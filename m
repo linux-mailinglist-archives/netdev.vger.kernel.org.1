@@ -1,198 +1,129 @@
-Return-Path: <netdev+bounces-40574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B29B7C7B29
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 03:31:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFEF37C7B3D
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 03:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13917281634
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 01:31:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB0341C20ABE
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 01:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397A781C;
-	Fri, 13 Oct 2023 01:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCC6A2A;
+	Fri, 13 Oct 2023 01:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iNtnfJT8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hp5VrZDt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3533B80A
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 01:30:55 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B205E3
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 18:30:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697160652;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GfT/FMpmZ/HEkzk47zbmE1dRPG8D6i4lQxrROMeYVjI=;
-	b=iNtnfJT8sbPF1V06ZNXEMNkznyEOsh1yLUhB+CrZAxyLNzDH/JETBik0eWs2dySBGSXEQl
-	Eomc+X/s/z/5AD9rWDcPRs12x2paIK6ld85Q7TG7PmhMtt9+TQDN//BEaCArVUPdrtFn7u
-	Gv7a+8Da8dx26YgEJKgB/gWOHby2xdI=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-55wkyuSdOCujEXx5MhklwA-1; Thu, 12 Oct 2023 21:30:50 -0400
-X-MC-Unique: 55wkyuSdOCujEXx5MhklwA-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2c5098fe88bso202931fa.0
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 18:30:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697160649; x=1697765449;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GfT/FMpmZ/HEkzk47zbmE1dRPG8D6i4lQxrROMeYVjI=;
-        b=oFrQV6G7m4Fec5gELzfAZFIjzmiwyQOMQ2xraDLr0BRkxUsu7N9r1D3+eKI5flCLRC
-         OFh/WXd7ri6PlQb0gIdPUbt7m0KMsaxwoiObhf0zhcVCljVvHgKLKl1enw7oZSVbEqv9
-         QpiMbR2P/9NFwMoH9peNx0aaWCprEMRLv9hbM9gYuyuqGUBVEwznNUQgcRn8LtxMIR77
-         FG9rNRbI3gS+HxrTWNJ/sJHR331VoR+uNsVMR7LcuuaKU/3E8W09eJ6TTMB1pE5jh+nH
-         fdv9tuNR/kTgwFaooZ72aAEygBq7OP6AdqzK1YNOpGd0CNCVUZeW+QmtCZPjAVHCvRwQ
-         q+Lg==
-X-Gm-Message-State: AOJu0YwkiYjzsFDov6jvgkZiDR6usSBpV/WwkHAYzdOQEbYqGQGCIO+C
-	pGzlVZp5GbwrMZM1pgSbMBSp8dYdX5Wdrw/7+N6n4cSl55YJzFYdKLproUb9cwL4F0b5s7oOtzO
-	8WSAGYx9cNQ/fCcPUEy23He/lloNi4jER
-X-Received: by 2002:a19:e048:0:b0:507:973f:a7dd with SMTP id g8-20020a19e048000000b00507973fa7ddmr1345596lfj.26.1697160649474;
-        Thu, 12 Oct 2023 18:30:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGil6WIwuVox0loXAF6qXa0cJJPEIiUE7ED3rA6zAvOlqnfy4LWVwLY2ZFTSaKEhUbH1DK71bWwUO/YboOjYVA=
-X-Received: by 2002:a19:e048:0:b0:507:973f:a7dd with SMTP id
- g8-20020a19e048000000b00507973fa7ddmr1345589lfj.26.1697160649165; Thu, 12 Oct
- 2023 18:30:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5293381D;
+	Fri, 13 Oct 2023 01:38:53 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0345FBB;
+	Thu, 12 Oct 2023 18:38:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697161132; x=1728697132;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=PVBal4Ud504RnPl1p/A+A7FV7TwvMJzp6ahO+CuDunM=;
+  b=Hp5VrZDtB2Cozp7ahJb+Sp1OzHnuQcoYy4HiKFPhVwRty6Hj9sPqTaYp
+   dKjSYuJQrXUKysq+9PANgvqNv2nBTOPD2h9uFQuodpdf2ZXi5fiiRV54Q
+   8okQVAsQ+7dgCa0H+itfznPif44HylcJIE8UfX4AD+mkYtGFHBnE6Mtzv
+   cAy5S3rnVFpT0xqaJ69UCRF8omk9VNlTdncfGQOPtJb1kGDe/oCYE+0dg
+   ZPsd2zk2WIdPlnyNcNo4Yc87nAFpnAA/Pi3svyOvsVy1aUOcR6Uz36WBb
+   tcUBdVsJ8SlmBXVDB1UGob8QbYWdCq/Zgf28bEJE3t/8uNpgE7jsUoViO
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="364446500"
+X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
+   d="scan'208";a="364446500"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 18:38:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="783946831"
+X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
+   d="scan'208";a="783946831"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by orsmga008.jf.intel.com with ESMTP; 12 Oct 2023 18:38:44 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qr78Q-0004Br-1m;
+	Fri, 13 Oct 2023 01:38:39 +0000
+Date: Fri, 13 Oct 2023 09:37:58 +0800
+From: kernel test robot <lkp@intel.com>
+To: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Michael Walle <michael@walle.cc>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Kory Maincent <kory.maincent@bootlin.com>
+Subject: Re: [PATCH net-next v5 13/16] net: Change the API of PHY default
+ timestamp to MAC
+Message-ID: <202310130914.kppQjKFp-lkp@intel.com>
+References: <20231009155138.86458-14-kory.maincent@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231011140126.800508-1-willemdebruijn.kernel@gmail.com>
- <CACGkMEuq3srKZWYsVQutfHOuJAyHDz4xCJWG3o6hs+W_HhZ2jQ@mail.gmail.com> <CAF=yD-Lat+ooErKN6GxOX6Q2oOHBvjCfty5w=N6C+076zSZ6zw@mail.gmail.com>
-In-Reply-To: <CAF=yD-Lat+ooErKN6GxOX6Q2oOHBvjCfty5w=N6C+076zSZ6zw@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 13 Oct 2023 09:30:37 +0800
-Message-ID: <CACGkMEtTqJ9NWTE=V9QUh57b59Y7VzNU-4E2wjUpROpWy5nanw@mail.gmail.com>
-Subject: Re: [PATCH net] net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, andrew@daynix.com, 
-	Willem de Bruijn <willemb@google.com>, syzbot+01cdbc31e9c0ae9b33ac@syzkaller.appspotmail.com, 
-	syzbot+c99d835ff081ca30f986@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231009155138.86458-14-kory.maincent@bootlin.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 8:29=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> On Thu, Oct 12, 2023 at 4:00=E2=80=AFAM Jason Wang <jasowang@redhat.com> =
-wrote:
-> >
-> > On Wed, Oct 11, 2023 at 10:01=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > From: Willem de Bruijn <willemb@google.com>
-> > >
-> > > Syzbot reported two new paths to hit an internal WARNING using the
-> > > new virtio gso type VIRTIO_NET_HDR_GSO_UDP_L4.
-> > >
-> > >     RIP: 0010:skb_checksum_help+0x4a2/0x600 net/core/dev.c:3260
-> > >     skb len=3D64521 gso_size=3D344
-> > > and
-> > >
-> > >     RIP: 0010:skb_warn_bad_offload+0x118/0x240 net/core/dev.c:3262
-> > >
-> > > Older virtio types have historically had loose restrictions, leading
-> > > to many entirely impractical fuzzer generated packets causing
-> > > problems deep in the kernel stack. Ideally, we would have had strict
-> > > validation for all types from the start.
-> > >
-> > > New virtio types can have tighter validation. Limit UDP GSO packets
-> > > inserted via virtio to the same limits imposed by the UDP_SEGMENT
-> > > socket interface:
-> > >
-> > > 1. must use checksum offload
-> > > 2. checksum offload matches UDP header
-> > > 3. no more segments than UDP_MAX_SEGMENTS
-> > > 4. UDP GSO does not take modifier flags, notably SKB_GSO_TCP_ECN
-> > >
-> > > Fixes: 860b7f27b8f7 ("linux/virtio_net.h: Support USO offload in vnet=
- header.")
-> > > Reported-by: syzbot+01cdbc31e9c0ae9b33ac@syzkaller.appspotmail.com
-> > > Closes: https://lore.kernel.org/netdev/0000000000005039270605eb0b7f@g=
-oogle.com/
-> > > Reported-by: syzbot+c99d835ff081ca30f986@syzkaller.appspotmail.com
-> > > Closes: https://lore.kernel.org/netdev/0000000000005426680605eb0b9f@g=
-oogle.com/
-> > > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > > ---
-> > >  include/linux/virtio_net.h | 19 ++++++++++++++++---
-> > >  1 file changed, 16 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-> > > index 7b4dd69555e49..27cc1d4643219 100644
-> > > --- a/include/linux/virtio_net.h
-> > > +++ b/include/linux/virtio_net.h
-> > > @@ -3,8 +3,8 @@
-> > >  #define _LINUX_VIRTIO_NET_H
-> > >
-> > >  #include <linux/if_vlan.h>
-> > > +#include <linux/udp.h>
-> > >  #include <uapi/linux/tcp.h>
-> > > -#include <uapi/linux/udp.h>
-> > >  #include <uapi/linux/virtio_net.h>
-> > >
-> > >  static inline bool virtio_net_hdr_match_proto(__be16 protocol, __u8 =
-gso_type)
-> > > @@ -151,9 +151,22 @@ static inline int virtio_net_hdr_to_skb(struct s=
-k_buff *skb,
-> > >                 unsigned int nh_off =3D p_off;
-> > >                 struct skb_shared_info *shinfo =3D skb_shinfo(skb);
-> > >
-> > > -               /* UFO may not include transport header in gso_size. =
-*/
-> > > -               if (gso_type & SKB_GSO_UDP)
-> > > +               switch (gso_type & ~SKB_GSO_TCP_ECN) {
-> > > +               case SKB_GSO_UDP:
-> > > +                       /* UFO may not include transport header in gs=
-o_size. */
-> > >                         nh_off -=3D thlen;
-> > > +                       break;
-> > > +               case SKB_GSO_UDP_L4:
-> > > +                       if (!(hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSU=
-M))
-> > > +                               return -EINVAL;
-> > > +                       if (skb->csum_offset !=3D offsetof(struct udp=
-hdr, check))
-> > > +                               return -EINVAL;
-> > > +                       if (skb->len - p_off > gso_size * UDP_MAX_SEG=
-MENTS)
-> > > +                               return -EINVAL;
-> >
-> > Acked-by: Jason Wang <jasowang@redhat.com>
-> >
-> > But a question comes into my mind: whether the udp max segments should
-> > be part of the virtio ABI or not.
->
-> Implicitly it is part of the ABI, but so are other sensible
-> limitations, such as MAX_SKB_FRAGS.
+Hi Köry,
 
-There's no easy to detect things like MAX_SKB_FRAGS or anything I miss
-here? For example, guests can send a packet with s/g more than
-MAX_SKB_FRAGS, TUN can arrange the skb allocation to make sure it
-doesn't exceed the limitation. This is not the case for
-UDP_MAX_SEGMENTS.
+kernel test robot noticed the following build warnings:
 
-Thanks
+[auto build test WARNING on net-next/main]
 
-> The limit was chosen high enough
-> to be unlikely to be a barrier to normal segmentation operations.
->
+url:    https://github.com/intel-lab-lkp/linux/commits/K-ry-Maincent/net-Convert-PHYs-hwtstamp-callback-to-use-kernel_hwtstamp_config/20231009-235451
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231009155138.86458-14-kory.maincent%40bootlin.com
+patch subject: [PATCH net-next v5 13/16] net: Change the API of PHY default timestamp to MAC
+config: i386-randconfig-063-20231012 (https://download.01.org/0day-ci/archive/20231013/202310130914.kppQjKFp-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231013/202310130914.kppQjKFp-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310130914.kppQjKFp-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/phy/phy_device.c:1419:12: sparse: sparse: symbol 'phy_timestamping_allowlist' was not declared. Should it be static?
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
