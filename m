@@ -1,98 +1,87 @@
-Return-Path: <netdev+bounces-40691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2EF47C857C
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 14:18:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4AF17C8585
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 14:19:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E944E1C20D62
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 12:18:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C13FCB2098F
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 12:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C80D14297;
-	Fri, 13 Oct 2023 12:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FcSKKAMr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13A914297;
+	Fri, 13 Oct 2023 12:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0F214A88;
-	Fri, 13 Oct 2023 12:18:27 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96DAECE;
-	Fri, 13 Oct 2023 05:18:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CNs9q6TO8zQOf3XyoHnGAzwbhrXwJMta9EMqOJxaZjs=; b=FcSKKAMrYCs7Sft+F3dTF65Q36
-	7qvaAA5PO4ttfd1tVymV+CHjS9ypOFv6v5ruZJrxemV7D4U4WEL6FEFWXHrjyW8nnJWWtSV8QQEOG
-	1y0CsUMDkFuYvKI9JLqATQsd2TV7hDBo9qvPGfHB8uVRe2DV6M02swNFUgC2CE40NrZQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qrH7S-0025TK-6a; Fri, 13 Oct 2023 14:18:18 +0200
-Date: Fri, 13 Oct 2023 14:18:18 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] net: phy: replace deprecated strncpy with ethtool_sprintf
-Message-ID: <73dd8e28-516a-4a85-a309-c411a82c958c@lunn.ch>
-References: <20231012-strncpy-drivers-net-phy-nxp-cbtx-c-v1-1-4510f20aa0e6@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A41914A81
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 12:19:44 +0000 (UTC)
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7FDE3A9;
+	Fri, 13 Oct 2023 05:19:42 -0700 (PDT)
+X-IronPort-AV: E=Sophos;i="6.03,222,1694703600"; 
+   d="scan'208";a="182975500"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie6.idc.renesas.com with ESMTP; 13 Oct 2023 21:19:41 +0900
+Received: from localhost.localdomain (unknown [10.166.15.32])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id B792C400264B;
+	Fri, 13 Oct 2023 21:19:41 +0900 (JST)
+From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To: s.shtylyov@omp.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH net-next v2 0/2] rswitch: Add PM ops
+Date: Fri, 13 Oct 2023 21:19:34 +0900
+Message-Id: <20231013121936.364678-1-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231012-strncpy-drivers-net-phy-nxp-cbtx-c-v1-1-4510f20aa0e6@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=1.1 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Justin
+This patch is based on the latest net-next.git / next branch.
+After applied this patch with the following patches, the system can
+enter/exit Suspend to Idle without any error:
+https://git.kernel.org/pub/scm/linux/kernel/git/phy/linux-phy.git/commit/?h=next&id=aa4c0bbf820ddb9dd8105a403aa12df57b9e5129
+https://git.kernel.org/pub/scm/linux/kernel/git/phy/linux-phy.git/commit/?h=next&id=1a5361189b7acac15b9b086b2300a11b7aa84c06
 
-The Subject line should say which PHY you are patching, nxp-cbtx. The
-patches which follow do have driver names. Please repost with the
-Subject corrected.
+Changes from v1:
+https://lore.kernel.org/all/20231012121618.267315-1-yoshihiro.shimoda.uh@renesas.com/
+ - Based on the latest net-next.git / main branch. So, the following patches
+   are already merged.
+   https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=510b18cf23b9bd8a982ef7f1fb19f3968a2bf787
+   https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=053f13f67be6d02781730c9ac71abde6e9140610
+ - Add a new patch to use unsigned int for array index in the patch 1/2.
+ - Use unsigned int for array index in the patch 2/2.
+ - Use DEFINE_SIMPLE_DEV_PM_OPS() and drop __maybe_unused tags in the patch 2/2.
+ - Use pm_sleep_ptr() in the patch 2/2.
 
-Please also take a look at
+Yoshihiro Shimoda (2):
+  rswitch: Use unsigned int for array index
+  rswitch: Add PM ops
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+ drivers/net/ethernet/renesas/rswitch.c | 51 ++++++++++++++++++++++++--
+ drivers/net/ethernet/renesas/rswitch.h |  2 +-
+ 2 files changed, 49 insertions(+), 4 deletions(-)
 
-which will tell you about networking subsystem specific processes it
-would be nice to follow.
+-- 
+2.25.1
 
-
-> strncpy() is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
-> 
-> ethtool_sprintf() is designed specifically for get_strings() usage.
-> Let's replace strncpy in favor of this dedicated helper function.
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
-
----
-pw-bot: cr
 
