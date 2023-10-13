@@ -1,181 +1,250 @@
-Return-Path: <netdev+bounces-40705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F9737C85BF
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 14:26:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F3CA7C85C7
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 14:27:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAB43282D90
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 12:26:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05428B20982
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 12:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8C314A91;
-	Fri, 13 Oct 2023 12:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EFYwKLMU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD4D14AA9;
+	Fri, 13 Oct 2023 12:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF641427E
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 12:26:52 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C800DA9;
-	Fri, 13 Oct 2023 05:26:50 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9b2cee55056so355381166b.3;
-        Fri, 13 Oct 2023 05:26:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697200009; x=1697804809; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NLZmmyB23MqsL0YjH6h472p8+DxkcdVuoOt1/sODOZc=;
-        b=EFYwKLMUfDAzV9glu4To+eYNscNFP7n9D8IUUymp1p5Cewtas0kktO9ELKOAGuRA6F
-         UFgCmhYDhqz2+7i9nc4/yzF7/GPeu6qSPBMdEWtec0c9Ki5sSD5aPjkpQ8Vrh/Dw3XGb
-         4nZ+nIG+Y08vCIAK/DHIx86+D0v8zZYLAKDbehVWmCZO+Yet7mNFmJBAST1e59HlTRsN
-         7zi0x/ZgLRQR0y06DKVUTfTuhOK/be6jOjlaVtcjBMlPWnlLAqzJzbquL/CJiRlNjFSb
-         NcKQRpM3dmojmd9HIUsSezQin8UYp77Q/J/XWlAarXTv7VHc1pyACkEGM62D+4oKf3oA
-         hAUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697200009; x=1697804809;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NLZmmyB23MqsL0YjH6h472p8+DxkcdVuoOt1/sODOZc=;
-        b=H73htvNZ0g7HKXRab1q9muG7k20vpcnumIuzOaXG/vm4WdGakMce5MtXaIPfGZFFk4
-         Py4jN8KZ1F3OGekfrCRcZ7b4NaHHvceT16KaTWx3Q2/koJXdZdZm149Cq1UWbUesqAxB
-         GsACIJXQjdanEVYQrrG2zg8KygWFGu4CQrDsuBsX4S8UbHPUseX9cOzluozdzD2liWSZ
-         IRloAuElDfIRGW/EMdg59rBvFl5kJsVMUGutcvHPAgGSEIj4cSvotjQ27jS7RqFivvzF
-         dEOz9aWic7Xs2fnJ0z0j8kllGtaCmgKzVKaVK0drQHKOpzwQMo1JYvwV9HM7DNDv0v4H
-         G06Q==
-X-Gm-Message-State: AOJu0Yx1r19FReET1maUfL9irJ6xT0A1ZW1KdtIuGfr8fdFpSijaLDtd
-	SZbikerieGIZY73YanWrtEk=
-X-Google-Smtp-Source: AGHT+IHLPuKBe8o7zFbZZBjsJAyNSnbAzqcspW1Zwm7xATl+IJe7o9ZwnUrVoA92KqYL4kfjcniG1A==
-X-Received: by 2002:a17:906:3188:b0:9ae:594d:d3fc with SMTP id 8-20020a170906318800b009ae594dd3fcmr21526526ejy.17.1697200008980;
-        Fri, 13 Oct 2023 05:26:48 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id k18-20020a1709065fd200b009adc7733f98sm12361031ejv.97.2023.10.13.05.26.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Oct 2023 05:26:48 -0700 (PDT)
-Date: Fri, 13 Oct 2023 15:26:46 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-	netdev@vger.kernel.org,
-	Alexander Stein <alexander.stein@ew.tq-group.com>
-Subject: Re: [PATCH net-next v2 3/3] net: phy: micrel: Fix forced link mode
- for KSZ886X switches
-Message-ID: <20231013122646.bjiy6soo3pdquk53@skbuf>
-References: <20231012065502.2928220-1-o.rempel@pengutronix.de>
- <20231012065502.2928220-1-o.rempel@pengutronix.de>
- <20231012065502.2928220-4-o.rempel@pengutronix.de>
- <20231012065502.2928220-4-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D1814280
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 12:27:36 +0000 (UTC)
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580EFBD;
+	Fri, 13 Oct 2023 05:27:33 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0Vu2UsWU_1697200049;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vu2UsWU_1697200049)
+          by smtp.aliyun-inc.com;
+          Fri, 13 Oct 2023 20:27:30 +0800
+Date: Fri, 13 Oct 2023 20:27:29 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Wenjia Zhang <wenjia@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+	jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net 1/5] net/smc: fix dangling sock under state
+ SMC_APPFINCLOSEWAIT
+Message-ID: <20231013122729.GU92403@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
+ <1697009600-22367-2-git-send-email-alibuda@linux.alibaba.com>
+ <e63b546f-b993-4e42-8269-e4d9afa5b845@linux.ibm.com>
+ <f8089b26-bb11-f82d-8070-222b1f8c1db1@linux.alibaba.com>
+ <745d3174-f497-4d6a-ba13-1074128ad99d@linux.ibm.com>
+ <20231013053214.GT92403@linux.alibaba.com>
+ <6666db42-a4de-425e-a96d-bfa899ab265e@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20231012065502.2928220-4-o.rempel@pengutronix.de>
- <20231012065502.2928220-4-o.rempel@pengutronix.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6666db42-a4de-425e-a96d-bfa899ab265e@linux.ibm.com>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Oleksij,
+On Fri, Oct 13, 2023 at 01:52:09PM +0200, Wenjia Zhang wrote:
+>
+>
+>On 13.10.23 07:32, Dust Li wrote:
+>> On Thu, Oct 12, 2023 at 01:51:54PM +0200, Wenjia Zhang wrote:
+>> > 
+>> > 
+>> > On 12.10.23 04:37, D. Wythe wrote:
+>> > > 
+>> > > 
+>> > > On 10/12/23 4:31 AM, Wenjia Zhang wrote:
+>> > > > 
+>> > > > 
+>> > > > On 11.10.23 09:33, D. Wythe wrote:
+>> > > > > From: "D. Wythe" <alibuda@linux.alibaba.com>
+>> > > > > 
+>> > > > > Considering scenario:
+>> > > > > 
+>> > > > >                  smc_cdc_rx_handler_rwwi
+>> > > > > __smc_release
+>> > > > >                  sock_set_flag
+>> > > > > smc_close_active()
+>> > > > > sock_set_flag
+>> > > > > 
+>> > > > > __set_bit(DEAD)            __set_bit(DONE)
+>> > > > > 
+>> > > > > Dues to __set_bit is not atomic, the DEAD or DONE might be lost.
+>> > > > > if the DEAD flag lost, the state SMC_CLOSED  will be never be reached
+>> > > > > in smc_close_passive_work:
+>> > > > > 
+>> > > > > if (sock_flag(sk, SOCK_DEAD) &&
+>> > > > >      smc_close_sent_any_close(conn)) {
+>> > > > >      sk->sk_state = SMC_CLOSED;
+>> > > > > } else {
+>> > > > >      /* just shutdown, but not yet closed locally */
+>> > > > >      sk->sk_state = SMC_APPFINCLOSEWAIT;
+>> > > > > }
+>> > > > > 
+>> > > > > Replace sock_set_flags or __set_bit to set_bit will fix this problem.
+>> > > > > Since set_bit is atomic.
+>> > > > > 
+>> > > > I didn't really understand the scenario. What is
+>> > > > smc_cdc_rx_handler_rwwi()? What does it do? Don't it get the lock
+>> > > > during the runtime?
+>> > > > 
+>> > > 
+>> > > Hi Wenjia,
+>> > > 
+>> > > Sorry for that, It is not smc_cdc_rx_handler_rwwi() but
+>> > > smc_cdc_rx_handler();
+>> > > 
+>> > > Following is a more specific description of the issues
+>> > > 
+>> > > 
+>> > > lock_sock()
+>> > > __smc_release
+>> > > 
+>> > > smc_cdc_rx_handler()
+>> > > smc_cdc_msg_recv()
+>> > > bh_lock_sock()
+>> > > smc_cdc_msg_recv_action()
+>> > > sock_set_flag(DONE) sock_set_flag(DEAD)
+>> > > __set_bit __set_bit
+>> > > bh_unlock_sock()
+>> > > release_sock()
+>> > > 
+>> > > 
+>> > > 
+>> > > Note : |bh_lock_sock|and |lock_sock|are not mutually exclusive. They are
+>> > > actually used for different purposes and contexts.
+>> > > 
+>> > > 
+>> > ok, that's true that |bh_lock_sock|and |lock_sock|are not really mutually
+>> > exclusive. However, since bh_lock_sock() is used, this scenario you described
+>> > above should not happen, because that gets the sk_lock.slock. Following this
+>> > scenarios, IMO, only the following situation can happen.
+>> > 
+>> > lock_sock()
+>> > __smc_release
+>> > 
+>> > smc_cdc_rx_handler()
+>> > smc_cdc_msg_recv()
+>> > bh_lock_sock()
+>> > smc_cdc_msg_recv_action()
+>> > sock_set_flag(DONE)
+>> > bh_unlock_sock()
+>> > sock_set_flag(DEAD)
+>> > release_sock()
+>> 
+>> Hi wenjia,
+>> 
+>> I think I know what D. Wythe means now, and I think he is right on this.
+>> 
+>> IIUC, in process context, lock_sock() won't respect bh_lock_sock() if it
+>> acquires the lock before bh_lock_sock(). This is how the sock lock works.
+>> 
+>>      PROCESS CONTEXT                                 INTERRUPT CONTEXT
+>> ------------------------------------------------------------------------
+>> lock_sock()
+>>      spin_lock_bh(&sk->sk_lock.slock);
+>>      ...
+>>      sk->sk_lock.owned = 1;
+>>      // here the spinlock is released
+>>      spin_unlock_bh(&sk->sk_lock.slock);
+>> __smc_release()
+>>                                                     bh_lock_sock(&smc->sk);
+>>                                                     smc_cdc_msg_recv_action(smc, cdc);
+>>                                                         sock_set_flag(&smc->sk, SOCK_DONE);
+>>                                                     bh_unlock_sock(&smc->sk);
+>> 
+>>      sock_set_flag(DEAD)  <-- Can be before or after sock_set_flag(DONE)
+>> release_sock()
+>> 
+>> The bh_lock_sock() only spins on sk->sk_lock.slock, which is already released
+>> after lock_sock() return. Therefor, there is actually no lock between
+>> the code after lock_sock() and before release_sock() with bh_lock_sock()...bh_unlock_sock().
+>> Thus, sock_set_flag(DEAD) won't respect bh_lock_sock() at all, and might be
+>> before or after sock_set_flag(DONE).
+>> 
+>> 
+>> Actually, in TCP, the interrupt context will check sock_owned_by_user().
+>> If it returns true, the softirq just defer the process to backlog, and process
+>> that in release_sock(). Which avoid the race between softirq and process
+>> when visiting the 'struct sock'.
+>> 
+>> tcp_v4_rcv()
+>>           bh_lock_sock_nested(sk);
+>>           tcp_segs_in(tcp_sk(sk), skb);
+>>           ret = 0;
+>>           if (!sock_owned_by_user(sk)) {
+>>                   ret = tcp_v4_do_rcv(sk, skb);
+>>           } else {
+>>                   if (tcp_add_backlog(sk, skb, &drop_reason))
+>>                           goto discard_and_relse;
+>>           }
+>>           bh_unlock_sock(sk);
+>> 
+>> 
+>> But in SMC we don't have a backlog, that means fields in 'struct sock'
+>> might all have race, and this sock_set_flag() is just one of the cases.
+>> 
+>> Best regards,
+>> Dust
+>> 
+>I agree on your description above.
+>Sure, the following case 1) can also happen
+>
+>case 1)
+>-------
+> lock_sock()
+> __smc_release
+>
+> sock_set_flag(DEAD)
+> bh_lock_sock()
+> smc_cdc_msg_recv_action()
+> sock_set_flag(DONE)
+> bh_unlock_sock()
+> release_sock()
+>
+>case 2)
+>-------
+> lock_sock()
+> __smc_release
+>
+> bh_lock_sock()
+> smc_cdc_msg_recv_action()
+> sock_set_flag(DONE) sock_set_flag(DEAD)
+> __set_bit __set_bit
+> bh_unlock_sock()
+> release_sock()
+>
+>My point here is that case2) can never happen. i.e that sock_set_flag(DONE)
+>and sock_set_flag(DEAD) can not happen concurrently. Thus, how could
+>the atomic set help make sure that the Dead flag would not be overwritten
+>with DONE?
 
-On Thu, Oct 12, 2023 at 08:55:02AM +0200, Oleksij Rempel wrote:
-> Address a link speed detection issue in KSZ886X PHY driver when in
-> forced link mode. Previously, link partners like "ASIX AX88772B"
-> with KSZ8873 could fall back to 10Mbit instead of configured 100Mbit.
-> 
-> The issue arises as KSZ886X PHY continues sending Fast Link Pulses (FLPs)
-> even with autonegotiation off, misleading link partners in autoneg mode,
-> leading to incorrect link speed detection.
-> 
-> Now, when autonegotiation is disabled, the driver sets the link state
-> forcefully using KSZ886X_CTRL_FORCE_LINK bit. This action, beyond just
-> disabling autonegotiation, makes the PHY state more reliably detected by
-> link partners using parallel detection, thus fixing the link speed
-> misconfiguration.
-> 
-> With autonegotiation enabled, link state is not forced, allowing proper
-> autonegotiation process participation.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
+I agree with you on this. I also don't see using atomic can
+solve the problem of overwriting the DEAD flag with DONE.
 
-Have you considered denying "ethtool -s swpN autoneg off" in "net.git"
-(considering that it doesn't work properly), and re-enabling it in
-"net-next.git"?
+I think we need some mechanisms to ensure that sk_flags and other
+struct sock related fields are not modified simultaneously.
 
->  drivers/net/phy/micrel.c | 32 +++++++++++++++++++++++++++++---
->  1 file changed, 29 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> index 927d3d54658e..599ebf54fafe 100644
-> --- a/drivers/net/phy/micrel.c
-> +++ b/drivers/net/phy/micrel.c
-> @@ -1729,9 +1729,35 @@ static int ksz886x_config_aneg(struct phy_device *phydev)
->  {
->  	int ret;
->  
-> -	ret = genphy_config_aneg(phydev);
-> -	if (ret)
-> -		return ret;
-> +	if (phydev->autoneg != AUTONEG_ENABLE) {
-> +		ret = genphy_setup_forced(phydev);
-> +		if (ret)
-> +			return ret;
+Best regards,
+Dust
 
-__genphy_config_aneg() will call genphy_setup_forced() as appropriate,
-and additionally it will resync the master-slave resolution to a forced
-value, if needed. So I think it's better to call genphy_config_aneg()
-from the common code path, and just use the "if (phydev->autoneg)" test
-to keep the vendor-specific register in sync with the autoneg setting.
-
-> +
-> +		/* When autonegotation is disabled, we need to manually force
-> +		 * the link state. If we don't do this, the PHY will keep
-> +		 * sending Fast Link Pulses (FLPs) which are part of the
-> +		 * autonegotiation process. This is not desired when
-> +		 * autonegotiation is off.
-> +		 */
-> +		ret = phy_set_bits(phydev, MII_KSZPHY_CTRL,
-> +				   KSZ886X_CTRL_FORCE_LINK);
-> +		if (ret)
-> +			return ret;
-> +	} else {
-> +		/* If we had previously forced the link state, we need to
-> +		 * clear KSZ886X_CTRL_FORCE_LINK bit now. Otherwise, the PHY
-> +		 * will not perform autonegotiation.
-> +		 */
-> +		ret = phy_clear_bits(phydev, MII_KSZPHY_CTRL,
-> +				     KSZ886X_CTRL_FORCE_LINK);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret = genphy_config_aneg(phydev);
-> +		if (ret)
-> +			return ret;
-> +	}
->  
->  	/* The MDI-X configuration is automatically changed by the PHY after
->  	 * switching from autoneg off to on. So, take MDI-X configuration under
-> -- 
-> 2.39.2
-> 
 
 
