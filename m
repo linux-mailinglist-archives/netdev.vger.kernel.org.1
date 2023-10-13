@@ -1,160 +1,141 @@
-Return-Path: <netdev+bounces-40730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D27A7C8858
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 17:11:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87C5F7C8864
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 17:15:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DE681C210F8
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 15:11:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F5DF2812FE
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 15:15:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D819518E20;
-	Fri, 13 Oct 2023 15:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08A719BDC;
+	Fri, 13 Oct 2023 15:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="1g6efEz1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LvYttgJ0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B219119BDC
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 15:11:22 +0000 (UTC)
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB46DBD
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 08:11:17 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-6b36e1fcea0so513862b3a.1
-        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 08:11:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E299A17740;
+	Fri, 13 Oct 2023 15:15:18 +0000 (UTC)
+Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 616FBE6;
+	Fri, 13 Oct 2023 08:15:16 -0700 (PDT)
+Received: by mail-oo1-xc30.google.com with SMTP id 006d021491bc7-57c0775d4fcso331780eaf.0;
+        Fri, 13 Oct 2023 08:15:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1697209877; x=1697814677; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Et4aQ4p14to5tbANw/8rnLA31aavpP5b9TAwFBI5Rk4=;
-        b=1g6efEz1hjku4NBTuuKyNk3OgamORJsEE9/75kAGESPL/8qRteUO4UoZRPq2dbiJwI
-         eWVRDA8rq791hV2oyX/wdfkltgPQNV9fsMkco+6lU+2HN6ZgAXlmMww/+NpcNZheUtFk
-         eWmNbXY00dSq5B4XYaliQQpws3iOEtNiFTd9UcIOtNJ6ymey0kGdSW8yp2tswdHhfqTx
-         ZgWQ8/409dOhltkcgDV/5fR5XSPMoxjT3gP8CtII7ZpLZibY9KCVVXcWvPOyHHTp23Mr
-         J22bebsTvnYZ6pUoOarM5cb1A735wnGFtoi6cmwOmeOHpIHh6p2uPK8HWMHlcTZ6dKAN
-         0DEA==
+        d=gmail.com; s=20230601; t=1697210115; x=1697814915; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YGA66Kd3z5BNtZqpc0uixzcNt7bSPROD/81oqwbxDCI=;
+        b=LvYttgJ0W1tf5StW/U65IHNWNSLP89yz0CtgfwFoy5gpGTtw+bypxXNY0LoxWCXO+z
+         GYGYgnbgCwKcthdCgvX+q+pbMDkGPVS1uNtMZ6xVoFz5jA1uHEaIXI6aUQ5zpnXCjZi/
+         exT2dnRm6RBafCtBJqek7wOowRM0nT9sYXIwYPvloe3W20hRyK8q3rH6wcgnoXP9faXb
+         clUFSotL+neFaaF0icsbZ+ZkA53MRp0nJQJUxFxPlNYwtfpbrvEueHui4fcWyJqdffDX
+         t/CQOZPoyUhyhc0MyeUyB2M2EsdSKG6BE5g21delM/bueJe5kyb3EBRAXSd+KBJBDi1U
+         JTrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697209877; x=1697814677;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Et4aQ4p14to5tbANw/8rnLA31aavpP5b9TAwFBI5Rk4=;
-        b=QfANB81YG1/gG1cf+BaFiS+kogAPSGXJk4dTIothBQ93SvsGB9ag78p14OZjHJC5h3
-         upgcuYFnXIa45UCDlHfrT6Gh+ImtvdHY6jhV5gwwm3mnPULKlG7kACDZWn1cqtP5BjUN
-         Gs27hllIy3U8fjK65d0vPfH8Rgb5Ph/lAO6LdJdi1a7fDDiUrsF6ve8ilcNc3Ih3XnYc
-         ukkxMoQu68MNlUAxy25Iy4CSgkiPvMu5SXpzIhEqiUTNNTBKeNbMexKBNWE/CyAE+NmF
-         VQ2PdVkXf+9/ykhEcN89K2wUleCxDI59yJe56cwHTKOmk+goKyGzloDV3lg0ghgGRsg1
-         aqpw==
-X-Gm-Message-State: AOJu0Yx8IUSx6j4hNFAoWijdLUkgIWYFneWN8acle9q7H/vmal4LDP6/
-	lTsMFXVHa13mq8UMTPgSnovLIJaXgMeEzUmDmWt3GA==
-X-Google-Smtp-Source: AGHT+IFN7XyFUEsQydS2g5aTMvIPjnewPo6Jo54CHn8bGaTdItcYrl7KG5qx3SYWZGu6kW3gWqdp0Q==
-X-Received: by 2002:a05:6a00:1389:b0:6b2:baa0:6d4c with SMTP id t9-20020a056a00138900b006b2baa06d4cmr2224729pfg.33.1697209876878;
-        Fri, 13 Oct 2023 08:11:16 -0700 (PDT)
-Received: from rogue-one.tail33bf8.ts.net ([2804:14d:5c5e:44fb:aa18:90b1:177c:3fd3])
-        by smtp.gmail.com with ESMTPSA id w18-20020aa78592000000b0064f76992905sm13716881pfn.202.2023.10.13.08.11.13
+        d=1e100.net; s=20230601; t=1697210115; x=1697814915;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YGA66Kd3z5BNtZqpc0uixzcNt7bSPROD/81oqwbxDCI=;
+        b=A8DF0Jo525ufrpimhGThvl86jlWppcgJ9KMKasFEArQV2IKWN58Pd275nqggLNHUfM
+         ywvddhpZhhEQgCIhhhYN5gt2OpFjhZaDqaRLL/rT/NA4/IzYQJLQxjNpLRSy1W4CAxs+
+         bsCitOdiPosowr99eyrka+lxusgo368J1OlVzCEG+UteADsVta3kvOdkhUAmaXwshoHN
+         kWPhdXQTiO9PmIJeteyeaRZ0yjntVAYEM7hITIyTywaUi7I9ivpKYYtO85rX2W8Awer3
+         cqeZvEnr15X8TyzuqqzJvzXDkL5IXiWz7QbnEqjKCc5DqqplkBeLgC3D8FCPfxhqaepK
+         qC0Q==
+X-Gm-Message-State: AOJu0YwHvbIvR/xMcNn3jgZgy3X4irppYIngJyJPTBreA/xar7Hgr8/1
+	C7vVwbg4Ybxq+74KaUyobds=
+X-Google-Smtp-Source: AGHT+IETzObRaTI1o4WmubSs9gdjYHinFlnPi8BVZGBLPRGzcOstmgCvsl1lBGNS2p2KVv5Xv0UVwA==
+X-Received: by 2002:a05:6359:219:b0:14a:cca4:5601 with SMTP id ej25-20020a056359021900b0014acca45601mr21930790rwb.3.1697210115333;
+        Fri, 13 Oct 2023 08:15:15 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id y16-20020aa793d0000000b0068fdb59e9d6sm290816pff.78.2023.10.13.08.15.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Oct 2023 08:11:16 -0700 (PDT)
-From: Pedro Tammela <pctammela@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Christian Theune <ct@flyingcircus.io>,
-	Budimir Markovic <markovicbudimir@gmail.com>
-Subject: [PATCH net 2/2] net/sched: sch_hfsc: upgrade 'rt' to 'sc' when it becomes a inner curve
-Date: Fri, 13 Oct 2023 12:10:57 -0300
-Message-Id: <20231013151057.2611860-3-pctammela@mojatatu.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231013151057.2611860-1-pctammela@mojatatu.com>
-References: <20231013151057.2611860-1-pctammela@mojatatu.com>
+        Fri, 13 Oct 2023 08:15:15 -0700 (PDT)
+Date: Sat, 14 Oct 2023 00:15:14 +0900 (JST)
+Message-Id: <20231014.001514.876461873397203589.fujita.tomonori@gmail.com>
+To: miguel.ojeda.sandonis@gmail.com, andrew@lunn.ch
+Cc: fujita.tomonori@gmail.com, gregkh@linuxfoundation.org,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+ wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CANiq72mgeVrcGcHXo1xjaRL1ix3vUsGbtk179kpyJ6GAe9MMVg@mail.gmail.com>
+References: <CANiq72=GAiR-Mps_ZuLtxmma28dJd2xKdXWh6fu1icLBmmaYAw@mail.gmail.com>
+	<20231012.081826.1846197263913130802.fujita.tomonori@gmail.com>
+	<CANiq72mgeVrcGcHXo1xjaRL1ix3vUsGbtk179kpyJ6GAe9MMVg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Christian Theune says:
-   I upgraded from 6.1.38 to 6.1.55 this morning and it broke my traffic shaping script,
-   leaving me with a non-functional uplink on a remote router.
-
-A 'rt' curve cannot be used as a inner curve (parent class), but we were
-allowing such configurations since the qdisc was introduced. Such
-configurations would trigger a UAF as Budimir explains:
-   The parent will have vttree_insert() called on it in init_vf(),
-   but will not have vttree_remove() called on it in update_vf()
-   because it does not have the HFSC_FSC flag set.
-
-The qdisc always assumes that inner classes have the HFSC_FSC flag set.
-This is by design as it doesn't make sense 'qdisc wise' for an 'rt'
-curve to be an inner curve.
-
-Budimir's original patch disallows users to add classes with a 'rt'
-parent, but this is too strict as it breaks users that have been using
-'rt' as a inner class. Another approach, taken by this patch, is to
-upgrade the inner 'rt' into a 'sc', warning the user in the process.
-It avoids the UAF reported by Budimir while also being more permissive
-to bad scripts/users/code using 'rt' as a inner class.
-
-Users checking the `tc class ls [...]` or `tc class get [...]` dumps would
-observe the curve change and are potentially breaking with this change.
-
-Cc: Christian Theune <ct@flyingcircus.io>
-Cc: Budimir Markovic <markovicbudimir@gmail.com>
-Fixes: 0c9570eeed69 ("net/sched: sch_hfsc: upgrade 'rt' to 'sc' when it becomes a inner curve")
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
----
- net/sched/sch_hfsc.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
-index 98805303218d..880c5f16b29c 100644
---- a/net/sched/sch_hfsc.c
-+++ b/net/sched/sch_hfsc.c
-@@ -902,6 +902,14 @@ hfsc_change_usc(struct hfsc_class *cl, struct tc_service_curve *usc,
- 	cl->cl_flags |= HFSC_USC;
- }
- 
-+static void
-+hfsc_upgrade_rt(struct hfsc_class *cl)
-+{
-+	cl->cl_fsc = cl->cl_rsc;
-+	rtsc_init(&cl->cl_virtual, &cl->cl_fsc, cl->cl_vt, cl->cl_total);
-+	cl->cl_flags |= HFSC_FSC;
-+}
-+
- static const struct nla_policy hfsc_policy[TCA_HFSC_MAX + 1] = {
- 	[TCA_HFSC_RSC]	= { .len = sizeof(struct tc_service_curve) },
- 	[TCA_HFSC_FSC]	= { .len = sizeof(struct tc_service_curve) },
-@@ -1061,6 +1069,12 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
- 	cl->cf_tree = RB_ROOT;
- 
- 	sch_tree_lock(sch);
-+	/* Check if the inner class is a misconfigured 'rt' */
-+	if (!(parent->cl_flags & HFSC_FSC) && parent != &q->root) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Forced curve change on parent 'rt' to 'sc'");
-+		hfsc_upgrade_rt(parent);
-+	}
- 	qdisc_class_hash_insert(&q->clhash, &cl->cl_common);
- 	list_add_tail(&cl->siblings, &parent->children);
- 	if (parent->level == 0)
--- 
-2.39.2
-
+T24gRnJpLCAxMyBPY3QgMjAyMyAxMzo1OToxMiArMDIwMA0KTWlndWVsIE9qZWRhIDxtaWd1ZWwu
+b2plZGEuc2FuZG9uaXNAZ21haWwuY29tPiB3cm90ZToNCg0KPiBPbiBUaHUsIE9jdCAxMiwgMjAy
+MyBhdCAxOjE44oCvQU0gRlVKSVRBIFRvbW9ub3JpDQo+IDxmdWppdGEudG9tb25vcmlAZ21haWwu
+Y29tPiB3cm90ZToNCj4+DQo+PiBJSVJDLCBBbmRyZXcgcHJlZmVycyB0byBhdm9pZCBjcmVhdGlu
+ZyBhIHRlbXBvcmFyeSBydXN0IHZhcmlhbnQgKEdyZWcNCj4+IGRvZXMgdG9vLCBJIHVuZGVyc3Rh
+bmQpLiBJIGd1ZXNzIHRoYXQgb25seSBzb2x1c2lvbiB0aGF0IGJvdGggUnVzdCBhbmQNCj4+IEMg
+ZGV2cyB3b3VsZCBiZSBoYXBweSB3aXRoIGlzIGdlbmVyYXRpbmcgc2FmZSBSdXN0IGNvZGUgZnJv
+bSBDLiBUaGUNCj4gDQo+IEFzIGZhciBhcyBJIHVuZGVyc3RhbmQsIHRoZSB3b3JrYXJvdW5kIEkg
+anVzdCBzdWdnZXN0ZWQgaW4gdGhlDQo+IHByZXZpb3VzIHJlcGx5IHdhcyBub3QgZGlzY3Vzc2Vk
+IHNvIGZhci4gSSBhbSBub3Qgc3VyZSB3aGljaCBvZiB0aGUNCj4gYWx0ZXJuYXRpdmVzIHlvdSBt
+ZWFuIGJ5IHRoZSAidGVtcG9yYXJ5IHJ1c3QgdmFyaWFudCIsIHNvIEkgbWF5IGJlDQo+IG1pc3Vu
+ZGVyc3RhbmRpbmcgeW91ciBtZXNzYWdlLg0KDQpJIG1lYW50IHRoYXQgZGVmaW5pbmcgUnVzdCdz
+IGVudW0gY29ycmVzcG9uZGluZyB0byB0aGUga2VybmVsJ3MgZW51bQ0KcGh5X3N0YXRlIGxpa2Uu
+DQoNCitwdWIgZW51bSBEZXZpY2VTdGF0ZSB7DQorICAgIC8vLyBQSFkgZGV2aWNlIGFuZCBkcml2
+ZXIgYXJlIG5vdCByZWFkeSBmb3IgYW55dGhpbmcuDQorICAgIERvd24sDQorICAgIC8vLyBQSFkg
+aXMgcmVhZHkgdG8gc2VuZCBhbmQgcmVjZWl2ZSBwYWNrZXRzLg0KKyAgICBSZWFkeSwNCisgICAg
+Ly8vIFBIWSBpcyB1cCwgYnV0IG5vIHBvbGxpbmcgb3IgaW50ZXJydXB0cyBhcmUgZG9uZS4NCisg
+ICAgSGFsdGVkLA0KKyAgICAvLy8gUEhZIGlzIHVwLCBidXQgaXMgaW4gYW4gZXJyb3Igc3RhdGUu
+DQorICAgIEVycm9yLA0KKyAgICAvLy8gUEhZIGFuZCBhdHRhY2hlZCBkZXZpY2UgYXJlIHJlYWR5
+IHRvIGRvIHdvcmsuDQorICAgIFVwLA0KKyAgICAvLy8gUEhZIGlzIGN1cnJlbnRseSBydW5uaW5n
+Lg0KKyAgICBSdW5uaW5nLA0KKyAgICAvLy8gUEhZIGlzIHVwLCBidXQgbm90IGN1cnJlbnRseSBw
+bHVnZ2VkIGluLg0KKyAgICBOb0xpbmssDQorICAgIC8vLyBQSFkgaXMgcGVyZm9ybWluZyBhIGNh
+YmxlIHRlc3QuDQorICAgIENhYmxlVGVzdCwNCit9DQoNClRoZW4gd3JpdGUgbWF0Y2ggY29kZSBi
+eSBoYW5kLg0KDQpJJ2xsIGxlYXZlIGl0IHRvIFBIWUxJQiBtYWludGFpbmVycy4gVGhlIHN1YnN5
+c3RlbSBtYWludGFpbmVycyBkZWNpZGUNCndoZXRoZXIgdGhleSBtZXJnZXMgdGhlIGNvZGUuDQoN
+CkFuZHJldywgd2hhdCBkbyB5b3UgdGhpbmsgYWJvdXQgdGhlIHN0YXR1cyBvZiB0aGUgYWJzdHJh
+Y3Rpb24gcGF0Y2hzZXQ/DQoNCg0KPiBIYXZpbmcgc2FpZCB0aGF0LCB0byB0cnkgdG8gdW5ibG9j
+ayB0aGluZ3MsIEkgc3BlbnQgc29tZSB0aW1lDQo+IHByb3RvdHlwaW5nIHRoZSB3b3JrYXJvdW5k
+IEkgc3VnZ2VzdGVkLCBzZWUgYmVsb3cgWzFdLiBUaGF0IGNhdGNoZXMNCj4gdGhlICJuZXcgQyB2
+YXJpYW50IGFkZGVkIiBkZXN5bmMgYmV0d2VlbiBSdXN0IGFuZCBDLg0KDQpUaGFua3MsIGJ1dCB3
+ZSBoYXZlIHRvIG1haW50YWluIHRoZSBmb2xsb3dpbmcgY29kZSBieSBoYW5kPyBpZiBzbywNCnRo
+ZSBtYWludGFuYWNlIG5pZ2h0bWFyZSBwcm9ibGVtIGlzbid0IHNvbHZlZD8NCg0KDQpidHcsIEkg
+Y2FuJ3QgYXBwbHkgdGhlIHBhdGNoLCBsaW5lIHdyYXBwaW5nPw0KDQo+IG5ldyBmaWxlIG1vZGUg
+MTAwNjQ0DQo+IGluZGV4IDAwMDAwMDAwMDAwMC4uN2M2MmJhYjEyZWExDQo+IC0tLSAvZGV2L251
+bGwNCj4gKysrIGIvcnVzdC9iaW5kaW5ncy9iaW5kaW5nc19lbnVtX2NoZWNrLnJzDQo+IEBAIC0w
+LDAgKzEsMzggQEANCj4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wDQo+ICsN
+Cj4gKy8vISBCaW5kaW5ncyBleGhhdXN0aXZlbmVzcyBlbnVtIGNoZWNrLg0KPiArLy8hDQo+ICsv
+LyEgRXZlbnR1YWxseSwgdGhpcyBzaG91bGQgYmUgcmVwbGFjZWQgYnkgYSBzYWZlIHZlcnNpb24g
+b2YNCj4gYC0tcnVzdGlmaWVkLWVudW1gLCBzZWUNCj4gKy8vISBodHRwczovL2dpdGh1Yi5jb20v
+cnVzdC1sYW5nL3J1c3QtYmluZGdlbi9pc3N1ZXMvMjY0Ni4NCj4gKw0KPiArIyFbbm9fc3RkXQ0K
+PiArIyFbYWxsb3coDQo+ICsgICAgY2xpcHB5OjphbGwsDQo+ICsgICAgZGVhZF9jb2RlLA0KPiAr
+ICAgIG1pc3NpbmdfZG9jcywNCj4gKyAgICBub25fY2FtZWxfY2FzZV90eXBlcywNCj4gKyAgICBu
+b25fdXBwZXJfY2FzZV9nbG9iYWxzLA0KPiArICAgIG5vbl9zbmFrZV9jYXNlLA0KPiArICAgIGlt
+cHJvcGVyX2N0eXBlcywNCj4gKyAgICB1bnJlYWNoYWJsZV9wdWIsDQo+ICsgICAgdW5zYWZlX29w
+X2luX3Vuc2FmZV9mbg0KPiArKV0NCj4gKw0KPiAraW5jbHVkZSEoY29uY2F0ISgNCj4gKyAgICBl
+bnYhKCJPQkpUUkVFIiksDQo+ICsgICAgIi9ydXN0L2JpbmRpbmdzL2JpbmRpbmdzX2dlbmVyYXRl
+ZF9lbnVtX2NoZWNrLnJzIg0KPiArKSk7DQo+ICsNCj4gK2ZuIGNoZWNrX3BoeV9zdGF0ZSgNCj4g
+KyAgICAocGh5X3N0YXRlOjpQSFlfRE9XTg0KPiArICAgIHwgcGh5X3N0YXRlOjpQSFlfUkVBRFkN
+Cj4gKyAgICB8IHBoeV9zdGF0ZTo6UEhZX0hBTFRFRA0KPiArICAgIHwgcGh5X3N0YXRlOjpQSFlf
+RVJST1INCj4gKyAgICB8IHBoeV9zdGF0ZTo6UEhZX1VQDQo+ICsgICAgfCBwaHlfc3RhdGU6OlBI
+WV9SVU5OSU5HDQo+ICsgICAgfCBwaHlfc3RhdGU6OlBIWV9OT0xJTksNCj4gKyAgICB8IHBoeV9z
+dGF0ZTo6UEhZX0NBQkxFVEVTVCk6IHBoeV9zdGF0ZSwNCj4gKykgew0KPiArfQ0KPiANCg==
 
