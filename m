@@ -1,105 +1,119 @@
-Return-Path: <netdev+bounces-40819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C760B7C8B03
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 18:33:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5843C7C8B86
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 18:42:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78A2E282E2B
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 16:32:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4F88B20B33
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 16:42:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B4412B8A;
-	Fri, 13 Oct 2023 16:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268BC1B26A;
+	Fri, 13 Oct 2023 16:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tTx/vtjC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b86OTm7/"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E518219F7
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 16:32:57 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87115DE
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 09:32:55 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-537f07dfe8eso13526a12.1
-        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 09:32:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697214774; x=1697819574; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9wEK7yMLfQa7Rzf2G7nEIjByX5/jYVgZ7BdzM7Aex8g=;
-        b=tTx/vtjCeXhr9yWCXJNm0yDTbVxLjEZxw54uHqY0XrgrHZ4T0hfuRvuVEGEIZspoYk
-         8LnnENKdb1EfAHAlCEVxW7mbv2/cUyPhrsgqZ0abYBSShkwbZSpNY1OGvexuCStOx+qJ
-         Qbg6Dbb58GD3PPuDk7Na4aHjkmXxhVPyr11kqGAg9Uv7O4VjMuQSjiasCyXhg/flXGr9
-         MjcTMQusPcG14FHu/IlEijZ0dCN5iVtaovhqJO9QC9HJbtox5seTfDhl2Zy+RYzqRJ/Q
-         1nxARlM2X+A7MJzVoghkZTRoyYRag2iuhlMQ0Q+7D97r3plqDPuh1WEC/i18+qV4EvE2
-         jkEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697214774; x=1697819574;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9wEK7yMLfQa7Rzf2G7nEIjByX5/jYVgZ7BdzM7Aex8g=;
-        b=HzrvJBg66rCMLAfPKrGkidDcunTQW+1v5J5t+bW/n5BeLNBoq2Yo6b4ZEdNRvfxyer
-         XACsJ0q2s3985M04VwAlV411s7L9nw5OVQe1wZWASAqNuroB6T6V5dYTworLb/7i2sFB
-         dJHO57dXLwYGEESYJcEgc9Vji7gS5f/QkQVeG4nz4rU2pUjHs42RxM0VSK5O1lArDqyk
-         Gh3gkzgpGeiBX21jo6kxxS82Fwr9GEHW3L4vRzoKjAlwzmQwFFhoQB4I5loT27EEjl3y
-         Kp6JABtbxg+lNCgdl5ff7AQJQIpIJtjwNTud35XzpK5azOap8QZJdql2DN3piWLz2eOn
-         tUGg==
-X-Gm-Message-State: AOJu0Yzibwjs8Aawb0XlVD0WWO5zHUDCrD86XmxrvByWnzB5p5wtg0ms
-	y1+bTZUlSdGkZJySLc+LTcpL5xburKpAVsiwwN0KIw==
-X-Google-Smtp-Source: AGHT+IF7f1WC5QTLXYZjwxFCqWHjb3bxU7ON10IgKVx0ClthIiwSRVnhl4z3wN/oEUoQ/pbJ6X868yr5ywHycyxY/Gc=
-X-Received: by 2002:a50:c35c:0:b0:538:50e4:5446 with SMTP id
- q28-20020a50c35c000000b0053850e45446mr133933edb.5.1697214773725; Fri, 13 Oct
- 2023 09:32:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CAF219F8
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 16:42:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C518C433C8;
+	Fri, 13 Oct 2023 16:42:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697215350;
+	bh=MqC3yrRRj3UMGOPti8ERknVNqGEUu0oFiV03E0Vidv0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=b86OTm7/vWPz1lXdWBiZn7RcGveX1aFsvL5jmXTq2YbcyNGIbGhWA6q1/AnMGbd1N
+	 IFYYegR+vc8lMskeUk8lajThoc+bo1PlPWPhNqD2fwOG3AfKYpg90Eza/kNH0uSNPW
+	 Jky7Vj9783vlIkTQS3O7jJucPYVzjXAq/DJZUjUVY+A/BEROWzFLMN0GpWgbN/I8Vu
+	 ImQsRWZuesvRBHjxd0H3/8ZdxSWJjJnhbYb4F5CAQ1P15D5R2lTSA+hkWwJq0LpHAe
+	 Bn/6fD9G+fr9mHm/5sCM1EEe3TdFQCGEcv6U3ysqKGhpLI6CBcvRuzJ9zOUE+g+0U1
+	 YdquVEXDnza8g==
+Date: Fri, 13 Oct 2023 11:42:28 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
+Cc: "Rafael J . Wysocki" <rafael@kernel.org>, linux-pci@vger.kernel.org,
+	Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, ath10k@lists.infradead.org,
+	ath11k@lists.infradead.org, ath12k@lists.infradead.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
+	Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 03/13] PCI/ASPM: Disable ASPM when driver requests it
+Message-ID: <20231013164228.GA1117889@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231010013814.70571-1-kuniyu@amazon.com>
-In-Reply-To: <20231010013814.70571-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 13 Oct 2023 18:32:42 +0200
-Message-ID: <CANn89iJcLQSsbD3pp_9pUwxyy1fBJnyO5Y33Q4t1Q7WmZ0e3yg@mail.gmail.com>
-Subject: Re: [PATCH v1 net] tcp: Fix listen() warning with v4-mapped-v6 address.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aa3386a4-c22d-6d5d-112d-f36b22cda6d3@linux.intel.com>
 
-On Tue, Oct 10, 2023 at 3:38=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> syzbot reported a warning [0] introduced by commit c48ef9c4aed3 ("tcp: Fi=
-x
-> bind() regression for v4-mapped-v6 non-wildcard address.").
->
-> After the cited commit, a v4 socket's address matches the corresponding
-> v4-mapped-v6 tb2 in inet_bind2_bucket_match_addr(), not vice versa.
->
-> During X.X.X.X -> ::ffff:X.X.X.X order bind()s, the second bind() uses
-> bhash and conflicts properly without checking bhash2 so that we need not
-> check if a v4-mapped-v6 sk matches the corresponding v4 address tb2 in
-> inet_bind2_bucket_match_addr().  However, the repro shows that we need
-> to check that in a no-conflict case.
->
+On Thu, Oct 12, 2023 at 01:56:16PM +0300, Ilpo Järvinen wrote:
+> On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
+> > On Mon, Sep 18, 2023 at 04:10:53PM +0300, Ilpo Järvinen wrote:
+> > > PCI core/ASPM service driver allows controlling ASPM state through
+> > > pci_disable_link_state() and pci_enable_link_state() API. It was
+> > > decided earlier (see the Link below), to not allow ASPM changes when OS
+> > > does not have control over it but only log a warning about the problem
+> > > (commit 2add0ec14c25 ("PCI/ASPM: Warn when driver asks to disable ASPM,
+> > > but we can't do it")). Similarly, if ASPM is not enabled through
+> > > config, ASPM cannot be disabled.
+> ...
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+> > This disables *all* ASPM states, unlike the version when
+> > CONFIG_PCIEASPM is enabled.  I suppose there's a reason, and maybe a
+> > comment could elaborate on it?
+> >
+> > When CONFIG_PCIEASPM is not enabled, I don't think we actively
+> > *disable* ASPM in the hardware; we just leave it as-is, so firmware
+> > might have left it enabled.
+> 
+> This whole trickery is intended for drivers that do not want to have ASPM 
+> because the devices are broken with it. So leaving it as-is is not really 
+> an option (as demonstrated by the custom workarounds).
 
-Thanks.
+Right.
+
+> > Conceptually it seems like the LNKCTL updates here should be the same
+> > whether CONFIG_PCIEASPM is enabled or not (subject to the question
+> > above).
+> > 
+> > When CONFIG_PCIEASPM is enabled, we might need to do more stuff, but
+> > it seems like the core should be the same.
+> 
+> So you think it's safer to partially disable ASPM (as per driver's 
+> request) rather than disable it completely? I got the impression that the 
+> latter might be safer from what Rafael said earlier but I suppose I might 
+> have misinterpreted him since he didn't exactly say that it might be safer 
+> to _completely_ disable it.
+
+My question is whether the state of the device should depend on
+CONFIG_PCIEASPM.  If the driver does this:
+
+  pci_disable_link_state(PCIE_LINK_STATE_L0S)
+
+do we want to leave L1 enabled when CONFIG_PCIEASPM=y but disable L1
+when CONFIG_PCIEASPM is unset?
+
+I can see arguments both ways.  My thought was that it would be nice
+to end up with a single implementation of pci_disable_link_state()
+with an #ifdef around the CONFIG_PCIEASPM-enabled stuff because it
+makes the code easier to read.
+
+Bjorn
 
