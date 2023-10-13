@@ -1,147 +1,114 @@
-Return-Path: <netdev+bounces-40578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 585837C7B45
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 03:40:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B317C7B51
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 03:45:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51409B20950
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 01:40:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07CA81C20B13
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 01:45:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C4EA29;
-	Fri, 13 Oct 2023 01:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E1F81D;
+	Fri, 13 Oct 2023 01:45:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bseE1Nkr"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wctTAqWM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8423EA35
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 01:40:42 +0000 (UTC)
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99769C9;
-	Thu, 12 Oct 2023 18:40:39 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-27d11401516so1186783a91.2;
-        Thu, 12 Oct 2023 18:40:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35D081C
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 01:45:12 +0000 (UTC)
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0DCC0
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 18:45:10 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-690fe1d9ba1so329646b3a.0
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 18:45:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697161239; x=1697766039; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vYzTD01QiqtJTW8F2SBqx3+gh99zDS3mTK0fJJG0LNQ=;
-        b=bseE1NkrXwOpqoTP/Qca9RQEFN1+onVjFUK9YLuqRtb0nKOd1ZdZVEefaby81CCx7C
-         CDxogWtGh2ma2xerl5iRqxD8drcY+k51jt/SI2rVcsl0ZpDeXrMc2f87OX44pB6BVyCH
-         ynuCX3K3hgfFI62gStQ6n7BG9ddz3oI+4oTfOgt0AZ61P4RSdcfHSNfKwhixie6kQWP6
-         RHSxxvgRKfOZfetYB5bmM4jCZwe7uyOEL6UUAquuTnWgq8lthIdiOU1QuHk2IZ+AiWfN
-         /TWMelYQ9EO2ieyss47u40UPFxeZchTgvIPF/S1+a665qVgm4zaXNd22mjYQ/bCRVXlu
-         jZAw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697161510; x=1697766310; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NkKDwESUMv6DmJniI4kRJ0Fze3BlCpWsKbtTeuEzRoQ=;
+        b=wctTAqWM+C+AavijPGVNcXf4bwP+E/t8KAOEKi+zZG4WomkiYnQOuVGojNwl+bo1Fy
+         kfVb9Y0l2NAq0k2sjYQSOnJdfEbR134ajyLXqORuY+Qph83AwRWE/6T3z7aTb1ubtMtQ
+         xKOQ2jc67GIJXMkuJliRocizaVmoAx2MyjAfUzU4XvUrgvEAaSHQ/2qOqXxJEJF+abvJ
+         sfERUcLnEhb6LnDv0ya5fLIlGmUwirNgqnIlxI7WdWz5s5xnwAmlnkvHmHGb4SqYVjul
+         y5u9bI9EGvU8QWeR6dqxsq6h04/a32jq64ZNoIeYqn9uj1ezriMuQoRbHEs3K8KIZNSE
+         pbUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697161239; x=1697766039;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vYzTD01QiqtJTW8F2SBqx3+gh99zDS3mTK0fJJG0LNQ=;
-        b=EqqKb84N/GR9YsurgDUo83656Tdqq9MgQ/K2mxN+9MMLwDyFUcBsV85QGqqLFFsawN
-         D9XpTb3EjExCLtxkjagC/Sq0id1HIZmcnJjwtBhJ3Bi/TdoQQ0gry3ZsDug0gYeuEbSS
-         bI6JJac7FAEkcgXdXOqWbQ1tU1GVBXEuwCX8QsGIbZs85fpL8pQ6gkb3dyP0P6CORRt/
-         4DiWbKA6bQMjd2V6JFlyC6a17aMRaIXst2SPa61TgNiuwL9CXcD23R1jxYiVz18uPlv3
-         CYnfiaF8uhUhXkA/NXUetXxOZFnq1g8PauYe/79J/nfGErk22LKW7TRzLh3fmxvoJWWm
-         zjQg==
-X-Gm-Message-State: AOJu0YwIiTh5zbUuIb+tPyW9k4TWg8rqTEP/KwyD5Xc2og+RAyYITKC2
-	gftvx7/CBykhxIzl6MnK+YCAuqAB0h8=
-X-Google-Smtp-Source: AGHT+IH7Q6oQZNMW3cVdZZMkgAekKoImLvRyDkvvnbC6TY6tL4MoF7NoLXFSSaGYZLRNRZ2WWgvrDQ==
-X-Received: by 2002:a17:90a:f48f:b0:268:557e:1848 with SMTP id bx15-20020a17090af48f00b00268557e1848mr22577277pjb.2.1697161239008;
-        Thu, 12 Oct 2023 18:40:39 -0700 (PDT)
-Received: from debian.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id nr20-20020a17090b241400b0027d1366d113sm2463209pjb.43.2023.10.12.18.40.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 18:40:38 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id 2A20995B3FA8; Fri, 13 Oct 2023 08:40:34 +0700 (WIB)
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Mat Martineau <martineau@kernel.org>,
-	Nicolas Schier <nicolas@fjasle.eu>,
-	"Srivatsa S. Bhat (VMware)" <srivatsa@csail.mit.edu>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Jesper Juhl <jesperjuhl76@gmail.com>,
-	Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH net 2/2] MAINTAINERS: Remove linuxwwan@intel.com mailing list
-Date: Fri, 13 Oct 2023 08:40:09 +0700
-Message-ID: <20231013014010.18338-3-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231013014010.18338-1-bagasdotme@gmail.com>
-References: <20231013014010.18338-1-bagasdotme@gmail.com>
+        d=1e100.net; s=20230601; t=1697161510; x=1697766310;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NkKDwESUMv6DmJniI4kRJ0Fze3BlCpWsKbtTeuEzRoQ=;
+        b=nu4aEwy+4eU8xeuls3FBoDyzgULFavhakaY9mN1iq9U0jUWA4JNUmGV9bZ/3aRw2DI
+         dNA8xqvkPzUPA0aHunFmPS63W1tN13DTN9Bhdp+B3mb+wovhMfrLQemcXaEJyACEewZW
+         o8XhihIGiLv2ZPn8lI5ocC9L5NiL5F0wJRMEyZ1pnsuukrE1Gr93ZpySgOyhwsroS+Ss
+         203pmjDdKxc8lw+koj+XeXGJxWjG66xnbnGFiFNGf6peG4HOigsBHHCtxMppVMyPJW8Q
+         bF2zQtl1o/dYBzpvcBwCJxoA3nU6R4md26lDmhql3GjO/rAtvCEk8wHRzOmRXkEFOrmu
+         +1uQ==
+X-Gm-Message-State: AOJu0YzCkfUPcJBeY7qtOZa2tjYF8tiAwGMWsIQNWEMj7ASqedOh7DVP
+	erYe0DTvEbyJB1KiA9G1AMAYYg==
+X-Google-Smtp-Source: AGHT+IFOeU/L1UU0SiBejqeHPkF2yLffG9fB6o7ii0U1VZbx4ZnCvJrB7MjXM1YaKAbTSIdFVKU0ZQ==
+X-Received: by 2002:a05:6a20:7da2:b0:15d:6fd3:8e74 with SMTP id v34-20020a056a207da200b0015d6fd38e74mr31715422pzj.3.1697161509881;
+        Thu, 12 Oct 2023 18:45:09 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id l21-20020a170902d35500b001c737950e4dsm2659672plk.2.2023.10.12.18.45.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Oct 2023 18:45:09 -0700 (PDT)
+Message-ID: <f39ef992-4789-4c30-92ef-e3114a31d5c7@kernel.dk>
+Date: Thu, 12 Oct 2023 19:45:07 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1428; i=bagasdotme@gmail.com; h=from:subject; bh=0BU8oIvaaBmasfaj62J44NQ079dYR7WyaVRII9R8ttg=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDKkac6tlw98EazRsujZnQemStgkSjNa3V/9IfHH9yOKrk 5XUjXd4dJSyMIhxMciKKbJMSuRrOr3LSORC+1pHmDmsTCBDGLg4BWAiJvMYGX5IOMw69dy6XZzH 72nra8lF0amLRd4wHNtUc1TT7vnn7HBGhu1lX27NaTzK73NdSGXpvbN5Ocu/uKRlqOZ5XPNsnv3 AiRcA
-X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: Problem with io_uring splice and KTLS
+Content-Language: en-US
+To: Sascha Hauer <sha@pengutronix.de>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel@pengutronix.de,
+ Boris Pismenny <borisp@nvidia.com>, John Fastabend
+ <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org
+References: <20231010141932.GD3114228@pengutronix.de>
+ <d729781a-3d12-423b-973e-c16fdbcbb60b@kernel.dk>
+ <20231012133407.GA3359458@pengutronix.de>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20231012133407.GA3359458@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Messages submitted to the ML bounce (address not found error). In
-fact, the ML was mistagged as person maintainer instead of mailing
-list.
+On 10/12/23 7:34 AM, Sascha Hauer wrote:
+> In case you don't have encryption hardware you can create an
+> asynchronous encryption module using cryptd. Compile a kernel with
+> CONFIG_CRYPTO_USER_API_AEAD and CONFIG_CRYPTO_CRYPTD and start the
+> webserver with the '-c' option. /proc/crypto should then contain an
+> entry with:
+> 
+>  name         : gcm(aes)
+>  driver       : cryptd(gcm_base(ctr(aes-generic),ghash-generic))
+>  module       : kernel
+>  priority     : 150
 
-Remove the ML to keep Cc: lists a bit shorter.
+I did a bit of prep work to ensure I had everything working for when
+there's time to dive into it, but starting it with -c doesn't register
+this entry. Turns out the bind() in there returns -1/ENOENT. For the
+life of me I can't figure out what I'm missing. I tried this with both
+arm64 and x86-64. On the latter there's some native AES that is higher
+priority, but I added a small hack in cryptd to ensure it's the highest
+one. But I don't even get that far...
 
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
- MAINTAINERS | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 785c8b13e74df6..096e6a4103c5ef 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10450,7 +10450,6 @@ F:	drivers/platform/x86/intel/atomisp2/led.c
- 
- INTEL BIOS SAR INT1092 DRIVER
- M:	Shravan Sudhakar <s.shravan@intel.com>
--M:	Intel Corporation <linuxwwan@intel.com>
- L:	platform-driver-x86@vger.kernel.org
- S:	Maintained
- F:	drivers/platform/x86/intel/int1092/
-@@ -10879,9 +10878,8 @@ S:	Maintained
- F:	drivers/platform/x86/intel/wmi/thunderbolt.c
- 
- INTEL WWAN IOSM DRIVER
--M:	Intel Corporation <linuxwwan@intel.com>
- L:	netdev@vger.kernel.org
--S:	Maintained
-+S:	Orphan
- F:	drivers/net/wwan/iosm/
- 
- INTEL(R) TRACE HUB
-@@ -13500,7 +13498,6 @@ F:	net/dsa/tag_mtk.c
- 
- MEDIATEK T7XX 5G WWAN MODEM DRIVER
- M:	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
--M:	Intel Corporation <linuxwwan@intel.com>
- R:	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>
- R:	Liu Haijun <haijun.liu@mediatek.com>
- R:	Ricardo Martinez <ricardo.martinez@linux.intel.com>
 -- 
-An old man doll... just what I always wanted! - Clara
+Jens Axboe
 
 
