@@ -1,114 +1,124 @@
-Return-Path: <netdev+bounces-40732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ABCD7C887F
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 17:22:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D52977C8885
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 17:24:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8ED71C2117E
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 15:22:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03AED1C20B2A
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 15:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70211B281;
-	Fri, 13 Oct 2023 15:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3011B285;
+	Fri, 13 Oct 2023 15:24:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ux7TX5yy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AFck7BDE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841C014AA6
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 15:22:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68417C433C8;
-	Fri, 13 Oct 2023 15:22:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697210549;
-	bh=c2JYWaHoIeIfFdJ4Ql+1dol9Mj/dIvd+1ctfD5PSQUQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ux7TX5yyd84S3J2wIyC8oDn7BRhdRsrR429k0+zuPEi1XmXV64wSVzc8W7O83zmbS
-	 vVQ8kAZSyk1lnD72J3h+0LN7gEYKroLK2PXvTuxIG9jeTk0USFkHpAKngt9Q9VxdTQ
-	 gRDS6qEyjV0VYNt48eWgZxyudmEDY1DgHtxie0yTAu1u17JksH0IUyjibjO4dBgCLs
-	 b1GvzgNeJHep2OEIjg2K1ci77cBhg6umWdefouIoekYBDeDVw3ieORN7leIAhBK0fH
-	 aprJke6c5CieF/NEwb+smzdCQa06XQzZEwxROTeS56KJyRTXnLrYeZaX/ngIfL/ZN+
-	 AXePkhxAHO/ag==
-Date: Fri, 13 Oct 2023 17:22:25 +0200
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot <syzkaller@googlegroups.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH net] xfrm: fix a data-race in xfrm_lookup_with_ifid()
-Message-ID: <20231013152225.GL29570@kernel.org>
-References: <20231011102429.799316-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE18011CBC;
+	Fri, 13 Oct 2023 15:24:34 +0000 (UTC)
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A576495;
+	Fri, 13 Oct 2023 08:24:33 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-6b390036045so143682b3a.1;
+        Fri, 13 Oct 2023 08:24:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697210673; x=1697815473; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hZ7WtNZgjJSfgroBq05/3lEy3OCT+o06OPhmA0hgBIc=;
+        b=AFck7BDEg0phkkqqa2higBa0h2jL6AdBbxcRjHdWHTu5mVNqBlUXAQOBZJtosTUIew
+         cSZK9yjv0QNvNTHjY+paRDdx8tyV52tDtsVuUPlabiNQjU8NEGjSMm0vSX1RO0FUHnLe
+         h85DxI65866BQFrZMBCGx+RBF2mKx2A5MEWwnsFSCvBv4LOaAcrxDhMHPIKCifSpnRW9
+         dEYZN5nXQJk30bwV+GmQOTX/5ybTwfVczy8ZH6+siwOOEl7cYJjL88GHwFk7zIWbtGqS
+         jnB2Xy53EWxIPOMMMRvONyM6jBHGAZO0sm892+01UeXlDBNq0MfB++11pyXMYJtzmXNn
+         1f5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697210673; x=1697815473;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hZ7WtNZgjJSfgroBq05/3lEy3OCT+o06OPhmA0hgBIc=;
+        b=bcOqRrg0CEfR1AZQf3izgNahe11JDjjCYMgiMe0HTls7akF0CX2uX7WyWOnmR4qIac
+         91xoiyGe2/pURQqMSjdVb0aEvUB57wDLYclkFBYF9O4CzQFtEbs2pPKQ/Q45+gN5z+40
+         8WTbgY3KeURljPQi1Lt8ic9eScQhc6DH/O21L0mdF7wwdSbGHfI1tzQmcWU2oJo3kanx
+         SKkkhvicpssZmSFfUK0jgnLLc3psauB/bmVJe9260drJAAq1SjyjzlpSH2th45frd64U
+         c39G/ezDM3EUNxBzTgXYX3CbhUTHtisGDzd8nhx2KR7Taywan4IxZmUbtZHGBagsLJ4B
+         +nzA==
+X-Gm-Message-State: AOJu0YzXLpSk+in7uZvNjm9qRNtUO8dY72vtT64+3IzDzaMX9HpBFYKL
+	0hwwB4iV+Oq/sbPiFhQDbGI=
+X-Google-Smtp-Source: AGHT+IEDwRSCENxA6vvv9qakmKKACYcjq4csulFjlk6rTgC3YwarSrpnFC06czSC06jHOdQNrGjDnw==
+X-Received: by 2002:a05:6a21:a5a0:b0:15d:a247:d20c with SMTP id gd32-20020a056a21a5a000b0015da247d20cmr35517768pzc.6.1697210672228;
+        Fri, 13 Oct 2023 08:24:32 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id p16-20020a170902e75000b001b7ffca7dbcsm4000851plf.148.2023.10.13.08.24.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 08:24:31 -0700 (PDT)
+Date: Sat, 14 Oct 2023 00:24:31 +0900 (JST)
+Message-Id: <20231014.002431.1219106292401172408.fujita.tomonori@gmail.com>
+To: boqun.feng@gmail.com
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, wedsonaf@gmail.com,
+ benno.lossin@proton.me, greg@kroah.com
+Subject: Re: [PATCH net-next v4 3/4] MAINTAINERS: add Rust PHY abstractions
+ to the ETHERNET PHY LIBRARY
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <ZSlVgAfz-O5UR_ps@Boquns-Mac-mini.home>
+References: <20231012125349.2702474-1-fujita.tomonori@gmail.com>
+	<20231012125349.2702474-4-fujita.tomonori@gmail.com>
+	<ZSlVgAfz-O5UR_ps@Boquns-Mac-mini.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231011102429.799316-1-edumazet@google.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 10:24:29AM +0000, Eric Dumazet wrote:
-> syzbot complains about a race in xfrm_lookup_with_ifid() [1]
-> 
-> When preparing commit 0a9e5794b21e ("xfrm: annotate data-race
-> around use_time") I thought xfrm_lookup_with_ifid() was modifying
-> a still private structure.
-> 
-> [1]
-> BUG: KCSAN: data-race in xfrm_lookup_with_ifid / xfrm_lookup_with_ifid
-> 
-> write to 0xffff88813ea41108 of 8 bytes by task 8150 on cpu 1:
-> xfrm_lookup_with_ifid+0xce7/0x12d0 net/xfrm/xfrm_policy.c:3218
-> xfrm_lookup net/xfrm/xfrm_policy.c:3270 [inline]
-> xfrm_lookup_route+0x3b/0x100 net/xfrm/xfrm_policy.c:3281
-> ip6_dst_lookup_flow+0x98/0xc0 net/ipv6/ip6_output.c:1246
-> send6+0x241/0x3c0 drivers/net/wireguard/socket.c:139
-> wg_socket_send_skb_to_peer+0xbd/0x130 drivers/net/wireguard/socket.c:178
-> wg_socket_send_buffer_to_peer+0xd6/0x100 drivers/net/wireguard/socket.c:200
-> wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
-> wg_packet_handshake_send_worker+0x10c/0x150 drivers/net/wireguard/send.c:51
-> process_one_work kernel/workqueue.c:2630 [inline]
-> process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2703
-> worker_thread+0x525/0x730 kernel/workqueue.c:2784
-> kthread+0x1d7/0x210 kernel/kthread.c:388
-> ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
-> ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-> 
-> write to 0xffff88813ea41108 of 8 bytes by task 15867 on cpu 0:
-> xfrm_lookup_with_ifid+0xce7/0x12d0 net/xfrm/xfrm_policy.c:3218
-> xfrm_lookup net/xfrm/xfrm_policy.c:3270 [inline]
-> xfrm_lookup_route+0x3b/0x100 net/xfrm/xfrm_policy.c:3281
-> ip6_dst_lookup_flow+0x98/0xc0 net/ipv6/ip6_output.c:1246
-> send6+0x241/0x3c0 drivers/net/wireguard/socket.c:139
-> wg_socket_send_skb_to_peer+0xbd/0x130 drivers/net/wireguard/socket.c:178
-> wg_socket_send_buffer_to_peer+0xd6/0x100 drivers/net/wireguard/socket.c:200
-> wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
-> wg_packet_handshake_send_worker+0x10c/0x150 drivers/net/wireguard/send.c:51
-> process_one_work kernel/workqueue.c:2630 [inline]
-> process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2703
-> worker_thread+0x525/0x730 kernel/workqueue.c:2784
-> kthread+0x1d7/0x210 kernel/kthread.c:388
-> ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
-> ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-> 
-> value changed: 0x00000000651cd9d1 -> 0x00000000651cd9d2
-> 
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 0 PID: 15867 Comm: kworker/u4:58 Not tainted 6.6.0-rc4-syzkaller-00016-g5e62ed3b1c8a #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
-> Workqueue: wg-kex-wg2 wg_packet_handshake_send_worker
-> 
-> Fixes: 0a9e5794b21e ("xfrm: annotate data-race around use_time")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+On Fri, 13 Oct 2023 07:34:40 -0700
+Boqun Feng <boqun.feng@gmail.com> wrote:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> On Thu, Oct 12, 2023 at 09:53:48PM +0900, FUJITA Tomonori wrote:
+>> Adds me as a maintainer for these Rust bindings too.
+>> 
+>> The files are placed at rust/kernel/ directory for now but the files
+>> are likely to be moved to net/ directory once a new Rust build system
+>> is implemented.
+>> 
+>> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>> ---
+>>  MAINTAINERS | 2 ++
+>>  1 file changed, 2 insertions(+)
+>> 
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 698ebbd78075..eb51a1d526b7 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -7770,6 +7770,7 @@ F:	net/bridge/
+>>  ETHERNET PHY LIBRARY
+>>  M:	Andrew Lunn <andrew@lunn.ch>
+>>  M:	Heiner Kallweit <hkallweit1@gmail.com>
+>> +M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
+>>  R:	Russell King <linux@armlinux.org.uk>
+> 
+> Since Trevor has been reviewing the series and showed a lot of
+> expertise, I suggest having him as the reviewer in Rust networking, of
+> course if he and everyone agree ;-)
 
+There is no such thing as Rust networking :) This is PHYLIB entry.
+
+If it's ok with the PHYLIB maintainers and Trevor, I'm happy to add
+him.
 
