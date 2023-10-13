@@ -1,184 +1,300 @@
-Return-Path: <netdev+bounces-40861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA2F47C8ECE
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 23:12:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C017C8ED9
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 23:16:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0687E1C21183
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 21:12:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0CE3281119
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 21:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34AA250F4;
-	Fri, 13 Oct 2023 21:12:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF2E266A9;
+	Fri, 13 Oct 2023 21:15:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mBaaSXK1"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="SOFfq/eB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5785824203
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 21:12:53 +0000 (UTC)
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC0E7BE
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 14:12:48 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-53dfc28a2afso4377198a12.1
-        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 14:12:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B05025116
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 21:15:47 +0000 (UTC)
+Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C928FBE
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 14:15:38 -0700 (PDT)
+Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5a7afd45199so31803957b3.0
+        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 14:15:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697231567; x=1697836367; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=65Li0CJUc3AAYY2ID9vtBx9Y6C6M7aGLDvXjXcw/aCw=;
-        b=mBaaSXK1I5ptvwYwXEbZNty4oAekgLoL8fTQMnd8WgD9uIHa6pKiDxNvTYefxPsm6W
-         V1ooqH5HWVIJ1yvOxIpv3FMwCnk/a70obO163LpHKrEe75h2HEF/oLE90E5rgJxphSSD
-         v1XQiS4wNcFYg1Dr0kPfjLpKo/RG7qOwBSsyjuxchyaXf/Yln5tWyiVUIpEUoOm9VvN6
-         7GLeIMEYEynxwDyR4QG220lf+5SmS2W3nblWhHGtMJ5+3NVx1TX47ZlJxb4sIORfh3MP
-         rmdNb7tufK6h/8pOz3FCP7oUkpmrnqhGsNYVjKZMIB8p7NKqdVkRW0MeL8EHcH1Ud65Z
-         QAMQ==
+        d=paul-moore.com; s=google; t=1697231738; x=1697836538; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=dLQj5ZtRhq6MJlTujO1awDYkdSdBvUj8+lUyHnK/bd4=;
+        b=SOFfq/eBOF46t8KmBVttTNwb/Ms9aEFLYPFekKQUyfhV1GEwPF/pi6ecxjZMQpA2/C
+         gJ3ylnLqIFiMtTDnIgfza01kRKbnZw2o8hu4U6jfdI60xd9TARK9D2GZwSrpjX+cAVaE
+         z01nYYRkKUuUCuixgXjcG8NDzNeUwNLor3lAMO2cJFZVc2LnMohl1erMYoCI2nji7A9D
+         kyBsvGVLp/Pf5eDdzzQQIoJTOSjN+Hb8/ObhonKWfLRaUc9Qais+kOWNnUm6zKm8fC9K
+         qgl7CoxFr4fgXS63q0oRJfHmL89xx8d/o7VPSF9t7y4OiQXZHwFPt25xcdD0/Z5b+DKt
+         f56w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697231567; x=1697836367;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=65Li0CJUc3AAYY2ID9vtBx9Y6C6M7aGLDvXjXcw/aCw=;
-        b=CnrOg7x6yE4ZLoqnb5soIZSSvk9rXfIfr9JPSL/q9WaqnRvdnasIYwhTu1RwZaBhIY
-         PHHYgPyDIblChRHHQEe0+s4iem9Hex8gImL1PcWsK9kBdlu5lQrJnVLNM84dv3YXJyzj
-         z+MqFFgZqyRZrT/WEuLanRiNR0gW9KxpnyaYlj0UHIGhJwI/+KKSfOCc6CN2Bs88YYGv
-         ShkKf/DMLKNPqNUatmyCQS3WgFFRXa53UdVCk31SCsG9PULg10K1Ai+k/DNgz4NEnQek
-         ERf42SkJU01u9HGY+NogQvgD8OAw6DPpOYMFdo7vpfPwc5X7cI36HiR1Nuk90D/JhMQS
-         Houg==
-X-Gm-Message-State: AOJu0Yzo/Z0pKtB9AbtNXZ5qW+tiNCAhUYxaXuIULNCYRzV6IXP4hUFH
-	D6OxIURN+SU1kC8MCz+wql51Nq3HqDyMbYFm61FN8Q==
-X-Google-Smtp-Source: AGHT+IECae+iT+rBLZo5NuHqthDxyRPk1+BH5q2rVfgRV9e5y2Dk1JwjKBHx5Cq7DDrLHjTGu8UXwVnF8HWTbbm75no=
-X-Received: by 2002:a05:6402:2707:b0:53e:1434:25db with SMTP id
- y7-20020a056402270700b0053e143425dbmr5372450edd.23.1697231567170; Fri, 13 Oct
- 2023 14:12:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697231738; x=1697836538;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dLQj5ZtRhq6MJlTujO1awDYkdSdBvUj8+lUyHnK/bd4=;
+        b=GFaVF/JwtiAXeVmNPn49RBvvivRmJ47lIM2YW+ex3IaqfgIGgtEN7JXKWRfxz09CUM
+         rHrso1uvLyHgqm4wWSVtFhFdRXkOS3zSwLB7VvbbuLLxpJWY+pWJN46XHtDp1evYRmV3
+         taKuy5DX8taIlen32b1/brPCv9QrwhKiiSLX+dAgMIz4XY65OqvdjHDt+HdLJHp8ntOT
+         KT8kD60LrZnKoFNULrlltSX8IqkMxgAE7IbtMnbU2gk0Vg8buaYl/yY/r26a7rNjkDts
+         vQV6c9ACmtIuYkNzMTQ+jdBT/Ml/mEvmx+lRsh1YSElg5Ci7HJj94vWb6cgqixSZg1yw
+         FH9A==
+X-Gm-Message-State: AOJu0YwQntpM2kfKOYe5xRPxgKgm2hlhkqMskjRPH2Eiu+PZi3dnXYi2
+	fuGFrvICH6+nAFYf/6O7BH7B
+X-Google-Smtp-Source: AGHT+IE9Y/CTy90dFiEu+jR5Pxz9wsQqLKZYtYve5r7Wzy5bzGLDis9NzbyVIICb9r05qqznex/94g==
+X-Received: by 2002:a0d:caca:0:b0:5a7:d133:370d with SMTP id m193-20020a0dcaca000000b005a7d133370dmr12555978ywd.16.1697231737932;
+        Fri, 13 Oct 2023 14:15:37 -0700 (PDT)
+Received: from localhost ([70.22.175.108])
+        by smtp.gmail.com with ESMTPSA id e5-20020a05620a12c500b007756c8ce8f5sm945199qkl.59.2023.10.13.14.15.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 14:15:37 -0700 (PDT)
+Date: Fri, 13 Oct 2023 17:15:36 -0400
+Message-ID: <f739928b1db9a9e45da89249c0389e85.paul@paul-moore.com>
+From: Paul Moore <paul@paul-moore.com>
+To: Andrii Nakryiko <andrii@kernel.org>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
+Cc: <linux-fsdevel@vger.kernel.org>, <linux-security-module@vger.kernel.org>, <keescook@chromium.org>, <brauner@kernel.org>, <lennart@poettering.net>, <kernel-team@meta.com>, <sargun@sargun.me>
+Subject: Re: [PATCH v7 6/18] bpf: add BPF token support to BPF_PROG_LOAD  command
+References: <20231012222810.4120312-7-andrii@kernel.org>
+In-Reply-To: <20231012222810.4120312-7-andrii@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231012-strncpy-drivers-net-phy-nxp-tja11xx-c-v1-1-5ad6c9dff5c4@google.com>
- <15af4bc4-2066-44bc-8d2e-839ff3945663@lunn.ch> <CAFhGd8pmq3UKBE_6ZbLyvRRhXJzaWMQ2GfosvcEEeAS-n7M4aQ@mail.gmail.com>
- <0c401bcb-70a8-47a5-bca0-0b9e8e0439a8@lunn.ch>
-In-Reply-To: <0c401bcb-70a8-47a5-bca0-0b9e8e0439a8@lunn.ch>
-From: Justin Stitt <justinstitt@google.com>
-Date: Fri, 13 Oct 2023 14:12:34 -0700
-Message-ID: <CAFhGd8p3WzqQu7kT0Pt8Axuv5sKdHJQOLZVEg5x8S_QNwT6bjQ@mail.gmail.com>
-Subject: Re: [PATCH] net: phy: tja11xx: replace deprecated strncpy with ethtool_sprintf
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Fri, Oct 13, 2023 at 1:13=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Fri, Oct 13, 2023 at 12:53:53PM -0700, Justin Stitt wrote:
-> > On Fri, Oct 13, 2023 at 5:22=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wr=
-ote:
-> > >
-> > > > -     for (i =3D 0; i < ARRAY_SIZE(tja11xx_hw_stats); i++) {
-> > > > -             strncpy(data + i * ETH_GSTRING_LEN,
-> > > > -                     tja11xx_hw_stats[i].string, ETH_GSTRING_LEN);
-> > > > -     }
-> > > > +     for (i =3D 0; i < ARRAY_SIZE(tja11xx_hw_stats); i++)
-> > > > +             ethtool_sprintf(&data, "%s", tja11xx_hw_stats[i].stri=
-ng);
-> > > >  }
-> > >
-> > > I assume you are using "%s" because tja11xx_hw_stats[i].string cannot
-> > > be trusted as a format string? Is this indicating we need an
-> > > ethtool_puts() ?
-> >
-> > Indeed, it would trigger a -Wformat-security warning.
-> >
-> > An ethtool_puts() would be useful for this situation.
->
-> Hi Justin
->
-> hyperv/netvsc_drv.c:                    ethtool_sprintf(&p, netvsc_stats[=
-i].name);
-> hyperv/netvsc_drv.c:                    ethtool_sprintf(&p, vf_stats[i].n=
-ame);
-> ethernet/intel/i40e/i40e_ethtool.c:             ethtool_sprintf(&p, i40e_=
-gstrings_priv_flags[i].flag_string);
-> ethernet/intel/i40e/i40e_ethtool.c:             ethtool_sprintf(&p, i40e_=
-gl_gstrings_priv_flags[i].flag_string);
-> ethernet/intel/ice/ice_ethtool.c:                       ethtool_sprintf(&=
-p, ice_gstrings_priv_flags[i].name);
-> ethernet/intel/igc/igc_ethtool.c:                       ethtool_sprintf(&=
-p, igc_gstrings_stats[i].stat_string);
-> ethernet/intel/ixgbe/ixgbe_ethtool.c:                   ethtool_sprintf(&=
-p, ixgbe_gstrings_test[i]);
-> ethernet/netronome/nfp/nfp_net_ethtool.c:                       ethtool_s=
-printf(&data, nfp_self_test[i].name);
-> ethernet/netronome/nfp/nfp_net_ethtool.c:               ethtool_sprintf(&=
-data, nfp_net_et_stats[i + swap_off].name);
-> ethernet/netronome/nfp/nfp_net_ethtool.c:               ethtool_sprintf(&=
-data, nfp_net_et_stats[i - swap_off].name);
-> ethernet/netronome/nfp/nfp_net_ethtool.c:               ethtool_sprintf(&=
-data, nfp_net_et_stats[i].name);
-> ethernet/fungible/funeth/funeth_ethtool.c:                      ethtool_s=
-printf(&p, txq_stat_names[j]);
-> ethernet/fungible/funeth/funeth_ethtool.c:                      ethtool_s=
-printf(&p, xdpq_stat_names[j]);
-> ethernet/fungible/funeth/funeth_ethtool.c:                      ethtool_s=
-printf(&p, rxq_stat_names[j]);
-> ethernet/fungible/funeth/funeth_ethtool.c:                      ethtool_s=
-printf(&p, tls_stat_names[j]);
-> ethernet/amazon/ena/ena_ethtool.c:              ethtool_sprintf(&data, en=
-a_stats->name);
-> ethernet/amazon/ena/ena_ethtool.c:                      ethtool_sprintf(&=
-data, ena_stats->name);
-> ethernet/brocade/bna/bnad_ethtool.c:            ethtool_sprintf(&string, =
-bnad_net_stats_strings[i]);
-> ethernet/pensando/ionic/ionic_stats.c:          ethtool_sprintf(buf, ioni=
-c_lif_stats_desc[i].name);
-> ethernet/pensando/ionic/ionic_stats.c:          ethtool_sprintf(buf, ioni=
-c_port_stats_desc[i].name);
-> ethernet/hisilicon/hns/hns_dsaf_gmac.c:         ethtool_sprintf(&buff, g_=
-gmac_stats_string[i].desc);
-> ethernet/hisilicon/hns/hns_dsaf_xgmac.c:                ethtool_sprintf(&=
-buff, g_xgmac_stats_string[i].desc);
-> vmxnet3/vmxnet3_ethtool.c:                      ethtool_sprintf(&buf, vmx=
-net3_tq_dev_stats[i].desc);
-> vmxnet3/vmxnet3_ethtool.c:                      ethtool_sprintf(&buf, vmx=
-net3_tq_driver_stats[i].desc);
-> vmxnet3/vmxnet3_ethtool.c:                      ethtool_sprintf(&buf, vmx=
-net3_rq_dev_stats[i].desc);
-> vmxnet3/vmxnet3_ethtool.c:                      ethtool_sprintf(&buf, vmx=
-net3_rq_driver_stats[i].desc);
-> vmxnet3/vmxnet3_ethtool.c:              ethtool_sprintf(&buf, vmxnet3_glo=
-bal_stats[i].desc);
->
+On Oct 12, 2023 Andrii Nakryiko <andrii@kernel.org> wrote:
+> 
+> Add basic support of BPF token to BPF_PROG_LOAD. Wire through a set of
+> allowed BPF program types and attach types, derived from BPF FS at BPF
+> token creation time. Then make sure we perform bpf_token_capable()
+> checks everywhere where it's relevant.
+> 
+> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> ---
+>  include/linux/bpf.h                           |  6 ++
+>  include/uapi/linux/bpf.h                      |  2 +
+>  kernel/bpf/core.c                             |  1 +
+>  kernel/bpf/inode.c                            |  6 +-
+>  kernel/bpf/syscall.c                          | 87 ++++++++++++++-----
+>  kernel/bpf/token.c                            | 27 ++++++
+>  tools/include/uapi/linux/bpf.h                |  2 +
+>  .../selftests/bpf/prog_tests/libbpf_probes.c  |  2 +
+>  .../selftests/bpf/prog_tests/libbpf_str.c     |  3 +
+>  9 files changed, 110 insertions(+), 26 deletions(-)
 
-Woah, are these all triggering -Wformat-security warnings?
+...
 
-> It looks like there are enough potential users to justify adding
-> it. Do you have the time and patience?
+> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+> index a2c9edcbcd77..c6b00aee3b62 100644
+> --- a/kernel/bpf/syscall.c
+> +++ b/kernel/bpf/syscall.c
+> @@ -2584,13 +2584,15 @@ static bool is_perfmon_prog_type(enum bpf_prog_type prog_type)
+>  }
+>  
+>  /* last field in 'union bpf_attr' used by this command */
+> -#define	BPF_PROG_LOAD_LAST_FIELD log_true_size
+> +#define BPF_PROG_LOAD_LAST_FIELD prog_token_fd
+>  
+>  static int bpf_prog_load(union bpf_attr *attr, bpfptr_t uattr, u32 uattr_size)
+>  {
+>  	enum bpf_prog_type type = attr->prog_type;
+>  	struct bpf_prog *prog, *dst_prog = NULL;
+>  	struct btf *attach_btf = NULL;
+> +	struct bpf_token *token = NULL;
+> +	bool bpf_cap;
+>  	int err;
+>  	char license[128];
+>  
+> @@ -2606,10 +2608,31 @@ static int bpf_prog_load(union bpf_attr *attr, bpfptr_t uattr, u32 uattr_size)
+>  				 BPF_F_XDP_DEV_BOUND_ONLY))
+>  		return -EINVAL;
+>  
+> +	bpf_prog_load_fixup_attach_type(attr);
+> +
+> +	if (attr->prog_token_fd) {
+> +		token = bpf_token_get_from_fd(attr->prog_token_fd);
+> +		if (IS_ERR(token))
+> +			return PTR_ERR(token);
+> +		/* if current token doesn't grant prog loading permissions,
+> +		 * then we can't use this token, so ignore it and rely on
+> +		 * system-wide capabilities checks
+> +		 */
+> +		if (!bpf_token_allow_cmd(token, BPF_PROG_LOAD) ||
+> +		    !bpf_token_allow_prog_type(token, attr->prog_type,
+> +					       attr->expected_attach_type)) {
+> +			bpf_token_put(token);
+> +			token = NULL;
+> +		}
 
-I do :)
+At the start of this effort I mentioned how we wanted to have LSM
+control points when the token is created and when it is used.  It is
+for this reason that we still want a hook inside the
+bpf_token_allow_cmd() function as it allows us to enable/disable use
+of the token when its use is first attempted.  If the LSM decides to
+disallow use of the token in this particular case then the token is
+disabled (set to NULL) while the operation is still allowed to move
+forward, simply without the token.  It's a much cleaner and well
+behaved approach as it allows the normal BPF access controls to do
+their work.
 
-Should I create ethtool_puts() and then submit adoption patches
-for it in the same series? Or wait to hear back about how ethtool_puts()
-is received.
+> +	}
+> +
+> +	bpf_cap = bpf_token_capable(token, CAP_BPF);
 
->
->     Andrew
+Similar to the above comment, we want to a LSM control point in
+bpf_token_capable() so that the LSM can control the token's
+ability to delegate capability privileges when they are used.  Having
+to delay this access control point to security_bpf_prog_load() is not
+only awkward but it requires either manual synchronization between
+all of the different LSMs and the the capability checks in the
+bpf_prog_load() function or a completely different set of LSM
+permissions for a token-based BPF program load over a normal BPF
+program load.
 
-Thanks
-Justin
+We really need these hooks Andrii, I wouldn't have suggested them if
+I didn't believe they were important.
+
+> +	err = -EPERM;
+> +
+>  	if (!IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) &&
+>  	    (attr->prog_flags & BPF_F_ANY_ALIGNMENT) &&
+> -	    !bpf_capable())
+> -		return -EPERM;
+> +	    !bpf_cap)
+> +		goto put_token;
+>  
+>  	/* Intent here is for unprivileged_bpf_disabled to block BPF program
+>  	 * creation for unprivileged users; other actions depend
+> @@ -2618,21 +2641,23 @@ static int bpf_prog_load(union bpf_attr *attr, bpfptr_t uattr, u32 uattr_size)
+>  	 * capability checks are still carried out for these
+>  	 * and other operations.
+>  	 */
+> -	if (sysctl_unprivileged_bpf_disabled && !bpf_capable())
+> -		return -EPERM;
+> +	if (sysctl_unprivileged_bpf_disabled && !bpf_cap)
+> +		goto put_token;
+>  
+>  	if (attr->insn_cnt == 0 ||
+> -	    attr->insn_cnt > (bpf_capable() ? BPF_COMPLEXITY_LIMIT_INSNS : BPF_MAXINSNS))
+> -		return -E2BIG;
+> +	    attr->insn_cnt > (bpf_cap ? BPF_COMPLEXITY_LIMIT_INSNS : BPF_MAXINSNS)) {
+> +		err = -E2BIG;
+> +		goto put_token;
+> +	}
+>  	if (type != BPF_PROG_TYPE_SOCKET_FILTER &&
+>  	    type != BPF_PROG_TYPE_CGROUP_SKB &&
+> -	    !bpf_capable())
+> -		return -EPERM;
+> +	    !bpf_cap)
+> +		goto put_token;
+>  
+> -	if (is_net_admin_prog_type(type) && !bpf_net_capable())
+> -		return -EPERM;
+> -	if (is_perfmon_prog_type(type) && !perfmon_capable())
+> -		return -EPERM;
+> +	if (is_net_admin_prog_type(type) && !bpf_token_capable(token, CAP_NET_ADMIN))
+> +		goto put_token;
+> +	if (is_perfmon_prog_type(type) && !bpf_token_capable(token, CAP_PERFMON))
+> +		goto put_token;
+>  
+>  	/* attach_prog_fd/attach_btf_obj_fd can specify fd of either bpf_prog
+>  	 * or btf, we need to check which one it is
+> @@ -2642,27 +2667,33 @@ static int bpf_prog_load(union bpf_attr *attr, bpfptr_t uattr, u32 uattr_size)
+>  		if (IS_ERR(dst_prog)) {
+>  			dst_prog = NULL;
+>  			attach_btf = btf_get_by_fd(attr->attach_btf_obj_fd);
+> -			if (IS_ERR(attach_btf))
+> -				return -EINVAL;
+> +			if (IS_ERR(attach_btf)) {
+> +				err = -EINVAL;
+> +				goto put_token;
+> +			}
+>  			if (!btf_is_kernel(attach_btf)) {
+>  				/* attaching through specifying bpf_prog's BTF
+>  				 * objects directly might be supported eventually
+>  				 */
+>  				btf_put(attach_btf);
+> -				return -ENOTSUPP;
+> +				err = -ENOTSUPP;
+> +				goto put_token;
+>  			}
+>  		}
+>  	} else if (attr->attach_btf_id) {
+>  		/* fall back to vmlinux BTF, if BTF type ID is specified */
+>  		attach_btf = bpf_get_btf_vmlinux();
+> -		if (IS_ERR(attach_btf))
+> -			return PTR_ERR(attach_btf);
+> -		if (!attach_btf)
+> -			return -EINVAL;
+> +		if (IS_ERR(attach_btf)) {
+> +			err = PTR_ERR(attach_btf);
+> +			goto put_token;
+> +		}
+> +		if (!attach_btf) {
+> +			err = -EINVAL;
+> +			goto put_token;
+> +		}
+>  		btf_get(attach_btf);
+>  	}
+>  
+> -	bpf_prog_load_fixup_attach_type(attr);
+>  	if (bpf_prog_load_check_attach(type, attr->expected_attach_type,
+>  				       attach_btf, attr->attach_btf_id,
+>  				       dst_prog)) {
+> @@ -2670,7 +2701,8 @@ static int bpf_prog_load(union bpf_attr *attr, bpfptr_t uattr, u32 uattr_size)
+>  			bpf_prog_put(dst_prog);
+>  		if (attach_btf)
+>  			btf_put(attach_btf);
+> -		return -EINVAL;
+> +		err = -EINVAL;
+> +		goto put_token;
+>  	}
+>  
+>  	/* plain bpf_prog allocation */
+> @@ -2680,7 +2712,8 @@ static int bpf_prog_load(union bpf_attr *attr, bpfptr_t uattr, u32 uattr_size)
+>  			bpf_prog_put(dst_prog);
+>  		if (attach_btf)
+>  			btf_put(attach_btf);
+> -		return -ENOMEM;
+> +		err = -EINVAL;
+> +		goto put_token;
+>  	}
+>  
+>  	prog->expected_attach_type = attr->expected_attach_type;
+> @@ -2691,6 +2724,10 @@ static int bpf_prog_load(union bpf_attr *attr, bpfptr_t uattr, u32 uattr_size)
+>  	prog->aux->sleepable = attr->prog_flags & BPF_F_SLEEPABLE;
+>  	prog->aux->xdp_has_frags = attr->prog_flags & BPF_F_XDP_HAS_FRAGS;
+>  
+> +	/* move token into prog->aux, reuse taken refcnt */
+> +	prog->aux->token = token;
+> +	token = NULL;
+> +
+>  	err = security_bpf_prog_alloc(prog->aux);
+>  	if (err)
+>  		goto free_prog;
+> @@ -2792,6 +2829,8 @@ static int bpf_prog_load(union bpf_attr *attr, bpfptr_t uattr, u32 uattr_size)
+>  	if (prog->aux->attach_btf)
+>  		btf_put(prog->aux->attach_btf);
+>  	bpf_prog_free(prog);
+> +put_token:
+> +	bpf_token_put(token);
+>  	return err;
+>  }
+
+--
+paul-moore.com
 
