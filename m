@@ -1,183 +1,102 @@
-Return-Path: <netdev+bounces-40620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C5867C7E90
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 09:28:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6B837C7EED
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 09:49:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D94C6282AD6
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 07:28:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF6FF1C20A73
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 07:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8DE101C9;
-	Fri, 13 Oct 2023 07:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF718101F0;
+	Fri, 13 Oct 2023 07:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="p4vyWKL1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86575D307
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 07:28:46 +0000 (UTC)
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9A03BD;
-	Fri, 13 Oct 2023 00:28:44 -0700 (PDT)
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-d8a000f6a51so1952631276.3;
-        Fri, 13 Oct 2023 00:28:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148AF101EF
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 07:49:20 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1556583
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 00:49:18 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9b6559cbd74so311237466b.1
+        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 00:49:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697183356; x=1697788156; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vEo3aJUGn6l90tX8MvscUVUbtsuLRzrV2Jn02J62UEc=;
+        b=p4vyWKL1EE3F8QXk49ZTxHrOzOYCV0R+0pQaYjOh7Xl9r4rMjBIf0j1JV8wZvK2h3y
+         flulAcKUdz7lmjMi4G6O1MTfSxFdPEJOjSkUuy91TeHT8ISCA3R9NihJ+E0FinRGiTEG
+         25Nej1EjrOzB2Tek0JJNrNutSYa3ajU7jcXEZe2KzaGfpOJGY6N0s7s1fHpp0TwXVja7
+         1Uq1fmxpBw6T00HDvr6UGIashNBMDu2FmiaG09nLobfqmk/KSbwD3QwVCFUJU8Hk5hIs
+         qLBzLV63P/LiSDXzAEjyK2vfzKKabKzTz4nkC9IPLwPvSOR27JHQpU2a2fBgM7IPpNdN
+         nUHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697182124; x=1697786924;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O+WBXNRhAR0kRrLkPQsIjB2me2dEptu6CHQ6Hg/HEvw=;
-        b=AdRHt1xWq0bGkcFq1s4Yru1j3YuSz0WJgz221EvzV0wrJxdO8TO+3v9w/27RMVx8bn
-         zABYsbb5bdOIhbH8fyj77r1EHca1Ocu/hRjVus4q6FIwySDbKTgR+MmNS1A3N02qR9ax
-         mCo9jPYUom6cC8wM3oFdx2+/ihvJ9n6mr/IIqN2JpLr/Jqms2jOiKlVFrldpZCrZiYD7
-         sYDZE5T8F7WClivWsCDFeZ2xsJyQ/hYvEPa40duBhlo3j9KSug1fVUJbxV62b0E8SKS6
-         Z0fLIfsF5JnK1M+i3u0R1ekuzcvTi0C996SzhNkcuMOAywzE/+qNQaaUwpg2fLCV3G7/
-         6Qow==
-X-Gm-Message-State: AOJu0YwU4ZABX2GXZq1Fewm1lqlOLdn6sQRYWU+blOQ774u/xe6aPr33
-	rr5uLg6TfSQxbgVvxjYS5TNau/sHOOQE3w==
-X-Google-Smtp-Source: AGHT+IGDjaijHhnf2UW+UfH0X9SgFRvxG3m6vb411EIdys5DLfyfFhrVJfbiVvsRRZEn8ZOLqNsZHg==
-X-Received: by 2002:a5b:f0c:0:b0:d05:59cd:a89d with SMTP id x12-20020a5b0f0c000000b00d0559cda89dmr23154364ybr.30.1697182123862;
-        Fri, 13 Oct 2023 00:28:43 -0700 (PDT)
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com. [209.85.128.181])
-        by smtp.gmail.com with ESMTPSA id v38-20020a25fc26000000b00d7e339ada01sm351773ybd.20.2023.10.13.00.28.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Oct 2023 00:28:43 -0700 (PDT)
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5a7c08b7744so21915377b3.3;
-        Fri, 13 Oct 2023 00:28:42 -0700 (PDT)
-X-Received: by 2002:a0d:dc81:0:b0:589:e7c1:96f2 with SMTP id
- f123-20020a0ddc81000000b00589e7c196f2mr26603024ywe.46.1697182122538; Fri, 13
- Oct 2023 00:28:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697183356; x=1697788156;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vEo3aJUGn6l90tX8MvscUVUbtsuLRzrV2Jn02J62UEc=;
+        b=adfbCnmYQuvZowaJhderieWonAO3k1N4vTZnolUuU3JGf32GSWqr6y80ltnbeXbwcz
+         BMKrl1wfOiSoCTgppYMPDKyXnRXbdA7llixPlG2NvB/rjdXZRs2Kvs2yJAcfzQPnbiIR
+         wfpfw69EbTR20XwXm16VInXWAq0bA6l9NpoTplkcZLomtsmSnAK5m66LDSRO+Ij6f6Ks
+         LpapjLD677eLs+EV7O2hRfXV/SRzU0J18tUwTJufX71cSMl0QXdtgepaFtCMlQo4peHZ
+         Zr+AmByUI4O258nfXk369knTJXFYvISQzvvhnanI38QsxRWAUqJtniOwIO8oOVK4yPtb
+         DvKw==
+X-Gm-Message-State: AOJu0YyjAhjKeXzQrPZKQYFfBwij2g2IScCwDfy8pkW8cf9jcJxDqBK8
+	Jbfp5WO1UINGFQ2iA9N+Nur8eA==
+X-Google-Smtp-Source: AGHT+IGkUcYgjgawQ1WjEwGtx1aaj5N1IRQt9ehTQ5OO/VvgRc+Ozm6uRMgskNt2IDuyi7kCIhv7/Q==
+X-Received: by 2002:a17:907:b12:b0:9ba:246c:1fa9 with SMTP id h18-20020a1709070b1200b009ba246c1fa9mr10113118ejl.10.1697183356361;
+        Fri, 13 Oct 2023 00:49:16 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id gq7-20020a170906e24700b009adc5802d08sm12074059ejb.190.2023.10.13.00.49.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 00:49:15 -0700 (PDT)
+Date: Fri, 13 Oct 2023 09:49:13 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com
+Subject: Re: [patch net-next] tools: ynl: introduce option to ignore unknown
+ attributes or types
+Message-ID: <ZSj2eW079Zj/0O7z@nanopsycho>
+References: <20231012140438.306857-1-jiri@resnulli.us>
+ <20231012073223.2210c517@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231012121618.267315-1-yoshihiro.shimoda.uh@renesas.com>
- <CAMuHMdWAk9kJBGGq9K-RnC0HFZk1XbaosTBO2OW1kpYFPh1Mqg@mail.gmail.com> <TYBPR01MB5341F5AAE321E3E373012E4DD8D2A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
-In-Reply-To: <TYBPR01MB5341F5AAE321E3E373012E4DD8D2A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 13 Oct 2023 09:28:30 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdU9Udd7xX7Us+3T06YMLAb4y0xnSOipN-5c-d-MfpvKdg@mail.gmail.com>
-Message-ID: <CAMuHMdU9Udd7xX7Us+3T06YMLAb4y0xnSOipN-5c-d-MfpvKdg@mail.gmail.com>
-Subject: Re: [PATCH net-next] rswitch: Add PM ops
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: "s.shtylyov@omp.ru" <s.shtylyov@omp.ru>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231012073223.2210c517@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Shimoda-san,
-
-On Fri, Oct 13, 2023 at 4:10=E2=80=AFAM Yoshihiro Shimoda
-<yoshihiro.shimoda.uh@renesas.com> wrote:
-> > From: Geert Uytterhoeven, Sent: Thursday, October 12, 2023 9:35 PM
-> > On Thu, Oct 12, 2023 at 2:16=E2=80=AFPM Yoshihiro Shimoda
-> > <yoshihiro.shimoda.uh@renesas.com> wrote:
-> > > Add PM ops for Suspend to Idle. When the system suspended,
-> > > the Ethernet Serdes's clock will be stopped. So, this driver needs
-> > > to re-initialize the Ethernet Serdes by phy_init() in
-> > > renesas_eth_sw_resume(). Otherwise, timeout happened in phy_power_on(=
-).
-> > >
-> > > Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-> >
-> > Thanks for your patch!
+Thu, Oct 12, 2023 at 04:32:23PM CEST, kuba@kernel.org wrote:
+>On Thu, 12 Oct 2023 16:04:38 +0200 Jiri Pirko wrote:
+>> $ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do trap-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "trap-name": "source_mac_is_multicast"}' --ignore-unknown
+>> {'bus-name': 'netdevsim',
+>>  'dev-name': 'netdevsim1',
+>>  'trap-action': 'drop',
+>>  'trap-group-name': 'l2_drops',
+>>  'trap-name': 'source_mac_is_multicast'}
 >
-> Thank you for your review!
+>Wouldn't it be better to put the unknown attr in as raw binary?
+>We can key it by attribute type (integer) and put the NlAttr object
+>in as the value.
 >
-> > > --- a/drivers/net/ethernet/renesas/rswitch.c
-> > > +++ b/drivers/net/ethernet/renesas/rswitch.c
-> > > @@ -17,6 +17,7 @@
-> > >  #include <linux/of_net.h>
-> > >  #include <linux/phy/phy.h>
-> > >  #include <linux/platform_device.h>
-> > > +#include <linux/pm.h>
-> > >  #include <linux/pm_runtime.h>
-> > >  #include <linux/rtnetlink.h>
-> > >  #include <linux/slab.h>
-> > > @@ -1315,6 +1316,7 @@ static int rswitch_phy_device_init(struct rswit=
-ch_device *rdev)
-> > >         if (!phydev)
-> > >                 goto out;
-> > >         __set_bit(rdev->etha->phy_interface, phydev->host_interfaces)=
-;
-> > > +       phydev->mac_managed_pm =3D true;
-> > >
-> > >         phydev =3D of_phy_connect(rdev->ndev, phy, rswitch_adjust_lin=
-k, 0,
-> > >                                 rdev->etha->phy_interface);
-> > > @@ -1991,11 +1993,52 @@ static void renesas_eth_sw_remove(struct plat=
-form_device *pdev)
-> > >         platform_set_drvdata(pdev, NULL);
-> > >  }
-> > >
-> > > +static int __maybe_unused renesas_eth_sw_suspend(struct device *dev)
-> > > +{
-> > > +       struct rswitch_private *priv =3D dev_get_drvdata(dev);
-> > > +       struct net_device *ndev;
-> > > +       int i;
-> >
-> > unsigned int (also below)
->
-> I don't know why unsigned int is needed. Other functions use
+>That way at least the user still sees that the unknown attrs are
+>present.
 
-There's this old mantra "prefer unsigned over signed in C",
-and a valid port array index here is always unsigned.
-
-> rswitch_for_each_enabled_port{_continue_reverse}() with int.
-> Especially, rswitch_for_each_enabled_port_continue_reverse()
-> has the following code, unsigned int will not work correctly:
-
-Oh, there is also a reverse variant, which indeed needs a signed
-iterator, currently...
-
-> ---
-> #define rswitch_for_each_enabled_port_continue_reverse(priv, i) \
->         for (i--; i >=3D 0; i--)                                  \
-
-I think this can be made to work with an unsigned iterator using
-
-    for (; i-- > 0; )
-
->                 if (priv->rdev[i]->disabled)                    \
->                         continue;                               \
->                 else
-> ---
->
-> So, I would like to keep this for consistency with other functions'
-> implementation. But, what do you think?
-
-Consistency is good...
-Surprising readers (why is this signed?) is bad...
-It's hard to keep a good balance...
-
-BTW, perhaps it would make sense to use the reverse order in suspend?
-Although it probably doesn't matter, as rswitch_deinit() uses the
-non-reverse order, too.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+Okay, will check that out.
 
