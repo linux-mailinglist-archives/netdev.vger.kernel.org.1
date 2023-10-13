@@ -1,264 +1,159 @@
-Return-Path: <netdev+bounces-40717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0DD87C8719
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 15:44:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2E6F7C8724
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 15:46:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 536CCB209A2
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 13:43:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A4D11C20BA0
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 13:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55D615EB1;
-	Fri, 13 Oct 2023 13:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB0A15EB8;
+	Fri, 13 Oct 2023 13:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lLRRazBE"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="n36tFI7R"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2645115EA0
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 13:43:51 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BE4FC0
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 06:43:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697204630; x=1728740630;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=g93uwdM5Fm0/B/ImXkOMRQI1ZwTld0ih4kQSke9XNiI=;
-  b=lLRRazBE1zW+7TXuTrl30Z35jw8ShK6Jc684+5xaLQWNW9Evy4d/e2QI
-   ZVYhzfzoBnw0fy0eWrUDPxVRiM6TxEsATSgOItL9lvSi9Fg2e9FZaxkOs
-   N5+F6ysxS9NxE9NNhyd7VBXub7aa95W2Rs3ID9tumSvjddez9xD/NKLWL
-   i2i/plS2H5+XJ5QOWwgXrsqfsqrSrGQr0FDvwtNsjA8lfFFJ9tk/a9UCi
-   BpcqVe+yODGNA0mp/k8Bykpif10tlR3Cctb68fsRJ4obGMxKZ/tIL5JTG
-   td1Zk5lajRh0qzMIuQFx9s+lPoHGaSvynnSF12S1RyjFdODumIHW75ANT
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10862"; a="416234586"
-X-IronPort-AV: E=Sophos;i="6.03,222,1694761200"; 
-   d="scan'208";a="416234586"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 06:43:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10862"; a="731374107"
-X-IronPort-AV: E=Sophos;i="6.03,222,1694761200"; 
-   d="scan'208";a="731374107"
-Received: from unknown (HELO fedora.iind.intel.com) ([10.138.157.125])
-  by orsmga006.jf.intel.com with ESMTP; 13 Oct 2023 06:43:47 -0700
-From: Aniruddha Paul <aniruddha.paul@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: marcin.szycik@intel.com,
-	netdev@vger.kernel.org,
-	Aniruddha Paul <aniruddha.paul@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [PATCH iwl-net,v3] ice: Fix VF-VF filter rules in switchdev mode
-Date: Fri, 13 Oct 2023 19:13:42 +0530
-Message-Id: <20231013134342.2466512-1-aniruddha.paul@intel.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A4915EB1
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 13:46:00 +0000 (UTC)
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97D93BE
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 06:45:57 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id ca18e2360f4ac-7a2874d2820so28883339f.1
+        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 06:45:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697204757; x=1697809557; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dy6cR2Hzs2fRj+jqX6DHkTEB1kpzFyCXP4UUU0j0bFE=;
+        b=n36tFI7RUEpCypQXtxDuyQFYulIBQv94NME8LYqJZ6k8NdiGShK3vSYFNhNE4KDp0d
+         MTBFbe/rihyI+sRO2h3Ke+vOXttE4puJUJgF5znvYKqWlebleZPb9WkZQUbQ88R/qWI8
+         pdcN45J+yLWa+I3DjwvvEBvAbJTEVUUA5N41Ho+Y/Ni5/84tt5OtTR89OyPNJ7uBz0dB
+         Z6M2ytm1mSw01Hokg+wlKPkeoN1ZTIdsH6k9VYhcBmLB8zsHLsFOYb9dGHq+oHuPg81+
+         b8mBzPYSirOx2ro7LTkOrTdDabv4egz4M9WoEajOAk6PduJMFXdzBanSuiN7EmLEeXL2
+         gjtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697204757; x=1697809557;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dy6cR2Hzs2fRj+jqX6DHkTEB1kpzFyCXP4UUU0j0bFE=;
+        b=SZpOgZ23bQxKeqQ2CWf4MJSKy+8hWAWzb1Ud/PTK7RleslLusBZ44Gh3wd3U63XEWQ
+         bD9x3YFtbsZzP+in5awIsw+kenCfMJNgfkxs2WQDc5VUsFUPdAZcdc9QNnqDNKdUbxtu
+         WkoDaTA+k2qp6ly0mXIFTnRcBEHOWD6x367cZtODMQrSQpZaREHFZ/cZ00beZ0x8/jKI
+         ZS2NOtFzADoNTa3mPSugfd7zN4xlEmKP2PbcyjZVffp/Ft6AO0W2zthhKr3IN/vLAIUZ
+         aiCfSRjC45o2/Wa7VuOfm6BOaBLH6zdegsna5SsWNtDyD4Gd8kZyhWjX2XKA0CZR2T2I
+         H3oQ==
+X-Gm-Message-State: AOJu0YzcdBiRgSOi22Nse9P0sTpbu9IZu2KC28bMfzQEb26BQ2iaXpUR
+	ozO2lcAgoVvlQuWsrUWL5CsUkw==
+X-Google-Smtp-Source: AGHT+IGhomw/8wuPVTHe5JDimsPS11whdPVfk1pJcH/40uMu9k60/6M26anDY6AXc9bGj7cgITZbWA==
+X-Received: by 2002:a92:dacd:0:b0:351:1ed0:5c6b with SMTP id o13-20020a92dacd000000b003511ed05c6bmr26491258ilq.3.1697204756852;
+        Fri, 13 Oct 2023 06:45:56 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id em15-20020a0566384daf00b0042ff466c9bdsm4674760jab.127.2023.10.13.06.45.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Oct 2023 06:45:56 -0700 (PDT)
+Message-ID: <a9dd11d9-b5b8-456d-b8b6-12257e2924ab@kernel.dk>
+Date: Fri, 13 Oct 2023 07:45:55 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: Problem with io_uring splice and KTLS
+Content-Language: en-US
+To: Sascha Hauer <sha@pengutronix.de>
+Cc: Boris Pismenny <borisp@nvidia.com>, netdev@vger.kernel.org,
+ John Fastabend <john.fastabend@gmail.com>, linux-kernel@vger.kernel.org,
+ io-uring@vger.kernel.org, kernel@pengutronix.de,
+ Jakub Kicinski <kuba@kernel.org>, Pavel Begunkov <asml.silence@gmail.com>
+References: <20231010141932.GD3114228@pengutronix.de>
+ <d729781a-3d12-423b-973e-c16fdbcbb60b@kernel.dk>
+ <20231012133407.GA3359458@pengutronix.de>
+ <f39ef992-4789-4c30-92ef-e3114a31d5c7@kernel.dk>
+ <20231013054716.GG3359458@pengutronix.de>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20231013054716.GG3359458@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Any packet leaving VSI i.e VF's VSI is considered as
-egress traffic by HW, thus failing to match the added
-rule.
+On 10/12/23 11:47 PM, Sascha Hauer wrote:
+> On Thu, Oct 12, 2023 at 07:45:07PM -0600, Jens Axboe wrote:
+>> On 10/12/23 7:34 AM, Sascha Hauer wrote:
+>>> In case you don't have encryption hardware you can create an
+>>> asynchronous encryption module using cryptd. Compile a kernel with
+>>> CONFIG_CRYPTO_USER_API_AEAD and CONFIG_CRYPTO_CRYPTD and start the
+>>> webserver with the '-c' option. /proc/crypto should then contain an
+>>> entry with:
+>>>
+>>>  name         : gcm(aes)
+>>>  driver       : cryptd(gcm_base(ctr(aes-generic),ghash-generic))
+>>>  module       : kernel
+>>>  priority     : 150
+>>
+>> I did a bit of prep work to ensure I had everything working for when
+>> there's time to dive into it, but starting it with -c doesn't register
+>> this entry. Turns out the bind() in there returns -1/ENOENT.
+> 
+> Yes, that happens here as well, that's why I don't check for the error
+> in the bind call. Nevertheless it has the desired effect that the new
+> algorithm is registered and used from there on. BTW you only need to
+> start the webserver once with -c. If you start it repeatedly with -c a
+> new gcm(aes) instance is registered each time.
 
-Mark the direction for redirect rules as below:
-1. VF-VF - Egress
-2. Uplink-VF - Ingress
-3. VF-Uplink - Egress
-4. Link_Partner-Uplink - Ingress
-5. Link_Partner-VF - Ingress
+Gotcha - I wasn't able to trigger the condition, which is why I thought
+perhaps I was missing something.
 
-Fixes: 0960a27bd479 ("ice: Add direction metadata")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Aniruddha Paul <aniruddha.paul@intel.com>
----
-Change Log:
-v3:
--Removed the unused variable
+Can you try the below patch and see if that makes a difference? I'm not
+quite sure why it would since you said it triggers with DEFER_TASKRUN as
+well, and for that kind of notification, you should never hit the paths
+you have detailed in the debug patch.
 
-Links:
-v1:
--https://lore.kernel.org/netdev/20230927104253.1729049-1-aniruddha.paul@intel.com/
-v2:
--https://lore.kernel.org/netdev/20231003081639.1915967-1-aniruddha.paul@intel.com/
----
- drivers/net/ethernet/intel/ice/ice_tc_lib.c | 90 ++++++++++++++-------
- 1 file changed, 62 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-index 37b54db91df2..0e75fc6b3c06 100644
---- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-@@ -630,32 +630,61 @@ bool ice_is_tunnel_supported(struct net_device *dev)
- 	return ice_tc_tun_get_type(dev) != TNL_LAST;
- }
+diff --git a/net/core/stream.c b/net/core/stream.c
+index f5c4e47df165..a9a196587254 100644
+--- a/net/core/stream.c
++++ b/net/core/stream.c
+@@ -67,7 +67,7 @@ int sk_stream_wait_connect(struct sock *sk, long *timeo_p)
+ 			return -EPIPE;
+ 		if (!*timeo_p)
+ 			return -EAGAIN;
+-		if (signal_pending(tsk))
++		if (task_sigpending(tsk))
+ 			return sock_intr_errno(*timeo_p);
  
--static int
--ice_eswitch_tc_parse_action(struct ice_tc_flower_fltr *fltr,
--			    struct flow_action_entry *act)
-+static bool ice_tc_is_dev_uplink(struct net_device *dev)
-+{
-+	return netif_is_ice(dev) || ice_is_tunnel_supported(dev);
-+}
-+
-+static int ice_tc_setup_redirect_action(struct net_device *filter_dev,
-+					struct ice_tc_flower_fltr *fltr,
-+					struct net_device *target_dev)
- {
- 	struct ice_repr *repr;
+ 		add_wait_queue(sk_sleep(sk), &wait);
+@@ -103,7 +103,7 @@ void sk_stream_wait_close(struct sock *sk, long timeout)
+ 		do {
+ 			if (sk_wait_event(sk, &timeout, !sk_stream_closing(sk), &wait))
+ 				break;
+-		} while (!signal_pending(current) && timeout);
++		} while (!task_sigpending(current) && timeout);
  
-+	fltr->action.fltr_act = ICE_FWD_TO_VSI;
-+
-+	if (ice_is_port_repr_netdev(filter_dev) &&
-+	    ice_is_port_repr_netdev(target_dev)) {
-+		repr = ice_netdev_to_repr(target_dev);
-+
-+		fltr->dest_vsi = repr->src_vsi;
-+		fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
-+	} else if (ice_is_port_repr_netdev(filter_dev) &&
-+		   ice_tc_is_dev_uplink(target_dev)) {
-+		repr = ice_netdev_to_repr(filter_dev);
-+
-+		fltr->dest_vsi = repr->src_vsi->back->switchdev.uplink_vsi;
-+		fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
-+	} else if (ice_tc_is_dev_uplink(filter_dev) &&
-+		   ice_is_port_repr_netdev(target_dev)) {
-+		repr = ice_netdev_to_repr(target_dev);
-+
-+		fltr->dest_vsi = repr->src_vsi;
-+		fltr->direction = ICE_ESWITCH_FLTR_INGRESS;
-+	} else {
-+		NL_SET_ERR_MSG_MOD(fltr->extack,
-+				   "Unsupported netdevice in switchdev mode");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int ice_eswitch_tc_parse_action(struct net_device *filter_dev,
-+				       struct ice_tc_flower_fltr *fltr,
-+				       struct flow_action_entry *act)
-+{
-+	int err;
-+
- 	switch (act->id) {
- 	case FLOW_ACTION_DROP:
- 		fltr->action.fltr_act = ICE_DROP_PACKET;
- 		break;
- 
- 	case FLOW_ACTION_REDIRECT:
--		fltr->action.fltr_act = ICE_FWD_TO_VSI;
--
--		if (ice_is_port_repr_netdev(act->dev)) {
--			repr = ice_netdev_to_repr(act->dev);
--
--			fltr->dest_vsi = repr->src_vsi;
--			fltr->direction = ICE_ESWITCH_FLTR_INGRESS;
--		} else if (netif_is_ice(act->dev) ||
--			   ice_is_tunnel_supported(act->dev)) {
--			fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
--		} else {
--			NL_SET_ERR_MSG_MOD(fltr->extack, "Unsupported netdevice in switchdev mode");
--			return -EINVAL;
--		}
-+		err = ice_tc_setup_redirect_action(filter_dev, fltr, act->dev);
-+		if (err)
-+			return err;
- 
- 		break;
- 
-@@ -696,10 +725,6 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
- 		goto exit;
+ 		remove_wait_queue(sk_sleep(sk), &wait);
  	}
- 
--	/* egress traffic is always redirect to uplink */
--	if (fltr->direction == ICE_ESWITCH_FLTR_EGRESS)
--		fltr->dest_vsi = vsi->back->switchdev.uplink_vsi;
--
- 	rule_info.sw_act.fltr_act = fltr->action.fltr_act;
- 	if (fltr->action.fltr_act != ICE_DROP_PACKET)
- 		rule_info.sw_act.vsi_handle = fltr->dest_vsi->idx;
-@@ -713,13 +738,21 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
- 	rule_info.flags_info.act_valid = true;
- 
- 	if (fltr->direction == ICE_ESWITCH_FLTR_INGRESS) {
-+		/* Uplink to VF */
- 		rule_info.sw_act.flag |= ICE_FLTR_RX;
- 		rule_info.sw_act.src = hw->pf_id;
- 		rule_info.flags_info.act = ICE_SINGLE_ACT_LB_ENABLE;
--	} else {
-+	} else if (fltr->direction == ICE_ESWITCH_FLTR_EGRESS &&
-+		   fltr->dest_vsi == vsi->back->switchdev.uplink_vsi) {
-+		/* VF to Uplink */
- 		rule_info.sw_act.flag |= ICE_FLTR_TX;
- 		rule_info.sw_act.src = vsi->idx;
- 		rule_info.flags_info.act = ICE_SINGLE_ACT_LAN_ENABLE;
-+	} else {
-+		/* VF to VF */
-+		rule_info.sw_act.flag |= ICE_FLTR_TX;
-+		rule_info.sw_act.src = vsi->idx;
-+		rule_info.flags_info.act = ICE_SINGLE_ACT_LB_ENABLE;
- 	}
- 
- 	/* specify the cookie as filter_rule_id */
-@@ -1745,16 +1778,17 @@ ice_tc_parse_action(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr,
- 
- /**
-  * ice_parse_tc_flower_actions - Parse the actions for a TC filter
-+ * @filter_dev: Pointer to device on which filter is being added
-  * @vsi: Pointer to VSI
-  * @cls_flower: Pointer to TC flower offload structure
-  * @fltr: Pointer to TC flower filter structure
-  *
-  * Parse the actions for a TC filter
-  */
--static int
--ice_parse_tc_flower_actions(struct ice_vsi *vsi,
--			    struct flow_cls_offload *cls_flower,
--			    struct ice_tc_flower_fltr *fltr)
-+static int ice_parse_tc_flower_actions(struct net_device *filter_dev,
-+				       struct ice_vsi *vsi,
-+				       struct flow_cls_offload *cls_flower,
-+				       struct ice_tc_flower_fltr *fltr)
- {
- 	struct flow_rule *rule = flow_cls_offload_flow_rule(cls_flower);
- 	struct flow_action *flow_action = &rule->action;
-@@ -1769,7 +1803,7 @@ ice_parse_tc_flower_actions(struct ice_vsi *vsi,
- 
- 	flow_action_for_each(i, act, flow_action) {
- 		if (ice_is_eswitch_mode_switchdev(vsi->back))
--			err = ice_eswitch_tc_parse_action(fltr, act);
-+			err = ice_eswitch_tc_parse_action(filter_dev, fltr, act);
- 		else
- 			err = ice_tc_parse_action(vsi, fltr, act);
- 		if (err)
-@@ -1856,7 +1890,7 @@ ice_add_tc_fltr(struct net_device *netdev, struct ice_vsi *vsi,
- 	if (err < 0)
- 		goto err;
- 
--	err = ice_parse_tc_flower_actions(vsi, f, fltr);
-+	err = ice_parse_tc_flower_actions(netdev, vsi, f, fltr);
- 	if (err < 0)
- 		goto err;
- 
+@@ -134,7 +134,7 @@ int sk_stream_wait_memory(struct sock *sk, long *timeo_p)
+ 			goto do_error;
+ 		if (!*timeo_p)
+ 			goto do_eagain;
+-		if (signal_pending(current))
++		if (task_sigpending(current))
+ 			goto do_interrupted;
+ 		sk_clear_bit(SOCKWQ_ASYNC_NOSPACE, sk);
+ 		if (sk_stream_memory_free(sk) && !vm_wait)
+
 -- 
-2.40.1
+Jens Axboe
 
 
