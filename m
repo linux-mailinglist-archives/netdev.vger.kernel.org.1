@@ -1,84 +1,96 @@
-Return-Path: <netdev+bounces-40808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A7017C8ADE
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 18:20:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 346E57C8AF4
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 18:25:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BE4C1C20B05
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 16:20:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65BAF1C20B05
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 16:25:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3982F20B0B;
-	Fri, 13 Oct 2023 16:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FF721371;
+	Fri, 13 Oct 2023 16:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rSdJ+ZfS"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="MAlztth3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182773D011
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 16:20:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3960C433C8;
-	Fri, 13 Oct 2023 16:19:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697214000;
-	bh=jB3xhsGiwedT1y0wsLmc3+3AK+4h8XgMTED+Ov12vqg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rSdJ+ZfS8hra/kHxpm4imBJSuOolm27MNMNZ7jyYCdnRGaeygnfM70LBwbbbY6STu
-	 ELaUi+KmT0gJGPp0k/4ekqUeFMjk4RTbXsgjnCRIIlMQJFu9LteNfhak5LfQssUGcC
-	 Tp3Vka37L6UIDskAq0wYaih8iStrWdDOzllpwGS9otXToYwuN1X4QbYgO64hZOf5CD
-	 7sSDOEyGx1YRlX48QCwwlRf2PljlPkd+dMrW7hVbunqdXNIJHoI435npJEEr1w8rHP
-	 9XIviSGO+1peoa+CkVn2iPLSc+rM6rLHJ7MbKr5IPW128AggXALCnpCJIBis2HJpl8
-	 ErDyxdrYzXX5A==
-Message-ID: <e18c52e8-116e-f258-7f2c-030a80e88343@kernel.org>
-Date: Fri, 13 Oct 2023 11:19:58 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1611B285
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 16:25:41 +0000 (UTC)
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B82910C
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 09:25:39 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1c8a6aa0cd1so18726875ad.0
+        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 09:25:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1697214339; x=1697819139; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fGsIQtn1kUOEPH/EyvUO5nXHmKVACT2hdgnYK7YYsf8=;
+        b=MAlztth3RyslyF84xmcY5tfcU2AGBZQz5P3EreddPRY/Q5C5UVWkRn2zTXN5lWaJTX
+         YHHlD4QJJ8S9yWL6lpmTOEUgIa2Q5SU4F6xj6nr5njiu6hPsPutyRulJNSwI9HcS6J55
+         GJ/rqR6wp7Qc4BFqW6ZxwqvFH0Cl1cUKTem6DKFJS6HTgsQXy/OPNoBWPoUv4HOOpgo0
+         UMe+XYg0Y3yuPP8V9Rtk6fUlNWQb3WSmeNygsKBoH0X6L/ovV7GknJaS4NV5CdyZCPfP
+         MbODyDAz7pfHuYXMFxKF4xgj+K8Q9EAfkLnw5Tp9Aricbo4/PtLpsGQCL5HzE2HWb/ca
+         AGVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697214339; x=1697819139;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fGsIQtn1kUOEPH/EyvUO5nXHmKVACT2hdgnYK7YYsf8=;
+        b=AFm3sd9g9rx+QbF1Egj4gSsRmvNy8UMJv4aZsFvfKiH3KTnhkcYAMqG8CIRhwwf4qQ
+         rjQRwbwVfxkamPXU3qi3u+WqAwh5TILY4XZCn/NJGVXeoWmvoDyT9RYsNI2XIyrgh8NZ
+         NLMW6NvZa/pYGSjwS29MXn4hPE/x1CmMGdo+mD0jWScMGxnaMMyiP6j1fABe2AVTIthT
+         8N08trsFYb8mmIBpQiM6VmmWd0Am0WB4UQRdtMX+XCVqpBfFaSoblIAdzRl9rBsWvu04
+         +k/qRTwJaAz113BMNv1Ja4rBUmWd1oICZ78HVsbSytvmPqejArmDCilMY/aLpdpA/oYC
+         zILg==
+X-Gm-Message-State: AOJu0YxND2ntfJ471/ob96nhO1XGv95iintwBNn63pxHuLlOGx168pZT
+	TeiQRZSTAHk8COsT4kSMyMlDMg==
+X-Google-Smtp-Source: AGHT+IHpc/Tkf9Pt5e2oD3IFVvwS6bTXm6J3mOQbVyXxjR0oCfbQQ1e+XvWpuSp0soQAKko2C1ScUg==
+X-Received: by 2002:a17:902:d2d1:b0:1ca:220:ce42 with SMTP id n17-20020a170902d2d100b001ca0220ce42mr2271443plc.37.1697214338684;
+        Fri, 13 Oct 2023 09:25:38 -0700 (PDT)
+Received: from hermes.local (204-195-126-68.wavecable.com. [204.195.126.68])
+        by smtp.gmail.com with ESMTPSA id x11-20020a1709028ecb00b001c3721897fcsm4025457plo.277.2023.10.13.09.25.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 09:25:38 -0700 (PDT)
+Date: Fri, 13 Oct 2023 09:25:36 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+ netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+ <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, "open list:ARM/Mediatek SoC
+ support" <linux-kernel@vger.kernel.org>, "moderated list:ARM/Mediatek SoC
+ support" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH net-next v2 1/2] net: dsa: Use conduit and user terms
+Message-ID: <20231013092536.09183d47@hermes.local>
+In-Reply-To: <20231012231029.tqz3e5dnlvbmcmja@skbuf>
+References: <20231011222026.4181654-1-florian.fainelli@broadcom.com>
+	<20231011222026.4181654-1-florian.fainelli@broadcom.com>
+	<20231011222026.4181654-2-florian.fainelli@broadcom.com>
+	<20231011222026.4181654-2-florian.fainelli@broadcom.com>
+	<20231012231029.tqz3e5dnlvbmcmja@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [net] ipv4: Fix broken PMTUD when using L4 multipath hash
-Content-Language: en-US
-To: "Nabil S. Alramli" <nalramli@fastly.com>, sbhogavilli@fastly.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: srao@fastly.com, dev@nalramli.com
-References: <20231012005721.2742-2-nalramli@fastly.com>
- <20231012234025.4025-1-nalramli@fastly.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231012234025.4025-1-nalramli@fastly.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 10/12/23 5:40 PM, Nabil S. Alramli wrote:
-> From: Suresh Bhogavilli <sbhogavilli@fastly.com>
-> 
-> On a node with multiple network interfaces, if we enable layer 4 hash
-> policy with net.ipv4.fib_multipath_hash_policy=1, path MTU discovery is
-> broken and TCP connection does not make progress unless the incoming
-> ICMP Fragmentation Needed (type 3, code 4) message is received on the
-> egress interface of selected nexthop of the socket.
 
-known problem.
-
-> 
-> This is because build_sk_flow_key() does not provide the sport and dport
-> from the socket when calling flowi4_init_output(). This appears to be a
-> copy/paste error of build_skb_flow_key() -> __build_flow_key() ->
-> flowi4_init_output() call used for packet forwarding where an skb is
-> present, is passed later to fib_multipath_hash() call, and can scrape
-> out both sport and dport from the skb if L4 hash policy is in use.
-
-are you sure?
-
-As I recall the problem is that the ICMP can be received on a different
-path. When it is processed, the exception is added to the ingress device
-of the ICMP and not the device the original packet egressed. I have
-scripts that somewhat reliably reproduced the problem; I started working
-on a fix and got distracted.
+Is there going to be a corresponding change to iproute2 devlink?
 
