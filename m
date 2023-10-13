@@ -1,71 +1,148 @@
-Return-Path: <netdev+bounces-40561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A94BE7C7AB1
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 02:01:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 913457C7AB7
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 02:04:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5779C282B95
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 00:01:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0F07B207D4
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 00:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F6636A;
-	Fri, 13 Oct 2023 00:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2297F1;
+	Fri, 13 Oct 2023 00:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iekErt/E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N3TP5Vcu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3605363
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 00:01:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4E53C433C7;
-	Fri, 13 Oct 2023 00:01:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697155308;
-	bh=Ha5S911H5ryYsiwYz0UJplTypjEmV4oV7kNBO0ZqmXA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iekErt/EtcnZMdtnt6ARmkStMpS+OHACro/dgSHLXxtVq+JUIJUwAgAZ2zxvaO8qa
-	 PAIuDp8eSG2pco4dZGwna6XKWb6aSOg0TdEUt6b9C4UcS1LRPuaY7riQxiQO61v6Nw
-	 VS41ScmoZNVfcNLlmlUCqthMumlGq4X7akbFujjJ7N3hmTSngD/xWMcM8X8BICJyUo
-	 /Ft8/Kmwq8HPPj2aKJdnTvscOSfWT6/Yg2eDTj0B4L5xPk+/PPop+IKh4SctkJHZHZ
-	 Ae9UeuSwwQ6Qc3FGPc29VULp1XC0PanRWcaKAuaaoM4KkDgwDgOwdNB4hvaJY1v14R
-	 2DqQgCDqCrSZg==
-Date: Thu, 12 Oct 2023 17:01:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
- <davem@davemloft.net>, <edumazet@google.com>, <egallen@redhat.com>,
- <hgani@marvell.com>, <mschmidt@redhat.com>, <netdev@vger.kernel.org>,
- <sedara@marvell.com>, <vburru@marvell.com>, <vimleshk@marvell.com>
-Subject: Re: [net PATCH v2] octeon_ep: update BQL sent bytes before ringing
- doorbell
-Message-ID: <20231012170147.5c0e8148@kernel.org>
-In-Reply-To: <20231012101706.2291551-1-srasheed@marvell.com>
-References: <PH0PR18MB47342FEB8D57162EE5765E3CC7D3A@PH0PR18MB4734.namprd18.prod.outlook.com>
-	<20231012101706.2291551-1-srasheed@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2086A7F6
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 00:04:17 +0000 (UTC)
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56EF6CA;
+	Thu, 12 Oct 2023 17:04:15 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id 46e09a7af769-6c64a3c4912so1025341a34.3;
+        Thu, 12 Oct 2023 17:04:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697155454; x=1697760254; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oh67ucGuzIvE780j/LrVx5Elx34xcaAEoCizzJ+iHF8=;
+        b=N3TP5VcuIGDVeiQY461R0QaNw6eX78Sss2PGs6h2S1lcHYGsrTMGFXyEcXxzWZ83g1
+         BSgUUuxfYxA95uU+YxaZyMwCh8nOFr3n4aG2WkMoZOm4kSSR6BdN1clVsIh8BSLLXF5g
+         SqArOx50D4E0Tx0ftwzgAc3IORCizgaEQJt3peapypbsDaLpHnG4iaepn5tncQoFOC1E
+         71ZqUc1DP1ccGGq9nWdo5eTkEuEl0iw4gIuDgMUyV103HhxOEk0latoP19BaHYSGa8n7
+         VIqlKsIrECYaoFPZqJCID+fjjHWpsOuHLCNZOYXuJbZwptFfwvQIbojaPyiPXhuce6Yw
+         jbnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697155454; x=1697760254;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Oh67ucGuzIvE780j/LrVx5Elx34xcaAEoCizzJ+iHF8=;
+        b=owm6QLBbaLtdFrUwNqVt+DN9zhswY/n6NY8rqJdvSKrdogk2SBOV/oh67tlxhk6R4N
+         7byH46HdeLzfHhXTKrzx+B1CvEO1QlvXQXEYPaxVRC1HJ/bt7YN6t523zkq98ZQart3j
+         fRDV13UMaPs8o9AZH+KwZ+86m+CEujdkiBSsip4xrrzy2w2Mtcbt3zKa5Q0HzyukL2nN
+         ZprLmlu4g42xbIqgSbJupoMxVBhOnD3C1/jWnhT8/jxmWAqFjnRUU3g/NrsrqgmX39PV
+         njYYP5odf7GRqyJkuUsuQ31fHBSLYs7k4FHa/weerLBfYGqkXhzAxqE/6a2KsTS1S/SH
+         bgqA==
+X-Gm-Message-State: AOJu0YxFvY8zcMwYDIEhF+XuaJ3c4fYMPjJjTiTfY+eQ7lCKyAhPGagC
+	yHTfj89CvkOxpOrqysQzsXA=
+X-Google-Smtp-Source: AGHT+IEoD+6r6arnZjsqloxzLh2yK4Ao1EbLkqH70J3zGd6qS6Bha/trbmFxeZQVi0Pk+lVNP9d65w==
+X-Received: by 2002:aca:1c18:0:b0:3ae:5c89:dcc2 with SMTP id c24-20020aca1c18000000b003ae5c89dcc2mr27713272oic.34.1697155454577;
+        Thu, 12 Oct 2023 17:04:14 -0700 (PDT)
+Received: from debian.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id d9-20020a634f09000000b005aa800c149bsm196524pgb.39.2023.10.12.17.04.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 17:04:13 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id 9E3208061F09; Fri, 13 Oct 2023 07:04:07 +0700 (WIB)
+Date: Fri, 13 Oct 2023 07:04:07 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Loic Poulain <loic.poulain@linaro.org>,
+	M Chetan Kumar <m.chetan.kumar@linux.intel.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Regressions <regressions@lists.linux.dev>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Intel Wireless WAN <linuxwwan@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>
+Subject: Re: Intel 7560 LTE Modem stops working after resuming from standby
+Message-ID: <ZSiJdxjokD0P9wRc@debian.me>
+References: <267abf02-4b60-4a2e-92cd-709e3da6f7d3@gmail.com>
+ <CAMZdPi9RDSAsA8bCwN1f-4v3Ahqh8+eFLTArdyE5qZeocAMhtQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="PP7bwyu6fGW3EUdk"
+Content-Disposition: inline
+In-Reply-To: <CAMZdPi9RDSAsA8bCwN1f-4v3Ahqh8+eFLTArdyE5qZeocAMhtQ@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 12 Oct 2023 03:17:06 -0700 Shinas Rasheed wrote:
-> Sometimes Tx is completed immediately after doorbell is updated, which
-> causes Tx completion routing to update completion bytes before the
-> same packet bytes are updated in sent bytes in transmit function, hence
-> hitting BUG_ON() in dql_completed(). To avoid this, update BQL
-> sent bytes before ringing doorbell.
 
-Please read this:
+--PP7bwyu6fGW3EUdk
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#resending-after-review
+On Thu, Oct 12, 2023 at 06:54:11PM +0200, Loic Poulain wrote:
+> Hi Chetan,
+>=20
+> On Thu, 12 Oct 2023 at 11:52, Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+> > I notice a regression report on Bugzilla [1]. Quoting from it:
+> >
+> > > I noticed a few days ago, after Fedora moved to Kernel 6.5, that my I=
+ntel LTE Modem was not working anymore after resuming from standby.
+> > >
+> > > The journal listed this error message multiple times:
+> > > kernel: iosm 0000:01:00.0: msg timeout
+> > >
+> > > It took me a while to determine the root cause of the problem, since =
+the modem did not work either in the following warm reboots.
+> > > Only a shutdown revived the modem.
+> > >
+> > > I did a bisection of the error and I was able to find the culprit:
+> > >
+> > > [e4f5073d53be6cec0c654fac98372047efb66947] net: wwan: iosm: enable ru=
+ntime pm support for 7560
+>=20
+> Any quick fix for this issue? alternatively we will probably revert e4f50=
+73d53.
 
-And also when you reply to people please use sane quoting.
-This: >>>
-is used to indicate three levels of quoting.
+Chetan can't be contacted as sending to his address bounces (error 550)
+(had he left Intel?). Last message on LKML is this culprit patch [1].
+Hence, revert for now.
+
+Thanks.
+
+[1]: https://lore.kernel.org/all/1b0829943267c30de27f271666cb7ce897f5b54a.1=
+686218573.git.m.chetan.kumar@linux.intel.com/
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--PP7bwyu6fGW3EUdk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZSiJcQAKCRD2uYlJVVFO
+o3T4AQC2eZBwGIxvu1lYm3OWhuSJWAkmt205gwAEftFVbJMb4wD/eOyi70nh9Io+
+kMI6SLXZyG8rleaKEg9MYV9rZ3LfCwk=
+=dFVx
+-----END PGP SIGNATURE-----
+
+--PP7bwyu6fGW3EUdk--
 
