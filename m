@@ -1,300 +1,143 @@
-Return-Path: <netdev+bounces-40598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 264AC7C7CDA
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 07:01:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71CC27C7D03
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 07:30:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80387B208B7
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 05:01:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACBAE282BEF
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 05:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54E13D017;
-	Fri, 13 Oct 2023 05:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0D8568C;
+	Fri, 13 Oct 2023 05:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="e2m9wx9U";
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="QLRdvd1m"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="rw38ukSj"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B46A28EB
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 05:01:26 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851F9B7;
-	Thu, 12 Oct 2023 22:01:23 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 284FE60152;
-	Fri, 13 Oct 2023 07:01:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1697173280; bh=mhSRRMLz3jAmea0c/jfOxmFHe6AXoaopsEh0rw/b3gA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=e2m9wx9UCdqvrvXBRAgbBNTu1S0TAKErc7FwON5uwKHePP5AZYJGh/2EECcoyzPEc
-	 2IjM4OEYLJ9HcRogs/Qkqx2Mj9WU7OWrHrFeXXVj9QLZZisHlAfkFbMDa81jBGzwuT
-	 BhB3SNCvlzEFCOMjNWagaxIxglkF70w5cMUOFzhc9VDsrOBX3eoxxU9xNCimN9E4zw
-	 B5tJ2wm0ngk9iNpK1Dlc1+VvtPincPYwB5etcgwuaLC4qux+RCHy6OGuzWtYcwVGnW
-	 6D934I1w3mQA/tgSq3uMuwh4YeGZEQ+Dw7eHDXGCe6FGfRGPijGeP+eJnTpIgXR2bM
-	 xuVRL+bmrpiwQ==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id w7y9ULEQZ4SK; Fri, 13 Oct 2023 07:01:16 +0200 (CEST)
-Received: from [192.168.1.3] (78-2-88-84.adsl.net.t-com.hr [78.2.88.84])
-	by domac.alu.hr (Postfix) with ESMTPSA id 8A61C6013C;
-	Fri, 13 Oct 2023 07:01:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1697173276; bh=mhSRRMLz3jAmea0c/jfOxmFHe6AXoaopsEh0rw/b3gA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QLRdvd1mJ2L8o0XO/ipNMd7s6g386TnpZTuZD6sNeHErNiQ1lhiAM8uy9NOix1n3V
-	 BukV8V8L+hO4EyRo4fGKfdtFwiCvRDFwhNHreZZRogrxg/AIc/aAmPBYhEHjTKovqs
-	 kL7gxua+s6P6YO+lf8TUSvDMGfAlG0CXrcN8lpzZWeJfOQaZvMovh/y/XRU34GiYu4
-	 inN7I6IE3cs5PHX8t9Dp9kgV8QuvjX56I1nv7iLcMjJ2Rori0dWUU5AW0tLevevqrR
-	 TI9xozBmwkyBh+b1Mjw04G44l3HwWAozmzxHVUd5JWe3cXYGqz06gS4uO8jKMDC8vR
-	 KCVeioZdR28aw==
-Message-ID: <250140d1-d592-45f4-aa27-691c1d68a528@alu.unizg.hr>
-Date: Fri, 13 Oct 2023 07:01:15 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA835685;
+	Fri, 13 Oct 2023 05:30:41 +0000 (UTC)
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34264BC;
+	Thu, 12 Oct 2023 22:30:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1697175037;
+	bh=AfBIySfe8fzqGBOdkjxdb3bfx1qDc/XmAZ67Y9SaAac=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rw38ukSjr6aqa3lxPk3vRRGIuP5LW4BKBj9TK36FGVsbxjB+nAUYJvvmf0/FUSo1j
+	 F3uK4/C4qbEumhrdNz9Asz4zj0x28JeJTVc/Hi+nsnlQh0PJA74fGy6Pg7/YaNVVLz
+	 G0fUr8y5yYekuGZNw0Ckt8iKrdMi9A9UcczLvSABhSw0q4fNDbG1jZrADtG0yDc7jT
+	 o1408nJUy75CY/Myuy1kYxr9nyPfPAx+6CrcK1/NG0j+FoK1LxIBoyPPu2jvaBuS8d
+	 dGKq2YfSqy2b7ubXQiWi+AIsAhKSh8RliwVqGkB7FJQVSgqb+kI0udN9+WOl8ssLlN
+	 TqQFnXw69zOOw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4S6FTS65HBz4x5K;
+	Fri, 13 Oct 2023 16:30:36 +1100 (AEDT)
+Date: Fri, 13 Oct 2023 16:30:34 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
+Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Daan De
+ Meyer <daan.j.demeyer@gmail.com>, Martin KaFai Lau <martin.lau@kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build warning after merge of the bpf-next tree
+Message-ID: <20231013163034.73314060@canb.auug.org.au>
+In-Reply-To: <20231013114007.2fb09691@canb.auug.org.au>
+References: <20231013114007.2fb09691@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v1 1/3] r8169: fix the KCSAN reported data-race in
- rtl_tx() while reading tp->cur_tx
-Content-Language: en-US
-To: Marco Elver <elver@google.com>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- nic_swsd@realtek.com, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20230927184158.243575-1-mirsad.todorovac@alu.unizg.hr>
- <0a201a6f-90dd-403c-97d0-94372be1e3e6@gmail.com>
- <CANpmjNP=jY2NzrXX4mgY5cL5tqZeLb18gQkzVhg1OofNtJ1VSw@mail.gmail.com>
-From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-Autocrypt: addr=mirsad.todorovac@alu.unizg.hr; keydata=
- xjMEYp0QmBYJKwYBBAHaRw8BAQdAI14D1/OE3jLBYycg8HaOJOYrvEaox0abFZtJf3vagyLN
- Nk1pcnNhZCBHb3JhbiBUb2Rvcm92YWMgPG1pcnNhZC50b2Rvcm92YWNAYWx1LnVuaXpnLmhy
- PsKPBBMWCAA3FiEEdCs8n09L2Xwp/ytk6p9/SWOJhIAFAmKdEJgFCQ0oaIACGwMECwkIBwUV
- CAkKCwUWAgMBAAAKCRDqn39JY4mEgIf/AP9hx09nve6VH6D/F3m5jRT5m1lzt5YzSMpxLGGU
- vGlI4QEAvOvGI6gPCQMhuQQrOfRr1CnnTXeaXHhlp9GaZEW45QzOOARinRCZEgorBgEEAZdV
- AQUBAQdAqJ1CxZGdTsiS0cqW3AvoufnWUIC/h3W2rpJ+HUxm61QDAQgHwn4EGBYIACYWIQR0
- KzyfT0vZfCn/K2Tqn39JY4mEgAUCYp0QmQUJDShogAIbDAAKCRDqn39JY4mEgIMnAQDPKMJJ
- fs8+QnWS2xx299NkVTRsZwfg54z9NIvH5L3HiAD9FT3zfHfvQxIViWEzcj0q+FLWoRkOh02P
- Ny0lWTyFlgc=
-Organization: Academy of Fine Arts, University of Zagreb
-In-Reply-To: <CANpmjNP=jY2NzrXX4mgY5cL5tqZeLb18gQkzVhg1OofNtJ1VSw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/k+myDR2_YBcKtAwJqPXFyO6";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/28/2023 8:02 AM, Marco Elver wrote:
-> On Wed, 27 Sept 2023 at 21:52, Heiner Kallweit <hkallweit1@gmail.com> wrote:
->>
->> On 27.09.2023 20:41, Mirsad Goran Todorovac wrote:
->>> KCSAN reported the following data-race:
->>>
->>> ==================================================================
->>> BUG: KCSAN: data-race in rtl8169_poll [r8169] / rtl8169_start_xmit [r8169]
->>>
->>> write (marked) to 0xffff888102474b74 of 4 bytes by task 5358 on cpu 29:
->>> rtl8169_start_xmit (drivers/net/ethernet/realtek/r8169_main.c:4254) r8169
->>> dev_hard_start_xmit (./include/linux/netdevice.h:4889 ./include/linux/netdevice.h:4903 net/core/dev.c:3544 net/core/dev.c:3560)
->>> sch_direct_xmit (net/sched/sch_generic.c:342)
->>> __dev_queue_xmit (net/core/dev.c:3817 net/core/dev.c:4306)
->>> ip_finish_output2 (./include/linux/netdevice.h:3082 ./include/net/neighbour.h:526 ./include/net/neighbour.h:540 net/ipv4/ip_output.c:233)
->>> __ip_finish_output (net/ipv4/ip_output.c:311 net/ipv4/ip_output.c:293)
->>> ip_finish_output (net/ipv4/ip_output.c:328)
->>> ip_output (net/ipv4/ip_output.c:435)
->>> ip_send_skb (./include/net/dst.h:458 net/ipv4/ip_output.c:127 net/ipv4/ip_output.c:1486)
->>> udp_send_skb (net/ipv4/udp.c:963)
->>> udp_sendmsg (net/ipv4/udp.c:1246)
->>> inet_sendmsg (net/ipv4/af_inet.c:840 (discriminator 4))
->>> sock_sendmsg (net/socket.c:730 net/socket.c:753)
->>> __sys_sendto (net/socket.c:2177)
->>> __x64_sys_sendto (net/socket.c:2185)
->>> do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
->>> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
->>>
->>> read to 0xffff888102474b74 of 4 bytes by interrupt on cpu 21:
->>> rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4397 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
->>> __napi_poll (net/core/dev.c:6527)
->>> net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
->>> __do_softirq (kernel/softirq.c:553)
->>> __irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
->>> irq_exit_rcu (kernel/softirq.c:647)
->>> common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 14))
->>> asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636)
->>> cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
->>> cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
->>> call_cpuidle (kernel/sched/idle.c:135)
->>> do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
->>> cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
->>> start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:294)
->>> secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
->>>
->>> value changed: 0x002f4815 -> 0x002f4816
->>>
->>> Reported by Kernel Concurrency Sanitizer on:
->>> CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kcsan-00143-gb5cbe7c00aa0 #41
->>> Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04/26/2023
->>> ==================================================================
->>>
->>> The write side of drivers/net/ethernet/realtek/r8169_main.c is:
->>> ==================
->>>     4251         /* rtl_tx needs to see descriptor changes before updated tp->cur_tx */
->>>     4252         smp_wmb();
->>>     4253
->>>   → 4254         WRITE_ONCE(tp->cur_tx, tp->cur_tx + frags + 1);
->>>     4255
->>>     4256         stop_queue = !netif_subqueue_maybe_stop(dev, 0, rtl_tx_slots_avail(tp),
->>>     4257                                                 R8169_TX_STOP_THRS,
->>>     4258                                                 R8169_TX_START_THRS);
->>>
->>> The read side is the function rtl_tx():
->>>
->>>     4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
->>>     4356                    int budget)
->>>     4357 {
->>>     4358         unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
->>>     4359         struct sk_buff *skb;
->>>     4360
->>>     4361         dirty_tx = tp->dirty_tx;
->>>     4362
->>>     4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
->>>     4364                 unsigned int entry = dirty_tx % NUM_TX_DESC;
->>>     4365                 u32 status;
->>>     4366
->>>     4367                 status = le32_to_cpu(tp->TxDescArray[entry].opts1);
->>>     4368                 if (status & DescOwn)
->>>     4369                         break;
->>>     4370
->>>     4371                 skb = tp->tx_skb[entry].skb;
->>>     4372                 rtl8169_unmap_tx_skb(tp, entry);
->>>     4373
->>>     4374                 if (skb) {
->>>     4375                         pkts_compl++;
->>>     4376                         bytes_compl += skb->len;
->>>     4377                         napi_consume_skb(skb, budget);
->>>     4378                 }
->>>     4379                 dirty_tx++;
->>>     4380         }
->>>     4381
->>>     4382         if (tp->dirty_tx != dirty_tx) {
->>>     4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_compl);
->>>     4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
->>>     4385
->>>     4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl, bytes_compl,
->>>     4387                                               rtl_tx_slots_avail(tp),
->>>     4388                                               R8169_TX_START_THRS);
->>>     4389                 /*
->>>     4390                  * 8168 hack: TxPoll requests are lost when the Tx packets are
->>>     4391                  * too close. Let's kick an extra TxPoll request when a burst
->>>     4392                  * of start_xmit activity is detected (if it is not detected,
->>>     4393                  * it is slow enough). -- FR
->>>     4394                  * If skb is NULL then we come here again once a tx irq is
->>>     4395                  * triggered after the last fragment is marked transmitted.
->>>     4396                  */
->>>   → 4397                 if (tp->cur_tx != dirty_tx && skb)
->>>     4398                         rtl8169_doorbell(tp);
->>>     4399         }
->>>     4400 }
->>>
->>> Obviously from the code, an earlier detected data-race for tp->cur_tx was fixed in the
->>> line 4363:
->>>
->>>     4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
->>>
->>> but the same solution is required for protecting the other access to tp->cur_tx:
->>>
->>>   → 4397                 if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
->>>     4398                         rtl8169_doorbell(tp);
->>>
->>> The write in the line 4254 is protected with WRITE_ONCE(), but the read in the line 4397
->>> might have suffered read tearing under some compiler optimisations.
->>>
->>> The fix eliminated the KCSAN data-race report for this bug.
->>>
->>> It is yet to be evaluated what happens if tp->cur_tx changes between the test in line 4363
->>> and line 4397. This test should certainly not be cached by the compiler in some register
->>> for such a long time, while asynchronous writes to tp->cur_tx might have occurred in line
->>> 4254 in the meantime.
->>>
->>
->> netif_subqueue_completed_wake() has barriers ensuring that no cached value for tp->cur_tx
->> is used in line 4397. I'm not aware of any reported issues with an obvious link to the
->> potentential issue you describe.
->> I don't have a strong opinion on these patches. They shouldn't hurt, and if they make
->> KCSAN happy, why not.
-> 
-> Barries don't protect unmarked accesses from being miscompiled. So the
-> use of barriers and marked accesses like READ_ONCE() is correct:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/access-marking.txt
-> That said, actually encountering a miscompilation depends on
-> architecture and compiler. Using the right marked accesses just
-> ensures things don't suddenly break because the compiler decided to be
-> a little more clever.
-> 
->>> Fixes: 94d8a98e6235c ("r8169: reduce number of workaround doorbell rings")
->>> Cc: Heiner Kallweit <hkallweit1@gmail.com>
->>> Cc: nic_swsd@realtek.com
->>> Cc: "David S. Miller" <davem@davemloft.net>
->>> Cc: Eric Dumazet <edumazet@google.com>
->>> Cc: Jakub Kicinski <kuba@kernel.org>
->>> Cc: Paolo Abeni <pabeni@redhat.com>
->>> Cc: Marco Elver <elver@google.com>
->>> Cc: netdev@vger.kernel.org
->>> Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@alu.unizg.hr/
->>> Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-> 
-> Acked-by: Marco Elver <elver@google.com>
+--Sig_/k+myDR2_YBcKtAwJqPXFyO6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hi, Marco,
+Hi all,
 
-Does this Acked-by: cover all of the [123]/3 in the patch series?
+On Fri, 13 Oct 2023 11:40:07 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> After merging the bpf-next tree, today's linux-next build (arm
+> multi_v7_defconfig) produced this warning:
+>=20
+> net/ipv4/af_inet.c: In function 'inet_getname':
+> net/ipv4/af_inet.c:791:13: warning: unused variable 'sin_addr_len' [-Wunu=
+sed-variable]
+>   791 |         int sin_addr_len =3D sizeof(*sin);
+>       |             ^~~~~~~~~~~~
+>=20
+> Introduced by commit
+>=20
+>   fefba7d1ae19 ("bpf: Propagate modified uaddrlen from cgroup sockaddr pr=
+ograms")
 
-I guess I should resubmit the patches as the formal ones as patchwork will
-not pick up a PATH RFC?
+This became a build failure for the i386 defconfig build, so I applied
+the following patch:
 
-Thanks,
-Mirsad Todorovac
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Fri, 13 Oct 2023 16:25:08 +1100
+Subject: [PATCH] fix up for "bpf: Propagate modified uaddrlen from cgroup s=
+ockaddr programs"
 
->>> ---
->>> v1:
->>>   the initial patch proposal. fixes the KCSAN warning.
->>>
->>>   drivers/net/ethernet/realtek/r8169_main.c | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
->>> index 6351a2dc13bc..281aaa851847 100644
->>> --- a/drivers/net/ethernet/realtek/r8169_main.c
->>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
->>> @@ -4394,7 +4394,7 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
->>>                 * If skb is NULL then we come here again once a tx irq is
->>>                 * triggered after the last fragment is marked transmitted.
->>>                 */
->>> -             if (tp->cur_tx != dirty_tx && skb)
->>> +             if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
->>>                        rtl8169_doorbell(tp);
->>>        }
->>>   }
->>
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ net/ipv4/af_inet.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
--- 
-Mirsad Todorovac
-Sistem inženjer
-Grafički fakultet | Akademija likovnih umjetnosti
-Sveučilište u Zagrebu
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 7e27ad37b939..0fcab6b6cb04 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -788,7 +788,9 @@ int inet_getname(struct socket *sock, struct sockaddr *=
+uaddr,
+ 	struct sock *sk		=3D sock->sk;
+ 	struct inet_sock *inet	=3D inet_sk(sk);
+ 	DECLARE_SOCKADDR(struct sockaddr_in *, sin, uaddr);
++#ifdef CONFIG_CGROUP_BPF
+ 	int sin_addr_len =3D sizeof(*sin);
++#endif
+=20
+ 	sin->sin_family =3D AF_INET;
+ 	lock_sock(sk);
+--=20
+2.40.1
 
-System engineer
-Faculty of Graphic Arts | Academy of Fine Arts
-University of Zagreb, Republic of Croatia
-tel. +385 (0)1 3711 451
-mob. +385 91 57 88 355
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/k+myDR2_YBcKtAwJqPXFyO6
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmUo1foACgkQAVBC80lX
+0Gy36gf8DWwDC94MJhWkzMIkGcJHT8SGoMCeaYPIqPAVeD7L5DUf9WRTz9DQf0bJ
+hC1bNGqyfW9e52BBYPMDpFZgyNbJ3avCPH67Jm4f97J7Sq5tGWKKoUyI/j3dQgt/
+RbJ+px91E2OK7gSKQLaj1V041f7/1owJdF/z9h9cuNjc56yy5n9mb1v9+cl4YMQq
+hYzo2lfq2Rw7yiDYvNwY3dHQJfkzER/0zExupCyCbOeO1z3zC6Qc5cX3dZB32RDa
+MwgXQQPe3deMgLDHcJKNkOUBjszxwcfZHGhRLD7H29KxXEZFrDexrUojRrosvDQm
+vuuvjMIoC4lz6HG8VEN4ZRbtcH2jaw==
+=V1UC
+-----END PGP SIGNATURE-----
+
+--Sig_/k+myDR2_YBcKtAwJqPXFyO6--
 
