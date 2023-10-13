@@ -1,277 +1,316 @@
-Return-Path: <netdev+bounces-40744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAB727C8924
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 17:52:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 342D37C8942
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 17:57:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AD6AB209C1
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 15:52:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C362B20A3F
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 15:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D81701BDEF;
-	Fri, 13 Oct 2023 15:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766C31C297;
+	Fri, 13 Oct 2023 15:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="JWBMe3XX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BiqMMxsM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F41911CBC
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 15:52:12 +0000 (UTC)
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2048.outbound.protection.outlook.com [40.107.20.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A44B8BB
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 08:52:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VNNYd17INGOiSDWopSMKGgbUqFqg4YfLjUmtu/MubqdwuFmFaKdGwcMz74IZp7fHCU8q/7BZejVBIWcX3CBErnOq/44cDTeMA4fhpjEPVH5VUQuRMGcqfAMclxI8lR1DkPbfD1NEELzYR92Yu1I4EJHj349s5SlJ5e5RQiUTPuO9CvwIV0r4vtxhx+ao4AOlaqSl25Y5CWcKLyKqWGjKNI+ZMJ2YJh9AEq/FmVb1RGkFm25w4lqr9gbr2IA3tyNuFrwS2+gutxZEzRmhm2ZNWaoKpQb98PLb4etD73yv51JvbUZHBoLHoa2fYWp79OjSPHZyuhpVtMG90TTPu1zwcg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7BAgRscS8kzjk97e40AkWblCSBzhLwZABfrs0YFeWU0=;
- b=GYoMyrwgbFNd913f0a1qz0XUpoLf61GCs6Vga4pPSAJin3z8BiE4NhPYXBQdXsqncqOMUB+/HlVC+C59iDqnCi72p9IiYwJa1IoBw4cONg0cFlhVL7g8lFqEIqxoWDvZZ8asRzRueXNIABufuONddf9pJEEnjn/F/yvfUohzjxJX4O7BX4ACUhVm81ajhDi2W0G8BK2J9W5Gphs5HjClTtMDwk4VHYkmXMo6zb6f7UrW01VBK6ySBIrIJzqbFMiP7s4QvWcNHbfgLCR1UROSN6a2GCzAnZYqv4xiTid5JR8+y5pdoiN62WwqA2Avhfn4fEC293/5Ma9ADAgndpFx7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7BAgRscS8kzjk97e40AkWblCSBzhLwZABfrs0YFeWU0=;
- b=JWBMe3XXT+laQKFUQipKKOSGCNa9tOISxebp8fKXWpU8yJH1met7in36BqYkSKmjenAm6sDEhEYTbeVAXW7RmlgNsD0r2VM0NS8S0MGVIDXQy2SSbFUPQX1GogQXvUIi0vlwEUcp0ssXRnEHGm1zV0myvuOaiQSSJIninvQ2qcs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from GV1PR04MB9070.eurprd04.prod.outlook.com (2603:10a6:150:21::14)
- by PAXPR04MB8798.eurprd04.prod.outlook.com (2603:10a6:102:20d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.45; Fri, 13 Oct
- 2023 15:52:07 +0000
-Received: from GV1PR04MB9070.eurprd04.prod.outlook.com
- ([fe80::b5bf:66cb:33a6:3345]) by GV1PR04MB9070.eurprd04.prod.outlook.com
- ([fe80::b5bf:66cb:33a6:3345%3]) with mapi id 15.20.6863.043; Fri, 13 Oct 2023
- 15:52:07 +0000
-Date: Fri, 13 Oct 2023 18:52:03 +0300
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-To: Daniel Klauer <daniel.klauer@gin.de>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [bug] dpaa2-eth: "Wrong SWA type" and null deref in
- dpaa2_eth_free_tx_fd()
-Message-ID: <20231013155203.kib4nowqvhtcv5ak@LXL00007.wbi.nxp.com>
-References: <30428046-fe1a-be57-1df6-2830bd33a385@gin.de>
- <20231004155048.ttllicuerlk5lroc@LXL00007.wbi.nxp.com>
- <aa784d0c-85eb-4e5d-968b-c8f74fa86be6@gin.de>
-Content-Type: multipart/mixed; boundary="7ryje6qlgtjpbxiw"
-Content-Disposition: inline
-In-Reply-To: <aa784d0c-85eb-4e5d-968b-c8f74fa86be6@gin.de>
-X-ClientProxiedBy: VI1P195CA0087.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:802:59::40) To GV1PR04MB9070.eurprd04.prod.outlook.com
- (2603:10a6:150:21::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127E11C280
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 15:57:41 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08BC8BD
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 08:57:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697212658;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/T7Rb4XZnpB8qQGskLxctbykFhIHLiOhPwndRDZOESw=;
+	b=BiqMMxsMg3DHWC0xdrRSA/ULatU/uBOt2XNFZcP+lsLKn4JzUWca0eAZBGAhucKPhrcJVc
+	rHtmWMBsnEro9QB3nXRjZWeNZm2NSgFKRocuRhuKnIeBxhddA3409spN8uYP3GWKDmaazS
+	Evzwi1FDjWTXz1L4sAQC2bq1754DNwk=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-282-jy3E8PpCNZu0_NJPMc52lw-1; Fri, 13 Oct 2023 11:57:33 -0400
+X-MC-Unique: jy3E8PpCNZu0_NJPMc52lw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3112B1E441DD;
+	Fri, 13 Oct 2023 15:57:32 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.226])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 67D181C06535;
+	Fri, 13 Oct 2023 15:57:29 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Jeff Layton <jlayton@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <lsahlber@redhat.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Christian Brauner <christian@brauner.io>,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 00/53] netfs, afs, cifs: Delegate high-level I/O to netfslib
+Date: Fri, 13 Oct 2023 16:56:33 +0100
+Message-ID: <20231013155727.2217781-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV1PR04MB9070:EE_|PAXPR04MB8798:EE_
-X-MS-Office365-Filtering-Correlation-Id: 35138045-f952-4ce6-dc7a-08dbcc045a31
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	NU5tMdVFTf6xhsA1nVNCP/GxrbxESbC/rCvlt6ZwSb4t8m/LYSlUUUqmtWFHtnQ8/6w9Xl/+A9jMzvrYsFb6CQCH1pDi121ZZR9e4NZLk1kHbCf4V5eJenCpN5Io2o916qV+OkEPFJw5IrvnvJ9Xehjo1EHKZDvUQorfEuzgIIWv7YAp6w3r2dVP2o3b0jKvKGhJFZC83YTqHVBwVQbramhcAvbZNnP6SoBjAP9uFPjn42ZwtRHk1jKwWqmNcO1isQdsOrxQvQO2yvcONgv7XRTktUTNvfoDtHWS8epuAOJXfnCZNBhMwGIm4Dqxmhof5/gJKKuCTHaQQnviTS7nmoihLEHXH9NSxnS2LGbyAQDi0zI/SqlYH+FuhBfMkBJ3I+uY38lHKe/YWNZbWQdFthUKp9OjQ3uBWFujwQGSjdVHG6EXZ4ZS774XqmW1CW9qdprHMj/zZPijxtX/6wh6QAi8KPXI8QAAaym8d6e1CjsBpL2pOetr3f6QvM3mDfwbNZUntwXo+FhLYAow91ScqPFw7EmzSbK41B6szVb1KJ/4l6GJ9gW5twfbTbOyGbuIXiUF3Ju0HawXzy4NdmWKE/5Xw5Jo0voHbnPzu7FxvejppOwLm2v+H3bc5jINLGfA
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9070.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(396003)(346002)(376002)(136003)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(26005)(41300700001)(83380400001)(44144004)(38100700002)(53546011)(1076003)(86362001)(6512007)(6506007)(6666004)(2906002)(235185007)(44832011)(5660300002)(6916009)(66476007)(66946007)(316002)(66556008)(6486002)(478600001)(8936002)(4326008)(8676002)(2700100001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Ieh29Us/c0r3nqGVD45JyEU/WgxLNgHa9lilDVtW+Z/blPyp9jMYbjHxqgQE?=
- =?us-ascii?Q?4q6ew5XLQa5OZLYZvXc8pQSrfoizSsr2NOauoGbtqSonSibGiv1CE2KHJvdJ?=
- =?us-ascii?Q?TJ4suIH24irTrA1xM53AhGsKRqqka2UvkNSKY3pTUwy9eDBaR+Sd1YFFg+h0?=
- =?us-ascii?Q?yGGAGse8fqHcp30AlpNVLqsRqzFS4xzVWeuEWsQmtGWoWufV/vw6OvGfi9Mz?=
- =?us-ascii?Q?OHh/ZlupwiwgsNJbXc3F2mhPiaAt0NNXCZA6mJclgtsLVWm4PfRHOVgwatLv?=
- =?us-ascii?Q?O2Dq77pmTCYORA7H1lcq5AuaDSEZ76Oz1s/MCIRgX7s7MXNkV9mfYIcZJWQD?=
- =?us-ascii?Q?jizUaMQHKQTzkxpYAweU1KzCQ5EkwNTAMc+4JucpC7gbB/XIi8rOkOJDVNGF?=
- =?us-ascii?Q?u23KLjPmkIIpzB/191wPDoZx2e+9JsBRo2DB6k3rwOsuK1irVHwL9L4RZmLy?=
- =?us-ascii?Q?SXnQTXYD74Ks0xyzSDxusORJcaXKU7wOdOBNsS3n1kgbWvAonDUG3fjJDzov?=
- =?us-ascii?Q?h4H6lLxaUqXzmieXltWU1VMJCTZ6qlheQQcEvH2dBl0Xp5BNppo6zD7UDLta?=
- =?us-ascii?Q?z8lkFyCUJDKddvsLsjct1CTqe8Xo5J6Wn5yCjJsvA9QufkGG1wJN4qTz8hJU?=
- =?us-ascii?Q?58U+eeEOfubO9ILlWZi6OvBaY9u9gGHPiz10bZ52SiEzKvj3Z8unwL0Xi/KZ?=
- =?us-ascii?Q?jRuas6GlFEyWDg/ag2rZ0LKh+qpzQMkWVo422vDfAMdrkhXfAUJ3M+f+nZHa?=
- =?us-ascii?Q?EZBvdSvPwIFlB9M2KcAWFgcfyjBj0P7WsLPojrCDn7SBooT1/5dQfkvovuP7?=
- =?us-ascii?Q?IUdgZTdxi7CRGPyLvucwY0rU/ptIWGuhegSPdrtQZrXT3bktQ6H0pMNvysCD?=
- =?us-ascii?Q?7KtfvcZwWoKwqIQqm3OjwWXjyuQgpfYuoLJQu0YWnM8ciPjoSFMcoE22CTKY?=
- =?us-ascii?Q?B6LCm4ULKLYHV88dObRH9k5Gidov2vdez9H7LHqoMQXxXmYSJjfKdQp4SvTZ?=
- =?us-ascii?Q?lhqq8vtU57q4dVhgjW0wyG/AobGtCZrA8pEMKcCQ+cNu4Yd3W81FCj3krKKe?=
- =?us-ascii?Q?BzHuaAxu4nswfzo5ADcrN9BKksqt0SVDc13fXURk4w484mKZ+VFf05R7HIs8?=
- =?us-ascii?Q?0VEFesjNAQCuRCWQNNzFyHDBtC9eOVQ2HVVWvPSwdCP8yGwuoh1+2VJVqsD9?=
- =?us-ascii?Q?t4sYIaWRO+MeDA+37fSKsx0sc89Qzb8Xh92uKjKPmtRlGB1q37GedGBbIzsw?=
- =?us-ascii?Q?6nGAoAsMhJv6uQCttnaAJXz2f9Th3KUgnCh+8Q/04fo9ihIefdFez7/CX6SA?=
- =?us-ascii?Q?BRmvzYY+cC03C6pU93VgtrB9LV77BTg+25OtkomI6288/RmuDW6R2kvIiuiF?=
- =?us-ascii?Q?WxPgE0/HdFhZLpv4p4E0+DRikkfq5RBsxqT0/RzYs32sAQM1rvF/a20lp7IL?=
- =?us-ascii?Q?zAegKqIcBL6nupJfLvT1Ytns3yv1NE+ugoaczBzK8e4drXpt6/C+J0zn/54s?=
- =?us-ascii?Q?E/j/bU0LhNiNhPjQta3QKP9aGs7shXJM2sg3AEcRXaS0SndEfFJ8P8Lb2NLI?=
- =?us-ascii?Q?wZqVj7LRI4NUkrRpz4HSO8RxNAmsHB/rU2xfOFht?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35138045-f952-4ce6-dc7a-08dbcc045a31
-X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9070.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2023 15:52:07.2789
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Hv4ZbktIPaQtNRGPW+wSuyVEvPwBIIRxLU/hCCZUy5Y3juhxGCdt/ZQg6ZZHlbeomi8UHn+wj44POrqwXi2TKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8798
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---7ryje6qlgtjpbxiw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Hi Jeff, Steve,
 
-On Fri, Oct 06, 2023 at 04:03:19PM +0200, Daniel Klauer wrote:
-> On 04.10.23 17:50, Ioana Ciornei wrote:
-> > On Wed, Aug 30, 2023 at 07:10:05PM +0200, Daniel Klauer wrote:
-> >> Hi,
-> >>
-> 
-(...)
+I have been working on my netfslib helpers to the point that I can run
+xfstests on AFS to completion (both with write-back buffering and, with a
+small patch, write-through buffering in the pagecache).  I can also run a
+certain amount of xfstests on CIFS, though that requires some more
+debugging.  However, this seems like a good time to post a preview of the
+patches.
 
-> > 
-> >> It's 100% reproducible here, however it seems to depend on the data
-> >> rate/load: Once it happened after receiving the first 80 frames,
-> >> another time after the first 300 frames, etc., and if I only send 5
-> >> frames per second, it does not happen at all.
-> >>
-> >> Please let me know if I should provide more info or do more tests. I
-> >> can provide a test program if needed.
-> >>
-> > 
-> > If you can provide a test program, that would be great. It would help in
-> > reproducing and debugging the issue on my side.
-> 
-> OK, I've attached a test program, send_and_recv.c, reduced as far as I could get it. If I run it:
-> 
-> ip link set up dev eth6
-> ip link set mtu 9000 dev eth6
-> ./send_and_recv eth6
-> 
+The patches remove a little over 800 lines from AFS and over 2000 from
+CIFS, albeit with around 3000 lines added to netfs.  Hopefully, I will be
+able to remove a bunch of lines from 9P and Ceph too.
 
-Thanks for the test program! I was able to reproduce the issue fairly easily.
+The main aims of these patches are to get high-level I/O and knowledge of
+the pagecache out of the filesystem drivers as much as possible and to get
+rid, as much of possible, of the knowledge that pages/folios exist.
 
-I still do not know the root cause but it seems to always happen with
-frames which are not 64 bytes aligned. I am afraid that the memory is
-somehow corrupted between Tx and Tx conf.
+Further, I would like to see ->write_begin, ->write_end and ->launder_folio
+go away.
 
-The driver already has a PTR_ALIGN call in dpaa2_eth_build_single_fd()
-but if there is not enough space in the skb's headroom then it will just
-go ahead without it.
+Features that are added by these patches to that which is already there in
+netfslib:
 
-Attached you will find 2 patches which make the 64 bytes alignment a
-must. With these patches applied onto net-next I do not see the issue
-anymore.
+ (1) NFS-style (and Ceph-style) locking around DIO vs buffered I/O calls to
+     prevent these from happening at the same time.  mmap'd I/O can, of
+     necessity, happen at any time ignoring these locks.
 
-Could you please also test on your side?
+ (2) Support for unbuffered I/O.  The data is kept in the bounce buffer and
+     the pagecache is not used.  This can be turned on with an inode flag.
 
-In the meantime, I will search internally for some more information on
-the Tx alignment restrictions in DPAA2 and whether or not they are only
-"nice to have" as the comment below suggests.
+ (3) Support for direct I/O.  This is basically unbuffered I/O with some
+     extra restrictions and no RMW.
 
-	/* If there's enough room to align the FD address, do it.
-	 * It will help hardware optimize accesses.
-	 */
+ (4) Support for using a bounce buffer in an operation.  The bounce buffer
+     may be bigger than the target data/buffer, allowing for crypto
+     rounding.
 
-Ioana
+ (5) Support for content encryption.  This isn't supported yet by AFS/CIFS
+     but is aimed initially at Ceph.
 
---7ryje6qlgtjpbxiw
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-dpaa2-eth-increase-the-needed-headroom-to-account-fo.patch"
+ (6) ->write_begin() and ->write_end() are ignored in favour of merging all
+     of that into one function, netfs_perform_write(), thereby avoiding the
+     function pointer traversals.
 
-From a8574f7e8e9aa01047f0e72a960209534a8257e8 Mon Sep 17 00:00:00 2001
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-Date: Fri, 13 Oct 2023 17:19:31 +0300
-Subject: [PATCH 1/2] dpaa2-eth: increase the needed headroom to account for
- alignment
+ (7) Support for write-through caching in the pagecache.
+     netfs_perform_write() adds the pages is modifies to an I/O operation
+     as it goes and directly marks them writeback rather than dirty.  When
+     writing back from write-through, it limits the range written back.
+     This should allow CIFS to deal with byte-range mandatory locks
+     correctly.
 
-Increase the needed headroom to account for a 64 byte alignment
-restriction which, with this patch, we make mandatory on the Tx path.
+ (8) O_*SYNC and RWF_*SYNC writes use write-through rather than writing to
+     the pagecache and then flushing afterwards.  An AIO O_*SYNC write will
+     notify of completion when the sub-writes all complete.
 
-The case in which the amount of headroom needed is not available is
-already handled by the driver which instead sends the a S/G frame with
-the first buffer only holding the SW and HW annotation areas.
+ (9) Support for write-streaming where modifed data is held in !uptodate
+     folios, with a private struct attached indicating the range that is
+     valid.
 
-Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
----
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+(10) Support for write grouping, multiplexing a pointer to a group in the
+     folio private data with the write-streaming data.  The writepages
+     algorithm only writes stuff back that's in the nominated group.  This
+     is intended for use by Ceph to write is snaps in order.
 
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-index 15bab41cee48..5442d0e5fd66 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-@@ -1081,6 +1081,8 @@ static int dpaa2_eth_build_single_fd(struct dpaa2_eth_priv *priv,
- 				  DPAA2_ETH_TX_BUF_ALIGN);
- 	if (aligned_start >= skb->head)
- 		buffer_start = aligned_start;
-+	else
-+		return -ENOMEM;
- 
- 	/* Store a backpointer to the skb at the beginning of the buffer
- 	 * (in the private data area) such that we can release it
-@@ -1412,7 +1414,7 @@ static netdev_tx_t __dpaa2_eth_tx(struct sk_buff *skb,
- 	percpu_extras = this_cpu_ptr(priv->percpu_extras);
- 	fd = (this_cpu_ptr(priv->fd))->array;
- 
--	needed_headroom = dpaa2_eth_needed_headroom(skb);
-+	needed_headroom = dpaa2_eth_needed_headroom(skb) + DPAA2_ETH_TX_BUF_ALIGN;
- 
- 	/* We'll be holding a back-reference to the skb until Tx Confirmation;
- 	 * we don't want that overwritten by a concurrent Tx with a cloned skb.
--- 
-2.25.1
+(11) Skipping reads for which we know the server could only supply zeros or
+     EOF (for instance if we've done a local write that leaves a hole in
+     the file and extends the local inode size).
 
 
---7ryje6qlgtjpbxiw
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0002-dpaa2-eth-set-needed_headroom-to-the-maximum-value-n.patch"
+General notes:
 
-From 2eb596d0486adc5954f6d9263f153afddb3e470b Mon Sep 17 00:00:00 2001
-From: Ioana Ciornei <ioana.ciornei@nxp.com>
-Date: Fri, 13 Oct 2023 17:37:23 +0300
-Subject: [PATCH 2/2] dpaa2-eth: set needed_headroom to the maximum value
- needed
+ (1) netfslib now makes use of folio->private, which means the filesystem
+     can't use it.
 
-Set the needed_headroom net device field to the maximum value that the
-driver would need on the Tx path:
-	- 64 bytes for the software annotation area
-	- 64 bytes for the hardware annotation area
-	- 64 bytes to account for a 64 byte aligned buffer address
+ (2) Use of fscache is not yet tested.  I'm not sure whether to allow a
+     cache to be used with a write-through write.
 
-Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
----
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c | 2 ++
- 1 file changed, 2 insertions(+)
+ (3) The filesystem provides wrappers to call the write helpers, allowing
+     it to do pre-validation, oplock/capability fetching and the passing in
+     of write group info.
 
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-index 5442d0e5fd66..9f029f3fe909 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c
-@@ -4969,6 +4969,8 @@ static int dpaa2_eth_probe(struct fsl_mc_device *dpni_dev)
- 	if (err)
- 		goto err_dl_port_add;
- 
-+	net_dev->needed_headroom = DPAA2_ETH_SWA_SIZE + DPAA2_ETH_TX_HWA_SIZE + DPAA2_ETH_TX_BUF_ALIGN;
-+
- 	err = register_netdev(net_dev);
- 	if (err < 0) {
- 		dev_err(dev, "register_netdev() failed\n");
--- 
-2.25.1
+ (4) I want to try flushing the data when tearing down an inode before
+     invalidating it to try and render launder_folio unnecessary.
+
+ (5) Write-through caching will generate and dispatch write subrequests as
+     it gathers enough data to hit wsize and has whole pages that at least
+     span that size.  This needs to be a bit more flexible, allowing for a
+     filesystem such as CIFS to have a variable wsize.
+
+ (6) The filesystem driver is just given read and write calls with an
+     iov_iter describing the data/buffer to use.  Ideally, they don't see
+     pages or folios at all.  A function, extract_iter_to_sg(), is already
+     available to decant part of an iterator into a scatterlist for crypto
+     purposes.
 
 
---7ryje6qlgtjpbxiw--
+CIFS notes:
+
+ (1) CIFS is made to use unbuffered I/O for unbuffered caching modes and
+     write-through caching for cache=strict.
+
+ (2) cifs_init_request() occasionally throws an error that it can't get a
+     writable file when trying to do writeback.
+
+ (3) Apparent file corruption frequently appears in the target file when
+     cifs_copy_file_range(), even though it doesn't use any netfslib
+     helpers and even if it doesn't overlap with any pages in the
+     pagecache.
+
+ (4) I should be able to turn multipage folio support on in CIFS now.
+
+ (5) The then-unused CIFS code is removed in three patches, not one, to
+     avoid the git patch generator from producing confusing patches in
+     which it thinks code is being moved around rather than just being
+     removed.
+
+David
+
+David Howells (53):
+  netfs: Add a procfile to list in-progress requests
+  netfs: Track the fpos above which the server has no data
+  netfs: Note nonblockingness in the netfs_io_request struct
+  netfs: Allow the netfs to make the io (sub)request alloc larger
+  netfs: Add a ->free_subrequest() op
+  afs: Don't use folio->private to record partial modification
+  netfs: Provide invalidate_folio and release_folio calls
+  netfs: Add rsize to netfs_io_request
+  netfs: Implement unbuffered/DIO vs buffered I/O locking
+  netfs: Add iov_iters to (sub)requests to describe various buffers
+  netfs: Add support for DIO buffering
+  netfs: Provide tools to create a buffer in an xarray
+  netfs: Add bounce buffering support
+  netfs: Add func to calculate pagecount/size-limited span of an
+    iterator
+  netfs: Limit subrequest by size or number of segments
+  netfs: Export netfs_put_subrequest() and some tracepoints
+  netfs: Extend the netfs_io_*request structs to handle writes
+  netfs: Add a hook to allow tell the netfs to update its i_size
+  netfs: Make netfs_put_request() handle a NULL pointer
+  fscache: Add a function to begin an cache op from a netfslib request
+  netfs: Make the refcounting of netfs_begin_read() easier to use
+  netfs: Prep to use folio->private for write grouping and streaming
+    write
+  netfs: Dispatch write requests to process a writeback slice
+  netfs: Provide func to copy data to pagecache for buffered write
+  netfs: Make netfs_read_folio() handle streaming-write pages
+  netfs: Allocate multipage folios in the writepath
+  netfs: Implement support for unbuffered/DIO read
+  netfs: Implement unbuffered/DIO write support
+  netfs: Implement buffered write API
+  netfs: Allow buffered shared-writeable mmap through
+    netfs_page_mkwrite()
+  netfs: Provide netfs_file_read_iter()
+  netfs: Provide a writepages implementation
+  netfs: Provide minimum blocksize parameter
+  netfs: Make netfs_skip_folio_read() take account of blocksize
+  netfs: Perform content encryption
+  netfs: Decrypt encrypted content
+  netfs: Support decryption on ubuffered/DIO read
+  netfs: Support encryption on Unbuffered/DIO write
+  netfs: Provide a launder_folio implementation
+  netfs: Implement a write-through caching option
+  netfs: Rearrange netfs_io_subrequest to put request pointer first
+  afs: Use the netfs write helpers
+  cifs: Replace cifs_readdata with a wrapper around netfs_io_subrequest
+  cifs: Share server EOF pos with netfslib
+  cifs: Replace cifs_writedata with a wrapper around netfs_io_subrequest
+  cifs: Use more fields from netfs_io_subrequest
+  cifs: Make wait_mtu_credits take size_t args
+  cifs: Implement netfslib hooks
+  cifs: Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c
+  cifs: Cut over to using netfslib
+  cifs: Remove some code that's no longer used, part 1
+  cifs: Remove some code that's no longer used, part 2
+  cifs: Remove some code that's no longer used, part 3
+
+ fs/9p/vfs_addr.c             |   51 +-
+ fs/afs/file.c                |  206 +--
+ fs/afs/inode.c               |   15 +-
+ fs/afs/internal.h            |   66 +-
+ fs/afs/write.c               |  816 +---------
+ fs/ceph/addr.c               |   28 +-
+ fs/ceph/cache.h              |   12 -
+ fs/fscache/io.c              |   42 +
+ fs/netfs/Makefile            |    9 +-
+ fs/netfs/buffered_read.c     |  245 ++-
+ fs/netfs/buffered_write.c    | 1223 ++++++++++++++
+ fs/netfs/crypto.c            |  148 ++
+ fs/netfs/direct_read.c       |  263 +++
+ fs/netfs/direct_write.c      |  359 +++++
+ fs/netfs/internal.h          |  121 ++
+ fs/netfs/io.c                |  325 +++-
+ fs/netfs/iterator.c          |   97 ++
+ fs/netfs/locking.c           |  209 +++
+ fs/netfs/main.c              |  101 ++
+ fs/netfs/misc.c              |  237 +++
+ fs/netfs/objects.c           |   64 +-
+ fs/netfs/output.c            |  485 ++++++
+ fs/netfs/stats.c             |   22 +-
+ fs/smb/client/Kconfig        |    1 +
+ fs/smb/client/cifsfs.c       |   65 +-
+ fs/smb/client/cifsfs.h       |   10 +-
+ fs/smb/client/cifsglob.h     |   59 +-
+ fs/smb/client/cifsproto.h    |   10 +-
+ fs/smb/client/cifssmb.c      |  111 +-
+ fs/smb/client/file.c         | 2905 ++++++----------------------------
+ fs/smb/client/fscache.c      |  109 --
+ fs/smb/client/fscache.h      |   54 -
+ fs/smb/client/inode.c        |   25 +-
+ fs/smb/client/smb2ops.c      |   20 +-
+ fs/smb/client/smb2pdu.c      |  168 +-
+ fs/smb/client/smb2proto.h    |    5 +-
+ fs/smb/client/trace.h        |  144 +-
+ fs/smb/client/transport.c    |   17 +-
+ include/linux/fscache.h      |    6 +
+ include/linux/netfs.h        |  173 +-
+ include/trace/events/afs.h   |   31 -
+ include/trace/events/netfs.h |  158 +-
+ 42 files changed, 5136 insertions(+), 4079 deletions(-)
+ create mode 100644 fs/netfs/buffered_write.c
+ create mode 100644 fs/netfs/crypto.c
+ create mode 100644 fs/netfs/direct_read.c
+ create mode 100644 fs/netfs/direct_write.c
+ create mode 100644 fs/netfs/locking.c
+ create mode 100644 fs/netfs/misc.c
+ create mode 100644 fs/netfs/output.c
+
 
