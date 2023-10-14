@@ -1,125 +1,80 @@
-Return-Path: <netdev+bounces-40958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34F207C92FB
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 08:35:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A4A77C930A
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 08:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A2A282DF7
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 06:35:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8060A282CCF
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 06:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B0E5240;
-	Sat, 14 Oct 2023 06:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523EA5236;
+	Sat, 14 Oct 2023 06:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Bo+61VSX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IFrC+uuA"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A30A5221
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 06:35:13 +0000 (UTC)
-Received: from smtp.smtpout.orange.fr (smtp-13.smtpout.orange.fr [80.12.242.13])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FB78CC
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 23:35:09 -0700 (PDT)
-Received: from pop-os.home ([86.243.2.178])
-	by smtp.orange.fr with ESMTPA
-	id rYEiqpnupvhM3rYEtqYMoq; Sat, 14 Oct 2023 08:35:08 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1697265308;
-	bh=il89cLsUPoSfIl2uIujuHP4uRIM1OQ8+x9zRodfnRok=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Bo+61VSX/YyYHCKiYBpJL1M4zOyIazFJEkWMUYYuOZqqleYlxrRVIWb5m9/g/i2fk
-	 /mQgtot4aePqBFtElrsXiGMGf5KEJ4gObLlcrOg2AT7E8FiuLIIy8w9LlFI5aikPrA
-	 WEpS8BipFODvU5kvBv0CRASebxqMW9PzIhLsTjuYoW5kMujbLL2jeuQFVJD6XNLPz6
-	 QRELQx1T+AF5t8a4aMQxgdNyOYAkg2CkE5AtMEZWBLHPaFs7yYPB0Q9ebCjXDTqe5g
-	 Fwi4uo3NH/U9hS6shMji3XkK8YyMNjJjJ9XxaHF65GbJRWwoi3n57YNfnv8yG1/vNJ
-	 C5YpJmAFysrEg==
-X-ME-Helo: pop-os.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 14 Oct 2023 08:35:08 +0200
-X-ME-IP: 86.243.2.178
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Pravin B Shelar <pshelar@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	netdev@vger.kernel.org,
-	dev@openvswitch.org,
-	linux-hardening@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH v2 2/2] net: openvswitch: Annotate struct mask_array with __counted_by
-Date: Sat, 14 Oct 2023 08:34:53 +0200
-Message-Id: <ca5c8049f58bb933f231afd0816e30a5aaa0eddd.1697264974.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <e5122b4ff878cbf3ed72653a395ad5c4da04dc1e.1697264974.git.christophe.jaillet@wanadoo.fr>
-References: <e5122b4ff878cbf3ed72653a395ad5c4da04dc1e.1697264974.git.christophe.jaillet@wanadoo.fr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC091C27;
+	Sat, 14 Oct 2023 06:42:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7893DC433C8;
+	Sat, 14 Oct 2023 06:42:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697265725;
+	bh=Pvnp6ClDU4xAPFz+GWQJRLH4Q1XIrlzcHFNtXw92fUQ=;
+	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+	b=IFrC+uuAlTszbKfHKFobiZGt35OWBZvGIonkyj/r68qF6fQ4z4aH3+ZHBwyT6DQKs
+	 ELO4kjrrSll4lLcK9w56nn+NB7JrCGdQvbIJANYfbesEssGtFyCZ+tdDXiRLEuPNJq
+	 NWwxEif8pM/z0It850p4If9P7PDrKK+caiQZm8Ke206qqfEU7zRXLr3O/dR9Rv3TjV
+	 4E2UvmNu6xmMx5QDGnwzGOQOVNAsLbl/6xTKRmXaPgBolYcIOLnZEWONO1c4eYjN+/
+	 1/nv6HMX+Fjtz2RfLiUGcLbZCxDtcsa6TkxLpQqA2KQc3slwOjmr8G4QkwkmDherTt
+	 49buWmwGgjxzw==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v2 08/10] wifi: atmel: remove unused ioctl function
+From: Kalle Valo <kvalo@kernel.org>
+In-Reply-To: <20231011140225.253106-8-arnd@kernel.org>
+References: <20231011140225.253106-8-arnd@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-wireless@vger.kernel.org, Johannes Berg <johannes@sipsolutions.net>,
+ linux-wpan@vger.kernel.org, Michael Hennerich <michael.hennerich@analog.com>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Rodolfo Zitellini <rwz@xhero.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Arnd Bergmann <arnd@arndb.de>
+User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
+Message-ID: <169726572036.3637479.12619977038667266484.kvalo@kernel.org>
+Date: Sat, 14 Oct 2023 06:42:02 +0000 (UTC)
 
-Prepare for the coming implementation by GCC and Clang of the __counted_by
-attribute. Flexible array members annotated with __counted_by can have
-their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
-(for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
-functions).
+Arnd Bergmann <arnd@kernel.org> wrote:
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-v2: Fix the subject  [Ilya Maximets]
-    fix the field name used with __counted_by  [Ilya Maximets]
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> This function has no callers, and for the past 20 years, the request_firmware
+> interface has been in place instead of the custom firmware loader.
+> 
+> Acked-by: Kalle Valo <kvalo@kernel.org>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-v1: https://lore.kernel.org/all/f66ddcf1ef9328f10292ea75a17b584359b6cde3.1696156198.git.christophe.jaillet@wanadoo.fr/
+2 patches applied to wireless-next.git, thanks.
 
+166ab7ca3418 wifi: atmel: remove unused ioctl function
+f35ccb65bd18 wifi: hostap: remove unused ioctl function
 
-This patch is part of a work done in parallel of what is currently worked
-on by Kees Cook.
-
-My patches are only related to corner cases that do NOT match the
-semantic of his Coccinelle script[1].
-
-In this case, in tbl_mask_array_alloc(), several things are allocated with
-a single allocation. Then, some pointer arithmetic computes the address of
-the memory after the flex-array.
-
-[1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
----
- net/openvswitch/flow_table.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/openvswitch/flow_table.h b/net/openvswitch/flow_table.h
-index 9e659db78c05..f524dc3e4862 100644
---- a/net/openvswitch/flow_table.h
-+++ b/net/openvswitch/flow_table.h
-@@ -48,7 +48,7 @@ struct mask_array {
- 	int count, max;
- 	struct mask_array_stats __percpu *masks_usage_stats;
- 	u64 *masks_usage_zero_cntr;
--	struct sw_flow_mask __rcu *masks[];
-+	struct sw_flow_mask __rcu *masks[] __counted_by(max);
- };
- 
- struct table_instance {
 -- 
-2.34.1
+https://patchwork.kernel.org/project/linux-wireless/patch/20231011140225.253106-8-arnd@kernel.org/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
 
