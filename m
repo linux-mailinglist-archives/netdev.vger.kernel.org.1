@@ -1,60 +1,52 @@
-Return-Path: <netdev+bounces-40939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D0C37C9240
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 03:56:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2782A7C924D
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 04:13:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B2D5B20AEC
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 01:56:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56DFC282DCE
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 02:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E97B1106;
-	Sat, 14 Oct 2023 01:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5BDB111B;
+	Sat, 14 Oct 2023 02:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="maqe7cYu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0de3ITaR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088227E;
-	Sat, 14 Oct 2023 01:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EEF7E;
+	Sat, 14 Oct 2023 02:13:01 +0000 (UTC)
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0346CBF;
-	Fri, 13 Oct 2023 18:55:55 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5C9EC0;
+	Fri, 13 Oct 2023 19:13:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=cjW+qsUfbs6nzKf1dTERhV/HEx/8IziabIg1Ep2LkPw=; b=maqe7cYuDKIiDrqKlbKmWOn7xM
-	IrpLEF9ncAqzaX8IOBfdJCyG8Q6HyvABIRi8ENKEsHWCwFEk5fAvYk3zgfB6Rqm/zVAgE1T02HSWO
-	O+Pe0xzv6vu7U8uIEtWKUpGC0Qk+B/iAc2hRT6PRiRcYtwaQduanCgdydx2qIbm9+Ux4=;
+	bh=LaQGFBK62vna6IUYt5GEKCDuPSNgJGTva0S77gxRNxM=; b=0de3ITaRHFJWq8PfJ5JFsaFXPQ
+	I3RiqLgkEZh3qw+an4wjAg3KTLYrKzpBLWktbUdXzZMEM1las4q72+DjsgGjCCc1gUt+kp2bixNGW
+	uSeZAew8LHi85Qmm5U7qky7jlDi4GoEyx6WTT3FdswtDJU1AZtvbiOXaw0mLV/8k7bNY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1qrTsT-0029U4-Mh; Sat, 14 Oct 2023 03:55:41 +0200
-Date: Sat, 14 Oct 2023 03:55:41 +0200
+	id 1qrU9C-0029X9-0E; Sat, 14 Oct 2023 04:12:58 +0200
+Date: Sat, 14 Oct 2023 04:12:57 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Kees Cook <keescook@chromium.org>
-Cc: Justin Stitt <justinstitt@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] net: phy: tja11xx: replace deprecated strncpy with
- ethtool_sprintf
-Message-ID: <a958d35e-98b6-4a95-b505-776482d1150c@lunn.ch>
-References: <20231012-strncpy-drivers-net-phy-nxp-tja11xx-c-v1-1-5ad6c9dff5c4@google.com>
- <15af4bc4-2066-44bc-8d2e-839ff3945663@lunn.ch>
- <CAFhGd8pmq3UKBE_6ZbLyvRRhXJzaWMQ2GfosvcEEeAS-n7M4aQ@mail.gmail.com>
- <0c401bcb-70a8-47a5-bca0-0b9e8e0439a8@lunn.ch>
- <CAFhGd8p3WzqQu7kT0Pt8Axuv5sKdHJQOLZVEg5x8S_QNwT6bjQ@mail.gmail.com>
- <CAFhGd8qcLARQ4GEabEvcD=HmLdikgP6J82VdT=A9hLTDNru0LQ@mail.gmail.com>
- <202310131630.5E435AD@keescook>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
+	tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com,
+	greg@kroah.com
+Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY
+ drivers
+Message-ID: <4b7096cd-076d-42fd-b0cc-f842d3b64ee4@lunn.ch>
+References: <20231012125349.2702474-1-fujita.tomonori@gmail.com>
+ <20231012125349.2702474-2-fujita.tomonori@gmail.com>
+ <85d5c498-efbc-4c1a-8d12-f1eca63c45cf@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,33 +55,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202310131630.5E435AD@keescook>
+In-Reply-To: <85d5c498-efbc-4c1a-8d12-f1eca63c45cf@proton.me>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> I've been told that this whole ethtool API area is considered
-> deprecated. If that holds, then I don't think it's worth adding new
-> helpers to support it when ethtool_sprintf() is sufficient.
+> > +config RUST_PHYLIB_ABSTRACTIONS
+> > +        bool "PHYLIB abstractions support"
+> > +        depends on RUST
+> > +        depends on PHYLIB=y
+> > +        help
+> > +          Adds support needed for PHY drivers written in Rust. It provides
+> > +          a wrapper around the C phylib core.
+> > +
+> 
+> I find it a bit weird that this is its own option under "General". I think
+> it would be reasonable to put it under "Rust", since that would also scale
+> better when other subsystems do this.
 
-I think deprecated is too strong. The current API is not great, so
-maybe with time a new API will emerge. But given there are around 160
-users of the API, probably over 100 drivers, it will be 20 years or
-more before all that hardware becomes obsolete and the drivers are
-removed.
+To some extent, this is just a temporary location. Once the
+restrictions of the build systems are solved, i expect this will move
+into drivers/net/phy/Kconfig, inside the 'if PHYLIB'. However, i
+agree, this should be under the Rust menu.
 
-> Once you're done with the strncpy->ethtool_sprintf conversions I think
-> it would be nice to have a single patch that fixes all of these
-> "%s"-less instances to use "%s". (Doing per-driver fixes for that case
-> seems just overly painful.)
+> > +    }
+> > +
+> > +    /// Reads a given C22 PHY register.
+> > +    pub fn read(&self, regnum: u16) -> Result<u16> {
+> 
+> No idea if this function should be `&mut self` or `&self`. Would
+> it be ok for mutltiple threads to call this function concurrently?
+> If yes, then leave it as `&self`, if no then change it to `&mut self`.
 
-I guess it is the same amount of effort to replace them with
-ethtool_puts()?
+The MDIO layer before has a lock, so its will serialize parallel
+reads/writes. With the current Rust integration, it should never be
+possible for multiple threads to be active at once, but if it does
+happen, its not a problem anyway.
 
-checkpatch warns about seq_printf() which could be seq_puts(), so
-somebody thinks using puts is the right thing to do?
-
-	 Andrew
+ 	Andrew
 
