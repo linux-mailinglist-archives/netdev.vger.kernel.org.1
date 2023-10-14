@@ -1,66 +1,88 @@
-Return-Path: <netdev+bounces-40932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ECB77C91FF
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 03:10:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF0347C9200
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 03:10:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86D801C20980
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 01:10:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71760282E68
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 01:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14EB17E6;
-	Sat, 14 Oct 2023 01:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3BD10F2;
+	Sat, 14 Oct 2023 01:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oSis4Kd0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZUifR6U1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44D97E
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 01:10:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA527C433C7;
-	Sat, 14 Oct 2023 01:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7437E
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 01:10:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B5478C433C8;
+	Sat, 14 Oct 2023 01:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697245821;
-	bh=PVaD7CmLTUBd6K4WNVtUaCxsdNdlcU2IAOFVlyxl0aI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oSis4Kd0mVD905+VTMQp3LuVR2fMiGPEiaSAQfBuJclsJYEr8jkE87+mKiialvECL
-	 SaQP8s/LAPGhjrKbzbhFDb53v5tB6axxuJhpfKPQDPXgNYgLqLqOfaaKhgGBhzLDdA
-	 1mqRrCa1Bm0C1K4ShgRp5vNwVTQyiHiZoi3kty9CL/3zj28hT53mx9X6HvpgXfTC5q
-	 7UhKyTn+1K+nOO3p6dNfntW0L+GQ/ILrf5Dy8F3StOEtY+DmCyPMKITkllZ3umyAvm
-	 q+3fIJfDV5Hl81kR9e8gwbjV5BGDWk27xdBk2j9id4jW94mQ7EmS6EJLtIkItCa0WG
-	 vl78UoDx5JgeA==
-Date: Fri, 13 Oct 2023 18:10:19 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Saeed Mahameed
- <saeedm@nvidia.com>, netdev@vger.kernel.org, Tariq Toukan
- <tariqt@nvidia.com>
-Subject: Re: [pull request][net-next V2 00/15] mlx5 updates 2023-10-10
-Message-ID: <20231013181019.1c8540dd@kernel.org>
-In-Reply-To: <20231012192750.124945-1-saeed@kernel.org>
-References: <20231012192750.124945-1-saeed@kernel.org>
+	s=k20201202; t=1697245826;
+	bh=HNiQU2GeRkiOXncEDTVcbyNdu52RSQS6LR+wpowB0aE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZUifR6U1HSizpshrggOfskHhs2SBkIkrJ7WfkR/mmLABSM9Ft/wAsCD+fiSzCiX3V
+	 cKJ75mazclMc/RKLwssq1Fpq6dl0ewtcjn0twcKPgWjc3RxJ7jNydeC+R8O+sXevHS
+	 WoOrlNNLPGTbVuNf9WrkSOtTIEAsMC4it2YW4wx55M1SYdjY/AVAzX6oZ4/M6AYZZ4
+	 Y3MnAxxA8ETbmWO/AJyOXB19sr1vm+kY0p/1lJb4UiV2fUfU2cIKZ3wEvAWd9Bi0vC
+	 7MwHCWT8fppBt3njW0Dtmen+OKP0v/s/8OdaCr5SGTYfF5AravyYW7jO8ZSBgTA1Ly
+	 /FMZzuQkt9/pA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A2642C691EF;
+	Sat, 14 Oct 2023 01:10:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/3][pull request] Intel Wired LAN Driver Updates
+ 2023-10-11 (i40e, ice)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169724582666.12217.506072166071786467.git-patchwork-notify@kernel.org>
+Date: Sat, 14 Oct 2023 01:10:26 +0000
+References: <20231011233334.336092-1-jacob.e.keller@intel.com>
+In-Reply-To: <20231011233334.336092-1-jacob.e.keller@intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org
 
-On Thu, 12 Oct 2023 12:27:35 -0700 Saeed Mahameed wrote:
-> v1->v2:
->   - patch #2, remove leftover mutex_init() to fix the build break
-> 
-> This provides misc updates to mlx5 driver.
-> For more information please see tag log below.
-> 
-> Please pull and let me know if there is any problem.
+Hello:
 
-There are missing sign-offs on the PR and patches don't apply 
-because I pulled Leon's ipsec branch :(
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 11 Oct 2023 16:33:31 -0700 you wrote:
+> This series contains fixes for the i40e and ice drivers.
+> 
+> Jesse adds handling to the ice driver which resetis the device when loading
+> on a crash kernel, preventing stale transactions from causing machine check
+> exceptions which could prevent capturing crash data.
+> 
+> Mateusz fixes a bug in the ice driver 'Safe mode' logic for handling the
+> device when the DDP is missing.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/3] i40e: prevent crash on probe if hw registers have invalid values
+    https://git.kernel.org/netdev/net/c/fc6f716a5069
+  - [net,2/3] ice: reset first in crash dump kernels
+    https://git.kernel.org/netdev/net/c/0288c3e709e5
+  - [net,3/3] ice: Fix safe mode when DDP is missing
+    https://git.kernel.org/netdev/net/c/42066c4d5d34
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
