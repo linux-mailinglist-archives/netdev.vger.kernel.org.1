@@ -1,303 +1,233 @@
-Return-Path: <netdev+bounces-40995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC5AF7C94B4
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 15:21:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E97077C94CE
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 15:54:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19F4FB20B50
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 13:21:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FE391C209B2
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 13:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE08125B8;
-	Sat, 14 Oct 2023 13:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F284312B75;
+	Sat, 14 Oct 2023 13:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lafranque.net header.i=@lafranque.net header.b="ikTjFgDP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="muXq1+K6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FAC53B9
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 13:21:44 +0000 (UTC)
-Received: from mail.lac-coloc.fr (unknown [45.90.160.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08BAEB7
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 06:21:41 -0700 (PDT)
-Authentication-Results: mail.lac-coloc.fr;
-	auth=pass (plain)
-From: Alce Lafranque <alce@lafranque.net>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	netdev@vger.kernel.org
-Cc: Alce Lafranque <alce@lafranque.net>,
-	Vincent Bernat <vincent@bernat.ch>
-Subject: [PATCH net-next v4] vxlan: add support for flowlabel inherit
-Date: Sat, 14 Oct 2023 08:21:02 -0500
-Message-Id: <20231014132102.54051-1-alce@lafranque.net>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5699C12B60
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 13:54:41 +0000 (UTC)
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD0FEB3
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 06:54:39 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-405361bb94eso35339835e9.0
+        for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 06:54:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697291678; x=1697896478; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1SuOOAxunTJUTPiukJW+9H8IuxRehPEqici0R4t6vQk=;
+        b=muXq1+K63SPo6fDe+R/zCzE3NzSBY2+lbGXX4gED91cb9strDvqFRrZqxWVMEzNrl5
+         OsGgCDJVMpTZqrnmPoG3qEn1WGvO2Jknnhlcr0vrE7BZLUBaDAR2g5XkK7c0fEyJvBsP
+         C7WX3P9XMw5aKNvBdkr2B/sG/o0wm/DIiAYdJw/U7USsk5ML2Zn+f9CkIUzBpNfZA4py
+         LC3i3TEmP+9q2e4sKdVr04MkwpVfFS5VvgpT8Al/2rXrWbJ5UL6tQlY618u3zI9hnV2n
+         FNL4BCZOXOCrm6r9kQIzM9o/CCdUpDh0jAFaZFlKonBnP81fQbhRnOmLcrrsTRIoZ+P5
+         lWnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697291678; x=1697896478;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1SuOOAxunTJUTPiukJW+9H8IuxRehPEqici0R4t6vQk=;
+        b=Y8fVQQ38YEdcuWEy0CKtgoKpQS6R2g6LjFMXWmKIgRRdWau0m29yhSoM9vLbrsNGCz
+         GW8HcD+8uewd7FyeF2aSONjUbRwIS4lUZpAXPjUHjcg52Hwp4ZuF+g0Av4I52lEipId7
+         bqHeQrF9ryLN5PprnuC51FbBfX6PcCKCyhomAXRsIfb5sY3eAFs8RFQZ/7k6K+B33Erk
+         qa3A4tJ6XkNzrCY4eEEimdct1nD31XVPIPp7/ipvdidE/9/e2Up8oZQDFjfBvnDc1H44
+         pBfXU1fQiAcMqknAqoqwLf48ISqgkOCyPxbiOmvWZYrUOK754u2bSh/SCbSKF9tpDGI7
+         CYCg==
+X-Gm-Message-State: AOJu0Yxwei2jQ0T9FNoCzb5fUt4+ts066V/+q9p5q1GfasH4Xc5Gz9WL
+	Ce1+1Z4amcFg6UaVLBKImv+1Bc1StCy2HP3VUFuyFCtr
+X-Google-Smtp-Source: AGHT+IFwcnUxk2BkCTm31AYxv/9Pb6CW8AKEfGMzKwmv2BL5IRjst2iRY2bfNrGsABq4PcMG/Iih7THwzsXhupzuI3w=
+X-Received: by 2002:adf:f84e:0:b0:324:8353:6e51 with SMTP id
+ d14-20020adff84e000000b0032483536e51mr27212687wrq.45.1697291677776; Sat, 14
+ Oct 2023 06:54:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received: from localhost (Unknown [127.0.0.1])
-	by mail.lac-coloc.fr (Haraka/3.0.1) with ESMTPSA id 3A4207B6-6CB3-42C6-8E43-95C7F46EBFD6.1
-	envelope-from <alce@lafranque.net>
-	tls TLS_AES_256_GCM_SHA384 (authenticated bits=0);
-	Sat, 14 Oct 2023 13:21:39 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=lafranque.net; s=s20211111873;
-	h=from:subject:date:message-id:to:cc:mime-version;
-	bh=BEO9SaI9W2YVQxHVTM006+i0nnIFVYvZHcNw4AV/roM=;
-	b=ikTjFgDP0fNaGQbp22+Inm81U177+bixhecRAQpzIzzJIw4tFYr92WVPhpjJW3DkutXh0y8sQI
-	dLy9ifqOGRnbXKXsudvNj5qSkESCR/kbrytMmhiXxeK5ftlykkCMf0lNyO295L6bQUVWdBPuqu5E
-	di7qOEMBZifaSAUotsgNQ=
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MSGID_FROM_MTA_HEADER,RDNS_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+References: <74BF3CC8-2A3A-44FF-98C2-1E20F110A92E@gmail.com>
+ <CALDO+SZ_qmBv2AXD3xusEx1fb_PqSqTXVaBdhDTogpvDoKqRUw@mail.gmail.com>
+ <CALDO+SanaY3dO8-1sjgZBH0NdGNhsBErLOSYC8ZKT3kVPpkFBQ@mail.gmail.com> <42F24D1E-E60D-49C6-935D-BB5E1E7290CC@gmail.com>
+In-Reply-To: <42F24D1E-E60D-49C6-935D-BB5E1E7290CC@gmail.com>
+From: William Tu <u9012063@gmail.com>
+Date: Sat, 14 Oct 2023 06:53:59 -0700
+Message-ID: <CALDO+SZxsxGUWyD4QATT-cswRf_ztL_5+FOy3egDSNwwn4WC4A@mail.gmail.com>
+Subject: Re: Vmxnet3 v22 - bug
+To: Martin Zaharinov <micron10@gmail.com>
+Cc: Alexander Duyck <alexanderduyck@fb.com>, alexandr.lobakin@intel.com, 
+	netdev <netdev@vger.kernel.org>, Sankararaman Jayaraman <jsankararama@vmware.com>, doshir@vmware.com, 
+	Boon Ang <bang@vmware.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-By default, VXLAN encapsulation over IPv6 sets the flow label to 0, with
-an option for a fixed value. This commits add the ability to inherit the
-flow label from the inner packet, like for other tunnel implementations.
-This enables devices using only L3 headers for ECMP to correctly balance
-VXLAN-encapsulated IPv6 packets.
+Hi Martin,
+Does everything work ok, do you find more issue?
+Otherwise I can send out patch to netdev, thanks!
+William
 
-```
-$ ./ip/ip link add dummy1 type dummy
-$ ./ip/ip addr add 2001:db8::2/64 dev dummy1
-$ ./ip/ip link set up dev dummy1
-$ ./ip/ip link add vxlan1 type vxlan id 100 flowlabel inherit remote 2001:db8::1 local 2001:db8::2
-$ ./ip/ip link set up dev vxlan1
-$ ./ip/ip addr add 2001:db8:1::2/64 dev vxlan1
-$ ./ip/ip link set arp off dev vxlan1
-$ ping -q 2001:db8:1::1 &
-$ tshark -d udp.port==8472,vxlan -Vpni dummy1 -c1
-[...]
-Internet Protocol Version 6, Src: 2001:db8::2, Dst: 2001:db8::1
-    0110 .... = Version: 6
-    .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
-        .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
-        .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
-    .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
-[...]
-Virtual eXtensible Local Area Network
-    Flags: 0x0800, VXLAN Network ID (VNI)
-    Group Policy ID: 0
-    VXLAN Network Identifier (VNI): 100
-[...]
-Internet Protocol Version 6, Src: 2001:db8:1::2, Dst: 2001:db8:1::1
-    0110 .... = Version: 6
-    .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
-        .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
-        .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
-    .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
-```
-
-Signed-off-by: Alce Lafranque <alce@lafranque.net>
-Co-developed-by: Vincent Bernat <vincent@bernat.ch>
-Signed-off-by: Vincent Bernat <vincent@bernat.ch>
-
----
-v4:
-  - Fix tabs
-v3: https://lore.kernel.org/all/20231014131320.51810-1-alce@lafranque.net/
-  - Adopt policy label inherit by default
-  - Set policy to label fixed when flowlabel is set
-  - Rename IFLA_VXLAN_LABEL_BEHAVIOR to IFLA_VXLAN_LABEL_POLICY
-v2: https://lore.kernel.org/all/20231007142624.739192-1-alce@lafranque.net/
-  - Use an enum instead of flag to define label behavior
-v1: https://lore.kernel.org/all/4444C5AE-FA5A-49A4-9700-7DD9D7916C0F.1@mail.lac-coloc.fr/
----
- drivers/net/vxlan/vxlan_core.c | 30 ++++++++++++++++++++++++++----
- include/net/ip_tunnels.h       | 11 +++++++++++
- include/net/vxlan.h            | 33 +++++++++++++++++----------------
- include/uapi/linux/if_link.h   |  8 ++++++++
- 4 files changed, 62 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 5b5597073b00..48ebbd4563f0 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -2475,7 +2475,17 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
- 		else
- 			udp_sum = !(flags & VXLAN_F_UDP_ZERO_CSUM6_TX);
- #if IS_ENABLED(CONFIG_IPV6)
--		label = vxlan->cfg.label;
-+		switch (vxlan->cfg.label_policy) {
-+		case VXLAN_LABEL_FIXED:
-+			label = vxlan->cfg.label;
-+			break;
-+		case VXLAN_LABEL_INHERIT:
-+			label = ip_tunnel_get_flowlabel(old_iph, skb);
-+			break;
-+		default:
-+			DEBUG_NET_WARN_ON_ONCE(1);
-+			goto drop;
-+		}
- #endif
- 	} else {
- 		if (!info) {
-@@ -3286,6 +3296,7 @@ static const struct nla_policy vxlan_policy[IFLA_VXLAN_MAX + 1] = {
- 	[IFLA_VXLAN_DF]		= { .type = NLA_U8 },
- 	[IFLA_VXLAN_VNIFILTER]	= { .type = NLA_U8 },
- 	[IFLA_VXLAN_LOCALBYPASS]	= NLA_POLICY_MAX(NLA_U8, 1),
-+	[IFLA_VXLAN_LABEL_POLICY]	= NLA_POLICY_MAX(NLA_U8, VXLAN_LABEL_MAX),
- };
- 
- static int vxlan_validate(struct nlattr *tb[], struct nlattr *data[],
-@@ -3653,13 +3664,18 @@ static int vxlan_config_validate(struct net *src_net, struct vxlan_config *conf,
- 			}
- 		}
- 	}
--
- 	if (conf->label && !use_ipv6) {
- 		NL_SET_ERR_MSG(extack,
- 			       "Label attribute only applies to IPv6 VXLAN devices");
- 		return -EINVAL;
- 	}
- 
-+	if (conf->label_policy && !use_ipv6) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Label policy only applies to IPv6 VXLAN devices");
-+		return -EINVAL;
-+	}
-+
- 	if (conf->remote_ifindex) {
- 		struct net_device *lowerdev;
- 
-@@ -3999,9 +4015,13 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
- 
- 	}
- 
--	if (data[IFLA_VXLAN_LABEL])
-+	if (data[IFLA_VXLAN_LABEL]) {
- 		conf->label = nla_get_be32(data[IFLA_VXLAN_LABEL]) &
--			     IPV6_FLOWLABEL_MASK;
-+			      IPV6_FLOWLABEL_MASK;
-+		conf->label_policy = VXLAN_LABEL_FIXED;
-+	}
-+	if (data[IFLA_VXLAN_LABEL_POLICY])
-+		conf->label_policy = nla_get_u8(data[IFLA_VXLAN_LABEL_POLICY]);
- 
- 	if (data[IFLA_VXLAN_LEARNING]) {
- 		err = vxlan_nl2flag(conf, data, IFLA_VXLAN_LEARNING,
-@@ -4315,6 +4335,7 @@ static size_t vxlan_get_size(const struct net_device *dev)
- 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_TOS */
- 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_DF */
- 		nla_total_size(sizeof(__be32)) + /* IFLA_VXLAN_LABEL */
-+		nla_total_size(sizeof(__u8)) +  /* IFLA_VXLAN_LABEL_POLICY */
- 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_LEARNING */
- 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_PROXY */
- 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_RSC */
-@@ -4387,6 +4408,7 @@ static int vxlan_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 	    nla_put_u8(skb, IFLA_VXLAN_TOS, vxlan->cfg.tos) ||
- 	    nla_put_u8(skb, IFLA_VXLAN_DF, vxlan->cfg.df) ||
- 	    nla_put_be32(skb, IFLA_VXLAN_LABEL, vxlan->cfg.label) ||
-+	    nla_put_u8(skb, IFLA_VXLAN_LABEL_POLICY, vxlan->cfg.label_policy) ||
- 	    nla_put_u8(skb, IFLA_VXLAN_LEARNING,
- 		       !!(vxlan->cfg.flags & VXLAN_F_LEARN)) ||
- 	    nla_put_u8(skb, IFLA_VXLAN_PROXY,
-diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-index f346b4efbc30..2d746f4c9a0a 100644
---- a/include/net/ip_tunnels.h
-+++ b/include/net/ip_tunnels.h
-@@ -416,6 +416,17 @@ static inline u8 ip_tunnel_get_dsfield(const struct iphdr *iph,
- 		return 0;
- }
- 
-+static inline __be32 ip_tunnel_get_flowlabel(const struct iphdr *iph,
-+					     const struct sk_buff *skb)
-+{
-+	__be16 payload_protocol = skb_protocol(skb, true);
-+
-+	if (payload_protocol == htons(ETH_P_IPV6))
-+		return ip6_flowlabel((const struct ipv6hdr *)iph);
-+	else
-+		return 0;
-+}
-+
- static inline u8 ip_tunnel_get_ttl(const struct iphdr *iph,
- 				       const struct sk_buff *skb)
- {
-diff --git a/include/net/vxlan.h b/include/net/vxlan.h
-index 6a9f8a5f387c..33ba6fc151cf 100644
---- a/include/net/vxlan.h
-+++ b/include/net/vxlan.h
-@@ -210,22 +210,23 @@ struct vxlan_rdst {
- };
- 
- struct vxlan_config {
--	union vxlan_addr	remote_ip;
--	union vxlan_addr	saddr;
--	__be32			vni;
--	int			remote_ifindex;
--	int			mtu;
--	__be16			dst_port;
--	u16			port_min;
--	u16			port_max;
--	u8			tos;
--	u8			ttl;
--	__be32			label;
--	u32			flags;
--	unsigned long		age_interval;
--	unsigned int		addrmax;
--	bool			no_share;
--	enum ifla_vxlan_df	df;
-+	union vxlan_addr		remote_ip;
-+	union vxlan_addr		saddr;
-+	__be32				vni;
-+	int				remote_ifindex;
-+	int				mtu;
-+	__be16				dst_port;
-+	u16				port_min;
-+	u16				port_max;
-+	u8				tos;
-+	u8				ttl;
-+	__be32				label;
-+	enum ifla_vxlan_label_policy	label_policy;
-+	u32				flags;
-+	unsigned long			age_interval;
-+	unsigned int			addrmax;
-+	bool				no_share;
-+	enum ifla_vxlan_df		df;
- };
- 
- enum {
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index fac351a93aed..d2f7760174ca 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -830,6 +830,7 @@ enum {
- 	IFLA_VXLAN_DF,
- 	IFLA_VXLAN_VNIFILTER, /* only applicable with COLLECT_METADATA mode */
- 	IFLA_VXLAN_LOCALBYPASS,
-+	IFLA_VXLAN_LABEL_POLICY,
- 	__IFLA_VXLAN_MAX
- };
- #define IFLA_VXLAN_MAX	(__IFLA_VXLAN_MAX - 1)
-@@ -847,6 +848,13 @@ enum ifla_vxlan_df {
- 	VXLAN_DF_MAX = __VXLAN_DF_END - 1,
- };
- 
-+enum ifla_vxlan_label_policy {
-+	VXLAN_LABEL_INHERIT = 0,
-+	VXLAN_LABEL_FIXED = 1,
-+	__VXLAN_LABEL_END,
-+	VXLAN_LABEL_MAX = __VXLAN_LABEL_END - 1,
-+};
-+
- /* GENEVE section */
- enum {
- 	IFLA_GENEVE_UNSPEC,
--- 
-2.39.2
-
+On Wed, Oct 4, 2023 at 1:33=E2=80=AFAM Martin Zaharinov <micron10@gmail.com=
+> wrote:
+>
+> Hi William,
+>
+> Yes this patch fix problem ,
+>
+> i will make little test if see any problem will update you.
+>
+> Thanks for your great work!
+>
+> Martin
+>
+> > On 30 Sep 2023, at 20:03, William Tu <u9012063@gmail.com> wrote:
+> >
+> > On Fri, Sep 29, 2023 at 1:30=E2=80=AFPM William Tu <u9012063@gmail.com>=
+ wrote:
+> >>
+> >> On Mon, Sep 4, 2023 at 9:24=E2=80=AFAM Martin Zaharinov <micron10@gmai=
+l.com> wrote:
+> >>>
+> >>> Hi William Tu
+> >>>
+> >>>
+> >>> this is report of bug with latest version of vmxnet3 xdp support:
+> >>>
+> >>>
+> >>> [   92.417855] ------------[ cut here ]------------
+> >>> [   92.417855] XDP_WARN: xdp_update_frame_from_buff(line:278): Driver=
+ BUG: missing reserved tailroom
+> >>> [   92.417855] WARNING: CPU: 0 PID: 0 at net/core/xdp.c:586 xdp_warn+=
+0xf/0x20
+> >>> [   92.417855] Modules linked in:  pppoe pppox ppp_generic slhc virti=
+o_net net_failover failover virtio_pci virtio_pci_legacy_dev virtio_pci_mod=
+ern_dev virtio virtio_ring vmxnet3
+> >>> [   92.417855] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W  O  =
+     6.5.1 #1
+> >>> [   92.417855] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BI=
+OS rel-1.16.2-0-gea1b7a073390-prebuilt.qemu.org 04/01/2014
+> >>> [   92.417855] RIP: 0010:xdp_warn+0xf/0x20
+> >>> [   92.417855] Code: 00 00 c3 0f 1f 84 00 00 00 00 00 83 7f 0c 01 0f =
+94 c0 c3 0f 1f 84 00 00 00 00 00 48 89 f9 48 c7 c7 3d b2 e4 91 e8 d1 00 8e =
+ff <0f> 0b c3 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 53 48 89 fb 8b
+> >>> [   92.417855] RSP: 0018:ffffb30180003d40 EFLAGS: 00010286
+> >>> [   92.417855] RAX: 0000000000000055 RBX: ffff99bcf7c22ee0 RCX: 00000=
+000fffdffff
+> >>> [   92.417855] RDX: 00000000fffdffff RSI: 0000000000000001 RDI: 00000=
+000ffffffea
+> >>> [   92.417855] RBP: ffff99bb849c2000 R08: 0000000000000000 R09: 00000=
+000fffdffff
+> >>> [   92.417855] R10: ffff99bcf6a00000 R11: 0000000000000003 R12: ffff9=
+9bb83840000
+> >>> [   92.417855] R13: ffff99bb83842780 R14: ffffb3018081d000 R15: ffff9=
+9bb849c2000
+> >>> [   92.417855] FS:  0000000000000000(0000) GS:ffff99bcf7c00000(0000) =
+knlGS:0000000000000000
+> >>> [   92.417855] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> >>> [   92.417855] CR2: 00007f9bf822df88 CR3: 00000001a74de000 CR4: 00000=
+000003506f0
+> >>> [   92.417855] Call Trace:
+> >>> [   92.417855]  <IRQ>
+> >>> [   92.417855]  ? __warn+0x6c/0x130
+> >>> [   92.417855]  ? report_bug+0x1e4/0x260
+> >>> [   92.417855]  ? handle_bug+0x36/0x70
+> >>> [   92.417855]  ? exc_invalid_op+0x17/0x1a0
+> >>> [   92.417855]  ? asm_exc_invalid_op+0x16/0x20
+> >>> [   92.417855]  ? xdp_warn+0xf/0x20
+> >>> [   92.417855]  xdp_do_redirect+0x15f/0x1c0
+> >>> [   92.417855]  vmxnet3_run_xdp+0x17a/0x400 [vmxnet3]
+> >>> [   92.417855]  vmxnet3_process_xdp+0xe4/0x760 [vmxnet3]
+> >>> [   92.417855]  ? vmxnet3_tq_tx_complete.isra.0+0x21e/0x2c0 [vmxnet3]
+> >>> [   92.417855]  vmxnet3_rq_rx_complete+0x7ad/0x1120 [vmxnet3]
+> >>> [   92.417855]  vmxnet3_poll_rx_only+0x2d/0xa0 [vmxnet3]
+> >>> [   92.417855]  __napi_poll+0x20/0x180
+> >>> [   92.417855]  net_rx_action+0x177/0x390
+> >>> [   92.417855]  __do_softirq+0xd0/0x202
+> >>> [   92.417855]  irq_exit_rcu+0x82/0xa0
+> >>> [   92.417855]  common_interrupt+0x7a/0xa0
+> >>> [   92.417855]  </IRQ>
+> >>> [   92.417855]  <TASK>
+> >>> [   92.417855]  asm_common_interrupt+0x22/0x40
+> >>> [   92.417855] RIP: 0010:default_idle+0xb/0x10
+> >>> [   92.417855] Code: 07 76 e7 48 89 07 49 c7 c0 08 00 00 00 4d 29 c8 =
+4c 01 c7 4c 29 c2 e9 72 ff ff ff cc cc cc cc eb 07 0f 00 2d 47 72 29 00 fb =
+f4 <fa> c3 0f 1f 00 65 48 8b 04 25 00 33 02 00 f0 80 48 02 20 48 8b 10
+> >>> [   92.417855] RSP: 0018:ffffffff92003e88 EFLAGS: 00000206
+> >>> [   92.417855] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 00000=
+00000000001
+> >>> [   92.417855] RDX: 4000000000000000 RSI: 0000000000000083 RDI: 00000=
+000000bfc34
+> >>> [   92.417855] RBP: ffffffff92009dc0 R08: ffff99bcf7c1f160 R09: ffff9=
+9bcf7c1f100
+> >>> [   92.417855] R10: ffff99bcf7c1f100 R11: 0000000000000000 R12: 00000=
+00000000000
+> >>> [   92.417855] R13: 0000000000000000 R14: ffffffff92009dc0 R15: 00000=
+00000000000
+> >>> [   92.417855]  default_idle_call+0x1f/0x30
+> >>> [   92.417855]  do_idle+0x1df/0x210
+> >>> [   92.417855]  cpu_startup_entry+0x14/0x20
+> >>> [   92.417855]  rest_init+0xc7/0xd0
+> >>> [   92.417855]  arch_call_rest_init+0x5/0x20
+> >>> [   92.417855]  start_kernel+0x3e9/0x5b0
+> >>> [   92.417855]  x86_64_start_reservations+0x14/0x30
+> >>> [   92.417855]  x86_64_start_kernel+0x71/0x80
+> >>> [   92.417855]  secondary_startup_64_no_verify+0x167/0x16b
+> >>> [   92.417855]  </TASK>
+> >>> [   92.417855] ---[ end trace 0000000000000000 ]=E2=80=94
+> >>>
+> >>>
+> >> Hi Martin,
+> >>
+> >> Thanks, I'll take a look.
+> >> William
+> >
+> > Hi Martin,
+> > For non-dataring packet, I should use rbi->len instead of rcd->len.
+> > Are you able to see if this fixes the bug?
+> > thanks!
+> >
+> > diff --git a/drivers/net/vmxnet3/vmxnet3_xdp.c
+> > b/drivers/net/vmxnet3/vmxnet3_xdp.c
+> > index 80ddaff759d4..a6c787454a1a 100644
+> > --- a/drivers/net/vmxnet3/vmxnet3_xdp.c
+> > +++ b/drivers/net/vmxnet3/vmxnet3_xdp.c
+> > @@ -382,12 +382,12 @@ vmxnet3_process_xdp(struct vmxnet3_adapter *adapt=
+er,
+> >        page =3D rbi->page;
+> >        dma_sync_single_for_cpu(&adapter->pdev->dev,
+> >                                page_pool_get_dma_addr(page) +
+> > -                               rq->page_pool->p.offset, rcd->len,
+> > +                               rq->page_pool->p.offset, rbi->len,
+> >                                page_pool_get_dma_dir(rq->page_pool));
+> >
+> > -       xdp_init_buff(&xdp, rbi->len, &rq->xdp_rxq);
+> > +       xdp_init_buff(&xdp, PAGE_SIZE, &rq->xdp_rxq);
+> >        xdp_prepare_buff(&xdp, page_address(page), rq->page_pool->p.offs=
+et,
+> > -                        rcd->len, false);
+> > +                        rbi->len, false);
+> >        xdp_buff_clear_frags_flag(&xdp);
+> >
+> >        xdp_prog =3D rcu_dereference(rq->adapter->xdp_bpf_prog);
+>
 
