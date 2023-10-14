@@ -1,28 +1,28 @@
-Return-Path: <netdev+bounces-40994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D5397C94B1
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 15:14:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC5AF7C94B4
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 15:21:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB9FFB20AFB
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 13:14:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19F4FB20B50
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 13:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EBB4125B1;
-	Sat, 14 Oct 2023 13:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE08125B8;
+	Sat, 14 Oct 2023 13:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lafranque.net header.i=@lafranque.net header.b="MZ7w0iHP"
+	dkim=pass (1024-bit key) header.d=lafranque.net header.i=@lafranque.net header.b="ikTjFgDP"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0751C37
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 13:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FAC53B9
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 13:21:44 +0000 (UTC)
 Received: from mail.lac-coloc.fr (unknown [45.90.160.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B457BB7
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 06:14:16 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08BAEB7
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 06:21:41 -0700 (PDT)
 Authentication-Results: mail.lac-coloc.fr;
 	auth=pass (plain)
 From: Alce Lafranque <alce@lafranque.net>
@@ -35,9 +35,9 @@ To: "David S. Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org
 Cc: Alce Lafranque <alce@lafranque.net>,
 	Vincent Bernat <vincent@bernat.ch>
-Subject: [PATCH net-next v3] vxlan: add support for flowlabel inherit
-Date: Sat, 14 Oct 2023 08:13:20 -0500
-Message-Id: <20231014131320.51810-1-alce@lafranque.net>
+Subject: [PATCH net-next v4] vxlan: add support for flowlabel inherit
+Date: Sat, 14 Oct 2023 08:21:02 -0500
+Message-Id: <20231014132102.54051-1-alce@lafranque.net>
 X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -47,17 +47,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received: from localhost (Unknown [127.0.0.1])
-	by mail.lac-coloc.fr (Haraka/3.0.1) with ESMTPSA id 216ECD29-25DF-4D1B-AD87-3B2990A53E75.1
+	by mail.lac-coloc.fr (Haraka/3.0.1) with ESMTPSA id 3A4207B6-6CB3-42C6-8E43-95C7F46EBFD6.1
 	envelope-from <alce@lafranque.net>
 	tls TLS_AES_256_GCM_SHA384 (authenticated bits=0);
-	Sat, 14 Oct 2023 13:14:14 +0000
+	Sat, 14 Oct 2023 13:21:39 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
 	d=lafranque.net; s=s20211111873;
 	h=from:subject:date:message-id:to:cc:mime-version;
-	bh=IgROqsj4zogu5vFdo5EhJdhBG1QfwTHrjxLty7lFwGY=;
-	b=MZ7w0iHPYSXNG+NtzpdMJaNMuL2EYgk0++9Ax8FdEzjx/4kd7C3nk/rj0VdTw4UNZsZmIxpT7M
-	gGliaxPh4E7AqDaky9UM5VCuafuRiELD18Uqy7t2+eVEsmznGq4BoNGYEw7onprHxwfmOAffI922
-	yF7w5utAHdX3FXJ1a0OwM=
+	bh=BEO9SaI9W2YVQxHVTM006+i0nnIFVYvZHcNw4AV/roM=;
+	b=ikTjFgDP0fNaGQbp22+Inm81U177+bixhecRAQpzIzzJIw4tFYr92WVPhpjJW3DkutXh0y8sQI
+	dLy9ifqOGRnbXKXsudvNj5qSkESCR/kbrytMmhiXxeK5ftlykkCMf0lNyO295L6bQUVWdBPuqu5E
+	di7qOEMBZifaSAUotsgNQ=
 X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MSGID_FROM_MTA_HEADER,RDNS_NONE,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
@@ -106,7 +106,9 @@ Co-developed-by: Vincent Bernat <vincent@bernat.ch>
 Signed-off-by: Vincent Bernat <vincent@bernat.ch>
 
 ---
-v3:
+v4:
+  - Fix tabs
+v3: https://lore.kernel.org/all/20231014131320.51810-1-alce@lafranque.net/
   - Adopt policy label inherit by default
   - Set policy to label fixed when flowlabel is set
   - Rename IFLA_VXLAN_LABEL_BEHAVIOR to IFLA_VXLAN_LABEL_POLICY
@@ -121,7 +123,7 @@ v1: https://lore.kernel.org/all/4444C5AE-FA5A-49A4-9700-7DD9D7916C0F.1@mail.lac-
  4 files changed, 62 insertions(+), 20 deletions(-)
 
 diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 5b5597073b00..69b85482b137 100644
+index 5b5597073b00..48ebbd4563f0 100644
 --- a/drivers/net/vxlan/vxlan_core.c
 +++ b/drivers/net/vxlan/vxlan_core.c
 @@ -2475,7 +2475,17 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
@@ -136,9 +138,9 @@ index 5b5597073b00..69b85482b137 100644
 +		case VXLAN_LABEL_INHERIT:
 +			label = ip_tunnel_get_flowlabel(old_iph, skb);
 +			break;
-+    		default:
-+        		DEBUG_NET_WARN_ON_ONCE(1);
-+        		goto drop;
++		default:
++			DEBUG_NET_WARN_ON_ONCE(1);
++			goto drop;
 +		}
  #endif
  	} else {
