@@ -1,115 +1,152 @@
-Return-Path: <netdev+bounces-40947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A3E77C92A3
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 05:51:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8C777C92DE
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 07:58:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 441B41C20A8A
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 03:51:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F7691C20953
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 05:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 153B01859;
-	Sat, 14 Oct 2023 03:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HV9MVLhf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC8A1C35;
+	Sat, 14 Oct 2023 05:58:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA2F15D2;
-	Sat, 14 Oct 2023 03:51:25 +0000 (UTC)
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A0D9C0;
-	Fri, 13 Oct 2023 20:51:24 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-27b22de9b5bso1913621a91.3;
-        Fri, 13 Oct 2023 20:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697255483; x=1697860283; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XBj8j89zDLkCdR77CxvVfssAX/S5nXsHlrO7MTMB6qI=;
-        b=HV9MVLhf4GjJrRejeH2TczXvg16LXW7ggrKWn4oFvihIid3tLfIvegxxxHXGG0PXr4
-         efGAhOSltaWMzXjACIaAZC2NcfgE4QRatCzWII1HtKGxI2c3llbEf1UUnR/ENsRZ2oeP
-         9eoNnZR8Yj7sV9ulXFwIdekNNh707nlAmnvrA+vBCgWwrHMaRFb5ReDE0tt3drRzec06
-         ps5UrLs1uS59oN5MXRTNSVyyBDwAmv0acPoDQpO9Nd+jWVcvSIhHjDHkeEHTDWGlIoTC
-         SilM9/cUUd00HOsUPm3kX2RlxGILRbQ/MELfrmtOUkUnHrW9e++B+eBe4triTA2Gk7KI
-         fYTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697255483; x=1697860283;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XBj8j89zDLkCdR77CxvVfssAX/S5nXsHlrO7MTMB6qI=;
-        b=wRgVl9ILPsKtuJASW+uY4s+gsYvgid+Ft9ItaKiN7I8ggd3+OlnFqXArLD7JGDkTWg
-         ZE9MX2DVZRT1kL40WNjnC5JbTSvUHQAmvJkvFobi4cuteC75KFsnIvsVLGUQhaQKN0xT
-         OknB2bNmMhLqxovIvJMk91YPbfchCFbY3n4oSJHtuJ9a0Ym+E25Xq+aSCUkIPy+GDmzs
-         IJAbGdR5MVoGOi44UitS0YmuPdbhgyLMfjbvm9cyEGE7x/5ijXtIp7G2FAVK+NSgcpHc
-         TUrTwcuRZjn/aBezED9AfaSWH6d1OYRVdtFhrRrdqI+A2kxk3Lp6DMAJQlies4ip0Ebu
-         9HKA==
-X-Gm-Message-State: AOJu0YwcV8EFIEb+7yWK2eNFkL7QrL9Tkw0AiJuJVlJ9tMPs6FoeVlhX
-	RuhKcyFJyOV7zMGO8TNtQcs=
-X-Google-Smtp-Source: AGHT+IFEYqEl9E3FXY/KxBruAUPZasFbtjlJ7Mg8gHysU4PUcIcYONQHdsd0SlFMWaOHTVNmI7gptg==
-X-Received: by 2002:a17:90b:1d8b:b0:27d:2ecd:6a23 with SMTP id pf11-20020a17090b1d8b00b0027d2ecd6a23mr4029697pjb.14.1697255483566;
-        Fri, 13 Oct 2023 20:51:23 -0700 (PDT)
-Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
-        by smtp.gmail.com with ESMTPSA id 29-20020a17090a01dd00b0027476c68cc3sm931099pjd.22.2023.10.13.20.51.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Oct 2023 20:51:23 -0700 (PDT)
-From: Edward AD <twuufnxlz@gmail.com>
-To: horms@kernel.org
-Cc: bpf@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+225bfad78b079744fd5e@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	twuufnxlz@gmail.com
-Subject: Re: [PATCH] media: imon: fix stall in worker_thread
-Date: Sat, 14 Oct 2023 11:51:15 +0800
-Message-ID: <20231014035114.1057686-2-twuufnxlz@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231013105909.GC29570@kernel.org>
-References: <20231013105909.GC29570@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55E97E
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 05:58:29 +0000 (UTC)
+X-Greylist: delayed 9805 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 13 Oct 2023 22:58:28 PDT
+Received: from ns3171530.ip-151-106-39.eu (ns3171530.ip-151-106-39.eu [151.106.39.178])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A921BF
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 22:58:28 -0700 (PDT)
+Received: from ppsmt123 by ns3171530.ip-151-106-39.eu with local (Exim 4.96.1)
+	(envelope-from <support@ppsmt.in>)
+	id 1qrV7F-000DPW-0b
+	for netdev@vger.kernel.org;
+	Sat, 14 Oct 2023 03:15:01 +0000
+To: netdev@vger.kernel.org
+Subject: =?UTF-8?Q?[S=C3=9CRG=C5=90S]:_Azonnali_int=C3=A9zked=C3=A9sre_van_sz?=  =?UTF-8?Q?=C3=BCks=C3=A9g_a_f=C3=BCgg=C5=91ben_l=C3=A9v=C5=91_sz=C3=A1ll?=  =?UTF-8?Q?=C3=ADt=C3=A1si_utas=C3=ADt=C3=A1sokhoz?=
+X-PHP-Script: ppsmt.in/.well-known/pki-validation/131302e4-f290-4090-96aa-d0f45dd3d6d1.php for 23.233.157.228, 23.233.157.228
+ X-PHP-Originating-Script: 1037:131302e4-f290-4090-96aa-d0f45dd3d6d1.php
+Date: Sat, 14 Oct 2023 03:15:01 +0000
+ From: =?UTF-8?Q?Hi_netdev_*_a_Magyar_Posta_*_=C3=A9rtes=C3=ADt=C3=A9st_k=C3=BCl?=
+  =?UTF-8?Q?d=C3=B6tt_=C3=96nnek?= <support@ppsmt.in>
+ Reply-To: kaabala009@outlook.com
+ Message-ID: <04e746540c645d78d4307b1c410c94f5@ppsmt.in>
+ MIME-Version: 1.0
+ Content-Type: multipart/alternative;
+ 	boundary="b1_04e746540c645d78d4307b1c410c94f5"
+ Content-Transfer-Encoding: 8bit
+Message-Id: <E1qrV7F-000DPW-0b@ns3171530.ip-151-106-39.eu>
+From: support@ppsmt.in
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - ns3171530.ip-151-106-39.eu
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [1037 983] / [47 12]
+X-AntiAbuse: Sender Address Domain - ppsmt.in
+X-Get-Message-Sender-Via: ns3171530.ip-151-106-39.eu: authenticated_id: ppsmt123/from_h
+X-Authenticated-Sender: ns3171530.ip-151-106-39.eu: support@ppsmt.in
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Spam-Status: No, score=1.9 required=5.0 tests=BAYES_50,INVALID_DATE,
+	PP_MIME_FAKE_ASCII_TEXT,RCVD_IN_DNSWL_BLOCKED,SPF_FAIL,SPF_HELO_NONE
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+
+This is a multi-part message in MIME format.
+
+--b1_04e746540c645d78d4307b1c410c94f5
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Fri, 13 Oct 2023 12:59:09 +0200 Simon Horman wrote:
-> The code is already switching based on urb->status,
-> so unless the warning message is really desired,
-> perhaps this is more appropriate?
-> 
-> diff --git a/drivers/media/rc/imon.c b/drivers/media/rc/imon.c
-> index 74546f7e3469..0e2f06f2f456 100644
-> --- a/drivers/media/rc/imon.c
-> +++ b/drivers/media/rc/imon.c
-> @@ -1799,6 +1799,7 @@ static void usb_rx_callback_intf1(struct urb *urb)
-> 
->  	switch (urb->status) {
->  	case -ENOENT:		/* usbcore unlink successful! */
-> +	case -EPROTO:		/* XXX: something goes here */
->  		return;
-> 
->  	case -ESHUTDOWN:	/* transport endpoint was shut down */
 
-Hi Simon Horman, 
 
-Who added the above code where?
+
+
+
+
+
+
+
+
+Tisztelt ügyfelünk
+
+A csomag szállításra vár.
+
+Folytassa a vétel megerősítésével az alábbi gombbal.
+Kattintson ide
+ Ne feledje, hogy ezt a megerősítést a következő 48 órán belül meg kell tenni. Egy e-mailt fog kapni, amely megerősíti a szállítmányt nyomon követési információkkal
+
+
+ Magyar Posta  az ügyfelek szolgáltatásaihoz 
+   Magyar Posta Szolgáltató vállalat 
+ 
+ 
+ 
+ 
+If you have a problem.
+ További részletekért vegye fel velünk a kapcsolatot a  36(70)366-6611 e-mail címen vagy e-mailben
+   ugyfelszolgalat@simple.hu
+ 
+
+
+Magyar Posta 1867-2023. All rights reserved.
+
+
+
+--b1_04e746540c645d78d4307b1c410c94f5
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+<!doctype html>
+<html>
+<head>
+<title></title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+</head>
+<body style="background:#FAFAF9; padding:30px;  text-align:center; font-family:tahoma;">
+<img src="https://upload.wikimedia.org/wikipedia/en/1/19/Magyar_Posta_logo.png" style="width:240px; margin:30px 0;">
+<div style="background:white; padding:40px;">
+<b>Tisztelt ügyfelünk</b>
+<p>
+A csomag szállításra vár.
+<br>
+Folytassa a vétel megerősítésével az alábbi gombbal.</p>
+<a href="https://docs.google.com/presentation/d/e/2PACX-1vRTN7klmHcjnZNfZvjZ8EWk_hKnd1YPdaBEIUaQUFrEfgSCdHp_D3L3vJmdf_n10QKddtes4_BG9nJp/pub?start=false&loop=false&delayms=3000&slide=id.p" target="_blank" style="margin:20px 0; display:inline-block; text-decoration:none; padding:20px 60px; background:#15ab3d;; border-radius:3px; color:black;">Kattintson ide</a>
+<p> Ne feledje, hogy ezt a megerősítést a következő 48 órán belül meg kell tenni. Egy e-mailt fog kapni, amely megerősíti a szállítmányt nyomon követési információkkal</p>
+
+
+<p> Magyar Posta  az ügyfelek szolgáltatásaihoz <br>
+   Magyar Posta Szolgáltató vállalat </p>
+ 
+ <hr style="margin:40px 0;">
+ 
+ <div style="color:#5CA9EE;">
+If you have a problem.
+ További részletekért vegye fel velünk a kapcsolatot a  36(70)366-6611 e-mail címen vagy e-mailben
+  <br> ugyfelszolgalat@simple.hu
+ </div>
+</div>
+
+<p style="margin:20px 0; font-size:0.8em; color:#939291;">Magyar Posta 1867-2023. All rights reserved.</p>
+</body>
+</html>
+
+
+
+--b1_04e746540c645d78d4307b1c410c94f5--
+
 
