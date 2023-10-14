@@ -1,50 +1,73 @@
-Return-Path: <netdev+bounces-40965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D09D7C9335
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 09:29:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 919C27C9349
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 09:39:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00B0E1F21A58
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 07:29:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E39BB20B52
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 07:39:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69936566E;
-	Sat, 14 Oct 2023 07:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308755679;
+	Sat, 14 Oct 2023 07:39:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EdNQl4Z3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SdtIzRSn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA921877
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 07:29:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67DD7C433C7;
-	Sat, 14 Oct 2023 07:29:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697268587;
-	bh=t4c1adpH10ty/zfKFnqCTgo2DQwG7YdUBbzGZstMMQE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EdNQl4Z3hRpyFSPqeobB9ZK0gxWKCdp1JyTcopWAz6zURN9Fd8BAY496uKtEvJr/9
-	 nrNzpWOi0PicSKaw0lviGNM8e11yNWadmnEM4+W5jV1cjdGnBK1n/XmxO3vGwj6Cuf
-	 EBeuI8mJhWVNqz5Pwb0sC91EFukA61XXPiqZ0rUCR9DEN0ZU9HDXCxeP+YCOd+PV5r
-	 5orrKD9OsBBHf99gdgIUWq8X481Mk6SXFxGdjqtPmd9NR/TxpFNUFOL+bXLD/SPUL+
-	 MBU5N/OFi1v2nM1rMriYYW3q7wmk46I+3j9T5C16NOxae4Vtz2lhN9YawIQ+rYJNdU
-	 Nq6UnWzOQDkOA==
-Date: Sat, 14 Oct 2023 09:29:43 +0200
-From: Simon Horman <horms@kernel.org>
-To: Edward AD <twuufnxlz@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, johannes.berg@intel.com,
-	johannes@sipsolutions.net, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzbot+509238e523e032442b80@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] rfkill: fix deadlock in rfkill_send_events
-Message-ID: <20231014072943.GV29570@kernel.org>
-References: <20231013110638.GD29570@kernel.org>
- <20231014024321.1002066-2-twuufnxlz@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA258566E
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 07:39:45 +0000 (UTC)
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D1ADB3;
+	Sat, 14 Oct 2023 00:39:44 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5a7bbcc099fso35776867b3.3;
+        Sat, 14 Oct 2023 00:39:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697269183; x=1697873983; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O3pfyKY5IaoFuTuLVntmNnqtU1SUqO73JEN0YvBTiXE=;
+        b=SdtIzRSngbDs7E0rP8faZ+PDnoHk3mznG1rAaaPw+OASvSG5z3grZj5lEruvIBS5Fx
+         or/umvCf/WWMYOhQTMR2Il3PCJB0zsSHhTXcXqrNMOjzjMWqieCWXfkg1+pxPEVGLqmg
+         7ZnktwaiYWNeb+argnfMHr8SWGyTymAnUgDnc1R+uf0JF8cwJW2otGkZunAsphF1Hfv6
+         GuzUmpw20urdwXl0VMgNOJHshxckQmupqq0zAxhdzJE1GnIPq7N8a12HRXoxMzlJ2AUF
+         GJGAPOhkWUNYwOMy4RRoo7IR3O20Sz5OVSD1IsHY0OmuFuk/+KPLtRxxN8am/Tb9dj8C
+         GZMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697269183; x=1697873983;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O3pfyKY5IaoFuTuLVntmNnqtU1SUqO73JEN0YvBTiXE=;
+        b=PuKlazZ6kJ5NxCifid51GINXjHx1jXoCSPEazuOOKI1x+DWUtYvKwSJK2lxpStSHy4
+         +sfpddqZM/+3YADn0gA1CffBkhOQ37ylWfeuSditkw7D4tHIKjwNr9d84BMrvf/ItRas
+         mbIrZuaznq3d30JbQlxGDWWS6Bp9ep49K1PYcS2YYr7DV3XZjavNbtmldMDjorsN0u/F
+         pn1eOlDc/zEUlgIrV9UzHKubAfmQ/iyX54oZv7clKFG6RSZRZ6ihpsH8R8ZrfB+QiBNX
+         +QoNRa7gNENhOf0+3zJZ/Thlti3BmrRb+r365UeWaCzak7OQt7oHj8hHPB109fh8yXcN
+         9Q6Q==
+X-Gm-Message-State: AOJu0Yxqwl5lyT8XhVRJMNO71DprBGet4b1c5oG0D4W5G3N4G/HuIQhB
+	Mfe9q8VwAVpalPqv5iR3030=
+X-Google-Smtp-Source: AGHT+IFLBBfUUgNr6LViOF1jpi5Iia8QBECN3q2/onj7OgNd1yfaPOAeXkVgoQpt6phF2TPyemePTw==
+X-Received: by 2002:a81:a546:0:b0:592:5def:5c0d with SMTP id v6-20020a81a546000000b005925def5c0dmr31356836ywg.45.1697269183527;
+        Sat, 14 Oct 2023 00:39:43 -0700 (PDT)
+Received: from gilbert-PC ([105.112.18.68])
+        by smtp.gmail.com with ESMTPSA id w3-20020a818603000000b0059c8387f673sm394202ywf.51.2023.10.14.00.39.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Oct 2023 00:39:41 -0700 (PDT)
+Date: Sat, 14 Oct 2023 08:39:34 +0100
+From: Gilbert Adikankwu <gilbertadikankwu@gmail.com>
+To: Julia Lawall <julia.lawall@inria.fr>
+Cc: outreachy@lists.linux.dev, manishc@marvell.com,
+	GR-Linux-NIC-Dev@marvell.com, coiby.xu@gmail.com,
+	gregkh@linuxfoundation.org, netdev@vger.kernel.org,
+	linux-staging@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] staging: qlge: Add bool type to qlge_idc_wait()
+Message-ID: <ZSpFtrC5xuYzgZhw@gilbert-PC>
+References: <ZSoxLxs45bIuBrHg@gilbert-PC>
+ <alpine.DEB.2.22.394.2310140819450.3383@hadrien>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,25 +76,114 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231014024321.1002066-2-twuufnxlz@gmail.com>
+In-Reply-To: <alpine.DEB.2.22.394.2310140819450.3383@hadrien>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sat, Oct 14, 2023 at 10:43:22AM +0800, Edward AD wrote:
-> Hi Simon Horman,
-> On Fri, 13 Oct 2023 13:06:38 +0200, Simon Horman wrote:
-> > I am wondering if you considered moving the rfkill_sync() calls
-> > to before &data->mtx is taken, to avoid the need to drop and
-> > retake it?
-> If you move rfkill_sync() before calling &data->mtx, more code will be added 
-> because rfkill_sync() is in the loop body.
-
-Maybe that is true. And maybe that is a good argument for
-not taking the approach that I suggested. But I do think it
-is simpler from a locking perspective, and that has some merit.
-
-> > 
-> > Perhaps it doesn't work for some reason (compile tested only!).
-> > But this does seem somehow cleaner for me.
-> BR,
-> edward
+On Sat, Oct 14, 2023 at 08:23:13AM +0200, Julia Lawall wrote:
 > 
+> 
+> On Sat, 14 Oct 2023, Gilbert Adikankwu wrote:
+> 
+> > Reported by checkpatch:
+> >
+> > WARNING: else is not generally useful after a break or return
+> >
+> > The idea of the break statements in the if/else is so that the loop is
+> > exited immediately the value of status is changed. And returned
+> > immediately. For if/else conditionals, the block to be executed will
+> > always be one of the two. Introduce a bool type variable 's_sig' that
+> > evaluates to true when the value of status is changed within the if/else
+> > block.
+> 
+> The idea of the checkpatch warning is that eg
+> 
+> found = search();
+> if (!found)
+>   break;
+> else do_something();
+> 
+> is equvalent to:
+> 
+> found = search();
+> if (!found)
+>   break;
+> do_something();
+> 
+> Because now the normal computation is at top level and the if branches are
+> only used for error handling.
+> 
+> But that is not the case in your code.  In your code, it seems that there
+> are two cases where one would like to break out of the loop.  The code
+> would be better left as it is.
+> 
+> julia
+
+Thank you for the quick review. I thought about it the you described but
+then realised the else was not redundant that was why I went the route
+of trying to suppress the warning. I will revert the changes as you
+have suggested
+
+Gilbert
+> 
+> >
+> > Signed-off-by: Gilbert Adikankwu <gilbertadikankwu@gmail.com>
+> > ---
+> >  drivers/staging/qlge/qlge.h     | 1 +
+> >  drivers/staging/qlge/qlge_mpi.c | 8 ++++++--
+> >  2 files changed, 7 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/staging/qlge/qlge.h b/drivers/staging/qlge/qlge.h
+> > index d0dd659834ee..b846bca82571 100644
+> > --- a/drivers/staging/qlge/qlge.h
+> > +++ b/drivers/staging/qlge/qlge.h
+> > @@ -11,6 +11,7 @@
+> >  #include <linux/netdevice.h>
+> >  #include <linux/rtnetlink.h>
+> >  #include <linux/if_vlan.h>
+> > +#include <linux/types.h>
+> >
+> >  /*
+> >   * General definitions...
+> > diff --git a/drivers/staging/qlge/qlge_mpi.c b/drivers/staging/qlge/qlge_mpi.c
+> > index 96a4de6d2b34..44cb879240a0 100644
+> > --- a/drivers/staging/qlge/qlge_mpi.c
+> > +++ b/drivers/staging/qlge/qlge_mpi.c
+> > @@ -909,6 +909,7 @@ int qlge_mb_wol_set_magic(struct qlge_adapter *qdev, u32 enable_wol)
+> >  static int qlge_idc_wait(struct qlge_adapter *qdev)
+> >  {
+> >  	int status = -ETIMEDOUT;
+> > +	bool s_sig = false;
+> >  	struct mbox_params *mbcp = &qdev->idc_mbc;
+> >  	long wait_time;
+> >
+> > @@ -934,14 +935,17 @@ static int qlge_idc_wait(struct qlge_adapter *qdev)
+> >  		} else if (mbcp->mbox_out[0] == AEN_IDC_CMPLT) {
+> >  			netif_err(qdev, drv, qdev->ndev, "IDC Success.\n");
+> >  			status = 0;
+> > -			break;
+> > +			s_sig = true;
+> >  		} else {
+> >  			netif_err(qdev, drv, qdev->ndev,
+> >  				  "IDC: Invalid State 0x%.04x.\n",
+> >  				  mbcp->mbox_out[0]);
+> >  			status = -EIO;
+> > -			break;
+> > +			s_sig = true;
+> >  		}
+> > +
+> > +		if (s_sig)
+> > +			break;
+> >  	}
+> >
+> >  	return status;
+> > --
+> > 2.34.1
+> >
+> >
+> >
 
