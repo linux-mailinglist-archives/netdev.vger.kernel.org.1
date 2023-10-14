@@ -1,71 +1,82 @@
-Return-Path: <netdev+bounces-40943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A48C7C926D
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 05:13:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A3E77C92A3
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 05:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5659C1C209B3
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 03:13:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 441B41C20A8A
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 03:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E80A46;
-	Sat, 14 Oct 2023 03:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 153B01859;
+	Sat, 14 Oct 2023 03:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mf7Qb1rH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HV9MVLhf"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C58367
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 03:13:39 +0000 (UTC)
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3953D6;
-	Fri, 13 Oct 2023 20:13:38 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c9b95943beso23275735ad.1;
-        Fri, 13 Oct 2023 20:13:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA2F15D2;
+	Sat, 14 Oct 2023 03:51:25 +0000 (UTC)
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A0D9C0;
+	Fri, 13 Oct 2023 20:51:24 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-27b22de9b5bso1913621a91.3;
+        Fri, 13 Oct 2023 20:51:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697253218; x=1697858018; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/ofkxnOmb7cqwZjJ5IHHNe3UaCC4MdflRYJIUEycODA=;
-        b=mf7Qb1rHN3nW1AKtxfAABJMYYARGGKnK2nYwmzPNCUEmUcTElE2+D9Xl8I2M3W4PqA
-         frknuMs8bGgBiiC8FwlyhiNbX+lKYQ70BvNG2aM3kfXJXMf/q09/RxHJBQ1Vc+yL4VS0
-         uDpzhtwZlbXHWR/kIhsbJQYly37eahFNwEmpkHABmEXANR6w4a2q06VimecGYxQVCQdr
-         uOZZ2mG2qM7apdnrQQG1yC2jhk7YD1KGw97HCfe9n3UMA43DzNivQy4e+nMTsBihSmqz
-         1GNsL3wI7zaDmjiNRDBbOQ/T+k4BuzCNFdFexkV/rMf9tBJK1DLVIA/LrKbiEmGJE6/I
-         wYVg==
+        d=gmail.com; s=20230601; t=1697255483; x=1697860283; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XBj8j89zDLkCdR77CxvVfssAX/S5nXsHlrO7MTMB6qI=;
+        b=HV9MVLhf4GjJrRejeH2TczXvg16LXW7ggrKWn4oFvihIid3tLfIvegxxxHXGG0PXr4
+         efGAhOSltaWMzXjACIaAZC2NcfgE4QRatCzWII1HtKGxI2c3llbEf1UUnR/ENsRZ2oeP
+         9eoNnZR8Yj7sV9ulXFwIdekNNh707nlAmnvrA+vBCgWwrHMaRFb5ReDE0tt3drRzec06
+         ps5UrLs1uS59oN5MXRTNSVyyBDwAmv0acPoDQpO9Nd+jWVcvSIhHjDHkeEHTDWGlIoTC
+         SilM9/cUUd00HOsUPm3kX2RlxGILRbQ/MELfrmtOUkUnHrW9e++B+eBe4triTA2Gk7KI
+         fYTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697253218; x=1697858018;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/ofkxnOmb7cqwZjJ5IHHNe3UaCC4MdflRYJIUEycODA=;
-        b=Czf2WXVgdYQAFLt3X6pbTjyrTTa2Tn2Jyfv6BqnMr6DDmtQPj1RHPJNrkOSn1+TrNY
-         MpyI5VBJqICEVj1mq5cWWJLnVxgLoyJLJy8bG3j6LOQF+A33iG1qj8h7wqVEKIQUSMWJ
-         YrgPRsuzlEg3w7dedfhWmmcczeJiE8Op+5eUye9Iw/q8gkCbxgaQ9vG30fTnYjP9nX/n
-         qBpa90PxkNKooS/XvclRPNP6amKF3QBJUWT8r3XxWYycWT7ZjaqhjkCYYygcPUP2XS6P
-         oBgRdgaA3zzFv5H++OSFRZChLU1YjcX2YMpfSdq2vXZ9Qbvz9wGa44hdznLdWkCUgdgc
-         G3/g==
-X-Gm-Message-State: AOJu0YxDVrIlZFl+HY4Bi4V2rctlB3Z/CVxAh53/IehRCXMb+Ivx2vAC
-	luJUR7e6+kCfreAk8h5JJsy2mIgbs5ey68a4csM=
-X-Google-Smtp-Source: AGHT+IGzfPvW7n4zXQ/L7W7VDl+z9apG5TzXSlGDcTK6w8h/OWl5IvZCS14HavnGhFdm853zAIu4Tw==
-X-Received: by 2002:a17:902:cec7:b0:1c9:9144:5740 with SMTP id d7-20020a170902cec700b001c991445740mr18656762plg.2.1697253218003;
-        Fri, 13 Oct 2023 20:13:38 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id h6-20020a170902680600b001c55e13bf39sm4632078plk.275.2023.10.13.20.13.36
+        d=1e100.net; s=20230601; t=1697255483; x=1697860283;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XBj8j89zDLkCdR77CxvVfssAX/S5nXsHlrO7MTMB6qI=;
+        b=wRgVl9ILPsKtuJASW+uY4s+gsYvgid+Ft9ItaKiN7I8ggd3+OlnFqXArLD7JGDkTWg
+         ZE9MX2DVZRT1kL40WNjnC5JbTSvUHQAmvJkvFobi4cuteC75KFsnIvsVLGUQhaQKN0xT
+         OknB2bNmMhLqxovIvJMk91YPbfchCFbY3n4oSJHtuJ9a0Ym+E25Xq+aSCUkIPy+GDmzs
+         IJAbGdR5MVoGOi44UitS0YmuPdbhgyLMfjbvm9cyEGE7x/5ijXtIp7G2FAVK+NSgcpHc
+         TUrTwcuRZjn/aBezED9AfaSWH6d1OYRVdtFhrRrdqI+A2kxk3Lp6DMAJQlies4ip0Ebu
+         9HKA==
+X-Gm-Message-State: AOJu0YwcV8EFIEb+7yWK2eNFkL7QrL9Tkw0AiJuJVlJ9tMPs6FoeVlhX
+	RuhKcyFJyOV7zMGO8TNtQcs=
+X-Google-Smtp-Source: AGHT+IFEYqEl9E3FXY/KxBruAUPZasFbtjlJ7Mg8gHysU4PUcIcYONQHdsd0SlFMWaOHTVNmI7gptg==
+X-Received: by 2002:a17:90b:1d8b:b0:27d:2ecd:6a23 with SMTP id pf11-20020a17090b1d8b00b0027d2ecd6a23mr4029697pjb.14.1697255483566;
+        Fri, 13 Oct 2023 20:51:23 -0700 (PDT)
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+        by smtp.gmail.com with ESMTPSA id 29-20020a17090a01dd00b0027476c68cc3sm931099pjd.22.2023.10.13.20.51.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Oct 2023 20:13:37 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull-request: bluetooth 2023-10-13
-Date: Fri, 13 Oct 2023 20:13:36 -0700
-Message-ID: <20231014031336.1664558-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Fri, 13 Oct 2023 20:51:23 -0700 (PDT)
+From: Edward AD <twuufnxlz@gmail.com>
+To: horms@kernel.org
+Cc: bpf@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+225bfad78b079744fd5e@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	twuufnxlz@gmail.com
+Subject: Re: [PATCH] media: imon: fix stall in worker_thread
+Date: Sat, 14 Oct 2023 11:51:15 +0800
+Message-ID: <20231014035114.1057686-2-twuufnxlz@gmail.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231013105909.GC29570@kernel.org>
+References: <20231013105909.GC29570@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,75 +84,32 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
+	HK_RANDOM_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The following changes since commit a950a5921db450c74212327f69950ff03419483a:
+On Fri, 13 Oct 2023 12:59:09 +0200 Simon Horman wrote:
+> The code is already switching based on urb->status,
+> so unless the warning message is really desired,
+> perhaps this is more appropriate?
+> 
+> diff --git a/drivers/media/rc/imon.c b/drivers/media/rc/imon.c
+> index 74546f7e3469..0e2f06f2f456 100644
+> --- a/drivers/media/rc/imon.c
+> +++ b/drivers/media/rc/imon.c
+> @@ -1799,6 +1799,7 @@ static void usb_rx_callback_intf1(struct urb *urb)
+> 
+>  	switch (urb->status) {
+>  	case -ENOENT:		/* usbcore unlink successful! */
+> +	case -EPROTO:		/* XXX: something goes here */
+>  		return;
+> 
+>  	case -ESHUTDOWN:	/* transport endpoint was shut down */
 
-  net/smc: Fix pos miscalculation in statistics (2023-10-11 10:36:35 +0100)
+Hi Simon Horman, 
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-10-13
-
-for you to fetch changes up to cb3871b1cd135a6662b732fbc6b3db4afcdb4a64:
-
-  Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name (2023-10-13 20:06:33 -0700)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - Fix race when opening vhci device
- - Avoid memcmp() out of bounds warning
- - Correctly bounds check and pad HCI_MON_NEW_INDEX name
- - Fix using memcmp when comparing keys
- - Ignore error return for hci_devcd_register() in btrtl
- - Always check if connection is alive before deleting
- - Fix a refcnt underflow problem for hci_conn
-
-----------------------------------------------------------------
-Arkadiusz Bokowy (1):
-      Bluetooth: vhci: Fix race when opening vhci device
-
-Arnd Bergmann (1):
-      Bluetooth: avoid memcmp() out of bounds warning
-
-Edward AD (1):
-      Bluetooth: hci_sock: fix slab oob read in create_monitor_event
-
-Iulia Tanasescu (1):
-      Bluetooth: ISO: Fix invalid context error
-
-Kees Cook (1):
-      Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
-
-Lee, Chun-Yi (2):
-      Bluetooth: hci_event: Ignore NULL link key
-      Bluetooth: Reject connection with the device which has same BD_ADDR
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_event: Fix using memcmp when comparing keys
-      Bluetooth: hci_event: Fix coding style
-
-Max Chou (1):
-      Bluetooth: btrtl: Ignore error return for hci_devcd_register()
-
-Pauli Virtanen (1):
-      Bluetooth: hci_sync: always check if connection is alive before deleting
-
-Ziyang Xuan (1):
-      Bluetooth: Fix a refcnt underflow problem for hci_conn
-
- drivers/bluetooth/btrtl.c       | 10 +++-------
- drivers/bluetooth/hci_vhci.c    |  3 +++
- include/net/bluetooth/hci_mon.h |  2 +-
- net/bluetooth/hci_conn.c        |  9 +++++++++
- net/bluetooth/hci_event.c       | 48 +++++++++++++++++++++++++++++++++++++++---------
- net/bluetooth/hci_sock.c        |  3 ++-
- net/bluetooth/hci_sync.c        | 26 ++++++++++++--------------
- 7 files changed, 69 insertions(+), 32 deletions(-)
+Who added the above code where?
 
