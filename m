@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-41022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 470397C95A6
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 19:20:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0EC27C95A7
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 19:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA198B20CF1
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 17:20:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08ED91C210F6
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 17:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFDEF266DE;
-	Sat, 14 Oct 2023 17:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8A426E0E;
+	Sat, 14 Oct 2023 17:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RHUaQZ7f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yt5ggjyO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BFD266B3
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 17:19:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57E36C433C8;
-	Sat, 14 Oct 2023 17:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F61726E07
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 17:19:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43140C433C8;
+	Sat, 14 Oct 2023 17:19:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697303974;
-	bh=UjgDFS/5IMOelL8eFxVzyB8902e7kAOJfC6v3aeei18=;
+	s=k20201202; t=1697303975;
+	bh=uc+jG5JGEFeLSmKzlNZWOtRuMUuOYM+JwwH1C4ft79M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RHUaQZ7fdW89LXO1hC38jOlrv0wir9TcV5nvQMhIb9d69TUbA4lyytyV3fbH7Q9/C
-	 SJ1AOOqiZehNjII3pWYzqqZNRWkxGEkYNYCWNAhD9kfVAYcLZ+rCDSfgPLbLVBsvW0
-	 eHXZocqE3JbgSRziOPdjsr8mSl1Uq3BvObvo+TS86GhBk4iXSPnLTywmOqAXkuTZK9
-	 F5+TDuu2/p2YHX7wtrwHWW1T9mt1NE9ugmtTnceD2q7ku4F41fNdM/AtpK5yHRlOaP
-	 iinmQ9rDEfpsdIrTMsLVi+cwN2EnQs3bBOmPAeBtDy9UF1CnEaHFnrpMebaXo1547B
-	 lAUoD9TuHaAAA==
+	b=Yt5ggjyO4z6QF3E7zStuQ6LbwW1a4pXv1GK6f5PkJHZhq6c6oMnTDUntuKxDwpxy9
+	 Cw2OBu3dgSNl9cdP3CcybXNDvipjBXR+2su6waoPItSu+rs0Ykxq12wEf/8SUNhF9W
+	 nGLeTF3EU+ce+3qOE3GiZvxjYHAJ9mlzwLhE75g2gOa3LQFEST1Uq/XB/r1AYdWjal
+	 PaDFk0qVhI4FkB/lXjvEJIdyk5p7Mw8jBE+iHCt/xRtkMOwlzi45LrhUUfTTYjmLqQ
+	 eIsM2Obj+aZ4+exUeABtcNkMaaOz6DTBMMPWAMiUol4vbDLvHMIfzgmJLun95ELcP3
+	 23x/cv4xBC5GQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -42,9 +42,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Adham Faris <afaris@nvidia.com>,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [net-next V3 11/15] net/mlx5e: Refactor mlx5e_rss_set_rxfh() and mlx5e_rss_get_rxfh()
-Date: Sat, 14 Oct 2023 10:19:04 -0700
-Message-ID: <20231014171908.290428-12-saeed@kernel.org>
+Subject: [net-next V3 12/15] net/mlx5e: Refactor mlx5e_rss_init() and mlx5e_rss_free() API's
+Date: Sat, 14 Oct 2023 10:19:05 -0700
+Message-ID: <20231014171908.290428-13-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231014171908.290428-1-saeed@kernel.org>
 References: <20231014171908.290428-1-saeed@kernel.org>
@@ -58,54 +58,237 @@ Content-Transfer-Encoding: 8bit
 
 From: Adham Faris <afaris@nvidia.com>
 
-Initialize indirect table array with memcpy rather than for loop.
-This change has made for two reasons:
-1) To be consistent with the indirect table array init in
-   mlx5e_rss_set_rxfh().
-2) In general, prefer to use memcpy for array initializing rather than
-   for loop.
+Introduce code refactoring below:
+1) Introduce single API for creating and destroying rss object,
+   mlx5e_rss_create() and mlx5e_rss_destroy() respectively.
+2) mlx5e_rss_create() constructs and initializes RSS object depends
+   on a function new param enum mlx5e_rss_create_type. Callers (like
+   rx_res.c) will no longer need to allocate RSS object via
+   mlx5e_rss_alloc() and initialize it immediately via
+   mlx5e_rss_init_no_tirs() or mlx5e_rss_init(), this will be done by
+   a single call to mlx5e_rss_create(). Hence, mlx5e_rss_alloc() and
+   mlx5e_rss_init_no_tirs() have been removed from rss.h file and became
+   static functions.
 
 Signed-off-by: Adham Faris <afaris@nvidia.com>
 Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en/rss.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/en/rss.c  | 44 ++++++++++++-------
+ .../net/ethernet/mellanox/mlx5/core/en/rss.h  | 15 ++++---
+ .../ethernet/mellanox/mlx5/core/en/rx_res.c   | 35 ++++-----------
+ 3 files changed, 44 insertions(+), 50 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rss.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rss.c
-index 7f93426b88b3..fd52541e5508 100644
+index fd52541e5508..654b5c45e4a5 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en/rss.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rss.c
-@@ -470,11 +470,9 @@ int mlx5e_rss_packet_merge_set_param(struct mlx5e_rss *rss,
+@@ -81,12 +81,12 @@ struct mlx5e_rss {
+ 	refcount_t refcnt;
+ };
  
- int mlx5e_rss_get_rxfh(struct mlx5e_rss *rss, u32 *indir, u8 *key, u8 *hfunc)
+-struct mlx5e_rss *mlx5e_rss_alloc(void)
++static struct mlx5e_rss *mlx5e_rss_alloc(void)
  {
--	unsigned int i;
--
- 	if (indir)
--		for (i = 0; i < MLX5E_INDIR_RQT_SIZE; i++)
--			indir[i] = rss->indir.table[i];
-+		memcpy(indir, rss->indir.table,
-+		       MLX5E_INDIR_RQT_SIZE * sizeof(*rss->indir.table));
+ 	return kvzalloc(sizeof(struct mlx5e_rss), GFP_KERNEL);
+ }
  
- 	if (key)
- 		memcpy(key, rss->hash.toeplitz_hash_key,
-@@ -523,12 +521,10 @@ int mlx5e_rss_set_rxfh(struct mlx5e_rss *rss, const u32 *indir,
+-void mlx5e_rss_free(struct mlx5e_rss *rss)
++static void mlx5e_rss_free(struct mlx5e_rss *rss)
+ {
+ 	kvfree(rss);
+ }
+@@ -282,28 +282,35 @@ static int mlx5e_rss_update_tirs(struct mlx5e_rss *rss)
+ 	return retval;
+ }
+ 
+-int mlx5e_rss_init_no_tirs(struct mlx5e_rss *rss, struct mlx5_core_dev *mdev,
+-			   bool inner_ft_support, u32 drop_rqn)
++static int mlx5e_rss_init_no_tirs(struct mlx5e_rss *rss)
+ {
+-	rss->mdev = mdev;
+-	rss->inner_ft_support = inner_ft_support;
+-	rss->drop_rqn = drop_rqn;
+-
+ 	mlx5e_rss_params_init(rss);
+ 	refcount_set(&rss->refcnt, 1);
+ 
+-	return mlx5e_rqt_init_direct(&rss->rqt, mdev, true, drop_rqn);
++	return mlx5e_rqt_init_direct(&rss->rqt, rss->mdev, true, rss->drop_rqn);
+ }
+ 
+-int mlx5e_rss_init(struct mlx5e_rss *rss, struct mlx5_core_dev *mdev,
+-		   bool inner_ft_support, u32 drop_rqn,
+-		   const struct mlx5e_packet_merge_param *init_pkt_merge_param)
++struct mlx5e_rss *mlx5e_rss_init(struct mlx5_core_dev *mdev, bool inner_ft_support, u32 drop_rqn,
++				 const struct mlx5e_packet_merge_param *init_pkt_merge_param,
++				 enum mlx5e_rss_init_type type)
+ {
++	struct mlx5e_rss *rss;
+ 	int err;
+ 
+-	err = mlx5e_rss_init_no_tirs(rss, mdev, inner_ft_support, drop_rqn);
++	rss = mlx5e_rss_alloc();
++	if (!rss)
++		return ERR_PTR(-ENOMEM);
++
++	rss->mdev = mdev;
++	rss->inner_ft_support = inner_ft_support;
++	rss->drop_rqn = drop_rqn;
++
++	err = mlx5e_rss_init_no_tirs(rss);
+ 	if (err)
+-		goto err_out;
++		goto err_free_rss;
++
++	if (type == MLX5E_RSS_INIT_NO_TIRS)
++		goto out;
+ 
+ 	err = mlx5e_rss_create_tirs(rss, init_pkt_merge_param, false);
+ 	if (err)
+@@ -315,14 +322,16 @@ int mlx5e_rss_init(struct mlx5e_rss *rss, struct mlx5_core_dev *mdev,
+ 			goto err_destroy_tirs;
  	}
  
- 	if (indir) {
--		unsigned int i;
+-	return 0;
++out:
++	return rss;
+ 
+ err_destroy_tirs:
+ 	mlx5e_rss_destroy_tirs(rss, false);
+ err_destroy_rqt:
+ 	mlx5e_rqt_destroy(&rss->rqt);
+-err_out:
+-	return err;
++err_free_rss:
++	mlx5e_rss_free(rss);
++	return ERR_PTR(err);
+ }
+ 
+ int mlx5e_rss_cleanup(struct mlx5e_rss *rss)
+@@ -336,6 +345,7 @@ int mlx5e_rss_cleanup(struct mlx5e_rss *rss)
+ 		mlx5e_rss_destroy_tirs(rss, true);
+ 
+ 	mlx5e_rqt_destroy(&rss->rqt);
++	mlx5e_rss_free(rss);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rss.h b/drivers/net/ethernet/mellanox/mlx5/core/en/rss.h
+index c6b216416344..8b2290727641 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rss.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rss.h
+@@ -8,18 +8,19 @@
+ #include "tir.h"
+ #include "fs.h"
+ 
++enum mlx5e_rss_init_type {
++	MLX5E_RSS_INIT_NO_TIRS = 0,
++	MLX5E_RSS_INIT_TIRS
++};
++
+ struct mlx5e_rss_params_traffic_type
+ mlx5e_rss_get_default_tt_config(enum mlx5_traffic_types tt);
+ 
+ struct mlx5e_rss;
+ 
+-struct mlx5e_rss *mlx5e_rss_alloc(void);
+-void mlx5e_rss_free(struct mlx5e_rss *rss);
+-int mlx5e_rss_init(struct mlx5e_rss *rss, struct mlx5_core_dev *mdev,
+-		   bool inner_ft_support, u32 drop_rqn,
+-		   const struct mlx5e_packet_merge_param *init_pkt_merge_param);
+-int mlx5e_rss_init_no_tirs(struct mlx5e_rss *rss, struct mlx5_core_dev *mdev,
+-			   bool inner_ft_support, u32 drop_rqn);
++struct mlx5e_rss *mlx5e_rss_init(struct mlx5_core_dev *mdev, bool inner_ft_support, u32 drop_rqn,
++				 const struct mlx5e_packet_merge_param *init_pkt_merge_param,
++				 enum mlx5e_rss_init_type type);
+ int mlx5e_rss_cleanup(struct mlx5e_rss *rss);
+ 
+ void mlx5e_rss_refcnt_inc(struct mlx5e_rss *rss);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
+index abbd08b6d1a9..81b13338bfdf 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
+@@ -39,36 +39,27 @@ static int mlx5e_rx_res_rss_init_def(struct mlx5e_rx_res *res,
+ {
+ 	bool inner_ft_support = res->features & MLX5E_RX_RES_FEATURE_INNER_FT;
+ 	struct mlx5e_rss *rss;
+-	int err;
+ 
+ 	if (WARN_ON(res->rss[0]))
+ 		return -EINVAL;
+ 
+-	rss = mlx5e_rss_alloc();
+-	if (!rss)
+-		return -ENOMEM;
 -
- 		changed_indir = true;
+-	err = mlx5e_rss_init(rss, res->mdev, inner_ft_support, res->drop_rqn,
+-			     &res->pkt_merge_param);
+-	if (err)
+-		goto err_rss_free;
++	rss = mlx5e_rss_init(res->mdev, inner_ft_support, res->drop_rqn,
++			     &res->pkt_merge_param, MLX5E_RSS_INIT_TIRS);
++	if (IS_ERR(rss))
++		return PTR_ERR(rss);
  
--		for (i = 0; i < MLX5E_INDIR_RQT_SIZE; i++)
--			rss->indir.table[i] = indir[i];
-+		memcpy(rss->indir.table, indir,
-+		       MLX5E_INDIR_RQT_SIZE * sizeof(*rss->indir.table));
- 	}
+ 	mlx5e_rss_set_indir_uniform(rss, init_nch);
  
- 	if (changed_indir && rss->enabled) {
+ 	res->rss[0] = rss;
+ 
+ 	return 0;
+-
+-err_rss_free:
+-	mlx5e_rss_free(rss);
+-	return err;
+ }
+ 
+ int mlx5e_rx_res_rss_init(struct mlx5e_rx_res *res, u32 *rss_idx, unsigned int init_nch)
+ {
+ 	bool inner_ft_support = res->features & MLX5E_RX_RES_FEATURE_INNER_FT;
+ 	struct mlx5e_rss *rss;
+-	int err, i;
++	int i;
+ 
+ 	for (i = 1; i < MLX5E_MAX_NUM_RSS; i++)
+ 		if (!res->rss[i])
+@@ -77,13 +68,10 @@ int mlx5e_rx_res_rss_init(struct mlx5e_rx_res *res, u32 *rss_idx, unsigned int i
+ 	if (i == MLX5E_MAX_NUM_RSS)
+ 		return -ENOSPC;
+ 
+-	rss = mlx5e_rss_alloc();
+-	if (!rss)
+-		return -ENOMEM;
+-
+-	err = mlx5e_rss_init_no_tirs(rss, res->mdev, inner_ft_support, res->drop_rqn);
+-	if (err)
+-		goto err_rss_free;
++	rss = mlx5e_rss_init(res->mdev, inner_ft_support, res->drop_rqn,
++			     &res->pkt_merge_param, MLX5E_RSS_INIT_NO_TIRS);
++	if (IS_ERR(rss))
++		return PTR_ERR(rss);
+ 
+ 	mlx5e_rss_set_indir_uniform(rss, init_nch);
+ 	if (res->rss_active)
+@@ -93,10 +81,6 @@ int mlx5e_rx_res_rss_init(struct mlx5e_rx_res *res, u32 *rss_idx, unsigned int i
+ 	*rss_idx = i;
+ 
+ 	return 0;
+-
+-err_rss_free:
+-	mlx5e_rss_free(rss);
+-	return err;
+ }
+ 
+ static int __mlx5e_rx_res_rss_destroy(struct mlx5e_rx_res *res, u32 rss_idx)
+@@ -108,7 +92,6 @@ static int __mlx5e_rx_res_rss_destroy(struct mlx5e_rx_res *res, u32 rss_idx)
+ 	if (err)
+ 		return err;
+ 
+-	mlx5e_rss_free(rss);
+ 	res->rss[rss_idx] = NULL;
+ 
+ 	return 0;
 -- 
 2.41.0
 
