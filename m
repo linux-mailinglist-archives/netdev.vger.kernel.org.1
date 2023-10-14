@@ -1,269 +1,267 @@
-Return-Path: <netdev+bounces-41050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C29E7C9715
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 00:39:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CDC87C971E
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 00:51:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87449281C0A
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 22:39:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EAF7B20BBF
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 22:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DCEC12B88;
-	Sat, 14 Oct 2023 22:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B5E2628A;
+	Sat, 14 Oct 2023 22:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D3rhDgFz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g//bDMJK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9CC26E16;
-	Sat, 14 Oct 2023 22:39:32 +0000 (UTC)
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12637C9;
-	Sat, 14 Oct 2023 15:39:31 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c9d132d92cso9222675ad.0;
-        Sat, 14 Oct 2023 15:39:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE261845
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 22:51:48 +0000 (UTC)
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91555D8
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 15:51:46 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-534694a9f26so4189a12.1
+        for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 15:51:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697323170; x=1697927970; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uPFaQ1LTAbMrVygJhEFrkNUoW5dlpLhBgjY1bYITzXs=;
-        b=D3rhDgFzSeNGxDtWgl4q2NxQTBzk4cvychGD3N1B6k8+eqvzFFpAQR0IwjKM/SD4Iu
-         t+V88Vgb2047aAxySL/zK/prcUi8UKzjaYVHRKYfUegWLd3dBIYt5KrdDgrpnBA7kx7W
-         glRr8ar1yLhvEytOq4qvzSLD5HJ63mckBYUda6hcLUYYTy/6kiNHBjjGSCCp4LMl/qTi
-         i/QMwWXImJjfHsz7oRyu7+PboyOqPREcqcYqMAwCW7O6gKbS3jc6H9hjhcIPIksHePeP
-         oPMbmYiE1UhxYSvNR4e4Bpy3Qq4u6a8HO0Ie0s5ldbWum5xU2+RIySEiTD7yf+ZBarxh
-         mLrw==
+        d=google.com; s=20230601; t=1697323904; x=1697928704; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K00T4i/GNbAMnPEVca4E7FGRh+xWaXajtvfvIjz1kr4=;
+        b=g//bDMJKl6kx3uGz90FB+iwpHx+I5OU6gt+OLMT727FGhiFWusx1jO9YQtzAeaspG7
+         oYJ3tTSdaN8n/2n+tW3bJeZBtP5P0BdmWZGw6xJN6jATRID4fN88+qznUcDZ7CGwSARM
+         +riA1z+UvgbZ7t+Dsiv+U79hOleLVXYfzkAD+KvxhB+hjcMkbYaFQnchmt1iSdtbtDFG
+         K1QzxBnbAXNzQ4Gu9YTCHT/+cKei+ENWo2kLxU0mFe9F7k62PE9meisgkI5POrgrMRGn
+         YHEzloGEHj1iCe1GQbeNMa76HgyUxdl7sjYMgUN6MHJF5mc2+z1OVdNv/sjy7x3NhtSp
+         ArWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697323170; x=1697927970;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uPFaQ1LTAbMrVygJhEFrkNUoW5dlpLhBgjY1bYITzXs=;
-        b=euwNPyw4GVcmHLkUjVV0m/cDRKU5j3cXQgCiAZKvTw4yoqQKK+kjM6XdApJ0fq4OGc
-         B0wf1CTRfoFVB3FXStoP5CtqGLpEn1uJo7oWhh5ntfV42erKb4w6JTDKWFcQgutCjYq0
-         7MAj1UVJ3mNJQlW20qPgQXaeG/gUAx8KvceXxgU9BDF3FjVdn28c1tDY2M1g1w/DLkoT
-         uFo2h8H6tI1UMIt/dbefiXaDusb+jKrUxB/HkRXEwVyLAP57sst2XLV+WCWeqHwb8jSX
-         XhEMdrRtB2w/N7FlmqswtDSwl8iD8msYNjpToTB1Ahz/Y3oEQ43Ez58851sBxEXHOi8Z
-         2LTw==
-X-Gm-Message-State: AOJu0Yzpru7bxJtFxGFhqrzzFa53a/yz9JQJ/wGVIjYCJ8iqYDjFmOsI
-	xGHSTBI4TA6yuzHwmhuwBPxVehuT5gDDZtQw
-X-Google-Smtp-Source: AGHT+IHAqzwSlxWogHqzIsVcozo+6nCwl5Lh6L7CwjIU9doHT3b1Ny0FMs/nV+c7OGFYcBIU6iEjoA==
-X-Received: by 2002:a17:90a:4d88:b0:263:730b:f568 with SMTP id m8-20020a17090a4d8800b00263730bf568mr28626896pjh.3.1697323170256;
-        Sat, 14 Oct 2023 15:39:30 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id 5-20020a17090a19c500b0027d0a60b9c9sm2326067pjj.28.2023.10.14.15.39.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Oct 2023 15:39:29 -0700 (PDT)
-Date: Sun, 15 Oct 2023 07:39:29 +0900 (JST)
-Message-Id: <20231015.073929.156461103776360133.fujita.tomonori@gmail.com>
-To: benno.lossin@proton.me
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com,
- wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network
- PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <9d70de37-c5ed-4776-a00f-76888e1230aa@proton.me>
-References: <3469de1c-0e6f-4fe5-9d93-2542f87ffd0d@proton.me>
-	<20231015.011502.276144165010584249.fujita.tomonori@gmail.com>
-	<9d70de37-c5ed-4776-a00f-76888e1230aa@proton.me>
+        d=1e100.net; s=20230601; t=1697323904; x=1697928704;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K00T4i/GNbAMnPEVca4E7FGRh+xWaXajtvfvIjz1kr4=;
+        b=JWq5pAWCFp6a3ovl5aAIU8iqU3nQaMISBH8aOynpFR7Ck3p4CMrdIAd9jGEEk0X42R
+         vPVtQEIprrB6ApUNaodxU7Uy9ri73ltCxAfkGpurx8A06EJmUpn+dpf2NjVK9aV2IrAl
+         2esuh1CSXpluwGlIkwwvMZkExfH2t5y55UW43MzhacscmSKa1VsLaQzlCwGBvLuwiIis
+         GfScJpi4wI1Vt2jkw1zTGWtxKCeigWUct0w+I+98vFPtbVIQ4QvikqovRBNnK3/TXdEW
+         130jA+eSCS2YMBRmQeWGwZsCzsBIrs9aoQqaQLQy4+bhC4LHKeb2OkGe2INlelGXdoqu
+         ewIg==
+X-Gm-Message-State: AOJu0Yyow6FNAq9YIcuEWAxwq3fZh1QiswhJq8lEpB9BOFkDvtmou0SE
+	ORlY4NpXoa//1WRT8Zb0xdT3PcTR3ZnI0hTlVRFTu9psMLftBHUlXbRIPA==
+X-Google-Smtp-Source: AGHT+IFL2KNTfXkr2eWzixAwygdqi5CKLQ1XGQJUqbCLWwIi3pgSsxz2naGm+NXu/7y983BT8b7lfVnSAFaPgDvaWY0=
+X-Received: by 2002:a50:8a95:0:b0:538:5f9e:f0fc with SMTP id
+ j21-20020a508a95000000b005385f9ef0fcmr111127edj.0.1697323904372; Sat, 14 Oct
+ 2023 15:51:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+MIME-Version: 1.0
+References: <7f31ddc8-9971-495e-a1f6-819df542e0af@gmx.net> <CANn89iKY58YSknzOzkEHxFu=C=1_p=pXGAHGo9ZkAfAGon9ayw@mail.gmail.com>
+ <CADVnQymV=nv53YaC8kLC1qT1ufhJL9+w_wcZ+8AHwPRG+JRdnw@mail.gmail.com>
+ <a35b1a27-575f-4d19-ad2d-95bf4ded40e9@gmx.net> <CADVnQymM2HrGrMGyJX2QQ9PpgQT8JqsRz_0U8_WvdvzteqsfEQ@mail.gmail.com>
+In-Reply-To: <CADVnQymM2HrGrMGyJX2QQ9PpgQT8JqsRz_0U8_WvdvzteqsfEQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 15 Oct 2023 00:51:30 +0200
+Message-ID: <CANn89iL97hLAyHx9ee1VKTnLEgJeEVPrf_8-wf0BEBKAPQitPA@mail.gmail.com>
+Subject: Re: iperf performance regression since Linux 5.18
+To: Neal Cardwell <ncardwell@google.com>
+Cc: Stefan Wahren <wahrenst@gmx.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Fabio Estevam <festevam@gmail.com>, linux-imx@nxp.com, 
+	Stefan Wahren <stefan.wahren@chargebyte.com>, Michael Heimpold <mhei@heimpold.de>, netdev@vger.kernel.org, 
+	Yuchung Cheng <ycheng@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, 14 Oct 2023 17:07:09 +0000
-Benno Lossin <benno.lossin@proton.me> wrote:
+On Sat, Oct 14, 2023 at 9:40=E2=80=AFPM Neal Cardwell <ncardwell@google.com=
+> wrote:
+>
+> On Fri, Oct 13, 2023 at 9:37=E2=80=AFAM Stefan Wahren <wahrenst@gmx.net> =
+wrote:
+> >
+> > Hi,
+> >
+> > Am 09.10.23 um 21:19 schrieb Neal Cardwell:
+> > > On Mon, Oct 9, 2023 at 3:11=E2=80=AFPM Eric Dumazet <edumazet@google.=
+com> wrote:
+> > >> On Mon, Oct 9, 2023 at 8:58=E2=80=AFPM Stefan Wahren <wahrenst@gmx.n=
+et> wrote:
+> > >>> Hi,
+> > >>> we recently switched on our ARM NXP i.MX6ULL based embedded device
+> > >>> (Tarragon Master [1]) from an older kernel version to Linux 6.1. Af=
+ter
+> > >>> that we noticed a measurable performance regression on the Ethernet
+> > >>> interface (driver: fec, 100 Mbit link) while running iperf client o=
+n the
+> > >>> device:
+> > >>>
+> > >>> BAD
+> > >>>
+> > >>> # iperf -t 10 -i 1 -c 192.168.1.129
+> > >>> ------------------------------------------------------------
+> > >>> Client connecting to 192.168.1.129, TCP port 5001
+> > >>> TCP window size: 96.2 KByte (default)
+> > >>> ------------------------------------------------------------
+> > >>> [  3] local 192.168.1.12 port 56022 connected with 192.168.1.129 po=
+rt 5001
+> > >>> [ ID] Interval       Transfer     Bandwidth
+> > >>> [  3]  0.0- 1.0 sec  9.88 MBytes  82.8 Mbits/sec
+> > >>> [  3]  1.0- 2.0 sec  9.62 MBytes  80.7 Mbits/sec
+> > >>> [  3]  2.0- 3.0 sec  9.75 MBytes  81.8 Mbits/sec
+> > >>> [  3]  3.0- 4.0 sec  9.62 MBytes  80.7 Mbits/sec
+> > >>> [  3]  4.0- 5.0 sec  9.62 MBytes  80.7 Mbits/sec
+> > >>> [  3]  5.0- 6.0 sec  9.62 MBytes  80.7 Mbits/sec
+> > >>> [  3]  6.0- 7.0 sec  9.50 MBytes  79.7 Mbits/sec
+> > >>> [  3]  7.0- 8.0 sec  9.75 MBytes  81.8 Mbits/sec
+> > >>> [  3]  8.0- 9.0 sec  9.62 MBytes  80.7 Mbits/sec
+> > >>> [  3]  9.0-10.0 sec  9.50 MBytes  79.7 Mbits/sec
+> > >>> [  3]  0.0-10.0 sec  96.5 MBytes  80.9 Mbits/sec
+> > >>>
+> > >>> GOOD
+> > >>>
+> > >>> # iperf -t 10 -i 1 -c 192.168.1.129
+> > >>> ------------------------------------------------------------
+> > >>> Client connecting to 192.168.1.129, TCP port 5001
+> > >>> TCP window size: 96.2 KByte (default)
+> > >>> ------------------------------------------------------------
+> > >>> [  3] local 192.168.1.12 port 54898 connected with 192.168.1.129 po=
+rt 5001
+> > >>> [ ID] Interval       Transfer     Bandwidth
+> > >>> [  3]  0.0- 1.0 sec  11.2 MBytes  94.4 Mbits/sec
+> > >>> [  3]  1.0- 2.0 sec  11.0 MBytes  92.3 Mbits/sec
+> > >>> [  3]  2.0- 3.0 sec  10.8 MBytes  90.2 Mbits/sec
+> > >>> [  3]  3.0- 4.0 sec  11.0 MBytes  92.3 Mbits/sec
+> > >>> [  3]  4.0- 5.0 sec  10.9 MBytes  91.2 Mbits/sec
+> > >>> [  3]  5.0- 6.0 sec  10.9 MBytes  91.2 Mbits/sec
+> > >>> [  3]  6.0- 7.0 sec  10.8 MBytes  90.2 Mbits/sec
+> > >>> [  3]  7.0- 8.0 sec  10.9 MBytes  91.2 Mbits/sec
+> > >>> [  3]  8.0- 9.0 sec  10.9 MBytes  91.2 Mbits/sec
+> > >>> [  3]  9.0-10.0 sec  10.9 MBytes  91.2 Mbits/sec
+> > >>> [  3]  0.0-10.0 sec   109 MBytes  91.4 Mbits/sec
+> > >>>
+> > >>> We were able to bisect this down to this commit:
+> > >>>
+> > >>> first bad commit: [65466904b015f6eeb9225b51aeb29b01a1d4b59c] tcp: a=
+djust
+> > >>> TSO packet sizes based on min_rtt
+> > >>>
+> > >>> Disabling this new setting via:
+> > >>>
+> > >>> echo 0 > /proc/sys/net/ipv4/tcp_tso_rtt_log
+> > >>>
+> > >>> confirm that this was the cause of the performance regression.
+> > >>>
+> > >>> Is it expected that the new default setting has such a performance =
+impact?
+> > > Indeed, thanks for the report.
+> > >
+> > > In addition to the "ss" output Eric mentioned, could you please grab
+> > > "nstat" output, which should allow us to calculate the average TSO/GS=
+O
+> > > and LRO/GRO burst sizes, which is the key thing tuned with the
+> > > tcp_tso_rtt_log knob.
+> > >
+> > > So it would be great to have the following from both data sender and
+> > > data receiver, for both the good case and bad case, if you could star=
+t
+> > > these before your test and kill them after the test stops:
+> > >
+> > > (while true; do date; ss -tenmoi; sleep 1; done) > /root/ss.txt &
+> > > nstat -n; (while true; do date; nstat; sleep 1; done)  > /root/nstat.=
+txt
+> > i upload everything here:
+> > https://github.com/lategoodbye/tcp_tso_rtt_log_regress
+> >
+> > The server part is a Ubuntu installation connected to the internet. At
+> > first i logged the good case, then i continued with the bad case.
+> > Accidentally i delete a log file of bad case, so i repeated the whole
+> > bad case again. So the uploaded bad case files are from the third run.
+>
+> Thanks for the detailed data!
+>
+> Here are some notes from looking at this data:
+>
+> + bad client: avg TSO burst size is roughly:
+> https://github.com/lategoodbye/tcp_tso_rtt_log_regress/blob/main/nstat_cl=
+ient_bad.log
+> IpOutRequests                   308               44.7
+> IpExtOutOctets                  10050656        1403181.0
+> est bytes   per TSO burst: 10050656 / 308 =3D 32632
+> est packets per TSO burst: 32632 / 1448 ~=3D 22.5
+>
+> + good client: avg TSO burst size is roughly:
+> https://github.com/lategoodbye/tcp_tso_rtt_log_regress/blob/main/nstat_cl=
+ient_good.log
+> IpOutRequests                   529               62.0
+> IpExtOutOctets                  11502992        1288711.5
+> est bytes   per TSO burst: 11502992 / 529 ~=3D 21745
+> est packets per TSO burst: 21745 / 1448 ~=3D 15.0
+>
+> + bad client ss data:
+> https://github.com/lategoodbye/tcp_tso_rtt_log_regress/blob/main/ss_clien=
+t_bad.log
+> State Recv-Q Send-Q Local Address:Port   Peer Address:PortProcess
+> ESTAB 0      236024  192.168.1.12:39228 192.168.1.129:5001
+> timer:(on,030ms,0) ino:25876 sk:414f52af rto:0.21 cwnd:68 ssthresh:20
+> reordering:0
+> Mbits/sec allowed by cwnd: 68 * 1448 * 8 / .0018 / 1000000.0 ~=3D 437.6
+>
+> + good client ss data:
+> https://github.com/lategoodbye/tcp_tso_rtt_log_regress/blob/main/ss_clien=
+t_good.log
+> Fri Oct 13 15:04:36 CEST 2023
+> State Recv-Q Send-Q Local Address:Port   Peer Address:PortProcess
+> ESTAB 0      425712  192.168.1.12:33284 192.168.1.129:5001
+> timer:(on,020ms,0) ino:20654 sk:414f52af rto:0.21 cwnd:106 ssthresh:20
+> reordering:0
+> Mbits/sec allowed by cwnd: 106 * 1448 * 8 / .0028 / 1000000.0 =3D 438.5
+>
+> So it seems indeed like cwnd is not the limiting factor, and instead
+> there is something about the larger TSO/GSO bursts (roughly 22.5
+> packets per burst on average) in the "bad" case that is causing
+> problems, and preventing the sender from keeping the pipe fully
+> utilized.
+>
+> So perhaps the details of the tcp_tso_should_defer() logic are hurting
+> performance?
+>
+> The default value of tcp_tso_win_divisor is 3, and in the bad case the
+> cwnd / tcp_tso_win_divisor =3D 68 / 3 =3D 22.7 packets, which is
+> suspiciously close to the average TSO burst size of 22.5. So my guess
+> is that the tcp_tso_win_divisor of 3 is the dominant factor here, and
+> perhaps if we raise it to 5, then 68/5 ~=3D 13.60 will approximate the
+> TSO burst size in the "good" case, and fully utilize the pipe. So it
+> seems worth an experiment, to see what we can learn.
+>
+> To test that theory, could you please try running the following as
+> root on the data sender machine, and then re-running the "bad" test
+> with tcp_tso_rtt_log at the default value of 9?
+>
+>    sysctl net.ipv4.tcp_tso_win_divisor=3D5
+>
+> Thanks!
+> neal
 
-> On 14.10.23 18:15, FUJITA Tomonori wrote:
->> On Sat, 14 Oct 2023 14:54:30 +0000
->> Benno Lossin <benno.lossin@proton.me> wrote:
->> 
->>> On 14.10.23 12:32, FUJITA Tomonori wrote:
->>>> On Sat, 14 Oct 2023 08:07:03 +0000
->>>> Benno Lossin <benno.lossin@proton.me> wrote:
->>>>
->>>>> On 14.10.23 09:22, FUJITA Tomonori wrote:
->>>>>> On Fri, 13 Oct 2023 21:31:16 +0000
->>>>>> Benno Lossin <benno.lossin@proton.me> wrote:
->>>>>>>> +    /// the exclusive access for the duration of the lifetime `'a`.
->>>>>>>
->>>>>>> In some other thread you mentioned that no lock is held for
->>>>>>> `resume`/`suspend`, how does this interact with it?
->>>>>>
->>>>>> The same quesiton, 4th time?
->>>>>
->>>>> Yes, it is not clear to me from the code/safety comment alone why
->>>>> this is safe. Please improve the comment such that that is the case.
->>>>>
->>>>>> PHYLIB is implemented in a way that PHY drivers exlusively access to
->>>>>> phy_device during the callbacks.
->>>>>
->>>>> As I suggested in a previous thread, it would be extremely helpful
->>>>> if you add a comment on the `phy` abstractions module that explains
->>>>> how `PHYLIB` is implemented. Explain that it takes care of locking
->>>>> and other safety related things.
->>>>
->>>>   From my understanding, the callers of suspend() try to call suspend()
->>>> for a device only once. They lock a device and get the current state
->>>> and update the sate, then unlock the device. If the state is a
->>>> paticular value, then call suspend(). suspend() and resume() are also
->>>> called where only one thread can access a device.
->>>
->>> Maybe explain this in the docs? In the future, when I will come
->>> into contact with this again, I will probably have forgotten this
->>> conversation, but the docs are permanent and can be re-read.
->> 
->> You meant adding this to the code?  like dding this to Device's #
->> Safety comment?
-> 
-> I would not put it in the `# Safety` section. Instead, put this
-> information on the phy module itself (the `//!` comments at the very
-> top of the file). I also would suggest to not take the above paragraph
-> word by word, but to improve and extend it.
+Hmm, we receive ~3200 acks per second, I am not sure the
+tcp_tso_should_defer() logic
+would hurt ?
 
-Sure, I'll try.
+Also the ss binary on the client seems very old, or its output has
+been mangled perhaps ?
 
-
->>>> Anyway,
->>>>
->>>> phy_id()
->>>> state()
->>>> get_link()
->>>> is_autoneg_enabled()
->>>> is_autoneg_completed()
->>>>
->>>> doesn't modify Self.
->>>
->>> yes, these should all be `&self`.
->>>
->>>> The rest modifies then need to be &mut self? Note that function like read_*
->>>> updates the C data structure.
->>>
->>> What exactly does it update? In Rust there is interior mutability
->>> which is used to implement mutexes. Interior mutability allows
->>> you to modify values despite only having a `&T` (for more info
->>> see [1]). Our `Opaque<T>` type uses this pattern as well (since
->>> you get a `*mut T` from `&Opaque<T>`) and it is the job of the
->>> abstraction writer to figure out what mutability to use.
->>>
->>> [1]: https://doc.rust-lang.org/reference/interior-mutability.html
->>>
->>> I have no idea what exactly `read_*` modifies on the C side.
->>> Mapping C functions to `&self`, `&mut self` and other receiver types
->>> is not obvious in all cases. I would focus more on the following aspect
->>> of `&mut self` and `&self`:
->>>
->>> Since `&mut self` is unique, only one thread per instance of `Self`
->>> can call that function. So use this when the C side would use a lock.
->>> (or requires that only one thread calls that code)
->> 
->> I guess that the rest are &mut self but let me continue to make sure.
->> 
->> I think that you already know that Device instance only was created in
->> the callbacks. Before the callbacks are called, PHYLIB holds
->> phydev->lock except for resume()/suspend(). As explained in the
->> previous mail, only one thread calls resume()/suspend().
-> 
-> The information in this paragraph would also fit nicely into the
-> phy module docs.
-
-Ok.
-
->> btw, methods in Device calling a C side function like mdiobus_read,
->> mdiobus_write, etc which never touch phydev->lock. Note that the c
->> side functions in resume()/suspned() methods don't touch phydev->lock
->> too.
->> 
->> There are two types how the methods in Device changes the C side data.
->> 
->> 1. read/write/read_paged
->> 
->> They call the C side functions, mdiobus_read, mdiobus_write,
->> phy_read_paged, respectively.
->> 
->> phy_device has a pointer to mii_bus object. It has stats for
->> read/write. So everytime they are called, stats is updated.
-> 
-> I think for reading & updating some stats using `&self`
-> should be fine. `write` should probably be `&mut self`.
-
-Can you tell me why exactly you think in that way?
-
-Firstly, you think that reading & updating some stats using `&self` should be fine.
-
-What's the difference between read() and set_speed(), which you think, needs &mut self.
-
-Because set_speed() updates the member in phy_device and read()
-updates the object that phy_device points to?
-
-
-Secondly, What's the difference between read() and write(), where you
-think that read() is &self write() is &mut self.
-
-read() is reading from hardware register. write() is writing a value
-to hardware register. Both updates the object that phy_device points
-to?
-
-
->> 2. the rest
->> 
->> The C side functions in the rest of methods in Device updates some
->> members in phy_device like set_speed() method does.
-> 
-> Those setter functions should be `&mut self`.
-
-Ok.
-
->>> Since multiple `&self` references are allowed to coexist, you should
->>> use this for functions which perform their own serialization/do not
->>> require serialization.
->> 
->> just to be sure, the C side guarantees that only one reference exists.
-> 
-> I see, then the `from_raw` function should definitely return
-> a `&mut Device`. Note that you can still call `&T` functions
-> when you have a `&mut T`.
-
-It already returns &mut Device so no change is necessary here, right?
-
-unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Self
-{
-
-If you want more additional comment on from_raw(), please let me know.
-
-
->>> If you cannot decide what certain function receivers should be, then
->>> we can help you, but I would need more info on what the C side is doing.
->> 
->> If you need more info on the C side, please let me know.
-> 
-> What about these functions?
-> - resolve_aneg_linkmode
-> - genphy_soft_reset
-> - init_hw
-> - start_aneg
-> - genphy_read_status
-> - genphy_update_link
-> - genphy_read_lpa
-> - genphy_read_abilities
-
-As Andrew replied, all the functions update some member in phy_device.
-
-
+State Recv-Q Send-Q Local Address:Port   Peer Address:PortProcess
+ESTAB 0      492320  192.168.1.12:33284 192.168.1.129:5001
+timer:(on,030ms,0) ino:20654 sk:414f52af rto:0.21 cwnd:106 ssthresh:20
+reordering:0
 
