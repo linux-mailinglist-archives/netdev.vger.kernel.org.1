@@ -1,119 +1,162 @@
-Return-Path: <netdev+bounces-40980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59CFA7C9472
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 14:00:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 236387C9483
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 14:05:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F64B1C20A78
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 12:00:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2DBF282683
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 12:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E711094B;
-	Sat, 14 Oct 2023 12:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gHx5kQpu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF62D11CB5;
+	Sat, 14 Oct 2023 12:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7362811CA5;
-	Sat, 14 Oct 2023 12:00:25 +0000 (UTC)
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05460C9;
-	Sat, 14 Oct 2023 05:00:23 -0700 (PDT)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-5a7b92cd0ccso37215707b3.1;
-        Sat, 14 Oct 2023 05:00:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697284822; x=1697889622; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2PmC5R9RoA6q/DVLNOvUSR2MbcKzh5eKTdtmaYPsehw=;
-        b=gHx5kQpuJO8rfVKAznrH2f3qjqpw7BVEWzrWyaC6ekbbl50w80JJVVXKbqS9yKugHB
-         8OFT7v4c2E9VcXIi2eZ7QQsuL4E+QfD7hXWpvKFlaaKQHSSuUSBnsYu1PiSi0sLQg1m+
-         QSzuDWsp6EYPGqKmXieHjtD/XpSjYidbJBdvHX6sJOGIjFif/oCdCjg7udOB3eo+laZE
-         QSSQp5OkTYPnVBXTAGq0Z2DMF1kgJZlvrld9gYd+uojkLapTkA9WIlT2iYksN2UxkRDD
-         7nrm5F1whyq8xNcy/2Zn+t1GNtqrpPXrod3wNAxQllyrKQUW3wxDcuSOPC5g0RxnF2bB
-         K1cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697284822; x=1697889622;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2PmC5R9RoA6q/DVLNOvUSR2MbcKzh5eKTdtmaYPsehw=;
-        b=UzE4/l7PsHfR/OX6DV8fyzJkjlogJRB/JNRWDJj2xJJPkQhnEYRgzYJa0HWtCixcvG
-         rUOK9KRrQwMGtT+AOP0xBuElW7OsntdkiHj1svgBd9CaYrHnjnOmFLUcloy2aFtKhKP6
-         J77+sqXmzI8fTWTFfRJuwo2TzN4rLkgdKjOe3eK57GiX9Em4vkvIp+fQ+XFYH+dqN060
-         GHv8FlWDraIeelzccOZdLsHisJNDcKa0I+LI1CHaMo/lLiqxHmO+gsFYeojTtvfqb03M
-         tTHvbncxUFpOPHHEAANqOX45mNUrUDy4r2UOMGHDaRvk7tOWjwdl6jmJ2jISaIKMSH3r
-         5pSg==
-X-Gm-Message-State: AOJu0Yz67+Od2i8W3Gd3ilQgSurgT+s991mq8S1WWKNJUw+FBbGt694s
-	H7+TfwMlvsRDmGidnxQrg4nRTNzpCZsrs5qq+X5oAHXoqbyQfw==
-X-Google-Smtp-Source: AGHT+IG5GAZXAzIL9988hhr4XYXvzD9PRMgMLduyYmzCT6d0Z14pjEj/tgHUccmKOy0/V5G2Pz0AO8mTCQV8L+Y5ekI=
-X-Received: by 2002:a25:9182:0:b0:d9a:c304:bb78 with SMTP id
- w2-20020a259182000000b00d9ac304bb78mr6551375ybl.12.1697284821228; Sat, 14 Oct
- 2023 05:00:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4FD1094B;
+	Sat, 14 Oct 2023 12:05:16 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B084A2;
+	Sat, 14 Oct 2023 05:05:14 -0700 (PDT)
+Received: from canpemm500010.china.huawei.com (unknown [172.30.72.54])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4S725g1FYxz1kv1H;
+	Sat, 14 Oct 2023 20:01:11 +0800 (CST)
+Received: from [10.174.176.93] (10.174.176.93) by
+ canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Sat, 14 Oct 2023 20:05:11 +0800
+Message-ID: <ef4882c0-b570-37a4-de37-c2ad251458d1@huawei.com>
+Date: Sat, 14 Oct 2023 20:05:11 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231012125349.2702474-1-fujita.tomonori@gmail.com>
- <20231012125349.2702474-2-fujita.tomonori@gmail.com> <85d5c498-efbc-4c1a-8d12-f1eca63c45cf@proton.me>
- <20231014.162210.522439670437191285.fujita.tomonori@gmail.com>
-In-Reply-To: <20231014.162210.522439670437191285.fujita.tomonori@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sat, 14 Oct 2023 14:00:10 +0200
-Message-ID: <CANiq72kT=wWDO-tb9z3N962g3Zi2v=_jwhE9YC4ZwteAOyYfCw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY drivers
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: benno.lossin@proton.me, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, 
-	boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+From: "liujian (CE)" <liujian56@huawei.com>
+Subject: Re: [PATCH bpf-next v5 1/7] bpf, sockmap: add BPF_F_PERMANENT flag
+ for skmsg redirect
+To: John Fastabend <john.fastabend@gmail.com>, <jakub@cloudflare.com>,
+	<ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
+	<martin.lau@linux.dev>, <song@kernel.org>, <yonghong.song@linux.dev>,
+	<kpsingh@kernel.org>, <sdf@google.com>, <haoluo@google.com>,
+	<jolsa@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <dsahern@kernel.org>
+CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>
+References: <20230927093013.1951659-1-liujian56@huawei.com>
+ <20230927093013.1951659-2-liujian56@huawei.com>
+ <651b982a1b22a_4fa3f20854@john.notmuch>
+In-Reply-To: <651b982a1b22a_4fa3f20854@john.notmuch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.93]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500010.china.huawei.com (7.192.105.118)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Oct 14, 2023 at 9:22=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> The same quesiton, 4th time?
 
-Perhaps you should then be documenting this better in the code?
 
-> Boqun asked me to drop mut on v3 review and then you ask why on v4?
-> Trying to find a way to discourage developpers to write Rust
-> abstractions? :)
->
-> I would recommend the Rust reviewers to make sure that such would
-> not happen. I really appreciate comments but inconsistent reviewing is
-> painful.
-
-Different people will give you different feedback. That feedback may
-be inconsistent or may pull you in different directions, which is
-typically a sign that things are not clear for at least somebody. Some
-feedback may be simply wrong, too. It is what it is, even if we try
-our best to be consistent.
-
-It is especially interesting that you are the one saying this, because
-you were the one that wanted to go quickly to the mailing list,
-including the netdev one. That is perfectly fine, but the result is
-that people may not be on the same page and it will take time to
-converge, especially for something new. So I am not sure what you are
-complaining about.
-
-Now, something more serious is happening here, which is you implying
-that reviewers are intentionally trying to discourage you. That is
-simply not acceptable.
-
-Cheers,
-Miguel
+On 2023/10/3 12:27, John Fastabend wrote:
+> Liu Jian wrote:
+>> If the sockmap msg redirection function is used only to forward packets
+>> and no other operation, the execution result of the BPF_SK_MSG_VERDICT
+>> program is the same each time. In this case, the BPF program only needs to
+>> be run once. Add BPF_F_PERMANENT flag to bpf_msg_redirect_map() and
+>> bpf_msg_redirect_hash() to implement this ability.
+>>
+>> Then we can enable this function in the bpf program as follows:
+>> bpf_msg_redirect_hash(xx, xx, xx, BPF_F_INGRESS | BPF_F_PERMANENT);
+>>
+>> Test results using netperf  TCP_STREAM mode:
+>> for i in 1 64 128 512 1k 2k 32k 64k 100k 500k 1m;then
+>> netperf -T 1,2 -t TCP_STREAM -H 127.0.0.1 -l 20 -- -m $i -s 100m,100m -S 100m,100m
+>> done
+>>
+>> before:
+>> 3.84 246.52 496.89 1885.03 3415.29 6375.03 40749.09 48764.40 51611.34 55678.26 55992.78
+>> after:
+>> 4.43 279.20 555.82 2080.79 3870.70 7105.44 41836.41 49709.75 51861.56 55211.00 54566.85
+>>
+>> Signed-off-by: Liu Jian <liujian56@huawei.com>
+>> ---
+> 
+> First sorry for the delay I was thinking about this a bit. I decided it likely makes
+> a lot of sense if you want to build an l7 load balancer where you just read some
+> keys off an initial msg and then pin the rest of the connection to a specific
+> backend or proxy socket, etc.
+> 
+>>   include/linux/skmsg.h          |  1 +
+>>   include/uapi/linux/bpf.h       | 45 ++++++++++++++++++++++++++--------
+>>   net/core/skmsg.c               |  6 ++++-
+>>   net/core/sock_map.c            |  4 +--
+>>   net/ipv4/tcp_bpf.c             | 12 +++++----
+>>   tools/include/uapi/linux/bpf.h | 45 ++++++++++++++++++++++++++--------
+>>   6 files changed, 85 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+>> index c1637515a8a4..acd7de85608b 100644
+>> --- a/include/linux/skmsg.h
+>> +++ b/include/linux/skmsg.h
+>> @@ -83,6 +83,7 @@ struct sk_psock {
+>>   	u32				cork_bytes;
+>>   	u32				eval;
+>>   	bool				redir_ingress; /* undefined if sk_redir is null */
+>> +	bool				redir_permanent;
+>>   	struct sk_msg			*cork;
+>>   	struct sk_psock_progs		progs;
+>>   #if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
+>> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+>> index 70bfa997e896..cec6c34f4486 100644
+>> --- a/include/uapi/linux/bpf.h
+>> +++ b/include/uapi/linux/bpf.h
+>> @@ -3029,11 +3029,23 @@ union bpf_attr {
+>>    * 		socket level. If the message *msg* is allowed to pass (i.e. if
+>>    * 		the verdict eBPF program returns **SK_PASS**), redirect it to
+>>    * 		the socket referenced by *map* (of type
+>> - * 		**BPF_MAP_TYPE_SOCKMAP**) at index *key*. Both ingress and
+>> - * 		egress interfaces can be used for redirection. The
+>> - * 		**BPF_F_INGRESS** value in *flags* is used to make the
+>> - * 		distinction (ingress path is selected if the flag is present,
+>> - * 		egress path otherwise). This is the only flag supported for now.
+>> + * 		**BPF_MAP_TYPE_SOCKMAP**) at index *key*.
+>> + *
+>> + *		The following *flags* are supported:
+>> + *
+>> + *		**BPF_F_INGRESS**
+>> + *		        Both ingress and egress interfaces can be used for redirection.
+>> + *		        The **BPF_F_INGRESS** value in *flags* is used to make the
+>> + *		        distinction. Ingress path is selected if the flag is present,
+>> + *		        egress path otherwise.
+>> + *		**BPF_F_PERMANENT**
+>> + *		        Indicates that redirect verdict and the target socket should be
+>> + *		        remembered. The verdict program will not be run for subsequent
+>> + *		        packets, unless an error occurs when forwarding packets.
+> 
+> Why clear it on error? The error is almost always because either the socket is
+> being torn down or there is a memory ENOMEM error that is going to be kicked
+> back to user.
+Sorry, yes, you're right, I've changed the code, but forgot to change 
+the help document. Have sent next version to fix this. Thank you~.
+> 
+> Is the idea that you can try anopther backend possibly by picking another socket
+> out of the table? But, I'm not sure how that might work because you probably
+> don't know that this is even the beginning of a msg block.
+> 
+> I'm wondering if I missed some other reason or if its just simpler to pass the
+> error up the stack and keep the same sk_redir.
+> 
+> Thanks,
+> John
+> 
 
