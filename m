@@ -1,113 +1,147 @@
-Return-Path: <netdev+bounces-40954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 076EE7C92E1
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 08:02:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 899FA7C92EB
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 08:12:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5FBA282CD8
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 06:02:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C714282632
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 06:12:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C86F1FDB;
-	Sat, 14 Oct 2023 06:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0CC746BD;
+	Sat, 14 Oct 2023 06:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZjW++VVQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j3H1hIW8"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1A97E;
-	Sat, 14 Oct 2023 06:01:55 +0000 (UTC)
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8B6FC9;
-	Fri, 13 Oct 2023 23:01:53 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6bbfb8f7ac4so39216b3a.0;
-        Fri, 13 Oct 2023 23:01:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8423F1FDB
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 06:12:10 +0000 (UTC)
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD1D6C2;
+	Fri, 13 Oct 2023 23:12:08 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-3231df054c4so2272847f8f.0;
+        Fri, 13 Oct 2023 23:12:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697263313; x=1697868113; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jsrmjeedRmndhI5oS2QuPLFeCL4M0GNNy483xruZaHM=;
-        b=ZjW++VVQ2F06MyzIHjm8+rjIrW3Ut7XuBli2302HUOw9YFuS9KJTLtqLUm9egWFs0K
-         sWrdy2TTMRgtdo5fkl9/F1dBBsMfamA9bEHFxNmY4ifG5QQuj3PiZUQ2oPUvmKKHTt6+
-         Bu5dkxJvRP9wR6UONI3gmg5rE7Y2JDwmgXW58BvcgSMrPQ2vcFTGQASPHjNJOCpv06e8
-         v7UrqYXnTc04L6xKLzUwlJfyr0TJh/Rg2lktKGQsYxKwAswCNB23K1IqIW3x+MS0FRpS
-         qF4u8hQDjenXp0y3P843U4AjDQ1iMLTRq8dNb+ExYcaMoJnc/PMcGUZzqy2qXSlmzRyl
-         V6Mg==
+        d=gmail.com; s=20230601; t=1697263927; x=1697868727; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1VRzvbjqCINI1PjThGRzgdXHNyyoQH94qlPK9c4W3jg=;
+        b=j3H1hIW8s0mX6xMYgzqOsXGQOYG+bJxJoM2q5WCRVoknhFsUnjzMIZiM7UjVnKbU8c
+         zIR9NtjP4sRyxjV2xsboGqdOifv8F/B2FFJrjMXbzEISp1jME7F1QSPvTTQFQNnuztT/
+         9VDFj9jT4YqUjVu09cttoW7cVeIhkpiBrbAbyIndeenD4BtTL5zHl96nk/++YfcVtOxZ
+         TW47qFcLi1Jc4IwAJQT/ieYjOfk0U9FASCfVlM/V3RrvdXu3VuVMReg4XsPSjTI5eh0C
+         GL6HHIGtHm1O6aErQoQkz9yE66pK+YGAdgFVkGLOCHyV9mDYceq8Y5D0l+hUCqsBqVEo
+         wUow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697263313; x=1697868113;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jsrmjeedRmndhI5oS2QuPLFeCL4M0GNNy483xruZaHM=;
-        b=gnslkq3P7XNqoDCfBYaEppzJESEjsGeX6kGhJiQUsQw9ZpPL9WoSkCSVH9b2SgDcZg
-         h7wbJARneESLwdpTz8fN8CZfkeGT7Up/dEz6W6SyEqhbpeBGVFYIOBvlUes3lXzgPR8O
-         Rn6F/QC0VWi3IDb9tLlASXalIgiuni+mP96dBBVHv5gax/C3oxQx5+pi8oU2HXsOG2n8
-         nYCFEET3tCAus47h+klfE8CKNX+EH9JEfVhvaDk4eLW3tlYDMxh7YIJBtRQN2Fw8du6I
-         E9Mt7RIjo3Yjq4VyTws5QXsGbTfFUNcSnZVmQlQUX3gRm8SKhO/kDJ3Cp+HWp4GtG8vD
-         G7fw==
-X-Gm-Message-State: AOJu0YxglEnXuvnqzoSJToGfkzlgewKPPb1Cibv7e2t5htOsBQSJV2zp
-	8XwQld1rWmvcbZxbqz1gFx8=
-X-Google-Smtp-Source: AGHT+IHqGvEGvsptJP/nQyf49LJyfR8Qxsjv7t6WSoYfzuaKvPtsgqMPNDuu2j+/8P2QqNLfH4ucxQ==
-X-Received: by 2002:a05:6a20:3d04:b0:13d:d5bd:758f with SMTP id y4-20020a056a203d0400b0013dd5bd758fmr35140214pzi.6.1697263313175;
-        Fri, 13 Oct 2023 23:01:53 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id e59-20020a17090a6fc100b00276bde3b8cesm1123255pjk.15.2023.10.13.23.01.52
+        d=1e100.net; s=20230601; t=1697263927; x=1697868727;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1VRzvbjqCINI1PjThGRzgdXHNyyoQH94qlPK9c4W3jg=;
+        b=B8xlvMjTHEyLVaAlKih4RKliDXhXEDlJHx9elaWsYSQ9I9BkYmrj4VnMe4M7utYjQG
+         /CbdRDrOuTgVJicsUdGO6IRscgHyQjhtqWCB5YkKJnTbXCH72V3zaGhHzqdvVT0DsFaN
+         ahs4llaYa37ucf7Yi0dvGIHME8dsIEcJP9nN75y6uVNNIxswz4HZuzzCKSHbtdlIZO5H
+         f1Y6q8X7mOV7dqbBxVjfDpXTyOPwgBm8NEGr+pkArLHZM1nBAjclPhoOqDq2ErTkF6Lv
+         oIoNhoWatOwtamc7e7mD1a+AJj1XQ9bV8HcRL9WrUPnBtFCfGZdl6f4RD7K7IPRaqTXK
+         +Org==
+X-Gm-Message-State: AOJu0YyzhL/Wf5MqYzekYp/xgsycBjwYyTQrlmOQhq+fQ2VeZ+0XqatJ
+	2E2aDoQLm+bNtJ9NgQWjAW4=
+X-Google-Smtp-Source: AGHT+IEjl9+rfnX2Gg8X1OBHZpVzqr/44hZGVggeu2TnQcKCipUXTEy/23qd9OlQsph4TJXX+wsc8g==
+X-Received: by 2002:a5d:63cb:0:b0:32d:a40f:d920 with SMTP id c11-20020a5d63cb000000b0032da40fd920mr901050wrw.20.1697263927045;
+        Fri, 13 Oct 2023 23:12:07 -0700 (PDT)
+Received: from gilbert-PC ([105.112.18.68])
+        by smtp.gmail.com with ESMTPSA id k7-20020a5d66c7000000b0031fd849e797sm22116052wrw.105.2023.10.13.23.12.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Oct 2023 23:01:52 -0700 (PDT)
-Date: Sat, 14 Oct 2023 15:01:52 +0900 (JST)
-Message-Id: <20231014.150152.235653841163958426.fujita.tomonori@gmail.com>
-To: fujita.tomonori@gmail.com
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com,
- wedsonaf@gmail.com, benno.lossin@proton.me, greg@kroah.com
-Subject: Re: [PATCH net-next v4 4/4] net: phy: add Rust Asix PHY driver
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20231012125349.2702474-5-fujita.tomonori@gmail.com>
-References: <20231012125349.2702474-1-fujita.tomonori@gmail.com>
-	<20231012125349.2702474-5-fujita.tomonori@gmail.com>
+        Fri, 13 Oct 2023 23:12:04 -0700 (PDT)
+Date: Sat, 14 Oct 2023 07:11:59 +0100
+From: Gilbert Adikankwu <gilbertadikankwu@gmail.com>
+To: outreachy@lists.linux.dev, manishc@marvell.com,
+	GR-Linux-NIC-Dev@marvell.com, coiby.xu@gmail.com,
+	gregkh@linuxfoundation.org
+Cc: netdev@vger.kernel.org, linux-staging@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] staging: qlge: Add bool type to qlge_idc_wait()
+Message-ID: <ZSoxLxs45bIuBrHg@gilbert-PC>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 12 Oct 2023 21:53:49 +0900
-FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+Reported by checkpatch:
 
-> This is the Rust implementation of drivers/net/phy/ax88796b.c. The
-> features are equivalent. You can choose C or Rust versionon kernel
-> configuration.
-> 
-> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  drivers/net/phy/Kconfig          |   8 ++
->  drivers/net/phy/Makefile         |   6 +-
->  drivers/net/phy/ax88796b_rust.rs | 129 +++++++++++++++++++++++++++++++
->  rust/uapi/uapi_helper.h          |   2 +
->  4 files changed, 144 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/phy/ax88796b_rust.rs
+WARNING: else is not generally useful after a break or return
 
-I'll add the following entry to MAINTAINERS file in the next version.
+The idea of the break statements in the if/else is so that the loop is
+exited immediately the value of status is changed. And returned
+immediately. For if/else conditionals, the block to be executed will
+always be one of the two. Introduce a bool type variable 's_sig' that
+evaluates to true when the value of status is changed within the if/else
+block.
 
-+ASIX PHY DRIVER
-+M:     FUJITA Tomonori <fujita.tomonori@gmail.com>
-+R:     Trevor Gross <tmgross@umich.edu>
-+L:     netdev@vger.kernel.org
-+L:     rust-for-linux@vger.kernel.org
-+S:     Maintained
-+F:     drivers/net/phy/ax88796b_rust.rs
+Signed-off-by: Gilbert Adikankwu <gilbertadikankwu@gmail.com>
+---
+ drivers/staging/qlge/qlge.h     | 1 +
+ drivers/staging/qlge/qlge_mpi.c | 8 ++++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/staging/qlge/qlge.h b/drivers/staging/qlge/qlge.h
+index d0dd659834ee..b846bca82571 100644
+--- a/drivers/staging/qlge/qlge.h
++++ b/drivers/staging/qlge/qlge.h
+@@ -11,6 +11,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/if_vlan.h>
++#include <linux/types.h>
+ 
+ /*
+  * General definitions...
+diff --git a/drivers/staging/qlge/qlge_mpi.c b/drivers/staging/qlge/qlge_mpi.c
+index 96a4de6d2b34..44cb879240a0 100644
+--- a/drivers/staging/qlge/qlge_mpi.c
++++ b/drivers/staging/qlge/qlge_mpi.c
+@@ -909,6 +909,7 @@ int qlge_mb_wol_set_magic(struct qlge_adapter *qdev, u32 enable_wol)
+ static int qlge_idc_wait(struct qlge_adapter *qdev)
+ {
+ 	int status = -ETIMEDOUT;
++	bool s_sig = false;
+ 	struct mbox_params *mbcp = &qdev->idc_mbc;
+ 	long wait_time;
+ 
+@@ -934,14 +935,17 @@ static int qlge_idc_wait(struct qlge_adapter *qdev)
+ 		} else if (mbcp->mbox_out[0] == AEN_IDC_CMPLT) {
+ 			netif_err(qdev, drv, qdev->ndev, "IDC Success.\n");
+ 			status = 0;
+-			break;
++			s_sig = true;
+ 		} else {
+ 			netif_err(qdev, drv, qdev->ndev,
+ 				  "IDC: Invalid State 0x%.04x.\n",
+ 				  mbcp->mbox_out[0]);
+ 			status = -EIO;
+-			break;
++			s_sig = true;
+ 		}
++
++		if (s_sig)
++			break;
+ 	}
+ 
+ 	return status;
+-- 
+2.34.1
+
 
