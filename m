@@ -1,125 +1,106 @@
-Return-Path: <netdev+bounces-41044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C9937C9686
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 23:35:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8485E7C9698
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 23:56:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45305281AC2
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 21:35:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40D002811E3
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 21:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DAA22629F;
-	Sat, 14 Oct 2023 21:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE76F266AC;
+	Sat, 14 Oct 2023 21:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yAEVrqcI"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B36CF4F8;
-	Sat, 14 Oct 2023 21:35:16 +0000 (UTC)
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3190CC;
-	Sat, 14 Oct 2023 14:35:14 -0700 (PDT)
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-1e5602c12e5so1884437fac.3;
-        Sat, 14 Oct 2023 14:35:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697319314; x=1697924114;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MBwRMIVROmmBQpDc6SVXosJBDiLfO3KWW/346cMaQiY=;
-        b=YKf78jn6KC/TudurfnV/D1x5YxmIAAvVBhHm3I2FmuIZIEJ/eHLYHdpbV+XNNnMWmc
-         GcFQJzgnR9qDbZ0nqg9gTLqQid5ShaN9dIvEBZaidmDXPWztv6IR4cUAUTQXhy+ONTjx
-         qDFNWq9/d2yJYobd6HNnF9DOAs9Prsvy7TeOp2L/gufpooat5ThP7HqCX8LJokUjKlyM
-         rD9wRzQ98sF/Jek7RIr/kVIOo2sJ7ZgmfDPn/cOyjM4jSDy91SVnH1E11adQzpfpUDXU
-         WNNqSc1gBrVdaLAgJsJncIJ0Umk8wS9n31xZd/4uJliGO/hCxdcSN3MY+whTYM4oXt5q
-         2B0Q==
-X-Gm-Message-State: AOJu0YxM2Q/11xoMuG6Ujo0tym190v9fY6okUZCXiwVCgbQD2PXgfpuU
-	sfl+GUAhpLdMTUpSaGogAA==
-X-Google-Smtp-Source: AGHT+IFh0ejBA0W/YnotiYIWBBpOzR7ycB6HKOGMnb3NELy6Kfr3Pi1cDDqsdVs5YRxjMJ/+og7j5g==
-X-Received: by 2002:a05:6870:b79c:b0:1e9:dd69:2fba with SMTP id ed28-20020a056870b79c00b001e9dd692fbamr5560561oab.9.1697319314080;
-        Sat, 14 Oct 2023 14:35:14 -0700 (PDT)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id dy40-20020a056870c7a800b001e1754b9fc1sm1221798oab.24.2023.10.14.14.35.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Oct 2023 14:35:13 -0700 (PDT)
-Received: (nullmailer pid 2970737 invoked by uid 1000);
-	Sat, 14 Oct 2023 21:35:12 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6ADD262A3;
+	Sat, 14 Oct 2023 21:55:53 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D9A5C9;
+	Sat, 14 Oct 2023 14:55:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ojjdNFWR96paowz1+U1nfC2WpfuymGA4Tbws0uysQW8=; b=yAEVrqcITpTCcXQumUGM3kd2T2
+	fnWAtVS7EqLXYbQF7CbuMGLkBiCibvHKtG+AKgbY/udW7MOnW3xrb5CDsxJxdclfERjm7eZ/jd5or
+	R4mRnqjkosB1IiAnIL+yu5dg6uCv5bL6OhOif3uhbLCgOiG3LyX/l83C4d6KltwH1PdE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qrmbs-002CmB-EK; Sat, 14 Oct 2023 23:55:48 +0200
+Date: Sat, 14 Oct 2023 23:55:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, boqun.feng@gmail.com,
+	tmgross@umich.edu, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
+	greg@kroah.com
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network PHY
+ drivers
+Message-ID: <72a268b1-aabc-4d98-aba4-4d92c3f3dd21@lunn.ch>
+References: <1da8acc8-ca48-49ae-8293-5e2a7ed86653@proton.me>
+ <20231013.185348.94552909652217598.fujita.tomonori@gmail.com>
+ <7e0803b4-33da-45b0-8b6b-8baff98a9593@proton.me>
+ <20231013.195347.1300413508876421033.fujita.tomonori@gmail.com>
+ <de903407-eb53-4d42-af5c-c019ace1b701@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Gregory Clement <gregory.clement@bootlin.com>, linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>, Christian Marangi <ansuelsmth@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh+dt@kernel.org>, Jakub Kicinski <kuba@kernel.org>, devicetree@vger.kernel.org, netdev@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, linux-arm-kernel@lists.infradead.org, Eric Dumazet <edumazet@google.com>, Conor Dooley <conor+dt@kernel.org>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-In-Reply-To: <20231014-marvell-88e6152-wan-led-v2-1-7fca08b68849@linaro.org>
-References: <20231014-marvell-88e6152-wan-led-v2-0-7fca08b68849@linaro.org>
- <20231014-marvell-88e6152-wan-led-v2-1-7fca08b68849@linaro.org>
-Message-Id: <169731931217.2970721.15978003644189758136.robh@kernel.org>
-Subject: Re: [PATCH net-next v2 1/5] dt-bindings: marvell: Rewrite
- MV88E6xxx in schema
-Date: Sat, 14 Oct 2023 16:35:12 -0500
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <de903407-eb53-4d42-af5c-c019ace1b701@proton.me>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-On Sat, 14 Oct 2023 22:51:32 +0200, Linus Walleij wrote:
-> This is an attempt to rewrite the Marvell MV88E6xxx switch bindings
-> in YAML schema.
+> > The PHY driver asks the state from the abstractions then the
+> > abstractions ask the state from PHYLIB. So when the abstractions get a
+> > bad value from PHYLIB, the abstractions must return something to the
+> > PHY driver. As I wrote, the abstractions return a random value or an
+> > error. In either way, probably the system cannot continue.
 > 
-> The current text binding says:
->   WARNING: This binding is currently unstable. Do not program it into a
->   FLASH never to be changed again. Once this binding is stable, this
->   warning will be removed.
-> 
-> Well that never happened before we switched to YAML markup,
-> we can't have it like this, what about fixing the mess?
-> 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  .../bindings/net/dsa/marvell,mv88e6xxx.yaml        | 241 +++++++++++++++++++++
->  .../devicetree/bindings/net/dsa/marvell.txt        | 109 ----------
->  MAINTAINERS                                        |   2 +-
->  3 files changed, 242 insertions(+), 110 deletions(-)
-> 
+> Sure then let the system BUG if it cannot continue. I think that
+> allowing UB is worse than BUGing.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+There is nothing a PHY driver can do which justifies calling BUG().
 
-yamllint warnings/errors:
+BUG() indicates the system is totally messed up, and running further
+is going to result in more file system corruption, causing more data
+loss, so we need to stop the machine immediately.
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/marvell,mvusb.example.dtb: switch@0: ports: '#address-cells' is a required property
-	from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/marvell,mvusb.example.dtb: switch@0: ports: '#size-cells' is a required property
-	from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+Anyway, we are talking about this bit of code in the C driver:
 
-doc reference errors (make refcheckdocs):
+        /* Reset PHY, otherwise MII_LPA will provide outdated information.
+         * This issue is reproducible only with some link partner PHYs
+         */
+        if (phydev->state == PHY_NOLINK) {
+                phy_init_hw(phydev);
+                _phy_start_aneg(phydev);
+        }
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231014-marvell-88e6152-wan-led-v2-1-7fca08b68849@linaro.org
+and what we should do if phydev->state is not one of the values
+defined in enum phy_state, but is actually 42. The system will
+continue, but it could be that the hardware reports the wrong value
+for LPA, the Link Partner Advertisement. That is not critical
+information, the link is likely to work, but the debug tool ethtool(1)
+will report the wrong value.
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
+Can we turn this UB into DB? I guess you can make the abstraction
+accept any value, validate it against the values in enum phy_state, do
+a WARN_ON_ONCE() if its not valid so we get a stack trace, and pass
+the value on. Life will likely continue, hopefully somebody will
+report the stack trace, and we can try to figure out what went wrong.
 
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+  Andrew
 
