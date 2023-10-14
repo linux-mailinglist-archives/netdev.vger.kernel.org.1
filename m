@@ -1,189 +1,130 @@
-Return-Path: <netdev+bounces-40966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 919C27C9349
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 09:39:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E2FD7C9354
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 09:47:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E39BB20B52
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 07:39:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BA23282BF9
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 07:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308755679;
-	Sat, 14 Oct 2023 07:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7C4567B;
+	Sat, 14 Oct 2023 07:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SdtIzRSn"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="GcFvCnsm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA258566E
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 07:39:45 +0000 (UTC)
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D1ADB3;
-	Sat, 14 Oct 2023 00:39:44 -0700 (PDT)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5a7bbcc099fso35776867b3.3;
-        Sat, 14 Oct 2023 00:39:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697269183; x=1697873983; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O3pfyKY5IaoFuTuLVntmNnqtU1SUqO73JEN0YvBTiXE=;
-        b=SdtIzRSngbDs7E0rP8faZ+PDnoHk3mznG1rAaaPw+OASvSG5z3grZj5lEruvIBS5Fx
-         or/umvCf/WWMYOhQTMR2Il3PCJB0zsSHhTXcXqrNMOjzjMWqieCWXfkg1+pxPEVGLqmg
-         7ZnktwaiYWNeb+argnfMHr8SWGyTymAnUgDnc1R+uf0JF8cwJW2otGkZunAsphF1Hfv6
-         GuzUmpw20urdwXl0VMgNOJHshxckQmupqq0zAxhdzJE1GnIPq7N8a12HRXoxMzlJ2AUF
-         GJGAPOhkWUNYwOMy4RRoo7IR3O20Sz5OVSD1IsHY0OmuFuk/+KPLtRxxN8am/Tb9dj8C
-         GZMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697269183; x=1697873983;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O3pfyKY5IaoFuTuLVntmNnqtU1SUqO73JEN0YvBTiXE=;
-        b=PuKlazZ6kJ5NxCifid51GINXjHx1jXoCSPEazuOOKI1x+DWUtYvKwSJK2lxpStSHy4
-         +sfpddqZM/+3YADn0gA1CffBkhOQ37ylWfeuSditkw7D4tHIKjwNr9d84BMrvf/ItRas
-         mbIrZuaznq3d30JbQlxGDWWS6Bp9ep49K1PYcS2YYr7DV3XZjavNbtmldMDjorsN0u/F
-         pn1eOlDc/zEUlgIrV9UzHKubAfmQ/iyX54oZv7clKFG6RSZRZ6ihpsH8R8ZrfB+QiBNX
-         +QoNRa7gNENhOf0+3zJZ/Thlti3BmrRb+r365UeWaCzak7OQt7oHj8hHPB109fh8yXcN
-         9Q6Q==
-X-Gm-Message-State: AOJu0Yxqwl5lyT8XhVRJMNO71DprBGet4b1c5oG0D4W5G3N4G/HuIQhB
-	Mfe9q8VwAVpalPqv5iR3030=
-X-Google-Smtp-Source: AGHT+IFLBBfUUgNr6LViOF1jpi5Iia8QBECN3q2/onj7OgNd1yfaPOAeXkVgoQpt6phF2TPyemePTw==
-X-Received: by 2002:a81:a546:0:b0:592:5def:5c0d with SMTP id v6-20020a81a546000000b005925def5c0dmr31356836ywg.45.1697269183527;
-        Sat, 14 Oct 2023 00:39:43 -0700 (PDT)
-Received: from gilbert-PC ([105.112.18.68])
-        by smtp.gmail.com with ESMTPSA id w3-20020a818603000000b0059c8387f673sm394202ywf.51.2023.10.14.00.39.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Oct 2023 00:39:41 -0700 (PDT)
-Date: Sat, 14 Oct 2023 08:39:34 +0100
-From: Gilbert Adikankwu <gilbertadikankwu@gmail.com>
-To: Julia Lawall <julia.lawall@inria.fr>
-Cc: outreachy@lists.linux.dev, manishc@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com, coiby.xu@gmail.com,
-	gregkh@linuxfoundation.org, netdev@vger.kernel.org,
-	linux-staging@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] staging: qlge: Add bool type to qlge_idc_wait()
-Message-ID: <ZSpFtrC5xuYzgZhw@gilbert-PC>
-References: <ZSoxLxs45bIuBrHg@gilbert-PC>
- <alpine.DEB.2.22.394.2310140819450.3383@hadrien>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5BB53B9;
+	Sat, 14 Oct 2023 07:47:35 +0000 (UTC)
+X-Greylist: delayed 36964 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 14 Oct 2023 00:47:33 PDT
+Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0A3BF;
+	Sat, 14 Oct 2023 00:47:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1697269650; x=1697528850;
+	bh=93GkfZGzIApgyXsBVNEfyjY0aJigreNdL+jk3oC3QZ8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=GcFvCnsmg9i48O0LcWxEfeuv2bIHH5rPskz8l3Mo+RMYhM5EY3oivsTfraxCwx13Z
+	 Ql3fFXGWuH0ecaBswpBK4T1tschfYX4DuJBh9CfUmFK9RFdULL0vQDrkAz/Cdk5X/Y
+	 Fc50u2lLMeLbYqRxFaMA389lPRcQZ3OvIz9e2x2eP/+a5Cdl7swWEZVbM5hXD52tiI
+	 sLfiiarY6lm2hg+cELBst5+IBu86xSJn+0cW5f6vZaYOwvaSgVSlW96pEzLouP/tYT
+	 GOQbP9LgUbOgDt4b96cAqR/T3XiDDTcNsSCxUOmFcHvZ2l9UTgcPWnNSRkFncplZhe
+	 0sB6pUlPZXSSg==
+Date: Sat, 14 Oct 2023 07:47:22 +0000
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: boqun.feng@gmail.com, tmgross@umich.edu, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, greg@kroah.com
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network PHY drivers
+Message-ID: <de903407-eb53-4d42-af5c-c019ace1b701@proton.me>
+In-Reply-To: <20231013.195347.1300413508876421033.fujita.tomonori@gmail.com>
+References: <1da8acc8-ca48-49ae-8293-5e2a7ed86653@proton.me> <20231013.185348.94552909652217598.fujita.tomonori@gmail.com> <7e0803b4-33da-45b0-8b6b-8baff98a9593@proton.me> <20231013.195347.1300413508876421033.fujita.tomonori@gmail.com>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.22.394.2310140819450.3383@hadrien>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Oct 14, 2023 at 08:23:13AM +0200, Julia Lawall wrote:
-> 
-> 
-> On Sat, 14 Oct 2023, Gilbert Adikankwu wrote:
-> 
-> > Reported by checkpatch:
-> >
-> > WARNING: else is not generally useful after a break or return
-> >
-> > The idea of the break statements in the if/else is so that the loop is
-> > exited immediately the value of status is changed. And returned
-> > immediately. For if/else conditionals, the block to be executed will
-> > always be one of the two. Introduce a bool type variable 's_sig' that
-> > evaluates to true when the value of status is changed within the if/else
-> > block.
-> 
-> The idea of the checkpatch warning is that eg
-> 
-> found = search();
-> if (!found)
->   break;
-> else do_something();
-> 
-> is equvalent to:
-> 
-> found = search();
-> if (!found)
->   break;
-> do_something();
-> 
-> Because now the normal computation is at top level and the if branches are
-> only used for error handling.
-> 
-> But that is not the case in your code.  In your code, it seems that there
-> are two cases where one would like to break out of the loop.  The code
-> would be better left as it is.
-> 
-> julia
+On 13.10.23 12:53, FUJITA Tomonori wrote:
+>>>> In the enum case it would also be incredibly simple for the C side to =
+just
+>>>> make a slight mistake and set the integer to a value outside of the
+>>>> specified range. This strengthens the case for checking validity here.
+>>>> When an invalid value is given to Rust we have immediate UB. In Rust U=
+B
+>>>> always means that anything can happen so we must avoid it at all costs=
+.
+>>>
+>>> I'm not sure the general rules in Rust can be applied to linux kernel.
+>>
+>> Rust UB is still forbidden, it can introduce arbitrary misscompilations.
+>=20
+> Can you give a pointer on how it can introduce such?
 
-Thank you for the quick review. I thought about it the you described but
-then realised the else was not redundant that was why I went the route
-of trying to suppress the warning. I will revert the changes as you
-have suggested
+First, I can point you to [1] that is a list of UB that can occur in
+Rust. Second, I can give you an example [2] of UB leading to
+miscompilations, compare the executions of both release and debug mode.
 
-Gilbert
-> 
-> >
-> > Signed-off-by: Gilbert Adikankwu <gilbertadikankwu@gmail.com>
-> > ---
-> >  drivers/staging/qlge/qlge.h     | 1 +
-> >  drivers/staging/qlge/qlge_mpi.c | 8 ++++++--
-> >  2 files changed, 7 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/staging/qlge/qlge.h b/drivers/staging/qlge/qlge.h
-> > index d0dd659834ee..b846bca82571 100644
-> > --- a/drivers/staging/qlge/qlge.h
-> > +++ b/drivers/staging/qlge/qlge.h
-> > @@ -11,6 +11,7 @@
-> >  #include <linux/netdevice.h>
-> >  #include <linux/rtnetlink.h>
-> >  #include <linux/if_vlan.h>
-> > +#include <linux/types.h>
-> >
-> >  /*
-> >   * General definitions...
-> > diff --git a/drivers/staging/qlge/qlge_mpi.c b/drivers/staging/qlge/qlge_mpi.c
-> > index 96a4de6d2b34..44cb879240a0 100644
-> > --- a/drivers/staging/qlge/qlge_mpi.c
-> > +++ b/drivers/staging/qlge/qlge_mpi.c
-> > @@ -909,6 +909,7 @@ int qlge_mb_wol_set_magic(struct qlge_adapter *qdev, u32 enable_wol)
-> >  static int qlge_idc_wait(struct qlge_adapter *qdev)
-> >  {
-> >  	int status = -ETIMEDOUT;
-> > +	bool s_sig = false;
-> >  	struct mbox_params *mbcp = &qdev->idc_mbc;
-> >  	long wait_time;
-> >
-> > @@ -934,14 +935,17 @@ static int qlge_idc_wait(struct qlge_adapter *qdev)
-> >  		} else if (mbcp->mbox_out[0] == AEN_IDC_CMPLT) {
-> >  			netif_err(qdev, drv, qdev->ndev, "IDC Success.\n");
-> >  			status = 0;
-> > -			break;
-> > +			s_sig = true;
-> >  		} else {
-> >  			netif_err(qdev, drv, qdev->ndev,
-> >  				  "IDC: Invalid State 0x%.04x.\n",
-> >  				  mbcp->mbox_out[0]);
-> >  			status = -EIO;
-> > -			break;
-> > +			s_sig = true;
-> >  		}
-> > +
-> > +		if (s_sig)
-> > +			break;
-> >  	}
-> >
-> >  	return status;
-> > --
-> > 2.34.1
-> >
-> >
-> >
+[1]: https://doc.rust-lang.org/nomicon/what-unsafe-does.html#what-unsafe-ru=
+st-can-do
+[2]: https://play.rust-lang.org/?version=3Dstable&mode=3Ddebug&edition=3D20=
+21&gist=3D856cdd7434350e38d3891162e04424db
+
+>>> If the C side (PHYLIB) to set in an invalid value to the state,
+>>> probably the network doesn't work; already anything can happen in the
+>>> system at this point. Then the Rust abstractions get the invalid value
+>>> from the C side and detect an error with a check. The abstractions
+>>> return an error to a Rust PHY driver. Next what can the Rust PHY
+>>> driver do? Stop working? Calling dev_err() to print something and then
+>>> selects the state randomly and continue?
+>>
+>> What if the C side has a bug and gives us a bad value by mistake? It is
+>> not required for the network not working for us to receive an invalid
+>> value. Ideally the PHY driver would not even notice this, the abstractio=
+ns
+>> should handle this fully. Not exactly sure what to do in the error case,
+>=20
+> Your case is that C side has a good value but somehow gives a bad
+> value to the abstractions?
+
+Just think of the C side having some weird bug.
+
+> The abstractions can't handle this. The abstractions works as the part
+> of a PHY driver; The abstractions do only what The driver asks.
+>=20
+> The PHY driver asks the state from the abstractions then the
+> abstractions ask the state from PHYLIB. So when the abstractions get a
+> bad value from PHYLIB, the abstractions must return something to the
+> PHY driver. As I wrote, the abstractions return a random value or an
+> error. In either way, probably the system cannot continue.
+
+Sure then let the system BUG if it cannot continue. I think that
+allowing UB is worse than BUGing.
+
+>> maybe a warn_once and then choose some sane default state?
+>=20
+> What sane default? PHY_ERROR?
+
+Sure.
+
+--=20
+Cheers,
+Benno
+
+
 
