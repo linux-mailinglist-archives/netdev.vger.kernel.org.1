@@ -1,162 +1,117 @@
-Return-Path: <netdev+bounces-40956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EFA87C92F0
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 08:24:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83EA67C92F9
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 08:35:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1931B20AD5
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 06:24:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34D69282C6A
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 06:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD08546BF;
-	Sat, 14 Oct 2023 06:24:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BA315B3;
+	Sat, 14 Oct 2023 06:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="eXEh3NBJ"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ILrQ4XJb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA427E
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 06:24:19 +0000 (UTC)
-X-Greylist: delayed 64 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 13 Oct 2023 23:24:18 PDT
-Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AA28C2
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 23:24:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=yFzlpkyvZPpAIoodnzAqzdRSObdnjJuYo39Mj5FNOmQ=;
-  b=eXEh3NBJLfWVhwyl2lcUoAdjPzfbpjWCfIF9HQW00x8N1GW1u2LyLc2o
-   H0RkghrxGuq/PxCITTFZ0JH2G9fxzFlVX4ZcumAclr9pwm0dE6GgQlIu5
-   e6AFw8IUYBjHIAA6B/zia4er/+EEeBCS7an3UL42DTrhVbebr+9O1mKVh
-   c=;
-Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.03,224,1694728800"; 
-   d="scan'208";a="131207271"
-Received: from 231.85.89.92.rev.sfr.net (HELO hadrien) ([92.89.85.231])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2023 08:23:12 +0200
-Date: Sat, 14 Oct 2023 08:23:13 +0200 (CEST)
-From: Julia Lawall <julia.lawall@inria.fr>
-X-X-Sender: jll@hadrien
-To: Gilbert Adikankwu <gilbertadikankwu@gmail.com>
-cc: outreachy@lists.linux.dev, manishc@marvell.com, 
-    GR-Linux-NIC-Dev@marvell.com, coiby.xu@gmail.com, 
-    gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
-    linux-staging@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] staging: qlge: Add bool type to qlge_idc_wait()
-In-Reply-To: <ZSoxLxs45bIuBrHg@gilbert-PC>
-Message-ID: <alpine.DEB.2.22.394.2310140819450.3383@hadrien>
-References: <ZSoxLxs45bIuBrHg@gilbert-PC>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE8E5221
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 06:35:07 +0000 (UTC)
+Received: from smtp.smtpout.orange.fr (smtp-14.smtpout.orange.fr [80.12.242.14])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F42CBF
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 23:35:03 -0700 (PDT)
+Received: from pop-os.home ([86.243.2.178])
+	by smtp.orange.fr with ESMTPA
+	id rYEiqpnupvhM3rYEiqYMnU; Sat, 14 Oct 2023 08:35:01 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1697265301;
+	bh=CxADXXhhxjM3tj/eg2DX7kLfA3AdAqKP4iJHaVmLDhs=;
+	h=From:To:Cc:Subject:Date;
+	b=ILrQ4XJbS8aVq6H2ZU6HW0E5LFiW+PZDIamMUNxW2ttR9mqFi48qE2Kkzf2egfDsQ
+	 l+RoM4OHVWa9Lv7u5o/qSMUVL4Romq48Z9BfW43m0SczUedDrNW1bXX2kwEOUnRK9P
+	 0r3hrsp/tYGbCn3ekbTAXnyu40mqE2oEBNLiPsfa3MANvqrrNiHJfSNRidlNvfFEoc
+	 4U1X+13yFgBcoWJNIg07jP5b6/d/xLQRTRCmX0B8xNj+gfKYa9dtsg0jK3mdFm0lu3
+	 GfPjdxZ4jMTs+PQBozZx/Zg7GhCmnshc9xkBcSl73W/DfkR2zYNnR/1HE7zleI6WNb
+	 yjVWG1rGushcA==
+X-ME-Helo: pop-os.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 14 Oct 2023 08:35:01 +0200
+X-ME-IP: 86.243.2.178
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Pravin B Shelar <pshelar@ovn.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	netdev@vger.kernel.org,
+	dev@openvswitch.org
+Subject: [PATCH v2 1/2] net: openvswitch: Use struct_size()
+Date: Sat, 14 Oct 2023 08:34:52 +0200
+Message-Id: <e5122b4ff878cbf3ed72653a395ad5c4da04dc1e.1697264974.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Use struct_size() instead of hand writing it.
+This is less verbose and more robust.
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+v2: No change
+
+v1: https://lore.kernel.org/all/8be59c9e06fca8eff2f264abb4c2f74db0b19a9e.1696156198.git.christophe.jaillet@wanadoo.fr/
 
 
-On Sat, 14 Oct 2023, Gilbert Adikankwu wrote:
+This is IMHO more readable, even if not perfect.
 
-> Reported by checkpatch:
->
-> WARNING: else is not generally useful after a break or return
->
-> The idea of the break statements in the if/else is so that the loop is
-> exited immediately the value of status is changed. And returned
-> immediately. For if/else conditionals, the block to be executed will
-> always be one of the two. Introduce a bool type variable 's_sig' that
-> evaluates to true when the value of status is changed within the if/else
-> block.
+However (untested):
++	new = kzalloc(size_add(struct_size(new, masks, size),
+			       size_mul(sizeof(u64), size)), GFP_KERNEL);
+looks completely unreadable to me.
+---
+ net/openvswitch/flow_table.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-The idea of the checkpatch warning is that eg
+diff --git a/net/openvswitch/flow_table.c b/net/openvswitch/flow_table.c
+index 4f3b1798e0b2..d108ae0bd0ee 100644
+--- a/net/openvswitch/flow_table.c
++++ b/net/openvswitch/flow_table.c
+@@ -220,16 +220,13 @@ static struct mask_array *tbl_mask_array_alloc(int size)
+ 	struct mask_array *new;
+ 
+ 	size = max(MASK_ARRAY_SIZE_MIN, size);
+-	new = kzalloc(sizeof(struct mask_array) +
+-		      sizeof(struct sw_flow_mask *) * size +
++	new = kzalloc(struct_size(new, masks, size) +
+ 		      sizeof(u64) * size, GFP_KERNEL);
+ 	if (!new)
+ 		return NULL;
+ 
+ 	new->masks_usage_zero_cntr = (u64 *)((u8 *)new +
+-					     sizeof(struct mask_array) +
+-					     sizeof(struct sw_flow_mask *) *
+-					     size);
++					     struct_size(new, masks, size));
+ 
+ 	new->masks_usage_stats = __alloc_percpu(sizeof(struct mask_array_stats) +
+ 						sizeof(u64) * size,
+-- 
+2.34.1
 
-found = search();
-if (!found)
-  break;
-else do_something();
-
-is equvalent to:
-
-found = search();
-if (!found)
-  break;
-do_something();
-
-Because now the normal computation is at top level and the if branches are
-only used for error handling.
-
-But that is not the case in your code.  In your code, it seems that there
-are two cases where one would like to break out of the loop.  The code
-would be better left as it is.
-
-julia
-
->
-> Signed-off-by: Gilbert Adikankwu <gilbertadikankwu@gmail.com>
-> ---
->  drivers/staging/qlge/qlge.h     | 1 +
->  drivers/staging/qlge/qlge_mpi.c | 8 ++++++--
->  2 files changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/staging/qlge/qlge.h b/drivers/staging/qlge/qlge.h
-> index d0dd659834ee..b846bca82571 100644
-> --- a/drivers/staging/qlge/qlge.h
-> +++ b/drivers/staging/qlge/qlge.h
-> @@ -11,6 +11,7 @@
->  #include <linux/netdevice.h>
->  #include <linux/rtnetlink.h>
->  #include <linux/if_vlan.h>
-> +#include <linux/types.h>
->
->  /*
->   * General definitions...
-> diff --git a/drivers/staging/qlge/qlge_mpi.c b/drivers/staging/qlge/qlge_mpi.c
-> index 96a4de6d2b34..44cb879240a0 100644
-> --- a/drivers/staging/qlge/qlge_mpi.c
-> +++ b/drivers/staging/qlge/qlge_mpi.c
-> @@ -909,6 +909,7 @@ int qlge_mb_wol_set_magic(struct qlge_adapter *qdev, u32 enable_wol)
->  static int qlge_idc_wait(struct qlge_adapter *qdev)
->  {
->  	int status = -ETIMEDOUT;
-> +	bool s_sig = false;
->  	struct mbox_params *mbcp = &qdev->idc_mbc;
->  	long wait_time;
->
-> @@ -934,14 +935,17 @@ static int qlge_idc_wait(struct qlge_adapter *qdev)
->  		} else if (mbcp->mbox_out[0] == AEN_IDC_CMPLT) {
->  			netif_err(qdev, drv, qdev->ndev, "IDC Success.\n");
->  			status = 0;
-> -			break;
-> +			s_sig = true;
->  		} else {
->  			netif_err(qdev, drv, qdev->ndev,
->  				  "IDC: Invalid State 0x%.04x.\n",
->  				  mbcp->mbox_out[0]);
->  			status = -EIO;
-> -			break;
-> +			s_sig = true;
->  		}
-> +
-> +		if (s_sig)
-> +			break;
->  	}
->
->  	return status;
-> --
-> 2.34.1
->
->
->
 
