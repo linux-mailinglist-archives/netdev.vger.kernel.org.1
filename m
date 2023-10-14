@@ -1,99 +1,104 @@
-Return-Path: <netdev+bounces-41008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C94297C9586
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 19:01:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB5647C958A
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 19:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A72941C2092D
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 17:01:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FEFE281F15
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 17:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BA11A265;
-	Sat, 14 Oct 2023 17:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A901B1A280;
+	Sat, 14 Oct 2023 17:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rt54Di6Q"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DdUpjYB7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A71018C30;
-	Sat, 14 Oct 2023 17:01:04 +0000 (UTC)
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353A4AD;
-	Sat, 14 Oct 2023 10:00:59 -0700 (PDT)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5a7c93507d5so36251117b3.2;
-        Sat, 14 Oct 2023 10:00:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697302858; x=1697907658; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OdCTPjRIGMKBfGx86w66vSRp/LhHVz+z8hRAmpGNEFU=;
-        b=Rt54Di6QhypOHMlf0yzHBw2aIh9POiIyxWf6v7ud3KLDhQ5ZRBIxL9i614XmmXyveL
-         gGOl2qmdCPHw5Plhg0YwQ4eQIXC2bdaSYevr1zRg/aL/JxhadzDJsPqbib9J1enbQJnq
-         BCRpG2BFyuLcsSCPem/0wtyGPl+cKKF1p1Kgssr8s5y2sXSSdHQWcQMYl1QZkQzYshR3
-         Q3NNSVuMBNds39Sou6+w/srO6tNB5sUJfJDPHnQd1lhS+VemodSwt+akfxe8M4sUpzkw
-         w1cww2mBRE+4TntpKbgUyJHEBpfYeDVfJGkCIjZO4Ek9/cjMXCJQ1m0KstXEAdK+I6wB
-         RbIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697302858; x=1697907658;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OdCTPjRIGMKBfGx86w66vSRp/LhHVz+z8hRAmpGNEFU=;
-        b=M8r0i++s3LBL9WOu+VB1Yn/sC+Yqlypirlu5t11EYuKVyNE0F6kakh4JBjpdPZw+zV
-         md2ggUGIzcxwUe26vpEJszxcItVggDkiJiBaosBJFobwcAhX1OD5m+I9Su+9R9OgvlSr
-         3rF05ZKeZcnfxHrRou2MBLrDUJTvfIYEYQ+9RD/TiO3jbeBVZ72jAQbw+csxA4an81a0
-         zKQEOhuyFNKTwwUqLU5F6Xu++4CW3wovlibe0tLcFkXIacQ+cV5mPhMa8dfm8A0hOe0D
-         NLTqG2NCtTW/4BcVWvJ66+wRcb+rOSP8mxhdrBAx54h117F1hCNSunwemdLk3gI1LJYc
-         8ONg==
-X-Gm-Message-State: AOJu0YwP0pOxPCmgd2bXgFagjSp9CPKuEW10NKRfqy218+dfsYJ+oOZA
-	waVz+uTOrDl/0NH6RluBdzimaSKF6WVA24pAap0=
-X-Google-Smtp-Source: AGHT+IEoSxuuJv7pY/Q3o8aJkDNJxHfM2K09KpP5qtFCHnQ2S8Jr4N9HhYjo79p+DMES7WmOwmJPpuOrfRBTZapNaGg=
-X-Received: by 2002:a0d:c886:0:b0:59f:9c08:8f12 with SMTP id
- k128-20020a0dc886000000b0059f9c088f12mr35762658ywd.38.1697302858330; Sat, 14
- Oct 2023 10:00:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3951C37;
+	Sat, 14 Oct 2023 17:02:11 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24B3BB7;
+	Sat, 14 Oct 2023 10:02:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=a4JZARCX0Pv8VMrXuno0db3MocAdG6ErfH+YqMbuS/U=; b=DdUpjYB7WQU2xK11g8gcDXl6jI
+	3fyUDr/ngjS2X/NwLJVATqMk2TX3T04y7ZxGE0caWTRWAG8bU1fB9lmMz4mHsxrVFPxYlknJ81Yml
+	k0aaq31yg3gGf92qvc2Eoh7ERy79gRPn5GA9yRURmJckRL9x/xlyfXVioQCzynRzY11g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qri1U-002BoU-VE; Sat, 14 Oct 2023 19:01:56 +0200
+Date: Sat, 14 Oct 2023 19:01:56 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/7] net: dsa: microchip: Set unique MAC at
+ startup for WoL support
+Message-ID: <d62d6c8d-9a18-473e-9773-2d6ae6eb0cc6@lunn.ch>
+References: <20231013122405.3745475-1-o.rempel@pengutronix.de>
+ <20231013122405.3745475-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231012125349.2702474-1-fujita.tomonori@gmail.com>
- <20231012125349.2702474-2-fujita.tomonori@gmail.com> <85d5c498-efbc-4c1a-8d12-f1eca63c45cf@proton.me>
- <4b7096cd-076d-42fd-b0cc-f842d3b64ee4@lunn.ch>
-In-Reply-To: <4b7096cd-076d-42fd-b0cc-f842d3b64ee4@lunn.ch>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sat, 14 Oct 2023 19:00:46 +0200
-Message-ID: <CANiq72m3xp6ErPwCOj6DrHpG_7OE9WUqVpsZcUDk4OSuH62mKg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY drivers
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Benno Lossin <benno.lossin@proton.me>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu, 
-	boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231013122405.3745475-3-o.rempel@pengutronix.de>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Oct 14, 2023 at 4:13=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> To some extent, this is just a temporary location. Once the
-> restrictions of the build systems are solved, i expect this will move
-> into drivers/net/phy/Kconfig, inside the 'if PHYLIB'. However, i
-> agree, this should be under the Rust menu.
+On Fri, Oct 13, 2023 at 02:24:00PM +0200, Oleksij Rempel wrote:
+> Set a unique global MAC address for each switch on the network at system
+> startup by syncing the switch's global MAC address with the Ethernet
+> address of the DSA master interface. This is crucial for supporting
+> Wake-on-LAN (WoL) functionality, as it requires a unique address for
+> each switch.
+> 
+> Although the operation is performed only at system start and won't sync
+> if the master Ethernet address changes dynamically, it lays the
+> groundwork for WoL support by ensuring a unique MAC address for each
+> switch.
 
-No, it is orthogonal to the build system restrictions.
+I've not been following this patchset, so sorry if i make points
+others have asked on earlier versions.
 
-In other words, the Kconfig entry could be moved there already. In
-fact, I would suggest so.
+Maybe it would be good to add that the hardware only supports one MAC
+address for all ports for WoL, and its this address. At least that is
+my assumption.
 
-Cheers,
-Miguel
+> + * ksz_cmn_set_default_switch_mac_addr - Set the switch's global MAC address
+> + *                                       from master port.
+
+Florian is doing a search replace to make use of the word `conduit`. 
+
+
+> @@ -3572,8 +3633,6 @@ static int ksz_switch_macaddr_get(struct dsa_switch *ds, int port,
+>  	const unsigned char *addr = slave->dev_addr;
+
+and this might need to change to user?
+
 
