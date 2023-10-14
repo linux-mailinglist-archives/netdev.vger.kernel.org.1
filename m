@@ -1,131 +1,244 @@
-Return-Path: <netdev+bounces-40942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6DA67C9269
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 05:13:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECD167C926F
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 05:16:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B22F282312
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 03:13:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E407B20AD8
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 03:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76298A46;
-	Sat, 14 Oct 2023 03:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083F7EA4;
+	Sat, 14 Oct 2023 03:15:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KOt6Xo5w"
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="h3MFNTe7";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="qTCFjXWl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07ACD367
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 03:13:12 +0000 (UTC)
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA7A0B7;
-	Fri, 13 Oct 2023 20:13:10 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b9c907bc68so32623031fa.2;
-        Fri, 13 Oct 2023 20:13:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697253189; x=1697857989; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/kczTBtEmRiBKNmdXxJoIn5oWpUhD3mts59tfdc3H1g=;
-        b=KOt6Xo5wmJ/EG/2KdbJdlFGQTKB6Yim1TS4eiJUuePU6nBeAvsa5HRxI+uSyOCTDt8
-         eHJR0/yqRF0wiF1jiOjawaohzi/SfpAdrzJwXMqXYfwkricrPtRr4BJTkS/2RTGcSGUz
-         JbLtO8PRkD3RFXuwi4JFUm9ntcYBjce9eMMeepIkU7GkpxE5ObbQd52MCqvgCX9hfCs7
-         +2drIa+zU0GGz6i7y1vGdRVIqfVJVBpjKyhGRyPPqbiPlbE/vLH+XqoPoh9MTEFnNmzv
-         WHKiiwE2FVfLi5DwYQCn2Hwag0I+S89Br0oSvqJVSRLJ4iOXLsSINBPNxafIRTObm9nI
-         e0Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697253189; x=1697857989;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/kczTBtEmRiBKNmdXxJoIn5oWpUhD3mts59tfdc3H1g=;
-        b=vuvb/UWynkIRb3MPgXHslkS4FwUZ/+XhkVUvvVs1/lox8Sa8H4nbDmu1Y34bMeO9dS
-         zufwUL9zRwRjBVnjn/MsL++bkp8WjZs6XRwvzvCx06AAn2WexrtPVV+Sg2gfEOnz6d6R
-         Rew5Uq1/vY8LgWlQYmcbGg/eSLuPalL05P7WXemnuzgrYtR73H3BS9kGJIMWuhBOzP4R
-         FBzIuJPUURIbmzoLqv5xt2ayYT89/e2EL2hOs3/5gXKrwbylxrLqa7MBQ5p0rl4Tm+4q
-         HLlMj+XYDTOe/eN5/1wq4ffP8u/+2xzN3umqkf7ewAH1E4UxSxV5DIT34YPSWWs2+hWx
-         cQTA==
-X-Gm-Message-State: AOJu0Yxhm8W95WerNizs4AExwU2LPT1PgBM0tUfLcphhv7juuUQRw5go
-	wkk3I20rNWR64bralqj7ZcKLBQRzR83tYY52yg/D3hFWqQ+KtpJc
-X-Google-Smtp-Source: AGHT+IHe8+SyPHcz9aA8FyvWw325/ne8Vx3vooCEnOjO55pTXKNU9F/C3QGfXYzC3RzT+r9MqfG5CzquORjyp81s69Y=
-X-Received: by 2002:a2e:9b97:0:b0:2bf:d379:275b with SMTP id
- z23-20020a2e9b97000000b002bfd379275bmr27820357lji.20.1697253188843; Fri, 13
- Oct 2023 20:13:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B50AA46
+	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 03:15:54 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1445B7;
+	Fri, 13 Oct 2023 20:15:51 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id F20BF60152;
+	Sat, 14 Oct 2023 05:15:49 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1697253349; bh=0LkZfwzKwKNgRkuMZX6TvvfAt9PdEsq166wj+rMJcYM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=h3MFNTe76sFuHATOndIfAp6M/7bcwOt1hfxXKwn5qQKushdcJtyFzhELV25p9kN+6
+	 LGBeg3GgBY8NBIjyaUJKv2IIqUzXouRaWWk4VOm8fGSQA7VCiGzFpmVKa+HgzLykV3
+	 Eyespw1tyTj1+IAZHjs+NgH30XsQGHafm+JUptcOrpPKChRXJv2BFMKdrvytRuqees
+	 w53DY9PjMPfSc9b8rmO8BsMoJ9hAhj/hvJh8qYoq212UD8KTsph/3BZd01NhEwJ6T2
+	 zAEuTvuvihhsi2TZQ7UVtIdUrH25ZERS96VgRK4pI+a2AexGD3e6eFyMQcbDIT/8Cf
+	 BjTP8XsXeq2gA==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id i1tZRJxgq527; Sat, 14 Oct 2023 05:15:46 +0200 (CEST)
+Received: from defiant.home (78-2-88-84.adsl.net.t-com.hr [78.2.88.84])
+	by domac.alu.hr (Postfix) with ESMTPSA id 1AC166013C;
+	Sat, 14 Oct 2023 05:15:45 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1697253346; bh=0LkZfwzKwKNgRkuMZX6TvvfAt9PdEsq166wj+rMJcYM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qTCFjXWlEBL4aCEnQqO4cSIsk7/5xLyOfLN12S6rnSAPYLz65IaOGrqjdnZO900a+
+	 rAQ7Nn7kPchBuBLDbduodGysBk7wsgXjy3uDoE6lY/wubLSvgY89uDGlm8Bs8Nqalt
+	 f7RTTtK2o0u+rqkmO6rl9zUNs0sMd7HKdBw68WxBd2QNCoDGK9b9jJjydjCvjiths5
+	 fCcs6gDCXGkSnC2UaPn4jAgUCXo/T5iKzR7cdQkQQ4dEUeQ+mcZWXy4t3ZNXaH4vlK
+	 jrsHvGRxMu8dgqTX118jQlyrxOsB7S0iQgEUkZ4jziS1agusuCsRAbXs7rgccjL2qM
+	 f1rEEMzuEO+KQ==
+From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: nic_swsd@realtek.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>,
+	Marco Elver <elver@google.com>
+Subject: [PATCH v1 1/3] r8169: fix the KCSAN reported data-race in rtl_tx() while reading tp->cur_tx
+Date: Sat, 14 Oct 2023 05:12:56 +0200
+Message-Id: <20231014031257.178630-1-mirsad.todorovac@alu.unizg.hr>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231011191524.1042566-1-luiz.dentz@gmail.com> <20231013175443.5cb5c2ce@kernel.org>
-In-Reply-To: <20231013175443.5cb5c2ce@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 13 Oct 2023 20:12:56 -0700
-Message-ID: <CABBYNZ+A9Zk8HbQBPNXFLbaR_maCY7o5qHtx_MTJqhQ=LNBMPQ@mail.gmail.com>
-Subject: Re: pull-request: bluetooth 2023-10-11
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jakub,
+KCSAN reported the following data-race:
 
-On Fri, Oct 13, 2023 at 5:54=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 11 Oct 2023 12:15:24 -0700 Luiz Augusto von Dentz wrote:
-> >  - Fix race when opening vhci device
-> >  - Avoid memcmp() out of bounds warning
-> >  - Correctly bounds check and pad HCI_MON_NEW_INDEX name
-> >  - Fix using memcmp when comparing keys
-> >  - Ignore error return for hci_devcd_register() in btrtl
-> >  - Always check if connection is alive before deleting
-> >  - Fix a refcnt underflow problem for hci_conn
->
-> Commit: fc11ae648f03 ("Bluetooth: hci_sock: Correctly bounds check and pa=
-d HCI_MON_NEW_INDEX name")
->         Fixes tag: Fixes: 78480de55a96 ("Bluetooth: hci_sock: fix slab oo=
-b read in create_monitor_event")
->         Has these problem(s):
->                 - Target SHA1 does not exist
->
-> Commit: 6f0ff718ed67 ("Bluetooth: avoid memcmp() out of bounds warning")
->         Fixes tag: Fixes: d70e44fef8621 ("Bluetooth: Reject connection wi=
-th the device which has same BD_ADDR")
->         Has these problem(s):
->                 - Target SHA1 does not exist
->
-> Commit: b03f32b195df ("Bluetooth: hci_event: Fix coding style")
->         Fixes tag: Fixes: d70e44fef862 ("Bluetooth: Reject connection wit=
-h the device which has same BD_ADDR")
->         Has these problem(s):
->                 - Target SHA1 does not exist
->
-> Commit: a9500f272b3b ("Bluetooth: hci_event: Fix using memcmp when compar=
-ing keys")
->         Fixes tag: Fixes: fe7a9da4fa54 ("Bluetooth: hci_event: Ignore NUL=
-L link key")
->         Has these problem(s):
->                 - Target SHA1 does not exist
->
-> :(
+==================================================================
+BUG: KCSAN: data-race in rtl8169_poll [r8169] / rtl8169_start_xmit [r8169]
 
-Not sure what I'm doing wrong, because verify_fixes.sh doesn't
-actually warn these for me, or perhaps it needs to be used in a clean
-tree/new clone since it may match commit ids of different
-branchs/remotes? Anyway, I'm preparing a new pull-request.
+write (marked) to 0xffff888102474b74 of 4 bytes by task 5358 on cpu 29:
+rtl8169_start_xmit (drivers/net/ethernet/realtek/r8169_main.c:4254) r8169
+dev_hard_start_xmit (./include/linux/netdevice.h:4889 ./include/linux/netdevice.h:4903 net/core/dev.c:3544 net/core/dev.c:3560)
+sch_direct_xmit (net/sched/sch_generic.c:342)
+__dev_queue_xmit (net/core/dev.c:3817 net/core/dev.c:4306)
+ip_finish_output2 (./include/linux/netdevice.h:3082 ./include/net/neighbour.h:526 ./include/net/neighbour.h:540 net/ipv4/ip_output.c:233)
+__ip_finish_output (net/ipv4/ip_output.c:311 net/ipv4/ip_output.c:293)
+ip_finish_output (net/ipv4/ip_output.c:328)
+ip_output (net/ipv4/ip_output.c:435)
+ip_send_skb (./include/net/dst.h:458 net/ipv4/ip_output.c:127 net/ipv4/ip_output.c:1486)
+udp_send_skb (net/ipv4/udp.c:963)
+udp_sendmsg (net/ipv4/udp.c:1246)
+inet_sendmsg (net/ipv4/af_inet.c:840 (discriminator 4))
+sock_sendmsg (net/socket.c:730 net/socket.c:753)
+__sys_sendto (net/socket.c:2177)
+__x64_sys_sendto (net/socket.c:2185)
+do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
 
---=20
-Luiz Augusto von Dentz
+read to 0xffff888102474b74 of 4 bytes by interrupt on cpu 21:
+rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4397 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
+__napi_poll (net/core/dev.c:6527)
+net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
+__do_softirq (kernel/softirq.c:553)
+__irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
+irq_exit_rcu (kernel/softirq.c:647)
+common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 14))
+asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636)
+cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
+cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
+call_cpuidle (kernel/sched/idle.c:135)
+do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
+cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
+start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:294)
+secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
+
+value changed: 0x002f4815 -> 0x002f4816
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kcsan-00143-gb5cbe7c00aa0 #41
+Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04/26/2023
+==================================================================
+
+The write side of drivers/net/ethernet/realtek/r8169_main.c is:
+==================
+   4251         /* rtl_tx needs to see descriptor changes before updated tp->cur_tx */
+   4252         smp_wmb();
+   4253
+ → 4254         WRITE_ONCE(tp->cur_tx, tp->cur_tx + frags + 1);
+   4255
+   4256         stop_queue = !netif_subqueue_maybe_stop(dev, 0, rtl_tx_slots_avail(tp),
+   4257                                                 R8169_TX_STOP_THRS,
+   4258                                                 R8169_TX_START_THRS);
+
+The read side is the function rtl_tx():
+
+   4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+   4356                    int budget)
+   4357 {
+   4358         unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
+   4359         struct sk_buff *skb;
+   4360
+   4361         dirty_tx = tp->dirty_tx;
+   4362
+   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+   4364                 unsigned int entry = dirty_tx % NUM_TX_DESC;
+   4365                 u32 status;
+   4366
+   4367                 status = le32_to_cpu(tp->TxDescArray[entry].opts1);
+   4368                 if (status & DescOwn)
+   4369                         break;
+   4370
+   4371                 skb = tp->tx_skb[entry].skb;
+   4372                 rtl8169_unmap_tx_skb(tp, entry);
+   4373
+   4374                 if (skb) {
+   4375                         pkts_compl++;
+   4376                         bytes_compl += skb->len;
+   4377                         napi_consume_skb(skb, budget);
+   4378                 }
+   4379                 dirty_tx++;
+   4380         }
+   4381
+   4382         if (tp->dirty_tx != dirty_tx) {
+   4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_compl);
+   4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
+   4385
+   4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl, bytes_compl,
+   4387                                               rtl_tx_slots_avail(tp),
+   4388                                               R8169_TX_START_THRS);
+   4389                 /*
+   4390                  * 8168 hack: TxPoll requests are lost when the Tx packets are
+   4391                  * too close. Let's kick an extra TxPoll request when a burst
+   4392                  * of start_xmit activity is detected (if it is not detected,
+   4393                  * it is slow enough). -- FR
+   4394                  * If skb is NULL then we come here again once a tx irq is
+   4395                  * triggered after the last fragment is marked transmitted.
+   4396                  */
+ → 4397                 if (tp->cur_tx != dirty_tx && skb)
+   4398                         rtl8169_doorbell(tp);
+   4399         }
+   4400 }
+
+Obviously from the code, an earlier detected data-race for tp->cur_tx was fixed in the
+line 4363:
+
+   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+
+but the same solution is required for protecting the other access to tp->cur_tx:
+
+ → 4397                 if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+   4398                         rtl8169_doorbell(tp);
+
+The write in the line 4254 is protected with WRITE_ONCE(), but the read in the line 4397
+might have suffered read tearing under some compiler optimisations.
+
+The fix eliminated the KCSAN data-race report for this bug.
+
+It is yet to be evaluated what happens if tp->cur_tx changes between the test in line 4363
+and line 4397. This test should certainly not be cached by the compiler in some register
+for such a long time, while asynchronous writes to tp->cur_tx might have occurred in line
+4254 in the meantime.
+
+Fixes: 94d8a98e6235c ("r8169: reduce number of workaround doorbell rings")
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Marco Elver <elver@google.com>
+Cc: netdev@vger.kernel.org
+Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@alu.unizg.hr/
+Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+Acked-by: Marco Elver <elver@google.com>
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 6351a2dc13bc..281aaa851847 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4394,7 +4394,7 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+ 		 * If skb is NULL then we come here again once a tx irq is
+ 		 * triggered after the last fragment is marked transmitted.
+ 		 */
+-		if (tp->cur_tx != dirty_tx && skb)
++		if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+ 			rtl8169_doorbell(tp);
+ 	}
+ }
+-- 
+2.34.1
+
 
