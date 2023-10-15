@@ -1,164 +1,109 @@
-Return-Path: <netdev+bounces-41070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105D17C98C6
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 13:12:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF2307C98F8
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 14:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81E70B20B89
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 11:12:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40B1528187A
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 12:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D559C23B9;
-	Sun, 15 Oct 2023 11:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CCDE63DD;
+	Sun, 15 Oct 2023 12:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="hA2QGmtp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LUz+ocZc"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9B5185E
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 11:12:12 +0000 (UTC)
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7149D6
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 04:12:09 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-32c9f2ce71aso2943596f8f.1
-        for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 04:12:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697368328; x=1697973128; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7+hjinkWqLesBIH5rOJHsFyg5k2o7WwTYjEkLw7zCHA=;
-        b=hA2QGmtpzgBqkX02RFFBEThVwHO9Ek4oV8fHy2gAOiAF0+Fyg3+gwfQYWhILylkFnw
-         /5t+l3L0BZYDmPpJIuKzNEn63loY3hOTVYD8Q9tLNMDbhfEiqgc4i8nv8AF73EYEFT48
-         tALGilxsyA9+L2Hp4CiGuqbSGKyHVGOEfcbEeYrggQm6WKeBzUNqSUW+eN8qw1c+ESZI
-         IjisI+c9eczW4Rl88vOzFwpdzF4IGps88vLVHr+d3bmSBD0J4R7IHKClcq6h0x1zCPYO
-         ffl9AyedLrat2ZojTYgbi/gKFKcUN3USdBIBkbc5S8eh7v26jY28XqbO8zkA+XW5trCj
-         PuDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697368328; x=1697973128;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7+hjinkWqLesBIH5rOJHsFyg5k2o7WwTYjEkLw7zCHA=;
-        b=oRZZaMizVqyiHUnRdf1A7d4RTdMwPETN4mRwsrBNGGyGd6YR7WZru1NrsUWWtn9ig9
-         2tDOOOyO+tDrCfz7KztFu9yDBk9+wJdPcEXIkZbGEyp7m5fpg0fRBFMruZWVSaC4LxVG
-         hL060xDjjEa/p80P/WB6ivsQqlZsygz7rqj3Xe9d5suTOLlSBt4qTI58FgWVgUBLPPZ2
-         JvOpp3d1rUTTu65XOJv6u2AxQ7703whFEvoFi1F6L0dxIs0EffNjIoBkE2WCDlbxDYXz
-         hiUAHQo2VpRwrg4OjXEBAiFrHaTJPZX9Wib78X10L+IS5Whq61mIDiId1/+UFDlqyZD+
-         NCpQ==
-X-Gm-Message-State: AOJu0YzpeT6bS83yrTA6tCVeGr4WGJICWsNVqmAs1sFShWfzQkwG6DH5
-	eQTI9P8oOHriNFazumgLWbbOFQ==
-X-Google-Smtp-Source: AGHT+IHU0ckLcePXBdGjqPbnlj6ms+Fm0W3lDMNY7EKvDXOW55XJotTCBpTlqJ/yTjSXwSN/BqDPmA==
-X-Received: by 2002:a05:6000:80b:b0:32d:a686:dedf with SMTP id bt11-20020a056000080b00b0032da686dedfmr3633105wrb.57.1697368327985;
-        Sun, 15 Oct 2023 04:12:07 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id p13-20020a5d68cd000000b0031ae8d86af4sm24790882wrw.103.2023.10.15.04.12.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Oct 2023 04:12:07 -0700 (PDT)
-Date: Sun, 15 Oct 2023 13:12:05 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, gal@nvidia.com
-Subject: Re: [patch net-next] devlink: don't take instance lock for nested
- handle put
-Message-ID: <ZSvJBV2dWf1dTlWp@nanopsycho>
-References: <ZST9yFTeeTuYD3RV@nanopsycho>
- <20231010075231.322ced83@kernel.org>
- <ZSV0NOackGvWn7t/@nanopsycho>
- <20231010111605.2d520efc@kernel.org>
- <ZSakg8W+SBgahXtW@nanopsycho>
- <20231011172025.5f4bebcb@kernel.org>
- <ZSeOq+I+Z12E/oRC@nanopsycho>
- <20231013083945.3f6d8efe@kernel.org>
- <ZSl5OS7bFsg/ahCK@nanopsycho>
- <20231013130100.0d08fb97@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED16D63D3
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 12:30:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 63950C433C9;
+	Sun, 15 Oct 2023 12:30:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697373027;
+	bh=i1YcrOqbwjKT/jMQfm28HMA/2YUC7i58f8iAS5jZh0Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LUz+ocZc5wTID/nfn03/wnOkcADgmXIsDkR0/28y12nztBMcO7eG5uUN2SRzUWiJN
+	 2IXM6dukmCdPC0fJa0b8Kt0vus1jukQj0Id9fyJy4UeN55s2JKowKitzDlOo5vBRxh
+	 HNiwlGdTEJBI5iq4JWHio5VS7gF32HMpsEQJFTTEg2cwzR/931NZW14XJmyc4dCtE8
+	 rY0HylHPxtt4Rj9sPIGFhipxrONFTCbwMyrw04N/Jmh+20TQfv+L86LY+kB+vmaxX0
+	 z1eTdFf4/GTZSYvsgsFisN2Vwq97lNa+/5RAGbP1mdR/HuPeiMIXvOt463+Uj22B9h
+	 QXdc08sRs0cqw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4945AE1F666;
+	Sun, 15 Oct 2023 12:30:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231013130100.0d08fb97@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4 00/12] vsock/virtio: continue MSG_ZEROCOPY support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169737302729.30024.1645018070157688379.git-patchwork-notify@kernel.org>
+Date: Sun, 15 Oct 2023 12:30:27 +0000
+References: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
+In-Reply-To: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
+ jasowang@redhat.com, bobby.eshleman@bytedance.com, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel@sberdevices.ru, oxffffaa@gmail.com
 
-Fri, Oct 13, 2023 at 10:01:00PM CEST, kuba@kernel.org wrote:
->On Fri, 13 Oct 2023 19:07:05 +0200 Jiri Pirko wrote:
->> >> Not sure what obvious bug you mean. If you mean the parent-child
->> >> lifetime change, I don't know how that would help here. I don't see how.
->> >> 
->> >> Plus it has performance implications. When user removes SF port under
->> >> instance lock, the SF itself is removed asynchonously out of the lock.
->> >> You suggest to remove it synchronously holding the instance lock,
->> >> correct?   
->> >
->> >The SF is deleted by calling ->port_del() on the PF instance, correct?  
->> 
->> That or setting opstate "inactive".
->
->The opstate also set on the port (i.e. from the PF), right?
+Hello:
 
-Correct. But the problem is elsewehere. The actual SF auxdev lifecycle,
-see below.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
+On Tue, 10 Oct 2023 22:15:12 +0300 you wrote:
+> Hello,
+> 
+> this patchset contains second and third parts of another big patchset
+> for MSG_ZEROCOPY flag support:
+> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
+> 
+> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+> suggested to split it for three parts to simplify review and merging:
+> 
+> [...]
 
->
->> >> SF removal does not need that lock. Removing thousands of SFs
->> >> would take much longer as currently, they are removed in parallel.
->> >> You would serialize the removals for no good reason.  
->> >
->> >First of all IDK what the removal rate you're targeting is, and what
->> >is achievable under PF's lock. Handwaving "we need parallelism" without
->> >data is not a serious argument.  
->> 
->> Oh there are data and there is a need. My colleagues are working
->> on parallel creation/removal within mlx5 driver as we speak. What you
->> suggest would be huge setback :/
->
->The only part that needs to be synchronous is un-linking.
->Once the SF is designated for destruction we can live without the link,
->it's just waiting to be garbage-collected.
+Here is the summary with links:
+  - [net-next,v4,01/12] vsock: set EPOLLERR on non-empty error queue
+    https://git.kernel.org/netdev/net-next/c/0064cfb44084
+  - [net-next,v4,02/12] vsock: read from socket's error queue
+    https://git.kernel.org/netdev/net-next/c/49dbe25adac4
+  - [net-next,v4,03/12] vsock: check for MSG_ZEROCOPY support on send
+    https://git.kernel.org/netdev/net-next/c/5fbfc7d24334
+  - [net-next,v4,04/12] vsock: enable SOCK_SUPPORT_ZC bit
+    https://git.kernel.org/netdev/net-next/c/dcc55d7bb230
+  - [net-next,v4,05/12] vhost/vsock: support MSG_ZEROCOPY for transport
+    https://git.kernel.org/netdev/net-next/c/3719c48d9a20
+  - [net-next,v4,06/12] vsock/virtio: support MSG_ZEROCOPY for transport
+    https://git.kernel.org/netdev/net-next/c/e2fcc326b498
+  - [net-next,v4,07/12] vsock/loopback: support MSG_ZEROCOPY for transport
+    https://git.kernel.org/netdev/net-next/c/cfdca3904687
+  - [net-next,v4,08/12] vsock: enable setting SO_ZEROCOPY
+    https://git.kernel.org/netdev/net-next/c/e0718bd82e27
+  - [net-next,v4,09/12] docs: net: description of MSG_ZEROCOPY for AF_VSOCK
+    https://git.kernel.org/netdev/net-next/c/bac2cac12c26
+  - [net-next,v4,10/12] test/vsock: MSG_ZEROCOPY flag tests
+    https://git.kernel.org/netdev/net-next/c/bc36442ef3b7
+  - [net-next,v4,11/12] test/vsock: MSG_ZEROCOPY support for vsock_perf
+    https://git.kernel.org/netdev/net-next/c/e846d679ad13
+  - [net-next,v4,12/12] test/vsock: io_uring rx/tx tests
+    https://git.kernel.org/netdev/net-next/c/8d211285c6d4
 
-Yeah. Another flow to consider is SF unbind. When user unbinds the SF
-manually, PF lock is not involved in at all (can't be really). SF needs
-to be unlisted as well as the SF devlink instance goes away. That was
-another reason for the rel infrastructure.
-
-
->
->> >> Not sure what you mean by that. Locking is quite clear. Why weird?
->> >> What's weird exactly? What do you mean by "random dependencies"?
->> >> 
->> >> I have to say I feel we got a bit lost in the conversation.  
->> >
->> >You have a rel object, which is refcounted, xarray with a lock, and 
->> >an async work for notifications.  
->> 
->> Yes. The async work for notification is something you would need anyway,
->> even with object lifetime change you suggest. It's about locking order.
->
->I don't think I would. If linking is always done under PF's lock we can
->safely send any ntf.
-
-If is not. Manual bind called over sysfs of the SF auxiliary device is
-called without any lock held.
-
-There are multiple race conditions to consider the probing/removing the
-SF auxiliary device in parallel operations like PF devlink reload, port
-funcion removal etc. Rel infra is considering and resolving them all.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
->
->> Please see the patchset I sent today (v3), I did put in a documentation
->> describing that (3 last patches). That should make it clear.
->
->It's unnecessarily complicated, but whatever, I'm not touching it.
 
