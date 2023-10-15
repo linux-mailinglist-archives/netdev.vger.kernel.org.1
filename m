@@ -1,263 +1,189 @@
-Return-Path: <netdev+bounces-41055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C9477C9755
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 02:06:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7A897C9770
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 02:54:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4E401C20949
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 00:06:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3D671C20952
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 00:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346A0195;
-	Sun, 15 Oct 2023 00:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D50910ED;
+	Sun, 15 Oct 2023 00:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="IvDK23e8"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=infradead.org header.i=@infradead.org header.b="remL+vZ6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E638161
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 00:06:30 +0000 (UTC)
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F69CD6
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 17:06:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net; s=s31663417;
- t=1697328379; x=1697933179; i=wahrenst@gmx.net;
- bh=KlV33a8F2B4w2Kf6SAsP1DSJ4DJyoLivvIY2+XasDio=;
- h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
- b=IvDK23e8AiV3z90wfA2FaMur7H0DnslMOt3o5RA+hEepqlhltOYyB5EJ30OdLS7qvGCvQVkQqmb
- kRBY/Pk/07iCe+OOPS7cZYP7a8JN357ldFq1zuB8kW4yxZItnr+26ZNnU9zIn1MbxQOYn+HIeaXH5
- 7ZYdpegKjy81c+XWWFMMmEZ8tabPC70xQFGxZbl9ExpyaoENU2WwaUSeX0RFwBbufTbxmrJfA8NN3
- 67DtHJ7TRx5INBUsWmNKBStU6qjxrtHiaM66+P0M3IwutlYiuGodsVb52ezt87ABEQPjRf1e8VuW3
- wxt4/BblTkRe1f4To8VwS4drOIW2GyW+7GIQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mqb1W-1rMjXO3n4C-00mb1H; Sun, 15
- Oct 2023 02:06:18 +0200
-Message-ID: <c7f4b618-696c-48bc-b95c-ddecf9024f84@gmx.net>
-Date: Sun, 15 Oct 2023 02:06:18 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028E510E7
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 00:54:02 +0000 (UTC)
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF82ECC;
+	Sat, 14 Oct 2023 17:53:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Fxni5dSBmJbibsqwhrWcgihmJb45z5XJE9yEcbUr3IQ=; b=remL+vZ6HueAFulPsMj0pfW7uY
+	psBV4lobi6JLREOl815YSw2H1fv2ryCihrz/xgr4XxYaDanbcY88sS6p/Tai2oM8HYQ6YrqpOg9OB
+	3h5gB6zUzIjsCtccKBl9SmFSk3KtBMSLjT5gy74RqONohJnZL+FpT+lgEHCmIsSBAilS7mjxcDARI
+	cXgiB+cHcAJgkZo6ih+pakXCsBPyMoI7FmH8ejaDQFlSX3O4YHeY3+BQ9ZUtKq/ipAf0WqJT4uZAH
+	pdo2KNUW4tlkBN+Jze0OYR9c3E37kDIrKxKDP8MmSx/cjZNe5aZtzJeU1u61wYhqifB35dW7GkjkF
+	GxNq6/SQ==;
+Received: from jlbec by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1qrpO1-001Kco-0g;
+	Sun, 15 Oct 2023 00:53:41 +0000
+Date: Sat, 14 Oct 2023 17:53:32 -0700
+From: Joel Becker <jlbec@evilplan.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	Eric Dumazet <edumazet@google.com>, hch@lst.de,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	horms@kernel.org
+Subject: Re: [PATCH net-next v4 2/4] netconsole: Initialize configfs_item for
+ default targets
+Message-ID: <ZSs4DF1o9pDlRP7w@google.com>
+Mail-Followup-To: Breno Leitao <leitao@debian.org>, kuba@kernel.org,
+	davem@davemloft.net, pabeni@redhat.com,
+	Eric Dumazet <edumazet@google.com>, hch@lst.de,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	horms@kernel.org
+References: <20231012111401.333798-1-leitao@debian.org>
+ <20231012111401.333798-3-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: iperf performance regression since Linux 5.18
-Content-Language: en-US
-To: Neal Cardwell <ncardwell@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Fabio Estevam <festevam@gmail.com>, linux-imx@nxp.com,
- Stefan Wahren <stefan.wahren@chargebyte.com>,
- Michael Heimpold <mhei@heimpold.de>, netdev@vger.kernel.org,
- Yuchung Cheng <ycheng@google.com>
-References: <7f31ddc8-9971-495e-a1f6-819df542e0af@gmx.net>
- <CANn89iKY58YSknzOzkEHxFu=C=1_p=pXGAHGo9ZkAfAGon9ayw@mail.gmail.com>
- <CADVnQymV=nv53YaC8kLC1qT1ufhJL9+w_wcZ+8AHwPRG+JRdnw@mail.gmail.com>
- <a35b1a27-575f-4d19-ad2d-95bf4ded40e9@gmx.net>
- <CADVnQymM2HrGrMGyJX2QQ9PpgQT8JqsRz_0U8_WvdvzteqsfEQ@mail.gmail.com>
-From: Stefan Wahren <wahrenst@gmx.net>
-In-Reply-To: <CADVnQymM2HrGrMGyJX2QQ9PpgQT8JqsRz_0U8_WvdvzteqsfEQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:N9s5wOizQWZpkW1y6EZB0OIHmQS7kQp1lhH7hMg5BAs68PDOArV
- Z0CBqo1mj/Dje00POk3K+EVZc6n9p36GzeNMz0vQ9oWdUsQZ14/mLWgzOFM4yHCSyYZdisB
- qI22kt3BX9O0nRYFwtcdf8OcDpMalIqQwpMl1RHglHD//M/Wd5mDLWbEZkgnwnpXEdwMNhq
- RTgluWJhM9+5zCgIkb8SA==
-UI-OutboundReport: notjunk:1;M01:P0:G+Br7+opBPM=;TtLKady4pZrjldT6XstrsF2iBof
- yPGzhjR7gxX4g1Jc0y/d8U6ANRvYFdtTdmH+AEvs6PLvu0Y+DNErfpCu5wWp+laDZnu/dNT8F
- TJluUdoZi1YY9Jdf2wjv8tsGvvqIIk+orYl/FdHWGB/Af0v3yK1Ydy2ha+IlBlCrWKSrE7Dqm
- w45T2Ipcw6CJJ9t2lrYrMUSjiPoGAys1x/14xNbKQQMKmOcgcII+A3ABF/iDBzkNkUb2XX8nk
- OKyWRl/sdC5sIWvwZ96loyyHWIt/EA/k0Ry5wQt2xrh4wT9jxb73H/Ay6fPPWqymwbtWdY8ZI
- 0aIG+LW3gJXR6j14hGoU0IaIV48BgVseOTdl/cjFGdCkedQYhUpNppI++fLtHw6aRAYbEYK0i
- A0iYlupp6nFm4xo+DwTNv8b56TW7wfrJ1zDYnIdpaF4Bm1FYFupM9TXydYNDA0w53tD9P9LJZ
- sl8QvRpCGpYwB5NxNmXw6P8Ku4MY/IUO9TqyFo83ABl9COSkdk9VS3JMhdw+BDXzgyIUu3u32
- ODlRJYZQDCSKbMwvhpx41HD7/T/di41+tut1L2+vHMiYL3A1prOy/jqH40XazmQADdoDQXf9r
- lVA5//3q3LStWcOP5Vi+CWwDSZBMNHWGElgAARoA0Tifzo7kHrtVceNCvn2nk9635lL/jEq5H
- BnbIb2xaofqAAjSbfiq6I7rQUMlwD2K5FtZxFYLcAdkmYjzMR99X5OFcaGCNC7hQLTsoiijaT
- Ovp9d3idb3Cy8qefVscv7M5Grs8xkL4nK32S90cdVykE6dAizWKWB0uwceza62LVcJOHy9fTx
- sq9oM6KtxZh9GPVQuBEKPlmoKDxC+1orhYPxhkUg8WslDKd4VcfTdCEWSYFtmKWZJnGGWX/j0
- 4il0xohRpU+6npFYcdHEkfEWBo3cTT4Bgt+W1LzJBRBoeHi2fATsyFG68+YCXgCWKhhEZYcW5
- gDiSgQqxhz2r+Euo0ODX5Kim1jg=
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231012111401.333798-3-leitao@debian.org>
+X-Burt-Line: Trees are cool.
+X-Red-Smith: Ninety feet between bases is perhaps as close as man has ever
+ come to perfection.
+Sender: Joel Becker <jlbec@ftp.linux.org.uk>
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Thu, Oct 12, 2023 at 04:13:59AM -0700, Breno Leitao wrote:
+> For netconsole targets allocated during the boot time (passing
+> netconsole=... argument), netconsole_target->item is not initialized.
+> That is not a problem because it is not used inside configfs.
+> 
+> An upcoming patch will be using it, thus, initialize the targets with
+> the name 'cmdline' plus a counter starting from 0.  This name will match
+> entries in the configfs later.
+> 
+> Suggested-by: Joel Becker <jlbec@evilplan.org>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+Reviewed-by: Joel Becker <jlbec@evilplan.org>
 
-Am 14.10.23 um 21:40 schrieb Neal Cardwell:
-> On Fri, Oct 13, 2023 at 9:37=E2=80=AFAM Stefan Wahren <wahrenst@gmx.net>=
- wrote:
->> Hi,
->>
->> Am 09.10.23 um 21:19 schrieb Neal Cardwell:
->>> On Mon, Oct 9, 2023 at 3:11=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
->>>> On Mon, Oct 9, 2023 at 8:58=E2=80=AFPM Stefan Wahren <wahrenst@gmx.ne=
-t> wrote:
->>>>> Hi,
->>>>> we recently switched on our ARM NXP i.MX6ULL based embedded device
->>>>> (Tarragon Master [1]) from an older kernel version to Linux 6.1. Aft=
-er
->>>>> that we noticed a measurable performance regression on the Ethernet
->>>>> interface (driver: fec, 100 Mbit link) while running iperf client on=
- the
->>>>> device:
->>>>>
->>>>> BAD
->>>>>
->>>>> # iperf -t 10 -i 1 -c 192.168.1.129
->>>>> ------------------------------------------------------------
->>>>> Client connecting to 192.168.1.129, TCP port 5001
->>>>> TCP window size: 96.2 KByte (default)
->>>>> ------------------------------------------------------------
->>>>> [  3] local 192.168.1.12 port 56022 connected with 192.168.1.129 por=
-t 5001
->>>>> [ ID] Interval       Transfer     Bandwidth
->>>>> [  3]  0.0- 1.0 sec  9.88 MBytes  82.8 Mbits/sec
->>>>> [  3]  1.0- 2.0 sec  9.62 MBytes  80.7 Mbits/sec
->>>>> [  3]  2.0- 3.0 sec  9.75 MBytes  81.8 Mbits/sec
->>>>> [  3]  3.0- 4.0 sec  9.62 MBytes  80.7 Mbits/sec
->>>>> [  3]  4.0- 5.0 sec  9.62 MBytes  80.7 Mbits/sec
->>>>> [  3]  5.0- 6.0 sec  9.62 MBytes  80.7 Mbits/sec
->>>>> [  3]  6.0- 7.0 sec  9.50 MBytes  79.7 Mbits/sec
->>>>> [  3]  7.0- 8.0 sec  9.75 MBytes  81.8 Mbits/sec
->>>>> [  3]  8.0- 9.0 sec  9.62 MBytes  80.7 Mbits/sec
->>>>> [  3]  9.0-10.0 sec  9.50 MBytes  79.7 Mbits/sec
->>>>> [  3]  0.0-10.0 sec  96.5 MBytes  80.9 Mbits/sec
->>>>>
->>>>> GOOD
->>>>>
->>>>> # iperf -t 10 -i 1 -c 192.168.1.129
->>>>> ------------------------------------------------------------
->>>>> Client connecting to 192.168.1.129, TCP port 5001
->>>>> TCP window size: 96.2 KByte (default)
->>>>> ------------------------------------------------------------
->>>>> [  3] local 192.168.1.12 port 54898 connected with 192.168.1.129 por=
-t 5001
->>>>> [ ID] Interval       Transfer     Bandwidth
->>>>> [  3]  0.0- 1.0 sec  11.2 MBytes  94.4 Mbits/sec
->>>>> [  3]  1.0- 2.0 sec  11.0 MBytes  92.3 Mbits/sec
->>>>> [  3]  2.0- 3.0 sec  10.8 MBytes  90.2 Mbits/sec
->>>>> [  3]  3.0- 4.0 sec  11.0 MBytes  92.3 Mbits/sec
->>>>> [  3]  4.0- 5.0 sec  10.9 MBytes  91.2 Mbits/sec
->>>>> [  3]  5.0- 6.0 sec  10.9 MBytes  91.2 Mbits/sec
->>>>> [  3]  6.0- 7.0 sec  10.8 MBytes  90.2 Mbits/sec
->>>>> [  3]  7.0- 8.0 sec  10.9 MBytes  91.2 Mbits/sec
->>>>> [  3]  8.0- 9.0 sec  10.9 MBytes  91.2 Mbits/sec
->>>>> [  3]  9.0-10.0 sec  10.9 MBytes  91.2 Mbits/sec
->>>>> [  3]  0.0-10.0 sec   109 MBytes  91.4 Mbits/sec
->>>>>
->>>>> We were able to bisect this down to this commit:
->>>>>
->>>>> first bad commit: [65466904b015f6eeb9225b51aeb29b01a1d4b59c] tcp: ad=
-just
->>>>> TSO packet sizes based on min_rtt
->>>>>
->>>>> Disabling this new setting via:
->>>>>
->>>>> echo 0 > /proc/sys/net/ipv4/tcp_tso_rtt_log
->>>>>
->>>>> confirm that this was the cause of the performance regression.
->>>>>
->>>>> Is it expected that the new default setting has such a performance i=
-mpact?
->>> Indeed, thanks for the report.
->>>
->>> In addition to the "ss" output Eric mentioned, could you please grab
->>> "nstat" output, which should allow us to calculate the average TSO/GSO
->>> and LRO/GRO burst sizes, which is the key thing tuned with the
->>> tcp_tso_rtt_log knob.
->>>
->>> So it would be great to have the following from both data sender and
->>> data receiver, for both the good case and bad case, if you could start
->>> these before your test and kill them after the test stops:
->>>
->>> (while true; do date; ss -tenmoi; sleep 1; done) > /root/ss.txt &
->>> nstat -n; (while true; do date; nstat; sleep 1; done)  > /root/nstat.t=
-xt
->> i upload everything here:
->> https://github.com/lategoodbye/tcp_tso_rtt_log_regress
->>
->> The server part is a Ubuntu installation connected to the internet. At
->> first i logged the good case, then i continued with the bad case.
->> Accidentally i delete a log file of bad case, so i repeated the whole
->> bad case again. So the uploaded bad case files are from the third run.
-> Thanks for the detailed data!
->
-> Here are some notes from looking at this data:
->
-> + bad client: avg TSO burst size is roughly:
-> https://github.com/lategoodbye/tcp_tso_rtt_log_regress/blob/main/nstat_c=
-lient_bad.log
-> IpOutRequests                   308               44.7
-> IpExtOutOctets                  10050656        1403181.0
-> est bytes   per TSO burst: 10050656 / 308 =3D 32632
-> est packets per TSO burst: 32632 / 1448 ~=3D 22.5
->
-> + good client: avg TSO burst size is roughly:
-> https://github.com/lategoodbye/tcp_tso_rtt_log_regress/blob/main/nstat_c=
-lient_good.log
-> IpOutRequests                   529               62.0
-> IpExtOutOctets                  11502992        1288711.5
-> est bytes   per TSO burst: 11502992 / 529 ~=3D 21745
-> est packets per TSO burst: 21745 / 1448 ~=3D 15.0
->
-> + bad client ss data:
-> https://github.com/lategoodbye/tcp_tso_rtt_log_regress/blob/main/ss_clie=
-nt_bad.log
-> State Recv-Q Send-Q Local Address:Port   Peer Address:PortProcess
-> ESTAB 0      236024  192.168.1.12:39228 192.168.1.129:5001
-> timer:(on,030ms,0) ino:25876 sk:414f52af rto:0.21 cwnd:68 ssthresh:20
-> reordering:0
-> Mbits/sec allowed by cwnd: 68 * 1448 * 8 / .0018 / 1000000.0 ~=3D 437.6
->
-> + good client ss data:
-> https://github.com/lategoodbye/tcp_tso_rtt_log_regress/blob/main/ss_clie=
-nt_good.log
-> Fri Oct 13 15:04:36 CEST 2023
-> State Recv-Q Send-Q Local Address:Port   Peer Address:PortProcess
-> ESTAB 0      425712  192.168.1.12:33284 192.168.1.129:5001
-> timer:(on,020ms,0) ino:20654 sk:414f52af rto:0.21 cwnd:106 ssthresh:20
-> reordering:0
-> Mbits/sec allowed by cwnd: 106 * 1448 * 8 / .0028 / 1000000.0 =3D 438.5
->
-> So it seems indeed like cwnd is not the limiting factor, and instead
-> there is something about the larger TSO/GSO bursts (roughly 22.5
-> packets per burst on average) in the "bad" case that is causing
-> problems, and preventing the sender from keeping the pipe fully
-> utilized.
->
-> So perhaps the details of the tcp_tso_should_defer() logic are hurting
-> performance?
->
-> The default value of tcp_tso_win_divisor is 3, and in the bad case the
-> cwnd / tcp_tso_win_divisor =3D 68 / 3 =3D 22.7 packets, which is
-> suspiciously close to the average TSO burst size of 22.5. So my guess
-> is that the tcp_tso_win_divisor of 3 is the dominant factor here, and
-> perhaps if we raise it to 5, then 68/5 ~=3D 13.60 will approximate the
-> TSO burst size in the "good" case, and fully utilize the pipe. So it
-> seems worth an experiment, to see what we can learn.
->
-> To test that theory, could you please try running the following as
-> root on the data sender machine, and then re-running the "bad" test
-> with tcp_tso_rtt_log at the default value of 9?
->
->     sysctl net.ipv4.tcp_tso_win_divisor=3D5
-Unfortunately this doesn't fix it.
+> ---
+>  drivers/net/netconsole.c | 25 +++++++++++++++++++++++--
+>  1 file changed, 23 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> index d609fb59cf99..e153bce4dee4 100644
+> --- a/drivers/net/netconsole.c
+> +++ b/drivers/net/netconsole.c
+> @@ -53,6 +53,8 @@ static bool oops_only = false;
+>  module_param(oops_only, bool, 0600);
+>  MODULE_PARM_DESC(oops_only, "Only log oops messages");
+>  
+> +#define NETCONSOLE_PARAM_TARGET_PREFIX "cmdline"
+> +
+>  #ifndef	MODULE
+>  static int __init option_setup(char *opt)
+>  {
+> @@ -165,6 +167,10 @@ static void netconsole_target_put(struct netconsole_target *nt)
+>  {
+>  }
+>  
+> +static void populate_configfs_item(struct netconsole_target *nt,
+> +				   int cmdline_count)
+> +{
+> +}
+>  #endif	/* CONFIG_NETCONSOLE_DYNAMIC */
+>  
+>  /* Allocate and initialize with defaults.
+> @@ -688,6 +694,17 @@ static struct configfs_subsystem netconsole_subsys = {
+>  	},
+>  };
+>  
+> +static void populate_configfs_item(struct netconsole_target *nt,
+> +				   int cmdline_count)
+> +{
+> +	char target_name[16];
+> +
+> +	snprintf(target_name, sizeof(target_name), "%s%d",
+> +		 NETCONSOLE_PARAM_TARGET_PREFIX, cmdline_count);
+> +	config_item_init_type_name(&nt->item, target_name,
+> +				   &netconsole_target_type);
+> +}
+> +
+>  #endif	/* CONFIG_NETCONSOLE_DYNAMIC */
+>  
+>  /* Handle network interface device notifications */
+> @@ -887,7 +904,8 @@ static void write_msg(struct console *con, const char *msg, unsigned int len)
+>  }
+>  
+>  /* Allocate new target (from boot/module param) and setup netpoll for it */
+> -static struct netconsole_target *alloc_param_target(char *target_config)
+> +static struct netconsole_target *alloc_param_target(char *target_config,
+> +						    int cmdline_count)
+>  {
+>  	struct netconsole_target *nt;
+>  	int err;
+> @@ -922,6 +940,7 @@ static struct netconsole_target *alloc_param_target(char *target_config)
+>  	if (err)
+>  		goto fail;
+>  
+> +	populate_configfs_item(nt, cmdline_count);
+>  	nt->enabled = true;
+>  
+>  	return nt;
+> @@ -954,6 +973,7 @@ static int __init init_netconsole(void)
+>  {
+>  	int err;
+>  	struct netconsole_target *nt, *tmp;
+> +	unsigned int count = 0;
+>  	bool extended = false;
+>  	unsigned long flags;
+>  	char *target_config;
+> @@ -961,7 +981,7 @@ static int __init init_netconsole(void)
+>  
+>  	if (strnlen(input, MAX_PARAM_LENGTH)) {
+>  		while ((target_config = strsep(&input, ";"))) {
+> -			nt = alloc_param_target(target_config);
+> +			nt = alloc_param_target(target_config, count);
+>  			if (IS_ERR(nt)) {
+>  				err = PTR_ERR(nt);
+>  				goto fail;
+> @@ -977,6 +997,7 @@ static int __init init_netconsole(void)
+>  			spin_lock_irqsave(&target_list_lock, flags);
+>  			list_add(&nt->list, &target_list);
+>  			spin_unlock_irqrestore(&target_list_lock, flags);
+> +			count++;
+>  		}
+>  	}
+>  
+> -- 
+> 2.34.1
+> 
 
-Please look at the trace and sysctl settings [1]. I will try to figure
-out what's wrong mit iproute2-ss later. CET says it's time to sleep.
+-- 
 
-[1] -
-https://github.com/lategoodbye/tcp_tso_rtt_log_regress/commit/e1ceb689d779=
-7eb10127613861d56cb3303f7b72
->
-> Thanks!
-> neal
+"I don't want to achieve immortality through my work; I want to
+ achieve immortality through not dying."
+        - Woody Allen
 
+			http://www.jlbec.org/
+			jlbec@evilplan.org
 
