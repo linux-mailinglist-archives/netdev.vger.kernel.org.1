@@ -1,172 +1,134 @@
-Return-Path: <netdev+bounces-41063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 939D77C97B3
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 04:47:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 876417C97EC
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 06:53:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 268F2B20C50
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 02:47:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 242A9281A59
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 04:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D3A1110A;
-	Sun, 15 Oct 2023 02:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23831855;
+	Sun, 15 Oct 2023 04:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Tz2NCax2"
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="k5IQxBjX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E04A15BE
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 02:47:19 +0000 (UTC)
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F5FDDC
-	for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 19:47:17 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id 3f1490d57ef6-d9a398f411fso3793581276.3
-        for <netdev@vger.kernel.org>; Sat, 14 Oct 2023 19:47:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79FE9EDB;
+	Sun, 15 Oct 2023 04:53:37 +0000 (UTC)
+Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D1DD9;
+	Sat, 14 Oct 2023 21:53:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1697338036; x=1697942836; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tzh+rNnWynK5ZcN3b/YWGdv8qRdOA13vGqNJM9zZRX4=;
-        b=Tz2NCax2dsuUxHNeFDSuW6DbZMDKvoxQIyEpWOajwif3z2+TCBzXWzS00xPTQcTx4N
-         E9prI3MY8b5kDoPLaV2pPEkXiduwv0ksr2e4LpDtEFYkWt/hQjxdW/lL7eFDZEJ5GtV9
-         Hwe0IjPFDUTXaKEIn9kyg442Ti2zZQN8iofjI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697338036; x=1697942836;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tzh+rNnWynK5ZcN3b/YWGdv8qRdOA13vGqNJM9zZRX4=;
-        b=FFkT33C5Os6h1WZaZO8QI9HG3aCiyP7Tc/FMSgwYWs4Y8XlszQVXv92Nd2yu1V7ZG9
-         HMouCGtuuXnhRM1MxIQwCfLj36678wTXpS3eOwbl/y7AES6o3q2VzDwlP6Vcc5yXqrK2
-         OTNT+fyne2wCu1UG5MNipImne24bmwzHZES2GzdNdrWHA+y/gALFAc78bTSuEvS3+mvD
-         z8aahQjAGaZj64MPyadFLcYiv9xFESb8UzZZ1irOi+p7Xr6OTBbAaOAdsdB0N5dYwTMA
-         VWAduL/felcG9/8iO9HAhvo1uEAIj8v6EpfGljK8o3VOTP36GcHXU1r/otpb6Ta3CvaU
-         eBww==
-X-Gm-Message-State: AOJu0Yw75V0PZpvpKLq308v8ylfx+l9sJUhTx9MnwnVKDw9zhLiCspXK
-	1URfQXEpROWyTBdMU/y4yOW4sjsdR4sA8KcC9Q0=
-X-Google-Smtp-Source: AGHT+IGw18lqrrhduG4jTuVZKWn5myx4C+3AqkfRYUY5Awp/+CRP7b49/Hik+o4kPmm55cncaXksbw==
-X-Received: by 2002:a25:4c5:0:b0:d9b:2477:b625 with SMTP id 188-20020a2504c5000000b00d9b2477b625mr5041003ybe.54.1697338036105;
-        Sat, 14 Oct 2023 19:47:16 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id a6-20020aa79706000000b00696e8215d28sm2435194pfg.20.2023.10.14.19.47.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Oct 2023 19:47:15 -0700 (PDT)
-Date: Sat, 14 Oct 2023 19:47:14 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Shahed Shaikh <shshaikh@marvell.com>,
-	Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] qlcnic: replace deprecated strncpy with strscpy
-Message-ID: <202310141944.08A1FF6D9@keescook>
-References: <20231012-strncpy-drivers-net-ethernet-qlogic-qlcnic-qlcnic_83xx_init-c-v1-1-f0008d5e43be@google.com>
+  d=inria.fr; s=dc;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=fMGwmeCiI2WGZSSIY9zDXk4JfSuYvkdAr36FIasOYjU=;
+  b=k5IQxBjXGV3CnXmP7VgfiaoFeBhRXdFbvwWcEJ86HrDH2aegcMqgy9/b
+   I9LI0HC1txkCq9sNogIroruo9K0Hh9y5ZrXnsAxRar8tN2v4I3LVDbRSv
+   x6yt7j8E7k1e7EcOSnJOckIDAkgHN9kLA1i0nOA4E0PtLe9QlrFZZ21U9
+   w=;
+Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.03,226,1694728800"; 
+   d="scan'208";a="68734435"
+Received: from 231.85.89.92.rev.sfr.net (HELO hadrien) ([92.89.85.231])
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2023 06:53:30 +0200
+Date: Sun, 15 Oct 2023 06:53:29 +0200 (CEST)
+From: Julia Lawall <julia.lawall@inria.fr>
+X-X-Sender: jll@hadrien
+To: Kees Cook <keescook@chromium.org>
+cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+    Pravin B Shelar <pshelar@ovn.org>, "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, 
+    "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+    Nathan Chancellor <nathan@kernel.org>, 
+    Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>, 
+    linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, 
+    netdev@vger.kernel.org, dev@openvswitch.org, 
+    linux-hardening@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH v2 2/2] net: openvswitch: Annotate struct mask_array with
+ __counted_by
+In-Reply-To: <202310141928.23985F1CA@keescook>
+Message-ID: <alpine.DEB.2.22.394.2310150653070.3260@hadrien>
+References: <e5122b4ff878cbf3ed72653a395ad5c4da04dc1e.1697264974.git.christophe.jaillet@wanadoo.fr> <ca5c8049f58bb933f231afd0816e30a5aaa0eddd.1697264974.git.christophe.jaillet@wanadoo.fr> <202310141928.23985F1CA@keescook>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231012-strncpy-drivers-net-ethernet-qlogic-qlcnic-qlcnic_83xx_init-c-v1-1-f0008d5e43be@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 07:44:29PM +0000, Justin Stitt wrote:
-> strncpy() is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
-> 
-> We expect fw_info->fw_file_name to be NUL-terminated based on its use
-> within _request_firmware_prepare() wherein `name` refers to it:
-> |       if (firmware_request_builtin_buf(firmware, name, dbuf, size)) {
-> |               dev_dbg(device, "using built-in %s\n", name);
-> |               return 0; /* assigned */
-> |       }
-> ... and with firmware_request_builtin() also via `name`:
-> |       if (strcmp(name, b_fw->name) == 0) {
-> 
-> There is no evidence that NUL-padding is required.
-> 
-> Considering the above, a suitable replacement is `strscpy` [2] due to
-> the fact that it guarantees NUL-termination on the destination buffer
-> without unnecessarily NUL-padding.
-
-When doing the hard-coded value to sizeof(), can you include in the
-commit log the rationale for it? For example:
-
-  Additionally replace size macro (QLC_FW_FILE_NAME_LEN) with
-  sizeof(fw_info->fw_file_name) to more directly tie the maximum buffer
-  size to the destination buffer:
-
-  struct qlc_83xx_fw_info {
-          ...
-          char    fw_file_name[QLC_FW_FILE_NAME_LEN];
-  };
 
 
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
-> ---
-> Note: build-tested only.
-> 
-> Found with: $ rg "strncpy\("
-> ---
->  drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c
-> index c95d56e56c59..b733374b4dc5 100644
-> --- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c
-> +++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_init.c
-> @@ -2092,8 +2092,8 @@ static int qlcnic_83xx_run_post(struct qlcnic_adapter *adapter)
->  		return -EINVAL;
->  	}
->  
-> -	strncpy(fw_info->fw_file_name, QLC_83XX_POST_FW_FILE_NAME,
-> -		QLC_FW_FILE_NAME_LEN);
-> +	strscpy(fw_info->fw_file_name, QLC_83XX_POST_FW_FILE_NAME,
-> +		sizeof(fw_info->fw_file_name));
->  
->  	ret = request_firmware(&fw_info->fw, fw_info->fw_file_name, dev);
->  	if (ret) {
-> @@ -2396,12 +2396,12 @@ static int qlcnic_83xx_get_fw_info(struct qlcnic_adapter *adapter)
->  		switch (pdev->device) {
->  		case PCI_DEVICE_ID_QLOGIC_QLE834X:
->  		case PCI_DEVICE_ID_QLOGIC_QLE8830:
-> -			strncpy(fw_info->fw_file_name, QLC_83XX_FW_FILE_NAME,
-> -				QLC_FW_FILE_NAME_LEN);
-> +			strscpy(fw_info->fw_file_name, QLC_83XX_FW_FILE_NAME,
-> +				sizeof(fw_info->fw_file_name));
->  			break;
->  		case PCI_DEVICE_ID_QLOGIC_QLE844X:
-> -			strncpy(fw_info->fw_file_name, QLC_84XX_FW_FILE_NAME,
-> -				QLC_FW_FILE_NAME_LEN);
-> +			strscpy(fw_info->fw_file_name, QLC_84XX_FW_FILE_NAME,
-> +				sizeof(fw_info->fw_file_name));
->  			break;
->  		default:
->  			dev_err(&pdev->dev, "%s: Invalid device id\n",
+On Sat, 14 Oct 2023, Kees Cook wrote:
 
-But yes, this all looks right to me.
+> On Sat, Oct 14, 2023 at 08:34:53AM +0200, Christophe JAILLET wrote:
+> > Prepare for the coming implementation by GCC and Clang of the __counted_by
+> > attribute. Flexible array members annotated with __counted_by can have
+> > their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+> > (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> > functions).
+> >
+> > Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> > ---
+> > v2: Fix the subject  [Ilya Maximets]
+> >     fix the field name used with __counted_by  [Ilya Maximets]
+> >
+> > v1: https://lore.kernel.org/all/f66ddcf1ef9328f10292ea75a17b584359b6cde3.1696156198.git.christophe.jaillet@wanadoo.fr/
+> >
+> >
+> > This patch is part of a work done in parallel of what is currently worked
+> > on by Kees Cook.
+> >
+> > My patches are only related to corner cases that do NOT match the
+> > semantic of his Coccinelle script[1].
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+What was the problem with the semantic patch in this case?
 
--- 
-Kees Cook
+thanks,
+julia
+
+
+> >
+> > In this case, in tbl_mask_array_alloc(), several things are allocated with
+> > a single allocation. Then, some pointer arithmetic computes the address of
+> > the memory after the flex-array.
+> >
+> > [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
+> > ---
+> >  net/openvswitch/flow_table.h | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/openvswitch/flow_table.h b/net/openvswitch/flow_table.h
+> > index 9e659db78c05..f524dc3e4862 100644
+> > --- a/net/openvswitch/flow_table.h
+> > +++ b/net/openvswitch/flow_table.h
+> > @@ -48,7 +48,7 @@ struct mask_array {
+> >  	int count, max;
+> >  	struct mask_array_stats __percpu *masks_usage_stats;
+> >  	u64 *masks_usage_zero_cntr;
+> > -	struct sw_flow_mask __rcu *masks[];
+> > +	struct sw_flow_mask __rcu *masks[] __counted_by(max);
+> >  };
+>
+> Yup, this looks correct to me. Thanks!
+>
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+>
+> --
+> Kees Cook
+>
 
