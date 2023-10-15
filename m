@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-41101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A41307C9AEF
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 21:10:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC13C7C9AF0
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 21:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FD5A1C208C7
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 19:10:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D38F1C20979
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 19:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4367F9D3;
-	Sun, 15 Oct 2023 19:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D960F9F8;
+	Sun, 15 Oct 2023 19:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XV0FMx51"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NyBHbEbj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83246259B
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 19:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E0DDCC433C9;
-	Sun, 15 Oct 2023 19:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3C1F9E9
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 19:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 02B12C433C9;
+	Sun, 15 Oct 2023 19:10:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697397023;
-	bh=J0G7xRI+dz2lTSms94crS+csF2xB8Yy166ftDr4IzeQ=;
+	s=k20201202; t=1697397025;
+	bh=RN0NGHUYPedHiC6SYb3gNz26CFkynA2t5TB3FnLOLTk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XV0FMx51MAmZZfEBnjzqC1LDBIYC4D4Pd4tjm/N31D575+enfcobi4zEFwa7FS6sJ
-	 Gm7F/kqTFNAzuUJf4d2lVbNUVH8DIBJAYmWZL7jbdxzuQ0HyIq97fFNrIxxduWwo2s
-	 YIJB183jxCePradMObglbjCmPxBqciqgcyEODSN4sHfMT5gRgD0eq/zoAK12DWIBNL
-	 SKdUGkmWIaihA63qpbTkMyn4evBOWKGbyZHBMyNpIAkLxQkASf5j1/7tgm76eROcux
-	 igu8pHzzr1KOzDBX8ckggJRfx57qycd7ushTCKkYB3byZ/UjEXjexZw2+ZKGBIzERS
-	 83mqjl0lYjUxA==
+	b=NyBHbEbj9EmhV4IPNOAiML2oDe5VUJSsrDzJZDrq935DgAFp0Dt9lk6YbBU4/xRlg
+	 BYQiATSqQbn4/xMaIVyewfrCstzdbmCF2c7Q2ypemjBRv7W2BodABTJdAQnb7mbAd4
+	 C8qEjZGHJ4pPQu92eMaKmagnUTlDznF9kbpnKKMxViLtvg+Qzalg92mWQZTcnEly0L
+	 14Tl+pgV86+OtlL3rhZEj8WF7JB3QhHxPbYVGXnSNa7VJvxpP8MmWBd3tfZYTLWNvr
+	 AfWwSO5PzVS/8Y3f9Wdp+xsfvMTPNlBsJ2keZcALYi76P2tna+iB4dIUiEx/sRDLyX
+	 eUNiFaLzc94fQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C2125C691EF;
-	Sun, 15 Oct 2023 19:10:23 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DFC1AC39563;
+	Sun, 15 Oct 2023 19:10:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,44 +43,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/4] selftests: openvswitch: Minor fixes for some
- systems
+Subject: Re: [PATCH net-next v6 0/6] ptp: Support for multiple filtered timestamp
+ event queue readers
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169739702379.16848.2168367864052155252.git-patchwork-notify@kernel.org>
-Date: Sun, 15 Oct 2023 19:10:23 +0000
-References: <20231011194939.704565-1-aconole@redhat.com>
-In-Reply-To: <20231011194939.704565-1-aconole@redhat.com>
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- pshelar@ovn.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, amorenoz@redhat.com, echaudro@redhat.com, shuah@kernel.org
+ <169739702490.16848.5167099930461687378.git-patchwork-notify@kernel.org>
+Date: Sun, 15 Oct 2023 19:10:24 +0000
+References: <cover.1697062274.git.reibax@gmail.com>
+In-Reply-To: <cover.1697062274.git.reibax@gmail.com>
+To: Xabier Marquiegui <reibax@gmail.com>
+Cc: netdev@vger.kernel.org, richardcochran@gmail.com, tglx@linutronix.de,
+ jstultz@google.com, horms@kernel.org, chrony-dev@chrony.tuxfamily.org,
+ mlichvar@redhat.com, ntp-lists@mattcorallo.com, vinicius.gomes@intel.com,
+ davem@davemloft.net, rrameshbabu@nvidia.com, shuah@kernel.org,
+ kuba@kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Wed, 11 Oct 2023 15:49:35 -0400 you wrote:
-> A number of corner cases were caught when trying to run the selftests on
-> older systems.  Missed skip conditions, some error cases, and outdated
-> python setups would all report failures but the issue would actually be
-> related to some other condition rather than the selftest suite.
+On Thu, 12 Oct 2023 00:39:52 +0200 you wrote:
+> On systems with multiple timestamp event channels, there can be scenarios
+> where multiple userspace readers want to access the timestamping data for
+> various purposes.
 > 
-> Address these individual cases.
+> One such example is wanting to use a pps out for time synchronization, and
+> wanting to timestamp external events with the synchronized time base
+> simultaneously.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/4] selftests: openvswitch: Add version check for pyroute2
-    https://git.kernel.org/netdev/net/c/92e37f20f20a
-  - [net,v2,2/4] selftests: openvswitch: Catch cases where the tests are killed
-    https://git.kernel.org/netdev/net/c/af846afad5ca
-  - [net,v2,3/4] selftests: openvswitch: Skip drop testing on older kernels
-    https://git.kernel.org/netdev/net/c/76035fd12cb9
-  - [net,v2,4/4] selftests: openvswitch: Fix the ct_tuple for v4
-    https://git.kernel.org/netdev/net/c/8eff0e062201
+  - [net-next,v6,1/6] posix-clock: introduce posix_clock_context concept
+    https://git.kernel.org/netdev/net-next/c/60c6946675fc
+  - [net-next,v6,2/6] ptp: Replace timestamp event queue with linked list
+    https://git.kernel.org/netdev/net-next/c/d26ab5a35ad9
+  - [net-next,v6,3/6] ptp: support multiple timestamp event readers
+    https://git.kernel.org/netdev/net-next/c/8f5de6fb2453
+  - [net-next,v6,4/6] ptp: support event queue reader channel masks
+    https://git.kernel.org/netdev/net-next/c/c5a445b1e934
+  - [net-next,v6,5/6] ptp: add debugfs interface to see applied channel masks
+    https://git.kernel.org/netdev/net-next/c/403376ddb422
+  - [net-next,v6,6/6] ptp: add testptp mask test
+    https://git.kernel.org/netdev/net-next/c/26285e689c6c
 
 You are awesome, thank you!
 -- 
