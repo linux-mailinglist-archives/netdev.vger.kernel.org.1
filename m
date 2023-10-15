@@ -1,158 +1,129 @@
-Return-Path: <netdev+bounces-41106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEA7F7C9BDE
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 23:19:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BA427C9C9E
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 01:51:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0903B1C204AB
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 21:19:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE00E28166D
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 23:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC9813ADF;
-	Sun, 15 Oct 2023 21:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED59914F9E;
+	Sun, 15 Oct 2023 23:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mAUEdKRM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m1ubDWIZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46408748D;
-	Sun, 15 Oct 2023 21:18:49 +0000 (UTC)
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A541AA1;
-	Sun, 15 Oct 2023 14:18:47 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-417f872fb94so28179271cf.0;
-        Sun, 15 Oct 2023 14:18:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697404727; x=1698009527; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZK3DjSDrs7+Fpjx53h+0VI7muc22Uwp8hTfWyevlIao=;
-        b=mAUEdKRMcELyf3y53ETpjL6rINFVlSwUSWMUX3iiQv29we6zlBpWmM3Xf+YJcBO3u1
-         sTJ1d1gW7V9i3PqP3Dt5cAtllldX7gfZZQyz39Jkdr8O7ekMrsDYq5Wp4F6WJYg0uVY4
-         R9Nn06Bw4NNzwlk/ZpFdNTMdgxUItLPqNVFYLvbfhiMNmvyI+rOPqqdrvGmQJNevhZZI
-         n82YvRIoAj16M1ORbHcH3/dmMLZQGTFz8LdbdNfL9Fi7AubzzqnrXRmcpVqy1tUM6lzm
-         DXXAV/gKdY8UgmFYennRicOQWqzx9LKe6mMahwY/Sc1xJHrUXcEZICyVbv0nhFtyLyR6
-         0Wgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697404727; x=1698009527;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZK3DjSDrs7+Fpjx53h+0VI7muc22Uwp8hTfWyevlIao=;
-        b=JkzXl0y5spb+9PnjJ8iMeSpNH44CR796AAHnz78NgR1NckBfuQYHI5/ySw8D5MG3WB
-         I7CYdYS99lOeAqqsbCJQURK0y9UCI7iS738pSOzligY+1cFeG7Py4B8V9rvCPvofaOY2
-         3cS7cAcgMVw4WlzrcaXqdAFUIH58zn4EzyPsKormwWmJaGak6E540wXy7JE7WH72Xzge
-         ZmC6fgijnMgdJIoWsJX9T6lBxeNp5PE+4vCSvJllhLorYz3OwJ9GYcaD1gk+o6XtE+BW
-         9sntt9ZLExPUMEwwu7ReXhNvbwthml7K2BnKcS3nSJJgydK7lMXXD1543WEQ6gQz/lZF
-         5Wkw==
-X-Gm-Message-State: AOJu0YyYRCdzXLM+StqC2IoVQlfQ6anbg64oEu+kYwjSg70K0RwU3/RI
-	qiam0BcOHfXVYHxMAUZ6kRI=
-X-Google-Smtp-Source: AGHT+IE5lV49udTMBJubPOE9Br0wBZEZ+q481szijXd/ZC1Q/XOuqodJfDrN5ihP7pT48HinMMUcCw==
-X-Received: by 2002:ac8:5916:0:b0:410:90c7:5185 with SMTP id 22-20020ac85916000000b0041090c75185mr40960539qty.54.1697404726705;
-        Sun, 15 Oct 2023 14:18:46 -0700 (PDT)
-Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id ie4-20020a05622a698400b00403ad6ec2e8sm2474500qtb.26.2023.10.15.14.18.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 15 Oct 2023 14:18:46 -0700 (PDT)
-Message-ID: <188688f2-1028-41ee-ba0a-c52456f63111@gmail.com>
-Date: Sun, 15 Oct 2023 14:18:43 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B7E14AB8
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 23:51:05 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00B81AD
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 16:51:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697413864; x=1728949864;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8nl5ahvXJDF1WoW7ftzJdmLFO0AXB8NwzYNKaesAV64=;
+  b=m1ubDWIZf+e6NCCIAkTiV/oV0KwwwUdKk//I/6zoka6REsoEO61DcWkS
+   gm7YZsSPrUfyeDS7C+JLeNI8YR6KUv9/szklqT9M0dSngj4mpe8NcbZog
+   f+8jCMGT3gw++xiMrl3JmEEc8/emT1E9s0pRDbyCaYJE2o5TQBq/kosNs
+   Jz/QjUg1QayyNmEzp5btj0eBfJPkPenWEvJjOYPw8o8OpRoUr0uCTH9M+
+   T85Ssmnw4oBKYx1TKL+R/tDFXGBiuCFWXq08LAkKIh23BDHVwMJV08bpy
+   Xnqm9RM1brFWtlpXKX1r+1Jo5ht8RABZldAAEX73w9mBkV3IognLTj6VW
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="370496071"
+X-IronPort-AV: E=Sophos;i="6.03,228,1694761200"; 
+   d="scan'208";a="370496071"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2023 16:51:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="929159757"
+X-IronPort-AV: E=Sophos;i="6.03,228,1694761200"; 
+   d="scan'208";a="929159757"
+Received: from unknown (HELO fedora.jf.intel.com) ([10.166.244.144])
+  by orsmga005.jf.intel.com with ESMTP; 15 Oct 2023 16:51:02 -0700
+From: Paul Greenwalt <paul.greenwalt@intel.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	aelior@marvell.com,
+	manishc@marvell.com,
+	vladimir.oltean@nxp.com,
+	jdamato@fastly.com,
+	pawel.chmielewski@intel.com,
+	edumazet@google.com,
+	intel-wired-lan@lists.osuosl.org,
+	horms@kernel.org,
+	kuba@kernel.org,
+	d-tatianin@yandex-team.ru,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	jiri@resnulli.us,
+	Paul Greenwalt <paul.greenwalt@intel.com>
+Subject: [PATCH net-next v5 0/3] ethtool: Add link mode maps for forced speeds
+Date: Sun, 15 Oct 2023 19:43:01 -0400
+Message-ID: <20231015234304.2633-1-paul.greenwalt@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/7] net: dsa: microchip: Set unique MAC at
- startup for WoL support
-Content-Language: en-US
-To: Vladimir Oltean <olteanv@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Woojung Huh <woojung.huh@microchip.com>,
- Arun Ramadoss <arun.ramadoss@microchip.com>,
- Conor Dooley <conor+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com, "Russell King (Oracle)"
- <linux@armlinux.org.uk>, devicetree@vger.kernel.org
-References: <20231013122405.3745475-1-o.rempel@pengutronix.de>
- <20231013122405.3745475-3-o.rempel@pengutronix.de>
- <20231013123249.bhigwsezy6afb5qt@skbuf>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231013123249.bhigwsezy6afb5qt@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+The following patch set was initially a part of [1]. As the purpose of the
+original series was to add the support of the new hardware to the intel ice
+driver, the refactoring of advertised link modes mapping was extracted to a
+new set.
+
+The patch set adds a common mechanism for mapping Ethtool forced speeds
+with Ethtool supported link modes, which can be used in drivers code.
+
+[1] https://lore.kernel.org/netdev/20230823180633.2450617-1-pawel.chmielewski@intel.com
+
+Changelog:
+v4->v5:
+Separated ethtool and qede changes into two patches, fixed indentation,
+and moved ethtool_forced_speed_maps_init() from ioctl.c to ethtool.h
+
+v3->v4:
+Moved the macro for setting fields into the common header file
+
+v2->v3:
+Fixed whitespaces, added missing line at end of file
+
+v1->v2:
+Fixed formatting, typo, moved declaration of iterator to loop line.
+
+Paul Greenwalt (2):
+  ethtool: Add forced speed to supported link modes maps
+  qede: Refactor qede_forced_speed_maps_init()
+
+Pawel Chmielewski (1):
+  ice: Refactor finding advertised link speed
+
+ drivers/net/ethernet/intel/ice/ice.h          |   1 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  | 193 ++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_main.c     |   2 +
+ .../net/ethernet/qlogic/qede/qede_ethtool.c   |  46 ++---
+ include/linux/ethtool.h                       |  37 ++++
+ include/linux/linkmode.h                      |  29 +--
+ 6 files changed, 195 insertions(+), 113 deletions(-)
 
 
-On 10/13/2023 5:32 AM, Vladimir Oltean wrote:
-> On Fri, Oct 13, 2023 at 02:24:00PM +0200, Oleksij Rempel wrote:
->> Set a unique global MAC address for each switch on the network at system
->> startup by syncing the switch's global MAC address with the Ethernet
->> address of the DSA master interface. This is crucial for supporting
->> Wake-on-LAN (WoL) functionality, as it requires a unique address for
->> each switch.
->>
->> Although the operation is performed only at system start and won't sync
->> if the master Ethernet address changes dynamically, it lays the
->> groundwork for WoL support by ensuring a unique MAC address for each
->> switch.
->>
->> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
->> ---
-> 
-> Why not take the MAC address of the user port at ksz9477_set_wol() time,
-> and use the existing ksz_switch_macaddr_get() API that was just added so
-> that this use case could work?
-
-Agreed we do that in a number of Ethernet MAC and PHY drivers FWIW 
-(net_device::dev_addr).
+base-commit: ac4dec3fd63c7da703c244698fc92efb411ff0d4
 -- 
-Florian
+2.40.0
+
 
