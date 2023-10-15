@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-41080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 700787C9930
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 15:40:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C7267C992F
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 15:40:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7FA8B20B71
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDE282816FE
 	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 13:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8026FC5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02446FC8;
 	Sun, 15 Oct 2023 13:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D3XCGPD7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="giVEbcTx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE4063B1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCDF6FA6
 	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 13:40:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3734EC433C8;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3EF85C433CA;
 	Sun, 15 Oct 2023 13:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1697377223;
-	bh=6Mewa66v8BFCchHUq3fJshoDXWM7XvqrgL6LOYfNQ5A=;
+	bh=jlQMl8V0cPpM03iOqNyy7WoktBR6yvB2hol+PjBAy4w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=D3XCGPD7hW8kYrTPpM3j/FV684hSxNCdzR68EEKgdmGKo4/IMY1NjVw0E5XeIRzTl
-	 nUNLyqFGY8ENnHfbYa5jCjY1D/DXwkUozUGcR2X1TaGM5wCUa51++tCcwilSORamAd
-	 kIrrGvpcTqa3fHR7p/g5r1mIM0g70897IMU+Ll6lqPFYPgqnX38RPrN7VRyNvOfrGJ
-	 myjVkiHGuUf4vBfvv8pBU49Q0Z9NujCptSHdaxLLOVTCTZRmjymdZndVP0q2fv9aYJ
-	 UOxLuGoJTm3zMGR3lU/5X1NgKho1V19gjGhue79drxXN9f0ZIYZOLIpolXljY1pady
-	 1jonfls8tmvFQ==
+	b=giVEbcTxd/PNeD7rqMjTlOUr3lIw3WjzEMRmz2EDFmg6OD/4zj0JSh4mAt0XYDOXE
+	 HmXgKE7HPnFWwcjwGu03RuZTQ1EN/jIl/uDIsgvFtx5Rr+oCnpgJG2s3nZbSHbQK93
+	 lTdyRIRw2Fszt28Z3ULbj7oWQm8d1FyYPKoiq3BxVvaL6CumR8qB/2niIt4XifKLfC
+	 Pc4EmpYqPzyW3PoBQ3P+h3z+HuB8i8idDCl8+vGtIgi0dlC4WXHfW3F7cPSQ50vjF0
+	 3xvJUkgcU/AChHcN2/i06Zys+CjIp0swh9Y5+7dV5B1SONOYyd5jXBexTJ+HhQlZoK
+	 4LpFoNxCEgcEA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1F6A5C595D0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 264C4C39563;
 	Sun, 15 Oct 2023 13:40:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,47 +43,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] i40e: Add basic devlink support
+Subject: Re: [PATCH net-next] tg3: Improve PTP TX timestamping logic
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169737722312.30429.981395182996753709.git-patchwork-notify@kernel.org>
+ <169737722315.30429.4672321534339473993.git-patchwork-notify@kernel.org>
 Date: Sun, 15 Oct 2023 13:40:23 +0000
-References: <20231013170755.2367410-1-ivecera@redhat.com>
-In-Reply-To: <20231013170755.2367410-1-ivecera@redhat.com>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org
+References: <20231013135919.408357-1-pavan.chebbi@broadcom.com>
+In-Reply-To: <20231013135919.408357-1-pavan.chebbi@broadcom.com>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
+ michael.chan@broadcom.com, gospo@broadcom.com, pabeni@redhat.com,
+ edumazet@google.com, richardcochran@gmail.com,
+ Simon.White@viavisolutions.com, kalesh-anakkur.purayil@broadcom.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri, 13 Oct 2023 19:07:50 +0200 you wrote:
-> The series adds initial support for devlink to i40e driver.
-> 
-> Patch-set overview:
-> Patch 1: Adds initial devlink support (devlink and port registration)
-> Patch 2: Refactors and split i40e_nvm_version_str()
-> Patch 3: Adds support for 'devlink dev info'
-> Patch 4: Refactors existing helper function to read PBA ID
-> Patch 5: Adds 'board.id' to 'devlink dev info' using PBA ID
+On Fri, 13 Oct 2023 06:59:19 -0700 you wrote:
+> When we are trying to timestamp a TX packet, there may be
+> occasions when the TX timestamp register is still not
+> updated with the latest timestamp even if the timestamp
+> packet descriptor is marked as complete.
+> This usually happens in cases where the system is under
+> stress or flow control is affecting the transmit side.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/5] i40e: Add initial devlink support
-    https://git.kernel.org/netdev/net-next/c/9e479d64dc58
-  - [net-next,2/5] i40e: Split and refactor i40e_nvm_version_str()
-    https://git.kernel.org/netdev/net-next/c/7aabde397683
-  - [net-next,3/5] i40e: Add handler for devlink .info_get
-    https://git.kernel.org/netdev/net-next/c/5a423552e0d9
-  - [net-next,4/5] i40e: Refactor and rename i40e_read_pba_string()
-    https://git.kernel.org/netdev/net-next/c/df19ea696644
-  - [net-next,5/5] i40e: Add PBA as board id info to devlink .info_get
-    https://git.kernel.org/netdev/net-next/c/3e02480d5e38
+  - [net-next] tg3: Improve PTP TX timestamping logic
+    https://git.kernel.org/netdev/net-next/c/b22f21f7a541
 
 You are awesome, thank you!
 -- 
