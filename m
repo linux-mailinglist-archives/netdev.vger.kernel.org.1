@@ -1,134 +1,157 @@
-Return-Path: <netdev+bounces-41064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 876417C97EC
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 06:53:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F1A87C97F8
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 07:14:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 242A9281A59
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 04:53:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E62B21F21672
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 05:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23831855;
-	Sun, 15 Oct 2023 04:53:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B7B1863;
+	Sun, 15 Oct 2023 05:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="k5IQxBjX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOrAGgvB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79FE9EDB;
-	Sun, 15 Oct 2023 04:53:37 +0000 (UTC)
-Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D1DD9;
-	Sat, 14 Oct 2023 21:53:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A19FEDB
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 05:14:09 +0000 (UTC)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC0BFB7;
+	Sat, 14 Oct 2023 22:14:06 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6b5e6301a19so1459759b3a.0;
+        Sat, 14 Oct 2023 22:14:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=fMGwmeCiI2WGZSSIY9zDXk4JfSuYvkdAr36FIasOYjU=;
-  b=k5IQxBjXGV3CnXmP7VgfiaoFeBhRXdFbvwWcEJ86HrDH2aegcMqgy9/b
-   I9LI0HC1txkCq9sNogIroruo9K0Hh9y5ZrXnsAxRar8tN2v4I3LVDbRSv
-   x6yt7j8E7k1e7EcOSnJOckIDAkgHN9kLA1i0nOA4E0PtLe9QlrFZZ21U9
-   w=;
-Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.03,226,1694728800"; 
-   d="scan'208";a="68734435"
-Received: from 231.85.89.92.rev.sfr.net (HELO hadrien) ([92.89.85.231])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2023 06:53:30 +0200
-Date: Sun, 15 Oct 2023 06:53:29 +0200 (CEST)
-From: Julia Lawall <julia.lawall@inria.fr>
-X-X-Sender: jll@hadrien
-To: Kees Cook <keescook@chromium.org>
-cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
-    Pravin B Shelar <pshelar@ovn.org>, "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, 
-    "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
-    Nathan Chancellor <nathan@kernel.org>, 
-    Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>, 
-    linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-    netdev@vger.kernel.org, dev@openvswitch.org, 
-    linux-hardening@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v2 2/2] net: openvswitch: Annotate struct mask_array with
- __counted_by
-In-Reply-To: <202310141928.23985F1CA@keescook>
-Message-ID: <alpine.DEB.2.22.394.2310150653070.3260@hadrien>
-References: <e5122b4ff878cbf3ed72653a395ad5c4da04dc1e.1697264974.git.christophe.jaillet@wanadoo.fr> <ca5c8049f58bb933f231afd0816e30a5aaa0eddd.1697264974.git.christophe.jaillet@wanadoo.fr> <202310141928.23985F1CA@keescook>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+        d=gmail.com; s=20230601; t=1697346846; x=1697951646; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=G+WDk3/mBm7uAe+u8znmKpDcmMQhVxbylz6EuuqaKXY=;
+        b=WOrAGgvBQwGu9OroYH1HUwpA7IE59B3L1osh4W0hakKjJN8FIJPcQeyJ/LzqThEnH9
+         bWdIeCDfBSbb0qBVdiLct7j31pw6AuCWQ+2jcEs7kbvybfxI+z9ZL5lnazAxgvH1bb+Y
+         MrNbXCBqgvpGi+tN8eKMo1cTMFfAO20xvkRhEZs4i4Z7vXrxdKqX3fPfJ7bemYjXNxSw
+         bX+4IsCtsz1bImfL+dtdR08pKvrcQlCVpgRSlQGFNZHPSlWZA61VyWcveX/zvxB/sCr3
+         BtjDBHYM1sJFsNQFK+1dbHwC+YWVRyPAxSIWBpAB8PrBp56syUsm0ijw+fu470+DCC1l
+         uYBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697346846; x=1697951646;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G+WDk3/mBm7uAe+u8znmKpDcmMQhVxbylz6EuuqaKXY=;
+        b=fVyjRtUfaSX9QFio2oYlXRLsXI0wy/FEwj9rE26ma3l2L7Uivts5rDn6nIJ9Ywro/Q
+         9ObpdnBzn2+p4qzIi1yRcqUrw98Canlvqt7LSbVKVyz0eSJLWBy2OTBSnGpHJnTrcMoj
+         Db49zhQ7FOo6ycfr7WiYPrjKLBvPNEzVeOBif08Ufd+10rxIUdzr+VEyMEr/qxgKPl/M
+         mTcy0NUye+t77kbdr+jRagFjWL8WN+JlTtU4Vi/YsvRYzLoNsXxxQqWRsw227ruCuJue
+         CxvU7ax2dOlDZENUKnulV33kz0U847Vs8p6weDqVRWTV1WnuBCdKgBaD0BvuVNvyR7Bf
+         rlQg==
+X-Gm-Message-State: AOJu0Yyfl4BWjPAuR1FqOo/vXyk6ccGJjMY8LN98pT+xHO2Znp7m0kg+
+	UGLq1/F1AzeG0Jk2E67v+PKylOZowBg=
+X-Google-Smtp-Source: AGHT+IFPYNO7aeSI01N8jGv3l6yrQeaszyKagpcRglFXE3YzTUrlgadgDCS5iFPaoBIOErN37Pt65A==
+X-Received: by 2002:a05:6a00:214a:b0:6bc:e7f8:821e with SMTP id o10-20020a056a00214a00b006bce7f8821emr1899469pfk.10.1697346846107;
+        Sat, 14 Oct 2023 22:14:06 -0700 (PDT)
+Received: from debian.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id e7-20020a62ee07000000b006879493aca0sm15531275pfi.26.2023.10.14.22.14.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Oct 2023 22:14:05 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id DAC739E897CB; Sun, 15 Oct 2023 12:14:02 +0700 (WIB)
+Date: Sun, 15 Oct 2023 12:14:02 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: chenguohua@jari.cn, linux@armlinux.org.uk
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: sfp: Clean up errors in sfp.h
+Message-ID: <ZSt1GkmyO_6iit3-@debian.me>
+References: <1a7c167f.942.18b26fb3ec9.Coremail.chenguohua@jari.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="v4L48laAikyil5vP"
+Content-Disposition: inline
+In-Reply-To: <1a7c167f.942.18b26fb3ec9.Coremail.chenguohua@jari.cn>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
+--v4L48laAikyil5vP
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 14 Oct 2023, Kees Cook wrote:
+On Fri, Oct 13, 2023 at 11:01:21AM +0800, chenguohua@jari.cn wrote:
+> Fix the following errors reported by checkpatch:
+>=20
+> ERROR: spaces required around that '=3D' (ctx:VxW)
+>=20
+> Signed-off-by: GuoHua Cheng <chenguohua@jari.cn>
+> ---
+>  include/linux/sfp.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/include/linux/sfp.h b/include/linux/sfp.h
+> index 9346cd44814d..725c8381a347 100644
+> --- a/include/linux/sfp.h
+> +++ b/include/linux/sfp.h
+> @@ -289,10 +289,10 @@ enum {
+>  	SFF8024_ENCODING_8B10B		=3D 0x01,
+>  	SFF8024_ENCODING_4B5B		=3D 0x02,
+>  	SFF8024_ENCODING_NRZ		=3D 0x03,
+> -	SFF8024_ENCODING_8472_MANCHESTER=3D 0x04,
+> +	SFF8024_ENCODING_8472_MANCHESTER =3D 0x04,
+>  	SFF8024_ENCODING_8472_SONET	=3D 0x05,
+>  	SFF8024_ENCODING_8472_64B66B	=3D 0x06,
+> -	SFF8024_ENCODING_8436_MANCHESTER=3D 0x06,
+> +	SFF8024_ENCODING_8436_MANCHESTER =3D 0x06,
+>  	SFF8024_ENCODING_8436_SONET	=3D 0x04,
+>  	SFF8024_ENCODING_8436_64B66B	=3D 0x05,
+>  	SFF8024_ENCODING_256B257B	=3D 0x07,
+> @@ -306,11 +306,11 @@ enum {
+>  	SFF8024_CONNECTOR_MT_RJ		=3D 0x08,
+>  	SFF8024_CONNECTOR_MU		=3D 0x09,
+>  	SFF8024_CONNECTOR_SG		=3D 0x0a,
+> -	SFF8024_CONNECTOR_OPTICAL_PIGTAIL=3D 0x0b,
+> +	SFF8024_CONNECTOR_OPTICAL_PIGTAIL =3D 0x0b,
+>  	SFF8024_CONNECTOR_MPO_1X12	=3D 0x0c,
+>  	SFF8024_CONNECTOR_MPO_2X16	=3D 0x0d,
+>  	SFF8024_CONNECTOR_HSSDC_II	=3D 0x20,
+> -	SFF8024_CONNECTOR_COPPER_PIGTAIL=3D 0x21,
+> +	SFF8024_CONNECTOR_COPPER_PIGTAIL =3D 0x21,
+>  	SFF8024_CONNECTOR_RJ45		=3D 0x22,
+>  	SFF8024_CONNECTOR_NOSEPARATE	=3D 0x23,
+>  	SFF8024_CONNECTOR_MXC_2X16	=3D 0x24,
 
-> On Sat, Oct 14, 2023 at 08:34:53AM +0200, Christophe JAILLET wrote:
-> > Prepare for the coming implementation by GCC and Clang of the __counted_by
-> > attribute. Flexible array members annotated with __counted_by can have
-> > their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
-> > (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
-> > functions).
-> >
-> > Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> > ---
-> > v2: Fix the subject  [Ilya Maximets]
-> >     fix the field name used with __counted_by  [Ilya Maximets]
-> >
-> > v1: https://lore.kernel.org/all/f66ddcf1ef9328f10292ea75a17b584359b6cde3.1696156198.git.christophe.jaillet@wanadoo.fr/
-> >
-> >
-> > This patch is part of a work done in parallel of what is currently worked
-> > on by Kees Cook.
-> >
-> > My patches are only related to corner cases that do NOT match the
-> > semantic of his Coccinelle script[1].
+To be consistent, other enum's indentation should also be aligned to match
+the longest ones (MANCHESTER and PIGTAIL).
 
-What was the problem with the semantic patch in this case?
+In netdev, though, checkpatch fixes are not welcome (auto-rejected) as these
+make stable backports more convoluted.
 
-thanks,
-julia
+Thanks.
 
+--=20
+An old man doll... just what I always wanted! - Clara
 
-> >
-> > In this case, in tbl_mask_array_alloc(), several things are allocated with
-> > a single allocation. Then, some pointer arithmetic computes the address of
-> > the memory after the flex-array.
-> >
-> > [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
-> > ---
-> >  net/openvswitch/flow_table.h | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/openvswitch/flow_table.h b/net/openvswitch/flow_table.h
-> > index 9e659db78c05..f524dc3e4862 100644
-> > --- a/net/openvswitch/flow_table.h
-> > +++ b/net/openvswitch/flow_table.h
-> > @@ -48,7 +48,7 @@ struct mask_array {
-> >  	int count, max;
-> >  	struct mask_array_stats __percpu *masks_usage_stats;
-> >  	u64 *masks_usage_zero_cntr;
-> > -	struct sw_flow_mask __rcu *masks[];
-> > +	struct sw_flow_mask __rcu *masks[] __counted_by(max);
-> >  };
->
-> Yup, this looks correct to me. Thanks!
->
-> Reviewed-by: Kees Cook <keescook@chromium.org>
->
-> --
-> Kees Cook
->
+--v4L48laAikyil5vP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZSt1GgAKCRD2uYlJVVFO
+o32hAP9QYVZ7joG4QINC/SIgwAKup3NqZVPF6Nd+fO62v8gFhwEAikdG0aJCslJx
+37l5zFrIz6QL6e2JYEElblDRIDNp4gc=
+=mbEP
+-----END PGP SIGNATURE-----
+
+--v4L48laAikyil5vP--
 
