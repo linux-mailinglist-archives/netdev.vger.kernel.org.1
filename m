@@ -1,109 +1,154 @@
-Return-Path: <netdev+bounces-41071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF2307C98F8
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 14:30:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 481007C98FF
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 14:37:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40B1528187A
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 12:30:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F2BB28167A
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 12:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CCDE63DD;
-	Sun, 15 Oct 2023 12:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CDCF63C6;
+	Sun, 15 Oct 2023 12:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LUz+ocZc"
+	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="hpAaDbTW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED16D63D3
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 12:30:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 63950C433C9;
-	Sun, 15 Oct 2023 12:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697373027;
-	bh=i1YcrOqbwjKT/jMQfm28HMA/2YUC7i58f8iAS5jZh0Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LUz+ocZc5wTID/nfn03/wnOkcADgmXIsDkR0/28y12nztBMcO7eG5uUN2SRzUWiJN
-	 2IXM6dukmCdPC0fJa0b8Kt0vus1jukQj0Id9fyJy4UeN55s2JKowKitzDlOo5vBRxh
-	 HNiwlGdTEJBI5iq4JWHio5VS7gF32HMpsEQJFTTEg2cwzR/931NZW14XJmyc4dCtE8
-	 rY0HylHPxtt4Rj9sPIGFhipxrONFTCbwMyrw04N/Jmh+20TQfv+L86LY+kB+vmaxX0
-	 z1eTdFf4/GTZSYvsgsFisN2Vwq97lNa+/5RAGbP1mdR/HuPeiMIXvOt463+Uj22B9h
-	 QXdc08sRs0cqw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4945AE1F666;
-	Sun, 15 Oct 2023 12:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF65FEDB
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 12:37:10 +0000 (UTC)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2112.outbound.protection.outlook.com [40.107.20.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 928C0AB
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 05:37:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PI1vQi1We9n/a72q0+VQ2SCVY0raKU0jWCsgWOET1zPwC2oLpMnvH5UCjCE1EUoamSCIGbR/BOyrkW/I6YyI9E31j/pVf5G4RYKcy9eHpdkay8c4oMcmxnmV8LFqdk/ZY4k45jEVA2gAHDxAAn1ycCAaDtJrAIp53R1v4/+U35OKFrqs1Lx8t12nMgEso5pUGW9UQE+6knFj8gjzq3xE7Fn8xUvyWbyQWTLZOUYdAhgbLDa9UwgZdsi4TJgNf7PrPBfNo27u/m3U3X7Y9BhrgssnSwd0AQmkEajFNvU6CQXzLiL3gO0tqOo5juM3HccAHHA/rx0/7PV/Wtb8uN2Sdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GvgzguQnNuPk93uE0ZhDpoocOMH1CohPVY+sdiPg8+A=;
+ b=BgOVEAjKSqNw3Vzu5fYzXPR3Jq5RsgUcmZSGa62mJPN0sz56UdC6PJgNnNij5RRXpn6tiO2gT6xEZadH4o2nf2UjLgO8XIV0y90IJyK4kDOqS4sXDyFvB9n0Ks0N9hSi/tmgiU1MatHjv52NZTCM9y6FoP+Rdcrdt1J0F9TWJp/D9uqcqaQw37kRLm6+gQWMyx/u20C3HFmmFh+sb2mVAaMandXp64RokPsqhWNQ+96SSCPtdX/1INjxvE7EkrXkjqD2Cmkt7b7TjcDq9CarC6OEVJypG4ccmHKZvHZzvs4BmPDbrDHxS1p1YAe6gY2AAxd6IaSgR75b7NvWmXi+aA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
+ dkim=pass header.d=voleatech.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GvgzguQnNuPk93uE0ZhDpoocOMH1CohPVY+sdiPg8+A=;
+ b=hpAaDbTWGc/WecPO0GijL47g420rQNIxWxwRKcc9gPVFWRuPJYE6PO5F16zZ9VJZcQi76FMwdvIFuC3roKiXhAEYaZJ6pl3mi2zDY5tWsIZgQDUlKUjW0JmQoyD/5wr6EKkGI9KxSxILAtPKhjDhUyOlYEqBfZBvmFPYEk1dsoM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=voleatech.de;
+Received: from AM9PR05MB8857.eurprd05.prod.outlook.com (2603:10a6:20b:438::20)
+ by DB9PR05MB8123.eurprd05.prod.outlook.com (2603:10a6:10:23e::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.47; Sun, 15 Oct
+ 2023 12:37:05 +0000
+Received: from AM9PR05MB8857.eurprd05.prod.outlook.com
+ ([fe80::cd64:d5c9:2116:1837]) by AM9PR05MB8857.eurprd05.prod.outlook.com
+ ([fe80::cd64:d5c9:2116:1837%7]) with mapi id 15.20.6863.047; Sun, 15 Oct 2023
+ 12:37:04 +0000
+Date: Sun, 15 Oct 2023 14:36:56 +0200
+From: Sven Auhagen <sven.auhagen@voleatech.de>
+To: netdev@vger.kernel.org
+Cc: thomas.petazzoni@bootlin.com, brouer@redhat.com, lorenzo@kernel.org, 
+	Paulo.DaSilva@kyberna.com, ilias.apalodimas@linaro.org, mcroce@microsoft.com
+Subject: [PATCH v3 0/2] net: page_pool: check page pool ethtool stats
+Message-ID: <lzjlafhtal5ho5wvle5v7uu5uw7afbxe26ztqvcz3cnjjaq42g@bpudjgnpikci>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-ClientProxiedBy: FR3P281CA0137.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:95::11) To AM9PR05MB8857.eurprd05.prod.outlook.com
+ (2603:10a6:20b:438::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 00/12] vsock/virtio: continue MSG_ZEROCOPY support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169737302729.30024.1645018070157688379.git-patchwork-notify@kernel.org>
-Date: Sun, 15 Oct 2023 12:30:27 +0000
-References: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
-In-Reply-To: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
- jasowang@redhat.com, bobby.eshleman@bytedance.com, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel@sberdevices.ru, oxffffaa@gmail.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR05MB8857:EE_|DB9PR05MB8123:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3b1c3ee5-1979-4484-3d4c-08dbcd7b6fd5
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	aGq2mvXFZCd+oEdou3hDkhuV+x+TIRyXHqVwr162NfP5aCE3g6M0LORVfsmNaAoQAEYRC61lq36TLVH+aV6invk5W2NWupmNd1HhE8rfSxcOT5KtuvaS8MIHRJ2ErxkjA8fIXjAMNTf4dkXEvRpR6uCbFsswYkH6yRo+HAw5D8X4wptSH+zFik6QNv6WKwoK7mdHxdyC3SDwk1MJ0WvvXsDCwBjvPkF7k6u4026d0NW4s7hbcGjf1koI9MC+ZPYCqCBiOKS+TYif4d9HCDvjSW69yOVJB0c7eEtT+gmpsbJqLyBhfhzBA1qSUcvclZH8PJ/kphE9CNfTWAsQxvZqTrxzx3xym5DImGZjg+FF/TyjuaGYEv3EPRmfdzE8ZNbUFudx5o276LgxySmx232FbZjNp/NbiSh4o6KaNpgT342ntgfDWb4sdhSTtmeTYnRTNOMdTFwqQ6GxZ0sjo4nE8KR5kscLqPNeD81CV/w4YTeZqO4oH15fUfPsweDFHDZFFld6aPV+vmfN3NGYdhKA/cNBMwgsbM/7EhwrQsYRcmv9d8UPo0FB0YQa+kmDnv9DTucXJCyVsmJhcwt8wmnXm7XI4ltqCUe/E4OuYMNNfkY8mZireJ3aMVbcsv6M/Odx
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR05MB8857.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(366004)(39830400003)(136003)(376002)(396003)(64100799003)(1800799009)(451199024)(186009)(6666004)(9686003)(6512007)(6506007)(5660300002)(8936002)(8676002)(4326008)(6486002)(478600001)(83380400001)(26005)(6916009)(316002)(41300700001)(66946007)(66556008)(66476007)(86362001)(38100700002)(4744005)(33716001)(2906002)(44832011)(27256005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?dcDFuqIgy31OOV7VlzdK6/kde37cv7uY0yx9IoPhytyXvdoygaK8h6/P/ksu?=
+ =?us-ascii?Q?LrkDpWb/3fQ8wXYoylHBbPtdh4YIVkwJNhKZ3QvkgJw6xWwIX6tkExG255Vx?=
+ =?us-ascii?Q?09Rc/Klr3cWVqBM3Z1pq+WHDA10RX3qmirw/ICR9z6IDpKG+ylwLyXgXSaSy?=
+ =?us-ascii?Q?J6YaAWCi0sxAbJmyusq/W7nnHzOjN2e+CPF74/hyKO2RRLimXV9clg1SzcIZ?=
+ =?us-ascii?Q?tZUOvF/SMRSYCfTQyO/IRAiC8qmQAF9oaRlrb7KvcUxri1v6asW8nPweR8Uw?=
+ =?us-ascii?Q?UeDMvTWDFUtSJp4jpj1MPsWrDU5iWOtsQfyiujBHkh9O5X/mewPF9APrNH0D?=
+ =?us-ascii?Q?EgJ3j1WnSKwlucnU8elLZ04sDVxkRmcE0BmS8ojsGh8yr0GtYbUjkdo0SfIn?=
+ =?us-ascii?Q?ExDmwXAgyJSZzLhpIHnAoNWnrriql4vvgv5NR5DgeXbyj02UUOpgVxqZCymu?=
+ =?us-ascii?Q?p2upB8pmrR6TcMUzAW4AOI4+NMjktvRNUmXWg+XKogFf+y526ooTUEoZYz2x?=
+ =?us-ascii?Q?zfV8HmuGTt1lOcZJR/cwV8PertabXHQOxSR7graQRuR755vUbPjNda75v1hx?=
+ =?us-ascii?Q?drYKlQnohr0wPrBu7LU0CdJbqYEypEvdtR6h3RJ+2Ic2lquvz8RHmsFAKbgp?=
+ =?us-ascii?Q?gfOaF3vJ7pW3HAo/gfPJhr7xaauWndQww24XSCswxBwD7345Gids3iFlOTD5?=
+ =?us-ascii?Q?JKd6+T1AptMG66okrLYqoCttpu2cJBCOEx2f0Mxo5bV5niqm2nd3ZmT3vyzt?=
+ =?us-ascii?Q?e/di4fPK4ZXyKBT2KWyOCTw5X5UUJjwt/5YbJ0e96WjJLvT6DM3tApJMB854?=
+ =?us-ascii?Q?KdPhG9URkO63BeJxpbhBM21q8WIYoRZgRbJvR7g8Rm6BgruHsTAASxiDM5+U?=
+ =?us-ascii?Q?ecbLGF+4kEaNaicPbDxGWawXhUFZVBq5Chd0kM5xb6/lfgLSfzsswhBgSVG1?=
+ =?us-ascii?Q?PU5HtPDTnT0s0p29wVkJMH7sAb8MDorGzESC+uBBvSN95vWKIZNkmii/HaEC?=
+ =?us-ascii?Q?6OMuGN4NYzqTAWAxV2H5x9Okyu9eAof6dWGQBmzY4y9VsFL65WoKPF3z+MEx?=
+ =?us-ascii?Q?GTKHR3q5ItTIf8OgoZf76HZneYG9uEMSURzGuPrYN7rFGSmSTWFiGq1mbQ/t?=
+ =?us-ascii?Q?di7p5LmE+9KvrXTIVp43BzGINW40r4AMQK5k+ROZ718HL130thNP9bIH1Jsh?=
+ =?us-ascii?Q?h9vair4Z0z3wp20dcbZ7FCvoT/HUDdcNcARJTc1sFI0gfTY667qGR1HntfG7?=
+ =?us-ascii?Q?ZRCwmLvBDGY0OUqIvl3w6CuaeXjuThUu5lMhTmSPePtxJvyVfG9vU22XuIs/?=
+ =?us-ascii?Q?H+nTNUDtyeOE3YdDUSegMckzBWNSZAKhnburxa24TyurHN+QzyUFUmEC6/wt?=
+ =?us-ascii?Q?CIeYHCLmSLmnOxToI+Dy33sagPPzkgi9MBHma5ooJUNa2MxLYUXBBUgvh7fG?=
+ =?us-ascii?Q?YJ9rWsau258HQVHENEIDODrAbLPMcfkorxoPEoOTdICop0D+fvJ4h8IKGlXm?=
+ =?us-ascii?Q?eqrBzqBFKSSJncU3inE80w6UV/Ae2cfTzKWFWKrTl7xNFt32fce7IJ7IZP0M?=
+ =?us-ascii?Q?Ro4WIZa+C5+IoI8/aep9pSltESAXSW/DjyFggy+skkTbntSfqto5ETe9nfxu?=
+ =?us-ascii?Q?aA=3D=3D?=
+X-OriginatorOrg: voleatech.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b1c3ee5-1979-4484-3d4c-08dbcd7b6fd5
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR05MB8857.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2023 12:37:04.5763
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: I++Zqs979rGozIuN6uOPBNs03NGIlG4HjexixnwkUmivmIDb0Wm0pbDm68UFZ9SkSdVjozIse7mAUopXtMb/Yw3a+edVwfVhSfZ8iXuLXqY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR05MB8123
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+This patch series fixes up an error when an invalid
+page pool is send to the page pool ethtool stats function.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+It also fixes cases in the mvneta driver where no page pool
+is used and allocated.
 
-On Tue, 10 Oct 2023 22:15:12 +0300 you wrote:
-> Hello,
-> 
-> this patchset contains second and third parts of another big patchset
-> for MSG_ZEROCOPY flag support:
-> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
-> 
-> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
-> suggested to split it for three parts to simplify review and merging:
-> 
-> [...]
+Change from v2:
+	* Fix the fixes tag
 
-Here is the summary with links:
-  - [net-next,v4,01/12] vsock: set EPOLLERR on non-empty error queue
-    https://git.kernel.org/netdev/net-next/c/0064cfb44084
-  - [net-next,v4,02/12] vsock: read from socket's error queue
-    https://git.kernel.org/netdev/net-next/c/49dbe25adac4
-  - [net-next,v4,03/12] vsock: check for MSG_ZEROCOPY support on send
-    https://git.kernel.org/netdev/net-next/c/5fbfc7d24334
-  - [net-next,v4,04/12] vsock: enable SOCK_SUPPORT_ZC bit
-    https://git.kernel.org/netdev/net-next/c/dcc55d7bb230
-  - [net-next,v4,05/12] vhost/vsock: support MSG_ZEROCOPY for transport
-    https://git.kernel.org/netdev/net-next/c/3719c48d9a20
-  - [net-next,v4,06/12] vsock/virtio: support MSG_ZEROCOPY for transport
-    https://git.kernel.org/netdev/net-next/c/e2fcc326b498
-  - [net-next,v4,07/12] vsock/loopback: support MSG_ZEROCOPY for transport
-    https://git.kernel.org/netdev/net-next/c/cfdca3904687
-  - [net-next,v4,08/12] vsock: enable setting SO_ZEROCOPY
-    https://git.kernel.org/netdev/net-next/c/e0718bd82e27
-  - [net-next,v4,09/12] docs: net: description of MSG_ZEROCOPY for AF_VSOCK
-    https://git.kernel.org/netdev/net-next/c/bac2cac12c26
-  - [net-next,v4,10/12] test/vsock: MSG_ZEROCOPY flag tests
-    https://git.kernel.org/netdev/net-next/c/bc36442ef3b7
-  - [net-next,v4,11/12] test/vsock: MSG_ZEROCOPY support for vsock_perf
-    https://git.kernel.org/netdev/net-next/c/e846d679ad13
-  - [net-next,v4,12/12] test/vsock: io_uring rx/tx tests
-    https://git.kernel.org/netdev/net-next/c/8d211285c6d4
+Change from v1:
+	* Add cover letter
+	* Move the page pool check in mvneta to the ethtool stats
+	  function
 
-You are awesome, thank you!
+Sven Auhagen (2):
+  net: page_pool: check page pool ethtool stats
+  net: mvneta: fix calls to page_pool_get_stats
+
+ drivers/net/ethernet/marvell/mvneta.c | 22 ++++++++++++++++------
+ net/core/page_pool.c                  |  3 +++
+ 2 files changed, 19 insertions(+), 6 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.42.0
 
 
