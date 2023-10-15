@@ -1,97 +1,104 @@
-Return-Path: <netdev+bounces-41102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC13C7C9AF0
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 21:10:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9703D7C9AF6
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 21:18:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D38F1C20979
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 19:10:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AD42B20C2E
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 19:18:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D960F9F8;
-	Sun, 15 Oct 2023 19:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38D9F9E9;
+	Sun, 15 Oct 2023 19:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NyBHbEbj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hzAeLYxX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3C1F9E9
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 19:10:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 02B12C433C9;
-	Sun, 15 Oct 2023 19:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C0D1FB9;
+	Sun, 15 Oct 2023 19:18:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97783C433C8;
+	Sun, 15 Oct 2023 19:17:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697397025;
-	bh=RN0NGHUYPedHiC6SYb3gNz26CFkynA2t5TB3FnLOLTk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NyBHbEbj9EmhV4IPNOAiML2oDe5VUJSsrDzJZDrq935DgAFp0Dt9lk6YbBU4/xRlg
-	 BYQiATSqQbn4/xMaIVyewfrCstzdbmCF2c7Q2ypemjBRv7W2BodABTJdAQnb7mbAd4
-	 C8qEjZGHJ4pPQu92eMaKmagnUTlDznF9kbpnKKMxViLtvg+Qzalg92mWQZTcnEly0L
-	 14Tl+pgV86+OtlL3rhZEj8WF7JB3QhHxPbYVGXnSNa7VJvxpP8MmWBd3tfZYTLWNvr
-	 AfWwSO5PzVS/8Y3f9Wdp+xsfvMTPNlBsJ2keZcALYi76P2tna+iB4dIUiEx/sRDLyX
-	 eUNiFaLzc94fQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DFC1AC39563;
-	Sun, 15 Oct 2023 19:10:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1697397481;
+	bh=R0SlymlymmOuTU6Y0PAYkc/uL1cbwCHuMM8dCsez20Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hzAeLYxXLkurO36USIDtsCpz3cykmUdW7qX6KNXb+bLZEptR9M7VZT3d57ISNUIoK
+	 DNxUiZkPxadlfupn/AOiksB9ky/w2LM34L5DmRt1z0pdym6MvX5WfOFPSyggaNrbTX
+	 +upTfMuNBk5+QlY1yy0ywbuqPq+HFBO4E+NABk/Voq85kLTPc6F8MX1XvmvymsHdu/
+	 jDT/nn6k3kxAIslKCKCF3uaJqmuLvaIt3vgU5UYwg5kHYUCrmSfFUnmS3JLHLJEgMT
+	 qB+1pUAX5tbb2qlx0P0zlDbx+TEKn5JDyZ84R/TBKHSJI+JV+qqjrsOrjbblv1/ukP
+	 vQ+OtKN0xJJDA==
+Date: Sun, 15 Oct 2023 21:17:56 +0200
+From: Simon Horman <horms@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux-foundation.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH vhost 12/22] virtio_net: xsk: bind/unbind xsk
+Message-ID: <20231015191756.GD1386676@kernel.org>
+References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
+ <20231011092728.105904-13-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 0/6] ptp: Support for multiple filtered timestamp
- event queue readers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169739702490.16848.5167099930461687378.git-patchwork-notify@kernel.org>
-Date: Sun, 15 Oct 2023 19:10:24 +0000
-References: <cover.1697062274.git.reibax@gmail.com>
-In-Reply-To: <cover.1697062274.git.reibax@gmail.com>
-To: Xabier Marquiegui <reibax@gmail.com>
-Cc: netdev@vger.kernel.org, richardcochran@gmail.com, tglx@linutronix.de,
- jstultz@google.com, horms@kernel.org, chrony-dev@chrony.tuxfamily.org,
- mlichvar@redhat.com, ntp-lists@mattcorallo.com, vinicius.gomes@intel.com,
- davem@davemloft.net, rrameshbabu@nvidia.com, shuah@kernel.org,
- kuba@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231011092728.105904-13-xuanzhuo@linux.alibaba.com>
 
-Hello:
+On Wed, Oct 11, 2023 at 05:27:18PM +0800, Xuan Zhuo wrote:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+...
 
-On Thu, 12 Oct 2023 00:39:52 +0200 you wrote:
-> On systems with multiple timestamp event channels, there can be scenarios
-> where multiple userspace readers want to access the timestamping data for
-> various purposes.
-> 
-> One such example is wanting to use a pps out for time synchronization, and
-> wanting to timestamp external events with the synchronized time base
-> simultaneously.
-> 
-> [...]
+> +static int virtnet_xsk_pool_disable(struct net_device *dev, u16 qid)
+> +{
+> +	struct virtnet_info *vi = netdev_priv(dev);
+> +	struct device *dma_dev;
+> +	struct virtnet_rq *rq;
+> +	struct virtnet_sq *sq;
+> +	int err1, err2;
+> +
+> +	if (qid >= vi->curr_queue_pairs)
+> +		return -EINVAL;
+> +
+> +	sq = &vi->sq[qid];
+> +	rq = &vi->rq[qid];
+> +
+> +	dma_dev = virtqueue_dma_dev(rq->vq);
+> +
+> +	dma_unmap_single(dma_dev, sq->xsk.hdr_dma_address, vi->hdr_len, DMA_TO_DEVICE);
+> +
+> +	xsk_pool_dma_unmap(sq->xsk.pool, 0);
 
-Here is the summary with links:
-  - [net-next,v6,1/6] posix-clock: introduce posix_clock_context concept
-    https://git.kernel.org/netdev/net-next/c/60c6946675fc
-  - [net-next,v6,2/6] ptp: Replace timestamp event queue with linked list
-    https://git.kernel.org/netdev/net-next/c/d26ab5a35ad9
-  - [net-next,v6,3/6] ptp: support multiple timestamp event readers
-    https://git.kernel.org/netdev/net-next/c/8f5de6fb2453
-  - [net-next,v6,4/6] ptp: support event queue reader channel masks
-    https://git.kernel.org/netdev/net-next/c/c5a445b1e934
-  - [net-next,v6,5/6] ptp: add debugfs interface to see applied channel masks
-    https://git.kernel.org/netdev/net-next/c/403376ddb422
-  - [net-next,v6,6/6] ptp: add testptp mask test
-    https://git.kernel.org/netdev/net-next/c/26285e689c6c
+nit: the line above makes Sparse a bit unhappy:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+ .../xsk.c:168:35: warning: incorrect type in argument 1 (different address spaces)
+ .../xsk.c:168:35:    expected struct xsk_buff_pool *pool
+ .../xsk.c:168:35:    got struct xsk_buff_pool [noderef] __rcu *pool
 
+> +
+> +	/* Sync with the XSK wakeup and with NAPI. */
+> +	synchronize_net();
+> +
+> +	err1 = virtnet_sq_bind_xsk_pool(vi, sq, NULL);
+> +	err2 = virtnet_rq_bind_xsk_pool(vi, rq, NULL);
+> +
+> +	return err1 | err2;
+> +}
 
+...
 
