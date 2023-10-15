@@ -1,96 +1,92 @@
-Return-Path: <netdev+bounces-41093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E097F7C99AF
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 17:10:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13D627C99D3
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 17:47:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBC9B1C20904
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 15:10:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB97BB20B90
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 15:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767187499;
-	Sun, 15 Oct 2023 15:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806AE79F4;
+	Sun, 15 Oct 2023 15:47:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DezLhnJv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Gixs54a0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC1C2F53;
-	Sun, 15 Oct 2023 15:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B6F91C433C8;
-	Sun, 15 Oct 2023 15:10:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697382622;
-	bh=xBmMMUeTqGOtCCswkqoAJy4I1gBJ/lCa3dC+0Fr59Ok=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DezLhnJv3oCrxZUHf9nDGv5AnznxqLJTwIERuZQ3RYmbdN0bdzHny5t29MS/CSblO
-	 ORqVPF9whdlUKBSVPDeazmStfTKPUomDkwuj/Z3VDxHn5OvbschVYhrnb/+p2mYqGK
-	 Td/DkkgFZZ2hTi6mrq091ooPMHp9ihothgR/Wd7SNfaXWYXEEWrOdUGRyyPeGIf2h1
-	 L5Kb0IUJnewEHdcIdCjKlaQ/8FDwLfh/0xuCmOVcfrQylEyRodxJ5O2PN64vSJJZy8
-	 Qub27xyAj4uJIWtDA+hKJ+IE7vJfNQTOwr3im+nlWfXZSTBh8Gx9TWixKOShJTzCOZ
-	 nma3TJ8xUGwYA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9BB3EC595D0;
-	Sun, 15 Oct 2023 15:10:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354D6749C;
+	Sun, 15 Oct 2023 15:47:40 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915F4AB;
+	Sun, 15 Oct 2023 08:47:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZstDpmxiWNvEKHZXZocDZQxQvgTHAaWx4KIzLBOqMwo=; b=Gixs54a0s+eZIhVBnh2oQL0uiK
+	B1UDBQQk/9vTZ5BL+yGXKGDC8HsoGVhfoP+ADtK4l+cF2x5LOEzIAdQGrhGPAN8GFO8kjeOG/9FTr
+	k6iktItKksIo73R/aM/1ORj05JtflcFHMZBCFKXdFAzhAPDZdnywQn6wjSwhXQgW3OAo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qs3L6-002FbS-1S; Sun, 15 Oct 2023 17:47:36 +0200
+Date: Sun, 15 Oct 2023 17:47:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com,
+	greg@kroah.com
+Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY
+ drivers
+Message-ID: <a4ce76e4-a057-4f5a-aceb-73cf8185244f@lunn.ch>
+References: <85d5c498-efbc-4c1a-8d12-f1eca63c45cf@proton.me>
+ <4b7096cd-076d-42fd-b0cc-f842d3b64ee4@lunn.ch>
+ <CANiq72m3xp6ErPwCOj6DrHpG_7OE9WUqVpsZcUDk4OSuH62mKg@mail.gmail.com>
+ <20231015.081849.2094682155986954086.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/5] dpll: add phase-offset and phase-adjust
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169738262262.5861.8707654384088164012.git-patchwork-notify@kernel.org>
-Date: Sun, 15 Oct 2023 15:10:22 +0000
-References: <20231011101236.23160-1-arkadiusz.kubalewski@intel.com>
-In-Reply-To: <20231011101236.23160-1-arkadiusz.kubalewski@intel.com>
-To: Kubalewski@codeaurora.org,
-	Arkadiusz <arkadiusz.kubalewski@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, jiri@resnulli.us,
- corbet@lwn.net, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
- linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231015.081849.2094682155986954086.fujita.tomonori@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Wed, 11 Oct 2023 12:12:31 +0200 you wrote:
-> Improve monitoring and control over dpll devices.
-> Allow user to receive measurement of phase difference between signals
-> on pin and dpll (phase-offset).
-> Allow user to receive and control adjustable value of pin's signal
-> phase (phase-adjust).
+> Andrew, if you prefer, I'll move RUST_PHYLIB_ABSTRACTIONS to
+> drivers/net/phy/Kconfig.
 > 
-> v4->v5:
-> - rebase series on top of net-next/main, fix conflict - remove redundant
->   attribute type definition in subset definition
-> 
-> [...]
+> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+> index e55b71937f01..0d39b97a546c 100644
+> --- a/drivers/net/phy/Kconfig
+> +++ b/drivers/net/phy/Kconfig
+> @@ -66,6 +66,14 @@ config SFP
+>  	depends on HWMON || HWMON=n
+>  	select MDIO_I2C
+>  
+> +config RUST_PHYLIB_ABSTRACTIONS
+> +        bool "PHYLIB abstractions support"
+> +        depends on RUST
+> +        depends on PHYLIB=y
+> +        help
+> +          Adds support needed for PHY drivers written in Rust. It provides
+> +          a wrapper around the C phylib core.
+> +
 
-Here is the summary with links:
-  - [net-next,v5,1/5] dpll: docs: add support for pin signal phase offset/adjust
-    https://git.kernel.org/netdev/net-next/c/27ed30d1f861
-  - [net-next,v5,2/5] dpll: spec: add support for pin-dpll signal phase offset/adjust
-    https://git.kernel.org/netdev/net-next/c/c3c6ab95c397
-  - [net-next,v5,3/5] dpll: netlink/core: add support for pin-dpll signal phase offset/adjust
-    https://git.kernel.org/netdev/net-next/c/d7fbc0b7e846
-  - [net-next,v5,4/5] ice: dpll: implement phase related callbacks
-    https://git.kernel.org/netdev/net-next/c/90e1c90750d7
-  - [net-next,v5,5/5] dpll: netlink/core: change pin frequency set behavior
-    https://git.kernel.org/netdev/net-next/c/20f6677234d8
+I'm nit picking, but i would actually put it between FIXED_PHY and
+SFP. But otherwise, i'm happy with this. Putting it somewhere here is
+the correct thing to do.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks
+	Andrew
 
