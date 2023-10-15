@@ -1,92 +1,133 @@
-Return-Path: <netdev+bounces-41094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13D627C99D3
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 17:47:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2BD67C99E7
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 18:08:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB97BB20B90
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 15:47:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6CF91C208F2
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 16:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806AE79F4;
-	Sun, 15 Oct 2023 15:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9091FB66E;
+	Sun, 15 Oct 2023 16:08:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Gixs54a0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AB0lTmfg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354D6749C;
-	Sun, 15 Oct 2023 15:47:40 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915F4AB;
-	Sun, 15 Oct 2023 08:47:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZstDpmxiWNvEKHZXZocDZQxQvgTHAaWx4KIzLBOqMwo=; b=Gixs54a0s+eZIhVBnh2oQL0uiK
-	B1UDBQQk/9vTZ5BL+yGXKGDC8HsoGVhfoP+ADtK4l+cF2x5LOEzIAdQGrhGPAN8GFO8kjeOG/9FTr
-	k6iktItKksIo73R/aM/1ORj05JtflcFHMZBCFKXdFAzhAPDZdnywQn6wjSwhXQgW3OAo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qs3L6-002FbS-1S; Sun, 15 Oct 2023 17:47:36 +0200
-Date: Sun, 15 Oct 2023 17:47:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com,
-	greg@kroah.com
-Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY
- drivers
-Message-ID: <a4ce76e4-a057-4f5a-aceb-73cf8185244f@lunn.ch>
-References: <85d5c498-efbc-4c1a-8d12-f1eca63c45cf@proton.me>
- <4b7096cd-076d-42fd-b0cc-f842d3b64ee4@lunn.ch>
- <CANiq72m3xp6ErPwCOj6DrHpG_7OE9WUqVpsZcUDk4OSuH62mKg@mail.gmail.com>
- <20231015.081849.2094682155986954086.fujita.tomonori@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A65F8C1C;
+	Sun, 15 Oct 2023 16:08:04 +0000 (UTC)
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F890AB;
+	Sun, 15 Oct 2023 09:08:02 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-405361bb9f7so37616635e9.2;
+        Sun, 15 Oct 2023 09:08:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697386081; x=1697990881; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XujhMv/8pwB8H+Ij7K6MZPspXyDbpmJ+2p7uc4kDFNk=;
+        b=AB0lTmfgWQPvnHMkCiiWckdZn655ocvhrgppqgLxkhdTtwrpGmKdX5OlL7LRqQgsar
+         W0/tqUa0MwCJhoUYSEYT4JKpkPZ85CihR/cFynoarQUC7EQmqYCvI+zVEhfafO8IkZk3
+         OdGseues4F2kE6jkll6PNZwS+P1N+RlyLqj+feAiLi9DwNrflBQoYNTjUA354IwQtHW1
+         VXkquQAgLutmqTIl8sN9a5V0KlEeDbmXbvIkBXhgCvjUdrLFQrb4e5jS51jnNBQLwzhQ
+         F9vDxn3IDLUlSr7enAuvRJ+dTVPM/zji9On94hMGlEDbkDetLtBIIWZmfqBaXB+8ftTe
+         iruA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697386081; x=1697990881;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XujhMv/8pwB8H+Ij7K6MZPspXyDbpmJ+2p7uc4kDFNk=;
+        b=cRvsQPwBYqsnjYiH1pZ7OzD+KEMb/kUIjWbQagaML1qHhIZhSEFkLz+ktcMtU8WyD1
+         nZJVcYIGk7Fwjx25l+CTkEzQVWRkGvRw8YwZz9oRheWFHLGN7ZRjnTxNT2+0aFPSQgVi
+         UotJJjZTNDQt3bt2y8hqdKlNzHwyzdch0V8LtiDNaYCQ1AzxSp4Hk4ngjsHK2Q2vru4E
+         k1aCAIYAy4XqcfmHHh8o1yDcHD+MNZtvJsqiENZkEvBKFD0knrl4XgK4BrJEWLElVqA5
+         0+P+5H6sdinR6KeF5SPpBEUvcsf8UDvlsmysMPPOTnT4JNUeC1HvqujKeI4VCOPmk+4C
+         E3PQ==
+X-Gm-Message-State: AOJu0YxN8czhQqsqjN9By13+sUH02C13lipa2rZJgo2ChPweHXiJZmv3
+	pmI1McKaHnqP3MXHSkV7Fo7LohqFu+nO3nJmKGU=
+X-Google-Smtp-Source: AGHT+IHRwQ5bE3hW1waPm3vlZF7IYRIPl+hr17w3AEC3uTMy8O1jLNp9Skrcd0Po7vdFsljBETR6eKnURnRLMkMbVyQ=
+X-Received: by 2002:a05:600c:21d1:b0:405:3ae6:2413 with SMTP id
+ x17-20020a05600c21d100b004053ae62413mr28009964wmj.25.1697386080580; Sun, 15
+ Oct 2023 09:08:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231015.081849.2094682155986954086.fujita.tomonori@gmail.com>
+References: <20231015141644.260646-1-akihiko.odaki@daynix.com> <20231015141644.260646-2-akihiko.odaki@daynix.com>
+In-Reply-To: <20231015141644.260646-2-akihiko.odaki@daynix.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 15 Oct 2023 09:07:49 -0700
+Message-ID: <CAADnVQLfUDmgYng8Cw1hiZOMfWNWLjbn7ZGc4yOEz-XmeFEz5Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 1/7] bpf: Introduce BPF_PROG_TYPE_VNET_HASH
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> Andrew, if you prefer, I'll move RUST_PHYLIB_ABSTRACTIONS to
-> drivers/net/phy/Kconfig.
-> 
-> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-> index e55b71937f01..0d39b97a546c 100644
-> --- a/drivers/net/phy/Kconfig
-> +++ b/drivers/net/phy/Kconfig
-> @@ -66,6 +66,14 @@ config SFP
->  	depends on HWMON || HWMON=n
->  	select MDIO_I2C
->  
-> +config RUST_PHYLIB_ABSTRACTIONS
-> +        bool "PHYLIB abstractions support"
-> +        depends on RUST
-> +        depends on PHYLIB=y
-> +        help
-> +          Adds support needed for PHY drivers written in Rust. It provides
-> +          a wrapper around the C phylib core.
+On Sun, Oct 15, 2023 at 7:17=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 0448700890f7..298634556fab 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -988,6 +988,7 @@ enum bpf_prog_type {
+>         BPF_PROG_TYPE_SK_LOOKUP,
+>         BPF_PROG_TYPE_SYSCALL, /* a program that can execute syscalls */
+>         BPF_PROG_TYPE_NETFILTER,
+> +       BPF_PROG_TYPE_VNET_HASH,
+
+Sorry, we do not add new stable program types anymore.
+
+> @@ -6111,6 +6112,10 @@ struct __sk_buff {
+>         __u8  tstamp_type;
+>         __u32 :24;              /* Padding, future use. */
+>         __u64 hwtstamp;
 > +
+> +       __u32 vnet_hash_value;
+> +       __u16 vnet_hash_report;
+> +       __u16 vnet_rss_queue;
+>  };
 
-I'm nit picking, but i would actually put it between FIXED_PHY and
-SFP. But otherwise, i'm happy with this. Putting it somewhere here is
-the correct thing to do.
+we also do not add anything to uapi __sk_buff.
 
-Thanks
-	Andrew
+> +const struct bpf_verifier_ops vnet_hash_verifier_ops =3D {
+> +       .get_func_proto         =3D sk_filter_func_proto,
+> +       .is_valid_access        =3D sk_filter_is_valid_access,
+> +       .convert_ctx_access     =3D bpf_convert_ctx_access,
+> +       .gen_ld_abs             =3D bpf_gen_ld_abs,
+> +};
+
+and we don't do ctx rewrites like this either.
+
+Please see how hid-bpf and cgroup rstat are hooking up bpf
+in _unstable_ way.
 
