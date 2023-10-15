@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-41085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A331C7C9976
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 16:17:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D64ED7C9979
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 16:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B7A3B20DC7
-	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 14:17:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BDED1C208EE
+	for <lists+netdev@lfdr.de>; Sun, 15 Oct 2023 14:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46860746A;
-	Sun, 15 Oct 2023 14:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C204748C;
+	Sun, 15 Oct 2023 14:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="jOjNclAy"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="RFS2pRpO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EA1746C
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 14:17:39 +0000 (UTC)
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32F02E7
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 07:17:35 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1ca3a54d2c4so7818505ad.3
-        for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 07:17:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E99746A
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 14:17:53 +0000 (UTC)
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A87109
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 07:17:42 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1c9bf22fe05so22328415ad.2
+        for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 07:17:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1697379454; x=1697984254; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1697379462; x=1697984262; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=q3e16X3BnACnel0/w/bQT7bK9RdqePAG/1Ajmk33nB0=;
-        b=jOjNclAylNWhZ4hB+LFckWl9nZjeAdYIUYBxlpMMjRuXSf70wdqUDw1m3PBBelChkk
-         nLQqE4n8aa2ZoFfZ0BjparIqreNrV64Ff8ga//0p9P24HdmueiH3bYlOZh5ZRUTxmr2Q
-         Bsj5n/KP4Bxq9SQMLWBtg4QAkrprtUZBMOMUtzk1wBV8jdslEszB6tigt/mgtHUr2vpJ
-         JmIC6Jy+LcrAjl7OPP7dUxx0xGOGSWCJLnSZbdocit6jH4QD9KyHFU7VaAenZptOZxaF
-         //tXuDZUaogqUgVHPqMaYTdCX1EvdVrD0nkZ8h+qUdchz4L8I16yD4/NSCJ8//WBPnw2
-         OPmQ==
+        bh=kvSWVbZXn/MrVEcGpo16B6JSHdwZ2fR7rly5J6YWZNE=;
+        b=RFS2pRpOPj0Fz3zbI6kHMAvLIv9pOZrbCw4IRXWqTM7IE4gIwhuZ7cMWL1lnx2NzjC
+         JmP2knUtSyyY1syJLyq+qzp3nZc1bh+nyiKBD+XFfVODB9AmKmpspLEWul9jaksfPYFr
+         gBcy3eEG55wtAaa0jTvrgZKvGgbxI3eEu1jJTw5zD9zCWhHyN3HfaBCMAEqTPM9AyP+R
+         1C2HXXFQqdZ7eis759QCNODeaizm5UiraLBG3eSS/s6vVAZlmCMFmyTShNOh4Yb59fRT
+         aHjvrGrh9h5WNqVk4iyDoarINlIy4OjJwRPgwySNoqVkKpXCYwohnBXH/4xDkepnrruM
+         T9hA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697379454; x=1697984254;
+        d=1e100.net; s=20230601; t=1697379462; x=1697984262;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=q3e16X3BnACnel0/w/bQT7bK9RdqePAG/1Ajmk33nB0=;
-        b=Q/M7EQilL/juPHrg4mAwKHjsdIg4Kfce1v5aZf/HKvZ6evIZJbK7Nz4Oo0EdgQhHxr
-         R3FA9mwUwEVieAT1DVWxGjPN5MKoS99edo4DRpHUbpUCWtJL+ug1nHmCKP6ZHTbBUHkd
-         UmPrX/educH9ZaG3pFJyBonMp/cSgnIu7kSnTaXx2G1hr3uNNVloZRNy6wnyFykwvjJR
-         hBUjOa877C7GOBWyFvZFeAmubYSS/2hCxE3bgPy82uUqLuPZP/VEUYBRxhr1RMJD5iIK
-         Aikld5+igOzQDtN1TgWsuO6tWthj1+NsoBDoCiR918cLIE4v+kt9vCziiRPkZGrv3t/u
-         jjxw==
-X-Gm-Message-State: AOJu0Yx5h2tpLdp79AVO2HOIeNtTmjexlPbUjm66E9j2WZIli3RRf+j+
-	dHuUlqhYddb3PquQ9os986Y5ug==
-X-Google-Smtp-Source: AGHT+IGa+4527nTRMoq3BT4pWp6MGz5aJZtlZUNhOW5hIrk1Y1oqpKECZxuWNJqZ5/MeAEwk4c/hSg==
-X-Received: by 2002:a17:90b:4ccb:b0:27d:51c4:1679 with SMTP id nd11-20020a17090b4ccb00b0027d51c41679mr4375745pjb.27.1697379454522;
-        Sun, 15 Oct 2023 07:17:34 -0700 (PDT)
+        bh=kvSWVbZXn/MrVEcGpo16B6JSHdwZ2fR7rly5J6YWZNE=;
+        b=afk2j2+W2DBAnDzsTTOFMZaQ5L/vCSWzCdSLu349V4ZxbLNwAf24iXZCam7pOxR59+
+         MeJ3M9GZulhVtuWkuaXGCES2X4BSe21ge/50uR/jSt5aTPHXSQDED26zHrRaf0q9T+m0
+         CMtrJ0Iul3CjA+0RrQjwNM0l4zD2M5p+zENbJFkwZBwpIb+JbQvgGvVwziFzzXrJaGWO
+         ZXFxVvtlD4KFyIp/vQ95+5bm3Zxa7gPhhZr7hC6oQV03DGlQs8e/R2ZbtXlrfcNNnOyK
+         vCio2p/UjOGyQf5C4TEKiqK/B4o4DeDtcBFBDGgifcgyXBux8bFt3OIhDunOvBYO4pRr
+         CcYQ==
+X-Gm-Message-State: AOJu0YwBe2q6K/f60jNODojGZRpa6aATlxAIcPvYcuyvwWHQO4HPU480
+	cezwW54OQQok9qdA9Jq74dVIHA==
+X-Google-Smtp-Source: AGHT+IE81It/1ElAFh3WqzA1MDP6+KyM5FALauAhwzot5b7EduhSxG7C2ZYhheRbI8ll3TgU9FJn+A==
+X-Received: by 2002:a17:902:aa48:b0:1c0:bcbc:d5d with SMTP id c8-20020a170902aa4800b001c0bcbc0d5dmr25880675plr.61.1697379461931;
+        Sun, 15 Oct 2023 07:17:41 -0700 (PDT)
 Received: from localhost ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
-        by smtp.gmail.com with UTF8SMTPSA id ij6-20020a170902ab4600b001c0c79b386esm7058350plb.95.2023.10.15.07.17.28
+        by smtp.gmail.com with UTF8SMTPSA id d8-20020a170903230800b001c62c9d7289sm6869426plh.104.2023.10.15.07.17.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 15 Oct 2023 07:17:34 -0700 (PDT)
+        Sun, 15 Oct 2023 07:17:41 -0700 (PDT)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
 To: 
 Cc: Alexei Starovoitov <ast@kernel.org>,
@@ -92,9 +92,9 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
 	Yuri Benditovich <yuri.benditovich@daynix.com>,
 	Andrew Melnychenko <andrew@daynix.com>,
 	Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [RFC PATCH v2 3/7] skbuff: Introduce SKB_EXT_TUN_VNET_HASH
-Date: Sun, 15 Oct 2023 23:16:31 +0900
-Message-ID: <20231015141644.260646-4-akihiko.odaki@daynix.com>
+Subject: [RFC PATCH v2 4/7] virtio_net: Add virtio_net_hdr_v1_hash_from_skb()
+Date: Sun, 15 Oct 2023 23:16:32 +0900
+Message-ID: <20231015141644.260646-5-akihiko.odaki@daynix.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231015141644.260646-1-akihiko.odaki@daynix.com>
 References: <20231015141644.260646-1-akihiko.odaki@daynix.com>
@@ -106,62 +106,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
 	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This new extension will be used by tun to carry the hash values and
-types to report with virtio-net headers.
+It is identical with virtio_net_hdr_from_skb() except that it
+impelements hash reporting.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
- include/linux/skbuff.h | 10 ++++++++++
- net/core/skbuff.c      |  3 +++
- 2 files changed, 13 insertions(+)
+ include/linux/virtio_net.h | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 4174c4b82d13..1f2e5d350810 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -333,6 +333,13 @@ struct tc_skb_ext {
- };
- #endif
+diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+index 7b4dd69555e4..01e594b4586b 100644
+--- a/include/linux/virtio_net.h
++++ b/include/linux/virtio_net.h
+@@ -216,4 +216,26 @@ static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
+ 	return 0;
+ }
  
-+#if IS_ENABLED(CONFIG_TUN)
-+struct tun_vnet_hash {
-+	u32 value;
-+	u16 report;
-+};
-+#endif
++static inline int virtio_net_hdr_v1_hash_from_skb(const struct sk_buff *skb,
++						  struct virtio_net_hdr_v1_hash *hdr,
++						  bool little_endian,
++						  bool has_data_valid,
++						  int vlan_hlen,
++						  u32 hash_value,
++						  u16 hash_report)
++{
++	int ret;
 +
- struct sk_buff_head {
- 	/* These two members must be first to match sk_buff. */
- 	struct_group_tagged(sk_buff_list, list,
-@@ -4631,6 +4638,9 @@ enum skb_ext_id {
- #endif
- #if IS_ENABLED(CONFIG_MCTP_FLOWS)
- 	SKB_EXT_MCTP,
-+#endif
-+#if IS_ENABLED(CONFIG_TUN)
-+	SKB_EXT_TUN_VNET_HASH,
- #endif
- 	SKB_EXT_NUM, /* must be last */
- };
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 4eaf7ed0d1f4..774c2b26bf25 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -4793,6 +4793,9 @@ static const u8 skb_ext_type_len[] = {
- #if IS_ENABLED(CONFIG_MCTP_FLOWS)
- 	[SKB_EXT_MCTP] = SKB_EXT_CHUNKSIZEOF(struct mctp_flow),
- #endif
-+#if IS_ENABLED(CONFIG_TUN)
-+	[SKB_EXT_TUN_VNET_HASH] = SKB_EXT_CHUNKSIZEOF(struct tun_vnet_hash),
-+#endif
- };
- 
- static __always_inline unsigned int skb_ext_total_length(void)
++	memset(hdr, 0, sizeof(*hdr));
++
++	ret = virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)hdr,
++				      little_endian, has_data_valid, vlan_hlen);
++	if (!ret) {
++		hdr->hash_value = cpu_to_le32(hash_value);
++		hdr->hash_report = cpu_to_le16(hash_report);
++	}
++
++	return ret;
++}
++
+ #endif /* _LINUX_VIRTIO_NET_H */
 -- 
 2.42.0
 
