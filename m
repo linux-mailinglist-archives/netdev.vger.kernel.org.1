@@ -1,229 +1,214 @@
-Return-Path: <netdev+bounces-41310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45F727CA8B8
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:00:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 134E47CA8CD
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:05:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2577281616
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:00:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 370A51C2089B
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844232770D;
-	Mon, 16 Oct 2023 13:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83DA2771F;
+	Mon, 16 Oct 2023 13:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bmWKo7Is"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="daGl9owa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3732770A
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:00:04 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2338F3
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:00:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697461201;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=9sDjD0PnFUNgV0X5f9SsRv9HtvY4pPJgeF96t1o0gDk=;
-	b=bmWKo7Ise4DztepQCpPNXRK8dl404TeAQy0KKceeki5R0RjcH/aPEG7pQ/4/5I7p70LGl9
-	KG2xvKhiviqzNikgqSm5n51sS942TNWvfO239uk5taDZ/qr3VRdC3tK8X984s8uxmjsyQc
-	G+JFui3+TVJiVr/M/Jzl9pFiaItEg/k=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-113-c3kl-JliNt2P5acWWO9h5g-1; Mon, 16 Oct 2023 08:59:48 -0400
-X-MC-Unique: c3kl-JliNt2P5acWWO9h5g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AA9083C1CC26;
-	Mon, 16 Oct 2023 12:59:47 +0000 (UTC)
-Received: from vschneid.remote.csb (unknown [10.39.194.52])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 89E191102E14;
-	Mon, 16 Oct 2023 12:59:45 +0000 (UTC)
-From: Valentin Schneider <vschneid@redhat.com>
-To: dccp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Tomas Glozar <tglozar@redhat.com>
-Subject: [RFC PATCH] tcp/dcpp: Un-pin tw_timer
-Date: Mon, 16 Oct 2023 14:59:34 +0200
-Message-Id: <20231016125934.1970789-1-vschneid@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC7520B22;
+	Mon, 16 Oct 2023 13:05:44 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94E50A2;
+	Mon, 16 Oct 2023 06:05:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=jk87Z9G5kk27ySxNjcyJeHPOT/DN888+nmzgX3iZ9tk=; b=daGl9owagA2pILDaXsPx1ieG4D
+	9tnaqJU9QyeLGQAayi8z3+kaObKTQV1KQNAl5OM+f1V/ID95B5EseNnsnOCF/gWdCi0uvUQPDqKv2
+	vS8W/OzTWPgIHZEK0pcrcjWYU69+fQt2ESHdCyxY9Le7YsGF9xTIc7VfAoiFCAZD9PA4lA4CRvRRG
+	2EH3viv7wtghsYUXdZrzl8zXZwoqJUPkap55SBn+nbNbKh/IMOwipTAaa/EYZteMIHE/ghX/1VQkb
+	PbF71vg2bB7A/gClYjwbmyBQxtVJgs5R8gvORk1h8Q4xtEA6rlb9lq/mWCZCARuup8Y8wgRSKqdtg
+	AkmdO6Aw==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qsNHi-000GY1-Lz; Mon, 16 Oct 2023 15:05:26 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qsNHh-000OO0-VE; Mon, 16 Oct 2023 15:05:25 +0200
+Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie
+ generation/validation SOCK_OPS hooks.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ David Ahern <dsahern@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20231013220433.70792-1-kuniyu@amazon.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <0611984e-aea2-7eb5-af3e-e0635ca3b7ba@iogearbox.net>
+Date: Mon, 16 Oct 2023 15:05:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <20231013220433.70792-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27063/Mon Oct 16 10:02:17 2023)
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The TCP timewait timer is proving to be problematic for setups where scheduler
-CPU isolation is achieved at runtime via cpusets (as opposed to statically via
-isolcpus=domains).
+On 10/14/23 12:04 AM, Kuniyuki Iwashima wrote:
+> Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
+> for the connection request until a valid ACK is responded to the SYN+ACK.
+> 
+> The cookie contains two kinds of host-specific bits, a timestamp and
+> secrets, so only can it be validated by the generator.  It means SYN
+> Cookie consumes network resources between the client and the server;
+> intermediate nodes must remember which nodes to route ACK for the cookie.
+> 
+> SYN Proxy reduces such unwanted resource allocation by handling 3WHS at
+> the edge network.  After SYN Proxy completes 3WHS, it forwards SYN to the
+> backend server and completes another 3WHS.  However, since the server's
+> ISN differs from the cookie, the proxy must manage the ISN mappings and
+> fix up SEQ/ACK numbers in every packet for each connection.  If a proxy
+> node is down, all the connections through it are also down.  Keeping a
+> state at proxy is painful from that perspective.
+> 
+> At AWS, we use a dirty hack to build truly stateless SYN Proxy at scale.
+> Our SYN Proxy consists of the front proxy layer and the backend kernel
+> module.  (See slides of netconf [0], p6 - p15)
+> 
+> The cookie that SYN Proxy generates differs from the kernel's cookie in
+> that it contains a secret (called rolling salt) (i) shared by all the proxy
+> nodes so that any node can validate ACK and (ii) updated periodically so
+> that old cookies cannot be validated.  Also, ISN contains WScale, SACK, and
+> ECN, not in TS val.  This is not to sacrifice any connection quality, where
+> some customers turn off the timestamp option due to retro CVE.
+> 
+> After 3WHS, the proxy restores SYN and forwards it and ACK to the backend
+> server.  Our kernel module works at Netfilter input/output hooks and first
+> feeds SYN to the TCP stack to initiate 3WHS.  When the module is triggered
+> for SYN+ACK, it looks up the corresponding request socket and overwrites
+> tcp_rsk(req)->snt_isn with the proxy's cookie.  Then, the module can
+> complete 3WHS with the original ACK as is.
+> 
+> This way, our SYN Proxy does not manage the ISN mappings and can stay
+> stateless.  It's working very well for high-bandwidth services like
+> multiple Tbps, but we are looking for a way to drop the dirty hack and
+> further optimise the sequences.
+> 
+> If we could validate an arbitrary SYN Cookie on the backend server with
+> BPF, the proxy would need not restore SYN nor pass it.  After validating
+> ACK, the proxy node just needs to forward it, and then the server can do
+> the lightweight validation (e.g. check if ACK came from proxy nodes, etc)
+> and create a connection from the ACK.
+> 
+> This series adds two SOCK_OPS hooks to generate and validate arbitrary
+> SYN Cookie.  Each hook is invoked if BPF_SOCK_OPS_SYNCOOKIE_CB_FLAG is
+> set to the listening socket in advance by bpf_sock_ops_cb_flags_set().
+> 
+> The user interface looks like this:
+> 
+>    BPF_SOCK_OPS_GEN_SYNCOOKIE_CB
+> 
+>      input
+>      |- bpf_sock_ops.sk           : 4-tuple
+>      |- bpf_sock_ops.skb          : TCP header
+>      |- bpf_sock_ops.args[0]      : MSS
+>      `- bpf_sock_ops.args[1]      : BPF_SYNCOOKIE_XXX flags
+> 
+>      output
+>      |- bpf_sock_ops.replylong[0] : ISN (SYN Cookie) ------.
+>      `- bpf_sock_ops.replylong[1] : TS value -----------.  |
+>                                                         |  |
+>    BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB                      |  |
+>                                                         |  |
+>      input                                              |  |
+>      |- bpf_sock_ops.sk           : 4-tuple             |  |
+>      |- bpf_sock_ops.skb          : TCP header          |  |
+>      |- bpf_sock_ops.args[0]      : ISN (SYN Cookie) <-----'
+>      `- bpf_sock_ops.args[1]      : TS value <----------'
+> 
+>      output
+>      |- bpf_sock_ops.replylong[0] : MSS
+>      `- bpf_sock_ops.replylong[1] : BPF_SYNCOOKIE_XXX flags
+> 
+> To establish a connection from SYN Cookie, BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB
+> hook must set a valid MSS to bpf_sock_ops.replylong[0], meaning that
+> BPF_SOCK_OPS_GEN_SYNCOOKIE_CB hook must encode MSS to ISN or TS val to be
+> restored in the validation hook.
+> 
+> If WScale, SACK, and ECN are detected to be available in SYN packet, the
+> corresponding flags are passed to args[0] of BPF_SOCK_OPS_GEN_SYNCOOKIE_CB
+> so that bpf prog need not parse the TCP header.  The same flags can be set
+> to replylong[0] of BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB to enable each feature
+> on the connection.
+> 
+> For details, please see each patch.  Here's an overview:
+> 
+>    patch 1 - 4 : Misc cleanup
+>    patch 5, 6  : Add SOCK_OPS hook (only ISN is available here)
+>    patch 7, 8  : Make TS val available as the second cookie storage
+>    patch 9, 10 : Make WScale, SACK, and ECN configurable from ACK
+>    patch 11    : selftest, need some help from BPF experts...
+> 
+> [0]: https://netdev.bots.linux.dev/netconf/2023/kuniyuki.pdf
 
-What happens there is a CPU goes through tcp_time_wait(), arming the time_wait
-timer, then gets isolated. TCP_TIMEWAIT_LEN later, the timer fires, causing
-interference for the now-isolated CPU. This is conceptually similar to the issue
-described in
-  e02b93124855 ("workqueue: Unbind kworkers before sending them to exit()")
+Fyi, just as quick feedback, this fails BPF CI selftests :
 
-Making the timer un-pinned would resolve this, as it would be queued onto
-HK_FLAG_TIMER CPUs. It would Unfortunately go against
-  ed2e92394589 ("tcp/dccp: fix timewait races in timer handling")
-as we'd need to arm the timer after the *hashdance() to not have it fire before
-we've finished setting up the timewait_socket.
+https://github.com/kernel-patches/bpf/actions/runs/6513838231/job/17694669376
 
-However, looking into this, I cannot grok what race is fixed by having the timer
-*armed* before the hashdance.
-
-[this next segment is brought to you by Cunningham's Law]
-
-Using [1] as an example, inet_twsk_schedule() only arms the timer and increments
-the deathrow refcount, which by itself does not affect
-__inet_lookup_established(). AFAICT it only comes in handy if:
-1) A CPU ends up livelocking in __inet_lookup_established() (cf. [1], though per
-   inet_twsk_alloc() I don't see how a timewait socket can hit the
-   forever-looping conditions with how the sk_hash and addr/port pairs are copied)
-2) the initialization context can be interrupted by NET_RX (it can, cf.
-   cfac7f836a71 ("tcp/dccp: block bh before arming time_wait timer"))
-
-In this scenario, we need the timer to fire to go through
-  inet_twsk_kill()
-    sk_nulls_del_node_init_rcu()
-and break out of the loop.
-
-Keep softirqs disabled, but make the timer un-pinned and arm it after the
-hashdance. Remote CPUs may start using the timewait socket before the timer is
-armed, but their execution of __inet_lookup_established() won't prevent the
-arming of the timer.
-
-This partially reverts
-  ed2e92394589 ("tcp/dccp: fix timewait races in timer handling")
-and
-  ec94c2696f0b ("tcp/dccp: avoid one atomic operation for timewait hashdance")
-
-Link: [1] https://lore.kernel.org/lkml/56941035.9040000@fastly.com/
-Link: https://lore.kernel.org/all/ZPhpfMjSiHVjQkTk@localhost.localdomain/
-Signed-off-by: Valentin Schneider <vschneid@redhat.com>
----
- net/dccp/minisocks.c          | 18 ++++++++++--------
- net/ipv4/inet_timewait_sock.c |  9 ++++-----
- net/ipv4/tcp_minisocks.c      | 18 ++++++++++--------
- 3 files changed, 24 insertions(+), 21 deletions(-)
-
-diff --git a/net/dccp/minisocks.c b/net/dccp/minisocks.c
-index 64d805b27adde..188a29a1aef49 100644
---- a/net/dccp/minisocks.c
-+++ b/net/dccp/minisocks.c
-@@ -53,16 +53,18 @@ void dccp_time_wait(struct sock *sk, int state, int timeo)
- 		if (state == DCCP_TIME_WAIT)
- 			timeo = DCCP_TIMEWAIT_LEN;
- 
--		/* tw_timer is pinned, so we need to make sure BH are disabled
--		 * in following section, otherwise timer handler could run before
--		 * we complete the initialization.
--		 */
--		local_bh_disable();
--		inet_twsk_schedule(tw, timeo);
--		/* Linkage updates.
--		 * Note that access to tw after this point is illegal.
-+		/* tw_timer is armed after the hashdance and recount update, so
-+		 * we need to make sure BH are disabled in following section to
-+		 * ensure the timer is armed before we handle any further skb's.
- 		 */
-+	       local_bh_disable();
-+
-+		// Linkage updates
- 		inet_twsk_hashdance(tw, sk, &dccp_hashinfo);
-+		inet_twsk_schedule(tw, timeo);
-+		// Access to tw after this point is illegal.
-+		inet_twsk_put(tw);
-+
- 		local_bh_enable();
- 	} else {
- 		/* Sorry, if we're out of memory, just CLOSE this
-diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
-index dd37a5bf68811..ba59c2c6ef4a2 100644
---- a/net/ipv4/inet_timewait_sock.c
-+++ b/net/ipv4/inet_timewait_sock.c
-@@ -152,16 +152,15 @@ void inet_twsk_hashdance(struct inet_timewait_sock *tw, struct sock *sk,
- 
- 	spin_unlock(lock);
- 
--	/* tw_refcnt is set to 3 because we have :
-+	/* tw_refcnt is set to 4 because we have :
- 	 * - one reference for bhash chain.
- 	 * - one reference for ehash chain.
- 	 * - one reference for timer.
-+	 * - One reference for ourself (our caller will release it).
- 	 * We can use atomic_set() because prior spin_lock()/spin_unlock()
- 	 * committed into memory all tw fields.
--	 * Also note that after this point, we lost our implicit reference
--	 * so we are not allowed to use tw anymore.
- 	 */
--	refcount_set(&tw->tw_refcnt, 3);
-+	refcount_set(&tw->tw_refcnt, 4);
- }
- EXPORT_SYMBOL_GPL(inet_twsk_hashdance);
- 
-@@ -207,7 +206,7 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct sock *sk,
- 		tw->tw_prot	    = sk->sk_prot_creator;
- 		atomic64_set(&tw->tw_cookie, atomic64_read(&sk->sk_cookie));
- 		twsk_net_set(tw, sock_net(sk));
--		timer_setup(&tw->tw_timer, tw_timer_handler, TIMER_PINNED);
-+		timer_setup(&tw->tw_timer, tw_timer_handler, 0);
- 		/*
- 		 * Because we use RCU lookups, we should not set tw_refcnt
- 		 * to a non null value before everything is setup for this
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index b98d476f1594b..269d4aa14a49e 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -324,16 +324,18 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
- 		if (state == TCP_TIME_WAIT)
- 			timeo = TCP_TIMEWAIT_LEN;
- 
--		/* tw_timer is pinned, so we need to make sure BH are disabled
--		 * in following section, otherwise timer handler could run before
--		 * we complete the initialization.
--		 */
--		local_bh_disable();
--		inet_twsk_schedule(tw, timeo);
--		/* Linkage updates.
--		 * Note that access to tw after this point is illegal.
-+		/* tw_timer is armed after the hashdance and recount update, so
-+		 * we need to make sure BH are disabled in following section to
-+		 * ensure the timer is armed before we handle any further skb's.
- 		 */
-+	       local_bh_disable();
-+
-+		// Linkage updates.
- 		inet_twsk_hashdance(tw, sk, net->ipv4.tcp_death_row.hashinfo);
-+		inet_twsk_schedule(tw, timeo);
-+		// Access to tw after this point is illegal.
-+		inet_twsk_put(tw);
-+
- 		local_bh_enable();
- 	} else {
- 		/* Sorry, if we're out of memory, just CLOSE this
--- 
-2.39.3
-
+Notice: Success: 427/3396, Skipped: 24, Failed: 1
+Error: #274 tcpbpf_user
+   Error: #274 tcpbpf_user
+   test_tcpbpf_user:PASS:open and load skel 0 nsec
+   test_tcpbpf_user:PASS:test__join_cgroup(/tcpbpf-user-test) 0 nsec
+   test_tcpbpf_user:PASS:attach_cgroup(bpf_testcb) 0 nsec
+   run_test:PASS:start_server 0 nsec
+   run_test:PASS:connect_to_fd(listen_fd) 0 nsec
+   run_test:PASS:accept(listen_fd) 0 nsec
+   run_test:PASS:send(cli_fd) 0 nsec
+   run_test:PASS:recv(accept_fd) 0 nsec
+   run_test:PASS:send(accept_fd) 0 nsec
+   run_test:PASS:recv(cli_fd) 0 nsec
+   run_test:PASS:recv(cli_fd) for fin 0 nsec
+   run_test:PASS:recv(accept_fd) for fin 0 nsec
+   verify_result:PASS:event_map 0 nsec
+   verify_result:PASS:bytes_received 0 nsec
+   verify_result:PASS:bytes_acked 0 nsec
+   verify_result:PASS:data_segs_in 0 nsec
+   verify_result:PASS:data_segs_out 0 nsec
+   verify_result:FAIL:bad_cb_test_rv unexpected bad_cb_test_rv: actual 0 != expected 128
+   verify_result:PASS:good_cb_test_rv 0 nsec
+   verify_result:PASS:num_listen 0 nsec
+   verify_result:PASS:num_close_events 0 nsec
+   verify_result:PASS:tcp_save_syn 0 nsec
+   verify_result:PASS:tcp_saved_syn 0 nsec
+   verify_result:PASS:window_clamp_client 0 nsec
+   verify_result:PASS:window_clamp_server 0 nsec
 
