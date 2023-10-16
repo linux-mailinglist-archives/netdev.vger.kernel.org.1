@@ -1,117 +1,95 @@
-Return-Path: <netdev+bounces-41539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA137CB390
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:56:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B2B37CB398
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:58:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F6E91C20941
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:56:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 817501C20A27
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:58:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E16234CE8;
-	Mon, 16 Oct 2023 19:56:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CCE35883;
+	Mon, 16 Oct 2023 19:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ij7Gnp0k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FX6MQtvL"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0248B29425
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 19:56:38 +0000 (UTC)
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92056B4
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 12:56:37 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so3668590a12.1
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 12:56:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697486197; x=1698090997; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hIUbumNBbfGRc4S/93+Nkfq8j7yrGIHi8Po2wOxRLs4=;
-        b=Ij7Gnp0kLPd2TaiMt+kyJrE3OuBb4fsUdJ/GgVHRS82EXmMZ5WF1xSXWKUF0B6Gx34
-         2ykfBtcPGGzTjJSX322kEpknkJDHxdMmuigIepCqr+mQupivmuyt860lMXrAAkAgKKUO
-         M3YHXV7RVyIZX65O+6plDE3BdcKmIVhSpbe1NEAdyX7i6dgooQ+s/nDq7r+jET/sKtwM
-         rUSeFGeaPsrfrNFv/H+0qQbeH4fDpxseBcyT7XVvEE9SBgaMmCdebn7CA6m+hGJNUiM/
-         6aeq94hrWBPo998wXzixCcTlKSRhI+qHAnDfO8lFXaWgmTPooBHQfRU3OZnpiq8cpM7u
-         YCOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697486197; x=1698090997;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hIUbumNBbfGRc4S/93+Nkfq8j7yrGIHi8Po2wOxRLs4=;
-        b=spEfJxH6+g3LuSINp8CqPUOesE7qjYoKVlULhKAkROa52U3GSmag/BlZPMUP4Olumn
-         /qqMw2QNW63BCYb2LGOvAENUJvY2FDYoGZL3z7uBJNaSTsTHUewONvkEeCdHjqWxn9Qe
-         B+XEAxIoWGYL+kh3X8KLzphYJltkZpdwJuG8qQifBvEZa37Qin3hFc93NcBqRIvrnALH
-         b+ftA/FLxnWUxxbCmPakjOcgJf/G2lIkt4JFli6M03/ZwgppQKQYUWOKPOmmMz4nA90T
-         QWRWM1IYenQ8i12Kg9gkP5jgRym747Yb/KzfIS3WuqlO51b5htpjAtPo5wG3kymYQuxh
-         j6yA==
-X-Gm-Message-State: AOJu0YzCt3NR7BEWL+BeWV0HIm3KGhaTUgStvojH7FEIS0u+cmL3AWt2
-	KTv+qSaJkoCw5MErcbSiV8GKTUOG9R7ALYdttqM=
-X-Google-Smtp-Source: AGHT+IHopxevhR6VjBQxQU5Oq5HwXyEj2oNSUH6w78ME2StIkZwBcY7PAiYzOylHlrje02NHl9C+UbOSpksmvvIdc9E=
-X-Received: by 2002:a17:90b:1901:b0:27d:af3:f15d with SMTP id
- mp1-20020a17090b190100b0027d0af3f15dmr173823pjb.4.1697486197013; Mon, 16 Oct
- 2023 12:56:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E4329425;
+	Mon, 16 Oct 2023 19:58:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B660BC433C8;
+	Mon, 16 Oct 2023 19:58:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697486321;
+	bh=QJt2FjmAOk4+5+b+Cj8Y/yCy8j4cnH5smrJ3zqV3En4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FX6MQtvL92gviz8tSxWSfFL5w4oPc6M/5NeJ4RfP2w0ZjzCQNmfkcliOrohxxdXRu
+	 mGf7jkY+Qp5+gnHnuKwnfGIOb/LYqvb7lLStTNsS5gmREJuEkVMPP5zE9qKJqsXX+h
+	 fjP+2hFDYTIHs2Fkw5mxJ65yjcMcMJbItI+s02EDjyW8kghqpS03VNdQ5OMrWCydCP
+	 DmUI2rWd5/7TberVoCzCL9sZYaaHCgCWWyq/OrrxP/rjg3kR5kWZSdhIeH2na82psT
+	 jkfMsfUdXTGz7eb7AIk0Aj2tV/3myWkuU/HPgTAkuVs5YQVN0or+J4/5Jzjq50e9bI
+	 O5EYsKIjUxeyw==
+Date: Mon, 16 Oct 2023 21:58:36 +0200
+From: Simon Horman <horms@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Justin Stitt <justinstitt@google.com>,
+	Thomas Sailer <t.sailer@alumni.ethz.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2] hamradio: replace deprecated strncpy with strscpy_pad
+Message-ID: <20231016195836.GB1751252@kernel.org>
+References: <20231016-strncpy-drivers-net-hamradio-baycom_epp-c-v2-1-39f72a72de30@google.com>
+ <202310161242.B0F9B693@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f8e887133547cca97d583e78c79f2ee8@rjmcmahon.com>
-In-Reply-To: <f8e887133547cca97d583e78c79f2ee8@rjmcmahon.com>
-From: Dave Taht <dave.taht@gmail.com>
-Date: Mon, 16 Oct 2023 12:56:24 -0700
-Message-ID: <CAA93jw5pMqz3qm35jpkdQQQOX1pUSStR8yF+Eger=+17Eur8Dw@mail.gmail.com>
-Subject: Re: Suggest use -e or --enhanced with iperf 2
-To: rjmcmahon <rjmcmahon@rjmcmahon.com>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202310161242.B0F9B693@keescook>
 
-Bob has put in a lot of work over the past few years on improving
-iperf2's capabilities. The new bounceback tests and histograms are
-great! I hope more folk here upgrade to the newer versions, and pour
-through the man pages for the new options.
+On Mon, Oct 16, 2023 at 12:42:22PM -0700, Kees Cook wrote:
+> On Mon, Oct 16, 2023 at 06:42:42PM +0000, Justin Stitt wrote:
+> > strncpy() is deprecated for use on NUL-terminated destination strings
+> > [1] and as such we should prefer more robust and less ambiguous string
+> > interfaces.
+> > 
+> > We expect both hi.data.modename and hi.data.drivername to be
+> > NUL-terminated based on its usage with sprintf:
+> > |       sprintf(hi.data.modename, "%sclk,%smodem,fclk=%d,bps=%d%s",
+> > |               bc->cfg.intclk ? "int" : "ext",
+> > |               bc->cfg.extmodem ? "ext" : "int", bc->cfg.fclk, bc->cfg.bps,
+> > |               bc->cfg.loopback ? ",loopback" : "");
+> > 
+> > Note that this data is copied out to userspace with:
+> > |       if (copy_to_user(data, &hi, sizeof(hi)))
+> > ... however, the data was also copied FROM the user here:
+> > |       if (copy_from_user(&hi, data, sizeof(hi)))
+> > 
+> > Considering the above, a suitable replacement is strscpy_pad() as it
+> > guarantees NUL-termination on the destination buffer while also
+> > NUL-padding (which is good+wanted behavior when copying data to
+> > userspace).
+> > 
+> > Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> > Link: https://github.com/KSPP/linux/issues/90
+> > Cc: linux-hardening@vger.kernel.org
+> > Signed-off-by: Justin Stitt <justinstitt@google.com>
+> 
+> Thanks!
+> 
+> Reviewed-by: Kees Cook <keescook@chromium.org>
 
-There is more to good networking than just throughput tests.
+Likewise, thanks. I prefer this over v1.
 
-On Mon, Oct 16, 2023 at 12:20=E2=80=AFPM rjmcmahon <rjmcmahon@rjmcmahon.com=
-> wrote:
->
-> Hi All,
->
-> I suggest the use of enhanced reports w/iperf 2, for those using iperf 2
-> version that's actively maintained (not 2.0.5.) This will provide a bit
-> more information to the user including CWND & RTT samples.
->
-> If the clocks are synced, then also use the --trip-times option on the
-> client which will enable latency related stats. There are also
-> histograms.
->
-> Man page is here: https://iperf2.sourceforge.io/iperf-manpage.html
->
-> Finally, there is some python code in the flows directory - though it
-> may be a bit brittle.
->
-> Source code is here:
-> https://sourceforge.net/p/iperf2/code/ci/master/tree/
->
-> Bob
->
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-
---=20
-Oct 30: https://netdevconf.info/0x17/news/the-maestro-and-the-music-bof.htm=
-l
-Dave T=C3=A4ht CSO, LibreQos
 
