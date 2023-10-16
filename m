@@ -1,165 +1,210 @@
-Return-Path: <netdev+bounces-41246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B6F7CA53A
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:23:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B187CA543
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:25:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53FCF1C2091F
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:23:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5450F281552
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:25:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509A21F615;
-	Mon, 16 Oct 2023 10:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 686151F616;
+	Mon, 16 Oct 2023 10:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TmcEhI90"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cyqNMnWr"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF87F1F60F;
-	Mon, 16 Oct 2023 10:23:00 +0000 (UTC)
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3537CEE;
-	Mon, 16 Oct 2023 03:22:59 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9b1ebc80d0aso672913366b.0;
-        Mon, 16 Oct 2023 03:22:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697451777; x=1698056577; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xfJWdslS3Yal/mqU3hhH87VKZdvRShl/Pe/cybkKHWg=;
-        b=TmcEhI906+Az0MSXct6z8ZR0aZPeGZfNxbs4iJARuzoErFLIpLJ9XLYHMDZ6XvhYD0
-         PBCSK/MAFUqHfmJWVnlSDGkNyM0St+6S95Bh/AsHJVd0FQaENIghm5zP4M1CmSc7XMZn
-         19Jp1Tob/ZQUkaF1nuwJiMXQlT2czT0+hmL5qWhX9dgjzAup77i+BK8OsZfi7UDI1wf7
-         9iTSYrUsD+ugvqBLblEQBUHJ95/RU412QaQdJaawB9tkSCPoOSvtRJhkGzA2xY7xW876
-         /T4QCJKN7wbXHL3KOpGPeuZA+FkhiBt2+DRKGAcIdCd7lN3JnAYSMRxZvhPDShfbJWZi
-         6YJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697451777; x=1698056577;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xfJWdslS3Yal/mqU3hhH87VKZdvRShl/Pe/cybkKHWg=;
-        b=LKQNn9iqE/9d2YYTzsKmj39EnTfKAdK8Sj/ereNEGOhBKJRL5B48ajEoiSczF0NRlr
-         6sm/Pt5eD8yMzAzzxKRPEO1LKT0bZHrNO+Apg+rMbN63xXS42lUCjT3skRLAg0CVrzmu
-         UmKKpE3X4DolnBHfVUTTPwcQlOgyYaJtTGgBboSbSVLuPfRp3fxaoxsBHEQomUJYMGxU
-         TI3ixmkzhm4IcSQ44rZKJME6vN5w/0D1Ql3x0rvGeFWf4JXe9Y2aJKldHYfDP1VUQfDf
-         KexZSlR5PS1etwU1VnZC+ppkO3HDlx2QJ2SedMPEeRAsufHRJ2OLkHRHxLANH6EUqaHo
-         0Uqg==
-X-Gm-Message-State: AOJu0Yx83xByEi2Zg28gXQS87DCkoVb+Yhs3IvWYUtiraYXmVUBjEsjJ
-	wo/NQhnzYjEr1lVZflKc0LE=
-X-Google-Smtp-Source: AGHT+IEKRQpew27HjOeGyjWHZXAUVaNqJuiqAmK9LZWwGrJlIJ3XHpuuO/jNnXt9DgwB+aS7MqbtNQ==
-X-Received: by 2002:a17:907:7ba1:b0:9c4:4b20:44b2 with SMTP id ne33-20020a1709077ba100b009c44b2044b2mr1761032ejc.23.1697451777533;
-        Mon, 16 Oct 2023 03:22:57 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id og41-20020a1709071de900b009adce1c97ccsm3701040ejc.53.2023.10.16.03.22.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 03:22:57 -0700 (PDT)
-Date: Mon, 16 Oct 2023 13:22:54 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 7/7] net: dsa: microchip: do not shut down
- the switch if WoL is active
-Message-ID: <20231016102254.f7u7vrk52siqoihd@skbuf>
-References: <20231013122405.3745475-1-o.rempel@pengutronix.de>
- <20231013122405.3745475-8-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968751DDF4
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 10:25:12 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37623AC;
+	Mon, 16 Oct 2023 03:25:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697451909; x=1728987909;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=EbdcjJBxDrXiBpd4uUul/55SK9TbMBfaffYi4nG1iLQ=;
+  b=cyqNMnWr90qUj3oRsfKuTI2Yq21MfKMZNLHecnF1kgxYlOW/16kDcBuZ
+   CrbBOCZXPcxqsg243BXWtC6dxgkpUFGBgob6d1MMpWOTueS7tOtz1ia3z
+   o3Wl4rYYh/lzhaKaPzVP+ozedIL25ePirdrjxOE0sbgcHbDFTwnXs/CBV
+   gzThhHQRZ8b9KIh8s9g1nBhC0dZVU/MY06CKttC/RHxUnOchLwUmntHKD
+   SeWxpfI9F90Wvpmq88QQCknj77wLAnOVZTn9XnmzLXJIHfyv1IcqDryZg
+   AKmuCFnTVph9600K1FKhS81gzaGx+8qQTqoVHjqsx+XzVc+18D0BUFgzv
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="370569001"
+X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
+   d="scan'208";a="370569001"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 03:25:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="749248384"
+X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
+   d="scan'208";a="749248384"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Oct 2023 03:25:08 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 16 Oct 2023 03:25:07 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Mon, 16 Oct 2023 03:25:07 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Mon, 16 Oct 2023 03:25:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gl1ObVwSs4KUY52dkCvREh1clxTlvh+6VSf6Ln2Y3OcSTiDtneoe1o4PVLrhsFssCy89fnp3YBCqJwjzJVSGg4KOIlQ1D7i0xP5jjqj/LD4Hvmif7maa8yXl7H0bwD5XCL1Hj7P/3AzV4AwAmRbRJIuNBmSvwxJbBc1KsOobbP3tEAHde7pM0gxcL4zSCkaj26sZX9eaPhbTfZs7Hsc92zGU5ghnhAXcLCzlMEdyXrmiRDUWCebt12AqG3brYQQkuu8k11u5VBtdTIhaZ2miJEYkW/EM0TVHhtZgMlL6zJRn9D+kopvR4ngM68V46q+UCiZYeCv4IIu/b8qYSNjVKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=B/rW7Vf4JlZfQaZUKDFRAtSfcPWcEWQpiQhH0ieY8g4=;
+ b=UOJtXKobQOm/K/FmAg121Op4a+60EANqbZWO4hhM0ml5/4E0hJEyfK6uEzWRZ3qk0Rq1PA2UgK8BCYjew4sE48zHBivrVAQ7CNRDPVZNb53XM23GVc3iKFPquZ6VmMqgyvhQXNjXbXMc4ZgW84QEJTVy1k6T9W/yafb2Vq5loOVw4a3f++hWXlVKtsmTFcHo/1EUZyNst8CyUvyQkaT6sMhsOytEHmrQJT3ng3lOQNDOe0T6pBYyecD8WGzLy+uY+G4h+Jv/SqWUXzFBbr9S4+HWFzNPvFoFzEDOujPQdaJvb1t1vFKIjpUdBCNJwqyv8Gd0cD8tDsCbqtFH048zyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3521.namprd11.prod.outlook.com (2603:10b6:208:7b::32)
+ by SA3PR11MB7526.namprd11.prod.outlook.com (2603:10b6:806:31c::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Mon, 16 Oct
+ 2023 10:25:05 +0000
+Received: from BL0PR11MB3521.namprd11.prod.outlook.com
+ ([fe80::a2bc:136a:3f41:c858]) by BL0PR11MB3521.namprd11.prod.outlook.com
+ ([fe80::a2bc:136a:3f41:c858%6]) with mapi id 15.20.6886.034; Mon, 16 Oct 2023
+ 10:25:05 +0000
+From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
+To: "Brandeburg, Jesse" <jesse.brandeburg@intel.com>, Dan Carpenter
+	<dan.carpenter@linaro.org>, Jinjie Ruan <ruanjinjie@huawei.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>, "Eric
+ Dumazet" <edumazet@google.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH net-next 1/2] igb: Fix an end of loop
+ test
+Thread-Topic: [Intel-wired-lan] [PATCH net-next 1/2] igb: Fix an end of loop
+ test
+Thread-Index: AQHZ95QOjtHQwFcfE02+YCzWjlaUJLBBmF0AgAqudxA=
+Date: Mon, 16 Oct 2023 10:25:05 +0000
+Message-ID: <BL0PR11MB3521FD279A6FC102DBEC8DAB8FD7A@BL0PR11MB3521.namprd11.prod.outlook.com>
+References: <4d61f086-c7b4-4762-b025-0ba5df08968b@moroto.mountain>
+ <95370ca0-c60a-ad91-aa22-60a1d9376461@intel.com>
+In-Reply-To: <95370ca0-c60a-ad91-aa22-60a1d9376461@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3521:EE_|SA3PR11MB7526:EE_
+x-ms-office365-filtering-correlation-id: 10b68bd0-2244-4a9c-752a-08dbce322a0f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: c2Axro3mwq5+rnusW+plTrCaHDlR5ajxJDLdmYpj+W+EY6anvLqr/CvVaBBAwxNXr54UXNgP4SD/FzfvsvqWy2sWiUQkPMmCDf8via9BekCkcjqWLC+XUwx4rMuU31k5eUOA2bkAYVua+SSkp5mhQK/2EXEKQ7Y4dvoE2RIabp8vpjFoIzgBMkXp/tllpikQMrenROvsqDR5yp9DLIv3/6Yn7oY+7WzY2RE1s6SCB0KrGnjnk4zL+lJbYnrzzE86h4bauaKpllwn7LYSTVtktKkOHeiIpLTyyYCpCTnyvq3QDZ8ZAXfF+HIwx/CSpPUgJ/pSHWzvLJB7sUYImGgaqvuW387XA8NZnlv1E/7akOm4UlpgfaO41/rCk4JcRkymLh6NN72T4tDBCbdI1Rz9aROO7KFNtpg0279o8ze4Q77UAbjne/6nv8UHGSiPMrChDzl0GX8t1te4+eaWOjX+HhQIPpgUDemCHtkaxi6EELrXGdLKxXIVQGu96jhaDu1un9vvn/XJ4VZgb6iNtrK5d+Np3CL2B3j4zkFWRh4YYHNvrPlq4jkUSJjki9oVYaMxA6n1VAcLlXXxw47LsnjRhaOnThJPwl+Lsp6r/07umww=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3521.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(346002)(39860400002)(396003)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(55016003)(478600001)(966005)(110136005)(76116006)(66946007)(66556008)(66476007)(66446008)(64756008)(54906003)(316002)(71200400001)(82960400001)(83380400001)(86362001)(38100700002)(9686003)(26005)(53546011)(7696005)(6506007)(33656002)(41300700001)(5660300002)(38070700005)(122000001)(8936002)(8676002)(4326008)(7416002)(2906002)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?w+c7ul/MEJsK7kWymF3P9V5KYn56weGinZoFzuq8QHUzZo5X89RAX86JL8vp?=
+ =?us-ascii?Q?SYAwa+YewYjTwZP86koe/xcEou0mt56H2chVBnbPdjmxJ5aVW6a3yAqOg7Vg?=
+ =?us-ascii?Q?Ivf9zRjMFDhKBqi5PR580lewu+o00qlfTNDwpj9zWTIBZ3M6BXsIs3J23kfM?=
+ =?us-ascii?Q?gYLLMFgVu1sStbORucbI1tsm3dxmVxCIoSAwGlydo3jsjGjCwQjOGBcQA/8v?=
+ =?us-ascii?Q?MBpwjbsdRsfPXy5Pn0XA91yUMzezrLPLY5C7DaEuJyJlRWSYrMrOEpYQFIr6?=
+ =?us-ascii?Q?SBSby9yO3xu5E6n8y6I6ZQMTLprxdqOqLvMuaV1BYJ8O/RN+6W9EkyBxRG/2?=
+ =?us-ascii?Q?TPOLCeXcgDVm55phjFKthI+gQ6HEEaM0COhNwbX0UpRKUEZ+azhL79OHLfAc?=
+ =?us-ascii?Q?iogXW4H/NwKd49OumHh19Rh8S4d6XBHyIplSMEuM/Uh6B8F8VSm/nH7icsyZ?=
+ =?us-ascii?Q?+500nexSUSFEmBIdP9lsBtx47HgtydWPKePuS/mLp/TX/MCIdRbA/fMzG1ns?=
+ =?us-ascii?Q?aGiYGI3UlQGr6OyMLk/09TYscmErTfrbstCsSrlXGGA+ofMNBV0g1LiuPbFR?=
+ =?us-ascii?Q?E4oGF1YVt0YoFzYmj9wO+UmnMVfljgvq13EatOuTui46x+B8Hpzhdkc7KWM4?=
+ =?us-ascii?Q?/2uSXAu/aZAOQK+V1v2+TFCu+tWvSID6BZCqKo0l4WwugXttgGhMywUxEUYz?=
+ =?us-ascii?Q?Dtcf+sH4MjXgMT2P6lixS/cV8qvUTxlxtG5ageN58T7UnJosY79cEu7ZIdMm?=
+ =?us-ascii?Q?ikA+ql5b4Ebv6c2wdpwddiWmROCnN8GjUBgzvn2OumZ/oanpd9sssW24ujAr?=
+ =?us-ascii?Q?aF12wxej0QiALKqUe1jlfy4h1fqlwzFPvZh6Y0J9/R2jwjafNilzz0su0CdU?=
+ =?us-ascii?Q?+o6HuTDjDsYKTSqYYL0Q1XxrVTbQgNNKo15XK2PDzl5wL3p7DPCJWx7f+Xnb?=
+ =?us-ascii?Q?c259GqEluwQLpaOcgrC05fjuYnzh23woQ0/Z7+xTUSnjM2KuHqYtO6jadtLu?=
+ =?us-ascii?Q?QToskDZGZc/xHaqyQ2PIUMUI1agRwdPTDfESKvaXxw1ZtDNq34RcXdc14RKv?=
+ =?us-ascii?Q?pO67spyeWz6wJ/oFFY6XFMmX6+nbvqhQSJh73reqGlsnRbnYo/32pMarPcxG?=
+ =?us-ascii?Q?+Gs6mmnK8C1gZ1wp6u7EQJJpqP7ImszQ272NkonCnx111pmtSINq/8OWZVdF?=
+ =?us-ascii?Q?1li0lYMZNveJhbyYVpg7IRZFbWpMJ2C06Xsism3H41UF71Y1l6nGwjW1B1Er?=
+ =?us-ascii?Q?6uhaYAjR18gZ3lTNI9aOP6RI5mEfNIuf9bas40Cvu0FFqrqU7yTUL7vZgtE3?=
+ =?us-ascii?Q?f5i0fytGKjwv+NglX6aX5IueF4ztH3KeT7e95Do6wHEx7WOk7khWHtNFVgx9?=
+ =?us-ascii?Q?+K7yOZ0FmeMKX42qRk3bamrNbI008vuxg43ViYlexdTo8e+ki2CZl4vzNnHg?=
+ =?us-ascii?Q?8QqBRmo6YHRBsmui3pDoCMhIpsfZ2buPn5+k+/rLmWi0qI1yVjVwbgfo97i3?=
+ =?us-ascii?Q?J67Y0AgIusEVtj8vrt3T9nyR9hez9ule3HjnOw/AkhxK/PWEQ/o3pGNadYRX?=
+ =?us-ascii?Q?nLEvg+PatOgYohXbAJ2NN7aDtng9bKrthEZ3xz0vmP20uheJ7VQ0t/XqTbJ5?=
+ =?us-ascii?Q?qA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231013122405.3745475-8-o.rempel@pengutronix.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3521.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10b68bd0-2244-4a9c-752a-08dbce322a0f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2023 10:25:05.2025
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hAZEdj4IRTF6vguC9OFh0lBaUnXKC4pAyv9jiqGkHoATJV1Xn7jLr/El6swkKzGOd3sflOamBUuItbc98khn1IXkPb4sdYCWXUpM5qfldME=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7526
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Oct 13, 2023 at 02:24:05PM +0200, Oleksij Rempel wrote:
-> For Wake on Lan we should not reconfigure, reset or power down the
-> switch on shut down sequence.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
->  drivers/net/dsa/microchip/ksz9477_i2c.c |  3 +++
->  drivers/net/dsa/microchip/ksz_common.c  | 18 ++++++++++++++++++
->  drivers/net/dsa/microchip/ksz_common.h  |  2 ++
->  drivers/net/dsa/microchip/ksz_spi.c     |  3 +++
->  4 files changed, 26 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/microchip/ksz9477_i2c.c b/drivers/net/dsa/microchip/ksz9477_i2c.c
-> index 2710afad4f3a..fe818742051c 100644
-> --- a/drivers/net/dsa/microchip/ksz9477_i2c.c
-> +++ b/drivers/net/dsa/microchip/ksz9477_i2c.c
-> @@ -66,6 +66,9 @@ static void ksz9477_i2c_shutdown(struct i2c_client *i2c)
->  	if (!dev)
->  		return;
->  
-> +	if (ksz_wol_is_active(dev))
-> +		return;
-> +
->  	if (dev->dev_ops->reset)
->  		dev->dev_ops->reset(dev);
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Jesse Brandeburg
+> Sent: Monday, October 9, 2023 5:18 PM
+> To: Dan Carpenter <dan.carpenter@linaro.org>; Jinjie Ruan
+> <ruanjinjie@huawei.com>
+> Cc: intel-wired-lan@lists.osuosl.org; kernel-janitors@vger.kernel.org; Er=
+ic
+> Dumazet <edumazet@google.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; Simon Horman <horms@kernel.org>;
+> netdev@vger.kernel.org; Keller, Jacob E <jacob.e.keller@intel.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; David S.
+> Miller <davem@davemloft.net>
+> Subject: Re: [Intel-wired-lan] [PATCH net-next 1/2] igb: Fix an end of lo=
+op test
+>=20
+> On 10/5/2023 6:57 AM, Dan Carpenter wrote:
+> > When we exit a list_for_each_entry() without hitting a break
+> > statement, the list iterator isn't NULL, it just point to an offset
+> > off the list_head.  In that situation, it wouldn't be too surprising
+> > for
+> > entry->free to be true and we end up corrupting memory.
+> >
+> > The way to test for these is to just set a flag.
+> >
+> > Fixes: c1fec890458a ("ethernet/intel: Use list_for_each_entry()
+> > helper")
+> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+>=20
+> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+>=20
+>=20
+> _______________________________________________
+> Intel-wired-lan mailing list
+> Intel-wired-lan@osuosl.org
+> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
 
-The rest of the code used to read:
 
-	dsa_switch_shutdown(dev->ds);
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 
-	i2c_set_clientdata(i2c, NULL);
-}
 
-and that part is non-optional. Please only skip the dev->dev_ops->reset()
-call if ksz_wol_is_active().
-
->  static void ksz_set_xmii(struct ksz_device *dev, int port,
->  			 phy_interface_t interface)
->  {
-> diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-> index 80679f38ee12..84b1eed8cd2a 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.h
-> +++ b/drivers/net/dsa/microchip/ksz_common.h
-> @@ -397,6 +397,8 @@ bool ksz_get_gbit(struct ksz_device *dev, int port);
->  phy_interface_t ksz_get_xmii(struct ksz_device *dev, int port, bool gbit);
->  extern const struct ksz_chip_data ksz_switch_chips[];
->  
-> +bool ksz_wol_is_active(struct ksz_device *dev);
-> +
->  /* Common register access functions */
->  static inline struct regmap *ksz_regmap_8(struct ksz_device *dev)
->  {
-> diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-> index 279338451621..c5d9c3d86ddb 100644
-> --- a/drivers/net/dsa/microchip/ksz_spi.c
-> +++ b/drivers/net/dsa/microchip/ksz_spi.c
-> @@ -114,6 +114,9 @@ static void ksz_spi_shutdown(struct spi_device *spi)
->  	if (!dev)
->  		return;
->  
-> +	if (ksz_wol_is_active(dev))
-> +		return;
-> +
->  	if (dev->dev_ops->reset)
->  		dev->dev_ops->reset(dev);
-
-Same here. Maybe introducing a common ksz_switch_shutdown() would be
-appropriate.
 
