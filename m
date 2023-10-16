@@ -1,96 +1,98 @@
-Return-Path: <netdev+bounces-41188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9B827CA2DF
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:56:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1297CA30C
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:00:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B0221C208CB
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 08:56:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9D2928156C
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A8B1A29F;
-	Mon, 16 Oct 2023 08:56:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB5A51A59D;
+	Mon, 16 Oct 2023 09:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fTVwj73m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gYebKGr1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA9B1548F
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 08:56:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C39D6C433C7;
-	Mon, 16 Oct 2023 08:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D36A1A58C
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:00:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2B7C0C433CC;
+	Mon, 16 Oct 2023 09:00:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697446579;
-	bh=1AHKkjopLy9MQ2QaX0CMu3exjv0u7VlsqlSyKEPL17I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fTVwj73mH4w8wkLtKxMBFbXppul9fJhr+aXijweVOwj/yAN+p6H+DVcthn0x4ZxrH
-	 WNWEVkbFlxG3zbRPgjplrcrzxbN/oIs4zJQNqGL93wenT/OfI3QIv0T4b5z6S2PRuz
-	 OTKz9XQ4qccllse9iUSs5S9NQsSzY0LOBZ4VxN6LkxejfolOUT1VcWVU3CEMRNOsta
-	 Fjo2Bb124+cbUWwQqzhbHw6vXHr04N4bYEn8sbI9/vPLIzRFP6FHovH5dMvEn1tCmI
-	 uNEaWIxvTuPV6cokexqMWvx8jdi0NSOAh/eLVrmPpAouDQY893Zn62mKS1XvdY93yh
-	 eTvWTlL0OLnLQ==
-Date: Mon, 16 Oct 2023 10:56:16 +0200
-From: Simon Horman <horms@kernel.org>
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v3 0/5] ice: Support 5 layer
- Tx scheduler topology
-Message-ID: <20231016085616.GF1501712@kernel.org>
-References: <20231009090711.136777-1-mateusz.polchlopek@intel.com>
+	s=k20201202; t=1697446825;
+	bh=NW9DlooEk/8D5F8mBI9PtB9cSzq23dm5wLvyptIwSks=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gYebKGr1jBoJa6pNw0PHBvY6lh+NfkAjJH/uQlBtFHxNIZgTzpf2sv9AEJxVEdpIZ
+	 ILu2nP7ScRlbrwaEHzJEwl34EMpelvxX0+VJDP7SLYxzUSibIQ6x0TXJYOeMS4DC7T
+	 siXR7HBxu4Ipdw1ozRSxo0QBpsg8FpLIX1upWSrxUMb4JVG3O2mOdCM/nM38INZzkO
+	 p98Xdcrq3yyMl8sxGuI0NS+/0QgpsqIDjTVzboG75u39bga9jamq2acRu42vTPRKV1
+	 gaW2dWSysVQ6nx6wV8qOb+tTcCp8WqmeTzRdz0Juc2DkrxCzHc2SFMypYyrm0qKB8a
+	 Ml1UfMM7FKnXg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1636EC41671;
+	Mon, 16 Oct 2023 09:00:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231009090711.136777-1-mateusz.polchlopek@intel.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/7] net: consolidate IPv4 route lookup for UDP
+ tunnels
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169744682508.7474.11859818002132979363.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Oct 2023 09:00:25 +0000
+References: <20231016071526.2958108-1-b.galvani@gmail.com>
+In-Reply-To: <20231016071526.2958108-1-b.galvani@gmail.com>
+To: Beniamino Galvani <b.galvani@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, gnault@redhat.com,
+ linux-kernel@vger.kernel.org
 
-On Mon, Oct 09, 2023 at 05:07:06AM -0400, Mateusz Polchlopek wrote:
-> For performance reasons there is a need to have support for selectable
-> Tx scheduler topology. Currently firmware supports only the default
-> 9-layer and 5-layer topology. This patch series enables switch from
-> default to 5-layer topology, if user decides to opt-in.
-> 
-> ---
-> v3:
-> - fixed documentation warnings
-> 
-> v2:
-> - updated documentation
-> - reorder of variables list (default-init first)
-> - comments changed to be more descriptive
-> - added elseif's instead of few if's
-> - returned error when ice_request_fw fails
-> - ice_cfg_tx_topo() changed to take const u8 as parameter (get rid of copy
->   buffer)
-> - renamed all "balance" occurences to the new one
-> - prevent fail of ice_aq_read_nvm() function
-> - unified variables names (int err instead of int status in few
->   functions)
-> - some smaller fixes, typo fixes
-> https://lore.kernel.org/netdev/20231006110212.96305-1-mateusz.polchlopek@intel.com/
-> 
-> v1: https://lore.kernel.org/netdev/20230523174008.3585300-1-anthony.l.nguyen@intel.com/
-> ---
-> 
-> Lukasz Czapnik (1):
->   ice: Add tx_scheduling_layers devlink param
-> 
-> Michal Wilczynski (2):
->   ice: Enable switching default Tx scheduler topology
->   ice: Document tx_scheduling_layers parameter
-> 
-> Raj Victor (2):
->   ice: Support 5 layer topology
->   ice: Adjust the VSI/Aggregator layers
+Hello:
 
-For series,
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+On Mon, 16 Oct 2023 09:15:19 +0200 you wrote:
+> At the moment different UDP tunnels rely on different functions for
+> IPv4 route lookup, and those functions all implement the same
+> logic. Only bareudp uses the generic ip_route_output_tunnel(), while
+> geneve and vxlan basically duplicate it slightly differently.
+> 
+> This series first extends the generic lookup function so that it is
+> suitable for all UDP tunnel implementations. Then, bareudp, geneve and
+> vxlan are adapted to use them.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/7] ipv4: rename and move ip_route_output_tunnel()
+    https://git.kernel.org/netdev/net-next/c/bf3fcbf7e7a0
+  - [net-next,v2,2/7] ipv4: remove "proto" argument from udp_tunnel_dst_lookup()
+    https://git.kernel.org/netdev/net-next/c/78f3655adcb5
+  - [net-next,v2,3/7] ipv4: add new arguments to udp_tunnel_dst_lookup()
+    https://git.kernel.org/netdev/net-next/c/72fc68c6356b
+  - [net-next,v2,4/7] ipv4: use tunnel flow flags for tunnel route lookups
+    https://git.kernel.org/netdev/net-next/c/3ae983a603a4
+  - [net-next,v2,5/7] geneve: add dsfield helper function
+    https://git.kernel.org/netdev/net-next/c/60a77d11cd5d
+  - [net-next,v2,6/7] geneve: use generic function for tunnel IPv4 route lookup
+    https://git.kernel.org/netdev/net-next/c/daa2ba7ed1d1
+  - [net-next,v2,7/7] vxlan: use generic function for tunnel IPv4 route lookup
+    https://git.kernel.org/netdev/net-next/c/6f19b2c136d9
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
