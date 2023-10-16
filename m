@@ -1,105 +1,117 @@
-Return-Path: <netdev+bounces-41536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 046597CB36D
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBF897CB36E
 	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:42:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51626B20E1D
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:42:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1889C1C209F9
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7D2347DD;
-	Mon, 16 Oct 2023 19:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C00A34CE3;
+	Mon, 16 Oct 2023 19:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iu/Wz/Oc"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bvq0tPG9"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD19E31A93
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 19:42:25 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9131683
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 12:42:23 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so342a12.0
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 12:42:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8453339B3
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 19:42:26 +0000 (UTC)
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C806B9F
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 12:42:24 -0700 (PDT)
+Received: by mail-oo1-xc32.google.com with SMTP id 006d021491bc7-57b8a0f320dso2747918eaf.1
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 12:42:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697485342; x=1698090142; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jTCw1J+PtbxSUK2345kRhvWOvvy1D1K1RsS0JllOSck=;
-        b=iu/Wz/Oc9pmDP58DXLo4T802lCgtnVFGcV3l2djRtQgRxVbuukj9WIBfOpqwascuvj
-         oU80Fata0E0TrTqzQO26x4VpHT9qhGMfEneHSo391M8+MVHksddDfrsk6VRMKw/JUFYr
-         IWykGk1ykIQtBVcDBgPpgC9gOb2yEx+LcyFL0ltdB2YezzYA2AshNnw0NVgJKvfpT8CP
-         KASlw+3siZsh+gMkgRKcURiHImnpCIBkYc/0qBvAk+HZIM+EbMtXGG+AfEzejyFsEoxe
-         9eVt+9OVtd1NW2Yt8DrfeO+/YRW/hjAs+5+xs5AFL2Bqv0nkA5XdjRu2lKW7lV7g3qTg
-         dySQ==
+        d=chromium.org; s=google; t=1697485344; x=1698090144; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ExrixakovrZwkXwzxSDYUz9hfcSEIbjsFsf/1/2B5EU=;
+        b=bvq0tPG9Qz3Ml50a36v5I3pehFpxpSrEQTk/117kB6CUdoToUIT8AAeUV9tq/MI8Sp
+         94GvEvuXqu6WSgKw3bJFofFt+Apzq6tCn5fbloaSAuGSdcs6tn44yHZdcXYEeJ7k5246
+         v3SO3KcXl168YUke5TZ+D2sMEEeTCleK5j4es=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697485342; x=1698090142;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jTCw1J+PtbxSUK2345kRhvWOvvy1D1K1RsS0JllOSck=;
-        b=JOr3Y+UXLJ2tehnmoaBCFo/eFB0d20vzfrZDYHKugyNHn1a7DdE1SN/BoOKJNeD5gW
-         CAfD/CygGrFv659lzJRry+oW6hsks76UeXA6SjimiIDh51LHIAXo2QllFfOxhE+/Kyb+
-         YYdK4+IuSw1UGYbXn7GfCRcTBtKcVK/hrwboNFDY76d6B0jQe3yjygQ/CEaH8xrn/Ied
-         tPbMu5JnL17EadY8ObMWE6qIfAXMDEAAM+G2pbr4gWy2PcR9KwuEJFMWLojGY2IbsXkf
-         WwneABPoaJOqWs3lPije2pU/OGa6l2AkKahH9T3B7sXSn0UAd2w4T/a4cltnmaHIw3Y2
-         N0Tg==
-X-Gm-Message-State: AOJu0Yyu/882GBui6yiXI5ATU217bJAX9WeQ8fPT6okY/+r3KctHIW3N
-	OBRDXzkiz7ZkALeo11XBWOLckRveDJpmUfjRSyMAxw==
-X-Google-Smtp-Source: AGHT+IEjzLPI7BrqkIwO1SWNpMLs/sJBVtLjwAiVsy7YfNVPYWfDZVLREjAiL5cSJJVGePau0nJgIz5p82eLzcHPo0k=
-X-Received: by 2002:a50:cdc3:0:b0:538:47bb:3e88 with SMTP id
- h3-20020a50cdc3000000b0053847bb3e88mr30495edj.6.1697485341772; Mon, 16 Oct
- 2023 12:42:21 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697485344; x=1698090144;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ExrixakovrZwkXwzxSDYUz9hfcSEIbjsFsf/1/2B5EU=;
+        b=A5RCPQeLvuAWUzkoRTMDRn4MPP/kdyN7UNYmm/2XzJWfNzlkGoJDEEJpJFxAOOu6vX
+         TZnV2x3np0mnJlOmsXaBALB6ycnec/DsZDLb7gp1wjjH6yk1EojnQTZPhXCEFtdoeczX
+         aEYhmxq1N/XnO3meTckDZlyqK59/PhtlKLTcHCR7vzR33WBL0C2myC6kClYjQ2Agq4SA
+         mX2FXuYaFAM8P9CAHuQucITz2vbvuouNudpLNtdcpNyisO8WsTxQ5tEAsgJlSfa808sl
+         +DPzWxVltdonevCqW4UuVP2Z5HUwU6BaRVEY6QbWqj3VN77/KOCTz5h4BIJbwy0fTWWZ
+         Lm+w==
+X-Gm-Message-State: AOJu0YzvuQIiN10izya4myBelt0hN4T5kz0SbV3dzklpwRBNvRXk0SnV
+	N10Z/9lxDzwtR7jBNHGYG+SsvQ==
+X-Google-Smtp-Source: AGHT+IEeMQKbP2fH+oTMUOPgV4TLaiTN+m0ARSGjw8cOPGexL7cup7dn1q/zvw3k9ghoXA+I9hEAuQ==
+X-Received: by 2002:a05:6358:56:b0:132:f294:77fe with SMTP id 22-20020a056358005600b00132f29477femr477811rwx.2.1697485344034;
+        Mon, 16 Oct 2023 12:42:24 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id k126-20020a632484000000b005b488b6441esm3746pgk.58.2023.10.16.12.42.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 12:42:23 -0700 (PDT)
+Date: Mon, 16 Oct 2023 12:42:22 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Thomas Sailer <t.sailer@alumni.ethz.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2] hamradio: replace deprecated strncpy with strscpy_pad
+Message-ID: <202310161242.B0F9B693@keescook>
+References: <20231016-strncpy-drivers-net-hamradio-baycom_epp-c-v2-1-39f72a72de30@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016180851.3560092-1-edumazet@google.com> <20231016123319.688bbd91@hermes.local>
-In-Reply-To: <20231016123319.688bbd91@hermes.local>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 16 Oct 2023 21:42:10 +0200
-Message-ID: <CANn89iJdhqOtvoGsquYbicThdUGFEzLFmKR5v7wXryKz6Rw3=Q@mail.gmail.com>
-Subject: Re: [PATCH net] tun: prevent negative ifindex
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016-strncpy-drivers-net-hamradio-baycom_epp-c-v2-1-39f72a72de30@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 16, 2023 at 9:33=E2=80=AFPM Stephen Hemminger
-<stephen@networkplumber.org> wrote:
->
-> On Mon, 16 Oct 2023 18:08:51 +0000
-> Eric Dumazet <edumazet@google.com> wrote:
->
-> > +             ret =3D -EINVAL;
-> > +             if (ifindex < 0)
-> > +                     goto unlock;
->
-> Shouldn't this be <=3D 0 since 0 is not a valid ifindex.
-> Zero ifindex is used as a sentinel in some API's
->
-> For example: if_nametoindex() returns 0 if name is not found.
+On Mon, Oct 16, 2023 at 06:42:42PM +0000, Justin Stitt wrote:
+> strncpy() is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
+> 
+> We expect both hi.data.modename and hi.data.drivername to be
+> NUL-terminated based on its usage with sprintf:
+> |       sprintf(hi.data.modename, "%sclk,%smodem,fclk=%d,bps=%d%s",
+> |               bc->cfg.intclk ? "int" : "ext",
+> |               bc->cfg.extmodem ? "ext" : "int", bc->cfg.fclk, bc->cfg.bps,
+> |               bc->cfg.loopback ? ",loopback" : "");
+> 
+> Note that this data is copied out to userspace with:
+> |       if (copy_to_user(data, &hi, sizeof(hi)))
+> ... however, the data was also copied FROM the user here:
+> |       if (copy_from_user(&hi, data, sizeof(hi)))
+> 
+> Considering the above, a suitable replacement is strscpy_pad() as it
+> guarantees NUL-termination on the destination buffer while also
+> NUL-padding (which is good+wanted behavior when copying data to
+> userspace).
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
 
-Setting tfile->ifindex to zero should be a NOP ?
+Thanks!
 
-This means dev_index_reserve() will allocate a ifindex for us.
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-Not sure we want to prevent something that was working properly in the past=
-.
+-- 
+Kees Cook
 
