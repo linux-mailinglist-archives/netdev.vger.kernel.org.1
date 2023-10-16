@@ -1,129 +1,89 @@
-Return-Path: <netdev+bounces-41239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F54B7CA483
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:50:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B35B7CA485
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:51:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFBEA1F21F87
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:50:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A046E1C208B8
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717491CF92;
-	Mon, 16 Oct 2023 09:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE1C1CAAF;
+	Mon, 16 Oct 2023 09:51:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NRflpb9i"
+	dkim=pass (1024-bit key) header.d=flyingcircus.io header.i=@flyingcircus.io header.b="SCMW4qsB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5462B168C0
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:50:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1929C433C9;
-	Mon, 16 Oct 2023 09:50:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697449819;
-	bh=3qu5yONyWa09qHBA5krufIoFjAXIFT/JnmHaxFdNKbI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NRflpb9iTrQMM1roVvBLDaaRC/btPdgwE+P5YkY0ui/HfGIgWe422OSHysA8DAeAY
-	 XbLUi+vCbF1lVsHHtr+bUFY11iQXK9sJiTjNuHX9jL5P8Lm54roOwSkHCB1HUqQAyY
-	 A7DZ3lGgY8HTvtlHq8hhPkhD+X9px3M4k3HcLZPxehfS4z+bQqWj4+iinJPl+QZixF
-	 2NoNSGs1CDFItkr8+X9xqwu5CQ/OhYvEM1Fnh7u1Z9BhZUOvJR1ChRSQgLHupg0Y03
-	 sNMQp9mpUfuPSGvpWcjn/CbhPDY2Q1UemvacMhWvS6kggtPqwuTXSqfYG5/F/XYK49
-	 sG3yOKByvNj+Q==
-Date: Mon, 16 Oct 2023 11:50:15 +0200
-From: Simon Horman <horms@kernel.org>
-To: Juntong Deng <juntong.deng@outlook.com>
-Cc: borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com
-Subject: Re: [PATCH] net/tls: Fix slab-use-after-free in tls_encrypt_done
-Message-ID: <20231016095015.GJ1501712@kernel.org>
-References: <VI1P193MB0752428D259D066379242BD099D3A@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5B71C28C
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:51:06 +0000 (UTC)
+Received: from mail.flyingcircus.io (mail.flyingcircus.io [212.122.41.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7593AAD
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 02:51:05 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flyingcircus.io;
+	s=mail; t=1697449863;
+	bh=Aue6FRHQtr7/q0XtIPjhCJxMhIMs4iRbhLC8/ZjIHvk=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To;
+	b=SCMW4qsBK90W9FzGE9nv3f9mp2B6CQQJFOt8b7LLpdKPHsMrlJCr2RUXnYmsba6Zi
+	 U4FwNNg80ArGL20puubKTeo4kXv2KJa8NOmX2KM0eZk7h0z31nCPdfpvDvWe3rl4yL
+	 TgRTofWuUAKgsGsRFhyTy4hOTVrT02F3/lMAWg/E=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <VI1P193MB0752428D259D066379242BD099D3A@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.100.2.1.4\))
+Subject: Re: [PATCH net 0/2] net/sched: sch_hfsc: safely allow 'rt' inner
+ curves
+From: Christian Theune <ct@flyingcircus.io>
+In-Reply-To: <CAM0EoMmLat0VGwN7f-ugk2UkDGDoFOwXT0ARubCmmGPX2X_QkQ@mail.gmail.com>
+Date: Mon, 16 Oct 2023 11:50:47 +0200
+Cc: netdev@vger.kernel.org,
+ xiyou.wangcong@gmail.com,
+ jiri@resnulli.us,
+ davem@davemloft.net,
+ edumazet@google.com,
+ Jakub Kicinski <kuba@kernel.org>,
+ pabeni@redhat.com,
+ Pedro Tammela <pctammela@mojatatu.com>,
+ Budimir Markovic <markovicbudimir@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D2A4D49E-D62B-47BB-9025-BA4C02191406@flyingcircus.io>
+References: <20231013151057.2611860-1-pctammela@mojatatu.com>
+ <CAM0EoMmLat0VGwN7f-ugk2UkDGDoFOwXT0ARubCmmGPX2X_QkQ@mail.gmail.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 07:02:51PM +0800, Juntong Deng wrote:
-> In the current implementation, ctx->async_wait.completion is completed
-> after spin_lock_bh, which causes tls_sw_release_resources_tx to
-> continue executing and return to tls_sk_proto_cleanup, then return
+Hi,
 
-Hi Juntong Deng,
+> On 16. Oct 2023, at 11:48, Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+>=20
+> For the series:
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>=20
+> Christian, this should fix it for you but with a caveat: if you
+> configure a "faulty" inner qdis to be rt it will "fixed" - meaning you
+> can keep your scripts but when you dump you will see the "fixed"
+> version instead of the "faulty" one.
 
-I'm slightly confused by "causes tls_sw_release_resources_tx to  continue
-executing".
+Thanks a lot, this is absolutely fine for my situation!
 
-What I see in tls_sw_release_resources_tx() is:
+Christian
 
-        /* Wait for any pending async encryptions to complete */   
-        spin_lock_bh(&ctx->encrypt_compl_lock);
-        ctx->async_notify = true;
-        pending = atomic_read(&ctx->encrypt_pending);
-        spin_unlock_bh(&ctx->encrypt_compl_lock);  
+--=20
+Christian Theune =C2=B7 ct@flyingcircus.io =C2=B7 +49 345 219401 0
+Flying Circus Internet Operations GmbH =C2=B7 https://flyingcircus.io
+Leipziger Str. 70/71 =C2=B7 06108 Halle (Saale) =C2=B7 Deutschland
+HR Stendal HRB 21169 =C2=B7 Gesch=C3=A4ftsf=C3=BChrer: Christian Theune, =
+Christian Zagrodnick
 
-Am I wrong in thinking the above will block because
-(the same) ctx->encrypt_compl_lock is held in tls_encrypt_done?
-
-> to tls_sk_proto_close, and after that enter tls_sw_free_ctx_tx to kfree
-> the entire struct tls_context (including ctx->encrypt_compl_lock).
-> 
-> Since ctx->encrypt_compl_lock has been freed, subsequent spin_unlock_bh
-> will result in slab-use-after-free error. Due to SMP, even using
-> spin_lock_bh does not prevent tls_sw_release_resources_tx from continuing
-> on other CPUs. After tls_sw_release_resources_tx is woken up, there is no
-> attempt to hold ctx->encrypt_compl_lock again, therefore everything
-> described above is possible.
-> 
-> The fix is to put complete(&ctx->async_wait.completion) after
-> spin_unlock_bh, making the release after the unlock. Since complete is
-> only executed if pending is 0, which means this is the last record, there
-> is no need to worry about race condition causing duplicate completes.
-> 
-> Reported-by: syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=29c22ea2d6b2c5fd2eae
-> Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
-> ---
->  net/tls/tls_sw.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index 270712b8d391..7abe5a6aa989 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -441,6 +441,7 @@ static void tls_encrypt_done(void *data, int err)
->  	struct sk_msg *msg_en;
->  	bool ready = false;
->  	struct sock *sk;
-> +	int async_notify;
->  	int pending;
->  
->  	msg_en = &rec->msg_encrypted;
-> @@ -482,10 +483,11 @@ static void tls_encrypt_done(void *data, int err)
->  
->  	spin_lock_bh(&ctx->encrypt_compl_lock);
->  	pending = atomic_dec_return(&ctx->encrypt_pending);
-> +	async_notify = ctx->async_notify;
-> +	spin_unlock_bh(&ctx->encrypt_compl_lock);
->  
-> -	if (!pending && ctx->async_notify)
-> +	if (!pending && async_notify)
->  		complete(&ctx->async_wait.completion);
-> -	spin_unlock_bh(&ctx->encrypt_compl_lock);
->  
->  	if (!ready)
->  		return;
-> -- 
-> 2.39.2
-> 
-> 
 
