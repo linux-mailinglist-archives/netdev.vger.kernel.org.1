@@ -1,154 +1,183 @@
-Return-Path: <netdev+bounces-41442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB6BA7CB01C
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:46:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D016F7CB020
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1873E1C20AF7
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:46:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79A22B20EE3
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4B728DD2;
-	Mon, 16 Oct 2023 16:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32F52E639;
+	Mon, 16 Oct 2023 16:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Z4/KbDyR"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NEgBRQba"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B657D30D0C;
-	Mon, 16 Oct 2023 16:46:26 +0000 (UTC)
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C77BC1A63B;
-	Mon, 16 Oct 2023 09:46:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714E92B779
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:47:05 +0000 (UTC)
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED5C6261E
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:47:02 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9b1ebc80d0aso745457566b.0
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:47:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1697474785; x=1729010785;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bq7RCfKU4ckrmiszPJvMeQ7TgL9PxzUxAwdnf3cz+x8=;
-  b=Z4/KbDyRMB7AHbzp9coLYrA4r096Tr/4kJP5bbhV+pMPhVZ2paXikNNa
-   GMkbx7knQvAimCQ+W8l6E96t70b0p71Rt2MwAMwMpYJSO6hgLEA1AlPRd
-   QD15F3e9ZoiZyPOsTUg2KTFT/yOd0hA+NbSH4yCGKgowPUNodntsm43Va
-   0=;
-X-IronPort-AV: E=Sophos;i="6.03,229,1694736000"; 
-   d="scan'208";a="160281536"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 16:46:21 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com (Postfix) with ESMTPS id BEF2FC0155;
-	Mon, 16 Oct 2023 16:46:19 +0000 (UTC)
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:62506]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.42:2525] with esmtp (Farcaster)
- id 12b44c11-b47e-4375-acfd-00f44b761278; Mon, 16 Oct 2023 16:46:19 +0000 (UTC)
-X-Farcaster-Flow-ID: 12b44c11-b47e-4375-acfd-00f44b761278
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 16 Oct 2023 16:46:17 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.29) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 16 Oct 2023 16:46:13 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <willemdebruijn.kernel@gmail.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
-	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <martin.lau@linux.dev>,
-	<mykolal@fb.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<sdf@google.com>, <song@kernel.org>, <yonghong.song@linux.dev>
-Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie generation/validation SOCK_OPS hooks.
-Date: Mon, 16 Oct 2023 09:46:06 -0700
-Message-ID: <20231016164606.29484-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <652d46664a3db_1980fa29460@willemb.c.googlers.com.notmuch>
-References: <652d46664a3db_1980fa29460@willemb.c.googlers.com.notmuch>
+        d=chromium.org; s=google; t=1697474818; x=1698079618; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+ZJGLg3D+ucnPrjgrPwyMGRdiSy2W8deAmYMGodOcfI=;
+        b=NEgBRQbaelu7WBM/f6gS6aelPx9qGiijcDF9QrAsaEcxd2nbDBPfkt6SRE15soiIkj
+         4lhnUUzbiQgr0ob70QDPjZEBMrV3IZssUtc554leeWxAglo687E41tJBtrgFf0eYNPFY
+         IK351SzBgEJt4xIzj7mH/ob47iiM+1TOrWs04=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697474818; x=1698079618;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+ZJGLg3D+ucnPrjgrPwyMGRdiSy2W8deAmYMGodOcfI=;
+        b=EjQcJLNR/5ib4HaxFpX1ISoabfcOA18Tzsyy7vPq6sQlptX0QYLaTJpmU0UD8uSX2x
+         fBptAQL1nrQ2T2AL2NxMoKm92kBgtTHr5OEDoPHwEfcvpzym8rAFlpMGqrC8wl+h0HBW
+         qX1XpaZyDKWKwA4pcT1nlqiyQ9wyQ+HIeN/dVQwZcacE8j8HsjOE4OOJHG78RyX92KID
+         a4B5uepo3cMBkRblPQOs0HuYZFYWOqIXO6/KlkdUyJ29C9RBJSmRH76va/9gtC93/s1Y
+         eHnyvmSDIqneVB5LcfKTp7OfQ43KQfgH826qBvgSTs439aDfgubcvlTm++e+toTNv+Sh
+         AJOg==
+X-Gm-Message-State: AOJu0YymBON0P/ODH95WJNAcmeQL2mQTjzXfhxgSP6+P5ulAlUckTRMT
+	iDHKW8GfQ2rr9yG0a5xqkc8ScxcgwpMpgIC6EICsyw==
+X-Google-Smtp-Source: AGHT+IFuHVryXYUfqWgZAWXzb6gHitw3jcnQ5YOOsycRe4BCr4w96EfJMTASJ0XnbCPfkQTEjxBjdA==
+X-Received: by 2002:a17:906:9c9:b0:9ae:4f9e:7813 with SMTP id r9-20020a17090609c900b009ae4f9e7813mr26837614eje.73.1697474818134;
+        Mon, 16 Oct 2023 09:46:58 -0700 (PDT)
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com. [209.85.128.53])
+        by smtp.gmail.com with ESMTPSA id kg20-20020a17090776f400b009929d998abcsm4260511ejc.209.2023.10.16.09.46.57
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Oct 2023 09:46:57 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4053f24c900so1175e9.1
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:46:57 -0700 (PDT)
+X-Received: by 2002:a05:600c:3c83:b0:405:38d1:e146 with SMTP id
+ bg3-20020a05600c3c8300b0040538d1e146mr211926wmb.4.1697474816851; Mon, 16 Oct
+ 2023 09:46:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.171.29]
-X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,UNPARSEABLE_RELAY autolearn=no
+References: <20231012192552.3900360-1-dianders@chromium.org>
+ <20231012122458.v3.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid> <29f9a2ff1979406489213909b940184f@realtek.com>
+In-Reply-To: <29f9a2ff1979406489213909b940184f@realtek.com>
+From: Doug Anderson <dianders@chromium.org>
+Date: Mon, 16 Oct 2023 09:46:39 -0700
+X-Gmail-Original-Message-ID: <CAD=FV=U4rGozXHoK8+ejPgRtyoACy1971ftoatQivqzk2tk5ng@mail.gmail.com>
+Message-ID: <CAD=FV=U4rGozXHoK8+ejPgRtyoACy1971ftoatQivqzk2tk5ng@mail.gmail.com>
+Subject: Re: [PATCH v3 5/5] r8152: Block future register access if register
+ access fails
+To: Hayes Wang <hayeswang@realtek.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Alan Stern <stern@rowland.harvard.edu>, Simon Horman <horms@kernel.org>, 
+	Edward Hill <ecgh@chromium.org>, Laura Nao <laura.nao@collabora.com>, 
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, 
+	=?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Mon, 16 Oct 2023 10:19:18 -0400
-> Kuniyuki Iwashima wrote:
-> > Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
-> > for the connection request until a valid ACK is responded to the SYN+ACK.
-> > 
-> > The cookie contains two kinds of host-specific bits, a timestamp and
-> > secrets, so only can it be validated by the generator.  It means SYN
-> > Cookie consumes network resources between the client and the server;
-> > intermediate nodes must remember which nodes to route ACK for the cookie.
-> > 
-> > SYN Proxy reduces such unwanted resource allocation by handling 3WHS at
-> > the edge network.  After SYN Proxy completes 3WHS, it forwards SYN to the
-> > backend server and completes another 3WHS.  However, since the server's
-> > ISN differs from the cookie, the proxy must manage the ISN mappings and
-> > fix up SEQ/ACK numbers in every packet for each connection.  If a proxy
-> > node is down, all the connections through it are also down.  Keeping a
-> > state at proxy is painful from that perspective.
-> > 
-> > At AWS, we use a dirty hack to build truly stateless SYN Proxy at scale.
-> > Our SYN Proxy consists of the front proxy layer and the backend kernel
-> > module.  (See slides of netconf [0], p6 - p15)
-> > 
-> > The cookie that SYN Proxy generates differs from the kernel's cookie in
-> > that it contains a secret (called rolling salt) (i) shared by all the proxy
-> > nodes so that any node can validate ACK and (ii) updated periodically so
-> > that old cookies cannot be validated.  Also, ISN contains WScale, SACK, and
-> > ECN, not in TS val.  This is not to sacrifice any connection quality, where
-> > some customers turn off the timestamp option due to retro CVE.
-> 
-> If easier: I think it should be possible to make the host secret
-> readable and writable with CAP_NET_ADMIN, to allow synchronizing
-> between hosts.
+Hi,
 
-I think the idea is doable for syncookie_secret and syncookie6_secret.
-However, the cookie timestamp is generated based on jiffies that cannot
-be written.
+On Mon, Oct 16, 2023 at 2:16=E2=80=AFAM Hayes Wang <hayeswang@realtek.com> =
+wrote:
+>
+> Douglas Anderson <dianders@chromium.org>
+> > Sent: Friday, October 13, 2023 3:25 AM
+> [...]
+> >  static int generic_ocp_read(struct r8152 *tp, u16 index, u16 size,
+> > @@ -8265,6 +8353,19 @@ static int rtl8152_pre_reset(struct usb_interfac=
+e
+> > *intf)
+> >         if (!tp)
+> >                 return 0;
+> >
+> > +       /* We can only use the optimized reset if we made it to the end=
+ of
+> > +        * probe without any register access fails, which sets
+> > +        * `PROBED_WITH_NO_ERRORS` to true. If we didn't have that then=
+ return
+> > +        * an error here which tells the USB framework to fully unbind/=
+rebind
+> > +        * our driver.
+>
+> Would you stay in a loop of unbind and rebind,
+> if the control transfers in the probe() are not always successful?
+> I just think about the worst case that at least one control always fails =
+in probe().
 
-[ I answered sharing secrets would resolve our issue at netconf, but
-  I was wrong. ]
+We won't! :-) One of the first things that rtl8152_probe() does is to
+call rtl8152_get_version(). That goes through to
+rtl8152_get_version(). That function _doesn't_ queue up a reset if
+there are communication problems, but it does do 3 retries of the
+read. So if all 3 reads fail then we will permanently fail probe,
+which I think is the correct thing to do.
+
+I can update the comment in __rtl_get_hw_ver() to make it more obvious
+that this is by design?
+
+>
+> > +        */
+> > +       mutex_lock(&tp->control);
+>
+> I don't think you need the mutex for testing the bit.
+
+Sure, I'll remove it.
 
 
-> For similar reasons as suggested here, a rolling salt might be
-> useful more broadly too.
+> > +       if (!test_bit(PROBED_WITH_NO_ERRORS, &tp->flags)) {
+> > +               mutex_unlock(&tp->control);
+> > +               return -EIO;
+> > +       }
+> > +       mutex_unlock(&tp->control);
+> > +
+> >         netdev =3D tp->netdev;
+> >         if (!netif_running(netdev))
+> >                 return 0;
+> > @@ -8277,7 +8378,9 @@ static int rtl8152_pre_reset(struct usb_interface
+> > *intf)
+> >         napi_disable(&tp->napi);
+> >         if (netif_carrier_ok(netdev)) {
+> >                 mutex_lock(&tp->control);
+> > +               set_bit(IN_PRE_RESET, &tp->flags);
+> >                 tp->rtl_ops.disable(tp);
+> > +               clear_bit(IN_PRE_RESET, &tp->flags);
+> >                 mutex_unlock(&tp->control);
+> >         }
+> >
+> > @@ -8293,6 +8396,10 @@ static int rtl8152_post_reset(struct usb_interfa=
+ce
+> > *intf)
+> >         if (!tp)
+> >                 return 0;
+> >
+> > +       mutex_lock(&tp->control);
+>
+> I don't think clear_bit() needs the protection of mutex.
+> I think you could call rtl_set_accessible() directly.
 
-Maybe we need not use jiffies and can create a worker to update the
-secret periodically if it's not configured manually.
+Agreed, I'll take this out.
 
-The problem here would be that we need to update/read u64[4] atomically
-if we want to use SipHash or HSipHash.  Maybe this also can be changed.
 
-But, we still want to use BPF as we need to encode (at least) WS and
-SACK bits in ISN, not TS and use different MSS candidates rather than
-msstab.
+Unless something else comes up, I'll send a new version tomorrow with
+the above small changes.
 
-Also, in our use case, the validation for cookie itself is done in
-the front proxy layer, and the kernel will do more light-weight
-validation like checking if the cookie is forwarded from trusted
-nodes.  Then, we can prevent invalid ACK from flowing through the
-backend and consuming some networking entries, and the backend need
-not do full validation.
-
-With BPF, we can get such flexibility at encoding and validation, and
-making cookie generation algorithm private could be good for security.
+-Doug
 
