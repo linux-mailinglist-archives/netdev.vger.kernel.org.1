@@ -1,149 +1,116 @@
-Return-Path: <netdev+bounces-41597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79E997CB684
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 00:21:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E09AA7CB689
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 00:23:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1948C281004
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:20:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 956F02815B2
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8C138FB1;
-	Mon, 16 Oct 2023 22:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD6E338F9F;
+	Mon, 16 Oct 2023 22:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ReM0Fkly"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vDG8J87n"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A018238F9F
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 22:20:54 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3896CB4
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 15:20:52 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-53e08b60febso7712469a12.1
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 15:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697494850; x=1698099650; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sG0si0hLhsORLT+IsP0hdNRtcz8tUgPMz+/Y6er4krs=;
-        b=ReM0Fklyoby7RKX8SNc+ywuzEYacTXjBbKFODxikwOXLXLDM2Y3szv59lbajRHqmGc
-         yxkPn59JlYEXQ+kKDAKIztQ7Q0Rd7sZnC6JjWcYobSmAdVSLS5X3nXP1EBzdFPFw3ve9
-         3rtMxV3R2rNxd6vxEGYpIEZXulYZ1gZScme/xOLVVPLFALxxBDG3VF3oksaZOEtBHRG3
-         Rhy4gQYUctmO5lEaTr8lXjyRvs3qRo6thhFutMBaOIm72sc/48t7Z5Y2laIq1fo3pXpx
-         05Rq2LwXa94zBR2XSUn7UJ/zkChHJ8ouD8Oz2n2O87qpIOWtbEF4pz+QQLEI2T9SLs73
-         D9BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697494850; x=1698099650;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sG0si0hLhsORLT+IsP0hdNRtcz8tUgPMz+/Y6er4krs=;
-        b=A0Eob4rCIvoSPVYb3hBnQe7eA/rFcKbrsWQbPKag4YM3UspV+FMy4a7bXqK2ucolXu
-         5F8zhFTTESv5OgjWNnhcw9YriJZ27MC8eudGQ6TIv568zAQ8m2vt1UBfZTUg4rD+5lpB
-         oZlKQXcTMcE+sgjQTN6ikmQ9qDvkzpGHGEBb4QPCfHj/q99fV541MzePf6OUu6NNm4NO
-         BtzV5KPAxkXP0N2CNCmC2O+XSTjlPBqAW0NquIED13vlkprhdaeEgCxPxnIuo4roBxrc
-         BNHmedpJI0Diu8qHdMcEacZhk/AO3gGkJM4RZQF8m4Zb/jhuhBvZqhTgbkAo96BjUwC6
-         Tq6Q==
-X-Gm-Message-State: AOJu0YxI04ALWQEGW0quzKsBKVFZv3CUdD74G1VNO+9jm33SCJWPxhMc
-	kdC6zhD3h1GGlScDtEFZrWjjwldPw8LbgYjbsvHIjw==
-X-Google-Smtp-Source: AGHT+IH4sUBuDdJbXWdg1g+aEaQi0NhdA683YD/+UNeUj/wXLDa1ObuFKvxOI7RdNEsEqBV2uXeZNwpNqktfeAb7+0Q=
-X-Received: by 2002:a50:c2c1:0:b0:53e:d0cf:453c with SMTP id
- u1-20020a50c2c1000000b0053ed0cf453cmr441341edf.9.1697494850639; Mon, 16 Oct
- 2023 15:20:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A9438F98
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 22:23:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50618C433C7;
+	Mon, 16 Oct 2023 22:23:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697495024;
+	bh=bRrY6z8Qu3DHxdJ9AWDgW2EEHgMVRnN3AxmhHve8YT0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=vDG8J87nBqFt4L6UK9UD0UURS6rn2Zw5xR5YguOBewzOHIpPmFmU7m2BWITb6nKtP
+	 1bUMsnYgmBJ4ihkMfm+CKSQdB3svbnsafQLeqhOFOT8aktvznQeOxoMXxDgMEtluL7
+	 /ItwqYCfITwZEq0Uie/0PtTtmP9FVsNExso+35t63ihM5YqgcXBMy5DV+4xCo7+VDv
+	 TPMkgErh0SFf1NgbrzXJ+Ix4F2S+8Vj/+cEVZJ8gJvDyeHUSUfZ2MG8WTaTulWAS4S
+	 EnMQJ/67pYltlKrmgWTsmdVmhsC1YnbjYbAx6+rDe3WByYmkhpCkwcVyU596eWuhgB
+	 UfsfQyYAwwdZA==
+Date: Mon, 16 Oct 2023 15:23:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Takeru Hayasaka <hayatake396@gmail.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Harald Welte <laforge@gnumonks.org>,
+ Pablo Neira Ayuso <pablo@netfilter.org>, osmocom-net-gprs@lists.osmocom.org
+Subject: Re: [PATCH net-next v2] ethtool: ice: Support for RSS settings to
+ GTP from ethtool
+Message-ID: <20231016152343.1fc7c7be@kernel.org>
+In-Reply-To: <20231012060115.107183-1-hayatake396@gmail.com>
+References: <20231012060115.107183-1-hayatake396@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231012-strncpy-drivers-net-hamradio-baycom_epp-c-v1-1-8f4097538ee4@google.com>
- <20231015150619.GC1386676@kernel.org> <ede96908-76ff-473c-a5e1-39e2ce130df9@kadam.mountain>
- <FA371CE1-F449-44D4-801A-11C842E84867@kernel.org> <123F9651-9469-4F2B-ADC1-12293C9EA7FE@kernel.org>
- <2b9fa498-e099-4987-89d3-dd1a5df24705@blemings.org>
-In-Reply-To: <2b9fa498-e099-4987-89d3-dd1a5df24705@blemings.org>
-From: Justin Stitt <justinstitt@google.com>
-Date: Mon, 16 Oct 2023 15:20:39 -0700
-Message-ID: <CAFhGd8r4rZ71WrYPVVSXXKwXF5c4Z_D+830cRQacm_oijQB4SA@mail.gmail.com>
-Subject: Re: [PATCH] hamradio: replace deprecated strncpy with strscpy
-To: Hugh Blemings <hugh@blemings.org>
-Cc: Kees Cook <kees@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Simon Horman <horms@kernel.org>, Thomas Sailer <t.sailer@alumni.ethz.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-hams@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 16, 2023 at 3:18=E2=80=AFPM Hugh Blemings <hugh@blemings.org> w=
-rote:
->
->
->
-> On 17/10/23 04:03, Kees Cook wrote:
-> >
-> >
-> > On October 16, 2023 10:01:20 AM PDT, Kees Cook <kees@kernel.org> wrote:
-> >>
-> >>
-> >> On October 15, 2023 10:47:53 PM PDT, Dan Carpenter <dan.carpenter@lina=
-ro.org> wrote:
-> >>> On Sun, Oct 15, 2023 at 05:06:19PM +0200, Simon Horman wrote:
-> >>>> On Thu, Oct 12, 2023 at 09:33:32PM +0000, Justin Stitt wrote:
-> >>>>> strncpy() is deprecated for use on NUL-terminated destination strin=
-gs
-> >>>>> [1] and as such we should prefer more robust and less ambiguous str=
-ing
-> >>>>> interfaces.
-> >>>>>
-> >>>>> We expect both hi.data.modename and hi.data.drivername to be
-> >>>>> NUL-terminated but not necessarily NUL-padded which is evident by i=
-ts
-> >>>>> usage with sprintf:
-> >>>>> |       sprintf(hi.data.modename, "%sclk,%smodem,fclk=3D%d,bps=3D%d=
-%s",
-> >>>>> |               bc->cfg.intclk ? "int" : "ext",
-> >>>>> |               bc->cfg.extmodem ? "ext" : "int", bc->cfg.fclk, bc-=
->cfg.bps,
-> >>>>> |               bc->cfg.loopback ? ",loopback" : "");
-> >>>>>
-> >>>>> Note that this data is copied out to userspace with:
-> >>>>> |       if (copy_to_user(data, &hi, sizeof(hi)))
-> >>>>> ... however, the data was also copied FROM the user here:
-> >>>>> |       if (copy_from_user(&hi, data, sizeof(hi)))
-> >>>>
-> >>>> Thanks Justin,
-> >>>>
-> >>>> I see that too.
-> >>>>
-> >>>> Perhaps I am off the mark here, and perhaps it's out of scope for th=
-is
-> >>>> patch, but I do think it would be nicer if the kernel only sent
-> >>>> intended data to user-space, even if any unintended payload came
-> >>>> from user-space.
-> >>>>
-> >>>
-> >>> It's kind of normal to pass user space data back to itself.  We
-> >>> generally only worry about info leaks.
-> >>
-> >> True but since this used to zero the rest of the buffet, let's just ke=
-ep that behavior and use strscpy_pad().
-> >
-> > I'm calling all byte arrays a "buffet" from now on. ;)
-> >
-> A tasteful change to the sauce I think.  ;)
+Thanks for the v2!
 
-Just perfect that this is happening on a **ham**radio driver.
+Adding Willem, Pablo, and Harald to CC (please CC them on future
+versions).
+
+On Thu, 12 Oct 2023 06:01:15 +0000 Takeru Hayasaka wrote:
+> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+> index f7fba0dc87e5..a2d4f2081cf3 100644
+> --- a/include/uapi/linux/ethtool.h
+> +++ b/include/uapi/linux/ethtool.h
+> @@ -2011,6 +2011,18 @@ static inline int ethtool_validate_duplex(__u8 duplex)
+>  #define	IPV4_FLOW	0x10	/* hash only */
+>  #define	IPV6_FLOW	0x11	/* hash only */
+>  #define	ETHER_FLOW	0x12	/* spec only (ether_spec) */
+> +#define GTPU_V4_FLOW 0x13	/* hash only */
+> +#define GTPU_V6_FLOW 0x14	/* hash only */
+> +#define GTPC_V4_FLOW 0x15	/* hash only */
+> +#define GTPC_V6_FLOW 0x16	/* hash only */
+> +#define GTPC_TEID_V4_FLOW 0x17	/* hash only */
+> +#define GTPC_TEID_V6_FLOW 0x18	/* hash only */
+> +#define GTPU_EH_V4_FLOW 0x19	/* hash only */
+> +#define GTPU_EH_V6_FLOW 0x20	/* hash only */
+
+nit: please note that these are hex numbers,
+     next value after 0x19 is 0x1a, not 0x20.
+
+> +#define GTPU_UL_V4_FLOW 0x21	/* hash only */
+> +#define GTPU_UL_V6_FLOW 0x22	/* hash only */
+> +#define GTPU_DL_V4_FLOW 0x23	/* hash only */
+> +#define GTPU_DL_V6_FLOW 0x24	/* hash only */
+>  /* Flag to enable additional fields in struct ethtool_rx_flow_spec */
+>  #define	FLOW_EXT	0x80000000
+>  #define	FLOW_MAC_EXT	0x40000000
+
+What gives me pause here is the number of flow sub-types we define
+for GTP hashing.
+
+My understanding of GTP is limited to what I just read on Wikipedia.
+
+IIUC the GTPC vs GTPU distinction comes down to the UDP port on
+which the protocol runs? Are the frames also different?
+
+I'm guessing UL/DL are uplink/downlink but what's EH?
+
+How do GTPU_V4_FLOW, GTPU_EH_V4_FLOW, GTPU_UL_V4_FLOW, and
+GTPU_DL_V4_FLOW differ?
+
+Key question is - are there reasonable use cases that you can think of
+for enabling GTP hashing for each one of those bits individually or can
+we combine some of them?
+
+> @@ -2025,6 +2037,7 @@ static inline int ethtool_validate_duplex(__u8 duplex)
+>  #define	RXH_IP_DST	(1 << 5)
+>  #define	RXH_L4_B_0_1	(1 << 6) /* src port in case of TCP/UDP/SCTP */
+>  #define	RXH_L4_B_2_3	(1 << 7) /* dst port in case of TCP/UDP/SCTP */
+> +#define	RXH_GTP_TEID	(1 << 8) /* teid in case of GTP */
+>  #define	RXH_DISCARD	(1 << 31)
 
