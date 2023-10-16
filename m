@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-41397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBCB07CADBC
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:39:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E43657CADBF
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:39:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23DC4B20D33
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:39:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2143B1C20A64
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961B52AB30;
-	Mon, 16 Oct 2023 15:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B632AB4B;
+	Mon, 16 Oct 2023 15:39:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqQX+7sX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NpqRwS0l"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3879F2AB2B;
-	Mon, 16 Oct 2023 15:39:21 +0000 (UTC)
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 060D9F0;
-	Mon, 16 Oct 2023 08:39:20 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-777252c396bso281526885a.2;
-        Mon, 16 Oct 2023 08:39:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D9F2AB2B;
+	Mon, 16 Oct 2023 15:39:38 +0000 (UTC)
+Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97179AC;
+	Mon, 16 Oct 2023 08:39:36 -0700 (PDT)
+Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-5a7af20c488so57697047b3.1;
+        Mon, 16 Oct 2023 08:39:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697470759; x=1698075559; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1697470776; x=1698075576; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gxDwBp9eLW2ZizpV0gYU08qk9UlwEBNpEGkIRNWQbPc=;
-        b=iqQX+7sXI9kgY5F+4XoeInvMlrKCD7yphkarHUcCfzJrTb1TD1AUg2heflWOo2LHOz
-         ARKXE2178eBqRhQM2coIip6YOdVppkSHsf9gBlR4s6ouPT1yWnkF1ggxBBs6dYq4tHp3
-         bAp0AZkW6m6eQvBhzWb4OKaaUEkAHy5j0twlp9QUVTH2rSTJm/oKXkHQljAvqffxEkfz
-         TnUBB11eTmmXC5ADWUFZDm0S2HoiFM6Q4YAeN7kTzLY5Fphho/MW69Qqr+Q9ts1VMi2W
-         856J1nFFXhgS3ie5Qaw+mQ2QyrZ0Cs9S1Tw/pOcNy9N2NBvjkLKVQorzI8vl2R412x6n
-         tI2A==
+        bh=i71WqBTF0Gd9XLapkEYhFiADewwOIyPH5hrL9rl36R8=;
+        b=NpqRwS0lVvDKfKfU/lg/tajmyYVsZm4AUE5JrEWx+TkPdc1xabyT0hNYqS0eVntfAI
+         g8YSHlslhDvOz0KXqCA0es65aGbQcHOBXguZku1FUTDYWwvGRmsBXJOSCthRswBnn3Ps
+         SId8ctI90YPHbU4sGqXimoLt3pVcSDfdONg9eWmyCLW7UgRJDbSUSDfRb4tlpARIWRm7
+         3IF44kW1TvBN279B/XJIiIiwSqksvlzzAadjaHxHt/dL+tQ37oOAT/795MkdA9uxMgOz
+         XW9Ogg1njB33HBe0fVyu3fQB6XWcGUzfoRTc0gTNk/8wP74lqKc3qzKbc3zHbeA2SbLD
+         zEjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697470759; x=1698075559;
+        d=1e100.net; s=20230601; t=1697470776; x=1698075576;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gxDwBp9eLW2ZizpV0gYU08qk9UlwEBNpEGkIRNWQbPc=;
-        b=PyacJgcM91XEzFc0FQ1gc+/Z9vnbBmudRA0yamBzzgCVs9whitsPuCcpldcB6n6Zxe
-         OHzoCATxEfbq+2fU1KKbK1XI8q4QWo2nQnFujgEQVOKuMFAnkRBLWgUp+9vQ3oYXRV6z
-         +hjI09kXsaZyxeuD1dBGVPub4yTICQ590gbOSDv6Zrbnxe8mu5xuAwT03AI/88KEmSTQ
-         jrOI4sfrU2XHTtuHj3zcvYnPXB9HLa32UaQgRHUxC1iM/sxitLsDK7FkIMtM4WPEo1Ud
-         EouwjGFYakTvG5eUy4yW+L6mEKi9Ym2GcowsdNAiwHOOYlhHQCs3bNN4grvYoeGzArZX
-         7POA==
-X-Gm-Message-State: AOJu0YzwwBjt7sonCLxNOlrgc1LdVWRQkpFRq+Vehozt7BcWn9RXDUjk
-	02zqmSD/IOZnFkyTDCHc+9g=
-X-Google-Smtp-Source: AGHT+IFLThut/XN6qO/W8f/lbgS62AdLqn+BJSmemWAgE7bDNozDdX31uUZ8RUe/KQBgFx42S58LSw==
-X-Received: by 2002:a05:620a:2493:b0:774:334d:74bd with SMTP id i19-20020a05620a249300b00774334d74bdmr38476586qkn.57.1697470758973;
-        Mon, 16 Oct 2023 08:39:18 -0700 (PDT)
+        bh=i71WqBTF0Gd9XLapkEYhFiADewwOIyPH5hrL9rl36R8=;
+        b=LeN6X8k5uF77/+4y4nQhGy8hyyFLx2bhBLTb1gJHKSBc79tVc2f1ZL5JtHJXa5mavs
+         FdLifo1T1kiRtezCyN7HZJIElB9ZrOVQJaTGrRPQ3epTJlYjtckHsH9NIX7ctA1va+BJ
+         c5JKunPq7EJz4lHGq2A9mDs5zL/uHFtfFwtH6srOEfZsrXV5ioLa88A9FuQnTNDSe0lO
+         Myeb45fUIM2T7pJabnQLVosU2pW3TqUgkDf56zbGRRfnypJy3Avtcn6IKRPrfjNh+MUt
+         ycsDjyc44mbwcdNhshHXsbZdoUZSOenmGjXZf7izVoViPGwhObskE3wB2eHqGngYoUx3
+         wgZA==
+X-Gm-Message-State: AOJu0Yzc30vTACb5d08BHX/xUhUJnH06aTSHvzbco0U0yJjQW/NTSGwR
+	EDg5Yhli7QCMUWf5x0iyWuQ=
+X-Google-Smtp-Source: AGHT+IHmla4wNNq5FnCFvtQ/XzV+pwwTjMIHmZc5Wlttbc0Af2qynVzjx4Mx4NUMMONGJGMmVIH+QA==
+X-Received: by 2002:a81:a193:0:b0:5a8:1812:a7ee with SMTP id y141-20020a81a193000000b005a81812a7eemr10080984ywg.3.1697470775566;
+        Mon, 16 Oct 2023 08:39:35 -0700 (PDT)
 Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id x21-20020a05620a14b500b00773f008da40sm3061221qkj.125.2023.10.16.08.39.16
+        by smtp.gmail.com with ESMTPSA id x21-20020a05620a14b500b00773f008da40sm3061221qkj.125.2023.10.16.08.39.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 08:39:18 -0700 (PDT)
-Message-ID: <028579e5-07f0-48cc-a128-dc5b5490a78a@gmail.com>
-Date: Mon, 16 Oct 2023 08:39:16 -0700
+        Mon, 16 Oct 2023 08:39:35 -0700 (PDT)
+Message-ID: <24ffddd0-3497-4888-9f0f-29e20281360c@gmail.com>
+Date: Mon, 16 Oct 2023 08:39:33 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 8/9] net: dsa: microchip: Refactor switch
- shutdown routine for WoL preparation
+Subject: Re: [PATCH net-next v4 9/9] net: dsa: microchip: do not reset the
+ switch on shutdown if WoL is active
 Content-Language: en-US
 To: Oleksij Rempel <o.rempel@pengutronix.de>,
  "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
@@ -83,7 +83,7 @@ Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
  "Russell King (Oracle)" <linux@armlinux.org.uk>, devicetree@vger.kernel.org
 References: <20231016141256.2011861-1-o.rempel@pengutronix.de>
- <20231016141256.2011861-9-o.rempel@pengutronix.de>
+ <20231016141256.2011861-10-o.rempel@pengutronix.de>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -118,7 +118,7 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231016141256.2011861-9-o.rempel@pengutronix.de>
+In-Reply-To: <20231016141256.2011861-10-o.rempel@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -131,13 +131,8 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 
 On 10/16/2023 7:12 AM, Oleksij Rempel wrote:
-> Centralize the switch shutdown routine in a dedicated function,
-> ksz_switch_shutdown(), to enhance code maintainability and reduce
-> redundancy. This change abstracts the common shutdown operations
-> previously duplicated in ksz9477_i2c_shutdown() and ksz_spi_shutdown().
-> 
-> This refactoring is a preparatory step for an upcoming patch to avoid
-> reset on shutdown if Wake-on-LAN (WoL) is enabled.
+> For Wake on Lan we should not reconfigure, reset or power down the
+> switch on shut down sequence.
 > 
 > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
