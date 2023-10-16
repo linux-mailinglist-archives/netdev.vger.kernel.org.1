@@ -1,88 +1,181 @@
-Return-Path: <netdev+bounces-41433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9639A7CAEF1
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:20:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 925A97CAF11
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:23:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 936E91C20ACB
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:20:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C29281C209B2
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB6B30D16;
-	Mon, 16 Oct 2023 16:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAAE830D0D;
+	Mon, 16 Oct 2023 16:23:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WuQYN0K2"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hqgbZmKJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0C230D0C
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:20:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A3DE6C433CA;
-	Mon, 16 Oct 2023 16:20:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697473227;
-	bh=OmDX71W8pnHJvXkCucPAjaUIHG3N468/aXGQVHPVYXQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WuQYN0K2HpIwDAjzQiBVC5JrYoaVVtaLpuWb1pc+cdzeBkr+6x5S/jEu9XDMgt4rY
-	 oKm+/HfdeAsovwP8ukPV9BWFziId+OCUwR1IlO/AYEn1kIMRPiaxszRwMciqUDl13n
-	 HYdqJywsspuFeiLzrq82PQRmU/+WADdUUISr090Xg2J78wmFOGih6iA6y1ojqQmWDR
-	 5nDzZIdcLht1DfVBZ3Phy9MLaFfMP2DkdDGOe822bB3s0dOmy8cbHMNMWd3jcFGrPK
-	 OZzB8xOyIlTc9GRPcmlWBSaqtWVhQOdoBCt1HO6Xm7ll5CvrQLY7ApSFUWl0L3RTZX
-	 8ZUoKpv9/JvRA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 89C14C04E32;
-	Mon, 16 Oct 2023 16:20:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3B02E645;
+	Mon, 16 Oct 2023 16:23:17 +0000 (UTC)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3C158252;
+	Mon, 16 Oct 2023 09:23:15 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 378FBE0002;
+	Mon, 16 Oct 2023 16:23:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1697473394;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/XVHBW4OllJOkAPcU2owgNX1LO5d3o45pdtyP1brke4=;
+	b=hqgbZmKJTURFIiX5ft6fhvifc3JzLapjCqlmxEd8rPDZ+kcyaFLNEi2/2qzlOkr90NvDhm
+	lNLJkQHtfn4K17Pir/2CyMQW3WQ/+VcQC6x2SokKSko5WO/XwQZdOuBeEQHGgLKW9SOw5C
+	4dXiSjc0JlSHJUDRNg1vwQ6wJFUGgof64slmcaCYnt7j5DSqqFkibPvkD8+wwPRbvMq24T
+	Cr2tWqMbu42VlXFo7XGRB9QJ4p4RKqogyzwXraGpp2nEvGV74nVyomo3vJjobXdYS4NgAo
+	ucYUU9I+fR7bocPTlzY5q3Um7oFrD9ga9LQXbKBhRFZr01NCqry2O8jXRVK9TQ==
+Date: Mon, 16 Oct 2023 18:23:07 +0200
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Michael Walle <michael@walle.cc>, Jacob Keller
+ <jacob.e.keller@intel.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v5 08/16] net: ethtool: Add a command to expose
+ current time stamping layer
+Message-ID: <20231016182307.18c5dcf1@kmaincent-XPS-13-7390>
+In-Reply-To: <20231016084346.10764b4a@kernel.org>
+References: <20231009155138.86458-1-kory.maincent@bootlin.com>
+	<20231009155138.86458-9-kory.maincent@bootlin.com>
+	<2fbde275-e60b-473d-8488-8f0aa637c294@broadcom.com>
+	<20231010102343.3529e4a7@kmaincent-XPS-13-7390>
+	<20231013090020.34e9f125@kernel.org>
+	<6ef6418d-6e63-49bd-bcc1-cdc6eb0da2d5@lunn.ch>
+	<20231016124134.6b271f07@kmaincent-XPS-13-7390>
+	<20231016072204.1cb41eab@kernel.org>
+	<20231016170027.42806cb7@kmaincent-XPS-13-7390>
+	<20231016084346.10764b4a@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 iproute2-next 0/2] rdma: Support dumping SRQ resource in
- raw format
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169747322756.5359.10248022521412902967.git-patchwork-notify@kernel.org>
-Date: Mon, 16 Oct 2023 16:20:27 +0000
-References: <20231010075526.3860869-1-huangjunxian6@hisilicon.com>
-In-Reply-To: <20231010075526.3860869-1-huangjunxian6@hisilicon.com>
-To: Junxian Huang <huangjunxian6@hisilicon.com>
-Cc: jgg@ziepe.ca, leon@kernel.org, dsahern@gmail.com,
- stephen@networkplumber.org, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linuxarm@huawei.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Mon, 16 Oct 2023 08:43:46 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+> On Mon, 16 Oct 2023 17:00:27 +0200 K=C3=B6ry Maincent wrote:
+> > On Mon, 16 Oct 2023 07:22:04 -0700
+> > Jakub Kicinski <kuba@kernel.org> wrote: =20
+>
+> > Ok, but there might be quality difference in case of several timestamp
+> > configuration done in the MAC. Like the timestamping precision vs frequ=
+ency
+> > precision. In that case how ethtool would tell the driver to switch bet=
+ween
+> > them? =20
+>=20
+> What's the reason for timestamp precision differences?
+> My understanding so far was the the differences come from:
+>  1. different stamping device (i.e. separate "piece of silicon",
+>     accessed over a different bus, with different PHC etc.)
+>  2. different stamping point (MAC vs DMA)
+>=20
+> I don't think any "integrated" device would support stamps which
+> differ under category 1.
 
-On Tue, 10 Oct 2023 15:55:24 +0800 you wrote:
-> This patchset adds support to dump SRQ resource in raw format with
-> rdmatool. The corresponding kernel commit is aebf8145e11a
-> ("RDMA/core: Add support to dump SRQ resource in RAW format")
-> 
-> v2 adds the missing change in res_srq_idx_parse_cb().
-> 
-> Junxian Huang (1):
->   rdma: Update uapi headers
-> 
-> [...]
+It was a case reported by Maxime on v3:
+https://lore.kernel.org/netdev/20230324112541.0b3dd38a@pc-7.home/=20
 
-Here is the summary with links:
-  - [v2,iproute2-next,1/2] rdma: Update uapi headers
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=cd4315de422e
-  - [v2,iproute2-next,2/2] rdma: Add support to dump SRQ resource in raw format
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=07bfa4482d49
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> > My solution could work for this case by simply adding new values to the
+> > enum:
+> >=20
+> > enum {
+> > 	NETDEV_TIMESTAMPING =3D (1 << 0),
+> > 	PHYLIB_TIMESTAMPING =3D (1 << 1),
+> > 	MAC_TS_PRECISION =3D (1 << 2)|(1 << 0),
+> > 	MAC_FREQ_PRECISION =3D (2 << 2)|(1 << 0),
+> > }
+> >=20
+> > Automatically Linux will go through the netdev implementation and could=
+ pass
+> > the enum value to the netdev driver. =20
+>=20
+> We can add multiple fields to netlink. Why use the magic encoding?
 
+To simplify the Linux code to go under either netdev or phylib implementati=
+on
+without needing describing all the enum possibility in the condition:
+if (ts_layer & PHYLIB_TIMESTAMPING)
+...
+if (ts_layer & NETDEV_TIMESTAMPING)
+...
+
+We also could add "is_phylib" and "is_netdev" functions with a simple switch
+case in it, but we have to be careful to always update these functions when=
+ new
+enum values will appear.
+
+>=20
+> > > But there is a big difference between MAC/PHY and DMA which would
+> > > both fall under NETDEV?   =20
+> >=20
+> > Currently there is no DMA timestamping support right? =20
+>=20
+> Kinda. Some devices pass DMA stamps as "HW stamps", and pretend they
+> are "good enough". But yes, there's no distinction at API level.
+
+Ok. I did suppose this when writing my last reply.
+
+> > In that case we will have MAC and DMA under netdev and PHY under phylib=
+ and
+> > we won't have to do anything more than this timestamping management pat=
+ch:=20
+> > https://lore.kernel.org/netdev/20231009155138.86458-14-kory.maincent@bo=
+otlin.com/
+> > =20
+>=20
+> Maybe we should start with a doc describing what APIs are at play,
+> what questions they answer, and what hard use cases we have.
+>=20
+> I'm not opposed to the ethool API reporting just the differences
+> from my point 1. (in the first paragraph). But then we shouldn't
+> call that "layer", IMO, but device or source or such.
+
+I am open to change the naming to fit the best for our current and future u=
+sage.
+If we take into account the Maxime case of several timestamps on a device t=
+hen
+maybe source could work.
 
 
