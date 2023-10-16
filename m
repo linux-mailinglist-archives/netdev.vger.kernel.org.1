@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-41395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B731E7CADB3
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:38:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 537B27CADB9
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:39:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70EFB2815A6
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:38:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7561B20D1B
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162032AB2C;
-	Mon, 16 Oct 2023 15:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401412AB2B;
+	Mon, 16 Oct 2023 15:39:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+xELNq/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GiEQgKrB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891482AB20;
-	Mon, 16 Oct 2023 15:38:19 +0000 (UTC)
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BDD8E6;
-	Mon, 16 Oct 2023 08:38:15 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id 6a1803df08f44-66d0169cf43so31065926d6.3;
-        Mon, 16 Oct 2023 08:38:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E487C1C2BA;
+	Mon, 16 Oct 2023 15:39:06 +0000 (UTC)
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D7C2EA;
+	Mon, 16 Oct 2023 08:39:03 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-77575233636so331618485a.2;
+        Mon, 16 Oct 2023 08:39:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697470694; x=1698075494; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1697470742; x=1698075542; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=E2U0tR8Dn0OrbtuxY9Iht1R/0yXE+tx6iPbJ9vem8lA=;
-        b=D+xELNq/ee3NM2fkVC6umSSgqvL09fPwudLyOX2exJwVXzES7svKsjauQtXN4xzHBB
-         K9qW6u+UZpfXvDhv23JjO1Cp/kIH3saY5bjOc1n+tbjXeC7A7feuYa+WT0TBsAec/7ux
-         BFN0L2Dj5q6/u5zhUZQa3+E+gqZl5QwTW1ZPzSWEySeczLF2YL8flAOEzlXgeaj2/w1I
-         pkRqWo97xKKlG21PS3buNSLBu/IZkv3v+U4NDvpcx0suFbh4kIa2atA9DDsczOrj2vIj
-         8Wlye+EN3fe9dSKPYBxAIfzS7lXUwlR6vl7D7xo2DRnLq9UYZxw9GMlzF3ADk3Ap5MWX
-         YQBg==
+        bh=lQb5f3PUQ/XerelBHXr/6AaCKBx7x/3JOSUgjCfaFEQ=;
+        b=GiEQgKrBuJpRtisGlwrx5rX/xLH1nBj2T2Jn0wcL41qPioawoNo8mvOaKT3WwrMyok
+         DR+hZ+cy1X3yoQb5/p3gjNLletRmkT2aQr0bwt3WjCFk0A8H/1pk4gtl6eSxeCphY9EF
+         MFGa/1TR7q/OVgUn/pDR9W0EcQgmHYeqGoRlNWLheB+tGnv48hA0YpNvppbIm0omAMws
+         dnIyIgRcTPHQqQUCYr9hNYWeEMUQewk4blZ4KaJjV5oyPpHNNLy5lmobzQoYyPViX7U9
+         I6RgjwMQDG3902PpF9nF2tYaggLVpal/J4J/sazDrgNiSq1YDx4ReBOt28GmyrRfYyyT
+         EiZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697470694; x=1698075494;
+        d=1e100.net; s=20230601; t=1697470742; x=1698075542;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E2U0tR8Dn0OrbtuxY9Iht1R/0yXE+tx6iPbJ9vem8lA=;
-        b=FI62efblsIMKKdL9UFHH959ZuS4/lP6hx50oCVtBfJQj01NFH7Zdx6eyUK9e1tQlFN
-         JldILGUQskc0WLOV+aJ3vTgAKGvdZIw4hoLZ3mH3fB434YtZWW6nm4rjFn9OJQm7uW0w
-         MGjW8py/8U/i0EH6M82uRqe+T47i4KG1xqzfsvYN8M6GjwTG5hG0fwgNElFPC+siY8f8
-         sW/RlSMkvBgV1iR4xIBRkeoOe39zImho61a4UeIiDOEPAQdAgU8B9cc+WBiRDRQc4rKF
-         5WvcbL8Cmg4yBfhXwDRJLeeio7XIwQT+CDmCoXMrWrNkP7qRexYE0GvV3Cp0G6MPipXc
-         0IYA==
-X-Gm-Message-State: AOJu0Yxj87vX4Iz/d3Wz3zHF68/FkACavlV+ys0PGjc/9fHqYQ4BRjDJ
-	Mz5gI/yyIS/edOO4ZC0tp/Q=
-X-Google-Smtp-Source: AGHT+IE+/NQ04r2GBtb3Ol6v8SJTHrMX4/dRmnKz/g+W0jkZ6ZFmtKxJI1svJ6Uo9QHYAId/h7ZxEw==
-X-Received: by 2002:a05:6214:5004:b0:66d:20f5:23cb with SMTP id jo4-20020a056214500400b0066d20f523cbmr15060073qvb.5.1697470694262;
-        Mon, 16 Oct 2023 08:38:14 -0700 (PDT)
+        bh=lQb5f3PUQ/XerelBHXr/6AaCKBx7x/3JOSUgjCfaFEQ=;
+        b=PODiX011D3+JAGQtNmbwGBv2zS3XI51YanQxTdCmb/zB/Zlvv/l9ZU3F2Ih/vuHXpm
+         NPhjSioxtZLKHixMBk/krlsCYhEJijHKKtnD1bIDJlv2Dn+KxEC6x053pX++bFj3dzjM
+         yVe89cRiqo5UPAVyP2LW773RrHnNSU0dpe8MVi3Lr75MZJnzl+2O7khoLMqAZbVGqT7S
+         V0juBJrQTcLVurZuHx4ISJAeUkz4xiopdWE5bo7WwrMGR7Nfpr9N4Z9r+imeE1Y+klwi
+         btMmiBaoncN2CGCWDv+ygYzPvapsRaOJbQrD5q74TOfmJcAaqy2t88HtDvJtKseIm/nq
+         Jjmg==
+X-Gm-Message-State: AOJu0Yxd+fubQJ7aeoT59OqK+U+iZTs+t+LvUgvd7f+rD72ULSuLmMFF
+	BzEizVJcp+Vahzg49pE5588=
+X-Google-Smtp-Source: AGHT+IGDW9BxVkPV2t7ycn0cro7NWTFvlZS3MIRaDk4jkHZ85vF+RM/Uty0K2iWQ1fA92Y/q9Inpxw==
+X-Received: by 2002:a05:620a:4710:b0:76f:14fc:6d2f with SMTP id bs16-20020a05620a471000b0076f14fc6d2fmr41774403qkb.1.1697470742597;
+        Mon, 16 Oct 2023 08:39:02 -0700 (PDT)
 Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id x21-20020a05620a14b500b00773f008da40sm3061221qkj.125.2023.10.16.08.38.11
+        by smtp.gmail.com with ESMTPSA id x21-20020a05620a14b500b00773f008da40sm3061221qkj.125.2023.10.16.08.38.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 08:38:13 -0700 (PDT)
-Message-ID: <f06813a8-cdf7-4013-928e-b4b20ec2d684@gmail.com>
-Date: Mon, 16 Oct 2023 08:38:11 -0700
+        Mon, 16 Oct 2023 08:39:01 -0700 (PDT)
+Message-ID: <53bb1429-f73a-4acd-a99a-a4fd5d1e20e8@gmail.com>
+Date: Mon, 16 Oct 2023 08:38:59 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 6/9] net: dsa: microchip: Refactor comment for
- ksz_switch_macaddr_get() function
+Subject: Re: [PATCH net-next v4 5/9] net: dsa: microchip: ksz9477: Add Wake on
+ Magic Packet support
 Content-Language: en-US
 To: Oleksij Rempel <o.rempel@pengutronix.de>,
  "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
@@ -83,7 +83,7 @@ Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
  "Russell King (Oracle)" <linux@armlinux.org.uk>, devicetree@vger.kernel.org
 References: <20231016141256.2011861-1-o.rempel@pengutronix.de>
- <20231016141256.2011861-7-o.rempel@pengutronix.de>
+ <20231016141256.2011861-6-o.rempel@pengutronix.de>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -118,12 +118,12 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231016141256.2011861-7-o.rempel@pengutronix.de>
+In-Reply-To: <20231016141256.2011861-6-o.rempel@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
@@ -131,7 +131,25 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 
 On 10/16/2023 7:12 AM, Oleksij Rempel wrote:
-> Update the comment to follow kernel-doc format.
+> Introduce Wake on Magic Packet (WoL) functionality to the ksz9477
+> driver.
+> 
+> Major changes include:
+> 
+> 1. Extending the `ksz9477_handle_wake_reason` function to identify Magic
+>     Packet wake events alongside existing wake reasons.
+> 
+> 2. Updating the `ksz9477_get_wol` and `ksz9477_set_wol` functions to
+>     handle WAKE_MAGIC alongside the existing WAKE_PHY option, and to
+>     program the switch's MAC address register accordingly when Magic
+>     Packet wake-up is enabled. This change will prevent WAKE_MAGIC
+>     activation if the related port has a different MAC address compared
+>     to a MAC address already used by HSR or an already active WAKE_MAGIC
+>     on another port.
+> 
+> 3. Adding a restriction in `ksz_port_set_mac_address` to prevent MAC
+>     address changes on ports with active Wake on Magic Packet, as the
+>     switch's MAC address register is utilized for this feature.
 > 
 > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
