@@ -1,150 +1,138 @@
-Return-Path: <netdev+bounces-41336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 324A47CA956
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:29:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A787CA97B
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E181F28130C
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:28:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D3741C209B1
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E527F27EEC;
-	Mon, 16 Oct 2023 13:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB15427EE6;
+	Mon, 16 Oct 2023 13:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="dstMeNX/"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="U3zi0KRI"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E9F26E16
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:28:56 +0000 (UTC)
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9914ED
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:28:54 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1c5c91bec75so28502355ad.3
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:28:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1697462934; x=1698067734; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W5edFP5IbqRycra4JwAwr7sw7tdQ8rYxAUGEg4gbH5I=;
-        b=dstMeNX/S/U6Zd5Z5IPb0P7sTdufE7lqsNm4s0QGvorWjKRX+UM52EXsnpN2UGO/b3
-         LlSHHASLlXtv8pxbvajKcPypiKB6305coJDK69Ijde8n4H8TpM+Dx5SY7J3MHCWtZeeP
-         40y4+KDWwCQ/+5TMdHkGjAc6BBWjKnKT7MnGU9GLBvLtFjJP453yt8iNF9VgJiJGdTUR
-         IrLc1ACoH8gvqsUID+DU9u1ZY73dUmSwPA+qf1mThnFJTdRwI68wn/7hUJiBaGpEOLQm
-         wuBqSYziHI6U/cn6sXobsz/ktXu29X8MviMMhN2VzDflqFmLF+0M6d4NgFPdl52R6dw+
-         i3KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697462934; x=1698067734;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W5edFP5IbqRycra4JwAwr7sw7tdQ8rYxAUGEg4gbH5I=;
-        b=vd4l0j01bn+fwW8wksAlKkl9u4Ev4vIVxSY8eyr8vCZsakLclavQy1ANnwh72HEJPx
-         9lPnHM2jt/OlZSyd9pWfM1d8xz7azBPlAbP3m1pVjVKx70CvBdh5qlX44rHOk0bWYWPZ
-         UrRUBbSgEs52LK6eUyh0ELW0tAmE09VqAZN2jaLcfVZKBTegM5i9q9dK1fH6Zju4r4/k
-         hRHTU+ydkwc0Kv0Be3OROzf/zc+oJVUk8b99FRguBEkWRWsqaZMIigcpGhABlNeRkTC4
-         Bs0Dxq48u/4c/I5QslGxeqXDZ+Wpi2EjWmztTZpNr895rMFWxmlItehG2MktjoKyktcn
-         kWAA==
-X-Gm-Message-State: AOJu0YzSuGcvsfSX/PbOxt0TNZZPNuJNGywpL+vUPj/grDL80I7jFjk7
-	0mqQ1KnTBh8s1YTaIHo0Owb0hA==
-X-Google-Smtp-Source: AGHT+IH0QjFU/M3nL9sQ7GpGqT0tk+CeTm1zv1UcyqYWSvsDzutF7dTumssneT1g+Jcbaao72hKBCQ==
-X-Received: by 2002:a17:902:c94f:b0:1c3:8464:cabd with SMTP id i15-20020a170902c94f00b001c38464cabdmr36959730pla.12.1697462934153;
-        Mon, 16 Oct 2023 06:28:54 -0700 (PDT)
-Received: from C02DV8HUMD6R.bytedance.net ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id l21-20020a170902d35500b001c737950e4dsm8476287plk.2.2023.10.16.06.28.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 06:28:53 -0700 (PDT)
-From: Abel Wu <wuyun.abel@bytedance.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shakeel Butt <shakeelb@google.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Abel Wu <wuyun.abel@bytedance.com>
-Subject: [PATCH net-next v2 3/3] sock: Fix improper heuristic on raising memory
-Date: Mon, 16 Oct 2023 21:28:12 +0800
-Message-Id: <20231016132812.63703-3-wuyun.abel@bytedance.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20231016132812.63703-1-wuyun.abel@bytedance.com>
-References: <20231016132812.63703-1-wuyun.abel@bytedance.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B670126E16
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:32:03 +0000 (UTC)
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F887119
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:32:00 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CF3F460142;
+	Mon, 16 Oct 2023 13:31:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1697463119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+ljZPxh2jdputm9TemFdHIvPMdXoKUEwFt2DcsNbr8A=;
+	b=U3zi0KRIXU3t/54+TkkzuG4DwAoXPyrb7H3WsBiamS03+LZvy8OLa1NcumuwTHhlp5hI2q
+	elFtGkjhGnXqr7105eWogdIblmJzZLQx78qYuoLuq2UQob1JkIMnHkihiuK277Cv4cG5/U
+	amGJ4MKiVbvb64g9QIEDjCVcOA2EqL0MokR6lAFDtQwJNWk2hg7alAhnEMTmJit6nR3siz
+	eVRrjeQ8F7L4hEk8xBo6phHxyjUVYE/8Km1trBu4SKbmfV6BqhRU9Ik6/dTkEVJIsN7PXL
+	ce5CjanNNOE93Y+amUfIkA5tzq0VMJDW/QWdM9ALW6VfbsYGUCA686Ee//+lwg==
+Date: Mon, 16 Oct 2023 15:31:54 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Alexander Stein <alexander.stein@ew.tq-group.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, Andrew Lunn
+ <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+ <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Russell King
+ <linux@armlinux.org.uk>, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-imx@nxp.com,
+ netdev@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: Ethernet issue on imx6
+Message-ID: <20231016153154.31d92529@xps-13>
+In-Reply-To: <2245614.iZASKD2KPV@steina-w>
+References: <20231012193410.3d1812cf@xps-13>
+	<20231012155857.6fd51380@hermes.local>
+	<20231013102718.6b3a2dfe@xps-13>
+	<2245614.iZASKD2KPV@steina-w>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Before sockets became aware of net-memcg's memory pressure since
-commit e1aab161e013 ("socket: initial cgroup code."), the memory
-usage would be granted to raise if below average even when under
-protocol's pressure. This provides fairness among the sockets of
-same protocol.
+Hi Alexander,
 
-That commit changes this because the heuristic will also be
-effective when only memcg is under pressure which makes no sense.
-Fix this by reverting to the behavior before that commit.
+Thanks a lot for your feedback.
 
-After this fix, __sk_mem_raise_allocated() no longer considers
-memcg's pressure. As memcgs are isolated from each other w.r.t.
-memory accounting, consuming one's budget won't affect others.
-So except the places where buffer sizes are needed to be tuned,
-allow workloads to use the memory they are provisioned.
+> > switch to partitions #0, OK
+> > mmc1 is current device
+> > reading boot.scr
+> > 444 bytes read in 10 ms (43 KiB/s)
+> > ## Executing script at 20000000
+> > Booting from mmc ...
+> > reading zImage
+> > 9160016 bytes read in 462 ms (18.9 MiB/s)
+> > reading <board>.dtb =20
+>=20
+> Which device tree is that?
+>=20
+> > 40052 bytes read in 22 ms (1.7 MiB/s)
+> > boot device tree kernel ...
+> > Kernel image @ 0x12000000 [ 0x000000 - 0x8bc550 ]
+> > ## Flattened Device Tree blob at 18000000
+> >    Booting using the fdt blob at 0x18000000
+> >    Using Device Tree in place at 18000000, end 1800cc73
+> >=20
+> > Starting kernel ...
+> >=20
+> > [    0.000000] Booting Linux on physical CPU 0x0
+> > [    0.000000] Linux version 6.5.0 (mraynal@xps-13) (arm-linux-gcc.br_r=
+eal
+> > (Buildroot 2 020.08-14-ge5a2a90) 10.2.0, GNU ld (GNU Binutils) 2.34) #1=
+20
+> > SMP Thu Oct 12 18:10:20 CE ST 2023
+> > [    0.000000] CPU: ARMv7 Processor [412fc09a] revision 10 (ARMv7),
+> > cr=3D10c5387d [    0.000000] CPU: PIPT / VIPT nonaliasing data cache, V=
+IPT
+> > aliasing instruction cache
+> > [    0.000000] OF: fdt: Machine model: TQ TQMa6Q
+> > on MBa6x =20
+>=20
+> Your first mail mentions a custom board, but this indicates "TQMa6Q
+> on MBa6x", so which is it?
 
-Fixes: e1aab161e013 ("socket: initial cgroup code.")
-Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
----
-v2:
-  - Ignore memcg pressure when raising memory allocated.
----
- net/core/sock.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+It's a custom carrier board with a TQMA6Q-AA module.
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 9f969e3c2ddf..1d28e3e87970 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3035,7 +3035,13 @@ EXPORT_SYMBOL(sk_wait_data);
-  *	@amt: pages to allocate
-  *	@kind: allocation type
-  *
-- *	Similar to __sk_mem_schedule(), but does not update sk_forward_alloc
-+ *	Similar to __sk_mem_schedule(), but does not update sk_forward_alloc.
-+ *
-+ *	Unlike the globally shared limits among the sockets under same protocol,
-+ *	consuming the budget of a memcg won't have direct effect on other ones.
-+ *	So be optimistic about memcg's tolerance, and leave the callers to decide
-+ *	whether or not to raise allocated through sk_under_memory_pressure() or
-+ *	its variants.
-  */
- int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
- {
-@@ -3093,7 +3099,11 @@ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
- 	if (sk_has_memory_pressure(sk)) {
- 		u64 alloc;
- 
--		if (!sk_under_memory_pressure(sk))
-+		/* The following 'average' heuristic is within the
-+		 * scope of global accounting, so it only makes
-+		 * sense for global memory pressure.
-+		 */
-+		if (!sk_under_global_memory_pressure(sk))
- 			return 1;
- 
- 		/* Try to be fair among all the sockets under global
--- 
-2.37.3
+> Please note that there are two different module variants, imx6qdl-tqma6a.=
+dtsi=20
+> and imx6qdl-tqma6b.dtsi. They deal with i.MX6's ERR006687 differently.
+> Package drop without any load somewhat indicates this issue.
 
+I've tried with and without the fsl,err006687-workaround-present DT
+property. It gets successfully parsed an I see the lower idle state
+being disabled under mach-imx. I've also tried just commenting out the
+registration of the cpuidle driver, just to be sure. I saw no
+difference.
+
+By the way, we tried with a TQ eval board with this SoM and saw the same
+issue (not me, I don't have this board in hands). Don't you experience
+something similar? I went across a couple of people reporting similar
+issues with these modules but none of them reported how they fixed it
+(if they did). I tried two different images based on TQ's Github using
+v4.14.69 and v5.10 kernels.
+
+Thanks,
+Miqu=C3=A8l
 
