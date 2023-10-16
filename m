@@ -1,134 +1,96 @@
-Return-Path: <netdev+bounces-41132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 960EE7C9F16
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:45:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5758B7C9F1C
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:48:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 937DD1C208B7
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 05:45:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CC0FB20CE7
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 05:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D318836;
-	Mon, 16 Oct 2023 05:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F214111AB;
+	Mon, 16 Oct 2023 05:48:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="2LZ3V85G"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DD1C8C0
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 05:45:39 +0000 (UTC)
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB49D6
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 22:45:37 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 83F4E205DD;
-	Mon, 16 Oct 2023 07:45:34 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CT-8X4LgIxiJ; Mon, 16 Oct 2023 07:45:33 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 47BD7201C7;
-	Mon, 16 Oct 2023 07:45:33 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout1.secunet.com (Postfix) with ESMTP id 402C580004A;
-	Mon, 16 Oct 2023 07:45:33 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 16 Oct 2023 07:45:32 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Mon, 16 Oct
- 2023 07:45:32 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 495B33180097; Mon, 16 Oct 2023 07:45:32 +0200 (CEST)
-Date: Mon, 16 Oct 2023 07:45:32 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<eric.dumazet@gmail.com>, syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH net] xfrm: fix a data-race in xfrm_lookup_with_ifid()
-Message-ID: <ZSzN/Gppt9qkHy+v@gauss3.secunet.de>
-References: <20231011102429.799316-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE04CF50A
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 05:48:13 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B9EF2;
+	Sun, 15 Oct 2023 22:48:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=HNzOvxESbvs0T+eHOSkoEf67mG8U/1N0p04PAmqKDXE=; b=2LZ3V85GIZkSezRnfJZYY+41II
+	hAx6KoDUJTBNqUViFNGY1iq1nTy806urFG6DFTIc2y/2hSVyjA5lvblAdhrrnaaZQVtKSHJ0ClxcT
+	btOJq+Bmc7p8nTSIiogtPYQD+ROsKcZY1kAf7rXBV5bTPCqZOXR5zAPo+kJAIpYCRWxWcBhYIWT30
+	W/8ajfCpTAo+9W/ldmJlQlKV4w+tSlA9wi1V8z5VY1wah9B3q7iD5jhMiU2g3oEsK5+9PSm+AfIol
+	T3CyQGbEa0TDUnq9JIaSaM67p8D5JV0MDB3w8KArp2cItSF5Kfm6892pvl119ffXh3wOtu4m6im+q
+	LIlB+54Q==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qsGSM-008Qdv-36;
+	Mon, 16 Oct 2023 05:47:59 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Greg Ungerer <gerg@linux-m68k.org>,
+	iommu@lists.linux.dev
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Conor Dooley <conor@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	linux-m68k@lists.linux-m68k.org,
+	netdev@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org,
+	Jim Quinlan <james.quinlan@broadcom.com>
+Subject: fix the non-coherent coldfire dma_alloc_coherent v2
+Date: Mon, 16 Oct 2023 07:47:42 +0200
+Message-Id: <20231016054755.915155-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231011102429.799316-1-edumazet@google.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 10:24:29AM +0000, Eric Dumazet wrote:
-> syzbot complains about a race in xfrm_lookup_with_ifid() [1]
-> 
-> When preparing commit 0a9e5794b21e ("xfrm: annotate data-race
-> around use_time") I thought xfrm_lookup_with_ifid() was modifying
-> a still private structure.
-> 
-> [1]
-> BUG: KCSAN: data-race in xfrm_lookup_with_ifid / xfrm_lookup_with_ifid
-> 
-> write to 0xffff88813ea41108 of 8 bytes by task 8150 on cpu 1:
-> xfrm_lookup_with_ifid+0xce7/0x12d0 net/xfrm/xfrm_policy.c:3218
-> xfrm_lookup net/xfrm/xfrm_policy.c:3270 [inline]
-> xfrm_lookup_route+0x3b/0x100 net/xfrm/xfrm_policy.c:3281
-> ip6_dst_lookup_flow+0x98/0xc0 net/ipv6/ip6_output.c:1246
-> send6+0x241/0x3c0 drivers/net/wireguard/socket.c:139
-> wg_socket_send_skb_to_peer+0xbd/0x130 drivers/net/wireguard/socket.c:178
-> wg_socket_send_buffer_to_peer+0xd6/0x100 drivers/net/wireguard/socket.c:200
-> wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
-> wg_packet_handshake_send_worker+0x10c/0x150 drivers/net/wireguard/send.c:51
-> process_one_work kernel/workqueue.c:2630 [inline]
-> process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2703
-> worker_thread+0x525/0x730 kernel/workqueue.c:2784
-> kthread+0x1d7/0x210 kernel/kthread.c:388
-> ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
-> ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-> 
-> write to 0xffff88813ea41108 of 8 bytes by task 15867 on cpu 0:
-> xfrm_lookup_with_ifid+0xce7/0x12d0 net/xfrm/xfrm_policy.c:3218
-> xfrm_lookup net/xfrm/xfrm_policy.c:3270 [inline]
-> xfrm_lookup_route+0x3b/0x100 net/xfrm/xfrm_policy.c:3281
-> ip6_dst_lookup_flow+0x98/0xc0 net/ipv6/ip6_output.c:1246
-> send6+0x241/0x3c0 drivers/net/wireguard/socket.c:139
-> wg_socket_send_skb_to_peer+0xbd/0x130 drivers/net/wireguard/socket.c:178
-> wg_socket_send_buffer_to_peer+0xd6/0x100 drivers/net/wireguard/socket.c:200
-> wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
-> wg_packet_handshake_send_worker+0x10c/0x150 drivers/net/wireguard/send.c:51
-> process_one_work kernel/workqueue.c:2630 [inline]
-> process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2703
-> worker_thread+0x525/0x730 kernel/workqueue.c:2784
-> kthread+0x1d7/0x210 kernel/kthread.c:388
-> ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
-> ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-> 
-> value changed: 0x00000000651cd9d1 -> 0x00000000651cd9d2
-> 
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 0 PID: 15867 Comm: kworker/u4:58 Not tainted 6.6.0-rc4-syzkaller-00016-g5e62ed3b1c8a #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
-> Workqueue: wg-kex-wg2 wg_packet_handshake_send_worker
-> 
-> Fixes: 0a9e5794b21e ("xfrm: annotate data-race around use_time")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Hi all,
 
-Applied to the ipsec tree, thanks a lot Eric!
+this is the next attempt to not return memory that is not DMA coherent
+on coldfire/m68knommu.  The last one needed more fixups in the fec
+driver, which this versions includes.  On top of that I've also added
+a few more cleanups to the core DMA allocation code.
+
+Jim: any work to support the set_uncached and remap method for arm32
+should probably be based on this, and patch 3 should make that
+selection a little easier.
+
+Changes since v1:
+ - sort out the dependency mess in RISCV
+ - don't even built non-coherent DMA support for coldfire cores without
+   data caches
+ - apply the fec workarounds to all coldfire platforms with data caches
+ - add a trivial cleanup for m68k dma.c
 
