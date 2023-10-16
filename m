@@ -1,140 +1,76 @@
-Return-Path: <netdev+bounces-41364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9B77CAB0B
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:13:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C68067CAB31
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3E671F22228
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:13:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AA932814A4
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6037228DBD;
-	Mon, 16 Oct 2023 14:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8B228DBB;
+	Mon, 16 Oct 2023 14:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UG1OvhCS"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D5B27EEE
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 14:13:22 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23E78E8
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:13:21 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qsOL4-0002pI-HV; Mon, 16 Oct 2023 16:12:58 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qsOL3-0026aT-F0; Mon, 16 Oct 2023 16:12:57 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qsOL3-008RPT-1G;
-	Mon, 16 Oct 2023 16:12:57 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: [PATCH net-next v4 9/9] net: dsa: microchip: do not reset the switch on shutdown if WoL is active
-Date: Mon, 16 Oct 2023 16:12:56 +0200
-Message-Id: <20231016141256.2011861-10-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231016141256.2011861-1-o.rempel@pengutronix.de>
-References: <20231016141256.2011861-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC471CAAD
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 14:17:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BA46C433C7;
+	Mon, 16 Oct 2023 14:17:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697465877;
+	bh=vG5dUiaoYpNcLFNAh/ByVOdSrpjZW8Cfq1lBFKNYtSQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UG1OvhCSuO7NSxwdw0CmsE1JEnaiDqPvtIVyLV80H9TWBhu4m5CfiNjJSvimHtQDk
+	 +eApjR4jM5WrRlLF1CcsOS/92VdHmG4jnLeCL3vjCO4cSiS0l25t4BltBT8H+R4X93
+	 YXFzyCRJ6hEkMxY01yr0oU4iqZnoH+e9rfD5hmMeQdy8lnWE04cNRedphcowScEtJ7
+	 pywA0opOpQvDGxpUdHScmTXRZg6hfI3nA+jaDAwAwEA2lIsiosYicYr8+33x3Rxy3n
+	 qwTzL659/tp9VrDSPsUXyDIWz2rf2Qw5atk7IFtkEZDsVJ5D6YIez/dXPURd7ksxIT
+	 ZEphC9JVXNpEA==
+Date: Mon, 16 Oct 2023 07:17:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner
+ <tglx@linutronix.de>, Come On Now <hawk@kernel.org>
+Subject: Re: [PATCH net-next 0/2] net: Use SMP threads for backlog NAPI (or
+ optional).
+Message-ID: <20231016071756.4ac5b865@kernel.org>
+In-Reply-To: <20231016095321.4xzKQ5Cd@linutronix.de>
+References: <20230929162121.1822900-1-bigeasy@linutronix.de>
+	<20231004154609.6007f1a0@kernel.org>
+	<20231007155957.aPo0ImuG@linutronix.de>
+	<20231009180937.2afdc4c1@kernel.org>
+	<20231016095321.4xzKQ5Cd@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-For Wake on Lan we should not reconfigure, reset or power down the
-switch on shut down sequence.
+On Mon, 16 Oct 2023 11:53:21 +0200 Sebastian Andrzej Siewior wrote:
+> > Do we have reason to believe nobody uses RPS?  
+> 
+> Not sure what you relate to. I would assume that RPS is used in general
+> on actual devices and not on loopback where backlog is used. But it is
+> just an assumption.
+> The performance drop, which I observed with RPS and stress-ng --udp, is
+> within the same range with threads and IPIs (based on memory). I can
+> re-run the test and provide actual numbers if you want.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz_common.c | 29 +++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 85513318d165..abfd9dcab450 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -3565,6 +3565,33 @@ static int ksz_set_wol(struct dsa_switch *ds, int port,
- 	return -EOPNOTSUPP;
- }
- 
-+/**
-+ * ksz_wol_is_active - Check if Wake-on-LAN is active on any port.
-+ * @dev: The device structure.
-+ *
-+ * This function iterates through each user port on the switch, checking if
-+ * Wake-on-LAN (WoL) is active on any of them.
-+ *
-+ * Return: true if WoL is active on any port, false otherwise.
-+ */
-+static bool ksz_wol_is_active(struct ksz_device *dev)
-+{
-+	struct dsa_port *dp;
-+
-+	if (!dev->wakeup_source)
-+		return false;
-+
-+	dsa_switch_for_each_user_port(dp, dev->ds) {
-+		struct ethtool_wolinfo wol;
-+
-+		ksz_get_wol(dev->ds, dp->index, &wol);
-+		if (wol.wolopts)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
- 				    const unsigned char *addr)
- {
-@@ -3822,7 +3849,7 @@ EXPORT_SYMBOL(ksz_switch_alloc);
-  */
- void ksz_switch_shutdown(struct ksz_device *dev)
- {
--	if (dev->dev_ops->reset)
-+	if (dev->dev_ops->reset && !ksz_wol_is_active(dev))
- 		dev->dev_ops->reset(dev);
- 
- 	dsa_switch_shutdown(dev->ds);
--- 
-2.39.2
-
+I was asking about RPS because with your current series RPS processing
+is forced into threads. IDK how well you can simulate the kind of
+workload which requires RPS. I've seen it used mostly on proxyies 
+and gateways. For proxies Meta's experiments with threaded NAPI show
+regressions across the board. So "force-threading" RPS will most likely
+also cause regressions.
 
