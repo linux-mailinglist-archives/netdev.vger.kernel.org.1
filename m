@@ -1,152 +1,261 @@
-Return-Path: <netdev+bounces-41427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D87157CAE9A
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:10:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A43917CAEAA
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:12:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77128B20C1B
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:10:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F20DCB20D82
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2426130CEB;
-	Mon, 16 Oct 2023 16:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD8830CEF;
+	Mon, 16 Oct 2023 16:12:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oZSi9Cr4"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="J0/P8eus"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE53830CE0;
-	Mon, 16 Oct 2023 16:10:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6700C433C9;
-	Mon, 16 Oct 2023 16:10:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697472652;
-	bh=gWHVm67UjtqFw6+7yv4rt62zVL2QbQsf6kz0OqfM+T4=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=oZSi9Cr46VJvDfJqXMvyt3WZMnh3kWQOGId5Ykf8NhRUkV1JLSq60ZEuW9aLkCetX
-	 sil+IjGAZbvHruvhuOiI8djrgL/SiaanaZOLMiaQa1tSFyoNb5Nlkh0TjdFGAJiay5
-	 SfJPKb8r8exJavmsBQGw4TiOA8LZFqvuinK7G3ADrnTpV7Idmg/KlDlaR5SYbA4LeI
-	 X6h60yT/c0b1f+iN5XqRzmx03D1z5a9WHAS97cpg8XRftJnID1Kr4zsHf46LaSw39s
-	 Sn6yblOrRc68OCh2l6paV3F2P/vXsQoBQ8A3E/1gLqYl8X+0LyMWIKHZUPKSFQWxv3
-	 idwbIz0NRNM+g==
-Message-ID: <bb0b02b4241da7f486cde28bdc83bb9ce077ee0e.camel@kernel.org>
-Subject: Re: [RFC PATCH 11/53] netfs: Add support for DIO buffering
-From: Jeff Layton <jlayton@kernel.org>
-To: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Marc Dionne
- <marc.dionne@auristor.com>,  Paulo Alcantara <pc@manguebit.com>, Shyam
- Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Dominique
- Martinet <asmadeus@codewreck.org>, Ilya Dryomov <idryomov@gmail.com>,
- Christian Brauner <christian@brauner.io>,  linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org,  linux-nfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Date: Mon, 16 Oct 2023 12:10:49 -0400
-In-Reply-To: <20231013160423.2218093-12-dhowells@redhat.com>
-References: <20231013160423.2218093-1-dhowells@redhat.com>
-	 <20231013160423.2218093-12-dhowells@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3822E638;
+	Mon, 16 Oct 2023 16:12:14 +0000 (UTC)
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD13E6;
+	Mon, 16 Oct 2023 09:12:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697472733; x=1729008733;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+36XmP8asMBo8L9iZ19ej+lJg8W+aW92hTS1Nj/oAYg=;
+  b=J0/P8eus/07FMHaSHcmkIMHmJsfDmbiTx8xFntl6k6cX4/bQXGMGWEOb
+   dqUGnKZTXxTrgi6C/sjewF2AF64GEjCLqxijjxhhF9RDLIGPuk+9UhhXA
+   mVhXI3HpepERN5Nc0yVEnkT4X4aYhzkGu1crjkUwJRLbFjGUYzTKK3R7R
+   c=;
+X-IronPort-AV: E=Sophos;i="6.03,229,1694736000"; 
+   d="scan'208";a="245384081"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 16:12:09 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com (Postfix) with ESMTPS id 14D344880B;
+	Mon, 16 Oct 2023 16:11:55 +0000 (UTC)
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:41908]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.209:2525] with esmtp (Farcaster)
+ id 32d64908-6f5e-4cac-b6d7-291102808b66; Mon, 16 Oct 2023 16:11:54 +0000 (UTC)
+X-Farcaster-Flow-ID: 32d64908-6f5e-4cac-b6d7-291102808b66
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 16 Oct 2023 16:11:46 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.29) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 16 Oct 2023 16:11:42 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <daniel@iogearbox.net>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<haoluo@google.com>, <john.fastabend@gmail.com>, <jolsa@kernel.org>,
+	<kpsingh@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <mykolal@fb.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
+	<song@kernel.org>, <yonghong.song@linux.dev>
+Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie generation/validation SOCK_OPS hooks.
+Date: Mon, 16 Oct 2023 09:11:34 -0700
+Message-ID: <20231016161134.25365-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <0611984e-aea2-7eb5-af3e-e0635ca3b7ba@iogearbox.net>
+References: <0611984e-aea2-7eb5-af3e-e0635ca3b7ba@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.171.29]
+X-ClientProxiedBy: EX19D039UWB003.ant.amazon.com (10.13.138.93) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 2023-10-13 at 17:03 +0100, David Howells wrote:
-> Add a bvec array pointer and an iterator to netfs_io_request for either
-> holding a copy of a DIO iterator or a list of all the bits of buffer
-> pointed to by a DIO iterator.
->=20
-> There are two problems:  Firstly, if an iovec-class iov_iter is passed to
-> ->read_iter() or ->write_iter(), this cannot be passed directly to
-> kernel_sendmsg() or kernel_recvmsg() as that may cause locking recursion =
-if
-> a fault is generated, so we need to keep track of the pages involved
-> separately.
->=20
-> Secondly, if the I/O is asynchronous, we must copy the iov_iter describin=
-g
-> the buffer before returning to the caller as it may be immediately
-> deallocated.
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-cachefs@redhat.com
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
-> ---
->  fs/netfs/objects.c    | 10 ++++++++++
->  include/linux/netfs.h |  3 +++
->  2 files changed, 13 insertions(+)
->=20
-> diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
-> index 8e92b8401aaa..4396318081bf 100644
-> --- a/fs/netfs/objects.c
-> +++ b/fs/netfs/objects.c
-> @@ -78,6 +78,7 @@ static void netfs_free_request(struct work_struct *work=
-)
->  {
->  	struct netfs_io_request *rreq =3D
->  		container_of(work, struct netfs_io_request, work);
-> +	unsigned int i;
-> =20
->  	trace_netfs_rreq(rreq, netfs_rreq_trace_free);
->  	netfs_proc_del_rreq(rreq);
-> @@ -86,6 +87,15 @@ static void netfs_free_request(struct work_struct *wor=
-k)
->  		rreq->netfs_ops->free_request(rreq);
->  	if (rreq->cache_resources.ops)
->  		rreq->cache_resources.ops->end_operation(&rreq->cache_resources);
-> +	if (rreq->direct_bv) {
-> +		for (i =3D 0; i < rreq->direct_bv_count; i++) {
-> +			if (rreq->direct_bv[i].bv_page) {
-> +				if (rreq->direct_bv_unpin)
-> +					unpin_user_page(rreq->direct_bv[i].bv_page);
-> +			}
-> +		}
-> +		kvfree(rreq->direct_bv);
-> +	}
->  	kfree_rcu(rreq, rcu);
->  	netfs_stat_d(&netfs_n_rh_rreq);
->  }
-> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-> index bd0437088f0e..66479a61ad00 100644
-> --- a/include/linux/netfs.h
-> +++ b/include/linux/netfs.h
-> @@ -191,7 +191,9 @@ struct netfs_io_request {
->  	struct list_head	subrequests;	/* Contributory I/O operations */
->  	struct iov_iter		iter;		/* Unencrypted-side iterator */
->  	struct iov_iter		io_iter;	/* I/O (Encrypted-side) iterator */
-> +	struct bio_vec		*direct_bv;	/* DIO buffer list (when handling iovec-ite=
-r) */
->  	void			*netfs_priv;	/* Private data for the netfs */
-> +	unsigned int		direct_bv_count; /* Number of elements in bv[] */
+From: Daniel Borkmann <daniel@iogearbox.net>
+Date: Mon, 16 Oct 2023 15:05:25 +0200
+> On 10/14/23 12:04 AM, Kuniyuki Iwashima wrote:
+> > Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
+> > for the connection request until a valid ACK is responded to the SYN+ACK.
+> > 
+> > The cookie contains two kinds of host-specific bits, a timestamp and
+> > secrets, so only can it be validated by the generator.  It means SYN
+> > Cookie consumes network resources between the client and the server;
+> > intermediate nodes must remember which nodes to route ACK for the cookie.
+> > 
+> > SYN Proxy reduces such unwanted resource allocation by handling 3WHS at
+> > the edge network.  After SYN Proxy completes 3WHS, it forwards SYN to the
+> > backend server and completes another 3WHS.  However, since the server's
+> > ISN differs from the cookie, the proxy must manage the ISN mappings and
+> > fix up SEQ/ACK numbers in every packet for each connection.  If a proxy
+> > node is down, all the connections through it are also down.  Keeping a
+> > state at proxy is painful from that perspective.
+> > 
+> > At AWS, we use a dirty hack to build truly stateless SYN Proxy at scale.
+> > Our SYN Proxy consists of the front proxy layer and the backend kernel
+> > module.  (See slides of netconf [0], p6 - p15)
+> > 
+> > The cookie that SYN Proxy generates differs from the kernel's cookie in
+> > that it contains a secret (called rolling salt) (i) shared by all the proxy
+> > nodes so that any node can validate ACK and (ii) updated periodically so
+> > that old cookies cannot be validated.  Also, ISN contains WScale, SACK, and
+> > ECN, not in TS val.  This is not to sacrifice any connection quality, where
+> > some customers turn off the timestamp option due to retro CVE.
+> > 
+> > After 3WHS, the proxy restores SYN and forwards it and ACK to the backend
+> > server.  Our kernel module works at Netfilter input/output hooks and first
+> > feeds SYN to the TCP stack to initiate 3WHS.  When the module is triggered
+> > for SYN+ACK, it looks up the corresponding request socket and overwrites
+> > tcp_rsk(req)->snt_isn with the proxy's cookie.  Then, the module can
+> > complete 3WHS with the original ACK as is.
+> > 
+> > This way, our SYN Proxy does not manage the ISN mappings and can stay
+> > stateless.  It's working very well for high-bandwidth services like
+> > multiple Tbps, but we are looking for a way to drop the dirty hack and
+> > further optimise the sequences.
+> > 
+> > If we could validate an arbitrary SYN Cookie on the backend server with
+> > BPF, the proxy would need not restore SYN nor pass it.  After validating
+> > ACK, the proxy node just needs to forward it, and then the server can do
+> > the lightweight validation (e.g. check if ACK came from proxy nodes, etc)
+> > and create a connection from the ACK.
+> > 
+> > This series adds two SOCK_OPS hooks to generate and validate arbitrary
+> > SYN Cookie.  Each hook is invoked if BPF_SOCK_OPS_SYNCOOKIE_CB_FLAG is
+> > set to the listening socket in advance by bpf_sock_ops_cb_flags_set().
+> > 
+> > The user interface looks like this:
+> > 
+> >    BPF_SOCK_OPS_GEN_SYNCOOKIE_CB
+> > 
+> >      input
+> >      |- bpf_sock_ops.sk           : 4-tuple
+> >      |- bpf_sock_ops.skb          : TCP header
+> >      |- bpf_sock_ops.args[0]      : MSS
+> >      `- bpf_sock_ops.args[1]      : BPF_SYNCOOKIE_XXX flags
+> > 
+> >      output
+> >      |- bpf_sock_ops.replylong[0] : ISN (SYN Cookie) ------.
+> >      `- bpf_sock_ops.replylong[1] : TS value -----------.  |
+> >                                                         |  |
+> >    BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB                      |  |
+> >                                                         |  |
+> >      input                                              |  |
+> >      |- bpf_sock_ops.sk           : 4-tuple             |  |
+> >      |- bpf_sock_ops.skb          : TCP header          |  |
+> >      |- bpf_sock_ops.args[0]      : ISN (SYN Cookie) <-----'
+> >      `- bpf_sock_ops.args[1]      : TS value <----------'
+> > 
+> >      output
+> >      |- bpf_sock_ops.replylong[0] : MSS
+> >      `- bpf_sock_ops.replylong[1] : BPF_SYNCOOKIE_XXX flags
+> > 
+> > To establish a connection from SYN Cookie, BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB
+> > hook must set a valid MSS to bpf_sock_ops.replylong[0], meaning that
+> > BPF_SOCK_OPS_GEN_SYNCOOKIE_CB hook must encode MSS to ISN or TS val to be
+> > restored in the validation hook.
+> > 
+> > If WScale, SACK, and ECN are detected to be available in SYN packet, the
+> > corresponding flags are passed to args[0] of BPF_SOCK_OPS_GEN_SYNCOOKIE_CB
+> > so that bpf prog need not parse the TCP header.  The same flags can be set
+> > to replylong[0] of BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB to enable each feature
+> > on the connection.
+> > 
+> > For details, please see each patch.  Here's an overview:
+> > 
+> >    patch 1 - 4 : Misc cleanup
+> >    patch 5, 6  : Add SOCK_OPS hook (only ISN is available here)
+> >    patch 7, 8  : Make TS val available as the second cookie storage
+> >    patch 9, 10 : Make WScale, SACK, and ECN configurable from ACK
+> >    patch 11    : selftest, need some help from BPF experts...
+> > 
+> > [0]: https://netdev.bots.linux.dev/netconf/2023/kuniyuki.pdf
+> 
+> Fyi, just as quick feedback, this fails BPF CI selftests :
+> 
+> https://github.com/kernel-patches/bpf/actions/runs/6513838231/job/17694669376
+> 
+> Notice: Success: 427/3396, Skipped: 24, Failed: 1
+> Error: #274 tcpbpf_user
+>    Error: #274 tcpbpf_user
+>    test_tcpbpf_user:PASS:open and load skel 0 nsec
+>    test_tcpbpf_user:PASS:test__join_cgroup(/tcpbpf-user-test) 0 nsec
+>    test_tcpbpf_user:PASS:attach_cgroup(bpf_testcb) 0 nsec
+>    run_test:PASS:start_server 0 nsec
+>    run_test:PASS:connect_to_fd(listen_fd) 0 nsec
+>    run_test:PASS:accept(listen_fd) 0 nsec
+>    run_test:PASS:send(cli_fd) 0 nsec
+>    run_test:PASS:recv(accept_fd) 0 nsec
+>    run_test:PASS:send(accept_fd) 0 nsec
+>    run_test:PASS:recv(cli_fd) 0 nsec
+>    run_test:PASS:recv(cli_fd) for fin 0 nsec
+>    run_test:PASS:recv(accept_fd) for fin 0 nsec
+>    verify_result:PASS:event_map 0 nsec
+>    verify_result:PASS:bytes_received 0 nsec
+>    verify_result:PASS:bytes_acked 0 nsec
+>    verify_result:PASS:data_segs_in 0 nsec
+>    verify_result:PASS:data_segs_out 0 nsec
+>    verify_result:FAIL:bad_cb_test_rv unexpected bad_cb_test_rv: actual 0 != expected 128
 
-nit: "number of elements in direct_bv[]"
+128 (0x80) should be BPF_SOCK_OPS_ALL_CB_FLAGS + 1 instead so
+that we need not update the test for each SOCK_OPS addition.
 
-Also, just for better readability, can you swap direct_bv and
-netfs_priv? Then at least the array and count are together.
+I'll include this diff in the next revision.
 
->  	unsigned int		debug_id;
->  	unsigned int		rsize;		/* Maximum read size (0 for none) */
->  	atomic_t		nr_outstanding;	/* Number of ops in progress */
-> @@ -200,6 +202,7 @@ struct netfs_io_request {
->  	size_t			len;		/* Length of the request */
->  	short			error;		/* 0 or error that occurred */
->  	enum netfs_io_origin	origin;		/* Origin of the request */
-> +	bool			direct_bv_unpin; /* T if direct_bv[] must be unpinned */
->  	loff_t			i_size;		/* Size of the file */
->  	loff_t			start;		/* Start position */
->  	pgoff_t			no_unlock_folio; /* Don't unlock this folio after read */
->=20
+Thank you!
 
---=20
-Jeff Layton <jlayton@kernel.org>
+---8<---
+diff --git a/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c b/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c
+index 7e8fe1bad03f..e4849d2a2956 100644
+--- a/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c
++++ b/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c
+@@ -26,7 +26,8 @@ static void verify_result(struct tcpbpf_globals *result)
+ 	ASSERT_EQ(result->bytes_acked, 1002, "bytes_acked");
+ 	ASSERT_EQ(result->data_segs_in, 1, "data_segs_in");
+ 	ASSERT_EQ(result->data_segs_out, 1, "data_segs_out");
+-	ASSERT_EQ(result->bad_cb_test_rv, 0x80, "bad_cb_test_rv");
++	ASSERT_EQ(result->bad_cb_test_rv, BPF_SOCK_OPS_ALL_CB_FLAGS + 1,
++		  "bad_cb_test_rv");
+ 	ASSERT_EQ(result->good_cb_test_rv, 0, "good_cb_test_rv");
+ 	ASSERT_EQ(result->num_listen, 1, "num_listen");
+ 
+diff --git a/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c b/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c
+index cf7ed8cbb1fe..52da66d77fd6 100644
+--- a/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c
++++ b/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c
+@@ -103,7 +103,8 @@ int bpf_testcb(struct bpf_sock_ops *skops)
+ 		break;
+ 	case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
+ 		/* Test failure to set largest cb flag (assumes not defined) */
+-		global.bad_cb_test_rv = bpf_sock_ops_cb_flags_set(skops, 0x80);
++		global.bad_cb_test_rv = bpf_sock_ops_cb_flags_set(skops,
++								  BPF_SOCK_OPS_ALL_CB_FLAGS + 1);
+ 		/* Set callback */
+ 		global.good_cb_test_rv = bpf_sock_ops_cb_flags_set(skops,
+ 						 BPF_SOCK_OPS_STATE_CB_FLAG);
+---8<---
+
+
+>    verify_result:PASS:good_cb_test_rv 0 nsec
+>    verify_result:PASS:num_listen 0 nsec
+>    verify_result:PASS:num_close_events 0 nsec
+>    verify_result:PASS:tcp_save_syn 0 nsec
+>    verify_result:PASS:tcp_saved_syn 0 nsec
+>    verify_result:PASS:window_clamp_client 0 nsec
+>    verify_result:PASS:window_clamp_server 0 nsec
 
