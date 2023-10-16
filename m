@@ -1,93 +1,140 @@
-Return-Path: <netdev+bounces-41567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4A447CB55D
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 23:39:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B6CF7CB56F
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 23:44:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0CBCB20E2B
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:39:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 905A81C20B25
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0296381B0;
-	Mon, 16 Oct 2023 21:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HbBngGIZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D516381CC;
+	Mon, 16 Oct 2023 21:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A3737CA9
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 21:39:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5984C433C7;
-	Mon, 16 Oct 2023 21:39:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697492380;
-	bh=4gzug7NKJCMlF9uqYhZhGQUBdFYAs1xvnbnd9eTW8RI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HbBngGIZZazNU8q65Fweoirkzv1vdclRvy4pdl4HYWvheg8ds2l6fflEU4GXhEmg0
-	 0vPKUt+AJehUJweWHEjlwu8cZPeGxzGrcI3edDDZTu82kEPSY6dx3W6pqm3n/heUgK
-	 l1vq9qQypdVV1WTWE6y1k5eidpcaePaX+T6QS1JIKAs15pwXaoYYeFDmfaGpb8/Z0F
-	 YPAMm2qqTr+rVQQrIMrmuwJs0ooAL51kt1JoT4Sp6MxpNNyadZCpabiJriZmk8wAcJ
-	 At+hAGt7dfL8wT1B6vzQBAl4heR+08Ai6n9VtQ/vIaoWXhVbLcdIyEzDenqut8jNvs
-	 uYdW6T4cBSU5g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	donald.hunter@gmail.com
-Subject: [PATCH net-next] tools: ynl: fix converting flags to names after recent cleanup
-Date: Mon, 16 Oct 2023 14:39:37 -0700
-Message-ID: <20231016213937.1820386-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3CF381C9;
+	Mon, 16 Oct 2023 21:44:40 +0000 (UTC)
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16DFAB;
+	Mon, 16 Oct 2023 14:44:39 -0700 (PDT)
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6c67060fdfbso3584082a34.2;
+        Mon, 16 Oct 2023 14:44:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697492679; x=1698097479;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gEGU67h2aLgP+jVHENE55AMROY3oIX9Sz/12+e/BNPI=;
+        b=pxFOL2OJ2rAyW4Xo+QytGz4GTyhpdEwSs/wvQptmenWq8Tawr396rkTUTorDEO5BNU
+         67znZ5SMEI/hEAQDwt79IY2D6ZOduL74cd4aHjFqsCvwv/ZxEMMuq2+65pTUTFu88Olw
+         6ecSaT4mc7YYAsQB0l57uoUpTKMjIh+7wzIaTNeu6f02jsXeY0nKRBIRXgDGx3nynbhS
+         31Odur/excI5TJgnUzr3+RlQIzhbGsFX96rlxiceAxJXF/Wup+GwPgedEK1fQzbyKkgs
+         FYKnSjGhaIiJydcVrgH7oYhZ7BKfHKdprSC6rkDQwPYbnOT3oCbzzFsfYYg+1vn5s6uF
+         SO3w==
+X-Gm-Message-State: AOJu0Yw46+w0u/K2zZvxI1QldVPkFQYa+Bwp5Z/7hWISn1S7CBuGdJh+
+	+9B8guCxSs8fILuwSnnu7g==
+X-Google-Smtp-Source: AGHT+IHuNmP8V6sstTsEu3VVHzkFP0xhM7V0ZTHQhU/5l3uo4mYCmbaKF/vdgAVoy0+B7a5WdoyAzQ==
+X-Received: by 2002:a05:6830:3499:b0:6b9:a6ef:2709 with SMTP id c25-20020a056830349900b006b9a6ef2709mr740772otu.8.1697492678863;
+        Mon, 16 Oct 2023 14:44:38 -0700 (PDT)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id k7-20020a9d4b87000000b006c21f11dcecsm28451otf.49.2023.10.16.14.44.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 14:44:38 -0700 (PDT)
+Received: (nullmailer pid 3823207 invoked by uid 1000);
+	Mon, 16 Oct 2023 21:44:35 -0000
+From: Rob Herring <robh@kernel.org>
+Subject: [PATCH net-next 0/8] dt-bindings: net: Child node schema cleanups
+Date: Mon, 16 Oct 2023 16:44:19 -0500
+Message-Id: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALOuLWUC/x2M0QpAQBAAf0X7bMvdSfgVeThnsaWluyMl/+54n
+ JqZGwJ5pgBtdoOnkwNvkkDlGbjFykzIY2LQhTaqUBWOEYUiupWsHHvAwRpt6qF0tqkhVbunia/
+ /2MFnCl0R+ud5AX4J6O5rAAAA
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Samuel Holland <samuel@sholland.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	Maxime Ripard <mripard@kernel.org>, =?UTF-8?B?bsOnIMOcTkFM?= <arinc.unal@arinc9.com>, 
+	Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>, 
+	John Crispin <john@phrozen.org>, Gerhard Engleder <gerhard@engleder-embedded.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
+	Sergei Shtylyov <sergei.shtylyov@gmail.com>, Justin Chen <justin.chen@broadcom.com>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>, 
+	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com
+X-Mailer: b4 0.13-dev
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
+	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-I recently cleaned up specs to not specify enum-as-flags
-when target enum is already defined as flags.
-YNL Python library did not convert flags, unfortunately,
-so this caused breakage for Stan and Willem.
+This is a series of clean-ups related to ensuring that child node 
+schemas are constrained to not allow undefined properties. Typically, 
+that means just adding additionalProperties or unevaluatedProperties as 
+appropriate. The DSA/switch schemas turned out to be a bit more 
+involved, so there's some more fixes and a bit of restructuring in them.
 
-Note that the nlspec.py abstraction already hides the differences
-between flags and enums (value vs user_value), so the changes
-are pretty trivial.
-
-Fixes: 0629f22ec130 ("ynl: netdev: drop unnecessary enum-as-flags")
-Reported-and-tested-by: Willem de Bruijn <willemb@google.com>
-Reported-and-tested-by: Stanislav Fomichev <sdf@google.com>
-Link: https://lore.kernel.org/all/ZS10NtQgd_BJZ3RU@google.com/
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Rob Herring <robh@kernel.org>
 ---
-CC: donald.hunter@gmail.com
-CC: sdf@google.com
----
- tools/net/ynl/lib/ynl.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Rob Herring (8):
+      dt-bindings: net: Add missing (unevaluated|additional)Properties on child node schemas
+      dt-bindings: net: renesas: Drop ethernet-phy node schema
+      dt-bindings: net: dsa/switch: Make 'ethernet-port' node addresses hex
+      dt-bindings: net: ethernet-switch: Add missing 'ethernet-ports' level
+      dt-bindings: net: ethernet-switch: Rename $defs "base" to 'ethernet-ports'
+      dt-bindings: net: mscc,vsc7514-switch: Clean-up example indentation
+      dt-bindings: net: mscc,vsc7514-switch: Simplify DSA and switch references
+      dt-bindings: net: dsa: Drop 'ethernet-ports' node properties
 
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index cc2930633f98..be479bd9dfc8 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -486,7 +486,7 @@ genl_family_name_to_id = None
- 
-     def _decode_enum(self, raw, attr_spec):
-         enum = self.consts[attr_spec['enum']]
--        if 'enum-as-flags' in attr_spec and attr_spec['enum-as-flags']:
-+        if enum.type == 'flags' or attr_spec.get('enum-as-flags', False):
-             i = 0
-             value = set()
-             while raw:
+ .../bindings/net/allwinner,sun8i-a83t-emac.yaml    |  2 +
+ .../devicetree/bindings/net/brcm,asp-v2.0.yaml     |  2 +-
+ .../devicetree/bindings/net/dsa/brcm,sf2.yaml      |  1 +
+ Documentation/devicetree/bindings/net/dsa/dsa.yaml | 11 +-----
+ .../bindings/net/dsa/mediatek,mt7530.yaml          |  8 ++--
+ .../bindings/net/dsa/microchip,lan937x.yaml        |  3 +-
+ .../devicetree/bindings/net/dsa/nxp,sja1105.yaml   |  4 +-
+ .../devicetree/bindings/net/dsa/qca8k.yaml         |  1 +
+ .../devicetree/bindings/net/dsa/realtek.yaml       |  2 +
+ .../bindings/net/dsa/renesas,rzn1-a5psw.yaml       | 10 +----
+ .../devicetree/bindings/net/engleder,tsnep.yaml    |  1 +
+ .../devicetree/bindings/net/ethernet-switch.yaml   | 14 ++++---
+ .../bindings/net/mscc,vsc7514-switch.yaml          | 46 +++++++++-------------
+ .../devicetree/bindings/net/nxp,tja11xx.yaml       |  1 +
+ .../devicetree/bindings/net/renesas,ether.yaml     |  3 +-
+ .../devicetree/bindings/net/renesas,etheravb.yaml  |  3 +-
+ .../devicetree/bindings/net/ti,cpsw-switch.yaml    |  2 +-
+ 17 files changed, 51 insertions(+), 63 deletions(-)
+---
+base-commit: 4d0515b235dec789578d135a5db586b25c5870cb
+change-id: 20231016-dt-net-cleanups-ba3238b4ca98
+
+Best regards,
 -- 
-2.41.0
+Rob Herring <robh@kernel.org>
 
 
