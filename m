@@ -1,136 +1,118 @@
-Return-Path: <netdev+bounces-41202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 766EF7CA3CA
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:14:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D7B7CA3D1
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:15:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04306B20CA8
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:14:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBFF3B20CEE
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:15:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39BE81BDF9;
-	Mon, 16 Oct 2023 09:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356A71C285;
+	Mon, 16 Oct 2023 09:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h3va2YfH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lj5Vmh5D"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76231775F
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:14:48 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 084F1100;
-	Mon, 16 Oct 2023 02:14:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697447687; x=1728983687;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5b1jrtRvpTLCn6MVfh7i01hTlZB4zdayHotD/uWXh4c=;
-  b=h3va2YfHgb3MSdvxdvbsGZqtIW8dEfr5/r657DRhOkHmUDD+4bp9mYtQ
-   eN1NNfty0nohk1/x5j/qPVzOD/FBmb5jdwVU7Lo6sM66uvr6K+HEXLNQd
-   hJladbAc5acwJM+edF/xa6roqhdoYZwS+VJj/5mrRZ6HKrNyfqgTzW/jX
-   OwoPhVruFrWPnUgTXLgPYDSvtEf0+mKkUnxj/mLyh1KI/Zpvx912Tv+Oo
-   q2KR/VBpz+TnKnpD23d1jwvRbD5JkuayECycB+EhEPZnIerPAUjPdmaUe
-   tIYoXv7pPZ62hJcihjNZaPEkzf0RjoVxHC/QrMd+AXr/3wJe3Rx0mKdeT
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="375851335"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="375851335"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 02:14:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="790732235"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="790732235"
-Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 16 Oct 2023 02:14:42 -0700
-Received: from kbuild by f64821696465 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qsJgO-0008Fz-14;
-	Mon, 16 Oct 2023 09:14:40 +0000
-Date: Mon, 16 Oct 2023 17:14:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: xiaolinkui <xiaolinkui@126.com>, pablo@netfilter.org,
-	kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	justinstitt@google.com, kuniyu@amazon.com
-Cc: oe-kbuild-all@lists.linux.dev, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Linkui Xiao <xiaolinkui@kylinos.cn>
-Subject: Re: [PATCH] netfilter: ipset: wait for xt_recseq on all cpus
-Message-ID: <202310161728.mW3lt1Jl-lkp@intel.com>
-References: <20231005115022.12902-1-xiaolinkui@126.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE4B1548F
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:15:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24C3EC433C7;
+	Mon, 16 Oct 2023 09:15:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697447722;
+	bh=nAEB00lWpXmD0sby7jz9CcDhj0KypBQSR4BqnMIm3rU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=lj5Vmh5D3ZM83L/Gd2AGsr7JJPp5F++y3e/P7uTbwdgk8T8taLIPY5+9IsqLVND3j
+	 2IznjNwmguSd5z3xkd828A+/SABqOSTopgZ2Yj3VT0ohXC0YGBrvF+oO6g6U1CJD2W
+	 XEVR/TYjnG9zm3CJ11ZUzjHyg8YYACepu4nJD0V5LiOGTM1InEqt2BbFOp6KSFi1tO
+	 hkrmyQ7BUb2+wQ9xonH0WoVUJTb6/PHfyOx5sDQ/4RvYRRqYB8ZZzUYia0k5KF29zh
+	 2e+EHFdiDHHED0a/EnBbrIq8eKVIXx+EyYpjPxxtuGOSbn/28MDw/hI58TxJhZ044A
+	 /LraByfuTIL7w==
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	netdev@vger.kernel.org,
+	Patrisious Haddad <phaddad@nvidia.com>,
+	Raed Salem <raeds@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>
+Subject: [PATCH xfrm-next 0/9] mlx5 IPsec replay window enhancement and XFRM core statistics
+Date: Mon, 16 Oct 2023 12:15:08 +0300
+Message-ID: <cover.1697444728.git.leon@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231005115022.12902-1-xiaolinkui@126.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-Hi xiaolinkui,
+From: Leon Romanovsky <leonro@nvidia.com>
 
-kernel test robot noticed the following build errors:
+Hi,
 
-[auto build test ERROR on netfilter-nf/main]
-[also build test ERROR on nf-next/master horms-ipvs/master linus/master v6.6-rc6 next-20231016]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This series does two things at the same time, but they are connected together:
+ * Rewrite and fix mlx5 IPsec replay window implementation.
+ * Connect XFRM statistics with offloaded counters to report replay window
+   reason statistics.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/xiaolinkui/netfilter-ipset-wait-for-xt_recseq-on-all-cpus/20231005-234042
-base:   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
-patch link:    https://lore.kernel.org/r/20231005115022.12902-1-xiaolinkui%40126.com
-patch subject: [PATCH] netfilter: ipset: wait for xt_recseq on all cpus
-config: i386-randconfig-016-20231016 (https://download.01.org/0day-ci/archive/20231016/202310161728.mW3lt1Jl-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231016/202310161728.mW3lt1Jl-lkp@intel.com/reproduce)
+First two patches are XFRM core changes to allow reuse of already existing
+callback to fill all statistics.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310161728.mW3lt1Jl-lkp@intel.com/
+Next two patches are fixes to replay window and sequence packet number
+misconfiguration. They are not urgent and can go to -next.
 
-All errors (new ones prefixed by >>):
+Rest of the patches are rewrite of mlx5 replay window implementation.
 
-   ld: net/netfilter/ipset/ip_set_core.o: in function `wait_xt_recseq':
->> net/netfilter/ipset/ip_set_core.c:1194: undefined reference to `xt_recseq'
+As an example, the end result, after simulating replay window attack with 5 packets:
+[leonro@c ~]$ grep XfrmInStateSeqError /proc/net/xfrm_stat
+XfrmInStateSeqError     	5
+[leonro@c ~]$ sudo ip -s x s
+<...>
+	stats:
+	  replay-window 0 replay 5 failed 0
 
+Thanks
 
-vim +1194 net/netfilter/ipset/ip_set_core.c
+Leon Romanovsky (7):
+  xfrm: generalize xdo_dev_state_update_curlft to allow statistics
+    update
+  xfrm: get global statistics from the offloaded device
+  net/mlx5e: Honor user choice of IPsec replay window size
+  net/mlx5e: Ensure that IPsec sequence packet number starts from 1
+  net/mlx5e: Remove exposure of IPsec RX flow steering struct
+  net/mlx5e: Connect mlx5 IPsec statistics with XFRM core
+  net/mlx5e: Delete obsolete IPsec code
 
-  1187	
-  1188	static void wait_xt_recseq(void)
-  1189	{
-  1190		unsigned int cpu;
-  1191	
-  1192		/* wait for even xt_recseq on all cpus */
-  1193		for_each_possible_cpu(cpu) {
-> 1194			seqcount_t *s = &per_cpu(xt_recseq, cpu);
-  1195			u32 seq = raw_read_seqcount(s);
-  1196	
-  1197			if (seq & 1) {
-  1198				do {
-  1199					cond_resched();
-  1200					cpu_relax();
-  1201				} while (seq == raw_read_seqcount(s));
-  1202			}
-  1203		}
-  1204	}
-  1205	
+Patrisious Haddad (2):
+  net/mlx5e: Unify esw and normal IPsec status table
+    creation/destruction
+  net/mlx5e: Add IPsec and ASO syndromes check in HW
+
+ Documentation/networking/xfrm_device.rst      |   4 +-
+ .../mellanox/mlx5/core/en_accel/ipsec.c       |  57 ++-
+ .../mellanox/mlx5/core/en_accel/ipsec.h       |  23 +-
+ .../mellanox/mlx5/core/en_accel/ipsec_fs.c    | 410 +++++++++++++++---
+ .../mlx5/core/en_accel/ipsec_offload.c        |   2 +-
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.c  |  25 +-
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h  |   1 -
+ .../mellanox/mlx5/core/en_accel/ipsec_stats.c |   1 -
+ .../mellanox/mlx5/core/esw/ipsec_fs.c         | 160 +------
+ .../mellanox/mlx5/core/esw/ipsec_fs.h         |  15 -
+ include/linux/mlx5/mlx5_ifc.h                 |   7 +
+ include/linux/netdevice.h                     |   2 +-
+ include/net/xfrm.h                            |  14 +-
+ net/xfrm/xfrm_proc.c                          |   1 +
+ net/xfrm/xfrm_state.c                         |  17 +-
+ net/xfrm/xfrm_user.c                          |   2 +-
+ 16 files changed, 459 insertions(+), 282 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.41.0
+
 
