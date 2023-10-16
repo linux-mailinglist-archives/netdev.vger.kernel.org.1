@@ -1,90 +1,127 @@
-Return-Path: <netdev+bounces-41523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B447CB31D
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:04:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0AA37CB322
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:06:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 139D0B20E08
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:03:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FAF2B20DD3
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5F930F92;
-	Mon, 16 Oct 2023 19:03:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D732D328BB;
+	Mon, 16 Oct 2023 19:06:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lZu5m9Ua"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XuAlRFnF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F69E34182
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 19:03:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69A84C433C7;
-	Mon, 16 Oct 2023 19:03:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697483033;
-	bh=K9tgzVSy7OHjw2Yj5wke3eQW5Pi+rz9MLIe8L001tEo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lZu5m9UaPUTbQTW3/swj6WXA/lBOmjN3m8qY557DjKrEDOPqMHjJZmmW4Qz5q6GBT
-	 givU+baJwgHAr0roRCV4ytNB05JPovSNVE+G8mLPNEwvTWYdEpxMIfBeArMQYmxR2t
-	 w0ZyjvtYLW+et8nA1Too28y3GfSrnevMsW3I72xpzVwd3Dxp/3l5/pipvV0xqItxSU
-	 I9AMhcthZy3S6ZvZqrkEBxGHBg9tVCn+bduBwe0k60KI4vwlpQ4d5s7WOh7fW2Z/WI
-	 9x0YxIgFQpaqH2iGfGIS5ioDv2ckRj+TWHkuxuzR+RXILm233Tu1X4bRa5s1nVAA3O
-	 ltAalR2YCoqTg==
-Date: Mon, 16 Oct 2023 12:03:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Daniel =?UTF-8?B?R3LDtmJlcg==?= <dxld@darkboxed.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, Richard Weinberger
- <richard@nod.at>, Serge Hallyn <serge.hallyn@canonical.com>, "Eric W.
- Biederman" <ebiederm@xmission.com>
-Subject: Re: [BUG] rtnl_newlink: Rogue MOVE event delivered on netns change
-Message-ID: <20231016120352.174fe1ee@kernel.org>
-In-Reply-To: <2023101632-circle-delegate-39dd@gregkh>
-References: <20231010121003.x3yi6fihecewjy4e@House.clients.dxld.at>
-	<20231013153605.487f5a74@kernel.org>
-	<20231013154302.44cc197d@kernel.org>
-	<2023101408-matador-stagnant-7cab@gregkh>
-	<20231016073251.0f47d42b@kernel.org>
-	<2023101632-circle-delegate-39dd@gregkh>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E17B30F92
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 19:06:01 +0000 (UTC)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D7195;
+	Mon, 16 Oct 2023 12:05:59 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-53de8fc1ad8so8499919a12.0;
+        Mon, 16 Oct 2023 12:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697483158; x=1698087958; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aUBC0dv+bnXuW2GkrUwjanS9UomsolAQvc5I7gaJS3M=;
+        b=XuAlRFnF4eX6ZAZMHiS9b8x0BM85XEs2ZQNkO1em5P7WCLVDd4fDArEdqdCo0g6Ego
+         lJIzx6D2eFRg+pPfCWqIi6JFsVZwvKbdfGpM6QrB1DIFa81hY734xr5iLrZOqSHrlQHr
+         akZEw3o2UacoqDyDAI7nCamGOzPlkTAtsgvN5Oauy4CwQ61Fk28l871iEaC8vVr/gaRg
+         5C0VmPz0+9SVB3fkyvh3Tbb9uJoWfe+Zbx/W3z8n7Vlt+G/v1XjeQLBauvO9E0+LE+WW
+         1XC7wCscZKsN/dmN2K9HF0WwsU1eGW7vQ/z/K4rf0NJdz1kVybewtMungXesbHY7UAx0
+         U4sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697483158; x=1698087958;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aUBC0dv+bnXuW2GkrUwjanS9UomsolAQvc5I7gaJS3M=;
+        b=OY8ix1h4ZZDMlFOIe/o2RzEhUQOnxwUTf5SnRZ5AIN2fSPpRO6RlDhUnt6r4h21zc2
+         53SieWle5Z1rNm8qgrA2mX+fzPB74VrZp/iol3wuk5QCHruEVJlPH6E7nW6jBZVpRuZq
+         XK/Q/jYg46skk2Ih5lEmMaIlfuiX8mkJZocFevw29lAkNf6GlhSV121KXJ3ftZMrTbJq
+         vCp/rscBgFcyH/m+6nRrbb3LCJrqgK6L/lvTwOLZw0GDZ5bzaSSRHtoyzbM/d1Jt7A4c
+         qOul43L8xoDr5QiPPw4sDt/sDlz2kJ2YDnmJVlZLgJth8PSKHvcXe9tsj4QVUyoP60yH
+         n40A==
+X-Gm-Message-State: AOJu0YyDERvLz8kumhI5z7AVFU2HvcdBFoS1D5PUl3i8mcxfAck+8mev
+	bHCkHxxw7M+36Dnk3bO4K5Y=
+X-Google-Smtp-Source: AGHT+IHkW401GgKF7H4m0E/5ZjjRdITV6zhu1jdrb+6+Rb7hzzVQnvJ7lUbneThjcnpoTHKIA4irKw==
+X-Received: by 2002:a50:8a9b:0:b0:532:cae2:8dfc with SMTP id j27-20020a508a9b000000b00532cae28dfcmr140418edj.5.1697483157884;
+        Mon, 16 Oct 2023 12:05:57 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id i29-20020a50871d000000b0053de19620b9sm314436edb.2.2023.10.16.12.05.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 12:05:57 -0700 (PDT)
+Date: Mon, 16 Oct 2023 22:05:55 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"open list:ARM/Mediatek SoC support" <linux-kernel@vger.kernel.org>,
+	"moderated list:ARM/Mediatek SoC support" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH net-next v3 1/2] net: dsa: Use conduit and user terms
+Message-ID: <20231016190555.svp5rjtheogxlkzv@skbuf>
+References: <20231013215251.152912-1-florian.fainelli@broadcom.com>
+ <20231013215251.152912-1-florian.fainelli@broadcom.com>
+ <20231013215251.152912-2-florian.fainelli@broadcom.com>
+ <20231013215251.152912-2-florian.fainelli@broadcom.com>
+ <20231016132334.b5pz7kw5oitk32z2@skbuf>
+ <ea6918d3-7e8c-4e31-9efb-cb9f3360962a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea6918d3-7e8c-4e31-9efb-cb9f3360962a@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 16 Oct 2023 19:20:26 +0200 Greg Kroah-Hartman wrote:
-> > IIUC what happens is:
+On Mon, Oct 16, 2023 at 09:41:35AM -0700, Florian Fainelli wrote:
+> > > @@ -29,7 +29,7 @@ static inline int dsa_tag_protocol_overhead(const struct dsa_device_ops *ops)
+> > >   	return ops->needed_headroom + ops->needed_tailroom;
+> > >   }
+> > > -static inline struct net_device *dsa_master_find_slave(struct net_device *dev,
+> > > +static inline struct net_device *dsa_conduit_find_user(struct net_device *dev,
+> > >   						       int device, int port)
 > > 
-> >  - systemd controls "real" eth0
-> >  - we move a "to be renamed" eth0 from a container into main ns
-> >  - we rename "to be renamed" eth0 to something else
-> >  - seeing the rename of eth0 system thinks it's the "real" one
-> >    that is being renamed, ergo there's no eth0 any more,
-> >    so it shuts down its "unit" for eth0
+> > Please adjust alignment.
+> 
+> checkpatch did not complain and my editor shows me the alignment appears to
+> be proper, what am I missing?
+
+I didn't realize that the length of "master-slave" is the same as that of "conduit-user",
+sorry.
+
+> > > diff --git a/net/dsa/tag_8021q.c b/net/dsa/tag_8021q.c
+> > > index cbdfc392f7e0..71b26ae6db39 100644
+> > > --- a/net/dsa/tag_8021q.c
+> > > +++ b/net/dsa/tag_8021q.c
+> > > @@ -468,10 +468,10 @@ struct sk_buff *dsa_8021q_xmit(struct sk_buff *skb, struct net_device *netdev,
+> > >   }
+> > >   EXPORT_SYMBOL_GPL(dsa_8021q_xmit);
+> > > -struct net_device *dsa_tag_8021q_find_port_by_vbid(struct net_device *master,
+> > > +struct net_device *dsa_tag_8021q_find_port_by_vbid(struct net_device *conduit,
+> > >   						   int vbid)
 > > 
-> > I don't think anything changed. Sounds more like someone finally tried
-> > to use this in anger.  
+> > Alignment.
 > 
-> Then they get to keep the broken pieces that they created here.
-> "moving" a network connection to a container needs to either be added to
-> systemd if it is going to manage the network connections, or just stop
-> using systemd to handle the connection entirely as they want to do
-> something that systemd doesn't support.
-> 
-> I don't think your proposed change is going to do much here as you would
-> have multiple adds for the same device without any removes, which is
-> odd.
+> Likewise.
 
-We issue the ADD and REMOVE uevents explicitly.
-
-If only we could have a form of device_rename() which does not generate
-any uevent, everything should be perfectly sensible. We issue REMOVE in
-the old namespace. Rejig the device including the silent rename. Issue
-ADD for the new identity in the new namespace.
+My mistake, sorry.
 
