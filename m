@@ -1,228 +1,401 @@
-Return-Path: <netdev+bounces-41258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6395D7CA633
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:02:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB9427CA643
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:09:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FD651C208EE
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:02:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF1F11C20925
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388D520B16;
-	Mon, 16 Oct 2023 11:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4FD3210F4;
+	Mon, 16 Oct 2023 11:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="j60lycTO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DnK5M0I7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC72BF4E5
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:02:36 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A588583
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 04:02:33 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9be7e3fa1daso309189766b.3
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 04:02:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C82BF4E5;
+	Mon, 16 Oct 2023 11:09:04 +0000 (UTC)
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0407A83;
+	Mon, 16 Oct 2023 04:09:03 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-53db1fbee70so7355279a12.2;
+        Mon, 16 Oct 2023 04:09:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697454152; x=1698058952; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2s4irllAw5wL2KJjp/hI8Dn/T6i4YEdKEe+FKiiZQc8=;
-        b=j60lycTOJHYSZww2hDJsmasQ43m8UKjCGSTYc3/Sb9rcU0Er/TgdRLfv+zOnFnQktK
-         5QlqGfaFulQmpWfmdAWtcmOslSJdPwxpP11RXRS6XvK2HBOSgkKP3/ZahzNAx6Ym3AQe
-         uTeGWkxBcGysVfo7M/urKlii2q17iKMTqYaoJWA0znzObE9bajF/atOVY6VeXIjwyEUU
-         jXQG1TRGdlxXWvDJ+KkwYmMAs45cx6vztir5Df8sLNgNBsPwCxqLhCNzZMJubb/fnFYJ
-         wgU7G6BEVSWvfbf6LVX8DxEYrKk9Wx0g/l/NYesEoddBrER5jYlMLBj8y8PpjG4Rt2WO
-         1zYw==
+        d=gmail.com; s=20230601; t=1697454541; x=1698059341; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xDaXo5MTP4dUtT2V4pjnvLHYZsmOGF0BPQquHVNEV4Q=;
+        b=DnK5M0I7D9snjD45PPJVyro+tB+/HvcYc27wzai+XPGh7pHpdIXnmnCzqtHFbV3TOM
+         /2nnTgEw2C43jfPtHIH4PE5W4BpHIWmllJhQZ6fiuYnTV0FbB4LvVSByo0Nat6RJ58Kl
+         l+jAuJO4PsCBkLM5ptKB/fo9QuWo0WbeUyYYstMss/r5raa01NuKRZRhxv+mvM9dZbjM
+         8es+0HyC6YSuZXqFtSmaUzPcwIiskhkHKBjHliMSnOy+9fW76tWT3wDN+F797+BLxFOa
+         CEwThvTJ7syFbumNx8aNS1lt1lfOQ44uhiiUj+dOrAUF4cb5AKUskH2CS6wcYRM3d0vh
+         z2ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697454152; x=1698058952;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2s4irllAw5wL2KJjp/hI8Dn/T6i4YEdKEe+FKiiZQc8=;
-        b=nztaqi3s35e0iuMaHOT+iRQMRM1mliVZUGvqDxpO+gSSnqbdfwnN+LP7N/7zheU79O
-         44g1mZtLd9UH8vFM2EQeBbMxAa2rC5QHTb2VSMx8UIOhVGWCjhygpoSCx+uMmNqRhYHt
-         Rsfm3GRiWOYt8RSIGcrF5UkwfvWyy3Tuc38+Xaug7H77X2Lr+7rMWqLx4le2y1z2/0IR
-         2/PEjDrwVd8ypz0B5UwdT/cZiGKqeN1BWZ48qpY7jbq5e4T/8thVDVIEVTRv1H42V4zy
-         IvliYCZQliTItHJmvmoteflRJFRK1aBW3Lu1gBTuRndeg2zYiGFlw1lmYoK8bDOxttud
-         pxgA==
-X-Gm-Message-State: AOJu0YypqnLCJuhnkdjAHMoOOfPHn5655h+1fkvSPOIM5MONxrzyddiQ
-	PVPVlScouB2ykgbmDFVZrFFvGoZX390sFhzc6nNKcQ==
-X-Google-Smtp-Source: AGHT+IENVIWALorQH2OiWDOyz6WsAFNSeJhdx8Z42lccMnmxYZ37bFZlBbqNKz8wWcSK0rdGo15NgQ==
-X-Received: by 2002:a17:907:d1b:b0:9c2:4d0a:c568 with SMTP id gn27-20020a1709070d1b00b009c24d0ac568mr3927885ejc.64.1697454151865;
-        Mon, 16 Oct 2023 04:02:31 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id b10-20020a1709062b4a00b009ad7fc17b2asm3841145ejg.224.2023.10.16.04.02.24
+        d=1e100.net; s=20230601; t=1697454541; x=1698059341;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xDaXo5MTP4dUtT2V4pjnvLHYZsmOGF0BPQquHVNEV4Q=;
+        b=kiXIp+qh7auHifDSUCMnOOxwIygMMBEf0M0aahK+j8roptM1BN7TtFOLyEosLJz19w
+         YU3iqDjH3AvrHmvyN/NILR9TqKcYFYhq2HJOVgZsDLKP1t7HqrqOUtiC0Vx8LRZCiYYG
+         YCaJhPNisphaPxGd4UG2mdsRZmTGp14WKThrRUZjjtdt2cuo8mPeoa4elACIPX61pEim
+         ULlT7io1qXYgxJyKzZT639avar/FpqBCHauLcWZVe2cD4udwLzW+pfJ6kuUyV1iaF6dc
+         IJk86vUZ3eDSaq7EF8Dc0baNwxhJ4TA1CbWs+RJ96OCmWzUR2ZTprOqkscneCft6JeXw
+         UcEQ==
+X-Gm-Message-State: AOJu0Yz5ZMpGVvophBPqSf9zo1ejuai+xB557JhVFRiyJKq/wPzKO/R8
+	UvMLxDXCCFa3uR1P63LwF4N0kjQ6JFyjVw==
+X-Google-Smtp-Source: AGHT+IGvxW1HlHJOzu2eVLozsnUNyEAyJ1WzlS5teJ9Anku85o1gYAixK4qMjJv3NB0bFi87s9t/lA==
+X-Received: by 2002:a05:6402:2712:b0:53e:708c:40be with SMTP id y18-20020a056402271200b0053e708c40bemr5252469edd.6.1697454541137;
+        Mon, 16 Oct 2023 04:09:01 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id c11-20020aa7c98b000000b00536ad96f867sm15269923edt.11.2023.10.16.04.08.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 04:02:25 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com
-Subject: [patch net-next v2] tools: ynl: introduce option to process unknown attributes or types
-Date: Mon, 16 Oct 2023 13:02:22 +0200
-Message-ID: <20231016110222.465453-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
+        Mon, 16 Oct 2023 04:09:00 -0700 (PDT)
+Date: Mon, 16 Oct 2023 14:08:58 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/6] dt-bindings: marvell: Rewrite MV88E6xxx
+ in schema
+Message-ID: <20231016110858.ljvjssqujuesu7kd@skbuf>
+References: <20231016-marvell-88e6152-wan-led-v3-0-38cd449dfb15@linaro.org>
+ <20231016-marvell-88e6152-wan-led-v3-0-38cd449dfb15@linaro.org>
+ <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
+ <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
+ <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Mon, Oct 16, 2023 at 11:12:54AM +0200, Linus Walleij wrote:
+> This is an attempt to rewrite the Marvell MV88E6xxx switch bindings
+> in YAML schema.
+> 
+> The current text binding says:
+>   WARNING: This binding is currently unstable. Do not program it into a
+>   FLASH never to be changed again. Once this binding is stable, this
+>   warning will be removed.
+> 
+> Well that never happened before we switched to YAML markup,
+> we can't have it like this, what about fixing the mess?
 
-In case the kernel sends message back containing attribute not defined
-in family spec, following exception is raised to the user:
+Removing that remark seems in order.
 
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do trap-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "trap-name": "source_mac_is_multicast"}'
-Traceback (most recent call last):
-  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 521, in _decode
-    attr_spec = attr_space.attrs_by_val[attr.type]
-                ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
-KeyError: 132
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  .../bindings/net/dsa/marvell,mv88e6xxx.yaml        | 243 +++++++++++++++++++++
+>  .../devicetree/bindings/net/dsa/marvell.txt        | 109 ---------
+>  MAINTAINERS                                        |   2 +-
+>  3 files changed, 244 insertions(+), 110 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
+> new file mode 100644
+> index 000000000000..954db04147f8
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
+> @@ -0,0 +1,243 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Marvell MV88E6xxx DSA switch family
+> +
+> +maintainers:
+> +  - Andrew Lunn <andrew@lunn.ch>
+> +
+> +description:
+> +  The Marvell MV88E6xxx switch series has been produced and sold
+> +  by Marvell since at least 2010. The switch has a few compatibles which
+> +  just indicate the base address of the switch, then operating systems
+> +  can investigate switch ID registers to find out which actual version
+> +  of the switch it is dealing with.
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - enum:
+> +          - marvell,mv88e6085
+> +          - marvell,mv88e6190
+> +          - marvell,mv88e6250
+> +    description: |
+> +      marvell,mv88e6085: This switch uses base address 0x10.
+> +        This switch and its siblings will be autodetected from
+> +        ID registers found in the switch, so only "marvell,mv88e6085" should be
+> +        specified. This includes the following list of MV88Exxxx switches:
+> +        6085, 6095, 6097, 6123, 6131, 6141, 6161, 6165, 6171, 6172, 6175, 6176,
+> +        6185, 6240, 6320, 6321, 6341, 6350, 6351, 6352
+> +      marvell,mv88e6190: This switch uses base address 0x00.
+> +        This switch and its siblings will be autodetected from
+> +        ID registers found in the switch, so only "marvell,mv88e6190" should be
+> +        specified. This includes the following list of MV88Exxxx switches:
+> +        6190, 6190X, 6191, 6290, 6361, 6390, 6390X
+> +      marvell,mv88e6250: This switch uses base address 0x08 or 0x18.
+> +        This switch and its siblings will be autodetected from
+> +        ID registers found in the switch, so only "marvell,mv88e6250" should be
+> +        specified. This includes the following list of MV88Exxxx switches:
+> +        6220, 6250
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  eeprom-length:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: Set to the length of an EEPROM connected to the switch. Must be
+> +      set if the switch can not detect the presence and/or size of a connected
+> +      EEPROM, otherwise optional.
+> +
+> +  reset-gpios:
+> +    description:
+> +      GPIO to be used to reset the whole device
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    description: The switch provides an external interrupt line, but it is
+> +      not always used by target systems.
+> +    maxItems: 1
+> +
+> +  interrupt-controller:
+> +    description: The switch has an internal interrupt controller used by
+> +      the different sub-blocks.
+> +
+> +  '#interrupt-cells':
+> +    description: The internal interrupt controller only supports triggering
+> +      on active high level interrupts so the second cell must alway be set to
+> +      IRQ_TYPE_LEVEL_HIGH.
+> +    const: 2
+> +
+> +  mdio:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +    description: Marvell MV88E6xxx switches have an varying combination of
+> +    internal and external MDIO buses, in some cases a combined bus that
+> +    can be used both internally and externally. This node is for the
+> +    primary bus, used internally and sometimes also externally.
+> +
+> +  mdio-external:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +    description: Marvell MV88E6xxx switches that have a separate external
+> +      MDIO bus use this port to access external components on the MDIO bus.
+> +
+> +    properties:
+> +      compatible:
+> +        const: marvell,mv88e6xxx-mdio-external
+> +
+> +    required:
+> +      - compatible
+> +
+> +$ref: dsa.yaml#
+> +
+> +patternProperties:
+> +  "^(ethernet-)?ports$":
+> +    type: object
+> +    patternProperties:
+> +      "^(ethernet-)?port@[0-9]+$":
+> +        type: object
+> +        description: Ethernet switch ports
+> +
+> +        $ref: dsa-port.yaml#
+> +
+> +        unevaluatedProperties: false
+> +
+> +oneOf:
+> +  - required:
+> +      - ports
+> +  - required:
+> +      - ethernet-ports
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/gpio/gpio.h>
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        switch0: switch@0 {
 
-During handling of the above exception, another exception occurred:
+ethernet-switch is preferred
 
-Traceback (most recent call last):
-  File "/home/jiri/work/linux/./tools/net/ynl/cli.py", line 61, in <module>
-    main()
-  File "/home/jiri/work/linux/./tools/net/ynl/cli.py", line 49, in main
-    reply = ynl.do(args.do, attrs, args.flags)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 731, in do
-    return self._op(method, vals, flags)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 719, in _op
-    rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 525, in _decode
-    raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
-Exception: Space 'devlink' has no attribute with value '132'
+> +            compatible = "marvell,mv88e6085";
+> +            reg = <0>;
+> +            reset-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
+> +            interrupt-parent = <&gpio0>;
 
-Introduce a command line option "process-unknown" and pass it down to
-YnlFamily class constructor to allow user to process unknown
-attributes and types and print them as binaries.
+I don't see interrupt-parent as an accepted property in the schema.
+Should interrupts-extended also be accepted?
 
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do trap-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "trap-name": "source_mac_is_multicast"}' --process-unknown
-{'129': {'0': b'\x00\x00\x00\x00\x00\x00\x00\x00',
-         '1': b'\x00\x00\x00\x00\x00\x00\x00\x00',
-         '2': b'(\x00\x00\x00\x00\x00\x00\x00'},
- '132': b'\x00',
- '133': b'',
- '134': {'0': b''},
- 'bus-name': 'netdevsim',
- 'dev-name': 'netdevsim1',
- 'trap-action': 'drop',
- 'trap-group-name': 'l2_drops',
- 'trap-name': 'source_mac_is_multicast'}
+> +            interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
+> +            interrupt-controller;
+> +            #interrupt-cells = <2>;
+> +
+> +            ports {
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
-v1->v2:
-- changed to process unknown attributes and type instead of ignoring them
----
- tools/net/ynl/cli.py     |  3 ++-
- tools/net/ynl/lib/ynl.py | 32 +++++++++++++++++++++++++++-----
- 2 files changed, 29 insertions(+), 6 deletions(-)
+ethernet-ports is preferred
 
-diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
-index 564ecf07cd2c..2ad9ec0f5545 100755
---- a/tools/net/ynl/cli.py
-+++ b/tools/net/ynl/cli.py
-@@ -27,6 +27,7 @@ def main():
-                         const=Netlink.NLM_F_CREATE)
-     parser.add_argument('--append', dest='flags', action='append_const',
-                         const=Netlink.NLM_F_APPEND)
-+    parser.add_argument('--process-unknown', action=argparse.BooleanOptionalAction)
-     args = parser.parse_args()
- 
-     if args.no_schema:
-@@ -36,7 +37,7 @@ def main():
-     if args.json_text:
-         attrs = json.loads(args.json_text)
- 
--    ynl = YnlFamily(args.spec, args.schema)
-+    ynl = YnlFamily(args.spec, args.schema, args.process_unknown)
- 
-     if args.ntf:
-         ynl.ntf_subscribe(args.ntf)
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 13c4b019a881..fe63e66694bb 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -403,11 +403,24 @@ class GenlProtocol(NetlinkProtocol):
- #
- 
- 
-+class FakeSpecAttr:
-+    def __init__(self, name):
-+        self.dict = {"name": name, "type": None}
-+        self.is_multi = False
-+
-+    def __getitem__(self, key):
-+        return self.dict[key]
-+
-+    def __contains__(self, key):
-+        return key in self.dict
-+
-+
- class YnlFamily(SpecFamily):
--    def __init__(self, def_path, schema=None):
-+    def __init__(self, def_path, schema=None, process_unknown=False):
-         super().__init__(def_path, schema)
- 
-         self.include_raw = False
-+        self.process_unknown = process_unknown
- 
-         try:
-             if self.proto == "netlink-raw":
-@@ -513,13 +526,16 @@ class YnlFamily(SpecFamily):
-         return decoded
- 
-     def _decode(self, attrs, space):
--        attr_space = self.attr_sets[space]
-+        if space:
-+            attr_space = self.attr_sets[space]
-         rsp = dict()
-         for attr in attrs:
-             try:
-                 attr_spec = attr_space.attrs_by_val[attr.type]
--            except KeyError:
--                raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
-+            except (KeyError, UnboundLocalError):
-+                if not self.process_unknown:
-+                    raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
-+                attr_spec = FakeSpecAttr(str(attr.type))
-             if attr_spec["type"] == 'nest':
-                 subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'])
-                 decoded = subdict
-@@ -534,7 +550,13 @@ class YnlFamily(SpecFamily):
-             elif attr_spec["type"] == 'array-nest':
-                 decoded = self._decode_array_nest(attr, attr_spec)
-             else:
--                raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
-+                if not self.process_unknown:
-+                    raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
-+                if attr._type & Netlink.NLA_F_NESTED:
-+                    subdict = self._decode(NlAttrs(attr.raw), None)
-+                    decoded = subdict
-+                else:
-+                    decoded = attr.as_bin()
- 
-             if 'enum' in attr_spec:
-                 decoded = self._decode_enum(decoded, attr_spec)
--- 
-2.41.0
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
+> +
+> +                port@0 {
+> +                    reg = <0>;
+> +                    label = "lan1";
+> +                };
+> +                port@1 {
+> +                    reg = <1>;
+> +                    label = "lan2";
+> +                };
+> +                port@2 {
+> +                    reg = <2>;
+> +                    label = "lan3";
+> +                };
+> +                port@3 {
+> +                    reg = <3>;
+> +                    label = "lan4";
+> +                };
+> +                port@4 {
+> +                    reg = <4>;
+> +                    label = "wan";
+> +                };
+> +
+> +                port@5 {
+> +                    reg = <5>;
+> +                    phy-mode = "sgmii";
+> +                    ethernet = <&eth2>;
+> +
+> +                    fixed-link {
+> +                        speed = <1000>;
+> +                        full-duplex;
+> +                    };
+> +                };
+> +            };
+> +
+> +            mdio {
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
 
+One blank link here
+
+> +                switch0phy0: switch0phy@0 {
+
+ethernet-phy@0
+
+> +                    reg = <0>;
+> +                    interrupt-parent = <&switch0>;
+> +                    interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
+
+interrupts-extended = <&switch0 0 IRQ_TYPE_LEVEL_HIGH>; would be shorter
+
+> +                };
+> +            };
+> +        };
+> +    };
+> +
+> +  - |
+> +    #include <dt-bindings/gpio/gpio.h>
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        switch1: switch@0 {
+> +            compatible = "marvell,mv88e6190";
+> +            reg = <0>;
+> +            reset-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
+> +            interrupt-parent = <&gpio0>;
+> +            interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
+> +            interrupt-controller;
+> +            #interrupt-cells = <2>;
+> +
+> +            ports {
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
+> +
+> +                port@0 {
+> +                    reg = <0>;
+> +                    label = "lan1";
+> +                };
+> +                port@1 {
+> +                    reg = <1>;
+> +                    label = "lan2";
+> +                };
+> +                port@2 {
+> +                    reg = <2>;
+> +                    label = "lan3";
+> +                };
+> +                port@3 {
+> +                    reg = <3>;
+> +                    label = "lan4";
+> +                };
+
+FWIW, this example would be rejected by real-life DSA, because a CPU
+port is missing (no port has an "ethernet" phandle).
+
+> +            };
+> +
+> +            mdio {
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
+> +                switch1phy0: switch1phy@0 {
+
+ethernet-phy@0
+
+> +                    reg = <0>;
+> +                    interrupt-parent = <&switch1>;
+> +                    interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
+> +                };
+> +            };
+> +
+> +            mdio-external {
+> +                compatible = "marvell,mv88e6xxx-mdio-external";
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
+> +                switch1phy9: switch1phy@9 {
+
+ethernet-phy@9
+
+> +                    reg = <9>;
+> +                };
+> +            };
+> +        };
+> +    };
 
