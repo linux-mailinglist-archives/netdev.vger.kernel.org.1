@@ -1,99 +1,228 @@
-Return-Path: <netdev+bounces-41257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB07A7CA617
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:55:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6395D7CA633
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:02:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91BE92815A6
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:55:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FD651C208EE
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38371208CA;
-	Mon, 16 Oct 2023 10:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388D520B16;
+	Mon, 16 Oct 2023 11:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtP+LPaT"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="j60lycTO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADAE1CA85;
-	Mon, 16 Oct 2023 10:55:26 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88DD6AC;
-	Mon, 16 Oct 2023 03:55:25 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-5230a22cfd1so7584932a12.1;
-        Mon, 16 Oct 2023 03:55:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC72BF4E5
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:02:36 +0000 (UTC)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A588583
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 04:02:33 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9be7e3fa1daso309189766b.3
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 04:02:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697453724; x=1698058524; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2IhcbshZ7IEXHsad/cfhuQEVHGHbmw/BOyh8FLp7ef0=;
-        b=ZtP+LPaTD7valvTgxq/3Kx4gxQ0eCP3KCSsnQ9wfCOWHH36r4q7OcZ4mFLrqHrnb8X
-         FN8vhYsq9zK+hbGzcLLJiaOq1ji0LC9t7eF6yJFr7ESx0GstN+8urYiDWRDBzLupSifE
-         EE1rrwFq6AguucSOsFBLp9asGJJ+8swrBLQgBFfYRWYImoxxVUfWk32y98YPBew2GyJI
-         UMTqTaYF3Hi7JwJnOG7bPAAzn+Tb7SuObfVg+Isl+UJzQnrmPIRuUkgFnd/DolzbNFGU
-         IfWGVqt4rHnE1IWf47GyzBA8H9KM4WKyXCGpQTwDhVzYRnhiXcy3wAAOh/ReXkKWRedP
-         7FIg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697454152; x=1698058952; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2s4irllAw5wL2KJjp/hI8Dn/T6i4YEdKEe+FKiiZQc8=;
+        b=j60lycTOJHYSZww2hDJsmasQ43m8UKjCGSTYc3/Sb9rcU0Er/TgdRLfv+zOnFnQktK
+         5QlqGfaFulQmpWfmdAWtcmOslSJdPwxpP11RXRS6XvK2HBOSgkKP3/ZahzNAx6Ym3AQe
+         uTeGWkxBcGysVfo7M/urKlii2q17iKMTqYaoJWA0znzObE9bajF/atOVY6VeXIjwyEUU
+         jXQG1TRGdlxXWvDJ+KkwYmMAs45cx6vztir5Df8sLNgNBsPwCxqLhCNzZMJubb/fnFYJ
+         wgU7G6BEVSWvfbf6LVX8DxEYrKk9Wx0g/l/NYesEoddBrER5jYlMLBj8y8PpjG4Rt2WO
+         1zYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697453724; x=1698058524;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2IhcbshZ7IEXHsad/cfhuQEVHGHbmw/BOyh8FLp7ef0=;
-        b=CCwOrNUhGysP22MFr/EMiuLFSDN4my++Rv/Qqhzy9Z9+CBN6EJtggpp4cfPwfoOXmi
-         wh16Ok+t/kYo3tLl82RO+aOjYCRQuQi5kzEVKrnzntba4QQ4mAhQhw8ZfijKKnOn/A3O
-         hEv3UVxMD+Q4eiSCtv4M/3cJGRkdDekHLTRCZQuQEi+yyDxmy7F87YNmc4o2Cg2/Ucjq
-         MhDmK7BMQA9pdii5WZXyGeFMS2YOqJgS9nimLcYluNFPPT+MVOaPZSLdeY3ZhLLozLSn
-         yKobZTMCIEttVMfq0t74EVFsqeSYWdf+KQKr5VsVCP2ShqpcxIUxJ4e/+92fqjmENwXY
-         RVrQ==
-X-Gm-Message-State: AOJu0YwUB/foGtbxkKgpzlznvqRdu1rDLDhfq938sAOYxvxqyc87IIVq
-	o1KlNUD7/YqFKDMLZbr46rg=
-X-Google-Smtp-Source: AGHT+IFJVMWLKXQIx770G0CQpF48Srsw0pMJC9hAdXdlZnJLZWktbRLgJH/ugs4I0s0NplvkczZxWA==
-X-Received: by 2002:a17:906:3e52:b0:9b2:aa2f:ab69 with SMTP id t18-20020a1709063e5200b009b2aa2fab69mr31720583eji.30.1697453723848;
-        Mon, 16 Oct 2023 03:55:23 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id g7-20020a170906594700b009a9fbeb15f2sm3791434ejr.62.2023.10.16.03.55.22
+        d=1e100.net; s=20230601; t=1697454152; x=1698058952;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2s4irllAw5wL2KJjp/hI8Dn/T6i4YEdKEe+FKiiZQc8=;
+        b=nztaqi3s35e0iuMaHOT+iRQMRM1mliVZUGvqDxpO+gSSnqbdfwnN+LP7N/7zheU79O
+         44g1mZtLd9UH8vFM2EQeBbMxAa2rC5QHTb2VSMx8UIOhVGWCjhygpoSCx+uMmNqRhYHt
+         Rsfm3GRiWOYt8RSIGcrF5UkwfvWyy3Tuc38+Xaug7H77X2Lr+7rMWqLx4le2y1z2/0IR
+         2/PEjDrwVd8ypz0B5UwdT/cZiGKqeN1BWZ48qpY7jbq5e4T/8thVDVIEVTRv1H42V4zy
+         IvliYCZQliTItHJmvmoteflRJFRK1aBW3Lu1gBTuRndeg2zYiGFlw1lmYoK8bDOxttud
+         pxgA==
+X-Gm-Message-State: AOJu0YypqnLCJuhnkdjAHMoOOfPHn5655h+1fkvSPOIM5MONxrzyddiQ
+	PVPVlScouB2ykgbmDFVZrFFvGoZX390sFhzc6nNKcQ==
+X-Google-Smtp-Source: AGHT+IENVIWALorQH2OiWDOyz6WsAFNSeJhdx8Z42lccMnmxYZ37bFZlBbqNKz8wWcSK0rdGo15NgQ==
+X-Received: by 2002:a17:907:d1b:b0:9c2:4d0a:c568 with SMTP id gn27-20020a1709070d1b00b009c24d0ac568mr3927885ejc.64.1697454151865;
+        Mon, 16 Oct 2023 04:02:31 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id b10-20020a1709062b4a00b009ad7fc17b2asm3841145ejg.224.2023.10.16.04.02.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 03:55:23 -0700 (PDT)
-Date: Mon, 16 Oct 2023 13:55:21 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Ante Knezic <ante.knezic@helmholz.de>
-Cc: netdev@vger.kernel.org, woojung.huh@microchip.com, andrew@lunn.ch,
-	f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	marex@denx.de, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/2] net: dsa: microchip: enable setting rmii
-Message-ID: <20231016105521.xsjcz5phcpdds2s6@skbuf>
-References: <cover.1697107915.git.ante.knezic@helmholz.de>
+        Mon, 16 Oct 2023 04:02:25 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com
+Subject: [patch net-next v2] tools: ynl: introduce option to process unknown attributes or types
+Date: Mon, 16 Oct 2023 13:02:22 +0200
+Message-ID: <20231016110222.465453-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1697107915.git.ante.knezic@helmholz.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 12:55:54PM +0200, Ante Knezic wrote:
-> KSZ88X3 devices can select between internal and external RMII reference clock.
-> This patch series introduces new device tree property for setting reference
-> clock to internal.
-> 
-> Ante Knezic (2):
->   net:dsa:microchip: add property to select internal RMII reference
->     clock
->   dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
+From: Jiri Pirko <jiri@nvidia.com>
 
-The dt-bindings patch should be placed before the kernel patch.
+In case the kernel sends message back containing attribute not defined
+in family spec, following exception is raised to the user:
+
+$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do trap-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "trap-name": "source_mac_is_multicast"}'
+Traceback (most recent call last):
+  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 521, in _decode
+    attr_spec = attr_space.attrs_by_val[attr.type]
+                ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 132
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/jiri/work/linux/./tools/net/ynl/cli.py", line 61, in <module>
+    main()
+  File "/home/jiri/work/linux/./tools/net/ynl/cli.py", line 49, in main
+    reply = ynl.do(args.do, attrs, args.flags)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 731, in do
+    return self._op(method, vals, flags)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 719, in _op
+    rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 525, in _decode
+    raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
+Exception: Space 'devlink' has no attribute with value '132'
+
+Introduce a command line option "process-unknown" and pass it down to
+YnlFamily class constructor to allow user to process unknown
+attributes and types and print them as binaries.
+
+$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do trap-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "trap-name": "source_mac_is_multicast"}' --process-unknown
+{'129': {'0': b'\x00\x00\x00\x00\x00\x00\x00\x00',
+         '1': b'\x00\x00\x00\x00\x00\x00\x00\x00',
+         '2': b'(\x00\x00\x00\x00\x00\x00\x00'},
+ '132': b'\x00',
+ '133': b'',
+ '134': {'0': b''},
+ 'bus-name': 'netdevsim',
+ 'dev-name': 'netdevsim1',
+ 'trap-action': 'drop',
+ 'trap-group-name': 'l2_drops',
+ 'trap-name': 'source_mac_is_multicast'}
+
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+v1->v2:
+- changed to process unknown attributes and type instead of ignoring them
+---
+ tools/net/ynl/cli.py     |  3 ++-
+ tools/net/ynl/lib/ynl.py | 32 +++++++++++++++++++++++++++-----
+ 2 files changed, 29 insertions(+), 6 deletions(-)
+
+diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
+index 564ecf07cd2c..2ad9ec0f5545 100755
+--- a/tools/net/ynl/cli.py
++++ b/tools/net/ynl/cli.py
+@@ -27,6 +27,7 @@ def main():
+                         const=Netlink.NLM_F_CREATE)
+     parser.add_argument('--append', dest='flags', action='append_const',
+                         const=Netlink.NLM_F_APPEND)
++    parser.add_argument('--process-unknown', action=argparse.BooleanOptionalAction)
+     args = parser.parse_args()
+ 
+     if args.no_schema:
+@@ -36,7 +37,7 @@ def main():
+     if args.json_text:
+         attrs = json.loads(args.json_text)
+ 
+-    ynl = YnlFamily(args.spec, args.schema)
++    ynl = YnlFamily(args.spec, args.schema, args.process_unknown)
+ 
+     if args.ntf:
+         ynl.ntf_subscribe(args.ntf)
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index 13c4b019a881..fe63e66694bb 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -403,11 +403,24 @@ class GenlProtocol(NetlinkProtocol):
+ #
+ 
+ 
++class FakeSpecAttr:
++    def __init__(self, name):
++        self.dict = {"name": name, "type": None}
++        self.is_multi = False
++
++    def __getitem__(self, key):
++        return self.dict[key]
++
++    def __contains__(self, key):
++        return key in self.dict
++
++
+ class YnlFamily(SpecFamily):
+-    def __init__(self, def_path, schema=None):
++    def __init__(self, def_path, schema=None, process_unknown=False):
+         super().__init__(def_path, schema)
+ 
+         self.include_raw = False
++        self.process_unknown = process_unknown
+ 
+         try:
+             if self.proto == "netlink-raw":
+@@ -513,13 +526,16 @@ class YnlFamily(SpecFamily):
+         return decoded
+ 
+     def _decode(self, attrs, space):
+-        attr_space = self.attr_sets[space]
++        if space:
++            attr_space = self.attr_sets[space]
+         rsp = dict()
+         for attr in attrs:
+             try:
+                 attr_spec = attr_space.attrs_by_val[attr.type]
+-            except KeyError:
+-                raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
++            except (KeyError, UnboundLocalError):
++                if not self.process_unknown:
++                    raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
++                attr_spec = FakeSpecAttr(str(attr.type))
+             if attr_spec["type"] == 'nest':
+                 subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'])
+                 decoded = subdict
+@@ -534,7 +550,13 @@ class YnlFamily(SpecFamily):
+             elif attr_spec["type"] == 'array-nest':
+                 decoded = self._decode_array_nest(attr, attr_spec)
+             else:
+-                raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
++                if not self.process_unknown:
++                    raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
++                if attr._type & Netlink.NLA_F_NESTED:
++                    subdict = self._decode(NlAttrs(attr.raw), None)
++                    decoded = subdict
++                else:
++                    decoded = attr.as_bin()
+ 
+             if 'enum' in attr_spec:
+                 decoded = self._decode_enum(decoded, attr_spec)
+-- 
+2.41.0
+
 
