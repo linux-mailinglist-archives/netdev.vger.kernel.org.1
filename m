@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-41319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93FAE7CA910
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:14:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 448107CA914
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:14:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B21831C20B09
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:14:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673441C20B87
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801592773D;
-	Mon, 16 Oct 2023 13:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD6527ED5;
+	Mon, 16 Oct 2023 13:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Lnx3Fkk3"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bazPTwSS"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE2C27739
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:14:07 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2048.outbound.protection.outlook.com [40.107.243.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66215B4
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:14:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2426A27ECE
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:14:13 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2078.outbound.protection.outlook.com [40.107.92.78])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5521EFE
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:14:11 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M3W7FGsgvPjKPdBV+Ezmvq7pZK3jiNMCwXJCeKs81txDiImZRwpG/rGzjEuf9QenvYA3vyTdXo/R1daZz43G64N0TAL1Dtc+9EV4JXC6uU7Q/wFhDbPZDOr5+Q4Br/1QXmqxggZWbSgwPWwlap4MXuIA0hzOigdH9rfKgLDIWRDNPmAl/mej5AB0kZGeVJ/WWDXIG0OuYYnjdZMy3jDWa4P7L+a8O4w0TUtePe+Yji2GYtNLsT2SjAZDIHXz1DU8TJLcheWSIVALBqekcZ4LaDuLLbpNl4OZGkBQyzXYCgoirZF93gZlzZ9U16wT+NDLb2+x+pPI0cACPvOjhG6NLg==
+ b=Zw7pkhh1U/4paHBqAcQdyNN3PAzKKilHt18EPlsu8/DTKKOYk7btow1b74ghPo/XX86MJM3jsPwmoUXCi/i2+ZbIgsIG7S2+OYJPuT1+cV1it1Lf5yG22pSIRgxlqTcVSwEkq0gf+B+TiZNmGbYhYtsFAd6snshCezQnTGzHHKzP93E287g7+wG3dq3oBNnthAzxkFwYA57On3lc3GwEo4q6dk22VfhBPUNLhTLrLU/tizjrT/MezqF5IfMXYkozIxoREit05Ve9MbPsjcp87HYoJSFZqckFGp+SZQvrAhBbX4LyDoEzPy9PhRp+Lt9wSdlW44RV8aEUBeJDTKgJSQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Kvn98rfcbAc2Va2VU7W+Q2Eo0H1y6sr9aaANUCjT7Lk=;
- b=Y2/iOSbklAV4t251Lzq3ZgHSQUACWXfYrkj9E4GWGq05mSraSjdTY94xFU404FPwIxOpPg0fkEeaCTNdxejL7DD6jiryJWSbnkO4M4InvHHhl5uY4CiLuQrYQYofkZGOWZyJZ2lexg+ZR8f4aiE67eAeMYgYs35uSxPxmgoomEQQwC/iLTpJHt56hRYP5Hlfma05WO+HzZIRGpSQt/7bquOYDZ27Lhl5zfkP0XyLbkls0PJhG3GzbJK009PzKViZ8l+j5tKUChNHpVoYUlOYUitdasWdgq0+Q66ELbl9ijFo5ZKEtpDxfMhAEU8+p/2NHRDT/EbM9H1cCkl0JIw6ew==
+ bh=0yjMJB5rcJ+8MrWeQsljB0+d7+3hGEcxUAz/vBZ1bvo=;
+ b=EODZZDwqvUNvg9892QkUEo3uVB9M8cr7HafyfofhQz5yHnSURowuwwdZRhS1PYawgKRRLJvHutoBJIVRwb5BwiqQOWmF0LOSnsd1XMGGpQyUWG/undc8kRFXZ5t0cVIrkOAgnWNRRmZGKCEr53faw++qAuJ9qm1Eqnu2KpmMCNUUmKKMwyZxrF66l4Uk9nbekNQD3OxYGGGZsWLKXWPTzPFZSgT7ejmz+w7aliI8McmwfpntB/XMjJfbUVCQA3fntmZEwUkWJ+V2wOc+Q/tRbTJVRPiLiPL2tlGhUAhe6XtNqVm4aPZMZ5MNcmb7VSowES0YCAAQ6NGUsGV1tqRsSg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -37,18 +37,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Kvn98rfcbAc2Va2VU7W+Q2Eo0H1y6sr9aaANUCjT7Lk=;
- b=Lnx3Fkk3g4vZ0D4x+lNHaSYDZULDPoeLcq56uXC2ztCM740zpB9chtlB7oukcKqhozAUThNml3ZSe9zRRwc3GRASyfxyp6RhlEfzfGvreqGs3pdGmjSQHwWYp3PIqtpwKmd+F61rscClXuPbvrEiN0XQ5XqIb2Pp0pw0RQK+/YCK7ICrT5XY0JnBAI0fNhkYoMTWhY8yHIxNNAKbKgcv7KYgbEx1+iDuo6J1ciOYMvSAzBasqTIkYZ4tCVjTGPOymGVfCyHoBYZjW6SvBx3BCKSN7gxn73jyukBk4S47+kAiB/sgxDQLfKUnbtq0LZPSgz+0wfUi65DSuzY9am3NuQ==
-Received: from MN2PR20CA0049.namprd20.prod.outlook.com (2603:10b6:208:235::18)
- by PH8PR12MB7447.namprd12.prod.outlook.com (2603:10b6:510:215::7) with
+ bh=0yjMJB5rcJ+8MrWeQsljB0+d7+3hGEcxUAz/vBZ1bvo=;
+ b=bazPTwSSHt+gkLbygiQjlEbhxeaxCwKg1Uan1roIIRyR0Ifgll6HCOZchtm2vf1Y2CtWCvkRBdk370Zvj99NFykUvUY4d4xbbG5Mt/bSTcyzOd45+1RRlC7girqrWcbkz9QS26CFMkEJFuJx7AVCmWGimiw2+8TznxsnZsUIe9QSVquL4J+rioK81lnL7F9rvTIw0Vd+QrmqOmOk80mj+1T41uErS2r6BKUmqeBu6sps1v5UT3HT5BshBTSKbP/l7jZH5mEYHQBAP6X6n2Gpgj9/BWH0E5okdhLZoJpKoQ8oz8gTClVOsm4/Vdqj/BGbUoTu94/PhWbV11RJXw0qbQ==
+Received: from MN2PR20CA0060.namprd20.prod.outlook.com (2603:10b6:208:235::29)
+ by DM4PR12MB5771.namprd12.prod.outlook.com (2603:10b6:8:62::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.34; Mon, 16 Oct
- 2023 13:14:04 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Mon, 16 Oct
+ 2023 13:14:07 +0000
 Received: from BL6PEPF0001AB71.namprd02.prod.outlook.com
- (2603:10b6:208:235:cafe::4f) by MN2PR20CA0049.outlook.office365.com
- (2603:10b6:208:235::18) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:208:235:cafe::61) by MN2PR20CA0060.outlook.office365.com
+ (2603:10b6:208:235::29) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36 via Frontend
- Transport; Mon, 16 Oct 2023 13:14:03 +0000
+ Transport; Mon, 16 Oct 2023 13:14:07 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -58,23 +58,23 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
 Received: from mail.nvidia.com (216.228.117.161) by
  BL6PEPF0001AB71.mail.protection.outlook.com (10.167.242.164) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:14:03 +0000
+ 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:14:07 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 16 Oct
- 2023 06:13:46 -0700
+ 2023 06:13:50 -0700
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Mon, 16 Oct 2023 06:13:43 -0700
+ 15.2.986.41; Mon, 16 Oct 2023 06:13:46 -0700
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>, <bridge@lists.linux-foundation.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <edumazet@google.com>,
 	<pabeni@redhat.com>, <roopa@nvidia.com>, <razor@blackwall.org>,
 	<mlxsw@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next 04/13] bridge: mcast: Rename MDB entry get function
-Date: Mon, 16 Oct 2023 16:12:50 +0300
-Message-ID: <20231016131259.3302298-5-idosch@nvidia.com>
+Subject: [PATCH net-next 05/13] vxlan: mdb: Adjust function arguments
+Date: Mon, 16 Oct 2023 16:12:51 +0300
+Message-ID: <20231016131259.3302298-6-idosch@nvidia.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231016131259.3302298-1-idosch@nvidia.com>
 References: <20231016131259.3302298-1-idosch@nvidia.com>
@@ -91,26 +91,26 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB71:EE_|PH8PR12MB7447:EE_
-X-MS-Office365-Filtering-Correlation-Id: ba55cd98-c75d-4b3d-8a34-08dbce49c4f2
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB71:EE_|DM4PR12MB5771:EE_
+X-MS-Office365-Filtering-Correlation-Id: 83568a1e-1c91-41a8-4843-08dbce49c738
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	OCB2KxfWBLHoItBJZ+ZuoI69+7fTDR4sfcuUZkNXGe7OZDD/RI0MyKg7Njk/TVeqcZrpePcB385JQsqzMPOJZRDlKaNHVCLTCv31uwLlWu8Ap1CEB38Hm8XIqAFAy7HHBAecFCEcIBuBYCdTDbmYJlHCUIQ/K6e0ayRqTnOMYmSwvQp8XCvymNEu1CICpvM8UWOsbWlOukIDto8evpiPviyl6FDXHf/fnmBv72mlIEd6BEbTV7aIGfuP/8kkZXOGyFsxNsnhpICJ41KkosmBG479UojsUp4lZwXTlbRVR3+JWqGBB1Kzk16c4x7SzX7AkFKxONzwBkXQpb0KH+wgVQfdPBr++w0TwL5LGMGatSxDxuLeMHvqjif2A3o/PbZr5qf6owzeUJJmmVkCmeBG/g6uZK3h6MKwnygEGRizxets33ga9i6PwBwh2ZWaZCN2feJy3plagwXqhqkUUFg4i8OC034lAZ6EC1Q3bljxr3cgaUNnsHlAYnr9Dz12h+QMy1toxINN7wXhHmrNt3rNY5UqwaLZrTDzjXFIhWSgZlmD9IFryin4yBOqB5x/t9L24PKV3mUGQzpA8AuXr+OSYEMIuqQABnsF31OmxKpLCVTUKT34x7F9dbfv8DnN1WQHELT9JMN6asU58pdhv3nKEdDSwmgtp4vytI2LlUNUtBhvqNu/JYrslKgv/ldj1FzT9pkPxELQM8aQtXGDjte7qctab5OWMzfv1Or2cHRG/KXEClY8x9L2ZFkac7f93P06
+	SVemNRXMNUuX1pfhnZGd5F1lPxBFTrASaCleUrMD1QZyk9qLi6pc4bcaon4sepbm0LmWn5xo/F1MlvCEfYupJVu578o2D37ruEg+IUj+4FYJx7jQ4ifZLq0A7iqdX2EwPmTXVhZSJbx+d46OWDLG8vSS99Qb/KVfqRsikKelBp6jdvFmNnDcyvxaYTAVX0d4b+TLtFhYFdQevFiXtHR05IxsLypv0zJiC2LB3fQ8jsXZc4OG+pJdT27N5aFxt5u6xr+P5MCFZ7HvZBWbIBFjP91lDWydYKLpz3Bk2/Nrcqog1JJp6YR/9H54ohRbXFE1vDa6wpFVM9MNEIkRkSw8k6gpXiTQLXiQGcRC4h/BRCcRVjmxd7+k9KTu0dp3vSmH/yusz9HLhG6OhvVHjO+phRcdYb21J1KlHoI1pfOx/EMY7TiBgME5q7CJbZ6W5SzrFiAFLNavtffFbY43IXMdC2nbDWLRR1YvgTIOqVZSg9fjG6IKlqQYBwNX1IeOGCoigMsoodje5uZgd57r6qKgjSNHUurna5sP+EB6PlGFYF0JsVfe5U0SPfa3qb+6KhhSgyUlFXjZZrAIK+BhKLVOZoiPPuLJW3uCLU2GYiONmqXuBEvDzcqjsQymtEr4l5tFBgRuaM76MiV4uvPRYT389ju5YIdMwnJqPJUxKa8Xg7RckVrgSSnkKwNUCLuo9/IKwnv5fR5bleOH4XUrXpaWTx4yh511Jue2mkyZfWXET399lycQF19STlYDUtg4qPOv
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(396003)(346002)(136003)(39860400002)(230922051799003)(451199024)(64100799003)(82310400011)(186009)(1800799009)(36840700001)(40470700004)(46966006)(40460700003)(1076003)(26005)(6666004)(107886003)(2616005)(16526019)(336012)(426003)(54906003)(36860700001)(83380400001)(47076005)(41300700001)(478600001)(5660300002)(4326008)(2906002)(8676002)(8936002)(70586007)(316002)(110136005)(82740400003)(7636003)(356005)(70206006)(86362001)(40480700001)(36756003);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(376002)(396003)(136003)(230922051799003)(186009)(82310400011)(1800799009)(451199024)(64100799003)(40470700004)(36840700001)(46966006)(41300700001)(110136005)(70206006)(478600001)(70586007)(54906003)(6666004)(107886003)(1076003)(26005)(16526019)(336012)(426003)(316002)(2616005)(8936002)(4326008)(8676002)(2906002)(5660300002)(36756003)(86362001)(7636003)(47076005)(36860700001)(83380400001)(82740400003)(356005)(40460700003)(40480700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:14:03.3346
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:14:07.1158
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba55cd98-c75d-4b3d-8a34-08dbce49c4f2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 83568a1e-1c91-41a8-4843-08dbce49c738
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	BL6PEPF0001AB71.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7447
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5771
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -118,90 +118,46 @@ X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The current name is going to conflict with the upcoming net device
-operation for the MDB get operation.
+Adjust the function's arguments and rename it to allow it to be reused
+by future call sites that only have access to 'struct
+vxlan_mdb_entry_key', but not to 'struct vxlan_mdb_config'.
 
-Rename the function to br_mdb_entry_skb_get(). No functional changes
-intended.
+No functional changes intended.
 
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- net/bridge/br_device.c    |  2 +-
- net/bridge/br_input.c     |  2 +-
- net/bridge/br_multicast.c |  5 +++--
- net/bridge/br_private.h   | 10 ++++++----
- 4 files changed, 11 insertions(+), 8 deletions(-)
+ drivers/net/vxlan/vxlan_mdb.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-index 9a5ea06236bd..d624710b384a 100644
---- a/net/bridge/br_device.c
-+++ b/net/bridge/br_device.c
-@@ -92,7 +92,7 @@ netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
- 			goto out;
- 		}
- 
--		mdst = br_mdb_get(brmctx, skb, vid);
-+		mdst = br_mdb_entry_skb_get(brmctx, skb, vid);
- 		if ((mdst || BR_INPUT_SKB_CB_MROUTERS_ONLY(skb)) &&
- 		    br_multicast_querier_exists(brmctx, eth_hdr(skb), mdst))
- 			br_multicast_flood(mdst, skb, brmctx, false, true);
-diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
-index c729528b5e85..f21097e73482 100644
---- a/net/bridge/br_input.c
-+++ b/net/bridge/br_input.c
-@@ -175,7 +175,7 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
- 
- 	switch (pkt_type) {
- 	case BR_PKT_MULTICAST:
--		mdst = br_mdb_get(brmctx, skb, vid);
-+		mdst = br_mdb_entry_skb_get(brmctx, skb, vid);
- 		if ((mdst || BR_INPUT_SKB_CB_MROUTERS_ONLY(skb)) &&
- 		    br_multicast_querier_exists(brmctx, eth_hdr(skb), mdst)) {
- 			if ((mdst && mdst->host_joined) ||
-diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-index 96d1fc78dd39..d7d021af1029 100644
---- a/net/bridge/br_multicast.c
-+++ b/net/bridge/br_multicast.c
-@@ -145,8 +145,9 @@ static struct net_bridge_mdb_entry *br_mdb_ip6_get(struct net_bridge *br,
+diff --git a/drivers/net/vxlan/vxlan_mdb.c b/drivers/net/vxlan/vxlan_mdb.c
+index 5e041622261a..0b6043e1473b 100644
+--- a/drivers/net/vxlan/vxlan_mdb.c
++++ b/drivers/net/vxlan/vxlan_mdb.c
+@@ -370,12 +370,10 @@ static bool vxlan_mdb_is_valid_source(const struct nlattr *attr, __be16 proto,
+ 	return true;
  }
- #endif
  
--struct net_bridge_mdb_entry *br_mdb_get(struct net_bridge_mcast *brmctx,
--					struct sk_buff *skb, u16 vid)
-+struct net_bridge_mdb_entry *
-+br_mdb_entry_skb_get(struct net_bridge_mcast *brmctx, struct sk_buff *skb,
-+		     u16 vid)
+-static void vxlan_mdb_config_group_set(struct vxlan_mdb_config *cfg,
+-				       const struct br_mdb_entry *entry,
+-				       const struct nlattr *source_attr)
++static void vxlan_mdb_group_set(struct vxlan_mdb_entry_key *group,
++				const struct br_mdb_entry *entry,
++				const struct nlattr *source_attr)
  {
- 	struct net_bridge *br = brmctx->br;
- 	struct br_ip ip;
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index cbbe35278459..3220898424ce 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -951,8 +951,9 @@ int br_multicast_rcv(struct net_bridge_mcast **brmctx,
- 		     struct net_bridge_mcast_port **pmctx,
- 		     struct net_bridge_vlan *vlan,
- 		     struct sk_buff *skb, u16 vid);
--struct net_bridge_mdb_entry *br_mdb_get(struct net_bridge_mcast *brmctx,
--					struct sk_buff *skb, u16 vid);
-+struct net_bridge_mdb_entry *
-+br_mdb_entry_skb_get(struct net_bridge_mcast *brmctx, struct sk_buff *skb,
-+		     u16 vid);
- int br_multicast_add_port(struct net_bridge_port *port);
- void br_multicast_del_port(struct net_bridge_port *port);
- void br_multicast_enable_port(struct net_bridge_port *port);
-@@ -1341,8 +1342,9 @@ static inline int br_multicast_rcv(struct net_bridge_mcast **brmctx,
- 	return 0;
- }
+-	struct vxlan_mdb_entry_key *group = &cfg->group;
+-
+ 	switch (entry->addr.proto) {
+ 	case htons(ETH_P_IP):
+ 		group->dst.sa.sa_family = AF_INET;
+@@ -503,7 +501,7 @@ static int vxlan_mdb_config_attrs_init(struct vxlan_mdb_config *cfg,
+ 				       entry->addr.proto, extack))
+ 		return -EINVAL;
  
--static inline struct net_bridge_mdb_entry *br_mdb_get(struct net_bridge_mcast *brmctx,
--						      struct sk_buff *skb, u16 vid)
-+static inline struct net_bridge_mdb_entry *
-+br_mdb_entry_skb_get(struct net_bridge_mcast *brmctx, struct sk_buff *skb,
-+		     u16 vid)
- {
- 	return NULL;
- }
+-	vxlan_mdb_config_group_set(cfg, entry, mdbe_attrs[MDBE_ATTR_SOURCE]);
++	vxlan_mdb_group_set(&cfg->group, entry, mdbe_attrs[MDBE_ATTR_SOURCE]);
+ 
+ 	/* rtnetlink code only validates that IPv4 group address is
+ 	 * multicast.
 -- 
 2.40.1
 
