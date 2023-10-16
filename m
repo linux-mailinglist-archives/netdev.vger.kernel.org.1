@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-41206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF6E47CA3D4
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:15:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3B197CA3D5
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:15:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6305DB20E04
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:15:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80959281673
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3C31C2BE;
-	Mon, 16 Oct 2023 09:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87741C6B7;
+	Mon, 16 Oct 2023 09:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L4XxuTiO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ApEbfj1d"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E37A1C285
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:15:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 944BDC433C8;
-	Mon, 16 Oct 2023 09:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5151C285
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:15:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BDDAC433C7;
+	Mon, 16 Oct 2023 09:15:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697447734;
-	bh=DWYN3ZNXGpZazBL7AG0GH5JKLapsM0nlZ5hmBUAT26o=;
+	s=k20201202; t=1697447737;
+	bh=NzeoFg/RlSPo87Mq500xuKg6O2P1KskYO7MbxT7cKUQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L4XxuTiO86GIjQYCCUJ9dVNC6eO+R/7iRZ6sGuaqschO1HZRNwuXJtx2AWKyneMES
-	 ezTBOVjtekmZRKasTEEPSPHglGeCoC/kJxRaMdm5lJ3hXpLNlBZheYmSr7OmOIfqqZ
-	 ff5Z6JuF+RGK180A8kkVsal2uJwahKax/QxcUlbtCUVw1Q/DMzyPcW0v/55YbyJVYj
-	 nxa4SPZ+FTKBMnJzpCak2nYTcCaXdCRpFZO9lziBIe6txFrXuP921xwENilTXfi02G
-	 nIcXorYe00uMfj6mEBCExiogbyk3UCv4y1upa+augmMYL1ORnjfM/0pPeQecNszDah
-	 oVLXH9iM2QE9w==
+	b=ApEbfj1dU9h19+8RKKL9wO1isE5D40lyjpfXMusH9/B+wcVZXslxYRJmqQmK3h+dn
+	 Ay3Xw0m6HfQQeY85Ncb//BU/2WPIsBUEGov/pGqel7iloht3bT4QROE+qQJPRkBSkk
+	 AdYA78m2cTJcwbYG1S8FOaEGC658AW89KVq/igtYLqEQ/aM2dh4WrD3RQJHhnWKoPs
+	 T51rzumsgrKE+S9j+rcnQgt1yIp1748QEJQLhXvyjUhHX882q5dZ/ZtSEYeRWcj68v
+	 t8zOnA4LpbHNOEES1ssqU3fOVw1P6nvTw3///N2cAYKZKfVr5V3gLVumLfrT+Q9BTp
+	 Kl1rLpouhqIUQ==
 From: Leon Romanovsky <leon@kernel.org>
 To: Steffen Klassert <steffen.klassert@secunet.com>
 Cc: Leon Romanovsky <leonro@nvidia.com>,
@@ -40,9 +40,9 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	Patrisious Haddad <phaddad@nvidia.com>,
 	Raed Salem <raeds@nvidia.com>,
 	Saeed Mahameed <saeedm@nvidia.com>
-Subject: [PATCH xfrm-next 3/9] net/mlx5e: Honor user choice of IPsec replay window size
-Date: Mon, 16 Oct 2023 12:15:11 +0300
-Message-ID: <7ccb58e49acabc433281c79c29358dff182c7f95.1697444728.git.leon@kernel.org>
+Subject: [PATCH xfrm-next 4/9] net/mlx5e: Ensure that IPsec sequence packet number starts from 1
+Date: Mon, 16 Oct 2023 12:15:12 +0300
+Message-ID: <1f32944a06ab72d61d7b5d2471e99d4dc189b205.1697444728.git.leon@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1697444728.git.leon@kernel.org>
 References: <cover.1697444728.git.leon@kernel.org>
@@ -56,82 +56,42 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Users can configure IPsec replay window size, but mlx5 driver didn't
-honor their choice and set always 32bits. Fix assignment logic to
-configure right size from the beginning.
+According to RFC4303, section "3.3.3. Sequence Number Generation",
+the first packet sent using a given SA will contain a sequence
+number of 1.
+
+However if user didn't set seq/oseq, the HW used zero as first sequence
+packet number. Such misconfiguration causes to drop of first packet
+if replay window protection was enabled in SA.
+
+To fix it, set sequence number to be at least 1.
 
 Fixes: 7db21ef4566e ("net/mlx5e: Set IPsec replay sequence numbers")
-Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- .../mellanox/mlx5/core/en_accel/ipsec.c       | 21 +++++++++++++++++++
- .../mlx5/core/en_accel/ipsec_offload.c        |  2 +-
- include/linux/mlx5/mlx5_ifc.h                 |  7 +++++++
- 3 files changed, 29 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-index 9bfffdeb0fe8..ddd2230f04aa 100644
+index ddd2230f04aa..bf88232a2fc2 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-@@ -335,6 +335,27 @@ void mlx5e_ipsec_build_accel_xfrm_attrs(struct mlx5e_ipsec_sa_entry *sa_entry,
- 		attrs->replay_esn.esn = sa_entry->esn_state.esn;
- 		attrs->replay_esn.esn_msb = sa_entry->esn_state.esn_msb;
- 		attrs->replay_esn.overlap = sa_entry->esn_state.overlap;
-+		switch (x->replay_esn->replay_window) {
-+		case 32:
-+			attrs->replay_esn.replay_window =
-+				MLX5_IPSEC_ASO_REPLAY_WIN_32BIT;
-+			break;
-+		case 64:
-+			attrs->replay_esn.replay_window =
-+				MLX5_IPSEC_ASO_REPLAY_WIN_64BIT;
-+			break;
-+		case 128:
-+			attrs->replay_esn.replay_window =
-+				MLX5_IPSEC_ASO_REPLAY_WIN_128BIT;
-+			break;
-+		case 256:
-+			attrs->replay_esn.replay_window =
-+				MLX5_IPSEC_ASO_REPLAY_WIN_256BIT;
-+			break;
-+		default:
-+			WARN_ON(true);
-+			return;
-+		}
- 	}
+@@ -121,7 +121,14 @@ static bool mlx5e_ipsec_update_esn_state(struct mlx5e_ipsec_sa_entry *sa_entry)
+ 	if (x->xso.type == XFRM_DEV_OFFLOAD_CRYPTO)
+ 		esn_msb = xfrm_replay_seqhi(x, htonl(seq_bottom));
  
- 	attrs->dir = x->xso.dir;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c
-index a91f772dc981..4e018fba2d5f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_offload.c
-@@ -95,7 +95,7 @@ static void mlx5e_ipsec_packet_setup(void *obj, u32 pdn,
+-	sa_entry->esn_state.esn = esn;
++	if (sa_entry->esn_state.esn_msb)
++		sa_entry->esn_state.esn = esn;
++	else
++		/* According to RFC4303, section "3.3.3. Sequence Number Generation",
++		 * the first packet sent using a given SA will contain a sequence
++		 * number of 1.
++		 */
++		sa_entry->esn_state.esn = max_t(u32, esn, 1);
+ 	sa_entry->esn_state.esn_msb = esn_msb;
  
- 		if (attrs->dir == XFRM_DEV_OFFLOAD_IN) {
- 			MLX5_SET(ipsec_aso, aso_ctx, window_sz,
--				 attrs->replay_esn.replay_window / 64);
-+				 attrs->replay_esn.replay_window);
- 			MLX5_SET(ipsec_aso, aso_ctx, mode,
- 				 MLX5_IPSEC_ASO_REPLAY_PROTECTION);
- 		}
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index 4df6d1c12437..6ceafbd8edc5 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -11995,6 +11995,13 @@ enum {
- 	MLX5_IPSEC_ASO_INC_SN            = 0x2,
- };
- 
-+enum {
-+	MLX5_IPSEC_ASO_REPLAY_WIN_32BIT  = 0x0,
-+	MLX5_IPSEC_ASO_REPLAY_WIN_64BIT  = 0x1,
-+	MLX5_IPSEC_ASO_REPLAY_WIN_128BIT = 0x2,
-+	MLX5_IPSEC_ASO_REPLAY_WIN_256BIT = 0x3,
-+};
-+
- struct mlx5_ifc_ipsec_aso_bits {
- 	u8         valid[0x1];
- 	u8         reserved_at_201[0x1];
+ 	if (unlikely(overlap && seq_bottom < MLX5E_IPSEC_ESN_SCOPE_MID)) {
 -- 
 2.41.0
 
