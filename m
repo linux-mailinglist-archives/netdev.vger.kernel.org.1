@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-41135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 059D87C9F1B
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:48:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BCB97C9F1D
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:48:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C27D1C209CE
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 05:48:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4712B20DEE
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 05:48:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FDB9125A8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E17F125C1;
 	Mon, 16 Oct 2023 05:48:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="k9gRQmW3"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QVxDSiE7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E9E1386
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E3279D1
 	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 05:48:14 +0000 (UTC)
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 921C7F4;
-	Sun, 15 Oct 2023 22:48:12 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87BF3E4;
+	Sun, 15 Oct 2023 22:48:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=WUNnW2AzudcNr4qo2U1qAYpqA55+BUJ9igvSrFrJsk0=; b=k9gRQmW3KX85+dvAm7SRblzVlF
-	8yt/+UihM/RmRRmyHk7PBZmtccb2GrfmrT5QymkNnPZTjG6GkUfDtN/+PBwoFbAtc2nTHA1LofGoZ
-	kh1TQEbcNuFER0Y9kUOxeWC1WE5P4Py6NxanrNWyKv0AR3+Udgz+XfDE9DFlZ/B2w/2c8KMYbxZma
-	RpSFh2lh7P5O/gyf+225JI9+v+QQ0TJkz/9EKr3Bjh0UTx8crzMs8TqaTNr2h9IQ5h0U1knAU9VWB
-	CUnV+4VVZ0xZgseUkikX2np0Wpg+R+/8MsNZAeJDEXqdinkkQKFYAh7i+HIfcbEsQgHcg3oI1I1qA
-	FdymHa9g==;
+	bh=09OXcjV5LjWtZgzHphgSEOzGoq+sVyJJ1rTh412jyyc=; b=QVxDSiE7PtzcAx7kdTFFhVH1A+
+	L+vIzroq4ifhL++4BR+7byFq3XULMiKqN5PKahJdNRmuPu1Pyj7hCfo5NDTaQeokmSktZoHBXWSoe
+	YRTw7HBbQPdYgxdcQiDRsQF8STUjdIhbVxhfwckO7PbwvH8Jzax6Tm9U+Rq6IowbFMrSIA/k74Jyg
+	i+N+nuUAC608YRtjWI6rmf8gs7KJVjCkJ2raNCUEDaIHLLvhjHkQV2622tpqOfPaC1c7JDuRUYlix
+	ettTWh6+82c7wQ167i+NhQ5rf6lBudSL8AX0gVpSAn/4s/KEL8ZZ4VBK9lWdWFLzQWCjK2ZlsT3ad
+	06HD7czg==;
 Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qsGSP-008QfY-1h;
-	Mon, 16 Oct 2023 05:48:01 +0000
+	id 1qsGSR-008QgM-30;
+	Mon, 16 Oct 2023 05:48:04 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Greg Ungerer <gerg@linux-m68k.org>,
 	iommu@lists.linux.dev
@@ -57,9 +57,9 @@ Cc: Paul Walmsley <paul.walmsley@sifive.com>,
 	linux-riscv@lists.infradead.org,
 	linux-renesas-soc@vger.kernel.org,
 	Jim Quinlan <james.quinlan@broadcom.com>
-Subject: [PATCH 01/12] riscv: RISCV_NONSTANDARD_CACHE_OPS shouldn't depend on RISCV_DMA_NONCOHERENT
-Date: Mon, 16 Oct 2023 07:47:43 +0200
-Message-Id: <20231016054755.915155-2-hch@lst.de>
+Subject: [PATCH 02/12] riscv: only select DMA_DIRECT_REMAP from RISCV_ISA_ZICBOM
+Date: Mon, 16 Oct 2023 07:47:44 +0200
+Message-Id: <20231016054755.915155-3-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231016054755.915155-1-hch@lst.de>
 References: <20231016054755.915155-1-hch@lst.de>
@@ -78,54 +78,34 @@ X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-RISCV_NONSTANDARD_CACHE_OPS is also used for the pmem cache maintenance
-helpers, which are built into the kernel unconditionally.
+RISCV_DMA_NONCOHERENT is also used for whacky non-standard
+non-coherent ops that use different hooks in dma-direct.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- arch/riscv/Kconfig          | 1 -
- drivers/cache/Kconfig       | 2 +-
- drivers/soc/renesas/Kconfig | 2 +-
- 3 files changed, 2 insertions(+), 3 deletions(-)
+ arch/riscv/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index d607ab0f7c6daf..0ac0b538379718 100644
+index 0ac0b538379718..9c48fecc671918 100644
 --- a/arch/riscv/Kconfig
 +++ b/arch/riscv/Kconfig
-@@ -277,7 +277,6 @@ config RISCV_DMA_NONCOHERENT
+@@ -273,7 +273,6 @@ config RISCV_DMA_NONCOHERENT
+ 	select ARCH_HAS_SYNC_DMA_FOR_CPU
+ 	select ARCH_HAS_SYNC_DMA_FOR_DEVICE
+ 	select DMA_BOUNCE_UNALIGNED_KMALLOC if SWIOTLB
+-	select DMA_DIRECT_REMAP if MMU
  
  config RISCV_NONSTANDARD_CACHE_OPS
  	bool
--	depends on RISCV_DMA_NONCOHERENT
+@@ -549,6 +548,7 @@ config RISCV_ISA_ZICBOM
+ 	depends on RISCV_ALTERNATIVE
+ 	default y
+ 	select RISCV_DMA_NONCOHERENT
++	select DMA_DIRECT_REMAP
  	help
- 	  This enables function pointer support for non-standard noncoherent
- 	  systems to handle cache management.
-diff --git a/drivers/cache/Kconfig b/drivers/cache/Kconfig
-index a57677f908f3ba..d6e5e3abaad8af 100644
---- a/drivers/cache/Kconfig
-+++ b/drivers/cache/Kconfig
-@@ -3,7 +3,7 @@ menu "Cache Drivers"
- 
- config AX45MP_L2_CACHE
- 	bool "Andes Technology AX45MP L2 Cache controller"
--	depends on RISCV_DMA_NONCOHERENT
-+	depends on RISCV
- 	select RISCV_NONSTANDARD_CACHE_OPS
- 	help
- 	  Support for the L2 cache controller on Andes Technology AX45MP platforms.
-diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
-index 12040ce116a551..880c544bb2dfda 100644
---- a/drivers/soc/renesas/Kconfig
-+++ b/drivers/soc/renesas/Kconfig
-@@ -335,7 +335,7 @@ config ARCH_R9A07G043
- 	bool "RISC-V Platform support for RZ/Five"
- 	depends on NONPORTABLE
- 	select ARCH_RZG2L
--	select AX45MP_L2_CACHE if RISCV_DMA_NONCOHERENT
-+	select AX45MP_L2_CACHE
- 	select DMA_GLOBAL_POOL
- 	select ERRATA_ANDES if RISCV_SBI
- 	select ERRATA_ANDES_CMO if ERRATA_ANDES
+ 	   Adds support to dynamically detect the presence of the ZICBOM
+ 	   extension (Cache Block Management Operations) and enable its
 -- 
 2.39.2
 
