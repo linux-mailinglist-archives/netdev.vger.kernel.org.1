@@ -1,238 +1,213 @@
-Return-Path: <netdev+bounces-41156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB6937C9FB9
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 08:40:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7E6C7C9FC1
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 08:41:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 259DAB20C0E
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 06:40:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6651BB20D1B
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 06:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351DD134A9;
-	Mon, 16 Oct 2023 06:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B53414F63;
+	Mon, 16 Oct 2023 06:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YS3OUpGR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bhFTjkBs"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F81F14F63
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:40:04 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3BFA97
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 23:40:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697438401;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wtocz0xnDLCru6Wp/42zrBx6bUeINs4MJNh9rY+1O2E=;
-	b=YS3OUpGR3zV+p1k2dKhdFOWhCDn03fzPMY02gldblYV7jANb2SG0JsKwjnUxhFcLjnJH4Q
-	eMbNGB7/DO6aZzi2q26kiLY7DK7c4uUr3bEfMgbbGWX/pstx/3J9R3voss6slEPj9dMmZV
-	GPgmpYopcX+ES1SsV0G9gTB8EFI0FSQ=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-529-qh4-JZ_HOWW4polmFGZIwg-1; Mon, 16 Oct 2023 02:39:55 -0400
-X-MC-Unique: qh4-JZ_HOWW4polmFGZIwg-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5079fe7cc7cso1752203e87.2
-        for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 23:39:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3020214294;
+	Mon, 16 Oct 2023 06:41:32 +0000 (UTC)
+Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22BD897;
+	Sun, 15 Oct 2023 23:41:30 -0700 (PDT)
+Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-66d501d3ffbso1920166d6.1;
+        Sun, 15 Oct 2023 23:41:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697438489; x=1698043289; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=U2AgiFgpa6O47pkmBK6yizLzUM3j74/+Btppzhh7DTg=;
+        b=bhFTjkBsaH04PGaiBkmzQe/A+T5jKzXD6kjZSvuh4bOTJB6PPR2v/dz2b96UnoueB3
+         p+hjc1/8v1Lm4Vg+UmdHwlyNujaYu8NyKCFlRywK74SXZhyHXP6hz4xWj/f7Ir1X9kdh
+         UuMEALuue/R4si2E4Uuls688KPGOWbrgKna0050vbiHRBZbmrlVS+Oeu+lxK0TM9zupT
+         /SExgKzW8WJuYyB69ChApcrnqjdLmtg96qwYJtqumctwZ9sLuMPcYlmxzGX9UhIFhzwm
+         34NTCZwOTux9lyDXvCvn6fyr1esNuONarHo1/MnZhH8oyimFzxpSNPmiJkvMeXPJx1Vw
+         X3mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697438394; x=1698043194;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wtocz0xnDLCru6Wp/42zrBx6bUeINs4MJNh9rY+1O2E=;
-        b=AdwF9fkjnoQXADH1zRt8JPzIamFyX3y+n5igv9tJ9S1wFh1oivspoD8sCVn4eCvd9I
-         0p9QxwItnKekoQRROX5In/DnbVHT/gDF7axSA4lcqOcZxE0+TXM3dJpuE34EbUZ8wDUS
-         1rki0RPGUoOcSnI8p9ovj8a8zPtOwa5mI4wtcRUUxx1MgVIdZ1aU5tthJO+crhwdvEm1
-         oQJBvsOV1S0Jx+Yf3vyqoKLelgnMNaSt91xG3Y83I3ZTEXUvF9aH6jXNAo/0Z4LVnE6c
-         A9rbFe0hVJMqeEmJs2qlVh+IC8CHkYQ8FarGwjXFbXxP447gHyHwVFWhXf95ivZaeEVH
-         ZwkA==
-X-Gm-Message-State: AOJu0YwDC0lanTI5XeUDvBxTz9m9qvoxOU4Nhw73yA+I+fWDvPp+53eY
-	YzMBwCOvSUr8IAHwVWpnIOzZhnJTAgRTqkIsCWGE7wxmNSuV1X9YR7LcSpPMNMWJoWMnq5FsEUA
-	cjAcW1f1Rr5MPyIIt91oDXCC+MeOnfeUW
-X-Received: by 2002:a05:6512:ba3:b0:4f9:51ac:41eb with SMTP id b35-20020a0565120ba300b004f951ac41ebmr32026267lfv.16.1697438394143;
-        Sun, 15 Oct 2023 23:39:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEkFmWsn+fwTv5hGbnQo3vIP90tESyOO8ACPC++s468+R/wFrXd/HLv7Ygdl309Az9IxT3t8fjyChohb5Uqa2g=
-X-Received: by 2002:a05:6512:ba3:b0:4f9:51ac:41eb with SMTP id
- b35-20020a0565120ba300b004f951ac41ebmr32026254lfv.16.1697438393713; Sun, 15
- Oct 2023 23:39:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697438489; x=1698043289;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U2AgiFgpa6O47pkmBK6yizLzUM3j74/+Btppzhh7DTg=;
+        b=aoIPmq+iq3oKxmk3ydDvUNQ/5GD3tutw82tD5BAJ61SnXZ+JEteR+IA2GPriykqZEf
+         uD0TvXwq9MHok/jbI5RdCi34+dDWwLGb7sN2IAbmF69BsSsa7AmAzrvzw+JnChFYJNvh
+         FerfVrsf0I6stAHsdJiOhUsU3ectPeRY54ezOkuTR6ToqHhYXicrSYugJ7pBcT2luA+d
+         PdlBh3ZOastDiuGeegO1B37OQP90/SzelC1UffhCd7wV/cEKveqQ7Ynf42IlKylTlmAH
+         w8PZRx13NR+fpUfXijIgWa/ig9/xlC83EiEJKgh5IgLCKxcTfEf7QLQtDhEdOHBLhSWJ
+         y4Og==
+X-Gm-Message-State: AOJu0YzrGyFeer6cgcxXfK9Jl/tVNY4dTcBW+sL8Q3lsTzpi3v5X3C/D
+	CrFQ/9hKEI1aPau5EXz2WjfYNAAc0QVuSOd63qk=
+X-Google-Smtp-Source: AGHT+IGOu5dCy5DsNJpTp0AkS3qCm43hqcvFo/YwF82YWmIpdeQwZY5gHOF2HV1zq1FBJiQdEfPmvpwyhBwF2SF+SxQ=
+X-Received: by 2002:ad4:5a13:0:b0:66d:5d31:999b with SMTP id
+ ei19-20020ad45a13000000b0066d5d31999bmr1038478qvb.3.1697438489105; Sun, 15
+ Oct 2023 23:41:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231011140126.800508-1-willemdebruijn.kernel@gmail.com>
- <CACGkMEuq3srKZWYsVQutfHOuJAyHDz4xCJWG3o6hs+W_HhZ2jQ@mail.gmail.com>
- <CAF=yD-Lat+ooErKN6GxOX6Q2oOHBvjCfty5w=N6C+076zSZ6zw@mail.gmail.com>
- <CACGkMEtTqJ9NWTE=V9QUh57b59Y7VzNU-4E2wjUpROpWy5nanw@mail.gmail.com> <CAF=yD-+-0SXnLhnu54rj5fVyTao23-c==nnqn2RxA8p3vK9t2A@mail.gmail.com>
-In-Reply-To: <CAF=yD-+-0SXnLhnu54rj5fVyTao23-c==nnqn2RxA8p3vK9t2A@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 16 Oct 2023 14:39:42 +0800
-Message-ID: <CACGkMEu+eMhNhkY0Aw-ahD_4pGKbDD58aP=KhYV_9KT3odN-Sg@mail.gmail.com>
-Subject: Re: [PATCH net] net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, andrew@daynix.com, 
-	Willem de Bruijn <willemb@google.com>, syzbot+01cdbc31e9c0ae9b33ac@syzkaller.appspotmail.com, 
-	syzbot+c99d835ff081ca30f986@syzkaller.appspotmail.com
+References: <20231016031649.35088-1-huangjie.albert@bytedance.com>
+In-Reply-To: <20231016031649.35088-1-huangjie.albert@bytedance.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Mon, 16 Oct 2023 08:41:17 +0200
+Message-ID: <CAJ8uoz2DUe3xySTKuLbA5=QDAGuTzPdGu3P_=ZvJmna25VtHCQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] xsk: Avoid starving xsk at the end of the list
+To: Albert Huang <huangjie.albert@bytedance.com>
+Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Oct 13, 2023 at 7:40=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+On Mon, 16 Oct 2023 at 05:17, Albert Huang
+<huangjie.albert@bytedance.com> wrote:
 >
-> On Thu, Oct 12, 2023 at 9:30=E2=80=AFPM Jason Wang <jasowang@redhat.com> =
-wrote:
-> >
-> > On Thu, Oct 12, 2023 at 8:29=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > On Thu, Oct 12, 2023 at 4:00=E2=80=AFAM Jason Wang <jasowang@redhat.c=
-om> wrote:
-> > > >
-> > > > On Wed, Oct 11, 2023 at 10:01=E2=80=AFPM Willem de Bruijn
-> > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > >
-> > > > > From: Willem de Bruijn <willemb@google.com>
-> > > > >
-> > > > > Syzbot reported two new paths to hit an internal WARNING using th=
-e
-> > > > > new virtio gso type VIRTIO_NET_HDR_GSO_UDP_L4.
-> > > > >
-> > > > >     RIP: 0010:skb_checksum_help+0x4a2/0x600 net/core/dev.c:3260
-> > > > >     skb len=3D64521 gso_size=3D344
-> > > > > and
-> > > > >
-> > > > >     RIP: 0010:skb_warn_bad_offload+0x118/0x240 net/core/dev.c:326=
-2
-> > > > >
-> > > > > Older virtio types have historically had loose restrictions, lead=
-ing
-> > > > > to many entirely impractical fuzzer generated packets causing
-> > > > > problems deep in the kernel stack. Ideally, we would have had str=
-ict
-> > > > > validation for all types from the start.
-> > > > >
-> > > > > New virtio types can have tighter validation. Limit UDP GSO packe=
-ts
-> > > > > inserted via virtio to the same limits imposed by the UDP_SEGMENT
-> > > > > socket interface:
-> > > > >
-> > > > > 1. must use checksum offload
-> > > > > 2. checksum offload matches UDP header
-> > > > > 3. no more segments than UDP_MAX_SEGMENTS
-> > > > > 4. UDP GSO does not take modifier flags, notably SKB_GSO_TCP_ECN
-> > > > >
-> > > > > Fixes: 860b7f27b8f7 ("linux/virtio_net.h: Support USO offload in =
-vnet header.")
-> > > > > Reported-by: syzbot+01cdbc31e9c0ae9b33ac@syzkaller.appspotmail.co=
-m
-> > > > > Closes: https://lore.kernel.org/netdev/0000000000005039270605eb0b=
-7f@google.com/
-> > > > > Reported-by: syzbot+c99d835ff081ca30f986@syzkaller.appspotmail.co=
-m
-> > > > > Closes: https://lore.kernel.org/netdev/0000000000005426680605eb0b=
-9f@google.com/
-> > > > > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > > > > ---
-> > > > >  include/linux/virtio_net.h | 19 ++++++++++++++++---
-> > > > >  1 file changed, 16 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/include/linux/virtio_net.h b/include/linux/virtio_ne=
-t.h
-> > > > > index 7b4dd69555e49..27cc1d4643219 100644
-> > > > > --- a/include/linux/virtio_net.h
-> > > > > +++ b/include/linux/virtio_net.h
-> > > > > @@ -3,8 +3,8 @@
-> > > > >  #define _LINUX_VIRTIO_NET_H
-> > > > >
-> > > > >  #include <linux/if_vlan.h>
-> > > > > +#include <linux/udp.h>
-> > > > >  #include <uapi/linux/tcp.h>
-> > > > > -#include <uapi/linux/udp.h>
-> > > > >  #include <uapi/linux/virtio_net.h>
-> > > > >
-> > > > >  static inline bool virtio_net_hdr_match_proto(__be16 protocol, _=
-_u8 gso_type)
-> > > > > @@ -151,9 +151,22 @@ static inline int virtio_net_hdr_to_skb(stru=
-ct sk_buff *skb,
-> > > > >                 unsigned int nh_off =3D p_off;
-> > > > >                 struct skb_shared_info *shinfo =3D skb_shinfo(skb=
-);
-> > > > >
-> > > > > -               /* UFO may not include transport header in gso_si=
-ze. */
-> > > > > -               if (gso_type & SKB_GSO_UDP)
-> > > > > +               switch (gso_type & ~SKB_GSO_TCP_ECN) {
-> > > > > +               case SKB_GSO_UDP:
-> > > > > +                       /* UFO may not include transport header i=
-n gso_size. */
-> > > > >                         nh_off -=3D thlen;
-> > > > > +                       break;
-> > > > > +               case SKB_GSO_UDP_L4:
-> > > > > +                       if (!(hdr->flags & VIRTIO_NET_HDR_F_NEEDS=
-_CSUM))
-> > > > > +                               return -EINVAL;
-> > > > > +                       if (skb->csum_offset !=3D offsetof(struct=
- udphdr, check))
-> > > > > +                               return -EINVAL;
-> > > > > +                       if (skb->len - p_off > gso_size * UDP_MAX=
-_SEGMENTS)
-> > > > > +                               return -EINVAL;
-> > > >
-> > > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > >
-> > > > But a question comes into my mind: whether the udp max segments sho=
-uld
-> > > > be part of the virtio ABI or not.
-> > >
-> > > Implicitly it is part of the ABI, but so are other sensible
-> > > limitations, such as MAX_SKB_FRAGS.
-> >
-> > There's no easy to detect things like MAX_SKB_FRAGS or anything I miss
-> > here? For example, guests can send a packet with s/g more than
-> > MAX_SKB_FRAGS, TUN can arrange the skb allocation to make sure it
-> > doesn't exceed the limitation. This is not the case for
-> > UDP_MAX_SEGMENTS.
+> In the previous implementation, when multiple xsk sockets were
+> associated with a single xsk_buff_pool, a situation could arise
+> where the xsk_tx_list maintained data at the front for one xsk
+> socket while starving the xsk sockets at the back of the list.
+> This could result in issues such as the inability to transmit packets,
+> increased latency, and jitter. To address this problem, we introduced
+> a new variable called tx_budget_cache, which limits each xsk to transmit
+> a maximum of MAX_XSK_TX_BUDGET tx descriptors. This allocation ensures
+> equitable opportunities for subsequent xsk sockets to send tx descriptors.
+> The value of MAX_XSK_TX_BUDGET is temporarily set to 16.
+
+Hi Albert. Yes you are correct that there is nothing hindering this to
+happen in the code at the moment, so let us fix it.
+
+> Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+> ---
+>  include/net/xdp_sock.h |  6 ++++++
+>  net/xdp/xsk.c          | 18 ++++++++++++++++++
+>  2 files changed, 24 insertions(+)
 >
-> Perhaps MAX_SKB_FRAGS is not the best example. But there are other
-> conditions that are discoverable by validation returning an error when
-> outside the bounds of normal operation.
+> diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+> index 69b472604b86..f617ff54e38c 100644
+> --- a/include/net/xdp_sock.h
+> +++ b/include/net/xdp_sock.h
+> @@ -44,6 +44,7 @@ struct xsk_map {
+>         struct xdp_sock __rcu *xsk_map[];
+>  };
 >
-> UDP_MAX_SEGMENTS is also not explicitly exposed to UDP_SEGMENT socket
-> users, without issues.
+> +#define MAX_XSK_TX_BUDGET 16
+
+I think something like MAX_PER_SOCKET_BUDGET would be clearer.
+
+>  struct xdp_sock {
+>         /* struct sock must be the first member of struct xdp_sock */
+>         struct sock sk;
+> @@ -63,6 +64,11 @@ struct xdp_sock {
 >
-> If absolutely needed, the boundary can be detected through probing.
-
-See above, probing can only be done during driver probe.
-
-> But it should not be needed as chosen to be well outside normal
-> operating range.
+>         struct xsk_queue *tx ____cacheline_aligned_in_smp;
+>         struct list_head tx_list;
+> +       /* Record the actual number of times xsk has transmitted a tx
+> +        * descriptor, with a maximum limit not exceeding MAX_XSK_TX_BUDGET
+> +        */
+> +       u32 tx_budget_cache;
+> +
+>         /* Protects generic receive. */
+>         spinlock_t rx_lock;
 >
-> A secondary benefit is that future kernels can relax (but not tighten)
-> the restriction if needed. The current limit was chosen with the usual
-> 64KB / 1500B operating default in mind. If we would extend BIGTCP to
-> UDP, the existing limit of 64 might need relaxing (for both virtio and
-> sockets simultaneously). Anything ABI is set in stone, best to avoid
-> if not strictly necessary.
-
-The main concern is the migration, if we migrate from a Linux
-hypervisor to another. Guests notice the difference in the limitation.
-
-Thanks
-
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index f5e96e0d6e01..087f2675333c 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -413,16 +413,25 @@ EXPORT_SYMBOL(xsk_tx_release);
 >
+>  bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
+>  {
+> +       u32 xsk_full_count = 0;
 
+Enough with a bool;
+
+>         struct xdp_sock *xs;
+>
+>         rcu_read_lock();
+> +again:
+>         list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+> +               if (xs->tx_budget_cache >= MAX_XSK_TX_BUDGET) {
+> +                       xsk_full_count++;
+> +                       continue;
+> +               }
+
+The problem here is that the fixed MAX_XSK_TX_BUDGET is only useful
+for the <= 2 socket case. If I have 3 sockets sharing a
+netdev/queue_id, the two first sockets can still starve the third one
+since the total budget per send is 32. You need to go through the list
+of sockets in the beginning to compute the MAX_XSK_TX_BUDGET to
+compute this dynamically before each call. Or cache this value
+somehow, in the pool for example. Actually, the refcount in the
+buf_pool will tell you how many sockets are sharing the same buf_pool.
+Try using that to form MAX_XSK_TX_BUDGET on the fly.
+
+Another simpler way of accomplishing this would be to just reorder the
+list every time. Put the first socket last in the list every time. The
+drawback of this is that you need to hold the xsk_tx_list_lock while
+doing this so might be slower. The per socket batch size would also be
+32 and you would not receive "fairness" over a single call to
+sendto(). Would that be a problem for you?
+
+> +
+>                 if (!xskq_cons_peek_desc(xs->tx, desc, pool)) {
+>                         if (xskq_has_descs(xs->tx))
+>                                 xskq_cons_release(xs->tx);
+>                         continue;
+>                 }
+>
+> +               xs->tx_budget_cache++;
+> +
+>                 /* This is the backpressure mechanism for the Tx path.
+>                  * Reserve space in the completion queue and only proceed
+>                  * if there is space in it. This avoids having to implement
+> @@ -436,6 +445,14 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
+>                 return true;
+>         }
+>
+> +       if (unlikely(xsk_full_count > 0)) {
+> +               list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+> +                       xs->tx_budget_cache = 0;
+> +               }
+> +               xsk_full_count = 0;
+> +               goto again;
+> +       }
+> +
+>  out:
+>         rcu_read_unlock();
+>         return false;
+> @@ -1230,6 +1247,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
+>         xs->zc = xs->umem->zc;
+>         xs->sg = !!(xs->umem->flags & XDP_UMEM_SG_FLAG);
+>         xs->queue_id = qid;
+> +       xs->tx_budget_cache = 0;
+>         xp_add_xsk(xs->pool, xs);
+>
+>  out_unlock:
+> --
+> 2.20.1
+>
+>
 
