@@ -1,138 +1,151 @@
-Return-Path: <netdev+bounces-41439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72ADB7CAF47
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:31:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70D3D7CB00B
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:42:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49B281C208D1
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:31:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1BB61C20A82
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E5B30D1F;
-	Mon, 16 Oct 2023 16:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD08286AF;
+	Mon, 16 Oct 2023 16:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BOBTuB52"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="H8xjBa8g"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B615E30F97
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:31:28 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5057C1FDE
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:31:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697473880;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rbzg7U/87dJSaK89YmTgCyu23XfU1BhnpwaB496FV9g=;
-	b=BOBTuB52y0K0wAR6s5CX7xgG1BncSFYX1sn3YfPs1bk0qfe7Wa4BiskcwpkSPMKCQ0r5U/
-	qo3DAlcGX3nEFEsVMLh67Lhri50sAV56zmTQJH+qGWU/NuxQHOGhVU/F+wXFR+fgxvIuAe
-	Y8Zf8lhtAI+B+rmlKFxv+LPgw34oOKQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-613-g1DVukGdOg29WJloZ1VP1g-1; Mon, 16 Oct 2023 12:31:16 -0400
-X-MC-Unique: g1DVukGdOg29WJloZ1VP1g-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 523CF81D9E2;
-	Mon, 16 Oct 2023 16:31:15 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.178])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B7B49492BEE;
-	Mon, 16 Oct 2023 16:31:12 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <11ec6f637698feb04963c6a7c39a5ca80af95464.camel@kernel.org>
-References: <11ec6f637698feb04963c6a7c39a5ca80af95464.camel@kernel.org> <20231013155727.2217781-1-dhowells@redhat.com> <20231013155727.2217781-3-dhowells@redhat.com>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Ronnie Sahlberg <lsahlber@redhat.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Subject: Re: [RFC PATCH 02/53] netfs: Track the fpos above which the server has no data
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA9D30F8D
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:41:56 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 157A42128;
+	Mon, 16 Oct 2023 09:41:33 -0700 (PDT)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39GGX4xj002792;
+	Mon, 16 Oct 2023 16:41:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=iUkNAEhmQcRALEI8TK0LzZjyN4+TVeYxiZy0KPk2Wh0=;
+ b=H8xjBa8gHPauBSHWpWfvEIU01ujnLO3WL4xP5uAL6ijCyPDbcv2YOz4I/uC5q7b5uNEW
+ /6Y7mWkblfrIDEolYQZWspyysgirYHx2kAncWwE/o41NcfLtCUhu0mxzdl9YbUMHPr4+
+ ak9kOEdxyNKXyITjJPtLjvPFK5Kf5d0rNLu7d8zpRlPUsENIKyjgXT9LOYYOfxBh6JPq
+ aLBjkuyfK3oCjUaKFhfTw72NHmlAtbN5CWV3GeTY2f1kMaEGz8021AFEAqycc/HVJ2tm
+ oWPs5myX5ocj9VkpNJg+wlClOmrAa70KoWSTY1XwXNQP963bwoRTp7Y+gK2wW9fB9kZF uQ== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tqm9f4mmj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 16 Oct 2023 16:41:20 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 39GGfJP2030527
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 16 Oct 2023 16:41:19 GMT
+Received: from [10.48.240.22] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Mon, 16 Oct
+ 2023 09:41:18 -0700
+Message-ID: <cabb874c-7518-4565-a007-f466f1b69165@quicinc.com>
+Date: Mon, 16 Oct 2023 09:41:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2841425.1697473872.1@warthog.procyon.org.uk>
-Date: Mon, 16 Oct 2023 17:31:12 +0100
-Message-ID: <2841426.1697473872@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] ath10k: mac: enable
+ WIPHY_FLAG_CHANNEL_CHANGE_ON_BEACON on ath10k
+Content-Language: en-US
+To: Kalle Valo <kvalo@kernel.org>, Abhishek Kumar <kuabhs@chromium.org>
+CC: <johannes.berg@intel.com>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <ath10k@lists.infradead.org>,
+        <linux-wireless@vger.kernel.org>
+References: <20230629035254.2.I23c5e51afcc6173299bb2806c8c38364ad15dd63@changeid>
+ <169634426707.121370.9448850980134728319.kvalo@kernel.org>
+ <87il793hmi.fsf@kernel.org>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <87il793hmi.fsf@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.49.16.6]
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: j9hu2thAUudPAJfKw7Dq_SsN7Z2POx0C
+X-Proofpoint-ORIG-GUID: j9hu2thAUudPAJfKw7Dq_SsN7Z2POx0C
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-16_10,2023-10-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 phishscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0
+ suspectscore=0 clxscore=1011 bulkscore=0 mlxlogscore=738
+ priorityscore=1501 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2309180000 definitions=main-2310160145
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Jeff Layton <jlayton@kernel.org> wrote:
-
-> >  (7) If stored data is culled from the local cache, we must set zero_point
-> >      above that if the data also got written to the server.
+On 10/13/2023 10:20 PM, Kalle Valo wrote:
+> Kalle Valo <kvalo@kernel.org> writes:
 > 
-> When you say culled here, it sounds like you're just throwing out the
-> dirty cache without writing the data back. That shouldn't be allowed
-> though, so I must be misunderstanding what you mean here. Can you
-> explain?
-
-I meant fscache specifically.  Too many caches - and some of them with the
-same names!
-
-> >  (8) If dirty data is written back to the server, but not the local cache,
-> >      we must set zero_point above that.
+>> Abhishek Kumar <kuabhs@chromium.org> wrote:
+>>
+>>> Enabling this flag, ensures that reg_call_notifier is called
+>>> on beacon hints from handle_reg_beacon in cfg80211. This call
+>>> propagates the channel property changes to ath10k driver, thus
+>>> changing the channel property from passive scan to active scan
+>>> based on beacon hints.
+>>> Once the channels are rightly changed from passive to active,the
+>>> connection to hidden SSID does not fail.
+>>>
+>>> Signed-off-by: Abhishek Kumar <kuabhs@chromium.org>
+>>
+>> There's no Tested-on tag, on which hardware/firmware did you test this?
+>>
+>> This flag is now enabled on ALL ath10k supported hardware: SNOC, PCI, SDIO and
+>> maybe soon USB. I'm just wondering can we trust that this doesn't break
+>> anything.
 > 
-> How do you write back without writing to the local cache? I'm guessing
-> this means you're doing a non-buffered write?
-
-I meant fscache.  fscache can decline to honour a request to store data.
-
-> > +		if (size != i_size) {
-> > +			truncate_pagecache(&vnode->netfs.inode, size);
-> > +			netfs_resize_file(&vnode->netfs, size);
-> > +			fscache_resize_cookie(afs_vnode_cache(vnode), size);
-> > +		}
+> Jeff, what are your thoughts on this? I'm worried how different ath10k
+> firmwares can be and if this breaks something.
 > 
-> Isn't this an existing bug? AFS is not setting remote_i_size in the
-> setattr path currently? I think this probably ought to be done in a
-> preliminary AFS patch.
 
-It is being set.  afs_apply_status() sets it.  This is called by
-afs_vnode_commit_status() which is called from afs_setattr_success().  The
-value isn't updated until we get the return status from the server that
-includes the new value.
+Since the 1/2 patch is already in pull-request: wireless-next-2023-10-06 
+I went through the logic of that again. It would have been nice if that 
+actually described how it fixes the problem. What actually causes a 
+channel to change from passive to active?
 
-> > +	loff_t			zero_point;	/* Size after which we assume there's no data
-> > +						 * on the server */
-> 
-> While I understand the concept, I'm not yet sure I understand how this
-> new value will be used. It might be better to merge this patch in with
-> the patch that adds the first user of this data.
+Note the existing logic prior to the 1/2 patch already updates the wiphy 
+and userspace with the updated channel flags, so it seems reasonable to 
+also update the driver
 
-I'll consider it.  At least it might make sense to move them adjacent to each
-other in the series.
+However, this led me down the rabbit hole of trying to figure out what 
+happens if a beacon hint causes us to change a channel from passive to 
+active, but then that AP goes away. What, if anything, causes the 
+channel to revert back to passive? I'm not immediately seeing that logic 
+anywhere.
 
-David
+My concern is that we have an AP with a hidden SSID on a DFS channel, 
+and as a result of a beacon hint we switch that channel to active scan. 
+But then later that AP detects radar and vacates the channel. Then we 
+potentially have stations doing active scan on a DFS channel with an 
+active radar.
+
+Hopefully this is all handled, and it just isn't obvious in my 
+admittedly very quick 10 minute scan of the code.
+
+And as far as the 2/2 patch, note this logic is all dependent upon 
+reg_is_world_roaming(wiphy) returning true, so ath10k impact would 
+really depend upon the board regulatory settings, whether configured for 
+a fixed regulatory domain/country code or configured for world roaming.
+
+/jeff
+
 
 
