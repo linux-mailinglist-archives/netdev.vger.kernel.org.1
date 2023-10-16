@@ -1,80 +1,85 @@
-Return-Path: <netdev+bounces-41242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61BC57CA4BE
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:06:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEEF77CA508
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:15:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 932811C208E1
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:06:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B40CB20DB9
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015B31D55B;
-	Mon, 16 Oct 2023 10:06:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676EA1F5F5;
+	Mon, 16 Oct 2023 10:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dMlWe0Ho"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aDt6GKHy"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26281CF8D
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 10:06:43 +0000 (UTC)
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735A4E8;
-	Mon, 16 Oct 2023 03:06:42 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-99357737980so707210366b.2;
-        Mon, 16 Oct 2023 03:06:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F441CFAF;
+	Mon, 16 Oct 2023 10:15:16 +0000 (UTC)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5943B83;
+	Mon, 16 Oct 2023 03:15:15 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-53d9b94731aso7686359a12.1;
+        Mon, 16 Oct 2023 03:15:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697450801; x=1698055601; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1697451314; x=1698056114; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1n848vc1DB3y6nZvForDzflBh2Jj0yE5IL1yqGeXagk=;
-        b=dMlWe0HoSSUnH3Awtw8mjNBdQz9RRocetA99uORcLUSSoaJ/aFCVZLREOvjWpnCQ9v
-         /uTOm64Zlxc/dnyM3mLH3uvcM7ZoA7bu7YaNNtQC+2NjDzy6eMq1kiP4CNJUxHJVK10N
-         lSiQi8A1tIkxwf6y4dU+qbj8ZtntUESQwuyj1eG0A5H/gPR27N+980xgTWrWUK9Mhnf7
-         xz3Gp8lHUm48xScEszm/rHHLahQShhlRo9zFbSF3hAT8bQZvynyVB93oac4MTeluCFn4
-         /4KgB+uNDhuc+8KRn+VWvlf/rzNGmK9B+C3hecMrioqhjQJ5e8eyR7p7SaV3mrU9BZKZ
-         ofzw==
+        bh=3CDALhGm3i1PJ9jhn5rXgWop6RzlcpY4kUfxNWLFsNk=;
+        b=aDt6GKHywlXN2KE7hm82hQtYBGfiWzM/osYAmiMWjDL74HMSd8RuHzjyl6uAhCvGzr
+         SeN7z/VnycG311EpuCDz7yNM9rkVZKxkmbYfP11PgP2x0sRt9RK6/aA5NTsCz3VpkXAp
+         NB71O7wed/Z9IYd2U6DoGe81Y9ZqoaSVTC6zkXxpxrw9XLPQdxL/Q/l8m/mZ1tYamY0V
+         QVu0w5AcGHinasXPmZU1MK6V30n8ljFm6FL/IvKbWJn6ViyQ4fsndAwpWcKbx50/cNZ3
+         f8/RTdF4tzQUjSCrh6kDtHg28KHqOXQ0ihhJdlesOrtlQ5qkSxQAIaga55x6fDlugZHT
+         lPfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697450801; x=1698055601;
+        d=1e100.net; s=20230601; t=1697451314; x=1698056114;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1n848vc1DB3y6nZvForDzflBh2Jj0yE5IL1yqGeXagk=;
-        b=txSorO/szTHu7mwRkXjfeyBptainprt25AdJNltNwA3ae2moug2nbZ7qOJ2tJFe3q8
-         yILc8sbvQwUtYc4Bvs/CRBuorrqgXO6OSPjgXXwZa/SDB9vl9mlmEtetGanql+y1+PDh
-         910M4NKv8asslv4/E/NVuRmfMkFZPPgeE3/f1PSkIt5zYQl5i/0ESY7fRSo5fhyG0sOb
-         Ui9nzZ91nh943AkIvi+gjlf4A4X4TVB45NE8Hk2DS7Gh587mgw1Ik/GBRp9q/9jFJtA3
-         tsmxFbHN3Sjd1C0eDZPUo2d0fp0473jOlIVcDBIECxe7e4ohKGiXcFdIxTypYRb0Ug1j
-         LaqA==
-X-Gm-Message-State: AOJu0Yxsuj0JuvtB+Z4q5UtKaWSmDwumOqrXbmt/WdPCY45myBmkv0JC
-	ZnHIBp/0ma40TdSmCTLpBTM=
-X-Google-Smtp-Source: AGHT+IH+cYPFUivLjV2Xm+dFfJ21iIFN8eG6ywvwMgmHYmFiHPKIHE/AonafT4tltrybgRZB3z4Kgg==
-X-Received: by 2002:a17:907:1c25:b0:9bf:b5bc:6c4b with SMTP id nc37-20020a1709071c2500b009bfb5bc6c4bmr4382143ejc.62.1697450800538;
-        Mon, 16 Oct 2023 03:06:40 -0700 (PDT)
+        bh=3CDALhGm3i1PJ9jhn5rXgWop6RzlcpY4kUfxNWLFsNk=;
+        b=jgffc5uv+gOJ3Lh3Sx8O0BbJ568fix2i+Fcgd/mSIFPgy1jzwZRgrwvxC2aD1+Bl/n
+         1GGr2y4ETSTAbzKps2GMGOl1d/LrVMDfS9djpkEeXHoku/Kmx2BWoyUIbprPBYPBJBCP
+         SBoMS5ZSQVpNAU0QGOMzlzbsa0/oeL1dRqfbSeiwivT1w29tVziz7it/4mMxeAofXIkv
+         eTsZfpQh1FvFRggbOO1nxcdDItoOUAMxTGfbH8djkGUaeVForN29c/xcnuuRMAO19GvX
+         C75lQInV7yXJH5JIPBDFK8fC+AHA7aH93opvPNXWhrXQMmmOq+gtz69KZ33PBdt2hyyK
+         u+jA==
+X-Gm-Message-State: AOJu0YzQqn2CGwHeXz88MvXpTc7EazXUygyJ7BoSL2BE1cLaFJm88OmJ
+	p9sOG44HmdthVW2wdzFEvXs=
+X-Google-Smtp-Source: AGHT+IHYffULIbOSq3oeOrU7yb3oXde224tzUH7bZhxUeNpn7T3vYYIZUt6iDSEo+5J8aIMYN0qgBw==
+X-Received: by 2002:a17:907:1c26:b0:9bf:5df1:38cc with SMTP id nc38-20020a1709071c2600b009bf5df138ccmr4432885ejc.4.1697451313430;
+        Mon, 16 Oct 2023 03:15:13 -0700 (PDT)
 Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id ca15-20020a170906a3cf00b009ada9f7217asm3712537ejb.88.2023.10.16.03.06.39
+        by smtp.gmail.com with ESMTPSA id jx17-20020a170907761100b009ad875d12d7sm3744594ejc.210.2023.10.16.03.15.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 03:06:40 -0700 (PDT)
-Date: Mon, 16 Oct 2023 13:06:37 +0300
+        Mon, 16 Oct 2023 03:15:13 -0700 (PDT)
+Date: Mon, 16 Oct 2023 13:15:10 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-	netdev@vger.kernel.org,
-	Alexander Stein <alexander.stein@ew.tq-group.com>
-Subject: Re: [PATCH net-next v2 1/3] net: phy: micrel: Extend KSZ886X PHY
- Special Ctrl/Status Reg definitions
-Message-ID: <20231016100637.6vfkfcilsucq6iki@skbuf>
-References: <20231012065502.2928220-1-o.rempel@pengutronix.de>
- <20231012065502.2928220-2-o.rempel@pengutronix.de>
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/7] net: dsa: microchip: Set unique MAC at
+ startup for WoL support
+Message-ID: <20231016101510.a6t3nbcelcnsdf53@skbuf>
+References: <20231013122405.3745475-1-o.rempel@pengutronix.de>
+ <20231013122405.3745475-3-o.rempel@pengutronix.de>
+ <20231013123249.bhigwsezy6afb5qt@skbuf>
+ <188688f2-1028-41ee-ba0a-c52456f63111@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231012065502.2928220-2-o.rempel@pengutronix.de>
+In-Reply-To: <188688f2-1028-41ee-ba0a-c52456f63111@gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -91,13 +96,41 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 08:55:00AM +0200, Oleksij Rempel wrote:
-> Extend 'micrel_phy.h' with additional definitions for KSZ886X PHY
-> Special Control/Status Register (Reg 31), for upcoming usage in
-> subsequent patches.
+On Sun, Oct 15, 2023 at 02:18:43PM -0700, Florian Fainelli wrote:
 > 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
+> 
+> On 10/13/2023 5:32 AM, Vladimir Oltean wrote:
+> > On Fri, Oct 13, 2023 at 02:24:00PM +0200, Oleksij Rempel wrote:
+> > > Set a unique global MAC address for each switch on the network at system
+> > > startup by syncing the switch's global MAC address with the Ethernet
+> > > address of the DSA master interface. This is crucial for supporting
+> > > Wake-on-LAN (WoL) functionality, as it requires a unique address for
+> > > each switch.
+> > > 
+> > > Although the operation is performed only at system start and won't sync
+> > > if the master Ethernet address changes dynamically, it lays the
+> > > groundwork for WoL support by ensuring a unique MAC address for each
+> > > switch.
+> > > 
+> > > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > > ---
+> > 
+> > Why not take the MAC address of the user port at ksz9477_set_wol() time,
+> > and use the existing ksz_switch_macaddr_get() API that was just added so
+> > that this use case could work?
+> 
+> Agreed we do that in a number of Ethernet MAC and PHY drivers FWIW
+> (net_device::dev_addr).
+> -- 
+> Florian
 
-I think you can squash this into patch 2.
+To be clear (to Oleksij), the request is for WoL to use the same runtime
+management of the global MAC address (ksz_switch_macaddr_get) as HSR,
+and also extend ksz_port_set_mac_address() to deny address changes to a
+port with WoL active. Thus, multiple user ports could have WoL enabled
+as long as they share the same MAC address. MAC address changes are also
+possible while WoL is not enabled. I guess wol->supported should only
+get set on those user ports which have the same MAC address as the
+global MAC address (if a global MAC address is configured), or on all
+user ports (if there is none).
 
