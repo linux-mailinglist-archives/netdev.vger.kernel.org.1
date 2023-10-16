@@ -1,174 +1,118 @@
-Return-Path: <netdev+bounces-41147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F8807C9F54
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 08:12:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA7CB7C9FB1
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 08:35:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A83C3B20C72
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 06:12:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E1BAB20BAD
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 06:35:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A291172D;
-	Mon, 16 Oct 2023 06:12:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2079779F1;
+	Mon, 16 Oct 2023 06:35:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9AF14294
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:12:03 +0000 (UTC)
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36572D9;
-	Sun, 15 Oct 2023 23:11:58 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R971e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VuBTOLS_1697436713;
-Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0VuBTOLS_1697436713)
-          by smtp.aliyun-inc.com;
-          Mon, 16 Oct 2023 14:11:54 +0800
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490941C04
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:35:34 +0000 (UTC)
+X-Greylist: delayed 282 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 15 Oct 2023 23:35:29 PDT
+Received: from cmccmta2.chinamobile.com (cmccmta2.chinamobile.com [111.22.67.135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D2CD48E
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 23:35:29 -0700 (PDT)
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app07-12007 (RichMail) with SMTP id 2ee7652cd892b73-ff3af;
+	Mon, 16 Oct 2023 14:30:42 +0800 (CST)
+X-RM-TRANSID:2ee7652cd892b73-ff3af
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from ubuntu.localdomain (unknown[10.54.5.252])
+	by rmsmtp-syy-appsvr08-12008 (RichMail) with SMTP id 2ee8652cd890ddd-29fd1;
+	Mon, 16 Oct 2023 14:30:41 +0800 (CST)
+X-RM-TRANSID:2ee8652cd890ddd-29fd1
+From: zhujun2 <zhujun2@cmss.chinamobile.com>
+To: davem@davemloft.net
+Cc: edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: tonylu@linux.alibaba.com,
-	alibuda@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net/smc: correct the reason code in smc_listen_find_device when fallback
-Date: Mon, 16 Oct 2023 14:11:53 +0800
-Message-Id: <20231016061153.40057-1-guangguan.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhujun2@cmss.chinamobile.com
+Subject: [PATCH] selftests: net: remove unused variables
+Date: Sun, 15 Oct 2023 23:30:39 -0700
+Message-Id: <20231016063039.3771-1-zhujun2@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-The function smc_find_ism_store_rc is not only used for ism, so it is
-reasonable to change the function name to smc_find_device_store_rc.
+These variables are never referenced in the code, just remove them
 
-The ini->rc is used to store the last error happened when finding usable
-ism or rdma device in smc_listen_find_device, and is set by calling smc_
-find_device_store_rc. Once the ini->rc is assigned to an none-zero value,
-the value can not be overwritten anymore. So the ini-rc should be set to
-the error reason only when an error actually occurs.
-
-When finding ISM/RDMA devices, device not found is not a real error, as
-not all machine have ISM/RDMA devices. Failures after device found, when
-initializing device or when initializing connection, is real errors, and
-should be store in ini->rc.
-
-SMC_CLC_DECL_DIFFPREFIX also is not a real error, as for SMC-RV2, it is
-not require same prefix.
-
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Signed-off-by: zhujun2 <zhujun2@cmss.chinamobile.com>
 ---
- net/smc/af_smc.c | 23 +++++++++--------------
- 1 file changed, 9 insertions(+), 14 deletions(-)
+ tools/testing/selftests/net/af_unix/scm_pidfd.c     | 1 -
+ tools/testing/selftests/net/af_unix/test_unix_oob.c | 2 --
+ tools/testing/selftests/net/nettest.c               | 5 +++--
+ 3 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index bacdd971615e..15d8ad7af75d 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -2121,7 +2121,7 @@ static void smc_check_ism_v2_match(struct smc_init_info *ini,
+diff --git a/tools/testing/selftests/net/af_unix/scm_pidfd.c b/tools/testing/selftests/net/af_unix/scm_pidfd.c
+index a86222143..7e5345941 100644
+--- a/tools/testing/selftests/net/af_unix/scm_pidfd.c
++++ b/tools/testing/selftests/net/af_unix/scm_pidfd.c
+@@ -294,7 +294,6 @@ static void fill_sockaddr(struct sock_addr *addr, bool abstract)
+ static void client(FIXTURE_DATA(scm_pidfd) *self,
+ 		   const FIXTURE_VARIANT(scm_pidfd) *variant)
+ {
+-	int err;
+ 	int cfd;
+ 	socklen_t len;
+ 	struct ucred peer_cred;
+diff --git a/tools/testing/selftests/net/af_unix/test_unix_oob.c b/tools/testing/selftests/net/af_unix/test_unix_oob.c
+index 532459a15..a7c51889a 100644
+--- a/tools/testing/selftests/net/af_unix/test_unix_oob.c
++++ b/tools/testing/selftests/net/af_unix/test_unix_oob.c
+@@ -180,9 +180,7 @@ main(int argc, char **argv)
+ 	char buf[1024];
+ 	int on = 0;
+ 	char oob;
+-	int flags;
+ 	int atmark;
+-	char *tmp_file;
+ 
+ 	lfd = socket(AF_UNIX, SOCK_STREAM, 0);
+ 	memset(&consumer_addr, 0, sizeof(consumer_addr));
+diff --git a/tools/testing/selftests/net/nettest.c b/tools/testing/selftests/net/nettest.c
+index 39a0e01f8..cd8a58097 100644
+--- a/tools/testing/selftests/net/nettest.c
++++ b/tools/testing/selftests/net/nettest.c
+@@ -1864,8 +1864,9 @@ static char *random_msg(int len)
+ 		n += i;
+ 		len -= i;
  	}
+-	i = snprintf(m + n, olen - n, "%.*s", len,
+-		     "abcdefghijklmnopqrstuvwxyz");
++
++	snprintf(m + n, olen - n, "%.*s", len,
++	     "abcdefghijklmnopqrstuvwxyz");
+ 	return m;
  }
  
--static void smc_find_ism_store_rc(u32 rc, struct smc_init_info *ini)
-+static void smc_find_device_store_rc(u32 rc, struct smc_init_info *ini)
- {
- 	if (!ini->rc)
- 		ini->rc = rc;
-@@ -2162,10 +2162,8 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
- 	}
- 	mutex_unlock(&smcd_dev_list.mutex);
- 
--	if (!ini->ism_dev[0]) {
--		smc_find_ism_store_rc(SMC_CLC_DECL_NOSMCD2DEV, ini);
-+	if (!ini->ism_dev[0])
- 		goto not_found;
--	}
- 
- 	smc_ism_get_system_eid(&eid);
- 	if (!smc_clc_match_eid(ini->negotiated_eid, smc_v2_ext,
-@@ -2180,7 +2178,7 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
- 		ini->ism_selected = i;
- 		rc = smc_listen_ism_init(new_smc, ini);
- 		if (rc) {
--			smc_find_ism_store_rc(rc, ini);
-+			smc_find_device_store_rc(rc, ini);
- 			/* try next active ISM device */
- 			continue;
- 		}
-@@ -2213,11 +2211,12 @@ static void smc_find_ism_v1_device_serv(struct smc_sock *new_smc,
- 		goto not_found;
- 	ini->ism_selected = 0;
- 	rc = smc_listen_ism_init(new_smc, ini);
--	if (!rc)
-+	if (!rc) {
-+		smc_find_device_store_rc(rc, ini);
- 		return;		/* V1 ISM device found */
-+	}
- 
- not_found:
--	smc_find_ism_store_rc(rc, ini);
- 	ini->smcd_version &= ~SMC_V1;
- 	ini->ism_dev[0] = NULL;
- 	ini->is_smcd = false;
-@@ -2266,10 +2265,8 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
- 	ini->smcrv2.saddr = new_smc->clcsock->sk->sk_rcv_saddr;
- 	ini->smcrv2.daddr = smc_ib_gid_to_ipv4(smc_v2_ext->roce);
- 	rc = smc_find_rdma_device(new_smc, ini);
--	if (rc) {
--		smc_find_ism_store_rc(rc, ini);
-+	if (rc)
- 		goto not_found;
--	}
- 	if (!ini->smcrv2.uses_gateway)
- 		memcpy(ini->smcrv2.nexthop_mac, pclc->lcl.mac, ETH_ALEN);
- 
-@@ -2284,7 +2281,7 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
- 	if (!rc)
- 		return;
- 	ini->smcr_version = smcr_version;
--	smc_find_ism_store_rc(rc, ini);
-+	smc_find_device_store_rc(rc, ini);
- 
- not_found:
- 	ini->smcr_version &= ~SMC_V2;
-@@ -2330,8 +2327,6 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
- 
- 	/* check for matching IP prefix and subnet length (V1) */
- 	prfx_rc = smc_listen_prfx_check(new_smc, pclc);
--	if (prfx_rc)
--		smc_find_ism_store_rc(prfx_rc, ini);
- 
- 	/* get vlan id from IP device */
- 	if (smc_vlan_by_tcpsk(new_smc->clcsock, ini))
-@@ -2358,7 +2353,7 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
- 		int rc;
- 
- 		rc = smc_find_rdma_v1_device_serv(new_smc, pclc, ini);
--		smc_find_ism_store_rc(rc, ini);
-+		smc_find_device_store_rc(rc, ini);
- 		return (!rc) ? 0 : ini->rc;
- 	}
- 	return SMC_CLC_DECL_NOSMCDEV;
 -- 
-2.24.3 (Apple Git-128)
+2.17.1
+
+
 
 
