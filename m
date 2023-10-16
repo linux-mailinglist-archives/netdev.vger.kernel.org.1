@@ -1,121 +1,129 @@
-Return-Path: <netdev+bounces-41244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 691F47CA520
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:17:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D9857CA52E
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 995661C20A2F
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:17:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08FDB2815A1
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887791F606;
-	Mon, 16 Oct 2023 10:17:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hUB11ebL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D9F41F60F;
+	Mon, 16 Oct 2023 10:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3026A1DDF4;
-	Mon, 16 Oct 2023 10:17:28 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E258D10D5;
-	Mon, 16 Oct 2023 03:17:25 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9ba081173a3so710235766b.1;
-        Mon, 16 Oct 2023 03:17:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697451444; x=1698056244; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6ABIBqRVTS2T0tRVHTT9KAXeuy4mMkl/npHfHsfl4HI=;
-        b=hUB11ebL+3GCTJSUc67A2heti7QL91wl/LyG0r0P33/Yk2wiMgHuzTFZYHZo17eLnE
-         RQvNFp3dRt6Q9AqOBHO3vS+y/uZQuPkJfTG/slkYW8R2Qi+a3NNLppCCeShezOI2JKAW
-         uAKytM8TgDpTIbU41qaATcMX4Cmn7bw9paImOCZhbJGt8kbEOhBGvvJPbdcgqVrGSEmu
-         3oIhC7gL0xq8q/v9S4GirX2Zu/TrULz1ulNZtqTcuXyKwhsUcV9By5JXOsxygaX5os2X
-         o0pdbhGJwk19IGnziH6SPt/PShaW3NgKxifS+NOeaA0uUbkps9NHP5wk0tGkksNIE6Xo
-         KyrQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66BA1D68A;
+	Mon, 16 Oct 2023 10:20:30 +0000 (UTC)
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68BDBF1;
+	Mon, 16 Oct 2023 03:20:27 -0700 (PDT)
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3af609c3e74so2926178b6e.2;
+        Mon, 16 Oct 2023 03:20:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697451444; x=1698056244;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6ABIBqRVTS2T0tRVHTT9KAXeuy4mMkl/npHfHsfl4HI=;
-        b=GE6VHggmq1CCeSTG4OCJWlm4JaQ6QS5/q5NzeP9hyHtHLW9znIwRPbwzSaFoizIjPD
-         9398lBi/71LB5VG86tOTUmomwjIfJ6C92LY2jM4s+USWRN6Ges2bTBTnycjruFWMgSU+
-         Pke3dzfgn83o2NBNfxgzzUA3klleiYyCtUbR/wxVQvkD78V5RBXs1RgQRV52NDGLaFGa
-         hri/lQrRbQAhpL64e4rPVgJPbDn+RnhLSVRl48YrnpGGCbWLHs5eNf46zC8oo6eqomYT
-         qFXTZTwR/O7peXYOvluOfuw+lMGNI63kd/tG0qUMENlj5mhFSurD21+WMskqAZzY28NZ
-         eSWA==
-X-Gm-Message-State: AOJu0YygtfBjNsryXXYnk806/gPjBVX9eQiIbWZf1zlpAzr3X15oZ8xG
-	RZ7fQaPEL5dv/gI6AuFQuRc=
-X-Google-Smtp-Source: AGHT+IHLskuU7E2U4B8DFF/3AUSD5n4mYeQu/HFu/etDgo35vkLCIanfxkLH0t5qDGRjitf6y+d4PA==
-X-Received: by 2002:a17:907:d02:b0:9be:1dbd:552e with SMTP id gn2-20020a1709070d0200b009be1dbd552emr7772284ejc.68.1697451444267;
-        Mon, 16 Oct 2023 03:17:24 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id n25-20020a17090673d900b0099297782aa9sm3683857ejl.49.2023.10.16.03.17.23
+        d=1e100.net; s=20230601; t=1697451627; x=1698056427;
+        h=date:subject:message-id:references:in-reply-to:cc:to:from
+         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=o5sJhsQNmbOT7c6Hbk0+8RLMXJFosGmigyC5c1uzxD4=;
+        b=Syj2/dbbjCoh2r3c3UkvnCFpgAlxN29/G38gnTHSY4vEGUaMJENmaYohMgSTA16JHI
+         DB09txz5fmMUx8jvdagD/y239AF8X+KP0neeH6YjZdcFVlJeXGEkqTDGs0BbsGddjfcN
+         vQTqtxnRavFCq2rwSoNZimAMuquGFbxoYXSZ2W+1XV2YqePn7jxwmSq5nBuvJfgHS706
+         Im+hR6TU5QlN0WrGcYlQeXZ+C1fjnoARN52EvsRaqyelILTmtzcdu3cJe1HMbovYa0sK
+         UcAzM49/5OsdwiBuhKMYKu69H8VTezNkEgFSZL6n/TOeafVLlr1PoNSbYsknboIdcQbb
+         O7QA==
+X-Gm-Message-State: AOJu0YynBJx0/UCHBV+GfIlUe1OKpXf0cd2yHbD61EAl2Mac23V3vs3E
+	k71bRq71ZrTokoLA5galYw==
+X-Google-Smtp-Source: AGHT+IEjmQ0QASWHv7d6KTWGX0k09e+bhKHEwBWKvhHcW+bG5yE9xwN0Kcutuvxhg937DJ6Z0G18EA==
+X-Received: by 2002:a05:6808:b23:b0:3b2:9c2f:50f1 with SMTP id t3-20020a0568080b2300b003b29c2f50f1mr15499375oij.8.1697451627039;
+        Mon, 16 Oct 2023 03:20:27 -0700 (PDT)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id 5-20020aca0d05000000b003ae3056a58csm1782009oin.49.2023.10.16.03.20.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 03:17:24 -0700 (PDT)
-Date: Mon, 16 Oct 2023 13:17:21 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/7] net: dsa: microchip: ksz9477: add Wake
- on LAN support
-Message-ID: <20231016101721.ktc6mrpewrxsh7nv@skbuf>
-References: <20231013122405.3745475-1-o.rempel@pengutronix.de>
- <20231013122405.3745475-1-o.rempel@pengutronix.de>
- <20231013122405.3745475-4-o.rempel@pengutronix.de>
- <20231013122405.3745475-4-o.rempel@pengutronix.de>
+        Mon, 16 Oct 2023 03:20:26 -0700 (PDT)
+Received: (nullmailer pid 2077745 invoked by uid 1000);
+	Mon, 16 Oct 2023 10:20:25 -0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231013122405.3745475-4-o.rempel@pengutronix.de>
- <20231013122405.3745475-4-o.rempel@pengutronix.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+From: Rob Herring <robh@kernel.org>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh+dt@kernel.org>, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Jakub Kicinski <kuba@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, Christian Marangi <ansuelsmth@gmail.com>, linux-kernel@vger.kernel.org, Gregory Clement <gregory.clement@bootlin.com>, Vladimir Oltean <olteanv@gmail.com>, Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
+In-Reply-To: <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
+References: <20231016-marvell-88e6152-wan-led-v3-0-38cd449dfb15@linaro.org>
+ <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
+Message-Id: <169745162509.2077728.8681177846583363222.robh@kernel.org>
+Subject: Re: [PATCH net-next v3 1/6] dt-bindings: marvell: Rewrite
+ MV88E6xxx in schema
+Date: Mon, 16 Oct 2023 05:20:25 -0500
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
+	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Oct 13, 2023 at 02:24:01PM +0200, Oleksij Rempel wrote:
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index db0ef4ad181e..bef1951fe6f2 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -319,6 +319,8 @@ static const struct ksz_dev_ops ksz9477_dev_ops = {
->  	.mdb_del = ksz9477_mdb_del,
->  	.change_mtu = ksz9477_change_mtu,
->  	.phylink_mac_link_up = ksz9477_phylink_mac_link_up,
-> +	.wol_get = ksz9477_get_wol,
-> +	.wol_set = ksz9477_set_wol,
 
-Can the dev_ops function pointers also be named get_wol() and set_wol()
-for consistency with everything else?
+On Mon, 16 Oct 2023 11:12:54 +0200, Linus Walleij wrote:
+> This is an attempt to rewrite the Marvell MV88E6xxx switch bindings
+> in YAML schema.
+> 
+> The current text binding says:
+>   WARNING: This binding is currently unstable. Do not program it into a
+>   FLASH never to be changed again. Once this binding is stable, this
+>   warning will be removed.
+> 
+> Well that never happened before we switched to YAML markup,
+> we can't have it like this, what about fixing the mess?
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  .../bindings/net/dsa/marvell,mv88e6xxx.yaml        | 243 +++++++++++++++++++++
+>  .../devicetree/bindings/net/dsa/marvell.txt        | 109 ---------
+>  MAINTAINERS                                        |   2 +-
+>  3 files changed, 244 insertions(+), 110 deletions(-)
+> 
 
->  	.config_cpu_port = ksz9477_config_cpu_port,
->  	.tc_cbs_set_cinc = ksz9477_tc_cbs_set_cinc,
->  	.enable_stp_addr = ksz9477_enable_stp_addr,
-> @@ -2935,6 +2937,28 @@ static int ksz_set_mac_eee(struct dsa_switch *ds, int port,
->  	return 0;
->  }
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
+
+yamllint warnings/errors:
+./Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml:78:5: [error] syntax error: could not find expected ':' (syntax)
+
+dtschema/dtc warnings/errors:
+make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.example.dts'
+Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml:78:5: could not find expected ':'
+make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.example.dts] Error 1
+make[2]: *** Waiting for unfinished jobs....
+./Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml:78:5: could not find expected ':'
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml: ignoring, error parsing file
+make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1427: dt_binding_check] Error 2
+make: *** [Makefile:234: __sub-make] Error 2
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
