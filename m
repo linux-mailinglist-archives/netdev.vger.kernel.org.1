@@ -1,209 +1,177 @@
-Return-Path: <netdev+bounces-41504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FDD17CB236
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:21:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41DAF7CB26F
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:23:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A59F1B20D3A
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:21:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C470BB20DB0
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E855033988;
-	Mon, 16 Oct 2023 18:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2120E33995;
+	Mon, 16 Oct 2023 18:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="fFrRj3Ef"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="RFypY+mw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD721F61D
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 18:21:16 +0000 (UTC)
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B1A6AC
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:21:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net; s=s31663417;
- t=1697480465; x=1698085265; i=wahrenst@gmx.net;
- bh=8G9sgkid8V1gahRKGDqoqTwq08lGsgfUBvNKixYV5mY=;
- h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
- b=fFrRj3EfrphV9uW9uB3x/h5kAWFS9n6Vy+ZU5rnTb20qWsCL0H1sjJ7rqU2QvJAhDpPWp9qKo3G
- hcvHGh4B4WI2I9Dm7WBjDlxsA2qhiFvMgM4/Viiu0f+TqUsHbEhBNBP8452AVALsxfh6aQLap+9rP
- uthohFAeUbd+Iv45+3Sp6KYekcNwQkcR1pKNWUnpspYYlOxIcRgErj5sse+YTEE+DaVOABV2j/qjt
- ZDN0ih+jnlGVdq8ud5QSHJ6G/BLoXbJ/hpu6jUdC1xeXDqob5Xg9qSxtEROBNtzlKJ3HzZYDMj0T8
- dr4TR+/0ySbk6uI9xOESmzSPUspiTgvPv7BQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MnaoZ-1rHZlV3j09-00jW1u; Mon, 16
- Oct 2023 20:21:04 +0200
-Message-ID: <b0bbc989-d6c7-4a3e-aa31-a63116542348@gmx.net>
-Date: Mon, 16 Oct 2023 20:21:04 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1F231A9F
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 18:23:43 +0000 (UTC)
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0186EB
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:23:41 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-4194c3cf04aso33858311cf.3
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:23:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1697480620; x=1698085420; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=slLQdIKd076Wd/jcmKbWiuJysNgl1PI1tXfrw1I/2ns=;
+        b=RFypY+mwC6t9sbo9JHt5O+rjkefCfBzGS49N5fFZj8PUbzoS3S6Aj6MwA2jbzru8lR
+         DLNX0alfgU7cg9eQW0ro2+bduCFveSQnesQXwTo6TqNx2LxdyIRvEnQuvijKJNSlQRHk
+         y/afqiecl0K5CmfBjUpNmHQSASw0J1+8XluEByDF52F+Ykdi838LVuTgMB8MxwFMzBm0
+         NyN8e8PiyeYg+/sZqV+ggJITbWRUDz0zVBlSkSxMImTO8ehOworSAxAN3acOFEhJvr4F
+         9o2C/6cnlNKgMW+mpapWsizs39HaygxZL7uZZfsRJAzkJNd4D1Ttyz7Xxp+p98L5oZjA
+         xI5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697480620; x=1698085420;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=slLQdIKd076Wd/jcmKbWiuJysNgl1PI1tXfrw1I/2ns=;
+        b=qIUoS4CXGNWKoxMUu1yeU9KEUPlfAcn2ZMwI8aHA+O9fylAd161HMlLCncmnxuN959
+         tQWmICboa7HoXfJluFrDx1fHXlQ+HPvUa9F7f5vD48jkuiF/+CiP/9rx8EDRKKfW2mIl
+         3t8r2yKLLcoX1OqWV5jS+urboQQAfQAPZUbENNM+XTKMtrKv7dxr64hvY6xy+9UJAfYY
+         gm2Ruo3634X2WjluBb5cY6IpU6ML4gppQ2tuHJgbxySr9kkfn4Yket+YIXwcWRwlpNzf
+         Wed71aEOr3jlFXWBSiqe/nF82k2s5vq0TB35V8GpsP2VoQubSELIL9EY2N10OEDqQ5WD
+         /d5w==
+X-Gm-Message-State: AOJu0YzOzp3Blf/g70CNam0l2psJaB8NssMDzofgcBQ5hSNK/vyw0MAu
+	I3g9YuBW4h30MqXCe4Cb1fTWekfqf5npAFKvFU3bOw==
+X-Google-Smtp-Source: AGHT+IE9m6qZCIFd9+yWOJ5ESCvJa4O2jE3aDP2pNfipsaG168iLj05O0ysZ6/OU2HA3fAy3U3Motg==
+X-Received: by 2002:ac8:5916:0:b0:418:163b:c5d7 with SMTP id 22-20020ac85916000000b00418163bc5d7mr55277qty.58.1697480620673;
+        Mon, 16 Oct 2023 11:23:40 -0700 (PDT)
+Received: from debian.debian ([140.141.197.139])
+        by smtp.gmail.com with ESMTPSA id kq19-20020ac86193000000b00405502aaf76sm3218093qtb.57.2023.10.16.11.23.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 11:23:40 -0700 (PDT)
+Date: Mon, 16 Oct 2023 11:23:38 -0700
+From: Yan Zhai <yan@cloudflare.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Aya Levin <ayal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	linux-kernel@vger.kernel.org, kernel-team@cloudflare.com,
+	Florian Westphal <fw@strlen.de>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: [PATCH v2 net-next] ipv6: avoid atomic fragment on GSO packets
+Message-ID: <ZS1/qtr0dZJ35VII@debian.debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: iperf performance regression since Linux 5.18
-To: Eric Dumazet <edumazet@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Fabio Estevam <festevam@gmail.com>, linux-imx@nxp.com,
- Stefan Wahren <stefan.wahren@chargebyte.com>,
- Michael Heimpold <mhei@heimpold.de>, netdev@vger.kernel.org,
- Yuchung Cheng <ycheng@google.com>
-References: <7f31ddc8-9971-495e-a1f6-819df542e0af@gmx.net>
- <CANn89iKY58YSknzOzkEHxFu=C=1_p=pXGAHGo9ZkAfAGon9ayw@mail.gmail.com>
- <CADVnQymV=nv53YaC8kLC1qT1ufhJL9+w_wcZ+8AHwPRG+JRdnw@mail.gmail.com>
- <a35b1a27-575f-4d19-ad2d-95bf4ded40e9@gmx.net>
- <CADVnQymM2HrGrMGyJX2QQ9PpgQT8JqsRz_0U8_WvdvzteqsfEQ@mail.gmail.com>
- <CANn89iL97hLAyHx9ee1VKTnLEgJeEVPrf_8-wf0BEBKAPQitPA@mail.gmail.com>
- <1ac3ea60-81d8-4501-b983-cb22b046f2ea@gmx.net>
- <a94b00d9-8bbc-4c54-b5c9-4a7902220312@gmx.net>
- <CANn89i+53WWxaZA5+cc9Yck8h+HTV6BvbybAnvTckriFfKpQMQ@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Wahren <wahrenst@gmx.net>
-In-Reply-To: <CANn89i+53WWxaZA5+cc9Yck8h+HTV6BvbybAnvTckriFfKpQMQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:KR03gsMgmmoT731RbBDmN1mWML9pFiP0PvBef7uZwbP4FNMYHOO
- 5AV4lAhAN0FAA9O3feLbUG4ZE5df528m0frPhCYQJkB7gmPgHgk0NEb3kRkfatG3AWH8xHn
- CX6Q8f9bpAZV4XSZx9vlMajhN/xXStyId+IjPaknzS+25RCpyzCfQXFesgc4BTqN2Jlk6dc
- IJfqRSSAkcsiWCbiX6WQw==
-UI-OutboundReport: notjunk:1;M01:P0:iP4rGHCLh3E=;oCvXYVZnCweQVC6lql2Zd81uBoI
- Kwng+mRs8fPGr84crvfJ4U0vpzUcyH0PYXju/hckqdiETULqtN1yBJowBzFVSkSJApDkz5wwR
- VmYMSueQfUF/v6vNQU1gDPlGeVsoyvaW3dNWc22bSj4m6pINFQ3bXYD1267Ifi9oFAETt50Ah
- v5bEurQkRtLktj7Rx7LuUucHJVyW35rZlbcHD9jGYQWvRzTmA1kPkE/hp+Ff2vD/fh7armS0Q
- Q4ArqUNsLsqLR+1LjwC9dmUT1Wv55m0exVMFz+xghcf+KULPOg6gD9O1ZyDgsKVhhWUWhlwPb
- 3TB0ca9nkfXZulYrqDqib7BpbAGBFDwI/4K7ER+Qwk7DOUjJ7YoMszkCrmnmQg7w2ljjU3/G7
- XMd8+9mBzVjQHdpNXCRKUYkfmgj7i59g4A5Lh5FJQvoPM4ZnTRp7YZ5wg1Ql/xRCptMDOXZlT
- DccB17tjnMPWORWVfmfeIoLSysTnDaTrkqaFVbLDybfmbCqX4tui+YBazHvMkpc+AxZxvYFkO
- OYv1Vv/1Bbz9Ygmk+bmZSMCHVTGurrPi/z5JdkxdZJk2V02C8G8Xdwmd8dUdrrqActE3fJQz6
- VmAW5PmKwIQupMsUx0pXyMQ4KV2Meeog8SM/tbCztMwHPxPXyLpqYPFzpaCcSsTQZB1tEn7MM
- vflNKNIA0ZCDuRL08wpG3Y3oFQ4m14Dc39rg9pM5/i0DfeLfrA8u3aCH7EGa8ZEeUWu7Xwudk
- caqGBE8hT5OYgW9eHK/jYmyyMSfQZYlSbfETJTz3Ik147XDYOZf+5yUU53Nc5+TZT5FY36vi+
- k6xX7LkVzT3gfAiLm7x6wxC8thnROIaWg9waknIL7fNoKQVQjCNX6K7TtQIawIWI+LX1MWELj
- CQlE0W32qilb0KaF5c4+Zz/QJu7wMJyVEA5CJ0azvTCn2QS/yC7RS4JmrnnL/6ndJG5WvXx6V
- Xhh4cg==
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Eric,
+GSO packets can contain a trailing segment that is smaller than
+gso_size. When examining the dst MTU for such packet, if its gso_size is
+too large, then all segments would be fragmented. However, there is a
+good chance the trailing segment has smaller actual size than both
+gso_size as well as the MTU, which leads to an "atomic fragment". It is
+considered harmful in RFC-8021. An Existing report from APNIC also shows
+that atomic fragments are more likely to be dropped even it is
+equivalent to a no-op [1].
 
-Am 16.10.23 um 11:49 schrieb Eric Dumazet:
-> On Sun, Oct 15, 2023 at 12:23=E2=80=AFPM Stefan Wahren <wahrenst@gmx.net=
-> wrote:
->> Hi,
->>
->> Am 15.10.23 um 01:26 schrieb Stefan Wahren:
->>> Hi Eric,
->>>
->>> Am 15.10.23 um 00:51 schrieb Eric Dumazet:
->>>> On Sat, Oct 14, 2023 at 9:40=E2=80=AFPM Neal Cardwell <ncardwell@goog=
-le.com>
->>>> wrote:
->> ...
->>>> Hmm, we receive ~3200 acks per second, I am not sure the
->>>> tcp_tso_should_defer() logic
->>>> would hurt ?
->>>>
->>>> Also the ss binary on the client seems very old, or its output has
->>>> been mangled perhaps ?
->>> this binary is from Yocto kirkstone:
->>>
->>> # ss --version
->>> ss utility, iproute2-5.17.0
->>>
->>> This shouldn't be too old. Maybe some missing kernel settings?
->>>
->> i think i was able to fix the issue by enable the proper kernel
->> settings. I rerun initial bad and good case again and overwrote the log
->> files:
->>
->> https://github.com/lategoodbye/tcp_tso_rtt_log_regress/commit/93615c94b=
-a1bf36bd47cc2b91dd44a3f58c601bc
-> Excellent, thanks.
->
-> I see your kernel uses HZ=3D100, have you tried HZ=3D1000 by any chance =
-?
->
-> CONFIG_HZ_1000=3Dy
-> CONFIG_HZ=3D1000
-i tried, but it doesn't have any influence.
-> I see that the bad run seems to be stuck for a while with cwnd=3D66, but
-> a smaller amount of packets in flight (26 in following ss extract)
->
-> ESTAB 0 315664 192.168.1.12:60542 192.168.1.129:5001
-> timer:(on,030ms,0) ino:13011 sk:2 <->
-> skmem:(r0,rb131072,t48488,tb295680,f3696,w319888,o0,bl0,d0) ts sack
-> cubic wscale:7,6 rto:210 rtt:3.418/1.117 mss:1448 pmtu:1500 rcvmss:536
-> advmss:1448 cwnd:66 ssthresh:20 bytes_sent:43874400
-> bytes_acked:43836753 segs_out:30302 segs_in:14110 data_segs_out:30300
-> send 223681685bps lastsnd:10 lastrcv:4310 pacing_rate 268408200bps
-> delivery_rate 46336000bps delivered:30275 busy:4310ms unacked:26
-> rcv_space:14480 rcv_ssthresh:64088 notsent:278016 minrtt:0.744
->
-> I wonder if fec pseudo-tso code is adding some kind of artifacts,
-> maybe with TCP small queue logic.
-> (TX completion might be delayed too much on fec driver side)
->
-> Can you try
->
-> ethtool -K eth0 tso off ?
-TSO off, CONFIG_HZ_100=3Dy
+Refactor __ip6_finish_output code to separate GSO and non-GSO packet
+processing. It mirrors __ip_finish_output logic now. Add an extra check
+in GSO handling to avoid atomic fragments. Lastly, drop dst_allfrag
+check, which is no longer true since commit 9d289715eb5c ("ipv6: stop
+sending PTB packets for MTU < 1280").
 
-root@tarragon:~# iperf -t 10 -i 1 -c 192.168.1.129
-=2D-----------------------------------------------------------
-Client connecting to 192.168.1.129, TCP port 5001
-TCP window size:=C2=A0 122 KByte (default)
-=2D-----------------------------------------------------------
-[=C2=A0 3] local 192.168.1.12 port 52326 connected with 192.168.1.129 port=
- 5001
-[ ID] Interval=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Transfer=C2=A0=C2=A0=C2=
-=A0=C2=A0 Bandwidth
-[=C2=A0 3]=C2=A0 0.0- 1.0 sec=C2=A0 11.6 MBytes=C2=A0 97.5 Mbits/sec
-[=C2=A0 3]=C2=A0 1.0- 2.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
-[=C2=A0 3]=C2=A0 2.0- 3.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
-[=C2=A0 3]=C2=A0 3.0- 4.0 sec=C2=A0 11.1 MBytes=C2=A0 93.3 Mbits/sec
-[=C2=A0 3]=C2=A0 4.0- 5.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
-[=C2=A0 3]=C2=A0 5.0- 6.0 sec=C2=A0 11.1 MBytes=C2=A0 93.3 Mbits/sec
-[=C2=A0 3]=C2=A0 6.0- 7.0 sec=C2=A0 11.4 MBytes=C2=A0 95.4 Mbits/sec
-[=C2=A0 3]=C2=A0 7.0- 8.0 sec=C2=A0 11.1 MBytes=C2=A0 93.3 Mbits/sec
-[=C2=A0 3]=C2=A0 8.0- 9.0 sec=C2=A0 11.5 MBytes=C2=A0 96.5 Mbits/sec
-[=C2=A0 3]=C2=A0 9.0-10.0 sec=C2=A0 11.1 MBytes=C2=A0 93.3 Mbits/sec
-[=C2=A0 3]=C2=A0 0.0-10.0 sec=C2=A0=C2=A0 113 MBytes=C2=A0 94.5 Mbits/sec
+Link: https://www.potaroo.net/presentations/2022-03-01-ipv6-frag.pdf [1]
+Fixes: b210de4f8c97 ("net: ipv6: Validate GSO SKB before finish IPv6 processing")
+Suggested-by: Florian Westphal <fw@strlen.de>
+Reported-by: David Wragg <dwragg@cloudflare.com>
+Signed-off-by: Yan Zhai <yan@cloudflare.com>
+---
+ net/ipv6/ip6_output.c | 33 +++++++++++++++++++++++----------
+ 1 file changed, 23 insertions(+), 10 deletions(-)
 
-The figures seems slightly better than tcp_tso_rtt_log =3D 0 -> Good
-> Alternatively I think I mentioned earlier that you could try to reduce
-> gso_max_size on a 100Mbit link
->
-> ip link set dev eth0 gso_max_size 16384
-TSO on, gso_max_size 16384, CONFIG_HZ_100=3Dy
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index a471c7e91761..1de6f3c11655 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -162,7 +162,14 @@ ip6_finish_output_gso_slowpath_drop(struct net *net, struct sock *sk,
+ 		int err;
+ 
+ 		skb_mark_not_on_list(segs);
+-		err = ip6_fragment(net, sk, segs, ip6_finish_output2);
++		/* Last gso segment might be smaller than actual MTU. Adding
++		 * a fragment header to it would produce an "atomic fragment",
++		 * which is considered harmful (RFC-8021)
++		 */
++		err = segs->len > mtu ?
++			ip6_fragment(net, sk, segs, ip6_finish_output2) :
++			ip6_finish_output2(net, sk, segs);
++
+ 		if (err && ret == 0)
+ 			ret = err;
+ 	}
+@@ -170,10 +177,19 @@ ip6_finish_output_gso_slowpath_drop(struct net *net, struct sock *sk,
+ 	return ret;
+ }
+ 
++static int ip6_finish_output_gso(struct net *net, struct sock *sk,
++				 struct sk_buff *skb, unsigned int mtu)
++{
++	if (!(IP6CB(skb)->flags & IP6SKB_FAKEJUMBO) &&
++	    !skb_gso_validate_network_len(skb, mtu))
++		return ip6_finish_output_gso_slowpath_drop(net, sk, skb, mtu);
++
++	return ip6_finish_output2(net, sk, skb);
++}
++
+ static int __ip6_finish_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+ 	unsigned int mtu;
+-
+ #if defined(CONFIG_NETFILTER) && defined(CONFIG_XFRM)
+ 	/* Policy lookup after SNAT yielded a new policy */
+ 	if (skb_dst(skb)->xfrm) {
+@@ -183,17 +199,14 @@ static int __ip6_finish_output(struct net *net, struct sock *sk, struct sk_buff
+ #endif
+ 
+ 	mtu = ip6_skb_dst_mtu(skb);
+-	if (skb_is_gso(skb) &&
+-	    !(IP6CB(skb)->flags & IP6SKB_FAKEJUMBO) &&
+-	    !skb_gso_validate_network_len(skb, mtu))
+-		return ip6_finish_output_gso_slowpath_drop(net, sk, skb, mtu);
++	if (skb_is_gso(skb))
++		return ip6_finish_output_gso(net, sk, skb, mtu);
+ 
+-	if ((skb->len > mtu && !skb_is_gso(skb)) ||
+-	    dst_allfrag(skb_dst(skb)) ||
++	if (skb->len > mtu ||
+ 	    (IP6CB(skb)->frag_max_size && skb->len > IP6CB(skb)->frag_max_size))
+ 		return ip6_fragment(net, sk, skb, ip6_finish_output2);
+-	else
+-		return ip6_finish_output2(net, sk, skb);
++
++	return ip6_finish_output2(net, sk, skb);
+ }
+ 
+ static int ip6_finish_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+-- 
+2.30.2
 
-root@tarragon:~# iperf -t 10 -i 1 -c 192.168.1.129
-=2D-----------------------------------------------------------
-Client connecting to 192.168.1.129, TCP port 5001
-TCP window size:=C2=A0 101 KByte (default)
-=2D-----------------------------------------------------------
-[=C2=A0 3] local 192.168.1.12 port 54548 connected with 192.168.1.129 port=
- 5001
-[ ID] Interval=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Transfer=C2=A0=C2=A0=C2=
-=A0=C2=A0 Bandwidth
-[=C2=A0 3]=C2=A0 0.0- 1.0 sec=C2=A0 11.4 MBytes=C2=A0 95.4 Mbits/sec
-[=C2=A0 3]=C2=A0 1.0- 2.0 sec=C2=A0 11.0 MBytes=C2=A0 92.3 Mbits/sec
-[=C2=A0 3]=C2=A0 2.0- 3.0 sec=C2=A0 10.9 MBytes=C2=A0 91.2 Mbits/sec
-[=C2=A0 3]=C2=A0 3.0- 4.0 sec=C2=A0 11.0 MBytes=C2=A0 92.3 Mbits/sec
-[=C2=A0 3]=C2=A0 4.0- 5.0 sec=C2=A0 10.6 MBytes=C2=A0 89.1 Mbits/sec
-[=C2=A0 3]=C2=A0 5.0- 6.0 sec=C2=A0 11.0 MBytes=C2=A0 92.3 Mbits/sec
-[=C2=A0 3]=C2=A0 6.0- 7.0 sec=C2=A0 10.9 MBytes=C2=A0 91.2 Mbits/sec
-[=C2=A0 3]=C2=A0 7.0- 8.0 sec=C2=A0 11.0 MBytes=C2=A0 92.3 Mbits/sec
-[=C2=A0 3]=C2=A0 8.0- 9.0 sec=C2=A0 10.8 MBytes=C2=A0 90.2 Mbits/sec
-[=C2=A0 3]=C2=A0 9.0-10.0 sec=C2=A0 10.9 MBytes=C2=A0 91.2 Mbits/sec
-[=C2=A0 3]=C2=A0 0.0-10.0 sec=C2=A0=C2=A0 109 MBytes=C2=A0 91.7 Mbits/sec
-
-The figures are similiar to tcp_tso_rtt_log =3D 0 -> Good
 
