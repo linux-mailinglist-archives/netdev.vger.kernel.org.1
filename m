@@ -1,135 +1,93 @@
-Return-Path: <netdev+bounces-41566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 896777CB52A
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 23:16:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4A447CB55D
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 23:39:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43A5B280EEB
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:16:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0CBCB20E2B
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA6837CB4;
-	Mon, 16 Oct 2023 21:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0296381B0;
+	Mon, 16 Oct 2023 21:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JXPkEXnw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HbBngGIZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6732770A
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 21:16:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97481EA
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 14:16:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697490973;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3SAiQPWvobnJto4O41BfA3AiFFWeyo/r47R6J0AOHwI=;
-	b=JXPkEXnw5OVcjWYAEAzWQqkpR6fCrQWnyJVJogu1PshfWw9mzFJYayXmHfyg0BQl1tRRK4
-	//uA5Eo4KR/qSV6yuMj7yKuMH76iQKzV8riTcm9lYfx2vp+hjI+JDgKHAMt8fUdXtcIDxT
-	8ttvhtvcCUBOwTKh6WpXBjZHieg92XE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-214-t7KphYJbOD-QLBESvVMFOw-1; Mon, 16 Oct 2023 17:16:09 -0400
-X-MC-Unique: t7KphYJbOD-QLBESvVMFOw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 463C7185A79B;
-	Mon, 16 Oct 2023 21:16:07 +0000 (UTC)
-Received: from [192.168.37.1] (unknown [10.22.48.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 28779492BFA;
-	Mon, 16 Oct 2023 21:16:04 +0000 (UTC)
-From: Benjamin Coddington <bcodding@redhat.com>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
- Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
- Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
- Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next v3 2/2] sunrpc: Use no_printk() in dfprintk*()
- dummies
-Date: Mon, 16 Oct 2023 17:16:03 -0400
-Message-ID: <AF5F4E44-08DE-4F4F-9BA0-3D7FC26554EF@redhat.com>
-In-Reply-To: <180fd042261dcd4243fad90660b114b8f0a78dcd.1697460614.git.geert+renesas@glider.be>
-References: <cover.1697460614.git.geert+renesas@glider.be>
- <180fd042261dcd4243fad90660b114b8f0a78dcd.1697460614.git.geert+renesas@glider.be>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A3737CA9
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 21:39:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5984C433C7;
+	Mon, 16 Oct 2023 21:39:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697492380;
+	bh=4gzug7NKJCMlF9uqYhZhGQUBdFYAs1xvnbnd9eTW8RI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=HbBngGIZZazNU8q65Fweoirkzv1vdclRvy4pdl4HYWvheg8ds2l6fflEU4GXhEmg0
+	 0vPKUt+AJehUJweWHEjlwu8cZPeGxzGrcI3edDDZTu82kEPSY6dx3W6pqm3n/heUgK
+	 l1vq9qQypdVV1WTWE6y1k5eidpcaePaX+T6QS1JIKAs15pwXaoYYeFDmfaGpb8/Z0F
+	 YPAMm2qqTr+rVQQrIMrmuwJs0ooAL51kt1JoT4Sp6MxpNNyadZCpabiJriZmk8wAcJ
+	 At+hAGt7dfL8wT1B6vzQBAl4heR+08Ai6n9VtQ/vIaoWXhVbLcdIyEzDenqut8jNvs
+	 uYdW6T4cBSU5g==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	donald.hunter@gmail.com
+Subject: [PATCH net-next] tools: ynl: fix converting flags to names after recent cleanup
+Date: Mon, 16 Oct 2023 14:39:37 -0700
+Message-ID: <20231016213937.1820386-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On 16 Oct 2023, at 9:09, Geert Uytterhoeven wrote:
+I recently cleaned up specs to not specify enum-as-flags
+when target enum is already defined as flags.
+YNL Python library did not convert flags, unfortunately,
+so this caused breakage for Stan and Willem.
 
-> When building NFS with W=3D1 and CONFIG_WERROR=3Dy, but
-> CONFIG_SUNRPC_DEBUG=3Dn:
->
->     fs/nfs/nfs4proc.c: In function =E2=80=98nfs4_proc_create_session=E2=
-=80=99:
->     fs/nfs/nfs4proc.c:9276:19: error: variable =E2=80=98ptr=E2=80=99 se=
-t but not used [-Werror=3Dunused-but-set-variable]
->      9276 |         unsigned *ptr;
-> 	  |                   ^~~
->       CC      fs/nfs/callback.o
->     fs/nfs/callback.c: In function =E2=80=98nfs41_callback_svc=E2=80=99=
-:
->     fs/nfs/callback.c:98:13: error: variable =E2=80=98error=E2=80=99 se=
-t but not used [-Werror=3Dunused-but-set-variable]
->        98 |         int error;
-> 	  |             ^~~~~
->       CC      fs/nfs/flexfilelayout/flexfilelayout.o
->     fs/nfs/flexfilelayout/flexfilelayout.c: In function =E2=80=98ff_lay=
-out_io_track_ds_error=E2=80=99:
->     fs/nfs/flexfilelayout/flexfilelayout.c:1230:13: error: variable =E2=
-=80=98err=E2=80=99 set but not used [-Werror=3Dunused-but-set-variable]
->      1230 |         int err;
-> 	  |             ^~~
->       CC      fs/nfs/flexfilelayout/flexfilelayoutdev.o
->     fs/nfs/flexfilelayout/flexfilelayoutdev.c: In function =E2=80=98nfs=
-4_ff_alloc_deviceid_node=E2=80=99:
->     fs/nfs/flexfilelayout/flexfilelayoutdev.c:55:16: error: variable =E2=
-=80=98ret=E2=80=99 set but not used [-Werror=3Dunused-but-set-variable]
->        55 |         int i, ret =3D -ENOMEM;
-> 	  |                ^~~
->
-> All these are due to variables that are set unconditionally, but are
-> used only when debugging is enabled.
->
-> Fix this by changing the dfprintk*() dummy macros from empty loops to
-> calls to the no_printk() helper.  This informs the compiler that the
-> passed debug parameters are actually used, and enables format specifier=
+Note that the nlspec.py abstraction already hides the differences
+between flags and enums (value vs user_value), so the changes
+are pretty trivial.
 
-> checking as a bonus.
->
-> This requires removing the protection by CONFIG_SUNRPC_DEBUG of the
-> declaration of nlmdbg_cookie2a() in fs/lockd/svclock.c, as its referenc=
-e
-> is now visible to the compiler, but optimized away.
->
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Acked-by: Jeff Layton <jlayton@kernel.org>
+Fixes: 0629f22ec130 ("ynl: netdev: drop unnecessary enum-as-flags")
+Reported-and-tested-by: Willem de Bruijn <willemb@google.com>
+Reported-and-tested-by: Stanislav Fomichev <sdf@google.com>
+Link: https://lore.kernel.org/all/ZS10NtQgd_BJZ3RU@google.com/
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: donald.hunter@gmail.com
+CC: sdf@google.com
+---
+ tools/net/ynl/lib/ynl.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Benjamin Coddington <bcodding@redhat.com>
-
-Ben
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index cc2930633f98..be479bd9dfc8 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -486,7 +486,7 @@ genl_family_name_to_id = None
+ 
+     def _decode_enum(self, raw, attr_spec):
+         enum = self.consts[attr_spec['enum']]
+-        if 'enum-as-flags' in attr_spec and attr_spec['enum-as-flags']:
++        if enum.type == 'flags' or attr_spec.get('enum-as-flags', False):
+             i = 0
+             value = set()
+             while raw:
+-- 
+2.41.0
 
 
