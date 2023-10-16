@@ -1,224 +1,154 @@
-Return-Path: <netdev+bounces-41441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 164DE7CB00F
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:42:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB6BA7CB01C
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:46:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CCEB1C20C3C
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:42:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1873E1C20AF7
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69AF2E639;
-	Mon, 16 Oct 2023 16:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4B728DD2;
+	Mon, 16 Oct 2023 16:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BwuNWpp6"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Z4/KbDyR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F4630F91
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:42:08 +0000 (UTC)
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233032720;
-	Mon, 16 Oct 2023 09:41:42 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-4181e268447so33585181cf.1;
-        Mon, 16 Oct 2023 09:41:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B657D30D0C;
+	Mon, 16 Oct 2023 16:46:26 +0000 (UTC)
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C77BC1A63B;
+	Mon, 16 Oct 2023 09:46:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697474501; x=1698079301; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=p4Tn0hTDyHkVTPWKQdaEhkQ4FlIC2s9fFr2Zb+BIJWk=;
-        b=BwuNWpp6KdPUEVuuaLRlKpGaooZIPbJfNB2TKrpul0/0HH0mR+eVgxNu55cNcJB2ts
-         MaLSI/0RHakEM3HeCHPgUvCPAGHbpWeI3OGXta6oS2VVRPf/87l423ZQcVNv3jyXAL0u
-         o0ETxKB+3RTRzKze1nNNxUhFIUQrEglWwVZrN7tc+3n7QK7eRvw9wcRXrowDy0vmJ+9r
-         WAFGdNVv8QIgLbI0f5LqBq52Vc5MwthhyX/7AJovdfRMjM9TRcfW+5RwxwJc4blaXniX
-         X2thCHBjgULSwLLoIJMHzht9vHhrWgEq55HkbCcsloMW1bQZ1vp5qFBOtMOUruMuYkpk
-         /gfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697474501; x=1698079301;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p4Tn0hTDyHkVTPWKQdaEhkQ4FlIC2s9fFr2Zb+BIJWk=;
-        b=k14ZfRlJoaLxxvGSqh+ZdIUgo2Rs9Y9uMOtE8GNR2opt5l4ttaxau0ieq9RCsnHECa
-         HFWjD7tYMrfN0zzsw2X2iBvuoz9qrwEqQhQvsfbuqnRPJYx7Hxo7W7l9sqjIzcTpgeP+
-         w6KNmIr/SmMmHTqo1yqHnfHB6/dll5q6SCz+gFI3TXx71dI6EAvrECakPz84zW12aSoi
-         r668IUzigJeXXorVj0ih2iMH36/oaW8V0GXtdcXWnEAGosNmhNaTT5TEKvaKfvh0ssKU
-         Qqp4jTrbVvWjSuNSWEkk5M6JFfWknbP+aQdk9cE02ZgOQnEoEyjX517DGACMCt2GygXa
-         r1sg==
-X-Gm-Message-State: AOJu0Yy/1zlgIygPs0j7qRa+7D0pAF6JMmEONbmllFkevEDNB2BfUBS/
-	A5EzvvhA/F+z/ZUr92l1gQI=
-X-Google-Smtp-Source: AGHT+IHqVpggNu+ii0SHrH08qvBi2XpiI/K0hmpxEmKsgbPNFoRSHIAP2DrOD7lqW1LrCmhEqgMNBw==
-X-Received: by 2002:ac8:7dd3:0:b0:410:9089:6b74 with SMTP id c19-20020ac87dd3000000b0041090896b74mr48344327qte.15.1697474500952;
-        Mon, 16 Oct 2023 09:41:40 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id bv10-20020a05622a0a0a00b004109d386323sm3138150qtb.66.2023.10.16.09.41.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 09:41:40 -0700 (PDT)
-Message-ID: <ea6918d3-7e8c-4e31-9efb-cb9f3360962a@gmail.com>
-Date: Mon, 16 Oct 2023 09:41:35 -0700
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697474785; x=1729010785;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=bq7RCfKU4ckrmiszPJvMeQ7TgL9PxzUxAwdnf3cz+x8=;
+  b=Z4/KbDyRMB7AHbzp9coLYrA4r096Tr/4kJP5bbhV+pMPhVZ2paXikNNa
+   GMkbx7knQvAimCQ+W8l6E96t70b0p71Rt2MwAMwMpYJSO6hgLEA1AlPRd
+   QD15F3e9ZoiZyPOsTUg2KTFT/yOd0hA+NbSH4yCGKgowPUNodntsm43Va
+   0=;
+X-IronPort-AV: E=Sophos;i="6.03,229,1694736000"; 
+   d="scan'208";a="160281536"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 16:46:21 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com (Postfix) with ESMTPS id BEF2FC0155;
+	Mon, 16 Oct 2023 16:46:19 +0000 (UTC)
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:62506]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.42:2525] with esmtp (Farcaster)
+ id 12b44c11-b47e-4375-acfd-00f44b761278; Mon, 16 Oct 2023 16:46:19 +0000 (UTC)
+X-Farcaster-Flow-ID: 12b44c11-b47e-4375-acfd-00f44b761278
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 16 Oct 2023 16:46:17 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.29) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 16 Oct 2023 16:46:13 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <willemdebruijn.kernel@gmail.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
+	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <martin.lau@linux.dev>,
+	<mykolal@fb.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<sdf@google.com>, <song@kernel.org>, <yonghong.song@linux.dev>
+Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie generation/validation SOCK_OPS hooks.
+Date: Mon, 16 Oct 2023 09:46:06 -0700
+Message-ID: <20231016164606.29484-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <652d46664a3db_1980fa29460@willemb.c.googlers.com.notmuch>
+References: <652d46664a3db_1980fa29460@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/2] net: dsa: Use conduit and user terms
-Content-Language: en-US
-To: Vladimir Oltean <olteanv@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- "open list:ARM/Mediatek SoC support" <linux-kernel@vger.kernel.org>,
- "moderated list:ARM/Mediatek SoC support"
- <linux-arm-kernel@lists.infradead.org>
-References: <20231013215251.152912-1-florian.fainelli@broadcom.com>
- <20231013215251.152912-1-florian.fainelli@broadcom.com>
- <20231013215251.152912-2-florian.fainelli@broadcom.com>
- <20231013215251.152912-2-florian.fainelli@broadcom.com>
- <20231016132334.b5pz7kw5oitk32z2@skbuf>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231016132334.b5pz7kw5oitk32z2@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.171.29]
+X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,UNPARSEABLE_RELAY autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/16/23 06:23, Vladimir Oltean wrote:
-> On Fri, Oct 13, 2023 at 02:52:50PM -0700, Florian Fainelli wrote:
->> Use more inclusive terms throughout the DSA subsystem by moving away
->> from "master" which is replaced by "conduit" and "slave" which is
->> replaced by "user". No functional changes.
->>
->> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
->> ---
->> diff --git a/Documentation/networking/dsa/configuration.rst b/Documentation/networking/dsa/configuration.rst
->> index d2934c40f0f1..e6c9719874b0 100644
->> --- a/Documentation/networking/dsa/configuration.rst
->> +++ b/Documentation/networking/dsa/configuration.rst
->> -Past this point, the DSA slave network devices get delivered regular Ethernet
->> +Past this point, the DSA user network devices get delivered regular Ethernet
->>   frames that can be processed by the networking stack.
->>   
->> -Slave network devices
->> +User network devices
->>   ---------------------
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 16 Oct 2023 10:19:18 -0400
+> Kuniyuki Iwashima wrote:
+> > Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
+> > for the connection request until a valid ACK is responded to the SYN+ACK.
+> > 
+> > The cookie contains two kinds of host-specific bits, a timestamp and
+> > secrets, so only can it be validated by the generator.  It means SYN
+> > Cookie consumes network resources between the client and the server;
+> > intermediate nodes must remember which nodes to route ACK for the cookie.
+> > 
+> > SYN Proxy reduces such unwanted resource allocation by handling 3WHS at
+> > the edge network.  After SYN Proxy completes 3WHS, it forwards SYN to the
+> > backend server and completes another 3WHS.  However, since the server's
+> > ISN differs from the cookie, the proxy must manage the ISN mappings and
+> > fix up SEQ/ACK numbers in every packet for each connection.  If a proxy
+> > node is down, all the connections through it are also down.  Keeping a
+> > state at proxy is painful from that perspective.
+> > 
+> > At AWS, we use a dirty hack to build truly stateless SYN Proxy at scale.
+> > Our SYN Proxy consists of the front proxy layer and the backend kernel
+> > module.  (See slides of netconf [0], p6 - p15)
+> > 
+> > The cookie that SYN Proxy generates differs from the kernel's cookie in
+> > that it contains a secret (called rolling salt) (i) shared by all the proxy
+> > nodes so that any node can validate ACK and (ii) updated periodically so
+> > that old cookies cannot be validated.  Also, ISN contains WScale, SACK, and
+> > ECN, not in TS val.  This is not to sacrifice any connection quality, where
+> > some customers turn off the timestamp option due to retro CVE.
 > 
-> Please adjust section underline width.
+> If easier: I think it should be possible to make the host secret
+> readable and writable with CAP_NET_ADMIN, to allow synchronizing
+> between hosts.
 
-Done.
+I think the idea is doable for syncookie_secret and syncookie6_secret.
+However, the cookie timestamp is generated based on jiffies that cannot
+be written.
 
-> 
-> Do we want a sentence in the documentation that clarifies that "user interfaces"
-> and "conduit interfaces" used to be called "slave interfaces" and "master interfaces"
-> (for 15 years), so that old time users don't get confused as to what happened?
+[ I answered sharing secrets would resolve our issue at netconf, but
+  I was wrong. ]
 
-Sure, we can do that.
 
-> 
->> @@ -863,7 +863,7 @@ int dsa_port_vlan_filtering(struct dsa_port *dp, bool vlan_filtering,
->>   }
->>   
->>   /* This enforces legacy behavior for switch drivers which assume they can't
->> - * receive VLAN configuration when enslaved to a bridge with vlan_filtering=0
->> + * receive VLAN configuration when enuserd to a bridge with vlan_filtering=0
-> 
-> when joining a bridge
-> 
->>    */
->>   bool dsa_port_skip_vlan_configuration(struct dsa_port *dp)
->>   {
->> @@ -1057,7 +1057,7 @@ static int dsa_switch_event(struct notifier_block *nb,
->>   		err = dsa_switch_tag_8021q_vlan_del(ds, info);
->>   		break;
->>   	case DSA_NOTIFIER_MASTER_STATE_CHANGE:
-> 
-> As Stephen points out, maybe you want to change this notifier name as well.
-> 
->> -		err = dsa_switch_master_state_change(ds, info);
->> +		err = dsa_switch_conduit_state_change(ds, info);
->>   		break;
->>   	default:
->>   		err = -EOPNOTSUPP;
->> diff --git a/net/dsa/tag.h b/net/dsa/tag.h
->> index 32d12f4a9d73..f6b9c73718df 100644
->> --- a/net/dsa/tag.h
->> +++ b/net/dsa/tag.h
->> @@ -9,7 +9,7 @@
->>   #include <net/dsa.h>
->>   
->>   #include "port.h"
->> -#include "slave.h"
->> +#include "user.h"
->>   
->>   struct dsa_tag_driver {
->>   	const struct dsa_device_ops *ops;
->> @@ -29,7 +29,7 @@ static inline int dsa_tag_protocol_overhead(const struct dsa_device_ops *ops)
->>   	return ops->needed_headroom + ops->needed_tailroom;
->>   }
->>   
->> -static inline struct net_device *dsa_master_find_slave(struct net_device *dev,
->> +static inline struct net_device *dsa_conduit_find_user(struct net_device *dev,
->>   						       int device, int port)
-> 
-> Please adjust alignment.
+> For similar reasons as suggested here, a rolling salt might be
+> useful more broadly too.
 
-checkpatch did not complain and my editor shows me the alignment appears 
-to be proper, what am I missing?
+Maybe we need not use jiffies and can create a worker to update the
+secret periodically if it's not configured manually.
 
-> 
->>   {
->>   	struct dsa_port *cpu_dp = dev->dsa_ptr;
->> diff --git a/net/dsa/tag_8021q.c b/net/dsa/tag_8021q.c
->> index cbdfc392f7e0..71b26ae6db39 100644
->> --- a/net/dsa/tag_8021q.c
->> +++ b/net/dsa/tag_8021q.c
->> @@ -468,10 +468,10 @@ struct sk_buff *dsa_8021q_xmit(struct sk_buff *skb, struct net_device *netdev,
->>   }
->>   EXPORT_SYMBOL_GPL(dsa_8021q_xmit);
->>   
->> -struct net_device *dsa_tag_8021q_find_port_by_vbid(struct net_device *master,
->> +struct net_device *dsa_tag_8021q_find_port_by_vbid(struct net_device *conduit,
->>   						   int vbid)
-> 
-> Alignment.
+The problem here would be that we need to update/read u64[4] atomically
+if we want to use SipHash or HSipHash.  Maybe this also can be changed.
 
-Likewise.
+But, we still want to use BPF as we need to encode (at least) WS and
+SACK bits in ISN, not TS and use different MSS candidates rather than
+msstab.
 
-> 
->>   {
->> -	struct dsa_port *cpu_dp = master->dsa_ptr;
->> +	struct dsa_port *cpu_dp = conduit->dsa_ptr;
->>   	struct dsa_switch_tree *dst = cpu_dp->dst;
->>   	struct dsa_port *dp;
->>   
->> diff --git a/net/dsa/tag_8021q.h b/net/dsa/tag_8021q.h
->> index b75cbaa028ef..41f7167ac520 100644
->> --- a/net/dsa/tag_8021q.h
->> +++ b/net/dsa/tag_8021q.h
->> @@ -16,7 +16,7 @@ struct sk_buff *dsa_8021q_xmit(struct sk_buff *skb, struct net_device *netdev,
->>   void dsa_8021q_rcv(struct sk_buff *skb, int *source_port, int *switch_id,
->>   		   int *vbid);
->>   
->> -struct net_device *dsa_tag_8021q_find_port_by_vbid(struct net_device *master,
->> +struct net_device *dsa_tag_8021q_find_port_by_vbid(struct net_device *conduit,
->>   						   int vbid);
-> 
-> Alignment.
+Also, in our use case, the validation for cookie itself is done in
+the front proxy layer, and the kernel will do more light-weight
+validation like checking if the cookie is forwarded from trusted
+nodes.  Then, we can prevent invalid ACK from flowing through the
+backend and consuming some networking entries, and the backend need
+not do full validation.
 
-Likewise.
--- 
-Florian
-
+With BPF, we can get such flexibility at encoding and validation, and
+making cookie generation algorithm private could be good for security.
 
