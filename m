@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-41432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CDE87CAEF0
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:20:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9639A7CAEF1
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:20:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47114281449
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:20:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 936E91C20ACB
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC4630CF7;
-	Mon, 16 Oct 2023 16:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB6B30D16;
+	Mon, 16 Oct 2023 16:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UEuOzUJU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WuQYN0K2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D45F27EFB
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:20:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0A1EFC433BA;
-	Mon, 16 Oct 2023 16:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0C230D0C
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:20:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A3DE6C433CA;
+	Mon, 16 Oct 2023 16:20:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697473226;
-	bh=prmnzMjJoC3orAuRSRPrA1N41eUMpXymOOpoOSxbUKA=;
+	s=k20201202; t=1697473227;
+	bh=OmDX71W8pnHJvXkCucPAjaUIHG3N468/aXGQVHPVYXQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UEuOzUJUytkjp3iOzEL0miyZ1udizh26dejpJNZtnKTs0b/4dDLAtC4Q46gek/YJ/
-	 jQIXUFqQk6q1rHD1OuhZys+ugAGOprFeLwOG3ovTZK6Ouj3xxgdgfihRjRrl+ay23V
-	 zGd+4JPsrs1FbkGn1EagnpEqznUjWqI+XnWy93K+zDOOQFTHyicixcQHyHwrUrdJa3
-	 2LOun3M+SNcG4MsjY0I66Uy1m/vMR6nTLlSsFPO5fWk96gNj4o5rLIRsw/qke1YRgy
-	 j4vole2UXQ0M/lBw90GekyR86oVzXaRgWcSOUm2N+/CMGDYfVBdkPvoysB+55rFmic
-	 Ayrp8jJnGCskA==
+	b=WuQYN0K2HpIwDAjzQiBVC5JrYoaVVtaLpuWb1pc+cdzeBkr+6x5S/jEu9XDMgt4rY
+	 oKm+/HfdeAsovwP8ukPV9BWFziId+OCUwR1IlO/AYEn1kIMRPiaxszRwMciqUDl13n
+	 HYdqJywsspuFeiLzrq82PQRmU/+WADdUUISr090Xg2J78wmFOGih6iA6y1ojqQmWDR
+	 5nDzZIdcLht1DfVBZ3Phy9MLaFfMP2DkdDGOe822bB3s0dOmy8cbHMNMWd3jcFGrPK
+	 OZzB8xOyIlTc9GRPcmlWBSaqtWVhQOdoBCt1HO6Xm7ll5CvrQLY7ApSFUWl0L3RTZX
+	 8ZUoKpv9/JvRA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E118CC4316B;
-	Mon, 16 Oct 2023 16:20:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 89C14C04E32;
+	Mon, 16 Oct 2023 16:20:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,34 +43,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute] ip: fix memory leak in 'ip maddr show'
+Subject: Re: [PATCH v2 iproute2-next 0/2] rdma: Support dumping SRQ resource in
+ raw format
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169747322590.5359.6865545494483517385.git-patchwork-notify@kernel.org>
-Date: Mon, 16 Oct 2023 16:20:25 +0000
-References: <7be84294-b02e-4280-89fb-cf222fbf0239@gmail.com>
-In-Reply-To: <7be84294-b02e-4280-89fb-cf222fbf0239@gmail.com>
-To: Maxim Petrov <mmrmaximuzz@gmail.com>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org
+ <169747322756.5359.10248022521412902967.git-patchwork-notify@kernel.org>
+Date: Mon, 16 Oct 2023 16:20:27 +0000
+References: <20231010075526.3860869-1-huangjunxian6@hisilicon.com>
+In-Reply-To: <20231010075526.3860869-1-huangjunxian6@hisilicon.com>
+To: Junxian Huang <huangjunxian6@hisilicon.com>
+Cc: jgg@ziepe.ca, leon@kernel.org, dsahern@gmail.com,
+ stephen@networkplumber.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linuxarm@huawei.com, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+This series was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-On Sun, 15 Oct 2023 16:32:12 +0200 you wrote:
-> In `read_dev_mcast`, the list of ma_info is allocated, but not cleared
-> after use. Free the list in the end to make valgrind happy.
+On Tue, 10 Oct 2023 15:55:24 +0800 you wrote:
+> This patchset adds support to dump SRQ resource in raw format with
+> rdmatool. The corresponding kernel commit is aebf8145e11a
+> ("RDMA/core: Add support to dump SRQ resource in RAW format")
 > 
-> Detected by valgrind: "valgrind ./ip/ip maddr show"
+> v2 adds the missing change in res_srq_idx_parse_cb().
 > 
-> Signed-off-by: Maxim Petrov <mmrmaximuzz@gmail.com>
+> Junxian Huang (1):
+>   rdma: Update uapi headers
 > 
 > [...]
 
 Here is the summary with links:
-  - [iproute] ip: fix memory leak in 'ip maddr show'
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=575322b09c3c
+  - [v2,iproute2-next,1/2] rdma: Update uapi headers
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=cd4315de422e
+  - [v2,iproute2-next,2/2] rdma: Add support to dump SRQ resource in raw format
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=07bfa4482d49
 
 You are awesome, thank you!
 -- 
