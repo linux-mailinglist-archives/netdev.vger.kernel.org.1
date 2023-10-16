@@ -1,178 +1,195 @@
-Return-Path: <netdev+bounces-41506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E15E7CB274
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:25:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D4247CB281
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EF2C1C2034D
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:25:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B20C1C2094A
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AF333997;
-	Mon, 16 Oct 2023 18:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6D5339A7;
+	Mon, 16 Oct 2023 18:27:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="RXZxHFGF"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Fxh3OEPp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E0931A70
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 18:25:44 +0000 (UTC)
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60526E1
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:25:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net; s=s31663417;
- t=1697480733; x=1698085533; i=wahrenst@gmx.net;
- bh=3/ON7I3LZ8x2C0p3GLrrWIJmHCRpz9LGGnbxlJL8lco=;
- h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
- b=RXZxHFGF9XlP1Itqee/CZ+bVAEEjhjiTLkAZZEVy1RcCMm5JO0Cbj12rzutGGYdHqcIRH8/LL5f
- kTN3ihn6TgsLS4PGdqzR0VqGxXNcnawl/mw8SoVAeZPjdbnP1FF7oeLgbrEIF6OXoqFQvI1+LyWc9
- yTEvuqTJng+f5TjYBcvorJz8hQjABWu8VA5CvUVtYl4HXqTV6VCZnP1ncUxel6Q7MY07yujg9VO1S
- puKV8fdciFI4OcQz/nG+v1JgxxCMShjGJm39uy0IlboI2duydFc/sikNn9axU7WihZUsrcBTTubS8
- KT9Q2nvqOj1RF4SipXV2Pcx+dOc2M8yS6hRA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M4JmN-1qsBIa0FW5-000HyD; Mon, 16
- Oct 2023 20:25:33 +0200
-Message-ID: <76a0c751-c827-4b6e-b27f-ced3ba2834fb@gmx.net>
-Date: Mon, 16 Oct 2023 20:25:32 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6667F31A70
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 18:27:21 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D07BE8
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:27:19 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53da72739c3so8144893a12.3
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:27:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1697480837; x=1698085637; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kb9SubRaEoUIylL4DNY5Xv/ATtzdMT7B3T3lbsOCFSw=;
+        b=Fxh3OEPpVrhXN/xHJQ6g07KTtmFfijds/o6sb6nz/xErJWTBQ26ILQE7zBfs7SK9zV
+         /VFvha3f9h6fLbWHC7eXcIm9m0YbA3NseM6tKfb+2H1zjio5aBkCom6TbwzBOvdRPTuk
+         ST/xrK2i+fiNk9DSi+MEU+Unvxr8V9pUqrzxLvIxjO2Ktr5dtxUaizw8roKgCWghVjq9
+         YwGcH0sXO2QjGLxcTEpXTknx2ikwV5yux1PbGc9LhExfu9zS9VU/RyGFr8D9myVtrEMb
+         Q19hb8aNM37zIQT6Av4cSSZlU6yZyMkDbWOB18bu6vNHCZwCEKtNg4WjHC18Pktb8x29
+         CErA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697480837; x=1698085637;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kb9SubRaEoUIylL4DNY5Xv/ATtzdMT7B3T3lbsOCFSw=;
+        b=f8W8bUNwSlJON/RbXX96c4XvauM0D3InxbfLgdqJ1jLCo9T82jucZe+T7UsXVEYU+W
+         q0hmpaAeOQHjYXnubBwek60tNsM9lPXKljk5v39pZTxGz9dpq7nGdfbiMjaZb38Ni0U+
+         lpWgEQhWlP5c39my5fTXyeOpTsMxJ0jJ/Ar3f2HzpCgizWfyATJASuKtK6XbsHI9JonD
+         H/Mjtbnly4aVs9tGEXaj3jZefZkbPn/7rxf7b/58aPKFKj7WAZnAbcbPOzT6uymaGet1
+         rDhh9kCrlcY/D6LPIJqK1NGDscZjwicKS2Knj9xk96gQckaZf09JdYPBKc1izpfja1py
+         2x+w==
+X-Gm-Message-State: AOJu0YwQe5nFVnMeeU3qps1k8PjRSdmxYH+s8c3QphB2ShY4wglxD6jF
+	AQY/lSbC3p/4omC74qUvDxxN6y/pRC8XF+coSdMzidSIqMj+XoJltRmxxw==
+X-Google-Smtp-Source: AGHT+IEQdYe/xZgPwgaTIyxFlobq2ZBO2NiSQKBCo2frWb0kJdJPZWrx8DCkc8xcZgoUSinrqhgQ9BPCNACc81tkAuo=
+X-Received: by 2002:a05:6402:51d4:b0:53d:eca8:8775 with SMTP id
+ r20-20020a05640251d400b0053deca88775mr34017edd.26.1697480837407; Mon, 16 Oct
+ 2023 11:27:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: iperf performance regression since Linux 5.18
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Fabio Estevam <festevam@gmail.com>, linux-imx@nxp.com,
- Stefan Wahren <stefan.wahren@chargebyte.com>,
- Michael Heimpold <mhei@heimpold.de>, netdev@vger.kernel.org,
- Yuchung Cheng <ycheng@google.com>
-References: <7f31ddc8-9971-495e-a1f6-819df542e0af@gmx.net>
- <CANn89iKY58YSknzOzkEHxFu=C=1_p=pXGAHGo9ZkAfAGon9ayw@mail.gmail.com>
- <CADVnQymV=nv53YaC8kLC1qT1ufhJL9+w_wcZ+8AHwPRG+JRdnw@mail.gmail.com>
- <a35b1a27-575f-4d19-ad2d-95bf4ded40e9@gmx.net>
- <CADVnQymM2HrGrMGyJX2QQ9PpgQT8JqsRz_0U8_WvdvzteqsfEQ@mail.gmail.com>
- <CANn89iL97hLAyHx9ee1VKTnLEgJeEVPrf_8-wf0BEBKAPQitPA@mail.gmail.com>
- <1ac3ea60-81d8-4501-b983-cb22b046f2ea@gmx.net>
- <a94b00d9-8bbc-4c54-b5c9-4a7902220312@gmx.net>
- <CANn89i+53WWxaZA5+cc9Yck8h+HTV6BvbybAnvTckriFfKpQMQ@mail.gmail.com>
- <CANn89iJUBujG2AOBYsr0V7qyC5WTgzx0GucO=2ES69tTDJRziw@mail.gmail.com>
-From: Stefan Wahren <wahrenst@gmx.net>
-In-Reply-To: <CANn89iJUBujG2AOBYsr0V7qyC5WTgzx0GucO=2ES69tTDJRziw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <ZS1/qtr0dZJ35VII@debian.debian>
+In-Reply-To: <ZS1/qtr0dZJ35VII@debian.debian>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Mon, 16 Oct 2023 13:27:06 -0500
+Message-ID: <CAO3-PboE=a_Z03bo10nmgdm3aHstxA_t4rtpAGekFzQAM+JOyA@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] ipv6: avoid atomic fragment on GSO packets
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Aya Levin <ayal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org, 
+	kernel-team@cloudflare.com, Florian Westphal <fw@strlen.de>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:GN46GLwkUyOpFJU23lryt1Dd5IH5huPjcl5yOVWE+4Bln3NBKJj
- 7D8GX31UmjtzJfur+uhLfRL4cLbjKxJ+4ClYPgkv/Z2G5grrZIoNf7+8EjwWmxg4fjQh4TX
- xAI/vM7pv1prEOXclfnH90HqAsZW5p1QWyVCvAaBWimaQWYIZ1ExjnYz25coYYemq7krvas
- q8rEAOufToEeCVOAnpCfQ==
-UI-OutboundReport: notjunk:1;M01:P0:fs1TsRK4P7Q=;cV9Jy61WmwlIDcG6Egnt38HIlTg
- XWdOEY4JCQr/6WmD5Id+ReH0bM1KlmZiTOfdYUwtMDQl9tfNWu0G1DOR2dDvGeRChkE6LEaX3
- CXDYFfYC1i7gnCqgmEDvKSli3EzvQkp1gl4IW+mXrsR/syvnLpexXSr4D0XKox4lgX/D6Wmyk
- WM2QHykMdFu8YlZPHG2hiXBNXzJ1purDHnEmRoBkaPRYGR35xoJb52ZuTQhErVzswEQF76W26
- N6T+WytHGKj/h1ruv4VNkyqmdXIxNrqWduT0hJU/bilNNRbMj+un6mP9/sZCWp5oIw4uQLva9
- psceYssd/fMSIcX0mnkeHAXzTG8ffoE9wkEeAFwFCQ9sg3rTpyI2gDiKteNURV0rVA6eU6+23
- pCn/VVEJbHeWNJ1ZoH3G7TErk0Y/6tvFYGg5bn7V1nO7Bc4K1dJn/4aN+/vy+WRbr/Mc5SXw5
- 3Xs6Nk57flnYo1RVCZb1vC+P70ihS8jQODV3c7bq4DrFqRdkExwkS1kWWio+3CCtVA4QigDPV
- zY8IhUgk6zURyA+gZJE4pJC+FGDWUuqcfNd9lECm9EH3OBf9DiEjhCb8kU4tevR9In7WKl3z9
- tFzs5fYHutSrN6/TS3p5s5FIJAA01Y1kBmWiKNubzYt7w7w/0XMU/6iPAVi9E2f6jOWi8/ksW
- /HggaPmQ6Z2cLpmIaKj3lrLuZYg1qgioX/iwnwFBv1LNzEmjHoMRixaApsjwzEcNbcBvN+ZcO
- ikScSP3BXFKCdGZa0RpqxzYWeXIyOFgHlgxs7CisPH4XwDrzT3IORxVoBCldStAdvxeV9tew4
- PpVInVMvcqPrNL3eggjW25l6+FFX7aY97nPkmgvsA0rUvxupeKSZZldjrsb5r2pRhYxvOYVVI
- L/X7kPDZzJxjz7CEG1Daqj3wiB/L1IQ2S5I0qKlhItAGq4LnPtmt51BYQhBtLzss4NWH3Gh16
- 7EL15w==
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Eric,
+On Mon, Oct 16, 2023 at 1:23=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wrote=
+:
+>
+> GSO packets can contain a trailing segment that is smaller than
+> gso_size. When examining the dst MTU for such packet, if its gso_size is
+> too large, then all segments would be fragmented. However, there is a
+> good chance the trailing segment has smaller actual size than both
+> gso_size as well as the MTU, which leads to an "atomic fragment". It is
+> considered harmful in RFC-8021. An Existing report from APNIC also shows
+> that atomic fragments are more likely to be dropped even it is
+> equivalent to a no-op [1].
+>
+> Refactor __ip6_finish_output code to separate GSO and non-GSO packet
+> processing. It mirrors __ip_finish_output logic now. Add an extra check
+> in GSO handling to avoid atomic fragments. Lastly, drop dst_allfrag
+> check, which is no longer true since commit 9d289715eb5c ("ipv6: stop
+> sending PTB packets for MTU < 1280").
+>
+> Link: https://www.potaroo.net/presentations/2022-03-01-ipv6-frag.pdf [1]
+> Fixes: b210de4f8c97 ("net: ipv6: Validate GSO SKB before finish IPv6 proc=
+essing")
+> Suggested-by: Florian Westphal <fw@strlen.de>
+> Reported-by: David Wragg <dwragg@cloudflare.com>
+> Signed-off-by: Yan Zhai <yan@cloudflare.com>
+> ---
+Forgot to add v1 thread:
+https://lore.kernel.org/lkml/20231002171146.GB9274@breakpoint.cc/. It
+was wrongly implemented though without considering max_frag_size for
+non-GSO packets though, so not really useful in fact.
 
-Am 16.10.23 um 12:35 schrieb Eric Dumazet:
-> On Mon, Oct 16, 2023 at 11:49=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> Speaking of TSQ, it seems an old change (commit 75eefc6c59fd "tcp:
-> tsq: add a shortcut in tcp_small_queue_check()")
-> has been accidentally removed in 2017 (75c119afe14f "tcp: implement
-> rb-tree based retransmit queue")
+>  net/ipv6/ip6_output.c | 33 +++++++++++++++++++++++----------
+>  1 file changed, 23 insertions(+), 10 deletions(-)
 >
-> Could you try this fix:
+> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+> index a471c7e91761..1de6f3c11655 100644
+> --- a/net/ipv6/ip6_output.c
+> +++ b/net/ipv6/ip6_output.c
+> @@ -162,7 +162,14 @@ ip6_finish_output_gso_slowpath_drop(struct net *net,=
+ struct sock *sk,
+>                 int err;
 >
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index 9c8c42c280b7638f0f4d94d68cd2c73e3c6c2bcc..e61a3a381d51b554ec844092=
-8e22a290712f0b6b
-> 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -2542,6 +2542,18 @@ static bool tcp_pacing_check(struct sock *sk)
->          return true;
->   }
+>                 skb_mark_not_on_list(segs);
+> -               err =3D ip6_fragment(net, sk, segs, ip6_finish_output2);
+> +               /* Last gso segment might be smaller than actual MTU. Add=
+ing
+> +                * a fragment header to it would produce an "atomic fragm=
+ent",
+> +                * which is considered harmful (RFC-8021)
+> +                */
+> +               err =3D segs->len > mtu ?
+> +                       ip6_fragment(net, sk, segs, ip6_finish_output2) :
+> +                       ip6_finish_output2(net, sk, segs);
+> +
+>                 if (err && ret =3D=3D 0)
+>                         ret =3D err;
+>         }
+> @@ -170,10 +177,19 @@ ip6_finish_output_gso_slowpath_drop(struct net *net=
+, struct sock *sk,
+>         return ret;
+>  }
 >
-> +static bool tcp_rtx_queue_empty_or_single_skb(const struct sock *sk)
+> +static int ip6_finish_output_gso(struct net *net, struct sock *sk,
+> +                                struct sk_buff *skb, unsigned int mtu)
 > +{
-> +       const struct rb_node *node =3D sk->tcp_rtx_queue.rb_node;
+> +       if (!(IP6CB(skb)->flags & IP6SKB_FAKEJUMBO) &&
+> +           !skb_gso_validate_network_len(skb, mtu))
+> +               return ip6_finish_output_gso_slowpath_drop(net, sk, skb, =
+mtu);
 > +
-> +       /* No skb in the rtx queue. */
-> +       if (!node)
-> +               return true;
-> +
-> +       /* Only one skb in rtx queue. */
-> +       return !node->rb_left && !node->rb_right;
+> +       return ip6_finish_output2(net, sk, skb);
 > +}
 > +
->   /* TCP Small Queues :
->    * Control number of packets in qdisc/devices to two packets / or ~1 m=
-s.
->    * (These limits are doubled for retransmits)
-> @@ -2579,12 +2591,12 @@ static bool tcp_small_queue_check(struct sock
-> *sk, const struct sk_buff *skb,
->                  limit +=3D extra_bytes;
->          }
->          if (refcount_read(&sk->sk_wmem_alloc) > limit) {
-> -               /* Always send skb if rtx queue is empty.
-> +               /* Always send skb if rtx queue is empty or has one skb.
->                   * No need to wait for TX completion to call us back,
->                   * after softirq/tasklet schedule.
->                   * This helps when TX completions are delayed too much.
->                   */
-> -               if (tcp_rtx_queue_empty(sk))
-> +               if (tcp_rtx_queue_empty_or_single_skb(sk))
->                          return false;
+>  static int __ip6_finish_output(struct net *net, struct sock *sk, struct =
+sk_buff *skb)
+>  {
+>         unsigned int mtu;
+> -
+>  #if defined(CONFIG_NETFILTER) && defined(CONFIG_XFRM)
+>         /* Policy lookup after SNAT yielded a new policy */
+>         if (skb_dst(skb)->xfrm) {
+> @@ -183,17 +199,14 @@ static int __ip6_finish_output(struct net *net, str=
+uct sock *sk, struct sk_buff
+>  #endif
 >
->                  set_bit(TSQ_THROTTLED, &sk->sk_tsq_flags);
-
-This patch applied on top of Linux 6.1.49, TSO on, gso_max_size 65535,
-CONFIG_HZ_100=3Dy
-
-root@tarragon:/boot# iperf -t 10 -i 1 -c 192.168.1.129
-=2D-----------------------------------------------------------
-Client connecting to 192.168.1.129, TCP port 5001
-TCP window size:=C2=A0 192 KByte (default)
-=2D-----------------------------------------------------------
-[=C2=A0 3] local 192.168.1.12 port 59714 connected with 192.168.1.129 port=
- 5001
-[ ID] Interval=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Transfer=C2=A0=C2=A0=C2=
-=A0=C2=A0 Bandwidth
-[=C2=A0 3]=C2=A0 0.0- 1.0 sec=C2=A0 11.5 MBytes=C2=A0 96.5 Mbits/sec
-[=C2=A0 3]=C2=A0 1.0- 2.0 sec=C2=A0 11.4 MBytes=C2=A0 95.4 Mbits/sec
-[=C2=A0 3]=C2=A0 2.0- 3.0 sec=C2=A0 11.1 MBytes=C2=A0 93.3 Mbits/sec
-[=C2=A0 3]=C2=A0 3.0- 4.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
-[=C2=A0 3]=C2=A0 4.0- 5.0 sec=C2=A0 11.1 MBytes=C2=A0 93.3 Mbits/sec
-[=C2=A0 3]=C2=A0 5.0- 6.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
-[=C2=A0 3]=C2=A0 6.0- 7.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
-[=C2=A0 3]=C2=A0 7.0- 8.0 sec=C2=A0 11.1 MBytes=C2=A0 93.3 Mbits/sec
-[=C2=A0 3]=C2=A0 8.0- 9.0 sec=C2=A0 11.4 MBytes=C2=A0 95.4 Mbits/sec
-[=C2=A0 3]=C2=A0 9.0-10.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
-[=C2=A0 3]=C2=A0 0.0-10.0 sec=C2=A0=C2=A0 113 MBytes=C2=A0 94.4 Mbits/sec
-
-The figures are comparable to disabling TSO -> Good
-
-Thanks
+>         mtu =3D ip6_skb_dst_mtu(skb);
+> -       if (skb_is_gso(skb) &&
+> -           !(IP6CB(skb)->flags & IP6SKB_FAKEJUMBO) &&
+> -           !skb_gso_validate_network_len(skb, mtu))
+> -               return ip6_finish_output_gso_slowpath_drop(net, sk, skb, =
+mtu);
+> +       if (skb_is_gso(skb))
+> +               return ip6_finish_output_gso(net, sk, skb, mtu);
+>
+> -       if ((skb->len > mtu && !skb_is_gso(skb)) ||
+> -           dst_allfrag(skb_dst(skb)) ||
+> +       if (skb->len > mtu ||
+>             (IP6CB(skb)->frag_max_size && skb->len > IP6CB(skb)->frag_max=
+_size))
+>                 return ip6_fragment(net, sk, skb, ip6_finish_output2);
+> -       else
+> -               return ip6_finish_output2(net, sk, skb);
+> +
+> +       return ip6_finish_output2(net, sk, skb);
+>  }
+>
+>  static int ip6_finish_output(struct net *net, struct sock *sk, struct sk=
+_buff *skb)
+> --
+> 2.30.2
+>
 
