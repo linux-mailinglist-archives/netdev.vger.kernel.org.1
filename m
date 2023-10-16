@@ -1,136 +1,90 @@
-Return-Path: <netdev+bounces-41387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C6FB7CACBA
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:00:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8C5F7CACCC
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:02:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51CEF1C20928
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:00:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53E8BB20D4F
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:02:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB61928E08;
-	Mon, 16 Oct 2023 15:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AF0328E0B;
+	Mon, 16 Oct 2023 15:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Tunkb17v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nwE77uyM"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9759F27EEB;
-	Mon, 16 Oct 2023 15:00:38 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD0A6AB;
-	Mon, 16 Oct 2023 08:00:35 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 24F11C000F;
-	Mon, 16 Oct 2023 15:00:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1697468434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ppkDtMZrQStND01nwr+Zoe8BhS+PL2DK/7cIl9/gVis=;
-	b=Tunkb17v62OZltx/uVcuSmnnpvWaf7eWs14cCjQdXud+YiNmf9b8dfoPyPsytcqbQeQA7L
-	VjDS1Pg9jpuQnAnijOqM3DGaanf6fTb5Cf8aMTzJjn1GojBFJ7s0YsVS6fIQ9bzpn/+Qfs
-	Jf4Nu8NbRMdud4fuJhsLVQEHgho6QWEEf6bbp6SkDP8UqjCabpuvecGIHcNQzgQG4kp0nG
-	qjwaADz2RPE6f+A1hOT/B0vSjFEZK8mHoBAoCnRLg3U5QtwvNedz2MOi0j/V/BKC0HSURL
-	eg3XISnf5MiyIMfl1O/nq/5YUUH6KZb4EHOffsD4rvWbrLqA7e6bvD2XMcSuhg==
-Date: Mon, 16 Oct 2023 17:00:27 +0200
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
- <florian.fainelli@broadcom.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Michael Walle <michael@walle.cc>, Jacob Keller
- <jacob.e.keller@intel.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v5 08/16] net: ethtool: Add a command to expose
- current time stamping layer
-Message-ID: <20231016170027.42806cb7@kmaincent-XPS-13-7390>
-In-Reply-To: <20231016072204.1cb41eab@kernel.org>
-References: <20231009155138.86458-1-kory.maincent@bootlin.com>
-	<20231009155138.86458-9-kory.maincent@bootlin.com>
-	<2fbde275-e60b-473d-8488-8f0aa637c294@broadcom.com>
-	<20231010102343.3529e4a7@kmaincent-XPS-13-7390>
-	<20231013090020.34e9f125@kernel.org>
-	<6ef6418d-6e63-49bd-bcc1-cdc6eb0da2d5@lunn.ch>
-	<20231016124134.6b271f07@kmaincent-XPS-13-7390>
-	<20231016072204.1cb41eab@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B46262A1;
+	Mon, 16 Oct 2023 15:02:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2663CC433C9;
+	Mon, 16 Oct 2023 15:02:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697468523;
+	bh=J5b7wIkmNDZePcl6689bb1lqUj0fI6CrDKw3d6N9cNQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nwE77uyMYSNbphoXAWn6ygCBN9Q7OQRXv+tz+SPnRISF379jWyUQyfomoc1+mxW+P
+	 NIZnRfAqC7tevyg0mOTjTv782qCPLA07+i1UgcSqJvOt9JSMVDjEwOCv2uPKAtxvmY
+	 vJRzQTj1EvdV5oQGdwUkT8mhnpJyD3Rl0m935hTPR6wFmLES/JXnhJs7MscEZtAaY9
+	 0bf7k93jUqoAJ/4bVq0BMXTEeIzsc46z1jqTcU7Ymq752JZSgaQ6nsayyXx0/2P7fB
+	 0qNmHFNfzp6Vtb6D7TS/cXVLLYFRvR0M0fDeIgPzfPK3YyK862ibFTE6AgjLW3C3Bc
+	 34jwcmi6xdGYw==
+Date: Mon, 16 Oct 2023 08:02:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+ <corbet@lwn.net>, <jesse.brandeburg@intel.com>,
+ <anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <vladimir.oltean@nxp.com>, <andrew@lunn.ch>,
+ <horms@kernel.org>, <mkubecek@suse.cz>, <linux-doc@vger.kernel.org>,
+ Wojciech Drewek <wojciech.drewek@intel.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH net-next v3 1/6] net: ethtool: allow symmetric-xor RSS
+ hash for any flow type
+Message-ID: <20231016080202.0d755ef3@kernel.org>
+In-Reply-To: <cf6c824a-be09-4b6c-b2a2-fb870e9f0c37@intel.com>
+References: <20231010200437.9794-1-ahmed.zaki@intel.com>
+	<20231010200437.9794-2-ahmed.zaki@intel.com>
+	<CAF=yD-+=3=MqqsHESPsgD0yCQSCA9qBe1mB1OVhSYuB_GhZK6g@mail.gmail.com>
+	<8d205051-d04c-42ff-a2c5-98fcd8545ecb@intel.com>
+	<CAF=yD-J=6atRuyhx+a9dvYkr3_Ydzqwwp0Pd1HkFsgNzzk01DQ@mail.gmail.com>
+	<cf6c824a-be09-4b6c-b2a2-fb870e9f0c37@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 16 Oct 2023 07:22:04 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Sat, 14 Oct 2023 06:19:54 -0600 Ahmed Zaki wrote:
+> >> +#define        RXH_SYMMETRIC_XOR       (1 << 30)
+> >> +#define        RXH_DISCARD             (1 << 31)
+> >>
+> >> Are these indentation changes intentional?
+> >>
+> >>
+> >> Yes, for alignment ("RXH_SYMMETRIC_XOR" is too long).  
+> > 
+> > I think it's preferable to not touch other lines. Among others, that
+> > messes up git blame. But it's subjective. Follow your preference if no
+> > one else chimes in.  
+> 
+> Jakub,
+> 
+> Sorry for late reply, I was off for few days.
+> 
+> I'd like to keep this version, I don't see any other comments that needs 
+> to be addressed. Can you accept this or need a v4/rebase ?
 
-> On Mon, 16 Oct 2023 12:41:34 +0200 K=C3=B6ry Maincent wrote:
-> > > Netdev vs phylib is an implementation detail of Linux.
-> > > I'm also surprised that you changed this.   =20
-> >=20
-> > This is the main reason I changed this. This is Linux implementation
-> > purpose to know whether it should go through netdev or phylib, and then
-> > each of these drivers could use other timestamps which are hardware
-> > related. =20
->=20
-> For an integrated design there's 90% chance the stamping is done=20
-> by the MAC. Even if it isn't there's no difference between PHY
-> and MAC in terms of quality.
+I think you should add a comment above the define explaining what
+"symmetric-xor" is. Is this correct?
 
-Ok, but there might be quality difference in case of several timestamp
-configuration done in the MAC. Like the timestamping precision vs frequency
-precision. In that case how ethtool would tell the driver to switch between
-them?
-
-My solution could work for this case by simply adding new values to the enu=
-m:
-
-enum {
-	NETDEV_TIMESTAMPING =3D (1 << 0),
-	PHYLIB_TIMESTAMPING =3D (1 << 1),
-	MAC_TS_PRECISION =3D (1 << 2)|(1 << 0),
-	MAC_FREQ_PRECISION =3D (2 << 2)|(1 << 0),
-}
-
-Automatically Linux will go through the netdev implementation and could pass
-the enum value to the netdev driver.
-
-> But there is a big difference between MAC/PHY and DMA which would
-> both fall under NETDEV?
-
-Currently there is no DMA timestamping support right? And I suppose it fill=
- fall
-under the net device management?
-
-In that case we will have MAC and DMA under netdev and PHY under phylib and
-we won't have to do anything more than this timestamping management patch:=
-=20
-https://lore.kernel.org/netdev/20231009155138.86458-14-kory.maincent@bootli=
-n.com/
+/* XOR corresponding source and destination fields, both copies 
+ * of the XOR'ed fields are fed into the RSS and RXHASH calculation.
+ */
 
