@@ -1,195 +1,139 @@
-Return-Path: <netdev+bounces-41507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D4247CB281
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:27:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64B387CB28B
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:33:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B20C1C2094A
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:27:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 912741C20AD7
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6D5339A7;
-	Mon, 16 Oct 2023 18:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9D12C86F;
+	Mon, 16 Oct 2023 18:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Fxh3OEPp"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="UTJrC6C3";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="S5UiA4Hq"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6667F31A70
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 18:27:21 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D07BE8
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:27:19 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53da72739c3so8144893a12.3
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:27:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1697480837; x=1698085637; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kb9SubRaEoUIylL4DNY5Xv/ATtzdMT7B3T3lbsOCFSw=;
-        b=Fxh3OEPpVrhXN/xHJQ6g07KTtmFfijds/o6sb6nz/xErJWTBQ26ILQE7zBfs7SK9zV
-         /VFvha3f9h6fLbWHC7eXcIm9m0YbA3NseM6tKfb+2H1zjio5aBkCom6TbwzBOvdRPTuk
-         ST/xrK2i+fiNk9DSi+MEU+Unvxr8V9pUqrzxLvIxjO2Ktr5dtxUaizw8roKgCWghVjq9
-         YwGcH0sXO2QjGLxcTEpXTknx2ikwV5yux1PbGc9LhExfu9zS9VU/RyGFr8D9myVtrEMb
-         Q19hb8aNM37zIQT6Av4cSSZlU6yZyMkDbWOB18bu6vNHCZwCEKtNg4WjHC18Pktb8x29
-         CErA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697480837; x=1698085637;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kb9SubRaEoUIylL4DNY5Xv/ATtzdMT7B3T3lbsOCFSw=;
-        b=f8W8bUNwSlJON/RbXX96c4XvauM0D3InxbfLgdqJ1jLCo9T82jucZe+T7UsXVEYU+W
-         q0hmpaAeOQHjYXnubBwek60tNsM9lPXKljk5v39pZTxGz9dpq7nGdfbiMjaZb38Ni0U+
-         lpWgEQhWlP5c39my5fTXyeOpTsMxJ0jJ/Ar3f2HzpCgizWfyATJASuKtK6XbsHI9JonD
-         H/Mjtbnly4aVs9tGEXaj3jZefZkbPn/7rxf7b/58aPKFKj7WAZnAbcbPOzT6uymaGet1
-         rDhh9kCrlcY/D6LPIJqK1NGDscZjwicKS2Knj9xk96gQckaZf09JdYPBKc1izpfja1py
-         2x+w==
-X-Gm-Message-State: AOJu0YwQe5nFVnMeeU3qps1k8PjRSdmxYH+s8c3QphB2ShY4wglxD6jF
-	AQY/lSbC3p/4omC74qUvDxxN6y/pRC8XF+coSdMzidSIqMj+XoJltRmxxw==
-X-Google-Smtp-Source: AGHT+IEQdYe/xZgPwgaTIyxFlobq2ZBO2NiSQKBCo2frWb0kJdJPZWrx8DCkc8xcZgoUSinrqhgQ9BPCNACc81tkAuo=
-X-Received: by 2002:a05:6402:51d4:b0:53d:eca8:8775 with SMTP id
- r20-20020a05640251d400b0053deca88775mr34017edd.26.1697480837407; Mon, 16 Oct
- 2023 11:27:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F07F34190;
+	Mon, 16 Oct 2023 18:33:22 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A46A2;
+	Mon, 16 Oct 2023 11:33:18 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 9340E21941;
+	Mon, 16 Oct 2023 18:33:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1697481195; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QkCIkhPVNqzKHJQMduEVPWqZGb5aCwOZAMiw/zbXR9E=;
+	b=UTJrC6C3SO/r3WQH6r5yJ9nuRF9VCxPuDyNRGuH7VkK9ichOpyY0/zEFJ5q4dn76WUhDx+
+	JC/Py8aMsEHrlKqhR4bPyvmJ8trS0KaX3qS7sAFW2c/jBLLOzYbowPDIcMSAdXVO7vH2Nx
+	Iy9FESfaLUjCH4c+60EgFHVZSFZjMsI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1697481195;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QkCIkhPVNqzKHJQMduEVPWqZGb5aCwOZAMiw/zbXR9E=;
+	b=S5UiA4Hq3Lwb/q9XN1YM7jBOWslZ3JKRi8PR5zmnZb7R7Xx5Q0Iz7zQafcSb645qj8DvhQ
+	eKUMkLOW3a8z3rCw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5DE9C138EF;
+	Mon, 16 Oct 2023 18:33:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id tLOLEeuBLWWWYQAAMHmgww
+	(envelope-from <krisman@suse.de>); Mon, 16 Oct 2023 18:33:15 +0000
+From: Gabriel Krisman Bertazi <krisman@suse.de>
+To: Breno Leitao <leitao@debian.org>
+Cc: sdf@google.com,  axboe@kernel.dk,  asml.silence@gmail.com,
+  willemdebruijn.kernel@gmail.com,  kuba@kernel.org,  pabeni@redhat.com,
+  martin.lau@linux.dev,  bpf@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  netdev@vger.kernel.org,
+  io-uring@vger.kernel.org
+Subject: Re: [PATCH v7 09/11] io_uring/cmd: Introduce
+ SOCKET_URING_OP_GETSOCKOPT
+In-Reply-To: <20231016134750.1381153-10-leitao@debian.org> (Breno Leitao's
+	message of "Mon, 16 Oct 2023 06:47:47 -0700")
+References: <20231016134750.1381153-1-leitao@debian.org>
+	<20231016134750.1381153-10-leitao@debian.org>
+Date: Mon, 16 Oct 2023 14:33:14 -0400
+Message-ID: <87bkcybeol.fsf@>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZS1/qtr0dZJ35VII@debian.debian>
-In-Reply-To: <ZS1/qtr0dZJ35VII@debian.debian>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Mon, 16 Oct 2023 13:27:06 -0500
-Message-ID: <CAO3-PboE=a_Z03bo10nmgdm3aHstxA_t4rtpAGekFzQAM+JOyA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] ipv6: avoid atomic fragment on GSO packets
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Aya Levin <ayal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org, 
-	kernel-team@cloudflare.com, Florian Westphal <fw@strlen.de>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -0.40
+X-Spamd-Result: default: False [-0.40 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TAGGED_RCPT(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-3.00)[-0.998];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-1.00)[-1.000];
+	 RCPT_COUNT_TWELVE(0.00)[12];
+	 INVALID_MSGID(1.70)[];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 RCVD_COUNT_TWO(0.00)[2];
+	 RCVD_TLS_ALL(0.00)[];
+	 SUSPICIOUS_RECIPS(1.50)[];
+	 FREEMAIL_CC(0.00)[google.com,kernel.dk,gmail.com,kernel.org,redhat.com,linux.dev,vger.kernel.org]
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,INVALID_MSGID,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 16, 2023 at 1:23=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wrote=
-:
->
-> GSO packets can contain a trailing segment that is smaller than
-> gso_size. When examining the dst MTU for such packet, if its gso_size is
-> too large, then all segments would be fragmented. However, there is a
-> good chance the trailing segment has smaller actual size than both
-> gso_size as well as the MTU, which leads to an "atomic fragment". It is
-> considered harmful in RFC-8021. An Existing report from APNIC also shows
-> that atomic fragments are more likely to be dropped even it is
-> equivalent to a no-op [1].
->
-> Refactor __ip6_finish_output code to separate GSO and non-GSO packet
-> processing. It mirrors __ip_finish_output logic now. Add an extra check
-> in GSO handling to avoid atomic fragments. Lastly, drop dst_allfrag
-> check, which is no longer true since commit 9d289715eb5c ("ipv6: stop
-> sending PTB packets for MTU < 1280").
->
-> Link: https://www.potaroo.net/presentations/2022-03-01-ipv6-frag.pdf [1]
-> Fixes: b210de4f8c97 ("net: ipv6: Validate GSO SKB before finish IPv6 proc=
-essing")
-> Suggested-by: Florian Westphal <fw@strlen.de>
-> Reported-by: David Wragg <dwragg@cloudflare.com>
-> Signed-off-by: Yan Zhai <yan@cloudflare.com>
-> ---
-Forgot to add v1 thread:
-https://lore.kernel.org/lkml/20231002171146.GB9274@breakpoint.cc/. It
-was wrongly implemented though without considering max_frag_size for
-non-GSO packets though, so not really useful in fact.
+Breno Leitao <leitao@debian.org> writes:
 
->  net/ipv6/ip6_output.c | 33 +++++++++++++++++++++++----------
->  1 file changed, 23 insertions(+), 10 deletions(-)
+> Add support for getsockopt command (SOCKET_URING_OP_GETSOCKOPT), where
+> level is SOL_SOCKET. This is leveraging the sockptr_t infrastructure,
+> where a sockptr_t is either userspace or kernel space, and handled as
+> such.
 >
-> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-> index a471c7e91761..1de6f3c11655 100644
-> --- a/net/ipv6/ip6_output.c
-> +++ b/net/ipv6/ip6_output.c
-> @@ -162,7 +162,14 @@ ip6_finish_output_gso_slowpath_drop(struct net *net,=
- struct sock *sk,
->                 int err;
+> Differently from the getsockopt(2), the optlen field is not a userspace
+> pointers. In getsockopt(2), userspace provides optlen pointer, which is
+> overwritten by the kernel.  In this implementation, userspace passes a
+> u32, and the new value is returned in cqe->res. I.e., optlen is not a
+> pointer.
 >
->                 skb_mark_not_on_list(segs);
-> -               err =3D ip6_fragment(net, sk, segs, ip6_finish_output2);
-> +               /* Last gso segment might be smaller than actual MTU. Add=
-ing
-> +                * a fragment header to it would produce an "atomic fragm=
-ent",
-> +                * which is considered harmful (RFC-8021)
-> +                */
-> +               err =3D segs->len > mtu ?
-> +                       ip6_fragment(net, sk, segs, ip6_finish_output2) :
-> +                       ip6_finish_output2(net, sk, segs);
-> +
->                 if (err && ret =3D=3D 0)
->                         ret =3D err;
->         }
-> @@ -170,10 +177,19 @@ ip6_finish_output_gso_slowpath_drop(struct net *net=
-, struct sock *sk,
->         return ret;
->  }
+> Important to say that userspace needs to keep the pointer alive until
+> the CQE is completed.
 >
-> +static int ip6_finish_output_gso(struct net *net, struct sock *sk,
-> +                                struct sk_buff *skb, unsigned int mtu)
-> +{
-> +       if (!(IP6CB(skb)->flags & IP6SKB_FAKEJUMBO) &&
-> +           !skb_gso_validate_network_len(skb, mtu))
-> +               return ip6_finish_output_gso_slowpath_drop(net, sk, skb, =
-mtu);
-> +
-> +       return ip6_finish_output2(net, sk, skb);
-> +}
-> +
->  static int __ip6_finish_output(struct net *net, struct sock *sk, struct =
-sk_buff *skb)
->  {
->         unsigned int mtu;
-> -
->  #if defined(CONFIG_NETFILTER) && defined(CONFIG_XFRM)
->         /* Policy lookup after SNAT yielded a new policy */
->         if (skb_dst(skb)->xfrm) {
-> @@ -183,17 +199,14 @@ static int __ip6_finish_output(struct net *net, str=
-uct sock *sk, struct sk_buff
->  #endif
->
->         mtu =3D ip6_skb_dst_mtu(skb);
-> -       if (skb_is_gso(skb) &&
-> -           !(IP6CB(skb)->flags & IP6SKB_FAKEJUMBO) &&
-> -           !skb_gso_validate_network_len(skb, mtu))
-> -               return ip6_finish_output_gso_slowpath_drop(net, sk, skb, =
-mtu);
-> +       if (skb_is_gso(skb))
-> +               return ip6_finish_output_gso(net, sk, skb, mtu);
->
-> -       if ((skb->len > mtu && !skb_is_gso(skb)) ||
-> -           dst_allfrag(skb_dst(skb)) ||
-> +       if (skb->len > mtu ||
->             (IP6CB(skb)->frag_max_size && skb->len > IP6CB(skb)->frag_max=
-_size))
->                 return ip6_fragment(net, sk, skb, ip6_finish_output2);
-> -       else
-> -               return ip6_finish_output2(net, sk, skb);
-> +
-> +       return ip6_finish_output2(net, sk, skb);
->  }
->
->  static int ip6_finish_output(struct net *net, struct sock *sk, struct sk=
-_buff *skb)
-> --
-> 2.30.2
->
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+
+I suspect you forgot to collect my previous r-b on this :).  Either way,
+still good to me:
+
+Reviewed-by: Gabriel Krisman Bertazi <krisman@suse.de>
+
+-- 
+Gabriel Krisman Bertazi
 
