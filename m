@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-41394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AD107CADAE
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:38:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B731E7CADB3
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:38:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B541F1C20AF3
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:38:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70EFB2815A6
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14392AB36;
-	Mon, 16 Oct 2023 15:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162032AB2C;
+	Mon, 16 Oct 2023 15:38:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dtq9Y6gW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+xELNq/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483B927729;
-	Mon, 16 Oct 2023 15:37:58 +0000 (UTC)
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC91AC;
-	Mon, 16 Oct 2023 08:37:54 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id 3f1490d57ef6-d9b9adaf291so1765412276.1;
-        Mon, 16 Oct 2023 08:37:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891482AB20;
+	Mon, 16 Oct 2023 15:38:19 +0000 (UTC)
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BDD8E6;
+	Mon, 16 Oct 2023 08:38:15 -0700 (PDT)
+Received: by mail-qv1-xf2d.google.com with SMTP id 6a1803df08f44-66d0169cf43so31065926d6.3;
+        Mon, 16 Oct 2023 08:38:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697470674; x=1698075474; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1697470694; x=1698075494; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=BZmLhijQjL/Xl626qWGcAXeacv5HX3ru3JVkU68P6Ks=;
-        b=dtq9Y6gWPaWyZhVxRxQcEF/J6g4SlaRCP++Eu4wiJHbtkqK9KJhPuyqcNupquWrqge
-         +DRrmPhLBt4Tba1vd2Dsy4mDWZfUwtzc8djtmlrg7GtankY7Sj3O6biAV3RMTEr4QtfV
-         9FYy+n46uEWl648TqgEpddNliuGx6uAIRKhkCf7lroW0cao+1EuFZ3fHkWvavE2KkrRf
-         h56Q8rfX1eMydZWrhoe164H8S6JtCKsipCzOHzfFhiKFcWfMVxi65X9pDgIFafsODCSr
-         lOSNZ4+FyPScQyd4fLBKJb7FJrvdxNKJu3GZkRoFowyHuwerEHY05rJtaJ/JiSmgX0Vt
-         PxXQ==
+        bh=E2U0tR8Dn0OrbtuxY9Iht1R/0yXE+tx6iPbJ9vem8lA=;
+        b=D+xELNq/ee3NM2fkVC6umSSgqvL09fPwudLyOX2exJwVXzES7svKsjauQtXN4xzHBB
+         K9qW6u+UZpfXvDhv23JjO1Cp/kIH3saY5bjOc1n+tbjXeC7A7feuYa+WT0TBsAec/7ux
+         BFN0L2Dj5q6/u5zhUZQa3+E+gqZl5QwTW1ZPzSWEySeczLF2YL8flAOEzlXgeaj2/w1I
+         pkRqWo97xKKlG21PS3buNSLBu/IZkv3v+U4NDvpcx0suFbh4kIa2atA9DDsczOrj2vIj
+         8Wlye+EN3fe9dSKPYBxAIfzS7lXUwlR6vl7D7xo2DRnLq9UYZxw9GMlzF3ADk3Ap5MWX
+         YQBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697470674; x=1698075474;
+        d=1e100.net; s=20230601; t=1697470694; x=1698075494;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BZmLhijQjL/Xl626qWGcAXeacv5HX3ru3JVkU68P6Ks=;
-        b=lwzyxq0CGGtBjfHm5KQSQ6f1UOT4VGeydtvU4Rh/wlgY8fA7MS6Rhk/B5xM3TwcymC
-         wEYYpS3ghkTcE7y+C/LNarJZ4Im1KJ862/CtZBA4OO83r7hXKrXMQUcEj1mbi38d9rWG
-         JG3Kjk4Mm9CHQ58XBG8qxdmcph7G1gJ1OghJMALLKJCOeV6OH0l5npQtHmCTo4Hw831h
-         jMkEzElBAWjQEuI0zH7c7TIUoz+IfuWt8E0Dt2aebvExXL3aPU3zcC7fXmHRz6PQf0o4
-         YHJXzOsRBlMEVJ6/cl7rAbWWSOypzxb0EFUKdz6q9e9jK7eVgLpnump13+hObrCufVDb
-         oLRA==
-X-Gm-Message-State: AOJu0YzlLIzfGTzYXAC7ki6JeN50tlgJElrjc5F7cE+gTgWDs0ZKVID+
-	1uiN/YPpIDzE0Xc410e8TB4=
-X-Google-Smtp-Source: AGHT+IHy6mf9prYlz0GRkgZRzgS21b1LhDsidbqwM/lb9PFH322tSlIj12p/qGeW1Fi0npbRYURV4g==
-X-Received: by 2002:a25:ac03:0:b0:d9b:3ef1:9b43 with SMTP id w3-20020a25ac03000000b00d9b3ef19b43mr8289896ybi.40.1697470673966;
-        Mon, 16 Oct 2023 08:37:53 -0700 (PDT)
+        bh=E2U0tR8Dn0OrbtuxY9Iht1R/0yXE+tx6iPbJ9vem8lA=;
+        b=FI62efblsIMKKdL9UFHH959ZuS4/lP6hx50oCVtBfJQj01NFH7Zdx6eyUK9e1tQlFN
+         JldILGUQskc0WLOV+aJ3vTgAKGvdZIw4hoLZ3mH3fB434YtZWW6nm4rjFn9OJQm7uW0w
+         MGjW8py/8U/i0EH6M82uRqe+T47i4KG1xqzfsvYN8M6GjwTG5hG0fwgNElFPC+siY8f8
+         sW/RlSMkvBgV1iR4xIBRkeoOe39zImho61a4UeIiDOEPAQdAgU8B9cc+WBiRDRQc4rKF
+         5WvcbL8Cmg4yBfhXwDRJLeeio7XIwQT+CDmCoXMrWrNkP7qRexYE0GvV3Cp0G6MPipXc
+         0IYA==
+X-Gm-Message-State: AOJu0Yxj87vX4Iz/d3Wz3zHF68/FkACavlV+ys0PGjc/9fHqYQ4BRjDJ
+	Mz5gI/yyIS/edOO4ZC0tp/Q=
+X-Google-Smtp-Source: AGHT+IE+/NQ04r2GBtb3Ol6v8SJTHrMX4/dRmnKz/g+W0jkZ6ZFmtKxJI1svJ6Uo9QHYAId/h7ZxEw==
+X-Received: by 2002:a05:6214:5004:b0:66d:20f5:23cb with SMTP id jo4-20020a056214500400b0066d20f523cbmr15060073qvb.5.1697470694262;
+        Mon, 16 Oct 2023 08:38:14 -0700 (PDT)
 Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id x21-20020a05620a14b500b00773f008da40sm3061221qkj.125.2023.10.16.08.37.51
+        by smtp.gmail.com with ESMTPSA id x21-20020a05620a14b500b00773f008da40sm3061221qkj.125.2023.10.16.08.38.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 08:37:53 -0700 (PDT)
-Message-ID: <97df39dc-daae-4334-bb80-d690851e5269@gmail.com>
-Date: Mon, 16 Oct 2023 08:37:50 -0700
+        Mon, 16 Oct 2023 08:38:13 -0700 (PDT)
+Message-ID: <f06813a8-cdf7-4013-928e-b4b20ec2d684@gmail.com>
+Date: Mon, 16 Oct 2023 08:38:11 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 4/9] net: dsa: microchip: ksz9477: add Wake on
- LAN support
+Subject: Re: [PATCH net-next v4 6/9] net: dsa: microchip: Refactor comment for
+ ksz_switch_macaddr_get() function
 Content-Language: en-US
 To: Oleksij Rempel <o.rempel@pengutronix.de>,
  "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
@@ -83,7 +83,7 @@ Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
  "Russell King (Oracle)" <linux@armlinux.org.uk>, devicetree@vger.kernel.org
 References: <20231016141256.2011861-1-o.rempel@pengutronix.de>
- <20231016141256.2011861-5-o.rempel@pengutronix.de>
+ <20231016141256.2011861-7-o.rempel@pengutronix.de>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -118,7 +118,7 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231016141256.2011861-5-o.rempel@pengutronix.de>
+In-Reply-To: <20231016141256.2011861-7-o.rempel@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -131,35 +131,9 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 
 On 10/16/2023 7:12 AM, Oleksij Rempel wrote:
-> Add WoL support for KSZ9477 family of switches. This code was tested on
-> KSZ8563 chip.
-> 
-> KSZ9477 family of switches supports multiple PHY events:
-> - wake on Link Up
-> - wake on Energy Detect.
-> Since current UAPI can't differentiate between this PHY events, map all of them
-> to WAKE_PHY.
+> Update the comment to follow kernel-doc format.
 > 
 > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
-[snip]
-> +void ksz9477_get_wol(struct ksz_device *dev, int port,
-> +		     struct ethtool_wolinfo *wol)
-> +{
-> +	u8 pme_ctrl, pme_conf;
-> +	int ret;
-> +
-> +	ret = ksz_read8(dev, REG_SW_PME_CTRL, &pme_conf);
-> +	if (ret)
-> +		return;
-> +
-> +	if (!(pme_conf & PME_ENABLE))
-> +		return;
-
-I suppose this works beause you have separate enable bits for 
-WOL_LINKUP, WOL_ENERGY and WOL_MAGICPKT, you could have also left the 
-setting of the PME_ENABLE bit to the set_wol() routine provided that 
-wol->wolopts is non-zero.
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
