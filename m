@@ -1,134 +1,86 @@
-Return-Path: <netdev+bounces-41509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A8317CB28E
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:33:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 524377CB2A3
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:39:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB6131C20B81
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:33:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 091A428174F
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A8230D00;
-	Mon, 16 Oct 2023 18:33:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960A030D02;
+	Mon, 16 Oct 2023 18:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="DEEpborb";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="wSh31jxG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LVOSe85L"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115EC3418A;
-	Mon, 16 Oct 2023 18:33:45 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8471195;
-	Mon, 16 Oct 2023 11:33:43 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 2808521941;
-	Mon, 16 Oct 2023 18:33:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1697481222; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uh1d2YtOaoK7v9g+0MCKG7i4FzpumtsR1ohj9YLCVzo=;
-	b=DEEpborbMwJOw2CqqeT0La1WoXpMB4iSb6jelaHeeahu0XJzJFc4zY/mmcJVBJIrShIlYO
-	uDL9Cg8szjvn/RfRLYe/eJK7S9YbsArF9EVpxgAm61miLAsUOo0NZs58MmtINiSfJoIBP7
-	VBKeG5xXaRG0zXb4resQO6GGJGyHzLg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1697481222;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uh1d2YtOaoK7v9g+0MCKG7i4FzpumtsR1ohj9YLCVzo=;
-	b=wSh31jxG5lMPPxuJ7w2GOPeTptKgeW6wHgAL4qipnjs37aWKk3kaP8du+5Lu2cnpjVoqEg
-	hVGYQcKXhptrB9BQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E62FE138EF;
-	Mon, 16 Oct 2023 18:33:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id ZU3RMgWCLWW8YQAAMHmgww
-	(envelope-from <krisman@suse.de>); Mon, 16 Oct 2023 18:33:41 +0000
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-To: Breno Leitao <leitao@debian.org>
-Cc: sdf@google.com,  axboe@kernel.dk,  asml.silence@gmail.com,
-  willemdebruijn.kernel@gmail.com,  kuba@kernel.org,  pabeni@redhat.com,
-  martin.lau@linux.dev,  bpf@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  netdev@vger.kernel.org,
-  io-uring@vger.kernel.org
-Subject: Re: [PATCH v7 10/11] io_uring/cmd: Introduce
- SOCKET_URING_OP_SETSOCKOPT
-In-Reply-To: <20231016134750.1381153-11-leitao@debian.org> (Breno Leitao's
-	message of "Mon, 16 Oct 2023 06:47:48 -0700")
-References: <20231016134750.1381153-1-leitao@debian.org>
-	<20231016134750.1381153-11-leitao@debian.org>
-Date: Mon, 16 Oct 2023 14:33:40 -0400
-Message-ID: <877cnmbenv.fsf@>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D750B341AA
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 18:39:35 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB162E8;
+	Mon, 16 Oct 2023 11:39:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=smJc+KZWUrYU3Au90yBTeYhcH3JmbRU7h9sw0eBa5ks=; b=LVOSe85LBQ5b1+axsRZNdpi8H/
+	CuiIrsbrhNuYmH4fh2PR7sBzwKcbxEwRumAwxKOxAXfEWQ7knuEUEVtWL2+whGszulIW71r/pGBCg
+	wyz8JU1/DwZ9AcOFG+qZ6kVXV5yplbkt3+U3TCM/psMJhq4QXm/Z3g3kh0LLMIiUV7wI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qsSUp-002Nl1-Sd; Mon, 16 Oct 2023 20:39:19 +0200
+Date: Mon, 16 Oct 2023 20:39:19 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Anwar, Md Danish" <a0501179@ti.com>
+Cc: MD Danish Anwar <danishanwar@ti.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>, r-gunasekaran@ti.com,
+	Roger Quadros <rogerq@kernel.org>
+Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix r30 CMDs bitmasks
+Message-ID: <a322d1c2-d79a-4b55-92f6-2b98c1f2266e@lunn.ch>
+References: <20231016161525.1695795-1-danishanwar@ti.com>
+ <11109e7d-139b-4c8c-beaa-e1e89e355b1b@lunn.ch>
+ <d7e56794-8061-bf18-bb6f-7525588546fc@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -0.40
-X-Spamd-Result: default: False [-0.40 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 BAYES_HAM(-0.00)[32.44%];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-3.00)[-0.998];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-1.00)[-1.000];
-	 RCPT_COUNT_TWELVE(0.00)[12];
-	 INVALID_MSGID(1.70)[];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 RCVD_TLS_ALL(0.00)[];
-	 SUSPICIOUS_RECIPS(1.50)[];
-	 FREEMAIL_CC(0.00)[google.com,kernel.dk,gmail.com,kernel.org,redhat.com,linux.dev,vger.kernel.org]
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,INVALID_MSGID,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d7e56794-8061-bf18-bb6f-7525588546fc@ti.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Breno Leitao <leitao@debian.org> writes:
+> > How many different versions of REL.PRU-ICSS-ETHERNET-SWITCH have been
+> > released? They don't appear to be part of linux-firmware.git :-(
+> > 
+> 
+> The firmwares are currently not posted to linux-firmware.git. They are
+> maintained internally as of now. Different version of firmware is
+> released for every SDK release (3-4 times a year)
 
-> Add initial support for SOCKET_URING_OP_SETSOCKOPT. This new command is
-> similar to setsockopt. This implementation leverages the function
-> do_sock_setsockopt(), which is shared with the setsockopt() system call
-> path.
->
-> Important to say that userspace needs to keep the pointer's memory alive
-> until the operation is completed. I.e, the memory could not be
-> deallocated before the CQE is returned to userspace.
->
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+Clearly, mainline works differently. Ideally you do want to get the
+firmware in linux-firmware.git. The kernel and firmware are then more
+likely to by upgraded at the same time. However, you should not assume
+so. Maybe in mainline you can then support the last 4 firmware
+versions, and issue an error if a version older than that is found.
 
-likewise..
+However, until the firmware is easily available via linux-firmware,
+you probably should be backwards compatible for a longer period.
 
-Reviewed-by: Gabriel Krisman Bertazi <krisman@suse.de>
-
--- 
-Gabriel Krisman Bertazi
+	Andrew
 
