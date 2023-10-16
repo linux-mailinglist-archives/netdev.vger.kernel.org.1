@@ -1,111 +1,142 @@
-Return-Path: <netdev+bounces-41475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD117CB153
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:28:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 283547CB169
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:34:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8805281613
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:28:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5C4328145F
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CCB31A92;
-	Mon, 16 Oct 2023 17:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CFA31A98;
+	Mon, 16 Oct 2023 17:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kzMuA8F+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LoyO6nLo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5400331A7E
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 17:28:21 +0000 (UTC)
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1091A1
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 10:28:18 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40684f53d11so55004975e9.1
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 10:28:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FF430CED
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 17:34:51 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E2AE83
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 10:34:49 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7dac80595so70564877b3.0
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 10:34:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697477297; x=1698082097; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GnUN5cuxAgIn1AVeXZDWW/Efxhy2T4tZCHS7uiiKgls=;
-        b=kzMuA8F+SZXWnOoOLwbjFBhyf3A2zoQnxTdAD/0BAgRWxlK/kF8d9Jva1U6HVSQ3D5
-         /V5v/XnJfNLJ0zHtfF2IRjr7/gGiP74VeHLhlbW7QwO/+6nvKzJ4uJFGUDd0ilk+qQ2p
-         N1jUORFJA4dyi9DCycILMwVHgikF1WSATJIbOXxjW9Ut2Sg8br8nS0z0jzPyYP2Tx9fx
-         pVVaJjS/OCXnoqBbnndjreUZv4GqROvmbpzfYf32738x2fzrdPUY4DaNmrehY7X6MB6n
-         t1PYx+7R5TbTs1DpYjR8bMv/sSmCBFFfhLw5p2ltpwVfLPV4rHE+YFMGDkvmvzabeXXZ
-         h8dQ==
+        d=google.com; s=20230601; t=1697477688; x=1698082488; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jdg0e3ntFTtv2Dafon8kmpSpFtJlb0KBcmQdXqXbSJU=;
+        b=LoyO6nLoUZvBlC1AscmIVzB+RrW6aYtooqQ9v+strp2+PZGtCLJjnkYcXiMrKv7p0/
+         CerrjPGRNj9CBfK1ZCiq57o834RLGo3WlGPYfOCKTfiqoHbT4Cy0cKMuTZYhpl1WPiOR
+         uV3ZhPZQoe3vDb3PjhXwnhqVTmUzEAozZQp/MWwMiWMwacH3V3ddQgOaiR6hoGbinRgc
+         O/5bqCqbYivB28dxnZTiEhE3rd75AxJZGwA3o11qurD6VJKUqzYYeP5dokaQtMZONxFV
+         vtR/oTbjJyin+RPBeP53yh9YvJFX9bjmw3u/8a5PPUKrnFob1+hZ5p7xDU89UN6wAiJt
+         7rng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697477297; x=1698082097;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GnUN5cuxAgIn1AVeXZDWW/Efxhy2T4tZCHS7uiiKgls=;
-        b=b9Ytj8ec2zk2onbQ5o565mfqN2H6jwIPTU1EFz0hTFX0coJCQUgK2x2rgZvu5t90NJ
-         GL6ApYN/zGlCfRoyl3CaZJSd2O+pIDID9bMWR15/pQj9RN8epXqPC9SNyxgn/bL3ACQU
-         K/4rANuIlojsePfzCEs+gQgKklw7URomBxEqB2lsSpwYDMKkf7SBQRXbQs4z/ohY6pPK
-         zwOmdYc5t3Jl9B8Jbna+PXMSCp/LPbPddPODNeKbU9c/tvuHVYZ9ENGMI8vUusgK9ge2
-         IZqWrQN86/3SlmvDagzfM4OPvM5wl/gjYwC6MjPqZv2KDIFxOTmsOioL3jMljpslknG+
-         cB/g==
-X-Gm-Message-State: AOJu0YzURHqNF4GsKfv7DliN3Ag1KOlQfG3VtRqmQfbcsl+KuWWutn1x
-	fathnUU0dzodPiaK1Gx+4+dLCQ==
-X-Google-Smtp-Source: AGHT+IFvIriZAI51ky7DuqcLEVh5b/T3s0wt9PW2D2Orplfm20a2U8/iKGSHNrjNFmituKSYmvwOjw==
-X-Received: by 2002:adf:f608:0:b0:32d:b19b:b3d9 with SMTP id t8-20020adff608000000b0032db19bb3d9mr94924wrp.2.1697477297102;
-        Mon, 16 Oct 2023 10:28:17 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id bq1-20020a5d5a01000000b0031ad5fb5a0fsm1906088wrb.58.2023.10.16.10.28.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 10:28:16 -0700 (PDT)
-Date: Mon, 16 Oct 2023 20:28:10 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Steve Glendinning <steve.glendinning@smsc.com>
-Cc: Steve Glendinning <steve.glendinning@shawell.net>,
-	UNGLinuxDriver@microchip.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net] net: usb: smsc95xx: Fix an error code in smsc95xx_reset()
-Message-ID: <147927f0-9ada-45cc-81ff-75a19dd30b76@moroto.mountain>
+        d=1e100.net; s=20230601; t=1697477688; x=1698082488;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jdg0e3ntFTtv2Dafon8kmpSpFtJlb0KBcmQdXqXbSJU=;
+        b=JrG3wHA1SU+Lg6WnrhrElh2W3qxJAacuAjF8b7B4yO05WgP3l/8bYxLlm/uOqQweBy
+         GzM6lhv3AyGh0doeSJi0l0hkhlSqyn4mQBtKb2TMvilAjLBhx51rTu+ZVqKiju4owMYn
+         5QgudMjyT3KUgClw6TwCNASNCmMP9qcpBIySypK3DxNzLTRd9VOxxxJYYXFJ4GWSd0DF
+         4UdnFoCFBu02yVkdS1LwJqZ+0rC44aaWLAyxiNhWVTb8Mo/tiv/02ib4sTWd9Fc9Uha/
+         NxL9dmOPpCzRDsXl9dVBs4vq5Ed8IyKNcxwCwx4Aqj8PmCb0HzRVZT56R/qUMF2b93Yn
+         /P4w==
+X-Gm-Message-State: AOJu0Yx+xceGlEu1tv+ZJ279Ex1rpSMW60Xp72s5BImkiNGw76zuErC+
+	rfy4iesGRgas6CpZ0vCd+4DFU88=
+X-Google-Smtp-Source: AGHT+IGvOTPVLTbGNVcb7CkA+o2+ORfNO6VwwKOAfBLygdSpR3YvaHz8TPMvLvneRr1hIwFZFBhGTjU=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a0d:ea90:0:b0:5a8:6162:b69 with SMTP id
+ t138-20020a0dea90000000b005a861620b69mr128429ywe.3.1697477688685; Mon, 16 Oct
+ 2023 10:34:48 -0700 (PDT)
+Date: Mon, 16 Oct 2023 10:34:46 -0700
+In-Reply-To: <20231003153416.2479808-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+References: <20231003153416.2479808-1-kuba@kernel.org> <20231003153416.2479808-2-kuba@kernel.org>
+Message-ID: <ZS10NtQgd_BJZ3RU@google.com>
+Subject: Re: [PATCH net-next 1/3] ynl: netdev: drop unnecessary enum-as-flags
+From: Stanislav Fomichev <sdf@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, lorenzo@kernel.org, willemb@google.com
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Return a negative error code instead of success.
+On 10/03, Jakub Kicinski wrote:
+> enum-as-flags can be used when enum declares bit positions but
+> we want to carry bitmask in an attribute. If the definition
+> is already provided as flags there's no need to indicate
+> the flag-iness of the attribute.
 
-Fixes: 2f7ca802bdae ("net: Add SMSC LAN9500 USB2.0 10/100 ethernet adapter driver")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/net/usb/smsc95xx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Jakub, Willem hit an issue with this commit when running cli.py:
 
-diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
-index 563ecd27b93e..17da42fe605c 100644
---- a/drivers/net/usb/smsc95xx.c
-+++ b/drivers/net/usb/smsc95xx.c
-@@ -897,7 +897,7 @@ static int smsc95xx_reset(struct usbnet *dev)
- 
- 	if (timeout >= 100) {
- 		netdev_warn(dev->net, "timeout waiting for completion of Lite Reset\n");
--		return ret;
-+		return -ETIMEDOUT;
- 	}
- 
- 	ret = smsc95xx_set_mac_address(dev);
--- 
-2.39.2
+./cli.py --spec $KDIR/Documentation/netlink/specs/netdev.yaml --dump dev-get --json='{"ifindex": 12}'
 
+Traceback (most recent call last):
+  File "/usr/local/google/home/sdf/net-next/tools/net/ynl/./cli.py", line 60, in <module>
+    main()
+  File "/usr/local/google/home/sdf/net-next/tools/net/ynl/./cli.py", line 51, in main
+    reply = ynl.dump(args.dump, attrs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/google/home/sdf/net-next/tools/net/ynl/lib/ynl.py", line 729, in dump
+    return self._op(method, vals, [], dump=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/google/home/sdf/net-next/tools/net/ynl/lib/ynl.py", line 714, in _op
+    rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/google/home/sdf/net-next/tools/net/ynl/lib/ynl.py", line 540, in _decode
+    decoded = self._decode_enum(decoded, attr_spec)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/google/home/sdf/net-next/tools/net/ynl/lib/ynl.py", line 486, in _decode_enum
+    value = enum.entries_by_val[raw].name
+            ~~~~~~~~~~~~~~~~~~~^^^^^
+KeyError: 127
+
+I do see we have special handing for enum-as-flags to parse out the
+individual fields:
+	if 'enum-as-flags' in attr_spec and attr_spec['enum-as-flags']:
+
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  Documentation/netlink/specs/netdev.yaml | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+> index c46fcc78fc04..14511b13f305 100644
+> --- a/Documentation/netlink/specs/netdev.yaml
+> +++ b/Documentation/netlink/specs/netdev.yaml
+> @@ -74,7 +74,6 @@ name: netdev
+>          doc: Bitmask of enabled xdp-features.
+>          type: u64
+>          enum: xdp-act
+> -        enum-as-flags: true
+>        -
+>          name: xdp-zc-max-segs
+>          doc: max fragment count supported by ZC driver
+> @@ -87,7 +86,6 @@ name: netdev
+>               See Documentation/networking/xdp-rx-metadata.rst for more details.
+>          type: u64
+>          enum: xdp-rx-metadata
+> -        enum-as-flags: true
+>  
+>  operations:
+>    list:
+> -- 
+> 2.41.0
+> 
 
