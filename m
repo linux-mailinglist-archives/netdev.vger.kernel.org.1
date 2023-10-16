@@ -1,145 +1,194 @@
-Return-Path: <netdev+bounces-41392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 785937CADA4
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:35:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DF127CADAC
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:37:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 803B3B20D4F
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:35:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27CC02813CE
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:37:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6216A2943E;
-	Mon, 16 Oct 2023 15:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488CE2943E;
+	Mon, 16 Oct 2023 15:37:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPlNsTjt"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JK+CR0UO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8F4286BC;
-	Mon, 16 Oct 2023 15:35:22 +0000 (UTC)
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAABD83;
-	Mon, 16 Oct 2023 08:35:20 -0700 (PDT)
-Received: by mail-qt1-x831.google.com with SMTP id d75a77b69052e-4181462ebf0so33127391cf.3;
-        Mon, 16 Oct 2023 08:35:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697470520; x=1698075320; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/8iWQdhdsbIjXfXAjbY1UOtDy3L9RcPIg9mUusmAaAU=;
-        b=OPlNsTjtm9+npbwzvTeB1HBCyoaUEl/Z4yGGi8HNJ/HHOwHIKJI+EI5uqcWsEYvzkq
-         B7uPiMBmRR92eLUMprMaKELD58c3Z9MpE0hPFM9I38SrITwLr7POvWmLVK1N75rByc9t
-         oweCkIQZE41gvV5BTm3IG0GRmiyubiJFl+YMc//o8LFbhEDuW0dDVIyCQLK3vGHCuVjq
-         tDbQdnuYQNkHecBG9DdvzOfam7UNfdQ+EF5Mn6QM3ncoO5TjI+4nTju2cT+KZvDv7akE
-         UCwnaouT13v6GjbRsOiizt0r07/L6HkIIo55yDS+5CvB0tBI+elR/5q7xdU+d4M3VwvT
-         ssqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697470520; x=1698075320;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/8iWQdhdsbIjXfXAjbY1UOtDy3L9RcPIg9mUusmAaAU=;
-        b=Q49lA6nSaQCI0WrPy7yAmhnJPN8rNAYji3IFuFbuX32SO0aOGVomv6thT9CEC5LoYG
-         uJMlT2nkl3AT2p4gLFLzkKT24QQsXHrS18gZzceaQZOdar5wJY3apw9cXCKQNIr87YFI
-         i6YxaOxcR2fuWQGBniIpc0NjksiYAQrWTFG32sPWLowiYeQzepYBSOTB/TgFt59CU4yf
-         mIg80sVaKM2S6kd4d+fH+C04fINqNT4HWkA6oifjyzSlh1RJcK/4dRHQCG8hUtU8FPk8
-         Iqe1TL9yg/um0FHP6oLxlv/6iDpQD2zeSaynWoyvtYrEun6PP7oEt0qPIO+hMp+k7xZ6
-         y7Qg==
-X-Gm-Message-State: AOJu0YyFyC6CpWB0LY7LSqBTAjan5jWFRFDgHlL5wHWd1Jc1ZCxkCPBk
-	GunhpZ/b81Bmc15QBx9uY30=
-X-Google-Smtp-Source: AGHT+IGK2V6aTDyDd3C2KpfFLn/lJmSy26tRdlpI6rfD9G/B8Gzk89cp+BWTyiVG1W6Os5R0TJEECg==
-X-Received: by 2002:ac8:59c9:0:b0:413:825:8f33 with SMTP id f9-20020ac859c9000000b0041308258f33mr40595326qtf.9.1697470519877;
-        Mon, 16 Oct 2023 08:35:19 -0700 (PDT)
-Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id v8-20020a05622a188800b00418142e802bsm3113484qtc.6.2023.10.16.08.35.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Oct 2023 08:35:19 -0700 (PDT)
-Message-ID: <b80fe176-e001-4fa1-a4ac-db5904e37852@gmail.com>
-Date: Mon, 16 Oct 2023 08:35:17 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412B528E2D
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 15:37:02 +0000 (UTC)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8D3EAB
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 08:36:59 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E5488E0006;
+	Mon, 16 Oct 2023 15:36:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1697470618;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DMOXgp4o1PrUZjkbvvxCGPoyCYh+0YWJORDBlMtyX5o=;
+	b=JK+CR0UOqwEs6LP27DAUH+yNSfdC0yhXKVKmctPoBJ6mtoOxLH2wA5tDr6l07nusOhBaDG
+	40Bk3JHqIzAtpe2a/cY1sNCpINSY1jIOPn1QH7albLqBCF06Ostnh6wWJStxR5JXUofTsa
+	uqyXGd5IoJkJuhiwhGCpZQbmUc/WqtPjhfRuWW7V8mc4M1reFzUKb6sEt2hwAYwMTcz9gP
+	Du3zPOcie9B67TZSxQIOzwFu1NmQXENb2gVjdOXapC+vkrq9aQrPanb+yiiZtV6tMcYqF7
+	zz3t4Qsyy6QCU6SHVdf9mcdFjH3HjzZoXZU09eo9TT2gSi4PwCRpkLBXjJK5Eg==
+Date: Mon, 16 Oct 2023 17:36:52 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Wei Fang
+ <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+ <xiaoning.wang@nxp.com>, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, linux-imx@nxp.com, netdev@vger.kernel.org, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, Stephen
+ Hemminger <stephen@networkplumber.org>
+Subject: Re: Ethernet issue on imx6
+Message-ID: <20231016173652.364997ae@xps-13>
+In-Reply-To: <20231016155858.7af3490b@xps-13>
+References: <20231012193410.3d1812cf@xps-13>
+	<ZShLX/ghL/b1Gbyz@shell.armlinux.org.uk>
+	<20231013104003.260cc2f1@xps-13>
+	<CANn89iKC9apkRG80eBPqsdKEkdawKzGt9EsBRLm61H=4Nn4jQQ@mail.gmail.com>
+	<20231016155858.7af3490b@xps-13>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 3/9] net: dsa: microchip: use wakeup-source DT
- property to enable PME output
-Content-Language: en-US
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
- Woojung Huh <woojung.huh@microchip.com>,
- Arun Ramadoss <arun.ramadoss@microchip.com>,
- Conor Dooley <conor+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Rob Herring <robh+dt@kernel.org>
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
- "Russell King (Oracle)" <linux@armlinux.org.uk>, devicetree@vger.kernel.org
-References: <20231016141256.2011861-1-o.rempel@pengutronix.de>
- <20231016141256.2011861-4-o.rempel@pengutronix.de>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231016141256.2011861-4-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hello again,
 
+> > > # iperf3 -c 192.168.1.1
+> > > Connecting to host 192.168.1.1, port 5201
+> > > [  5] local 192.168.1.2 port 37948 connected to 192.168.1.1 port 5201
+> > > [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+> > > [  5]   0.00-1.00   sec  11.3 MBytes  94.5 Mbits/sec   43   32.5 KByt=
+es
+> > > [  5]   1.00-2.00   sec  3.29 MBytes  27.6 Mbits/sec   26   1.41 KByt=
+es
+> > > [  5]   2.00-3.00   sec  0.00 Bytes  0.00 bits/sec    1   1.41 KBytes
+> > > [  5]   3.00-4.00   sec  0.00 Bytes  0.00 bits/sec    0   1.41 KBytes
+> > > [  5]   4.00-5.00   sec  0.00 Bytes  0.00 bits/sec    5   1.41 KBytes
+> > > [  5]   5.00-6.00   sec  0.00 Bytes  0.00 bits/sec    1   1.41 KBytes
+> > > [  5]   6.00-7.00   sec  0.00 Bytes  0.00 bits/sec    1   1.41 KBytes
+> > > [  5]   7.00-8.00   sec  0.00 Bytes  0.00 bits/sec    1   1.41 KBytes
+> > > [  5]   8.00-9.00   sec  0.00 Bytes  0.00 bits/sec    0   1.41 KBytes
+> > > [  5]   9.00-10.00  sec  0.00 Bytes  0.00 bits/sec    0   1.41 KBytes
+> > >
+> > > Thanks,
+> > > Miqu=C3=A8l   =20
+> >=20
+> > Can you experiment with :
+> >=20
+> > - Disabling TSO on your NIC (ethtool -K eth0 tso off)
+> > - Reducing max GSO size (ip link set dev eth0 gso_max_size 16384)
+> >=20
+> > I suspect some kind of issues with fec TX completion, vs TSO emulation.=
+ =20
+>=20
+> Wow, appears to have a significant effect. I am using Busybox's iproute
+> implementation which does not know gso_max_size, but I hacked directly
+> into netdevice.h just to see if it would have an effect. I'm adding
+> iproute2 to the image for further testing.
+>=20
+> Here is the diff:
+>=20
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -2364,7 +2364,7 @@ struct net_device {
+>  /* TCP minimal MSS is 8 (TCP_MIN_GSO_SIZE),
+>   * and shinfo->gso_segs is a 16bit field.
+>   */
+> -#define GSO_MAX_SIZE           (8 * GSO_MAX_SEGS)
+> +#define GSO_MAX_SIZE           16384u
+> =20
+>         unsigned int            gso_max_size;
+>  #define TSO_LEGACY_MAX_SIZE    65536
+>=20
+> And here are the results:
+>=20
+> # ethtool -K eth0 tso off
+> # iperf3 -c 192.168.1.1 -u -b1M
+> Connecting to host 192.168.1.1, port 5201
+> [  5] local 192.168.1.2 port 50490 connected to 192.168.1.1 port 5201
+> [ ID] Interval           Transfer     Bitrate         Total Datagrams
+> [  5]   0.00-1.00   sec   123 KBytes  1.01 Mbits/sec  87 =20
+> [  5]   1.00-2.00   sec   122 KBytes   996 Kbits/sec  86 =20
+> [  5]   2.00-3.00   sec   122 KBytes   996 Kbits/sec  86 =20
+> [  5]   3.00-4.00   sec   123 KBytes  1.01 Mbits/sec  87 =20
+> [  5]   4.00-5.00   sec   122 KBytes   996 Kbits/sec  86 =20
+> [  5]   5.00-6.00   sec   122 KBytes   996 Kbits/sec  86 =20
+> [  5]   6.00-7.00   sec   123 KBytes  1.01 Mbits/sec  87 =20
+> [  5]   7.00-8.00   sec   122 KBytes   996 Kbits/sec  86 =20
+> [  5]   8.00-9.00   sec   122 KBytes   996 Kbits/sec  86 =20
+> [  5]   9.00-10.00  sec   123 KBytes  1.01 Mbits/sec  87 =20
+> - - - - - - - - - - - - - - - - - - - - - - - - -
+> [ ID] Interval           Transfer     Bitrate         Jitter    Lost/Tota=
+l Datagrams
+> [  5]   0.00-10.00  sec  1.19 MBytes  1.00 Mbits/sec  0.000 ms  0/864 (0%=
+)  sender
+> [  5]   0.00-10.05  sec  1.11 MBytes   925 Kbits/sec  0.045 ms  62/864 (7=
+.2%)  receiver
+> iperf Done.
+> # iperf3 -c 192.168.1.1
+> Connecting to host 192.168.1.1, port 5201
+> [  5] local 192.168.1.2 port 34792 connected to 192.168.1.1 port 5201
+> [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+> [  5]   0.00-1.00   sec  1.63 MBytes  13.7 Mbits/sec   30   1.41 KBytes  =
+    =20
+> [  5]   1.00-2.00   sec  7.40 MBytes  62.1 Mbits/sec   65   14.1 KBytes  =
+    =20
+> [  5]   2.00-3.00   sec  7.83 MBytes  65.7 Mbits/sec  109   2.83 KBytes  =
+    =20
+> [  5]   3.00-4.00   sec  2.49 MBytes  20.9 Mbits/sec   46   19.8 KBytes  =
+    =20
+> [  5]   4.00-5.00   sec  7.89 MBytes  66.2 Mbits/sec  109   2.83 KBytes  =
+    =20
+> [  5]   5.00-6.00   sec   255 KBytes  2.09 Mbits/sec   22   2.83 KBytes  =
+    =20
+> [  5]   6.00-7.00   sec  4.35 MBytes  36.5 Mbits/sec   74   41.0 KBytes  =
+    =20
+> [  5]   7.00-8.00   sec  10.9 MBytes  91.8 Mbits/sec   34   45.2 KBytes  =
+    =20
+> [  5]   8.00-9.00   sec  5.35 MBytes  44.9 Mbits/sec   82   1.41 KBytes  =
+    =20
+> [  5]   9.00-10.00  sec  1.37 MBytes  11.5 Mbits/sec   73   1.41 KBytes  =
+    =20
+> - - - - - - - - - - - - - - - - - - - - - - - - -
+> [ ID] Interval           Transfer     Bitrate         Retr
+> [  5]   0.00-10.00  sec  49.5 MBytes  41.5 Mbits/sec  644             sen=
+der
+> [  5]   0.00-10.05  sec  49.3 MBytes  41.1 Mbits/sec                  rec=
+eiver
+> iperf Done.
+>=20
+> There is still a noticeable amount of drop/retries, but overall the
+> results are significantly better. What is the rationale behind the
+> choice of 16384 in particular? Could this be further improved?
 
-On 10/16/2023 7:12 AM, Oleksij Rempel wrote:
-> KSZ switches with WoL support signals wake event over PME pin. If this
-> pin is attached to some external PMIC or System Controller can't be
-> described as GPIO, the only way to describe it in the devicetree is to
-> use wakeup-source property. So, add support for this property and enable
-> PME switch output if this property is present.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Apparently I've been too enthusiastic. After sending this e-mail I've
+re-generated an image with iproute2 and dd'ed the whole image into an
+SD card, while until now I was just updating the kernel/DT manually and
+got the same performances as above without the gro size trick. I need
+to clarify this further.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+Thanks,
+Miqu=C3=A8l
 
