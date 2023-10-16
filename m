@@ -1,291 +1,198 @@
-Return-Path: <netdev+bounces-41405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4849F7CADDC
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:43:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73B527CADE2
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:43:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96AF1B20F8F
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:43:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5E20B20E6C
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5F32E620;
-	Mon, 16 Oct 2023 15:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615C22C85F;
+	Mon, 16 Oct 2023 15:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UD94NMhb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KqeONs3E"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2682AB23;
-	Mon, 16 Oct 2023 15:43:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70438C433C9;
-	Mon, 16 Oct 2023 15:43:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697470988;
-	bh=YQSftXDjlX2jFmFmLwmBjWy0+Qa2LejmfwOCODfHmbA=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=UD94NMhbAF0Hn1+u54/EiSInIpU2roomIDJ5upRsOMwiD4gpbndghYR0Y3z/fv+4c
-	 n4RR0XUcaGCV89ZTPYhcNgqO1pzHheP28GSQknY0DyiLSf2evkv3sUV85BJr1YFviP
-	 MWbvFXCBei0EDjy7na4F6lkyEd6BpjIflzijk2BSo5n64vyvFUKUaywLeMgxM6c7Rt
-	 Z7UZn8+coDOKKDanrSAqOmPEgCwOuy9Y2hJJXS82+jQlA/Zvf9E31UGGdpKBiyMzhj
-	 WhpkDThHBqGqaCh9truLhLS1Yn9oJHo701osnpf3pIFjG/1CAVk74vRPJx13IigKTT
-	 GrIkgpaY8NKdw==
-Message-ID: <11ec6f637698feb04963c6a7c39a5ca80af95464.camel@kernel.org>
-Subject: Re: [RFC PATCH 02/53] netfs: Track the fpos above which the server
- has no data
-From: Jeff Layton <jlayton@kernel.org>
-To: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Marc Dionne
- <marc.dionne@auristor.com>,  Paulo Alcantara <pc@manguebit.com>, Ronnie
- Sahlberg <lsahlber@redhat.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
- Talpey <tom@talpey.com>, Dominique Martinet <asmadeus@codewreck.org>, Ilya
- Dryomov <idryomov@gmail.com>, Christian Brauner <christian@brauner.io>,
- linux-afs@lists.infradead.org,  linux-cifs@vger.kernel.org,
- linux-nfs@vger.kernel.org,  ceph-devel@vger.kernel.org,
- v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,  linux-mm@kvack.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-cachefs@redhat.com
-Date: Mon, 16 Oct 2023 11:43:05 -0400
-In-Reply-To: <20231013155727.2217781-3-dhowells@redhat.com>
-References: <20231013155727.2217781-1-dhowells@redhat.com>
-	 <20231013155727.2217781-3-dhowells@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5FB2C86D;
+	Mon, 16 Oct 2023 15:43:14 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E467083;
+	Mon, 16 Oct 2023 08:43:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=soSU2MGTCT6ib3yKWFkcFVy9AAMSw/XWVbMCp1pCqhg=; b=KqeONs3E6YFOOlSFETWK7Q8GTY
+	YlS08xPPKyljyRF/L6L9u2r4vHOaWuzSBCr6Ur2EuGs6zNkCf1EPNFn9hCya1Nika9GANUrqU1vjB
+	a8j2f+ABuA1AXR42UydnF8eJob4tg3u7HoWDVaV/CSWaCT73CeHPIfN575EcaL9qfOvt/AnQOc/xu
+	yF5nEZwn9+JWisbExtpNqhB2+oswuT40un0/mdDNk7NIN26yyUCEaXYVrsw44FIaqOBF15bCxIGeL
+	ldgQadxFadc4sBt6N4pIpWUgVTFBaKJUCn7XJyd8KJBLwMLm6cvI8634KD5+j1LfetC7Us4L+10Gs
+	maISKUiw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51926 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1qsPkJ-0001fm-2J;
+	Mon, 16 Oct 2023 16:43:07 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1qsPkK-009wip-W9; Mon, 16 Oct 2023 16:43:09 +0100
+In-Reply-To: <ZS1Z5DDfHyjMryYu@shell.armlinux.org.uk>
+References: <ZS1Z5DDfHyjMryYu@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sean Anderson <sean.anderson@seco.com>
+Subject: [PATCH net-next 4/4] net: phylink: remove a bunch of unused
+ validation methods
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1qsPkK-009wip-W9@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 16 Oct 2023 16:43:08 +0100
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 2023-10-13 at 16:56 +0100, David Howells wrote:
-> Track the file position above which the server is not expected to have an=
-y
-> data and preemptively assume that we can simply fill blocks with zeroes
-> locally rather than attempting to download them - even if we've written
-> data back to the server.  Assume that any data that was written back abov=
-e
-> that position is held in the local cache.  Call this the "zero point".
->=20
-> Make use of this to optimise away some reads from the server.  We need to
-> set the zero point in the following circumstances:
->=20
->  (1) When we see an extant remote inode and have no cache for it, we set
->      the zero_point to i_size.
->=20
->  (2) On local inode creation, we set zero_point to 0.
->=20
->  (3) On local truncation down, we reduce zero_point to the new i_size if
->      the new i_size is lower.
->=20
->  (4) On local truncation up, we don't change zero_point.
->=20
->  (5) On local modification, we don't change zero_point.
->=20
->  (6) On remote invalidation, we set zero_point to the new i_size.
->=20
->  (7) If stored data is culled from the local cache, we must set zero_poin=
-t
->      above that if the data also got written to the server.
->=20
+Remove exports for phylink_caps_to_linkmodes(),
+phylink_get_capabilities(), phylink_validate_mask_caps() and
+phylink_generic_validate(). Also, as phylink_generic_validate() is no
+longer called, we can remove its implementation as well.
 
-When you say culled here, it sounds like you're just throwing out the
-dirty cache without writing the data back. That shouldn't be allowed
-though, so I must be misunderstanding what you mean here. Can you
-explain?
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phylink.c | 35 ++++++++---------------------------
+ include/linux/phylink.h   | 11 -----------
+ 2 files changed, 8 insertions(+), 38 deletions(-)
 
->  (8) If dirty data is written back to the server, but not the local cache=
-,
->      we must set zero_point above that.
->=20
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 1c7e73fa58e4..6712883498bb 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -257,7 +257,8 @@ static int phylink_interface_max_speed(phy_interface_t interface)
+  * Set all possible pause, speed and duplex linkmodes in @linkmodes that are
+  * supported by the @caps. @linkmodes must have been initialised previously.
+  */
+-void phylink_caps_to_linkmodes(unsigned long *linkmodes, unsigned long caps)
++static void phylink_caps_to_linkmodes(unsigned long *linkmodes,
++				      unsigned long caps)
+ {
+ 	if (caps & MAC_SYM_PAUSE)
+ 		__set_bit(ETHTOOL_LINK_MODE_Pause_BIT, linkmodes);
+@@ -400,7 +401,6 @@ void phylink_caps_to_linkmodes(unsigned long *linkmodes, unsigned long caps)
+ 		__set_bit(ETHTOOL_LINK_MODE_400000baseCR4_Full_BIT, linkmodes);
+ 	}
+ }
+-EXPORT_SYMBOL_GPL(phylink_caps_to_linkmodes);
+ 
+ static struct {
+ 	unsigned long mask;
+@@ -477,9 +477,9 @@ static unsigned long phylink_cap_from_speed_duplex(int speed,
+  * Get the MAC capabilities that are supported by the @interface mode and
+  * @mac_capabilities.
+  */
+-unsigned long phylink_get_capabilities(phy_interface_t interface,
+-				       unsigned long mac_capabilities,
+-				       int rate_matching)
++static unsigned long phylink_get_capabilities(phy_interface_t interface,
++					      unsigned long mac_capabilities,
++					      int rate_matching)
+ {
+ 	int max_speed = phylink_interface_max_speed(interface);
+ 	unsigned long caps = MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
+@@ -606,7 +606,6 @@ unsigned long phylink_get_capabilities(phy_interface_t interface,
+ 
+ 	return (caps & mac_capabilities) | matched_caps;
+ }
+-EXPORT_SYMBOL_GPL(phylink_get_capabilities);
+ 
+ /**
+  * phylink_validate_mask_caps() - Restrict link modes based on caps
+@@ -618,9 +617,9 @@ EXPORT_SYMBOL_GPL(phylink_get_capabilities);
+  * @supported and @state based on that. Use this function if your capabiliies
+  * aren't constant, such as if they vary depending on the interface.
+  */
+-void phylink_validate_mask_caps(unsigned long *supported,
+-				struct phylink_link_state *state,
+-				unsigned long mac_capabilities)
++static void phylink_validate_mask_caps(unsigned long *supported,
++				       struct phylink_link_state *state,
++				       unsigned long mac_capabilities)
+ {
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
+ 	unsigned long caps;
+@@ -634,24 +633,6 @@ void phylink_validate_mask_caps(unsigned long *supported,
+ 	linkmode_and(supported, supported, mask);
+ 	linkmode_and(state->advertising, state->advertising, mask);
+ }
+-EXPORT_SYMBOL_GPL(phylink_validate_mask_caps);
+-
+-/**
+- * phylink_generic_validate() - generic validate() callback implementation
+- * @config: a pointer to a &struct phylink_config.
+- * @supported: ethtool bitmask for supported link modes.
+- * @state: a pointer to a &struct phylink_link_state.
+- *
+- * Generic implementation of the validate() callback that MAC drivers can
+- * use when they pass the range of supported interfaces and MAC capabilities.
+- */
+-void phylink_generic_validate(struct phylink_config *config,
+-			      unsigned long *supported,
+-			      struct phylink_link_state *state)
+-{
+-	phylink_validate_mask_caps(supported, state, config->mac_capabilities);
+-}
+-EXPORT_SYMBOL_GPL(phylink_generic_validate);
+ 
+ static int phylink_validate_mac_and_pcs(struct phylink *pl,
+ 					unsigned long *supported,
+diff --git a/include/linux/phylink.h b/include/linux/phylink.h
+index 0cf559bae1ff..875439ab45de 100644
+--- a/include/linux/phylink.h
++++ b/include/linux/phylink.h
+@@ -613,17 +613,6 @@ void pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 		 phy_interface_t interface, int speed, int duplex);
+ #endif
+ 
+-void phylink_caps_to_linkmodes(unsigned long *linkmodes, unsigned long caps);
+-unsigned long phylink_get_capabilities(phy_interface_t interface,
+-				       unsigned long mac_capabilities,
+-				       int rate_matching);
+-void phylink_validate_mask_caps(unsigned long *supported,
+-				struct phylink_link_state *state,
+-				unsigned long caps);
+-void phylink_generic_validate(struct phylink_config *config,
+-			      unsigned long *supported,
+-			      struct phylink_link_state *state);
+-
+ struct phylink *phylink_create(struct phylink_config *,
+ 			       const struct fwnode_handle *,
+ 			       phy_interface_t,
+-- 
+2.30.2
 
-How do you write back without writing to the local cache? I'm guessing
-this means you're doing a non-buffered write?
-
-> Assuming the above, any read from the server at or above the zero_point
-> position will return all zeroes.
->=20
-> The zero_point value can be stored in the cache, provided the above rules
-> are applied to it by any code that culls part of the local cache.
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-cachefs@redhat.com
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
-> ---
->  fs/afs/inode.c           | 13 +++++++------
->  fs/netfs/buffered_read.c | 40 +++++++++++++++++++++++++---------------
->  include/linux/netfs.h    |  5 +++++
->  3 files changed, 37 insertions(+), 21 deletions(-)
->=20
-> diff --git a/fs/afs/inode.c b/fs/afs/inode.c
-> index 1c794a1896aa..46bc5574d6f5 100644
-> --- a/fs/afs/inode.c
-> +++ b/fs/afs/inode.c
-> @@ -252,6 +252,7 @@ static void afs_apply_status(struct afs_operation *op=
-,
->  		vnode->netfs.remote_i_size =3D status->size;
->  		if (change_size) {
->  			afs_set_i_size(vnode, status->size);
-> +			vnode->netfs.zero_point =3D status->size;
->  			inode_set_ctime_to_ts(inode, t);
->  			inode->i_atime =3D t;
->  		}
-> @@ -865,17 +866,17 @@ static void afs_setattr_success(struct afs_operatio=
-n *op)
->  static void afs_setattr_edit_file(struct afs_operation *op)
->  {
->  	struct afs_vnode_param *vp =3D &op->file[0];
-> -	struct inode *inode =3D &vp->vnode->netfs.inode;
-> +	struct afs_vnode *vnode =3D vp->vnode;
-> =20
->  	if (op->setattr.attr->ia_valid & ATTR_SIZE) {
->  		loff_t size =3D op->setattr.attr->ia_size;
->  		loff_t i_size =3D op->setattr.old_i_size;
-> =20
-> -		if (size < i_size)
-> -			truncate_pagecache(inode, size);
-> -		if (size !=3D i_size)
-> -			fscache_resize_cookie(afs_vnode_cache(vp->vnode),
-> -					      vp->scb.status.size);
-> +		if (size !=3D i_size) {
-> +			truncate_pagecache(&vnode->netfs.inode, size);
-> +			netfs_resize_file(&vnode->netfs, size);
-> +			fscache_resize_cookie(afs_vnode_cache(vnode), size);
-> +		}
-
-Isn't this an existing bug? AFS is not setting remote_i_size in the
-setattr path currently? I think this probably ought to be done in a
-preliminary AFS patch.
-
->
->  	}
->  }
-> =20
-> diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-> index 2cd3ccf4c439..a2852fa64ad0 100644
-> --- a/fs/netfs/buffered_read.c
-> +++ b/fs/netfs/buffered_read.c
-> @@ -147,6 +147,22 @@ static void netfs_rreq_expand(struct netfs_io_reques=
-t *rreq,
->  	}
->  }
-> =20
-> +/*
-> + * Begin an operation, and fetch the stored zero point value from the co=
-okie if
-> + * available.
-> + */
-> +static int netfs_begin_cache_operation(struct netfs_io_request *rreq,
-> +				       struct netfs_inode *ctx)
-> +{
-> +	int ret =3D -ENOBUFS;
-> +
-> +	if (ctx->ops->begin_cache_operation) {
-> +		ret =3D ctx->ops->begin_cache_operation(rreq);
-> +		/* TODO: Get the zero point value from the cache */
-> +	}
-> +	return ret;
-> +}
-> +
->  /**
->   * netfs_readahead - Helper to manage a read request
->   * @ractl: The description of the readahead request
-> @@ -180,11 +196,9 @@ void netfs_readahead(struct readahead_control *ractl=
-)
->  	if (IS_ERR(rreq))
->  		return;
-> =20
-> -	if (ctx->ops->begin_cache_operation) {
-> -		ret =3D ctx->ops->begin_cache_operation(rreq);
-> -		if (ret =3D=3D -ENOMEM || ret =3D=3D -EINTR || ret =3D=3D -ERESTARTSYS=
-)
-> -			goto cleanup_free;
-> -	}
-> +	ret =3D netfs_begin_cache_operation(rreq, ctx);
-> +	if (ret =3D=3D -ENOMEM || ret =3D=3D -EINTR || ret =3D=3D -ERESTARTSYS)
-> +		goto cleanup_free;
-> =20
->  	netfs_stat(&netfs_n_rh_readahead);
->  	trace_netfs_read(rreq, readahead_pos(ractl), readahead_length(ractl),
-> @@ -238,11 +252,9 @@ int netfs_read_folio(struct file *file, struct folio=
- *folio)
->  		goto alloc_error;
->  	}
-> =20
-> -	if (ctx->ops->begin_cache_operation) {
-> -		ret =3D ctx->ops->begin_cache_operation(rreq);
-> -		if (ret =3D=3D -ENOMEM || ret =3D=3D -EINTR || ret =3D=3D -ERESTARTSYS=
-)
-> -			goto discard;
-> -	}
-> +	ret =3D netfs_begin_cache_operation(rreq, ctx);
-> +	if (ret =3D=3D -ENOMEM || ret =3D=3D -EINTR || ret =3D=3D -ERESTARTSYS)
-> +		goto discard;
-> =20
->  	netfs_stat(&netfs_n_rh_readpage);
->  	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_readpag=
-e);
-> @@ -390,11 +402,9 @@ int netfs_write_begin(struct netfs_inode *ctx,
->  	rreq->no_unlock_folio	=3D folio_index(folio);
->  	__set_bit(NETFS_RREQ_NO_UNLOCK_FOLIO, &rreq->flags);
-> =20
-> -	if (ctx->ops->begin_cache_operation) {
-> -		ret =3D ctx->ops->begin_cache_operation(rreq);
-> -		if (ret =3D=3D -ENOMEM || ret =3D=3D -EINTR || ret =3D=3D -ERESTARTSYS=
-)
-> -			goto error_put;
-> -	}
-> +	ret =3D netfs_begin_cache_operation(rreq, ctx);
-> +	if (ret =3D=3D -ENOMEM || ret =3D=3D -EINTR || ret =3D=3D -ERESTARTSYS)
-> +		goto error_put;
-> =20
->  	netfs_stat(&netfs_n_rh_write_begin);
->  	trace_netfs_read(rreq, pos, len, netfs_read_trace_write_begin);
-> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-> index b447cb67f599..282511090ead 100644
-> --- a/include/linux/netfs.h
-> +++ b/include/linux/netfs.h
-> @@ -129,6 +129,8 @@ struct netfs_inode {
->  	struct fscache_cookie	*cache;
->  #endif
->  	loff_t			remote_i_size;	/* Size of the remote file */
-> +	loff_t			zero_point;	/* Size after which we assume there's no data
-> +						 * on the server */
-
-While I understand the concept, I'm not yet sure I understand how this
-new value will be used. It might be better to merge this patch in with
-the patch that adds the first user of this data.
-
->  };
-> =20
->  /*
-> @@ -330,6 +332,7 @@ static inline void netfs_inode_init(struct netfs_inod=
-e *ctx,
->  {
->  	ctx->ops =3D ops;
->  	ctx->remote_i_size =3D i_size_read(&ctx->inode);
-> +	ctx->zero_point =3D ctx->remote_i_size;
->  #if IS_ENABLED(CONFIG_FSCACHE)
->  	ctx->cache =3D NULL;
->  #endif
-> @@ -345,6 +348,8 @@ static inline void netfs_inode_init(struct netfs_inod=
-e *ctx,
->  static inline void netfs_resize_file(struct netfs_inode *ctx, loff_t new=
-_i_size)
->  {
->  	ctx->remote_i_size =3D new_i_size;
-> +	if (new_i_size < ctx->zero_point)
-> +		ctx->zero_point =3D new_i_size;
->  }
-> =20
->  /**
->=20
-
---=20
-Jeff Layton <jlayton@kernel.org>
 
