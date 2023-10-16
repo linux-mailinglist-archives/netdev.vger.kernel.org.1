@@ -1,151 +1,213 @@
-Return-Path: <netdev+bounces-41558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D45BE7CB4D0
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:38:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A687A7CB4D2
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:38:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57CD3B20F0A
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:38:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B3E9B21118
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7835830FBF;
-	Mon, 16 Oct 2023 20:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3C434195;
+	Mon, 16 Oct 2023 20:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Hn3b3B3N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fmYjLW7g"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D553E381A5
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 20:38:22 +0000 (UTC)
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E70D9B0
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:38:20 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-d9ad90e1038so5212760276.3
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:38:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3D0381A9
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 20:38:29 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D3DE9B
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:38:27 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9a3954f6dcso6126073276.2
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:38:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1697488700; x=1698093500; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ab1cQmjcNTze6NoCzSY8OfemgbBn41PWgBmFMxTMYIY=;
-        b=Hn3b3B3NlVrYztZVhDtlqnkLXvrqXaAJdS48nh/U7Zi58QTFGfugMU9pbG10NPJ1HX
-         P1iv3WW5UNxCKoKDAvsZFVcoexGC+KYhaLCMZfkMvNHwWYxNAzcx/mOJ/dug7Z41Bnc4
-         ZmcPTiIySZ/trb0FZN55gdT5BzrZX4yuv6p9ShgQEyBeCBNyhcAQNcMmRuK8aJZoWIzU
-         4F/O65E4jLPDwIbKMHktO4zClqQh+p9Mw+yOYgecSI7mJsFFqnMQ1PkvW/W80uD+gykX
-         1530c4Sp+MASfKJOrTCsn7cy+i6PKcTCYCfdpL8122n2dELYK2uCyaagawo7DGnYJppZ
-         ojvg==
+        d=google.com; s=20230601; t=1697488706; x=1698093506; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=42P4dDsvAvSKGIwNZvOmYDs0ORuSxxlM87KN6hrtLD0=;
+        b=fmYjLW7gdmf4+zObh+UiftQcIkGFvYuaf2R0CA2fDsFcRnAif/B8rczdThKZjfGDQ+
+         9dyD0u1TjSo9/DQYYJGVPKfDPFdpGzJdKLvMBpcXV14rEmcwjKwfgUS3CL3iIzk8lYJs
+         h+6Itijcbsl4fw48jN6zcHGNRcmxgzRdIuNVCK26QaJKbmcjlnKzJ12tq3YnqW+JmK9Q
+         ezW6dOt1+QhCkeA7j2qWUG5hZmjl4iA5azBHsmgiClXE9wBl6ZwBAjkKAC1qBvJ2A/L9
+         j2XqDgGcUded4NnKVnBn7VhZ5Cx9tnIHEfJs2qdp2yedlFDA2qpKx0eglOLhEV14wmEz
+         zvzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697488700; x=1698093500;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ab1cQmjcNTze6NoCzSY8OfemgbBn41PWgBmFMxTMYIY=;
-        b=EarJpgKKH78vRGsXwLWPpe+/aEoPns1qyGHvnTaQRo1yv6ooRHE1yVy7RjHkTEP0I2
-         5pGsqfynm9o+uvObPrzKGKhjrv75vV0eqGVWkPOxcOmSFnryxE4MhnpFyvN3A3FwnreD
-         s3Ln8KgvLXdC5ezs/om158bW17yvcVLIKUvI2XzCwVs1J7OPSOi7rS+S2n/17rnbeLPr
-         jm6OplWkD6ASV28+qx6bqYCSePGLOui/bVsr9uAN5OkBkWrUvZg9RqeiiVlsLbpp+6QN
-         Uw/JMR4Pa4RH0d7nFxEW+WyPouXtFb3VJ9fjV295VGI+f9yR7v52fuN8N275jKBaQ4sb
-         a9Ww==
-X-Gm-Message-State: AOJu0YxppY6SsWLhMoWojAyzGlJVC4YgJAapyfbZce6p/foq2nPI2QTl
-	E8nDbp94DCBfkbYWlgwbECIc+nga7cB3WSZYj+Uwjg==
-X-Google-Smtp-Source: AGHT+IE71mivRMzQPZ46xAL4eCKfL1kUMjj4mvMCTvlYF8+sZ8n46/5Qj7mYzDOtbWJa91vRbYjQVL46+KAyBgLJ/aI=
-X-Received: by 2002:a25:ad93:0:b0:d42:d029:ff99 with SMTP id
- z19-20020a25ad93000000b00d42d029ff99mr141119ybi.55.1697488700121; Mon, 16 Oct
- 2023 13:38:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697488706; x=1698093506;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=42P4dDsvAvSKGIwNZvOmYDs0ORuSxxlM87KN6hrtLD0=;
+        b=MsFx/+S7LEoaCwL+ZMCDay66YFuM+9P+XFsIJgQ9Y52S963Ciq9GirpTJ92mTPT2Un
+         Ra3xYfgW/th+3LqIuldrArfmBSsPmADS3oIcgEhx9f7o/sZN+oax1Hkihn9z8TYbGWAx
+         wfPmhUUv4qJzbEryWj6bszL0/6lRcah6LJWW7vId0WZe/UuAAvkZERXf+5qZnad+as71
+         bKAdty00dUQJLguKB/y7As812ecr0UlK7INMYsJfhfsFHJPLW5LncIZwZfX3wPI7RR/Q
+         tZ4y6uxIBDSkfwRK1S6A+mCB1HMMimQ4PCNuHag99iGHVoJAN6H0qSY03O2Cur/RgHRa
+         5wPA==
+X-Gm-Message-State: AOJu0YwKNz9XzfZp86EUaCj7BeAvNqEHL9cQ6DYfCFeyhWrQBLCmr3y0
+	8nL+tbJtecX5QiBqtpzXRbDhZ08=
+X-Google-Smtp-Source: AGHT+IFBJC21ZzwlnPuojmXXsct1gBdsNNB0JV8bT67i9SDfKY28G4YS+FVPrIQDwsmg4BkuR/UraXI=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a25:ac07:0:b0:d89:4d2c:d846 with SMTP id
+ w7-20020a25ac07000000b00d894d2cd846mr3217ybi.12.1697488706513; Mon, 16 Oct
+ 2023 13:38:26 -0700 (PDT)
+Date: Mon, 16 Oct 2023 13:38:25 -0700
+In-Reply-To: <20231013220433.70792-7-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231016093549.181952-1-jhs@mojatatu.com> <20231016131506.71ad76f5@kernel.org>
-In-Reply-To: <20231016131506.71ad76f5@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 16 Oct 2023 16:38:08 -0400
-Message-ID: <CAM0EoM=nT2KQcVqPrWvKJXnW7h8uodhu0daNsLkuAUt5n=zuZw@mail.gmail.com>
-Subject: Re: [PATCH v7 net-next 00/18] Introducing P4TC
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, anjali.singhai@intel.com, namrata.limaye@intel.com, 
-	deb.chatterjee@intel.com, john.andy.fingerhut@intel.com, dan.daly@intel.com, 
-	Vipin.Jain@amd.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
-	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, 
-	toke@redhat.com, mattyk@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+References: <20231013220433.70792-1-kuniyu@amazon.com> <20231013220433.70792-7-kuniyu@amazon.com>
+Message-ID: <ZS2fQXqhjRlG64kZ@google.com>
+Subject: Re: [PATCH v1 bpf-next 06/11] bpf: tcp: Add SYN Cookie validation
+ SOCK_OPS hook.
+From: Stanislav Fomichev <sdf@google.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Mykola Lysenko <mykolal@fb.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 16, 2023 at 4:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 16 Oct 2023 05:35:31 -0400 Jamal Hadi Salim wrote:
-> > Changes In RFC Version 7
-> > -------------------------
-> >
-> > 0) First time removing the RFC tag!
-> >
-> > 1) Removed XDP cookie. It turns out as was pointed out by Toke(Thanks!)=
- - that
-> > using bpf links was sufficient to protect us from someone replacing or =
-deleting
-> > a eBPF program after it has been bound to a netdev.
-> >
-> > 2) Add some reviewed-bys from Vlad.
-> >
-> > 3) Small bug fixes from v6 based on testing for ebpf.
-> >
-> > 4) Added the counter extern as a sample extern. Illustrating this examp=
-le because
-> >    it is slightly complex since it is possible to invoke it directly fr=
-om
-> >    the P4TC domain (in case of direct counters) or from eBPF (indirect =
-counters).
-> >    It is not exactly the most efficient implementation (a reasonable co=
-unter impl
-> >    should be per-cpu).
->
-> I think that I already shared my reservations about this series.
+On 10/13, Kuniyuki Iwashima wrote:
+> This patch adds a new SOCK_OPS hook to validate arbitrary SYN Cookie.
+> 
+> When the kernel receives ACK for SYN Cookie, the hook is invoked with
+> bpf_sock_ops.op == BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB if the listener has
+> BPF_SOCK_OPS_SYNCOOKIE_CB_FLAG set by bpf_sock_ops_cb_flags_set().
+> 
+> The BPF program can access the following information to validate ISN:
+> 
+>   bpf_sock_ops.sk      : 4-tuple
+>   bpf_sock_ops.skb     : TCP header
+>   bpf_sock_ops.args[0] : ISN
+> 
+> The program must decode MSS and set it to bpf_sock_ops.replylong[0].
+> 
+> By default, the kernel validates SYN Cookie before allocating reqsk, but
+> the hook is invoked after allocating reqsk to keep the user interface
+> consistent with BPF_SOCK_OPS_GEN_SYNCOOKIE_CB.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  include/net/tcp.h              | 12 ++++++
+>  include/uapi/linux/bpf.h       | 20 +++++++---
+>  net/ipv4/syncookies.c          | 73 +++++++++++++++++++++++++++-------
+>  net/ipv6/syncookies.c          | 44 +++++++++++++-------
+>  tools/include/uapi/linux/bpf.h | 20 +++++++---
+>  5 files changed, 130 insertions(+), 39 deletions(-)
+> 
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 676618c89bb7..90d95acdc34a 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -2158,6 +2158,18 @@ static inline __u32 cookie_init_sequence(const struct tcp_request_sock_ops *ops,
+>  	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESSENT);
+>  	return ops->cookie_init_seq(skb, mss);
+>  }
+> +
+> +#ifdef CONFIG_CGROUP_BPF
+> +int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req,
+> +			   struct sk_buff *skb);
+> +#else
+> +static inline int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req,
+> +					 struct sk_buff *skb)
+> +{
+> +	return 0;
+> +}
+> +#endif
+> +
+>  #else
+>  static inline __u32 cookie_init_sequence(const struct tcp_request_sock_ops *ops,
+>  					 const struct sock *sk, struct sk_buff *skb,
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index d3cc530613c0..e6f1507d7895 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -6738,13 +6738,16 @@ enum {
+>  	 * options first before the BPF program does.
+>  	 */
+>  	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
+> -	/* Call bpf when the kernel generates SYN Cookie (ISN) for SYN+ACK.
+> +	/* Call bpf when the kernel generates SYN Cookie (ISN) for SYN+ACK
+> +	 * and validates ACK for SYN Cookie.
+>  	 *
+> -	 * The bpf prog will be called to encode MSS into SYN Cookie with
+> -	 * sock_ops->op == BPF_SOCK_OPS_GEN_SYNCOOKIE_CB.
+> +	 * The bpf prog will be first called to encode MSS into SYN Cookie
+> +	 * with sock_ops->op == BPF_SOCK_OPS_GEN_SYNCOOKIE_CB.  Then, the
+> +	 * bpf prog will be called to decode MSS from SYN Cookie with
+> +	 * sock_ops->op == BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB.
+>  	 *
+> -	 * Please refer to the comment in BPF_SOCK_OPS_GEN_SYNCOOKIE_CB for
+> -	 * input and output.
+> +	 * Please refer to the comment in BPF_SOCK_OPS_GEN_SYNCOOKIE_CB and
+> +	 * BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB for input and output.
+>  	 */
+>  	BPF_SOCK_OPS_SYNCOOKIE_CB_FLAG = (1<<7),
+>  /* Mask of all currently supported cb flags */
+> @@ -6868,6 +6871,13 @@ enum {
+>  					 *
+>  					 * replylong[0]: ISN
+>  					 */
+> +	BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB,/* Validate SYN Cookie and set
+> +					 * MSS.
+> +					 *
+> +					 * args[0]: ISN
+> +					 *
+> +					 * replylong[0]: MSS
+> +					 */
+>  };
+>  
+>  /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
+> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> index 514f1a4abdee..b1dd415863ff 100644
+> --- a/net/ipv4/syncookies.c
+> +++ b/net/ipv4/syncookies.c
+> @@ -317,6 +317,37 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
+>  }
+>  EXPORT_SYMBOL_GPL(cookie_tcp_reqsk_alloc);
+>  
+> +#if IS_ENABLED(CONFIG_CGROUP_BPF) && IS_ENABLED(CONFIG_SYN_COOKIES)
+> +int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_buff *skb)
+> +{
+> +	struct bpf_sock_ops_kern sock_ops;
+> +
+> +	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
+> +
+> +	sock_ops.op = BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB;
+> +	sock_ops.sk = req_to_sk(req);
+> +	sock_ops.args[0] = tcp_rsk(req)->snt_isn;
+> +
+> +	bpf_skops_init_skb(&sock_ops, skb, tcp_hdrlen(skb));
+> +
+> +	if (BPF_CGROUP_RUN_PROG_SOCK_OPS_SK(&sock_ops, sk))
+> +		goto err;
+> +
+> +	if (!sock_ops.replylong[0])
+> +		goto err;
+> +
+> +	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESRECV);
 
-And please please let's have a _technical_ discussion on reservations
-not hyperboles.
+I don't see LINUX_MIB_SYNCOOKIESSENT being incremented in the
+previous patch, so maybe also don't touch the mib here? The bpf
+program can do the counting if needed?
 
-> On top of that, please, please, please make sure that it builds cleanly
-> before posting.
->
-> I took the shared infra 8 hours to munch thru this series, and it threw
-> out all sorts of warnings. 8 hours during which I could not handle any
-> PR or high-prio patch :( Not your fault that builds are slow, I guess,
-> but if you are throwing a huge series at the list for the what-ever'th
-> time, it'd be great if it at least built cleanly :(
-
-We absolutely dont want to add unnecessary work.
-Probably we may have missed the net-next tip? We'll pull the latest
-and retest with tip.
-Is there a link that we can look at on what the infra does so we can
-make sure it works per expectation next time?
-If you know what kind of warnings/issues so we can avoid it going forward?
-Note: We didnt see any and we built each patch separately on gcc 11,
-12, 13 and clang 16.
-BTW: Lore does reorder the patches, but i am assuming cicd is smart
-enough to understand this?
-
-> FWIW please do not post another version this week (not that I think
-> that you would do that, but better safe than sorry. Last week the patch
-> bombs pushed the shared infra 24h+ behind the list..)
-
-Not intending to.
-
-cheers,
-jamal
-
-> --
-> pw-bot: cr
+Or, alternatively, add LINUX_MIB_SYNCOOKIESSENT to
+the BPF_SOCK_OPS_GEN_SYNCOOKIE_CB path?
 
