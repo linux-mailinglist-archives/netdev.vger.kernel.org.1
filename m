@@ -1,178 +1,166 @@
-Return-Path: <netdev+bounces-41252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 434917CA596
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:37:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41CAC7CA5E9
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:42:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19AB51C208E1
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:37:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 691221C209F3
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA37019BCA;
-	Mon, 16 Oct 2023 10:37:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB3A1CF82;
+	Mon, 16 Oct 2023 10:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SSqz0NLo"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mNYix7oA"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C10208A3;
-	Mon, 16 Oct 2023 10:37:14 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78230B4;
-	Mon, 16 Oct 2023 03:37:12 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-53db1fbee70so7296241a12.2;
-        Mon, 16 Oct 2023 03:37:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697452631; x=1698057431; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GYPaLG/yqq2AeQmdJ6S7bmu8cvVq2TzURcOqOkOdsJE=;
-        b=SSqz0NLoHwFG1V+5Ci+O0kVUQcxHU/wgnB0vyJvBLSOc6ODc39SzMaQak9eUn7zKag
-         VA0QEnbnRlY802OiJpuTwaOqcTeJs9ggieUyKrb4llO5asPIJ8gAcIxEmwzviUJSeQJp
-         BX24BuAvgzmIO7bIpgC9DuZKHKIaJCCA0mXLpDlICV5dOp+IcchKfUEyO/wDOCdbvKvz
-         /Tauuh9w83lqUfX7pQH9sI37GfHEXO51tgNcuqd3RjARaDbIFi9PFg3kENRFcfaz9fuy
-         Xe0/9WZ9q93T6wFZQWX+V9X8nypGtCAL6owp1zkekzES0OfDG81Wy5VfpINTY5uqk63i
-         wyyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697452631; x=1698057431;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GYPaLG/yqq2AeQmdJ6S7bmu8cvVq2TzURcOqOkOdsJE=;
-        b=NH9yquLh8bkSwhETtvD45mG6iG2ME/4ErILBtHaLlXPw/CBaZtgfhbbf1MkxDoQRAu
-         dochGi8OuWzMtdCOJjedh3+PNsDQcGm0K0dzTBUFkRrs4Lwf+UoQNOiK+b6KNQpUu6Yw
-         6wY+2g6zY1PWhd5P2GbK0dBMxsbUvj80ER3OnU/J55GGxGWvQUG5Gr0n0zkBjLGYC3uM
-         ijqaCkq83JLia+U4KGJBI+KVp8cI3o1ZtVWP2I9lXqVZMrwzHoIEZDpXPEKrX8y5Gtgv
-         vvs9QlhPfAJYBLKs6HViPufOrskifig4qqxMVIgRZPt1yXvlSOS75NrWw2VtjlfhGq4E
-         OtPg==
-X-Gm-Message-State: AOJu0Yz05GnTQUEh65iFHjLMloGFfpvZSlVVQ4kUm5wUjzmtqX1mZLQI
-	ckHlusoQY5BDLk0HhDA7Qo0=
-X-Google-Smtp-Source: AGHT+IEXtTbrs2iEVL6pfGr8blG7GifaIRJu/lvf+cSiq6TJEJoDPY9DrrN3BE9mCdr2dSxUY4ut7g==
-X-Received: by 2002:a05:6402:40d0:b0:53e:a9bd:508 with SMTP id z16-20020a05640240d000b0053ea9bd0508mr3069297edb.25.1697452630828;
-        Mon, 16 Oct 2023 03:37:10 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id a26-20020a50e71a000000b00537963f692esm15440188edn.0.2023.10.16.03.37.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 03:37:10 -0700 (PDT)
-Date: Mon, 16 Oct 2023 13:37:08 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Ante Knezic <ante.knezic@helmholz.de>
-Cc: netdev@vger.kernel.org, woojung.huh@microchip.com, andrew@lunn.ch,
-	f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	marex@denx.de, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] net:dsa:microchip: add property to
- select internal RMII reference clock
-Message-ID: <20231016103708.6ka5vxfkdatrjvdk@skbuf>
-References: <cover.1697107915.git.ante.knezic@helmholz.de>
- <cover.1697107915.git.ante.knezic@helmholz.de>
- <c8bb7002e6d81a661c853dd21e0fe18e95887609.1697107915.git.ante.knezic@helmholz.de>
- <c8bb7002e6d81a661c853dd21e0fe18e95887609.1697107915.git.ante.knezic@helmholz.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC6623766;
+	Mon, 16 Oct 2023 10:41:58 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 066E7210B;
+	Mon, 16 Oct 2023 03:41:46 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id F0A181C0009;
+	Mon, 16 Oct 2023 10:41:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1697452902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vT9G5NQZZ2eFijBoTns5foUBCOXcsCpnGULg2LBKId4=;
+	b=mNYix7oANrLWcPA45+MCZhVDWozUj6f8PfqSzJqKysm1KuHJKww2ZZKGHzyDTEA2pFZ89M
+	GQL7cVUygSHhtDqKDGhuWpIDjZHMs+X/thryopJPYiizCwuNlElaLc2SZ92J9f/7dgg3Sn
+	OyUMUelmsPPYlkOdzCI9ZLHzzUmJdI2aCw31stMkro65apZFzdGCXKqoxlfVxZnx5d8Mgg
+	1ks4wZl5bCVkhEQmLYZlI7exvP7f9Lc+5fRA/wvVZk404CeBuzJf8RQAtoRNZhiLFyzweM
+	Dw13OEMhp7QgdQx6bh2TMIWFL90IIUzrnqHVsGKBKTNmKUI9XkDqOZUh5Je4TA==
+Date: Mon, 16 Oct 2023 12:41:34 +0200
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Michael Walle <michael@walle.cc>, Jacob Keller
+ <jacob.e.keller@intel.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v5 08/16] net: ethtool: Add a command to expose
+ current time stamping layer
+Message-ID: <20231016124134.6b271f07@kmaincent-XPS-13-7390>
+In-Reply-To: <6ef6418d-6e63-49bd-bcc1-cdc6eb0da2d5@lunn.ch>
+References: <20231009155138.86458-1-kory.maincent@bootlin.com>
+	<20231009155138.86458-9-kory.maincent@bootlin.com>
+	<2fbde275-e60b-473d-8488-8f0aa637c294@broadcom.com>
+	<20231010102343.3529e4a7@kmaincent-XPS-13-7390>
+	<20231013090020.34e9f125@kernel.org>
+	<6ef6418d-6e63-49bd-bcc1-cdc6eb0da2d5@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c8bb7002e6d81a661c853dd21e0fe18e95887609.1697107915.git.ante.knezic@helmholz.de>
- <c8bb7002e6d81a661c853dd21e0fe18e95887609.1697107915.git.ante.knezic@helmholz.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: kory.maincent@bootlin.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit message: "net: dsa: microchip: ".
+On Fri, 13 Oct 2023 18:11:19 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-On Thu, Oct 12, 2023 at 12:55:55PM +0200, Ante Knezic wrote:
-> Microchip KSZ8863/KSZ8873 have the ability to select between internal
-> and external RMII reference clock. By default, reference clock
-> needs to be provided via REFCLKI_3 pin. If required, device can be
-> setup to provide RMII clock internally so that REFCLKI_3 pin can be
-> left unconnected.
-> Add a new "microchip,rmii-clk-internal" property which will set
-> RMII clock reference to internal. If property is not set, reference
-> clock needs to be provided externally.
+> > > All these possibles timestamps go through exclusively the netdev API or
+> > > the phylib API. Even the software timestamping is done in the netdev
+> > > driver, therefore it goes through the netdev API and then should have the
+> > > NETDEV_TIMESTAMPING bit set.  
+> > 
+> > Netdev vs phylib is an implementation detail of Linux.
+> > I'm also surprised that you changed this.
+> >   
+> > > > > + */
+> > > > > +enum {
+> > > > > +	NO_TIMESTAMPING = 0,
+> > > > > +	NETDEV_TIMESTAMPING = (1 << 0),
+> > > > > +	PHYLIB_TIMESTAMPING = (1 << 1),
+> > > > > +	SOFTWARE_TIMESTAMPING = (1 << 2) | (1 << 0),      
 > 
-> Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
-> ---
->  drivers/net/dsa/microchip/ksz8795.c     | 5 +++++
->  drivers/net/dsa/microchip/ksz8795_reg.h | 3 +++
->  drivers/net/dsa/microchip/ksz_common.c  | 3 +++
->  drivers/net/dsa/microchip/ksz_common.h  | 1 +
->  4 files changed, 12 insertions(+)
+> Just emphasising Jakubs point here. phylib is an implementation
+> detail, in that the MAC driver might be using firmware to drive its
+> PHY, and that firmware can do a timestamp in the PHY. The API being
+> defined here should be independent of the implementation details. So
+> it probably should be MAC_TIMESTAMPING and PHY_TIMESTAMPING, and leave
+> it to the driver to decide if its PHYLIB doing the actual work, or
+> firmware.
+
+That is one reason why I moved to NETDEV_TIMESTAMPING, we don't know if it will
+really be the MAC that does the timestamping, as the firmware could ask the PHY
+to does it, but it surely goes though the netdev driver.
+
+> Netdev vs phylib is an implementation detail of Linux.
+> I'm also surprised that you changed this.
+
+This is the main reason I changed this. This is Linux implementation purpose to
+know whether it should go through netdev or phylib, and then each of these
+drivers could use other timestamps which are hardware related.
+
+As I have answered to Florian maybe you prefer to separate the Linux
+implementation detail and the hardware timestamping like this:
+
+> Or maybe do you prefer to use defines like this:
+> # define NETDEV_TIMESTAMPING (1 << 0)
+> # define PHYLIB_TIMESTAMPING (1 << 1)
 > 
-> diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
-> index 91aba470fb2f..78f3a668aa99 100644
-> --- a/drivers/net/dsa/microchip/ksz8795.c
-> +++ b/drivers/net/dsa/microchip/ksz8795.c
-> @@ -1434,6 +1434,11 @@ int ksz8_setup(struct dsa_switch *ds)
->  	for (i = 0; i < (dev->info->num_vlans / 4); i++)
->  		ksz8_r_vlan_entries(dev, i);
->  
-> +	if (ksz_is_ksz88x3(dev))
-> +		ksz_cfg(dev, KSZ88X3_REG_FVID_AND_HOST_MODE,
-> +			KSZ88X3_PORT3_RMII_CLK_INTERNAL,
-> +			dev->rmii_clk_internal);
-> +
+> enum {
+> 	NO_TIMESTAMPING = 0,
+> 	MAC_TIMESTAMPING = NETDEV_TIMESTAMPING,
+> 	PHY_TIMESTAMPING = PHYLIB_TIMESTAMPING,
+> 	SOFTWARE_TIMESTAMPING = (1 << 2) | NETDEV_TIMESTAMPING,
+> 	...
+> 	MAC_DMA_TIMESTAMPING = (2 << 2) | NETDEV_TIMESTAMPING,
+> 	MAC_PRECISION_TIMESTAMPING = (3 << 2) | NETDEV_TIMESTAMPING,
+> };
 
-Can this be done in dev->dev_ops->phylink_mac_config() (which so far has no implementation)
-for port 3 of ksz88x3?
 
->  	return ksz8_handle_global_errata(ds);
->  }
->  
-> diff --git a/drivers/net/dsa/microchip/ksz8795_reg.h b/drivers/net/dsa/microchip/ksz8795_reg.h
-> index 3c9dae53e4d8..beca974e0171 100644
-> --- a/drivers/net/dsa/microchip/ksz8795_reg.h
-> +++ b/drivers/net/dsa/microchip/ksz8795_reg.h
-> @@ -22,6 +22,9 @@
->  #define KSZ8863_GLOBAL_SOFTWARE_RESET	BIT(4)
->  #define KSZ8863_PCS_RESET		BIT(0)
->  
-> +#define KSZ88X3_REG_FVID_AND_HOST_MODE  0xC6
-> +#define KSZ88X3_PORT3_RMII_CLK_INTERNAL BIT(3)
-> +
->  #define REG_SW_CTRL_0			0x02
->  
->  #define SW_NEW_BACKOFF			BIT(7)
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index b800ace40ce1..0a0a53ce5b1b 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -4160,6 +4160,9 @@ int ksz_switch_register(struct ksz_device *dev)
->  		}
->  	}
->  
-> +	dev->rmii_clk_internal = of_property_read_bool(dev->dev->of_node,
-> +						       "microchip,rmii-clk-internal");
+> > The gist of what I'm proposing is for the core ethtool netlink message
+> > handler to get just the phc_index as an attribute. No other information
+> > as to what it represents. Not that it's netdev, DMA, phylib PHY or whatnot.
+> > 
+> > The ethtool kernel code would iterate through the stuff registered in
+> > the system for the netdev, calling get_ts_info() or phy_ts_info() on it,
+> > until it finds something which populates struct ethtool_ts_info ::
+> > phc_index with the phc_index retrieved from netlink.
+> > 
+> > Then, ethtool just talks with the timestamper that matched that phc_index.
+> > 
+> > Same idea would be applied for the command that lists all timestamping
+> > layers for a netdev. Check get_ts_info(), phy_ts_info(dev->phydev), and
+> > can be extended in the future.  
+> 
+> I see, that could work. The user would then dig around sysfs to figure
+> out which PHC has what characteristics?
 
-Port property.
-
-> +
->  	ret = dsa_register_switch(dev->ds);
->  	if (ret) {
->  		dev->dev_ops->exit(dev);
-> diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-> index 8842efca0871..e5b0445fe2ca 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.h
-> +++ b/drivers/net/dsa/microchip/ksz_common.h
-> @@ -163,6 +163,7 @@ struct ksz_device {
->  	phy_interface_t compat_interface;
->  	bool synclko_125;
->  	bool synclko_disable;
-> +	bool rmii_clk_internal;
->  
->  	struct vlan_table *vlan_cache;
->  
-> -- 
-> 2.11.0
+I am not an expert but there are net drivers that enable
+SOF_TIMESTAMPING_TX/RX/RAW_HARDWARE without phc. In that case we won't ever be
+able to enter the get_ts_info() with you proposition.
+Still I am wondering why hardware timestamping capabilities can be enabled
+without phc.
 
