@@ -1,172 +1,120 @@
-Return-Path: <netdev+bounces-41377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A8D7CAB78
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:27:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8AEE7CAB86
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:32:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17F611F22122
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:27:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52D6DB20D87
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA19128DDC;
-	Mon, 16 Oct 2023 14:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9464626E08;
+	Mon, 16 Oct 2023 14:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MLdYaMUr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RxnpPReU"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C737927732
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 14:27:50 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA8683;
-	Mon, 16 Oct 2023 07:27:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697466468; x=1729002468;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version:content-id;
-  bh=WAHtEU+QRIIV0hjjctV4dFUOMA87lFSZZckv/e6FmbI=;
-  b=MLdYaMUrX5YccmQcg2hEP63YIkH+x1b3KeRgjLxsRYMcuSx99wFnnN6R
-   IzN66rHPFhvJKLQ5WOEcR5hT9yNZ5cybG6UUjUvmz6wtAPXVToW0V62OQ
-   KWIsNyrR/rnjiWcpfFHWYHYRzurXPtROJnnmoOY/gJUYmC/SAREcjIa8G
-   dr+7jGx5XGCIU974YKCV8goveF9t0DYWMxLia3zr31EIN2VMir1eVyQXc
-   ghvlcbrHLr8zwmKLE1HtgSvqd+Mc+eQ/s0YnbLieqOoVgsSWB/76qp6TV
-   AS10mjor5216OwX7Lpd9ZCG58YtCpoikRazXWSM0i+nYQqeeyZuCo2kwW
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="388396812"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="388396812"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 07:27:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="759416190"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="759416190"
-Received: from rhaeussl-mobl.ger.corp.intel.com ([10.252.59.103])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 07:27:40 -0700
-Date: Mon, 16 Oct 2023 17:27:37 +0300 (EEST)
-From: =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: Bjorn Helgaas <helgaas@kernel.org>, 
-    "Rafael J . Wysocki" <rafael@kernel.org>
-cc: linux-pci@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, 
-    Rob Herring <robh@kernel.org>, 
-    =?ISO-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>, 
-    Lukas Wunner <lukas@wunner.de>, Heiner Kallweit <hkallweit1@gmail.com>, 
-    Emmanuel Grumbach <emmanuel.grumbach@intel.com>, 
-    LKML <linux-kernel@vger.kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-    ath10k@lists.infradead.org, ath11k@lists.infradead.org, 
-    ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org, 
-    linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-    linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org, 
-    linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 03/13] PCI/ASPM: Disable ASPM when driver requests
- it
-In-Reply-To: <20231013164228.GA1117889@bhelgaas>
-Message-ID: <a434d9f-48ec-cfe5-900-8923361798a9@linux.intel.com>
-References: <20231013164228.GA1117889@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7649228E10
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 14:32:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BD92C433C7;
+	Mon, 16 Oct 2023 14:32:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697466773;
+	bh=ybykDt/NemfhXcLcv/MMn4Or6vPKfoGmKXm/cawvROk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RxnpPReU50Q65aqZpye9yk/Oa22ZG5ThNcXFNEu3Z9EblYzeweMjtn6COdTNavktv
+	 SpzSF25gcjjUAJFjeK26+b1e94PqwLysnsY+iHum7vHO32KgOV3+jpop1iUYZrFCwh
+	 w1m0xnd+e9YernryljBbFeoCwAmkkIyn0nzUotEK4/qPzviCzUERUu7Dc8GiQiT+3H
+	 sxsW7lRu1KB9gwcL6xPTLupx740MmUrgWrkJ5p0oMVQeaJFfhNCJkZKjFp2nd3Hpne
+	 yEZUnhdEBgJuRFz3BhP45YekJeOGwOowuOYLL4i0Nvc/XgNPVOyTRptXXyQil4mhCX
+	 pmQzSXzrLqbHw==
+Date: Mon, 16 Oct 2023 07:32:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Daniel =?UTF-8?B?R3LDtmJlcg==?= <dxld@darkboxed.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, Richard Weinberger
+ <richard@nod.at>, Serge Hallyn <serge.hallyn@canonical.com>, "Eric W.
+ Biederman" <ebiederm@xmission.com>
+Subject: Re: [BUG] rtnl_newlink: Rogue MOVE event delivered on netns change
+Message-ID: <20231016073251.0f47d42b@kernel.org>
+In-Reply-To: <2023101408-matador-stagnant-7cab@gregkh>
+References: <20231010121003.x3yi6fihecewjy4e@House.clients.dxld.at>
+	<20231013153605.487f5a74@kernel.org>
+	<20231013154302.44cc197d@kernel.org>
+	<2023101408-matador-stagnant-7cab@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323329-158890400-1697462044=:1986"
-Content-ID: <58c8d854-b57c-582-1ba0-efeb857febe@linux.intel.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---8323329-158890400-1697462044=:1986
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: 8BIT
-Content-ID: <a321263b-cac2-11d0-6cb1-43cc78d1c6d1@linux.intel.com>
-
-On Fri, 13 Oct 2023, Bjorn Helgaas wrote:
-> On Thu, Oct 12, 2023 at 01:56:16PM +0300, Ilpo Järvinen wrote:
-> > On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
-> > > On Mon, Sep 18, 2023 at 04:10:53PM +0300, Ilpo Järvinen wrote:
-> > > > PCI core/ASPM service driver allows controlling ASPM state through
-> > > > pci_disable_link_state() and pci_enable_link_state() API. It was
-> > > > decided earlier (see the Link below), to not allow ASPM changes when OS
-> > > > does not have control over it but only log a warning about the problem
-> > > > (commit 2add0ec14c25 ("PCI/ASPM: Warn when driver asks to disable ASPM,
-> > > > but we can't do it")). Similarly, if ASPM is not enabled through
-> > > > config, ASPM cannot be disabled.
-> > ...
-> 
-> > > This disables *all* ASPM states, unlike the version when
-> > > CONFIG_PCIEASPM is enabled.  I suppose there's a reason, and maybe a
-> > > comment could elaborate on it?
-> > >
-> > > When CONFIG_PCIEASPM is not enabled, I don't think we actively
-> > > *disable* ASPM in the hardware; we just leave it as-is, so firmware
-> > > might have left it enabled.
+On Sat, 14 Oct 2023 10:58:20 +0200 Greg Kroah-Hartman wrote:
+> On Fri, Oct 13, 2023 at 03:43:02PM -0700, Jakub Kicinski wrote:
+> > On Fri, 13 Oct 2023 15:36:05 -0700 Jakub Kicinski wrote:  
+> > >    kobject_uevent(&dev->dev.kobj, KOBJ_REMOVE);
+> > >    dev_net_set(dev, net);
+> > >    kobject_uevent(&dev->dev.kobj, KOBJ_ADD);  
 > > 
-> > This whole trickery is intended for drivers that do not want to have ASPM 
-> > because the devices are broken with it. So leaving it as-is is not really 
-> > an option (as demonstrated by the custom workarounds).
-> 
-> Right.
-> 
-> > > Conceptually it seems like the LNKCTL updates here should be the same
-> > > whether CONFIG_PCIEASPM is enabled or not (subject to the question
-> > > above).
-> > > 
-> > > When CONFIG_PCIEASPM is enabled, we might need to do more stuff, but
-> > > it seems like the core should be the same.
+> > Greg, we seem to have a problem in networking with combined
+> > netns move and name change.
 > > 
-> > So you think it's safer to partially disable ASPM (as per driver's 
-> > request) rather than disable it completely? I got the impression that the 
-> > latter might be safer from what Rafael said earlier but I suppose I might 
-> > have misinterpreted him since he didn't exactly say that it might be safer 
-> > to _completely_ disable it.
+> > We have this code in __dev_change_net_namespace():
+> > 
+> > 	kobject_uevent(&dev->dev.kobj, KOBJ_REMOVE);
+> > 	dev_net_set(dev, net);
+> > 	kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
+> > 
+> > 	err = device_rename(&dev->dev, dev->name);
+> > 
+> > Is there any way we can only get the REMOVE (old name) and ADD
+> > (new name) events, without the move? I.e. silence the rename? 
+> > 
+> > Daniel is reporting that with current code target netns sees an 
+> > add of an interface with the old (duplicated) name. And then a rename.  
 > 
-> My question is whether the state of the device should depend on
-> CONFIG_PCIEASPM.  If the driver does this:
+> But that's how this has always been, right?  What problems is this
+> causing?
+
+Original report is up-thread:
+https://lore.kernel.org/all/20231010121003.x3yi6fihecewjy4e@House.clients.dxld.at/
+With a link to a GH issue for lxc:
+https://github.com/lxc/incus/issues/146
+
+> > Without a silent move best we can do is probably:
+> > 
+> > 	kobject_uevent(&dev->dev.kobj, KOBJ_REMOVE);
+> > 	dev_net_set(dev, net);
+> > 	err = device_rename(&dev->dev, dev->name);
+> > 	kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
+> > 
+> > which will give us:
+> > 
+> > 	MOVE new-name
+> > 	ADD new-name
+> > 
+> > in target netns, which, hm.  
 > 
->   pci_disable_link_state(PCIE_LINK_STATE_L0S)
+> That wouldn't make much sense.
 > 
-> do we want to leave L1 enabled when CONFIG_PCIEASPM=y but disable L1
-> when CONFIG_PCIEASPM is unset?
-> 
-> I can see arguments both ways.  My thought was that it would be nice
-> to end up with a single implementation of pci_disable_link_state()
-> with an #ifdef around the CONFIG_PCIEASPM-enabled stuff because it
-> makes the code easier to read.
+> What is the real problem here?  What changed to cause a problem?
 
-Hi Bjorn,
+IIUC what happens is:
 
-Thanks a lot for all your feedback so far, it has been very helpful.
+ - systemd controls "real" eth0
+ - we move a "to be renamed" eth0 from a container into main ns
+ - we rename "to be renamed" eth0 to something else
+ - seeing the rename of eth0 system thinks it's the "real" one
+   that is being renamed, ergo there's no eth0 any more,
+   so it shuts down its "unit" for eth0
 
-I think there's still one important thing to discuss and none of the 
-comments have covered that area so far.
-
-The drivers that have workaround are not going to turn more dangerous than 
-they're already without this change, so we're mostly within charted waters 
-there even with what you propose. However, I think the bigger catch and 
-potential source of problems, with both this v2 and your alternative, are 
-the drivers that do not have the workarounds around CONFIG_PCIEASPM=n 
-and/or _OSC permissions. Those code paths just call 
-pci_disable_link_state() and do nothing else.
-
-Do you think it's okay to alter the behavior for those drivers too 
-(disable ASPM where it previously was a no-op)?
-
-I'm okay with going the direction you indicated but I just wanted to ask
-this in advance before reworking the behavior so I can take that detail 
-also into account.
-
-
--- 
- i.
---8323329-158890400-1697462044=:1986--
+I don't think anything changed. Sounds more like someone finally tried
+to use this in anger.
 
