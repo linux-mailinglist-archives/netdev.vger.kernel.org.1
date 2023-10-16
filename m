@@ -1,129 +1,116 @@
-Return-Path: <netdev+bounces-41575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 361D77CB588
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 23:45:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F5C7CB590
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 23:45:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E53882814B2
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:45:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 822AF281507
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C5438FAB;
-	Mon, 16 Oct 2023 21:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41D6381BD;
+	Mon, 16 Oct 2023 21:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QgpdJjU0"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3768037C83;
-	Mon, 16 Oct 2023 21:44:59 +0000 (UTC)
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D13C9EA;
-	Mon, 16 Oct 2023 14:44:55 -0700 (PDT)
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5812eaed1eeso2558045eaf.0;
-        Mon, 16 Oct 2023 14:44:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697492694; x=1698097494;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tgkZY4yEAeEqDfcsSpYD9I+A+ikpbLIHeBQl2vVrEO0=;
-        b=mCNwYzOIu6Phljp5Ioh4YFuolzjg8s679O4oNb9nA5W86wfjXQ+XIJDMTLfqT+rFCj
-         XLhHKJb4zMm0+Os4urnAVlNilH2DOpBVUtWHBUZzjLJWck90j624bkonJEW2Wd2Kk2MB
-         gPh6QEU1j9pfoqwN7dkkgEbAeDL+FcdK3sUv35gq9t0pfZfe8hPdyaOy+0Y+giRGGnJ+
-         gHd5QdqXmw/Uq0E86K7Zv95kODflq+w3QTNyQahzuo1USs1eeuz9pne5Ic+w5pNq2QlC
-         /TM49Y5hh6FQkA1KhXyQLUHmS5nwdYo5qEnSoujpX5GDMR2rkd7t2mSggcwRCuw7bPkk
-         ht5g==
-X-Gm-Message-State: AOJu0YwiX/FYOVKZF2MAQ1Us98VJpJWsARQLtTFL0fwdCnFIbRr8P0PL
-	kvs2e/0HA6r3p/j2DEE1pQ==
-X-Google-Smtp-Source: AGHT+IER0+zM9rQTeSBTpDXhq27aL8B0l2V/HFAOMXgvaN9iR4T6Jv7HeoKsOLVk8pksacBkXQt5/g==
-X-Received: by 2002:a05:6870:858c:b0:1d5:aed5:6579 with SMTP id f12-20020a056870858c00b001d5aed56579mr328754oal.4.1697492694494;
-        Mon, 16 Oct 2023 14:44:54 -0700 (PDT)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id r5-20020a05687032c500b001e5dd8a29c6sm8595oac.29.2023.10.16.14.44.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 14:44:53 -0700 (PDT)
-Received: (nullmailer pid 3823224 invoked by uid 1000);
-	Mon, 16 Oct 2023 21:44:35 -0000
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 16 Oct 2023 16:44:27 -0500
-Subject: [PATCH net-next 8/8] dt-bindings: net: dsa: Drop 'ethernet-ports'
- node properties
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A3237C83;
+	Mon, 16 Oct 2023 21:45:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AF20C433C8;
+	Mon, 16 Oct 2023 21:45:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697492744;
+	bh=urYeCNriV0kxeshU5Rna6R1RxVeHNVc0shzEPlTWcXs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QgpdJjU0XWdzBdhLG07ys33H8Qw8Ytzfr+oRrjxHcr4A9LshNYoVlPLC4QGfOCDRf
+	 cVR39GPluQOUMdjrYhbaa4lhC5UJESydkJYNWZuB1w6AkAeeGh78EPJqT6et5NY9Ym
+	 zpSWRwkPnGAd44J+SpnM4dEBiJ1bE4T7XWZWJ8W0Ptx6uhU+kU0NcExJZ2Lno7O4rh
+	 j7BedJqbzeBK+SzvTE/Lq9nn71WkVm5gTAJcXhFUstCKrSgib5SwifWdgo83DvtYpD
+	 i+8T7mF9cfMrC4PcLciAnJewEDTMyq3lb+5VtEqCGRIsHFYSclsf/6dTjclhbXTInh
+	 i17kTR9+0WsEg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	jiri@resnulli.us,
+	linux-doc@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2] docs: netlink: clean up after deprecating version
+Date: Mon, 16 Oct 2023 14:45:40 -0700
+Message-ID: <20231016214540.1822392-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231016-dt-net-cleanups-v1-8-a525a090b444@kernel.org>
-References: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
-In-Reply-To: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
-	Samuel Holland <samuel@sholland.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
-	Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	Maxime Ripard <mripard@kernel.org>, =?UTF-8?B?bsOnIMOcTkFM?= <arinc.unal@arinc9.com>, 
-	Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>, 
-	John Crispin <john@phrozen.org>, Gerhard Engleder <gerhard@engleder-embedded.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
-	Sergei Shtylyov <sergei.shtylyov@gmail.com>, Justin Chen <justin.chen@broadcom.com>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>, 
-	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com
-X-Mailer: b4 0.13-dev
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-Constraints on 'ethernet-ports' node properties are already defined by the
-reference to ethernet-switch.yaml, so they can be dropped from the DSA
-schema.
+Jiri moved version to legacy specs in commit 0f07415ebb78 ("netlink:
+specs: don't allow version to be specified for genetlink").
+Update the documentation.
 
-Signed-off-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/devicetree/bindings/net/dsa/dsa.yaml | 9 ---------
- 1 file changed, 9 deletions(-)
+v2:
+ - s/Gobals/Globals/
+ - breaking changes are -> compatibility breaking changes are
+   I think it's plural but the omission of "compatibility" made it confusing
+ - not changing the wording to "should never be used", I prefer existing
+v1: https://lore.kernel.org/all/20231012154315.587383-1-kuba@kernel.org/
+---
+ .../userspace-api/netlink/genetlink-legacy.rst     | 14 ++++++++++++++
+ Documentation/userspace-api/netlink/specs.rst      |  5 -----
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-index e6010821f86f..6107189d276a 100644
---- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-@@ -40,15 +40,6 @@ $defs:
+diff --git a/Documentation/userspace-api/netlink/genetlink-legacy.rst b/Documentation/userspace-api/netlink/genetlink-legacy.rst
+index 40b82ad5d54a..0b3febd57ff5 100644
+--- a/Documentation/userspace-api/netlink/genetlink-legacy.rst
++++ b/Documentation/userspace-api/netlink/genetlink-legacy.rst
+@@ -11,6 +11,20 @@ the ``genetlink-legacy`` protocol level.
+ Specification
+ =============
  
-     patternProperties:
-       "^(ethernet-)?ports$":
--        type: object
--        additionalProperties: false
++Globals
++-------
++
++Attributes listed directly at the root level of the spec file.
++
++version
++~~~~~~~
++
++Generic Netlink family version, default is 1.
++
++``version`` has historically been used to introduce family changes
++which may break backwards compatibility. Since compatibility breaking changes
++are generally not allowed ``version`` is very rarely used.
++
+ Attribute type nests
+ --------------------
+ 
+diff --git a/Documentation/userspace-api/netlink/specs.rst b/Documentation/userspace-api/netlink/specs.rst
+index cc4e2430997e..40dd7442d2c3 100644
+--- a/Documentation/userspace-api/netlink/specs.rst
++++ b/Documentation/userspace-api/netlink/specs.rst
+@@ -86,11 +86,6 @@ name
+ Name of the family. Name identifies the family in a unique way, since
+ the Family IDs are allocated dynamically.
+ 
+-version
+-~~~~~~~
 -
--        properties:
--          '#address-cells':
--            const: 1
--          '#size-cells':
--            const: 0
+-Generic Netlink family version, default is 1.
 -
-         patternProperties:
-           "^(ethernet-)?port@[0-9a-f]+$":
-             description: Ethernet switch ports
-
+ protocol
+ ~~~~~~~~
+ 
 -- 
-2.42.0
+2.41.0
 
 
