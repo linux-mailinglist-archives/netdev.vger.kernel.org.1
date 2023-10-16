@@ -1,147 +1,121 @@
-Return-Path: <netdev+bounces-41305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2ED87CA8A1
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:56:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B055F7CA89F
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:56:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E26D28147E
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:56:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66B0C2811F3
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9070E27702;
-	Mon, 16 Oct 2023 12:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="qvyn3pHY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDC92273E0;
+	Mon, 16 Oct 2023 12:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8551CA91
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 12:56:25 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F052F7;
-	Mon, 16 Oct 2023 05:56:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1697460984; x=1728996984;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=owu+iKqUzWkQLtSBTtxj1zT2rwGvuD6S/GZDMO70pg0=;
-  b=qvyn3pHYMneMBEBeSY8pWPiA1MOaw6ve7A3h7uUQGU8Sqt1WQd02IwS5
-   CxuBxLWwYRJuZrcKLiwr0uJg7GIj0SUBZtmL7vSjZSGieCK36di5SRXdW
-   vPz+vfAOcpC0bXddd+F/skIpn9bNqyp9qDXYOpMJhmNJb+HIMVz13ehOx
-   IcVAJ82CawPlAPj3EfJMA+D8tmd2X7bgHtoc78b6y8f7Qgq/ZdRtErdHm
-   fUIEoLFXFjsN3Bp/I8y5G0+fQospFc+LwmputKntmzg1h8eit5tcuI131
-   H7keTEyw8NrEMu1UqFAT0zzPZmpj0tr7qXDfyd3jUL144OUeZbQmmnKZA
-   w==;
-X-CSE-ConnectionGUID: MUYjPoOnQe+6O7A6bgCR6A==
-X-CSE-MsgGUID: HFcEOj/NRFqcOiHhwh4vUQ==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="asc'?scan'208";a="177204000"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Oct 2023 05:56:23 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 16 Oct 2023 05:56:06 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex01.mchp-main.com (10.10.85.143)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
- Transport; Mon, 16 Oct 2023 05:56:02 -0700
-Date: Mon, 16 Oct 2023 13:55:40 +0100
-From: Conor Dooley <conor.dooley@microchip.com>
-To: Christoph Hellwig <hch@lst.de>
-CC: Greg Ungerer <gerg@linux-m68k.org>, <iommu@lists.linux.dev>, Paul Walmsley
-	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley
-	<conor@kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm
-	<magnus.damm@gmail.com>, Robin Murphy <robin.murphy@arm.com>, Marek
- Szyprowski <m.szyprowski@samsung.com>, Geert Uytterhoeven
-	<geert@linux-m68k.org>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
-	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team
-	<linux-imx@nxp.com>, <linux-m68k@lists.linux-m68k.org>,
-	<netdev@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-	<linux-renesas-soc@vger.kernel.org>, Jim Quinlan <james.quinlan@broadcom.com>
-Subject: Re: [PATCH 02/12] riscv: only select DMA_DIRECT_REMAP from
- RISCV_ISA_ZICBOM
-Message-ID: <20231016-chomp-vitally-b6c004be7809@wendy>
-References: <20231016054755.915155-1-hch@lst.de>
- <20231016054755.915155-3-hch@lst.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC9E1CA91
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 12:56:18 +0000 (UTC)
+Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.48])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CF99F1;
+	Mon, 16 Oct 2023 05:56:14 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 6C1E8CC010E;
+	Mon, 16 Oct 2023 14:56:11 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at smtp2.kfki.hu
+Received: from smtp2.kfki.hu ([127.0.0.1])
+	by localhost (smtp2.kfki.hu [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP; Mon, 16 Oct 2023 14:56:09 +0200 (CEST)
+Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
+	by smtp2.kfki.hu (Postfix) with ESMTP id AE4D6CC010A;
+	Mon, 16 Oct 2023 14:56:06 +0200 (CEST)
+Received: by blackhole.kfki.hu (Postfix, from userid 1000)
+	id 8B45C3431A8; Mon, 16 Oct 2023 14:56:06 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by blackhole.kfki.hu (Postfix) with ESMTP id 89D09340D74;
+	Mon, 16 Oct 2023 14:56:06 +0200 (CEST)
+Date: Mon, 16 Oct 2023 14:56:06 +0200 (CEST)
+From: Jozsef Kadlecsik <kadlec@netfilter.org>
+To: xiaolinkui <xiaolinkui@126.com>
+cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+    David Miller <davem@davemloft.net>, edumazet@google.com, kuba@kernel.org, 
+    pabeni@redhat.com, justinstitt@google.com, kuniyu@amazon.com, 
+    oe-kbuild-all@lists.linux.dev, netfilter-devel@vger.kernel.org, 
+    coreteam@netfilter.org, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, Linkui Xiao <xiaolinkui@kylinos.cn>
+Subject: Re: [PATCH] netfilter: ipset: wait for xt_recseq on all cpus
+In-Reply-To: <202310161625.GDDBP8SZ-lkp@intel.com>
+Message-ID: <20ae91c-155-32c5-c388-9fdaea5b1eed@netfilter.org>
+References: <20231005115022.12902-1-xiaolinkui@126.com> <202310161625.GDDBP8SZ-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Ihs0Gu2JVloYpIJM"
-Content-Disposition: inline
-In-Reply-To: <20231016054755.915155-3-hch@lst.de>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Ihs0Gu2JVloYpIJM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On Mon, Oct 16, 2023 at 07:47:44AM +0200, Christoph Hellwig wrote:
-> RISCV_DMA_NONCOHERENT is also used for whacky non-standard
-> non-coherent ops that use different hooks in dma-direct.
->=20
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Besides the broken patch, the description simply cannot be true:
 
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+"Before destroying the ipset, take a check on sequence to ensure that the 
+ip_set_test operation of this ipset has been completed."
 
-Thanks,
-Conor.
+Set can only be destroyed when there is no iptables rule (match/target) 
+which refers to it. If this condition is not true, then the real reason 
+must be fixed.
 
-> ---
->  arch/riscv/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index 0ac0b538379718..9c48fecc671918 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -273,7 +273,6 @@ config RISCV_DMA_NONCOHERENT
->  	select ARCH_HAS_SYNC_DMA_FOR_CPU
->  	select ARCH_HAS_SYNC_DMA_FOR_DEVICE
->  	select DMA_BOUNCE_UNALIGNED_KMALLOC if SWIOTLB
-> -	select DMA_DIRECT_REMAP if MMU
-> =20
->  config RISCV_NONSTANDARD_CACHE_OPS
->  	bool
-> @@ -549,6 +548,7 @@ config RISCV_ISA_ZICBOM
->  	depends on RISCV_ALTERNATIVE
->  	default y
->  	select RISCV_DMA_NONCOHERENT
-> +	select DMA_DIRECT_REMAP
->  	help
->  	   Adds support to dynamically detect the presence of the ZICBOM
->  	   extension (Cache Block Management Operations) and enable its
-> --=20
-> 2.39.2
->=20
+How can one reproduce the issue?
 
---Ihs0Gu2JVloYpIJM
-Content-Type: application/pgp-signature; name="signature.asc"
+Best regards,
+Jozsef
 
------BEGIN PGP SIGNATURE-----
+On Mon, 16 Oct 2023, kernel test robot wrote:
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZS0yzAAKCRB4tDGHoIJi
-0hjvAQCuU+lkdZEJGHqzkwUX3I/m5Rjm/NNqvKylHzOsHPnU9wD+O+V5jY/UGcxC
-5Y5HrOaAn3eYO5OnNXk29wyRBjksoAU=
-=pzeO
------END PGP SIGNATURE-----
+> Hi xiaolinkui,
+> 
+> kernel test robot noticed the following build errors:
+> 
+> [auto build test ERROR on netfilter-nf/main]
+> [also build test ERROR on nf-next/master horms-ipvs/master linus/master v6.6-rc6 next-20231016]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/xiaolinkui/netfilter-ipset-wait-for-xt_recseq-on-all-cpus/20231005-234042
+> base:   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
+> patch link:    https://lore.kernel.org/r/20231005115022.12902-1-xiaolinkui%40126.com
+> patch subject: [PATCH] netfilter: ipset: wait for xt_recseq on all cpus
+> config: x86_64-buildonly-randconfig-006-20231016 (https://download.01.org/0day-ci/archive/20231016/202310161625.GDDBP8SZ-lkp@intel.com/config)
+> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231016/202310161625.GDDBP8SZ-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202310161625.GDDBP8SZ-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    ld: vmlinux.o: in function `wait_xt_recseq':
+> >> ip_set_core.c:(.text+0x1c561ac): undefined reference to `xt_recseq'
+> 
+> -- 
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
+> 
 
---Ihs0Gu2JVloYpIJM--
+-- 
+E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
+PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
+Address : Wigner Research Centre for Physics
+          H-1525 Budapest 114, POB. 49, Hungary
 
