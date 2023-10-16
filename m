@@ -1,187 +1,308 @@
-Return-Path: <netdev+bounces-41306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A5A57CA8A7
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:57:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E566F7CA8A8
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:57:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59463B20B4C
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:57:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13DA51C20A20
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C64273F0;
-	Mon, 16 Oct 2023 12:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54123273F5;
+	Mon, 16 Oct 2023 12:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xf/12PbH"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2ELmBn8Q";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="i6M5IYdJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BF1273E0
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 12:57:16 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 674ABAD;
-	Mon, 16 Oct 2023 05:57:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697461034; x=1728997034;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=33VN831uWAKG7f4eIn44PpDJgWUV0McuEtJM+oSWIh4=;
-  b=Xf/12PbHv7oGM5zCun8OHZP2oOMZxmhEH6ZJ5/lUhqXfYAqUQEckGFxg
-   uhBxh6kGxA949FC6FN2zZBWyvKJUifUexGABTLbcEAf1OWjx7mkTVa8Th
-   xcjaHeb44AZsDmv4pcw7gCTgvOCLukytu2kdP8klIQpb52JMIVDCQIG4w
-   L1wXdn9S2w13DghDuKXdK3k7ITNbCmmBqcE7MLPz8phNpEUDr+k3GznJW
-   WWb2zBxOO8yfgVXUiNz7waOrIXsq+sVisX6XfG9x/jLpM0Arh3YOUHPEd
-   Uq4Y8ewK7wuy0L394EulosARaZq0Chiyy9OV9IB39oKpZLPVvwycCESLJ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="4130579"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="4130579"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 05:57:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="1087063948"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="1087063948"
-Received: from rhaeussl-mobl.ger.corp.intel.com (HELO bhoerz-mobl1.ger.corp.intel.com) ([10.252.59.103])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 05:57:07 -0700
-Date: Mon, 16 Oct 2023 15:57:05 +0300 (EEST)
-From: =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-cc: linux-pci@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, 
-    Rob Herring <robh@kernel.org>, 
-    =?ISO-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>, 
-    Lukas Wunner <lukas@wunner.de>, "Rafael J . Wysocki" <rafael@kernel.org>, 
-    Heiner Kallweit <hkallweit1@gmail.com>, 
-    Emmanuel Grumbach <emmanuel.grumbach@intel.com>, 
-    LKML <linux-kernel@vger.kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-    ath10k@lists.infradead.org, ath11k@lists.infradead.org, 
-    ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org, 
-    linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-    linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org, 
-    linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 05/13] PCI/ASPM: Add pci_enable_link_state()
-In-Reply-To: <20231013164850.GA1118214@bhelgaas>
-Message-ID: <9da430a3-9336-8e75-7385-3d5ddcb6cb7@linux.intel.com>
-References: <20231013164850.GA1118214@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71D6262AD;
+	Mon, 16 Oct 2023 12:57:43 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52640A2;
+	Mon, 16 Oct 2023 05:57:41 -0700 (PDT)
+Date: Mon, 16 Oct 2023 14:57:38 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1697461059;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J4Fq3rGIS8nov1DFK/Ma53UlC+qh+yTUV7FkCGLePEw=;
+	b=2ELmBn8QdHGkXS8KFExnyMLH04TqKwm5q5kggSZWjGJJQXDyPQbo/1qjR8ztL6Qspzzztp
+	2muhurZ8JeFTzRTj+b52fXECty7hv7dA/yfbbR+VwFe0j/UZC6oH8AkfUxdAcKxO8ILNmG
+	XbRCbEUUQKC+cAa9LWlBIs7Ayhz4EWu0uwcq+wc06LU5Ju5s3dHUq8vPTGksrVPM7+fURk
+	+KgTQ6owLEBGAZRsqD/LokQEST8f+G1HEjT9xZpF0aoS6NDK6MLu0lkrzzuqsQSK9jEfXZ
+	KTqq/SgcNK4eSY64/M0tPA6v5IZy1nm7tK56fTGnfBihADwuAMZ2hdfVXBTUAQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1697461059;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J4Fq3rGIS8nov1DFK/Ma53UlC+qh+yTUV7FkCGLePEw=;
+	b=i6M5IYdJsbxkm1tan/1ajVWkqnTzZ/6Bn3+DiViKMtJtMtmwRn8CowMUI3FL3f3w2K66gF
+	fPSZRClHgGbdAoBg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>, Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Subject: [PATCH bpf-next -v5] net: Add a warning if NAPI cb missed
+ xdp_do_flush().
+Message-ID: <20231016125738.Yt79p1uF@linutronix.de>
+References: <20230929165825.RvwBYGP1@linutronix.de>
+ <20231004070926.5b4ba04c@kernel.org>
+ <20231006154933.mQgxQHHt@linutronix.de>
+ <20231006123139.5203444e@kernel.org>
+ <20231007154351.UvncuBMF@linutronix.de>
+ <20231010065745.lJLYdf_X@linutronix.de>
+ <652627b386bbe_2d55e208d6@john.notmuch>
+ <5efb2093-537e-0f7d-beef-d32c02ec4a3d@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-1750157713-1697461032=:1986"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <5efb2093-537e-0f7d-beef-d32c02ec4a3d@iogearbox.net>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+A few drivers were missing a xdp_do_flush() invocation after
+XDP_REDIRECT.
 
---8323329-1750157713-1697461032=:1986
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Add three helper functions each for one of the per-CPU lists. Return
+true if the per-CPU list is non-empty and flush the list.
+Add xdp_do_check_flushed() which invokes each helper functions and
+creates a warning if one of the functions had a non-empty list.
+Hide everything behind CONFIG_DEBUG_NET.
 
-On Fri, 13 Oct 2023, Bjorn Helgaas wrote:
+Suggested-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+Acked-by: Jakub Kicinski <kuba@kernel.org>
+Acked-by: John Fastabend <john.fastabend@gmail.com>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+v4=E2=80=A6v5:
+  - rebase on top of bpf-next
+  - Collected Reviewed/Acked from the list.
 
-> On Thu, Oct 12, 2023 at 03:53:39PM +0300, Ilpo Järvinen wrote:
-> > On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
-> > > On Mon, Sep 18, 2023 at 04:10:55PM +0300, Ilpo Järvinen wrote:
-> > > > pci_disable_link_state() lacks a symmetric pair. Some drivers want to
-> > > > disable ASPM during certain phases of their operation but then
-> > > > re-enable it later on. If pci_disable_link_state() is made for the
-> > > > device, there is currently no way to re-enable the states that were
-> > > > disabled.
-> > > 
-> > > pci_disable_link_state() gives drivers a way to disable specified ASPM
-> > > states using a bitmask (PCIE_LINK_STATE_L0S, PCIE_LINK_STATE_L1,
-> > > PCIE_LINK_STATE_L1_1, etc), but IIUC the driver can't tell exactly
-> > > what changed and can't directly restore the original state, e.g.,
-> > > 
-> > >   - PCIE_LINK_STATE_L1 enabled initially
-> > >   - driver calls pci_disable_link_state(PCIE_LINK_STATE_L0S)
-> > >   - driver calls pci_enable_link_state(PCIE_LINK_STATE_L0S)
-> > >   - PCIE_LINK_STATE_L0S and PCIE_LINK_STATE_L1 are enabled now
-> > > 
-> > > Now PCIE_LINK_STATE_L0S is enabled even though it was not initially
-> > > enabled.  Maybe that's what we want; I dunno.
-> > > 
-> > > pci_disable_link_state() currently returns success/failure, but only
-> > > r8169 and mt76 even check, and only rtl_init_one() (r8169) has a
-> > > non-trivial reason, so it's conceivable that it could return a bitmask
-> > > instead.
-> > 
-> > It's great that you suggested this since it's actually what also I've been 
-> > started to think should be done instead of this straightforward approach
-> > I used in V2. 
-> > 
-> > That is, don't have the drivers to get anything directly from LNKCTL
-> > but they should get everything through the API provided by the 
-> > disable/enable calls which makes it easy for the driver to pass the same
-> > value back into the enable call.
-> > 
-> > > > Add pci_enable_link_state() to remove ASPM states from the state
-> > > > disable mask.
-> > > > 
-> > > > Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-> > > > ---
-> > > >  drivers/pci/pcie/aspm.c | 42 +++++++++++++++++++++++++++++++++++++++++
-> > > >  include/linux/pci.h     |  2 ++
-> > > >  2 files changed, 44 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
-> > > > index 91dc95aca90f..f45d18d47c20 100644
-> > > > --- a/drivers/pci/pcie/aspm.c
-> > > > +++ b/drivers/pci/pcie/aspm.c
-> > > > @@ -1117,6 +1117,48 @@ int pci_disable_link_state(struct pci_dev *pdev, int state)
-> > > >  }
-> > > >  EXPORT_SYMBOL(pci_disable_link_state);
-> > > >  
-> > > > +/**
-> > > > + * pci_enable_link_state - Re-enable device's link state
-> > > > + * @pdev: PCI device
-> > > > + * @state: ASPM link states to re-enable
-> > > > + *
-> > > > + * Enable device's link state that were previously disable so the link is
-> > > 
-> > > "state[s] that were previously disable[d]" alludes to the use case you
-> > > have in mind, but I don't think it describes how this function
-> > > actually works.  This function just makes it possible to enable the
-> > > specified states.  The @state parameter may have nothing to do with
-> > > any previously disabled states.
-> > 
-> > Yes, it's what I've been thinking between the lines. But I see your point 
-> > that this API didn't make it easy/obvious as is.
-> > 
-> > Would you want me to enforce it too besides altering the API such that the 
-> > states are actually returned from disable call? (I don't personally find
-> > that necessary as long as the API pair itself makes it obvious what the 
-> > driver is expect to pass there.)
-> 
-> This was just a comment about the doc not matching the function
-> behavior.
-> 
-> I think we have to support pci_enable_link_state() even if the driver
-> hasn't previously called pci_disable_link_state(), so drivers have to
-> be able to specify the pci_enable_link_state() @state from scratch.
-> 
-> Does that answer the enforcement question?
+v3=E2=80=A6v4:
+  - s/creats/creates as per Simon Horman.
 
-Yes.
+v2=E2=80=A6v3:
+  - Collected Reviewed/Acked from the list.
+  - Added an include dev.h to filter.c, the robot pointed out a missing
+    prototype.
 
--- 
- i.
+v1=E2=80=A6v2:
+  - Moved xdp_do_check_flushed() to net/core/dev.h.
+  - Stripped __ from function names.
+  - Removed empty lines within an ifdef block.
+  - xdp_do_check_flushed() is now behind CONFIG_DEBUG_NET &&
+    CONFIG_BPF_SYSCALL. dev_check_flush and cpu_map_check_flush are now
+    only behind CONFIG_DEBUG_NET. They have no empty inline function for
+    the !CONFIG_DEBUG_NET case since they are only called in
+    CONFIG_DEBUG_NET case.
 
-> I don't think we can
-> really enforce anything other than that @state specifies valid ASPM
-> states.
-> 
-> Bjorn
-> 
+ include/linux/bpf.h    |  3 +++
+ include/net/xdp_sock.h |  9 +++++++++
+ kernel/bpf/cpumap.c    | 10 ++++++++++
+ kernel/bpf/devmap.c    | 10 ++++++++++
+ net/core/dev.c         |  2 ++
+ net/core/dev.h         |  6 ++++++
+ net/core/filter.c      | 16 ++++++++++++++++
+ net/xdp/xsk.c          | 10 ++++++++++
+ 8 files changed, 66 insertions(+)
 
---8323329-1750157713-1697461032=:1986--
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index f0891ba24cb1c..92b76360ff58a 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -2478,6 +2478,9 @@ void bpf_dynptr_init(struct bpf_dynptr_kern *ptr, voi=
+d *data,
+ 		     enum bpf_dynptr_type type, u32 offset, u32 size);
+ void bpf_dynptr_set_null(struct bpf_dynptr_kern *ptr);
+ void bpf_dynptr_set_rdonly(struct bpf_dynptr_kern *ptr);
++
++bool dev_check_flush(void);
++bool cpu_map_check_flush(void);
+ #else /* !CONFIG_BPF_SYSCALL */
+ static inline struct bpf_prog *bpf_prog_get(u32 ufd)
+ {
+diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+index 69b472604b86f..7dd0df2f6f8e6 100644
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -109,4 +109,13 @@ static inline void __xsk_map_flush(void)
+=20
+ #endif /* CONFIG_XDP_SOCKETS */
+=20
++#if defined(CONFIG_XDP_SOCKETS) && defined(CONFIG_DEBUG_NET)
++bool xsk_map_check_flush(void);
++#else
++static inline bool xsk_map_check_flush(void)
++{
++	return false;
++}
++#endif
++
+ #endif /* _LINUX_XDP_SOCK_H */
+diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+index e42a1bdb7f536..8a0bb80fe48a3 100644
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -764,6 +764,16 @@ void __cpu_map_flush(void)
+ 	}
+ }
+=20
++#ifdef CONFIG_DEBUG_NET
++bool cpu_map_check_flush(void)
++{
++	if (list_empty(this_cpu_ptr(&cpu_map_flush_list)))
++		return false;
++	__cpu_map_flush();
++	return true;
++}
++#endif
++
+ static int __init cpu_map_init(void)
+ {
+ 	int cpu;
+diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+index 4d42f6ed6c11a..a936c704d4e77 100644
+--- a/kernel/bpf/devmap.c
++++ b/kernel/bpf/devmap.c
+@@ -418,6 +418,16 @@ void __dev_flush(void)
+ 	}
+ }
+=20
++#ifdef CONFIG_DEBUG_NET
++bool dev_check_flush(void)
++{
++	if (list_empty(this_cpu_ptr(&dev_flush_list)))
++		return false;
++	__dev_flush();
++	return true;
++}
++#endif
++
+ /* Elements are kept alive by RCU; either by rcu_read_lock() (from syscall=
+) or
+  * by local_bh_disable() (from XDP calls inside NAPI). The
+  * rcu_read_lock_bh_held() below makes lockdep accept both.
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 606a366cc2095..9273b12ecf6fa 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6526,6 +6526,8 @@ static int __napi_poll(struct napi_struct *n, bool *r=
+epoll)
+ 	if (test_bit(NAPI_STATE_SCHED, &n->state)) {
+ 		work =3D n->poll(n, weight);
+ 		trace_napi_poll(n, work, weight);
++
++		xdp_do_check_flushed(n);
+ 	}
+=20
+ 	if (unlikely(work > weight))
+diff --git a/net/core/dev.h b/net/core/dev.h
+index e075e198092cc..f66125857af77 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -136,4 +136,10 @@ static inline void netif_set_gro_ipv4_max_size(struct =
+net_device *dev,
+ }
+=20
+ int rps_cpumask_housekeeping(struct cpumask *mask);
++
++#if defined(CONFIG_DEBUG_NET) && defined(CONFIG_BPF_SYSCALL)
++void xdp_do_check_flushed(struct napi_struct *napi);
++#else
++static inline void xdp_do_check_flushed(struct napi_struct *napi) { }
++#endif
+ #endif
+diff --git a/net/core/filter.c b/net/core/filter.c
+index cc2e4babc85fb..21d75108c2e94 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -83,6 +83,8 @@
+ #include <net/netfilter/nf_conntrack_bpf.h>
+ #include <linux/un.h>
+=20
++#include "dev.h"
++
+ static const struct bpf_func_proto *
+ bpf_sk_base_func_proto(enum bpf_func_id func_id);
+=20
+@@ -4208,6 +4210,20 @@ void xdp_do_flush(void)
+ }
+ EXPORT_SYMBOL_GPL(xdp_do_flush);
+=20
++#if defined(CONFIG_DEBUG_NET) && defined(CONFIG_BPF_SYSCALL)
++void xdp_do_check_flushed(struct napi_struct *napi)
++{
++	bool ret;
++
++	ret =3D dev_check_flush();
++	ret |=3D cpu_map_check_flush();
++	ret |=3D xsk_map_check_flush();
++
++	WARN_ONCE(ret, "Missing xdp_do_flush() invocation after NAPI by %ps\n",
++		  napi->poll);
++}
++#endif
++
+ void bpf_clear_redirect_map(struct bpf_map *map)
+ {
+ 	struct bpf_redirect_info *ri;
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 7482d0aca5046..e23689b82914f 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -391,6 +391,16 @@ void __xsk_map_flush(void)
+ 	}
+ }
+=20
++#ifdef CONFIG_DEBUG_NET
++bool xsk_map_check_flush(void)
++{
++	if (list_empty(this_cpu_ptr(&xskmap_flush_list)))
++		return false;
++	__xsk_map_flush();
++	return true;
++}
++#endif
++
+ void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries)
+ {
+ 	xskq_prod_submit_n(pool->cq, nb_entries);
+--=20
+2.42.0
+
 
