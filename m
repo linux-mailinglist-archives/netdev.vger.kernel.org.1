@@ -1,119 +1,134 @@
-Return-Path: <netdev+bounces-41131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 225D17C9E5A
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 06:49:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 960EE7C9F16
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:45:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38DA61C208DA
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 04:49:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 937DD1C208B7
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 05:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F861C14;
-	Mon, 16 Oct 2023 04:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="BBBIVCCE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D318836;
+	Mon, 16 Oct 2023 05:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED055187C
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 04:49:24 +0000 (UTC)
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 008DFA1;
-	Sun, 15 Oct 2023 21:49:19 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39G4n1OY118152;
-	Sun, 15 Oct 2023 23:49:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1697431741;
-	bh=JrRh9ubyzzH2MAP+bXtYybav8jXiF8o2AzNmGNsNuZc=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=BBBIVCCEr7LI2YqfXWJILudS0rvjsSj8cHdwiFwYOBGW5i9joGP4LlMlxxtfs7BA/
-	 oOYNxUai18/m/UWhvHpwqdaNsAdkTEPwf1r8O44Znj+PPUKn1uTDPcai9uo7izP+Qh
-	 MhoNy5j3p2JJK+gUeIBUst0wTgp5pmCV5Yec0pV8=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39G4n17r077749
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 15 Oct 2023 23:49:01 -0500
-Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 15
- Oct 2023 23:49:01 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 15 Oct 2023 23:49:01 -0500
-Received: from [10.249.135.225] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39G4mud6116504;
-	Sun, 15 Oct 2023 23:48:56 -0500
-Message-ID: <345f6891-0898-0bba-1d28-84b5aaaaeb08@ti.com>
-Date: Mon, 16 Oct 2023 10:18:55 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DD1C8C0
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 05:45:39 +0000 (UTC)
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB49D6
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 22:45:37 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 83F4E205DD;
+	Mon, 16 Oct 2023 07:45:34 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id CT-8X4LgIxiJ; Mon, 16 Oct 2023 07:45:33 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 47BD7201C7;
+	Mon, 16 Oct 2023 07:45:33 +0200 (CEST)
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout1.secunet.com (Postfix) with ESMTP id 402C580004A;
+	Mon, 16 Oct 2023 07:45:33 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 16 Oct 2023 07:45:32 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Mon, 16 Oct
+ 2023 07:45:32 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 495B33180097; Mon, 16 Oct 2023 07:45:32 +0200 (CEST)
+Date: Mon, 16 Oct 2023 07:45:32 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Eric Dumazet <edumazet@google.com>
+CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<eric.dumazet@gmail.com>, syzbot <syzkaller@googlegroups.com>
+Subject: Re: [PATCH net] xfrm: fix a data-race in xfrm_lookup_with_ifid()
+Message-ID: <ZSzN/Gppt9qkHy+v@gauss3.secunet.de>
+References: <20231011102429.799316-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [EXTERNAL] Re: [PATCH net] net: ti: icssg-prueth: Fix r30 CMDs
- bitmasks
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, MD Danish Anwar <danishanwar@ti.com>
-CC: Grygorii Strashko <grygorii.strashko@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, Simon Horman <horms@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, <r-gunasekaran@ti.com>
-References: <20231013111758.213769-1-danishanwar@ti.com>
- <8b11140d-6d91-48aa-be66-9c4a117366af@lunn.ch>
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <8b11140d-6d91-48aa-be66-9c4a117366af@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231011102429.799316-1-edumazet@google.com>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Andrew
-
-On 10/13/2023 9:30 PM, Andrew Lunn wrote:
-> On Fri, Oct 13, 2023 at 04:47:58PM +0530, MD Danish Anwar wrote:
->> The bitmask for EMAC_PORT_DISABLE and EMAC_PORT_FORWARD has been changed
->> in the latest ICSSG firmware.
->>
->> The current bitmasks are wrong and as a result EMAC_PORT_DISABLE and
->> EMAC_PORT_FORWARD commands do not work.
->> Update r30 commands to use the same bitmask as used by the latest ICSSG
->> firmware.
+On Wed, Oct 11, 2023 at 10:24:29AM +0000, Eric Dumazet wrote:
+> syzbot complains about a race in xfrm_lookup_with_ifid() [1]
 > 
-> Please indicate in the commit message this is backwards compatible
-> with old firmware. I assume it is actually backwards compatible.
+> When preparing commit 0a9e5794b21e ("xfrm: annotate data-race
+> around use_time") I thought xfrm_lookup_with_ifid() was modifying
+> a still private structure.
 > 
-
-The bitmasks that are used in driver currently is not used in firmware
-anymore. The latest ICSSG firmware is using different bitmasks and the
-older bitmasks are no longer compatible with the latets ICSSG firmware.
-So it is not backwards compatible. I'll mention this in commit message
-once I post next revision.
-
->     Andrew
+> [1]
+> BUG: KCSAN: data-race in xfrm_lookup_with_ifid / xfrm_lookup_with_ifid
 > 
-> ---
-> pw-bot: cr
+> write to 0xffff88813ea41108 of 8 bytes by task 8150 on cpu 1:
+> xfrm_lookup_with_ifid+0xce7/0x12d0 net/xfrm/xfrm_policy.c:3218
+> xfrm_lookup net/xfrm/xfrm_policy.c:3270 [inline]
+> xfrm_lookup_route+0x3b/0x100 net/xfrm/xfrm_policy.c:3281
+> ip6_dst_lookup_flow+0x98/0xc0 net/ipv6/ip6_output.c:1246
+> send6+0x241/0x3c0 drivers/net/wireguard/socket.c:139
+> wg_socket_send_skb_to_peer+0xbd/0x130 drivers/net/wireguard/socket.c:178
+> wg_socket_send_buffer_to_peer+0xd6/0x100 drivers/net/wireguard/socket.c:200
+> wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
+> wg_packet_handshake_send_worker+0x10c/0x150 drivers/net/wireguard/send.c:51
+> process_one_work kernel/workqueue.c:2630 [inline]
+> process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2703
+> worker_thread+0x525/0x730 kernel/workqueue.c:2784
+> kthread+0x1d7/0x210 kernel/kthread.c:388
+> ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
+> ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+> 
+> write to 0xffff88813ea41108 of 8 bytes by task 15867 on cpu 0:
+> xfrm_lookup_with_ifid+0xce7/0x12d0 net/xfrm/xfrm_policy.c:3218
+> xfrm_lookup net/xfrm/xfrm_policy.c:3270 [inline]
+> xfrm_lookup_route+0x3b/0x100 net/xfrm/xfrm_policy.c:3281
+> ip6_dst_lookup_flow+0x98/0xc0 net/ipv6/ip6_output.c:1246
+> send6+0x241/0x3c0 drivers/net/wireguard/socket.c:139
+> wg_socket_send_skb_to_peer+0xbd/0x130 drivers/net/wireguard/socket.c:178
+> wg_socket_send_buffer_to_peer+0xd6/0x100 drivers/net/wireguard/socket.c:200
+> wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
+> wg_packet_handshake_send_worker+0x10c/0x150 drivers/net/wireguard/send.c:51
+> process_one_work kernel/workqueue.c:2630 [inline]
+> process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2703
+> worker_thread+0x525/0x730 kernel/workqueue.c:2784
+> kthread+0x1d7/0x210 kernel/kthread.c:388
+> ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
+> ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+> 
+> value changed: 0x00000000651cd9d1 -> 0x00000000651cd9d2
+> 
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 0 PID: 15867 Comm: kworker/u4:58 Not tainted 6.6.0-rc4-syzkaller-00016-g5e62ed3b1c8a #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
+> Workqueue: wg-kex-wg2 wg_packet_handshake_send_worker
+> 
+> Fixes: 0a9e5794b21e ("xfrm: annotate data-race around use_time")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
 
--- 
-Thanks and Regards,
-Md Danish Anwar
+Applied to the ipsec tree, thanks a lot Eric!
 
