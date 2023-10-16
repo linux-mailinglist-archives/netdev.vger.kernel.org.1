@@ -1,173 +1,151 @@
-Return-Path: <netdev+bounces-41557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D64097CB4BF
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:36:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D45BE7CB4D0
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:38:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EA2EB21086
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:36:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57CD3B20F0A
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08690341B3;
-	Mon, 16 Oct 2023 20:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7835830FBF;
+	Mon, 16 Oct 2023 20:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabijaczleweli.xyz header.i=@nabijaczleweli.xyz header.b="UmpOEYPJ"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Hn3b3B3N"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60EE1381BB
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 20:36:03 +0000 (UTC)
-Received: from tarta.nabijaczleweli.xyz (tarta.nabijaczleweli.xyz [139.28.40.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A20A181;
-	Mon, 16 Oct 2023 13:35:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-	s=202305; t=1697488557;
-	bh=9/Rch1NNnuQcxUUP1sdNlrNNgx7qX1hxKSFQK/3R+Pg=;
-	h=Date:From:Cc:Subject:References:In-Reply-To:From;
-	b=UmpOEYPJlFLiL4ag5qI+r8wZnOjdoxGBe9TfIsmDRZajgouiqNxZIFuEPmq0+t0dQ
-	 XjWhFPb64jAe3/1/E7WKRc3Ygdb9pGYU9if2p7IqdndK6KJ8GrBb53XK4WCsLpu78l
-	 GkAyuT4vdjDak/FatVvwXqPcKN4WjZDqSOHGvfLI7AR6N5xvSSbf53N0/Iji9xRtnR
-	 YZyvcwA2KvsCuVaMmxmXgyCAVFZg/LCrx6pFjfeVTSfwIr2c6FcaMOiFhJXsYe/5rk
-	 pfiDdyRNRKP+LR0YKcUBN668YPC9vsuIw7Sipc9Wiq9fw+t6hPM/0XI05F9OErBe36
-	 1sb5wxpR2oNXg==
-Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-	by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id 043D71041C;
-	Mon, 16 Oct 2023 22:35:57 +0200 (CEST)
-Date: Mon, 16 Oct 2023 22:35:56 +0200
-From: 
-	Ahelenia =?utf-8?Q?Ziemia=C5=84ska?= <nabijaczleweli@nabijaczleweli.xyz>
-Cc: Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 09/11] net/tcp: tcp_splice_read: always do non-blocking reads
-Message-ID: <d44f2f64c18151d103ee045d1e3ce7a7d5534273.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
-References: <cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D553E381A5
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 20:38:22 +0000 (UTC)
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E70D9B0
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:38:20 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-d9ad90e1038so5212760276.3
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:38:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1697488700; x=1698093500; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ab1cQmjcNTze6NoCzSY8OfemgbBn41PWgBmFMxTMYIY=;
+        b=Hn3b3B3NlVrYztZVhDtlqnkLXvrqXaAJdS48nh/U7Zi58QTFGfugMU9pbG10NPJ1HX
+         P1iv3WW5UNxCKoKDAvsZFVcoexGC+KYhaLCMZfkMvNHwWYxNAzcx/mOJ/dug7Z41Bnc4
+         ZmcPTiIySZ/trb0FZN55gdT5BzrZX4yuv6p9ShgQEyBeCBNyhcAQNcMmRuK8aJZoWIzU
+         4F/O65E4jLPDwIbKMHktO4zClqQh+p9Mw+yOYgecSI7mJsFFqnMQ1PkvW/W80uD+gykX
+         1530c4Sp+MASfKJOrTCsn7cy+i6PKcTCYCfdpL8122n2dELYK2uCyaagawo7DGnYJppZ
+         ojvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697488700; x=1698093500;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ab1cQmjcNTze6NoCzSY8OfemgbBn41PWgBmFMxTMYIY=;
+        b=EarJpgKKH78vRGsXwLWPpe+/aEoPns1qyGHvnTaQRo1yv6ooRHE1yVy7RjHkTEP0I2
+         5pGsqfynm9o+uvObPrzKGKhjrv75vV0eqGVWkPOxcOmSFnryxE4MhnpFyvN3A3FwnreD
+         s3Ln8KgvLXdC5ezs/om158bW17yvcVLIKUvI2XzCwVs1J7OPSOi7rS+S2n/17rnbeLPr
+         jm6OplWkD6ASV28+qx6bqYCSePGLOui/bVsr9uAN5OkBkWrUvZg9RqeiiVlsLbpp+6QN
+         Uw/JMR4Pa4RH0d7nFxEW+WyPouXtFb3VJ9fjV295VGI+f9yR7v52fuN8N275jKBaQ4sb
+         a9Ww==
+X-Gm-Message-State: AOJu0YxppY6SsWLhMoWojAyzGlJVC4YgJAapyfbZce6p/foq2nPI2QTl
+	E8nDbp94DCBfkbYWlgwbECIc+nga7cB3WSZYj+Uwjg==
+X-Google-Smtp-Source: AGHT+IE71mivRMzQPZ46xAL4eCKfL1kUMjj4mvMCTvlYF8+sZ8n46/5Qj7mYzDOtbWJa91vRbYjQVL46+KAyBgLJ/aI=
+X-Received: by 2002:a25:ad93:0:b0:d42:d029:ff99 with SMTP id
+ z19-20020a25ad93000000b00d42d029ff99mr141119ybi.55.1697488700121; Mon, 16 Oct
+ 2023 13:38:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fzr4ntv4xizfeqvz"
-Content-Disposition: inline
-In-Reply-To: <cover.1697486714.git.nabijaczleweli@nabijaczleweli.xyz>
-User-Agent: NeoMutt/20231006
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MISSING_HEADERS,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=no
+References: <20231016093549.181952-1-jhs@mojatatu.com> <20231016131506.71ad76f5@kernel.org>
+In-Reply-To: <20231016131506.71ad76f5@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 16 Oct 2023 16:38:08 -0400
+Message-ID: <CAM0EoM=nT2KQcVqPrWvKJXnW7h8uodhu0daNsLkuAUt5n=zuZw@mail.gmail.com>
+Subject: Re: [PATCH v7 net-next 00/18] Introducing P4TC
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, anjali.singhai@intel.com, namrata.limaye@intel.com, 
+	deb.chatterjee@intel.com, john.andy.fingerhut@intel.com, dan.daly@intel.com, 
+	Vipin.Jain@amd.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, 
+	toke@redhat.com, mattyk@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, Oct 16, 2023 at 4:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 16 Oct 2023 05:35:31 -0400 Jamal Hadi Salim wrote:
+> > Changes In RFC Version 7
+> > -------------------------
+> >
+> > 0) First time removing the RFC tag!
+> >
+> > 1) Removed XDP cookie. It turns out as was pointed out by Toke(Thanks!)=
+ - that
+> > using bpf links was sufficient to protect us from someone replacing or =
+deleting
+> > a eBPF program after it has been bound to a netdev.
+> >
+> > 2) Add some reviewed-bys from Vlad.
+> >
+> > 3) Small bug fixes from v6 based on testing for ebpf.
+> >
+> > 4) Added the counter extern as a sample extern. Illustrating this examp=
+le because
+> >    it is slightly complex since it is possible to invoke it directly fr=
+om
+> >    the P4TC domain (in case of direct counters) or from eBPF (indirect =
+counters).
+> >    It is not exactly the most efficient implementation (a reasonable co=
+unter impl
+> >    should be per-cpu).
+>
+> I think that I already shared my reservations about this series.
 
---fzr4ntv4xizfeqvz
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+And please please let's have a _technical_ discussion on reservations
+not hyperboles.
 
-Otherwise we risk sleeping with the pipe locked for indeterminate
-lengths of time.
+> On top of that, please, please, please make sure that it builds cleanly
+> before posting.
+>
+> I took the shared infra 8 hours to munch thru this series, and it threw
+> out all sorts of warnings. 8 hours during which I could not handle any
+> PR or high-prio patch :( Not your fault that builds are slow, I guess,
+> but if you are throwing a huge series at the list for the what-ever'th
+> time, it'd be great if it at least built cleanly :(
 
-sock_rcvtimeo() returns 0 if the second argument is true, so the
-explicit re-try loop for empty read conditions can be removed
-entirely.
+We absolutely dont want to add unnecessary work.
+Probably we may have missed the net-next tip? We'll pull the latest
+and retest with tip.
+Is there a link that we can look at on what the infra does so we can
+make sure it works per expectation next time?
+If you know what kind of warnings/issues so we can avoid it going forward?
+Note: We didnt see any and we built each patch separately on gcc 11,
+12, 13 and clang 16.
+BTW: Lore does reorder the patches, but i am assuming cicd is smart
+enough to understand this?
 
-Link: https://lore.kernel.org/linux-fsdevel/qk6hjuam54khlaikf2ssom6custxf5i=
-s2ekkaequf4hvode3ls@zgf7j5j4ubvw/t/#u
-Signed-off-by: Ahelenia Ziemia=C5=84ska <nabijaczleweli@nabijaczleweli.xyz>
----
- net/ipv4/tcp.c | 30 +++---------------------------
- 1 file changed, 3 insertions(+), 27 deletions(-)
+> FWIW please do not post another version this week (not that I think
+> that you would do that, but better safe than sorry. Last week the patch
+> bombs pushed the shared infra 24h+ behind the list..)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 3f66cdeef7de..09b562e2c1bf 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -782,7 +782,6 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *pp=
-os,
- 		.len =3D len,
- 		.flags =3D flags,
- 	};
--	long timeo;
- 	ssize_t spliced;
- 	int ret;
-=20
-@@ -797,7 +796,6 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *pp=
-os,
-=20
- 	lock_sock(sk);
-=20
--	timeo =3D sock_rcvtimeo(sk, sock->file->f_flags & O_NONBLOCK);
- 	while (tss.len) {
- 		ret =3D __tcp_splice_read(sk, &tss);
- 		if (ret < 0)
-@@ -821,35 +819,13 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *=
-ppos,
- 				ret =3D -ENOTCONN;
- 				break;
- 			}
--			if (!timeo) {
--				ret =3D -EAGAIN;
--				break;
--			}
--			/* if __tcp_splice_read() got nothing while we have
--			 * an skb in receive queue, we do not want to loop.
--			 * This might happen with URG data.
--			 */
--			if (!skb_queue_empty(&sk->sk_receive_queue))
--				break;
--			sk_wait_data(sk, &timeo, NULL);
--			if (signal_pending(current)) {
--				ret =3D sock_intr_errno(timeo);
--				break;
--			}
--			continue;
-+			ret =3D -EAGAIN;
-+			break;
- 		}
- 		tss.len -=3D ret;
- 		spliced +=3D ret;
-=20
--		if (!tss.len || !timeo)
--			break;
--		release_sock(sk);
--		lock_sock(sk);
--
--		if (sk->sk_err || sk->sk_state =3D=3D TCP_CLOSE ||
--		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
--		    signal_pending(current))
--			break;
-+		break;
- 	}
-=20
- 	release_sock(sk);
---=20
-2.39.2
+Not intending to.
 
---fzr4ntv4xizfeqvz
-Content-Type: application/pgp-signature; name="signature.asc"
+cheers,
+jamal
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmUtnqwACgkQvP0LAY0m
-WPFjbRAApjaF2MmOlUN/7/0y1McNSrda5MBqzAFcQ3NKrJBC3+bbPLoxIayoT27x
-JBVR4DxibstsZkxjjoeM2yMsxprbP6F6K0RzdKGp1PyjlioTxUJfgkhLyBckOEt7
-KrSBEwTGDDtdnwCFWJBWHtjtdFyCjLu6PaDu1xQs6mS7JZbOkGrrEFIIuq2rUp6F
-oBBzmc9CQut830eAB/UoJeVmU4WnFAT9Aqq5LcDQltkTp4XJYNsjyuzW2KCzhpuY
-Y3tQrDDrxHvhaEfdMw9K8M30EycM0XEk2r119k51F/Hzgh//nKe1d6M9qYxo9P3e
-n9OXOaq1VMVSHrkwgPe7z4jZpY/ot2ybHiw/EzZLtJ1Tyd8kSsnSAuSvBsEIo8nN
-FwSRJvWPDx0pTixy/otgGaQ6aFlEUw5PMvrU6cKQeuGjtVHUKdzICoIFkBSuPZW8
-9Jo7Ijlcy7r97AHFAYffvQm2WjazLhllHga1cxgLDKuFYsMxIGsSMLK5xilDGQr3
-gQS3iDEf3mIeVoqayBlXgNmyiZFzRgeyShN29FCBVatfm+WU9z2syDzzGgChBvYd
-A7vNgyuWzO99NF2E41J9iKP8HIPFronfsov+HM2SyZnWsFabdlGqTYlUDlIk+Vv+
-+mwy+pPB4/Y+ihlEjTMU2hwbRs6mS0JM9Xm71w7V++uZfNNkPy0=
-=KTUg
------END PGP SIGNATURE-----
-
---fzr4ntv4xizfeqvz--
+> --
+> pw-bot: cr
 
