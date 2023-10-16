@@ -1,123 +1,121 @@
-Return-Path: <netdev+bounces-41274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C7017CA738
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:56:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC6417CA74F
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:58:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAF1728160A
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:56:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54EBC2815E0
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:58:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88A702629D;
-	Mon, 16 Oct 2023 11:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="NDZxOhu2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043E5266CD;
+	Mon, 16 Oct 2023 11:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F4615ADD;
-	Mon, 16 Oct 2023 11:56:35 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7619BEB;
-	Mon, 16 Oct 2023 04:56:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=WRPI/vvAe1a/d/T53OXiNe5f7JTZlBNBUbkDycSd458=; b=NDZxOhu2bvM4P4YdZuYfpQ2lwo
-	dhyoO/D1aKBPPjhCqUPDdtavMHg9e0J0xKrO2FOVJ3qtwef5GICHvfzMSARLIaRWxVQoZsXYoHd/w
-	n2/mTj7GwkocyAJH1+TFnFZQUtGn9KavOtBbv2Fgu0fTIeoxcIbA2gT2O6rER665ZqrYZrZvmgtqi
-	wBieyPcQuIQLnA6WKx9QgMb8RexRDBwgv0VR3EN+HVBDy6FmONTyQ4VJES9N1znpw92eGDq8KefaC
-	R7lCW8CFqsJAOod3C1RumaGqWTLeh/kpUtV86/EOL6MpQv3LpG9/hJAtbA/nw0QSoC7cJWt0ageZQ
-	syGDO2KA==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qsMCw-00093v-5q; Mon, 16 Oct 2023 13:56:26 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qsMCv-0002uD-7t; Mon, 16 Oct 2023 13:56:25 +0200
-Subject: Re: [PATCH bpf-next -v4] net: Add a warning if NAPI cb missed
- xdp_do_flush().
-To: John Fastabend <john.fastabend@gmail.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Hao Luo <haoluo@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Jiri Olsa <jolsa@kernel.org>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- KP Singh <kpsingh@kernel.org>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Martin KaFai Lau <martin.lau@linux.dev>, Paolo Abeni <pabeni@redhat.com>,
- Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Thomas Gleixner <tglx@linutronix.de>, Yonghong Song
- <yonghong.song@linux.dev>, =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?=
- <toke@redhat.com>
-References: <20230929165825.RvwBYGP1@linutronix.de>
- <20231004070926.5b4ba04c@kernel.org> <20231006154933.mQgxQHHt@linutronix.de>
- <20231006123139.5203444e@kernel.org> <20231007154351.UvncuBMF@linutronix.de>
- <20231010065745.lJLYdf_X@linutronix.de>
- <652627b386bbe_2d55e208d6@john.notmuch>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <5efb2093-537e-0f7d-beef-d32c02ec4a3d@iogearbox.net>
-Date: Mon, 16 Oct 2023 13:56:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F9C266AA
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:58:52 +0000 (UTC)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 30A38F2;
+	Mon, 16 Oct 2023 04:58:51 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 616F01FB;
+	Mon, 16 Oct 2023 04:59:31 -0700 (PDT)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 698A83F5A1;
+	Mon, 16 Oct 2023 04:58:48 -0700 (PDT)
+Message-ID: <fffcf35b-0da5-4df5-9224-5ac4e28b5f3a@arm.com>
+Date: Mon, 16 Oct 2023 12:58:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <652627b386bbe_2d55e208d6@john.notmuch>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27063/Mon Oct 16 10:02:17 2023)
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/12] dma-direct: simplify the use atomic pool logic in
+ dma_direct_alloc
+Content-Language: en-GB
+To: Christoph Hellwig <hch@lst.de>, Greg Ungerer <gerg@linux-m68k.org>,
+ iommu@lists.linux.dev
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Wei Fang <wei.fang@nxp.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
+ netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-renesas-soc@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>
+References: <20231016054755.915155-1-hch@lst.de>
+ <20231016054755.915155-8-hch@lst.de>
+From: Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20231016054755.915155-8-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Sebastian,
+On 16/10/2023 6:47 am, Christoph Hellwig wrote:
+> The logic in dma_direct_alloc when to use the atomic pool vs remapping
+> grew a bit unreadable.  Consolidate it into a single check, and clean
+> up the set_uncached vs remap logic a bit as well.
 
-On 10/11/23 6:42 AM, John Fastabend wrote:
-> Sebastian Andrzej Siewior wrote:
->> A few drivers were missing a xdp_do_flush() invocation after
->> XDP_REDIRECT.
->>
->> Add three helper functions each for one of the per-CPU lists. Return
->> true if the per-CPU list is non-empty and flush the list.
->> Add xdp_do_check_flushed() which invokes each helper functions and
->> creates a warning if one of the functions had a non-empty list.
->> Hide everything behind CONFIG_DEBUG_NET.
->>
->> Suggested-by: Jesper Dangaard Brouer <hawk@kernel.org>
->> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
->> Acked-by: Jakub Kicinski <kuba@kernel.org>
->> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Reviewed-by: Robin Murphy <robin.murphy@arm.com>
+
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   kernel/dma/direct.c | 25 ++++++++++---------------
+>   1 file changed, 10 insertions(+), 15 deletions(-)
 > 
-> LGTM.
-> 
-> Acked-by: John Fastabend <john.fastabend@gmail.com>
-
-Do you have a chance to send a v5 rebase? It does not apply to bpf-next.
-
-Other than that, the patch lgtm.
-
-Thanks,
-Daniel
+> diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
+> index ec410af1d8a14e..1327d04fa32a25 100644
+> --- a/kernel/dma/direct.c
+> +++ b/kernel/dma/direct.c
+> @@ -234,27 +234,22 @@ void *dma_direct_alloc(struct device *dev, size_t size,
+>   					dma_handle);
+>   
+>   		/*
+> -		 * Otherwise remap if the architecture is asking for it.  But
+> -		 * given that remapping memory is a blocking operation we'll
+> -		 * instead have to dip into the atomic pools.
+> +		 * Otherwise we require the architecture to either be able to
+> +		 * mark arbitrary parts of the kernel direct mapping uncached,
+> +		 * or remapped it uncached.
+>   		 */
+> +		set_uncached = IS_ENABLED(CONFIG_ARCH_HAS_DMA_SET_UNCACHED);
+>   		remap = IS_ENABLED(CONFIG_DMA_DIRECT_REMAP);
+> -		if (remap) {
+> -			if (dma_direct_use_pool(dev, gfp))
+> -				return dma_direct_alloc_from_pool(dev, size,
+> -						dma_handle, gfp);
+> -		} else {
+> -			if (!IS_ENABLED(CONFIG_ARCH_HAS_DMA_SET_UNCACHED))
+> -				return NULL;
+> -			set_uncached = true;
+> -		}
+> +		if (!set_uncached && !remap)
+> +			return NULL;
+>   	}
+>   
+>   	/*
+> -	 * Decrypting memory may block, so allocate the memory from the atomic
+> -	 * pools if we can't block.
+> +	 * Remapping or decrypting memory may block, allocate the memory from
+> +	 * the atomic pools instead if we aren't allowed block.
+>   	 */
+> -	if (force_dma_unencrypted(dev) && dma_direct_use_pool(dev, gfp))
+> +	if ((remap || force_dma_unencrypted(dev)) &&
+> +	    dma_direct_use_pool(dev, gfp))
+>   		return dma_direct_alloc_from_pool(dev, size, dma_handle, gfp);
+>   
+>   	/* we always manually zero the memory once we are done */
 
