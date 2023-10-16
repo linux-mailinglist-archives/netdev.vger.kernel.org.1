@@ -1,116 +1,121 @@
-Return-Path: <netdev+bounces-41174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6485D7CA10C
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:54:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A1187CA114
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5515B20CB3
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:54:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 368A8281477
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CAC71775E;
-	Mon, 16 Oct 2023 07:54:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B270D1775E;
+	Mon, 16 Oct 2023 07:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="RTzkJj3B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="khz17ag3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF0718047
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:54:02 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E48ADE
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:53:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=ngQA2UXPqbvVAjT+xhmuNpfsjFjFJDhMWj120VzIiR0=; b=RTzkJj3BM96l6JFb2aDFsGl5DP
-	Js9q3EFC5LsPQGcycbtoLcdYVdhuESKlc4YXifHnbHE0MIIXBDCVNhxJK9zIm/801jeLBVaqyBRq2
-	mAl3eeHKSKIa6wDsm7mDcwYdTjEiGztYsm4ny5Vd6ytQ58/BtEkN1UeH2j0LNfXyg9wSgK2WstQCG
-	X+QrEQYPUGpHVOrTnmVaa4sNqLN5WtMrHxUPBIZgcB/lcOBFBq8sumF1+Vr6BU7L0Hu0cAS247CQX
-	UpSh4fJhOYMZoCl/gYc1cJkPU6Q883kActkYiJF4yv6OYg1ikBb9HDUSYfy6v81cSPcQPABBk0/g+
-	6668kK5A==;
-Received: from [192.168.1.4] (port=11103 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qsIQF-0006Qb-0B;
-	Mon, 16 Oct 2023 09:53:55 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Mon, 16 Oct 2023 09:53:54 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <conor@kernel.org>
-CC: <andrew@lunn.ch>, <ante.knezic@helmholz.de>, <conor+dt@kernel.org>,
-	<davem@davemloft.net>, <devicetree@vger.kernel.org>, <edumazet@google.com>,
-	<f.fainelli@gmail.com>, <krzysztof.kozlowski+dt@linaro.org>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <marex@denx.de>,
-	<netdev@vger.kernel.org>, <olteanv@gmail.com>, <pabeni@redhat.com>,
-	<robh+dt@kernel.org>, <woojung.huh@microchip.com>
-Subject: [PATCH net-next 2/2] dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
-Date: Mon, 16 Oct 2023 09:53:49 +0200
-Message-ID: <20231016075349.18792-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20231012-unicorn-rambling-55dc66b78f2f@spud>
-References: <20231012-unicorn-rambling-55dc66b78f2f@spud>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5355CA2D
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:57:35 +0000 (UTC)
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1381CA2
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:57:34 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so2049a12.1
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:57:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697443052; x=1698047852; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i+sl9PX6kdt8RqR7y0x6gHM4u3u4eMyuWu9rmEcATII=;
+        b=khz17ag3dgKqfSspc2LfxE32aKOmRsyQf3VdGhbFCPV/ZpUJL+apDDDA7VXaqSScRg
+         Uhe9+drcYnEjrnYn/4rJAnuQbfBQRAX36lBkDMbTFRhL2Fq52C+mhsG5VS8AG1qkyXwM
+         VMSb7AgETMii0MKtUfkNel64t6RTcAMIatd7k0eEeYOa3tgSyXKPsNeeuJkCQmm7dx7v
+         hVRsplg7RVdRkaGzvFwmPrZoWfU3X5iNGU95PhprfTzFFgfC4monElFIraOKH662VpM3
+         wTzV4t5Wzf9xv4DphKHclF2kER/RyD+F74my7+v/vMPJrA/sbSuP9yW1ZB+zgweVVA3T
+         f8MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697443052; x=1698047852;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i+sl9PX6kdt8RqR7y0x6gHM4u3u4eMyuWu9rmEcATII=;
+        b=YtgzlrbV/Pu6GoEXdyRYrtN4phdunP9GjhRA4gD0a433o38/6t9WY3Jdj9CjZTF/h3
+         gdjMopT8gJBHXA4voFsPi2RFCj9L8HsrrE8vRtSGF2kvbz65PQ8cRtGgvUpTXMTBN/nE
+         KhOROUs4FdfJ3Z5QDs+OhhbN4cwKXP+CShEerP1HPHoZz8/MhmvnOo4fEaELtXTnos75
+         ylBNUmJwQkvkaF4JkHVjkB8RLegIukl0i1WgGmfTfGBsvEFokCqQlNJpb9mXX/p8vmGy
+         LtEIhsocX5T8/DT7qz5etOONcDoJTKammGhM/a9iWJ9Z3VH4IrmN8LBc+Lr5VVJWGKAd
+         Aifw==
+X-Gm-Message-State: AOJu0YzugFgQsHcSi8h+loB7P+FHDvNbYgHMrGAG3BUgSzTDWpR38nkI
+	JdD7gOKFoxAyzItoudg2B1a2JOPwevcrDb0VGwcIZrKZQA/krubWzHwhSA==
+X-Google-Smtp-Source: AGHT+IFbKxMMQdpukTRp29PbFa7JP6Trr1yUNIAxpXdgMno4Fxr+URtk5qNfBOG67fAeA8LDIgDeFG+YWB3LYHtGA9I=
+X-Received: by 2002:a50:fa99:0:b0:53e:7ad7:6d47 with SMTP id
+ w25-20020a50fa99000000b0053e7ad76d47mr120665edr.5.1697443052314; Mon, 16 Oct
+ 2023 00:57:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20231015174700.2206872-1-ncardwell.sw@gmail.com>
+In-Reply-To: <20231015174700.2206872-1-ncardwell.sw@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 16 Oct 2023 09:57:18 +0200
+Message-ID: <CANn89iJRCaZzzdWedQ1uEyiW3CgxFA2sEi=BCjOscLj8s6YjXQ@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: fix excessive TLP and RACK timeouts from HZ rounding
+To: Neal Cardwell <ncardwell.sw@gmail.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 12 Oct 2023 16:18:09 +0100, Conor Dooley wrote:
-> On Thu, Oct 12, 2023 at 12:55:56PM +0200, Ante Knezic wrote:
-> > Add documentation for selecting reference rmii clock on KSZ88X3 devices
-> > 
-> > Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
-> > ---
-> >  .../devicetree/bindings/net/dsa/microchip,ksz.yaml    | 19 +++++++++++++++++++
-> >  1 file changed, 19 insertions(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > index 41014f5c01c4..eaa347b04db1 100644
-> > --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > @@ -72,6 +72,25 @@ properties:
-> >    interrupts:
-> >      maxItems: 1
-> >  
-> > +  microchip,rmii-clk-internal:
-> > +    $ref: /schemas/types.yaml#/definitions/flag
-> > +    description:
-> > +      Set if the RMII reference clock is provided internally. Otherwise
-> > +      reference clock should be provided externally.
-> 
-> I regret not asking this on the previous iteration - how come you need a
-> custom property? In the externally provided case would there not be a
-> clocks property pointing to the RMII reference clock, that would be
-> absent when provided by the itnernal reference?
-> 
-> Cheers,
-> Conor.
+On Sun, Oct 15, 2023 at 7:47=E2=80=AFPM Neal Cardwell <ncardwell.sw@gmail.c=
+om> wrote:
+>
+> From: Neal Cardwell <ncardwell@google.com>
+>
+> We discovered from packet traces of slow loss recovery on kernels with
+> the default HZ=3D250 setting (and min_rtt < 1ms) that after reordering,
+> when receiving a SACKed sequence range, the RACK reordering timer was
+> firing after about 16ms rather than the desired value of roughly
+> min_rtt/4 + 2ms. The problem is largely due to the RACK reorder timer
+> calculation adding in TCP_TIMEOUT_MIN, which is 2 jiffies. On kernels
+> with HZ=3D250, this is 2*4ms =3D 8ms. The TLP timer calculation has the
+> exact same issue.
+>
+> This commit fixes the TLP transmit timer and RACK reordering timer
+> floor calculation to more closely match the intended 2ms floor even on
+> kernels with HZ=3D250. It does this by adding in a new
+> TCP_TIMEOUT_MIN_US floor of 2000 us and then converting to jiffies,
+> instead of the current approach of converting to jiffies and then
+> adding th TCP_TIMEOUT_MIN value of 2 jiffies.
+>
+> Our testing has verified that on kernels with HZ=3D1000, as expected,
+> this does not produce significant changes in behavior, but on kernels
+> with the default HZ=3D250 the latency improvement can be large. For
+> example, our tests show that for HZ=3D250 kernels at low RTTs this fix
+> roughly halves the latency for the RACK reorder timer: instead of
+> mostly firing at 16ms it mostly fires at 8ms.
+>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Neal Cardwell <ncardwell@google.com>
+> Signed-off-by: Yuchung Cheng <ycheng@google.com>
+> Fixes: bb4d991a28cc ("tcp: adjust tail loss probe timeout")
 
-In both cases (external and internal), the KSZ88X3 is actually providing the
-RMII reference clock. Difference is only will the clock be routed as external
-copper track (pin REFCLKO -> pin REFCLKI), or will it be routed internally.
-So, this should not affect the clock relation between the uC and the switch
-device? 
-This property has no effect if KSZ88X3 is not providing the reference clock.
-Maybe I should provide more info in the commit message of both patches as well?
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+It is a bit sad that some distros are still using HZ=3D250 in 2023.
+
+Thanks Neal !
 
