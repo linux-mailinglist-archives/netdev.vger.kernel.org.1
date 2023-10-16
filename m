@@ -1,131 +1,204 @@
-Return-Path: <netdev+bounces-41338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77CB57CA986
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89F267CAAB5
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7A1FB20E9B
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:33:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52696B20E8E
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD4727EEC;
-	Mon, 16 Oct 2023 13:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fWcW/Fj6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01243286AD;
+	Mon, 16 Oct 2023 14:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EC926E16
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:33:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0144FC433CA
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:33:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697463205;
-	bh=53c0if5gtlyK/H3uqm3FGi3l9NCjxsvEiVZyLNyWIdg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=fWcW/Fj6MrlDY45J0xOH9DfhVxK1NDcWLzj7BLeSwpQJUlLC1J/REOTL/sgmTp72A
-	 2ynPZciFIoOD8tlwWq+jLPcC+bFEchLwZarAyf1WuW7OK9FJfI61KCBbrKG+LQBu5c
-	 EGAxvSGaQsjrQxJVHcqgRRusXiiODRISejCOzZQqj/cf6yzGDWoLP02kcEvNZrodEi
-	 VBaRaf5qhMkqJccvmzpOFnxJmFHGhmmPKDZns2lz2hjbehS0JO4Eg2Zfmuji1XUJ+R
-	 tMcyPP0YJgCAGpCbsmFaJDyCX8fNOyF7zmZWBKt53BKIekys6aA2xW+DRn5ZHH/1BT
-	 Yk6YVTBM0Br0g==
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-507b18cf2e1so1076875e87.3
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:33:24 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxQHz7cmjz9hvMEBtbWT8SPb6g/tppoSaFAvY3nkHXe6hzA7ReY
-	2HVP0bB3JB+O5uILKEFVFK3oDYqvIH48dXSVdQ==
-X-Google-Smtp-Source: AGHT+IGOu53QmlzEtm1OexJcqnwAESHNz83QU3yBo51Qy3sxnciUsFcS7BrEJ6/IJfJcaMUPMnUcv/t2zLCHUWC602o=
-X-Received: by 2002:a05:6512:3582:b0:500:99a9:bc40 with SMTP id
- m2-20020a056512358200b0050099a9bc40mr25423017lfr.69.1697463203207; Mon, 16
- Oct 2023 06:33:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D806A28693;
+	Mon, 16 Oct 2023 14:01:36 +0000 (UTC)
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9658CAC;
+	Mon, 16 Oct 2023 07:01:34 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5384975e34cso8162188a12.0;
+        Mon, 16 Oct 2023 07:01:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697464893; x=1698069693;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K+vz+RhpX8IapoVrGDcBGs5+y+fGXCtRk6K6ExAlVio=;
+        b=pI+H6gOSgQ6beOgPoCSQwzzzHIFWa7zz3b5q4it26ZET9NIIMZV42gKlGYVnZe/4w3
+         +ctPsDUieuW8usxO0MBUZmepABppV+fh6wEFqWUuEi++vj7iSFxwe8GVGdH6CXEl9DJN
+         YARiIBeKx+ExrDzliSElrlmrc04HpuNJ+yYJz9weDiF4yRyb6QQUopsx0g9/hlaayyVk
+         VddHzWyS7RRRZGKnfkhJAkd7E9LECVRpG4NQBeanEJzlXtdeZcObtZws04hMH0nKDMpB
+         CY4QiidOt80AxEjDqTBhPOrjvJfSU7YVmK1ejDQAOgslFTOwjXhuev1C1JzI3qhFgrVc
+         5G0w==
+X-Gm-Message-State: AOJu0YwQKWzGJBUxZOM0VnKrW/hHIHCZWmDgAuv4b+UPTT5hbkGp96Rx
+	REWIiCJZz5rb7R26WrYY8Ek=
+X-Google-Smtp-Source: AGHT+IGxhTzT8TXN4hkrB/CggwoI9BfAgVK6NaXYMJoWmUypn51PMTBTCXHP1YpiFMAXS8xJGiDJ2Q==
+X-Received: by 2002:a50:c058:0:b0:53e:455c:6273 with SMTP id u24-20020a50c058000000b0053e455c6273mr7409252edd.2.1697464892721;
+        Mon, 16 Oct 2023 07:01:32 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-116.fbsv.net. [2a03:2880:31ff:74::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a23-20020a50ff17000000b005342fa19070sm15672646edu.89.2023.10.16.07.01.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 07:01:32 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: sdf@google.com,
+	axboe@kernel.dk,
+	asml.silence@gmail.com,
+	willemdebruijn.kernel@gmail.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	martin.lau@linux.dev,
+	krisman@suse.de
+Cc: bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	io-uring@vger.kernel.org
+Subject: [PATCH v7 00/11] io_uring: Initial support for {s,g}etsockopt commands
+Date: Mon, 16 Oct 2023 06:47:38 -0700
+Message-Id: <20231016134750.1381153-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016122446.807703-1-alexander.stein@ew.tq-group.com>
-In-Reply-To: <20231016122446.807703-1-alexander.stein@ew.tq-group.com>
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 16 Oct 2023 08:33:10 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqL0v+a5rijNdEqD7A=DbLeWWSHA2vOmYMv4hVN6nL97fA@mail.gmail.com>
-Message-ID: <CAL_JsqL0v+a5rijNdEqD7A=DbLeWWSHA2vOmYMv4hVN6nL97fA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] net: fec: Fix device_get_match_data usage
-To: Alexander Stein <alexander.stein@ew.tq-group.com>
-Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
-	Clark Wang <xiaoning.wang@nxp.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Oct 16, 2023 at 7:24=E2=80=AFAM Alexander Stein
-<alexander.stein@ew.tq-group.com> wrote:
->
-> device_get_match_data() returns an entry of fec_devtype, an array of
-> struct platform_device_id. But the desired struct fec_devinfo information
-> is stored in platform_device_id.driver_data. Thus directly storing
-> device_get_match_data() result in dev_info is wrong.
-> Instead, similar to before the change, update the pdev->id_entry if
-> device_get_match_data() returned non-NULL.
->
-> Fixes: b0377116decd ("net: ethernet: Use device_get_match_data()")
-> Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
-> ---
-> Admittedly I am not a fan of adding a additional struct platform_device_i=
-d
-> pointer. But as long a this driver supports non-DT probes it can be non-N=
-ULL.
+This patchset adds support for getsockopt (SOCKET_URING_OP_GETSOCKOPT)
+and setsockopt (SOCKET_URING_OP_SETSOCKOPT) in io_uring commands.
+SOCKET_URING_OP_SETSOCKOPT implements generic case, covering all levels
+and optnames. SOCKET_URING_OP_GETSOCKOPT is limited, for now, to
+SOL_SOCKET level, which seems to be the most common level parameter for
+get/setsockopt(2).
 
-Besides Coldfire, none of the non-DT platform id's are still needed.
-I'm not sure we need an entry for Coldfire if it's the only one and
-there is no driver data. Maybe for module autoloading? I don't
-remember offhand.
+In order to keep the implementation (and tests) simple, some refactors
+were done prior to the changes, as follows:
 
-Regardless, fec_dt_ids should be updated to use fec_foo_info structs
-directly instead of the indirection with the platform_device_id
-structs.
+Patches 1-2: Make BPF cgroup filters sockptr aware
 
->  drivers/net/ethernet/freescale/fec_main.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethe=
-rnet/freescale/fec_main.c
-> index 5eb756871a963..dc7c3ef5ba9de 100644
-> --- a/drivers/net/ethernet/freescale/fec_main.c
-> +++ b/drivers/net/ethernet/freescale/fec_main.c
-> @@ -4297,6 +4297,7 @@ fec_probe(struct platform_device *pdev)
->         char irq_name[8];
->         int irq_cnt;
->         const struct fec_devinfo *dev_info;
-> +       const struct platform_device_id *plat_dev_id;
->
->         fec_enet_get_queue_num(pdev, &num_tx_qs, &num_rx_qs);
->
-> @@ -4311,9 +4312,10 @@ fec_probe(struct platform_device *pdev)
->         /* setup board info structure */
->         fep =3D netdev_priv(ndev);
->
-> -       dev_info =3D device_get_match_data(&pdev->dev);
-> -       if (!dev_info)
-> -               dev_info =3D (const struct fec_devinfo *)pdev->id_entry->=
-driver_data;
+Patches 3-4: Remove the core {s,g}etsockopt() core function from
+__sys_{g,s}etsockopt, so, the code could be reused by other callers, such as
+io_uring.
 
-I don't know why I kept this line. Probably because I originally used
-of_device_get_match_data instead. It's redundant because
-device_get_match_data() will do platform id matching too.
+Patch 5: Pass compat mode to the file/socket callbacks
 
-> +       plat_dev_id =3D device_get_match_data(&pdev->dev);
-> +       if (plat_dev_id)
-> +               pdev->id_entry =3D plat_dev_id;
-> +       dev_info =3D (const struct fec_devinfo *)pdev->id_entry->driver_d=
-ata;
->         if (dev_info)
->                 fep->quirks =3D dev_info->quirks;
->
-> --
-> 2.34.1
->
+Patch 6-7: Move io_uring helpers from io_uring_zerocopy_tx to a generic
+io_uring headers. This simplify the test case (last patch). Also copy the
+io_uring UAPI to the tests directory.
+
+Patch 8: Protect io_uring_cmd_sock() to not be called if CONFIG_NET is
+disabled.
+
+These changes were tested with a new test[1] in liburing, LTP sockopt*
+tests, as also with bpf/progs/sockopt test case, which is now adapted to
+run using both system calls and io_uring commands.
+
+[1] Link: https://github.com/leitao/liburing/blob/getsock/test/socket-getsetsock-cmd.c
+
+RFC -> V1:
+	* Copy user memory at io_uring subsystem, and call proto_ops
+	  callbacks using kernel memory
+	* Implement all the cases for SOCKET_URING_OP_SETSOCKOPT
+
+V1 -> V2
+	* Implemented the BPF part
+	* Using user pointers from optval to avoid kmalloc in io_uring part.
+
+V2 -> V3:
+	* Break down __sys_setsockopt and reuse the core code, avoiding
+	  duplicated code. This removed the requirement to expose
+	  sock_use_custom_sol_socket().
+	* Added io_uring test to selftests/bpf/sockopt.
+	* Fixed compat argument, by passing it to the issue_flags.
+
+V3 -> V4:
+	* Rebase on top of commit 1ded5e5a5931b ("net: annotate data-races around sock->ops")
+	* Also broke down __sys_setsockopt() to reuse the core function
+	  from io_uring.
+	* Create a new patch to return -EOPNOTSUPP if CONFIG_NET is
+	  disabled.
+	* Added two SOL_SOCKET tests in bpf/prog_tests/sockopt.
+
+V4 -> V5:
+	* Do not use sockptr anymore, by changing the optlen getsock argument
+	  to be a user pointer (instead of a kernel pointer). This change also drop
+	  the limitation on getsockopt from previous versions, and now all
+	  levels are supported.
+	* Simplified the BPF sockopt test, since there is no more limitation on
+	  the io_uring commands.
+	* No more changes in the BPF subsystem.
+	* Moved the optlen field in the SQE struct. It is now a pointer instead
+	  of u32.
+
+V5 -> V6:
+	* Removed the need for #ifdef CONFIG_NET as suggested by Gabriel
+	  Krisman.
+	* Changed the variable declaration order to respect the reverse
+	  xmas declaration as suggested by Paolo Abeni.
+
+V6 -> V7:
+	* Changed the optlen back to a value in the SQE instead of
+	  user-pointer. This is similar to version 4.
+	  [https://lore.kernel.org/all/20231009095518.288a5573@kernel.org/]
+	* Imported the io_uring.h into tools/include/uapi/linux to be able to
+	  run the tests in machines without liburing.
+	  [https://lore.kernel.org/all/77405214-ae42-d58b-1d40-c639683a0cb1@linux.dev/]
+
+Breno Leitao (11):
+  bpf: Leverage sockptr_t in BPF getsockopt hook
+  bpf: Leverage sockptr_t in BPF setsockopt hook
+  net/socket: Break down __sys_setsockopt
+  net/socket: Break down __sys_getsockopt
+  io_uring/cmd: Pass compat mode in issue_flags
+  tools headers: Grab copy of io_uring.h
+  selftests/net: Extract uring helpers to be reusable
+  io_uring/cmd: return -EOPNOTSUPP if net is disabled
+  io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
+  io_uring/cmd: Introduce SOCKET_URING_OP_SETSOCKOPT
+  selftests/bpf/sockopt: Add io_uring support
+Breno Leitao (11):
+  bpf: Add sockptr support for getsockopt
+  bpf: Add sockptr support for setsockopt
+  net/socket: Break down __sys_setsockopt
+  net/socket: Break down __sys_getsockopt
+  io_uring/cmd: Pass compat mode in issue_flags
+  tools headers: Grab copy of io_uring.h
+  selftests/net: Extract uring helpers to be reusable
+  io_uring/cmd: return -EOPNOTSUPP if net is disabled
+  io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
+  io_uring/cmd: Introduce SOCKET_URING_OP_SETSOCKOPT
+  selftests/bpf/sockopt: Add io_uring support
+
+ include/linux/bpf-cgroup.h                    |   9 +-
+ include/linux/io_uring.h                      |   1 +
+ include/net/sock.h                            |   6 +-
+ include/uapi/linux/io_uring.h                 |   8 +
+ io_uring/uring_cmd.c                          |  53 ++
+ kernel/bpf/cgroup.c                           |  25 +-
+ net/core/sock.c                               |   8 -
+ net/socket.c                                  | 103 ++-
+ tools/include/io_uring/mini_liburing.h        | 282 +++++++
+ tools/include/uapi/linux/io_uring.h           | 757 ++++++++++++++++++
+ .../selftests/bpf/prog_tests/sockopt.c        | 113 ++-
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../selftests/net/io_uring_zerocopy_tx.c      | 268 +------
+ 13 files changed, 1300 insertions(+), 334 deletions(-)
+ create mode 100644 tools/include/io_uring/mini_liburing.h
+ create mode 100644 tools/include/uapi/linux/io_uring.h
+
+-- 
+2.34.1
+
 
