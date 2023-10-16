@@ -1,94 +1,164 @@
-Return-Path: <netdev+bounces-41276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFB607CA756
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:59:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 073497CA761
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:00:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 128F31C2091B
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:59:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 684D2B20E0A
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C41266D5;
-	Mon, 16 Oct 2023 11:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C35F626E16;
+	Mon, 16 Oct 2023 12:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C31266CD
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:59:53 +0000 (UTC)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CE9648E;
-	Mon, 16 Oct 2023 04:59:52 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B8461FB;
-	Mon, 16 Oct 2023 05:00:33 -0700 (PDT)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA1E43F5A1;
-	Mon, 16 Oct 2023 04:59:49 -0700 (PDT)
-Message-ID: <4f709c6d-0635-4136-9cfa-717484f47fde@arm.com>
-Date: Mon, 16 Oct 2023 12:59:49 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46282374D;
+	Mon, 16 Oct 2023 12:00:41 +0000 (UTC)
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02A57DC;
+	Mon, 16 Oct 2023 05:00:39 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VuHc.Mz_1697457634;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VuHc.Mz_1697457634)
+          by smtp.aliyun-inc.com;
+          Mon, 16 Oct 2023 20:00:34 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux-foundation.org,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v1 00/19] virtio-net: support AF_XDP zero copy
+Date: Mon, 16 Oct 2023 20:00:14 +0800
+Message-Id: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/12] dma-direct: warn when coherent allocations aren't
- supported
-Content-Language: en-GB
-To: Christoph Hellwig <hch@lst.de>, Greg Ungerer <gerg@linux-m68k.org>,
- iommu@lists.linux.dev
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Geert Uytterhoeven <geert@linux-m68k.org>, Wei Fang <wei.fang@nxp.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
- netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-renesas-soc@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>
-References: <20231016054755.915155-1-hch@lst.de>
- <20231016054755.915155-9-hch@lst.de>
-From: Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20231016054755.915155-9-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Git-Hash: 9790cc452aab
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 16/10/2023 6:47 am, Christoph Hellwig wrote:
-> Log a warning once when dma_alloc_coherent fails because the platform
-> does not support coherent allocations at all.
+## AF_XDP
 
-Reviewed-by: Robin Murphy <robin.murphy@arm.com>
+XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+copy feature of xsk (XDP socket) needs to be supported by the driver. The
+performance of zero copy is very good. mlx5 and intel ixgbe already support
+this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
+feature.
 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   kernel/dma/direct.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
-> index 1327d04fa32a25..fddfea3b2fe173 100644
-> --- a/kernel/dma/direct.c
-> +++ b/kernel/dma/direct.c
-> @@ -240,8 +240,10 @@ void *dma_direct_alloc(struct device *dev, size_t size,
->   		 */
->   		set_uncached = IS_ENABLED(CONFIG_ARCH_HAS_DMA_SET_UNCACHED);
->   		remap = IS_ENABLED(CONFIG_DMA_DIRECT_REMAP);
-> -		if (!set_uncached && !remap)
-> +		if (!set_uncached && !remap) {
-> +			pr_warn_once("coherent DMA allocations not supported on this platform.\n");
->   			return NULL;
-> +		}
->   	}
->   
->   	/*
+At present, we have completed some preparation:
+
+1. vq-reset (virtio spec and kernel code)
+2. virtio-core premapped dma
+3. virtio-net xdp refactor
+
+So it is time for Virtio-Net to complete the support for the XDP Socket
+Zerocopy.
+
+Virtio-net can not increase the queue num at will, so xsk shares the queue with
+kernel.
+
+On the other hand, Virtio-Net does not support generate interrupt from driver
+manually, so when we wakeup tx xmit, we used some tips. If the CPU run by TX
+NAPI last time is other CPUs, use IPI to wake up NAPI on the remote CPU. If it
+is also the local CPU, then we wake up napi directly.
+
+This patch set includes some refactor to the virtio-net to let that to support
+AF_XDP.
+
+## performance
+
+ENV: Qemu with vhost-user(polling mode).
+
+Sockperf: https://github.com/Mellanox/sockperf
+I use this tool to send udp packet by kernel syscall.
+
+xmit command: sockperf tp -i 10.0.3.1 -t 1000
+
+I write a tool that sends udp packets or recvs udp packets by AF_XDP.
+
+                  | Guest APP CPU |Guest Softirq CPU | UDP PPS
+------------------|---------------|------------------|------------
+xmit by syscall   |   100%        |                  |   676,915
+xmit by xsk       |   59.1%       |   100%           | 5,447,168
+recv by syscall   |   60%         |   100%           |   932,288
+recv by xsk       |   35.7%       |   100%           | 3,343,168
+
+## maintain
+
+I am currently a reviewer for virtio-net. I commit to maintain AF_XDP support in
+virtio-net.
+
+Please review.
+
+Thanks.
+
+v1:
+    1. remove two virtio commits. Push this patchset to net-next
+    2. squash "virtio_net: virtnet_poll_tx support rescheduled" to xsk: support tx
+    3. fix some warnings
+
+Xuan Zhuo (19):
+  virtio_net: rename free_old_xmit_skbs to free_old_xmit
+  virtio_net: unify the code for recycling the xmit ptr
+  virtio_net: independent directory
+  virtio_net: move to virtio_net.h
+  virtio_net: add prefix virtnet to all struct/api inside virtio_net.h
+  virtio_net: separate virtnet_rx_resize()
+  virtio_net: separate virtnet_tx_resize()
+  virtio_net: sq support premapped mode
+  virtio_net: xsk: bind/unbind xsk
+  virtio_net: xsk: prevent disable tx napi
+  virtio_net: xsk: tx: support tx
+  virtio_net: xsk: tx: support wakeup
+  virtio_net: xsk: tx: virtnet_free_old_xmit() distinguishes xsk buffer
+  virtio_net: xsk: tx: virtnet_sq_free_unused_buf() check xsk buffer
+  virtio_net: xsk: rx: introduce add_recvbuf_xsk()
+  virtio_net: xsk: rx: introduce receive_xsk() to recv xsk buffer
+  virtio_net: xsk: rx: virtnet_rq_free_unused_buf() check xsk buffer
+  virtio_net: update tx timeout record
+  virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROCOPY
+
+ MAINTAINERS                                 |   2 +-
+ drivers/net/Kconfig                         |   8 +-
+ drivers/net/Makefile                        |   2 +-
+ drivers/net/virtio/Kconfig                  |  13 +
+ drivers/net/virtio/Makefile                 |   8 +
+ drivers/net/{virtio_net.c => virtio/main.c} | 652 +++++++++-----------
+ drivers/net/virtio/virtio_net.h             | 359 +++++++++++
+ drivers/net/virtio/xsk.c                    | 545 ++++++++++++++++
+ drivers/net/virtio/xsk.h                    |  32 +
+ 9 files changed, 1247 insertions(+), 374 deletions(-)
+ create mode 100644 drivers/net/virtio/Kconfig
+ create mode 100644 drivers/net/virtio/Makefile
+ rename drivers/net/{virtio_net.c => virtio/main.c} (91%)
+ create mode 100644 drivers/net/virtio/virtio_net.h
+ create mode 100644 drivers/net/virtio/xsk.c
+ create mode 100644 drivers/net/virtio/xsk.h
+
+--
+2.32.0.3.g01195cf9f
+
 
