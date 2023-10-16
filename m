@@ -1,167 +1,280 @@
-Return-Path: <netdev+bounces-41382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC18D7CABC6
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:41:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92C2A7CABC9
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:44:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 094861C20975
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:41:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0C58B20D86
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDB3286BC;
-	Mon, 16 Oct 2023 14:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFFE823743;
+	Mon, 16 Oct 2023 14:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="PZsVQ2YO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pbL0JENl"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D99328E1C
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 14:41:54 +0000 (UTC)
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE066A2
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:41:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1697467310; x=1729003310;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AfY4KWDk/y0chtVhZrLZNLcgBVTn2dPIVHmMu5VynyI=;
-  b=PZsVQ2YOdFU0wb/ga5sb1Y9kf8OWSJ+x+L0Vt2XZjurfRpe4FIhCX0E6
-   GZ1BnRmTpbPRL2LTYUZ6zauWSUtRaFoVNU8CVbccajchFSBf0BbwWnc9+
-   LZ5sInvPdJbCfRvZGdT4rZk/3wIDDzK3GHVkewUO9nMvfCPfHMdiNrcU/
-   l7Q+2yg79Tr1BUvkUgyOt+wvUWnJMfeUrPHYkRwc+ulldS9tdxjEcLgaz
-   oPOXdybJPyiYzO1no5LHjREU1Jvy1dtfbeZSQGOXg9+z3SqH/lA/I0yZ6
-   +XC73jxi9vMV95X4lRpd59q7ZS4I6zpvFkkjsxbJoEnpL57a3ZJY9/Lbo
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.03,229,1694728800"; 
-   d="scan'208";a="33485842"
-Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 16 Oct 2023 16:41:48 +0200
-Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 653E0280082;
-	Mon, 16 Oct 2023 16:41:48 +0200 (CEST)
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Russell King <linux@armlinux.org.uk>, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linux-imx@nxp.com, netdev@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: Ethernet issue on imx6
-Date: Mon, 16 Oct 2023 16:41:50 +0200
-Message-ID: <3527956.iIbC2pHGDl@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To: <20231016153154.31d92529@xps-13>
-References: <20231012193410.3d1812cf@xps-13> <2245614.iZASKD2KPV@steina-w> <20231016153154.31d92529@xps-13>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C7B28E02;
+	Mon, 16 Oct 2023 14:44:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65C62C433C7;
+	Mon, 16 Oct 2023 14:44:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697467467;
+	bh=EosIPRQRkZS/m8fRSYLf1GF9E5dQpYw/H0GO2FrhMzU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=pbL0JENlz5RnGYP4I9kBXyy7y5PAbYeNgIvdEtdEfV+6JtSnYAgZxXfj6QS0OTvnq
+	 7EQLcIfg5sdun4AKj6ILT0f9Sn+Lj6uvsAiodPVGiYDgFZBItlIo32ZAZ94e+7xhcC
+	 EzgeCAxFRNF1lIZMxpTdwOblh/UZLmbq4cioT65oxIZDzZFXQX7uvm9EQBD1jalFt1
+	 7JjsKBkOkgur951+Esn3xom0VBOBX9uF/8bVz6kjKcDLzBtDl8aS9RlYKjQ/3DdqNd
+	 U2gH58YxGzyynaLl9ZTOovVYCLIQjHNnnlfnqltpw7WhZQlr1WcoivXsWgUIsn7mNI
+	 RHCnJAlJeYfQA==
+Message-ID: <bd10b3e5a826d8658a2ee6bba510d25b27c35b50.camel@kernel.org>
+Subject: Re: [RFC PATCH 01/53] netfs: Add a procfile to list in-progress
+ requests
+From: Jeff Layton <jlayton@kernel.org>
+To: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>
+Cc: Matthew Wilcox <willy@infradead.org>, Marc Dionne
+ <marc.dionne@auristor.com>,  Paulo Alcantara <pc@manguebit.com>, Ronnie
+ Sahlberg <lsahlber@redhat.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
+ Talpey <tom@talpey.com>, Dominique Martinet <asmadeus@codewreck.org>, Ilya
+ Dryomov <idryomov@gmail.com>, Christian Brauner <christian@brauner.io>,
+ linux-afs@lists.infradead.org,  linux-cifs@vger.kernel.org,
+ linux-nfs@vger.kernel.org,  ceph-devel@vger.kernel.org,
+ v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,  linux-mm@kvack.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-cachefs@redhat.com
+Date: Mon, 16 Oct 2023 10:44:24 -0400
+In-Reply-To: <20231013155727.2217781-2-dhowells@redhat.com>
+References: <20231013155727.2217781-1-dhowells@redhat.com>
+	 <20231013155727.2217781-2-dhowells@redhat.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Hi Miquel,
-
-Am Montag, 16. Oktober 2023, 15:31:54 CEST schrieb Miquel Raynal:
-> Hi Alexander,
+On Fri, 2023-10-13 at 16:56 +0100, David Howells wrote:
+> Add a procfile, /proc/fs/netfs/requests, to list in-progress netfslib I/O
+> requests.
 >=20
-> Thanks a lot for your feedback.
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: linux-cachefs@redhat.com
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
+>  fs/netfs/internal.h   | 22 +++++++++++
+>  fs/netfs/main.c       | 91 +++++++++++++++++++++++++++++++++++++++++++
+>  fs/netfs/objects.c    |  4 +-
+>  include/linux/netfs.h |  6 ++-
+>  4 files changed, 121 insertions(+), 2 deletions(-)
 >=20
-> > > switch to partitions #0, OK
-> > > mmc1 is current device
-> > > reading boot.scr
-> > > 444 bytes read in 10 ms (43 KiB/s)
-> > > ## Executing script at 20000000
-> > > Booting from mmc ...
-> > > reading zImage
-> > > 9160016 bytes read in 462 ms (18.9 MiB/s)
-> > > reading <board>.dtb
-> >=20
-> > Which device tree is that?
-> >=20
-> > > 40052 bytes read in 22 ms (1.7 MiB/s)
-> > > boot device tree kernel ...
-> > > Kernel image @ 0x12000000 [ 0x000000 - 0x8bc550 ]
-> > > ## Flattened Device Tree blob at 18000000
-> > >=20
-> > >    Booting using the fdt blob at 0x18000000
-> > >    Using Device Tree in place at 18000000, end 1800cc73
-> > >=20
-> > > Starting kernel ...
-> > >=20
-> > > [    0.000000] Booting Linux on physical CPU 0x0
-> > > [    0.000000] Linux version 6.5.0 (mraynal@xps-13)
-> > > (arm-linux-gcc.br_real
-> > > (Buildroot 2 020.08-14-ge5a2a90) 10.2.0, GNU ld (GNU Binutils) 2.34)
-> > > #120
-> > > SMP Thu Oct 12 18:10:20 CE ST 2023
-> > > [    0.000000] CPU: ARMv7 Processor [412fc09a] revision 10 (ARMv7),
-> > > cr=3D10c5387d [    0.000000] CPU: PIPT / VIPT nonaliasing data cache,=
- VIPT
-> > > aliasing instruction cache
-> > > [    0.000000] OF: fdt: Machine model: TQ TQMa6Q
-> > > on MBa6x
-> >=20
-> > Your first mail mentions a custom board, but this indicates "TQMa6Q
-> > on MBa6x", so which is it?
+> diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+> index 43fac1b14e40..1f067aa96c50 100644
+> --- a/fs/netfs/internal.h
+> +++ b/fs/netfs/internal.h
+> @@ -29,6 +29,28 @@ int netfs_begin_read(struct netfs_io_request *rreq, bo=
+ol sync);
+>   * main.c
+>   */
+>  extern unsigned int netfs_debug;
+> +extern struct list_head netfs_io_requests;
+> +extern spinlock_t netfs_proc_lock;
+> +
+> +#ifdef CONFIG_PROC_FS
+> +static inline void netfs_proc_add_rreq(struct netfs_io_request *rreq)
+> +{
+> +	spin_lock(&netfs_proc_lock);
+> +	list_add_tail_rcu(&rreq->proc_link, &netfs_io_requests);
+> +	spin_unlock(&netfs_proc_lock);
+> +}
+> +static inline void netfs_proc_del_rreq(struct netfs_io_request *rreq)
+> +{
+> +	if (!list_empty(&rreq->proc_link)) {
+> +		spin_lock(&netfs_proc_lock);
+> +		list_del_rcu(&rreq->proc_link);
+> +		spin_unlock(&netfs_proc_lock);
+> +	}
+> +}
+> +#else
+> +static inline void netfs_proc_add_rreq(struct netfs_io_request *rreq) {}
+> +static inline void netfs_proc_del_rreq(struct netfs_io_request *rreq) {}
+> +#endif
+> =20
+>  /*
+>   * objects.c
+> diff --git a/fs/netfs/main.c b/fs/netfs/main.c
+> index 068568702957..21f814eee6af 100644
+> --- a/fs/netfs/main.c
+> +++ b/fs/netfs/main.c
+> @@ -7,6 +7,8 @@
+> =20
+>  #include <linux/module.h>
+>  #include <linux/export.h>
+> +#include <linux/proc_fs.h>
+> +#include <linux/seq_file.h>
+>  #include "internal.h"
+>  #define CREATE_TRACE_POINTS
+>  #include <trace/events/netfs.h>
+> @@ -18,3 +20,92 @@ MODULE_LICENSE("GPL");
+>  unsigned netfs_debug;
+>  module_param_named(debug, netfs_debug, uint, S_IWUSR | S_IRUGO);
+>  MODULE_PARM_DESC(netfs_debug, "Netfs support debugging mask");
+> +
+> +#ifdef CONFIG_PROC_FS
+> +LIST_HEAD(netfs_io_requests);
+> +DEFINE_SPINLOCK(netfs_proc_lock);
+> +
+> +static const char *netfs_origins[] =3D {
+> +	[NETFS_READAHEAD]	=3D "RA",
+> +	[NETFS_READPAGE]	=3D "RP",
+> +	[NETFS_READ_FOR_WRITE]	=3D "RW",
+> +};
+> +
+> +/*
+> + * Generate a list of I/O requests in /proc/fs/netfs/requests
+> + */
+> +static int netfs_requests_seq_show(struct seq_file *m, void *v)
+> +{
+> +	struct netfs_io_request *rreq;
+> +
+> +	if (v =3D=3D &netfs_io_requests) {
+> +		seq_puts(m,
+> +			 "REQUEST  OR REF FL ERR  OPS COVERAGE\n"
+> +			 "=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D =3D=3D=3D =3D=3D =3D=3D=3D=3D =3D=
+=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D\n"
+> +			 );
+> +		return 0;
+> +	}
+> +
+> +	rreq =3D list_entry(v, struct netfs_io_request, proc_link);
+> +	seq_printf(m,
+> +		   "%08x %s %3d %2lx %4d %3d @%04llx %zx/%zx",
+> +		   rreq->debug_id,
+> +		   netfs_origins[rreq->origin],
+> +		   refcount_read(&rreq->ref),
+> +		   rreq->flags,
+> +		   rreq->error,
+> +		   atomic_read(&rreq->nr_outstanding),
+> +		   rreq->start, rreq->submitted, rreq->len);
+> +	seq_putc(m, '\n');
+> +	return 0;
+> +}
+> +
+> +static void *netfs_requests_seq_start(struct seq_file *m, loff_t *_pos)
+> +	__acquires(rcu)
+> +{
+> +	rcu_read_lock();
+> +	return seq_list_start_head(&netfs_io_requests, *_pos);
+> +}
+> +
+> +static void *netfs_requests_seq_next(struct seq_file *m, void *v, loff_t=
+ *_pos)
+> +{
+> +	return seq_list_next(v, &netfs_io_requests, _pos);
+> +}
+> +
+> +static void netfs_requests_seq_stop(struct seq_file *m, void *v)
+> +	__releases(rcu)
+> +{
+> +	rcu_read_unlock();
+> +}
+> +
+> +static const struct seq_operations netfs_requests_seq_ops =3D {
+> +	.start  =3D netfs_requests_seq_start,
+> +	.next   =3D netfs_requests_seq_next,
+> +	.stop   =3D netfs_requests_seq_stop,
+> +	.show   =3D netfs_requests_seq_show,
+> +};
+> +#endif /* CONFIG_PROC_FS */
+> +
+> +static int __init netfs_init(void)
+> +{
+> +	if (!proc_mkdir("fs/netfs", NULL))
+> +		goto error;
+> +
+
+It seems like this should go under debugfs instead.
+
+> +	if (!proc_create_seq("fs/netfs/requests", S_IFREG | 0444, NULL,
+> +			     &netfs_requests_seq_ops))
+> +		goto error_proc;
+> +
+> +	return 0;
+> +
+> +error_proc:
+> +	remove_proc_entry("fs/netfs", NULL);
+> +error:
+> +	return -ENOMEM;
+> +}
+> +fs_initcall(netfs_init);
+> +
+> +static void __exit netfs_exit(void)
+> +{
+> +	remove_proc_entry("fs/netfs", NULL);
+> +}
+> +module_exit(netfs_exit);
+> diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
+> index e17cdf53f6a7..85f428fc52e6 100644
+> --- a/fs/netfs/objects.c
+> +++ b/fs/netfs/objects.c
+> @@ -45,6 +45,7 @@ struct netfs_io_request *netfs_alloc_request(struct add=
+ress_space *mapping,
+>  		}
+>  	}
+> =20
+> +	netfs_proc_add_rreq(rreq);
+>  	netfs_stat(&netfs_n_rh_rreq);
+>  	return rreq;
+>  }
+> @@ -76,12 +77,13 @@ static void netfs_free_request(struct work_struct *wo=
+rk)
+>  		container_of(work, struct netfs_io_request, work);
+> =20
+>  	trace_netfs_rreq(rreq, netfs_rreq_trace_free);
+> +	netfs_proc_del_rreq(rreq);
+>  	netfs_clear_subrequests(rreq, false);
+>  	if (rreq->netfs_ops->free_request)
+>  		rreq->netfs_ops->free_request(rreq);
+>  	if (rreq->cache_resources.ops)
+>  		rreq->cache_resources.ops->end_operation(&rreq->cache_resources);
+> -	kfree(rreq);
+> +	kfree_rcu(rreq, rcu);
+>  	netfs_stat_d(&netfs_n_rh_rreq);
+>  }
+> =20
+> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+> index b11a84f6c32b..b447cb67f599 100644
+> --- a/include/linux/netfs.h
+> +++ b/include/linux/netfs.h
+> @@ -175,10 +175,14 @@ enum netfs_io_origin {
+>   * operations to a variety of data stores and then stitch the result tog=
+ether.
+>   */
+>  struct netfs_io_request {
+> -	struct work_struct	work;
+> +	union {
+> +		struct work_struct work;
+> +		struct rcu_head rcu;
+> +	};
+>  	struct inode		*inode;		/* The file being accessed */
+>  	struct address_space	*mapping;	/* The mapping being accessed */
+>  	struct netfs_cache_resources cache_resources;
+> +	struct list_head	proc_link;	/* Link in netfs_iorequests */
+>  	struct list_head	subrequests;	/* Contributory I/O operations */
+>  	void			*netfs_priv;	/* Private data for the netfs */
+>  	unsigned int		debug_id;
 >=20
-> It's a custom carrier board with a TQMA6Q-AA module.
 
-Could you please adjust the machine model to your mainboard if it is not a=
-=20
-MBa6x? Thanks.
-Which HW revision is this module? It should be printed in u-boot during sta=
-rt.=20
-Can you provide a full log?
-
-> > Please note that there are two different module variants,
-> > imx6qdl-tqma6a.dtsi and imx6qdl-tqma6b.dtsi. They deal with i.MX6's
-> > ERR006687 differently. Package drop without any load somewhat indicates
-> > this issue.
->=20
-> I've tried with and without the fsl,err006687-workaround-present DT
-> property. It gets successfully parsed an I see the lower idle state
-> being disabled under mach-imx. I've also tried just commenting out the
-> registration of the cpuidle driver, just to be sure. I saw no
-> difference.
-
-fsl,err006687-workaround-present requires a specific HW workaround, see [1]=
-=2E=20
-So this is not applicable on every module.
-
-> By the way, we tried with a TQ eval board with this SoM and saw the same
-> issue (not me, I don't have this board in hands). Don't you experience
-> something similar? I went across a couple of people reporting similar
-> issues with these modules but none of them reported how they fixed it
-> (if they did). I tried two different images based on TQ's Github using
-> v4.14.69 and v5.10 kernels.
-
-Personally I've heard the first time about this issue. I never noticed=20
-something like this. Does this issue also appear when using TCP? Or is it a=
-n=20
-UDP only issue?
-
-Best regards,
-Alexander
-
-[1] https://github.com/tq-systems/linux-tqmaxx/blob/TQMa8-fslc-5.10-2.1.x-i=
-mx/
-arch/arm/boot/dts/imx6qdl-tqma6a.dtsi#L36-L48
-
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
-
-
+ACK on the general concept however. This is useful debugging info.
+--=20
+Jeff Layton <jlayton@kernel.org>
 
