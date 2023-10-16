@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-41544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E34E7CB474
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:17:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D0EA7CB476
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:17:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7603F281785
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:17:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF6101C20C8A
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 20:17:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B0337149;
-	Mon, 16 Oct 2023 20:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF56374DC;
+	Mon, 16 Oct 2023 20:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lHKG6ygi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OD2rfkau"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5843734CE3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE15837178
 	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 20:17:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 868A9C433C7;
-	Mon, 16 Oct 2023 20:17:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C4DEC433C9;
+	Mon, 16 Oct 2023 20:17:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697487422;
-	bh=3TnMjMxYjwPTAXjTP7ZccZQD14qQ31M1uIrL1rwlliM=;
+	s=k20201202; t=1697487423;
+	bh=jIMYJZdLSkIjGhV+sa8/zN79aQ1+r4oyWNEsEnAiRtA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lHKG6ygi9fFDKEUepnP3JOnyyu6DQAQyBDZUeQwOaA9e4t7D2SRUK7HKQKzlJFTNx
-	 J2DpIfqgQDdQtB/tYBbyS0X2sunkbzHCfFA2ybjKYkSaVihpA82lLOVZEn0ANFpPDN
-	 cwIAQXdqDzJi84owckzMQ3LraaZiJ/A/693KqHeeh/XJnjKlqp72fb3bxswA0KHHSK
-	 s6e2zYfRtWh+zFCDkW93H2jTxt6BiJs16zTOmcxMGeEriU+mRpKHPL7YWUCdjZYMUh
-	 4Om8mbrRhB1jzEV8wc8+2fMSO8VydpDYxrAr4Yr+SfN+ThhuUwaezHn4+vZDs2F0V2
-	 7zgd92+GDoPFw==
+	b=OD2rfkauCejGrdo1+gvNdyygx2aTWDd0Niij7iUwY1oR8NDyPuyQtj4RXBHGLtLC9
+	 BLC3LHnb2Ot9Y6/Vhowg5Lu/IE03bQTJ5MChzJBxbVOtBBSM/EXW+KwAvYyEXR3rUX
+	 6lSSiCIBB84p2Lk6rV3aKh9yRVXpdd58ppW3MlO899zo/xqughZexUEWkkcwPtf44U
+	 TdSeY/gCjkRGHtAaXV4Hife0wzRnDfuCu7n20oSa3zwYFIHU0F3jiGkE3JDBRLw1r6
+	 2AtxP/VRdpwdwm9EBWZt+hnZKXPtC70ow0Hd1cHCUBJ0gsnE87P+aRj+RmRfRseMeM
+	 ZLTfaw3+ltSJQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	daniel@iogearbox.net,
-	opurdila@ixiacom.com
-Subject: [PATCH net 1/5] net: fix ifname in netlink ntf during netns move
-Date: Mon, 16 Oct 2023 13:16:53 -0700
-Message-ID: <20231016201657.1754763-2-kuba@kernel.org>
+	gnault@redhat.com,
+	liuhangbin@gmail.com,
+	lucien.xin@gmail.com,
+	jiri@resnulli.us
+Subject: [PATCH net 2/5] net: check for altname conflicts when changing netdev's netns
+Date: Mon, 16 Oct 2023 13:16:54 -0700
+Message-ID: <20231016201657.1754763-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231016201657.1754763-1-kuba@kernel.org>
 References: <20231016201657.1754763-1-kuba@kernel.org>
@@ -54,116 +56,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-dev_get_valid_name() overwrites the netdev's name on success.
-This makes it hard to use in prepare-commit-like fashion,
-where we do validation first, and "commit" to the change
-later.
+It's currently possible to create an altname conflicting
+with an altname or real name of another device by creating
+it in another netns and moving it over:
 
-Factor out a helper which lets us save the new name to a buffer.
-Use it to fix the problem of notification on netns move having
-incorrect name:
+ [ ~]$ ip link add dev eth0 type dummy
 
- 5: eth0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN group default
-     link/ether be:4d:58:f9:d5:40 brd ff:ff:ff:ff:ff:ff
- 6: eth1: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN group default
-     link/ether 1e:4a:34:36:e3:cd brd ff:ff:ff:ff:ff:ff
+ [ ~]$ ip netns add test
+ [ ~]$ ip -netns test link add dev ethX netns test type dummy
+ [ ~]$ ip -netns test link property add dev ethX altname eth0
+ [ ~]$ ip -netns test link set dev ethX netns 1
 
- [ ~]# ip link set dev eth0 netns 1 name eth1
+ [ ~]$ ip link
+ ...
+ 3: eth0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+     link/ether 02:40:88:62:ec:b8 brd ff:ff:ff:ff:ff:ff
+ ...
+ 5: ethX: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+     link/ether 26:b7:28:78:38:0f brd ff:ff:ff:ff:ff:ff
+     altname eth0
 
-ip monitor inside netns:
- Deleted inet eth0
- Deleted inet6 eth0
- Deleted 5: eth1: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN group default
-     link/ether be:4d:58:f9:d5:40 brd ff:ff:ff:ff:ff:ff new-netnsid 0 new-ifindex 7
+Create a macro for walking the altnames, this hopefully makes
+it clearer that the list we walk contains only altnames.
+Which is otherwise not entirely intuitive.
 
-Name is reported as eth1 in old netns for ifindex 5, already renamed.
-
-Fixes: d90310243fd7 ("net: device name allocation cleanups")
+Fixes: 36fbf1e52bd3 ("net: rtnetlink: add linkprop commands to add and delete alternative ifnames")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: daniel@iogearbox.net
-CC: opurdila@ixiacom.com
+CC: gnault@redhat.com
+CC: liuhangbin@gmail.com
+CC: lucien.xin@gmail.com
+CC: jiri@resnulli.us
 ---
- net/core/dev.c | 42 ++++++++++++++++++++++++++++--------------
- 1 file changed, 28 insertions(+), 14 deletions(-)
+ net/core/dev.c | 9 ++++++++-
+ net/core/dev.h | 3 +++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 5aaf5753d4e4..b08031957ffe 100644
+index b08031957ffe..f4fa2692cf6d 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -1157,22 +1157,32 @@ int dev_alloc_name(struct net_device *dev, const char *name)
- }
- EXPORT_SYMBOL(dev_alloc_name);
+@@ -1086,7 +1086,8 @@ static int __dev_alloc_name(struct net *net, const char *name, char *buf)
  
-+static int dev_prep_valid_name(struct net *net, struct net_device *dev,
-+			       const char *want_name, char *out_name)
-+{
-+	int ret;
+ 		for_each_netdev(net, d) {
+ 			struct netdev_name_node *name_node;
+-			list_for_each_entry(name_node, &d->name_node->list, list) {
 +
-+	BUG_ON(!net);
-+
-+	if (!dev_valid_name(want_name))
-+		return -EINVAL;
-+
-+	if (strchr(want_name, '%')) {
-+		ret = __dev_alloc_name(net, want_name, out_name);
-+		return ret < 0 ? ret : 0;
-+	} else if (netdev_name_in_use(net, want_name)) {
-+		return -EEXIST;
-+	} else if (out_name != want_name) {
-+		strscpy(out_name, want_name, IFNAMSIZ);
-+	}
-+
-+	return 0;
-+}
-+
- static int dev_get_valid_name(struct net *net, struct net_device *dev,
- 			      const char *name)
- {
--	BUG_ON(!net);
--
--	if (!dev_valid_name(name))
--		return -EINVAL;
--
--	if (strchr(name, '%'))
--		return dev_alloc_name_ns(net, dev, name);
--	else if (netdev_name_in_use(net, name))
--		return -EEXIST;
--	else if (dev->name != name)
--		strscpy(dev->name, name, IFNAMSIZ);
--
--	return 0;
-+	return dev_prep_valid_name(net, dev, name, dev->name);
- }
- 
- /**
-@@ -11038,6 +11048,7 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
++			netdev_for_each_altname(d, name_node) {
+ 				if (!sscanf(name_node->name, name, &i))
+ 					continue;
+ 				if (i < 0 || i >= max_netdevices)
+@@ -11047,6 +11048,7 @@ EXPORT_SYMBOL(unregister_netdev);
+ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
  			       const char *pat, int new_ifindex)
  {
++	struct netdev_name_node *name_node;
  	struct net *net_old = dev_net(dev);
-+	char new_name[IFNAMSIZ] = {};
+ 	char new_name[IFNAMSIZ] = {};
  	int err, new_nsid;
- 
- 	ASSERT_RTNL();
-@@ -11064,7 +11075,7 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 		/* We get here if we can't use the current device name */
- 		if (!pat)
- 			goto out;
--		err = dev_get_valid_name(net, dev, pat);
-+		err = dev_prep_valid_name(net, dev, pat, new_name);
+@@ -11079,6 +11081,11 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
  		if (err < 0)
  			goto out;
  	}
-@@ -11135,6 +11146,9 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 	kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
- 	netdev_adjacent_add_links(dev);
++	/* Check that none of the altnames conflicts. */
++	err = -EEXIST;
++	netdev_for_each_altname(dev, name_node)
++		if (netdev_name_in_use(net, name_node->name))
++			goto out;
  
-+	if (new_name[0]) /* Rename the netdev to prepared name */
-+		strscpy(dev->name, new_name, IFNAMSIZ);
+ 	/* Check that new_ifindex isn't used yet. */
+ 	if (new_ifindex) {
+diff --git a/net/core/dev.h b/net/core/dev.h
+index e075e198092c..d093be175bd0 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -62,6 +62,9 @@ struct netdev_name_node {
+ int netdev_get_name(struct net *net, char *name, int ifindex);
+ int dev_change_name(struct net_device *dev, const char *newname);
+ 
++#define netdev_for_each_altname(dev, name_node)				\
++	list_for_each_entry((name_node), &(dev)->name_node->list, list)
 +
- 	/* Fixup kobjects */
- 	err = device_rename(&dev->dev, dev->name);
- 	WARN_ON(err);
+ int netdev_name_node_alt_create(struct net_device *dev, const char *name);
+ int netdev_name_node_alt_destroy(struct net_device *dev, const char *name);
+ 
 -- 
 2.41.0
 
