@@ -1,308 +1,225 @@
-Return-Path: <netdev+bounces-41307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E566F7CA8A8
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:57:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 625F97CA8AC
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13DA51C20A20
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:57:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 565031C20B4F
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 12:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54123273F5;
-	Mon, 16 Oct 2023 12:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2ELmBn8Q";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="i6M5IYdJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965F62771F;
+	Mon, 16 Oct 2023 12:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71D6262AD;
-	Mon, 16 Oct 2023 12:57:43 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52640A2;
-	Mon, 16 Oct 2023 05:57:41 -0700 (PDT)
-Date: Mon, 16 Oct 2023 14:57:38 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1697461059;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J4Fq3rGIS8nov1DFK/Ma53UlC+qh+yTUV7FkCGLePEw=;
-	b=2ELmBn8QdHGkXS8KFExnyMLH04TqKwm5q5kggSZWjGJJQXDyPQbo/1qjR8ztL6Qspzzztp
-	2muhurZ8JeFTzRTj+b52fXECty7hv7dA/yfbbR+VwFe0j/UZC6oH8AkfUxdAcKxO8ILNmG
-	XbRCbEUUQKC+cAa9LWlBIs7Ayhz4EWu0uwcq+wc06LU5Ju5s3dHUq8vPTGksrVPM7+fURk
-	+KgTQ6owLEBGAZRsqD/LokQEST8f+G1HEjT9xZpF0aoS6NDK6MLu0lkrzzuqsQSK9jEfXZ
-	KTqq/SgcNK4eSY64/M0tPA6v5IZy1nm7tK56fTGnfBihADwuAMZ2hdfVXBTUAQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1697461059;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J4Fq3rGIS8nov1DFK/Ma53UlC+qh+yTUV7FkCGLePEw=;
-	b=i6M5IYdJsbxkm1tan/1ajVWkqnTzZ/6Bn3+DiViKMtJtMtmwRn8CowMUI3FL3f3w2K66gF
-	fPSZRClHgGbdAoBg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Subject: [PATCH bpf-next -v5] net: Add a warning if NAPI cb missed
- xdp_do_flush().
-Message-ID: <20231016125738.Yt79p1uF@linutronix.de>
-References: <20230929165825.RvwBYGP1@linutronix.de>
- <20231004070926.5b4ba04c@kernel.org>
- <20231006154933.mQgxQHHt@linutronix.de>
- <20231006123139.5203444e@kernel.org>
- <20231007154351.UvncuBMF@linutronix.de>
- <20231010065745.lJLYdf_X@linutronix.de>
- <652627b386bbe_2d55e208d6@john.notmuch>
- <5efb2093-537e-0f7d-beef-d32c02ec4a3d@iogearbox.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7972771D;
+	Mon, 16 Oct 2023 12:57:48 +0000 (UTC)
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B194A2;
+	Mon, 16 Oct 2023 05:57:47 -0700 (PDT)
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3afc38cbdbcso2328455b6e.1;
+        Mon, 16 Oct 2023 05:57:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697461066; x=1698065866;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9MwlUK1egCZ2dvdbGrNweXe0Njk0R/Nf5RkQ1HODqQg=;
+        b=VSrkCkeOlPO1yxYOGPLh+sLtzaQKikbMIvkGFfMop5MStuYxtiD5iPU2qdgW9DM7dU
+         5AB/FITR1JGsDXA9y+PwQhjdueG9PXc7LbD1uTmzTufSPBMzuRl151ZRuN9BKNWxD9Mi
+         8VCugpZJUzMFr2SjDe2wraa2qvPZ9KPXQyodLayStxc+eGq4P9W7jpFPZ7+7I78h50aX
+         0nUqzgxcrncmDGSP9hzebocuNhSgLCuVxXclQX7zKaL0h0RwDf+NkjYdCHsQq1Co9xA7
+         NWu6NA6/kEnYWFujQTVb3e1VLSSUSbx3EJYkxKtbawGBf/cwKX8HMeJO+JShPOsjTtF5
+         a8Hw==
+X-Gm-Message-State: AOJu0YzRse4+AMvGe2p0FBDcCFB1/7G8jU/OMCl3Na9UjrT22mXjy4tO
+	hImZ9xTZCcWNNA5edsmJog==
+X-Google-Smtp-Source: AGHT+IFyYahMS48AlCxtEa8fqlsOgFUCfzkyZbq3xoT1b3JjxPOUHloC5ggzFsKyNNZvSpU7Q1muyw==
+X-Received: by 2002:a05:6808:1a21:b0:3ad:cb0f:afa8 with SMTP id bk33-20020a0568081a2100b003adcb0fafa8mr4589679oib.2.1697461066341;
+        Mon, 16 Oct 2023 05:57:46 -0700 (PDT)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id j5-20020a056808034500b003afe5617691sm1844805oie.12.2023.10.16.05.57.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 05:57:45 -0700 (PDT)
+Received: (nullmailer pid 2590929 invoked by uid 1000);
+	Mon, 16 Oct 2023 12:57:38 -0000
+Date: Mon, 16 Oct 2023 07:57:38 -0500
+From: Rob Herring <robh@kernel.org>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Gregory Clement <gregory.clement@bootlin.com>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Russell King <linux@armlinux.org.uk>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Christian Marangi <ansuelsmth@gmail.com>, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/6] dt-bindings: marvell: Rewrite MV88E6xxx
+ in schema
+Message-ID: <20231016125738.GA2578576-robh@kernel.org>
+References: <20231016-marvell-88e6152-wan-led-v3-0-38cd449dfb15@linaro.org>
+ <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <5efb2093-537e-0f7d-beef-d32c02ec4a3d@iogearbox.net>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
+	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-A few drivers were missing a xdp_do_flush() invocation after
-XDP_REDIRECT.
+On Mon, Oct 16, 2023 at 11:12:54AM +0200, Linus Walleij wrote:
+> This is an attempt to rewrite the Marvell MV88E6xxx switch bindings
+> in YAML schema.
+> 
+> The current text binding says:
+>   WARNING: This binding is currently unstable. Do not program it into a
+>   FLASH never to be changed again. Once this binding is stable, this
+>   warning will be removed.
+> 
+> Well that never happened before we switched to YAML markup,
+> we can't have it like this, what about fixing the mess?
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  .../bindings/net/dsa/marvell,mv88e6xxx.yaml        | 243 +++++++++++++++++++++
+>  .../devicetree/bindings/net/dsa/marvell.txt        | 109 ---------
+>  MAINTAINERS                                        |   2 +-
+>  3 files changed, 244 insertions(+), 110 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
+> new file mode 100644
+> index 000000000000..954db04147f8
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
+> @@ -0,0 +1,243 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Marvell MV88E6xxx DSA switch family
+> +
+> +maintainers:
+> +  - Andrew Lunn <andrew@lunn.ch>
+> +
+> +description:
+> +  The Marvell MV88E6xxx switch series has been produced and sold
+> +  by Marvell since at least 2010. The switch has a few compatibles which
+> +  just indicate the base address of the switch, then operating systems
+> +  can investigate switch ID registers to find out which actual version
+> +  of the switch it is dealing with.
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - enum:
 
-Add three helper functions each for one of the per-CPU lists. Return
-true if the per-CPU list is non-empty and flush the list.
-Add xdp_do_check_flushed() which invokes each helper functions and
-creates a warning if one of the functions had a non-empty list.
-Hide everything behind CONFIG_DEBUG_NET.
+Don't need oneOf with only 1 entry. However, I'd probably split each 
+compatible and description for it into 3 entries.
 
-Suggested-by: Jesper Dangaard Brouer <hawk@kernel.org>
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-Acked-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: John Fastabend <john.fastabend@gmail.com>
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
-v4=E2=80=A6v5:
-  - rebase on top of bpf-next
-  - Collected Reviewed/Acked from the list.
+> +          - marvell,mv88e6085
+> +          - marvell,mv88e6190
+> +          - marvell,mv88e6250
+> +    description: |
+> +      marvell,mv88e6085: This switch uses base address 0x10.
+> +        This switch and its siblings will be autodetected from
+> +        ID registers found in the switch, so only "marvell,mv88e6085" should be
+> +        specified. This includes the following list of MV88Exxxx switches:
+> +        6085, 6095, 6097, 6123, 6131, 6141, 6161, 6165, 6171, 6172, 6175, 6176,
+> +        6185, 6240, 6320, 6321, 6341, 6350, 6351, 6352
+> +      marvell,mv88e6190: This switch uses base address 0x00.
+> +        This switch and its siblings will be autodetected from
+> +        ID registers found in the switch, so only "marvell,mv88e6190" should be
+> +        specified. This includes the following list of MV88Exxxx switches:
+> +        6190, 6190X, 6191, 6290, 6361, 6390, 6390X
+> +      marvell,mv88e6250: This switch uses base address 0x08 or 0x18.
+> +        This switch and its siblings will be autodetected from
+> +        ID registers found in the switch, so only "marvell,mv88e6250" should be
+> +        specified. This includes the following list of MV88Exxxx switches:
+> +        6220, 6250
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  eeprom-length:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: Set to the length of an EEPROM connected to the switch. Must be
+> +      set if the switch can not detect the presence and/or size of a connected
+> +      EEPROM, otherwise optional.
+> +
+> +  reset-gpios:
+> +    description:
+> +      GPIO to be used to reset the whole device
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    description: The switch provides an external interrupt line, but it is
+> +      not always used by target systems.
+> +    maxItems: 1
+> +
+> +  interrupt-controller:
+> +    description: The switch has an internal interrupt controller used by
+> +      the different sub-blocks.
+> +
+> +  '#interrupt-cells':
+> +    description: The internal interrupt controller only supports triggering
+> +      on active high level interrupts so the second cell must alway be set to
+> +      IRQ_TYPE_LEVEL_HIGH.
+> +    const: 2
+> +
+> +  mdio:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +    description: Marvell MV88E6xxx switches have an varying combination of
+> +    internal and external MDIO buses, in some cases a combined bus that
+> +    can be used both internally and externally. This node is for the
+> +    primary bus, used internally and sometimes also externally.
+> +
+> +  mdio-external:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +    description: Marvell MV88E6xxx switches that have a separate external
+> +      MDIO bus use this port to access external components on the MDIO bus.
+> +
+> +    properties:
+> +      compatible:
+> +        const: marvell,mv88e6xxx-mdio-external
+> +
+> +    required:
+> +      - compatible
+> +
 
-v3=E2=80=A6v4:
-  - s/creats/creates as per Simon Horman.
+> +$ref: dsa.yaml#
+> +
+> +patternProperties:
+> +  "^(ethernet-)?ports$":
+> +    type: object
+> +    patternProperties:
+> +      "^(ethernet-)?port@[0-9]+$":
+> +        type: object
+> +        description: Ethernet switch ports
+> +
+> +        $ref: dsa-port.yaml#
+> +
+> +        unevaluatedProperties: false
 
-v2=E2=80=A6v3:
-  - Collected Reviewed/Acked from the list.
-  - Added an include dev.h to filter.c, the robot pointed out a missing
-    prototype.
+You can drop all this and ref dsa.yaml#/$defs/ethernet-ports instead of 
+just dsa.yaml.
 
-v1=E2=80=A6v2:
-  - Moved xdp_do_check_flushed() to net/core/dev.h.
-  - Stripped __ from function names.
-  - Removed empty lines within an ifdef block.
-  - xdp_do_check_flushed() is now behind CONFIG_DEBUG_NET &&
-    CONFIG_BPF_SYSCALL. dev_check_flush and cpu_map_check_flush are now
-    only behind CONFIG_DEBUG_NET. They have no empty inline function for
-    the !CONFIG_DEBUG_NET case since they are only called in
-    CONFIG_DEBUG_NET case.
+> +
+> +oneOf:
+> +  - required:
+> +      - ports
+> +  - required:
+> +      - ethernet-ports
 
- include/linux/bpf.h    |  3 +++
- include/net/xdp_sock.h |  9 +++++++++
- kernel/bpf/cpumap.c    | 10 ++++++++++
- kernel/bpf/devmap.c    | 10 ++++++++++
- net/core/dev.c         |  2 ++
- net/core/dev.h         |  6 ++++++
- net/core/filter.c      | 16 ++++++++++++++++
- net/xdp/xsk.c          | 10 ++++++++++
- 8 files changed, 66 insertions(+)
+This probably belongs in dsa.yaml.
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index f0891ba24cb1c..92b76360ff58a 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -2478,6 +2478,9 @@ void bpf_dynptr_init(struct bpf_dynptr_kern *ptr, voi=
-d *data,
- 		     enum bpf_dynptr_type type, u32 offset, u32 size);
- void bpf_dynptr_set_null(struct bpf_dynptr_kern *ptr);
- void bpf_dynptr_set_rdonly(struct bpf_dynptr_kern *ptr);
-+
-+bool dev_check_flush(void);
-+bool cpu_map_check_flush(void);
- #else /* !CONFIG_BPF_SYSCALL */
- static inline struct bpf_prog *bpf_prog_get(u32 ufd)
- {
-diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index 69b472604b86f..7dd0df2f6f8e6 100644
---- a/include/net/xdp_sock.h
-+++ b/include/net/xdp_sock.h
-@@ -109,4 +109,13 @@ static inline void __xsk_map_flush(void)
-=20
- #endif /* CONFIG_XDP_SOCKETS */
-=20
-+#if defined(CONFIG_XDP_SOCKETS) && defined(CONFIG_DEBUG_NET)
-+bool xsk_map_check_flush(void);
-+#else
-+static inline bool xsk_map_check_flush(void)
-+{
-+	return false;
-+}
-+#endif
-+
- #endif /* _LINUX_XDP_SOCK_H */
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index e42a1bdb7f536..8a0bb80fe48a3 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -764,6 +764,16 @@ void __cpu_map_flush(void)
- 	}
- }
-=20
-+#ifdef CONFIG_DEBUG_NET
-+bool cpu_map_check_flush(void)
-+{
-+	if (list_empty(this_cpu_ptr(&cpu_map_flush_list)))
-+		return false;
-+	__cpu_map_flush();
-+	return true;
-+}
-+#endif
-+
- static int __init cpu_map_init(void)
- {
- 	int cpu;
-diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-index 4d42f6ed6c11a..a936c704d4e77 100644
---- a/kernel/bpf/devmap.c
-+++ b/kernel/bpf/devmap.c
-@@ -418,6 +418,16 @@ void __dev_flush(void)
- 	}
- }
-=20
-+#ifdef CONFIG_DEBUG_NET
-+bool dev_check_flush(void)
-+{
-+	if (list_empty(this_cpu_ptr(&dev_flush_list)))
-+		return false;
-+	__dev_flush();
-+	return true;
-+}
-+#endif
-+
- /* Elements are kept alive by RCU; either by rcu_read_lock() (from syscall=
-) or
-  * by local_bh_disable() (from XDP calls inside NAPI). The
-  * rcu_read_lock_bh_held() below makes lockdep accept both.
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 606a366cc2095..9273b12ecf6fa 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6526,6 +6526,8 @@ static int __napi_poll(struct napi_struct *n, bool *r=
-epoll)
- 	if (test_bit(NAPI_STATE_SCHED, &n->state)) {
- 		work =3D n->poll(n, weight);
- 		trace_napi_poll(n, work, weight);
-+
-+		xdp_do_check_flushed(n);
- 	}
-=20
- 	if (unlikely(work > weight))
-diff --git a/net/core/dev.h b/net/core/dev.h
-index e075e198092cc..f66125857af77 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -136,4 +136,10 @@ static inline void netif_set_gro_ipv4_max_size(struct =
-net_device *dev,
- }
-=20
- int rps_cpumask_housekeeping(struct cpumask *mask);
-+
-+#if defined(CONFIG_DEBUG_NET) && defined(CONFIG_BPF_SYSCALL)
-+void xdp_do_check_flushed(struct napi_struct *napi);
-+#else
-+static inline void xdp_do_check_flushed(struct napi_struct *napi) { }
-+#endif
- #endif
-diff --git a/net/core/filter.c b/net/core/filter.c
-index cc2e4babc85fb..21d75108c2e94 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -83,6 +83,8 @@
- #include <net/netfilter/nf_conntrack_bpf.h>
- #include <linux/un.h>
-=20
-+#include "dev.h"
-+
- static const struct bpf_func_proto *
- bpf_sk_base_func_proto(enum bpf_func_id func_id);
-=20
-@@ -4208,6 +4210,20 @@ void xdp_do_flush(void)
- }
- EXPORT_SYMBOL_GPL(xdp_do_flush);
-=20
-+#if defined(CONFIG_DEBUG_NET) && defined(CONFIG_BPF_SYSCALL)
-+void xdp_do_check_flushed(struct napi_struct *napi)
-+{
-+	bool ret;
-+
-+	ret =3D dev_check_flush();
-+	ret |=3D cpu_map_check_flush();
-+	ret |=3D xsk_map_check_flush();
-+
-+	WARN_ONCE(ret, "Missing xdp_do_flush() invocation after NAPI by %ps\n",
-+		  napi->poll);
-+}
-+#endif
-+
- void bpf_clear_redirect_map(struct bpf_map *map)
- {
- 	struct bpf_redirect_info *ri;
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 7482d0aca5046..e23689b82914f 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -391,6 +391,16 @@ void __xsk_map_flush(void)
- 	}
- }
-=20
-+#ifdef CONFIG_DEBUG_NET
-+bool xsk_map_check_flush(void)
-+{
-+	if (list_empty(this_cpu_ptr(&xskmap_flush_list)))
-+		return false;
-+	__xsk_map_flush();
-+	return true;
-+}
-+#endif
-+
- void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries)
- {
- 	xskq_prod_submit_n(pool->cq, nb_entries);
---=20
-2.42.0
-
+Rob
 
