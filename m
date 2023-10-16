@@ -1,443 +1,167 @@
-Return-Path: <netdev+bounces-41381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35FBE7CABA8
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:38:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC18D7CABC6
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AB3BB20D3F
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:38:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 094861C20975
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 14:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D192227EFF;
-	Mon, 16 Oct 2023 14:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDB3286BC;
+	Mon, 16 Oct 2023 14:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GzpeZLZG"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="PZsVQ2YO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E0B28E20
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 14:38:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 880D8C433C8;
-	Mon, 16 Oct 2023 14:38:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697467103;
-	bh=lC1q/rxBn1EVe0iVn+GQabdR2avsASTHtSuzWrrtFKo=;
-	h=From:Subject:To:Cc:Date:From;
-	b=GzpeZLZGetIBs0py3OIoYVA/1QwECPyMivc5Cxdcxfrsttl+OknXQKDOGserHXJgV
-	 zWTuOAX5Rov9Pseh+kEF37kbuChEjOyPxMS7rFEqHvldDKyqb+lM5b/7Qg2XG8ZByo
-	 tzTF6wrOgiI54Dp2VIsgWfRNEif4ZsB8tJtvbwVN84QM5wz53jqS7J9AzRMI0tTXW/
-	 EPDa2IOVm+Bqg8om3KLEajMEbjb9425BfE0nLtxjVh0jdpmwnO2uV8QCU8FrRflN0X
-	 x6HR5Wkpi0LCL5m3d3oDMDUKCHNoRNB//W48bhfA9KXkABNbe4KPnnbJHCNxNDGI9H
-	 mUMgbLaUZ/JSQ==
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D99328E1C
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 14:41:54 +0000 (UTC)
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE066A2
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:41:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1697467310; x=1729003310;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=AfY4KWDk/y0chtVhZrLZNLcgBVTn2dPIVHmMu5VynyI=;
+  b=PZsVQ2YOdFU0wb/ga5sb1Y9kf8OWSJ+x+L0Vt2XZjurfRpe4FIhCX0E6
+   GZ1BnRmTpbPRL2LTYUZ6zauWSUtRaFoVNU8CVbccajchFSBf0BbwWnc9+
+   LZ5sInvPdJbCfRvZGdT4rZk/3wIDDzK3GHVkewUO9nMvfCPfHMdiNrcU/
+   l7Q+2yg79Tr1BUvkUgyOt+wvUWnJMfeUrPHYkRwc+ulldS9tdxjEcLgaz
+   oPOXdybJPyiYzO1no5LHjREU1Jvy1dtfbeZSQGOXg9+z3SqH/lA/I0yZ6
+   +XC73jxi9vMV95X4lRpd59q7ZS4I6zpvFkkjsxbJoEnpL57a3ZJY9/Lbo
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.03,229,1694728800"; 
+   d="scan'208";a="33485842"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 16 Oct 2023 16:41:48 +0200
+Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 653E0280082;
+	Mon, 16 Oct 2023 16:41:48 +0200 (CEST)
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Russell King <linux@armlinux.org.uk>, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linux-imx@nxp.com, netdev@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: Ethernet issue on imx6
+Date: Mon, 16 Oct 2023 16:41:50 +0200
+Message-ID: <3527956.iIbC2pHGDl@steina-w>
+Organization: TQ-Systems GmbH
+In-Reply-To: <20231016153154.31d92529@xps-13>
+References: <20231012193410.3d1812cf@xps-13> <2245614.iZASKD2KPV@steina-w> <20231016153154.31d92529@xps-13>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Kalle Valo <kvalo@kernel.org>
-Subject: pull-request: wireless-next-2023-10-16
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Message-Id: <20231016143822.880D8C433C8@smtp.kernel.org>
-Date: Mon, 16 Oct 2023 14:38:22 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hi,
+Hi Miquel,
 
-here's a pull request to net-next tree, more info below. Please let me know if
-there are any problems.
+Am Montag, 16. Oktober 2023, 15:31:54 CEST schrieb Miquel Raynal:
+> Hi Alexander,
+>=20
+> Thanks a lot for your feedback.
+>=20
+> > > switch to partitions #0, OK
+> > > mmc1 is current device
+> > > reading boot.scr
+> > > 444 bytes read in 10 ms (43 KiB/s)
+> > > ## Executing script at 20000000
+> > > Booting from mmc ...
+> > > reading zImage
+> > > 9160016 bytes read in 462 ms (18.9 MiB/s)
+> > > reading <board>.dtb
+> >=20
+> > Which device tree is that?
+> >=20
+> > > 40052 bytes read in 22 ms (1.7 MiB/s)
+> > > boot device tree kernel ...
+> > > Kernel image @ 0x12000000 [ 0x000000 - 0x8bc550 ]
+> > > ## Flattened Device Tree blob at 18000000
+> > >=20
+> > >    Booting using the fdt blob at 0x18000000
+> > >    Using Device Tree in place at 18000000, end 1800cc73
+> > >=20
+> > > Starting kernel ...
+> > >=20
+> > > [    0.000000] Booting Linux on physical CPU 0x0
+> > > [    0.000000] Linux version 6.5.0 (mraynal@xps-13)
+> > > (arm-linux-gcc.br_real
+> > > (Buildroot 2 020.08-14-ge5a2a90) 10.2.0, GNU ld (GNU Binutils) 2.34)
+> > > #120
+> > > SMP Thu Oct 12 18:10:20 CE ST 2023
+> > > [    0.000000] CPU: ARMv7 Processor [412fc09a] revision 10 (ARMv7),
+> > > cr=3D10c5387d [    0.000000] CPU: PIPT / VIPT nonaliasing data cache,=
+ VIPT
+> > > aliasing instruction cache
+> > > [    0.000000] OF: fdt: Machine model: TQ TQMa6Q
+> > > on MBa6x
+> >=20
+> > Your first mail mentions a custom board, but this indicates "TQMa6Q
+> > on MBa6x", so which is it?
+>=20
+> It's a custom carrier board with a TQMA6Q-AA module.
 
-Kalle
+Could you please adjust the machine model to your mainboard if it is not a=
+=20
+MBa6x? Thanks.
+Which HW revision is this module? It should be printed in u-boot during sta=
+rt.=20
+Can you provide a full log?
 
-The following changes since commit 48533eca606efcf63ef4080ded5618e0b17ee3d7:
+> > Please note that there are two different module variants,
+> > imx6qdl-tqma6a.dtsi and imx6qdl-tqma6b.dtsi. They deal with i.MX6's
+> > ERR006687 differently. Package drop without any load somewhat indicates
+> > this issue.
+>=20
+> I've tried with and without the fsl,err006687-workaround-present DT
+> property. It gets successfully parsed an I see the lower idle state
+> being disabled under mach-imx. I've also tried just commenting out the
+> registration of the cpuidle driver, just to be sure. I saw no
+> difference.
 
-  net: sock_dequeue_err_skb() optimization (2023-10-06 16:29:08 -0700)
+fsl,err006687-workaround-present requires a specific HW workaround, see [1]=
+=2E=20
+So this is not applicable on every module.
 
-are available in the Git repository at:
+> By the way, we tried with a TQ eval board with this SoM and saw the same
+> issue (not me, I don't have this board in hands). Don't you experience
+> something similar? I went across a couple of people reporting similar
+> issues with these modules but none of them reported how they fixed it
+> (if they did). I tried two different images based on TQ's Github using
+> v4.14.69 and v5.10 kernels.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2023-10-16
+Personally I've heard the first time about this issue. I never noticed=20
+something like this. Does this issue also appear when using TCP? Or is it a=
+n=20
+UDP only issue?
 
-for you to fetch changes up to b650981501bf00bc84f09cf3b3e0b6190cfed794:
+Best regards,
+Alexander
 
-  wifi: rtw89: mac: do bf_monitor only if WiFi 6 chips (2023-10-14 09:43:32 +0300)
+[1] https://github.com/tq-systems/linux-tqmaxx/blob/TQMa8-fslc-5.10-2.1.x-i=
+mx/
+arch/arm/boot/dts/imx6qdl-tqma6a.dtsi#L36-L48
 
-----------------------------------------------------------------
-wireless-next patches for v6.7
+=2D-=20
+TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht M=FCnchen, HRB 105018
+Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
+http://www.tq-group.com/
 
-The second pull request for v6.7, with only driver changes this time.
-We have now support for mt7925 PCIe and USB variants, few new features
-and of course some fixes.
-
-Major changes:
-
-mt76
-
-* mt7925 support
-
-ath12k
-
-* read board data variant name from SMBIOS
-
-wfx
-
-* Remain-On-Channel (ROC) support
-
-----------------------------------------------------------------
-Aditya Kumar Singh (2):
-      wifi: ath11k: fix CAC running state during virtual interface start
-      wifi: ath11k: fix Tx power value during active CAC
-
-Allen Ye (1):
-      wifi: mt76: check sta rx control frame to multibss capability
-
-Arnd Bergmann (2):
-      wifi: atmel: remove unused ioctl function
-      wifi: hostap: remove unused ioctl function
-
-Benjamin Lin (1):
-      wifi: mt76: mt7996: remove periodic MPDU TXS request
-
-Bo Jiao (1):
-      wifi: mt76: fix potential memory leak of beacon commands
-
-Chank Chen (1):
-      wifi: mt76: connac: add MBSSID support for mt7996
-
-Christophe JAILLET (2):
-      wifi: ath: dfs_pattern_detector: Fix a memory initialization issue
-      wifi: ath: dfs_pattern_detector: Use flex array to simplify code
-
-Deren Wu (10):
-      wifi: mt76: connac: introduce helper for mt7925 chipset
-      wifi: mt76: mt792x: support mt7925 chip init
-      wifi: mt76: connac: export functions for mt7925
-      wifi: mt76: connac: add eht support for phy mode config
-      wifi: mt76: connac: add eht support for tx power
-      wifi: mt76: connac: add data field in struct tlv
-      wifi: mt76: connac: add more unified command IDs
-      wifi: mt76: connac: add more unified event IDs
-      wifi: mt76: mt7925: add Mediatek Wi-Fi7 driver for mt7925 chips
-      wifi: mt76: mt7921: move connac nic capability handling to mt7921
-
-Dmitry Antipov (7):
-      wifi: mt76: add DMA mapping error check in mt76_alloc_txwi()
-      wifi: mt76: fix clang-specific fortify warnings
-      wifi: ath10k: consistently use kstrtoX_from_user() functions
-      wifi: ath10k: simplify ath10k_peer_create()
-      wifi: rtlwifi: use unsigned long for bt_coexist_8723 timestamp
-      wifi: rtlwifi: use convenient list_count_nodes()
-      wifi: rtlwifi: simplify TX command fill callbacks
-
-Douglas Anderson (1):
-      wifi: ath10k: Don't touch the CE interrupt registers after power up
-
-Felipe Negrelli Wolter (1):
-      wifi: wfx: fix case where rates are out of order
-
-Felix Fietkau (9):
-      wifi: mt76: mt7603: rework/fix rx pse hang check
-      wifi: mt76: mt7603: improve watchdog reset reliablity
-      wifi: mt76: mt7603: improve stuck beacon handling
-      wifi: mt76: mt7603: add missing register initialization for MT7628
-      wifi: mt76: mt7603: disable A-MSDU tx support on MT7628
-      wifi: mt76: fix race condition related to checking tx queue fill status
-      wifi: mt76: remove unused error path in mt76_connac_tx_complete_skb
-      wifi: mt76: mt7915: fix monitor mode issues
-      wifi: mt76: mt7915 add tc offloading support
-
-Gustavo A. R. Silva (2):
-      wifi: hostap: Add __counted_by for struct prism2_download_data and use struct_size()
-      wifi: brcmfmac: fweh: Add __counted_by for struct brcmf_fweh_queue_item and use struct_size()
-
-Hari Chandrakanthan (1):
-      wifi: ath12k: do not drop data frames from unassociated stations
-
-Howard Hsu (3):
-      wifi: mt76: mt7996: fix beamform mcu cmd configuration
-      wifi: mt76: mt7996: fix beamformee ss subfield in EHT PHY cap
-      wifi: mt76: mt7996: support more options for mt7996_set_bitrate_mask()
-
-Ingo Rohloff (1):
-      wifi: mt76: mt7921e: Support MT7992 IP in Xiaomi Redmibook 15 Pro (2023)
-
-Jen-Hao Cheng (1):
-      wifi: mt76: mt7996: support per-band LED control
-
-Jinjie Ruan (3):
-      wifi: mt76: Use PTR_ERR_OR_ZERO() to simplify code
-      wifi: mt76: Drop unnecessary error check for debugfs_create_dir()
-      wifi: rtw88: Remove duplicate NULL check before calling usb_kill/free_urb()
-
-Johannes Berg (1):
-      wifi: mt76: use atomic iface iteration for pre-TBTT work
-
-Jérôme Pouiller (8):
-      wifi: wfx: fix power_save setting when AP is stopped
-      wifi: wfx: relocate wfx_rate_mask_to_hw()
-      wifi: wfx: move wfx_skb_*() out of the header file
-      wifi: wfx: introduce hif_scan_uniq()
-      wifi: wfx: simplify exclusion between scan and Rx filters
-      wifi: wfx: scan_lock is global to the device
-      wifi: wfx: allow to send frames during ROC
-      wifi: wfx: implement wfx_remain_on_channel()
-
-Kalle Valo (3):
-      wifi: ath12k: fix debug messages
-      Merge tag 'mt76-for-kvalo-2023-09-30' of https://github.com/nbd168/wireless
-      Merge ath-next from git://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git
-
-Kees Cook (2):
-      wifi: mt76: Annotate struct mt76_rx_tid with __counted_by
-      wifi: p54: Annotate struct p54_cal_database with __counted_by
-
-Lorenzo Bianconi (2):
-      wifi: mt76: mt792x: move mt7921_skb_add_usb_sdio_hdr in mt792x module
-      wifi: mt76: mt792x: move some common usb code in mt792x module
-
-Ma Ke (1):
-      wifi: ath12k: mhi: fix potential memory leak in ath12k_mhi_register()
-
-MeiChia Chiu (2):
-      wifi: mt76: update beacon size limitation
-      wifi: mt76: mt7915: fix beamforming availability check
-
-Ming Yen Hsieh (4):
-      wifi: mt76: mt7921: enable set txpower for UNII-4
-      wifi: mt76: mt7921: add 6GHz power type support for clc
-      wifi: mt76: mt7921: get regulatory information from the clc event
-      wifi: mt76: mt7921: update the channel usage when the regd domain changed
-
-Peter Chiu (6):
-      wifi: mt76: mt7996: set correct wcid in txp
-      wifi: mt76: mt7996: fix wmm queue mapping
-      wifi: mt76: mt7996: fix rx rate report for CBW320-2
-      wifi: mt76: mt7996: fix TWT command format
-      wifi: mt76: check vif type before reporting cca and csa
-      wifi: mt76: mt7915: update mpdu density capability
-
-Ping-Ke Shih (9):
-      wifi: radiotap: add bandwidth definition of EHT U-SIG
-      wifi: rtw89: parse EHT information from RX descriptor and PPDU status packet
-      wifi: rtw89: Add EHT rate mask as parameters of RA H2C command
-      wifi: rtw89: parse TX EHT rate selected by firmware from RA C2H report
-      wifi: rtw89: show EHT rate in debugfs
-      wifi: rtw89: add EHT radiotap in monitor mode
-      wifi: rtw89: coex: add annotation __counted_by() for struct rtw89_btc_btf_set_slot_table
-      wifi: rtw89: coex: add annotation __counted_by() to struct rtw89_btc_btf_set_mon_reg
-      wifi: rtw89: mac: add registers of MU-EDCA parameters for WiFi 7 chips
-
-Sean Wang (4):
-      wifi: mt76: move struct ieee80211_chanctx_conf up to struct mt76_vif
-      wifi: mt76: mt7921: fix the wrong rate pickup for the chanctx driver
-      wifi: mt76: mt7921: fix the wrong rate selected in fw for the chanctx driver
-      wifi: mt76: reduce spin_lock_bh held up in mt76_dma_rx_cleanup
-
-Shayne Chen (2):
-      wifi: mt76: mt7996: only set vif teardown cmds at remove interface
-      wifi: mt76: fix per-band IEEE80211_CONF_MONITOR flag comparison
-
-StanleyYP Wang (1):
-      wifi: mt76: get rid of false alamrs of tx emission issues
-
-Wen Gong (3):
-      wifi: ath12k: add read variant from SMBIOS for download board data
-      wifi: ath12k: add keep backward compatibility of PHY mode to avoid firmware crash
-      wifi: ath10k: indicate to mac80211 scan complete with aborted flag for ATH10K_SCAN_STARTING state
-
-Wu Yunchuan (1):
-      wifi: carl9170: remove unnecessary (void*) conversions
-
-Yi-Chia Hsieh (3):
-      wifi: mt76: mt7996: get tx_retries and tx_failed from txfree
-      wifi: mt76: mt7996: Add mcu commands for getting sta tx statistic
-      wifi: mt76: mt7996: enable PPDU-TxS to host
-
-Zong-Zhe Yang (10):
-      wifi: rtw88: regd: configure QATAR and UK
-      wifi: rtw88: 8821c: update TX power limit to V67
-      wifi: rtw88: 8822c: update TX power limit to V70
-      wifi: rtw88: regd: update regulatory map to R64-R42
-      wifi: rtw88: 8821c: tweak CCK TX filter setting for SRRC regulation
-      wifi: rtw89: mac: update RTS threshold according to chip gen
-      wifi: rtw89: mac: generalize register of MU-EDCA switch according to chip gen
-      wifi: rtw89: mac: set bfee_ctrl() according to chip gen
-      wifi: rtw89: mac: set bf_assoc capabilities according to chip gen
-      wifi: rtw89: mac: do bf_monitor only if WiFi 6 chips
-
- drivers/net/wireless/ath/ath10k/debug.c            |   47 +-
- drivers/net/wireless/ath/ath10k/mac.c              |   26 +-
- drivers/net/wireless/ath/ath10k/snoc.c             |   18 +-
- drivers/net/wireless/ath/ath10k/spectral.c         |   26 +-
- drivers/net/wireless/ath/ath11k/mac.c              |   27 +-
- drivers/net/wireless/ath/ath12k/core.c             |   69 +
- drivers/net/wireless/ath/ath12k/core.h             |   21 +-
- drivers/net/wireless/ath/ath12k/debug.c            |    2 +-
- drivers/net/wireless/ath/ath12k/dp_rx.c            |   12 +-
- drivers/net/wireless/ath/ath12k/mac.c              |   65 +-
- drivers/net/wireless/ath/ath12k/mhi.c              |   11 +-
- drivers/net/wireless/ath/ath12k/qmi.c              |    5 +
- drivers/net/wireless/ath/ath12k/wmi.h              |    3 +
- drivers/net/wireless/ath/carl9170/usb.c            |   10 +-
- drivers/net/wireless/ath/dfs_pattern_detector.c    |   21 +-
- drivers/net/wireless/atmel/atmel.c                 |   72 -
- .../wireless/broadcom/brcm80211/brcmfmac/fweh.c    |    6 +-
- drivers/net/wireless/intersil/hostap/hostap.h      |    1 -
- .../net/wireless/intersil/hostap/hostap_download.c |    3 +-
- .../net/wireless/intersil/hostap/hostap_ioctl.c    |  228 --
- drivers/net/wireless/intersil/hostap/hostap_main.c |    3 -
- drivers/net/wireless/intersil/hostap/hostap_wlan.h |    2 +-
- drivers/net/wireless/intersil/p54/p54.h            |    2 +-
- drivers/net/wireless/mediatek/mt76/Kconfig         |    1 +
- drivers/net/wireless/mediatek/mt76/Makefile        |    1 +
- drivers/net/wireless/mediatek/mt76/debugfs.c       |    2 -
- drivers/net/wireless/mediatek/mt76/dma.c           |   14 +-
- drivers/net/wireless/mediatek/mt76/eeprom.c        |    7 +-
- drivers/net/wireless/mediatek/mt76/mac80211.c      |   62 +-
- drivers/net/wireless/mediatek/mt76/mt76.h          |   36 +-
- drivers/net/wireless/mediatek/mt76/mt7603/beacon.c |   80 +-
- drivers/net/wireless/mediatek/mt76/mt7603/core.c   |    2 +
- drivers/net/wireless/mediatek/mt76/mt7603/init.c   |    8 +
- drivers/net/wireless/mediatek/mt76/mt7603/mac.c    |   52 +-
- drivers/net/wireless/mediatek/mt76/mt7603/main.c   |    4 +-
- drivers/net/wireless/mediatek/mt76/mt7603/regs.h   |    5 +
- drivers/net/wireless/mediatek/mt76/mt7615/init.c   |    5 +-
- drivers/net/wireless/mediatek/mt76/mt7615/main.c   |    4 +-
- drivers/net/wireless/mediatek/mt76/mt7615/mcu.c    |    2 +-
- .../net/wireless/mediatek/mt76/mt7615/pci_mac.c    |    2 +-
- drivers/net/wireless/mediatek/mt76/mt76_connac.h   |    6 +
- .../net/wireless/mediatek/mt76/mt76_connac3_mac.h  |   18 +-
- .../net/wireless/mediatek/mt76/mt76_connac_mac.c   |   28 +-
- .../net/wireless/mediatek/mt76/mt76_connac_mcu.c   |  191 +-
- .../net/wireless/mediatek/mt76/mt76_connac_mcu.h   |   60 +-
- .../net/wireless/mediatek/mt76/mt76x02_beacon.c    |    8 +-
- drivers/net/wireless/mediatek/mt76/mt76x02_mmio.c  |   11 +-
- .../net/wireless/mediatek/mt76/mt76x02_usb_core.c  |   13 +-
- drivers/net/wireless/mediatek/mt76/mt76x02_util.c  |    4 +-
- drivers/net/wireless/mediatek/mt76/mt7915/init.c   |   24 +-
- drivers/net/wireless/mediatek/mt76/mt7915/mac.c    |    2 +-
- drivers/net/wireless/mediatek/mt76/mt7915/main.c   |   53 +-
- drivers/net/wireless/mediatek/mt76/mt7915/mcu.c    |   79 +-
- drivers/net/wireless/mediatek/mt76/mt7915/mcu.h    |   18 +-
- drivers/net/wireless/mediatek/mt76/mt7915/mt7915.h |    4 +
- drivers/net/wireless/mediatek/mt76/mt7915/regs.h   |    1 +
- drivers/net/wireless/mediatek/mt76/mt7915/soc.c    |    5 +-
- drivers/net/wireless/mediatek/mt76/mt7921/init.c   |   54 +-
- drivers/net/wireless/mediatek/mt76/mt7921/mac.c    |    2 +-
- drivers/net/wireless/mediatek/mt76/mt7921/main.c   |   69 +-
- drivers/net/wireless/mediatek/mt76/mt7921/mcu.c    |  155 +-
- drivers/net/wireless/mediatek/mt76/mt7921/mcu.h    |   13 +
- drivers/net/wireless/mediatek/mt76/mt7921/mt7921.h |   18 +-
- drivers/net/wireless/mediatek/mt76/mt7921/pci.c    |    2 +
- .../net/wireless/mediatek/mt76/mt7921/pci_mac.c    |    2 +-
- .../net/wireless/mediatek/mt76/mt7921/sdio_mcu.c   |    2 +-
- drivers/net/wireless/mediatek/mt76/mt7921/usb.c    |   12 +-
- drivers/net/wireless/mediatek/mt76/mt7925/Kconfig  |   30 +
- drivers/net/wireless/mediatek/mt76/mt7925/Makefile |    9 +
- .../net/wireless/mediatek/mt76/mt7925/debugfs.c    |  319 ++
- drivers/net/wireless/mediatek/mt76/mt7925/init.c   |  235 ++
- drivers/net/wireless/mediatek/mt76/mt7925/mac.c    | 1452 +++++++++
- drivers/net/wireless/mediatek/mt76/mt7925/mac.h    |   23 +
- drivers/net/wireless/mediatek/mt76/mt7925/main.c   | 1454 +++++++++
- drivers/net/wireless/mediatek/mt76/mt7925/mcu.c    | 3174 ++++++++++++++++++++
- drivers/net/wireless/mediatek/mt76/mt7925/mcu.h    |  537 ++++
- drivers/net/wireless/mediatek/mt76/mt7925/mt7925.h |  309 ++
- drivers/net/wireless/mediatek/mt76/mt7925/pci.c    |  586 ++++
- .../net/wireless/mediatek/mt76/mt7925/pci_mac.c    |  148 +
- .../net/wireless/mediatek/mt76/mt7925/pci_mcu.c    |   53 +
- drivers/net/wireless/mediatek/mt76/mt7925/regs.h   |   92 +
- drivers/net/wireless/mediatek/mt76/mt7925/usb.c    |  332 ++
- drivers/net/wireless/mediatek/mt76/mt792x.h        |   38 +-
- drivers/net/wireless/mediatek/mt76/mt792x_core.c   |   30 +-
- drivers/net/wireless/mediatek/mt76/mt792x_dma.c    |   49 +-
- drivers/net/wireless/mediatek/mt76/mt792x_usb.c    |    9 +
- drivers/net/wireless/mediatek/mt76/mt7996/init.c   |   50 +-
- drivers/net/wireless/mediatek/mt76/mt7996/mac.c    |  115 +-
- drivers/net/wireless/mediatek/mt76/mt7996/main.c   |   65 +-
- drivers/net/wireless/mediatek/mt76/mt7996/mcu.c    |  359 ++-
- drivers/net/wireless/mediatek/mt76/mt7996/mcu.h    |   37 +-
- drivers/net/wireless/mediatek/mt76/mt7996/mt7996.h |    2 +-
- drivers/net/wireless/mediatek/mt76/mt7996/regs.h   |    8 +
- drivers/net/wireless/mediatek/mt76/tx.c            |  108 +-
- drivers/net/wireless/realtek/rtlwifi/core.c        |    2 +-
- .../net/wireless/realtek/rtlwifi/rtl8188ee/trx.c   |    8 +-
- .../net/wireless/realtek/rtlwifi/rtl8188ee/trx.h   |    1 -
- .../net/wireless/realtek/rtlwifi/rtl8192ce/trx.c   |    9 +-
- .../net/wireless/realtek/rtlwifi/rtl8192ce/trx.h   |    1 -
- .../net/wireless/realtek/rtlwifi/rtl8192cu/hw.c    |    2 +-
- .../net/wireless/realtek/rtlwifi/rtl8192cu/trx.c   |    8 +-
- .../net/wireless/realtek/rtlwifi/rtl8192cu/trx.h   |    5 +-
- .../net/wireless/realtek/rtlwifi/rtl8192de/fw.c    |    2 +-
- .../net/wireless/realtek/rtlwifi/rtl8192de/trx.c   |    8 +-
- .../net/wireless/realtek/rtlwifi/rtl8192de/trx.h   |    1 -
- .../net/wireless/realtek/rtlwifi/rtl8192ee/dm.c    |    7 +-
- .../net/wireless/realtek/rtlwifi/rtl8192ee/trx.c   |    8 +-
- .../net/wireless/realtek/rtlwifi/rtl8192ee/trx.h   |    1 -
- .../net/wireless/realtek/rtlwifi/rtl8192se/fw.c    |    2 +-
- .../net/wireless/realtek/rtlwifi/rtl8192se/trx.c   |    2 +-
- .../net/wireless/realtek/rtlwifi/rtl8192se/trx.h   |    4 +-
- .../wireless/realtek/rtlwifi/rtl8723ae/hal_btc.c   |   16 +-
- .../net/wireless/realtek/rtlwifi/rtl8723ae/trx.c   |    8 +-
- .../net/wireless/realtek/rtlwifi/rtl8723ae/trx.h   |    1 -
- .../net/wireless/realtek/rtlwifi/rtl8723be/dm.c    |    7 +-
- .../net/wireless/realtek/rtlwifi/rtl8723be/trx.c   |    1 -
- .../net/wireless/realtek/rtlwifi/rtl8723be/trx.h   |    1 -
- .../net/wireless/realtek/rtlwifi/rtl8821ae/dm.c    |    6 +-
- .../net/wireless/realtek/rtlwifi/rtl8821ae/trx.c   |    5 +-
- .../net/wireless/realtek/rtlwifi/rtl8821ae/trx.h   |    1 -
- drivers/net/wireless/realtek/rtlwifi/wifi.h        |    3 +-
- drivers/net/wireless/realtek/rtw88/main.h          |    4 +-
- drivers/net/wireless/realtek/rtw88/regd.c          |   24 +-
- drivers/net/wireless/realtek/rtw88/regd.h          |    2 +
- drivers/net/wireless/realtek/rtw88/rtw8821c.c      |   67 +
- drivers/net/wireless/realtek/rtw88/rtw8821c.h      |    1 +
- .../net/wireless/realtek/rtw88/rtw8821c_table.c    | 1154 +++++--
- .../net/wireless/realtek/rtw88/rtw8822c_table.c    | 1239 ++++----
- drivers/net/wireless/realtek/rtw88/usb.c           |    9 +-
- drivers/net/wireless/realtek/rtw89/coex.c          |   23 +-
- drivers/net/wireless/realtek/rtw89/core.c          |  127 +-
- drivers/net/wireless/realtek/rtw89/core.h          |   11 +-
- drivers/net/wireless/realtek/rtw89/debug.c         |   14 +
- drivers/net/wireless/realtek/rtw89/mac.c           |   57 +-
- drivers/net/wireless/realtek/rtw89/mac.h           |   22 +-
- drivers/net/wireless/realtek/rtw89/mac80211.c      |   16 +-
- drivers/net/wireless/realtek/rtw89/mac_be.c        |  174 ++
- drivers/net/wireless/realtek/rtw89/phy.c           |   70 +-
- drivers/net/wireless/realtek/rtw89/phy.h           |    5 +
- drivers/net/wireless/realtek/rtw89/reg.h           |   79 +
- drivers/net/wireless/silabs/wfx/data_tx.c          |  125 +-
- drivers/net/wireless/silabs/wfx/data_tx.h          |   21 +-
- drivers/net/wireless/silabs/wfx/hif_tx.c           |   43 +
- drivers/net/wireless/silabs/wfx/hif_tx.h           |    1 +
- drivers/net/wireless/silabs/wfx/main.c             |    5 +
- drivers/net/wireless/silabs/wfx/queue.c            |   38 +-
- drivers/net/wireless/silabs/wfx/queue.h            |    1 +
- drivers/net/wireless/silabs/wfx/scan.c             |   66 +-
- drivers/net/wireless/silabs/wfx/scan.h             |    6 +
- drivers/net/wireless/silabs/wfx/sta.c              |   41 +-
- drivers/net/wireless/silabs/wfx/sta.h              |    1 -
- drivers/net/wireless/silabs/wfx/wfx.h              |    8 +-
- include/linux/pci_ids.h                            |    2 +
- include/net/ieee80211_radiotap.h                   |    6 +
- 154 files changed, 12734 insertions(+), 2292 deletions(-)
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/Kconfig
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/Makefile
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/debugfs.c
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/init.c
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/mac.c
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/mac.h
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/main.c
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/mcu.c
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/mcu.h
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/mt7925.h
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/pci.c
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/pci_mac.c
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/pci_mcu.c
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/regs.h
- create mode 100644 drivers/net/wireless/mediatek/mt76/mt7925/usb.c
 
 
