@@ -1,165 +1,242 @@
-Return-Path: <netdev+bounces-41168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498B57CA093
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:26:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3DA97CA0B0
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02B3F1F21843
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:26:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96FD228141E
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7330F1641A;
-	Mon, 16 Oct 2023 07:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E47BC168AB;
+	Mon, 16 Oct 2023 07:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MC5DhabG"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306B91641F
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:26:51 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020F6AD
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:26:49 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qsHzz-0002wL-97; Mon, 16 Oct 2023 09:26:47 +0200
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qsHzy-0021tg-LG; Mon, 16 Oct 2023 09:26:46 +0200
-Received: from sha by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qsHzy-00EhVy-GZ; Mon, 16 Oct 2023 09:26:46 +0200
-Date: Mon, 16 Oct 2023 09:26:46 +0200
-From: Sascha Hauer <sha@pengutronix.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Boris Pismenny <borisp@nvidia.com>, netdev@vger.kernel.org,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
-	kernel@pengutronix.de, Jakub Kicinski <kuba@kernel.org>,
-	Pavel Begunkov <asml.silence@gmail.com>
-Subject: Re: Problem with io_uring splice and KTLS
-Message-ID: <20231016072646.GV3359458@pengutronix.de>
-References: <20231010141932.GD3114228@pengutronix.de>
- <d729781a-3d12-423b-973e-c16fdbcbb60b@kernel.dk>
- <20231012133407.GA3359458@pengutronix.de>
- <f39ef992-4789-4c30-92ef-e3114a31d5c7@kernel.dk>
- <20231013054716.GG3359458@pengutronix.de>
- <a9dd11d9-b5b8-456d-b8b6-12257e2924ab@kernel.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F801642D
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:35:52 +0000 (UTC)
+Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD373EB
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:35:50 -0700 (PDT)
+Received: by mail-vs1-xe32.google.com with SMTP id ada2fe7eead31-457bda4cf32so1318139137.3
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:35:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697441750; x=1698046550; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uZWxgydpZppRV3uFhpO46+mr4KRDGo1ndeXPvO+3cY4=;
+        b=MC5DhabGSH3oNOgExQJVgI1sPVP5qpfD7NY/IpKxbNnUp9VZZIZAf96WKcVhgJ26RW
+         L55yvsjepwpLl2D6P1DU+wUnshNjUaCX+1FJ/YlRHsRExZbYRKzz4Qujzs6IaarKMSkX
+         HVIs7raJSDtmPkrRmboeXb6nraf6IowVNqRK3ZT0UT9Sd2LG41mgS1QgMgS8mz+nXXAk
+         CEteDF2eoNtnt9ITBEtKKtbk1wffbwkKHCOpgmHv9DeqMoTof88ZFrDXX88Z/0UzO8FY
+         JZB8fAin8owLw0H8Drxt57dnhVm8BtjWWlYYED9qGMBs8H8gfccCQFeQd6wpq6YHOGtX
+         Nxww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697441750; x=1698046550;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uZWxgydpZppRV3uFhpO46+mr4KRDGo1ndeXPvO+3cY4=;
+        b=f+v+2G7AWA4l7aCfBTalIhC0UXYhtWFP2IQSINhlE015xwMjnulR+4J2g72PrNLRVc
+         K3IXD1F6mQBEFNJZWyMlbRlnqwhcqBWE/6CtEjbEowM0LXWzcHtinxtmKWcIIjpxrOC5
+         B/5OqwOWWWct/RzCppP5DoYLFbo/4lYTcSBGHI0LBlyIyobVgBacAcG4HQDT3kKIscYh
+         y/KrJL4VxmkO+pqsgDuDO+UMfezwlbJcguVW82Z0eKScYM6fDozNX0P9cgEKp67EUzBZ
+         zdOXWFwkmQMdQuUFMm5XncdOpKuNj6qe+JtywYAXEDnbFU9PQFSCjaOuTNAgrZd+cWfQ
+         kYqw==
+X-Gm-Message-State: AOJu0YxbGEMNH8JWajXaxzUewAWFpxKY/+qBUGutjWDK0eJNxf7jsdMW
+	xXvvJvU0Q1VGo12xqaUYu5xE4vRJxD6n9fN/GeCHkw==
+X-Google-Smtp-Source: AGHT+IGtxtcQ/DwbOjZOxe+vSiZxL2yoStxDTOGDWY6AK+7ZzeunATAPpwfYQKkogueWZsUdGJzM3OxpCtnI+gmEk3U=
+X-Received: by 2002:a67:a64b:0:b0:457:d207:4328 with SMTP id
+ r11-20020a67a64b000000b00457d2074328mr3902554vsh.23.1697441749420; Mon, 16
+ Oct 2023 00:35:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a9dd11d9-b5b8-456d-b8b6-12257e2924ab@kernel.dk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: sha@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20231014031257.178630-1-mirsad.todorovac@alu.unizg.hr> <20231014031257.178630-2-mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <20231014031257.178630-2-mirsad.todorovac@alu.unizg.hr>
+From: Marco Elver <elver@google.com>
+Date: Mon, 16 Oct 2023 09:35:13 +0200
+Message-ID: <CANpmjNOphxEYnw41tc+WisidgHOpqVDajtXj_m8-TfYevObQ=g@mail.gmail.com>
+Subject: Re: [PATCH v1 2/3] r8169: fix the KCSAN reported data-race in rtl_tx
+ while reading TxDescArray[entry].opts1
+To: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nic_swsd@realtek.com, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Oct 13, 2023 at 07:45:55AM -0600, Jens Axboe wrote:
-> On 10/12/23 11:47 PM, Sascha Hauer wrote:
-> > On Thu, Oct 12, 2023 at 07:45:07PM -0600, Jens Axboe wrote:
-> >> On 10/12/23 7:34 AM, Sascha Hauer wrote:
-> >>> In case you don't have encryption hardware you can create an
-> >>> asynchronous encryption module using cryptd. Compile a kernel with
-> >>> CONFIG_CRYPTO_USER_API_AEAD and CONFIG_CRYPTO_CRYPTD and start the
-> >>> webserver with the '-c' option. /proc/crypto should then contain an
-> >>> entry with:
-> >>>
-> >>>  name         : gcm(aes)
-> >>>  driver       : cryptd(gcm_base(ctr(aes-generic),ghash-generic))
-> >>>  module       : kernel
-> >>>  priority     : 150
-> >>
-> >> I did a bit of prep work to ensure I had everything working for when
-> >> there's time to dive into it, but starting it with -c doesn't register
-> >> this entry. Turns out the bind() in there returns -1/ENOENT.
-> > 
-> > Yes, that happens here as well, that's why I don't check for the error
-> > in the bind call. Nevertheless it has the desired effect that the new
-> > algorithm is registered and used from there on. BTW you only need to
-> > start the webserver once with -c. If you start it repeatedly with -c a
-> > new gcm(aes) instance is registered each time.
-> 
-> Gotcha - I wasn't able to trigger the condition, which is why I thought
-> perhaps I was missing something.
-> 
-> Can you try the below patch and see if that makes a difference? I'm not
-> quite sure why it would since you said it triggers with DEFER_TASKRUN as
-> well, and for that kind of notification, you should never hit the paths
-> you have detailed in the debug patch.
+On Sat, 14 Oct 2023 at 05:16, Mirsad Goran Todorovac
+<mirsad.todorovac@alu.unizg.hr> wrote:
+>
+> KCSAN reported the following data-race:
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> BUG: KCSAN: data-race in rtl8169_poll (drivers/net/ethernet/realtek/r8169=
+_main.c:4368 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
+>
+> race at unknown origin, with read to 0xffff888140d37570 of 4 bytes by int=
+errupt on cpu 21:
+> rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4368 drivers/net/=
+ethernet/realtek/r8169_main.c:4581) r8169
+> __napi_poll (net/core/dev.c:6527)
+> net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
+> __do_softirq (kernel/softirq.c:553)
+> __irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
+> irq_exit_rcu (kernel/softirq.c:647)
+> sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1074 (discrimina=
+tor 14))
+> asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:645)
+> cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
+> cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
+> call_cpuidle (kernel/sched/idle.c:135)
+> do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
+> cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
+> start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:=
+294)
+> secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
+>
+> value changed: 0xb0000042 -> 0x00000000
+>
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kc=
+san-00143-gb5cbe7c00aa0 #41
+> Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04=
+/26/2023
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> The read side is in
+>
+> drivers/net/ethernet/realtek/r8169_main.c
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>    4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private=
+ *tp,
+>    4356                    int budget)
+>    4357 {
+>    4358         unsigned int dirty_tx, bytes_compl =3D 0, pkts_compl =3D =
+0;
+>    4359         struct sk_buff *skb;
+>    4360
+>    4361         dirty_tx =3D tp->dirty_tx;
+>    4362
+>    4363         while (READ_ONCE(tp->cur_tx) !=3D dirty_tx) {
+>    4364                 unsigned int entry =3D dirty_tx % NUM_TX_DESC;
+>    4365                 u32 status;
+>    4366
+>  =E2=86=92 4367                 status =3D le32_to_cpu(tp->TxDescArray[en=
+try].opts1);
+>    4368                 if (status & DescOwn)
+>    4369                         break;
+>    4370
+>    4371                 skb =3D tp->tx_skb[entry].skb;
+>    4372                 rtl8169_unmap_tx_skb(tp, entry);
+>    4373
+>    4374                 if (skb) {
+>    4375                         pkts_compl++;
+>    4376                         bytes_compl +=3D skb->len;
+>    4377                         napi_consume_skb(skb, budget);
+>    4378                 }
+>    4379                 dirty_tx++;
+>    4380         }
+>    4381
+>    4382         if (tp->dirty_tx !=3D dirty_tx) {
+>    4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_com=
+pl);
+>    4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
+>    4385
+>    4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl,=
+ bytes_compl,
+>    4387                                               rtl_tx_slots_avail(=
+tp),
+>    4388                                               R8169_TX_START_THRS=
+);
+>    4389                 /*
+>    4390                  * 8168 hack: TxPoll requests are lost when the T=
+x packets are
+>    4391                  * too close. Let's kick an extra TxPoll request =
+when a burst
+>    4392                  * of start_xmit activity is detected (if it is n=
+ot detected,
+>    4393                  * it is slow enough). -- FR
+>    4394                  * If skb is NULL then we come here again once a =
+tx irq is
+>    4395                  * triggered after the last fragment is marked tr=
+ansmitted.
+>    4396                  */
+>    4397                 if (READ_ONCE(tp->cur_tx) !=3D dirty_tx && skb)
+>    4398                         rtl8169_doorbell(tp);
+>    4399         }
+>    4400 }
+>
+> tp->TxDescArray[entry].opts1 is reported to have a data-race and READ_ONC=
+E() fixes
+> this KCSAN warning.
+>
+>    4366
+>  =E2=86=92 4367                 status =3D le32_to_cpu(READ_ONCE(tp->TxDe=
+scArray[entry].opts1));
+>    4368                 if (status & DescOwn)
+>    4369                         break;
+>    4370
+>
+> Fixes: ^1da177e4c3f4 ("initial git repository build")
+> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+> Cc: nic_swsd@realtek.com
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Marco Elver <elver@google.com>
+> Cc: netdev@vger.kernel.org
+> Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@a=
+lu.unizg.hr/
+> Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
 
-I can confirm that this patch makes it work for me. I tested with both
-software cryptd and also with my original CAAM encryption workload.
-IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN is not needed.
-Both my simple webserver and the original C++ Webserver from our
-customer are now working without problems.
+Acked-by: Marco Elver <elver@google.com>
 
-Do you think there is a chance getting this change upstream? I'm a bit
-afraid the code originally uses signal_pending() instead of
-task_sigpending() for a good reason.
-
-Sascha
-
-> 
-> diff --git a/net/core/stream.c b/net/core/stream.c
-> index f5c4e47df165..a9a196587254 100644
-> --- a/net/core/stream.c
-> +++ b/net/core/stream.c
-> @@ -67,7 +67,7 @@ int sk_stream_wait_connect(struct sock *sk, long *timeo_p)
->  			return -EPIPE;
->  		if (!*timeo_p)
->  			return -EAGAIN;
-> -		if (signal_pending(tsk))
-> +		if (task_sigpending(tsk))
->  			return sock_intr_errno(*timeo_p);
->  
->  		add_wait_queue(sk_sleep(sk), &wait);
-> @@ -103,7 +103,7 @@ void sk_stream_wait_close(struct sock *sk, long timeout)
->  		do {
->  			if (sk_wait_event(sk, &timeout, !sk_stream_closing(sk), &wait))
->  				break;
-> -		} while (!signal_pending(current) && timeout);
-> +		} while (!task_sigpending(current) && timeout);
->  
->  		remove_wait_queue(sk_sleep(sk), &wait);
->  	}
-> @@ -134,7 +134,7 @@ int sk_stream_wait_memory(struct sock *sk, long *timeo_p)
->  			goto do_error;
->  		if (!*timeo_p)
->  			goto do_eagain;
-> -		if (signal_pending(current))
-> +		if (task_sigpending(current))
->  			goto do_interrupted;
->  		sk_clear_bit(SOCKWQ_ASYNC_NOSPACE, sk);
->  		if (sk_stream_memory_free(sk) && !vm_wait)
-> 
-> -- 
-> Jens Axboe
-> 
-> 
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethe=
+rnet/realtek/r8169_main.c
+> index 81be6085a480..361b90007148 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -4364,7 +4364,7 @@ static void rtl_tx(struct net_device *dev, struct r=
+tl8169_private *tp,
+>                 unsigned int entry =3D dirty_tx % NUM_TX_DESC;
+>                 u32 status;
+>
+> -               status =3D le32_to_cpu(tp->TxDescArray[entry].opts1);
+> +               status =3D le32_to_cpu(READ_ONCE(tp->TxDescArray[entry].o=
+pts1));
+>                 if (status & DescOwn)
+>                         break;
+>
+> --
+> 2.34.1
+>
 
