@@ -1,245 +1,126 @@
-Return-Path: <netdev+bounces-41466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C05AD7CB089
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:55:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B26A07CB096
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:56:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0BB51C20D0C
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:55:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E312E1C20B9B
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C86330FA7;
-	Mon, 16 Oct 2023 16:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5019230CF5;
+	Mon, 16 Oct 2023 16:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dP5tinsn"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="tgzt7S9p"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C661D30FA4
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:55:15 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AB161706;
-	Mon, 16 Oct 2023 09:55:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697475314; x=1729011314;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=iMvW9Pd7slcD9HuUM6knbeG8rQ/qVzk1d8EzAuKBzzI=;
-  b=dP5tinsnt3hf06gP2zn+spHDS1ZFM/2gYGBz5srZBYCssxbRp7At8nR/
-   uUC+MtQBoUwCR55rgdLCWQbzfjbgJ2bhn/UobUPjH4EK5EPbj7oA3wSha
-   01J2IB/4ifJUXMx7N7zVYatymZcMr29Pz84MN096DtGsSu9V8WGTTJY/J
-   wOzsBSELy0R5jzzUn3lna7nmYqpLu4vJB7qIFzdQhDf4ciWrZ9CSMj+u2
-   R7tQdd1I7Khqh/8Qc/YwIfAmy/cYZGyiQkPWvM5AgMYMghjK8w335ubwc
-   OLKTxFSrBj7l59b+FR0QgJwJHhXZpdZC8mYTWDOlbs3+4k9Cr8qWHFNnd
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364937356"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="364937356"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:55:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="826084575"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="826084575"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmsmga004.fm.intel.com with ESMTP; 16 Oct 2023 09:55:09 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Alexander Potapenko <glider@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	netdev@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	dm-devel@redhat.com,
-	ntfs3@lists.linux.dev,
-	linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 13/13] lib/bitmap: add tests for IP tunnel flags conversion helpers
-Date: Mon, 16 Oct 2023 18:52:47 +0200
-Message-ID: <20231016165247.14212-14-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231016165247.14212-1-aleksander.lobakin@intel.com>
-References: <20231016165247.14212-1-aleksander.lobakin@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0B928E25
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:56:42 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05C652413;
+	Mon, 16 Oct 2023 09:56:40 -0700 (PDT)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39GGuTmc113281;
+	Mon, 16 Oct 2023 11:56:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1697475389;
+	bh=8uawIvwXCNY3cQCPZEe1PeCx0P4Tg5jesgAAUCp7n7U=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=tgzt7S9peZqtq4Jwc7d96+kGQYhJN63L4gsd6B9J73K9syja/gy0lsoiexDrgMnR6
+	 czoMV0M3HRefUzpLFovVmBTKnypzH2EvMrnkI/6o0Xn1/SEtV8CYDwtlsrIs4/oxRL
+	 6aqGRZpvtvz/0Dg9c01J5u9XoBJUQYbPA7ihSza0=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39GGuTMH002669
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 16 Oct 2023 11:56:29 -0500
+Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 16
+ Oct 2023 11:56:29 -0500
+Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 16 Oct 2023 11:56:29 -0500
+Received: from [10.249.135.225] (ileaxei01-snat.itg.ti.com [10.180.69.5])
+	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39GGuOOI032386;
+	Mon, 16 Oct 2023 11:56:25 -0500
+Message-ID: <d7e56794-8061-bf18-bb6f-7525588546fc@ti.com>
+Date: Mon, 16 Oct 2023 22:26:24 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix r30 CMDs bitmasks
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>, MD Danish Anwar <danishanwar@ti.com>
+CC: Jacob Keller <jacob.e.keller@intel.com>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David
+ S. Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, <r-gunasekaran@ti.com>,
+        Roger Quadros <rogerq@kernel.org>
+References: <20231016161525.1695795-1-danishanwar@ti.com>
+ <11109e7d-139b-4c8c-beaa-e1e89e355b1b@lunn.ch>
+From: "Anwar, Md Danish" <a0501179@ti.com>
+In-Reply-To: <11109e7d-139b-4c8c-beaa-e1e89e355b1b@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Now that there are helpers for converting IP tunnel flags between the
-old __be16 format and the bitmap format, make sure they work as expected
-by adding a couple of tests to the bitmap testing suite. The helpers are
-all inline, so no dependencies on the related CONFIG_* (or a standalone
-module) are needed.
+On 10/16/2023 9:58 PM, Andrew Lunn wrote:
+> On Mon, Oct 16, 2023 at 09:45:25PM +0530, MD Danish Anwar wrote:
+>> The bitmask for EMAC_PORT_DISABLE and EMAC_PORT_FORWARD has been changed
+>> in the ICSSG firmware REL.PRU-ICSS-ETHERNET-SWITCH_02.02.12.05.
+>>
+>> The current bitmasks are wrong and as a result EMAC_PORT_DISABLE and
+>> EMAC_PORT_FORWARD commands doesn not work.
+>> Update r30 commands to use the same bitmask as used by the ICSSG firmware
+>> REL.PRU-ICSS-ETHERNET-SWITCH_02.02.12.05.
+>>
+>> These bitmasks are not backwards compatible. This will work with
+>> firmware version REL.PRU-ICSS-ETHERNET-SWITCH_02.02.12.05 and above but
+>> not with lower firmware versions.
+> 
+> Breaking backwards compatibility is generally not allowed.
+> 
+> As far as i understand the driver, it loads whatever version of
+> firmware is available. It does not ask for a specific version. So you
+> should ask the firmware what version it is, and then handle the
+> bitmask as appropriate.
+> 
 
-Cover three possible cases:
+Understood. I will try to find a way to do this at runtime.
 
-1. No bits past BIT(15) are set, VTI/SIT bits are not set. This
-   conversion is almost a direct assignment.
-2. No bits past BIT(15) are set, but VTI/SIT bit is set. During the
-   conversion, it must be transformed into BIT(16) in the bitmap,
-   but still compatible with the __be16 format.
-3. The bitmap has bits past BIT(15) set (not the VTI/SIT one). The
-   result will be truncated.
-   Note that currently __IP_TUNNEL_FLAG_NUM is 17 (incl. special),
-   which means that the result of this case is currently
-   semi-false-positive. When BIT(17) is finally here, it will be
-   adjusted accordingly.
+> How many different versions of REL.PRU-ICSS-ETHERNET-SWITCH have been
+> released? They don't appear to be part of linux-firmware.git :-(
+> 
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- lib/test_bitmap.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 105 insertions(+)
+The firmwares are currently not posted to linux-firmware.git. They are
+maintained internally as of now. Different version of firmware is
+released for every SDK release (3-4 times a year)
 
-diff --git a/lib/test_bitmap.c b/lib/test_bitmap.c
-index a005fcd70ed7..2981277ed8d4 100644
---- a/lib/test_bitmap.c
-+++ b/lib/test_bitmap.c
-@@ -14,6 +14,8 @@
- #include <linux/string.h>
- #include <linux/uaccess.h>
- 
-+#include <net/ip_tunnels.h>
-+
- #include "../tools/testing/selftests/kselftest_module.h"
- 
- #define EXP1_IN_BITS	(sizeof(exp1) * 8)
-@@ -1387,6 +1389,108 @@ static void __init test_bitmap_write_perf(void)
- 
- #undef TEST_BIT_LEN
- 
-+struct ip_tunnel_flags_test {
-+	const u16	*src_bits;
-+	const u16	*exp_bits;
-+	u8		src_num;
-+	u8		exp_num;
-+	__be16		exp_val;
-+	bool		exp_comp:1;
-+};
-+
-+#define IP_TUNNEL_FLAGS_TEST(src, comp, eval, exp) {	\
-+	.src_bits	= (src),			\
-+	.src_num	= ARRAY_SIZE(src),		\
-+	.exp_comp	= (comp),			\
-+	.exp_val	= (eval),			\
-+	.exp_bits	= (exp),			\
-+	.exp_num	= ARRAY_SIZE(exp),		\
-+}
-+
-+/* These are __be16-compatible and can be compared as is */
-+static const u16 ip_tunnel_flags_1[] __initconst = {
-+	IP_TUNNEL_KEY_BIT,
-+	IP_TUNNEL_STRICT_BIT,
-+	IP_TUNNEL_ERSPAN_OPT_BIT,
-+};
-+
-+/*
-+ * Due to the previous flags design limitation, setting either
-+ * ``IP_TUNNEL_CSUM_BIT`` (on Big Endian) or ``IP_TUNNEL_DONT_FRAGMENT_BIT``
-+ * (on Little) also sets VTI/ISATAP bit. In the bitmap implementation, they
-+ * correspond to ``BIT(16)``, which is bigger than ``U16_MAX``, but still is
-+ * backward-compatible.
-+ */
-+#ifdef __BIG_ENDIAN
-+#define IP_TUNNEL_CONFLICT_BIT	IP_TUNNEL_CSUM_BIT
-+#else
-+#define IP_TUNNEL_CONFLICT_BIT	IP_TUNNEL_DONT_FRAGMENT_BIT
-+#endif
-+
-+static const u16 ip_tunnel_flags_2_src[] __initconst = {
-+	IP_TUNNEL_CONFLICT_BIT,
-+};
-+
-+static const u16 ip_tunnel_flags_2_exp[] __initconst = {
-+	IP_TUNNEL_CONFLICT_BIT,
-+	IP_TUNNEL_SIT_ISATAP_BIT,
-+};
-+
-+/* Bits 17 and higher are not compatible with __be16 flags */
-+static const u16 ip_tunnel_flags_3_src[] __initconst = {
-+	IP_TUNNEL_VXLAN_OPT_BIT,
-+	17,
-+	18,
-+	20,
-+};
-+
-+static const u16 ip_tunnel_flags_3_exp[] __initconst = {
-+	IP_TUNNEL_VXLAN_OPT_BIT,
-+};
-+
-+static const struct ip_tunnel_flags_test ip_tunnel_flags_test[] __initconst = {
-+	IP_TUNNEL_FLAGS_TEST(ip_tunnel_flags_1, true,
-+			     cpu_to_be16(BIT(IP_TUNNEL_KEY_BIT) |
-+					 BIT(IP_TUNNEL_STRICT_BIT) |
-+					 BIT(IP_TUNNEL_ERSPAN_OPT_BIT)),
-+			     ip_tunnel_flags_1),
-+	IP_TUNNEL_FLAGS_TEST(ip_tunnel_flags_2_src, true, VTI_ISVTI,
-+			     ip_tunnel_flags_2_exp),
-+	IP_TUNNEL_FLAGS_TEST(ip_tunnel_flags_3_src,
-+			     /*
-+			      * This must be set to ``false`` once
-+			      * ``__IP_TUNNEL_FLAG_NUM`` goes above 17.
-+			      */
-+			     true,
-+			     cpu_to_be16(BIT(IP_TUNNEL_VXLAN_OPT_BIT)),
-+			     ip_tunnel_flags_3_exp),
-+};
-+
-+static void __init test_ip_tunnel_flags(void)
-+{
-+	for (u32 i = 0; i < ARRAY_SIZE(ip_tunnel_flags_test); i++) {
-+		typeof(*ip_tunnel_flags_test) *test = &ip_tunnel_flags_test[i];
-+		IP_TUNNEL_DECLARE_FLAGS(src) = { };
-+		IP_TUNNEL_DECLARE_FLAGS(exp) = { };
-+		IP_TUNNEL_DECLARE_FLAGS(out);
-+
-+		for (u32 j = 0; j < test->src_num; j++)
-+			__set_bit(test->src_bits[j], src);
-+
-+		for (u32 j = 0; j < test->exp_num; j++)
-+			__set_bit(test->exp_bits[j], exp);
-+
-+		ip_tunnel_flags_from_be16(out, test->exp_val);
-+
-+		expect_eq_uint(test->exp_comp,
-+			       ip_tunnel_flags_is_be16_compat(src));
-+		expect_eq_uint((__force u16)test->exp_val,
-+			       (__force u16)ip_tunnel_flags_to_be16(src));
-+
-+		__ipt_flag_op(expect_eq_bitmap, exp, out);
-+	}
-+}
-+
- static void __init selftest(void)
- {
- 	test_zero_clear();
-@@ -1405,6 +1509,7 @@ static void __init selftest(void)
- 	test_bitmap_read_write();
- 	test_bitmap_read_perf();
- 	test_bitmap_write_perf();
-+	test_ip_tunnel_flags();
- 
- 	test_find_nth_bit();
- 	test_for_each_set_bit();
+>     Andrew
+> 
+> ---
+> pw-bot: cr
+
 -- 
-2.41.0
-
+Thanks and Regards,
+Md Danish Anwar
 
