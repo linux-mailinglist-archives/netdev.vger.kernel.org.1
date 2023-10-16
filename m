@@ -1,123 +1,100 @@
-Return-Path: <netdev+bounces-41408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43CE07CADE7
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:43:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A1937CADD2
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:42:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F25372814E3
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:43:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B4851C20AA0
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:42:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEE22B5D1;
-	Mon, 16 Oct 2023 15:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682F92AB4C;
+	Mon, 16 Oct 2023 15:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGtTZ1J0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tmK4Xajf"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD442AB59
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 15:43:46 +0000 (UTC)
-Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 014A5103;
-	Mon, 16 Oct 2023 08:43:44 -0700 (PDT)
-Received: by mail-vk1-xa32.google.com with SMTP id 71dfb90a1353d-4a06fb5331bso1849979e0c.0;
-        Mon, 16 Oct 2023 08:43:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697471024; x=1698075824; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W5VhkbLijcsIjEPutw+pmedC1vRGyDo1Fb4EwWhkNwo=;
-        b=KGtTZ1J0xkXxmuKtAwZX3GyXsFrD3m33OgVwLkTHQkbenNaqmoD7LAKAoGBvY2TaIu
-         JXHMTk9XjTE0sz19zXSryTxttjITFS0lNslI5T4spx48U8ToOS2Gs8lYX6FcWi5oaBMa
-         PBTlOx4E5DPPgv3d5oGbJLeA9r8mQ3uuCbB/+GZcQLWnZ61yJNINaTruLI3JYOuoBOyl
-         zjiJbDXbSV+XvAzp+HOliAXfppYPeJUy9S8YQP86Sk7kZrl4xI6JM0Qop+VAsF1XtFtZ
-         1w/oLnwGsy9tWlo++c1MMGb1Dk8/84C583N6qph4U4rwaJS76BljY8Lrz79NWbFHQ2l9
-         7U1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697471024; x=1698075824;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W5VhkbLijcsIjEPutw+pmedC1vRGyDo1Fb4EwWhkNwo=;
-        b=qZMsWNWZeIaVYHsryMeVQ88cBsIO5xATBdBrA5BcWCrVFwevBnDtrNma88JSCyuyxR
-         2CGMQzXhO8q87QWrIEVP3aGceDn3KGQwDwKPb+eXA7d54KA2hWeepip6BbKBfZ+trMhl
-         CyHMH8gQiI+TmBUD1ct75cHzvSx9YjU91Au8YGC0y9loFWhBhCw3PRqfcWm3ynjDswch
-         ZTjMq/acj3GeHmc1CeMD4rePOkt4/8FeGUL0nkxXnGHW+7YqI1RWEcbkK1f56vaNWohq
-         yg35NpB1H3fGjh4f+bj5sYyTJ/XLS8it8EXRugr2l2vbFis6oPzH9PqzMQl/hnDmy27q
-         1wFg==
-X-Gm-Message-State: AOJu0YxFX/uxqhvQDiD6lAAsmBILJYlfvLCB9L35KFKNeO49VWNKa1vN
-	YUzI+t70GsPPNm47zidfaBCp7LvJ+k+x17EmR4E=
-X-Google-Smtp-Source: AGHT+IG/WMjMrGYCGsuwhthBEKZ8VCVuxCi3PoeLoYHu5J1bxDK0qcF2TAbbJo60X/pGsL22e+tEj0vGdiYsm/MFMMM=
-X-Received: by 2002:a1f:e404:0:b0:49a:1a56:945c with SMTP id
- b4-20020a1fe404000000b0049a1a56945cmr28517495vkh.13.1697471023853; Mon, 16
- Oct 2023 08:43:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175182AB23;
+	Mon, 16 Oct 2023 15:42:41 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DE1F83;
+	Mon, 16 Oct 2023 08:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Zzp2g3em91HvoJPEHh32yNmJM73IDkWjeKVwnDIuGHI=; b=tmK4Xajfb/eKyAIVdNlmpVKHTY
+	72EvyPPMaDhtojc2DUFZEKgyYvCyiW9qr5JICBeRy5oxG7iU6bBl/5dUSHZBmsRlrqlSIq+jSdsEt
+	xCwel1xpviHnjTAdRgQYYn0tv0xM6y1D3u8OzEStVEW+9FQDLdCKGLw4fbZZgMzaGYi3eSn8YBmY4
+	TzwIQsUiE0mou9mXWB+uYSvl0u9zqBWQydt8NWd2QssdNMK3AVbACtwi2XNQgIXity3mOByz1uxXb
+	Qmt3SU5kytPtBTu/0+jP0Sjf2b/6v2vN8m/fiLDfKcX79QFUAtjcck3U61PyhzEsuQq0OWNKK/cEK
+	C94swfPA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54782)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qsPji-0001er-1O;
+	Mon, 16 Oct 2023 16:42:30 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qsPjg-0005iw-Pb; Mon, 16 Oct 2023 16:42:28 +0100
+Date: Mon, 16 Oct 2023 16:42:28 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org, Madalin Bucur <madalin.bucur@nxp.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Sean Anderson <sean.anderson@seco.com>
+Subject: [PATCH net-next 0/4] net: remove last of the phylink validate
+ methods and clean up
+Message-ID: <ZS1Z5DDfHyjMryYu@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016054755.915155-1-hch@lst.de> <20231016054755.915155-5-hch@lst.de>
-In-Reply-To: <20231016054755.915155-5-hch@lst.de>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Mon, 16 Oct 2023 16:42:27 +0100
-Message-ID: <CA+V-a8skxbuRkU9PKUZRkQkp-y0PKeYx4WhVcJtktAT-VEgmCA@mail.gmail.com>
-Subject: Re: [PATCH 04/12] soc: renesas: select RISCV_DMA_NONCOHERENT from ARCH_R9A07G043
-To: Christoph Hellwig <hch@lst.de>
-Cc: Greg Ungerer <gerg@linux-m68k.org>, iommu@lists.linux.dev, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Conor Dooley <conor@kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
-	Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, 
-	linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
-	Jim Quinlan <james.quinlan@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 16, 2023 at 6:48=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
->
-> Selecting DMA_GLOBAL_POOL without the rest of the non-coherent DMA
-> infrastructure does not make sense.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/soc/renesas/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
-> index f1696d3b5018d0..ea473b4150dfa8 100644
-> --- a/drivers/soc/renesas/Kconfig
-> +++ b/drivers/soc/renesas/Kconfig
-> @@ -338,6 +338,7 @@ config ARCH_R9A07G043
->         select ARCH_RZG2L
->         select AX45MP_L2_CACHE
->         select DMA_GLOBAL_POOL
-> +       select RISCV_DMA_NONCOHERENT
-Can we keep this alphabetical sorted please, with that fixed:
+Hi,
 
-Reviewed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+This four patch series removes the last of the phylink MAC .validate
+methods which can be found in the Freescale fman driver. fman has a
+requirement that half duplex may not be supported in RGMII mode,
+which is currently handled in its .validate method.
 
-Cheers,
-Prabhakar
+In order to keep this functionality when removing the .validate method,
+we need to replace that with equivalent functionality, for which I
+propose the optional .mac_get_caps method in the first patch.
 
->         select ERRATA_ANDES if RISCV_SBI
->         select ERRATA_ANDES_CMO if ERRATA_ANDES
->
-> --
-> 2.39.2
->
+The advantage of this approach over the .validate callback is that MAC
+drivers only have to deal with the MAC_* capabilities, and don't need
+to call back into phylink functions to do the masking of the ethtool
+linkmodes etc - which then becomes internal to phylink. This can be
+seen in the fourth patch where we make a load of these methods static.
+
+ Documentation/networking/sfp-phylink.rst         | 10 +++--
+ drivers/net/ethernet/freescale/fman/fman_memac.c | 11 +++--
+ drivers/net/phy/phylink.c                        | 45 +++++++------------
+ include/linux/phylink.h                          | 56 +++++-------------------
+ 4 files changed, 37 insertions(+), 85 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
