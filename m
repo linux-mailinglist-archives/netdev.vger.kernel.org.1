@@ -1,210 +1,243 @@
-Return-Path: <netdev+bounces-41582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D177CB5AD
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 23:51:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCD497CB5B0
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 23:52:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76FCC281508
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:51:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53CCCB20EDC
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C36B381C0;
-	Mon, 16 Oct 2023 21:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB69381D1;
+	Mon, 16 Oct 2023 21:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="V86NF4m3";
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="C56bskH0"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="X1RxFHq2"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD2C37CBC
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 21:51:36 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8306AA1;
-	Mon, 16 Oct 2023 14:51:34 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id AB51C60189;
-	Mon, 16 Oct 2023 23:51:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1697493092; bh=8u3W3+CG6i//KHpCvHZFDWSwcglzwJjdVVqlccPYXjU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=V86NF4m3ZOd6uDFt6KZPdc9cLLVpT9yOWJuNFFQQF1G0XyR/9lFAu48kp5NEie3HM
-	 uCaO/bmZ2EiP+vEo1ejhcnFwslncSOXyprCiAURtiWAupkvGi7b/wveAPFSr18WbVa
-	 6cO26u9w0TyGnooKKNnynzP1/d5GBMkZtFn+uEAn3sdXD6vHd4FQeJWyVSNTQFwBbB
-	 wOYR4gsFMbsQIz+Gad7pWYMcM9FHIAgRfLrONNfP7Qo3CJQv4Uf6fYBfciurHFve9l
-	 TclPAc52GpjnomAXxuHHQl+lnqFQhH+W03TLBY095Xfy0sXYYcgrnIJ6BeuYhsq9Kz
-	 T/BIAWyRbnJmg==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id srGQYGpkdYFO; Mon, 16 Oct 2023 23:51:30 +0200 (CEST)
-Received: from defiant.home (78-3-40-223.adsl.net.t-com.hr [78.3.40.223])
-	by domac.alu.hr (Postfix) with ESMTPSA id 0250B60186;
-	Mon, 16 Oct 2023 23:51:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1697493090; bh=8u3W3+CG6i//KHpCvHZFDWSwcglzwJjdVVqlccPYXjU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=C56bskH024fMub+OvP87eWgCFUJO/zLVm4ADsOCUZJ5J55/1EdjADSdqM7acDh5Xz
-	 3GvGDhXcMFyPbDlpwJq6AHOIl6G7Rzn0sUBcza/fCegl+QU5huRzci/qaAXxJs/fjR
-	 SbBZWDG+C6fxnu3Yt2As12I9WzgYQO26+G/25JPWi3ASkKd+N2k8Sy5uFxhNwKsQJr
-	 32j9G8xqNJuNt8b85rNc1qecbe5+7D8odT9YQs2hIo33l4RHhTfmN/HaQlCq16Ik2V
-	 EUPx+C03d+jErA1lYVvb+009kE4tdYNVuEX5HhhIBTWW2Fob3FzDbCydoXsa0i3Sq2
-	 FTC39tfKmVTBA==
-From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-To: Heiner Kallweit <hkallweit1@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: nic_swsd@realtek.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Marco Elver <elver@google.com>
-Subject: [PATCH v2 3/3] r8169: fix the KCSAN reported data-race in rtl_tx while reading TxDescArray[entry].opts1
-Date: Mon, 16 Oct 2023 23:47:56 +0200
-Message-Id: <20231016214753.175097-3-mirsad.todorovac@alu.unizg.hr>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231016214753.175097-1-mirsad.todorovac@alu.unizg.hr>
-References: <20231016214753.175097-1-mirsad.todorovac@alu.unizg.hr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF04381C0
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 21:51:58 +0000 (UTC)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15A03AC
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 14:51:54 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-53b32dca0bfso10419267a12.0
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 14:51:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1697493112; x=1698097912; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qDfJSs5OzGXgc3TokAo6lqqr7PnjzUUqy1FZuPSGgB4=;
+        b=X1RxFHq2ve6JEwV8ZhI34+bEmwPF3Ofat12z6Qm2Ti853HxecH4dR1DhIJEN8qvOsl
+         CSvB/h7FUkj+rzKdETOF2YkpIayzoo10OHZx5+uDXsh/pGhA7sausoYTDK0i3ZAp3p3G
+         /RGC+RB/AaP/fzDoyCFZVfOYU9ai/53I+a6DaqO54O1ieKyrsRZ87ffOoafrbr5VGHMJ
+         GGfHlXpdwmbtP/TU6atEicURzkb6umq4OxBAjtnDpPWgveKIkZPTRrKuYm+WBNFjidKu
+         2wBliQqcr1Z3mqPObXZmGWvb37zMZQprog8WWMpTSx4QsI0JoRkRRCjSIxD4BLmb3ot1
+         1LqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697493112; x=1698097912;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qDfJSs5OzGXgc3TokAo6lqqr7PnjzUUqy1FZuPSGgB4=;
+        b=b3qnzXeTU974ZrRz/rryltUuTzNYUTKR95sr2hmJ4kl+DYHG43hO32YWcPIMBaYO28
+         SlJyzBJuBs850HNzZnK46gwPlMFonV45aBPxRlreodbR8wasoLrDHjOM1ufokACfjibI
+         TjZqVSYiNkA4WEiTkBHtFWIt+63mU25ra7s9sh62/f3m/OVhV1ZVjNRKviEJqxgnQmcu
+         nEmkRRR7N8ilT2g79WV30NM73lZqZNEdD2MsDFuopA2R9Q5PLrkczzmv3fdrKx/giGEL
+         yrLFHlww60ZImU2HcHdtFznClFmnL3e/Wku6NG/145uxilwNXLyNnIQPbGKruGuCBS7o
+         VJKw==
+X-Gm-Message-State: AOJu0YyxAtfQmeRpwUGTS5CrDokpkYlL1vzXMjZVXEi5tjjGaRvFUzwK
+	PJVfimMyJp1Ms6+KiHKbAl+LvzwQFGZtLK/PAOR0Hg==
+X-Google-Smtp-Source: AGHT+IEERpWYV2vvHcCnO5+y33naH5Yx+loYIItAIaXNa0Ly8dUTDTTte1O+ITWOJ2yMMclBJqz5TFZylUajwBV8p0g=
+X-Received: by 2002:a50:c301:0:b0:53d:fa08:bd2e with SMTP id
+ a1-20020a50c301000000b0053dfa08bd2emr32625edb.20.1697493112467; Mon, 16 Oct
+ 2023 14:51:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,T_SPF_HELO_TEMPERROR,
-	T_SPF_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
+References: <ZS1/qtr0dZJ35VII@debian.debian> <4c524eba575992cc1adfc41b2b230835946b126c.camel@gmail.com>
+In-Reply-To: <4c524eba575992cc1adfc41b2b230835946b126c.camel@gmail.com>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Mon, 16 Oct 2023 16:51:41 -0500
+Message-ID: <CAO3-PbrhdDrFdjzkCFM9EvDTK2HA2_JCkYLBZiHka4WAMRtm4w@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] ipv6: avoid atomic fragment on GSO packets
+To: Alexander H Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Aya Levin <ayal@nvidia.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org, 
+	kernel-team@cloudflare.com, Florian Westphal <fw@strlen.de>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-KCSAN reported the following data-race:
+On Mon, Oct 16, 2023 at 4:00=E2=80=AFPM Alexander H Duyck
+<alexander.duyck@gmail.com> wrote:
+>
+> On Mon, 2023-10-16 at 11:23 -0700, Yan Zhai wrote:
+> > GSO packets can contain a trailing segment that is smaller than
+> > gso_size. When examining the dst MTU for such packet, if its gso_size i=
+s
+> > too large, then all segments would be fragmented. However, there is a
+> > good chance the trailing segment has smaller actual size than both
+> > gso_size as well as the MTU, which leads to an "atomic fragment". It is
+> > considered harmful in RFC-8021. An Existing report from APNIC also show=
+s
+> > that atomic fragments are more likely to be dropped even it is
+> > equivalent to a no-op [1].
+> >
+> > Refactor __ip6_finish_output code to separate GSO and non-GSO packet
+> > processing. It mirrors __ip_finish_output logic now. Add an extra check
+> > in GSO handling to avoid atomic fragments. Lastly, drop dst_allfrag
+> > check, which is no longer true since commit 9d289715eb5c ("ipv6: stop
+> > sending PTB packets for MTU < 1280").
+> >
+> > Link: https://www.potaroo.net/presentations/2022-03-01-ipv6-frag.pdf [1=
+]
+> > Fixes: b210de4f8c97 ("net: ipv6: Validate GSO SKB before finish IPv6 pr=
+ocessing")
+> > Suggested-by: Florian Westphal <fw@strlen.de>
+> > Reported-by: David Wragg <dwragg@cloudflare.com>
+> > Signed-off-by: Yan Zhai <yan@cloudflare.com>
+> > ---
+> >  net/ipv6/ip6_output.c | 33 +++++++++++++++++++++++----------
+> >  1 file changed, 23 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+> > index a471c7e91761..1de6f3c11655 100644
+> > --- a/net/ipv6/ip6_output.c
+> > +++ b/net/ipv6/ip6_output.c
+> > @@ -162,7 +162,14 @@ ip6_finish_output_gso_slowpath_drop(struct net *ne=
+t, struct sock *sk,
+> >               int err;
+> >
+> >               skb_mark_not_on_list(segs);
+> > -             err =3D ip6_fragment(net, sk, segs, ip6_finish_output2);
+> > +             /* Last gso segment might be smaller than actual MTU. Add=
+ing
+> > +              * a fragment header to it would produce an "atomic fragm=
+ent",
+> > +              * which is considered harmful (RFC-8021)
+> > +              */
+> > +             err =3D segs->len > mtu ?
+> > +                     ip6_fragment(net, sk, segs, ip6_finish_output2) :
+> > +                     ip6_finish_output2(net, sk, segs);
+> > +
+> >               if (err && ret =3D=3D 0)
+> >                       ret =3D err;
+> >       }
+> > @@ -170,10 +177,19 @@ ip6_finish_output_gso_slowpath_drop(struct net *n=
+et, struct sock *sk,
+> >       return ret;
+> >  }
+> >
+> > +static int ip6_finish_output_gso(struct net *net, struct sock *sk,
+> > +                              struct sk_buff *skb, unsigned int mtu)
+> > +{
+> > +     if (!(IP6CB(skb)->flags & IP6SKB_FAKEJUMBO) &&
+> > +         !skb_gso_validate_network_len(skb, mtu))
+> > +             return ip6_finish_output_gso_slowpath_drop(net, sk, skb, =
+mtu);
+>
+> If we are sending fakejumbo or have a frame that doesn't pass the
+> muster it is just going immediately to ip6_finish_output. I think the
+> checks that you removed are needed to keep the socket from getting
+> stuck sending frames that will probably be discarded.
+>
 
-==================================================================
-BUG: KCSAN: data-race in rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4368 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
+Hi Alexander,
 
-race at unknown origin, with read to 0xffff888140d37570 of 4 bytes by interrupt on cpu 21:
-rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4368 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
-__napi_poll (net/core/dev.c:6527)
-net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
-__do_softirq (kernel/softirq.c:553)
-__irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
-irq_exit_rcu (kernel/softirq.c:647)
-sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1074 (discriminator 14))
-asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:645)
-cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
-cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
-call_cpuidle (kernel/sched/idle.c:135)
-do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
-cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
-start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:294)
-secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
+Thanks for the feedback! But I am not sure I follow the situation you
+mentioned here. If it is a fake jumbo but non GSO packet, it won't
+enter ip6_finish_output_gso. What I am really skipping are the
+dst_allfrag and frag_max_size checks on GSO packets, and dst_allfrag
+on non-GSO packets.
 
-value changed: 0xb0000042 -> 0x00000000
+As to dst_allfrag, I looked back at the case when this was added:
 
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kcsan-00143-gb5cbe7c00aa0 #41
-Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04/26/2023
-==================================================================
+https://www.mail-archive.com/bk-commits-head@vger.kernel.org/msg03399.html
 
-The read side is in
+The actual feature was set only when a PMTU message carries a value
+smaller than 1280 byte. But the main line kernel just drops such
+messages now since the commit I pointed to in the change log (which
+makes sense because the feature was set based on old RFC-2460
+guidelines, and those have been deprecated in RFC-8200). Iproute2 also
+doesn't expose this option as well. Is there any case that I am not
+aware of here that still relies on it?
 
-drivers/net/ethernet/realtek/r8169_main.c
-=========================================
-   4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
-   4356                    int budget)
-   4357 {
-   4358         unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
-   4359         struct sk_buff *skb;
-   4360
-   4361         dirty_tx = tp->dirty_tx;
-   4362
-   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
-   4364                 unsigned int entry = dirty_tx % NUM_TX_DESC;
-   4365                 u32 status;
-   4366
- → 4367                 status = le32_to_cpu(tp->TxDescArray[entry].opts1);
-   4368                 if (status & DescOwn)
-   4369                         break;
-   4370
-   4371                 skb = tp->tx_skb[entry].skb;
-   4372                 rtl8169_unmap_tx_skb(tp, entry);
-   4373
-   4374                 if (skb) {
-   4375                         pkts_compl++;
-   4376                         bytes_compl += skb->len;
-   4377                         napi_consume_skb(skb, budget);
-   4378                 }
-   4379                 dirty_tx++;
-   4380         }
-   4381
-   4382         if (tp->dirty_tx != dirty_tx) {
-   4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_compl);
-   4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
-   4385
-   4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl, bytes_compl,
-   4387                                               rtl_tx_slots_avail(tp),
-   4388                                               R8169_TX_START_THRS);
-   4389                 /*
-   4390                  * 8168 hack: TxPoll requests are lost when the Tx packets are
-   4391                  * too close. Let's kick an extra TxPoll request when a burst
-   4392                  * of start_xmit activity is detected (if it is not detected,
-   4393                  * it is slow enough). -- FR
-   4394                  * If skb is NULL then we come here again once a tx irq is
-   4395                  * triggered after the last fragment is marked transmitted.
-   4396                  */
-   4397                 if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
-   4398                         rtl8169_doorbell(tp);
-   4399         }
-   4400 }
+For frag_max_size, I might be wrong but to my best knowledge it only
+applies when netfilter defrags packets. However, when dealing with
+fragments, both local output and GRO code won't produce GSO packets in
+the first place. Similarly, if we look at IPv4 implementation, it also
+does not consider frag_max_size in GSO handling. So I intentionally
+skip this for GSO packets in the change. WDYT?
 
-tp->TxDescArray[entry].opts1 is reported to have a data-race and READ_ONCE() fixes
-this KCSAN warning.
 
-   4366
- → 4367                 status = le32_to_cpu(READ_ONCE(tp->TxDescArray[entry].opts1));
-   4368                 if (status & DescOwn)
-   4369                         break;
-   4370
+> > +
+> > +     return ip6_finish_output2(net, sk, skb);
+> > +}
+> > +
+> >  static int __ip6_finish_output(struct net *net, struct sock *sk, struc=
+t sk_buff *skb)
+> >  {
+> >       unsigned int mtu;
+> > -
+>
+> This blank line can probably be left there to separate variable
+> declarations from code.
+>
+my bad, should not have included it. I'll revise this.
 
-Fixes: ^1da177e4c3f4 ("initial git repository build")
-Cc: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: nic_swsd@realtek.com
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Marco Elver <elver@google.com>
-Cc: netdev@vger.kernel.org
-Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@alu.unizg.hr/
-Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-Acked-by: Marco Elver <elver@google.com>
----
-v2:
- fixed a double Signed-off-by: tag
+thanks
+Yan
 
- drivers/net/ethernet/realtek/r8169_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 281aaa851847..7e14a1d958c8 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -4364,7 +4364,7 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
- 		unsigned int entry = dirty_tx % NUM_TX_DESC;
- 		u32 status;
- 
--		status = le32_to_cpu(tp->TxDescArray[entry].opts1);
-+		status = le32_to_cpu(READ_ONCE(tp->TxDescArray[entry].opts1));
- 		if (status & DescOwn)
- 			break;
- 
--- 
-2.34.1
-
+> >  #if defined(CONFIG_NETFILTER) && defined(CONFIG_XFRM)
+> >       /* Policy lookup after SNAT yielded a new policy */
+> >       if (skb_dst(skb)->xfrm) {
+> > @@ -183,17 +199,14 @@ static int __ip6_finish_output(struct net *net, s=
+truct sock *sk, struct sk_buff
+> >  #endif
+> >
+> >       mtu =3D ip6_skb_dst_mtu(skb);
+> > -     if (skb_is_gso(skb) &&
+> > -         !(IP6CB(skb)->flags & IP6SKB_FAKEJUMBO) &&
+> > -         !skb_gso_validate_network_len(skb, mtu))
+> > -             return ip6_finish_output_gso_slowpath_drop(net, sk, skb, =
+mtu);
+> > +     if (skb_is_gso(skb))
+> > +             return ip6_finish_output_gso(net, sk, skb, mtu);
+> >
+> > -     if ((skb->len > mtu && !skb_is_gso(skb)) ||
+> > -         dst_allfrag(skb_dst(skb)) ||
+> > +     if (skb->len > mtu ||
+>
+> This change looks a bit too aggressive to me. Basically if the frame is
+> gso you now bypass the ip6_fragment entirely and are ignoring the
+> dst_allfrag and frag_max_size case below. See the fail_toobig code in
+> ip6_fragment.
+>
+> >           (IP6CB(skb)->frag_max_size && skb->len > IP6CB(skb)->frag_max=
+_size))
+> >               return ip6_fragment(net, sk, skb, ip6_finish_output2);
+> > -     else
+> > -             return ip6_finish_output2(net, sk, skb);
+> > +
+> > +     return ip6_finish_output2(net, sk, skb);
+> >  }
+> >
+> >  static int ip6_finish_output(struct net *net, struct sock *sk, struct =
+sk_buff *skb)
+>
 
