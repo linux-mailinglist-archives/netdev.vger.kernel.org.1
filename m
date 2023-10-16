@@ -1,226 +1,94 @@
-Return-Path: <netdev+bounces-41587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EDFA7CB629
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 00:03:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E4797CB64D
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 00:12:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A88D0281787
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:03:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21EB92814CB
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:12:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6825038F83;
-	Mon, 16 Oct 2023 22:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A70A38F9B;
+	Mon, 16 Oct 2023 22:12:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Ri/GNkth"
+	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="DMBVdAW1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7130347AA;
-	Mon, 16 Oct 2023 22:03:03 +0000 (UTC)
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C460A2;
-	Mon, 16 Oct 2023 15:03:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1697493783; x=1729029783;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=L/dSmXdNxfjyVjizo2pCEKEcYlM8cqjMSI3pDpxoZRg=;
-  b=Ri/GNkthq8KjvoNf04X/gY5t3SccYoRUUnPdbRle2WGZLLfFcTTrDvXt
-   Ao8UjvU/MCm8sfTr5vMVAW/AGUKvxqrHM7V8Zsp63nAMeWvsbJDH5uW89
-   9woXq1ETenFBM+7QfAl4JMYDZKQumsLadsVnmCNrPdfwUkOmgvwTKo8NU
-   k=;
-X-IronPort-AV: E=Sophos;i="6.03,230,1694736000"; 
-   d="scan'208";a="245935877"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-21d8d9f4.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 22:02:59 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2a-m6i4x-21d8d9f4.us-west-2.amazon.com (Postfix) with ESMTPS id 02E6580EC7;
-	Mon, 16 Oct 2023 22:02:57 +0000 (UTC)
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:35485]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.209:2525] with esmtp (Farcaster)
- id fee03f79-316a-4ce6-a9a8-7c0fc8854bb7; Mon, 16 Oct 2023 22:02:57 +0000 (UTC)
-X-Farcaster-Flow-ID: fee03f79-316a-4ce6-a9a8-7c0fc8854bb7
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 16 Oct 2023 22:02:47 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.171.29) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 16 Oct 2023 22:02:43 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <sdf@google.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
-	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <martin.lau@linux.dev>,
-	<mykolal@fb.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<song@kernel.org>, <yonghong.song@linux.dev>
-Subject: Re: [PATCH v1 bpf-next 06/11] bpf: tcp: Add SYN Cookie validation SOCK_OPS hook.
-Date: Mon, 16 Oct 2023 15:02:35 -0700
-Message-ID: <20231016220235.80560-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <ZS2fQXqhjRlG64kZ@google.com>
-References: <ZS2fQXqhjRlG64kZ@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA3A381D8;
+	Mon, 16 Oct 2023 22:12:08 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D9B7B4;
+	Mon, 16 Oct 2023 15:12:06 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1174)
+	id C34B420B74C0; Mon, 16 Oct 2023 15:12:04 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C34B420B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1697494324;
+	bh=aobf/RxcZbP6ByTEXUNT39lz8Bz1Q2bXgp7q74BkzHI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=DMBVdAW16SIV0IEbvC46sDXbo1Do3OOB/QOU8izZgyjIBqgi9CVU0i1xKwW3nkttM
+	 D94mnsPfX7x8Oi44Ko9ghAysWB4clQJwcJR6qx7OAs7Wu12l0lm31sIpzygw9reeBH
+	 ESjCJ0nlsG0ZG5mpgR85ezwvcoOgiw6eP8xzepRo=
+From: sharmaajay@linuxonhyperv.com
+To: Long Li <longli@microsoft.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ajay Sharma <sharmaajay@microsoft.com>
+Subject: [Patch v7 0/5] RDMA/mana_ib
+Date: Mon, 16 Oct 2023 15:11:57 -0700
+Message-Id: <1697494322-26814-1-git-send-email-sharmaajay@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-9.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_SPF_WL
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.171.29]
-X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-From: Stanislav Fomichev <sdf@google.com>
-Date: Mon, 16 Oct 2023 13:38:25 -0700
-> On 10/13, Kuniyuki Iwashima wrote:
-> > This patch adds a new SOCK_OPS hook to validate arbitrary SYN Cookie.
-> > 
-> > When the kernel receives ACK for SYN Cookie, the hook is invoked with
-> > bpf_sock_ops.op == BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB if the listener has
-> > BPF_SOCK_OPS_SYNCOOKIE_CB_FLAG set by bpf_sock_ops_cb_flags_set().
-> > 
-> > The BPF program can access the following information to validate ISN:
-> > 
-> >   bpf_sock_ops.sk      : 4-tuple
-> >   bpf_sock_ops.skb     : TCP header
-> >   bpf_sock_ops.args[0] : ISN
-> > 
-> > The program must decode MSS and set it to bpf_sock_ops.replylong[0].
-> > 
-> > By default, the kernel validates SYN Cookie before allocating reqsk, but
-> > the hook is invoked after allocating reqsk to keep the user interface
-> > consistent with BPF_SOCK_OPS_GEN_SYNCOOKIE_CB.
-> > 
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  include/net/tcp.h              | 12 ++++++
-> >  include/uapi/linux/bpf.h       | 20 +++++++---
-> >  net/ipv4/syncookies.c          | 73 +++++++++++++++++++++++++++-------
-> >  net/ipv6/syncookies.c          | 44 +++++++++++++-------
-> >  tools/include/uapi/linux/bpf.h | 20 +++++++---
-> >  5 files changed, 130 insertions(+), 39 deletions(-)
-> > 
-> > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > index 676618c89bb7..90d95acdc34a 100644
-> > --- a/include/net/tcp.h
-> > +++ b/include/net/tcp.h
-> > @@ -2158,6 +2158,18 @@ static inline __u32 cookie_init_sequence(const struct tcp_request_sock_ops *ops,
-> >  	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESSENT);
-> >  	return ops->cookie_init_seq(skb, mss);
-> >  }
-> > +
-> > +#ifdef CONFIG_CGROUP_BPF
-> > +int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req,
-> > +			   struct sk_buff *skb);
-> > +#else
-> > +static inline int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req,
-> > +					 struct sk_buff *skb)
-> > +{
-> > +	return 0;
-> > +}
-> > +#endif
-> > +
-> >  #else
-> >  static inline __u32 cookie_init_sequence(const struct tcp_request_sock_ops *ops,
-> >  					 const struct sock *sk, struct sk_buff *skb,
-> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> > index d3cc530613c0..e6f1507d7895 100644
-> > --- a/include/uapi/linux/bpf.h
-> > +++ b/include/uapi/linux/bpf.h
-> > @@ -6738,13 +6738,16 @@ enum {
-> >  	 * options first before the BPF program does.
-> >  	 */
-> >  	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
-> > -	/* Call bpf when the kernel generates SYN Cookie (ISN) for SYN+ACK.
-> > +	/* Call bpf when the kernel generates SYN Cookie (ISN) for SYN+ACK
-> > +	 * and validates ACK for SYN Cookie.
-> >  	 *
-> > -	 * The bpf prog will be called to encode MSS into SYN Cookie with
-> > -	 * sock_ops->op == BPF_SOCK_OPS_GEN_SYNCOOKIE_CB.
-> > +	 * The bpf prog will be first called to encode MSS into SYN Cookie
-> > +	 * with sock_ops->op == BPF_SOCK_OPS_GEN_SYNCOOKIE_CB.  Then, the
-> > +	 * bpf prog will be called to decode MSS from SYN Cookie with
-> > +	 * sock_ops->op == BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB.
-> >  	 *
-> > -	 * Please refer to the comment in BPF_SOCK_OPS_GEN_SYNCOOKIE_CB for
-> > -	 * input and output.
-> > +	 * Please refer to the comment in BPF_SOCK_OPS_GEN_SYNCOOKIE_CB and
-> > +	 * BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB for input and output.
-> >  	 */
-> >  	BPF_SOCK_OPS_SYNCOOKIE_CB_FLAG = (1<<7),
-> >  /* Mask of all currently supported cb flags */
-> > @@ -6868,6 +6871,13 @@ enum {
-> >  					 *
-> >  					 * replylong[0]: ISN
-> >  					 */
-> > +	BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB,/* Validate SYN Cookie and set
-> > +					 * MSS.
-> > +					 *
-> > +					 * args[0]: ISN
-> > +					 *
-> > +					 * replylong[0]: MSS
-> > +					 */
-> >  };
-> >  
-> >  /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
-> > diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-> > index 514f1a4abdee..b1dd415863ff 100644
-> > --- a/net/ipv4/syncookies.c
-> > +++ b/net/ipv4/syncookies.c
-> > @@ -317,6 +317,37 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
-> >  }
-> >  EXPORT_SYMBOL_GPL(cookie_tcp_reqsk_alloc);
-> >  
-> > +#if IS_ENABLED(CONFIG_CGROUP_BPF) && IS_ENABLED(CONFIG_SYN_COOKIES)
-> > +int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_buff *skb)
-> > +{
-> > +	struct bpf_sock_ops_kern sock_ops;
-> > +
-> > +	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
-> > +
-> > +	sock_ops.op = BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB;
-> > +	sock_ops.sk = req_to_sk(req);
-> > +	sock_ops.args[0] = tcp_rsk(req)->snt_isn;
-> > +
-> > +	bpf_skops_init_skb(&sock_ops, skb, tcp_hdrlen(skb));
-> > +
-> > +	if (BPF_CGROUP_RUN_PROG_SOCK_OPS_SK(&sock_ops, sk))
-> > +		goto err;
-> > +
-> > +	if (!sock_ops.replylong[0])
-> > +		goto err;
-> > +
-> > +	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESRECV);
-> 
-> I don't see LINUX_MIB_SYNCOOKIESSENT being incremented in the
-> previous patch, so maybe also don't touch the mib here? The bpf
-> program can do the counting if needed?
-> 
-> Or, alternatively, add LINUX_MIB_SYNCOOKIESSENT to
-> the BPF_SOCK_OPS_GEN_SYNCOOKIE_CB path?
+From: Ajay Sharma <sharmaajay@microsoft.com>
 
-Good catch!
+Change from v5:
+Use xarray for qp lookup.
 
-I skipped calling tcp_synq_overflow() in the previous patch but should
-have incremented LINUX_MIB_SYNCOOKIESSENT.  Will fix in v2.
+Ajay Sharma (5):
+  RDMA/mana_ib: Rename all mana_ib_dev type variables to mib_dev
+  RDMA/mana_ib: Register Mana IB  device with Management SW
+  RDMA/mana_ib: Create adapter and Add error eq
+  RDMA/mana_ib: Query adapter capabilities
+  RDMA/mana_ib: Send event to qp
 
-Thanks!
+ drivers/infiniband/hw/mana/cq.c               |  12 +-
+ drivers/infiniband/hw/mana/device.c           |  78 +++--
+ drivers/infiniband/hw/mana/main.c             | 290 +++++++++++++-----
+ drivers/infiniband/hw/mana/mana_ib.h          | 102 +++++-
+ drivers/infiniband/hw/mana/mr.c               |  42 ++-
+ drivers/infiniband/hw/mana/qp.c               |  86 +++---
+ drivers/infiniband/hw/mana/wq.c               |  21 +-
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 152 +++++----
+ drivers/net/ethernet/microsoft/mana/mana_en.c |   3 +
+ include/net/mana/gdma.h                       |  16 +-
+ 10 files changed, 543 insertions(+), 259 deletions(-)
+
+-- 
+2.25.1
 
 
