@@ -1,116 +1,206 @@
-Return-Path: <netdev+bounces-41598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E09AA7CB689
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 00:23:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99CC17CB692
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 00:29:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 956F02815B2
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:23:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15A36B20E9F
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 22:29:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD6E338F9F;
-	Mon, 16 Oct 2023 22:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1FD38FB1;
+	Mon, 16 Oct 2023 22:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vDG8J87n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aopnqbaC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A9438F98
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 22:23:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50618C433C7;
-	Mon, 16 Oct 2023 22:23:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697495024;
-	bh=bRrY6z8Qu3DHxdJ9AWDgW2EEHgMVRnN3AxmhHve8YT0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vDG8J87nBqFt4L6UK9UD0UURS6rn2Zw5xR5YguOBewzOHIpPmFmU7m2BWITb6nKtP
-	 1bUMsnYgmBJ4ihkMfm+CKSQdB3svbnsafQLeqhOFOT8aktvznQeOxoMXxDgMEtluL7
-	 /ItwqYCfITwZEq0Uie/0PtTtmP9FVsNExso+35t63ihM5YqgcXBMy5DV+4xCo7+VDv
-	 TPMkgErh0SFf1NgbrzXJ+Ix4F2S+8Vj/+cEVZJ8gJvDyeHUSUfZ2MG8WTaTulWAS4S
-	 EnMQJ/67pYltlKrmgWTsmdVmhsC1YnbjYbAx6+rDe3WByYmkhpCkwcVyU596eWuhgB
-	 UfsfQyYAwwdZA==
-Date: Mon, 16 Oct 2023 15:23:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Takeru Hayasaka <hayatake396@gmail.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Harald Welte <laforge@gnumonks.org>,
- Pablo Neira Ayuso <pablo@netfilter.org>, osmocom-net-gprs@lists.osmocom.org
-Subject: Re: [PATCH net-next v2] ethtool: ice: Support for RSS settings to
- GTP from ethtool
-Message-ID: <20231016152343.1fc7c7be@kernel.org>
-In-Reply-To: <20231012060115.107183-1-hayatake396@gmail.com>
-References: <20231012060115.107183-1-hayatake396@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6961028DD2
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 22:29:05 +0000 (UTC)
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D85A695;
+	Mon, 16 Oct 2023 15:29:03 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-5ac88d2cfaaso2533464a12.2;
+        Mon, 16 Oct 2023 15:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697495343; x=1698100143; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YIltTB5RXnB/HbiI9eyhaiUtmKimVkgUsywSRuJ70lU=;
+        b=aopnqbaCSNHqF6KpHfOs9i4eGmk0PeNFmcRoz4IagUggRx/jolTCPG/Sa82+Kp3MAA
+         ty1RIF8zeW104dMDSYNrNXOVvb2Y5gC42mwI4s9UsEs4022BVXN6SMilhVMAu1Wgqms5
+         mqqdYiV/oaLCtGzoQer1GUTiM6YDs4SQ+JUSckLhMLTKM+KhNiqbqJa8ghsYG0wTA8+2
+         jptFENH4daN10ehwdpaHofp+NPx1botHSVxc3C4Yp/RZG6Ohz71bm/jpxldklgQRjCig
+         cbElB5VT3FHdKBEb6xwv4ANNEmPzigwE3b5eN7+L/cd8hjsWYPcWfVwO3kHJd95ct72a
+         ezQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697495343; x=1698100143;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YIltTB5RXnB/HbiI9eyhaiUtmKimVkgUsywSRuJ70lU=;
+        b=FmiJJIuPSUCqIIA2Z04ARtmU5zPb0UFrry74jE5NzmIEEsC5X/HwuXFM+hkP8h82f2
+         VzoWotI3bK57je9t+XksdcfvHix5fjMmnVTRwpKBr72LJGV4ERrSZiGhZeYJ2dj/wgZ1
+         D0fo6Rj5r1Tb7FOKhMDWYjmwsXWCL2UxLqGiFA1vqc/8A1eE6P8wEW5PcnxQObeAxQcy
+         C3i2ImZCMrHA4BelvNEQi5VA7ikDZliYdlY2MCRw1hGZ+Zfdc7ll1/s+n3FYXAD21g/D
+         PHpUmZDpi5HyFhGqghHy2yuk2KuuuC42+Cku5jGZa86PzWb5S/aAm8ILroAvsPqChXmP
+         nnuw==
+X-Gm-Message-State: AOJu0YxOXaICjJJOJrg44XEmjGbHIAGEsDQPgWzPyQVpaIoNdR6c4IRi
+	hJhGdssLzindzUMn+q2/zgypGaDIICPRF+1K9AM=
+X-Google-Smtp-Source: AGHT+IFHhGEr1n/vy8in1Q6rjAMQ2eCy9R7rGUdktM71Fc3B5tae9zwlqDKfG1+NelJjjKnouByHZrpBXR7uE/gOcYM=
+X-Received: by 2002:a05:6a21:3e0b:b0:16b:c20d:f979 with SMTP id
+ bk11-20020a056a213e0b00b0016bc20df979mr366217pzc.13.1697495343227; Mon, 16
+ Oct 2023 15:29:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <ZS1/qtr0dZJ35VII@debian.debian> <4c524eba575992cc1adfc41b2b230835946b126c.camel@gmail.com>
+ <CAO3-PbrhdDrFdjzkCFM9EvDTK2HA2_JCkYLBZiHka4WAMRtm4w@mail.gmail.com>
+In-Reply-To: <CAO3-PbrhdDrFdjzkCFM9EvDTK2HA2_JCkYLBZiHka4WAMRtm4w@mail.gmail.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 16 Oct 2023 15:28:26 -0700
+Message-ID: <CAKgT0UfLECx9HZAKKK+Grv5oTiUTrwSkpscmJy_+EWax9AZU6w@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] ipv6: avoid atomic fragment on GSO packets
+To: Yan Zhai <yan@cloudflare.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Aya Levin <ayal@nvidia.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org, 
+	kernel-team@cloudflare.com, Florian Westphal <fw@strlen.de>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Thanks for the v2!
+On Mon, Oct 16, 2023 at 2:51=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wrote=
+:
+>
+> On Mon, Oct 16, 2023 at 4:00=E2=80=AFPM Alexander H Duyck
+> <alexander.duyck@gmail.com> wrote:
+> >
+> > On Mon, 2023-10-16 at 11:23 -0700, Yan Zhai wrote:
+> > > GSO packets can contain a trailing segment that is smaller than
+> > > gso_size. When examining the dst MTU for such packet, if its gso_size=
+ is
+> > > too large, then all segments would be fragmented. However, there is a
+> > > good chance the trailing segment has smaller actual size than both
+> > > gso_size as well as the MTU, which leads to an "atomic fragment". It =
+is
+> > > considered harmful in RFC-8021. An Existing report from APNIC also sh=
+ows
+> > > that atomic fragments are more likely to be dropped even it is
+> > > equivalent to a no-op [1].
+> > >
+> > > Refactor __ip6_finish_output code to separate GSO and non-GSO packet
+> > > processing. It mirrors __ip_finish_output logic now. Add an extra che=
+ck
+> > > in GSO handling to avoid atomic fragments. Lastly, drop dst_allfrag
+> > > check, which is no longer true since commit 9d289715eb5c ("ipv6: stop
+> > > sending PTB packets for MTU < 1280").
+> > >
+> > > Link: https://www.potaroo.net/presentations/2022-03-01-ipv6-frag.pdf =
+[1]
+> > > Fixes: b210de4f8c97 ("net: ipv6: Validate GSO SKB before finish IPv6 =
+processing")
+> > > Suggested-by: Florian Westphal <fw@strlen.de>
+> > > Reported-by: David Wragg <dwragg@cloudflare.com>
+> > > Signed-off-by: Yan Zhai <yan@cloudflare.com>
+> > > ---
+> > >  net/ipv6/ip6_output.c | 33 +++++++++++++++++++++++----------
+> > >  1 file changed, 23 insertions(+), 10 deletions(-)
+> > >
+> > > diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+> > > index a471c7e91761..1de6f3c11655 100644
+> > > --- a/net/ipv6/ip6_output.c
+> > > +++ b/net/ipv6/ip6_output.c
+> > > @@ -162,7 +162,14 @@ ip6_finish_output_gso_slowpath_drop(struct net *=
+net, struct sock *sk,
+> > >               int err;
+> > >
+> > >               skb_mark_not_on_list(segs);
+> > > -             err =3D ip6_fragment(net, sk, segs, ip6_finish_output2)=
+;
+> > > +             /* Last gso segment might be smaller than actual MTU. A=
+dding
+> > > +              * a fragment header to it would produce an "atomic fra=
+gment",
+> > > +              * which is considered harmful (RFC-8021)
+> > > +              */
+> > > +             err =3D segs->len > mtu ?
+> > > +                     ip6_fragment(net, sk, segs, ip6_finish_output2)=
+ :
+> > > +                     ip6_finish_output2(net, sk, segs);
+> > > +
+> > >               if (err && ret =3D=3D 0)
+> > >                       ret =3D err;
+> > >       }
+> > > @@ -170,10 +177,19 @@ ip6_finish_output_gso_slowpath_drop(struct net =
+*net, struct sock *sk,
+> > >       return ret;
+> > >  }
+> > >
+> > > +static int ip6_finish_output_gso(struct net *net, struct sock *sk,
+> > > +                              struct sk_buff *skb, unsigned int mtu)
+> > > +{
+> > > +     if (!(IP6CB(skb)->flags & IP6SKB_FAKEJUMBO) &&
+> > > +         !skb_gso_validate_network_len(skb, mtu))
+> > > +             return ip6_finish_output_gso_slowpath_drop(net, sk, skb=
+, mtu);
+> >
+> > If we are sending fakejumbo or have a frame that doesn't pass the
+> > muster it is just going immediately to ip6_finish_output. I think the
+> > checks that you removed are needed to keep the socket from getting
+> > stuck sending frames that will probably be discarded.
+> >
+>
+> Hi Alexander,
+>
+> Thanks for the feedback! But I am not sure I follow the situation you
+> mentioned here. If it is a fake jumbo but non GSO packet, it won't
+> enter ip6_finish_output_gso. What I am really skipping are the
+> dst_allfrag and frag_max_size checks on GSO packets, and dst_allfrag
+> on non-GSO packets.
+>
+> As to dst_allfrag, I looked back at the case when this was added:
+>
+> https://www.mail-archive.com/bk-commits-head@vger.kernel.org/msg03399.htm=
+l
+>
+> The actual feature was set only when a PMTU message carries a value
+> smaller than 1280 byte. But the main line kernel just drops such
+> messages now since the commit I pointed to in the change log (which
+> makes sense because the feature was set based on old RFC-2460
+> guidelines, and those have been deprecated in RFC-8200). Iproute2 also
+> doesn't expose this option as well. Is there any case that I am not
+> aware of here that still relies on it?
+>
+> For frag_max_size, I might be wrong but to my best knowledge it only
+> applies when netfilter defrags packets. However, when dealing with
+> fragments, both local output and GRO code won't produce GSO packets in
+> the first place. Similarly, if we look at IPv4 implementation, it also
+> does not consider frag_max_size in GSO handling. So I intentionally
+> skip this for GSO packets in the change. WDYT?
 
-Adding Willem, Pablo, and Harald to CC (please CC them on future
-versions).
+I am not certain. Just looking at the code it seems like there were a
+number of corner cases handled that this is getting rid of the code
+for. Specifically my main concern is GSO being enabled for a path
+where the MTU is incorrect due to something such as a tunnel being
+between the system and the endpoint. In such a case it would normally
+send back an ICMP message triggering a path MTU update which would
+then have to ripple through.
 
-On Thu, 12 Oct 2023 06:01:15 +0000 Takeru Hayasaka wrote:
-> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-> index f7fba0dc87e5..a2d4f2081cf3 100644
-> --- a/include/uapi/linux/ethtool.h
-> +++ b/include/uapi/linux/ethtool.h
-> @@ -2011,6 +2011,18 @@ static inline int ethtool_validate_duplex(__u8 duplex)
->  #define	IPV4_FLOW	0x10	/* hash only */
->  #define	IPV6_FLOW	0x11	/* hash only */
->  #define	ETHER_FLOW	0x12	/* spec only (ether_spec) */
-> +#define GTPU_V4_FLOW 0x13	/* hash only */
-> +#define GTPU_V6_FLOW 0x14	/* hash only */
-> +#define GTPC_V4_FLOW 0x15	/* hash only */
-> +#define GTPC_V6_FLOW 0x16	/* hash only */
-> +#define GTPC_TEID_V4_FLOW 0x17	/* hash only */
-> +#define GTPC_TEID_V6_FLOW 0x18	/* hash only */
-> +#define GTPU_EH_V4_FLOW 0x19	/* hash only */
-> +#define GTPU_EH_V6_FLOW 0x20	/* hash only */
-
-nit: please note that these are hex numbers,
-     next value after 0x19 is 0x1a, not 0x20.
-
-> +#define GTPU_UL_V4_FLOW 0x21	/* hash only */
-> +#define GTPU_UL_V6_FLOW 0x22	/* hash only */
-> +#define GTPU_DL_V4_FLOW 0x23	/* hash only */
-> +#define GTPU_DL_V6_FLOW 0x24	/* hash only */
->  /* Flag to enable additional fields in struct ethtool_rx_flow_spec */
->  #define	FLOW_EXT	0x80000000
->  #define	FLOW_MAC_EXT	0x40000000
-
-What gives me pause here is the number of flow sub-types we define
-for GTP hashing.
-
-My understanding of GTP is limited to what I just read on Wikipedia.
-
-IIUC the GTPC vs GTPU distinction comes down to the UDP port on
-which the protocol runs? Are the frames also different?
-
-I'm guessing UL/DL are uplink/downlink but what's EH?
-
-How do GTPU_V4_FLOW, GTPU_EH_V4_FLOW, GTPU_UL_V4_FLOW, and
-GTPU_DL_V4_FLOW differ?
-
-Key question is - are there reasonable use cases that you can think of
-for enabling GTP hashing for each one of those bits individually or can
-we combine some of them?
-
-> @@ -2025,6 +2037,7 @@ static inline int ethtool_validate_duplex(__u8 duplex)
->  #define	RXH_IP_DST	(1 << 5)
->  #define	RXH_L4_B_0_1	(1 << 6) /* src port in case of TCP/UDP/SCTP */
->  #define	RXH_L4_B_2_3	(1 << 7) /* dst port in case of TCP/UDP/SCTP */
-> +#define	RXH_GTP_TEID	(1 << 8) /* teid in case of GTP */
->  #define	RXH_DISCARD	(1 << 31)
+I'm not an IPv6 expert though so perhaps I will leave that for
+somebody else to provide feedback on.
 
