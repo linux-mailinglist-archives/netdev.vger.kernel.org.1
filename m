@@ -1,131 +1,116 @@
-Return-Path: <netdev+bounces-41173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 039D67CA102
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:51:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6485D7CA10C
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:54:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB9EC28116C
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:51:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5515B20CB3
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D4917722;
-	Mon, 16 Oct 2023 07:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CAC71775E;
+	Mon, 16 Oct 2023 07:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Or+NmpDD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="RTzkJj3B"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C488154B2
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:51:38 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0A62DC
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:51:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697442695;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iWJN0w7xWWzsBQvThID80a9TVLPdJu/x6hSW6zNhXtU=;
-	b=Or+NmpDDiM7wlu9B7ifWC2YibUe2U8OB5d5Qj0pMF4IoT9fFrjxtcIKx4iFIZ9bGIRBAph
-	01YYApzBMq3Hf+06gKms4Qzgmy5mlyLVtL44HZhuZ5p7iDfZTzvRjuZ1hq9onrOX/7QYE7
-	K10gMfXXomd+csK0dfSnAg9O4CgxicI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-604-8QIxIXbVO_-mAgrWzLTvTQ-1; Mon, 16 Oct 2023 03:51:29 -0400
-X-MC-Unique: 8QIxIXbVO_-mAgrWzLTvTQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-405629826ccso30926435e9.0
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:51:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697442688; x=1698047488;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iWJN0w7xWWzsBQvThID80a9TVLPdJu/x6hSW6zNhXtU=;
-        b=VlerTZvOxbvV1XTxmp54hCBS0xSTYV/V1I/JRZDT3tuVqFqv6YSUuw8EsHWlDgRI9t
-         dFxZrqIL9PSoTur1N6XZP6OeW8Q38O6JV4uvW52UcowtCJEvaqHA+HwXxOC5E0NQ5FAz
-         8iTqGWBvjnG314JMnEE6Bwe7N+8caMb0KOntaFBlvV7z6PaC3KaTJNUa0fENWHt2MtRp
-         WUykFCSN9dS/UV3eS9vLO1MGMAqpuAU4s8pIKyUgoBHjPY5WlEazi+f2vyJz8+b8z22L
-         0TVWE9VrVYw2hxURBMTwTShOUu8uY3wZudSRPkEBwP/kE1xwtFn3HasJAcsBukLeC/r9
-         dnpQ==
-X-Gm-Message-State: AOJu0YxFHgyHTDFrXKWGJzFIbkl+ZWHnxdlB/2+0qg5zXXHVcc2n5y6K
-	qnhQCGcRO89VuyGVsPPVZuOSuy3OJOZVy0M4kDBHx/Gd723vIr9H5MMpwwb5/i8rCNgWhRc2P99
-	gc2L3Ml0Zaz6lGUpf
-X-Received: by 2002:a5d:6389:0:b0:32d:b488:8dc3 with SMTP id p9-20020a5d6389000000b0032db4888dc3mr1990385wru.62.1697442687730;
-        Mon, 16 Oct 2023 00:51:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE1LXqPDGVCf1m88/1JdZzNWkDf44hKGDFwTs5dPfpIuJTAs3f3C5PNPBlsWn0kJItiQ6A7tQ==
-X-Received: by 2002:a5d:6389:0:b0:32d:b488:8dc3 with SMTP id p9-20020a5d6389000000b0032db4888dc3mr1990361wru.62.1697442687392;
-        Mon, 16 Oct 2023 00:51:27 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:178:f56b:1acf:3cb7:c133:f86d])
-        by smtp.gmail.com with ESMTPSA id e4-20020a5d5944000000b003247d3e5d99sm7138692wri.55.2023.10.16.00.51.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 00:51:26 -0700 (PDT)
-Date: Mon, 16 Oct 2023 03:51:22 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>,
-	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Simon Horman <horms@kernel.org>, "Liu, Yujie" <yujie.liu@intel.com>
-Subject: Re: [PATCH net-next 2/5] virtio-net: separate rx/tx coalescing
- moderation cmds
-Message-ID: <20231016035034-mutt-send-email-mst@kernel.org>
-References: <cover.1697093455.git.hengqi@linux.alibaba.com>
- <dc171e2288d2755b1805afde6b394d2d443a134d.1697093455.git.hengqi@linux.alibaba.com>
- <20231013181148.3fd252dc@kernel.org>
- <06d90cc8-ccc0-4b2f-ad42-2db4a6fb229f@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF0718047
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:54:02 +0000 (UTC)
+Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E48ADE
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:53:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
+	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
+	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=ngQA2UXPqbvVAjT+xhmuNpfsjFjFJDhMWj120VzIiR0=; b=RTzkJj3BM96l6JFb2aDFsGl5DP
+	Js9q3EFC5LsPQGcycbtoLcdYVdhuESKlc4YXifHnbHE0MIIXBDCVNhxJK9zIm/801jeLBVaqyBRq2
+	mAl3eeHKSKIa6wDsm7mDcwYdTjEiGztYsm4ny5Vd6ytQ58/BtEkN1UeH2j0LNfXyg9wSgK2WstQCG
+	X+QrEQYPUGpHVOrTnmVaa4sNqLN5WtMrHxUPBIZgcB/lcOBFBq8sumF1+Vr6BU7L0Hu0cAS247CQX
+	UpSh4fJhOYMZoCl/gYc1cJkPU6Q883kActkYiJF4yv6OYg1ikBb9HDUSYfy6v81cSPcQPABBk0/g+
+	6668kK5A==;
+Received: from [192.168.1.4] (port=11103 helo=SH-EX2013.helmholz.local)
+	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Ante.Knezic@helmholz.de>)
+	id 1qsIQF-0006Qb-0B;
+	Mon, 16 Oct 2023 09:53:55 +0200
+Received: from linuxdev.helmholz.local (192.168.6.7) by
+ SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Mon, 16 Oct 2023 09:53:54 +0200
+From: Ante Knezic <ante.knezic@helmholz.de>
+To: <conor@kernel.org>
+CC: <andrew@lunn.ch>, <ante.knezic@helmholz.de>, <conor+dt@kernel.org>,
+	<davem@davemloft.net>, <devicetree@vger.kernel.org>, <edumazet@google.com>,
+	<f.fainelli@gmail.com>, <krzysztof.kozlowski+dt@linaro.org>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <marex@denx.de>,
+	<netdev@vger.kernel.org>, <olteanv@gmail.com>, <pabeni@redhat.com>,
+	<robh+dt@kernel.org>, <woojung.huh@microchip.com>
+Subject: [PATCH net-next 2/2] dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
+Date: Mon, 16 Oct 2023 09:53:49 +0200
+Message-ID: <20231016075349.18792-1-ante.knezic@helmholz.de>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20231012-unicorn-rambling-55dc66b78f2f@spud>
+References: <20231012-unicorn-rambling-55dc66b78f2f@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <06d90cc8-ccc0-4b2f-ad42-2db4a6fb229f@linux.alibaba.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [192.168.6.7]
+X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
+ SH-EX2013.helmholz.local (192.168.1.4)
+X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 16, 2023 at 03:45:38PM +0800, Heng Qi wrote:
+On Thu, 12 Oct 2023 16:18:09 +0100, Conor Dooley wrote:
+> On Thu, Oct 12, 2023 at 12:55:56PM +0200, Ante Knezic wrote:
+> > Add documentation for selecting reference rmii clock on KSZ88X3 devices
+> > 
+> > Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+> > ---
+> >  .../devicetree/bindings/net/dsa/microchip,ksz.yaml    | 19 +++++++++++++++++++
+> >  1 file changed, 19 insertions(+)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > index 41014f5c01c4..eaa347b04db1 100644
+> > --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > @@ -72,6 +72,25 @@ properties:
+> >    interrupts:
+> >      maxItems: 1
+> >  
+> > +  microchip,rmii-clk-internal:
+> > +    $ref: /schemas/types.yaml#/definitions/flag
+> > +    description:
+> > +      Set if the RMII reference clock is provided internally. Otherwise
+> > +      reference clock should be provided externally.
 > 
+> I regret not asking this on the previous iteration - how come you need a
+> custom property? In the externally provided case would there not be a
+> clocks property pointing to the RMII reference clock, that would be
+> absent when provided by the itnernal reference?
 > 
-> 在 2023/10/14 上午9:11, Jakub Kicinski 写道:
-> > On Thu, 12 Oct 2023 15:44:06 +0800 Heng Qi wrote:
-> > > +
-> > > +static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
-> > > +					  struct ethtool_coalesce *ec)
-> > > +{
-> > > +	struct scatterlist sgs_rx;
-> > > +
-> > ../drivers/net/virtio_net.c: In function ‘virtnet_send_rx_notf_coal_cmds’:
-> > ../drivers/net/virtio_net.c:3306:14: error: ‘i’ undeclared (first use in this function); did you mean ‘vi’?
-> >   3306 |         for (i = 0; i < vi->max_queue_pairs; i++) {
-> >        |              ^
-> >        |              vi
-> 
-> Will fix in the next version.
-> 
-> Thanks!
+> Cheers,
+> Conor.
 
-OK, however pls do test individual patches as well as the whole
-patchset.
-
--- 
-MST
-
+In both cases (external and internal), the KSZ88X3 is actually providing the
+RMII reference clock. Difference is only will the clock be routed as external
+copper track (pin REFCLKO -> pin REFCLKI), or will it be routed internally.
+So, this should not affect the clock relation between the uC and the switch
+device? 
+This property has no effect if KSZ88X3 is not providing the reference clock.
+Maybe I should provide more info in the commit message of both patches as well?
 
