@@ -1,174 +1,123 @@
-Return-Path: <netdev+bounces-41268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184867CA6C8
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:33:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 392AB7CA6DD
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:41:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB0BE1F22034
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:33:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 626181C20940
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960452377E;
-	Mon, 16 Oct 2023 11:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE9C23778;
+	Mon, 16 Oct 2023 11:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2Q5uhr7K"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4AC23775
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:33:41 +0000 (UTC)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 708D4DC;
-	Mon, 16 Oct 2023 04:33:40 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A18911FB;
-	Mon, 16 Oct 2023 04:34:20 -0700 (PDT)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6EA663F5A1;
-	Mon, 16 Oct 2023 04:33:37 -0700 (PDT)
-Message-ID: <bf6f7c39-9d8f-4a2d-bdd1-3e2a7de4b857@arm.com>
-Date: Mon, 16 Oct 2023 12:33:36 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153DC24214
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:41:02 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14386E6
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 04:41:00 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so11469a12.0
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 04:41:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697456458; x=1698061258; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2I6xiVgm8CDmOxobNPXJ5HYpt0gEXNwuNgT27rQ1pK8=;
+        b=2Q5uhr7KZnIOPozm+oy0vHWbp03Q1sFUZSwBPx0LsVQC/w/dnP/c3KuRsVKTGEu7kM
+         AROIj0DxDxL1/YKoSGX7rM5Lq1lTKGlp1lkaJWGbrOjLbVJXxdpyCT1WYWzb3vbWOBgk
+         anltbr9L+X2Hn1JBwCIzkQjRdEjjugweYDFB8mohX2nuHlw0wCfQMUy4FqZzgBkBaHdR
+         8SPVoFEJSGtEulLCD0j5oxaLuLvVE5dUJvuP0kmBS9RuKVQIuAeZGQ6X55Aqyj9Vn3md
+         s2mtdAxgTRbWRYgZ+LzvH0GL2oEeUQ6/l+nyB3P1/YMPXJaPilTrFc8I/841CfVH1Yba
+         CarQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697456458; x=1698061258;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2I6xiVgm8CDmOxobNPXJ5HYpt0gEXNwuNgT27rQ1pK8=;
+        b=S5UIwdOKw11eZr5puhHhbx4Z1B2PprqUxSgj5ffIsSXUSsL71rPKkza5zpSBw5FTnK
+         juXGboHkDVZ0Qa/sGTTgmaifEUTdvZ+2dnXnOzPmY7GEOMemzIjQnnPLQpoRlz/xrwaJ
+         U30S31Pk/OvhwEPeWznNlsRil35MF5i21YNF5ZTnPIEN/ok9f8+wqVC/CZp0wnzaR+89
+         pw3kCfA5nRKAacmq5VDH7Qdc8143bMQYWQaULDhG4/VOGhB5NtDwkKUXl0uB569Ban4u
+         ulXGRBR79zA9oWoPaFRAwtv/mfz3ftduCGcLsmzCsoebBuUC2x2ujHijDzRSmbg3CWyX
+         0ahw==
+X-Gm-Message-State: AOJu0YyNMMTYPF7e2hswTGT86DG2rWcYriJu8Abx4ZK+t2zlrDbT7l2z
+	EbJYrtP/tdTUabtwNk4l6D7EmXjPhOhgVW4PYx+BJg==
+X-Google-Smtp-Source: AGHT+IEd7QsZDGvewhvSCOpW/J+FnpZ5jMRtoRoEZoPIfRkDvA7e50KC0N8Z+vcUAqp+1WNdbYbn6DP3CRW+eN2eV5Y=
+X-Received: by 2002:a50:cd16:0:b0:538:1d3a:d704 with SMTP id
+ z22-20020a50cd16000000b005381d3ad704mr155111edi.1.1697456458241; Mon, 16 Oct
+ 2023 04:40:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 06/12] dma-direct: add a CONFIG_ARCH_DMA_ALLOC symbol
-Content-Language: en-GB
-To: Christoph Hellwig <hch@lst.de>, Greg Ungerer <gerg@linux-m68k.org>,
- iommu@lists.linux.dev
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Geert Uytterhoeven <geert@linux-m68k.org>, Wei Fang <wei.fang@nxp.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
- netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-renesas-soc@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>
-References: <20231016054755.915155-1-hch@lst.de>
- <20231016054755.915155-7-hch@lst.de>
-From: Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20231016054755.915155-7-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <1697056244-21888-1-git-send-email-haiyangz@microsoft.com>
+In-Reply-To: <1697056244-21888-1-git-send-email-haiyangz@microsoft.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 16 Oct 2023 13:40:43 +0200
+Message-ID: <CANn89iLth-thO7=V=b+3dbP=K-m+hbBk75FtM+7cFiUphGXwoA@mail.gmail.com>
+Subject: Re: [PATCH net-next,v3] tcp: Set pingpong threshold via sysctl
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, kys@microsoft.com, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, 
+	dsahern@kernel.org, ncardwell@google.com, ycheng@google.com, 
+	kuniyu@amazon.com, morleyd@google.com, mfreemon@cloudflare.com, 
+	mubashirq@google.com, linux-doc@vger.kernel.org, weiwan@google.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 16/10/2023 6:47 am, Christoph Hellwig wrote:
-> Instead of using arch_dma_alloc if none of the generic coherent
-> allocators are used, require the architectures to explicitly opt into
-> providing it.  This will used to deal with the case of m68knommu and
-> coldfire where we can't do any coherent allocations whatsoever, and
-> also makes it clear that arch_dma_alloc is a last resort.
+On Wed, Oct 11, 2023 at 10:31=E2=80=AFPM Haiyang Zhang <haiyangz@microsoft.=
+com> wrote:
+>
+> TCP pingpong threshold is 1 by default. But some applications, like SQL D=
+B
+> may prefer a higher pingpong threshold to activate delayed acks in quick
+> ack mode for better performance.
+>
 
-With one miniscule nit that possibly ARCH_HAS_DMA_ALLOC might be a 
-little more consistent with other symbol names in this area (but feel 
-free to disagree),
+...
 
-Reviewed-by: Robin Murphy <robin.murphy@arm.com>
+>
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index f207712eece1..7d0fe76d56ef 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -170,10 +170,10 @@ static void tcp_event_data_sent(struct tcp_sock *tp=
+,
+>         tp->lsndtime =3D now;
+>
+>         /* If it is a reply for ato after last received
+> -        * packet, enter pingpong mode.
+> +        * packet, increase pingpong count.
+>          */
+>         if ((u32)(now - icsk->icsk_ack.lrcvtime) < icsk->icsk_ack.ato)
+> -               inet_csk_enter_pingpong_mode(sk);
+> +               inet_csk_inc_pingpong_cnt(sk);
+>  }
+>
+>  /* Account for an ACK we sent. */
 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   arch/arm/Kconfig    |  1 +
->   arch/m68k/Kconfig   |  1 +
->   arch/parisc/Kconfig |  1 +
->   kernel/dma/Kconfig  |  9 +++++++++
->   kernel/dma/direct.c | 12 ++----------
->   5 files changed, 14 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-> index 9557808e8937b1..a3fdf584278f86 100644
-> --- a/arch/arm/Kconfig
-> +++ b/arch/arm/Kconfig
-> @@ -4,6 +4,7 @@ config ARM
->   	default y
->   	select ARCH_32BIT_OFF_T
->   	select ARCH_CORRECT_STACKTRACE_ON_KRETPROBE if HAVE_KRETPROBES && FRAME_POINTER && !ARM_UNWIND
-> +	select ARCH_DMA_ALLOC if MMU
->   	select ARCH_HAS_BINFMT_FLAT
->   	select ARCH_HAS_CPU_FINALIZE_INIT if MMU
->   	select ARCH_HAS_CURRENT_STACK_POINTER
-> diff --git a/arch/m68k/Kconfig b/arch/m68k/Kconfig
-> index 3e318bf9504c5b..0430b8ba6b5cc6 100644
-> --- a/arch/m68k/Kconfig
-> +++ b/arch/m68k/Kconfig
-> @@ -3,6 +3,7 @@ config M68K
->   	bool
->   	default y
->   	select ARCH_32BIT_OFF_T
-> +	select ARCH_DMA_ALLOC if !MMU || COLDFIRE
->   	select ARCH_HAS_BINFMT_FLAT
->   	select ARCH_HAS_CPU_FINALIZE_INIT if MMU
->   	select ARCH_HAS_CURRENT_STACK_POINTER
-> diff --git a/arch/parisc/Kconfig b/arch/parisc/Kconfig
-> index a15ab147af2e07..30a4916fa9b0cc 100644
-> --- a/arch/parisc/Kconfig
-> +++ b/arch/parisc/Kconfig
-> @@ -3,6 +3,7 @@ config PARISC
->   	def_bool y
->   	select ALTERNATE_USER_ADDRESS_SPACE
->   	select ARCH_32BIT_OFF_T if !64BIT
-> +	select ARCH_DMA_ALLOC if PA11
->   	select ARCH_MIGHT_HAVE_PC_PARPORT
->   	select HAVE_FUNCTION_TRACER
->   	select HAVE_FUNCTION_GRAPH_TRACER
-> diff --git a/kernel/dma/Kconfig b/kernel/dma/Kconfig
-> index 4524db877eba36..515d2063b509ac 100644
-> --- a/kernel/dma/Kconfig
-> +++ b/kernel/dma/Kconfig
-> @@ -144,6 +144,15 @@ config DMA_DIRECT_REMAP
->   	select DMA_COHERENT_POOL
->   	select DMA_NONCOHERENT_MMAP
->   
-> +#
-> +# Fallback to arch code for DMA allocations.  This should eventually go away.
-> +#
-> +config ARCH_DMA_ALLOC
-> +	depends on !ARCH_HAS_DMA_SET_UNCACHED
-> +	depends on !DMA_DIRECT_REMAP
-> +	depends on !DMA_GLOBAL_POOL
-> +	bool
-> +
->   config DMA_CMA
->   	bool "DMA Contiguous Memory Allocator"
->   	depends on HAVE_DMA_CONTIGUOUS && CMA
-> diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
-> index 9596ae1aa0dacf..ec410af1d8a14e 100644
-> --- a/kernel/dma/direct.c
-> +++ b/kernel/dma/direct.c
-> @@ -220,13 +220,7 @@ void *dma_direct_alloc(struct device *dev, size_t size,
->   		return dma_direct_alloc_no_mapping(dev, size, dma_handle, gfp);
->   
->   	if (!dev_is_dma_coherent(dev)) {
-> -		/*
-> -		 * Fallback to the arch handler if it exists.  This should
-> -		 * eventually go away.
-> -		 */
-> -		if (!IS_ENABLED(CONFIG_ARCH_HAS_DMA_SET_UNCACHED) &&
-> -		    !IS_ENABLED(CONFIG_DMA_DIRECT_REMAP) &&
-> -		    !IS_ENABLED(CONFIG_DMA_GLOBAL_POOL) &&
-> +		if (IS_ENABLED(CONFIG_ARCH_DMA_ALLOC) &&
->   		    !is_swiotlb_for_alloc(dev))
->   			return arch_dma_alloc(dev, size, dma_handle, gfp,
->   					      attrs);
-> @@ -330,9 +324,7 @@ void dma_direct_free(struct device *dev, size_t size,
->   		return;
->   	}
->   
-> -	if (!IS_ENABLED(CONFIG_ARCH_HAS_DMA_SET_UNCACHED) &&
-> -	    !IS_ENABLED(CONFIG_DMA_DIRECT_REMAP) &&
-> -	    !IS_ENABLED(CONFIG_DMA_GLOBAL_POOL) &&
-> +	if (IS_ENABLED(CONFIG_ARCH_DMA_ALLOC) &&
->   	    !dev_is_dma_coherent(dev) &&
->   	    !is_swiotlb_for_alloc(dev)) {
->   		arch_dma_free(dev, size, cpu_addr, dma_addr, attrs);
+OK, but I do not think we solved the fundamental problem of using
+jiffies for this heuristic,
+especially for HZ=3D100 or HZ=3D250 builds.
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
