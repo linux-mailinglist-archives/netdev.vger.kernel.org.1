@@ -1,126 +1,105 @@
-Return-Path: <netdev+bounces-41468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B26A07CB096
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:56:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99AF97CB0E1
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E312E1C20B9B
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:56:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E63AB20E1A
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5019230CF5;
-	Mon, 16 Oct 2023 16:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D470E30FA7;
+	Mon, 16 Oct 2023 17:01:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="tgzt7S9p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jt3IksFv"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0B928E25
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:56:42 +0000 (UTC)
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05C652413;
-	Mon, 16 Oct 2023 09:56:40 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39GGuTmc113281;
-	Mon, 16 Oct 2023 11:56:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1697475389;
-	bh=8uawIvwXCNY3cQCPZEe1PeCx0P4Tg5jesgAAUCp7n7U=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=tgzt7S9peZqtq4Jwc7d96+kGQYhJN63L4gsd6B9J73K9syja/gy0lsoiexDrgMnR6
-	 czoMV0M3HRefUzpLFovVmBTKnypzH2EvMrnkI/6o0Xn1/SEtV8CYDwtlsrIs4/oxRL
-	 6aqGRZpvtvz/0Dg9c01J5u9XoBJUQYbPA7ihSza0=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39GGuTMH002669
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 16 Oct 2023 11:56:29 -0500
-Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 16
- Oct 2023 11:56:29 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 16 Oct 2023 11:56:29 -0500
-Received: from [10.249.135.225] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39GGuOOI032386;
-	Mon, 16 Oct 2023 11:56:25 -0500
-Message-ID: <d7e56794-8061-bf18-bb6f-7525588546fc@ti.com>
-Date: Mon, 16 Oct 2023 22:26:24 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0831168DE;
+	Mon, 16 Oct 2023 17:01:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C0DFC433C7;
+	Mon, 16 Oct 2023 17:01:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697475710;
+	bh=jrSWt+qKvM3F/hpjsvam+0cAPmswN21zpfkWuyRqu78=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=Jt3IksFvaDHMbpKErxsfMA09XrC2usal72zOnisU3M4xvVRjObjhiu4/Cn8+FXye1
+	 M3EFWfb1p3k/2Bf5H38SmJoJwO1tDpl0HElPWT7HuhExehnK0wUt3ugetUVYzdvyh5
+	 smxHUf6q/A5vyiwcVCLRAOpv9Sn4XbZvJ2EzrQ5BCpNuwqhGElNv9eCa3d+QB08qyQ
+	 JGd3oKSh1zBPn7yb9RP7gVVE0Mk2av+CNopCp5nTUs+2cTTmjKByS9QZOPk8wI126M
+	 +zekt2PSjUpypr/3c/9fKtLZHqP6oYy3ebEVCtQPQbt/j53SFND+mnCpxEQjvK1xz2
+	 NF1qgeUsV67/Q==
+Date: Mon, 16 Oct 2023 10:01:20 -0700
+From: Kees Cook <kees@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>, Simon Horman <horms@kernel.org>
+CC: Justin Stitt <justinstitt@google.com>,
+ Thomas Sailer <t.sailer@alumni.ethz.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] hamradio: replace deprecated strncpy with strscpy
+User-Agent: K-9 Mail for Android
+In-Reply-To: <ede96908-76ff-473c-a5e1-39e2ce130df9@kadam.mountain>
+References: <20231012-strncpy-drivers-net-hamradio-baycom_epp-c-v1-1-8f4097538ee4@google.com> <20231015150619.GC1386676@kernel.org> <ede96908-76ff-473c-a5e1-39e2ce130df9@kadam.mountain>
+Message-ID: <FA371CE1-F449-44D4-801A-11C842E84867@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix r30 CMDs bitmasks
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, MD Danish Anwar <danishanwar@ti.com>
-CC: Jacob Keller <jacob.e.keller@intel.com>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David
- S. Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>, <r-gunasekaran@ti.com>,
-        Roger Quadros <rogerq@kernel.org>
-References: <20231016161525.1695795-1-danishanwar@ti.com>
- <11109e7d-139b-4c8c-beaa-e1e89e355b1b@lunn.ch>
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <11109e7d-139b-4c8c-beaa-e1e89e355b1b@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 10/16/2023 9:58 PM, Andrew Lunn wrote:
-> On Mon, Oct 16, 2023 at 09:45:25PM +0530, MD Danish Anwar wrote:
->> The bitmask for EMAC_PORT_DISABLE and EMAC_PORT_FORWARD has been changed
->> in the ICSSG firmware REL.PRU-ICSS-ETHERNET-SWITCH_02.02.12.05.
->>
->> The current bitmasks are wrong and as a result EMAC_PORT_DISABLE and
->> EMAC_PORT_FORWARD commands doesn not work.
->> Update r30 commands to use the same bitmask as used by the ICSSG firmware
->> REL.PRU-ICSS-ETHERNET-SWITCH_02.02.12.05.
->>
->> These bitmasks are not backwards compatible. This will work with
->> firmware version REL.PRU-ICSS-ETHERNET-SWITCH_02.02.12.05 and above but
->> not with lower firmware versions.
-> 
-> Breaking backwards compatibility is generally not allowed.
-> 
-> As far as i understand the driver, it loads whatever version of
-> firmware is available. It does not ask for a specific version. So you
-> should ask the firmware what version it is, and then handle the
-> bitmask as appropriate.
-> 
 
-Understood. I will try to find a way to do this at runtime.
 
-> How many different versions of REL.PRU-ICSS-ETHERNET-SWITCH have been
-> released? They don't appear to be part of linux-firmware.git :-(
-> 
+On October 15, 2023 10:47:53 PM PDT, Dan Carpenter <dan=2Ecarpenter@linaro=
+=2Eorg> wrote:
+>On Sun, Oct 15, 2023 at 05:06:19PM +0200, Simon Horman wrote:
+>> On Thu, Oct 12, 2023 at 09:33:32PM +0000, Justin Stitt wrote:
+>> > strncpy() is deprecated for use on NUL-terminated destination strings
+>> > [1] and as such we should prefer more robust and less ambiguous strin=
+g
+>> > interfaces=2E
+>> >=20
+>> > We expect both hi=2Edata=2Emodename and hi=2Edata=2Edrivername to be
+>> > NUL-terminated but not necessarily NUL-padded which is evident by its
+>> > usage with sprintf:
+>> > |       sprintf(hi=2Edata=2Emodename, "%sclk,%smodem,fclk=3D%d,bps=3D=
+%d%s",
+>> > |               bc->cfg=2Eintclk ? "int" : "ext",
+>> > |               bc->cfg=2Eextmodem ? "ext" : "int", bc->cfg=2Efclk, b=
+c->cfg=2Ebps,
+>> > |               bc->cfg=2Eloopback ? ",loopback" : "");
+>> >=20
+>> > Note that this data is copied out to userspace with:
+>> > |       if (copy_to_user(data, &hi, sizeof(hi)))
+>> > =2E=2E=2E however, the data was also copied FROM the user here:
+>> > |       if (copy_from_user(&hi, data, sizeof(hi)))
+>>=20
+>> Thanks Justin,
+>>=20
+>> I see that too=2E
+>>=20
+>> Perhaps I am off the mark here, and perhaps it's out of scope for this
+>> patch, but I do think it would be nicer if the kernel only sent
+>> intended data to user-space, even if any unintended payload came
+>> from user-space=2E
+>>=20
+>
+>It's kind of normal to pass user space data back to itself=2E  We
+>generally only worry about info leaks=2E
 
-The firmwares are currently not posted to linux-firmware.git. They are
-maintained internally as of now. Different version of firmware is
-released for every SDK release (3-4 times a year)
+True but since this used to zero the rest of the buffet, let's just keep t=
+hat behavior and use strscpy_pad()=2E
 
->     Andrew
-> 
-> ---
-> pw-bot: cr
+-Kees
 
--- 
-Thanks and Regards,
-Md Danish Anwar
+--=20
+Kees Cook
 
