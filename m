@@ -1,233 +1,373 @@
-Return-Path: <netdev+bounces-41418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 219357CAE2B
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:50:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CC607CAE2D
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:50:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F621281561
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:50:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BECF528102C
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A90EB2E638;
-	Mon, 16 Oct 2023 15:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6FCA2E62B;
+	Mon, 16 Oct 2023 15:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lW3pK4Pe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2t0uQf/"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B112E624;
-	Mon, 16 Oct 2023 15:50:31 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C5DAB;
-	Mon, 16 Oct 2023 08:50:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697471430; x=1729007430;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SMKzGtgkVh/v0k+9IHZejSxFUir7un0TbYckecawQnA=;
-  b=lW3pK4PeYYc4BNHL0RwN2Fj2Zf6+pz4ZZYezP5fMaxgY4PRVT48O87IJ
-   hmLNAaYiHFFtK13wyPn7NZfv2unnaRfi4UYF77c3yfPlJSeN4seSoekKv
-   QkVl8QJ0vhXZrasL1grczvJ23LsOm42j6zA1SaRwGk2c+/xgTIlZAdS87
-   QTpLekhbB2AmDjrFJ0h5WG3VbDri9BK44ED40mrJnwYs692QTiOGH1jf2
-   urWcv7WprGdSXm/qxI56qtowvUHjtPYY5w5AtdRKfoFSeK4X8HqPJ55f5
-   4tB1nlfbERM+3p5cnWkGT4sTU3hsZ9c/KAAjJBiu272BKE0jUIVztKB0E
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="385400537"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="385400537"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 08:50:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10863"; a="749324009"
-X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
-   d="scan'208";a="749324009"
-Received: from rolfrich-mobl1.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.249.38.44])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 08:50:23 -0700
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	corbet@lwn.net,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	vladimir.oltean@nxp.com,
-	andrew@lunn.ch,
-	horms@kernel.org,
-	mkubecek@suse.cz,
-	willemdebruijn.kernel@gmail.com,
-	linux-doc@vger.kernel.org,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>
-Subject: [PATCH net-next v4 6/6] iavf: enable symmetric RSS Toeplitz hash
-Date: Mon, 16 Oct 2023 09:49:37 -0600
-Message-Id: <20231016154937.41224-7-ahmed.zaki@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231016154937.41224-1-ahmed.zaki@intel.com>
-References: <20231016154937.41224-1-ahmed.zaki@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4882C87E;
+	Mon, 16 Oct 2023 15:50:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E701C433C8;
+	Mon, 16 Oct 2023 15:50:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697471452;
+	bh=8Z3jrNAij+Fk5+s3c9fGMpm3Llf0bqvYwxb17CmvIj4=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=a2t0uQf/DvBBY36/YSVGHmEbDVIJss6218VIOQFaRNy8JmQ0oer3kf5Do4B/XVenG
+	 33gyHHvUp34cAPyShV8hXUknOC/FDMNGdNjTPZJIcqDJUhBRCBvvVC16qC3yq7Sc0K
+	 6I7K8HlxTttf8VEYSL/9nhJiLXbO97xByEonHK91iC09/ZE70rl6GZxNnpxTwr5E5V
+	 q5Pqgk3a6b2L7xZJwBVEiGuUDDd7tXyymGf5isDXPBkRuGcR3Q9MlwE/DlbvXcKCcL
+	 QDOSHkHAxS6J/twjTAZ2McHQ4XR/fhs1WSS1NGUGj/jDf09dQOLLUlJEXb+HyrMikw
+	 OssnuHYl7WxWQ==
+Message-ID: <01b4b502db610db7e100a6a1371acd8633a5dbb7.camel@kernel.org>
+Subject: Re: [RFC PATCH 07/53] netfs: Provide invalidate_folio and
+ release_folio calls
+From: Jeff Layton <jlayton@kernel.org>
+To: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>
+Cc: Matthew Wilcox <willy@infradead.org>, Marc Dionne
+ <marc.dionne@auristor.com>,  Paulo Alcantara <pc@manguebit.com>, Shyam
+ Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Dominique
+ Martinet <asmadeus@codewreck.org>, Ilya Dryomov <idryomov@gmail.com>,
+ Christian Brauner <christian@brauner.io>,  linux-afs@lists.infradead.org,
+ linux-cifs@vger.kernel.org,  linux-nfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
+Date: Mon, 16 Oct 2023 11:50:49 -0400
+In-Reply-To: <20231013160423.2218093-8-dhowells@redhat.com>
+References: <20231013160423.2218093-1-dhowells@redhat.com>
+	 <20231013160423.2218093-8-dhowells@redhat.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Allow the VFs to support symmetric RSS for any flow type. The symmetric
-RSS will not be supported on PFs not advertising the ADV RSS Offload
-flag (ADV_RSS_SUPPORT()), for example the E700 series (i40e).
-
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
----
- .../net/ethernet/intel/iavf/iavf_adv_rss.c    |  8 +++++--
- .../net/ethernet/intel/iavf/iavf_adv_rss.h    |  3 ++-
- .../net/ethernet/intel/iavf/iavf_ethtool.c    | 22 +++++++++++++++----
- 3 files changed, 26 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
-index 6edbf134b73f..a9e1da35e248 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.c
-@@ -95,17 +95,21 @@ iavf_fill_adv_rss_sctp_hdr(struct virtchnl_proto_hdr *hdr, u64 hash_flds)
-  * @rss_cfg: the virtchnl message to be filled with RSS configuration setting
-  * @packet_hdrs: the RSS configuration protocol header types
-  * @hash_flds: the RSS configuration protocol hash fields
-+ * @symm: if true, symmetric hash is required
-  *
-  * Returns 0 if the RSS configuration virtchnl message is filled successfully
-  */
- int
- iavf_fill_adv_rss_cfg_msg(struct virtchnl_rss_cfg *rss_cfg,
--			  u32 packet_hdrs, u64 hash_flds)
-+			  u32 packet_hdrs, u64 hash_flds, bool symm)
+On Fri, 2023-10-13 at 17:03 +0100, David Howells wrote:
+> Provide default invalidate_folio and release_folio calls.  These will nee=
+d
+> to interact with invalidation correctly at some point.  They will be need=
+ed
+> if netfslib is to make use of folio->private for its own purposes.
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: linux-cachefs@redhat.com
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
+>  fs/9p/vfs_addr.c      | 33 ++-------------------------
+>  fs/afs/file.c         | 53 ++++---------------------------------------
+>  fs/ceph/addr.c        | 24 ++------------------
+>  fs/netfs/Makefile     |  1 +
+>  fs/netfs/misc.c       | 51 +++++++++++++++++++++++++++++++++++++++++
+>  include/linux/netfs.h |  6 +++--
+>  6 files changed, 64 insertions(+), 104 deletions(-)
+>  create mode 100644 fs/netfs/misc.c
+>=20
+> diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+> index 8a635999a7d6..18a666c43e4a 100644
+> --- a/fs/9p/vfs_addr.c
+> +++ b/fs/9p/vfs_addr.c
+> @@ -104,35 +104,6 @@ const struct netfs_request_ops v9fs_req_ops =3D {
+>  	.issue_read		=3D v9fs_issue_read,
+>  };
+> =20
+> -/**
+> - * v9fs_release_folio - release the private state associated with a foli=
+o
+> - * @folio: The folio to be released
+> - * @gfp: The caller's allocation restrictions
+> - *
+> - * Returns true if the page can be released, false otherwise.
+> - */
+> -
+> -static bool v9fs_release_folio(struct folio *folio, gfp_t gfp)
+> -{
+> -	if (folio_test_private(folio))
+> -		return false;
+> -#ifdef CONFIG_9P_FSCACHE
+> -	if (folio_test_fscache(folio)) {
+> -		if (current_is_kswapd() || !(gfp & __GFP_FS))
+> -			return false;
+> -		folio_wait_fscache(folio);
+> -	}
+> -	fscache_note_page_release(v9fs_inode_cookie(V9FS_I(folio_inode(folio)))=
+);
+> -#endif
+> -	return true;
+> -}
+> -
+> -static void v9fs_invalidate_folio(struct folio *folio, size_t offset,
+> -				 size_t length)
+> -{
+> -	folio_wait_fscache(folio);
+> -}
+> -
+>  #ifdef CONFIG_9P_FSCACHE
+>  static void v9fs_write_to_cache_done(void *priv, ssize_t transferred_or_=
+error,
+>  				     bool was_async)
+> @@ -355,8 +326,8 @@ const struct address_space_operations v9fs_addr_opera=
+tions =3D {
+>  	.writepage =3D v9fs_vfs_writepage,
+>  	.write_begin =3D v9fs_write_begin,
+>  	.write_end =3D v9fs_write_end,
+> -	.release_folio =3D v9fs_release_folio,
+> -	.invalidate_folio =3D v9fs_invalidate_folio,
+> +	.release_folio =3D netfs_release_folio,
+> +	.invalidate_folio =3D netfs_invalidate_folio,
+>  	.launder_folio =3D v9fs_launder_folio,
+>  	.direct_IO =3D v9fs_direct_IO,
+>  };
+> diff --git a/fs/afs/file.c b/fs/afs/file.c
+> index 0c49b3b6f214..3fea5cd8ef13 100644
+> --- a/fs/afs/file.c
+> +++ b/fs/afs/file.c
+> @@ -20,9 +20,6 @@
+> =20
+>  static int afs_file_mmap(struct file *file, struct vm_area_struct *vma);
+>  static int afs_symlink_read_folio(struct file *file, struct folio *folio=
+);
+> -static void afs_invalidate_folio(struct folio *folio, size_t offset,
+> -			       size_t length);
+> -static bool afs_release_folio(struct folio *folio, gfp_t gfp_flags);
+> =20
+>  static ssize_t afs_file_read_iter(struct kiocb *iocb, struct iov_iter *i=
+ter);
+>  static ssize_t afs_file_splice_read(struct file *in, loff_t *ppos,
+> @@ -57,8 +54,8 @@ const struct address_space_operations afs_file_aops =3D=
  {
- 	struct virtchnl_proto_hdrs *proto_hdrs = &rss_cfg->proto_hdrs;
- 	struct virtchnl_proto_hdr *hdr;
- 
--	rss_cfg->rss_algorithm = VIRTCHNL_RSS_ALG_TOEPLITZ_ASYMMETRIC;
-+	if (symm)
-+		rss_cfg->rss_algorithm = VIRTCHNL_RSS_ALG_TOEPLITZ_SYMMETRIC;
-+	else
-+		rss_cfg->rss_algorithm = VIRTCHNL_RSS_ALG_TOEPLITZ_ASYMMETRIC;
- 
- 	proto_hdrs->tunnel_level = 0;	/* always outer layer */
- 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.h b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.h
-index 4d3be11af7aa..e31eb2afebea 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_adv_rss.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_adv_rss.h
-@@ -80,13 +80,14 @@ struct iavf_adv_rss {
- 
- 	u32 packet_hdrs;
- 	u64 hash_flds;
-+	bool symm;
- 
- 	struct virtchnl_rss_cfg cfg_msg;
- };
- 
- int
- iavf_fill_adv_rss_cfg_msg(struct virtchnl_rss_cfg *rss_cfg,
--			  u32 packet_hdrs, u64 hash_flds);
-+			  u32 packet_hdrs, u64 hash_flds, bool symm);
- struct iavf_adv_rss *
- iavf_find_adv_rss_cfg_by_hdrs(struct iavf_adapter *adapter, u32 packet_hdrs);
- void
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-index 90397293525f..8b81c5510bae 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-@@ -1618,6 +1618,7 @@ iavf_set_adv_rss_hash_opt(struct iavf_adapter *adapter,
- 	struct iavf_adv_rss *rss_old, *rss_new;
- 	bool rss_new_add = false;
- 	int count = 50, err = 0;
-+	bool symm = false;
- 	u64 hash_flds;
- 	u32 hdrs;
- 
-@@ -1632,11 +1633,15 @@ iavf_set_adv_rss_hash_opt(struct iavf_adapter *adapter,
- 	if (hash_flds == IAVF_ADV_RSS_HASH_INVALID)
- 		return -EINVAL;
- 
-+	if (cmd->data & RXH_SYMMETRIC_XOR)
-+		symm = true;
-+
- 	rss_new = kzalloc(sizeof(*rss_new), GFP_KERNEL);
- 	if (!rss_new)
- 		return -ENOMEM;
- 
--	if (iavf_fill_adv_rss_cfg_msg(&rss_new->cfg_msg, hdrs, hash_flds)) {
-+	if (iavf_fill_adv_rss_cfg_msg(&rss_new->cfg_msg, hdrs, hash_flds,
-+				      symm)) {
- 		kfree(rss_new);
- 		return -EINVAL;
- 	}
-@@ -1655,9 +1660,11 @@ iavf_set_adv_rss_hash_opt(struct iavf_adapter *adapter,
- 	if (rss_old) {
- 		if (rss_old->state != IAVF_ADV_RSS_ACTIVE) {
- 			err = -EBUSY;
--		} else if (rss_old->hash_flds != hash_flds) {
-+		} else if (rss_old->hash_flds != hash_flds ||
-+			   rss_old->symm != symm) {
- 			rss_old->state = IAVF_ADV_RSS_ADD_REQUEST;
- 			rss_old->hash_flds = hash_flds;
-+			rss_old->symm = symm;
- 			memcpy(&rss_old->cfg_msg, &rss_new->cfg_msg,
- 			       sizeof(rss_new->cfg_msg));
- 			adapter->aq_required |= IAVF_FLAG_AQ_ADD_ADV_RSS_CFG;
-@@ -1669,6 +1676,7 @@ iavf_set_adv_rss_hash_opt(struct iavf_adapter *adapter,
- 		rss_new->state = IAVF_ADV_RSS_ADD_REQUEST;
- 		rss_new->packet_hdrs = hdrs;
- 		rss_new->hash_flds = hash_flds;
-+		rss_new->symm = symm;
- 		list_add_tail(&rss_new->list, &adapter->adv_rss_list_head);
- 		adapter->aq_required |= IAVF_FLAG_AQ_ADD_ADV_RSS_CFG;
- 	}
-@@ -1698,6 +1706,7 @@ iavf_get_adv_rss_hash_opt(struct iavf_adapter *adapter,
+>  	.readahead	=3D netfs_readahead,
+>  	.dirty_folio	=3D afs_dirty_folio,
+>  	.launder_folio	=3D afs_launder_folio,
+> -	.release_folio	=3D afs_release_folio,
+> -	.invalidate_folio =3D afs_invalidate_folio,
+> +	.release_folio	=3D netfs_release_folio,
+> +	.invalidate_folio =3D netfs_invalidate_folio,
+>  	.write_begin	=3D afs_write_begin,
+>  	.write_end	=3D afs_write_end,
+>  	.writepages	=3D afs_writepages,
+> @@ -67,8 +64,8 @@ const struct address_space_operations afs_file_aops =3D=
  {
- 	struct iavf_adv_rss *rss;
- 	u64 hash_flds;
-+	bool symm;
- 	u32 hdrs;
- 
- 	if (!ADV_RSS_SUPPORT(adapter))
-@@ -1711,10 +1720,12 @@ iavf_get_adv_rss_hash_opt(struct iavf_adapter *adapter,
- 
- 	spin_lock_bh(&adapter->adv_rss_lock);
- 	rss = iavf_find_adv_rss_cfg_by_hdrs(adapter, hdrs);
--	if (rss)
-+	if (rss) {
- 		hash_flds = rss->hash_flds;
--	else
-+		symm = rss->symm;
-+	} else {
- 		hash_flds = IAVF_ADV_RSS_HASH_INVALID;
-+	}
- 	spin_unlock_bh(&adapter->adv_rss_lock);
- 
- 	if (hash_flds == IAVF_ADV_RSS_HASH_INVALID)
-@@ -1738,6 +1749,9 @@ iavf_get_adv_rss_hash_opt(struct iavf_adapter *adapter,
- 			 IAVF_ADV_RSS_HASH_FLD_SCTP_DST_PORT))
- 		cmd->data |= (u64)RXH_L4_B_2_3;
- 
-+	if (symm)
-+		cmd->data |= (u64)RXH_SYMMETRIC_XOR;
-+
- 	return 0;
- }
- 
--- 
-2.34.1
+> =20
+>  const struct address_space_operations afs_symlink_aops =3D {
+>  	.read_folio	=3D afs_symlink_read_folio,
+> -	.release_folio	=3D afs_release_folio,
+> -	.invalidate_folio =3D afs_invalidate_folio,
+> +	.release_folio	=3D netfs_release_folio,
+> +	.invalidate_folio =3D netfs_invalidate_folio,
+>  	.migrate_folio	=3D filemap_migrate_folio,
+>  };
+> =20
+> @@ -405,48 +402,6 @@ int afs_write_inode(struct inode *inode, struct writ=
+eback_control *wbc)
+>  	return 0;
+>  }
+> =20
+> -/*
+> - * invalidate part or all of a page
+> - * - release a page and clean up its private data if offset is 0 (indica=
+ting
+> - *   the entire page)
+> - */
+> -static void afs_invalidate_folio(struct folio *folio, size_t offset,
+> -			       size_t length)
+> -{
+> -	_enter("{%lu},%zu,%zu", folio->index, offset, length);
+> -
+> -	folio_wait_fscache(folio);
+> -	_leave("");
+> -}
+> -
+> -/*
+> - * release a page and clean up its private state if it's not busy
+> - * - return true if the page can now be released, false if not
+> - */
+> -static bool afs_release_folio(struct folio *folio, gfp_t gfp)
+> -{
+> -	struct afs_vnode *vnode =3D AFS_FS_I(folio_inode(folio));
+> -
+> -	_enter("{{%llx:%llu}[%lu],%lx},%x",
+> -	       vnode->fid.vid, vnode->fid.vnode, folio_index(folio), folio->fla=
+gs,
+> -	       gfp);
+> -
+> -	/* deny if folio is being written to the cache and the caller hasn't
+> -	 * elected to wait */
+> -#ifdef CONFIG_AFS_FSCACHE
+> -	if (folio_test_fscache(folio)) {
+> -		if (current_is_kswapd() || !(gfp & __GFP_FS))
+> -			return false;
+> -		folio_wait_fscache(folio);
+> -	}
+> -	fscache_note_page_release(afs_vnode_cache(vnode));
+> -#endif
+> -
+> -	/* Indicate that the folio can be released */
+> -	_leave(" =3D T");
+> -	return true;
+> -}
+> -
+>  static void afs_add_open_mmap(struct afs_vnode *vnode)
+>  {
+>  	if (atomic_inc_return(&vnode->cb_nr_mmap) =3D=3D 1) {
+> diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+> index f4863078f7fe..ced19ff08988 100644
+> --- a/fs/ceph/addr.c
+> +++ b/fs/ceph/addr.c
+> @@ -160,27 +160,7 @@ static void ceph_invalidate_folio(struct folio *foli=
+o, size_t offset,
+>  		ceph_put_snap_context(snapc);
+>  	}
+> =20
+> -	folio_wait_fscache(folio);
+> -}
+> -
+> -static bool ceph_release_folio(struct folio *folio, gfp_t gfp)
+> -{
+> -	struct inode *inode =3D folio->mapping->host;
+> -
+> -	dout("%llx:%llx release_folio idx %lu (%sdirty)\n",
+> -	     ceph_vinop(inode),
+> -	     folio->index, folio_test_dirty(folio) ? "" : "not ");
+> -
+> -	if (folio_test_private(folio))
+> -		return false;
+> -
+> -	if (folio_test_fscache(folio)) {
+> -		if (current_is_kswapd() || !(gfp & __GFP_FS))
+> -			return false;
+> -		folio_wait_fscache(folio);
+> -	}
+> -	ceph_fscache_note_page_release(inode);
+> -	return true;
+> +	netfs_invalidate_folio(folio, offset, length);
+>  }
+> =20
+>  static void ceph_netfs_expand_readahead(struct netfs_io_request *rreq)
+> @@ -1563,7 +1543,7 @@ const struct address_space_operations ceph_aops =3D=
+ {
+>  	.write_end =3D ceph_write_end,
+>  	.dirty_folio =3D ceph_dirty_folio,
+>  	.invalidate_folio =3D ceph_invalidate_folio,
+> -	.release_folio =3D ceph_release_folio,
+> +	.release_folio =3D netfs_release_folio,
+>  	.direct_IO =3D noop_direct_IO,
+>  };
+> =20
+> diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
+> index 386d6fb92793..cd22554d9048 100644
+> --- a/fs/netfs/Makefile
+> +++ b/fs/netfs/Makefile
+> @@ -5,6 +5,7 @@ netfs-y :=3D \
+>  	io.o \
+>  	iterator.o \
+>  	main.o \
+> +	misc.o \
+>  	objects.o
+> =20
+>  netfs-$(CONFIG_NETFS_STATS) +=3D stats.o
+> diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
+> new file mode 100644
+> index 000000000000..c3baf2b247d9
+> --- /dev/null
+> +++ b/fs/netfs/misc.c
+> @@ -0,0 +1,51 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/* Miscellaneous routines.
+> + *
+> + * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
+> + * Written by David Howells (dhowells@redhat.com)
+> + */
+> +
+> +#include <linux/swap.h>
+> +#include "internal.h"
+> +
+> +/**
+> + * netfs_invalidate_folio - Invalidate or partially invalidate a folio
+> + * @folio: Folio proposed for release
+> + * @offset: Offset of the invalidated region
+> + * @length: Length of the invalidated region
+> + *
+> + * Invalidate part or all of a folio for a network filesystem.  The foli=
+o will
+> + * be removed afterwards if the invalidated region covers the entire fol=
+io.
+> + */
+> +void netfs_invalidate_folio(struct folio *folio, size_t offset, size_t l=
+ength)
+> +{
+> +	_enter("{%lx},%zx,%zx", folio_index(folio), offset, length);
+> +
+> +	folio_wait_fscache(folio);
+> +}
+> +EXPORT_SYMBOL(netfs_invalidate_folio);
+> +
+> +/**
+> + * netfs_release_folio - Try to release a folio
+> + * @folio: Folio proposed for release
+> + * @gfp: Flags qualifying the release
+> + *
+> + * Request release of a folio and clean up its private state if it's not=
+ busy.
+> + * Returns true if the folio can now be released, false if not
+> + */
+> +bool netfs_release_folio(struct folio *folio, gfp_t gfp)
+> +{
+> +	struct netfs_inode *ctx =3D netfs_inode(folio_inode(folio));
+> +
+> +	if (folio_test_private(folio))
+> +		return false;
+> +	if (folio_test_fscache(folio)) {
+> +		if (current_is_kswapd() || !(gfp & __GFP_FS))
+> +			return false;
+> +		folio_wait_fscache(folio);
+> +	}
+> +
+> +	fscache_note_page_release(netfs_i_cookie(ctx));
+> +	return true;
+> +}
+> +EXPORT_SYMBOL(netfs_release_folio);
+> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+> index ed64d1034afa..daa431c4148d 100644
+> --- a/include/linux/netfs.h
+> +++ b/include/linux/netfs.h
+> @@ -299,8 +299,10 @@ struct readahead_control;
+>  void netfs_readahead(struct readahead_control *);
+>  int netfs_read_folio(struct file *, struct folio *);
+>  int netfs_write_begin(struct netfs_inode *, struct file *,
+> -		struct address_space *, loff_t pos, unsigned int len,
+> -		struct folio **, void **fsdata);
+> +		      struct address_space *, loff_t pos, unsigned int len,
+> +		      struct folio **, void **fsdata);
+> +void netfs_invalidate_folio(struct folio *folio, size_t offset, size_t l=
+ength);
+> +bool netfs_release_folio(struct folio *folio, gfp_t gfp);
+> =20
+>  void netfs_subreq_terminated(struct netfs_io_subrequest *, ssize_t, bool=
+);
+>  void netfs_get_subrequest(struct netfs_io_subrequest *subreq,
+>=20
 
+Nice cleanup. Might can merge this in advance of the rest of the series.
+
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
 
