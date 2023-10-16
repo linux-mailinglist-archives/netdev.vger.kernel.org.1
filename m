@@ -1,242 +1,132 @@
-Return-Path: <netdev+bounces-41170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3DA97CA0B0
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:35:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE90B7CA0AC
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:35:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96FD228141E
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:35:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76C732814FD
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E47BC168AB;
-	Mon, 16 Oct 2023 07:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MC5DhabG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094FC16423;
+	Mon, 16 Oct 2023 07:35:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F801642D
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:35:52 +0000 (UTC)
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD373EB
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:35:50 -0700 (PDT)
-Received: by mail-vs1-xe32.google.com with SMTP id ada2fe7eead31-457bda4cf32so1318139137.3
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:35:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697441750; x=1698046550; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uZWxgydpZppRV3uFhpO46+mr4KRDGo1ndeXPvO+3cY4=;
-        b=MC5DhabGSH3oNOgExQJVgI1sPVP5qpfD7NY/IpKxbNnUp9VZZIZAf96WKcVhgJ26RW
-         L55yvsjepwpLl2D6P1DU+wUnshNjUaCX+1FJ/YlRHsRExZbYRKzz4Qujzs6IaarKMSkX
-         HVIs7raJSDtmPkrRmboeXb6nraf6IowVNqRK3ZT0UT9Sd2LG41mgS1QgMgS8mz+nXXAk
-         CEteDF2eoNtnt9ITBEtKKtbk1wffbwkKHCOpgmHv9DeqMoTof88ZFrDXX88Z/0UzO8FY
-         JZB8fAin8owLw0H8Drxt57dnhVm8BtjWWlYYED9qGMBs8H8gfccCQFeQd6wpq6YHOGtX
-         Nxww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697441750; x=1698046550;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uZWxgydpZppRV3uFhpO46+mr4KRDGo1ndeXPvO+3cY4=;
-        b=f+v+2G7AWA4l7aCfBTalIhC0UXYhtWFP2IQSINhlE015xwMjnulR+4J2g72PrNLRVc
-         K3IXD1F6mQBEFNJZWyMlbRlnqwhcqBWE/6CtEjbEowM0LXWzcHtinxtmKWcIIjpxrOC5
-         B/5OqwOWWWct/RzCppP5DoYLFbo/4lYTcSBGHI0LBlyIyobVgBacAcG4HQDT3kKIscYh
-         y/KrJL4VxmkO+pqsgDuDO+UMfezwlbJcguVW82Z0eKScYM6fDozNX0P9cgEKp67EUzBZ
-         zdOXWFwkmQMdQuUFMm5XncdOpKuNj6qe+JtywYAXEDnbFU9PQFSCjaOuTNAgrZd+cWfQ
-         kYqw==
-X-Gm-Message-State: AOJu0YxbGEMNH8JWajXaxzUewAWFpxKY/+qBUGutjWDK0eJNxf7jsdMW
-	xXvvJvU0Q1VGo12xqaUYu5xE4vRJxD6n9fN/GeCHkw==
-X-Google-Smtp-Source: AGHT+IGtxtcQ/DwbOjZOxe+vSiZxL2yoStxDTOGDWY6AK+7ZzeunATAPpwfYQKkogueWZsUdGJzM3OxpCtnI+gmEk3U=
-X-Received: by 2002:a67:a64b:0:b0:457:d207:4328 with SMTP id
- r11-20020a67a64b000000b00457d2074328mr3902554vsh.23.1697441749420; Mon, 16
- Oct 2023 00:35:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1CBD154A3
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 07:35:31 +0000 (UTC)
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AB54D9
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 00:35:29 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VuCobbW_1697441724;
+Received: from 30.221.149.148(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VuCobbW_1697441724)
+          by smtp.aliyun-inc.com;
+          Mon, 16 Oct 2023 15:35:26 +0800
+Message-ID: <5244489d-333b-467f-ac16-ba060c5288c7@linux.alibaba.com>
+Date: Mon, 16 Oct 2023 15:35:21 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231014031257.178630-1-mirsad.todorovac@alu.unizg.hr> <20231014031257.178630-2-mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <20231014031257.178630-2-mirsad.todorovac@alu.unizg.hr>
-From: Marco Elver <elver@google.com>
-Date: Mon, 16 Oct 2023 09:35:13 +0200
-Message-ID: <CANpmjNOphxEYnw41tc+WisidgHOpqVDajtXj_m8-TfYevObQ=g@mail.gmail.com>
-Subject: Re: [PATCH v1 2/3] r8169: fix the KCSAN reported data-race in rtl_tx
- while reading TxDescArray[entry].opts1
-To: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nic_swsd@realtek.com, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/5] virtio-net: support dynamic coalescing
+ moderation
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, "Liu, Yujie" <yujie.liu@intel.com>
+References: <cover.1697093455.git.hengqi@linux.alibaba.com>
+ <CACGkMEthktJjPdptHo3EDQxjRqdPELOSbMw4k-d0MyYmR4i9KA@mail.gmail.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <CACGkMEthktJjPdptHo3EDQxjRqdPELOSbMw4k-d0MyYmR4i9KA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, 14 Oct 2023 at 05:16, Mirsad Goran Todorovac
-<mirsad.todorovac@alu.unizg.hr> wrote:
->
-> KCSAN reported the following data-race:
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KCSAN: data-race in rtl8169_poll (drivers/net/ethernet/realtek/r8169=
-_main.c:4368 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
->
-> race at unknown origin, with read to 0xffff888140d37570 of 4 bytes by int=
-errupt on cpu 21:
-> rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4368 drivers/net/=
-ethernet/realtek/r8169_main.c:4581) r8169
-> __napi_poll (net/core/dev.c:6527)
-> net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
-> __do_softirq (kernel/softirq.c:553)
-> __irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
-> irq_exit_rcu (kernel/softirq.c:647)
-> sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1074 (discrimina=
-tor 14))
-> asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:645)
-> cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
-> cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
-> call_cpuidle (kernel/sched/idle.c:135)
-> do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
-> cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
-> start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:=
-294)
-> secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
->
-> value changed: 0xb0000042 -> 0x00000000
->
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kc=
-san-00143-gb5cbe7c00aa0 #41
-> Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04=
-/26/2023
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> The read side is in
->
-> drivers/net/ethernet/realtek/r8169_main.c
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->    4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private=
- *tp,
->    4356                    int budget)
->    4357 {
->    4358         unsigned int dirty_tx, bytes_compl =3D 0, pkts_compl =3D =
-0;
->    4359         struct sk_buff *skb;
->    4360
->    4361         dirty_tx =3D tp->dirty_tx;
->    4362
->    4363         while (READ_ONCE(tp->cur_tx) !=3D dirty_tx) {
->    4364                 unsigned int entry =3D dirty_tx % NUM_TX_DESC;
->    4365                 u32 status;
->    4366
->  =E2=86=92 4367                 status =3D le32_to_cpu(tp->TxDescArray[en=
-try].opts1);
->    4368                 if (status & DescOwn)
->    4369                         break;
->    4370
->    4371                 skb =3D tp->tx_skb[entry].skb;
->    4372                 rtl8169_unmap_tx_skb(tp, entry);
->    4373
->    4374                 if (skb) {
->    4375                         pkts_compl++;
->    4376                         bytes_compl +=3D skb->len;
->    4377                         napi_consume_skb(skb, budget);
->    4378                 }
->    4379                 dirty_tx++;
->    4380         }
->    4381
->    4382         if (tp->dirty_tx !=3D dirty_tx) {
->    4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_com=
-pl);
->    4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
->    4385
->    4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl,=
- bytes_compl,
->    4387                                               rtl_tx_slots_avail(=
-tp),
->    4388                                               R8169_TX_START_THRS=
-);
->    4389                 /*
->    4390                  * 8168 hack: TxPoll requests are lost when the T=
-x packets are
->    4391                  * too close. Let's kick an extra TxPoll request =
-when a burst
->    4392                  * of start_xmit activity is detected (if it is n=
-ot detected,
->    4393                  * it is slow enough). -- FR
->    4394                  * If skb is NULL then we come here again once a =
-tx irq is
->    4395                  * triggered after the last fragment is marked tr=
-ansmitted.
->    4396                  */
->    4397                 if (READ_ONCE(tp->cur_tx) !=3D dirty_tx && skb)
->    4398                         rtl8169_doorbell(tp);
->    4399         }
->    4400 }
->
-> tp->TxDescArray[entry].opts1 is reported to have a data-race and READ_ONC=
-E() fixes
-> this KCSAN warning.
->
->    4366
->  =E2=86=92 4367                 status =3D le32_to_cpu(READ_ONCE(tp->TxDe=
-scArray[entry].opts1));
->    4368                 if (status & DescOwn)
->    4369                         break;
->    4370
->
-> Fixes: ^1da177e4c3f4 ("initial git repository build")
-> Cc: Heiner Kallweit <hkallweit1@gmail.com>
-> Cc: nic_swsd@realtek.com
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Marco Elver <elver@google.com>
-> Cc: netdev@vger.kernel.org
-> Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@a=
-lu.unizg.hr/
-> Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
 
-Acked-by: Marco Elver <elver@google.com>
 
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+在 2023/10/12 下午4:29, Jason Wang 写道:
+> On Thu, Oct 12, 2023 at 3:44 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>> Now, virtio-net already supports per-queue moderation parameter
+>> setting. Based on this, we use the netdim library of linux to support
+>> dynamic coalescing moderation for virtio-net.
+>>
+>> Due to hardware scheduling issues, we only tested rx dim.
+> Do you have PPS numbers? And TX numbers are also important as the
+> throughput could be misleading due to various reasons.
+
+OK, will reply until the test environment is ready (the test machine is 
+currently locked by someone else).
+
+Thanks!
+
 >
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethe=
-rnet/realtek/r8169_main.c
-> index 81be6085a480..361b90007148 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -4364,7 +4364,7 @@ static void rtl_tx(struct net_device *dev, struct r=
-tl8169_private *tp,
->                 unsigned int entry =3D dirty_tx % NUM_TX_DESC;
->                 u32 status;
+> Thanks
 >
-> -               status =3D le32_to_cpu(tp->TxDescArray[entry].opts1);
-> +               status =3D le32_to_cpu(READ_ONCE(tp->TxDescArray[entry].o=
-pts1));
->                 if (status & DescOwn)
->                         break;
->
-> --
-> 2.34.1
->
+>> @Test env
+>> rxq0 has affinity to cpu0.
+>>
+>> @Test cmd
+>> client: taskset -c 0 sockperf tp -i ${IP} -t 30 --tcp -m ${msg_size}
+>> server: taskset -c 0 sockperf sr --tcp
+>>
+>> @Test res
+>> The second column is the ratio of the result returned by client
+>> when rx dim is enabled to the result returned by client when
+>> rx dim is disabled.
+>>          --------------------------------------
+>>          | msg_size |  rx_dim=on / rx_dim=off |
+>>          --------------------------------------
+>>          |   14B    |         + 3%            |
+>>          --------------------------------------
+>>          |   100B   |         + 16%           |
+>>          --------------------------------------
+>>          |   500B   |         + 25%           |
+>>          --------------------------------------
+>>          |   1400B  |         + 28%           |
+>>          --------------------------------------
+>>          |   2048B  |         + 22%           |
+>>          --------------------------------------
+>>          |   4096B  |         + 5%            |
+>>          --------------------------------------
+>>
+>> ---
+>> This patch set was part of the previous netdim patch set[1].
+>> [1] was split into a merged bugfix set[2] and the current set.
+>> The previous relevant commentators have been Cced.
+>>
+>> [1] https://lore.kernel.org/all/20230811065512.22190-1-hengqi@linux.alibaba.com/
+>> [2] https://lore.kernel.org/all/cover.1696745452.git.hengqi@linux.alibaba.com/
+>>
+>> Heng Qi (5):
+>>    virtio-net: returns whether napi is complete
+>>    virtio-net: separate rx/tx coalescing moderation cmds
+>>    virtio-net: extract virtqueue coalescig cmd for reuse
+>>    virtio-net: support rx netdim
+>>    virtio-net: support tx netdim
+>>
+>>   drivers/net/virtio_net.c | 394 ++++++++++++++++++++++++++++++++-------
+>>   1 file changed, 322 insertions(+), 72 deletions(-)
+>>
+>> --
+>> 2.19.1.6.gb485710b
+>>
+>>
+
 
