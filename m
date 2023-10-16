@@ -1,401 +1,316 @@
-Return-Path: <netdev+bounces-41259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB9427CA643
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:09:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 936F17CA64C
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF1F11C20925
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:09:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47AB82814D8
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4FD3210F4;
-	Mon, 16 Oct 2023 11:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C6F2110E;
+	Mon, 16 Oct 2023 11:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DnK5M0I7"
+	dkim=pass (2048-bit key) header.d=qwilt.com header.i=@qwilt.com header.b="EtsWwFR0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C82BF4E5;
-	Mon, 16 Oct 2023 11:09:04 +0000 (UTC)
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0407A83;
-	Mon, 16 Oct 2023 04:09:03 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-53db1fbee70so7355279a12.2;
-        Mon, 16 Oct 2023 04:09:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CA2210F4
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 11:10:30 +0000 (UTC)
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CDCDAB
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 04:10:28 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b95d5ee18dso58298591fa.1
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 04:10:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697454541; x=1698059341; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xDaXo5MTP4dUtT2V4pjnvLHYZsmOGF0BPQquHVNEV4Q=;
-        b=DnK5M0I7D9snjD45PPJVyro+tB+/HvcYc27wzai+XPGh7pHpdIXnmnCzqtHFbV3TOM
-         /2nnTgEw2C43jfPtHIH4PE5W4BpHIWmllJhQZ6fiuYnTV0FbB4LvVSByo0Nat6RJ58Kl
-         l+jAuJO4PsCBkLM5ptKB/fo9QuWo0WbeUyYYstMss/r5raa01NuKRZRhxv+mvM9dZbjM
-         8es+0HyC6YSuZXqFtSmaUzPcwIiskhkHKBjHliMSnOy+9fW76tWT3wDN+F797+BLxFOa
-         CEwThvTJ7syFbumNx8aNS1lt1lfOQ44uhiiUj+dOrAUF4cb5AKUskH2CS6wcYRM3d0vh
-         z2ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697454541; x=1698059341;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=qwilt.com; s=google; t=1697454626; x=1698059426; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xDaXo5MTP4dUtT2V4pjnvLHYZsmOGF0BPQquHVNEV4Q=;
-        b=kiXIp+qh7auHifDSUCMnOOxwIygMMBEf0M0aahK+j8roptM1BN7TtFOLyEosLJz19w
-         YU3iqDjH3AvrHmvyN/NILR9TqKcYFYhq2HJOVgZsDLKP1t7HqrqOUtiC0Vx8LRZCiYYG
-         YCaJhPNisphaPxGd4UG2mdsRZmTGp14WKThrRUZjjtdt2cuo8mPeoa4elACIPX61pEim
-         ULlT7io1qXYgxJyKzZT639avar/FpqBCHauLcWZVe2cD4udwLzW+pfJ6kuUyV1iaF6dc
-         IJk86vUZ3eDSaq7EF8Dc0baNwxhJ4TA1CbWs+RJ96OCmWzUR2ZTprOqkscneCft6JeXw
-         UcEQ==
-X-Gm-Message-State: AOJu0Yz5ZMpGVvophBPqSf9zo1ejuai+xB557JhVFRiyJKq/wPzKO/R8
-	UvMLxDXCCFa3uR1P63LwF4N0kjQ6JFyjVw==
-X-Google-Smtp-Source: AGHT+IGvxW1HlHJOzu2eVLozsnUNyEAyJ1WzlS5teJ9Anku85o1gYAixK4qMjJv3NB0bFi87s9t/lA==
-X-Received: by 2002:a05:6402:2712:b0:53e:708c:40be with SMTP id y18-20020a056402271200b0053e708c40bemr5252469edd.6.1697454541137;
-        Mon, 16 Oct 2023 04:09:01 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id c11-20020aa7c98b000000b00536ad96f867sm15269923edt.11.2023.10.16.04.08.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 04:09:00 -0700 (PDT)
-Date: Mon, 16 Oct 2023 14:08:58 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/6] dt-bindings: marvell: Rewrite MV88E6xxx
- in schema
-Message-ID: <20231016110858.ljvjssqujuesu7kd@skbuf>
-References: <20231016-marvell-88e6152-wan-led-v3-0-38cd449dfb15@linaro.org>
- <20231016-marvell-88e6152-wan-led-v3-0-38cd449dfb15@linaro.org>
- <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
- <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
+        bh=XtL1+aW8LhVip/6UvTCsFpfFZJkrcvT0X1r2ce5OAeM=;
+        b=EtsWwFR0DryIhJvMnfw/iDyQNoCG3rMHUqJrMrfCmf9YaQbrJSsud6277EdICMFPL6
+         jW6KFWVI9l28W3n+2M0aHQfYaJOK7uYVAw+GHnL8eAH+DZ2R7/uuG7TwSNp43las/obI
+         obDSKoqlqc/2P2+jKnuAZYuD5m6eIenAJDCb0mdSbKK2Nb+uMDFT755QB+P3mlToq2HD
+         7stD6Kblt0WphExCawa5d/JPlKSKnSh3VQwaeJi3poygHXUutxRCQAE8q5FUx/NT6M4g
+         K0aLawbM8UOVu9e+jdCwakfm/SuRwnH5wL4izy2y7h2EO7OlQ+Y8sUjKlbY9+xuwpMZL
+         x+lA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697454626; x=1698059426;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XtL1+aW8LhVip/6UvTCsFpfFZJkrcvT0X1r2ce5OAeM=;
+        b=cS1gRa5EIyKAZ7WN87FxsyyLqBAy7kFnrvBUbbU8sLOmFuN7atrcmyE6t0PiKEbQD+
+         n5bamksYzvWCFbtmxl0oR+ls2jI5cCAvEa+lV8pN4E2c7ys9erIMfqbraSUTNV2U5qkR
+         c/Id0c9tJ+r6WCO1ziqVaLKPOxKNuXxm8MEgTbv95tgiQg4j+/ymksb9ESheY5RguCVv
+         FCIn3+lp+MxUF/iBl7vmfWXFRvgToHhEH5iOPLXePnnXDcgM3TtFj0182F65X19eFFHJ
+         UusLWiCAZdlqz3eOcKrOrcsW8YRoEpU58e37hkVA7ywkh34jPq603BkTyN1Gh+C2izLQ
+         hMDA==
+X-Gm-Message-State: AOJu0YxYVHi/1ShKoU0KRXuxn8y2OJ2zwOwjkRMMd5BSmw6wc7PUey7x
+	Eks8VAhFSZezOJHHlhI0GAaqvQge84X+/NXgWG3TqQ==
+X-Google-Smtp-Source: AGHT+IG970oy53W9GmJr4b+hpeJzyHKorWw17NPXaMdu8DKqphWqKDp0YeK21rYCd6+SAQJGUpaCXP4oLTraSOmuX2k=
+X-Received: by 2002:a05:6512:33d0:b0:507:a1dd:5a86 with SMTP id
+ d16-20020a05651233d000b00507a1dd5a86mr5145691lfg.13.1697454626170; Mon, 16
+ Oct 2023 04:10:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
- <20231016-marvell-88e6152-wan-led-v3-1-38cd449dfb15@linaro.org>
+References: <CAAvCjhhxBHL63O4s4ufhU7-rptJgX1LM7zEDGeQ9zGP+9Am2kA@mail.gmail.com>
+ <20231011205428.81550-1-kuniyu@amazon.com> <CAAvCjhhEPd4MHNT9x5h_gpyphp3jB9MAnzbCDogiuRVGcqtdkQ@mail.gmail.com>
+ <CAAvCjhjOmDDbDCF9xAVifHEsQqJOFJ1whtzzKu-0+Um=Odm=NQ@mail.gmail.com>
+In-Reply-To: <CAAvCjhjOmDDbDCF9xAVifHEsQqJOFJ1whtzzKu-0+Um=Odm=NQ@mail.gmail.com>
+From: Dmitry Kravkov <dmitryk@qwilt.com>
+Date: Mon, 16 Oct 2023 14:10:15 +0300
+Message-ID: <CAAvCjhj+c14o1EN77gtU_EsPM3_TzY5riQ3zH=AmaU2pUjMoXQ@mail.gmail.com>
+Subject: Re: kernel BUG at net/ipv4/tcp_output.c:2642 with kernel 5.19.0-rc2
+ and newer
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: edumazet@google.com, netdev@vger.kernel.org, slavas@qwilt.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 16, 2023 at 11:12:54AM +0200, Linus Walleij wrote:
-> This is an attempt to rewrite the Marvell MV88E6xxx switch bindings
-> in YAML schema.
-> 
-> The current text binding says:
->   WARNING: This binding is currently unstable. Do not program it into a
->   FLASH never to be changed again. Once this binding is stable, this
->   warning will be removed.
-> 
-> Well that never happened before we switched to YAML markup,
-> we can't have it like this, what about fixing the mess?
+On Thu, Oct 12, 2023 at 7:49=E2=80=AFPM Dmitry Kravkov <dmitryk@qwilt.com> =
+wrote:
+>
+> On Thu, Oct 12, 2023 at 12:19=E2=80=AFAM Dmitry Kravkov <dmitryk@qwilt.co=
+m> wrote:
+> >
+> > On Wed, Oct 11, 2023 at 11:54=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amaz=
+on.com> wrote:
+> > >
+> > > From: Dmitry Kravkov <dmitryk@qwilt.com>
+> > > Date: Wed, 11 Oct 2023 23:20:10 +0300
+> > > > On Wed, Oct 11, 2023 at 5:02=E2=80=AFPM Eric Dumazet <edumazet@goog=
+le.com> wrote:
+> > > > >
+> > > > > On Wed, Oct 11, 2023 at 12:28=E2=80=AFPM Dmitry Kravkov <dmitryk@=
+qwilt.com> wrote:
+> > > > > >
+> > > > > > Hi,
+> > > > > >
+> > > > > > In our try to upgrade from 5.10 to 6.1 kernel we noticed stable=
+ crash
+> > > > > > in kernel that bisected to this commit:
+> > > > > >
+> > > > > > commit 849b425cd091e1804af964b771761cfbefbafb43
+> > > > > > Author: Eric Dumazet <edumazet@google.com>
+> > > > > > Date:   Tue Jun 14 10:17:34 2022 -0700
+> > > > > >
+> > > > > >     tcp: fix possible freeze in tx path under memory pressure
+> > > > > >
+> > > > > >     Blamed commit only dealt with applications issuing small wr=
+ites.
+> > > > > >
+> > > > > >     Issue here is that we allow to force memory schedule for th=
+e sk_buff
+> > > > > >     allocation, but we have no guarantee that sendmsg() is able=
+ to
+> > > > > >     copy some payload in it.
+> > > > > >
+> > > > > >     In this patch, I make sure the socket can use up to tcp_wme=
+m[0] bytes.
+> > > > > >
+> > > > > >     For example, if we consider tcp_wmem[0] =3D 4096 (default o=
+n x86),
+> > > > > >     and initial skb->truesize being 1280, tcp_sendmsg() is able=
+ to
+> > > > > >     copy up to 2816 bytes under memory pressure.
+> > > > > >
+> > > > > >     Before this patch a sendmsg() sending more than 2816 bytes
+> > > > > >     would either block forever (if persistent memory pressure),
+> > > > > >     or return -EAGAIN.
+> > > > > >
+> > > > > >     For bigger MTU networks, it is advised to increase tcp_wmem=
+[0]
+> > > > > >     to avoid sending too small packets.
+> > > > > >
+> > > > > >     v2: deal with zero copy paths.
+> > > > > >
+> > > > > >     Fixes: 8e4d980ac215 ("tcp: fix behavior for epoll edge trig=
+ger")
+> > > > > >     Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > > >     Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
+> > > > > >     Reviewed-by: Wei Wang <weiwan@google.com>
+> > > > > >     Reviewed-by: Shakeel Butt <shakeelb@google.com>
+> > > > > >     Signed-off-by: David S. Miller <davem@davemloft.net>
+> > > > > >
+> > > > > > This happens in a pretty stressful situation when two 100Gb (E8=
+10 or
+> > > > > > ConnectX6) ports transmit above 150Gbps that most of the data i=
+s read
+> > > > > > from disks. So it appears that the system is constantly in a me=
+mory
+> > > > > > deficit. Apparently reverting the patch in 6.1.38 kernel elimin=
+ates
+> > > > > > the crash and system appears stable at delivering 180Gbps
+> > > > > >
+> > > > > > [ 2445.532318] ------------[ cut here ]------------
+> > > > > > [ 2445.532323] kernel BUG at net/ipv4/tcp_output.c:2642!
+> > > > > > [ 2445.532334] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> > > > > > [ 2445.550934] CPU: 61 PID: 109767 Comm: nginx Tainted: G S    =
+     OE
+> > >
+> > > It seems 3rd party module is loaded.
+> > >
+> > > Just curious if it is possible to reproduce the issue without
+> > > out-of-tree modules.
+> > Not sure if ice driver is mature enough there. We will give it a try. T=
+hanks
+>
+> Happens on not-tained kernel too (we went for 6.1.38 to have more mature =
+ice)
+>
+> [ 1057.099780] ------------[ cut here ]------------
+> [ 1057.100389] RSP: 0018:ffffaa4e10093df0 EFLAGS: 00010286
+> [ 1057.101060] kernel BUG at net/ipv4/tcp_output.c:2645!
+> [ 1057.122021] RAX: 00000000ffff4000 RBX: ffff8ccad77e3540 RCX: 000000000=
+0000000
+> [ 1057.122025] RDX: 0000000000000000 RSI: 00000000ffff4000 RDI: ffff8ccad=
+77e3540
+> [ 1057.122027] RBP: ffff8ccad77e3480 R08: ffff8ccad77e35d4 R09: 000000008=
+0400013
+> [ 1057.122029] R10: 0000000000000000 R11: 0000000000000000 R12: ffff8ccad=
+77e3480
+> [ 1057.122031] R13: 7fffffffffffff00 R14: ffff8ccad77e3698 R15: 000000000=
+0000000
+> [ 1057.122033] FS:  00007fd600d42840(0000) GS:ffff8ce1ffac0000(0000)
+> knlGS:0000000000000000
+> [ 1057.122035] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [ 1057.122038] CR2: 00007fd57dacdc80 CR3: 00000041dda7a005 CR4: 000000000=
+0770ee0
+> [ 1057.122041] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
+0000000
+> [ 1057.122042] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000=
+0000400
+> [ 1057.122044] PKRU: 55555554
+> [ 1057.122046] Call Trace:
+> [ 1057.122880] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> [ 1057.123683]  <TASK>
+> [ 1057.124409] CPU: 112 PID: 51072 Comm: nginx Not tainted 6.1.38 #27
+> [ 1057.125125]  ? show_trace_log_lvl+0x1c4/0x2df
+> [ 1057.125812] Hardware name: Cisco Systems Inc
+> UCSC-C220-M6N/UCSC-C220-M6N, BIOS C220M6.4.2.1g.0.1121212157
+> 11/21/2021
+> [ 1057.125815] RIP: 0010:tcp_write_xmit+0x70f/0x830
+> [ 1057.126559]  ? show_trace_log_lvl+0x1c4/0x2df
+>
+>
+>
+> > >
+> > >
+> > > > > >     5.19.0-rc2+ #21
+> > > > > > [ 2445.560127] ------------[ cut here ]------------
+> > > > > > [ 2445.560565] Hardware name: Cisco Systems Inc
+> > > > > > UCSC-C220-M6N/UCSC-C220-M6N, BIOS C220M6.4.2.1g.0.1121212157
+> > > > > > 11/21/2021
+> > > > > > [ 2445.560571] RIP: 0010:tcp_write_xmit+0x70b/0x830
+> > > > > > [ 2445.561221] kernel BUG at net/ipv4/tcp_output.c:2642!
+> > > > > > [ 2445.561821] Code: 84 0b fc ff ff 0f b7 43 32 41 39 c6 0f 84 =
+fe fb
+> > > > > > ff ff 8b 43 70 41 39 c6 0f 82 ff 00 00 00 c7 43 30 01 00 00 00 =
+e9 e6
+> > > > > > fb ff ff <0f> 0b 8b 74 24 20 8b 85 dc 05 00 00 44 89 ea 01 c8 2=
+b 43 28
+> > > > > > 41 39
+> > > > > > [ 2445.561828] RSP: 0000:ffffc110ed647dc0 EFLAGS: 00010246
+> > > > > > [ 2445.561832] RAX: 0000000000000000 RBX: ffff9fe1f8081a00 RCX:=
+ 00000000000005a8
+> > > > > > [ 2445.561833] RDX: 000000000000043a RSI: 000002389172f8f4 RDI:=
+ 000000000000febf
+> > > > > > [ 2445.561835] RBP: ffff9fe5f864e900 R08: 0000000000000000 R09:=
+ 0000000000000100
+> > > > > > [ 2445.561836] R10: ffffffff9be060d0 R11: 000000000000000e R12:=
+ ffff9fe5f864e901
+> > > > > > [ 2445.561837] R13: 0000000000000001 R14: 00000000000005a8 R15:=
+ 0000000000000000
+> > > > > > [ 2445.561839] FS:  00007f342530c840(0000) GS:ffff9ffa7f940000(=
+0000)
+> > > > > > knlGS:0000000000000000
+> > > > > > [ 2445.561842] CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003=
+3
+> > > > > > [ 2445.561844] CR2: 00007f20ca4ed830 CR3: 00000045d976e005 CR4:=
+ 0000000000770ee0
+> > > > > > [ 2445.561846] DR0: 0000000000000000 DR1: 0000000000000000 DR2:=
+ 0000000000000000
+> > > > > > [ 2445.561847] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:=
+ 0000000000000400
+> > > > > > [ 2445.561849] PKRU: 55555554
+> > > > > > [ 2445.561853] Call Trace:
+> > > > > > [ 2445.561858]  <TASK>
+> > > > > > [ 2445.564202] ------------[ cut here ]------------
+> > > > > > [ 2445.568007]  ? tcp_tasklet_func+0x120/0x120
+> > > > > > [ 2445.569107] kernel BUG at net/ipv4/tcp_output.c:2642!
+> > > > > > [ 2445.569608]  tcp_tsq_handler+0x7c/0xa0
+> > > > > > [ 2445.569627]  tcp_pace_kick+0x19/0x60
+> > > > > > [ 2445.569632]  __run_hrtimer+0x5c/0x1d0
+> > > > > > [ 2445.572264] ------------[ cut here ]------------
+> > > > > > [ 2445.574287] ------------[ cut here ]------------
+> > > > > > [ 2445.574292] kernel BUG at net/ipv4/tcp_output.c:2642!
+> > > > > > [ 2445.582581]  __hrtimer_run_queues+0x7d/0xe0
+> > > > > > --
+> > > > > > --
+> > > > > >
+> > > > > > --
+> > > > > > --
+> > > > > >
+> > > > >
+> > > > > Hi Dmitry, thanks for the report.
+> > > > >
+> > > > > Can you post content of /proc/sys/net/ipv4/tcp_wmem and
+> > > > > /proc/sys/net/ipv4/tcp_rmem ?
+> > > > Thank you, Eric
+> > > >
+> > > > # cat /proc/sys/net/ipv4/tcp_wmem
+> > > > 786432 1048576 6291456
+> > > > # cat /proc/sys/net/ipv4/tcp_rmem
+> > > > 4096 87380 6291456
+> > > >
+> > > > >
+> > > > > Are you using memcg ?
+> > > > No
+> > > > >
+> > > > > Can you try the following patch ?
+> > > > >
+> > > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > > > > index 3f66cdeef7decb5b5d2b84212c623781b8ce63db..d74b197e02e94aa2f=
+032f2c3971969e604abc7de
+> > > > > 100644
+> > > > > --- a/net/ipv4/tcp.c
+> > > > > +++ b/net/ipv4/tcp.c
+> > > > > @@ -1286,6 +1286,7 @@ int tcp_sendmsg_locked(struct sock *sk, str=
+uct
+> > > > > msghdr *msg, size_t size)
+> > > > >                 continue;
+> > > > >
+> > > > >  wait_for_space:
+> > > > > +               tcp_remove_empty_skb(sk);
+> > > > >                 set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+> > > > >                 if (copied)
+> > > > >                         tcp_push(sk, flags & ~MSG_MORE, mss_now,
+> > > >
+> > > >
+> > > > The patched kernel crashed in the same manner:
+> > > > [ 2214.154278] kernel BUG at net/ipv4/tcp_output.c:2642!
 
-Removing that remark seems in order.
+Hi Eric, do you think we can try something to avoid the crash?
+Decreasing tcp_wmem[0] did not help
+# cat /proc/sys/net/ipv4/tcp_wmem
+4096 1048576 629145
 
-> 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  .../bindings/net/dsa/marvell,mv88e6xxx.yaml        | 243 +++++++++++++++++++++
->  .../devicetree/bindings/net/dsa/marvell.txt        | 109 ---------
->  MAINTAINERS                                        |   2 +-
->  3 files changed, 244 insertions(+), 110 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
-> new file mode 100644
-> index 000000000000..954db04147f8
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
-> @@ -0,0 +1,243 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Marvell MV88E6xxx DSA switch family
-> +
-> +maintainers:
-> +  - Andrew Lunn <andrew@lunn.ch>
-> +
-> +description:
-> +  The Marvell MV88E6xxx switch series has been produced and sold
-> +  by Marvell since at least 2010. The switch has a few compatibles which
-> +  just indicate the base address of the switch, then operating systems
-> +  can investigate switch ID registers to find out which actual version
-> +  of the switch it is dealing with.
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - enum:
-> +          - marvell,mv88e6085
-> +          - marvell,mv88e6190
-> +          - marvell,mv88e6250
-> +    description: |
-> +      marvell,mv88e6085: This switch uses base address 0x10.
-> +        This switch and its siblings will be autodetected from
-> +        ID registers found in the switch, so only "marvell,mv88e6085" should be
-> +        specified. This includes the following list of MV88Exxxx switches:
-> +        6085, 6095, 6097, 6123, 6131, 6141, 6161, 6165, 6171, 6172, 6175, 6176,
-> +        6185, 6240, 6320, 6321, 6341, 6350, 6351, 6352
-> +      marvell,mv88e6190: This switch uses base address 0x00.
-> +        This switch and its siblings will be autodetected from
-> +        ID registers found in the switch, so only "marvell,mv88e6190" should be
-> +        specified. This includes the following list of MV88Exxxx switches:
-> +        6190, 6190X, 6191, 6290, 6361, 6390, 6390X
-> +      marvell,mv88e6250: This switch uses base address 0x08 or 0x18.
-> +        This switch and its siblings will be autodetected from
-> +        ID registers found in the switch, so only "marvell,mv88e6250" should be
-> +        specified. This includes the following list of MV88Exxxx switches:
-> +        6220, 6250
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  eeprom-length:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: Set to the length of an EEPROM connected to the switch. Must be
-> +      set if the switch can not detect the presence and/or size of a connected
-> +      EEPROM, otherwise optional.
-> +
-> +  reset-gpios:
-> +    description:
-> +      GPIO to be used to reset the whole device
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    description: The switch provides an external interrupt line, but it is
-> +      not always used by target systems.
-> +    maxItems: 1
-> +
-> +  interrupt-controller:
-> +    description: The switch has an internal interrupt controller used by
-> +      the different sub-blocks.
-> +
-> +  '#interrupt-cells':
-> +    description: The internal interrupt controller only supports triggering
-> +      on active high level interrupts so the second cell must alway be set to
-> +      IRQ_TYPE_LEVEL_HIGH.
-> +    const: 2
-> +
-> +  mdio:
-> +    $ref: /schemas/net/mdio.yaml#
-> +    unevaluatedProperties: false
-> +    description: Marvell MV88E6xxx switches have an varying combination of
-> +    internal and external MDIO buses, in some cases a combined bus that
-> +    can be used both internally and externally. This node is for the
-> +    primary bus, used internally and sometimes also externally.
-> +
-> +  mdio-external:
-> +    $ref: /schemas/net/mdio.yaml#
-> +    unevaluatedProperties: false
-> +    description: Marvell MV88E6xxx switches that have a separate external
-> +      MDIO bus use this port to access external components on the MDIO bus.
-> +
-> +    properties:
-> +      compatible:
-> +        const: marvell,mv88e6xxx-mdio-external
-> +
-> +    required:
-> +      - compatible
-> +
-> +$ref: dsa.yaml#
-> +
-> +patternProperties:
-> +  "^(ethernet-)?ports$":
-> +    type: object
-> +    patternProperties:
-> +      "^(ethernet-)?port@[0-9]+$":
-> +        type: object
-> +        description: Ethernet switch ports
-> +
-> +        $ref: dsa-port.yaml#
-> +
-> +        unevaluatedProperties: false
-> +
-> +oneOf:
-> +  - required:
-> +      - ports
-> +  - required:
-> +      - ethernet-ports
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +    #include <dt-bindings/interrupt-controller/irq.h>
-> +    mdio {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        switch0: switch@0 {
-
-ethernet-switch is preferred
-
-> +            compatible = "marvell,mv88e6085";
-> +            reg = <0>;
-> +            reset-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
-> +            interrupt-parent = <&gpio0>;
-
-I don't see interrupt-parent as an accepted property in the schema.
-Should interrupts-extended also be accepted?
-
-> +            interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
-> +            interrupt-controller;
-> +            #interrupt-cells = <2>;
-> +
-> +            ports {
-
-ethernet-ports is preferred
-
-> +                #address-cells = <1>;
-> +                #size-cells = <0>;
-> +
-> +                port@0 {
-> +                    reg = <0>;
-> +                    label = "lan1";
-> +                };
-> +                port@1 {
-> +                    reg = <1>;
-> +                    label = "lan2";
-> +                };
-> +                port@2 {
-> +                    reg = <2>;
-> +                    label = "lan3";
-> +                };
-> +                port@3 {
-> +                    reg = <3>;
-> +                    label = "lan4";
-> +                };
-> +                port@4 {
-> +                    reg = <4>;
-> +                    label = "wan";
-> +                };
-> +
-> +                port@5 {
-> +                    reg = <5>;
-> +                    phy-mode = "sgmii";
-> +                    ethernet = <&eth2>;
-> +
-> +                    fixed-link {
-> +                        speed = <1000>;
-> +                        full-duplex;
-> +                    };
-> +                };
-> +            };
-> +
-> +            mdio {
-> +                #address-cells = <1>;
-> +                #size-cells = <0>;
-
-One blank link here
-
-> +                switch0phy0: switch0phy@0 {
-
-ethernet-phy@0
-
-> +                    reg = <0>;
-> +                    interrupt-parent = <&switch0>;
-> +                    interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
-
-interrupts-extended = <&switch0 0 IRQ_TYPE_LEVEL_HIGH>; would be shorter
-
-> +                };
-> +            };
-> +        };
-> +    };
-> +
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +    #include <dt-bindings/interrupt-controller/irq.h>
-> +    mdio {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        switch1: switch@0 {
-> +            compatible = "marvell,mv88e6190";
-> +            reg = <0>;
-> +            reset-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
-> +            interrupt-parent = <&gpio0>;
-> +            interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
-> +            interrupt-controller;
-> +            #interrupt-cells = <2>;
-> +
-> +            ports {
-> +                #address-cells = <1>;
-> +                #size-cells = <0>;
-> +
-> +                port@0 {
-> +                    reg = <0>;
-> +                    label = "lan1";
-> +                };
-> +                port@1 {
-> +                    reg = <1>;
-> +                    label = "lan2";
-> +                };
-> +                port@2 {
-> +                    reg = <2>;
-> +                    label = "lan3";
-> +                };
-> +                port@3 {
-> +                    reg = <3>;
-> +                    label = "lan4";
-> +                };
-
-FWIW, this example would be rejected by real-life DSA, because a CPU
-port is missing (no port has an "ethernet" phandle).
-
-> +            };
-> +
-> +            mdio {
-> +                #address-cells = <1>;
-> +                #size-cells = <0>;
-> +                switch1phy0: switch1phy@0 {
-
-ethernet-phy@0
-
-> +                    reg = <0>;
-> +                    interrupt-parent = <&switch1>;
-> +                    interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
-> +                };
-> +            };
-> +
-> +            mdio-external {
-> +                compatible = "marvell,mv88e6xxx-mdio-external";
-> +                #address-cells = <1>;
-> +                #size-cells = <0>;
-> +                switch1phy9: switch1phy@9 {
-
-ethernet-phy@9
-
-> +                    reg = <9>;
-> +                };
-> +            };
-> +        };
-> +    };
+> > >
+> >
+> >
+> > --
+> > --
 
