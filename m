@@ -1,400 +1,150 @@
-Return-Path: <netdev+bounces-41344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1361F7CAA38
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:46:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C603B7CA953
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12AB51C20AA0
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:46:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E097B20CE1
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 13:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F2BA28DAB;
-	Mon, 16 Oct 2023 13:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961AA27EDC;
+	Mon, 16 Oct 2023 13:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="FmHrLZiK"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="lXfrO1fs"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEADD2868A
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:45:40 +0000 (UTC)
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69BAB13E;
-	Mon, 16 Oct 2023 06:45:34 -0700 (PDT)
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Mon, 16 Oct 2023 15:45:33 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
-	t=1697463933; bh=izObkuWYieNPEzOpLEXnNiKd9Ga6Rekym0GPM8tGX2Q=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FmHrLZiKk3d6UUmVQdFy+QqddN2VaJv0R4C2WygAbLT1TIEr5sE/m2hH/MKYNPPAc
-	 Pxnx4hOQf3QT5+2Pu9OSfBHSN2Rg0xnAbyAkgOwaBifoUL64dkVMbkwkltdrJ/DrYF
-	 2PJzUeltsc8zA/NXK5qfU/p07GJ0ImSxhaDntJv4=
-Received: from localhost (unknown [172.17.88.63])
-	by mail-auth.avm.de (Postfix) with ESMTPSA id CA92380A2D;
-	Mon, 16 Oct 2023 15:45:32 +0200 (CEST)
-From: Johannes Nixdorf <jnixdorf-oss@avm.de>
-Date: Mon, 16 Oct 2023 15:27:24 +0200
-Subject: [PATCH net-next v5 5/5] selftests: forwarding:
- bridge_fdb_learning_limit: Add a new selftest
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70BA26E16
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 13:28:36 +0000 (UTC)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ECADD9
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:28:35 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1ca72f8ff3aso5574765ad.0
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 06:28:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1697462915; x=1698067715; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4aBj7JQ+keXNLTEJI81zHdQbbGhY/4fEWPU2oi6ixMU=;
+        b=lXfrO1fsMGC5QLgGqwDORzAfq3rDCA3w7RGXyf2iWe3WmQWfS44Lf+j+p+44eXbyls
+         o1R5kvy5gbTf20U9X1yBdcu1Bd8GOAVfAHvVWO9/R98BQRSyJDmED7IUFJnEc5DhvQjL
+         nrOOOO+V3jXUJVWnfpMMLKnN/Wdbc+YxaUKl+aGBZfoTWZ61hNyHRoWvdrv63EakqxYC
+         X9FZo5jchidkdqa8fl5bUixZE9gaY96K9J866QLg4u6Q0w6RgPmyF5RIyL9V4fhCwKwd
+         Kcppcid4aFkRU0kITziw+Z05zPvg5BykAk8c5zwzuo2FQd6ZF18d2OJtQMIBy3kemfaq
+         JDSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697462915; x=1698067715;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4aBj7JQ+keXNLTEJI81zHdQbbGhY/4fEWPU2oi6ixMU=;
+        b=pB73+udb58q2B5EE0aWIkRMM1uqjO4bJLIj/YdLh1ga5AjUDk9Q8S+ycH49c1O/tpG
+         wNLa+ztHZPv9oee2zTpxnYNORiAxcyNDiRPHJxaLjOh/xvATydPU8jXZwaMgiMRXXn/o
+         d96+MXjgB8xOXR5KryvvTwOutWsqEcAuR1CdodSjU3LHMyElwksGPx8px9Y+dwtEfAZI
+         UfMpl0zOfjNnFo0MqAV1G1whWKgWgPdO4MF6wmJ0A8gyd1cfxxqnK3fYdTZfOmBXLOqy
+         PKCCbi6SvVz9XtcowR4ztOqNdGSFYSh0aMGWrxW1z/42QEpz00PRNe3KWxPvyEPrgWMr
+         8u5Q==
+X-Gm-Message-State: AOJu0Yy5O5PLSOTwYg5hZDucoNx9H3y5iK2LOxslecxcsLc0dmOvaQ9s
+	6U2eMLkj4LjZvpdwquKUBCr5HQ==
+X-Google-Smtp-Source: AGHT+IGJ3DtPhfQwjYL4m3gc8AKJVML01Aff6rf6yFGw99xFhjdJoNkI5UMftZbSgs4Sf+513AQsog==
+X-Received: by 2002:a17:902:f907:b0:1c9:e6a0:edb6 with SMTP id kw7-20020a170902f90700b001c9e6a0edb6mr7341216plb.2.1697462914871;
+        Mon, 16 Oct 2023 06:28:34 -0700 (PDT)
+Received: from C02DV8HUMD6R.bytedance.net ([203.208.167.147])
+        by smtp.gmail.com with ESMTPSA id l21-20020a170902d35500b001c737950e4dsm8476287plk.2.2023.10.16.06.28.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 06:28:34 -0700 (PDT)
+From: Abel Wu <wuyun.abel@bytedance.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shakeel Butt <shakeelb@google.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Abel Wu <wuyun.abel@bytedance.com>
+Subject: [PATCH net-next v2 1/3] sock: Code cleanup on __sk_mem_raise_allocated()
+Date: Mon, 16 Oct 2023 21:28:10 +0800
+Message-Id: <20231016132812.63703-1-wuyun.abel@bytedance.com>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231016-fdb_limit-v5-5-32cddff87758@avm.de>
-References: <20231016-fdb_limit-v5-0-32cddff87758@avm.de>
-In-Reply-To: <20231016-fdb_limit-v5-0-32cddff87758@avm.de>
-To: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>, 
- David Ahern <dsahern@gmail.com>, Eric Dumazet <edumazet@google.com>, 
- Florian Fainelli <f.fainelli@gmail.com>, Ido Schimmel <idosch@nvidia.com>, 
- Jakub Kicinski <kuba@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, 
- Oleksij Rempel <linux@rempel-privat.de>, Paolo Abeni <pabeni@redhat.com>, 
- Roopa Prabhu <roopa@nvidia.com>, Shuah Khan <shuah@kernel.org>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: bridge@lists.linux-foundation.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Johannes Nixdorf <jnixdorf-oss@avm.de>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1697462840; l=7339;
- i=jnixdorf-oss@avm.de; s=20230906; h=from:subject:message-id;
- bh=izObkuWYieNPEzOpLEXnNiKd9Ga6Rekym0GPM8tGX2Q=;
- b=J92g9W980J4VvlbuvBioz6YU5/+tYwVHJQ0IhRZQGe6GT/3YLYb6+gGkYmvFZ50q3O/YMVGRi
- 6H5xTyTYYDECeStELimbjoFCVmMvjTSFnIa2EbFzppuklrImuIqxDCS
-X-Developer-Key: i=jnixdorf-oss@avm.de; a=ed25519;
- pk=KMraV4q7ANHRrwjf9EVhvU346JsqGGNSbPKeNILOQfo=
-X-purgate-ID: 149429::1697463933-43E2D79D-59FC9709/0/0
-X-purgate-type: clean
-X-purgate-size: 7341
-X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
-X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
-X-purgate: clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a suite covering the fdb_n_learned and fdb_max_learned bridge
-features, touching all special cases in accounting at least once.
+Code cleanup for both better simplicity and readability.
+No functional change intended.
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
-Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
+Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
+Acked-by: Shakeel Butt <shakeelb@google.com>
 ---
- tools/testing/selftests/net/forwarding/Makefile    |   3 +-
- .../net/forwarding/bridge_fdb_learning_limit.sh    | 283 +++++++++++++++++++++
- 2 files changed, 285 insertions(+), 1 deletion(-)
+ net/core/sock.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/Makefile b/tools/testing/selftests/net/forwarding/Makefile
-index 74e754e266c3..df593b7b3e6b 100644
---- a/tools/testing/selftests/net/forwarding/Makefile
-+++ b/tools/testing/selftests/net/forwarding/Makefile
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0+ OR MIT
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 290165954379..43842520db86 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3039,17 +3039,19 @@ EXPORT_SYMBOL(sk_wait_data);
+  */
+ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
+ {
+-	bool memcg_charge = mem_cgroup_sockets_enabled && sk->sk_memcg;
++	struct mem_cgroup *memcg = mem_cgroup_sockets_enabled ? sk->sk_memcg : NULL;
+ 	struct proto *prot = sk->sk_prot;
+-	bool charged = true;
++	bool charged = false;
+ 	long allocated;
  
--TEST_PROGS = bridge_igmp.sh \
-+TEST_PROGS = bridge_fdb_learning_limit.sh \
-+	bridge_igmp.sh \
- 	bridge_locked_port.sh \
- 	bridge_mdb.sh \
- 	bridge_mdb_host.sh \
-diff --git a/tools/testing/selftests/net/forwarding/bridge_fdb_learning_limit.sh b/tools/testing/selftests/net/forwarding/bridge_fdb_learning_limit.sh
-new file mode 100755
-index 000000000000..0760a34b7114
---- /dev/null
-+++ b/tools/testing/selftests/net/forwarding/bridge_fdb_learning_limit.sh
-@@ -0,0 +1,283 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# ShellCheck incorrectly believes that most of the code here is unreachable
-+# because it's invoked by variable name following ALL_TESTS.
-+#
-+# shellcheck disable=SC2317
-+
-+ALL_TESTS="check_accounting check_limit"
-+NUM_NETIFS=6
-+source lib.sh
-+
-+TEST_MAC_BASE=de:ad:be:ef:42:
-+
-+NUM_PKTS=16
-+FDB_LIMIT=8
-+
-+FDB_TYPES=(
-+	# name		is counted?	overrides learned?
-+	'learned	1		0'
-+	'static		0		1'
-+	'user		0		1'
-+	'extern_learn	0		1'
-+	'local		0		1'
-+)
-+
-+mac()
-+{
-+	printf "${TEST_MAC_BASE}%02x" "$1"
-+}
-+
-+H1_DEFAULT_MAC=$(mac 42)
-+
-+switch_create()
-+{
-+	ip link add dev br0 type bridge
-+
-+	ip link set dev "$swp1" master br0
-+	ip link set dev "$swp2" master br0
-+	# swp3 is used to add local MACs, so do not add it to the bridge yet.
-+
-+	# swp2 is only used for replying when learning on swp1, its MAC should not be learned.
-+	ip link set dev "$swp2" type bridge_slave learning off
-+
-+	ip link set dev br0 up
-+
-+	ip link set dev "$swp1" up
-+	ip link set dev "$swp2" up
-+	ip link set dev "$swp3" up
-+}
-+
-+switch_destroy()
-+{
-+	ip link set dev "$swp3" down
-+	ip link set dev "$swp2" down
-+	ip link set dev "$swp1" down
-+
-+	ip link del dev br0
-+}
-+
-+h_create()
-+{
-+	ip link set "$h1" addr "$H1_DEFAULT_MAC"
-+
-+	simple_if_init "$h1" 192.0.2.1/24
-+	simple_if_init "$h2" 192.0.2.2/24
-+}
-+
-+h_destroy()
-+{
-+	simple_if_fini "$h1" 192.0.2.1/24
-+	simple_if_fini "$h2" 192.0.2.2/24
-+}
-+
-+setup_prepare()
-+{
-+	h1=${NETIFS[p1]}
-+	swp1=${NETIFS[p2]}
-+
-+	h2=${NETIFS[p3]}
-+	swp2=${NETIFS[p4]}
-+
-+	swp3=${NETIFS[p6]}
-+
-+	vrf_prepare
-+
-+	h_create
-+
-+	switch_create
-+}
-+
-+cleanup()
-+{
-+	pre_cleanup
-+
-+	switch_destroy
-+
-+	h_destroy
-+
-+	vrf_cleanup
-+}
-+
-+fdb_get_n_learned()
-+{
-+	ip -d -j link show dev br0 type bridge | \
-+		jq '.[]["linkinfo"]["info_data"]["fdb_n_learned"]'
-+}
-+
-+fdb_get_n_mac()
-+{
-+	local mac=${1}
-+
-+	bridge -j fdb show br br0 | \
-+		jq "map(select(.mac == \"${mac}\" and (has(\"vlan\") | not))) | length"
-+}
-+
-+fdb_fill_learned()
-+{
-+	local i
-+
-+	for i in $(seq 1 "$NUM_PKTS"); do
-+		fdb_add learned "$(mac "$i")"
-+	done
-+}
-+
-+fdb_reset()
-+{
-+	bridge fdb flush dev br0
-+
-+	# Keep the default MAC address of h1 in the table. We set it to a different one when
-+	# testing dynamic learning.
-+	bridge fdb add "$H1_DEFAULT_MAC" dev "$swp1" master static use
-+}
-+
-+fdb_add()
-+{
-+	local type=$1 mac=$2
-+
-+	case "$type" in
-+		learned)
-+			ip link set "$h1" addr "$mac"
-+			# Wait for a reply so we implicitly wait until after the forwarding
-+			# code finished and the FDB entry was created.
-+			PING_COUNT=1 ping_do "$h1" 192.0.2.2
-+			check_err $? "Failed to ping another bridge port"
-+			ip link set "$h1" addr "$H1_DEFAULT_MAC"
-+			;;
-+		local)
-+			ip link set dev "$swp3" addr "$mac" && ip link set "$swp3" master br0
-+			;;
-+		static)
-+			bridge fdb replace "$mac" dev "$swp1" master static
-+			;;
-+		user)
-+			bridge fdb replace "$mac" dev "$swp1" master static use
-+			;;
-+		extern_learn)
-+			bridge fdb replace "$mac" dev "$swp1" master extern_learn
-+			;;
-+	esac
-+
-+	check_err $? "Failed to add a FDB entry of type ${type}"
-+}
-+
-+fdb_del()
-+{
-+	local type=$1 mac=$2
-+
-+	case "$type" in
-+		local)
-+			ip link set "$swp3" nomaster
-+			;;
-+		*)
-+			bridge fdb del "$mac" dev "$swp1" master
-+			;;
-+	esac
-+
-+	check_err $? "Failed to remove a FDB entry of type ${type}"
-+}
-+
-+check_accounting_one_type()
-+{
-+	local type=$1 is_counted=$2 overrides_learned=$3
-+	shift 3
-+	RET=0
-+
-+	fdb_reset
-+	fdb_add "$type" "$(mac 0)"
-+	learned=$(fdb_get_n_learned)
-+	[ "$learned" -ne "$is_counted" ]
-+	check_fail $? "Inserted FDB type ${type}: Expected the count ${is_counted}, but got ${learned}"
-+
-+	fdb_del "$type" "$(mac 0)"
-+	learned=$(fdb_get_n_learned)
-+	[ "$learned" -ne 0 ]
-+	check_fail $? "Removed FDB type ${type}: Expected the count 0, but got ${learned}"
-+
-+	if [ "$overrides_learned" -eq 1 ]; then
-+		fdb_reset
-+		fdb_add learned "$(mac 0)"
-+		fdb_add "$type" "$(mac 0)"
-+		learned=$(fdb_get_n_learned)
-+		[ "$learned" -ne "$is_counted" ]
-+		check_fail $? "Set a learned entry to FDB type ${type}: Expected the count ${is_counted}, but got ${learned}"
-+		fdb_del "$type" "$(mac 0)"
-+	fi
-+
-+	log_test "FDB accounting interacting with FDB type ${type}"
-+}
-+
-+check_accounting()
-+{
-+	local type_args learned
-+	RET=0
-+
-+	fdb_reset
-+	learned=$(fdb_get_n_learned)
-+	[ "$learned" -ne 0 ]
-+	check_fail $? "Flushed the FDB table: Expected the count 0, but got ${learned}"
-+
-+	fdb_fill_learned
-+	sleep 1
-+
-+	learned=$(fdb_get_n_learned)
-+	[ "$learned" -ne "$NUM_PKTS" ]
-+	check_fail $? "Filled the FDB table: Expected the count ${NUM_PKTS}, but got ${learned}"
-+
-+	log_test "FDB accounting"
-+
-+	for type_args in "${FDB_TYPES[@]}"; do
-+		# This is intentional use of word splitting.
-+		# shellcheck disable=SC2086
-+		check_accounting_one_type $type_args
-+	done
-+}
-+
-+check_limit_one_type()
-+{
-+	local type=$1 is_counted=$2
-+	local n_mac expected=$((1 - is_counted))
-+	RET=0
-+
-+	fdb_reset
-+	fdb_fill_learned
-+
-+	fdb_add "$type" "$(mac 0)"
-+	n_mac=$(fdb_get_n_mac "$(mac 0)")
-+	[ "$n_mac" -ne "$expected" ]
-+	check_fail $? "Inserted FDB type ${type} at limit: Expected the count ${expected}, but got ${n_mac}"
-+
-+	log_test "FDB limits interacting with FDB type ${type}"
-+}
-+
-+check_limit()
-+{
-+	local learned
-+	RET=0
-+
-+	ip link set br0 type bridge fdb_max_learned "$FDB_LIMIT"
-+
-+	fdb_reset
-+	fdb_fill_learned
-+
-+	learned=$(fdb_get_n_learned)
-+	[ "$learned" -ne "$FDB_LIMIT" ]
-+	check_fail $? "Filled the limited FDB table: Expected the count ${FDB_LIMIT}, but got ${learned}"
-+
-+	log_test "FDB limits"
-+
-+	for type_args in "${FDB_TYPES[@]}"; do
-+		# This is intentional use of word splitting.
-+		# shellcheck disable=SC2086
-+		check_limit_one_type $type_args
-+	done
-+}
-+
-+trap cleanup EXIT
-+
-+setup_prepare
-+
-+tests_run
-+
-+exit $EXIT_STATUS
-
+ 	sk_memory_allocated_add(sk, amt);
+ 	allocated = sk_memory_allocated(sk);
+-	if (memcg_charge &&
+-	    !(charged = mem_cgroup_charge_skmem(sk->sk_memcg, amt,
+-						gfp_memcg_charge())))
+-		goto suppress_allocation;
++
++	if (memcg) {
++		if (!mem_cgroup_charge_skmem(memcg, amt, gfp_memcg_charge()))
++			goto suppress_allocation;
++		charged = true;
++	}
+ 
+ 	/* Under limit. */
+ 	if (allocated <= sk_prot_mem_limits(sk, 0)) {
+@@ -3104,8 +3106,8 @@ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
+ 		 */
+ 		if (sk->sk_wmem_queued + size >= sk->sk_sndbuf) {
+ 			/* Force charge with __GFP_NOFAIL */
+-			if (memcg_charge && !charged) {
+-				mem_cgroup_charge_skmem(sk->sk_memcg, amt,
++			if (memcg && !charged) {
++				mem_cgroup_charge_skmem(memcg, amt,
+ 					gfp_memcg_charge() | __GFP_NOFAIL);
+ 			}
+ 			return 1;
+@@ -3117,8 +3119,8 @@ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
+ 
+ 	sk_memory_allocated_sub(sk, amt);
+ 
+-	if (memcg_charge && charged)
+-		mem_cgroup_uncharge_skmem(sk->sk_memcg, amt);
++	if (charged)
++		mem_cgroup_uncharge_skmem(memcg, amt);
+ 
+ 	return 0;
+ }
 -- 
-2.42.0
+2.37.3
 
 
