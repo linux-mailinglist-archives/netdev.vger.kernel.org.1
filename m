@@ -1,145 +1,124 @@
-Return-Path: <netdev+bounces-41146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA13C7C9F36
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:50:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22C207C9F1A
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 07:48:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E059A1C2048D
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 05:50:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B7821C2091B
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 05:48:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A13E1549C;
-	Mon, 16 Oct 2023 05:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1097AF50A;
+	Mon, 16 Oct 2023 05:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RE1OhfRU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WWU1oiPl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0961014F8C
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 05:48:42 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B222F7;
-	Sun, 15 Oct 2023 22:48:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=Y9DUw/dY172Zls+LRmOYmL30GnIrMabtQP9ggTJL0d8=; b=RE1OhfRU8CYhr7JH6VVDgiplTC
-	gjX3zJyGEe0eyRXQO2v84UfNP9kxd+gvBYj5cYvHZT5Hb+C2bWuiL0Eq5T/MRz9Z1X20ZWW/Rj0GD
-	ffAoypglXTNsoXYikcZIoJIoBCqHijes44y3x10ny1i8ygX5UJPTC/XbxlsGIHa+AQ1fZlD73wnj4
-	fB7uqpCtygxiNMPuHVhF0NHZwH5r9ICNexDt6VFaWcV0KKrhy/Or1+JbMw3ms9w8qvyUOKCKicOc8
-	gHFF2aJrnlt1sG87jjJdVY2r7Y4x2GdxUDJ70y/AMRNQWEmzwWa7kZpPe3qLM9E60mv5FbBsQF1vv
-	5gp46UxA==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qsGSo-008Qyh-10;
-	Mon, 16 Oct 2023 05:48:26 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Greg Ungerer <gerg@linux-m68k.org>,
-	iommu@lists.linux.dev
-Cc: Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Conor Dooley <conor@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	linux-m68k@lists.linux-m68k.org,
-	netdev@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org,
-	Jim Quinlan <james.quinlan@broadcom.com>
-Subject: [PATCH 11/12] m68k: don't provide arch_dma_alloc for nommu/coldfire
-Date: Mon, 16 Oct 2023 07:47:53 +0200
-Message-Id: <20231016054755.915155-12-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231016054755.915155-1-hch@lst.de>
-References: <20231016054755.915155-1-hch@lst.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1D0C8C0
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 05:48:00 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09BCD95
+	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 22:47:59 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40666aa674fso40952865e9.0
+        for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 22:47:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697435277; x=1698040077; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=APqyNWoGiniVbLUmpGHDy/Anj/nDAihOoYwD68G5Kvc=;
+        b=WWU1oiPlc2oIE3KUL3ECJKHqPSwtY7jmAM8/djDse3R9aZ3mxcrbCKET+DXtdvMc2L
+         C3IfIUhp5c1pL2GmgF8zG2UZQi3pIfShRxWF6GWnMLQmyEMdZg9+MdLoCkDr//A8EqH8
+         K4EmYcPbFpeosN1CQg5Yr5CRGYBtR9UjTbT0vFGTQMDHSW0MWWg4DEU9pmiWe8CAc8/g
+         d1xs8+MPshvxhuA4L2E3vTM0u8vEEAAvNTVzCmztn3N4QAVaMYteWMp9mPQFnmYHfkZW
+         CYJDG8EN3StEWsqe+n5wcV3NTcs44itulq4wOIOq4NFlSQZwlVAWOXGpeVwRZcAoJbVC
+         c3YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697435277; x=1698040077;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=APqyNWoGiniVbLUmpGHDy/Anj/nDAihOoYwD68G5Kvc=;
+        b=IxznG/UjcrKZnSBYluwBzA5ZgVhdXpR0COMFgavors9pScYAoVDk13IYqnpo1RKZM8
+         ZVXk59jDU3I+DlABRqKiRa5FcnoqoI7wrWMPcj4aSmzGzh31kp1RDpeejr4KBYLTj9L3
+         bvNxyxoR4nERLMaAaL7YH/SEpu8e7Xio/eAX6uAMipCJoBOqbxmDboHBlzKon43bgOd+
+         Ijs0k/avH5o6BiT8vK7IJh+IzSm0EWTHkjvyAOaMlDVwOwRSQU/he8yza2qGP/2sUau0
+         +kEc22FE8Hlf6gDbMtmkMC7Q+jPS5BIIviHX1bxPh3aKlpR1KGwlsQH50Vfc7YN0PsaT
+         g8Sw==
+X-Gm-Message-State: AOJu0Yw0GY44PmPOJlDCx7K7fpll+dzJXLsjD2RCdiKzj4nu9J40vZue
+	H+3opaJZKvQJAaKeHOewpUm1kA==
+X-Google-Smtp-Source: AGHT+IEqFBJmt4qwktiIeWcTfadTv5RQBY42SkmYDcKqxJZy53DlvvoIzGgZ3IbRwu3jJLQlcNIdvw==
+X-Received: by 2002:a05:600c:2298:b0:3fe:1af6:6542 with SMTP id 24-20020a05600c229800b003fe1af66542mr27821090wmf.33.1697435277411;
+        Sun, 15 Oct 2023 22:47:57 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id 13-20020a05600c230d00b004068495910csm6156468wmo.23.2023.10.15.22.47.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Oct 2023 22:47:56 -0700 (PDT)
+Date: Mon, 16 Oct 2023 08:47:53 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Justin Stitt <justinstitt@google.com>,
+	Thomas Sailer <t.sailer@alumni.ethz.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] hamradio: replace deprecated strncpy with strscpy
+Message-ID: <ede96908-76ff-473c-a5e1-39e2ce130df9@kadam.mountain>
+References: <20231012-strncpy-drivers-net-hamradio-baycom_epp-c-v1-1-8f4097538ee4@google.com>
+ <20231015150619.GC1386676@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231015150619.GC1386676@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Coldfire cores configured with a data cache can't provide coherent
-DMA allocations at all.
+On Sun, Oct 15, 2023 at 05:06:19PM +0200, Simon Horman wrote:
+> On Thu, Oct 12, 2023 at 09:33:32PM +0000, Justin Stitt wrote:
+> > strncpy() is deprecated for use on NUL-terminated destination strings
+> > [1] and as such we should prefer more robust and less ambiguous string
+> > interfaces.
+> > 
+> > We expect both hi.data.modename and hi.data.drivername to be
+> > NUL-terminated but not necessarily NUL-padded which is evident by its
+> > usage with sprintf:
+> > |       sprintf(hi.data.modename, "%sclk,%smodem,fclk=%d,bps=%d%s",
+> > |               bc->cfg.intclk ? "int" : "ext",
+> > |               bc->cfg.extmodem ? "ext" : "int", bc->cfg.fclk, bc->cfg.bps,
+> > |               bc->cfg.loopback ? ",loopback" : "");
+> > 
+> > Note that this data is copied out to userspace with:
+> > |       if (copy_to_user(data, &hi, sizeof(hi)))
+> > ... however, the data was also copied FROM the user here:
+> > |       if (copy_from_user(&hi, data, sizeof(hi)))
+> 
+> Thanks Justin,
+> 
+> I see that too.
+> 
+> Perhaps I am off the mark here, and perhaps it's out of scope for this
+> patch, but I do think it would be nicer if the kernel only sent
+> intended data to user-space, even if any unintended payload came
+> from user-space.
+> 
 
-Instead of returning non-coherent kernel memory in this case,
-return NULL and fail the allocation.
+It's kind of normal to pass user space data back to itself.  We
+generally only worry about info leaks.
 
-The only driver that used to rely on the previous behavior (fec) has
-been switched to use non-coherent allocations for this case recently.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- arch/m68k/Kconfig      |  1 -
- arch/m68k/kernel/dma.c | 23 -----------------------
- 2 files changed, 24 deletions(-)
-
-diff --git a/arch/m68k/Kconfig b/arch/m68k/Kconfig
-index 6c585eae89f4dc..c1c0faffb0d413 100644
---- a/arch/m68k/Kconfig
-+++ b/arch/m68k/Kconfig
-@@ -3,7 +3,6 @@ config M68K
- 	bool
- 	default y
- 	select ARCH_32BIT_OFF_T
--	select ARCH_DMA_ALLOC if M68K_NONCOHERENT_DMA && COLDFIRE
- 	select ARCH_HAS_BINFMT_FLAT
- 	select ARCH_HAS_CPU_FINALIZE_INIT if MMU
- 	select ARCH_HAS_CURRENT_STACK_POINTER
-diff --git a/arch/m68k/kernel/dma.c b/arch/m68k/kernel/dma.c
-index f83870cfa79b37..eef63d032abb53 100644
---- a/arch/m68k/kernel/dma.c
-+++ b/arch/m68k/kernel/dma.c
-@@ -33,29 +33,6 @@ pgprot_t pgprot_dmacoherent(pgprot_t prot)
- 	}
- 	return prot;
- }
--#else
--void *arch_dma_alloc(struct device *dev, size_t size, dma_addr_t *dma_handle,
--		gfp_t gfp, unsigned long attrs)
--{
--	void *ret;
--
--	if (dev == NULL || (*dev->dma_mask < 0xffffffff))
--		gfp |= GFP_DMA;
--	ret = (void *)__get_free_pages(gfp, get_order(size));
--
--	if (ret != NULL) {
--		memset(ret, 0, size);
--		*dma_handle = virt_to_phys(ret);
--	}
--	return ret;
--}
--
--void arch_dma_free(struct device *dev, size_t size, void *vaddr,
--		dma_addr_t dma_handle, unsigned long attrs)
--{
--	free_pages((unsigned long)vaddr, get_order(size));
--}
--
- #endif /* CONFIG_MMU && !CONFIG_COLDFIRE */
- 
- void arch_sync_dma_for_device(phys_addr_t handle, size_t size,
--- 
-2.39.2
+regards,
+dan carpenter
 
 
