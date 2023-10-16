@@ -1,192 +1,118 @@
-Return-Path: <netdev+bounces-41129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C3477C9DA8
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 05:17:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BC7B7C9E0B
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 05:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2715D28165F
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 03:17:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BF5E1F218BF
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 03:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E220185C;
-	Mon, 16 Oct 2023 03:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76BD63CA;
+	Mon, 16 Oct 2023 03:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="efevaxTD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mhq42raT"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EAD187C
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 03:17:11 +0000 (UTC)
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D4DAD9
-	for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 20:17:08 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1c9b7c234a7so35072235ad.3
-        for <netdev@vger.kernel.org>; Sun, 15 Oct 2023 20:17:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7755EA8
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 03:54:20 +0000 (UTC)
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 285DEAD;
+	Sun, 15 Oct 2023 20:54:17 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-3513c435465so9510535ab.0;
+        Sun, 15 Oct 2023 20:54:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1697426228; x=1698031028; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+gcDF6obS9msoNGbrvp8VjI3eEmOOKndQkCumFLGk4Q=;
-        b=efevaxTDxwJGJGS0dUk31db53gixwaHeSqy55hTLRJd/aVWej4JZAd7FjlCe78XrUu
-         KFbc9UKoSoKfH/+rgsc/4sg5jS2BqBL1boHp5L9b7SnrNH/K8bUJ25R+5y2BKQjW2Mmu
-         5N83kD9Qxp5KzbvznX55REYGDQxRJKTzs28+EeGxqixG5yduhCmnGEZELYmhFoWpaUKJ
-         IXWjyDEqI9Umt/4MWUSK2muG/M4v3WDI3HvB4lQiLoqvNC67LXsQ3RM0pEbQSzAY3kyh
-         Q8rT53qDVNo/+HCx/me0NiOgSMGEib+ma27B9KxYXRC3wCrHT/+6liqO/WiPcH9JFex/
-         Ue4A==
+        d=gmail.com; s=20230601; t=1697428456; x=1698033256; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kL9vRKZWkxdmpBYxrVOOiXDRyOSSPaW0P3GH4wQ9cEk=;
+        b=mhq42raTGwJn9yXLL3Ru0L3K1S2lpdnQjnTg/eYfYw8vEPofywb7Mlv7QWuKSCJQm7
+         ZIp7jszwzB8go5LtqKkfXiuNI0LC2U69h1m5gTDof86+iGcD6zDjrIJ9ITqsljpSmm/S
+         TCG1ejjmuUgHMGGg7NAM4G+wRvCtf0DZoO6Q9fDPg4ssNWLOv98PbBeGWVGBc5V9pL5w
+         j7WpZv35At48Ydcaan77wy8nL48V+dCfFzmgD++yU9gWrUxGm6LdL4jP+RXAtZyF6vRR
+         F6x2vOcGtL2XqDstOr1Y2667QGJuRvmchv09onKxeMsJdN60g9zXAadqx2C8XM7ebReO
+         cbcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697426228; x=1698031028;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+gcDF6obS9msoNGbrvp8VjI3eEmOOKndQkCumFLGk4Q=;
-        b=ai8qdc6VmWuIgvKWh4zrbLl7fle9OVDR8N9ruKQK89DvAyucFMwPML5Xh5UYLCmzfv
-         Z9l6cKoS4TDuCiep6zucGj2jvCrLv8X2BdEfPz0GeGFM/eRsH9VaSNIRRSd5f5l3z11P
-         4z2b7skU2eGvOL0N20x4LRznO2/0zGuuIOUHyWe9sqw2CP7DpqmolabsG23wYSH6w6ZP
-         bfMimWPvgzUlZ0djMBuAZPIB9Xri7QpDxwFuaY33zc7eKoMDickhH/VV5O2/LFGYoH45
-         H5MeBh6PfLcgxImxPYe4owcVHTywHd6ffFDCh1vZZn/ikweYk1LBuf+wE+GViKgbUYh6
-         0b8w==
-X-Gm-Message-State: AOJu0YzpwZyE8jX2q3dY2XJvTn9CQfKf281UHwFVfIaKECAsYODz0z0y
-	8lDSV1WH6f7ojeGJeb2N49rTDQ==
-X-Google-Smtp-Source: AGHT+IG/AkDpyZ/tVSGq9dCcSfxYTyeru3TiqUeRhv2rK+sA9A8t/AMd1s2NWxUK8WU13xEjJOxsmw==
-X-Received: by 2002:a17:902:f14c:b0:1c9:e0f9:a668 with SMTP id d12-20020a170902f14c00b001c9e0f9a668mr8430661plb.18.1697426227817;
-        Sun, 15 Oct 2023 20:17:07 -0700 (PDT)
-Received: from C02FG34NMD6R.bytedance.net ([203.208.189.8])
-        by smtp.gmail.com with ESMTPSA id g12-20020a170902934c00b001b9da42cd7dsm7320172plp.279.2023.10.15.20.17.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Oct 2023 20:17:07 -0700 (PDT)
-From: Albert Huang <huangjie.albert@bytedance.com>
-To: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>
-Cc: Albert Huang <huangjie.albert@bytedance.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net-next] xsk: Avoid starving xsk at the end of the list
-Date: Mon, 16 Oct 2023 11:16:48 +0800
-Message-Id: <20231016031649.35088-1-huangjie.albert@bytedance.com>
-X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
+        d=1e100.net; s=20230601; t=1697428456; x=1698033256;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kL9vRKZWkxdmpBYxrVOOiXDRyOSSPaW0P3GH4wQ9cEk=;
+        b=m4Mw5/Mu40VPxn5kz3TBfkpW6lIKwMaKWg2IG7YLZ1IGdfnS0SUBhGOWwert6kidal
+         Ez0xIvQQjN1Y2BUKLiqqXw34URcspbqnEEBWXuJwHdP7gI6yrs0+E+vSkGIOsxx86p0E
+         Mvl7Eu95T4ix1LAxixC81iZcCkR7G+qLiMBtAJmzaXu9/g9OuYLt6Ui26JsW6tS6AtXO
+         JouX8YwQ8WgIDJzolWj+NUQPJgjUtQWgQmFFltuRke5FJrMf2CLWO4NULWL6+xD34TdH
+         NIsSP9viwBonSoelxERHgDDD3sCIstrz5CXvCdKM5lAKCYEUrR1SjgyKxFotVooamv29
+         mbiA==
+X-Gm-Message-State: AOJu0Yxw7tI3ei1nyNFugrOW/JAjNgScEvX+n6FDLLQ72+hEa5YtwxSL
+	bPWgVmNfGKE8Ae9yi8RBV5gCfzlfpWQ=
+X-Google-Smtp-Source: AGHT+IHexA5e9hBHSEkhXFH8IfpCuDjwX2WC62p1KEktm8eoajEtjufjcLgw+myQ/hCxU9kTYpvhCg==
+X-Received: by 2002:a92:d1d1:0:b0:34f:7e2f:b837 with SMTP id u17-20020a92d1d1000000b0034f7e2fb837mr4305115ilg.2.1697428456487;
+        Sun, 15 Oct 2023 20:54:16 -0700 (PDT)
+Received: from ?IPV6:2601:282:1e82:2350:6964:515b:e2e1:e1eb? ([2601:282:1e82:2350:6964:515b:e2e1:e1eb])
+        by smtp.googlemail.com with ESMTPSA id z16-20020a92d6d0000000b00351268dfbd5sm3113192ilp.57.2023.10.15.20.54.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 15 Oct 2023 20:54:15 -0700 (PDT)
+Message-ID: <e12077e2-ac6e-ae76-bc11-7795034df6c0@gmail.com>
+Date: Sun, 15 Oct 2023 21:54:14 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH v2 iproute2-next 2/2] rdma: Add support to dump SRQ
+ resource in raw format
+To: Junxian Huang <huangjunxian6@hisilicon.com>, jgg@ziepe.ca,
+ leon@kernel.org, stephen@networkplumber.org
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org, linuxarm@huawei.com,
+ linux-kernel@vger.kernel.org
+References: <20231010075526.3860869-1-huangjunxian6@hisilicon.com>
+ <20231010075526.3860869-3-huangjunxian6@hisilicon.com>
+Content-Language: en-US
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20231010075526.3860869-3-huangjunxian6@hisilicon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In the previous implementation, when multiple xsk sockets were
-associated with a single xsk_buff_pool, a situation could arise
-where the xsk_tx_list maintained data at the front for one xsk
-socket while starving the xsk sockets at the back of the list.
-This could result in issues such as the inability to transmit packets,
-increased latency, and jitter. To address this problem, we introduced
-a new variable called tx_budget_cache, which limits each xsk to transmit
-a maximum of MAX_XSK_TX_BUDGET tx descriptors. This allocation ensures
-equitable opportunities for subsequent xsk sockets to send tx descriptors.
-The value of MAX_XSK_TX_BUDGET is temporarily set to 16.
+On 10/10/23 1:55 AM, Junxian Huang wrote:
+> @@ -162,6 +162,20 @@ out:
+>  	return -EINVAL;
+>  }
+>  
+> +static int res_srq_line_raw(struct rd *rd, const char *name, int idx,
+> +			    struct nlattr **nla_line)
+> +{
+> +	if (!nla_line[RDMA_NLDEV_ATTR_RES_RAW])
+> +		return MNL_CB_ERROR;
+> +
+> +	open_json_object(NULL);
 
-Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
----
- include/net/xdp_sock.h |  6 ++++++
- net/xdp/xsk.c          | 18 ++++++++++++++++++
- 2 files changed, 24 insertions(+)
+open_json_object with no corresponding close.
 
-diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index 69b472604b86..f617ff54e38c 100644
---- a/include/net/xdp_sock.h
-+++ b/include/net/xdp_sock.h
-@@ -44,6 +44,7 @@ struct xsk_map {
- 	struct xdp_sock __rcu *xsk_map[];
- };
- 
-+#define MAX_XSK_TX_BUDGET 16
- struct xdp_sock {
- 	/* struct sock must be the first member of struct xdp_sock */
- 	struct sock sk;
-@@ -63,6 +64,11 @@ struct xdp_sock {
- 
- 	struct xsk_queue *tx ____cacheline_aligned_in_smp;
- 	struct list_head tx_list;
-+	/* Record the actual number of times xsk has transmitted a tx
-+	 * descriptor, with a maximum limit not exceeding MAX_XSK_TX_BUDGET
-+	 */
-+	u32 tx_budget_cache;
-+
- 	/* Protects generic receive. */
- 	spinlock_t rx_lock;
- 
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index f5e96e0d6e01..087f2675333c 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -413,16 +413,25 @@ EXPORT_SYMBOL(xsk_tx_release);
- 
- bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
- {
-+	u32 xsk_full_count = 0;
- 	struct xdp_sock *xs;
- 
- 	rcu_read_lock();
-+again:
- 	list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
-+		if (xs->tx_budget_cache >= MAX_XSK_TX_BUDGET) {
-+			xsk_full_count++;
-+			continue;
-+		}
-+
- 		if (!xskq_cons_peek_desc(xs->tx, desc, pool)) {
- 			if (xskq_has_descs(xs->tx))
- 				xskq_cons_release(xs->tx);
- 			continue;
- 		}
- 
-+		xs->tx_budget_cache++;
-+
- 		/* This is the backpressure mechanism for the Tx path.
- 		 * Reserve space in the completion queue and only proceed
- 		 * if there is space in it. This avoids having to implement
-@@ -436,6 +445,14 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
- 		return true;
- 	}
- 
-+	if (unlikely(xsk_full_count > 0)) {
-+		list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
-+			xs->tx_budget_cache = 0;
-+		}
-+		xsk_full_count = 0;
-+		goto again;
-+	}
-+
- out:
- 	rcu_read_unlock();
- 	return false;
-@@ -1230,6 +1247,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
- 	xs->zc = xs->umem->zc;
- 	xs->sg = !!(xs->umem->flags & XDP_UMEM_SG_FLAG);
- 	xs->queue_id = qid;
-+	xs->tx_budget_cache = 0;
- 	xp_add_xsk(xs->pool, xs);
- 
- out_unlock:
--- 
-2.20.1
+> +	print_dev(rd, idx, name);
+> +	print_raw_data(rd, nla_line);
+> +	newline(rd);
+> +
+> +	return MNL_CB_OK;
+> +}
+> +
+>  static int res_srq_line(struct rd *rd, const char *name, int idx,
+>  			struct nlattr **nla_line)
+>  {
+
 
 
