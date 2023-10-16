@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-41577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78A8D7CB58F
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 23:45:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DE8C7CB584
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 23:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB689B20F83
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:45:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1BED281464
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 21:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC1A38FB3;
-	Mon, 16 Oct 2023 21:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED85138F87;
+	Mon, 16 Oct 2023 21:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A8138FBE;
-	Mon, 16 Oct 2023 21:45:04 +0000 (UTC)
-Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD9CE1A8;
-	Mon, 16 Oct 2023 14:45:00 -0700 (PDT)
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-1e98e97c824so3068493fac.1;
-        Mon, 16 Oct 2023 14:45:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F250381BB;
+	Mon, 16 Oct 2023 21:44:55 +0000 (UTC)
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08E89A1;
+	Mon, 16 Oct 2023 14:44:52 -0700 (PDT)
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3af5b26d599so3734417b6e.2;
+        Mon, 16 Oct 2023 14:44:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697492699; x=1698097499;
+        d=1e100.net; s=20230601; t=1697492692; x=1698097492;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YU8u+sBPim2K3r5DGxEa61RapakHy3YnHZgIMLk+JTo=;
-        b=dCk4RORZWvICahYV8BhjukWwy0koq9FNNpKIz1ICfogDHD57gr2TCz8ue/1agVCvwB
-         9+TkA9dBWit+SW1JMoEDiwHIF7Duu7OG3uE346DyD8X476d1b5IREsKBna65N2AYfccN
-         GuMoAELOjrX63jKG1ycJmZA9EBb8KFdW8bwKSZNOCnlZ72jWRBgYMAiiSCN7iUipf2DS
-         5gcpGKnsWvE6VKsPGDRxGEQnPKhJWGHks5cIxOjJKjVcokGf6eE03ilfX+KMK3SBPVch
-         k1S9HX6crgb0JqZl58Im99wz4cqWrFbjc2hEh+UPnohXFG57frPuOyilcLWh9RnZPjhN
-         ulYw==
-X-Gm-Message-State: AOJu0YwIk+7KLYIpAL327EOzwGWPF1X5nMmgp38MczQvnLZKYTZgwgub
-	nCUXk8K3LK77uboijRcG7w==
-X-Google-Smtp-Source: AGHT+IHVJZSvo9G+71y8WVX1VKgCtT5MDvO9YigKl0mCdN/122ZVPZKl1yBarH7bSgYTtsYqwjxrTA==
-X-Received: by 2002:a05:6870:310f:b0:1e9:a85a:9ec0 with SMTP id v15-20020a056870310f00b001e9a85a9ec0mr40962oaa.0.1697492699637;
-        Mon, 16 Oct 2023 14:44:59 -0700 (PDT)
+        bh=ht8N98xxNnhr4mxygYrnIRrNI1WvXoWdTJ8XF/XP/F8=;
+        b=k2fkkh6m7QR0l9CiFqQO94c9UzS6Ak9FAXaPo2l/EHXDzV6cIPM6IFQQp/Yf3AoPOx
+         2eSnUi6ogO/4TbfLdbpLTUavGr2dM1gJ7MXX1qILhfaOVoh91PX07Xju+6GjByd/5JA4
+         47qQH/vpsFxTx+eLddtqwBVAevGF0wy5moWHOhwOwYoH1CPZYuOYns+rZJW+Ty0pcTcJ
+         B3RVNs41FqBToZpvPaX+IgDcRMU9X23b5CfeWdrRRAhiTACdRQZJHtMIgQo2R1b+5uKT
+         GlJe/Daho2MPu03g+Tkz95rD39BItjfInQCMeBUZlF5slPT2fPw0ZmJGzxjyFMIUs/M0
+         nQkQ==
+X-Gm-Message-State: AOJu0Ywnpftqg6zVOj7WQipP50RWaw7B3qqGx2XwQKAgdiA5tQcOO212
+	fsFRBFLcUm8rDw7JhSG0GA==
+X-Google-Smtp-Source: AGHT+IGRRlSS/F1kWukUHeHHHZmSLPVKA0n8LTYOyHwpWpjScHo01PEc7nh9ywAQ/bdErdN4oiSVXg==
+X-Received: by 2002:a05:6808:3a82:b0:3ae:1446:d48b with SMTP id fb2-20020a0568083a8200b003ae1446d48bmr592595oib.3.1697492691930;
+        Mon, 16 Oct 2023 14:44:51 -0700 (PDT)
 Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id g9-20020a9d5f89000000b006bdcef91e61sm29973oti.17.2023.10.16.14.44.57
+        by smtp.gmail.com with ESMTPSA id v11-20020a54448b000000b003af732a2054sm28836oiv.57.2023.10.16.14.44.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Oct 2023 14:44:58 -0700 (PDT)
-Received: (nullmailer pid 3823218 invoked by uid 1000);
+        Mon, 16 Oct 2023 14:44:51 -0700 (PDT)
+Received: (nullmailer pid 3823220 invoked by uid 1000);
 	Mon, 16 Oct 2023 21:44:35 -0000
 From: Rob Herring <robh@kernel.org>
-Date: Mon, 16 Oct 2023 16:44:24 -0500
-Subject: [PATCH net-next 5/8] dt-bindings: net: ethernet-switch: Rename
- $defs "base" to 'ethernet-ports'
+Date: Mon, 16 Oct 2023 16:44:25 -0500
+Subject: [PATCH net-next 6/8] dt-bindings: net: mscc,vsc7514-switch:
+ Clean-up example indentation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231016-dt-net-cleanups-v1-5-a525a090b444@kernel.org>
+Message-Id: <20231016-dt-net-cleanups-v1-6-a525a090b444@kernel.org>
 References: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
 In-Reply-To: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -87,37 +87,70 @@ Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, devicetre
 X-Mailer: b4 0.13-dev
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
 	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The name "base" is misleading as the definition is for a complete schema
-definition without additional properties allowed, not a "base class".
-Align the same to be the same as dsa.yaml. This schema file without any
-json pointer path is the base schema which can be extended.
-
-There are not yet any references to $defs/base to update.
+The indentation for the example is completely messed up for
+'ethernet-ports'. Fix it.
 
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
- Documentation/devicetree/bindings/net/ethernet-switch.yaml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../bindings/net/mscc,vsc7514-switch.yaml          | 32 +++++++++++-----------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/ethernet-switch.yaml b/Documentation/devicetree/bindings/net/ethernet-switch.yaml
-index 688938c2e261..72ac67ca3415 100644
---- a/Documentation/devicetree/bindings/net/ethernet-switch.yaml
-+++ b/Documentation/devicetree/bindings/net/ethernet-switch.yaml
-@@ -53,7 +53,7 @@ oneOf:
- additionalProperties: true
+diff --git a/Documentation/devicetree/bindings/net/mscc,vsc7514-switch.yaml b/Documentation/devicetree/bindings/net/mscc,vsc7514-switch.yaml
+index 8ee2c7d7ff42..07de52a3a295 100644
+--- a/Documentation/devicetree/bindings/net/mscc,vsc7514-switch.yaml
++++ b/Documentation/devicetree/bindings/net/mscc,vsc7514-switch.yaml
+@@ -185,7 +185,7 @@ examples:
+     };
+   # VSC7512 (DSA)
+   - |
+-    ethernet-switch@1{
++    ethernet-switch@1 {
+       compatible = "mscc,vsc7512-switch";
+       reg = <0x71010000 0x10000>,
+             <0x71030000 0x10000>,
+@@ -212,22 +212,22 @@ examples:
+             "port7", "port8", "port9", "port10", "qsys",
+             "ana", "s0", "s1", "s2";
  
- $defs:
--  base:
-+  ethernet-ports:
-     description: An ethernet switch without any extra port properties
-     $ref: '#'
+-            ethernet-ports {
+-            #address-cells = <1>;
+-            #size-cells = <0>;
+-
+-           port@0 {
+-            reg = <0>;
+-            ethernet = <&mac_sw>;
+-            phy-handle = <&phy0>;
+-            phy-mode = "internal";
+-          };
+-          port@1 {
+-            reg = <1>;
+-            phy-handle = <&phy1>;
+-            phy-mode = "internal";
+-          };
++      ethernet-ports {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        port@0 {
++          reg = <0>;
++          ethernet = <&mac_sw>;
++          phy-handle = <&phy0>;
++          phy-mode = "internal";
++        };
++        port@1 {
++          reg = <1>;
++          phy-handle = <&phy1>;
++          phy-mode = "internal";
+         };
+       };
++    };
  
+ ...
 
 -- 
 2.42.0
