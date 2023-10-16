@@ -1,150 +1,228 @@
-Return-Path: <netdev+bounces-41453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AD4A7CB04E
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:51:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C7227CB078
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:54:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C1AE1C20A79
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:51:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEF3BB20D80
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:54:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7892AB2A;
-	Mon, 16 Oct 2023 16:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C58630D1C;
+	Mon, 16 Oct 2023 16:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uQ5+XCYN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CjnO/A7Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F0F1F61D
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:51:26 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2077.outbound.protection.outlook.com [40.107.237.77])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A09621BFB;
-	Mon, 16 Oct 2023 09:51:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hx0wJeqnp5MHpuR83eivRCp1RyShMP32htPhVQo1cd54HSJ0eS2nBtP35/jnjBE5uE+LNI8HVVMecYYXE2iG/5DwXFjw+nifBDIjjFj38wCBafQ2sb9V4r6njEQFmdmmSxXBDSLF0rlEkpwulfr/Oc4e+61s96jxc7YFeny34FlF+1tTkKjAxJCOombOUUvGc4045nJZL8PSWP/Ust+xuXgm+Uu+zmqnv+cTKmxiSWzB/7GN/4iRTG7VivZzHn4iq+RAfbzOi4IvM6ys9xDYM9aUFk3rKPf0f6XeeY2T6W7RDh/siDZ54rM4hRTPmWRrHcABl7rp1+jXODf6uaQIbA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7hjrB42UI9BqRucPzt4wp9dg2CzxPSiKZlrjnh6pUSo=;
- b=RUcU7xMHS5fNp2ERCxSjxv20BG/prkj9RGSWiRJMzJ6Kbj3PZneHWcuugHVTK3fUMH/KcVQOUpPBN9Wj447nnbhVw/IPlv4d+CrpvVooSUY893faFPZJNH2wyCXtNdgnNwcyd5wKO4XRqBE0FBu7d24qnfvBw2YR5Lw1LKGE6BzZcHgNmSl1p893AvdqfSJxyEDcAGf/lY/kxV5kf61KZ6okpZYR4BcgLYiHbgCQUM6D4lXaLl4+Nh+7MxDnBo7e/hMgbWSFbKDQ6lloM876wHo+jN8v3gfy1VkCVGGGTTS1TsD0FaqrVeTkaPasMzYYaTAkBkNS5ryFi/iZxu0jCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7hjrB42UI9BqRucPzt4wp9dg2CzxPSiKZlrjnh6pUSo=;
- b=uQ5+XCYNYUsgB/aon/azsaI8f/AsTECZJUeh4mxajz7Pv1pAR3tC99VTbHZBtiY+j+jkCCsb7VE/Bj1UMPRxa17PJLT2DdnJ95OAW32k/X1ZyeRGq7dFhVBF/4hfbOE/8/f17ckpc2REHlZd5WIOFPYxQKs8xWkV18ldnnakqFBe3ByoBRA7ZSGTgX/dEEKHK3SRRpQqA3sozaL1Mucmyhu2MrOXiWVVbaC2MOJeeRaTki7eaaX8zeT5oNE2kztfwcGxmS0e4yMX2HCCc2gMFaI1ccXpVQx5z/MISDXn8NXcFt4SBqKUVydCtsMX+8hl7mq2kddb4hkM7l134bElSA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB7549.namprd12.prod.outlook.com (2603:10b6:8:10f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.45; Mon, 16 Oct
- 2023 16:51:21 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::3f66:c2b6:59eb:78c2%6]) with mapi id 15.20.6863.046; Mon, 16 Oct 2023
- 16:51:21 +0000
-Date: Mon, 16 Oct 2023 13:51:20 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Yahui Cao <yahui.cao@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, lingyu.liu@intel.com, kevin.tian@intel.com,
-	madhu.chittim@intel.com, sridhar.samudrala@intel.com,
-	alex.williamson@redhat.com, yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com, brett.creeley@amd.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com
-Subject: Re: [PATCH iwl-next v3 00/13] Add E800 live migration driver
-Message-ID: <20231016165120.GA441518@nvidia.com>
-References: <20230918062546.40419-1-yahui.cao@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230918062546.40419-1-yahui.cao@intel.com>
-X-ClientProxiedBy: BLAPR05CA0036.namprd05.prod.outlook.com
- (2603:10b6:208:335::17) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5D630F99
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:54:18 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FC2E1BD7;
+	Mon, 16 Oct 2023 09:54:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697475256; x=1729011256;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=uQiT4Q6mFElej1pV8NDfuC7904o/FoUvXesRhi74k1A=;
+  b=CjnO/A7ZxNdcLsB1oD+xv3Ergy6J5B/xvIPNdqgUOX2iAql25VRXvx+H
+   7gOcN5np99oTOXx4iej0n/fOCEE0o77Zdkc9c2uDiQfG0QCP9RcVISbyg
+   z5HWhtUh8Lu7orhol2ohCkkqEl7L3g9lRgQRTFEJEuBfBo8W4HvHQ1lyd
+   v4j1IXr2K+SriUkJBRCLQYbwSL2JG369mRaXZunuD7fUX86Cm2exZfcHt
+   YTOQwHl9Yc643oH4yQvYeMNUPfBThN605R3Qn/B9QWuHWzULzKGFSbC4O
+   KhreFuKGkIr/IPxJ4+/LKzOpJWelbrQX6ojeMKbl+7naiPStDINusdSUg
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="364936987"
+X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
+   d="scan'208";a="364936987"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 09:54:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="826083910"
+X-IronPort-AV: E=Sophos;i="6.03,229,1694761200"; 
+   d="scan'208";a="826083910"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmsmga004.fm.intel.com with ESMTP; 16 Oct 2023 09:54:12 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Alexander Potapenko <glider@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	netdev@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	dm-devel@redhat.com,
+	ntfs3@lists.linux.dev,
+	linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/13] ip_tunnel: convert __be16 tunnel flags to bitmaps
+Date: Mon, 16 Oct 2023 18:52:34 +0200
+Message-ID: <20231016165247.14212-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB7549:EE_
-X-MS-Office365-Filtering-Correlation-Id: dcb5559d-01c1-40fb-ea31-08dbce682020
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	ItrG8ZQTGrFLgpu/jHn/SvNLQYc7L28pVz5ZfCUbSWRBchv7TiK12ZNmA0UM3GI81Hyk9k84btzPLIWFr6zdoPKfMm4x5Dylx2Vi4VRHTwBVbw1t+KJ48IquWXwpSPEOwNLwzikr/mLLjp0yc9u5scHGP+B8R7dJenOPTJF9yjHmhFNhoMHM+HWRF88GxXZMQlMPKUQBmX99TgPDSPZ80QuCIMomtLpxT/zZdcYZcu1306uRBqQZVus3KkoausE7u+T3FBDlEqCXe/zmRol03JaU7UcPD6KOoxstvbpYeBAdcmUBKtdPf2/Uqfikhib1VftSuyqxDi937/HX9DtVrBjEeGaj9SnY3A2sPT6+ityBwAo3gKq3ayZb0rR9qVGB9SA9WCAYP4dcbp3jddY/CKmXEpJd/RpgoeJbl+cp295VDsNopt/rJ1QJQXrAiLzr+UH/ce/8ka/zvg9Po11niBtptuPfjpzZIttwc4NI4x0TlQxgopsLBFrVoilpSFtqeCDtHizdIy6guXdSri2Lbmtlm12WGi0RFzY+4aMv6bqKrUbwRj0MjdXgaadcN/F4rTm9vBbVzLSkdzbrax8nzd/Up1tqyDcNbw2R6X55IaASaBqcILzSvITj2ECyDHS5
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(366004)(136003)(39860400002)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(6486002)(36756003)(83380400001)(38100700002)(6512007)(26005)(66946007)(478600001)(66556008)(6916009)(316002)(1076003)(2616005)(66476007)(6506007)(2906002)(7416002)(33656002)(4744005)(41300700001)(86362001)(8936002)(5660300002)(4326008)(8676002)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vSMcOluMA7vwuJlaM3JjNnlt6f9Fp8Hw6xP5FFnyLbnIfuGuuaaM/Lqp1Qre?=
- =?us-ascii?Q?8EJaIzYZRr0HWLz3LSGA6AFzyImToDz8JhvKpK885me6KOkDXF0UHZUmSK2J?=
- =?us-ascii?Q?UF6P86WYAwJqMlgDlAnwqgiP38ZdNKdiUftcS4j5aBrrKPblUBOG9FXfuH6F?=
- =?us-ascii?Q?QAITcOI7Y19I13F1oHPAkFflmU1y+7VEjeDgLxyFAa/G1DMMKWKOIErkmXJU?=
- =?us-ascii?Q?OB33HbHbHk6h578r4ZNsYqbjSfRvAusk3mw8OIgKobVHZO+KqF22jgm3AToq?=
- =?us-ascii?Q?8Zu4jvcV73XIzmCDX0MslvWFyqFcX8/cu1zfwX2XLLHubLdbpcKA52mZjxoP?=
- =?us-ascii?Q?IWVxLOYSHg5TGCL3HG8oOm291dHXIKANfJdQG3TJdGHVN10n+V1XW4qpUo34?=
- =?us-ascii?Q?ZbSYfSpmjGrwA2ZoeQFJCKolbJ2kcUoXgk+dCynZEKOmWvfKuMOXS5KBr4Ei?=
- =?us-ascii?Q?mXEkcRN1eoYiScSS4XQI0Pf8W2EA1U2M7YzkB+tvoBsr0AYqjrg99Z4h0PAC?=
- =?us-ascii?Q?iwO9yEWt+cWV5hM19bab8G2snUaptWY/eHYAfWmiPNYhSapxj4xTyAMIyw8K?=
- =?us-ascii?Q?awm89CKs7pjNYfux00nz6C2jBub7uL8LJKXUFvBfT+GInOkwP9QQznE5KNU2?=
- =?us-ascii?Q?+xCA3YF/VHbkJE8bxDRdzJ6/FPaYDb2TYV20yuDVqzdsKRLIA63pCF3nnfKD?=
- =?us-ascii?Q?WegHsF0Fj6fmVosES0y+TNv4pOjfC8LUeZneeWxwD0Bf9MXCTkKSa3A4jCqz?=
- =?us-ascii?Q?B95MtAtx1w5CfiQk4RTdKBm5OK7+TBwy00mzt2CcW1d0bbRFU6mIkwWIFsO+?=
- =?us-ascii?Q?S/NMSb0sAyx8rG1E2aVkVYCxrZE7uk0YAxS3SaoYbVXBP/GKIIZKgQW9CjvZ?=
- =?us-ascii?Q?mAt7ug1CjKEChgjJ2ZdVK126leHHzjof9GYBRMFFzSqwKRr0fGq5JCjwZD3G?=
- =?us-ascii?Q?nmrFN8L9dJsbO8BYvjMaROdY0j2214atoklYsAZBS42tHErVRCK7zJOKhIvb?=
- =?us-ascii?Q?uLdc1LOXOAMh0GWzYfzFxetaXSwp+dltiHbz9VR/1b/lEiou9JzuVdbWWA7+?=
- =?us-ascii?Q?dwPyMsyOS8Rq7+INAb2WhOPQQaEc/CsbD0kN4HHK2RdDzSsrLWwY3XlQPTkR?=
- =?us-ascii?Q?5PRkPnfCVgUiKnklRw5TBmpmoC0KkLqfxJ1B+Dm/LEPWRVl5M5rosmmwfluO?=
- =?us-ascii?Q?d37QnRvK/qdzJj7TF2LDYKIqRhHiLdBwsyZ8pUuc1AgV8n3F6YQlGR2nbI2m?=
- =?us-ascii?Q?JGZ03bAW0buV1U9xTZUEnVaEU4HE5JR38rdNd/NcDw+YtNl55Wwe7tkh6G6B?=
- =?us-ascii?Q?5exmsAZ5Fs1ncvt0Qe6o4C9rIfhIOtNg5qLHQQrMFWdbdtWWd02HkOseXely?=
- =?us-ascii?Q?QlNAYuKYxHA2/cA+ElIcsNflYnD1Ap9GgHZm46oxRt1hqwBDOAAgpmsCRmnP?=
- =?us-ascii?Q?szobgQBaEdkcsdlVIlTRvBDNa8d3dgB8nRUMYPol2BmnH88aQ6L6JkwsUwB+?=
- =?us-ascii?Q?6bj8Ts5l9RENDY7mupRlhYnrP2G8RMUDEJYSit4pGR9OTGwX3JyX0eECn5J6?=
- =?us-ascii?Q?R/tMgiHoBj5DNW340OE/kvaiNFA009CS82xvfKvM?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dcb5559d-01c1-40fb-ea31-08dbce682020
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 16:51:21.5544
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EpvTQH6zwtQrOOggey7rd4ggM7OreSXopFXIaaEHkwhVh1dKw+eX3XtAmPGTtRtT
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7549
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 18, 2023 at 06:25:33AM +0000, Yahui Cao wrote:
-> This series adds vfio live migration support for Intel E810 VF devices
-> based on the v2 migration protocol definition series discussed here[0].
-> 
-> Steps to test:
-> 1. Bind one or more E810 VF devices to the module ice_vfio_pci.ko
-> 2. Assign the VFs to the virtual machine and enable device live migration
-> 3. Run a workload using IAVF inside the VM, for example, iperf.
-> 4. Migrate the VM from the source node to a destination node.
+Based on top of "Implement MTE tag compression for swapped pages"[0]
+from Alexander Potapenko as it uses its bitmap_{read,write}() functions
+to not introduce another pair of similar ones.
 
-It looked better that the previous versions, I wanted to take a closer
-look but the series didn't apply to v6.6-rc6. When you send v4 with
-the compilation fixed include a git link please
+Derived from the PFCP support series[1] as this grew bigger (2 -> 13
+commits) and involved more core bitmap changes. Only commits 10 and 11
+are from the mentioned tree, the rest is new. PFCP itself still depends
+on this series.
 
-Jason
+IP tunnels have their flags defined as `__be16`, including UAPI, and
+after GTP was accepted, there are no more free bits left. UAPI (incl.
+direct usage of one of the user structs) and explicit Endianness only
+complicate things.
+Since it would either way end up with hundreds of locs due to all that,
+pick bitmaps right from the start to store the flags in the most native
+and scalable format with rich API. I don't think it's worth trying to
+praise luck and pick smth like u32 only to redo everything in x years :)
+More details regarding the IP tunnel flags is in 11 and 13.
+
+The rest is just a good bunch of prereqs and tests: a couple of new
+helpers and extensions to the old ones, a few optimizations to partially
+mitigate IP tunnel object code growth due to __be16 -> long, and
+decouping one UAPI struct used throughout the whole kernel into the
+userspace and the kernel space counterparts to eliminate the dependency.
+
+[0] https://lore.kernel.org/lkml/20231011172836.2579017-1-glider@google.com
+[1] https://lore.kernel.org/netdev/20230721071532.613888-1-marcin.szycik@linux.intel.com
+
+Alexander Lobakin (13):
+  bitops: add missing prototype check
+  bitops: make BYTES_TO_BITS() treewide-available
+  bitops: let the compiler optimize {__,}assign_bit()
+  linkmode: convert linkmode_{test,set,clear,mod}_bit() to macros
+  s390/cio: rename bitmap_size() -> idset_bitmap_size()
+  fs/ntfs3: add prefix to bitmap_size() and use BITS_TO_U64()
+  btrfs: rename bitmap_set_bits() -> btrfs_bitmap_set_bits()
+  bitmap: introduce generic optimized bitmap_size()
+  bitmap: make bitmap_{get,set}_value8() use bitmap_{read,write}()
+  ip_tunnel: use a separate struct to store tunnel params in the kernel
+  ip_tunnel: convert __be16 tunnel flags to bitmaps
+  lib/bitmap: add compile-time test for __assign_bit() optimization
+  lib/bitmap: add tests for IP tunnel flags conversion helpers
+
+ drivers/md/dm-clone-metadata.c                |   5 -
+ drivers/net/bareudp.c                         |  19 ++-
+ .../ethernet/mellanox/mlx5/core/en/tc_tun.h   |   2 +-
+ .../mellanox/mlx5/core/en/tc_tun_encap.c      |   6 +-
+ .../mellanox/mlx5/core/en/tc_tun_geneve.c     |  12 +-
+ .../mellanox/mlx5/core/en/tc_tun_gre.c        |   8 +-
+ .../mellanox/mlx5/core/en/tc_tun_vxlan.c      |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/en_tc.c   |  16 +-
+ .../ethernet/mellanox/mlxsw/spectrum_ipip.c   |  56 ++++---
+ .../ethernet/mellanox/mlxsw/spectrum_ipip.h   |   2 +-
+ .../ethernet/mellanox/mlxsw/spectrum_span.c   |  10 +-
+ .../ethernet/netronome/nfp/flower/action.c    |  27 +++-
+ drivers/net/geneve.c                          |  44 +++---
+ drivers/net/vxlan/vxlan_core.c                |  14 +-
+ drivers/s390/cio/idset.c                      |  12 +-
+ fs/btrfs/free-space-cache.c                   |   8 +-
+ fs/ntfs3/bitmap.c                             |   4 +-
+ fs/ntfs3/fsntfs.c                             |   2 +-
+ fs/ntfs3/index.c                              |  11 +-
+ fs/ntfs3/ntfs_fs.h                            |   4 +-
+ fs/ntfs3/super.c                              |   2 +-
+ include/linux/bitmap.h                        |  46 ++----
+ include/linux/bitops.h                        |  23 +--
+ include/linux/cpumask.h                       |   2 +-
+ include/linux/linkmode.h                      |  27 +---
+ include/linux/netdevice.h                     |   7 +-
+ include/net/dst_metadata.h                    |  10 +-
+ include/net/flow_dissector.h                  |   2 +-
+ include/net/gre.h                             |  70 +++++----
+ include/net/ip6_tunnel.h                      |   4 +-
+ include/net/ip_tunnels.h                      | 136 ++++++++++++++---
+ include/net/udp_tunnel.h                      |   4 +-
+ include/uapi/linux/if_tunnel.h                |  33 ++++
+ kernel/trace/trace_probe.c                    |   2 -
+ lib/math/prime_numbers.c                      |   2 -
+ lib/test_bitmap.c                             | 123 ++++++++++++++-
+ net/bridge/br_vlan_tunnel.c                   |   9 +-
+ net/core/filter.c                             |  26 ++--
+ net/core/flow_dissector.c                     |  20 ++-
+ net/ipv4/fou_bpf.c                            |   2 +-
+ net/ipv4/gre_demux.c                          |   2 +-
+ net/ipv4/ip_gre.c                             | 144 +++++++++++-------
+ net/ipv4/ip_tunnel.c                          | 109 ++++++++-----
+ net/ipv4/ip_tunnel_core.c                     |  82 ++++++----
+ net/ipv4/ip_vti.c                             |  41 +++--
+ net/ipv4/ipip.c                               |  33 ++--
+ net/ipv4/ipmr.c                               |   2 +-
+ net/ipv4/udp_tunnel_core.c                    |   5 +-
+ net/ipv6/addrconf.c                           |   3 +-
+ net/ipv6/ip6_gre.c                            |  85 ++++++-----
+ net/ipv6/ip6_tunnel.c                         |  14 +-
+ net/ipv6/sit.c                                |  38 ++---
+ net/netfilter/ipvs/ip_vs_core.c               |   6 +-
+ net/netfilter/ipvs/ip_vs_xmit.c               |  20 +--
+ net/netfilter/nft_tunnel.c                    |  44 +++---
+ net/openvswitch/flow_netlink.c                |  61 +++++---
+ net/psample/psample.c                         |  26 ++--
+ net/sched/act_tunnel_key.c                    |  36 ++---
+ net/sched/cls_flower.c                        |  27 ++--
+ tools/include/linux/bitmap.h                  |   8 +-
+ tools/include/linux/bitops.h                  |   2 +
+ tools/perf/util/probe-finder.c                |   2 -
+ 62 files changed, 1011 insertions(+), 600 deletions(-)
+
+---
+Not sure whether it's fine to have that all in one series, but OTOH
+there's not much stuff I could split (like, 3 commits), it either
+depends directly (new helpers etc.) or will just generate suboptimal
+code w/o some of the commits.
+
+I'm also thinking of which tree this would ideally be taken through.
+The main subject is networking, but most of the commits are generic.
+My idea is to push this via Yury / bitmaps and then ask the netdev
+maintainers to pull his tree before they take PFCP (dependent on this
+one).
+
+From v1[2]:
+ * 03: convert assign_bit() to a macro as well, saves some bytes and
+   looks more consistent (Yury);
+ * 03: enclose each argument into own pair of braces (Yury);
+ * 06: use generic BITS_TO_U64() while at it (Yury);
+ * 07: pick Acked-by (David);
+ * 08: Acked-by, use bitmap_size() in the code from 05 as well (Yury);
+ * 09: instead of introducing a new pair of functions, use generic
+   bitmap_{read,write}() from [0]. bloat-o-meter shows no regressions
+   from the switch (Yury, also Andy).
+
+Old pfcp -> bitmap changelog:
+
+As for former commits (now 10 and 11), almost all of the changes were
+suggested by Andy, notably: stop violating bitmap API, use
+__assign_bit() where appropriate, and add more tests to make sure
+everything works as expected. Apart from that, add simple wrappers for
+bitmap_*() used in the IP tunnel code to avoid manually specifying
+``__IP_TUNNEL_FLAG_NUM`` each time.
+
+[2] https://lore.kernel.org/lkml/20231009151026.66145-1-aleksander.lobakin@intel.com
+-- 
+2.41.0
+
 
