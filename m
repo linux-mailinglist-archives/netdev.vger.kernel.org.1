@@ -1,47 +1,48 @@
-Return-Path: <netdev+bounces-41209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 010487CA3D7
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:15:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B1AF7CA3DA
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:16:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05CE31C20925
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:15:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46B0E281672
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA581C69B;
-	Mon, 16 Oct 2023 09:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA3B1C6AB;
+	Mon, 16 Oct 2023 09:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IASh64DO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGSUjKla"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683601C699
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:15:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9FD0C433C7;
-	Mon, 16 Oct 2023 09:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90FA81A5B7
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:15:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A9EC433C7;
+	Mon, 16 Oct 2023 09:15:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697447744;
-	bh=YTxl0DTpGXDxuoXHWPVPassb+nOjGXzmd+QHRBTEIp0=;
+	s=k20201202; t=1697447756;
+	bh=rl8jQHf40+5HuJmEUcnm4nMI14sbBscpIOv1WombThY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IASh64DOd+RVuoZcNWDDoELzF/A2vjwBd6lpHbQ8aVQa37DKpPy29CXBSi3rQvZIW
-	 yI0lChJjWQDPQY4kYhdQIM8bTlaiBgUOFeaLLGATVtKcdFBrFAzhAVmPQL33jhi4t4
-	 eugjusaIwCr/BPV343zlPRyJY8Q9eq1wuxYUs/uFKW/X/bqvshhTLq0QpPB4AWm6im
-	 KStOEM5/2IjzVD6v8ur7pCb/sZZtAcPs/SUap/PiMedvUJDyLd/j/HYnt/N89//XkE
-	 C1zcRychJPn55VJ0mFeBtSfZWH1fB9uqNlZKMPfLXeK37gjAXHbmcJoTXl3vCFF5XE
-	 OZQfS4SFTlrYw==
+	b=DGSUjKlaahnZ9sM7oZ1lNJkeZIynvJQ2JBZAork6K/6EbC2TuMmWbIDIFHf/7gBV6
+	 Loe6eGfP9x9ZSNT99bWTsjjMo/UdNO+vrdG0CvIeuSnGQ71d68zatdX91Hw5kKYRgv
+	 xf8JBZvG9aEmIfTdGqJxxr2uzr1dqudlwCoD1Tmm+rPvBL/DztHJSlRFTghb/Wu3lD
+	 ulNXDL2/JZ8XPN2KHN72YqfievuBM/+hkQAamdVeHjndPvByMmPPA9AxL8iRc36AYC
+	 h1QLOPo+fJ+sJ9B+CwDp91mP+IO6wqf46bnEvYxKCLcop51tbAh6MjYByx8WTi3omE
+	 Avl2EJUytMvtw==
 From: Leon Romanovsky <leon@kernel.org>
 To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Patrisious Haddad <phaddad@nvidia.com>,
+Cc: Leon Romanovsky <leonro@nvidia.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	netdev@vger.kernel.org,
+	Patrisious Haddad <phaddad@nvidia.com>,
 	Raed Salem <raeds@nvidia.com>,
 	Saeed Mahameed <saeedm@nvidia.com>
-Subject: [PATCH xfrm-next 7/9] net/mlx5e: Add IPsec and ASO syndromes check in HW
-Date: Mon, 16 Oct 2023 12:15:15 +0300
-Message-ID: <e1da001bbe02d11714dc916c124e53dd2c00b5a9.1697444728.git.leon@kernel.org>
+Subject: [PATCH xfrm-next 8/9] net/mlx5e: Connect mlx5 IPsec statistics with XFRM core
+Date: Mon, 16 Oct 2023 12:15:16 +0300
+Message-ID: <99b75f89921438eb35bd86560b7c4440a7d6c4f5.1697444728.git.leon@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1697444728.git.leon@kernel.org>
 References: <cover.1697444728.git.leon@kernel.org>
@@ -53,384 +54,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Patrisious Haddad <phaddad@nvidia.com>
+From: Leon Romanovsky <leonro@nvidia.com>
 
-After IPsec decryption it isn't enough to only check the IPsec syndrome
-but need to also check the ASO syndrome in order to verify that the
-operation was actually successful.
+Fill integrity, replay and bad trailer counters.
 
-Verify that both syndromes are actually zero and in case not drop the
-packet and increment the appropriate flow counter for the drop reason.
+As an example, after simulating replay window attack with 5 packets:
+[leonro@c ~]$ grep XfrmInStateSeqError /proc/net/xfrm_stat
+XfrmInStateSeqError     	5
+[leonro@c ~]$ sudo ip -s x s
+<...>
+	stats:
+	  replay-window 0 replay 5 failed 0
 
-Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- .../mellanox/mlx5/core/en_accel/ipsec.h       |   8 +
- .../mellanox/mlx5/core/en_accel/ipsec_fs.c    | 235 ++++++++++++++++--
- 2 files changed, 223 insertions(+), 20 deletions(-)
+ .../mellanox/mlx5/core/en_accel/ipsec.c       | 22 +++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h
-index c3a40bf11952..adaea3493193 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h
-@@ -189,11 +189,19 @@ struct mlx5e_ipsec_ft {
- 	u32 refcnt;
- };
- 
-+struct mlx5e_ipsec_drop {
-+	struct mlx5_flow_handle *rule;
-+	struct mlx5_fc *fc;
-+};
-+
- struct mlx5e_ipsec_rule {
- 	struct mlx5_flow_handle *rule;
- 	struct mlx5_modify_hdr *modify_hdr;
- 	struct mlx5_pkt_reformat *pkt_reformat;
- 	struct mlx5_fc *fc;
-+	struct mlx5e_ipsec_drop replay;
-+	struct mlx5e_ipsec_drop auth;
-+	struct mlx5e_ipsec_drop trailer;
- };
- 
- struct mlx5e_ipsec_miss {
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
-index aa74a2422869..aeb399d8dae5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
-@@ -32,13 +32,17 @@ struct mlx5e_ipsec_tx {
- 	u8 allow_tunnel_mode : 1;
- };
- 
-+struct mlx5e_ipsec_status_checks {
-+	struct mlx5_flow_group *drop_all_group;
-+	struct mlx5e_ipsec_drop all;
-+};
-+
- struct mlx5e_ipsec_rx {
- 	struct mlx5e_ipsec_ft ft;
- 	struct mlx5e_ipsec_miss pol;
- 	struct mlx5e_ipsec_miss sa;
- 	struct mlx5e_ipsec_rule status;
--	struct mlx5e_ipsec_miss status_drop;
--	struct mlx5_fc *status_drop_cnt;
-+	struct mlx5e_ipsec_status_checks status_drops;
- 	struct mlx5e_ipsec_fc *fc;
- 	struct mlx5_fs_chains *chains;
- 	u8 allow_tunnel_mode : 1;
-@@ -143,9 +147,9 @@ static struct mlx5_flow_table *ipsec_ft_create(struct mlx5_flow_namespace *ns,
- static void ipsec_rx_status_drop_destroy(struct mlx5e_ipsec *ipsec,
- 					 struct mlx5e_ipsec_rx *rx)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+index bf88232a2fc2..5b2660662811 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+@@ -980,19 +980,37 @@ static void mlx5e_xfrm_update_stats(struct xfrm_state *x)
  {
--	mlx5_del_flow_rules(rx->status_drop.rule);
--	mlx5_destroy_flow_group(rx->status_drop.group);
--	mlx5_fc_destroy(ipsec->mdev, rx->status_drop_cnt);
-+	mlx5_del_flow_rules(rx->status_drops.all.rule);
-+	mlx5_fc_destroy(ipsec->mdev, rx->status_drops.all.fc);
-+	mlx5_destroy_flow_group(rx->status_drops.drop_all_group);
+ 	struct mlx5e_ipsec_sa_entry *sa_entry = to_ipsec_sa_entry(x);
+ 	struct mlx5e_ipsec_rule *ipsec_rule = &sa_entry->ipsec_rule;
++	struct net *net = dev_net(x->xso.dev);
+ 	u64 packets, bytes, lastuse;
+ 
+ 	lockdep_assert(lockdep_is_held(&x->lock) ||
+ 		       lockdep_is_held(&dev_net(x->xso.real_dev)->xfrm.xfrm_cfg_mutex) ||
+ 		       lockdep_is_held(&dev_net(x->xso.real_dev)->xfrm.xfrm_state_lock));
+ 
+-	if (x->xso.flags & XFRM_DEV_OFFLOAD_FLAG_ACQ ||
+-	    x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
++	if (x->xso.flags & XFRM_DEV_OFFLOAD_FLAG_ACQ)
++		return;
++
++	if (sa_entry->attrs.dir == XFRM_DEV_OFFLOAD_IN) {
++		mlx5_fc_query_cached(ipsec_rule->auth.fc, &bytes, &packets, &lastuse);
++		x->stats.integrity_failed += packets;
++		XFRM_ADD_STATS(net, LINUX_MIB_XFRMINSTATEPROTOERROR, packets);
++
++		mlx5_fc_query_cached(ipsec_rule->trailer.fc, &bytes, &packets, &lastuse);
++		XFRM_ADD_STATS(net, LINUX_MIB_XFRMINHDRERROR, packets);
++	}
++
++	if (x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
+ 		return;
+ 
+ 	mlx5_fc_query_cached(ipsec_rule->fc, &bytes, &packets, &lastuse);
+ 	x->curlft.packets += packets;
+ 	x->curlft.bytes += bytes;
++
++	if (sa_entry->attrs.dir == XFRM_DEV_OFFLOAD_IN) {
++		mlx5_fc_query_cached(ipsec_rule->replay.fc, &bytes, &packets, &lastuse);
++		x->stats.replay += packets;
++		XFRM_ADD_STATS(net, LINUX_MIB_XFRMINSTATESEQERROR, packets);
++	}
  }
  
- static void ipsec_rx_status_pass_destroy(struct mlx5e_ipsec *ipsec,
-@@ -161,8 +165,149 @@ static void ipsec_rx_status_pass_destroy(struct mlx5e_ipsec *ipsec,
- #endif
- }
- 
--static int ipsec_rx_status_drop_create(struct mlx5e_ipsec *ipsec,
--				       struct mlx5e_ipsec_rx *rx)
-+static int rx_add_rule_drop_auth_trailer(struct mlx5e_ipsec_sa_entry *sa_entry,
-+					 struct mlx5e_ipsec_rx *rx)
-+{
-+	struct mlx5e_ipsec *ipsec = sa_entry->ipsec;
-+	struct mlx5_flow_table *ft = rx->ft.status;
-+	struct mlx5_core_dev *mdev = ipsec->mdev;
-+	struct mlx5_flow_destination dest = {};
-+	struct mlx5_flow_act flow_act = {};
-+	struct mlx5_flow_handle *rule;
-+	struct mlx5_fc *flow_counter;
-+	struct mlx5_flow_spec *spec;
-+	int err;
-+
-+	spec = kvzalloc(sizeof(*spec), GFP_KERNEL);
-+	if (!spec)
-+		return -ENOMEM;
-+
-+	flow_counter = mlx5_fc_create(mdev, true);
-+	if (IS_ERR(flow_counter)) {
-+		err = PTR_ERR(flow_counter);
-+		mlx5_core_err(mdev,
-+			      "Failed to add ipsec rx status drop rule counter, err=%d\n", err);
-+		goto err_cnt;
-+	}
-+	sa_entry->ipsec_rule.auth.fc = flow_counter;
-+
-+	flow_act.action = MLX5_FLOW_CONTEXT_ACTION_DROP | MLX5_FLOW_CONTEXT_ACTION_COUNT;
-+	flow_act.flags = FLOW_ACT_NO_APPEND;
-+	dest.type = MLX5_FLOW_DESTINATION_TYPE_COUNTER;
-+	dest.counter_id = mlx5_fc_id(flow_counter);
-+	if (rx == ipsec->rx_esw)
-+		spec->flow_context.flow_source = MLX5_FLOW_CONTEXT_FLOW_SOURCE_UPLINK;
-+
-+	MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria, misc_parameters_2.ipsec_syndrome);
-+	MLX5_SET(fte_match_param, spec->match_value, misc_parameters_2.ipsec_syndrome, 1);
-+	MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria, misc_parameters_2.metadata_reg_c_2);
-+	MLX5_SET(fte_match_param, spec->match_value,
-+		 misc_parameters_2.metadata_reg_c_2,
-+		 sa_entry->ipsec_obj_id | BIT(31));
-+	spec->match_criteria_enable = MLX5_MATCH_MISC_PARAMETERS_2;
-+	rule = mlx5_add_flow_rules(ft, spec, &flow_act, &dest, 1);
-+	if (IS_ERR(rule)) {
-+		err = PTR_ERR(rule);
-+		mlx5_core_err(mdev,
-+			      "Failed to add ipsec rx status drop rule, err=%d\n", err);
-+		goto err_rule;
-+	}
-+	sa_entry->ipsec_rule.auth.rule = rule;
-+
-+	flow_counter = mlx5_fc_create(mdev, true);
-+	if (IS_ERR(flow_counter)) {
-+		err = PTR_ERR(flow_counter);
-+		mlx5_core_err(mdev,
-+			      "Failed to add ipsec rx status drop rule counter, err=%d\n", err);
-+		goto err_cnt_2;
-+	}
-+	sa_entry->ipsec_rule.trailer.fc = flow_counter;
-+
-+	dest.counter_id = mlx5_fc_id(flow_counter);
-+	MLX5_SET(fte_match_param, spec->match_value, misc_parameters_2.ipsec_syndrome, 2);
-+	rule = mlx5_add_flow_rules(ft, spec, &flow_act, &dest, 1);
-+	if (IS_ERR(rule)) {
-+		err = PTR_ERR(rule);
-+		mlx5_core_err(mdev,
-+			      "Failed to add ipsec rx status drop rule, err=%d\n", err);
-+		goto err_rule_2;
-+	}
-+	sa_entry->ipsec_rule.trailer.rule = rule;
-+
-+	kvfree(spec);
-+	return 0;
-+
-+err_rule_2:
-+	mlx5_fc_destroy(mdev, sa_entry->ipsec_rule.trailer.fc);
-+err_cnt_2:
-+	mlx5_del_flow_rules(sa_entry->ipsec_rule.auth.rule);
-+err_rule:
-+	mlx5_fc_destroy(mdev, sa_entry->ipsec_rule.auth.fc);
-+err_cnt:
-+	kvfree(spec);
-+	return err;
-+}
-+
-+static int rx_add_rule_drop_replay(struct mlx5e_ipsec_sa_entry *sa_entry, struct mlx5e_ipsec_rx *rx)
-+{
-+	struct mlx5e_ipsec *ipsec = sa_entry->ipsec;
-+	struct mlx5_flow_table *ft = rx->ft.status;
-+	struct mlx5_core_dev *mdev = ipsec->mdev;
-+	struct mlx5_flow_destination dest = {};
-+	struct mlx5_flow_act flow_act = {};
-+	struct mlx5_flow_handle *rule;
-+	struct mlx5_fc *flow_counter;
-+	struct mlx5_flow_spec *spec;
-+	int err;
-+
-+	spec = kvzalloc(sizeof(*spec), GFP_KERNEL);
-+	if (!spec)
-+		return -ENOMEM;
-+
-+	flow_counter = mlx5_fc_create(mdev, true);
-+	if (IS_ERR(flow_counter)) {
-+		err = PTR_ERR(flow_counter);
-+		mlx5_core_err(mdev,
-+			      "Failed to add ipsec rx status drop rule counter, err=%d\n", err);
-+		goto err_cnt;
-+	}
-+
-+	flow_act.action = MLX5_FLOW_CONTEXT_ACTION_DROP | MLX5_FLOW_CONTEXT_ACTION_COUNT;
-+	flow_act.flags = FLOW_ACT_NO_APPEND;
-+	dest.type = MLX5_FLOW_DESTINATION_TYPE_COUNTER;
-+	dest.counter_id = mlx5_fc_id(flow_counter);
-+	if (rx == ipsec->rx_esw)
-+		spec->flow_context.flow_source = MLX5_FLOW_CONTEXT_FLOW_SOURCE_UPLINK;
-+
-+	MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria, misc_parameters_2.metadata_reg_c_4);
-+	MLX5_SET(fte_match_param, spec->match_value, misc_parameters_2.metadata_reg_c_4, 1);
-+	MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria, misc_parameters_2.metadata_reg_c_2);
-+	MLX5_SET(fte_match_param, spec->match_value,  misc_parameters_2.metadata_reg_c_2,
-+		 sa_entry->ipsec_obj_id | BIT(31));
-+	spec->match_criteria_enable = MLX5_MATCH_MISC_PARAMETERS_2;
-+	rule = mlx5_add_flow_rules(ft, spec, &flow_act, &dest, 1);
-+	if (IS_ERR(rule)) {
-+		err = PTR_ERR(rule);
-+		mlx5_core_err(mdev,
-+			      "Failed to add ipsec rx status drop rule, err=%d\n", err);
-+		goto err_rule;
-+	}
-+
-+	sa_entry->ipsec_rule.replay.rule = rule;
-+	sa_entry->ipsec_rule.replay.fc = flow_counter;
-+
-+	kvfree(spec);
-+	return 0;
-+
-+err_rule:
-+	mlx5_fc_destroy(mdev, flow_counter);
-+err_cnt:
-+	kvfree(spec);
-+	return err;
-+}
-+
-+static int ipsec_rx_status_drop_all_create(struct mlx5e_ipsec *ipsec,
-+					   struct mlx5e_ipsec_rx *rx)
- {
- 	int inlen = MLX5_ST_SZ_BYTES(create_flow_group_in);
- 	struct mlx5_flow_table *ft = rx->ft.status;
-@@ -214,9 +359,9 @@ static int ipsec_rx_status_drop_create(struct mlx5e_ipsec *ipsec,
- 		goto err_rule;
- 	}
- 
--	rx->status_drop.group = g;
--	rx->status_drop.rule = rule;
--	rx->status_drop_cnt = flow_counter;
-+	rx->status_drops.drop_all_group = g;
-+	rx->status_drops.all.rule = rule;
-+	rx->status_drops.all.fc = flow_counter;
- 
- 	kvfree(flow_group_in);
- 	kvfree(spec);
-@@ -247,8 +392,12 @@ static int ipsec_rx_status_pass_create(struct mlx5e_ipsec *ipsec,
- 
- 	MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria,
- 			 misc_parameters_2.ipsec_syndrome);
-+	MLX5_SET_TO_ONES(fte_match_param, spec->match_criteria,
-+			 misc_parameters_2.metadata_reg_c_4);
- 	MLX5_SET(fte_match_param, spec->match_value,
- 		 misc_parameters_2.ipsec_syndrome, 0);
-+	MLX5_SET(fte_match_param, spec->match_value,
-+		 misc_parameters_2.metadata_reg_c_4, 0);
- 	if (rx == ipsec->rx_esw)
- 		spec->flow_context.flow_source = MLX5_FLOW_CONTEXT_FLOW_SOURCE_UPLINK;
- 	spec->match_criteria_enable = MLX5_MATCH_MISC_PARAMETERS_2;
-@@ -285,7 +434,7 @@ static int mlx5_ipsec_rx_status_create(struct mlx5e_ipsec *ipsec,
- {
- 	int err;
- 
--	err = ipsec_rx_status_drop_create(ipsec, rx);
-+	err = ipsec_rx_status_drop_all_create(ipsec, rx);
- 	if (err)
- 		return err;
- 
-@@ -529,7 +678,7 @@ static int rx_create(struct mlx5_core_dev *mdev, struct mlx5e_ipsec *ipsec,
- 	if (err)
- 		return err;
- 
--	ft = ipsec_ft_create(attr.ns, attr.status_level, attr.prio, 1, 0);
-+	ft = ipsec_ft_create(attr.ns, attr.status_level, attr.prio, 3, 0);
- 	if (IS_ERR(ft)) {
- 		err = PTR_ERR(ft);
- 		goto err_fs_ft_status;
-@@ -1159,29 +1308,48 @@ static int setup_modify_header(struct mlx5e_ipsec *ipsec, int type, u32 val, u8
- 			       struct mlx5_flow_act *flow_act)
- {
- 	enum mlx5_flow_namespace_type ns_type = ipsec_fs_get_ns(ipsec, type, dir);
--	u8 action[MLX5_UN_SZ_BYTES(set_add_copy_action_in_auto)] = {};
-+	u8 action[3][MLX5_UN_SZ_BYTES(set_add_copy_action_in_auto)] = {};
- 	struct mlx5_core_dev *mdev = ipsec->mdev;
- 	struct mlx5_modify_hdr *modify_hdr;
-+	u8 num_of_actions = 1;
- 
--	MLX5_SET(set_action_in, action, action_type, MLX5_ACTION_TYPE_SET);
-+	MLX5_SET(set_action_in, action[0], action_type, MLX5_ACTION_TYPE_SET);
- 	switch (dir) {
- 	case XFRM_DEV_OFFLOAD_IN:
--		MLX5_SET(set_action_in, action, field,
-+		MLX5_SET(set_action_in, action[0], field,
- 			 MLX5_ACTION_IN_FIELD_METADATA_REG_B);
-+
-+		num_of_actions++;
-+		MLX5_SET(set_action_in, action[1], action_type, MLX5_ACTION_TYPE_SET);
-+		MLX5_SET(set_action_in, action[1], field, MLX5_ACTION_IN_FIELD_METADATA_REG_C_2);
-+		MLX5_SET(set_action_in, action[1], data, val);
-+		MLX5_SET(set_action_in, action[1], offset, 0);
-+		MLX5_SET(set_action_in, action[1], length, 32);
-+
-+		if (type == XFRM_DEV_OFFLOAD_CRYPTO) {
-+			num_of_actions++;
-+			MLX5_SET(set_action_in, action[2], action_type,
-+				 MLX5_ACTION_TYPE_SET);
-+			MLX5_SET(set_action_in, action[2], field,
-+				 MLX5_ACTION_IN_FIELD_METADATA_REG_C_4);
-+			MLX5_SET(set_action_in, action[2], data, 0);
-+			MLX5_SET(set_action_in, action[2], offset, 0);
-+			MLX5_SET(set_action_in, action[2], length, 32);
-+		}
- 		break;
- 	case XFRM_DEV_OFFLOAD_OUT:
--		MLX5_SET(set_action_in, action, field,
-+		MLX5_SET(set_action_in, action[0], field,
- 			 MLX5_ACTION_IN_FIELD_METADATA_REG_C_4);
- 		break;
- 	default:
- 		return -EINVAL;
- 	}
- 
--	MLX5_SET(set_action_in, action, data, val);
--	MLX5_SET(set_action_in, action, offset, 0);
--	MLX5_SET(set_action_in, action, length, 32);
-+	MLX5_SET(set_action_in, action[0], data, val);
-+	MLX5_SET(set_action_in, action[0], offset, 0);
-+	MLX5_SET(set_action_in, action[0], length, 32);
- 
--	modify_hdr = mlx5_modify_header_alloc(mdev, ns_type, 1, action);
-+	modify_hdr = mlx5_modify_header_alloc(mdev, ns_type, num_of_actions, action);
- 	if (IS_ERR(modify_hdr)) {
- 		mlx5_core_err(mdev, "Failed to allocate modify_header %ld\n",
- 			      PTR_ERR(modify_hdr));
-@@ -1479,6 +1647,15 @@ static int rx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
- 		mlx5_core_err(mdev, "fail to add RX ipsec rule err=%d\n", err);
- 		goto err_add_flow;
- 	}
-+	if (attrs->type == XFRM_DEV_OFFLOAD_PACKET)
-+		err = rx_add_rule_drop_replay(sa_entry, rx);
-+	if (err)
-+		goto err_add_replay;
-+
-+	err = rx_add_rule_drop_auth_trailer(sa_entry, rx);
-+	if (err)
-+		goto err_drop_reason;
-+
- 	kvfree(spec);
- 
- 	sa_entry->ipsec_rule.rule = rule;
-@@ -1487,6 +1664,13 @@ static int rx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
- 	sa_entry->ipsec_rule.pkt_reformat = flow_act.pkt_reformat;
- 	return 0;
- 
-+err_drop_reason:
-+	if (sa_entry->ipsec_rule.replay.rule) {
-+		mlx5_del_flow_rules(sa_entry->ipsec_rule.replay.rule);
-+		mlx5_fc_destroy(mdev, sa_entry->ipsec_rule.replay.fc);
-+	}
-+err_add_replay:
-+	mlx5_del_flow_rules(rule);
- err_add_flow:
- 	mlx5_fc_destroy(mdev, counter);
- err_add_cnt:
-@@ -1994,6 +2178,17 @@ void mlx5e_accel_ipsec_fs_del_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
- 
- 	if (ipsec_rule->modify_hdr)
- 		mlx5_modify_header_dealloc(mdev, ipsec_rule->modify_hdr);
-+
-+	mlx5_del_flow_rules(ipsec_rule->trailer.rule);
-+	mlx5_fc_destroy(mdev, ipsec_rule->trailer.fc);
-+
-+	mlx5_del_flow_rules(ipsec_rule->auth.rule);
-+	mlx5_fc_destroy(mdev, ipsec_rule->auth.fc);
-+
-+	if (ipsec_rule->replay.rule) {
-+		mlx5_del_flow_rules(ipsec_rule->replay.rule);
-+		mlx5_fc_destroy(mdev, ipsec_rule->replay.fc);
-+	}
- 	mlx5_esw_ipsec_rx_id_mapping_remove(sa_entry);
- 	rx_ft_put(sa_entry->ipsec, sa_entry->attrs.family, sa_entry->attrs.type);
- }
+ static int mlx5e_xfrm_validate_policy(struct mlx5_core_dev *mdev,
 -- 
 2.41.0
 
