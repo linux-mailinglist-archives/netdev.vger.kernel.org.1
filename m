@@ -1,110 +1,131 @@
-Return-Path: <netdev+bounces-41471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36367CB0EA
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:04:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 954ED7CB127
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 19:16:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D40971C20C5A
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:04:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B790281613
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF9630FB9;
-	Mon, 16 Oct 2023 17:04:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BB93158A;
+	Mon, 16 Oct 2023 17:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J+4Tzggk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ipMf8FZs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0698230F94;
-	Mon, 16 Oct 2023 17:04:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC7C4C433C7;
-	Mon, 16 Oct 2023 17:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38A330FB9;
+	Mon, 16 Oct 2023 17:16:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D9E5C433C8;
+	Mon, 16 Oct 2023 17:16:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697475843;
-	bh=PfysQKQ+U5oiVOeEEWSdmDvGFo/K4A19Hbz110sUuPQ=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=J+4TzggkoIquBGDze1MsMSJPBHkDy8YKKWcxCdmkCdY0evAc0vCDPTsGbFltdCzRW
-	 vm3HHHG9Zp8hANIV9o1QwqtVf0NwZSnhpzTJem3evF8aat8FqlyJpPCeV0UlLkRJkE
-	 RyNT3oJP6y4wgV3Xu9+zewRoBaiA0SCJqc9eTgtgZXy7XCIAajxKe/r6QodQ4E/fVb
-	 BCf9iMwM130jxv+7+hNrDUB61Gp5FeIcUlQNR8qrKk9/JJmbJQAkGd7BskIB/RRa9E
-	 tUHnUBnKISWQojXcvo6/1K0eMZHts1LA3FE7dP0LMLHcrCI5nuMqFFyBnuq1gWKXQQ
-	 Jj/G062WwDXkg==
-Date: Mon, 16 Oct 2023 10:03:57 -0700
-From: Kees Cook <kees@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>, Simon Horman <horms@kernel.org>
-CC: Justin Stitt <justinstitt@google.com>,
- Thomas Sailer <t.sailer@alumni.ethz.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-hams@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] hamradio: replace deprecated strncpy with strscpy
-User-Agent: K-9 Mail for Android
-In-Reply-To: <FA371CE1-F449-44D4-801A-11C842E84867@kernel.org>
-References: <20231012-strncpy-drivers-net-hamradio-baycom_epp-c-v1-1-8f4097538ee4@google.com> <20231015150619.GC1386676@kernel.org> <ede96908-76ff-473c-a5e1-39e2ce130df9@kadam.mountain> <FA371CE1-F449-44D4-801A-11C842E84867@kernel.org>
-Message-ID: <123F9651-9469-4F2B-ADC1-12293C9EA7FE@kernel.org>
+	s=k20201202; t=1697476586;
+	bh=MRy3up7oqUohj1XgFS/GiBFKY4NG7WbUD1k/7sSM8yM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ipMf8FZsx8iTVB3wSbylZBSCHdrLB9w4rvDfkqnc8OEH92i+lx+zxbGvLA3SWLgf7
+	 inKovQXXDMyiOl88agX16f0oLzdYGl0f/kKBwYw79ppGjETfOyJ8krtmvDh8M+C7sR
+	 o1xcU2etDt1GGUk7m/x2cShFClEqOmPkkZT1XVfdJS5xgt6beKobBf+FlARHSh+9vt
+	 lP/OevPV6O3qMwS2fzL4p1WRYsP4pjlBRiAJHZ4IC6TVRZqftsbLYewdNCH3EIM0g7
+	 fsEq5bObLfsAlf2jYlRrxk6Kh53CEmpcwkdc9QoozbLHqM2eYAn9KDpqGNJSrXDFo5
+	 U0u0JM/pkIv8Q==
+Date: Mon, 16 Oct 2023 18:16:20 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Conor Dooley <conor.dooley@microchip.com>,
+	Greg Ungerer <gerg@linux-m68k.org>, iommu@lists.linux.dev,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
+	netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org,
+	Jim Quinlan <james.quinlan@broadcom.com>
+Subject: Re: [PATCH 01/12] riscv: RISCV_NONSTANDARD_CACHE_OPS shouldn't
+ depend on RISCV_DMA_NONCOHERENT
+Message-ID: <20231016-outwit-bungee-b46cf212c292@spud>
+References: <20231016054755.915155-1-hch@lst.de>
+ <20231016054755.915155-2-hch@lst.de>
+ <20231016-walmart-egomaniac-dc4c63ea70a6@wendy>
+ <20231016131716.GA26484@lst.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="n9y3/cEO82Secmi+"
+Content-Disposition: inline
+In-Reply-To: <20231016131716.GA26484@lst.de>
+
+
+--n9y3/cEO82Secmi+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
+On Mon, Oct 16, 2023 at 03:17:16PM +0200, Christoph Hellwig wrote:
+> On Mon, Oct 16, 2023 at 01:49:41PM +0100, Conor Dooley wrote:
+> > Hey,
+> >=20
+> > On Mon, Oct 16, 2023 at 07:47:43AM +0200, Christoph Hellwig wrote:
+> > > RISCV_NONSTANDARD_CACHE_OPS is also used for the pmem cache maintenan=
+ce
+> > > helpers, which are built into the kernel unconditionally.
+> >=20
+> > You surely have better insight than I do here, but is this actually
+> > required?
+> > This patch seems to allow creation of a kernel where the cache
+> > maintenance operations could be used for pmem, but would be otherwise
+> > unavailable, which seems counter intuitive to me.
+> >
+> > Why would someone want to provide the pmem helpers with cache
+> > maintenance operations, but not provide them generally?
+> >=20
+>=20
+> Even if all your periphals are cache coherent (very common on server
+> class hardware) you still need cache maintenance for pmem.  No need
+> to force the extra text size and runtime overhead for non-coherent DMA.
+
+Ah, right.
+
+> > I also don't really understand what the unconditional nature of the pmem
+> > helpers has to do with anything, as this patch does not unconditionally
+> > provide any cache management operations, only relax the conditions under
+> > which the non-standard cache management operations can be provided.
+>=20
+> They simply were broken if a platform had non-standard cache mem but
+> only coherent DMA before.  That's probably more a theoretical than
+> practial case, but still worth fixing.
+
+And this part of it makes more sense with the above use-case explained.
+
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+
+Thanks,
+Conor.
 
 
-On October 16, 2023 10:01:20 AM PDT, Kees Cook <kees@kernel=2Eorg> wrote:
->
->
->On October 15, 2023 10:47:53 PM PDT, Dan Carpenter <dan=2Ecarpenter@linar=
-o=2Eorg> wrote:
->>On Sun, Oct 15, 2023 at 05:06:19PM +0200, Simon Horman wrote:
->>> On Thu, Oct 12, 2023 at 09:33:32PM +0000, Justin Stitt wrote:
->>> > strncpy() is deprecated for use on NUL-terminated destination string=
-s
->>> > [1] and as such we should prefer more robust and less ambiguous stri=
-ng
->>> > interfaces=2E
->>> >=20
->>> > We expect both hi=2Edata=2Emodename and hi=2Edata=2Edrivername to be
->>> > NUL-terminated but not necessarily NUL-padded which is evident by it=
-s
->>> > usage with sprintf:
->>> > |       sprintf(hi=2Edata=2Emodename, "%sclk,%smodem,fclk=3D%d,bps=
-=3D%d%s",
->>> > |               bc->cfg=2Eintclk ? "int" : "ext",
->>> > |               bc->cfg=2Eextmodem ? "ext" : "int", bc->cfg=2Efclk, =
-bc->cfg=2Ebps,
->>> > |               bc->cfg=2Eloopback ? ",loopback" : "");
->>> >=20
->>> > Note that this data is copied out to userspace with:
->>> > |       if (copy_to_user(data, &hi, sizeof(hi)))
->>> > =2E=2E=2E however, the data was also copied FROM the user here:
->>> > |       if (copy_from_user(&hi, data, sizeof(hi)))
->>>=20
->>> Thanks Justin,
->>>=20
->>> I see that too=2E
->>>=20
->>> Perhaps I am off the mark here, and perhaps it's out of scope for this
->>> patch, but I do think it would be nicer if the kernel only sent
->>> intended data to user-space, even if any unintended payload came
->>> from user-space=2E
->>>=20
->>
->>It's kind of normal to pass user space data back to itself=2E  We
->>generally only worry about info leaks=2E
->
->True but since this used to zero the rest of the buffet, let's just keep =
-that behavior and use strscpy_pad()=2E
+--n9y3/cEO82Secmi+
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I'm calling all byte arrays a "buffet" from now on=2E ;)
+-----BEGIN PGP SIGNATURE-----
 
---=20
-Kees Cook
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZS1v5AAKCRB4tDGHoIJi
+0uu/AQDsd+QvHSok4Q8k4HHYfsUMrdFaeTVLhvRpSi+kRG+LLwD/T6ws6vJoKrWg
+ZkwzD5bj5QIZjaHiwVcDzL6nh9r1gAo=
+=qQsV
+-----END PGP SIGNATURE-----
+
+--n9y3/cEO82Secmi+--
 
