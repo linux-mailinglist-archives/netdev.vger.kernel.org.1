@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-41428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A43917CAEAA
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:12:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56E3A7CAEB3
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 18:16:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F20DCB20D82
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:12:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 914CD1C203E0
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 16:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD8830CEF;
-	Mon, 16 Oct 2023 16:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CC72E645;
+	Mon, 16 Oct 2023 16:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="J0/P8eus"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="BuVTZJ3d"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3822E638;
-	Mon, 16 Oct 2023 16:12:14 +0000 (UTC)
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD13E6;
-	Mon, 16 Oct 2023 09:12:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1697472733; x=1729008733;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+36XmP8asMBo8L9iZ19ej+lJg8W+aW92hTS1Nj/oAYg=;
-  b=J0/P8eus/07FMHaSHcmkIMHmJsfDmbiTx8xFntl6k6cX4/bQXGMGWEOb
-   dqUGnKZTXxTrgi6C/sjewF2AF64GEjCLqxijjxhhF9RDLIGPuk+9UhhXA
-   mVhXI3HpepERN5Nc0yVEnkT4X4aYhzkGu1crjkUwJRLbFjGUYzTKK3R7R
-   c=;
-X-IronPort-AV: E=Sophos;i="6.03,229,1694736000"; 
-   d="scan'208";a="245384081"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2023 16:12:09 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com (Postfix) with ESMTPS id 14D344880B;
-	Mon, 16 Oct 2023 16:11:55 +0000 (UTC)
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:41908]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.209:2525] with esmtp (Farcaster)
- id 32d64908-6f5e-4cac-b6d7-291102808b66; Mon, 16 Oct 2023 16:11:54 +0000 (UTC)
-X-Farcaster-Flow-ID: 32d64908-6f5e-4cac-b6d7-291102808b66
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 16 Oct 2023 16:11:46 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.29) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 16 Oct 2023 16:11:42 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <daniel@iogearbox.net>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<haoluo@google.com>, <john.fastabend@gmail.com>, <jolsa@kernel.org>,
-	<kpsingh@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <mykolal@fb.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
-	<song@kernel.org>, <yonghong.song@linux.dev>
-Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie generation/validation SOCK_OPS hooks.
-Date: Mon, 16 Oct 2023 09:11:34 -0700
-Message-ID: <20231016161134.25365-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <0611984e-aea2-7eb5-af3e-e0635ca3b7ba@iogearbox.net>
-References: <0611984e-aea2-7eb5-af3e-e0635ca3b7ba@iogearbox.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A452128E24
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 16:16:01 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1736A2;
+	Mon, 16 Oct 2023 09:15:58 -0700 (PDT)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39GGFXNq100868;
+	Mon, 16 Oct 2023 11:15:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1697472933;
+	bh=KUI1YZQF+e2I5/EmK98OhOJUzMMaVq6d4VLQ6Wded+M=;
+	h=From:To:CC:Subject:Date;
+	b=BuVTZJ3dp2qphcvPflja5RVToUdp9+aspi5lJ54v6z5TqryecE/xbj+w3C7Z9ZLK/
+	 9uX212paSd94qcTwDoZBzC4n4HQ8x6uJrAGi6LcQZcDgHAi13e23thRZm3d9LN2x26
+	 JUsSPokA33yCa8f/E9ARByClQaJ49IUDq8jG9+6U=
+Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39GGFXEO108192
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 16 Oct 2023 11:15:33 -0500
+Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE114.ent.ti.com
+ (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 16
+ Oct 2023 11:15:33 -0500
+Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 16 Oct 2023 11:15:33 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39GGFXQ4121826;
+	Mon, 16 Oct 2023 11:15:33 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.31])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 39GGFWN1016754;
+	Mon, 16 Oct 2023 11:15:33 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Jacob Keller <jacob.e.keller@intel.com>, Andrew Lunn <andrew@lunn.ch>,
+        MD
+ Danish Anwar <danishanwar@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub
+ Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>, <r-gunasekaran@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>
+Subject: [PATCH net v2] net: ti: icssg-prueth: Fix r30 CMDs bitmasks
+Date: Mon, 16 Oct 2023 21:45:25 +0530
+Message-ID: <20231016161525.1695795-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,187 +75,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.187.171.29]
-X-ClientProxiedBy: EX19D039UWB003.ant.amazon.com (10.13.138.93) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
-	version=3.4.6
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Daniel Borkmann <daniel@iogearbox.net>
-Date: Mon, 16 Oct 2023 15:05:25 +0200
-> On 10/14/23 12:04 AM, Kuniyuki Iwashima wrote:
-> > Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
-> > for the connection request until a valid ACK is responded to the SYN+ACK.
-> > 
-> > The cookie contains two kinds of host-specific bits, a timestamp and
-> > secrets, so only can it be validated by the generator.  It means SYN
-> > Cookie consumes network resources between the client and the server;
-> > intermediate nodes must remember which nodes to route ACK for the cookie.
-> > 
-> > SYN Proxy reduces such unwanted resource allocation by handling 3WHS at
-> > the edge network.  After SYN Proxy completes 3WHS, it forwards SYN to the
-> > backend server and completes another 3WHS.  However, since the server's
-> > ISN differs from the cookie, the proxy must manage the ISN mappings and
-> > fix up SEQ/ACK numbers in every packet for each connection.  If a proxy
-> > node is down, all the connections through it are also down.  Keeping a
-> > state at proxy is painful from that perspective.
-> > 
-> > At AWS, we use a dirty hack to build truly stateless SYN Proxy at scale.
-> > Our SYN Proxy consists of the front proxy layer and the backend kernel
-> > module.  (See slides of netconf [0], p6 - p15)
-> > 
-> > The cookie that SYN Proxy generates differs from the kernel's cookie in
-> > that it contains a secret (called rolling salt) (i) shared by all the proxy
-> > nodes so that any node can validate ACK and (ii) updated periodically so
-> > that old cookies cannot be validated.  Also, ISN contains WScale, SACK, and
-> > ECN, not in TS val.  This is not to sacrifice any connection quality, where
-> > some customers turn off the timestamp option due to retro CVE.
-> > 
-> > After 3WHS, the proxy restores SYN and forwards it and ACK to the backend
-> > server.  Our kernel module works at Netfilter input/output hooks and first
-> > feeds SYN to the TCP stack to initiate 3WHS.  When the module is triggered
-> > for SYN+ACK, it looks up the corresponding request socket and overwrites
-> > tcp_rsk(req)->snt_isn with the proxy's cookie.  Then, the module can
-> > complete 3WHS with the original ACK as is.
-> > 
-> > This way, our SYN Proxy does not manage the ISN mappings and can stay
-> > stateless.  It's working very well for high-bandwidth services like
-> > multiple Tbps, but we are looking for a way to drop the dirty hack and
-> > further optimise the sequences.
-> > 
-> > If we could validate an arbitrary SYN Cookie on the backend server with
-> > BPF, the proxy would need not restore SYN nor pass it.  After validating
-> > ACK, the proxy node just needs to forward it, and then the server can do
-> > the lightweight validation (e.g. check if ACK came from proxy nodes, etc)
-> > and create a connection from the ACK.
-> > 
-> > This series adds two SOCK_OPS hooks to generate and validate arbitrary
-> > SYN Cookie.  Each hook is invoked if BPF_SOCK_OPS_SYNCOOKIE_CB_FLAG is
-> > set to the listening socket in advance by bpf_sock_ops_cb_flags_set().
-> > 
-> > The user interface looks like this:
-> > 
-> >    BPF_SOCK_OPS_GEN_SYNCOOKIE_CB
-> > 
-> >      input
-> >      |- bpf_sock_ops.sk           : 4-tuple
-> >      |- bpf_sock_ops.skb          : TCP header
-> >      |- bpf_sock_ops.args[0]      : MSS
-> >      `- bpf_sock_ops.args[1]      : BPF_SYNCOOKIE_XXX flags
-> > 
-> >      output
-> >      |- bpf_sock_ops.replylong[0] : ISN (SYN Cookie) ------.
-> >      `- bpf_sock_ops.replylong[1] : TS value -----------.  |
-> >                                                         |  |
-> >    BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB                      |  |
-> >                                                         |  |
-> >      input                                              |  |
-> >      |- bpf_sock_ops.sk           : 4-tuple             |  |
-> >      |- bpf_sock_ops.skb          : TCP header          |  |
-> >      |- bpf_sock_ops.args[0]      : ISN (SYN Cookie) <-----'
-> >      `- bpf_sock_ops.args[1]      : TS value <----------'
-> > 
-> >      output
-> >      |- bpf_sock_ops.replylong[0] : MSS
-> >      `- bpf_sock_ops.replylong[1] : BPF_SYNCOOKIE_XXX flags
-> > 
-> > To establish a connection from SYN Cookie, BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB
-> > hook must set a valid MSS to bpf_sock_ops.replylong[0], meaning that
-> > BPF_SOCK_OPS_GEN_SYNCOOKIE_CB hook must encode MSS to ISN or TS val to be
-> > restored in the validation hook.
-> > 
-> > If WScale, SACK, and ECN are detected to be available in SYN packet, the
-> > corresponding flags are passed to args[0] of BPF_SOCK_OPS_GEN_SYNCOOKIE_CB
-> > so that bpf prog need not parse the TCP header.  The same flags can be set
-> > to replylong[0] of BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB to enable each feature
-> > on the connection.
-> > 
-> > For details, please see each patch.  Here's an overview:
-> > 
-> >    patch 1 - 4 : Misc cleanup
-> >    patch 5, 6  : Add SOCK_OPS hook (only ISN is available here)
-> >    patch 7, 8  : Make TS val available as the second cookie storage
-> >    patch 9, 10 : Make WScale, SACK, and ECN configurable from ACK
-> >    patch 11    : selftest, need some help from BPF experts...
-> > 
-> > [0]: https://netdev.bots.linux.dev/netconf/2023/kuniyuki.pdf
-> 
-> Fyi, just as quick feedback, this fails BPF CI selftests :
-> 
-> https://github.com/kernel-patches/bpf/actions/runs/6513838231/job/17694669376
-> 
-> Notice: Success: 427/3396, Skipped: 24, Failed: 1
-> Error: #274 tcpbpf_user
->    Error: #274 tcpbpf_user
->    test_tcpbpf_user:PASS:open and load skel 0 nsec
->    test_tcpbpf_user:PASS:test__join_cgroup(/tcpbpf-user-test) 0 nsec
->    test_tcpbpf_user:PASS:attach_cgroup(bpf_testcb) 0 nsec
->    run_test:PASS:start_server 0 nsec
->    run_test:PASS:connect_to_fd(listen_fd) 0 nsec
->    run_test:PASS:accept(listen_fd) 0 nsec
->    run_test:PASS:send(cli_fd) 0 nsec
->    run_test:PASS:recv(accept_fd) 0 nsec
->    run_test:PASS:send(accept_fd) 0 nsec
->    run_test:PASS:recv(cli_fd) 0 nsec
->    run_test:PASS:recv(cli_fd) for fin 0 nsec
->    run_test:PASS:recv(accept_fd) for fin 0 nsec
->    verify_result:PASS:event_map 0 nsec
->    verify_result:PASS:bytes_received 0 nsec
->    verify_result:PASS:bytes_acked 0 nsec
->    verify_result:PASS:data_segs_in 0 nsec
->    verify_result:PASS:data_segs_out 0 nsec
->    verify_result:FAIL:bad_cb_test_rv unexpected bad_cb_test_rv: actual 0 != expected 128
+The bitmask for EMAC_PORT_DISABLE and EMAC_PORT_FORWARD has been changed
+in the ICSSG firmware REL.PRU-ICSS-ETHERNET-SWITCH_02.02.12.05.
 
-128 (0x80) should be BPF_SOCK_OPS_ALL_CB_FLAGS + 1 instead so
-that we need not update the test for each SOCK_OPS addition.
+The current bitmasks are wrong and as a result EMAC_PORT_DISABLE and
+EMAC_PORT_FORWARD commands doesn not work.
+Update r30 commands to use the same bitmask as used by the ICSSG firmware
+REL.PRU-ICSS-ETHERNET-SWITCH_02.02.12.05.
 
-I'll include this diff in the next revision.
+These bitmasks are not backwards compatible. This will work with
+firmware version REL.PRU-ICSS-ETHERNET-SWITCH_02.02.12.05 and above but
+not with lower firmware versions.
 
-Thank you!
+Fixes: e9b4ece7d74b ("net: ti: icssg-prueth: Add Firmware config and classification APIs.")
+Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+---
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Ravi Gunasekaran <r-gunasekaran@ti.com>
 
----8<---
-diff --git a/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c b/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c
-index 7e8fe1bad03f..e4849d2a2956 100644
---- a/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c
-+++ b/tools/testing/selftests/bpf/prog_tests/tcpbpf_user.c
-@@ -26,7 +26,8 @@ static void verify_result(struct tcpbpf_globals *result)
- 	ASSERT_EQ(result->bytes_acked, 1002, "bytes_acked");
- 	ASSERT_EQ(result->data_segs_in, 1, "data_segs_in");
- 	ASSERT_EQ(result->data_segs_out, 1, "data_segs_out");
--	ASSERT_EQ(result->bad_cb_test_rv, 0x80, "bad_cb_test_rv");
-+	ASSERT_EQ(result->bad_cb_test_rv, BPF_SOCK_OPS_ALL_CB_FLAGS + 1,
-+		  "bad_cb_test_rv");
- 	ASSERT_EQ(result->good_cb_test_rv, 0, "good_cb_test_rv");
- 	ASSERT_EQ(result->num_listen, 1, "num_listen");
+Changes from v1 to v2:
+*) Added firmware version in commit message as asked by Ravi.
+*) Mentioned in commit message that the patch is not backwards compatible
+   as asked by Andrew.
+
+v1: https://lore.kernel.org/all/20231013111758.213769-1-danishanwar@ti.com/
+
+ drivers/net/ethernet/ti/icssg/icssg_config.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+index 933b84666574..b272361e378f 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_config.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+@@ -379,9 +379,9 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
  
-diff --git a/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c b/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c
-index cf7ed8cbb1fe..52da66d77fd6 100644
---- a/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c
-+++ b/tools/testing/selftests/bpf/progs/test_tcpbpf_kern.c
-@@ -103,7 +103,8 @@ int bpf_testcb(struct bpf_sock_ops *skops)
- 		break;
- 	case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
- 		/* Test failure to set largest cb flag (assumes not defined) */
--		global.bad_cb_test_rv = bpf_sock_ops_cb_flags_set(skops, 0x80);
-+		global.bad_cb_test_rv = bpf_sock_ops_cb_flags_set(skops,
-+								  BPF_SOCK_OPS_ALL_CB_FLAGS + 1);
- 		/* Set callback */
- 		global.good_cb_test_rv = bpf_sock_ops_cb_flags_set(skops,
- 						 BPF_SOCK_OPS_STATE_CB_FLAG);
----8<---
+ /* Bitmask for ICSSG r30 commands */
+ static const struct icssg_r30_cmd emac_r32_bitmask[] = {
+-	{{0xffff0004, 0xffff0100, 0xffff0100, EMAC_NONE}},	/* EMAC_PORT_DISABLE */
++	{{0xffff0004, 0xffff0100, 0xffff0004, EMAC_NONE}},	/* EMAC_PORT_DISABLE */
+ 	{{0xfffb0040, 0xfeff0200, 0xfeff0200, EMAC_NONE}},	/* EMAC_PORT_BLOCK */
+-	{{0xffbb0000, 0xfcff0000, 0xdcff0000, EMAC_NONE}},	/* EMAC_PORT_FORWARD */
++	{{0xffbb0000, 0xfcff0000, 0xdcfb0000, EMAC_NONE}},	/* EMAC_PORT_FORWARD */
+ 	{{0xffbb0000, 0xfcff0000, 0xfcff2000, EMAC_NONE}},	/* EMAC_PORT_FORWARD_WO_LEARNING */
+ 	{{0xffff0001, EMAC_NONE,  EMAC_NONE, EMAC_NONE}},	/* ACCEPT ALL */
+ 	{{0xfffe0002, EMAC_NONE,  EMAC_NONE, EMAC_NONE}},	/* ACCEPT TAGGED */
+-- 
+2.34.1
 
-
->    verify_result:PASS:good_cb_test_rv 0 nsec
->    verify_result:PASS:num_listen 0 nsec
->    verify_result:PASS:num_close_events 0 nsec
->    verify_result:PASS:tcp_save_syn 0 nsec
->    verify_result:PASS:tcp_saved_syn 0 nsec
->    verify_result:PASS:window_clamp_client 0 nsec
->    verify_result:PASS:window_clamp_server 0 nsec
 
