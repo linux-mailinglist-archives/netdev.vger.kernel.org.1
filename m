@@ -1,41 +1,84 @@
-Return-Path: <netdev+bounces-41176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80B497CA151
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:10:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C8C1D7CA161
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 10:14:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10B46B20C41
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 08:10:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68D72B20C42
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 08:14:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B575218623;
-	Mon, 16 Oct 2023 08:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FFC518628;
+	Mon, 16 Oct 2023 08:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pGwqhzUL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FI7rEVu0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BE71802D
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 08:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 15412C433C9;
-	Mon, 16 Oct 2023 08:10:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697443824;
-	bh=hy4665Tqe22tAQwJ1oDqGVuhQuSrzBC3ikTfqc6HLNs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pGwqhzULeQMXsBvaVnHU2f8rFjpE+3M9u4I/7pbWJZVuMjYcjtOW9g+g2O7401cC1
-	 WjrQj4cW+4VvX/ngms2S3QsNT5Qhe/Shm3zDJTOmAb5uOv5mFn2l2Kh5sbL2PSEeAz
-	 X+Uc8k0zgc3KW4uzO2qdWqpIwpIP/DN/kvAV4fhO9v1biUiPhw9RO3+xeZP7UistA5
-	 o0p4cHfCdwDf8UtS3I/4FAhNKO9QMQ1MZiy1tvHogg6g8bFgCLnx5YbT/3mbIjdbUn
-	 MFStZpw9ih9EG0WpVCNkTHj+Q7jYoY9sTKPsoNzXiJQymAk5/WWmMTUH8hl6JR7tjt
-	 lmdfK014RJJAg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F0F2CE4E9B5;
-	Mon, 16 Oct 2023 08:10:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76F818623
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 08:14:10 +0000 (UTC)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 629BAB4
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 01:14:09 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-32d849cc152so4031161f8f.1
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 01:14:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697444048; x=1698048848; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oQjpvg7MGAmM9iA2NCznSunlkzHKe6ycndsouHEmzpk=;
+        b=FI7rEVu0d+bcprOnEwUUMLepoKMOAjGOP1ycO2fnjGE5KR+amB55erC0onsSvWp9RZ
+         h0E3TeyKZiNeA4+mwMgfU4QDRZQSWL12o1CTpt4KkG0hwobNEtPktwWH2f7ZnKX4BCQj
+         hrd9dc6H1tqHpbMJ6sPe65mVEnpX17biggHeISbUJCxijhurPyUpGwsuGPlU43Yig1iZ
+         3yInYejnUbXJA0QYgVzJKq2TWQpAuHzHAxIQGwD94rV5HD300tQKFejMPbJZ2w2TSYJO
+         8P7NWj8kPePKfHn/9SxGYQje+JDjyD1fhnXjE9Luxc7fvuKsfW7dURuMELW2DjIIkvBt
+         cv/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697444048; x=1698048848;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oQjpvg7MGAmM9iA2NCznSunlkzHKe6ycndsouHEmzpk=;
+        b=jd8SwgLiARekgJhAImajSReQvyCHmoJaPuRVhOeNnYLlvzEi2N9td6Irkm4OTBKnxV
+         1O5Z1lKSTLzXhrRP3Z1BvvvSmuVygcZk23d5E72hQS8e/d+zzIdpG/wZraPmN0tv7YYS
+         MaXJYZShqagGECOvmtUwxTLQbpIwAoTvSyjGBgfbV5CK3GRpjnIOcu73ocz0L2lUyfqd
+         pBni9+bynn1NBGmAtqDs6WDFKKEn23AQjAiHyYxg92BkEyJlTbjLnDLYk0D5TldBHJj6
+         3ykL+qdqUlp0G/CGRy1YP784HUlEyIfqrOuJihrP+vrTFJ0D4Q1WtPFiqKdLpC3fZ/h2
+         1OFw==
+X-Gm-Message-State: AOJu0Yxr2bSKf9iuZC5ST/8Jizn5kPJYceUnJdS2vSdH0JMbp+VA+Ybf
+	q/tp+WGcgB6wLVTne+sXxz8=
+X-Google-Smtp-Source: AGHT+IHJ1KBmQhTTq9FucQdsbJI/NYYxMdPPS/M5zXZ3oFtQ7bspxLFQzYZRQa86eK5qXpsCLWebeA==
+X-Received: by 2002:a05:6000:1189:b0:321:6936:c217 with SMTP id g9-20020a056000118900b003216936c217mr26853069wrx.14.1697444047600;
+        Mon, 16 Oct 2023 01:14:07 -0700 (PDT)
+Received: from xmarquiegui-HP-ZBook-15-G6.internal.ainguraiiot.com (210.212-55-6.static.clientes.euskaltel.es. [212.55.6.210])
+        by smtp.gmail.com with ESMTPSA id t11-20020a5d534b000000b003232380ffd5sm26703515wrv.106.2023.10.16.01.14.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 01:14:06 -0700 (PDT)
+From: Xabier Marquiegui <reibax@gmail.com>
+To: kuba@kernel.org
+Cc: chrony-dev@chrony.tuxfamily.org,
+	davem@davemloft.net,
+	horms@kernel.org,
+	jstultz@google.com,
+	mlichvar@redhat.com,
+	netdev@vger.kernel.org,
+	ntp-lists@mattcorallo.com,
+	reibax@gmail.com,
+	richardcochran@gmail.com,
+	rrameshbabu@nvidia.com,
+	shuah@kernel.org,
+	tglx@linutronix.de,
+	vinicius.gomes@intel.com
+Subject: Re: [PATCH net-next v5 5/6] ptp: add debugfs interface to see applied channel masks
+Date: Mon, 16 Oct 2023 10:14:04 +0200
+Message-Id: <20231016081404.1647363-1-reibax@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231012163733.1f61a56d@kernel.org>
+References: <20231012163733.1f61a56d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,45 +86,24 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next PATCH] net: cxgb3: simplify logic for rspq_check_napi
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169744382398.7812.17747534311837223482.git-patchwork-notify@kernel.org>
-Date: Mon, 16 Oct 2023 08:10:23 +0000
-References: <20231012091429.2048-1-ansuelsmth@gmail.com>
-In-Reply-To: <20231012091429.2048-1-ansuelsmth@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: rajur@chelsio.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 12 Oct 2023 11:14:29 +0200 you wrote:
-> Simplify logic for rspq_check_napi.
-> Drop redundant and wrong napi_is_scheduled call as it's not race free
-> and directly use the output of napi_schedule to understand if a napi is
-> pending or not.
+Jakub Kicinski said:
+> The netdevsim driver which is supposed to be used for uAPI selftests
+> now supports PHCs. Maybe we can extend it and build a proper-er test?
 > 
-> rspq_check_napi main logic is to check if is_new_response is true and
-> check if a napi is not scheduled. The result of this function is then
-> used to detect if we are missing some interrupt and act on top of
-> this... With this knowing, we can rework and simplify the logic and make
-> it less problematic with testing an internal bit for napi.
-> 
-> [...]
+> Whether we'd then want to move the debugfs entries onto netdevsim
+> or leave them where you have then now is another question..
 
-Here is the summary with links:
-  - [net-next] net: cxgb3: simplify logic for rspq_check_napi
-    https://git.kernel.org/netdev/net-next/c/101c6032031f
+That is an interesting idea. Thank you Jakub. I will start looking onto it
+at whatever pace my other duties allow me to give it some thought.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+One challenge I anticipate encountering is that even if netdevsim has PHC
+support via the PTP mock implementation, we will probably have to think
+about how to simulate external timestamp events.
 
