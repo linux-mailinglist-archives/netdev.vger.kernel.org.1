@@ -1,373 +1,98 @@
-Return-Path: <netdev+bounces-41419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CC607CAE2D
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:50:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D4B57CAE34
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 17:51:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BECF528102C
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:50:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47C0328115A
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 15:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6FCA2E62B;
-	Mon, 16 Oct 2023 15:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452662E62C;
+	Mon, 16 Oct 2023 15:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2t0uQf/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p/1x9O/Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4882C87E;
-	Mon, 16 Oct 2023 15:50:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E701C433C8;
-	Mon, 16 Oct 2023 15:50:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697471452;
-	bh=8Z3jrNAij+Fk5+s3c9fGMpm3Llf0bqvYwxb17CmvIj4=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=a2t0uQf/DvBBY36/YSVGHmEbDVIJss6218VIOQFaRNy8JmQ0oer3kf5Do4B/XVenG
-	 33gyHHvUp34cAPyShV8hXUknOC/FDMNGdNjTPZJIcqDJUhBRCBvvVC16qC3yq7Sc0K
-	 6I7K8HlxTttf8VEYSL/9nhJiLXbO97xByEonHK91iC09/ZE70rl6GZxNnpxTwr5E5V
-	 q5Pqgk3a6b2L7xZJwBVEiGuUDDd7tXyymGf5isDXPBkRuGcR3Q9MlwE/DlbvXcKCcL
-	 QDOSHkHAxS6J/twjTAZ2McHQ4XR/fhs1WSS1NGUGj/jDf09dQOLLUlJEXb+HyrMikw
-	 OssnuHYl7WxWQ==
-Message-ID: <01b4b502db610db7e100a6a1371acd8633a5dbb7.camel@kernel.org>
-Subject: Re: [RFC PATCH 07/53] netfs: Provide invalidate_folio and
- release_folio calls
-From: Jeff Layton <jlayton@kernel.org>
-To: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Marc Dionne
- <marc.dionne@auristor.com>,  Paulo Alcantara <pc@manguebit.com>, Shyam
- Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Dominique
- Martinet <asmadeus@codewreck.org>, Ilya Dryomov <idryomov@gmail.com>,
- Christian Brauner <christian@brauner.io>,  linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org,  linux-nfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Date: Mon, 16 Oct 2023 11:50:49 -0400
-In-Reply-To: <20231013160423.2218093-8-dhowells@redhat.com>
-References: <20231013160423.2218093-1-dhowells@redhat.com>
-	 <20231013160423.2218093-8-dhowells@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E405D2C87F
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 15:51:41 +0000 (UTC)
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D2FBAB
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 08:51:40 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1c9c496c114so300045ad.0
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 08:51:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697471500; x=1698076300; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kFeXmQZfEkNQkEz1U5GC4L95YIPIbK2MUFvggu/UIEk=;
+        b=p/1x9O/YlsD0FLMxDWPgXcot6xiK2+thKKgxFClxTLnaM7PFDb6N6Oy3FU4Uhw3fZp
+         z/HgNPrOyic3n0BvBOrAtHpGSvHEI7SgX6lw2bejeMHisnsP/O1q8T2KuCvgKyMXr6bc
+         zLX5R6T75rzriEs9wkFa/a9CTWRI1rPwe+D9JsdtCb1rVbkQGmCjsO9xWFHfSIX82H21
+         yo4FmVsoBP7iSJ9cvhUSX9DI0CrpnGG/arUy88jOFznalYKZ9uGiF3EStsWflLgDVnU5
+         iVPIP/9ysDdM89rNF//+iQPqborWA4dRpQf7GgpktZZv8DuG5GTpmhpYejS7a8xKL7vf
+         aFrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697471500; x=1698076300;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kFeXmQZfEkNQkEz1U5GC4L95YIPIbK2MUFvggu/UIEk=;
+        b=Ca2L9tpUD6GSGPerZxKicemANXAILK/9Z4eSPAWmWmdAQfLA4+64xmze13miWe8HeH
+         g2y14nkxrdcngdgM7s7za+Z4vdb1MwfF1/4aqVajwU7v8lQV523PUY8igAa+/YUSkHOe
+         oOpKSUXOGQZb74KxzY0lv0JHOBa+5bk5Qf626ZYvnZXvlry+Et29FOyhonBVSycTuNNO
+         K/E/HUZLD8QNJPcmRbQwwB7tlD+wcGPAbjZTz1s5AQmjJ9bBJz1heAvK6Iqjm2APQbLt
+         oxMpfkcCQ0t4oywV/DYCESm9fbN425tnVQwq1mrqfjk7U1JtIV4jmxCopcA8r7G85I1e
+         /bkg==
+X-Gm-Message-State: AOJu0YzNV9o7+UHZ2e956npuhsWkOrf73RYw3ZWTJURgpe5KJ5ALj/jK
+	zNThclwWqqYDByG7SzPpBCK9ynp3Cxv0MUhUccX4lA==
+X-Google-Smtp-Source: AGHT+IEmvWfb9yBVNL5GED+BdBq0lbt0TdRkDME7jWGP5D5U9iMQ+561vIu2zwSpQG5s6plvxRrcIBLJ8Ij9QA/YrAU=
+X-Received: by 2002:a17:903:40c1:b0:1b8:9551:de55 with SMTP id
+ t1-20020a17090340c100b001b89551de55mr321115pld.26.1697471499608; Mon, 16 Oct
+ 2023 08:51:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20231016132812.63703-1-wuyun.abel@bytedance.com> <20231016132812.63703-2-wuyun.abel@bytedance.com>
+In-Reply-To: <20231016132812.63703-2-wuyun.abel@bytedance.com>
+From: Shakeel Butt <shakeelb@google.com>
+Date: Mon, 16 Oct 2023 08:51:28 -0700
+Message-ID: <CALvZod5uy476CBNoxcUUsH4W9Yc7Oqg4yUM9gNK=fKRs_bqidA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/3] sock: Doc behaviors for pressure heurisitics
+To: Abel Wu <wuyun.abel@bytedance.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 2023-10-13 at 17:03 +0100, David Howells wrote:
-> Provide default invalidate_folio and release_folio calls.  These will nee=
-d
-> to interact with invalidation correctly at some point.  They will be need=
-ed
-> if netfslib is to make use of folio->private for its own purposes.
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-cachefs@redhat.com
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
-> ---
->  fs/9p/vfs_addr.c      | 33 ++-------------------------
->  fs/afs/file.c         | 53 ++++---------------------------------------
->  fs/ceph/addr.c        | 24 ++------------------
->  fs/netfs/Makefile     |  1 +
->  fs/netfs/misc.c       | 51 +++++++++++++++++++++++++++++++++++++++++
->  include/linux/netfs.h |  6 +++--
->  6 files changed, 64 insertions(+), 104 deletions(-)
->  create mode 100644 fs/netfs/misc.c
->=20
-> diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
-> index 8a635999a7d6..18a666c43e4a 100644
-> --- a/fs/9p/vfs_addr.c
-> +++ b/fs/9p/vfs_addr.c
-> @@ -104,35 +104,6 @@ const struct netfs_request_ops v9fs_req_ops =3D {
->  	.issue_read		=3D v9fs_issue_read,
->  };
-> =20
-> -/**
-> - * v9fs_release_folio - release the private state associated with a foli=
-o
-> - * @folio: The folio to be released
-> - * @gfp: The caller's allocation restrictions
-> - *
-> - * Returns true if the page can be released, false otherwise.
-> - */
-> -
-> -static bool v9fs_release_folio(struct folio *folio, gfp_t gfp)
-> -{
-> -	if (folio_test_private(folio))
-> -		return false;
-> -#ifdef CONFIG_9P_FSCACHE
-> -	if (folio_test_fscache(folio)) {
-> -		if (current_is_kswapd() || !(gfp & __GFP_FS))
-> -			return false;
-> -		folio_wait_fscache(folio);
-> -	}
-> -	fscache_note_page_release(v9fs_inode_cookie(V9FS_I(folio_inode(folio)))=
-);
-> -#endif
-> -	return true;
-> -}
-> -
-> -static void v9fs_invalidate_folio(struct folio *folio, size_t offset,
-> -				 size_t length)
-> -{
-> -	folio_wait_fscache(folio);
-> -}
-> -
->  #ifdef CONFIG_9P_FSCACHE
->  static void v9fs_write_to_cache_done(void *priv, ssize_t transferred_or_=
-error,
->  				     bool was_async)
-> @@ -355,8 +326,8 @@ const struct address_space_operations v9fs_addr_opera=
-tions =3D {
->  	.writepage =3D v9fs_vfs_writepage,
->  	.write_begin =3D v9fs_write_begin,
->  	.write_end =3D v9fs_write_end,
-> -	.release_folio =3D v9fs_release_folio,
-> -	.invalidate_folio =3D v9fs_invalidate_folio,
-> +	.release_folio =3D netfs_release_folio,
-> +	.invalidate_folio =3D netfs_invalidate_folio,
->  	.launder_folio =3D v9fs_launder_folio,
->  	.direct_IO =3D v9fs_direct_IO,
->  };
-> diff --git a/fs/afs/file.c b/fs/afs/file.c
-> index 0c49b3b6f214..3fea5cd8ef13 100644
-> --- a/fs/afs/file.c
-> +++ b/fs/afs/file.c
-> @@ -20,9 +20,6 @@
-> =20
->  static int afs_file_mmap(struct file *file, struct vm_area_struct *vma);
->  static int afs_symlink_read_folio(struct file *file, struct folio *folio=
-);
-> -static void afs_invalidate_folio(struct folio *folio, size_t offset,
-> -			       size_t length);
-> -static bool afs_release_folio(struct folio *folio, gfp_t gfp_flags);
-> =20
->  static ssize_t afs_file_read_iter(struct kiocb *iocb, struct iov_iter *i=
-ter);
->  static ssize_t afs_file_splice_read(struct file *in, loff_t *ppos,
-> @@ -57,8 +54,8 @@ const struct address_space_operations afs_file_aops =3D=
- {
->  	.readahead	=3D netfs_readahead,
->  	.dirty_folio	=3D afs_dirty_folio,
->  	.launder_folio	=3D afs_launder_folio,
-> -	.release_folio	=3D afs_release_folio,
-> -	.invalidate_folio =3D afs_invalidate_folio,
-> +	.release_folio	=3D netfs_release_folio,
-> +	.invalidate_folio =3D netfs_invalidate_folio,
->  	.write_begin	=3D afs_write_begin,
->  	.write_end	=3D afs_write_end,
->  	.writepages	=3D afs_writepages,
-> @@ -67,8 +64,8 @@ const struct address_space_operations afs_file_aops =3D=
- {
-> =20
->  const struct address_space_operations afs_symlink_aops =3D {
->  	.read_folio	=3D afs_symlink_read_folio,
-> -	.release_folio	=3D afs_release_folio,
-> -	.invalidate_folio =3D afs_invalidate_folio,
-> +	.release_folio	=3D netfs_release_folio,
-> +	.invalidate_folio =3D netfs_invalidate_folio,
->  	.migrate_folio	=3D filemap_migrate_folio,
->  };
-> =20
-> @@ -405,48 +402,6 @@ int afs_write_inode(struct inode *inode, struct writ=
-eback_control *wbc)
->  	return 0;
->  }
-> =20
-> -/*
-> - * invalidate part or all of a page
-> - * - release a page and clean up its private data if offset is 0 (indica=
-ting
-> - *   the entire page)
-> - */
-> -static void afs_invalidate_folio(struct folio *folio, size_t offset,
-> -			       size_t length)
-> -{
-> -	_enter("{%lu},%zu,%zu", folio->index, offset, length);
-> -
-> -	folio_wait_fscache(folio);
-> -	_leave("");
-> -}
-> -
-> -/*
-> - * release a page and clean up its private state if it's not busy
-> - * - return true if the page can now be released, false if not
-> - */
-> -static bool afs_release_folio(struct folio *folio, gfp_t gfp)
-> -{
-> -	struct afs_vnode *vnode =3D AFS_FS_I(folio_inode(folio));
-> -
-> -	_enter("{{%llx:%llu}[%lu],%lx},%x",
-> -	       vnode->fid.vid, vnode->fid.vnode, folio_index(folio), folio->fla=
-gs,
-> -	       gfp);
-> -
-> -	/* deny if folio is being written to the cache and the caller hasn't
-> -	 * elected to wait */
-> -#ifdef CONFIG_AFS_FSCACHE
-> -	if (folio_test_fscache(folio)) {
-> -		if (current_is_kswapd() || !(gfp & __GFP_FS))
-> -			return false;
-> -		folio_wait_fscache(folio);
-> -	}
-> -	fscache_note_page_release(afs_vnode_cache(vnode));
-> -#endif
-> -
-> -	/* Indicate that the folio can be released */
-> -	_leave(" =3D T");
-> -	return true;
-> -}
-> -
->  static void afs_add_open_mmap(struct afs_vnode *vnode)
->  {
->  	if (atomic_inc_return(&vnode->cb_nr_mmap) =3D=3D 1) {
-> diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
-> index f4863078f7fe..ced19ff08988 100644
-> --- a/fs/ceph/addr.c
-> +++ b/fs/ceph/addr.c
-> @@ -160,27 +160,7 @@ static void ceph_invalidate_folio(struct folio *foli=
-o, size_t offset,
->  		ceph_put_snap_context(snapc);
->  	}
-> =20
-> -	folio_wait_fscache(folio);
-> -}
-> -
-> -static bool ceph_release_folio(struct folio *folio, gfp_t gfp)
-> -{
-> -	struct inode *inode =3D folio->mapping->host;
-> -
-> -	dout("%llx:%llx release_folio idx %lu (%sdirty)\n",
-> -	     ceph_vinop(inode),
-> -	     folio->index, folio_test_dirty(folio) ? "" : "not ");
-> -
-> -	if (folio_test_private(folio))
-> -		return false;
-> -
-> -	if (folio_test_fscache(folio)) {
-> -		if (current_is_kswapd() || !(gfp & __GFP_FS))
-> -			return false;
-> -		folio_wait_fscache(folio);
-> -	}
-> -	ceph_fscache_note_page_release(inode);
-> -	return true;
-> +	netfs_invalidate_folio(folio, offset, length);
->  }
-> =20
->  static void ceph_netfs_expand_readahead(struct netfs_io_request *rreq)
-> @@ -1563,7 +1543,7 @@ const struct address_space_operations ceph_aops =3D=
- {
->  	.write_end =3D ceph_write_end,
->  	.dirty_folio =3D ceph_dirty_folio,
->  	.invalidate_folio =3D ceph_invalidate_folio,
-> -	.release_folio =3D ceph_release_folio,
-> +	.release_folio =3D netfs_release_folio,
->  	.direct_IO =3D noop_direct_IO,
->  };
-> =20
-> diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
-> index 386d6fb92793..cd22554d9048 100644
-> --- a/fs/netfs/Makefile
-> +++ b/fs/netfs/Makefile
-> @@ -5,6 +5,7 @@ netfs-y :=3D \
->  	io.o \
->  	iterator.o \
->  	main.o \
-> +	misc.o \
->  	objects.o
-> =20
->  netfs-$(CONFIG_NETFS_STATS) +=3D stats.o
-> diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
-> new file mode 100644
-> index 000000000000..c3baf2b247d9
-> --- /dev/null
-> +++ b/fs/netfs/misc.c
-> @@ -0,0 +1,51 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/* Miscellaneous routines.
-> + *
-> + * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
-> + * Written by David Howells (dhowells@redhat.com)
-> + */
-> +
-> +#include <linux/swap.h>
-> +#include "internal.h"
-> +
-> +/**
-> + * netfs_invalidate_folio - Invalidate or partially invalidate a folio
-> + * @folio: Folio proposed for release
-> + * @offset: Offset of the invalidated region
-> + * @length: Length of the invalidated region
-> + *
-> + * Invalidate part or all of a folio for a network filesystem.  The foli=
-o will
-> + * be removed afterwards if the invalidated region covers the entire fol=
-io.
-> + */
-> +void netfs_invalidate_folio(struct folio *folio, size_t offset, size_t l=
-ength)
-> +{
-> +	_enter("{%lx},%zx,%zx", folio_index(folio), offset, length);
-> +
-> +	folio_wait_fscache(folio);
-> +}
-> +EXPORT_SYMBOL(netfs_invalidate_folio);
-> +
-> +/**
-> + * netfs_release_folio - Try to release a folio
-> + * @folio: Folio proposed for release
-> + * @gfp: Flags qualifying the release
-> + *
-> + * Request release of a folio and clean up its private state if it's not=
- busy.
-> + * Returns true if the folio can now be released, false if not
-> + */
-> +bool netfs_release_folio(struct folio *folio, gfp_t gfp)
-> +{
-> +	struct netfs_inode *ctx =3D netfs_inode(folio_inode(folio));
-> +
-> +	if (folio_test_private(folio))
-> +		return false;
-> +	if (folio_test_fscache(folio)) {
-> +		if (current_is_kswapd() || !(gfp & __GFP_FS))
-> +			return false;
-> +		folio_wait_fscache(folio);
-> +	}
-> +
-> +	fscache_note_page_release(netfs_i_cookie(ctx));
-> +	return true;
-> +}
-> +EXPORT_SYMBOL(netfs_release_folio);
-> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-> index ed64d1034afa..daa431c4148d 100644
-> --- a/include/linux/netfs.h
-> +++ b/include/linux/netfs.h
-> @@ -299,8 +299,10 @@ struct readahead_control;
->  void netfs_readahead(struct readahead_control *);
->  int netfs_read_folio(struct file *, struct folio *);
->  int netfs_write_begin(struct netfs_inode *, struct file *,
-> -		struct address_space *, loff_t pos, unsigned int len,
-> -		struct folio **, void **fsdata);
-> +		      struct address_space *, loff_t pos, unsigned int len,
-> +		      struct folio **, void **fsdata);
-> +void netfs_invalidate_folio(struct folio *folio, size_t offset, size_t l=
-ength);
-> +bool netfs_release_folio(struct folio *folio, gfp_t gfp);
-> =20
->  void netfs_subreq_terminated(struct netfs_io_subrequest *, ssize_t, bool=
-);
->  void netfs_get_subrequest(struct netfs_io_subrequest *subreq,
->=20
+On Mon, Oct 16, 2023 at 6:28=E2=80=AFAM Abel Wu <wuyun.abel@bytedance.com> =
+wrote:
+>
+> There are now two accounting infrastructures for skmem, while the
+> heuristics in __sk_mem_raise_allocated() were actually introduced
+> before memcg was born.
+>
+> Add some comments to clarify whether they can be applied to both
+> infrastructures or not.
+>
+> Suggested-by: Shakeel Butt <shakeelb@google.com>
+> Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
 
-Nice cleanup. Might can merge this in advance of the rest of the series.
-
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Acked-by: Shakeel Butt <shakeelb@google.com>
 
