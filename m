@@ -1,158 +1,170 @@
-Return-Path: <netdev+bounces-41213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D8137CA3E2
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:17:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18C3A7CA3F3
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 11:21:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C62DCB20CD2
-	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:17:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3F3CB20CA5
+	for <lists+netdev@lfdr.de>; Mon, 16 Oct 2023 09:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113041C6A3;
-	Mon, 16 Oct 2023 09:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F8931C69C;
+	Mon, 16 Oct 2023 09:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hEMUQXG7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E2A1A5B7;
-	Mon, 16 Oct 2023 09:17:30 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A158EB4;
-	Mon, 16 Oct 2023 02:17:28 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 39G9GN3R02428077, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.93/5.92) with ESMTPS id 39G9GN3R02428077
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 16 Oct 2023 17:16:24 +0800
-Received: from RTEXDAG01.realtek.com.tw (172.21.6.100) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Mon, 16 Oct 2023 17:15:52 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG01.realtek.com.tw (172.21.6.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Mon, 16 Oct 2023 17:15:51 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
- RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
- 15.01.2375.007; Mon, 16 Oct 2023 17:15:51 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Douglas Anderson <dianders@chromium.org>,
-        Jakub Kicinski
-	<kuba@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>
-CC: Alan Stern <stern@rowland.harvard.edu>, Simon Horman <horms@kernel.org>,
-        Edward Hill <ecgh@chromium.org>, Laura Nao <laura.nao@collabora.com>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        Grant Grundler
-	<grundler@chromium.org>,
-        =?iso-8859-1?Q?Bj=F8rn_Mork?= <bjorn@mork.no>,
-        "Eric
- Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH v3 5/5] r8152: Block future register access if register access fails
-Thread-Topic: [PATCH v3 5/5] r8152: Block future register access if register
- access fails
-Thread-Index: AQHZ/UKPr2uppqw2y0WH24Vf4SC1orBMGX/A
-Date: Mon, 16 Oct 2023 09:15:51 +0000
-Message-ID: <29f9a2ff1979406489213909b940184f@realtek.com>
-References: <20231012192552.3900360-1-dianders@chromium.org>
- <20231012122458.v3.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
-In-Reply-To: <20231012122458.v3.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXDAG01.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2551C689
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 09:21:05 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D25CE6;
+	Mon, 16 Oct 2023 02:21:04 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39FMqfbK002130;
+	Mon, 16 Oct 2023 02:20:57 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=aDkqH3qqGAqawjC5yA0b026nEmhgxqApxWhyZtYmvjQ=;
+ b=hEMUQXG7QCO2OOVMteR6YPJVDcCIDBymsegwuJzH8g9lpz2ymHbyd7WumyKnyw6mdc7N
+ 7Z3Bv/ILegqkKbYd8VSsu+kBxMGh5uuHEI21Y3FZV42NO4AnM2PQSLyAyNY2CGmoEdu2
+ r2AewTfNlEoU6eZXiGkgNzmi+ihWAjtfnTu+z+i/NoIicCRbULqimGmzR0oX96R7LgFC
+ YCvnsovcgx3/DxxfPFf0MoEl/twxSv+V+lWNE3to02p57GNGEUPGYlPcdhNlyj+7q1ED
+ SiSFsGCXgfhkcXn38vZApbV/jRf8IH5s3QYK4BU55KpNiVUM9jKIhdO5YbvW+zO5kiUc BA== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3tqtgkmnww-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 16 Oct 2023 02:20:57 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 16 Oct
+ 2023 02:20:54 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 16 Oct 2023 02:20:55 -0700
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 9A99B3F7068;
+	Mon, 16 Oct 2023 02:20:54 -0700 (PDT)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <horms@kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <pabeni@redhat.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <egallen@redhat.com>, <hgani@marvell.com>, <kuba@kernel.org>,
+        <mschmidt@redhat.com>, <netdev@vger.kernel.org>,
+        <srasheed@marvell.com>, <sedara@marvell.com>, <vburru@marvell.com>,
+        <vimleshk@marvell.com>
+Subject: [net-next PATCH v3] octeon_ep: pack hardware structure
+Date: Mon, 16 Oct 2023 02:20:51 -0700
+Message-ID: <20231016092051.2306831-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: rQ3Uxx9A4OP0jyJbrrXnlndqvmzoLGGk
+X-Proofpoint-ORIG-GUID: rQ3Uxx9A4OP0jyJbrrXnlndqvmzoLGGk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-16_03,2023-10-12_01,2023-05-22_02
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Douglas Anderson <dianders@chromium.org>
-> Sent: Friday, October 13, 2023 3:25 AM
-[...]
->  static int generic_ocp_read(struct r8152 *tp, u16 index, u16 size,
-> @@ -8265,6 +8353,19 @@ static int rtl8152_pre_reset(struct usb_interface
-> *intf)
->         if (!tp)
->                 return 0;
->=20
-> +       /* We can only use the optimized reset if we made it to the end o=
-f
-> +        * probe without any register access fails, which sets
-> +        * `PROBED_WITH_NO_ERRORS` to true. If we didn't have that then r=
-eturn
-> +        * an error here which tells the USB framework to fully unbind/re=
-bind
-> +        * our driver.
+Clean up structure defines related to hardware data to be
+attributed 'packed' in the code, as padding is not allowed
+by hardware.
 
-Would you stay in a loop of unbind and rebind,
-if the control transfers in the probe() are not always successful?
-I just think about the worst case that at least one control always fails in=
- probe().
+Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+---
+V3:
+  - Updated changelog to indicate this is a cleanup
+V2: https://lore.kernel.org/all/20231010194026.2284786-1-srasheed@marvell.com/
+  - Updated changelog to provide more information
+V1: https://lore.kernel.org/all/20231006120225.2259533-1-srasheed@marvell.com/
 
-> +        */
-> +       mutex_lock(&tp->control);
+ drivers/net/ethernet/marvell/octeon_ep/octep_rx.h | 6 +++---
+ drivers/net/ethernet/marvell/octeon_ep/octep_tx.h | 8 ++++----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-I don't think you need the mutex for testing the bit.
-
-> +       if (!test_bit(PROBED_WITH_NO_ERRORS, &tp->flags)) {
-> +               mutex_unlock(&tp->control);
-> +               return -EIO;
-> +       }
-> +       mutex_unlock(&tp->control);
-> +
->         netdev =3D tp->netdev;
->         if (!netif_running(netdev))
->                 return 0;
-> @@ -8277,7 +8378,9 @@ static int rtl8152_pre_reset(struct usb_interface
-> *intf)
->         napi_disable(&tp->napi);
->         if (netif_carrier_ok(netdev)) {
->                 mutex_lock(&tp->control);
-> +               set_bit(IN_PRE_RESET, &tp->flags);
->                 tp->rtl_ops.disable(tp);
-> +               clear_bit(IN_PRE_RESET, &tp->flags);
->                 mutex_unlock(&tp->control);
->         }
->=20
-> @@ -8293,6 +8396,10 @@ static int rtl8152_post_reset(struct usb_interface
-> *intf)
->         if (!tp)
->                 return 0;
->=20
-> +       mutex_lock(&tp->control);
-
-I don't think clear_bit() needs the protection of mutex.
-I think you could call rtl_set_accessible() directly.
-
-> +       rtl_set_accessible(tp);
-> +       mutex_unlock(&tp->control);
-> +
->         /* reset the MAC address in case of policy change */
->         if (determine_ethernet_addr(tp, &sa) >=3D 0) {
->                 rtnl_lock();
-
-Best Regards,
-Hayes
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h
+index 782a24f27f3e..ca42ddb77491 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h
+@@ -19,7 +19,7 @@
+ struct octep_oq_desc_hw {
+ 	dma_addr_t buffer_ptr;
+ 	u64 info_ptr;
+-};
++} __packed;
+ 
+ #define OCTEP_OQ_DESC_SIZE    (sizeof(struct octep_oq_desc_hw))
+ 
+@@ -38,7 +38,7 @@ struct octep_oq_resp_hw_ext {
+ 
+ 	/* checksum verified. */
+ 	u64 csum_verified:2;
+-};
++} __packed;
+ 
+ #define  OCTEP_OQ_RESP_HW_EXT_SIZE   (sizeof(struct octep_oq_resp_hw_ext))
+ 
+@@ -49,7 +49,7 @@ struct octep_oq_resp_hw_ext {
+ struct octep_oq_resp_hw {
+ 	/* The Length of the packet. */
+ 	__be64 length;
+-};
++} __packed;
+ 
+ #define OCTEP_OQ_RESP_HW_SIZE   (sizeof(struct octep_oq_resp_hw))
+ 
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
+index 21e75ff9f5e7..74189e5a7d33 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
+@@ -35,7 +35,7 @@
+ struct octep_tx_sglist_desc {
+ 	u16 len[4];
+ 	dma_addr_t dma_ptr[4];
+-};
++} __packed;
+ 
+ /* Each Scatter/Gather entry sent to hardwar hold four pointers.
+  * So, number of entries required is (MAX_SKB_FRAGS + 1)/4, where '+1'
+@@ -238,7 +238,7 @@ struct octep_instr_hdr {
+ 
+ 	/* Reserved3 */
+ 	u64 reserved3:1;
+-};
++} __packed;
+ 
+ /* Hardware Tx completion response header */
+ struct octep_instr_resp_hdr {
+@@ -262,7 +262,7 @@ struct octep_instr_resp_hdr {
+ 
+ 	/* Opcode for the return packet  */
+ 	u64 opcode:16;
+-};
++} __packed;
+ 
+ /* 64-byte Tx instruction format.
+  * Format of instruction for a 64-byte mode input queue.
+@@ -292,7 +292,7 @@ struct octep_tx_desc_hw {
+ 
+ 	/* Additional headers available in a 64-byte instruction. */
+ 	u64 exhdr[4];
+-};
++} __packed;
+ 
+ #define OCTEP_IQ_DESC_SIZE (sizeof(struct octep_tx_desc_hw))
+ #endif /* _OCTEP_TX_H_ */
+-- 
+2.25.1
 
 
