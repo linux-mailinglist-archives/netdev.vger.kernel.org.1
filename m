@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-41902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04FF97CC1D9
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:34:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 403B77CC1DA
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:34:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 993D2B20F4A
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:34:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADC9C280E1A
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:34:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE3041ABC;
-	Tue, 17 Oct 2023 11:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19DD341E33;
+	Tue, 17 Oct 2023 11:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9817541AAB
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:34:06 +0000 (UTC)
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 37D48B0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8007741AAC
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:34:07 +0000 (UTC)
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0F3A8EA;
 	Tue, 17 Oct 2023 04:34:05 -0700 (PDT)
 X-IronPort-AV: E=Sophos;i="6.03,231,1694703600"; 
-   d="scan'208";a="183380335"
+   d="scan'208";a="179586178"
 Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie6.idc.renesas.com with ESMTP; 17 Oct 2023 20:34:04 +0900
+  by relmlie5.idc.renesas.com with ESMTP; 17 Oct 2023 20:34:04 +0900
 Received: from localhost.localdomain (unknown [10.166.15.32])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 278164003EA8;
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 3DE3C4003EA8;
 	Tue, 17 Oct 2023 20:34:04 +0900 (JST)
 From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 To: s.shtylyov@omp.ru,
@@ -38,9 +38,9 @@ To: s.shtylyov@omp.ru,
 Cc: netdev@vger.kernel.org,
 	linux-renesas-soc@vger.kernel.org,
 	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Subject: [PATCH net-next v3 1/2] rswitch: Use unsigned int for port related array index
-Date: Tue, 17 Oct 2023 20:34:01 +0900
-Message-Id: <20231017113402.849735-2-yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH net-next v3 2/2] rswitch: Add PM ops
+Date: Tue, 17 Oct 2023 20:34:02 +0900
+Message-Id: <20231017113402.849735-3-yoshihiro.shimoda.uh@renesas.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231017113402.849735-1-yoshihiro.shimoda.uh@renesas.com>
 References: <20231017113402.849735-1-yoshihiro.shimoda.uh@renesas.com>
@@ -56,71 +56,89 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Array index should not be negative, so modify the condition of
-rswitch_for_each_enabled_port_continue_reverse() macro, and then
-use unsigned int instead.
+Add PM ops for Suspend to Idle. When the system suspended,
+the Ethernet Serdes's clock will be stopped. So, this driver needs
+to re-initialize the Ethernet Serdes by phy_init() in
+renesas_eth_sw_resume(). Otherwise, timeout happened in phy_power_on().
 
 Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 ---
- drivers/net/ethernet/renesas/rswitch.c | 10 ++++++----
- drivers/net/ethernet/renesas/rswitch.h |  2 +-
- 2 files changed, 7 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/renesas/rswitch.c | 43 ++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
 diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index 112e605f104a..e5a41e7880d8 100644
+index e5a41e7880d8..43a7795d6591 100644
 --- a/drivers/net/ethernet/renesas/rswitch.c
 +++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -1405,7 +1405,8 @@ static void rswitch_ether_port_deinit_one(struct rswitch_device *rdev)
+@@ -17,6 +17,7 @@
+ #include <linux/of_net.h>
+ #include <linux/phy/phy.h>
+ #include <linux/platform_device.h>
++#include <linux/pm.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/slab.h>
+@@ -1315,6 +1316,7 @@ static int rswitch_phy_device_init(struct rswitch_device *rdev)
+ 	if (!phydev)
+ 		goto out;
+ 	__set_bit(rdev->etha->phy_interface, phydev->host_interfaces);
++	phydev->mac_managed_pm = true;
  
- static int rswitch_ether_port_init_all(struct rswitch_private *priv)
- {
--	int i, err;
+ 	phydev = of_phy_connect(rdev->ndev, phy, rswitch_adjust_link, 0,
+ 				rdev->etha->phy_interface);
+@@ -1995,11 +1997,52 @@ static void renesas_eth_sw_remove(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, NULL);
+ }
+ 
++static int renesas_eth_sw_suspend(struct device *dev)
++{
++	struct rswitch_private *priv = dev_get_drvdata(dev);
++	struct net_device *ndev;
 +	unsigned int i;
-+	int err;
- 
- 	rswitch_for_each_enabled_port(priv, i) {
- 		err = rswitch_ether_port_init_one(priv->rdev[i]);
-@@ -1786,7 +1787,8 @@ static void rswitch_device_free(struct rswitch_private *priv, int index)
- 
- static int rswitch_init(struct rswitch_private *priv)
- {
--	int i, err;
++
++	rswitch_for_each_enabled_port(priv, i) {
++		ndev = priv->rdev[i]->ndev;
++		if (netif_running(ndev)) {
++			netif_device_detach(ndev);
++			rswitch_stop(ndev);
++		}
++		if (priv->rdev[i]->serdes->init_count)
++			phy_exit(priv->rdev[i]->serdes);
++	}
++
++	return 0;
++}
++
++static int renesas_eth_sw_resume(struct device *dev)
++{
++	struct rswitch_private *priv = dev_get_drvdata(dev);
++	struct net_device *ndev;
 +	unsigned int i;
-+	int err;
- 
- 	for (i = 0; i < RSWITCH_NUM_PORTS; i++)
- 		rswitch_etha_init(priv, i);
-@@ -1816,7 +1818,7 @@ static int rswitch_init(struct rswitch_private *priv)
- 	for (i = 0; i < RSWITCH_NUM_PORTS; i++) {
- 		err = rswitch_device_alloc(priv, i);
- 		if (err < 0) {
--			for (i--; i >= 0; i--)
-+			for (; i-- > 0; )
- 				rswitch_device_free(priv, i);
- 			goto err_device_alloc;
- 		}
-@@ -1959,7 +1961,7 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
- 
- static void rswitch_deinit(struct rswitch_private *priv)
- {
--	int i;
-+	unsigned int i;
- 
- 	rswitch_gwca_hw_deinit(priv);
- 	rcar_gen4_ptp_unregister(priv->ptp_priv);
-diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-index 04f49a7a5843..27c9d3872c0e 100644
---- a/drivers/net/ethernet/renesas/rswitch.h
-+++ b/drivers/net/ethernet/renesas/rswitch.h
-@@ -20,7 +20,7 @@
- 		else
- 
- #define rswitch_for_each_enabled_port_continue_reverse(priv, i)	\
--	for (i--; i >= 0; i--)					\
-+	for (; i-- > 0; )					\
- 		if (priv->rdev[i]->disabled)			\
- 			continue;				\
- 		else
++
++	rswitch_for_each_enabled_port(priv, i) {
++		phy_init(priv->rdev[i]->serdes);
++		ndev = priv->rdev[i]->ndev;
++		if (netif_running(ndev)) {
++			rswitch_open(ndev);
++			netif_device_attach(ndev);
++		}
++	}
++
++	return 0;
++}
++
++static DEFINE_SIMPLE_DEV_PM_OPS(renesas_eth_sw_pm_ops, renesas_eth_sw_suspend,
++				renesas_eth_sw_resume);
++
+ static struct platform_driver renesas_eth_sw_driver_platform = {
+ 	.probe = renesas_eth_sw_probe,
+ 	.remove_new = renesas_eth_sw_remove,
+ 	.driver = {
+ 		.name = "renesas_eth_sw",
++		.pm = pm_sleep_ptr(&renesas_eth_sw_pm_ops),
+ 		.of_match_table = renesas_eth_sw_of_table,
+ 	}
+ };
 -- 
 2.25.1
 
