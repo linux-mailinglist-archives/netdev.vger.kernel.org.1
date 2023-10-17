@@ -1,93 +1,192 @@
-Return-Path: <netdev+bounces-41988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61F987CC890
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:16:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A687E7CC8AA
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F2681C20A41
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:16:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA4C61C20A0D
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6389945F62;
-	Tue, 17 Oct 2023 16:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A8045F79;
+	Tue, 17 Oct 2023 16:22:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0JuOmF/O"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="uxfapWGF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3925844498;
-	Tue, 17 Oct 2023 16:16:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED93AC433C7;
-	Tue, 17 Oct 2023 16:16:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1697559367;
-	bh=++5rVi+ySPKnY3Zse4S0U6+ylTHGyB3WPeAoWkJ/y9I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=0JuOmF/O97uodM8GMATlFfPdhBkDgpX25ilRq6Kd7CwO5pFWiERm8bZQLGPGgxD6M
-	 Ku71F7f6NplDx7xQnD+TwPp/ujKGg5vPeS6+dAkJ9DSmEQP0LED41cz73IO4dcdEy5
-	 Gsvo5PLnH7scXTY4KmSPtdDyZowf5DPPxjTXLLYk=
-Date: Tue, 17 Oct 2023 18:15:44 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Benno Lossin <benno.lossin@proton.me>, Andrew Lunn <andrew@lunn.ch>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	boqun.feng@gmail.com, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY
- drivers
-Message-ID: <2023101758-scone-supernova-e9a1@gregkh>
-References: <3469de1c-0e6f-4fe5-9d93-2542f87ffd0d@proton.me>
- <20231015.011502.276144165010584249.fujita.tomonori@gmail.com>
- <9d70de37-c5ed-4776-a00f-76888e1230aa@proton.me>
- <20231015.073929.156461103776360133.fujita.tomonori@gmail.com>
- <98471d44-c267-4c80-ba54-82ab2563e465@proton.me>
- <1454c3e6-82d1-4f60-b07d-bc3b47b23662@lunn.ch>
- <f26a3e1a-7eb8-464e-9cbe-ebb8bdf69b20@proton.me>
- <2023101756-procedure-uninvited-f6c9@gregkh>
- <0f839f73-400f-47d5-9708-0fa40ed0d4e9@proton.me>
- <CANiq72nbhdyPDWebXFphKjwvYT2VdQq-ksDmbOTNezV9OarPpQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF9A45F74
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:22:56 +0000 (UTC)
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04olkn2037.outbound.protection.outlook.com [40.92.75.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AC01A4;
+	Tue, 17 Oct 2023 09:22:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MsidnMIHUykPYc8/mxvWl8CoDYWJPb7gstIt+KappnqKLZvU86OCe42JcEFfavpfyANnJc/Dy8Wl2rn9HAd0Ehg9XygY0lP+zEUwWlStGMYnUWOZESErA0Q6GGcS13h8OkypYirw0w5yD+RoZz7iO8/AYQiai97oz+v61AlwIScgwli4IA905Xih6YS+8y/c0ePq2PkNg2buQBuRxRnN67VaFEzr/ogx9SuGm+HRHMMQsXm/0WgjIYrjJ2H5AHtGfC+SDft9HHobYND7VJI6F9JexZLANj1S9gFOmrXrsYBKAia8pycY9iHMdO/mrZCQ6MkU1E5Ws666+KWZi+UZfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DDRqOekf0qd4P/DQTcQIPmfho3vMDf5sI5B6cunmMHI=;
+ b=OYuH9whVBKQFUxnEgJakKiT/PTuLcNQsmHxirR9FHktMz2Kwff504mK0tOjfRIF9SCPu8UxoGfDKifyBvb5gaWPFQVIy7TG/1sAYYsCb3DNEtOEWhqcCoJz9Qzy0HaVxDIKuTabjt2eYH6LgWzoWWHjjEYWMBDqGE77ceRSyBRCsG4tvUn68cTrLINaXwNBDZ58lvdj+aQenc274k8H27KhQuXoTP7FeecW6L16ruv8E8HW2dj8nXx1T4i8vjzXTaenSa8pB4XdbLA8FPESiCMKs32LJdmECGEoePqNu6DSh2V7g7BReff56syg+g34xL/JGr1He/BPZ/tm5rqf82Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DDRqOekf0qd4P/DQTcQIPmfho3vMDf5sI5B6cunmMHI=;
+ b=uxfapWGF8nd2m6ItjbS3YSBt8YDG8fvYla0P0gqKo1Y4YBtiE0qtkSRI8SDEsSf/W7D+Oz1Cs9eRaNxX50jCjksfXJAU8+fWyiWwHbv5YMAUiWwAZwLWuSq2xv625ZNNhcx1JwdRWUyA2MSljzmq6dUg6bzphraaS9k91+NfynMCG+sPTwtaF5wOlPRRaS96Cqs6yICHzngXTn1TrxU2srWXuL2rQgxGczm3ZLO+wgC0ziawESXGS69xfYZZvG5xLVCCUipDsGC4er3urcEW2NKuWTkJ20R7bdpG23OaEtj8gj2UibdU7liUCENtu0LBJ8flNwbtWsSIEVFUSWEZbw==
+Received: from VI1P193MB0752.EURP193.PROD.OUTLOOK.COM (2603:10a6:800:32::19)
+ by PR3P193MB0553.EURP193.PROD.OUTLOOK.COM (2603:10a6:102:36::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Tue, 17 Oct
+ 2023 16:22:53 +0000
+Received: from VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
+ ([fe80::af68:c2a:73ce:8e99]) by VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
+ ([fe80::af68:c2a:73ce:8e99%3]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
+ 16:22:53 +0000
+From: Juntong Deng <juntong.deng@outlook.com>
+To: borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com
+Subject: [PATCH v2] net/tls: Fix slab-use-after-free in tls_encrypt_done
+Date: Wed, 18 Oct 2023 00:22:15 +0800
+Message-ID:
+ <VI1P193MB0752321F24623E024C87886A99D6A@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [l4mhqtjJiDvTyGcARR2Dbgu+eyvxvniW]
+X-ClientProxiedBy: LNXP265CA0086.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:76::26) To VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
+ (2603:10a6:800:32::19)
+X-Microsoft-Original-Message-ID:
+ <20231017162215.20484-1-juntong.deng@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72nbhdyPDWebXFphKjwvYT2VdQq-ksDmbOTNezV9OarPpQ@mail.gmail.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI1P193MB0752:EE_|PR3P193MB0553:EE_
+X-MS-Office365-Filtering-Correlation-Id: f70fa696-fbd1-4989-9c1d-08dbcf2d4f69
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	dvvpteJGpr3dRZvuYHCactD6WD/sIwC8auKsqtOe2BAa48PwhSPHCQNaLiT9Bw7qV+H0roClitVOYjpPg3EKt7ji+z5lwoAf20iBziUfVKOykzNNnfXZfsQIm5TepY7B8PVHqeueSjPSli0HxvBgA9OzWG7MRRakeV9M6H/+mvW19p5Od3gHnhv56Q/1obrrsVmtYnfwtOH5MqDofnmG/BlRD5+E8YAS0jE/+Ripb6gp3qESPUDHM1j18Kc9LJk2AFFSYJWCxIDhYPOEc5wxoDJAekXoG8eElSe4wonrXtWpmwESlwnLVve4YNRE6T+GtaVgAJuDw0mvB/nE+t87bN3Dvkc4kPlRa1KWRLHPmFv6IgacUaX6n2EKVxqHB/iPuqUKCC72FilWlxXB0/hydrzbQyJLD9x7cVbBEt3Lqe1geQm3ksj+StXjBWVjhXARe4KSmrkVuGEfgug7pjCL9+8rJXvfFYp2G+ZiBcnyxynFT4sdRsya7mXTfA3UaZfpgq4kNoLFEkPy0VBbMxoUQow5buejBYtxgofcMAoZNWCLZ9jlFWYHQ7KWiago0mzlnhfoDBUhZVAjBnFlAOzOqZEreSofQLls6gRLDW7Etvo=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?og+5c227dqG1JjGvwMb31JYgjRoAZXAjDTzlcDSR/H3zJFBaXC62o56ussvb?=
+ =?us-ascii?Q?MzQjcxEQvs1HAbKOCmx1jcSkEgV5BVkCrz4nAgAHTt6W2Yw0pUqu7IHYSh+F?=
+ =?us-ascii?Q?eKyPJJK1Drxe5qh4pj3bzTqFNgaZhWmrYAOUJ0xSUlMXGOP1zqnOCgmDkvYj?=
+ =?us-ascii?Q?PBayeBgWVAqMwGUGqKG71aTb4lpwg2U+uthQ7FKeQNqVL72yg1ZdYeYKk+Wa?=
+ =?us-ascii?Q?uXi+Q0crKVNC57O04y0bNzySGRdNTqVZMfpFgaMiN7gd7wymwDnN2oObEjJC?=
+ =?us-ascii?Q?z9XSzKyhDG/4cJrhNoV/n4t/vqYJmSBSkwcKYZ0gP+PC479KRik4Odx3hYOV?=
+ =?us-ascii?Q?zzPIciqlk+9+yNuGuNttNRFGggxucwlINTcqqQmciirLvMhe0aM+MtPJUQ3k?=
+ =?us-ascii?Q?rde76Uf1Y+oGuY6TtM8dn87kbLAYYWr9WQl34S3mF9vyHBe7I5hRFBb6QLX2?=
+ =?us-ascii?Q?bpAUxuCeNLCB01aPqMovgH+YlC0K22Akd2HW9EQi7NMhgczl9lsejmHDh9gK?=
+ =?us-ascii?Q?MV53SGESMrFj3Npk3FLprmJKhJ4nNnjTdFbYYaoERebI1TNo19Ze0t+31L6i?=
+ =?us-ascii?Q?HfldUSqo/jqKxJnmC0MdXM9+ltMNlsaWL723pec/WBoGzRLWPxRawVEjjJP1?=
+ =?us-ascii?Q?OtrdOxHGECOa5gnpfqmdcts5rGqLA340V7p9qSLNPl+LeRYAOKG5bp+JcaUD?=
+ =?us-ascii?Q?nczKKEfkQ2YGJndC6kU8ljtSTS+xgKJm8giNW8uonbxkqe9H80gui6NHqOkx?=
+ =?us-ascii?Q?l1BWRKVyWeVFLi5/Mxg/tQ0EsTs63ORNwDiHIQrAQDivYX13dmKE2xN+d4Gi?=
+ =?us-ascii?Q?ukySfh1RLk+nirFCf1qQjEKZYWjFHRo8DbuexBDlBPZgkcSszisVkTieNiBk?=
+ =?us-ascii?Q?69DHqnQh5K9aFDiCGos2W4oKgLH9xWK3kSVbucZfcPmN3ZjyXrbTO7hCLovD?=
+ =?us-ascii?Q?UTxw2/nw3oPqkRRxvSFuHdttO7VcmBFA96nyMymD0g3sczKiUrsQ5kn3Shr5?=
+ =?us-ascii?Q?YA3zDD5oJKGQ54InabgL+KhcSt2fzFrnKpIaYzX2gjHCs2Al70rq5bx/7cfs?=
+ =?us-ascii?Q?UvzjHRubgOsQuKjw5wyXXudhUeRrJuF0oyMbSjOEgRQs7XKyfj99uTrvSgkQ?=
+ =?us-ascii?Q?Qf41nN6iMhrxdU6kQMeUs0ubmd82a2zC4NnjetXoGrjWvCoxAfJZd29/uRLW?=
+ =?us-ascii?Q?2BsSJQ9IpBtxSGg2Oc35ebvKlC+S+wAWludxOkoZEkS0hMcSy7M/VELIdwo?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f70fa696-fbd1-4989-9c1d-08dbcf2d4f69
+X-MS-Exchange-CrossTenant-AuthSource: VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 16:22:51.9331
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3P193MB0553
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 05:17:40PM +0200, Miguel Ojeda wrote:
-> On Tue, Oct 17, 2023 at 4:32 PM Benno Lossin <benno.lossin@proton.me> wrote:
-> >
-> > This is not allowed in Rust, it is UB and will lead to bad things.
-> 
-> Yeah, and to be clear, data races are also UB in C.
+In the current implementation, ctx->async_wait.completion is completed
+after spin_lock_bh, which causes tls_sw_release_resources_tx to
+continue executing and return to tls_sk_proto_cleanup, then return
+to tls_sk_proto_close, and after that enter tls_sw_free_ctx_tx to kfree
+the entire struct tls_sw_context_tx (including ctx->encrypt_compl_lock).
 
-And to be clear, something we totally ignore in many places in the
-kernel because it flat out does not matter at all.
+Since ctx->encrypt_compl_lock has been freed, subsequent spin_unlock_bh
+will result in slab-use-after-free error. Due to SMP, even using
+spin_lock_bh does not prevent tls_sw_release_resources_tx from continuing
+on other CPUs. After tls_sw_release_resources_tx is woken up, there is no
+attempt to hold ctx->encrypt_compl_lock again, therefore everything
+described above is possible.
 
-Think about userspace writing 2 different values to the same sysfs file
-at the same time, which the kernel driver will then attempt to save into
-the same location at the "same" time.  Which one wins?  Who cares?
-Userspace did something foolish and it doesn't matter, and writes are
-pretty much "atomic" in that they do not split across memory locations
-so it's not a real issue.
+The fix is to put complete(&ctx->async_wait.completion) after
+spin_unlock_bh, making the release after the unlock. Since complete is
+only executed if pending is 0, which means this is the last record, there
+is no need to worry about race condition causing duplicate completes.
 
-Same here with your "speed" value, it just doesn't matter, right?  One
-will "win" and the other one will not, so what is the problem?  Same
-thing would happen if you put a lock here, but a lock would be
-pointless.
+Since tls_sw_release_resources_tx freed all un-sent records in the
+ctx->tx_list, subsequent schedule transmission is meaningless, and
+the entire struct tls_sw_context_tx has been freed (including
+ctx->tx_bitmask and ctx->tx_work.work), continuing to execute
+subsequent code will cause use-after-free, so return directly.
 
-So yes, I agree, mark things in rust as "mut" if you are going to change
-them, that's good, but attempting to prevent multiple writes at the same
-time without a lock, that's not going to matter, if it did, you would
-have used a lock :)
+Reported-by: syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=29c22ea2d6b2c5fd2eae
+Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
+---
+V1 -> V2: Fix possible use-after-free caused by test_and_set_bit
 
-thanks,
+ net/tls/tls_sw.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-greg k-h
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 270712b8d391..b21f5fecc84e 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -441,6 +441,7 @@ static void tls_encrypt_done(void *data, int err)
+ 	struct sk_msg *msg_en;
+ 	bool ready = false;
+ 	struct sock *sk;
++	int async_notify;
+ 	int pending;
+ 
+ 	msg_en = &rec->msg_encrypted;
+@@ -482,10 +483,13 @@ static void tls_encrypt_done(void *data, int err)
+ 
+ 	spin_lock_bh(&ctx->encrypt_compl_lock);
+ 	pending = atomic_dec_return(&ctx->encrypt_pending);
++	async_notify = ctx->async_notify;
++	spin_unlock_bh(&ctx->encrypt_compl_lock);
+ 
+-	if (!pending && ctx->async_notify)
++	if (!pending && async_notify) {
+ 		complete(&ctx->async_wait.completion);
+-	spin_unlock_bh(&ctx->encrypt_compl_lock);
++		return;
++	}
+ 
+ 	if (!ready)
+ 		return;
+-- 
+2.39.2
+
 
