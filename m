@@ -1,144 +1,96 @@
-Return-Path: <netdev+bounces-41803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E0B77CBEB2
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:14:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FAAA7CBEB9
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:17:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6777B21056
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:14:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B4E11C20998
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42AC63F4B0;
-	Tue, 17 Oct 2023 09:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GPeI5XqQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874223F4B0;
+	Tue, 17 Oct 2023 09:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4AD27721;
-	Tue, 17 Oct 2023 09:14:42 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 602EC8E;
-	Tue, 17 Oct 2023 02:14:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697534081; x=1729070081;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=5hJ1MOTyviSW3cZFQ1/6LAEsLb2tBCjZ2qHZ6qLypPU=;
-  b=GPeI5XqQVBZOvT8zyzLJO/bJ7Hnlm+DI8VvieFJYQMxA/CjFkDj+elJV
-   xF1tAoVOK4gqYlvXGJCRbzNV17u8CuIJp7bPhR+A6O9LkW8IkVWgFbn6y
-   9rEdaS9KKDZLX/yHxpYKPilPBaEXxNcBvI1a/8svivdIjCMVNiVcpHweL
-   AyRez3cpm7rbUsNSDPtPy9lmPk9rlzbSgQDNSJf9+AHsnRsE358WWRURE
-   DoONlBvAczW7TJZJ0krX/xx5IuxKkjdtGi/B1FyPQmFJwGpUM6MPg0gEn
-   0IWRt7eNNiPf6L4CZWVda4WLtQDUi5cr7/YNMhzEZZzYo18a2eNaHo20c
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="416820961"
-X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="416820961"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 02:14:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="3851348"
-Received: from spandruv-mobl.amr.corp.intel.com ([10.252.44.24])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 02:13:27 -0700
-Date: Tue, 17 Oct 2023 12:14:30 +0300 (EEST)
-From: =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: Ma Jun <Jun.Ma2@amd.com>
-cc: amd-gfx@lists.freedesktop.org, lenb@kernel.org, johannes@sipsolutions.net, 
-    davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-    pabeni@redhat.com, alexander.deucher@amd.com, Lijo.Lazar@amd.com, 
-    mario.limonciello@amd.com, majun@amd.com, netdev@vger.kernel.org, 
-    linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    linux-doc@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-    Evan Quan <quanliangl@hotmail.com>
-Subject: Re: [PATCH v12 3/9] cfg80211: expose nl80211_chan_width_to_mhz for
- wide sharing
-In-Reply-To: <20231017025358.1773598-4-Jun.Ma2@amd.com>
-Message-ID: <92dde569-3919-15e-b714-4eb8fbc73eae@linux.intel.com>
-References: <20231017025358.1773598-1-Jun.Ma2@amd.com> <20231017025358.1773598-4-Jun.Ma2@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A92838FB3
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:17:02 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B4758E
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:17:01 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-678-Os0hwS-iOcqWslJTLSvOeA-1; Tue, 17 Oct 2023 05:16:58 -0400
+X-MC-Unique: Os0hwS-iOcqWslJTLSvOeA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6B80B85A5BD;
+	Tue, 17 Oct 2023 09:16:58 +0000 (UTC)
+Received: from hog (unknown [10.39.192.51])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B75ED2166B26;
+	Tue, 17 Oct 2023 09:16:57 +0000 (UTC)
+Date: Tue, 17 Oct 2023 11:16:56 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com
+Subject: Re: [PATCH net-next 08/14] tls: also use init_prot_info in
+ tls_set_device_offload
+Message-ID: <ZS5RCPqxlJtTgL_4@hog>
+References: <cover.1696596130.git.sd@queasysnail.net>
+ <6da95c0d469415ee62cc23ce72227f8d058400bc.1696596130.git.sd@queasysnail.net>
+ <20231013142307.70af75d6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20231013142307.70af75d6@kernel.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 17 Oct 2023, Ma Jun wrote:
+2023-10-13, 14:23:07 -0700, Jakub Kicinski wrote:
+> On Mon,  9 Oct 2023 22:50:48 +0200 Sabrina Dubroca wrote:
+> > +=09if (mode =3D=3D TLS_HW) {
+> > +=09=09prot->aad_size =3D 0;
+> > +=09=09prot->tail_size =3D 0;
+> > +=09}
+>=20
+> Strange, tail_size doesn't matter because HW doesn't support TLS 1.3
+> but aad_size?  Is it overwritten by SW init or something?
 
-> From: Evan Quan <quanliangl@hotmail.com>
-> 
-> The newly added WBRF feature needs this interface for channel
-> width calculation.
-> 
-> Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
-> Signed-off-by: Evan Quan <quanliangl@hotmail.com>
-> 
-> --
-> v8->v9:
->   - correct typo(Mhz -> MHz) (Johnson)
-> ---
->  include/net/cfg80211.h | 8 ++++++++
->  net/wireless/chan.c    | 3 ++-
->  2 files changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
-> index d6fa7c8767ad..026d91083f37 100644
-> --- a/include/net/cfg80211.h
-> +++ b/include/net/cfg80211.h
-> @@ -923,6 +923,14 @@ const struct cfg80211_chan_def *
->  cfg80211_chandef_compatible(const struct cfg80211_chan_def *chandef1,
->  			    const struct cfg80211_chan_def *chandef2);
->  
-> +/**
-> + * nl80211_chan_width_to_mhz - get the channel width in MHz
-> + * @chan_width: the channel width from &enum nl80211_chan_width
-> + * Return: channel width in MHz if the chan_width from &enum nl80211_chan_width
-> + * is valid. -1 otherwise.
+For RX, yes, tls_set_device_offload_rx -> tls_set_sw_offload ->
+  init_prot_info(mode=3DTLS_SW).
+But aad_size is not used in tls_device_reencrypt, maybe because (for
+both GCM variants)
+    TLS_HEADER_SIZE + cipher_desc->iv =3D=3D TLS_AAD_SPACE_SIZE
 
-Add empty line before Return:
+For TX, it looks like tls_device_fallback hardcodes TLS_AAD_SPACE_SIZE
+where tls_sw would use prot->aad_size. tls_device doesn't use either.
 
-> + */
-> +int nl80211_chan_width_to_mhz(enum nl80211_chan_width chan_width);
-> +
->  /**
->   * cfg80211_chandef_valid - check if a channel definition is valid
->   * @chandef: the channel definition to check
-> diff --git a/net/wireless/chan.c b/net/wireless/chan.c
-> index 0b7e81db383d..227db04eac42 100644
-> --- a/net/wireless/chan.c
-> +++ b/net/wireless/chan.c
-> @@ -141,7 +141,7 @@ static bool cfg80211_edmg_chandef_valid(const struct cfg80211_chan_def *chandef)
->  	return true;
->  }
->  
-> -static int nl80211_chan_width_to_mhz(enum nl80211_chan_width chan_width)
-> +int nl80211_chan_width_to_mhz(enum nl80211_chan_width chan_width)
->  {
->  	int mhz;
->  
-> @@ -190,6 +190,7 @@ static int nl80211_chan_width_to_mhz(enum nl80211_chan_width chan_width)
->  	}
->  	return mhz;
->  }
-> +EXPORT_SYMBOL(nl80211_chan_width_to_mhz);
->  
->  static int cfg80211_chandef_get_width(const struct cfg80211_chan_def *c)
->  {
-> 
+Actually this patch is broken. If we set TLS_RX to TLS_SW first (for
+example because we disabled tls-hw-rx-offload with ethtool), and
+TLS_TX to TLS_HW second, that will set aad_size to 0, but RX needs it
+to be set.
 
--- 
- i.
+I'll send a fix to drop this hunk completely. Thanks for reviewing.
+
+--=20
+Sabrina
 
 
