@@ -1,151 +1,89 @@
-Return-Path: <netdev+bounces-41920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A98DF7CC380
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:45:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 723DA7CC39B
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:46:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64B5A28195D
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:45:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A22771C20BA5
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F633F4C4;
-	Tue, 17 Oct 2023 12:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Alchtysp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA3141AAE;
+	Tue, 17 Oct 2023 12:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531EB3D994
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:45:35 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D6095
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 05:45:29 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7bbe0a453so86971917b3.0
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 05:45:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697546729; x=1698151529; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DrMhmvGp/H6j3Xg6VLB8FAox2ke+eSPgNnnniqEWCgs=;
-        b=AlchtyspKmE3OnHIfpVoDV5f7bvX+PyE7lANVkQrTRhICQRAU9knygu8+k4EUMUVrg
-         fkYmGYyWPBNO8auXmOn09coz8q/Yff4FlIJyYLskNOd5WYCObFRIjXUnVsBpxoaHmWxw
-         a7iBtzTvS07RpJ58mRhn6PmjFlkFDKRfVeZa0qBKkrsbQqytjNSsQK4XM+LwE7rvNYZO
-         d3dhUYtgUDWTidDMXxRNN5eWKGfYfF1ObJKPFBeFRgPdSxt/P5JO+aVJVCd3D6Fm1d16
-         QdEleY7o9m6c1konpYQeiHPRBGLb5RVYQG8aApTrzLloiWeyUjSqB1bIucgXI7yJvD7P
-         9g0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697546729; x=1698151529;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DrMhmvGp/H6j3Xg6VLB8FAox2ke+eSPgNnnniqEWCgs=;
-        b=w3BdkRBBRYFKXX5AeON9v4nqrCKihBPxR5aZi4siLxeblETb2Uam4aIwkWFt7TsmUf
-         YXmU4AwlQI1Rgj5cdaFav99YNIIY6CMyc+a4GLry7RZB9GnxVvv/A69zIGNkJpNTNcIf
-         TVYuzaaQU1VmFgsctQE59+Nbm2UqF9ewo/4sLlk2dYPi/oGyknehZpWCe0tQx2ilAC0i
-         rBBppOjzQsy+rg1CiqIKhJW/PKJnXxqxuHHNk8j5A4vkamd+XQgIATbX17DU05LcOy1W
-         mbPiM+TyBn2aZe8+URDNyBYjoCgV+z6MuQJayDb/i+AKeOZWvBFsJv2vqLVhSCFhRdSg
-         XlXQ==
-X-Gm-Message-State: AOJu0YwclFoinUGUPnu+wUMG5NZeS9y3YhzkTRjcgVwrTPV6SdTNIyUA
-	xuH+AWyi1IoFaqa2cvGY4f77WmVT6Ol3Ow==
-X-Google-Smtp-Source: AGHT+IHQKO4tBRmTolbzNRuzLZUJgfamZstDL3syDaIFgTtDNSeEcYFkol6DsEMJaSR7CFoNfEQaT0NTg5cB2g==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a0d:cccf:0:b0:5a7:db29:40e3 with SMTP id
- o198-20020a0dcccf000000b005a7db2940e3mr45365ywd.7.1697546729173; Tue, 17 Oct
- 2023 05:45:29 -0700 (PDT)
-Date: Tue, 17 Oct 2023 12:45:26 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B90941222
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:46:15 +0000 (UTC)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8704DB;
+	Tue, 17 Oct 2023 05:46:14 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 4AE0367373; Tue, 17 Oct 2023 14:46:09 +0200 (CEST)
+Date: Tue, 17 Oct 2023 14:46:08 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Greg Ungerer <gerg@linux-m68k.org>, iommu@lists.linux.dev,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Conor Dooley <conor@kernel.org>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
+	netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org,
+	Jim Quinlan <james.quinlan@broadcom.com>, arm-soc <soc@kernel.org>
+Subject: Re: [PATCH 04/12] soc: renesas: select RISCV_DMA_NONCOHERENT from
+ ARCH_R9A07G043
+Message-ID: <20231017124608.GA4386@lst.de>
+References: <20231016054755.915155-1-hch@lst.de> <20231016054755.915155-5-hch@lst.de> <20231016-pantyhose-tall-7565b6b20fb9@wendy> <20231016131745.GB26484@lst.de> <CAMuHMdXVZz=YWMAgzUzme-U3qxYeLdi66xw2CGubpesGy+ZjRw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <20231017124526.4060202-1-edumazet@google.com>
-Subject: [PATCH net] tcp: tsq: relax tcp_small_queue_check() when rtx queue
- contains a single skb
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Stefan Wahren <wahrenst@gmx.net>, 
-	Neal Cardwell <ncardwell@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMuHMdXVZz=YWMAgzUzme-U3qxYeLdi66xw2CGubpesGy+ZjRw@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In commit 75eefc6c59fd ("tcp: tsq: add a shortcut in tcp_small_queue_check()")
-we allowed to send an skb regardless of TSQ limits being hit if rtx queue
-was empty or had a single skb, in order to better fill the pipe
-when/if TX completions were slow.
+On Tue, Oct 17, 2023 at 12:44:41PM +0200, Geert Uytterhoeven wrote:
+> Hi Christoph,
+> 
+> On Mon, Oct 16, 2023 at 3:17 PM Christoph Hellwig <hch@lst.de> wrote:
+> > On Mon, Oct 16, 2023 at 01:52:57PM +0100, Conor Dooley wrote:
+> > > > +   select RISCV_DMA_NONCOHERENT
+> > > >     select ERRATA_ANDES if RISCV_SBI
+> > > >     select ERRATA_ANDES_CMO if ERRATA_ANDES
+> > >
+> > > Since this Kconfig menu has changed a bit in linux-next, the selects
+> > > are unconditional here, and ERRATA_ANDES_CMO will in turn select
+> > > RISCV_DMA_NONCOHERENT.
+> >
+> > Oh, looks like another patch landed there in linux-next.  I had
+> > waited for the previous one go go upstream in -rc6.  Not sure
+> > how to best handle this conflict.
+> 
+> I think the easiest is to ask soc to apply this series?
 
-Then later, commit 75c119afe14f ("tcp: implement rb-tree based
-retransmit queue") accidentally removed the special case for
-one skb in rtx queue.
-
-Stefan Wahren reported a regression in single TCP flow throughput
-using a 100Mbit fec link, starting from commit 65466904b015 ("tcp: adjust
-TSO packet sizes based on min_rtt"). This last commit only made the
-regression more visible, because it locked the TCP flow on a particular
-behavior where TSQ prevented two skbs being pushed downstream,
-adding silences on the wire between each TSO packet.
-
-Many thanks to Stefan for his invaluable help !
-
-Fixes: 75c119afe14f ("tcp: implement rb-tree based retransmit queue")
-Link: https://lore.kernel.org/netdev/7f31ddc8-9971-495e-a1f6-819df542e0af@gmx.net/
-Reported-by: Stefan Wahren <wahrenst@gmx.net>
-Tested-by: Stefan Wahren <wahrenst@gmx.net>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>
----
- net/ipv4/tcp_output.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 9c8c42c280b7638f0f4d94d68cd2c73e3c6c2bcc..e61a3a381d51b554ec8440928e22a290712f0b6b 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -2542,6 +2542,18 @@ static bool tcp_pacing_check(struct sock *sk)
- 	return true;
- }
- 
-+static bool tcp_rtx_queue_empty_or_single_skb(const struct sock *sk)
-+{
-+	const struct rb_node *node = sk->tcp_rtx_queue.rb_node;
-+
-+	/* No skb in the rtx queue. */
-+	if (!node)
-+		return true;
-+
-+	/* Only one skb in rtx queue. */
-+	return !node->rb_left && !node->rb_right;
-+}
-+
- /* TCP Small Queues :
-  * Control number of packets in qdisc/devices to two packets / or ~1 ms.
-  * (These limits are doubled for retransmits)
-@@ -2579,12 +2591,12 @@ static bool tcp_small_queue_check(struct sock *sk, const struct sk_buff *skb,
- 		limit += extra_bytes;
- 	}
- 	if (refcount_read(&sk->sk_wmem_alloc) > limit) {
--		/* Always send skb if rtx queue is empty.
-+		/* Always send skb if rtx queue is empty or has one skb.
- 		 * No need to wait for TX completion to call us back,
- 		 * after softirq/tasklet schedule.
- 		 * This helps when TX completions are delayed too much.
- 		 */
--		if (tcp_rtx_queue_empty(sk))
-+		if (tcp_rtx_queue_empty_or_single_skb(sk))
- 			return false;
- 
- 		set_bit(TSQ_THROTTLED, &sk->sk_tsq_flags);
--- 
-2.42.0.655.g421f12c284-goog
-
+I don't think pulling all the DMA bits into a random other tree
+would be a good idea.   I can hand off the first few bits, but I'd
+need a stable branch to pull in after that.  Which of the half a dozen
+soc trees we have in linux-next is this anyway?
 
