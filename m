@@ -1,298 +1,205 @@
-Return-Path: <netdev+bounces-42059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 875AF7CCEBE
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 22:49:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B12277CCEC5
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 22:51:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7FA91C20C6A
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 20:49:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F18E281901
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 20:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9DA2E418;
-	Tue, 17 Oct 2023 20:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3535F2E3FA;
+	Tue, 17 Oct 2023 20:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="VG5j+iTW"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hdqzzxLv"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448312E3FB;
-	Tue, 17 Oct 2023 20:49:53 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DE99F1;
-	Tue, 17 Oct 2023 13:49:51 -0700 (PDT)
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39HJxL5w028802;
-	Tue, 17 Oct 2023 20:49:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=7hfYxqdaVSBGzCtP/S9qPiXdgv6XOO/NUMbd326UADE=;
- b=VG5j+iTWebHYLwK2gQ8QQ4IKW3s4u2Aa8eA7lCClCqgkEgalrkHaEwsezKnzFtZ2Z521
- 2Y6gLrLr3DWfeuEPO6otJkMYbcs0dT4mPVLTr+yq0s02ZTTfBEQX44qvZNqk4uaVraNm
- MvG5yVfiRXTKgzWokkrTtQiiFLNFCYi6A94DhzHbdLtsoa46aTMi71UTaxukoUz9/2JX
- 12m4w6yVy0jKEqKGcHrWQQqPqkmHT60gyr9QOlXo++YrFM/imow+by4Cz2BfPuFe86gt
- MAS322ySmZ/BRdJBlQ2L07yaRhQckw5WRBDoy3FsyEzGnpOkFS30vNkv/oJQthbnHZ5a aA== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tsv0v0y87-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Oct 2023 20:49:09 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 39HKmn3T030620
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 17 Oct 2023 20:48:49 GMT
-Received: from [10.50.30.7] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Tue, 17 Oct
- 2023 13:48:41 -0700
-Message-ID: <2024130d-612e-9a3e-8c52-8982866e62f5@quicinc.com>
-Date: Wed, 18 Oct 2023 02:18:38 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4244343116
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 20:51:27 +0000 (UTC)
+Received: from mail-vk1-xa36.google.com (mail-vk1-xa36.google.com [IPv6:2607:f8b0:4864:20::a36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF054BA
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 13:51:25 -0700 (PDT)
+Received: by mail-vk1-xa36.google.com with SMTP id 71dfb90a1353d-4a13374a1e8so2400353e0c.1
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 13:51:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1697575884; x=1698180684; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=AwO/KdzP4teJUaTi2zOZwHSyt1Pxi98O9GvK84YlLuE=;
+        b=hdqzzxLvwmm5pOmph3FuiCNKL334R7uPuYMV4Zs3gnaZ2MIBRcs0C7bWHhg23gFgO9
+         /PiwkxIds0/57eJ6j+igVgCLb5VLWRnr+MHV+K5Vo0bvuFkpYNsU1ZK9fTEL62JLKc4+
+         BiUgLlvTvKpSqXow1zUuORyDu874DxIsFDZN8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697575884; x=1698180684;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AwO/KdzP4teJUaTi2zOZwHSyt1Pxi98O9GvK84YlLuE=;
+        b=OfHsG+6iurqryVGBEPCxEpr+DQyuphpdjGQuz2YuhyOY02Ha+90V0yrd4b+sDhCX6j
+         pS9KEntDO71knOOoWQYoBjlaNIYzQSUFSLAb1AMH5rtoCrSQFT3HoaMiKAE105kvGFKo
+         PSwyuCQpg4JmaZulTIqPN0u6EFJQSBAK5UaMcSnVNqGfmFJ4eBB/F5WKR/6hnhGC9aUZ
+         Vp2YBbgAumwapSTzN2E1NOxPmG5NRDClGzr62L5fJ8CBKfBwDZFmbB8ab0yE3WcXgFH6
+         EdJ+yVhMpbAXrQG7BhAtln0390kAv3ij77vTK8VQ+zlUkrve1O8Vki6t9wmy/rFqZC5M
+         djpw==
+X-Gm-Message-State: AOJu0Yyo6vmL8xAZ9POvBtUYJlG9JVPs1x/8EwW+BbvTDIMwurm63R1H
+	HomYFFAounXMWXuheMxAHLwEHwi4kVjfuEt+jLcXOjTY8PMVZUShGLSBzN2uaqIZqODemvA/Dht
+	1Q3TPBTPH5rkkw8eqWPhPkR2CpxNshL2WY1oBjlpvaJ7vWBbVMDR/5C+oXbL8vk/sCBUBVaCsUf
+	2x65z0UKrs4g==
+X-Google-Smtp-Source: AGHT+IHRwLOjKtj3ub2aROY2oc6C9xE+2zatdB36kZmb4NjmjJI/IcInO7/uH0QsmGe+cVFlN3hJ4g==
+X-Received: by 2002:a05:6122:16a9:b0:4a8:4218:8074 with SMTP id 41-20020a05612216a900b004a842188074mr4346455vkl.8.1697575884473;
+        Tue, 17 Oct 2023 13:51:24 -0700 (PDT)
+Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id x20-20020ac87314000000b004194c21ee85sm893029qto.79.2023.10.17.13.51.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 13:51:23 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Justin Chen <justin.chen@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net v2] net: phy: bcm7xxx: Add missing 16nm EPHY statistics
+Date: Tue, 17 Oct 2023 13:51:19 -0700
+Message-Id: <20231017205119.416392-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH V2 5/7] clk: qcom: Add NSS clock Controller driver for
- IPQ9574
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-CC: <andersson@kernel.org>, <agross@kernel.org>, <konrad.dybcio@linaro.org>,
-        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
-        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
-        <nfraprado@collabora.com>, <rafal@milecki.pl>, <peng.fan@nxp.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <quic_saahtoma@quicinc.com>
-References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
- <20230825091234.32713-6-quic_devipriy@quicinc.com>
- <CAA8EJpr+Wwgot-PDRtj-LVi79aD13B9WVREmjTXiR-8XEEx-rQ@mail.gmail.com>
- <652b55cc-87dd-46d1-e480-e25f5f22b8d8@quicinc.com>
- <a4c9baae-f328-22b5-48d7-fc7df0b62a79@quicinc.com>
- <CAA8EJpq0uawrOBHA8XHygEpGYF--HyxJWxKG44iiFdAZZz7O2w@mail.gmail.com>
- <45f96567-553c-9214-eb7e-c75c6e09d78b@quicinc.com>
- <65b030c6-6fab-53ea-2774-48698905dd96@quicinc.com>
- <CAA8EJprSw4MGQKh01mZ5x5rBcRpgD7t4ph2617RhpR2Qg5SB=g@mail.gmail.com>
- <43aee0f9-3a83-3b90-5e3d-13a935f41b47@quicinc.com>
- <CAA8EJppabK8j9T40waMv=t-1aksXfqJibWuS41GhruzLhpatrg@mail.gmail.com>
-Content-Language: en-US
-From: Devi Priya <quic_devipriy@quicinc.com>
-In-Reply-To: <CAA8EJppabK8j9T40waMv=t-1aksXfqJibWuS41GhruzLhpatrg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 3zSnubBXBpPtv-axFdcQk1vC7QsHsCcC
-X-Proofpoint-GUID: 3zSnubBXBpPtv-axFdcQk1vC7QsHsCcC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-17_04,2023-10-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- priorityscore=1501 malwarescore=0 phishscore=0 mlxscore=0 mlxlogscore=999
- impostorscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310170177
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000098e9410607efaf72"
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MIME_NO_TEXT,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+--00000000000098e9410607efaf72
+Content-Transfer-Encoding: 8bit
+
+The .probe() function would allocate the necessary space and ensure that
+the library call sizes the nunber of statistics but the callbacks
+necessary to fetch the name and values were not wired up.
+
+Reported-by: Justin Chen <justin.chen@broadcom.com>
+Fixes: f68d08c437f9 ("net: phy: bcm7xxx: Add EPHY entry for 72165")
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+---
+ drivers/net/phy/bcm7xxx.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/phy/bcm7xxx.c b/drivers/net/phy/bcm7xxx.c
+index 8478b081c058..97638ba7ae85 100644
+--- a/drivers/net/phy/bcm7xxx.c
++++ b/drivers/net/phy/bcm7xxx.c
+@@ -894,6 +894,9 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
+ 	.name		= _name,					\
+ 	/* PHY_BASIC_FEATURES */					\
+ 	.flags		= PHY_IS_INTERNAL,				\
++	.get_sset_count	= bcm_phy_get_sset_count,			\
++	.get_strings	= bcm_phy_get_strings,				\
++	.get_stats	= bcm7xxx_28nm_get_phy_stats,			\
+ 	.probe		= bcm7xxx_28nm_probe,				\
+ 	.config_init	= bcm7xxx_16nm_ephy_config_init,		\
+ 	.config_aneg	= genphy_config_aneg,				\
+-- 
+2.34.1
 
 
-On 10/7/2023 2:51 AM, Dmitry Baryshkov wrote:
-> On Thu, 5 Oct 2023 at 12:56, Devi Priya <quic_devipriy@quicinc.com> wrote:
->>
->>
->>
->> On 10/5/2023 12:49 PM, Dmitry Baryshkov wrote:
->>> On Thu, 5 Oct 2023 at 09:26, Devi Priya <quic_devipriy@quicinc.com> wrote:
->>>>
->>>>
->>>>
->>>> On 9/22/2023 5:31 PM, Devi Priya wrote:
->>>>>
->>>>>
->>>>> On 9/20/2023 1:50 PM, Dmitry Baryshkov wrote:
->>>>>> On Wed, 20 Sept 2023 at 09:39, Devi Priya <quic_devipriy@quicinc.com>
->>>>>> wrote:
->>>>>>>
->>>>>>>
->>>>>>>
->>>>>>> On 9/12/2023 7:38 PM, Devi Priya wrote:
->>>>>>>>
->>>>>>>>
->>>>>>>> On 8/25/2023 5:14 PM, Dmitry Baryshkov wrote:
->>>>>>>>> On Fri, 25 Aug 2023 at 12:15, Devi Priya <quic_devipriy@quicinc.com>
->>>>>>>>> wrote:
->>>>>>>>>>
->>>>>>>>>> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574
->>>>>>>>>> based
->>>>>>>>>> devices.
->>>>>>>>>>
->>>>>>>>>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
->>>>>>>>>> ---
->>>>>>>>>>      Changes in V2:
->>>>>>>>>>             - Added depends on ARM64 || COMPILE_TEST in Kconfig
->>>>>>>>>>             - Added module_platform_driver
->>>>>>>>>>             - Dropped patch [2/6] - clk: qcom: gcc-ipq9574: Mark nssnoc
->>>>>>>>>> clocks as critical
->>>>>>>>>>                & added pm_clk for nssnoc clocks
->>>>>>>>>>             - Updated the uniphy clock names
->>>>>>>>>>
->>>>>>>>>>      drivers/clk/qcom/Kconfig         |    7 +
->>>>>>>>>>      drivers/clk/qcom/Makefile        |    1 +
->>>>>>>>>>      drivers/clk/qcom/nsscc-ipq9574.c | 3109
->>>>>>>>>> ++++++++++++++++++++++++++++++
->>>>>>>>>>      3 files changed, 3117 insertions(+)
->>>>>>>>>>      create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
->>>>>>>>>>
->>>>>>>>>> diff --git a/drivers/clk/qcom/Kconfig b/drivers/clk/qcom/Kconfig
->>>>>>>>>> index bd9bfb11b328..3ecc11e2c8e3 100644
->>>>>>>>>> --- a/drivers/clk/qcom/Kconfig
->>>>>>>>>> +++ b/drivers/clk/qcom/Kconfig
->>>>>>>>>> @@ -203,6 +203,13 @@ config IPQ_GCC_9574
->>>>>>>>>>               i2c, USB, SD/eMMC, etc. Select this for the root clock
->>>>>>>>>>               of ipq9574.
->>>>>>>>>>
->>>>>>>>>> +config IPQ_NSSCC_9574
->>>>>>>>>> +       tristate "IPQ9574 NSS Clock Controller"
->>>>>>>>>> +       depends on ARM64 || COMPILE_TEST
->>>>>>>>>> +       depends on IPQ_GCC_9574
->>>>>>>>>> +       help
->>>>>>>>>> +         Support for NSS clock controller on ipq9574 devices.
->>>>>>>>>> +
->>>>>>>>>>      config MSM_GCC_8660
->>>>>>>>>>             tristate "MSM8660 Global Clock Controller"
->>>>>>>>>>             depends on ARM || COMPILE_TEST
->>>>>>>>>> diff --git a/drivers/clk/qcom/Makefile b/drivers/clk/qcom/Makefile
->>>>>>>>>> index 4790c8cca426..3f084928962e 100644
->>>>>>>>>> --- a/drivers/clk/qcom/Makefile
->>>>>>>>>> +++ b/drivers/clk/qcom/Makefile
->>>>>>>>>> @@ -30,6 +30,7 @@ obj-$(CONFIG_IPQ_GCC_6018) += gcc-ipq6018.o
->>>>>>>>>>      obj-$(CONFIG_IPQ_GCC_806X) += gcc-ipq806x.o
->>>>>>>>>>      obj-$(CONFIG_IPQ_GCC_8074) += gcc-ipq8074.o
->>>>>>>>>>      obj-$(CONFIG_IPQ_GCC_9574) += gcc-ipq9574.o
->>>>>>>>>> +obj-$(CONFIG_IPQ_NSSCC_9574)   += nsscc-ipq9574.o
->>>>>>>>>>      obj-$(CONFIG_IPQ_LCC_806X) += lcc-ipq806x.o
->>>>>>>>>>      obj-$(CONFIG_MDM_GCC_9607) += gcc-mdm9607.o
->>>>>>>>>>      obj-$(CONFIG_MDM_GCC_9615) += gcc-mdm9615.o
->>>>>>>>>> diff --git a/drivers/clk/qcom/nsscc-ipq9574.c
->>>>>>>>>> b/drivers/clk/qcom/nsscc-ipq9574.c
->>>>>>>>>> new file mode 100644
->>>>>>>>>> index 000000000000..65bdb449ae5f
->>>>>>>>>> --- /dev/null
->>>>>>>>>> +++ b/drivers/clk/qcom/nsscc-ipq9574.c
->>>>>>>>>> @@ -0,0 +1,3109 @@
->>>>>>>>>> +// SPDX-License-Identifier: GPL-2.0-only
->>>>>>>>>> +/*
->>>>>>>>>> + * Copyright (c) 2021, The Linux Foundation. All rights reserved.
->>>>>>>>>> + * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights
->>>>>>>>>> reserved.
->>>>>>>>>> + */
->>>>>>>>>> +
->>>>>>>>>> +#include <linux/clk-provider.h>
->>>>>>>>>> +#include <linux/err.h>
->>>>>>>>>> +#include <linux/kernel.h>
->>>>>>>>>> +#include <linux/module.h>
->>>>>>>>>> +#include <linux/of.h>
->>>>>>>>>> +#include <linux/of_device.h>
->>>>>>>>>> +#include <linux/regmap.h>
->>>>>>>>>> +#include <linux/pm_clock.h>
->>>>>>>>>> +#include <linux/pm_runtime.h>
->>>>>>>>>> +
->>>>>>>>>> +#include <dt-bindings/clock/qcom,ipq9574-nsscc.h>
->>>>>>>>>> +#include <dt-bindings/reset/qcom,ipq9574-nsscc.h>
->>>>>>>>>> +
->>>>>>>>>> +#include "clk-alpha-pll.h"
->>>>>>>>>> +#include "clk-branch.h"
->>>>>>>>>> +#include "clk-pll.h"
->>>>>>>>>> +#include "clk-rcg.h"
->>>>>>>>>> +#include "clk-regmap.h"
->>>>>>>>>> +#include "clk-regmap-divider.h"
->>>>>>>>>> +#include "clk-regmap-mux.h"
->>>>>>>>>> +#include "common.h"
->>>>>>>>>> +#include "reset.h"
->>>>>>>>>> +
->>>>>>>>>> +/* Need to match the order of clocks in DT binding */
->>>>>>>>>> +enum {
->>>>>>>>>> +       DT_NSSNOC_NSSCC_CLK,
->>>>>>>>>> +       DT_NSSNOC_SNOC_CLK,
->>>>>>>>>> +       DT_NSSNOC_SNOC_1_CLK,
->>>>>>>>>
->>>>>>>>> Not using the index makes it seem that these clocks are not used,
->>>>>>>>> until one scrolls down to pm_clks.
->>>>>>>> Okay, got it
->>>>>>>>>
->>>>>>>>> BTW: The NSSNOC_SNOC clocks make it look like there is an interconnect
->>>>>>>>> here (not a simple NIU).
->>>>>>>>
->>>>>>>> Hi Dmitry, We are exploring on the ICC driver. In the meantime to
->>>>>>>> unblock PCIe/NSS changes getting merged, shall we use
->>>>>>>> regmap_update_bits
->>>>>>>> and turn on the critical NSSNOC clocks, ANOC & SNOC pcie clocks in the
->>>>>>>> probe function of the gcc driver itself as like sm8550 driver to get
->>>>>>>> the
->>>>>>>> changes merged?
->>>>>>>>
->>>>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/clk/qcom/gcc-sm8550.c#n3347
->>>>>>>
->>>>>>> Hi Dmitry,
->>>>>>> Just curious to know if we could send out the next series with the
->>>>>>> proposed approach if that holds good.
->>>>>>
->>>>>> The answer really depends on the structure of your hardware. The issue
->>>>>> is that once you commit the device bindings,you have to support them
->>>>>> forever. So, if you commit the NSS clock support without interconnects
->>>>>> in place, you have to keep this ANOC/SNOC/etc code forever, even after
->>>>>> you land the interconnect. So I'd suggest landing the icc driver first
->>>>>> (or at least implementing and sending to the mailing list), so that we
->>>>>> can see how all these pieces fit together.
->>>>>
->>>>> Hi Dmitry,
->>>>> Unlike MSM chipsets, IPQ chipsets does not have any use case wherein the
->>>>> NOC clocks have to be scaled. So if these clocks can be enabled in the
->>>>> probe, there is no need for an interconnect driver at all. The same
->>>>> applies to both ipq9574 and ipq5332 SoCs.
->>>>>
->>>>
->>>> Hi Dmitry,
->>>> Just curious to know if we can go ahead with the proposed solution of
->>>> enabling the NOC clocks in the probe as these clocks need not be scaled
->>>> in IPQ chipsets & hence there would be no need for an ICC driver in
->>>> ipq9574 & ipq5332 targets.
->>>
->>> In the probe of which driver?
->> GCC driver of ipq9574 & ipq5332 targets.
-> 
-> Would you need to handle these clocks additionally in the
-> suspend/resume path? Will this increase the power consumption of the
-> board?
-> 
-> Generally, I'd say this looks like a bad idea. Consider all the
-> troubles we are undergoing now while sorting out the NIU clocks on RPM
-> and RPMH platforms.
-> So, unless you are 100% sure that this is a permanent solution (like
-> AHB clocks being always on), I'd kindly suggest implementing the NoC
-> attachment properly. In the end, other Qualcomm platforms use ICC
-> drivers, so by following this pattern we will have more common code
-> paths.
-> 
-Hi Dmitry,
+--00000000000098e9410607efaf72
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Having these clocks always on seems to be a permanent solution and
-we do not foresee any issues in our SoCs.
-
-Thanks,
-Devi Priya
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFzzlZowTa2rZtc1
+3Qb4O+9eXgedQRZfIgFkgy2b3XxzMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMTAxNzIwNTEyNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAFVX6+4QnNd9C07LInA3w4s9xDpHz3KP1u
+XHI2sQ05YByG/Ev/Hw/xokLdKfF4tXrM6UuhaXGryQf76CgloXux7rgvGEb79wrbToyTD0J7jGIf
+1HUgy5gt4PEZ31pQP9f9HC3Ou9VDtt/N3qjdEkLz9rTiynyarMdKlnBnr7B3RGXdfx5wlhUcL7Zx
+1u8+BjbQS9t7YRzozZQZZ6VdE43XLawD2J+YL9dKp14Jq5Z0RJvM+yLx7cPy9O6J49khFFEnjzYw
+YEj+WrevgAcuhvXv/1vJ6aBAvWGhtU0rabSEyCYOA/vXzrjWXE50oOzuZsCsfKuNKcYU2IY6cjRj
+YWEB
+--00000000000098e9410607efaf72--
 
