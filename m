@@ -1,201 +1,168 @@
-Return-Path: <netdev+bounces-41722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92BD67CBC45
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:32:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE8A87CBC5E
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:36:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 465FC281409
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:32:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35C0E1C209DB
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C3A18B1A;
-	Tue, 17 Oct 2023 07:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509DF1CF81;
+	Tue, 17 Oct 2023 07:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YE48KTM5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="A3tKidzS"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B83A747B;
-	Tue, 17 Oct 2023 07:32:53 +0000 (UTC)
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F16B593;
-	Tue, 17 Oct 2023 00:32:51 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-58962bf3f89so494845a12.0;
-        Tue, 17 Oct 2023 00:32:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697527971; x=1698132771; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OdztVy4CXH6kUCFsFARk6VsKQ6Jj/+IFMkgv+HYDI18=;
-        b=YE48KTM5eG5xWwQxkXMuoiCoU07QP4WBmzR0TuA5tZdPEq4+5BMtxYymy0XSjOCbBl
-         pMDJB7klVOkpZuDMZqz8eHN1R60hESjrtRkvA263IBTT/mFTlw1wDg3vs9GQyNB+jEVa
-         cm7/193qgji1a9yM/7OXc554+XMj1FDdL9aZWIGKh3W1T10lvic4Q5VF5zZs2AXZ8UtT
-         bLfVbR+0uXUMn1t4gyCCFysOTupWcSaPmPhBbgcdrviPOvKdtRDcDYou5R1gxr+ZqYly
-         hkQGJ3806LzJxa1/Rc/mjWG6DmUe4ZtgKgOQpWGNyIrEr4duEs1WfhS+Yq5C3UkjhHVp
-         Xv9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697527971; x=1698132771;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=OdztVy4CXH6kUCFsFARk6VsKQ6Jj/+IFMkgv+HYDI18=;
-        b=uqOAXv5/uCvVUqwiFleFVdmjRXFXwBCaOhFxBK2I3jNrkOSJFZbVTD6XjUXblFXI0f
-         6GtNGU8XFgGWtiQoSTn50u6csJqKulqpfUqYpvei/TdFXEc935ds4kycc05Qi7AnBcjA
-         pZv/bj1q37iKohI4F+zSpDtvlkAlB4X0zbJt4+s9mJirAIZoYgsQ+Stz4Nrm76gs7D06
-         FXcbZRQlMKuDFXYRwMTv/5bd4MW23gt/ywsppnYtwvK7ziGpaUgmhlLn5ieGBYRkUQ3B
-         eFL+nCYaYWeADor/x/drXWe9qFYxlTOGD24rP9ZfosHjuTTbeRklSGSfWlOpXLMA1LsB
-         sdCg==
-X-Gm-Message-State: AOJu0YwEULobiFFDI0ZcOam5p04soV+NlCSpOeY2IcAY8Xtu0uQ9fqi7
-	C502iyGa0sM/3UpaPvJyFsg=
-X-Google-Smtp-Source: AGHT+IGo0BKqz0AoaYvhK3EsBI2NdSHTquCFwfppkth39MFX3gAOP9k+ewmoz4cOiZBGOa5A16/6og==
-X-Received: by 2002:a17:90b:38cf:b0:27d:32d8:5f23 with SMTP id nn15-20020a17090b38cf00b0027d32d85f23mr1548855pjb.2.1697527971087;
-        Tue, 17 Oct 2023 00:32:51 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id 7-20020a17090a030700b00279479e9105sm6424810pje.2.2023.10.17.00.32.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 00:32:50 -0700 (PDT)
-Date: Tue, 17 Oct 2023 16:32:49 +0900 (JST)
-Message-Id: <20231017.163249.1403385254279967838.fujita.tomonori@gmail.com>
-To: benno.lossin@proton.me
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com,
- wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network
- PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <98471d44-c267-4c80-ba54-82ab2563e465@proton.me>
-References: <9d70de37-c5ed-4776-a00f-76888e1230aa@proton.me>
-	<20231015.073929.156461103776360133.fujita.tomonori@gmail.com>
-	<98471d44-c267-4c80-ba54-82ab2563e465@proton.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D091A5B5
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:35:55 +0000 (UTC)
+Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC8D8ED
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 00:35:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
+	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
+	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=j8Yjw9qTnr5v+oYYYw9BPDKqUmIDawpKKHTte4gBrLc=; b=A3tKidzS0rUO5lQ625xP+Bi8aU
+	jeQNfqZVtqU0SZ2f6JC3BV8yJLmqd4JpdohZdcTnSMH1WZddfRxJsttC2MeiK3IGwZg7lVWUKP0df
+	DWFvr21/E2iGpIqzfBAeKXS1XBEmFD5Tac60uIGfxQuC7rCt7gtRcms6l6OQ/0GQGcvDl93eYo7q7
+	B+PO/Oql98kJEhwCsG2LtQ14imrAXa/nN0AKifujZBHrnpf930CQk2vUESe5iPVVhUPM7mA52iHR3
+	XXM7TbaEjM6ACJL1sKymtclzenSrDf6d8yc2UnwkzYiwm35ZNQKWjq5nYkjt87ayZ7A3tvPzQNU2Z
+	BaMBL/ow==;
+Received: from [192.168.1.4] (port=58719 helo=SH-EX2013.helmholz.local)
+	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Ante.Knezic@helmholz.de>)
+	id 1qsecH-0006KV-0g;
+	Tue, 17 Oct 2023 09:35:49 +0200
+Received: from linuxdev.helmholz.local (192.168.6.7) by
+ SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Tue, 17 Oct 2023 09:35:48 +0200
+From: Ante Knezic <ante.knezic@helmholz.de>
+To: <olteanv@gmail.com>
+CC: <andrew@lunn.ch>, <ante.knezic@helmholz.de>, <conor+dt@kernel.org>,
+	<davem@davemloft.net>, <devicetree@vger.kernel.org>, <edumazet@google.com>,
+	<f.fainelli@gmail.com>, <krzysztof.kozlowski+dt@linaro.org>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <marex@denx.de>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<woojung.huh@microchip.com>
+Subject: [PATCH net-next v2 2/2] dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
+Date: Tue, 17 Oct 2023 09:35:48 +0200
+Message-ID: <20231017073548.15050-1-ante.knezic@helmholz.de>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20231016103708.6ka5vxfkdatrjvdk@skbuf>
+References: <20231016103708.6ka5vxfkdatrjvdk@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [192.168.6.7]
+X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
+ SH-EX2013.helmholz.local (192.168.1.4)
+X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 17 Oct 2023 07:06:38 +0000
-Benno Lossin <benno.lossin@proton.me> wrote:
+> > +  microchip,rmii-clk-internal:
+> > +    $ref: /schemas/types.yaml#/definitions/flag
+> > +    description:
+> > +      Set if the RMII reference clock is provided internally. Otherwise
+> > +      reference clock should be provided externally.
+> > +
+> > +if:
+> > +  not:
+> > +    properties:
+> > +      compatible:
+> > +        enum:
+> > +          - microchip,ksz8863
+> > +          - microchip,ksz8873
+> > +then:
+> > +  not:
+> > +    required:
+> > +      - microchip,rmii-clk-internal
+> 
+> I think that what you want to express is that microchip,rmii-clk-internal
+> is only defined for microchip,ksz8863 and microchip,ksz8873.
+> Can't you describe that as "if: properties: compatible: (...) then:
+> properties: microchip,rmii-clk-internal"?
 
-> On 15.10.23 00:39, FUJITA Tomonori wrote:
->> On Sat, 14 Oct 2023 17:07:09 +0000
->> Benno Lossin <benno.lossin@proton.me> wrote:
->>>> btw, methods in Device calling a C side function like mdiobus_read,
->>>> mdiobus_write, etc which never touch phydev->lock. Note that the c
->>>> side functions in resume()/suspned() methods don't touch phydev->lock
->>>> too.
->>>>
->>>> There are two types how the methods in Device changes the C side data.
->>>>
->>>> 1. read/write/read_paged
->>>>
->>>> They call the C side functions, mdiobus_read, mdiobus_write,
->>>> phy_read_paged, respectively.
->>>>
->>>> phy_device has a pointer to mii_bus object. It has stats for
->>>> read/write. So everytime they are called, stats is updated.
->>>
->>> I think for reading & updating some stats using `&self`
->>> should be fine. `write` should probably be `&mut self`.
+If I understood you correctly you are refering to a solution like
+if:
+  properties:
+    compatible:
+      enum:
+        - microchip,ksz8863
+        - microchip,ksz8873
+then:
+  properties:
+    microchip,rmii-clk-internal:
+      $ref: /schemas/types.yaml#/definitions/flag
+      description:
+        Set if the RMII reference clock is provided internally. Otherwise
+        reference clock should be provided externally.
+
+This was already suggested in v1, but was not a satisfactory solution
+according to Mr. Conor Dooley:
+
+>> On Tue, 10 Oct 2023 16:25:55 +0100, Conor Dooley wrote:
+>> > On Tue, Oct 10, 2023 at 03:18:54PM +0200, Ante Knezic wrote:
+>> > > Add documentation for selecting reference rmii clock on KSZ88X3 devices
+>> > > 
+>> > > Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+>> > > ---
+>> > >  Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 6 ++++++
+>> > >  1 file changed, 6 insertions(+)
+>> > > 
+>> > > diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+>> > > index e51be1ac0362..3df5d2e72dba 100644
+>> > > --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+>> > > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+>> > > @@ -49,6 +49,12 @@ properties:
+>> > >        Set if the output SYNCLKO clock should be disabled. Do not mix with
+>> > >        microchip,synclko-125.
+>> > >  
+>> > > +  microchip,rmii-clk-internal:
+>> > > +    $ref: /schemas/types.yaml#/definitions/flag
+>> > > +    description:
+>> > > +      Set if the RMII reference clock should be provided internally.
+>> > 
+>> > > Applies only
+>> > > +      to KSZ88X3 devices.
+>> > 
+>> > This should be enforced by the schema, the example schema in the docs
+>> > should show you how to do this.
 >> 
->> Can you tell me why exactly you think in that way?
+>> I am guessing you are refering to limiting the property to ksz88x3 devices?
+>> Something like:
 >> 
->> Firstly, you think that reading & updating some stats using `&self` should be fine.
->> 
->> What's the difference between read() and set_speed(), which you think, needs &mut self.
->> 
->> Because set_speed() updates the member in phy_device and read()
->> updates the object that phy_device points to?
-> 
-> `set_speed` is entirely implemented on the Rust side and is not protected
-> by a lock. Since data races in Rust are UB, this function must be `&mut`,
-> in order to guarantee that no data races occur. This is the case, because
-> our `Opaque` forces you to use interior mutability and thus sidestep this
-> rule (modifying through a `&T`).
+>> if:
+>>   properties:
+>>     compatible:
+>>       enum:
+>>         - microchip,ksz8863
+>>         - microchip,ksz8873
+>> then:
+>>   properties:
+>>     microchip,rmii-clk-internal:
+>>       $ref: /schemas/types.yaml#/definitions/flag
+>>       description:
+>>         Set if the RMII reference clock is provided internally. Otherwise
+>>         reference clock should be provided externally.
+>
+>Not quite. The definition of the property should be outside the if/then,
+>but one should be used to allow/disallow the property.
 
-Understood.
-
-
->> Secondly, What's the difference between read() and write(), where you
->> think that read() is &self write() is &mut self.
-> 
-> This is just the standard Rust way of using mutability. For reading one
-> uses `&self` and for writing `&mut self`. The only thing that is special
-> here is the stats that are updated. But I thought that it still could fit
-> Rust by the following pattern:
-> ```rust
->      pub struct TrackingReader {
->          buf: [u8; 64],
->          num_of_reads: Mutex<usize>,
->      }
-> 
->      impl TrackingReader {
->          pub fn read(&self, idx: usize) -> u8 {
->              *self.num_of_reads.lock() += 1;
->              self.buf[idx]
->          }
->      }
-> 
-> ```
-> 
-> And after taking a look at `mdiobus_read` I indeed found a mutex.
-
-Yes, both read() and write() update the stats with mdiobus's lock.
-
-
->> read() is reading from hardware register. write() is writing a value
->> to hardware register. Both updates the object that phy_device points
->> to?
-> 
-> Indeed, I was just going with the standard way of suggesting `&self`
-> for reads, there are of course exceptions where `&mut self` would make
-> sense. That being said in this case both options are sound, since
-> the C side locks a mutex.
-
-I see. I use &mut self for both read() and write().
-
-
->>>>> If you cannot decide what certain function receivers should be, then
->>>>> we can help you, but I would need more info on what the C side is doing.
->>>>
->>>> If you need more info on the C side, please let me know.
->>>
->>> What about these functions?
->>> - resolve_aneg_linkmode
->>> - genphy_soft_reset
->>> - init_hw
->>> - start_aneg
->>> - genphy_read_status
->>> - genphy_update_link
->>> - genphy_read_lpa
->>> - genphy_read_abilities
->> 
->> As Andrew replied, all the functions update some member in phy_device.
-> 
-> Do all of these functions lock the `bus->mdio_lock`? If yes, then you
-> can just treat them like `read` or `write` (both `&self` and `&mut self`
-> will be sound) and use the standard Rust way of setting the mutability.
-> So if it changes some internal state, I would go with `&mut self`.
-
-They hold mdiobus's lock and update mdiobus stats. They also change
-some internal state in phy_device without touching any lock (it's safe
-since PHYLIB guarantes there is only one thread calling a callback for
-one device).
-
-I'll use &mut self for them.
-
-Thanks a lot!
 
