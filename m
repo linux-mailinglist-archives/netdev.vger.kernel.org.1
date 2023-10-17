@@ -1,241 +1,245 @@
-Return-Path: <netdev+bounces-41911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CDAC7CC2CB
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:17:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B89FC7CC2CD
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:18:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB6BF281501
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:17:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9681FB20F99
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4F941E58;
-	Tue, 17 Oct 2023 12:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF3F41E59;
+	Tue, 17 Oct 2023 12:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="JTZY9scj"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hD+zt0iP"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676FB1946A
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:17:28 +0000 (UTC)
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A068DD78
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 05:17:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net; s=s31663417;
- t=1697545029; x=1698149829; i=wahrenst@gmx.net;
- bh=lVt1g/1S8InOEbIwxs1bjjBFO2el2tcIwq7jUiTK3dE=;
- h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
- b=JTZY9scjDd8s1FQu0mrPKu1nQYLsjzQUILgnRq2eU+CByEg+xRKJUD7AMrmeBrI4uwuqg9Bd2NC
- NfsstlYJ4WA0g5ucndU5byXh53cqTWIprBW7Cw4LCarEivzsBLVHZ/6jf7jQ6fENWUZ1G9fJZE3Gf
- KmHJbloQLZYHbOxV2RK1vpHPIDgikNfdgbTS+JkH9k73AFaNXz3fzvhWeSFT1SZM5v5PC2oXGvhLy
- 9r341vgangozObaI9qWLOVMDU4DR1kP/7pHml8QpI4wHq19Zblpdke6nHcAHfP8siKbMMOKhyYYZ1
- jAdcXAUzQx2MeR8UkwzYPRYIEWaooDBLYYKw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MacOQ-1rPIfn1Gt0-00cA2N; Tue, 17
- Oct 2023 14:17:09 +0200
-Message-ID: <2e554688-f974-465c-a9a1-50f9044abc15@gmx.net>
-Date: Tue, 17 Oct 2023 14:17:08 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F7A1946A
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:17:52 +0000 (UTC)
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CFFD118
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 05:17:49 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-507adc3381cso3045094e87.3
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 05:17:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697545067; x=1698149867; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=0NE2es9FYFS0mSlu5ve+Yss2hukel82LAPmeDG92pME=;
+        b=hD+zt0iPtDn1EC+YddH4RHWI0w6T4VconfIX3Up0jonMv/bfbuCEKM8jQ5gG7sI27I
+         joIOu222pD+tgmXTyt0xkzCKLmu3buloX694BgYy7ElO8/xM5pHEHFyhkHOraurhHFHS
+         HUjNGQicvpfnAj6CVNr5v6s7XoEoOKG7MJQhHj6M+OQu4RimMhSDAeZnYnY1vp3wZiRo
+         ZYkI4W7Fn9b9QycXVrN+SqsVhL8dbwdBZtPEvbXSuj1sn0aup0xv3dbSVYmXCyLZnZtb
+         xIG943ezuIET6WTXzWPwZ+L1aeQtm5fspLOvjz2otKZaB0s3IcQZ+J9LpI0vPKNuG52L
+         fU8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697545067; x=1698149867;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0NE2es9FYFS0mSlu5ve+Yss2hukel82LAPmeDG92pME=;
+        b=IU8DJP33s9qF0qc1Cl29/Nw34E3Ag1M2gyxDgHWgrOs2cXyTiYAYdJnCdn3np60ewl
+         vDtiXYB1EYVghk4fl6efsyYFZHPAbsaK3GRrCiSdEYuqFDC7gkYGIcV1xpk0B70Bs1z/
+         Y84VZ0m85+ToqEoq/xvplJniZltDm4pQc66OAM8sPhSurITSCxSMd8vCGQqQ7gZE1YtC
+         k4DQ+fb7aWl+Peb3dVo7yYQ1zdN0rl0E3vByY8JFkE8eBTcwmbqRDGxQ+C9GpJsckdZO
+         XYNXxK1MLOW6LMN8lyXMrv5a1aqpJ+lwQYyDMut1jeeGtGLvQyHwBtQxjMHv5nIvtqT5
+         SImg==
+X-Gm-Message-State: AOJu0YzxNtBYstCYLsyZmaVxwyxS2EaUhWFcTiIbUeXNjgr0WcFRWyV2
+	k+pYvd0j3WdSE+fQ0go1iViNOadoYWawa8DeFN+t6A==
+X-Google-Smtp-Source: AGHT+IHkBhMWQoFFD2034ar1d+95+wi0b8n/21RlF6F0EEWfujXdsGMEiOi84J1LtX9CXVmccciqfJIbbLbaczLUkXc=
+X-Received: by 2002:a05:6512:558:b0:500:7685:83d with SMTP id
+ h24-20020a056512055800b005007685083dmr1675449lfl.48.1697545067186; Tue, 17
+ Oct 2023 05:17:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: iperf performance regression since Linux 5.18
-To: Eric Dumazet <edumazet@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Fabio Estevam <festevam@gmail.com>, linux-imx@nxp.com,
- Stefan Wahren <stefan.wahren@chargebyte.com>,
- Michael Heimpold <mhei@heimpold.de>, netdev@vger.kernel.org,
- Yuchung Cheng <ycheng@google.com>
-References: <7f31ddc8-9971-495e-a1f6-819df542e0af@gmx.net>
- <CANn89iKY58YSknzOzkEHxFu=C=1_p=pXGAHGo9ZkAfAGon9ayw@mail.gmail.com>
- <CADVnQymV=nv53YaC8kLC1qT1ufhJL9+w_wcZ+8AHwPRG+JRdnw@mail.gmail.com>
- <a35b1a27-575f-4d19-ad2d-95bf4ded40e9@gmx.net>
- <CADVnQymM2HrGrMGyJX2QQ9PpgQT8JqsRz_0U8_WvdvzteqsfEQ@mail.gmail.com>
- <CANn89iL97hLAyHx9ee1VKTnLEgJeEVPrf_8-wf0BEBKAPQitPA@mail.gmail.com>
- <1ac3ea60-81d8-4501-b983-cb22b046f2ea@gmx.net>
- <a94b00d9-8bbc-4c54-b5c9-4a7902220312@gmx.net>
- <CANn89i+53WWxaZA5+cc9Yck8h+HTV6BvbybAnvTckriFfKpQMQ@mail.gmail.com>
- <CANn89iJUBujG2AOBYsr0V7qyC5WTgzx0GucO=2ES69tTDJRziw@mail.gmail.com>
- <76a0c751-c827-4b6e-b27f-ced3ba2834fb@gmx.net>
- <CANn89i+6VuixihW4YyHntjj_GOKOOyXt8hHF8TJtB3bm07CZ6w@mail.gmail.com>
- <ea9578d1-be40-48ab-b9d3-826bb5006756@gmx.net>
- <CANn89i+kcnSDTJ5E5Rrmvk-V3Oqg8NbAyG=LWWVLc+_CF_kLjA@mail.gmail.com>
-Content-Language: en-US
-From: Stefan Wahren <wahrenst@gmx.net>
-In-Reply-To: <CANn89i+kcnSDTJ5E5Rrmvk-V3Oqg8NbAyG=LWWVLc+_CF_kLjA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:VlvJxMkXbxpkyzp51vmqB9whUj6LlYWPUu6wy9HG0k7RY9Aqgup
- k4BVoT+tM1gDJc1tMlHCTWLSk7PvgyPj6nXNRrvO+cipuBa22wWKPdkQ7vN3H74wH1LiyrG
- AyE3dkYIY3RsG8ZHRkj3dKie7QtAUAmrLBeuTvT43WkDIwxggnzP2Fg5tlIZ3yJqWTnf+DP
- q3LCjZS8+5PQX0YX62v8A==
-UI-OutboundReport: notjunk:1;M01:P0:nkHmJZJbUok=;silYTDRF+Jl6oZOBGs+E6WcuMe0
- nez0P7v7S71BKPto4jyOHhq97FT6lgENc7VAWV2r9hOnZ0VtpJiCHjamGdwdBjCFZ6Ss9M+g/
- x9JmD9xb5QG8ATnxliZSWd5v+RIGQXxMHRzgj9vNe5tzKDZY0p6HHUAcz0UdixiT5FYzMI0zx
- TK7QqRHDzpY/yyi4i0EAyj6uM5Q6R+l10RTlvbABmtXKIf3g4lXz/fgj4jI9nNis5ZZwFCisu
- 6+OP+Rc5l0L92hHw8ivNbORfywAEpwInzSJyK8vMAJu8DRAh83q+kdApsOpwt7MgEAEjHBdUW
- it+gTZbf7zC9lu4t89yw3Wdlgqn5MTzfvGY1fQZo/bQIUEDOTVd6+l9rXHrlXQTtp4hDLKLze
- HicL3U/rJndaBZy73XKfHdUhe4RvxtLsXEZR0iwVCO0522K5NuGHypVJuthoZUZ+/NNJFFthp
- WoDa//DG3EMl0qaJsjFMnm4r9GBuENzXEZ/BMtIYvLuCI7AHfXGcC2iaEfG5OTBNRkVE2j5Sx
- ounF3qID//vlpdEFksyYUHv3UPJ19O8VcvyIzp71Pn/mtUWe6rQWC7VCUcXqTMb6NESccrW/k
- Jg3rRzaAP73Uo+oS8Zwcz6YCdDOVGEO3gCSqGk5vG5GeDqNejx0NtrrZ4fmMagVcYoID7H1sO
- F88p0avRw52MlbQEx0PBcvVAcsCIEsha5dA7vhb+T8qVDCVMzxW/yrt50tPO5MRzpg+xBA1T+
- yqVfAYZpAWF8jDH63Bur1nD1aRoS13oF4Q/0D62jjfDdsOQoj7CrfQSW/XbZeFe/bEYPidkPd
- azA7+fRIsyPnzeAKjWbWdPVySHhBqfC8G7etl593LW6VPD6bq/oJF0uKLcILtNm/HOtCBAawJ
- ydoWmfejUrV+UwkwVyysowof1f5meN5ZhxtPcl9OiVUnlRlh64ve9Eb3IPMc7vttNptl1NZX0
- 8jsj7SzvCiQxMUbQlVUuBxydfnI=
+References: <20231013064827.61135-1-linyunsheng@huawei.com> <20231013064827.61135-2-linyunsheng@huawei.com>
+In-Reply-To: <20231013064827.61135-2-linyunsheng@huawei.com>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Tue, 17 Oct 2023 15:17:11 +0300
+Message-ID: <CAC_iWj+FR+ojP7akSY0azc0hVnrhsPhyFTejNit0sVR742KgEw@mail.gmail.com>
+Subject: Re: [PATCH net-next v11 1/6] page_pool: fragment API support for
+ 32-bit arch with 64-bit DMA
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
+	Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen <liangchen.linux@gmail.com>, 
+	Guillaume Tucker <guillaume.tucker@collabora.com>, Matthew Wilcox <willy@infradead.org>, 
+	Linux-MM <linux-mm@kvack.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Yunsheng
 
-Am 17.10.23 um 14:08 schrieb Eric Dumazet:
-> On Tue, Oct 17, 2023 at 11:53=E2=80=AFAM Stefan Wahren <wahrenst@gmx.net=
-> wrote:
->> Hi Eric,
->>
->> Am 16.10.23 um 20:47 schrieb Eric Dumazet:
->>> On Mon, Oct 16, 2023 at 8:25=E2=80=AFPM Stefan Wahren <wahrenst@gmx.ne=
-t> wrote:
->>>> Hi Eric,
->>>>
->>>> Am 16.10.23 um 12:35 schrieb Eric Dumazet:
->>>>> On Mon, Oct 16, 2023 at 11:49=E2=80=AFAM Eric Dumazet <edumazet@goog=
-le.com> wrote:
->>>>> Speaking of TSQ, it seems an old change (commit 75eefc6c59fd "tcp:
->>>>> tsq: add a shortcut in tcp_small_queue_check()")
->>>>> has been accidentally removed in 2017 (75c119afe14f "tcp: implement
->>>>> rb-tree based retransmit queue")
->>>>>
->>>>> Could you try this fix:
->>>>>
->>>>> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
->>>>> index 9c8c42c280b7638f0f4d94d68cd2c73e3c6c2bcc..e61a3a381d51b554ec84=
-40928e22a290712f0b6b
->>>>> 100644
->>>>> --- a/net/ipv4/tcp_output.c
->>>>> +++ b/net/ipv4/tcp_output.c
->>>>> @@ -2542,6 +2542,18 @@ static bool tcp_pacing_check(struct sock *sk)
->>>>>            return true;
->>>>>     }
->>>>>
->>>>> +static bool tcp_rtx_queue_empty_or_single_skb(const struct sock *sk=
-)
->>>>> +{
->>>>> +       const struct rb_node *node =3D sk->tcp_rtx_queue.rb_node;
->>>>> +
->>>>> +       /* No skb in the rtx queue. */
->>>>> +       if (!node)
->>>>> +               return true;
->>>>> +
->>>>> +       /* Only one skb in rtx queue. */
->>>>> +       return !node->rb_left && !node->rb_right;
->>>>> +}
->>>>> +
->>>>>     /* TCP Small Queues :
->>>>>      * Control number of packets in qdisc/devices to two packets / o=
-r ~1 ms.
->>>>>      * (These limits are doubled for retransmits)
->>>>> @@ -2579,12 +2591,12 @@ static bool tcp_small_queue_check(struct soc=
-k
->>>>> *sk, const struct sk_buff *skb,
->>>>>                    limit +=3D extra_bytes;
->>>>>            }
->>>>>            if (refcount_read(&sk->sk_wmem_alloc) > limit) {
->>>>> -               /* Always send skb if rtx queue is empty.
->>>>> +               /* Always send skb if rtx queue is empty or has one =
-skb.
->>>>>                     * No need to wait for TX completion to call us b=
-ack,
->>>>>                     * after softirq/tasklet schedule.
->>>>>                     * This helps when TX completions are delayed too=
- much.
->>>>>                     */
->>>>> -               if (tcp_rtx_queue_empty(sk))
->>>>> +               if (tcp_rtx_queue_empty_or_single_skb(sk))
->>>>>                            return false;
->>>>>
->>>>>                    set_bit(TSQ_THROTTLED, &sk->sk_tsq_flags);
->>>> This patch applied on top of Linux 6.1.49, TSO on, gso_max_size 65535=
-,
->>>> CONFIG_HZ_100=3Dy
->>>>
->>>> root@tarragon:/boot# iperf -t 10 -i 1 -c 192.168.1.129
->>>> ------------------------------------------------------------
->>>> Client connecting to 192.168.1.129, TCP port 5001
->>>> TCP window size:  192 KByte (default)
->>>> ------------------------------------------------------------
->>>> [  3] local 192.168.1.12 port 59714 connected with 192.168.1.129 port=
- 5001
->>>> [ ID] Interval       Transfer     Bandwidth
->>>> [  3]  0.0- 1.0 sec  11.5 MBytes  96.5 Mbits/sec
->>>> [  3]  1.0- 2.0 sec  11.4 MBytes  95.4 Mbits/sec
->>>> [  3]  2.0- 3.0 sec  11.1 MBytes  93.3 Mbits/sec
->>>> [  3]  3.0- 4.0 sec  11.2 MBytes  94.4 Mbits/sec
->>>> [  3]  4.0- 5.0 sec  11.1 MBytes  93.3 Mbits/sec
->>>> [  3]  5.0- 6.0 sec  11.2 MBytes  94.4 Mbits/sec
->>>> [  3]  6.0- 7.0 sec  11.2 MBytes  94.4 Mbits/sec
->>>> [  3]  7.0- 8.0 sec  11.1 MBytes  93.3 Mbits/sec
->>>> [  3]  8.0- 9.0 sec  11.4 MBytes  95.4 Mbits/sec
->>>> [  3]  9.0-10.0 sec  11.2 MBytes  94.4 Mbits/sec
->>>> [  3]  0.0-10.0 sec   113 MBytes  94.4 Mbits/sec
->>>>
->>>> The figures are comparable to disabling TSO -> Good
->>>>
->>>> Thanks
->>> Great. I suspect a very slow TX completion from fec then.
->>>
->>> Could you use the following bpftrace program while your iperf is runni=
-ng ?
->> unfortuntely there is no bpftrace and most of its dependencies on my
->> platform. I looked at some guides and it seems to have a lot of (build)
->> dependencies. On a PC this won't be a problem, but on my ARM platform
->> there is only 1 GB eMMC space left.
->>
->> Before investing a lot of time to get bpftrace running, is there an
->> alternative solution?
-> No worries Stefan, I think we do not have to get precise numbers, I
-> will try to provide a debug patch (since you are able to build custom
-> kernels)
+re-sending, HTML was somehow enabled and the ML dropped the public part.
 
-Great, this would be much easier for me.
+Apologies for the late reply (and the noise)
 
+
+On Fri, 13 Oct 2023 at 09:47, Yunsheng Lin <linyunsheng@huawei.com> wrote:
 >
-> In the meantime, I will submit the official TCP patch, as you said it
-> was helping a lot.
+> Currently page_pool_alloc_frag() is not supported in 32-bit
+> arch with 64-bit DMA because of the overlap issue between
+> pp_frag_count and dma_addr_upper in 'struct page' for those
+> arches, which seems to be quite common, see [1], which means
+> driver may need to handle it when using fragment API.
 >
-> Just to confirm, have you tried the patch on top of the latest net tree =
-?
-
-Not yet (only Linux 6.1.49 stable), but i can do this today and come
-back to you.
-
+> It is assumed that the combination of the above arch with an
+> address space >16TB does not exist, as all those arches have
+> 64b equivalent, it seems logical to use the 64b version for a
+> system with a large address space. It is also assumed that dma
+> address is page aligned when we are dma mapping a page aligned
+> buffer, see [2].
 >
-> Thanks.
+> That means we're storing 12 bits of 0 at the lower end for a
+> dma address, we can reuse those bits for the above arches to
+> support 32b+12b, which is 16TB of memory.
 >
->>> .bpftrace -e '
->>> k:__dev_queue_xmit {
->>>    $skb =3D (struct sk_buff *)arg0;
->>>    if ($skb->fclone =3D=3D 2) {
->>>     @start[$skb] =3D nsecs;
->>>    }
->>> }
->>> k:__kfree_skb {
->>>    $skb =3D (struct sk_buff *)arg0;
->>>    if ($skb->fclone =3D=3D 2 && @start[$skb]) {
->>>     @tx_compl_usecs =3D hist((nsecs - @start[$skb])/1000);
->>>     delete(@start[$skb]);
->>>    }
->>> }
->>> END { clear(@start); }'
+> If we make a wrong assumption, a warning is emitted so that
+> user can report to us.
+>
+> 1. https://lore.kernel.org/all/20211117075652.58299-1-linyunsheng@huawei.com/
+> 2. https://lore.kernel.org/all/20230818145145.4b357c89@kernel.org/
+>
+> Tested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> CC: Lorenzo Bianconi <lorenzo@kernel.org>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> CC: Liang Chen <liangchen.linux@gmail.com>
+> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+> CC: Guillaume Tucker <guillaume.tucker@collabora.com>
+> CC: Matthew Wilcox <willy@infradead.org>
+> CC: Linux-MM <linux-mm@kvack.org>
+> ---
+>  include/linux/mm_types.h        | 13 +------------
+>  include/net/page_pool/helpers.h | 20 ++++++++++++++------
+>  net/core/page_pool.c            | 14 +++++++++-----
+>  3 files changed, 24 insertions(+), 23 deletions(-)
+>
+> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+> index 36c5b43999e6..74b49c4c7a52 100644
+> --- a/include/linux/mm_types.h
+> +++ b/include/linux/mm_types.h
+> @@ -125,18 +125,7 @@ struct page {
+>                         struct page_pool *pp;
+>                         unsigned long _pp_mapping_pad;
+>                         unsigned long dma_addr;
+> -                       union {
+> -                               /**
+> -                                * dma_addr_upper: might require a 64-bit
+> -                                * value on 32-bit architectures.
+> -                                */
+> -                               unsigned long dma_addr_upper;
+> -                               /**
+> -                                * For frag page support, not supported in
+> -                                * 32-bit architectures with 64-bit DMA.
+> -                                */
+> -                               atomic_long_t pp_frag_count;
+> -                       };
+> +                       atomic_long_t pp_frag_count;
+>                 };
+>                 struct {        /* Tail pages of compound page */
+>                         unsigned long compound_head;    /* Bit zero is set */
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+> index 8e7751464ff5..8f64adf86f5b 100644
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -197,7 +197,7 @@ static inline void page_pool_recycle_direct(struct page_pool *pool,
+>         page_pool_put_full_page(pool, page, true);
+>  }
+>
+> -#define PAGE_POOL_DMA_USE_PP_FRAG_COUNT        \
+> +#define PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA    \
+>                 (sizeof(dma_addr_t) > sizeof(unsigned long))
+>
+>  /**
+> @@ -211,17 +211,25 @@ static inline dma_addr_t page_pool_get_dma_addr(struct page *page)
+>  {
+>         dma_addr_t ret = page->dma_addr;
+>
+> -       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
+> -               ret |= (dma_addr_t)page->dma_addr_upper << 16 << 16;
+> +       if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA)
+> +               ret <<= PAGE_SHIFT;
+>
+>         return ret;
+>  }
+>
+> -static inline void page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
+> +static inline bool page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
+>  {
+> +       if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA) {
+> +               page->dma_addr = addr >> PAGE_SHIFT;
+> +
+> +               /* We assume page alignment to shave off bottom bits,
+> +                * if this "compression" doesn't work we need to drop.
+> +                */
+> +               return addr != (dma_addr_t)page->dma_addr << PAGE_SHIFT;
+> +       }
+> +
+>         page->dma_addr = addr;
+> -       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
+> -               page->dma_addr_upper = upper_32_bits(addr);
+> +       return false;
+>  }
+>
+>  static inline bool page_pool_put(struct page_pool *pool)
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 77cb75e63aca..8a9868ea5067 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -211,10 +211,6 @@ static int page_pool_init(struct page_pool *pool,
+>                  */
+>         }
+>
+> -       if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT &&
+> -           pool->p.flags & PP_FLAG_PAGE_FRAG)
+> -               return -EINVAL;
+> -
+>  #ifdef CONFIG_PAGE_POOL_STATS
+>         pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
+>         if (!pool->recycle_stats)
+> @@ -359,12 +355,20 @@ static bool page_pool_dma_map(struct page_pool *pool, struct page *page)
+>         if (dma_mapping_error(pool->p.dev, dma))
+>                 return false;
+>
+> -       page_pool_set_dma_addr(page, dma);
+> +       if (page_pool_set_dma_addr(page, dma))
+> +               goto unmap_failed;
+>
+>         if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
+>                 page_pool_dma_sync_for_device(pool, page, pool->p.max_len);
+>
+>         return true;
+> +
+> +unmap_failed:
+> +       WARN_ON_ONCE("unexpected DMA address, please report to netdev@");
+> +       dma_unmap_page_attrs(pool->p.dev, dma,
+> +                            PAGE_SIZE << pool->p.order, pool->p.dma_dir,
+> +                            DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
+> +       return false;
+>  }
+>
+>  static void page_pool_set_pp_info(struct page_pool *pool,
+> --
+> 2.33.0
+>
 
+That looks fine wrt what we discussed with Jakub,
+
+Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
 
