@@ -1,227 +1,108 @@
-Return-Path: <netdev+bounces-41898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EB917CC1CE
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:32:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B796B7CC1D0
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:32:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C7F8B20D64
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:32:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD7661C20C31
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCD641AA9;
-	Tue, 17 Oct 2023 11:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B452D41AB7;
+	Tue, 17 Oct 2023 11:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="ZNj1KXou"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GOOlEA8N"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340F741AA0
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:32:36 +0000 (UTC)
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2066.outbound.protection.outlook.com [40.107.104.66])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F9BEA;
-	Tue, 17 Oct 2023 04:32:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JGBZuPlIkWr9qPWfeMSh7exFu9S1PCEzCrIiwfVtRH5XYdO5WLB44+uOroT8E3bEabmJtE+Yuvul6JDR/W6B8POjo2n0kXzJiKUXfcdT4oueazoslR0RaP3af7BWXjl+7d04ki3xpT1N+8Ii2ir+N6dhie5+efTz7GN3G5cE6QRNIYzdf5sWg7UxQFqzXimYyEMSGc8nu8Xf0ScaMytOvNIoErDr5VZgoEEqm8D2VNLRctkGOxvMKWk0wHWNKhEkMfLm7TugbWiI5iV8tnA3NzKQakrRPTMQZgdq2Y0XLmkijIBDV9KkNIlLpYPKQ3sVQ+4T/7ct0jt6ty5YRbiMWw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=50ZinWRDi0hsKrUkozc8pJbrOTYGLAhOG7dmbSaSZ3c=;
- b=FFATFylWtjo0bnlWHVhu4pFvGHg7EAZ04Ke03LCHggOyhLgpfI2Wg1PvS0MU+AcURyqo2UjejLB91112pSf7TRZTDS+1Mq4T5kDp4oXzTIMC/IV6Lw+aaFyUm7gmXVUOBG2WuprFL5vJpK9tYOc/mnmZYHYfb6gSat6n61hNK7nhH3iV95MghMdoseM0Cn+ZpYW26C2bkEeWmBk+4G2LrzW6Yl1GgB3Py69gGJSpg8/DESUnuDqQc4AUeDs2mp3jXnc47Qv3O3wZ+iqR+7U4nh1SMyTNZT5lzS3MEjqrdX5FTu3EdtijQCRCJrxTAs3g1Lv/D8+wbNKE4yPE/Y+9BA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=50ZinWRDi0hsKrUkozc8pJbrOTYGLAhOG7dmbSaSZ3c=;
- b=ZNj1KXoudWxdLUwnchVoMPFgnUxJaLJKIuWbzg2O0/BOxEGrblhaVoHVeQfZCW4p2oV/tedjFTtfhvT2X/uoD7DbTdZqGe7DYCS0xZdO9HsedBTQXZ31GQHEksfu8Jul+c51ZzYRuMCkG3xpB03J7BYrZZFiGzAFQVVUTrskdOU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AS8PR04MB7720.eurprd04.prod.outlook.com (2603:10a6:20b:299::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Tue, 17 Oct
- 2023 11:32:32 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::992:76c8:4771:8367]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::992:76c8:4771:8367%7]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
- 11:32:32 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Michael Walle <michael@walle.cc>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: mdio-mux: fix C45 access returning -EIO after API change
-Date: Tue, 17 Oct 2023 14:32:22 +0300
-Message-Id: <20231017113222.3135895-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR04CA0048.eurprd04.prod.outlook.com
- (2603:10a6:208:1::25) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58ADF41AA0;
+	Tue, 17 Oct 2023 11:32:41 +0000 (UTC)
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6042F1;
+	Tue, 17 Oct 2023 04:32:39 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6bbfb8f7ac4so572196b3a.0;
+        Tue, 17 Oct 2023 04:32:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697542359; x=1698147159; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dlG4425ZJG56gASWrCiVxtWOAmHEutELCv8uyCjBQSs=;
+        b=GOOlEA8NwL1Nsa4kmE7jkUf1vz4Jsehve+VrxBYAXD8Zh+7kQnGWY2l+fAn4aWhbCs
+         w8lZkCAAlh/RRaMB1mYCnMagxCTs0lJp/wgoBNs/gk5axuDCfBomE4LXYNC3RHZgts73
+         tnqM8OthtQJLa0K6VoJ+7pZ0OSdjuOGDFu+pKjf7cxplmbG9jI+RSTYVyl5AA6WlkcGM
+         1479jARNz1d0BNH5PrRWBrCnPEPd9kNjYP5ck9Fj3LRqzT1lJuXxMblfmHlWjzzZW4t3
+         kmZAabboLIVULRHymxV38XW3uoVfZYoAVZvIKOuPCoaZim0PzNuFGvAOmmGH5/2eVHw+
+         FOZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697542359; x=1698147159;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dlG4425ZJG56gASWrCiVxtWOAmHEutELCv8uyCjBQSs=;
+        b=C9DdyHIy1IR2apIBLmYyxw+l8AgEArcnw+rVatUlKHafTpwBXQtUagWoIqBJl83zyQ
+         XW0vsluD0lW9JIoGNdTyWteN2TnJq/9ciV+ybaFF+ieTa4LPRs8oQIu3jqnVTpuXeWJ5
+         nwjCQi1ouzIHA/2i8m97qxVK098DKrBOhXl1951dL+8yEBNZXzsySJsIlEAwXF3jedpC
+         km7fcqbmY+w5wBljykyXVBjGEIYuWzbzpllE7tSciSbago7QZ5T6+ZOBCrh28A4/zFjG
+         LrzxbX7Cd2bGcvZ6ZzLBnSdjEGIE8Jkhj+aKE8Z+BtUJBbm2asb4l0j469pHiOI94PKD
+         9Rcg==
+X-Gm-Message-State: AOJu0YydGBUr4cNa3Z3WVx1SHDfS3SF/wVVNj7s7Ar4l2Zrc5b6M0ZPL
+	3KZNIlghuG6PHsjB38LyHpCVyaXI5Q2Eica0
+X-Google-Smtp-Source: AGHT+IHaB9K6PBuYVdOjK9j+ll1LRK2eAgXDkaljTn51kkAEsDlCsg8t/vP1TMSU9sBgf/YaNchFrw==
+X-Received: by 2002:a05:6a21:81a1:b0:16e:26fd:7c02 with SMTP id pd33-20020a056a2181a100b0016e26fd7c02mr1566969pzb.2.1697542359307;
+        Tue, 17 Oct 2023 04:32:39 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id jh13-20020a170903328d00b001c0de73564dsm1299261plb.205.2023.10.17.04.32.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 04:32:38 -0700 (PDT)
+Date: Tue, 17 Oct 2023 20:32:38 +0900 (JST)
+Message-Id: <20231017.203238.979167277269755650.fujita.tomonori@gmail.com>
+To: benno.lossin@proton.me
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com,
+ wedsonaf@gmail.com, greg@kroah.com
+Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <cad79d65-4c66-4344-b0b4-93d2cbf891af@proton.me>
+References: <98471d44-c267-4c80-ba54-82ab2563e465@proton.me>
+	<20231017.163249.1403385254279967838.fujita.tomonori@gmail.com>
+	<cad79d65-4c66-4344-b0b4-93d2cbf891af@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB7720:EE_
-X-MS-Office365-Filtering-Correlation-Id: 63cede20-f198-4f8f-8fa6-08dbcf04c072
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yUFW6Vzo5a8qrTkbRHe/5Chs9RiRNs2aHOL6H7fckxJTqOT00o/T/XBZkUNBL7Xo/HIo4m29JtoJjsOW4LxKOe6nhvZ6fH+x375Ak290m2Aiqy8Zr3Wv603ewuab2KPZ7P+ytwxga6oVsr9/+9vMaQwjZ51RB1RmvsI9Rtr3/diFjzSg94W7MoPhtriTkKQyFGlTKtebKgoGzV9uUsAxXHvuculbUe7JnX+5c7BsHtJ0vyn22kbQybzVrB7pWRmouInnGhQTuP5VWQ+wljuTlQHbKTMAgpfsrWPTWJuTnr38jvZGcu4HgBqntkQiOpopr/APRGWuBpuJyR/ANnBVLXFpMb7qgT6t96HZR7IH0tTRCXA9tLpVYkw4VMqXAvzCgxmxFUyQuQyVyB5aWR32MSTskcu6+qpBnGjkUBuXlVYLmj3FYzWxDbK4+AXn0hB9NUSbGNMv3jVn3JcRpjvQ/8xm56iF3XXx4uoov6IIolH+AFCBts1Q+8FqfTxKYYam3d7zZwL6+vlYHC9OScg3jrbDd4a8qDUGSnMlnw9QkisMSQ04tQ/GyEf4iEXP7L3MxJ6+nrvrTaJZAEb+/Fr1OJF6jejAhrHa1T3ATovt84IPs3JRKQoYVvKkay4BFg8w
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(39860400002)(366004)(346002)(376002)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(6486002)(478600001)(6666004)(52116002)(6512007)(86362001)(36756003)(38350700005)(6506007)(38100700002)(2616005)(1076003)(26005)(83380400001)(316002)(6916009)(54906003)(66946007)(66476007)(41300700001)(5660300002)(66556008)(8936002)(8676002)(4326008)(2906002)(7416002)(44832011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?VO+gRYyndtuJtz8W64uTcbs8kWXfQaQ3MrCxpZjI+NMozEqxKryXf8nvJcYf?=
- =?us-ascii?Q?z7PcLsrpkExJQbtCOSIX8usbVmpUIsOKayYu3g9/XeVVlF3g+ZSy8eFe2W+9?=
- =?us-ascii?Q?00kwambGvCho/0lwFuftA5U495pr/D1gjl7W0DMmMWRNwcNu0ZJPmhXCpJKd?=
- =?us-ascii?Q?UDkqnB6KMDwShJyyfGXrrsxhc16iEejWtx1DYcA/jqaaX9IW0G7DYwgMRHaT?=
- =?us-ascii?Q?YUXlpoyT2OUvkjeH42jc2E4bErPaC8iS6YkSQ0ouXJzPl9TG14pmI4ca49+A?=
- =?us-ascii?Q?ax9Wno1hKdU5cqKBEPbr3LEJ0Zo5FHnghYGwHfwV5EiUj6WbbD6cyCuAAfHt?=
- =?us-ascii?Q?bjOVroVJ8GU0dHwIqrUivO4mN8LyzvO5yTTXcTK8M9a3Rux9VklBnZDL2fDR?=
- =?us-ascii?Q?vOWOoVDjM+k47NTmZ2O37Vb9xiidjUzoOEC0KHFCFd2HdO12PcIWYPEjvA4k?=
- =?us-ascii?Q?t37lCHQAbm1KLPQhGVFeHM4+5D5qIEle7qintRfSp8CaT3bgGdzJKetg0MTR?=
- =?us-ascii?Q?nu/cUUfrClGfqL1wYSdrBX7ewUXRPJpfruwjtgfEYlIdO0LT3gD/NyJefLhR?=
- =?us-ascii?Q?/iyxi9o5/aBWs6KQpGeOnTQYngFa7cyDr6RT8+UAvNZ9uTlPS5PAWbtBs744?=
- =?us-ascii?Q?V7U3X3EkPREuJFJwn3Lf3MKXsSKsUueuRkidx51/nxhX7qpba5gByUFy2Oc1?=
- =?us-ascii?Q?E0gG/PvPst4PJLGAoiR1QYImXYKNTzuKSroTwOzReaVgRagNkxGLM/w76AtF?=
- =?us-ascii?Q?2Nk5iGTtACj3I9IKrwXTSOCU5M3SdBbmU4EgzS6aYRTU2X4USD6r7nEXd8Ph?=
- =?us-ascii?Q?zEUKbCzmUA7LuBUtlxPZ5snF5dkg/w3MOaU9aka+Knmqh+ZGGENzvfl7bl1V?=
- =?us-ascii?Q?rjVT8ph6mefI2q13OGvUfgxrZmjbS6L8QNNCwA3M19cn3ezUEuxtREUgLX68?=
- =?us-ascii?Q?30+QDNK6r67KAYGM/7G4kUsI3MBFTu82u5W+FazxySzC12g5G7lWNSJ4qAxv?=
- =?us-ascii?Q?P1yQCP9Ronqdem36NJKhtxguzMQCXsOIhpXQgOC71hxp6vYEH6WOTUdClxUk?=
- =?us-ascii?Q?8vSFhCe80D3PijTeW4O3o5kaCHHNuQTyVT27b8Itw2K1S4duKaMxY8SrL/YQ?=
- =?us-ascii?Q?gaGfHnTl9MmXGyfl0KEr/gPvro3ikmLVz/qPVYE/RsaJnGVPbIOpvbWs6gs4?=
- =?us-ascii?Q?qF7FaSXahq1A5hcCpDY0z19DrJ24uwRcTD5G1o3r1LbRcm107q6uFZSHx57t?=
- =?us-ascii?Q?tHBxbF9ksED2/WWFQ3G+rekak1m2wCMxVI/BN6mNS45WzKy/aGDf+bvnT5t9?=
- =?us-ascii?Q?k3LF+R0IdhZKrmTHMGP7JpA44MImO3jW51cAhfSYR6+GOi3ScC0xNTKnnUI6?=
- =?us-ascii?Q?CIy0iy6Gu4PsKy0razHGeE773+bj2hahCPtcRiiIUX3pjBpQxxMe3lwB/+ae?=
- =?us-ascii?Q?pBqvn5C7XxMKaumIS99IvoEgWyYQrNkSfPCnoU6H1XzSF/froYayyD/jZHbh?=
- =?us-ascii?Q?e4yoSa1XpyJaboAAWptRVFhQC6Zw+VOmdgNdvrZ5CQGmpQ4rzf+tt2b8eFZ7?=
- =?us-ascii?Q?xEPrW9y87Hn6Cy6xRpDM+phNTZNJEZ/cYeR5lDZkPnLowiKhJKUbCPz+SWHx?=
- =?us-ascii?Q?XQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63cede20-f198-4f8f-8fa6-08dbcf04c072
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 11:32:32.1314
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Bv41dVg87YKiq0ryIwQ5IxJHFVxMjPRsNxccOGTofaaUZVTnj+E2cEAYxsxPxt6bnsARp+gTucxkXGmsTjezcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7720
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The mii_bus API conversion to read_c45() and write_c45() did not cover
-the mdio-mux driver before read() and write() were made C22-only.
+On Tue, 17 Oct 2023 07:41:38 +0000
+Benno Lossin <benno.lossin@proton.me> wrote:
 
-This broke arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-13bb.dtso.
-The -EOPNOTSUPP from mdiobus_c45_read() is transformed by
-get_phy_c45_devs_in_pkg() into -EIO, is further propagated to
-of_mdiobus_register() and this makes the mdio-mux driver fail to probe
-the entire child buses, not just the PHYs that cause access errors.
+>>>> read() is reading from hardware register. write() is writing a value
+>>>> to hardware register. Both updates the object that phy_device points
+>>>> to?
+>>>
+>>> Indeed, I was just going with the standard way of suggesting `&self`
+>>> for reads, there are of course exceptions where `&mut self` would make
+>>> sense. That being said in this case both options are sound, since
+>>> the C side locks a mutex.
+>> 
+>> I see. I use &mut self for both read() and write().
+> 
+> I would recommend documenting this somewhere (why `read` is `&mut`), since
+> that is a bit unusual (why restrict something more than necessary?).
 
-Fix the regression by introducing special c45 read and write accessors
-to mdio-mux which forward the operation to the parent MDIO bus.
-
-Fixes: db1a63aed89c ("net: phy: Remove fallback to old C45 method")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/mdio/mdio-mux.c | 45 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
-
-diff --git a/drivers/net/mdio/mdio-mux.c b/drivers/net/mdio/mdio-mux.c
-index a881e3523328..7d322c08c1e9 100644
---- a/drivers/net/mdio/mdio-mux.c
-+++ b/drivers/net/mdio/mdio-mux.c
-@@ -55,6 +55,27 @@ static int mdio_mux_read(struct mii_bus *bus, int phy_id, int regnum)
- 	return r;
- }
- 
-+static int mdio_mux_read_c45(struct mii_bus *bus, int phy_id, int dev_addr,
-+			     int regnum)
-+{
-+	struct mdio_mux_child_bus *cb = bus->priv;
-+	struct mdio_mux_parent_bus *pb = cb->parent;
-+	int r;
-+
-+	mutex_lock_nested(&pb->mii_bus->mdio_lock, MDIO_MUTEX_MUX);
-+	r = pb->switch_fn(pb->current_child, cb->bus_number, pb->switch_data);
-+	if (r)
-+		goto out;
-+
-+	pb->current_child = cb->bus_number;
-+
-+	r = pb->mii_bus->read_c45(pb->mii_bus, phy_id, dev_addr, regnum);
-+out:
-+	mutex_unlock(&pb->mii_bus->mdio_lock);
-+
-+	return r;
-+}
-+
- /*
-  * The parent bus' lock is used to order access to the switch_fn.
-  */
-@@ -80,6 +101,28 @@ static int mdio_mux_write(struct mii_bus *bus, int phy_id,
- 	return r;
- }
- 
-+static int mdio_mux_write_c45(struct mii_bus *bus, int phy_id, int dev_addr,
-+			      int regnum, u16 val)
-+{
-+	struct mdio_mux_child_bus *cb = bus->priv;
-+	struct mdio_mux_parent_bus *pb = cb->parent;
-+
-+	int r;
-+
-+	mutex_lock_nested(&pb->mii_bus->mdio_lock, MDIO_MUTEX_MUX);
-+	r = pb->switch_fn(pb->current_child, cb->bus_number, pb->switch_data);
-+	if (r)
-+		goto out;
-+
-+	pb->current_child = cb->bus_number;
-+
-+	r = pb->mii_bus->write_c45(pb->mii_bus, phy_id, dev_addr, regnum, val);
-+out:
-+	mutex_unlock(&pb->mii_bus->mdio_lock);
-+
-+	return r;
-+}
-+
- static int parent_count;
- 
- static void mdio_mux_uninit_children(struct mdio_mux_parent_bus *pb)
-@@ -173,6 +216,8 @@ int mdio_mux_init(struct device *dev,
- 		cb->mii_bus->parent = dev;
- 		cb->mii_bus->read = mdio_mux_read;
- 		cb->mii_bus->write = mdio_mux_write;
-+		cb->mii_bus->read_c45 = mdio_mux_read_c45;
-+		cb->mii_bus->write_c45 = mdio_mux_write_c45;
- 		r = of_mdiobus_register(cb->mii_bus, child_bus_node);
- 		if (r) {
- 			mdiobus_free(cb->mii_bus);
--- 
-2.34.1
-
+I added such at the top of the file.
 
