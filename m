@@ -1,148 +1,171 @@
-Return-Path: <netdev+bounces-41946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C6D77CC5F0
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:32:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 321827CC5FC
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:36:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C5821F231D9
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:32:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9330DB210E4
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AEE641750;
-	Tue, 17 Oct 2023 14:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE1A41743;
+	Tue, 17 Oct 2023 14:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="aUdLydFI"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="CH3/o+YM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B6E4446F
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:32:25 +0000 (UTC)
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5425C92
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:32:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1697553141; x=1697812341;
-	bh=LeJACiK8k41rGXlYq+ParZetrisZUYGK8XTW8D7eDjs=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=aUdLydFImzx7+pqR4Q+AgNBQ3up0/Rzg4ahMlmdSccGQ0QSZW+X7CFG18IVqaZIpY
-	 uqYPgndSZ7qZafT/WY0GYXEoAVWkog3kDf/mUtxa3UCp9wH8nfEuEyNPilZ3+zOhAU
-	 xuTxzrUErA2qkCohjjsDwLzTRrc1yTtB4MnLMKCtYqavbuBgN7DC0QSnpx6JIP/YKd
-	 uGr3DsKVdvNUGIH/Q+MqEiuaWMMV8xf4SgRBv+YMI/o0/9FZEBIUYo7LxyqtwXJInE
-	 iX30QAODQDY+gEHOpkbsVqYE1gK2EwOwA9Z5P5ydWSfOPC45wscswhzf4Lzkc4YZgm
-	 R0hmhhG2Pfd+g==
-Date: Tue, 17 Oct 2023 14:32:07 +0000
-To: Greg KH <gregkh@linuxfoundation.org>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Andrew Lunn <andrew@lunn.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY drivers
-Message-ID: <0f839f73-400f-47d5-9708-0fa40ed0d4e9@proton.me>
-In-Reply-To: <2023101756-procedure-uninvited-f6c9@gregkh>
-References: <3469de1c-0e6f-4fe5-9d93-2542f87ffd0d@proton.me> <20231015.011502.276144165010584249.fujita.tomonori@gmail.com> <9d70de37-c5ed-4776-a00f-76888e1230aa@proton.me> <20231015.073929.156461103776360133.fujita.tomonori@gmail.com> <98471d44-c267-4c80-ba54-82ab2563e465@proton.me> <1454c3e6-82d1-4f60-b07d-bc3b47b23662@lunn.ch> <f26a3e1a-7eb8-464e-9cbe-ebb8bdf69b20@proton.me> <2023101756-procedure-uninvited-f6c9@gregkh>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1214446D
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:36:16 +0000 (UTC)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8902F92
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:36:15 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6b201a93c9cso3476907b3a.0
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:36:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1697553375; x=1698158175; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0iwkHAvpfBOIXAZ4ZbzgTwZWwWbSALrr4ObQlytmE0g=;
+        b=CH3/o+YM6ujcXe+y9R2EnW/AfxniQpQp4fDdckwtpVF0YEU3YfHl+GECTiltM/1J59
+         AoBH6LFAXvNs3xvgy14Pt59Ca4wrxNVZrVU+Ux3FoxY13L6GaemkH3L+HXBWRiEIxTWn
+         TuKnXfjGxZ52AkP9P9Ik7nfFIuWN5xdP2syrnCEMGS0nIkzmnjy8GyC3JLnw7nhmkKs8
+         t3hbiG9XDnq8v8fEot8QR05yEHibkZZecLPhCGKiTRSLei2NHkch+1t2gRvg6cQIBvwS
+         YZp9VnkLiat8zD6wjxc+JkXAzOXnfpb9V0PmTOYSklE/0LeRFQcEC3VaXNnXL6u9MjYf
+         rvOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697553375; x=1698158175;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0iwkHAvpfBOIXAZ4ZbzgTwZWwWbSALrr4ObQlytmE0g=;
+        b=swTBYNyhI0E4mRE4PJBqbf8E2y/5jk+2GOiwwdZY6Z086RoFhbk/JqyuMEhlZQyu9q
+         MfQ9qNZeVj9UmxTRUieN6YZovstUXHlhI2f8pDolpIgVdUEUQ6cXXU0oUI3fOxlQ3dLE
+         L9elJpC3XdNMtQn6BM3Oe5OizEwRU8V7lbztRN6+vhnXzVaQn7Mfy+xDeQsDqPWT8xtc
+         xRn40pKY87V5z35z91QJXfDHmakDhaZgj5xw39DhfDA5xJ7eUBSqbx33q5CxMv+JdJHT
+         i+OTXu0lw8uEquf5fZvpKz0FN6Mx5zTNF7GnTWJg3dRhdbp40y8ZvmQYnZYZ829FD8++
+         rteQ==
+X-Gm-Message-State: AOJu0Yw2ORrlyFrHlwaWgvu6b+CGtEXcZWBUVf/n5Q2QULlUUAV3E/sC
+	RQFZDiJgkevS+EXmcHCW3UjF9m5YLWL0W6cWkwavZg==
+X-Google-Smtp-Source: AGHT+IEB91J2WOZHXUz3uw16/kEenoPBeF0TiNelFfc7YRrfTCe1wwaOk8bK6B1ylW9mzLvaPKaocg==
+X-Received: by 2002:a05:6a21:1a5:b0:154:d3ac:2076 with SMTP id le37-20020a056a2101a500b00154d3ac2076mr2661894pzb.40.1697553374864;
+        Tue, 17 Oct 2023 07:36:14 -0700 (PDT)
+Received: from rogue-one.tail33bf8.ts.net ([2804:14d:5c5e:44fb:8ef5:7647:6178:de4e])
+        by smtp.gmail.com with ESMTPSA id az7-20020a17090b028700b0027360359b70sm6421355pjb.48.2023.10.17.07.36.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 07:36:14 -0700 (PDT)
+From: Pedro Tammela <pctammela@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Pedro Tammela <pctammela@mojatatu.com>,
+	Christian Theune <ct@flyingcircus.io>,
+	Budimir Markovic <markovicbudimir@gmail.com>
+Subject: [PATCH net v2] net/sched: sch_hfsc: upgrade 'rt' to 'sc' when it becomes a inner curve
+Date: Tue, 17 Oct 2023 11:36:02 -0300
+Message-Id: <20231017143602.3191556-1-pctammela@mojatatu.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 17.10.23 16:21, Greg KH wrote:
-> On Tue, Oct 17, 2023 at 02:04:33PM +0000, Benno Lossin wrote:
->> On 17.10.23 14:38, Andrew Lunn wrote:
->>>>> Because set_speed() updates the member in phy_device and read()
->>>>> updates the object that phy_device points to?
->>>>
->>>> `set_speed` is entirely implemented on the Rust side and is not protec=
-ted
->>>> by a lock.
->>>
->>> With the current driver, all entry points into the driver are called
->>> from the phylib core, and the core guarantees that the lock is
->>> taken. So it should not matter if its entirely implemented in the Rust
->>> side, somewhere up the call stack, the lock was taken.
->>
->> Sure that might be the case, I am trying to guard against this future
->> problem:
->>
->>       fn soft_reset(driver: &mut Driver) -> Result {
->>           let driver =3D driver
->>           thread::scope(|s| {
->>               let thread_a =3D s.spawn(|| {
->>                   for _ in 0..100_000_000 {
->>                       driver.set_speed(10);
->>                   }
->>               });
->>               let thread_b =3D s.spawn(|| {
->>                   for _ in 0..100_000_000 {
->>                       driver.set_speed(10);
->>                   }
->>               });
->>               thread_a.join();
->>               thread_b.join();
->>           });
->>           Ok(())
->>       }
->>
->> This code spawns two new threads both of which can call `set_speed`,
->> since it takes `&self`. But this leads to a data race, since those
->> accesses are not serialized. I know that this is a very contrived
->> example, but you never when this will become reality, so we should
->> do the right thing now and just use `&mut self`, since that is exactly
->> what it is for.
->=20
-> Kernel code is written for the use cases today, don't worry about
-> tomorrow, you can fix the issue tomorrow if you change something that
-> requires it.
+Christian Theune says:
+   I upgraded from 6.1.38 to 6.1.55 this morning and it broke my traffic shaping script,
+   leaving me with a non-functional uplink on a remote router.
 
-The kind of coding style that (mis)-uses interior mutability is not
-something that we can change over night. We should do it properly to
-begin with.
+A 'rt' curve cannot be used as a inner curve (parent class), but we were
+allowing such configurations since the qdisc was introduced. Such
+configurations would trigger a UAF as Budimir explains:
+   The parent will have vttree_insert() called on it in init_vf(),
+   but will not have vttree_remove() called on it in update_vf()
+   because it does not have the HFSC_FSC flag set.
 
-> And what "race" are you getting here?  You don't have threads in the
-> kernel :)
+The qdisc always assumes that inner classes have the HFSC_FSC flag set.
+This is by design as it doesn't make sense 'qdisc wise' for an 'rt'
+curve to be an inner curve.
 
-I chose threads, since I am a lot more familiar with that, but the
-kernel also has workqueues which execute stuff concurrently (if I
-remember correctly). We also have patches for bindings for the workqueue
-so they are not that far away.
+Budimir's original patch disallows users to add classes with a 'rt'
+parent, but this is too strict as it breaks users that have been using
+'rt' as a inner class. Another approach, taken by this patch, is to
+upgrade the inner 'rt' into a 'sc', warning the user in the process.
+It avoids the UAF reported by Budimir while also being more permissive
+to bad scripts/users/code using 'rt' as a inner class.
 
-> Also, if two things are setting the speed, wonderful, you get some sort
-> of value eventually, you have much bigger problems in your code as you
-> shouldn't have been doing that in the first place.
+Users checking the `tc class ls [...]` or `tc class get [...]` dumps would
+observe the curve change and are potentially breaking with this change.
 
-This is not allowed in Rust, it is UB and will lead to bad things.
+v1->v2: https://lore.kernel.org/all/20231013151057.2611860-1-pctammela@mojatatu.com/
+- Correct 'Fixes' tag and merge with revert (Jakub)
 
->> Not that we do not even have a way to create threads on the Rust side
->> at the moment.
->=20
-> Which is a good thing :)
->=20
->> But we should already be thinking about any possible code pattern.
->=20
-> Again, no, deal with what we have today, kernel code is NOT
-> future-proof, that's not how we write this stuff.
+Cc: Christian Theune <ct@flyingcircus.io>
+Cc: Budimir Markovic <markovicbudimir@gmail.com>
+Fixes: b3d26c5702c7 ("net/sched: sch_hfsc: Ensure inner classes have fsc curve")
+Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+---
+ net/sched/sch_hfsc.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-While I made my argument for future proofing, I think that we
-should just be using the standard Rust stuff where it applies.
-
-When you want to modify something, use `&mut T`, if not then use
-`&T`. Only deviate from this if you have a good argument.
-
---=20
-Cheers,
-Benno
+diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
+index 3554085bc2be..880c5f16b29c 100644
+--- a/net/sched/sch_hfsc.c
++++ b/net/sched/sch_hfsc.c
+@@ -902,6 +902,14 @@ hfsc_change_usc(struct hfsc_class *cl, struct tc_service_curve *usc,
+ 	cl->cl_flags |= HFSC_USC;
+ }
+ 
++static void
++hfsc_upgrade_rt(struct hfsc_class *cl)
++{
++	cl->cl_fsc = cl->cl_rsc;
++	rtsc_init(&cl->cl_virtual, &cl->cl_fsc, cl->cl_vt, cl->cl_total);
++	cl->cl_flags |= HFSC_FSC;
++}
++
+ static const struct nla_policy hfsc_policy[TCA_HFSC_MAX + 1] = {
+ 	[TCA_HFSC_RSC]	= { .len = sizeof(struct tc_service_curve) },
+ 	[TCA_HFSC_FSC]	= { .len = sizeof(struct tc_service_curve) },
+@@ -1011,10 +1019,6 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
+ 		if (parent == NULL)
+ 			return -ENOENT;
+ 	}
+-	if (!(parent->cl_flags & HFSC_FSC) && parent != &q->root) {
+-		NL_SET_ERR_MSG(extack, "Invalid parent - parent class must have FSC");
+-		return -EINVAL;
+-	}
+ 
+ 	if (classid == 0 || TC_H_MAJ(classid ^ sch->handle) != 0)
+ 		return -EINVAL;
+@@ -1065,6 +1069,12 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
+ 	cl->cf_tree = RB_ROOT;
+ 
+ 	sch_tree_lock(sch);
++	/* Check if the inner class is a misconfigured 'rt' */
++	if (!(parent->cl_flags & HFSC_FSC) && parent != &q->root) {
++		NL_SET_ERR_MSG(extack,
++			       "Forced curve change on parent 'rt' to 'sc'");
++		hfsc_upgrade_rt(parent);
++	}
+ 	qdisc_class_hash_insert(&q->clhash, &cl->cl_common);
+ 	list_add_tail(&cl->siblings, &parent->children);
+ 	if (parent->level == 0)
+-- 
+2.39.2
 
 
