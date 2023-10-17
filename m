@@ -1,286 +1,97 @@
-Return-Path: <netdev+bounces-41702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD917CBBC8
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:55:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B94527CBBCB
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:56:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 909C1B20F59
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 06:55:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72F02281408
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 06:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C94156E8;
-	Tue, 17 Oct 2023 06:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="lgYC1Grt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23228156F9;
+	Tue, 17 Oct 2023 06:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D9211728
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 06:55:13 +0000 (UTC)
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD0DE8
-	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 23:55:11 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2bff776fe0bso69341981fa.0
-        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 23:55:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1697525709; x=1698130509; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bDkATyrBELpMJhNZkPKNwPN8vNWTOg5Prx6dfaUxudc=;
-        b=lgYC1Grth33gc7E48Q0tJylGuhX7skgPrvXq3Sk3MRg0qbOroyDLOFFf3qhHeMz2lJ
-         o2h8AaX3jKbigUivUgQit/fYI9pekdkwzIGyOsT8NcOyw4VJJyNu0+APhcsoZcBMAJww
-         nE0S2+FQqMS39Z0bB2RszhPfhnRxM4EJ7ZpSRxIJ+dHxFjmMomRx3oUjxZzx5gIsXw5t
-         6h949gBsh151J1m/pW6E88DQ/Rr1vtTHZGV1xS1LFm2LnLOlaG/HOpm5oGnPclH3vsRm
-         LLTYjUIqppv6l4cr1wZiHzRd1oofB2Cda8oAga8ovjDZOCMbNGlH0KJI6GG4AUF9CWlY
-         lbQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697525709; x=1698130509;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bDkATyrBELpMJhNZkPKNwPN8vNWTOg5Prx6dfaUxudc=;
-        b=l4cJD1jNmURgdp7or70QCcZOU+8fYYIN1Pa/nasyjVdXiAaZDaG2yMoEguGUFSJxeh
-         aO7Aw7hlwwFDPHLZYSiAlrEF9pZTzoBzUebnEZnULo+qhLc7uzVzRQPVcZKUYofSIC49
-         uC7DKEK/48Rk1+FbS3kDv+QPSuFogBEQUAZDWrXwRaHIIP+B/gn/xnr5qG8tvmwk63Es
-         GHjsH9xYL5pUmYTV0eLG85iLUqjH2wDzCNNBJgivELPqTzhJnrPhAUi5ipHURGsqD3VT
-         e/2a7jZ95BvIC53Cn/pX6LH2q3x+seZ0wLYe/j5zzhHBo59ivrONUpoBSCphfecdIROZ
-         lzPg==
-X-Gm-Message-State: AOJu0YxBUU+Ic23kZ+QYPI+657EFkURKavqpH/UCT6nH8rA5BMJKFzDH
-	H6EuPFzoJc2k6H3bDNil96mbwISpvG40e2zeF7jwig==
-X-Google-Smtp-Source: AGHT+IECj117APB9tIfHpuHnYtXL8pZAUC+BwW1vvYpdkLMvvBPbK79bq7ACBx0xDJ5SxErp0KFKe6Hj+mIK5TUoNyU=
-X-Received: by 2002:a2e:730a:0:b0:2c5:1c4:9005 with SMTP id
- o10-20020a2e730a000000b002c501c49005mr895088ljc.32.1697525709544; Mon, 16 Oct
- 2023 23:55:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC8A11728
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 06:56:28 +0000 (UTC)
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34656AB
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 23:56:23 -0700 (PDT)
+X-QQ-mid:Yeas47t1697525707t444t52469
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.119.254.108])
+X-QQ-SSF:00400000000000F0FRF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 16759421726094174930
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>
+References: <20231016094831.139939-1-jiawenwu@trustnetic.com> <23d363d0-70d6-42b7-9efd-d9953b3bc7f5@lunn.ch>
+In-Reply-To: <23d363d0-70d6-42b7-9efd-d9953b3bc7f5@lunn.ch>
+Subject: RE: [PATCH] net: txgbe: clean up PBA string
+Date: Tue, 17 Oct 2023 14:55:06 +0800
+Message-ID: <010901da00c6$dca02ba0$95e082e0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016031649.35088-1-huangjie.albert@bytedance.com>
- <CAJ8uoz2DUe3xySTKuLbA5=QDAGuTzPdGu3P_=ZvJmna25VtHCQ@mail.gmail.com>
- <CABKxMyMieNNMXFMTRdof1W43ijvZq5e04nOkXFv5djzadXh0xQ@mail.gmail.com> <CAJ8uoz069tKX60=j3PwsVrO64c+mRGvVYJJWPwTktrAuh=3fbg@mail.gmail.com>
-In-Reply-To: <CAJ8uoz069tKX60=j3PwsVrO64c+mRGvVYJJWPwTktrAuh=3fbg@mail.gmail.com>
-From: =?UTF-8?B?6buE5p2w?= <huangjie.albert@bytedance.com>
-Date: Tue, 17 Oct 2023 14:54:57 +0800
-Message-ID: <CABKxMyM_jGBWK1g8Hb145PEBui_p1RCg-uGm5Sjtb4injVD3Jw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] xsk: Avoid starving xsk at the end of the list
-To: Magnus Karlsson <magnus.karlsson@gmail.com>
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
-	"open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain;
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQK9HPdu1S25dJV4PK5RCAPTMaA92AGvHQB4rnnTNkA=
+Content-Language: zh-cn
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FROM_EXCESS_BASE64,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Magnus Karlsson <magnus.karlsson@gmail.com> =E4=BA=8E2023=E5=B9=B410=E6=9C=
-=8816=E6=97=A5=E5=91=A8=E4=B8=80 17:13=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, 16 Oct 2023 at 10:54, =E9=BB=84=E6=9D=B0 <huangjie.albert@bytedan=
-ce.com> wrote:
+On Tuesday, October 17, 2023 3:19 AM, Andrew Lunn wrote:
+> On Mon, Oct 16, 2023 at 05:48:31PM +0800, Jiawen Wu wrote:
+> > Replace deprecated strncpy with strscpy, and add the missing PBA prints.
 > >
-> > Magnus Karlsson <magnus.karlsson@gmail.com> =E4=BA=8E2023=E5=B9=B410=E6=
-=9C=8816=E6=97=A5=E5=91=A8=E4=B8=80 14:41=E5=86=99=E9=81=93=EF=BC=9A
-> > >
-> > > On Mon, 16 Oct 2023 at 05:17, Albert Huang
-> > > <huangjie.albert@bytedance.com> wrote:
-> > > >
-> > > > In the previous implementation, when multiple xsk sockets were
-> > > > associated with a single xsk_buff_pool, a situation could arise
-> > > > where the xsk_tx_list maintained data at the front for one xsk
-> > > > socket while starving the xsk sockets at the back of the list.
-> > > > This could result in issues such as the inability to transmit packe=
-ts,
-> > > > increased latency, and jitter. To address this problem, we introduc=
-ed
-> > > > a new variable called tx_budget_cache, which limits each xsk to tra=
-nsmit
-> > > > a maximum of MAX_XSK_TX_BUDGET tx descriptors. This allocation ensu=
-res
-> > > > equitable opportunities for subsequent xsk sockets to send tx descr=
-iptors.
-> > > > The value of MAX_XSK_TX_BUDGET is temporarily set to 16.
-> > >
-> > > Hi Albert. Yes you are correct that there is nothing hindering this t=
-o
-> > > happen in the code at the moment, so let us fix it.
-> > >
-> > thanks.
+> > This issue is reported by: Justin Stitt <justinstitt@google.com>
+> > Link: https://lore.kernel.org/netdev/002101d9ffdd$9ea59f90$dbf0deb0$@trustnetic.com/T/#t
 > >
-> > > > Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
-> > > > ---
-> > > >  include/net/xdp_sock.h |  6 ++++++
-> > > >  net/xdp/xsk.c          | 18 ++++++++++++++++++
-> > > >  2 files changed, 24 insertions(+)
-> > > >
-> > > > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-> > > > index 69b472604b86..f617ff54e38c 100644
-> > > > --- a/include/net/xdp_sock.h
-> > > > +++ b/include/net/xdp_sock.h
-> > > > @@ -44,6 +44,7 @@ struct xsk_map {
-> > > >         struct xdp_sock __rcu *xsk_map[];
-> > > >  };
-> > > >
-> > > > +#define MAX_XSK_TX_BUDGET 16
-> > >
-> > > I think something like MAX_PER_SOCKET_BUDGET would be clearer.
-> > >
+> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> > ---
+> >  drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
 > >
-> >  OK, this will be considered  in the next patch.
+> > diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> > index 394f699c51da..123e3ca78ef0 100644
+> > --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> > +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> > @@ -741,8 +741,9 @@ static int txgbe_probe(struct pci_dev *pdev,
+> >  	/* First try to read PBA as a string */
+> >  	err = txgbe_read_pba_string(wx, part_str, TXGBE_PBANUM_LENGTH);
+> >  	if (err)
+> > -		strncpy(part_str, "Unknown", TXGBE_PBANUM_LENGTH);
+> > +		strscpy(part_str, "Unknown", sizeof(part_str));
 > >
-> > > >  struct xdp_sock {
-> > > >         /* struct sock must be the first member of struct xdp_sock =
-*/
-> > > >         struct sock sk;
-> > > > @@ -63,6 +64,11 @@ struct xdp_sock {
-> > > >
-> > > >         struct xsk_queue *tx ____cacheline_aligned_in_smp;
-> > > >         struct list_head tx_list;
-> > > > +       /* Record the actual number of times xsk has transmitted a =
-tx
-> > > > +        * descriptor, with a maximum limit not exceeding MAX_XSK_T=
-X_BUDGET
-> > > > +        */
-> > > > +       u32 tx_budget_cache;
-> > > > +
-> > > >         /* Protects generic receive. */
-> > > >         spinlock_t rx_lock;
-> > > >
-> > > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > > > index f5e96e0d6e01..087f2675333c 100644
-> > > > --- a/net/xdp/xsk.c
-> > > > +++ b/net/xdp/xsk.c
-> > > > @@ -413,16 +413,25 @@ EXPORT_SYMBOL(xsk_tx_release);
-> > > >
-> > > >  bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc =
-*desc)
-> > > >  {
-> > > > +       u32 xsk_full_count =3D 0;
-> > >
-> > > Enough with a bool;
-> > >
-> > > >         struct xdp_sock *xs;
-> > > >
-> > > >         rcu_read_lock();
-> > > > +again:
-> > > >         list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
-> > > > +               if (xs->tx_budget_cache >=3D MAX_XSK_TX_BUDGET) {
-> > > > +                       xsk_full_count++;
-> > > > +                       continue;
-> > > > +               }
-> > >
-> > > The problem here is that the fixed MAX_XSK_TX_BUDGET is only useful
-> > > for the <=3D 2 socket case. If I have 3 sockets sharing a
-> > > netdev/queue_id, the two first sockets can still starve the third one
-> > > since the total budget per send is 32.
-> >
-> > Why is there a limit of 32? I'm not quite clear on the implications of =
-these,
-> > Did I miss something?
-> > BR
-> > Albert
->
-> There is a define TX_BATCH_SIZE 32 that controls the max number of
-> packets a sendto() call can send before it exits. It is used in
-> __xsk_generic_xmit().
+> > +	netif_info(wx, probe, netdev, "PBA No: %s\n", part_str);
+> >  	netif_info(wx, probe, netdev, "%pM\n", netdev->dev_addr);
+> 
+> In general, we try not to spam the kernel log, especially not for the
+> good case. You can get the MAC address with ip link show. How
+> important is the part? Can you get the same information from lspci?
+> Or maybe you could append it to the driver name in wx_get_drvinfo()?
 
-OK,I got it . I missed the logic here. I will reconsider the logic in this =
-part.
-Thanks
-BR
-Albert
+PBA info can be read from lspci, also the log for MAC address can be removed.
+I'll submit a patch to clean them up in txgbe/ngbe.
 
->
-> > >You need to go through the list
-> > > of sockets in the beginning to compute the MAX_XSK_TX_BUDGET to
-> > > compute this dynamically before each call. Or cache this value
-> > > somehow, in the pool for example. Actually, the refcount in the
-> > > buf_pool will tell you how many sockets are sharing the same buf_pool=
-.
-> > > Try using that to form MAX_XSK_TX_BUDGET on the fly.
-> > >
-> > > Another simpler way of accomplishing this would be to just reorder th=
-e
-> > > list every time. Put the first socket last in the list every time. Th=
-e
-> > > drawback of this is that you need to hold the xsk_tx_list_lock while
-> > > doing this so might be slower. The per socket batch size would also b=
-e
-> > > 32 and you would not receive "fairness" over a single call to
-> > > sendto(). Would that be a problem for you?
-> > >
-> >
-> > Yes, I did consider this approach, but I abandoned it because it would =
-lose
-> > the performance advantages of lock-free operations(RCU read)
-> > thanks
-> > Albert
->
-> OK, then let us not consider it and try to make your current approach wor=
-k.
->
-> >
-> > > > +
-> > > >                 if (!xskq_cons_peek_desc(xs->tx, desc, pool)) {
-> > > >                         if (xskq_has_descs(xs->tx))
-> > > >                                 xskq_cons_release(xs->tx);
-> > > >                         continue;
-> > > >                 }
-> > > >
-> > > > +               xs->tx_budget_cache++;
-> > > > +
-> > > >                 /* This is the backpressure mechanism for the Tx pa=
-th.
-> > > >                  * Reserve space in the completion queue and only p=
-roceed
-> > > >                  * if there is space in it. This avoids having to i=
-mplement
-> > > > @@ -436,6 +445,14 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *po=
-ol, struct xdp_desc *desc)
-> > > >                 return true;
-> > > >         }
-> > > >
-> > > > +       if (unlikely(xsk_full_count > 0)) {
-> > > > +               list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_=
-list) {
-> > > > +                       xs->tx_budget_cache =3D 0;
-> > > > +               }
-> > > > +               xsk_full_count =3D 0;
-> > > > +               goto again;
-> > > > +       }
-> >
-> > this section of code only enters when it's unable to acquire any TX
-> > descriptors and
-> > xsk_full_count > 0.
-> >
-> > > > +
-> > > >  out:
-> > > >         rcu_read_unlock();
-> > > >         return false;
-> > > > @@ -1230,6 +1247,7 @@ static int xsk_bind(struct socket *sock, stru=
-ct sockaddr *addr, int addr_len)
-> > > >         xs->zc =3D xs->umem->zc;
-> > > >         xs->sg =3D !!(xs->umem->flags & XDP_UMEM_SG_FLAG);
-> > > >         xs->queue_id =3D qid;
-> > > > +       xs->tx_budget_cache =3D 0;
-> > > >         xp_add_xsk(xs->pool, xs);
-> > > >
-> > > >  out_unlock:
-> > > > --
-> > > > 2.20.1
-> > > >
-> > > >
+
 
