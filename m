@@ -1,151 +1,111 @@
-Return-Path: <netdev+bounces-42035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE5817CCBC5
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 21:06:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64DF37CCBD5
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 21:10:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79942281966
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:06:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 965531C2048D
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DDAFEBE;
-	Tue, 17 Oct 2023 19:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8167EEBE;
+	Tue, 17 Oct 2023 19:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aZJfQghf"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="N3HTsTe2"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E572EAE5
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 19:06:40 +0000 (UTC)
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 763C51B2;
-	Tue, 17 Oct 2023 12:06:30 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6b2018a11efso4197817b3a.0;
-        Tue, 17 Oct 2023 12:06:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697569590; x=1698174390; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X74HUdsW7jfV9HBl6W8q2e+Tb/QlaXmSgd9sDUUldmw=;
-        b=aZJfQghfrHabId4SjASH9tUoByuq7Fe5DQ+B7lZOcddpqmiB+a0Rsfe7JxCV+VWLr+
-         6ysIUI9wOWUO+S8YufvIg8gpeBI7QOFnw1EPLphQdHNQC9bCs3MpNxSGVZKeXYD4RfOj
-         lZ9bqhBwo5Wvs2ScEJWW5Uv3yDc9jvuH/lW0gNwqOvuqw7ombJFDenbBoQlwR/D7YrTZ
-         kc+UQcKytLw+Ps3sjTNCu/Ns9+jbbC2fZcSwtoYxxyek2lnNCb9aliIZPiuLa6hNNJC7
-         ucsDeNs19PsL+whdNKAlYZ9KkAq3ZYeQntKj/ajjZgsBOPKFiVd3QYXbE0kiJA+gQ0Y4
-         GsKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697569590; x=1698174390;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X74HUdsW7jfV9HBl6W8q2e+Tb/QlaXmSgd9sDUUldmw=;
-        b=uo2fLVygdR4uWkSzVC0ypFdn9Q/acYZOSdwdKnHHnZpHFCCubthOPoDuDH0fbdj7jS
-         IZZaR44+vLnUbZOhWBEQmrMbT/VO3ZHcsolL4aKqRe7OlOJg5eiIX6BkI84VlolU1TFC
-         C6BCopgFUOE+UrVOtuzfxaXgHUdvU5K62TbmQwGYwthBWFEIqgpvnU2YnPCPcIvJcxuK
-         6w+zzMpuka0PYmNQ72Zuqj1m5kxP2BY+AWX/gxtPX5VAgKqH8ThagNRhTJ6X3UtD0wKq
-         7uijgJYG1VP0SEzmmQoL5oSE67DuL/igTbqiNcSBoTBAfxBvNU/D3WdhRewh7cZjyBOO
-         XJbg==
-X-Gm-Message-State: AOJu0Yxnh5ulXRUq1wo5ILRiNE4KeSLt+N1Nn+DolqbrUKLqjBY3heGL
-	CPM5FhDy4t0Pg/yMnmke4RY=
-X-Google-Smtp-Source: AGHT+IEgCGqhRzHdz4LfOpgn9gY4BENB6Qs/KK0GimbsV+aw48rQBEvNseqyaKykuRW1FJ4sJSJ2KA==
-X-Received: by 2002:a05:6a20:7f8d:b0:16a:b651:dcd6 with SMTP id d13-20020a056a207f8d00b0016ab651dcd6mr3842233pzj.7.1697569590237;
-        Tue, 17 Oct 2023 12:06:30 -0700 (PDT)
-Received: from ubuntu ([223.226.54.200])
-        by smtp.gmail.com with ESMTPSA id pb11-20020a17090b3c0b00b002794fe14cabsm6879886pjb.12.2023.10.17.12.06.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 12:06:29 -0700 (PDT)
-Date: Tue, 17 Oct 2023 12:06:23 -0700
-From: Nandha Kumar Singaram <nandhakumar.singaram@gmail.com>
-To: Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Coiby Xu <coiby.xu@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	netdev@vger.kernel.org, linux-staging@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: kumaran.4353@gmail.com
-Subject: [PATCH 2/2] staging: qlge: Replace the occurrences of (1<<x) by
- BIT(x)
-Message-ID: <5a962ea2ab9a40b1da11d95cdaf990002ffed7fa.1697568757.git.nandhakumar.singaram@gmail.com>
-References: <cover.1697568757.git.nandhakumar.singaram@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF322EAEF
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 19:10:03 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E07FDF7
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:10:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=Q6hagcCPa4li9xS4hq++0sBFuHSj3jvcxFmcy/DU0EY=; b=N3
+	HTsTe23nXDpRsQWxWWii6bnqpt9f17+D19N1zRIT9j6d7ZoQ+czzeQyQ4l2UKa1ll0geigukKJ+zq
+	pcP/Dlxr0LFQVYGubpx0oH76brvDRso/n0fXjUhWuWJD0x9R97kVhzcY+XorTgwUw/61NXF4lAASo
+	cKpyDbYBQ6aPE/0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qspS1-002W5e-Vr; Tue, 17 Oct 2023 21:09:57 +0200
+Date: Tue, 17 Oct 2023 21:09:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Coco Li <lixiaoyan@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Mubashir Adnan Qureshi <mubashirq@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>,
+	David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH v2 net-next 2/5] net-smnp: reorganize SNMP fast path
+ variables
+Message-ID: <353dcd1e-a191-488c-8802-fede2a644453@lunn.ch>
+References: <20231017014716.3944813-1-lixiaoyan@google.com>
+ <20231017014716.3944813-3-lixiaoyan@google.com>
+ <a666cea7-078d-4dc0-bad9-87fa15e44036@lunn.ch>
+ <CANn89iJVGQ0hpX8aSXjyfubntfy_a9xrZ5gGrx+ekY0THZ4p+Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cover.1697568757.git.nandhakumar.singaram@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iJVGQ0hpX8aSXjyfubntfy_a9xrZ5gGrx+ekY0THZ4p+Q@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Adhere to linux coding style. Replace the occurrences of
-(1<<x) by BIT(x)
+On Tue, Oct 17, 2023 at 08:10:21PM +0200, Eric Dumazet wrote:
+> On Tue, Oct 17, 2023 at 3:57 AM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > On Tue, Oct 17, 2023 at 01:47:13AM +0000, Coco Li wrote:
+> > > From: Chao Wu <wwchao@google.com>
+> > >
+> > > Reorganize fast path variables on tx-txrx-rx order.
+> > > Fast path cacheline ends afer LINUX_MIB_DELAYEDACKLOCKED.
+> > > There are only read-write variables here.
+> > >
+> > > Below data generated with pahole on x86 architecture.
+> > >
+> > > Fast path variables span cache lines before change: 12
+> > > Fast path variables span cache lines after change: 2
+> >
+> > As i pointed out for the first version, this is a UAPI file.
+> >
+> > Please could you add some justification that this does not cause any
+> > UAPI changes. Will old user space binaries still work after this?
+> >
+> > Thanks
+> >         Andrew
+> 
+> I do not think the particular order is really UAPI. Not sure why they
+> were pushed in uapi in the first place.
+> 
+> Kernel exports these counters with a leading line with the names of the metrics.
+> 
+> We already in the past added fields and nothing broke.
+> 
+> So the answer is : user space binaries not ignoring the names of the
+> metrics will work as before.
+> 
+> nstat is one of the standard binary.
 
-Signed-off-by: Nandha Kumar Singaram <nandhakumar.singaram@gmail.com>
----
- drivers/staging/qlge/qlge_main.c | 8 ++++----
- drivers/staging/qlge/qlge_mpi.c  | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+This is the sort of thing which i think should be in the commit
+message. It makes it clear somebody has thought about this, and they
+think the risk is minimal. Without such a comment, somebody will ask
+if changing to a uapi file is safe.
 
-diff --git a/drivers/staging/qlge/qlge_main.c b/drivers/staging/qlge/qlge_main.c
-index 1ead7793062a..9f67e44123cc 100644
---- a/drivers/staging/qlge/qlge_main.c
-+++ b/drivers/staging/qlge/qlge_main.c
-@@ -2191,7 +2191,7 @@ static int qlge_napi_poll_msix(struct napi_struct *napi, int budget)
- 		/* If this TX completion ring belongs to this vector and
- 		 * it's not empty then service it.
- 		 */
--		if ((ctx->irq_mask & (1 << trx_ring->cq_id)) &&
-+		if ((ctx->irq_mask & BIT(trx_ring->cq_id)) &&
- 		    (qlge_read_sh_reg(trx_ring->prod_idx_sh_reg) !=
- 		     trx_ring->cnsmr_idx)) {
- 			netif_printk(qdev, intr, KERN_DEBUG, qdev->ndev,
-@@ -3222,13 +3222,13 @@ static void qlge_set_irq_mask(struct qlge_adapter *qdev, struct intr_context *ct
- 		/* Add the RSS ring serviced by this vector
- 		 * to the mask.
- 		 */
--		ctx->irq_mask = (1 << qdev->rx_ring[vect].cq_id);
-+		ctx->irq_mask = BIT(qdev->rx_ring[vect].cq_id);
- 		/* Add the TX ring(s) serviced by this vector
- 		 * to the mask.
- 		 */
- 		for (j = 0; j < tx_rings_per_vector; j++) {
- 			ctx->irq_mask |=
--				(1 << qdev->rx_ring[qdev->rss_ring_count +
-+				BIT(qdev->rx_ring[qdev->rss_ring_count +
- 				 (vect * tx_rings_per_vector) + j].cq_id);
- 		}
- 	} else {
-@@ -3236,7 +3236,7 @@ static void qlge_set_irq_mask(struct qlge_adapter *qdev, struct intr_context *ct
- 		 * ID into the mask.
- 		 */
- 		for (j = 0; j < qdev->rx_ring_count; j++)
--			ctx->irq_mask |= (1 << qdev->rx_ring[j].cq_id);
-+			ctx->irq_mask |= BIT(qdev->rx_ring[j].cq_id);
- 	}
- }
- 
-diff --git a/drivers/staging/qlge/qlge_mpi.c b/drivers/staging/qlge/qlge_mpi.c
-index 96a4de6d2b34..ce0b54603071 100644
---- a/drivers/staging/qlge/qlge_mpi.c
-+++ b/drivers/staging/qlge/qlge_mpi.c
-@@ -113,7 +113,7 @@ int qlge_own_firmware(struct qlge_adapter *qdev)
- 	 * core dump and firmware reset after an error.
- 	 */
- 	temp =  qlge_read32(qdev, STS);
--	if (!(temp & (1 << (8 + qdev->alt_func))))
-+	if (!(temp & BIT((8 + qdev->alt_func))))
- 		return 1;
- 
- 	return 0;
--- 
-2.25.1
-
+   Andrew
 
