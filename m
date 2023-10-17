@@ -1,126 +1,107 @@
-Return-Path: <netdev+bounces-41977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5913C7CC800
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:50:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D3B07CC82A
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:54:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9116D1C20AB0
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:50:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DB981C2099B
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1905450F1;
-	Tue, 17 Oct 2023 15:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3916C450F4;
+	Tue, 17 Oct 2023 15:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ieCl5oaD"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="SZy8uS1v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11F4450EC
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 15:50:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1372DC433CA;
-	Tue, 17 Oct 2023 15:50:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697557854;
-	bh=tpaDDi5AOX5s2f2Vf6+2CZRZFhSqTVVlwCWOfzHW5xo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ieCl5oaDAxZkxOYtHjwg/niu8JeeJEiIRgxDpG6oSFZG8E8/JhCDzqPpslpyNt+cL
-	 2W5ZdJHtl7mDcg6WzQWGyd2vyDCEaa2Xu7vqs5nh+oKZyiB61LEJLDc6WxaOlQ8pVs
-	 L3joF9M+eS/bmroCblOlYZsUEfX+f3sasypbImnrvGuTeLLyZrYKOnOS3aapryxYQV
-	 mQsyCxke2Nu+J2tstXiJlo4fLdV3xMHwWrNUGb9TLg7tWEmml8zUe2/Iwh2ANPSbTq
-	 5Eg2SueR6V5AAR5kqlLKzgCW0YCsVde28cRYiRacNQJFVMxo15FDX6pw5YpZquNpS7
-	 ekTzYIA5fEbNw==
-Date: Tue, 17 Oct 2023 08:50:53 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com
-Subject: Re: [patch net-next v2] tools: ynl: introduce option to process
- unknown attributes or types
-Message-ID: <20231017085053.63d4af40@kernel.org>
-In-Reply-To: <ZS4nJeM+Svk+WUq+@nanopsycho>
-References: <20231016110222.465453-1-jiri@resnulli.us>
-	<20231016175903.605f61aa@kernel.org>
-	<ZS4nJeM+Svk+WUq+@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C0B4448F
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 15:54:50 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF5195
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 08:54:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=fbBBx1xXXZfCGN2MO4QG4DClma3XXnAS/gYofQ7iBqw=; b=SZy8uS1v2mgMcuW1CREBC/lH+7
+	vcYCiU3wMvD9LDNhWaE41Sch/lf1gX77DjuRm99ysy8b/jjfZDpGuyq1c9NaaV0jHpqvZo7fAUcLv
+	+ymvPKLCLGslV2zvDOpBY9X0xjmoMRVJctkw3CRrz1jRLooyW87bhLAyJk5OrWHKDjJcOn/Izo0+5
+	xikqhqDCyhVlaDDt9yj+q3/mEYiwOTHMpcfcDJEUoDZcjxTnrmQyqb0T+apykTermM2q8IOZPTjC1
+	8IEXBHgejwxOnn9OLxVUlxOcl+8Xv5lkTKQAx737mxWi1QOWGZUndMxiudD68EYJxJGbQ9sYscI3/
+	t2MQJtvw==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qsmP7-000MuD-L4; Tue, 17 Oct 2023 17:54:45 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qsmP6-000NMq-Ql; Tue, 17 Oct 2023 17:54:44 +0200
+Subject: Re: [PATCH v7 net-next 00/18] Introducing P4TC
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ anjali.singhai@intel.com, namrata.limaye@intel.com,
+ deb.chatterjee@intel.com, john.andy.fingerhut@intel.com, dan.daly@intel.com,
+ Vipin.Jain@amd.com, tom@sipanda.io, mleitner@redhat.com,
+ Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us,
+ xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com,
+ toke@redhat.com, mattyk@nvidia.com
+References: <20231016093549.181952-1-jhs@mojatatu.com>
+ <20231016131506.71ad76f5@kernel.org>
+ <CAM0EoM=nT2KQcVqPrWvKJXnW7h8uodhu0daNsLkuAUt5n=zuZw@mail.gmail.com>
+ <9246d8a0-113a-9c71-9e44-090b6850a143@iogearbox.net>
+ <CAM0EoMkJcVFx+u93T=PO_Q6BJuHe3h_GGW1=5h=asYFo--x=TQ@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <c8bfd660-96d1-3cb7-3f1e-44bc88af0007@iogearbox.net>
+Date: Tue, 17 Oct 2023 17:54:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAM0EoMkJcVFx+u93T=PO_Q6BJuHe3h_GGW1=5h=asYFo--x=TQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27064/Tue Oct 17 10:11:10 2023)
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 17 Oct 2023 08:18:13 +0200 Jiri Pirko wrote:
-> Tue, Oct 17, 2023 at 02:59:03AM CEST, kuba@kernel.org wrote:
-> >On Mon, 16 Oct 2023 13:02:22 +0200 Jiri Pirko wrote:  
-> >> +class FakeSpecAttr:
-> >> +    def __init__(self, name):
-> >> +        self.dict = {"name": name, "type": None}
-> >> +        self.is_multi = False
-> >> +
-> >> +    def __getitem__(self, key):
-> >> +        return self.dict[key]
-> >> +
-> >> +    def __contains__(self, key):
-> >> +        return key in self.dict  
-> >
-> >Why the new class? Why not attach the NlAttr object directly?  
+On 10/17/23 5:38 PM, Jamal Hadi Salim wrote:
+> On Tue, Oct 17, 2023 at 11:00 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>
+>> On 10/16/23 10:38 PM, Jamal Hadi Salim wrote:
+>>> On Mon, Oct 16, 2023 at 4:15 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>> [...]
+>>>> FWIW please do not post another version this week (not that I think
+>>>> that you would do that, but better safe than sorry. Last week the patch
+>>>> bombs pushed the shared infra 24h+ behind the list..)
+>>>
+>>> Not intending to.
+>>
+>> Given bpf & kfuncs, please also Cc bpf@vger.kernel.org on future revisions
+>> as not everyone on bpf list is subscribed to netdev.
 > 
-> It's not NlAttr, it's SpecAttr. And that has a constructor with things I
-> cannot provide for fake object, that's why I did this dummy object.
+> I thought i did that, maybe it was in earlier patches. Do you want Cc
+> on everything or only on kfuncs? I am getting conflicting messages, do
+> you have to Cc bpf for kfuncs?
+> Example, attached from (some fs?) conference last month i think
 
-Just to be able to do spec["type"] on it?
-
-There is an if "ladder", just replace the first
-
-	if attr_spec["type"] == ...
-
-with
-	if attr_spec is None:
-		# your code
-	elif attr_spec["type"] == ...
-
-hm?
-
-> >I have an idea knocking about in my head to support "polymorphic"
-> >nests (nests where decoding depends on value of another attr,
-> >link rtnl link attrs or tc object attrs). The way I'm thinking 
-> >about doing it is to return NlAttr / struct nla_attr back to the user.
-> >And let the users call a sub-parser of choice by hand.  
-> 
-> Sounds parallel to this patch, isn't it?
-
-I'm just giving you extra info to explain my thinking.
-Given how we struggle to understand each other lately :S
-
-> >So returning a raw NlAttr appeals to me more.  
-> 
-> Wait, you suggest not to print out attr.as_bin(), but something else?
-
-Yea, it should not be needed. NlAttr has a __repr__ which *I think*
-should basically do the same thing? Or you may need to call that
-__repr__ from __str__, I don't know what PrettyPrinter uses internally
-
-> >> +                if not self.process_unknown:
-> >> +                    raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
-> >> +                if attr._type & Netlink.NLA_F_NESTED:
-> >> +                    subdict = self._decode(NlAttrs(attr.raw), None)
-> >> +                    decoded = subdict
-> >> +                else:
-> >> +                    decoded = attr.as_bin()  
-> >
-> >Again, I wouldn't descend at all.  
-> 
-> I don't care that much. I just thought it might be handy for the user to
-> understand the topology. Actually, I found it quite convenient already.
-> It's basically a direct dump. What is the reason not to do this exactly?
-
-No strong reason but you need to rewrite it to at least not access
-attr._type directly.
-
-I have a weak preference for putting this code in NlAttr's __repr__,
-could be more broadly useful?
+This is extending capabilities of XDP and tc BPF prog types, so yes, the bpf
+list should be in the loop.
 
