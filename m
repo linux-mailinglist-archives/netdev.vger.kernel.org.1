@@ -1,83 +1,109 @@
-Return-Path: <netdev+bounces-41630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80A437CB7CD
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 03:10:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D76EC7CB7D8
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 03:12:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB41B1C209A9
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 01:10:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D549D1C209C0
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 01:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B622C15CC;
-	Tue, 17 Oct 2023 01:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E9517D2;
+	Tue, 17 Oct 2023 01:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CVTyKhN4"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mH6vtagR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985CE17CB
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 01:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 16EABC433C9;
-	Tue, 17 Oct 2023 01:10:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697505024;
-	bh=DdeqRcKlBQ/+BhS/2gKujHNhtsc3mNA2gqQ3eKEHjBE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CVTyKhN45x6gD+6WyeV5uv5oF+/XraBRSJJrhbIGjskEoYDcsM+Xsm3/mxcWJRa4P
-	 GFk3NY/+oD+A0pw8xT8jZsLq7h5rJTXi2yxikRx43O/6ahqDomEAM+hqT4RJK3LL2x
-	 DR2emnqBG9v1fbIvYDNbnPenV/s71+M0alosLi17Sjf6W6B4MgM+9Ql4rbWLyWIUhs
-	 J00bmsO2jVrAVM3XHP4Md67qf9nZRqSeGxHDeAPbiWDZCCGMk4FqJYLHcDAn1hMacV
-	 dIzSYqx9meIeGEJPwFvnYxMqK0nkKpo40nZPh6xZbdtx7DRLhsow6AMhJUyRZ4uazY
-	 eUz9XoZJasLog==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EC16EC4316B;
-	Tue, 17 Oct 2023 01:10:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CD215DA
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 01:12:19 +0000 (UTC)
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FE58F9;
+	Mon, 16 Oct 2023 18:12:18 -0700 (PDT)
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39GKONsP014525;
+	Tue, 17 Oct 2023 01:12:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=corp-2023-03-30;
+ bh=QFA8Q5JfrFLxXyI/2NbtgGFd2MRBy1aq57sU7Ghi5bA=;
+ b=mH6vtagRnFu1e2z/fwoGXdsCQOVpsUAPWDoE+WuWgxkOADyVoWDkI/Zb4RVlnnW0nW3k
+ WX0Rw8sn103ApliBK7ssxt4m4y/zpyBZHSwNHGSwOViY3Y2beHXLULh1ISngriWPxgkj
+ OsPKrSkL4uIh7dOrXwtTZOnh/5BjpR6Ry4SAIYAB/DxMJy95gBKmqKbjxfOt47jLxZfc
+ NPwUQm+CXm4l7Ow9wwPgnxJmcZarTgp82JxUDg0PRewOt57i3v35dKsUNo4dIg9l4NJj
+ /fXxilGAK6eSeGNzCnbwx4xjRLF3fV4YWB4M2vIvMOBixDwQcECEO/NRM3GNxj0WiE9G 1w== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqkhu41s6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 17 Oct 2023 01:12:05 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39GMqLq7027089;
+	Tue, 17 Oct 2023 01:12:04 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3trg5366nf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 17 Oct 2023 01:12:04 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39H1C3si039761;
+	Tue, 17 Oct 2023 01:12:04 GMT
+Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3trg5366mf-2;
+	Tue, 17 Oct 2023 01:12:04 +0000
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: Hannes Reinecke <hare@suse.de>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Richard Cochran <richardcochran@gmail.com>, linux-scsi@vger.kernel.org,
+        Wenchao Hao <haowenchao2@huawei.com>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        louhongxiang@huawei.com
+Subject: Re: [PATCH] scsi: libfc: Fix potential NULL pointer dereference in fc_lport_ptp_setup
+Date: Mon, 16 Oct 2023 21:11:49 -0400
+Message-Id: <169750286910.2183937.11241575331092205293.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231011130350.819571-1-haowenchao2@huawei.com>
+References: <20231011130350.819571-1-haowenchao2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bluetooth 2023-10-13
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169750502395.8129.10858482508717627477.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Oct 2023 01:10:23 +0000
-References: <20231014031336.1664558-1-luiz.dentz@gmail.com>
-In-Reply-To: <20231014031336.1664558-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-16_13,2023-10-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 phishscore=0
+ malwarescore=0 suspectscore=0 mlxlogscore=830 spamscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310170008
+X-Proofpoint-GUID: Rg81BBs0gnOhaz41M4c31Cop8GfTm6Ce
+X-Proofpoint-ORIG-GUID: Rg81BBs0gnOhaz41M4c31Cop8GfTm6Ce
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Wed, 11 Oct 2023 21:03:50 +0800, Wenchao Hao wrote:
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 13 Oct 2023 20:13:36 -0700 you wrote:
-> The following changes since commit a950a5921db450c74212327f69950ff03419483a:
+> fc_lport_ptp_setup() did not check the return value of fc_rport_create()
+> which is possible to return NULL which would cause a NULL pointer
+> dereference. Address this issue by checking return value of
+> fc_rport_create() and log error message on fc_rport_create() failed.
 > 
->   net/smc: Fix pos miscalculation in statistics (2023-10-11 10:36:35 +0100)
 > 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-10-13
-> 
-> [...]
 
-Here is the summary with links:
-  - pull-request: bluetooth 2023-10-13
-    https://git.kernel.org/netdev/net/c/2b10740ce74a
+Applied to 6.7/scsi-queue, thanks!
 
-You are awesome, thank you!
+[1/1] scsi: libfc: Fix potential NULL pointer dereference in fc_lport_ptp_setup
+      https://git.kernel.org/mkp/scsi/c/4df105f0ce9f
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Martin K. Petersen	Oracle Linux Engineering
 
