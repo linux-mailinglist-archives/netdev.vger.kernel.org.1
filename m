@@ -1,112 +1,144 @@
-Return-Path: <netdev+bounces-41927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B17A37CC3E3
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:03:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D667CC3E1
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:03:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1CD91C209DB
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:03:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 254C7B21003
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7277242BFB;
-	Tue, 17 Oct 2023 13:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rPx00GwR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4648F42BF6;
+	Tue, 17 Oct 2023 13:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF24942BF6
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 13:03:19 +0000 (UTC)
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4FADB
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 06:03:18 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-507975d34e8so5829099e87.1
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 06:03:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697547796; x=1698152596; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bXs0q9mBXE4NFA1doT5CaGDIU8NXELScS6cZ9XMNR7U=;
-        b=rPx00GwRt9Lbt7IyotlZsRbO/ONXH9XpNJcRUe4wSiqSVFAYeusc9IcWO2Ht6Jw7E3
-         FAPbRwqZN0tgSTa5BqTu6W/cKslNRW81Lr+RNw2MdBYzE2FhsAEVPJZGz/fmzMcTjtE2
-         0v/mMGnqPiiADHYICj3JY9XeL2ROckUJr9ee66NS/PSf+bXBN5enukZ7gdKi7eQ6V6+n
-         7yt68+AgsduvXXov4GJ7qP0ub/EBzrdUDqOyhbNZx8jZeA6Z1you4/9cGvyt9oN1gsjI
-         HbK/5q0SDiPnbpse7E9fwu3FBS3Yak5fq0RO1shhwM54DTGTXsqGgYjINfaGiVo1aWUs
-         XTSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697547796; x=1698152596;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bXs0q9mBXE4NFA1doT5CaGDIU8NXELScS6cZ9XMNR7U=;
-        b=hc9Px0IUpcgAqI2TsqsczFjpos7QPNcO67X/ajf2dxv45577rCZ7XI6Ivna8cT+bdQ
-         sPuu1OoW7T6yczme9T0xYFFXfvFKakdgepXrhaq2e0Af8lS3bi1cck7r4Tue5iXbvGMT
-         8a6SR9f0KbgnRhXw57uKCT7FMnHarKg748gHSwBnIdmP13cRxcMCmTOYo++PM7GllBhO
-         zKAMkbWv2QXzFoLVYczHcgUnm7oThWhC3U+YTmSN3bYIUThGaTGvNHbvjtGlh9L+maGx
-         aabEfjvDc9hFfj3mehMjl35XJNSaIlIe58vzUI6SbJQQfkqY5PXqNYKNNKdyhNb9EUX+
-         Gmuw==
-X-Gm-Message-State: AOJu0YxqPywf7fxlgjyilKTEuAOnBChW4n40f5SjL9bp8dpEQlaoxeXr
-	+7gpHQMGm1gB6xexBYRkRPOb3t3hexhMvaZXQ/ka7w==
-X-Google-Smtp-Source: AGHT+IF++YlDi1NoCe1h+WHq9g3qbnOigxmvB0ZYJcTY0RXDaQmwTSmc/On4WuvZ0sl+dk+2o8fU+tqucPcC/vLewDI=
-X-Received: by 2002:a19:7417:0:b0:502:d743:9fc4 with SMTP id
- v23-20020a197417000000b00502d7439fc4mr1822904lfe.37.1697547796528; Tue, 17
- Oct 2023 06:03:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB423CD1B
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 13:03:08 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23537B0;
+	Tue, 17 Oct 2023 06:03:06 -0700 (PDT)
+Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.53])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4S8vDC2n1wzvQDc;
+	Tue, 17 Oct 2023 20:58:19 +0800 (CST)
+Received: from [192.168.98.231] (10.67.165.2) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 17 Oct 2023 21:03:02 +0800
+Message-ID: <150d8d95-a6cd-dc28-618b-6cc5295b4bf9@huawei.com>
+Date: Tue, 17 Oct 2023 21:03:01 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231013064827.61135-1-linyunsheng@huawei.com>
- <20231013064827.61135-2-linyunsheng@huawei.com> <CAC_iWj+FR+ojP7akSY0azc0hVnrhsPhyFTejNit0sVR742KgEw@mail.gmail.com>
- <e738b0b9-6c60-b971-7fd9-0ec1b14dda3c@huawei.com>
-In-Reply-To: <e738b0b9-6c60-b971-7fd9-0ec1b14dda3c@huawei.com>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Tue, 17 Oct 2023 16:02:40 +0300
-Message-ID: <CAC_iWjLYZWUt9RFkAMR8=2amscbOUqXbVP8n8oiXHGsXw-ZKCA@mail.gmail.com>
-Subject: Re: [PATCH net-next v11 1/6] page_pool: fragment API support for
- 32-bit arch with 64-bit DMA
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen <liangchen.linux@gmail.com>, 
-	Guillaume Tucker <guillaume.tucker@collabora.com>, Matthew Wilcox <willy@infradead.org>, 
-	Linux-MM <linux-mm@kvack.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla Thunderbird
+CC: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>,
+	<netdev@vger.kernel.org>, <stable@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net 5/6] net: hns3: fix wrong print link down up
+From: Jijie Shao <shaojijie@huawei.com>
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20230728075840.4022760-1-shaojijie@huawei.com>
+ <20230728075840.4022760-6-shaojijie@huawei.com>
+ <7ce32389-550b-4beb-82b1-1b6183fdeabb@lunn.ch>
+ <2c6514a7-db97-f345-9bc4-affd4eba2dda@huawei.com>
+ <73b41fe2-12dd-4fc0-a44d-f6f94e6541fc@lunn.ch>
+ <ef5489f9-43b4-ee59-699b-3f54a30c00aa@huawei.com>
+ <e7219114-774f-49d0-8985-8875fd351b60@lunn.ch>
+ <a21beff2-9f38-d354-6049-aed20c18c8d4@huawei.com>
+In-Reply-To: <a21beff2-9f38-d354-6049-aed20c18c8d4@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.165.2]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Yunsheng
 
-On Tue, 17 Oct 2023 at 15:53, Yunsheng Lin <linyunsheng@huawei.com> wrote:
+on 2023/7/31 17:10, Jijie Shao wrote:
 >
-> On 2023/10/17 20:17, Ilias Apalodimas wrote:
-> >>
-> >
-> > That looks fine wrt what we discussed with Jakub,
-> >
-> > Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
->
-> Thanks. What about other patches in this series? Could you take
-> some time to review them too?
+> on 2023/7/30 2:23, Andrew Lunn wrote:
+>>>      Now i wounder if you are fixing the wrong thing. Maybe you 
+>>> should be
+>>>      fixing the PHY so it does not report up and then down? You say 
+>>> 'very
+>>>      snall intervals', which should in fact be 1 second. So is the PHY
+>>>      reporting link for a number of poll intervals? 1min to 10 minutes?
+>>>
+>>>                Andrew
+>>>
+>>> Yes, according to the log records, the phy polls every second,
+>>> but the link status changes take time.
+>>> Generally, it takes 10 seconds for the phy to detect link down,
+>>> but occasionally it takes several minutes to detect link down,
+>> What PHY driver is this?
+>>
+>> It is not so clear what should actually happen with auto-neg turned
+>> off. With it on, and the link going down, the PHY should react after
+>> about 1 second. It is not supposed to react faster than that, although
+>> some PHYs allow fast link down notification to be configured.
+>>
+>> Have you checked 802.3 to see what it says about auto-neg off and link
+>> down detection?
+>>
+>> I personally would not suppress this behaviour in the MAC
+>> driver. Otherwise you are going to have funny combinations of special
+>> cases of a feature which very few people actually use, making your
+>> maintenance costs higher.
+>>
+>>         Andrew
 
-Yes I will, I was on nonstop trips, and was a bit cumbersome to
-review/test.  Also, there Plumbers is in a month, and I have an idea I
-need to discuss with Jakub about adding page pool patches to a CI.
-That should make the whole process a bit faster
+Hi Andrew,
+We've rewritten the commit log to explain this problem,
+Would you please take some time to review that?
 
-Thanks
-/Ilias
->
-> >
-> > .
-> >
+The following is the new commit log:
+This patch is to correct a wrong log info "link down/up" in hns3 driver.
+When setting autoneg off without changing speed and duplex, the link
+should be not changed. However in hns3 driver, it print link down/up once
+incorrectly. We trace the phy machine state and find the phy change form
+PHY_UP to PHY_RUNNING. No other state of PHY occurs during this process.
+MDIO trace also indicate the link is on. The wrong log info and mdio
+trace are showed as followed:
+
+[  843.720783][  T367] hns3 0000:35:00.0 eth1: set link(phy): autoneg=0,
+speed=10, duplex=1
+[  843.736087][  T367] hns3 0000:35:00.0 eth1: link down
+[  843.773506][   T17] RTL8211F Gigabit Ethernet mii-0000:35:00.0:02: PHY
+state change UP -> RUNNING
+[  844.674668][   T31] hns3 0000:35:00.0 eth1: link up
+
+      kworker/1:1-32      [001] ....   841.457231: mdio_access: mii-0000:
+35:00.0 read  phy:0x02 reg:0x01 val:0x79ad
+      kworker/1:1-32      [001] ....   842.486496: mdio_access: mii-0000:
+35:00.0 read  phy:0x02 reg:0x01 val:0x79ad
+      kworker/1:1-32      [001] ....   843.520565: mdio_access: mii-0000:
+35:00.0 read  phy:0x02 reg:0x01 val:0x79ad
+      kworker/0:1-17      [000] ....   843.757147: mdio_access: mii-0000:
+35:00.0 read  phy:0x02 reg:0x01 val:0x798d
+      kworker/0:1-17      [000] ....   844.799141: mdio_access: mii-0000:
+35:00.0 read  phy:0x02 reg:0x01 val:0x798d
+      kworker/0:1-17      [000] ....   845.831513: mdio_access: mii-0000:
+35:00.0 read  phy:0x02 reg:0x01 val:0x798d
+      kworker/0:1-17      [000] ....   846.863053: mdio_access: mii-0000:
+35:00.0 read  phy:0x02 reg:0x01 val:0x798d
+
+Regards
+Jijie
+
+
 
