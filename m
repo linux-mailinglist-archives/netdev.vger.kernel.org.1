@@ -1,316 +1,103 @@
-Return-Path: <netdev+bounces-41685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24A327CBAC1
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:16:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE887CBA94
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:10:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 007DD1C20A0E
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 06:16:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E36972813EE
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 06:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD919D30B;
-	Tue, 17 Oct 2023 06:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06C6C8EC;
+	Tue, 17 Oct 2023 06:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="lDMa1So1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E5E1FA2;
-	Tue, 17 Oct 2023 06:16:36 +0000 (UTC)
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 591CBAB;
-	Mon, 16 Oct 2023 23:16:34 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R821e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VuLyRLF_1697523389;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VuLyRLF_1697523389)
-          by smtp.aliyun-inc.com;
-          Tue, 17 Oct 2023 14:16:29 +0800
-Message-ID: <1697522771.0390663-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v1 00/19] virtio-net: support AF_XDP zero copy
-Date: Tue, 17 Oct 2023 14:06:11 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux-foundation.org,
- bpf@vger.kernel.org
-References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEs4u-4ch2UAK14hNfKeORjqMu4BX7=46OfaXpvxW+VT7w@mail.gmail.com>
- <1697511725.2037013-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEskfXDo+bnx5hbGU3JRwOgBRwOC-bYDdFYSmEO2jjgPnA@mail.gmail.com>
- <1697512950.0813534-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEtppjoX_WAM+vjzkMKaMQQ0iZL=C_xS4RObuoLbm0udUw@mail.gmail.com>
- <CACGkMEvWAhH3uj2DEo=m7qWg3-pQjE-EtEBvTT8JXzqZ+RYEXQ@mail.gmail.com>
-In-Reply-To: <CACGkMEvWAhH3uj2DEo=m7qWg3-pQjE-EtEBvTT8JXzqZ+RYEXQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9181FA2
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 06:10:50 +0000 (UTC)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B58D8B0
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 23:10:47 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-53d9f001b35so9102862a12.2
+        for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 23:10:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697523046; x=1698127846; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1s53oEMh5V2p+5Wch+/BP0DtHv7CDJ24f+zn1j5seak=;
+        b=lDMa1So1th1WDgMunnM6XAa354KVuoF/x0ohJnriH8EiK4KEolgUhzmB/LpzJ3aTsT
+         APVn+VpMgrm0URayn+8JW2tk4vCl90v+1unHL9TAOqcSPDquOfIxHbI8O1qKJJ6uzG/f
+         Z3LjrURnY83GLCfZ9yMbaDMqgq1zm84jSLwH2RCdIwU2i+bmhPtpHziZDPGj4qGiuOro
+         z98nlrWBvIVr0dzk4RD//SUw4GieGQPwsLcHhy6SIrO4JJ9VsB0o5xpJKiX+1rlaFKnd
+         I0fPP0sTy05YLXwpA4bXz5/RYc6EtoE/2TRnpPBrRgkFdgycUvun5ILp6kaVyXFdTF0w
+         dA2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697523046; x=1698127846;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1s53oEMh5V2p+5Wch+/BP0DtHv7CDJ24f+zn1j5seak=;
+        b=wopwxLOyWQJoaw+Y/xLArqLnFSPfqRwZwCwyWq4fLYUud7M6WyU70CrjaBxCV9GhBu
+         /bVGfe5K8KHydSj5U7S1MbWZkVRkpkA9wIdoIIc7VQLjL7gZnH5fUep2lDoViqtVm4gN
+         GOJVPgyVbrNgZXuQ3PXxaZbUfPLV43PR6/DmHpl5X3+u+sIXzOwD8sTfI/DkteGMotGx
+         E7XlQtukzrSBT57JfBlhiTUDn2bf9YDo0FfTj2UgFcgqRmaCkkHaAisb3wilTcHMdFW7
+         YhlVoODd6Eb+rimoaPey4NMEbIE00d0m7dS5dv8IzN++JJVhova6EZcChQciVk8ApZxA
+         ONSQ==
+X-Gm-Message-State: AOJu0Yyj3CeSQ0cQFMuxyN4HcGaL2AdU4TvJ0OA87v1TPhn1XhC12Rq7
+	T6mYjgxAayAQ3qumGjz2SQtZCw==
+X-Google-Smtp-Source: AGHT+IFIEb1I1DfKdQW12i9ZqQUMZZmfxglGYTdvc1nDAadlbxmuxBmr/0rWQnVCV928jNiMOLhJVA==
+X-Received: by 2002:a05:6402:2687:b0:53e:1388:e04e with SMTP id w7-20020a056402268700b0053e1388e04emr1011037edd.37.1697523046079;
+        Mon, 16 Oct 2023 23:10:46 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id s26-20020a056402037a00b00532eba07773sm559273edw.25.2023.10.16.23.10.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Oct 2023 23:10:45 -0700 (PDT)
+Date: Tue, 17 Oct 2023 08:10:44 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v2] docs: netlink: clean up after deprecating
+ version
+Message-ID: <ZS4lZGuZPnO/9NC+@nanopsycho>
+References: <20231016214540.1822392-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016214540.1822392-1-kuba@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 17 Oct 2023 13:27:47 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Oct 17, 2023 at 11:28=E2=80=AFAM Jason Wang <jasowang@redhat.com>=
- wrote:
-> >
-> > On Tue, Oct 17, 2023 at 11:26=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alib=
-aba.com> wrote:
-> > >
-> > > On Tue, 17 Oct 2023 11:20:41 +0800, Jason Wang <jasowang@redhat.com> =
-wrote:
-> > > > On Tue, Oct 17, 2023 at 11:11=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.=
-alibaba.com> wrote:
-> > > > >
-> > > > > On Tue, 17 Oct 2023 10:53:44 +0800, Jason Wang <jasowang@redhat.c=
-om> wrote:
-> > > > > > On Mon, Oct 16, 2023 at 8:00=E2=80=AFPM Xuan Zhuo <xuanzhuo@lin=
-ux.alibaba.com> wrote:
-> > > > > > >
-> > > > > > > ## AF_XDP
-> > > > > > >
-> > > > > > > XDP socket(AF_XDP) is an excellent bypass kernel network fram=
-ework. The zero
-> > > > > > > copy feature of xsk (XDP socket) needs to be supported by the=
- driver. The
-> > > > > > > performance of zero copy is very good. mlx5 and intel ixgbe a=
-lready support
-> > > > > > > this feature, This patch set allows virtio-net to support xsk=
-'s zerocopy xmit
-> > > > > > > feature.
-> > > > > > >
-> > > > > > > At present, we have completed some preparation:
-> > > > > > >
-> > > > > > > 1. vq-reset (virtio spec and kernel code)
-> > > > > > > 2. virtio-core premapped dma
-> > > > > > > 3. virtio-net xdp refactor
-> > > > > > >
-> > > > > > > So it is time for Virtio-Net to complete the support for the =
-XDP Socket
-> > > > > > > Zerocopy.
-> > > > > > >
-> > > > > > > Virtio-net can not increase the queue num at will, so xsk sha=
-res the queue with
-> > > > > > > kernel.
-> > > > > > >
-> > > > > > > On the other hand, Virtio-Net does not support generate inter=
-rupt from driver
-> > > > > > > manually, so when we wakeup tx xmit, we used some tips. If th=
-e CPU run by TX
-> > > > > > > NAPI last time is other CPUs, use IPI to wake up NAPI on the =
-remote CPU. If it
-> > > > > > > is also the local CPU, then we wake up napi directly.
-> > > > > > >
-> > > > > > > This patch set includes some refactor to the virtio-net to le=
-t that to support
-> > > > > > > AF_XDP.
-> > > > > > >
-> > > > > > > ## performance
-> > > > > > >
-> > > > > > > ENV: Qemu with vhost-user(polling mode).
-> > > > > > >
-> > > > > > > Sockperf: https://github.com/Mellanox/sockperf
-> > > > > > > I use this tool to send udp packet by kernel syscall.
-> > > > > > >
-> > > > > > > xmit command: sockperf tp -i 10.0.3.1 -t 1000
-> > > > > > >
-> > > > > > > I write a tool that sends udp packets or recvs udp packets by=
- AF_XDP.
-> > > > > > >
-> > > > > > >                   | Guest APP CPU |Guest Softirq CPU | UDP PPS
-> > > > > > > ------------------|---------------|------------------|-------=
------
-> > > > > > > xmit by syscall   |   100%        |                  |   676,=
-915
-> > > > > > > xmit by xsk       |   59.1%       |   100%           | 5,447,=
-168
-> > > > > > > recv by syscall   |   60%         |   100%           |   932,=
-288
-> > > > > > > recv by xsk       |   35.7%       |   100%           | 3,343,=
-168
-> > > > > >
-> > > > > > Any chance we can get a testpmd result (which I guess should be=
- better
-> > > > > > than PPS above)?
-> > > > >
-> > > > > Do you mean testpmd + DPDK + AF_XDP?
-> > > >
-> > > > Yes.
-> > > >
-> > > > >
-> > > > > Yes. This is probably better because my tool does more work. That=
- is not a
-> > > > > complete testing tool used by our business.
-> > > >
-> > > > Probably, but it would be appealing for others. Especially consider=
-ing
-> > > > DPDK supports AF_XDP PMD now.
-> > >
-> > > OK.
-> > >
-> > > Let me try.
-> > >
-> > > But could you start to review firstly?
-> >
-> > Yes, it's in my todo list.
+Mon, Oct 16, 2023 at 11:45:40PM CEST, kuba@kernel.org wrote:
+>Jiri moved version to legacy specs in commit 0f07415ebb78 ("netlink:
+>specs: don't allow version to be specified for genetlink").
+>Update the documentation.
 >
-> Speaking too fast, I think if it doesn't take too long time, I would
-> wait for the result first as netdim series. One reason is that I
-> remember claims to be only 10% to 20% loss comparing to wire speed, so
-> I'd expect it should be much faster. I vaguely remember, even a vhost
-> can gives us more than 3M PPS if we disable SMAP, so the numbers here
-> are not as impressive as expected.
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>---
+>v2:
+> - s/Gobals/Globals/
+> - breaking changes are -> compatibility breaking changes are
+>   I think it's plural but the omission of "compatibility" made it confusing
+> - not changing the wording to "should never be used", I prefer existing
+>v1: https://lore.kernel.org/all/20231012154315.587383-1-kuba@kernel.org/
+>---
+> .../userspace-api/netlink/genetlink-legacy.rst     | 14 ++++++++++++++
+> Documentation/userspace-api/netlink/specs.rst      |  5 -----
+> 2 files changed, 14 insertions(+), 5 deletions(-)
 
-
-What is SMAP? Cloud you give me more info?
-
-So if we think the 3M as the wire speed, you expect the result
-can reach 2.8M pps/core, right?
-Now the recv result is 2.5M(2463646) pps/core.
-Do you think there is a huge gap?
-
-My tool makes udp packet and lookup route, so it take more much cpu.
-
-I am confused.
-
-
-What is SMAP? Could you give me more information?
-
-So if we use 3M as the wire speed, you would expect the result to be 2.8M
-pps/core, right?
-
-Now the recv result is 2.5M (2463646 =3D 3,343,168/1.357) pps/core. Do you =
-think
-the difference is big?
-
-My tool makes udp packets and looks up routes, so it requires more CPU.
-
-I'm confused. Is there something I misunderstood?
-
-Thanks.
-
->
-> Thanks
->
-> >
-> > >
-> > >
-> > > >
-> > > > >
-> > > > > What I noticed is that the hotspot is the driver writing virtio d=
-esc. Because
-> > > > > the device is in busy mode. So there is race between driver and d=
-evice.
-> > > > > So I modified the virtio core and lazily updated avail idx. Then =
-pps can reach
-> > > > > 10,000,000.
-> > > >
-> > > > Care to post a draft for this?
-> > >
-> > > YES, I is thinking for this.
-> > > But maybe that is just work for split. The packed mode has some troub=
-les.
-> >
-> > Ok.
-> >
-> > Thanks
-> >
-> > >
-> > > Thanks.
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > > > >
-> > > > > Thanks.
-> > > > >
-> > > > > >
-> > > > > > Thanks
-> > > > > >
-> > > > > > >
-> > > > > > > ## maintain
-> > > > > > >
-> > > > > > > I am currently a reviewer for virtio-net. I commit to maintai=
-n AF_XDP support in
-> > > > > > > virtio-net.
-> > > > > > >
-> > > > > > > Please review.
-> > > > > > >
-> > > > > > > Thanks.
-> > > > > > >
-> > > > > > > v1:
-> > > > > > >     1. remove two virtio commits. Push this patchset to net-n=
-ext
-> > > > > > >     2. squash "virtio_net: virtnet_poll_tx support reschedule=
-d" to xsk: support tx
-> > > > > > >     3. fix some warnings
-> > > > > > >
-> > > > > > > Xuan Zhuo (19):
-> > > > > > >   virtio_net: rename free_old_xmit_skbs to free_old_xmit
-> > > > > > >   virtio_net: unify the code for recycling the xmit ptr
-> > > > > > >   virtio_net: independent directory
-> > > > > > >   virtio_net: move to virtio_net.h
-> > > > > > >   virtio_net: add prefix virtnet to all struct/api inside vir=
-tio_net.h
-> > > > > > >   virtio_net: separate virtnet_rx_resize()
-> > > > > > >   virtio_net: separate virtnet_tx_resize()
-> > > > > > >   virtio_net: sq support premapped mode
-> > > > > > >   virtio_net: xsk: bind/unbind xsk
-> > > > > > >   virtio_net: xsk: prevent disable tx napi
-> > > > > > >   virtio_net: xsk: tx: support tx
-> > > > > > >   virtio_net: xsk: tx: support wakeup
-> > > > > > >   virtio_net: xsk: tx: virtnet_free_old_xmit() distinguishes =
-xsk buffer
-> > > > > > >   virtio_net: xsk: tx: virtnet_sq_free_unused_buf() check xsk=
- buffer
-> > > > > > >   virtio_net: xsk: rx: introduce add_recvbuf_xsk()
-> > > > > > >   virtio_net: xsk: rx: introduce receive_xsk() to recv xsk bu=
-ffer
-> > > > > > >   virtio_net: xsk: rx: virtnet_rq_free_unused_buf() check xsk=
- buffer
-> > > > > > >   virtio_net: update tx timeout record
-> > > > > > >   virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROCOPY
-> > > > > > >
-> > > > > > >  MAINTAINERS                                 |   2 +-
-> > > > > > >  drivers/net/Kconfig                         |   8 +-
-> > > > > > >  drivers/net/Makefile                        |   2 +-
-> > > > > > >  drivers/net/virtio/Kconfig                  |  13 +
-> > > > > > >  drivers/net/virtio/Makefile                 |   8 +
-> > > > > > >  drivers/net/{virtio_net.c =3D> virtio/main.c} | 652 ++++++++=
-+-----------
-> > > > > > >  drivers/net/virtio/virtio_net.h             | 359 +++++++++++
-> > > > > > >  drivers/net/virtio/xsk.c                    | 545 ++++++++++=
-++++++
-> > > > > > >  drivers/net/virtio/xsk.h                    |  32 +
-> > > > > > >  9 files changed, 1247 insertions(+), 374 deletions(-)
-> > > > > > >  create mode 100644 drivers/net/virtio/Kconfig
-> > > > > > >  create mode 100644 drivers/net/virtio/Makefile
-> > > > > > >  rename drivers/net/{virtio_net.c =3D> virtio/main.c} (91%)
-> > > > > > >  create mode 100644 drivers/net/virtio/virtio_net.h
-> > > > > > >  create mode 100644 drivers/net/virtio/xsk.c
-> > > > > > >  create mode 100644 drivers/net/virtio/xsk.h
-> > > > > > >
-> > > > > > > --
-> > > > > > > 2.32.0.3.g01195cf9f
-> > > > > > >
-> > > > > >
-> > > > >
-> > > >
-> > >
->
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
