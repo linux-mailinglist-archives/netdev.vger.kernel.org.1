@@ -1,98 +1,137 @@
-Return-Path: <netdev+bounces-41776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C2497CBE20
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:51:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 408E47CBE22
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:52:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B020B20F61
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:51:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4786B210BD
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:52:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B253C6BC;
-	Tue, 17 Oct 2023 08:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AdxGa5zm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A35E3CD01;
+	Tue, 17 Oct 2023 08:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0370BE6D
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 08:51:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25F27C433C7;
-	Tue, 17 Oct 2023 08:51:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697532709;
-	bh=Bg0LkH+yHeoMGGJe2bDNU8n9U3MpiXVKfEYjCW7rZ3U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AdxGa5zmIceb0A/IvLo30mO4goGgLGIKcicxVgU5Dhad9i2mXASBGEghU61wuqkqK
-	 Kirnxkw4kRRemXDRN/l8MphPPVnMck6uqW4N4bx78yr+37u3CW5En7yjJPdmxjAag9
-	 78pMxTP5PD63qHicYgAxRrICmn51QikbKQ7yI3EOJ32G+8hpon6kkEKrOFz17mcMBF
-	 GyPHiis5Dt6ESjXLK6vVzp7yPm8wpF2MIV6Uqtuz8q9EQiPFsL7Zc3+DEbHaFXN0PO
-	 LXHRKKUMetq/sNPmWIZnjT2zFrpOZiQsr0ipYw1sQx1YvVV5yy8RuWIcxkw0QmqU6T
-	 jqjjedZbrjABA==
-Date: Tue, 17 Oct 2023 10:51:46 +0200
-From: Simon Horman <horms@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com
-Subject: Re: [patch net-next v3 4/7] devlink: don't take instance lock for
- nested handle put
-Message-ID: <20231017085146.GL1751252@kernel.org>
-References: <20231013121029.353351-1-jiri@resnulli.us>
- <20231013121029.353351-5-jiri@resnulli.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204F0BE6D
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 08:52:17 +0000 (UTC)
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A425493;
+	Tue, 17 Oct 2023 01:52:15 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VuMgVhC_1697532731;
+Received: from 30.221.102.81(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0VuMgVhC_1697532731)
+          by smtp.aliyun-inc.com;
+          Tue, 17 Oct 2023 16:52:13 +0800
+Message-ID: <e89d6d5d-9fde-43b3-9cbc-ddefe56d188a@linux.alibaba.com>
+Date: Tue, 17 Oct 2023 16:52:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231013121029.353351-5-jiri@resnulli.us>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: correct the reason code in
+ smc_listen_find_device when fallback
+Content-Language: en-US
+To: dust.li@linux.alibaba.com, kgraul@linux.ibm.com, wenjia@linux.ibm.com,
+ jaka@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: tonylu@linux.alibaba.com, alibuda@linux.alibaba.com,
+ guwen@linux.alibaba.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231016061153.40057-1-guangguan.wang@linux.alibaba.com>
+ <20231017073733.GV92403@linux.alibaba.com>
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+In-Reply-To: <20231017073733.GV92403@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Oct 13, 2023 at 02:10:26PM +0200, Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
-> 
-> Lockdep reports following issue:
-> 
-> WARNING: possible circular locking dependency detected
-> ------------------------------------------------------
-> devlink/8191 is trying to acquire lock:
-> ffff88813f32c250 (&devlink->lock_key#14){+.+.}-{3:3}, at: devlink_rel_devlink_handle_put+0x11e/0x2d0
-> 
->                            but task is already holding lock:
-> ffffffff8511eca8 (rtnl_mutex){+.+.}-{3:3}, at: unregister_netdev+0xe/0x20
-> 
->                            which lock already depends on the new lock.
-> 
->                            the existing dependency chain (in reverse order) is:
-> 
->                            -> #3 (rtnl_mutex){+.+.}-{3:3}:
 
-...
 
->  Possible unsafe locking scenario:
+On 2023/10/17 15:37, Dust Li wrote:
+> On Mon, Oct 16, 2023 at 02:11:53PM +0800, Guangguan Wang wrote:
 > 
->        CPU0                    CPU1
->        ----                    ----
->   lock(rtnl_mutex);
->                                lock(mlx5_intf_mutex);
->                                lock(rtnl_mutex);
->   lock(&devlink->lock_key#14);
+> Hi guangguan,
 > 
-> Problem is taking the devlink instance lock of nested instance when RTNL
-> is already held.
-> 
-> To fix this, don't take the devlink instance lock when putting nested
-> handle. Instead, rely on the preparations done by previous two patches
-> to be able to access device pointer and obtain netns id without devlink
-> instance lock held.
-> 
-> Fixes: c137743bce02 ("devlink: introduce object and nested devlink relationship infra")
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> This patch doesn't apply clearly on net because it conflict with my
+> previous patch 4abbd2e3c1db(net/smc: return the right falback reason
+> when prefix checks fail), pls rebase.
+>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This patch sent before the patch 4abbd2e3c1db applied. I will rebase it
+in the next version.
+ 
+>> The function smc_find_ism_store_rc is not only used for ism, so it is
+>> reasonable to change the function name to smc_find_device_store_rc.
+>>
+>> The ini->rc is used to store the last error happened when finding usable
+>> ism or rdma device in smc_listen_find_device, and is set by calling smc_
+>> find_device_store_rc. Once the ini->rc is assigned to an none-zero value,
+>> the value can not be overwritten anymore. So the ini-rc should be set to
+>> the error reason only when an error actually occurs.
+>>
+>> When finding ISM/RDMA devices, device not found is not a real error, as
+>> not all machine have ISM/RDMA devices. Failures after device found, when
+>> initializing device or when initializing connection, is real errors, and
+>> should be store in ini->rc.
+>>
+>> SMC_CLC_DECL_DIFFPREFIX also is not a real error, as for SMC-RV2, it is
+>> not require same prefix.
+> 
+> I think it's better to seperate this patch into 2:
+> - one for changing the name from smc_find_ism_store_rc to smc_find_device_store_rc.
+> - one for fixing the return reason.
+> 
+> More comments below.
+> 
+OK, I will seperate it.
+>>
+>> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+
+>> @@ -2213,11 +2211,12 @@ static void smc_find_ism_v1_device_serv(struct smc_sock *new_smc,
+>> 		goto not_found;
+>> 	ini->ism_selected = 0;
+>> 	rc = smc_listen_ism_init(new_smc, ini);
+>> -	if (!rc)
+>> +	if (!rc) {
+>> +		smc_find_device_store_rc(rc, ini);
+> 
+> This smc_find_device_store_rc() seems useless when rc == 0 here ?
+
+Oh, I see. The code here should be:
+
+rc = smc_listen_ism_init(new_smc, ini);
+if (!rc)
+    return;
+smc_find_device_store_rc(rc, ini);
+
+not_found:
+    ini->smcd_version &= ~SMC_V1;
+    ini->ism_dev[0] = NULL;
+    ini->is_smcd = false;
+
+
+Thanks,
+Guangguan Wang.
+> 
+>> 		return;		/* V1 ISM device found */
+>> +	}
+>>
+>> not_found:
+>> -	smc_find_ism_store_rc(rc, ini);
+>> 	ini->smcd_version &= ~SMC_V1;
+>> 	ini->ism_dev[0] = NULL;
+>> 	ini->is_smcd = false;
 
 
