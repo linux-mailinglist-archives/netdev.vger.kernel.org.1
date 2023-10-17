@@ -1,165 +1,226 @@
-Return-Path: <netdev+bounces-42000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11BF87CC921
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:53:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59C3F7CC920
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A68B1B20FB5
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:53:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D09F1C209DB
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3912D05A;
-	Tue, 17 Oct 2023 16:53:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0249A2D058;
+	Tue, 17 Oct 2023 16:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="m1XFIs1p"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="N/UlntXd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9382D03C;
-	Tue, 17 Oct 2023 16:53:14 +0000 (UTC)
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07BE3AB;
-	Tue, 17 Oct 2023 09:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1697561593; x=1729097593;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DYMS26X/tscicdPoA7u1E7ofsnxzW2sufLuPqW6vXyA=;
-  b=m1XFIs1plp7gTltbXdyZ3AHFucsPZaPukXcVFr0eZYCu5fAUL90VfbDf
-   Pk/C/PMLVDt1rH3SmmzQKMBaj6PFLqCYpOZjQ0Dx4fEYzUS3A/9oVtqkM
-   1OLm5grjA7ofxwggT0w7Y8IL3E83T1xWbVrysyw+635nG8Hgrfjm0DL1h
-   g=;
-X-IronPort-AV: E=Sophos;i="6.03,232,1694736000"; 
-   d="scan'208";a="36355217"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 16:53:02 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com (Postfix) with ESMTPS id C6603488DE;
-	Tue, 17 Oct 2023 16:52:55 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:39670]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.32.42:2525] with esmtp (Farcaster)
- id f4c7dc41-9623-4b8f-bfbc-2020be008e4d; Tue, 17 Oct 2023 16:52:55 +0000 (UTC)
-X-Farcaster-Flow-ID: f4c7dc41-9623-4b8f-bfbc-2020be008e4d
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 17 Oct 2023 16:52:50 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 17 Oct 2023 16:52:46 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
-	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <martin.lau@linux.dev>, <mykolal@fb.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
-	<song@kernel.org>, <yonghong.song@linux.dev>
-Subject: Re: [PATCH v1 bpf-next 06/11] bpf: tcp: Add SYN Cookie validation SOCK_OPS hook.
-Date: Tue, 17 Oct 2023 09:52:39 -0700
-Message-ID: <20231017165239.20308-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231013220433.70792-7-kuniyu@amazon.com>
-References: <20231013220433.70792-7-kuniyu@amazon.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9912D03C
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:53:06 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2042.outbound.protection.outlook.com [40.107.223.42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2505294;
+	Tue, 17 Oct 2023 09:53:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fQhvO2IPnl9BeeyjdQ4c8ktjIcZKYNQL5HIN5ojFn4IGozBUWQwNAyMj2oPyEhaGbpquomLowqZxLxUWErr2sGvbjyZ9Evqibt05ybtEx3sKfW1zN9BnIf0Qrlz1IG/p0yzk34xlvfVCrGXc/yhcDROUuhwPXStcHgG09qiMgH0ntIwqCScYUdnwtUmkfsDSz4vQKXsk9Ay3uTJifKLyB55fDcmee0CsFZjdmI/p9JctPZ3urX95Ltb97VAaPlUJsI3ugzAvzS1/B0jWVE2brFRVb1OKu8twZ1mNtzN0onuvYru2e0TGq6NLOjDz43O3cCflsaH+fOsFX9YBUwfYzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yq36ljxrv1QIlkujEr09NhyLj50waM7FvZRYatpitn4=;
+ b=L/rgSqQ+4SEG8sMNXtvZMyfZ6pnyXCsyVLtwxAvV/EtlCQZjfAyvA7/4ohPPXWWTXgU6HGcYX/CJVP7/LsUkpvsT8MiQmMDWF5I0H/7V4WAUAwSKaNvlzdZmEjzmfEdq5xz62zuHbWp8jnCZZPPPrPVEJh16fgVjOz5O33PFM6EXh+NKXOIKb3Rxs9odVaX6el+xj9LMkS7IW9RGmpe7XoG47bWb5K2Xc/0uMrHR713KXWbo7zz0JdiiHR0booy9WPeKB+JVSUada2TEIWeJHehxQIZ+Td026F5TP8K32xrFyIv+rVEuxCyxR8d/NjoH/3obncw8Rr1jukqgU+qOtg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yq36ljxrv1QIlkujEr09NhyLj50waM7FvZRYatpitn4=;
+ b=N/UlntXdD6qdHqYON/Npiwzqi/MWqMbkX5J/edkMN1M/7mAdFoXayjMcJaT3aQJi04K0roir+jUdZYQAnlJDuNdkRn/wbEDCB5qdSc2CVrcLRjbZduamrAz6jUCQ2+tK/GGNDUs5yYji4Psemhauwcg5qLSYJG4D0VuMDPOHve0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ PH0PR12MB7861.namprd12.prod.outlook.com (2603:10b6:510:26e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Tue, 17 Oct
+ 2023 16:53:02 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::e31c:de3c:af9d:cd2c]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::e31c:de3c:af9d:cd2c%5]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
+ 16:53:02 +0000
+Message-ID: <97473ad9-c9c8-450c-bb1a-ad72dea0a5ad@amd.com>
+Date: Tue, 17 Oct 2023 09:52:57 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 03/11] pds_core: devlink health: use retained
+ error fmsg API
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Michael Chan <michael.chan@broadcom.com>,
+ Cai Huoqing <cai.huoqing@linux.dev>,
+ George Cherian <george.cherian@marvell.com>,
+ Danielle Ratson <danieller@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Ariel Elior <aelior@marvell.com>,
+ Manish Chopra <manishc@marvell.com>, Igor Russkikh <irusskikh@marvell.com>,
+ Coiby Xu <coiby.xu@gmail.com>
+Cc: Brett Creeley <brett.creeley@amd.com>,
+ Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
+ hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>,
+ Leon Romanovsky <leon@kernel.org>, linux-kernel@vger.kernel.org,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>
+References: <20231017105341.415466-1-przemyslaw.kitszel@intel.com>
+ <20231017105341.415466-4-przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20231017105341.415466-4-przemyslaw.kitszel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PH8PR07CA0026.namprd07.prod.outlook.com
+ (2603:10b6:510:2cf::21) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.171.38]
-X-ClientProxiedBy: EX19D040UWA003.ant.amazon.com (10.13.139.6) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|PH0PR12MB7861:EE_
+X-MS-Office365-Filtering-Correlation-Id: e52088fa-a18a-44df-c4ab-08dbcf318683
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	QYRjc5pfL7uQ8wsmhhPOzvJY+JZLUtGDetsj9wkq5Y53pxeD/E1Vm9SHH5J3fYHcCljs3dDj20uZ4J0psm7kQTPq62ROL1FaF/AjfoMUWv5/lOdqxf187BS8smDWVVscsHJjVjTEnkU/rW8PX+VhWlSl1qC+j8AHiJvDZvLdjo1x0hRz/oH4xKb+UCnfvLubbASUIvhB2NvCMHRG6eF7iRZYohsonjl5YJVCdgxNiIA7503SuQyseG5c/3AqaZBBGgYakTxfIj/w1boKDiBHtO93yXn8rPvhu8gEhAd4qRII4fHR1+qbBGN6Zwd5Oc2Ee44W8lmnng3oSFsc6LEHbrs2Fe35qZzmsuP+Qmma6UQMrgJOJ8TF6EOa1GxPgRqEECc3eoRdM9HgKe9auF8n1/FwTlhYDAnFhCAYyx7jG9C2elCnJ8QpYSRt9/50dgskIrpT4k3xZh6JdIs7LrTq/E8kqVUAwVbLvUYx9dSiiy9tr5TIxjzxpK9lIz+Ib+cGu0K12aC4D4C9q54O6v+oi7mUAKfb0Z/o8bQUv25ikL7thdxnMFbQfgRW3V3OBuvtYnPfm7VaWCPwLEnRKw+vRD0VDW/OyYWnCVGeqYo5/DeYmlXDtj/6CXXTRkj3/bbuC6LinnK8LbcMTIQLU4Rz1wKIIYW0UKMz1fOT+4BUMA4=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(366004)(39860400002)(396003)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(31686004)(53546011)(6486002)(921005)(6666004)(38100700002)(83380400001)(36756003)(26005)(6506007)(2906002)(66556008)(54906003)(66476007)(316002)(2616005)(478600001)(66946007)(31696002)(7406005)(110136005)(7416002)(86362001)(6512007)(41300700001)(8936002)(8676002)(5660300002)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OW40QjN6dVkrWURscTV5ZUpKZ2owejZ4RThDbWtkOWlwTXVpSDBhSGVBT3Ey?=
+ =?utf-8?B?VlNQZDZUdC9WR0o3RDUvTHZJdlhNZXY2QklCbmZqak1BRW1sNURKR0RuTXM5?=
+ =?utf-8?B?K2JDQTcyTSt6VGJhT0pKTmU4TktZWkVqR2JOelVTOXBlb3c1NGk5czd6anEx?=
+ =?utf-8?B?K0E2NWEzQ3R6WEVLRVFlSUgwS3kwK0JEWXUyNkM0QWszWVNaN3Z2QjFoUFJ3?=
+ =?utf-8?B?SHVpVnBTMjNDWXV6VldwdkVMTU0wcHBVUHg5QlNXMjRRbnp3L0NtN0dyMWNX?=
+ =?utf-8?B?aUkvWDc1WEFYSkwwK2czd2NROFBFN0cvVUl5blN0bDBHK1pnOEJUU3pFWVd6?=
+ =?utf-8?B?RUFHTXNXZ2NQdEg3VXRpa0t0aE1McTZaZjhqWTgvRittLzFFWVB0UzR3b2Fh?=
+ =?utf-8?B?ajQ3aU5kcEFzMm9penV1TmVwR0hPOHZRZlNaTm5mdUlSbWdzUmxqWkpoT3ZT?=
+ =?utf-8?B?eEI5MTJPendKRU5NWWx5a0kycTRadW84SFp5L2JPdjVyK2V6cVJzSW0yaW0z?=
+ =?utf-8?B?b3htUmtLNFJtTng1YVIxZm9lek8vd2k1WU13YmhhWG8yUTMyVmhCZzY3aXcx?=
+ =?utf-8?B?M3dMaVZJMjdQVjVkYktnZkZtRnFKNzJlVUNnWVU1TTdHa0pNWkFlVFpkYnJF?=
+ =?utf-8?B?TEMyQ3pwZjRIRDVKTElpblJXVHI2REU4aVZ0bTR5bjdtMUtVOXM4UTlnajZL?=
+ =?utf-8?B?Rlhkb3gxTmRxZUdXcnJmeGQ2dzB2eVRPc0lra0o2SDFmc1oyNUtNVWVCakpZ?=
+ =?utf-8?B?SWFSY1BNRjZLbENweHh2d05SUE1tMHI1ZDU1OGlubEt0L0xwNDdCbU12cnhE?=
+ =?utf-8?B?Z2NIUjNuODNxOGtPSU9LSlBHRjRrbDhkMjJhSFk0UUlvWjNzMFlPOE1wdHlK?=
+ =?utf-8?B?bHJRNSs1RmJ0LzdrZDdlNDhGaGJoOFJucHFVRk8xVlZHd1c1VXZpSHE5eEJP?=
+ =?utf-8?B?QUc0K053UTFYNDdibjRRK3ZpdUJJVGQyZlo1bHRrbzV2RlhMREtKdDN6MjJM?=
+ =?utf-8?B?RzA3Sms2citjMjAyU1hNSFRIQVNmK2NBZHVSWDJPRDRNVHRJVnhtRklpZmhZ?=
+ =?utf-8?B?SlN6M0xic0MreVk1RnVGclgrdmRmc0xZaGpNVHVUY085WnBOYWpwaVpWYVJ6?=
+ =?utf-8?B?MEVYZ214TEZUb25ma2tkWU94VmR0S0V0ZWllcllrcU9XTUo3TFcveSsrcmMv?=
+ =?utf-8?B?dHgzM29rYkdQMVZrQ0ZLOUNTNU5FOUd2dThVcVpRa2VtYmJlZmY5ajZRK1Ur?=
+ =?utf-8?B?MWZkVElIdTJNbWtVVTNRTTkvQWFUYlNtR3NQQzI3bW82eXJ3dlB0ZUJUSlBa?=
+ =?utf-8?B?NC9ZZkRnVlRjeWV4TURlZXFhWUQ2S0pZSHVBQmliYk9CbUNvc3JqTjRQVWFJ?=
+ =?utf-8?B?TzlaZ2o0RWZUUWxjVkVsVnZSNWlQbWhSdXg1R3ZOT05wNGZmRXROTnMvQW5C?=
+ =?utf-8?B?SW9oNFVUbGFoS2F1OHcxK0JNQ2VobW1YbmZDdCtyT0ZZbEJnaGRLbUpwU0I0?=
+ =?utf-8?B?bDBXU2p1Vm9PU2owVlVmMmlidmFnTDJmMy9mZDA3a1psbFEwaDBMekxOOTZ0?=
+ =?utf-8?B?eUNxYVNMTUFlanJPK0g4dHROMGxETUFMdlRvOTNEbjdtaUFYY1ZSU0VXUUdi?=
+ =?utf-8?B?bVV5eDVvaEdaRy84d2xGUTdkcGZMdXNGTFBieUZpNnJGS0tJZVUveFJUaVpi?=
+ =?utf-8?B?eXdpR2lLUCsrVFVtOXBnbkMxY0EzVVA0WjkrcXNsV2k3dlB5djZrQ2hhZDJ4?=
+ =?utf-8?B?S3doVFF4SlNab01YKy9uSmtuczVCdCsxQTJCNnpHSFUwQjR3VmZueGZZbldF?=
+ =?utf-8?B?cmJ4L2pvV3dDdmVNY0xGUnVGTDl5TUE4QnhwT1ZjbXUzREJRYWRsWTgrbk9U?=
+ =?utf-8?B?NEFNalJIQzhuWEUwaTJVV1J6SCtoS2gzdVBLcVA2UHFSZkRrdHZPZG9aOEV1?=
+ =?utf-8?B?M29iRldaaUpZaDF2aGZMOXcyZnBMR256aitTbFd0ODlJMzc5VnAycTd5Qlpi?=
+ =?utf-8?B?R2tUTjdnV2Q0VW5ZTzdpUUM4V282QlM0ZWlKRm9lZjFndUNFdzdjeDJONVRj?=
+ =?utf-8?B?cmZCV0dOMmRHa3NtUG1reHp4TWp1alJBN1BnUUVFSHRLTEdpditWb1dXbllB?=
+ =?utf-8?Q?MPQt9mk5+fhlnv2q8mQKFZSsE?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e52088fa-a18a-44df-c4ab-08dbcf318683
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 16:53:02.2742
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jmBHwB8AGJVWPtfDQ8g9nErDbq2EOJ+NgrwWtWAAbkRGnKGoRe2Yt5oSogrIvYqtJJhV97RezEpWwu7/c2MyrA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7861
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Fri, 13 Oct 2023 15:04:28 -0700
-> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-> index 514f1a4abdee..b1dd415863ff 100644
-> --- a/net/ipv4/syncookies.c
-> +++ b/net/ipv4/syncookies.c
-> @@ -317,6 +317,37 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
->  }
->  EXPORT_SYMBOL_GPL(cookie_tcp_reqsk_alloc);
->  
-> +#if IS_ENABLED(CONFIG_CGROUP_BPF) && IS_ENABLED(CONFIG_SYN_COOKIES)
-> +int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_buff *skb)
-> +{
-> +	struct bpf_sock_ops_kern sock_ops;
-> +
-> +	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
-> +
-> +	sock_ops.op = BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB;
-> +	sock_ops.sk = req_to_sk(req);
-> +	sock_ops.args[0] = tcp_rsk(req)->snt_isn;
-> +
-> +	bpf_skops_init_skb(&sock_ops, skb, tcp_hdrlen(skb));
-> +
-> +	if (BPF_CGROUP_RUN_PROG_SOCK_OPS_SK(&sock_ops, sk))
-> +		goto err;
-> +
-> +	if (!sock_ops.replylong[0])
-> +		goto err;
+On 10/17/2023 3:53 AM, Przemek Kitszel wrote:
+> 
+> Drop unneeded error checking.
+> 
+> devlink_fmsg_*() family of functions is now retaining errors,
+> so there is no need to check for them after each call.
+> 
+> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-I noticed this test is insufficient to check valid MSS.
-I'll use msstab[0] as the minimum valid MSS in v2.
+Thanks,
 
----8<---
-diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-index 22353a9af52d..4af165fd48f9 100644
---- a/net/ipv4/syncookies.c
-+++ b/net/ipv4/syncookies.c
-@@ -287,6 +287,7 @@ int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_
- 	struct bpf_sock_ops_kern sock_ops;
- 	struct net *net = sock_net(sk);
- 	u32 options;
-+	u16 min_mss;
- 
- 	if (tcp_opt->saw_tstamp) {
- 		if (!READ_ONCE(net->ipv4.sysctl_tcp_timestamps))
-@@ -307,7 +308,8 @@ int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_
- 	if (BPF_CGROUP_RUN_PROG_SOCK_OPS_SK(&sock_ops, sk))
- 		goto err;
- 
--	if (!sock_ops.replylong[0])
-+	min_mss = skb->protocol == htons(ETH_P_IP) ? msstab[0] : IPV6_MIN_MTU - 60;
-+	if (sock_ops.replylong[0] < min_mss)
- 		goto err;
- 
- 	options = sock_ops.replylong[1];
----8<---
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
 
-
-
-> +
-> +	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESRECV);
-> +
-> +	return sock_ops.replylong[0];
-> +
-> +err:
-> +	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESFAILED);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(bpf_skops_cookie_check);
-> +#endif
-> +
->  /* On input, sk is a listener.
->   * Output is listener if incoming packet would not create a child
->   *           NULL if memory could not be allocated.
+> ---
+> add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-57 (-57)
+> ---
+>   drivers/net/ethernet/amd/pds_core/devlink.c | 29 ++++++---------------
+>   1 file changed, 8 insertions(+), 21 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/amd/pds_core/devlink.c b/drivers/net/ethernet/amd/pds_core/devlink.c
+> index d9607033bbf2..8b2b9e0d59f3 100644
+> --- a/drivers/net/ethernet/amd/pds_core/devlink.c
+> +++ b/drivers/net/ethernet/amd/pds_core/devlink.c
+> @@ -154,33 +154,20 @@ int pdsc_fw_reporter_diagnose(struct devlink_health_reporter *reporter,
+>                                struct netlink_ext_ack *extack)
+>   {
+>          struct pdsc *pdsc = devlink_health_reporter_priv(reporter);
+> -       int err;
+> 
+>          mutex_lock(&pdsc->config_lock);
+> -
+>          if (test_bit(PDSC_S_FW_DEAD, &pdsc->state))
+> -               err = devlink_fmsg_string_pair_put(fmsg, "Status", "dead");
+> +               devlink_fmsg_string_pair_put(fmsg, "Status", "dead");
+>          else if (!pdsc_is_fw_good(pdsc))
+> -               err = devlink_fmsg_string_pair_put(fmsg, "Status", "unhealthy");
+> +               devlink_fmsg_string_pair_put(fmsg, "Status", "unhealthy");
+>          else
+> -               err = devlink_fmsg_string_pair_put(fmsg, "Status", "healthy");
+> -
+> +               devlink_fmsg_string_pair_put(fmsg, "Status", "healthy");
+>          mutex_unlock(&pdsc->config_lock);
+> 
+> -       if (err)
+> -               return err;
+> -
+> -       err = devlink_fmsg_u32_pair_put(fmsg, "State",
+> -                                       pdsc->fw_status &
+> -                                               ~PDS_CORE_FW_STS_F_GENERATION);
+> -       if (err)
+> -               return err;
+> -
+> -       err = devlink_fmsg_u32_pair_put(fmsg, "Generation",
+> -                                       pdsc->fw_generation >> 4);
+> -       if (err)
+> -               return err;
+> +       devlink_fmsg_u32_pair_put(fmsg, "State",
+> +                                 pdsc->fw_status & ~PDS_CORE_FW_STS_F_GENERATION);
+> +       devlink_fmsg_u32_pair_put(fmsg, "Generation", pdsc->fw_generation >> 4);
+> +       devlink_fmsg_u32_pair_put(fmsg, "Recoveries", pdsc->fw_recoveries);
+> 
+> -       return devlink_fmsg_u32_pair_put(fmsg, "Recoveries",
+> -                                        pdsc->fw_recoveries);
+> +       return 0;
+>   }
+> --
+> 2.40.1
+> 
 
