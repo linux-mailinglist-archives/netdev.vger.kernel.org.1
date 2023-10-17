@@ -1,224 +1,263 @@
-Return-Path: <netdev+bounces-42016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6BD97CCA8F
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 20:24:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E957A7CCAD9
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 20:38:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F884281473
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:24:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17F2F1C20A66
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEDB2D7B6;
-	Tue, 17 Oct 2023 18:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9F62D04B;
+	Tue, 17 Oct 2023 18:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="z4u5Y3DR";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="TsoFCscu"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="d+8ibS9H"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092E22D786
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 18:24:17 +0000 (UTC)
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F0F93;
-	Tue, 17 Oct 2023 11:24:16 -0700 (PDT)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39HHsCc5013751;
-	Tue, 17 Oct 2023 18:24:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=6qTKwR3Lu400fYbX5vD0N0lJgSl03gwZGfe/2FR7bYc=;
- b=z4u5Y3DRF4plS8K3aqplcJECtr35bS7X6BSJigD0wCMMR78xfKkdkxp/1elDt0HbLpaT
- wqGbJifJoOy/FLIm7AQdgPllc6Y3ZM571QQ+dGOsVblwEB00pizAOAxP5OL22bwJkDsK
- dvpWqIUqFg+33RS4S1Mon0mXVxDj5Vfom2OPqZePz0GkfsjjqWy2wSIiJXWsIHvmotrP
- eDoDsw1KqSpLnpSU3W4bnwWqGcukDkWs+FADqiLB759w/hozRDSFMgqy0JNvDnpwY1/9
- Z48OClJ3rIEJDP5zmyvwnC6q3Jj0zkhjqH6YjpwYM668ux/yU5gMYl5txq9XRbsYLsF+ gg== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqjy1duy0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 17 Oct 2023 18:24:09 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39HGuWLQ027152;
-	Tue, 17 Oct 2023 18:24:09 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2168.outbound.protection.outlook.com [104.47.56.168])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3trg54815s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 17 Oct 2023 18:24:09 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mGbuNwgk7SgIbz7MrpWH7mhnazxo9ojn/53+Cm2YHEa2ae2jARHadm2/DIeZY5NoQ/+lVPLLykIpAZT4nygb4LnOFsZcAB3+H/IM9A13Qoh0iZ2n6fd0VLJ3Akdd8kAjM93AGDNfa9MtRw/2vgY0u7xOpxVinkravWIuRrVw5IfFBZpMSL/DCJpqVaYKWMUXTu2CHN1wAANhOwh15uWYUiaDbg+GeIVsH2hBGRVIvIEf1GcnpZM7iwG79n5LvI2RuA/d3bnxBYH5ogUnNfnNTNtQMwF0bAuQMRUeQyuE5okc44rEm8Seh+i78Mkyeabw6fLh0ooC/z69zu22pUnPJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6qTKwR3Lu400fYbX5vD0N0lJgSl03gwZGfe/2FR7bYc=;
- b=dWu7Oo76pNWsnjrh1dTQSvUWdB2qrsGhVLLObLjd1Xi/dU0hjgqFPyedKNVwcb2GPAIbmyMSFdlqFtlFD1UHuK1+ZmEUsumyBXKjYMFek1tUggvWWU0DhbCYVhycSVNp+i+dFBpC+Aba8OqFD18SL0144dqKGdzW8honPlgb27pm5BStXRkC1wdVJuemI79HezmAu+dqfJbEqwyy91zSJ/FATQ0n3+Y9Y2LzwbFaQZCWeXeb9MJtliJGf+GNGQbsbOkkcKQ0TT67dYOolDFVfbJnOlaaBJSOWRXCkako89uzTre766Zem/rsc5+xt6eVD8MnUOu8D/+snyUw7YAKhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246BC2D02C
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 18:37:57 +0000 (UTC)
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F8110B
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:37:54 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9936b3d0286so975452466b.0
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:37:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6qTKwR3Lu400fYbX5vD0N0lJgSl03gwZGfe/2FR7bYc=;
- b=TsoFCscu6DsFjIaRy9UrNfDae0G5wCaQzu9BcuofqP35Y7dv50IcT6CuY4BbI8E4pjZU65uZgS+RmxSz/UlfuWNEBjinri0/yW+tDqtu1RW9jdFbc2bGwbE4Aor49gF1nTI8NBTw2yDKOHnW/fj2c2bGJkXVOkJmf+TFKfdFZ74=
-Received: from BY5PR10MB4129.namprd10.prod.outlook.com (2603:10b6:a03:210::21)
- by DS7PR10MB5007.namprd10.prod.outlook.com (2603:10b6:5:3ab::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Tue, 17 Oct
- 2023 18:24:07 +0000
-Received: from BY5PR10MB4129.namprd10.prod.outlook.com
- ([fe80::f5d4:dcca:5e7d:ad91]) by BY5PR10MB4129.namprd10.prod.outlook.com
- ([fe80::f5d4:dcca:5e7d:ad91%6]) with mapi id 15.20.6863.032; Tue, 17 Oct 2023
- 18:24:07 +0000
-From: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-To: Oliver Sang <oliver.sang@intel.com>
-CC: Jakub Kicinski <kuba@kernel.org>,
-        "oe-lkp@lists.linux.dev"
-	<oe-lkp@lists.linux.dev>,
-        "lkp@intel.com" <lkp@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Liam Howlett <liam.howlett@oracle.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [linus:master] [connector/cn_proc]  2aa1f7a1f4:
- BUG:kernel_NULL_pointer_dereference,address
-Thread-Topic: [linus:master] [connector/cn_proc]  2aa1f7a1f4:
- BUG:kernel_NULL_pointer_dereference,address
-Thread-Index: AQHZ647wLdBfKiOcokm+jxdng1npYrA52wCAgA6f94CABUB2AIAAu6IA
-Date: Tue, 17 Oct 2023 18:24:06 +0000
-Message-ID: <8E4806C7-0850-4719-8C1D-95F498562B03@oracle.com>
-References: <202309201456.84c19e27-oliver.sang@intel.com>
- <20231004084011.7aeef442@kernel.org>
- <E79EF019-0E7F-4935-87AB-6A543A134E35@oracle.com>
- <ZS4z1mxtTIEpFZI/@xsang-OptiPlex-9020>
-In-Reply-To: <ZS4z1mxtTIEpFZI/@xsang-OptiPlex-9020>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY5PR10MB4129:EE_|DS7PR10MB5007:EE_
-x-ms-office365-filtering-correlation-id: a8ea1e2a-e0fc-40d7-ef23-08dbcf3e3fdf
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- jWoi3zLEKJoLZrUlFv8HoMGekGLHI4ZMg9QZpDckb0++lYshs7Aj9Zti/xe7Mu62j56sducNy0y+CkAnFPJkFzgUdP8iCQBlke0/f1rmJdyCPZ1Ab5WsVMe8vZOEyVvPB1e1Vn27gtfTfB801vIqWUpCChFhgalqOGr3g5JhCfcE7GL1kl2qs4TQACtZwbjW4w1xcvrsQM4iGQhDtAEkIP8qXlTFCT2+c2k7JxVbG9k+zU2ExYOWVD8syBFbw/jm1KuhEq5UNw+tGct1JCYs3tE3+mU3Qtx8XmklKBNUFQh1gaFVp6VU6iET0ccUeSfZ7dB4FvAb/7KQD7jx9m8+iIOt4KE6L1j1L3YUQ4E4GtzPZzoXcycAIy4ZY5lg8s5SfcupoM0Pljy05hiZCOz9GALUZTx67YZvmajjCz8FpjoAlJaIDr6MAG9aNQ1PbeO0V6pAtCEEWF8AHPEBAy2wlS9gOKT2g3AdJsLOvpADt9HKKRsrJvJC6O6TKVbCs9eKZq1ISR6y7cJGoiIjniyXn0Mv1l1WLHhG6DVsJNZNVfhbIKJqt2xDd1Rc/cFwusHzgmoVYONkJkPxYMae74hOUgY/dLBCQn2VLJNF90QZhYBigMLp3dVrOzgIQxIykXbIMTG3hWWWwb+j+1WCaD9dfA==
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR10MB4129.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(39860400002)(346002)(396003)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(966005)(54906003)(64756008)(66946007)(6916009)(478600001)(6486002)(76116006)(66556008)(71200400001)(66446008)(66476007)(91956017)(316002)(83380400001)(38100700002)(6512007)(2616005)(53546011)(6506007)(26005)(36756003)(86362001)(33656002)(41300700001)(38070700005)(122000001)(5660300002)(4326008)(2906002)(8936002)(8676002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?utf-8?B?OE5PMFpPUkdLbVp2SFBNMGoxMkhad1lPY281OGd0cjd1OWZKbGlReFNCSjZz?=
- =?utf-8?B?Z0dFSGNoclpYVUwwL0ZUK3lTNTFDQ3hDQjVoUHErbVd3ODZEZkI1ZzRzamRs?=
- =?utf-8?B?NFdZK2szNDRrUlRzd2RJRExEbkZvUGg5d1BoRml1dDJ2WTZMazdLejk3aG1N?=
- =?utf-8?B?ejQwNmUybWpCemVURllmaXBlVmduZ040cTBEYkxQM1F5Zk9CY3BGK3dWZis5?=
- =?utf-8?B?OWFNUEVDNDJJdnBCSUppSVFBS2hpYStGZXZuWXdUblIvcXRsNmVoelZSVENV?=
- =?utf-8?B?d3NINXViczNleDhHMWZDckN2dnp3WGQ3eklKUXZVVG9qdEx0TytkMkQwb2FX?=
- =?utf-8?B?OVY4SUQ1aHc0WU1MY3E5VVdVcjhKd1B3ZVFFeXIzZSs1VzRNd055TVRJMzZ1?=
- =?utf-8?B?ZFROZXdoUVgrbzQ3cm92TTBuOTU5RVNYWW5oWFVuVWJMVGEzbS9Mdk5CRTE3?=
- =?utf-8?B?UVFhZ0djYW1pMWlpN3Q2YXJFdWdKVTh3bWtWOWFHd3FaVVprcFJCVTRBNmJZ?=
- =?utf-8?B?WUtvRHc3dllFcWUwZHFJVTlQOU9tV3cxMlJKZUFzbWZVems5MUx3aDFsZTlK?=
- =?utf-8?B?WHpocFpNQm5UUGhNclpXTzVzOHRMSS81dTZTV2RBaGIrNElVRWttNWdHVnhk?=
- =?utf-8?B?a3dCTFhVS3RKYm9hUGpWUGdrVlJqaG9TOWZSeWlqUW93SFBqcGNLclFQeWdX?=
- =?utf-8?B?YmViTnpadUdsb0crWXQ5ZTE3ZWtjU2RUaG9RL3hHNTFsb3VLblVDaEJLTGpa?=
- =?utf-8?B?TzliTGlqMzJGcUlhT3ZnejhJSFNybWtvZlEvQWhKNHJuNzV3MDFVZTljeXFl?=
- =?utf-8?B?b2tHT1ZSL25tbzdCOXBmOVNPSkh3dzcvRFZEcm5IckVZQzNnNDJnL3F4ZVV6?=
- =?utf-8?B?K2hrOGlHODM2and2bWxJQVNlNkVlWFg0dDBqeGlVdmd1YjJrVFFueG9jc2tq?=
- =?utf-8?B?bXBjcU10a3NjYVJDSnRYbzBscEJrVC9xYkFIRnppM29VZEZydWRaeXhGM0Zs?=
- =?utf-8?B?b09TS01rRkdXMWc3UmJQS3FkUkhSZi9ETWVqSnRNWVdscWlFbkJ2b0JRbysz?=
- =?utf-8?B?b05BUCtzekVtblM1MG5sazZhSHA1OWpCZkVmM25qYTFzdkVvYlNacFFGQmQ2?=
- =?utf-8?B?V2tDcU8rU0gyQnlPbFdQVlRYYVNwdkw5eHFxTzMxcHBXdEJ6SHJRNys0ckVx?=
- =?utf-8?B?QW16ZXBmOG1UaFhqVFluS2NudURzYjlvQjFzdnFVTXUrZUF1QVVDOGtpRGVl?=
- =?utf-8?B?bmc4anZUY05BN29abU1sTW5mczdJckJYMlhNZ092R1I0Y2JLcFdia09sU21T?=
- =?utf-8?B?ckdZcHJYU2x2S3ZrMk9PQUpoVVM1eDJqVk1ZSjE3dnEya1dDUlZoWjFuL2xx?=
- =?utf-8?B?Rkd3SldDU0pHRWtMYUp5ckdWalNXdW5sa0dWRDNDRnJzZFJIVVRZSFJSU2RE?=
- =?utf-8?B?QVRBM0JTZ3F3SjlJM1JSUkVUdUhiYTJrYVZlL21NR3JQTTVlSDZaQzVpRzdl?=
- =?utf-8?B?d3MxUW9XeWVrNWQ5bGVJM0lkMWVabC81eFdjRjBIdG1YWVd6Ny8xL2R3Y3dE?=
- =?utf-8?B?eGlhQUU1L0tQRXhkc0ZjL2UvVHZ4cnpjc3Awci9EbGNrMWJKTEIvenNLTFhV?=
- =?utf-8?B?aENkYmx4TnF2S1d6ZVgyb2dXb0Q1ZzN2alVtTHZNNHBsUmoyYzNRTjlGMFV3?=
- =?utf-8?B?T29YeVJpdXE4OTVNTlVYZXBvcDNsUW1tc1AyS3pvZkJHOUEwR2oxRkpyQzY2?=
- =?utf-8?B?WXE5OTExcU5RSEpxVmIybVJVRjM3RTNFTVlnNmNiUWdGbXV4Wnh6ckI5SCtn?=
- =?utf-8?B?bXpQVFhXbURBTmYyTGh4UFNiTWxxanFlazB6eGk5SEJ6ay9zK1EzSlF3dnZR?=
- =?utf-8?B?ZUxGemJBeldNbnhGRmhhcThXak5NeVNwbFV1NldHVFlpZ3owTXBqV0NPUThh?=
- =?utf-8?B?WlNjbzQ0cWt0VHlHcnJIL0kyMkZWZnBwdm1oa3BRcXRQcjZ4dDFGbWkwMGVh?=
- =?utf-8?B?eU16a3Bmay9hSkx5ZmgrVGdRK2VUWnQ4VCswazJXR3doNHUrOTBiSXIwMDN6?=
- =?utf-8?B?Y1VIMVBibHhaejJ5b1hDQzJwQ0RxRmxuTVllSGJmSXJnUmtxMWZPcmVHNVd1?=
- =?utf-8?B?MWVFL2lGOFhHaWFWbDFrWmJYRGRqVTA5M0ExYWJsV1NpT1hORG9nWjFXbUFa?=
- =?utf-8?B?a0E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <57D00E4B715DF24E9896FEFA30D0107E@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=chromium.org; s=google; t=1697567871; x=1698172671; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E0ndmeFAnooDYJrLwBWEykUK1jnu79vBWHr+CSspHeI=;
+        b=d+8ibS9HVj8ISXpJ7WsVfmRuCtpTJPJPrPhrzcFH6WvzoucV+mYpFWL++9pCdsTnlE
+         Z/QexG9mCbX+Uk7ybfQ2w01NZ1WKZxL4evA2Zqew1tTqL0nMNYCFBEevT+pH8EJAbznm
+         fzQjTSP7UE+Pxl5mj8+/ou2Ny3X60du7RnElQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697567871; x=1698172671;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E0ndmeFAnooDYJrLwBWEykUK1jnu79vBWHr+CSspHeI=;
+        b=kfR7hzq52Uk29bfatEuv2FiRa2OISUbNsn8tC2kwixfBkLX9LJ6yG/x/TQUbd9Tup+
+         5YaN8ZpHGkRi1W1zkS6W9jBaskGTMTtP85ikCiKoXfEp/D5C6UY/MyarAJbsCV66izPM
+         l5OmB5pVHHeO7kGGTyxdh3bCso+YSfiDFZ3CXk4sHvGoANRMqDy092YdBWN0X6W2PAKY
+         YKCRJHTOpU0JpnNOzJZ+qpS5SoCP2K+/NhJr3sZxohNthHaPR+dl7b5TwbvxFfN8kEM5
+         BEUdV3w/00EUzCPwssLT0QrXlSvg7dMt3yDGFZBviQd0VkCT/GIfe/etLiaWjJKaVPLP
+         HgUA==
+X-Gm-Message-State: AOJu0YxiqSNIIsMW9cHf0mNl6YulRITt1ZGrNpihodMldX6pH7WYtTTh
+	XKBe/Gf9j8XPmBMK3W6MVHkqrcxCBqnsNqrbnePBAF+X
+X-Google-Smtp-Source: AGHT+IFrpasRrxAMlp49vQusA9beD6Nkd7om+lVEGBDftHBmT+8iUWya8H1acz7k5RMd3TFzGjAq5Q==
+X-Received: by 2002:a17:907:9706:b0:9ae:5aa4:9fa with SMTP id jg6-20020a170907970600b009ae5aa409famr2481919ejc.42.1697567870996;
+        Tue, 17 Oct 2023 11:37:50 -0700 (PDT)
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com. [209.85.128.54])
+        by smtp.gmail.com with ESMTPSA id e26-20020a170906749a00b009adc5802d08sm234348ejl.190.2023.10.17.11.37.49
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 11:37:50 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40837124e1cso13435e9.0
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:37:49 -0700 (PDT)
+X-Received: by 2002:a05:600c:11cf:b0:400:c6de:6a20 with SMTP id
+ b15-20020a05600c11cf00b00400c6de6a20mr16564wmi.3.1697567869494; Tue, 17 Oct
+ 2023 11:37:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	iBjnD85KJIVFUwAw+cx4cJhtdcukf1Ykf5u4H5ZUGPv034pzbxilrgg89YUx38sJpMs9cc1kmNGrlvkDvC8zK1locyp8E+8hf2l4jmYxV6Jjm5F/1xHTVBwM3xyhiLq5EoLc+ld7wrqgcQnl+KZi3GufPslvmzM+YQAAsMM3dVOuAyspvuaxJiQKGEl0l4Dam4L0tpHpXhtc/Ynme1DYWd9Ov4E0qT12UQHJhQjDHsBumTXeM8Wp9hZ/0bdBRUoMWATHC0wRC9ypJsbK9gCVE//0CtdwHliTljTSu6ykv09r0vWPlbdtmpyLuTRaJ0u9umWDoFFkHoAoQ8JlVl4TQocd1DZxEj2VZJe3qS/iaUUSIeXlFxLUlqXZn78YnpJOGuhufrC8xOSj7mZq1bFWR82vvYfEEVP6bmBQ+Ot1bFEeTvj/6Qs8qWmioWFlP8bDUlhC5RXz9MEWh95vbQd+px9Px97pWXedPiwtIbsbLAXzvzg6vNHR0L+8UZKRO3hrFUZ0Nd5B280dOBOQzHc8cCsnMnHMWKZtSQ/3HtMHyVsS/tQdb8u6bKojb2RJ1ye6O8ACplkTa1pvSBeQkmMSSkec7dCyuM09FHDUnYWEt7NxnNM561qXSwSuCtEr9PdHpNkVK6JcdNRkUohD6P72mq6xPNdJU7mzCzHEGcVMthOtsnfSPHODKE4dD/Fn2nised4L3EDPtZAWdWvrODL69VkyckOhVXUPahiEJMYiJBACBBUnI4ySqFHFCAYgv/K/2MZ5cokbS6aqkXAaRWjTpy53qHMGM0QVF6ScRa5NfBn1L0l2tHBzA5uF6DP+/jzcsvtdgRZg3dxsKaRlJ6q1CqbMr8Mgf9h03okl2pSfpdv1wQX0+GE4CCAYhViAf0w8HmxVHgFMzDWz8ROqRzpc8g==
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR10MB4129.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a8ea1e2a-e0fc-40d7-ef23-08dbcf3e3fdf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2023 18:24:06.9598
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wA+5G2e3cwzzpDfZEMGa4yVMC8UFYctiUGaNqtN+6Pk9sbVd6brnOkDiQUkGfw37OVBy0tD0kSVHwbOEaUcim+a4MHTIhQzWQcw69OcdmjU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5007
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-17_03,2023-10-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 phishscore=0
- malwarescore=0 suspectscore=0 mlxlogscore=999 spamscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310170156
-X-Proofpoint-GUID: TD2QAlh8IZhBIYTWL2DQIqrrMs5GVE7y
-X-Proofpoint-ORIG-GUID: TD2QAlh8IZhBIYTWL2DQIqrrMs5GVE7y
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20231012192552.3900360-1-dianders@chromium.org>
+ <20231012122458.v3.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
+ <29f9a2ff1979406489213909b940184f@realtek.com> <CAD=FV=U4rGozXHoK8+ejPgRtyoACy1971ftoatQivqzk2tk5ng@mail.gmail.com>
+ <052401da00fa$dacccd90$906668b0$@realtek.com> <CAD=FV=XQswgKZh-JQ6PuKGRmrDMfDmZwM+MUpAcOk1=7Ppjyiw@mail.gmail.com>
+In-Reply-To: <CAD=FV=XQswgKZh-JQ6PuKGRmrDMfDmZwM+MUpAcOk1=7Ppjyiw@mail.gmail.com>
+From: Doug Anderson <dianders@chromium.org>
+Date: Tue, 17 Oct 2023 11:37:32 -0700
+X-Gmail-Original-Message-ID: <CAD=FV=Vp_KE_hjWy7bKJbvmqwCQ67jhzfFoV368vB5ZGge=Yzw@mail.gmail.com>
+Message-ID: <CAD=FV=Vp_KE_hjWy7bKJbvmqwCQ67jhzfFoV368vB5ZGge=Yzw@mail.gmail.com>
+Subject: Re: [PATCH v3 5/5] r8152: Block future register access if register
+ access fails
+To: Hayes Wang <hayeswang@realtek.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Alan Stern <stern@rowland.harvard.edu>, Simon Horman <horms@kernel.org>, 
+	Edward Hill <ecgh@chromium.org>, Laura Nao <laura.nao@collabora.com>, 
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, 
+	=?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-DQoNCj4gT24gT2N0IDE3LCAyMDIzLCBhdCAxMjoxMiBBTSwgT2xpdmVyIFNhbmcgPG9saXZlci5z
-YW5nQGludGVsLmNvbT4gd3JvdGU6DQo+IA0KPiBoaSwgQW5qYWxpIEt1bGthcm5pLA0KPiANCj4g
-T24gRnJpLCBPY3QgMTMsIDIwMjMgYXQgMTE6MDA6MzFQTSArMDAwMCwgQW5qYWxpIEt1bGthcm5p
-IHdyb3RlOg0KPj4gDQo+PiANCj4+PiBPbiBPY3QgNCwgMjAyMywgYXQgODo0MCBBTSwgSmFrdWIg
-S2ljaW5za2kgPGt1YmFAa2VybmVsLm9yZz4gd3JvdGU6DQo+Pj4gDQo+Pj4gT24gV2VkLCAyMCBT
-ZXAgMjAyMyAxNDo1MTozMiArMDgwMCBrZXJuZWwgdGVzdCByb2JvdCB3cm90ZToNCj4+Pj4ga2Vy
-bmVsIHRlc3Qgcm9ib3Qgbm90aWNlZCAiQlVHOmtlcm5lbF9OVUxMX3BvaW50ZXJfZGVyZWZlcmVu
-Y2UsYWRkcmVzcyIgb246DQo+Pj4+IA0KPj4+PiBjb21taXQ6IDJhYTFmN2ExZjQ3Y2U4ZGFjNzU5
-M2FmNjA1YWFhODU5YjNjZjNiYjEgKCJjb25uZWN0b3IvY25fcHJvYzogQWRkIGZpbHRlcmluZyB0
-byBmaXggc29tZSBidWdzIikNCj4+Pj4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9jZ2l0L2xpbnV4
-L2tlcm5lbC9naXQvdG9ydmFsZHMvbGludXguZ2l0IG1hc3Rlcg0KPj4+IA0KPj4+IEFuamFsaSwg
-aGF2ZSB5b3UgaGFkIHRoZSBjaGFuY2UgdG8gbG9vayBpbnRvIHRoaXM/DQo+PiANCj4+IEhpLA0K
-Pj4gSSB3YXMgdW5hYmxlIHRvIHJlcHJvZHVjZSB0aGUgaXNzdWVzIHdpdGggdGhlIHN0ZXBzIGdp
-dmVuIC0gbWFueSBwYWNrYWdlcyBhcmUgbWlzc2luZywgZXRjLiAtIEkgYW0gc3RpbGwgdHJ5aW5n
-IHRob3VnaCAtIGhvd2V2ZXIsIHRoZSBzdGFjayB0cmFjZSBvZiB0aGlzIGlzc3VlIHNob3dzIGl0
-IGlzIGEgTlVMTCBwb2ludGVyIGRlLXJlZmVyZW5jZSAoaXQgbG9va3MgbGlrZSBpbiBjbl9maWx0
-ZXIoKSBmdW5jdGlvbikgLSBhbmQgSSBmb3VuZCBhIHBvdGVudGlhbCBzdXNwZWN0IHdoZXJlIGEg
-Y2hlY2sgZm9yIE5VTEwgcG9pbnRlciB3YXMgbWlzc2luZy4gU28gSeKAmXZlIHNlbnQgb3V0IHRo
-ZSBwYXRjaCBmaXggZm9yIHRoaXMgLSBpcyBpdCBwb3NzaWJsZSBmb3Igc29tZW9uZSB0byBwbGVh
-c2UgdGVzdCB3aXRoIHRoaXMgZml4IGFuZCBsZXQgbWUga25vdyBpZiB0aGUgaXNzdWUgaXMgcmVz
-b2x2ZWQ/IFRoZSBmaXggbG9va3MgbGlrZToNCj4gDQo+IEkgYXBwbGllZCBiZWxvdyBwYXRjaCB1
-cG9uIHY2LjYtcmM2LCB0aGUgaXNzdWUgcmVwb3J0ZWQgYnkgb3JpZ2luYWwgcmVwb3J0IHdhcw0K
-PiBnb25lLg0KPiANCg0KVGhhbmsgeW91IHZlcnkgbXVjaCBmb3IgdGVzdGluZyEgDQoNCj4gKGFu
-ZCBJIGNvbmZpcm1lZCB0aGUgaXNzdWUgc3RpbGwgY2FuIGJlIHJlcHJvZHVjZWQgb24gdjYuNi1y
-YzYpDQo+IA0KPiBUZXN0ZWQtYnk6IGtlcm5lbCB0ZXN0IHJvYm90IDxvbGl2ZXIuc2FuZ0BpbnRl
-bC5jb20+DQo+IA0KPj4gDQo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jb25uZWN0b3IvY25fcHJv
-Yy5jIGIvZHJpdmVycy9jb25uZWN0b3IvY25fcHJvYy5jDQo+PiBpbmRleCAwNWQ1NjJlOWM4YjEu
-LmE4ZTU1NTY5ZTRmNSAxMDA2NDQNCj4+IC0tLSBhL2RyaXZlcnMvY29ubmVjdG9yL2NuX3Byb2Mu
-Yw0KPj4gKysrIGIvZHJpdmVycy9jb25uZWN0b3IvY25fcHJvYy5jDQo+PiBAQCAtNTQsNyArNTQs
-NyBAQCBzdGF0aWMgaW50IGNuX2ZpbHRlcihzdHJ1Y3Qgc29jayAqZHNrLCBzdHJ1Y3Qgc2tfYnVm
-ZiAqc2tiLCB2b2lkICpkYXRhKQ0KPj4gICAgICAgIGVudW0gcHJvY19jbl9tY2FzdF9vcCBtY19v
-cDsNCj4+ICAgICAgICB1aW50cHRyX3QgdmFsOw0KPj4gDQo+PiAtICAgICAgIGlmICghZHNrIHx8
-ICFkYXRhKQ0KPj4gKyAgICAgICBpZiAoIWRzayB8fCAhZGF0YSB8fCAhZHNrLT5za191c2VyX2Rh
-dGEpDQo+PiAgICAgICAgICAgICAgICByZXR1cm4gMDsNCj4+IA0KPj4gICAgICAgIHB0ciA9IChf
-X3UzMiAqKWRhdGE7DQo+PiAtLSAgMi40Mi4wDQoNCg0K
+Hi,
+
+On Tue, Oct 17, 2023 at 7:17=E2=80=AFAM Doug Anderson <dianders@chromium.or=
+g> wrote:
+>
+> Hi,
+>
+> On Tue, Oct 17, 2023 at 6:07=E2=80=AFAM Hayes Wang <hayeswang@realtek.com=
+> wrote:
+> >
+> > Doug Anderson <dianders@chromium.org>
+> > > Sent: Tuesday, October 17, 2023 12:47 AM
+> > [...
+> > > > >  static int generic_ocp_read(struct r8152 *tp, u16 index, u16 siz=
+e,
+> > > > > @@ -8265,6 +8353,19 @@ static int rtl8152_pre_reset(struct
+> > > usb_interface
+> > > > > *intf)
+> > > > >         if (!tp)
+> > > > >                 return 0;
+> > > > >
+> > > > > +       /* We can only use the optimized reset if we made it to t=
+he end of
+> > > > > +        * probe without any register access fails, which sets
+> > > > > +        * `PROBED_WITH_NO_ERRORS` to true. If we didn't have tha=
+t then return
+> > > > > +        * an error here which tells the USB framework to fully u=
+nbind/rebind
+> > > > > +        * our driver.
+> > > >
+> > > > Would you stay in a loop of unbind and rebind,
+> > > > if the control transfers in the probe() are not always successful?
+> > > > I just think about the worst case that at least one control always =
+fails in probe().
+> > >
+> > > We won't! :-) One of the first things that rtl8152_probe() does is to
+> > > call rtl8152_get_version(). That goes through to
+> > > rtl8152_get_version(). That function _doesn't_ queue up a reset if
+> > > there are communication problems, but it does do 3 retries of the
+> > > read. So if all 3 reads fail then we will permanently fail probe,
+> > > which I think is the correct thing to do.
+> >
+> > The probe() contains control transfers in
+> >         1. rtl8152_get_version()
+> >         2. tp->rtl_ops.init()
+> >
+> > If one of the 3 control transfers in 1) is successful AND
+> > any control transfer in 2) fails,
+> > you would queue a usb reset which would unbind/rebind the driver.
+> > Then, the loop starts.
+> > The loop would be broken, if and only if
+> >         a) all control transfers in 1) fail, OR
+> >         b) all control transfers in 2) succeed.
+> >
+> > That is, the loop would be broken when the fail rate of the control tra=
+nsfer is high or low enough.
+> > Otherwise, you would queue a usb reset again and again.
+> > For example, if the fail rate of the control transfer is 10% ~ 60%,
+> > I think you have high probability to keep the loop continually.
+> > Would it never happen?
+>
+> Actually, even with a failure rate of 10% I don't think you'll end up
+> with a fully continuous loop, right? All you need is to get 3 failures
+> in a row in rtl8152_get_version() to get out of the loop. So with a
+> 10% failure rate you'd unbind/bind 1000 times (on average) and then
+> (finally) give up. With a 50% failure rate I think you'd only
+> unbind/bind 8 times on average, right? Of course, I guess 1000 loops
+> is pretty close to infinite.
+>
+> In any case, we haven't actually seen hardware that fails like this.
+> We've seen failure rates that are much much lower and we can imagine
+> failure rates that are 100% if we're got really broken hardware. Do
+> you think cases where failure rates are middle-of-the-road are likely?
+>
+> I would also say that nothing we can do can perfectly handle faulty
+> hardware. If we're imagining theoretical hardware, we could imagine
+> theoretical hardware that de-enumerated itself and re-enumerated
+> itself every half second because the firmware on the device crashed or
+> some regulator kept dropping. This faulty hardware would also cause an
+> infinite loop of de-enumeration and re-enumeration, right?
+>
+> Presumably if we get into either case, the user will realize that the
+> hardware isn't working and will unplug it from the system. While the
+> system is doing the loop of trying to enumerate the hardware, it will
+> be taking up a bunch of extra CPU cycles but (I believe) it won't be
+> fully locked up or anything. The machine will still function and be
+> able to do non-Ethernet activities, right? I would say that the worst
+> thing about this state would be that it would stress corner cases in
+> the reset of the USB subsystem, possibly ticking bugs.
+>
+> So I guess I would summarize all the above as:
+>
+> If hardware is broken in just the right way then this patch could
+> cause a nearly infinite unbinding/rebinding of the r8152 driver.
+> However:
+>
+> 1. It doesn't seem terribly likely for hardware to be broken in just this=
+ way.
+>
+> 2. We haven't seen hardware broken in just this way.
+>
+> 3. Hardware broken in a slightly different way could cause infinite
+> unbinding/rebinding even without this patch.
+>
+> 4. Infinite unbinding/rebinding of a USB adapter isn't great, but not
+> the absolute worst thing.
+>
+>
+> That all being said, if we wanted to address this we could try two
+> different ways:
+>
+> a) We could add a global in the r8152 driver and limit the number of
+> times we reset. This gets a little ugly because if we have multiple
+> r8152 adapters plugged in then the same global would be used for both,
+> but maybe it's OK?
+>
+> b) We could improve the USB core to somehow prevent usb_reset_device()
+> from running too much on a given device?
+>
+>
+> ...though I would re-emphasize that I don't think this is something we
+> need to address now. If later we actually see a problem we can always
+> address it then.
+
+One other idea occurred to me that we could do, if we cared to solve
+this hypothetical failure case. We could change the code to always
+read the version 4 times on every probe. If one of the transfers fails
+then we could consider that OK. If 2 or more transfers fails then we
+could consider that to be an error. You still might get a _few_
+unbind/bind in this hypothetical failure mode, but I think it would
+catch the problem more quickly.
+
+My probability theory is rusty and I'm sure there's a better way, but
+I think we can just add up all the cases. Assuming a 10% failures and
+90% success of any transfer:
+
+# Chance of 2 failures:
+.10 * .10 * .90 * .90 +
+.10 * .90 * .10 * .90 +
+.10 * .90 * .90 * .10 +
+.90 * .10 * .90 * .10 +
+.90 * .90 * .10 * .10
+
+# Chance of 3 failures:
+.10 * .10 * .10 * .90 +
+.10 * .10 * .90 * .10 +
+.10 * .90 * .10 * .10 +
+.90 * .10 * .10 * .10
+
+# Chance of 4 failures:
+.10 * .10 * .10 * .10
+
+If I add that up I get about a 4.4% chance of 2 or more failures in 4
+reads. That means if we got into an unbind/bind cycle we'd get out of
+it (on average) in ~23 probes because we'd see enough failures. We
+could likely reduce this further by reading the version 5 or 6 times.
+
+I will note that my measurements showed that a normal probe is ~200
+transfers and also includes a bunch of delays, so reading the version
+a few times wouldn't be a huge deal.
+
+
+In any case, I'm still of the opinion that we don't need to handle this.
+
+-Doug
 
