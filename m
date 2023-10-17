@@ -1,133 +1,151 @@
-Return-Path: <netdev+bounces-41919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2A417CC370
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:42:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A98DF7CC380
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:45:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 678C62813C5
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:42:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64B5A28195D
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C8541AA6;
-	Tue, 17 Oct 2023 12:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F633F4C4;
+	Tue, 17 Oct 2023 12:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Alchtysp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE6E42BFA
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:42:47 +0000 (UTC)
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A26EF7;
-	Tue, 17 Oct 2023 05:42:45 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VuNiO3D_1697546559;
-Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0VuNiO3D_1697546559)
-          by smtp.aliyun-inc.com;
-          Tue, 17 Oct 2023 20:42:39 +0800
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: tonylu@linux.alibaba.com,
-	alibuda@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2 2/2] net/smc: correct the reason code in smc_listen_find_device when fallback
-Date: Tue, 17 Oct 2023 20:42:34 +0800
-Message-Id: <20231017124234.99574-3-guangguan.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20231017124234.99574-1-guangguan.wang@linux.alibaba.com>
-References: <20231017124234.99574-1-guangguan.wang@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531EB3D994
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:45:35 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D6095
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 05:45:29 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7bbe0a453so86971917b3.0
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 05:45:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697546729; x=1698151529; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DrMhmvGp/H6j3Xg6VLB8FAox2ke+eSPgNnnniqEWCgs=;
+        b=AlchtyspKmE3OnHIfpVoDV5f7bvX+PyE7lANVkQrTRhICQRAU9knygu8+k4EUMUVrg
+         fkYmGYyWPBNO8auXmOn09coz8q/Yff4FlIJyYLskNOd5WYCObFRIjXUnVsBpxoaHmWxw
+         a7iBtzTvS07RpJ58mRhn6PmjFlkFDKRfVeZa0qBKkrsbQqytjNSsQK4XM+LwE7rvNYZO
+         d3dhUYtgUDWTidDMXxRNN5eWKGfYfF1ObJKPFBeFRgPdSxt/P5JO+aVJVCd3D6Fm1d16
+         QdEleY7o9m6c1konpYQeiHPRBGLb5RVYQG8aApTrzLloiWeyUjSqB1bIucgXI7yJvD7P
+         9g0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697546729; x=1698151529;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DrMhmvGp/H6j3Xg6VLB8FAox2ke+eSPgNnnniqEWCgs=;
+        b=w3BdkRBBRYFKXX5AeON9v4nqrCKihBPxR5aZi4siLxeblETb2Uam4aIwkWFt7TsmUf
+         YXmU4AwlQI1Rgj5cdaFav99YNIIY6CMyc+a4GLry7RZB9GnxVvv/A69zIGNkJpNTNcIf
+         TVYuzaaQU1VmFgsctQE59+Nbm2UqF9ewo/4sLlk2dYPi/oGyknehZpWCe0tQx2ilAC0i
+         rBBppOjzQsy+rg1CiqIKhJW/PKJnXxqxuHHNk8j5A4vkamd+XQgIATbX17DU05LcOy1W
+         mbPiM+TyBn2aZe8+URDNyBYjoCgV+z6MuQJayDb/i+AKeOZWvBFsJv2vqLVhSCFhRdSg
+         XlXQ==
+X-Gm-Message-State: AOJu0YwclFoinUGUPnu+wUMG5NZeS9y3YhzkTRjcgVwrTPV6SdTNIyUA
+	xuH+AWyi1IoFaqa2cvGY4f77WmVT6Ol3Ow==
+X-Google-Smtp-Source: AGHT+IHQKO4tBRmTolbzNRuzLZUJgfamZstDL3syDaIFgTtDNSeEcYFkol6DsEMJaSR7CFoNfEQaT0NTg5cB2g==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a0d:cccf:0:b0:5a7:db29:40e3 with SMTP id
+ o198-20020a0dcccf000000b005a7db2940e3mr45365ywd.7.1697546729173; Tue, 17 Oct
+ 2023 05:45:29 -0700 (PDT)
+Date: Tue, 17 Oct 2023 12:45:26 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
+Message-ID: <20231017124526.4060202-1-edumazet@google.com>
+Subject: [PATCH net] tcp: tsq: relax tcp_small_queue_check() when rtx queue
+ contains a single skb
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Stefan Wahren <wahrenst@gmx.net>, 
+	Neal Cardwell <ncardwell@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The ini->rc is used to store the last error happened when finding usable
-ism or rdma device in smc_listen_find_device, and is set by calling smc_
-find_device_store_rc. Once the ini->rc is assigned to an none-zero value,
-the value can not be overwritten anymore. So the ini-rc should be set to
-the error reason only when an error actually occurs.
+In commit 75eefc6c59fd ("tcp: tsq: add a shortcut in tcp_small_queue_check()")
+we allowed to send an skb regardless of TSQ limits being hit if rtx queue
+was empty or had a single skb, in order to better fill the pipe
+when/if TX completions were slow.
 
-When finding ISM/RDMA devices, device not found is not a real error, as
-not all machine have ISM/RDMA devices. Failures after device found, when
-initializing device or when initializing connection, is real errors, and
-should be store in ini->rc.
+Then later, commit 75c119afe14f ("tcp: implement rb-tree based
+retransmit queue") accidentally removed the special case for
+one skb in rtx queue.
 
-SMC_CLC_DECL_DIFFPREFIX also is not a real error, as for SMC-RV2, it is
-not require same prefix.
+Stefan Wahren reported a regression in single TCP flow throughput
+using a 100Mbit fec link, starting from commit 65466904b015 ("tcp: adjust
+TSO packet sizes based on min_rtt"). This last commit only made the
+regression more visible, because it locked the TCP flow on a particular
+behavior where TSQ prevented two skbs being pushed downstream,
+adding silences on the wire between each TSO packet.
 
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Many thanks to Stefan for his invaluable help !
+
+Fixes: 75c119afe14f ("tcp: implement rb-tree based retransmit queue")
+Link: https://lore.kernel.org/netdev/7f31ddc8-9971-495e-a1f6-819df542e0af@gmx.net/
+Reported-by: Stefan Wahren <wahrenst@gmx.net>
+Tested-by: Stefan Wahren <wahrenst@gmx.net>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Neal Cardwell <ncardwell@google.com>
 ---
- net/smc/af_smc.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ net/ipv4/tcp_output.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index b3a67a168495..21e9c6ec4d01 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -2163,10 +2163,8 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 9c8c42c280b7638f0f4d94d68cd2c73e3c6c2bcc..e61a3a381d51b554ec8440928e22a290712f0b6b 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -2542,6 +2542,18 @@ static bool tcp_pacing_check(struct sock *sk)
+ 	return true;
+ }
+ 
++static bool tcp_rtx_queue_empty_or_single_skb(const struct sock *sk)
++{
++	const struct rb_node *node = sk->tcp_rtx_queue.rb_node;
++
++	/* No skb in the rtx queue. */
++	if (!node)
++		return true;
++
++	/* Only one skb in rtx queue. */
++	return !node->rb_left && !node->rb_right;
++}
++
+ /* TCP Small Queues :
+  * Control number of packets in qdisc/devices to two packets / or ~1 ms.
+  * (These limits are doubled for retransmits)
+@@ -2579,12 +2591,12 @@ static bool tcp_small_queue_check(struct sock *sk, const struct sk_buff *skb,
+ 		limit += extra_bytes;
  	}
- 	mutex_unlock(&smcd_dev_list.mutex);
+ 	if (refcount_read(&sk->sk_wmem_alloc) > limit) {
+-		/* Always send skb if rtx queue is empty.
++		/* Always send skb if rtx queue is empty or has one skb.
+ 		 * No need to wait for TX completion to call us back,
+ 		 * after softirq/tasklet schedule.
+ 		 * This helps when TX completions are delayed too much.
+ 		 */
+-		if (tcp_rtx_queue_empty(sk))
++		if (tcp_rtx_queue_empty_or_single_skb(sk))
+ 			return false;
  
--	if (!ini->ism_dev[0]) {
--		smc_find_device_store_rc(SMC_CLC_DECL_NOSMCD2DEV, ini);
-+	if (!ini->ism_dev[0])
- 		goto not_found;
--	}
- 
- 	smc_ism_get_system_eid(&eid);
- 	if (!smc_clc_match_eid(ini->negotiated_eid, smc_v2_ext,
-@@ -2216,9 +2214,9 @@ static void smc_find_ism_v1_device_serv(struct smc_sock *new_smc,
- 	rc = smc_listen_ism_init(new_smc, ini);
- 	if (!rc)
- 		return;		/* V1 ISM device found */
-+	smc_find_device_store_rc(rc, ini);
- 
- not_found:
--	smc_find_device_store_rc(rc, ini);
- 	ini->smcd_version &= ~SMC_V1;
- 	ini->ism_dev[0] = NULL;
- 	ini->is_smcd = false;
-@@ -2267,10 +2265,8 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
- 	ini->smcrv2.saddr = new_smc->clcsock->sk->sk_rcv_saddr;
- 	ini->smcrv2.daddr = smc_ib_gid_to_ipv4(smc_v2_ext->roce);
- 	rc = smc_find_rdma_device(new_smc, ini);
--	if (rc) {
--		smc_find_device_store_rc(rc, ini);
-+	if (rc)
- 		goto not_found;
--	}
- 	if (!ini->smcrv2.uses_gateway)
- 		memcpy(ini->smcrv2.nexthop_mac, pclc->lcl.mac, ETH_ALEN);
- 
-@@ -2331,8 +2327,6 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
- 
- 	/* check for matching IP prefix and subnet length (V1) */
- 	prfx_rc = smc_listen_prfx_check(new_smc, pclc);
--	if (prfx_rc)
--		smc_find_device_store_rc(prfx_rc, ini);
- 
- 	/* get vlan id from IP device */
- 	if (smc_vlan_by_tcpsk(new_smc->clcsock, ini))
+ 		set_bit(TSQ_THROTTLED, &sk->sk_tsq_flags);
 -- 
-2.24.3 (Apple Git-128)
+2.42.0.655.g421f12c284-goog
 
 
