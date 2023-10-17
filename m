@@ -1,62 +1,91 @@
-Return-Path: <netdev+bounces-41855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 306D47CC109
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:50:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E9C67CC11C
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:54:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A0F2B210C5
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:50:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18E551F22E13
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC73405DF;
-	Tue, 17 Oct 2023 10:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4484120C;
+	Tue, 17 Oct 2023 10:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Dh8fbntq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bklKBs9L"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2387B3D39F
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:50:49 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03A6FF0;
-	Tue, 17 Oct 2023 03:50:47 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39H3JocE008487;
-	Tue, 17 Oct 2023 03:50:35 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=LSRCKb8JzrEBoZi94vlE+OdKI7L0JbMMj1EiLEo1A7Y=;
- b=Dh8fbntqyrSq/Z6FSpfyxPkf5JOoWxVQvUH1mL/1n3Rxf1xJKqOdsMopN08ltP6oTOaL
- UXV01MHZKat1ddbJUWhkIhRVC6AE3hiFkTzhEDmGNN8a9GJWDqB2LUs88SjX/f/55fVE
- 6hFCI3Q46VwzOu77MzfevwbsyFDbAJAk/nOs5bsBuFFTQFbmAV4IYWVorM/WWVSl4vhy
- dukIB4j7VTI6+Sl2SZxL9sbb5LtIogMeGTHV3c9WYLXFh2Bf3HBz1Hn9n+aIf0q8POHg
- FkilLeBC+/zvXwe+Vdcg6U4n4UJ18JTGUNb7qZF05ZB4o9PN+oFQ0Pgd7lga+Q+MPB6P aw== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3tsj8shjf3-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 17 Oct 2023 03:50:34 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 17 Oct
- 2023 03:50:33 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 17 Oct 2023 03:50:32 -0700
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id CC9F45B6943;
-	Tue, 17 Oct 2023 03:50:32 -0700 (PDT)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <kuba@kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <pabeni@redhat.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <egallen@redhat.com>, <hgani@marvell.com>, <mschmidt@redhat.com>,
-        <netdev@vger.kernel.org>, <srasheed@marvell.com>, <sedara@marvell.com>,
-        <vburru@marvell.com>, <vimleshk@marvell.com>
-Subject: [PATCH net v3] octeon_ep: update BQL sent bytes before ringing doorbell
-Date: Tue, 17 Oct 2023 03:50:30 -0700
-Message-ID: <20231017105030.2310966-1-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE9A1A584
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:54:19 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A481AA2;
+	Tue, 17 Oct 2023 03:54:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697540058; x=1729076058;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ZQE6BpiayELUC26ur600Gzn7596iC7PaPo/DK0fqnrY=;
+  b=bklKBs9LDsMMYdl4AqTDACLdjOn+hSS8OZzVeVPIeeKlsv/Q0pS9kY4G
+   QNBsfwarQYEVkDsPW5swFJiTgKo6gX9SjnRwat0JF+zv3ctYLyPjlr0Gc
+   luXcUlHWJmPK+FnvW7TBW8/NjUw9LgFhqKW9GhDfofX5rZqpwfVCcxO9y
+   kYDf9TVznvdXRjYhLEuNjJhxpZvLFLmUVLkX6TAzDgfIYnXagwtZ2h+9j
+   3fL01WYPTM+B29emRRu44H6nyPyFZrP+ndHN/ypOAi2ivnvulEefbEkGj
+   XR5IViM5kFdVKTIPvaAP0t2fmTcG2wKaRe/7VkGxrhOIS+7TOCzeUd/ly
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="366012584"
+X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
+   d="scan'208";a="366012584"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 03:54:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="785445243"
+X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
+   d="scan'208";a="785445243"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orsmga008.jf.intel.com with ESMTP; 17 Oct 2023 03:54:09 -0700
+Received: from pelor.igk.intel.com (pelor.igk.intel.com [10.123.220.13])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 26BB3312C0;
+	Tue, 17 Oct 2023 11:54:07 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Cai Huoqing <cai.huoqing@linux.dev>,
+	George Cherian <george.cherian@marvell.com>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Igor Russkikh <irusskikh@marvell.com>,
+	Coiby Xu <coiby.xu@gmail.com>
+Cc: Brett Creeley <brett.creeley@amd.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Eran Ben Elisha <eranbe@nvidia.com>,
+	Aya Levin <ayal@mellanox.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH net-next v2 00/11] devlink: retain error in struct devlink_fmsg
+Date: Tue, 17 Oct 2023 12:53:30 +0200
+Message-Id: <20231017105341.415466-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,68 +93,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 7fydJ-HZjoIX1jq51LDFzlEZrCj4EjrU
-X-Proofpoint-GUID: 7fydJ-HZjoIX1jq51LDFzlEZrCj4EjrU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-16_13,2023-10-17_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Sometimes Tx is completed immediately after doorbell is updated, which
-causes Tx completion routing to update completion bytes before the
-same packet bytes are updated in sent bytes in transmit function, hence
-hitting BUG_ON() in dql_completed(). To avoid this, update BQL
-sent bytes before ringing doorbell.
+Extend devlink fmsg to retain error (patch 1),
+so drivers could omit error checks after devlink_fmsg_*() (patches 2-10),
+and finally enforce future uses to follow this practice by change to
+return void (patch 11)
 
-Fixes: 37d79d059606 ("octeon_ep: add Tx/Rx processing and interrupt support")
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V3:
-  - Update skb timestamp and host write index before memory barrier
-V2: https://lore.kernel.org/all/20231012101706.2291551-1-srasheed@marvell.com/
-  - Call netdev_tx_sent_queue before memory barrier
-V1: https://lore.kernel.org/all/20231010115015.2279977-1-srasheed@marvell.com/
+Note that it was compile tested only.
 
- drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+bloat-o-meter for whole series:
+add/remove: 8/18 grow/shrink: 23/40 up/down: 2017/-5833 (-3816)
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index dbc518ff8276..5b46ca47c8e5 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -715,20 +715,19 @@ static netdev_tx_t octep_start_xmit(struct sk_buff *skb,
- 		hw_desc->dptr = tx_buffer->sglist_dma;
- 	}
- 
--	/* Flush the hw descriptor before writing to doorbell */
--	wmb();
--
--	/* Ring Doorbell to notify the NIC there is a new packet */
--	writel(1, iq->doorbell_reg);
-+	netdev_tx_sent_queue(iq->netdev_q, skb->len);
-+	skb_tx_timestamp(skb);
- 	atomic_inc(&iq->instr_pending);
- 	wi++;
- 	if (wi == iq->max_count)
- 		wi = 0;
- 	iq->host_write_index = wi;
-+	/* Flush the hw descriptor before writing to doorbell */
-+	wmb();
- 
--	netdev_tx_sent_queue(iq->netdev_q, skb->len);
-+	/* Ring Doorbell to notify the NIC there is a new packet */
-+	writel(1, iq->doorbell_reg);
- 	iq->stats.instr_posted++;
--	skb_tx_timestamp(skb);
- 	return NETDEV_TX_OK;
- 
- dma_map_sg_err:
+changelog:
+v2: extend series by two more drivers (qed, qlge);
+    add final cleanup patch, since now whole series should be merged in
+    one part (thanks Jiri for encouragement here);
+
+v1:
+https://lore.kernel.org/netdev/20231010104318.3571791-3-przemyslaw.kitszel@intel.com
+
+Przemek Kitszel (11):
+  devlink: retain error in struct devlink_fmsg
+  netdevsim: devlink health: use retained error fmsg API
+  pds_core: devlink health: use retained error fmsg API
+  bnxt_en: devlink health: use retained error fmsg API
+  hinic: devlink health: use retained error fmsg API
+  octeontx2-af: devlink health: use retained error fmsg API
+  mlxsw: core: devlink health: use retained error fmsg API
+  net/mlx5: devlink health: use retained error fmsg API
+  qed: devlink health: use retained error fmsg API
+  staging: qlge: devlink health: use retained error fmsg API
+  devlink: convert most of devlink_fmsg_*() to return void
+
+ drivers/net/ethernet/amd/pds_core/devlink.c   |  29 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |  93 ++--
+ .../net/ethernet/huawei/hinic/hinic_devlink.c | 217 +++-----
+ .../marvell/octeontx2/af/rvu_devlink.c        | 464 +++++-------------
+ .../mellanox/mlx5/core/diag/fw_tracer.c       |  49 +-
+ .../mellanox/mlx5/core/diag/reporter_vnic.c   | 118 ++---
+ .../mellanox/mlx5/core/diag/reporter_vnic.h   |   6 +-
+ .../ethernet/mellanox/mlx5/core/en/health.c   | 185 ++-----
+ .../ethernet/mellanox/mlx5/core/en/health.h   |  14 +-
+ .../mellanox/mlx5/core/en/reporter_rx.c       | 426 ++++------------
+ .../mellanox/mlx5/core/en/reporter_tx.c       | 346 ++++---------
+ .../net/ethernet/mellanox/mlx5/core/en_rep.c  |   5 +-
+ .../net/ethernet/mellanox/mlx5/core/health.c  | 127 ++---
+ drivers/net/ethernet/mellanox/mlxsw/core.c    | 171 ++-----
+ drivers/net/ethernet/qlogic/qed/qed_devlink.c |   6 +-
+ drivers/net/netdevsim/health.c                | 118 ++---
+ drivers/staging/qlge/qlge_devlink.c           |  60 +--
+ include/net/devlink.h                         |  60 +--
+ net/devlink/health.c                          | 388 +++++----------
+ 19 files changed, 822 insertions(+), 2060 deletions(-)
+
 -- 
-2.25.1
+2.40.1
 
 
