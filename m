@@ -1,200 +1,337 @@
-Return-Path: <netdev+bounces-42001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 432267CC962
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:02:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ABBB7CC965
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B9AEB20FDC
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:02:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 662771C20B9C
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BEC41A96;
-	Tue, 17 Oct 2023 17:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B8D41A96;
+	Tue, 17 Oct 2023 17:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NfzfYyVm"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="G5x5TKzY"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3FB8475
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 17:02:49 +0000 (UTC)
-Received: from mail-vk1-xa35.google.com (mail-vk1-xa35.google.com [IPv6:2607:f8b0:4864:20::a35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 285E4B0
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:02:47 -0700 (PDT)
-Received: by mail-vk1-xa35.google.com with SMTP id 71dfb90a1353d-49dd3bb5348so2308094e0c.0
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:02:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697562166; x=1698166966; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=meOLKnGF8WJL8QjeAU5Bsneou80HA3ukuD4wiDVJQNM=;
-        b=NfzfYyVm0NffAoJJqAMEjtT8MRCRd9nBcYX602Zgo7bIurVgSuPMKcxunkl8vBnE8h
-         2mplbFNWx+7++gE7+gskZzjyfS0j4T8x5msriXKdfzGP0XCezBTtfQS2MGEe2SP02Wi/
-         na7ekbqLO/N3AZK8eQSAhb//XfwUDrN3LofGU4+VD2IMaWGhH59JpWWH2dHIZCqlhxIV
-         9DtpRKv8b/C47iNoMpleCeFBtwXrknwadi9O5zDp7ENFvWey8ul0C2g1T2SaqG4+6WYq
-         3x0o52KOJicNqtyWvhAvjIH38S/qPwJg5a9pxD4OaqWX159AOSJTWIOG7gmXUzoXFSQY
-         JE5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697562166; x=1698166966;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=meOLKnGF8WJL8QjeAU5Bsneou80HA3ukuD4wiDVJQNM=;
-        b=EgmfycaBXmVRzjcP+2358Q+0/brpejRZYWEH9P1nLJtlbJDgPLMXSH5HFJLqglAxyd
-         IIiikR+lHfGb00kmpr4T8ZRJ3NTx1fkkQR968dooidxCSY4WxEnxOcnWs0HhHYYwr2+R
-         r2SNkqw5ojC3YeOS2CTgf5Gjix0h+9+lmaxDSM1KHVQEwrvWPkjmIVBNLOIwl8ShKTVc
-         1+iLwmXRTRzsFXAt1N4CRZ3ok5bzvSpDwdUM01L8K5zQ1jOmMWp4jhg1YIs1kzsu7cWz
-         ixp08dYC4+jbI9EGPp2HDvHjMpO6OcWTYNlRmU2OTYwze2uiuL2UskMrI+4euI+S7xKE
-         3Ojw==
-X-Gm-Message-State: AOJu0Yw0WMJKs9m7d280Cp5QA9vGmbOhJ1qMDJdWEizo+iDTk7LUqT7+
-	6QuBFXVmWIs65wPGz2RECScfvx0zGf9nnBcabdaebw==
-X-Google-Smtp-Source: AGHT+IFKxW3fp61cEvFV4zIZHRMcfUgLA1DOw8xeH9LPsaW1WrBi9O5xa5z7KvkDVSnAv+yp6cbFNhvK7yasiSnwVGs=
-X-Received: by 2002:a1f:27c6:0:b0:4a1:58e0:a0db with SMTP id
- n189-20020a1f27c6000000b004a158e0a0dbmr2632544vkn.11.1697562166128; Tue, 17
- Oct 2023 10:02:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B6043AB6
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 17:03:15 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BABFDAB;
+	Tue, 17 Oct 2023 10:03:13 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39HH2Fj5026481;
+	Tue, 17 Oct 2023 17:03:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8/Zwfj6R1eK4/u/hdrrJ9mdLcyQSnZZX0l+rS01es1E=;
+ b=G5x5TKzYlpXaT7yw/g/356gObOCTDxNQdPXflJSxwlUp4pJE3Z+0IRt+AN2pW1w404vp
+ x6HaVt2bRS1sLpTgqG40452DNyrj2n2DCoiS5sdXv7M0tAqkNdBtZD8oHsuzjOBI7nFw
+ OYmYRRytkdiDDS6IrP7Am3tS28EdRv0UHBiSDklRGtAa9cuAHQsYMiNH15YVe717PGB2
+ ZMVDIrWuVHQOewUat/Ju//A0iJeIt99oxB8G8/GdRxbkPgSYZdi2WU2Ts3vbFOMiVbWu
+ 4ePLbvijLklo+EJmqkW7+I/1YiVVSncICFk2LwsPfa1LBC6QUBXviGEVc/6wb2PLIu2T 5g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tsxakg15u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Oct 2023 17:03:07 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39HH2jKo028820;
+	Tue, 17 Oct 2023 17:03:07 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tsxakg13k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Oct 2023 17:03:07 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39HEpNBO027177;
+	Tue, 17 Oct 2023 17:03:06 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tr6tka737-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Oct 2023 17:03:06 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39HH35SU18940424
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 17 Oct 2023 17:03:05 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2BA8058045;
+	Tue, 17 Oct 2023 17:03:05 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 192F958050;
+	Tue, 17 Oct 2023 17:03:03 +0000 (GMT)
+Received: from [9.171.53.134] (unknown [9.171.53.134])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 17 Oct 2023 17:03:02 +0000 (GMT)
+Message-ID: <2a72918a-2782-4d21-be50-2c3931957f16@linux.ibm.com>
+Date: Tue, 17 Oct 2023 19:03:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230830112600.4483-1-hdanton@sina.com> <f607a7d5-8075-f321-e3c0-963993433b14@I-love.SAKURA.ne.jp>
- <20230831114108.4744-1-hdanton@sina.com> <CANn89iLCCGsP7SFn9HKpvnKu96Td4KD08xf7aGtiYgZnkjaL=w@mail.gmail.com>
- <20230903005334.5356-1-hdanton@sina.com> <CANn89iJj_VR0L7g3-0=aZpKbXfVo7=BG0tsb8rhiTBc4zi_EtQ@mail.gmail.com>
- <20230905111059.5618-1-hdanton@sina.com> <CANn89iKvoLUy=TMxW124tiixhOBL+SsV2jcmYhH8MFh3O75mow@mail.gmail.com>
-In-Reply-To: <CANn89iKvoLUy=TMxW124tiixhOBL+SsV2jcmYhH8MFh3O75mow@mail.gmail.com>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Tue, 17 Oct 2023 22:32:34 +0530
-Message-ID: <CA+G9fYvskJfx3=h4oCTAyxDWO1-aG7S0hAxSk4Jm+xSx=P1dhA@mail.gmail.com>
-Subject: Re: selftests: net: pmtu.sh: Unable to handle kernel paging request
- at virtual address
-To: Eric Dumazet <edumazet@google.com>
-Cc: Hillf Danton <hdanton@sina.com>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, 
-	Netdev <netdev@vger.kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Dan Carpenter <dan.carpenter@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/5] net/smc: fix dangling sock under state
+ SMC_APPFINCLOSEWAIT
+To: "D. Wythe" <alibuda@linux.alibaba.com>, dust.li@linux.alibaba.com,
+        kgraul@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
+ <1697009600-22367-2-git-send-email-alibuda@linux.alibaba.com>
+ <e63b546f-b993-4e42-8269-e4d9afa5b845@linux.ibm.com>
+ <f8089b26-bb11-f82d-8070-222b1f8c1db1@linux.alibaba.com>
+ <745d3174-f497-4d6a-ba13-1074128ad99d@linux.ibm.com>
+ <20231013053214.GT92403@linux.alibaba.com>
+ <6666db42-a4de-425e-a96d-bfa899ab265e@linux.ibm.com>
+ <20231013122729.GU92403@linux.alibaba.com>
+ <2eabf3fb-9613-1b96-3ce9-993f94ef081d@linux.alibaba.com>
+Content-Language: en-GB
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <2eabf3fb-9613-1b96-3ce9-993f94ef081d@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: hqL54ccYXCtVdEAN9ZPfqccg0NAweWIG
+X-Proofpoint-GUID: 6vJuSgZiWss-CRFjdwk3GNIGvQeVx1Eb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-17_03,2023-10-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ impostorscore=0 lowpriorityscore=0 spamscore=0 suspectscore=0 bulkscore=0
+ clxscore=1015 adultscore=0 phishscore=0 malwarescore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310170144
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 5 Sept 2023 at 17:55, Eric Dumazet <edumazet@google.com> wrote:
->
-> On Tue, Sep 5, 2023 at 1:52=E2=80=AFPM Hillf Danton <hdanton@sina.com> wr=
-ote:
-> >
-> > On Mon, 4 Sep 2023 13:29:57 +0200 Eric Dumazet <edumazet@google.com>
-> > > On Sun, Sep 3, 2023 at 5:57=3DE2=3D80=3DAFAM Hillf Danton <hdanton@si=
-na.com>
-> > > > On Thu, 31 Aug 2023 15:12:30 +0200 Eric Dumazet <edumazet@google.co=
-m>
-> > > > > --- a/net/core/dst.c
-> > > > > +++ b/net/core/dst.c
-> > > > > @@ -163,8 +163,13 @@ EXPORT_SYMBOL(dst_dev_put);
-> > > > >
-> > > > >  void dst_release(struct dst_entry *dst)
-> > > > >  {
-> > > > > -       if (dst && rcuref_put(&dst->__rcuref))
-> > > > > +       if (dst && rcuref_put(&dst->__rcuref)) {
-> > > > > +               if (!(dst->flags & DST_NOCOUNT)) {
-> > > > > +                       dst->flags |=3D DST_NOCOUNT;
-> > > > > +                       dst_entries_add(dst->ops, -1);
-> > > >
-> > > > Could this add happen after the rcu sync above?
-> > > >
-> > > I do not think so. All dst_release() should happen before netns remov=
-al.
-> >
-> >         cpu2                    cpu3
-> >         =3D=3D=3D=3D                    =3D=3D=3D=3D
-> >         cleanup_net()           __sys_sendto
-> >                                 sock_sendmsg()
-> >                                 udpv6_sendmsg()
-> >         synchronize_rcu();
-> >                                 dst_release()
-> >
-> > Could this one be an exception?
->
-> No idea what you are trying to say.
->
-> Please give exact locations, instead of being rather vague.
->
-> Note that an UDP socket can not send a packet while its netns is dismantl=
-ed,
-> because alive sockets keep a reference on the netns.
 
-Gentle reminder.
-This is still an open issue.
 
-# selftests: net: pmtu.sh
-# TEST: ipv4: PMTU exceptions                                         [ OK =
-]
-# TEST: ipv4: PMTU exceptions - nexthop objects                       [ OK =
-]
-# TEST: ipv6: PMTU exceptions                                         [ OK =
-]
-# TEST: ipv6: PMTU exceptions - nexthop objects                       [ OK =
-]
-# TEST: ICMPv4 with DSCP and ECN: PMTU exceptions                     [ OK =
-]
-# TEST: ICMPv4 with DSCP and ECN: PMTU exceptions - nexthop objects   [ OK =
-]
-# TEST: UDPv4 with DSCP and ECN: PMTU exceptions                      [ OK =
-]
-# TEST: UDPv4 with DSCP and ECN: PMTU exceptions - nexthop objects    [ OK =
-]
-# TEST: IPv4 over vxlan4: PMTU exceptions                             [ OK =
-]
-# TEST: IPv4 over vxlan4: PMTU exceptions - nexthop objects           [ OK =
-]
-# TEST: IPv6 over vxlan4: PMTU exceptions                             [ OK =
-]
-# TEST: IPv6 over vxlan4: PMTU exceptions - nexthop objects           [ OK =
-]
-# TEST: IPv4 over vxlan6: PMTU exceptions                             [ OK =
-]
-<1>[  155.820793] Unable to handle kernel paging request at virtual
-address ffff247020442000
-<1>[  155.821495] Mem abort info:
-<1>[  155.821719]   ESR =3D 0x0000000097b58004
-<1>[  155.822046]   EC =3D 0x25: DABT (current EL), IL =3D 32 bits
-<1>[  155.822412]   SET =3D 0, FnV =3D 0
-<1>[  155.822648]   EA =3D 0, S1PTW =3D 0
-<1>[  155.822925]   FSC =3D 0x04: level 0 translation fault
-<1>[  155.823317] Data abort info:
-<1>[  155.823590]   Access size =3D 4 byte(s)
-<1>[  155.823886]   SSE =3D 1, SRT =3D 21
-<1>[  155.824167]   SF =3D 1, AR =3D 0
-<1>[  155.824450]   CM =3D 0, WnR =3D 0, TnD =3D 0, TagAccess =3D 0
-<1>[  155.824847]   GCS =3D 0, Overlay =3D 0, DirtyBit =3D 0, Xs =3D 0
-<1>[  155.825345] swapper pgtable: 4k pages, 48-bit VAs, pgdp=3D0000000041d=
-84000
-<1>[  155.827244] [ffff247020442000] pgd=3D0000000000000000, p4d=3D00000000=
-00000000
-<0>[  155.828511] Internal error: Oops: 0000000097b58004 [#1] PREEMPT SMP
-<4>[  155.829155] Modules linked in: vxlan ip6_udp_tunnel udp_tunnel
-act_csum libcrc32c act_pedit cls_flower sch_prio veth vrf macvtap
-macvlan tap crct10dif_ce sm3_ce sm3 sha3_ce sha512_ce sha512_arm64
-fuse drm backlight dm_mod ip_tables x_tables [last unloaded:
-test_blackhole_dev]
-<4>[  155.832289] CPU: 0 PID: 15 Comm: ksoftirqd/0 Not tainted 6.6.0-rc6 #1
-<4>[  155.832896] Hardware name: linux,dummy-virt (DT)
-<4>[  155.833927] pstate: 824000c9 (Nzcv daIF +PAN -UAO +TCO -DIT
--SSBS BTYPE=3D--)
-<4>[  155.834496] pc : percpu_counter_add_batch+0x24/0xcc
-<4>[  155.835735] lr : dst_destroy+0x44/0x1e4
-
-Links:
-- https://qa-reports.linaro.org/lkft/linux-mainline-master/build/v6.6-rc6/t=
-estrun/20613439/suite/log-parser-test/test/check-kernel-oops/log
-- https://qa-reports.linaro.org/lkft/linux-mainline-master/build/v6.6-rc6/t=
-estrun/20613439/suite/log-parser-test/tests/
-
-- Naresh
+On 17.10.23 04:00, D. Wythe wrote:
+> 
+> 
+> On 10/13/23 8:27 PM, Dust Li wrote:
+>> On Fri, Oct 13, 2023 at 01:52:09PM +0200, Wenjia Zhang wrote:
+>>>
+>>> On 13.10.23 07:32, Dust Li wrote:
+>>>> On Thu, Oct 12, 2023 at 01:51:54PM +0200, Wenjia Zhang wrote:
+>>>>>
+>>>>> On 12.10.23 04:37, D. Wythe wrote:
+>>>>>>
+>>>>>> On 10/12/23 4:31 AM, Wenjia Zhang wrote:
+>>>>>>>
+>>>>>>> On 11.10.23 09:33, D. Wythe wrote:
+>>>>>>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>>>>>>>
+>>>>>>>> Considering scenario:
+>>>>>>>>
+>>>>>>>>                   smc_cdc_rx_handler_rwwi
+>>>>>>>> __smc_release
+>>>>>>>>                   sock_set_flag
+>>>>>>>> smc_close_active()
+>>>>>>>> sock_set_flag
+>>>>>>>>
+>>>>>>>> __set_bit(DEAD)            __set_bit(DONE)
+>>>>>>>>
+>>>>>>>> Dues to __set_bit is not atomic, the DEAD or DONE might be lost.
+>>>>>>>> if the DEAD flag lost, the state SMC_CLOSED  will be never be 
+>>>>>>>> reached
+>>>>>>>> in smc_close_passive_work:
+>>>>>>>>
+>>>>>>>> if (sock_flag(sk, SOCK_DEAD) &&
+>>>>>>>>       smc_close_sent_any_close(conn)) {
+>>>>>>>>       sk->sk_state = SMC_CLOSED;
+>>>>>>>> } else {
+>>>>>>>>       /* just shutdown, but not yet closed locally */
+>>>>>>>>       sk->sk_state = SMC_APPFINCLOSEWAIT;
+>>>>>>>> }
+>>>>>>>>
+>>>>>>>> Replace sock_set_flags or __set_bit to set_bit will fix this 
+>>>>>>>> problem.
+>>>>>>>> Since set_bit is atomic.
+>>>>>>>>
+>>>>>>> I didn't really understand the scenario. What is
+>>>>>>> smc_cdc_rx_handler_rwwi()? What does it do? Don't it get the lock
+>>>>>>> during the runtime?
+>>>>>>>
+>>>>>> Hi Wenjia,
+>>>>>>
+>>>>>> Sorry for that, It is not smc_cdc_rx_handler_rwwi() but
+>>>>>> smc_cdc_rx_handler();
+>>>>>>
+>>>>>> Following is a more specific description of the issues
+>>>>>>
+>>>>>>
+>>>>>> lock_sock()
+>>>>>> __smc_release
+>>>>>>
+>>>>>> smc_cdc_rx_handler()
+>>>>>> smc_cdc_msg_recv()
+>>>>>> bh_lock_sock()
+>>>>>> smc_cdc_msg_recv_action()
+>>>>>> sock_set_flag(DONE) sock_set_flag(DEAD)
+>>>>>> __set_bit __set_bit
+>>>>>> bh_unlock_sock()
+>>>>>> release_sock()
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> Note : |bh_lock_sock|and |lock_sock|are not mutually exclusive. 
+>>>>>> They are
+>>>>>> actually used for different purposes and contexts.
+>>>>>>
+>>>>>>
+>>>>> ok, that's true that |bh_lock_sock|and |lock_sock|are not really 
+>>>>> mutually
+>>>>> exclusive. However, since bh_lock_sock() is used, this scenario you 
+>>>>> described
+>>>>> above should not happen, because that gets the sk_lock.slock. 
+>>>>> Following this
+>>>>> scenarios, IMO, only the following situation can happen.
+>>>>>
+>>>>> lock_sock()
+>>>>> __smc_release
+>>>>>
+>>>>> smc_cdc_rx_handler()
+>>>>> smc_cdc_msg_recv()
+>>>>> bh_lock_sock()
+>>>>> smc_cdc_msg_recv_action()
+>>>>> sock_set_flag(DONE)
+>>>>> bh_unlock_sock()
+>>>>> sock_set_flag(DEAD)
+>>>>> release_sock()
+>>>> Hi wenjia,
+>>>>
+>>>> I think I know what D. Wythe means now, and I think he is right on 
+>>>> this.
+>>>>
+>>>> IIUC, in process context, lock_sock() won't respect bh_lock_sock() 
+>>>> if it
+>>>> acquires the lock before bh_lock_sock(). This is how the sock lock 
+>>>> works.
+>>>>
+>>>>       PROCESS CONTEXT                                 INTERRUPT CONTEXT
+>>>> ------------------------------------------------------------------------
+>>>> lock_sock()
+>>>>       spin_lock_bh(&sk->sk_lock.slock);
+>>>>       ...
+>>>>       sk->sk_lock.owned = 1;
+>>>>       // here the spinlock is released
+>>>>       spin_unlock_bh(&sk->sk_lock.slock);
+>>>> __smc_release()
+>>>>                                                      
+>>>> bh_lock_sock(&smc->sk);
+>>>>                                                      
+>>>> smc_cdc_msg_recv_action(smc, cdc);
+>>>>                                                          
+>>>> sock_set_flag(&smc->sk, SOCK_DONE);
+>>>>                                                      
+>>>> bh_unlock_sock(&smc->sk);
+>>>>
+>>>>       sock_set_flag(DEAD)  <-- Can be before or after 
+>>>> sock_set_flag(DONE)
+>>>> release_sock()
+>>>>
+>>>> The bh_lock_sock() only spins on sk->sk_lock.slock, which is already 
+>>>> released
+>>>> after lock_sock() return. Therefor, there is actually no lock between
+>>>> the code after lock_sock() and before release_sock() with 
+>>>> bh_lock_sock()...bh_unlock_sock().
+>>>> Thus, sock_set_flag(DEAD) won't respect bh_lock_sock() at all, and 
+>>>> might be
+>>>> before or after sock_set_flag(DONE).
+>>>>
+>>>>
+>>>> Actually, in TCP, the interrupt context will check 
+>>>> sock_owned_by_user().
+>>>> If it returns true, the softirq just defer the process to backlog, 
+>>>> and process
+>>>> that in release_sock(). Which avoid the race between softirq and 
+>>>> process
+>>>> when visiting the 'struct sock'.
+>>>>
+>>>> tcp_v4_rcv()
+>>>>            bh_lock_sock_nested(sk);
+>>>>            tcp_segs_in(tcp_sk(sk), skb);
+>>>>            ret = 0;
+>>>>            if (!sock_owned_by_user(sk)) {
+>>>>                    ret = tcp_v4_do_rcv(sk, skb);
+>>>>            } else {
+>>>>                    if (tcp_add_backlog(sk, skb, &drop_reason))
+>>>>                            goto discard_and_relse;
+>>>>            }
+>>>>            bh_unlock_sock(sk);
+>>>>
+>>>>
+>>>> But in SMC we don't have a backlog, that means fields in 'struct sock'
+>>>> might all have race, and this sock_set_flag() is just one of the cases.
+>>>>
+>>>> Best regards,
+>>>> Dust
+>>>>
+>>> I agree on your description above.
+>>> Sure, the following case 1) can also happen
+>>>
+>>> case 1)
+>>> -------
+>>> lock_sock()
+>>> __smc_release
+>>>
+>>> sock_set_flag(DEAD)
+>>> bh_lock_sock()
+>>> smc_cdc_msg_recv_action()
+>>> sock_set_flag(DONE)
+>>> bh_unlock_sock()
+>>> release_sock()
+>>>
+>>> case 2)
+>>> -------
+>>> lock_sock()
+>>> __smc_release
+>>>
+>>> bh_lock_sock()
+>>> smc_cdc_msg_recv_action()
+>>> sock_set_flag(DONE) sock_set_flag(DEAD)
+>>> __set_bit __set_bit
+>>> bh_unlock_sock()
+>>> release_sock()
+>>>
+>>> My point here is that case2) can never happen. i.e that 
+>>> sock_set_flag(DONE)
+>>> and sock_set_flag(DEAD) can not happen concurrently. Thus, how could
+>>> the atomic set help make sure that the Dead flag would not be 
+>>> overwritten
+>>> with DONE?
+>> I agree with you on this. I also don't see using atomic can
+>> solve the problem of overwriting the DEAD flag with DONE.
+>>
+>> I think we need some mechanisms to ensure that sk_flags and other
+>> struct sock related fields are not modified simultaneously.
+>>
+>> Best regards,
+>> Dust
+> 
+> It seems that everyone has agrees on that case 2 is impossible. I'm a 
+> bit confused, why that
+> sock_set_flag(DONE) and sock_set_flag(DEAD) can not happen concurrently. 
+> What mechanism
+> prevents their parallel execution?
+> 
+> Best wishes,
+> D. Wythe
+> 
+>>
+> 
+In the smc_cdc_rx_handler(), if bh_lock_sock() is got, how could the 
+sock_set_flag(DEAD) in the __smc_release() modify the flag concurrently? 
+As I said, that could be just kind of lapse of my thought, but I still 
+want to make it clarify.
 
