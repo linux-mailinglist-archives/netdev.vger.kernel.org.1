@@ -1,114 +1,274 @@
-Return-Path: <netdev+bounces-41985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 061F27CC870
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:11:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 785B87CC87F
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:14:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACDA128189F
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:10:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D8851C20BED
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77ED945F6A;
-	Tue, 17 Oct 2023 16:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6790745F6D;
+	Tue, 17 Oct 2023 16:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="udMVZrhV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OcmyBj01"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908B745F65
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:10:52 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFF26F5
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:10:48 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-407da05f05aso6079815e9.3
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:10:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697559047; x=1698163847; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GOZy9r3gitQDazXMraa4da2VGsolgs7iqty+tLP15Ug=;
-        b=udMVZrhVHBfong0gNbwFNoEnL9Ars+M0rwsUF1hwTifYGcXLyJik2YCGbekHbSds/J
-         U4Jz70WvVyXWm7j09Fo7xIi6ww3r6ZGizLERI8kIy7Tof52YQs2jIaU/YJVMTC3nG7P7
-         wfweRvzBQmrRSbesmhKKIH7DfuV+3DMIl4CoKLEhwR8H2+pHzUMGGf5B1pigvG0RosVT
-         1xdspdVeiqW6uDS96v290Y4gvQh9pgQpVj6NRHP+zypTyWPvIb64oJrDSpx5rdLCBuGI
-         nMTjvvGqcNbVpn2BZac14E7vemJE0a5369MRoKoSKSuUoMkTEyrf0+RDNPUNHGmlG9lO
-         +lRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697559047; x=1698163847;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GOZy9r3gitQDazXMraa4da2VGsolgs7iqty+tLP15Ug=;
-        b=LDVS9zke73QqtCnzANda2S8mCU1bLZE/LmgGfJezeLPu5G8uyjxNTUi+FAFS5iJk5u
-         4n7s0E1Isemz94rhtDHMGVWaliHd8UnztMTbtOnSQX59NxG0ntAkDNiW1elQR8r9lUVZ
-         6y08cAjyKXqgaXYoX8qrWaR5mF5fJjv9UJQ2TlPvTHic5/iAUnwB3qOCi8vbwzgT93EE
-         WMmkB3CwEf9yO4w7r5X0+4WlziXMsogFWqo005GpxUjdFRLsPZnb831LND5DDDbjbmBR
-         cucD7P16TvbTEcMIqldSGEA8OJXAqv0vi/diB1PKbKMzURF/a6wf6GabTaCen02N4Iah
-         +x5g==
-X-Gm-Message-State: AOJu0YzEKA9O+QBHZZqAysNqfTp0MMvm0S3+TWYjLhis/XYqq+5g7Rmt
-	MXdTGS7VmoqTfuY99lzZ4L5VTM0TcqW6SNhZDFI=
-X-Google-Smtp-Source: AGHT+IHUKgmUBlF1bXwGVmAYjKZFMFJSpGCM+V9H0vQquCa+SmNm4hNAQiCyJk74htxwV/xXTuAp/g==
-X-Received: by 2002:a05:600c:1d13:b0:406:5301:317c with SMTP id l19-20020a05600c1d1300b004065301317cmr2017984wms.6.1697559047206;
-        Tue, 17 Oct 2023 09:10:47 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id fj7-20020a05600c0c8700b0040772138bb7sm10249419wmb.2.2023.10.17.09.10.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 09:10:46 -0700 (PDT)
-Date: Tue, 17 Oct 2023 18:10:44 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH net 3/5] net: avoid UAF on deleted altname
-Message-ID: <ZS6yBP+aZk67q8Tc@nanopsycho>
-References: <20231016201657.1754763-1-kuba@kernel.org>
- <20231016201657.1754763-4-kuba@kernel.org>
- <ZS485sWKKb99KrBx@nanopsycho>
- <20231017075259.5876c644@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B067245F65;
+	Tue, 17 Oct 2023 16:13:53 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D720107;
+	Tue, 17 Oct 2023 09:13:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697559232; x=1729095232;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=QzeH4b7Rg9lDeMUmK4zWOn8d8SiQjYZYRiGYVbeHDhk=;
+  b=OcmyBj01AVnNkQyzqWVby9cNFPzLv8N+s1sKQ4U96RYwuXJV29Cho0jx
+   GsSpUpesD+Zm9ga5DnkTE7NaFRdAfJl18knwqbODbTfv9AFW1j+y620dE
+   vnSVYQM/D3H9aSbXBUaA7cD8ZGmRZl6ktOhFmpdq26GgvHZwtnU9C1Jx+
+   IWnN1PRtFCDnkhO+gbjspZ5KFYByMUDQfIGPYUOBiDb5wXUFRivc4lGrY
+   zggy0uPU6XJJIZmWo1M4U0T2HDZ4vpa5DAucvSS+r5UmL4KMbJ9Idwk0V
+   zkPKrExF2YZtwYesAJZvLNX3QK1rWndyobg1qe9HuYg2yVABH9SPjaNvZ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="472042621"
+X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
+   d="scan'208";a="472042621"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 09:13:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="899961234"
+X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
+   d="scan'208";a="899961234"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Oct 2023 09:11:49 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 17 Oct 2023 09:13:50 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 17 Oct 2023 09:13:50 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Tue, 17 Oct 2023 09:13:50 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Tue, 17 Oct 2023 09:13:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NuyBib+wXzddzyS1fZUsFWZanO3FAmVmfBgBRaHwmbrl7+hRtc2e3H3EU0Z/ei5haz7rbaZpOfXIMfjUj/91EPw9mQ02URA3WCqvEfAq7giIEFsdsZZ5NPz0zdtLSJIlZHUBNS2pinekI6s7zrZ0FqfJ5SVooCoEU2wwbh3julUNLBhTKkSdw6yma/nAC2s0VCGU39b3QsntOhvLCkpl3QfIZxfiKIiGFAYhm8TZjhnrNHSRU+3NFaiMSLW1H/ecOo23x+9pk4F0JGCyBP14ajz+AJ+HdU6QhBGfVJb7XRZfk7FLai3eK0uqWe4qdRxA9eRVBgfhi30Dp4oB8pAbtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+4qI4WzmiBXk18YhZLT+JX+q/CQoPq1Nyj75D4++kSs=;
+ b=X124m57XQOZJEP1DLD7JV51Zg74u3AsKI0WgK+1qLyqvtlvKUe9PN4U2q90Hz9D9LeDYEc9jL8/lMtvK0lpg2G9OqwVZAtvkY+Q9R5PwHfHaSR6umbv7QIZh+mvixtwpSgrVnWwvCvEKzvEGjBjFlgSXtMNj7hotJnJZGjT53BExKXL85li0qUH3IZy9bOBR/3k0iPv0qiQ63YsVcuknRtLAemc8ppBlgPBImoQ0l8thd+i0EK+6S/sAcq7HdhjzolPIA8S6x2HnjEaZuuBhvec8nmmFRcmu6gU6TtiiDs25FvuSfAy/3AbZ840btJWqD3SJaigkVLt1gqtn4056LA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ CO1PR11MB5043.namprd11.prod.outlook.com (2603:10b6:303:96::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6886.36; Tue, 17 Oct 2023 16:13:46 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::551d:c6c9:7d7:79cc]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::551d:c6c9:7d7:79cc%7]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
+ 16:13:46 +0000
+Date: Tue, 17 Oct 2023 18:13:30 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
+	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
+	<haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, Anatoly Burakov
+	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
+	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
+	<alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>,
+	Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>,
+	<magnus.karlsson@intel.com>
+Subject: Re: [PATCH bpf-next v6 07/18] ice: Support XDP hints in AF_XDP ZC
+ mode
+Message-ID: <ZS6yqqMZD1mojQNr@boxer>
+References: <20231012170524.21085-1-larysa.zaremba@intel.com>
+ <20231012170524.21085-8-larysa.zaremba@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231012170524.21085-8-larysa.zaremba@intel.com>
+X-ClientProxiedBy: FR3P281CA0174.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a0::17) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231017075259.5876c644@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CO1PR11MB5043:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0a036b9d-3a69-468f-67bf-08dbcf2c0a1e
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BLwaVLQg9H6XYOtT4chsTsZzHsXHpeDya775cQ5jI32K4jLrNCH/rTVntJ2PAaOp91h2cUL7wTNiNMUb6vDf48XZEwDgoLcBdMSyjLYTIIMKM/0dxXhTkz27hvo7a5hAeFv4QmLRzJSbkuG0fwhE2++ffWWBZwOLikBnBvFpOMCFUYfThgSL5846cMKPOwdGsfyHYa+VjEVrty40OWvaBZrs8SBXCsulYR944uxOnt4AzKpmmELmtMz5zQRXcEp+oAxmaffr5M1m7gxNWHZ8aX+TgopHMS6P7Tds4Wv/CB3bi3Y0Bv7Av8c5CwoQENJh5S86xglZIIfKTJlt3F68DQ0qG1zgDsegbQUqSRfrpYHmmbhAkf+5tYsqPYVLUhiamd+KO2HK7iYpauEYlOFxfWWroE2trU0TtE1+QTo2Xmj2X8ntEVERgAwNWiplbjZS3yxuxx9/vOQZIObyUnNwi77mgJidG3JCaFGiDN4X9nG59ZFc2TUuTlJTNXLerfovR35RQqNEi5S+uWdaqAoiEzmarpremGXhtqKlVt0MEzXsqhBSunJWmwA76f+UFbH/
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(366004)(136003)(376002)(39860400002)(346002)(230922051799003)(1800799009)(64100799003)(186009)(451199024)(83380400001)(38100700002)(6666004)(6506007)(9686003)(6512007)(26005)(107886003)(82960400001)(478600001)(8936002)(66556008)(66476007)(54906003)(316002)(6636002)(41300700001)(66946007)(6862004)(4326008)(8676002)(7416002)(6486002)(86362001)(2906002)(33716001)(44832011)(5660300002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?uYX4P9/SI5/ygEjcMCCiQGXScUYdretYMRV2bOEdLe4tzC/piP83wtS9aU5n?=
+ =?us-ascii?Q?T9B0PdZ8cNudGyhkymCLssi31CFH56LtEwYIQGpBt8VvWCTh1Mlpp4KuMzSu?=
+ =?us-ascii?Q?H6TGGSaxNewD1JchUtFxnwRN3mP1nyGyzAQFyQ42tVbQZu7LfhkUekuu4Pgd?=
+ =?us-ascii?Q?3uaSa6gHZcvjm/KglN9rmHgbmiuHtTof/jrNA+fCaCqotrJrEdFQuc9Hoqc9?=
+ =?us-ascii?Q?t34VDtN1CFwUbIvEbKe3nbA6DN2Y1vrdYxn0sAZjlaCOfaWFAm/KphC2XrGr?=
+ =?us-ascii?Q?1cEV34G5TlHJXFIitpg7EaKHZdySrDIPXBm3RasVXnq6/Fdsn7K0gmM5N7m2?=
+ =?us-ascii?Q?VWIxciEVzJcxEHPjBlnfSu3jYBY0x9yxlUEjMCNUQ3GIYRpZmhtzIA8dO2Mu?=
+ =?us-ascii?Q?lWtFsA8TJelzh7NarAJgN96rzyDsH9st/m1kou1K4SF9LBXuyn74LdE0AOon?=
+ =?us-ascii?Q?if06slSZ8Wx9I/YTWmlqmBdEbxl98vfaSvXim9w861g2bIVaYp5O3BA2pYjU?=
+ =?us-ascii?Q?SA1RN3AIeXmth/XJSwJsOw2ASYTumWI1sp0fajPKR+McujITPiPmvRkHTLGo?=
+ =?us-ascii?Q?XweVIcHYaZNghNjP6wNpqM6xVabAx8aARkrC/5NgaFLnydLbi8RD/mGFGMN1?=
+ =?us-ascii?Q?Q6ZR5acNSqNd+V0bkUNjJdXFBdpXcnPC8HeaJCJ2sda2N6eYVCloQpoDSlmf?=
+ =?us-ascii?Q?gkFXOmnordYuUg7eFpQv8u8Sva1mxOoN6WwnFnT2UNzfJrd+2Y3gZgcsoSni?=
+ =?us-ascii?Q?rBQlyW6tanVsKKK5OKwfbsmAFZ4XIVQjriFYMzRiEyAoDav9XhDkX0XSfVH4?=
+ =?us-ascii?Q?fsy+FOlqq/WmTbID3YTmbGSWSCJg7WQ7VS8FjrZJyOD4F98pPZoxcZknRZYT?=
+ =?us-ascii?Q?Q6+wtc6kmDqgpevAgAjGjxQxu0hicI9gT9ts69+if0t/F0SEMv/IdvjYG1tO?=
+ =?us-ascii?Q?csmI68Y2Q2UtjxpXysXEpNe0HqrfhMcdTq1YlPAvUJjbaQjB/ptbfkT2aaSL?=
+ =?us-ascii?Q?Fedvr3hmsMkFAyez+wcQQVIMDo+Ri3kaDQ19i4vsLxHbpPzIgr4iU5SRkPLb?=
+ =?us-ascii?Q?E8KKc/omFNMKGlba4FGSG1GiJC0wL+iFw4b9ji6G6S/0UZ6k+NfJHEvC7hz6?=
+ =?us-ascii?Q?jbvqERwFhA1l6W9IJoAez/eASbXF4mNevMdMdr8I+wLDwEgW2chYQQ6bV9JY?=
+ =?us-ascii?Q?BNGpvrySCT/IdbDTOadOsQ9nbByEOjJcLwH/nqcgS4jXmvrkGYp7EEhSWO+M?=
+ =?us-ascii?Q?xLqEdeTiDukLZymqZ+zn3q4lfOcUDfvmcS88MkySrEzW1yjpCH0l/RUQJkf0?=
+ =?us-ascii?Q?CD43ntDMmTjpE2tf8Qu6OypFvJ9cfGc1c2fugIYIADqy1uwnwnZJ6nLPOqdP?=
+ =?us-ascii?Q?30Hquu7Q4f5+EVGzI25ueHsrLhX5SKPiLjXxMznAAoh+QpdfVKEkcgvyRnkn?=
+ =?us-ascii?Q?ArPYvjJLNlhmy6Z9xisRi2tabBsJZ4AoJLavH1S3JelOey/F+lBqvg8bN1Bl?=
+ =?us-ascii?Q?dsGO8I10mlizpZiAg6/3DQ9kaH9Xrkce/u2Ew8TXfYFiF1nAiPaz0w7m/bCY?=
+ =?us-ascii?Q?pQYB4311g3F38OwlDoDhaGlcCxpgKqLpin20ntuYkw5a4e9VS+q4lQ+j+spM?=
+ =?us-ascii?Q?gg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a036b9d-3a69-468f-67bf-08dbcf2c0a1e
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 16:13:46.0602
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lpr2m68y6doAKmXGzEIkYyjVLlaVP4A6gtIH14Pk3PHm/n6yT7IfoLFBRZy2xuNgrwzqo6iSsgX6O8qB7jZe73IR4oVbvHURaiN3G+eGQaM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5043
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Oct 17, 2023 at 04:52:59PM CEST, kuba@kernel.org wrote:
->On Tue, 17 Oct 2023 09:51:02 +0200 Jiri Pirko wrote:
->> >but freed by kfree() with no synchronization point.
->> >
->> >Because the name nodes don't hold a reference on the netdevice
->> >either, take the heavier approach of inserting synchronization  
->> 
->> What about to use kfree_rcu() in netdev_name_node_free()
->> and treat node_name->dev as a rcu pointer instead?
->> 
->> struct net_device *dev_get_by_name_rcu(struct net *net, const char *name)
->> {
->>         struct netdev_name_node *node_name;
->> 
->>         node_name = netdev_name_node_lookup_rcu(net, name);
->>         return node_name ? rcu_deferecence(node_name->dev) : NULL;
->> }
->> 
->> This would avoid synchronize_rcu() in netdev_name_node_alt_destroy()
->> 
->> Btw, the next patch is smooth with this.
->
->As I said in the commit message, I prefer the explicit sync.
->Re-inserting the device and taking refs already necessitate it.
+On Thu, Oct 12, 2023 at 07:05:13PM +0200, Larysa Zaremba wrote:
+> In AF_XDP ZC, xdp_buff is not stored on ring,
+> instead it is provided by xsk_buff_pool.
+> Space for metadata sources right after such buffers was already reserved
+> in commit 94ecc5ca4dbf ("xsk: Add cb area to struct xdp_buff_xsk").
+> This makes the implementation rather straightforward.
+> 
+> Update AF_XDP ZC packet processing to support XDP hints.
+> 
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_xsk.c | 34 ++++++++++++++++++++++--
+>  1 file changed, 32 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
+> index ef778b8e6d1b..6ca620b2fbdd 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_xsk.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
+> @@ -752,22 +752,51 @@ static int ice_xmit_xdp_tx_zc(struct xdp_buff *xdp,
+>  	return ICE_XDP_CONSUMED;
+>  }
+>  
+> +/**
+> + * ice_prepare_pkt_ctx_zc - Prepare packet context for XDP hints
+> + * @xdp: xdp_buff used as input to the XDP program
+> + * @eop_desc: End of packet descriptor
+> + * @rx_ring: Rx ring with packet context
+> + *
+> + * In regular XDP, xdp_buff is placed inside the ring structure,
+> + * just before the packet context, so the latter can be accessed
+> + * with xdp_buff address only at all times, but in ZC mode,
+> + * xdp_buffs come from the pool, so we need to reinitialize
+> + * context for every packet.
+> + *
+> + * We can safely convert xdp_buff_xsk to ice_xdp_buff,
+> + * because there are XSK_PRIV_MAX bytes reserved in xdp_buff_xsk
+> + * right after xdp_buff, for our private use.
+> + * XSK_CHECK_PRIV_TYPE() ensures we do not go above the limit.
+> + */
+> +static void ice_prepare_pkt_ctx_zc(struct xdp_buff *xdp,
+> +				   union ice_32b_rx_flex_desc *eop_desc,
+> +				   struct ice_rx_ring *rx_ring)
+> +{
+> +	XSK_CHECK_PRIV_TYPE(struct ice_xdp_buff);
+> +	((struct ice_xdp_buff *)xdp)->pkt_ctx = rx_ring->pkt_ctx;
 
-You don't need any ref, just rcu_dereference() the netdev pointer.
+I will be loud thinking over here, but this could be set in
+ice_fill_rx_descs(), while grabbing xdp_buffs from xsk_pool, should
+minimize the performance overhead.
 
-Synchronize_rcu() should be avoided if possible.
+But then again you address that with static branch in later patch.
+
+OTOH, I was thinking that we could come with xsk_buff_pool API that would
+let drivers assign this at setup time. Similar what is being done with dma
+mappings.
+
+Magnus, do you think it is worth the hassle? Thoughts?
+
+Or should we advise any other driver that support hints to mimic static
+branch solution?
+
+> +	ice_xdp_meta_set_desc(xdp, eop_desc);
+> +}
+> +
+>  /**
+>   * ice_run_xdp_zc - Executes an XDP program in zero-copy path
+>   * @rx_ring: Rx ring
+>   * @xdp: xdp_buff used as input to the XDP program
+>   * @xdp_prog: XDP program to run
+>   * @xdp_ring: ring to be used for XDP_TX action
+> + * @rx_desc: packet descriptor
+>   *
+>   * Returns any of ICE_XDP_{PASS, CONSUMED, TX, REDIR}
+>   */
+>  static int
+>  ice_run_xdp_zc(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+> -	       struct bpf_prog *xdp_prog, struct ice_tx_ring *xdp_ring)
+> +	       struct bpf_prog *xdp_prog, struct ice_tx_ring *xdp_ring,
+> +	       union ice_32b_rx_flex_desc *rx_desc)
+>  {
+>  	int err, result = ICE_XDP_PASS;
+>  	u32 act;
+>  
+> +	ice_prepare_pkt_ctx_zc(xdp, rx_desc, rx_ring);
+>  	act = bpf_prog_run_xdp(xdp_prog, xdp);
+>  
+>  	if (likely(act == XDP_REDIRECT)) {
+> @@ -907,7 +936,8 @@ int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget)
+>  		if (ice_is_non_eop(rx_ring, rx_desc))
+>  			continue;
+>  
+> -		xdp_res = ice_run_xdp_zc(rx_ring, first, xdp_prog, xdp_ring);
+> +		xdp_res = ice_run_xdp_zc(rx_ring, first, xdp_prog, xdp_ring,
+> +					 rx_desc);
+>  		if (likely(xdp_res & (ICE_XDP_TX | ICE_XDP_REDIR))) {
+>  			xdp_xmit |= xdp_res;
+>  		} else if (xdp_res == ICE_XDP_EXIT) {
+> -- 
+> 2.41.0
+> 
 
