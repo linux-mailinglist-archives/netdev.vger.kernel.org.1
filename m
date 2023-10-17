@@ -1,157 +1,123 @@
-Return-Path: <netdev+bounces-41752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E12E57CBD20
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:11:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D59957CBD3E
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:21:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D633281877
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:11:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48332B20BA7
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC9938FA9;
-	Tue, 17 Oct 2023 08:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YxQei0w0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7523AC24;
+	Tue, 17 Oct 2023 08:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2881EC2CD
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 08:11:38 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2072.outbound.protection.outlook.com [40.107.223.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16FA993;
-	Tue, 17 Oct 2023 01:11:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QxtqxnwGAxuRo/DFLC4U0yMv8aaeg5I6erqr/OqQDGSTHo4t5Cry7olkhie3cF0s9ZAlZ5VDCrSRQsfp7FX4e2q6VrBN4fWu5KPFGpuw3o1vC/h+bEl4fw1kOX3YyqIjrKF1Kq8bbxDvrSQtVVEeaixhiLylYggOgpbF7zxR4Yh3Zkgrt47nlnKvRWxy2Wr3bEBykoBP5t/+qcb5CIeXdXNVaBqoNr/bpmHREjrKdbY14wN2IP1pJeJhCFI27DP6TPqvj1JRnR2hy6TvWG2MNxQJPUZCQzIQx07eJPQKdn8rCzwqcI/NjqjHSPUUF7EzeeWt6pPDiMx5QS53PBzEkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j4T+JoLj2ZzuDj3d75na6qY4knZE3cPRlR/JKGD+th4=;
- b=F7tn1vn4qWdlUxpoxjjqnI2eU7KW3OdLtMXmp/aRnNI0tksewy5HKN3E3zH2MueXUNcMcu6fHLCZd8VDPcqsSVrKBYBHrwZvCYNJs2VIoxZUBA+uoVgfajiRfUfoQTiguLxRs2NUCIuE09GAnZK8iKhG5UtPCmofzPQ9GGgltTcjbKneYd6wosfjdd8MPiSa8w25BqII/Jpyk5OivCTHSjKdbLZ/I6TWjCdkF1Zxty9yEsHK3aKpe5aYf45jln8jR/nyq+mzzvogZvGSh35P7mTv0gqck7nl8xDYQKCFf5ImdM9Dg5Mj0itN3Oo91dMQnX1dHSXCFSreqaz9FYR8uA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j4T+JoLj2ZzuDj3d75na6qY4knZE3cPRlR/JKGD+th4=;
- b=YxQei0w0r57E4U8fwsjPSEm+u8IzoLcwNVTlffEae0+0XmfL5io4pZc+oDNaBcU3WLBKFuoGBabbGb7AQYRJDifgA0fFB76lh+SnAMoEAsLSr0oF0xcquqWqS8OGZuyb9AK4Y2uj9FOgi8w8JGdCUxFAFlkWx+Q3Dq8eWQtvUgG9ezkf77ggZNIxLiO/f3YftFf3D6jS0WXEYXoReqNmKbgqz2u8J/tSqow/kOyalEoDFl8FYjLmaVkYKPQMYSWWHbGCOqCZX3Gj6CxEtWNeDEdBaZvAjcviC59L2nms0wQHInVV6YX/RMDPUtHkijjaGRVPX09QAl+J588nMbkIPQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by LV2PR12MB6014.namprd12.prod.outlook.com (2603:10b6:408:170::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Tue, 17 Oct
- 2023 08:11:34 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::628c:5cf4:ebb2:77f]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::628c:5cf4:ebb2:77f%6]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
- 08:11:34 +0000
-Date: Tue, 17 Oct 2023 11:11:24 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, linux-pci@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	bhelgaas@google.com, alex.williamson@redhat.com, lukas@wunner.de,
-	petrm@nvidia.com, jiri@nvidia.com, mlxsw@nvidia.com
-Subject: Re: [RFC PATCH net-next 02/12] devlink: Hold a reference on parent
- device
-Message-ID: <ZS5BrH1AOVJyt6ac@shredder>
-References: <20231017074257.3389177-1-idosch@nvidia.com>
- <20231017074257.3389177-3-idosch@nvidia.com>
- <ZS4+InoncFqPVW72@nanopsycho>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZS4+InoncFqPVW72@nanopsycho>
-X-ClientProxiedBy: TLZP290CA0011.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:9::19) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C257B3AC12
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 08:20:52 +0000 (UTC)
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74957B6;
+	Tue, 17 Oct 2023 01:20:51 -0700 (PDT)
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-5a7d9d357faso68247557b3.0;
+        Tue, 17 Oct 2023 01:20:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697530850; x=1698135650;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CdUY7Js3MyY72r3pkukYQuEPFyg4hUCkNQ1ukw9r4To=;
+        b=MC3l/+bzsWk6kp5jPaWygddVbO8ijVIy4T4uwnpewezrHC5e5kiveg8UGjkVqtdt/a
+         rosWdqqk6Q6N0QDyDZ8a365huAnIx076FMEPAGL9cOM3ABND+nKtSUvaNuwsFAKsyQs2
+         J//VU6bJBsdkGhyTKaQAmt8MxH1PBH2fp3dGOr6laLbd5iAjkzJGbx+o0IRL54wP8pPh
+         LDP+7GAwbx41WRx/7NKBVWqVL3q4iIItjVQrGq/WRw3LJuUwiCcGSYcKIPZsAOJ1v1cC
+         s2JMNCcoU6YCuHy7XaicW1pt8bKjADlaPsVlF5uOrArn9R1ZVoKOmwodPfAKdT2qM7lF
+         Gjwg==
+X-Gm-Message-State: AOJu0YxovUglmGp+EG21RwEEbvyaKsMkLYp83ub3ECBV2RU+awu9gZ1/
+	n2z9k5eKVYCwbV2OwJBeVGdjBCTUigblXw==
+X-Google-Smtp-Source: AGHT+IEJzhaLN4am3ds7V2gEybMX6p2WmlkWY75ltCA4Ap0dqKr5vQ3GvjxNarSW0iG9TUkcB2sIzg==
+X-Received: by 2002:a0d:d50a:0:b0:5a7:be9f:bd19 with SMTP id x10-20020a0dd50a000000b005a7be9fbd19mr1562588ywd.44.1697530850572;
+        Tue, 17 Oct 2023 01:20:50 -0700 (PDT)
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com. [209.85.128.181])
+        by smtp.gmail.com with ESMTPSA id m190-20020a0dcac7000000b0059c2e3b7d88sm431284ywd.12.2023.10.17.01.20.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 01:20:48 -0700 (PDT)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5a7d532da4bso68024357b3.2;
+        Tue, 17 Oct 2023 01:20:47 -0700 (PDT)
+X-Received: by 2002:a81:ab41:0:b0:59f:4dcd:227e with SMTP id
+ d1-20020a81ab41000000b0059f4dcd227emr1543078ywk.37.1697530847545; Tue, 17 Oct
+ 2023 01:20:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|LV2PR12MB6014:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1835f0e5-8902-4975-8bbd-08dbcee8ad9b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	CgfE173nmDOeze4pg8k0f4h2JN/khMTVUJklJnmr5kni1XjJYRvr/P55mR1EKk1berTOSOs4B5MDnTIuabY3YXHRQxwcrtu11TQ/2mqOEPdmFu8O3NO/Cy8bwDr2hEFXlrEQ8AleGU7QHQN7ANapcuDImv1AmBrxhdb3oRNOhxZHYkgUD14sxGI7vAlnjgV5617LM2h+DWd4Ri7TMEoHcnXAk+Pt4C3tYOpPBx2G0bZ+r6ZGezkBQC+KXFMczPHFkIQHoN5BrZCu3SaFKIryZQ5bA/0WQTrecjaqeJLUID5ixNibLIZM0beaU1LV6AgXbhjtFac2G+IwAL0PZ4HhDtkgKFMdPeQjhLQCiJmRuniRVPlJnSZf1GuuCu2b5FoINSqutbk+KI6JY1Z+V4LdnkB71qm8O45GYWlhQXIOXK50DoASoaLs4pQoBX0wtJOmYVqYliFLhPsON8+IcqEXj49mo/UTIESuskndN23GPPZyYQsRNFDINOtVOpIBEeqOcWN+Md0OE+6CK8DqatUFJEU3NjpgcMQ7vOu8Y1735QmGHr0nLEmbYWDeZoCmEcupT2D9S1orF6N5zQWbaOayubh3hCKRY3SXt5z3iLqK9Qfc1XuUW53w2ti3ztofKfPhTwO+IU6eRn9S67RFvlHCOQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(376002)(346002)(396003)(136003)(366004)(230922051799003)(1800799009)(64100799003)(186009)(451199024)(6486002)(7416002)(66556008)(2906002)(66476007)(9686003)(6666004)(38100700002)(26005)(83380400001)(107886003)(4326008)(8936002)(8676002)(5660300002)(41300700001)(6512007)(478600001)(966005)(6916009)(6506007)(66946007)(33716001)(86362001)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2W44znea0tuJGL/3pr9RSGoda8+gjMEi3v8CvGwDz+uZJdSts0s+vpvKafS1?=
- =?us-ascii?Q?LxuQBknNbbyuhJKUgmxKIsMwp8veMe6D6FtV4nzyK59W33zdgmHu4l/C2+E8?=
- =?us-ascii?Q?dFbUc0wkloJj+/w6mJG9vb4pfWTnWUMiGcw6UuG/+wQaaN58Q52W27igT/QQ?=
- =?us-ascii?Q?VaiQgVgrSC2/LSZLpD6Nj/TRx0h/4GvNdNv9aC5XSYi5L0SAzr7sX1KLeZmk?=
- =?us-ascii?Q?TD6tnskBWbgAQSgDI3OK3nFH+JjbLoiDGZhmM2xyKwVIYUefkS52PSGRPrJH?=
- =?us-ascii?Q?K47O3e1o0Qh7uZwrTxidvffzk+m697vBxGjDwKb59TcOuR8gH01LGGg+MGx1?=
- =?us-ascii?Q?J6USPTGX9QwtZYvEiFU6FroV6vCS5Yj2jMFMzg1zHUVuL3PnwJqwgMRlLYXy?=
- =?us-ascii?Q?0gFc7Rt+vxH6zULWbOzsRp7VmNrV7XRGtialuwh3BJa+TT7wqsz/ZjEGzrK8?=
- =?us-ascii?Q?rETSrKtZyP5hqMODdDs0COWL4b3yy2JVqgZYPc8jKBDz31d1TfMfRkpR6XC6?=
- =?us-ascii?Q?IeZJYrVYKHMZjs3uS/pKa163ltcemiphja0cgR8P1wTCb6Mi0IBhiB7GICMH?=
- =?us-ascii?Q?0ODMCIwl1iTPIpygvJPnPVEKLkw0KeCEAXg67q+RXuV3uFCA6UPEy6z6NC83?=
- =?us-ascii?Q?w/A5YJQPcDtjsu6u1omBITsULEIwKYPlcx1ENBsJ/Kid4voDplCSHEBZt2RP?=
- =?us-ascii?Q?CQntZVfAEZt4feHiG3JUJiawfdj7vRg8dD+y+k6I87GwY3Tc5VNhHmNr8tpk?=
- =?us-ascii?Q?w3N9ZZijru7bS+FrEGHaMi9kujebjXQyrpNww7N3EYeM9HdbPAYWtO06iitz?=
- =?us-ascii?Q?jsTArEQl7qOdP9b6vrEHREjL67nz33kdI7TtB3MABCxhk2z20elsqiw+hIUj?=
- =?us-ascii?Q?8LuIikI94bZPPbaxJRzJV5EcmXpxjk80bNR4HSCaTlZitE5CyDHZ81LaAqPB?=
- =?us-ascii?Q?ELG9RmWMEkMgweMhUMgFxRmaSACAIK6Gpr8MHi7xGZgX7AuTwbkuepGRewLz?=
- =?us-ascii?Q?YJEtePERQRQfQP6bW78AtFPErP3GDC4aQqyZSOs35tQt5jsiMcKZv7B76FM4?=
- =?us-ascii?Q?0wO5tf5J6derf77FwV/IJv9UUdAOEsWetA1mxSZWV5o0lTz/DqwplyR3rEyW?=
- =?us-ascii?Q?AbF+AvNHaNjltVjU+JGqPBsIYO84PUaoSmr1CUP1FMFCwBFn5QjXQuhCmNzp?=
- =?us-ascii?Q?zh2d9kKdMV6oeyolQ383x3GAIuXPEFEuy9oicXyrJyaRz7VYxs+sNWL+1lMs?=
- =?us-ascii?Q?AOBuer0MtlLGODkp7RCSLe5yPUs+I+/MCNc6h4ekZGsnrx/H52c57Cr+2UEM?=
- =?us-ascii?Q?FZrSGPVtoap1zpoiYGlGDrNo4+qOKAq9fTXINKS/7Liyt8rb7BfehMAuzbN0?=
- =?us-ascii?Q?ZfOm9xur2T7UWRFmH8+yz1Cre55bSdE19WRxc/DWk7idk3w9jewNXsBobX3W?=
- =?us-ascii?Q?UH8GiN+oKZd+ZC7gCXU4Ch51V6DPR7Sj3/9uMZO8Fo1uLymTeVC96/iH3eqL?=
- =?us-ascii?Q?6ybv6TYzfC+R7KM6sHwG+qJmcUMo0xRJ7S72erFilmbxslLj/V4wzebOIFZZ?=
- =?us-ascii?Q?pqD9uDl8qm34YN9Cymw/wDmdD93AglLcjozEGiWa?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1835f0e5-8902-4975-8bbd-08dbcee8ad9b
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 08:11:34.4451
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nv6ayOI8R/m/YuAMyYuUu1B6YdoU+XCPu5TXSG54iW/7Mdf6mwh3BIOEWJO9SLOoVxPnFdlV6/khCTub2/2e7A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB6014
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+References: <20231016054755.915155-1-hch@lst.de> <20231016054755.915155-5-hch@lst.de>
+In-Reply-To: <20231016054755.915155-5-hch@lst.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 17 Oct 2023 10:20:35 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdW=Rp8+fcGrZ5fbVDyEZgVMGH_YHMxSTBdHB+zNxw4bxA@mail.gmail.com>
+Message-ID: <CAMuHMdW=Rp8+fcGrZ5fbVDyEZgVMGH_YHMxSTBdHB+zNxw4bxA@mail.gmail.com>
+Subject: Re: [PATCH 04/12] soc: renesas: select RISCV_DMA_NONCOHERENT from ARCH_R9A07G043
+To: Christoph Hellwig <hch@lst.de>
+Cc: Greg Ungerer <gerg@linux-m68k.org>, iommu@lists.linux.dev, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Conor Dooley <conor@kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
+	Jim Quinlan <james.quinlan@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 09:56:18AM +0200, Jiri Pirko wrote:
-> Tue, Oct 17, 2023 at 09:42:47AM CEST, idosch@nvidia.com wrote:
-> >Each devlink instance is associated with a parent device and a pointer
-> >to this device is stored in the devlink structure, but devlink does not
-> >hold a reference on this device.
-> >
-> >This is going to be a problem in the next patch where - among other
-> >things - devlink will acquire the device lock during netns dismantle,
-> >before the reload operation. Since netns dismantle is performed
-> >asynchronously and since a reference is not held on the parent device,
-> >it will be possible to hit a use-after-free.
-> >
-> >Prepare for the upcoming change by holding a reference on the parent
-> >device.
-> >
-> 
-> Just a note, I'm currently pushing the same patch as a part
-> of my patchset:
-> https://lore.kernel.org/all/20231013121029.353351-4-jiri@resnulli.us/
+On Mon, Oct 16, 2023 at 7:48=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
+e:
+> Selecting DMA_GLOBAL_POOL without the rest of the non-coherent DMA
+> infrastructure does not make sense.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/soc/renesas/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/soc/renesas/Kconfig b/drivers/soc/renesas/Kconfig
+> index f1696d3b5018d0..ea473b4150dfa8 100644
+> --- a/drivers/soc/renesas/Kconfig
+> +++ b/drivers/soc/renesas/Kconfig
+> @@ -338,6 +338,7 @@ config ARCH_R9A07G043
+>         select ARCH_RZG2L
+>         select AX45MP_L2_CACHE
+>         select DMA_GLOBAL_POOL
+> +       select RISCV_DMA_NONCOHERENT
+>         select ERRATA_ANDES if RISCV_SBI
+>         select ERRATA_ANDES_CMO if ERRATA_ANDES
 
-Then you probably need patch #1 as well:
+With proper sort order, and rebased to soc/for-next:
+Acked-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-https://lore.kernel.org/netdev/20231017074257.3389177-2-idosch@nvidia.com/
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
