@@ -1,168 +1,188 @@
-Return-Path: <netdev+bounces-41723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE8A87CBC5E
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:36:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FF7C7CBC6A
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:37:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35C0E1C209DB
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:36:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 789E2B20F8C
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509DF1CF81;
-	Tue, 17 Oct 2023 07:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="A3tKidzS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463261CFB8;
+	Tue, 17 Oct 2023 07:37:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D091A5B5
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:35:55 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC8D8ED
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 00:35:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=j8Yjw9qTnr5v+oYYYw9BPDKqUmIDawpKKHTte4gBrLc=; b=A3tKidzS0rUO5lQ625xP+Bi8aU
-	jeQNfqZVtqU0SZ2f6JC3BV8yJLmqd4JpdohZdcTnSMH1WZddfRxJsttC2MeiK3IGwZg7lVWUKP0df
-	DWFvr21/E2iGpIqzfBAeKXS1XBEmFD5Tac60uIGfxQuC7rCt7gtRcms6l6OQ/0GQGcvDl93eYo7q7
-	B+PO/Oql98kJEhwCsG2LtQ14imrAXa/nN0AKifujZBHrnpf930CQk2vUESe5iPVVhUPM7mA52iHR3
-	XXM7TbaEjM6ACJL1sKymtclzenSrDf6d8yc2UnwkzYiwm35ZNQKWjq5nYkjt87ayZ7A3tvPzQNU2Z
-	BaMBL/ow==;
-Received: from [192.168.1.4] (port=58719 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qsecH-0006KV-0g;
-	Tue, 17 Oct 2023 09:35:49 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Tue, 17 Oct 2023 09:35:48 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <olteanv@gmail.com>
-CC: <andrew@lunn.ch>, <ante.knezic@helmholz.de>, <conor+dt@kernel.org>,
-	<davem@davemloft.net>, <devicetree@vger.kernel.org>, <edumazet@google.com>,
-	<f.fainelli@gmail.com>, <krzysztof.kozlowski+dt@linaro.org>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <marex@denx.de>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
-	<woojung.huh@microchip.com>
-Subject: [PATCH net-next v2 2/2] dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
-Date: Tue, 17 Oct 2023 09:35:48 +0200
-Message-ID: <20231017073548.15050-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20231016103708.6ka5vxfkdatrjvdk@skbuf>
-References: <20231016103708.6ka5vxfkdatrjvdk@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91CC94404
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:37:40 +0000 (UTC)
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B365A93;
+	Tue, 17 Oct 2023 00:37:37 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R611e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VuMT906_1697528253;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VuMT906_1697528253)
+          by smtp.aliyun-inc.com;
+          Tue, 17 Oct 2023 15:37:34 +0800
+Date: Tue, 17 Oct 2023 15:37:33 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: tonylu@linux.alibaba.com, alibuda@linux.alibaba.com,
+	guwen@linux.alibaba.com, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net/smc: correct the reason code in
+ smc_listen_find_device when fallback
+Message-ID: <20231017073733.GV92403@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20231016061153.40057-1-guangguan.wang@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016061153.40057-1-guangguan.wang@linux.alibaba.com>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > +  microchip,rmii-clk-internal:
-> > +    $ref: /schemas/types.yaml#/definitions/flag
-> > +    description:
-> > +      Set if the RMII reference clock is provided internally. Otherwise
-> > +      reference clock should be provided externally.
-> > +
-> > +if:
-> > +  not:
-> > +    properties:
-> > +      compatible:
-> > +        enum:
-> > +          - microchip,ksz8863
-> > +          - microchip,ksz8873
-> > +then:
-> > +  not:
-> > +    required:
-> > +      - microchip,rmii-clk-internal
-> 
-> I think that what you want to express is that microchip,rmii-clk-internal
-> is only defined for microchip,ksz8863 and microchip,ksz8873.
-> Can't you describe that as "if: properties: compatible: (...) then:
-> properties: microchip,rmii-clk-internal"?
+On Mon, Oct 16, 2023 at 02:11:53PM +0800, Guangguan Wang wrote:
 
-If I understood you correctly you are refering to a solution like
-if:
-  properties:
-    compatible:
-      enum:
-        - microchip,ksz8863
-        - microchip,ksz8873
-then:
-  properties:
-    microchip,rmii-clk-internal:
-      $ref: /schemas/types.yaml#/definitions/flag
-      description:
-        Set if the RMII reference clock is provided internally. Otherwise
-        reference clock should be provided externally.
+Hi guangguan,
 
-This was already suggested in v1, but was not a satisfactory solution
-according to Mr. Conor Dooley:
+This patch doesn't apply clearly on net because it conflict with my
+previous patch 4abbd2e3c1db(net/smc: return the right falback reason
+when prefix checks fail), pls rebase.
 
->> On Tue, 10 Oct 2023 16:25:55 +0100, Conor Dooley wrote:
->> > On Tue, Oct 10, 2023 at 03:18:54PM +0200, Ante Knezic wrote:
->> > > Add documentation for selecting reference rmii clock on KSZ88X3 devices
->> > > 
->> > > Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
->> > > ---
->> > >  Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 6 ++++++
->> > >  1 file changed, 6 insertions(+)
->> > > 
->> > > diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
->> > > index e51be1ac0362..3df5d2e72dba 100644
->> > > --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
->> > > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
->> > > @@ -49,6 +49,12 @@ properties:
->> > >        Set if the output SYNCLKO clock should be disabled. Do not mix with
->> > >        microchip,synclko-125.
->> > >  
->> > > +  microchip,rmii-clk-internal:
->> > > +    $ref: /schemas/types.yaml#/definitions/flag
->> > > +    description:
->> > > +      Set if the RMII reference clock should be provided internally.
->> > 
->> > > Applies only
->> > > +      to KSZ88X3 devices.
->> > 
->> > This should be enforced by the schema, the example schema in the docs
->> > should show you how to do this.
->> 
->> I am guessing you are refering to limiting the property to ksz88x3 devices?
->> Something like:
->> 
->> if:
->>   properties:
->>     compatible:
->>       enum:
->>         - microchip,ksz8863
->>         - microchip,ksz8873
->> then:
->>   properties:
->>     microchip,rmii-clk-internal:
->>       $ref: /schemas/types.yaml#/definitions/flag
->>       description:
->>         Set if the RMII reference clock is provided internally. Otherwise
->>         reference clock should be provided externally.
+>The function smc_find_ism_store_rc is not only used for ism, so it is
+>reasonable to change the function name to smc_find_device_store_rc.
 >
->Not quite. The definition of the property should be outside the if/then,
->but one should be used to allow/disallow the property.
+>The ini->rc is used to store the last error happened when finding usable
+>ism or rdma device in smc_listen_find_device, and is set by calling smc_
+>find_device_store_rc. Once the ini->rc is assigned to an none-zero value,
+>the value can not be overwritten anymore. So the ini-rc should be set to
+>the error reason only when an error actually occurs.
+>
+>When finding ISM/RDMA devices, device not found is not a real error, as
+>not all machine have ISM/RDMA devices. Failures after device found, when
+>initializing device or when initializing connection, is real errors, and
+>should be store in ini->rc.
+>
+>SMC_CLC_DECL_DIFFPREFIX also is not a real error, as for SMC-RV2, it is
+>not require same prefix.
 
+I think it's better to seperate this patch into 2:
+- one for changing the name from smc_find_ism_store_rc to smc_find_device_store_rc.
+- one for fixing the return reason.
+
+More comments below.
+
+>
+>Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+>---
+> net/smc/af_smc.c | 23 +++++++++--------------
+> 1 file changed, 9 insertions(+), 14 deletions(-)
+>
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index bacdd971615e..15d8ad7af75d 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -2121,7 +2121,7 @@ static void smc_check_ism_v2_match(struct smc_init_info *ini,
+> 	}
+> }
+> 
+>-static void smc_find_ism_store_rc(u32 rc, struct smc_init_info *ini)
+>+static void smc_find_device_store_rc(u32 rc, struct smc_init_info *ini)
+> {
+> 	if (!ini->rc)
+> 		ini->rc = rc;
+>@@ -2162,10 +2162,8 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
+> 	}
+> 	mutex_unlock(&smcd_dev_list.mutex);
+> 
+>-	if (!ini->ism_dev[0]) {
+>-		smc_find_ism_store_rc(SMC_CLC_DECL_NOSMCD2DEV, ini);
+>+	if (!ini->ism_dev[0])
+> 		goto not_found;
+>-	}
+> 
+> 	smc_ism_get_system_eid(&eid);
+> 	if (!smc_clc_match_eid(ini->negotiated_eid, smc_v2_ext,
+>@@ -2180,7 +2178,7 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
+> 		ini->ism_selected = i;
+> 		rc = smc_listen_ism_init(new_smc, ini);
+> 		if (rc) {
+>-			smc_find_ism_store_rc(rc, ini);
+>+			smc_find_device_store_rc(rc, ini);
+> 			/* try next active ISM device */
+> 			continue;
+> 		}
+>@@ -2213,11 +2211,12 @@ static void smc_find_ism_v1_device_serv(struct smc_sock *new_smc,
+> 		goto not_found;
+> 	ini->ism_selected = 0;
+> 	rc = smc_listen_ism_init(new_smc, ini);
+>-	if (!rc)
+>+	if (!rc) {
+>+		smc_find_device_store_rc(rc, ini);
+
+This smc_find_device_store_rc() seems useless when rc == 0 here ?
+
+> 		return;		/* V1 ISM device found */
+>+	}
+> 
+> not_found:
+>-	smc_find_ism_store_rc(rc, ini);
+> 	ini->smcd_version &= ~SMC_V1;
+> 	ini->ism_dev[0] = NULL;
+> 	ini->is_smcd = false;
+>@@ -2266,10 +2265,8 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
+> 	ini->smcrv2.saddr = new_smc->clcsock->sk->sk_rcv_saddr;
+> 	ini->smcrv2.daddr = smc_ib_gid_to_ipv4(smc_v2_ext->roce);
+> 	rc = smc_find_rdma_device(new_smc, ini);
+>-	if (rc) {
+>-		smc_find_ism_store_rc(rc, ini);
+>+	if (rc)
+> 		goto not_found;
+>-	}
+> 	if (!ini->smcrv2.uses_gateway)
+> 		memcpy(ini->smcrv2.nexthop_mac, pclc->lcl.mac, ETH_ALEN);
+> 
+>@@ -2284,7 +2281,7 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
+> 	if (!rc)
+> 		return;
+> 	ini->smcr_version = smcr_version;
+>-	smc_find_ism_store_rc(rc, ini);
+>+	smc_find_device_store_rc(rc, ini);
+> 
+> not_found:
+> 	ini->smcr_version &= ~SMC_V2;
+>@@ -2330,8 +2327,6 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
+> 
+> 	/* check for matching IP prefix and subnet length (V1) */
+> 	prfx_rc = smc_listen_prfx_check(new_smc, pclc);
+>-	if (prfx_rc)
+>-		smc_find_ism_store_rc(prfx_rc, ini);
+> 
+> 	/* get vlan id from IP device */
+> 	if (smc_vlan_by_tcpsk(new_smc->clcsock, ini))
+>@@ -2358,7 +2353,7 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
+> 		int rc;
+> 
+> 		rc = smc_find_rdma_v1_device_serv(new_smc, pclc, ini);
+>-		smc_find_ism_store_rc(rc, ini);
+>+		smc_find_device_store_rc(rc, ini);
+> 		return (!rc) ? 0 : ini->rc;
+> 	}
+> 	return SMC_CLC_DECL_NOSMCDEV;
+>-- 
+>2.24.3 (Apple Git-128)
 
