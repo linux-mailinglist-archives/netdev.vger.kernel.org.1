@@ -1,115 +1,206 @@
-Return-Path: <netdev+bounces-41786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD5407CBE51
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:01:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CE8A7CBE5A
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:04:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87572281746
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:01:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5136A2815E4
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABE43D96A;
-	Tue, 17 Oct 2023 09:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716793D96F;
+	Tue, 17 Oct 2023 09:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="PPexVhVa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BE0Z6mbQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E72DC15F
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:01:44 +0000 (UTC)
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72932124
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:01:41 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-32db8924201so1440460f8f.1
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:01:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697533300; x=1698138100; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=n0ZwSxcglD63mlTmCZgEp9zNaqcuyVBL+a1pqctvEUg=;
-        b=PPexVhVaIAM5qUx+Y8sxnj/6/ZCxwnbOXXNuFODKiYlo8dx4YTF2/9rFjZ0sdja9t+
-         973L/2Reyr+iExOy4Eirp3peys9AcbDFwgvj7uTS5rwmAcGx89P6Xxm14fZFvIqiWwoA
-         Oc+RFgDmqYGOCqxBhK93ZWmIFZzS7XLgAU5MwCfw3cYWamqWzPjBQwX5missbGm6pP6z
-         7wVFe04t+zwlk0NIJrwKA6eY7qOQ3sShJogPKObRppwgLxD48U5m27HWOWFj97fwQ93h
-         +EFSF7hRhDhbDv2d1aufbyMosECtFXZnzD0CY4GwZQ3VBlq9o9kHrOabMcJepdacooFf
-         D98A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697533300; x=1698138100;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n0ZwSxcglD63mlTmCZgEp9zNaqcuyVBL+a1pqctvEUg=;
-        b=gL5jp0rlI8tI6sWom7dYmYfRzWehBga27bZyWvu28XYpm4K5cdu5VWxH4yfh3QxkM5
-         u8ex7HaX31a37O6sltPstEzUR7JwJELdqq7aGN3ZR7ytCqfdj0R5r6vpgn6Uh0Tg2ibQ
-         xu0VolPaTaAWy3TG4cSxpa4iAxTJrClvtRJnUltavgndTAGJEEdl5vywB+x4S3kBV7ad
-         yKrVozQOWHu+vIyA4vVoB87roKTKAuVeQvwHJ5owQwQe2mKJerjvajsrN3kMJY9j9c+f
-         QmlYkD0iHdecPgxcMUh5jCz31JpkBqqFs4xrUoNzTcbh8Vz5oaxyGDGF+oPp+Q9DYu1p
-         zweA==
-X-Gm-Message-State: AOJu0YzGe+dpyqixFNFFHCE2ea80EeecSD1bU+7zuKAFn9YQY7U4vlYN
-	vPmeRHBL9Mh0u/Ur5+skZJ0loA==
-X-Google-Smtp-Source: AGHT+IF5WzTohtQMpALIknd58a9nZY7AlTTTgEMp4caFdIhtlHk0o8BsyBUOrFNhAS5GQVSEORRBtQ==
-X-Received: by 2002:a5d:5347:0:b0:32d:b654:894b with SMTP id t7-20020a5d5347000000b0032db654894bmr1227002wrv.32.1697533299879;
-        Tue, 17 Oct 2023 02:01:39 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id n2-20020a5d51c2000000b0032da4f70756sm1208902wrv.5.2023.10.17.02.01.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 02:01:39 -0700 (PDT)
-Date: Tue, 17 Oct 2023 11:01:38 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-pci@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	bhelgaas@google.com, alex.williamson@redhat.com, lukas@wunner.de,
-	petrm@nvidia.com, jiri@nvidia.com, mlxsw@nvidia.com
-Subject: Re: [RFC PATCH net-next 02/12] devlink: Hold a reference on parent
- device
-Message-ID: <ZS5Nclma7BXGNX3F@nanopsycho>
-References: <20231017074257.3389177-1-idosch@nvidia.com>
- <20231017074257.3389177-3-idosch@nvidia.com>
- <ZS4+InoncFqPVW72@nanopsycho>
- <ZS5BrH1AOVJyt6ac@shredder>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2C3381D8;
+	Tue, 17 Oct 2023 09:03:54 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 512CB8E;
+	Tue, 17 Oct 2023 02:03:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697533433; x=1729069433;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=bYg38E3e/vhXYWresPVnGgaNf/gc0H4id9aMD0AqQJM=;
+  b=BE0Z6mbQZgghka3Nc7awanwJ454pIFIkdt5M+Hqxg1mAz6CQ6q2ftXoe
+   dnM15I/m+wVN3vkQioFEiF0hF6f5QGa1AkTuJD6YKTzB0OG9mlJRjSjNT
+   /EH1DUK5wWAkifNyny4k2N+LVyc4awEHhZhIMfi+ELsB6iyexlTO9M6Sv
+   KGI4e42stoq3vNGV97CchE4oYemWRXS/If/P23iBat4oFrPDr8NmMiSh5
+   D7b/z+Vev/aj/fsh8VljE+5jNCCvvZXFSoDyLIkWOyjnP22sWZNfG6lLT
+   1Ks743IBEuk+8lltt2E0fzY4KH1zgDzfobB0QaiO/vA1WvVojB3GwCMuc
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="376106189"
+X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
+   d="scan'208";a="376106189"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 02:03:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="785409867"
+X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
+   d="scan'208";a="785409867"
+Received: from spandruv-mobl.amr.corp.intel.com ([10.252.44.24])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 02:03:47 -0700
+Date: Tue, 17 Oct 2023 12:03:45 +0300 (EEST)
+From: =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To: Ma Jun <Jun.Ma2@amd.com>
+cc: amd-gfx@lists.freedesktop.org, lenb@kernel.org, johannes@sipsolutions.net, 
+    davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+    pabeni@redhat.com, alexander.deucher@amd.com, Lijo.Lazar@amd.com, 
+    mario.limonciello@amd.com, majun@amd.com, netdev@vger.kernel.org, 
+    linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    linux-doc@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+    Evan Quan <quanliangl@hotmail.com>
+Subject: Re: [PATCH v12 9/9] drm/amd/pm: enable Wifi RFI mitigation feature
+ support for SMU13.0.7
+In-Reply-To: <20231017025358.1773598-10-Jun.Ma2@amd.com>
+Message-ID: <9ab5375c-d911-ab3-5522-e0e1dd33f043@linux.intel.com>
+References: <20231017025358.1773598-1-Jun.Ma2@amd.com> <20231017025358.1773598-10-Jun.Ma2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZS5BrH1AOVJyt6ac@shredder>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Oct 17, 2023 at 10:11:24AM CEST, idosch@nvidia.com wrote:
->On Tue, Oct 17, 2023 at 09:56:18AM +0200, Jiri Pirko wrote:
->> Tue, Oct 17, 2023 at 09:42:47AM CEST, idosch@nvidia.com wrote:
->> >Each devlink instance is associated with a parent device and a pointer
->> >to this device is stored in the devlink structure, but devlink does not
->> >hold a reference on this device.
->> >
->> >This is going to be a problem in the next patch where - among other
->> >things - devlink will acquire the device lock during netns dismantle,
->> >before the reload operation. Since netns dismantle is performed
->> >asynchronously and since a reference is not held on the parent device,
->> >it will be possible to hit a use-after-free.
->> >
->> >Prepare for the upcoming change by holding a reference on the parent
->> >device.
->> >
->> 
->> Just a note, I'm currently pushing the same patch as a part
->> of my patchset:
->> https://lore.kernel.org/all/20231013121029.353351-4-jiri@resnulli.us/
->
->Then you probably need patch #1 as well:
->
->https://lore.kernel.org/netdev/20231017074257.3389177-2-idosch@nvidia.com/
+On Tue, 17 Oct 2023, Ma Jun wrote:
 
-Correct.
+> From: Evan Quan <quanliangl@hotmail.com>
+> 
+> Fulfill the SMU13.0.7 support for Wifi RFI mitigation feature.
+> 
+> Signed-off-by: Evan Quan <quanliangl@hotmail.com>
+> Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
+> Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
+> --
+> v10->v11:
+>   - downgrade the prompt level on message failure(Lijo)
+> ---
+>  .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  | 59 +++++++++++++++++++
+>  1 file changed, 59 insertions(+)
+> 
+> diff --git a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
+> index 62f2886ab4df..c5736fb3cf6d 100644
+> --- a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
+> +++ b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
+> @@ -126,6 +126,7 @@ static struct cmn2asic_msg_mapping smu_v13_0_7_message_map[SMU_MSG_MAX_COUNT] =
+>  	MSG_MAP(AllowGpo,			PPSMC_MSG_SetGpoAllow,           0),
+>  	MSG_MAP(GetPptLimit,			PPSMC_MSG_GetPptLimit,                 0),
+>  	MSG_MAP(NotifyPowerSource,		PPSMC_MSG_NotifyPowerSource,           0),
+> +	MSG_MAP(EnableUCLKShadow,		PPSMC_MSG_EnableUCLKShadow,            0),
+>  };
+>  
+>  static struct cmn2asic_mapping smu_v13_0_7_clk_map[SMU_CLK_COUNT] = {
+> @@ -207,6 +208,7 @@ static struct cmn2asic_mapping smu_v13_0_7_table_map[SMU_TABLE_COUNT] = {
+>  	TAB_MAP(ACTIVITY_MONITOR_COEFF),
+>  	[SMU_TABLE_COMBO_PPTABLE] = {1, TABLE_COMBO_PPTABLE},
+>  	TAB_MAP(OVERDRIVE),
+> +	TAB_MAP(WIFIBAND),
+>  };
+>  
+>  static struct cmn2asic_mapping smu_v13_0_7_pwr_src_map[SMU_POWER_SOURCE_COUNT] = {
+> @@ -503,6 +505,9 @@ static int smu_v13_0_7_tables_init(struct smu_context *smu)
+>  	               AMDGPU_GEM_DOMAIN_VRAM);
+>  	SMU_TABLE_INIT(tables, SMU_TABLE_COMBO_PPTABLE, MP0_MP1_DATA_REGION_SIZE_COMBOPPTABLE,
+>  			PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM);
+> +	SMU_TABLE_INIT(tables, SMU_TABLE_WIFIBAND,
+> +		       sizeof(WifiBandEntryTable_t), PAGE_SIZE,
+> +		       AMDGPU_GEM_DOMAIN_VRAM);
+>  
+>  	smu_table->metrics_table = kzalloc(sizeof(SmuMetricsExternal_t), GFP_KERNEL);
+>  	if (!smu_table->metrics_table)
+> @@ -2179,6 +2184,57 @@ static int smu_v13_0_7_set_df_cstate(struct smu_context *smu,
+>  					       NULL);
+>  }
+>  
+> +static bool smu_v13_0_7_wbrf_support_check(struct smu_context *smu)
+> +{
+> +	return smu->smc_fw_version > 0x00524600;
+> +}
+> +
+> +static int smu_v13_0_7_set_wbrf_exclusion_ranges(struct smu_context *smu,
+> +						 struct freq_band_range *exclusion_ranges)
+> +{
+> +	WifiBandEntryTable_t wifi_bands;
+> +	int valid_entries = 0;
+> +	int ret, i;
+> +
+> +	memset(&wifi_bands, 0, sizeof(wifi_bands));
+> +	for (i = 0; i < ARRAY_SIZE(wifi_bands.WifiBandEntry); i++) {
+> +		if (!exclusion_ranges[i].start &&
+> +		    !exclusion_ranges[i].end)
+
+After having seen this construct nth time, I think you should have a 
+static inline function for this check with a proper name.
+
+> +			break;
+> +
+> +		/* PMFW expects the inputs to be in Mhz unit */
+> +		wifi_bands.WifiBandEntry[valid_entries].LowFreq =
+> +			DIV_ROUND_DOWN_ULL(exclusion_ranges[i].start, HZ_IN_MHZ);
+> +		wifi_bands.WifiBandEntry[valid_entries++].HighFreq =
+> +			DIV_ROUND_UP_ULL(exclusion_ranges[i].end, HZ_IN_MHZ);
+> +	}
+> +	wifi_bands.WifiBandEntryNum = valid_entries;
+> +
+> +	/*
+> +	 * Per confirm with PMFW team, WifiBandEntryNum = 0 is a valid setting.
+> +	 * Considering the scenarios below:
+> +	 * - At first the wifi device adds an exclusion range e.g. (2400,2500) to
+> +	 *   BIOS and our driver gets notified. We will set WifiBandEntryNum = 1
+> +	 *   and pass the WifiBandEntry (2400, 2500) to PMFW.
+> +	 *
+> +	 * - Later the wifi device removes the wifiband list added above and
+> +	 *   our driver gets notified again. At this time, driver will set
+> +	 *   WifiBandEntryNum = 0 and pass an empty WifiBandEntry list to PMFW.
+> +	 *   - PMFW may still need to do some uclk shadow update(e.g. switching
+> +	 *     from shadow clock back to primary clock) on receiving this.
+> +	 */
+> +
+> +	ret = smu_cmn_update_table(smu,
+> +				   SMU_TABLE_WIFIBAND,
+> +				   0,
+> +				   (void *)(&wifi_bands),
+> +				   true);
+> +	if (ret)
+> +		dev_warn(smu->adev->dev, "Failed to set wifiband!");
+> +
+> +	return ret;
+> +}
+
+Is this whole function duplicate of the one in the other file? Don't 
+duplicate code like this but create reusable functions properly.
+
+-- 
+ i.
+
+> +
+>  static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
+>  	.get_allowed_feature_mask = smu_v13_0_7_get_allowed_feature_mask,
+>  	.set_default_dpm_table = smu_v13_0_7_set_default_dpm_table,
+> @@ -2247,6 +2303,9 @@ static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
+>  	.set_mp1_state = smu_v13_0_7_set_mp1_state,
+>  	.set_df_cstate = smu_v13_0_7_set_df_cstate,
+>  	.gpo_control = smu_v13_0_gpo_control,
+> +	.is_asic_wbrf_supported = smu_v13_0_7_wbrf_support_check,
+> +	.enable_uclk_shadow = smu_v13_0_enable_uclk_shadow,
+> +	.set_wbrf_exclusion_ranges = smu_v13_0_7_set_wbrf_exclusion_ranges,
+>  };
+>  
+>  void smu_v13_0_7_set_ppt_funcs(struct smu_context *smu)
+> 
+
 
