@@ -1,159 +1,111 @@
-Return-Path: <netdev+bounces-41688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A07B7CBB15
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:26:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A0CB7CBB16
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:26:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10F5E281514
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 06:25:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A56B1C20BAB
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 06:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D9511739;
-	Tue, 17 Oct 2023 06:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="bcTdqH2i"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B09711CB3;
+	Tue, 17 Oct 2023 06:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E010BE5C;
-	Tue, 17 Oct 2023 06:25:53 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F6B8F;
-	Mon, 16 Oct 2023 23:25:50 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6F323C0007;
-	Tue, 17 Oct 2023 06:25:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1697523949;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=itnPW5rRfzWD1R0hThVhfk8sAUkui3kg+yDMgRUM000=;
-	b=bcTdqH2iIG9E86n9wjdLB9+H1RfKLhSC1wgDOmxIwvCp3LLgzdRHfsygoJxwnDurJqvOhh
-	ci1qBi8NI2RV5PvEeN2ONy+TIog7sDsPSXcnKN5YYHcrBm4m9REvx7w+VjfEllLn+wKSWQ
-	QjmvEIYNxq3hfgCIDOmQdrYn3RT3WSCU+4rjZcDv7THt/gqvQWjtNNs3dyLBP1vwxlQfAw
-	6rlU8hfuB2xhGaSGRaCy8lv9kVlm6o7Y/m6ZoRnxy2dGqD1SFRJqwnm90FLarqbAnjqLg+
-	f74wTcSI+f+fB3yuMX78XBjEUUpgWQr2tgyFDrjskmejyDyL/8VnN1nLEreKeg==
-Message-ID: <735a683c-fdf2-42ab-b94b-efb32847979d@arinc9.com>
-Date: Tue, 17 Oct 2023 09:25:18 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC2011712
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 06:25:54 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFE2EAB
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 23:25:52 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qsdWK-00083B-1E; Tue, 17 Oct 2023 08:25:36 +0200
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qsdWJ-002Fvi-Bu; Tue, 17 Oct 2023 08:25:35 +0200
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qsdWJ-00Erxi-8m; Tue, 17 Oct 2023 08:25:35 +0200
+Date: Tue, 17 Oct 2023 08:25:35 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v4 4/9] net: dsa: microchip: ksz9477: add Wake
+ on LAN support
+Message-ID: <20231017062535.GC3539182@pengutronix.de>
+References: <20231016141256.2011861-1-o.rempel@pengutronix.de>
+ <20231016141256.2011861-5-o.rempel@pengutronix.de>
+ <18c20ed3-c117-4124-af3c-33df562b7f02@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/8] dt-bindings: net: dsa/switch: Make
- 'ethernet-port' node addresses hex
-Content-Language: en-US
-To: Rob Herring <robh@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>, Maxime Ripard <mripard@kernel.org>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>,
- John Crispin <john@phrozen.org>,
- Gerhard Engleder <gerhard@engleder-embedded.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Sergey Shtylyov <s.shtylyov@omp.ru>,
- Sergei Shtylyov <sergei.shtylyov@gmail.com>,
- Justin Chen <justin.chen@broadcom.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- bcm-kernel-feedback-list@broadcom.com
-References: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
- <20231016-dt-net-cleanups-v1-3-a525a090b444@kernel.org>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20231016-dt-net-cleanups-v1-3-a525a090b444@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <18c20ed3-c117-4124-af3c-33df562b7f02@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 17.10.2023 00:44, Rob Herring wrote:
-> 'ethernet-port' node unit-addresses should be in hexadecimal. Some
-> instances have it correct, but fix the ones that don't.
+On Mon, Oct 16, 2023 at 04:59:24PM +0200, Andrew Lunn wrote:
+> > +int ksz9477_set_wol(struct ksz_device *dev, int port,
+> > +		    struct ethtool_wolinfo *wol)
+> > +{
+> > +	u8 pme_conf, pme_ctrl = 0;
+> > +	int ret;
+> > +
+> > +	if (wol->wolopts & ~WAKE_PHY)
+> > +		return -EINVAL;
 > 
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
->   Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml         | 2 +-
->   Documentation/devicetree/bindings/net/dsa/dsa.yaml               | 2 +-
->   Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml   | 6 +++---
->   Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml | 2 +-
->   Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml       | 2 +-
->   Documentation/devicetree/bindings/net/ethernet-switch.yaml       | 4 ++--
->   Documentation/devicetree/bindings/net/ti,cpsw-switch.yaml        | 2 +-
->   7 files changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
-> index aa3162c74833..75d8138298fb 100644
-> --- a/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
-> +++ b/Documentation/devicetree/bindings/net/brcm,asp-v2.0.yaml
-> @@ -53,7 +53,7 @@ properties:
->           const: 0
->   
->       patternProperties:
-> -      "^port@[0-9]+$":
-> +      "^port@[0-9a-f]+$":
->           type: object
->   
->           $ref: ethernet-controller.yaml#
-> diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-> index ec74a660beda..e6010821f86f 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-> @@ -50,7 +50,7 @@ $defs:
->               const: 0
->   
->           patternProperties:
-> -          "^(ethernet-)?port@[0-9]+$":
-> +          "^(ethernet-)?port@[0-9a-f]+$":
->               description: Ethernet switch ports
->               $ref: dsa-port.yaml#
->               unevaluatedProperties: false
-> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> index 20f7ba4e2203..5038818e9f2e 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> @@ -157,7 +157,7 @@ patternProperties:
->       additionalProperties: true
->   
->       patternProperties:
-> -      "^(ethernet-)?port@[0-9]+$":
-> +      "^(ethernet-)?port@[0-6]$":
+> EOPNOTSUPP might be better here. I'm assuming there is no other way
+> WoL can be supported, since this is a combined MAC/PHY device. 
 
-You also restrict the pattern depending on how many ports the switch has.
-Shouldn't this be a separate patch or, at the least, mentioned on the patch
-log?
+EOPNOTSUPP is typically returned when WoL isn’t supported at all. In
+this instance, WoL is supported but an invalid option has been given.
+Nonetheless, I don’t have a strong opinion on this matter currently, and
+am ready to go with whichever option is recommended.
 
-Regardless:
-
-Acked-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-
-Arınç
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
