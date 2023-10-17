@@ -1,185 +1,146 @@
-Return-Path: <netdev+bounces-41720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 623367CBC22
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:21:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 550607CBC34
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:27:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54C581C20912
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:21:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9B8CB20E84
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283D3182DC;
-	Tue, 17 Oct 2023 07:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 123AE18B02;
+	Tue, 17 Oct 2023 07:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="UkaMoQ3z"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="W3B3bafZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB91747B
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:21:34 +0000 (UTC)
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F95693
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 00:21:33 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-507bd19eac8so549614e87.0
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 00:21:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697527291; x=1698132091; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p9fLTeqd+pfQZExO4SmQFOL9f70l8EA8aD+aWPF6bUs=;
-        b=UkaMoQ3zpGQlG4eLKLzrW6QMpJbhdvQwyKHpCl/2iDIqbYYGKBKaTGtYIXKPoR/9lv
-         4vmcEXXx2yTMv/I60+ZvmNK8Pr5DvyU1zJv3uLjvFaNMmyjxPLXYyPpz/jWD6a24WQAG
-         TXm0xTy9XUvcNVCKRK1EiFS2R0bKxAp5T85I3Igzb/RXnMddG7AjefE1qHDPmi7ifkxx
-         p9fpPoIplDsUNdhnywynyL419wbSMKdvglGycpf37OI2K75J7UanBiIyV2P1sWl3nX6/
-         pa7iHeEp6uRAYIs4j1CPfkP3SzpJMUzppKtf/AlscTIoknQBMDL5thl/+9W3O1KX5v+k
-         8Lig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697527291; x=1698132091;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p9fLTeqd+pfQZExO4SmQFOL9f70l8EA8aD+aWPF6bUs=;
-        b=pwAXb1Zbhq0s2pSAy2Z0MRYr5bfpkhpTeqRdOMARf6IhAXtiC9hyX3XZEfkFpLrjbU
-         D+DL6L0Kp/d7e0Zf9JcXTChbS0He9znb2nWz300yslTFmsmfeihWETA3iGkbQNsAZzKw
-         K8ov5YKAt6qJAUWoMt9VBahk53BsaPoyn/uo4eSllE41rrue4a0wuiSoixc9uJnvB5Bk
-         BhAKChxlP6IQN/ocC5BrIuPgtlGacRY+RQWSU/kzfTpUD0nlhYwgWPuwJtGPfiIC60bj
-         tFitjuriHF7ezHnYmp7IZh6tsBM2p25HnBLhrNF5BOaZvNrfiNprgGAdJtcCYD0zuY+P
-         gOgw==
-X-Gm-Message-State: AOJu0Ywt4eD6WLVHFqV82QvvwD19R7roixldFDcAByBKlV+5GBCDTTG9
-	+pN+CEeB2AdbAhHiaY51reR0QQ==
-X-Google-Smtp-Source: AGHT+IEgHTgr9k0Um4OhvcPiCbPlv3fze4eR9i01t+Js8GJMAJYI4PzkdOFA1IlIrK69DbYQkSZVew==
-X-Received: by 2002:a19:2d02:0:b0:500:7cab:efc3 with SMTP id k2-20020a192d02000000b005007cabefc3mr936591lfj.11.1697527291329;
-        Tue, 17 Oct 2023 00:21:31 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id n13-20020a5d67cd000000b0032dbf32bd56sm996212wrw.37.2023.10.17.00.21.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 00:21:30 -0700 (PDT)
-Date: Tue, 17 Oct 2023 09:21:29 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, gnault@redhat.com, liuhangbin@gmail.com,
-	lucien.xin@gmail.com
-Subject: Re: [PATCH net 2/5] net: check for altname conflicts when changing
- netdev's netns
-Message-ID: <ZS41+WxrRVqq9BgL@nanopsycho>
-References: <20231016201657.1754763-1-kuba@kernel.org>
- <20231016201657.1754763-3-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0702D4404
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:27:33 +0000 (UTC)
+Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 316A58E
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 00:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
+	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
+	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=2H1XYwCGnvnQyLwiCFvBq4BTDv9g1LPrxJ3zkNlok2Q=; b=W3B3bafZ7EigAZoxjrOmRUEAAX
+	imeq2f75Z1IACWrMX2VxhLeuNC/frO9L3vbQCiXQlb2o0oH1Vq4AXy3N2KKBMkWIMfMkf5xToz5/U
+	X6C/+qb7YpLNReQPvMjSpBU/lixkt9NVqDNzQSkNN6mCpjh/vLE8ShCznxnAsZH73z5Kf0GYGsNRw
+	E+3fHk1SRFwTwqR2ZSij9mL0cutJ2Mg/duq0quEAAJnlZr0RxzBiMnbiXua3rpi7YkZzvRQ/BjVuF
+	xRnW50JHHncgSs2cuvF3/oa57bWPDIxW6wcFIPJXS+7+/CO5CWfVjKucdKk5G9gbShwX1MIq4IJdf
+	xUTHcZxg==;
+Received: from [192.168.1.4] (port=57894 helo=SH-EX2013.helmholz.local)
+	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Ante.Knezic@helmholz.de>)
+	id 1qseUA-0005X9-2v;
+	Tue, 17 Oct 2023 09:27:26 +0200
+Received: from linuxdev.helmholz.local (192.168.6.7) by
+ SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Tue, 17 Oct 2023 09:27:26 +0200
+From: Ante Knezic <ante.knezic@helmholz.de>
+To: <olteanv@gmail.com>
+CC: <andrew@lunn.ch>, <ante.knezic@helmholz.de>, <conor+dt@kernel.org>,
+	<davem@davemloft.net>, <devicetree@vger.kernel.org>, <edumazet@google.com>,
+	<f.fainelli@gmail.com>, <krzysztof.kozlowski+dt@linaro.org>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <marex@denx.de>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<woojung.huh@microchip.com>
+Subject: [PATCH net-next v2 1/2] net:dsa:microchip: add property to select internal RMII reference clock
+Date: Tue, 17 Oct 2023 09:27:23 +0200
+Message-ID: <20231017072723.14216-1-ante.knezic@helmholz.de>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20231016103708.6ka5vxfkdatrjvdk@skbuf>
+References: <20231016103708.6ka5vxfkdatrjvdk@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231016201657.1754763-3-kuba@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [192.168.6.7]
+X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
+ SH-EX2013.helmholz.local (192.168.1.4)
+X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Mon, Oct 16, 2023 at 10:16:54PM CEST, kuba@kernel.org wrote:
->It's currently possible to create an altname conflicting
->with an altname or real name of another device by creating
->it in another netns and moving it over:
->
-> [ ~]$ ip link add dev eth0 type dummy
->
-> [ ~]$ ip netns add test
-> [ ~]$ ip -netns test link add dev ethX netns test type dummy
-> [ ~]$ ip -netns test link property add dev ethX altname eth0
-> [ ~]$ ip -netns test link set dev ethX netns 1
->
-> [ ~]$ ip link
-> ...
-> 3: eth0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->     link/ether 02:40:88:62:ec:b8 brd ff:ff:ff:ff:ff:ff
-> ...
-> 5: ethX: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->     link/ether 26:b7:28:78:38:0f brd ff:ff:ff:ff:ff:ff
->     altname eth0
->
->Create a macro for walking the altnames, this hopefully makes
->it clearer that the list we walk contains only altnames.
->Which is otherwise not entirely intuitive.
->
->Fixes: 36fbf1e52bd3 ("net: rtnetlink: add linkprop commands to add and delete alternative ifnames")
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->---
->CC: gnault@redhat.com
->CC: liuhangbin@gmail.com
->CC: lucien.xin@gmail.com
->CC: jiri@resnulli.us
->---
-> net/core/dev.c | 9 ++++++++-
-> net/core/dev.h | 3 +++
-> 2 files changed, 11 insertions(+), 1 deletion(-)
->
->diff --git a/net/core/dev.c b/net/core/dev.c
->index b08031957ffe..f4fa2692cf6d 100644
->--- a/net/core/dev.c
->+++ b/net/core/dev.c
->@@ -1086,7 +1086,8 @@ static int __dev_alloc_name(struct net *net, const char *name, char *buf)
+On Mon, 16 Oct 2023 13:37:08 +0300, Vladimir Oltean wrote:
+> > diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
+> > index 91aba470fb2f..78f3a668aa99 100644
+> > --- a/drivers/net/dsa/microchip/ksz8795.c
+> > +++ b/drivers/net/dsa/microchip/ksz8795.c
+> > @@ -1434,6 +1434,11 @@ int ksz8_setup(struct dsa_switch *ds)
+> >  	for (i = 0; i < (dev->info->num_vlans / 4); i++)
+> >  	        ksz8_r_vlan_entries(dev, i);
+> >  
+> > +	if (ksz_is_ksz88x3(dev))
+> > +	        ksz_cfg(dev, KSZ88X3_REG_FVID_AND_HOST_MODE,
+> > +	                KSZ88X3_PORT3_RMII_CLK_INTERNAL,
+> > +	                dev->rmii_clk_internal);
+> > +
 > 
-> 		for_each_netdev(net, d) {
-> 			struct netdev_name_node *name_node;
->-			list_for_each_entry(name_node, &d->name_node->list, list) {
->+
->+			netdev_for_each_altname(d, name_node) {
+> Can this be done in dev->dev_ops->phylink_mac_config() (which so far has no implementation)
+> for port 3 of ksz88x3?
 
-Well, cleaner would be to do this in a separate patch and the fix itself
-too.
-
-One way or another, code looks fine.
-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-
-Thanks!
-
-
-> 				if (!sscanf(name_node->name, name, &i))
-> 					continue;
-> 				if (i < 0 || i >= max_netdevices)
->@@ -11047,6 +11048,7 @@ EXPORT_SYMBOL(unregister_netdev);
-> int __dev_change_net_namespace(struct net_device *dev, struct net *net,
-> 			       const char *pat, int new_ifindex)
-> {
->+	struct netdev_name_node *name_node;
-> 	struct net *net_old = dev_net(dev);
-> 	char new_name[IFNAMSIZ] = {};
-> 	int err, new_nsid;
->@@ -11079,6 +11081,11 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
-> 		if (err < 0)
-> 			goto out;
-> 	}
->+	/* Check that none of the altnames conflicts. */
->+	err = -EEXIST;
->+	netdev_for_each_altname(dev, name_node)
->+		if (netdev_name_in_use(net, name_node->name))
->+			goto out;
+> >  	return ksz8_handle_global_errata(ds);
+> >  }
+> >  
+> > diff --git a/drivers/net/dsa/microchip/ksz8795_reg.h b/drivers/net/dsa/microchip/ksz8795_reg.h
+> > index 3c9dae53e4d8..beca974e0171 100644
+> > --- a/drivers/net/dsa/microchip/ksz8795_reg.h
+> > +++ b/drivers/net/dsa/microchip/ksz8795_reg.h
+> > @@ -22,6 +22,9 @@
+> >  #define KSZ8863_GLOBAL_SOFTWARE_RESET	BIT(4)
+> >  #define KSZ8863_PCS_RESET	        BIT(0)
+> >  
+> > +#define KSZ88X3_REG_FVID_AND_HOST_MODE  0xC6
+> > +#define KSZ88X3_PORT3_RMII_CLK_INTERNAL BIT(3)
+> > +
+> >  #define REG_SW_CTRL_0                        0x02
+> >  
+> >  #define SW_NEW_BACKOFF	                BIT(7)
+> > diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> > index b800ace40ce1..0a0a53ce5b1b 100644
+> > --- a/drivers/net/dsa/microchip/ksz_common.c
+> > +++ b/drivers/net/dsa/microchip/ksz_common.c
+> > @@ -4160,6 +4160,9 @@ int ksz_switch_register(struct ksz_device *dev)
+> >  	        }
+> >  	}
+> >  
+> > +	dev->rmii_clk_internal = of_property_read_bool(dev->dev->of_node,
+> > +	                                               "microchip,rmii-clk-internal");
 > 
-> 	/* Check that new_ifindex isn't used yet. */
-> 	if (new_ifindex) {
->diff --git a/net/core/dev.h b/net/core/dev.h
->index e075e198092c..d093be175bd0 100644
->--- a/net/core/dev.h
->+++ b/net/core/dev.h
->@@ -62,6 +62,9 @@ struct netdev_name_node {
-> int netdev_get_name(struct net *net, char *name, int ifindex);
-> int dev_change_name(struct net_device *dev, const char *newname);
-> 
->+#define netdev_for_each_altname(dev, name_node)				\
->+	list_for_each_entry((name_node), &(dev)->name_node->list, list)
->+
-> int netdev_name_node_alt_create(struct net_device *dev, const char *name);
-> int netdev_name_node_alt_destroy(struct net_device *dev, const char *name);
-> 
->-- 
->2.41.0
->
+> Port property.
+
+Yes, I guess we can do it in phylink_mac_config. Or perhaps it would be better
+to put everything in ksz8_port_setup if you suggest this is a port specific 
+property and not global?
+Something like:
+
+@@ -1312,8 +1314,15 @@ void ksz8_port_setup(struct ksz_device *dev, int port, bool cpu_port)
+        ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_802_1P_ENABLE, true);
+
+        if (cpu_port) {
+-               if (!ksz_is_ksz88x3(dev))
++               if (!ksz_is_ksz88x3(dev)) {
+                        ksz8795_cpu_interface_select(dev, port);
++               } else {
++                       dev->rmii_clk_internal = of_property_read_bool(dev->dev->of_node,
++                                                                      "microchip,rmii-clk-internal");
++                       ksz_cfg(dev, KSZ88X3_REG_FVID_AND_HOST_MODE,
++                               KSZ88X3_PORT3_RMII_CLK_INTERNAL,
++                               dev->rmii_clk_internal);
++               }
+
 
