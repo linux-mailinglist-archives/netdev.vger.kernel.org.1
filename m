@@ -1,226 +1,200 @@
-Return-Path: <netdev+bounces-41999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59C3F7CC920
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:53:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 432267CC962
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:02:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D09F1C209DB
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:53:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B9AEB20FDC
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0249A2D058;
-	Tue, 17 Oct 2023 16:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BEC41A96;
+	Tue, 17 Oct 2023 17:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="N/UlntXd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NfzfYyVm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9912D03C
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:53:06 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2042.outbound.protection.outlook.com [40.107.223.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2505294;
-	Tue, 17 Oct 2023 09:53:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fQhvO2IPnl9BeeyjdQ4c8ktjIcZKYNQL5HIN5ojFn4IGozBUWQwNAyMj2oPyEhaGbpquomLowqZxLxUWErr2sGvbjyZ9Evqibt05ybtEx3sKfW1zN9BnIf0Qrlz1IG/p0yzk34xlvfVCrGXc/yhcDROUuhwPXStcHgG09qiMgH0ntIwqCScYUdnwtUmkfsDSz4vQKXsk9Ay3uTJifKLyB55fDcmee0CsFZjdmI/p9JctPZ3urX95Ltb97VAaPlUJsI3ugzAvzS1/B0jWVE2brFRVb1OKu8twZ1mNtzN0onuvYru2e0TGq6NLOjDz43O3cCflsaH+fOsFX9YBUwfYzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yq36ljxrv1QIlkujEr09NhyLj50waM7FvZRYatpitn4=;
- b=L/rgSqQ+4SEG8sMNXtvZMyfZ6pnyXCsyVLtwxAvV/EtlCQZjfAyvA7/4ohPPXWWTXgU6HGcYX/CJVP7/LsUkpvsT8MiQmMDWF5I0H/7V4WAUAwSKaNvlzdZmEjzmfEdq5xz62zuHbWp8jnCZZPPPrPVEJh16fgVjOz5O33PFM6EXh+NKXOIKb3Rxs9odVaX6el+xj9LMkS7IW9RGmpe7XoG47bWb5K2Xc/0uMrHR713KXWbo7zz0JdiiHR0booy9WPeKB+JVSUada2TEIWeJHehxQIZ+Td026F5TP8K32xrFyIv+rVEuxCyxR8d/NjoH/3obncw8Rr1jukqgU+qOtg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yq36ljxrv1QIlkujEr09NhyLj50waM7FvZRYatpitn4=;
- b=N/UlntXdD6qdHqYON/Npiwzqi/MWqMbkX5J/edkMN1M/7mAdFoXayjMcJaT3aQJi04K0roir+jUdZYQAnlJDuNdkRn/wbEDCB5qdSc2CVrcLRjbZduamrAz6jUCQ2+tK/GGNDUs5yYji4Psemhauwcg5qLSYJG4D0VuMDPOHve0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- PH0PR12MB7861.namprd12.prod.outlook.com (2603:10b6:510:26e::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Tue, 17 Oct
- 2023 16:53:02 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::e31c:de3c:af9d:cd2c]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::e31c:de3c:af9d:cd2c%5]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
- 16:53:02 +0000
-Message-ID: <97473ad9-c9c8-450c-bb1a-ad72dea0a5ad@amd.com>
-Date: Tue, 17 Oct 2023 09:52:57 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 03/11] pds_core: devlink health: use retained
- error fmsg API
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Michael Chan <michael.chan@broadcom.com>,
- Cai Huoqing <cai.huoqing@linux.dev>,
- George Cherian <george.cherian@marvell.com>,
- Danielle Ratson <danieller@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Ariel Elior <aelior@marvell.com>,
- Manish Chopra <manishc@marvell.com>, Igor Russkikh <irusskikh@marvell.com>,
- Coiby Xu <coiby.xu@gmail.com>
-Cc: Brett Creeley <brett.creeley@amd.com>,
- Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
- hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
- Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>,
- Leon Romanovsky <leon@kernel.org>, linux-kernel@vger.kernel.org,
- Jesse Brandeburg <jesse.brandeburg@intel.com>
-References: <20231017105341.415466-1-przemyslaw.kitszel@intel.com>
- <20231017105341.415466-4-przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <20231017105341.415466-4-przemyslaw.kitszel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PH8PR07CA0026.namprd07.prod.outlook.com
- (2603:10b6:510:2cf::21) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3FB8475
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 17:02:49 +0000 (UTC)
+Received: from mail-vk1-xa35.google.com (mail-vk1-xa35.google.com [IPv6:2607:f8b0:4864:20::a35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 285E4B0
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:02:47 -0700 (PDT)
+Received: by mail-vk1-xa35.google.com with SMTP id 71dfb90a1353d-49dd3bb5348so2308094e0c.0
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:02:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697562166; x=1698166966; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=meOLKnGF8WJL8QjeAU5Bsneou80HA3ukuD4wiDVJQNM=;
+        b=NfzfYyVm0NffAoJJqAMEjtT8MRCRd9nBcYX602Zgo7bIurVgSuPMKcxunkl8vBnE8h
+         2mplbFNWx+7++gE7+gskZzjyfS0j4T8x5msriXKdfzGP0XCezBTtfQS2MGEe2SP02Wi/
+         na7ekbqLO/N3AZK8eQSAhb//XfwUDrN3LofGU4+VD2IMaWGhH59JpWWH2dHIZCqlhxIV
+         9DtpRKv8b/C47iNoMpleCeFBtwXrknwadi9O5zDp7ENFvWey8ul0C2g1T2SaqG4+6WYq
+         3x0o52KOJicNqtyWvhAvjIH38S/qPwJg5a9pxD4OaqWX159AOSJTWIOG7gmXUzoXFSQY
+         JE5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697562166; x=1698166966;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=meOLKnGF8WJL8QjeAU5Bsneou80HA3ukuD4wiDVJQNM=;
+        b=EgmfycaBXmVRzjcP+2358Q+0/brpejRZYWEH9P1nLJtlbJDgPLMXSH5HFJLqglAxyd
+         IIiikR+lHfGb00kmpr4T8ZRJ3NTx1fkkQR968dooidxCSY4WxEnxOcnWs0HhHYYwr2+R
+         r2SNkqw5ojC3YeOS2CTgf5Gjix0h+9+lmaxDSM1KHVQEwrvWPkjmIVBNLOIwl8ShKTVc
+         1+iLwmXRTRzsFXAt1N4CRZ3ok5bzvSpDwdUM01L8K5zQ1jOmMWp4jhg1YIs1kzsu7cWz
+         ixp08dYC4+jbI9EGPp2HDvHjMpO6OcWTYNlRmU2OTYwze2uiuL2UskMrI+4euI+S7xKE
+         3Ojw==
+X-Gm-Message-State: AOJu0Yw0WMJKs9m7d280Cp5QA9vGmbOhJ1qMDJdWEizo+iDTk7LUqT7+
+	6QuBFXVmWIs65wPGz2RECScfvx0zGf9nnBcabdaebw==
+X-Google-Smtp-Source: AGHT+IFKxW3fp61cEvFV4zIZHRMcfUgLA1DOw8xeH9LPsaW1WrBi9O5xa5z7KvkDVSnAv+yp6cbFNhvK7yasiSnwVGs=
+X-Received: by 2002:a1f:27c6:0:b0:4a1:58e0:a0db with SMTP id
+ n189-20020a1f27c6000000b004a158e0a0dbmr2632544vkn.11.1697562166128; Tue, 17
+ Oct 2023 10:02:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|PH0PR12MB7861:EE_
-X-MS-Office365-Filtering-Correlation-Id: e52088fa-a18a-44df-c4ab-08dbcf318683
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	QYRjc5pfL7uQ8wsmhhPOzvJY+JZLUtGDetsj9wkq5Y53pxeD/E1Vm9SHH5J3fYHcCljs3dDj20uZ4J0psm7kQTPq62ROL1FaF/AjfoMUWv5/lOdqxf187BS8smDWVVscsHJjVjTEnkU/rW8PX+VhWlSl1qC+j8AHiJvDZvLdjo1x0hRz/oH4xKb+UCnfvLubbASUIvhB2NvCMHRG6eF7iRZYohsonjl5YJVCdgxNiIA7503SuQyseG5c/3AqaZBBGgYakTxfIj/w1boKDiBHtO93yXn8rPvhu8gEhAd4qRII4fHR1+qbBGN6Zwd5Oc2Ee44W8lmnng3oSFsc6LEHbrs2Fe35qZzmsuP+Qmma6UQMrgJOJ8TF6EOa1GxPgRqEECc3eoRdM9HgKe9auF8n1/FwTlhYDAnFhCAYyx7jG9C2elCnJ8QpYSRt9/50dgskIrpT4k3xZh6JdIs7LrTq/E8kqVUAwVbLvUYx9dSiiy9tr5TIxjzxpK9lIz+Ib+cGu0K12aC4D4C9q54O6v+oi7mUAKfb0Z/o8bQUv25ikL7thdxnMFbQfgRW3V3OBuvtYnPfm7VaWCPwLEnRKw+vRD0VDW/OyYWnCVGeqYo5/DeYmlXDtj/6CXXTRkj3/bbuC6LinnK8LbcMTIQLU4Rz1wKIIYW0UKMz1fOT+4BUMA4=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(366004)(39860400002)(396003)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(31686004)(53546011)(6486002)(921005)(6666004)(38100700002)(83380400001)(36756003)(26005)(6506007)(2906002)(66556008)(54906003)(66476007)(316002)(2616005)(478600001)(66946007)(31696002)(7406005)(110136005)(7416002)(86362001)(6512007)(41300700001)(8936002)(8676002)(5660300002)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OW40QjN6dVkrWURscTV5ZUpKZ2owejZ4RThDbWtkOWlwTXVpSDBhSGVBT3Ey?=
- =?utf-8?B?VlNQZDZUdC9WR0o3RDUvTHZJdlhNZXY2QklCbmZqak1BRW1sNURKR0RuTXM5?=
- =?utf-8?B?K2JDQTcyTSt6VGJhT0pKTmU4TktZWkVqR2JOelVTOXBlb3c1NGk5czd6anEx?=
- =?utf-8?B?K0E2NWEzQ3R6WEVLRVFlSUgwS3kwK0JEWXUyNkM0QWszWVNaN3Z2QjFoUFJ3?=
- =?utf-8?B?SHVpVnBTMjNDWXV6VldwdkVMTU0wcHBVUHg5QlNXMjRRbnp3L0NtN0dyMWNX?=
- =?utf-8?B?aUkvWDc1WEFYSkwwK2czd2NROFBFN0cvVUl5blN0bDBHK1pnOEJUU3pFWVd6?=
- =?utf-8?B?RUFHTXNXZ2NQdEg3VXRpa0t0aE1McTZaZjhqWTgvRittLzFFWVB0UzR3b2Fh?=
- =?utf-8?B?ajQ3aU5kcEFzMm9penV1TmVwR0hPOHZRZlNaTm5mdUlSbWdzUmxqWkpoT3ZT?=
- =?utf-8?B?eEI5MTJPendKRU5NWWx5a0kycTRadW84SFp5L2JPdjVyK2V6cVJzSW0yaW0z?=
- =?utf-8?B?b3htUmtLNFJtTng1YVIxZm9lek8vd2k1WU13YmhhWG8yUTMyVmhCZzY3aXcx?=
- =?utf-8?B?M3dMaVZJMjdQVjVkYktnZkZtRnFKNzJlVUNnWVU1TTdHa0pNWkFlVFpkYnJF?=
- =?utf-8?B?TEMyQ3pwZjRIRDVKTElpblJXVHI2REU4aVZ0bTR5bjdtMUtVOXM4UTlnajZL?=
- =?utf-8?B?Rlhkb3gxTmRxZUdXcnJmeGQ2dzB2eVRPc0lra0o2SDFmc1oyNUtNVWVCakpZ?=
- =?utf-8?B?SWFSY1BNRjZLbENweHh2d05SUE1tMHI1ZDU1OGlubEt0L0xwNDdCbU12cnhE?=
- =?utf-8?B?Z2NIUjNuODNxOGtPSU9LSlBHRjRrbDhkMjJhSFk0UUlvWjNzMFlPOE1wdHlK?=
- =?utf-8?B?bHJRNSs1RmJ0LzdrZDdlNDhGaGJoOFJucHFVRk8xVlZHd1c1VXZpSHE5eEJP?=
- =?utf-8?B?QUc0K053UTFYNDdibjRRK3ZpdUJJVGQyZlo1bHRrbzV2RlhMREtKdDN6MjJM?=
- =?utf-8?B?RzA3Sms2citjMjAyU1hNSFRIQVNmK2NBZHVSWDJPRDRNVHRJVnhtRklpZmhZ?=
- =?utf-8?B?SlN6M0xic0MreVk1RnVGclgrdmRmc0xZaGpNVHVUY085WnBOYWpwaVpWYVJ6?=
- =?utf-8?B?MEVYZ214TEZUb25ma2tkWU94VmR0S0V0ZWllcllrcU9XTUo3TFcveSsrcmMv?=
- =?utf-8?B?dHgzM29rYkdQMVZrQ0ZLOUNTNU5FOUd2dThVcVpRa2VtYmJlZmY5ajZRK1Ur?=
- =?utf-8?B?MWZkVElIdTJNbWtVVTNRTTkvQWFUYlNtR3NQQzI3bW82eXJ3dlB0ZUJUSlBa?=
- =?utf-8?B?NC9ZZkRnVlRjeWV4TURlZXFhWUQ2S0pZSHVBQmliYk9CbUNvc3JqTjRQVWFJ?=
- =?utf-8?B?TzlaZ2o0RWZUUWxjVkVsVnZSNWlQbWhSdXg1R3ZOT05wNGZmRXROTnMvQW5C?=
- =?utf-8?B?SW9oNFVUbGFoS2F1OHcxK0JNQ2VobW1YbmZDdCtyT0ZZbEJnaGRLbUpwU0I0?=
- =?utf-8?B?bDBXU2p1Vm9PU2owVlVmMmlidmFnTDJmMy9mZDA3a1psbFEwaDBMekxOOTZ0?=
- =?utf-8?B?eUNxYVNMTUFlanJPK0g4dHROMGxETUFMdlRvOTNEbjdtaUFYY1ZSU0VXUUdi?=
- =?utf-8?B?bVV5eDVvaEdaRy84d2xGUTdkcGZMdXNGTFBieUZpNnJGS0tJZVUveFJUaVpi?=
- =?utf-8?B?eXdpR2lLUCsrVFVtOXBnbkMxY0EzVVA0WjkrcXNsV2k3dlB5djZrQ2hhZDJ4?=
- =?utf-8?B?S3doVFF4SlNab01YKy9uSmtuczVCdCsxQTJCNnpHSFUwQjR3VmZueGZZbldF?=
- =?utf-8?B?cmJ4L2pvV3dDdmVNY0xGUnVGTDl5TUE4QnhwT1ZjbXUzREJRYWRsWTgrbk9U?=
- =?utf-8?B?NEFNalJIQzhuWEUwaTJVV1J6SCtoS2gzdVBLcVA2UHFSZkRrdHZPZG9aOEV1?=
- =?utf-8?B?M29iRldaaUpZaDF2aGZMOXcyZnBMR256aitTbFd0ODlJMzc5VnAycTd5Qlpi?=
- =?utf-8?B?R2tUTjdnV2Q0VW5ZTzdpUUM4V282QlM0ZWlKRm9lZjFndUNFdzdjeDJONVRj?=
- =?utf-8?B?cmZCV0dOMmRHa3NtUG1reHp4TWp1alJBN1BnUUVFSHRLTEdpditWb1dXbllB?=
- =?utf-8?Q?MPQt9mk5+fhlnv2q8mQKFZSsE?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e52088fa-a18a-44df-c4ab-08dbcf318683
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 16:53:02.2742
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jmBHwB8AGJVWPtfDQ8g9nErDbq2EOJ+NgrwWtWAAbkRGnKGoRe2Yt5oSogrIvYqtJJhV97RezEpWwu7/c2MyrA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7861
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+References: <20230830112600.4483-1-hdanton@sina.com> <f607a7d5-8075-f321-e3c0-963993433b14@I-love.SAKURA.ne.jp>
+ <20230831114108.4744-1-hdanton@sina.com> <CANn89iLCCGsP7SFn9HKpvnKu96Td4KD08xf7aGtiYgZnkjaL=w@mail.gmail.com>
+ <20230903005334.5356-1-hdanton@sina.com> <CANn89iJj_VR0L7g3-0=aZpKbXfVo7=BG0tsb8rhiTBc4zi_EtQ@mail.gmail.com>
+ <20230905111059.5618-1-hdanton@sina.com> <CANn89iKvoLUy=TMxW124tiixhOBL+SsV2jcmYhH8MFh3O75mow@mail.gmail.com>
+In-Reply-To: <CANn89iKvoLUy=TMxW124tiixhOBL+SsV2jcmYhH8MFh3O75mow@mail.gmail.com>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Tue, 17 Oct 2023 22:32:34 +0530
+Message-ID: <CA+G9fYvskJfx3=h4oCTAyxDWO1-aG7S0hAxSk4Jm+xSx=P1dhA@mail.gmail.com>
+Subject: Re: selftests: net: pmtu.sh: Unable to handle kernel paging request
+ at virtual address
+To: Eric Dumazet <edumazet@google.com>
+Cc: Hillf Danton <hdanton@sina.com>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, 
+	Netdev <netdev@vger.kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Dan Carpenter <dan.carpenter@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/17/2023 3:53 AM, Przemek Kitszel wrote:
-> 
-> Drop unneeded error checking.
-> 
-> devlink_fmsg_*() family of functions is now retaining errors,
-> so there is no need to check for them after each call.
-> 
-> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+On Tue, 5 Sept 2023 at 17:55, Eric Dumazet <edumazet@google.com> wrote:
+>
+> On Tue, Sep 5, 2023 at 1:52=E2=80=AFPM Hillf Danton <hdanton@sina.com> wr=
+ote:
+> >
+> > On Mon, 4 Sep 2023 13:29:57 +0200 Eric Dumazet <edumazet@google.com>
+> > > On Sun, Sep 3, 2023 at 5:57=3DE2=3D80=3DAFAM Hillf Danton <hdanton@si=
+na.com>
+> > > > On Thu, 31 Aug 2023 15:12:30 +0200 Eric Dumazet <edumazet@google.co=
+m>
+> > > > > --- a/net/core/dst.c
+> > > > > +++ b/net/core/dst.c
+> > > > > @@ -163,8 +163,13 @@ EXPORT_SYMBOL(dst_dev_put);
+> > > > >
+> > > > >  void dst_release(struct dst_entry *dst)
+> > > > >  {
+> > > > > -       if (dst && rcuref_put(&dst->__rcuref))
+> > > > > +       if (dst && rcuref_put(&dst->__rcuref)) {
+> > > > > +               if (!(dst->flags & DST_NOCOUNT)) {
+> > > > > +                       dst->flags |=3D DST_NOCOUNT;
+> > > > > +                       dst_entries_add(dst->ops, -1);
+> > > >
+> > > > Could this add happen after the rcu sync above?
+> > > >
+> > > I do not think so. All dst_release() should happen before netns remov=
+al.
+> >
+> >         cpu2                    cpu3
+> >         =3D=3D=3D=3D                    =3D=3D=3D=3D
+> >         cleanup_net()           __sys_sendto
+> >                                 sock_sendmsg()
+> >                                 udpv6_sendmsg()
+> >         synchronize_rcu();
+> >                                 dst_release()
+> >
+> > Could this one be an exception?
+>
+> No idea what you are trying to say.
+>
+> Please give exact locations, instead of being rather vague.
+>
+> Note that an UDP socket can not send a packet while its netns is dismantl=
+ed,
+> because alive sockets keep a reference on the netns.
 
-Thanks,
+Gentle reminder.
+This is still an open issue.
 
-Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+# selftests: net: pmtu.sh
+# TEST: ipv4: PMTU exceptions                                         [ OK =
+]
+# TEST: ipv4: PMTU exceptions - nexthop objects                       [ OK =
+]
+# TEST: ipv6: PMTU exceptions                                         [ OK =
+]
+# TEST: ipv6: PMTU exceptions - nexthop objects                       [ OK =
+]
+# TEST: ICMPv4 with DSCP and ECN: PMTU exceptions                     [ OK =
+]
+# TEST: ICMPv4 with DSCP and ECN: PMTU exceptions - nexthop objects   [ OK =
+]
+# TEST: UDPv4 with DSCP and ECN: PMTU exceptions                      [ OK =
+]
+# TEST: UDPv4 with DSCP and ECN: PMTU exceptions - nexthop objects    [ OK =
+]
+# TEST: IPv4 over vxlan4: PMTU exceptions                             [ OK =
+]
+# TEST: IPv4 over vxlan4: PMTU exceptions - nexthop objects           [ OK =
+]
+# TEST: IPv6 over vxlan4: PMTU exceptions                             [ OK =
+]
+# TEST: IPv6 over vxlan4: PMTU exceptions - nexthop objects           [ OK =
+]
+# TEST: IPv4 over vxlan6: PMTU exceptions                             [ OK =
+]
+<1>[  155.820793] Unable to handle kernel paging request at virtual
+address ffff247020442000
+<1>[  155.821495] Mem abort info:
+<1>[  155.821719]   ESR =3D 0x0000000097b58004
+<1>[  155.822046]   EC =3D 0x25: DABT (current EL), IL =3D 32 bits
+<1>[  155.822412]   SET =3D 0, FnV =3D 0
+<1>[  155.822648]   EA =3D 0, S1PTW =3D 0
+<1>[  155.822925]   FSC =3D 0x04: level 0 translation fault
+<1>[  155.823317] Data abort info:
+<1>[  155.823590]   Access size =3D 4 byte(s)
+<1>[  155.823886]   SSE =3D 1, SRT =3D 21
+<1>[  155.824167]   SF =3D 1, AR =3D 0
+<1>[  155.824450]   CM =3D 0, WnR =3D 0, TnD =3D 0, TagAccess =3D 0
+<1>[  155.824847]   GCS =3D 0, Overlay =3D 0, DirtyBit =3D 0, Xs =3D 0
+<1>[  155.825345] swapper pgtable: 4k pages, 48-bit VAs, pgdp=3D0000000041d=
+84000
+<1>[  155.827244] [ffff247020442000] pgd=3D0000000000000000, p4d=3D00000000=
+00000000
+<0>[  155.828511] Internal error: Oops: 0000000097b58004 [#1] PREEMPT SMP
+<4>[  155.829155] Modules linked in: vxlan ip6_udp_tunnel udp_tunnel
+act_csum libcrc32c act_pedit cls_flower sch_prio veth vrf macvtap
+macvlan tap crct10dif_ce sm3_ce sm3 sha3_ce sha512_ce sha512_arm64
+fuse drm backlight dm_mod ip_tables x_tables [last unloaded:
+test_blackhole_dev]
+<4>[  155.832289] CPU: 0 PID: 15 Comm: ksoftirqd/0 Not tainted 6.6.0-rc6 #1
+<4>[  155.832896] Hardware name: linux,dummy-virt (DT)
+<4>[  155.833927] pstate: 824000c9 (Nzcv daIF +PAN -UAO +TCO -DIT
+-SSBS BTYPE=3D--)
+<4>[  155.834496] pc : percpu_counter_add_batch+0x24/0xcc
+<4>[  155.835735] lr : dst_destroy+0x44/0x1e4
 
-> ---
-> add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-57 (-57)
-> ---
->   drivers/net/ethernet/amd/pds_core/devlink.c | 29 ++++++---------------
->   1 file changed, 8 insertions(+), 21 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/amd/pds_core/devlink.c b/drivers/net/ethernet/amd/pds_core/devlink.c
-> index d9607033bbf2..8b2b9e0d59f3 100644
-> --- a/drivers/net/ethernet/amd/pds_core/devlink.c
-> +++ b/drivers/net/ethernet/amd/pds_core/devlink.c
-> @@ -154,33 +154,20 @@ int pdsc_fw_reporter_diagnose(struct devlink_health_reporter *reporter,
->                                struct netlink_ext_ack *extack)
->   {
->          struct pdsc *pdsc = devlink_health_reporter_priv(reporter);
-> -       int err;
-> 
->          mutex_lock(&pdsc->config_lock);
-> -
->          if (test_bit(PDSC_S_FW_DEAD, &pdsc->state))
-> -               err = devlink_fmsg_string_pair_put(fmsg, "Status", "dead");
-> +               devlink_fmsg_string_pair_put(fmsg, "Status", "dead");
->          else if (!pdsc_is_fw_good(pdsc))
-> -               err = devlink_fmsg_string_pair_put(fmsg, "Status", "unhealthy");
-> +               devlink_fmsg_string_pair_put(fmsg, "Status", "unhealthy");
->          else
-> -               err = devlink_fmsg_string_pair_put(fmsg, "Status", "healthy");
-> -
-> +               devlink_fmsg_string_pair_put(fmsg, "Status", "healthy");
->          mutex_unlock(&pdsc->config_lock);
-> 
-> -       if (err)
-> -               return err;
-> -
-> -       err = devlink_fmsg_u32_pair_put(fmsg, "State",
-> -                                       pdsc->fw_status &
-> -                                               ~PDS_CORE_FW_STS_F_GENERATION);
-> -       if (err)
-> -               return err;
-> -
-> -       err = devlink_fmsg_u32_pair_put(fmsg, "Generation",
-> -                                       pdsc->fw_generation >> 4);
-> -       if (err)
-> -               return err;
-> +       devlink_fmsg_u32_pair_put(fmsg, "State",
-> +                                 pdsc->fw_status & ~PDS_CORE_FW_STS_F_GENERATION);
-> +       devlink_fmsg_u32_pair_put(fmsg, "Generation", pdsc->fw_generation >> 4);
-> +       devlink_fmsg_u32_pair_put(fmsg, "Recoveries", pdsc->fw_recoveries);
-> 
-> -       return devlink_fmsg_u32_pair_put(fmsg, "Recoveries",
-> -                                        pdsc->fw_recoveries);
-> +       return 0;
->   }
-> --
-> 2.40.1
-> 
+Links:
+- https://qa-reports.linaro.org/lkft/linux-mainline-master/build/v6.6-rc6/t=
+estrun/20613439/suite/log-parser-test/test/check-kernel-oops/log
+- https://qa-reports.linaro.org/lkft/linux-mainline-master/build/v6.6-rc6/t=
+estrun/20613439/suite/log-parser-test/tests/
+
+- Naresh
 
