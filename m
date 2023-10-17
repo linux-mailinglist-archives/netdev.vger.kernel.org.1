@@ -1,192 +1,480 @@
-Return-Path: <netdev+bounces-41989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A687E7CC8AA
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:23:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F70F7CC8B2
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:23:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA4C61C20A0D
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:23:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9B63281B3F
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A8045F79;
-	Tue, 17 Oct 2023 16:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F379D9CA5E;
+	Tue, 17 Oct 2023 16:23:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="uxfapWGF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S1pjWRhd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF9A45F74
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:22:56 +0000 (UTC)
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04olkn2037.outbound.protection.outlook.com [40.92.75.37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AC01A4;
-	Tue, 17 Oct 2023 09:22:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MsidnMIHUykPYc8/mxvWl8CoDYWJPb7gstIt+KappnqKLZvU86OCe42JcEFfavpfyANnJc/Dy8Wl2rn9HAd0Ehg9XygY0lP+zEUwWlStGMYnUWOZESErA0Q6GGcS13h8OkypYirw0w5yD+RoZz7iO8/AYQiai97oz+v61AlwIScgwli4IA905Xih6YS+8y/c0ePq2PkNg2buQBuRxRnN67VaFEzr/ogx9SuGm+HRHMMQsXm/0WgjIYrjJ2H5AHtGfC+SDft9HHobYND7VJI6F9JexZLANj1S9gFOmrXrsYBKAia8pycY9iHMdO/mrZCQ6MkU1E5Ws666+KWZi+UZfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DDRqOekf0qd4P/DQTcQIPmfho3vMDf5sI5B6cunmMHI=;
- b=OYuH9whVBKQFUxnEgJakKiT/PTuLcNQsmHxirR9FHktMz2Kwff504mK0tOjfRIF9SCPu8UxoGfDKifyBvb5gaWPFQVIy7TG/1sAYYsCb3DNEtOEWhqcCoJz9Qzy0HaVxDIKuTabjt2eYH6LgWzoWWHjjEYWMBDqGE77ceRSyBRCsG4tvUn68cTrLINaXwNBDZ58lvdj+aQenc274k8H27KhQuXoTP7FeecW6L16ruv8E8HW2dj8nXx1T4i8vjzXTaenSa8pB4XdbLA8FPESiCMKs32LJdmECGEoePqNu6DSh2V7g7BReff56syg+g34xL/JGr1He/BPZ/tm5rqf82Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DDRqOekf0qd4P/DQTcQIPmfho3vMDf5sI5B6cunmMHI=;
- b=uxfapWGF8nd2m6ItjbS3YSBt8YDG8fvYla0P0gqKo1Y4YBtiE0qtkSRI8SDEsSf/W7D+Oz1Cs9eRaNxX50jCjksfXJAU8+fWyiWwHbv5YMAUiWwAZwLWuSq2xv625ZNNhcx1JwdRWUyA2MSljzmq6dUg6bzphraaS9k91+NfynMCG+sPTwtaF5wOlPRRaS96Cqs6yICHzngXTn1TrxU2srWXuL2rQgxGczm3ZLO+wgC0ziawESXGS69xfYZZvG5xLVCCUipDsGC4er3urcEW2NKuWTkJ20R7bdpG23OaEtj8gj2UibdU7liUCENtu0LBJ8flNwbtWsSIEVFUSWEZbw==
-Received: from VI1P193MB0752.EURP193.PROD.OUTLOOK.COM (2603:10a6:800:32::19)
- by PR3P193MB0553.EURP193.PROD.OUTLOOK.COM (2603:10a6:102:36::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Tue, 17 Oct
- 2023 16:22:53 +0000
-Received: from VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
- ([fe80::af68:c2a:73ce:8e99]) by VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
- ([fe80::af68:c2a:73ce:8e99%3]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
- 16:22:53 +0000
-From: Juntong Deng <juntong.deng@outlook.com>
-To: borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com
-Subject: [PATCH v2] net/tls: Fix slab-use-after-free in tls_encrypt_done
-Date: Wed, 18 Oct 2023 00:22:15 +0800
-Message-ID:
- <VI1P193MB0752321F24623E024C87886A99D6A@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.39.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [l4mhqtjJiDvTyGcARR2Dbgu+eyvxvniW]
-X-ClientProxiedBy: LNXP265CA0086.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:76::26) To VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:800:32::19)
-X-Microsoft-Original-Message-ID:
- <20231017162215.20484-1-juntong.deng@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C564734F;
+	Tue, 17 Oct 2023 16:23:19 +0000 (UTC)
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27D19B0;
+	Tue, 17 Oct 2023 09:23:18 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5a7afd45199so74400687b3.0;
+        Tue, 17 Oct 2023 09:23:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697559797; x=1698164597; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NnWq+uYNn+SsjJw/E+I7Mb11OXcmP1oROjW1ThmoOQs=;
+        b=S1pjWRhdWPRweHX4etqhy8DcIhPM0v0JcxS9IXmIVb7zC7CaYhk3as9Akt4AaGfIF0
+         ukC8f7NWgvxILPD9wNoey6kz/BpuO8nOsNw3itk5247pa7rYstSJ9Z1NvQUFiq/aq2E4
+         jDbIlRe52StjAn3DV59HQQE9Afj0NstFEz7Tu2X0j3pF+18nQz3nuIqdo993rYTZY5Pk
+         DSwXK6GAqH4+Zh7+LxeggymcQrpvu8e63AtM2dY7B0mb7VARXtZE0aq37JEGs7T8/EZp
+         y+6euTFmATYJd80NnSr9YtuDmfTbw5YKTeTvbHcd8s+tyM/LjlH5LqDET4AknumV1Uku
+         keWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697559797; x=1698164597;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NnWq+uYNn+SsjJw/E+I7Mb11OXcmP1oROjW1ThmoOQs=;
+        b=RWqdu3AgFR/knQs+7s4Pqd0Tw/xZgB5NbkrqFVhe0RnO15pRdT4s2kRnB2zGQSLlBT
+         HL196iC8mrSPI+dAwpDdQL2QsZ4Juq6sRhxN3EuC2c3jpH84PzQlMjkilClorB1MOwMf
+         8/CLBxUdWz3lAp5mDDhX0sNXNrIEvDOxKuEeoDPKJ/KWbgW4QZFSyo12iZzdpBBKFFlA
+         wqTL7zAV9yiDygnjFIYSlRuCZGOXmAV66VF13sL1FCT/s2OgwtE6uh/pARqG4NIjIVng
+         gzgWq9/ZousqeekS3ZCY5BnN5+1306CYWw9V3h3UIpB+mrTLxs/t4Oj2qjLSycai9rSc
+         BllQ==
+X-Gm-Message-State: AOJu0YwSROd7eu7Ky1AavKZwkKjHiuc9n92GcIyaQ4c3IWo3/HNs+nrQ
+	VbMVcXu2Tm9ZEW2Pn+9H8G573fWhN4Y=
+X-Google-Smtp-Source: AGHT+IEteWVlunfEUR41/DWe+unPX12TZNR8U4ttj2eux9Ty6fBOtfQ/FyC1SgKC8vbpjSecLI+kMg==
+X-Received: by 2002:a25:ae8e:0:b0:d9c:66fb:db9 with SMTP id b14-20020a25ae8e000000b00d9c66fb0db9mr1133388ybj.59.1697559797049;
+        Tue, 17 Oct 2023 09:23:17 -0700 (PDT)
+Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:ed01:b54a:4364:93cc])
+        by smtp.gmail.com with ESMTPSA id r189-20020a2544c6000000b00d814d8dfd69sm623645yba.27.2023.10.17.09.23.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 09:23:16 -0700 (PDT)
+From: thinker.li@gmail.com
+To: bpf@vger.kernel.org,
+	ast@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	kernel-team@meta.com,
+	andrii@kernel.org,
+	drosen@google.com
+Cc: sinquersw@gmail.com,
+	kuifeng@meta.com,
+	Kui-Feng Lee <thinker.li@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf-next v5 6/9] bpf, net: switch to dynamic registration
+Date: Tue, 17 Oct 2023 09:23:03 -0700
+Message-Id: <20231017162306.176586-7-thinker.li@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231017162306.176586-1-thinker.li@gmail.com>
+References: <20231017162306.176586-1-thinker.li@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI1P193MB0752:EE_|PR3P193MB0553:EE_
-X-MS-Office365-Filtering-Correlation-Id: f70fa696-fbd1-4989-9c1d-08dbcf2d4f69
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	dvvpteJGpr3dRZvuYHCactD6WD/sIwC8auKsqtOe2BAa48PwhSPHCQNaLiT9Bw7qV+H0roClitVOYjpPg3EKt7ji+z5lwoAf20iBziUfVKOykzNNnfXZfsQIm5TepY7B8PVHqeueSjPSli0HxvBgA9OzWG7MRRakeV9M6H/+mvW19p5Od3gHnhv56Q/1obrrsVmtYnfwtOH5MqDofnmG/BlRD5+E8YAS0jE/+Ripb6gp3qESPUDHM1j18Kc9LJk2AFFSYJWCxIDhYPOEc5wxoDJAekXoG8eElSe4wonrXtWpmwESlwnLVve4YNRE6T+GtaVgAJuDw0mvB/nE+t87bN3Dvkc4kPlRa1KWRLHPmFv6IgacUaX6n2EKVxqHB/iPuqUKCC72FilWlxXB0/hydrzbQyJLD9x7cVbBEt3Lqe1geQm3ksj+StXjBWVjhXARe4KSmrkVuGEfgug7pjCL9+8rJXvfFYp2G+ZiBcnyxynFT4sdRsya7mXTfA3UaZfpgq4kNoLFEkPy0VBbMxoUQow5buejBYtxgofcMAoZNWCLZ9jlFWYHQ7KWiago0mzlnhfoDBUhZVAjBnFlAOzOqZEreSofQLls6gRLDW7Etvo=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?og+5c227dqG1JjGvwMb31JYgjRoAZXAjDTzlcDSR/H3zJFBaXC62o56ussvb?=
- =?us-ascii?Q?MzQjcxEQvs1HAbKOCmx1jcSkEgV5BVkCrz4nAgAHTt6W2Yw0pUqu7IHYSh+F?=
- =?us-ascii?Q?eKyPJJK1Drxe5qh4pj3bzTqFNgaZhWmrYAOUJ0xSUlMXGOP1zqnOCgmDkvYj?=
- =?us-ascii?Q?PBayeBgWVAqMwGUGqKG71aTb4lpwg2U+uthQ7FKeQNqVL72yg1ZdYeYKk+Wa?=
- =?us-ascii?Q?uXi+Q0crKVNC57O04y0bNzySGRdNTqVZMfpFgaMiN7gd7wymwDnN2oObEjJC?=
- =?us-ascii?Q?z9XSzKyhDG/4cJrhNoV/n4t/vqYJmSBSkwcKYZ0gP+PC479KRik4Odx3hYOV?=
- =?us-ascii?Q?zzPIciqlk+9+yNuGuNttNRFGggxucwlINTcqqQmciirLvMhe0aM+MtPJUQ3k?=
- =?us-ascii?Q?rde76Uf1Y+oGuY6TtM8dn87kbLAYYWr9WQl34S3mF9vyHBe7I5hRFBb6QLX2?=
- =?us-ascii?Q?bpAUxuCeNLCB01aPqMovgH+YlC0K22Akd2HW9EQi7NMhgczl9lsejmHDh9gK?=
- =?us-ascii?Q?MV53SGESMrFj3Npk3FLprmJKhJ4nNnjTdFbYYaoERebI1TNo19Ze0t+31L6i?=
- =?us-ascii?Q?HfldUSqo/jqKxJnmC0MdXM9+ltMNlsaWL723pec/WBoGzRLWPxRawVEjjJP1?=
- =?us-ascii?Q?OtrdOxHGECOa5gnpfqmdcts5rGqLA340V7p9qSLNPl+LeRYAOKG5bp+JcaUD?=
- =?us-ascii?Q?nczKKEfkQ2YGJndC6kU8ljtSTS+xgKJm8giNW8uonbxkqe9H80gui6NHqOkx?=
- =?us-ascii?Q?l1BWRKVyWeVFLi5/Mxg/tQ0EsTs63ORNwDiHIQrAQDivYX13dmKE2xN+d4Gi?=
- =?us-ascii?Q?ukySfh1RLk+nirFCf1qQjEKZYWjFHRo8DbuexBDlBPZgkcSszisVkTieNiBk?=
- =?us-ascii?Q?69DHqnQh5K9aFDiCGos2W4oKgLH9xWK3kSVbucZfcPmN3ZjyXrbTO7hCLovD?=
- =?us-ascii?Q?UTxw2/nw3oPqkRRxvSFuHdttO7VcmBFA96nyMymD0g3sczKiUrsQ5kn3Shr5?=
- =?us-ascii?Q?YA3zDD5oJKGQ54InabgL+KhcSt2fzFrnKpIaYzX2gjHCs2Al70rq5bx/7cfs?=
- =?us-ascii?Q?UvzjHRubgOsQuKjw5wyXXudhUeRrJuF0oyMbSjOEgRQs7XKyfj99uTrvSgkQ?=
- =?us-ascii?Q?Qf41nN6iMhrxdU6kQMeUs0ubmd82a2zC4NnjetXoGrjWvCoxAfJZd29/uRLW?=
- =?us-ascii?Q?2BsSJQ9IpBtxSGg2Oc35ebvKlC+S+wAWludxOkoZEkS0hMcSy7M/VELIdwo?=
- =?us-ascii?Q?=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f70fa696-fbd1-4989-9c1d-08dbcf2d4f69
-X-MS-Exchange-CrossTenant-AuthSource: VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 16:22:51.9331
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3P193MB0553
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In the current implementation, ctx->async_wait.completion is completed
-after spin_lock_bh, which causes tls_sw_release_resources_tx to
-continue executing and return to tls_sk_proto_cleanup, then return
-to tls_sk_proto_close, and after that enter tls_sw_free_ctx_tx to kfree
-the entire struct tls_sw_context_tx (including ctx->encrypt_compl_lock).
+From: Kui-Feng Lee <thinker.li@gmail.com>
 
-Since ctx->encrypt_compl_lock has been freed, subsequent spin_unlock_bh
-will result in slab-use-after-free error. Due to SMP, even using
-spin_lock_bh does not prevent tls_sw_release_resources_tx from continuing
-on other CPUs. After tls_sw_release_resources_tx is woken up, there is no
-attempt to hold ctx->encrypt_compl_lock again, therefore everything
-described above is possible.
+Replace the static list of struct_ops types with pre-btf struct_ops_tab to
+enable dynamic registration.
 
-The fix is to put complete(&ctx->async_wait.completion) after
-spin_unlock_bh, making the release after the unlock. Since complete is
-only executed if pending is 0, which means this is the last record, there
-is no need to worry about race condition causing duplicate completes.
+Both bpf_dummy_ops and bpf_tcp_ca now utilize the registration function
+instead of being listed in bpf_struct_ops_types.h.
 
-Since tls_sw_release_resources_tx freed all un-sent records in the
-ctx->tx_list, subsequent schedule transmission is meaningless, and
-the entire struct tls_sw_context_tx has been freed (including
-ctx->tx_bitmask and ctx->tx_work.work), continuing to execute
-subsequent code will cause use-after-free, so return directly.
-
-Reported-by: syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=29c22ea2d6b2c5fd2eae
-Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
 ---
-V1 -> V2: Fix possible use-after-free caused by test_and_set_bit
+ include/linux/bpf.h               |   2 +
+ include/linux/btf.h               |  29 +++++++
+ kernel/bpf/bpf_struct_ops.c       | 124 +++++++++++++++---------------
+ kernel/bpf/bpf_struct_ops_types.h |  12 ---
+ kernel/bpf/btf.c                  |   2 +-
+ net/bpf/bpf_dummy_struct_ops.c    |  14 +++-
+ net/ipv4/bpf_tcp_ca.c             |  16 +++-
+ 7 files changed, 119 insertions(+), 80 deletions(-)
+ delete mode 100644 kernel/bpf/bpf_struct_ops_types.h
 
- net/tls/tls_sw.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 270712b8d391..b21f5fecc84e 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -441,6 +441,7 @@ static void tls_encrypt_done(void *data, int err)
- 	struct sk_msg *msg_en;
- 	bool ready = false;
- 	struct sock *sk;
-+	int async_notify;
- 	int pending;
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index 1e1647c8b0ce..b0f33147aa93 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -3207,4 +3207,6 @@ static inline bool bpf_is_subprog(const struct bpf_prog *prog)
+ 	return prog->aux->func_idx != 0;
+ }
  
- 	msg_en = &rec->msg_encrypted;
-@@ -482,10 +483,13 @@ static void tls_encrypt_done(void *data, int err)
++int register_bpf_struct_ops(struct bpf_struct_ops *st_ops);
++
+ #endif /* _LINUX_BPF_H */
+diff --git a/include/linux/btf.h b/include/linux/btf.h
+index aa2ba77648be..fdc83aa10462 100644
+--- a/include/linux/btf.h
++++ b/include/linux/btf.h
+@@ -12,6 +12,8 @@
+ #include <uapi/linux/bpf.h>
  
- 	spin_lock_bh(&ctx->encrypt_compl_lock);
- 	pending = atomic_dec_return(&ctx->encrypt_pending);
-+	async_notify = ctx->async_notify;
-+	spin_unlock_bh(&ctx->encrypt_compl_lock);
+ #define BTF_TYPE_EMIT(type) ((void)(type *)0)
++#define BTF_STRUCT_OPS_TYPE_EMIT(type) {((void)(struct type *)0);	\
++		((void)(struct bpf_struct_ops_##type *)0); }
+ #define BTF_TYPE_EMIT_ENUM(enum_val) ((void)enum_val)
  
--	if (!pending && ctx->async_notify)
-+	if (!pending && async_notify) {
- 		complete(&ctx->async_wait.completion);
--	spin_unlock_bh(&ctx->encrypt_compl_lock);
-+		return;
+ /* These need to be macros, as the expressions are used in assembler input */
+@@ -200,6 +202,7 @@ u32 btf_obj_id(const struct btf *btf);
+ bool btf_is_kernel(const struct btf *btf);
+ bool btf_is_module(const struct btf *btf);
+ struct module *btf_try_get_module(const struct btf *btf);
++struct btf *btf_get_module_btf(const struct module *module);
+ u32 btf_nr_types(const struct btf *btf);
+ bool btf_member_is_reg_int(const struct btf *btf, const struct btf_type *s,
+ 			   const struct btf_member *m,
+@@ -577,4 +580,30 @@ int btf_add_struct_ops(struct bpf_struct_ops *st_ops);
+ const struct bpf_struct_ops **
+ btf_get_struct_ops(struct btf *btf, u32 *ret_cnt);
+ 
++enum bpf_struct_ops_state {
++	BPF_STRUCT_OPS_STATE_INIT,
++	BPF_STRUCT_OPS_STATE_INUSE,
++	BPF_STRUCT_OPS_STATE_TOBEFREE,
++	BPF_STRUCT_OPS_STATE_READY,
++};
++
++struct bpf_struct_ops_common_value {
++	refcount_t refcnt;
++	enum bpf_struct_ops_state state;
++};
++#define BPF_STRUCT_OPS_COMMON_VALUE struct bpf_struct_ops_common_value common
++
++/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
++ * the map's value exposed to the userspace and its btf-type-id is
++ * stored at the map->btf_vmlinux_value_type_id.
++ *
++ */
++#define DEFINE_STRUCT_OPS_VALUE_TYPE(_name)			\
++extern struct bpf_struct_ops bpf_##_name;			\
++								\
++struct bpf_struct_ops_##_name {					\
++	BPF_STRUCT_OPS_COMMON_VALUE;				\
++	struct _name data ____cacheline_aligned_in_smp;		\
++}
++
+ #endif
+diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+index 60445ff32275..175068b083cb 100644
+--- a/kernel/bpf/bpf_struct_ops.c
++++ b/kernel/bpf/bpf_struct_ops.c
+@@ -13,19 +13,6 @@
+ #include <linux/btf_ids.h>
+ #include <linux/rcupdate_wait.h>
+ 
+-enum bpf_struct_ops_state {
+-	BPF_STRUCT_OPS_STATE_INIT,
+-	BPF_STRUCT_OPS_STATE_INUSE,
+-	BPF_STRUCT_OPS_STATE_TOBEFREE,
+-	BPF_STRUCT_OPS_STATE_READY,
+-};
+-
+-struct bpf_struct_ops_common_value {
+-	refcount_t refcnt;
+-	enum bpf_struct_ops_state state;
+-};
+-#define BPF_STRUCT_OPS_COMMON_VALUE struct bpf_struct_ops_common_value common
+-
+ struct bpf_struct_ops_value {
+ 	BPF_STRUCT_OPS_COMMON_VALUE;
+ 	char data[] ____cacheline_aligned_in_smp;
+@@ -72,35 +59,6 @@ static DEFINE_MUTEX(update_mutex);
+ #define VALUE_PREFIX "bpf_struct_ops_"
+ #define VALUE_PREFIX_LEN (sizeof(VALUE_PREFIX) - 1)
+ 
+-/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
+- * the map's value exposed to the userspace and its btf-type-id is
+- * stored at the map->btf_vmlinux_value_type_id.
+- *
+- */
+-#define BPF_STRUCT_OPS_TYPE(_name)				\
+-extern struct bpf_struct_ops bpf_##_name;			\
+-								\
+-struct bpf_struct_ops_##_name {						\
+-	BPF_STRUCT_OPS_COMMON_VALUE;				\
+-	struct _name data ____cacheline_aligned_in_smp;		\
+-};
+-#include "bpf_struct_ops_types.h"
+-#undef BPF_STRUCT_OPS_TYPE
+-
+-enum {
+-#define BPF_STRUCT_OPS_TYPE(_name) BPF_STRUCT_OPS_TYPE_##_name,
+-#include "bpf_struct_ops_types.h"
+-#undef BPF_STRUCT_OPS_TYPE
+-	__NR_BPF_STRUCT_OPS_TYPE,
+-};
+-
+-static struct bpf_struct_ops * const bpf_struct_ops[] = {
+-#define BPF_STRUCT_OPS_TYPE(_name)				\
+-	[BPF_STRUCT_OPS_TYPE_##_name] = &bpf_##_name,
+-#include "bpf_struct_ops_types.h"
+-#undef BPF_STRUCT_OPS_TYPE
+-};
+-
+ const struct bpf_verifier_ops bpf_struct_ops_verifier_ops = {
+ };
+ 
+@@ -234,16 +192,51 @@ static void bpf_struct_ops_init_one(struct bpf_struct_ops *st_ops,
+ 
+ }
+ 
++static int register_bpf_struct_ops_btf(struct bpf_struct_ops *st_ops,
++				       struct btf *btf)
++{
++	struct bpf_verifier_log *log;
++	int err;
++
++	if (st_ops == NULL)
++		return -EINVAL;
++
++	log = kzalloc(sizeof(*log), GFP_KERNEL | __GFP_NOWARN);
++	if (!log) {
++		err = -ENOMEM;
++		goto errout;
 +	}
++
++	log->level = BPF_LOG_KERNEL;
++
++	bpf_struct_ops_init_one(st_ops, btf, st_ops->owner, log);
++
++	err = btf_add_struct_ops(st_ops);
++
++errout:
++	kfree(log);
++
++	return err;
++}
++
++int register_bpf_struct_ops(struct bpf_struct_ops *st_ops)
++{
++	struct btf *btf;
++	int err;
++
++	btf = btf_get_module_btf(st_ops->owner);
++	if (!btf)
++		return -EINVAL;
++	err = register_bpf_struct_ops_btf(st_ops, btf);
++	btf_put(btf);
++
++	return err;
++}
++EXPORT_SYMBOL_GPL(register_bpf_struct_ops);
++
+ void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log)
+ {
+-	struct bpf_struct_ops *st_ops;
+ 	s32 module_id, common_value_id;
+-	u32 i;
+-
+-	/* Ensure BTF type is emitted for "struct bpf_struct_ops_##_name" */
+-#define BPF_STRUCT_OPS_TYPE(_name) BTF_TYPE_EMIT(struct bpf_struct_ops_##_name);
+-#include "bpf_struct_ops_types.h"
+-#undef BPF_STRUCT_OPS_TYPE
  
- 	if (!ready)
+ 	module_id = btf_find_by_name_kind(btf, "module", BTF_KIND_STRUCT);
+ 	if (module_id < 0) {
+@@ -259,11 +252,6 @@ void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log)
  		return;
+ 	}
+ 	common_value_type = btf_type_by_id(btf, common_value_id);
+-
+-	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
+-		st_ops = bpf_struct_ops[i];
+-		bpf_struct_ops_init_one(st_ops, btf, NULL, log);
+-	}
+ }
+ 
+ extern struct btf *btf_vmlinux;
+@@ -271,32 +259,44 @@ extern struct btf *btf_vmlinux;
+ static const struct bpf_struct_ops *
+ bpf_struct_ops_find_value(struct btf *btf, u32 value_id)
+ {
++	const struct bpf_struct_ops *st_ops = NULL;
++	const struct bpf_struct_ops **st_ops_list;
+ 	unsigned int i;
++	u32 cnt = 0;
+ 
+ 	if (!value_id || !btf_vmlinux)
+ 		return NULL;
+ 
+-	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
+-		if (bpf_struct_ops[i]->value_id == value_id)
+-			return bpf_struct_ops[i];
++	st_ops_list = btf_get_struct_ops(btf, &cnt);
++	for (i = 0; i < cnt; i++) {
++		if (st_ops_list[i]->value_id == value_id) {
++			st_ops = st_ops_list[i];
++			break;
++		}
+ 	}
+ 
+-	return NULL;
++	return st_ops;
+ }
+ 
+ const struct bpf_struct_ops *bpf_struct_ops_find(struct btf *btf, u32 type_id)
+ {
++	const struct bpf_struct_ops *st_ops = NULL;
++	const struct bpf_struct_ops **st_ops_list;
+ 	unsigned int i;
++	u32 cnt;
+ 
+ 	if (!type_id || !btf_vmlinux)
+ 		return NULL;
+ 
+-	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
+-		if (bpf_struct_ops[i]->type_id == type_id)
+-			return bpf_struct_ops[i];
++	st_ops_list = btf_get_struct_ops(btf, &cnt);
++	for (i = 0; i < cnt; i++) {
++		if (st_ops_list[i]->type_id == type_id) {
++			st_ops = st_ops_list[i];
++			break;
++		}
+ 	}
+ 
+-	return NULL;
++	return st_ops;
+ }
+ 
+ static int bpf_struct_ops_map_get_next_key(struct bpf_map *map, void *key,
+diff --git a/kernel/bpf/bpf_struct_ops_types.h b/kernel/bpf/bpf_struct_ops_types.h
+deleted file mode 100644
+index 5678a9ddf817..000000000000
+--- a/kernel/bpf/bpf_struct_ops_types.h
++++ /dev/null
+@@ -1,12 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/* internal file - do not include directly */
+-
+-#ifdef CONFIG_BPF_JIT
+-#ifdef CONFIG_NET
+-BPF_STRUCT_OPS_TYPE(bpf_dummy_ops)
+-#endif
+-#ifdef CONFIG_INET
+-#include <net/tcp.h>
+-BPF_STRUCT_OPS_TYPE(tcp_congestion_ops)
+-#endif
+-#endif
+diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+index be5144dbb53d..990973d6057d 100644
+--- a/kernel/bpf/btf.c
++++ b/kernel/bpf/btf.c
+@@ -7532,7 +7532,7 @@ struct module *btf_try_get_module(const struct btf *btf)
+ /* Returns struct btf corresponding to the struct module.
+  * This function can return NULL or ERR_PTR.
+  */
+-static struct btf *btf_get_module_btf(const struct module *module)
++struct btf *btf_get_module_btf(const struct module *module)
+ {
+ #ifdef CONFIG_DEBUG_INFO_BTF_MODULES
+ 	struct btf_module *btf_mod, *tmp;
+diff --git a/net/bpf/bpf_dummy_struct_ops.c b/net/bpf/bpf_dummy_struct_ops.c
+index 5918d1b32e19..724bb7224079 100644
+--- a/net/bpf/bpf_dummy_struct_ops.c
++++ b/net/bpf/bpf_dummy_struct_ops.c
+@@ -7,7 +7,7 @@
+ #include <linux/bpf.h>
+ #include <linux/btf.h>
+ 
+-extern struct bpf_struct_ops bpf_bpf_dummy_ops;
++static struct bpf_struct_ops bpf_bpf_dummy_ops;
+ 
+ /* A common type for test_N with return value in bpf_dummy_ops */
+ typedef int (*dummy_ops_test_ret_fn)(struct bpf_dummy_ops_state *state, ...);
+@@ -216,11 +216,13 @@ static int bpf_dummy_reg(void *kdata)
+ 	return -EOPNOTSUPP;
+ }
+ 
++DEFINE_STRUCT_OPS_VALUE_TYPE(bpf_dummy_ops);
++
+ static void bpf_dummy_unreg(void *kdata)
+ {
+ }
+ 
+-struct bpf_struct_ops bpf_bpf_dummy_ops = {
++static struct bpf_struct_ops bpf_bpf_dummy_ops = {
+ 	.verifier_ops = &bpf_dummy_verifier_ops,
+ 	.init = bpf_dummy_init,
+ 	.check_member = bpf_dummy_ops_check_member,
+@@ -228,4 +230,12 @@ struct bpf_struct_ops bpf_bpf_dummy_ops = {
+ 	.reg = bpf_dummy_reg,
+ 	.unreg = bpf_dummy_unreg,
+ 	.name = "bpf_dummy_ops",
++	.owner = THIS_MODULE,
+ };
++
++static int __init bpf_dummy_struct_ops_init(void)
++{
++	BTF_STRUCT_OPS_TYPE_EMIT(bpf_dummy_ops);
++	return register_bpf_struct_ops(&bpf_bpf_dummy_ops);
++}
++late_initcall(bpf_dummy_struct_ops_init);
+diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
+index 39dcccf0f174..20c401c73dfb 100644
+--- a/net/ipv4/bpf_tcp_ca.c
++++ b/net/ipv4/bpf_tcp_ca.c
+@@ -12,7 +12,7 @@
+ #include <net/bpf_sk_storage.h>
+ 
+ /* "extern" is to avoid sparse warning.  It is only used in bpf_struct_ops.c. */
+-extern struct bpf_struct_ops bpf_tcp_congestion_ops;
++static struct bpf_struct_ops bpf_tcp_congestion_ops;
+ 
+ static u32 unsupported_ops[] = {
+ 	offsetof(struct tcp_congestion_ops, get_info),
+@@ -271,7 +271,9 @@ static int bpf_tcp_ca_validate(void *kdata)
+ 	return tcp_validate_congestion_control(kdata);
+ }
+ 
+-struct bpf_struct_ops bpf_tcp_congestion_ops = {
++DEFINE_STRUCT_OPS_VALUE_TYPE(tcp_congestion_ops);
++
++static struct bpf_struct_ops bpf_tcp_congestion_ops = {
+ 	.verifier_ops = &bpf_tcp_ca_verifier_ops,
+ 	.reg = bpf_tcp_ca_reg,
+ 	.unreg = bpf_tcp_ca_unreg,
+@@ -281,10 +283,18 @@ struct bpf_struct_ops bpf_tcp_congestion_ops = {
+ 	.init = bpf_tcp_ca_init,
+ 	.validate = bpf_tcp_ca_validate,
+ 	.name = "tcp_congestion_ops",
++	.owner = THIS_MODULE,
+ };
+ 
+ static int __init bpf_tcp_ca_kfunc_init(void)
+ {
+-	return register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_tcp_ca_kfunc_set);
++	int ret;
++
++	BTF_STRUCT_OPS_TYPE_EMIT(tcp_congestion_ops);
++
++	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_tcp_ca_kfunc_set);
++	ret = ret ?: register_bpf_struct_ops(&bpf_tcp_congestion_ops);
++
++	return ret;
+ }
+ late_initcall(bpf_tcp_ca_kfunc_init);
 -- 
-2.39.2
+2.34.1
 
 
