@@ -1,161 +1,165 @@
-Return-Path: <netdev+bounces-42011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52BB67CCA1B
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:46:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A62A7CCA55
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 20:05:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15C8A2813AF
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:46:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F8A01C20C22
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE872D792;
-	Tue, 17 Oct 2023 17:46:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W0eBRw7p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6512D7A8;
+	Tue, 17 Oct 2023 18:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DCBD2D78E;
-	Tue, 17 Oct 2023 17:46:47 +0000 (UTC)
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3AFB9E;
-	Tue, 17 Oct 2023 10:46:45 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-53e84912038so5209798a12.1;
-        Tue, 17 Oct 2023 10:46:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697564804; x=1698169604; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZTJcOzkVSYuq3kdfWyM6/478vxCOCOP6lLPkJ2SdCTM=;
-        b=W0eBRw7pPBw0LgH7eY75+XKjNwPp6qARg0GYJU1DBzYzRycL2nFcUHueMOW0NjR94r
-         iMptzkXIt03mGzygTNRBXA1k4f9D5GtxhdUOvGExTXpIIEtnkKVnrzMzoOq2Ohxcnjpu
-         TQTmbHY7isk53BAEgL5M6xITC8UF6TK3o2Eyoii6apY1QXqEZHGO9TrOOn7XD0hcLDE1
-         xNsOE2qsMudG3Gd4YDXu5W6v7GBgb3QF1hVZ5EhP7R8DxFGqj+2LgwJZYyGeY+ZW7guG
-         jFDaQccXS+mDbxpgT8jQJB5/vNX7Cq4naPyLx/xJd+gHoKAvBDy5XgapNAMG6v7Su22f
-         jQyA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9A02D7A0
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 18:05:01 +0000 (UTC)
+Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A491D3
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:04:59 -0700 (PDT)
+Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-3af5b5d7ecbso9143657b6e.3
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:04:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697564804; x=1698169604;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZTJcOzkVSYuq3kdfWyM6/478vxCOCOP6lLPkJ2SdCTM=;
-        b=nIOgyr587rGbEWtdGa15D+x4ASLnnrF5zV4xgPqaDNZd8x2VMJ4/o9Ia3IsR/Ltpa7
-         WfhHTT/B1AQ0Ttgh0f+t9Ph0IGmXz8kEKZsOgEgIp//Lap/nitPxorPW5C8ZzpvzaoqX
-         JeFhZWiXgQIwNlR8H0pSmythe6tOasYQwx5lXObgFrMpU9Z3RtHP5gVdzw1nWbpHjwaz
-         hldcrwQsn9mmjXI+hqV3FGkLG7aC6v4UZX2jRInsprgXcdHw/FNkoKj1CT69CT+x+q3g
-         gHVH9ulkwzzAyeKOljg9a47OpgEgow8dRHt1n22GvMZIFxfvAyj64s6l0FCWZxlFJnf0
-         a3xw==
-X-Gm-Message-State: AOJu0Yy8B0KjElDHJ7m05m6Krpe99/x9gta5Brye3Jz/owNERzhGIr1I
-	OJ4hdLD0N9DxwGtOedCrfAw9Go2xkXhDTStrYKM=
-X-Google-Smtp-Source: AGHT+IF5SdawNji0JQ5EenvvwzkSH87GiKHVfD8DHFgGHgtaMPq9u4MQVqu7f7GBxWz3XY3Y2YEWNPJNHJ+Djc05Tfg=
-X-Received: by 2002:a05:6402:2314:b0:53d:b839:2045 with SMTP id
- l20-20020a056402231400b0053db8392045mr2345712eda.25.1697564803833; Tue, 17
- Oct 2023 10:46:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697565899; x=1698170699;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wBc6OrybcBoGw+HylW8Uo0tWXXs4E0MyVL0SByuv/FE=;
+        b=cNeVRr9+GCtMaOwRWyIzxQVsjzc67qgZlJURm1PeIesMP29kI/WvNaPoJ0dgXS+Bbq
+         4737GxAu4td9epXfqeVsE7hBnZG/mvsSd8ASo8bKt2byMPi04LsLrrjtkGd/r8ypMJH/
+         3Rp5O9T7DBuUBn8lMDIWrKmShyhmhHev7ViRtN6zVF1JaavwCQayvPaKxnaYiC9rCMdZ
+         GprWLTI615tQN7gOukhZW4LlM2cwBHyjAREpsBbx00kDm4f61020ia3OTMFf2snzKQlo
+         +YSnVy0njeZxqCb0mx7n4NjCLCgLq3i2vAIxdaqrFNOoyNlIM4UJM2GbBxeqgQiR/QtW
+         xNLA==
+X-Gm-Message-State: AOJu0YzuPWEOMEuZlPkT9HgJs650lHe+wkyOZW39S8zkPniYYtR2ii4/
+	npFmecWa/+fOkDCNsJCILi6aO+D80OlOWgsK/hTK6F65csa3
+X-Google-Smtp-Source: AGHT+IFDLXwS2Vt5zHggEQpkomEJqnHYyAN3Csq2jsoFAXyYPB2sV9AY3Aa42Q6OvUiS/pNC1LY6b3Hq2Bk0utkT1ufHiC9io0x/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016180220.3866105-10-andrii@kernel.org> <202310172156.zcehiHbq-lkp@intel.com>
-In-Reply-To: <202310172156.zcehiHbq-lkp@intel.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 17 Oct 2023 10:46:32 -0700
-Message-ID: <CAEf4BzbJBDkCTO9VOdBiMzrhwOXAd3UsguJqNA5oZAR7Q8Eo8A@mail.gmail.com>
-Subject: Re: [PATCH v8 bpf-next 09/18] bpf,lsm: refactor bpf_prog_alloc/bpf_prog_free
- LSM hooks
-To: kernel test robot <lkp@intel.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	oe-kbuild-all@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, keescook@chromium.org, 
-	brauner@kernel.org, lennart@poettering.net, kernel-team@meta.com, 
-	sargun@sargun.me
+X-Received: by 2002:a05:6808:3602:b0:3ae:61f:335e with SMTP id
+ ct2-20020a056808360200b003ae061f335emr1021489oib.5.1697565898921; Tue, 17 Oct
+ 2023 11:04:58 -0700 (PDT)
+Date: Tue, 17 Oct 2023 11:04:58 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000635bfa0607ed5cdc@google.com>
+Subject: [syzbot] [netfilter?] WARNING in __nf_unregister_net_hook (6)
+From: syzbot <syzbot+de4025c006ec68ac56fc@syzkaller.appspotmail.com>
+To: bpf@vger.kernel.org, coreteam@netfilter.org, davem@davemloft.net, 
+	edumazet@google.com, fw@strlen.de, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 6:56=E2=80=AFAM kernel test robot <lkp@intel.com> w=
-rote:
->
-> Hi Andrii,
->
-> kernel test robot noticed the following build warnings:
->
-> [auto build test WARNING on bpf-next/master]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Andrii-Nakryiko/bp=
-f-align-CAP_NET_ADMIN-checks-with-bpf_capable-approach/20231017-152928
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git =
-master
-> patch link:    https://lore.kernel.org/r/20231016180220.3866105-10-andrii=
-%40kernel.org
-> patch subject: [PATCH v8 bpf-next 09/18] bpf,lsm: refactor bpf_prog_alloc=
-/bpf_prog_free LSM hooks
-> config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/202310=
-17/202310172156.zcehiHbq-lkp@intel.com/config)
-> compiler: m68k-linux-gcc (GCC) 13.2.0
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
-ve/20231017/202310172156.zcehiHbq-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202310172156.zcehiHbq-lkp=
-@intel.com/
->
-> All warnings (new ones prefixed by >>):
->
-> >> security/security.c:5196: warning: Function parameter or member 'prog'=
- not described in 'security_bpf_prog_load'
->
->
-> vim +5196 security/security.c
->
-> 55e853201a9e03 Paul Moore      2023-02-16  5181
-> 55e853201a9e03 Paul Moore      2023-02-16  5182  /**
-> 82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5183   * security_bpf_prog_loa=
-d() - Check if loading of BPF program is allowed
-> 82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5184   * @prog BPF program obj=
-ect
+Hello,
 
-missing colon after @prog, cute, will fix
+syzbot found the following issue on:
 
-> 82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5185   * @attr: BPF syscall at=
-tributes used to create BPF program
-> 82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5186   * @token: BPF token use=
-d to grant user access to BPF subsystem
-> 55e853201a9e03 Paul Moore      2023-02-16  5187   *
-> 82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5188   * Do a check when the k=
-ernel allocates BPF program object and is about to
-> 82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5189   * pass it to BPF verifi=
-er for additional correctness checks. This is also the
-> 82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5190   * point where LSM blob =
-is allocated for LSMs that need them.
-> 55e853201a9e03 Paul Moore      2023-02-16  5191   *
-> 55e853201a9e03 Paul Moore      2023-02-16  5192   * Return: Returns 0 on =
-success, error on failure.
-> 55e853201a9e03 Paul Moore      2023-02-16  5193   */
-> 82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5194  int security_bpf_prog_lo=
-ad(struct bpf_prog *prog, union bpf_attr *attr,
-> 82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5195                          =
-  struct bpf_token *token)
-> afdb09c720b62b Chenbo Feng     2017-10-18 @5196  {
-> 82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5197         return call_int_h=
-ook(bpf_prog_load, 0, prog, attr, token);
-> afdb09c720b62b Chenbo Feng     2017-10-18  5198  }
-> 55e853201a9e03 Paul Moore      2023-02-16  5199
->
-> --
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+HEAD commit:    6465e260f487 Linux 6.6-rc3
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1376e3bc680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8d7d7928f78936aa
+dashboard link: https://syzkaller.appspot.com/bug?extid=de4025c006ec68ac56fc
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17f218da680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=149ff8c6680000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/563852357aa6/disk-6465e260.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/df22793fe953/vmlinux-6465e260.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/84c2aad43ae3/bzImage-6465e260.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+de4025c006ec68ac56fc@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+hook not found, pf 2 num 1
+WARNING: CPU: 1 PID: 5062 at net/netfilter/core.c:517 __nf_unregister_net_hook+0x1de/0x670 net/netfilter/core.c:517
+Modules linked in:
+CPU: 1 PID: 5062 Comm: syz-executor417 Not tainted 6.6.0-rc3-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
+RIP: 0010:__nf_unregister_net_hook+0x1de/0x670 net/netfilter/core.c:517
+Code: 14 02 4c 89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 7a 04 00 00 8b 53 1c 48 c7 c7 c0 d4 a8 8b 8b 74 24 04 e8 b2 ce dc f8 <0f> 0b e9 ec 00 00 00 e8 46 a5 16 f9 48 89 e8 48 c1 e0 04 49 8d 7c
+RSP: 0018:ffffc9000355f2b8 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: ffff8880218dde00 RCX: 0000000000000000
+RDX: ffff888019aee000 RSI: ffffffff814cf016 RDI: 0000000000000001
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: ffffffff92611690
+R13: ffff888016fff020 R14: ffff888016fff000 R15: ffff8880218dde1c
+FS:  00007f76ca1526c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f76ca1e86b8 CR3: 0000000020292000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ nf_unregister_net_hook+0xd5/0x110 net/netfilter/core.c:539
+ __nf_tables_unregister_hook net/netfilter/nf_tables_api.c:361 [inline]
+ __nf_tables_unregister_hook+0x1a0/0x220 net/netfilter/nf_tables_api.c:340
+ nf_tables_unregister_hook net/netfilter/nf_tables_api.c:368 [inline]
+ nf_tables_commit+0x410f/0x59f0 net/netfilter/nf_tables_api.c:9992
+ nfnetlink_rcv_batch+0xf36/0x2500 net/netfilter/nfnetlink.c:569
+ nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:639 [inline]
+ nfnetlink_rcv+0x3bf/0x430 net/netfilter/nfnetlink.c:657
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0x536/0x810 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x93c/0xe40 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ sock_sendmsg+0xd9/0x180 net/socket.c:753
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2541
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2595
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2624
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f76ca192059
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f76ca152208 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f76ca21c3e8 RCX: 00007f76ca192059
+RDX: 0000000000000000 RSI: 000000002000c2c0 RDI: 0000000000000004
+RBP: 00007f76ca21c3e0 R08: 0000000000000003 R09: 0000000000000000
+R10: 0000000000000a00 R11: 0000000000000246 R12: 00007f76ca1e917c
+R13: 0000000000000001 R14: 0000000000000008 R15: 0200000000000000
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
