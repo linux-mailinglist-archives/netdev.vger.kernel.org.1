@@ -1,153 +1,81 @@
-Return-Path: <netdev+bounces-41907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6530D7CC208
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:51:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DB037CC224
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F17F21F22E64
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:51:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64DDD1C208D0
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5150141ABF;
-	Tue, 17 Oct 2023 11:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E46A41E31;
+	Tue, 17 Oct 2023 12:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyR13NqG"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA56405D6
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:51:41 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30104ED
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 04:51:39 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qsibo-0000fP-Tr; Tue, 17 Oct 2023 13:51:36 +0200
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qsibo-002J5f-7i; Tue, 17 Oct 2023 13:51:36 +0200
-Received: from sha by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qsibo-00Eukn-5G; Tue, 17 Oct 2023 13:51:36 +0200
-Date: Tue, 17 Oct 2023 13:51:36 +0200
-From: Sascha Hauer <sha@pengutronix.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Boris Pismenny <borisp@nvidia.com>, netdev@vger.kernel.org,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
-	kernel@pengutronix.de, Jakub Kicinski <kuba@kernel.org>,
-	Pavel Begunkov <asml.silence@gmail.com>
-Subject: Re: Problem with io_uring splice and KTLS
-Message-ID: <20231017115136.GF3359458@pengutronix.de>
-References: <20231010141932.GD3114228@pengutronix.de>
- <d729781a-3d12-423b-973e-c16fdbcbb60b@kernel.dk>
- <20231012133407.GA3359458@pengutronix.de>
- <f39ef992-4789-4c30-92ef-e3114a31d5c7@kernel.dk>
- <20231013054716.GG3359458@pengutronix.de>
- <a9dd11d9-b5b8-456d-b8b6-12257e2924ab@kernel.dk>
- <20231016072646.GV3359458@pengutronix.de>
- <50310b5e-7642-4ca1-a9e1-6d817d472131@kernel.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F385F1946A
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:00:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 66026C433C7;
+	Tue, 17 Oct 2023 12:00:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697544023;
+	bh=r6Rm3djNaBJSAPvsANZ7x4Pe/zaEWxkEXZRLiYOaOeg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DyR13NqG35Y4Un5VydQdm4Iz4olyaBSVM8W83Lei2ZJ/yyYBZx8c3uG69rKcunNuP
+	 lMJLD4Z1JCmY1vOH9F2Oz0esJr8rFJEqDav+uKnUbMXXBTDNhKJYKaPWEbbKvgyj9Z
+	 aet93E8pXpz/ulT71Xdmt1KR7NLMX9Dzz2O7EaimcEnDanWuJBnFXgzB5+7XcOhLS7
+	 6znjqBiMuZFVsxTusZ8NLbAqxweH2O4vw/ZN5HhKI0JKwkMeTwiI8z7SoUknIMYeDx
+	 RBQzcCAMm20q13primuuQ3mknpIXuCtjCjhE3kfxXn0+ctLzHfC01GJ3RfYsFGvp8P
+	 J72I5gQo9JHBw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 51F07C04E24;
+	Tue, 17 Oct 2023 12:00:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <50310b5e-7642-4ca1-a9e1-6d817d472131@kernel.dk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: sha@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] gve: Do not fully free QPL pages on prefill errors
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169754402333.24227.4640309007559494474.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Oct 2023 12:00:23 +0000
+References: <20231014014121.2843922-1-shailend@google.com>
+In-Reply-To: <20231014014121.2843922-1-shailend@google.com>
+To: Shailend Chand <shailend@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org
 
-On Mon, Oct 16, 2023 at 07:17:23AM -0600, Jens Axboe wrote:
-> On 10/16/23 1:26 AM, Sascha Hauer wrote:
-> > On Fri, Oct 13, 2023 at 07:45:55AM -0600, Jens Axboe wrote:
-> >> On 10/12/23 11:47 PM, Sascha Hauer wrote:
-> >>> On Thu, Oct 12, 2023 at 07:45:07PM -0600, Jens Axboe wrote:
-> >>>> On 10/12/23 7:34 AM, Sascha Hauer wrote:
-> >>>>> In case you don't have encryption hardware you can create an
-> >>>>> asynchronous encryption module using cryptd. Compile a kernel with
-> >>>>> CONFIG_CRYPTO_USER_API_AEAD and CONFIG_CRYPTO_CRYPTD and start the
-> >>>>> webserver with the '-c' option. /proc/crypto should then contain an
-> >>>>> entry with:
-> >>>>>
-> >>>>>  name         : gcm(aes)
-> >>>>>  driver       : cryptd(gcm_base(ctr(aes-generic),ghash-generic))
-> >>>>>  module       : kernel
-> >>>>>  priority     : 150
-> >>>>
-> >>>> I did a bit of prep work to ensure I had everything working for when
-> >>>> there's time to dive into it, but starting it with -c doesn't register
-> >>>> this entry. Turns out the bind() in there returns -1/ENOENT.
-> >>>
-> >>> Yes, that happens here as well, that's why I don't check for the error
-> >>> in the bind call. Nevertheless it has the desired effect that the new
-> >>> algorithm is registered and used from there on. BTW you only need to
-> >>> start the webserver once with -c. If you start it repeatedly with -c a
-> >>> new gcm(aes) instance is registered each time.
-> >>
-> >> Gotcha - I wasn't able to trigger the condition, which is why I thought
-> >> perhaps I was missing something.
-> >>
-> >> Can you try the below patch and see if that makes a difference? I'm not
-> >> quite sure why it would since you said it triggers with DEFER_TASKRUN as
-> >> well, and for that kind of notification, you should never hit the paths
-> >> you have detailed in the debug patch.
-> > 
-> > I can confirm that this patch makes it work for me. I tested with both
-> > software cryptd and also with my original CAAM encryption workload.
-> > IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN is not needed.
-> > Both my simple webserver and the original C++ Webserver from our
-> > customer are now working without problems.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sat, 14 Oct 2023 01:41:21 +0000 you wrote:
+> The prefill function should have only removed the page count bias it
+> added. Fully freeing the page will cause gve_free_queue_page_list to
+> free a page the driver no longer owns.
 > 
-> OK, good to hear. I'm assuming you only change for
-> sk_stream_wait_memory()? If you can reproduce, would be good to test.
-> But i general none of them should hurt.
-
-Yes, only the change in sk_stream_wait_memory() is needed for me. The
-other two hunks do not change anything for me.
-
+> Fixes: 82fd151d38d9 ("gve: Reduce alloc and copy costs in the GQ rx path")
+> Signed-off-by: Shailend Chand <shailend@google.com>
 > 
-> FWIW, the reason why DEFER_TASKRUN wasn't fully solving it is because
-> we'd also use TIF_NOTIFY_SIGNAL for creating new io-wq workers. So while
-> task_work would not be the trigger for setting that condition, we'd
-> still end up doing it via io-wq worker creation.
-> 
-> > Do you think there is a chance getting this change upstream? I'm a bit
-> > afraid the code originally uses signal_pending() instead of
-> > task_sigpending() for a good reason.
-> 
-> The distinction between signal_pending() and task_sigpending() was
-> introduced with TIF_NOTIFY_SIGNAL. This isn't a case of networking
-> needing to use signal_pending(), just that this is was originally the
-> only aborting condition and now it's a bit too broad for some cases
-> (like this one).
+> [...]
 
-Ok. I didn't realize so far that it was you who TIF_NOTIFY_SIGNAL.
+Here is the summary with links:
+  - [net] gve: Do not fully free QPL pages on prefill errors
+    https://git.kernel.org/netdev/net/c/95535e37e895
 
-Sascha
-
+You are awesome, thank you!
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
