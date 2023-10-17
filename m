@@ -1,131 +1,127 @@
-Return-Path: <netdev+bounces-41979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C2487CC832
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:55:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E4AB7CC839
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:56:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C7301C20A0D
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:55:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F163B20F84
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661FD45F45;
-	Tue, 17 Oct 2023 15:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A7F45F47;
+	Tue, 17 Oct 2023 15:56:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DPACtJJL"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ntV5rT6j"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05565450F4
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 15:55:49 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88AD695;
-	Tue, 17 Oct 2023 08:55:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697558148; x=1729094148;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KvNF39DN5bsLz6aBPCxszPKohNzs0AOuRVPxH10s/7g=;
-  b=DPACtJJL01iygb182SlAdZPD7dwyy3K5v3q723010iyYkd73uV56S+NE
-   b0Nx1dF+qvRPpnxlJb/lc/ewd+ZYebkFTEvpG01oJUaU4arWJo8C0251c
-   Nojta8cdjLtgJTnkGTn+x/mtRpWdEC20W4DaaZGD1+NB/orZ1iwgA/pr9
-   +DKBHY8G60Fy/ieqvv+n5cGGobiuFmc38fXstIKKr3k1K6Funa+cFbXUc
-   e6BP4V52v45v/s9v6LPVsdrQzltgzOMvUUKBvx2M9zyVzocuzPY+peZdJ
-   IX8uza7OmhykX1eOBghYOHtOXOL0ftMd0zehKjs4uF830d6hYMYTxsFIg
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="385651925"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="385651925"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 08:55:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="791271177"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="791271177"
-Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 17 Oct 2023 08:55:40 -0700
-Received: from kbuild by f64821696465 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qsmPx-0009lt-2a;
-	Tue, 17 Oct 2023 15:55:37 +0000
-Date: Tue, 17 Oct 2023 23:55:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vishvambar Panth S <vishvambarpanth.s@microchip.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, kuba@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, richardcochran@gmail.com
-Subject: Re: [PATCH v2 net-next] net: microchip: lan743x: improve throughput
- with rx timestamp config
-Message-ID: <202310172343.lfyTHDCw-lkp@intel.com>
-References: <20231017180542.30613-1-vishvambarpanth.s@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29045450F4
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 15:56:29 +0000 (UTC)
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874F8FD
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 08:56:27 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-d9a58aa4983so6971261276.0
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 08:56:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1697558186; x=1698162986; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y7GSwWid5rTY6pUqth/qURI2tOHic+DeG6UQFF1Yi+U=;
+        b=ntV5rT6jh/3K8ozEzkGsIZKwHrtdSqt/HNvk9oaHLj+nC4BPVAMlGS95z3g5dnWGBt
+         OAInUSqqZngXwjHgjFTB9Jf6p+Y9YqfXhyoE2ebEFseVWfbsBXQs/NKJ8+z/Xva5CGCm
+         TUhzlkV3EOEX6MI78XtMzN13uSkp+mN7h+U4H6nziX+u89Rij6dqhAvofgR2+o+u1666
+         MmTzHKxCc3dyJuz+QlF0ZVYRtGRgbnZ1WE4GxKT2RFSHAPvCIU6AMyn+y96xX2+vhHMR
+         mRUM5j3Rjhjr9v30Xz6F4BtvEZqZd9+Ovy2RAkaAdTBXUecqXx5cuNy1tAqa0ZefHGkw
+         5C+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697558186; x=1698162986;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y7GSwWid5rTY6pUqth/qURI2tOHic+DeG6UQFF1Yi+U=;
+        b=hsz+gpMxGomdGw0QjcqbMgm5GZvw4bmXfwFrsvk9ZXuMIBF0xe5eW6U228Pr3oSyIG
+         uuTMiWjci0nqJqA7djo0oCucz/nB83tG/TStGXpIPwsZkzPttOSImE2xqdNx7gHLRSP+
+         Vojh2EF78HSpiLroW+UHXgBGMw+m8C7FrWol3bz8Jw+0UOgL2l3Ak5D5aMLNXl+JmfBg
+         fXheocg7HkrbmV3IWhUVctHSgfXh4PoJ4rXdQLo0SyCqOAV4Lcni2xJ7EUAT/eS4CuHZ
+         lRLa2DHrSfiFnoJ3how92umTQY13L0WYSvpYxSsw7GOphLiiHhh69OG2GMzhXQj9YO32
+         0siw==
+X-Gm-Message-State: AOJu0YypcWc+qzh42RFgrlmcb4xZCUH74vYEf8328twOveruRgTLb1mb
+	whA7uuwjT6lxIXoROuwMPq8hhx9JaQZ9XNuyn8QFIg==
+X-Google-Smtp-Source: AGHT+IG+jU3PnwpZ7LCWI+kSFgx+Fj3tlPzeOssMOxi8ahecJe/jh8ZRgkrK05TLscP2spUJw7WCTEgGffx3fM77grg=
+X-Received: by 2002:a25:dc13:0:b0:d9a:384a:d4c5 with SMTP id
+ y19-20020a25dc13000000b00d9a384ad4c5mr2461609ybe.33.1697558186697; Tue, 17
+ Oct 2023 08:56:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231017180542.30613-1-vishvambarpanth.s@microchip.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20231016093549.181952-1-jhs@mojatatu.com> <20231016131506.71ad76f5@kernel.org>
+ <CAM0EoM=nT2KQcVqPrWvKJXnW7h8uodhu0daNsLkuAUt5n=zuZw@mail.gmail.com>
+ <CAM0EoM=ZGLifh4yWXWO5WtZzwe1-bFsi-fnef+-FRS81MqYDMA@mail.gmail.com>
+ <CAM0EoMmA3_9XmTFk5H-0oR5qfEYtxq_1Vc2zRVKfA_vtVTmafg@mail.gmail.com>
+ <20231016153548.1c050ea3@kernel.org> <CAM0EoMk6aRnm_EPevO7MuyOHq52KOVXoJpy2i=exCuQeg0X-zA@mail.gmail.com>
+ <20231017084029.3920553d@kernel.org>
+In-Reply-To: <20231017084029.3920553d@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 17 Oct 2023 11:56:15 -0400
+Message-ID: <CAM0EoM=f9qGmTR5jW1vayu0JHy0MQjrOeREX6acjnS7MFQP7Ww@mail.gmail.com>
+Subject: Re: [PATCH v7 net-next 00/18] Introducing P4TC
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, anjali.singhai@intel.com, namrata.limaye@intel.com, 
+	deb.chatterjee@intel.com, john.andy.fingerhut@intel.com, dan.daly@intel.com, 
+	Vipin.Jain@amd.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, 
+	toke@redhat.com, mattyk@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Vishvambar,
+On Tue, Oct 17, 2023 at 11:40=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Tue, 17 Oct 2023 11:27:36 -0400 Jamal Hadi Salim wrote:
+> > > patch-by-patch W=3D1 C=3D1 should be good enough to catch the problem=
+s.
+> >
+> > Thanks - this helps. We didnt pay good attention to
+> > https://www.kernel.org/doc/Documentation/process/maintainer-netdev.rst
+> > Only thing that is missing now is the mention of C=3D1 in the doc. Patc=
+h
+> > to the doc acceptable?
+> > Also a note about false positives in sparse output (there were a few
+> > in the warnings from the bot) would be apropos.
+>
+> Um. Maybe.. Sparse generates more false positives than good warnings
+> lately :( We'd have to add some extra info like "Note that sparse
+> is known to generate false-positive warnings, if you think that the
+> warning generated with C=3D1 is bogus, ignore it and note that fact
+> in the commit message".
+>
 
-kernel test robot noticed the following build warnings:
+> I don't like documenting things which aren't clear-cut :(
 
-[auto build test WARNING on net-next/main]
+Upto you - couldnt sum up from above if you want a patch or not. I
+think it makes sense to document C=3D1 somewhere since it helps your
+overhead.
+But the comment Similar in spirit to the checkpatch comment if - "But
+do not be mindlessly robotic in doing so..."
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vishvambar-Panth-S/net-microchip-lan743x-improve-throughput-with-rx-timestamp-config/20231017-180453
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231017180542.30613-1-vishvambarpanth.s%40microchip.com
-patch subject: [PATCH v2 net-next] net: microchip: lan743x: improve throughput with rx timestamp config
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20231017/202310172343.lfyTHDCw-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231017/202310172343.lfyTHDCw-lkp@intel.com/reproduce)
+> I'm pretty sure you have pure W=3D1 warnings here, too.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310172343.lfyTHDCw-lkp@intel.com/
+True - I am not sure how we missed one with function not used.
 
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/microchip/lan743x_main.c:1873:6: warning: no previous prototype for 'lan743x_rx_cfg_b_tstamp_config' [-Wmissing-prototypes]
-    1873 | void lan743x_rx_cfg_b_tstamp_config(struct lan743x_adapter *adapter,
-         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/lan743x_rx_cfg_b_tstamp_config +1873 drivers/net/ethernet/microchip/lan743x_main.c
-
-  1872	
-> 1873	void lan743x_rx_cfg_b_tstamp_config(struct lan743x_adapter *adapter,
-  1874					    int rx_ts_config)
-  1875	{
-  1876		int channel_number;
-  1877		int index;
-  1878		u32 data;
-  1879	
-  1880		for (index = 0; index < LAN743X_USED_RX_CHANNELS; index++) {
-  1881			channel_number = adapter->rx[index].channel_number;
-  1882			data = lan743x_csr_read(adapter, RX_CFG_B(channel_number));
-  1883			data &= RX_CFG_B_TS_MASK_;
-  1884			data |= rx_ts_config;
-  1885			lan743x_csr_write(adapter, RX_CFG_B(channel_number),
-  1886					  data);
-  1887		}
-  1888	}
-  1889	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+cheers,
+jamal
 
