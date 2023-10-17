@@ -1,135 +1,125 @@
-Return-Path: <netdev+bounces-41829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E017CBFB5
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:41:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E50D7CBFBD
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:43:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E932281671
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:41:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A75EB20F59
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:43:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D20405D9;
-	Tue, 17 Oct 2023 09:41:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3650B405DA;
+	Tue, 17 Oct 2023 09:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="lR1lDhVS"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="DJRrXWf3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793393F4D1
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:41:29 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF0A187
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:41:27 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40806e4106dso2003375e9.1
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:41:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1697535686; x=1698140486; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k1HhjSFJ3PcXQuOnajVqbB+EruV5a4SO5sIW1LuSBTE=;
-        b=lR1lDhVSYR0YcXZMNehKGexSafwCCOODFIB2FcHpWYNAjt+sBRivdcwg0BUc5S32aH
-         mwss3/C/0eQ/kx0Sldt37GHGJTFVzKxpnfq5U8HnqPQim9a0zySgc3uHGalxlPmP3i+k
-         DziZ1CC/LKqMuoklqj1+PJbIGejq2jkS7y4xR9CSRpDOmsC3WIOJZRSkVQsvYlr//VZ0
-         zfjLCIf6cEOr2EIJeB/qd1tGztXt2SukoU9ZqjItUxno9PaOF1S1EgmwXSwf5ojFxAum
-         sAfbodzywWWNCY2BMpiQzyGJSqHb085ZXc5L5dEB9XvMw7w7BlXnBSIiyqwefpkyQ095
-         Bh/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697535686; x=1698140486;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k1HhjSFJ3PcXQuOnajVqbB+EruV5a4SO5sIW1LuSBTE=;
-        b=pPU6fkvXlx0txmbGx9vSR/uy5D2rsQShPWgZq0G4U2EANMEO+2cldQ9q8i0gXr5U6H
-         NB1mLwnPiRx3tfyIrV/MCoVp10iIG8mqKYscGCCZ7NN96tEgy2kAuhhrNCaWdKGYwVMJ
-         opJIVsfdCMdHxSiyZ1t63wjYidrnpbgszmGnqr+IlnDLcsamQOC4lizkeyPe9J8Sm4FM
-         yZJ4W3mb1mwWakM1+B6pjfSmGN/j49wMvCDWJ2vA5yS2z+rJ4l6KfS2ILNTdZVUO6qXv
-         c0vck1R/3CrLwBaR189ivAy/yJsrZxnZl0aHIRGlrhiDioWGOrv4Mzf57ES7dnoTXOCz
-         khkA==
-X-Gm-Message-State: AOJu0YzZuMCmyC19oWKDxa0ENqibCg+r9b+TRtPehYvMy4grN2vA8Mr2
-	H9ZeoUGjEQRMkdberP6QjHU8IQ==
-X-Google-Smtp-Source: AGHT+IGaj8hYNwU3ROY6IbiYLG3Pom+cp0Ac5uomcY/fsuNGmWSxNDCGTLtVJy1Q0cHFPbw/h7N5YA==
-X-Received: by 2002:a05:600c:a47:b0:401:b92f:eec5 with SMTP id c7-20020a05600c0a4700b00401b92feec5mr1209058wmq.9.1697535686013;
-        Tue, 17 Oct 2023 02:41:26 -0700 (PDT)
-Received: from [192.168.0.106] (haunt.prize.volia.net. [93.72.109.136])
-        by smtp.gmail.com with ESMTPSA id g23-20020a7bc4d7000000b004065e235417sm9255615wmk.21.2023.10.17.02.41.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Oct 2023 02:41:25 -0700 (PDT)
-Message-ID: <3f6f13c7-f8aa-c60f-49f2-fe22d3777f23@blackwall.org>
-Date: Tue, 17 Oct 2023 12:41:24 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A2A3F4D1
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:43:31 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E12B998;
+	Tue, 17 Oct 2023 02:43:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1697535809; x=1729071809;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=aA+396/l67uMfrVCyXw8FN73UoV7n1BkXMcRb+xZZuo=;
+  b=DJRrXWf3mpLUJBVNbQiv5TbIIey2dBeOGaAiN4BQMxbhdwhZiVKqhb+u
+   tLSyjz7QAAVPRUnUgK3fI2xlMO51MrrYTICpM7+Ti57xhYSBVi+9b7FLw
+   /X0Dn+daDtHRIxcpqOkIkFIAwrAwEhGWiCW/guQmEcUqkHADQXwgjt7B1
+   81Z18NEtYNePnclr31woJ/LEivsq8AcHIO7X9BFyNMQ46W/HvGZrPEbnf
+   ci3MPrxKsqbSym3g6D3YX/cDnwSWsYAWLKDSO7XvovrNNlezxnnNmfyT0
+   G90lnejKTQi/B1RJLgbf4mT5ctUEjL5XUVdLsVnk7XOwzIS/SkQ6NWDRn
+   w==;
+X-CSE-ConnectionGUID: EEbPSG5+T0W6T1Zrb5aZ6A==
+X-CSE-MsgGUID: ZZ3vNBvmREq0+76behTLNw==
+X-ThreatScanner-Verdict: Negative
+X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
+   d="scan'208";a="10101600"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Oct 2023 02:43:29 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Tue, 17 Oct 2023 02:43:19 -0700
+Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.21 via Frontend Transport; Tue, 17 Oct 2023 02:43:16 -0700
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <Bryan.Whitehead@microchip.com>,
+	<linux-kernel@vger.kernel.org>, <andrew@lunn.ch>, <linux@armlinux.org.uk>,
+	<UNGLinuxDriver@microchip.com>
+Subject: [PATCH net-next V1 0/7] Add support to PHYLINK and SFP for PCI11x1x chips 
+Date: Tue, 17 Oct 2023 15:12:01 +0530
+Message-ID: <20231017094208.4956-1-Raju.Lakkaraju@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH iproute2-next 8/8] man: bridge: add a note about using
- 'master' and 'self' with flush
-Content-Language: en-US
-To: Amit Cohen <amcohen@nvidia.com>, netdev@vger.kernel.org
-Cc: dsahern@gmail.com, stephen@networkplumber.org, mlxsw@nvidia.com,
- roopa@nvidia.com
-References: <20231017070227.3560105-1-amcohen@nvidia.com>
- <20231017070227.3560105-9-amcohen@nvidia.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20231017070227.3560105-9-amcohen@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/17/23 10:02, Amit Cohen wrote:
-> When 'master' and 'self' keywords are used, the command will be handled
-> by the driver of the device itself and by the driver that the device is
-> master on. For VXLAN, such command will be handled by VXLAN driver and by
-> bridge driver in case that the VXLAN is master on a bridge.
-> 
-> The bridge driver and VXLAN driver do not support the same arguments for
-> flush command, for example - "vlan" is supported by bridge and not by
-> VXLAN and "vni" is supported by VXLAN and not by bridge.
-> 
-> The following command returns an error:
-> $ bridge fdb flush dev vx10 vlan 1 self master
-> Error: Unsupported attribute.
-> 
-> This error comes from the VXLAN driver, which does not support flush by
-> VLAN, but this command is handled by bridge driver, so entries in bridge
-> are flushed even though user gets an error.
-> 
-> Note in the man page that such command is not recommended, instead, user
-> should run flush command twice - once with 'self' and once with 'master',
-> and each one with the supported attributes.
-> 
-> Signed-off-by: Amit Cohen <amcohen@nvidia.com>
-> ---
->   man/man8/bridge.8 | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
-> index f76bf96b..ee6f2260 100644
-> --- a/man/man8/bridge.8
-> +++ b/man/man8/bridge.8
-> @@ -943,6 +943,11 @@ command can also be used on the bridge device itself. The flag is set by default
->   .B master
->   if the specified network device is a port that belongs to a master device
->   such as a bridge, the operation is fulfilled by the master device's driver.
-> +Flush with both 'master' and 'self' is not recommended with attributes that are
-> +not supported by all devices (e.g., vlan, vni). Such command will be handled by
-> +bridge or VXLAN driver, but will return an error from the driver that does not
-> +support the attribute. Instead, run flush twice - once with 'self' and once
-> +with 'master', and each one with the supported attributes.
->   
->   .TP
->   .B [no]permanent
+This patch series adds support to phylink and sfp pluggable module.
+Add software-nodes to hold the network interface phylink, sfp, i2c and gpio
+configuration and integrates the PCI1x1x chip i2c driver and gpio driver to
+access the sfp module eeprom data.
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Tested on chip PCI11010 Rev-B with Bridgeport Evaluation board Rev-1 with
+following SFP modules:
+
+1. FS's 2.5G SFP (SFP-2.5G-T) with 2.5 Gbps speed (interface 2500Base-X)
+
+2. Mellanox DAC10G SFP (MC3309130-001) at 2.5 Gbps speed (interface 2500Base-X)
+and 1Gpbs speed (interface 1000Base-X)
+
+3. Axcen's 1G SFP (AXGT-R1T4-05I1) at 1G/100M/10M bps speed (interface SGMII)
+
+4. Fiber 1G SFP (AXGE-1354-0531) at 1Gpbs speed (interface 1000Base-X)
+
+Change Log:
+===========
+V0 -> V1:
+  - Integrate with Synopsys DesignWare XPCS drivers
+  - Based on external review comments,
+    - Changes made to SGMII interface support only 1G/100M/10M bps speed
+    - Changes made to 2500Base-X interface support only 2.5Gbps speed
+    - Add check for not is_sgmii_en with is_sfp_support_en support
+    - Change the "pci11x1x_strap_get_status" function return type from void to  
+      int
+    - Add ethtool phylink wol, eee, pause get/set functions
+
+Raju Lakkaraju (7):
+  net: lan743x: Create separate PCS power reset function
+  net: lan743x: Create separate Link Speed Duplex state function
+  net: lan743x: Add SFP support check flag
+  net: lan743x: Add support to software-nodes for sfp and phylink
+  net: lan743x: Register the platform device for sfp pluggable module
+  net: lan743x: Add support to the phylink framework
+  net: lan743x: Add support to ethtool phylink get and set settings
+
+ drivers/net/ethernet/microchip/Kconfig        |    9 +-
+ .../net/ethernet/microchip/lan743x_ethtool.c  |   85 +-
+ drivers/net/ethernet/microchip/lan743x_main.c | 1090 ++++++++++++-----
+ drivers/net/ethernet/microchip/lan743x_main.h |   49 +
+ 4 files changed, 868 insertions(+), 365 deletions(-)
+
+-- 
+2.34.1
 
 
