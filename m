@@ -1,109 +1,83 @@
-Return-Path: <netdev+bounces-41631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D76EC7CB7D8
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 03:12:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 708DC7CB7E7
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 03:17:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D549D1C209C0
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 01:12:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A761CB20EDB
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 01:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E9517D2;
-	Tue, 17 Oct 2023 01:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999DD17D2;
+	Tue, 17 Oct 2023 01:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mH6vtagR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0SYGznn"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CD215DA
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 01:12:19 +0000 (UTC)
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FE58F9;
-	Mon, 16 Oct 2023 18:12:18 -0700 (PDT)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39GKONsP014525;
-	Tue, 17 Oct 2023 01:12:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2023-03-30;
- bh=QFA8Q5JfrFLxXyI/2NbtgGFd2MRBy1aq57sU7Ghi5bA=;
- b=mH6vtagRnFu1e2z/fwoGXdsCQOVpsUAPWDoE+WuWgxkOADyVoWDkI/Zb4RVlnnW0nW3k
- WX0Rw8sn103ApliBK7ssxt4m4y/zpyBZHSwNHGSwOViY3Y2beHXLULh1ISngriWPxgkj
- OsPKrSkL4uIh7dOrXwtTZOnh/5BjpR6Ry4SAIYAB/DxMJy95gBKmqKbjxfOt47jLxZfc
- NPwUQm+CXm4l7Ow9wwPgnxJmcZarTgp82JxUDg0PRewOt57i3v35dKsUNo4dIg9l4NJj
- /fXxilGAK6eSeGNzCnbwx4xjRLF3fV4YWB4M2vIvMOBixDwQcECEO/NRM3GNxj0WiE9G 1w== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tqkhu41s6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 17 Oct 2023 01:12:05 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39GMqLq7027089;
-	Tue, 17 Oct 2023 01:12:04 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3trg5366nf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 17 Oct 2023 01:12:04 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39H1C3si039761;
-	Tue, 17 Oct 2023 01:12:04 GMT
-Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3trg5366mf-2;
-	Tue, 17 Oct 2023 01:12:04 +0000
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-To: Hannes Reinecke <hare@suse.de>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Richard Cochran <richardcochran@gmail.com>, linux-scsi@vger.kernel.org,
-        Wenchao Hao <haowenchao2@huawei.com>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        louhongxiang@huawei.com
-Subject: Re: [PATCH] scsi: libfc: Fix potential NULL pointer dereference in fc_lport_ptp_setup
-Date: Mon, 16 Oct 2023 21:11:49 -0400
-Message-Id: <169750286910.2183937.11241575331092205293.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231011130350.819571-1-haowenchao2@huawei.com>
-References: <20231011130350.819571-1-haowenchao2@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7D915DA
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 01:17:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67174C433C7;
+	Tue, 17 Oct 2023 01:17:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697505443;
+	bh=7ROoh33B4S2Q8HMlE9WFvuHJg58fYlf2DYwWrsmMf3w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=J0SYGznn0p/q9hG4OWB0taG9gEVS6J/UfZMU1ZuxWIyG/P4AGQTysEWSbdJlQAV2r
+	 9Zv1wt8MOExF1wh6jYBBj9rvUEFWuyXwjrtTqOP3tzAgj1wmobV8I3b1sVHC7PzM4h
+	 3JGwyVV2xekE4pL65bHjq/PGm7AbcHmOEpKq3S9ARDeIpSIZHyDhbY3LIo2xteHxpy
+	 hJ3ZqrRX5VCSV75sxmmctjMjhdxdw85DlAwH72goSvSaTrqk5GlDBTV+2gIBm8ba/d
+	 5RVAR7nUWzcnWuy+AheLpf8Fm7RuB2ZBrfNRmJMYdgfkMCvFjHm49OP7OE4M9vwA4n
+	 fwJAXn5uToOsw==
+Date: Mon, 16 Oct 2023 18:17:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, Christian Theune <ct@flyingcircus.io>, Budimir Markovic
+ <markovicbudimir@gmail.com>
+Subject: Re: [PATCH net 2/2] net/sched: sch_hfsc: upgrade 'rt' to 'sc' when
+ it becomes a inner curve
+Message-ID: <20231016181722.50e9284e@kernel.org>
+In-Reply-To: <20231013151057.2611860-3-pctammela@mojatatu.com>
+References: <20231013151057.2611860-1-pctammela@mojatatu.com>
+	<20231013151057.2611860-3-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-16_13,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 phishscore=0
- malwarescore=0 suspectscore=0 mlxlogscore=830 spamscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310170008
-X-Proofpoint-GUID: Rg81BBs0gnOhaz41M4c31Cop8GfTm6Ce
-X-Proofpoint-ORIG-GUID: Rg81BBs0gnOhaz41M4c31Cop8GfTm6Ce
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 11 Oct 2023 21:03:50 +0800, Wenchao Hao wrote:
+On Fri, 13 Oct 2023 12:10:57 -0300 Pedro Tammela wrote:
+> Budimir's original patch disallows users to add classes with a 'rt'
+> parent, but this is too strict as it breaks users that have been using
+> 'rt' as a inner class. Another approach, taken by this patch, is to
+> upgrade the inner 'rt' into a 'sc', warning the user in the process.
+> It avoids the UAF reported by Budimir while also being more permissive
+> to bad scripts/users/code using 'rt' as a inner class.
 
-> fc_lport_ptp_setup() did not check the return value of fc_rport_create()
-> which is possible to return NULL which would cause a NULL pointer
-> dereference. Address this issue by checking return value of
-> fc_rport_create() and log error message on fc_rport_create() failed.
+Perfect, thank you.
+
+> Users checking the `tc class ls [...]` or `tc class get [...]` dumps would
+> observe the curve change and are potentially breaking with this change.
 > 
-> 
+> Cc: Christian Theune <ct@flyingcircus.io>
+> Cc: Budimir Markovic <markovicbudimir@gmail.com>
+> Fixes: 0c9570eeed69 ("net/sched: sch_hfsc: upgrade 'rt' to 'sc' when it becomes a inner curve")
 
-Applied to 6.7/scsi-queue, thanks!
+git says this SHA does not exist. From the title I'm guessing this is
+the patch itself, some mis-automation, perhaps?
 
-[1/1] scsi: libfc: Fix potential NULL pointer dereference in fc_lport_ptp_setup
-      https://git.kernel.org/mkp/scsi/c/4df105f0ce9f
-
+All in all I think you can squash the revert into this and use
+b3d26c5702c7d6c45 for Fixes. I don't think there's a reason to keep
+the revert separate, given how small it is. And if the revert is
+first what if someone backports just the revert..
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+pw-bot: cr
 
