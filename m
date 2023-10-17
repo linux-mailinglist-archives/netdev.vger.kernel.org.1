@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-41741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 370227CBCCB
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:51:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DAF597CBCD0
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:51:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1C66B20F8C
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:51:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A13BB20FD7
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77FFF339A7;
-	Tue, 17 Oct 2023 07:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2306F341B4;
+	Tue, 17 Oct 2023 07:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="nmHgtbzx"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="l4mq+guK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160A5179A1
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:51:10 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB2DCFB
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 00:51:05 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9c603e2354fso80770866b.1
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 00:51:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2C515AF6
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:51:42 +0000 (UTC)
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B361ED
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 00:51:41 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-5230a22cfd1so9338567a12.1
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 00:51:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697529064; x=1698133864; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697529099; x=1698133899; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dtp5Dk2V0bXJ/0BVKTUHzPQ4mQRhcSAPMqIZjVjjJoc=;
-        b=nmHgtbzxu17ceGIUszI4pk1NqBIIXSx7ydsac7Qm+9L4yIc+DFlnTXNRpM40jfzaUx
-         ADoVDl8sLwDIgJfJG3JOSpjgIwzbCGdliN10XekK//wQ7tV2c9CONfYYt0noR9WoEW8v
-         bFlXyDSv+ePJFejtHgVE3oIREdOpHl+gy4WhpoY9KZQrWGMJ/CbdDo0DVekQq7ijDccd
-         0TtPTg8/8DMD6atwYWbbhtpF7Ot9Tq2wHNeRcLNZoYLXMs6z5nVclobCQA+hHLUL6evC
-         f2/2OnrxAUFpzYSAZfnWD4iYitgVgEM9Rl1wpmh+1ZH5rDLxDhDLvNx1orNQxOPoecyG
-         qN4g==
+        bh=PGbKB+flKfQvR3BIytAtxhvo0o0w+Aq3uMDs7t9/RSA=;
+        b=l4mq+guKKezoF8fWH7bAs522mPVzL/QkXfPUOc1RV+t2zSXcTvZtFh6hkPTDBkyZzH
+         oTmID072XEbIbxC80mJRkq9zp/DufNp8XO53ZvM1xxtAH89YaC2lLyQ5d1XiosR303Qh
+         Y1IpA4ekmPKoWPLjLD7zns76S39bA7hzGZpjaHMNOzS99hp5rtjIeNcz9ERKHGORLRDa
+         jqVZl4/FfMtgjdUECZm9ukKQGqLkYZExiUre/LBwYd+/Oj++DxZpYfCiO1LPqJuHFf31
+         8I7tCApW5cN+nvxHA/W8I8+MEflXrX3r9hpAr2o3MQh9akhu7Ne3V+/PmrSVMgtr6kJo
+         KwkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697529064; x=1698133864;
+        d=1e100.net; s=20230601; t=1697529099; x=1698133899;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dtp5Dk2V0bXJ/0BVKTUHzPQ4mQRhcSAPMqIZjVjjJoc=;
-        b=GvqRV9/zw4Sgh1OZldaQIm0MgA0LjXEBswsCNWLx33TjouNPU2Njyr/ReJMYgU7G+G
-         7mLdCiQiharnN60Kk1xMQykiQPlXJU4ICjAo/pzr72LoCdn2fZghPyG/wCp7DHr8psUb
-         a6wUW3pBg6oHt4/ac32g1CQM/wwhMzfnEPQZJzvWu+H+bYeeKCtkps9hYHGV2qEpbzdu
-         ngI9GqLGYZLgpexTp4fWpeOoFHgTv9echV++ioDGYiY5qh698TXnpvCx0txxWXTLosBl
-         qUdmssDbK0bl3FJi9HQkwjt0F+nvh4PWSHgP1A/9vVIM5lUVn1WOo/CcUgYIcPsAVpQi
-         ArJw==
-X-Gm-Message-State: AOJu0Yw+2TCOOVLngIwTKyJhRpMhvypALsq8AALSmfPkw9hIu/ufIxu8
-	E0n8jLdKKihJbZ9mDHkxrIIXRQ==
-X-Google-Smtp-Source: AGHT+IEJbc37Q7h3XQH/uiEmqmirFQpSb71pSKNd/9fEyzT24qRF418i5ACUplVkkHNnW/Pr5i3eNg==
-X-Received: by 2002:a17:907:7ba0:b0:9b2:b15b:383d with SMTP id ne32-20020a1709077ba000b009b2b15b383dmr1219786ejc.11.1697529064073;
-        Tue, 17 Oct 2023 00:51:04 -0700 (PDT)
+        bh=PGbKB+flKfQvR3BIytAtxhvo0o0w+Aq3uMDs7t9/RSA=;
+        b=kVP6eJ3xebcZM5XvgFVM8t31Tt+nWoc8zDndFclW+EXP6IahQrEiAZTf7478uMy8yE
+         9U/MT0LIrdUSrE+x5dNMx8tgKzoIAm617+PGqdk+nUUAhJbINoTtryjHjZjGCn1BhV/s
+         DM1EQcocZESntZMDurWeZR6Ua2mx4zXLEOSCxQPk6RCTsZqmkGeXYFc7A+MjZ/9XHW2I
+         m4CPzmHgA44qpUa5x02JR2scGamRl/6AH63wTOkBAT1F62Q/vT+Q1ej/0p+RNHsy+/Tv
+         rQEkS4E4JKp5hPx+ukearaPxQxIcGT5o8Q8OQ3rH9ylq7y9JdNGvQ5rj7jnX12XyLykC
+         DV6w==
+X-Gm-Message-State: AOJu0YwP4yfI8Xq0UjRKohZcbG8iLoJcDK0ouVfQqME8mmgEW2JMoQD/
+	QF5t1Fp6MvJ5VnKLq98kDSSeFQ==
+X-Google-Smtp-Source: AGHT+IFoWzg5Dhcda/++S65LAPkIFh5YlyQ1IuzkXdFGXQPclRwbBg95Q1lr11EubLz0fDu/rJ2a2A==
+X-Received: by 2002:a50:871b:0:b0:53d:b1ca:293c with SMTP id i27-20020a50871b000000b0053db1ca293cmr1125093edb.22.1697529099608;
+        Tue, 17 Oct 2023 00:51:39 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id t13-20020a170906178d00b0099293cdbc98sm732721eje.145.2023.10.17.00.51.03
+        by smtp.gmail.com with ESMTPSA id co25-20020a0564020c1900b0053e36dd75dfsm705978edb.35.2023.10.17.00.51.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 00:51:03 -0700 (PDT)
-Date: Tue, 17 Oct 2023 09:51:02 +0200
+        Tue, 17 Oct 2023 00:51:39 -0700 (PDT)
+Date: Tue, 17 Oct 2023 09:51:38 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
 	pabeni@redhat.com
-Subject: Re: [PATCH net 3/5] net: avoid UAF on deleted altname
-Message-ID: <ZS485sWKKb99KrBx@nanopsycho>
+Subject: Re: [PATCH net 4/5] net: move altnames together with the netdevice
+Message-ID: <ZS49CjLECQHdcQwv@nanopsycho>
 References: <20231016201657.1754763-1-kuba@kernel.org>
- <20231016201657.1754763-4-kuba@kernel.org>
+ <20231016201657.1754763-5-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,91 +74,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231016201657.1754763-4-kuba@kernel.org>
+In-Reply-To: <20231016201657.1754763-5-kuba@kernel.org>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Mon, Oct 16, 2023 at 10:16:55PM CEST, kuba@kernel.org wrote:
->Altnames are accessed under RCU (__dev_get_by_name())
-
-dev_get_by_name_rcu()
-
-
->but freed by kfree() with no synchronization point.
+Mon, Oct 16, 2023 at 10:16:56PM CEST, kuba@kernel.org wrote:
+>The altname nodes are currently not moved to the new netns
+>when netdevice itself moves:
 >
->Because the name nodes don't hold a reference on the netdevice
->either, take the heavier approach of inserting synchronization
-
-What about to use kfree_rcu() in netdev_name_node_free()
-and treat node_name->dev as a rcu pointer instead?
-
-struct net_device *dev_get_by_name_rcu(struct net *net, const char *name)
-{
-        struct netdev_name_node *node_name;
-
-        node_name = netdev_name_node_lookup_rcu(net, name);
-        return node_name ? rcu_deferecence(node_name->dev) : NULL;
-}
-
-This would avoid synchronize_rcu() in netdev_name_node_alt_destroy()
-
-Btw, the next patch is smooth with this.
-
-
->points. Subsequent patch will remove the one added on device
->deletion path.
+>  [ ~]# ip netns add test
+>  [ ~]# ip -netns test link add name eth0 type dummy
+>  [ ~]# ip -netns test link property add dev eth0 altname some-name
+>  [ ~]# ip -netns test link show dev some-name
+>  2: eth0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+>      link/ether 1e:67:ed:19:3d:24 brd ff:ff:ff:ff:ff:ff
+>      altname some-name
+>  [ ~]# ip -netns test link set dev eth0 netns 1
+>  [ ~]# ip link
+>  ...
+>  3: eth0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+>      link/ether 02:40:88:62:ec:b8 brd ff:ff:ff:ff:ff:ff
+>      altname some-name
+>  [ ~]# ip li show dev some-name
+>  Device "some-name" does not exist.
 >
->Fixes: ff92741270bf ("net: introduce name_node struct to be used in hashlist")
+>Remove them from the hash table when device is unlisted
+>and add back when listed again.
+>
+>Fixes: 36fbf1e52bd3 ("net: rtnetlink: add linkprop commands to add and delete alternative ifnames")
 >Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->---
->CC: jiri@resnulli.us
->---
-> net/core/dev.c | 7 ++++++-
-> 1 file changed, 6 insertions(+), 1 deletion(-)
->
->diff --git a/net/core/dev.c b/net/core/dev.c
->index f4fa2692cf6d..7d5107cd5792 100644
->--- a/net/core/dev.c
->+++ b/net/core/dev.c
->@@ -345,7 +345,6 @@ int netdev_name_node_alt_create(struct net_device *dev, const char *name)
-> static void __netdev_name_node_alt_destroy(struct netdev_name_node *name_node)
-> {
-> 	list_del(&name_node->list);
->-	netdev_name_node_del(name_node);
-> 	kfree(name_node->name);
-> 	netdev_name_node_free(name_node);
-> }
->@@ -364,6 +363,8 @@ int netdev_name_node_alt_destroy(struct net_device *dev, const char *name)
-> 	if (name_node == dev->name_node || name_node->dev != dev)
-> 		return -EINVAL;
-> 
->+	netdev_name_node_del(name_node);
->+	synchronize_rcu();
-> 	__netdev_name_node_alt_destroy(name_node);
-> 
-> 	return 0;
->@@ -10937,6 +10938,7 @@ void unregister_netdevice_many_notify(struct list_head *head,
-> 	synchronize_net();
-> 
-> 	list_for_each_entry(dev, head, unreg_list) {
->+		struct netdev_name_node *name_node;
-> 		struct sk_buff *skb = NULL;
-> 
-> 		/* Shutdown queueing discipline. */
->@@ -10964,6 +10966,9 @@ void unregister_netdevice_many_notify(struct list_head *head,
-> 		dev_uc_flush(dev);
-> 		dev_mc_flush(dev);
-> 
->+		netdev_for_each_altname(dev, name_node)
->+			netdev_name_node_del(name_node);
->+		synchronize_rcu();
-> 		netdev_name_node_alt_flush(dev);
-> 		netdev_name_node_free(dev->name_node);
-> 
->-- 
->2.41.0
->
+
+Nice, thanks!
+
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
