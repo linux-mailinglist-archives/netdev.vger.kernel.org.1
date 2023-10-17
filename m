@@ -1,133 +1,157 @@
-Return-Path: <netdev+bounces-41852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70FFB7CC0E6
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:46:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 174757CC0E8
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:46:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B65A281858
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:46:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC0581F22D85
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8006B38DC8;
-	Tue, 17 Oct 2023 10:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EC93FB27;
+	Tue, 17 Oct 2023 10:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UAe8MUhs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLZ/PlEM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3318D41750
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:46:07 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 094B3B0;
-	Tue, 17 Oct 2023 03:46:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ROQZdDcLut5ViR2MKWTEe7ujDUIt2VMvj7Y8134W1Do=; b=UAe8MUhsddOe2s6WwFUT3m0YdX
-	nKeI/8fZLVWEOltPVdHSx609o4C59e2by21Ke+Wj5JhcHp4tQz9IihlOM3HnOfNwlDmJc9C6Fa3DG
-	ipBLCU0feoGodloXbVWpEqwgSH2AEQtfm4QAj+43MnNfNU5Bc8a4+4W3nNDTaS+79PPHWlJkupJtX
-	VxOwRabCWnNtrduVbOpIaZ9jjvEmFFfzGdzwjmJH2NX4O7hgC13UOh6vASlYthfxORgPbfs0u8282
-	ZFfqBXVY0JLzQFF6WOZRUFTkQodoApQjEKH6HGy2HSdf6uV/a5Vmh4o+UjlKyXkjGxxEkk/aZFBT5
-	ePNON4ag==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48774)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qshaK-00036p-10;
-	Tue, 17 Oct 2023 11:46:00 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qshaK-0006ca-OQ; Tue, 17 Oct 2023 11:46:00 +0100
-Date: Tue, 17 Oct 2023 11:46:00 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	Bryan.Whitehead@microchip.com, linux-kernel@vger.kernel.org,
-	andrew@lunn.ch, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next V1 6/7] net: lan743x: Add support to the phylink
- framework
-Message-ID: <ZS5l6Ko0NeaotV2Q@shell.armlinux.org.uk>
-References: <20231017094208.4956-1-Raju.Lakkaraju@microchip.com>
- <20231017094208.4956-7-Raju.Lakkaraju@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA7241757
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:46:17 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43B14B0
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 03:46:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697539575;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zqkbb/k4y19ZoEz8tHHeyQiTb7Pt5hF4nVZg7dtOzKk=;
+	b=CLZ/PlEMMDB5LN8WAgUNHjojyuIHJj57w7MylXCwnqw5SB6a8JXaz6jAGKTmaqVQYB3tte
+	8U3bq1MHBKKO8qN5rAcC9WbcsHi9oE+tsxIwG96UW67lHJGSyJEtms+hZxl41xB8SqTDx2
+	cHbaFkt75uSQDhF/1kGpwkPNna3T77o=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645-ZBRszdW5OWqW9yEto7rQxA-1; Tue, 17 Oct 2023 06:46:12 -0400
+X-MC-Unique: ZBRszdW5OWqW9yEto7rQxA-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50337007b37so1181888e87.1
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 03:46:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697539571; x=1698144371;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zqkbb/k4y19ZoEz8tHHeyQiTb7Pt5hF4nVZg7dtOzKk=;
+        b=jS3Mlfjo7dT5/zEvV7Pxy6hPR9eLDSVDC6q0liAdQn0RUZa0etuSBi24uXqx7NhPTD
+         gwOd7SAzFHuaRvDEnQfJ05m0YAyzGaGEJJI/iBRo2+GBDBpf1eWIy+ZM0EJsTVlOV9rz
+         aR12zyLMq0JF9e1+kDuL2fg0OvN4hCGBvm8ni33Aev2e39AIlk7Ut9BcSJ3yD7pXKc0n
+         TqotCqwtkWgHJ3/rxIfa7QEJNon0Tch8oGxRMXx2Mv8aoqk7gBRc2Dc2LNGS5u6L0oXY
+         LfE5Eez/ktmANK2Gurefk3rn4C7tD39JQT8qIXspPFuQkg7GScJAbi1k7T4x4aVl0rHK
+         KUTA==
+X-Gm-Message-State: AOJu0YwTGBrc/O0khU7vxQy0hD7w4ViAa19GMTx/p77uc7Yse9dH4JAm
+	3clNlWvg2QAC6dWWTMe9zb+L18vkecJRhw0hIzw1UHkljgt4uzgq1vOv0NFV9p9g2L3ZCsYcuaT
+	umIn6BSExMy0gX/R0
+X-Received: by 2002:a05:6512:1188:b0:505:97b9:5d50 with SMTP id g8-20020a056512118800b0050597b95d50mr1595971lfr.5.1697539570787;
+        Tue, 17 Oct 2023 03:46:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGM26eZbLoF1xnImDI1P3NpnJ00X/0O1AwfU7XYcu3kmZD6x5Nae+2tZHNg+jy1emwoUXnpJA==
+X-Received: by 2002:a05:6512:1188:b0:505:97b9:5d50 with SMTP id g8-20020a056512118800b0050597b95d50mr1595953lfr.5.1697539570431;
+        Tue, 17 Oct 2023 03:46:10 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-233-87.dyn.eolo.it. [146.241.233.87])
+        by smtp.gmail.com with ESMTPSA id q8-20020a056512210800b00505677e7a99sm226862lfr.139.2023.10.17.03.46.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 03:46:09 -0700 (PDT)
+Message-ID: <caa89a15568b2d92592476995bfcf362475be11f.camel@redhat.com>
+Subject: Re: [PATCH net-next v6 3/3] mctp i3c: MCTP I3C driver
+From: Paolo Abeni <pabeni@redhat.com>
+To: Simon Horman <horms@kernel.org>, Matt Johnston
+ <matt@codeconstruct.com.au>
+Cc: linux-i3c@lists.infradead.org, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Jeremy Kerr
+ <jk@codeconstruct.com.au>,  Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+ <conor+dt@kernel.org>,  miquel.raynal@bootlin.com
+Date: Tue, 17 Oct 2023 12:46:07 +0200
+In-Reply-To: <20231017082427.GH1751252@kernel.org>
+References: <20231013040628.354323-1-matt@codeconstruct.com.au>
+	 <20231013040628.354323-4-matt@codeconstruct.com.au>
+	 <20231017082427.GH1751252@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231017094208.4956-7-Raju.Lakkaraju@microchip.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 03:12:07PM +0530, Raju Lakkaraju wrote:
-> +static void lan743x_phylink_mac_config(struct phylink_config *config,
-> +				       unsigned int link_an_mode,
-> +				       const struct phylink_link_state *state)
-> +{
-> +	struct net_device *netdev = to_net_dev(config->dev);
-> +	struct lan743x_adapter *adapter = netdev_priv(netdev);
-> +	bool status;
-> +	int ret;
-> +
-> +	lan743x_mac_cfg_update(adapter, state->link, state->speed,
-> +			       state->advertising);
+On Tue, 2023-10-17 at 10:24 +0200, Simon Horman wrote:
+> On Fri, Oct 13, 2023 at 12:06:25PM +0800, Matt Johnston wrote:
+> > Provides MCTP network transport over an I3C bus, as specified in
+> > DMTF DSP0233.
+> >=20
+> > Each I3C bus (with "mctp-controller" devicetree property) gets an
+> > "mctpi3cX" net device created. I3C devices are reachable as remote
+> > endpoints through that net device. Link layer addressing uses the
+> > I3C PID as a fixed hardware address for neighbour table entries.
+> >=20
+> > The driver matches I3C devices that have the MIPI assigned DCR 0xCC for
+> > MCTP.
+> >=20
+> > Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
+>=20
+> Hi Matt,
+>=20
+> one minor nit below, which you can take, leave, or leave for later
+> as far as I am concerned.
+>=20
+> Overall the patch looks good to me and I see that Paolo's review of v5 ha=
+s
+> has been addressed.
+>=20
+> Reviewed-by: Simon Horman <horms@kernel.org>
+>=20
+> > +/* List of mctp_i3c_busdev */
+> > +static LIST_HEAD(busdevs);
+> > +/* Protects busdevs, as well as mctp_i3c_bus.devs lists */
+> > +static DEFINE_MUTEX(busdevs_lock);
+> > +
+> > +struct mctp_i3c_bus {
+> > +	struct net_device *ndev;
+> > +
+> > +	struct task_struct *tx_thread;
+> > +	wait_queue_head_t tx_wq;
+> > +	/* tx_lock protects tx_skb and devs */
+> > +	spinlock_t tx_lock;
+> > +	/* Next skb to transmit */
+> > +	struct sk_buff *tx_skb;
+> > +	/* Scratch buffer for xmit */
+> > +	u8 tx_scratch[MCTP_I3C_MAXBUF];
+> > +
+> > +	/* Element of busdevs */
+> > +	struct list_head list;
+>=20
+> I am unsure if it is important, but I observe that on x86_64
+> list spans a cacheline.
 
-Another case of not reading the phylink documentation... :( I *really*
-don't see why we bother to write documentation, from my experience, it
-seems to be totally a write-only thing... no one seems to bother
-reading it.
+It looks like 'list' is only touched on control path, so it's should
+not critical.
 
-/**
- * mac_config() - configure the MAC for the selected mode and state
- * @config: a pointer to a &struct phylink_config.
- * @mode: one of %MLO_AN_FIXED, %MLO_AN_PHY, %MLO_AN_INBAND.
- * @state: a pointer to a &struct phylink_link_state.
- *
- * Note - not all members of @state are valid.  In particular,
- * @state->lp_advertising, @state->link, @state->an_complete are never
- * guaranteed to be correct, and so any mac_config() implementation must
- * never reference these fields.
-...
- * The action performed depends on the currently selected mode:
- *
- * %MLO_AN_FIXED, %MLO_AN_PHY:
-...
- *   Valid state members: interface, advertising.
- *   Deprecated state members: speed, duplex, pause.
-...
- * %MLO_AN_INBAND:
-...
- *   Valid state members: interface, an_enabled, pause, advertising.
+Cheers,
 
-So "link" and "speed" are not valid. They're certainly not valid now
-that the pre-March 2020 legacy support has been removed.
+Paolo
 
-The only time that you get to know what speed the link is operating at
-is after the link has been negotiated and is up - and you will be told
-via the mac_link_up() function (or in the case of a PCS, via the
-pcs_link_up() function.) You can't know before that point what speed
-the link will be operating at because its dependent on the results of
-link negotiation.
-
-I haven't bothered to look more deeply at this patch, because I regard
-any patch that gets this wrong to be utter trash (sorry that's a bit
-hard, but I see people not bothering to read documentation all too
-often and it pisses me off that I've gone to the bother of writing it
-and it just gets ignored.)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
