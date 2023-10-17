@@ -1,235 +1,202 @@
-Return-Path: <netdev+bounces-41666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ECD17CB8C7
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 04:56:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69BC47CB8DB
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 05:11:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB4F42817E5
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 02:56:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE593B20EE0
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 03:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B4479EA;
-	Tue, 17 Oct 2023 02:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="am9YBnPb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B9B7481;
+	Tue, 17 Oct 2023 03:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8C7747E;
-	Tue, 17 Oct 2023 02:56:30 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2081.outbound.protection.outlook.com [40.107.223.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AB7BFD;
-	Mon, 16 Oct 2023 19:55:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gtpw6c0ygifg8OTq6P0KW2Le2B6S549wSjubrY8jKJxFR9vnnzAhCwFv2U8TFko1uZdkr600BwGae26fEWTazS0nC4V09lAUBwmU2dv9FLg+4MJi7utoBrTjZ4CftftfS+5LKvmnIZ0vrw4TNj0lkbCbrX2PUCT/Evo/Fg6Om0YytObvM0ENYfmvfqEz29je+4lUwOztwOU2FA4Jcm1FiCN937xBgpwewSGfBcSUUKK8pyqpFpJIeF1U+AhmtgYNKVPiyCdTtRfZbsnRxPtsIDlLI64R9ZBAtaSRHFVIU7tMwQVEzvVUyYXVeCQg4ZZ8Qy4rW2qpK7UytaYNDDlEnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ymyfopRpnD+SjDQpDk720xaQkDvgTOsMoJ9/AJaDsd0=;
- b=F+UNwYOtMcD3wbMPsb372zdumNMnyJ9rQ4c57E933KGQNF0yET7OojVyWl1QThqIPNKm3NmBfdG7tSe+Kz8mqE+hmOSE/NJjTMIoXx6JlKFHc1QdnjYtRSyjiMEhg06EuHnonvPCLwvOOvPSfHXFINLvFY4i8v3+Ue+m03dQAHWLEyvgI4/Qr6qJhqFelkbTRB7dKgPqDQt8+zZEz4KGKZLGYqFPK+PM22WO5/jAkmyAZlHdR38fQjW5c/bdfvTokegNCXmotRaCb/d2MXAoykTRFnYWsHQHrd0KTt4+NlvONHJHZQ9SrM8DKmCZAsE+rPvFcL2dnlI3ybOf1oalxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lists.freedesktop.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ymyfopRpnD+SjDQpDk720xaQkDvgTOsMoJ9/AJaDsd0=;
- b=am9YBnPbFNlwi/reuu1+rDgleZjLx1R7nsbI+OvQ3cX9dwaK0WJpuGBUoRXAGmE7W4ZD9bw85SjvdQxijuXJXnSQJ110lxj0uB2ye1XhqphHqhTeY26gP33JGOycpLqp0P1FrxJnJToSdEEz6C+06hED+OIAyLrcS+DlSSdD4iw=
-Received: from MW4P221CA0009.NAMP221.PROD.OUTLOOK.COM (2603:10b6:303:8b::14)
- by CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Tue, 17 Oct
- 2023 02:55:55 +0000
-Received: from MWH0EPF000989E6.namprd02.prod.outlook.com
- (2603:10b6:303:8b:cafe::3e) by MW4P221CA0009.outlook.office365.com
- (2603:10b6:303:8b::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36 via Frontend
- Transport; Tue, 17 Oct 2023 02:55:54 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MWH0EPF000989E6.mail.protection.outlook.com (10.167.241.133) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.22 via Frontend Transport; Tue, 17 Oct 2023 02:55:54 +0000
-Received: from compile-server.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 16 Oct
- 2023 21:55:49 -0500
-From: Ma Jun <Jun.Ma2@amd.com>
-To: <amd-gfx@lists.freedesktop.org>, <lenb@kernel.org>,
-	<johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <alexander.deucher@amd.com>,
-	<Lijo.Lazar@amd.com>, <mario.limonciello@amd.com>
-CC: <majun@amd.com>, <netdev@vger.kernel.org>,
-	<linux-wireless@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>, Evan Quan
-	<quanliangl@hotmail.com>, Ma Jun <Jun.Ma2@amd.com>
-Subject: [PATCH v12 9/9] drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
-Date: Tue, 17 Oct 2023 10:53:58 +0800
-Message-ID: <20231017025358.1773598-10-Jun.Ma2@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231017025358.1773598-1-Jun.Ma2@amd.com>
-References: <20231017025358.1773598-1-Jun.Ma2@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1419C46A6;
+	Tue, 17 Oct 2023 03:11:27 +0000 (UTC)
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C341AA2;
+	Mon, 16 Oct 2023 20:11:25 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VuLNn2t_1697512280;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VuLNn2t_1697512280)
+          by smtp.aliyun-inc.com;
+          Tue, 17 Oct 2023 11:11:21 +0800
+Message-ID: <1697511725.2037013-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v1 00/19] virtio-net: support AF_XDP zero copy
+Date: Tue, 17 Oct 2023 11:02:05 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux-foundation.org,
+ bpf@vger.kernel.org
+References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEs4u-4ch2UAK14hNfKeORjqMu4BX7=46OfaXpvxW+VT7w@mail.gmail.com>
+In-Reply-To: <CACGkMEs4u-4ch2UAK14hNfKeORjqMu4BX7=46OfaXpvxW+VT7w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000989E6:EE_|CY5PR12MB6179:EE_
-X-MS-Office365-Filtering-Correlation-Id: 47227f90-3328-4214-79fd-08dbcebc94e0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	jqnUF3YrEf2ZQqoOaeCPBkQoif1jpQjljuyzWRqDvxQBZTLBd1ry7YxPLONosCTTHOMnPD1D5udvPJ9Vd2M2ovmZPXe2SzpFobk6Kee3empLO6+pI8yLBiik+B81A89ZIi0chzZvHm5VxDXC+299QkoHXciHvwKgGSKT/U0k77xSvLeRdWjLYo/XzVoWYDv8tvMLVUWtfBJl2zFcsUYGJYaQvff4lNvZGxWjULBiU7hxrHeWagkln55SYR2EjpiKupMq4uoS3w4gxW6DleGMudTGngXskmSaq8h+o2CdVU967znCJ9P1aIUAUHEbmIcPQ3CXMDlKlS51sz5LtrCN6lw6jqdt8NX+ldwx3bGOViaCDDWr8t8Wra5sxoTTp4iYHInWXCPOgwIIxmd3RtyF+ebuC3wqO3wy6qs5LisiDAiJeAOmFMUJODLWt6zkRTWWKPdVSzqyBP6VCHasT5AW+Qwo5U0dWayvzViINUwCpkwrgSlBDHB/KnImedfjhJ9LiZMHTSUWl1LB3q4R6RyvFqve+vGaxiF6ksjgtdgJbR7pf2iDs7+Dd1+pjppeJJ2SJUOFcPcPuaRZMEhrXwUWzkeZn0WCH1SHzGpcY4V0h1H6T5YhZ81OpmZ10gZlN4oFcHu+9fA53Cnq5PFdXjyQEN530opREFJO+eDTw0A+Jw1yu9K5hUVkyEwki5cOSuhd1h1OBVsKnghmU3wD3460a65hnyiIdSn93u4eb/ZwkrMN5Z4hyD5yctuZIp3yF+OTkscy6jBtTWYF59UqIMKpL5dR8u7QiAKDUHCVLn5Gx90=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(376002)(39860400002)(136003)(230922051799003)(82310400011)(64100799003)(451199024)(186009)(1800799009)(40470700004)(36840700001)(110136005)(478600001)(45080400002)(7696005)(6666004)(86362001)(81166007)(36756003)(356005)(921005)(82740400003)(40460700003)(16526019)(26005)(2616005)(426003)(1076003)(83380400001)(6636002)(316002)(54906003)(70586007)(70206006)(41300700001)(5660300002)(8936002)(4326008)(8676002)(2906002)(7416002)(336012)(32650700002)(40480700001)(36860700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 02:55:54.8251
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47227f90-3328-4214-79fd-08dbcebc94e0
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000989E6.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6179
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-From: Evan Quan <quanliangl@hotmail.com>
+On Tue, 17 Oct 2023 10:53:44 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Mon, Oct 16, 2023 at 8:00=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > ## AF_XDP
+> >
+> > XDP socket(AF_XDP) is an excellent bypass kernel network framework. The=
+ zero
+> > copy feature of xsk (XDP socket) needs to be supported by the driver. T=
+he
+> > performance of zero copy is very good. mlx5 and intel ixgbe already sup=
+port
+> > this feature, This patch set allows virtio-net to support xsk's zerocop=
+y xmit
+> > feature.
+> >
+> > At present, we have completed some preparation:
+> >
+> > 1. vq-reset (virtio spec and kernel code)
+> > 2. virtio-core premapped dma
+> > 3. virtio-net xdp refactor
+> >
+> > So it is time for Virtio-Net to complete the support for the XDP Socket
+> > Zerocopy.
+> >
+> > Virtio-net can not increase the queue num at will, so xsk shares the qu=
+eue with
+> > kernel.
+> >
+> > On the other hand, Virtio-Net does not support generate interrupt from =
+driver
+> > manually, so when we wakeup tx xmit, we used some tips. If the CPU run =
+by TX
+> > NAPI last time is other CPUs, use IPI to wake up NAPI on the remote CPU=
+. If it
+> > is also the local CPU, then we wake up napi directly.
+> >
+> > This patch set includes some refactor to the virtio-net to let that to =
+support
+> > AF_XDP.
+> >
+> > ## performance
+> >
+> > ENV: Qemu with vhost-user(polling mode).
+> >
+> > Sockperf: https://github.com/Mellanox/sockperf
+> > I use this tool to send udp packet by kernel syscall.
+> >
+> > xmit command: sockperf tp -i 10.0.3.1 -t 1000
+> >
+> > I write a tool that sends udp packets or recvs udp packets by AF_XDP.
+> >
+> >                   | Guest APP CPU |Guest Softirq CPU | UDP PPS
+> > ------------------|---------------|------------------|------------
+> > xmit by syscall   |   100%        |                  |   676,915
+> > xmit by xsk       |   59.1%       |   100%           | 5,447,168
+> > recv by syscall   |   60%         |   100%           |   932,288
+> > recv by xsk       |   35.7%       |   100%           | 3,343,168
+>
+> Any chance we can get a testpmd result (which I guess should be better
+> than PPS above)?
 
-Fulfill the SMU13.0.7 support for Wifi RFI mitigation feature.
+Do you mean testpmd + DPDK + AF_XDP?
 
-Signed-off-by: Evan Quan <quanliangl@hotmail.com>
-Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
-Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
+Yes. This is probably better because my tool does more work. That is not a
+complete testing tool used by our business.
+
+What I noticed is that the hotspot is the driver writing virtio desc. Becau=
+se
+the device is in busy mode. So there is race between driver and device.
+So I modified the virtio core and lazily updated avail idx. Then pps can re=
+ach
+10,000,000.
+
+Thanks.
+
+>
+> Thanks
+>
+> >
+> > ## maintain
+> >
+> > I am currently a reviewer for virtio-net. I commit to maintain AF_XDP s=
+upport in
+> > virtio-net.
+> >
+> > Please review.
+> >
+> > Thanks.
+> >
+> > v1:
+> >     1. remove two virtio commits. Push this patchset to net-next
+> >     2. squash "virtio_net: virtnet_poll_tx support rescheduled" to xsk:=
+ support tx
+> >     3. fix some warnings
+> >
+> > Xuan Zhuo (19):
+> >   virtio_net: rename free_old_xmit_skbs to free_old_xmit
+> >   virtio_net: unify the code for recycling the xmit ptr
+> >   virtio_net: independent directory
+> >   virtio_net: move to virtio_net.h
+> >   virtio_net: add prefix virtnet to all struct/api inside virtio_net.h
+> >   virtio_net: separate virtnet_rx_resize()
+> >   virtio_net: separate virtnet_tx_resize()
+> >   virtio_net: sq support premapped mode
+> >   virtio_net: xsk: bind/unbind xsk
+> >   virtio_net: xsk: prevent disable tx napi
+> >   virtio_net: xsk: tx: support tx
+> >   virtio_net: xsk: tx: support wakeup
+> >   virtio_net: xsk: tx: virtnet_free_old_xmit() distinguishes xsk buffer
+> >   virtio_net: xsk: tx: virtnet_sq_free_unused_buf() check xsk buffer
+> >   virtio_net: xsk: rx: introduce add_recvbuf_xsk()
+> >   virtio_net: xsk: rx: introduce receive_xsk() to recv xsk buffer
+> >   virtio_net: xsk: rx: virtnet_rq_free_unused_buf() check xsk buffer
+> >   virtio_net: update tx timeout record
+> >   virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROCOPY
+> >
+> >  MAINTAINERS                                 |   2 +-
+> >  drivers/net/Kconfig                         |   8 +-
+> >  drivers/net/Makefile                        |   2 +-
+> >  drivers/net/virtio/Kconfig                  |  13 +
+> >  drivers/net/virtio/Makefile                 |   8 +
+> >  drivers/net/{virtio_net.c =3D> virtio/main.c} | 652 +++++++++---------=
 --
-v10->v11:
-  - downgrade the prompt level on message failure(Lijo)
----
- .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  | 59 +++++++++++++++++++
- 1 file changed, 59 insertions(+)
-
-diff --git a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-index 62f2886ab4df..c5736fb3cf6d 100644
---- a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-+++ b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-@@ -126,6 +126,7 @@ static struct cmn2asic_msg_mapping smu_v13_0_7_message_map[SMU_MSG_MAX_COUNT] =
- 	MSG_MAP(AllowGpo,			PPSMC_MSG_SetGpoAllow,           0),
- 	MSG_MAP(GetPptLimit,			PPSMC_MSG_GetPptLimit,                 0),
- 	MSG_MAP(NotifyPowerSource,		PPSMC_MSG_NotifyPowerSource,           0),
-+	MSG_MAP(EnableUCLKShadow,		PPSMC_MSG_EnableUCLKShadow,            0),
- };
- 
- static struct cmn2asic_mapping smu_v13_0_7_clk_map[SMU_CLK_COUNT] = {
-@@ -207,6 +208,7 @@ static struct cmn2asic_mapping smu_v13_0_7_table_map[SMU_TABLE_COUNT] = {
- 	TAB_MAP(ACTIVITY_MONITOR_COEFF),
- 	[SMU_TABLE_COMBO_PPTABLE] = {1, TABLE_COMBO_PPTABLE},
- 	TAB_MAP(OVERDRIVE),
-+	TAB_MAP(WIFIBAND),
- };
- 
- static struct cmn2asic_mapping smu_v13_0_7_pwr_src_map[SMU_POWER_SOURCE_COUNT] = {
-@@ -503,6 +505,9 @@ static int smu_v13_0_7_tables_init(struct smu_context *smu)
- 	               AMDGPU_GEM_DOMAIN_VRAM);
- 	SMU_TABLE_INIT(tables, SMU_TABLE_COMBO_PPTABLE, MP0_MP1_DATA_REGION_SIZE_COMBOPPTABLE,
- 			PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM);
-+	SMU_TABLE_INIT(tables, SMU_TABLE_WIFIBAND,
-+		       sizeof(WifiBandEntryTable_t), PAGE_SIZE,
-+		       AMDGPU_GEM_DOMAIN_VRAM);
- 
- 	smu_table->metrics_table = kzalloc(sizeof(SmuMetricsExternal_t), GFP_KERNEL);
- 	if (!smu_table->metrics_table)
-@@ -2179,6 +2184,57 @@ static int smu_v13_0_7_set_df_cstate(struct smu_context *smu,
- 					       NULL);
- }
- 
-+static bool smu_v13_0_7_wbrf_support_check(struct smu_context *smu)
-+{
-+	return smu->smc_fw_version > 0x00524600;
-+}
-+
-+static int smu_v13_0_7_set_wbrf_exclusion_ranges(struct smu_context *smu,
-+						 struct freq_band_range *exclusion_ranges)
-+{
-+	WifiBandEntryTable_t wifi_bands;
-+	int valid_entries = 0;
-+	int ret, i;
-+
-+	memset(&wifi_bands, 0, sizeof(wifi_bands));
-+	for (i = 0; i < ARRAY_SIZE(wifi_bands.WifiBandEntry); i++) {
-+		if (!exclusion_ranges[i].start &&
-+		    !exclusion_ranges[i].end)
-+			break;
-+
-+		/* PMFW expects the inputs to be in Mhz unit */
-+		wifi_bands.WifiBandEntry[valid_entries].LowFreq =
-+			DIV_ROUND_DOWN_ULL(exclusion_ranges[i].start, HZ_IN_MHZ);
-+		wifi_bands.WifiBandEntry[valid_entries++].HighFreq =
-+			DIV_ROUND_UP_ULL(exclusion_ranges[i].end, HZ_IN_MHZ);
-+	}
-+	wifi_bands.WifiBandEntryNum = valid_entries;
-+
-+	/*
-+	 * Per confirm with PMFW team, WifiBandEntryNum = 0 is a valid setting.
-+	 * Considering the scenarios below:
-+	 * - At first the wifi device adds an exclusion range e.g. (2400,2500) to
-+	 *   BIOS and our driver gets notified. We will set WifiBandEntryNum = 1
-+	 *   and pass the WifiBandEntry (2400, 2500) to PMFW.
-+	 *
-+	 * - Later the wifi device removes the wifiband list added above and
-+	 *   our driver gets notified again. At this time, driver will set
-+	 *   WifiBandEntryNum = 0 and pass an empty WifiBandEntry list to PMFW.
-+	 *   - PMFW may still need to do some uclk shadow update(e.g. switching
-+	 *     from shadow clock back to primary clock) on receiving this.
-+	 */
-+
-+	ret = smu_cmn_update_table(smu,
-+				   SMU_TABLE_WIFIBAND,
-+				   0,
-+				   (void *)(&wifi_bands),
-+				   true);
-+	if (ret)
-+		dev_warn(smu->adev->dev, "Failed to set wifiband!");
-+
-+	return ret;
-+}
-+
- static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
- 	.get_allowed_feature_mask = smu_v13_0_7_get_allowed_feature_mask,
- 	.set_default_dpm_table = smu_v13_0_7_set_default_dpm_table,
-@@ -2247,6 +2303,9 @@ static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
- 	.set_mp1_state = smu_v13_0_7_set_mp1_state,
- 	.set_df_cstate = smu_v13_0_7_set_df_cstate,
- 	.gpo_control = smu_v13_0_gpo_control,
-+	.is_asic_wbrf_supported = smu_v13_0_7_wbrf_support_check,
-+	.enable_uclk_shadow = smu_v13_0_enable_uclk_shadow,
-+	.set_wbrf_exclusion_ranges = smu_v13_0_7_set_wbrf_exclusion_ranges,
- };
- 
- void smu_v13_0_7_set_ppt_funcs(struct smu_context *smu)
--- 
-2.34.1
-
+> >  drivers/net/virtio/virtio_net.h             | 359 +++++++++++
+> >  drivers/net/virtio/xsk.c                    | 545 ++++++++++++++++
+> >  drivers/net/virtio/xsk.h                    |  32 +
+> >  9 files changed, 1247 insertions(+), 374 deletions(-)
+> >  create mode 100644 drivers/net/virtio/Kconfig
+> >  create mode 100644 drivers/net/virtio/Makefile
+> >  rename drivers/net/{virtio_net.c =3D> virtio/main.c} (91%)
+> >  create mode 100644 drivers/net/virtio/virtio_net.h
+> >  create mode 100644 drivers/net/virtio/xsk.c
+> >  create mode 100644 drivers/net/virtio/xsk.h
+> >
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
 
