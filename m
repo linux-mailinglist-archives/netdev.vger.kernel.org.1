@@ -1,274 +1,147 @@
-Return-Path: <netdev+bounces-41837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19ACC7CBFCA
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:44:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F4D7CBFE5
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:50:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C34EE28167C
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:44:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 021D628195B
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B235405E8;
-	Tue, 17 Oct 2023 09:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D438F405FF;
+	Tue, 17 Oct 2023 09:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ySpEhj4Z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lMotbMjU"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0232381D8
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:44:14 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DF97103;
-	Tue, 17 Oct 2023 02:44:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367B4405F6
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:50:19 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E5AC9F
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:50:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1697535852; x=1729071852;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4rShQaN0BjuypQNXY38PzlhzE5ck98tJjN4aVyfvIoQ=;
-  b=ySpEhj4Z5KlYEJBEZeUW3SOerPUtIx4QrqUhlFvlsKJWpkIiDDxAh+Lm
-   K5ICk1cnBuDltpmJS11EGXhvKgY0kasPYDgkr0S8K/zugG4vgpISSJZtK
-   wCS58TjRHrpSIRpN3uZPBYKC4IhTPEAoIn1jAbk5FBfDyqEWr496GCkYz
-   sUBMaGZbpNpOAiTBdID0Q38IDBRE5rxCC/lQ1UynDACPo+zYyGgsQzudB
-   5gxPgIk1NbPlUJt2LsLvx/21nfzuotkTYEwL0+2119GqwvpXtM2MCVPkz
-   4ED8Mt+tiboAg2J5PScwlzUUdqg92ZB3RdbcPjcvUf1ZbmM6VkwOLa376
-   w==;
-X-CSE-ConnectionGUID: dgJ6hSiqT7yzYdbZnQNEqQ==
-X-CSE-MsgGUID: TZFbQwDpS0qzX8aym//nrg==
-X-ThreatScanner-Verdict: Negative
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697536217; x=1729072217;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nyyg0L8NonbYaXsBEp+WK/UQNHC0Bw/76oVgNS6I6s0=;
+  b=lMotbMjU2GNRLD3cW3noP2i9uOJy6UINDiHEkhNdkbWyq1UPKwwAo1Aa
+   dw7/Dw7LDvlMKM3EfmBcjNXlKhVWWBX31Jb6JYwcNJqtUpHMr62oUnT3n
+   lpBI8SD1XztQewlHUzsL1j1Yip2bpo0Xoq3FCecu98DqA2bnrCdHbPHbE
+   j4kiuQBeZy/X4dFtvVa08oCZjyr+EhiksTYW0436S5IlFnNlB0T7WAWQq
+   F9Ry1DIRwMriiRXWm/9bSsaIf/9/dDDOlFVvNDMMGdc1SwWCQ0KwaDf0J
+   fDjy3ZzgCpAIMJ2dm2tRU5o0gxlflQLiyU+JSjUPKPMWfQf8mksQ7mmfV
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="452221555"
 X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
-   d="scan'208";a="10336290"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Oct 2023 02:44:12 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Tue, 17 Oct 2023 02:43:42 -0700
-Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Tue, 17 Oct 2023 02:43:39 -0700
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <Bryan.Whitehead@microchip.com>,
-	<linux-kernel@vger.kernel.org>, <andrew@lunn.ch>, <linux@armlinux.org.uk>,
-	<UNGLinuxDriver@microchip.com>
-Subject: [PATCH net-next V1 7/7] net: lan743x: Add support to ethtool phylink get and set settings
-Date: Tue, 17 Oct 2023 15:12:08 +0530
-Message-ID: <20231017094208.4956-8-Raju.Lakkaraju@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231017094208.4956-1-Raju.Lakkaraju@microchip.com>
-References: <20231017094208.4956-1-Raju.Lakkaraju@microchip.com>
+   d="scan'208";a="452221555"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 02:50:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10865"; a="872495253"
+X-IronPort-AV: E=Sophos;i="6.03,231,1694761200"; 
+   d="scan'208";a="872495253"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by fmsmga002.fm.intel.com with ESMTP; 17 Oct 2023 02:50:14 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qsgiJ-0009RF-33;
+	Tue, 17 Oct 2023 09:50:11 +0000
+Date: Tue, 17 Oct 2023 17:49:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Konrad Knitter <konrad.knitter@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	jdelvare@suse.com, linux@roeck-us.net,
+	Konrad Knitter <konrad.knitter@intel.com>,
+	Marcin Domagala <marcinx.domagala@intel.com>,
+	Eric Joyner <eric.joyner@intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH iwl-next v4] ice: read internal temperature sensor
+Message-ID: <202310171740.MOWYti1J-lkp@intel.com>
+References: <20231016102913.898932-1-konrad.knitter@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016102913.898932-1-konrad.knitter@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add support to ethtool phylink functions:
-  - get/set settings like speed, duplex etc.
-  - get/set the wake-on-lan (WOL)
-  - get/set the energy-efficient ethernet (EEE)
-  - get/set the pause
+Hi Konrad,
 
-Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
----
-Change Log:                                                                     
-===========                                                                     
-V0 -> V1:                                                                       
-  - Remove the phylib ethtool functions and support the phylink ethtool 
+kernel test robot noticed the following build warnings:
 
- .../net/ethernet/microchip/lan743x_ethtool.c  | 85 ++++++++-----------
- 1 file changed, 34 insertions(+), 51 deletions(-)
+[auto build test WARNING on ac4dec3fd63c7da703c244698fc92efb411ff0d4]
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-index 9f825d0c6dec..349630baa29a 100644
---- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
-+++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-@@ -1055,19 +1055,10 @@ static int lan743x_ethtool_get_eee(struct net_device *netdev,
- 				   struct ethtool_eee *eee)
- {
- 	struct lan743x_adapter *adapter = netdev_priv(netdev);
--	struct phy_device *phydev = netdev->phydev;
- 	u32 buf;
- 	int ret;
- 
--	if (!phydev)
--		return -EIO;
--	if (!phydev->drv) {
--		netif_err(adapter, drv, adapter->netdev,
--			  "Missing PHY Driver\n");
--		return -EIO;
--	}
--
--	ret = phy_ethtool_get_eee(phydev, eee);
-+	ret = phylink_ethtool_get_eee(adapter->phylink, eee);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -1093,32 +1084,15 @@ static int lan743x_ethtool_set_eee(struct net_device *netdev,
- 				   struct ethtool_eee *eee)
- {
- 	struct lan743x_adapter *adapter;
--	struct phy_device *phydev;
- 	u32 buf = 0;
--	int ret = 0;
- 
- 	if (!netdev)
- 		return -EINVAL;
- 	adapter = netdev_priv(netdev);
- 	if (!adapter)
- 		return -EINVAL;
--	phydev = netdev->phydev;
--	if (!phydev)
--		return -EIO;
--	if (!phydev->drv) {
--		netif_err(adapter, drv, adapter->netdev,
--			  "Missing PHY Driver\n");
--		return -EIO;
--	}
- 
- 	if (eee->eee_enabled) {
--		ret = phy_init_eee(phydev, false);
--		if (ret) {
--			netif_err(adapter, drv, adapter->netdev,
--				  "EEE initialization failed\n");
--			return ret;
--		}
--
- 		buf = (u32)eee->tx_lpi_timer;
- 		lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT, buf);
- 
-@@ -1131,7 +1105,23 @@ static int lan743x_ethtool_set_eee(struct net_device *netdev,
- 		lan743x_csr_write(adapter, MAC_CR, buf);
- 	}
- 
--	return phy_ethtool_set_eee(phydev, eee);
-+	return phylink_ethtool_set_eee(adapter->phylink, eee);
-+}
-+
-+static int lan743x_ethtool_set_link_ksettings(struct net_device *netdev,
-+					      const struct ethtool_link_ksettings *cmd)
-+{
-+	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+
-+	return phylink_ethtool_ksettings_set(adapter->phylink, cmd);
-+}
-+
-+static int lan743x_ethtool_get_link_ksettings(struct net_device *netdev,
-+					      struct ethtool_link_ksettings *cmd)
-+{
-+	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+
-+	return phylink_ethtool_ksettings_get(adapter->phylink, cmd);
- }
- 
- #ifdef CONFIG_PM
-@@ -1143,8 +1133,7 @@ static void lan743x_ethtool_get_wol(struct net_device *netdev,
- 	wol->supported = 0;
- 	wol->wolopts = 0;
- 
--	if (netdev->phydev)
--		phy_ethtool_get_wol(netdev->phydev, wol);
-+	phylink_ethtool_get_wol(adapter->phylink, wol);
- 
- 	wol->supported |= WAKE_BCAST | WAKE_UCAST | WAKE_MCAST |
- 		WAKE_MAGIC | WAKE_PHY | WAKE_ARP;
-@@ -1161,8 +1150,18 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
- 				   struct ethtool_wolinfo *wol)
- {
- 	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+	int ret;
- 
- 	adapter->wolopts = 0;
-+
-+	/* Pass the order to phylink layer */
-+	ret = phylink_ethtool_set_wol(adapter->phylink, wol);
-+	/* Don't manage WoL on MAC if handled by the PHY
-+	 * or if there's a failure in talking to the PHY
-+	 */
-+	if (!ret || ret != -EOPNOTSUPP)
-+		return ret;
-+
- 	if (wol->wolopts & WAKE_UCAST)
- 		adapter->wolopts |= WAKE_UCAST;
- 	if (wol->wolopts & WAKE_MCAST)
-@@ -1185,8 +1184,7 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
- 
- 	device_set_wakeup_enable(&adapter->pdev->dev, (bool)wol->wolopts);
- 
--	return netdev->phydev ? phy_ethtool_set_wol(netdev->phydev, wol)
--			: -ENETDOWN;
-+	return 0;
- }
- #endif /* CONFIG_PM */
- 
-@@ -1342,28 +1340,16 @@ static void lan743x_get_pauseparam(struct net_device *dev,
- 				   struct ethtool_pauseparam *pause)
- {
- 	struct lan743x_adapter *adapter = netdev_priv(dev);
--	struct lan743x_phy *phy = &adapter->phy;
- 
--	if (phy->fc_request_control & FLOW_CTRL_TX)
--		pause->tx_pause = 1;
--	if (phy->fc_request_control & FLOW_CTRL_RX)
--		pause->rx_pause = 1;
--	pause->autoneg = phy->fc_autoneg;
-+	phylink_ethtool_get_pauseparam(adapter->phylink, pause);
- }
- 
- static int lan743x_set_pauseparam(struct net_device *dev,
- 				  struct ethtool_pauseparam *pause)
- {
- 	struct lan743x_adapter *adapter = netdev_priv(dev);
--	struct phy_device *phydev = dev->phydev;
- 	struct lan743x_phy *phy = &adapter->phy;
- 
--	if (!phydev)
--		return -ENODEV;
--
--	if (!phy_validate_pause(phydev, pause))
--		return -EINVAL;
--
- 	phy->fc_request_control = 0;
- 	if (pause->rx_pause)
- 		phy->fc_request_control |= FLOW_CTRL_RX;
-@@ -1376,10 +1362,7 @@ static int lan743x_set_pauseparam(struct net_device *dev,
- 	if (pause->autoneg == AUTONEG_DISABLE)
- 		lan743x_mac_flow_ctrl_set_enables(adapter, pause->tx_pause,
- 						  pause->rx_pause);
--	else
--		phy_set_asym_pause(phydev, pause->rx_pause,  pause->tx_pause);
--
--	return 0;
-+	return phylink_ethtool_set_pauseparam(adapter->phylink, pause);
- }
- 
- const struct ethtool_ops lan743x_ethtool_ops = {
-@@ -1404,8 +1387,8 @@ const struct ethtool_ops lan743x_ethtool_ops = {
- 	.get_ts_info = lan743x_ethtool_get_ts_info,
- 	.get_eee = lan743x_ethtool_get_eee,
- 	.set_eee = lan743x_ethtool_set_eee,
--	.get_link_ksettings = phy_ethtool_get_link_ksettings,
--	.set_link_ksettings = phy_ethtool_set_link_ksettings,
-+	.get_link_ksettings = lan743x_ethtool_get_link_ksettings,
-+	.set_link_ksettings = lan743x_ethtool_set_link_ksettings,
- 	.get_regs_len = lan743x_get_regs_len,
- 	.get_regs = lan743x_get_regs,
- 	.get_pauseparam = lan743x_get_pauseparam,
+url:    https://github.com/intel-lab-lkp/linux/commits/Konrad-Knitter/ice-read-internal-temperature-sensor/20231017-142048
+base:   ac4dec3fd63c7da703c244698fc92efb411ff0d4
+patch link:    https://lore.kernel.org/r/20231016102913.898932-1-konrad.knitter%40intel.com
+patch subject: [PATCH iwl-next v4] ice: read internal temperature sensor
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20231017/202310171740.MOWYti1J-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231017/202310171740.MOWYti1J-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310171740.MOWYti1J-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/intel/ice/ice_common.c:5329: warning: Excess function parameter 'sensor' description in 'ice_aq_get_sensor_reading'
+>> drivers/net/ethernet/intel/ice/ice_common.c:5329: warning: Excess function parameter 'format' description in 'ice_aq_get_sensor_reading'
+
+
+vim +5329 drivers/net/ethernet/intel/ice/ice_common.c
+
+  5317	
+  5318	/**
+  5319	 * ice_aq_get_sensor_reading
+  5320	 * @hw: pointer to the HW struct
+  5321	 * @sensor: sensor type
+  5322	 * @format: requested response format
+  5323	 * @data: pointer to data to be read from the sensor
+  5324	 *
+  5325	 * Get sensor reading (0x0632)
+  5326	 */
+  5327	int ice_aq_get_sensor_reading(struct ice_hw *hw,
+  5328				      struct ice_aqc_get_sensor_reading_resp *data)
+> 5329	{
+  5330		struct ice_aqc_get_sensor_reading *cmd;
+  5331		struct ice_aq_desc desc;
+  5332		int status;
+  5333	
+  5334		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_sensor_reading);
+  5335		cmd = &desc.params.get_sensor_reading;
+  5336	#define ICE_INTERNAL_TEMP_SENSOR_FORMAT	0
+  5337	#define ICE_INTERNAL_TEMP_SENSOR	0
+  5338		cmd->sensor = ICE_INTERNAL_TEMP_SENSOR;
+  5339		cmd->format = ICE_INTERNAL_TEMP_SENSOR_FORMAT;
+  5340	
+  5341		status = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
+  5342		if (!status)
+  5343			memcpy(data, &desc.params.get_sensor_reading_resp,
+  5344			       sizeof(*data));
+  5345	
+  5346		return status;
+  5347	}
+  5348	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
