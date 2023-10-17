@@ -1,131 +1,145 @@
-Return-Path: <netdev+bounces-41935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 590B37CC545
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:56:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A28007CC54F
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:57:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 151BF281501
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:56:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D67328158B
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 778E1436B8;
-	Tue, 17 Oct 2023 13:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7A2436BF;
+	Tue, 17 Oct 2023 13:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hFZSV9Ss"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="ciyMRVc/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20064369C;
-	Tue, 17 Oct 2023 13:56:24 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A1ECF5;
-	Tue, 17 Oct 2023 06:56:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697550982; x=1729086982;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WcBUtEAJe/ah7+TklnC7EIaNuN0jruDSdP3tyvkNCd0=;
-  b=hFZSV9SsgvWuu6FW9vOiGlPkONXLPKIhnDYWJ16OltQBlWdaC0TjPQ5g
-   OC9b7RRJvRR4x/G0s8+9kzFU9o9rSUGsidKHh1xGmlJK8s5E1QyBayyil
-   XByW6KGFEqVizcy1W8kPqfgMEb1SjBK+XTYILlxjvD4sE6GoKk76utYcm
-   4B2wG3qmC83AxBjLgvgrgwnrLHHu8Eem6YohAfXj6W0WVlyxiVp3u6Mmf
-   VOBtgMvIdM+85LkAfmlAe/6teLR1RgRqEt5EBgT47G/5olTCiC1t8Eh34
-   zyLqP6xg0q7NEZy8EPR1yMcP7qoy3FNWKnOkVQzSOiXxZuFfRTVJ4EmX7
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="388645428"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="388645428"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 06:56:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="826453794"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="826453794"
-Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
-  by fmsmga004.fm.intel.com with ESMTP; 17 Oct 2023 06:56:18 -0700
-Received: from kbuild by f64821696465 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qskYS-0009eV-1J;
-	Tue, 17 Oct 2023 13:56:16 +0000
-Date: Tue, 17 Oct 2023 21:56:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keescook@chromium.org,
-	brauner@kernel.org, lennart@poettering.net, kernel-team@meta.com,
-	sargun@sargun.me
-Subject: Re: [PATCH v8 bpf-next 09/18] bpf,lsm: refactor
- bpf_prog_alloc/bpf_prog_free LSM hooks
-Message-ID: <202310172156.zcehiHbq-lkp@intel.com>
-References: <20231016180220.3866105-10-andrii@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085D6436BB
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 13:57:32 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2088.outbound.protection.outlook.com [40.107.22.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE97711D;
+	Tue, 17 Oct 2023 06:57:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OobZ8H1StkLi+F9c53s/1F2jW8Q5Fku6lnsLX+MG5xoTYysM8IcFrdGWcheBuCih/Ix7i4ytl/rHXy3+2KXnQPUDuSsov5Os/doptVwkvbammfc+MOlyBDtNf3T3RYwCXUYc0IuOsylWRZTqhyC/Dq2//+zG+c1dcfedQxubYMnMrgVsE2dvhSnLmSilBV0M0gYKYQOwjkyKzTuh5wkneOoUltvYim2FusVPdgyKILTomlodPCQxZQMIlm84PewX3QTM2PDjfE+/rIClENwXmljPZac7GKmgg/moKk4YQNMPL0v5pm8MHQ0X6r9qT9GqCC7WPyg4Dg3nmysF+Sqqmg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kEYPqAIgozko+LnqkXzlt1sYhN9jH6JlVVlbWYTFlro=;
+ b=SOfoeaRBv2ufhwr/TWtOlBc0qfo1WGLq2g6C+tFeFVX6sluuvEdLeB9TbcRndYwx0QWCTN++B+4HjeBe41xkqprMD66erX/8f3ytmRg2+BFLCsmyLTx/DKr6uDpTG8f4x2tpU7biot7EZ2WDTHjV0fZFiDzMHdFc+zMVh0yGNYzcOPojO04z8Uu/f7KMFx1WTKQUCb4HBAbOuqbdLRtWtcSkTd5aRQl9nBFLuQdU6koGdqSQFhWBK99kJwBcxzs8V0XTumOR7L3m4HJhSpxoHftf6e7lzM8WGZQE9zQwF1aGOGo6roARkK1NcG5jc4xJFewufl50r6g/ScO+ifEl2w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kEYPqAIgozko+LnqkXzlt1sYhN9jH6JlVVlbWYTFlro=;
+ b=ciyMRVc/kPPM3rYigA4Qd2qk2nDRmcsIPU4xdq5nTd/zLkNM3r5BS73a5radcC9HyelFWqE5Aqa0ciQxSsip1PWApUbIG5nbkyPufWyeaTiZBFlQDdnO2ODPcGrADH92OUR6pA0PlbRE+pQDBn+mDBlvoMtZPzg/+fVJ8W2Ov4M=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DU2PR04MB8565.eurprd04.prod.outlook.com (2603:10a6:10:2d4::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Tue, 17 Oct
+ 2023 13:57:28 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::992:76c8:4771:8367]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::992:76c8:4771:8367%7]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
+ 13:57:28 +0000
+Date: Tue, 17 Oct 2023 16:57:24 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Michael Walle <michael@walle.cc>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: mdio-mux: fix C45 access returning -EIO after
+ API change
+Message-ID: <20231017135724.pl5neb2ubjdopf6l@skbuf>
+References: <20231017113222.3135895-1-vladimir.oltean@nxp.com>
+ <ZS6Mskpb6gDpBD3z@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZS6Mskpb6gDpBD3z@shell.armlinux.org.uk>
+X-ClientProxiedBy: AS4P192CA0017.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5e1::12) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231016180220.3866105-10-andrii@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DU2PR04MB8565:EE_
+X-MS-Office365-Filtering-Correlation-Id: c058229b-1b8a-453c-5636-08dbcf18ffbf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	DOH8Sbi+3yBg3i3cbRaSKmnrdyEmd2hv2yMOHwgzZ8QyVXIQsMpfWmnDLA01eFnN1HtK1CGlHqTKb276og9koDivuxD45P9WafKgD3HjHtRK/u6c+982tS47WnK+ZZ/0HkILC5MRBbHLkgi2/4DpmjKzB1J1tIhWpS+vxxdPHTIendtEihphkK5KNMVpPGZgUFM+Nl7Mt96ikYkfBxvOGt7eAHIs5InIfifsnvTmKFGOCKD/tZ45+E3sSlyPnnGygcYosSD+c+hb9OHxKDFPoj1vWUoZ5JzmG26bi2cBt3h1nqVS88ZHsZEgx82+6/XQbNJCksKD2uXaBCLGtnVXhK5IuSfKeQFmW4XoUKqq7yyrYNmX44n8lWE8UsjYUR9AHqU25xsjuCaYTfaqVSZuGOvP9DDPAAxu9UZPItMOcdP48PQSF2wfUz1b99Vm5k9zjMnDTmxsy6LTUOdRyNmL8DW8bHDcakb8oYuRueUU9DUi6NVGx80tGB/tBmMJQOSkKrp8gYpGvCnlVTDSC2OdTI7/Farau+Vhc0G8SdJ+PJQXB5uUTZOZ9wDDNCe2vLAm
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(39860400002)(376002)(366004)(396003)(346002)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(478600001)(6486002)(66476007)(66556008)(316002)(6916009)(54906003)(66946007)(1076003)(26005)(86362001)(38100700002)(6506007)(6666004)(33716001)(9686003)(7416002)(4744005)(6512007)(2906002)(41300700001)(5660300002)(8936002)(8676002)(4326008)(44832011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?EOpXffOBBM1B641rGUpLHDHao6Ux9N31b+7+38Brs7MG5v+Pxbt9mY96VQfw?=
+ =?us-ascii?Q?5g9t3yan7qxumtM1XpqgB56939yjXBrMLtITnj4Ig9WKcaksozVaBYOLD3y4?=
+ =?us-ascii?Q?jEBwfJNmw6QguGjdhKYPDwdUXu8+xBxH44bc4RIAKe7PHFvQgZDwZTGaQX7/?=
+ =?us-ascii?Q?0DBen8qdUTVc9H3slS1W3y3BQB9fPM2fiy10srz2f+DzDW/uPcYuZZUtcVQK?=
+ =?us-ascii?Q?T4Nc//XRv2RZv2P0s8mom2Ffsp0LZDeHCRlnJeFQIH3K4yNTejX5z50PcoPQ?=
+ =?us-ascii?Q?GJU/lyV31b67fNwH+aOAGKoQxOciN8E4wCcFu1nqoowA6RsoPQMF8xLcu/7I?=
+ =?us-ascii?Q?lhLeMpzjLHgGAGtDrz0xfbK6vHZz4s7ZDNENxhZm+Ju+BslNYHCAL05/P8ww?=
+ =?us-ascii?Q?O7RyDQSnVkUCChoG9oF5wGpin7AAItqJKWNEjJTO3Yb2G9b+rvmYKP15EZm8?=
+ =?us-ascii?Q?f6sSp5GNhdNCD5dnh4CRFLaepFi1QChekc8GKLyAufxO8xEybm2HcTzwvhYB?=
+ =?us-ascii?Q?sgMvFf6YRZmCQZvbI7R91XNR3yisdEUVrc8P1KBjOTePKZyNmddmFik1BUCM?=
+ =?us-ascii?Q?FqzfpVJIoJeH5zaq5yAJu0IJlUa/bTp51c1tt0Sxislwp3ud4E6YVD1LKx8m?=
+ =?us-ascii?Q?fcFK6VY4uqY5wCmAXJj6kLLXncY4b2KMjgHDbE8IkC3azaVvPU19itcD0Hur?=
+ =?us-ascii?Q?7plScpME58fbnX9sGgvBeQHaX9c0/d3KdFP932izEaMKLYDcV+JDdsLUJTdj?=
+ =?us-ascii?Q?fQkvcDwq2MnO8UZmethAczNUkQmUt3P/7KrHzHpsydhBh0cuQgIMvca5YoZj?=
+ =?us-ascii?Q?t5g4xcHbPkyFoPhzG2sOKBVkYIiFXXwSPiciSS6VwrgwqFOMKDlEUhzm5IR/?=
+ =?us-ascii?Q?+zmQG+/PhepcdGYcZs2BnixRNpGo7H3eFvC4766HE5V7FqPNIeup8kB/z0AS?=
+ =?us-ascii?Q?30esn26XhJShquoQmSC7JrSzDcQCc6Ppu8k8kNk6ZiJSaQhmBYiJuYU9cu+T?=
+ =?us-ascii?Q?67ytInsaACqGLW7ElJb84qqFBXoVTtql4JZ3ofpdHrLd6bu1lvKoZVjbWAQx?=
+ =?us-ascii?Q?POSGvI0QlFKRF2ZsBmOdK3/r5DTS8OPh6wcD2tfW568nU8XoHFenvwGJf1ov?=
+ =?us-ascii?Q?99bilB6ZjLUS/igZYptoKcUHlGtvO125PU5z5HaewS739d/hRsXZseTIfZT/?=
+ =?us-ascii?Q?kkNhqT9gpT9bM4HIuOhA7IRSBdwlRCxr/OsZqTmw62jbWshZ2cjZJxa8YOr7?=
+ =?us-ascii?Q?iVo/6AvBJoYNG0owRnGhcCzrHV0qTZITSIbl8caf9OGVNOuoh8TGl16H6oCY?=
+ =?us-ascii?Q?ng1Bks3Vd4NPnEZ6SJfgWG4UmsgD2glbKHfX/TDPTzeSw3PckL8vMvES9kq4?=
+ =?us-ascii?Q?9cEpa+nPcnashzuw/0vSvlE/5/pg0aMn80cVtieYz9Ti+62TzpFf7OBOsFqI?=
+ =?us-ascii?Q?IJ0kA3ANnS1BSPE/ygmTQ9hU/FxBMI/G8sPRCmdJh0UVZRPs1KP2InuA7g1T?=
+ =?us-ascii?Q?oz6sS6rIg9Vq+iqUhVUfZCEww/BGc7FFoYFXcUOLMy+6Z6ysZUSSIzqCmhoR?=
+ =?us-ascii?Q?QfCV/dMN/z7Rj8/J7RpXa+wdHF8T6VPla1qldyt/VB7SthczigL7Vk2vQ331?=
+ =?us-ascii?Q?0Q=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c058229b-1b8a-453c-5636-08dbcf18ffbf
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 13:57:28.2797
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4732p6wJx1qSUrFGiFsiLszbqaNAnkRiG3ZckruHaqIw0uNS9qjPDlSEUvBQ35IY1y22wp/zkZGvsV1r5VKbdg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8565
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Andrii,
+On Tue, Oct 17, 2023 at 02:31:30PM +0100, Russell King (Oracle) wrote:
+> What if the parent bus doesn't have read_c45 or write_c45 ?
 
-kernel test robot noticed the following build warnings:
+Good question. Predictably, the kernel crashes.
 
-[auto build test WARNING on bpf-next/master]
+> Maybe make these conditional on the parent bus implementing the c45
+> read/write ops?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andrii-Nakryiko/bpf-align-CAP_NET_ADMIN-checks-with-bpf_capable-approach/20231017-152928
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20231016180220.3866105-10-andrii%40kernel.org
-patch subject: [PATCH v8 bpf-next 09/18] bpf,lsm: refactor bpf_prog_alloc/bpf_prog_free LSM hooks
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20231017/202310172156.zcehiHbq-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231017/202310172156.zcehiHbq-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310172156.zcehiHbq-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> security/security.c:5196: warning: Function parameter or member 'prog' not described in 'security_bpf_prog_load'
-
-
-vim +5196 security/security.c
-
-55e853201a9e03 Paul Moore      2023-02-16  5181  
-55e853201a9e03 Paul Moore      2023-02-16  5182  /**
-82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5183   * security_bpf_prog_load() - Check if loading of BPF program is allowed
-82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5184   * @prog BPF program object
-82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5185   * @attr: BPF syscall attributes used to create BPF program
-82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5186   * @token: BPF token used to grant user access to BPF subsystem
-55e853201a9e03 Paul Moore      2023-02-16  5187   *
-82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5188   * Do a check when the kernel allocates BPF program object and is about to
-82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5189   * pass it to BPF verifier for additional correctness checks. This is also the
-82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5190   * point where LSM blob is allocated for LSMs that need them.
-55e853201a9e03 Paul Moore      2023-02-16  5191   *
-55e853201a9e03 Paul Moore      2023-02-16  5192   * Return: Returns 0 on success, error on failure.
-55e853201a9e03 Paul Moore      2023-02-16  5193   */
-82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5194  int security_bpf_prog_load(struct bpf_prog *prog, union bpf_attr *attr,
-82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5195  			   struct bpf_token *token)
-afdb09c720b62b Chenbo Feng     2017-10-18 @5196  {
-82c20ee03a7a4e Andrii Nakryiko 2023-10-16  5197  	return call_int_hook(bpf_prog_load, 0, prog, attr, token);
-afdb09c720b62b Chenbo Feng     2017-10-18  5198  }
-55e853201a9e03 Paul Moore      2023-02-16  5199  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I can do that, and send a v2 right away. Thanks for the hint.
 
