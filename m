@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-41796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9432A7CBE86
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:08:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 429A27CBE93
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:09:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 175FBB210A8
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:08:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3490B20FBC
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C43713E49C;
-	Tue, 17 Oct 2023 09:08:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E2EC3E494;
+	Tue, 17 Oct 2023 09:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="Ea1PW5wI"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="iGaFAIke"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7316A3E480
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:08:35 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16E25113
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:08:33 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-307d58b3efbso4425617f8f.0
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:08:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25523D99D
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:08:57 +0000 (UTC)
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BE6ED53
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:08:50 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40684f53ef3so57555295e9.3
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:08:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1697533712; x=1698138512; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1697533729; x=1698138529; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=MTB0PMaH81cPxzWaC0ockKjG/083eP/4X9lYMUVdtT8=;
-        b=Ea1PW5wIYUzgfzJaBXNZ7Ij6Ud6pew8YqIkVJHDgNJukgL1CuRyvwrMNg4n7Mw0hp0
-         g46NLWAeAE2CgeqR4Br0OSatUq29+keWA5Tlc55mDbaGZ1VzuiI9kb6l+FAt6Oey3Gh0
-         sS8CY3ATOGz2O4A60aFGgqpi0pIuZbywptnnrurAZr1uqWa24HHu4WsHvpXHx64db96K
-         /t5G9riKHUI7rPv8BrcXbBA9K/IlVWvdxVRg4uxlG1ejSmwpYx+i98ik032jVdgOobp0
-         EmfHhjsShQ5CJLQ6ZwBYSR+lQWUzg/MoXDVrrs2CjxKLU4af8xfDM+1+l8WBUudrAVFw
-         iPjg==
+        bh=978qXrc9YEW7M0wZEw9ore1peLfv22bFLkhcrdH2ft8=;
+        b=iGaFAIkepgLkbdrbc1UHBZ8t/YiDPbr1UoG6/j6nluOXZ3MiitZetIp+mG836A8EEN
+         1/RW/FtpcPOFDhHNwModkSO5zfchk7PHyIisXHSGi+aDjvF0FJduVdu96fWNd/MhcbWB
+         IMwIjPh7NoPJfqGWLgxY9DzwgJtqLpdD2jLttdb+vBbCysc0IzaVRhT4tFm6oClDDbSZ
+         gPu+4em9TcJIT5c+LHngln1AglJ6O7/vJGPjK4i8jt8xBjrSAuCHf2UnbOVvB1SdAR0G
+         RDpLDcynPhJJSv0YHGXV1FTGk8v+4VTvhqGtwJhXqYFJsyu2WeGI372D2OX/e5uW/9EH
+         FG3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697533712; x=1698138512;
+        d=1e100.net; s=20230601; t=1697533729; x=1698138529;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MTB0PMaH81cPxzWaC0ockKjG/083eP/4X9lYMUVdtT8=;
-        b=NnU+OITY5xrY4vIcZIb9+4NdSVXEGnf2Rs2EqAk8YK7jrr6SvG9XpCyx322v5iHxux
-         /SErSVEfTk7MwZ9jSrd6VgIIvHp1d3d02fJ1vyOjpzTLjxNvRWS2f4o8LR3+OgJVOXlb
-         aLxOlSpHlO6Cas8ZNDJcUyFOddG5ETm/wuBvWKPS1QylpLQRxd/nMgj68dI60CFa2SFr
-         yiteSBCbF/2yK62rkASB2NFMaIOIm507AwNg8KCjYd6J3RxbkYAr/MhX/ZJdRJ2iuxEJ
-         UaS0HDAz/pM/ino+NJlqG+aZbZO/pXRa+OJ4Hn15bYNROKlBAxoxvgVSfLtmBtl45uJk
-         FoAg==
-X-Gm-Message-State: AOJu0Yzfbxd0m8hjCuuwnV+BYDWC+2aLd/1PGncCPRuVxyZFzoS036eK
-	mv/WstsSZEq3xM1bXUgIP3yTAw==
-X-Google-Smtp-Source: AGHT+IEKlKUjAzEYYG9bMLZQN2BDOsUYVxWI1cNAYo4pvWcT5Cpe/y+SIVSa1+2HJShKv/WHKr20Hg==
-X-Received: by 2002:adf:e908:0:b0:31f:f99c:6009 with SMTP id f8-20020adfe908000000b0031ff99c6009mr1487116wrm.22.1697533712286;
-        Tue, 17 Oct 2023 02:08:32 -0700 (PDT)
+        bh=978qXrc9YEW7M0wZEw9ore1peLfv22bFLkhcrdH2ft8=;
+        b=fUm7JY0cmvW5U73/GiE03I82plW7mvCUhEFANILUJMt5jYSfpN3LD/jUuy4dbvnguG
+         MBauCaIm+xYf27uFt1OOhcJno209oOzfZzGinCmXAjRjXY6bqe31l4VR8Z8y1fIWG5Mo
+         4Zo21TDkQcW70vZD3/MsIMnHWQ0SQJBcCMtmDIIWYi/eS61h7NUTyWNj89w3J640xZF9
+         LG0TLIEmlfWZ6NamhPrRO5KjD4u5ZqRAw6k/E5FZm1ZvYW8s0Sq7c0zw/d3Q63AhymEy
+         h5SM9JGCSZhZpLtToK6kR7c6XUtgq/vb1/avs0WIfFn/K31PbLKeFw4AnBhTqXxAPvGA
+         3+pw==
+X-Gm-Message-State: AOJu0YweREYaTZcDa3GrsJbiDoAAqrIk4o9ageoTaGzzNBmoTEOdPuxf
+	wxtRvEcx4WXeHp/9Yko/LkBhrg==
+X-Google-Smtp-Source: AGHT+IFtmVgY2Etjqgkq/2FalSMZlzKy8YOSFyq+CGURWoaZHhN9z7rm9HMIdunpvXJJQZOdd6t1hg==
+X-Received: by 2002:a05:600c:19c6:b0:407:8e85:899f with SMTP id u6-20020a05600c19c600b004078e85899fmr1206909wmq.16.1697533728868;
+        Tue, 17 Oct 2023 02:08:48 -0700 (PDT)
 Received: from [192.168.0.106] (haunt.prize.volia.net. [93.72.109.136])
-        by smtp.gmail.com with ESMTPSA id f5-20020a5d50c5000000b003140f47224csm1213811wrt.15.2023.10.17.02.08.31
+        by smtp.gmail.com with ESMTPSA id t15-20020a05600c450f00b004064288597bsm1339463wmo.30.2023.10.17.02.08.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Oct 2023 02:08:31 -0700 (PDT)
-Message-ID: <b3e0d656-cb25-3ac8-6391-8fb27217470b@blackwall.org>
-Date: Tue, 17 Oct 2023 12:08:30 +0300
+        Tue, 17 Oct 2023 02:08:48 -0700 (PDT)
+Message-ID: <8558d00c-ae0c-54dc-8b41-4feeb991f8f8@blackwall.org>
+Date: Tue, 17 Oct 2023 12:08:47 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,16 +68,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH net-next 07/13] bridge: add MDB get uAPI attributes
+Subject: Re: [PATCH net-next 08/13] net: Add MDB get device operation
 Content-Language: en-US
 To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
  bridge@lists.linux-foundation.org
 Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
  pabeni@redhat.com, roopa@nvidia.com, mlxsw@nvidia.com
 References: <20231016131259.3302298-1-idosch@nvidia.com>
- <20231016131259.3302298-8-idosch@nvidia.com>
+ <20231016131259.3302298-9-idosch@nvidia.com>
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20231016131259.3302298-8-idosch@nvidia.com>
+In-Reply-To: <20231016131259.3302298-9-idosch@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -87,52 +87,32 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 On 10/16/23 16:12, Ido Schimmel wrote:
-> Add MDB get attributes that correspond to the MDB set attributes used in
-> RTM_NEWMDB messages. Specifically, add 'MDBA_GET_ENTRY' which will hold
-> a 'struct br_mdb_entry' and 'MDBA_GET_ENTRY_ATTRS' which will hold
-> 'MDBE_ATTR_*' attributes that are used as indexes (source IP and source
-> VNI).
+> Add MDB net device operation that will be invoked by rtnetlink code in
+> response to received RTM_GETMDB messages. Subsequent patches will
+> implement the operation in the bridge and VXLAN drivers.
 > 
-> An example request will look as follows:
-> 
-> [ struct nlmsghdr ]
-> [ struct br_port_msg ]
-> [ MDBA_GET_ENTRY ]
-> 	struct br_mdb_entry
-> [ MDBA_GET_ENTRY_ATTRS ]
-> 	[ MDBE_ATTR_SOURCE ]
-> 		struct in_addr / struct in6_addr
-> 	[ MDBE_ATTR_SRC_VNI ]
-> 		u32
-> 
-
-Could you please add this info as a comment above the enum?
-Similar to the enum below it. It'd be nice to have an example
-of what's expected.
-
 > Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 > ---
->   include/uapi/linux/if_bridge.h | 8 ++++++++
->   1 file changed, 8 insertions(+)
+>   include/linux/netdevice.h | 4 ++++
+>   1 file changed, 4 insertions(+)
 > 
-> diff --git a/include/uapi/linux/if_bridge.h b/include/uapi/linux/if_bridge.h
-> index f95326fce6bb..7e1bf080b414 100644
-> --- a/include/uapi/linux/if_bridge.h
-> +++ b/include/uapi/linux/if_bridge.h
-> @@ -723,6 +723,14 @@ enum {
->   };
->   #define MDBA_SET_ENTRY_MAX (__MDBA_SET_ENTRY_MAX - 1)
->   
-> +enum {
-> +	MDBA_GET_ENTRY_UNSPEC,
-> +	MDBA_GET_ENTRY,
-> +	MDBA_GET_ENTRY_ATTRS,
-> +	__MDBA_GET_ENTRY_MAX,
-> +};
-> +#define MDBA_GET_ENTRY_MAX (__MDBA_GET_ENTRY_MAX - 1)
-> +
->   /* [MDBA_SET_ENTRY_ATTRS] = {
->    *    [MDBE_ATTR_xxx]
->    *    ...
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 1c7681263d30..18376b65dc61 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -1586,6 +1586,10 @@ struct net_device_ops {
+>   	int			(*ndo_mdb_dump)(struct net_device *dev,
+>   						struct sk_buff *skb,
+>   						struct netlink_callback *cb);
+> +	int			(*ndo_mdb_get)(struct net_device *dev,
+> +					       struct nlattr *tb[], u32 portid,
+> +					       u32 seq,
+> +					       struct netlink_ext_ack *extack);
+>   	int			(*ndo_bridge_setlink)(struct net_device *dev,
+>   						      struct nlmsghdr *nlh,
+>   						      u16 flags,
+
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+
 
 
