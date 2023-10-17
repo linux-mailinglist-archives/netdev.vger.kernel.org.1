@@ -1,248 +1,387 @@
-Return-Path: <netdev+bounces-42062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0A767CCFE2
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 00:12:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B517CD050
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:20:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 845ABB21198
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 22:12:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8FD3B21061
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 23:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E8D2F51B;
-	Tue, 17 Oct 2023 22:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5B52F516;
+	Tue, 17 Oct 2023 23:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jue7ZkS1"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="cCyn5lJi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A68430F9;
-	Tue, 17 Oct 2023 22:12:30 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9CC395;
-	Tue, 17 Oct 2023 15:12:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697580748; x=1729116748;
-  h=message-id:date:from:subject:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=l43wPKHJjFkM3t6IoQ1P2Nw8I5zM9NMmf1NqWvOfr2g=;
-  b=Jue7ZkS1txKe0/Ms8vaLouVSUr9JWUKLESJqtqoh671ddSdav8d+QLIa
-   /MD2482jlfMrK3Tz7O2jMI4RzGmhw+bq7XsdMCZRB0ovDgUkZ0JmaT4g4
-   2WAcV+aF/RNNOKAfC2sSoj+O7/QKPrA7nW6pRwpCCpwPzx5EvJZheuUwg
-   thpoRF3rEO7vTdBYcUkbfylTL4H9LpWF5cWJYzsCgROOdQEgt60DiPFrb
-   1XHolNLbcWrsz/UZrrFTn05M6TKazYxq/Ba2eDAbbf7vYMFTFvLkLINNT
-   PHMUiv9V8X3de6z4DHOhknLIbzaeykHqgBz+M29FVkKzdBAvxQqlXhz/L
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="370952835"
-X-IronPort-AV: E=Sophos;i="6.03,233,1694761200"; 
-   d="scan'208";a="370952835"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 15:12:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="756316018"
-X-IronPort-AV: E=Sophos;i="6.03,233,1694761200"; 
-   d="scan'208";a="756316018"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Oct 2023 15:12:25 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 17 Oct 2023 15:12:25 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 17 Oct 2023 15:12:25 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 17 Oct 2023 15:12:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=le1OB91QEzQSA8/n5y4cxC7RwzUbf+aD/TThDEJWW4u65jrO/xK+8wSFeZYXAqpM0VjEHDGOjC48Tcf9l7lmzGtJAO4N4/lK3UFkc7RRj4cJlqj/sbV0PLZr7n2yNkwh+0StViCQGq83DydPaGTSdNmy5uxC4YnD/5Ne2PDgLetqLP4jGdN1fniOfrsN31VLLN/OAoPOdNFcDUuJgIK1BKg2MuzW46PvmhOoGB0IskBtAM6gTDXshHfTw/YnB4eOr+5/SUyLJPfEpuEXeXz0QIJikcM/9eAwqD0K5rw1FDTOV3EAUVqqxIMDsF1i/pA1QTZPw0sWdu7Wm/X5xFlQBQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=McB66+KYgUdosNciaTkFrzTi9ZeSfGvuqymTTRjyOAM=;
- b=BHgxJouFpthwEJeKz473iQp4E+1MmyH245SLmSAPAx84frNctIjdur0+qjOmMr8FH4U3y0kD2O0lojnIDgs9E6kxa24G/dYeDomqPRIpeiTco/RLd4KnYgQDGNh0gb0HHbrIDpc29bldkZPobjnobKhYyNGAs4CEdFtM6RariijbNCQwaETH0gKFTuUU4rbqpcu/1pLldVoCagav9L/w3GGy3u9ZPoKbrbBJqdgR/ywVaSukebpT481bIEa6eK4CkfJoPGU/y130MVXyLJXeW9cfjXm/Wg3pOM5DGzugxIrH1jjWBAU+7kCH2Mw121vuwdgUKAXJKsu+DQ7p9iw2kw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
- by DM8PR11MB5672.namprd11.prod.outlook.com (2603:10b6:8:26::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.34; Tue, 17 Oct
- 2023 22:12:23 +0000
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::2329:7c5f:350:9f8]) by SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::2329:7c5f:350:9f8%7]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
- 22:12:23 +0000
-Message-ID: <ef588877-0ec9-43fd-a532-e3605139593b@intel.com>
-Date: Tue, 17 Oct 2023 16:12:11 -0600
-User-Agent: Mozilla Thunderbird
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next v4 1/6] net: ethtool: allow
- symmetric-xor RSS hash for any flow type
-To: Alexander Duyck <alexander.duyck@gmail.com>, Jakub Kicinski
-	<kuba@kernel.org>
-CC: <mkubecek@suse.cz>, <andrew@lunn.ch>, <willemdebruijn.kernel@gmail.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>, <corbet@lwn.net>,
-	<netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<jesse.brandeburg@intel.com>, <edumazet@google.com>,
-	<anthony.l.nguyen@intel.com>, <horms@kernel.org>, <vladimir.oltean@nxp.com>,
-	<intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>,
-	<davem@davemloft.net>
-References: <20231016154937.41224-1-ahmed.zaki@intel.com>
- <20231016154937.41224-2-ahmed.zaki@intel.com>
- <8d1b1494cfd733530be887806385cde70e077ed1.camel@gmail.com>
- <26812a57-bdd8-4a39-8dd2-b0ebcfd1073e@intel.com>
- <CAKgT0Ud7JjUiE32jJbMbBGVexrndSCepG54PcGYWHJ+OC9pOtQ@mail.gmail.com>
- <14feb89d-7b4a-40c5-8983-5ef331953224@intel.com>
- <CAKgT0UfcT5cEDRBzCxU9UrQzbBEgFt89vJZjz8Tow=yAfEYERw@mail.gmail.com>
- <20231016163059.23799429@kernel.org>
- <CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
- <20231017131727.78e96449@kernel.org>
- <CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P123CA0600.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:295::20) To SN7PR11MB7420.namprd11.prod.outlook.com
- (2603:10b6:806:328::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F29F2DF73
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 23:20:03 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC040F1
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:20:00 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-408002b5b9fso8182915e9.3
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:20:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1697584799; x=1698189599; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n9pyZVaXRqwpqT4EHL+t2VBTLWYs4FebCCpvED/uf38=;
+        b=cCyn5lJiMgbqbVTJ8+etzigz8yhgpRvj+6bYvP+mVrm7D17Rf/fC8b2zrjj8QhCR53
+         IMfNhBMnGyRq+oj82TD/nfveqX9KikGFWqxLAfvbdbvP97rWCRLMAkQ8X2U2AQGFnJZ/
+         IlNrEk9TJjQmpsJpJR6ETGKZ5epWhWFbK1qns1796o207YWoW97BZFhdBqPNuCtvMM5P
+         mKl/jozsKfI3rMeM6U8myLHs85o2UrTrFBgle3rRExz6aU5j4ABWwGDHJa7P0VaLu+dD
+         KGIyYn366XARDBeq63LFh8ON55jDR7ux2Y5JZ6fXiUGnq4k2JDzp7FT22oA0m3F55pbj
+         YRXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697584799; x=1698189599;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n9pyZVaXRqwpqT4EHL+t2VBTLWYs4FebCCpvED/uf38=;
+        b=NfYE+yUbE1vfeEuSRwe3GepFLnrWVbtYKhOpAh6rOTzyYM44TvuRLMk4Ig0pcOJxkU
+         7uNto+ZK8kjcgZhHVn2wMWRbzyZHU7SGTEZOFnylkfiM5Ajqe4jR1nq/8rGgNfLtykvP
+         KDrhTw/FGahTuiv+REgszYMFqJqWoVxfgwjvhLfwKbEQ9LK91YV3fhHghuBhMBKjNNZf
+         FIJI1s1tIor/VrHKYrQ7IvaVyf0Sn0vWWzvcAo/a+MaRazgBggrEVfMXrQ5JZI/GVUqS
+         6DDMmevN510I3jt9Vl2cd6aryTI0YJ5uloNgkVP8+Sk+wKJ+sxsEllyo4uXUYzoHBN1t
+         02cA==
+X-Gm-Message-State: AOJu0YwHASm8XjhAqkLDvNe1wo5KoMrXDMhiG1GrSuIlBonTShdDHIZX
+	3FUYZuunwlY+HQ3n5kW5/adAyg==
+X-Google-Smtp-Source: AGHT+IFgtxHqfa3MfT53ir6NDVEURGNyLb9Mdt/B6aJHd8Qts5+X+pCfKl/8ANCZ8Ar0jGaC5mv2jg==
+X-Received: by 2002:adf:f449:0:b0:32d:a98c:aa20 with SMTP id f9-20020adff449000000b0032da98caa20mr2505156wrp.59.1697584799023;
+        Tue, 17 Oct 2023 16:19:59 -0700 (PDT)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id t17-20020a05600001d100b0032d8034724esm734566wrx.94.2023.10.17.16.19.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 16:19:58 -0700 (PDT)
+Message-ID: <bd0e29db-c8dd-4d1a-a898-69e0b8e6dc54@arista.com>
+Date: Wed, 18 Oct 2023 00:19:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|DM8PR11MB5672:EE_
-X-MS-Office365-Filtering-Correlation-Id: ade7e1cd-6fd0-4b68-e66e-08dbcf5e22ec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: E3wIkahEnGL0Vr6MOH1k0+uSulc+EfZDZVfAIv2abYxCgyEI+2DO66XwReGQC42P1/xYcYrCquT++NI/2HSh+ZT1NMoBgJFCyDG8rxUjqK9jLUGRYWHCrdKoxZZTWZVE7/ETXNk0HoHYyUrZXYNL69LgEXO3uP54MqwVKjzgnAKm+2cvw1+utGpsYpJqAi1HLhatHC46vKyghD7YHjoXYvf6cE/2Qd9srhNbzoWyosBm/Wsf3a241Q7jyufnwTNGUCAgXD1s2sQelL/pfpokUaI8F+D8KGJf+/9f9Oe3beVg5vbFHg5wyo/t/uuNlEs/XPVioq8tn6Q3jia2M9i8qjpShRwgZkQ8ha/TkiDUTlZruVoMOJzTWAM6MJ1cjkFOAlqhmvhLndYk5DMEA8TFsUhkAuhkLzncoBStz6bMWJXTXax2Vhl2zsxRaYB2jDSXFBNyYQIbEEFyWuJeLuHc60DlCjVu/EXBTC3i1dqc7lrct0t6OsIlMpB9jhdy7kngCdFGvNllTQNvTR9tS4YU7ptz4A1OSl/IN/Qndsfs0vKsVewjocIiEf01jvh/FiMihNltsTyQpGHXCbGd4y0+SlTH9u4swHLcAcz3KGxq5619l25QahIUoz1PiOUi1ZyvaZZ2fPHoxESJgxfwHM1DYA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(366004)(396003)(39860400002)(136003)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(31696002)(38100700002)(86362001)(83380400001)(31686004)(478600001)(82960400001)(66946007)(966005)(316002)(110136005)(6512007)(66476007)(6666004)(2616005)(6486002)(36756003)(5660300002)(41300700001)(7416002)(44832011)(2906002)(4001150100001)(53546011)(4326008)(8936002)(8676002)(6506007)(66556008)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RDhsM0ZRVUFtaDAvOWhzdUNGRVNGOGQzOHdSOFh4SXcrWm5leHFFOFp1MWdr?=
- =?utf-8?B?bnFBRzl2b09oa0Z6Ty9lem5vRThjMCtZdkNkYTlKVU9iV1d0eTFJSnR4clJY?=
- =?utf-8?B?QnRucUZya2p3Y2dRUlpEVDhkTlhxKy85V3p2YjkxNEllRG5wOHdaOEdVMkJk?=
- =?utf-8?B?NGFPUk93dkp4R0J3MW5HazduQmVzZDgyVGh5aFBCTFVqeUdBZGo4alA5akdo?=
- =?utf-8?B?b1FPSDBZZVlSY21pNHVPZENDeTBrancrYlZRYjRWY3VnSko4N3RwdzNqUGJj?=
- =?utf-8?B?Ukk4M0E3NzBOWXVnQ3MzaUMyL2xTSmRteTN1cUlGR0xDSTl0cUlSY2RMM3Q5?=
- =?utf-8?B?RjllbjV3YjhlRXRDMDJlN0JXb0FDTk03M3h0WkNrV2pnVGMraXpNVGZPUTR1?=
- =?utf-8?B?K2JKSzFUK3RmVGJnRk5vRXg4cGFRK2FtclZNV3VJa3JqN2txNFBCZnh3Rnox?=
- =?utf-8?B?eC9KOHdUZ0RLUTZIbzdvS1ZOb0t3VEJxK094czc2d001TTJhY2FmaEVCZmRz?=
- =?utf-8?B?ZndkVHB0dFgvQjJZZG5UZG1KK3dMM0VCOHhxQWlIOFhZeWtkdFg0U3JxcmVI?=
- =?utf-8?B?MjVKaUUwemRLcWo1eHZockgvSThSeDlzU1BJY1RrMVloNm5JRUthcDE2V1Fy?=
- =?utf-8?B?MVFSU1NKdVd2MTlzMU4xWEU3dHFrNGdVNFhhUnpEUmNWWEVJVmNaV0tHSXFo?=
- =?utf-8?B?ZWM4U2RJV3pxdEVQbVVtZWd3S1Myc25JaTZDNXVXYkRzMmNVcG9FZ2x1L3M1?=
- =?utf-8?B?Rm45Zk41WkJobjlEaURYZUhsQ2h1cVcyOXd2dENVdUdYS3B2RXVkVSsvZEU5?=
- =?utf-8?B?bDMvR3lSbUYzeDQwNGtzY1lDdGN3VnlGWEtqMlhJZVlleXFwYnlvK0pBY3cw?=
- =?utf-8?B?L01zRXpPb2o1WHNoNDRRVVUzNUVRUkxkY2dUQUo3NmpjVW51eExLM0xzRHgz?=
- =?utf-8?B?TUlxR09NcHl3MkY3NCtZN2oxelgrR283NmtDaGJFd0U3OUxtSU1qeU0vSGNF?=
- =?utf-8?B?VS9teXFtVWVTZER2ekY4UWx6ODBXVVZBdFZzTUdPL3Q4SWhIS3VjN2lzb2lx?=
- =?utf-8?B?b0tYb2hsMEtkdnFQbzdxb1JheUtHYU1LdDdYMndGVGlzQzZkOG90TFZpVkRC?=
- =?utf-8?B?aXM4SHhFYzZPWUdGanQzQTBLejZ2eWZaU2V3KzlKZnk3Nk9udktzUG9IUFox?=
- =?utf-8?B?dC8xSTBFemxiNkFZNDFvQ3ZKWERoYjB4S2VERWdSNzhNZzZ6ME54VmtLRFVS?=
- =?utf-8?B?OFVoeW95MnhjamhaaGlrT1ZwUDA5MkQxYllaeUNaVlZUa2ZIdzNBMHBFZWI3?=
- =?utf-8?B?U1QrdktaWjBMeEZwYmh6SDVxWHRhSFBRNWFPbUNxRG9GUUM3OStkQnFJMStK?=
- =?utf-8?B?azZBY0pXTVpCT2RhU0daUGJTVnBtZmptMkR0ZFMrc0FiMVEvMGhid0NSYmU1?=
- =?utf-8?B?Ri9EbDQydEFrUzNNZ216b2VwUi8rTGFOTWhpN1VkMGtKRUNHSlJtRVNiTlBM?=
- =?utf-8?B?eUlQM3VFcll4bVBnQkhJYVVBWEJmNDJXcVpiRlJkaHZPUTloUUduYTJidkNJ?=
- =?utf-8?B?amNuajJWNU9DTGV6UmhlNkdlZGJ4V1NXajhBS1ZUbmRDUUVOTTJvbFZUYThl?=
- =?utf-8?B?Y0N6YWd6VWFSQmtnZmM4SFNGYm5IWk9Eb08wSndIdlV4d2NQY0FsLzM1ZWMz?=
- =?utf-8?B?eWFhNmJPemQzK0JBdzVYTExoTmozTTFUWHg5aDBUZWpkenRLdm93Lzh2NGk4?=
- =?utf-8?B?YXl1ZmVTRDNQcHV3MXQrSFR6Uzc0azZQRWt2OTk4S3RqamwwczVEUGNNV2Uy?=
- =?utf-8?B?SGR4YzJtMFBXMUZnSWVSaFdJVTRkaGQzVXdIUGR2b1FXZ3FiOGQxRmhqbDlO?=
- =?utf-8?B?UHNOU3VBVXRBV3F0dEhEcmZrdUZVSERYSjVsQ2FWYzU4VUtlWjViZVpocC9J?=
- =?utf-8?B?SVlBRStJVS94ZzlGbGpMaGVwYm9pbE1IZmNkSStENDYvcnJwY2JRc1ZYeFYy?=
- =?utf-8?B?ZlZ6cTZpL1JHUUZFeC8yTjBhVXM0UmVnampzUGFBbFZSdkNHMWc2aGpINWhM?=
- =?utf-8?B?SWxLdVhiTElaWENsRGhoNXpZN2s4MHVuU05MczRMbXR3VGhXM0VFdmF0dHk5?=
- =?utf-8?Q?8je0iyK/metIsZUhuI8GBW8FT?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ade7e1cd-6fd0-4b68-e66e-08dbcf5e22ec
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 22:12:22.5323
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2EiQ3G/Dv7t41hX7MnkJVaPjFG41M9DWG3UJAmoJ+3MPVDorT6lWoruZq6/oSh6GLopxhzw+nxZy7rS3k4GLdA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR11MB5672
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 net-next 08/23] net/tcp: Add AO sign to RST packets
+Content-Language: en-US
+To: kernel test robot <oliver.sang@intel.com>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
+ Francesco Ruggeri <fruggeri@arista.com>,
+ Salam Noureddine <noureddine@arista.com>, David Ahern <dsahern@kernel.org>,
+ netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+ Andy Lutomirski <luto@amacapital.net>, Ard Biesheuvel <ardb@kernel.org>,
+ Bob Gilligan <gilligan@arista.com>, Dan Carpenter <error27@gmail.com>,
+ David Laight <David.Laight@aculab.com>, Dmitry Safonov
+ <0x7f454c46@gmail.com>, Donald Cassidy <dcassidy@redhat.com>,
+ Eric Biggers <ebiggers@kernel.org>, "Eric W. Biederman"
+ <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>,
+ "Gaillardetz, Dominik" <dgaillar@ciena.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+ Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
+ "Nassiri, Mohammad" <mnassiri@ciena.com>,
+ "Tetreault, Francois" <ftetreau@ciena.com>
+References: <202310171606.30e15ebe-oliver.sang@intel.com>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <202310171606.30e15ebe-oliver.sang@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 2023-10-17 14:41, Alexander Duyck wrote:
-> On Tue, Oct 17, 2023 at 1:17 PM Jakub Kicinski <kuba@kernel.org> wrote:
->>
->> On Tue, 17 Oct 2023 11:37:52 -0700 Alexander Duyck wrote:
->>>> Algo is also a bit confusing, it's more like key pre-processing?
->>>> There's nothing toeplitz about xoring input fields. Works as well
->>>> for CRC32.. or XOR.
->>>
->>> I agree that the change to the algorithm doesn't necessarily have
->>> anything to do with toeplitz, however it is still a change to the
->>> algorithm by performing the extra XOR on the inputs prior to
->>> processing. That is why I figured it might make sense to just add a
->>> new hfunc value that would mean toeplitz w/ symmetric XOR.
->>
->> XOR is just one form of achieving symmetric hashing, sorting is another.
+On 10/17/23 09:37, kernel test robot wrote:
 > 
-> Right, but there are huge algorithmic differences between the two.
-> With sorting you don't lose any entropy, whereas with XOR you do. For
-> example one side effect of XOR is that for every two hosts on the same
-> IP subnet the IP subnets will cancel out. As such with the same key
-> 192.168.0.1->192.168.0.2 will hash out essentially the same as
-> fc::1->fc::2.
-
-I agree of course that we lose entropy by XORing, but don't we also lose 
-entropy, for example, if we hash only the L4 dst_port vs (ip_src, 
-ip_dst, l4_src, l4_dst,..etc)? we still say we are using the same alg.
-
-
->>>> We can use one of the reserved fields of struct ethtool_rxfh to carry
->>>> this extension. I think I asked for this at some point, but there's
->>>> only so much repeated feedback one can send in a day :(
->>>
->>> Why add an extra reserved field when this is just a variant on a hash
->>> function? I view it as not being dissimilar to how we handle TSO or
->>> tx-checksumming. It would make sense to me to just set something like
->>> toeplitz-symmetric-xor to on in order to turn this on.
->>
->> It's entirely orthogonal. {sym-XOR, sym-sort} x {toep, crc, xor} -
->> all combinations can work.
->>
->> Forget the "is it algo or not algo" question, just purely from data
->> normalization perspective, in terms of the API, if combinations make
->> sense they should be controllable independently.
->>
->> https://en.wikipedia.org/wiki/First_normal_form
 > 
-> I am thinking of this from a software engineering perspective. This
-> symmetric-xor aka simplified-toeplitz is actually much cheaper to
-> implement in software than the original. As such I would want it to be
-> considered a separate algorithm as I could make use of something like
-> that when having to implement RSS in QEMU for instance. Based on
-> earlier comments it doesn't change the inputs, it just changes how I
-> have to handle the data and the key. It starts reducing things down to
-> something like the Intel implementation of Flow Director in terms of
-> how the key gets generated and hashed.
+> Hello,
+> 
+> kernel test robot noticed "BUG:sleeping_function_called_from_invalid_context_at_net/core/sock.c" on:
+> 
+> commit: df13d11e6a2a3cc5f973aca36f68f880fa42d55f ("[PATCH v14 net-next 08/23] net/tcp: Add AO sign to RST packets")
+> url: https://github.com/intel-lab-lkp/linux/commits/Dmitry-Safonov/net-tcp-Prepare-tcp_md5sig_pool-for-TCP-AO/20231010-071412
+> patch link: https://lore.kernel.org/all/20231009230722.76268-9-dima@arista.com/
+> patch subject: [PATCH v14 net-next 08/23] net/tcp: Add AO sign to RST packets
+> 
+> in testcase: trinity
+> version: trinity-i386-abe9de86-1_20230429
+> with following parameters:
+> 
+> 	runtime: 300s
+> 	group: group-02
+> 	nr_groups: 5
+> 
+> test-description: Trinity is a linux system call fuzz tester.
+> test-url: http://codemonkey.org.uk/projects/trinity/
+> 
+> 
+> compiler: gcc-12
+> test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
+> 
+> (please refer to attached dmesg/kmsg for entire log/backtrace)
+> 
+> 
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <oliver.sang@intel.com>
+> | Closes: https://lore.kernel.org/oe-lkp/202310171606.30e15ebe-oliver.sang@intel.com
+> 
+> 
+> [  221.348247][ T7133] BUG: sleeping function called from invalid context at net/core/sock.c:2978
+> [  221.349875][ T7133] in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 7133, name: trinity-c4
+> [  221.351666][ T7133] preempt_count: 0, expected: 0
+> [  221.352614][ T7133] RCU nest depth: 1, expected: 0
+> [  221.353518][ T7133] 2 locks held by trinity-c4/7133:
+> [ 221.354530][ T7133] #0: ed8b5660 (sk_lock-AF_INET6){+.+.}-{0:0}, at: tcp_sendmsg (net/ipv4/tcp.c:1336) 
+> [ 221.374314][ T7133] #1: c27dbb18 (rcu_read_lock){....}-{1:2}, at: inet6_csk_xmit (include/linux/rcupdate.h:747 net/ipv6/inet6_connection_sock.c:129) 
+> [  221.375906][ T7133] CPU: 1 PID: 7133 Comm: trinity-c4 Tainted: G        W       TN 6.6.0-rc4-01105-gdf13d11e6a2a #1
 
-The key is independent of all of this discussion. It is set by the user 
-and whatever that key is, the hardware (after properly configuring what 
-fields are XOR'd) will generate the symmetric hash from the input data. 
-The "alg" does not handle or manipulate the key.
+Quite puzzling. It doesn't seem that it can happen to inet6_csk_xmit():
+
+:	rcu_read_lock();
+:	skb_dst_set_noref(skb, dst);
+:
+:	/* Restore final destination back after routing done */
+:	fl6.daddr = sk->sk_v6_daddr;
+:
+:	res = ip6_xmit(sk, skb, &fl6, sk->sk_mark, rcu_dereference(np->opt),
+:		       np->tclass,  sk->sk_priority);
+:	rcu_read_unlock();
+
+So, I presumed the calltrace was for nested rcu_read_lock() case.
+Then I've looked at all return/goto cases, I couldn't find any
+unbalanced rcu_read_{,un}lock().
+
+Is this reproducible by any chance?
+
+
+> [  221.377820][ T7133] Call Trace:
+> [ 221.378447][ T7133] dump_stack_lvl (lib/dump_stack.c:107) 
+> [ 221.379373][ T7133] dump_stack (lib/dump_stack.c:114) 
+> [ 221.380186][ T7133] __might_resched (kernel/sched/core.c:10188) 
+> [ 221.381100][ T7133] __release_sock (include/linux/sched.h:2097 net/core/sock.c:2978) 
+> [ 221.381960][ T7133] release_sock (net/core/sock.c:3520) 
+> [ 221.382784][ T7133] inet_wait_for_connect (net/ipv4/af_inet.c:609) 
+> [ 221.383763][ T7133] ? autoremove_wake_function (kernel/sched/wait.c:479) 
+> [ 221.384757][ T7133] __inet_stream_connect (net/ipv4/af_inet.c:701 (discriminator 1)) 
+> [ 221.385741][ T7133] ? kmalloc_node_trace (mm/slab_common.c:1133) 
+> [ 221.386702][ T7133] tcp_sendmsg_fastopen (net/ipv4/tcp.c:1026) 
+> [ 221.387685][ T7133] tcp_sendmsg_locked (net/ipv4/tcp.c:1073) 
+> [ 221.388642][ T7133] ? find_held_lock (kernel/locking/lockdep.c:5243) 
+> [ 221.389536][ T7133] ? mark_held_locks (kernel/locking/lockdep.c:4273) 
+> [ 221.390437][ T7133] ? lock_sock_nested (net/core/sock.c:3511) 
+> [ 221.391359][ T7133] ? lock_sock_nested (net/core/sock.c:3511) 
+> [ 221.392335][ T7133] tcp_sendmsg (net/ipv4/tcp.c:1336) 
+> [ 221.393153][ T7133] inet6_sendmsg (net/ipv6/af_inet6.c:658 (discriminator 2)) 
+> [ 221.394010][ T7133] ____sys_sendmsg (net/socket.c:730 net/socket.c:745 net/socket.c:2558) 
+> [ 221.394927][ T7133] ___sys_sendmsg (net/socket.c:2612) 
+> [ 221.395844][ T7133] __sys_sendmsg (net/socket.c:2641) 
+> [ 221.396671][ T7133] __ia32_sys_sendmsg (net/socket.c:2648) 
+> [ 221.397562][ T7133] __do_fast_syscall_32 (arch/x86/entry/common.c:112 arch/x86/entry/common.c:178) 
+> [ 221.398485][ T7133] do_fast_syscall_32 (arch/x86/entry/common.c:203) 
+> [ 221.399401][ T7133] do_SYSENTER_32 (arch/x86/entry/common.c:247) 
+> [ 221.404363][ T7133] entry_SYSENTER_32 (arch/x86/entry/entry_32.S:840) 
+> [  221.405255][ T7133] EIP: 0xb7f59579
+> [ 221.405931][ T7133] Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d 76 00 58 b8 77 00 00 00 cd 80 90 8d 76
+> All code
+> ========
+>    0:	b8 01 10 06 03       	mov    $0x3061001,%eax
+>    5:	74 b4                	je     0xffffffffffffffbb
+>    7:	01 10                	add    %edx,(%rax)
+>    9:	07                   	(bad)
+>    a:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
+>    e:	10 08                	adc    %cl,(%rax)
+>   10:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+> 	...
+>   20:	00 51 52             	add    %dl,0x52(%rcx)
+>   23:	55                   	push   %rbp
+>   24:*	89 e5                	mov    %esp,%ebp		<-- trapping instruction
+>   26:	0f 34                	sysenter
+>   28:	cd 80                	int    $0x80
+>   2a:	5d                   	pop    %rbp
+>   2b:	5a                   	pop    %rdx
+>   2c:	59                   	pop    %rcx
+>   2d:	c3                   	ret
+>   2e:	90                   	nop
+>   2f:	90                   	nop
+>   30:	90                   	nop
+>   31:	90                   	nop
+>   32:	8d 76 00             	lea    0x0(%rsi),%esi
+>   35:	58                   	pop    %rax
+>   36:	b8 77 00 00 00       	mov    $0x77,%eax
+>   3b:	cd 80                	int    $0x80
+>   3d:	90                   	nop
+>   3e:	8d                   	.byte 0x8d
+>   3f:	76                   	.byte 0x76
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0:	5d                   	pop    %rbp
+>    1:	5a                   	pop    %rdx
+>    2:	59                   	pop    %rcx
+>    3:	c3                   	ret
+>    4:	90                   	nop
+>    5:	90                   	nop
+>    6:	90                   	nop
+>    7:	90                   	nop
+>    8:	8d 76 00             	lea    0x0(%rsi),%esi
+>    b:	58                   	pop    %rax
+>    c:	b8 77 00 00 00       	mov    $0x77,%eax
+>   11:	cd 80                	int    $0x80
+>   13:	90                   	nop
+>   14:	8d                   	.byte 0x8d
+>   15:	76                   	.byte 0x76
+> [  221.409527][ T7133] EAX: ffffffda EBX: 00000137 ECX: 01ce1580 EDX: 240449b4
+> [  221.410805][ T7133] ESI: 000000b1 EDI: 8b8b8b8b EBP: 08080808 ESP: bfc205fc
+> [  221.412147][ T7133] DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b EFLAGS: 00000296
+> [  221.481648][ T7133]
+> [  221.482194][ T7133] ================================================
+> [  221.483377][ T7133] WARNING: lock held when returning to user space!
+> [  221.484574][ T7133] 6.6.0-rc4-01105-gdf13d11e6a2a #1 Tainted: G        W       TN
+> [  221.485904][ T7133] ------------------------------------------------
+> [  221.487044][ T7133] trinity-c4/7133 is leaving the kernel with locks still held!
+> [  221.488448][ T7133] 1 lock held by trinity-c4/7133:
+> [ 221.489401][ T7133] #0: c27dbb18 (rcu_read_lock){....}-{1:2}, at: inet6_csk_xmit (include/linux/rcupdate.h:747 net/ipv6/inet6_connection_sock.c:129) 
+> [  221.491125][ T7133] ------------[ cut here ]------------
+> [  221.501170][ T7133] Voluntary context switch within RCU read-side critical section!
+> [ 221.501214][ T7133] WARNING: CPU: 1 PID: 7133 at kernel/rcu/tree_plugin.h:320 rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
+> [  221.504458][ T7133] Modules linked in: ipmi_msghandler uio_pdrv_genirq uio rtc_cmos processor fuse drm drm_panel_orientation_quirks configfs
+> [  221.506701][ T7133] CPU: 1 PID: 7133 Comm: trinity-c4 Tainted: G        W       TN 6.6.0-rc4-01105-gdf13d11e6a2a #1
+> [ 221.508634][ T7133] EIP: rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
+> [ 221.509684][ T7133] Code: e9 87 fe ff ff 8d 74 26 00 8b 41 2c 89 45 ec e9 16 ff ff ff 8d 74 26 00 90 c6 05 09 88 94 c2 01 68 04 84 32 c2 e8 47 14 f5 ff <0f> 0b 5a e9 b0 fd ff ff 8d b4 26 00 00 00 00 81 e2 ff ff ff 7f 0f
+> All code
+> ========
+>    0:	e9 87 fe ff ff       	jmp    0xfffffffffffffe8c
+>    5:	8d 74 26 00          	lea    0x0(%rsi,%riz,1),%esi
+>    9:	8b 41 2c             	mov    0x2c(%rcx),%eax
+>    c:	89 45 ec             	mov    %eax,-0x14(%rbp)
+>    f:	e9 16 ff ff ff       	jmp    0xffffffffffffff2a
+>   14:	8d 74 26 00          	lea    0x0(%rsi,%riz,1),%esi
+>   18:	90                   	nop
+>   19:	c6 05 09 88 94 c2 01 	movb   $0x1,-0x3d6b77f7(%rip)        # 0xffffffffc2948829
+>   20:	68 04 84 32 c2       	push   $0xffffffffc2328404
+>   25:	e8 47 14 f5 ff       	call   0xfffffffffff51471
+>   2a:*	0f 0b                	ud2		<-- trapping instruction
+>   2c:	5a                   	pop    %rdx
+>   2d:	e9 b0 fd ff ff       	jmp    0xfffffffffffffde2
+>   32:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+>   39:	81 e2 ff ff ff 7f    	and    $0x7fffffff,%edx
+>   3f:	0f                   	.byte 0xf
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0:	0f 0b                	ud2
+>    2:	5a                   	pop    %rdx
+>    3:	e9 b0 fd ff ff       	jmp    0xfffffffffffffdb8
+>    8:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+>    f:	81 e2 ff ff ff 7f    	and    $0x7fffffff,%edx
+>   15:	0f                   	.byte 0xf
+> [  221.513148][ T7133] EAX: 00000000 EBX: e52d7c40 ECX: 00000000 EDX: 00000000
+> [  221.514443][ T7133] ESI: 00000000 EDI: eadb5640 EBP: ead7df28 ESP: ead7df10
+> [  221.515747][ T7133] DS: 007b ES: 007b FS: 00d8 GS: 0033 SS: 0068 EFLAGS: 00010046
+> [  221.517184][ T7133] CR0: 80050033 CR2: 01ce68cc CR3: 2ae6f000 CR4: 00000690
+> [  221.518449][ T7133] Call Trace:
+> [ 221.519074][ T7133] ? show_regs (arch/x86/kernel/dumpstack.c:478) 
+> [ 221.519826][ T7133] ? rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
+> [ 221.520887][ T7133] ? __warn (kernel/panic.c:673) 
+> [ 221.521663][ T7133] ? rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
+> [ 221.522722][ T7133] ? report_bug (lib/bug.c:201 lib/bug.c:219) 
+> [ 221.523615][ T7133] ? exc_overflow (arch/x86/kernel/traps.c:250) 
+> [ 221.524517][ T7133] ? handle_bug (arch/x86/kernel/traps.c:216) 
+> [ 221.525240][ T7133] ? exc_invalid_op (arch/x86/kernel/traps.c:258 (discriminator 1)) 
+> [ 221.526115][ T7133] ? handle_exception (arch/x86/entry/entry_32.S:1056) 
+> [ 221.527035][ T7133] ? exc_overflow (arch/x86/kernel/traps.c:250) 
+> [ 221.527882][ T7133] ? rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
+> [ 221.528945][ T7133] ? exc_overflow (arch/x86/kernel/traps.c:250) 
+> [ 221.529743][ T7133] ? rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
+> [ 221.530784][ T7133] __schedule (arch/x86/include/asm/preempt.h:80 (discriminator 3) kernel/sched/core.c:556 (discriminator 3) kernel/sched/sched.h:1372 (discriminator 3) kernel/sched/sched.h:1681 (discriminator 3) kernel/sched/core.c:6612 (discriminator 3)) 
+> [ 221.531573][ T7133] ? exit_to_user_mode_prepare (kernel/entry/common.c:158 kernel/entry/common.c:204) 
+> [ 221.532627][ T7133] schedule (arch/x86/include/asm/preempt.h:85 (discriminator 1) kernel/sched/core.c:6772 (discriminator 1)) 
+> [ 221.533358][ T7133] exit_to_user_mode_prepare (kernel/entry/common.c:161 kernel/entry/common.c:204) 
+> [ 221.534382][ T7133] ? sysvec_reboot (arch/x86/kernel/smp.c:269) 
+> [ 221.535255][ T7133] irqentry_exit_to_user_mode (kernel/entry/common.c:130 kernel/entry/common.c:311) 
+> [ 221.536302][ T7133] irqentry_exit (kernel/entry/common.c:445) 
+> [ 221.537101][ T7133] sysvec_reschedule_ipi (arch/x86/kernel/smp.c:269) 
+> [ 221.538079][ T7133] handle_exception (arch/x86/entry/entry_32.S:1056) 
+> [  221.538990][ T7133] EIP: 0xb7f59579
+> [ 221.539674][ T7133] Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d 76 00 58 b8 77 00 00 00 cd 80 90 8d 76
+> All code
+> ========
+>    0:	b8 01 10 06 03       	mov    $0x3061001,%eax
+>    5:	74 b4                	je     0xffffffffffffffbb
+>    7:	01 10                	add    %edx,(%rax)
+>    9:	07                   	(bad)
+>    a:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
+>    e:	10 08                	adc    %cl,(%rax)
+>   10:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+> 	...
+>   20:	00 51 52             	add    %dl,0x52(%rcx)
+>   23:	55                   	push   %rbp
+>   24:*	89 e5                	mov    %esp,%ebp		<-- trapping instruction
+>   26:	0f 34                	sysenter
+>   28:	cd 80                	int    $0x80
+>   2a:	5d                   	pop    %rbp
+>   2b:	5a                   	pop    %rdx
+>   2c:	59                   	pop    %rcx
+>   2d:	c3                   	ret
+>   2e:	90                   	nop
+>   2f:	90                   	nop
+>   30:	90                   	nop
+>   31:	90                   	nop
+>   32:	8d 76 00             	lea    0x0(%rsi),%esi
+>   35:	58                   	pop    %rax
+>   36:	b8 77 00 00 00       	mov    $0x77,%eax
+>   3b:	cd 80                	int    $0x80
+>   3d:	90                   	nop
+>   3e:	8d                   	.byte 0x8d
+>   3f:	76                   	.byte 0x76
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>    0:	5d                   	pop    %rbp
+>    1:	5a                   	pop    %rdx
+>    2:	59                   	pop    %rcx
+>    3:	c3                   	ret
+>    4:	90                   	nop
+>    5:	90                   	nop
+>    6:	90                   	nop
+>    7:	90                   	nop
+>    8:	8d 76 00             	lea    0x0(%rsi),%esi
+>    b:	58                   	pop    %rax
+>    c:	b8 77 00 00 00       	mov    $0x77,%eax
+>   11:	cd 80                	int    $0x80
+>   13:	90                   	nop
+>   14:	8d                   	.byte 0x8d
+>   15:	76                   	.byte 0x76
+> [  221.543249][ T7133] EAX: ffffff91 EBX: 00000137 ECX: bfc205fc EDX: b7f59579
+> [  221.544585][ T7133] ESI: 000000b1 EDI: 8b8b8b8b EBP: 08080808 ESP: bfc205fc
+> [  221.545872][ T7133] DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b EFLAGS: 00000296
+> [ 221.547230][ T7133] ? sysvec_reboot (arch/x86/kernel/smp.c:269) 
+> [  221.548133][ T7133] irq event stamp: 10576
+> [ 221.548909][ T7133] hardirqs last enabled at (10575): _raw_spin_unlock_irq (arch/x86/include/asm/irqflags.h:42 arch/x86/include/asm/irqflags.h:77 include/linux/spinlock_api_smp.h:159 kernel/locking/spinlock.c:202) 
+> [ 221.550576][ T7133] hardirqs last disabled at (10576): exit_to_user_mode_prepare (include/linux/entry-common.h:191 kernel/entry/common.c:181 kernel/entry/common.c:204) 
+> [ 221.552434][ T7133] softirqs last enabled at (10570): release_sock (net/core/sock.c:3528) 
+> [ 221.553958][ T7133] softirqs last disabled at (10568): release_sock (net/core/sock.c:3517) 
+> [  221.555538][ T7133] ---[ end trace 0000000000000000 ]---
+> 
+> 
+> The kernel config and materials to reproduce are available at:
+> https://download.01.org/0day-ci/archive/20231017/202310171606.30e15ebe-oliver.sang@intel.com
+> 
+> 
+> 
+
+Thanks,
+             Dmitry
 
 
