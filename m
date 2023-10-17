@@ -1,118 +1,133 @@
-Return-Path: <netdev+bounces-41856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2F427CC111
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:52:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70FFB7CC0E6
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:46:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 763611F22DCD
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:52:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B65A281858
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:46:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA3E405DF;
-	Tue, 17 Oct 2023 10:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8006B38DC8;
+	Tue, 17 Oct 2023 10:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UAe8MUhs"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF7C1A5AC
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:52:01 +0000 (UTC)
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5E19A2;
-	Tue, 17 Oct 2023 03:52:00 -0700 (PDT)
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-57b5f0d658dso3262062eaf.0;
-        Tue, 17 Oct 2023 03:52:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697539920; x=1698144720;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fPRdJ+3TN8Zmg5SzFNo5gq2GpoI/z77WwxmQGbYRfiU=;
-        b=RCqn7mNcEeR/kx77+0QRClbUQdwRghnm3reiM25HovHj6plRZ2AbmLNwY4G/zyGvLi
-         khz4IL3OdUqG3oR069pm3jSlMT+yBcVrUytapkExg3lE5nUY/s4XDI2ynt9h8YrvMPEu
-         LNb73icQAvIyHE/nnYDVj1IStwjDbrC3KWMWdskNFiRzeXQ56tnpUSU/GXR+X1p69NQP
-         wn7D7s+C7eO8rD+i8vEGYOhF7gPeq50f+8RSWEilNYU3sGtA6SAorV8EBB9DbEo8lmNz
-         uK5brbmcOGVdDtRHKBFsL0mL6wM2MLCH2ZjPL2VcSPBWVuqFhdg2Dvw0NFOE6v7a3SHC
-         po4w==
-X-Gm-Message-State: AOJu0YxibEjKZbaJgk1UvSyq8CfYVC/F6jPzrYPGp7KdbyUIJydquYGp
-	880p22geTodVlkYOKauMLh2Wcnm7IX5F/A==
-X-Google-Smtp-Source: AGHT+IFd3iKI9wLlTzsJrXCrzBBpHjkhI7rghbba6LFq3K4sgcOrjxFIoH5VkuTuGXIyau3tWf75YQ==
-X-Received: by 2002:a05:6870:2183:b0:1e9:c315:9d66 with SMTP id l3-20020a056870218300b001e9c3159d66mr2032182oae.40.1697539919886;
-        Tue, 17 Oct 2023 03:51:59 -0700 (PDT)
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com. [209.85.210.50])
-        by smtp.gmail.com with ESMTPSA id i2-20020a056830010200b006b9b6aea237sm217009otp.80.2023.10.17.03.51.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Oct 2023 03:51:59 -0700 (PDT)
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6c4fc2ce697so3863996a34.0;
-        Tue, 17 Oct 2023 03:51:59 -0700 (PDT)
-X-Received: by 2002:a81:4996:0:b0:592:ffc:c787 with SMTP id
- w144-20020a814996000000b005920ffcc787mr1937845ywa.30.1697539494112; Tue, 17
- Oct 2023 03:44:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3318D41750
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:46:07 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 094B3B0;
+	Tue, 17 Oct 2023 03:46:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ROQZdDcLut5ViR2MKWTEe7ujDUIt2VMvj7Y8134W1Do=; b=UAe8MUhsddOe2s6WwFUT3m0YdX
+	nKeI/8fZLVWEOltPVdHSx609o4C59e2by21Ke+Wj5JhcHp4tQz9IihlOM3HnOfNwlDmJc9C6Fa3DG
+	ipBLCU0feoGodloXbVWpEqwgSH2AEQtfm4QAj+43MnNfNU5Bc8a4+4W3nNDTaS+79PPHWlJkupJtX
+	VxOwRabCWnNtrduVbOpIaZ9jjvEmFFfzGdzwjmJH2NX4O7hgC13UOh6vASlYthfxORgPbfs0u8282
+	ZFfqBXVY0JLzQFF6WOZRUFTkQodoApQjEKH6HGy2HSdf6uV/a5Vmh4o+UjlKyXkjGxxEkk/aZFBT5
+	ePNON4ag==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48774)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qshaK-00036p-10;
+	Tue, 17 Oct 2023 11:46:00 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qshaK-0006ca-OQ; Tue, 17 Oct 2023 11:46:00 +0100
+Date: Tue, 17 Oct 2023 11:46:00 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	Bryan.Whitehead@microchip.com, linux-kernel@vger.kernel.org,
+	andrew@lunn.ch, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next V1 6/7] net: lan743x: Add support to the phylink
+ framework
+Message-ID: <ZS5l6Ko0NeaotV2Q@shell.armlinux.org.uk>
+References: <20231017094208.4956-1-Raju.Lakkaraju@microchip.com>
+ <20231017094208.4956-7-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016054755.915155-1-hch@lst.de> <20231016054755.915155-5-hch@lst.de>
- <20231016-pantyhose-tall-7565b6b20fb9@wendy> <20231016131745.GB26484@lst.de>
-In-Reply-To: <20231016131745.GB26484@lst.de>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 17 Oct 2023 12:44:41 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXVZz=YWMAgzUzme-U3qxYeLdi66xw2CGubpesGy+ZjRw@mail.gmail.com>
-Message-ID: <CAMuHMdXVZz=YWMAgzUzme-U3qxYeLdi66xw2CGubpesGy+ZjRw@mail.gmail.com>
-Subject: Re: [PATCH 04/12] soc: renesas: select RISCV_DMA_NONCOHERENT from ARCH_R9A07G043
-To: Christoph Hellwig <hch@lst.de>
-Cc: Conor Dooley <conor.dooley@microchip.com>, Greg Ungerer <gerg@linux-m68k.org>, 
-	iommu@lists.linux.dev, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, 
-	Magnus Damm <magnus.damm@gmail.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
-	Jim Quinlan <james.quinlan@broadcom.com>, arm-soc <soc@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231017094208.4956-7-Raju.Lakkaraju@microchip.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Christoph,
+On Tue, Oct 17, 2023 at 03:12:07PM +0530, Raju Lakkaraju wrote:
+> +static void lan743x_phylink_mac_config(struct phylink_config *config,
+> +				       unsigned int link_an_mode,
+> +				       const struct phylink_link_state *state)
+> +{
+> +	struct net_device *netdev = to_net_dev(config->dev);
+> +	struct lan743x_adapter *adapter = netdev_priv(netdev);
+> +	bool status;
+> +	int ret;
+> +
+> +	lan743x_mac_cfg_update(adapter, state->link, state->speed,
+> +			       state->advertising);
 
-On Mon, Oct 16, 2023 at 3:17=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
-e:
-> On Mon, Oct 16, 2023 at 01:52:57PM +0100, Conor Dooley wrote:
-> > > +   select RISCV_DMA_NONCOHERENT
-> > >     select ERRATA_ANDES if RISCV_SBI
-> > >     select ERRATA_ANDES_CMO if ERRATA_ANDES
-> >
-> > Since this Kconfig menu has changed a bit in linux-next, the selects
-> > are unconditional here, and ERRATA_ANDES_CMO will in turn select
-> > RISCV_DMA_NONCOHERENT.
->
-> Oh, looks like another patch landed there in linux-next.  I had
-> waited for the previous one go go upstream in -rc6.  Not sure
-> how to best handle this conflict.
+Another case of not reading the phylink documentation... :( I *really*
+don't see why we bother to write documentation, from my experience, it
+seems to be totally a write-only thing... no one seems to bother
+reading it.
 
-I think the easiest is to ask soc to apply this series?
+/**
+ * mac_config() - configure the MAC for the selected mode and state
+ * @config: a pointer to a &struct phylink_config.
+ * @mode: one of %MLO_AN_FIXED, %MLO_AN_PHY, %MLO_AN_INBAND.
+ * @state: a pointer to a &struct phylink_link_state.
+ *
+ * Note - not all members of @state are valid.  In particular,
+ * @state->lp_advertising, @state->link, @state->an_complete are never
+ * guaranteed to be correct, and so any mac_config() implementation must
+ * never reference these fields.
+...
+ * The action performed depends on the currently selected mode:
+ *
+ * %MLO_AN_FIXED, %MLO_AN_PHY:
+...
+ *   Valid state members: interface, advertising.
+ *   Deprecated state members: speed, duplex, pause.
+...
+ * %MLO_AN_INBAND:
+...
+ *   Valid state members: interface, an_enabled, pause, advertising.
 
-Gr{oetje,eeting}s,
+So "link" and "speed" are not valid. They're certainly not valid now
+that the pre-March 2020 legacy support has been removed.
 
-                        Geert
+The only time that you get to know what speed the link is operating at
+is after the link has been negotiated and is up - and you will be told
+via the mac_link_up() function (or in the case of a PCS, via the
+pcs_link_up() function.) You can't know before that point what speed
+the link will be operating at because its dependent on the results of
+link negotiation.
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+I haven't bothered to look more deeply at this patch, because I regard
+any patch that gets this wrong to be utter trash (sorry that's a bit
+hard, but I see people not bothering to read documentation all too
+often and it pisses me off that I've gone to the bother of writing it
+and it just gets ignored.)
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
