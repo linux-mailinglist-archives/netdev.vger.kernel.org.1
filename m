@@ -1,81 +1,72 @@
-Return-Path: <netdev+bounces-41990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F70F7CC8B2
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:23:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2CE77CC8DB
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9B63281B3F
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:23:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82CF6B210F5
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F379D9CA5E;
-	Tue, 17 Oct 2023 16:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B759F9CA5B;
+	Tue, 17 Oct 2023 16:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S1pjWRhd"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PRGB0A4e"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C564734F;
-	Tue, 17 Oct 2023 16:23:19 +0000 (UTC)
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27D19B0;
-	Tue, 17 Oct 2023 09:23:18 -0700 (PDT)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5a7afd45199so74400687b3.0;
-        Tue, 17 Oct 2023 09:23:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13859CA61;
+	Tue, 17 Oct 2023 16:30:24 +0000 (UTC)
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24889F7;
+	Tue, 17 Oct 2023 09:30:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697559797; x=1698164597; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NnWq+uYNn+SsjJw/E+I7Mb11OXcmP1oROjW1ThmoOQs=;
-        b=S1pjWRhdWPRweHX4etqhy8DcIhPM0v0JcxS9IXmIVb7zC7CaYhk3as9Akt4AaGfIF0
-         ukC8f7NWgvxILPD9wNoey6kz/BpuO8nOsNw3itk5247pa7rYstSJ9Z1NvQUFiq/aq2E4
-         jDbIlRe52StjAn3DV59HQQE9Afj0NstFEz7Tu2X0j3pF+18nQz3nuIqdo993rYTZY5Pk
-         DSwXK6GAqH4+Zh7+LxeggymcQrpvu8e63AtM2dY7B0mb7VARXtZE0aq37JEGs7T8/EZp
-         y+6euTFmATYJd80NnSr9YtuDmfTbw5YKTeTvbHcd8s+tyM/LjlH5LqDET4AknumV1Uku
-         keWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697559797; x=1698164597;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NnWq+uYNn+SsjJw/E+I7Mb11OXcmP1oROjW1ThmoOQs=;
-        b=RWqdu3AgFR/knQs+7s4Pqd0Tw/xZgB5NbkrqFVhe0RnO15pRdT4s2kRnB2zGQSLlBT
-         HL196iC8mrSPI+dAwpDdQL2QsZ4Juq6sRhxN3EuC2c3jpH84PzQlMjkilClorB1MOwMf
-         8/CLBxUdWz3lAp5mDDhX0sNXNrIEvDOxKuEeoDPKJ/KWbgW4QZFSyo12iZzdpBBKFFlA
-         wqTL7zAV9yiDygnjFIYSlRuCZGOXmAV66VF13sL1FCT/s2OgwtE6uh/pARqG4NIjIVng
-         gzgWq9/ZousqeekS3ZCY5BnN5+1306CYWw9V3h3UIpB+mrTLxs/t4Oj2qjLSycai9rSc
-         BllQ==
-X-Gm-Message-State: AOJu0YwSROd7eu7Ky1AavKZwkKjHiuc9n92GcIyaQ4c3IWo3/HNs+nrQ
-	VbMVcXu2Tm9ZEW2Pn+9H8G573fWhN4Y=
-X-Google-Smtp-Source: AGHT+IEteWVlunfEUR41/DWe+unPX12TZNR8U4ttj2eux9Ty6fBOtfQ/FyC1SgKC8vbpjSecLI+kMg==
-X-Received: by 2002:a25:ae8e:0:b0:d9c:66fb:db9 with SMTP id b14-20020a25ae8e000000b00d9c66fb0db9mr1133388ybj.59.1697559797049;
-        Tue, 17 Oct 2023 09:23:17 -0700 (PDT)
-Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:ed01:b54a:4364:93cc])
-        by smtp.gmail.com with ESMTPSA id r189-20020a2544c6000000b00d814d8dfd69sm623645yba.27.2023.10.17.09.23.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 09:23:16 -0700 (PDT)
-From: thinker.li@gmail.com
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	kernel-team@meta.com,
-	andrii@kernel.org,
-	drosen@google.com
-Cc: sinquersw@gmail.com,
-	kuifeng@meta.com,
-	Kui-Feng Lee <thinker.li@gmail.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH bpf-next v5 6/9] bpf, net: switch to dynamic registration
-Date: Tue, 17 Oct 2023 09:23:03 -0700
-Message-Id: <20231017162306.176586-7-thinker.li@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231017162306.176586-1-thinker.li@gmail.com>
-References: <20231017162306.176586-1-thinker.li@gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697560223; x=1729096223;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=nhGsRjdf/+8DRd3402CH1F8gtVqbu/IHtlDEiqBWqdE=;
+  b=PRGB0A4exFtwDidEuaKLwVDaShoLdQSVC7wLrwp5aNBsmXLE9oQe6mql
+   s/TOQ/PQQR8/AVWhGntlPP77+QIzRetC1U3yM6jjoglzOyt/lgEGtItep
+   vTlqU/CFA9hHFIcR/jnwoEsAULh+TbP8/ht9b07mTtRAHsdneotOki0gu
+   0=;
+X-IronPort-AV: E=Sophos;i="6.03,232,1694736000"; 
+   d="scan'208";a="678260187"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 16:30:15 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1d-m6i4x-b404fda3.us-east-1.amazon.com (Postfix) with ESMTPS id 75E76824B7;
+	Tue, 17 Oct 2023 16:30:09 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:22838]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.209:2525] with esmtp (Farcaster)
+ id 86d4c900-5632-4f88-87b6-efd043245543; Tue, 17 Oct 2023 16:30:08 +0000 (UTC)
+X-Farcaster-Flow-ID: 86d4c900-5632-4f88-87b6-efd043245543
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Tue, 17 Oct 2023 16:30:05 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.38) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Tue, 17 Oct 2023 16:30:01 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <martin.lau@linux.dev>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
+	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <mykolal@fb.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
+	<song@kernel.org>, <yonghong.song@linux.dev>
+Subject: Re: [PATCH v1 bpf-next 11/11] selftest: bpf: Test BPF_SOCK_OPS_(GEN|CHECK)_SYNCOOKIE_CB.
+Date: Tue, 17 Oct 2023 09:29:54 -0700
+Message-ID: <20231017162954.18403-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <84d1ab6f-339f-c3f1-4dc3-69043a889b65@linux.dev>
+References: <84d1ab6f-339f-c3f1-4dc3-69043a889b65@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,398 +74,140 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.187.171.38]
+X-ClientProxiedBy: EX19D038UWB004.ant.amazon.com (10.13.139.177) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Kui-Feng Lee <thinker.li@gmail.com>
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Date: Mon, 16 Oct 2023 22:50:44 -0700
+> On 10/13/23 3:04 PM, Kuniyuki Iwashima wrote:
+> > This patch adds a test for BPF_SOCK_OPS_(GEN|CHECK)_SYNCOOKIE_CB hooks.
+> > 
+> > BPF_SOCK_OPS_GEN_SYNCOOKIE_CB hook generates a hash using SipHash from
+> > based on 4-tuple.  The hash is split into ISN and TS.  MSS, ECN, SACK,
+> > and WScale are encoded into the lower 8-bits of ISN.
+> > 
+> >    ISN:
+> >      MSB                                   LSB
+> >      | 31 ... 8 | 7 6 | 5   | 4    | 3 2 1 0 |
+> >      | Hash_1   | MSS | ECN | SACK | WScale  |
+> > 
+> >    TS:
+> >      MSB                LSB
+> >      | 31 ... 8 | 7 ... 0 |
+> >      | Random   | Hash_2  |
+> > 
+> > BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB hook re-calculates the hash and validates
+> > the cookie.
+> > 
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> > Currently, the validator is incomplete...
+> > 
+> > If this line is changed
+> > 
+> >      skops->replylong[0] = msstab[3];
+> > 
+> > to
+> >      skops->replylong[0] = msstab[mssind];
+> > 
+> > , we will get the error below during make:
+> > 
+> >      GEN-SKEL [test_progs] test_tcp_syncookie.skel.h
+> >    ...
+> >    Error: failed to open BPF object file: No such file or directory
+> 
+> I cannot reprod. Does it have error earlier than this? GEN-SKEL is probably 
+> running this (make V=1 can tell):
+> 
+> tools/testing/selftests/bpf/tools/sbin/bpftool gen skeleton 
+> tools/testing/selftests/bpf/test_tcp_syncookie.bpf.linked3.o name 
+> test_tcp_syncookie > tools/testing/selftests/bpf/test_tcp_syncookie.skel.h
+> 
+> Add a "-d" to bpftool for more debug output: bpftool -d gen skeleton....
 
-Replace the static list of struct_ops types with pre-btf struct_ops_tab to
-enable dynamic registration.
+Somehow .rodata was 0 bytes while generating skeleton, and after
+removing `static` from `msstab[]`, it compiled successfully.
 
-Both bpf_dummy_ops and bpf_tcp_ca now utilize the registration function
-instead of being listed in bpf_struct_ops_types.h.
+Thank you!
 
-Cc: netdev@vger.kernel.org
-Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
----
- include/linux/bpf.h               |   2 +
- include/linux/btf.h               |  29 +++++++
- kernel/bpf/bpf_struct_ops.c       | 124 +++++++++++++++---------------
- kernel/bpf/bpf_struct_ops_types.h |  12 ---
- kernel/bpf/btf.c                  |   2 +-
- net/bpf/bpf_dummy_struct_ops.c    |  14 +++-
- net/ipv4/bpf_tcp_ca.c             |  16 +++-
- 7 files changed, 119 insertions(+), 80 deletions(-)
- delete mode 100644 kernel/bpf/bpf_struct_ops_types.h
+---8<---
+$ tools/testing/selftests/bpf/tools/sbin/bpftool -d gen skeleton tools/testing/selftests/bpf/test_tcp_syncookie.bpf.linked3.o name test_tcp_syncookie > tools/testing/selftests/bpf/test_tcp_syncookie.skel.h
+libbpf: loading object 'test_tcp_syncookie' from buffer
+libbpf: elf: section(2) .symtab, size 432, link 1, flags 0, type=2
+libbpf: elf: section(3) .text, size 2888, link 0, flags 6, type=1
+libbpf: sec '.text': found program 'cookie_hash' at insn offset 0 (0 bytes), code size 361 insns (2888 bytes)
+libbpf: elf: section(4) sockops, size 864, link 0, flags 6, type=1
+libbpf: sec 'sockops': found program 'syncookie' at insn offset 0 (0 bytes), code size 108 insns (864 bytes)
+libbpf: elf: section(5) license, size 4, link 0, flags 3, type=1
+libbpf: license of test_tcp_syncookie is GPL
+libbpf: elf: section(6) .maps, size 32, link 0, flags 3, type=1
+libbpf: elf: section(7) .rodata.cst8, size 8, link 0, flags 12, type=1
+libbpf: elf: section(8) .relsockops, size 48, link 2, flags 40, type=9
+libbpf: elf: section(9) .BTF, size 3891, link 0, flags 0, type=1
+libbpf: elf: section(10) .BTF.ext, size 2648, link 0, flags 0, type=1
+libbpf: looking for externs among 18 symbols...
+libbpf: collected 0 externs total
+libbpf: sec '.rodata': failed to determine size from ELF: size 0, err -2
+Error: failed to open BPF object file: No such file or directory
+---8<---
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index 1e1647c8b0ce..b0f33147aa93 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -3207,4 +3207,6 @@ static inline bool bpf_is_subprog(const struct bpf_prog *prog)
- 	return prog->aux->func_idx != 0;
+---8<---
+diff --git a/tools/testing/selftests/bpf/progs/test_tcp_syncookie.c b/tools/testing/selftests/bpf/progs/test_tcp_syncookie.c
+index 5d1fc928602b..19307567cc4c 100644
+--- a/tools/testing/selftests/bpf/progs/test_tcp_syncookie.c
++++ b/tools/testing/selftests/bpf/progs/test_tcp_syncookie.c
+@@ -63,7 +63,7 @@ static __u32 cookie_hash(struct bpf_sock_ops *skops)
+ 			    &test_key_siphash);
  }
  
-+int register_bpf_struct_ops(struct bpf_struct_ops *st_ops);
-+
- #endif /* _LINUX_BPF_H */
-diff --git a/include/linux/btf.h b/include/linux/btf.h
-index aa2ba77648be..fdc83aa10462 100644
---- a/include/linux/btf.h
-+++ b/include/linux/btf.h
-@@ -12,6 +12,8 @@
- #include <uapi/linux/bpf.h>
+-static const __u16 msstab[] = {
++const __u16 msstab[] = {
+ 	536,
+ 	1300,
+ 	1440,
+@@ -137,7 +137,7 @@ static int check_syncookie(struct bpf_sock_ops *skops)
+ 		return CG_ERR;
  
- #define BTF_TYPE_EMIT(type) ((void)(type *)0)
-+#define BTF_STRUCT_OPS_TYPE_EMIT(type) {((void)(struct type *)0);	\
-+		((void)(struct bpf_struct_ops_##type *)0); }
- #define BTF_TYPE_EMIT_ENUM(enum_val) ((void)enum_val)
- 
- /* These need to be macros, as the expressions are used in assembler input */
-@@ -200,6 +202,7 @@ u32 btf_obj_id(const struct btf *btf);
- bool btf_is_kernel(const struct btf *btf);
- bool btf_is_module(const struct btf *btf);
- struct module *btf_try_get_module(const struct btf *btf);
-+struct btf *btf_get_module_btf(const struct module *module);
- u32 btf_nr_types(const struct btf *btf);
- bool btf_member_is_reg_int(const struct btf *btf, const struct btf_type *s,
- 			   const struct btf_member *m,
-@@ -577,4 +580,30 @@ int btf_add_struct_ops(struct bpf_struct_ops *st_ops);
- const struct bpf_struct_ops **
- btf_get_struct_ops(struct btf *btf, u32 *ret_cnt);
- 
-+enum bpf_struct_ops_state {
-+	BPF_STRUCT_OPS_STATE_INIT,
-+	BPF_STRUCT_OPS_STATE_INUSE,
-+	BPF_STRUCT_OPS_STATE_TOBEFREE,
-+	BPF_STRUCT_OPS_STATE_READY,
-+};
-+
-+struct bpf_struct_ops_common_value {
-+	refcount_t refcnt;
-+	enum bpf_struct_ops_state state;
-+};
-+#define BPF_STRUCT_OPS_COMMON_VALUE struct bpf_struct_ops_common_value common
-+
-+/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
-+ * the map's value exposed to the userspace and its btf-type-id is
-+ * stored at the map->btf_vmlinux_value_type_id.
-+ *
-+ */
-+#define DEFINE_STRUCT_OPS_VALUE_TYPE(_name)			\
-+extern struct bpf_struct_ops bpf_##_name;			\
-+								\
-+struct bpf_struct_ops_##_name {					\
-+	BPF_STRUCT_OPS_COMMON_VALUE;				\
-+	struct _name data ____cacheline_aligned_in_smp;		\
-+}
-+
- #endif
-diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-index 60445ff32275..175068b083cb 100644
---- a/kernel/bpf/bpf_struct_ops.c
-+++ b/kernel/bpf/bpf_struct_ops.c
-@@ -13,19 +13,6 @@
- #include <linux/btf_ids.h>
- #include <linux/rcupdate_wait.h>
- 
--enum bpf_struct_ops_state {
--	BPF_STRUCT_OPS_STATE_INIT,
--	BPF_STRUCT_OPS_STATE_INUSE,
--	BPF_STRUCT_OPS_STATE_TOBEFREE,
--	BPF_STRUCT_OPS_STATE_READY,
--};
--
--struct bpf_struct_ops_common_value {
--	refcount_t refcnt;
--	enum bpf_struct_ops_state state;
--};
--#define BPF_STRUCT_OPS_COMMON_VALUE struct bpf_struct_ops_common_value common
--
- struct bpf_struct_ops_value {
- 	BPF_STRUCT_OPS_COMMON_VALUE;
- 	char data[] ____cacheline_aligned_in_smp;
-@@ -72,35 +59,6 @@ static DEFINE_MUTEX(update_mutex);
- #define VALUE_PREFIX "bpf_struct_ops_"
- #define VALUE_PREFIX_LEN (sizeof(VALUE_PREFIX) - 1)
- 
--/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
-- * the map's value exposed to the userspace and its btf-type-id is
-- * stored at the map->btf_vmlinux_value_type_id.
-- *
-- */
--#define BPF_STRUCT_OPS_TYPE(_name)				\
--extern struct bpf_struct_ops bpf_##_name;			\
--								\
--struct bpf_struct_ops_##_name {						\
--	BPF_STRUCT_OPS_COMMON_VALUE;				\
--	struct _name data ____cacheline_aligned_in_smp;		\
--};
--#include "bpf_struct_ops_types.h"
--#undef BPF_STRUCT_OPS_TYPE
--
--enum {
--#define BPF_STRUCT_OPS_TYPE(_name) BPF_STRUCT_OPS_TYPE_##_name,
--#include "bpf_struct_ops_types.h"
--#undef BPF_STRUCT_OPS_TYPE
--	__NR_BPF_STRUCT_OPS_TYPE,
--};
--
--static struct bpf_struct_ops * const bpf_struct_ops[] = {
--#define BPF_STRUCT_OPS_TYPE(_name)				\
--	[BPF_STRUCT_OPS_TYPE_##_name] = &bpf_##_name,
--#include "bpf_struct_ops_types.h"
--#undef BPF_STRUCT_OPS_TYPE
--};
--
- const struct bpf_verifier_ops bpf_struct_ops_verifier_ops = {
- };
- 
-@@ -234,16 +192,51 @@ static void bpf_struct_ops_init_one(struct bpf_struct_ops *st_ops,
- 
- }
- 
-+static int register_bpf_struct_ops_btf(struct bpf_struct_ops *st_ops,
-+				       struct btf *btf)
-+{
-+	struct bpf_verifier_log *log;
-+	int err;
-+
-+	if (st_ops == NULL)
-+		return -EINVAL;
-+
-+	log = kzalloc(sizeof(*log), GFP_KERNEL | __GFP_NOWARN);
-+	if (!log) {
-+		err = -ENOMEM;
-+		goto errout;
-+	}
-+
-+	log->level = BPF_LOG_KERNEL;
-+
-+	bpf_struct_ops_init_one(st_ops, btf, st_ops->owner, log);
-+
-+	err = btf_add_struct_ops(st_ops);
-+
-+errout:
-+	kfree(log);
-+
-+	return err;
-+}
-+
-+int register_bpf_struct_ops(struct bpf_struct_ops *st_ops)
-+{
-+	struct btf *btf;
-+	int err;
-+
-+	btf = btf_get_module_btf(st_ops->owner);
-+	if (!btf)
-+		return -EINVAL;
-+	err = register_bpf_struct_ops_btf(st_ops, btf);
-+	btf_put(btf);
-+
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(register_bpf_struct_ops);
-+
- void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log)
- {
--	struct bpf_struct_ops *st_ops;
- 	s32 module_id, common_value_id;
--	u32 i;
--
--	/* Ensure BTF type is emitted for "struct bpf_struct_ops_##_name" */
--#define BPF_STRUCT_OPS_TYPE(_name) BTF_TYPE_EMIT(struct bpf_struct_ops_##_name);
--#include "bpf_struct_ops_types.h"
--#undef BPF_STRUCT_OPS_TYPE
- 
- 	module_id = btf_find_by_name_kind(btf, "module", BTF_KIND_STRUCT);
- 	if (module_id < 0) {
-@@ -259,11 +252,6 @@ void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log)
- 		return;
- 	}
- 	common_value_type = btf_type_by_id(btf, common_value_id);
--
--	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
--		st_ops = bpf_struct_ops[i];
--		bpf_struct_ops_init_one(st_ops, btf, NULL, log);
--	}
- }
- 
- extern struct btf *btf_vmlinux;
-@@ -271,32 +259,44 @@ extern struct btf *btf_vmlinux;
- static const struct bpf_struct_ops *
- bpf_struct_ops_find_value(struct btf *btf, u32 value_id)
- {
-+	const struct bpf_struct_ops *st_ops = NULL;
-+	const struct bpf_struct_ops **st_ops_list;
- 	unsigned int i;
-+	u32 cnt = 0;
- 
- 	if (!value_id || !btf_vmlinux)
- 		return NULL;
- 
--	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
--		if (bpf_struct_ops[i]->value_id == value_id)
--			return bpf_struct_ops[i];
-+	st_ops_list = btf_get_struct_ops(btf, &cnt);
-+	for (i = 0; i < cnt; i++) {
-+		if (st_ops_list[i]->value_id == value_id) {
-+			st_ops = st_ops_list[i];
-+			break;
-+		}
- 	}
- 
--	return NULL;
-+	return st_ops;
- }
- 
- const struct bpf_struct_ops *bpf_struct_ops_find(struct btf *btf, u32 type_id)
- {
-+	const struct bpf_struct_ops *st_ops = NULL;
-+	const struct bpf_struct_ops **st_ops_list;
- 	unsigned int i;
-+	u32 cnt;
- 
- 	if (!type_id || !btf_vmlinux)
- 		return NULL;
- 
--	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
--		if (bpf_struct_ops[i]->type_id == type_id)
--			return bpf_struct_ops[i];
-+	st_ops_list = btf_get_struct_ops(btf, &cnt);
-+	for (i = 0; i < cnt; i++) {
-+		if (st_ops_list[i]->type_id == type_id) {
-+			st_ops = st_ops_list[i];
-+			break;
-+		}
- 	}
- 
--	return NULL;
-+	return st_ops;
- }
- 
- static int bpf_struct_ops_map_get_next_key(struct bpf_map *map, void *key,
-diff --git a/kernel/bpf/bpf_struct_ops_types.h b/kernel/bpf/bpf_struct_ops_types.h
-deleted file mode 100644
-index 5678a9ddf817..000000000000
---- a/kernel/bpf/bpf_struct_ops_types.h
-+++ /dev/null
-@@ -1,12 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--/* internal file - do not include directly */
--
--#ifdef CONFIG_BPF_JIT
--#ifdef CONFIG_NET
--BPF_STRUCT_OPS_TYPE(bpf_dummy_ops)
--#endif
--#ifdef CONFIG_INET
--#include <net/tcp.h>
--BPF_STRUCT_OPS_TYPE(tcp_congestion_ops)
--#endif
--#endif
-diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-index be5144dbb53d..990973d6057d 100644
---- a/kernel/bpf/btf.c
-+++ b/kernel/bpf/btf.c
-@@ -7532,7 +7532,7 @@ struct module *btf_try_get_module(const struct btf *btf)
- /* Returns struct btf corresponding to the struct module.
-  * This function can return NULL or ERR_PTR.
-  */
--static struct btf *btf_get_module_btf(const struct module *module)
-+struct btf *btf_get_module_btf(const struct module *module)
- {
- #ifdef CONFIG_DEBUG_INFO_BTF_MODULES
- 	struct btf_module *btf_mod, *tmp;
-diff --git a/net/bpf/bpf_dummy_struct_ops.c b/net/bpf/bpf_dummy_struct_ops.c
-index 5918d1b32e19..724bb7224079 100644
---- a/net/bpf/bpf_dummy_struct_ops.c
-+++ b/net/bpf/bpf_dummy_struct_ops.c
-@@ -7,7 +7,7 @@
- #include <linux/bpf.h>
- #include <linux/btf.h>
- 
--extern struct bpf_struct_ops bpf_bpf_dummy_ops;
-+static struct bpf_struct_ops bpf_bpf_dummy_ops;
- 
- /* A common type for test_N with return value in bpf_dummy_ops */
- typedef int (*dummy_ops_test_ret_fn)(struct bpf_dummy_ops_state *state, ...);
-@@ -216,11 +216,13 @@ static int bpf_dummy_reg(void *kdata)
- 	return -EOPNOTSUPP;
- }
- 
-+DEFINE_STRUCT_OPS_VALUE_TYPE(bpf_dummy_ops);
-+
- static void bpf_dummy_unreg(void *kdata)
- {
- }
- 
--struct bpf_struct_ops bpf_bpf_dummy_ops = {
-+static struct bpf_struct_ops bpf_bpf_dummy_ops = {
- 	.verifier_ops = &bpf_dummy_verifier_ops,
- 	.init = bpf_dummy_init,
- 	.check_member = bpf_dummy_ops_check_member,
-@@ -228,4 +230,12 @@ struct bpf_struct_ops bpf_bpf_dummy_ops = {
- 	.reg = bpf_dummy_reg,
- 	.unreg = bpf_dummy_unreg,
- 	.name = "bpf_dummy_ops",
-+	.owner = THIS_MODULE,
- };
-+
-+static int __init bpf_dummy_struct_ops_init(void)
-+{
-+	BTF_STRUCT_OPS_TYPE_EMIT(bpf_dummy_ops);
-+	return register_bpf_struct_ops(&bpf_bpf_dummy_ops);
-+}
-+late_initcall(bpf_dummy_struct_ops_init);
-diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
-index 39dcccf0f174..20c401c73dfb 100644
---- a/net/ipv4/bpf_tcp_ca.c
-+++ b/net/ipv4/bpf_tcp_ca.c
-@@ -12,7 +12,7 @@
- #include <net/bpf_sk_storage.h>
- 
- /* "extern" is to avoid sparse warning.  It is only used in bpf_struct_ops.c. */
--extern struct bpf_struct_ops bpf_tcp_congestion_ops;
-+static struct bpf_struct_ops bpf_tcp_congestion_ops;
- 
- static u32 unsupported_ops[] = {
- 	offsetof(struct tcp_congestion_ops, get_info),
-@@ -271,7 +271,9 @@ static int bpf_tcp_ca_validate(void *kdata)
- 	return tcp_validate_congestion_control(kdata);
- }
- 
--struct bpf_struct_ops bpf_tcp_congestion_ops = {
-+DEFINE_STRUCT_OPS_VALUE_TYPE(tcp_congestion_ops);
-+
-+static struct bpf_struct_ops bpf_tcp_congestion_ops = {
- 	.verifier_ops = &bpf_tcp_ca_verifier_ops,
- 	.reg = bpf_tcp_ca_reg,
- 	.unreg = bpf_tcp_ca_unreg,
-@@ -281,10 +283,18 @@ struct bpf_struct_ops bpf_tcp_congestion_ops = {
- 	.init = bpf_tcp_ca_init,
- 	.validate = bpf_tcp_ca_validate,
- 	.name = "tcp_congestion_ops",
-+	.owner = THIS_MODULE,
- };
- 
- static int __init bpf_tcp_ca_kfunc_init(void)
- {
--	return register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_tcp_ca_kfunc_set);
-+	int ret;
-+
-+	BTF_STRUCT_OPS_TYPE_EMIT(tcp_congestion_ops);
-+
-+	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_tcp_ca_kfunc_set);
-+	ret = ret ?: register_bpf_struct_ops(&bpf_tcp_congestion_ops);
-+
-+	return ret;
- }
- late_initcall(bpf_tcp_ca_kfunc_init);
--- 
-2.34.1
+ 	/* msstab[mssind]; does not compile ... */
+-	skops->replylong[0] = msstab[3];
++	skops->replylong[0] = msstab[mssind];
+ 	skops->replylong[1] = skops->args[0] & (BPF_SYNCOOKIE_ECN |
+ 						BPF_SYNCOOKIE_SACK |
+ 						BPF_SYNCOOKIE_WSCALE_MASK);
+---8<---
 
+
+> 
+> 
+> I cannot compile the patch in my environment as-is also:
+> 
+> In file included from progs/test_tcp_syncookie.c:6:
+> In file included from 
+> /data/users/kafai/fb-kernel/linux/tools/include/uapi/linux/tcp.h:22:
+> In file included from /usr/include/asm/byteorder.h:5:
+> In file included from /usr/include/linux/byteorder/little_endian.h:13:
+> /usr/include/linux/swab.h:136:8: error: unknown type name '__always_inline'
+>    136 | static __always_inline unsigned long __swab(const unsigned long y)
+> 
+> I have to add a "#include <linux/stddef.h>".
+
+Will add it in v2.
+
+
+> 
+> 
+> >      GEN-SKEL [test_progs-no_alu32] test_tcp_syncookie.skel.h
+> >    make: *** [Makefile:603: /home/ec2-user/kernel/bpf_syncookie/tools/testing/selftests/bpf/test_tcp_syncookie.skel.h] Error 254
+> >    make: *** Deleting file '/home/ec2-user/kernel/bpf_syncookie/tools/testing/selftests/bpf/test_tcp_syncookie.skel.h'
+> >    make: *** Waiting for unfinished jobs....
 
