@@ -1,108 +1,262 @@
-Return-Path: <netdev+bounces-41826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A80A7CBF97
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:39:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52B117CBF99
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:39:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E6DF1F22CD2
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:39:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D259C1F22CC3
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91DA7405CA;
-	Tue, 17 Oct 2023 09:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15FD4405D3;
+	Tue, 17 Oct 2023 09:39:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="TJjwdefh"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="Mmrwmd8N"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31EA13F4BA
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:39:02 +0000 (UTC)
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88EABA2
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:39:01 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-32d8c2c6dfdso5240768f8f.1
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:39:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1697535540; x=1698140340; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WH7IhoHXk5YN5o7LNnUnU58viq6fOsGDKs+rY61D/ls=;
-        b=TJjwdefhmjLS/DTC1kau/Ya5pMbNvUI0+gOZzS5gxW0vgqWn6AcwpGVk0n228MAY7A
-         7jLPK4m8jR5iV9SN/vZWjneg9xWiD7agvMtT6ztNSd+zuGfBF3zT3mIJHzeUBnfs8jdW
-         nHCiPTKzBH3H2axgcwQMMviSGTPbwC4Qkd5DZqL9wrTCoLmE4dpbJev3PaHCGme0HyXy
-         3zN29o1khkxJq+qOC8kSMKGvzVdjXth31DAVFIcV0s7ESxUWVE8m8xgsis+N0LCwCW62
-         emnFlB9YK3Dd+Y2mFDWrtLnElpKb6xMgpMY4khiSBzLSKZlYSuWHhchYYiKlk33HbGQG
-         IXnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697535540; x=1698140340;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WH7IhoHXk5YN5o7LNnUnU58viq6fOsGDKs+rY61D/ls=;
-        b=IJBK2XkGZkNuzDnalsAWn6xIelXTXlyF9jUVDxifhTBqA0oCUjtz3qybHycqI8DlMN
-         KtbBCN0XlVkBydaerMfMJ79Zd2h7QnD6fRyp1hgmGSavmcRgC9hW0kS7dj0L9F5oux/W
-         UVdn9zbtslfLyqTIs6pkcIIVHjKUHcbnyKm8WCYIjOW1r+gb4t8zOsVGEl33e3a8B7FJ
-         XDBENkiS8mK1c+Ngizn6zpaVU34LfLw96I6oOR/9Y5py4cavhOTR/mRBqeFK8eAFo0b7
-         AcOkT8VAt5DjGFol7uUsZHITj415n0BO35pkSgfG5pKDgex056d8ObHOFwKvwwHNB+0M
-         Y+pg==
-X-Gm-Message-State: AOJu0YxDCtRbrberNHRmtsxAsxzFD6pxWaKE8t7mqDCwsbHUXwfwNHkE
-	sR766DU75Ka7pecJyViTkI3DiA==
-X-Google-Smtp-Source: AGHT+IGY0xxEYv0+mdSkzmkeVTYAiUsHOmpYlfBWk54yMdhP3nRJYssTTqjYlSA5wlWwh1WBEJrT+Q==
-X-Received: by 2002:adf:f608:0:b0:32d:b2dd:ee1c with SMTP id t8-20020adff608000000b0032db2ddee1cmr1520576wrp.5.1697535540041;
-        Tue, 17 Oct 2023 02:39:00 -0700 (PDT)
-Received: from [192.168.0.106] (haunt.prize.volia.net. [93.72.109.136])
-        by smtp.gmail.com with ESMTPSA id o14-20020a5d62ce000000b0031779a6b451sm1258716wrv.83.2023.10.17.02.38.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Oct 2023 02:38:59 -0700 (PDT)
-Message-ID: <443e62da-342d-620f-27df-4af0bd1f0e31@blackwall.org>
-Date: Tue, 17 Oct 2023 12:38:58 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ECFB3F4BA
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:39:16 +0000 (UTC)
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [IPv6:2001:41d0:e:133a::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A46B011A;
+	Tue, 17 Oct 2023 02:39:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=ML44Fb1WqO6BSc+1qTVe1pdjfiswW3uaeburkbZxk40=; b=Mmrwmd8NlEjCUMcRI0L5WUIEfU
+	JkwXrz6h+WCxfjMtH+IGoV4MY+2KYbFn788M68NUHZmgFHM+T1Rm6i5tXFliWtvoL9FpWzs32RuCD
+	cnX5A/Mk/1Ii3xn+GQ2j4eQxdyefliPrPcpxad1hoaUEC/qaKa71eWJveYPLBmpH3XmfcJXwySHK+
+	rs/xhBPNW4//gUMGOId+uzR+0PkDrKiPorhxs/P/ZI41S7yV9AsiFpQ739Fhc3QZbpPRQ6yuK3D0c
+	EflrPfP4aCgN2Y56ZiWH3+JInfJJ+eawbFoScEwzNg5IwfQk5ai6HcCmZ8/vJdMMyJHT/Udff+s5E
+	JQZyxyug==;
+Received: from localhost ([::1] helo=xic)
+	by orbyte.nwl.cc with esmtp (Exim 4.94.2)
+	(envelope-from <phil@nwl.cc>)
+	id 1qsgXe-0008Jt-EM; Tue, 17 Oct 2023 11:39:10 +0200
+From: Phil Sutter <phil@nwl.cc>
+To: David Miller <davem@davemloft.net>
+Cc: netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	Florian Westphal <fw@strlen.de>,
+	Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: [net-next PATCH v2] net: skb_find_text: Ignore patterns extending past 'to'
+Date: Tue, 17 Oct 2023 11:39:06 +0200
+Message-ID: <20231017093906.26310-1-phil@nwl.cc>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH iproute2-next 6/8] bridge: fdb: support match on
- destination IP in flush command
-Content-Language: en-US
-To: Amit Cohen <amcohen@nvidia.com>, netdev@vger.kernel.org
-Cc: dsahern@gmail.com, stephen@networkplumber.org, mlxsw@nvidia.com,
- roopa@nvidia.com
-References: <20231017070227.3560105-1-amcohen@nvidia.com>
- <20231017070227.3560105-7-amcohen@nvidia.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20231017070227.3560105-7-amcohen@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/17/23 10:02, Amit Cohen wrote:
-> Extend "fdb flush" command to match fdb entries with a specific destination
-> IP.
-> 
-> Example:
-> $ bridge fdb flush dev vx10 dst 192.1.1.1
-> This will flush all fdb entries pointing to vx10 with destination IP
-> 192.1.1.1
-> 
-> Signed-off-by: Amit Cohen <amcohen@nvidia.com>
-> ---
->   bridge/fdb.c      | 14 ++++++++++++--
->   man/man8/bridge.8 |  8 ++++++++
->   2 files changed, 20 insertions(+), 2 deletions(-)
-> 
+Assume that caller's 'to' offset really represents an upper boundary for
+the pattern search, so patterns extending past this offset are to be
+rejected.
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+The old behaviour also was kind of inconsistent when it comes to
+fragmentation (or otherwise non-linear skbs): If the pattern started in
+between 'to' and 'from' offsets but extended to the next fragment, it
+was not found if 'to' offset was still within the current fragment.
 
+Test the new behaviour in a kselftest using iptables' string match.
+
+Suggested-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Fixes: f72b948dcbb8 ("[NET]: skb_find_text ignores to argument")
+Signed-off-by: Phil Sutter <phil@nwl.cc>
+---
+Changes since v1:
+- Hook test into respective Makefile
+- Reduce checkpatch.pl output by "fixing" Fixes: tag ref to 12 chars of
+  hash from 13
+---
+ net/core/skbuff.c                             |   3 +-
+ tools/testing/selftests/netfilter/Makefile    |   2 +-
+ .../testing/selftests/netfilter/xt_string.sh  | 128 ++++++++++++++++++
+ 3 files changed, 131 insertions(+), 2 deletions(-)
+ create mode 100755 tools/testing/selftests/netfilter/xt_string.sh
+
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 0401f40973a5..975c9a6ffb4a 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4267,6 +4267,7 @@ static void skb_ts_finish(struct ts_config *conf, struct ts_state *state)
+ unsigned int skb_find_text(struct sk_buff *skb, unsigned int from,
+ 			   unsigned int to, struct ts_config *config)
+ {
++	unsigned int patlen = config->ops->get_pattern_len(config);
+ 	struct ts_state state;
+ 	unsigned int ret;
+ 
+@@ -4278,7 +4279,7 @@ unsigned int skb_find_text(struct sk_buff *skb, unsigned int from,
+ 	skb_prepare_seq_read(skb, from, to, TS_SKB_CB(&state));
+ 
+ 	ret = textsearch_find(config, &state);
+-	return (ret <= to - from ? ret : UINT_MAX);
++	return (ret + patlen <= to - from ? ret : UINT_MAX);
+ }
+ EXPORT_SYMBOL(skb_find_text);
+ 
+diff --git a/tools/testing/selftests/netfilter/Makefile b/tools/testing/selftests/netfilter/Makefile
+index ef90aca4cc96..bced422b78f7 100644
+--- a/tools/testing/selftests/netfilter/Makefile
++++ b/tools/testing/selftests/netfilter/Makefile
+@@ -7,7 +7,7 @@ TEST_PROGS := nft_trans_stress.sh nft_fib.sh nft_nat.sh bridge_brouter.sh \
+ 	nft_queue.sh nft_meta.sh nf_nat_edemux.sh \
+ 	ipip-conntrack-mtu.sh conntrack_tcp_unreplied.sh \
+ 	conntrack_vrf.sh nft_synproxy.sh rpath.sh nft_audit.sh \
+-	conntrack_sctp_collision.sh
++	conntrack_sctp_collision.sh xt_string.sh
+ 
+ HOSTPKG_CONFIG := pkg-config
+ 
+diff --git a/tools/testing/selftests/netfilter/xt_string.sh b/tools/testing/selftests/netfilter/xt_string.sh
+new file mode 100755
+index 000000000000..1802653a4728
+--- /dev/null
++++ b/tools/testing/selftests/netfilter/xt_string.sh
+@@ -0,0 +1,128 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++# return code to signal skipped test
++ksft_skip=4
++rc=0
++
++if ! iptables --version >/dev/null 2>&1; then
++	echo "SKIP: Test needs iptables"
++	exit $ksft_skip
++fi
++if ! ip -V >/dev/null 2>&1; then
++	echo "SKIP: Test needs iproute2"
++	exit $ksft_skip
++fi
++if ! nc -h >/dev/null 2>&1; then
++	echo "SKIP: Test needs netcat"
++	exit $ksft_skip
++fi
++
++pattern="foo bar baz"
++patlen=11
++hdrlen=$((20 + 8)) # IPv4 + UDP
++ns="ns-$(mktemp -u XXXXXXXX)"
++trap 'ip netns del $ns' EXIT
++ip netns add "$ns"
++ip -net "$ns" link add d0 type dummy
++ip -net "$ns" link set d0 up
++ip -net "$ns" addr add 10.1.2.1/24 dev d0
++
++#ip netns exec "$ns" tcpdump -npXi d0 &
++#tcpdump_pid=$!
++#trap 'kill $tcpdump_pid; ip netns del $ns' EXIT
++
++add_rule() { # (alg, from, to)
++	ip netns exec "$ns" \
++		iptables -A OUTPUT -o d0 -m string \
++			--string "$pattern" --algo $1 --from $2 --to $3
++}
++showrules() { # ()
++	ip netns exec "$ns" iptables -v -S OUTPUT | grep '^-A'
++}
++zerorules() {
++	ip netns exec "$ns" iptables -Z OUTPUT
++}
++countrule() { # (pattern)
++	showrules | grep -c -- "$*"
++}
++send() { # (offset)
++	( for ((i = 0; i < $1 - $hdrlen; i++)); do
++		printf " "
++	  done
++	  printf "$pattern"
++	) | ip netns exec "$ns" nc -w 1 -u 10.1.2.2 27374
++}
++
++add_rule bm 1000 1500
++add_rule bm 1400 1600
++add_rule kmp 1000 1500
++add_rule kmp 1400 1600
++
++zerorules
++send 0
++send $((1000 - $patlen))
++if [ $(countrule -c 0 0) -ne 4 ]; then
++	echo "FAIL: rules match data before --from"
++	showrules
++	((rc--))
++fi
++
++zerorules
++send 1000
++send $((1400 - $patlen))
++if [ $(countrule -c 2) -ne 2 ]; then
++	echo "FAIL: only two rules should match at low offset"
++	showrules
++	((rc--))
++fi
++
++zerorules
++send $((1500 - $patlen))
++if [ $(countrule -c 1) -ne 4 ]; then
++	echo "FAIL: all rules should match at end of packet"
++	showrules
++	((rc--))
++fi
++
++zerorules
++send 1495
++if [ $(countrule -c 1) -ne 1 ]; then
++	echo "FAIL: only kmp with proper --to should match pattern spanning fragments"
++	showrules
++	((rc--))
++fi
++
++zerorules
++send 1500
++if [ $(countrule -c 1) -ne 2 ]; then
++	echo "FAIL: two rules should match pattern at start of second fragment"
++	showrules
++	((rc--))
++fi
++
++zerorules
++send $((1600 - $patlen))
++if [ $(countrule -c 1) -ne 2 ]; then
++	echo "FAIL: two rules should match pattern at end of largest --to"
++	showrules
++	((rc--))
++fi
++
++zerorules
++send $((1600 - $patlen + 1))
++if [ $(countrule -c 1) -ne 0 ]; then
++	echo "FAIL: no rules should match pattern extending largest --to"
++	showrules
++	((rc--))
++fi
++
++zerorules
++send 1600
++if [ $(countrule -c 1) -ne 0 ]; then
++	echo "FAIL: no rule should match pattern past largest --to"
++	showrules
++	((rc--))
++fi
++
++exit $rc
+-- 
+2.41.0
 
 
