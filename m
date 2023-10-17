@@ -1,145 +1,98 @@
-Return-Path: <netdev+bounces-41672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B40547CB96C
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 05:49:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33AE57CB987
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 06:10:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53DD3B20EA9
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 03:49:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEF442816C0
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 04:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B597BE4E;
-	Tue, 17 Oct 2023 03:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC5B8F47;
+	Tue, 17 Oct 2023 04:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhBclQ0d"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9251FD5
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 03:49:11 +0000 (UTC)
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A67BE83;
-	Mon, 16 Oct 2023 20:49:09 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0VuLP0Gd_1697514545;
-Received: from 30.221.128.209(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VuLP0Gd_1697514545)
-          by smtp.aliyun-inc.com;
-          Tue, 17 Oct 2023 11:49:06 +0800
-Message-ID: <49847786-9914-b615-56d6-f39fbc6e03c2@linux.alibaba.com>
-Date: Tue, 17 Oct 2023 11:49:04 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA3A1FD5;
+	Tue, 17 Oct 2023 04:10:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 63058C433C9;
+	Tue, 17 Oct 2023 04:10:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697515835;
+	bh=lQAc0M6wyDc260gsVnZP65MqVVRlE4I8/AoGwjKnMNY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=uhBclQ0dI0ivJwnZ3PAiWJPwa9irt4jB3y4VhfKTrwrniIo5Jcwgff+TDzZvP7bv+
+	 +lztTmmLaf6dap7HLbT0KzMa4RMLVLP3tfoewfmCW2TJz54K5S6EE1OdMcjSDkKwF4
+	 VHA8F/kTx9bWuStif47Ab/POnqssGvaZ1mXUSiGsxDrHdVODJw+fVztWKKtUx8sfN0
+	 Q07+xEz5NvtNFJP+kpLOb/6e1SIzXiDDvSEUsibmtu7PtO1eBaFax19wh/9PXSZzVP
+	 BFXxY4N3auHeY3RbxaB6X0skPRmnFfx9TTAj0b4wwTQT5PWPJfK6m0L9H/22sLj4u1
+	 IjYv5p9EQejUQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 264D3C4316B;
+	Tue, 17 Oct 2023 04:10:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v4 00/18] net/smc: implement virtual ISM
- extension and loopback-ism
-From: Wen Gu <guwen@linux.alibaba.com>
-To: Niklas Schnelle <schnelle@linux.ibm.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: wintera@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
- <dcc46fedda57e7e3ade14685ddb262309544ad7e.camel@linux.ibm.com>
- <d04f304b-fe41-09b5-b2a5-5ce0e8254e41@linux.alibaba.com>
-In-Reply-To: <d04f304b-fe41-09b5-b2a5-5ce0e8254e41@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-13.2 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next v11 0/6] introduce page_pool_alloc() related API
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169751583515.29825.863167765608905945.git-patchwork-notify@kernel.org>
+Date: Tue, 17 Oct 2023 04:10:35 +0000
+References: <20231013064827.61135-1-linyunsheng@huawei.com>
+In-Reply-To: <20231013064827.61135-1-linyunsheng@huawei.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 2023/10/8 15:19, Wen Gu wrote:
+On Fri, 13 Oct 2023 14:48:20 +0800 you wrote:
+> In [1] & [2] & [3], there are usecases for veth and virtio_net
+> to use frag support in page pool to reduce memory usage, and it
+> may request different frag size depending on the head/tail
+> room space for xdp_frame/shinfo and mtu/packet size. When the
+> requested frag size is large enough that a single page can not
+> be split into more than one frag, using frag support only have
+> performance penalty because of the extra frag count handling
+> for frag support.
 > 
-> 
-> On 2023/10/5 16:21, Niklas Schnelle wrote:
-> 
->>
->> Hi Wen Gu,
->>
->> I've been trying out your series with iperf3, qperf, and uperf on
->> s390x. I'm using network namespaces with a ConnectX VF from the same
->> card in each namespace for the initial TCP/IP connection i.e. initially
->> it goes out to a real NIC even if that can switch internally. All of
->> these look great for streaming workloads both in terms of performance
->> and stability. With a Connect-Request-Response workload and uperf
->> however I've run into issues. The test configuration I use is as
->> follows:
->>
->> Client Command:
->>
->> # host=$ip_server ip netns exec client smc_run uperf -m tcp_crr.xml
->>
->> Server Command:
->>
->> # ip netns exec server smc_run uperf -s &> /dev/null
->>
->> Uperf tcp_crr.xml:
->>
->> <?xml version="1.0"?>
->> <profile name="TCP_CRR">
->>          <group nthreads="12">
->>                  <transaction duration="120">
->>                          <flowop type="connect" options="remotehost=$host protocol=tcp" />
->>                          <flowop type="write" options="size=200"/>
->>                          <flowop type="read" options="size=1000"/>
->>                          <flowop type="disconnect" />
->>                  </transaction>
->>          </group>
->> </profile>
->>
->> The workload first runs fine but then after about 4 GB of data
->> transferred fails with "Connection refused" and "Connection reset by
->> peer" errors. The failure is not permanent however and re-running
->> the streaming workloads run fine again (with both uperf server and
->> client restarted). So I suspect something gets stuck in either the
->> client or server sockets. The same workload runs fine with TCP/IP of
->> course.
->>
->> Thanks,
->> Niklas
->>
->>
-> 
-> Hi Niklas,
-> 
-> Thank you very much for the test. With the test example you provided, I've
-> reproduced the issue in my VM. And moreover, sometimes the test complains
-> with 'Error saying goodbye with <ip>'
-> 
-> I'll figure out what's going on here.
-> 
-> Thanks!
-> Wen Gu
+> [...]
 
-I think that there is a common issue for SMC-R and SMC-D. I also reproduce
-'connection reset by peer' and 'Error saying goodbye with <ip>' when using
-SMC-R under the same test condition. They occur at the end of the test.
+Here is the summary with links:
+  - [net-next,v11,1/6] page_pool: fragment API support for 32-bit arch with 64-bit DMA
+    https://git.kernel.org/netdev/net-next/c/90de47f020db
+  - [net-next,v11,2/6] page_pool: unify frag_count handling in page_pool_is_last_frag()
+    (no matching commit)
+  - [net-next,v11,3/6] page_pool: remove PP_FLAG_PAGE_FRAG
+    (no matching commit)
+  - [net-next,v11,4/6] page_pool: introduce page_pool[_cache]_alloc() API
+    (no matching commit)
+  - [net-next,v11,5/6] page_pool: update document about fragment API
+    (no matching commit)
+  - [net-next,v11,6/6] net: veth: use newly added page pool API for veth with xdp
+    (no matching commit)
 
-When the uperf test time ends, some signals are sent. At this point there
-are usually some SMC connections doing CLC handshake. I catch some -EINTR(-4)
-in client and -ECONNRESET(-104) in server returned from smc_clc_wait_msg,
-(correspondingly handshake error counts also increase) and TCP RST packets
-sent to terminate the CLC TCP connection(clcsock).
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I am not sure if this should be considered as a bydesign or a bug of SMC.
- From an application perspective, the conn reset behavior only happens when
-using SMC.
 
-@Wenjia, could you please take a look at this?
-
-Thanks,
-Wen Gu
 
