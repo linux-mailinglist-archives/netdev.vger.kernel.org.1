@@ -1,147 +1,208 @@
-Return-Path: <netdev+bounces-42057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 246087CCE54
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 22:42:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E9B67CCE5D
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 22:44:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5438C1C20BD1
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 20:41:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BDAF1C209E1
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 20:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8B42D798;
-	Tue, 17 Oct 2023 20:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5922B2D7B9;
+	Tue, 17 Oct 2023 20:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K0WEzhR2"
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="IxXnZqiO";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="upAsRbHF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF972E402;
-	Tue, 17 Oct 2023 20:41:57 +0000 (UTC)
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C1B992;
-	Tue, 17 Oct 2023 13:41:55 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6be0277c05bso2109119b3a.0;
-        Tue, 17 Oct 2023 13:41:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697575315; x=1698180115; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g2QjUtUne6LmfA+Yc1sbIHWXuOgvtYAgxxHwnssJ0D4=;
-        b=K0WEzhR2QTGtNfP66dLm0yRgkXznos7Ljj9hjm8+wOK9qZ4Qlck2wg3xKJ4Q4fzlpZ
-         XAfBrZaSjMxZiInKr/gt3pTJJ7O1tfMz6GH/adoV9DvJBT0kDi1go7CdwwOv8eu7khew
-         IRDGv3/7k14mc/NDdA01ZUHUU970+qqgfIyUY+ksFOV+OLpQd83VzHH9xY0KjbUjeuzC
-         xson4Zn57p5lFGta3eqY2ev/BL/uUoGw/RC7rpucFuk+XPSWVOHa/7Wifi8G7dzlpKuy
-         PTWjnEjJgOcrTHx5K+7K6jePheNWpV9NthmHsBnvuC5W/iuZj9+Nc4JTIc1qR8RzjWML
-         FMPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697575315; x=1698180115;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g2QjUtUne6LmfA+Yc1sbIHWXuOgvtYAgxxHwnssJ0D4=;
-        b=pO6ybbtrSsScuahn9aBWRpZ7Ke6vjx5OwwAnymXUFEqbwu+/PFQJ0JwAeKd4gJI07C
-         +/GbTdFCOE2qpkFA5Gvig4OOzBingvMd4xBa2GPAJGjuvMUnfUzprfKOKBdUUejOR/HL
-         yJrVndKJDYeAYxpNVur5wvJuScCvQgWrLzB94n7nAGmlinCpo+qLRxyh1+d5xt4NM/6y
-         6QWk1Fw0amKGexNHUoeZPUJkqP1JRR9JeCTbPEGC7AoP+ajfUlC4LCuePKXoDQOxV7Fr
-         N6DLXhiw1wrULKd3nQNrNYzvo9TxZkOLt32z8804Q2iYz2XQqa2N1Kzn0Yo1rOQs9JlG
-         eRlQ==
-X-Gm-Message-State: AOJu0YwW03axfUXpKvnnYVDsQyiNDBFSsFRv4jAdM5y32ZeL/kDt9Eh5
-	YfjezETD4MqL7SwLQQtPF4ECWEke+DtVvo9MSLE=
-X-Google-Smtp-Source: AGHT+IH3uQEast+qVLuY2ClylosZqqA6hbvLCh4rGE/zP/pQWfjFwV2DonPP2EAs13gfBAzP8Z2L1o5+lRxAzEFJyC4=
-X-Received: by 2002:a05:6a21:32a4:b0:17b:43:9ba5 with SMTP id
- yt36-20020a056a2132a400b0017b00439ba5mr2683379pzb.52.1697575314977; Tue, 17
- Oct 2023 13:41:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AD043105
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 20:43:55 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B73792;
+	Tue, 17 Oct 2023 13:43:53 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 274CF60174;
+	Tue, 17 Oct 2023 22:43:49 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1697575429; bh=JUBD9sFg6gvWejh9DwTAaOrqXlxrXwgq3KheNQfZO8I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IxXnZqiOMQYOhBd2Ar0GQ+jYggFnGnghwG8AkKw5qUw/Boi5G8Q6dugd8zxtn7RnR
+	 9GwSu9NHWSKbxEW/FSsMYOhn0e62WsGN/Z+rbY7ckTTHRIwjyscYVI4IzPM9Kr/60D
+	 LLYLufqvkaHAjIlxn55Qrpb5E6UOiQ9yWFZOsUGJCBN/sHK4UiP3o6iEq+uCAVSeg5
+	 f3lFPxy5DmmsiG/tbV3ACO+kiVVnUG6z4FjYpvY2d3H3aLHQrE8fQPMz+eD49Tlgc7
+	 7rUeNItQSnvlZNSyz7YWa1L1lBgToXDCZyfbz8HkLvMVdeVVV/RYNzzCq46CUzMpLx
+	 u5Z0Tc+J+uDJw==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 9gsXl7XC6Y2V; Tue, 17 Oct 2023 22:43:38 +0200 (CEST)
+Received: from [192.168.1.6] (78-0-136-77.adsl.net.t-com.hr [78.0.136.77])
+	by domac.alu.hr (Postfix) with ESMTPSA id 646035FD95;
+	Tue, 17 Oct 2023 22:43:36 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1697575418; bh=JUBD9sFg6gvWejh9DwTAaOrqXlxrXwgq3KheNQfZO8I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=upAsRbHFMNjM4mBoNTk3F/pixfpKaIMm4pFPoXTSkyEnA48BJnwIkHB4AqKK8uait
+	 Gr57NtZMz3YHRZ+E5JNSHSblCeakHJHDkZbbc1hCWDm4qXYjddiKareulvvvlpoG0t
+	 pwyXCOuMQoDpP6TghxVs+aWCbyID518txf+XFAWglcY3Ss81aFZejyFEcuijnCtvj3
+	 nCapve3ZyZz/nD601EZUurEj1BOEAewo9khbHk8nhT7kyeQWFE6ZqTi9T3TWmYAvn8
+	 7zgaFiQ7qRG9EceSZlKaTYiBkc/aqaciWXoE5kT2y3NyUaxrZi2WBeDH9bvpOVRLo7
+	 lFGwFw5CePjKQ==
+Message-ID: <992dcaf7-2b24-4e91-8c69-a5471da209ae@alu.unizg.hr>
+Date: Tue, 17 Oct 2023 22:43:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016154937.41224-1-ahmed.zaki@intel.com> <20231016154937.41224-2-ahmed.zaki@intel.com>
- <8d1b1494cfd733530be887806385cde70e077ed1.camel@gmail.com>
- <26812a57-bdd8-4a39-8dd2-b0ebcfd1073e@intel.com> <CAKgT0Ud7JjUiE32jJbMbBGVexrndSCepG54PcGYWHJ+OC9pOtQ@mail.gmail.com>
- <14feb89d-7b4a-40c5-8983-5ef331953224@intel.com> <CAKgT0UfcT5cEDRBzCxU9UrQzbBEgFt89vJZjz8Tow=yAfEYERw@mail.gmail.com>
- <20231016163059.23799429@kernel.org> <CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
- <20231017131727.78e96449@kernel.org>
-In-Reply-To: <20231017131727.78e96449@kernel.org>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 17 Oct 2023 13:41:18 -0700
-Message-ID: <CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/6] net: ethtool: allow symmetric-xor RSS
- hash for any flow type
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org, corbet@lwn.net, jesse.brandeburg@intel.com, 
-	anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, vladimir.oltean@nxp.com, andrew@lunn.ch, horms@kernel.org, 
-	mkubecek@suse.cz, willemdebruijn.kernel@gmail.com, linux-doc@vger.kernel.org, 
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] r8169: fix the KCSAN reported data-race in rtl_tx
+ while reading TxDescArray[entry].opts1
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nic_swsd@realtek.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Marco Elver <elver@google.com>
+References: <20231016214753.175097-1-mirsad.todorovac@alu.unizg.hr>
+ <20231016214753.175097-3-mirsad.todorovac@alu.unizg.hr>
+ <20231017200138.GB1940501@kernel.org>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <20231017200138.GB1940501@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 1:17=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 17 Oct 2023 11:37:52 -0700 Alexander Duyck wrote:
-> > > Algo is also a bit confusing, it's more like key pre-processing?
-> > > There's nothing toeplitz about xoring input fields. Works as well
-> > > for CRC32.. or XOR.
-> >
-> > I agree that the change to the algorithm doesn't necessarily have
-> > anything to do with toeplitz, however it is still a change to the
-> > algorithm by performing the extra XOR on the inputs prior to
-> > processing. That is why I figured it might make sense to just add a
-> > new hfunc value that would mean toeplitz w/ symmetric XOR.
->
-> XOR is just one form of achieving symmetric hashing, sorting is another.
+On 10/17/23 22:01, Simon Horman wrote:
+> On Mon, Oct 16, 2023 at 11:47:56PM +0200, Mirsad Goran Todorovac wrote:
+>> KCSAN reported the following data-race:
+>>
+>> ==================================================================
+>> BUG: KCSAN: data-race in rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4368 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
+>>
+>> race at unknown origin, with read to 0xffff888140d37570 of 4 bytes by interrupt on cpu 21:
+>> rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4368 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
+>> __napi_poll (net/core/dev.c:6527)
+>> net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
+>> __do_softirq (kernel/softirq.c:553)
+>> __irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
+>> irq_exit_rcu (kernel/softirq.c:647)
+>> sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1074 (discriminator 14))
+>> asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:645)
+>> cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
+>> cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
+>> call_cpuidle (kernel/sched/idle.c:135)
+>> do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
+>> cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
+>> start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:294)
+>> secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
+>>
+>> value changed: 0xb0000042 -> 0x00000000
+>>
+>> Reported by Kernel Concurrency Sanitizer on:
+>> CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kcsan-00143-gb5cbe7c00aa0 #41
+>> Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04/26/2023
+>> ==================================================================
+>>
+>> The read side is in
+>>
+>> drivers/net/ethernet/realtek/r8169_main.c
+>> =========================================
+>>     4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+>>     4356                    int budget)
+>>     4357 {
+>>     4358         unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
+>>     4359         struct sk_buff *skb;
+>>     4360
+>>     4361         dirty_tx = tp->dirty_tx;
+>>     4362
+>>     4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+>>     4364                 unsigned int entry = dirty_tx % NUM_TX_DESC;
+>>     4365                 u32 status;
+>>     4366
+>>   → 4367                 status = le32_to_cpu(tp->TxDescArray[entry].opts1);
+>>     4368                 if (status & DescOwn)
+>>     4369                         break;
+>>     4370
+>>     4371                 skb = tp->tx_skb[entry].skb;
+>>     4372                 rtl8169_unmap_tx_skb(tp, entry);
+>>     4373
+>>     4374                 if (skb) {
+>>     4375                         pkts_compl++;
+>>     4376                         bytes_compl += skb->len;
+>>     4377                         napi_consume_skb(skb, budget);
+>>     4378                 }
+>>     4379                 dirty_tx++;
+>>     4380         }
+>>     4381
+>>     4382         if (tp->dirty_tx != dirty_tx) {
+>>     4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_compl);
+>>     4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
+>>     4385
+>>     4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl, bytes_compl,
+>>     4387                                               rtl_tx_slots_avail(tp),
+>>     4388                                               R8169_TX_START_THRS);
+>>     4389                 /*
+>>     4390                  * 8168 hack: TxPoll requests are lost when the Tx packets are
+>>     4391                  * too close. Let's kick an extra TxPoll request when a burst
+>>     4392                  * of start_xmit activity is detected (if it is not detected,
+>>     4393                  * it is slow enough). -- FR
+>>     4394                  * If skb is NULL then we come here again once a tx irq is
+>>     4395                  * triggered after the last fragment is marked transmitted.
+>>     4396                  */
+>>     4397                 if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+>>     4398                         rtl8169_doorbell(tp);
+>>     4399         }
+>>     4400 }
+>>
+>> tp->TxDescArray[entry].opts1 is reported to have a data-race and READ_ONCE() fixes
+>> this KCSAN warning.
+>>
+>>     4366
+>>   → 4367                 status = le32_to_cpu(READ_ONCE(tp->TxDescArray[entry].opts1));
+>>     4368                 if (status & DescOwn)
+>>     4369                         break;
+>>     4370
+>>
+>> Fixes: ^1da177e4c3f4 ("initial git repository build")
+> 
+> Hi Mirsad,
+> 
+> The fixes tag above seems wrong.
 
-Right, but there are huge algorithmic differences between the two.
-With sorting you don't lose any entropy, whereas with XOR you do. For
-example one side effect of XOR is that for every two hosts on the same
-IP subnet the IP subnets will cancel out. As such with the same key
-192.168.0.1->192.168.0.2 will hash out essentially the same as
-fc::1->fc::2.
+Hi, Simon,
 
-> > > We can use one of the reserved fields of struct ethtool_rxfh to carry
-> > > this extension. I think I asked for this at some point, but there's
-> > > only so much repeated feedback one can send in a day :(
-> >
-> > Why add an extra reserved field when this is just a variant on a hash
-> > function? I view it as not being dissimilar to how we handle TSO or
-> > tx-checksumming. It would make sense to me to just set something like
-> > toeplitz-symmetric-xor to on in order to turn this on.
->
-> It's entirely orthogonal. {sym-XOR, sym-sort} x {toep, crc, xor} -
-> all combinations can work.
->
-> Forget the "is it algo or not algo" question, just purely from data
-> normalization perspective, in terms of the API, if combinations make
-> sense they should be controllable independently.
->
-> https://en.wikipedia.org/wiki/First_normal_form
+It is taken directly from "git blame" as you can check for yourself.
 
-I am thinking of this from a software engineering perspective. This
-symmetric-xor aka simplified-toeplitz is actually much cheaper to
-implement in software than the original. As such I would want it to be
-considered a separate algorithm as I could make use of something like
-that when having to implement RSS in QEMU for instance. Based on
-earlier comments it doesn't change the inputs, it just changes how I
-have to handle the data and the key. It starts reducing things down to
-something like the Intel implementation of Flow Director in terms of
-how the key gets generated and hashed.
+It is supposed to tag the commits prior to the introduction of git.
 
-As far as sorting that is a different can of worms, but I would be
-more open to that being an input specific thing as all it would affect
-is the ordering of the fields, it doesn't impact how I would have to
-handle the key or hash the inputs.
+If you have a better idea how to denote those, I will be happy to learn,
+but I have no better clue than what "git blame" gives ...
+
+Best regards,
+Mirsad Todorovac
+  
+>> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+>> Cc: nic_swsd@realtek.com
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Marco Elver <elver@google.com>
+>> Cc: netdev@vger.kernel.org
+>> Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@alu.unizg.hr/
+>> Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+>> Acked-by: Marco Elver <elver@google.com>
+> 
+> ...
 
