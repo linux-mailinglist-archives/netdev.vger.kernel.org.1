@@ -1,72 +1,118 @@
-Return-Path: <netdev+bounces-41850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B1CE7CC0D7
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:43:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2F427CC111
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:52:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ABAF1C20C0F
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:43:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 763611F22DCD
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59690339B7;
-	Tue, 17 Oct 2023 10:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA3E405DF;
+	Tue, 17 Oct 2023 10:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B5D4174E
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:43:10 +0000 (UTC)
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BACE1FA;
-	Tue, 17 Oct 2023 03:43:08 -0700 (PDT)
-Received: from [78.30.34.192] (port=50662 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1qshXU-004p5p-Hl; Tue, 17 Oct 2023 12:43:06 +0200
-Date: Tue, 17 Oct 2023 12:43:03 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Phil Sutter <phil@nwl.cc>, David Miller <davem@davemloft.net>,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org
-Subject: Re: [net-next PATCH v2] net: skb_find_text: Ignore patterns
- extending past 'to'
-Message-ID: <ZS5lNz5bqMus/K9L@calendula>
-References: <20231017093906.26310-1-phil@nwl.cc>
- <20231017100939.GC10901@breakpoint.cc>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF7C1A5AC
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:52:01 +0000 (UTC)
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5E19A2;
+	Tue, 17 Oct 2023 03:52:00 -0700 (PDT)
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-57b5f0d658dso3262062eaf.0;
+        Tue, 17 Oct 2023 03:52:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697539920; x=1698144720;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fPRdJ+3TN8Zmg5SzFNo5gq2GpoI/z77WwxmQGbYRfiU=;
+        b=RCqn7mNcEeR/kx77+0QRClbUQdwRghnm3reiM25HovHj6plRZ2AbmLNwY4G/zyGvLi
+         khz4IL3OdUqG3oR069pm3jSlMT+yBcVrUytapkExg3lE5nUY/s4XDI2ynt9h8YrvMPEu
+         LNb73icQAvIyHE/nnYDVj1IStwjDbrC3KWMWdskNFiRzeXQ56tnpUSU/GXR+X1p69NQP
+         wn7D7s+C7eO8rD+i8vEGYOhF7gPeq50f+8RSWEilNYU3sGtA6SAorV8EBB9DbEo8lmNz
+         uK5brbmcOGVdDtRHKBFsL0mL6wM2MLCH2ZjPL2VcSPBWVuqFhdg2Dvw0NFOE6v7a3SHC
+         po4w==
+X-Gm-Message-State: AOJu0YxibEjKZbaJgk1UvSyq8CfYVC/F6jPzrYPGp7KdbyUIJydquYGp
+	880p22geTodVlkYOKauMLh2Wcnm7IX5F/A==
+X-Google-Smtp-Source: AGHT+IFd3iKI9wLlTzsJrXCrzBBpHjkhI7rghbba6LFq3K4sgcOrjxFIoH5VkuTuGXIyau3tWf75YQ==
+X-Received: by 2002:a05:6870:2183:b0:1e9:c315:9d66 with SMTP id l3-20020a056870218300b001e9c3159d66mr2032182oae.40.1697539919886;
+        Tue, 17 Oct 2023 03:51:59 -0700 (PDT)
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com. [209.85.210.50])
+        by smtp.gmail.com with ESMTPSA id i2-20020a056830010200b006b9b6aea237sm217009otp.80.2023.10.17.03.51.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 03:51:59 -0700 (PDT)
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-6c4fc2ce697so3863996a34.0;
+        Tue, 17 Oct 2023 03:51:59 -0700 (PDT)
+X-Received: by 2002:a81:4996:0:b0:592:ffc:c787 with SMTP id
+ w144-20020a814996000000b005920ffcc787mr1937845ywa.30.1697539494112; Tue, 17
+ Oct 2023 03:44:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231017100939.GC10901@breakpoint.cc>
-X-Spam-Score: -1.9 (-)
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+References: <20231016054755.915155-1-hch@lst.de> <20231016054755.915155-5-hch@lst.de>
+ <20231016-pantyhose-tall-7565b6b20fb9@wendy> <20231016131745.GB26484@lst.de>
+In-Reply-To: <20231016131745.GB26484@lst.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 17 Oct 2023 12:44:41 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdXVZz=YWMAgzUzme-U3qxYeLdi66xw2CGubpesGy+ZjRw@mail.gmail.com>
+Message-ID: <CAMuHMdXVZz=YWMAgzUzme-U3qxYeLdi66xw2CGubpesGy+ZjRw@mail.gmail.com>
+Subject: Re: [PATCH 04/12] soc: renesas: select RISCV_DMA_NONCOHERENT from ARCH_R9A07G043
+To: Christoph Hellwig <hch@lst.de>
+Cc: Conor Dooley <conor.dooley@microchip.com>, Greg Ungerer <gerg@linux-m68k.org>, 
+	iommu@lists.linux.dev, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, 
+	Magnus Damm <magnus.damm@gmail.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
+	Jim Quinlan <james.quinlan@broadcom.com>, arm-soc <soc@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 12:09:39PM +0200, Florian Westphal wrote:
-> Phil Sutter <phil@nwl.cc> wrote:
-> > Assume that caller's 'to' offset really represents an upper boundary for
-> > the pattern search, so patterns extending past this offset are to be
-> > rejected.
-> > 
-> > The old behaviour also was kind of inconsistent when it comes to
-> > fragmentation (or otherwise non-linear skbs): If the pattern started in
-> > between 'to' and 'from' offsets but extended to the next fragment, it
-> > was not found if 'to' offset was still within the current fragment.
-> > 
-> > Test the new behaviour in a kselftest using iptables' string match.
-> 
-> Reviewed-by: Florian Westphal <fw@strlen.de>
+Hi Christoph,
 
-Reviewed-by: Pablo Neira Ayuso <pablo@netfilter.org>
+On Mon, Oct 16, 2023 at 3:17=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
+e:
+> On Mon, Oct 16, 2023 at 01:52:57PM +0100, Conor Dooley wrote:
+> > > +   select RISCV_DMA_NONCOHERENT
+> > >     select ERRATA_ANDES if RISCV_SBI
+> > >     select ERRATA_ANDES_CMO if ERRATA_ANDES
+> >
+> > Since this Kconfig menu has changed a bit in linux-next, the selects
+> > are unconditional here, and ERRATA_ANDES_CMO will in turn select
+> > RISCV_DMA_NONCOHERENT.
+>
+> Oh, looks like another patch landed there in linux-next.  I had
+> waited for the previous one go go upstream in -rc6.  Not sure
+> how to best handle this conflict.
+
+I think the easiest is to ask soc to apply this series?
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
