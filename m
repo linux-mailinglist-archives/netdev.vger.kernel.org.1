@@ -1,284 +1,511 @@
-Return-Path: <netdev+bounces-41888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F33A7CC1AF
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:19:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFCE97CC1BA
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:28:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD05FB20F25
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:19:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF1E01C208BE
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB6441A9A;
-	Tue, 17 Oct 2023 11:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KROFIqFB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949DB41AA7;
+	Tue, 17 Oct 2023 11:28:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C5838FA7
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:19:09 +0000 (UTC)
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B9AB0
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 04:19:06 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A73711C0007;
-	Tue, 17 Oct 2023 11:19:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1697541545;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TKYjGjM0JAEPXJEzCVicRh6vAQJ2fXUoOnm9PQno80w=;
-	b=KROFIqFBCtxxx2kzUmfQq0dSQQv/TlsHi2jDcdMqhePQBUXgLn0UuLONYJwvGcxIGgM2Tt
-	5+oKgwPXjiOuhY43J+nh1VuBI0u+ROjAmyA0dOPE6Be415SueG+wsnQEVASElWP22J282t
-	jhjIliKKJvEoM+i91FYZJ42UcaTXXRz+EDcx2S99U3Gq2LHbHl8I0h9Q/UKRW0SFA3K2+2
-	ddcskhrHpngBFytvOubWtmehMO0Z8KkqyGwsYFySiWtlUHK37ZvjENwnzlGsfOi3t57nWw
-	1Ry8s1pR3XXQr+4YO1GK/cDIdD1vSbeZSwTmt+B6dT7AKpRbiW+hh3JLyRAevQ==
-Date: Tue, 17 Oct 2023 13:19:01 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Wei Fang
- <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
- <xiaoning.wang@nxp.com>, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, linux-imx@nxp.com, netdev@vger.kernel.org, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, Stephen
- Hemminger <stephen@networkplumber.org>, Alexander Stein
- <alexander.stein@ew.tq-group.com>
-Subject: Re: Ethernet issue on imx6
-Message-ID: <20231017131901.5ae65e4d@xps-13>
-In-Reply-To: <CANn89iLxKQOY5ZA5o3d1y=v4MEAsAQnzmVDjmLY0_bJPG93tKQ@mail.gmail.com>
-References: <20231012193410.3d1812cf@xps-13>
-	<ZShLX/ghL/b1Gbyz@shell.armlinux.org.uk>
-	<20231013104003.260cc2f1@xps-13>
-	<CANn89iKC9apkRG80eBPqsdKEkdawKzGt9EsBRLm61H=4Nn4jQQ@mail.gmail.com>
-	<20231016155858.7af3490b@xps-13>
-	<20231016173652.364997ae@xps-13>
-	<CANn89iLxKQOY5ZA5o3d1y=v4MEAsAQnzmVDjmLY0_bJPG93tKQ@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D479041A93;
+	Tue, 17 Oct 2023 11:28:09 +0000 (UTC)
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A271F0;
+	Tue, 17 Oct 2023 04:28:06 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R941e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VuNedX9_1697542082;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VuNedX9_1697542082)
+          by smtp.aliyun-inc.com;
+          Tue, 17 Oct 2023 19:28:03 +0800
+Message-ID: <1697541581.967358-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v1 00/19] virtio-net: support AF_XDP zero copy
+Date: Tue, 17 Oct 2023 19:19:41 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux-foundation.org,
+ bpf@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>
+References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEs4u-4ch2UAK14hNfKeORjqMu4BX7=46OfaXpvxW+VT7w@mail.gmail.com>
+ <1697511725.2037013-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEskfXDo+bnx5hbGU3JRwOgBRwOC-bYDdFYSmEO2jjgPnA@mail.gmail.com>
+ <1697512950.0813534-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEtppjoX_WAM+vjzkMKaMQQ0iZL=C_xS4RObuoLbm0udUw@mail.gmail.com>
+ <CACGkMEvWAhH3uj2DEo=m7qWg3-pQjE-EtEBvTT8JXzqZ+RYEXQ@mail.gmail.com>
+ <1697522771.0390663-2-xuanzhuo@linux.alibaba.com>
+ <CACGkMEu4tSHd4RVo0zEp1A6uM-6h42y+yAB2xzHTv8SzYdZPXQ@mail.gmail.com>
+ <1697525013.7650406-3-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1697525013.7650406-3-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Hi Eric,
-
-edumazet@google.com wrote on Mon, 16 Oct 2023 21:37:58 +0200:
-
-> On Mon, Oct 16, 2023 at 5:37=E2=80=AFPM Miquel Raynal <miquel.raynal@boot=
-lin.com> wrote:
-> >
-> > Hello again,
-> > =20
-> > > > > # iperf3 -c 192.168.1.1
-> > > > > Connecting to host 192.168.1.1, port 5201
-> > > > > [  5] local 192.168.1.2 port 37948 connected to 192.168.1.1 port =
-5201
-> > > > > [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-> > > > > [  5]   0.00-1.00   sec  11.3 MBytes  94.5 Mbits/sec   43   32.5 =
-KBytes
-> > > > > [  5]   1.00-2.00   sec  3.29 MBytes  27.6 Mbits/sec   26   1.41 =
-KBytes
-> > > > > [  5]   2.00-3.00   sec  0.00 Bytes  0.00 bits/sec    1   1.41 KB=
-ytes
-> > > > > [  5]   3.00-4.00   sec  0.00 Bytes  0.00 bits/sec    0   1.41 KB=
-ytes
-> > > > > [  5]   4.00-5.00   sec  0.00 Bytes  0.00 bits/sec    5   1.41 KB=
-ytes
-> > > > > [  5]   5.00-6.00   sec  0.00 Bytes  0.00 bits/sec    1   1.41 KB=
-ytes
-> > > > > [  5]   6.00-7.00   sec  0.00 Bytes  0.00 bits/sec    1   1.41 KB=
-ytes
-> > > > > [  5]   7.00-8.00   sec  0.00 Bytes  0.00 bits/sec    1   1.41 KB=
-ytes
-> > > > > [  5]   8.00-9.00   sec  0.00 Bytes  0.00 bits/sec    0   1.41 KB=
-ytes
-> > > > > [  5]   9.00-10.00  sec  0.00 Bytes  0.00 bits/sec    0   1.41 KB=
-ytes
+On Tue, 17 Oct 2023 14:43:33 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.com> =
+wrote:
+> On Tue, 17 Oct 2023 14:26:01 +0800, Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > On Tue, Oct 17, 2023 at 2:17=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> > >
+> > > On Tue, 17 Oct 2023 13:27:47 +0800, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > On Tue, Oct 17, 2023 at 11:28=E2=80=AFAM Jason Wang <jasowang@redha=
+t.com> wrote:
 > > > > >
-> > > > > Thanks,
-> > > > > Miqu=C3=A8l =20
+> > > > > On Tue, Oct 17, 2023 at 11:26=E2=80=AFAM Xuan Zhuo <xuanzhuo@linu=
+x.alibaba.com> wrote:
+> > > > > >
+> > > > > > On Tue, 17 Oct 2023 11:20:41 +0800, Jason Wang <jasowang@redhat=
+.com> wrote:
+> > > > > > > On Tue, Oct 17, 2023 at 11:11=E2=80=AFAM Xuan Zhuo <xuanzhuo@=
+linux.alibaba.com> wrote:
+> > > > > > > >
+> > > > > > > > On Tue, 17 Oct 2023 10:53:44 +0800, Jason Wang <jasowang@re=
+dhat.com> wrote:
+> > > > > > > > > On Mon, Oct 16, 2023 at 8:00=E2=80=AFPM Xuan Zhuo <xuanzh=
+uo@linux.alibaba.com> wrote:
+> > > > > > > > > >
+> > > > > > > > > > ## AF_XDP
+> > > > > > > > > >
+> > > > > > > > > > XDP socket(AF_XDP) is an excellent bypass kernel networ=
+k framework. The zero
+> > > > > > > > > > copy feature of xsk (XDP socket) needs to be supported =
+by the driver. The
+> > > > > > > > > > performance of zero copy is very good. mlx5 and intel i=
+xgbe already support
+> > > > > > > > > > this feature, This patch set allows virtio-net to suppo=
+rt xsk's zerocopy xmit
+> > > > > > > > > > feature.
+> > > > > > > > > >
+> > > > > > > > > > At present, we have completed some preparation:
+> > > > > > > > > >
+> > > > > > > > > > 1. vq-reset (virtio spec and kernel code)
+> > > > > > > > > > 2. virtio-core premapped dma
+> > > > > > > > > > 3. virtio-net xdp refactor
+> > > > > > > > > >
+> > > > > > > > > > So it is time for Virtio-Net to complete the support fo=
+r the XDP Socket
+> > > > > > > > > > Zerocopy.
+> > > > > > > > > >
+> > > > > > > > > > Virtio-net can not increase the queue num at will, so x=
+sk shares the queue with
+> > > > > > > > > > kernel.
+> > > > > > > > > >
+> > > > > > > > > > On the other hand, Virtio-Net does not support generate=
+ interrupt from driver
+> > > > > > > > > > manually, so when we wakeup tx xmit, we used some tips.=
+ If the CPU run by TX
+> > > > > > > > > > NAPI last time is other CPUs, use IPI to wake up NAPI o=
+n the remote CPU. If it
+> > > > > > > > > > is also the local CPU, then we wake up napi directly.
+> > > > > > > > > >
+> > > > > > > > > > This patch set includes some refactor to the virtio-net=
+ to let that to support
+> > > > > > > > > > AF_XDP.
+> > > > > > > > > >
+> > > > > > > > > > ## performance
+> > > > > > > > > >
+> > > > > > > > > > ENV: Qemu with vhost-user(polling mode).
+> > > > > > > > > >
+> > > > > > > > > > Sockperf: https://github.com/Mellanox/sockperf
+> > > > > > > > > > I use this tool to send udp packet by kernel syscall.
+> > > > > > > > > >
+> > > > > > > > > > xmit command: sockperf tp -i 10.0.3.1 -t 1000
+> > > > > > > > > >
+> > > > > > > > > > I write a tool that sends udp packets or recvs udp pack=
+ets by AF_XDP.
+> > > > > > > > > >
+> > > > > > > > > >                   | Guest APP CPU |Guest Softirq CPU | =
+UDP PPS
+> > > > > > > > > > ------------------|---------------|------------------|-=
+-----------
+> > > > > > > > > > xmit by syscall   |   100%        |                  | =
+  676,915
+> > > > > > > > > > xmit by xsk       |   59.1%       |   100%           | =
+5,447,168
+> > > > > > > > > > recv by syscall   |   60%         |   100%           | =
+  932,288
+> > > > > > > > > > recv by xsk       |   35.7%       |   100%           | =
+3,343,168
+> > > > > > > > >
+> > > > > > > > > Any chance we can get a testpmd result (which I guess sho=
+uld be better
+> > > > > > > > > than PPS above)?
+> > > > > > > >
+> > > > > > > > Do you mean testpmd + DPDK + AF_XDP?
+> > > > > > >
+> > > > > > > Yes.
+> > > > > > >
+> > > > > > > >
+> > > > > > > > Yes. This is probably better because my tool does more work=
+. That is not a
+> > > > > > > > complete testing tool used by our business.
+> > > > > > >
+> > > > > > > Probably, but it would be appealing for others. Especially co=
+nsidering
+> > > > > > > DPDK supports AF_XDP PMD now.
+> > > > > >
+> > > > > > OK.
+> > > > > >
+> > > > > > Let me try.
+> > > > > >
+> > > > > > But could you start to review firstly?
+> > > > >
+> > > > > Yes, it's in my todo list.
 > > > >
-> > > > Can you experiment with :
-> > > >
-> > > > - Disabling TSO on your NIC (ethtool -K eth0 tso off)
-> > > > - Reducing max GSO size (ip link set dev eth0 gso_max_size 16384)
-> > > >
-> > > > I suspect some kind of issues with fec TX completion, vs TSO emulat=
-ion. =20
+> > > > Speaking too fast, I think if it doesn't take too long time, I would
+> > > > wait for the result first as netdim series. One reason is that I
+> > > > remember claims to be only 10% to 20% loss comparing to wire speed,=
+ so
+> > > > I'd expect it should be much faster. I vaguely remember, even a vho=
+st
+> > > > can gives us more than 3M PPS if we disable SMAP, so the numbers he=
+re
+> > > > are not as impressive as expected.
 > > >
-> > > Wow, appears to have a significant effect. I am using Busybox's iprou=
-te
-> > > implementation which does not know gso_max_size, but I hacked directly
-> > > into netdevice.h just to see if it would have an effect. I'm adding
-> > > iproute2 to the image for further testing.
 > > >
-> > > Here is the diff:
-> > >
-> > > --- a/include/linux/netdevice.h
-> > > +++ b/include/linux/netdevice.h
-> > > @@ -2364,7 +2364,7 @@ struct net_device {
-> > >  /* TCP minimal MSS is 8 (TCP_MIN_GSO_SIZE),
-> > >   * and shinfo->gso_segs is a 16bit field.
-> > >   */
-> > > -#define GSO_MAX_SIZE           (8 * GSO_MAX_SEGS)
-> > > +#define GSO_MAX_SIZE           16384u
-> > >
-> > >         unsigned int            gso_max_size;
-> > >  #define TSO_LEGACY_MAX_SIZE    65536
-> > >
-> > > And here are the results:
-> > >
-> > > # ethtool -K eth0 tso off
-> > > # iperf3 -c 192.168.1.1 -u -b1M
-> > > Connecting to host 192.168.1.1, port 5201
-> > > [  5] local 192.168.1.2 port 50490 connected to 192.168.1.1 port 5201
-> > > [ ID] Interval           Transfer     Bitrate         Total Datagrams
-> > > [  5]   0.00-1.00   sec   123 KBytes  1.01 Mbits/sec  87
-> > > [  5]   1.00-2.00   sec   122 KBytes   996 Kbits/sec  86
-> > > [  5]   2.00-3.00   sec   122 KBytes   996 Kbits/sec  86
-> > > [  5]   3.00-4.00   sec   123 KBytes  1.01 Mbits/sec  87
-> > > [  5]   4.00-5.00   sec   122 KBytes   996 Kbits/sec  86
-> > > [  5]   5.00-6.00   sec   122 KBytes   996 Kbits/sec  86
-> > > [  5]   6.00-7.00   sec   123 KBytes  1.01 Mbits/sec  87
-> > > [  5]   7.00-8.00   sec   122 KBytes   996 Kbits/sec  86
-> > > [  5]   8.00-9.00   sec   122 KBytes   996 Kbits/sec  86
-> > > [  5]   9.00-10.00  sec   123 KBytes  1.01 Mbits/sec  87
-> > > - - - - - - - - - - - - - - - - - - - - - - - - -
-> > > [ ID] Interval           Transfer     Bitrate         Jitter    Lost/=
-Total Datagrams
-> > > [  5]   0.00-10.00  sec  1.19 MBytes  1.00 Mbits/sec  0.000 ms  0/864=
- (0%)  sender
-> > > [  5]   0.00-10.05  sec  1.11 MBytes   925 Kbits/sec  0.045 ms  62/86=
-4 (7.2%)  receiver
-> > > iperf Done.
-> > > # iperf3 -c 192.168.1.1
-> > > Connecting to host 192.168.1.1, port 5201
-> > > [  5] local 192.168.1.2 port 34792 connected to 192.168.1.1 port 5201
-> > > [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-> > > [  5]   0.00-1.00   sec  1.63 MBytes  13.7 Mbits/sec   30   1.41 KByt=
-es
-> > > [  5]   1.00-2.00   sec  7.40 MBytes  62.1 Mbits/sec   65   14.1 KByt=
-es
-> > > [  5]   2.00-3.00   sec  7.83 MBytes  65.7 Mbits/sec  109   2.83 KByt=
-es
-> > > [  5]   3.00-4.00   sec  2.49 MBytes  20.9 Mbits/sec   46   19.8 KByt=
-es
-> > > [  5]   4.00-5.00   sec  7.89 MBytes  66.2 Mbits/sec  109   2.83 KByt=
-es
-> > > [  5]   5.00-6.00   sec   255 KBytes  2.09 Mbits/sec   22   2.83 KByt=
-es
-> > > [  5]   6.00-7.00   sec  4.35 MBytes  36.5 Mbits/sec   74   41.0 KByt=
-es
-> > > [  5]   7.00-8.00   sec  10.9 MBytes  91.8 Mbits/sec   34   45.2 KByt=
-es
-> > > [  5]   8.00-9.00   sec  5.35 MBytes  44.9 Mbits/sec   82   1.41 KByt=
-es
-> > > [  5]   9.00-10.00  sec  1.37 MBytes  11.5 Mbits/sec   73   1.41 KByt=
-es
-> > > - - - - - - - - - - - - - - - - - - - - - - - - -
-> > > [ ID] Interval           Transfer     Bitrate         Retr
-> > > [  5]   0.00-10.00  sec  49.5 MBytes  41.5 Mbits/sec  644            =
- sender
-> > > [  5]   0.00-10.05  sec  49.3 MBytes  41.1 Mbits/sec                 =
- receiver
-> > > iperf Done.
-> > >
-> > > There is still a noticeable amount of drop/retries, but overall the
-> > > results are significantly better. What is the rationale behind the
-> > > choice of 16384 in particular? Could this be further improved? =20
+> > > What is SMAP? Cloud you give me more info?
 > >
-> > Apparently I've been too enthusiastic. After sending this e-mail I've
-> > re-generated an image with iproute2 and dd'ed the whole image into an
-> > SD card, while until now I was just updating the kernel/DT manually and
-> > got the same performances as above without the gro size trick. I need
-> > to clarify this further.
-> > =20
->=20
-> Looking a bit at fec, I think fec_enet_txq_put_hdr_tso() is  bogus...
->=20
-> txq->tso_hdrs should be properly aligned by definition.
->=20
-> If FEC_QUIRK_SWAP_FRAME is requested, better copy the right thing, not
-> original skb->data ???
+> > Supervisor Mode Access Prevention
+> >
+> > Vhost suffers from this.
+> >
+> > >
+> > > So if we think the 3M as the wire speed, you expect the result
+> > > can reach 2.8M pps/core, right?
+> >
+> > It's AF_XDP that claims to be 80% if my memory is correct. So a
+> > correct AF_XDP implementation should not sit behind this too much.
+> >
+> > > Now the recv result is 2.5M(2463646) pps/core.
+> > > Do you think there is a huge gap?
+> >
+> > You never describe your testing environment in details. For example,
+> > is this a virtual environment? What's the CPU model and frequency etc.
+> >
+> > Because I never see a NIC whose wire speed is 3M.
+> >
+> > >
+> > > My tool makes udp packet and lookup route, so it take more much cpu.
+> >
+> > That's why I suggest you to test raw PPS.
+>
+> OK. Let's align some info.
+>
+> 1. My test env is vhost-user. Qemu + vhost-user(polling mode).
+>    I do not use the DPDK, because that there is some trouble for me.
+>    I use the VAPP (https://github.com/fengidri/vapp) as the vhost-user de=
+vice.
+>    That has two threads all are busy mode for tx and rx.
+>    tx thread consumes the tx ring and drop the packet.
+>    rx thread put the packet to the rx ring.
+>
+> 2. My Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
+>
+> 3. From this http://fast.dpdk.org/doc/perf/DPDK_23_03_Intel_virtio_perfor=
+mance_report.pdf
+>    I think we can align that the vhost max speed is 8.5 MPPS.
+>    Is that ok?
+>    And the expected AF_XDP pps is about 6 MPPS.
+>
+> 4. About the raw PPS, I agree that. I will test with testpmd.
+>
 
-I've clarified the situation after looking at the build artifacts and
-going through (way) longer testing sessions, as successive 10-second
-tests can lead to really different results.
+## testpmd command
 
-On a 4.14.322 kernel (still maintained) I really get extremely crappy
-throughput.
+./build/app/dpdk-testpmd -l 1-2 --no-pci --main-lcore=3D2 \
+        --vdev net_af_xdp0,iface=3Dens5,queue_count=3D1,busy_budget=3D0 \
+        --log-level=3Dpmd.net.af_xdp:8 \
+        -- -i -a --nb-cores=3D1 --rxq=3D1 --txq=3D1 --forward-mode=3Dmacswap
 
-On a mainline 6.5 kernel I thought I had a similar issue but this was
-due to wrong RGMII-ID timings being used (I ported the board from 4.14
-to 6.5 and made a mistake). So with the right timings, I get
-much better throughput but still significantly low compared to what I
-would expect.
+## work without the follow patch[0]
 
-So I tested Eric's fixes:
-- TCP fix:
-https://lore.kernel.org/netdev/CANn89iJUBujG2AOBYsr0V7qyC5WTgzx0GucO=3D2ES6=
-9tTDJRziw@mail.gmail.com/
-- FEC fix:
-https://lore.kernel.org/netdev/CANn89iLxKQOY5ZA5o3d1y=3Dv4MEAsAQnzmVDjmLY0_=
-bJPG93tKQ@mail.gmail.com/
-As well as different CPUfreq/CPUidle parameters, as pointed out by
-Alexander:
-https://lore.kernel.org/netdev/2245614.iZASKD2KPV@steina-w/
+testpmd> show port stats all
 
-Here are the results of 100 seconds iperf uplink TCP tests, as reported
-by the receiver. First value is the mean, the raw results are in the '(' ')=
-'.
-Unit: Mbps
+  ######################## NIC statistics for port 0  #####################=
+###
+  RX-packets: 3615824336 RX-missed: 0          RX-bytes:  202486162816
+  RX-errors: 0
+  RX-nombuf:  0
+  TX-packets: 3615795592 TX-errors: 20738      TX-bytes:  202484553152
 
-Default setup:
-CPUidle yes, CPUfreq yes, TCP fix no, FEC fix no: 30.2 (23.8, 28.4, 38.4)
+  Throughput (since last show)
+  Rx-pps:      3790446          Rx-bps:   1698120056
+  Tx-pps:      3790446          Tx-bps:   1698120056
+  #########################################################################=
+###
 
-CPU power management tests (with TCP fix and FEC fix):
-CPUidle yes, CPUfreq yes: 26.5 (24.5, 28.5)
-CPUidle  no, CPUfreq yes: 50.3 (44.8, 55.7)
-CPUidle yes, CPUfreq  no: 80.2 (75.8, 79.5, 80.8, 81.8, 83.1)
-CPUidle  no, CPUfreq  no: 85.4 (80.6, 81.1, 86.2, 87.5, 91.8)
 
-Eric's fixes tests (No CPUidle, no CPUfreq):
-TCP fix yes, FEC fix yes: 85.4 (80.6, 81.1, 86.2, 87.5, 91.8) (same as abov=
-e)
-TCP fix  no, FEC fix yes: 82.0 (74.5, 75.9, 82.2, 87.5, 90.2)
-TCP fix yes, FEC fix  no: 81.4 (77.5, 77.7, 82.8, 83.7, 85.4)
-TCP fix  no, FEC fix  no: 79.6 (68.2, 77.6, 78.9, 86.4, 87.1)
+## work with the follow patch[0]
 
-So indeed the TCP and FEC patches don't seem to have a real impact (or
-a small one, I don't know given how scattered are the results). However
-there is definitely something wrong with the low power settings and I
-believe the Errata pointed by Alexander may have a real impact there
-(ERR006687 ENET: Only the ENET wake-up interrupt request can wake the
-system from Wait mode [i.MX 6Dual/6Quad Only]), probably that my
-hardware lacks the hardware workaround.
+testpmd> show port stats all
 
-I believe the remaining fluctuations are due to the RGMII-ID timings
-not being totally optimal, I think I would need to extend them slightly
-more in the Tx path but they are already set to the maximum value.
-Anyhow, I no longer see any difference in the drop rate between -b1M
-and -b0 (<1%) so I believe it is acceptable like that.
+  ######################## NIC statistics for port 0  #####################=
+###
+  RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
+  RX-errors: 0
+  RX-nombuf:  0
+  TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
 
-Now I might try to track what is missing in 4.14.322 and perhaps ask
-for a backport if it's relevant.
+  Throughput (since last show)
+  Rx-pps:      6333196          Rx-bps:   2837272088
+  Tx-pps:      6333227          Tx-bps:   2837285936
+  #########################################################################=
+###
 
-Thanks a lot for all your feedback,
-Miqu=C3=A8l
+I search the dpdk code that the dpdk virtio driver has the similar code.
+
+virtio_xmit_pkts(void *tx_queue, struct rte_mbuf **tx_pkts, uint16_t nb_pkt=
+s)
+{
+	[...]
+
+	for (nb_tx =3D 0; nb_tx < nb_pkts; nb_tx++) {
+
+		[...]
+
+		/* Enqueue Packet buffers */
+		virtqueue_enqueue_xmit(txvq, txm, slots, use_indirect,
+			can_push, 0);
+	}
+
+	[...]
+
+	if (likely(nb_tx)) {
+-->		vq_update_avail_idx(vq);
+
+		if (unlikely(virtqueue_kick_prepare(vq))) {
+			virtqueue_notify(vq);
+			PMD_TX_LOG(DEBUG, "Notified backend after xmit");
+		}
+	}
+}
+
+## patch[0]
+
+diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+index 51d8f3299c10..cfe556b5d88f 100644
+--- a/drivers/virtio/virtio_ring.c
++++ b/drivers/virtio/virtio_ring.c
+@@ -687,12 +687,7 @@ static inline int virtqueue_add_split(struct virtqueue=
+ *_vq,
+        avail =3D vq->split.avail_idx_shadow & (vq->split.vring.num - 1);
+        vq->split.vring.avail->ring[avail] =3D cpu_to_virtio16(_vq->vdev, h=
+ead);
+
+-       /* Descriptors and available array need to be set before we expose =
+the
+-        * new available array entries. */
+-       virtio_wmb(vq->weak_barriers);
+        vq->split.avail_idx_shadow++;
+-       vq->split.vring.avail->idx =3D cpu_to_virtio16(_vq->vdev,
+-                                               vq->split.avail_idx_shadow);
+        vq->num_added++;
+
+        pr_debug("Added buffer head %i to %p\n", head, vq);
+@@ -700,8 +695,12 @@ static inline int virtqueue_add_split(struct virtqueue=
+ *_vq,
+
+        /* This is very unlikely, but theoretically possible.  Kick
+         * just in case. */
+-       if (unlikely(vq->num_added =3D=3D (1 << 16) - 1))
++       if (unlikely(vq->num_added =3D=3D (1 << 16) - 1)) {
++               virtio_wmb(vq->weak_barriers);
++               vq->split.vring.avail->idx =3D cpu_to_virtio16(_vq->vdev,
++                                                            vq->split.avai=
+l_idx_shadow);
+                virtqueue_kick(_vq);
++       }
+
+        return 0;
+
+@@ -742,6 +741,9 @@ static bool virtqueue_kick_prepare_split(struct virtque=
+ue *_vq)
+         * event. */
+        virtio_mb(vq->weak_barriers);
+
++       vq->split.vring.avail->idx =3D cpu_to_virtio16(_vq->vdev,
++                                               vq->split.avail_idx_shadow);
++
+        old =3D vq->split.avail_idx_shadow - vq->num_added;
+        new =3D vq->split.avail_idx_shadow;
+        vq->num_added =3D 0;
+
+---------------
+
+Thanks.
+
+
+>
+> Thanks.
+>
+>
+> >
+> > Thanks
+> >
+> > >
+> > > I am confused.
+> > >
+> > >
+> > > What is SMAP? Could you give me more information?
+> > >
+> > > So if we use 3M as the wire speed, you would expect the result to be =
+2.8M
+> > > pps/core, right?
+> > >
+> > > Now the recv result is 2.5M (2463646 =3D 3,343,168/1.357) pps/core. D=
+o you think
+> > > the difference is big?
+> > >
+> > > My tool makes udp packets and looks up routes, so it requires more CP=
+U.
+> > >
+> > > I'm confused. Is there something I misunderstood?
+> > >
+> > > Thanks.
+> > >
+> > > >
+> > > > Thanks
+> > > >
+> > > > >
+> > > > > >
+> > > > > >
+> > > > > > >
+> > > > > > > >
+> > > > > > > > What I noticed is that the hotspot is the driver writing vi=
+rtio desc. Because
+> > > > > > > > the device is in busy mode. So there is race between driver=
+ and device.
+> > > > > > > > So I modified the virtio core and lazily updated avail idx.=
+ Then pps can reach
+> > > > > > > > 10,000,000.
+> > > > > > >
+> > > > > > > Care to post a draft for this?
+> > > > > >
+> > > > > > YES, I is thinking for this.
+> > > > > > But maybe that is just work for split. The packed mode has some=
+ troubles.
+> > > > >
+> > > > > Ok.
+> > > > >
+> > > > > Thanks
+> > > > >
+> > > > > >
+> > > > > > Thanks.
+> > > > > >
+> > > > > > >
+> > > > > > > Thanks
+> > > > > > >
+> > > > > > > >
+> > > > > > > > Thanks.
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > > Thanks
+> > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > ## maintain
+> > > > > > > > > >
+> > > > > > > > > > I am currently a reviewer for virtio-net. I commit to m=
+aintain AF_XDP support in
+> > > > > > > > > > virtio-net.
+> > > > > > > > > >
+> > > > > > > > > > Please review.
+> > > > > > > > > >
+> > > > > > > > > > Thanks.
+> > > > > > > > > >
+> > > > > > > > > > v1:
+> > > > > > > > > >     1. remove two virtio commits. Push this patchset to=
+ net-next
+> > > > > > > > > >     2. squash "virtio_net: virtnet_poll_tx support resc=
+heduled" to xsk: support tx
+> > > > > > > > > >     3. fix some warnings
+> > > > > > > > > >
+> > > > > > > > > > Xuan Zhuo (19):
+> > > > > > > > > >   virtio_net: rename free_old_xmit_skbs to free_old_xmit
+> > > > > > > > > >   virtio_net: unify the code for recycling the xmit ptr
+> > > > > > > > > >   virtio_net: independent directory
+> > > > > > > > > >   virtio_net: move to virtio_net.h
+> > > > > > > > > >   virtio_net: add prefix virtnet to all struct/api insi=
+de virtio_net.h
+> > > > > > > > > >   virtio_net: separate virtnet_rx_resize()
+> > > > > > > > > >   virtio_net: separate virtnet_tx_resize()
+> > > > > > > > > >   virtio_net: sq support premapped mode
+> > > > > > > > > >   virtio_net: xsk: bind/unbind xsk
+> > > > > > > > > >   virtio_net: xsk: prevent disable tx napi
+> > > > > > > > > >   virtio_net: xsk: tx: support tx
+> > > > > > > > > >   virtio_net: xsk: tx: support wakeup
+> > > > > > > > > >   virtio_net: xsk: tx: virtnet_free_old_xmit() distingu=
+ishes xsk buffer
+> > > > > > > > > >   virtio_net: xsk: tx: virtnet_sq_free_unused_buf() che=
+ck xsk buffer
+> > > > > > > > > >   virtio_net: xsk: rx: introduce add_recvbuf_xsk()
+> > > > > > > > > >   virtio_net: xsk: rx: introduce receive_xsk() to recv =
+xsk buffer
+> > > > > > > > > >   virtio_net: xsk: rx: virtnet_rq_free_unused_buf() che=
+ck xsk buffer
+> > > > > > > > > >   virtio_net: update tx timeout record
+> > > > > > > > > >   virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROC=
+OPY
+> > > > > > > > > >
+> > > > > > > > > >  MAINTAINERS                                 |   2 +-
+> > > > > > > > > >  drivers/net/Kconfig                         |   8 +-
+> > > > > > > > > >  drivers/net/Makefile                        |   2 +-
+> > > > > > > > > >  drivers/net/virtio/Kconfig                  |  13 +
+> > > > > > > > > >  drivers/net/virtio/Makefile                 |   8 +
+> > > > > > > > > >  drivers/net/{virtio_net.c =3D> virtio/main.c} | 652 ++=
++++++++-----------
+> > > > > > > > > >  drivers/net/virtio/virtio_net.h             | 359 ++++=
++++++++
+> > > > > > > > > >  drivers/net/virtio/xsk.c                    | 545 ++++=
+++++++++++++
+> > > > > > > > > >  drivers/net/virtio/xsk.h                    |  32 +
+> > > > > > > > > >  9 files changed, 1247 insertions(+), 374 deletions(-)
+> > > > > > > > > >  create mode 100644 drivers/net/virtio/Kconfig
+> > > > > > > > > >  create mode 100644 drivers/net/virtio/Makefile
+> > > > > > > > > >  rename drivers/net/{virtio_net.c =3D> virtio/main.c} (=
+91%)
+> > > > > > > > > >  create mode 100644 drivers/net/virtio/virtio_net.h
+> > > > > > > > > >  create mode 100644 drivers/net/virtio/xsk.c
+> > > > > > > > > >  create mode 100644 drivers/net/virtio/xsk.h
+> > > > > > > > > >
+> > > > > > > > > > --
+> > > > > > > > > > 2.32.0.3.g01195cf9f
+> > > > > > > > > >
+> > > > > > > > >
+> > > > > > > >
+> > > > > > >
+> > > > > >
+> > > >
+> > >
+> >
+>
 
