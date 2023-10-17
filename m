@@ -1,234 +1,157 @@
-Return-Path: <netdev+bounces-42004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEC767CC972
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:05:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55EAE7CC978
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:07:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94FEA281519
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:05:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 840EF1C20A2E
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F4E42C10;
-	Tue, 17 Oct 2023 17:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41176436A2;
+	Tue, 17 Oct 2023 17:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F43824X5"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="mgiAu6ai"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F8F2D028
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 17:05:24 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FAA3B0;
-	Tue, 17 Oct 2023 10:05:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697562322; x=1729098322;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=wAKkFcJxkdlBC64QyTEttA9An4whR8bdJdT6ajiELsU=;
-  b=F43824X5PFW6PE0yeLJVws/2mK7fI4Q499qHiY7L0+vfhhhIe3POJS7D
-   C0vTHtGVsoa1VZA3a4gFCAFRYsbXB2rrSaHXPZm3lp6yQ9Ev9LT73Derz
-   siBmqjISTwkWOH7ySwAPmXEYSenJpjRyJu26xmMd5qzRvMQaNjDFERXPy
-   kYdQHWsv7NrbwDoz4Xt9lfVzf41idrRqBqtU4kXjLU4yNZnIwamyPxLkZ
-   +h4JQ7u4yd4z08IY4hcZHa8JRQEFMQpAWE7UIXZmZCYhFOctxomKiy5w+
-   KgqWiRdBj4yokEhcNX+CR9jEBaXzehlz+TolsYeSPBIcvpIWWE1qCBcQE
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="472057265"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="472057265"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 10:05:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="1087578413"
-X-IronPort-AV: E=Sophos;i="6.03,232,1694761200"; 
-   d="scan'208";a="1087578413"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Oct 2023 10:05:19 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 17 Oct 2023 10:05:19 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 17 Oct 2023 10:05:19 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 17 Oct 2023 10:05:19 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JdiWdtxGYK4NWyAjMYxOxyIc9MgZ4yydK/Pp+5xk91pqrHdaSNKguZhq/J8UDk/pLSIPnphoFnOUzyeOqn4UzYcErFLOa+PHJwC5vS+GmZwOsDtmUaLdKFjchHwgkGrKlIGspQ9WEbQkOP4/WESZkIz0nK+vTEynkiGC1vvUmeqI88Z8GtTkbupCpcG+tMtWZO/eZkzcqq7bfHe0abaOF7BH23kMqREdGHY+17Hs+lyWglSToPJFEEcZfGcZ0+8ubcqf133GU4ncDxKEqdmBi68mR0HD6V+gsFmhtfPrbfG9pmHHPVipa2xDIbrR+g9GivhIDDEXc36w7mRZZcW3jw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FRNPRkD1trr77dqbjzssPmFVMWoAvhVa+3HDYGfx7B8=;
- b=hBarfgIJzCWp5xhOaED8zz/Fx3xgad4+AyzWkPiMkyvNx4isEkS0yzdqNl90rNCFSRyW9uElJ8WPnukY/Sk5ic6d6E/dhvYAQNGNUUCFM3gA+YoKFekEIz10J7+VG0FXgSNGDofWltUHOevJeM0fWR1Z8MkQYdUMkizXKR6tL4q9nR+r0xA5coHeWcUBlLf98NXWXVLGgV3t46PwV2CiCEWq1ds5bOe0z2S3U1tfhE/rxH5nhXvT6eSQGC11f9tTApu1ZYvf4kDBFB13JSPsm4HYwMeBhNrijEez3/3Q2P77NVlGUjnNeRSbNkqDkpSm7bsZRFmJ7VNWPNIyYds+3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by SN7PR11MB7604.namprd11.prod.outlook.com (2603:10b6:806:343::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.45; Tue, 17 Oct
- 2023 17:05:15 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::34a7:52c3:3b8b:75f4]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::34a7:52c3:3b8b:75f4%4]) with mapi id 15.20.6907.021; Tue, 17 Oct 2023
- 17:05:15 +0000
-Message-ID: <75d7c5fb-2cbd-479c-bc9b-3730223e77db@intel.com>
-Date: Tue, 17 Oct 2023 10:05:13 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/5] i40e: Add handler for devlink .info_get
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Ivan Vecera <ivecera@redhat.com>
-CC: <netdev@vger.kernel.org>, Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>
-References: <20231013170755.2367410-1-ivecera@redhat.com>
- <20231013170755.2367410-4-ivecera@redhat.com>
- <20231016075619.02d1dd27@kernel.org>
- <b1805c01-483a-4d7e-8fb2-537f9a7ed9b4@redhat.com>
- <20231017082120.1d1246f6@kernel.org>
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20231017082120.1d1246f6@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0233.namprd03.prod.outlook.com
- (2603:10b6:303:b9::28) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4803B2D055
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 17:07:19 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8777192
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:07:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=eEZlfQkbZN1cteRhBP9/iurjG7ALJIf7HFqGuTRBgo0=; b=mgiAu6aiUHseIgFQkJExL7oftM
+	49DFjSjnDX8HakUfnwd+KDc8n03aTj2OQIDm2+DQpCGTBshdzL2vXppkTYmp4nnKq4GAZ7ObSjQTy
+	MEQKtfOJSvsZtMz5D8bTnT6fq8Ndx1cIXvI/dsLSugw1XHCLDR34RpN018xPkAUuVEiHJ6eyMTjNS
+	az8oYAxpZngcjq4pH+Rbn4kB2xlWzK3akq7mkVx2qI1LKui0ZTOKa2VsrM6lY6ImmtHJkNbiThIFR
+	CUPDsvsfCiyQkef5V1SHuxyWJssrzguZsHIN42zPnFDsK1YyDgs/zOffk25De4wKslKrJdK++ABE4
+	1xTRVfsw==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qsnX7-0004Z2-90; Tue, 17 Oct 2023 19:07:05 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy04.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qsnX6-000Ld5-Ox; Tue, 17 Oct 2023 19:07:04 +0200
+Subject: Re: [PATCH v2 net-next 0/5] Analyze and Reorganize core Networking
+ Structs to optimize cacheline consumption
+To: Eric Dumazet <edumazet@google.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Coco Li <lixiaoyan@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>,
+ Mubashir Adnan Qureshi <mubashirq@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>
+References: <20231017014716.3944813-1-lixiaoyan@google.com>
+ <0807165f-3805-4f45-b4f6-893cf8480508@gmail.com>
+ <2d2f76b5-6af6-b6f0-5c05-cc24cb355fe8@iogearbox.net>
+ <CANn89iKmpFN74Zu7_Ot_entm8_ryRbi7sENZXo=KJuiD4HAyDQ@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <da79e5cf-a004-b1e2-9a91-deb709ca0302@iogearbox.net>
+Date: Tue, 17 Oct 2023 19:07:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SN7PR11MB7604:EE_
-X-MS-Office365-Filtering-Correlation-Id: 009b5d53-130a-45b0-9963-08dbcf333b52
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pkGBPhFVzvPEz/ZF0EvIzkglOru4aVbU2oYuDWHC53FWHyQrBRPhFexf5lSFPCSzWG4lXANec9sk32REfU/MDNs0OHfKQXW9hc1A7Ti4ZWpt/TN1UtQ3yH3TWN2EYmWE64q8LDjBThfbQwPu3FgYzRJ2dg21iZ9h68DXh6Qm/hM5IGSs3MIw+JX43BgPB7Zy0KBZsXfm9SJCihZoUWiqQ5uL0+FNObthu32UmrWbJz2UrzWf0MkxmQg8jJXvhxkoi8k9ntztDXmTb/+S/JEdy5j+q6r/oaLS9dagrqtqx1u8WLoiPH9E4tCHPxwWvw13AvNf6hUSWezal7BEVdP20952wBPj0NFY5KFuZPl2Ck7PbpPt7gDUKzaUEQEyUfTDNl/g6oiNV1EnK66Ap24Qw495BCLwi5rPlKBzQAJWBjGWqHG0uv1PTvCxdcOYExjYHspRSquXIj1e9LtswVZQQEb19sq+p8HqDvTYh1UelibxA06GCMJ5S2/M9mzLUWxWUl8Y/ejkuydeML2Z2eTrNGx9ozBJQnktuwkhC1N7X+HexHA3vrjmnh3fpji2nBbWajlg9LlV7JU1Vr7sQvLPZF3LOVPiDktABXQv6sgHuoddNjsUrlMxHbe9jeA65cw1bO5sDYH7WbM5ooK3VBSKp5FvO1Eo6c/A7xNpw629ULeoyUcG7+WJogXxNm5yDRQO2JTAFL5k0/oSP+qEPvqaIg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(366004)(376002)(39860400002)(136003)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(2906002)(8936002)(8676002)(66556008)(83380400001)(66476007)(110136005)(316002)(66946007)(5660300002)(41300700001)(54906003)(966005)(4326008)(478600001)(6486002)(31686004)(6512007)(6506007)(2616005)(26005)(53546011)(36756003)(86362001)(38100700002)(31696002)(82960400001)(142923001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bFZpMk9WV0pKUU03dGpJTVMrU1lsV0VHWFkvekduUzI0a3VzU1RDNlp5N3J0?=
- =?utf-8?B?TzZNMHhoZXRiOVhWZUV0QWJSM1c2bnFHRHRlenZvWW5GLzl0R2ZraUlybHlS?=
- =?utf-8?B?RDE2eThEVnc0NVUvSUNTL1VBMzNNcVBRQ2lTcHB5NWRKVVp6cWNqTDlNTDJa?=
- =?utf-8?B?ZE1pc1pZMTc1WTRiL1hQQkZqZ3FmUExUSzEvbkljZ2dQN1lwaGw2b2tjSTZ6?=
- =?utf-8?B?Y09heG5BVk15S0NHWnZWdDlMMlN6NVFEV3lYdnVjZmt6dlBYa3BldDNhMndj?=
- =?utf-8?B?RUNGQ255bDlUa291dmhZZURLN3l5TVJ6eUIvYTdaL0tJZWRSbWlTdTNvN2JF?=
- =?utf-8?B?Q25sT1dnYmxXWFdDYkxrWFFTMHJpbUlONE5CTjB5RnR2SXFFMktCRUEvUVA3?=
- =?utf-8?B?eGxQR0dOemw0eEtJQ0dJYjR6eVM4bHMwQks0UVhLT2V1a3BRWUh1R0x4MWpk?=
- =?utf-8?B?SWdyTVRIUTkyeWhFeEZyRGU2QURzUUlpRE1zRTMxMXoxeFYzYmUwVFZjdk1t?=
- =?utf-8?B?a1dzNllVN0lxLzVuclhibCthU3djV2xEcVJLTFdaYnZQV29BUzBEcWVEdlpL?=
- =?utf-8?B?ZjZabjhNdkFEUHljY2wycnNtN1hoZEN3cno1Y2oyUW9tY09LQlRSZXFDQ0lJ?=
- =?utf-8?B?dDlZV3pBQXByUEZYSm11UXI5SkVuZy83WThtY0k1MWtFS0x2TVVDa3VqTURO?=
- =?utf-8?B?WVV4T1BTWTVpMmtlbHNQVnJ5KzkvK2lVS3dLZUJvTlRFVzZpczBPVmhVTC9S?=
- =?utf-8?B?ODVqLzdvVWNjMGtQZjNBbWhoOGc5STJPTEV2RUk0a3Z6SGhNZkF0Q3FxeWgr?=
- =?utf-8?B?S042V012SXRNbHg3YUZ6V0RPNENFNmk4aUczcGhPS29lc3dycUl1dTN3TC9F?=
- =?utf-8?B?V2NGUDRGVVIrYmFHR2Fjczh2cjh3cGt0cHhZYXdIeThNTGJmelpoTUNXei9X?=
- =?utf-8?B?VWNlRXlxcGRRbThUeGc3NGFnYlZ6c2N0M0t2S3Fldk10U2gwaDg4RCsxOUZ0?=
- =?utf-8?B?MytvMlBMUDNoQk5pdUJZRDlneXlQWlVvdVdZUlFna1NYcnJFdFFFWEVTT2Rz?=
- =?utf-8?B?QlA4cHZtMjlvdnZEamdLaGNsNm4ramI5N3lGMmVETURSK3JXZTNxbHhFWDRH?=
- =?utf-8?B?RVJrNDd6RU1GdHRJZWlOQXU2MVN0Ri9uekZ4bkNuZUZSSHc4QTUrV0dQY2ZO?=
- =?utf-8?B?YjViL2NacVcwRDVYUm9PYmROTUd5MUV5QzdVN28ybGZteTBkdVI2ditjT3Ez?=
- =?utf-8?B?bThxVnc2dGpxOGZWY0U1U05ZdFNCTWNiemw4SlphL0ZnOUpwVlRtZUM3MmQz?=
- =?utf-8?B?UjZodGlkckp1OEMzK1VMYnIrRmg3SVdTemNxMFpyejI3Tld6OEZLaHdRUUpK?=
- =?utf-8?B?M255Z0hlRGtjaXIwL2ZHRE42RWhQTHJMNW5zMXVWV2Mvc3ZvOUYzWFlDQ3E2?=
- =?utf-8?B?NTE0UENIZ2RJYTRtWEIzUXJNUm45allhRTI1aG44RlBCeHBNV3p4Z20vejZT?=
- =?utf-8?B?MTZrNjJNTEc3c0xBakh0bXVaNzhvSS92MW5qUjVueE9XWFM4aUhLVFZoZVRB?=
- =?utf-8?B?SllmbUx5QW43ejlZNnNNVDIxNFdOVXd4QnBROGE5b1kzVE5QWXZLV1FiU0xP?=
- =?utf-8?B?a2pzM0U1dlZXSEk4S1RJTTFlNDltL0RvNVRqcEhnQk1FZlFUdWx1ajBCVGk1?=
- =?utf-8?B?OTloRE9ObGFHM1NFU0FQckJZWlpIU0xRRnhHWU1aVUtxUHhrWmtCdGd2NERP?=
- =?utf-8?B?ekgrOVZ3VktwZjJncHUrZ0g4NGc3MUNyYmRVQmhvcVNPOGRCTmUyaEx2UFF4?=
- =?utf-8?B?WkcwQXBESDdGRXk0OHM2WTBUZHhTaUdNUWJ6VnhCazBhYmwvUlJVNGcvV0hP?=
- =?utf-8?B?bkVTdnpQa0VWWFhBVWhCc0FGcldiY2FsZHNETG00QWlPOWdGUUJMOVdmNWpm?=
- =?utf-8?B?QWZEZklGZTc0MTNRdTQxZmd1ekVKYnYyNU0zTlV3d0ZGUDBnRStxcUUwb0da?=
- =?utf-8?B?T1VTSkpJdVNYR0ppS2cwT2dzS3RSTnFDcXd5a1ZaeFJpM0xqNFF2Vk1nVHpk?=
- =?utf-8?B?emdERlNadmp4eFZOUldIQU5aVWlreFVXZXJjTDBoTFVFMVJtQkJCTFB1bFFE?=
- =?utf-8?B?bmVWaEt4MFFNc1cxSmlmZjFjS3Zub0pIb0p2UjRIOXRTL0RGY0lMT3hKTktS?=
- =?utf-8?B?Znc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 009b5d53-130a-45b0-9963-08dbcf333b52
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 17:05:14.9740
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5fIxU1omiSr69kP2BNwKO3ddyyJCOKaxa4Zxngg7EHnzAyNjcoaKAyL1ZCOwsj/zeLUelJF2V1DeuZBaWQunMwMjOS73CCUXo2tPb/bSrpE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7604
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <CANn89iKmpFN74Zu7_Ot_entm8_ryRbi7sENZXo=KJuiD4HAyDQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27064/Tue Oct 17 10:11:10 2023)
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 10/17/2023 8:21 AM, Jakub Kicinski wrote:
-> On Tue, 17 Oct 2023 11:56:20 +0200 Ivan Vecera wrote:
->>> Your board reports "fw.psid 9.30", this may not be right,
->>> PSID is more of a board+customer ID, IIUC. 9.30 looks like
->>> a version, not an ID.  
+On 10/17/23 6:50 PM, Eric Dumazet wrote:
+> On Tue, Oct 17, 2023 at 11:06 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>> On 10/17/23 5:46 AM, Florian Fainelli wrote:
+>>> On 10/16/2023 6:47 PM, Coco Li wrote:
+>>>> Currently, variable-heavy structs in the networking stack is organized
+>>>> chronologically, logically and sometimes by cache line access.
+>>>>
+>>>> This patch series attempts to reorganize the core networking stack
+>>>> variables to minimize cacheline consumption during the phase of data
+>>>> transfer. Specifically, we looked at the TCP/IP stack and the fast
+>>>> path definition in TCP.
+>>>>
+>>>> For documentation purposes, we also added new files for each core data
+>>>> structure we considered, although not all ended up being modified due
+>>>> to the amount of existing cache line they span in the fast path. In
+>>>> the documentation, we recorded all variables we identified on the
+>>>> fast path and the reasons. We also hope that in the future when
+>>>> variables are added/modified, the document can be referred to and
+>>>> updated accordingly to reflect the latest variable organization.
+>>>
+>>> This is great stuff, while Eric mentioned this work during Netconf'23 one concern that came up however is how can we make sure that a future change which adds/removes/shuffles members in those structures is not going to be detrimental to the work you just did? Is there a way to "lock" the structure layout to avoid causing performance drops?
+>>>
+>>> I suppose we could use pahole before/after for these structures and ensure that the layout on a cacheline basis remains preserved, but that means adding custom scripts to CI.
 >>
->> Maybe plain 'fw' should be used for this '9.30' as this is a version
->> of the whole software package provided by Intel for these adapters
->> (e.g. 
->> https://www.intel.com/content/www/us/en/download/18190/non-volatile-memory-nvm-update-utility-for-intel-ethernet-network-adapter-700-series.html).
+>> It should be possible without extra CI. We could probably have zero-sized markers
+>> as we have in sk_buff e.g. __cloned_offset[0], and use some macros to force grouping.
 >>
->> Thoughts?
-> 
-> Hm, that could be better, yes.
-> 
-> Jake, any guidance?
-
-Hm. The ice driver has 'fw.psid.api' which is documented as:
-
-    * - ``fw.psid.api``
-      - running
-      - 0.80
-      - Version defining the format of the flash contents.
-
-I think we settled on this as well back when I was working on the ice
-version.
-
-See
-https://lore.kernel.org/netdev/70001e87-b369-bab4-f318-ad4514e7dcfb@intel.com/
-
-However, looking at the code more closely, this does appear to match the
-ice driver's implementation if you use "fw.psid.api". I believe the
-intent for this is a version that indicates the format or layout of the
-NVM contents.
-
-Given that ice uses fw.psid.api for what appears to be the same purpose
-I would propose that here as well.
-
-> 
->>> UNDI means PXE. Is that whave "combo image" means for Intel?  
+>> ASSERT_CACHELINE_GROUP() could then throw a build error for example if the member is
+>> not within __begin_cacheline_group and __end_cacheline_group :
 >>
->> Combo image version (aka CIVD) is reported by nvmupdate tool and this
->> should be version of OROM that contains PXE, EFI images that each of
->> them can have specific version but this CIVD should be overall OROM 
->> version for this combination of PXE and EFI. I hope I'm right.
+>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+>> index 9ea3ec906b57..c664e0594da4 100644
+>> --- a/include/linux/netdevice.h
+>> +++ b/include/linux/netdevice.h
+>> @@ -2059,6 +2059,7 @@ struct net_device {
+>>            */
+>>
+>>           /* TX read-mostly hotpath */
+>> +       __begin_cacheline_group(tx_read_mostly);
+>>           unsigned long long      priv_flags;
+>>           const struct net_device_ops *netdev_ops;
+>>           const struct header_ops *header_ops;
+>> @@ -2085,6 +2086,7 @@ struct net_device {
+>>    #ifdef CONFIG_NET_XGRESS
+>>           struct bpf_mprog_entry __rcu *tcx_egress;
+>>    #endif
+>> +       __end_cacheline_group(tx_read_mostly);
+>>
+>>           /* TXRX read-mostly hotpath */
+>>           unsigned int            flags;
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index 97e7b9833db9..2a91bd4077ad 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -11523,6 +11523,9 @@ static int __init net_dev_init(void)
+>>
+>>           BUG_ON(!dev_boot_phase);
+>>
+>> +       ASSERT_CACHELINE_GROUP(tx_read_mostly, priv_flags);
+>> +       ASSERT_CACHELINE_GROUP(tx_read_mostly, netdev_ops);
+
+nit, should have been sth like:
+
+   ASSERT_CACHELINE_GROUP(struct net_device, netdev_ops, tx_read_mostly)
+
+> Great idea, we only need to generate these automatically from the file
+> describing the fields (currently in Documentation/ )
 > 
-> Sounds good then!
+> I think the initial intent was to find a way to generate the layout of
+> the structure itself, but this looked a bit tricky.
 
-Yes that sounds correct. That's what we do in ice as well.
-
-I'm going to review the whole patch now since I hadn't noticed this
-previously.
-
-Thanks,
-Jake
+Agree, ideally this could be scripted from the Documentation/ file of this
+series, and perhaps the latter may not even be needed then if we have it
+self-documented in code behind some macro magic with BUILD_BUG_ON assertion
+which probes offsetof wrt the field being within markers.
 
