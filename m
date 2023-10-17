@@ -1,143 +1,157 @@
-Return-Path: <netdev+bounces-41788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A23F7CBE5D
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:04:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7EBF7CBE63
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:05:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9A162817DE
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:04:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 050C71C20993
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30CED3D979;
-	Tue, 17 Oct 2023 09:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88203D974;
+	Tue, 17 Oct 2023 09:05:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="DHouHpBZ"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="o6HGc/M9"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C774381D8
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:04:12 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D3A7F1
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:04:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=xr93BtMovn5IoQemVdcs8ujKiBxoTrW4iPyMfWFZv7g=; b=DHouHpBZWk4pxV8zUnRbaudLm9
-	9NMilUz55D2FjnxDIVC/sDYiGVyv4qxAlWbY0ePY0iYZVKJS+QBzMACAXghsuvY/2ulL7KZ0FhR5t
-	urDJo2834PZ2e7f/MJAuEZhucYseI0VHd1B0gekTJ0sbI1mJDyq6uQzSQGbD+ndTQt6f82Poouwxn
-	MBKfISVRRtCgSw7sklJSP549jxC3mJ6ttNWmFMqJifMm/N7Zhe5yoc2adbBbo+dYKz7CUlzuJbNjn
-	XYEAXHG8FnxPx6FoeX18ySNKdXOyfYmP/IVe02XQmmrPlkApY/5FnrgnjOjMoXBMVVi9OX9ZkEgVg
-	2gHwGn7A==;
-Received: from [192.168.1.4] (port=10741 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qsfzi-0002Po-35;
-	Tue, 17 Oct 2023 11:04:06 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Tue, 17 Oct 2023 11:04:06 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <conor@kernel.org>
-CC: <andrew@lunn.ch>, <ante.knezic@helmholz.de>, <conor+dt@kernel.org>,
-	<davem@davemloft.net>, <devicetree@vger.kernel.org>, <edumazet@google.com>,
-	<f.fainelli@gmail.com>, <krzysztof.kozlowski+dt@linaro.org>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <marex@denx.de>,
-	<netdev@vger.kernel.org>, <olteanv@gmail.com>, <pabeni@redhat.com>,
-	<robh+dt@kernel.org>, <woojung.huh@microchip.com>
-Subject: [PATCH net-next v2 2/2] dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
-Date: Tue, 17 Oct 2023 11:04:03 +0200
-Message-ID: <20231017090403.18416-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20231017-generous-botanical-28436c5ba13a@spud>
-References: <20231017-generous-botanical-28436c5ba13a@spud>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDD5C15F
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:04:58 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF66F7
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:04:57 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-40806e40fccso2202075e9.2
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 02:04:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1697533495; x=1698138295; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GLkwIKpccGDhl2g/IAel1atWebFPpXTz7dxlcfet/9o=;
+        b=o6HGc/M9L0+fca2bnCFA27whzk7n4BNbIuOCH7SrckAS1oidB4V6G9x0bvmIXAk0eR
+         FyoR7ALINRojjkVUgpExmvDhpmVmlqYGMIIudoeqUefaHoJSS2QmACHKLnZZ+jm4TOVl
+         CxSehU2wfMzOfR23N3S+7ykwOhGRANroFoGLoWYJToGR4KNdSlkW/5jzAD2KjTrka8gq
+         ce/87FYa9j3aIVJUpXApVa2+XRyC5HHZb43YU4YhFYbi44Znp990oyh6IOpFFCzIqRCi
+         9PR7g2UoN+XoidXGnaJyorTC7L9ebm86TxLe5NlKgzo0e2yypK/ih8+UaXHo0K/BxdYp
+         +axQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697533495; x=1698138295;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GLkwIKpccGDhl2g/IAel1atWebFPpXTz7dxlcfet/9o=;
+        b=A1Q7e8ONcUePilCwPNiactY7gHo+B7xH1dzYNKly+MIQWgyCFeXpK+oGVqfcs+5u1y
+         jR30zxkPNOFz7E/AQWpGkLhnFvdC669fd/q1hkx/0eYizkuSwci2B052kg2mxjw5Rvtw
+         914fOrk4EZgkORVAmCuDx/092GeScKo2mQAXQPuugiwyxYK326V3Ak1LD93/Wcdb6lHs
+         LUr+17fGRpBoeVVzFoLLcvlhKJKQOeRNv8MDVzx7DccbchhOEtG9JK5n8f94kgYR55ku
+         qlCnqqbsQMRwkMgvU5jwt6xDU4B8tsDJvqoZsuf6O7f9WHH1hcCGAjTQyx0SyQL30qKG
+         O0FA==
+X-Gm-Message-State: AOJu0YxmEIhDD+0D03TRcJyToApf/jwiwkdCj3cF6aC+ula6iyIQk0uV
+	6f4jz1B9RqcsAQ+pdmoRqR75ng==
+X-Google-Smtp-Source: AGHT+IF3cEUI3F2vErWkTlpLAbSQ5XM/SWvyATBG6VSsHoKO0SkhuTCLQXUl8O/7wmzfxFKQOdeuHg==
+X-Received: by 2002:a05:600c:3143:b0:3f6:58ad:ed85 with SMTP id h3-20020a05600c314300b003f658aded85mr1216597wmo.10.1697533495396;
+        Tue, 17 Oct 2023 02:04:55 -0700 (PDT)
+Received: from [192.168.0.106] (haunt.prize.volia.net. [93.72.109.136])
+        by smtp.gmail.com with ESMTPSA id p3-20020a05600c430300b004076f522058sm9264765wme.0.2023.10.17.02.04.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 02:04:54 -0700 (PDT)
+Message-ID: <6a6a2919-c414-0b13-9488-2c81655c2b8a@blackwall.org>
+Date: Tue, 17 Oct 2023 12:04:52 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH net-next 01/13] bridge: mcast: Dump MDB entries even when
+ snooping is disabled
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+ bridge@lists.linux-foundation.org
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, roopa@nvidia.com, mlxsw@nvidia.com
+References: <20231016131259.3302298-1-idosch@nvidia.com>
+ <20231016131259.3302298-2-idosch@nvidia.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20231016131259.3302298-2-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 17 Oct 2023 09:00:15 +0100, Conor Dooley wrote:
-
-> > In both cases (external and internal), the KSZ88X3 is actually providing the
-> > RMII reference clock.
-> > Difference is only will the clock be routed as external
-> > copper track (pin REFCLKO -> pin REFCLKI), or will it be routed internally.
+On 10/16/23 16:12, Ido Schimmel wrote:
+> Currently, the bridge driver does not dump MDB entries when multicast
+> snooping is disabled although the entries are present in the kernel:
 > 
-> The switch always provides it's own external reference, wut? Why would
-> anyone actually bother doing this instead of just using the internal
-> reference?
-
-Thats a good question... Other KSZ chips don't have the ability to route clock
-internally, and these two (ksz8863 and ksz8873) are actually by default the
-expecting to route it externally. Why this is so is a matter of HW design. 
-The KSZ88x3 does not have to provide the reference clock, it can be provided 
-externally, by some other device, for example the uC. 
-BUT in case when it is provided by the switch we have the option to route the 
-internal block that is generating the clock to the clock input externally 
-(as a copper track) or internally.
-To quote the manual:
-"When EN_REFCLKO_3 is high, KSZ8863RLL outputs a 50 MHz in REFCLKO_3. 
-Register 198 bit [3] is used to select the internal or external reference clock.
-Internal reference clock means that the clock for the RMII of KSZ8863RLL is
-provided by KSZ8863RLL internally and the REFCLKI_3 pin is unconnected. For the 
-external reference clock, the clock provides to KSZ8863RLL via REFCLKI_3.
-If KSZ8863RLL does not provide the reference clock, this 50 MHz reference clock
-with divide-by-2 (25 MHz) has to be used in X1 pin instead of the 25 MHz 
-crystal, since the clock skew of these two clock sources impacts the RMII timing
-before Rev A3 part. The Rev A3 part can connect the external 50 MHz reference 
-clock to X1 pin and SMTXC3/REFCLKI_3 pins directly with strap pins of pin 17 
-SMTXD33/EN_REFCLKO_3 and pin 18 SMTXD32 to be pulled down."
-
-> > So, this should not affect the clock relation between the uC and the switch
-> > device?
+>   # bridge mdb add dev br0 port swp1 grp 239.1.1.1 permanent
+>   # bridge mdb show dev br0
+>   dev br0 port swp1 grp 239.1.1.1 permanent
+>   dev br0 port br0 grp ff02::6a temp
+>   dev br0 port br0 grp ff02::1:ff9d:e61b temp
+>   # ip link set dev br0 type bridge mcast_snooping 0
+>   # bridge mdb show dev br0
+>   # ip link set dev br0 type bridge mcast_snooping 1
+>   # bridge mdb show dev br0
+>   dev br0 port swp1 grp 239.1.1.1 permanent
+>   dev br0 port br0 grp ff02::6a temp
+>   dev br0 port br0 grp ff02::1:ff9d:e61b temp
 > 
-> > This property has no effect if KSZ88X3 is not providing the reference clock.
+> This behavior differs from other netlink dump interfaces that dump
+> entries regardless if they are used or not. For example, VLANs are
+> dumped even when VLAN filtering is disabled:
+> 
+>   # ip link set dev br0 type bridge vlan_filtering 0
+>   # bridge vlan show dev swp1
+>   port              vlan-id
+>   swp1              1 PVID Egress Untagged
+> 
+> Remove the check and always dump MDB entries:
+> 
+>   # bridge mdb add dev br0 port swp1 grp 239.1.1.1 permanent
+>   # bridge mdb show dev br0
+>   dev br0 port swp1 grp 239.1.1.1 permanent
+>   dev br0 port br0 grp ff02::6a temp
+>   dev br0 port br0 grp ff02::1:ffeb:1a4d temp
+>   # ip link set dev br0 type bridge mcast_snooping 0
+>   # bridge mdb show dev br0
+>   dev br0 port swp1 grp 239.1.1.1 permanent
+>   dev br0 port br0 grp ff02::6a temp
+>   dev br0 port br0 grp ff02::1:ffeb:1a4d temp
+>   # ip link set dev br0 type bridge mcast_snooping 1
+>   # bridge mdb show dev br0
+>   dev br0 port swp1 grp 239.1.1.1 permanent
+>   dev br0 port br0 grp ff02::6a temp
+>   dev br0 port br0 grp ff02::1:ffeb:1a4d temp
+> 
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>   net/bridge/br_mdb.c | 3 ---
+>   1 file changed, 3 deletions(-)
+> 
+> diff --git a/net/bridge/br_mdb.c b/net/bridge/br_mdb.c
+> index 7305f5f8215c..fb58bb1b60e8 100644
+> --- a/net/bridge/br_mdb.c
+> +++ b/net/bridge/br_mdb.c
+> @@ -323,9 +323,6 @@ static int br_mdb_fill_info(struct sk_buff *skb, struct netlink_callback *cb,
+>   	struct net_bridge_mdb_entry *mp;
+>   	struct nlattr *nest, *nest2;
+>   
+> -	if (!br_opt_get(br, BROPT_MULTICAST_ENABLED))
+> -		return 0;
+> -
+>   	nest = nla_nest_start_noflag(skb, MDBA_MDB);
+>   	if (nest == NULL)
+>   		return -EMSGSIZE;
 
-> This appears to contradict with the above, unless I am misunderstanding
-> something.
-
-There are actually 5 RMII clock configuration modes depending on the
-setting of the EN_REFCLKO_3, register 0xC6 and SMTXD32 pin (which affects
-the expected clock, 25 or 50 Mhz), but the patch covers the case in which
-the switch is generating the reference clock (outputing it to REFCLKO_3), 
-because EN_REFCLK0_3 is pulled up. By clearing/setting the 0xC6 bit 3 we can 
-choose whether to connect the REFCLKO to REFCLKI externally, or internally.
-
-If reference clock is being provided to the ksz88x3 by some other device,
-then there is no point in setting the 0xC6 bit 3 because other device is 
-providing the clock to REFCLKI_3 and REFCLKO should not be connected and 
-should not generate the clock (as EN_REFCLKI is pulled down).
-
-> What I would have expected to see is that when the reference clock is
-> provided externally that there would be a clocks property in the DT
-> node, pointing at that external clock & when there was not, then
-> no property. Likely that ship has already said, as I don't see clocks
-> present in the current binding. How does the driver get the frequency of
-> the RMII reference clock when an external reference is provided?
-
-In case when ksz88x3 is generating the reference clock the devices rmii 
-interface should be configured to external clock usage, for example something
-like rmii-clock-ext for TI cpsw. This should be true regardles of whether
-the ksz88x3 node has "microchip,rmii-clk-internal" set or not.
+Finally! Thanks :) this has been a long-standing annoyance.
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
