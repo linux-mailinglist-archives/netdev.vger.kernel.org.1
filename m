@@ -1,108 +1,158 @@
-Return-Path: <netdev+bounces-41755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DD277CBD67
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:29:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29B667CBD7A
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:31:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF68E1C2086F
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:29:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AF9F1C20B5C
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:31:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D763B28E;
-	Tue, 17 Oct 2023 08:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PsBfDznE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958473B791;
+	Tue, 17 Oct 2023 08:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D076FC2CD;
-	Tue, 17 Oct 2023 08:29:40 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E5DBFC;
-	Tue, 17 Oct 2023 01:29:38 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id DF350C000B;
-	Tue, 17 Oct 2023 08:29:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1697531377;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dmxQpIzLlbHBHrdjma2mjJV6ut4SgvXoBNrtVZhL5uI=;
-	b=PsBfDznE7RSnRaJOw9XIKjq3YkUFypmBDmoCj642kLRhUasKALIlXZeXRmKN1mGp2RuU4n
-	sc+RRpz61XhIDXG9nFIhrq0Pm7Nq763J9O+Bbmhq3gXTPyjkgrYby74TsoCURTxJi/d4W/
-	auCbKUpZINclHYRcWrATica58YFiQsanftfnTF40zZqISQN4zVBP1KAvlca1hdNfpjsBR+
-	JZzx+sQx0eTg8omH2bQFiUSg0p5nfUEqiBJxY529pes55aj3gv6F242Su+gKzqbAqlOynB
-	+w6w4ppPeUks1N6rBiH2zOhUNFQCFDPOiCpL9dyMA+23hjnhxRCF/8z5gd6j0g==
-Date: Tue, 17 Oct 2023 10:29:20 +0200
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Florian
- Fainelli <florian.fainelli@broadcom.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Michael Walle <michael@walle.cc>, Jacob Keller
- <jacob.e.keller@intel.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v5 08/16] net: ethtool: Add a command to expose
- current time stamping layer
-Message-ID: <20231017102920.584d759f@kmaincent-XPS-13-7390>
-In-Reply-To: <ZS3MKWlnPqTe8gkq@hoboy.vegasvil.org>
-References: <20231009155138.86458-1-kory.maincent@bootlin.com>
-	<20231009155138.86458-9-kory.maincent@bootlin.com>
-	<2fbde275-e60b-473d-8488-8f0aa637c294@broadcom.com>
-	<20231010102343.3529e4a7@kmaincent-XPS-13-7390>
-	<20231013090020.34e9f125@kernel.org>
-	<6ef6418d-6e63-49bd-bcc1-cdc6eb0da2d5@lunn.ch>
-	<20231016124134.6b271f07@kmaincent-XPS-13-7390>
-	<ZS3MKWlnPqTe8gkq@hoboy.vegasvil.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B273D387
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 08:31:45 +0000 (UTC)
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 387FBE8
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 01:31:44 -0700 (PDT)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-5a7b91faf40so65527177b3.1
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 01:31:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697531503; x=1698136303;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ei9tALPoBKhoksEnlBgw5HOrFsYUFtyrr5JUw29UL+E=;
+        b=eevJSORRUKepIQ4t9oR97IXmDEfveeT33lzCX23gu9XZq88zmNjbQ1ZcsNuPD3DJ1c
+         nyaB9Towj0gjxng2X883SpQOgpVLJqPmODfjQLICcUMNfMZ3ayoxm72N32HfBidLUuuq
+         ZUWzye6M+stX8GCCBfxB9Cj/WcHBcZz3BW/kb7q2z2ciKWJ6XRYkGNXqHWK7RJFr33Fg
+         yAR/VwBlcq9GtMqJNZlEKHshUIP8z7iH/gSBGIk4s3lVdohhoHwireW4WoSJTAl66h0q
+         SpGGp+cxLZui7omlJTcsrN0U7GWWQhqtUnUtahTDGZlNSq1PJRMgeNxJfSEDEGJCudQx
+         VIjA==
+X-Gm-Message-State: AOJu0YzqRzZT3uEIE/My6HItpse9HzJ7V1SsrZI/eIVXHdFMmbWdUrXb
+	d9+1JH4I6sYmKK7/KnDKEZThyQ3Ai6t3VQ==
+X-Google-Smtp-Source: AGHT+IEJkqKTUAEHeWPQ0NTJd8RnBOD9f0sFMhcIHTh0KhIKC+qdRnBj3lwoQYsjYrTOh5pvo50+xg==
+X-Received: by 2002:a05:690c:dd6:b0:5a8:204c:5c9b with SMTP id db22-20020a05690c0dd600b005a8204c5c9bmr2012179ywb.18.1697531502863;
+        Tue, 17 Oct 2023 01:31:42 -0700 (PDT)
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com. [209.85.128.174])
+        by smtp.gmail.com with ESMTPSA id v5-20020a81a545000000b005a2245c3506sm431774ywg.42.2023.10.17.01.31.42
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 01:31:42 -0700 (PDT)
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5a7b91faf40so65527017b3.1
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 01:31:42 -0700 (PDT)
+X-Received: by 2002:a0d:db0e:0:b0:59f:7f8e:dc4a with SMTP id
+ d14-20020a0ddb0e000000b0059f7f8edc4amr1605644ywe.22.1697531502538; Tue, 17
+ Oct 2023 01:31:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20231009074121.219686-1-hch@lst.de> <20231009074121.219686-6-hch@lst.de>
+ <ea608718-8a50-4f87-aecf-fc100d283fe8@arm.com> <20231009125843.GA7272@lst.de>
+ <eedf951d-901c-40d8-91f2-0f13d33b7d4e@linux-m68k.org> <CAMuHMdVis0F02J1D7C2=MgShswt+2-4vCV076Mb3q4weagUY1A@mail.gmail.com>
+In-Reply-To: <CAMuHMdVis0F02J1D7C2=MgShswt+2-4vCV076Mb3q4weagUY1A@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 17 Oct 2023 10:31:30 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWxs=DQZWYfoxE4Jk4cc4qHUb_P65qf+xRvsooQ6ob8mw@mail.gmail.com>
+Message-ID: <CAMuHMdWxs=DQZWYfoxE4Jk4cc4qHUb_P65qf+xRvsooQ6ob8mw@mail.gmail.com>
+Subject: Re: [PATCH 5/6] net: fec: use dma_alloc_noncoherent for m532x
+To: Greg Ungerer <gerg@linux-m68k.org>
+Cc: Christoph Hellwig <hch@lst.de>, Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org, 
+	Jim Quinlan <james.quinlan@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 16 Oct 2023 16:50:01 -0700
-Richard Cochran <richardcochran@gmail.com> wrote:
+On Mon, Oct 16, 2023 at 11:12=E2=80=AFAM Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
+> On Tue, Oct 10, 2023 at 4:45=E2=80=AFPM Greg Ungerer <gerg@linux-m68k.org=
+> wrote:
+> > On 9/10/23 22:58, Christoph Hellwig wrote:
+> > > On Mon, Oct 09, 2023 at 11:29:12AM +0100, Robin Murphy wrote:
+> > >> It looks a bit odd that this ends up applying to all of Coldfire, wh=
+ile the
+> > >> associated cache flush only applies to the M532x platform, which imp=
+lies
+> > >> that we'd now be relying on the non-coherent allocation actually bei=
+ng
+> > >> coherent on other Coldfire platforms.
+> > >>
+> > >> Would it work to do something like this to make sure dma-direct does=
+ the
+> > >> right thing on such platforms (which presumably don't have caches?),=
+ and
+> > >> then reduce the scope of this FEC hack accordingly, to clean things =
+up even
+> > >> better?
+> > >
+> > > Probably.  Actually Greg comment something along the lines last
+> > > time, and mentioned something about just instruction vs instruction
+> > > and data cache.
+> >
+> > I just elaborated on that point a little in response to Robin's email.
+> >
+> > >>
+> > >> diff --git a/arch/m68k/Kconfig.cpu b/arch/m68k/Kconfig.cpu
+> > >> index b826e9c677b2..1851fa3fe077 100644
+> > >> --- a/arch/m68k/Kconfig.cpu
+> > >> +++ b/arch/m68k/Kconfig.cpu
+> > >> @@ -27,6 +27,7 @@ config COLDFIRE
+> > >>      select CPU_HAS_NO_BITFIELDS
+> > >>      select CPU_HAS_NO_CAS
+> > >>      select CPU_HAS_NO_MULDIV64
+> > >> +    select DMA_DEFAULT_COHERENT if !MMU && !M523x
+> > >
+> > > Although it would probably make more sense to simply not select
+> > > CONFIG_ARCH_HAS_SYNC_DMA_FOR_DEVICE and
+> > > CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU for these platforms and not
+> > > build the non-coherent code at all.  This should also include
+> > > all coldfire platforms with mmu (M54xx/M548x/M5441x).  Then
+> > > again for many of the coldfire platforms the Kconfig allows
+> > > to select CACHE_WRITETHRU/CACHE_COPYBACK which looks related.
+> > >
+> > > Greg, any chance you could help out with the caching modes on
+> > > coldfire and legacy m68knommu?
+> >
+> > Sure, yep. I am not aware that the legacy 68000 or 68328 had any caches
+> > at all.
+>
+> 68000 (and derivatives like 68*328) does not have any cache.
+> 68360 (which is no longer supported by Linux) is based on CPU32, and
+> does not seem to have any caches, although the documentation does
+> mention the use of "external cache memories".
 
-> On Mon, Oct 16, 2023 at 12:41:34PM +0200, K=C3=B6ry Maincent wrote:
->=20
-> > Still I am wondering why hardware timestamping capabilities can be enab=
-led
-> > without phc. =20
->=20
-> There is hardware that simply provides time values on frames from a
-> free running clock, and that clock cannot be read, set, or adjusted.
->=20
-> So the time stamps only relate to other time stamps from the same
-> device.  That might be used for performance analysis.
+As M68K selects NO_DMA if !MMU && !COLDFIRE anyway, this doesn't
+matter for legacy^Wclassic m68knommu.
 
-Ok, thanks you for the information.
+Gr{oetje,eeting}s,
 
-K=C3=B6ry
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
