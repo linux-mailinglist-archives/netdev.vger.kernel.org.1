@@ -1,140 +1,176 @@
-Return-Path: <netdev+bounces-41939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A076C7CC58A
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:05:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C69417CC5B1
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:15:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52AA1C20A4B
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:05:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B26891C20921
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29BB43A92;
-	Tue, 17 Oct 2023 14:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582EC43A9F;
+	Tue, 17 Oct 2023 14:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="izYj5Ga6"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BuhHU8zO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF82C436AF
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:05:06 +0000 (UTC)
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5304FF5
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:05:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1697551501; x=1697810701;
-	bh=WbdP5fcQx3fwBJjucXlAM/p4DeJcbvea89fpjicPDuM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=izYj5Ga6Cz2CtBXXdG4cukES/JT4vVkO/l8Df/chhwTefcLTP6DCoiOS8z7qJS6p6
-	 ZS224f9z204CDVcwQ6bS+GmmbZ7lznwx329FkJL0/8eowidB85Tmd9+RQSoN4iB1uL
-	 jLPLwfowtMZjxTESljz0voATZTqVqq7nHu3thUlhf9GkfkJfO+rOG1jKvLNDhEx53y
-	 0hH4UxOR3Qm+lYn3Csql71tt9es8qcf3GpCwhXFEm1RuDFjGYg5TdInVFwrVWJaVqf
-	 V2vM6opC48mgLU5DZvfXlZvmm3ZfnMziZMB3bmODNnU/Tdkq64Gc3ztzI2OU/wnDWy
-	 bHKt+FLjx9DFQ==
-Date: Tue, 17 Oct 2023 14:04:33 +0000
-To: Andrew Lunn <andrew@lunn.ch>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY drivers
-Message-ID: <f26a3e1a-7eb8-464e-9cbe-ebb8bdf69b20@proton.me>
-In-Reply-To: <1454c3e6-82d1-4f60-b07d-bc3b47b23662@lunn.ch>
-References: <3469de1c-0e6f-4fe5-9d93-2542f87ffd0d@proton.me> <20231015.011502.276144165010584249.fujita.tomonori@gmail.com> <9d70de37-c5ed-4776-a00f-76888e1230aa@proton.me> <20231015.073929.156461103776360133.fujita.tomonori@gmail.com> <98471d44-c267-4c80-ba54-82ab2563e465@proton.me> <1454c3e6-82d1-4f60-b07d-bc3b47b23662@lunn.ch>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE67B43681
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:15:36 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A75B5FA;
+	Tue, 17 Oct 2023 07:15:35 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39HECtqg021776;
+	Tue, 17 Oct 2023 14:15:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=ACi5eTARhKvQqEEvAFgNcoSlkqmFPO0yXbmr3r1fRE8=;
+ b=BuhHU8zODY0fN5SbWxOQDDcAI672+9JEAF5zkuT8/mLZs+6SNkgXdiH1wfo8TQEmr5pt
+ YavOjp/qqm2vAon2pF+c+Z2Ii7fVqxZGwMsjzp/JdQ22nJpOlsifa+RPMtc3vY4XhG2X
+ +mwO8AZQCDBEDT492Nmrjm/Cwn21p94xTm04k0bPoDGi4tALw9JVA40024K4EVQvdQow
+ o6nxhT6z7qv58AyIgcJAgRnZRufBEpSzHkoyhys/RLhr2k7A/YHbCPeqWmfPW4az1GTt
+ /G6FIhcpWUXSSalX5Ib9W86QV5WxZ+zo0CfD89ap6ZKxG1/8wGHoavdOce5TxNZxCGS4 EQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tsuu0r426-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Oct 2023 14:15:27 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39HEDcHU025064;
+	Tue, 17 Oct 2023 14:15:26 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tsuu0r40c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Oct 2023 14:15:26 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39HC8IbU027154;
+	Tue, 17 Oct 2023 14:15:24 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tr6tk97t8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Oct 2023 14:15:24 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39HEFLvK46792964
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 17 Oct 2023 14:15:21 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 567922004E;
+	Tue, 17 Oct 2023 14:15:21 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0112520040;
+	Tue, 17 Oct 2023 14:15:21 +0000 (GMT)
+Received: from [9.155.208.153] (unknown [9.155.208.153])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 17 Oct 2023 14:15:20 +0000 (GMT)
+Message-ID: <b152ec7c0e690027da1086b777a3ec512001ba1f.camel@linux.ibm.com>
+Subject: Re: [PATCH net] net/smc: Fix dependency of SMC on ISM
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Randy Dunlap <rdunlap@infradead.org>, wenjia@linux.ibm.com
+Cc: linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
+        netdev@vger.kernel.org, raspl@linux.ibm.com, sfr@canb.auug.org.au,
+        alibuda@linux.alibaba.com, wintera@linux.ibm.com,
+        guwen@linux.alibaba.com, tonylu@linux.alibaba.com, jaka@linux.ibm.com
+Date: Tue, 17 Oct 2023 16:15:20 +0200
+In-Reply-To: <afd142a2-1fa0-46b9-8b2d-7652d41d3ab8@infradead.org>
+References: <d9a2d47d-c8bd-cf17-83e0-d9b82561a594@linux.ibm.com>
+	 <20231006125847.1517840-1-gbayer@linux.ibm.com>
+	 <afd142a2-1fa0-46b9-8b2d-7652d41d3ab8@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.48.4 (3.48.4-1.module_f38+17164+63eeee4a) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ygHLqLKxeizfpEdiz0ZOsakjb0xjj2Lq
+X-Proofpoint-ORIG-GUID: xrGBjupqLn5GVl5gb-Pha81j7jub6hSG
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-17_03,2023-10-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ clxscore=1015 mlxlogscore=856 suspectscore=0 adultscore=0
+ lowpriorityscore=0 priorityscore=1501 phishscore=0 mlxscore=0 spamscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310170120
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 17.10.23 14:38, Andrew Lunn wrote:
->>> Because set_speed() updates the member in phy_device and read()
->>> updates the object that phy_device points to?
->>
->> `set_speed` is entirely implemented on the Rust side and is not protecte=
-d
->> by a lock.
+On Mon, 2023-10-16 at 16:09 -0700, Randy Dunlap wrote:
+> Hi Gerd,
 >=20
-> With the current driver, all entry points into the driver are called
-> from the phylib core, and the core guarantees that the lock is
-> taken. So it should not matter if its entirely implemented in the Rust
-> side, somewhere up the call stack, the lock was taken.
-
-Sure that might be the case, I am trying to guard against this future
-problem:
-
-     fn soft_reset(driver: &mut Driver) -> Result {
-         let driver =3D driver
-         thread::scope(|s| {
-             let thread_a =3D s.spawn(|| {
-                 for _ in 0..100_000_000 {
-                     driver.set_speed(10);
-                 }
-             });
-             let thread_b =3D s.spawn(|| {
-                 for _ in 0..100_000_000 {
-                     driver.set_speed(10);
-                 }
-             });
-             thread_a.join();
-             thread_b.join();
-         });
-         Ok(())
-     }
-
-This code spawns two new threads both of which can call `set_speed`,
-since it takes `&self`. But this leads to a data race, since those
-accesses are not serialized. I know that this is a very contrived
-example, but you never when this will become reality, so we should
-do the right thing now and just use `&mut self`, since that is exactly
-what it is for.
-
-Not that we do not even have a way to create threads on the Rust side
-at the moment. But we should already be thinking about any possible
-code pattern.
-
->>>> What about these functions?
->>>> - resolve_aneg_linkmode
->>>> - genphy_soft_reset
->>>> - init_hw
->>>> - start_aneg
->>>> - genphy_read_status
->>>> - genphy_update_link
->>>> - genphy_read_lpa
->>>> - genphy_read_abilities
->>>
->>> As Andrew replied, all the functions update some member in phy_device.
->>
->> Do all of these functions lock the `bus->mdio_lock`?
+> On 10/6/23 05:58, Gerd Bayer wrote:
+> > When the SMC protocol is built into the kernel proper while ISM is
+> > configured to be built as module, linking the kernel fails due to
+> > unresolved dependencies out of net/smc/smc_ism.o to
+> > ism_get_smcd_ops, ism_register_client, and ism_unregister_client
+> > as reported via the linux-next test automation (see link).
+> > This however is a bug introduced a while ago.
+> >=20
+> > Correct the dependency list in ISM's and SMC's Kconfig to reflect
+> > the
+> > dependencies that are actually inverted. With this you cannot build
+> > a
+> > kernel with CONFIG_SMC=3Dy and CONFIG_ISM=3Dm. Either ISM needs to be
+> > 'y',
+> > too - or a 'n'. That way, SMC can still be configured on non-s390
+> > architectures that do not have (nor need) an ISM driver.
+> >=20
+> > Fixes: 89e7d2ba61b7 ("net/ism: Add new API for client
+> > registration")
+> >=20
+> > Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> > Closes:
+> > https://lore.kernel.org/linux-next/d53b5b50-d894-4df8-8969-fd39e63440ae=
+@infradead.org/
+> > Co-developed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> > Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
 >=20
-> When accessing the hardware, yes.
+> With this patch, ISM can be build without SMC being enabled.
 >=20
-> The basic architecture is that at the bottom we have an MDIO bus, and
-> on top of that bus, we have a number of devices. The MDIO core will
-> serialise access to the bus, so only one device on the bus can be
-> accessed at once. The phylib core will serialise access to the PHY,
-> but when there are multiple PHYs, the phylib core will allow parallel
-> access to different PHYs.
+> This leads to some build warnings:
 >=20
-> In summary, the core of each layer protects the drivers using that
-> layer from multiple parallel accesses from above.
-Thanks for this explanation, it really helps!
+> ../drivers/s390/net/ism_drv.c:572:12: warning: 'ism_get_local_gid'
+> defined but not used [-Wunused-function]
+> =C2=A0 572 | static u64 ism_get_local_gid(struct ism_dev *ism)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~~~~~~
+> ../drivers/s390/net/ism_drv.c:506:12: warning: 'ism_get_chid' defined
+> but not used [-Wunused-function]
+> =C2=A0 506 | static u16 ism_get_chid(struct ism_dev *ism)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~
+> ../drivers/s390/net/ism_drv.c:432:12: warning: 'ism_signal_ieq'
+> defined but not used [-Wunused-function]
+> =C2=A0 432 | static int ism_signal_ieq(struct ism_dev *ism, u64 rgid, u32
+> trigger_irq,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~~~
+> ../drivers/s390/net/ism_drv.c:292:12: warning: 'ism_query_rgid'
+> defined but not used [-Wunused-function]
+> =C2=A0 292 | static int ism_query_rgid(struct ism_dev *ism, u64 rgid, u32
+> vid_valid,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~~~
 
---=20
-Cheers,
-Benno
+Hi Randy,
 
+I must have missed testing a config of ISM without SMC. I'm working on
+a fix.
+
+Thanks for reporting,
+Gerd
 
 
