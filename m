@@ -1,82 +1,153 @@
-Return-Path: <netdev+bounces-41680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 286237CBA62
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:53:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 624327CBA63
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:53:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58FC0B20F9C
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 05:53:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2446B2103F
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 05:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A78C3C155;
-	Tue, 17 Oct 2023 05:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E7BC15F;
+	Tue, 17 Oct 2023 05:53:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WQTTaE9y"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ThmOeqLP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA34946E
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 05:53:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE1A4C433C7;
-	Tue, 17 Oct 2023 05:53:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697521997;
-	bh=wvervu08O2tB/wlrgscAj5HHqJoy64a2u9WnJdsQOFU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WQTTaE9yO3KV+mdxcLE30eAfRNTaWZ5ElqHxXZbGUVIasU6Zw0gZM5jTFKdTt4xBW
-	 ybQKX17tDDtSD2a18ORTdat92dlUlSXEEzywQS/12eT4FhCxF1Y6aiuxijqIHvhx/n
-	 4Osfa162GVTb/XzTTio4x+hUSp7FOzw4K7DDNvNglqjJ3dM7QcQN0ym9oRtEdYcJax
-	 snyXBLq+TBdWj1MDNw1rmEKxOhJrIsBUd/C4M2HSq7ZYu5WGbvCNHslpcU4OzbVc9G
-	 u4myW1NvKzTmSTfGK3n0w6/nLI/OFnf0bB6FJpCJDrUy9cyoEBkPLnQEnBGVft2na7
-	 daAWzzxc5e9Kw==
-Date: Tue, 17 Oct 2023 07:53:13 +0200
-From: Simon Horman <horms@kernel.org>
-To: Muhammad Muzammil <m.muzzammilashraf@gmail.com>
-Cc: m.chetan.kumar@intel.com, linuxwwan@intel.com, loic.poulain@linaro.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] drivers: net: wwan: iosm: Fixed multiple typos in
- multiple files
-Message-ID: <20231017055313.GD1751252@kernel.org>
-References: <20231014121407.10012-1-m.muzzammilashraf@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B92DC2C2
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 05:53:27 +0000 (UTC)
+Received: from out-205.mta0.migadu.com (out-205.mta0.migadu.com [91.218.175.205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A53CC102
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 22:53:25 -0700 (PDT)
+Message-ID: <9666242b-d899-c428-55bd-14f724cc4ffd@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1697522003;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gav1QVjqUN4yqflEWQ6On0xLHhhoAVNXR/XTuzPjPWg=;
+	b=ThmOeqLPj7ARlMMBukujDXrjMWD8iP5Jthk7FXzYS1d1PDtd8kIPkxlWhMGiCG/e7kQm+g
+	Y0iUePPuP2AVtxttNgcudBAXaOujwhSjZv0FXIpMUNUniL43BW8GL9YGS/deBXx64LTkVp
+	biJIqSt5iBt9i9D93rW2EJJ5qAW2bIk=
+Date: Mon, 16 Oct 2023 22:53:15 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231014121407.10012-1-m.muzzammilashraf@gmail.com>
+Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie
+ generation/validation SOCK_OPS hooks.
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>
+References: <20231013220433.70792-1-kuniyu@amazon.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231013220433.70792-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sat, Oct 14, 2023 at 05:14:07PM +0500, Muhammad Muzammil wrote:
-> iosm_ipc_chnl_cfg.h: Fixed typo
-> iosm_ipc_imem_ops.h: Fixed typo
-> iosm_ipc_mux.h: Fixed typo
-> iosm_ipc_pm.h: Fixed typo
-> iosm_ipc_port.h: Fixed typo
-> iosm_ipc_trace.h: Fixed typo
+On 10/13/23 3:04 PM, Kuniyuki Iwashima wrote:
+> Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
+> After 3WHS, the proxy restores SYN and forwards it and ACK to the backend
+> server.  Our kernel module works at Netfilter input/output hooks and first
+> feeds SYN to the TCP stack to initiate 3WHS.  When the module is triggered
+> for SYN+ACK, it looks up the corresponding request socket and overwrites
+> tcp_rsk(req)->snt_isn with the proxy's cookie.  Then, the module can
+> complete 3WHS with the original ACK as is.
+
+Does the current kernel module also use the timestamp bits differently? 
+(something like patch 8 and patch 10 trying to do)
+
 > 
-> Signed-off-by: Muhammad Muzammil <m.muzzammilashraf@gmail.com>
+> This way, our SYN Proxy does not manage the ISN mappings and can stay
+> stateless.  It's working very well for high-bandwidth services like
+> multiple Tbps, but we are looking for a way to drop the dirty hack and
+> further optimise the sequences.
+> 
+> If we could validate an arbitrary SYN Cookie on the backend server with
+> BPF, the proxy would need not restore SYN nor pass it.  After validating
+> ACK, the proxy node just needs to forward it, and then the server can do
+> the lightweight validation (e.g. check if ACK came from proxy nodes, etc)
+> and create a connection from the ACK.
+> 
+> This series adds two SOCK_OPS hooks to generate and validate arbitrary
+> SYN Cookie.  Each hook is invoked if BPF_SOCK_OPS_SYNCOOKIE_CB_FLAG is
+> set to the listening socket in advance by bpf_sock_ops_cb_flags_set().
+> 
+> The user interface looks like this:
+> 
+>    BPF_SOCK_OPS_GEN_SYNCOOKIE_CB
+> 
+>      input
+>      |- bpf_sock_ops.sk           : 4-tuple
+>      |- bpf_sock_ops.skb          : TCP header
+>      |- bpf_sock_ops.args[0]      : MSS
+>      `- bpf_sock_ops.args[1]      : BPF_SYNCOOKIE_XXX flags
+> 
+>      output
+>      |- bpf_sock_ops.replylong[0] : ISN (SYN Cookie) ------.
+>      `- bpf_sock_ops.replylong[1] : TS value -----------.  |
+>                                                         |  |
+>    BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB                      |  |
+>                                                         |  |
+>      input                                              |  |
+>      |- bpf_sock_ops.sk           : 4-tuple             |  |
+>      |- bpf_sock_ops.skb          : TCP header          |  |
+>      |- bpf_sock_ops.args[0]      : ISN (SYN Cookie) <-----'
+>      `- bpf_sock_ops.args[1]      : TS value <----------'
+> 
+>      output
+>      |- bpf_sock_ops.replylong[0] : MSS
+>      `- bpf_sock_ops.replylong[1] : BPF_SYNCOOKIE_XXX flags
+> 
+> To establish a connection from SYN Cookie, BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB
+> hook must set a valid MSS to bpf_sock_ops.replylong[0], meaning that
+> BPF_SOCK_OPS_GEN_SYNCOOKIE_CB hook must encode MSS to ISN or TS val to be
+> restored in the validation hook.
+> 
+> If WScale, SACK, and ECN are detected to be available in SYN packet, the
+> corresponding flags are passed to args[0] of BPF_SOCK_OPS_GEN_SYNCOOKIE_CB
+> so that bpf prog need not parse the TCP header.  The same flags can be set
+> to replylong[0] of BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB to enable each feature
+> on the connection.
+> 
+> For details, please see each patch.  Here's an overview:
+> 
+>    patch 1 - 4 : Misc cleanup
+>    patch 5, 6  : Add SOCK_OPS hook (only ISN is available here)
+>    patch 7, 8  : Make TS val available as the second cookie storage
+>    patch 9, 10 : Make WScale, SACK, and ECN configurable from ACK
+>    patch 11    : selftest, need some help from BPF experts...
 
-Thanks Muhammad,
+I cannot reprod the issue. Commented in patch 11.
 
-Please consider targeting Networking patches to either
-'net' for bug fixes or 'net-next' for other patches.
+I only scanned through the high level of the patchset. will take a closer look. 
+Thanks.
 
-	Subject: [PATCH net-next] ...
 
-Looking at the git log the 'drivers: ' part of the prefix should be
-dropped.
+> 
+> [0]: https://netdev.bots.linux.dev/netconf/2023/kuniyuki.pdf
 
-	Subject: [PATCH net-next] net: iosm: ...
-
-And lastly, if you do spin a v2 of this patch, you might
-consider also fixing the misspelling of 'defering' in iosm_ipc_imem_ops.h.
-
-The above notwithstanding, these typo corrections look good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
 
