@@ -1,157 +1,243 @@
-Return-Path: <netdev+bounces-41853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 174757CC0E8
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:46:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DF357CC101
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 12:49:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC0581F22D85
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:46:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F3F71C20842
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EC93FB27;
-	Tue, 17 Oct 2023 10:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B10381BD;
+	Tue, 17 Oct 2023 10:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLZ/PlEM"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FenBL/z0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA7241757
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:46:17 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43B14B0
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 03:46:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697539575;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12990381A6
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 10:49:28 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B155DB0
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 03:49:26 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CC59D1C000C;
+	Tue, 17 Oct 2023 10:49:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1697539765;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zqkbb/k4y19ZoEz8tHHeyQiTb7Pt5hF4nVZg7dtOzKk=;
-	b=CLZ/PlEMMDB5LN8WAgUNHjojyuIHJj57w7MylXCwnqw5SB6a8JXaz6jAGKTmaqVQYB3tte
-	8U3bq1MHBKKO8qN5rAcC9WbcsHi9oE+tsxIwG96UW67lHJGSyJEtms+hZxl41xB8SqTDx2
-	cHbaFkt75uSQDhF/1kGpwkPNna3T77o=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-ZBRszdW5OWqW9yEto7rQxA-1; Tue, 17 Oct 2023 06:46:12 -0400
-X-MC-Unique: ZBRszdW5OWqW9yEto7rQxA-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50337007b37so1181888e87.1
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 03:46:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697539571; x=1698144371;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zqkbb/k4y19ZoEz8tHHeyQiTb7Pt5hF4nVZg7dtOzKk=;
-        b=jS3Mlfjo7dT5/zEvV7Pxy6hPR9eLDSVDC6q0liAdQn0RUZa0etuSBi24uXqx7NhPTD
-         gwOd7SAzFHuaRvDEnQfJ05m0YAyzGaGEJJI/iBRo2+GBDBpf1eWIy+ZM0EJsTVlOV9rz
-         aR12zyLMq0JF9e1+kDuL2fg0OvN4hCGBvm8ni33Aev2e39AIlk7Ut9BcSJ3yD7pXKc0n
-         TqotCqwtkWgHJ3/rxIfa7QEJNon0Tch8oGxRMXx2Mv8aoqk7gBRc2Dc2LNGS5u6L0oXY
-         LfE5Eez/ktmANK2Gurefk3rn4C7tD39JQT8qIXspPFuQkg7GScJAbi1k7T4x4aVl0rHK
-         KUTA==
-X-Gm-Message-State: AOJu0YwTGBrc/O0khU7vxQy0hD7w4ViAa19GMTx/p77uc7Yse9dH4JAm
-	3clNlWvg2QAC6dWWTMe9zb+L18vkecJRhw0hIzw1UHkljgt4uzgq1vOv0NFV9p9g2L3ZCsYcuaT
-	umIn6BSExMy0gX/R0
-X-Received: by 2002:a05:6512:1188:b0:505:97b9:5d50 with SMTP id g8-20020a056512118800b0050597b95d50mr1595971lfr.5.1697539570787;
-        Tue, 17 Oct 2023 03:46:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGM26eZbLoF1xnImDI1P3NpnJ00X/0O1AwfU7XYcu3kmZD6x5Nae+2tZHNg+jy1emwoUXnpJA==
-X-Received: by 2002:a05:6512:1188:b0:505:97b9:5d50 with SMTP id g8-20020a056512118800b0050597b95d50mr1595953lfr.5.1697539570431;
-        Tue, 17 Oct 2023 03:46:10 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-233-87.dyn.eolo.it. [146.241.233.87])
-        by smtp.gmail.com with ESMTPSA id q8-20020a056512210800b00505677e7a99sm226862lfr.139.2023.10.17.03.46.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 03:46:09 -0700 (PDT)
-Message-ID: <caa89a15568b2d92592476995bfcf362475be11f.camel@redhat.com>
-Subject: Re: [PATCH net-next v6 3/3] mctp i3c: MCTP I3C driver
-From: Paolo Abeni <pabeni@redhat.com>
-To: Simon Horman <horms@kernel.org>, Matt Johnston
- <matt@codeconstruct.com.au>
-Cc: linux-i3c@lists.infradead.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Jeremy Kerr
- <jk@codeconstruct.com.au>,  Alexandre Belloni
- <alexandre.belloni@bootlin.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
- <conor+dt@kernel.org>,  miquel.raynal@bootlin.com
-Date: Tue, 17 Oct 2023 12:46:07 +0200
-In-Reply-To: <20231017082427.GH1751252@kernel.org>
-References: <20231013040628.354323-1-matt@codeconstruct.com.au>
-	 <20231013040628.354323-4-matt@codeconstruct.com.au>
-	 <20231017082427.GH1751252@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	bh=YktfQXJJf6eq8h6WB2b8ng8dgtoMCtj13PRTZnCb60E=;
+	b=FenBL/z0uH+1PM+PZV1tupY3MEjeUf01YQrqTTFTGAqmU5bMknPupU+kX7L6A5PH7B86ws
+	O6DPFRaFKXxlDWBPRnwIqD9CzqwNhsnYzkuophO9wTY19itatGBIN8oto0ponr+l8upgsO
+	t1YA8JjPylCPARDdK1NZGhV2dwy7/iJmWV4sW4vjPZo2YfdC5ZlgSVxM7wdWVNi0GmHbyR
+	zls/nhpaRD3v3BAlohiS/N7eR+in822E1xm+ArZfW7tDnYiKm3pGZ72UTe5oyIKxkn0uql
+	fhhe1leXPTpbAUwJTBTWXJPB1b5SiYOBXfixFiAoPp6t+bu6Z4rjZ9GrsyJoKA==
+Date: Tue, 17 Oct 2023 12:49:19 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Alexander Stein <alexander.stein@ew.tq-group.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, Andrew Lunn
+ <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+ <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Russell King
+ <linux@armlinux.org.uk>, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-imx@nxp.com,
+ netdev@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: Ethernet issue on imx6
+Message-ID: <20231017124919.08601e9c@xps-13>
+In-Reply-To: <3527956.iIbC2pHGDl@steina-w>
+References: <20231012193410.3d1812cf@xps-13>
+	<2245614.iZASKD2KPV@steina-w>
+	<20231016153154.31d92529@xps-13>
+	<3527956.iIbC2pHGDl@steina-w>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-10-17 at 10:24 +0200, Simon Horman wrote:
-> On Fri, Oct 13, 2023 at 12:06:25PM +0800, Matt Johnston wrote:
-> > Provides MCTP network transport over an I3C bus, as specified in
-> > DMTF DSP0233.
+Hi Alexander,
+
+alexander.stein@ew.tq-group.com wrote on Mon, 16 Oct 2023 16:41:50
++0200:
+
+> Hi Miquel,
+>=20
+> Am Montag, 16. Oktober 2023, 15:31:54 CEST schrieb Miquel Raynal:
+> > Hi Alexander,
 > >=20
-> > Each I3C bus (with "mctp-controller" devicetree property) gets an
-> > "mctpi3cX" net device created. I3C devices are reachable as remote
-> > endpoints through that net device. Link layer addressing uses the
-> > I3C PID as a fixed hardware address for neighbour table entries.
+> > Thanks a lot for your feedback.
+> >  =20
+> > > > switch to partitions #0, OK
+> > > > mmc1 is current device
+> > > > reading boot.scr
+> > > > 444 bytes read in 10 ms (43 KiB/s)
+> > > > ## Executing script at 20000000
+> > > > Booting from mmc ...
+> > > > reading zImage
+> > > > 9160016 bytes read in 462 ms (18.9 MiB/s)
+> > > > reading <board>.dtb =20
+> > >=20
+> > > Which device tree is that?
+> > >  =20
+> > > > 40052 bytes read in 22 ms (1.7 MiB/s)
+> > > > boot device tree kernel ...
+> > > > Kernel image @ 0x12000000 [ 0x000000 - 0x8bc550 ]
+> > > > ## Flattened Device Tree blob at 18000000
+> > > >=20
+> > > >    Booting using the fdt blob at 0x18000000
+> > > >    Using Device Tree in place at 18000000, end 1800cc73
+> > > >=20
+> > > > Starting kernel ...
+> > > >=20
+> > > > [    0.000000] Booting Linux on physical CPU 0x0
+> > > > [    0.000000] Linux version 6.5.0 (mraynal@xps-13)
+> > > > (arm-linux-gcc.br_real
+> > > > (Buildroot 2 020.08-14-ge5a2a90) 10.2.0, GNU ld (GNU Binutils) 2.34)
+> > > > #120
+> > > > SMP Thu Oct 12 18:10:20 CE ST 2023
+> > > > [    0.000000] CPU: ARMv7 Processor [412fc09a] revision 10 (ARMv7),
+> > > > cr=3D10c5387d [    0.000000] CPU: PIPT / VIPT nonaliasing data cach=
+e, VIPT
+> > > > aliasing instruction cache
+> > > > [    0.000000] OF: fdt: Machine model: TQ TQMa6Q
+> > > > on MBa6x =20
+> > >=20
+> > > Your first mail mentions a custom board, but this indicates "TQMa6Q
+> > > on MBa6x", so which is it? =20
 > >=20
-> > The driver matches I3C devices that have the MIPI assigned DCR 0xCC for
-> > MCTP.
+> > It's a custom carrier board with a TQMA6Q-AA module. =20
+>=20
+> Could you please adjust the machine model to your mainboard if it is not =
+a=20
+> MBa6x? Thanks.
+> Which HW revision is this module? It should be printed in u-boot during s=
+tart.=20
+> Can you provide a full log?
+
+The full kernel log is at the bottom of this e-mail:
+https://lore.kernel.org/netdev/20231013102718.6b3a2dfe@xps-13/
+
+On the module I read on a white sticker:
+	TQMA6Q-AA
+	RK.0203
+And on one side of the PCB:
+	TQMa6x.0201
+
+Do you know if this module has the hardware workaround discussed below?
+(I don't have the schematics of the module)
+
+Here is also the U-Boot log:
+
+U-Boot 2017.11 (Aug 11 2023 - 19:35:47 +0200)
+
+CPU:   Freescale i.MX6Q rev1.5 at 792 MHz
+Reset cause: POR
+Board: TQMa6Q on a MBa6x
+I2C:   ready
+DRAM:  1 GiB
+PMIC: PFUZE100 ID=3D0x10 REV=3D0x21
+MMC:   FSL_SDHC: 0, FSL_SDHC: 1
+reading uboot.env
+In:    serial
+Out:   serial
+Err:   serial
+Net:   FEC [PRIME]
+Warning: FEC MAC addresses don't match:
+Address in SROM is         00:d0:93:44:a4:c0
+Address in environment is  fc:c2:3d:18:5f:91
+
+starting USB...
+USB0:   Port not available.
+USB1:   USB EHCI 1.00
+scanning bus 1 for devices... 3 USB Device(s) found
+       scanning usb for storage devices... 0 Storage Device(s) found
+       scanning usb for ethernet devices... 1 Ethernet Device(s) found
+Hit any key to stop autoboot:  0=20
+switch to partitions #0, OK
+mmc1 is current device
+reading boot.scr
+444 bytes read in 10 ms (43 KiB/s)
+## Executing script at 20000000
+Booting from mmc ...
+reading zImage
+7354128 bytes read in 368 ms (19.1 MiB/s)
+reading stephan_Stephanie_ControlUnit_A809_60_408.dtb
+40002 bytes read in 25 ms (1.5 MiB/s)
+boot device tree kernel ...
+Kernel image @ 0x12000000 [ 0x000000 - 0x703710 ]
+## Flattened Device Tree blob at 18000000
+   Booting using the fdt blob at 0x18000000
+   Using Device Tree in place at 18000000, end 1800cc41
+
+Starting kernel ...
+
+> > > Please note that there are two different module variants,
+> > > imx6qdl-tqma6a.dtsi and imx6qdl-tqma6b.dtsi. They deal with i.MX6's
+> > > ERR006687 differently. Package drop without any load somewhat indicat=
+es
+> > > this issue. =20
 > >=20
-> > Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
+> > I've tried with and without the fsl,err006687-workaround-present DT
+> > property. It gets successfully parsed an I see the lower idle state
+> > being disabled under mach-imx. I've also tried just commenting out the
+> > registration of the cpuidle driver, just to be sure. I saw no
+> > difference. =20
 >=20
-> Hi Matt,
->=20
-> one minor nit below, which you can take, leave, or leave for later
-> as far as I am concerned.
->=20
-> Overall the patch looks good to me and I see that Paolo's review of v5 ha=
-s
-> has been addressed.
->=20
-> Reviewed-by: Simon Horman <horms@kernel.org>
->=20
-> > +/* List of mctp_i3c_busdev */
-> > +static LIST_HEAD(busdevs);
-> > +/* Protects busdevs, as well as mctp_i3c_bus.devs lists */
-> > +static DEFINE_MUTEX(busdevs_lock);
-> > +
-> > +struct mctp_i3c_bus {
-> > +	struct net_device *ndev;
-> > +
-> > +	struct task_struct *tx_thread;
-> > +	wait_queue_head_t tx_wq;
-> > +	/* tx_lock protects tx_skb and devs */
-> > +	spinlock_t tx_lock;
-> > +	/* Next skb to transmit */
-> > +	struct sk_buff *tx_skb;
-> > +	/* Scratch buffer for xmit */
-> > +	u8 tx_scratch[MCTP_I3C_MAXBUF];
-> > +
-> > +	/* Element of busdevs */
-> > +	struct list_head list;
->=20
-> I am unsure if it is important, but I observe that on x86_64
-> list spans a cacheline.
+> fsl,err006687-workaround-present requires a specific HW workaround, see [=
+1].=20
+> So this is not applicable on every module.
 
-It looks like 'list' is only touched on control path, so it's should
-not critical.
+Based on the information provided above, do you think I can rely on the
+HW workaround?
 
-Cheers,
+I've tried disabling the registration of both the CPUidle and CPUfreq
+drivers in the machine code and I see a real difference. The transfers
+are still not perfect though, but I believe this is related to the ~1%
+drop of the RGMII lines (timings are not perfect, but I could not
+extend them more).
 
-Paolo
+I believe if the hardware workaround is not available on this module I
+can still disable CPUidle and CPUfreq as a workaround of the
+workaround...?
 
+> > By the way, we tried with a TQ eval board with this SoM and saw the same
+> > issue (not me, I don't have this board in hands). Don't you experience
+> > something similar? I went across a couple of people reporting similar
+> > issues with these modules but none of them reported how they fixed it
+> > (if they did). I tried two different images based on TQ's Github using
+> > v4.14.69 and v5.10 kernels. =20
+>=20
+> Personally I've heard the first time about this issue. I never noticed=20
+> something like this. Does this issue also appear when using TCP? Or is it=
+ an=20
+> UDP only issue?
+
+With a mainline kernel:
+* With UDP I get a high drop rate.
+* With TCP I get slow/bumpy throughputs.
+
+> [1] https://github.com/tq-systems/linux-tqmaxx/blob/TQMa8-fslc-5.10-2.1.x=
+-imx/
+> arch/arm/boot/dts/imx6qdl-tqma6a.dtsi#L36-L48
+
+Thanks,
+Miqu=C3=A8l
 
