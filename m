@@ -1,116 +1,125 @@
-Return-Path: <netdev+bounces-41882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 602567CC173
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:04:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91DAB7CC17D
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B50281A66
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:04:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 494B4281ACB
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B7F41776;
-	Tue, 17 Oct 2023 11:04:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0653641777;
+	Tue, 17 Oct 2023 11:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X8gVlGJc"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="uub9dAta"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681CEBE69
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:04:35 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BD87B6
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 04:04:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697540673;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GYqRkp5nbhNy4codggZnLt08peOmFDnihVhb/KDpZ7g=;
-	b=X8gVlGJcO6vNKZXmedJ/EDQ+fyaku2poikmYjbQXEhNcpJrvIcanddmDAAxXUyr8UAwC5k
-	TwKwesYl4TBQ9tosxoB7WyDDVEF+dpqfq2jaasyCQl2V/dMa5Cf+dybFbG7FG+XxRloHWk
-	XCzIg97N/0ayGI2q0ei7JZj2jEBRjEQ=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-428-fHmgh0qYOZWPzFav72VMfw-1; Tue, 17 Oct 2023 07:04:32 -0400
-X-MC-Unique: fHmgh0qYOZWPzFav72VMfw-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9bfbc393c43so39247966b.1
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 04:04:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697540671; x=1698145471;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GYqRkp5nbhNy4codggZnLt08peOmFDnihVhb/KDpZ7g=;
-        b=N4O9zaqkFsFU6m5MkTmKupetWX9OC7UbDhfqVKJYtVgs8Am2LgaJkTMqUxiYQLh7dR
-         EuagP54pgS6wKXwQyR8vHO4qUavfi3gY8/oJFrP/czUexOcEbiqSv7bLudxat+BF0tgY
-         EaDKqp1EnaqZnoATmMhwFNuqt1yukk78sRCBCOccAgq0nkeCrjrR/n/uuIxNohiX7NbF
-         uJLn2gHxrVdZQXeVeWpNdl/zkalx4r97DtCKLR/tQ0mJikcRf+vrHkRukSJFiVzBkNpy
-         VDiC3GaKl6JfmFhgxaTrZxYBJkt+JgoUgooCHL50Tcdh65jUwzLIiRjVh9Kk2OOJulOo
-         ibMg==
-X-Gm-Message-State: AOJu0YzAlyxTJEq7aIB2Vc1xF/EjqkOReBdNPPsQ0fjUlAdn1BGbJ9an
-	k6cQJpfMD+aPGtOASwZLMPMLoUH6a/TdvOK9aHOabhLUQIsIvPv7V5cxDiyDvY5tOXfFhaCvfmJ
-	htVCQbkgLjf+h88xQ
-X-Received: by 2002:a17:907:94c3:b0:9c4:409:6d42 with SMTP id dn3-20020a17090794c300b009c404096d42mr1341013ejc.3.1697540670844;
-        Tue, 17 Oct 2023 04:04:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IESTIhEc9vD0Ik4h6NFgWxMULaxTEBNNmO1WfnFCd7dcXYuY3RUp7VoDu/Rw9S2hN4rrq8jTQ==
-X-Received: by 2002:a17:907:94c3:b0:9c4:409:6d42 with SMTP id dn3-20020a17090794c300b009c404096d42mr1340990ejc.3.1697540670506;
-        Tue, 17 Oct 2023 04:04:30 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-233-87.dyn.eolo.it. [146.241.233.87])
-        by smtp.gmail.com with ESMTPSA id i5-20020a1709061cc500b0099315454e76sm1021589ejh.211.2023.10.17.04.04.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 04:04:30 -0700 (PDT)
-Message-ID: <a3612d9fce07dffc1029cf49286f16913d2e2df8.camel@redhat.com>
-Subject: Re: [PATCH net] net: ethernet: ti: Fix mixed module-builtin object
-From: Paolo Abeni <pabeni@redhat.com>
-To: MD Danish Anwar <danishanwar@ti.com>, Andrew Lunn <andrew@lunn.ch>, Arnd
- Bergmann <arnd@arndb.de>, Wolfram Sang <wsa+renesas@sang-engineering.com>,
- Simon Horman <horms@kernel.org>, Roger Quadros <rogerq@ti.com>, Vignesh
- Raghavendra <vigneshr@ti.com>, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com, 
-	r-gunasekaran@ti.com, Roger Quadros <rogerq@kernel.org>
-Date: Tue, 17 Oct 2023 13:04:28 +0200
-In-Reply-To: <20231013100549.3198564-1-danishanwar@ti.com>
-References: <20231013100549.3198564-1-danishanwar@ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C902038FA7
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:06:17 +0000 (UTC)
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E989AFC;
+	Tue, 17 Oct 2023 04:06:14 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 3A5CB5C0308;
+	Tue, 17 Oct 2023 07:06:14 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Tue, 17 Oct 2023 07:06:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1697540774; x=1697627174; bh=gk4uH597iCVOZ
+	ZIrN/RdNf7XGlip0tVQ+qETf0YnWnM=; b=uub9dAtaSbqCsb5DHt/7NzLuERclT
+	ci/W/XwyQ6GgWFzejlhKNAEcIuZ4ZVgq9dUL7DthXYE+X7aBjqhXvIqbq8kGeTXz
+	xaQD+E9I1513hcuio8WWpWBhicj9ER/J/7T5dQN+kiRahW5hIFHLfOkaHsi1+Vb1
+	/cC1UcSp9TZ+GgrF7sCUWRE2QGVcTRDdS2GEt0EYzFj7/Fb5Xwu3II2IDc+yxs03
+	9ZLzu19qbcYUJ2WDf7lJV2JDSAu+6V3qHY+aplIaRSoTPWM/x7BZyr4/Qd8MTV2r
+	N45iHMctDsCZharssV6oaB9TFaMQZOOplSOC9ApQl94xCq7lqNiqSuL6g==
+X-ME-Sender: <xms:pWouZfyC30nDYgKei5x4q2ult-hfe1uovSMU8Jcks8o3XSX-_uAcfg>
+    <xme:pWouZXRJH9RYHFyr8qT9WOlhN6k5NNQtYw7yYIaw6c2S8sZhdoU2r_zbRpDAB9Elo
+    gPBAUW3SJxdS9w>
+X-ME-Received: <xmr:pWouZZXWoLPz3OgbvniINxQD1w8FRz9NbkhqRuYmcWJMC95t9OzrzD5E2C_eROi9zW3mGOmb6eoyPwKTgm3FA_ZIKJucyA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrjedvgdefgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeg
+    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
+    hoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:pWouZZinhEjKprpqjCn_Q6M_45y6YXUt3GG3UShyf8c5ss-fYPpgxQ>
+    <xmx:pWouZRCwcZuVDGxXSQeQ_AU2p7BGSH60Z39MfgZbM36iB2qlOj_eOg>
+    <xmx:pWouZSLzPAM3iLZRbNQjnA_GdEzJdSnd-O9xnH8sZZ2t9J9PG_U4KQ>
+    <xmx:pmouZbSK5L9yxQI7I4oQ3NPPUHZ2_uP9ygtjzvDhCZac0mKM7oxu-Q>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 17 Oct 2023 07:06:12 -0400 (EDT)
+Date: Tue, 17 Oct 2023 14:06:07 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Johannes Nixdorf <jnixdorf-oss@avm.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	David Ahern <dsahern@gmail.com>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Ido Schimmel <idosch@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Paolo Abeni <pabeni@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	bridge@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v5 3/5] net: bridge: Add netlink knobs for
+ number / max learned FDB entries
+Message-ID: <ZS5qn0cv8InB/qn+@shredder>
+References: <20231016-fdb_limit-v5-0-32cddff87758@avm.de>
+ <20231016-fdb_limit-v5-3-32cddff87758@avm.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016-fdb_limit-v5-3-32cddff87758@avm.de>
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-10-13 at 15:35 +0530, MD Danish Anwar wrote:
-> With CONFIG_TI_K3_AM65_CPSW_NUSS=3Dy and CONFIG_TI_ICSSG_PRUETH=3Dm,
-> k3-cppi-desc-pool.o is linked to a module and also to vmlinux even though
-> the expected CFLAGS are different between builtins and modules.
->=20
-> The build system is complaining about the following:
->=20
-> k3-cppi-desc-pool.o is added to multiple modules: icssg-prueth
-> ti-am65-cpsw-nuss
->=20
-> Introduce the new module, k3-cppi-desc-pool, to provide the common
-> functions to ti-am65-cpsw-nuss and icssg-prueth.
->=20
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+On Mon, Oct 16, 2023 at 03:27:22PM +0200, Johannes Nixdorf wrote:
+> The previous patch added accounting and a limit for the number of
+> dynamically learned FDB entries per bridge. However it did not provide
+> means to actually configure those bounds or read back the count. This
+> patch does that.
+> 
+> Two new netlink attributes are added for the accounting and limit of
+> dynamically learned FDB entries:
+>  - IFLA_BR_FDB_N_LEARNED (RO) for the number of entries accounted for
+>    a single bridge.
+>  - IFLA_BR_FDB_MAX_LEARNED (RW) for the configured limit of entries for
+>    the bridge.
+> 
+> The new attributes are used like this:
+> 
+>  # ip link add name br up type bridge fdb_max_learned 256
+>  # ip link add name v1 up master br type veth peer v2
+>  # ip link set up dev v2
+>  # mausezahn -a rand -c 1024 v2
+>  0.01 seconds (90877 packets per second
+>  # bridge fdb | grep -v permanent | wc -l
+>  256
+>  # ip -d link show dev br
+>  13: br: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 [...]
+>      [...] fdb_n_learned 256 fdb_max_learned 256
+> 
+> Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
 
-Given that you target the -net tree, please include a suitable fixes
-tag, thanks!
-
-Paolo
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
