@@ -1,115 +1,114 @@
-Return-Path: <netdev+bounces-41984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B6607CC859
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:06:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 061F27CC870
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:11:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEE50281004
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:06:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACDA128189F
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75EAA45F5F;
-	Tue, 17 Oct 2023 16:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77ED945F6A;
+	Tue, 17 Oct 2023 16:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="LtLdfluC"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="udMVZrhV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E1C3B2B1
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:06:12 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A56AF2
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:06:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=IbN2ji3yngz8m088A5AA92VPGnMfuo/wbUcH16vDB5M=; b=LtLdfluCHFjpWFEqo5ZyCUV01A
-	gjS3W88xiTckj/JsZt13B8WCSYFA2bLQcWwwjyrSfTLei16ebSH2VxvCAkouUBwGwstlD4ALmF7WZ
-	jE/htRdSyoQJkO2ez2+G+ImY4wDMpkU05VIpAg4VZBPP9q/mU4g/3otP/DdWeXsxEtUuorp5cEqKa
-	DKXI4h09M+EtIZqAYecBbzxM7XEiUrVaPnMW7YUQIljU003JVqz100j8m4zY6/BK81ZXUu6icpz4a
-	yyyUGYfljKWbD+QlwE9gRR0MTYDFy9KLMxhRmRbAN97tssxXzqwl3wNckJh7fnm6OcfeRaUXBmmFV
-	HyV8vFcg==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qsma6-000OCt-EV; Tue, 17 Oct 2023 18:06:06 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qsma5-0009lk-LZ; Tue, 17 Oct 2023 18:06:05 +0200
-Subject: Re: [PATCH v7 net-next 00/18] Introducing P4TC
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- anjali.singhai@intel.com, namrata.limaye@intel.com,
- deb.chatterjee@intel.com, john.andy.fingerhut@intel.com, dan.daly@intel.com,
- Vipin.Jain@amd.com, tom@sipanda.io, mleitner@redhat.com,
- Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us,
- xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com,
- toke@redhat.com, mattyk@nvidia.com
-References: <20231016093549.181952-1-jhs@mojatatu.com>
- <20231016131506.71ad76f5@kernel.org>
- <CAM0EoM=nT2KQcVqPrWvKJXnW7h8uodhu0daNsLkuAUt5n=zuZw@mail.gmail.com>
- <9246d8a0-113a-9c71-9e44-090b6850a143@iogearbox.net>
- <CAM0EoMkJcVFx+u93T=PO_Q6BJuHe3h_GGW1=5h=asYFo--x=TQ@mail.gmail.com>
- <c8bfd660-96d1-3cb7-3f1e-44bc88af0007@iogearbox.net>
- <CAM0EoMmTG422piwXYB6jDrU_JQCphLjsAXXL55xBADd6j-vYSA@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <2eb99672-d8bb-b9ea-fe97-f8f18208884b@iogearbox.net>
-Date: Tue, 17 Oct 2023 18:06:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908B745F65
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:10:52 +0000 (UTC)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFF26F5
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:10:48 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-407da05f05aso6079815e9.3
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 09:10:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697559047; x=1698163847; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GOZy9r3gitQDazXMraa4da2VGsolgs7iqty+tLP15Ug=;
+        b=udMVZrhVHBfong0gNbwFNoEnL9Ars+M0rwsUF1hwTifYGcXLyJik2YCGbekHbSds/J
+         U4Jz70WvVyXWm7j09Fo7xIi6ww3r6ZGizLERI8kIy7Tof52YQs2jIaU/YJVMTC3nG7P7
+         wfweRvzBQmrRSbesmhKKIH7DfuV+3DMIl4CoKLEhwR8H2+pHzUMGGf5B1pigvG0RosVT
+         1xdspdVeiqW6uDS96v290Y4gvQh9pgQpVj6NRHP+zypTyWPvIb64oJrDSpx5rdLCBuGI
+         nMTjvvGqcNbVpn2BZac14E7vemJE0a5369MRoKoSKSuUoMkTEyrf0+RDNPUNHGmlG9lO
+         +lRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697559047; x=1698163847;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GOZy9r3gitQDazXMraa4da2VGsolgs7iqty+tLP15Ug=;
+        b=LDVS9zke73QqtCnzANda2S8mCU1bLZE/LmgGfJezeLPu5G8uyjxNTUi+FAFS5iJk5u
+         4n7s0E1Isemz94rhtDHMGVWaliHd8UnztMTbtOnSQX59NxG0ntAkDNiW1elQR8r9lUVZ
+         6y08cAjyKXqgaXYoX8qrWaR5mF5fJjv9UJQ2TlPvTHic5/iAUnwB3qOCi8vbwzgT93EE
+         WMmkB3CwEf9yO4w7r5X0+4WlziXMsogFWqo005GpxUjdFRLsPZnb831LND5DDDbjbmBR
+         cucD7P16TvbTEcMIqldSGEA8OJXAqv0vi/diB1PKbKMzURF/a6wf6GabTaCen02N4Iah
+         +x5g==
+X-Gm-Message-State: AOJu0YzEKA9O+QBHZZqAysNqfTp0MMvm0S3+TWYjLhis/XYqq+5g7Rmt
+	MXdTGS7VmoqTfuY99lzZ4L5VTM0TcqW6SNhZDFI=
+X-Google-Smtp-Source: AGHT+IHUKgmUBlF1bXwGVmAYjKZFMFJSpGCM+V9H0vQquCa+SmNm4hNAQiCyJk74htxwV/xXTuAp/g==
+X-Received: by 2002:a05:600c:1d13:b0:406:5301:317c with SMTP id l19-20020a05600c1d1300b004065301317cmr2017984wms.6.1697559047206;
+        Tue, 17 Oct 2023 09:10:47 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id fj7-20020a05600c0c8700b0040772138bb7sm10249419wmb.2.2023.10.17.09.10.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 09:10:46 -0700 (PDT)
+Date: Tue, 17 Oct 2023 18:10:44 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com
+Subject: Re: [PATCH net 3/5] net: avoid UAF on deleted altname
+Message-ID: <ZS6yBP+aZk67q8Tc@nanopsycho>
+References: <20231016201657.1754763-1-kuba@kernel.org>
+ <20231016201657.1754763-4-kuba@kernel.org>
+ <ZS485sWKKb99KrBx@nanopsycho>
+ <20231017075259.5876c644@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAM0EoMmTG422piwXYB6jDrU_JQCphLjsAXXL55xBADd6j-vYSA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27064/Tue Oct 17 10:11:10 2023)
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231017075259.5876c644@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/17/23 5:57 PM, Jamal Hadi Salim wrote:
-> On Tue, Oct 17, 2023 at 11:54 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
->> On 10/17/23 5:38 PM, Jamal Hadi Salim wrote:
->>> On Tue, Oct 17, 2023 at 11:00 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
->>>> On 10/16/23 10:38 PM, Jamal Hadi Salim wrote:
->>>>> On Mon, Oct 16, 2023 at 4:15 PM Jakub Kicinski <kuba@kernel.org> wrote:
->>>> [...]
->>>>>> FWIW please do not post another version this week (not that I think
->>>>>> that you would do that, but better safe than sorry. Last week the patch
->>>>>> bombs pushed the shared infra 24h+ behind the list..)
->>>>>
->>>>> Not intending to.
->>>>
->>>> Given bpf & kfuncs, please also Cc bpf@vger.kernel.org on future revisions
->>>> as not everyone on bpf list is subscribed to netdev.
->>>
->>> I thought i did that, maybe it was in earlier patches. Do you want Cc
->>> on everything or only on kfuncs? I am getting conflicting messages, do
->>> you have to Cc bpf for kfuncs?
->>> Example, attached from (some fs?) conference last month i think
->>
->> This is extending capabilities of XDP and tc BPF prog types, so yes, the bpf
->> list should be in the loop.
-> 
-> Roger that, makes sense. So all patches or only kfunc ones?
+Tue, Oct 17, 2023 at 04:52:59PM CEST, kuba@kernel.org wrote:
+>On Tue, 17 Oct 2023 09:51:02 +0200 Jiri Pirko wrote:
+>> >but freed by kfree() with no synchronization point.
+>> >
+>> >Because the name nodes don't hold a reference on the netdevice
+>> >either, take the heavier approach of inserting synchronization  
+>> 
+>> What about to use kfree_rcu() in netdev_name_node_free()
+>> and treat node_name->dev as a rcu pointer instead?
+>> 
+>> struct net_device *dev_get_by_name_rcu(struct net *net, const char *name)
+>> {
+>>         struct netdev_name_node *node_name;
+>> 
+>>         node_name = netdev_name_node_lookup_rcu(net, name);
+>>         return node_name ? rcu_deferecence(node_name->dev) : NULL;
+>> }
+>> 
+>> This would avoid synchronize_rcu() in netdev_name_node_alt_destroy()
+>> 
+>> Btw, the next patch is smooth with this.
+>
+>As I said in the commit message, I prefer the explicit sync.
+>Re-inserting the device and taking refs already necessitate it.
 
-Preferably the whole series as it's a bit hard to see some end to end
-example on how it would be used if it's largely taken out of context.
+You don't need any ref, just rcu_dereference() the netdev pointer.
+
+Synchronize_rcu() should be avoided if possible.
 
