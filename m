@@ -1,264 +1,161 @@
-Return-Path: <netdev+bounces-41949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25C8D7CC605
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:38:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A51907CC607
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:39:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79D29B20CEC
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:38:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2C56B210D8
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:39:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4382A41AAD;
-	Tue, 17 Oct 2023 14:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAE341E23;
+	Tue, 17 Oct 2023 14:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdJNkb/K"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="ISlPm5yd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA4A41772
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:38:11 +0000 (UTC)
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98303B0;
-	Tue, 17 Oct 2023 07:38:09 -0700 (PDT)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5a7c7262d5eso72667637b3.1;
-        Tue, 17 Oct 2023 07:38:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697553489; x=1698158289; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=75OfTF2wq/AyhsHzOu0gWS2g0ZYPjPU8/R+8KK4wR8g=;
-        b=HdJNkb/KRnMJ5ocOFfUdlrhkdfcEObOXIyo10nenYzGevwna1EMHwktsohT8GgFgxy
-         GkqwaU5eEIJHdva3SXgzNIClcxg35aCjjoP2riiCbYmgghpqZMoCt0L0UUfhidMWT/iV
-         8NEuVToO2e3UO3fmPAVTP45jCUfOB9bO5qJJlys//2UThFW3/tSO518ZA5I+IYgZg1vX
-         LrH3tAJSaLw39m58aOdf9fMI3rQy0xebomLA4JhJMOZfYisPBjCa8TmwKYg9AvlTQWcU
-         kk8Wq1mQ6wKfF6f1nF22p7owZ3OKPTov5Xv6eJ1CCuWU+nsdbyrz4SBJDvaO1gcepib6
-         peOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697553489; x=1698158289;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=75OfTF2wq/AyhsHzOu0gWS2g0ZYPjPU8/R+8KK4wR8g=;
-        b=FsjFJZxoRBuG6I/u6LoEOkOjZ4niUz9P3/keOZly4uaFP1qdvD8vyhu3O1hJFcRYUB
-         G0JAXFniFcGhSVTQnMOwlu25MseamhE5AE/sYRr/D//bzOOv3E6B5QhomVWt4e/J9EV1
-         M6QmT7ptsLjnCoEBklXpNiYdqKncdRq3vsyiU1deyHhCzK2LiOsFHv4uL0OqwH5wmaQP
-         qZaVif2tKhtzMtTaJluUpvZ1Woc2F8zAoqOUNilZQTI0gyHRM5/xR2tWcJlN+x7ctyOR
-         uwgzHHHTxhD+zrgQ61eAStpAyxVKmA8gtBK9u0RSHRFQX4qiucz94dHE62ATRcVk9Ksj
-         Ap7w==
-X-Gm-Message-State: AOJu0Yzte2qUnBF0t2j8/EdwrvSu+H0ONdjU8VRUNFW5QlrbSBFXFizD
-	2tBZ4KuErJ1KlqlTZGPQxXtsH8nQbReeLcmnuDY=
-X-Google-Smtp-Source: AGHT+IH7wE1X/ExHqh4Xq+zw0JindTailoWVgfKyCo8C2MNshEPC+omLh0FxBAhLQ3IAwYpYAcQJg6crfhXrVV//QTE=
-X-Received: by 2002:a25:780a:0:b0:d9a:e224:1822 with SMTP id
- t10-20020a25780a000000b00d9ae2241822mr2412785ybc.11.1697553488460; Tue, 17
- Oct 2023 07:38:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEBB1F5FA
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:39:09 +0000 (UTC)
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D037B0
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:39:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net; s=s31663417;
+ t=1697553531; x=1698158331; i=wahrenst@gmx.net;
+ bh=vjiBJBdXURqAr5mlqf8TRfrJKfDIvVbJDwTpW8QJCgA=;
+ h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
+ b=ISlPm5ydTaky+Y3PPrxodqDqdDzhoXnkMIKBFttfl2/Yvjie2qufxyJWFEHrpFQsd9lEtE7awbG
+ m4zNI4wZmSbANAINyurOXp05cu2EYlj2juqb3BlTKO0rsZnvgirp0u6Dx3ALfa6yAYm5lq8hBYMPE
+ HXHeSOHEbzku8vnbs+1XneAFseIMm1syQp1l9z3/eds9GPHOdQnUE8VOnXbrUO9RmnTTxV7SxBl4e
+ df0XEyNIAzc23lufxAZcu9xYKLacxpO20+JiQLXzzTIDunn4gF/7vfgpuUr0R96/tt/OcDkfzKV14
+ TSE/Uc2hv49ARsocNdl9mJo3YGAOLX+BX4zg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MKbg4-1r77Cw47cS-00Ku33; Tue, 17
+ Oct 2023 16:38:51 +0200
+Message-ID: <b0f3d278-5da3-4ef8-8b9b-2cb439e2e88f@gmx.net>
+Date: Tue, 17 Oct 2023 16:38:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231012060115.107183-1-hayatake396@gmail.com>
- <20231016152343.1fc7c7be@kernel.org> <CADFiAcKOKiTXFXs-e=WotnQwhLB2ycbBovqS2YCk9hvK_RH2uQ@mail.gmail.com>
-In-Reply-To: <CADFiAcKOKiTXFXs-e=WotnQwhLB2ycbBovqS2YCk9hvK_RH2uQ@mail.gmail.com>
-From: takeru hayasaka <hayatake396@gmail.com>
-Date: Tue, 17 Oct 2023 23:37:57 +0900
-Message-ID: <CADFiAcLiAcyqaOTsRZHex8g-wSBQjCzt_0SBtBaW3CJHz9afug@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] ethtool: ice: Support for RSS settings to GTP
- from ethtool
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Harald Welte <laforge@gnumonks.org>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, osmocom-net-gprs@lists.osmocom.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tcp: tsq: relax tcp_small_queue_check() when rtx
+ queue contains a single skb
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Neal Cardwell <ncardwell@google.com>
+References: <20231017124526.4060202-1-edumazet@google.com>
+From: Stefan Wahren <wahrenst@gmx.net>
+In-Reply-To: <20231017124526.4060202-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Provags-ID: V03:K1:1I1Tun17Og24bz7b9JiZCmxoRDaFT5VYxOg+G4M76d5LCUr1W3j
+ CGVq2osPr6nzU8UdTkbOLku8yBgaTulBlQzsnmusp+tSbfL9CpZaT9FVeokBK6oR5rnVhpS
+ ZCD4rBohwhyvSc8SS7JneocJ9nypNT2wC7WsoqadEtxFg2sPGW3rKq6LvnS5OZX3rZzC0h5
+ gMCtyMUpNQst9jBr1o41w==
+UI-OutboundReport: notjunk:1;M01:P0:+zD6e7QpANY=;pxprGekyMNsXRlO5yvjPoihMDII
+ biw1rCa56YTZpNSGsi12KW2JmMRUVKU3Z6Tmr/oeu4Hls94NmIXf9IQetM+GzXrAu+2KmBOYc
+ 8x6cU6wPM3TW+of2vreI8EG83YWivcOfrFHhURi9pyBJ3pZrVlMbzn/B0Djvqyqewi/j4m7Fu
+ PZSmd9PLYltivilFWl7Nkhu/HDmoE5BSf5qbjAPNAbGEBrd+5CYqcicoXTwpRp4dQJllJNT47
+ +p4XigwPHcfj4L3MBKl92e3dh/lH4XpKvKF0DNvWTmi+6GwZKMxdnoT/OPziQPs3c+zG21FkH
+ DwJpm+yzbOXtq5Duk1/h2ce2tf7zYCzuGh+B7/0dnSuV2ym6NVVINKgxcrNFemS92r3A4u9J2
+ 8UGs5Ks5HCbXRuL04rKfKtEhGlw/M+PF5ztaR439Lj/rTtmpfiSw+69WVMiMDDUXYp8ezkLz5
+ +dle12V4eTGbrupLm4hu3DXLxacSBko1gEklq9hEbP480hgFAEyVJDkuP5QnX75+EqTESEqsT
+ I9G8cx0IPDFXm0S2rapdq088CHEWnvfl7fQXhuzOc2OuIf32k6uJR4PT0cwbgUwHZou3XIzh1
+ rpchNPOGJMKQ+PA4j+BqzRcIKfBHzpt/WTwSsv+2JmAlhqlzrHrNqDZCNGAnwRzacqr7givIn
+ stklrZaxkaVLc/sv6C/h9UxUVWr8W8VLFWVAhzVU7BQovpEwLXprvzrYaJUvEwwVFBjcnTWkF
+ Iu3IQ6nn9iMhJOUMW3CYrqqodN7rxnKM6q0wy9oPFYQC5PSVMavjTDBhCnRXsqMDHcy4+UtHV
+ nNrxslTIADgfhTnA/UKOhAxYXl64OThdZIopElbMPSMh+odJV3CxZwe8ggTQMJ1iEjagkMccu
+ 0yg+hoFwWqtJVHff190pJjjib0O2k73yokFwF+tcIvh3MYoaeGWajBoIGqbQKFG9raJihs07X
+ jxW+IQ==
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Harald-san
+Hi,
 
-Thanks for your review!
-
-> so if I'm guessing correctly, those would be hashing only on the V4/V6
-destination address?  Why would that be GTP specific?  The IPv4/v6
-header in front of the GTP header is a normal IP header.
-
-This is not correct. The TEID and the src port/dst port of the inner
-packet are also included.
-
-> Are there really deployments where the *very limited* GTP-C control
-I also think that it should not be limited to GTP-C. However, as I
-wrote in the email earlier, all the flows written are different in
-packet structure, including GTP-C. In the semantics of ethtool, I
-thought it was correct to pass a fixed packet structure and the
-controllable parameters for it. At least, the Intel ice driver that I
-modified is already like that.
-
-> IMHO that kind of explanation should be in the comment next to the
-> #define (for all of them) rather than "hash only".  That way it's
-> obvious to the reader what they do, rather than having to guess.
-
-Regarding what should be hashed, this is a complex case. It will also
-answer other questions, but for example, if you read this Intel ice
-driver, there are cases where you can manipulate the port of the Inter
-packet. I think this varies depending on the driver to be implemented.
-
-Note that these comments follow the existing code of ethtool.
-
-FYI: I think it will be helpful for you!
-https://www.intel.com/content/www/us/en/content-details/617015/intel-ethern=
-et-controller-e810-dynamic-device-personalization-ddp-technology-guide.html
-(cf. Table 8. Patterns and Input Sets for iavf RSS)
-
-2023=E5=B9=B410=E6=9C=8817=E6=97=A5(=E7=81=AB) 23:18 takeru hayasaka <hayat=
-ake396@gmail.com>:
->
-> Hi Jakub-san and Simon-san
-> Thank you for reviewing again!
->
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> Thanks;)
->
-> > Adding Willem, Pablo, and Harald to CC (please CC them on future
-> versions).
->
-> of course.  thanks!
->
-> > nit: please note that these are hex numbers,
->      next value after 0x19 is 0x1a, not 0x20.
->
-> !!!!! I'm so embarrassed.... I will next version fix
->
-> > What gives me pause here is the number of flow sub-types we define
-> > for GTP hashing.
-> >
-> > My understanding of GTP is limited to what I just read on Wikipedia.
-> >
-> > IIUC the GTPC vs GTPU distinction comes down to the UDP port on
-> > which the protocol runs? Are the frames also different?
-> >
-> > I'm guessing UL/DL are uplink/downlink but what's EH?
-> >
-> > How do GTPU_V4_FLOW, GTPU_EH_V4_FLOW, GTPU_UL_V4_FLOW, and
-> > GTPU_DL_V4_FLOW differ?
-> >
-> > Key question is - are there reasonable use cases that you can think of
-> > for enabling GTP hashing for each one of those bits individually or can
-> > we combine some of them?
->
-> Firstly, what I want to convey is that the structure of each of these
-> packets is entirely different. Therefore, in terms of ethtool, since
-> packets with the same structure are considered a flow, I understand
-> that it is necessary to define such different things (I actually think
-> that the people at Intel are doing it that way).
->
-> Let me first explain the difference between GTPC and GTPU.
-> The UDP ports are different in GTPC and GTPU.
-> What's further different is that in the case of GTPC, GTPv2-C is used,
-> and in the case of GTPU, GTPv1-U is used, which are mainstream in
-> current mobile communications.
->
-> Especially the uniqueness of GTPC communication varies according to
-> the processing phase.
-> CSR (Create Session Request) starts processing from a state where TEID
-> is not included. Therefore, it is separated into cases where packets
-> have TEID and where they don=E2=80=99t.
-> Of course, there are cases where we want to specially process only the
-> communication without TEID, and just creating a session is one of the
-> more vulnerable parts of the mobile network.
->
-> EH stands for Extension Header.
-> This is the case with GTPU packets compatible with 5G. If it=E2=80=99s th=
+Am 17.10.23 um 14:45 schrieb Eric Dumazet:
+> In commit 75eefc6c59fd ("tcp: tsq: add a shortcut in tcp_small_queue_che=
+ck()")
+> we allowed to send an skb regardless of TSQ limits being hit if rtx queu=
 e
-> Flow Director, it reads a parameter related to QoS called QFI.
-> Without this, it is impossible to process GTPv1 packets compatible with 5=
-G.
-> Furthermore, this Extension Header has parts where the shape differs
-> depending on UL/DL, which is called the PDU Session Container.
+> was empty or had a single skb, in order to better fill the pipe
+> when/if TX completions were slow.
 >
-> Specific use cases basically apply to services that terminate GTP itself.
+> Then later, commit 75c119afe14f ("tcp: implement rb-tree based
+> retransmit queue") accidentally removed the special case for
+> one skb in rtx queue.
 >
-> The structure of processing in RSS with ethtool until now was to
-> select a fixed shape of packets and parameters of those packets to
-> perform RSS.
-> Conforming to this format is why it becomes so numerous.
+> Stefan Wahren reported a regression in single TCP flow throughput
+> using a 100Mbit fec link, starting from commit 65466904b015 ("tcp: adjus=
+t
+> TSO packet sizes based on min_rtt"). This last commit only made the
+> regression more visible, because it locked the TCP flow on a particular
+> behavior where TSQ prevented two skbs being pushed downstream,
+> adding silences on the wire between each TSO packet.
 >
+> Many thanks to Stefan for his invaluable help !
 >
-> 2023=E5=B9=B410=E6=9C=8817=E6=97=A5(=E7=81=AB) 7:23 Jakub Kicinski <kuba@=
-kernel.org>:
->
-> >
-> > Thanks for the v2!
-> >
-> > Adding Willem, Pablo, and Harald to CC (please CC them on future
-> > versions).
-> >
-> > On Thu, 12 Oct 2023 06:01:15 +0000 Takeru Hayasaka wrote:
-> > > diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtoo=
-l.h
-> > > index f7fba0dc87e5..a2d4f2081cf3 100644
-> > > --- a/include/uapi/linux/ethtool.h
-> > > +++ b/include/uapi/linux/ethtool.h
-> > > @@ -2011,6 +2011,18 @@ static inline int ethtool_validate_duplex(__u8=
- duplex)
-> > >  #define      IPV4_FLOW       0x10    /* hash only */
-> > >  #define      IPV6_FLOW       0x11    /* hash only */
-> > >  #define      ETHER_FLOW      0x12    /* spec only (ether_spec) */
-> > > +#define GTPU_V4_FLOW 0x13    /* hash only */
-> > > +#define GTPU_V6_FLOW 0x14    /* hash only */
-> > > +#define GTPC_V4_FLOW 0x15    /* hash only */
-> > > +#define GTPC_V6_FLOW 0x16    /* hash only */
-> > > +#define GTPC_TEID_V4_FLOW 0x17       /* hash only */
-> > > +#define GTPC_TEID_V6_FLOW 0x18       /* hash only */
-> > > +#define GTPU_EH_V4_FLOW 0x19 /* hash only */
-> > > +#define GTPU_EH_V6_FLOW 0x20 /* hash only */
-> >
-> > nit: please note that these are hex numbers,
-> >      next value after 0x19 is 0x1a, not 0x20.
-> >
-> > > +#define GTPU_UL_V4_FLOW 0x21 /* hash only */
-> > > +#define GTPU_UL_V6_FLOW 0x22 /* hash only */
-> > > +#define GTPU_DL_V4_FLOW 0x23 /* hash only */
-> > > +#define GTPU_DL_V6_FLOW 0x24 /* hash only */
-> > >  /* Flag to enable additional fields in struct ethtool_rx_flow_spec *=
-/
-> > >  #define      FLOW_EXT        0x80000000
-> > >  #define      FLOW_MAC_EXT    0x40000000
-> >
-> > What gives me pause here is the number of flow sub-types we define
-> > for GTP hashing.
-> >
-> > My understanding of GTP is limited to what I just read on Wikipedia.
-> >
-> > IIUC the GTPC vs GTPU distinction comes down to the UDP port on
-> > which the protocol runs? Are the frames also different?
-> >
-> > I'm guessing UL/DL are uplink/downlink but what's EH?
-> >
-> > How do GTPU_V4_FLOW, GTPU_EH_V4_FLOW, GTPU_UL_V4_FLOW, and
-> > GTPU_DL_V4_FLOW differ?
-> >
-> > Key question is - are there reasonable use cases that you can think of
-> > for enabling GTP hashing for each one of those bits individually or can
-> > we combine some of them?
-> >
-> > > @@ -2025,6 +2037,7 @@ static inline int ethtool_validate_duplex(__u8 =
-duplex)
-> > >  #define      RXH_IP_DST      (1 << 5)
-> > >  #define      RXH_L4_B_0_1    (1 << 6) /* src port in case of TCP/UDP=
-/SCTP */
-> > >  #define      RXH_L4_B_2_3    (1 << 7) /* dst port in case of TCP/UDP=
-/SCTP */
-> > > +#define      RXH_GTP_TEID    (1 << 8) /* teid in case of GTP */
-> > >  #define      RXH_DISCARD     (1 << 31)
+just some figures using my ARM platform (Tarragon) as iperf client and a
+PC (Ubuntu 22.04) as iperf server.
+
+Using current net ( 95535e37e895 ) without the patch
+
+# iperf -t 10 -i 1 -c 192.168.1.129
+=2D-----------------------------------------------------------
+Client connecting to 192.168.1.129, TCP port 5001
+TCP window size: 96.2 KByte (default)
+=2D-----------------------------------------------------------
+[=C2=A0 3] local 192.168.1.12 port 33152 connected with 192.168.1.129 port=
+ 5001
+[ ID] Interval=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Transfer=C2=A0=C2=A0=C2=
+=A0=C2=A0 Bandwidth
+[=C2=A0 3]=C2=A0 0.0- 1.0 sec=C2=A0 10.1 MBytes=C2=A0 84.9 Mbits/sec
+[=C2=A0 3]=C2=A0 1.0- 2.0 sec=C2=A0 9.62 MBytes=C2=A0 80.7 Mbits/sec
+[=C2=A0 3]=C2=A0 2.0- 3.0 sec=C2=A0 9.62 MBytes=C2=A0 80.7 Mbits/sec
+[=C2=A0 3]=C2=A0 3.0- 4.0 sec=C2=A0 9.62 MBytes=C2=A0 80.7 Mbits/sec
+[=C2=A0 3]=C2=A0 4.0- 5.0 sec=C2=A0 9.62 MBytes=C2=A0 80.7 Mbits/sec
+[=C2=A0 3]=C2=A0 5.0- 6.0 sec=C2=A0 9.62 MBytes=C2=A0 80.7 Mbits/sec
+[=C2=A0 3]=C2=A0 6.0- 7.0 sec=C2=A0 9.62 MBytes=C2=A0 80.7 Mbits/sec
+[=C2=A0 3]=C2=A0 7.0- 8.0 sec=C2=A0 9.75 MBytes=C2=A0 81.8 Mbits/sec
+[=C2=A0 3]=C2=A0 8.0- 9.0 sec=C2=A0 9.62 MBytes=C2=A0 80.7 Mbits/sec
+[=C2=A0 3]=C2=A0 9.0-10.0 sec=C2=A0 10.0 MBytes=C2=A0 83.9 Mbits/sec
+[=C2=A0 3]=C2=A0 0.0-10.0 sec=C2=A0 97.2 MBytes=C2=A0 81.5 Mbits/sec
+
+Using current net with applied patch
+
+# iperf -t 10 -i 1 -c 192.168.1.129
+=2D-----------------------------------------------------------
+Client connecting to 192.168.1.129, TCP port 5001
+TCP window size: 96.2 KByte (default)
+=2D-----------------------------------------------------------
+[=C2=A0 3] local 192.168.1.12 port 32854 connected with 192.168.1.129 port=
+ 5001
+[ ID] Interval=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Transfer=C2=A0=C2=A0=C2=
+=A0=C2=A0 Bandwidth
+[=C2=A0 3]=C2=A0 0.0- 1.0 sec=C2=A0 11.5 MBytes=C2=A0 96.5 Mbits/sec
+[=C2=A0 3]=C2=A0 1.0- 2.0 sec=C2=A0 11.4 MBytes=C2=A0 95.4 Mbits/sec
+[=C2=A0 3]=C2=A0 2.0- 3.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
+[=C2=A0 3]=C2=A0 3.0- 4.0 sec=C2=A0 11.1 MBytes=C2=A0 93.3 Mbits/sec
+[=C2=A0 3]=C2=A0 4.0- 5.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
+[=C2=A0 3]=C2=A0 5.0- 6.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
+[=C2=A0 3]=C2=A0 6.0- 7.0 sec=C2=A0 11.1 MBytes=C2=A0 93.3 Mbits/sec
+[=C2=A0 3]=C2=A0 7.0- 8.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
+[=C2=A0 3]=C2=A0 8.0- 9.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
+[=C2=A0 3]=C2=A0 9.0-10.0 sec=C2=A0 11.2 MBytes=C2=A0 94.4 Mbits/sec
+[=C2=A0 3]=C2=A0 0.0-10.0 sec=C2=A0=C2=A0 113 MBytes=C2=A0 94.4 Mbits/sec
+
+Thanks
 
