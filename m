@@ -1,111 +1,142 @@
-Return-Path: <netdev+bounces-41745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 664A57CBCF3
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:59:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E3F67CBCFC
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 10:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20F2A28176F
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:59:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E22D9B21049
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 08:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC7B381A1;
-	Tue, 17 Oct 2023 07:59:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7649E381CB;
+	Tue, 17 Oct 2023 08:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tv8hN+5j"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1211C30D1D
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:59:20 +0000 (UTC)
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD872F3;
-	Tue, 17 Oct 2023 00:59:17 -0700 (PDT)
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-5a822f96aedso47252277b3.2;
-        Tue, 17 Oct 2023 00:59:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697529557; x=1698134357;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R9M3vO8TKvpu7sLT3D9MNM+ZNPQeT7q9+/iFi4wqDgU=;
-        b=PaODHez6am+VoWawHt7q7KnqcXlnU5YTJ29N/WlaoYJfHYKXLePp9IZcIjZeGNHrbl
-         lMmNlOQBHylVpUirrOVf6pfTd+gtqMDgcIyWdSFT0lBh4aDyiZcNH0XRSILm+2abJ7aL
-         f7NntfMsZ1N+7IfNQzLL8wEO8LBlFrSdglu3xAUz5gggoLcs2o3dbVMTe4eZ/IrDsoXP
-         HaF74mgZm+xB6JwtG/IIBjFiLpxOJI2za9tr/tEc6wA88Npb/U01R/De6JD+X/b5iVWl
-         dT1Mb+kG1PmqlZBXVuwkbnhN4pps8W7uo+g8dlKnjgKzfUbIRa91qnsvUlSFYUrhh26r
-         VSOQ==
-X-Gm-Message-State: AOJu0YydBsrLJxTO2Mi7KvpQLaXnpljPFuD+/XREY7ZtQRpWomoSqW1C
-	4aCimhYCb9J125F5sO8Ku+rI2viLt04ofA==
-X-Google-Smtp-Source: AGHT+IFivF7kiCdUjLmOEYgcF61SO/2Yz9muD3w24YmcRVaiOl0zr8gBDqhunQbDydK5Hum1e/zusA==
-X-Received: by 2002:a81:a214:0:b0:5a7:a81b:d9af with SMTP id w20-20020a81a214000000b005a7a81bd9afmr1714590ywg.7.1697529556783;
-        Tue, 17 Oct 2023 00:59:16 -0700 (PDT)
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com. [209.85.128.170])
-        by smtp.gmail.com with ESMTPSA id v194-20020a8148cb000000b0057a918d6644sm412006ywa.128.2023.10.17.00.59.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Oct 2023 00:59:16 -0700 (PDT)
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-579de633419so66270177b3.3;
-        Tue, 17 Oct 2023 00:59:16 -0700 (PDT)
-X-Received: by 2002:a0d:e9c2:0:b0:59b:c6a4:15c7 with SMTP id
- s185-20020a0de9c2000000b0059bc6a415c7mr1352703ywe.46.1697529555871; Tue, 17
- Oct 2023 00:59:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453B930D1D;
+	Tue, 17 Oct 2023 08:00:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A87AC433C7;
+	Tue, 17 Oct 2023 08:00:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697529620;
+	bh=dDKPWob3NTMe7C9SlY1gR19DUsq4sN8SeXQP0UXWyaw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tv8hN+5jlJ0ofhkcuyLjePs3+5j6h6eiQJYCA82U2nTd8vNgQEcUrhJ/e35LA22Ay
+	 aiyYXEGCK+GDNB4BN7Gj/hK49XhXmB2ebQJITOd0Rz83VHTgynZlzTaQHy5KsHcgDd
+	 dYO4dv1dcQXaiTYw23PgvEoCHMQWpGOmyd7o93nJn49CIkt98rgKnNxVHaW2ZBk+n6
+	 reD/irVj5bxCHcmm0CDfxf25qKZgOgQ+gWBhSEMtaDdYik/RU73ytegEKWgbwxpBud
+	 Bx4YmIESFh/B6BtaysceZjBDq054CwtYevuveEio/GfQV4lWIKe61g+XK4dIOd7ico
+	 jTvlG8mLzdUaQ==
+Date: Tue, 17 Oct 2023 09:00:15 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Ante Knezic <ante.knezic@helmholz.de>
+Cc: andrew@lunn.ch, conor+dt@kernel.org, davem@davemloft.net,
+	devicetree@vger.kernel.org, edumazet@google.com,
+	f.fainelli@gmail.com, krzysztof.kozlowski+dt@linaro.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org, marex@denx.de,
+	netdev@vger.kernel.org, olteanv@gmail.com, pabeni@redhat.com,
+	robh+dt@kernel.org, woojung.huh@microchip.com
+Subject: Re: [PATCH net-next 2/2] dt-bindings: net: microchip,ksz: document
+ microchip,rmii-clk-internal
+Message-ID: <20231017-generous-botanical-28436c5ba13a@spud>
+References: <20231012-unicorn-rambling-55dc66b78f2f@spud>
+ <20231016075349.18792-1-ante.knezic@helmholz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016054755.915155-1-hch@lst.de> <20231016054755.915155-4-hch@lst.de>
-In-Reply-To: <20231016054755.915155-4-hch@lst.de>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 17 Oct 2023 09:59:03 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXO94MVoNVh+=meozYXRwpV8jPTBivLJfDHVTvJn7nW4g@mail.gmail.com>
-Message-ID: <CAMuHMdXO94MVoNVh+=meozYXRwpV8jPTBivLJfDHVTvJn7nW4g@mail.gmail.com>
-Subject: Re: [PATCH 03/12] soc: renesas: ARCH_R9A07G043 depends on !RISCV_ISA_ZICBOM
-To: Christoph Hellwig <hch@lst.de>
-Cc: Greg Ungerer <gerg@linux-m68k.org>, iommu@lists.linux.dev, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Conor Dooley <conor@kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Magnus Damm <magnus.damm@gmail.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
-	Jim Quinlan <james.quinlan@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="RTdQAc1dJT5nSWZw"
+Content-Disposition: inline
+In-Reply-To: <20231016075349.18792-1-ante.knezic@helmholz.de>
+
+
+--RTdQAc1dJT5nSWZw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Mon, Oct 16, 2023 at 7:48=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
-> ARCH_R9A07G043 has it's own non-standard global pool based DMA coherent
+On Mon, Oct 16, 2023 at 09:53:49AM +0200, Ante Knezic wrote:
+> On Thu, 12 Oct 2023 16:18:09 +0100, Conor Dooley wrote:
+> > On Thu, Oct 12, 2023 at 12:55:56PM +0200, Ante Knezic wrote:
+> > > Add documentation for selecting reference rmii clock on KSZ88X3 devic=
+es
+> > >=20
+> > > Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+> > > ---
+> > >  .../devicetree/bindings/net/dsa/microchip,ksz.yaml    | 19 +++++++++=
+++++++++++
+> > >  1 file changed, 19 insertions(+)
+> > >=20
+> > > diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.=
+yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > index 41014f5c01c4..eaa347b04db1 100644
+> > > --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > @@ -72,6 +72,25 @@ properties:
+> > >    interrupts:
+> > >      maxItems: 1
+> > > =20
+> > > +  microchip,rmii-clk-internal:
+> > > +    $ref: /schemas/types.yaml#/definitions/flag
+> > > +    description:
+> > > +      Set if the RMII reference clock is provided internally. Otherw=
+ise
+> > > +      reference clock should be provided externally.
+> >=20
+> > I regret not asking this on the previous iteration - how come you need a
+> > custom property? In the externally provided case would there not be a
+> > clocks property pointing to the RMII reference clock, that would be
+> > absent when provided by the itnernal reference?
 
-its
+> In both cases (external and internal), the KSZ88X3 is actually providing =
+the
+> RMII reference clock.
+> Difference is only will the clock be routed as external
+> copper track (pin REFCLKO -> pin REFCLKI), or will it be routed internall=
+y.
 
-> allocator, which conflicts with the remap based RISCV_ISA_ZICBOM version.
-> Add a proper dependency.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+The switch always provides it's own external reference, wut? Why would
+anyone actually bother doing this instead of just using the internal
+reference?
 
-Acked-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> So, this should not affect the clock relation between the uC and the swit=
+ch
+> device?
 
-Gr{oetje,eeting}s,
+> This property has no effect if KSZ88X3 is not providing the reference clo=
+ck.
 
-                        Geert
+This appears to contradict with the above, unless I am misunderstanding
+something.
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+> Maybe I should provide more info in the commit message of both patches as=
+ well?
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+What I would have expected to see is that when the reference clock is
+provided externally that there would be a clocks property in the DT
+node, pointing at that external clock & when there was not, then
+no property. Likely that ship has already said, as I don't see clocks
+present in the current binding. How does the driver get the frequency of
+the RMII reference clock when an external reference is provided?
+
+--RTdQAc1dJT5nSWZw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZS4/DwAKCRB4tDGHoIJi
+0rFQAP9m8VpRBlP7rWXT1ZHoFPq6+eLOQwYnPTJprqcCty2+fAEA1o0kvyUPI69W
+wXbdny+DrsOyb/DSpvy1L3OvYkdJ/gg=
+=xLsw
+-----END PGP SIGNATURE-----
+
+--RTdQAc1dJT5nSWZw--
 
