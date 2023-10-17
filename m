@@ -1,117 +1,129 @@
-Return-Path: <netdev+bounces-41953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B0077CC6DB
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:55:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AF9E7CC6DC
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:58:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAAC71C20859
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:55:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82F021C20BA5
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B4243AB8;
-	Tue, 17 Oct 2023 14:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C1C44460;
+	Tue, 17 Oct 2023 14:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Nhja8BHc"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="ULBpVbHl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A46405C8
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:55:00 +0000 (UTC)
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A60138A5B
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:54:25 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-5ac87af634aso2477146a12.2
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:54:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1697554465; x=1698159265; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FWWTZnBVIZTe4ofDfw2r1CM+hodCfZ095WrXM2I86aA=;
-        b=Nhja8BHcmdRP3LKvG2shWW2TcDWH4JuX6S8qZ8yxvL2ObvNjAN/j6lcztiALdeWfvU
-         HS5tJ7FLP7noK11kFzTTWONt3TZjA73bLb51YpbQ7FoR3OxkZzvjDhJzO+WXCdhhj7AC
-         oMdwDYxgb11i/3wZjRIg6y+lL/en3J6X6KG/GRbhPmreAUoMTf/TvRFRZDDJWtiR/uqh
-         GY7iRrIQ3/wbu1P4GcCoI39LSc0qihfE7wv78FhdY6G3hb4JVnPKJmkoT6vqwWWVtjmK
-         q+tXeMqpmRrT9dt2HCggf5Vgl2MVwEBC8lQxPNdhyGA3S6FFg/kGCcvW3Rkyp/Ctl+KS
-         aPWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697554465; x=1698159265;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FWWTZnBVIZTe4ofDfw2r1CM+hodCfZ095WrXM2I86aA=;
-        b=uJWWsgBErIqBVOQUURLaE/9TFaGQXMjBJDOqqZb7yCmPb7J1bt2dBBBRC1Rgqe+teS
-         +7yB+CyB0EL2Rh6MpYbg7u051DUMFLMwGa9kSblwhBDvsmITqQUor9veZSDsed1DrX1L
-         1ebftiuMUKekSWQsc3o545CHoPqedVcSBId08efp+HB3/XllMCEGeUoCxwZoD4DvwJoY
-         7/nw84g4gCOO0BgWF4IxpJvDjPLYnGmy6VqE5uB6s0cXJ/YhGUJevpovUCLlKCkAEeys
-         9CTOxfvO+21bt67RA0HaDsxxuc3M7uC02WYFnKzv4QT8Y8QPShsaGjZe9/YY1F6hpDAl
-         RFyg==
-X-Gm-Message-State: AOJu0YzcIjQPyXJgLdjDufwZ3bAVKCU1SZ7nXVVlrPxpb8SLL7dLLWlD
-	B9rhD/LTSQ6F3YiznaTT3k6bH+ZKoxd6ZhsESZ2NaQ==
-X-Google-Smtp-Source: AGHT+IHKi1ptjbhQrWNr/7yJvCw2b3J4HArSVyS3RhAPbeKT9U34wDkjpX/utVKvMoawnUmBwUeX3A==
-X-Received: by 2002:a17:90a:c251:b0:274:9409:bbca with SMTP id d17-20020a17090ac25100b002749409bbcamr2181998pjx.3.1697554464795;
-        Tue, 17 Oct 2023 07:54:24 -0700 (PDT)
-Received: from ?IPV6:2804:14d:5c5e:44fb:8ef5:7647:6178:de4e? ([2804:14d:5c5e:44fb:8ef5:7647:6178:de4e])
-        by smtp.gmail.com with ESMTPSA id q7-20020a17090a178700b0027758c7f585sm1546213pja.52.2023.10.17.07.54.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Oct 2023 07:54:24 -0700 (PDT)
-Message-ID: <61900f67-0432-4967-8ab0-c4766beaabb8@mojatatu.com>
-Date: Tue, 17 Oct 2023 11:54:20 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC85D405C8
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:57:58 +0000 (UTC)
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEA1A2366E
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:57:56 -0700 (PDT)
+Received: from localhost (unknown [IPv6:2601:281:8300:73::646])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 8C01F37C;
+	Tue, 17 Oct 2023 14:57:56 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 8C01F37C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1697554676; bh=9dz7qLoNvtDhASUW/qPVLsB36MpW7OBQ4hurrrMfmpk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=ULBpVbHltJ2z/DRuVx3OEKLhsKMJbZ08q7mLyI8f2SR5fnUdDHr4Zi39nO+LHYAov
+	 93LC4j91sRkzMxBQj1H1u6M6s+KYXR5CVFiejuH/JUo52vENW7AD6UmKeegdTD7ykc
+	 nQF2w04TODOerHLw8+IkPYwrjUl190m/g3bLM4kTEJ2qiI/SbM8UoZGe2IBvKfoWjO
+	 /jHJAqGCxP6IaXDBX4gd03z1pg9Jf6rwKsDl1SKJXuJ/DhWSuhw/IoEjbh7dzoIseY
+	 wJUSvgexZ6kxRoE1k1XgjH20qAbt4e9H0n6SKcDYo2dLZBxw1704RDk3kKui4yZcy7
+	 MSl1ypx2Txj6w==
+From: Jonathan Corbet <corbet@lwn.net>
+To: Coco Li <lixiaoyan@google.com>, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+ Mubashir Adnan Qureshi <mubashirq@google.com>, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, Wei Wang
+ <weiwan@google.com>, Coco Li <lixiaoyan@google.com>
+Subject: Re: [PATCH v2 net-next 1/5] Documentations: Analyze heavily used
+ Networking related structs
+In-Reply-To: <20231017014716.3944813-2-lixiaoyan@google.com>
+References: <20231017014716.3944813-1-lixiaoyan@google.com>
+ <20231017014716.3944813-2-lixiaoyan@google.com>
+Date: Tue, 17 Oct 2023 08:57:55 -0600
+Message-ID: <87y1g1b8jw.fsf@meer.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests: tc-testing: add dummy and veth to
- minimum config
-Content-Language: en-US
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-References: <20231016180222.3065160-1-pctammela@mojatatu.com>
-From: Pedro Tammela <pctammela@mojatatu.com>
-In-Reply-To: <20231016180222.3065160-1-pctammela@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 16/10/2023 15:02, Pedro Tammela wrote:
-> Dummy and VETH are heavily used by tdc. Make sure CI builds using
-> tc-testing/config pick them up.
-> 
-> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+Coco Li <lixiaoyan@google.com> writes:
+
+> Analyzed a few structs in the networking stack by looking at variables
+> within them that are used in the TCP/IP fast path.
+>
+> Fast path is defined as TCP path where data is transferred from sender to
+> receiver unidirectionaly. It doesn't include phases other than
+> TCP_ESTABLISHED, nor does it look at error paths.
+>
+> We hope to re-organizing variables that span many cachelines whose fast
+> path variables are also spread out, and this document can help future
+> developers keep networking fast path cachelines small.
+>
+> Optimized_cacheline field is computed as
+> (Fastpath_Bytes/L3_cacheline_size_x86), and not the actual organized
+> results (see patches to come for these).
+>
+> Note that the optimization is not cache line size dependent, we use
+> x86 as an example of improvements.
+>
+> Investigation is done on 6.5
+>
+> Name	                Struct_Cachelines  Cur_fastpath_cache Fastpath_Bytes Optimized_cacheline
+> tcp_sock	        42 (2664 Bytes)	   12   		396		8
+> net_device	        39 (2240 bytes)	   12			234		4
+> inet_sock	        15 (960 bytes)	   14			922		14
+> Inet_connection_sock	22 (1368 bytes)	   18			1166		18
+> Netns_ipv4 (sysctls)	12 (768 bytes)     4			77		2
+> linux_mib	        16 (1060)	   6			104		2
+>
+> Note how there isn't much improvement space for inet_sock and
+> Inet_connection_sock because sk and icsk_inet respective take up so
+> much of the struct that rest of the variables become a small portion of
+> the struct size.
+>
+> So, we decided to reorganize tcp_sock, net_device, Netns_ipv4, linux_mib
+>
+> Signed-off-by: Coco Li <lixiaoyan@google.com>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
 > ---
->   tools/testing/selftests/tc-testing/config | 7 +++++++
->   1 file changed, 7 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/tc-testing/config b/tools/testing/selftests/tc-testing/config
-> index 5aa8705751f0..cf3ff04dfcb2 100644
-> --- a/tools/testing/selftests/tc-testing/config
-> +++ b/tools/testing/selftests/tc-testing/config
-> @@ -1,3 +1,10 @@
-> +#
-> +# Network
-> +#
-> +
-> +CONFIG_DUMMY=y
-> +CONFIG_VETH=y
-> +
->   #
->   # Core Netfilter Configuration
->   #
+>  .../net_cachelines/inet_connection_sock.rst   |  42 +++++
+>  .../networking/net_cachelines/inet_sock.rst   |  37 ++++
+>  .../networking/net_cachelines/net_device.rst  | 167 ++++++++++++++++++
+>  .../net_cachelines/netns_ipv4_sysctl.rst      | 151 ++++++++++++++++
+>  .../networking/net_cachelines/snmp.rst        | 128 ++++++++++++++
+>  .../networking/net_cachelines/tcp_sock.rst    | 148 ++++++++++++++++
 
-I will include this change in a bigger series today.
+So none of this changelog tells us anything about this documentation you
+are adding or what readers are supposed to gain from it.  What are these
+files?
 
---
-pw-bot: cr
+What they are *not* is RST; you clearly have not tried a documentation
+build with these files in place.  I would say that needs to be fixed,
+but I do wonder if this kind of information (to the extent that I
+understand what it is) isn't better placed in the source itself?  If
+nothing else, I would expect it to have a somewhat higher chance of
+staying current that way.
+
+Thanks,
+
+jon
 
