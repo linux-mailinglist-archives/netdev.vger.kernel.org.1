@@ -1,114 +1,84 @@
-Return-Path: <netdev+bounces-41962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64CEB7CC730
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:14:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5515C7CC742
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 17:18:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70518B20E09
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:14:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DAA53B20FDA
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55F544481;
-	Tue, 17 Oct 2023 15:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1107C44483;
+	Tue, 17 Oct 2023 15:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gh49EVzj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FDuaXcTW"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BB04447D;
-	Tue, 17 Oct 2023 15:14:28 +0000 (UTC)
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2B97E8;
-	Tue, 17 Oct 2023 08:14:26 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2c50ec238aeso49716511fa.0;
-        Tue, 17 Oct 2023 08:14:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954954368F;
+	Tue, 17 Oct 2023 15:17:57 +0000 (UTC)
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A968392;
+	Tue, 17 Oct 2023 08:17:52 -0700 (PDT)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-579de633419so71470907b3.3;
+        Tue, 17 Oct 2023 08:17:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697555665; x=1698160465; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1697555872; x=1698160672; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LAQIUSSFEkh8UCmi8THqE2sWEJcCZDabuYYz4V23TW8=;
-        b=gh49EVzjJAMOiA15cn3qHH81WJn2Q9tYEiZPVMrP8RpyAAzuZ0VIt3OZhmuO8YrADr
-         TGcHEbmzI8QlA4BQyDgHtfN94tQSKCYr2tn87XflaQQ433UayXgNAiuFq26fshxgtMJt
-         ZAQ5xpyMLLqmaaZAJu37abtdpk6XI7HHvgDWbOKrOXHSmACSb3hJKCHFdq356MK361aJ
-         xgzaVlSU4dGsyYbGyQIVg463sFjthNsbFUEVQkqWCtc3rasZb39a3IiX7+gmKDQpvX8L
-         ZtR/tx6O8I0J+7KJfdwIrnynqwIZbTN2nXqlKPeyyeG0GveWmtA6Sl3b9QFj7NVD83Hx
-         NR/w==
+        bh=v+bzE/J8ZGt17tl8akqeT/kIc+0mcRGIKAK2nciDey4=;
+        b=FDuaXcTWbUQ2tSnQmfehAt42ixyW2mP6yo210BVgZVbjT3zfNWy1rBb3tSuTn+cUh/
+         A3QLTsUwqB7/lz4uwYfCuOuGMlwBpxoXW+elOfrD2GGjtQZ50cpVpmGAc27vjGRLHvCK
+         Q6f524ttC8G9MZpk5FaJu4/WzlTPa95rNQfTWtkXeHiex/aysaKWNNKjmMeKHb9/unqh
+         HVX1FTqVepeeuKsszTqbC00ADuOe7as0ktrxKZUxnqyUrtMxq3KErWoTng8qmcRl2vTS
+         C/rODil09AwV8w+A0+hKdD30KpNsO0ZzVhfkURyMbMcPJBHPdjegELXqTCJve/wYMsIT
+         lwjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697555665; x=1698160465;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1697555872; x=1698160672;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LAQIUSSFEkh8UCmi8THqE2sWEJcCZDabuYYz4V23TW8=;
-        b=J8SgQ/+pUJaPeAs80gnMIyX8bhuvAGWDN3XLiOtLvlTZ5XyPqp6E7E23mQjSP+3P5Q
-         OjIGwIBNj60mN3H6OCd+Y1R03HJZ32ei1dh26xKCrk7Ym76qRcwOm/X1o5XjYzxo1m3K
-         E+9xJyz66fWKtqsaJ+rJoYMWY+3H+mH/9G2GG5M/3rVeH4X9Vt4j85lUe06+gMZjtasn
-         1Pncufe3LIY7EuJuVN0ItN5ejAYKJxrDdFm7BgYY31mmaCzBJgBatgo6+OEeorTy+xFE
-         yT2k0f26gksp1aqAQeD8NrxX/GKergwt3Adxgj/6GaVV9wThTq3hHZ5fVVmoGlFHSH2g
-         cyaw==
-X-Gm-Message-State: AOJu0YwxWqmsxdL1146EkmppD/m1vw3yMx9VkEbfLurKFoHwYXvmOhta
-	bKD9gtlFYFi2qj4J9ZTAEDQ=
-X-Google-Smtp-Source: AGHT+IGGk9+XOX5f1XNqFWNen/mWjFSeo+yOGyG3yMMSOnh8F9Yx0HDcS+QgLDHdukQU3wtBx5MZag==
-X-Received: by 2002:a2e:aa22:0:b0:2c5:31e6:e8e2 with SMTP id bf34-20020a2eaa22000000b002c531e6e8e2mr1904703ljb.25.1697555664440;
-        Tue, 17 Oct 2023 08:14:24 -0700 (PDT)
-Received: from jernej-laptop.localnet (82-149-12-148.dynamic.telemach.net. [82.149.12.148])
-        by smtp.gmail.com with ESMTPSA id v18-20020a05600c15d200b00406447b798bsm1907790wmf.37.2023.10.17.08.14.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 08:14:23 -0700 (PDT)
-From: Jernej =?utf-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
- Samuel Holland <samuel@sholland.org>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Linus Walleij <linus.walleij@linaro.org>,
- Alvin =?utf-8?B?xaBpcHJhZ2E=?= <alsi@bang-olufsen.dk>,
- =?ISO-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>, Maxime Ripard <mripard@kernel.org>,
- =?ISO-8859-1?Q?n=E7_=DCNAL?= <arinc.unal@arinc9.com>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>,
- John Crispin <john@phrozen.org>,
- Gerhard Engleder <gerhard@engleder-embedded.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Sergey Shtylyov <s.shtylyov@omp.ru>,
- Sergei Shtylyov <sergei.shtylyov@gmail.com>,
- Justin Chen <justin.chen@broadcom.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Rob Herring <robh@kernel.org>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- bcm-kernel-feedback-list@broadcom.com
-Subject:
- Re: [PATCH net-next 1/8] dt-bindings: net: Add missing
- (unevaluated|additional)Properties on child node schemas
-Date: Tue, 17 Oct 2023 17:14:21 +0200
-Message-ID: <2720928.mvXUDI8C0e@jernej-laptop>
-In-Reply-To: <20231016-dt-net-cleanups-v1-1-a525a090b444@kernel.org>
-References:
- <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
- <20231016-dt-net-cleanups-v1-1-a525a090b444@kernel.org>
+        bh=v+bzE/J8ZGt17tl8akqeT/kIc+0mcRGIKAK2nciDey4=;
+        b=Go01fFYeYsZcMrMmy5Oi/f5/jke1zraEbJqjTafS69PteLcVbDH6/Tylt8+omFK0WM
+         8u5UX+o4BQFQYspdiAH0tRmqyRJoEue0wRd5tdhRWFqkQEVU7KbRLFuPgC4JltA2RHWY
+         T0ToA9PdNKU7DWJiV1YsKdu5QzYpJXB+rtMAFb4gIqPLbzmJWSyvEEzzQs9mJq8Xn/UF
+         qCw4qb07qJgRpLAk3oZzYEdtN709ERMy5fUKXtEP2GdFJ+chcBhs1Kh1PBzdFdinEfjQ
+         Vpat8v90ohvvl0SoQMp6iX14vMR2HL7Zh/+ugNZWkm67KNM1Rs3s4JiTv8Mlg6aWp//C
+         +7yQ==
+X-Gm-Message-State: AOJu0Yx0s7KUc4B1UPrjlPH7rVVFABquT4r77XFPz6j9Og62uCxe9y1K
+	0SHaqFaxwluV1uw2ObCEHnmuG7/AsYDmPPAa2vb+LQOghOo=
+X-Google-Smtp-Source: AGHT+IGAKy4racr1hrrzicGubeAKSnyPCiLhMUkxl1+lYzm0Dno5DLDsv13WcNo6GFT2Xlqy/hENKgz6JYtl96Z5YIs=
+X-Received: by 2002:a05:690c:f93:b0:5a8:2007:b5e4 with SMTP id
+ df19-20020a05690c0f9300b005a82007b5e4mr2961155ywb.36.1697555871607; Tue, 17
+ Oct 2023 08:17:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+References: <3469de1c-0e6f-4fe5-9d93-2542f87ffd0d@proton.me>
+ <20231015.011502.276144165010584249.fujita.tomonori@gmail.com>
+ <9d70de37-c5ed-4776-a00f-76888e1230aa@proton.me> <20231015.073929.156461103776360133.fujita.tomonori@gmail.com>
+ <98471d44-c267-4c80-ba54-82ab2563e465@proton.me> <1454c3e6-82d1-4f60-b07d-bc3b47b23662@lunn.ch>
+ <f26a3e1a-7eb8-464e-9cbe-ebb8bdf69b20@proton.me> <2023101756-procedure-uninvited-f6c9@gregkh>
+ <0f839f73-400f-47d5-9708-0fa40ed0d4e9@proton.me>
+In-Reply-To: <0f839f73-400f-47d5-9708-0fa40ed0d4e9@proton.me>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 17 Oct 2023 17:17:40 +0200
+Message-ID: <CANiq72nbhdyPDWebXFphKjwvYT2VdQq-ksDmbOTNezV9OarPpQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY drivers
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Andrew Lunn <andrew@lunn.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu, boqun.feng@gmail.com, 
+	wedsonaf@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -116,35 +86,13 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Dne ponedeljek, 16. oktober 2023 ob 23:44:20 CEST je Rob Herring napisal(a):
-> Just as unevaluatedProperties or additionalProperties are required at
-> the top level of schemas, they should (and will) also be required for
-> child node schemas. That ensures only documented properties are
-> present for any node.
-> 
-> Add unevaluatedProperties or additionalProperties as appropriate.
-> 
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
->  .../devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml     |  2 ++
+On Tue, Oct 17, 2023 at 4:32=E2=80=AFPM Benno Lossin <benno.lossin@proton.m=
+e> wrote:
+>
+> This is not allowed in Rust, it is UB and will lead to bad things.
 
-For Allwinner:
-Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
+Yeah, and to be clear, data races are also UB in C.
 
-Best regards,
-Jernej
-
->  Documentation/devicetree/bindings/net/dsa/brcm,sf2.yaml        |  1 +
->  Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml |  2 ++
->  .../devicetree/bindings/net/dsa/microchip,lan937x.yaml         |  1 +
->  Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml     |  2 ++
->  Documentation/devicetree/bindings/net/dsa/qca8k.yaml           |  1 +
->  Documentation/devicetree/bindings/net/dsa/realtek.yaml         |  2 ++
->  .../devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml        | 10 ++--------
->  Documentation/devicetree/bindings/net/engleder,tsnep.yaml      |  1 +
->  Documentation/devicetree/bindings/net/nxp,tja11xx.yaml         |  1 +
->  10 files changed, 15 insertions(+), 8 deletions(-)
-
-
-
+Cheers,
+Miguel
 
