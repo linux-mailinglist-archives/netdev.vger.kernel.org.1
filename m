@@ -1,143 +1,159 @@
-Return-Path: <netdev+bounces-41937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33D1F7CC55B
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:59:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8449C7CC56E
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:01:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3A562817E5
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:59:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36F682813DE
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2889643A81;
-	Tue, 17 Oct 2023 13:59:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D0F436B0;
+	Tue, 17 Oct 2023 14:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hrW9hrfJ"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="LARKGFN5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635E6436AA
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 13:59:13 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B346F5;
-	Tue, 17 Oct 2023 06:59:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=LwuQtc6BAEH37KxR4NT7V8Ve+ukUxIEjORvi7ui3JHI=; b=hr
-	W9hrfJTecFcxkf91ofdGB59NoYEqMm1qWQPvnOlb7MJUyuWjDT6spSz5Xi7bbqXTxATaJ1w3R/BIa
-	b3KCCTHPu29PquXAIwOvvnk91Q4GNLdr/oESLqIN6OL/E3FRcBUHieYPsHNIlUzTPP7NTyMJaZaWU
-	uwFkRC3aebRBvXw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qskb9-002U7a-Kb; Tue, 17 Oct 2023 15:59:03 +0200
-Date: Tue, 17 Oct 2023 15:59:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, wangpeiyang1@huawei.com,
-	netdev@vger.kernel.org, stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 5/6] net: hns3: fix wrong print link down up
-Message-ID: <06cd6f53-e0af-4bdf-a684-68fc55b9b436@lunn.ch>
-References: <20230728075840.4022760-1-shaojijie@huawei.com>
- <20230728075840.4022760-6-shaojijie@huawei.com>
- <7ce32389-550b-4beb-82b1-1b6183fdeabb@lunn.ch>
- <2c6514a7-db97-f345-9bc4-affd4eba2dda@huawei.com>
- <73b41fe2-12dd-4fc0-a44d-f6f94e6541fc@lunn.ch>
- <ef5489f9-43b4-ee59-699b-3f54a30c00aa@huawei.com>
- <e7219114-774f-49d0-8985-8875fd351b60@lunn.ch>
- <a21beff2-9f38-d354-6049-aed20c18c8d4@huawei.com>
- <150d8d95-a6cd-dc28-618b-6cc5295b4bf9@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD56881F
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:01:41 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2087.outbound.protection.outlook.com [40.107.22.87])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0D8F7;
+	Tue, 17 Oct 2023 07:01:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RlYet1dymDnUPGYeM5eVHY9HJGo8qFm7duPQOj8TgSsk0zFghwSerBeQsTw5+pynJt930VJrs2OTn+QkG6dgtbP86i2JHh8cwbXk1eXbALr/LH9DKBd3zqySlRfyqZWwaTrEZSUXbKwkW9pASHse+IsFa0w5ZqTN98VQZbcpyKGOccAdbo/JbDO8EDyU3L50nEc1tnhLLUCodb0+RufMK0KQvMqZNbK4iyp85MSPLx8MEInfO6Xfp7IhTyEPc/+omcP5WVNNOHwfB7gMzdMVg1sjwpVJsKI5ASpt2uRtxXsVmjAhIMbCJwC6qluYv8LMY35GyhwSKvjCMggGKvJ81w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1Gy/xj/DsCqd744C+d0UGWv8g7M6rxWC+yjiRak4iLU=;
+ b=Yu8q/3eFORVejGZlaLNj/45vDARehGxOcB2bKtuISyxby3RHv1QQtroAXNdTGqrOvdYBbcpgnSOuV7O6KEH2ETV0VyVgWTQzOqufSpjfnVVooDTQHKXHDMvc7E/twpWZ71yEIegYeuO/ksuwhZ8g1+FselE21TlWO+0lUA0BrqeM+p5E52A/ZhuI3ijCs/TX7oM5lnj2W42XEkj4qdmO8tKbOrEQlYsY3J7N5gyV2Jrdqe1fzVP/D3776KCNBjvQjArQKvGUJwTvI6OpKcspxeBD0/MD0p31gqdGvRLg1MQ6aFr0eAlpc5uTQkAbq1tIHjMvyKEObuvu7bvui3U9wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1Gy/xj/DsCqd744C+d0UGWv8g7M6rxWC+yjiRak4iLU=;
+ b=LARKGFN5YBscxo+i/F7An0Ray54kJZPF96B8fPqnwMPZpKMsuuvPlFIlqUE4SIxO5YyrSrJunb2WpmvuO/SJBh1HLgX7NuVVL7sd3ALtl86IHIwPJcXnJJ1PtvCVse0Q4Q/PmYTtjXgyl2d0SpdqMjg8aEvLq44YhfcwSeZQo/8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AS8PR04MB8118.eurprd04.prod.outlook.com (2603:10a6:20b:3f2::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Tue, 17 Oct
+ 2023 14:01:37 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::992:76c8:4771:8367]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::992:76c8:4771:8367%7]) with mapi id 15.20.6886.034; Tue, 17 Oct 2023
+ 14:01:37 +0000
+Date: Tue, 17 Oct 2023 17:01:34 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Michael Walle <michael@walle.cc>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: mdio-mux: fix C45 access returning -EIO after
+ API change
+Message-ID: <20231017140134.ce3cjv3bhbq3k4m6@skbuf>
+References: <20231017113222.3135895-1-vladimir.oltean@nxp.com>
+ <ZS6Mskpb6gDpBD3z@shell.armlinux.org.uk>
+ <4ccd7dc9-b611-48aa-865f-68d3a1327ce8@lunn.ch>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4ccd7dc9-b611-48aa-865f-68d3a1327ce8@lunn.ch>
+X-ClientProxiedBy: AM0PR10CA0113.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:e6::30) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <150d8d95-a6cd-dc28-618b-6cc5295b4bf9@huawei.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB8118:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8b496c93-37a1-4707-3d31-08dbcf19948c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ePyZrUN0xgwmxEQf0h3sycd+yMc6GUW7kZj+CBto9oCajHnZY6HW08YAWde96QwaGZ2t/zTJac5rzWN1bVRXo5TU1qTgYQJ1Se9c5LwyV9yw2IhPoGtPTGyB+IspPQ07aVb3l5DnrFNfNvM6SmzIGzP9bcNm3L78atkaJeNn86guDMorHwQf+cAS3fo5uvADGusH2A81f/Dojd/Lh2IEAE5D9L89x0XNb3CxmIDey3Cf+7auMURNImkKY8K8+3ICzkcl4EhFa/p7g3Zm+Pb+2wuH+F7tPX4NcDqWab9Q6hMGBM92zWiBSeRbor+k4eBfx6UgorWvUL33QKGzaurHuF2PZPSjiVnhQobyO/7VKZK2xCzhE5YNW1ajGez1O2ENEyOAUP9uaDUoPNFrEWPDklndKf7JRzK/WYg2hx9oVfrELAXk9JvNiMLS1I3N037+SzLD5WWfdyg5fLbbvAjTbWS9N+GJbcFF0/4GA8p8oJWpm1UC+GZnzkO/ygHt5CqQVpJ+ZSHRb4BAle3aWa6m43xs5+yJWze+eh2W4fQ9f1Sx7kKpIaKnd8W0dASPJmFu
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(39860400002)(376002)(396003)(136003)(366004)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(33716001)(83380400001)(8676002)(4326008)(316002)(478600001)(66556008)(66946007)(6506007)(6666004)(6486002)(8936002)(26005)(6916009)(1076003)(54906003)(66476007)(6512007)(9686003)(7416002)(4744005)(2906002)(5660300002)(86362001)(38100700002)(41300700001)(44832011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?kq+Br5I2x1Ry5u2NNgLLeruRfYwPxmczsWD7Rw3fw5ZWK6gKI86U5IRDEC0k?=
+ =?us-ascii?Q?YqwI16XSL9P6zNag984vFsJ1BrPAUuocD9OdGnpWrlQ6QW3Y3abL8BBLmSy7?=
+ =?us-ascii?Q?ja6N6rsFygJEcNRmPvQ1Y8k4lLYskzAlofj4IBcNxYIfKgHS5WdPexJ+6GN0?=
+ =?us-ascii?Q?H2GwfECsRstB0CVK3apm/pcYwYRdcJ66ua/i2HWGgfXtBAcr0Whx2/k4nUd1?=
+ =?us-ascii?Q?Guy6c5/ZoKcc8wh8j4DLwYO7wOKX7COuDNf35b9xKWLTDCf+vAs1HkHRlnd3?=
+ =?us-ascii?Q?yuNqtdbSH3HYEiPZxjmSTWcL6OBppOUTxOdCtqxQb/+hZboh53n0A01hRAWN?=
+ =?us-ascii?Q?TA/VX6pvM74zcAbA5bKGFT63i9v2cVE/REicaTLqakE/lYK9s9w90NZ23yX/?=
+ =?us-ascii?Q?PrNkj/yyIHRyteJQtKWRzqW4ugEJ+OABCTpOADFANBRyVNYY0wWzEiGM+OOF?=
+ =?us-ascii?Q?elmHXe2RVL0cDzCFzBQLoEVl/jQslxZuvxh8pVSPSJXlNTMYs1ccrtwb/EKP?=
+ =?us-ascii?Q?Ejuk0xK1d/IidUAqXh5Htt4ivj6wKAYV/hOki++RJjg59jalGj2wU5wVAKKH?=
+ =?us-ascii?Q?C8acfTBGIUiRKL+HAuY4HC0+BGeUSYm+mzoMccqXaPTmiqCWLpbd/KBD8ts+?=
+ =?us-ascii?Q?OCUVGm6uhbbyCaw9AExzn5Z0rGA0+LHSnur9PnlS4Uxggf8IxWYiWMYL7opv?=
+ =?us-ascii?Q?661ox966OekwemYcuux9LAfDJbQpyNCURQ+oUhVOpgJlMBiQ6SF96kIOoqIE?=
+ =?us-ascii?Q?ZmbCm+KeSSEIEJ5QTjOza60/zzwXynhz0q50RbehmwDbKpY2GJDlG0wpAmPg?=
+ =?us-ascii?Q?INkPLR7vDV4+JcaFeUSzeZztW9wbB1fGjB55dUi9wcUcm85euxTfUIl0BsLl?=
+ =?us-ascii?Q?MZsuo4elCX8o3RcQxswARlQ05AtZSl9ClewEBFxVgiUs2zLwx4dWNLA9QNab?=
+ =?us-ascii?Q?pbNbZzFal2KT8i6CxuyAzdr6Q3xzQhZmWF/ILMUuZQ0E3e7zZ9E//pgx3MoJ?=
+ =?us-ascii?Q?CWhPJn8e+l7eJWapPKT5GZgrZowsJ4fqbtV8z/ZxOylG3GlU4ruKq6XGDpZ/?=
+ =?us-ascii?Q?R8R3j53P7FHxEYFKx9ZhfnkZ0oU399Nt9aViKDvJSk6+yE557l7+v7fjTU6L?=
+ =?us-ascii?Q?nFK1zM8xP2yAXTKH/Bpvf8FFHkUMhDnMRdwSKNuxEm0fUVksvFznv8Wmr+bA?=
+ =?us-ascii?Q?np01KwgjxLRqhetkAy4Ui80rI7pNWWsTSjgDv5ZZcfNGQIR2gNRMsLuVpvwA?=
+ =?us-ascii?Q?wQgbBZzH7JX4FFXkiz34ziWMVGRASzvCsQnxwA/X4M0BQ56tS3C8IB2TAb5v?=
+ =?us-ascii?Q?H11oWWTH4cTKnH31Z6LGcGbnK2aFdixDIsGsW50Zf0UWq2SPO/urbmOzKt4y?=
+ =?us-ascii?Q?VfTxxUVa0AXtQmbU7YfC8XU2wb/FQj1m0vhdH1+hWOUczPdIPWqHfKxdIaLC?=
+ =?us-ascii?Q?2jEyLxpaJGEisjqpIEzmqJa8y6yXUZPYaVMdPE08IpW0d/v1OS9JO6F+0L82?=
+ =?us-ascii?Q?yNCGEEFOeOelQIciaKwwYPAzziNTFtgQT/vg2zQA5APNWRGsThHGAmOD0v6Z?=
+ =?us-ascii?Q?n5+t0tT1YP/bPB0yN8DERO88txI4ZOn9gFZgfkc3kWKQibVMWdx+jNptOWpI?=
+ =?us-ascii?Q?yw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b496c93-37a1-4707-3d31-08dbcf19948c
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 14:01:37.7588
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: P57MEwidqyVaco2pUQK36yJxrdqrRbhtSRGye4Le7v+fSww3C2JxGAgCsCLol9QGxIIXluk/Uh+c31fVflXAPQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8118
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 09:03:01PM +0800, Jijie Shao wrote:
+On Tue, Oct 17, 2023 at 03:44:58PM +0200, Andrew Lunn wrote:
+> > Maybe make these conditional on the parent bus implementing the c45
+> > read/write ops?
 > 
-> on 2023/7/31 17:10, Jijie Shao wrote:
-> > 
-> > on 2023/7/30 2:23, Andrew Lunn wrote:
-> > > >      Now i wounder if you are fixing the wrong thing. Maybe you
-> > > > should be
-> > > >      fixing the PHY so it does not report up and then down? You
-> > > > say 'very
-> > > >      snall intervals', which should in fact be 1 second. So is the PHY
-> > > >      reporting link for a number of poll intervals? 1min to 10 minutes?
-> > > > 
-> > > >                Andrew
-> > > > 
-> > > > Yes, according to the log records, the phy polls every second,
-> > > > but the link status changes take time.
-> > > > Generally, it takes 10 seconds for the phy to detect link down,
-> > > > but occasionally it takes several minutes to detect link down,
-> > > What PHY driver is this?
-> > > 
-> > > It is not so clear what should actually happen with auto-neg turned
-> > > off. With it on, and the link going down, the PHY should react after
-> > > about 1 second. It is not supposed to react faster than that, although
-> > > some PHYs allow fast link down notification to be configured.
-> > > 
-> > > Have you checked 802.3 to see what it says about auto-neg off and link
-> > > down detection?
-> > > 
-> > > I personally would not suppress this behaviour in the MAC
-> > > driver. Otherwise you are going to have funny combinations of special
-> > > cases of a feature which very few people actually use, making your
-> > > maintenance costs higher.
-> > > 
-> > >         Andrew
+> And optionally, for net-next, make the c22 read/write ops conditional
+> on the parent bus having C22 as well. Its a bit of a corner case, but
+> there are a couple of MDIO bus masters which are C45 only.
 > 
-> Hi Andrew,
-> We've rewritten the commit log to explain this problem,
-> Would you please take some time to review that?
+> Not having C45 is however very common, so we should make this
+> conditional as part of the fix.
 > 
-> The following is the new commit log:
-> This patch is to correct a wrong log info "link down/up" in hns3 driver.
-> When setting autoneg off without changing speed and duplex, the link
-> should be not changed. However in hns3 driver, it print link down/up once
-> incorrectly. We trace the phy machine state and find the phy change form
-> PHY_UP to PHY_RUNNING. No other state of PHY occurs during this process.
-> MDIO trace also indicate the link is on. The wrong log info and mdio
-> trace are showed as followed:
-> 
-> [  843.720783][  T367] hns3 0000:35:00.0 eth1: set link(phy): autoneg=0,
-> speed=10, duplex=1
-> [  843.736087][  T367] hns3 0000:35:00.0 eth1: link down
-> [  843.773506][   T17] RTL8211F Gigabit Ethernet mii-0000:35:00.0:02: PHY
-> state change UP -> RUNNING
-> [  844.674668][   T31] hns3 0000:35:00.0 eth1: link up
+>       Andrew
 
-I still think this is totally valid and correct.
+Ok. I don't know if net-next will remain open after this patch gets
+accepted and "net" gets merged back into it, so in order to not
+completely forget, I'll add a patch with your suggestion to our
+Layerscape SDK and that will serve as a reminder for the next
+upstreaming session.
 
-When you turn auto-neg off the link partner is going to react to that,
-it might drop the link. After a while, the link partner will give up
-trying to perform auto-neg and might fall back to 10/Half. At which
-point, the link might allow traffic flow. However, in this example,
-you have a duplex mis-match, so it might not work correctly.
+In the meantime, for this patch:
 
-Turning off auto-neg is something you need to do at both ends, and you
-need to then force both ends to the same settings. Link down is
-expected. I would actually be suppressed if no link down events were
-reported.
-
-	Andrew
+pw-bot: cr
 
