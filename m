@@ -1,188 +1,112 @@
-Return-Path: <netdev+bounces-41724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FF7C7CBC6A
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:37:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 327BC7CBC79
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 09:42:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 789E2B20F8C
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:37:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A94AB20FCA
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 07:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463261CFB8;
-	Tue, 17 Oct 2023 07:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54CB1F5FA;
+	Tue, 17 Oct 2023 07:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Ay60W9zo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91CC94404
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 07:37:40 +0000 (UTC)
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B365A93;
-	Tue, 17 Oct 2023 00:37:37 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R611e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VuMT906_1697528253;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VuMT906_1697528253)
-          by smtp.aliyun-inc.com;
-          Tue, 17 Oct 2023 15:37:34 +0800
-Date: Tue, 17 Oct 2023 15:37:33 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: tonylu@linux.alibaba.com, alibuda@linux.alibaba.com,
-	guwen@linux.alibaba.com, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net/smc: correct the reason code in
- smc_listen_find_device when fallback
-Message-ID: <20231017073733.GV92403@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20231016061153.40057-1-guangguan.wang@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708854404;
+	Tue, 17 Oct 2023 07:41:52 +0000 (UTC)
+Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 664E18F;
+	Tue, 17 Oct 2023 00:41:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1697528507; x=1697787707;
+	bh=Dkzy2YiSbGk0eaGP2EwvSNner+nDvIC06gMS1dbmlLw=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=Ay60W9zo7wjxjiCtueS+JoGsMjVnWq1ItmSEnCYC2wAnr12waEco1Qih1RwgJnxDH
+	 VstWBy3wnlODKhqqdijpz7pktkAOErsMFFgIIO4d7Z3OKPF2eMMHEa9kys/ENRPGtM
+	 CUUMk6xRF5UdodriWQGN1QRWBi9DS74Zm4pAMfjlSoMk4fOwq3/4qWHFFqN+LLeMaU
+	 zDvtblBQipsNECPiYfx7jPiGGY7ERmZKjzsgdBYQaMz4gsf/lzA9GA/uv5GfAFtAlp
+	 kGN1fV9azu0dcJ7VeisJk4FyM79kdERSVsJe4m8d7QXW8DkcxHVgksC7PxrKNheAig
+	 VAF45RbN1xvjg==
+Date: Tue, 17 Oct 2023 07:41:38 +0000
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
+Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY drivers
+Message-ID: <cad79d65-4c66-4344-b0b4-93d2cbf891af@proton.me>
+In-Reply-To: <20231017.163249.1403385254279967838.fujita.tomonori@gmail.com>
+References: <9d70de37-c5ed-4776-a00f-76888e1230aa@proton.me> <20231015.073929.156461103776360133.fujita.tomonori@gmail.com> <98471d44-c267-4c80-ba54-82ab2563e465@proton.me> <20231017.163249.1403385254279967838.fujita.tomonori@gmail.com>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231016061153.40057-1-guangguan.wang@linux.alibaba.com>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 16, 2023 at 02:11:53PM +0800, Guangguan Wang wrote:
+On 17.10.23 09:32, FUJITA Tomonori wrote:
+> On Tue, 17 Oct 2023 07:06:38 +0000
+> Benno Lossin <benno.lossin@proton.me> wrote:
+>>> Secondly, What's the difference between read() and write(), where you
+>>> think that read() is &self write() is &mut self.
+>>
+>> This is just the standard Rust way of using mutability. For reading one
+>> uses `&self` and for writing `&mut self`. The only thing that is special
+>> here is the stats that are updated. But I thought that it still could fi=
+t
+>> Rust by the following pattern:
+>> ```rust
+>>       pub struct TrackingReader {
+>>           buf: [u8; 64],
+>>           num_of_reads: Mutex<usize>,
+>>       }
+>>
+>>       impl TrackingReader {
+>>           pub fn read(&self, idx: usize) -> u8 {
+>>               *self.num_of_reads.lock() +=3D 1;
+>>               self.buf[idx]
+>>           }
+>>       }
+>>
+>> ```
+>>
+>> And after taking a look at `mdiobus_read` I indeed found a mutex.
+>=20
+> Yes, both read() and write() update the stats with mdiobus's lock.
+>=20
+>=20
+>>> read() is reading from hardware register. write() is writing a value
+>>> to hardware register. Both updates the object that phy_device points
+>>> to?
+>>
+>> Indeed, I was just going with the standard way of suggesting `&self`
+>> for reads, there are of course exceptions where `&mut self` would make
+>> sense. That being said in this case both options are sound, since
+>> the C side locks a mutex.
+>=20
+> I see. I use &mut self for both read() and write().
 
-Hi guangguan,
+I would recommend documenting this somewhere (why `read` is `&mut`), since
+that is a bit unusual (why restrict something more than necessary?).
 
-This patch doesn't apply clearly on net because it conflict with my
-previous patch 4abbd2e3c1db(net/smc: return the right falback reason
-when prefix checks fail), pls rebase.
+--=20
+Cheers,
+Benno
 
->The function smc_find_ism_store_rc is not only used for ism, so it is
->reasonable to change the function name to smc_find_device_store_rc.
->
->The ini->rc is used to store the last error happened when finding usable
->ism or rdma device in smc_listen_find_device, and is set by calling smc_
->find_device_store_rc. Once the ini->rc is assigned to an none-zero value,
->the value can not be overwritten anymore. So the ini-rc should be set to
->the error reason only when an error actually occurs.
->
->When finding ISM/RDMA devices, device not found is not a real error, as
->not all machine have ISM/RDMA devices. Failures after device found, when
->initializing device or when initializing connection, is real errors, and
->should be store in ini->rc.
->
->SMC_CLC_DECL_DIFFPREFIX also is not a real error, as for SMC-RV2, it is
->not require same prefix.
 
-I think it's better to seperate this patch into 2:
-- one for changing the name from smc_find_ism_store_rc to smc_find_device_store_rc.
-- one for fixing the return reason.
-
-More comments below.
-
->
->Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
->---
-> net/smc/af_smc.c | 23 +++++++++--------------
-> 1 file changed, 9 insertions(+), 14 deletions(-)
->
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index bacdd971615e..15d8ad7af75d 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -2121,7 +2121,7 @@ static void smc_check_ism_v2_match(struct smc_init_info *ini,
-> 	}
-> }
-> 
->-static void smc_find_ism_store_rc(u32 rc, struct smc_init_info *ini)
->+static void smc_find_device_store_rc(u32 rc, struct smc_init_info *ini)
-> {
-> 	if (!ini->rc)
-> 		ini->rc = rc;
->@@ -2162,10 +2162,8 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
-> 	}
-> 	mutex_unlock(&smcd_dev_list.mutex);
-> 
->-	if (!ini->ism_dev[0]) {
->-		smc_find_ism_store_rc(SMC_CLC_DECL_NOSMCD2DEV, ini);
->+	if (!ini->ism_dev[0])
-> 		goto not_found;
->-	}
-> 
-> 	smc_ism_get_system_eid(&eid);
-> 	if (!smc_clc_match_eid(ini->negotiated_eid, smc_v2_ext,
->@@ -2180,7 +2178,7 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
-> 		ini->ism_selected = i;
-> 		rc = smc_listen_ism_init(new_smc, ini);
-> 		if (rc) {
->-			smc_find_ism_store_rc(rc, ini);
->+			smc_find_device_store_rc(rc, ini);
-> 			/* try next active ISM device */
-> 			continue;
-> 		}
->@@ -2213,11 +2211,12 @@ static void smc_find_ism_v1_device_serv(struct smc_sock *new_smc,
-> 		goto not_found;
-> 	ini->ism_selected = 0;
-> 	rc = smc_listen_ism_init(new_smc, ini);
->-	if (!rc)
->+	if (!rc) {
->+		smc_find_device_store_rc(rc, ini);
-
-This smc_find_device_store_rc() seems useless when rc == 0 here ?
-
-> 		return;		/* V1 ISM device found */
->+	}
-> 
-> not_found:
->-	smc_find_ism_store_rc(rc, ini);
-> 	ini->smcd_version &= ~SMC_V1;
-> 	ini->ism_dev[0] = NULL;
-> 	ini->is_smcd = false;
->@@ -2266,10 +2265,8 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
-> 	ini->smcrv2.saddr = new_smc->clcsock->sk->sk_rcv_saddr;
-> 	ini->smcrv2.daddr = smc_ib_gid_to_ipv4(smc_v2_ext->roce);
-> 	rc = smc_find_rdma_device(new_smc, ini);
->-	if (rc) {
->-		smc_find_ism_store_rc(rc, ini);
->+	if (rc)
-> 		goto not_found;
->-	}
-> 	if (!ini->smcrv2.uses_gateway)
-> 		memcpy(ini->smcrv2.nexthop_mac, pclc->lcl.mac, ETH_ALEN);
-> 
->@@ -2284,7 +2281,7 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
-> 	if (!rc)
-> 		return;
-> 	ini->smcr_version = smcr_version;
->-	smc_find_ism_store_rc(rc, ini);
->+	smc_find_device_store_rc(rc, ini);
-> 
-> not_found:
-> 	ini->smcr_version &= ~SMC_V2;
->@@ -2330,8 +2327,6 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
-> 
-> 	/* check for matching IP prefix and subnet length (V1) */
-> 	prfx_rc = smc_listen_prfx_check(new_smc, pclc);
->-	if (prfx_rc)
->-		smc_find_ism_store_rc(prfx_rc, ini);
-> 
-> 	/* get vlan id from IP device */
-> 	if (smc_vlan_by_tcpsk(new_smc->clcsock, ini))
->@@ -2358,7 +2353,7 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
-> 		int rc;
-> 
-> 		rc = smc_find_rdma_v1_device_serv(new_smc, pclc, ini);
->-		smc_find_ism_store_rc(rc, ini);
->+		smc_find_device_store_rc(rc, ini);
-> 		return (!rc) ? 0 : ini->rc;
-> 	}
-> 	return SMC_CLC_DECL_NOSMCDEV;
->-- 
->2.24.3 (Apple Git-128)
 
