@@ -1,135 +1,229 @@
-Return-Path: <netdev+bounces-42038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DE767CCC00
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 21:15:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A77877CCC0D
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 21:18:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCBFB281AAB
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:15:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D47A91C20AA7
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:18:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BC42EB04;
-	Tue, 17 Oct 2023 19:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71E32EB09;
+	Tue, 17 Oct 2023 19:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O9Zsz9pH"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="w2JrJHZa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397722EAEF
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 19:15:42 +0000 (UTC)
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770E6FD
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:15:40 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so5a12.0
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:15:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697570139; x=1698174939; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Oopxp9TwN2h/JkyMuEtN5Ny1VADX1X+/wXCGgacoWvU=;
-        b=O9Zsz9pHfcK5pZI3WlSGuDYbjwkhSQZq+0YmQzWw5plenZjhpyjn3JWt5hoQRN+Thy
-         tWdJRVcaMRo/pEHBVbuGqHo3rIKpX0516i5k4M5HJioStYZjO/nBgca7EEzqOXkwDXvb
-         ibEb5DXsH5f9DcvlurZ/JISOvuvQWScdkEgfoJ/K/KjI8IAB475wAM8m2OQJS8T2+aGT
-         g+pKD5CuYgl9FbfBCchnj8fFXXji0VNuym76SnUmTJULglYwuWLDJyOehKxpbRNuCsmi
-         YeXGs8FyfLXmr2/jiI50WQdkb+LZbt8gaLWa4NzWyYYO7Hd+Xyk8EpHkF9u9jP1JrRY2
-         8LvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697570139; x=1698174939;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Oopxp9TwN2h/JkyMuEtN5Ny1VADX1X+/wXCGgacoWvU=;
-        b=RCDzsy/IiU5qWddGV4UdwyLSHcu5IwtbanfvajcwFEMSon+2sEWcz3r/U/80Z7Eidx
-         MDRW848Xa/z0J339Sss823ZQDvc6EyQP/OFvS7JbPbv+L2TNwOaACsJSRq0DJdUjzfu8
-         GGB2xP3wdiMNmG6vPaVhRz3B27H6BqWBArZ7rSBiw+GO0Z9Z+gtGXEoXNxyvoXQtvs/J
-         eprkAGrCeiD3gE9oxT5+uUfum+yjkLXZ645LdgSbTH6HfA8CzfDX3J+z/Qk2zjpNA+jw
-         gE7POR4dzWqivoTDWadQN2t8PyHu8L0c0lc4Okg0ZfQR97ry+5JFViNmQSOQ0QWmp+ko
-         EjPA==
-X-Gm-Message-State: AOJu0Yz6VqWtxnON5H3qeRP98e3Bx8KPYfFimKoQ4PyxGC4ewG9unk1b
-	tD/1GVnhgao7rO5MR6HG5eMQ4fW5eVk6uHuBGgQhXg==
-X-Google-Smtp-Source: AGHT+IEes36Yw05GYpvEuZ+9fzBedX2dcD0S2PPO6z1c2N5G1AYBAsbZTSRhmiyNxmBib4IqH/5/nMNAJ46q7WsOqw4=
-X-Received: by 2002:a50:cd98:0:b0:53d:b53c:946b with SMTP id
- p24-20020a50cd98000000b0053db53c946bmr34794edi.2.1697570138732; Tue, 17 Oct
- 2023 12:15:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF872EAEA;
+	Tue, 17 Oct 2023 19:18:43 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2074.outbound.protection.outlook.com [40.107.92.74])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EEB3C4;
+	Tue, 17 Oct 2023 12:18:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XpR/Ls/ClpTcTm+wj6BmArw6zgKti2kuvTSZqY0qbnUr0MUKRp7LAFEMrUjfkPZMIm9vBRSnbzFcAeGb/vh+SSoa/J0XJY/eSKhPNXp4QmqxgSjTG0wmY3wqazYnujPdKLyR2EY6m1ft9XYWPoXvfrxbPAj8Ctv5iC2naPUM/ZiEGl3C9YRZMU+9E54+g/wUv+N4HYvyQOxmDrZ9rlIKKgJUQDrHg43FwoTy9MbhmUX6Vg2ZEqi0CpgEgW7nbtaAsMlXGWlItM9NSUhjt3IylQfxp3LaoIS2fJE+NfdEwkwxPQ+ahG+NkElxFchl58/Fo+hINzOt3T4otRdMnAYuPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HZYpm6AA9cqtkEN+eUbZQzekEI9zyYDL8m4nO/Fw8Vs=;
+ b=AmVVREX3CKm0wtYafPkASwIKQt36VszMkgDHNqxo9RArdVvw0wUiZwmG+NgOP01M0Nd7KQWAq3abLFfxrGcZbvl7GItkAqFZAIB4JJ1cU4TdKWWrEh7/ZZWR5ipcqRGdCZcoLVmu2CIqotgto6N1aCEENgEjldT+zLeJRdUn5WDeJpLQNm94DyPH7nBCYxTzotyLsT45NPhwZ/G5mnuWI6l9Zbx/R1ftJPuEoX1RMXuAD8mCLBsaUfLi5JxAv0lQ8uWa/SHI5Ql9ikfLb56HqQPIHMALEZvm+gI6ICFM7dleHMcG3E21A2Ck0nJZDsLQ+dSS0j9MgDjSYc1UCP1bnw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HZYpm6AA9cqtkEN+eUbZQzekEI9zyYDL8m4nO/Fw8Vs=;
+ b=w2JrJHZa/t3It9q2W/FMtFT7IdlxMzdXEPNSFfyW6EHb748KPh3wVie24uxUfC1cT/o/ZLFg2pSY0cuzbFFG0h1JkXX0XsK/yOv7OQb68O6E4ZhxVRegbQx1Ea0gBgWGbaFAm02x9z4cC+n2jy3/1xK7W00gYcS/yjZXiZ9qjzs=
+Received: from CH2PR12CA0015.namprd12.prod.outlook.com (2603:10b6:610:57::25)
+ by SA0PR12MB4558.namprd12.prod.outlook.com (2603:10b6:806:72::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Tue, 17 Oct
+ 2023 19:18:38 +0000
+Received: from DS3PEPF000099D9.namprd04.prod.outlook.com
+ (2603:10b6:610:57:cafe::54) by CH2PR12CA0015.outlook.office365.com
+ (2603:10b6:610:57::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.21 via Frontend
+ Transport; Tue, 17 Oct 2023 19:18:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS3PEPF000099D9.mail.protection.outlook.com (10.167.17.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6907.20 via Frontend Transport; Tue, 17 Oct 2023 19:18:37 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 17 Oct
+ 2023 14:18:37 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB06.amd.com
+ (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 17 Oct
+ 2023 14:18:37 -0500
+Received: from xhdradheys41.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.27 via Frontend
+ Transport; Tue, 17 Oct 2023 14:18:32 -0500
+From: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<michal.simek@amd.com>, <linux@armlinux.org.uk>, <f.fainelli@gmail.com>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<git@amd.com>, Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+Subject: [PATCH net-next v8 0/3] net: axienet: Introduce dmaengine
+Date: Wed, 18 Oct 2023 00:47:51 +0530
+Message-ID: <1697570274-798170-1-git-send-email-radhey.shyam.pandey@amd.com>
+X-Mailer: git-send-email 2.1.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231017014716.3944813-1-lixiaoyan@google.com>
- <20231017014716.3944813-3-lixiaoyan@google.com> <a666cea7-078d-4dc0-bad9-87fa15e44036@lunn.ch>
- <CANn89iJVGQ0hpX8aSXjyfubntfy_a9xrZ5gGrx+ekY0THZ4p+Q@mail.gmail.com> <353dcd1e-a191-488c-8802-fede2a644453@lunn.ch>
-In-Reply-To: <353dcd1e-a191-488c-8802-fede2a644453@lunn.ch>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 17 Oct 2023 21:15:24 +0200
-Message-ID: <CANn89iKfXxaLr0b-rp0_+X7QY82pK21zeLCVjqxNipfKkwOnDg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 2/5] net-smnp: reorganize SNMP fast path variables
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Coco Li <lixiaoyan@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, 
-	Wei Wang <weiwan@google.com>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D9:EE_|SA0PR12MB4558:EE_
+X-MS-Office365-Filtering-Correlation-Id: 949f4439-beae-4420-04b1-08dbcf45dd75
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	n4LMx8fSXFw8+0kzxbFIE1nz57gM/pi7PEBDZ3hDp2hlbXwkgRG/eix64pP6E67U+UwQWCLNQMgcpc8ZU8mTpEwPUCT6Au4Pk6ZFxRNhhFOmenwCci0+w7ZDG3EZylmWl+x+6H6nPTuXz70GyYqWq1/eLbdcLIgTx9ZmqCxDsgJzByJG3ScmDbNj7xXvtRsscJMW6uUXEQBsNZkMbxw8Nrr/XmMidRV0A6PRZKkEXLkTQ6OpusHxC7NdZCCx3K/axjKhwtuIyXaBnvBeLhFcl723QzrP9jaoNojU+cGJggWe3G6T5OyfPX9VYGT5wiYKt+fMLsNWARp45trXotTQK4MGNS6Vi2SUWk+5PDsIkLuIhrap4q90mNrYUBVItToeTxA8y+3luLTXlOxeapMmMjZUAcA+APSSgWa4taspuLRgdRBwiUUxYssSgCRwp+0G/A6Etlys6fvA0MiL9A7kqxf4SLM2RgBam3uqyPQ73XoYqAb4Y2e0FgyBx5PMlfc8U6Lrc6cQtYhCdKPT/YZUJN7Zvb/3R9krIugoLo3y7cH1kSglz8Dxz1eIf8wrdODavXGC7FUmgNZTwedHfzqHDX4NsAflF+0EeItPh2WqAVmRJRI3ttZ54LI/V1SnrnZV5x0NoKpayvGKiP9wwluR6Yd6ziUyClEoq+Qm8c5yPxuGqCJqLg3TWmeyTPrjlSB1bSrKxRNVmAh/4mW3u+WE5iymL4LIKgJrIzcnVu0GqLANBcVjQ1SYX5BlQFpC2GtFGBrwLryv3GBAcVjgClXNZh3XYCIrfn+1FfIx/aSkt60l1BcR9dm7XTg+HhcPzkik
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(396003)(346002)(376002)(230922051799003)(82310400011)(186009)(64100799003)(1800799009)(451199024)(40470700004)(36840700001)(46966006)(40480700001)(36756003)(66899024)(40460700003)(110136005)(54906003)(70206006)(86362001)(82740400003)(921005)(81166007)(356005)(70586007)(316002)(36860700001)(83380400001)(336012)(8936002)(966005)(26005)(2616005)(426003)(6666004)(2906002)(478600001)(8676002)(7416002)(5660300002)(47076005)(41300700001)(4326008)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2023 19:18:37.7402
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 949f4439-beae-4420-04b1-08dbcf45dd75
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099D9.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4558
+X-Spam-Status: No, score=1.9 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	FORGED_SPF_HELO,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 9:10=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Tue, Oct 17, 2023 at 08:10:21PM +0200, Eric Dumazet wrote:
-> > On Tue, Oct 17, 2023 at 3:57=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wr=
-ote:
-> > >
-> > > On Tue, Oct 17, 2023 at 01:47:13AM +0000, Coco Li wrote:
-> > > > From: Chao Wu <wwchao@google.com>
-> > > >
-> > > > Reorganize fast path variables on tx-txrx-rx order.
-> > > > Fast path cacheline ends afer LINUX_MIB_DELAYEDACKLOCKED.
-> > > > There are only read-write variables here.
-> > > >
-> > > > Below data generated with pahole on x86 architecture.
-> > > >
-> > > > Fast path variables span cache lines before change: 12
-> > > > Fast path variables span cache lines after change: 2
-> > >
-> > > As i pointed out for the first version, this is a UAPI file.
-> > >
-> > > Please could you add some justification that this does not cause any
-> > > UAPI changes. Will old user space binaries still work after this?
-> > >
-> > > Thanks
-> > >         Andrew
-> >
-> > I do not think the particular order is really UAPI. Not sure why they
-> > were pushed in uapi in the first place.
-> >
-> > Kernel exports these counters with a leading line with the names of the=
- metrics.
-> >
-> > We already in the past added fields and nothing broke.
-> >
-> > So the answer is : user space binaries not ignoring the names of the
-> > metrics will work as before.
-> >
-> > nstat is one of the standard binary.
->
-> This is the sort of thing which i think should be in the commit
-> message. It makes it clear somebody has thought about this, and they
-> think the risk is minimal. Without such a comment, somebody will ask
-> if changing to a uapi file is safe.
+The axiethernet driver can use the dmaengine framework to communicate
+with the xilinx DMAengine driver(AXIDMA, MCDMA). The inspiration behind
+this dmaengine adoption is to reuse the in-kernel xilinx dma engine
+driver[1] and remove redundant dma programming sequence[2] from the
+ethernet driver. This simplifies the ethernet driver and also makes
+it generic to be hooked to any complaint dma IP i.e AXIDMA, MCDMA
+without any modification.
 
-Sure, although we never said such a thing in prior changes.
+The dmaengine framework was extended for metadata API support during
+the axidma RFC[3] discussion. However, it still needs further
+enhancements to make it well suited for ethernet usecases.
 
-Perhaps add a big comment in the file itself, instead of repeating it
-on future commit changelogs ?
+Comments, suggestions, thoughts to implement remaining functional
+features are very welcome!
+
+[1]: https://github.com/torvalds/linux/blob/master/drivers/dma/xilinx/xilinx_dma.c
+[2]: https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/xilinx/xilinx_axienet_main.c#L238
+[3]: http://lkml.iu.edu/hypermail/linux/kernel/1804.0/00367.html
+[4]: https://lore.kernel.org/all/20221124102745.2620370-1-sarath.babu.naidu.gaddam@amd.com
+
+
+Changes for v8:
+- Use dev_consume_skb_any() in transmit callback.
+- Fix queue stop logic in _xmit_dmaengine().
+- Fix skb leak in _xmit_dmaengine() error path.
+- In dmaengine tx path use dma_device pointer to call prep_slave_sg.
+- In rx submit use rate limiting for mapping errors and fix error
+  handling.
+- Revert dev_err_probe from _init_dmaengine().
+- Remove unnecessary new line after call to _init_dmaengine().
+- Move free_irq(lp->eth_irq) to error path.
+- Have separate netdev_ops for dmaengine flow.
+- Remove spurious new line and inline attribute from axienet_init_legacy_dma().
+- Drop indirection for xmit() func. For dmaengine flow have separate
+  netdev_ops.
+- Improve axienet_dma_tx_cb and axienet_rx_submit_desc documentation.
+
+Changes in v7:
+- Fix comment spaces.
+- In xmit use correct XAE_FEATURE_PARTIAL_TX_CSUM define.
+- Rename app to app_metadata.
+- Switch to __netif_rx.
+- In axienet_rx_submit_desc() add mapping error handling.
+- Introduce new workaround 4/4 patch to enable lkp_test
+  build coverage. To be dropped for mainline.
+
+Changes in v6:
+- Remove patchset 1-7 as it was applied to dmaengine tree in v5 version.
+- Added Krzysztof reviewed-by tag for dmaengine binding patch.
+- Rename struct axi_skbuff to skbuf_dma_descriptor and removed
+  __packed attribute.
+- Drop kmem_cache implementation and switch to using ring buffers.
+- Remove __inline from axienet_init_dmaengine().
+- Name labels after the target.
+- Add error check for platform_get_irq_optional().
+- Fix double space and no empty lines between call and its error check.
+
+Changes in v5:
+- Fix git am failure on net-next
+- Addressed DT binding review comments i.e Modified commit description to
+  remove dmaengine framework references and instead describe how
+  axiethernet IP uses DMA channels.
+- Fix "^[tr]x_chan[0-9]|1[0-5]$" -> "^[tr]x_chan([0-9]|1[0-5])$"
+- Drop generic dmas description.
+- Fix kmem_cache resource leak.
+- Merge Xilinx DMA enhancements and optimization[4] into this series.
+
+Changes in V4:
+- Updated commit description about tx/rx channels name(1/3).
+- Removed "dt-bindings" and "dmaengine" strings in subject(1/3).
+- Extended dmas and dma-names to support MCDMA channel names(1/3).
+- Rename has_dmas to use_dmaegine(2/3).
+- Remove the AXIENET_USE_DMA(2/3).
+- Remove the AXIENET_USE_DMA(3/3).
+- Add dev_err_probe for dma_request_chan error handling(3/3).
+- Add kmem_cache_destroy for create in axienet_setup_dma_chan(3/3).
+
+Changes in V3:
+- Moved RFC to PATCH.
+- Removed ethtool get/set coalesce, will be added later.
+- Added backward comapatible support.
+- Split the dmaengine support patch of V2 into two patches(2/3 and 3/3).
+https://lore.kernel.org/all/20220920055703.13246-4-sarath.babu.naidu.gaddam@amd.com/
+
+Changes in V2:
+- Add ethtool get/set coalesce and DMA reset using DMAengine framework.
+- Add performance numbers.
+- Remove .txt and change the name of file to xlnx,axiethernet.yaml.
+- Fix DT check warning(Fix DT check warning('device_type' does not match
+   any of the regexes:'pinctrl-[0-9]+' From schema: Documentation/
+   devicetree/bindings/net/xilinx_axienet.yaml).
+
+Radhey Shyam Pandey (2):
+  dt-bindings: net: xlnx,axi-ethernet: Introduce DMA support
+  net: axienet: Introduce dmaengine support
+
+Sarath Babu Naidu Gaddam (1):
+  net: axienet: Preparatory changes for dmaengine support
+
+ .../bindings/net/xlnx,axi-ethernet.yaml       |  16 +
+ drivers/net/ethernet/xilinx/Kconfig           |   1 +
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  35 +
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 666 ++++++++++++++----
+ 4 files changed, 597 insertions(+), 121 deletions(-)
+
+-- 
+2.34.1
+
 
