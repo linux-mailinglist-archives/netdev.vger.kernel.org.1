@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-42030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 305A27CCBA9
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 21:04:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 726037CCBAA
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 21:04:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4C5AB211CB
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:04:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EA26281BAA
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52922450FE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFDAF9CA79;
 	Tue, 17 Oct 2023 19:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MsAhjMoi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PRzDb62r"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5752DF6F;
-	Tue, 17 Oct 2023 19:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596CC2DF78;
+	Tue, 17 Oct 2023 19:04:32 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54661FC;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19C7FF;
 	Tue, 17 Oct 2023 12:04:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697569470; x=1729105470;
+  t=1697569471; x=1729105471;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=5nN1JzZo3THylg3A7E1nTQIboa4XH08Qebb+ohZVNpE=;
-  b=MsAhjMoiIBhn8bY5sbLSzpawQ0jK/6TKIsm1l1quBb8M5k2IjIUq+Xnq
-   TsFSEwGRu3So+8ZmnOhtRg1fyA8Fhf6IAu8W2YO2hfkx8wH4AAQPX5gtu
-   b8XHCJ5mbHPDjeYswEnotapl1Eo/e0GQmNtmnFHDs818RcA4xJPF3npyu
-   FDkgDq0hXxV9CR73Y78J+m/6J4Gh9gLwy2PerOxbhoJdmd6WTkh8oFkyb
-   dkh43eKbiz6kveLS9NeAHklQ/g4NTgSli8xfJe4tP/4fq5foPBa+4PKwH
-   30aJWASKOu8boR2C+Uz3XHgSEDYc0mhSwVnLZb4g5dgZrUAXkSdpwlOW0
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="384739765"
+  bh=0uvkn8d+tZ9D+o5gz3EzUens/grIvdbagcO3bHmKFL0=;
+  b=PRzDb62r4my42kozX/8PbpV6N6+C5W5d/naQLyJBnFkrPaYQT1O6INZP
+   74jrlfvM8dwjkiuCFKhPt/MEy1UJruRbkOmPZEYk6VbilhEknwpTGRxyk
+   7PwZYzpNeUWiVdO4MqstkWx5qX449zJ1N2Gte+mt0N+0j80XrD4X6EPvA
+   chquar8E6s5GVBcdqqnsS4hZjtonvvbpfKqb5SFp1+PsVFmkNgSXPSzSu
+   5P1SYjN9O9Kxl+88mXKwKK9YJ5ojeC6HXMlm7Gcnyzac0/CDMBLQCaRzD
+   yGZYNg78zAVl/jlGgE6M4K67jpw6HlDBkYi2EOnw1LLGoSEynrKYTsqXf
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="384739778"
 X-IronPort-AV: E=Sophos;i="6.03,233,1694761200"; 
-   d="scan'208";a="384739765"
+   d="scan'208";a="384739778"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 12:04:19 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="822108754"
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="822108764"
 X-IronPort-AV: E=Sophos;i="6.03,233,1694761200"; 
-   d="scan'208";a="822108754"
+   d="scan'208";a="822108764"
 Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 12:04:19 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
@@ -55,9 +55,9 @@ Cc: Justin Stitt <justinstitt@google.com>,
 	linux-hardening@vger.kernel.org,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next 6/9] i40e: use scnprintf over strncpy+strncat
-Date: Tue, 17 Oct 2023 12:04:08 -0700
-Message-ID: <20231017190411.2199743-7-jacob.e.keller@intel.com>
+Subject: [PATCH net-next 7/9] igb: replace deprecated strncpy with strscpy
+Date: Tue, 17 Oct 2023 12:04:09 -0700
+Message-ID: <20231017190411.2199743-8-jacob.e.keller@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231017190411.2199743-1-jacob.e.keller@intel.com>
 References: <20231017190411.2199743-1-jacob.e.keller@intel.com>
@@ -80,15 +80,22 @@ From: Justin Stitt <justinstitt@google.com>
 [1] and as such we should prefer more robust and less ambiguous string
 interfaces.
 
-Moreover, `strncat` shouldn't really be used either as per
-fortify-string.h:
- * Do not use this function. While FORTIFY_SOURCE tries to avoid
- * read and write overflows, this is only possible when the sizes
- * of @p and @q are known to the compiler. Prefer building the
- * string with formatting, via scnprintf() or similar.
+We see that netdev->name is expected to be NUL-terminated based on its
+usage with format strings:
+|       sprintf(q_vector->name, "%s-TxRx-%u", netdev->name,
+|               q_vector->rx.ring->queue_index);
 
-Instead, use `scnprintf` with "%s%s" format string. This code is now
-more readable and robust.
+Furthermore, NUL-padding is not required as netdev is already
+zero-allocated:
+|       netdev = alloc_etherdev_mq(sizeof(struct igb_adapter),
+|                                  IGB_MAX_TX_QUEUES);
+...
+alloc_etherdev_mq() -> alloc_etherdev_mqs() -> alloc_netdev_mqs() ...
+|       p = kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
+
+Considering the above, a suitable replacement is `strscpy` [2] due to
+the fact that it guarantees NUL-termination on the destination buffer
+without unnecessarily NUL-padding.
 
 Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
 Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
@@ -98,27 +105,22 @@ Signed-off-by: Justin Stitt <justinstitt@google.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_ddp.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/intel/igb/igb_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ddp.c b/drivers/net/ethernet/intel/i40e/i40e_ddp.c
-index 6b68b6575a1d..cf25bfc5dc3f 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ddp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ddp.c
-@@ -456,10 +456,9 @@ int i40e_ddp_flash(struct net_device *netdev, struct ethtool_flash *flash)
- 		char profile_name[sizeof(I40E_DDP_PROFILE_PATH)
- 				  + I40E_DDP_PROFILE_NAME_MAX];
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index fdadf3e84f59..db54453e1946 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -3263,7 +3263,7 @@ static int igb_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	igb_set_ethtool_ops(netdev);
+ 	netdev->watchdog_timeo = 5 * HZ;
  
--		profile_name[sizeof(profile_name) - 1] = 0;
--		strncpy(profile_name, I40E_DDP_PROFILE_PATH,
--			sizeof(profile_name) - 1);
--		strncat(profile_name, flash->data, I40E_DDP_PROFILE_NAME_MAX);
-+		scnprintf(profile_name, sizeof(profile_name), "%s%s",
-+			  I40E_DDP_PROFILE_PATH, flash->data);
-+
- 		/* Load DDP recipe. */
- 		status = request_firmware(&ddp_config, profile_name,
- 					  &netdev->dev);
+-	strncpy(netdev->name, pci_name(pdev), sizeof(netdev->name) - 1);
++	strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
+ 
+ 	netdev->mem_start = pci_resource_start(pdev, 0);
+ 	netdev->mem_end = pci_resource_end(pdev, 0);
 -- 
 2.41.0
 
