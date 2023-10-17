@@ -1,104 +1,85 @@
-Return-Path: <netdev+bounces-41649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D50C77CB828
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 03:57:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4097E7CB82D
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 03:57:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A2D82814C3
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 01:57:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F04AF2814CD
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 01:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA35F4402;
-	Tue, 17 Oct 2023 01:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDDD8440D;
+	Tue, 17 Oct 2023 01:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="H66hswY+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77ED31FD5
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 01:57:10 +0000 (UTC)
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0613B4;
-	Mon, 16 Oct 2023 18:57:05 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VuL.UJ1_1697507816;
-Received: from 30.221.149.45(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VuL.UJ1_1697507816)
-          by smtp.aliyun-inc.com;
-          Tue, 17 Oct 2023 09:57:02 +0800
-Message-ID: <eecd0cbe-1dc5-c3e8-c047-6a3d9382ac58@linux.alibaba.com>
-Date: Tue, 17 Oct 2023 09:56:55 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A754402
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 01:57:50 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA814D9
+	for <netdev@vger.kernel.org>; Mon, 16 Oct 2023 18:57:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=LLL8azOnxijkldHrCyjrkUMH6ntn9EpQTnNIpM02RF4=; b=H66hswY+SdTYzvRbk1Id/zrNyD
+	uLggmlQtXsbWd1Ywqox1mc9nZbpDkx57YYlb6IZjtFExPMleYWtvn3BIWG3+f7DrFpwq9r6MjM9oh
+	2lEUnrRuYHk939tfQa2RLsq/9p5V+9u+clOSkGWx3arLRO2mIWCGDoxPWkgMjf4It4tM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qsZL7-002QHY-8X; Tue, 17 Oct 2023 03:57:45 +0200
+Date: Tue, 17 Oct 2023 03:57:45 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Coco Li <lixiaoyan@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Mubashir Adnan Qureshi <mubashirq@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>,
+	David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH v2 net-next 2/5] net-smnp: reorganize SNMP fast path
+ variables
+Message-ID: <a666cea7-078d-4dc0-bad9-87fa15e44036@lunn.ch>
+References: <20231017014716.3944813-1-lixiaoyan@google.com>
+ <20231017014716.3944813-3-lixiaoyan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net 0/5] net/smc: bugfixs for smc-r
-Content-Language: en-US
-To: Alexandra Winter <wintera@linux.ibm.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
- <4a1b965e-b026-45d7-bd09-7b23b797ee90@linux.ibm.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <4a1b965e-b026-45d7-bd09-7b23b797ee90@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-13.2 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231017014716.3944813-3-lixiaoyan@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Tue, Oct 17, 2023 at 01:47:13AM +0000, Coco Li wrote:
+> From: Chao Wu <wwchao@google.com>
+> 
+> Reorganize fast path variables on tx-txrx-rx order.
+> Fast path cacheline ends afer LINUX_MIB_DELAYEDACKLOCKED.
+> There are only read-write variables here.
+> 
+> Below data generated with pahole on x86 architecture.
+> 
+> Fast path variables span cache lines before change: 12
+> Fast path variables span cache lines after change: 2
 
+As i pointed out for the first version, this is a UAPI file.
 
-On 10/12/23 9:43 PM, Alexandra Winter wrote:
-> The subject of the thread says 'smc-r', but some of the changes affect smc-d alike,
-> don't they?
+Please could you add some justification that this does not cause any
+UAPI changes. Will old user space binaries still work after this?
 
-Yes, sorry for this mistake, it should be bugfix for smc.
->
->
-> On 11.10.23 09:33, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> This patches contains bugfix following:
->>
->> 1. hung state
->> 2. sock leak
->> 3. potential panic
->>
-> I may be helpful for the reviewers, when you point out, which patch fixes which problem.
->
-> Were they all found by code reviews?
-> Or did some occur in real life? If so, then what were the symptoms?
-> A description of the symptoms is helpful for somebody who is debugging and wants to check
-> whether the issue was already fixed upstream.
-
-Hi Alexandra,
-
-Except for the issue with the barrier, which was feedback from the 
-review, all other issues have actually occurred in our environment
-and have been verified through internal testing. However, most of these 
-issues are caused by reference leakage rather than panic, so it is 
-difficult to provide a
-representative phenomenon. But what you said is do necessary, so I will 
-post some phenomena in the next version, such as
-
-lsmod | grep smc
-or
-smcss - a
-
-In that case, we can found  the issues of reference residue or the 
-connection residue. Hope it can be helpful to you.
-
-Thanks,
-D. Wythe
-
-
+Thanks
+	Andrew
 
