@@ -1,149 +1,180 @@
-Return-Path: <netdev+bounces-42021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9243E7CCB71
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 20:58:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52E737CCB9F
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 21:04:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75D481C20C2B
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:58:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 738E11C20C46
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2109CA55;
-	Tue, 17 Oct 2023 18:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95342DF68;
+	Tue, 17 Oct 2023 19:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JYlOqaHM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E455EBE
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 18:58:45 +0000 (UTC)
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C5E690;
-	Tue, 17 Oct 2023 11:58:42 -0700 (PDT)
-Received: from [192.168.1.103] (178.176.75.209) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Tue, 17 Oct
- 2023 21:58:37 +0300
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: Re: [PATCH net] ravb: Fix races between ravb_tx_timeout_work() and
- net related ops
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>
-References: <20231017085341.813335-1-yoshihiro.shimoda.uh@renesas.com>
-Organization: Open Mobile Platform
-Message-ID: <7b153bc6-2094-eee5-f506-0c1615032edb@omp.ru>
-Date: Tue, 17 Oct 2023 21:58:36 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5CBEBE;
+	Tue, 17 Oct 2023 19:04:03 +0000 (UTC)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E61C6;
+	Tue, 17 Oct 2023 12:04:02 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-32d885e97e2so5680626f8f.0;
+        Tue, 17 Oct 2023 12:04:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697569440; x=1698174240; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3URO8PfjgnFnifpX9a/pgxt4rV16Mqdk8BmJm6wrjEE=;
+        b=JYlOqaHMN/TfINJOTUtG884SeTU0RPTEvkHgrK1tY5HSEDF0DbejWuiEwBS1Rl+/gz
+         CVoMXoAH2NotGP9AmIpE21DetHN0iJ1VWxXqI7/EZikwksNW6TWHXMJesGwR0kro7VFC
+         qZY8BlQwnY1PAR5PSbKdwgyLBODDevKeY7SQLsFuynoNp6owrNnF8JxuIdUgZMQHh+Ah
+         sQ8HtJi9kYM2CqVeSMh4vDTLX6syuK9mlQlTTwzUvU+KoN4TsBDGI8MzbXUjCXs+MSMi
+         wUptc8P3rvA0wbtaZex9efMgE5M9Apc0wBEu7RPK8HiUXCsha5kIX1vkx57TLodzbja6
+         esQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697569440; x=1698174240;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3URO8PfjgnFnifpX9a/pgxt4rV16Mqdk8BmJm6wrjEE=;
+        b=ZRYJ4KDxvC9svGmbPkGKQasnNgELOn7wBZnVXYo53BUYsef7wfw4dXX0yMQSN0XOv3
+         /w0Iq6faKcWcK1dOf2YPDtdl80wGAqPldCTtHcmv6s4xnsmeWILX1gRw1Ra25ziJT+e0
+         Z1WAWBiUNN4bAA6ywzzRpj71VgSTQOMvyBmiSTRnUBKqBkrXnSAk8zTMcdIeE+mI9Atu
+         aI6afvbOGQcqXJ94KqEsg60splORIfYWLw7R/9fpUjGMy+jcIC9VW1CI0N6tgMxvIx/g
+         DSdW/4wK6/wmOuTn3noMoU8NxfOqbKMAMQC1nQz/DB4eWhUitYi0blnC4U5hJA9Ej0rk
+         lyPg==
+X-Gm-Message-State: AOJu0YyQ6psrh5C3LzHV6OkWsAY3QjjQjqRmMaxR2QkwKjuIhoOwr++I
+	JlaheQMPtZGtFlEvhIdQAUJshBs7BG1nfsoVhvs=
+X-Google-Smtp-Source: AGHT+IEqUCfXV01nbzvJAQDYMt9/bfI3+Cy97/1wLOR9HsrauveAzt0KnETONmK639Tj5oEfXeeZKSha0vPN++YdkEI=
+X-Received: by 2002:a5d:4e47:0:b0:32d:65ab:2228 with SMTP id
+ r7-20020a5d4e47000000b0032d65ab2228mr2493781wrt.11.1697569440390; Tue, 17 Oct
+ 2023 12:04:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231017085341.813335-1-yoshihiro.shimoda.uh@renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [178.176.75.209]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 10/17/2023 18:43:21
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 180688 [Oct 17 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 540 540 2509a3fe0f7fdc802e7154a32be7c2dd394ab987
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.209 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: {rdns complete}
-X-KSE-AntiSpam-Info: {fromrtbl complete}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.209
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=none header.from=omp.ru;spf=none
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 10/17/2023 18:48:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 10/17/2023 2:36:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+References: <20231015141644.260646-1-akihiko.odaki@daynix.com>
+ <20231015141644.260646-2-akihiko.odaki@daynix.com> <CAADnVQLfUDmgYng8Cw1hiZOMfWNWLjbn7ZGc4yOEz-XmeFEz5Q@mail.gmail.com>
+ <2594bb24-74dc-4785-b46d-e1bffcc3e7ed@daynix.com> <CAADnVQ+J+bOtvEfdvgUse_Rr07rM5KOZ5DtAmHDgRmi70W68+g@mail.gmail.com>
+ <CACGkMEs22078F7rSLEz6eQabkZZ=kujSONUNMThZz5Gp=YiidQ@mail.gmail.com>
+In-Reply-To: <CACGkMEs22078F7rSLEz6eQabkZZ=kujSONUNMThZz5Gp=YiidQ@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 17 Oct 2023 12:03:48 -0700
+Message-ID: <CAADnVQLt8NWvP8qGWMPx=12PwWWE69P7aS2dbm=khAJkCnJEoQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 1/7] bpf: Introduce BPF_PROG_TYPE_VNET_HASH
+To: Jason Wang <jasowang@redhat.com>
+Cc: Akihiko Odaki <akihiko.odaki@daynix.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello!
+On Mon, Oct 16, 2023 at 7:38=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
+ote:
+>
+> On Tue, Oct 17, 2023 at 7:53=E2=80=AFAM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+> >
+> > On Sun, Oct 15, 2023 at 10:10=E2=80=AFAM Akihiko Odaki <akihiko.odaki@d=
+aynix.com> wrote:
+> > >
+> > > On 2023/10/16 1:07, Alexei Starovoitov wrote:
+> > > > On Sun, Oct 15, 2023 at 7:17=E2=80=AFAM Akihiko Odaki <akihiko.odak=
+i@daynix.com> wrote:
+> > > >>
+> > > >> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> > > >> index 0448700890f7..298634556fab 100644
+> > > >> --- a/include/uapi/linux/bpf.h
+> > > >> +++ b/include/uapi/linux/bpf.h
+> > > >> @@ -988,6 +988,7 @@ enum bpf_prog_type {
+> > > >>          BPF_PROG_TYPE_SK_LOOKUP,
+> > > >>          BPF_PROG_TYPE_SYSCALL, /* a program that can execute sysc=
+alls */
+> > > >>          BPF_PROG_TYPE_NETFILTER,
+> > > >> +       BPF_PROG_TYPE_VNET_HASH,
+> > > >
+> > > > Sorry, we do not add new stable program types anymore.
+> > > >
+> > > >> @@ -6111,6 +6112,10 @@ struct __sk_buff {
+> > > >>          __u8  tstamp_type;
+> > > >>          __u32 :24;              /* Padding, future use. */
+> > > >>          __u64 hwtstamp;
+> > > >> +
+> > > >> +       __u32 vnet_hash_value;
+> > > >> +       __u16 vnet_hash_report;
+> > > >> +       __u16 vnet_rss_queue;
+> > > >>   };
+> > > >
+> > > > we also do not add anything to uapi __sk_buff.
+> > > >
+> > > >> +const struct bpf_verifier_ops vnet_hash_verifier_ops =3D {
+> > > >> +       .get_func_proto         =3D sk_filter_func_proto,
+> > > >> +       .is_valid_access        =3D sk_filter_is_valid_access,
+> > > >> +       .convert_ctx_access     =3D bpf_convert_ctx_access,
+> > > >> +       .gen_ld_abs             =3D bpf_gen_ld_abs,
+> > > >> +};
+> > > >
+> > > > and we don't do ctx rewrites like this either.
+> > > >
+> > > > Please see how hid-bpf and cgroup rstat are hooking up bpf
+> > > > in _unstable_ way.
+> > >
+> > > Can you describe what "stable" and "unstable" mean here? I'm new to B=
+PF
+> > > and I'm worried if it may mean the interface stability.
+> > >
+> > > Let me describe the context. QEMU bundles an eBPF program that is use=
+d
+> > > for the "eBPF steering program" feature of tun. Now I'm proposing to
+> > > extend the feature to allow to return some values to the userspace an=
+d
+> > > vhost_net. As such, the extension needs to be done in a way that ensu=
+res
+> > > interface stability.
+> >
+> > bpf is not an option then.
+> > we do not add stable bpf program types or hooks any more.
+>
+> Does this mean eBPF could not be used for any new use cases other than
+> the existing ones?
 
-On 10/17/23 11:53 AM, Yoshihiro Shimoda wrote:
+It means that any new use of bpf has to be unstable for the time being.
 
-> Fix races between ravb_tx_timeout_work() and functions of net_device_ops
-> and ethtool_ops by using rtnl_trylock() and rtnl_unlock(). Note that
-> since ravb_close() is under the rtnl lock and calls cancel_work_sync(),
-> ravb_tx_timeout_work() calls rtnl_trylock() to avoid a deadlock.
+> > If a kernel subsystem wants to use bpf it needs to accept the fact
+> > that such bpf extensibility will be unstable and subsystem maintainers
+> > can decide to remove such bpf support in the future.
+>
+> I don't see how it is different from the existing ones.
 
-   I don't quite follow... how calling cancel_work_sync() is a problem?
-I thought the problem was that unregister_netdev() can be called with
-the TX timeout work still pending? And, more generally, shouldn't we
-protect against the TX timeout work being executed on a different CPU
-than the {net_device|ethtool}_ops methods are being executed (is that
-possible?)?
-   I also had a suspicion that we still miss the spinlock calls in
-ravb_tx_timeout_work() but nothing in particular jumped at me...
-mind looking into that? :-)
-
-> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-> ---
->  drivers/net/ethernet/renesas/ravb_main.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 0ef0b88b7145..b53533ab4599 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-[...]
-> @@ -1907,6 +1910,7 @@ static void ravb_tx_timeout_work(struct work_struct *work)
->  		 */
->  		netdev_err(ndev, "%s: ravb_dmac_init() failed, error %d\n",
->  			   __func__, error);
-> +		rtnl_unlock();
->  		return;
-
-   Perhaps *goto* instead here?
-
->  	}
->  	ravb_emac_init(ndev);
-> @@ -1917,6 +1921,7 @@ static void ravb_tx_timeout_work(struct work_struct *work)
->  		ravb_ptp_init(ndev, priv->pdev);
->  
->  	netif_tx_start_all_queues(ndev);
-
-   ... and add label here?
-
-> +	rtnl_unlock();
->  }
-
-MBR, Sergey
+Can we remove BPF_CGROUP_RUN_PROG_INET_INGRESS hook along
+with BPF_PROG_TYPE_CGROUP_SKB program type?
+Obviously not.
+We can refactor it. We can move it around, but not remove.
+That's the difference in stable vs unstable.
 
