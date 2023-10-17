@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-42025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99C067CCBA3
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 21:04:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B56F7CCBA7
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 21:04:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AD4F1F23518
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:04:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 829F0281B9A
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 19:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21CFE2DF73;
-	Tue, 17 Oct 2023 19:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352C62DF9D;
+	Tue, 17 Oct 2023 19:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZEOMnexe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MNJaVEZ/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3D62DF66
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 19:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A152DF68
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 19:04:30 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70FBE100
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDEDFF7
 	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 12:04:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697569468; x=1729105468;
+  t=1697569469; x=1729105469;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qHgTiIyEpClmJ4m20opd/Hfr7O60rwSuy+vjNTk0W08=;
-  b=ZEOMnexeNcr40I2FHwNJ676+8UC4GBMFqU/1rHRz/WACJDebn7/nh1jp
-   xKfHslnrOwRSd1H+x4oY3Tt3Qc4fUfu4fdICW+grRUqJ1m3e+pqrktel5
-   tJba7FDRmY92ihUbqP1nj3J1dlXDpZsSuAQIliae45MVL7lIhvdvbGjYQ
-   6xutFlI/y3Oyb+YsVpGv2WhhVVTRyrZn2imgGhT+BEJIMzCcDcVU0zLWr
-   fMHJgVcKk4tfzrMjtPvuGkz9pzGaRShJ6kvDrDAgCqkaWstnDjm9kZA9S
-   WCBVtiXhasLhSnhuKHlZR8CcBnnKJ9i4pqNKxTs2fmqiWCTdOKbi67gzv
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="384739694"
+  bh=021HxRuTL5thXIfbIQD3o820zZI4N+mXSrrljJWVtcU=;
+  b=MNJaVEZ/lpVZJsMlYHf2n76wV9AqQ/jOCGi5QN9iT3axo3Bfk/Xzdsgp
+   LiFt80nV0mQH5OCYeIqyT/ui0oA+n5wZu8kgGcIVS7btx4x/gK6lq0jOk
+   AS8BZF7xDLAigGvHpCoIARTGg8luruJSmQRoU6zFiXVfeIjw9h8x/aS5r
+   QGkQpz0NnoOZ96PjTziHgu7shVVJLlF5wvmRUjor851B2VtgDM1gSKmOK
+   pHdk0eHCFQ7fL09Nl37J/zwWLwR3KoDPj5Fp/zicmbo/D87v7NeOWjTn9
+   FhJHgByYnDKqzlZmEhfJ+mjWqStZulDtuR2ZQ1qV5K3jSNqvWV+MEM7Dx
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="384739709"
 X-IronPort-AV: E=Sophos;i="6.03,233,1694761200"; 
-   d="scan'208";a="384739694"
+   d="scan'208";a="384739709"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 12:04:18 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="822108689"
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="822108703"
 X-IronPort-AV: E=Sophos;i="6.03,233,1694761200"; 
-   d="scan'208";a="822108689"
+   d="scan'208";a="822108703"
 Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 12:04:18 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
@@ -56,9 +56,9 @@ Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next 1/9] intel: fix string truncation warnings
-Date: Tue, 17 Oct 2023 12:04:03 -0700
-Message-ID: <20231017190411.2199743-2-jacob.e.keller@intel.com>
+Subject: [PATCH net-next 2/9] intel: fix format warnings
+Date: Tue, 17 Oct 2023 12:04:04 -0700
+Message-ID: <20231017190411.2199743-3-jacob.e.keller@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231017190411.2199743-1-jacob.e.keller@intel.com>
 References: <20231017190411.2199743-1-jacob.e.keller@intel.com>
@@ -68,7 +68,6 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
@@ -78,22 +77,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
-Fix -Wformat-truncated warnings to complete the intel directories' W=1
-clean efforts. The W=1 recently got enhanced with a few new flags and
-this brought up some new warnings.
+Get ahead of the game and fix all the -Wformat=2 noted warnings in the
+intel drivers directory.
 
-Switch to using kasprintf() when possible so we always allocate the
-right length strings.
+There are one set of i40e and iavf warnings I couldn't figure out how to
+fix because the driver is already using vsnprintf without an explicit
+"const char *" format string.
+
+Tested with both gcc-12 and clang-15. I found gcc-12 runs clean after
+this series but clang-15 is a little worried about the vsnprintf lines.
 
 summary of warnings:
-drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1425:60: warning: ‘%s’ directive output may be truncated writing 4 bytes into a region of size between 1 and 11 [-Wformat-truncation=]
-drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1425:17: note: ‘snprintf’ output between 7 and 17 bytes into a destination of size 13
-drivers/net/ethernet/intel/ice/ice_ptp.c:43:27: warning: ‘%s’ directive output may be truncated writing up to 479 bytes into a region of size 64 [-Wformat-truncation=]
-drivers/net/ethernet/intel/ice/ice_ptp.c:42:17: note: ‘snprintf’ output between 1 and 480 bytes into a destination of size 64
-drivers/net/ethernet/intel/igb/igb_main.c:3092:53: warning: ‘%d’ directive output may be truncated writing between 1 and 5 bytes into a region of size between 1 and 13 [-Wformat-truncation=]
-drivers/net/ethernet/intel/igb/igb_main.c:3092:34: note: directive argument in the range [0, 65535]
-drivers/net/ethernet/intel/igb/igb_main.c:3092:34: note: directive argument in the range [0, 65535]
-drivers/net/ethernet/intel/igb/igb_main.c:3090:25: note: ‘snprintf’ output between 23 and 43 bytes into a destination of size 32
+
+drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c:148:34: warning: format string is not a string literal [-Wformat-nonliteral]
+drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c:1416:24: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c:1416:24: note: treat the string as an argument to avoid this
+drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c:1421:6: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c:1421:6: note: treat the string as an argument to avoid this
+drivers/net/ethernet/intel/igc/igc_ethtool.c:776:24: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/igc/igc_ethtool.c:776:24: note: treat the string as an argument to avoid this
+drivers/net/ethernet/intel/igc/igc_ethtool.c:779:6: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/igc/igc_ethtool.c:779:6: note: treat the string as an argument to avoid this
+drivers/net/ethernet/intel/iavf/iavf_ethtool.c:199:34: warning: format string is not a string literal [-Wformat-nonliteral]
+drivers/net/ethernet/intel/igb/igb_ethtool.c:2360:6: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/igb/igb_ethtool.c:2360:6: note: treat the string as an argument to avoid this
+drivers/net/ethernet/intel/igb/igb_ethtool.c:2363:6: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/igb/igb_ethtool.c:2363:6: note: treat the string as an argument to avoid this
+drivers/net/ethernet/intel/i40e/i40e_ethtool.c:208:34: warning: format string is not a string literal [-Wformat-nonliteral]
+drivers/net/ethernet/intel/i40e/i40e_ethtool.c:2515:23: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/i40e/i40e_ethtool.c:2515:23: note: treat the string as an argument to avoid this
+drivers/net/ethernet/intel/i40e/i40e_ethtool.c:2519:23: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/i40e/i40e_ethtool.c:2519:23: note: treat the string as an argument to avoid this
+drivers/net/ethernet/intel/ice/ice_ethtool.c:1064:6: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/ice/ice_ethtool.c:1064:6: note: treat the string as an argument to avoid this
+drivers/net/ethernet/intel/ice/ice_ethtool.c:1084:6: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/ice/ice_ethtool.c:1084:6: note: treat the string as an argument to avoid this
+drivers/net/ethernet/intel/ice/ice_ethtool.c:1100:24: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+drivers/net/ethernet/intel/ice/ice_ethtool.c:1100:24: note: treat the string as an argument to avoid this
 
 Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
@@ -101,158 +121,137 @@ Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- .../net/ethernet/intel/iavf/iavf_ethtool.c    |  4 +-
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 22 ++++-------
- drivers/net/ethernet/intel/ice/ice_ptp.c      |  4 +-
- drivers/net/ethernet/intel/igb/igb_main.c     | 37 +++++++++----------
- 4 files changed, 30 insertions(+), 37 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_ethtool.c   | 6 ++++--
+ drivers/net/ethernet/intel/iavf/iavf_ethtool.c   | 8 +++-----
+ drivers/net/ethernet/intel/ice/ice_ethtool.c     | 7 ++++---
+ drivers/net/ethernet/intel/igb/igb_ethtool.c     | 4 ++--
+ drivers/net/ethernet/intel/igc/igc_ethtool.c     | 5 +++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 4 ++--
+ 6 files changed, 18 insertions(+), 16 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+index ebf36f76c0d7..fd7163128c4d 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+@@ -2514,11 +2514,13 @@ static void i40e_get_priv_flag_strings(struct net_device *netdev, u8 *data)
+ 	u8 *p = data;
+ 
+ 	for (i = 0; i < I40E_PRIV_FLAGS_STR_LEN; i++)
+-		ethtool_sprintf(&p, i40e_gstrings_priv_flags[i].flag_string);
++		ethtool_sprintf(&p, "%s",
++				i40e_gstrings_priv_flags[i].flag_string);
+ 	if (pf->hw.pf_id != 0)
+ 		return;
+ 	for (i = 0; i < I40E_GL_PRIV_FLAGS_STR_LEN; i++)
+-		ethtool_sprintf(&p, i40e_gl_gstrings_priv_flags[i].flag_string);
++		ethtool_sprintf(&p, "%s",
++				i40e_gl_gstrings_priv_flags[i].flag_string);
+ }
+ 
+ static void i40e_get_strings(struct net_device *netdev, u32 stringset,
 diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-index 90397293525f..9246172c9c33 100644
+index 9246172c9c33..6f236d1a6444 100644
 --- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
 +++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-@@ -396,8 +396,8 @@ static void iavf_get_priv_flag_strings(struct net_device *netdev, u8 *data)
+@@ -395,11 +395,9 @@ static void iavf_get_priv_flag_strings(struct net_device *netdev, u8 *data)
+ {
  	unsigned int i;
  
- 	for (i = 0; i < IAVF_PRIV_FLAGS_STR_LEN; i++) {
--		snprintf(data, ETH_GSTRING_LEN, "%s",
--			 iavf_gstrings_priv_flags[i].flag_string);
-+		strscpy(data, iavf_gstrings_priv_flags[i].flag_string,
-+			ETH_GSTRING_LEN);
- 		data += ETH_GSTRING_LEN;
- 	}
- }
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 8ce6389b5815..82b84a93bcc8 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -1378,8 +1378,6 @@ void iavf_disable_vlan_insertion_v2(struct iavf_adapter *adapter, u16 tpid)
- 				  VIRTCHNL_OP_DISABLE_VLAN_INSERTION_V2);
+-	for (i = 0; i < IAVF_PRIV_FLAGS_STR_LEN; i++) {
+-		strscpy(data, iavf_gstrings_priv_flags[i].flag_string,
+-			ETH_GSTRING_LEN);
+-		data += ETH_GSTRING_LEN;
+-	}
++	for (i = 0; i < IAVF_PRIV_FLAGS_STR_LEN; i++)
++		ethtool_sprintf(&data, "%s",
++				iavf_gstrings_priv_flags[i].flag_string);
  }
  
--#define IAVF_MAX_SPEED_STRLEN	13
--
  /**
-  * iavf_print_link_message - print link up or down
-  * @adapter: adapter structure
-@@ -1397,10 +1395,6 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
- 		return;
- 	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index d3cb08e66dcb..5545906f39af 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -1060,7 +1060,7 @@ __ice_get_strings(struct net_device *netdev, u32 stringset, u8 *data,
+ 	switch (stringset) {
+ 	case ETH_SS_STATS:
+ 		for (i = 0; i < ICE_VSI_STATS_LEN; i++)
+-			ethtool_sprintf(&p,
++			ethtool_sprintf(&p, "%s",
+ 					ice_gstrings_vsi_stats[i].stat_string);
  
--	speed = kzalloc(IAVF_MAX_SPEED_STRLEN, GFP_KERNEL);
--	if (!speed)
--		return;
--
- 	if (ADV_LINK_SUPPORT(adapter)) {
- 		link_speed_mbps = adapter->link_speed_mbps;
- 		goto print_link_msg;
-@@ -1438,17 +1432,17 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
+ 		if (ice_is_port_repr_netdev(netdev))
+@@ -1080,7 +1080,7 @@ __ice_get_strings(struct net_device *netdev, u32 stringset, u8 *data,
+ 			return;
  
- print_link_msg:
- 	if (link_speed_mbps > SPEED_1000) {
--		if (link_speed_mbps == SPEED_2500)
--			snprintf(speed, IAVF_MAX_SPEED_STRLEN, "2.5 Gbps");
--		else
-+		if (link_speed_mbps == SPEED_2500) {
-+			speed = kasprintf(GFP_KERNEL, "%s", "2.5 Gbps");
-+		} else {
- 			/* convert to Gbps inline */
--			snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
--				 link_speed_mbps / 1000, "Gbps");
-+			speed = kasprintf(GFP_KERNEL, "%d Gbps",
-+					  link_speed_mbps / 1000);
-+		}
- 	} else if (link_speed_mbps == SPEED_UNKNOWN) {
--		snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%s", "Unknown Mbps");
-+		speed = kasprintf(GFP_KERNEL, "%s", "Unknown Mbps");
- 	} else {
--		snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
--			 link_speed_mbps, "Mbps");
-+		speed = kasprintf(GFP_KERNEL, "%d Mbps", link_speed_mbps);
- 	}
+ 		for (i = 0; i < ICE_PF_STATS_LEN; i++)
+-			ethtool_sprintf(&p,
++			ethtool_sprintf(&p, "%s",
+ 					ice_gstrings_pf_stats[i].stat_string);
  
- 	netdev_info(netdev, "NIC Link is Up Speed is %s Full Duplex\n", speed);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 5293df2d57a8..1eddcbe89b0c 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -39,8 +39,8 @@ ice_get_sma_config_e810t(struct ice_hw *hw, struct ptp_pin_desc *ptp_pins)
- 
- 	/* initialize with defaults */
- 	for (i = 0; i < NUM_PTP_PINS_E810T; i++) {
--		snprintf(ptp_pins[i].name, sizeof(ptp_pins[i].name),
--			 "%s", ice_pin_desc_e810t[i].name);
-+		strscpy(ptp_pins[i].name, ice_pin_desc_e810t[i].name,
-+			sizeof(ptp_pins[i].name));
- 		ptp_pins[i].index = ice_pin_desc_e810t[i].index;
- 		ptp_pins[i].func = ice_pin_desc_e810t[i].func;
- 		ptp_pins[i].chan = ice_pin_desc_e810t[i].chan;
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 2ac9dffd0bf8..fdadf3e84f59 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -3069,6 +3069,7 @@ void igb_set_fw_version(struct igb_adapter *adapter)
- {
- 	struct e1000_hw *hw = &adapter->hw;
- 	struct e1000_fw_version fw;
-+	char *lbuf;
- 
- 	igb_get_fw_version(hw, &fw);
- 
-@@ -3076,36 +3077,34 @@ void igb_set_fw_version(struct igb_adapter *adapter)
- 	case e1000_i210:
- 	case e1000_i211:
- 		if (!(igb_get_flash_presence_i210(hw))) {
--			snprintf(adapter->fw_version,
--				 sizeof(adapter->fw_version),
--				 "%2d.%2d-%d",
--				 fw.invm_major, fw.invm_minor,
--				 fw.invm_img_type);
-+			lbuf = kasprintf(GFP_KERNEL, "%2d.%2d-%d",
-+					 fw.invm_major, fw.invm_minor,
-+					 fw.invm_img_type);
- 			break;
- 		}
- 		fallthrough;
- 	default:
--		/* if option is rom valid, display its version too */
-+		/* if option rom is valid, display its version too */
- 		if (fw.or_valid) {
--			snprintf(adapter->fw_version,
--				 sizeof(adapter->fw_version),
--				 "%d.%d, 0x%08x, %d.%d.%d",
--				 fw.eep_major, fw.eep_minor, fw.etrack_id,
--				 fw.or_major, fw.or_build, fw.or_patch);
-+			lbuf = kasprintf(GFP_KERNEL, "%d.%d, 0x%08x, %d.%d.%d",
-+					 fw.eep_major, fw.eep_minor,
-+					 fw.etrack_id, fw.or_major, fw.or_build,
-+					 fw.or_patch);
- 		/* no option rom */
- 		} else if (fw.etrack_id != 0X0000) {
--			snprintf(adapter->fw_version,
--			    sizeof(adapter->fw_version),
--			    "%d.%d, 0x%08x",
--			    fw.eep_major, fw.eep_minor, fw.etrack_id);
-+			lbuf = kasprintf(GFP_KERNEL, "%d.%d, 0x%08x",
-+					 fw.eep_major, fw.eep_minor,
-+					 fw.etrack_id);
- 		} else {
--		snprintf(adapter->fw_version,
--		    sizeof(adapter->fw_version),
--		    "%d.%d.%d",
--		    fw.eep_major, fw.eep_minor, fw.eep_build);
-+			lbuf = kasprintf(GFP_KERNEL, "%d.%d.%d", fw.eep_major,
-+					 fw.eep_minor, fw.eep_build);
- 		}
+ 		for (i = 0; i < ICE_MAX_USER_PRIORITY; i++) {
+@@ -1097,7 +1097,8 @@ __ice_get_strings(struct net_device *netdev, u32 stringset, u8 *data,
  		break;
- 	}
-+
-+	/* the truncate happens here if it doesn't fit */
-+	strscpy(adapter->fw_version, lbuf, sizeof(adapter->fw_version));
-+	kfree(lbuf);
- }
- 
- /**
+ 	case ETH_SS_PRIV_FLAGS:
+ 		for (i = 0; i < ICE_PRIV_FLAG_ARRAY_SIZE; i++)
+-			ethtool_sprintf(&p, ice_gstrings_priv_flags[i].name);
++			ethtool_sprintf(&p, "%s",
++					ice_gstrings_priv_flags[i].name);
+ 		break;
+ 	default:
+ 		break;
+diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
+index 319ed601eaa1..9cbd35b6df43 100644
+--- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
++++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
+@@ -2356,10 +2356,10 @@ static void igb_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
+ 		break;
+ 	case ETH_SS_STATS:
+ 		for (i = 0; i < IGB_GLOBAL_STATS_LEN; i++)
+-			ethtool_sprintf(&p,
++			ethtool_sprintf(&p, "%s",
+ 					igb_gstrings_stats[i].stat_string);
+ 		for (i = 0; i < IGB_NETDEV_STATS_LEN; i++)
+-			ethtool_sprintf(&p,
++			ethtool_sprintf(&p, "%s",
+ 					igb_gstrings_net_stats[i].stat_string);
+ 		for (i = 0; i < adapter->num_tx_queues; i++) {
+ 			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
+diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+index 7ab6dd58e400..bf4f611286ae 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
++++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+@@ -773,9 +773,10 @@ static void igc_ethtool_get_strings(struct net_device *netdev, u32 stringset,
+ 		break;
+ 	case ETH_SS_STATS:
+ 		for (i = 0; i < IGC_GLOBAL_STATS_LEN; i++)
+-			ethtool_sprintf(&p, igc_gstrings_stats[i].stat_string);
++			ethtool_sprintf(&p, "%s",
++					igc_gstrings_stats[i].stat_string);
+ 		for (i = 0; i < IGC_NETDEV_STATS_LEN; i++)
+-			ethtool_sprintf(&p,
++			ethtool_sprintf(&p, "%s",
+ 					igc_gstrings_net_stats[i].stat_string);
+ 		for (i = 0; i < adapter->num_tx_queues; i++) {
+ 			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index 0bbad4a5cc2f..4dd897806fa5 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -1413,11 +1413,11 @@ static void ixgbe_get_strings(struct net_device *netdev, u32 stringset,
+ 	switch (stringset) {
+ 	case ETH_SS_TEST:
+ 		for (i = 0; i < IXGBE_TEST_LEN; i++)
+-			ethtool_sprintf(&p, ixgbe_gstrings_test[i]);
++			ethtool_sprintf(&p, "%s", ixgbe_gstrings_test[i]);
+ 		break;
+ 	case ETH_SS_STATS:
+ 		for (i = 0; i < IXGBE_GLOBAL_STATS_LEN; i++)
+-			ethtool_sprintf(&p,
++			ethtool_sprintf(&p, "%s",
+ 					ixgbe_gstrings_stats[i].stat_string);
+ 		for (i = 0; i < netdev->num_tx_queues; i++) {
+ 			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
 -- 
 2.41.0
 
