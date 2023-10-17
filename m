@@ -1,310 +1,395 @@
-Return-Path: <netdev+bounces-41896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65F247CC1C7
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:30:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D01877CC1D3
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:33:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5782FB2121A
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:30:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8597C2819BF
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 11:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749B842BE8;
-	Tue, 17 Oct 2023 11:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4559C41AA4;
+	Tue, 17 Oct 2023 11:32:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FzwNDz1/"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k0a1nqRT"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189F341E30;
-	Tue, 17 Oct 2023 11:30:28 +0000 (UTC)
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A65DEA;
-	Tue, 17 Oct 2023 04:30:27 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-27d8a1aed37so646629a91.1;
-        Tue, 17 Oct 2023 04:30:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63BD41AAA
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 11:32:55 +0000 (UTC)
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2522EA
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 04:32:53 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9936b3d0286so905576666b.0
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 04:32:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697542226; x=1698147026; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4aIASIePDIlwDrvIzhdCIIxM2ipF2BorTyrKRNp3nJc=;
-        b=FzwNDz1/aVr3LZur/bCIlDRmJsP1LnwkMiB+QMQPrlrKlYlfXsjMYQf4bOKKzI5o9C
-         Krt/awF9bLbDGy18IiWSoq/rOrxdXb8eeQ0tl1GdDcE4CHM0qeZEeUIvLl/qTs4bTyNs
-         kuy/pcCOLLxjtHbGWdp2AQYMfwJtQ99xx/22b0P62gfKChoN/3wtLOnARhMGLe477FG8
-         3yJEnf1pxGTWBRy2jkKJujcUxeuqqHZ+gcfj66oqclw3OeX7wx5tDK2BbjdK+AYs9SLa
-         0C2/aA8KvM2FaXZyFJaSkB2U4NguSgBQcMikh2MJIaKRQZkd98K8FHoAMWNIx4Sm08oL
-         8RAA==
+        d=linaro.org; s=google; t=1697542372; x=1698147172; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=oXk0KxqRZ9jejLhx8JsARQQNd5N5k9nNlrEn6GNkSNg=;
+        b=k0a1nqRTYUkmTidOEEDPjfHP4qRYEo0t4dAM2ui9m3wZ+F8iqHv1btJ872JQaPvTfI
+         /KY1r0ereyxPAPbKxCBft1WtqYLdKuwtWVtInCm9XPbfaJ9Fg03kJMzL0CmiuQpPjpXK
+         T/mboZErMsCVPOW8O3A0VbxZp3HAo3PkMwswq13iJ3uKXSG9sCDZzvOhq4WrC5BLQuBJ
+         ZkrCZRtLECX478EAa4BZnGRnKrrJ1OVHuP0c+Yv/TnWYrnAKZhEfhUeIWGgD9K1oYmbn
+         8gJg1ArLB9tMO2ovA0EmlpPUL2ez+nRIZfACVGfwn5JyFMpjYHXzxgooub2GsVEeoA/j
+         CBGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697542226; x=1698147026;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4aIASIePDIlwDrvIzhdCIIxM2ipF2BorTyrKRNp3nJc=;
-        b=px1E6mpC+hHVfS/9tqdugEN/lxCvbT/Tun87FKXqkKQ7MZkrKkmnOp4cbMiXXTB+aL
-         EkDe37CV24hqIqXW3mPC9n9WlLMFadpYd51I01A/3eotWYHDYt/qazL7gT4KHbeHARCG
-         um+eJXevTlhW1hKWGDRTcWGQqNg8UQDIpgskLX0RNP7NHgxr8IWa5Hhm2rHJ876oL01z
-         yxvrslfn8o70pDFsysCJQzaxqXdQw2XD2wnpAtTg/ul+UhqXX7ILwVd5/r43qNBEwwM3
-         RYb7HmOsdoeFwLlYpJJ8F6IF2Pj4uKezuTsToyLNFtTPnN009Oc4Kd5t5iTIJS1lrIA5
-         qLdw==
-X-Gm-Message-State: AOJu0YzklW6p5YTUiof/rDw1ZZWq6uRfO19ERTN2tv01C1ZvhBujar2W
-	OZ0ISHH6IizquFhD9N+We0f891pMzUlNwgm6
-X-Google-Smtp-Source: AGHT+IFIrdZ+fRPk6cNPeKQmQC1ukkQg4tHQpQ99LyNcgHsOlOFKyt5zK+Yfx8l+rnDFErpFjpy3iQ==
-X-Received: by 2002:a17:90b:3510:b0:27d:6268:b75c with SMTP id ls16-20020a17090b351000b0027d6268b75cmr1987185pjb.4.1697542226470;
-        Tue, 17 Oct 2023 04:30:26 -0700 (PDT)
-Received: from ip-172-30-47-114.us-west-2.compute.internal (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id r16-20020a17090ad41000b002635db431a0sm1116277pju.45.2023.10.17.04.30.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 04:30:26 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: netdev@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch,
-	miguel.ojeda.sandonis@gmail.com,
-	tmgross@umich.edu,
-	boqun.feng@gmail.com,
-	wedsonaf@gmail.com,
-	benno.lossin@proton.me,
-	greg@kroah.com
-Subject: [PATCH net-next v5 5/5] net: phy: add Rust Asix PHY driver
-Date: Tue, 17 Oct 2023 20:30:14 +0900
-Message-Id: <20231017113014.3492773-6-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
-References: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
+        d=1e100.net; s=20230601; t=1697542372; x=1698147172;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oXk0KxqRZ9jejLhx8JsARQQNd5N5k9nNlrEn6GNkSNg=;
+        b=GYeS0Ipx7W6QmWG0czydD1XXAEGoWlYFph/AT6rF8szcyjWITsYATRu9GRN6qBWlqf
+         OTmKCyRyMxd1iWnvtcfXDvJ+0XIGULT2KYivPAT6Kz0JtGcDyGk7f9P3tM9D0qMw+8+z
+         02Y6Ggqwl6yYWhpUS0x9DIwpi6CQVxrNk7YC8xY8MynqEF9l4ncQWxjlTS0VhW+t4sMG
+         LNzdXuEL6HILQoXXJ23rElagOnHndXJ1815tTcgSWow2SJqHD1qyEAOh8/AIxhVR/4BR
+         7Mnf8hfSSVPUEZh6D3bKKMrNQ4nL2uki/37YC2nmUX3fnMZW66JQXrMWT6zuhxyQD6GZ
+         FRBQ==
+X-Gm-Message-State: AOJu0YzwXuPasW0F4BPoJEgmoKKpgMn9DZmz7qNCB1hUaVQX9ZDdMl1R
+	Snh06rVR6N1KbU7T6n3TfNNqAiqAi84M3x0bUR3gvA==
+X-Google-Smtp-Source: AGHT+IGauLKLYx6btp86Av5RC89JgZvmBItTh/fJtBmXX047C4V+47ymL4W2NxsepDmFTmWgVHPF3u/yQi6kKlNal4g=
+X-Received: by 2002:a17:907:97d4:b0:9ae:7206:963c with SMTP id
+ js20-20020a17090797d400b009ae7206963cmr1372424ejc.15.1697542371818; Tue, 17
+ Oct 2023 04:32:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231017080812.117892-1-bagasdotme@gmail.com>
+In-Reply-To: <20231017080812.117892-1-bagasdotme@gmail.com>
+From: Loic Poulain <loic.poulain@linaro.org>
+Date: Tue, 17 Oct 2023 13:32:15 +0200
+Message-ID: <CAMZdPi_7Psk-EF5-nA7U=Wdenq8GGszH8fUoN+LJTn9kKis41Q@mail.gmail.com>
+Subject: Re: [PATCH net] Revert "net: wwan: iosm: enable runtime pm support
+ for 7560"
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Networking <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Regressions <regressions@lists.linux.dev>, Sergey Ryazanov <ryazanov.s.a@gmail.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Martin <mwolf@adiumentum.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This is the Rust implementation of drivers/net/phy/ax88796b.c. The
-features are equivalent. You can choose C or Rust versionon kernel
-configuration.
+On Tue, 17 Oct 2023 at 10:08, Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+>
+> Runtime power management support breaks Intel LTE modem where dmesg dump
+> showes timeout errors:
+>
+> ```
+> [   72.027442] iosm 0000:01:00.0: msg timeout
+> [   72.531638] iosm 0000:01:00.0: msg timeout
+> [   73.035414] iosm 0000:01:00.0: msg timeout
+> [   73.540359] iosm 0000:01:00.0: msg timeout
+> ```
+>
+> Furthermore, when shutting down with `poweroff` and modem attached, the
+> system rebooted instead of powering down as expected. The modem works
+> again only after power cycling.
+>
+> Revert runtime power management support for IOSM driver as introduced by
+> commit e4f5073d53be6c ("net: wwan: iosm: enable runtime pm support for
+> 7560").
+>
+> Fixes: e4f5073d53be ("net: wwan: iosm: enable runtime pm support for 7560")
+> Reported-by: Martin <mwolf@adiumentum.com>
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217996
+> Link: https://lore.kernel.org/r/267abf02-4b60-4a2e-92cd-709e3da6f7d3@gmail.com/
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
-Reviewed-by: Trevor Gross <tmgross@umich.edu>
-Reviewed-by: Benno Lossin <benno.lossin@proton.me>
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
----
- MAINTAINERS                      |   8 ++
- drivers/net/phy/Kconfig          |   8 ++
- drivers/net/phy/Makefile         |   6 +-
- drivers/net/phy/ax88796b_rust.rs | 129 +++++++++++++++++++++++++++++++
- rust/uapi/uapi_helper.h          |   2 +
- 5 files changed, 152 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/phy/ax88796b_rust.rs
+Reviewed-by: Loic Poulain <loic.poulain@linaro.org>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e85651c35cb9..fad9563d2c80 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3058,6 +3058,14 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/net/asix,ax88796c.yaml
- F:	drivers/net/ethernet/asix/ax88796c_*
- 
-+ASIX PHY DRIVER [RUST]
-+M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
-+R:	Trevor Gross <tmgross@umich.edu>
-+L:	netdev@vger.kernel.org
-+L:	rust-for-linux@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/phy/ax88796b_rust.rs
-+
- ASPEED CRYPTO DRIVER
- M:	Neal Liu <neal_liu@aspeedtech.com>
- L:	linux-aspeed@lists.ozlabs.org (moderated for non-subscribers)
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 0faebdb184ca..11b18370a05b 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -115,6 +115,14 @@ config AX88796B_PHY
- 	  Currently supports the Asix Electronics PHY found in the X-Surf 100
- 	  AX88796B package.
- 
-+config AX88796B_RUST_PHY
-+	bool "Rust reference driver for Asix PHYs"
-+	depends on RUST_PHYLIB_ABSTRACTIONS && AX88796B_PHY
-+	help
-+	  Uses the Rust reference driver for Asix PHYs (ax88796b_rust.ko).
-+	  The features are equivalent. It supports the Asix Electronics PHY
-+	  found in the X-Surf 100 AX88796B package.
-+
- config BROADCOM_PHY
- 	tristate "Broadcom 54XX PHYs"
- 	select BCM_NET_PHYLIB
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index c945ed9bd14b..58d7dfb095ab 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -41,7 +41,11 @@ aquantia-objs			+= aquantia_hwmon.o
- endif
- obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
- obj-$(CONFIG_AT803X_PHY)	+= at803x.o
--obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-+ifdef CONFIG_AX88796B_RUST_PHY
-+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b_rust.o
-+else
-+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-+endif
- obj-$(CONFIG_BCM54140_PHY)	+= bcm54140.o
- obj-$(CONFIG_BCM63XX_PHY)	+= bcm63xx.o
- obj-$(CONFIG_BCM7XXX_PHY)	+= bcm7xxx.o
-diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
-new file mode 100644
-index 000000000000..017f817f6f8d
---- /dev/null
-+++ b/drivers/net/phy/ax88796b_rust.rs
-@@ -0,0 +1,129 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (C) 2023 FUJITA Tomonori <fujita.tomonori@gmail.com>
-+
-+//! Rust Asix PHYs driver
-+//!
-+//! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796b.c)
-+use kernel::c_str;
-+use kernel::net::phy::{self, DeviceId, Driver};
-+use kernel::prelude::*;
-+use kernel::uapi;
-+
-+kernel::module_phy_driver! {
-+    drivers: [PhyAX88772A, PhyAX88772C, PhyAX88796B],
-+    device_table: [
-+        DeviceId::new_with_driver::<PhyAX88772A>(),
-+        DeviceId::new_with_driver::<PhyAX88772C>(),
-+        DeviceId::new_with_driver::<PhyAX88796B>()
-+    ],
-+    name: "rust_asix_phy",
-+    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
-+    description: "Rust Asix PHYs driver",
-+    license: "GPL",
-+}
-+
-+// Performs a software PHY reset using the standard
-+// BMCR_RESET bit and poll for the reset bit to be cleared.
-+// Toggle BMCR_RESET bit off to accommodate broken AX8796B PHY implementation
-+// such as used on the Individual Computers' X-Surf 100 Zorro card.
-+fn asix_soft_reset(dev: &mut phy::Device) -> Result {
-+    dev.write(uapi::MII_BMCR as u16, 0)?;
-+    dev.genphy_soft_reset()
-+}
-+
-+struct PhyAX88772A;
-+
-+#[vtable]
-+impl phy::Driver for PhyAX88772A {
-+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772A");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1861);
-+
-+    // AX88772A is not working properly with some old switches (NETGEAR EN 108TP):
-+    // after autoneg is done and the link status is reported as active, the MII_LPA
-+    // register is 0. This issue is not reproducible on AX88772C.
-+    fn read_status(dev: &mut phy::Device) -> Result<u16> {
-+        dev.genphy_update_link()?;
-+        if !dev.get_link() {
-+            return Ok(0);
-+        }
-+        // If MII_LPA is 0, phy_resolve_aneg_linkmode() will fail to resolve
-+        // linkmode so use MII_BMCR as default values.
-+        let ret = dev.read(uapi::MII_BMCR as u16)?;
-+
-+        if ret as u32 & uapi::BMCR_SPEED100 != 0 {
-+            dev.set_speed(uapi::SPEED_100);
-+        } else {
-+            dev.set_speed(uapi::SPEED_10);
-+        }
-+
-+        let duplex = if ret as u32 & uapi::BMCR_FULLDPLX != 0 {
-+            phy::DuplexMode::Full
-+        } else {
-+            phy::DuplexMode::Half
-+        };
-+        dev.set_duplex(duplex);
-+
-+        dev.genphy_read_lpa()?;
-+
-+        if dev.is_autoneg_enabled() && dev.is_autoneg_completed() {
-+            dev.resolve_aneg_linkmode();
-+        }
-+
-+        Ok(0)
-+    }
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        dev.genphy_resume()
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+
-+    fn link_change_notify(dev: &mut phy::Device) {
-+        // Reset PHY, otherwise MII_LPA will provide outdated information.
-+        // This issue is reproducible only with some link partner PHYs.
-+        if dev.state() == phy::DeviceState::NoLink {
-+            let _ = dev.init_hw();
-+            let _ = dev.start_aneg();
-+        }
-+    }
-+}
-+
-+struct PhyAX88772C;
-+
-+#[vtable]
-+impl Driver for PhyAX88772C {
-+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772C");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1881);
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        dev.genphy_resume()
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+}
-+
-+struct PhyAX88796B;
-+
-+#[vtable]
-+impl Driver for PhyAX88796B {
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88796B");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_model_mask(0x003b1841);
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+}
-diff --git a/rust/uapi/uapi_helper.h b/rust/uapi/uapi_helper.h
-index 301f5207f023..08f5e9334c9e 100644
---- a/rust/uapi/uapi_helper.h
-+++ b/rust/uapi/uapi_helper.h
-@@ -7,3 +7,5 @@
-  */
- 
- #include <uapi/asm-generic/ioctl.h>
-+#include <uapi/linux/mii.h>
-+#include <uapi/linux/ethtool.h>
--- 
-2.34.1
 
+
+> ---
+>
+>  Compile-tested only.
+>
+>  I explicitly do not Cc: the culprit author (M Chetan Kumar) as he can't
+>  be contacted (see his MAINTAINERS entry removal [1] for why).
+>
+>  [1]: https://lore.kernel.org/netdev/20231013014010.18338-2-bagasdotme@gmail.com/
+>
+>  drivers/net/wwan/iosm/iosm_ipc_imem.c  | 17 -----------------
+>  drivers/net/wwan/iosm/iosm_ipc_imem.h  |  2 --
+>  drivers/net/wwan/iosm/iosm_ipc_pcie.c  |  4 +---
+>  drivers/net/wwan/iosm/iosm_ipc_port.c  | 17 +----------------
+>  drivers/net/wwan/iosm/iosm_ipc_trace.c |  8 --------
+>  drivers/net/wwan/iosm/iosm_ipc_wwan.c  | 21 ++-------------------
+>  6 files changed, 4 insertions(+), 65 deletions(-)
+>
+> diff --git a/drivers/net/wwan/iosm/iosm_ipc_imem.c b/drivers/net/wwan/iosm/iosm_ipc_imem.c
+> index 635301d677e186..829515a601b379 100644
+> --- a/drivers/net/wwan/iosm/iosm_ipc_imem.c
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_imem.c
+> @@ -4,7 +4,6 @@
+>   */
+>
+>  #include <linux/delay.h>
+> -#include <linux/pm_runtime.h>
+>
+>  #include "iosm_ipc_chnl_cfg.h"
+>  #include "iosm_ipc_devlink.h"
+> @@ -632,11 +631,6 @@ static void ipc_imem_run_state_worker(struct work_struct *instance)
+>         /* Complete all memory stores after setting bit */
+>         smp_mb__after_atomic();
+>
+> -       if (ipc_imem->pcie->pci->device == INTEL_CP_DEVICE_7560_ID) {
+> -               pm_runtime_mark_last_busy(ipc_imem->dev);
+> -               pm_runtime_put_autosuspend(ipc_imem->dev);
+> -       }
+> -
+>         return;
+>
+>  err_ipc_mux_deinit:
+> @@ -1240,7 +1234,6 @@ void ipc_imem_cleanup(struct iosm_imem *ipc_imem)
+>
+>         /* forward MDM_NOT_READY to listeners */
+>         ipc_uevent_send(ipc_imem->dev, UEVENT_MDM_NOT_READY);
+> -       pm_runtime_get_sync(ipc_imem->dev);
+>
+>         hrtimer_cancel(&ipc_imem->td_alloc_timer);
+>         hrtimer_cancel(&ipc_imem->tdupdate_timer);
+> @@ -1426,16 +1419,6 @@ struct iosm_imem *ipc_imem_init(struct iosm_pcie *pcie, unsigned int device_id,
+>
+>                 set_bit(IOSM_DEVLINK_INIT, &ipc_imem->flag);
+>         }
+> -
+> -       if (!pm_runtime_enabled(ipc_imem->dev))
+> -               pm_runtime_enable(ipc_imem->dev);
+> -
+> -       pm_runtime_set_autosuspend_delay(ipc_imem->dev,
+> -                                        IPC_MEM_AUTO_SUSPEND_DELAY_MS);
+> -       pm_runtime_use_autosuspend(ipc_imem->dev);
+> -       pm_runtime_allow(ipc_imem->dev);
+> -       pm_runtime_mark_last_busy(ipc_imem->dev);
+> -
+>         return ipc_imem;
+>  devlink_channel_fail:
+>         ipc_devlink_deinit(ipc_imem->ipc_devlink);
+> diff --git a/drivers/net/wwan/iosm/iosm_ipc_imem.h b/drivers/net/wwan/iosm/iosm_ipc_imem.h
+> index 0144b45e2afb39..5664ac507c902e 100644
+> --- a/drivers/net/wwan/iosm/iosm_ipc_imem.h
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_imem.h
+> @@ -103,8 +103,6 @@ struct ipc_chnl_cfg;
+>  #define FULLY_FUNCTIONAL 0
+>  #define IOSM_DEVLINK_INIT 1
+>
+> -#define IPC_MEM_AUTO_SUSPEND_DELAY_MS 5000
+> -
+>  /* List of the supported UL/DL pipes. */
+>  enum ipc_mem_pipes {
+>         IPC_MEM_PIPE_0 = 0,
+> diff --git a/drivers/net/wwan/iosm/iosm_ipc_pcie.c b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
+> index 3a259c9abefdfa..04517bd3325a2a 100644
+> --- a/drivers/net/wwan/iosm/iosm_ipc_pcie.c
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
+> @@ -6,7 +6,6 @@
+>  #include <linux/acpi.h>
+>  #include <linux/bitfield.h>
+>  #include <linux/module.h>
+> -#include <linux/pm_runtime.h>
+>  #include <net/rtnetlink.h>
+>
+>  #include "iosm_ipc_imem.h"
+> @@ -438,8 +437,7 @@ static int __maybe_unused ipc_pcie_resume_cb(struct device *dev)
+>         return 0;
+>  }
+>
+> -static DEFINE_RUNTIME_DEV_PM_OPS(iosm_ipc_pm, ipc_pcie_suspend_cb,
+> -                                ipc_pcie_resume_cb, NULL);
+> +static SIMPLE_DEV_PM_OPS(iosm_ipc_pm, ipc_pcie_suspend_cb, ipc_pcie_resume_cb);
+>
+>  static struct pci_driver iosm_ipc_driver = {
+>         .name = KBUILD_MODNAME,
+> diff --git a/drivers/net/wwan/iosm/iosm_ipc_port.c b/drivers/net/wwan/iosm/iosm_ipc_port.c
+> index 2ba1ddca3945b2..5d5b4183e14a3a 100644
+> --- a/drivers/net/wwan/iosm/iosm_ipc_port.c
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_port.c
+> @@ -3,8 +3,6 @@
+>   * Copyright (C) 2020-21 Intel Corporation.
+>   */
+>
+> -#include <linux/pm_runtime.h>
+> -
+>  #include "iosm_ipc_chnl_cfg.h"
+>  #include "iosm_ipc_imem_ops.h"
+>  #include "iosm_ipc_port.h"
+> @@ -15,16 +13,12 @@ static int ipc_port_ctrl_start(struct wwan_port *port)
+>         struct iosm_cdev *ipc_port = wwan_port_get_drvdata(port);
+>         int ret = 0;
+>
+> -       pm_runtime_get_sync(ipc_port->ipc_imem->dev);
+>         ipc_port->channel = ipc_imem_sys_port_open(ipc_port->ipc_imem,
+>                                                    ipc_port->chl_id,
+>                                                    IPC_HP_CDEV_OPEN);
+>         if (!ipc_port->channel)
+>                 ret = -EIO;
+>
+> -       pm_runtime_mark_last_busy(ipc_port->ipc_imem->dev);
+> -       pm_runtime_put_autosuspend(ipc_port->ipc_imem->dev);
+> -
+>         return ret;
+>  }
+>
+> @@ -33,24 +27,15 @@ static void ipc_port_ctrl_stop(struct wwan_port *port)
+>  {
+>         struct iosm_cdev *ipc_port = wwan_port_get_drvdata(port);
+>
+> -       pm_runtime_get_sync(ipc_port->ipc_imem->dev);
+>         ipc_imem_sys_port_close(ipc_port->ipc_imem, ipc_port->channel);
+> -       pm_runtime_mark_last_busy(ipc_port->ipc_imem->dev);
+> -       pm_runtime_put_autosuspend(ipc_port->ipc_imem->dev);
+>  }
+>
+>  /* transfer control data to modem */
+>  static int ipc_port_ctrl_tx(struct wwan_port *port, struct sk_buff *skb)
+>  {
+>         struct iosm_cdev *ipc_port = wwan_port_get_drvdata(port);
+> -       int ret;
+>
+> -       pm_runtime_get_sync(ipc_port->ipc_imem->dev);
+> -       ret = ipc_imem_sys_cdev_write(ipc_port, skb);
+> -       pm_runtime_mark_last_busy(ipc_port->ipc_imem->dev);
+> -       pm_runtime_put_autosuspend(ipc_port->ipc_imem->dev);
+> -
+> -       return ret;
+> +       return ipc_imem_sys_cdev_write(ipc_port, skb);
+>  }
+>
+>  static const struct wwan_port_ops ipc_wwan_ctrl_ops = {
+> diff --git a/drivers/net/wwan/iosm/iosm_ipc_trace.c b/drivers/net/wwan/iosm/iosm_ipc_trace.c
+> index 4368373797b69b..eeecfa3d10c5ab 100644
+> --- a/drivers/net/wwan/iosm/iosm_ipc_trace.c
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_trace.c
+> @@ -3,9 +3,7 @@
+>   * Copyright (C) 2020-2021 Intel Corporation.
+>   */
+>
+> -#include <linux/pm_runtime.h>
+>  #include <linux/wwan.h>
+> -
+>  #include "iosm_ipc_trace.h"
+>
+>  /* sub buffer size and number of sub buffer */
+> @@ -99,8 +97,6 @@ static ssize_t ipc_trace_ctrl_file_write(struct file *filp,
+>         if (ret)
+>                 return ret;
+>
+> -       pm_runtime_get_sync(ipc_trace->ipc_imem->dev);
+> -
+>         mutex_lock(&ipc_trace->trc_mutex);
+>         if (val == TRACE_ENABLE && ipc_trace->mode != TRACE_ENABLE) {
+>                 ipc_trace->channel = ipc_imem_sys_port_open(ipc_trace->ipc_imem,
+> @@ -121,10 +117,6 @@ static ssize_t ipc_trace_ctrl_file_write(struct file *filp,
+>         ret = count;
+>  unlock:
+>         mutex_unlock(&ipc_trace->trc_mutex);
+> -
+> -       pm_runtime_mark_last_busy(ipc_trace->ipc_imem->dev);
+> -       pm_runtime_put_autosuspend(ipc_trace->ipc_imem->dev);
+> -
+>         return ret;
+>  }
+>
+> diff --git a/drivers/net/wwan/iosm/iosm_ipc_wwan.c b/drivers/net/wwan/iosm/iosm_ipc_wwan.c
+> index 93d17de08786c2..ff747fc79aaf80 100644
+> --- a/drivers/net/wwan/iosm/iosm_ipc_wwan.c
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_wwan.c
+> @@ -6,7 +6,6 @@
+>  #include <linux/etherdevice.h>
+>  #include <linux/if_arp.h>
+>  #include <linux/if_link.h>
+> -#include <linux/pm_runtime.h>
+>  #include <linux/rtnetlink.h>
+>  #include <linux/wwan.h>
+>  #include <net/pkt_sched.h>
+> @@ -52,13 +51,11 @@ static int ipc_wwan_link_open(struct net_device *netdev)
+>         struct iosm_netdev_priv *priv = wwan_netdev_drvpriv(netdev);
+>         struct iosm_wwan *ipc_wwan = priv->ipc_wwan;
+>         int if_id = priv->if_id;
+> -       int ret = 0;
+>
+>         if (if_id < IP_MUX_SESSION_START ||
+>             if_id >= ARRAY_SIZE(ipc_wwan->sub_netlist))
+>                 return -EINVAL;
+>
+> -       pm_runtime_get_sync(ipc_wwan->ipc_imem->dev);
+>         /* get channel id */
+>         priv->ch_id = ipc_imem_sys_wwan_open(ipc_wwan->ipc_imem, if_id);
+>
+> @@ -66,8 +63,7 @@ static int ipc_wwan_link_open(struct net_device *netdev)
+>                 dev_err(ipc_wwan->dev,
+>                         "cannot connect wwan0 & id %d to the IPC mem layer",
+>                         if_id);
+> -               ret = -ENODEV;
+> -               goto err_out;
+> +               return -ENODEV;
+>         }
+>
+>         /* enable tx path, DL data may follow */
+> @@ -76,11 +72,7 @@ static int ipc_wwan_link_open(struct net_device *netdev)
+>         dev_dbg(ipc_wwan->dev, "Channel id %d allocated to if_id %d",
+>                 priv->ch_id, priv->if_id);
+>
+> -err_out:
+> -       pm_runtime_mark_last_busy(ipc_wwan->ipc_imem->dev);
+> -       pm_runtime_put_autosuspend(ipc_wwan->ipc_imem->dev);
+> -
+> -       return ret;
+> +       return 0;
+>  }
+>
+>  /* Bring-down the wwan net link */
+> @@ -90,12 +82,9 @@ static int ipc_wwan_link_stop(struct net_device *netdev)
+>
+>         netif_stop_queue(netdev);
+>
+> -       pm_runtime_get_sync(priv->ipc_wwan->ipc_imem->dev);
+>         ipc_imem_sys_wwan_close(priv->ipc_wwan->ipc_imem, priv->if_id,
+>                                 priv->ch_id);
+>         priv->ch_id = -1;
+> -       pm_runtime_mark_last_busy(priv->ipc_wwan->ipc_imem->dev);
+> -       pm_runtime_put_autosuspend(priv->ipc_wwan->ipc_imem->dev);
+>
+>         return 0;
+>  }
+> @@ -117,7 +106,6 @@ static netdev_tx_t ipc_wwan_link_transmit(struct sk_buff *skb,
+>             if_id >= ARRAY_SIZE(ipc_wwan->sub_netlist))
+>                 return -EINVAL;
+>
+> -       pm_runtime_get(ipc_wwan->ipc_imem->dev);
+>         /* Send the SKB to device for transmission */
+>         ret = ipc_imem_sys_wwan_transmit(ipc_wwan->ipc_imem,
+>                                          if_id, priv->ch_id, skb);
+> @@ -131,14 +119,9 @@ static netdev_tx_t ipc_wwan_link_transmit(struct sk_buff *skb,
+>                 ret = NETDEV_TX_BUSY;
+>                 dev_err(ipc_wwan->dev, "unable to push packets");
+>         } else {
+> -               pm_runtime_mark_last_busy(ipc_wwan->ipc_imem->dev);
+> -               pm_runtime_put_autosuspend(ipc_wwan->ipc_imem->dev);
+>                 goto exit;
+>         }
+>
+> -       pm_runtime_mark_last_busy(ipc_wwan->ipc_imem->dev);
+> -       pm_runtime_put_autosuspend(ipc_wwan->ipc_imem->dev);
+> -
+>         return ret;
+>
+>  exit:
+>
+> base-commit: 2b10740ce74abaea31c2cad4ff8e180549c4544b
+> --
+> An old man doll... just what I always wanted! - Clara
+>
 
