@@ -1,51 +1,75 @@
-Return-Path: <netdev+bounces-41943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57D367CC5D1
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:21:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E47DB7CC5D5
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:23:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 872311C20BE3
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:21:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A01362817FF
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:23:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18D543AAF;
-	Tue, 17 Oct 2023 14:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B6743AB0;
+	Tue, 17 Oct 2023 14:23:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="sphavuOh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U3Ub1etc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C3F43A84;
-	Tue, 17 Oct 2023 14:21:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B5F5C433C7;
-	Tue, 17 Oct 2023 14:21:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1697552514;
-	bh=S0cFMSsiptioecYbb5PIgsQ87Q6x7neETMASL7MH+pQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sphavuOhQS7yQjewzOpQOQIpDXM+vWNO7F0l2IlR0io0/I1VjP2VbccfCFjQ8PlXi
-	 ksQ2w4oxO/iHXhK1MymVZbMVPFiokpE2CYNWcJ97c7AG1BCg0vrL+Hmfw9huuEnoqP
-	 bPoVMdRgEPWV/KVkqi/oHYi+Ifg51eJbZyyiLI/0=
-Date: Tue, 17 Oct 2023 16:21:47 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
-	tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY
- drivers
-Message-ID: <2023101756-procedure-uninvited-f6c9@gregkh>
-References: <3469de1c-0e6f-4fe5-9d93-2542f87ffd0d@proton.me>
- <20231015.011502.276144165010584249.fujita.tomonori@gmail.com>
- <9d70de37-c5ed-4776-a00f-76888e1230aa@proton.me>
- <20231015.073929.156461103776360133.fujita.tomonori@gmail.com>
- <98471d44-c267-4c80-ba54-82ab2563e465@proton.me>
- <1454c3e6-82d1-4f60-b07d-bc3b47b23662@lunn.ch>
- <f26a3e1a-7eb8-464e-9cbe-ebb8bdf69b20@proton.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7403343AA3
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:23:20 +0000 (UTC)
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E93FA2;
+	Tue, 17 Oct 2023 07:23:19 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-565334377d0so4287371a12.2;
+        Tue, 17 Oct 2023 07:23:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697552599; x=1698157399; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o8x4u3Tgqxm/wT15hbhSA2dGVONGLw0lsKJBjy2cxi4=;
+        b=U3Ub1etcxD6FxMXmVQF4wuWsnHpQwqcJ4EryaHbuMkmTuV5/O8E76cYMm2yA+i99Sp
+         3lVwxO0GKAxHk8c2Dz0Prsdxqjmx9OkMPEiyUptnGGMOq2tFe9Z9jUVcKQIw1CMs1VRZ
+         Y0n/72ipfPJ1zL9/9PV197Xm2lZJ8Smu0gqk5IS1fvKoWB9ZEYFqwVjkdCopbSaa0qfd
+         HRYWDPMDKdgXOZitgfREJMYVfuRFW/dYto3HeZR1VeT8COWQuhG6l0GrcYSTaYVO+50h
+         LX5TAL4aLLJw8tYd6TWp/AxwR12FSxSZlmIiukChsvfUgqgE3MtQslxEcaNYPgS5F479
+         V6dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697552599; x=1698157399;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o8x4u3Tgqxm/wT15hbhSA2dGVONGLw0lsKJBjy2cxi4=;
+        b=eao8HGgB8fCPBR3MSpgSnfP/WMhZaubUL8kt3E/iErpuEzRGC32bBrS1bzRIxAfljq
+         qvjHahp6yWrfO4dgmTtS2xOjlODFNhbuZGnKlCdc9o3BiDLcbmivpKcyBawRYdM/cdVp
+         9irdXSIGCO9mMTY8HNDlNHwWZHs5znipaE4HMBspyOUIKTvKdvWxsKH6aImxoSg8fv8E
+         qwBMLiGxo0PZUN1yjM/xPHGvjN9qahFUMJSOi2KD7Lz+Qt06D/0FsjY/so1GONB8HbgL
+         8zf19yQ3BIUIwPb1A0MKlYLv7zSyrM9KPrY45oUgV+7k3TICwK7lm4D9PtmHnI7eHYxD
+         hEGQ==
+X-Gm-Message-State: AOJu0Yxxr/zYF5upd9prukOsw66S1g4eG16WYEUm0sMh80g2fxS5oRtb
+	RYcyQq1bzgINF8w36WNovgM=
+X-Google-Smtp-Source: AGHT+IGQ9rbPOMmVl+v2/m2m1wjMd3AyNTDDOmysGd0xpq/VkIt4k5dwSI61dpmOkHe71FK+0u4lpw==
+X-Received: by 2002:a17:903:1cf:b0:1c9:d46e:d52d with SMTP id e15-20020a17090301cf00b001c9d46ed52dmr2487529plh.64.1697552598729;
+        Tue, 17 Oct 2023 07:23:18 -0700 (PDT)
+Received: from ubuntu ([223.226.54.200])
+        by smtp.gmail.com with ESMTPSA id kx14-20020a170902f94e00b001c1f4edfb9csm1606814plb.173.2023.10.17.07.23.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 07:23:18 -0700 (PDT)
+Date: Tue, 17 Oct 2023 07:23:13 -0700
+From: Nandha Kumar Singaram <nandhakumar.singaram@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+	Coiby Xu <coiby.xu@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	netdev@vger.kernel.org, linux-staging@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kumaran.4353@gmail.com
+Subject: Re: [PATCH] staging: qlge: Replace the occurrences of (1<<x) by
+ BIT(x)
+Message-ID: <20231017142313.GC3156@ubuntu>
+References: <20231015133558.GA5489@ubuntu>
+ <20231017091814.GS1751252@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,76 +78,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f26a3e1a-7eb8-464e-9cbe-ebb8bdf69b20@proton.me>
+In-Reply-To: <20231017091814.GS1751252@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 02:04:33PM +0000, Benno Lossin wrote:
-> On 17.10.23 14:38, Andrew Lunn wrote:
-> >>> Because set_speed() updates the member in phy_device and read()
-> >>> updates the object that phy_device points to?
-> >>
-> >> `set_speed` is entirely implemented on the Rust side and is not protected
-> >> by a lock.
+On Tue, Oct 17, 2023 at 11:18:14AM +0200, Simon Horman wrote:
+> On Sun, Oct 15, 2023 at 06:35:58AM -0700, Nandha Kumar Singaram wrote:
+> > Adhere to linux coding style. Reported by checkpatch.pl:
+> > CHECK: Prefer using the BIT macro
 > > 
-> > With the current driver, all entry points into the driver are called
-> > from the phylib core, and the core guarantees that the lock is
-> > taken. So it should not matter if its entirely implemented in the Rust
-> > side, somewhere up the call stack, the lock was taken.
+> > Signed-off-by: Nandha Kumar Singaram <nandhakumar.singaram@gmail.com>
 > 
-> Sure that might be the case, I am trying to guard against this future
-> problem:
+> Hi Nandha,
 > 
->      fn soft_reset(driver: &mut Driver) -> Result {
->          let driver = driver
->          thread::scope(|s| {
->              let thread_a = s.spawn(|| {
->                  for _ in 0..100_000_000 {
->                      driver.set_speed(10);
->                  }
->              });
->              let thread_b = s.spawn(|| {
->                  for _ in 0..100_000_000 {
->                      driver.set_speed(10);
->                  }
->              });
->              thread_a.join();
->              thread_b.join();
->          });
->          Ok(())
->      }
+> I am assuming that checkpatch clean ups are acceptable, perhaps
+> even desired, in staging. So this patch seems appropriate to me.
 > 
-> This code spawns two new threads both of which can call `set_speed`,
-> since it takes `&self`. But this leads to a data race, since those
-> accesses are not serialized. I know that this is a very contrived
-> example, but you never when this will become reality, so we should
-> do the right thing now and just use `&mut self`, since that is exactly
-> what it is for.
+> I do, however, see a lot more potential uses of BIT() in qlge.h.
+> Could you take a second look?
+> 
+> ...
 
-Kernel code is written for the use cases today, don't worry about
-tomorrow, you can fix the issue tomorrow if you change something that
-requires it.
+Hi Simon,
 
-And what "race" are you getting here?  You don't have threads in the
-kernel :)
+I will look into it and update the patch
 
-Also, if two things are setting the speed, wonderful, you get some sort
-of value eventually, you have much bigger problems in your code as you
-shouldn't have been doing that in the first place.
-
-> Not that we do not even have a way to create threads on the Rust side
-> at the moment.
-
-Which is a good thing :)
-
-> But we should already be thinking about any possible code pattern.
-
-Again, no, deal with what we have today, kernel code is NOT
-future-proof, that's not how we write this stuff.
-
-If you really worry about a "split write" then us a lock, that's what
-they are there for.  But that's not the issue here, so don't worry about
-it.
-
-thanks,
-
-greg k-h
+Thanks,
+Nandha Kumar Singaram
 
