@@ -1,387 +1,297 @@
-Return-Path: <netdev+bounces-42063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5B517CD050
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:20:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 590FF7CD0D7
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:35:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8FD3B21061
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 23:20:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 837651C20955
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 23:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5B52F516;
-	Tue, 17 Oct 2023 23:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9A32F528;
+	Tue, 17 Oct 2023 23:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="cCyn5lJi"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Mrb70A3E"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F29F2DF73
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 23:20:03 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC040F1
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:20:00 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-408002b5b9fso8182915e9.3
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:20:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2D243102
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 23:35:43 +0000 (UTC)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34421B0
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:35:41 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c77449a6daso50619725ad.0
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:35:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1697584799; x=1698189599; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=n9pyZVaXRqwpqT4EHL+t2VBTLWYs4FebCCpvED/uf38=;
-        b=cCyn5lJiMgbqbVTJ8+etzigz8yhgpRvj+6bYvP+mVrm7D17Rf/fC8b2zrjj8QhCR53
-         IMfNhBMnGyRq+oj82TD/nfveqX9KikGFWqxLAfvbdbvP97rWCRLMAkQ8X2U2AQGFnJZ/
-         IlNrEk9TJjQmpsJpJR6ETGKZ5epWhWFbK1qns1796o207YWoW97BZFhdBqPNuCtvMM5P
-         mKl/jozsKfI3rMeM6U8myLHs85o2UrTrFBgle3rRExz6aU5j4ABWwGDHJa7P0VaLu+dD
-         KGIyYn366XARDBeq63LFh8ON55jDR7ux2Y5JZ6fXiUGnq4k2JDzp7FT22oA0m3F55pbj
-         YRXg==
+        d=broadcom.com; s=google; t=1697585740; x=1698190540; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cImd/Fhd+FMZtj9e5YHZnBefeuxEYvHxrfJNren1yFI=;
+        b=Mrb70A3E31nZprLeGlgmbmkNVZegdHb80v1KL1yCZUDlkXS+kkoY+3hwQdeRrS0dMd
+         X9U36R7IYUsNqHjy0JW3G6iT+EFBpY0EoRO59g276ACVeneBqgXs4MPCH5NHUeuKHc4Y
+         HYFVEF3uWtrHNsbVCSGRsTc4PBot7RoclUedQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697584799; x=1698189599;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n9pyZVaXRqwpqT4EHL+t2VBTLWYs4FebCCpvED/uf38=;
-        b=NfYE+yUbE1vfeEuSRwe3GepFLnrWVbtYKhOpAh6rOTzyYM44TvuRLMk4Ig0pcOJxkU
-         7uNto+ZK8kjcgZhHVn2wMWRbzyZHU7SGTEZOFnylkfiM5Ajqe4jR1nq/8rGgNfLtykvP
-         KDrhTw/FGahTuiv+REgszYMFqJqWoVxfgwjvhLfwKbEQ9LK91YV3fhHghuBhMBKjNNZf
-         FIJI1s1tIor/VrHKYrQ7IvaVyf0Sn0vWWzvcAo/a+MaRazgBggrEVfMXrQ5JZI/GVUqS
-         6DDMmevN510I3jt9Vl2cd6aryTI0YJ5uloNgkVP8+Sk+wKJ+sxsEllyo4uXUYzoHBN1t
-         02cA==
-X-Gm-Message-State: AOJu0YwHASm8XjhAqkLDvNe1wo5KoMrXDMhiG1GrSuIlBonTShdDHIZX
-	3FUYZuunwlY+HQ3n5kW5/adAyg==
-X-Google-Smtp-Source: AGHT+IFgtxHqfa3MfT53ir6NDVEURGNyLb9Mdt/B6aJHd8Qts5+X+pCfKl/8ANCZ8Ar0jGaC5mv2jg==
-X-Received: by 2002:adf:f449:0:b0:32d:a98c:aa20 with SMTP id f9-20020adff449000000b0032da98caa20mr2505156wrp.59.1697584799023;
-        Tue, 17 Oct 2023 16:19:59 -0700 (PDT)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id t17-20020a05600001d100b0032d8034724esm734566wrx.94.2023.10.17.16.19.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Oct 2023 16:19:58 -0700 (PDT)
-Message-ID: <bd0e29db-c8dd-4d1a-a898-69e0b8e6dc54@arista.com>
-Date: Wed, 18 Oct 2023 00:19:56 +0100
+        d=1e100.net; s=20230601; t=1697585740; x=1698190540;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cImd/Fhd+FMZtj9e5YHZnBefeuxEYvHxrfJNren1yFI=;
+        b=Clk6rvO1sxzd6BjRf9cP6Pbsfg41yjKiOBf0YKyy+O3lsJEkPUHwRlLgZW0Dlp+x25
+         599AdjycNrV7W3vpNzbpigFKwtKdwzLTACE3CpArg7+LzELFrgCBlwYxFkJouAa/K6nf
+         jK7Djoc38FbtGCialc+DLCJto7kdZr6jOR+Qs/STEROvMiaADj06VRo7tJXTTob5ZDmR
+         5+7m5vOeuDLIL3g9LLANRIBjsGpbJMfcHklQtOYF86SUvLImbxVTpXA1xNyKaTvTiR95
+         WHfi8Nl/Dr6JytbMkiP3Xm4i6clBcKTpkV9g0ZNzeR5fJpQq3dOqQCwOFWqAXbAUlow7
+         U9bA==
+X-Gm-Message-State: AOJu0YycXDb4ot45CbSwnRb+tMmIzGCmKidvrB3IQ1C8s/KID7X/jm5H
+	ntY5tWXYgqLfHyVAW0zZ7ohbJCRSXR5uMNzZXu1EnDCKb6ImWOgrGmWUVaf6pmk1sq6bE2KKRso
+	l+CwaViOlIanKkJtnw7+oxCdq8cU6tvZODDlp2EYFXak33Dj/22TWHLuXIatprIAwc/chHWn69k
+	y5Ziql+nV1rQ==
+X-Google-Smtp-Source: AGHT+IHYryXJgjRJ+3/6ydhVGgy9ALMB50NDAKiFnnrB8yQlvbIkLrvFNz0VP4oDLpcsQ9KAf8huVw==
+X-Received: by 2002:a17:903:1249:b0:1c4:3cd5:4298 with SMTP id u9-20020a170903124900b001c43cd54298mr4336604plh.18.1697585740182;
+        Tue, 17 Oct 2023 16:35:40 -0700 (PDT)
+Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id g14-20020a1709029f8e00b001bc18e579aesm2139458plq.101.2023.10.17.16.35.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Oct 2023 16:35:39 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	linux-kernel@vger.kernel.org (open list:ARM/Mediatek SoC support),
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/Mediatek SoC support)
+Subject: [PATCH net-next v5 0/2] Switch DSA to inclusive terminology
+Date: Tue, 17 Oct 2023 16:35:34 -0700
+Message-Id: <20231017233536.426704-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 net-next 08/23] net/tcp: Add AO sign to RST packets
-Content-Language: en-US
-To: kernel test robot <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
- Francesco Ruggeri <fruggeri@arista.com>,
- Salam Noureddine <noureddine@arista.com>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
- Andy Lutomirski <luto@amacapital.net>, Ard Biesheuvel <ardb@kernel.org>,
- Bob Gilligan <gilligan@arista.com>, Dan Carpenter <error27@gmail.com>,
- David Laight <David.Laight@aculab.com>, Dmitry Safonov
- <0x7f454c46@gmail.com>, Donald Cassidy <dcassidy@redhat.com>,
- Eric Biggers <ebiggers@kernel.org>, "Eric W. Biederman"
- <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>,
- "Gaillardetz, Dominik" <dgaillar@ciena.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
- "Nassiri, Mohammad" <mnassiri@ciena.com>,
- "Tetreault, Francois" <ftetreau@ciena.com>
-References: <202310171606.30e15ebe-oliver.sang@intel.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <202310171606.30e15ebe-oliver.sang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000000c5da20607f1fbdb"
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MIME_NO_TEXT,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/17/23 09:37, kernel test robot wrote:
-> 
-> 
-> Hello,
-> 
-> kernel test robot noticed "BUG:sleeping_function_called_from_invalid_context_at_net/core/sock.c" on:
-> 
-> commit: df13d11e6a2a3cc5f973aca36f68f880fa42d55f ("[PATCH v14 net-next 08/23] net/tcp: Add AO sign to RST packets")
-> url: https://github.com/intel-lab-lkp/linux/commits/Dmitry-Safonov/net-tcp-Prepare-tcp_md5sig_pool-for-TCP-AO/20231010-071412
-> patch link: https://lore.kernel.org/all/20231009230722.76268-9-dima@arista.com/
-> patch subject: [PATCH v14 net-next 08/23] net/tcp: Add AO sign to RST packets
-> 
-> in testcase: trinity
-> version: trinity-i386-abe9de86-1_20230429
-> with following parameters:
-> 
-> 	runtime: 300s
-> 	group: group-02
-> 	nr_groups: 5
-> 
-> test-description: Trinity is a linux system call fuzz tester.
-> test-url: http://codemonkey.org.uk/projects/trinity/
-> 
-> 
-> compiler: gcc-12
-> test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
-> 
-> (please refer to attached dmesg/kmsg for entire log/backtrace)
-> 
-> 
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <oliver.sang@intel.com>
-> | Closes: https://lore.kernel.org/oe-lkp/202310171606.30e15ebe-oliver.sang@intel.com
-> 
-> 
-> [  221.348247][ T7133] BUG: sleeping function called from invalid context at net/core/sock.c:2978
-> [  221.349875][ T7133] in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 7133, name: trinity-c4
-> [  221.351666][ T7133] preempt_count: 0, expected: 0
-> [  221.352614][ T7133] RCU nest depth: 1, expected: 0
-> [  221.353518][ T7133] 2 locks held by trinity-c4/7133:
-> [ 221.354530][ T7133] #0: ed8b5660 (sk_lock-AF_INET6){+.+.}-{0:0}, at: tcp_sendmsg (net/ipv4/tcp.c:1336) 
-> [ 221.374314][ T7133] #1: c27dbb18 (rcu_read_lock){....}-{1:2}, at: inet6_csk_xmit (include/linux/rcupdate.h:747 net/ipv6/inet6_connection_sock.c:129) 
-> [  221.375906][ T7133] CPU: 1 PID: 7133 Comm: trinity-c4 Tainted: G        W       TN 6.6.0-rc4-01105-gdf13d11e6a2a #1
+--0000000000000c5da20607f1fbdb
+Content-Transfer-Encoding: 8bit
 
-Quite puzzling. It doesn't seem that it can happen to inet6_csk_xmit():
+One of the action items following Netconf'23 is to switch subsystems to
+use inclusive terminology. DSA has been making extensive use of the
+"master" and "slave" words which are now replaced by "conduit" and
+"user" respectively.
 
-:	rcu_read_lock();
-:	skb_dst_set_noref(skb, dst);
-:
-:	/* Restore final destination back after routing done */
-:	fl6.daddr = sk->sk_v6_daddr;
-:
-:	res = ip6_xmit(sk, skb, &fl6, sk->sk_mark, rcu_dereference(np->opt),
-:		       np->tclass,  sk->sk_priority);
-:	rcu_read_unlock();
+Changes in v5:
 
-So, I presumed the calltrace was for nested rcu_read_lock() case.
-Then I've looked at all return/goto cases, I couldn't find any
-unbalanced rcu_read_{,un}lock().
+- actually collected Rob's acked-by tag
+- added Stephen's Acked-by tag
+- fixed the stray references spotted by Vladimir
 
-Is this reproducible by any chance?
+Changes in v4:
+
+- added clarification that we used "master" and "slave" terms for a
+  while
+- fixed include guard names in user.h
+- fixed some improper subtitutions
+- renamed STATE_CHANGE notifier
+- added Rob's ack on the DT patches from the first review
+
+Changes in v3:
+- properly align arguments with the changed function names
+- ensure markup delimiters lengths are corrected to the name word length
+- maintain the existing wording about LAG devices
+
+Changes in v2:
+
+- addressed kbuild test robots reports
+- preserve capitalization where relevant
+- fixed build error in mtk_ppe_offload.c
+
+Florian Fainelli (2):
+  net: dsa: Use conduit and user terms
+  net: dsa: Rename IFLA_DSA_MASTER to IFLA_DSA_CONDUIT
+
+ .../bindings/net/dsa/mediatek,mt7530.yaml     |    2 +-
+ Documentation/networking/dsa/b53.rst          |   14 +-
+ Documentation/networking/dsa/bcm_sf2.rst      |    2 +-
+ .../networking/dsa/configuration.rst          |  102 +-
+ Documentation/networking/dsa/dsa.rst          |  162 +-
+ Documentation/networking/dsa/lan9303.rst      |    2 +-
+ Documentation/networking/dsa/sja1105.rst      |    6 +-
+ .../dts/marvell/armada-3720-espressobin.dtsi  |    2 +-
+ drivers/net/dsa/b53/b53_common.c              |    4 +-
+ drivers/net/dsa/b53/b53_mdio.c                |    2 +-
+ drivers/net/dsa/bcm_sf2.c                     |   36 +-
+ drivers/net/dsa/bcm_sf2.h                     |    2 +-
+ drivers/net/dsa/bcm_sf2_cfp.c                 |    4 +-
+ drivers/net/dsa/lan9303-core.c                |    4 +-
+ drivers/net/dsa/lantiq_gswip.c                |   34 +-
+ drivers/net/dsa/microchip/ksz9477.c           |    6 +-
+ drivers/net/dsa/microchip/ksz_common.c        |   20 +-
+ drivers/net/dsa/microchip/ksz_ptp.c           |    2 +-
+ drivers/net/dsa/mt7530.c                      |   18 +-
+ drivers/net/dsa/mv88e6xxx/chip.c              |    4 +-
+ drivers/net/dsa/ocelot/felix.c                |   68 +-
+ drivers/net/dsa/ocelot/felix.h                |    6 +-
+ drivers/net/dsa/qca/qca8k-8xxx.c              |   50 +-
+ drivers/net/dsa/qca/qca8k-common.c            |    4 +-
+ drivers/net/dsa/qca/qca8k-leds.c              |    6 +-
+ drivers/net/dsa/qca/qca8k.h                   |    2 +-
+ drivers/net/dsa/realtek/realtek-smi.c         |   28 +-
+ drivers/net/dsa/realtek/realtek.h             |    2 +-
+ drivers/net/dsa/realtek/rtl8365mb.c           |    2 +-
+ drivers/net/dsa/sja1105/sja1105_main.c        |    4 +-
+ drivers/net/dsa/xrs700x/xrs700x.c             |   12 +-
+ drivers/net/ethernet/broadcom/bcmsysport.c    |    2 +-
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c   |    2 +-
+ .../net/ethernet/mediatek/mtk_ppe_offload.c   |    2 +-
+ include/linux/dsa/sja1105.h                   |    2 +-
+ include/net/dsa.h                             |   56 +-
+ include/net/dsa_stubs.h                       |   22 +-
+ include/uapi/linux/if_link.h                  |    4 +-
+ net/core/dev_ioctl.c                          |    2 +-
+ net/dsa/Makefile                              |    6 +-
+ net/dsa/{master.c => conduit.c}               |  118 +-
+ net/dsa/conduit.h                             |   22 +
+ net/dsa/dsa.c                                 |  224 +--
+ net/dsa/dsa.h                                 |   12 +-
+ net/dsa/master.h                              |   22 -
+ net/dsa/netlink.c                             |   22 +-
+ net/dsa/port.c                                |  124 +-
+ net/dsa/port.h                                |    4 +-
+ net/dsa/slave.h                               |   69 -
+ net/dsa/switch.c                              |   20 +-
+ net/dsa/switch.h                              |    8 +-
+ net/dsa/tag.c                                 |   10 +-
+ net/dsa/tag.h                                 |   26 +-
+ net/dsa/tag_8021q.c                           |   22 +-
+ net/dsa/tag_8021q.h                           |    2 +-
+ net/dsa/tag_ar9331.c                          |    4 +-
+ net/dsa/tag_brcm.c                            |   14 +-
+ net/dsa/tag_dsa.c                             |    6 +-
+ net/dsa/tag_gswip.c                           |    4 +-
+ net/dsa/tag_hellcreek.c                       |    4 +-
+ net/dsa/tag_ksz.c                             |   12 +-
+ net/dsa/tag_lan9303.c                         |    4 +-
+ net/dsa/tag_mtk.c                             |    4 +-
+ net/dsa/tag_none.c                            |    6 +-
+ net/dsa/tag_ocelot.c                          |   22 +-
+ net/dsa/tag_ocelot_8021q.c                    |   12 +-
+ net/dsa/tag_qca.c                             |    6 +-
+ net/dsa/tag_rtl4_a.c                          |    6 +-
+ net/dsa/tag_rtl8_4.c                          |    6 +-
+ net/dsa/tag_rzn1_a5psw.c                      |    4 +-
+ net/dsa/tag_sja1105.c                         |   30 +-
+ net/dsa/tag_trailer.c                         |    4 +-
+ net/dsa/tag_xrs700x.c                         |    4 +-
+ net/dsa/{slave.c => user.c}                   | 1464 ++++++++---------
+ net/dsa/user.h                                |   69 +
+ 75 files changed, 1553 insertions(+), 1547 deletions(-)
+ rename net/dsa/{master.c => conduit.c} (76%)
+ create mode 100644 net/dsa/conduit.h
+ delete mode 100644 net/dsa/master.h
+ delete mode 100644 net/dsa/slave.h
+ rename net/dsa/{slave.c => user.c} (62%)
+ create mode 100644 net/dsa/user.h
+
+-- 
+2.34.1
 
 
-> [  221.377820][ T7133] Call Trace:
-> [ 221.378447][ T7133] dump_stack_lvl (lib/dump_stack.c:107) 
-> [ 221.379373][ T7133] dump_stack (lib/dump_stack.c:114) 
-> [ 221.380186][ T7133] __might_resched (kernel/sched/core.c:10188) 
-> [ 221.381100][ T7133] __release_sock (include/linux/sched.h:2097 net/core/sock.c:2978) 
-> [ 221.381960][ T7133] release_sock (net/core/sock.c:3520) 
-> [ 221.382784][ T7133] inet_wait_for_connect (net/ipv4/af_inet.c:609) 
-> [ 221.383763][ T7133] ? autoremove_wake_function (kernel/sched/wait.c:479) 
-> [ 221.384757][ T7133] __inet_stream_connect (net/ipv4/af_inet.c:701 (discriminator 1)) 
-> [ 221.385741][ T7133] ? kmalloc_node_trace (mm/slab_common.c:1133) 
-> [ 221.386702][ T7133] tcp_sendmsg_fastopen (net/ipv4/tcp.c:1026) 
-> [ 221.387685][ T7133] tcp_sendmsg_locked (net/ipv4/tcp.c:1073) 
-> [ 221.388642][ T7133] ? find_held_lock (kernel/locking/lockdep.c:5243) 
-> [ 221.389536][ T7133] ? mark_held_locks (kernel/locking/lockdep.c:4273) 
-> [ 221.390437][ T7133] ? lock_sock_nested (net/core/sock.c:3511) 
-> [ 221.391359][ T7133] ? lock_sock_nested (net/core/sock.c:3511) 
-> [ 221.392335][ T7133] tcp_sendmsg (net/ipv4/tcp.c:1336) 
-> [ 221.393153][ T7133] inet6_sendmsg (net/ipv6/af_inet6.c:658 (discriminator 2)) 
-> [ 221.394010][ T7133] ____sys_sendmsg (net/socket.c:730 net/socket.c:745 net/socket.c:2558) 
-> [ 221.394927][ T7133] ___sys_sendmsg (net/socket.c:2612) 
-> [ 221.395844][ T7133] __sys_sendmsg (net/socket.c:2641) 
-> [ 221.396671][ T7133] __ia32_sys_sendmsg (net/socket.c:2648) 
-> [ 221.397562][ T7133] __do_fast_syscall_32 (arch/x86/entry/common.c:112 arch/x86/entry/common.c:178) 
-> [ 221.398485][ T7133] do_fast_syscall_32 (arch/x86/entry/common.c:203) 
-> [ 221.399401][ T7133] do_SYSENTER_32 (arch/x86/entry/common.c:247) 
-> [ 221.404363][ T7133] entry_SYSENTER_32 (arch/x86/entry/entry_32.S:840) 
-> [  221.405255][ T7133] EIP: 0xb7f59579
-> [ 221.405931][ T7133] Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d 76 00 58 b8 77 00 00 00 cd 80 90 8d 76
-> All code
-> ========
->    0:	b8 01 10 06 03       	mov    $0x3061001,%eax
->    5:	74 b4                	je     0xffffffffffffffbb
->    7:	01 10                	add    %edx,(%rax)
->    9:	07                   	(bad)
->    a:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
->    e:	10 08                	adc    %cl,(%rax)
->   10:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
-> 	...
->   20:	00 51 52             	add    %dl,0x52(%rcx)
->   23:	55                   	push   %rbp
->   24:*	89 e5                	mov    %esp,%ebp		<-- trapping instruction
->   26:	0f 34                	sysenter
->   28:	cd 80                	int    $0x80
->   2a:	5d                   	pop    %rbp
->   2b:	5a                   	pop    %rdx
->   2c:	59                   	pop    %rcx
->   2d:	c3                   	ret
->   2e:	90                   	nop
->   2f:	90                   	nop
->   30:	90                   	nop
->   31:	90                   	nop
->   32:	8d 76 00             	lea    0x0(%rsi),%esi
->   35:	58                   	pop    %rax
->   36:	b8 77 00 00 00       	mov    $0x77,%eax
->   3b:	cd 80                	int    $0x80
->   3d:	90                   	nop
->   3e:	8d                   	.byte 0x8d
->   3f:	76                   	.byte 0x76
-> 
-> Code starting with the faulting instruction
-> ===========================================
->    0:	5d                   	pop    %rbp
->    1:	5a                   	pop    %rdx
->    2:	59                   	pop    %rcx
->    3:	c3                   	ret
->    4:	90                   	nop
->    5:	90                   	nop
->    6:	90                   	nop
->    7:	90                   	nop
->    8:	8d 76 00             	lea    0x0(%rsi),%esi
->    b:	58                   	pop    %rax
->    c:	b8 77 00 00 00       	mov    $0x77,%eax
->   11:	cd 80                	int    $0x80
->   13:	90                   	nop
->   14:	8d                   	.byte 0x8d
->   15:	76                   	.byte 0x76
-> [  221.409527][ T7133] EAX: ffffffda EBX: 00000137 ECX: 01ce1580 EDX: 240449b4
-> [  221.410805][ T7133] ESI: 000000b1 EDI: 8b8b8b8b EBP: 08080808 ESP: bfc205fc
-> [  221.412147][ T7133] DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b EFLAGS: 00000296
-> [  221.481648][ T7133]
-> [  221.482194][ T7133] ================================================
-> [  221.483377][ T7133] WARNING: lock held when returning to user space!
-> [  221.484574][ T7133] 6.6.0-rc4-01105-gdf13d11e6a2a #1 Tainted: G        W       TN
-> [  221.485904][ T7133] ------------------------------------------------
-> [  221.487044][ T7133] trinity-c4/7133 is leaving the kernel with locks still held!
-> [  221.488448][ T7133] 1 lock held by trinity-c4/7133:
-> [ 221.489401][ T7133] #0: c27dbb18 (rcu_read_lock){....}-{1:2}, at: inet6_csk_xmit (include/linux/rcupdate.h:747 net/ipv6/inet6_connection_sock.c:129) 
-> [  221.491125][ T7133] ------------[ cut here ]------------
-> [  221.501170][ T7133] Voluntary context switch within RCU read-side critical section!
-> [ 221.501214][ T7133] WARNING: CPU: 1 PID: 7133 at kernel/rcu/tree_plugin.h:320 rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
-> [  221.504458][ T7133] Modules linked in: ipmi_msghandler uio_pdrv_genirq uio rtc_cmos processor fuse drm drm_panel_orientation_quirks configfs
-> [  221.506701][ T7133] CPU: 1 PID: 7133 Comm: trinity-c4 Tainted: G        W       TN 6.6.0-rc4-01105-gdf13d11e6a2a #1
-> [ 221.508634][ T7133] EIP: rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
-> [ 221.509684][ T7133] Code: e9 87 fe ff ff 8d 74 26 00 8b 41 2c 89 45 ec e9 16 ff ff ff 8d 74 26 00 90 c6 05 09 88 94 c2 01 68 04 84 32 c2 e8 47 14 f5 ff <0f> 0b 5a e9 b0 fd ff ff 8d b4 26 00 00 00 00 81 e2 ff ff ff 7f 0f
-> All code
-> ========
->    0:	e9 87 fe ff ff       	jmp    0xfffffffffffffe8c
->    5:	8d 74 26 00          	lea    0x0(%rsi,%riz,1),%esi
->    9:	8b 41 2c             	mov    0x2c(%rcx),%eax
->    c:	89 45 ec             	mov    %eax,-0x14(%rbp)
->    f:	e9 16 ff ff ff       	jmp    0xffffffffffffff2a
->   14:	8d 74 26 00          	lea    0x0(%rsi,%riz,1),%esi
->   18:	90                   	nop
->   19:	c6 05 09 88 94 c2 01 	movb   $0x1,-0x3d6b77f7(%rip)        # 0xffffffffc2948829
->   20:	68 04 84 32 c2       	push   $0xffffffffc2328404
->   25:	e8 47 14 f5 ff       	call   0xfffffffffff51471
->   2a:*	0f 0b                	ud2		<-- trapping instruction
->   2c:	5a                   	pop    %rdx
->   2d:	e9 b0 fd ff ff       	jmp    0xfffffffffffffde2
->   32:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
->   39:	81 e2 ff ff ff 7f    	and    $0x7fffffff,%edx
->   3f:	0f                   	.byte 0xf
-> 
-> Code starting with the faulting instruction
-> ===========================================
->    0:	0f 0b                	ud2
->    2:	5a                   	pop    %rdx
->    3:	e9 b0 fd ff ff       	jmp    0xfffffffffffffdb8
->    8:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
->    f:	81 e2 ff ff ff 7f    	and    $0x7fffffff,%edx
->   15:	0f                   	.byte 0xf
-> [  221.513148][ T7133] EAX: 00000000 EBX: e52d7c40 ECX: 00000000 EDX: 00000000
-> [  221.514443][ T7133] ESI: 00000000 EDI: eadb5640 EBP: ead7df28 ESP: ead7df10
-> [  221.515747][ T7133] DS: 007b ES: 007b FS: 00d8 GS: 0033 SS: 0068 EFLAGS: 00010046
-> [  221.517184][ T7133] CR0: 80050033 CR2: 01ce68cc CR3: 2ae6f000 CR4: 00000690
-> [  221.518449][ T7133] Call Trace:
-> [ 221.519074][ T7133] ? show_regs (arch/x86/kernel/dumpstack.c:478) 
-> [ 221.519826][ T7133] ? rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
-> [ 221.520887][ T7133] ? __warn (kernel/panic.c:673) 
-> [ 221.521663][ T7133] ? rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
-> [ 221.522722][ T7133] ? report_bug (lib/bug.c:201 lib/bug.c:219) 
-> [ 221.523615][ T7133] ? exc_overflow (arch/x86/kernel/traps.c:250) 
-> [ 221.524517][ T7133] ? handle_bug (arch/x86/kernel/traps.c:216) 
-> [ 221.525240][ T7133] ? exc_invalid_op (arch/x86/kernel/traps.c:258 (discriminator 1)) 
-> [ 221.526115][ T7133] ? handle_exception (arch/x86/entry/entry_32.S:1056) 
-> [ 221.527035][ T7133] ? exc_overflow (arch/x86/kernel/traps.c:250) 
-> [ 221.527882][ T7133] ? rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
-> [ 221.528945][ T7133] ? exc_overflow (arch/x86/kernel/traps.c:250) 
-> [ 221.529743][ T7133] ? rcu_note_context_switch (kernel/rcu/tree_plugin.h:320 (discriminator 11)) 
-> [ 221.530784][ T7133] __schedule (arch/x86/include/asm/preempt.h:80 (discriminator 3) kernel/sched/core.c:556 (discriminator 3) kernel/sched/sched.h:1372 (discriminator 3) kernel/sched/sched.h:1681 (discriminator 3) kernel/sched/core.c:6612 (discriminator 3)) 
-> [ 221.531573][ T7133] ? exit_to_user_mode_prepare (kernel/entry/common.c:158 kernel/entry/common.c:204) 
-> [ 221.532627][ T7133] schedule (arch/x86/include/asm/preempt.h:85 (discriminator 1) kernel/sched/core.c:6772 (discriminator 1)) 
-> [ 221.533358][ T7133] exit_to_user_mode_prepare (kernel/entry/common.c:161 kernel/entry/common.c:204) 
-> [ 221.534382][ T7133] ? sysvec_reboot (arch/x86/kernel/smp.c:269) 
-> [ 221.535255][ T7133] irqentry_exit_to_user_mode (kernel/entry/common.c:130 kernel/entry/common.c:311) 
-> [ 221.536302][ T7133] irqentry_exit (kernel/entry/common.c:445) 
-> [ 221.537101][ T7133] sysvec_reschedule_ipi (arch/x86/kernel/smp.c:269) 
-> [ 221.538079][ T7133] handle_exception (arch/x86/entry/entry_32.S:1056) 
-> [  221.538990][ T7133] EIP: 0xb7f59579
-> [ 221.539674][ T7133] Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d 76 00 58 b8 77 00 00 00 cd 80 90 8d 76
-> All code
-> ========
->    0:	b8 01 10 06 03       	mov    $0x3061001,%eax
->    5:	74 b4                	je     0xffffffffffffffbb
->    7:	01 10                	add    %edx,(%rax)
->    9:	07                   	(bad)
->    a:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
->    e:	10 08                	adc    %cl,(%rax)
->   10:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
-> 	...
->   20:	00 51 52             	add    %dl,0x52(%rcx)
->   23:	55                   	push   %rbp
->   24:*	89 e5                	mov    %esp,%ebp		<-- trapping instruction
->   26:	0f 34                	sysenter
->   28:	cd 80                	int    $0x80
->   2a:	5d                   	pop    %rbp
->   2b:	5a                   	pop    %rdx
->   2c:	59                   	pop    %rcx
->   2d:	c3                   	ret
->   2e:	90                   	nop
->   2f:	90                   	nop
->   30:	90                   	nop
->   31:	90                   	nop
->   32:	8d 76 00             	lea    0x0(%rsi),%esi
->   35:	58                   	pop    %rax
->   36:	b8 77 00 00 00       	mov    $0x77,%eax
->   3b:	cd 80                	int    $0x80
->   3d:	90                   	nop
->   3e:	8d                   	.byte 0x8d
->   3f:	76                   	.byte 0x76
-> 
-> Code starting with the faulting instruction
-> ===========================================
->    0:	5d                   	pop    %rbp
->    1:	5a                   	pop    %rdx
->    2:	59                   	pop    %rcx
->    3:	c3                   	ret
->    4:	90                   	nop
->    5:	90                   	nop
->    6:	90                   	nop
->    7:	90                   	nop
->    8:	8d 76 00             	lea    0x0(%rsi),%esi
->    b:	58                   	pop    %rax
->    c:	b8 77 00 00 00       	mov    $0x77,%eax
->   11:	cd 80                	int    $0x80
->   13:	90                   	nop
->   14:	8d                   	.byte 0x8d
->   15:	76                   	.byte 0x76
-> [  221.543249][ T7133] EAX: ffffff91 EBX: 00000137 ECX: bfc205fc EDX: b7f59579
-> [  221.544585][ T7133] ESI: 000000b1 EDI: 8b8b8b8b EBP: 08080808 ESP: bfc205fc
-> [  221.545872][ T7133] DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b EFLAGS: 00000296
-> [ 221.547230][ T7133] ? sysvec_reboot (arch/x86/kernel/smp.c:269) 
-> [  221.548133][ T7133] irq event stamp: 10576
-> [ 221.548909][ T7133] hardirqs last enabled at (10575): _raw_spin_unlock_irq (arch/x86/include/asm/irqflags.h:42 arch/x86/include/asm/irqflags.h:77 include/linux/spinlock_api_smp.h:159 kernel/locking/spinlock.c:202) 
-> [ 221.550576][ T7133] hardirqs last disabled at (10576): exit_to_user_mode_prepare (include/linux/entry-common.h:191 kernel/entry/common.c:181 kernel/entry/common.c:204) 
-> [ 221.552434][ T7133] softirqs last enabled at (10570): release_sock (net/core/sock.c:3528) 
-> [ 221.553958][ T7133] softirqs last disabled at (10568): release_sock (net/core/sock.c:3517) 
-> [  221.555538][ T7133] ---[ end trace 0000000000000000 ]---
-> 
-> 
-> The kernel config and materials to reproduce are available at:
-> https://download.01.org/0day-ci/archive/20231017/202310171606.30e15ebe-oliver.sang@intel.com
-> 
-> 
-> 
+--0000000000000c5da20607f1fbdb
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Thanks,
-             Dmitry
-
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAUP7dK8MqedE8lw
+pyFKPsijeXOpTVXNzeisCLnlHdHoMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMTAxNzIzMzU0MFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDx2Pt8X9l1DQBgD6ONxkHXaCx3EcQdUUSq
+1ZqeVUFKY1Dkcg3AFJGjQxisfFCbKgwky9cNPNmYmJ4zT0nVocRLaCZnpy2fxQUHILniQrUo/o1G
+5WIx+TYV5ZPPNU45T/y/NolN7Bk0bZgy68y5LpLWgARk3wGFx235W1m1Wuzw0JZs0kQxUgu5rcK0
+Uc6nqvQyKpnP4iu52WLrmE3ZI+uLcEa7+zZ6n4PFmGPQ98tRfYq6kyEvXQ616GcBEEVFRu/VIV3h
+sJbF59BoHd5UIYYD825nv+r34LzvkIZzI1I9JRCUUfgnhUuxTSjjxhDICqPTqJT/w+sNMMKW8k86
+EPF5
+--0000000000000c5da20607f1fbdb--
 
