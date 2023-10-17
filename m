@@ -1,271 +1,128 @@
-Return-Path: <netdev+bounces-42065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3792D7CD0D9
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:35:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5C77CD0F8
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC6C8281004
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 23:35:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75864B21016
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 23:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17841335A7;
-	Tue, 17 Oct 2023 23:35:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hR+Q5iHc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E75F2F53E;
+	Tue, 17 Oct 2023 23:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C87335A3
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 23:35:47 +0000 (UTC)
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5959CF5
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:35:45 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c9b1e3a809so41731485ad.2
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:35:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1697585744; x=1698190544; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gEAsTdpug6RwvoGYi45t+3hSkLkRBnYtnzd2KfZTxgg=;
-        b=hR+Q5iHcsoRc98CWCMN2CNBU2i8imN0zo4XHwpGNrP2/Wv+kck247j4k6nAt98gS1p
-         i5kDlGrBr43dnk0b0kBA0iHRZ3d5kmyt98ZaYV5Dor8yh/FuTLy99X5uAa3Qf5nCwk4a
-         nW2sbQQEf2X0QExK7U8ISBtTjNVW0E+z3vi88=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697585744; x=1698190544;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gEAsTdpug6RwvoGYi45t+3hSkLkRBnYtnzd2KfZTxgg=;
-        b=bOtyW8GByBcau6stSBS+RIew5SvdR5N/5Aa601p9xUpGGIdJ3GomoodIJaNrkdneRb
-         4LOzfM/XagddbT6DC2uq6QG3ZVaYn7LxEPNwaMuFuELFbtevJCWjnKnr0Z8B0Ff/cUjE
-         7m3Ctvyv7mt1Hq2q5JYtC+bIo0OvtITSWVUMw+pDc7GqONhf1HvCwIV5HN7ODjjHdICH
-         +DF3VW0Jith97oxTxa4THz4cVjUtBfJtyoam7DrNWrZwQqTOquYTEwmwp1qBBKpEsqxu
-         0s9VpDuM7sjY4w2JkzsvpsfWIdoPg7oBGAkCLq1bciYNbiDvE8dXdyyfhT4G/O9Tr3OG
-         htOQ==
-X-Gm-Message-State: AOJu0YyDzfAfETu9199uoM7Pd3y1P8JGyo9vOd+QXun1UPJtksWotjac
-	9xNWk2GJpxKD4aJPf325QfHgQambML/C3yLJbNPoEjcx+UHp+W++DFeMBwG2wGlQLuHjelGV55E
-	fkBljD8//zsf+P+SELgoarg4C+jr+GHEl1H/W20NB3Flt1zmApxhja9eGEspS6Rka8FI9idGwkM
-	Ij33Z/b3QooQ==
-X-Google-Smtp-Source: AGHT+IGqJJEies6TlvM0faqQow6M/BsIPoxPmS8m45I5Lxt490jZrkvMrro1g+2sQPDbuKDhldxGOA==
-X-Received: by 2002:a17:903:1103:b0:1c9:c968:4ce with SMTP id n3-20020a170903110300b001c9c96804cemr4697436plh.33.1697585744382;
-        Tue, 17 Oct 2023 16:35:44 -0700 (PDT)
-Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id g14-20020a1709029f8e00b001bc18e579aesm2139458plq.101.2023.10.17.16.35.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Oct 2023 16:35:43 -0700 (PDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CC82E3ED
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 23:41:50 +0000 (UTC)
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE13610B
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:41:47 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mx.ewheeler.net (Postfix) with ESMTP id 5DC7385
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:41:46 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id ouw2Sn3sE6pS for <netdev@vger.kernel.org>;
+	Tue, 17 Oct 2023 16:41:42 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx.ewheeler.net (Postfix) with ESMTPSA id E574C45
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:41:41 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net E574C45
+Date: Tue, 17 Oct 2023 16:41:41 -0700 (PDT)
+From: Eric Wheeler <netdev@lists.ewheeler.net>
 To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	linux-kernel@vger.kernel.org (open list:ARM/Mediatek SoC support),
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/Mediatek SoC support)
-Subject: [PATCH net-next v5 2/2] net: dsa: Rename IFLA_DSA_MASTER to IFLA_DSA_CONDUIT
-Date: Tue, 17 Oct 2023 16:35:36 -0700
-Message-Id: <20231017233536.426704-3-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231017233536.426704-1-florian.fainelli@broadcom.com>
-References: <20231017233536.426704-1-florian.fainelli@broadcom.com>
+Subject: BUG: looking up invalid subclass: 8
+Message-ID: <cea84b66-2ad5-76af-3feb-418b78cdd87@ewheeler.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000004c1ee50607f1fbd3"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000004c1ee50607f1fbd3
-Content-Transfer-Encoding: 8bit
+Hello all:
 
-This preserves the existing IFLA_DSA_MASTER which is part of the uAPI
-and creates an alias named IFLA_DSA_CONDUIT.
+We are running Linux 6.5.7 and are getting the following trace in dmesg.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- Documentation/networking/dsa/configuration.rst |  4 ++--
- include/uapi/linux/if_link.h                   |  4 +++-
- net/dsa/netlink.c                              | 10 +++++-----
- 3 files changed, 10 insertions(+), 8 deletions(-)
+I found a similar backtrace that was fixed in
+3510c7aa069aa83a2de6dab2b41401a198317bdc .  It was for ALSA, but had the
+same BUG of "looking up invalid subclass: 8" and the fix was trivial,
+noting that MAX_HOPS shouldn't be bigger than MAX_LOCKDEP_SUBCLASSES.
 
-diff --git a/Documentation/networking/dsa/configuration.rst b/Documentation/networking/dsa/configuration.rst
-index e6c9719874b0..6cc4ded3cc23 100644
---- a/Documentation/networking/dsa/configuration.rst
-+++ b/Documentation/networking/dsa/configuration.rst
-@@ -393,7 +393,7 @@ description which has an ``ethernet`` property. It is up to the user to
- configure the system for the switch to use other conduits.
- 
- DSA uses the ``rtnl_link_ops`` mechanism (with a "dsa" ``kind``) to allow
--changing the DSA conduit of a user port. The ``IFLA_DSA_MASTER`` u32 netlink
-+changing the DSA conduit of a user port. The ``IFLA_DSA_CONDUIT`` u32 netlink
- attribute contains the ifindex of the conduit device that handles each user
- device. The DSA conduit must be a valid candidate based on firmware node
- information, or a LAG interface which contains only slaves which are valid
-@@ -435,7 +435,7 @@ Using iproute2, the following manipulations are possible:
-         dsa master bond0
- 
- Notice that in the case of CPU ports under a LAG, the use of the
--``IFLA_DSA_MASTER`` netlink attribute is not strictly needed, but rather, DSA
-+``IFLA_DSA_CONDUIT`` netlink attribute is not strictly needed, but rather, DSA
- reacts to the ``IFLA_MASTER`` attribute change of its present conduit (``eth0``)
- and migrates all user ports to the new upper of ``eth0``, ``bond0``. Similarly,
- when ``bond0`` is destroyed using ``RTM_DELLINK``, DSA migrates the user ports
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index fac351a93aed..30ef80aff033 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1392,7 +1392,9 @@ enum {
- 
- enum {
- 	IFLA_DSA_UNSPEC,
--	IFLA_DSA_MASTER,
-+	IFLA_DSA_CONDUIT,
-+	/* Deprecated, use IFLA_DSA_CONDUIT insted */
-+	IFLA_DSA_MASTER = IFLA_DSA_CONDUIT,
- 	__IFLA_DSA_MAX,
- };
- 
-diff --git a/net/dsa/netlink.c b/net/dsa/netlink.c
-index f56f90a25b99..1332e56349e5 100644
---- a/net/dsa/netlink.c
-+++ b/net/dsa/netlink.c
-@@ -8,7 +8,7 @@
- #include "user.h"
- 
- static const struct nla_policy dsa_policy[IFLA_DSA_MAX + 1] = {
--	[IFLA_DSA_MASTER]	= { .type = NLA_U32 },
-+	[IFLA_DSA_CONDUIT]	= { .type = NLA_U32 },
- };
- 
- static int dsa_changelink(struct net_device *dev, struct nlattr *tb[],
-@@ -20,8 +20,8 @@ static int dsa_changelink(struct net_device *dev, struct nlattr *tb[],
- 	if (!data)
- 		return 0;
- 
--	if (data[IFLA_DSA_MASTER]) {
--		u32 ifindex = nla_get_u32(data[IFLA_DSA_MASTER]);
-+	if (data[IFLA_DSA_CONDUIT]) {
-+		u32 ifindex = nla_get_u32(data[IFLA_DSA_CONDUIT]);
- 		struct net_device *conduit;
- 
- 		conduit = __dev_get_by_index(dev_net(dev), ifindex);
-@@ -38,7 +38,7 @@ static int dsa_changelink(struct net_device *dev, struct nlattr *tb[],
- 
- static size_t dsa_get_size(const struct net_device *dev)
- {
--	return nla_total_size(sizeof(u32)) +	/* IFLA_DSA_MASTER  */
-+	return nla_total_size(sizeof(u32)) +	/* IFLA_DSA_CONDUIT  */
- 	       0;
- }
- 
-@@ -46,7 +46,7 @@ static int dsa_fill_info(struct sk_buff *skb, const struct net_device *dev)
- {
- 	struct net_device *conduit = dsa_user_to_conduit(dev);
- 
--	if (nla_put_u32(skb, IFLA_DSA_MASTER, conduit->ifindex))
-+	if (nla_put_u32(skb, IFLA_DSA_CONDUIT, conduit->ifindex))
- 		return -EMSGSIZE;
- 
- 	return 0;
--- 
-2.34.1
+Is there a simple fix for this in netlink, too?
+
+]# ./scripts/decode_stacktrace.sh vmlinux `pwd` < stackdump.txt 
+[  113.347055] BUG: looking up invalid subclass: 8
+[  113.357387] turning off the locking correctness validator.
+[  113.364842] Hardware name: Supermicro Super Server/H11SSL-i, BIOS 2.4 12/27/2021
+[  113.373614] Call Trace:
+[  113.381874]  <TASK>
+[  113.382556] dump_stack_lvl (lib/dump_stack.c:108) 
+[  113.388816] look_up_lock_class (kernel/locking/lockdep.c:941) 
+[  113.399562] register_lock_class (kernel/locking/lockdep.c:1284 (discriminator 13)) 
+[  113.400238] ? srso_return_thunk (arch/x86/lib/retpoline.S:308) 
+[  113.403627] __lock_acquire (kernel/locking/lockdep.c:5014) 
+[  113.414652] lock_acquire.part.0 (kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5755) 
+[  113.428619] ? srso_return_thunk (arch/x86/lib/retpoline.S:308) 
+[  113.435463] ? lock_acquire (./include/trace/events/lock.h:24 kernel/locking/lockdep.c:5724) 
+[  113.440620] _raw_spin_lock_nested (kernel/locking/spinlock.c:379) 
+[  113.462749] ? __nla_validate_parse (lib/nlattr.c:606) 
+[  113.471052] genl_family_rcv_msg_doit.isra.0 (net/netlink/genetlink.c:970) 
+[  113.471651] genl_family_rcv_msg (net/netlink/genetlink.c:1050) 
+[  113.483623] genl_rcv_msg (net/netlink/genetlink.c:1069) 
+[  113.489055] ? __pfx_genl_rcv_msg (net/netlink/genetlink.c:1056) 
+[  113.489623] netlink_rcv_skb (net/netlink/af_netlink.c:2519) 
+[  113.492711] genl_rcv (net/netlink/genetlink.c:1079) 
+[  113.502610] netlink_unicast (net/netlink/af_netlink.c:1338 net/netlink/af_netlink.c:1363) 
+[  113.506927] netlink_sendmsg (net/netlink/af_netlink.c:1885) 
+[  113.507486] sock_write_iter (net/socket.c:725 net/socket.c:740 net/socket.c:1147) 
+[  113.510657] vfs_write (./include/linux/fs.h:1877 fs/read_write.c:491 fs/read_write.c:584) 
+[  113.519624] ksys_write (fs/read_write.c:637) 
+[  113.524713] do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80) 
+[  113.525233] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120) 
+[  113.526621] RIP: 0033:0x7f41c473e987
+[ 113.535618] Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85
+
+Code starting with the faulting instruction
+===========================================
+   0:	0b 00                	or     (%rax),%eax
+   2:	f7 d8                	neg    %eax
+   4:	64 89 02             	mov    %eax,%fs:(%rdx)
+   7:	48 c7 c0 ff ff ff ff 	mov    $0xffffffffffffffff,%rax
+   e:	eb b7                	jmp    0xffffffffffffffc7
+  10:	0f 1f 00             	nopl   (%rax)
+  13:	f3 0f 1e fa          	endbr64 
+  17:	64 8b 04 25 18 00 00 	mov    %fs:0x18,%eax
+  1e:	00 
+  1f:	85                   	.byte 0x85
+c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+[  113.543013] RSP: 002b:00007ffe80a28648 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+[  113.543627] RAX: ffffffffffffffda RBX: 00000000000000c8 RCX: 00007f41c473e987
+[  113.552607] RDX: 00000000000000c8 RSI: 000055be8e4f7320 RDI: 0000000000000004
+[  113.560243] RBP: 000055be8e4f7320 R08: 0000000000000000 R09: 0000000000000000
+[  113.560803] R10: 0000000000001000 R11: 0000000000000246 R12: 00000000000000c8
+[  113.561353] R13: 0000000000000004 R14: 00007ffe80a28970 R15: 000055be8d383848
+[  113.569626]  </TASK>
 
 
---0000000000004c1ee50607f1fbd3
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFDQn+HkNnknDVxI
-h7m9r5wIzN9t/1NuEoVIFBV5SJ3WMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTAxNzIzMzU0NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCQ0cTUn+s3aluSaRQ0a2Tj1TA1S72HxGnd
-n35xp9/i/f0HkcrSuuFx6vdCEpWR0OOONm5YBS5qpx7d42RT2UCxmamQF8UOL/XguJ7z/BtcJ7LV
-jPyujrtrte1lfGeAGSv5r7Onrnlg8/xm/nR0A3igPgfGY+hF+kwW3ZVR7rPtaoXTwH39sjfR7dSJ
-IhO4386iz/Lxv/bx8dI6+/eo0xaK0uMUeb6UDPvuuXlvq228dnzPMpU3IJssPjguWaDLydpPScn/
-210/apBUyBrdoS5vW740yLAvSl7FKYYti5RMTwyZQ7R4d0jXrywRh2+ZGK4atGa7kKW2vN/5SIRd
-23xW
---0000000000004c1ee50607f1fbd3--
+
+
+
+--
+Eric Wheeler
 
