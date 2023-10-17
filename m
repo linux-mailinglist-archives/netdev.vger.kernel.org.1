@@ -1,85 +1,87 @@
-Return-Path: <netdev+bounces-41993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 682997CC8F5
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:37:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A6317CC8F7
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 18:37:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FFE92825EF
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:37:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BA8C1C20C3C
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2112D031;
-	Tue, 17 Oct 2023 16:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72B42D031;
+	Tue, 17 Oct 2023 16:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FYaDMQhB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ilVCBkDi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A422D02C;
-	Tue, 17 Oct 2023 16:37:20 +0000 (UTC)
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7077CA4;
-	Tue, 17 Oct 2023 09:37:19 -0700 (PDT)
-Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-66d00415a92so7395566d6.1;
-        Tue, 17 Oct 2023 09:37:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9052D034
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 16:37:45 +0000 (UTC)
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E7094;
+	Tue, 17 Oct 2023 09:37:44 -0700 (PDT)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-5a7dd65052aso80331317b3.0;
+        Tue, 17 Oct 2023 09:37:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697560638; x=1698165438; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Acry/SkmOO+//pdMk3iso04YDCLFfseKjRwabK+zSS0=;
-        b=FYaDMQhBsKqBA4vba4gzub1lsifF/31WU0nSSOlSmMvP6Oi2bgPyN0BLXkC6eKbIHB
-         LiYyc2vjDMVQA46woiioannsrEJxsYj8h/6rZXyjBbsQ87YHsIZ1dvHghfIw80ICAHso
-         CFmaFgQ0h9kBmqMEAFlT3U7kcNGzMH9oGaVMMAL5JN0q7APVVlX9CgTsOA95jpP15qz3
-         NNdzuLkPWubURUM0s/p3rR3M6froky3LVc66V8wBd24h1sZqEsgSke1ETpnr0tj9Trzi
-         N1HZ2feBDf+MLw1hCfCiLdnvCIOaxKqI45WtGpWd+/N4ZvKKEoR6WqVhfvkG7muTIhl7
-         7Rig==
+        d=gmail.com; s=20230601; t=1697560663; x=1698165463; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NorG2GdjjtD2Uger6OsxVjsTdk016IzEJmN5x8jpF9Y=;
+        b=ilVCBkDi1rKOTMw0afudl7pmlP9AWEHwx8IsI6285FpgqYLpvmf+MJnUf7OrNS2cea
+         DJulZrWaeVAwm88eeqaDFj405bTAePJ6GWODoYxwqCb9y7c6GCMOAfDrvGzIcrvb8ab8
+         t+0o5Un/UHKJja8S4wb8DoMQ+l2S2d/9lnoqiEMC5NVs95PoAMQq+MWcf2c+gS8r4g6E
+         FlSKyuzmcHuOHZcOiPJC3HVBxbD7PslJTBZCckN6sVN5vWpxUzXjka3k2hGr6D5inmvJ
+         JIKcqslIbT1BvGaFQgzvYC8nfLIAG1itXkV5hyRaLtbRtXssxQ+6HImKhkneK96pqVxb
+         9/MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697560638; x=1698165438;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Acry/SkmOO+//pdMk3iso04YDCLFfseKjRwabK+zSS0=;
-        b=hGhMP9uFckZdWks9/UhriyNN1JVTFybWzFFN1boPoU5rqaLzRfx58YY8G8RMjNR821
-         jfT6MrJnrNpkjFnnl0vzATsdop4SXk7K5PqDyyJvRK3xwgXkIXTaXjB3d8b+zmZhBV0j
-         ixeSwlrLFHjAnUMsgEqNJhRTrBPngSphLqXWcNVLrOp1+U4G22RytThoN8d6Gf4slDpZ
-         RXx2v1VH3cX8wGHzicO/Gd8jivZ8IMryFOW20JHptqJeJuoGC5tVbNAJBdCgQ/hvSVwL
-         KRvBGcHIqZ9qACQirpnaz2GoOYz8A5S6p4y+VAATKO7MszEcNWyZBSGTArrtd7JiX4+l
-         qyvA==
-X-Gm-Message-State: AOJu0Yz3k/Wh4pcOHODNgkVefpbNiXUT4n8yEoIBi+SeTZdwU0dV90jh
-	Nw/i8cYG7PqQk1lNOEJYN7U1b+RXYkmB8PfZG5c=
-X-Google-Smtp-Source: AGHT+IGTat1ho+DMJZVtLhYHIBuyyy4aKRP3WdLAkSBcaTTNmTkoRlB1b+S0RfQSQd4IZ+QGS6+4PwHvfyk+vVrRMwY=
-X-Received: by 2002:a05:6214:4402:b0:66d:169a:a661 with SMTP id
- oj2-20020a056214440200b0066d169aa661mr2949294qvb.4.1697560638502; Tue, 17 Oct
- 2023 09:37:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697560663; x=1698165463;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NorG2GdjjtD2Uger6OsxVjsTdk016IzEJmN5x8jpF9Y=;
+        b=R+6uxJ2oDiw4F6Z/sw/HXPX9f0vWuhnT6IduBNzxEQw2V+pXSykuBx8qpKqweqlSag
+         h9JdFvPuABmkNSfDcaXCUI5SbH63IFlpD/Lrgkl+jiOZzldX/QMhtnu9OS5X75nilASA
+         OtMASHezSRsR975y3GLrkbR7hXPB3wjHgsiARBSvWqcDAOp5cNfcuTrxwCXnvVw7FVPo
+         44JJuTse/J/q0BoaAR5DuKDxWsIxuBbSy3Y0SPn8wMNJmdmPgljHMIdo7xIpORix3KxZ
+         DEYxpxSIgkKqEXd63Lkif3h/OKtMT/p8AHLSGFDAHfF0HSeVWStfVqj4TnWekkHr10z7
+         /bEA==
+X-Gm-Message-State: AOJu0YyvoMITePlUfYksvaN1sQ6WDOULFkb5BKzBqcx8/TF2XBzMbw2U
+	yscOur09CV7pa50TlJ5l3tk=
+X-Google-Smtp-Source: AGHT+IH2OujYG+98LT+C23FwlzuIWsB/3pXU3kwRMxVMkJdNtpaU+rBEGUrl/uqZR1ghWbY7OQmSIQ==
+X-Received: by 2002:a05:690c:f0f:b0:59b:5170:a0f3 with SMTP id dc15-20020a05690c0f0f00b0059b5170a0f3mr3919565ywb.36.1697560663545;
+        Tue, 17 Oct 2023 09:37:43 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id t6-20020a05620a450600b0077772296f9dsm787953qkp.126.2023.10.17.09.37.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 09:37:42 -0700 (PDT)
+Message-ID: <60787e41-e137-43d7-8fd0-59818cfbb536@gmail.com>
+Date: Tue, 17 Oct 2023 09:37:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231012170524.21085-1-larysa.zaremba@intel.com>
- <20231012170524.21085-8-larysa.zaremba@intel.com> <ZS6yqqMZD1mojQNr@boxer>
-In-Reply-To: <ZS6yqqMZD1mojQNr@boxer>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Tue, 17 Oct 2023 18:37:07 +0200
-Message-ID: <CAJ8uoz3Bqtb-F1bpKWKx8bhftJW7g1BEyjxnQZprRv4NxsXi9Q@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v6 07/18] ice: Support XDP hints in AF_XDP ZC mode
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>, bpf@vger.kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
-	David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Anatoly Burakov <anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>, 
-	Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net, netdev@vger.kernel.org, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>, 
-	Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>, magnus.karlsson@intel.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net] net: mdio-mux: fix C45 access returning -EIO after
+ API change
+Content-Language: en-US
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Michael Walle <michael@walle.cc>, linux-kernel@vger.kernel.org
+References: <20231017143144.3212657-1-vladimir.oltean@nxp.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20231017143144.3212657-1-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -87,111 +89,24 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 17 Oct 2023 at 18:13, Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> On Thu, Oct 12, 2023 at 07:05:13PM +0200, Larysa Zaremba wrote:
-> > In AF_XDP ZC, xdp_buff is not stored on ring,
-> > instead it is provided by xsk_buff_pool.
-> > Space for metadata sources right after such buffers was already reserved
-> > in commit 94ecc5ca4dbf ("xsk: Add cb area to struct xdp_buff_xsk").
-> > This makes the implementation rather straightforward.
-> >
-> > Update AF_XDP ZC packet processing to support XDP hints.
-> >
-> > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> > ---
-> >  drivers/net/ethernet/intel/ice/ice_xsk.c | 34 ++++++++++++++++++++++--
-> >  1 file changed, 32 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
-> > index ef778b8e6d1b..6ca620b2fbdd 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_xsk.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
-> > @@ -752,22 +752,51 @@ static int ice_xmit_xdp_tx_zc(struct xdp_buff *xdp,
-> >       return ICE_XDP_CONSUMED;
-> >  }
-> >
-> > +/**
-> > + * ice_prepare_pkt_ctx_zc - Prepare packet context for XDP hints
-> > + * @xdp: xdp_buff used as input to the XDP program
-> > + * @eop_desc: End of packet descriptor
-> > + * @rx_ring: Rx ring with packet context
-> > + *
-> > + * In regular XDP, xdp_buff is placed inside the ring structure,
-> > + * just before the packet context, so the latter can be accessed
-> > + * with xdp_buff address only at all times, but in ZC mode,
-> > + * xdp_buffs come from the pool, so we need to reinitialize
-> > + * context for every packet.
-> > + *
-> > + * We can safely convert xdp_buff_xsk to ice_xdp_buff,
-> > + * because there are XSK_PRIV_MAX bytes reserved in xdp_buff_xsk
-> > + * right after xdp_buff, for our private use.
-> > + * XSK_CHECK_PRIV_TYPE() ensures we do not go above the limit.
-> > + */
-> > +static void ice_prepare_pkt_ctx_zc(struct xdp_buff *xdp,
-> > +                                union ice_32b_rx_flex_desc *eop_desc,
-> > +                                struct ice_rx_ring *rx_ring)
-> > +{
-> > +     XSK_CHECK_PRIV_TYPE(struct ice_xdp_buff);
-> > +     ((struct ice_xdp_buff *)xdp)->pkt_ctx = rx_ring->pkt_ctx;
->
-> I will be loud thinking over here, but this could be set in
-> ice_fill_rx_descs(), while grabbing xdp_buffs from xsk_pool, should
-> minimize the performance overhead.
->
-> But then again you address that with static branch in later patch.
->
-> OTOH, I was thinking that we could come with xsk_buff_pool API that would
-> let drivers assign this at setup time. Similar what is being done with dma
-> mappings.
->
-> Magnus, do you think it is worth the hassle? Thoughts?
+On 10/17/23 07:31, Vladimir Oltean wrote:
+> The mii_bus API conversion to read_c45() and write_c45() did not cover
+> the mdio-mux driver before read() and write() were made C22-only.
+> 
+> This broke arch/arm64/boot/dts/freescale/fsl-ls1028a-qds-13bb.dtso.
+> The -EOPNOTSUPP from mdiobus_c45_read() is transformed by
+> get_phy_c45_devs_in_pkg() into -EIO, is further propagated to
+> of_mdiobus_register() and this makes the mdio-mux driver fail to probe
+> the entire child buses, not just the PHYs that cause access errors.
+> 
+> Fix the regression by introducing special c45 read and write accessors
+> to mdio-mux which forward the operation to the parent MDIO bus.
+> 
+> Fixes: db1a63aed89c ("net: phy: Remove fallback to old C45 method")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-I would measure the overhead of the current assignment and if it is
-significant (incurs a cache miss for example), then why not try out
-your idea. Usually good not to have to touch things when not needed.
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
-> Or should we advise any other driver that support hints to mimic static
-> branch solution?
->
-> > +     ice_xdp_meta_set_desc(xdp, eop_desc);
-> > +}
-> > +
-> >  /**
-> >   * ice_run_xdp_zc - Executes an XDP program in zero-copy path
-> >   * @rx_ring: Rx ring
-> >   * @xdp: xdp_buff used as input to the XDP program
-> >   * @xdp_prog: XDP program to run
-> >   * @xdp_ring: ring to be used for XDP_TX action
-> > + * @rx_desc: packet descriptor
-> >   *
-> >   * Returns any of ICE_XDP_{PASS, CONSUMED, TX, REDIR}
-> >   */
-> >  static int
-> >  ice_run_xdp_zc(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
-> > -            struct bpf_prog *xdp_prog, struct ice_tx_ring *xdp_ring)
-> > +            struct bpf_prog *xdp_prog, struct ice_tx_ring *xdp_ring,
-> > +            union ice_32b_rx_flex_desc *rx_desc)
-> >  {
-> >       int err, result = ICE_XDP_PASS;
-> >       u32 act;
-> >
-> > +     ice_prepare_pkt_ctx_zc(xdp, rx_desc, rx_ring);
-> >       act = bpf_prog_run_xdp(xdp_prog, xdp);
-> >
-> >       if (likely(act == XDP_REDIRECT)) {
-> > @@ -907,7 +936,8 @@ int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget)
-> >               if (ice_is_non_eop(rx_ring, rx_desc))
-> >                       continue;
-> >
-> > -             xdp_res = ice_run_xdp_zc(rx_ring, first, xdp_prog, xdp_ring);
-> > +             xdp_res = ice_run_xdp_zc(rx_ring, first, xdp_prog, xdp_ring,
-> > +                                      rx_desc);
-> >               if (likely(xdp_res & (ICE_XDP_TX | ICE_XDP_REDIR))) {
-> >                       xdp_xmit |= xdp_res;
-> >               } else if (xdp_res == ICE_XDP_EXIT) {
-> > --
-> > 2.41.0
-> >
 
