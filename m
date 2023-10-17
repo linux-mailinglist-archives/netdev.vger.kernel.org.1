@@ -1,86 +1,121 @@
-Return-Path: <netdev+bounces-41635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C0F7CB7FB
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 03:31:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B5F47CB809
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 03:36:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1074E281410
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 01:31:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1423281412
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 01:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8612C17D8;
-	Tue, 17 Oct 2023 01:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18EAE17D8;
+	Tue, 17 Oct 2023 01:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWRuXWUw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="szqc4imp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E28C15DA
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 01:31:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 236D7C433C8;
-	Tue, 17 Oct 2023 01:31:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697506299;
-	bh=UR60mYADl5EHC1NoZ4GrAkpMSCrV5ZQb/hfA25cXCI8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hWRuXWUwoKb/yom/A7F87AKYH4syC/l67lawzuKkTbxqZmoiVCVa/B0FON5NvEcGb
-	 1mCXphpQRUs/J/qR0vXPq6E/6//hvzzUG52ZwQclfbnSlVj3jO6O1YXT9FXBrP4PQe
-	 EImgT2p0map18oRROeMmWTmGOWqNgG4hMl2bATEvipIs8JRFjGMVFsmJEJE6jamAJP
-	 zqP0jxpL9TKeyosrdyND0b3O/sePyDxv4tZg08LMSbywgW9JMuYm1cVng7A+9dD+b9
-	 V99yj12zz6JxUcynopuGHEKfTWNhQgSzOTVl13itv1bBAQaCUW3U3sGFhrzH3HZWX2
-	 iGzyxh5daMIVQ==
-Date: Mon, 16 Oct 2023 18:31:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
- <liangchen.linux@gmail.com>, Guillaume Tucker
- <guillaume.tucker@collabora.com>, Matthew Wilcox <willy@infradead.org>,
- Linux-MM <linux-mm@kvack.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet
- <edumazet@google.com>
-Subject: Re: [PATCH net-next v11 1/6] page_pool: fragment API support for
- 32-bit arch with 64-bit DMA
-Message-ID: <20231016183138.2c4366a7@kernel.org>
-In-Reply-To: <20231013064827.61135-2-linyunsheng@huawei.com>
-References: <20231013064827.61135-1-linyunsheng@huawei.com>
-	<20231013064827.61135-2-linyunsheng@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B815215DA;
+	Tue, 17 Oct 2023 01:36:20 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA9FA2;
+	Mon, 16 Oct 2023 18:36:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=PdmCK+QKhB4J65trAM73Xd6W0JFw+BGZhKeUw6mvorg=; b=szqc4imp7+Ln1Gn6z8hPn9agRW
+	L6hW29IERHrs1GYLIQ0pre21at26HTGXenCxq4CSSXaiJOZc/EUKQZGuwWR6lLhk5OoyVEkrneGY/
+	tKFxVMrNdf7HqrEx8GbQ0VvNyBTYtjC7Nh6hwIiWx47g9vDKfJgC7TI96qq2FfQMSZ2c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qsZ07-002Q9Y-Tk; Tue, 17 Oct 2023 03:36:03 +0200
+Date: Tue, 17 Oct 2023 03:36:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v4 5/9] net: dsa: microchip: ksz9477: Add Wake
+ on Magic Packet support
+Message-ID: <c0403dc3-db3b-4167-8abb-d920299762e7@lunn.ch>
+References: <20231016141256.2011861-1-o.rempel@pengutronix.de>
+ <20231016141256.2011861-6-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016141256.2011861-6-o.rempel@pengutronix.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 13 Oct 2023 14:48:21 +0800 Yunsheng Lin wrote:
-> Currently page_pool_alloc_frag() is not supported in 32-bit
-> arch with 64-bit DMA because of the overlap issue between
-> pp_frag_count and dma_addr_upper in 'struct page' for those
-> arches, which seems to be quite common, see [1], which means
-> driver may need to handle it when using fragment API.
-> 
-> It is assumed that the combination of the above arch with an
-> address space >16TB does not exist, as all those arches have
-> 64b equivalent, it seems logical to use the 64b version for a
-> system with a large address space. It is also assumed that dma
-> address is page aligned when we are dma mapping a page aligned
-> buffer, see [2].
-> 
-> That means we're storing 12 bits of 0 at the lower end for a
-> dma address, we can reuse those bits for the above arches to
-> support 32b+12b, which is 16TB of memory.
-> 
-> If we make a wrong assumption, a warning is emitted so that
-> user can report to us.
+> @@ -155,6 +158,14 @@ int ksz9477_set_wol(struct ksz_device *dev, int port,
+>  	if (ret)
+>  		return ret;
+>  
+> +	if (wol->wolopts & WAKE_MAGIC) {
+> +		ret = ksz_switch_macaddr_get(dev->ds, port, NULL);
+> +		if (ret)
+> +			return ret;
+> +
+> +		pme_ctrl |= PME_WOL_MAGICPKT;
+> +	}
 
-Let me apply this one already, I think it should be uncontroversial
-from review perspective. And the more time it gets in linux-next
-the better..
+There is no matching ksz_switch_macaddr_put() here when the user turns
+WAKE_MAGIC off. Ideally you need to keep track of the WoL state per
+port, and when the user disables it, release the MAC address.
+
+> +
+>  	if (wol->wolopts & WAKE_PHY)
+>  		pme_ctrl |= PME_WOL_LINKUP | PME_WOL_ENERGY;
+>  
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index 3f7c86e545a7..4601aaca5179 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -3569,6 +3569,7 @@ static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
+>  				    const unsigned char *addr)
+>  {
+>  	struct dsa_port *dp = dsa_to_port(ds, port);
+> +	struct ethtool_wolinfo wol;
+>  
+>  	if (dp->hsr_dev) {
+>  		dev_err(ds->dev,
+> @@ -3577,6 +3578,14 @@ static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
+>  		return -EBUSY;
+>  	}
+>  
+> +	ksz_get_wol(ds, dp->index, &wol);
+> +	if (wol.wolopts & WAKE_MAGIC) {
+> +		dev_err(ds->dev,
+> +			"Cannot change MAC address on port %d with active Wake on Magic Packet\n",
+> +			port);
+
+This is not really an error, as in something went wrong. Its just a
+hardware restriction. So dev_warn() would be better, or nothing at all
+in the logs.
+
+   Andrew
 
