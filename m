@@ -1,222 +1,129 @@
-Return-Path: <netdev+bounces-41942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A0F77CC5C6
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:18:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57D367CC5D1
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 16:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1B26B21013
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:18:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 872311C20BE3
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 14:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75D143AA6;
-	Tue, 17 Oct 2023 14:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18D543AAF;
+	Tue, 17 Oct 2023 14:21:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bx00iSEX"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="sphavuOh"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC8843A84
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 14:18:24 +0000 (UTC)
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C968AFA;
-	Tue, 17 Oct 2023 07:18:22 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-d9b2ca542e5so4669867276.3;
-        Tue, 17 Oct 2023 07:18:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697552302; x=1698157102; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NI422ZwFC+FZy06/SEvrLc/oafnXORoAgmBSlqnJCBc=;
-        b=Bx00iSEXwiNeZqmkRDGxtzbT37p1q1OkyWBv+4hiWVqI0l+yUr/CghfwvqWIO0ci3D
-         71FJJXGuC+dfIhCMW6dkoYZ3/8s49654nVVnoYRcZ4pZcQg/vmdhnkYhxC6j3WSS4xwV
-         5eh/n+oYMqYBgwje7TAqwEq42xr6M/Zk5s0Xz3WEhaxxseBY5NaDF5G58F07t7roDGc9
-         bQrmjKeFNPF7VRK1+IYK/090cDkhdPFVPUEAsTewLHxsPjKXuK3zWvKVWm4ZiUtGdgIc
-         3asduiv+jVd2XO7QeRW0Exomrb8pEjNFTAVYFyuG7IW8qhEMErkmAnLc/XNIvayk4QdF
-         JxzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697552302; x=1698157102;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NI422ZwFC+FZy06/SEvrLc/oafnXORoAgmBSlqnJCBc=;
-        b=o/6WtuQ5sZRDx07V/lzwbGWAmvLMQRGxKK256jH+vy1MFMvViVDPYDOXWjgkO7geSj
-         AM+jMf/BxzmAJaPeFAVivxZdrncv03hUQkBaXbda63yUqP8jA6g2Wji7RuP/Sba2z3vZ
-         cw+gWROgLWRfEzR8apvNHCoi1V9QbIqhOzml8P9HXAfFSYGd6xztHsTc4UbSPnatAlhb
-         SnTHrhTf77e6Yye/2YeQmj66GPVWdZRW0TCT7Ykd8oNTMEGdDiNGVzQtoAx6gI0VdCrA
-         o1E1DfMcLtLnXPU8qBRHaMV+OSFUm+kK3scr0yGGp/3SXXU7zLgA+wxQLy+Y+BHh3qm3
-         CiCQ==
-X-Gm-Message-State: AOJu0Yzvhz54LrLc/hNjKynG1UEqxFs2lxP/Rj51AShwD+thAizv8P4A
-	z0XyHKv25pMRJPSjQQgZ7zZ9mvB4+dJTBoasHdk=
-X-Google-Smtp-Source: AGHT+IGV/cNOijgcyX6YbdaC3gix3tYgeDlyLmcozvJjGQPyfoC73JRgCPVyHX5pMQVaZ6seRvCciLzWohic8S0Q594=
-X-Received: by 2002:a25:e689:0:b0:d9b:df08:811d with SMTP id
- d131-20020a25e689000000b00d9bdf08811dmr2272203ybh.32.1697552301876; Tue, 17
- Oct 2023 07:18:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C3F43A84;
+	Tue, 17 Oct 2023 14:21:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B5F5C433C7;
+	Tue, 17 Oct 2023 14:21:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1697552514;
+	bh=S0cFMSsiptioecYbb5PIgsQ87Q6x7neETMASL7MH+pQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sphavuOhQS7yQjewzOpQOQIpDXM+vWNO7F0l2IlR0io0/I1VjP2VbccfCFjQ8PlXi
+	 ksQ2w4oxO/iHXhK1MymVZbMVPFiokpE2CYNWcJ97c7AG1BCg0vrL+Hmfw9huuEnoqP
+	 bPoVMdRgEPWV/KVkqi/oHYi+Ifg51eJbZyyiLI/0=
+Date: Tue, 17 Oct 2023 16:21:47 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
+	tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY
+ drivers
+Message-ID: <2023101756-procedure-uninvited-f6c9@gregkh>
+References: <3469de1c-0e6f-4fe5-9d93-2542f87ffd0d@proton.me>
+ <20231015.011502.276144165010584249.fujita.tomonori@gmail.com>
+ <9d70de37-c5ed-4776-a00f-76888e1230aa@proton.me>
+ <20231015.073929.156461103776360133.fujita.tomonori@gmail.com>
+ <98471d44-c267-4c80-ba54-82ab2563e465@proton.me>
+ <1454c3e6-82d1-4f60-b07d-bc3b47b23662@lunn.ch>
+ <f26a3e1a-7eb8-464e-9cbe-ebb8bdf69b20@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231012060115.107183-1-hayatake396@gmail.com> <20231016152343.1fc7c7be@kernel.org>
-In-Reply-To: <20231016152343.1fc7c7be@kernel.org>
-From: takeru hayasaka <hayatake396@gmail.com>
-Date: Tue, 17 Oct 2023 23:18:10 +0900
-Message-ID: <CADFiAcKOKiTXFXs-e=WotnQwhLB2ycbBovqS2YCk9hvK_RH2uQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] ethtool: ice: Support for RSS settings to GTP
- from ethtool
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Harald Welte <laforge@gnumonks.org>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, osmocom-net-gprs@lists.osmocom.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f26a3e1a-7eb8-464e-9cbe-ebb8bdf69b20@proton.me>
 
-Hi Jakub-san and Simon-san
-Thank you for reviewing again!
+On Tue, Oct 17, 2023 at 02:04:33PM +0000, Benno Lossin wrote:
+> On 17.10.23 14:38, Andrew Lunn wrote:
+> >>> Because set_speed() updates the member in phy_device and read()
+> >>> updates the object that phy_device points to?
+> >>
+> >> `set_speed` is entirely implemented on the Rust side and is not protected
+> >> by a lock.
+> > 
+> > With the current driver, all entry points into the driver are called
+> > from the phylib core, and the core guarantees that the lock is
+> > taken. So it should not matter if its entirely implemented in the Rust
+> > side, somewhere up the call stack, the lock was taken.
+> 
+> Sure that might be the case, I am trying to guard against this future
+> problem:
+> 
+>      fn soft_reset(driver: &mut Driver) -> Result {
+>          let driver = driver
+>          thread::scope(|s| {
+>              let thread_a = s.spawn(|| {
+>                  for _ in 0..100_000_000 {
+>                      driver.set_speed(10);
+>                  }
+>              });
+>              let thread_b = s.spawn(|| {
+>                  for _ in 0..100_000_000 {
+>                      driver.set_speed(10);
+>                  }
+>              });
+>              thread_a.join();
+>              thread_b.join();
+>          });
+>          Ok(())
+>      }
+> 
+> This code spawns two new threads both of which can call `set_speed`,
+> since it takes `&self`. But this leads to a data race, since those
+> accesses are not serialized. I know that this is a very contrived
+> example, but you never when this will become reality, so we should
+> do the right thing now and just use `&mut self`, since that is exactly
+> what it is for.
 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-Thanks;)
+Kernel code is written for the use cases today, don't worry about
+tomorrow, you can fix the issue tomorrow if you change something that
+requires it.
 
-> Adding Willem, Pablo, and Harald to CC (please CC them on future
-versions).
+And what "race" are you getting here?  You don't have threads in the
+kernel :)
 
-of course.  thanks!
+Also, if two things are setting the speed, wonderful, you get some sort
+of value eventually, you have much bigger problems in your code as you
+shouldn't have been doing that in the first place.
 
-> nit: please note that these are hex numbers,
-     next value after 0x19 is 0x1a, not 0x20.
+> Not that we do not even have a way to create threads on the Rust side
+> at the moment.
 
-!!!!! I'm so embarrassed.... I will next version fix
+Which is a good thing :)
 
-> What gives me pause here is the number of flow sub-types we define
-> for GTP hashing.
->
-> My understanding of GTP is limited to what I just read on Wikipedia.
->
-> IIUC the GTPC vs GTPU distinction comes down to the UDP port on
-> which the protocol runs? Are the frames also different?
->
-> I'm guessing UL/DL are uplink/downlink but what's EH?
->
-> How do GTPU_V4_FLOW, GTPU_EH_V4_FLOW, GTPU_UL_V4_FLOW, and
-> GTPU_DL_V4_FLOW differ?
->
-> Key question is - are there reasonable use cases that you can think of
-> for enabling GTP hashing for each one of those bits individually or can
-> we combine some of them?
+> But we should already be thinking about any possible code pattern.
 
-Firstly, what I want to convey is that the structure of each of these
-packets is entirely different. Therefore, in terms of ethtool, since
-packets with the same structure are considered a flow, I understand
-that it is necessary to define such different things (I actually think
-that the people at Intel are doing it that way).
+Again, no, deal with what we have today, kernel code is NOT
+future-proof, that's not how we write this stuff.
 
-Let me first explain the difference between GTPC and GTPU.
-The UDP ports are different in GTPC and GTPU.
-What's further different is that in the case of GTPC, GTPv2-C is used,
-and in the case of GTPU, GTPv1-U is used, which are mainstream in
-current mobile communications.
+If you really worry about a "split write" then us a lock, that's what
+they are there for.  But that's not the issue here, so don't worry about
+it.
 
-Especially the uniqueness of GTPC communication varies according to
-the processing phase.
-CSR (Create Session Request) starts processing from a state where TEID
-is not included. Therefore, it is separated into cases where packets
-have TEID and where they don=E2=80=99t.
-Of course, there are cases where we want to specially process only the
-communication without TEID, and just creating a session is one of the
-more vulnerable parts of the mobile network.
+thanks,
 
-EH stands for Extension Header.
-This is the case with GTPU packets compatible with 5G. If it=E2=80=99s the
-Flow Director, it reads a parameter related to QoS called QFI.
-Without this, it is impossible to process GTPv1 packets compatible with 5G.
-Furthermore, this Extension Header has parts where the shape differs
-depending on UL/DL, which is called the PDU Session Container.
-
-Specific use cases basically apply to services that terminate GTP itself.
-
-The structure of processing in RSS with ethtool until now was to
-select a fixed shape of packets and parameters of those packets to
-perform RSS.
-Conforming to this format is why it becomes so numerous.
-
-
-2023=E5=B9=B410=E6=9C=8817=E6=97=A5(=E7=81=AB) 7:23 Jakub Kicinski <kuba@ke=
-rnel.org>:
-
->
-> Thanks for the v2!
->
-> Adding Willem, Pablo, and Harald to CC (please CC them on future
-> versions).
->
-> On Thu, 12 Oct 2023 06:01:15 +0000 Takeru Hayasaka wrote:
-> > diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.=
-h
-> > index f7fba0dc87e5..a2d4f2081cf3 100644
-> > --- a/include/uapi/linux/ethtool.h
-> > +++ b/include/uapi/linux/ethtool.h
-> > @@ -2011,6 +2011,18 @@ static inline int ethtool_validate_duplex(__u8 d=
-uplex)
-> >  #define      IPV4_FLOW       0x10    /* hash only */
-> >  #define      IPV6_FLOW       0x11    /* hash only */
-> >  #define      ETHER_FLOW      0x12    /* spec only (ether_spec) */
-> > +#define GTPU_V4_FLOW 0x13    /* hash only */
-> > +#define GTPU_V6_FLOW 0x14    /* hash only */
-> > +#define GTPC_V4_FLOW 0x15    /* hash only */
-> > +#define GTPC_V6_FLOW 0x16    /* hash only */
-> > +#define GTPC_TEID_V4_FLOW 0x17       /* hash only */
-> > +#define GTPC_TEID_V6_FLOW 0x18       /* hash only */
-> > +#define GTPU_EH_V4_FLOW 0x19 /* hash only */
-> > +#define GTPU_EH_V6_FLOW 0x20 /* hash only */
->
-> nit: please note that these are hex numbers,
->      next value after 0x19 is 0x1a, not 0x20.
->
-> > +#define GTPU_UL_V4_FLOW 0x21 /* hash only */
-> > +#define GTPU_UL_V6_FLOW 0x22 /* hash only */
-> > +#define GTPU_DL_V4_FLOW 0x23 /* hash only */
-> > +#define GTPU_DL_V6_FLOW 0x24 /* hash only */
-> >  /* Flag to enable additional fields in struct ethtool_rx_flow_spec */
-> >  #define      FLOW_EXT        0x80000000
-> >  #define      FLOW_MAC_EXT    0x40000000
->
-> What gives me pause here is the number of flow sub-types we define
-> for GTP hashing.
->
-> My understanding of GTP is limited to what I just read on Wikipedia.
->
-> IIUC the GTPC vs GTPU distinction comes down to the UDP port on
-> which the protocol runs? Are the frames also different?
->
-> I'm guessing UL/DL are uplink/downlink but what's EH?
->
-> How do GTPU_V4_FLOW, GTPU_EH_V4_FLOW, GTPU_UL_V4_FLOW, and
-> GTPU_DL_V4_FLOW differ?
->
-> Key question is - are there reasonable use cases that you can think of
-> for enabling GTP hashing for each one of those bits individually or can
-> we combine some of them?
->
-> > @@ -2025,6 +2037,7 @@ static inline int ethtool_validate_duplex(__u8 du=
-plex)
-> >  #define      RXH_IP_DST      (1 << 5)
-> >  #define      RXH_L4_B_0_1    (1 << 6) /* src port in case of TCP/UDP/S=
-CTP */
-> >  #define      RXH_L4_B_2_3    (1 << 7) /* dst port in case of TCP/UDP/S=
-CTP */
-> > +#define      RXH_GTP_TEID    (1 << 8) /* teid in case of GTP */
-> >  #define      RXH_DISCARD     (1 << 31)
+greg k-h
 
