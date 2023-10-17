@@ -1,91 +1,131 @@
-Return-Path: <netdev+bounces-41929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-41930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1B827CC409
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:10:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE487CC419
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 15:12:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AFBF281972
-	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:10:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 992731C209EE
+	for <lists+netdev@lfdr.de>; Tue, 17 Oct 2023 13:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C3942C0B;
-	Tue, 17 Oct 2023 13:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uG8uY7Xn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534B342C0E;
+	Tue, 17 Oct 2023 13:12:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029653D3AF;
-	Tue, 17 Oct 2023 13:10:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8908BC433C9;
-	Tue, 17 Oct 2023 13:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697548223;
-	bh=fjqg+d3uN/UZTcuNgFoQC2y2BQt837SnCY8bYVS5auw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uG8uY7XnN2MpCOjZyvuOQyHq1W6KxxtHB4BEZaOq57W9ViltNIMD5SRfoA6uRGtan
-	 SAxaMBckNHjtIUCDbtFAHBrMRrKlW6h89G3+FlD/JZzDq2+an7EIzPAEbgHvgoKDgN
-	 Hr1KORccf/wwBdQcvJIT9SGs/pjRDJpT+W+Suni5BVSsm/67E/W/Wsdn1ZNk3a07gL
-	 2LbBCQWWOQf1vcscz7u8OxJ0cl2W80YnX1XktADzNzkw8/yGCKF/gmpMDomIGfC18L
-	 /AR8f5U0S/I5B5PUZpxYip0/CSBLcV6Qig4a8m2CiZSOVLpyIXIjqN7m2TOHjEdumS
-	 yQRLWyj5X7A1w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6C9D1C04E24;
-	Tue, 17 Oct 2023 13:10:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908F042BFC
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 13:12:38 +0000 (UTC)
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87489F2;
+	Tue, 17 Oct 2023 06:12:37 -0700 (PDT)
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-5a7af52ee31so68582247b3.2;
+        Tue, 17 Oct 2023 06:12:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697548356; x=1698153156;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hrjVOTU4vVWhg8rZEFBUd1El+uZlCjcijcwvkBEbBus=;
+        b=TIrkqUnK8yYKZR/UmwjqPZikb7F9uOSLZD2wPW8LcSsAjooa4Jfx29qPc6/qmPWfUS
+         28v5aliExFI+ZtzO6sYhroJG/kjAnayBsPm2oZ22ccq+KuLrCOe6S/hY3w1xdPl9eCEs
+         eK8HRkCTnbP4PAM51NP7/PqUVAD7dNTwGHSPY7/erDfbx2oReMmMbdgnA0q0P+Tm5m81
+         Va48lHj/8getzuCiPg5TKkbYFeHx5eRFuKnRw9x58UhFi7sF/ts8igWTRPQaWrvQrd/N
+         ziiwrWjpeLOyj92TfPsOsOQYpD62WySwm73AraYoaH/t075JSxnD5xDyjkxdEEOErm6Q
+         wCKw==
+X-Gm-Message-State: AOJu0YwTiZZuxaWwymu35fRrW+v04LtHLMpy1WiCnP6qnL7HM36krLcu
+	jenyUnzqvS1uozOywM9qtbxWhkbXw2+cOg==
+X-Google-Smtp-Source: AGHT+IHdnPW7ENbcBKHUSBrHHdvh+dAtiOkatYLJfZGVRL3NyUQlvp/ZOTePuE2VjQNVpCA12YtmdQ==
+X-Received: by 2002:a81:8441:0:b0:5a8:1aa2:1ac1 with SMTP id u62-20020a818441000000b005a81aa21ac1mr2316544ywf.12.1697548356481;
+        Tue, 17 Oct 2023 06:12:36 -0700 (PDT)
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com. [209.85.128.179])
+        by smtp.gmail.com with ESMTPSA id m190-20020a0dcac7000000b0059c2e3b7d88sm600863ywd.12.2023.10.17.06.12.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 06:12:35 -0700 (PDT)
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-5a7c08b7744so68409737b3.3;
+        Tue, 17 Oct 2023 06:12:35 -0700 (PDT)
+X-Received: by 2002:a0d:cb10:0:b0:5a7:afcc:80fe with SMTP id
+ n16-20020a0dcb10000000b005a7afcc80femr2307771ywd.3.1697548354803; Tue, 17 Oct
+ 2023 06:12:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next -v5] net: Add a warning if NAPI cb missed
- xdp_do_flush().
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169754822344.726.6139633216361785104.git-patchwork-notify@kernel.org>
-Date: Tue, 17 Oct 2023 13:10:23 +0000
-References: <20231016125738.Yt79p1uF@linutronix.de>
-In-Reply-To: <20231016125738.Yt79p1uF@linutronix.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: daniel@iogearbox.net, john.fastabend@gmail.com, kuba@kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- bjorn@kernel.org, ast@kernel.org, andrii@kernel.org, edumazet@google.com,
- haoluo@google.com, hawk@kernel.org, jolsa@kernel.org,
- jonathan.lemon@gmail.com, kpsingh@kernel.org, maciej.fijalkowski@intel.com,
- magnus.karlsson@intel.com, martin.lau@linux.dev, pabeni@redhat.com,
- song@kernel.org, sdf@google.com, tglx@linutronix.de, yonghong.song@linux.dev,
- toke@redhat.com
+References: <20231016054755.915155-1-hch@lst.de> <20231016054755.915155-5-hch@lst.de>
+ <20231016-pantyhose-tall-7565b6b20fb9@wendy> <20231016131745.GB26484@lst.de>
+ <CAMuHMdXVZz=YWMAgzUzme-U3qxYeLdi66xw2CGubpesGy+ZjRw@mail.gmail.com> <20231017124608.GA4386@lst.de>
+In-Reply-To: <20231017124608.GA4386@lst.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 17 Oct 2023 15:12:21 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVavDc4g3ALqxFRn45ySCJ16F-Ay72=P3fxXipk0uXFiQ@mail.gmail.com>
+Message-ID: <CAMuHMdVavDc4g3ALqxFRn45ySCJ16F-Ay72=P3fxXipk0uXFiQ@mail.gmail.com>
+Subject: Re: [PATCH 04/12] soc: renesas: select RISCV_DMA_NONCOHERENT from ARCH_R9A07G043
+To: Christoph Hellwig <hch@lst.de>
+Cc: Conor Dooley <conor.dooley@microchip.com>, Greg Ungerer <gerg@linux-m68k.org>, 
+	iommu@lists.linux.dev, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, 
+	Magnus Damm <magnus.damm@gmail.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
+	Jim Quinlan <james.quinlan@broadcom.com>, arm-soc <soc@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi Christoph,
 
-This patch was applied to bpf/bpf-next.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
+On Tue, Oct 17, 2023 at 2:46=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrot=
+e:
+> On Tue, Oct 17, 2023 at 12:44:41PM +0200, Geert Uytterhoeven wrote:
+> > On Mon, Oct 16, 2023 at 3:17=E2=80=AFPM Christoph Hellwig <hch@lst.de> =
+wrote:
+> > > On Mon, Oct 16, 2023 at 01:52:57PM +0100, Conor Dooley wrote:
+> > > > > +   select RISCV_DMA_NONCOHERENT
+> > > > >     select ERRATA_ANDES if RISCV_SBI
+> > > > >     select ERRATA_ANDES_CMO if ERRATA_ANDES
+> > > >
+> > > > Since this Kconfig menu has changed a bit in linux-next, the select=
+s
+> > > > are unconditional here, and ERRATA_ANDES_CMO will in turn select
+> > > > RISCV_DMA_NONCOHERENT.
+> > >
+> > > Oh, looks like another patch landed there in linux-next.  I had
+> > > waited for the previous one go go upstream in -rc6.  Not sure
+> > > how to best handle this conflict.
+> >
+> > I think the easiest is to ask soc to apply this series?
+>
+> I don't think pulling all the DMA bits into a random other tree
+> would be a good idea.   I can hand off the first few bits, but I'd
+> need a stable branch to pull in after that.  Which of the half a dozen
+> soc trees we have in linux-next is this anyway?
 
-On Mon, 16 Oct 2023 14:57:38 +0200 you wrote:
-> A few drivers were missing a xdp_do_flush() invocation after
-> XDP_REDIRECT.
-> 
-> Add three helper functions each for one of the per-CPU lists. Return
-> true if the per-CPU list is non-empty and flush the list.
-> Add xdp_do_check_flushed() which invokes each helper functions and
-> creates a warning if one of the functions had a non-empty list.
-> Hide everything behind CONFIG_DEBUG_NET.
-> 
-> [...]
+The one and only https://git.kernel.org/pub/scm/linux/kernel/git/soc/soc.gi=
+t/
 
-Here is the summary with links:
-  - [bpf-next,-v5] net: Add a warning if NAPI cb missed xdp_do_flush().
-    https://git.kernel.org/bpf/bpf-next/c/9a675ba55a96
+Gr{oetje,eeting}s,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+                        Geert
 
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
