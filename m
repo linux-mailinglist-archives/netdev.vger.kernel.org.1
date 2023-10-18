@@ -1,115 +1,157 @@
-Return-Path: <netdev+bounces-42147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F275D7CD5D9
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:59:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C9477CD5E8
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 10:03:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E6311C209FD
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:59:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E2862817FE
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 08:03:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE29F134BE;
-	Wed, 18 Oct 2023 07:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7712811733;
+	Wed, 18 Oct 2023 08:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LM1WKH8C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1mIrJ2R8"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52C311722
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 07:59:19 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12348C6
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 00:59:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697615957;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j/RuX7PEGAER5VWHTAgQGINHue7Pa6HBkkP2SfD/G/8=;
-	b=LM1WKH8C4J0QzkBb/YdcEEos3A0fsxb08JhBGxMryJKN83Du+QDC2ld2L7DZKJGLwt4d/o
-	GDOwPVQZHppe14ViY6GVLCURspyDSHxi13N4FFAjJGnB+/beIHmLLdzJVXrZPHXgiUBRSI
-	/zWWnptZgZgLLVWGqecCflSBbKbk4sQ=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-225-ISAhpiF_NrCiShg_O4O8oA-1; Wed, 18 Oct 2023 03:59:11 -0400
-X-MC-Unique: ISAhpiF_NrCiShg_O4O8oA-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-53e4a5807b8so3749350a12.3
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 00:59:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697615950; x=1698220750;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7DC13AF3
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 08:03:06 +0000 (UTC)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9D2CEA
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:03:04 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so6659a12.1
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:03:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697616183; x=1698220983; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j/RuX7PEGAER5VWHTAgQGINHue7Pa6HBkkP2SfD/G/8=;
-        b=SZ5zuHGQGNOKLxLxcNZN0mXrISsK/TCTrNf+xZB6nKoxl54EZRxkkkRv5tqlu/e/Xk
-         JlGJYyXFcNuVz+wwA9a1F0iHC9DX8y5gUN4erFmEmwE4+feAmq1sZl9VI+zUmB1wr9Wt
-         w/RqNdR/TyzXGPGS5rhzsyoAvbzV8N0eWMvowOIoz6ml8Irx0FYurr4qNAcqB9eCmgJP
-         tSzT1F5rh1vnAHiZkfUeCUYfhXhhejo94R2P770LCEYCjQ7W2Pao+AD/YYeLdgokZPlC
-         q5I3ZgOLBDkdPXPLnYKvZ0tFW2hEgTfaELOzZZhFO2ZxqJexmY/SlGWmfV2bagqWpFgU
-         novA==
-X-Gm-Message-State: AOJu0Yww5tJGYGN0nVPkHQmeOthlU56Bcp43NCsvY0abAH3MvG6Auxb6
-	6hE79CgMqffti9QNprLmDfmVVjhrUyujjzfMICmf/x8RWsb2AJxQGZM+GTCW3Az/dL2knT3ccjp
-	hkkLmzJ1UhInjaYYo
-X-Received: by 2002:a05:6402:518d:b0:52d:212d:78ee with SMTP id q13-20020a056402518d00b0052d212d78eemr3681709edd.25.1697615949941;
-        Wed, 18 Oct 2023 00:59:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEWa90MygBLIZW4CwgrTQDTiga7S0LJQ7NKa0AEFJwcbizxjymr8txFWZM0Exp5aJmHG3yWYA==
-X-Received: by 2002:a05:6402:518d:b0:52d:212d:78ee with SMTP id q13-20020a056402518d00b0052d212d78eemr3681693edd.25.1697615949647;
-        Wed, 18 Oct 2023 00:59:09 -0700 (PDT)
-Received: from redhat.com ([193.142.201.34])
-        by smtp.gmail.com with ESMTPSA id j30-20020a508a9e000000b0053f11e3c019sm2389384edj.90.2023.10.18.00.59.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 00:59:09 -0700 (PDT)
-Date: Wed, 18 Oct 2023 03:59:03 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH vhost 02/22] virtio_ring: introduce
- virtqueue_dma_[un]map_page_attrs
-Message-ID: <20231018035751-mutt-send-email-mst@kernel.org>
-References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
- <20231011092728.105904-3-xuanzhuo@linux.alibaba.com>
- <1697615580.6880193-1-xuanzhuo@linux.alibaba.com>
+        bh=kYmrzfbSpfhJpzk7wxE5iReTZLh+c/L+KaX/QfF6tjk=;
+        b=1mIrJ2R8kgz3fLvgnIfqcoivKep/rXahaIs5g1vyLRsgUikU4Ncfxis3iFsp94DBPG
+         m3ZblEAe1rd9Gej3u3HNkHrH1MCH3AihxYkCfPdsBjmEF2LrEeBkh0taI19LPG1Gnhru
+         KOjo2Sx1n5g4vtDcGY0ERcsi/sXR1Bwagu5XtCqLUh9VsG1igU2DclZ9W5Ss3Jy3VDDX
+         oTG1PaQtDKN/PflOStpMmCDTxZOACzhGIVSWG1XqssUwFMFiESqsodYiCDMm9OjJ3kTd
+         PW+m4olsM9pVo9JK4uspwsnykcp9AXbULz459f7EB29rw0a1gh0on+lL1RQZNJtU00Qz
+         IR4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697616183; x=1698220983;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kYmrzfbSpfhJpzk7wxE5iReTZLh+c/L+KaX/QfF6tjk=;
+        b=qi0gEzSIfukAo8FjHGCsJXK6BubGTILx/drFnj+duZnsWYdMTot8xYSeSGwrsN+w8u
+         xuaNe++MUEMtVoaKJEjfg7ZpAnor7aQxjPvDZ3GaAHso11oESp6VOy6lIqJOIxqC06ga
+         vavaX2Lh8YdLJhHRcfpDgAEAHjxz7atHZEQftlWB9cCTpb31twCRSo9BFojlQ8RXmnEU
+         b7gbR76zOXv66OsTw8+JGcNY9b6WSqUcdirUBFiF493K3flYp3Ub7ndS+y8OWV5iMuTm
+         BFBk1fsHCxnloL0b+BfDkAlwZAMxIi9w5VHYl4BUK8VXCX7BoNrYdJeTDaU32KxQoPVn
+         66Ww==
+X-Gm-Message-State: AOJu0Ywb7fLrUUdv42BwODfX4JznQVMWNNNwOwBhnuA4V7VnMGOnBHl0
+	gQSVWekIYc3p23ABqc8Dr1RsKigz6U/QTwvh8qmkCg==
+X-Google-Smtp-Source: AGHT+IFNOBt7ly7V+Ed15uta76GiRvvZPhBglemdtKMriR48IhSCOFLraZDtdINSzwx5L7ePd0DZkOL9sOFndhSQ6j0=
+X-Received: by 2002:a50:cd98:0:b0:53f:3d3d:8b04 with SMTP id
+ p24-20020a50cd98000000b0053f3d3d8b04mr116320edi.2.1697616183032; Wed, 18 Oct
+ 2023 01:03:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1697615580.6880193-1-xuanzhuo@linux.alibaba.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+References: <9666242b-d899-c428-55bd-14f724cc4ffd@linux.dev>
+ <20231017164807.19824-1-kuniyu@amazon.com> <469fd0e9-686f-f1dc-cb45-6c50ff126ccf@linux.dev>
+In-Reply-To: <469fd0e9-686f-f1dc-cb45-6c50ff126ccf@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 18 Oct 2023 10:02:51 +0200
+Message-ID: <CANn89iLZDvqrGy9UJ39a49O3NLT74r+5FXfh7u3SxSSm60BJmA@mail.gmail.com>
+Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie
+ generation/validation SOCK_OPS hooks.
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, andrii@kernel.org, ast@kernel.org, 
+	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
+	dsahern@kernel.org, haoluo@google.com, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, kuni1840@gmail.com, 
+	mykolal@fb.com, netdev@vger.kernel.org, pabeni@redhat.com, sdf@google.com, 
+	song@kernel.org, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 18, 2023 at 03:53:00PM +0800, Xuan Zhuo wrote:
-> Hi Michael,
-> 
-> Do you think it's appropriate to push the first two patches of this patch set to
-> linux 6.6?
-> 
-> Thanks.
+On Wed, Oct 18, 2023 at 8:19=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 10/17/23 9:48 AM, Kuniyuki Iwashima wrote:
+> > From: Martin KaFai Lau <martin.lau@linux.dev>
+> > Date: Mon, 16 Oct 2023 22:53:15 -0700
+> >> On 10/13/23 3:04 PM, Kuniyuki Iwashima wrote:
+> >>> Under SYN Flood, the TCP stack generates SYN Cookie to remain statele=
+ss
+> >>> After 3WHS, the proxy restores SYN and forwards it and ACK to the bac=
+kend
+> >>> server.  Our kernel module works at Netfilter input/output hooks and =
+first
+> >>> feeds SYN to the TCP stack to initiate 3WHS.  When the module is trig=
+gered
+> >>> for SYN+ACK, it looks up the corresponding request socket and overwri=
+tes
+> >>> tcp_rsk(req)->snt_isn with the proxy's cookie.  Then, the module can
+> >>> complete 3WHS with the original ACK as is.
+> >>
+> >> Does the current kernel module also use the timestamp bits differently=
+?
+> >> (something like patch 8 and patch 10 trying to do)
+> >
+> > Our SYN Proxy uses TS as is.  The proxy nodes generate a random number
+> > if TS is in SYN.
+> >
+> > But I thought someone would suggest making TS available so that we can
+> > mock the default behaviour at least, and it would be more acceptable.
+> >
+> > The selftest uses TS just to strengthen security by validating 32-bits
+> > hash.  Dropping a part of hash makes collision easier to happen, but
+> > 24-bits were sufficient for us to reduce SYN flood to the managable
+> > level at the backend.
+>
+> While enabling bpf to customize the syncookie (and timestamp), I want to =
+explore
+> where can this also be done other than at the tcp layer.
+>
+> Have you thought about directly sending the SYNACK back at a lower layer =
+like
+> tc/xdp after receiving the SYN? There are already bpf_tcp_{gen,check}_syn=
+cookie
+> helper that allows to do this for the performance reason to absorb synflo=
+od. It
+> will be natural to extend it to handle the customized syncookie also.
+>
+> I think it should already be doable to send a SYNACK back with customized
+> syncookie (and timestamp) at tc/xdp today.
+>
+> When ack is received, the prog@tc/xdp can verify the cookie. It will prob=
+ably
+> need some new kfuncs to create the ireq and queue the child socket. The b=
+pf prog
+> can change the ireq->{snd_wscale, sack_ok...} if needed. The details of t=
+he
+> kfuncs need some more thoughts. I think most of the bpf-side infra is rea=
+dy,
+> e.g. acquire/release/ref-tracking...etc.
+>
 
-I generally treat patchsets as a whole unless someone asks me to do
-otherwise. Why do you want this?
+I think I mostly agree with this.
 
--- 
-MST
+I am rebasing  a patch adding usec resolution to TCP TS,
+that we used for about 10 years at Google, because it is time to upstream i=
+t.
 
+I am worried about more changes/conflicts caused by Kuniyuki patch set...
 
