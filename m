@@ -1,125 +1,139 @@
-Return-Path: <netdev+bounces-42193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C40497CD944
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:33:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62FC07CD977
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:43:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 685901F236F0
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 10:33:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC414B20FCA
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 10:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7021C18B0B;
-	Wed, 18 Oct 2023 10:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCBC1775B;
+	Wed, 18 Oct 2023 10:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Za7iYfeo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F84919469;
-	Wed, 18 Oct 2023 10:32:56 +0000 (UTC)
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C9B1EA;
-	Wed, 18 Oct 2023 03:32:54 -0700 (PDT)
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3b2f2b9a176so25838b6e.0;
-        Wed, 18 Oct 2023 03:32:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEC811C8C
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 10:42:57 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E51EC109
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 03:42:55 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99c3d3c3db9so1065518166b.3
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 03:42:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1697625774; x=1698230574; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=DD//RB5HzgwDO2+uqGPcSev8BgcvzwqxQz19yWVzT1k=;
+        b=Za7iYfeoRqae2rVUr8lRIIFrK6Os+q1YS4j4EQkhVFKt7f0KnyZbONNOPegJFTbzqZ
+         rPDsgvgk5maheMnmLjTt+/YE8MOO+mfAob2dyIkh+reVx0Pt5+AscBsYZS/KiteK/bTH
+         pCe1Z9cMQNVnEAwt7CsqbatkSyB5fFeOG3ulr7ceqFAnmNF9JpRKNJrZ6d7kKJcMgDG4
+         qA8lQkb9AeivvU54BKNv7w6raKg32xQeqwTBQZpE7jjatCUH0e0zsDV84HBt3LNOdpoI
+         qmdrgOvV140bAxv/SPXYSe24LLHNcL2+VYbCX0cXK0rPLGoY5k+CFeiGa1PfESjUD2GW
+         lfQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697625173; x=1698229973;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UmbVrx3kvH0r68sBw/GJCPYCHWMUhOzKvn9kROVZewE=;
-        b=bsEEN0rjgjp0QWLZt17vhvxPBOhE5kTZNX1hW3AHnHtVjNsTjLorFpsKaWaQ33/c/R
-         nDAWyJOctkC8f3vJkhtVIQrgnVU6mILMeXXWg+Uk0n0naMmbRf1jMHHVZ5PQ1ySU8qsX
-         wU2l3tHqc0GlniqKZId73T7P0QdfVT5Lm7cX2qam1fWkKbLIvWmZG6ibMwwL7CNTe3EY
-         YfRQM02C7SvV7DHY6Eo+YZVS5hnUZdIyZNuQcXTBaf/qf0TZCCWN7fxSPbB5/WCQswCR
-         DnPiI+ZqSCoLdAVs/fNJpEutkVCZ+6Y13IPdZTkETQOoVwV1mHey2js21J6S9X29KH4W
-         rAbw==
-X-Gm-Message-State: AOJu0YyaKpi7/tRealCvXRXRrdHxM9egVM8zILEIiSOnXBKOZRv9Zg8k
-	N2icn7hKIthHmTQqLiN88A==
-X-Google-Smtp-Source: AGHT+IGguJvx7euIHkwYhW8loUuEySlqQJw1vUUYeEeRd6xi6pZbiyhYle0ERX9CZ29XjjXgVF4Lyg==
-X-Received: by 2002:a05:6870:310d:b0:1e9:9c39:a580 with SMTP id v13-20020a056870310d00b001e99c39a580mr5430942oaa.7.1697625173637;
-        Wed, 18 Oct 2023 03:32:53 -0700 (PDT)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id eg48-20020a05687098b000b001e9a253afa3sm636004oab.49.2023.10.18.03.32.52
+        d=1e100.net; s=20230601; t=1697625774; x=1698230574;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DD//RB5HzgwDO2+uqGPcSev8BgcvzwqxQz19yWVzT1k=;
+        b=luZ6TMvdk8jlKSboF+rBHH+js2627oLgebAMkiMlZ1pj9FHvcwb0VaLwg0/+AFCWQ9
+         1FdkenGImWJ4gQIxFK5uxQ5d2QVm+wzw6aPrCm1IzTcEKBhypBuuWX3hCUSkIdBWvMWu
+         RWnATJ+Vnub4Rp+v3UvmKJrKSfhlPKRVesveuRzcYh9Jo7EWcH8Q3I5Oo0lE+PezWS2o
+         XclBuo4Mv6lQE4Bqi+OlLlZ7cLnLQkrwQcMUt3f9o7dpPXha+bWiUnWaR4jbZ4iwEN69
+         +fqWk3rRi6ToBQkmMxlp+W3YuA9N4Qwg0p/HVj9i4SxW67TT3Mo1HTxx+LETo9hPZphw
+         CBVg==
+X-Gm-Message-State: AOJu0YwvIGLd7R2nHUHnu2DiIaVqy+8jrD627AzhI+TjlpiFL291NzQO
+	OALG6Wq6V/8TawS+UXuqvggLWw==
+X-Google-Smtp-Source: AGHT+IH3iPW/F4s0jNFITgCxHRYm+qgBwrME2EwsZMDMePhXqaRzLWflPOUeY3EWWifOn3S3GltGzQ==
+X-Received: by 2002:a17:907:1b04:b0:9bf:792:d696 with SMTP id mp4-20020a1709071b0400b009bf0792d696mr4029562ejc.46.1697625774317;
+        Wed, 18 Oct 2023 03:42:54 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:1ae])
+        by smtp.gmail.com with ESMTPSA id z23-20020a170906075700b009b947f81c4asm1410048ejb.155.2023.10.18.03.42.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 03:32:52 -0700 (PDT)
-Received: (nullmailer pid 391917 invoked by uid 1000);
-	Wed, 18 Oct 2023 10:32:48 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Wed, 18 Oct 2023 03:42:53 -0700 (PDT)
+References: <20231016190819.81307-1-john.fastabend@gmail.com>
+ <20231016190819.81307-2-john.fastabend@gmail.com>
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangyingliang@huawei.com,
+ martin.lau@kernel.org
+Subject: Re: [PATCH bpf 1/2] bpf: sockmap, af_unix sockets need to hold ref
+ for pair sock
+Date: Wed, 18 Oct 2023 12:40:42 +0200
+In-reply-to: <20231016190819.81307-2-john.fastabend@gmail.com>
+Message-ID: <87fs289poz.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, Eric Dumazet <edumazet@google.com>, linux-arm-kernel@lists.infradead.org, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, devicetree@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org, Gregory Clement <gregory.clement@bootlin.com>, Conor Dooley <conor+dt@kernel.org>
-In-Reply-To: <20231018-marvell-88e6152-wan-led-v4-2-3ee0c67383be@linaro.org>
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-2-3ee0c67383be@linaro.org>
-Message-Id: <169762516741.391849.18342287891015837205.robh@kernel.org>
-Subject: Re: [PATCH net-next v4 2/7] dt-bindings: net: mvusb: Fix up DSA
- example
-Date: Wed, 18 Oct 2023 05:32:48 -0500
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, Oct 16, 2023 at 12:08 PM -07, John Fastabend wrote:
+> AF_UNIX sockets are a paired socket. So sending on one of the pairs
+> will lookup the paired socket as part of the send operation. It is
+> possible however to put just one of the pairs in a BPF map. This
+> currently increments the refcnt on the sock in the sockmap to
+> ensure it is not free'd by the stack before sockmap cleans up its
+> state and stops any skbs being sent/recv'd to that socket.
+>
+> But we missed a case. If the peer socket is closed it will be
+> free'd by the stack. However, the paired socket can still be
+> referenced from BPF sockmap side because we hold a reference
+> there. Then if we are sending traffic through BPF sockmap to
+> that socket it will try to dereference the free'd pair in its
+> send logic creating a use after free.  And following splat,
+>
+>    [59.900375] BUG: KASAN: slab-use-after-free in sk_wake_async+0x31/0x1b0
+>    [59.901211] Read of size 8 at addr ffff88811acbf060 by task kworker/1:2/954
+>    [...]
+>    [59.905468] Call Trace:
+>    [59.905787]  <TASK>
+>    [59.906066]  dump_stack_lvl+0x130/0x1d0
+>    [59.908877]  print_report+0x16f/0x740
+>    [59.910629]  kasan_report+0x118/0x160
+>    [59.912576]  sk_wake_async+0x31/0x1b0
+>    [59.913554]  sock_def_readable+0x156/0x2a0
+>    [59.914060]  unix_stream_sendmsg+0x3f9/0x12a0
+>    [59.916398]  sock_sendmsg+0x20e/0x250
+>    [59.916854]  skb_send_sock+0x236/0xac0
+>    [59.920527]  sk_psock_backlog+0x287/0xaa0
 
-On Wed, 18 Oct 2023 11:03:41 +0200, Linus Walleij wrote:
-> When adding a proper schema for the Marvell mx88e6xxx switch,
-> the scripts start complaining about this embedded example:
-> 
->   dtschema/dtc warnings/errors:
->   net/marvell,mvusb.example.dtb: switch@0: ports: '#address-cells'
->   is a required property
->   from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
->   net/marvell,mvusb.example.dtb: switch@0: ports: '#size-cells'
->   is a required property
->   from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
-> 
-> Fix this up by extending the example with those properties in
-> the ports node.
-> 
-> While we are at it, rename "ports" to "ethernet-ports" and rename
-> "switch" to "ethernet-switch" as this is recommended practice.
-> 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Isn't the problem here that unix_stream_sendmsg doesn't grab a ref to
+peer sock? Unlike unix_dgram_sendmsg which uses the unix_peer_get
+helper.
+
+>
+> To fix let BPF sockmap hold a refcnt on both the socket in the
+> sockmap and its paired socket.  It wasn't obvious how to contain
+> the fix to bpf_unix logic. The primarily problem with keeping this
+> logic in bpf_unix was: In the sock close() we could handle the
+> deref by having a close handler. But, when we are destroying the
+> psock through a map delete operation we wouldn't have gotten any
+> signal thorugh the proto struct other than it being replaced.
+> If we do the deref from the proto replace its too early because
+> we need to deref the skpair after the backlog worker has been
+> stopped.
+>
+> Given all this it seems best to just cache it at the end of the
+> psock and eat 8B for the af_unix and vsock users.
+>
+> Fixes: 94531cfcbe79 ("af_unix: Add unix_stream_proto for sockmap")
+> Signed-off-by: John Fastabend <john.fastabend@gmail.com>
 > ---
->  Documentation/devicetree/bindings/net/marvell,mvusb.yaml | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-Documentation/devicetree/bindings/net/marvell,mvusb.example.dtb: /example-0/usb/mdio@1/ethernet-switch@0: failed to match any schema with compatible: ['marvell,mv88e6190']
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231018-marvell-88e6152-wan-led-v4-2-3ee0c67383be@linaro.org
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+[...]
 
