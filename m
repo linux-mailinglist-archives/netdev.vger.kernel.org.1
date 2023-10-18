@@ -1,103 +1,145 @@
-Return-Path: <netdev+bounces-42206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B147CDA9C
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:37:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A99057CDABA
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:39:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B39AF281C6B
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:37:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8A8D1C20D90
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:39:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93A92E3E6;
-	Wed, 18 Oct 2023 11:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q2lLG2lw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC364335D7;
+	Wed, 18 Oct 2023 11:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1565B2D03A
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 11:37:24 +0000 (UTC)
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 932BEFE
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 04:37:22 -0700 (PDT)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5a7afd45199so84707307b3.0
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 04:37:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697629042; x=1698233842; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ibBJyoflxMS2afxFGqsv5c5GwukKSXqA1+zh4x2as+k=;
-        b=q2lLG2lw8LkDsY/Fcj+qsMhuRDPN30MnTc6ddL82FBkdpEdyxTO4PwArBProNwvQtI
-         +fc3FHXUgjaej4mUJLCnu4N585chfulmBWStl9EsHShSPYBWn12H+t6ww4iV4rcIPOEm
-         eoM0abM+Y8ep7Uz47kZuBSFtq/6Ewd6Vk0/h/wYWplmFBrI32qMNYsGKsc1BFO6eqUph
-         HLLBZbrDSa+yFgW4Fx+MG4yjmcYrR/osRuEWbZTRvn8rsuW2X6N4fAdHqZHEltD2SN2P
-         150+rY5UVnzX2M/pAY+EJVkyavc3WSxk/rsqyPt5ouB4qsTi296AgTgVl6al03/WI7Sn
-         og1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697629042; x=1698233842;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ibBJyoflxMS2afxFGqsv5c5GwukKSXqA1+zh4x2as+k=;
-        b=KPCQvTb7Dpg4KU0Obr1w21+nMUubCIT/dOTma0ZZoCj83L2wPKuxybmEoj/gAGlkRU
-         8FfvGz5EQVqtmuOafQqz5MpFzrecDWV04Mip0YCEi4//ojEU3BmyP+c60Yt4KeFO/I0M
-         jdCWOCbQ0LAo+jHkOy8/wyAFAizEfFJapTFuSDe1rdTici0qbPDE5tg1GJV3mqMAi/PS
-         5nJj4h5bo2T8iABG2YqnmVdvNT+wNXKziCB1yWFjc+NMr4/FD+ObAaqV+r/oXMkwWY9a
-         N6XytyZh7/eBAF8pVerdjEQikDCl7PvGFpcxWQJP3Mq0WyrSsSkaATrW0kK8G0IhWnf8
-         PVAQ==
-X-Gm-Message-State: AOJu0YxVNyHTvePuddftGjjKXt8QshJloVkb5jFddUoyQgaIa94Xh3lx
-	R0FNMdAHN7nWXJxQ9pJhIQ0gT4Ho/wf8bSJrZvsSIA==
-X-Google-Smtp-Source: AGHT+IE75mXYYgUQv5l73Vl5L22dr+4CYg+Lk4Ei4q1AvQqBIy5FH+CDcNjtjq5F7t62tXm4y3QBwhP/N0B5gX/8qPo=
-X-Received: by 2002:a81:6dca:0:b0:5a7:a874:d83e with SMTP id
- i193-20020a816dca000000b005a7a874d83emr4891684ywc.42.1697629041772; Wed, 18
- Oct 2023 04:37:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29862F52A
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 11:39:38 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73714124
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 04:39:36 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qt4tP-0002JJ-K9; Wed, 18 Oct 2023 13:39:15 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qt4tO-002Xih-D8; Wed, 18 Oct 2023 13:39:14 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qt4tO-00FE7I-14;
+	Wed, 18 Oct 2023 13:39:14 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: [PATCH net-next v5 0/9] net: dsa: microchip: provide Wake on LAN support
+Date: Wed, 18 Oct 2023 13:39:04 +0200
+Message-Id: <20231018113913.3629151-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-2-3ee0c67383be@linaro.org> <169762516741.391849.18342287891015837205.robh@kernel.org>
-In-Reply-To: <169762516741.391849.18342287891015837205.robh@kernel.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 18 Oct 2023 13:37:10 +0200
-Message-ID: <CACRpkdZff9fbeJdxqudCtjad=FVKTKQtvo_=GiEBOvnw5xQapw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 2/7] dt-bindings: net: mvusb: Fix up DSA example
-To: Rob Herring <robh@kernel.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	linux-arm-kernel@lists.infradead.org, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, devicetree@vger.kernel.org, 
-	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org, 
-	Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org, 
-	Gregory Clement <gregory.clement@bootlin.com>, Conor Dooley <conor+dt@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 18, 2023 at 12:32=E2=80=AFPM Rob Herring <robh@kernel.org> wrot=
-e:
+This patch series introduces extensive Wake on LAN (WoL) support for the
+Microchip KSZ9477 family of switches, coupled with some code refactoring
+and error handling enhancements. The principal aim is to enable and
+manage Wake on Magic Packet and other PHY event triggers for waking up
+the system, whilst ensuring that the switch isn't reset during a
+shutdown if WoL is active.
 
-> dtschema/dtc warnings/errors:
-> Documentation/devicetree/bindings/net/marvell,mvusb.example.dtb: /example=
--0/usb/mdio@1/ethernet-switch@0: failed to match any schema with compatible=
-: ['marvell,mv88e6190']
+The Wake on LAN functionality is optional and is particularly beneficial
+if the PME pins are connected to the SoC as a wake source or to a PMIC
+that can enable or wake the SoC.
 
-Isn't that just because the bindings now come last in the series.
-Which is in response to a review comment, hence this warning
-didn't appear before.
+changes v5:
+- rework Wake on Magic Packet support.
+- Make sure we show more or less realistic information on get_wol by
+  comparing refcounted mac address against the ports address
+- fix mac address refcounting on set_wol()
+- rework shutdown sequence by to handle PMIC related issues. Make sure
+  PME pin is net frequently toggled.
+- use wakeup_source variable instead of reading PME pin register.
 
-Yours,
-Linus Walleij
+changes v4:
+- add ksz_switch_shutdown() and do not skip dsa_switch_shutdown() and
+  etc.
+- try to configure MAC address on WAKE_MAGIC. If not possible, prevent
+  WAKE_MAGIC configuration
+- use ksz_switch_macaddr_get() for WAKE_MAGIC.
+- prevent ksz_port_set_mac_address if WAKE_MAGIC is active
+- do some more refactoring and patch reordering
+
+changes v3:
+- use ethernet address of DSA master instead from devicetree
+- use dev_ops->wol* instead of list of supported switch
+- don't shutdown the switch if WoL is enabled
+- rework on top of latest HSR changes
+
+changes v2:
+- rebase against latest next
+
+Oleksij Rempel (9):
+  net: dsa: microchip: Add missing MAC address register offset for
+    ksz8863
+  dt-bindings: net: dsa: microchip: add wakeup-source property
+  net: dsa: microchip: use wakeup-source DT property to enable PME
+    output
+  net: dsa: microchip: ksz9477: add Wake on LAN support
+  net: dsa: microchip: ksz9477: Add Wake on Magic Packet support
+  net: dsa: microchip: Refactor comment for ksz_switch_macaddr_get()
+    function
+  net: dsa: microchip: Add error handling for ksz_switch_macaddr_get()
+  net: dsa: microchip: Refactor switch shutdown routine for WoL
+    preparation
+  net: dsa: microchip: Ensure Stable PME Pin State for Wake-on-LAN
+
+ .../bindings/net/dsa/microchip,ksz.yaml       |   2 +
+ drivers/net/dsa/microchip/ksz9477.c           | 194 ++++++++++++++++++
+ drivers/net/dsa/microchip/ksz9477.h           |   5 +
+ drivers/net/dsa/microchip/ksz9477_i2c.c       |   5 +-
+ drivers/net/dsa/microchip/ksz_common.c        |  96 +++++++--
+ drivers/net/dsa/microchip/ksz_common.h        |  10 +
+ drivers/net/dsa/microchip/ksz_spi.c           |   5 +-
+ 7 files changed, 297 insertions(+), 20 deletions(-)
+
+-- 
+2.39.2
+
 
