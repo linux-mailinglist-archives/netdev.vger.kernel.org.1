@@ -1,157 +1,187 @@
-Return-Path: <netdev+bounces-42383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E180E7CE836
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:53:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0DBB7CE885
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 22:08:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E3D1B21038
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 19:53:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81F78281C17
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:08:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764961EB2E;
-	Wed, 18 Oct 2023 19:53:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16C21EB48;
+	Wed, 18 Oct 2023 20:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xu28X+0e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FMjCaMI9"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88721EB2C
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 19:53:12 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E8A12D;
-	Wed, 18 Oct 2023 12:53:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697658790; x=1729194790;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=vVcTcLcqzSvvPpWvdFGa7bhaSwzPNStbb7uaXtpeqCI=;
-  b=Xu28X+0eKa5kHSdNrVswiZnO899y4QXBpAZt+5jGpMSeL5SU3VoJaDsA
-   h9moUY1sJBJOxRYwcC5Jc0eESZTzZdalIbjzrT9uyb3vNHdze9vtKg6Ag
-   OFiWqgl4OSXl2peZd/WUGFz9YKrmhZCjVH96zLaajYzgCzRb2IkopKdqH
-   qD4q4ATBHjTGaDTqrZiLmB4j+y/RNHnJTYo2FafdJ1eHoiWLOiDPdZaQB
-   nXxhn6lGBhasdM8KE8Cdepa3XLN+AUbwfswZaSu6eGPLbukCfT/UvxwAs
-   h6nNujFek1C5Nniwp4yjzdoy5l1ZYfWgHi25yZSM3trArQcjHwqSjJkcL
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="452569154"
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="452569154"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 12:52:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="1003924988"
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="1003924988"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 18 Oct 2023 12:52:20 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qtCaX-0000wa-1O;
-	Wed, 18 Oct 2023 19:52:17 +0000
-Date: Thu, 19 Oct 2023 03:51:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>
-Subject: [mst-vhost:vhost 18/35] drivers/virtio/virtio_pci_modern.c:54:17:
- warning: format '%ld' expects argument of type 'long int', but argument 3
- has type 'size_t' {aka 'unsigned int'}
-Message-ID: <202310190338.ES0nNnf4-lkp@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB8F1EB2C
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 20:08:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D45FDC433C8;
+	Wed, 18 Oct 2023 20:08:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697659708;
+	bh=lQXFa8GvRF5Gpf0BOOqxsbqcnxpTVfTyS8mWMgl0qe4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=FMjCaMI9Voxnjw2OYBhrYkuNwl5lBfiCXSUqSkldqAaIAksh/bQ7dbs1zVaOGI5Am
+	 qF8n//4XA0ZfjgWCndMby2rGz+YY1mGSGGyMdGuBQ0hrqOjBb8mUzZkZipeSJ9lklL
+	 Jg3Y3MgHStmTola7X+oLCWkn9ImUeCC4H4ffGBk4wcPFzZP96Flkyf6vr2gJEHOxGd
+	 qJk4OOP/eLkV4/wz8cd+Uc50zdE2XUnie7DdxCkTFGhWDmPWBa35ur03cOyOj9YcC5
+	 JWk/WRUahuM4w9PV0G57sfIKFhWeaotaQugXkPCcVrqAv/J2rzLgQyIqOEyoZ6ys/3
+	 lC0q23Txk67hA==
+Date: Wed, 18 Oct 2023 15:08:26 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, linux-pci@vger.kernel.org, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	bhelgaas@google.com, alex.williamson@redhat.com, lukas@wunner.de,
+	petrm@nvidia.com, jiri@nvidia.com, mlxsw@nvidia.com
+Subject: Re: [RFC PATCH net-next 05/12] PCI: Add device-specific reset for
+ NVIDIA Spectrum devices
+Message-ID: <20231018200826.GA1371652@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231017074257.3389177-6-idosch@nvidia.com>
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
-head:   185ec99c107fe7659a9d809bc7a8e7ab3c338bf9
-commit: 37c82be3988d4cc710dee436d47cd80e792cab93 [18/35] virtio_pci: add check for common cfg size
-config: parisc-allyesconfig (https://download.01.org/0day-ci/archive/20231019/202310190338.ES0nNnf4-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231019/202310190338.ES0nNnf4-lkp@intel.com/reproduce)
+On Tue, Oct 17, 2023 at 10:42:50AM +0300, Ido Schimmel wrote:
+> The PCIe specification defines two methods to trigger a hot reset across
+> a link: Bus reset and link disablement (r6.0.1, sec 7.1, sec 6.6.1). In
+> the first method, the Secondary Bus Reset (SBR) bit in the Bridge
+> Control Register of the Downstream Port is asserted for at least 1ms
+> (r6.0.1, sec 7.5.1.3.13). In the second method, the Link Disable bit in
+> the Link Control Register of the Downstream Port is asserted and then
+> cleared to disable and enable the link (r6.0.1, sec 7.5.3.7).
+> 
+> While the two methods are identical from the perspective of the
+> Downstream device, they are different as far as the host is concerned.
+> In the first method, the Link Training and Status State Machine (LTSSM)
+> of the Downstream Port is expected to be in the Hot Reset state as long
+> as the SBR bit is asserted. In the second method, the LTSSM of the
+> Downstream Port is expected to be in the Disabled state as long as the
+> Link Disable bit is asserted.
+> 
+> This above difference is of importance because the specification
+> requires the LTTSM to exit from the Hot Reset state to the Detect state
+> within a 2ms timeout (r6.0.1, sec 4.2.7.11).
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310190338.ES0nNnf4-lkp@intel.com/
+I don't read 4.2.7.11 quite that way.  Here's the text (from r6.0):
 
-All warnings (new ones prefixed by >>):
+  • Lanes that were directed by a higher Layer to initiate Hot
+    Reset:
 
-   In file included from include/linux/device.h:15,
-                    from include/linux/pci.h:37,
-                    from drivers/virtio/virtio_pci_common.h:21,
-                    from drivers/virtio/virtio_pci_modern.c:20:
-   drivers/virtio/virtio_pci_modern.c: In function '__vp_check_common_size_one_feature':
->> drivers/virtio/virtio_pci_modern.c:54:17: warning: format '%ld' expects argument of type 'long int', but argument 3 has type 'size_t' {aka 'unsigned int'} [-Wformat=]
-      54 |                 "virtio: common cfg size(%ld) does not match the feature %s\n",
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/dev_printk.h:110:30: note: in definition of macro 'dev_printk_index_wrap'
-     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
-         |                              ^~~
-   include/linux/dev_printk.h:144:56: note: in expansion of macro 'dev_fmt'
-     144 |         dev_printk_index_wrap(_dev_err, KERN_ERR, dev, dev_fmt(fmt), ##__VA_ARGS__)
-         |                                                        ^~~~~~~
-   drivers/virtio/virtio_pci_modern.c:53:9: note: in expansion of macro 'dev_err'
-      53 |         dev_err(&vdev->dev,
-         |         ^~~~~~~
-   drivers/virtio/virtio_pci_modern.c:54:44: note: format string is defined here
-      54 |                 "virtio: common cfg size(%ld) does not match the feature %s\n",
-         |                                          ~~^
-         |                                            |
-         |                                            long int
-         |                                          %d
+    ◦ All Lanes in the configured Link transmit TS1 Ordered Sets
+      with the Hot Reset bit asserted and the configured Link and
+      Lane numbers.
 
+    ◦ If two consecutive TS1 Ordered Sets are received on any
+      Lane with the Hot Reset bit asserted and configured Link
+      and Lane numbers, then:
 
-vim +54 drivers/virtio/virtio_pci_modern.c
+      ▪ LinkUp = 0b (False)
 
-  > 20	#include "virtio_pci_common.h"
-    21	
-    22	static u64 vp_get_features(struct virtio_device *vdev)
-    23	{
-    24		struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-    25	
-    26		return vp_modern_get_features(&vp_dev->mdev);
-    27	}
-    28	
-    29	static void vp_transport_features(struct virtio_device *vdev, u64 features)
-    30	{
-    31		struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-    32		struct pci_dev *pci_dev = vp_dev->pci_dev;
-    33	
-    34		if ((features & BIT_ULL(VIRTIO_F_SR_IOV)) &&
-    35				pci_find_ext_capability(pci_dev, PCI_EXT_CAP_ID_SRIOV))
-    36			__virtio_set_bit(vdev, VIRTIO_F_SR_IOV);
-    37	
-    38		if (features & BIT_ULL(VIRTIO_F_RING_RESET))
-    39			__virtio_set_bit(vdev, VIRTIO_F_RING_RESET);
-    40	}
-    41	
-    42	static int __vp_check_common_size_one_feature(struct virtio_device *vdev, u32 fbit,
-    43						    u32 offset, const char *fname)
-    44	{
-    45		struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-    46	
-    47		if (!__virtio_test_bit(vdev, fbit))
-    48			return 0;
-    49	
-    50		if (likely(vp_dev->mdev.common_len >= offset))
-    51			return 0;
-    52	
-    53		dev_err(&vdev->dev,
-  > 54			"virtio: common cfg size(%ld) does not match the feature %s\n",
-    55			vp_dev->mdev.common_len, fname);
-    56	
-    57		return -EINVAL;
-    58	}
-    59	
+      ▪ If no higher Layer is directing the Physical Layer to
+        remain in Hot Reset, the next state is Detect
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+      ▪ Otherwise, all Lanes in the configured Link continue to
+	transmit TS1 Ordered Sets with the Hot Reset bit asserted
+	and the configured Link and Lane numbers.
+
+    ◦ Otherwise, after a 2 ms timeout next state is Detect.
+
+I assume that SBR being set constitutes a "higher Layer directing the
+Physical Layer to remain in Hot Reset," so I would read this as saying
+the LTSSM stays in Hot Reset as long as SBR is set.  Then, *after* a
+2 ms timeout (not *within* 2 ms), the next state is Detect.
+
+> NVIDIA Spectrum devices cannot guarantee it and a host enforcing
+> such a behavior might fail to communicate with the device after
+> issuing a Secondary Bus Reset.
+
+I don't quite follow this.  What behavior is the host enforcing here?
+I guess you're doing an SBR, and the Spectrum device doesn't respond
+as expected afterwards?
+
+It looks like pci_reset_secondary_bus() asserts SBR for at least
+2 ms.  Then pci_bridge_wait_for_secondary_bus() should wait before
+accessing the device, but maybe we don't wait long enough?
+
+I guess this ends up back at d3cold_delay as suggested by Lukas.
+
+> With the link disablement method, the host can leave the link
+> disabled for enough time to allow the device to undergo a hot reset
+> and reach the Detect state. After enabling the link, the host will
+> exit from the Disabled state to Detect state (r6.0.1, sec 4.2.7.9)
+> and observe that the device is already in the Detect state.
+> 
+> The PCI core only implements the first method, which might not work with
+> NVIDIA Spectrum devices on certain hosts, as explained above. Therefore,
+> implement the link disablement method as a device-specific method for
+> NVIDIA Spectrum devices. Specifically, disable the link, wait for 500ms,
+> enable the link and then wait for the device to become accessible.
+> 
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>  drivers/pci/quirks.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+> 
+> diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+> index 23f6bd2184e2..a6e308bb934c 100644
+> --- a/drivers/pci/quirks.c
+> +++ b/drivers/pci/quirks.c
+> @@ -4182,6 +4182,31 @@ static int reset_hinic_vf_dev(struct pci_dev *pdev, bool probe)
+>  	return 0;
+>  }
+>  
+> +#define PCI_DEVICE_ID_MELLANOX_SPECTRUM		0xcb84
+> +#define PCI_DEVICE_ID_MELLANOX_SPECTRUM2	0xcf6c
+> +#define PCI_DEVICE_ID_MELLANOX_SPECTRUM3	0xcf70
+> +#define PCI_DEVICE_ID_MELLANOX_SPECTRUM4	0xcf80
+> +
+> +static int reset_mlx(struct pci_dev *pdev, bool probe)
+> +{
+> +	struct pci_dev *bridge = pdev->bus->self;
+> +
+> +	if (probe)
+> +		return 0;
+> +
+> +	/*
+> +	 * Disable the link on the Downstream port in order to trigger a hot
+> +	 * reset in the Downstream device. Wait for 500ms before enabling the
+> +	 * link so that the firmware on the device will have enough time to
+> +	 * transition the Upstream port to the Detect state.
+> +	 */
+> +	pcie_capability_set_word(bridge, PCI_EXP_LNKCTL, PCI_EXP_LNKCTL_LD);
+> +	msleep(500);
+> +	pcie_capability_clear_word(bridge, PCI_EXP_LNKCTL, PCI_EXP_LNKCTL_LD);
+> +
+> +	return pci_bridge_wait_for_secondary_bus(bridge, "link toggle");
+> +}
+> +
+>  static const struct pci_dev_reset_methods pci_dev_reset_methods[] = {
+>  	{ PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_82599_SFP_VF,
+>  		 reset_intel_82599_sfp_virtfn },
+> @@ -4197,6 +4222,10 @@ static const struct pci_dev_reset_methods pci_dev_reset_methods[] = {
+>  		reset_chelsio_generic_dev },
+>  	{ PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HINIC_VF,
+>  		reset_hinic_vf_dev },
+> +	{ PCI_VENDOR_ID_MELLANOX, PCI_DEVICE_ID_MELLANOX_SPECTRUM, reset_mlx },
+> +	{ PCI_VENDOR_ID_MELLANOX, PCI_DEVICE_ID_MELLANOX_SPECTRUM2, reset_mlx },
+> +	{ PCI_VENDOR_ID_MELLANOX, PCI_DEVICE_ID_MELLANOX_SPECTRUM3, reset_mlx },
+> +	{ PCI_VENDOR_ID_MELLANOX, PCI_DEVICE_ID_MELLANOX_SPECTRUM4, reset_mlx },
+>  	{ 0 }
+>  };
+>  
+> -- 
+> 2.40.1
+> 
 
