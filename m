@@ -1,52 +1,41 @@
-Return-Path: <netdev+bounces-42103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B4377CD1E2
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:38:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 617E67CD1E4
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:40:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABFCA1C20CDA
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:38:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01E04B20F8F
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4225229;
-	Wed, 18 Oct 2023 01:38:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33FA15B7;
+	Wed, 18 Oct 2023 01:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ausSp2LO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m8Nmg2T6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E347446AE
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:38:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A4C4C4339A;
-	Wed, 18 Oct 2023 01:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D930A5B
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EED66C433C8;
+	Wed, 18 Oct 2023 01:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697593101;
-	bh=f0zNhqDQDlIMjey8sKlMmnhZLPqiYQN5DPfy8ZtSSZg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ausSp2LOsoSWKsRg3eI1nyKJcJsnAltL6B7nCg62iSjLAfpg0ynlW7gMHqbFZU61E
-	 QIGHkUJ1MF+97FDCOE+HJ3j7vnIQSjh8NOTvDwQPpviN0Qxo4JtMHOeFiidMoE6V8A
-	 8rwPFEBfPfBYMzavcNL0rAUpSe6PpnOBmn1cBKF5Ij7iiVRkUMC5GOPqqauayScWQ8
-	 iteoXh27/APpIxkQj/uKGgEMDav1AQItc/0lnCxAnNpzKfI5u2GvLAiaIpHApJwoDh
-	 WYu6Gsng7UCD9yYuDYkg/ixZLtZSacZ8sqSt6lfpDfndKjfs9aaN5L+GN6E4A1Ex5D
-	 J3kC6Uit+HE7g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jiri@resnulli.us,
-	przemyslaw.kitszel@intel.com,
-	daniel@iogearbox.net,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net v2 5/5] selftests: net: add very basic test for netdev names and namespaces
-Date: Tue, 17 Oct 2023 18:38:17 -0700
-Message-ID: <20231018013817.2391509-6-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231018013817.2391509-1-kuba@kernel.org>
-References: <20231018013817.2391509-1-kuba@kernel.org>
+	s=k20201202; t=1697593224;
+	bh=ucuHisvDKDQda+rqArQYPEbAKWja8UuyY4zxgpBN9Os=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=m8Nmg2T6Zh7kDfkMbqb6wtAnTC+s0JYRkZhdR9Sm8x97vYuih19txKR1D9fHWqR5w
+	 Dno7dXgRqrE/FlpXid5NajBTQQXIJKledDp5g3+NzoWnV8Ae4E/kEuFAxdTsuAPSXc
+	 vxTyGpf7i/GtwwoFkCHEySWvN0O2o9BgD4LdCsTIuFSh/9GDujVle7HdfUf82uN0Dl
+	 JoJQYogdjtf1YNvxjd/DgKm8d87h5fEou4G0S8GFSYOvwD70FopRYtwH956dlOECcE
+	 VsoMLfDzXDP+zmHPnOLAJo2DayLWlWkTDrM8GgEA+hokNfppFCozmZ0mLiDjY9N5LD
+	 X7mcTZn/62aww==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D9FDFC04E24;
+	Wed, 18 Oct 2023 01:40:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,127 +43,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/7] net: xfrm: skip policies marked as dead while reinserting
+ policies
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169759322388.7564.14270204146303958143.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Oct 2023 01:40:23 +0000
+References: <20231017083723.1364940-2-steffen.klassert@secunet.com>
+In-Reply-To: <20231017083723.1364940-2-steffen.klassert@secunet.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: davem@davemloft.net, kuba@kernel.org, herbert@gondor.apana.org.au,
+ netdev@vger.kernel.org
 
-Add selftest for fixes around naming netdevs and namespaces.
+Hello:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - drop the \ from line ends
- - use Przemek's magic for the error message
- - redirect errors to stderr
----
- tools/testing/selftests/net/Makefile      |  1 +
- tools/testing/selftests/net/netns-name.sh | 87 +++++++++++++++++++++++
- 2 files changed, 88 insertions(+)
- create mode 100755 tools/testing/selftests/net/netns-name.sh
+This series was applied to netdev/net.git (main)
+by Steffen Klassert <steffen.klassert@secunet.com>:
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 8b017070960d..4a2881d43989 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -34,6 +34,7 @@ TEST_PROGS += gro.sh
- TEST_PROGS += gre_gso.sh
- TEST_PROGS += cmsg_so_mark.sh
- TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
-+TEST_PROGS += netns-name.sh
- TEST_PROGS += srv6_end_dt46_l3vpn_test.sh
- TEST_PROGS += srv6_end_dt4_l3vpn_test.sh
- TEST_PROGS += srv6_end_dt6_l3vpn_test.sh
-diff --git a/tools/testing/selftests/net/netns-name.sh b/tools/testing/selftests/net/netns-name.sh
-new file mode 100755
-index 000000000000..7d3d3fc99461
---- /dev/null
-+++ b/tools/testing/selftests/net/netns-name.sh
-@@ -0,0 +1,87 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+set -o pipefail
-+
-+NS=netns-name-test
-+DEV=dummy-dev0
-+DEV2=dummy-dev1
-+ALT_NAME=some-alt-name
-+
-+RET_CODE=0
-+
-+cleanup() {
-+    ip netns del $NS
-+}
-+
-+trap cleanup EXIT
-+
-+fail() {
-+    echo "ERROR: ${1:-unexpected return code} (ret: $_)" >&2
-+    RET_CODE=1
-+}
-+
-+ip netns add $NS
-+
-+#
-+# Test basic move without a rename
-+#
-+ip -netns $NS link add name $DEV type dummy || fail
-+ip -netns $NS link set dev $DEV netns 1 ||
-+    fail "Can't perform a netns move"
-+ip link show dev $DEV >> /dev/null || fail "Device not found after move"
-+ip link del $DEV || fail
-+
-+#
-+# Test move with a conflict
-+#
-+ip link add name $DEV type dummy
-+ip -netns $NS link add name $DEV type dummy || fail
-+ip -netns $NS link set dev $DEV netns 1 2> /dev/null &&
-+    fail "Performed a netns move with a name conflict"
-+ip link show dev $DEV >> /dev/null || fail "Device not found after move"
-+ip -netns $NS link del $DEV || fail
-+ip link del $DEV || fail
-+
-+#
-+# Test move with a conflict and rename
-+#
-+ip link add name $DEV type dummy
-+ip -netns $NS link add name $DEV type dummy || fail
-+ip -netns $NS link set dev $DEV netns 1 name $DEV2 ||
-+    fail "Can't perform a netns move with rename"
-+ip link del $DEV2 || fail
-+ip link del $DEV || fail
-+
-+#
-+# Test dup alt-name with netns move
-+#
-+ip link add name $DEV type dummy || fail
-+ip link property add dev $DEV altname $ALT_NAME || fail
-+ip -netns $NS link add name $DEV2 type dummy || fail
-+ip -netns $NS link property add dev $DEV2 altname $ALT_NAME || fail
-+
-+ip -netns $NS link set dev $DEV2 netns 1 2> /dev/null &&
-+    fail "Moved with alt-name dup"
-+
-+ip link del $DEV || fail
-+ip -netns $NS link del $DEV2 || fail
-+
-+#
-+# Test creating alt-name in one net-ns and using in another
-+#
-+ip -netns $NS link add name $DEV type dummy || fail
-+ip -netns $NS link property add dev $DEV altname $ALT_NAME || fail
-+ip -netns $NS link set dev $DEV netns 1 || fail
-+ip link show dev $ALT_NAME >> /dev/null || fail "Can't find alt-name after move"
-+ip  -netns $NS link show dev $ALT_NAME 2> /dev/null &&
-+    fail "Can still find alt-name after move"
-+ip link del $DEV || fail
-+
-+echo -ne "$(basename $0) \t\t\t\t"
-+if [ $RET_CODE -eq 0 ]; then
-+    echo "[  OK  ]"
-+else
-+    echo "[ FAIL ]"
-+fi
-+exit $RET_CODE
+On Tue, 17 Oct 2023 10:37:17 +0200 you wrote:
+> From: Dong Chenchen <dongchenchen2@huawei.com>
+> 
+> BUG: KASAN: slab-use-after-free in xfrm_policy_inexact_list_reinsert+0xb6/0x430
+> Read of size 1 at addr ffff8881051f3bf8 by task ip/668
+> 
+> CPU: 2 PID: 668 Comm: ip Not tainted 6.5.0-rc5-00182-g25aa0bebba72-dirty #64
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.13 04/01/2014
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x72/0xa0
+>  print_report+0xd0/0x620
+>  kasan_report+0xb6/0xf0
+>  xfrm_policy_inexact_list_reinsert+0xb6/0x430
+>  xfrm_policy_inexact_insert_node.constprop.0+0x537/0x800
+>  xfrm_policy_inexact_alloc_chain+0x23f/0x320
+>  xfrm_policy_inexact_insert+0x6b/0x590
+>  xfrm_policy_insert+0x3b1/0x480
+>  xfrm_add_policy+0x23c/0x3c0
+>  xfrm_user_rcv_msg+0x2d0/0x510
+>  netlink_rcv_skb+0x10d/0x2d0
+>  xfrm_netlink_rcv+0x49/0x60
+>  netlink_unicast+0x3fe/0x540
+>  netlink_sendmsg+0x528/0x970
+>  sock_sendmsg+0x14a/0x160
+>  ____sys_sendmsg+0x4fc/0x580
+>  ___sys_sendmsg+0xef/0x160
+>  __sys_sendmsg+0xf7/0x1b0
+>  do_syscall_64+0x3f/0x90
+>  entry_SYSCALL_64_after_hwframe+0x73/0xdd
+> 
+> [...]
+
+Here is the summary with links:
+  - [1/7] net: xfrm: skip policies marked as dead while reinserting policies
+    https://git.kernel.org/netdev/net/c/6d41d4fe2872
+  - [2/7] xfrm: interface: use DEV_STATS_INC()
+    https://git.kernel.org/netdev/net/c/f7c4e3e5d4f6
+  - [3/7] xfrm: fix a data-race in xfrm_gen_index()
+    https://git.kernel.org/netdev/net/c/3e4bc23926b8
+  - [4/7] xfrm6: fix inet6_dev refcount underflow problem
+    https://git.kernel.org/netdev/net/c/cc9b364bb1d5
+  - [5/7] net: ipv6: fix return value check in esp_remove_trailer
+    https://git.kernel.org/netdev/net/c/dad4e491e30b
+  - [6/7] net: ipv4: fix return value check in esp_remove_trailer
+    https://git.kernel.org/netdev/net/c/513f61e21933
+  - [7/7] xfrm: fix a data-race in xfrm_lookup_with_ifid()
+    https://git.kernel.org/netdev/net/c/de5724ca38fd
+
+You are awesome, thank you!
 -- 
-2.41.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
