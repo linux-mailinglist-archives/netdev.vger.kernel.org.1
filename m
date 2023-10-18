@@ -1,149 +1,127 @@
-Return-Path: <netdev+bounces-42115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C89987CD29B
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 05:18:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E169D7CD2AC
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 05:29:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9455B20FE1
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:18:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83A06B20FCB
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D844436;
-	Wed, 18 Oct 2023 03:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66F05246;
+	Wed, 18 Oct 2023 03:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G0+9ydww"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794D94421
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 03:18:47 +0000 (UTC)
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D42ABA;
-	Tue, 17 Oct 2023 20:18:44 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VuPHcIo_1697599120;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VuPHcIo_1697599120)
-          by smtp.aliyun-inc.com;
-          Wed, 18 Oct 2023 11:18:41 +0800
-Date: Wed, 18 Oct 2023 11:18:40 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: tonylu@linux.alibaba.com, alibuda@linux.alibaba.com,
-	guwen@linux.alibaba.com, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 1/2] net/smc: change function name from
- smc_find_ism_store_rc to smc_find_device_store_rc
-Message-ID: <20231018031840.GX92403@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20231017124234.99574-1-guangguan.wang@linux.alibaba.com>
- <20231017124234.99574-2-guangguan.wang@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38FF3D90
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 03:29:41 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC66FA;
+	Tue, 17 Oct 2023 20:29:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697599780; x=1729135780;
+  h=from:to:cc:subject:date:message-id;
+  bh=phDj3684tOP+B+d0MXIvzoUnOpESFYXdBSU3w4+mZTY=;
+  b=G0+9ydww8G/DnoWz214Myyx537j0v5vB3I78BHAE09KFFd6Ki1QIrT/N
+   1zBfRqLv3H8VhqkPaIjDf5EcR+ykpjbI4pxGh1F6gK/DQYEMlkMM1RjOs
+   oTNQbRCVIje32mdE/qbEgwhSuxsVvhAzBF3Iy5CHJVekEynBvhiolw0iH
+   WiVI/j+u4AtJf+GajLrMrUHSyv1xAk6lzGqkGGv21x42giGdYlHcs3tL9
+   qzjs+CQ6DpRYYVM+h04WBhouxlJPxIDb8BZ/EF6B9RVmkGLHJochucOE9
+   Ky9MH8LuUCHaRx/zkhNa/jaEfRdEsaK7I/GbLfoyi1cVFwHcLEkDlOZDk
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="370990644"
+X-IronPort-AV: E=Sophos;i="6.03,234,1694761200"; 
+   d="scan'208";a="370990644"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 20:29:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="847066898"
+X-IronPort-AV: E=Sophos;i="6.03,234,1694761200"; 
+   d="scan'208";a="847066898"
+Received: from ssid-ilbpg3.png.intel.com ([10.88.227.111])
+  by FMSMGA003.fm.intel.com with ESMTP; 17 Oct 2023 20:29:37 -0700
+From: Lai Peter Jun Ann <jun.ann.lai@intel.com>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lai Peter Jun Ann <jun.ann.lai@intel.com>
+Subject: [PATCH net-next v2 1/1] taprio: Add boundary check for sched-entry values
+Date: Wed, 18 Oct 2023 11:28:27 +0800
+Message-Id: <1697599707-3546-1-git-send-email-jun.ann.lai@intel.com>
+X-Mailer: git-send-email 1.9.1
+X-Spam-Status: No, score=0.9 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231017124234.99574-2-guangguan.wang@linux.alibaba.com>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 08:42:33PM +0800, Guangguan Wang wrote:
->The function smc_find_ism_store_rc is not only used for ism, so it is
->reasonable to change the function name to smc_find_device_store_rc.
->
->Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Adds boundary checks for the gatemask provided against the number of
+traffic class defined for each sched-entry.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Without this check, the user would not know that the gatemask provided is
+invalid and the driver has already truncated the gatemask provided to
+match the number of traffic class defined.
 
->---
-> net/smc/af_smc.c | 16 ++++++++--------
-> 1 file changed, 8 insertions(+), 8 deletions(-)
->
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index 35ddebae8894..b3a67a168495 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -2122,7 +2122,7 @@ static void smc_check_ism_v2_match(struct smc_init_info *ini,
-> 	}
-> }
-> 
->-static void smc_find_ism_store_rc(u32 rc, struct smc_init_info *ini)
->+static void smc_find_device_store_rc(u32 rc, struct smc_init_info *ini)
-> {
-> 	if (!ini->rc)
-> 		ini->rc = rc;
->@@ -2164,7 +2164,7 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
-> 	mutex_unlock(&smcd_dev_list.mutex);
-> 
-> 	if (!ini->ism_dev[0]) {
->-		smc_find_ism_store_rc(SMC_CLC_DECL_NOSMCD2DEV, ini);
->+		smc_find_device_store_rc(SMC_CLC_DECL_NOSMCD2DEV, ini);
-> 		goto not_found;
-> 	}
-> 
->@@ -2181,7 +2181,7 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
-> 		ini->ism_selected = i;
-> 		rc = smc_listen_ism_init(new_smc, ini);
-> 		if (rc) {
->-			smc_find_ism_store_rc(rc, ini);
->+			smc_find_device_store_rc(rc, ini);
-> 			/* try next active ISM device */
-> 			continue;
-> 		}
->@@ -2218,7 +2218,7 @@ static void smc_find_ism_v1_device_serv(struct smc_sock *new_smc,
-> 		return;		/* V1 ISM device found */
-> 
-> not_found:
->-	smc_find_ism_store_rc(rc, ini);
->+	smc_find_device_store_rc(rc, ini);
-> 	ini->smcd_version &= ~SMC_V1;
-> 	ini->ism_dev[0] = NULL;
-> 	ini->is_smcd = false;
->@@ -2268,7 +2268,7 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
-> 	ini->smcrv2.daddr = smc_ib_gid_to_ipv4(smc_v2_ext->roce);
-> 	rc = smc_find_rdma_device(new_smc, ini);
-> 	if (rc) {
->-		smc_find_ism_store_rc(rc, ini);
->+		smc_find_device_store_rc(rc, ini);
-> 		goto not_found;
-> 	}
-> 	if (!ini->smcrv2.uses_gateway)
->@@ -2285,7 +2285,7 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
-> 	if (!rc)
-> 		return;
-> 	ini->smcr_version = smcr_version;
->-	smc_find_ism_store_rc(rc, ini);
->+	smc_find_device_store_rc(rc, ini);
-> 
-> not_found:
-> 	ini->smcr_version &= ~SMC_V2;
->@@ -2332,7 +2332,7 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
-> 	/* check for matching IP prefix and subnet length (V1) */
-> 	prfx_rc = smc_listen_prfx_check(new_smc, pclc);
-> 	if (prfx_rc)
->-		smc_find_ism_store_rc(prfx_rc, ini);
->+		smc_find_device_store_rc(prfx_rc, ini);
-> 
-> 	/* get vlan id from IP device */
-> 	if (smc_vlan_by_tcpsk(new_smc->clcsock, ini))
->@@ -2359,7 +2359,7 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
-> 		int rc;
-> 
-> 		rc = smc_find_rdma_v1_device_serv(new_smc, pclc, ini);
->-		smc_find_ism_store_rc(rc, ini);
->+		smc_find_device_store_rc(rc, ini);
-> 		return (!rc) ? 0 : ini->rc;
-> 	}
-> 	return prfx_rc;
->-- 
->2.24.3 (Apple Git-128)
+Signed-off-by: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+Signed-off-by: Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>
+Signed-off-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
+---
+ net/sched/sch_taprio.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+index 1cb5e41..44b9e21 100644
+--- a/net/sched/sch_taprio.c
++++ b/net/sched/sch_taprio.c
+@@ -102,6 +102,7 @@ struct taprio_sched {
+ 	u32 max_sdu[TC_MAX_QUEUE]; /* save info from the user */
+ 	u32 fp[TC_QOPT_MAX_QUEUE]; /* only for dump and offloading */
+ 	u32 txtime_delay;
++	u8 num_tc;
+ };
+ 
+ struct __tc_taprio_qopt_offload {
+@@ -1063,6 +1064,11 @@ static int fill_sched_entry(struct taprio_sched *q, struct nlattr **tb,
+ 		return -EINVAL;
+ 	}
+ 
++	if (entry->gate_mask >= q->num_tc) {
++		NL_SET_ERR_MSG(extack, "Traffic Class defined less than gatemask");
++		return -EINVAL;
++	}
++
+ 	entry->interval = interval;
+ 
+ 	return 0;
+@@ -1913,6 +1919,8 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 		for (i = 0; i <= TC_BITMASK; i++)
+ 			netdev_set_prio_tc_map(dev, i,
+ 					       mqprio->prio_tc_map[i]);
++
++		q->num_tc = mqprio->num_tc;
+ 	}
+ 
+ 	err = parse_taprio_schedule(q, tb, new_admin, extack);
+-- 
+1.9.1
+
 
