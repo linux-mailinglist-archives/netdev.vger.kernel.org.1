@@ -1,121 +1,127 @@
-Return-Path: <netdev+bounces-42303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D717CE1E4
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:57:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F1B7CE242
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:09:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43F2D281D5A
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 15:57:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D07091C20A81
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F893B7B1;
-	Wed, 18 Oct 2023 15:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174C03C069;
+	Wed, 18 Oct 2023 16:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="GQiUFRDc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xu0yRV8x"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5075A347D0
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:57:22 +0000 (UTC)
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63BDF11C
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 08:57:20 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-27d45f5658fso4249060a91.3
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 08:57:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1697644640; x=1698249440; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UruBDXRQS7jPcNe0E70TXx3ruy8Wb51bnBvMyopkdbE=;
-        b=GQiUFRDc9HPy9AyfJEnsi9Smvb0Maos4NEI1PreeLVTRaHE8KlNJnJiUJzulGZ4682
-         CW3SlEAJuAWBBS20F8oihgXEx2OtiQOMQS4BWZaRLuoBlQYbvGTspOazXyDSsbP8a4x0
-         cR7lOCQ5MJPrymlauhJecudLahQv3mjkWjh8jTChTpLzzwpr8yXuryeyKCJ6L5nIcoSj
-         yIKhOohQ92sSaeGthk/S6RyYMGH2r0cQndNCkjLTQDUoYU3z1zYTbRuThvRsOHghgkuA
-         yIJjeLkGGt4n1Y2F1I5UZ+tf09lqsExFavwRNWtQoXxNVeE1C6ayFrZkRFm1JnafB92x
-         Xu5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697644640; x=1698249440;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UruBDXRQS7jPcNe0E70TXx3ruy8Wb51bnBvMyopkdbE=;
-        b=FRZgu/5FN6fvVih8R7tzKgl1cp8tOYZdP314LgNVtPlnAm8PHEf/6GMBOLknqAd3Uc
-         p1KEX4i8sDtMZdT0ln21CxBqYKQ/z8fzlYowxXE9qtoUZjHfOvTQx0sONdkmgQLlFykP
-         YDQSMcv72Eg/DVJXCbF5jpbGJo4gF4p8A8T7ZTUtAPlyRToPZ2ZSNeBCD24LrSJVvN68
-         EJAWJJ8g1AhMo/3EhYm7T7LiDES3NO2Iw3m1rp4pYg8L9T/iyr7b0bzd5XXFd1kx/RUj
-         8o0Cbpjpp4Tb94/eITSh4XavN6Q/hdnqVLRFalff2iF8bZR7n6sG80dd1mslpooNlr1C
-         D4jQ==
-X-Gm-Message-State: AOJu0YxsN5qVbfP4wWFsn8dKPnhcNRAPAKdiih2/rM3OjYqTxBck0hkp
-	fqEBBj19QEAu63D+4VHiiLoQc4KuoFKn8eh/HUfIXg==
-X-Google-Smtp-Source: AGHT+IEzGR9qAHjBrGpnWQ+Al4Zf1I+C7JOwmbzXQ8LuC8wH0U5MfJMor5cSjsLm+XnwGBfENB76Ug==
-X-Received: by 2002:a17:90a:19c2:b0:27d:d9c2:6ee5 with SMTP id 2-20020a17090a19c200b0027dd9c26ee5mr2074402pjj.9.1697644639827;
-        Wed, 18 Oct 2023 08:57:19 -0700 (PDT)
-Received: from hermes.local (204-195-126-68.wavecable.com. [204.195.126.68])
-        by smtp.gmail.com with ESMTPSA id d62-20020a17090a6f4400b002772faee740sm107444pjk.5.2023.10.18.08.57.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 08:57:19 -0700 (PDT)
-Date: Wed, 18 Oct 2023 08:57:17 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, gregkh@linuxfoundation.org,
- mhocko@suse.com
-Subject: Re: [RFC PATCH net-next 0/4] net-sysfs: remove
- rtnl_trylock/restart_syscall use
-Message-ID: <20231018085717.454931c3@hermes.local>
-In-Reply-To: <20231018154804.420823-1-atenart@kernel.org>
-References: <20231018154804.420823-1-atenart@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9AD37151
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 16:09:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12435C433C7;
+	Wed, 18 Oct 2023 16:08:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697645342;
+	bh=4MR7iDZ+ixMX3Hkqy8fTKzN7HrpxuhyU6baJRTI8kUg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Xu0yRV8xDJ2jramzFaTKjJu286TbqXgRtm6Fnu6t/XIWQN67j4ZKJzisW2q9Xc+43
+	 aJP9Clv7ivguDYTQHxjOOg/UJX5LkCg35QqWSOk1mRuBGg4Ce8MxOKRICXSTUxQrFD
+	 Z40rGO35IXupws5F9Y5gw5++KTerH/+BA213yF1MxOmm8HnglybT/1Mp2CJQeC2Ox6
+	 /K6wEwD7y/RXAUVJvasd/7I7i5569LnWUiB7OBB9nj2O8wtl16qcrf6WQnu7LHd/8r
+	 KCUYy6pEUiOMQx3fr0Dj+JxVLpZsI9C8CU2Ai/yYzsrCpleBTM3FBS+0Kf8RtHn68Q
+	 +JZA55NQnJxww==
+Date: Wed, 18 Oct 2023 18:08:55 +0200
+From: Simon Horman <horms@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Cai Huoqing <cai.huoqing@linux.dev>,
+	George Cherian <george.cherian@marvell.com>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Igor Russkikh <irusskikh@marvell.com>,
+	Coiby Xu <coiby.xu@gmail.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>,
+	Leon Romanovsky <leon@kernel.org>, linux-kernel@vger.kernel.org,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>
+Subject: Re: [PATCH net-next v2 08/11] net/mlx5: devlink health: use retained
+ error fmsg API
+Message-ID: <20231018160855.GT1940501@kernel.org>
+References: <20231017105341.415466-1-przemyslaw.kitszel@intel.com>
+ <20231017105341.415466-9-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231017105341.415466-9-przemyslaw.kitszel@intel.com>
 
-On Wed, 18 Oct 2023 17:47:42 +0200
-Antoine Tenart <atenart@kernel.org> wrote:
+On Tue, Oct 17, 2023 at 12:53:38PM +0200, Przemek Kitszel wrote:
+> Drop unneeded error checking.
+> 
+> devlink_fmsg_*() family of functions is now retaining errors,
+> so there is no need to check for them after each call.
+> 
+> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-> Hi,
-> 
-> This is sent as an RFC because I believe this should be discussed (and
-> some might want to do additional testing), but the code itself is ready.
-> 
-> Some time ago we tried to improve the rtnl_trylock/restart_syscall
-> situation[1]. What happens is when there is rtnl contention, userspace
-> accessing net sysfs attributes will spin and experience delays. This can
-> happen in different situations, when sysfs attributes are accessed
-> (networking daemon, configuration, monitoring) while operations under
-> rtnl are performed (veth creation, driver configuration, etc). A few
-> improvements can be done in userspace to ease things, like using the
-> netlink interface instead, or polling less (or more selectively) the
-> attributes; but in the end the root cause is always there and this keeps
-> happening from time to time.
-> 
-> That initial effort however wasn't successful, although I think there
-> was an interest, mostly because we found technical flaws and didn't find
-> a working solution at the time. Some time later, we gave it a new try
-> and found something more promising, but the patches fell off my radar. I
-> recently had another look at this series, made more tests and cleaned it
-> up.
-> 
-> The technical aspect is described in patch 1 directly in the code
-> comments, with an additional important comment in patch 3. This was
-> mostly tested by stress-testing net sysfs attributes (read/write ops)
-> while adding/removing queues and adding/removing veths, all in parallel.
-> 
-> All comments are welcomed.
+...
 
-The trylock was introduced to deal with lock inversion.
-It is not clear how this more complex solution prevents that.
+> @@ -288,52 +206,31 @@ int mlx5e_health_rsc_fmsg_dump(struct mlx5e_priv *priv, struct mlx5_rsc_key *key
+
+Hi Przemek,
+
+The code above this hunk looks like this:
+
+        do {
+                cmd_err = mlx5_rsc_dump_next(mdev, cmd, page, &size);
+                if (cmd_err < 0) {
+                        err = cmd_err;
+
+clang-16 W=1 warns that err, which is used as the return value of the
+function, will be uninitialised if the loop never hits this condition.
+
+Smatch also warns about this.
+
+>  			goto destroy_cmd;
+>  		}
+>  
+> -		err = mlx5e_health_rsc_fmsg_binary(fmsg, page_address(page), size);
+> -		if (err)
+> -			goto destroy_cmd;
+> -
+> +		mlx5e_health_rsc_fmsg_binary(fmsg, page_address(page), size);
+>  	} while (cmd_err > 0);
+>  
+>  destroy_cmd:
+>  	mlx5_rsc_dump_cmd_destroy(cmd);
+> -	end_err = devlink_fmsg_binary_pair_nest_end(fmsg);
+> -	if (end_err)
+> -		err = end_err;
+> +	devlink_fmsg_binary_pair_nest_end(fmsg);
+>  free_page:
+>  	__free_page(page);
+>  	return err;
+>  }
+
+...
 
