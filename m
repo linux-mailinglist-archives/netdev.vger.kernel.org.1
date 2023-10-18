@@ -1,110 +1,275 @@
-Return-Path: <netdev+bounces-42125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CACB47CD3B4
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:55:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A0C37CD3D2
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 08:06:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0975D1C209C1
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 05:55:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A3FFB210BC
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 06:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4632A8F44;
-	Wed, 18 Oct 2023 05:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8A08F5B;
+	Wed, 18 Oct 2023 06:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SPa4lMGN"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45AF7493
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 05:55:36 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F33BC6
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 22:55:35 -0700 (PDT)
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qszWg-0007hK-2U; Wed, 18 Oct 2023 07:55:26 +0200
-Message-ID: <24f14f0f-2a1b-401d-b5f8-314387d0aaef@pengutronix.de>
-Date: Wed, 18 Oct 2023 07:55:21 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188835696
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 06:06:21 +0000 (UTC)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50665EA
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 23:06:19 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c9c496c114so89425ad.0
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 23:06:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1697609179; x=1698213979; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v1WMeQoTbai5jcFg/8kPiT+daiwAiiktJJC7VnxF4OU=;
+        b=SPa4lMGNoiPN8ba/IOo1l6b6wG1H8bjr2+q8jU8NNNxNSvsboTqevRNtT+OKotsbIU
+         SaJR0iLTSOWVnqpUCfGy3CuNN6L1Wn0Gjc8ZCZwQcnKTtThgMefCAdK5hw+6BdG+uveP
+         ehLPZ6ehV4FCvtSA7bUJXJUPLwRbzpcSEwCIg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697609179; x=1698213979;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v1WMeQoTbai5jcFg/8kPiT+daiwAiiktJJC7VnxF4OU=;
+        b=gPFyrvZDg4O5/4jFH+5sP5syuAVlvQ4B4iRG1n+bq5az2PoopfTAvyQoo07fYLjJYZ
+         Nale4vTitjy9D1ZB0Jv8auwIXssHkysF+mw8kk+tANeSsx2ksy3am6Sz31ZEl2qMLhuw
+         g+g89tWgQ95gDVlYGFizf7NBbKBlIsHVO3nZ+SEp8HbPmrBrnItWONxlth8LhEmP9wLt
+         jkh1SH25NNbsTSZ3gsBD5Vo8ElBycbxYrW9hwLZxlkT7/rxADO3hIclVCMI6fBlWXDnf
+         2MTtTJeOzYrdQ51vjIgwejCdZcnRsV+4+H7LmaVzhjLNLOaYbfwiqD/lBpwnrJkz3rRF
+         q0Sw==
+X-Gm-Message-State: AOJu0YyLJoCuNkbYWpLgGfRoVDhaGWLhSdqbIGSZpWEE186pTncT2XJF
+	oC8nAiHtoRCv62TmyFEgan+kmnqn1S6OnRQ8sjdx8A==
+X-Google-Smtp-Source: AGHT+IFCmyy+5s6X+xOiaol9ZdDdb7IvXqxzpm7o3kfVB89cGbzx/i5UCG3hHH6rTE4spkcyS1gycWYRMQqcdi75asA=
+X-Received: by 2002:a17:902:cecb:b0:1bb:c2b1:9be0 with SMTP id
+ d11-20020a170902cecb00b001bbc2b19be0mr173548plg.16.1697609178444; Tue, 17 Oct
+ 2023 23:06:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/5] net: stmmac: fix PPS capture input index
-Content-Language: en-US, de-DE
-To: Jakub Kicinski <kuba@kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Richard Cochran <richardcochran@gmail.com>,
- Kurt Kanzenbach <kurt@linutronix.de>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- linux-stm32@st-md-mailman.stormreply.com, Eric Dumazet
- <edumazet@google.com>, Jose Abreu <joabreu@synopsys.com>,
- Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- linux-arm-kernel@lists.infradead.org, patchwork-jzi@pengutronix.de
-References: <20231010-stmmac_fix_auxiliary_event_capture-v1-0-3eeca9e844fa@pengutronix.de>
- <20231010-stmmac_fix_auxiliary_event_capture-v1-2-3eeca9e844fa@pengutronix.de>
- <20231014144428.GA1386676@kernel.org>
- <004d6ce9-7d15-4944-b31c-c9e628e7483a@pengutronix.de>
- <20231017082618.4558ad06@kernel.org>
- <20231017-transfer-refurbish-5cfaf12a524c-mkl@pengutronix.de>
- <20231017165042.30fa9061@kernel.org>
-From: Johannes Zink <j.zink@pengutronix.de>
-In-Reply-To: <20231017165042.30fa9061@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: j.zink@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+References: <20231012192552.3900360-1-dianders@chromium.org>
+ <20231012122458.v3.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
+ <29f9a2ff1979406489213909b940184f@realtek.com> <CAD=FV=U4rGozXHoK8+ejPgRtyoACy1971ftoatQivqzk2tk5ng@mail.gmail.com>
+ <052401da00fa$dacccd90$906668b0$@realtek.com> <CAD=FV=XQswgKZh-JQ6PuKGRmrDMfDmZwM+MUpAcOk1=7Ppjyiw@mail.gmail.com>
+ <CAD=FV=Vp_KE_hjWy7bKJbvmqwCQ67jhzfFoV368vB5ZGge=Yzw@mail.gmail.com>
+In-Reply-To: <CAD=FV=Vp_KE_hjWy7bKJbvmqwCQ67jhzfFoV368vB5ZGge=Yzw@mail.gmail.com>
+From: Grant Grundler <grundler@chromium.org>
+Date: Tue, 17 Oct 2023 23:06:06 -0700
+Message-ID: <CANEJEGuEdGUAUufEHBfxbo_thXbgr8gMFVBaa+pCV_axWO=NGQ@mail.gmail.com>
+Subject: Re: [PATCH v3 5/5] r8152: Block future register access if register
+ access fails
+To: Doug Anderson <dianders@chromium.org>, Hayes Wang <hayeswang@realtek.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Alan Stern <stern@rowland.harvard.edu>, Simon Horman <horms@kernel.org>, 
+	Edward Hill <ecgh@chromium.org>, Laura Nao <laura.nao@collabora.com>, 
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, 
+	=?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_SPF_WL
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jakub, hi Marc,
+On Tue, Oct 17, 2023 at 11:46=E2=80=AFAM Doug Anderson <dianders@chromium.o=
+rg> wrote:
+>
+> Hi,
+>
+> On Tue, Oct 17, 2023 at 7:17=E2=80=AFAM Doug Anderson <dianders@chromium.=
+org> wrote:
+> >
+> > Hi,
+> >
+> > On Tue, Oct 17, 2023 at 6:07=E2=80=AFAM Hayes Wang <hayeswang@realtek.c=
+om> wrote:
+> > >
+> > > Doug Anderson <dianders@chromium.org>
+> > > > Sent: Tuesday, October 17, 2023 12:47 AM
+> > > [...
+> > > > > >  static int generic_ocp_read(struct r8152 *tp, u16 index, u16 s=
+ize,
+> > > > > > @@ -8265,6 +8353,19 @@ static int rtl8152_pre_reset(struct
+> > > > usb_interface
+> > > > > > *intf)
+> > > > > >         if (!tp)
+> > > > > >                 return 0;
+> > > > > >
+> > > > > > +       /* We can only use the optimized reset if we made it to=
+ the end of
+> > > > > > +        * probe without any register access fails, which sets
+> > > > > > +        * `PROBED_WITH_NO_ERRORS` to true. If we didn't have t=
+hat then return
+> > > > > > +        * an error here which tells the USB framework to fully=
+ unbind/rebind
+> > > > > > +        * our driver.
+> > > > >
+> > > > > Would you stay in a loop of unbind and rebind,
+> > > > > if the control transfers in the probe() are not always successful=
+?
+> > > > > I just think about the worst case that at least one control alway=
+s fails in probe().
+> > > >
+> > > > We won't! :-) One of the first things that rtl8152_probe() does is =
+to
+> > > > call rtl8152_get_version(). That goes through to
+> > > > rtl8152_get_version(). That function _doesn't_ queue up a reset if
+> > > > there are communication problems, but it does do 3 retries of the
+> > > > read. So if all 3 reads fail then we will permanently fail probe,
+> > > > which I think is the correct thing to do.
+> > >
+> > > The probe() contains control transfers in
+> > >         1. rtl8152_get_version()
+> > >         2. tp->rtl_ops.init()
+> > >
+> > > If one of the 3 control transfers in 1) is successful AND
+> > > any control transfer in 2) fails,
+> > > you would queue a usb reset which would unbind/rebind the driver.
+> > > Then, the loop starts.
+> > > The loop would be broken, if and only if
+> > >         a) all control transfers in 1) fail, OR
+> > >         b) all control transfers in 2) succeed.
+> > >
+> > > That is, the loop would be broken when the fail rate of the control t=
+ransfer is high or low enough.
+> > > Otherwise, you would queue a usb reset again and again.
+> > > For example, if the fail rate of the control transfer is 10% ~ 60%,
+> > > I think you have high probability to keep the loop continually.
+> > > Would it never happen?
+> >
+> > Actually, even with a failure rate of 10% I don't think you'll end up
+> > with a fully continuous loop, right? All you need is to get 3 failures
+> > in a row in rtl8152_get_version() to get out of the loop. So with a
+> > 10% failure rate you'd unbind/bind 1000 times (on average) and then
+> > (finally) give up. With a 50% failure rate I think you'd only
+> > unbind/bind 8 times on average, right? Of course, I guess 1000 loops
+> > is pretty close to infinite.
+> >
+> > In any case, we haven't actually seen hardware that fails like this.
+> > We've seen failure rates that are much much lower and we can imagine
+> > failure rates that are 100% if we're got really broken hardware. Do
+> > you think cases where failure rates are middle-of-the-road are likely?
+> >
+> > I would also say that nothing we can do can perfectly handle faulty
+> > hardware. If we're imagining theoretical hardware, we could imagine
+> > theoretical hardware that de-enumerated itself and re-enumerated
+> > itself every half second because the firmware on the device crashed or
+> > some regulator kept dropping. This faulty hardware would also cause an
+> > infinite loop of de-enumeration and re-enumeration, right?
+> >
+> > Presumably if we get into either case, the user will realize that the
+> > hardware isn't working and will unplug it from the system. While the
+> > system is doing the loop of trying to enumerate the hardware, it will
+> > be taking up a bunch of extra CPU cycles but (I believe) it won't be
+> > fully locked up or anything. The machine will still function and be
+> > able to do non-Ethernet activities, right? I would say that the worst
+> > thing about this state would be that it would stress corner cases in
+> > the reset of the USB subsystem, possibly ticking bugs.
+> >
+> > So I guess I would summarize all the above as:
+> >
+> > If hardware is broken in just the right way then this patch could
+> > cause a nearly infinite unbinding/rebinding of the r8152 driver.
+> > However:
+> >
+> > 1. It doesn't seem terribly likely for hardware to be broken in just th=
+is way.
+> >
+> > 2. We haven't seen hardware broken in just this way.
+> >
+> > 3. Hardware broken in a slightly different way could cause infinite
+> > unbinding/rebinding even without this patch.
+> >
+> > 4. Infinite unbinding/rebinding of a USB adapter isn't great, but not
+> > the absolute worst thing.
+> >
+> >
+> > That all being said, if we wanted to address this we could try two
+> > different ways:
+> >
+> > a) We could add a global in the r8152 driver and limit the number of
+> > times we reset. This gets a little ugly because if we have multiple
+> > r8152 adapters plugged in then the same global would be used for both,
+> > but maybe it's OK?
+> >
+> > b) We could improve the USB core to somehow prevent usb_reset_device()
+> > from running too much on a given device?
+> >
+> >
+> > ...though I would re-emphasize that I don't think this is something we
+> > need to address now. If later we actually see a problem we can always
+> > address it then.
+>
+> One other idea occurred to me that we could do, if we cared to solve
+> this hypothetical failure case. We could change the code to always
+> read the version 4 times on every probe. If one of the transfers fails
+> then we could consider that OK. If 2 or more transfers fails then we
+> could consider that to be an error. You still might get a _few_
+> unbind/bind in this hypothetical failure mode, but I think it would
+> catch the problem more quickly.
+>
+> My probability theory is rusty and I'm sure there's a better way, but
+> I think we can just add up all the cases. Assuming a 10% failures and
+> 90% success of any transfer:
+>
+> # Chance of 2 failures:
+> .10 * .10 * .90 * .90 +
+> .10 * .90 * .10 * .90 +
+> .10 * .90 * .90 * .10 +
+> .90 * .10 * .90 * .10 +
+> .90 * .90 * .10 * .10
+>
+> # Chance of 3 failures:
+> .10 * .10 * .10 * .90 +
+> .10 * .10 * .90 * .10 +
+> .10 * .90 * .10 * .10 +
+> .90 * .10 * .10 * .10
+>
+> # Chance of 4 failures:
+> .10 * .10 * .10 * .10
+>
+> If I add that up I get about a 4.4% chance of 2 or more failures in 4
+> reads. That means if we got into an unbind/bind cycle we'd get out of
+> it (on average) in ~23 probes because we'd see enough failures. We
+> could likely reduce this further by reading the version 5 or 6 times.
+>
+> I will note that my measurements showed that a normal probe is ~200
+> transfers and also includes a bunch of delays, so reading the version
+> a few times wouldn't be a huge deal.
+>
+>
+> In any case, I'm still of the opinion that we don't need to handle this.
 
-On 10/18/23 01:50, Jakub Kicinski wrote:
-> On Tue, 17 Oct 2023 22:27:41 +0200 Marc Kleine-Budde wrote:
->>> Would be good to clarify what impact on device operation the problem
->>> has. How would end user notice the problem?
->>> Does it mean snapshots were always or never enabled, previously?
->>
->> On all dwmac devices not covered by dwmac-intel.c (INTEL 10/100/1000
->> Ethernet PCI driver), PPS capture can be requested from user-space, but
->> is not enabled in HW. There is no error message or other feedback to the
->> user space. The user space will not get any PPS events.
->>
->> As this change also affects the Intel driver, and we don't have any
->> hardware to test, I think it's better that this goes via net-next to
->> give it a bit more time of testing.
+Hayes,
+As Doug points out the probability is really low of this happening for
+an event that is already rare. Doug's patch is a very good step in the
+right direction (driver robustness) and I think has been tested by
+Chromium OS team enough that it is safe to apply to the upstream tree.
+I'm a big fan of taking small steps where we can. We can further
+improve on this in the future as needed.
 
-I have also CC'ed Kurt in this series, as I know he has at least some hardware 
-at hand, though I cannot tell whether he has any chance to test the PPS 
-capture. Maybe he has a possibility to try it out. However, giving it a spin in 
-net-next SGTM.
+Please add:
+Reviewed-by: Grant Grundler <grundler@chromium.org>
 
-> 
-> SGTM, we can chalk it up to "never worked, doesn't hurt anyone"
-> and put it in net-next. But then the Fixes tag must go.
-> 
+cheers,
+grant
 
-sure, that's fine for me. I will reword the commit messages and send a v2.
-
-Best regards,
-Johannes
-
--- 
-Pengutronix e.K.                | Johannes Zink                  |
-Steuerwalder Str. 21            | https://www.pengutronix.de/    |
-31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
-Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
-
+>
+> -Doug
 
