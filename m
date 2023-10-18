@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-42230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BD507CDBCD
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:36:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 170BF7CDBCF
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:36:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99CCE1C20D39
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:36:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE6582814CD
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E2C3C3E;
-	Wed, 18 Oct 2023 12:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34A734CD3;
+	Wed, 18 Oct 2023 12:36:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kznUucxN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P/FnAP9A"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5252A34CDD
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 12:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F5834CE1
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 12:36:02 +0000 (UTC)
 Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C00D710F;
-	Wed, 18 Oct 2023 05:35:58 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-4081ccf69dcso10049875e9.0;
-        Wed, 18 Oct 2023 05:35:58 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AC35114;
+	Wed, 18 Oct 2023 05:36:00 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-4083cd39188so4660215e9.2;
+        Wed, 18 Oct 2023 05:36:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697632557; x=1698237357; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+z2DeuWbLpI7AEzz9he/oetq9pODDYK4Bo2MZwm1LlY=;
-        b=kznUucxN6CW1QLdzL9Q9cLnndx4jBo8J/iAytD6q6kEyJCUN/o6yzcImP3lQvZ93ri
-         9130pjTDDxhA0Q5Cxm+Im2vENF2tlQRlIEEYdsDcdcnI1+PNwAA/r7XtUbPHQqmGf9+J
-         yMSsQ84WSU+imrHsKbuaRRtoBFyjJ0RX1sxpjJ1M+52XiguiPbfrmRZR410lKLkTO8Ni
-         yNJp8gItC0nb3NFnfTS1WQluVdenO/nLWGbtybqpaCW6pZbpfXgFFPVCAOhU2f+DFZ6B
-         FTk6y7xQ8V4wg5M3VcnALZTprrM7z6xZtexIGYpxRi7XKAXRoar85wb1T7TTXl+Ztp4C
-         u/4w==
+        d=gmail.com; s=20230601; t=1697632558; x=1698237358; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0v0ZmldTmEHElH0nzfPoImpxhHxc/jfxnYXGlHkEaSw=;
+        b=P/FnAP9ANfmDDxex6pXE8sdpnuIA4RjlogwtL6Ul37mnpF5bcN8VE6D1bXHGPoU/OC
+         XPpRFIMlnIOzYWN9j2OU0uqXtjcRwG7gNyQqdIkstfJs2yS77OGXs1gJlPfSwdQ61o24
+         JUGwhY8GK9AtKTosNTe5c2gD0y5wTekNzzRLKQjEgsLEd0dKBgRlN0Szp9tyV4IXTqHG
+         bdtJwW+YKtP4YeEoA7v5khVhlS12LQG0ELO+kLVXCANJyWW44L8dMHL6uZbM7nLYVLvR
+         ZL+kwYh8I84WS9ed2GWAlAZFr782nQrj5p9WlP7rRa99+1Is/0ptvQqyOao4PrQyt0Ne
+         PrzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697632557; x=1698237357;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+z2DeuWbLpI7AEzz9he/oetq9pODDYK4Bo2MZwm1LlY=;
-        b=OwGgJ/iA//+hhTRhZxry9khxURYndmFIsZhV6sipskl/LaN2tt37N3T9w0NrbxV2J9
-         sn8yqmN3kh0+3w4uMRkImNtEjNOMWDnKDmLzMYCJR+mrOP6hrm+3Amd2hbQVXyW4uHlf
-         3bZYBz6WqBpISBCe7/unXn9Wm70DgMR7dFDIbM/2uMieiG8ApraHJUYnRZNDiAVa3V+U
-         Saiu8w9pLl54kvv3shKnuKuSHpDX9A7BuYJCpYKUFj0+fs8A1uc0z722eAPc1kijb/88
-         tNP6/CHRqkkTBJ3Y1npaP1BacHQDIAYJQExskQb8f8sqPKoX3pm3uCHALlT//ud1FRhb
-         Moyw==
-X-Gm-Message-State: AOJu0Ywy9/hXPi71bkDBwbcssCGNyBAbAe1lxwaMcVpVJ6jEDIB0equH
-	CG2S/xDBHIwNIcbC99Va7kE=
-X-Google-Smtp-Source: AGHT+IHi7O1ZsGGb+3ZGVPAoATB5PmPAZWxpAXGDGRKLUdLuB4yOu6xE3tV0+2ka93mWmWLL4vJhfw==
-X-Received: by 2002:adf:9b95:0:b0:31f:fc9a:a03 with SMTP id d21-20020adf9b95000000b0031ffc9a0a03mr4367013wrc.20.1697632556892;
-        Wed, 18 Oct 2023 05:35:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697632558; x=1698237358;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0v0ZmldTmEHElH0nzfPoImpxhHxc/jfxnYXGlHkEaSw=;
+        b=Ls/g2JXAAXVTqVAt3lnqRZZMMjtBZ7MXNOq59r+ZUbnaRlsnCF4tsyLqJxQYOo8Gkt
+         E5BaZDV4/Iye9ss41ZVqLpwJEBKwoV8JbKqY1oRXn9M9EZRPGjE6E3sDfpxKSAjR/Sbp
+         Qab6QlRUcTTxaOASJDygBW6OEanyNqzPMvJ+40s7fM0XZA4LSFBdhhlTwneoyhj4xR8m
+         15eramOofmJouBpxd/yyyBJXykAH/2pPvI3X1l/2Ucbc6DCb2AS6MVabUV1Srasot1st
+         iP+fQDCNiXF8OE/lOvJNrC9BbCLeR84yvO/iOLfdebbvgS9E5vBlGdKzk5DFUgyF4O47
+         QvtQ==
+X-Gm-Message-State: AOJu0Yy12u167d84IWg6WHdqe6wX6KbJqb+KqzEuLhG4mdvKaPP4mstq
+	/SmkREEnguTtCv5DZBrjoy3qQzEcwrU=
+X-Google-Smtp-Source: AGHT+IHYxeHjCIR/FT2JDqNfUwmEd2G8A/49wx/hETYLT6M/03g9TnduO1+10bkcfRpmv5Wp7ErFMw==
+X-Received: by 2002:a05:600c:3511:b0:404:72fe:ed5c with SMTP id h17-20020a05600c351100b0040472feed5cmr4380670wmq.29.1697632558280;
+        Wed, 18 Oct 2023 05:35:58 -0700 (PDT)
 Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id q28-20020adfab1c000000b003248a490e3asm2048211wrc.39.2023.10.18.05.35.55
+        by smtp.googlemail.com with ESMTPSA id q28-20020adfab1c000000b003248a490e3asm2048211wrc.39.2023.10.18.05.35.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 05:35:56 -0700 (PDT)
+        Wed, 18 Oct 2023 05:35:57 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Raju Rangoju <rajur@chelsio.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -78,10 +79,12 @@ To: Raju Rangoju <rajur@chelsio.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-wireless@vger.kernel.org
 Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH v4 0/4] net: stmmac: improve tx timer logic
-Date: Wed, 18 Oct 2023 14:35:46 +0200
-Message-Id: <20231018123550.27110-1-ansuelsmth@gmail.com>
+Subject: [net-next PATCH v4 1/4] net: introduce napi_is_scheduled helper
+Date: Wed, 18 Oct 2023 14:35:47 +0200
+Message-Id: <20231018123550.27110-2-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20231018123550.27110-1-ansuelsmth@gmail.com>
+References: <20231018123550.27110-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,61 +99,104 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This series comes with the intention of restoring original performance
-of stmmac on some router/device that used the stmmac driver to handle
-gigabit traffic.
+We currently have napi_if_scheduled_mark_missed that can be used to
+check if napi is scheduled but that does more thing than simply checking
+it and return a bool. Some driver already implement custom function to
+check if napi is scheduled.
 
-More info are present in patch 3. This cover letter is to show results
-and improvements of the following change.
+Drop these custom function and introduce napi_is_scheduled that simply
+check if napi is scheduled atomically.
 
-The move to hr_timer for tx timer and commit 8fce33317023 ("net: stmmac:
-Rework coalesce timer and fix multi-queue races") caused big performance
-regression on these kind of device.
+Update any driver and code that implement a similar check and instead
+use this new helper.
 
-This was observed on ipq806x that after kernel 4.19 couldn't handle
-gigabit speed anymore.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+ drivers/net/ethernet/chelsio/cxgb3/sge.c  |  8 --------
+ drivers/net/wireless/realtek/rtw89/core.c |  2 +-
+ include/linux/netdevice.h                 | 23 +++++++++++++++++++++++
+ net/core/dev.c                            |  2 +-
+ 4 files changed, 25 insertions(+), 10 deletions(-)
 
-The following series is currently applied and tested in OpenWrt SNAPSHOT
-and have great performance increase. (the scenario is qca8k switch +
-stmmac dwmac1000) Some good comparison can be found here [1].
-
-The difference is from a swconfig scenario (where dsa tagging is not
-used so very low CPU impact in handling traffic) and DSA scenario where
-tagging is used and there is a minimal impact in the CPU. As can be
-notice even with DSA in place we have better perf.
-
-It was observed by other user that also SQM scenario with cake scheduler
-were improved in the order of 100mbps (this scenario is CPU limited and
-any increase of perf is caused by removing load on the CPU)
-
-Been at least 15 days that this is in use without any complain or bug
-reported about queue timeout. (was the case with v1 before the
-additional patch was added, only appear on real world tests and not on
-iperf tests)
-
-[1] https://forum.openwrt.org/t/netgear-r7800-exploration-ipq8065-qca9984/285/3427?u=ansuel
-
-Changes v4:
-- Fix W=1 warning for missing define of pending_packets
-Changes v3:
-- Fix compilation error for missing comma
-Changes v2:
-- Add patch to move tx timer arm outside tx clean.
-
-Christian Marangi (4):
-  net: introduce napi_is_scheduled helper
-  net: stmmac: improve TX timer arm logic
-  net: stmmac: move TX timer arm after DMA enable
-  net: stmmac: increase TX coalesce timer to 5ms
-
- drivers/net/ethernet/chelsio/cxgb3/sge.c      |  8 ----
- drivers/net/ethernet/stmicro/stmmac/common.h  |  2 +-
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 40 +++++++++++++++----
- drivers/net/wireless/realtek/rtw89/core.c     |  2 +-
- include/linux/netdevice.h                     | 23 +++++++++++
- net/core/dev.c                                |  2 +-
- 6 files changed, 59 insertions(+), 18 deletions(-)
-
+diff --git a/drivers/net/ethernet/chelsio/cxgb3/sge.c b/drivers/net/ethernet/chelsio/cxgb3/sge.c
+index 2e9a74fe0970..71fa2dc19034 100644
+--- a/drivers/net/ethernet/chelsio/cxgb3/sge.c
++++ b/drivers/net/ethernet/chelsio/cxgb3/sge.c
+@@ -2501,14 +2501,6 @@ static int napi_rx_handler(struct napi_struct *napi, int budget)
+ 	return work_done;
+ }
+ 
+-/*
+- * Returns true if the device is already scheduled for polling.
+- */
+-static inline int napi_is_scheduled(struct napi_struct *napi)
+-{
+-	return test_bit(NAPI_STATE_SCHED, &napi->state);
+-}
+-
+ /**
+  *	process_pure_responses - process pure responses from a response queue
+  *	@adap: the adapter
+diff --git a/drivers/net/wireless/realtek/rtw89/core.c b/drivers/net/wireless/realtek/rtw89/core.c
+index cca18d7ea1dd..6faf4dcf007c 100644
+--- a/drivers/net/wireless/realtek/rtw89/core.c
++++ b/drivers/net/wireless/realtek/rtw89/core.c
+@@ -1919,7 +1919,7 @@ static void rtw89_core_rx_to_mac80211(struct rtw89_dev *rtwdev,
+ 	struct napi_struct *napi = &rtwdev->napi;
+ 
+ 	/* In low power mode, napi isn't scheduled. Receive it to netif. */
+-	if (unlikely(!test_bit(NAPI_STATE_SCHED, &napi->state)))
++	if (unlikely(!napi_is_scheduled(napi)))
+ 		napi = NULL;
+ 
+ 	rtw89_core_hw_to_sband_rate(rx_status);
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 1c7681263d30..b8bf669212cc 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -482,6 +482,29 @@ static inline bool napi_prefer_busy_poll(struct napi_struct *n)
+ 	return test_bit(NAPI_STATE_PREFER_BUSY_POLL, &n->state);
+ }
+ 
++/**
++ * napi_is_scheduled - test if NAPI is scheduled
++ * @n: NAPI context
++ *
++ * This check is "best-effort". With no locking implemented,
++ * a NAPI can be scheduled or terminate right after this check
++ * and produce not precise results.
++ *
++ * NAPI_STATE_SCHED is an internal state, napi_is_scheduled
++ * should not be used normally and napi_schedule should be
++ * used instead.
++ *
++ * Use only if the driver really needs to check if a NAPI
++ * is scheduled for example in the context of delayed timer
++ * that can be skipped if a NAPI is already scheduled.
++ *
++ * Return True if NAPI is scheduled, False otherwise.
++ */
++static inline bool napi_is_scheduled(struct napi_struct *n)
++{
++	return test_bit(NAPI_STATE_SCHED, &n->state);
++}
++
+ bool napi_schedule_prep(struct napi_struct *n);
+ 
+ /**
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 3ca746a5f0ad..8d267fc0b988 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6527,7 +6527,7 @@ static int __napi_poll(struct napi_struct *n, bool *repoll)
+ 	 * accidentally calling ->poll() when NAPI is not scheduled.
+ 	 */
+ 	work = 0;
+-	if (test_bit(NAPI_STATE_SCHED, &n->state)) {
++	if (napi_is_scheduled(n)) {
+ 		work = n->poll(n, weight);
+ 		trace_napi_poll(n, work, weight);
+ 	}
 -- 
 2.40.1
 
