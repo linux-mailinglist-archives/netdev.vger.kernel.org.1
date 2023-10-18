@@ -1,269 +1,174 @@
-Return-Path: <netdev+bounces-42431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68D387CEA24
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:39:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C9A57CEA33
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:47:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14194B21269
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:39:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A38B1C20D64
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8C63FE3B;
-	Wed, 18 Oct 2023 21:39:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38053E019;
+	Wed, 18 Oct 2023 21:47:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+eCZd2y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IhOtcnRu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77EA43FB0D
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 21:39:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1D6FC433C7;
-	Wed, 18 Oct 2023 21:39:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697665165;
-	bh=3ma14P99QjO486lw+mTLJr8fTVnCPxtNoQRGpRPGNsg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=X+eCZd2yFfcsjjulke8qvxiXdts55CGz19ywsxiUGZIlK5s3Xnf9DHw6+YmpVIe4E
-	 N1fMb+YekI1F4DPL8vhDvaGpli+TefbmP1On79QFaW3w8ISx05cmVgj1+aufdO77ri
-	 JxLwQ9FLAqdFMyw9L8S2l7bYL/tKTnmkbCRsU3kW2al/HHnFH+iIkSXEqGF8f8lyjU
-	 RwJ9Ijd4c/0V2l5A529rX22GzAk9ccFUK7nijInwFgRc65uzU+7Vyj4Ae7IM22zSpQ
-	 c6KqdM6w6AttoLMT3AR+A5lK7L04Oyhkp+BcoJh4FhSaOO40mYnTHoAjdQMttFRhzv
-	 wSNv60aY8Mwwg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 3/3] netlink: specs: add support for auto-sized scalars
-Date: Wed, 18 Oct 2023 14:39:21 -0700
-Message-ID: <20231018213921.2694459-4-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231018213921.2694459-1-kuba@kernel.org>
-References: <20231018213921.2694459-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5287A335B1;
+	Wed, 18 Oct 2023 21:47:48 +0000 (UTC)
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1368FE;
+	Wed, 18 Oct 2023 14:47:46 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-5a7b91faf40so89283687b3.1;
+        Wed, 18 Oct 2023 14:47:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697665666; x=1698270466; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3IauKMSr3rTbLZMLKRdVJth+GWH6uHwoa0fXMf9VnAo=;
+        b=IhOtcnRuAo38n2/29xnvm205O5c2YJQ+qifs+WMt+y1hfzr7x6Z4NYYa0gMEGZ4QeD
+         THkWoL7j96TlW527xyTUSVJa/tpOZJAVL0t/04zPazozeoy8rBtL0DEvegtEb7teGJJ2
+         zWZxI8PtLjad4KTbYNK/pvK+igHoH88y8/wkzibcQ6Rdc4FRe5+9St+PwlsSMO9ZaPVZ
+         WFWLe5fs/HKibLuLFPEpGP+a3a61e/9lCYTah0AcC9wfiJxlb/pp0pjf9VUbY69FDuY9
+         Jlr1klwH29FsvGXSGpZ+OgDaEeChbwvicV/rSwGe9Z6tb55GjnOVDr4qabFA3pdqbeTA
+         UPvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697665666; x=1698270466;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3IauKMSr3rTbLZMLKRdVJth+GWH6uHwoa0fXMf9VnAo=;
+        b=LSHUH5Ku353EGdTA3B2ipRagPZU1QGnd5lPoFgEtht3MMuxO5Ci7QSvEfL9VVVRm1u
+         2VY3458VM9kmRbYTaeJqtqmpfY8qOjJgK9noRQxwdOo+b2debcQu3t4j7HXq5c8gP1IP
+         Yhd9kLjcRtWiDrz5I4SX5FIENq7Az7qGxZ8Anqv/fWcG8jW3whQY0f3RooItsaUq4Wfm
+         fW0N5iYtfT8aH9Wm9AQaLK0YfMrhWyFFCIrpeFfviLRSvwBobJU/Anay0BHZhLFJ1EGv
+         qC7saB6Wmrbupv+UK3wrWiexwOSo065R1NVjAJcbRtYf1XfpLPdzuFtW120ODueESLSq
+         yfeQ==
+X-Gm-Message-State: AOJu0YwTrn5IwiYptCN0ykN4HAmDcittlinGEnx/Ea5s6/uoagR5pm/R
+	CC/SYSRj9vCg6huOpFjcV3o=
+X-Google-Smtp-Source: AGHT+IH1vVi5koft4vHMX93mSqwvGxKuLtvk0n5sCSsrWiZTSlJi24QvnPDg5pwIbibJWpZHa3XxEQ==
+X-Received: by 2002:a05:690c:1d:b0:59b:dbb7:5c74 with SMTP id bc29-20020a05690c001d00b0059bdbb75c74mr706779ywb.32.1697665666110;
+        Wed, 18 Oct 2023 14:47:46 -0700 (PDT)
+Received: from ?IPV6:2600:1700:6cf8:1240:bc1b:4929:64c8:fdbf? ([2600:1700:6cf8:1240:bc1b:4929:64c8:fdbf])
+        by smtp.gmail.com with ESMTPSA id i78-20020a819151000000b0059be6a5fcffsm1842353ywg.44.2023.10.18.14.47.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Oct 2023 14:47:45 -0700 (PDT)
+Message-ID: <7aac6512-c1f9-42ce-b8ca-07980f90714e@gmail.com>
+Date: Wed, 18 Oct 2023 14:47:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie
+ generation/validation SOCK_OPS hooks.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, edumazet@google.com
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, dsahern@kernel.org,
+ haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
+ kpsingh@kernel.org, kuba@kernel.org, kuni1840@gmail.com,
+ martin.lau@linux.dev, mykolal@fb.com, netdev@vger.kernel.org,
+ pabeni@redhat.com, sdf@google.com, song@kernel.org, yonghong.song@linux.dev
+References: <CANn89iLZDvqrGy9UJ39a49O3NLT74r+5FXfh7u3SxSSm60BJmA@mail.gmail.com>
+ <20231018172027.9936-1-kuniyu@amazon.com>
+Content-Language: en-US
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <20231018172027.9936-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Support uint / sint types in specs and YNL.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- Documentation/netlink/genetlink-c.yaml      |  3 ++-
- Documentation/netlink/genetlink-legacy.yaml |  3 ++-
- Documentation/netlink/genetlink.yaml        |  3 ++-
- tools/net/ynl/lib/nlspec.py                 |  6 ++++++
- tools/net/ynl/lib/ynl.c                     |  6 ++++++
- tools/net/ynl/lib/ynl.h                     | 17 +++++++++++++++++
- tools/net/ynl/lib/ynl.py                    | 14 ++++++++++++++
- tools/net/ynl/ynl-gen-c.py                  |  6 ++++--
- 8 files changed, 53 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
-index dee11c514896..c72c8a428911 100644
---- a/Documentation/netlink/genetlink-c.yaml
-+++ b/Documentation/netlink/genetlink-c.yaml
-@@ -149,7 +149,8 @@ additionalProperties: False
-               name:
-                 type: string
-               type: &attr-type
--                enum: [ unused, pad, flag, binary, u8, u16, u32, u64, s32, s64,
-+                enum: [ unused, pad, flag, binary,
-+                        uint, sint, u8, u16, u32, u64, s32, s64,
-                         string, nest, array-nest, nest-type-value ]
-               doc:
-                 description: Documentation of the attribute.
-diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-index 9194f3e223ef..923de0ff1a9e 100644
---- a/Documentation/netlink/genetlink-legacy.yaml
-+++ b/Documentation/netlink/genetlink-legacy.yaml
-@@ -192,7 +192,8 @@ additionalProperties: False
-                 type: string
-               type: &attr-type
-                 description: The netlink attribute type
--                enum: [ unused, pad, flag, binary, u8, u16, u32, u64, s32, s64,
-+                enum: [ unused, pad, flag, binary,
-+                        uint, sint, u8, u16, u32, u64, s32, s64,
-                         string, nest, array-nest, nest-type-value ]
-               doc:
-                 description: Documentation of the attribute.
-diff --git a/Documentation/netlink/genetlink.yaml b/Documentation/netlink/genetlink.yaml
-index 0a4ae861d011..9ceb096b2df2 100644
---- a/Documentation/netlink/genetlink.yaml
-+++ b/Documentation/netlink/genetlink.yaml
-@@ -122,7 +122,8 @@ additionalProperties: False
-               name:
-                 type: string
-               type: &attr-type
--                enum: [ unused, pad, flag, binary, u8, u16, u32, u64, s32, s64,
-+                enum: [ unused, pad, flag, binary,
-+                        uint, sint, u8, u16, u32, u64, s32, s64,
-                         string, nest, array-nest, nest-type-value ]
-               doc:
-                 description: Documentation of the attribute.
-diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
-index 37bcb4d8b37b..92889298b197 100644
---- a/tools/net/ynl/lib/nlspec.py
-+++ b/tools/net/ynl/lib/nlspec.py
-@@ -149,6 +149,7 @@ jsonschema = None
-     Represents a single attribute type within an attr space.
- 
-     Attributes:
-+        type          string, attribute type
-         value         numerical ID when serialized
-         attr_set      Attribute Set containing this attr
-         is_multi      bool, attr may repeat multiple times
-@@ -157,10 +158,13 @@ jsonschema = None
-         len           integer, optional byte length of binary types
-         display_hint  string, hint to help choose format specifier
-                       when displaying the value
-+
-+        is_auto_scalar bool, attr is a variable-size scalar
-     """
-     def __init__(self, family, attr_set, yaml, value):
-         super().__init__(family, yaml)
- 
-+        self.type = yaml['type']
-         self.value = value
-         self.attr_set = attr_set
-         self.is_multi = yaml.get('multi-attr', False)
-@@ -170,6 +174,8 @@ jsonschema = None
-         self.len = yaml.get('len')
-         self.display_hint = yaml.get('display-hint')
- 
-+        self.is_auto_scalar = self.type == "sint" or self.type == "uint"
-+
- 
- class SpecAttrSet(SpecElement):
-     """ Netlink Attribute Set class.
-diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index 514e0d69e731..350ddc247450 100644
---- a/tools/net/ynl/lib/ynl.c
-+++ b/tools/net/ynl/lib/ynl.c
-@@ -352,6 +352,12 @@ int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *attr)
- 		yerr(yarg->ys, YNL_ERROR_ATTR_INVALID,
- 		     "Invalid attribute (u64 %s)", policy->name);
- 		return -1;
-+	case YNL_PT_UINT:
-+		if (len == sizeof(__u32) || len == sizeof(__u64))
-+			break;
-+		yerr(yarg->ys, YNL_ERROR_ATTR_INVALID,
-+		     "Invalid attribute (uint %s)", policy->name);
-+		return -1;
- 	case YNL_PT_FLAG:
- 		/* Let flags grow into real attrs, why not.. */
- 		break;
-diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
-index 9eafa3552c16..87b4dad832f0 100644
---- a/tools/net/ynl/lib/ynl.h
-+++ b/tools/net/ynl/lib/ynl.h
-@@ -133,6 +133,7 @@ enum ynl_policy_type {
- 	YNL_PT_U16,
- 	YNL_PT_U32,
- 	YNL_PT_U64,
-+	YNL_PT_UINT,
- 	YNL_PT_NUL_STR,
- };
- 
-@@ -234,4 +235,20 @@ int ynl_exec_dump(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
- void ynl_error_unknown_notification(struct ynl_sock *ys, __u8 cmd);
- int ynl_error_parse(struct ynl_parse_arg *yarg, const char *msg);
- 
-+#ifndef MNL_HAS_AUTO_SCALARS
-+static inline uint64_t mnl_attr_get_uint(const struct nlattr *attr)
-+{
-+	if (mnl_attr_get_len(attr) == 4)
-+		return mnl_attr_get_u32(attr);
-+	return mnl_attr_get_u64(attr);
-+}
-+
-+static inline void
-+mnl_attr_put_uint(struct nlmsghdr *nlh, uint16_t type, uint64_t data)
-+{
-+	if ((uint32_t)data == (uint64_t)data)
-+		return mnl_attr_put_u32(nlh, type, data);
-+	return mnl_attr_put_u64(nlh, type, data);
-+}
-+#endif
- #endif
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 28ac35008e65..3b36553a66cc 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -130,6 +130,13 @@ from .nlspec import SpecFamily
-         format = self.get_format(attr_type, byte_order)
-         return format.unpack(self.raw)[0]
- 
-+    def as_auto_scalar(self, attr_type, byte_order=None):
-+        if len(self.raw) != 4 and len(self.raw) != 8:
-+            raise Exception(f"Auto-scalar len payload be 4 or 8 bytes, got {len(self.raw)}")
-+        real_type = attr_type[0] + str(len(self.raw) * 8)
-+        format = self.get_format(real_type, byte_order)
-+        return format.unpack(self.raw)[0]
-+
-     def as_strz(self):
-         return self.raw.decode('ascii')[:-1]
- 
-@@ -463,6 +470,11 @@ genl_family_name_to_id = None
-                 attr_payload = bytes.fromhex(value)
-             else:
-                 raise Exception(f'Unknown type for binary attribute, value: {value}')
-+        elif attr.is_auto_scalar:
-+            scalar = int(value)
-+            real_type = attr["type"][0] + ('32' if scalar.bit_length() <= 32 else '64')
-+            format = NlAttr.get_format(real_type, attr.byte_order)
-+            attr_payload = format.pack(int(value))
-         elif attr['type'] in NlAttr.type_formats:
-             format = NlAttr.get_format(attr['type'], attr.byte_order)
-             attr_payload = format.pack(int(value))
-@@ -529,6 +541,8 @@ genl_family_name_to_id = None
-                 decoded = self._decode_binary(attr, attr_spec)
-             elif attr_spec["type"] == 'flag':
-                 decoded = True
-+            elif attr_spec.is_auto_scalar:
-+                decoded = attr.as_auto_scalar(attr_spec['type'], attr_spec.byte_order)
-             elif attr_spec["type"] in NlAttr.type_formats:
-                 decoded = attr.as_scalar(attr_spec['type'], attr_spec.byte_order)
-             elif attr_spec["type"] == 'array-nest':
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 6f4c538bda9a..a9e8898c9386 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -335,6 +335,8 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         maybe_enum = not self.is_bitfield and 'enum' in self.attr
-         if maybe_enum and self.family.consts[self.attr['enum']].enum_name:
-             self.type_name = f"enum {self.family.name}_{c_lower(self.attr['enum'])}"
-+        elif self.is_auto_scalar:
-+            self.type_name = '__' + self.type[0] + '64'
-         else:
-             self.type_name = '__' + self.type
- 
-@@ -362,7 +364,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         return super()._attr_policy(policy)
- 
-     def _attr_typol(self):
--        return f'.type = YNL_PT_U{self.type[1:]}, '
-+        return f'.type = YNL_PT_U{c_upper(self.type[1:])}, '
- 
-     def arg_member(self, ri):
-         return [f'{self.type_name} {self.c_name}{self.byte_order_comment}']
-@@ -1291,7 +1293,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-             self.p(line)
- 
- 
--scalars = {'u8', 'u16', 'u32', 'u64', 's32', 's64'}
-+scalars = {'u8', 'u16', 'u32', 'u64', 's32', 's64', 'uint', 'sint'}
- 
- direction_to_suffix = {
-     'reply': '_rsp',
--- 
-2.41.0
+On 10/18/23 10:20, Kuniyuki Iwashima wrote:
+> From: Eric Dumazet <edumazet@google.com>
+> Date: Wed, 18 Oct 2023 10:02:51 +0200
+>> On Wed, Oct 18, 2023 at 8:19 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>>
+>>> On 10/17/23 9:48 AM, Kuniyuki Iwashima wrote:
+>>>> From: Martin KaFai Lau <martin.lau@linux.dev>
+>>>> Date: Mon, 16 Oct 2023 22:53:15 -0700
+>>>>> On 10/13/23 3:04 PM, Kuniyuki Iwashima wrote:
+>>>>>> Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
+>>>>>> After 3WHS, the proxy restores SYN and forwards it and ACK to the backend
+>>>>>> server.  Our kernel module works at Netfilter input/output hooks and first
+>>>>>> feeds SYN to the TCP stack to initiate 3WHS.  When the module is triggered
+>>>>>> for SYN+ACK, it looks up the corresponding request socket and overwrites
+>>>>>> tcp_rsk(req)->snt_isn with the proxy's cookie.  Then, the module can
+>>>>>> complete 3WHS with the original ACK as is.
+>>>>>
+>>>>> Does the current kernel module also use the timestamp bits differently?
+>>>>> (something like patch 8 and patch 10 trying to do)
+>>>>
+>>>> Our SYN Proxy uses TS as is.  The proxy nodes generate a random number
+>>>> if TS is in SYN.
+>>>>
+>>>> But I thought someone would suggest making TS available so that we can
+>>>> mock the default behaviour at least, and it would be more acceptable.
+>>>>
+>>>> The selftest uses TS just to strengthen security by validating 32-bits
+>>>> hash.  Dropping a part of hash makes collision easier to happen, but
+>>>> 24-bits were sufficient for us to reduce SYN flood to the managable
+>>>> level at the backend.
+>>>
+>>> While enabling bpf to customize the syncookie (and timestamp), I want to explore
+>>> where can this also be done other than at the tcp layer.
+>>>
+>>> Have you thought about directly sending the SYNACK back at a lower layer like
+>>> tc/xdp after receiving the SYN?
+> 
+> Yes.  Actually, at netconf I mentioned the cookie generation hook will not
+> be necessary and should be replaced with XDP.
+> 
+> 
+>>> There are already bpf_tcp_{gen,check}_syncookie
+>>> helper that allows to do this for the performance reason to absorb synflood. It
+>>> will be natural to extend it to handle the customized syncookie also.
+> 
+> Maybe we even need not extend it and can use XDP as said below.
+> 
+> 
+>>>
+>>> I think it should already be doable to send a SYNACK back with customized
+>>> syncookie (and timestamp) at tc/xdp today.
+>>>
+>>> When ack is received, the prog@tc/xdp can verify the cookie. It will probably
+>>> need some new kfuncs to create the ireq and queue the child socket. The bpf prog
+>>> can change the ireq->{snd_wscale, sack_ok...} if needed. The details of the
+>>> kfuncs need some more thoughts. I think most of the bpf-side infra is ready,
+>>> e.g. acquire/release/ref-tracking...etc.
+>>>
+>>
+>> I think I mostly agree with this.
+> 
+> I didn't come up with kfunc to create ireq and queue it to listener, so
+> cookie_v[46]_check() were best place for me to extend easily, but now it
+> sounds like kfunc would be the way to go.
+> 
+> Maybe we can move the core part of cookie_v[46]_check() except for kernel
+> cookie's validation to __cookie_v[46]_check() and expose a wrapper of it
+> as kfunc ?
+> 
+> Then, we can look up sk and pass the listener, skb, and flags (for sack_ok,
+> etc) to the kfunc.  (It could still introduce some conflicts with Eric's
+> patch though...)
 
+Does that mean the packets handled in this way (in XDP) will skip all 
+netfilter at all?
+
+
+> 
+> 
+>>
+>> I am rebasing  a patch adding usec resolution to TCP TS,
+>> that we used for about 10 years at Google, because it is time to upstream it.
+>>
+>> I am worried about more changes/conflicts caused by Kuniyuki patch set...
+> 
 
