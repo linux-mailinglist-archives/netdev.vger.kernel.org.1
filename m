@@ -1,298 +1,142 @@
-Return-Path: <netdev+bounces-42282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 182777CE0A6
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:03:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3274F7CE0BB
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:07:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82BF7B21062
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 15:03:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96D39281C5B
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 15:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2E537C9F;
-	Wed, 18 Oct 2023 15:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3982837CA5;
+	Wed, 18 Oct 2023 15:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gn2cvizO"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="U2NBdHD3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3C831A86;
-	Wed, 18 Oct 2023 15:03:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF3E9C433C8;
-	Wed, 18 Oct 2023 15:03:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697641393;
-	bh=L6D+qpbBdCzUDrl/li04wVioUZCLruBmB/YXF1xf4Bs=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=Gn2cvizOXkUy01k71YGxTE7X4z6vLqaoJLFafo+1V2D8V7Wv88ZBfmZ6d50ZFxvKj
-	 r0STRxGjErKUq13H3Iv7mn7AvIVCLxpKl0n0AqJx/zBkuo7ZkXLhcheBVnAbwngAJy
-	 S2skRkZqL4VlJYnoY86FUfOK7xrHRmF0ZzWNiFTOC5AyErC5YFeuU702fAYEtK/kQ0
-	 aIQ4dUnbHPpyCEC4k4S/zZbe8fb2opZ517pamFcrGwYG5OKsJ8cUyxGf+7h0XtSe7s
-	 mTD2R7Bi85VJqLSadyBjO5Aq+0cQCsfNSkx/qUgSy3TUsIJ33tfm5uq6iku67rtVOB
-	 05ypzoiMkKRgg==
-Message-ID: <9d2fc137b4295058ac3f88f1cca7a54bc67f01fd.camel@kernel.org>
-Subject: Re: [RFC PATCH 12/53] netfs: Provide tools to create a buffer in an
- xarray
-From: Jeff Layton <jlayton@kernel.org>
-To: David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Marc Dionne
- <marc.dionne@auristor.com>,  Paulo Alcantara <pc@manguebit.com>, Shyam
- Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Dominique
- Martinet <asmadeus@codewreck.org>, Ilya Dryomov <idryomov@gmail.com>,
- Christian Brauner <christian@brauner.io>,  linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org,  linux-nfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Date: Wed, 18 Oct 2023 11:03:10 -0400
-In-Reply-To: <20231013160423.2218093-13-dhowells@redhat.com>
-References: <20231013160423.2218093-1-dhowells@redhat.com>
-	 <20231013160423.2218093-13-dhowells@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A779F3C1E
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:07:43 +0000 (UTC)
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582BE94;
+	Wed, 18 Oct 2023 08:07:42 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39IF7NeE087456;
+	Wed, 18 Oct 2023 10:07:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1697641643;
+	bh=Xfb8xAPoeSQVAD4+8cJSBA5CbVXNlnkSmUPpryI54xI=;
+	h=From:To:CC:Subject:Date;
+	b=U2NBdHD38jXrWR6Y/XM2VFYzaq5CR4k/MWZajymYWsv01Nn/UMT0uUqsz9VMB2VX2
+	 HBU8Ipjct3GNNmxP9uQqY+T8UagilE7ubTT82VFSSOa+Jt4T6aAmTxGTdOyAygz8+N
+	 y5Gh9Q4cLsEKzA2lrLkAdcwZaoTJUsUOhZgg1Iq8=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39IF7N1G084046
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 18 Oct 2023 10:07:23 -0500
+Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 18
+ Oct 2023 10:07:23 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 18 Oct 2023 10:07:23 -0500
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39IF7N3C093689;
+	Wed, 18 Oct 2023 10:07:23 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.31])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 39IF7MEm011182;
+	Wed, 18 Oct 2023 10:07:22 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+        Grygorii Strashko
+	<grygorii.strashko@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        "Jacob
+ Keller" <jacob.e.keller@intel.com>,
+        Roger Quadros <rogerq@kernel.org>,
+        "MD
+ Danish Anwar" <danishanwar@ti.com>,
+        Paolo Abeni <pabeni@redhat.com>, "Jakub
+ Kicinski" <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+        <r-gunasekaran@ti.com>
+Subject: [PATCH net v3] net: ti: icssg-prueth: Fix r30 CMDs bitmasks
+Date: Wed, 18 Oct 2023 20:37:15 +0530
+Message-ID: <20231018150715.3085380-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 2023-10-13 at 17:03 +0100, David Howells wrote:
-> Provide tools to create a buffer in an xarray, with a function to add
-> new folios with a mark.  This will be used to create bounce buffer and ca=
-n be
-> used more easily to create a list of folios the span of which would requi=
-re
-> more than a page's worth of bio_vec structs.
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-cachefs@redhat.com
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
-> ---
->  fs/netfs/internal.h   |  16 +++++
->  fs/netfs/misc.c       | 140 ++++++++++++++++++++++++++++++++++++++++++
->  include/linux/netfs.h |   4 ++
->  3 files changed, 160 insertions(+)
->=20
-> diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-> index 1f067aa96c50..00e01278316f 100644
-> --- a/fs/netfs/internal.h
-> +++ b/fs/netfs/internal.h
-> @@ -52,6 +52,22 @@ static inline void netfs_proc_add_rreq(struct netfs_io=
-_request *rreq) {}
->  static inline void netfs_proc_del_rreq(struct netfs_io_request *rreq) {}
->  #endif
-> =20
-> +/*
-> + * misc.c
-> + */
-> +int netfs_xa_store_and_mark(struct xarray *xa, unsigned long index,
-> +			    struct folio *folio, bool put_mark,
-> +			    bool pagecache_mark, gfp_t gfp_mask);
-> +int netfs_add_folios_to_buffer(struct xarray *buffer,
-> +			       struct address_space *mapping,
-> +			       pgoff_t index, pgoff_t to, gfp_t gfp_mask);
-> +int netfs_set_up_buffer(struct xarray *buffer,
-> +			struct address_space *mapping,
-> +			struct readahead_control *ractl,
-> +			struct folio *keep,
-> +			pgoff_t have_index, unsigned int have_folios);
-> +void netfs_clear_buffer(struct xarray *buffer);
-> +
->  /*
->   * objects.c
->   */
-> diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
-> index c3baf2b247d9..c70f856f3129 100644
-> --- a/fs/netfs/misc.c
-> +++ b/fs/netfs/misc.c
-> @@ -8,6 +8,146 @@
->  #include <linux/swap.h>
->  #include "internal.h"
-> =20
-> +/*
-> + * Attach a folio to the buffer and maybe set marks on it to say that we=
- need
-> + * to put the folio later and twiddle the pagecache flags.
-> + */
-> +int netfs_xa_store_and_mark(struct xarray *xa, unsigned long index,
-> +			    struct folio *folio, bool put_mark,
-> +			    bool pagecache_mark, gfp_t gfp_mask)
-> +{
-> +	XA_STATE_ORDER(xas, xa, index, folio_order(folio));
-> +
-> +retry:
-> +	xas_lock(&xas);
-> +	for (;;) {
-> +		xas_store(&xas, folio);
-> +		if (!xas_error(&xas))
-> +			break;
-> +		xas_unlock(&xas);
-> +		if (!xas_nomem(&xas, gfp_mask))
-> +			return xas_error(&xas);
-> +		goto retry;
-> +	}
-> +
-> +	if (put_mark)
-> +		xas_set_mark(&xas, NETFS_BUF_PUT_MARK);
-> +	if (pagecache_mark)
-> +		xas_set_mark(&xas, NETFS_BUF_PAGECACHE_MARK);
-> +	xas_unlock(&xas);
-> +	return xas_error(&xas);
-> +}
-> +
-> +/*
-> + * Create the specified range of folios in the buffer attached to the re=
-ad
-> + * request.  The folios are marked with NETFS_BUF_PUT_MARK so that we kn=
-ow that
-> + * these need freeing later.
-> + */
+The bitmasks for EMAC_PORT_DISABLE and EMAC_PORT_FORWARD r30 commands are
+wrong in the driver.
 
-Some kerneldoc comments on these new helpers would be nice. I assume
-that "index" and "to" are "start" and "end" for this, but it'd be nice
-to make that explicit.
+Update the bitmasks of these commands to the correct ones as used by the
+ICSSG firmware. These bitmasks are backwards compatible and work with
+any ICSSG firmware version.
 
+Fixes: e9b4ece7d74b ("net: ti: icssg-prueth: Add Firmware config and classification APIs.")
+Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+---
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Ravi Gunasekaran <r-gunasekaran@ti.com>
 
-> +int netfs_add_folios_to_buffer(struct xarray *buffer,
-> +			       struct address_space *mapping,
-> +			       pgoff_t index, pgoff_t to, gfp_t gfp_mask)
-> +{
-> +	struct folio *folio;
-> +	int ret;
-> +
-> +	if (to + 1 =3D=3D index) /* Page range is inclusive */
-> +		return 0;
-> +
-> +	do {
-> +		/* TODO: Figure out what order folio can be allocated here */
-> +		folio =3D filemap_alloc_folio(readahead_gfp_mask(mapping), 0);
-> +		if (!folio)
-> +			return -ENOMEM;
-> +		folio->index =3D index;
-> +		ret =3D netfs_xa_store_and_mark(buffer, index, folio,
-> +					      true, false, gfp_mask);
-> +		if (ret < 0) {
-> +			folio_put(folio);
-> +			return ret;
-> +		}
-> +
-> +		index +=3D folio_nr_pages(folio);
-> +	} while (index <=3D to && index !=3D 0);
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Set up a buffer into which to data will be read or decrypted/decompre=
-ssed.
-> + * The folios to be read into are attached to this buffer and the gaps f=
-illed
-> + * in to form a continuous region.
-> + */
-> +int netfs_set_up_buffer(struct xarray *buffer,
-> +			struct address_space *mapping,
-> +			struct readahead_control *ractl,
-> +			struct folio *keep,
-> +			pgoff_t have_index, unsigned int have_folios)
-> +{
-> +	struct folio *folio;
-> +	gfp_t gfp_mask =3D readahead_gfp_mask(mapping);
-> +	unsigned int want_folios =3D have_folios;
-> +	pgoff_t want_index =3D have_index;
-> +	int ret;
-> +
-> +	ret =3D netfs_add_folios_to_buffer(buffer, mapping, want_index,
-> +					 have_index - 1, gfp_mask);
-> +	if (ret < 0)
-> +		return ret;
-> +	have_folios +=3D have_index - want_index;
-> +
-> +	ret =3D netfs_add_folios_to_buffer(buffer, mapping,
-> +					 have_index + have_folios,
-> +					 want_index + want_folios - 1,
-> +					 gfp_mask);
+Changes from v2 to v3:
+*) Updated the commit message mentioning that the patch is infact backwards
+   compatible after testing the patch with multiple firmwares. The patch works
+   with both old and new ICSSG firmwares.
+*) Rebased on latest net/main.
 
-I don't get it. Why are you calling netfs_add_folios_to_buffer twice
-here? Why not just make one call? Either way, a comment here explaining
-that would also be nice.
+Changes from v1 to v2:
+*) Added firmware version in commit message as asked by Ravi.
+*) Mentioned in commit message that the patch is not backwards compatible
+   as asked by Andrew.
 
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	/* Transfer the folios proposed by the VM into the buffer and take refs
-> +	 * on them.  The locks will be dropped in netfs_rreq_unlock().
-> +	 */
-> +	if (ractl) {
-> +		while ((folio =3D readahead_folio(ractl))) {
-> +			folio_get(folio);
-> +			if (folio =3D=3D keep)
-> +				folio_get(folio);
-> +			ret =3D netfs_xa_store_and_mark(buffer, folio->index, folio,
-> +						      true, true, gfp_mask);
-> +			if (ret < 0) {
-> +				if (folio !=3D keep)
-> +					folio_unlock(folio);
-> +				folio_put(folio);
-> +				return ret;
-> +			}
-> +		}
-> +	} else {
-> +		folio_get(keep);
-> +		ret =3D netfs_xa_store_and_mark(buffer, keep->index, keep,
-> +					      true, true, gfp_mask);
-> +		if (ret < 0) {
-> +			folio_put(keep);
-> +			return ret;
-> +		}
-> +	}
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Clear an xarray buffer, putting a ref on the folios that have
-> + * NETFS_BUF_PUT_MARK set.
-> + */
-> +void netfs_clear_buffer(struct xarray *buffer)
-> +{
-> +	struct folio *folio;
-> +	XA_STATE(xas, buffer, 0);
-> +
-> +	rcu_read_lock();
-> +	xas_for_each_marked(&xas, folio, ULONG_MAX, NETFS_BUF_PUT_MARK) {
-> +		folio_put(folio);
-> +	}
-> +	rcu_read_unlock();
-> +	xa_destroy(buffer);
-> +}
-> +
->  /**
->   * netfs_invalidate_folio - Invalidate or partially invalidate a folio
->   * @folio: Folio proposed for release
-> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-> index 66479a61ad00..e8d702ac6968 100644
-> --- a/include/linux/netfs.h
-> +++ b/include/linux/netfs.h
-> @@ -109,6 +109,10 @@ static inline int wait_on_page_fscache_killable(stru=
-ct page *page)
->  	return folio_wait_private_2_killable(page_folio(page));
->  }
-> =20
-> +/* Marks used on xarray-based buffers */
-> +#define NETFS_BUF_PUT_MARK	XA_MARK_0	/* - Page needs putting  */
-> +#define NETFS_BUF_PAGECACHE_MARK XA_MARK_1	/* - Page needs wb/dirty flag=
- wrangling */
-> +
->  enum netfs_io_source {
->  	NETFS_FILL_WITH_ZEROES,
->  	NETFS_DOWNLOAD_FROM_SERVER,
->=20
+v1: https://lore.kernel.org/all/20231013111758.213769-1-danishanwar@ti.com/
+v2: https://lore.kernel.org/all/20231016161525.1695795-1-danishanwar@ti.com/
 
---=20
-Jeff Layton <jlayton@kernel.org>
+ drivers/net/ethernet/ti/icssg/icssg_config.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+index 933b84666574..b272361e378f 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_config.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+@@ -379,9 +379,9 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
+ 
+ /* Bitmask for ICSSG r30 commands */
+ static const struct icssg_r30_cmd emac_r32_bitmask[] = {
+-	{{0xffff0004, 0xffff0100, 0xffff0100, EMAC_NONE}},	/* EMAC_PORT_DISABLE */
++	{{0xffff0004, 0xffff0100, 0xffff0004, EMAC_NONE}},	/* EMAC_PORT_DISABLE */
+ 	{{0xfffb0040, 0xfeff0200, 0xfeff0200, EMAC_NONE}},	/* EMAC_PORT_BLOCK */
+-	{{0xffbb0000, 0xfcff0000, 0xdcff0000, EMAC_NONE}},	/* EMAC_PORT_FORWARD */
++	{{0xffbb0000, 0xfcff0000, 0xdcfb0000, EMAC_NONE}},	/* EMAC_PORT_FORWARD */
+ 	{{0xffbb0000, 0xfcff0000, 0xfcff2000, EMAC_NONE}},	/* EMAC_PORT_FORWARD_WO_LEARNING */
+ 	{{0xffff0001, EMAC_NONE,  EMAC_NONE, EMAC_NONE}},	/* ACCEPT ALL */
+ 	{{0xfffe0002, EMAC_NONE,  EMAC_NONE, EMAC_NONE}},	/* ACCEPT TAGGED */
+
+base-commit: 2915240eddba96b37de4c7e9a3d0ac6f9548454b
+-- 
+2.34.1
+
 
