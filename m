@@ -1,206 +1,194 @@
-Return-Path: <netdev+bounces-42166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 776707CD759
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:00:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EA77CD768
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:04:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3386A281D39
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:00:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E247C281C93
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9E916427;
-	Wed, 18 Oct 2023 09:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B831E168BB;
+	Wed, 18 Oct 2023 09:03:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nWh/C0+W"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OoAfKx6A"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC52411723
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 09:00:19 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC4DF9
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 02:00:17 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9c6ab06242so1481484276.2
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 02:00:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F97134BF
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 09:03:53 +0000 (UTC)
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FD14F9
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 02:03:52 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-507ad511315so4375855e87.0
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 02:03:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697619617; x=1698224417; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hdl0e02+fzmdDNtZW4QZEzk2fnupS9pcSP9s69wjNOc=;
-        b=nWh/C0+WNvkKaslGIdEEOcwX0XlOTxLx1RI1wXrJZzsldCEScX8LjE8l2b5SW0qdMO
-         JLUmC/I4cqtaFFd/mJ6h7n0B5vxYVS79lDVyXYJs/sZ1HOO1rWbEgQWvfRnlHM54pnoh
-         XxKsjRsSn4vp0WtXW9jQyUxUluiLQ10HXSFoKBMxXLXwHUyfl3J2uK27Z+mS2Hq9T4+g
-         vkZtC7NRj8ZUV384eRuD+6HCySrGk6YtRHFxw/j/13aka2ys3vCls0qOTgn2f8tujn30
-         bePprhaPJ1+9K+HgDvVEv38+wyfq+uDP7s0n2AMnQCNWkYyK5EHsWVJvshmPLfIuaJUQ
-         O66g==
+        d=linaro.org; s=google; t=1697619830; x=1698224630; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zaIruG/+oRLmIiPtyA4re6+dZhPVyRXTEXdAK4NZbCw=;
+        b=OoAfKx6A0Iu/niMUpEPUx3KGuTz5uQZWkFp2jBBEP/fSil7X7r327G3vAyDTooahjp
+         EGgdU9a9cyDX9WJrbJ/rd6e9B0cfa60ku3RDTJODaj4bnkfwy6z5VjzxEeFaoDG01IJx
+         CxQR4D1+cEVfzkybHhSH1OaG3mzXUO10h2ztnvg4K2ndaw1VUspL7Zdx/diYFVihC/VN
+         nIP4FVS4R6l9AY80+0rXhwfYJISvhO5fTGdabBZGnJoPSiGFKGwjI0rLCQzu2RNWUU6t
+         m7xbGxBeanjUGBlXVdNe0Ut5eQ75wa5mvRf6+LcVPtBrxqGCf10YgKF4qtCm9fM3wR1u
+         E4+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697619617; x=1698224417;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hdl0e02+fzmdDNtZW4QZEzk2fnupS9pcSP9s69wjNOc=;
-        b=duw9mMmz1ug/ryPDrMUib2Fxt5Jb+ZOWRhc2jDwt1ftj6vYEKJ7yMEiKPKp/egcptI
-         +XfpOavF83wPFHGsssHbQK9iEQR2OuKVqmqLQWaZHXw9Q3nO5BTqoGUr5m6ihJC2h3+Z
-         O8bR0lpILjvXVVh0CCwYJy+uEfAz4bMqivjt5etuUEPwY6pwUP9gd3cGH1L/88e9y5pO
-         hssER0MePTx+zfMRkAREt5z9vYGzzDrtLaRySoJnNjtZvAM5utukWCqPrUW5fm5QiFvI
-         X++xk/Jn649mrEhy1r60xXdulX0iEn3QzE69jCeswmNouWAtHmlCEoZ5ASztgItqp1oU
-         p45g==
-X-Gm-Message-State: AOJu0YzDoApdJRAP47cdmDBT9mu8ji1qok9oWclm7bYHZJi5yTVebzz6
-	dO+pJ0h8cT8mD3g1DOcBiERXvo9GUTZPaw==
-X-Google-Smtp-Source: AGHT+IHv+obtPhucexH/IJCwoPMuYVkyncBT2xD3h9NDDffXznbr+04iZzPWK6FUcW6ydVFUKwUVWea8OW/F8g==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:102d:b0:d9c:2a58:b905 with SMTP
- id x13-20020a056902102d00b00d9c2a58b905mr127673ybt.9.1697619617192; Wed, 18
- Oct 2023 02:00:17 -0700 (PDT)
-Date: Wed, 18 Oct 2023 09:00:13 +0000
+        d=1e100.net; s=20230601; t=1697619830; x=1698224630;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zaIruG/+oRLmIiPtyA4re6+dZhPVyRXTEXdAK4NZbCw=;
+        b=U7kvOgMniIC1c2dKyun1kT749qNngtA6lxjb3g1zTgInUfjK8LVJ6qhOOTUG9nb/kT
+         3bhAie40X4aV2BYMtzxckjm1G2JSF57ZiJEov3O9ilr3bO5h0qDIrZ5HqW3kSfQ+ZDGu
+         8iNcBu1s8Lot9hmaJq6mLjvVWE9Pjx03WvjCK54hxJ7dGuh67Eb+koGvdCLha7pSk1gu
+         fi1wUl02GTqFCiyQofPHDk7vpNDIgtcjIihodPPNTDaSzNHXEIN9Vlewndh2bCN52RXv
+         M7T8mJmPxzvf9rGae9KbCp1F1D2ufqHOTcZ/JiWJvxBJM9dESFQHa20o+iiN6uF4tYcQ
+         x0CQ==
+X-Gm-Message-State: AOJu0YyJ7TqZoOjtKFdkTplVBLEEYrMIt0JLAEP+DagrNjo5gNDYIpTo
+	xBNtsuNtqB93/Dac4I7gQ0WTYw==
+X-Google-Smtp-Source: AGHT+IFY0XDRY/pa63zXmKQrtZQymVa+AbJSNc4MhTRKG7V9Bl/TmTl9DLtY0/d2S5YnwLU222UlmA==
+X-Received: by 2002:ac2:5585:0:b0:507:9608:4a87 with SMTP id v5-20020ac25585000000b0050796084a87mr3480502lfg.56.1697619830254;
+        Wed, 18 Oct 2023 02:03:50 -0700 (PDT)
+Received: from [127.0.1.1] ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id w19-20020a05651234d300b005056fb1d6fbsm616595lfr.238.2023.10.18.02.03.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Oct 2023 02:03:49 -0700 (PDT)
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH net-next v4 0/7] Create a binding for the Marvell MV88E6xxx
+ DSA switches
+Date: Wed, 18 Oct 2023 11:03:39 +0200
+Message-Id: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <20231018090014.345158-1-edumazet@google.com>
-Subject: [PATCH net-next] inet: lock the socket in ip_sock_set_tos()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Christoph Paasch <cpaasch@apple.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGufL2UC/3XNTQ6CMBCG4auQrq3pH1BceQ/jorRTaIKtKaRiC
+ He3wQ3GsHzzZZ5Z0AjRwYguxYIiJDe64HOIU4F0r3wH2JnciBHGKSESP1RMMAxYSqhoyfBLeTy
+ Aya0Fb2trmDUoXz8jWDdv8g15mLCHeUL3vPRunEJ8by8T3favTvmhnigmmNSUtappZFnr6+C8i
+ uEcYrehie0hcQyxDNVWKyLbSkrR/EF8D1XHEM8Ql9oI0Rjb0vIHWtf1A/ktN/5bAQAA
+To: Andrew Lunn <andrew@lunn.ch>, 
+ Gregory Clement <gregory.clement@bootlin.com>, 
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
+ Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Russell King <linux@armlinux.org.uk>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Christian Marangi <ansuelsmth@gmail.com>, 
+ linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>
+X-Mailer: b4 0.12.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Christoph Paasch reported a panic in TCP stack [1]
+The Marvell switches are lacking DT bindings.
 
-Indeed, we should not call sk_dst_reset() without holding
-the socket lock, as __sk_dst_get() callers do not all rely
-on bare RCU.
+I need proper schema checking to add LED support to the
+Marvell switch. Just how it is, it can't go on like this.
 
-[1]
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-PGD 12bad6067 P4D 12bad6067 PUD 12bad5067 PMD 0
-Oops: 0000 [#1] PREEMPT SMP
-CPU: 1 PID: 2750 Comm: syz-executor.5 Not tainted 6.6.0-rc4-g7a5720a344e7 #49
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.11.0-2.el7 04/01/2014
-RIP: 0010:tcp_get_metrics+0x118/0x8f0 net/ipv4/tcp_metrics.c:321
-Code: c7 44 24 70 02 00 8b 03 89 44 24 48 c7 44 24 4c 00 00 00 00 66 c7 44 24 58 02 00 66 ba 02 00 b1 01 89 4c 24 04 4c 89 7c 24 10 <49> 8b 0f 48 8b 89 50 05 00 00 48 89 4c 24 30 33 81 00 02 00 00 69
-RSP: 0018:ffffc90000af79b8 EFLAGS: 00010293
-RAX: 000000000100007f RBX: ffff88812ae8f500 RCX: ffff88812b5f8f01
-RDX: 0000000000000002 RSI: ffffffff8300f080 RDI: 0000000000000002
-RBP: 0000000000000002 R08: 0000000000000003 R09: ffffffff8205eca0
-R10: 0000000000000002 R11: ffff88812b5f8f00 R12: ffff88812a9e0580
-R13: 0000000000000000 R14: ffff88812ae8fbd2 R15: 0000000000000000
-FS: 00007f70a006b640(0000) GS:ffff88813bd00000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000012bad7003 CR4: 0000000000170ee0
-Call Trace:
-<TASK>
-tcp_fastopen_cache_get+0x32/0x140 net/ipv4/tcp_metrics.c:567
-tcp_fastopen_cookie_check+0x28/0x180 net/ipv4/tcp_fastopen.c:419
-tcp_connect+0x9c8/0x12a0 net/ipv4/tcp_output.c:3839
-tcp_v4_connect+0x645/0x6e0 net/ipv4/tcp_ipv4.c:323
-__inet_stream_connect+0x120/0x590 net/ipv4/af_inet.c:676
-tcp_sendmsg_fastopen+0x2d6/0x3a0 net/ipv4/tcp.c:1021
-tcp_sendmsg_locked+0x1957/0x1b00 net/ipv4/tcp.c:1073
-tcp_sendmsg+0x30/0x50 net/ipv4/tcp.c:1336
-__sock_sendmsg+0x83/0xd0 net/socket.c:730
-__sys_sendto+0x20a/0x2a0 net/socket.c:2194
-__do_sys_sendto net/socket.c:2206 [inline]
+Some Device Tree fixes are included in the series, these
+remove the major and most annoying warnings fallout noise:
+some warnings remain, and these are of more serious nature,
+such as missing phy-mode. They can be applied individually,
+or to the networking tree with the rest of the patches.
 
-Fixes: e08d0b3d1723 ("inet: implement lockless IP_TOS")
-Reported-by: Christoph Paasch <cpaasch@apple.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+This series requires Rob Herrings series
+"dt-bindings: net: Child node schema cleanups" to be applied
+first.
+
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- include/net/ip.h                                   |  1 +
- net/ipv4/ip_sockglue.c                             | 11 +++++++++--
- net/mptcp/sockopt.c                                |  4 ++--
- tools/testing/selftests/net/mptcp/mptcp_connect.sh |  2 +-
- 4 files changed, 13 insertions(+), 5 deletions(-)
+Changes in v4:
+- Rebase the series on top of Rob's series
+  "dt-bindings: net: Child node schema cleanups" (or the hex numbered
+  ports will not work)
+- Fix up a whitespacing error corrupting v3...
+- Add a new patch making the generic DSA binding require ports or
+  ethernet-ports in the switch node.
+- Drop any corrections of port@a in the patches.
+- Drop oneOf in the compatible enum for mv88e6xxx
+- Use ethernet-switch, ethernet-ports and ethernet-phy in the examples
+- Transclude the dsa.yaml#/$defs/ethernet-ports define for ports
+- Move the DTS and binding fixes first, before the actual bindings,
+  so they apply without (too many) warnings as fallout.
+- Drop stray colon in text.
+- Drop example port in the mveusb binding.
+- Link to v3: https://lore.kernel.org/r/20231016-marvell-88e6152-wan-led-v3-0-38cd449dfb15@linaro.org
 
-diff --git a/include/net/ip.h b/include/net/ip.h
-index 6fbc0dcf4b9780d60b5e5d6f84d6017fbf57d0ae..1fc4c8d69e333e81b6fae1840262df18c2c66e25 100644
---- a/include/net/ip.h
-+++ b/include/net/ip.h
-@@ -810,5 +810,6 @@ int ip_sock_set_mtu_discover(struct sock *sk, int val);
- void ip_sock_set_pktinfo(struct sock *sk);
- void ip_sock_set_recverr(struct sock *sk);
- void ip_sock_set_tos(struct sock *sk, int val);
-+void  __ip_sock_set_tos(struct sock *sk, int val);
- 
- #endif	/* _IP_H */
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 0b74ac49d6a6f82f5e8ffe5279dba3baf30f874e..9c68b6b74d9f440be279badd8e0d7fe99ee75d0a 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -585,9 +585,9 @@ int ip_recv_error(struct sock *sk, struct msghdr *msg, int len, int *addr_len)
- 	return err;
- }
- 
--void ip_sock_set_tos(struct sock *sk, int val)
-+void __ip_sock_set_tos(struct sock *sk, int val)
- {
--	u8 old_tos = READ_ONCE(inet_sk(sk)->tos);
-+	u8 old_tos = inet_sk(sk)->tos;
- 
- 	if (sk->sk_type == SOCK_STREAM) {
- 		val &= ~INET_ECN_MASK;
-@@ -599,6 +599,13 @@ void ip_sock_set_tos(struct sock *sk, int val)
- 		sk_dst_reset(sk);
- 	}
- }
-+
-+void ip_sock_set_tos(struct sock *sk, int val)
-+{
-+	lock_sock(sk);
-+	__ip_sock_set_tos(sk, val);
-+	release_sock(sk);
-+}
- EXPORT_SYMBOL(ip_sock_set_tos);
- 
- void ip_sock_set_freebind(struct sock *sk)
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index 18ce624bfde2a5a451e42148ec7349d1ead2cec3..59bd5e114392a007a71df57217e0ec357aae8229 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -738,7 +738,7 @@ static int mptcp_setsockopt_v4_set_tos(struct mptcp_sock *msk, int optname,
- 	mptcp_for_each_subflow(msk, subflow) {
- 		struct sock *ssk = mptcp_subflow_tcp_sock(subflow);
- 
--		ip_sock_set_tos(ssk, val);
-+		__ip_sock_set_tos(ssk, val);
- 	}
- 	release_sock(sk);
- 
-@@ -1411,7 +1411,7 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
- 	ssk->sk_bound_dev_if = sk->sk_bound_dev_if;
- 	ssk->sk_incoming_cpu = sk->sk_incoming_cpu;
- 	ssk->sk_ipv6only = sk->sk_ipv6only;
--	ip_sock_set_tos(ssk, inet_sk(sk)->tos);
-+	__ip_sock_set_tos(ssk, inet_sk(sk)->tos);
- 
- 	if (sk->sk_userlocks & tx_rx_locks) {
- 		ssk->sk_userlocks |= sk->sk_userlocks & tx_rx_locks;
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-index 61a2a1988ce69ffa17e0dd8e629eac550f4f7d99..b1fc8afd072dc6ddde8d561a675a5549a9a37dba 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-@@ -716,7 +716,7 @@ run_test_transparent()
- 	# the required infrastructure in MPTCP sockopt code. To support TOS, the
- 	# following function has been exported (T). Not great but better than
- 	# checking for a specific kernel version.
--	if ! mptcp_lib_kallsyms_has "T ip_sock_set_tos$"; then
-+	if ! mptcp_lib_kallsyms_has "T __ip_sock_set_tos$"; then
- 		echo "INFO: ${msg} not supported by the kernel: SKIP"
- 		mptcp_lib_result_skip "${TEST_GROUP}"
- 		return
+Changes in v3:
+- Fix up a related mvusb example in a different binding that
+  the scripts were complaining about.
+- Fix up the wording on internal vs external MDIO buses in the
+  mv88e6xxx binding document.
+- Remove pointless label and put the right rev-mii into the
+  MV88E6060 schema.
+- Link to v2: https://lore.kernel.org/r/20231014-marvell-88e6152-wan-led-v2-0-7fca08b68849@linaro.org
+
+Changes in v2:
+- Break out a separate Marvell MV88E6060 binding file. I stand corrected.
+- Drop the idea to rely on nodename mdio-external for the external
+  MDIO bus, keep the compatible, drop patch for the driver.
+- Fix more Marvell DT mistakes.
+- Fix NXP DT mistakes in a separate patch.
+- Fix Marvell ARM64 mistakes in a separate patch.
+- Link to v1: https://lore.kernel.org/r/20231013-marvell-88e6152-wan-led-v1-0-0712ba99857c@linaro.org
+
+---
+Linus Walleij (7):
+      dt-bindings: net: dsa: Require ports or ethernet-ports
+      dt-bindings: net: mvusb: Fix up DSA example
+      ARM: dts: marvell: Fix some common switch mistakes
+      ARM: dts: nxp: Fix some common switch mistakes
+      ARM64: dts: marvell: Fix some common switch mistakes
+      dt-bindings: marvell: Rewrite MV88E6xxx in schema
+      dt-bindings: marvell: Add Marvell MV88E6060 DSA schema
+
+ Documentation/devicetree/bindings/net/dsa/dsa.yaml |   6 +
+ .../bindings/net/dsa/marvell,mv88e6060.yaml        |  90 +++++++++
+ .../bindings/net/dsa/marvell,mv88e6xxx.yaml        | 225 +++++++++++++++++++++
+ .../devicetree/bindings/net/dsa/marvell.txt        | 109 ----------
+ .../devicetree/bindings/net/marvell,mvusb.yaml     |   7 +-
+ MAINTAINERS                                        |   3 +-
+ arch/arm/boot/dts/marvell/armada-370-rd.dts        |   2 -
+ .../dts/marvell/armada-381-netgear-gs110emx.dts    |   2 -
+ .../dts/marvell/armada-385-clearfog-gtr-l8.dts     |   2 +-
+ .../dts/marvell/armada-385-clearfog-gtr-s4.dts     |   2 +-
+ arch/arm/boot/dts/marvell/armada-385-linksys.dtsi  |   2 -
+ .../boot/dts/marvell/armada-385-turris-omnia.dts   |  16 +-
+ arch/arm/boot/dts/marvell/armada-388-clearfog.dts  |   2 -
+ .../boot/dts/marvell/armada-xp-linksys-mamba.dts   |   2 -
+ arch/arm/boot/dts/nxp/vf/vf610-zii-cfu1.dts        |   2 +-
+ arch/arm/boot/dts/nxp/vf/vf610-zii-scu4-aib.dts    |   8 +-
+ arch/arm/boot/dts/nxp/vf/vf610-zii-spb4.dts        |   2 +-
+ arch/arm/boot/dts/nxp/vf/vf610-zii-ssmb-dtu.dts    |   4 +-
+ arch/arm/boot/dts/nxp/vf/vf610-zii-ssmb-spu3.dts   |   2 +-
+ .../boot/dts/marvell/armada-3720-espressobin.dtsi  |   4 +-
+ .../boot/dts/marvell/armada-3720-gl-mv1000.dts     |   4 +-
+ .../boot/dts/marvell/armada-3720-turris-mox.dts    |  12 +-
+ .../boot/dts/marvell/armada-7040-mochabin.dts      |   2 -
+ .../dts/marvell/armada-8040-clearfog-gt-8k.dts     |   2 +-
+ arch/arm64/boot/dts/marvell/cn9130-crb.dtsi        |   4 +-
+ 25 files changed, 356 insertions(+), 160 deletions(-)
+---
+base-commit: 1c9be5fea84e409542a186893d219bf7cff22f5a
+change-id: 20231008-marvell-88e6152-wan-led-88c43b7fd2fd
+
+Best regards,
 -- 
-2.42.0.655.g421f12c284-goog
+Linus Walleij <linus.walleij@linaro.org>
 
 
