@@ -1,173 +1,188 @@
-Return-Path: <netdev+bounces-42356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA8467CE6AD
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:33:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 104407CE71A
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E6C8282390
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:33:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 081D0B20F1A
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30E9641AB8;
-	Wed, 18 Oct 2023 18:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uipath.com header.i=@uipath.com header.b="dLj+9Akj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAE23AC23;
+	Wed, 18 Oct 2023 18:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084B643A98
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 18:33:33 +0000 (UTC)
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2130.outbound.protection.outlook.com [40.107.13.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31312114;
-	Wed, 18 Oct 2023 11:33:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dbdE2xi4ItJvpZsQt76xwj9f5cm8bIrTzOf1fS32U7L07KH2GQNKrfKJeMe5ryEV5qFlb19nTK341xyTpxTGg/MM4AXdVUFSw6NiGms2MwBl0A3Jp/tVsx9wkNjD9QBUpxfqZ3v72pp3tOrB2/hotpFSRrZfh8cBe3qoxFvbwjtYpww4j0oENpkJf8fFANF39/Ofev0+OhvMP5UJwOqHMj3bChufKaT+TkPjgRDV1gw4lOtXhlcsHfYiu/2FYFuelQnhMbS4zQVt5F74DEcevf2vKBpDrJ/PwY2vGipsqBISFlwIa2ZMqHjzr1BHtRAJrx/3aTC2LDrsugqlsr0WAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=evUAGQf5IYhFKWZHAxtq8BuJvPx+ARK5yZPGDZy0KCE=;
- b=Hh0N9xzHLMPuAA51qU/Vi5EAkeeMXb5GLzNQMTX/DIs9x9xHfvVSHgqxPlUwDhsXVBFYTnBJCckjL3COc5cRVwqcdaO3R3CC8Qx0jn1e4rwFGdgLFAHhXbwBaMvjEdnhvhaolwVtx+0mghFzQyW2jT/MnCR4brbUfxyF9ByGz6G4ksT0HmVaccSE2ayvgJi77Yb1LE1xPkZVhsBmj2reVUAjXdTyzdrQPspAtTuehVxJcerY0Xqpm3+arU5QxQokz7ZtXDXa6x27eHP8prKQmsLlepVcHMYQ9zpienFgFqm/ce99jrmLpzT8D6Ee1gRAlOrl4/rpiftdEsEhhzP6iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=uipath.com; dmarc=pass action=none header.from=uipath.com;
- dkim=pass header.d=uipath.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uipath.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=evUAGQf5IYhFKWZHAxtq8BuJvPx+ARK5yZPGDZy0KCE=;
- b=dLj+9AkjYHjvpChYDRqREaK2t73MKH81OXUuGKA+hB+UYMbrCuWXvK+XPGPryYABqeOs9hEKVqHJgVt6kJM95I8KSE+YDk2HgK9NfA/pnC78u5xT3XMKhvD1to8ypXnXLw8tJ5bdPEVoau5IBA8YFIatPJJ/2EQjOxqzhPnDZi8mGEPVFwWAXsA7dUv6uxuk068FFML1jZ+uW2LnCdWEcgYozam/LT16o96akn2nUMmrXFfjay8YiShYQrkb2yrJa5dXl6O2QHGL94kgn/cd5ybkCuTRxRmocJxXWXkmMH0Q+5k0EmSPf+SGuM+aDsnDJM49bEjlOidQp6aRVfaAQw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=uipath.com;
-Received: from DB7PR02MB4521.eurprd02.prod.outlook.com (2603:10a6:10:65::25)
- by AS2PR02MB9191.eurprd02.prod.outlook.com (2603:10a6:20b:5fb::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.22; Wed, 18 Oct
- 2023 18:33:27 +0000
-Received: from DB7PR02MB4521.eurprd02.prod.outlook.com
- ([fe80::c3aa:5631:dfe9:e09c]) by DB7PR02MB4521.eurprd02.prod.outlook.com
- ([fe80::c3aa:5631:dfe9:e09c%4]) with mapi id 15.20.6907.022; Wed, 18 Oct 2023
- 18:33:27 +0000
-From: Alexandru Matei <alexandru.matei@uipath.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alexandru Matei <alexandru.matei@uipath.com>,
-	Mihai Petrisor <mihai.petrisor@uipath.com>,
-	Viorel Canja <viorel.canja@uipath.com>
-Subject: [PATCH] vsock: initialize the_virtio_vsock before using VQs
-Date: Wed, 18 Oct 2023 21:32:47 +0300
-Message-Id: <20231018183247.1827-1-alexandru.matei@uipath.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1PR0102CA0033.eurprd01.prod.exchangelabs.com
- (2603:10a6:802::46) To DB7PR02MB4521.eurprd02.prod.outlook.com
- (2603:10a6:10:65::25)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A70047343
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 18:44:51 +0000 (UTC)
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 565CA119
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 11:44:49 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mx.ewheeler.net (Postfix) with ESMTP id EEB7081;
+	Wed, 18 Oct 2023 11:44:48 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id hAd3bfPpobIz; Wed, 18 Oct 2023 11:44:43 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx.ewheeler.net (Postfix) with ESMTPSA id 71A9240;
+	Wed, 18 Oct 2023 11:44:43 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 71A9240
+Date: Wed, 18 Oct 2023 11:44:43 -0700 (PDT)
+From: Eric Wheeler <netdev@lists.ewheeler.net>
+To: Jakub Kicinski <kuba@kernel.org>
+cc: netdev@vger.kernel.org
+Subject: Re: BUG: looking up invalid subclass: 8
+In-Reply-To: <20231017170900.62f951cd@kernel.org>
+Message-ID: <44d7fba4-3887-50ff-3dd1-3ca39164e6a@ewheeler.net>
+References: <cea84b66-2ad5-76af-3feb-418b78cdd87@ewheeler.net> <20231017170900.62f951cd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB7PR02MB4521:EE_|AS2PR02MB9191:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1c7cefad-7339-4899-8dae-08dbd008b837
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	qHbdFQoZWtccWB8ItB/6jW7p6jJDHEPwb/oS1LGJpsAkGBUTp65rrJh2SX72GpWfmZnxIHe+lyEXxpm3TA3xrSQY3dQXW7G68z/LXpkVcBE9BKx/1LlbdYBFWdi4uqCGwFKIYKkbRoqvKxZthAzBuyG/Tc5bFS+QR2KwAeVBoGDC3TOKHnSJb1HvuMGKoPm34g9jvSbFvYAVQgmAIDsmNk6fdOBO9GwUX93n0rXIIYSoIPz4gKnJ9a8vM+lIyTCyNH44I3chFNSTx5sbRtEAFNHS3J545LFEu5uRquUhekUH/YbOt4UxKFxtZmO9YeneH7oDoGhDDzr02nbYHWVhd1x211hvj1vqcOgkxkC+syJKd2M4QZvfnJqXtpH9lCQ0W9W9KjasaGqGD5bdK50Zhu38D1jcLpZnYuDKt52z9EEuCh5tjVpBVSekHGbWM+ow/mjmyTxsUMeUX7aW92ObdJZAlUvUaV8iHNQ3ei9HXVW8F3G+rAqJYaFsxqL6rBfxqHUk5CgQvhnozgJ6FxzgOg6hKj/p/GWyJP7iVDuaBBgp3+LfPMqe8R2P5XU9wjwa
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR02MB4521.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(39860400002)(376002)(396003)(136003)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(83380400001)(38100700002)(107886003)(2616005)(36756003)(6512007)(44832011)(316002)(66556008)(478600001)(110136005)(66476007)(2906002)(54906003)(7416002)(66946007)(1076003)(8676002)(8936002)(4326008)(5660300002)(6506007)(6666004)(86362001)(6486002)(41300700001)(26005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?D4wUM33fliEQFIk3XKu9k/rXam/yrTmqERYGmkvbScA9uGvkautfn9PhqevN?=
- =?us-ascii?Q?zxy+LiwNlVFht5oN2A2wK5DQCuHc8Mv2FdDQiCn3wdB8IvE8Qi/epKIvaiW0?=
- =?us-ascii?Q?LIPCZIO3flEL9k0oQpRiIz+vSxkC+ltEeqyUHnPt/p6Jd+S1AqSjxS3BHyEx?=
- =?us-ascii?Q?2rdg+QhHPd/WbW0lVKcErikC6ZtUIb739IA83S+uK95geCKFhDzUHyNJersL?=
- =?us-ascii?Q?7nsKjavF6yaaoD6EqkkoPeupMgr7wctQl3w9rKjEvv844FQObBI1NNd4vUdM?=
- =?us-ascii?Q?kJ1FsSp3DFxjnFA43020HHciOuZyII4zB7fW3Kfz792lZ96So7H9Rzc/+obY?=
- =?us-ascii?Q?Gip10U+/xH4D+bq4rf25Rv2Z8pcENpVbL1a1etHvap33RHgx3jNfuQb6M2gm?=
- =?us-ascii?Q?lr2EQ3Z8ZtDMkaRd+6LJdfw2YdEsTrmBByO9E9hpkgAJPpopqU/KHS8PDTYi?=
- =?us-ascii?Q?TunVAA6JcoQwwvPtPYuu+ewd4Mjn3bI9s7ZNcW2YWaHC3/uAHvL6/kzTlYfQ?=
- =?us-ascii?Q?iX3WcS8ZWVsdbkrf7URj9XBGwPdgkWoMPmov7LkkVaXy0I35DgUtBI8PnTdQ?=
- =?us-ascii?Q?5ATFjOI12uabO2M7IDy6rYOzQnYHWe0BdIBJy3vhVPwd6rGt98lFZ807uUaZ?=
- =?us-ascii?Q?fJjsIYo2ol8/iSE3tiMR4k8BNnojDAkqzzfychPx8RQ1YfQ96JZNVBWRyKzw?=
- =?us-ascii?Q?eOj+AyVR2Lcrad/8jZ0f/fjJ3sXL3ApKJQlmDCtF7qL2GZlYhy9NPHvCBt6l?=
- =?us-ascii?Q?SJbIVzs412P9NiX5pm/ad9jLpQiweIDOowc8/of+R0XozEn9QyF6ipzWLC44?=
- =?us-ascii?Q?6vmlQbM8C/tmcAzOfJV4dg9p6z5FBXhy1tcs2pekCo8ZDVZ6YMGZsDGl/mQQ?=
- =?us-ascii?Q?w//2EYoghejPJyrJIaEldKEGWExnDrXlepYsrVuWU8LWrelIKZh3j270tCNh?=
- =?us-ascii?Q?zSFPfRYh46E1EVIutW06+PeEifUX2EG9MlC1WmwM6rrrZ1ZhzNg6Vah2qz9n?=
- =?us-ascii?Q?g5bBhpRIleDSYTGfrgWvOCo3DwXimolmZsAPFeS7A5/rl1NanEdUq4SIhdXP?=
- =?us-ascii?Q?KWj1fTVHX75COWIkSVVR2qGarNzxYz1Ogrn5i23xBHEnXhILjWEgM/Fi4w6E?=
- =?us-ascii?Q?4w1o8bdt4R3usX0i/DR9S60fRqgXTbC7VeXblKKuAn2iwoKrHyBvTyvIrYQt?=
- =?us-ascii?Q?JiFWpHNVatxyUr+Z6laWaoadVdl2742Gp/l5wYiNrrY4at8qMXBP3sJs9yRr?=
- =?us-ascii?Q?Q+iBh+rYtkynvSTJ21R2XallvpYoShi4tv+mQMSNgOCSd/fijiVm10lKhxQq?=
- =?us-ascii?Q?SP7G5ZIeeOm5OeOfN5lnYHIb59njf6v6lWQv/gHb/Kn2AX7I9b/0H7DaKCkD?=
- =?us-ascii?Q?DzZnLCUfzXgxJBAwvMYg9qDGTtDm8kPIwURFmtRV08G4dvB9B0j3YfWU2mW4?=
- =?us-ascii?Q?VfubE9MtPMGlAom5hgapLxZRDVBWPvKQ5DZcCp/3nr89nylKKNS4gSYzlQVq?=
- =?us-ascii?Q?+9ieUFq7s7G3aoLsCi52pIpQ79JUP206fx3txCrWqyhpJxu3MxwMaSmxdOAk?=
- =?us-ascii?Q?NGMRwjRIV+1/8Los/rofSkPTTqg2YgQj3uitHWERgIhPFvPK+hw7YN/reHnA?=
- =?us-ascii?Q?bQ=3D=3D?=
-X-OriginatorOrg: uipath.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c7cefad-7339-4899-8dae-08dbd008b837
-X-MS-Exchange-CrossTenant-AuthSource: DB7PR02MB4521.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 18:33:27.3743
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d8353d2a-b153-4d17-8827-902c51f72357
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rs5kvZ68z56DeECIZL+WVU4kdZCiNU/AL9ekh3zrldQVfZE1OQ8FkIjk//vCAPpDZpou5UpFCichbY9+pkgJm4iIaJOrl6NQt+NER2IyrTY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR02MB9191
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
 
-Once VQs are filled with empty buffers and we kick the host, it can send
-connection requests. If 'the_virtio_vsock' is not initialized before,
-replies are silently dropped and do not reach the host.
+On Tue, 17 Oct 2023, Jakub Kicinski wrote:
+> On Tue, 17 Oct 2023 16:41:41 -0700 (PDT) Eric Wheeler wrote:
+> > I found a similar backtrace that was fixed in
+> > 3510c7aa069aa83a2de6dab2b41401a198317bdc .  It was for ALSA, but had the
+> > same BUG of "looking up invalid subclass: 8" and the fix was trivial,
+> > noting that MAX_HOPS shouldn't be bigger than MAX_LOCKDEP_SUBCLASSES.
+> > 
+> > Is there a simple fix for this in netlink, too?
+> > 
+> > ]# ./scripts/decode_stacktrace.sh vmlinux `pwd` < stackdump.txt 
+> > [  113.347055] BUG: looking up invalid subclass: 8
+> > [  113.357387] turning off the locking correctness validator.
+> > [  113.364842] Hardware name: Supermicro Super Server/H11SSL-i, BIOS 2.4 12/27/2021
+> > [  113.373614] Call Trace:
+> > [  113.381874]  <TASK>
+> > [  113.382556] dump_stack_lvl (lib/dump_stack.c:108) 
+> > [  113.388816] look_up_lock_class (kernel/locking/lockdep.c:941) 
+> > [  113.399562] register_lock_class (kernel/locking/lockdep.c:1284 (discriminator 13)) 
+> > [  113.400238] ? srso_return_thunk (arch/x86/lib/retpoline.S:308) 
+> > [  113.403627] __lock_acquire (kernel/locking/lockdep.c:5014) 
+> > [  113.414652] lock_acquire.part.0 (kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5755) 
+> > [  113.428619] ? srso_return_thunk (arch/x86/lib/retpoline.S:308) 
+> > [  113.435463] ? lock_acquire (./include/trace/events/lock.h:24 kernel/locking/lockdep.c:5724) 
+> > [  113.440620] _raw_spin_lock_nested (kernel/locking/spinlock.c:379) 
+> > [  113.462749] ? __nla_validate_parse (lib/nlattr.c:606) 
+> > [  113.471052] genl_family_rcv_msg_doit.isra.0 (net/netlink/genetlink.c:970) 
+> > [  113.471651] genl_family_rcv_msg (net/netlink/genetlink.c:1050) 
+> 
+> Thanks for sharing the decoded stack trace, can you share the full
+> non-decoded one? Is there the name of the command that's calling
+> this somewhere?
+> 
+> There's no lock where this is pointing at, just an indirect call.
+> So I wonder where the lock is. Perhaps retpoline is confusing 
+> the stack trace :(
 
-Fixes: 0deab087b16a ("vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock")
-Signed-off-by: Alexandru Matei <alexandru.matei@uipath.com>
----
- net/vmw_vsock/virtio_transport.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Here it is from two different hosts.
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index e95df847176b..eae0867133f8 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -658,12 +658,13 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
- 		vsock->seqpacket_allow = true;
- 
- 	vdev->priv = vsock;
-+	rcu_assign_pointer(the_virtio_vsock, vsock);
- 
- 	ret = virtio_vsock_vqs_init(vsock);
--	if (ret < 0)
-+	if (ret < 0) {
-+		rcu_assign_pointer(the_virtio_vsock, NULL);
- 		goto out;
--
--	rcu_assign_pointer(the_virtio_vsock, vsock);
-+	}
- 
- 	mutex_unlock(&the_virtio_vsock_mutex);
- 
--- 
-2.34.1
+This is vanilla v6.5.7:
+
+Oct 16 09:48:47 hv1.ewheeler.net kernel: BUG: looking up invalid subclass: 8
+Oct 16 09:48:47 hv1.ewheeler.net kernel: turning off the locking correctness validator.
+Oct 16 09:48:47 hv1.ewheeler.net kernel: CPU: 8 PID: 13275 Comm: drbdsetup-84 Tainted: G            E      6.5.7 #23
+Oct 16 09:48:47 hv1.ewheeler.net kernel: Hardware name: Supermicro Super Server/H11SSL-i, BIOS 2.4 12/27/2021
+Oct 16 09:48:47 hv1.ewheeler.net kernel: Call Trace:
+Oct 16 09:48:47 hv1.ewheeler.net kernel: <TASK>
+Oct 16 09:48:47 hv1.ewheeler.net kernel: dump_stack_lvl+0x60/0xa0
+Oct 16 09:48:47 hv1.ewheeler.net kernel: look_up_lock_class+0x10b/0x150
+Oct 16 09:48:47 hv1.ewheeler.net kernel: register_lock_class+0x48/0x500
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ? srso_return_thunk+0x5/0x10
+Oct 16 09:48:47 hv1.ewheeler.net kernel: __lock_acquire+0x5f/0xb80
+Oct 16 09:48:47 hv1.ewheeler.net kernel: lock_acquire.part.0+0x90/0x210
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ? lock_all_resources+0x5a/0x90 [drbd]
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ? lock_all_resources+0x5a/0x90 [drbd]
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ? srso_return_thunk+0x5/0x10
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ? lock_acquire+0x10b/0x120
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ? lock_all_resources+0x5a/0x90 [drbd]
+Oct 16 09:48:47 hv1.ewheeler.net kernel: _raw_spin_lock_nested+0x33/0x80
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ? lock_all_resources+0x5a/0x90 [drbd]
+Oct 16 09:48:47 hv1.ewheeler.net kernel: lock_all_resources+0x5a/0x90 [drbd]
+Oct 16 09:48:47 hv1.ewheeler.net kernel: drbd_adm_attach+0x748/0x1340 [drbd]
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ? __nla_validate_parse+0x13f/0x1f0
+Oct 16 09:48:47 hv1.ewheeler.net kernel: genl_family_rcv_msg_doit.isra.0+0xe4/0x150
+Oct 16 09:48:47 hv1.ewheeler.net kernel: genl_family_rcv_msg+0x187/0x260
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ? __pfx_drbd_adm_attach+0x10/0x10 [drbd]
+Oct 16 09:48:47 hv1.ewheeler.net kernel: genl_rcv_msg+0x4b/0xb0
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ? __pfx_genl_rcv_msg+0x10/0x10
+Oct 16 09:48:47 hv1.ewheeler.net kernel: netlink_rcv_skb+0x66/0x120
+Oct 16 09:48:47 hv1.ewheeler.net kernel: genl_rcv+0x28/0x40
+Oct 16 09:48:47 hv1.ewheeler.net kernel: netlink_unicast+0x1b8/0x280
+Oct 16 09:48:47 hv1.ewheeler.net kernel: netlink_sendmsg+0x273/0x520
+Oct 16 09:48:47 hv1.ewheeler.net kernel: sock_write_iter+0x188/0x190
+Oct 16 09:48:47 hv1.ewheeler.net kernel: vfs_write+0x3e5/0x520
+Oct 16 09:48:47 hv1.ewheeler.net kernel: ksys_write+0xc8/0x100
+Oct 16 09:48:47 hv1.ewheeler.net kernel: do_syscall_64+0x3f/0xa0
+Oct 16 09:48:47 hv1.ewheeler.net kernel: entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+Oct 16 09:48:47 hv1.ewheeler.net kernel: RIP: 0033:0x7f41c473e987
+Oct 16 09:48:47 hv1.ewheeler.net kernel: Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+Oct 16 09:48:47 hv1.ewheeler.net kernel: RSP: 002b:00007ffe80a28648 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+Oct 16 09:48:47 hv1.ewheeler.net kernel: RAX: ffffffffffffffda RBX: 00000000000000c8 RCX: 00007f41c473e987
+Oct 16 09:48:47 hv1.ewheeler.net kernel: RDX: 00000000000000c8 RSI: 000055be8e4f7320 RDI: 0000000000000004
+Oct 16 09:48:47 hv1.ewheeler.net kernel: RBP: 000055be8e4f7320 R08: 0000000000000000 R09: 0000000000000000
+Oct 16 09:48:47 hv1.ewheeler.net kernel: R10: 0000000000001000 R11: 0000000000000246 R12: 00000000000000c8
+Oct 16 09:48:47 hv1.ewheeler.net kernel: R13: 0000000000000004 R14: 00007ffe80a28970 R15: 000055be8d383848
+Oct 16 09:48:47 hv1.ewheeler.net kernel: </TASK>
+
+And this is a hacked up Oracle UEK 5.15.0-X build with a similar trace:
+
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.342188] CPU: 29 PID: 35965 Comm: drbdsetup-84 Kdump: loaded Not tainted 5.15.0-7.86.6.1.el9uek.x86_64-TEST+ #7
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.358188] Hardware name: Supermicro Super Server/H11SSL-i, BIOS 2.4 12/27/2021
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.374188] Call Trace:
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.390189]  <TASK>
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.406190]  dump_stack_lvl+0x57/0x7e
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.422187]  look_up_lock_class+0xe7/0xfb
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.438187]  register_lock_class+0x3d/0x4db
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.454191]  __lock_acquire+0x56/0xaa3
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.469193]  lock_acquire+0xc8/0x32d
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.484192]  ? lock_all_resources+0x54/0x80 [drbd]
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.500053]  ? find_held_lock+0x32/0x8d
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.515189]  ? lock_all_resources+0x54/0x80 [drbd]
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.530198]  ? lock_all_resources+0x54/0x80 [drbd]
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.545186]  ? __lock_acquired+0x58/0x278
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.559270]  _raw_spin_lock_nested+0x2f/0x71
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.573191]  ? lock_all_resources+0x54/0x80 [drbd]
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.588187]  lock_all_resources+0x54/0x80 [drbd]
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.603187]  drbd_adm_attach+0x90c/0x1074 [drbd]
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.618191]  ? __nla_validate_parse+0x15c/0x1c8
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.632189]  genl_family_rcv_msg_doit+0xfd/0x169
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.646192]  genl_family_rcv_msg+0xbe/0x179
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.658194]  ? drbd_adm_disk_opts.cold+0x77/0x77 [drbd]
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.672195]  genl_rcv_msg+0x47/0xa6
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.685194]  ? find_held_lock+0x32/0x8d
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.698199]  ? genl_family_rcv_msg+0x180/0x179
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.711192]  netlink_rcv_skb+0x5c/0x106
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.724191]  genl_rcv+0x24/0x31
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.736197]  netlink_unicast+0x1a5/0x261
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.749188]  netlink_sendmsg+0x24f/0x4d5
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.761612]  sock_sendmsg+0x68/0x6a
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.773189]  sock_write_iter+0x9e/0x10a
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.785193]  new_sync_write+0x1da/0x1e9
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.797193]  vfs_write+0x276/0x381
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.809188]  ksys_write+0xc7/0xf4
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.820190]  do_syscall_64+0x3b/0x8d
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.831196]  entry_SYSCALL_64_after_hwframe+0x63/0x0
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.843192] RIP: 0033:0x7fdc29a1d987
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.853533] Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.877188] RSP: 002b:00007fff4acbe2a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.889186] RAX: ffffffffffffffda RBX: 00000000000000c8 RCX: 00007fdc29a1d987
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.900198] RDX: 00000000000000c8 RSI: 00005583cafa6320 RDI: 0000000000000004
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.911508] RBP: 00005583cafa6320 R08: 0000000000000000 R09: 0000000000000000
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.922188] R10: 0000000000001000 R11: 0000000000000246 R12: 00000000000000c8
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.934189] R13: 0000000000000004 R14: 00007fff4acbe5d0 R15: 00005583ca41d848
+Oct 16 10:56:58 hv2.ewheeler.net  [  406.945189]  </TASK>
 
 
