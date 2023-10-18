@@ -1,151 +1,170 @@
-Return-Path: <netdev+bounces-42435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1697CEB07
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 00:15:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 629FE7CEB4C
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 00:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0FB31C20BAC
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 22:15:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D732BB207D6
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 22:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7022F3DFEF;
-	Wed, 18 Oct 2023 22:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4019B3984D;
+	Wed, 18 Oct 2023 22:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rpD9nXDr"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gGibVNxz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DABDA1A737
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 22:14:58 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D87118
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:14:56 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7af69a4baso112005617b3.0
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:14:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C42439847;
+	Wed, 18 Oct 2023 22:31:28 +0000 (UTC)
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14B91113;
+	Wed, 18 Oct 2023 15:31:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697667296; x=1698272096; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PlQsMleo8ndyb1BkvS8psG/NpipwSb1Ibvd6wvaptgE=;
-        b=rpD9nXDr8ZV4X1Zjrx1Lpkbi8PcVhM+FAsPQEkE/bgGqvJdPH1dZ/7vggwFyV7nhEA
-         X8bQ+c4ABe5Lv0Lx4UdVxd3dONLa3xGFTYGjnsytjjaPuWHDgsSwaDQqOqxNYmUHL3E8
-         fd6cI8mvnnYu0l+EvsSOxOG18UhCTsNL6jB/fhq9pjPCpnyyxwUQHxSZ87gnNTZIS6r+
-         iRqmgKZXyA5v+lImVMteIruljC+BI0JQ11H/uZKwoOFulZPDL9CV4UpMWYejLAO+vAfZ
-         /dHi5bk0o61IOex9EqNmqWyAwgpM35REgb1kPuw72D9Xa/TL/git7S9ZvXE7Ceui1EnK
-         6sYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697667296; x=1698272096;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PlQsMleo8ndyb1BkvS8psG/NpipwSb1Ibvd6wvaptgE=;
-        b=Fe5DKH7Toiex4/y+qid3Gqk2EfJFJheLvsfte1ua88zoJsjiJhNaffHMzANNzmk771
-         waWBZLfMdU1xcRSPZgQ9p9RMDpqAhpWqKAGatNnYtC8VMsWKn0IijCilVk3T3kdQA3G6
-         O0Tm05+lqrZWR4ZpJJh4Lsj4a9SaJ8c4aB8q0oyqr+m/ayanM2PL2/dSXtp86hfMuRXq
-         cb3zjcwZKTAu/pENER4YotMx9MnieGlq0C3WzH5d42slzf1oukc5+xyxsx7AAkoY28/8
-         R7RBKE7VbWtQmpnIuffib53UGwXAA//29wVvkpwX1xbxBmeGy22OTK+zFMRI4zxTM2Cm
-         1DyA==
-X-Gm-Message-State: AOJu0YwJyFJO30vn6DI6zr/YCxU4pN7+YyOlHsFCFW/NSnziCST468Kx
-	ypvWwNExqxlyimjjiM5sqZq2lWmjPPLiesfP4Q==
-X-Google-Smtp-Source: AGHT+IFCGhabYMIAAC6XiL9TzzjSCY6BQgj3jImjG5X7Fcyl/tbrVb3NWUepotJZi0+qdYwrlX/ZrUxtd4WudCjg7Q==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a0d:d9d2:0:b0:5a7:be10:461d with SMTP
- id b201-20020a0dd9d2000000b005a7be10461dmr15636ywe.2.1697667295839; Wed, 18
- Oct 2023 15:14:55 -0700 (PDT)
-Date: Wed, 18 Oct 2023 22:14:55 +0000
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697668288; x=1729204288;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=V7ckVtGsh3NLhLy0XrLlVvYfNhWivhJ9KGdldOoMSN8=;
+  b=gGibVNxzqKxmA4Stc8els0Ju9N1jworE6E0giFBzw96WosjCVm4/Y48p
+   WQjnWc2ZAf7pjwL5hV0xzgD895rBWUCUnrBjlB/tpHmFQ1qLXbrqZvnv1
+   P/ZIYrN9mtAi0C9GeqOsVzknB9WAyocV1cl4gNYGmQz4xjRFVeZcQl2Pd
+   4=;
+X-IronPort-AV: E=Sophos;i="6.03,236,1694736000"; 
+   d="scan'208";a="246011420"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 22:31:24 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com (Postfix) with ESMTPS id D49F14885F;
+	Wed, 18 Oct 2023 22:31:17 +0000 (UTC)
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:17186]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.182:2525] with esmtp (Farcaster)
+ id 28bc7272-d50c-465f-a27c-6eb0d2455059; Wed, 18 Oct 2023 22:31:17 +0000 (UTC)
+X-Farcaster-Flow-ID: 28bc7272-d50c-465f-a27c-6eb0d2455059
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 18 Oct 2023 22:31:16 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.171.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.37;
+ Wed, 18 Oct 2023 22:31:12 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <sinquersw@gmail.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
+	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <martin.lau@linux.dev>,
+	<mykolal@fb.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<sdf@google.com>, <song@kernel.org>, <yonghong.song@linux.dev>
+Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie generation/validation SOCK_OPS hooks.
+Date: Wed, 18 Oct 2023 15:31:04 -0700
+Message-ID: <20231018223104.51121-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <7aac6512-c1f9-42ce-b8ca-07980f90714e@gmail.com>
+References: <7aac6512-c1f9-42ce-b8ca-07980f90714e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAN5YMGUC/x2NywrCMBAAf6Xs2YU8oIi/IlJCsqkLGsNuaJXSf
- 2/qbeYys4GSMCnchg2EFlb+lC72MkB8hjITcuoOzjhvjb2iNimx/jAJLySKhRquaygo9a3zdOI Um7wwos+jMyHk5N0IPViFMn//s/tj3w8hAG6ffAAAAA==
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1697667294; l=2364;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=+RiFAuTFDYeSx5+FsqkeyVgCujTXIxMDn3P2javi3XY=; b=123OWlCw+sopcVGOlRvo8H8eZ3pupMbwmZbCt7KUM82cnX6fdX3BK+EJUTP0xC4c1b3gbO3IB
- 1w6u2cozf6AB/MUjQvfMIuLfOn9l4T+IXmXkdkHqvfMcPANOo65c801
-X-Mailer: b4 0.12.3
-Message-ID: <20231018-strncpy-drivers-net-wwan-rpmsg_wwan_ctrl-c-v1-1-4e343270373a@google.com>
-Subject: [PATCH] net: wwan: replace deprecated strncpy with strscpy_pad
-From: Justin Stitt <justinstitt@google.com>
-To: Stephan Gerhold <stephan@gerhold.net>, Loic Poulain <loic.poulain@linaro.org>, 
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	Justin Stitt <justinstitt@google.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.187.171.20]
+X-ClientProxiedBy: EX19D045UWC002.ant.amazon.com (10.13.139.230) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-strncpy() is deprecated for use on NUL-terminated destination strings
-[1] and as such we should prefer more robust and less ambiguous string
-interfaces.
+From: Kui-Feng Lee <sinquersw@gmail.com>
+Date: Wed, 18 Oct 2023 14:47:43 -0700
+> On 10/18/23 10:20, Kuniyuki Iwashima wrote:
+> > From: Eric Dumazet <edumazet@google.com>
+> > Date: Wed, 18 Oct 2023 10:02:51 +0200
+> >> On Wed, Oct 18, 2023 at 8:19 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+> >>>
+> >>> On 10/17/23 9:48 AM, Kuniyuki Iwashima wrote:
+> >>>> From: Martin KaFai Lau <martin.lau@linux.dev>
+> >>>> Date: Mon, 16 Oct 2023 22:53:15 -0700
+> >>>>> On 10/13/23 3:04 PM, Kuniyuki Iwashima wrote:
+> >>>>>> Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
+> >>>>>> After 3WHS, the proxy restores SYN and forwards it and ACK to the backend
+> >>>>>> server.  Our kernel module works at Netfilter input/output hooks and first
+> >>>>>> feeds SYN to the TCP stack to initiate 3WHS.  When the module is triggered
+> >>>>>> for SYN+ACK, it looks up the corresponding request socket and overwrites
+> >>>>>> tcp_rsk(req)->snt_isn with the proxy's cookie.  Then, the module can
+> >>>>>> complete 3WHS with the original ACK as is.
+> >>>>>
+> >>>>> Does the current kernel module also use the timestamp bits differently?
+> >>>>> (something like patch 8 and patch 10 trying to do)
+> >>>>
+> >>>> Our SYN Proxy uses TS as is.  The proxy nodes generate a random number
+> >>>> if TS is in SYN.
+> >>>>
+> >>>> But I thought someone would suggest making TS available so that we can
+> >>>> mock the default behaviour at least, and it would be more acceptable.
+> >>>>
+> >>>> The selftest uses TS just to strengthen security by validating 32-bits
+> >>>> hash.  Dropping a part of hash makes collision easier to happen, but
+> >>>> 24-bits were sufficient for us to reduce SYN flood to the managable
+> >>>> level at the backend.
+> >>>
+> >>> While enabling bpf to customize the syncookie (and timestamp), I want to explore
+> >>> where can this also be done other than at the tcp layer.
+> >>>
+> >>> Have you thought about directly sending the SYNACK back at a lower layer like
+> >>> tc/xdp after receiving the SYN?
+> > 
+> > Yes.  Actually, at netconf I mentioned the cookie generation hook will not
+> > be necessary and should be replaced with XDP.
+> > 
+> > 
+> >>> There are already bpf_tcp_{gen,check}_syncookie
+> >>> helper that allows to do this for the performance reason to absorb synflood. It
+> >>> will be natural to extend it to handle the customized syncookie also.
+> > 
+> > Maybe we even need not extend it and can use XDP as said below.
+> > 
+> > 
+> >>>
+> >>> I think it should already be doable to send a SYNACK back with customized
+> >>> syncookie (and timestamp) at tc/xdp today.
+> >>>
+> >>> When ack is received, the prog@tc/xdp can verify the cookie. It will probably
+> >>> need some new kfuncs to create the ireq and queue the child socket. The bpf prog
+> >>> can change the ireq->{snd_wscale, sack_ok...} if needed. The details of the
+> >>> kfuncs need some more thoughts. I think most of the bpf-side infra is ready,
+> >>> e.g. acquire/release/ref-tracking...etc.
+> >>>
+> >>
+> >> I think I mostly agree with this.
+> > 
+> > I didn't come up with kfunc to create ireq and queue it to listener, so
+> > cookie_v[46]_check() were best place for me to extend easily, but now it
+> > sounds like kfunc would be the way to go.
+> > 
+> > Maybe we can move the core part of cookie_v[46]_check() except for kernel
+> > cookie's validation to __cookie_v[46]_check() and expose a wrapper of it
+> > as kfunc ?
+> > 
+> > Then, we can look up sk and pass the listener, skb, and flags (for sack_ok,
+> > etc) to the kfunc.  (It could still introduce some conflicts with Eric's
+> > patch though...)
+> 
+> Does that mean the packets handled in this way (in XDP) will skip all 
+> netfilter at all?
 
-We expect chinfo.name to be NUL-terminated based on its use with format
-strings and sprintf:
-rpmsg/rpmsg_char.c
-165:            dev_err(dev, "failed to open %s\n", eptdev->chinfo.name);
-368:    return sprintf(buf, "%s\n", eptdev->chinfo.name);
+Good point.
 
-... and with strcmp():
-|  static struct rpmsg_endpoint *qcom_glink_create_ept(struct rpmsg_device *rpdev,
-|  						    rpmsg_rx_cb_t cb,
-|  						    void *priv,
-|  						    struct rpmsg_channel_info
-|  									chinfo)
-|  ...
-|  const char *name = chinfo.name;
-|  ...
-|  		if (!strcmp(channel->name, name))
+If we want not to skip other layers, maybe we can use tc ?
 
-Moreover, as chinfo is not kzalloc'd, let's opt to NUL-pad the
-destination buffer
-
-Similar change to:
-Commit 766279a8f85d ("rpmsg: qcom: glink: replace strncpy() with strscpy_pad()")
-and
-Commit 08de420a8014 ("rpmsg: glink: Replace strncpy() with strscpy_pad()")
-
-Considering the above, a suitable replacement is `strscpy_pad` due to
-the fact that it guarantees both NUL-termination and NUL-padding on the
-destination buffer.
-
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
-Signed-off-by: Justin Stitt <justinstitt@google.com>
----
-Note: build-tested only.
-
-Found with: $ rg "strncpy\("
----
- drivers/net/wwan/rpmsg_wwan_ctrl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/wwan/rpmsg_wwan_ctrl.c b/drivers/net/wwan/rpmsg_wwan_ctrl.c
-index 86b60aadfa11..39f5e780c478 100644
---- a/drivers/net/wwan/rpmsg_wwan_ctrl.c
-+++ b/drivers/net/wwan/rpmsg_wwan_ctrl.c
-@@ -37,7 +37,7 @@ static int rpmsg_wwan_ctrl_start(struct wwan_port *port)
- 		.dst = RPMSG_ADDR_ANY,
- 	};
- 
--	strncpy(chinfo.name, rpwwan->rpdev->id.name, RPMSG_NAME_SIZE);
-+	strscpy_pad(chinfo.name, rpwwan->rpdev->id.name, sizeof(chinfo.name));
- 	rpwwan->ept = rpmsg_create_ept(rpwwan->rpdev, rpmsg_wwan_ctrl_callback,
- 				       rpwwan, chinfo);
- 	if (!rpwwan->ept)
-
----
-base-commit: 58720809f52779dc0f08e53e54b014209d13eebb
-change-id: 20231018-strncpy-drivers-net-wwan-rpmsg_wwan_ctrl-c-3f620aafd326
-
-Best regards,
---
-Justin Stitt <justinstitt@google.com>
-
+1) allocate ireq and set sack_ok etc with kfunc
+2) bpf_sk_assign() to set ireq to skb (this could be done in kfunc above)
+3) let inet_steal_sock() return req->sk_listener if not sk_fullsock(sk)
+4) if skb->sk is reqsk in cookie_v[46]_check(), skip validation and
+   req allocation and create full sk
 
