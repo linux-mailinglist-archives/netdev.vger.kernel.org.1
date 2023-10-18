@@ -1,121 +1,255 @@
-Return-Path: <netdev+bounces-42108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 384177CD210
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:58:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 102C77CD23E
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 04:25:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0E92B210FB
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:58:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15A3C1C20B34
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 02:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577B63D9C;
-	Wed, 18 Oct 2023 01:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0254421;
+	Wed, 18 Oct 2023 02:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B4Y++f7H"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hrbuIx8m"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07774311C
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:58:13 +0000 (UTC)
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3DACF7;
-	Tue, 17 Oct 2023 18:58:11 -0700 (PDT)
-Received: by mail-vk1-xa2f.google.com with SMTP id 71dfb90a1353d-49dc95be8c3so2818112e0c.0;
-        Tue, 17 Oct 2023 18:58:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697594290; x=1698199090; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zrBkKk/OhaMOdfc+Pvuh6DSNNjTaKia2Rbq4gj7RLNE=;
-        b=B4Y++f7HPiQ/pzsHFl13dkAWhjJ8WLl1d6pY1o5TaSvConj1+cyvRTAagxRE6chPQb
-         XBcmEEeDrIlrrKBf3TEQFiYgkDCJfkpkhOsPvqbBU5OniIvlhUdzBtLy5RjXETFGKwnA
-         2egdHVVC/rpuxCTftTBw1jMkr6UHi6521Cl2p6pXKA8ZhxwSuqcM7yEbmt5yVW+2vQB6
-         PK2sWFD4WWMYMlRSiYBREL3owbKzLn7jR8XBzEAvDPgB2d8n+ec3XoeZLXNVHYZWjqxD
-         QehyCpSufKNpD9L1ot0ukTNB7ZT6PwOUJsDKe44Aomsa1FvVEhI4Or6N3mc7CtJxmHLh
-         MXmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697594290; x=1698199090;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zrBkKk/OhaMOdfc+Pvuh6DSNNjTaKia2Rbq4gj7RLNE=;
-        b=mOdqK7Ax/5n2oCTPvkKoryYD5363uDlXkUV1JQi/c5mbUeRKci2OAFwMsGRs3m+lHR
-         svqbEFkIftr9yWeK9mXKlgm/MkmjmVkERgZDGmORjP+oMX8QBqhxWoWJ/OhlLRx9FJwI
-         rkeYG/8CK1H5BJCub8ijmu+JNlUONAOvd/ZAdyyDCNxnzFNPj1cnaRtPsDx/DNOVUSLx
-         wHpWejrjcCJ+hwRJ+F4meWfqaftfIhJdECOIhZ+Rk5lr0SUKMIMBQYm0hp/jWu9R6Jwf
-         /vMAVvwx8X3eNudYWotuExOQ+HAEEk8iQpNkis4anDGuDsYoCZ/2oFhQu1c6LXoPzTed
-         d5MQ==
-X-Gm-Message-State: AOJu0YwBigmoELb5RdUcWHlw+5cnk+/XOjRSOeubig9bnzGtZb4k9RAW
-	bviIWaHqyK+XgJKd0zobVuP6YOCTVLMKK/WCY0w=
-X-Google-Smtp-Source: AGHT+IE7orZ60FrzBq0xgMmGzpIm0rBysB9wYcBW5L3/ndTzQkWYVFrjnTfVXz7u261rosYUhC4Rg5ZpGcWmXQESlmQ=
-X-Received: by 2002:a1f:abc1:0:b0:49d:d3dd:fa40 with SMTP id
- u184-20020a1fabc1000000b0049dd3ddfa40mr3724461vke.5.1697594290608; Tue, 17
- Oct 2023 18:58:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E221FC5;
+	Wed, 18 Oct 2023 02:25:13 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2086.outbound.protection.outlook.com [40.107.223.86])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CD4FFA;
+	Tue, 17 Oct 2023 19:25:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UEB8rIHJy73mFJq5y+zkPR7kLtT+q2ZLioQ8ht/61Ghnyhvv4voorbvPQBvgj6N2ihUjLZOqtWac1dPi5x2oZqkpqQLp4sfn8lhibOafAH9JnQ8Segegi2xvQ0BOBkKDyULhjhM/YrmJcKiTcMQvjJG9zwg3gqEce+50gWHpXuNoJ+Dpxn8EOdMOBUbnOx7Bq6Oyq7DsWfeYGULco8n59Q2T3x91Q9/U7wcoxmpDIGSRhK6KkZwvfPnAWdolG40G/t9vZsigL80UZsNoCgBVm+SCPQhqQdidyPzBxph1rT2PmzCU2NHirOKJzjB8TV6BB02gG8V1sWt3QtujcAelEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k9JK+HVkroSYzk3UIVHNJneXM1qKAcMfOjjKlabeNoI=;
+ b=UvM6B9Ys/IdBjjY5HsP7tz/oUeZ/VlSSj/8YOEQ/UymnhgQeKtrsQi09OTci76FZIM9nDtcuV08Ajj3R0AWbhyR7xGqwpsGA5ib/gU7ZT5YeFizM+3RpJ5saNjmAc1WFZu+NMvhqawrUiUIzaPcWcoTRpViX/fy5yRzaI9wup37mMw26mdoRSn/KVuD63SDrVH671lEBvAvN1n2+ugsCNlQ2Jhxph5zNQJHAzoU8U+lB5sUqdJJACa0Mmskx0E9k9YlOYpI8rE/L4GLu1R3Gj7y6f7BtmO+3yD52O1II/ciY748XnACPMr/1+gM7VMblicj9gDA2MwH16Fj1CVuzPg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k9JK+HVkroSYzk3UIVHNJneXM1qKAcMfOjjKlabeNoI=;
+ b=hrbuIx8mP1gnlh5BeHH2Qn9sklxL31pHJXBAh4aOJYC6su3xtlG16nGXbPNJ3Y6Uma072Mopujd6aGnVu0mzoJEsUGN5P8PntOQEPoazpAimaMOF435dVtNuVCf3jUsdanfNIjhRXmvI6DNgTcRYdpm3+heWMT9BjqpnT/Vt9y4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB6351.namprd12.prod.outlook.com (2603:10b6:8:a2::6) by
+ SA1PR12MB6871.namprd12.prod.outlook.com (2603:10b6:806:25f::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.37; Wed, 18 Oct
+ 2023 02:25:07 +0000
+Received: from DM4PR12MB6351.namprd12.prod.outlook.com
+ ([fe80::4ead:d69:799a:281e]) by DM4PR12MB6351.namprd12.prod.outlook.com
+ ([fe80::4ead:d69:799a:281e%5]) with mapi id 15.20.6886.034; Wed, 18 Oct 2023
+ 02:25:07 +0000
+Message-ID: <7372315b-cec9-b951-daa6-d63dc00b5fe1@amd.com>
+Date: Wed, 18 Oct 2023 10:24:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Cc: majun@amd.com, amd-gfx@lists.freedesktop.org, lenb@kernel.org,
+ johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, alexander.deucher@amd.com,
+ Lijo.Lazar@amd.com, mario.limonciello@amd.com, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH v12 1/9] Documentation/driver-api: Add document about WBRF
+ mechanism
+To: =?UTF-8?Q?Ilpo_J=c3=a4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Ma Jun <Jun.Ma2@amd.com>
+References: <20231017025358.1773598-1-Jun.Ma2@amd.com>
+ <20231017025358.1773598-2-Jun.Ma2@amd.com>
+ <f3c89e85-a683-eedf-9c3-ed54173bc12@linux.intel.com>
+Content-Language: en-US
+From: "Ma, Jun" <majun@amd.com>
+In-Reply-To: <f3c89e85-a683-eedf-9c3-ed54173bc12@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2PR02CA0115.apcprd02.prod.outlook.com
+ (2603:1096:4:92::31) To DM4PR12MB6351.namprd12.prod.outlook.com
+ (2603:10b6:8:a2::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZS1/qtr0dZJ35VII@debian.debian> <20231017200207.GA5770@breakpoint.cc>
- <CAO3-Pbod3qc7rdg0bN0z5TjeoxO-SAADEwPZm6jcT42Gya8s=g@mail.gmail.com>
-In-Reply-To: <CAO3-Pbod3qc7rdg0bN0z5TjeoxO-SAADEwPZm6jcT42Gya8s=g@mail.gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Tue, 17 Oct 2023 21:57:34 -0400
-Message-ID: <CAF=yD-K7SbUkeVkTcZyR_x-+fgtpcBr0R6e75J=C_Af54J+zew@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] ipv6: avoid atomic fragment on GSO packets
-To: Yan Zhai <yan@cloudflare.com>
-Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Aya Levin <ayal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org, 
-	kernel-team@cloudflare.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB6351:EE_|SA1PR12MB6871:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4b21ba89-a14a-4a3d-f768-08dbcf8171c8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	sIOGcLIiK9GtsLIVODFegMibLWL6Fa+zRTOTcu+EBtMpFU3WIWurQnn/aMUjfm2AstLMX91c/QXU+aMJLYn7Z56cWej/DBDS/1anVjMvspiuM9urkpwkw9B0ee5NopCutrhVJhETGoUaewX1r53KwfQFHe9WMV9Ge6+9qVXDPU3lEbPO8nI13zlms7XQ19uwzdsCwtH/dAUQ2W1ydVddcAcc9YOI2mIA0HwxJ/+V2UZOeuyqiAqjXjnTdHrGvm57FEYYWghtB6prKDPSdrF2I5vJm0M5l5JOYZqL1rjjcjOZS4QUiJNdJDwZ7NJD1kkj4RSA1UXsJUQc9ShOB8cJmpt8vio4Lk8lTf7XKr7tqReVVIG6J+BgYqdlQe802lZ/yYHlgw77I5o8qwK+4ESZmoKrYmtfeboSYbTmwLHFLktbRLScue7A3nWS1wzkAeI/Pzn/gVtPpW5ZJytOPy6hQICRlD88O1evGHL84GEUsjS/pcH9/iTkAnuqkly14SzBl9q1ApLanBJtfQpoxDuXJcMz74fQHLyqbRsYV7tJKfdg0IXk0pOx0uxwLs26R81YyNoeaXSOBxhsfh2oZ5uVvesvpY5gU+d8/5HNVIy+JAhmTLnxYzl9SXtpTjtxP5wS3MzhyDPuVRW15Opd6SIsSw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6351.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(346002)(396003)(136003)(366004)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(31686004)(6512007)(6506007)(66574015)(2616005)(53546011)(26005)(6666004)(478600001)(6486002)(36756003)(41300700001)(38100700002)(8936002)(31696002)(8676002)(83380400001)(5660300002)(4326008)(2906002)(6636002)(7416002)(110136005)(66476007)(316002)(66556008)(66946007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dFJMb1VmTEMvS3FoR2xWZzdPMjZDcFZibmZ6cDd3OEhwYVg5Ny9RZTVMV01U?=
+ =?utf-8?B?YnVxQXJaS1F2Tlp4emx4YXdHWitQZEdJSGFtMC80MmswRURsQjBOaklLUGlZ?=
+ =?utf-8?B?QkFBUmhXNVpXMXBsRnlXU1Y4Zk15NTZPVnRxbWxLMVFaaHV4dmdTUkJONy8r?=
+ =?utf-8?B?ZW16NjVsVXc3WXl4WU1VY0hZVVdCWWc0a01MMUZ4ckY1UHJManZTZ2xoNFpa?=
+ =?utf-8?B?VEF3akxwUk93aUlPNTJ6TTVTbnVSM1BvTlhaWXFHeEphUzkzbEtuMXFubWI0?=
+ =?utf-8?B?ODF3dmhOTmNUazNTMFlBclRHbFAvTWx5Wjh3TkRrKzZwcHJySzJHVCtRWS93?=
+ =?utf-8?B?SVk3eW5Lb3dhMUo2UDcrN01UbGxDdmNvS1NMY0RKVXhXUmxhQmRqWGMxcjJv?=
+ =?utf-8?B?SlNWRTZFSWgrVWNzQ3dhdGJTVmhacGpaaWc0cDlmOXJ0OEFCUS9pdUttRXl5?=
+ =?utf-8?B?QkV2YVZPeXFRKzZDQVFDclFHREw0RjZ4UkJhMStMc1FLYVdpVGQ3MTRYNS9v?=
+ =?utf-8?B?WXFpUlpKZ096R1JleGM5c3ExSDJmdzkzL3JQK2tuKzF3Q2dWOXBHbHROOHhy?=
+ =?utf-8?B?YTBJTkQrTFBPMTZMQUY3cUdBWXByVnl1eXNaV2JUWFYxQmlnb1YrY2ZIdnZ6?=
+ =?utf-8?B?QzRTbWRSdTIxK0pyYTZKVlUxeHMrdXVXTGZLZWM4RnNwaU1lZjFvUGIvQnlG?=
+ =?utf-8?B?MWxLZjk1UzlBS01Zb3pFQ0R2cDludHdGa0s1Mlkra0gvOGlrS1NiTWV0U3Y0?=
+ =?utf-8?B?elBqRDQ2azJmbFZPQ3FVZ3FZakI0Q0d2dFN0ZUtZWGYyLzBDUFU2VXg5MmZI?=
+ =?utf-8?B?U3ZzYmkxN21KeTU4MS9HUG5vVTZmMFdJMGtMa1pJZFdEeGJXZjFxRGN5bVFK?=
+ =?utf-8?B?NE1OcVRScHpQSkltNVkyYkQyTFRqdUk5UFVsVk1CcDc4OFloZUVSSHpka0N1?=
+ =?utf-8?B?UUhWY0ZtK2RiMmVvYlIxVzl5SlQ3M3R2RkZzVkFDWnMzYXhta05maDhFbXZi?=
+ =?utf-8?B?M292SEQ5S3l4aHNXWmJ0cURvbTFLNEUzMno3MFVUSjFQK1ptK1kwYVRCYnkr?=
+ =?utf-8?B?cm9SQnc0UmJoTzgwTzdEZ3ZoRUQzNDBTZEpYcU8zQjMzUkpMemQyZ2VFekxw?=
+ =?utf-8?B?cFE4Y3NUOVR4UTZpYWptUkpuL3VDUTZBWTB1MVJZSEJPVHJOUjcwaGVBYWly?=
+ =?utf-8?B?K1M2aUMzSzdKWVpEVGkzbFNxbEdEeHk1MHpIRTFFRlViOXBpZ1pVR2F4TUVo?=
+ =?utf-8?B?MDlXd2ZZTXlFbzJyVTNyRVFrNmU4aXdaTzMzTkhMYTFNOUJxU3BvMXlLQjlz?=
+ =?utf-8?B?V0hwbllWZkt5OUQzc3hwK0dGb1hOOVpUNDYyNnlBRGNjM3JNc0hWc1ZqTjJJ?=
+ =?utf-8?B?czJ5WnBsbTdzM3pUc2pVSUllZjNJWEg4eEVwZHR6UEZCcUppOGw4b3BqT0dk?=
+ =?utf-8?B?aXFJb1hBWEhIS2FDeVUwYmZzSjh2UEpuZHVBVjlLQ3l4NS9yV29ncnZEa3Ix?=
+ =?utf-8?B?QTlncXZ0aHpNZkdxdXJERGhkZzRFSWdUa3VJaWRtNGxJbDRzc25NeVU5d2I2?=
+ =?utf-8?B?WHdaZGZWV0M1S3hjMGhVVzlvNlo5WXdSdTV2M2VEOTdJdVdwVnh6L2hKTGNP?=
+ =?utf-8?B?eUxuMmtLNk1FLzZjWFNLblR0YjNFdHNpWlJ3bmJuekprYmxnZDB0WTN6d21F?=
+ =?utf-8?B?NW1aeW0rdUN4NnVDYmVvY2VhNmdQaXpyZjh4TEhuejIwQm40YXNnNVpkYzUx?=
+ =?utf-8?B?ZHJXZUJha3B3Zk5YS0FRL1ppZFJlYnd2KzY2Q3RrT3NwM0RsK1Z1eG4zbkdr?=
+ =?utf-8?B?a09wS3FMV2p6dGdzSmUyaHgrbVN1akhWeVdWRnE3RHo5VjJLYkh4S0ZuV0FP?=
+ =?utf-8?B?UHdTWGNVNElyOGZZYStxbnpZQitMcHpHSWtTZXp3ckxlQzN4OFRPL3VMNU5T?=
+ =?utf-8?B?RFZ4MGVXWVVwakRzbTNJNjlNbVJmTnVPUFhXNTJoZjQ5S0JwOGlPUnN4bHcw?=
+ =?utf-8?B?VGhGUWU0RUtqMGVHOHRUZEQ5eFdZYXN2RFBiZVlrdC9aZHlvSis5Q2Z2NVk1?=
+ =?utf-8?B?U2NWTmZMTFNpMEFOVklCcDJ3LzBXczd0dFJBdnE3VTMralVucjZBUFJ4U1ZN?=
+ =?utf-8?Q?sGoaHnJfp3/stsKLsXz/c1xiA?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b21ba89-a14a-4a3d-f768-08dbcf8171c8
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6351.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 02:25:07.1140
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pNuInD5Fkx7d3Hd96T7Sv4z2p7XVS7FcaXzhCcodfRLBggsSB5kaeh3s4F2IUt6p
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6871
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 9:42=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wrote=
-:
->
-> On Tue, Oct 17, 2023 at 3:02=E2=80=AFPM Florian Westphal <fw@strlen.de> w=
-rote:
-> >
-> > Yan Zhai <yan@cloudflare.com> wrote:
-> > > Refactor __ip6_finish_output code to separate GSO and non-GSO packet
-> > > processing. It mirrors __ip_finish_output logic now. Add an extra che=
-ck
-> > > in GSO handling to avoid atomic fragments. Lastly, drop dst_allfrag
-> > > check, which is no longer true since commit 9d289715eb5c ("ipv6: stop
-> > > sending PTB packets for MTU < 1280").
-> >
-> >
-> > > -     if ((skb->len > mtu && !skb_is_gso(skb)) ||
-> > > -         dst_allfrag(skb_dst(skb)) ||
-> >
-> > My preference is to first remove dst_allfrag, i.e. do this in
-> > a separate change.
->
-> You mean completely removing all dst_allfrag references and related
-> stuff such like IP cork flags/socket flags? I was debating, it might
-> be cleaner that way but it does not fit so well with the subject of
-> this patch. I can open a new patchset to clean that up separately. For
-> this one, I guess I can keep dst_allfrag for now and come back with a
-> V3. Does that sound good to you?
+Hi llpo,
 
-The second paragraph in the commit message really makes
-clear that this combines three changes in one patch. Of which
-the largest one in terms of code churn is supposed to be a
-NOOP.
+Thanks for these comments on format issues, I'll
+fix it in the next version.
 
-Separating into three patches will make all three more clear.
-They can be pushed as one series, conceivably.
+Regards,
+Ma Jun
+
+On 10/17/2023 5:20 PM, Ilpo Järvinen wrote:
+> On Tue, 17 Oct 2023, Ma Jun wrote:
+> 
+>> Add documentation about AMD's Wifi band RFI mitigation (WBRF) mechanism
+>> explaining the theory and how it is used.
+>>
+>> Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
+>> ---
+>>  Documentation/driver-api/wbrf.rst | 73 +++++++++++++++++++++++++++++++
+>>  1 file changed, 73 insertions(+)
+>>  create mode 100644 Documentation/driver-api/wbrf.rst
+>>
+>> diff --git a/Documentation/driver-api/wbrf.rst b/Documentation/driver-api/wbrf.rst
+>> new file mode 100644
+>> index 000000000000..8561840263b3
+>> --- /dev/null
+>> +++ b/Documentation/driver-api/wbrf.rst
+>> @@ -0,0 +1,73 @@
+>> +.. SPDX-License-Identifier: GPL-2.0-or-later
+>> +
+>> +=================================
+>> +WBRF - Wifi Band RFI Mitigations
+>> +=================================
+>> +Due to electrical and mechanical constraints in certain platform designs
+> 
+> Add empty line before starting the content of a section.
+> 
+>> +there may be likely interference of relatively high-powered harmonics of
+>> +the GPU memory clocks with local radio module frequency bands used by
+>> +certain Wifi bands.
+>> +
+>> +To mitigate possible RFI interference producers can advertise the
+>> +frequencies in use and consumers can use this information to avoid using
+>> +these frequencies for sensitive features.
+>> +
+>> +When a platform is known to have this issue with any contained devices,
+>> +the platform designer will advertise the availability of this feature via
+>> +ACPI devices with a device specific method (_DSM).
+>> +* Producers with this _DSM will be able to advertise the frequencies in use.
+>> +* Consumers with this _DSM will be able to register for notifications of
+>> +frequencies in use.
+>> +
+>> +Some general terms
+>> +==================
+>> +Producer: such component who can produce high-powered radio frequency
+>> +Consumer: such component who can adjust its in-use frequency in
+>> +           response to the radio frequencies of other components to
+>> +           mitigate the possible RFI.
+>> +
+>> +To make the mechanism function, those producers should notify active use
+>> +of their particular frequencies so that other consumers can make relative
+>> +internal adjustments as necessary to avoid this resonance.
+>> +
+>> +ACPI interface
+>> +==============
+>> +Although initially used by for wifi + dGPU use cases, the ACPI interface
+>> +can be scaled to any type of device that a platform designer discovers
+>> +can cause interference.
+>> +
+>> +The GUID used for the _DSM is 7B7656CF-DC3D-4C1C-83E9-66E721DE3070.
+>> +
+>> +3 functions are available in this _DSM:
+>> +
+>> +* 0: discover # of functions available
+>> +* 1: record RF bands in use
+>> +* 2: retrieve RF bands in use
+>> +
+>> +Driver programming interface
+>> +============================
+>> +.. kernel-doc:: drivers/platform/x86/amd/wbrf.c
+>> +
+>> +Sample Usage
+>> +=============
+>> +The expected flow for the producers:
+>> +1) During probe, call `acpi_amd_wbrf_supported_producer` to check if WBRF
+>> +can be enabled for the device.
+>> +2) On using some frequency band, call `acpi_amd_wbrf_add_remove` with 'add'
+>> +param to get other consumers properly notified.
+>> +3) Or on stopping using some frequency band, call
+>> +`acpi_amd_wbrf_add_remove` with 'remove' param to get other consumers notified.
+>> +
+>> +The expected flow for the consumers:
+>> +1) During probe, call `acpi_amd_wbrf_supported_consumer` to check if WBRF
+>> +can be enabled for the device.
+>> +2) Call `amd_wbrf_register_notifier` to register for notification
+>> +of frequency band change(add or remove) from other producers.
+>> +3) Call the `amd_wbrf_retrieve_freq_band` intentionally to retrieve
+>> +current active frequency bands considering some producers may broadcast
+>> +such information before the consumer is up.
+>> +4) On receiving a notification for frequency band change, run
+>> +`amd_wbrf_retrieve_freq_band` again to retrieve the latest
+>> +active frequency bands.
+>> +5) During driver cleanup, call `amd_wbrf_unregister_notifier` to
+>> +unregister the notifier.
+> 
+> Align these so that only the numbers start from first column. I think the 
+> proper markup for numbered lists is 1. not 1).
+> 
+> 
 
