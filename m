@@ -1,105 +1,83 @@
-Return-Path: <netdev+bounces-42095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B047CD1B1
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:13:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4CEC7CD1B2
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:15:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04A82B21003
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:13:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BA192814D3
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7571AEC3;
-	Wed, 18 Oct 2023 01:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73163EDE;
+	Wed, 18 Oct 2023 01:15:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fOdu7bzm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eB6fL6g3"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC34EDE
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:13:00 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCCA7FD
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 18:12:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697591578; x=1729127578;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3y4VOaeb5VOWwjk004T1iDytBCrLOtFdXPCLmP84Imc=;
-  b=fOdu7bzmPDPLUS32EBcJaItsXIsEivE4HUKZulfa6epzZHOarP1eZk3F
-   VrjU/Hjw8ZZ8Cefd1jabavpbCiNkLXb8dcA89mDcsIMXZSE+cP/aVKrm1
-   56HhDg9ahn8GZ19KZRXIeW8x/LAWckbAk+AMul5lXkTB8xTe4kv/a+fj+
-   aYTiwW+c/tuRzDBsgcGjK42wjaaikZ2q4jeqZGmYiKAYcFVoupWJ5uwx+
-   9VnncA9vym6f56iVBxBK/X3xRM5XLxgeCBZdqkoU1XAsQ+qAsQ7ScqB5g
-   lvUTns+voo96DTfrAjL4fpKsUlscD/72XpTdSYYlqHFaIL24FaRM6+yME
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="384792391"
-X-IronPort-AV: E=Sophos;i="6.03,233,1694761200"; 
-   d="scan'208";a="384792391"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 18:12:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="826667277"
-X-IronPort-AV: E=Sophos;i="6.03,233,1694761200"; 
-   d="scan'208";a="826667277"
-Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
-  by fmsmga004.fm.intel.com with ESMTP; 17 Oct 2023 18:12:57 -0700
-Received: from kbuild by f64821696465 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qsv7H-000AJX-1e;
-	Wed, 18 Oct 2023 01:12:55 +0000
-Date: Wed, 18 Oct 2023 09:12:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH net-next v5 1/2] net: dsa: Use conduit and user terms
-Message-ID: <202310180907.RbYMqtyd-lkp@intel.com>
-References: <20231017233536.426704-2-florian.fainelli@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52811A5B
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:15:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6205C433C8;
+	Wed, 18 Oct 2023 01:15:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697591745;
+	bh=txh0CUFBNNdl/1yV+ubQIc1v2meuc+g1RlL8IiDVMtQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eB6fL6g3DGYiyQGzTY1ORMxAdBrTR6uHsE3B9mOurD0ARmEgYyOAbNYRhA0Br/n/O
+	 G8YBo3OqTB0qsSPtyY4rtU79sF7NItMU1y8jwC3KvLbq4mAWGNFXZVFnDoVFvNrWxn
+	 N5s5u8A3XQv8iln5pVP2MauYrlUWiFBGMt+xlxV8RYNNt9OGtglfX5J5QrQ6sfXEJz
+	 c9HoHkDMIl0cfoMguW7IS1pLx76c6ii4sza4IWawT5OLU1MiwJxlFY57yRrNyzo6dT
+	 DCIBiwJKL6cQrAD43ScrbE9+hLup3aGtiRPLQ6d2OK6IDSy2Ordio/ap4XEo/kP2w+
+	 qpHRncobsvwtg==
+Date: Tue, 17 Oct 2023 18:15:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Coiby Xu <coiby.xu@gmail.com>, Benjamin Poirier <bpoirier@suse.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Jiri Pirko
+ <jiri@resnulli.us>, netdev@vger.kernel.org, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Shannon Nelson <shannon.nelson@amd.com>, Michael Chan
+ <michael.chan@broadcom.com>, Cai Huoqing <cai.huoqing@linux.dev>, George
+ Cherian <george.cherian@marvell.com>, Danielle Ratson
+ <danieller@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Ariel Elior <aelior@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, Igor Russkikh <irusskikh@marvell.com>, Brett Creeley
+ <brett.creeley@amd.com>, Sunil Goutham <sgoutham@marvell.com>, Linu Cherian
+ <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Jerin Jacob
+ <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, Subbaraya Sundeep
+ <sbhatta@marvell.com>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
+ <petrm@nvidia.com>, Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin
+ <ayal@mellanox.com>, Leon Romanovsky <leon@kernel.org>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 10/11] staging: qlge: devlink health: use
+ retained error fmsg API
+Message-ID: <20231017181543.70a75b82@kernel.org>
+In-Reply-To: <20231017105341.415466-11-przemyslaw.kitszel@intel.com>
+References: <20231017105341.415466-1-przemyslaw.kitszel@intel.com>
+	<20231017105341.415466-11-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231017233536.426704-2-florian.fainelli@broadcom.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Florian,
+On Tue, 17 Oct 2023 12:53:40 +0200 Przemek Kitszel wrote:
+> Drop unneeded error checking.
+> 
+> devlink_fmsg_*() family of functions is now retaining errors,
+> so there is no need to check for them after each call.
 
-kernel test robot noticed the following build warnings:
+Humpf. Unrelated to the set, when did qlge grow devlink support?!
 
-[auto build test WARNING on net-next/main]
+Coiby, do you still use this HW?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Florian-Fainelli/net-dsa-Use-conduit-and-user-terms/20231018-073644
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231017233536.426704-2-florian.fainelli%40broadcom.com
-patch subject: [PATCH net-next v5 1/2] net: dsa: Use conduit and user terms
-reproduce: (https://download.01.org/0day-ci/archive/20231018/202310180907.RbYMqtyd-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310180907.RbYMqtyd-lkp@intel.com/
-
-# many are suggestions rather than must-fix
-
-WARNING:SPLIT_STRING: quoted string split across lines
-#4682: FILE: net/dsa/tag_sja1105.c:399:
- 					    "Expected meta frame, is %12llx "
-+					    "in the DSA conduit multicast filter?\n",
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+It looks like the driver was moved to staging on account of being
+old and unused, and expecting that we'll delete it. Clearly that's
+not the case if people are adding devlink support, so should we
+move it back?
 
