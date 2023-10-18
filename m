@@ -1,616 +1,807 @@
-Return-Path: <netdev+bounces-42118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 762997CD2C0
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 05:40:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B67297CD2CD
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 06:11:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37F68B20FD7
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:40:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87BDCB20EEA
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 04:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45502567C;
-	Wed, 18 Oct 2023 03:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9EB76135;
+	Wed, 18 Oct 2023 04:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DY14vec5"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XCm0CHLZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BDA53B7
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 03:40:46 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16714BA
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 20:40:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697600442;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZDj6Xi/E4fqXekaoLeij0fmPr3ZN9Xp4UAOiAKqpZ84=;
-	b=DY14vec5zquqmlo+XNUbNxdXw2L9Waj1YF2G3peWRzQVzNOvn7Uzk6JU/9lWMSwI6S6rmX
-	f8zxRdVZVq6HbVE3FaWEuEQGrnwR8FMdHlG+rUTRtXY3PwkNXwZw71HH1DGNjvEHvdenDP
-	FARDX3Q6NyC4x7VaNftMvswN7f7qNxc=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-44-K_RVjaRoOtOY2WxiLy6Dpg-1; Tue, 17 Oct 2023 23:40:41 -0400
-X-MC-Unique: K_RVjaRoOtOY2WxiLy6Dpg-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c52b2e424fso18487271fa.1
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 20:40:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8688E4311C
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 04:10:56 +0000 (UTC)
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DF8FFA
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 21:10:53 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-507c8316abcso321290e87.1
+        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 21:10:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1697602251; x=1698207051; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=eO2k9FRpjkZWCgXH2moasyn8gd3OaCwALs7d7R/GaV4=;
+        b=XCm0CHLZe8cvXgvxmMKC+lISO4kj1r2WPKQ/9TE+RT3iwqv8gI1hh4HNN8QmHqQR14
+         mxlMr96ryS2PzcxhBwtk4tly+JnNgyqf3QDS3lHHz8O4hJey/lHCqXyQhSyuUg0LSUWV
+         c+51s0GnUaTH+lSiL7Mhsr7uUSVHtPpHB0Mw0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697600437; x=1698205237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZDj6Xi/E4fqXekaoLeij0fmPr3ZN9Xp4UAOiAKqpZ84=;
-        b=tP4y4zzyOOfuFBQYhPP+WHETQELGnkss84zGnyWw9/FJFyZ9sNDa8Rd1lIB72+nWPn
-         uUSiiMkyP/4Rg142oG7LmsnyU2mEN0UchmEFLttcix9caBGQkbPgNgiqoIRtrODM4ZyA
-         XeEW7dVI1rGJFUvKXHINT5xWU0w8ZlfK30abpIQlTyGA/QannBHLWAjO/cCw3H4sH1Gz
-         AIuQLNRIgHHlkvKNAFN4EPCg3lR6F7LoLWX3JA3gLXwfRcanq4PK1BGhiwee7fsoQwxn
-         AxeWv94qzNbzCKtj+xdeJQVHf80S3c0CMXn7THTkju4c1ulX5GPinIyLJFy+c0BWClUl
-         rnOg==
-X-Gm-Message-State: AOJu0YyrIDrd1LxKwmgXjcxazuYr0jeoSzey0u3KkoAqUwFst/stjv2W
-	4V1aJig+5NJt9UhB0Wxoaj06zNj7J0rQmfTQO7ItEM9agbwfwTN/PsJIbzcPzIgODJwhz7p8DsJ
-	rgqzL/kP2xd2Aa+VYHWATEs+rJExYwQXQ
-X-Received: by 2002:a05:651c:220a:b0:2c5:16bd:83d4 with SMTP id y10-20020a05651c220a00b002c516bd83d4mr1168791ljq.26.1697600437170;
-        Tue, 17 Oct 2023 20:40:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFPIOKh8J7LLxAyqYzkKvZSrzosSREKUa8UQ946zrjNdwM2Fb7/8zYClTh3PCO6BTsp+Kntbjl22om7QVgrjvY=
-X-Received: by 2002:a05:651c:220a:b0:2c5:16bd:83d4 with SMTP id
- y10-20020a05651c220a00b002c516bd83d4mr1168773ljq.26.1697600436694; Tue, 17
- Oct 2023 20:40:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697602251; x=1698207051;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eO2k9FRpjkZWCgXH2moasyn8gd3OaCwALs7d7R/GaV4=;
+        b=oB5K8v+82+WpGiI1ubttKf7gDbFuXty4L/9uXfzzXwB7viCCGkxsnv3N4p/MWX00LL
+         TCqRRdAWd7xfrOdOLEmtsWtIuThVSbGH3o0Fs0JI5fYDgpQ93A5IRqOdhF3MPmbHBHdh
+         qkS5RrDsYw7wIIxGwC4l57OE9YbMkBQt7Mb7tJzvoD5+atwVrFkE6FTG0v7YKoRXZxmX
+         gMzM67qhPMsxKRf7EfEBClhN4pLd4zki0u1yRrQsu9Q1qBUAy6BWFaCdnJuc/XmV/WB+
+         Dnw1nu+1O1kuiW8IGibrsB2RtfbKnAEbuh3xxSGgZmu7VEaGh6sn+Nh64labNGy7nXsa
+         mONQ==
+X-Gm-Message-State: AOJu0Yyj0QesoHcimAPvq9HIgAZcUrg6N5N/2CS930KhtjgQHndhR4iO
+	Y1+LkjRd3C2sKlgXfrWzSgWksm19so3OtQNbr2BU4g==
+X-Google-Smtp-Source: AGHT+IH9g0OSEQKuL6zN7jmkVMdJBjcWhswskth5T8rcm70GDl+fTHnWhKTVh1REkj6LLCDm2qTYznDf7QgoixrCc6Y=
+X-Received: by 2002:ac2:528b:0:b0:507:a8ed:ee0b with SMTP id
+ q11-20020ac2528b000000b00507a8edee0bmr2650372lfm.65.1697602251305; Tue, 17
+ Oct 2023 21:10:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEs4u-4ch2UAK14hNfKeORjqMu4BX7=46OfaXpvxW+VT7w@mail.gmail.com>
- <1697511725.2037013-1-xuanzhuo@linux.alibaba.com> <CACGkMEskfXDo+bnx5hbGU3JRwOgBRwOC-bYDdFYSmEO2jjgPnA@mail.gmail.com>
- <1697512950.0813534-1-xuanzhuo@linux.alibaba.com> <CACGkMEtppjoX_WAM+vjzkMKaMQQ0iZL=C_xS4RObuoLbm0udUw@mail.gmail.com>
- <CACGkMEvWAhH3uj2DEo=m7qWg3-pQjE-EtEBvTT8JXzqZ+RYEXQ@mail.gmail.com>
- <1697522771.0390663-2-xuanzhuo@linux.alibaba.com> <CACGkMEu4tSHd4RVo0zEp1A6uM-6h42y+yAB2xzHTv8SzYdZPXQ@mail.gmail.com>
- <1697525013.7650406-3-xuanzhuo@linux.alibaba.com> <1697541581.967358-1-xuanzhuo@linux.alibaba.com>
- <1697599938.9302888-2-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1697599938.9302888-2-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 18 Oct 2023 11:40:25 +0800
-Message-ID: <CACGkMEu=xHY5MKzU31fJLnj9wt1=ycO8YJ269ZOdo1geWZnEeQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 00/19] virtio-net: support AF_XDP zero copy
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+References: <1697494322-26814-1-git-send-email-sharmaajay@linuxonhyperv.com>
+ <1697494322-26814-5-git-send-email-sharmaajay@linuxonhyperv.com>
+ <CAH-L+nPAxQHCCA6pwwHMxys4GGnvmvYZKKNzd8AvMxy-hO0eSw@mail.gmail.com> <87330A78-CDF0-4B49-8192-DBDF006DB8A7@microsoft.com>
+In-Reply-To: <87330A78-CDF0-4B49-8192-DBDF006DB8A7@microsoft.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Wed, 18 Oct 2023 09:40:38 +0530
+Message-ID: <CAH-L+nOXEohzF0Fn2B_aPn+d9W6KxnnEnGOozCKusA1QeMU9aw@mail.gmail.com>
+Subject: Re: [EXTERNAL] Re: [Patch v7 4/5] RDMA/mana_ib: Query adapter capabilities
+To: Ajay Sharma <sharmaajay@microsoft.com>
+Cc: "sharmaajay@linuxonhyperv.com" <sharmaajay@linuxonhyperv.com>, Long Li <longli@microsoft.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Wei Liu <wei.liu@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000003177650607f5d32b"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HTML_MESSAGE,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 18, 2023 at 11:38=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
-com> wrote:
->
-> On Tue, 17 Oct 2023 19:19:41 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.com=
-> wrote:
-> > On Tue, 17 Oct 2023 14:43:33 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
-> > > On Tue, 17 Oct 2023 14:26:01 +0800, Jason Wang <jasowang@redhat.com> =
+--0000000000003177650607f5d32b
+Content-Type: multipart/alternative; boundary="000000000000292d500607f5d33c"
+
+--000000000000292d500607f5d33c
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Oct 17, 2023 at 11:17=E2=80=AFAM Ajay Sharma <sharmaajay@microsoft.=
+com>
 wrote:
-> > > > On Tue, Oct 17, 2023 at 2:17=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.a=
-libaba.com> wrote:
-> > > > >
-> > > > > On Tue, 17 Oct 2023 13:27:47 +0800, Jason Wang <jasowang@redhat.c=
-om> wrote:
-> > > > > > On Tue, Oct 17, 2023 at 11:28=E2=80=AFAM Jason Wang <jasowang@r=
-edhat.com> wrote:
-> > > > > > >
-> > > > > > > On Tue, Oct 17, 2023 at 11:26=E2=80=AFAM Xuan Zhuo <xuanzhuo@=
-linux.alibaba.com> wrote:
-> > > > > > > >
-> > > > > > > > On Tue, 17 Oct 2023 11:20:41 +0800, Jason Wang <jasowang@re=
-dhat.com> wrote:
-> > > > > > > > > On Tue, Oct 17, 2023 at 11:11=E2=80=AFAM Xuan Zhuo <xuanz=
-huo@linux.alibaba.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > On Tue, 17 Oct 2023 10:53:44 +0800, Jason Wang <jasowan=
-g@redhat.com> wrote:
-> > > > > > > > > > > On Mon, Oct 16, 2023 at 8:00=E2=80=AFPM Xuan Zhuo <xu=
-anzhuo@linux.alibaba.com> wrote:
-> > > > > > > > > > > >
-> > > > > > > > > > > > ## AF_XDP
-> > > > > > > > > > > >
-> > > > > > > > > > > > XDP socket(AF_XDP) is an excellent bypass kernel ne=
-twork framework. The zero
-> > > > > > > > > > > > copy feature of xsk (XDP socket) needs to be suppor=
-ted by the driver. The
-> > > > > > > > > > > > performance of zero copy is very good. mlx5 and int=
-el ixgbe already support
-> > > > > > > > > > > > this feature, This patch set allows virtio-net to s=
-upport xsk's zerocopy xmit
-> > > > > > > > > > > > feature.
-> > > > > > > > > > > >
-> > > > > > > > > > > > At present, we have completed some preparation:
-> > > > > > > > > > > >
-> > > > > > > > > > > > 1. vq-reset (virtio spec and kernel code)
-> > > > > > > > > > > > 2. virtio-core premapped dma
-> > > > > > > > > > > > 3. virtio-net xdp refactor
-> > > > > > > > > > > >
-> > > > > > > > > > > > So it is time for Virtio-Net to complete the suppor=
-t for the XDP Socket
-> > > > > > > > > > > > Zerocopy.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Virtio-net can not increase the queue num at will, =
-so xsk shares the queue with
-> > > > > > > > > > > > kernel.
-> > > > > > > > > > > >
-> > > > > > > > > > > > On the other hand, Virtio-Net does not support gene=
-rate interrupt from driver
-> > > > > > > > > > > > manually, so when we wakeup tx xmit, we used some t=
-ips. If the CPU run by TX
-> > > > > > > > > > > > NAPI last time is other CPUs, use IPI to wake up NA=
-PI on the remote CPU. If it
-> > > > > > > > > > > > is also the local CPU, then we wake up napi directl=
-y.
-> > > > > > > > > > > >
-> > > > > > > > > > > > This patch set includes some refactor to the virtio=
--net to let that to support
-> > > > > > > > > > > > AF_XDP.
-> > > > > > > > > > > >
-> > > > > > > > > > > > ## performance
-> > > > > > > > > > > >
-> > > > > > > > > > > > ENV: Qemu with vhost-user(polling mode).
-> > > > > > > > > > > >
-> > > > > > > > > > > > Sockperf: https://github.com/Mellanox/sockperf
-> > > > > > > > > > > > I use this tool to send udp packet by kernel syscal=
-l.
-> > > > > > > > > > > >
-> > > > > > > > > > > > xmit command: sockperf tp -i 10.0.3.1 -t 1000
-> > > > > > > > > > > >
-> > > > > > > > > > > > I write a tool that sends udp packets or recvs udp =
-packets by AF_XDP.
-> > > > > > > > > > > >
-> > > > > > > > > > > >                   | Guest APP CPU |Guest Softirq CP=
-U | UDP PPS
-> > > > > > > > > > > > ------------------|---------------|----------------=
---|------------
-> > > > > > > > > > > > xmit by syscall   |   100%        |                =
-  |   676,915
-> > > > > > > > > > > > xmit by xsk       |   59.1%       |   100%         =
-  | 5,447,168
-> > > > > > > > > > > > recv by syscall   |   60%         |   100%         =
-  |   932,288
-> > > > > > > > > > > > recv by xsk       |   35.7%       |   100%         =
-  | 3,343,168
-> > > > > > > > > > >
-> > > > > > > > > > > Any chance we can get a testpmd result (which I guess=
- should be better
-> > > > > > > > > > > than PPS above)?
-> > > > > > > > > >
-> > > > > > > > > > Do you mean testpmd + DPDK + AF_XDP?
-> > > > > > > > >
-> > > > > > > > > Yes.
-> > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > Yes. This is probably better because my tool does more =
-work. That is not a
-> > > > > > > > > > complete testing tool used by our business.
-> > > > > > > > >
-> > > > > > > > > Probably, but it would be appealing for others. Especiall=
-y considering
-> > > > > > > > > DPDK supports AF_XDP PMD now.
-> > > > > > > >
-> > > > > > > > OK.
-> > > > > > > >
-> > > > > > > > Let me try.
-> > > > > > > >
-> > > > > > > > But could you start to review firstly?
-> > > > > > >
-> > > > > > > Yes, it's in my todo list.
-> > > > > >
-> > > > > > Speaking too fast, I think if it doesn't take too long time, I =
-would
-> > > > > > wait for the result first as netdim series. One reason is that =
-I
-> > > > > > remember claims to be only 10% to 20% loss comparing to wire sp=
-eed, so
-> > > > > > I'd expect it should be much faster. I vaguely remember, even a=
- vhost
-> > > > > > can gives us more than 3M PPS if we disable SMAP, so the number=
-s here
-> > > > > > are not as impressive as expected.
-> > > > >
-> > > > >
-> > > > > What is SMAP? Cloud you give me more info?
-> > > >
-> > > > Supervisor Mode Access Prevention
-> > > >
-> > > > Vhost suffers from this.
-> > > >
-> > > > >
-> > > > > So if we think the 3M as the wire speed, you expect the result
-> > > > > can reach 2.8M pps/core, right?
-> > > >
-> > > > It's AF_XDP that claims to be 80% if my memory is correct. So a
-> > > > correct AF_XDP implementation should not sit behind this too much.
-> > > >
-> > > > > Now the recv result is 2.5M(2463646) pps/core.
-> > > > > Do you think there is a huge gap?
-> > > >
-> > > > You never describe your testing environment in details. For example=
-,
-> > > > is this a virtual environment? What's the CPU model and frequency e=
-tc.
-> > > >
-> > > > Because I never see a NIC whose wire speed is 3M.
-> > > >
-> > > > >
-> > > > > My tool makes udp packet and lookup route, so it take more much c=
-pu.
-> > > >
-> > > > That's why I suggest you to test raw PPS.
-> > >
-> > > OK. Let's align some info.
-> > >
-> > > 1. My test env is vhost-user. Qemu + vhost-user(polling mode).
-> > >    I do not use the DPDK, because that there is some trouble for me.
-> > >    I use the VAPP (https://github.com/fengidri/vapp) as the vhost-use=
-r device.
-> > >    That has two threads all are busy mode for tx and rx.
-> > >    tx thread consumes the tx ring and drop the packet.
-> > >    rx thread put the packet to the rx ring.
-> > >
-> > > 2. My Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
-> > >
-> > > 3. From this http://fast.dpdk.org/doc/perf/DPDK_23_03_Intel_virtio_pe=
-rformance_report.pdf
-> > >    I think we can align that the vhost max speed is 8.5 MPPS.
-> > >    Is that ok?
-> > >    And the expected AF_XDP pps is about 6 MPPS.
-> > >
-> > > 4. About the raw PPS, I agree that. I will test with testpmd.
-> > >
-> >
-> > ## testpmd command
-> >
-> > ./build/app/dpdk-testpmd -l 1-2 --no-pci --main-lcore=3D2 \
-> >         --vdev net_af_xdp0,iface=3Dens5,queue_count=3D1,busy_budget=3D0=
- \
-> >         --log-level=3Dpmd.net.af_xdp:8 \
-> >         -- -i -a --nb-cores=3D1 --rxq=3D1 --txq=3D1 --forward-mode=3Dma=
-cswap
-> >
-> > ## work without the follow patch[0]
-> >
-> > testpmd> show port stats all
-> >
-> >   ######################## NIC statistics for port 0  #################=
-#######
-> >   RX-packets: 3615824336 RX-missed: 0          RX-bytes:  202486162816
-> >   RX-errors: 0
-> >   RX-nombuf:  0
-> >   TX-packets: 3615795592 TX-errors: 20738      TX-bytes:  202484553152
-> >
-> >   Throughput (since last show)
-> >   Rx-pps:      3790446          Rx-bps:   1698120056
-> >   Tx-pps:      3790446          Tx-bps:   1698120056
-> >   #####################################################################=
-#######
-> >
-> >
-> > ## work with the follow patch[0]
-> >
-> > testpmd> show port stats all
-> >
-> >   ######################## NIC statistics for port 0  #################=
-#######
-> >   RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
-> >   RX-errors: 0
-> >   RX-nombuf:  0
-> >   TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
-> >
-> >   Throughput (since last show)
-> >   Rx-pps:      6333196          Rx-bps:   2837272088
-> >   Tx-pps:      6333227          Tx-bps:   2837285936
-> >   #####################################################################=
-#######
->
->
-> ## virtio PMD in guest with testpmd
->
-> testpmd> show port stats all
->
->  ######################## NIC statistics for port 0 #####################=
-###
->  RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
->  RX-errors: 0
->  RX-nombuf: 0
->  TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
->
->
->  Throughput (since last show)
->  Rx-pps:   8861574     Rx-bps:  3969985208
->  Tx-pps:   8861493     Tx-bps:  3969962736
->  ########################################################################=
-####
->
-> ## AF_XDP PMD in guest with testpmd
->
-> testpmd> show port stats all
->
->   ######################## NIC statistics for port 0  ###################=
-#####
->   RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
->   RX-errors: 0
->   RX-nombuf:  0
->   TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
->
->   Throughput (since last show)
->   Rx-pps:      6333196          Rx-bps:   2837272088
->   Tx-pps:      6333227          Tx-bps:   2837285936
->   #######################################################################=
-#####
->
-> But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
-
-Thanks for the testing. This is expected.
-
-I will look at the series in detail.
-
-Thanks
 
 >
-> Thanks.
 >
-> >
-> > I search the dpdk code that the dpdk virtio driver has the similar code=
-.
-> >
-> > virtio_xmit_pkts(void *tx_queue, struct rte_mbuf **tx_pkts, uint16_t nb=
-_pkts)
-> > {
-> >       [...]
-> >
-> >       for (nb_tx =3D 0; nb_tx < nb_pkts; nb_tx++) {
-> >
-> >               [...]
-> >
-> >               /* Enqueue Packet buffers */
-> >               virtqueue_enqueue_xmit(txvq, txm, slots, use_indirect,
-> >                       can_push, 0);
-> >       }
-> >
-> >       [...]
-> >
-> >       if (likely(nb_tx)) {
-> > -->           vq_update_avail_idx(vq);
-> >
-> >               if (unlikely(virtqueue_kick_prepare(vq))) {
-> >                       virtqueue_notify(vq);
-> >                       PMD_TX_LOG(DEBUG, "Notified backend after xmit");
-> >               }
-> >       }
-> > }
-> >
-> > ## patch[0]
-> >
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.=
-c
-> > index 51d8f3299c10..cfe556b5d88f 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -687,12 +687,7 @@ static inline int virtqueue_add_split(struct virtq=
-ueue *_vq,
-> >         avail =3D vq->split.avail_idx_shadow & (vq->split.vring.num - 1=
-);
-> >         vq->split.vring.avail->ring[avail] =3D cpu_to_virtio16(_vq->vde=
-v, head);
-> >
-> > -       /* Descriptors and available array need to be set before we exp=
-ose the
-> > -        * new available array entries. */
-> > -       virtio_wmb(vq->weak_barriers);
-> >         vq->split.avail_idx_shadow++;
-> > -       vq->split.vring.avail->idx =3D cpu_to_virtio16(_vq->vdev,
-> > -                                               vq->split.avail_idx_sha=
-dow);
-> >         vq->num_added++;
-> >
-> >         pr_debug("Added buffer head %i to %p\n", head, vq);
-> > @@ -700,8 +695,12 @@ static inline int virtqueue_add_split(struct virtq=
-ueue *_vq,
-> >
-> >         /* This is very unlikely, but theoretically possible.  Kick
-> >          * just in case. */
-> > -       if (unlikely(vq->num_added =3D=3D (1 << 16) - 1))
-> > +       if (unlikely(vq->num_added =3D=3D (1 << 16) - 1)) {
-> > +               virtio_wmb(vq->weak_barriers);
-> > +               vq->split.vring.avail->idx =3D cpu_to_virtio16(_vq->vde=
+> On Oct 16, 2023, at 9:32 PM, Kalesh Anakkur Purayil <
+> kalesh-anakkur.purayil@broadcom.com> wrote:
+>
+> =EF=BB=BF
+> Hi Ajay,
+>
+> One comment in line.
+>
+> Regards,
+> Kalesh
+>
+> On Tue, Oct 17, 2023 at 3:42=E2=80=AFAM <sharmaajay@linuxonhyperv.com> wr=
+ote:
+>
+>> From: Ajay Sharma <sharmaajay@microsoft.com>
+>>
+>> Query the adapter capabilities to expose to
+>> other clients and VF. This checks against
+>> the user supplied values and protects against
+>> overflows.
+>>
+>> Signed-off-by: Ajay Sharma <sharmaajay@microsoft.com>
+>> ---
+>>  drivers/infiniband/hw/mana/device.c  |  4 ++
+>>  drivers/infiniband/hw/mana/main.c    | 67 ++++++++++++++++++++++------
+>>  drivers/infiniband/hw/mana/mana_ib.h | 53 +++++++++++++++++++++-
+>>  3 files changed, 110 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/drivers/infiniband/hw/mana/device.c
+>> b/drivers/infiniband/hw/mana/device.c
+>> index 4077e440657a..e15da43c73a0 100644
+>> --- a/drivers/infiniband/hw/mana/device.c
+>> +++ b/drivers/infiniband/hw/mana/device.c
+>> @@ -97,6 +97,10 @@ static int mana_ib_probe(struct auxiliary_device *ade=
 v,
-> > +                                                            vq->split.=
-avail_idx_shadow);
-> >                 virtqueue_kick(_vq);
-> > +       }
-> >
-> >         return 0;
-> >
-> > @@ -742,6 +741,9 @@ static bool virtqueue_kick_prepare_split(struct vir=
-tqueue *_vq)
-> >          * event. */
-> >         virtio_mb(vq->weak_barriers);
-> >
-> > +       vq->split.vring.avail->idx =3D cpu_to_virtio16(_vq->vdev,
-> > +                                               vq->split.avail_idx_sha=
-dow);
-> > +
-> >         old =3D vq->split.avail_idx_shadow - vq->num_added;
-> >         new =3D vq->split.avail_idx_shadow;
-> >         vq->num_added =3D 0;
-> >
-> > ---------------
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > Thanks.
-> > >
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > > > >
-> > > > > I am confused.
-> > > > >
-> > > > >
-> > > > > What is SMAP? Could you give me more information?
-> > > > >
-> > > > > So if we use 3M as the wire speed, you would expect the result to=
- be 2.8M
-> > > > > pps/core, right?
-> > > > >
-> > > > > Now the recv result is 2.5M (2463646 =3D 3,343,168/1.357) pps/cor=
-e. Do you think
-> > > > > the difference is big?
-> > > > >
-> > > > > My tool makes udp packets and looks up routes, so it requires mor=
-e CPU.
-> > > > >
-> > > > > I'm confused. Is there something I misunderstood?
-> > > > >
-> > > > > Thanks.
-> > > > >
-> > > > > >
-> > > > > > Thanks
-> > > > > >
-> > > > > > >
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > What I noticed is that the hotspot is the driver writin=
-g virtio desc. Because
-> > > > > > > > > > the device is in busy mode. So there is race between dr=
-iver and device.
-> > > > > > > > > > So I modified the virtio core and lazily updated avail =
-idx. Then pps can reach
-> > > > > > > > > > 10,000,000.
-> > > > > > > > >
-> > > > > > > > > Care to post a draft for this?
-> > > > > > > >
-> > > > > > > > YES, I is thinking for this.
-> > > > > > > > But maybe that is just work for split. The packed mode has =
-some troubles.
-> > > > > > >
-> > > > > > > Ok.
-> > > > > > >
-> > > > > > > Thanks
-> > > > > > >
-> > > > > > > >
-> > > > > > > > Thanks.
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > > Thanks
-> > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > Thanks.
-> > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > Thanks
-> > > > > > > > > > >
-> > > > > > > > > > > >
-> > > > > > > > > > > > ## maintain
-> > > > > > > > > > > >
-> > > > > > > > > > > > I am currently a reviewer for virtio-net. I commit =
-to maintain AF_XDP support in
-> > > > > > > > > > > > virtio-net.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Please review.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Thanks.
-> > > > > > > > > > > >
-> > > > > > > > > > > > v1:
-> > > > > > > > > > > >     1. remove two virtio commits. Push this patchse=
-t to net-next
-> > > > > > > > > > > >     2. squash "virtio_net: virtnet_poll_tx support =
-rescheduled" to xsk: support tx
-> > > > > > > > > > > >     3. fix some warnings
-> > > > > > > > > > > >
-> > > > > > > > > > > > Xuan Zhuo (19):
-> > > > > > > > > > > >   virtio_net: rename free_old_xmit_skbs to free_old=
-_xmit
-> > > > > > > > > > > >   virtio_net: unify the code for recycling the xmit=
- ptr
-> > > > > > > > > > > >   virtio_net: independent directory
-> > > > > > > > > > > >   virtio_net: move to virtio_net.h
-> > > > > > > > > > > >   virtio_net: add prefix virtnet to all struct/api =
-inside virtio_net.h
-> > > > > > > > > > > >   virtio_net: separate virtnet_rx_resize()
-> > > > > > > > > > > >   virtio_net: separate virtnet_tx_resize()
-> > > > > > > > > > > >   virtio_net: sq support premapped mode
-> > > > > > > > > > > >   virtio_net: xsk: bind/unbind xsk
-> > > > > > > > > > > >   virtio_net: xsk: prevent disable tx napi
-> > > > > > > > > > > >   virtio_net: xsk: tx: support tx
-> > > > > > > > > > > >   virtio_net: xsk: tx: support wakeup
-> > > > > > > > > > > >   virtio_net: xsk: tx: virtnet_free_old_xmit() dist=
-inguishes xsk buffer
-> > > > > > > > > > > >   virtio_net: xsk: tx: virtnet_sq_free_unused_buf()=
- check xsk buffer
-> > > > > > > > > > > >   virtio_net: xsk: rx: introduce add_recvbuf_xsk()
-> > > > > > > > > > > >   virtio_net: xsk: rx: introduce receive_xsk() to r=
-ecv xsk buffer
-> > > > > > > > > > > >   virtio_net: xsk: rx: virtnet_rq_free_unused_buf()=
- check xsk buffer
-> > > > > > > > > > > >   virtio_net: update tx timeout record
-> > > > > > > > > > > >   virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_Z=
-EROCOPY
-> > > > > > > > > > > >
-> > > > > > > > > > > >  MAINTAINERS                                 |   2 =
-+-
-> > > > > > > > > > > >  drivers/net/Kconfig                         |   8 =
-+-
-> > > > > > > > > > > >  drivers/net/Makefile                        |   2 =
-+-
-> > > > > > > > > > > >  drivers/net/virtio/Kconfig                  |  13 =
-+
-> > > > > > > > > > > >  drivers/net/virtio/Makefile                 |   8 =
-+
-> > > > > > > > > > > >  drivers/net/{virtio_net.c =3D> virtio/main.c} | 65=
-2 +++++++++-----------
-> > > > > > > > > > > >  drivers/net/virtio/virtio_net.h             | 359 =
-+++++++++++
-> > > > > > > > > > > >  drivers/net/virtio/xsk.c                    | 545 =
-++++++++++++++++
-> > > > > > > > > > > >  drivers/net/virtio/xsk.h                    |  32 =
-+
-> > > > > > > > > > > >  9 files changed, 1247 insertions(+), 374 deletions=
-(-)
-> > > > > > > > > > > >  create mode 100644 drivers/net/virtio/Kconfig
-> > > > > > > > > > > >  create mode 100644 drivers/net/virtio/Makefile
-> > > > > > > > > > > >  rename drivers/net/{virtio_net.c =3D> virtio/main.=
-c} (91%)
-> > > > > > > > > > > >  create mode 100644 drivers/net/virtio/virtio_net.h
-> > > > > > > > > > > >  create mode 100644 drivers/net/virtio/xsk.c
-> > > > > > > > > > > >  create mode 100644 drivers/net/virtio/xsk.h
-> > > > > > > > > > > >
-> > > > > > > > > > > > --
-> > > > > > > > > > > > 2.32.0.3.g01195cf9f
-> > > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > >
-> > > > > > > >
-> > > > > >
-> > > > >
-> > > >
-> > >
+>>                 goto free_error_eq;
+>>         }
+>>
+>> +       ret =3D mana_ib_query_adapter_caps(mib_dev);
+>> +       if (ret)
+>> +               ibdev_dbg(&mib_dev->ib_dev, "Failed to get caps, use
+>> defaults");
+>>
+> [Kalesh]: You are ignoring the failure here and continuing with the IB
+> register. When the FW command fails, you won't populate the
+> "mib_dev->adapter_caps". Subsequent "mana_ib_query_device" may return sta=
+le
+> values?
+> Is that what you want?
+>
+> It will use default capabilities.
+>
+[Kalesh]: Maybe I am missing something here. I could not see that code
+where you are initializing "mib_dev->adapter_caps" with default values.
+
+> +
+>>         ret =3D ib_register_device(&mib_dev->ib_dev, "mana_%d",
+>>                                  mdev->gdma_context->dev);
+>>         if (ret)
+>> diff --git a/drivers/infiniband/hw/mana/main.c
+>> b/drivers/infiniband/hw/mana/main.c
+>> index 5b5d7abe79ac..82923475267d 100644
+>> --- a/drivers/infiniband/hw/mana/main.c
+>> +++ b/drivers/infiniband/hw/mana/main.c
+>> @@ -469,20 +469,15 @@ int mana_ib_get_port_immutable(struct ib_device
+>> *ibdev, u32 port_num,
+>>  int mana_ib_query_device(struct ib_device *ibdev, struct ib_device_attr
+>> *props,
+>>                          struct ib_udata *uhw)
+>>  {
+>> -       props->max_qp =3D MANA_MAX_NUM_QUEUES;
+>> -       props->max_qp_wr =3D MAX_SEND_BUFFERS_PER_QUEUE;
+>> +       struct mana_ib_dev *mib_dev =3D container_of(ibdev,
+>> +                       struct mana_ib_dev, ib_dev);
+>>
+>> -       /*
+>> -        * max_cqe could be potentially much bigger.
+>> -        * As this version of driver only support RAW QP, set it to the
+>> same
+>> -        * value as max_qp_wr
+>> -        */
+>> -       props->max_cqe =3D MAX_SEND_BUFFERS_PER_QUEUE;
+>> -
+>> -       props->max_mr_size =3D MANA_IB_MAX_MR_SIZE;
+>> -       props->max_mr =3D MANA_IB_MAX_MR;
+>> -       props->max_send_sge =3D MAX_TX_WQE_SGL_ENTRIES;
+>> -       props->max_recv_sge =3D MAX_RX_WQE_SGL_ENTRIES;
+>> +       props->max_qp =3D mib_dev->adapter_caps.max_qp_count;
+>> +       props->max_qp_wr =3D mib_dev->adapter_caps.max_requester_sq_size=
+;
+>> +       props->max_cqe =3D mib_dev->adapter_caps.max_requester_sq_size;
+>> +       props->max_mr =3D mib_dev->adapter_caps.max_mr_count;
+>> +       props->max_send_sge =3D mib_dev->adapter_caps.max_send_wqe_size;
+>> +       props->max_recv_sge =3D mib_dev->adapter_caps.max_recv_wqe_size;
+>>
+>>         return 0;
+>>  }
+>> @@ -601,3 +596,49 @@ int mana_ib_create_error_eq(struct mana_ib_dev
+>> *mib_dev)
+>>
+>>         return 0;
+>>  }
+>> +
+>> +static void assign_caps(struct mana_ib_adapter_caps *caps,
+>> +                       struct mana_ib_query_adapter_caps_resp *resp)
+>> +{
+>> +       caps->max_sq_id =3D resp->max_sq_id;
+>> +       caps->max_rq_id =3D resp->max_rq_id;
+>> +       caps->max_cq_id =3D resp->max_cq_id;
+>> +       caps->max_qp_count =3D resp->max_qp_count;
+>> +       caps->max_cq_count =3D resp->max_cq_count;
+>> +       caps->max_mr_count =3D resp->max_mr_count;
+>> +       caps->max_pd_count =3D resp->max_pd_count;
+>> +       caps->max_inbound_read_limit =3D resp->max_inbound_read_limit;
+>> +       caps->max_outbound_read_limit =3D resp->max_outbound_read_limit;
+>> +       caps->mw_count =3D resp->mw_count;
+>> +       caps->max_srq_count =3D resp->max_srq_count;
+>> +       caps->max_requester_sq_size =3D resp->max_requester_sq_size;
+>> +       caps->max_responder_sq_size =3D resp->max_responder_sq_size;
+>> +       caps->max_requester_rq_size =3D resp->max_requester_rq_size;
+>> +       caps->max_responder_rq_size =3D resp->max_responder_rq_size;
+>> +       caps->max_send_wqe_size =3D resp->max_send_wqe_size;
+>> +       caps->max_recv_wqe_size =3D resp->max_recv_wqe_size;
+>> +       caps->max_inline_data_size =3D resp->max_inline_data_size;
+>> +}
+>> +
+>> +int mana_ib_query_adapter_caps(struct mana_ib_dev *mib_dev)
+>> +{
+>> +       struct mana_ib_query_adapter_caps_resp resp =3D {};
+>> +       struct mana_ib_query_adapter_caps_req req =3D {};
+>> +       int err;
+>> +
+>> +       mana_gd_init_req_hdr(&req.hdr, MANA_IB_GET_ADAPTER_CAP,
+>> sizeof(req),
+>> +                            sizeof(resp));
+>> +       req.hdr.resp.msg_version =3D MANA_IB_GET_ADAPTER_CAP_RESPONSE_V3=
+;
+>> +       req.hdr.dev_id =3D mib_dev->gc->mana_ib.dev_id;
+>> +
+>> +       err =3D mana_gd_send_request(mib_dev->gc, sizeof(req), &req,
+>> +                                  sizeof(resp), &resp);
+>> +
+>> +       if (err) {
+>> +               ibdev_err(&mib_dev->ib_dev, "Failed to query adapter cap=
+s
+>> err %d", err);
+>> +               return err;
+>> +       }
+>> +
+>> +       assign_caps(&mib_dev->adapter_caps, &resp);
+>> +       return 0;
+>> +}
+>> diff --git a/drivers/infiniband/hw/mana/mana_ib.h
+>> b/drivers/infiniband/hw/mana/mana_ib.h
+>> index 8a652bccd978..6b9406738cb2 100644
+>> --- a/drivers/infiniband/hw/mana/mana_ib.h
+>> +++ b/drivers/infiniband/hw/mana/mana_ib.h
+>> @@ -20,19 +20,41 @@
+>>
+>>  /* MANA doesn't have any limit for MR size */
+>>  #define MANA_IB_MAX_MR_SIZE    U64_MAX
+>> -
+>> +#define MANA_IB_GET_ADAPTER_CAP_RESPONSE_V3 3
+>>  /*
+>>   * The hardware limit of number of MRs is greater than maximum number o=
+f
+>> MRs
+>>   * that can possibly represent in 24 bits
+>>   */
+>>  #define MANA_IB_MAX_MR         0xFFFFFFu
+>>
+>> +struct mana_ib_adapter_caps {
+>> +       u32 max_sq_id;
+>> +       u32 max_rq_id;
+>> +       u32 max_cq_id;
+>> +       u32 max_qp_count;
+>> +       u32 max_cq_count;
+>> +       u32 max_mr_count;
+>> +       u32 max_pd_count;
+>> +       u32 max_inbound_read_limit;
+>> +       u32 max_outbound_read_limit;
+>> +       u32 mw_count;
+>> +       u32 max_srq_count;
+>> +       u32 max_requester_sq_size;
+>> +       u32 max_responder_sq_size;
+>> +       u32 max_requester_rq_size;
+>> +       u32 max_responder_rq_size;
+>> +       u32 max_send_wqe_size;
+>> +       u32 max_recv_wqe_size;
+>> +       u32 max_inline_data_size;
+>> +};
+>> +
+>>  struct mana_ib_dev {
+>>         struct ib_device ib_dev;
+>>         struct gdma_dev *gdma_dev;
+>>         struct gdma_context *gc;
+>>         struct gdma_queue *fatal_err_eq;
+>>         mana_handle_t adapter_handle;
+>> +       struct mana_ib_adapter_caps adapter_caps;
+>>  };
+>>
+>>  struct mana_ib_wq {
+>> @@ -96,6 +118,7 @@ struct mana_ib_rwq_ind_table {
+>>  };
+>>
+>>  enum mana_ib_command_code {
+>> +       MANA_IB_GET_ADAPTER_CAP =3D 0x30001,
+>>         MANA_IB_CREATE_ADAPTER  =3D 0x30002,
+>>         MANA_IB_DESTROY_ADAPTER =3D 0x30003,
+>>  };
+>> @@ -120,6 +143,32 @@ struct mana_ib_destroy_adapter_resp {
+>>         struct gdma_resp_hdr hdr;
+>>  }; /* HW Data */
+>>
+>> +struct mana_ib_query_adapter_caps_req {
+>> +       struct gdma_req_hdr hdr;
+>> +}; /*HW Data */
+>> +
+>> +struct mana_ib_query_adapter_caps_resp {
+>> +       struct gdma_resp_hdr hdr;
+>> +       u32 max_sq_id;
+>> +       u32 max_rq_id;
+>> +       u32 max_cq_id;
+>> +       u32 max_qp_count;
+>> +       u32 max_cq_count;
+>> +       u32 max_mr_count;
+>> +       u32 max_pd_count;
+>> +       u32 max_inbound_read_limit;
+>> +       u32 max_outbound_read_limit;
+>> +       u32 mw_count;
+>> +       u32 max_srq_count;
+>> +       u32 max_requester_sq_size;
+>> +       u32 max_responder_sq_size;
+>> +       u32 max_requester_rq_size;
+>> +       u32 max_responder_rq_size;
+>> +       u32 max_send_wqe_size;
+>> +       u32 max_recv_wqe_size;
+>> +       u32 max_inline_data_size;
+>> +}; /* HW Data */
+>> +
+>>  int mana_ib_gd_create_dma_region(struct mana_ib_dev *mib_dev,
+>>                                  struct ib_umem *umem,
+>>                                  mana_handle_t *gdma_region);
+>> @@ -194,4 +243,6 @@ int mana_ib_create_adapter(struct mana_ib_dev
+>> *mib_dev);
+>>
+>>  int mana_ib_destroy_adapter(struct mana_ib_dev *mib_dev);
+>>
+>> +int mana_ib_query_adapter_caps(struct mana_ib_dev *mib_dev);
+>> +
+>>  #endif
+>> --
+>> 2.25.1
+>>
+>>
+>>
+>
+> --
+> Regards,
+> Kalesh A P
+>
 >
 
+--=20
+Regards,
+Kalesh A P
+
+--000000000000292d500607f5d33c
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Oct 17, 2023 at 11:17=E2=80=
+=AFAM Ajay Sharma &lt;<a href=3D"mailto:sharmaajay@microsoft.com">sharmaaja=
+y@microsoft.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" s=
+tyle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pad=
+ding-left:1ex">
+
+
+
+<div dir=3D"auto">
+<div dir=3D"ltr"></div>
+<div dir=3D"ltr"><br>
+</div>
+<div dir=3D"ltr"><br>
+<blockquote type=3D"cite">On Oct 16, 2023, at 9:32 PM, Kalesh Anakkur Puray=
+il &lt;<a href=3D"mailto:kalesh-anakkur.purayil@broadcom.com" target=3D"_bl=
+ank">kalesh-anakkur.purayil@broadcom.com</a>&gt; wrote:<br>
+<br>
+</blockquote>
+</div>
+<blockquote type=3D"cite">
+<div dir=3D"ltr">=EF=BB=BF
+<div dir=3D"ltr">
+<div>Hi Ajay,</div>
+<div><br>
+</div>
+<div>One comment=C2=A0in line.</div>
+<div><br>
+</div>
+<div>Regards,</div>
+<div>Kalesh</div>
+<br>
+<div class=3D"gmail_quote">
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Oct 17, 2023 at 3:42=E2=80=AF=
+AM &lt;<a href=3D"mailto:sharmaajay@linuxonhyperv.com" target=3D"_blank">sh=
+armaajay@linuxonhyperv.com</a>&gt; wrote:<br>
+</div>
+<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
+left:1px solid rgb(204,204,204);padding-left:1ex">
+From: Ajay Sharma &lt;<a href=3D"mailto:sharmaajay@microsoft.com" target=3D=
+"_blank">sharmaajay@microsoft.com</a>&gt;<br>
+<br>
+Query the adapter capabilities to expose to<br>
+other clients and VF. This checks against<br>
+the user supplied values and protects against<br>
+overflows.<br>
+<br>
+Signed-off-by: Ajay Sharma &lt;<a href=3D"mailto:sharmaajay@microsoft.com" =
+target=3D"_blank">sharmaajay@microsoft.com</a>&gt;<br>
+---<br>
+=C2=A0drivers/infiniband/hw/mana/device.c=C2=A0 |=C2=A0 4 ++<br>
+=C2=A0drivers/infiniband/hw/mana/main.c=C2=A0 =C2=A0 | 67 +++++++++++++++++=
++++++------<br>
+=C2=A0drivers/infiniband/hw/mana/mana_ib.h | 53 +++++++++++++++++++++-<br>
+=C2=A03 files changed, 110 insertions(+), 14 deletions(-)<br>
+<br>
+diff --git a/drivers/infiniband/hw/mana/device.c b/drivers/infiniband/hw/ma=
+na/device.c<br>
+index 4077e440657a..e15da43c73a0 100644<br>
+--- a/drivers/infiniband/hw/mana/device.c<br>
++++ b/drivers/infiniband/hw/mana/device.c<br>
+@@ -97,6 +97,10 @@ static int mana_ib_probe(struct auxiliary_device *adev,<=
+br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto free_error_eq;=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D mana_ib_query_adapter_caps(mib_dev);<br=
+>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0if (ret)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ibdev_dbg(&amp;mib_=
+dev-&gt;ib_dev, &quot;Failed to get caps, use defaults&quot;);<br>
+</blockquote>
+<div>[Kalesh]: You are ignoring the failure here and continuing with the IB=
+ register. When the FW command fails, you won&#39;t populate the &quot;mib_=
+dev-&gt;adapter_caps&quot;. Subsequent &quot;mana_ib_query_device&quot; may=
+ return stale values?</div>
+<div>Is that what you want?</div>
+</div>
+</div>
+</div>
+</blockquote>
+It will use default capabilities.<br></div></blockquote><div>[Kalesh]: Mayb=
+e I am missing something here. I could not see that code where you are init=
+ializing &quot;mib_dev-&gt;adapter_caps&quot; with default values.</div><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-lef=
+t:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"auto">
+<blockquote type=3D"cite">
+<div dir=3D"ltr">
+<div dir=3D"ltr">
+<div class=3D"gmail_quote">
+<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
+left:1px solid rgb(204,204,204);padding-left:1ex">
++<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D ib_register_device(&amp;mib_dev-&gt;ib_=
+dev, &quot;mana_%d&quot;,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0mdev-&gt;gdma_context-&gt;dev)=
+;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (ret)<br>
+diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana=
+/main.c<br>
+index 5b5d7abe79ac..82923475267d 100644<br>
+--- a/drivers/infiniband/hw/mana/main.c<br>
++++ b/drivers/infiniband/hw/mana/main.c<br>
+@@ -469,20 +469,15 @@ int mana_ib_get_port_immutable(struct ib_device *ibde=
+v, u32 port_num,<br>
+=C2=A0int mana_ib_query_device(struct ib_device *ibdev, struct ib_device_at=
+tr *props,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0struct ib_udata *uhw)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_qp =3D MANA_MAX_NUM_QUEUES;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_qp_wr =3D MAX_SEND_BUFFERS_PER_QU=
+EUE;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0struct mana_ib_dev *mib_dev =3D container_of(ib=
+dev,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0struct mana_ib_dev, ib_dev);<br>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0/*<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 * max_cqe could be potentially much bigger.<br=
+>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 * As this version of driver only support RAW Q=
+P, set it to the same<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 * value as max_qp_wr<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 */<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_cqe =3D MAX_SEND_BUFFERS_PER_QUEU=
+E;<br>
+-<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_mr_size =3D MANA_IB_MAX_MR_SIZE;<=
+br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_mr =3D MANA_IB_MAX_MR;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_send_sge =3D MAX_TX_WQE_SGL_ENTRI=
+ES;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_recv_sge =3D MAX_RX_WQE_SGL_ENTRI=
+ES;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_qp =3D mib_dev-&gt;adapter_caps.m=
+ax_qp_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_qp_wr =3D mib_dev-&gt;adapter_cap=
+s.max_requester_sq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_cqe =3D mib_dev-&gt;adapter_caps.=
+max_requester_sq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_mr =3D mib_dev-&gt;adapter_caps.m=
+ax_mr_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_send_sge =3D mib_dev-&gt;adapter_=
+caps.max_send_wqe_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0props-&gt;max_recv_sge =3D mib_dev-&gt;adapter_=
+caps.max_recv_wqe_size;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
+=C2=A0}<br>
+@@ -601,3 +596,49 @@ int mana_ib_create_error_eq(struct mana_ib_dev *mib_de=
+v)<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
+=C2=A0}<br>
++<br>
++static void assign_caps(struct mana_ib_adapter_caps *caps,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0struct mana_ib_query_adapter_caps_resp *resp)<br>
++{<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_sq_id =3D resp-&gt;max_sq_id;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_rq_id =3D resp-&gt;max_rq_id;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_cq_id =3D resp-&gt;max_cq_id;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_qp_count =3D resp-&gt;max_qp_count=
+;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_cq_count =3D resp-&gt;max_cq_count=
+;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_mr_count =3D resp-&gt;max_mr_count=
+;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_pd_count =3D resp-&gt;max_pd_count=
+;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_inbound_read_limit =3D resp-&gt;ma=
+x_inbound_read_limit;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_outbound_read_limit =3D resp-&gt;m=
+ax_outbound_read_limit;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;mw_count =3D resp-&gt;mw_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_srq_count =3D resp-&gt;max_srq_cou=
+nt;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_requester_sq_size =3D resp-&gt;max=
+_requester_sq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_responder_sq_size =3D resp-&gt;max=
+_responder_sq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_requester_rq_size =3D resp-&gt;max=
+_requester_rq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_responder_rq_size =3D resp-&gt;max=
+_responder_rq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_send_wqe_size =3D resp-&gt;max_sen=
+d_wqe_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_recv_wqe_size =3D resp-&gt;max_rec=
+v_wqe_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0caps-&gt;max_inline_data_size =3D resp-&gt;max_=
+inline_data_size;<br>
++}<br>
++<br>
++int mana_ib_query_adapter_caps(struct mana_ib_dev *mib_dev)<br>
++{<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0struct mana_ib_query_adapter_caps_resp resp =3D=
+ {};<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0struct mana_ib_query_adapter_caps_req req =3D {=
+};<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0int err;<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0mana_gd_init_req_hdr(&amp;req.hdr, MANA_IB_GET_=
+ADAPTER_CAP, sizeof(req),<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 sizeof(resp));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0req.hdr.resp.msg_version =3D MANA_IB_GET_ADAPTE=
+R_CAP_RESPONSE_V3;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0req.hdr.dev_id =3D mib_dev-&gt;gc-&gt;mana_ib.d=
+ev_id;<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0err =3D mana_gd_send_request(mib_dev-&gt;gc, si=
+zeof(req), &amp;req,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 sizeof(resp), &amp;resp);<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0if (err) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ibdev_err(&amp;mib_=
+dev-&gt;ib_dev, &quot;Failed to query adapter caps err %d&quot;, err);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return err;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0assign_caps(&amp;mib_dev-&gt;adapter_caps, &amp=
+;resp);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;<br>
++}<br>
+diff --git a/drivers/infiniband/hw/mana/mana_ib.h b/drivers/infiniband/hw/m=
+ana/mana_ib.h<br>
+index 8a652bccd978..6b9406738cb2 100644<br>
+--- a/drivers/infiniband/hw/mana/mana_ib.h<br>
++++ b/drivers/infiniband/hw/mana/mana_ib.h<br>
+@@ -20,19 +20,41 @@<br>
+<br>
+=C2=A0/* MANA doesn&#39;t have any limit for MR size */<br>
+=C2=A0#define MANA_IB_MAX_MR_SIZE=C2=A0 =C2=A0 U64_MAX<br>
+-<br>
++#define MANA_IB_GET_ADAPTER_CAP_RESPONSE_V3 3<br>
+=C2=A0/*<br>
+=C2=A0 * The hardware limit of number of MRs is greater than maximum number=
+ of MRs<br>
+=C2=A0 * that can possibly represent in 24 bits<br>
+=C2=A0 */<br>
+=C2=A0#define MANA_IB_MAX_MR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00xFFFFFFu<br>
+<br>
++struct mana_ib_adapter_caps {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_sq_id;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_rq_id;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_cq_id;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_qp_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_cq_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_mr_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_pd_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_inbound_read_limit;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_outbound_read_limit;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 mw_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_srq_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_requester_sq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_responder_sq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_requester_rq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_responder_rq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_send_wqe_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_recv_wqe_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_inline_data_size;<br>
++};<br>
++<br>
+=C2=A0struct mana_ib_dev {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct ib_device ib_dev;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct gdma_dev *gdma_dev;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct gdma_context *gc;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct gdma_queue *fatal_err_eq;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 mana_handle_t adapter_handle;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0struct mana_ib_adapter_caps adapter_caps;<br>
+=C2=A0};<br>
+<br>
+=C2=A0struct mana_ib_wq {<br>
+@@ -96,6 +118,7 @@ struct mana_ib_rwq_ind_table {<br>
+=C2=A0};<br>
+<br>
+=C2=A0enum mana_ib_command_code {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0MANA_IB_GET_ADAPTER_CAP =3D 0x30001,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 MANA_IB_CREATE_ADAPTER=C2=A0 =3D 0x30002,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 MANA_IB_DESTROY_ADAPTER =3D 0x30003,<br>
+=C2=A0};<br>
+@@ -120,6 +143,32 @@ struct mana_ib_destroy_adapter_resp {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct gdma_resp_hdr hdr;<br>
+=C2=A0}; /* HW Data */<br>
+<br>
++struct mana_ib_query_adapter_caps_req {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0struct gdma_req_hdr hdr;<br>
++}; /*HW Data */<br>
++<br>
++struct mana_ib_query_adapter_caps_resp {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0struct gdma_resp_hdr hdr;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_sq_id;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_rq_id;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_cq_id;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_qp_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_cq_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_mr_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_pd_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_inbound_read_limit;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_outbound_read_limit;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 mw_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_srq_count;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_requester_sq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_responder_sq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_requester_rq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_responder_rq_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_send_wqe_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_recv_wqe_size;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u32 max_inline_data_size;<br>
++}; /* HW Data */<br>
++<br>
+=C2=A0int mana_ib_gd_create_dma_region(struct mana_ib_dev *mib_dev,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct ib_umem *umem,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0mana_handle_t *gdma_region);<b=
+r>
+@@ -194,4 +243,6 @@ int mana_ib_create_adapter(struct mana_ib_dev *mib_dev)=
+;<br>
+<br>
+=C2=A0int mana_ib_destroy_adapter(struct mana_ib_dev *mib_dev);<br>
+<br>
++int mana_ib_query_adapter_caps(struct mana_ib_dev *mib_dev);<br>
++<br>
+=C2=A0#endif<br>
+-- <br>
+2.25.1<br>
+<br>
+<br>
+</blockquote>
+</div>
+<br clear=3D"all">
+<div><br>
+</div>
+<span class=3D"gmail_signature_prefix">-- </span><br>
+<div dir=3D"ltr" class=3D"gmail_signature">
+<div dir=3D"ltr">Regards,
+<div>Kalesh A P</div>
+</div>
+</div>
+</div>
+</div>
+</blockquote>
+</div>
+
+</blockquote></div><br clear=3D"all"><div><br></div><span class=3D"gmail_si=
+gnature_prefix">-- </span><br><div dir=3D"ltr" class=3D"gmail_signature"><d=
+iv dir=3D"ltr">Regards,<div>Kalesh A P</div></div></div></div>
+
+--000000000000292d500607f5d33c--
+
+--0000000000003177650607f5d32b
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIADANshYAnp3wnvokMoeDcgPAnMCwfenv15+NXfXt4onMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTAxODA0MTA1MVowaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCspKRw7UFk
+BIGMIze7H3iKGBK40CtzgjKGaWT2U6WzrkrsnG1N4DRTyYhhoLUW8GGXnGSCxTsoF95UpS2RwvFf
+YaIH2mCJLBz8hkSq3NSPANo7cw2RvZzzoK6YcEZoijT3SPuvnyroYWppPZ5hEvJ7ktbeiVs30vmv
+jZfy8UfNYjVQWWaTr+1Y3tW1Kw5yIjcKXganmW5c28t8fZTQzRAYslPVko8GRe1Hvhe6MyMMvLOy
+7xjLvUYWkE7PeKxlsc045JkAPVEqxZvdi8aPqJ+l9xnmD8li7PYrWsTrW6/Rss+iO1MBCqZJVtLA
+Az0fHDwYLHvwq4J5ezPEXv/lEgGz
+--0000000000003177650607f5d32b--
 
