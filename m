@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-42318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 006027CE345
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 19:02:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A09AF7CE3CC
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 19:07:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1044C1C20A2A
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:02:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D127D1C20A16
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B4D3C686;
-	Wed, 18 Oct 2023 17:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A36143C089;
+	Wed, 18 Oct 2023 17:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="YF0DbO2J"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J8uiqr87"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5175F3C071;
-	Wed, 18 Oct 2023 17:02:34 +0000 (UTC)
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C294A111;
-	Wed, 18 Oct 2023 10:02:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1697648553; x=1729184553;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yufWILeJIcU7vxg5cLT0ChCVEOVQwU7OL/NaxwWlnig=;
-  b=YF0DbO2JwB4cPdqz+FO0yNS4WBeWubE/D7g+7xYNWGKbUIAu1ry4aYBB
-   /HLyElOtHp6JTunSVnVHBzLPzPL6KwBu93Lc/oj7Rh0BLOzyPnCTd+xEK
-   3IbV5jFB528QKNw4Q8G5NmGIZEjbZr/SltMmiLFLu699PM3+mbwmjhOXI
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.03,235,1694736000"; 
-   d="scan'208";a="160750732"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 17:02:29 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com (Postfix) with ESMTPS id 9CFE440D52;
-	Wed, 18 Oct 2023 17:02:27 +0000 (UTC)
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:13852]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.81:2525] with esmtp (Farcaster)
- id 184ea7e1-aed1-43c9-8a59-f6ddba66683a; Wed, 18 Oct 2023 17:02:27 +0000 (UTC)
-X-Farcaster-Flow-ID: 184ea7e1-aed1-43c9-8a59-f6ddba66683a
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Wed, 18 Oct 2023 17:02:26 +0000
-Received: from 88665a182662.ant.amazon.com (10.111.146.69) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Wed, 18 Oct 2023 17:02:23 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <martin.lau@linux.dev>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
-	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <mykolal@fb.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
-	<song@kernel.org>, <yonghong.song@linux.dev>
-Subject: Re: [PATCH v1 bpf-next 10/11] bpf: tcp: Make WS, SACK, ECN configurable from BPF SYN Cookie.
-Date: Wed, 18 Oct 2023 10:02:15 -0700
-Message-ID: <20231018170215.8830-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <66f72518-f9d6-f19b-60a6-eff0f30c2590@linux.dev>
-References: <66f72518-f9d6-f19b-60a6-eff0f30c2590@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EF43C086;
+	Wed, 18 Oct 2023 17:07:01 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4F5318A;
+	Wed, 18 Oct 2023 10:06:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697648814; x=1729184814;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/AH7FG5H24zeN3zHGTfVvmBBV3l6sDBNWvaVvqh4yB8=;
+  b=J8uiqr87GaVcsF5u7wksAIpMqTmdygxTunuej1A7tl1Ea3Z6RyQU3DDi
+   Lk6p5UUiBH/kTIJ6345wM6c2cXX5/LMKYpIbaL4L2OTvqe392karZcnXB
+   VRwUOXWCyEEQnpo6LkC/0C18xhKOTW4JR0PuggT6wFUxHC2WBEqzrdZAy
+   iYJBDJSF3cX29ADmwOrl6ePeM6aA9ZIAgGfoJHhHkec6V9iVZMoFbOwP8
+   GhYVxWybZQYf28pIXOFCFTQ8zRheHUjzE1Gx8i1v8NOACW61Tvm57rdMi
+   SebbOtN8TqBfcakXptQRB4YN0ykU2hcL7Wk0fB2OXTpocNZ28bXXJZjU5
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="388924762"
+X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
+   d="scan'208";a="388924762"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 10:06:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="822494033"
+X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
+   d="scan'208";a="822494033"
+Received: from nirmoyda-mobl.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.249.38.47])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 10:06:43 -0700
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	corbet@lwn.net,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	vladimir.oltean@nxp.com,
+	andrew@lunn.ch,
+	horms@kernel.org,
+	mkubecek@suse.cz,
+	willemdebruijn.kernel@gmail.com,
+	linux-doc@vger.kernel.org,
+	Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: [PATCH net-next v5 0/6] Support symmetric RSS (Toeplitz) hash
+Date: Wed, 18 Oct 2023 11:06:29 -0600
+Message-Id: <20231018170635.65409-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,152 +75,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.111.146.69]
-X-ClientProxiedBy: EX19D039UWA004.ant.amazon.com (10.13.139.68) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Date: Tue, 17 Oct 2023 18:08:34 -0700
-> On 10/13/23 3:04 PM, Kuniyuki Iwashima wrote:
-> > This patch allows BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB hook to enable WScale,
-> > SACK, and ECN by passing corresponding flags to bpf_sock_ops.replylong[1].
-> > 
-> > The same flags are passed to BPF_SOCK_OPS_GEN_SYNCOOKIE_CB hook as
-> > bpf_sock_ops.args[1] so that the BPF prog need not parse the TCP header to
-> > check if WScale, SACK, ECN, and TS are available in SYN.
-> > 
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >   include/uapi/linux/bpf.h       | 18 ++++++++++++++++++
-> >   net/ipv4/syncookies.c          | 20 ++++++++++++++++++++
-> >   net/ipv4/tcp_input.c           | 11 +++++++++++
-> >   tools/include/uapi/linux/bpf.h | 18 ++++++++++++++++++
-> >   4 files changed, 67 insertions(+)
-> > 
-> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> > index 24f673d88c0d..cdae4dd5d797 100644
-> > --- a/include/uapi/linux/bpf.h
-> > +++ b/include/uapi/linux/bpf.h
-> > @@ -6869,6 +6869,7 @@ enum {
-> >   					 * option.
-> >   					 *
-> >   					 * args[0]: MSS
-> > +					 * args[1]: BPF_SYNCOOKIE_XXX
-> >   					 *
-> >   					 * replylong[0]: ISN
-> >   					 * replylong[1]: TS
-> > @@ -6883,6 +6884,7 @@ enum {
-> >   					 * args[1]: TS
-> >   					 *
-> >   					 * replylong[0]: MSS
-> > +					 * replylong[1]: BPF_SYNCOOKIE_XXX
-> >   					 */
-> >   };
-> >   
-> > @@ -6970,6 +6972,22 @@ enum {
-> >   						 */
-> >   };
-> >   
-> > +/* arg[1] value for BPF_SOCK_OPS_GEN_SYNCOOKIE_CB and
-> > + * replylong[1] for BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB.
-> > + *
-> > + * MSB                                LSB
-> > + * | 31 ... | 6  | 5   | 4    | 3 2 1 0 |
-> > + * |    ... | TS | ECN | SACK | WScale  |
-> > + */
-> > +enum {
-> > +	/* 0xf is invalid thus means that SYN did not have WScale. */
-> > +	BPF_SYNCOOKIE_WSCALE_MASK	= (1 << 4) - 1,
-> > +	BPF_SYNCOOKIE_SACK		= (1 << 4),
-> > +	BPF_SYNCOOKIE_ECN		= (1 << 5),
-> > +	/* Only available for BPF_SOCK_OPS_GEN_SYNCOOKIE_CB to check if SYN has TS */
-> > +	BPF_SYNCOOKIE_TS		= (1 << 6),
-> > +};
-> 
-> This details should not be exposed to uapi (more below).
-> 
-> > +
-> >   struct bpf_perf_event_value {
-> >   	__u64 counter;
-> >   	__u64 enabled;
-> > diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-> > index ff979cc314da..22353a9af52d 100644
-> > --- a/net/ipv4/syncookies.c
-> > +++ b/net/ipv4/syncookies.c
-> > @@ -286,6 +286,7 @@ int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_
-> >   {
-> >   	struct bpf_sock_ops_kern sock_ops;
-> >   	struct net *net = sock_net(sk);
-> > +	u32 options;
-> >   
-> >   	if (tcp_opt->saw_tstamp) {
-> >   		if (!READ_ONCE(net->ipv4.sysctl_tcp_timestamps))
-> > @@ -309,6 +310,25 @@ int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_
-> >   	if (!sock_ops.replylong[0])
-> >   		goto err;
-> >   
-> > +	options = sock_ops.replylong[1];
-> > +
-> > +	if ((options & BPF_SYNCOOKIE_WSCALE_MASK) != BPF_SYNCOOKIE_WSCALE_MASK) {
-> > +		if (!READ_ONCE(net->ipv4.sysctl_tcp_window_scaling))
-> > +			goto err;
-> > +
-> > +		tcp_opt->wscale_ok = 1;
-> > +		tcp_opt->snd_wscale = options & BPF_SYNCOOKIE_WSCALE_MASK;
-> > +	}
-> > +
-> > +	if (options & BPF_SYNCOOKIE_SACK) {
-> > +		if (!READ_ONCE(net->ipv4.sysctl_tcp_sack))
-> > +			goto err;
-> > +
-> > +		tcp_opt->sack_ok = 1;
-> > +	}
-> > +
-> > +	inet_rsk(req)->ecn_ok = options & BPF_SYNCOOKIE_ECN;
-> > +
-> >   	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESRECV);
-> >   
-> >   	return sock_ops.replylong[0];
-> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > index feb44bff29ef..483e2f36afe5 100644
-> > --- a/net/ipv4/tcp_input.c
-> > +++ b/net/ipv4/tcp_input.c
-> > @@ -6970,14 +6970,25 @@ EXPORT_SYMBOL_GPL(tcp_get_syncookie_mss);
-> >   static int bpf_skops_cookie_init_sequence(struct sock *sk, struct request_sock *req,
-> >   					  struct sk_buff *skb, __u32 *isn)
-> >   {
-> > +	struct inet_request_sock *ireq = inet_rsk(req);
-> >   	struct bpf_sock_ops_kern sock_ops;
-> > +	u32 options;
-> >   	int ret;
-> >   
-> > +	options = ireq->wscale_ok ? ireq->snd_wscale : BPF_SYNCOOKIE_WSCALE_MASK;
-> > +	if (ireq->sack_ok)
-> > +		options |= BPF_SYNCOOKIE_SACK;
-> > +	if (ireq->ecn_ok)
-> > +		options |= BPF_SYNCOOKIE_ECN;
-> > +	if (ireq->tstamp_ok)
-> > +		options |= BPF_SYNCOOKIE_TS;
-> 
-> No need to set "options" (which becomes args[1]). sock_ops.sk is available to 
-> the bpf prog. The bpf prog can directly read it. The recent AF_UNIX bpf support 
-> could be a reference on how the bpf_cast_to_kern_ctx() and bpf_rdonly_cast() are 
-> used.
-> 
-> https://lore.kernel.org/bpf/20231011185113.140426-10-daan.j.demeyer@gmail.com/
+Patch 1 adds the support at the Kernel level, allowing the user to set a
+symmetric RSS hash for any flow type via:
 
-I just tried bpf_cast_to_kern_ctx() and bpf_rdonly_cast() and found
-it's quite useful, thanks!
+    # ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n symmetric-xor
 
-If we want to set {sack_ok,ecn_ok,snd_wscale} in one shot, it would
-be good to expose such flags and a helper.
+Support for the new "symmetric-xor" flag will be later sent to the
+"ethtool" user-space tool.
+
+Patch 2 fixes a long standing bug with the register values. The bug has
+been benign for now since only (asymmetric) Toeplitz hash (Zero) has been
+used.
+
+Patches 3 and 4 lay some groundwork refactoring. While the first is
+mainly cosmetic, the second is needed since there is no more room in the
+previous 64-bit RSS profile ID for the symmetric attribute introduced in 
+the next patch.
+
+Finally, patches 5 and 6 add the symmetric Toeplitz support for the ice 
+(E800 PFs) and the iAVF drivers.
+
+---
+v5: move sanity checks from ethtool/ioctl.c to ice's and iavf's rxfnc
+    drivers entries (patches 5 and 6).
+v4: add a comment to "#define RXH_SYMMETRIC_XOR" (in uapi/linux/ethtool.h)
+v3: rename "symmetric" to "symmetric-xor" and drop "Fixes" tag in patch 2.
+v2: fixed a "Reviewed by" to "Reviewed-by", also need to cc maintainers.
+
+Ahmed Zaki (4):
+  net: ethtool: allow symmetric-xor RSS hash for any flow type
+  ice: fix ICE_AQ_VSI_Q_OPT_RSS_* register values
+  ice: refactor the FD and RSS flow ID generation
+  iavf: enable symmetric RSS Toeplitz hash
+
+Jeff Guo (1):
+  ice: enable symmetric RSS Toeplitz hash for any flow type
+
+Qi Zhang (1):
+  ice: refactor RSS configuration
+
+ Documentation/networking/scaling.rst          |   6 +
+ .../net/ethernet/intel/iavf/iavf_adv_rss.c    |   8 +-
+ .../net/ethernet/intel/iavf/iavf_adv_rss.h    |   3 +-
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |  33 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   8 +-
+ drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |  25 +-
+ .../net/ethernet/intel/ice/ice_ethtool_fdir.c |  35 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |  43 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |   4 +-
+ .../net/ethernet/intel/ice/ice_flex_type.h    |   7 +
+ drivers/net/ethernet/intel/ice/ice_flow.c     | 439 +++++++++++++-----
+ drivers/net/ethernet/intel/ice/ice_flow.h     |  46 +-
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |   4 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      | 117 ++---
+ drivers/net/ethernet/intel/ice/ice_main.c     |  49 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |  55 ++-
+ .../ethernet/intel/ice/ice_virtchnl_fdir.c    |  35 +-
+ include/linux/avf/virtchnl.h                  |  16 +-
+ include/uapi/linux/ethtool.h                  |  21 +-
+ 22 files changed, 652 insertions(+), 306 deletions(-)
+
+-- 
+2.34.1
+
 
