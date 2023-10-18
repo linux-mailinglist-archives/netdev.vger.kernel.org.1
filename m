@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-42188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC0617CD8E6
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:10:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEEB47CD906
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A89B3281C58
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 10:10:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61AA61F236FD
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 10:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7901518B15;
-	Wed, 18 Oct 2023 10:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9282F18C0A;
+	Wed, 18 Oct 2023 10:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h42bS60I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eriMRYuK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A63518B0B
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 10:10:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 28AE0C433CA;
-	Wed, 18 Oct 2023 10:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669EA18B11;
+	Wed, 18 Oct 2023 10:20:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 00117C433C9;
+	Wed, 18 Oct 2023 10:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697623823;
-	bh=WuXUZXR6Fqzg/9JZerRXRjWDA8H5BHBFcBiSCLvFMiI=;
+	s=k20201202; t=1697624424;
+	bh=sOgqO5PGqwB3C8z51ihJDgYx6Qkli8L//Uj/en/125s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=h42bS60IcySv71gfgESP05vUUViquk8C4qlcx5lEbXN3xF69+ZahfgceImdhNw/EY
-	 0w8NaF4berxwJyWmn1biV0L4NKkEfqT2Z7T7Q7QnquDgP/yxw2v4YTTmMKE5GTO0nt
-	 Aw1nbAs1ZkdLJ46JwdTjaPEaCJlBiqfzoIIVyYf9Jw/nzM0q99S3ydj37FnLnRw1T0
-	 tumiZEsPCCqYjgjbIX4imqTw60VFmJr5tKFXCw12h5YSTlq+78i2x87C3M62NWBMJM
-	 Kob6zHEeXE7ej5/SnXezlzHYl1Tu/Bw1zRJYMag63kVkHSNqRcN95hjcnew8iFlBOb
-	 /ZbMF0A/98Fkw==
+	b=eriMRYuKPHmk/+70yqXpGXDVRlULhZ2BTh7nYpTXTMMim+Qmd/If/FjPVM1MCyxZ4
+	 zLvKOFF68y1neFdxiklaOmrrsFZZ8rhawXXS7rcfn7OBi9rN+SWI0U8NP58dZVQFL9
+	 jVThbWyCSL8HSnu2OsvVxN1MaRCGX2lYkg8GfLm/8pqAzRaJplBdhd/7X5PRdu6FM1
+	 1yAgQOpuwRiMU0aobMOglS3I+NvE/X879Zci9zIFvuh0N78XTzXj5TVKLnBIh4yil1
+	 eCKjJIjinBIgbbOUESBuTbqCc6/gmGCs+tjsqvCUQdF8zbJcsj6Txz7d3GQK3E4MGR
+	 c/fOHOnN+7SWQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 16674C04E27;
-	Wed, 18 Oct 2023 10:10:23 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DC5A4C04E27;
+	Wed, 18 Oct 2023 10:20:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -43,48 +43,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/7] netfilter: xt_mangle: only check verdict part of
- return value
+Subject: Re: [PATCH] neighbor: tracing: Move pin6 inside CONFIG_IPV6=y section
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169762382308.3133.9060197209130107475.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Oct 2023 10:10:23 +0000
-References: <20231018085118.10829-2-fw@strlen.de>
-In-Reply-To: <20231018085118.10829-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org
+ <169762442389.8273.11100691121228999250.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Oct 2023 10:20:23 +0000
+References: <60cb0b0c6266881e225160f80a83884607617921.1697460418.git.geert+renesas@glider.be>
+In-Reply-To: <60cb0b0c6266881e225160f80a83884607617921.1697460418.git.geert+renesas@glider.be>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: rostedt@goodmis.org, mhiramat@kernel.org, davem@davemloft.net,
+ dsahern@gmail.com, linux-trace-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Florian Westphal <fw@strlen.de>:
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On Wed, 18 Oct 2023 10:51:05 +0200 you wrote:
-> These checks assume that the caller only returns NF_DROP without
-> any errno embedded in the upper bits.
+On Mon, 16 Oct 2023 14:49:04 +0200 you wrote:
+> When CONFIG_IPV6=n, and building with W=1:
 > 
-> This is fine right now, but followup patches will start to propagate
-> such errors to allow kfree_skb_drop_reason() in the called functions,
-> those would then indicate 'errno << 8 | NF_STOLEN'.
+>     In file included from include/trace/define_trace.h:102,
+> 		     from include/trace/events/neigh.h:255,
+> 		     from net/core/net-traces.c:51:
+>     include/trace/events/neigh.h: In function ‘trace_event_raw_event_neigh_create’:
+>     include/trace/events/neigh.h:42:34: error: variable ‘pin6’ set but not used [-Werror=unused-but-set-variable]
+>        42 |                 struct in6_addr *pin6;
+> 	  |                                  ^~~~
+>     include/trace/trace_events.h:402:11: note: in definition of macro ‘DECLARE_EVENT_CLASS’
+>       402 |         { assign; }                                                     \
+> 	  |           ^~~~~~
+>     include/trace/trace_events.h:44:30: note: in expansion of macro ‘PARAMS’
+>        44 |                              PARAMS(assign),                   \
+> 	  |                              ^~~~~~
+>     include/trace/events/neigh.h:23:1: note: in expansion of macro ‘TRACE_EVENT’
+>        23 | TRACE_EVENT(neigh_create,
+> 	  | ^~~~~~~~~~~
+>     include/trace/events/neigh.h:41:9: note: in expansion of macro ‘TP_fast_assign’
+>        41 |         TP_fast_assign(
+> 	  |         ^~~~~~~~~~~~~~
+>     In file included from include/trace/define_trace.h:103,
+> 		     from include/trace/events/neigh.h:255,
+> 		     from net/core/net-traces.c:51:
+>     include/trace/events/neigh.h: In function ‘perf_trace_neigh_create’:
+>     include/trace/events/neigh.h:42:34: error: variable ‘pin6’ set but not used [-Werror=unused-but-set-variable]
+>        42 |                 struct in6_addr *pin6;
+> 	  |                                  ^~~~
+>     include/trace/perf.h:51:11: note: in definition of macro ‘DECLARE_EVENT_CLASS’
+>        51 |         { assign; }                                                     \
+> 	  |           ^~~~~~
+>     include/trace/trace_events.h:44:30: note: in expansion of macro ‘PARAMS’
+>        44 |                              PARAMS(assign),                   \
+> 	  |                              ^~~~~~
+>     include/trace/events/neigh.h:23:1: note: in expansion of macro ‘TRACE_EVENT’
+>        23 | TRACE_EVENT(neigh_create,
+> 	  | ^~~~~~~~~~~
+>     include/trace/events/neigh.h:41:9: note: in expansion of macro ‘TP_fast_assign’
+>        41 |         TP_fast_assign(
+> 	  |         ^~~~~~~~~~~~~~
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/7] netfilter: xt_mangle: only check verdict part of return value
-    https://git.kernel.org/netdev/net-next/c/e15e5027106f
-  - [net-next,2/7] netfilter: nf_tables: mask out non-verdict bits when checking return value
-    https://git.kernel.org/netdev/net-next/c/4d26ab0086aa
-  - [net-next,3/7] netfilter: conntrack: convert nf_conntrack_update to netfilter verdicts
-    https://git.kernel.org/netdev/net-next/c/6291b3a67ad5
-  - [net-next,4/7] netfilter: nf_nat: mask out non-verdict bits when checking return value
-    https://git.kernel.org/netdev/net-next/c/35c038b0a4be
-  - [net-next,5/7] netfilter: make nftables drops visible in net dropmonitor
-    https://git.kernel.org/netdev/net-next/c/e0d4593140b0
-  - [net-next,6/7] netfilter: bridge: convert br_netfilter to NF_DROP_REASON
-    https://git.kernel.org/netdev/net-next/c/cf8b7c1a5be7
-  - [net-next,7/7] netfilter: nf_tables: de-constify set commit ops function argument
-    https://git.kernel.org/netdev/net-next/c/256001672153
+  - neighbor: tracing: Move pin6 inside CONFIG_IPV6=y section
+    https://git.kernel.org/netdev/net/c/2915240eddba
 
 You are awesome, thank you!
 -- 
