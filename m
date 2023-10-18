@@ -1,44 +1,47 @@
-Return-Path: <netdev+bounces-42133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6B337CD50F
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:05:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A27877CD549
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:10:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 913B92819CD
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:05:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B3E2281B4B
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2CC3C2C5;
-	Wed, 18 Oct 2023 07:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="ZOnGh8go"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A789BCA74;
+	Wed, 18 Oct 2023 07:10:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581968BEB
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 07:05:16 +0000 (UTC)
-Received: from mail.avm.de (mail.avm.de [IPv6:2001:bf0:244:244::94])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA46B0
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 00:05:13 -0700 (PDT)
-Received: from mail-auth.avm.de (unknown [IPv6:2001:bf0:244:244::71])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Wed, 18 Oct 2023 09:05:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
-	t=1697612711; bh=7duyYS4uKMmrIiJWnBLeesAW+mofu1JAMbtCZUOvg80=;
-	h=From:Date:Subject:To:Cc:From;
-	b=ZOnGh8gou7ff4faNHPcPaZ1D16L+X1M0G9DSEGMgYsv5yHt9Ct5UXomH2UpkgPVWD
-	 u2hwo0keqMABgOFowcHebKBA+oX+Hq3qGDEIPP/pcF4kkT2AWxqJgFAVGcQh8HIArr
-	 2JrHEJmi32i/LAfgNQOPjRBoEoqqizv/PC7tl2Fg=
-Received: from localhost (unknown [172.17.88.63])
-	by mail-auth.avm.de (Postfix) with ESMTPSA id 80F4B81FE6;
-	Wed, 18 Oct 2023 09:05:10 +0200 (CEST)
-From: Johannes Nixdorf <jnixdorf-oss@avm.de>
-Date: Wed, 18 Oct 2023 09:04:43 +0200
-Subject: [PATCH iproute2-next v5] iplink: bridge: Add support for bridge
- FDB learning limits
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE554D310
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 07:10:32 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 321A0EA
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 00:10:30 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qt0h1-0007Yq-S8; Wed, 18 Oct 2023 09:10:11 +0200
+Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qt0gz-002V9Y-2q; Wed, 18 Oct 2023 09:10:09 +0200
+Received: from localhost ([::1] helo=dude03.red.stw.pengutronix.de)
+	by dude03.red.stw.pengutronix.de with esmtp (Exim 4.96)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qt0gy-003JoA-3B;
+	Wed, 18 Oct 2023 09:10:08 +0200
+From: Johannes Zink <j.zink@pengutronix.de>
+Subject: [PATCH net-next v2 0/5] net: stmmac: use correct PPS input
+ indexing
+Date: Wed, 18 Oct 2023 09:09:52 +0200
+Message-Id: <20231010-stmmac_fix_auxiliary_event_capture-v2-0-51d5f56542d7@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,195 +50,117 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231018-fdb_limit-v5-1-7ca3b3eb7c1f@avm.de>
-X-B4-Tracking: v=1; b=H4sIAIqDL2UC/02NwQ6CMBAFf4Xs2ZpSCgon/8MQU9qtbCKFtLXBE
- P7dBi8eJ28yb4OAnjBAV2zgMVGg2WWoTwXoUbknMjKZQXBR8ZbXzJrh8aKJIlMaS9lcdKOuErK
- /eLS0Hq070OLnd0TBHK4R+jyPFOLsP8dTkof0i5btXzRJVrJBGmG0NLbi9qbSdDYI/b7vXyqTH
- IauAAAA
-To: David Ahern <dsahern@gmail.com>, Roopa Prabhu <roopa@nvidia.com>, 
- Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, 
- Petr Machata <petrm@nvidia.com>
-Cc: bridge@lists.linux-foundation.org, netdev@vger.kernel.org, 
- Johannes Nixdorf <jnixdorf-oss@avm.de>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1697612682; l=5381;
- i=jnixdorf-oss@avm.de; s=20230906; h=from:subject:message-id;
- bh=7duyYS4uKMmrIiJWnBLeesAW+mofu1JAMbtCZUOvg80=;
- b=zv1GAGzIqwcXgxBPRXjOTzIz3Lc/894YncC79u++wRhb82LuxnQhc+ZKtIRnt7KFWGMX3WSso
- 8HRZ/LSTZv+BSOixJ4x16pfBETF+eEzQSa6vZRO58fzks89qC6eW/ES
-X-Developer-Key: i=jnixdorf-oss@avm.de; a=ed25519;
- pk=KMraV4q7ANHRrwjf9EVhvU346JsqGGNSbPKeNILOQfo=
-X-purgate-ID: 149429::1697612710-7862642D-443DAE41/0/0
-X-purgate-type: clean
-X-purgate-size: 5383
-X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
-X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
-X-purgate: clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+X-B4-Tracking: v=1; b=H4sIAMCEL2UC/5WOQQqDMBREryJ/3RRju6hd9R5F5JuO9YN+JYmii
+ Hdv8AZdzjx4MzsFeEGgZ7aTxyJBRk2huGTkOtYvjHxSpiIvbja3uQlxGNjVraw1z6v0wn6rsUB
+ j7XiKs4cBt4UFl65sQUnUcIBpPKvrkkrnvk/l5JEc5/KbFNEo1khVIp2EOPrtvLTYk/+zvliTm
+ xvguMTjfm/5NUG/c/Sjynr9gKrjOH4vfQ5o+AAAAA==
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Kurt Kanzenbach <kurt@linutronix.de>
+Cc: patchwork-jzi@pengutronix.de, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ kernel@pengutronix.de, vee.khee.wong@linux.intel.com, tee.min.tan@intel.com, 
+ rmk+kernel@armlinux.org.uk, bartosz.golaszewski@linaro.org, 
+ ahalaney@redhat.com, horms@kernel.org, 
+ Johannes Zink <j.zink@pengutronix.de>
+X-Mailer: b4 0.12.0
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: j.zink@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Support setting the FDB limit through ip link. The arguments is:
- - fdb_max_learned: A 32-bit unsigned integer specifying the maximum
-                    number of learned FDB entries, with 0 disabling
-                    the limit.
+The stmmac can have 0 to 4 auxiliary snapshot in channels, which can be
+used for capturing external triggers with respect to the eqos PTP timer.
 
-Also support reading back the current number of learned FDB entries in
-the bridge by this count. The returned value's name is:
- - fdb_n_learned: A 32-bit unsigned integer specifying the current number
-                  of learned FDB entries.
+Previously when enabling the auxiliary snapshot, an invalid request was
+written to the hardware register, except for the Intel variant of this
+driver, where the only snapshot available was hardcoded.
 
-Example:
+Patch 1 of this series cleans up the debug netdev_dbg message indicating
+the auxiliary snapshot being {en,dis}abled. No functional changes here
 
- # ip -d -j -p link show br0
-[ {
-...
-        "linkinfo": {
-            "info_kind": "bridge",
-            "info_data": {
-...
-                "fdb_n_learned": 2,
-                "fdb_max_learned": 0,
-...
-            }
-        },
-...
-    } ]
- # ip link set br0 type bridge fdb_max_learned 1024
- # ip -d -j -p link show br0
-[ {
-...
-        "linkinfo": {
-            "info_kind": "bridge",
-            "info_data": {
-...
-                "fdb_n_learned": 2,
-                "fdb_max_learned": 1024,
-...
-            }
-        },
-...
-    } ]
+Patch 2 of this series writes the correct PPS input indexing to the
+hardware registers instead of a previously used fixed value
 
-Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
+Patch 3 of this series removes a field member from plat_stmmacnet_data
+that is no longer needed
+
+Patch 4 of this series prepares Patch 5 by protecting the snapshot
+enabled flag by the aux_ts_lock mutex
+
+Patch 5 of this series adds a temporary workaround, since at the moment
+the driver can handle only one single auxiliary snapshot at a time.
+Previously the driver silently dropped the previous configuration and
+enabled the new one. Now, if a snapshot is already enabled and userspace
+tries to enable another without previously disabling the snapshot currently
+enabled: issue a netdev_err and return an errorcode indicating the device is
+busy.
+
+This series is a "never worked, doesn't hurt anyone" touchup to the PPS
+capture for non-intel variants of the dwmac driver.
+
+Best Regards
+Johannes
+
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>
+To: Jose Abreu <joabreu@synopsys.com>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+To: Richard Cochran <richardcochran@gmail.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: patchwork-jzi@pengutronix.de
+Cc: netdev@vger.kernel.org
+Cc: linux-stm32@st-md-mailman.stormreply.com
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kernel@pengutronix.de
+Cc: vee.khee.wong@linux.intel.com
+Cc: tee.min.tan@intel.com
+Cc: rmk+kernel@armlinux.org.uk
+Cc: bartosz.golaszewski@linaro.org
+Cc: ahalaney@redhat.com
+Cc: horms@kernel.org
+
+Signed-off-by: Johannes Zink <j.zink@pengutronix.de>
 ---
-The corresponding kernel changes are in net-next.git as commit
-ddd1ad68826d ("net: bridge: Add netlink knobs for number / max learned
-FDB entries").
----
-Changes in v5:
- - Removed the RFC status again, as the kernel changes landed.
- - Link to v4: https://lore.kernel.org/r/20230919-fdb_limit-v4-1-b4d2dc4df30f@avm.de
-
-Changes in v4:
- - Removed _entries from the names. (from review)
- - Removed the UAPI change, to be synced from linux separately by the
-   maintainer. (from review)
-   For local testing e.g. `make CCOPTS="-O2 -pipe
-   -I${path_to_dev_kernel_headers}"` works as a workaround.
- - Downgraded to an RFC until the kernel changes land.
- - Link to v3: https://lore.kernel.org/netdev/20230905-fdb_limit-v3-1-34bb124556d8@avm.de/
-
-Changes in v3:
- - Properly split the net-next and iproute2-next threads. (from review)
- - Changed to *_n_* instead of *_cur_*. (from review)
- - Use strcmp() instead of matches(). (from review)
- - Made names in code and documentation consistent. (from review)
- - Various documentation fixes. (from review)
- - Link to v2: https://lore.kernel.org/netdev/20230619071444.14625-1-jnixdorf-oss@avm.de/
-
 Changes in v2:
- - Sent out the first corresponding iproute2 patches.
- - Link to v1: https://lore.kernel.org/netdev/20230515085046.4457-1-jnixdorf-oss@avm.de/
----
- ip/iplink_bridge.c    | 21 +++++++++++++++++++++
- man/man8/ip-link.8.in | 10 ++++++++++
- 2 files changed, 31 insertions(+)
-
-diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
-index 462075295308..6b70ffbb6f5f 100644
---- a/ip/iplink_bridge.c
-+++ b/ip/iplink_bridge.c
-@@ -34,6 +34,7 @@ static void print_explain(FILE *f)
- 		"		  [ group_fwd_mask MASK ]\n"
- 		"		  [ group_address ADDRESS ]\n"
- 		"		  [ no_linklocal_learn NO_LINKLOCAL_LEARN ]\n"
-+		"		  [ fdb_max_learned FDB_MAX_LEARNED ]\n"
- 		"		  [ vlan_filtering VLAN_FILTERING ]\n"
- 		"		  [ vlan_protocol VLAN_PROTOCOL ]\n"
- 		"		  [ vlan_default_pvid VLAN_DEFAULT_PVID ]\n"
-@@ -168,6 +169,14 @@ static int bridge_parse_opt(struct link_util *lu, int argc, char **argv,
- 				bm.optval |= no_ll_learn_bit;
- 			else
- 				bm.optval &= ~no_ll_learn_bit;
-+		} else if (strcmp(*argv, "fdb_max_learned") == 0) {
-+			__u32 fdb_max_learned;
-+
-+			NEXT_ARG();
-+			if (get_u32(&fdb_max_learned, *argv, 0))
-+				invarg("invalid fdb_max_learned", *argv);
-+
-+			addattr32(n, 1024, IFLA_BR_FDB_MAX_LEARNED, fdb_max_learned);
- 		} else if (matches(*argv, "fdb_flush") == 0) {
- 			addattr(n, 1024, IFLA_BR_FDB_FLUSH);
- 		} else if (matches(*argv, "vlan_default_pvid") == 0) {
-@@ -544,6 +553,18 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 	if (tb[IFLA_BR_GC_TIMER])
- 		_bridge_print_timer(f, "gc_timer", tb[IFLA_BR_GC_TIMER]);
- 
-+	if (tb[IFLA_BR_FDB_N_LEARNED])
-+		print_uint(PRINT_ANY,
-+			   "fdb_n_learned",
-+			   "fdb_n_learned %u ",
-+			   rta_getattr_u32(tb[IFLA_BR_FDB_N_LEARNED]));
-+
-+	if (tb[IFLA_BR_FDB_MAX_LEARNED])
-+		print_uint(PRINT_ANY,
-+			   "fdb_max_learned",
-+			   "fdb_max_learned %u ",
-+			   rta_getattr_u32(tb[IFLA_BR_FDB_MAX_LEARNED]));
-+
- 	if (tb[IFLA_BR_VLAN_DEFAULT_PVID])
- 		print_uint(PRINT_ANY,
- 			   "vlan_default_pvid",
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index 7365d0c6b14f..e82b2dbb0070 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -1630,6 +1630,8 @@ the following additional arguments are supported:
- ] [
- .BI no_linklocal_learn " NO_LINKLOCAL_LEARN "
- ] [
-+.BI fdb_max_learned " FDB_MAX_LEARNED "
-+] [
- .BI vlan_filtering " VLAN_FILTERING "
- ] [
- .BI vlan_protocol " VLAN_PROTOCOL "
-@@ -1741,6 +1743,14 @@ or off
- When disabled, the bridge will not learn from link-local frames (default:
- enabled).
- 
-+.BI fdb_max_learned " FDB_MAX_LEARNED "
-+- set the maximum number of learned FDB entries. If
-+.RI ( FDB_MAX_LEARNED " == 0) "
-+the feature is disabled. Default is
-+.BR 0 .
-+.I FDB_MAX_LEARNED
-+is a 32bit unsigned integer.
-+
- .BI vlan_filtering " VLAN_FILTERING "
- - turn VLAN filtering on
- .RI ( VLAN_FILTERING " > 0) "
+- fixed CC list to also include maintainers/authors of dwmac-intel
+- reworded commit messages and removed fixme-Tag as discussed with Simon
+  and Jakub. Thanks for reviewing the series!
+- Link to v1: https://lore.kernel.org/r/20231010-stmmac_fix_auxiliary_event_capture-v1-0-3eeca9e844fa@pengutronix.de
 
 ---
-base-commit: 582453de1b65e9eada669d9aea4aca88509e7658
-change-id: 20230905-fdb_limit-ace1467c6a84
+Johannes Zink (5):
+      net: stmmac: simplify debug message on stmmac_enable()
+      net: stmmac: use correct PPS capture input index
+      net: stmmac: intel: remove unnecessary field struct plat_stmmacenet_data::ext_snapshot_num
+      net: stmmac: ptp: stmmac_enable(): move change of plat->flags into mutex
+      net: stmmac: do not silently change auxiliary snapshot capture channel
+
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c |  1 -
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c  | 32 ++++++++++++++---------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h  |  2 +-
+ include/linux/stmmac.h                            |  1 -
+ 4 files changed, 21 insertions(+), 15 deletions(-)
+---
+base-commit: ee2a35fedbc942e6eeb9e351a53acb1fe6b101c5
+change-id: 20231010-stmmac_fix_auxiliary_event_capture-eaf21ea9c9fe
 
 Best regards,
 -- 
-Johannes Nixdorf <jnixdorf-oss@avm.de>
+Johannes Zink <j.zink@pengutronix.de>
 
 
