@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-42102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F247CD1E1
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:38:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B4377CD1E2
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:38:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A4211C20A47
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:38:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABFCA1C20CDA
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4EA46A9;
-	Wed, 18 Oct 2023 01:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4225229;
+	Wed, 18 Oct 2023 01:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H28s64bt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ausSp2LO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29394696
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E347446AE
 	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:38:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A319C433A9;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A4C4C4339A;
 	Wed, 18 Oct 2023 01:38:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1697593101;
-	bh=4/LXeWlQfqv2X1J3iz5EKXpO+5YXGk/IILMMoZTou8w=;
+	bh=f0zNhqDQDlIMjey8sKlMmnhZLPqiYQN5DPfy8ZtSSZg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=H28s64btbAZaJjcZnSO/DoSAj0g2FxmlF0J4lNFOG23dgM5cFgEXwa5345pLDaNrb
-	 Sy8oGKXD5Pe+A5Z1sMlQNOrtdIHk75dfqbhXOGilooJWst1ISjLUErdh0pTKAyCd7R
-	 oETxapGNqFbeYmyKZcuV7JOPHWtPIFKEupafbRThElLhzitWP1HPCcX+/sw11smsUU
-	 ngxFijuHuY15+hfgKlJSTg+WvQ+vWy2As+/rj0q3I0tNjUWGo8iXXHBRzh8YzAMgUR
-	 V1tB9bJVVEumPA9A7/8JW4S3fnINNECNeOtxwxrUQuVBCZr7n/ls6S8/fEwb9KghM/
-	 iCdvCgzfWC8XA==
+	b=ausSp2LOsoSWKsRg3eI1nyKJcJsnAltL6B7nCg62iSjLAfpg0ynlW7gMHqbFZU61E
+	 QIGHkUJ1MF+97FDCOE+HJ3j7vnIQSjh8NOTvDwQPpviN0Qxo4JtMHOeFiidMoE6V8A
+	 8rwPFEBfPfBYMzavcNL0rAUpSe6PpnOBmn1cBKF5Ij7iiVRkUMC5GOPqqauayScWQ8
+	 iteoXh27/APpIxkQj/uKGgEMDav1AQItc/0lnCxAnNpzKfI5u2GvLAiaIpHApJwoDh
+	 WYu6Gsng7UCD9yYuDYkg/ixZLtZSacZ8sqSt6lfpDfndKjfs9aaN5L+GN6E4A1Ex5D
+	 J3kC6Uit+HE7g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -40,11 +40,10 @@ Cc: netdev@vger.kernel.org,
 	jiri@resnulli.us,
 	przemyslaw.kitszel@intel.com,
 	daniel@iogearbox.net,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net v2 4/5] net: move altnames together with the netdevice
-Date: Tue, 17 Oct 2023 18:38:16 -0700
-Message-ID: <20231018013817.2391509-5-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net v2 5/5] selftests: net: add very basic test for netdev names and namespaces
+Date: Tue, 17 Oct 2023 18:38:17 -0700
+Message-ID: <20231018013817.2391509-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231018013817.2391509-1-kuba@kernel.org>
 References: <20231018013817.2391509-1-kuba@kernel.org>
@@ -56,93 +55,125 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The altname nodes are currently not moved to the new netns
-when netdevice itself moves:
+Add selftest for fixes around naming netdevs and namespaces.
 
-  [ ~]# ip netns add test
-  [ ~]# ip -netns test link add name eth0 type dummy
-  [ ~]# ip -netns test link property add dev eth0 altname some-name
-  [ ~]# ip -netns test link show dev some-name
-  2: eth0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-      link/ether 1e:67:ed:19:3d:24 brd ff:ff:ff:ff:ff:ff
-      altname some-name
-  [ ~]# ip -netns test link set dev eth0 netns 1
-  [ ~]# ip link
-  ...
-  3: eth0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-      link/ether 02:40:88:62:ec:b8 brd ff:ff:ff:ff:ff:ff
-      altname some-name
-  [ ~]# ip li show dev some-name
-  Device "some-name" does not exist.
-
-Remove them from the hash table when device is unlisted
-and add back when listed again.
-
-Fixes: 36fbf1e52bd3 ("net: rtnetlink: add linkprop commands to add and delete alternative ifnames")
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/core/dev.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+v2:
+ - drop the \ from line ends
+ - use Przemek's magic for the error message
+ - redirect errors to stderr
+---
+ tools/testing/selftests/net/Makefile      |  1 +
+ tools/testing/selftests/net/netns-name.sh | 87 +++++++++++++++++++++++
+ 2 files changed, 88 insertions(+)
+ create mode 100755 tools/testing/selftests/net/netns-name.sh
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 559705aeefe4..9f3f8930c691 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -381,6 +381,7 @@ static void netdev_name_node_alt_flush(struct net_device *dev)
- /* Device list insertion */
- static void list_netdevice(struct net_device *dev)
- {
-+	struct netdev_name_node *name_node;
- 	struct net *net = dev_net(dev);
- 
- 	ASSERT_RTNL();
-@@ -391,6 +392,10 @@ static void list_netdevice(struct net_device *dev)
- 	hlist_add_head_rcu(&dev->index_hlist,
- 			   dev_index_hash(net, dev->ifindex));
- 	write_unlock(&dev_base_lock);
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 8b017070960d..4a2881d43989 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -34,6 +34,7 @@ TEST_PROGS += gro.sh
+ TEST_PROGS += gre_gso.sh
+ TEST_PROGS += cmsg_so_mark.sh
+ TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
++TEST_PROGS += netns-name.sh
+ TEST_PROGS += srv6_end_dt46_l3vpn_test.sh
+ TEST_PROGS += srv6_end_dt4_l3vpn_test.sh
+ TEST_PROGS += srv6_end_dt6_l3vpn_test.sh
+diff --git a/tools/testing/selftests/net/netns-name.sh b/tools/testing/selftests/net/netns-name.sh
+new file mode 100755
+index 000000000000..7d3d3fc99461
+--- /dev/null
++++ b/tools/testing/selftests/net/netns-name.sh
+@@ -0,0 +1,87 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
 +
-+	netdev_for_each_altname(dev, name_node)
-+		netdev_name_node_add(net, name_node);
++set -o pipefail
 +
- 	/* We reserved the ifindex, this can't fail */
- 	WARN_ON(xa_store(&net->dev_by_index, dev->ifindex, dev, GFP_KERNEL));
- 
-@@ -402,12 +407,16 @@ static void list_netdevice(struct net_device *dev)
-  */
- static void unlist_netdevice(struct net_device *dev, bool lock)
- {
-+	struct netdev_name_node *name_node;
- 	struct net *net = dev_net(dev);
- 
- 	ASSERT_RTNL();
- 
- 	xa_erase(&net->dev_by_index, dev->ifindex);
- 
-+	netdev_for_each_altname(dev, name_node)
-+		netdev_name_node_del(name_node);
++NS=netns-name-test
++DEV=dummy-dev0
++DEV2=dummy-dev1
++ALT_NAME=some-alt-name
 +
- 	/* Unlink dev from the device chain */
- 	if (lock)
- 		write_lock(&dev_base_lock);
-@@ -10942,7 +10951,6 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 	synchronize_net();
- 
- 	list_for_each_entry(dev, head, unreg_list) {
--		struct netdev_name_node *name_node;
- 		struct sk_buff *skb = NULL;
- 
- 		/* Shutdown queueing discipline. */
-@@ -10970,9 +10978,6 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 		dev_uc_flush(dev);
- 		dev_mc_flush(dev);
- 
--		netdev_for_each_altname(dev, name_node)
--			netdev_name_node_del(name_node);
--		synchronize_rcu();
- 		netdev_name_node_alt_flush(dev);
- 		netdev_name_node_free(dev->name_node);
- 
++RET_CODE=0
++
++cleanup() {
++    ip netns del $NS
++}
++
++trap cleanup EXIT
++
++fail() {
++    echo "ERROR: ${1:-unexpected return code} (ret: $_)" >&2
++    RET_CODE=1
++}
++
++ip netns add $NS
++
++#
++# Test basic move without a rename
++#
++ip -netns $NS link add name $DEV type dummy || fail
++ip -netns $NS link set dev $DEV netns 1 ||
++    fail "Can't perform a netns move"
++ip link show dev $DEV >> /dev/null || fail "Device not found after move"
++ip link del $DEV || fail
++
++#
++# Test move with a conflict
++#
++ip link add name $DEV type dummy
++ip -netns $NS link add name $DEV type dummy || fail
++ip -netns $NS link set dev $DEV netns 1 2> /dev/null &&
++    fail "Performed a netns move with a name conflict"
++ip link show dev $DEV >> /dev/null || fail "Device not found after move"
++ip -netns $NS link del $DEV || fail
++ip link del $DEV || fail
++
++#
++# Test move with a conflict and rename
++#
++ip link add name $DEV type dummy
++ip -netns $NS link add name $DEV type dummy || fail
++ip -netns $NS link set dev $DEV netns 1 name $DEV2 ||
++    fail "Can't perform a netns move with rename"
++ip link del $DEV2 || fail
++ip link del $DEV || fail
++
++#
++# Test dup alt-name with netns move
++#
++ip link add name $DEV type dummy || fail
++ip link property add dev $DEV altname $ALT_NAME || fail
++ip -netns $NS link add name $DEV2 type dummy || fail
++ip -netns $NS link property add dev $DEV2 altname $ALT_NAME || fail
++
++ip -netns $NS link set dev $DEV2 netns 1 2> /dev/null &&
++    fail "Moved with alt-name dup"
++
++ip link del $DEV || fail
++ip -netns $NS link del $DEV2 || fail
++
++#
++# Test creating alt-name in one net-ns and using in another
++#
++ip -netns $NS link add name $DEV type dummy || fail
++ip -netns $NS link property add dev $DEV altname $ALT_NAME || fail
++ip -netns $NS link set dev $DEV netns 1 || fail
++ip link show dev $ALT_NAME >> /dev/null || fail "Can't find alt-name after move"
++ip  -netns $NS link show dev $ALT_NAME 2> /dev/null &&
++    fail "Can still find alt-name after move"
++ip link del $DEV || fail
++
++echo -ne "$(basename $0) \t\t\t\t"
++if [ $RET_CODE -eq 0 ]; then
++    echo "[  OK  ]"
++else
++    echo "[ FAIL ]"
++fi
++exit $RET_CODE
 -- 
 2.41.0
 
