@@ -1,79 +1,88 @@
-Return-Path: <netdev+bounces-42097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29B037CD1C1
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:20:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58D767CD1DD
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:38:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B6F31C209EE
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:20:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 130882816C5
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F324F1115;
-	Wed, 18 Oct 2023 01:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD8115A2;
+	Wed, 18 Oct 2023 01:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QcqGpRx3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b/UZS8vZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43F5EC3
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:20:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 480CEC433CA;
-	Wed, 18 Oct 2023 01:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA78A1382
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:38:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2B0C433C8;
+	Wed, 18 Oct 2023 01:38:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697592004;
-	bh=4EUpHRPi3sFqaSYjaI49krLGltGU968DKkzms82feiw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QcqGpRx3+kcTLTVNI7lD/dxyFo/BXM4Av6Z1cTZ3c9AIu9ZRpvxOVmmPVbxbndYNa
-	 n/BB4SRL5Ks4vF6dnAAZv3OLPJCWfEW+2DDp4LGH1eUUP7v7I0mmGlAYNoq5aCeVnD
-	 vK7FBgGVwnYqPLQOKccPTZcUWiLm1LS/j0GPZPugJ/73KUNIF9K6Rnd8pUi5tTqDXZ
-	 fUGWDbA7MIHCvT7spPIgT3AP0J9rIE4Z4CxdCdD1R4DPRET0HasrVnmE27LEgMac6b
-	 Lwy+++ghCKIRq+7DdAS0hy7YYswGeenzZ+/Dxcyx0wJOLO07PZEjNz2sDYDH2oIu5o
-	 ZmBk9FoRZfrgg==
-Date: Tue, 17 Oct 2023 18:20:02 -0700
+	s=k20201202; t=1697593099;
+	bh=YtwOEOmdoEYVYgJxtRQB8HP+jCYX/vLAwSYbHMq96Q4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=b/UZS8vZmWecGwyTghAudTf6M9ERSolzaD+CFlQMAZQK6QdXKVYBuUxMK9jAq/5Ga
+	 NkqWJ0ibStzMcEwZ1HMsRbgoNQpFcVXrsLzW+2C8AooNJQ4T7CvGVjyFAVu6CE3uFh
+	 okvrm8u5E7VjkOMgWnJofnWkyp9aTtg6ZxiRYkwcEq9ovbBvEs9XY7i1Vv1RPRe7I4
+	 U5RGrtvay1W58EaG1wjcKql4IDZae3Z0d1sW6okj+y1SmqsRJjGeA3ps8phjYGOofD
+	 E99O7/43Chy3wmduqNXMn26uHtHpX0xgFeg0LxlhrHNQBzwGS+/R15eSj2jiybFLuA
+	 DUj2eF0HWE50A==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Shannon Nelson <shannon.nelson@amd.com>, Michael
- Chan <michael.chan@broadcom.com>, Cai Huoqing <cai.huoqing@linux.dev>,
- George Cherian <george.cherian@marvell.com>, Danielle Ratson
- <danieller@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Ariel Elior <aelior@marvell.com>, Manish Chopra
- <manishc@marvell.com>, Igor Russkikh <irusskikh@marvell.com>, Coiby Xu
- <coiby.xu@gmail.com>, Brett Creeley <brett.creeley@amd.com>, Sunil Goutham
- <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>, Geetha
- sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>, hariprasad
- <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, Ido Schimmel
- <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Eran Ben Elisha
- <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>, Leon Romanovsky
- <leon@kernel.org>, linux-kernel@vger.kernel.org, Jesse Brandeburg
- <jesse.brandeburg@intel.com>
-Subject: Re: [PATCH net-next v2 02/11] netdevsim: devlink health: use
- retained error fmsg API
-Message-ID: <20231017182002.716ae87b@kernel.org>
-In-Reply-To: <20231017105341.415466-3-przemyslaw.kitszel@intel.com>
-References: <20231017105341.415466-1-przemyslaw.kitszel@intel.com>
-	<20231017105341.415466-3-przemyslaw.kitszel@intel.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	jiri@resnulli.us,
+	przemyslaw.kitszel@intel.com,
+	daniel@iogearbox.net,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net v2 0/5] net: fix bugs in device netns-move and rename
+Date: Tue, 17 Oct 2023 18:38:12 -0700
+Message-ID: <20231018013817.2391509-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 17 Oct 2023 12:53:32 +0200 Przemek Kitszel wrote:
-> Drop unneeded error checking.
-> 
-> devlink_fmsg_*() family of functions is now retaining errors,
-> so there is no need to check for them after each call.
-> 
-> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Daniel reported issues with the uevents generated during netdev
+namespace move, if the netdev is getting renamed at the same time.
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+While the issue that he actually cares about is not fixed here,
+there is a bunch of seemingly obvious other bugs in this code.
+Fix the purely networking bugs while the discussion around
+the uevent fix is still ongoing.
+
+v2:
+ - fix the bug in patch 1
+ - improvements in patch 5
+v1: https://lore.kernel.org/all/20231016201657.1754763-1-kuba@kernel.org/
+
+Link: https://lore.kernel.org/all/20231010121003.x3yi6fihecewjy4e@House.clients.dxld.at/
+
+Jakub Kicinski (5):
+  net: fix ifname in netlink ntf during netns move
+  net: check for altname conflicts when changing netdev's netns
+  net: avoid UAF on deleted altname
+  net: move altnames together with the netdevice
+  selftests: net: add very basic test for netdev names and namespaces
+
+ net/core/dev.c                            | 65 +++++++++++++----
+ net/core/dev.h                            |  3 +
+ tools/testing/selftests/net/Makefile      |  1 +
+ tools/testing/selftests/net/netns-name.sh | 87 +++++++++++++++++++++++
+ 4 files changed, 141 insertions(+), 15 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netns-name.sh
+
+-- 
+2.41.0
+
 
