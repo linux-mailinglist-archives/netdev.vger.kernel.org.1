@@ -1,64 +1,58 @@
-Return-Path: <netdev+bounces-42448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87C4A7CEC4D
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:50:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A78E7CEC6F
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:59:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91D1F1C20E21
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:50:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C70501F226F0
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A4F450ED;
-	Wed, 18 Oct 2023 23:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2EFF46680;
+	Wed, 18 Oct 2023 23:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jDyquIIA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBcb3c1d"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C394B4292F;
-	Wed, 18 Oct 2023 23:50:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2588C433C9;
-	Wed, 18 Oct 2023 23:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1BF4667C;
+	Wed, 18 Oct 2023 23:59:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FE80C433C7;
+	Wed, 18 Oct 2023 23:59:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697673022;
-	bh=xzyBRSLNILhZ9XPTGbRgeQaBpcpvp+VTRtwqd65Y2ps=;
+	s=k20201202; t=1697673575;
+	bh=43wvTMvKEndBuSQzafrBMZPiTVttoGCygda/qQSlXC0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jDyquIIAfzo1AcouG0XZnhFod8njD5NjytVJbZ17RUkxx9ihOmWpBENhLa05hU+wq
-	 or4nP6z09vCfgxp3rOamqbcitzreRbIsj6u1wt8KGE6yHS4RxP4XA3HmPQkdsSFjL7
-	 UCRQB32WmkOAxT9x6tFn7bZhxAexFDg+/CWMIf71JQrhlshzye5VJqqJNIxiYjXNHX
-	 Ytc/B+BrzZ6zzFFRPVTXtYRuZJdnoCEPilQ1oxsNtPWAnn1STqTK+9bQPzFyO58hk0
-	 sLOVU4PxJ258vj7dG6kHIz3twBBC7Y9zvpPsw/JzsWG3GxnwwLf9risIW2XpTvkm+T
-	 /ThvaixH7OLmA==
-Date: Wed, 18 Oct 2023 16:50:20 -0700
+	b=YBcb3c1d0jAmtXDiJuvO0aqLjTEaDRhSCuOJO2huaNZ4pr6D76JB7CNw+WT2LvBp+
+	 YgsVTRqLYWQ1hvIqbPu6MDOuzFGJeYlWC1SKpEpTcAeYwE4fqkzV9ckHh4mS+0K3W7
+	 apNCPQOa0xvMbbW9QeH83wNvMmpHiQV0avuMRE8szg/jzJj8MvwTOScQA673jGzuAQ
+	 c7jk1uzPxsYjhD1Gu+YZxtrnZfQ0L+tFYGOW7adHM1uAp6wHkLVUbuokvVCrUwM9XO
+	 Z4mTxMTQIFtfwz+fn4EpCnZejDQWfhUlaFAXSHzRmIzpy9Qkboomdfw+uSoiDD7Hze
+	 6FmAsrEX4nmVw==
+Date: Wed, 18 Oct 2023 16:59:31 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, corbet@lwn.net,
- jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- vladimir.oltean@nxp.com, andrew@lunn.ch, horms@kernel.org,
- mkubecek@suse.cz, willemdebruijn.kernel@gmail.com,
- linux-doc@vger.kernel.org, Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: Re: [PATCH net-next v4 1/6] net: ethtool: allow symmetric-xor RSS
- hash for any flow type
-Message-ID: <20231018165020.55cc4a79@kernel.org>
-In-Reply-To: <CAKgT0Udz+YdkmtO2Gbhr7CccHtBbTpKich4er3qQXY-b2inUoA@mail.gmail.com>
-References: <20231016154937.41224-1-ahmed.zaki@intel.com>
-	<20231016154937.41224-2-ahmed.zaki@intel.com>
-	<8d1b1494cfd733530be887806385cde70e077ed1.camel@gmail.com>
-	<26812a57-bdd8-4a39-8dd2-b0ebcfd1073e@intel.com>
-	<CAKgT0Ud7JjUiE32jJbMbBGVexrndSCepG54PcGYWHJ+OC9pOtQ@mail.gmail.com>
-	<14feb89d-7b4a-40c5-8983-5ef331953224@intel.com>
-	<CAKgT0UfcT5cEDRBzCxU9UrQzbBEgFt89vJZjz8Tow=yAfEYERw@mail.gmail.com>
-	<20231016163059.23799429@kernel.org>
-	<CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
-	<20231017131727.78e96449@kernel.org>
-	<CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
-	<20231017173448.3f1c35aa@kernel.org>
-	<CAKgT0Udz+YdkmtO2Gbhr7CccHtBbTpKich4er3qQXY-b2inUoA@mail.gmail.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, David Ahern <dsahern@gmail.com>,
+ Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Anatoly Burakov <anatoly.burakov@intel.com>, Alexander
+ Lobakin <alexandr.lobakin@intel.com>, Magnus Karlsson
+ <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>,
+ xdp-hints@xdp-project.net, netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
+ <alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>,
+ Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH bpf-next v6 08/18] xdp: Add VLAN tag hint
+Message-ID: <20231018165931.1016e6c5@kernel.org>
+In-Reply-To: <20231012170524.21085-9-larysa.zaremba@intel.com>
+References: <20231012170524.21085-1-larysa.zaremba@intel.com>
+	<20231012170524.21085-9-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,39 +62,36 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 18 Oct 2023 11:12:13 -0700 Alexander Duyck wrote:
-> > > Based on earlier comments it doesn't change the inputs, it just
-> > > changes how I have to handle the data and the key. It starts reducing
-> > > things down to something like the Intel implementation of Flow
-> > > Director in terms of how the key gets generated and hashed.  
-> >
-> > About Flow Director I know only that it is bad :)  
-> 
-> Yeah, and that is my concern w/ the symmetric XOR is that it isn't
-> good. It opens up the toeplitz hash to exploitation. You can target
-> the same bucket by just making sure that source IP and port XOR with
-> destination IP and port to the same value. That can be done by adding
-> the same amount to each side. So there are 2^144 easily predictable
-> possible combinations that will end up in the same hash bucket. Seems
-> like it might be something that could be exploitable. That is why I
-> want it marked out as a separate algo since it is essentially
-> destroying entropy before we even get to the Toeplitz portion of the
-> hash. As such it isn't a hash I would want to use for anything that is
-> meant to spread workload since it is so easily exploitable.
+On Thu, 12 Oct 2023 19:05:14 +0200 Larysa Zaremba wrote:
+> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+> index 2943a151d4f1..661f603e3e43 100644
+> --- a/include/uapi/linux/netdev.h
+> +++ b/include/uapi/linux/netdev.h
+> @@ -44,13 +44,16 @@ enum netdev_xdp_act {
+>   *   timestamp via bpf_xdp_metadata_rx_timestamp().
+>   * @NETDEV_XDP_RX_METADATA_HASH: Device is capable of exposing receive packet
+>   *   hash via bpf_xdp_metadata_rx_hash().
+> + * @NETDEV_XDP_RX_METADATA_VLAN_TAG: Device is capable of exposing stripped
+> + *   receive VLAN tag (proto and TCI) via bpf_xdp_metadata_rx_vlan_tag().
+>   */
+>  enum netdev_xdp_rx_metadata {
+>  	NETDEV_XDP_RX_METADATA_TIMESTAMP = 1,
+>  	NETDEV_XDP_RX_METADATA_HASH = 2,
+> +	NETDEV_XDP_RX_METADATA_VLAN_TAG = 4,
+>  
+>  	/* private: */
+> -	NETDEV_XDP_RX_METADATA_MASK = 3,
+> +	NETDEV_XDP_RX_METADATA_MASK = 7,
+>  };
+>  
+>  enum {
 
-I see your point.
+Top of this file says:
 
-Which is not to say that I know what to do about it. crc or any
-future secure algo will get destroyed all the same. It's the input
-entropy that gets destroyed, independently of the algo.
+/* Do not edit directly, auto-generated from: */
+/*	Documentation/netlink/specs/netdev.yaml */
+/* YNL-GEN uapi header */
 
-We already support xor, and it doesn't come with a warning saying
-it's insecure so we kind of assume user knows what they are doing.
-
-I think the API we pick for configuring sym-xor should be the same as
-sym-sort. And the "makes algo insecure" argument won't apply to sort.
-
-IMO fat warning in the documentation and ethtool man saying that this
-makes the algo (any / all) vulnerable to attack would be enough.
-Willem?
+Please add your new value in Documentation/netlink/specs/netdev.yaml
+and then run ./tools/net/ynl/ynl-regen.sh
 
