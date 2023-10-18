@@ -1,188 +1,100 @@
-Return-Path: <netdev+bounces-42354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52A737CE64F
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:24:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04C387CE65E
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:26:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5CE1B20F8B
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:24:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B21A0281D6A
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:26:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A93642BF4;
-	Wed, 18 Oct 2023 18:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F076D4123A;
+	Wed, 18 Oct 2023 18:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qgHppDzn"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="V5phy8EH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFEB941AB9;
-	Wed, 18 Oct 2023 18:24:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 254BFC433BF;
-	Wed, 18 Oct 2023 18:24:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697653444;
-	bh=KZ6N65Nkl5YNxcN1w6vYt0uy5Mo7hWRtrXVthBvScVQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=qgHppDzn1lteN27ftYSRGn1OItTRhdHkeXOxxWx3DlIhx2Z4kqwxj56FDfE7Z4WAs
-	 5r1ytCFEPMxUiKwTWXeOIBxjyOH00RfS1S3JZrUt2pC6yUs9WmpGYf3JRGRYv93+9W
-	 Srjd0CY6+A6JoOe46C6oOfemi2d3H+Tmckq0GkDCv53G4wxNblQnK1HOsXae+7H0t3
-	 4fP0ZpvqYbtqGXEGN36rGj6ykYTlhHRyVnfqZE2H/if6lN1eJtSzax3qXYnw/xZXJn
-	 UTG1B7v0gWze0fQKWkpW7gmaO6Ivjmh8SjEU22nH7UhVFaRtslZfsixec/oVlYMbHC
-	 ij4MjqjEneoWg==
-From: Mat Martineau <martineau@kernel.org>
-Date: Wed, 18 Oct 2023 11:23:56 -0700
-Subject: [PATCH net 5/5] selftests: mptcp: join: no RST when rm
- subflow/addr
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F72374D0;
+	Wed, 18 Oct 2023 18:25:59 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 932B7B6;
+	Wed, 18 Oct 2023 11:25:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=99zA8o13/ejaEM2O9/K0kn45FaKKMRK+h1KEU8ji9+A=; b=V5phy8EHYfhtPfVyyG8Exv3G/r
+	Pw9Vvflf4+xBXK/uMwG2DGE/qdGXwm9pcyW6dJo/OOocmhxsI9aB14b3THWJ5W1/ENsEgMQCTzTY9
+	GArQsjXE+6rZK3EK6yo6y1moCF//BhGc72niOCUs2iMiRgRfcF9IGyKstZ+u/zQqjS+RcTwAJXFXy
+	iuhdOEie6GRBdLNWbiXAgStwO1jb6aHU7oGZeXrBUqhvyXbAaLTrEj18N40UvgmycR39epxmr0CNh
+	FZpRc55o2s6iaf3eR6T4bk/5j3m70Vbr3urwfCedbJ8nVpBqAg+9FJanWPIwETux/tFacgUggpkYr
+	Dna5ig9A==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1qtBEp-00FReC-07;
+	Wed, 18 Oct 2023 18:25:47 +0000
+Date: Wed, 18 Oct 2023 11:25:46 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Daniel Mack <daniel@zonque.org>,
+	Haojian Zhuang <haojian.zhuang@gmail.com>,
+	Robert Jarzmik <robert.jarzmik@free.fr>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Manuel Lauss <manuel.lauss@gmail.com>,
+	Yangbo Lu <yangbo.lu@nxp.com>, Joshua Kinard <kumba@gentoo.org>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Arnd Bergmann <arnd@arndb.de>, linux-arm-kernel@lists.infradead.org,
+	open list <linux-kernel@vger.kernel.org>, linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-modules@vger.kernel.org
+Subject: Re: [PATCH 5/5] modules: only allow symbol_get of EXPORT_SYMBOL_GPL
+ modules
+Message-ID: <ZTAjKv0FKAH+rePH@bombadil.infradead.org>
+References: <20230801173544.1929519-1-hch@lst.de>
+ <20230801173544.1929519-6-hch@lst.de>
+ <bf555c2a4df5196533b6e614cc57638004dfb426.camel@infradead.org>
+ <20231018053146.GA16765@lst.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231018-send-net-20231018-v1-5-17ecb002e41d@kernel.org>
-References: <20231018-send-net-20231018-v1-0-17ecb002e41d@kernel.org>
-In-Reply-To: <20231018-send-net-20231018-v1-0-17ecb002e41d@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- David Ahern <dsahern@kernel.org>, Davide Caratti <dcaratti@redhat.com>, 
- Christoph Paasch <cpaasch@apple.com>, Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- Mat Martineau <martineau@kernel.org>, stable@vger.kernel.org
-X-Mailer: b4 0.12.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231018053146.GA16765@lst.de>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Matthieu Baerts <matttbe@kernel.org>
+On Wed, Oct 18, 2023 at 07:31:46AM +0200, Christoph Hellwig wrote:
+> On Wed, Oct 18, 2023 at 01:30:18AM +0100, David Woodhouse wrote:
+> > 
+> > But if we're going to tolerate the core kernel still exporting some
+> > stuff with EXPORT_SYMBOL, why isn't OK for a GPL-licensed module do to
+> > the same? Even an *in-tree* GPL-licensed module now can't export
+> > functionality with EXPORT_SYMBOL and have it used with symbol_get().
+> 
+> Anything using symbol_get is by intent very deeply internal for tightly
+> coupled modules working together, and thus not a non-GPL export.
+> 
+> In fact the current series is just a stepping stone.  Once some mess
+> in the kvm/vfio integration is fixed up we'll require a new explicit
+> EXPORT_SYMBOL variant as symbol_get wasn't ever intended to be used
+> on totally random symbols not exported for use by symbol_get.
 
-Recently, we noticed that some RST were wrongly generated when removing
-the initial subflow.
+The later patches in the series also show we could resolves most
+uses through Kconfig and at build time, it really begs the question
+if we even need it for any real valid uses.
 
-This patch makes sure RST are not sent when removing any subflows or any
-addresses.
-
-Fixes: c2b2ae3925b6 ("mptcp: handle correctly disconnect() failures")
-Cc: stable@vger.kernel.org
-Acked-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Matthieu Baerts <matttbe@kernel.org>
-Signed-off-by: Mat Martineau <martineau@kernel.org>
----
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 27953670206e..dc895b7b94e1 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -2309,6 +2309,7 @@ remove_tests()
- 		chk_join_nr 1 1 1
- 		chk_rm_tx_nr 1
- 		chk_rm_nr 1 1
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# multiple subflows, remove
-@@ -2321,6 +2322,7 @@ remove_tests()
- 			run_tests $ns1 $ns2 10.0.1.1
- 		chk_join_nr 2 2 2
- 		chk_rm_nr 2 2
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# single address, remove
-@@ -2333,6 +2335,7 @@ remove_tests()
- 		chk_join_nr 1 1 1
- 		chk_add_nr 1 1
- 		chk_rm_nr 1 1 invert
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# subflow and signal, remove
-@@ -2346,6 +2349,7 @@ remove_tests()
- 		chk_join_nr 2 2 2
- 		chk_add_nr 1 1
- 		chk_rm_nr 1 1
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# subflows and signal, remove
-@@ -2360,6 +2364,7 @@ remove_tests()
- 		chk_join_nr 3 3 3
- 		chk_add_nr 1 1
- 		chk_rm_nr 2 2
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# addresses remove
-@@ -2374,6 +2379,7 @@ remove_tests()
- 		chk_join_nr 3 3 3
- 		chk_add_nr 3 3
- 		chk_rm_nr 3 3 invert
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# invalid addresses remove
-@@ -2388,6 +2394,7 @@ remove_tests()
- 		chk_join_nr 1 1 1
- 		chk_add_nr 3 3
- 		chk_rm_nr 3 1 invert
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# subflows and signal, flush
-@@ -2402,6 +2409,7 @@ remove_tests()
- 		chk_join_nr 3 3 3
- 		chk_add_nr 1 1
- 		chk_rm_nr 1 3 invert simult
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# subflows flush
-@@ -2421,6 +2429,7 @@ remove_tests()
- 		else
- 			chk_rm_nr 3 3
- 		fi
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# addresses flush
-@@ -2435,6 +2444,7 @@ remove_tests()
- 		chk_join_nr 3 3 3
- 		chk_add_nr 3 3
- 		chk_rm_nr 3 3 invert simult
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# invalid addresses flush
-@@ -2449,6 +2459,7 @@ remove_tests()
- 		chk_join_nr 1 1 1
- 		chk_add_nr 3 3
- 		chk_rm_nr 3 1 invert
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# remove id 0 subflow
-@@ -2460,6 +2471,7 @@ remove_tests()
- 			run_tests $ns1 $ns2 10.0.1.1
- 		chk_join_nr 1 1 1
- 		chk_rm_nr 1 1
-+		chk_rst_nr 0 0
- 	fi
- 
- 	# remove id 0 address
-@@ -2472,6 +2484,7 @@ remove_tests()
- 		chk_join_nr 1 1 1
- 		chk_add_nr 1 1
- 		chk_rm_nr 1 1 invert
-+		chk_rst_nr 0 0 invert
- 	fi
- }
- 
-
--- 
-2.41.0
-
+  Luis
 
