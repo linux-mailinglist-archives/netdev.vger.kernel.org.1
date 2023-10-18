@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-42366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB5637CE7CA
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:34:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8EF87CE7DB
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:37:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17D2A1C209A6
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 19:34:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 256AAB20EF3
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 19:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC32450C9;
-	Wed, 18 Oct 2023 19:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF8645F5A;
+	Wed, 18 Oct 2023 19:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="ugaIAH3z";
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="EhmDyHZk"
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="mLQQq9xu";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="GDvTxLaY"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB90C339AF
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 19:34:23 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5C3811F;
-	Wed, 18 Oct 2023 12:34:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21003FE49
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 19:37:32 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC1BCAB;
+	Wed, 18 Oct 2023 12:37:30 -0700 (PDT)
 Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 40C4C6017F;
-	Wed, 18 Oct 2023 21:34:19 +0200 (CEST)
+	by domac.alu.hr (Postfix) with ESMTP id 68D996017F;
+	Wed, 18 Oct 2023 21:37:29 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1697657659; bh=/W3mk8TahFX3fe6Zwq2eTM/o+YuIuTXh3wIDyuxcYGk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ugaIAH3z/KUiC9ZBmjFP9shpP559G4snGyQ94CtEH1nndvxEaTajwQdUxBsXHouZd
-	 phZllqTU1Bcd7ItNdoPsQf6IDqsUGypTCjuU/lyL5f29UqhkxRvVZFPWxkyxTPfNC/
-	 fzNunZchniaIKUjcAJDZnP9pF5dKhdiqj2Ximiu1hf6YUKZ8LkbAAhLHgUeJxTjr3U
-	 BLfKDRorxGIjYLRYxjb1lhJdUuYK5e1lxboLu72w9Xeb8CQknHAYo8QV0kRzXOL2mr
-	 L8RxV5H7WzxtuQrfxRfymhgr9lhijLqFxtDT3fRz1vqKq0V8jK/JFbuLLO/F9IjxHg
-	 eExZ2I2q0RsPw==
+	t=1697657849; bh=VeXWLGEDckmd4sgvaB8SrsTUgqhJhGFE8mZwXOUw68A=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mLQQq9xuLvSTlY6vSyOpn54Q8CmeK94Mpiho5ZneYkIBAYBBjX7D+Md8RWifYj1Ds
+	 t7ORZ6IuR0X3R5BTToGQ0GlpGCo9pilpXcF77W5hNqVGOgy6nPJcxvCEYOh76aK9ew
+	 ZQ9SrkGYxyrGfkhETGFTgwPobTeneFGI27SaNiKCxZ4qSriexlLL90EZ5QpznnuTbN
+	 KcA+ScqKA72PjuYgLegEZeJ6PyJjWT4c6Ojz/MI3veXAjUsU3ZTTUlcaEiApA9Zv68
+	 Sjwn6LHGzYQo0G3EuwsJsIGanop1XRgCS+DrLiDNDTqZdVaD45Xh/V2jP/CeYRBXCx
+	 iOoc3pIyLbXaw==
 X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
 Received: from domac.alu.hr ([127.0.0.1])
 	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pH1VaXI5Ez19; Wed, 18 Oct 2023 21:34:16 +0200 (CEST)
+	with ESMTP id Y6TdbkOq1Vlm; Wed, 18 Oct 2023 21:37:26 +0200 (CEST)
 Received: from defiant.home (78-2-200-105.adsl.net.t-com.hr [78.2.200.105])
-	by domac.alu.hr (Postfix) with ESMTPSA id 7C0996017E;
-	Wed, 18 Oct 2023 21:34:16 +0200 (CEST)
+	by domac.alu.hr (Postfix) with ESMTPSA id 670366017E;
+	Wed, 18 Oct 2023 21:37:26 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1697657656; bh=/W3mk8TahFX3fe6Zwq2eTM/o+YuIuTXh3wIDyuxcYGk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EhmDyHZk/+90zh97GTcCb56QBpvh+97Fd+5aS5Kg+D/kBjRmxWLvl2vftvvf7GrLX
-	 IAE46Mv/szXpw6g5O44A6e17WHGNlQGIqbtv6bPjx7mLHJWZgGZk/JlJftYW9Hmgr5
-	 1wGj3Esp6XERxxA1nbCjxlMWXklsn5cksYCkUXHv5Hvzirr8XfVmiz6REMC2inFGCs
-	 DJR9wtC/fj++oXZAvyqDP3vSxAkSo382T7FR4yjEhNgJZhU4NurtuITG3gAV6NI13Y
-	 21FOkUh8R9ShD7v/KLzR8oOd7gL3navjYn35NTtjOn0oT2izy/FmNxHIx+4W0I73En
-	 lGif90N9463/A==
+	t=1697657846; bh=VeXWLGEDckmd4sgvaB8SrsTUgqhJhGFE8mZwXOUw68A=;
+	h=From:To:Cc:Subject:Date:From;
+	b=GDvTxLaYbA1WLNXZu4oQ0ncc8ARIQ3PT1j9DybEIEK+gUcMlpQvb9ZQBza9Vwol89
+	 dvMtbis6H6b171xCIhpPl3nD4HFQRGVNwv80EhGoLSI8dAIPPkERX5bkDYKlATFmaw
+	 l82iUrOjPQ2bSFy6lg0Pd9aLx01xDj/RkA5Qly9c4jNn/EUP4EsB2DR+MPcTCVIqEv
+	 4qewo8EmeEw3OlwCIjJsVwCpI8XJR7pw7o84uX/tCBhB2ceYRQJq+nKPZTYat8gEKa
+	 z6bRl9/WwyLI4GTcmcp8N4VDdAUKGkMQAmelLuMlnCF0w10z6ji/qBnDMvTqcP2Abu
+	 pswXMMe56Z/zA==
 From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
 To: Heiner Kallweit <hkallweit1@gmail.com>,
 	netdev@vger.kernel.org,
@@ -63,12 +63,10 @@ Cc: nic_swsd@realtek.com,
 	Paolo Abeni <pabeni@redhat.com>,
 	Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>,
 	Marco Elver <elver@google.com>
-Subject: [PATCH v3 3/3] r8169: fix the KCSAN reported data race in rtl_rx while reading desc->opts1
-Date: Wed, 18 Oct 2023 21:28:31 +0200
-Message-Id: <20231018192828.343562-3-mirsad.todorovac@alu.unizg.hr>
+Subject: [PATCH v4 1/3] r8169: fix the KCSAN reported data-race in rtl_tx() while reading tp->cur_tx
+Date: Wed, 18 Oct 2023 21:34:34 +0200
+Message-Id: <20231018193434.344176-1-mirsad.todorovac@alu.unizg.hr>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231018192828.343562-1-mirsad.todorovac@alu.unizg.hr>
-References: <20231018192828.343562-1-mirsad.todorovac@alu.unizg.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,20 +76,39 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-KCSAN reported the following data-race bug:
+KCSAN reported the following data-race:
 
 ==================================================================
-BUG: KCSAN: data-race in rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4430 drivers/net/ethernet/realtek/r8169_main.c:4583) r8169
+BUG: KCSAN: data-race in rtl8169_poll [r8169] / rtl8169_start_xmit [r8169]
 
-race at unknown origin, with read to 0xffff888117e43510 of 4 bytes by interrupt on cpu 21:
-rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4430 drivers/net/ethernet/realtek/r8169_main.c:4583) r8169
+write (marked) to 0xffff888102474b74 of 4 bytes by task 5358 on cpu 29:
+rtl8169_start_xmit (drivers/net/ethernet/realtek/r8169_main.c:4254) r8169
+dev_hard_start_xmit (./include/linux/netdevice.h:4889 ./include/linux/netdevice.h:4903 net/core/dev.c:3544 net/core/dev.c:3560)
+sch_direct_xmit (net/sched/sch_generic.c:342)
+__dev_queue_xmit (net/core/dev.c:3817 net/core/dev.c:4306)
+ip_finish_output2 (./include/linux/netdevice.h:3082 ./include/net/neighbour.h:526 ./include/net/neighbour.h:540 net/ipv4/ip_output.c:233)
+__ip_finish_output (net/ipv4/ip_output.c:311 net/ipv4/ip_output.c:293)
+ip_finish_output (net/ipv4/ip_output.c:328)
+ip_output (net/ipv4/ip_output.c:435)
+ip_send_skb (./include/net/dst.h:458 net/ipv4/ip_output.c:127 net/ipv4/ip_output.c:1486)
+udp_send_skb (net/ipv4/udp.c:963)
+udp_sendmsg (net/ipv4/udp.c:1246)
+inet_sendmsg (net/ipv4/af_inet.c:840 (discriminator 4))
+sock_sendmsg (net/socket.c:730 net/socket.c:753)
+__sys_sendto (net/socket.c:2177)
+__x64_sys_sendto (net/socket.c:2185)
+do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
+
+read to 0xffff888102474b74 of 4 bytes by interrupt on cpu 21:
+rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4397 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
 __napi_poll (net/core/dev.c:6527)
 net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
 __do_softirq (kernel/softirq.c:553)
 __irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
 irq_exit_rcu (kernel/softirq.c:647)
-sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1074 (discriminator 14))
-asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:645)
+common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 14))
+asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636)
 cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
 cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
 call_cpuidle (kernel/sched/idle.c:135)
@@ -100,55 +117,109 @@ cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
 start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:294)
 secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
 
-value changed: 0x80003fff -> 0x3402805f
+value changed: 0x002f4815 -> 0x002f4816
 
 Reported by Kernel Concurrency Sanitizer on:
 CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kcsan-00143-gb5cbe7c00aa0 #41
 Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04/26/2023
 ==================================================================
 
-drivers/net/ethernet/realtek/r8169_main.c:
-==========================================
-   4429
- → 4430                 status = le32_to_cpu(desc->opts1);
-   4431                 if (status & DescOwn)
-   4432                         break;
-   4433
-   4434                 /* This barrier is needed to keep us from reading
-   4435                  * any other fields out of the Rx descriptor until
-   4436                  * we know the status of DescOwn
-   4437                  */
-   4438                 dma_rmb();
-   4439
-   4440                 if (unlikely(status & RxRES)) {
-   4441                         if (net_ratelimit())
-   4442                                 netdev_warn(dev, "Rx ERROR. status = %08x\n",
+The write side of drivers/net/ethernet/realtek/r8169_main.c is:
+==================
+   4251         /* rtl_tx needs to see descriptor changes before updated tp->cur_tx */
+   4252         smp_wmb();
+   4253
+ → 4254         WRITE_ONCE(tp->cur_tx, tp->cur_tx + frags + 1);
+   4255
+   4256         stop_queue = !netif_subqueue_maybe_stop(dev, 0, rtl_tx_slots_avail(tp),
+   4257                                                 R8169_TX_STOP_THRS,
+   4258                                                 R8169_TX_START_THRS);
 
-Marco Elver explained that dma_rmb() doesn't prevent the compiler to tear up the access to
-desc->opts1 which can be written to concurrently. READ_ONCE() should prevent that from
-happening:
+The read side is the function rtl_tx():
 
-   4429
- → 4430                 status = le32_to_cpu(READ_ONCE(desc->opts1));
-   4431                 if (status & DescOwn)
-   4432                         break;
-   4433
+   4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+   4356                    int budget)
+   4357 {
+   4358         unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
+   4359         struct sk_buff *skb;
+   4360
+   4361         dirty_tx = tp->dirty_tx;
+   4362
+   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+   4364                 unsigned int entry = dirty_tx % NUM_TX_DESC;
+   4365                 u32 status;
+   4366
+   4367                 status = le32_to_cpu(tp->TxDescArray[entry].opts1);
+   4368                 if (status & DescOwn)
+   4369                         break;
+   4370
+   4371                 skb = tp->tx_skb[entry].skb;
+   4372                 rtl8169_unmap_tx_skb(tp, entry);
+   4373
+   4374                 if (skb) {
+   4375                         pkts_compl++;
+   4376                         bytes_compl += skb->len;
+   4377                         napi_consume_skb(skb, budget);
+   4378                 }
+   4379                 dirty_tx++;
+   4380         }
+   4381
+   4382         if (tp->dirty_tx != dirty_tx) {
+   4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_compl);
+   4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
+   4385
+   4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl, bytes_compl,
+   4387                                               rtl_tx_slots_avail(tp),
+   4388                                               R8169_TX_START_THRS);
+   4389                 /*
+   4390                  * 8168 hack: TxPoll requests are lost when the Tx packets are
+   4391                  * too close. Let's kick an extra TxPoll request when a burst
+   4392                  * of start_xmit activity is detected (if it is not detected,
+   4393                  * it is slow enough). -- FR
+   4394                  * If skb is NULL then we come here again once a tx irq is
+   4395                  * triggered after the last fragment is marked transmitted.
+   4396                  */
+ → 4397                 if (tp->cur_tx != dirty_tx && skb)
+   4398                         rtl8169_doorbell(tp);
+   4399         }
+   4400 }
 
-As the consequence of this fix, this KCSAN warning was eliminated.
+Obviously from the code, an earlier detected data-race for tp->cur_tx was fixed in the
+line 4363:
 
-Fixes: 6202806e7c03a ("r8169: drop member opts1_mask from struct rtl8169_private")
-Suggested-by: Marco Elver <elver@google.com>
+   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+
+but the same solution is required for protecting the other access to tp->cur_tx:
+
+ → 4397                 if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+   4398                         rtl8169_doorbell(tp);
+
+The write in the line 4254 is protected with WRITE_ONCE(), but the read in the line 4397
+might have suffered read tearing under some compiler optimisations.
+
+The fix eliminated the KCSAN data-race report for this bug.
+
+It is yet to be evaluated what happens if tp->cur_tx changes between the test in line 4363
+and line 4397. This test should certainly not be cached by the compiler in some register
+for such a long time, while asynchronous writes to tp->cur_tx might have occurred in line
+4254 in the meantime.
+
+Fixes: 94d8a98e6235c ("r8169: reduce number of workaround doorbell rings")
 Cc: Heiner Kallweit <hkallweit1@gmail.com>
 Cc: nic_swsd@realtek.com
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Marco Elver <elver@google.com>
 Cc: netdev@vger.kernel.org
 Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@alu.unizg.hr/
 Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
 Acked-by: Marco Elver <elver@google.com>
 ---
+v4:
+ fixed the Fixes: tag for 2/3.
+ 
 v3:
  fixed the Fixes: tag for 3/3.
 
@@ -159,18 +230,18 @@ v2:
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 281aaa851847..81be6085a480 100644
+index 6351a2dc13bc..281aaa851847 100644
 --- a/drivers/net/ethernet/realtek/r8169_main.c
 +++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -4427,7 +4427,7 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
- 		dma_addr_t addr;
- 		u32 status;
- 
--		status = le32_to_cpu(desc->opts1);
-+		status = le32_to_cpu(READ_ONCE(desc->opts1));
- 		if (status & DescOwn)
- 			break;
- 
+@@ -4394,7 +4394,7 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+ 		 * If skb is NULL then we come here again once a tx irq is
+ 		 * triggered after the last fragment is marked transmitted.
+ 		 */
+-		if (tp->cur_tx != dirty_tx && skb)
++		if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+ 			rtl8169_doorbell(tp);
+ 	}
+ }
 -- 
 2.34.1
 
