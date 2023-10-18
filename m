@@ -1,76 +1,47 @@
-Return-Path: <netdev+bounces-42427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 816477CEA18
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:36:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E36E7CEA22
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21672B20CAD
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:36:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00068B20EA3
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:39:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA0C13589B;
-	Wed, 18 Oct 2023 21:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42CF38F8A;
+	Wed, 18 Oct 2023 21:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fMYLrq/W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oEUZflsc"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9076742930
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 21:36:21 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A35210C4;
-	Wed, 18 Oct 2023 14:36:20 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40806e40fccso16400635e9.2;
-        Wed, 18 Oct 2023 14:36:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697664978; x=1698269778; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HCVhrp90okWSl9RRgMNdpBPnBJhruFjjACD6W7aKPnE=;
-        b=fMYLrq/Wp45Ig88rjE3KTV0ATRN2Ui6Q+yQhIhCyG81hL+Hfpo/HSUyoI6IS9S2wZe
-         Mol6t6hncOWwXXCCYwfn01MUDGDztJ0KHJQTcu1aCiZsafnm69dFzBxh0g08CRpEz+kO
-         1MB5JXE/KTGn36iuvqEeN3vmszxGTEMo1P1p+RH9ZEQdRiRi4ACyoOHfWBvA31TkGpVm
-         AwaTzhykr830pSOyQNsC/P4QavSGU2jj47YKFhMZycLnudCSbSktB/KifFf5iPbpBPal
-         hfKGw/ryAx9H8UCo69/mRD81ScA86XUzIwzsUn6YS1ruEjI48F3VEmU/ryZq65fFRGwf
-         TOLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697664978; x=1698269778;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HCVhrp90okWSl9RRgMNdpBPnBJhruFjjACD6W7aKPnE=;
-        b=LnURJyIRn93elarE8MxRklVxjhBvKkWiXLHp5vDx8dfUHCNLkHIVLVQhwwKJtIZNaQ
-         E/3dlEMOy4Z0ouHTDTJxlth0s4E6Gx4SnSVxPVYlOMNizERwE0ir0REypNh0TpclMc62
-         gu7na9QyePw4fUDDL9cGQSbk5M0irdWgpalnqdzp2ptTfCE8Go35Me60tANgEHB3F5Tc
-         qIcrRDkrTYL/b0cgVpZkOZIGNzYZGryXjBttAgM6j/Vwrm4Ive/u8JcQaWekOBZ1jsx5
-         AnWXL8WXmAvgIWVr5fQRhHMhBj80rNowDlEdyTHKLOXCkF9gqZHaWXhIZwnUKmfCvH6S
-         sH5w==
-X-Gm-Message-State: AOJu0YxuncAz0w5at4qArHaIwH139YzV7Kp7uqN08TO2xUDH1mIwCj1c
-	2bobm9NkrPoaR6vAbXDk49k=
-X-Google-Smtp-Source: AGHT+IHjqcHZlWwSZER6472scqSi0GlbXjVK2Qg9iOIon9lhuOzZOXx7h0ejemyGWbBMaK1zGnxvqQ==
-X-Received: by 2002:a05:600c:1384:b0:408:4160:1528 with SMTP id u4-20020a05600c138400b0040841601528mr409741wmf.30.1697664978620;
-        Wed, 18 Oct 2023 14:36:18 -0700 (PDT)
-Received: from reibax-minipc.lan ([2a0c:5a80:3302:f900::978])
-        by smtp.gmail.com with ESMTPSA id bi26-20020a05600c3d9a00b003feea62440bsm2617007wmb.43.2023.10.18.14.36.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 14:36:18 -0700 (PDT)
-From: Xabier Marquiegui <reibax@gmail.com>
-To: dan.carpenter@linaro.org
-Cc: davem@davemloft.net,
-	kernel-janitors@vger.kernel.org,
-	netdev@vger.kernel.org,
-	reibax@gmail.com,
-	richardcochran@gmail.com
-Subject: Re: [PATCH net-next] ptp: prevent string overflow
-Date: Wed, 18 Oct 2023 23:36:17 +0200
-Message-Id: <20231018213617.3196-1-reibax@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <d4b1a995-a0cb-4125-aa1d-5fd5044aba1d@moroto.mountain>
-References: <d4b1a995-a0cb-4125-aa1d-5fd5044aba1d@moroto.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867EB4292A
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 21:39:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A45CC433C7;
+	Wed, 18 Oct 2023 21:39:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697665163;
+	bh=eokjp/1DggAE4rjPzpdAqEXMjUzwf27cj3Yk3nOotcQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=oEUZflscsi1FI1c/CICfZB3HLNdtX1KQbZHwWKb8ghYvECv3Hr5Nr/IN/2V3Y1OkR
+	 l2p3hZE5D9xT1zvwOiB3yW7XJZKUPX1IvRZ+/HOrWAnqzPk5JTtmhrOwN0wE3Ys+W3
+	 HAwdZdYgGhdK+bWa1AdOoerabF9tTXF/oC+ex62EnqsLahHGn6xqxPtSBePjfzBdhL
+	 kfYp3SQxKPzjTs+jFEO9Kqp0q7mKsjQf9JPc/JAGQ1gGkIU3PAG8O+Zvg/YKMnUU7H
+	 xrwypusV6LTawJhxr15opDGMBg7Wkr/mpARGzANIoejWAp25n6Bq7WGxw1+BA4idsu
+	 dddRiLypRqIow==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/3] netlink: add variable-length / auto integers
+Date: Wed, 18 Oct 2023 14:39:18 -0700
+Message-ID: <20231018213921.2694459-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,9 +50,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Nice catch Dan. Thank you very much for the fix! Looks good to me.
+Add netlink support for "common" / variable-length / auto integers
+which are carried at the message level as either 4B or 8B depending
+on the exact value. This saves space and will hopefully decrease
+the number of instances where we realize that we needed more bits
+after uAPI is set is stone. It also loosens the alignment requirements,
+avoiding the need for padding.
 
-Cheers,
+This mini-series is a fuller version of the previous RFC:
+https://lore.kernel.org/netdev/20121204.130914.1457976839967676240.davem@davemloft.net/
+No user included here. I have tested (and will use) it
+in the upcoming page pool API but the assumption is that
+it will be widely applicable. So sending without a user.
 
-Xabier.
+Jakub Kicinski (3):
+  tools: ynl-gen: make the mnl_type() method public
+  netlink: add variable-length / auto integers
+  netlink: specs: add support for auto-sized scalars
+
+ Documentation/netlink/genetlink-c.yaml        |  3 +-
+ Documentation/netlink/genetlink-legacy.yaml   |  3 +-
+ Documentation/netlink/genetlink.yaml          |  3 +-
+ Documentation/userspace-api/netlink/specs.rst | 18 ++++-
+ include/net/netlink.h                         | 69 ++++++++++++++++++-
+ include/uapi/linux/netlink.h                  |  5 ++
+ lib/nlattr.c                                  | 22 ++++++
+ net/netlink/policy.c                          | 14 +++-
+ tools/net/ynl/lib/nlspec.py                   |  6 ++
+ tools/net/ynl/lib/ynl.c                       |  6 ++
+ tools/net/ynl/lib/ynl.h                       | 17 +++++
+ tools/net/ynl/lib/ynl.py                      | 14 ++++
+ tools/net/ynl/ynl-gen-c.py                    | 44 ++++++------
+ 13 files changed, 192 insertions(+), 32 deletions(-)
+
+-- 
+2.41.0
+
 
