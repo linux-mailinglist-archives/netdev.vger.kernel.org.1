@@ -1,75 +1,173 @@
-Return-Path: <netdev+bounces-42307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78D5F7CE2D0
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:34:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 622EC7CE2D5
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:34:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 038371F225C0
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:34:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02DADB21016
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3D1341A1;
-	Wed, 18 Oct 2023 16:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323CE341A1;
+	Wed, 18 Oct 2023 16:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kCJ1P+kR"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="HAyEtaWA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60AE63D3A9
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 16:34:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA4CC433C8;
-	Wed, 18 Oct 2023 16:34:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697646868;
-	bh=ZZXDxCp17+VfW9J5pkXtqffD6VUVgGD9+E3fbOncF+E=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=kCJ1P+kRGJc51olq/AknkDzgqmkPFf/K3g1R+lToDxApECI+7PNJ2YJLwYmdQeqrM
-	 45GKsxXaEv8GJuIVDnFo6kepn6OiW4IHWPw4GU3zsyQ7M4zpRPiIo24IJ/hZcxpILw
-	 UoUSYcLCdrLo3L5T190v53cDw2QdNc+ZJ7/TxQTapUeHiLEFKxb4iFqaEurWCbfCRw
-	 YoanTY4VmYW9psKH4MeUlqPvRD8iCwmYf9AfULLK9nfh/wNKaD+mEhPLzTubpUsJ+U
-	 dXAmiFFaxTLx13kwBTvZBpBfriBe8YCbQegRnmNpivY+Qi/6/hc5adKmCeyc53phlZ
-	 b7GOeaWWHoIuw==
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461393FB02
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 16:34:45 +0000 (UTC)
+Received: from smtp-190c.mail.infomaniak.ch (smtp-190c.mail.infomaniak.ch [185.125.25.12])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A432111
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 09:34:42 -0700 (PDT)
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4S9bzN6GprzMpnhB;
+	Wed, 18 Oct 2023 16:34:40 +0000 (UTC)
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4S9bzN2h3VzMpp9v;
+	Wed, 18 Oct 2023 18:34:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1697646880;
+	bh=CQUmmHiSErLby2lNEYPNY/t43aBfTRQam0pIROhUnrI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HAyEtaWARBhPTyUtyfN33vMCk9hST5LcmB8oBQu4G997Gl8hUQsPsuvk66cGBUkKS
+	 g2CDYUE8PAHS6U9iEsQk2VxJl4SGjJ8eJqNgRAofXIySb0ZHYrdCUFgWJZXU6jWKLA
+	 hpatlFElhV05pDDOKPwUsSsfZO8U1XSIh9/8ADEM=
+Date: Wed, 18 Oct 2023 18:34:38 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com
+Subject: Re: [PATCH v13 07/12] landlock: Refactor landlock_add_rule() syscall
+Message-ID: <20231018.quie0uuphieB@digikod.net>
+References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
+ <20231016015030.1684504-8-konstantin.meskhidze@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20231018085717.454931c3@hermes.local>
-References: <20231018154804.420823-1-atenart@kernel.org> <20231018085717.454931c3@hermes.local>
-Subject: Re: [RFC PATCH net-next 0/4] net-sysfs: remove rtnl_trylock/restart_syscall use
-From: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org, gregkh@linuxfoundation.org, mhocko@suse.com
-To: Stephen Hemminger <stephen@networkplumber.org>
-Date: Wed, 18 Oct 2023 18:34:26 +0200
-Message-ID: <169764686602.6041.3041045279733408955@kwain>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231016015030.1684504-8-konstantin.meskhidze@huawei.com>
+X-Infomaniak-Routing: alpha
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Quoting Stephen Hemminger (2023-10-18 17:57:17)
-> The trylock was introduced to deal with lock inversion.
-> It is not clear how this more complex solution prevents that.
+On Mon, Oct 16, 2023 at 09:50:25AM +0800, Konstantin Meskhidze wrote:
+> Change the landlock_add_rule() syscall to support new rule types
+> in future Landlock versions. Add the add_rule_path_beneath() helper
+> to support current filesystem rules.
+> 
+> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> Link: https://lore.kernel.org/r/20230920092641.832134-8-konstantin.meskhidze@huawei.com
+> Signed-off-by: Mickaël Salaün <mic@digikod.net>
+> ---
+> 
+> Changes since v12:
+> * None.
+> 
+> Changes since v11:
+> * None.
+> 
+> Changes since v10:
+> * None.
+> 
+> Changes since v9:
+> * Minor fixes:
+> 	- deletes unnecessary curly braces.
+> 	- deletes unnecessary empty line.
+> 
+> Changes since v8:
+> * Refactors commit message.
+> * Minor fixes.
+> 
+> Changes since v7:
+> * None
+> 
+> Changes since v6:
+> * None
+> 
+> Changes since v5:
+> * Refactors syscall landlock_add_rule() and add_rule_path_beneath() helper
+> to make argument check ordering consistent and get rid of partial revertings
+> in following patches.
+> * Rolls back refactoring base_test.c seltest.
+> * Formats code with clang-format-14.
+> 
+> Changes since v4:
+> * Refactors add_rule_path_beneath() and landlock_add_rule() functions
+> to optimize code usage.
+> * Refactors base_test.c seltest: adds LANDLOCK_RULE_PATH_BENEATH
+> rule type in landlock_add_rule() call.
+> 
+> Changes since v3:
+> * Split commit.
+> * Refactors landlock_add_rule syscall.
+> 
+> ---
+>  security/landlock/syscalls.c | 92 +++++++++++++++++++-----------------
+>  1 file changed, 48 insertions(+), 44 deletions(-)
+> 
+> diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
+> index d35cd5d304db..8a54e87dbb17 100644
+> --- a/security/landlock/syscalls.c
+> +++ b/security/landlock/syscalls.c
+> @@ -274,6 +274,47 @@ static int get_path_from_fd(const s32 fd, struct path *const path)
+>  	return err;
+>  }
+> 
+> +static int add_rule_path_beneath(struct landlock_ruleset *const ruleset,
+> +				 const void __user *const rule_attr)
+> +{
+> +	struct landlock_path_beneath_attr path_beneath_attr;
+> +	struct path path;
+> +	int res, err;
+> +	access_mask_t mask;
+> +
+> +	/* Copies raw user space buffer, only one type for now. */
+> +	res = copy_from_user(&path_beneath_attr, rule_attr,
+> +			     sizeof(path_beneath_attr));
+> +	if (res)
+> +		return -EFAULT;
+> +
+> +	/*
+> +	 * Informs about useless rule: empty allowed_access (i.e. deny rules)
+> +	 * are ignored in path walks.
+> +	 */
+> +	if (!path_beneath_attr.allowed_access)
+> +		return -ENOMSG;
+> +
+> +	/*
+> +	 * Checks that allowed_access matches the @ruleset constraints
+> +	 * (ruleset->access_masks[0] is automatically upgraded to 64-bits).
+> +	 */
 
-Anything specifically in the patch 1 comments is not clear that I can
-improve?
+You now can replace this comment block with that:
++	/* Checks that allowed_access matches the @ruleset constraints. */
 
-The dead lock happens between rtnl_lock and the refcounting on the
-attribute kn->active, specifically when unregistering net devices
-because device_del kernfs_drain will wait for the kn->active refcount to
-reach KN_DEACTIVATED_BIAS, under an rtnl section. The current solution
-was making one path to bail out (trylock/restart syscall).
-
-The idea here is we can actually bail out of the attribute kn protection
-(kn->active), while still letting unregistering net devices to wait for
-the current sysfs operations to complete, by using the net device
-refcount instead. To simplify, instead of waiting on kn->active in the
-net device unregistration step, this waits on the net device refcount
-(netdev_wait_allrefs_any), which is done outside an rtnl section. This
-way kernfs_drain can complete under its rtnl section even if a call to
-rtnl_lock is waiting in a sysfs operation.
-
-Antoine
+> +	mask = landlock_get_raw_fs_access_mask(ruleset, 0);
+> +	if ((path_beneath_attr.allowed_access | mask) != mask)
+> +		return -EINVAL;
+> +
+> +	/* Gets and checks the new rule. */
+> +	err = get_path_from_fd(path_beneath_attr.parent_fd, &path);
+> +	if (err)
+> +		return err;
+> +
+> +	/* Imports the new rule. */
+> +	err = landlock_append_fs_rule(ruleset, &path,
+> +				      path_beneath_attr.allowed_access);
+> +	path_put(&path);
+> +	return err;
+> +}
 
