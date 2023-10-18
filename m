@@ -1,159 +1,148 @@
-Return-Path: <netdev+bounces-42178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE5B87CD79B
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:14:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCCCB7CD7A2
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:16:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 777D6B21177
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:14:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C754B20F4A
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977F71773D;
-	Wed, 18 Oct 2023 09:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TVsm8+Pf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB49A1773B;
+	Wed, 18 Oct 2023 09:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F22156D8
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 09:14:04 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B0AF7
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 02:14:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697620442;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v98xBIyBJ/sPUC9GJh7rulg1/URL0/oOEeAw0GP7jZM=;
-	b=TVsm8+PfHyDpLfwLwscViiXDNfbaB35hnJiYucTtdfuRMRQPwn88lJ8BxPZLj/nDGpXn5x
-	098fcv78rioPIWHKUj/6DcP6LK9eIoNPlU7nOGdA9g2obCIwi1q5XeDtG14kzrjo4RFEUj
-	9e8zLAh/GY3ujZbvUDoeQo7pUpRVTHU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-581-BijvCVjNO7a9BDRJjLc6cg-1; Wed, 18 Oct 2023 05:13:51 -0400
-X-MC-Unique: BijvCVjNO7a9BDRJjLc6cg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9b9ecd8c351so463049766b.1
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 02:13:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27EA2134BF
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 09:15:52 +0000 (UTC)
+Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79DBBFE
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 02:15:50 -0700 (PDT)
+Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-1e9bc53c828so8276031fac.1
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 02:15:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697620430; x=1698225230;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v98xBIyBJ/sPUC9GJh7rulg1/URL0/oOEeAw0GP7jZM=;
-        b=HlPt0Xk+1th5lYJWg5FnSEciebWIiqWxWKWfkIb+4G2lW4TPPX6ChJzsKpd2XXMhPD
-         CjlkAbqN6gImKen6zKHEqZFOH5hRxgYimMFn3i/Uun7jxAR9Hy0D2oDMQIyp+cGyb5S4
-         hoIfUupAYK1e1uoyxLaop3k8XLKgUhAHVDi5Nv37R4pH5mF0Z+Kn4/HH0zwAt/4ZLZii
-         mAmyRGepQnlQwlAXHKUjgQIZglHov9Sb5OjvR9lfeu5pjX9CopiFxmI+8woCgVXzPVRB
-         vRe+ab/C9xeRKKRVR7cHX7HyZAUVSmfQOHzHkAKAPx1rFaSLziwEcPdTgbT1kQksPnEK
-         wbsA==
-X-Gm-Message-State: AOJu0Yzjlz8RybaYUndGWIefQGjeDTtuBYXr7Wg4dTP3ScjU/ZDwrzyJ
-	B4fGGRIbC0KNQfS1QOAPl8octxFOAlB8oS1mPTYiCixrd1wuK5aSUEsQAs9aGVrTgT4JFUZgeeC
-	SXvRgykBIMIZMWQV7
-X-Received: by 2002:a17:907:72d0:b0:9a9:ef41:e5c7 with SMTP id du16-20020a17090772d000b009a9ef41e5c7mr3845027ejc.8.1697620430382;
-        Wed, 18 Oct 2023 02:13:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH+QMli7NKSSKCArCyKPit9urwbgTh0jXYZj5BcmUsdRcVCgnT75EXLlIW5G/G2XZ6Kd+BSHQ==
-X-Received: by 2002:a17:907:72d0:b0:9a9:ef41:e5c7 with SMTP id du16-20020a17090772d000b009a9ef41e5c7mr3845014ejc.8.1697620430054;
-        Wed, 18 Oct 2023 02:13:50 -0700 (PDT)
-Received: from redhat.com ([193.142.201.38])
-        by smtp.gmail.com with ESMTPSA id l26-20020a1709061c5a00b009adcb6c0f0esm1233352ejg.193.2023.10.18.02.13.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 02:13:49 -0700 (PDT)
-Date: Wed, 18 Oct 2023 05:13:44 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH vhost 02/22] virtio_ring: introduce
- virtqueue_dma_[un]map_page_attrs
-Message-ID: <20231018051201-mutt-send-email-mst@kernel.org>
-References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
- <20231011092728.105904-3-xuanzhuo@linux.alibaba.com>
- <1697615580.6880193-1-xuanzhuo@linux.alibaba.com>
- <20231018035751-mutt-send-email-mst@kernel.org>
- <1697616022.630633-2-xuanzhuo@linux.alibaba.com>
- <20231018044204-mutt-send-email-mst@kernel.org>
- <1697619441.5367694-3-xuanzhuo@linux.alibaba.com>
+        d=1e100.net; s=20230601; t=1697620550; x=1698225350;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rnf7mxU5ljq5PJpqjMzySXNNyUScoKkMxLEuUfdA8+0=;
+        b=ezm8zWO/oaNqG7pqUcRMW+WwY1MSy1M7jGvxWD9360vEg08awQy09tNpqCgBLV818J
+         DYML6mtqIcEsySA7h13b+5bDvkzEzNgaXp3ddA6WOsExWqe54zACuRkzyr3lodDIZl9Q
+         Adn9vf2rwmL0VcAj+dNgZWqh5Sens0n6HpOSj6pViUHC2qU4IBzY2UKyyoeOOqaYBqEY
+         Gv42JYvhani9OCSEZap88wKE9RURvEef+p7+TbY9D5ZYAZxDYxLgqykrv2+EOQdBkp6V
+         vPN/lvFHYKhHw+NAoidXgOUznof6IhoHC7ULciu+yFUVcOOJNoWhubzedxrJW2ox8HKG
+         9KHA==
+X-Gm-Message-State: AOJu0Yy2/Cqa3fBRCAB1IDzY1HwtzqXcccR2Ha9Jn8le6AJZFnFfLaKo
+	m+QKbnLeIkwfRmCrWzkcnGJIoW+1t057FKCkfKqxIlOQTA/g
+X-Google-Smtp-Source: AGHT+IEVyOpzK0ciUkUl8pn15LkIrJ8+nZaZyVv+YpJTW6P3ZFsyCiCzeN+C9hCwesLkD1y4lMba0bHLzEuoXGWcYMP7LQdzCAk6
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1697619441.5367694-3-xuanzhuo@linux.alibaba.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Received: by 2002:a05:6870:6586:b0:1e1:2f43:1dc6 with SMTP id
+ fp6-20020a056870658600b001e12f431dc6mr2262117oab.1.1697620549825; Wed, 18 Oct
+ 2023 02:15:49 -0700 (PDT)
+Date: Wed, 18 Oct 2023 02:15:49 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d5fbc80607fa152b@google.com>
+Subject: [syzbot] [rds?] KCSAN: data-race in rds_sendmsg / rds_sendmsg
+From: syzbot <syzbot+00563755980a79a575f6@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, rds-devel@oss.oracle.com, 
+	santosh.shilimkar@oracle.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_DIGITS,
+	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 18, 2023 at 04:57:21PM +0800, Xuan Zhuo wrote:
-> On Wed, 18 Oct 2023 04:44:24 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > On Wed, Oct 18, 2023 at 04:00:22PM +0800, Xuan Zhuo wrote:
-> > > On Wed, 18 Oct 2023 03:59:03 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > On Wed, Oct 18, 2023 at 03:53:00PM +0800, Xuan Zhuo wrote:
-> > > > > Hi Michael,
-> > > > >
-> > > > > Do you think it's appropriate to push the first two patches of this patch set to
-> > > > > linux 6.6?
-> > > > >
-> > > > > Thanks.
-> > > >
-> > > > I generally treat patchsets as a whole unless someone asks me to do
-> > > > otherwise. Why do you want this?
-> > >
-> > > As we discussed, the patch set supporting AF_XDP will be push to net-next.
-> > > But the two patchs belong to the vhost.
-> > >
-> > > So, if you think that is appropriate, I will post a new patchset(include the two
-> > > patchs without virtio-net + AF_XDP) to vhost. I wish that can be merged to 6.6.
-> >
-> > Oh wait 6.6? Too late really, merge window has been closed for weeks.
-> 
-> I mean as a fix. So I ask you do you think it is appropriate?
+Hello,
 
-Sure if there's a bugfix please post is separately - what issues do
-these two patches fix? this is the part I'm missing. Especially patch 2
-which just adds a new API.
+syzbot found the following issue on:
 
-> >
-> > > Then when the 6.7 net-next merge window is open, I can push this patch set to 6.7.
-> > > The v1 version use the virtqueue_dma_map_single_attrs to replace
-> > > virtqueue_dma_map_page_attrs. But I think we should use virtqueue_dma_map_page_attrs.
-> > >
-> > > Thanks.
-> > >
-> >
-> > Get a complete working patchset that causes no regressions posted first please
-> > then we will discuss merge strategy.
-> > I would maybe just put everything in one file for now, easier to merge,
-> > refactor later when it's all upstream. But up to you.
-> 
-> OK. I will get a working patchset firstly.
-> 
-> Thanks.
-> 
-> >
-> >
-> > > >
-> > > > --
-> > > > MST
-> > > >
-> >
+HEAD commit:    401644852d0b Merge tag 'fs_for_v6.6-rc6' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10bbf9ce680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=70d8e328e7a4e377
+dashboard link: https://syzkaller.appspot.com/bug?extid=00563755980a79a575f6
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/32193fa290fa/disk-40164485.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/45596bbf452b/vmlinux-40164485.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/930999dd8dfc/bzImage-40164485.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+00563755980a79a575f6@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KCSAN: data-race in rds_sendmsg / rds_sendmsg
+
+write to 0xffff8881039110f8 of 8 bytes by task 15969 on cpu 0:
+ rds_sendmsg+0xbc6/0x1410 net/rds/send.c:1304
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x37c/0x4d0 net/socket.c:2558
+ ___sys_sendmsg net/socket.c:2612 [inline]
+ __sys_sendmsg+0x1e9/0x270 net/socket.c:2641
+ __do_sys_sendmsg net/socket.c:2650 [inline]
+ __se_sys_sendmsg net/socket.c:2648 [inline]
+ __x64_sys_sendmsg+0x46/0x50 net/socket.c:2648
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+read to 0xffff8881039110f8 of 8 bytes by task 15973 on cpu 1:
+ rds_sendmsg+0xa51/0x1410 net/rds/send.c:1291
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x37c/0x4d0 net/socket.c:2558
+ ___sys_sendmsg net/socket.c:2612 [inline]
+ __sys_sendmsg+0x1e9/0x270 net/socket.c:2641
+ __do_sys_sendmsg net/socket.c:2650 [inline]
+ __se_sys_sendmsg net/socket.c:2648 [inline]
+ __x64_sys_sendmsg+0x46/0x50 net/socket.c:2648
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+value changed: 0x0000000000000000 -> 0xffff888137df17e8
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 1 PID: 15973 Comm: syz-executor.0 Not tainted 6.6.0-rc5-syzkaller-00072-g401644852d0b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
