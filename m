@@ -1,95 +1,86 @@
-Return-Path: <netdev+bounces-42078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD1667CD159
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 02:34:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0FD87CD16C
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 02:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75A9C280FE3
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 00:34:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 173FE28146E
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 00:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B18D8F44;
-	Wed, 18 Oct 2023 00:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3F1193;
+	Wed, 18 Oct 2023 00:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sczVb/vv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fLGJs1jl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C288F41;
-	Wed, 18 Oct 2023 00:34:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C75D7C433C7;
-	Wed, 18 Oct 2023 00:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA94630
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 00:40:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A18B5C433C9;
+	Wed, 18 Oct 2023 00:40:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697589290;
-	bh=s4c03elfdERBy4zrtDjx6kCMTKW/KWYHfHp4XQimaus=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sczVb/vvpGtFXEO6D/aIRYs6n+ceGsHSEAVInJOS4taE/yqBzcR7cEMIqfeEVMzdM
-	 Jgxk85NBx9FHN/Rac39XbEFHtqeXPl7CJ/T5L1Nck9hjW9I4goczq3S+81K6XN/XS/
-	 cMqi0l/3qiDUf4UbOedAOOwY6Amm9U/Uvma2dzr0Q5RZPnPCwo6qomMiloQB7EzWMg
-	 +M9ipIhle6TQmYJJ8rt5Gccm3F6Mz0InbfExeduA0vZiVd2ff7jlwPyP/q5JBAbA+T
-	 AvypWJ1+EklpA2wbdzRXaIzVj/+P+S7VBcos/cnI9wsZal3ZUNex4+vKiNk1Q8ci3Z
-	 T8QBNTWEKNIcA==
-Date: Tue, 17 Oct 2023 17:34:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, corbet@lwn.net,
- jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- vladimir.oltean@nxp.com, andrew@lunn.ch, horms@kernel.org,
- mkubecek@suse.cz, willemdebruijn.kernel@gmail.com,
- linux-doc@vger.kernel.org, Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: Re: [PATCH net-next v4 1/6] net: ethtool: allow symmetric-xor RSS
- hash for any flow type
-Message-ID: <20231017173448.3f1c35aa@kernel.org>
-In-Reply-To: <CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
-References: <20231016154937.41224-1-ahmed.zaki@intel.com>
-	<20231016154937.41224-2-ahmed.zaki@intel.com>
-	<8d1b1494cfd733530be887806385cde70e077ed1.camel@gmail.com>
-	<26812a57-bdd8-4a39-8dd2-b0ebcfd1073e@intel.com>
-	<CAKgT0Ud7JjUiE32jJbMbBGVexrndSCepG54PcGYWHJ+OC9pOtQ@mail.gmail.com>
-	<14feb89d-7b4a-40c5-8983-5ef331953224@intel.com>
-	<CAKgT0UfcT5cEDRBzCxU9UrQzbBEgFt89vJZjz8Tow=yAfEYERw@mail.gmail.com>
-	<20231016163059.23799429@kernel.org>
-	<CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
-	<20231017131727.78e96449@kernel.org>
-	<CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
+	s=k20201202; t=1697589622;
+	bh=oSQbRF4OP4QhhdUhVVIYIq7V/k8xhzaHn6bU0DsDZnY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fLGJs1jl4LRgfIV4pJ6LCmRSJWrKul1B7VItLK6s0rWMPTrQqebf4VzfU+zZWBkoT
+	 7IW+cdOSvs47HP/T8mI8kCLfQDD6KV2pR2RSfy4pF9fG07vOglsS+SO3RFqGTmE5vg
+	 CLCKv6NglE80WyUtTyNZnQ/Qe1m9I7ZPuafDcdhXKOOYaDf4SXzJJ4qowaeENGgXKY
+	 /0HzP+pAMtjPmDXQJ1OgxGlW3tqeqlowlWF99OeZ/jHLcoaGmrX0Oi0X8u4b8auvOq
+	 dYZLbTPJDsdTDFLmFzKEiXND0qEHo/XpmuBTwzaM28MlfTtF36gHTZ+wZs4jJTXHNQ
+	 GapvZmQPpHbiA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 87233C04E24;
+	Wed, 18 Oct 2023 00:40:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] tcp: fix excessive TLP and RACK timeouts from HZ rounding
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169758962254.9987.492571478078988197.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Oct 2023 00:40:22 +0000
+References: <20231015174700.2206872-1-ncardwell.sw@gmail.com>
+In-Reply-To: <20231015174700.2206872-1-ncardwell.sw@gmail.com>
+To: Neal Cardwell <ncardwell.sw@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ netdev@vger.kernel.org, ncardwell@google.com, ycheng@google.com
 
-On Tue, 17 Oct 2023 13:41:18 -0700 Alexander Duyck wrote:
-> I am thinking of this from a software engineering perspective. This
-> symmetric-xor aka simplified-toeplitz is actually much cheaper to
-> implement in software than the original. As such I would want it to be
-> considered a separate algorithm as I could make use of something like
-> that when having to implement RSS in QEMU for instance.
+Hello:
 
-That's exactly why XOR and CRC32 _algorithms_ already exist.
-CPUs have instructions to do them word at a time. 
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-	ETH_RSS_HASH_TOP_BIT, /* Configurable RSS hash function -
-	Toeplitz */
-	ETH_RSS_HASH_XOR_BIT, /* Configurable RSS hash function - Xor */
-	ETH_RSS_HASH_CRC32_BIT, /* Configurable RSS hash function - Crc32 */
+On Sun, 15 Oct 2023 13:47:00 -0400 you wrote:
+> From: Neal Cardwell <ncardwell@google.com>
+> 
+> We discovered from packet traces of slow loss recovery on kernels with
+> the default HZ=250 setting (and min_rtt < 1ms) that after reordering,
+> when receiving a SACKed sequence range, the RACK reordering timer was
+> firing after about 16ms rather than the desired value of roughly
+> min_rtt/4 + 2ms. The problem is largely due to the RACK reorder timer
+> calculation adding in TCP_TIMEOUT_MIN, which is 2 jiffies. On kernels
+> with HZ=250, this is 2*4ms = 8ms. The TLP timer calculation has the
+> exact same issue.
+> 
+> [...]
 
-If efficient SW implementation is important why do some weird
-bastardized para-toeplitz and not crc32? Hashes fairly well
-from what I recall with the older NFPs. x86 has an instruction
-for it, IIRC it was part of SSE but on normal registers.
+Here is the summary with links:
+  - [net] tcp: fix excessive TLP and RACK timeouts from HZ rounding
+    https://git.kernel.org/netdev/net/c/1c2709cfff1d
 
-> Based on earlier comments it doesn't change the inputs, it just
-> changes how I have to handle the data and the key. It starts reducing
-> things down to something like the Intel implementation of Flow
-> Director in terms of how the key gets generated and hashed.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-About Flow Director I know only that it is bad :)
+
 
