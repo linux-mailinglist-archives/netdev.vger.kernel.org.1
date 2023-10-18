@@ -1,111 +1,96 @@
-Return-Path: <netdev+bounces-42221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC9A57CDB2A
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:01:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3E27CDB86
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74179B20E64
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:01:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C518B213A0
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F9C335B1;
-	Wed, 18 Oct 2023 12:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 791781DDFC;
+	Wed, 18 Oct 2023 12:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F2C15AD7;
-	Wed, 18 Oct 2023 12:01:44 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00A0295;
-	Wed, 18 Oct 2023 05:01:42 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 39IC14goC1519562, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.93/5.92) with ESMTPS id 39IC14goC1519562
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 18 Oct 2023 20:01:04 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5DC2E63E
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 12:26:04 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B83C998;
+	Wed, 18 Oct 2023 05:26:02 -0700 (PDT)
+Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.54])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4S9VPJ6ZLSz15NZL;
+	Wed, 18 Oct 2023 20:23:16 +0800 (CST)
+Received: from [192.168.98.231] (10.67.165.2) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Wed, 18 Oct 2023 20:01:04 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Wed, 18 Oct 2023 20:01:02 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
- RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
- 15.01.2375.007; Wed, 18 Oct 2023 20:01:02 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Grant Grundler <grundler@chromium.org>,
-        Doug Anderson
-	<dianders@chromium.org>
-CC: Jakub Kicinski <kuba@kernel.org>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Simon Horman
-	<horms@kernel.org>, Edward Hill <ecgh@chromium.org>,
-        Laura Nao
-	<laura.nao@collabora.com>,
-        "linux-usb@vger.kernel.org"
-	<linux-usb@vger.kernel.org>,
-        =?utf-8?B?QmrDuHJuIE1vcms=?= <bjorn@mork.no>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH v3 5/5] r8152: Block future register access if register access fails
-Thread-Topic: [PATCH v3 5/5] r8152: Block future register access if register
- access fails
-Thread-Index: AQHZ/UKPr2uppqw2y0WH24Vf4SC1orBMGX/AgAAGioCAAVSUAIAAE/SAgABIyACAAMBiAIAA3Ynw
-Date: Wed, 18 Oct 2023 12:01:02 +0000
-Message-ID: <a6f10400c04d48fbaa419310c0ae71de@realtek.com>
-References: <20231012192552.3900360-1-dianders@chromium.org>
- <20231012122458.v3.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
- <29f9a2ff1979406489213909b940184f@realtek.com>
- <CAD=FV=U4rGozXHoK8+ejPgRtyoACy1971ftoatQivqzk2tk5ng@mail.gmail.com>
- <052401da00fa$dacccd90$906668b0$@realtek.com>
- <CAD=FV=XQswgKZh-JQ6PuKGRmrDMfDmZwM+MUpAcOk1=7Ppjyiw@mail.gmail.com>
- <CAD=FV=Vp_KE_hjWy7bKJbvmqwCQ67jhzfFoV368vB5ZGge=Yzw@mail.gmail.com>
- <CANEJEGuEdGUAUufEHBfxbo_thXbgr8gMFVBaa+pCV_axWO=NGQ@mail.gmail.com>
-In-Reply-To: <CANEJEGuEdGUAUufEHBfxbo_thXbgr8gMFVBaa+pCV_axWO=NGQ@mail.gmail.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ 15.1.2507.31; Wed, 18 Oct 2023 20:25:59 +0800
+Message-ID: <f256ba6b-b0e7-333a-10a7-57b73892d626@huawei.com>
+Date: Wed, 18 Oct 2023 20:25:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <shenjian15@huawei.com>,
+	<wangjie125@huawei.com>, <liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>,
+	<netdev@vger.kernel.org>, <stable@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net 5/6] net: hns3: fix wrong print link down up
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20230728075840.4022760-1-shaojijie@huawei.com>
+ <20230728075840.4022760-6-shaojijie@huawei.com>
+ <7ce32389-550b-4beb-82b1-1b6183fdeabb@lunn.ch>
+ <2c6514a7-db97-f345-9bc4-affd4eba2dda@huawei.com>
+ <73b41fe2-12dd-4fc0-a44d-f6f94e6541fc@lunn.ch>
+ <ef5489f9-43b4-ee59-699b-3f54a30c00aa@huawei.com>
+ <e7219114-774f-49d0-8985-8875fd351b60@lunn.ch>
+ <a21beff2-9f38-d354-6049-aed20c18c8d4@huawei.com>
+ <150d8d95-a6cd-dc28-618b-6cc5295b4bf9@huawei.com>
+ <06cd6f53-e0af-4bdf-a684-68fc55b9b436@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <06cd6f53-e0af-4bdf-a684-68fc55b9b436@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.165.2]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-R3JhbnQgR3J1bmRsZXIgPGdydW5kbGVyQGNocm9taXVtLm9yZz4NCj4gU2VudDogV2VkbmVzZGF5
-LCBPY3RvYmVyIDE4LCAyMDIzIDI6MDYgUE0NClsuLi5dDQo+IEhheWVzLA0KPiBBcyBEb3VnIHBv
-aW50cyBvdXQgdGhlIHByb2JhYmlsaXR5IGlzIHJlYWxseSBsb3cgb2YgdGhpcyBoYXBwZW5pbmcg
-Zm9yDQo+IGFuIGV2ZW50IHRoYXQgaXMgYWxyZWFkeSByYXJlLiBEb3VnJ3MgcGF0Y2ggaXMgYSB2
-ZXJ5IGdvb2Qgc3RlcCBpbiB0aGUNCj4gcmlnaHQgZGlyZWN0aW9uIChkcml2ZXIgcm9idXN0bmVz
-cykgYW5kIEkgdGhpbmsgaGFzIGJlZW4gdGVzdGVkIGJ5DQo+IENocm9taXVtIE9TIHRlYW0gZW5v
-dWdoIHRoYXQgaXQgaXMgc2FmZSB0byBhcHBseSB0byB0aGUgdXBzdHJlYW0gdHJlZS4NCj4gSSdt
-IGEgYmlnIGZhbiBvZiB0YWtpbmcgc21hbGwgc3RlcHMgd2hlcmUgd2UgY2FuLiBXZSBjYW4gZnVy
-dGhlcg0KPiBpbXByb3ZlIG9uIHRoaXMgaW4gdGhlIGZ1dHVyZSBhcyBuZWVkZWQuDQoNCkkgZG9u
-J3QgcmVqZWN0IHRoZSBwYXRjaC4gQW5kLCBJIGRvbid0IGhhdmUgdGhlIHJpZ2h0IHRvIHJlamVj
-dCBvciBhcHBseSB0aGUgcGF0Y2guDQpJIGp1c3QgZG9uJ3Qgd2lzaCB0aGUgcGF0Y2ggdG8gdHJv
-dWJsZSB0aGUgb3RoZXJzLiBBbmQsIEkgbmVlZCB0aGUgcHJvZmVzc2lvbmFsDQpwZW9wbGUgdG8g
-Y2hlY2sgbWUgdmlld3MsIHRvby4NCg0KSSB0aGluayBzb21lb25lIHdvdWxkIGRldGVybWluZSB3
-aGV0aGVyIHRoZSBwYXRjaCBjb3VsZCBiZSBhcHBsaWVkLCBvciBub3QuDQoNCkJlc3QgUmVnYXJk
-cywNCkhheWVzDQoNCj4gUGxlYXNlIGFkZDoNCj4gUmV2aWV3ZWQtYnk6IEdyYW50IEdydW5kbGVy
-IDxncnVuZGxlckBjaHJvbWl1bS5vcmc+DQo+IA0KPiBjaGVlcnMsDQo+IGdyYW50DQo+IA0KPiA+
-DQo+ID4gLURvdWcNCg==
+
+on 2023/10/17 21:59, Andrew Lunn wrote
+> I still think this is totally valid and correct.
+>
+> When you turn auto-neg off the link partner is going to react to that,
+> it might drop the link. After a while, the link partner will give up
+> trying to perform auto-neg and might fall back to 10/Half. At which
+> point, the link might allow traffic flow. However, in this example,
+> you have a duplex mis-match, so it might not work correctly.
+>
+> Turning off auto-neg is something you need to do at both ends, and you
+> need to then force both ends to the same settings. Link down is
+> expected. I would actually be suppressed if no link down events were
+> reported.
+>
+> 	Andrew
+
+Hi Andrew,
+Thank you for your comments, we are re-evaluating this issue and may drop this patch.
+
+Regards
+Jijie
+
 
