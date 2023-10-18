@@ -1,144 +1,117 @@
-Return-Path: <netdev+bounces-42135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0CCC7CD545
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:10:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDE7A7CD55F
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:13:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C67251C20C5D
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:10:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 790E3281B83
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C5310A36;
-	Wed, 18 Oct 2023 07:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B181810A3C;
+	Wed, 18 Oct 2023 07:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="lhX/3hmu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73963CA74
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 07:10:32 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F08C6
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 00:10:29 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qt0h1-0007Yu-S9; Wed, 18 Oct 2023 09:10:11 +0200
-Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qt0gz-002V9d-4t; Wed, 18 Oct 2023 09:10:09 +0200
-Received: from localhost ([::1] helo=dude03.red.stw.pengutronix.de)
-	by dude03.red.stw.pengutronix.de with esmtp (Exim 4.96)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qt0gz-003JoA-09;
-	Wed, 18 Oct 2023 09:10:09 +0200
-From: Johannes Zink <j.zink@pengutronix.de>
-Date: Wed, 18 Oct 2023 09:09:57 +0200
-Subject: [PATCH net-next v2 5/5] net: stmmac: do not silently change
- auxiliary snapshot capture channel
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876487495
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 07:13:31 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 242E0B6;
+	Wed, 18 Oct 2023 00:13:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=wG/jppn5wAJbUG660quwsOFgGaPB3YrezpAQFZpUfiA=; t=1697613209; x=1698822809; 
+	b=lhX/3hmuj9Uw6dzXBt46J5RBIMT4W4astAvVA031vLoUwpZ/7/NLyGHSqgFHRcRpL9N23+w5qt/
+	36xan8ipCBYKjg+6Yngg1xh2y9Bb8WdpuARoLD6PsFcblx2szbAatFMrmP3SkEDg3uoIIrrl7CQ5X
+	FOePEXMMWjcmjwP4CIux+ukByKP6+LNbwHZ+nVmG0MG3M2jgYScPsjDofie9HZGRsF1T4pDYnowU4
+	0X6sxc/lsDh2gAUu2+T0A/YOC2stNBaX3In0O/5s32t+ib9GBWbbykH6xNqndBPts4hwaOeCKFEcd
+	C5ClzejSt/OIitsfjU35PKNxTSrqMJ0Jx6ow==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97-RC1)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qt0kA-0000000Bb5i-1dSB;
+	Wed, 18 Oct 2023 09:13:26 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: pull-request: wireless-2023-10-18
+Date: Wed, 18 Oct 2023 09:10:42 +0200
+Message-ID: <20231018071041.8175-2-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231010-stmmac_fix_auxiliary_event_capture-v2-5-51d5f56542d7@pengutronix.de>
-References: <20231010-stmmac_fix_auxiliary_event_capture-v2-0-51d5f56542d7@pengutronix.de>
-In-Reply-To: <20231010-stmmac_fix_auxiliary_event_capture-v2-0-51d5f56542d7@pengutronix.de>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Kurt Kanzenbach <kurt@linutronix.de>
-Cc: patchwork-jzi@pengutronix.de, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kernel@pengutronix.de, vee.khee.wong@linux.intel.com, tee.min.tan@intel.com, 
- rmk+kernel@armlinux.org.uk, bartosz.golaszewski@linaro.org, 
- ahalaney@redhat.com, horms@kernel.org, 
- Johannes Zink <j.zink@pengutronix.de>
-X-Mailer: b4 0.12.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: j.zink@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Even though the hardware theoretically supports up to 4 simultaneous
-auxiliary snapshot capture channels, the stmmac driver does support only
-a single channel to be active at a time.
+Hi,
 
-Previously in case of a PTP_CLK_REQ_EXTTS request, previously active
-auxiliary snapshot capture channels were silently dropped and the new
-channel was activated.
+So we have a couple more fixes, all in the stack this time.
 
-Instead of silently changing the state for all consumers, log an error
-and return -EBUSY if a channel is already in use in order to signal to
-userspace to disable the currently active channel before enabling another one.
+Unfortunately, one of them is for an issue I noticed during
+the merge between wireless and wireless-next last time, and
+while it was already resolved in wireless-next, the issue
+also existed in wireless; as a result, this causes a merge
+conflict again when merging wireless and wireless-next (or
+obviously net/net-next after pulling this in, etc.). This is
+(pretty easily) resolved by taking the version without the
+lock, as the lock doesn't exist any more in -next.
 
-Signed-off-by: Johannes Zink <j.zink@pengutronix.de>
+Please pull and let us know if there's any problem.
 
----
+Thanks,
+johannes
 
-Changelog:
 
-v1 -> v2: no changes
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-index 6b639b62f778..bffa5c017032 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-@@ -191,11 +191,23 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
- 					     priv->systime_flags);
- 		write_unlock_irqrestore(&priv->ptp_lock, flags);
- 		break;
--	case PTP_CLK_REQ_EXTTS:
-+	case PTP_CLK_REQ_EXTTS: {
-+		u8 channel;
-+
- 		mutex_lock(&priv->aux_ts_lock);
- 		acr_value = readl(ptpaddr + PTP_ACR);
-+		channel = ilog2(FIELD_GET(PTP_ACR_MASK, acr_value));
- 		acr_value &= ~PTP_ACR_MASK;
-+
- 		if (on) {
-+			if (FIELD_GET(PTP_ACR_MASK, acr_value)) {
-+				netdev_err(priv->dev,
-+					   "Cannot enable auxiliary snapshot %d as auxiliary snapshot %d is already enabled",
-+					rq->extts.index, channel);
-+				mutex_unlock(&priv->aux_ts_lock);
-+				return -EBUSY;
-+			}
-+
- 			priv->plat->flags |= STMMAC_FLAG_EXT_SNAPSHOT_EN;
- 
- 			/* Enable External snapshot trigger */
-@@ -213,6 +225,7 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
- 					 !(acr_value & PTP_ACR_ATSFC),
- 					 10, 10000);
- 		break;
-+	}
- 
- 	default:
- 		break;
+The following changes since commit f291209eca5eba0b4704fa0832af57b12dbc1a02:
 
--- 
-2.39.2
+  Merge tag 'net-6.6-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-10-05 11:29:21 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2023-10-18
+
+for you to fetch changes up to f2ac54ebf85615a6d78f5eb213a8bbeeb17ebe5d:
+
+  net: rfkill: reduce data->mtx scope in rfkill_fop_open (2023-10-11 16:55:10 +0200)
+
+----------------------------------------------------------------
+A few more fixes:
+ * prevent value bounce/glitch in rfkill GPIO probe
+ * fix lockdep report in rfkill
+ * fix error path leak in mac80211 key handling
+ * use system_unbound_wq for wiphy work since it
+   can take longer
+
+----------------------------------------------------------------
+Johannes Berg (3):
+      wifi: cfg80211: use system_unbound_wq for wiphy work
+      wifi: mac80211: fix error path key leak
+      net: rfkill: reduce data->mtx scope in rfkill_fop_open
+
+Josua Mayer (1):
+      net: rfkill: gpio: prevent value glitch during probe
+
+ net/mac80211/key.c       | 3 +--
+ net/rfkill/core.c        | 5 ++---
+ net/rfkill/rfkill-gpio.c | 4 ++--
+ net/wireless/core.c      | 2 +-
+ 4 files changed, 6 insertions(+), 8 deletions(-)
 
 
