@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-42304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0F1B7CE242
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:09:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B39E7CE25F
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:11:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D07091C20A81
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:09:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE272B20E41
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:11:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174C03C069;
-	Wed, 18 Oct 2023 16:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AEFD3C06B;
+	Wed, 18 Oct 2023 16:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xu0yRV8x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NUYLIsGy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9AD37151
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 16:09:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12435C433C7;
-	Wed, 18 Oct 2023 16:08:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381A53C067
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 16:11:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CDD5C433C7;
+	Wed, 18 Oct 2023 16:10:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697645342;
-	bh=4MR7iDZ+ixMX3Hkqy8fTKzN7HrpxuhyU6baJRTI8kUg=;
+	s=k20201202; t=1697645462;
+	bh=yDdmQ0V9wvojaQKv5dZ7J8a15nZOMdq7QItSFt0CGnU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Xu0yRV8xDJ2jramzFaTKjJu286TbqXgRtm6Fnu6t/XIWQN67j4ZKJzisW2q9Xc+43
-	 aJP9Clv7ivguDYTQHxjOOg/UJX5LkCg35QqWSOk1mRuBGg4Ce8MxOKRICXSTUxQrFD
-	 Z40rGO35IXupws5F9Y5gw5++KTerH/+BA213yF1MxOmm8HnglybT/1Mp2CJQeC2Ox6
-	 /K6wEwD7y/RXAUVJvasd/7I7i5569LnWUiB7OBB9nj2O8wtl16qcrf6WQnu7LHd/8r
-	 KCUYy6pEUiOMQx3fr0Dj+JxVLpZsI9C8CU2Ai/yYzsrCpleBTM3FBS+0Kf8RtHn68Q
-	 +JZA55NQnJxww==
-Date: Wed, 18 Oct 2023 18:08:55 +0200
+	b=NUYLIsGy9I5+Z1057HBBPPERkRSfihNd9Jnqdd/Z2PVzwdx9SgBmx+28ScsxQnKVd
+	 EefQEji/0T7rWRsI9Z6xX3abBEBbYZDOwKOqwfxGPrfrm/nfkRZEdExYq6tNZo19D3
+	 v3/kQ4U0RdMaRgXVhSEd7QvzIkwEQrpe4ABwTqpKt5Lu3WDYysPlzO7QFK5iKl7H5J
+	 TISUG5h0Cu2GrLhQIUNBDbLwlpU+Ec/MwLLhiargMfuqCptfLYZZV6VR8rzH7TKC7T
+	 d2SPz9PK/I62E8OviKsMY+MNF3kf9aAy/iiT/mnISKvtpzH9qVZg4ZxOgevlHqMzpA
+	 ckVXH7gi6ImnQ==
+Date: Wed, 18 Oct 2023 18:10:55 +0200
 From: Simon Horman <horms@kernel.org>
 To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
@@ -58,13 +58,12 @@ Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
 	Subbaraya Sundeep <sbhatta@marvell.com>,
 	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>,
-	Leon Romanovsky <leon@kernel.org>, linux-kernel@vger.kernel.org,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: Re: [PATCH net-next v2 08/11] net/mlx5: devlink health: use retained
- error fmsg API
-Message-ID: <20231018160855.GT1940501@kernel.org>
+	Leon Romanovsky <leon@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 11/11] devlink: convert most of
+ devlink_fmsg_*() to return void
+Message-ID: <20231018161055.GU1940501@kernel.org>
 References: <20231017105341.415466-1-przemyslaw.kitszel@intel.com>
- <20231017105341.415466-9-przemyslaw.kitszel@intel.com>
+ <20231017105341.415466-12-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,55 +72,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231017105341.415466-9-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20231017105341.415466-12-przemyslaw.kitszel@intel.com>
 
-On Tue, Oct 17, 2023 at 12:53:38PM +0200, Przemek Kitszel wrote:
-> Drop unneeded error checking.
-> 
-> devlink_fmsg_*() family of functions is now retaining errors,
-> so there is no need to check for them after each call.
-> 
-> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+On Tue, Oct 17, 2023 at 12:53:41PM +0200, Przemek Kitszel wrote:
 
 ...
 
-> @@ -288,52 +206,31 @@ int mlx5e_health_rsc_fmsg_dump(struct mlx5e_priv *priv, struct mlx5_rsc_key *key
+> diff --git a/net/devlink/health.c b/net/devlink/health.c
+> index 3858a436598e..f4a6de576b6c 100644
+> --- a/net/devlink/health.c
+> +++ b/net/devlink/health.c
+> @@ -566,17 +566,15 @@ static int devlink_health_do_dump(struct devlink_health_reporter *reporter,
+>  	if (!reporter->dump_fmsg)
+>  		return -ENOMEM;
+>  
+> -	err = devlink_fmsg_obj_nest_start(reporter->dump_fmsg);
+> -	if (err)
+> -		goto dump_err;
+> +	devlink_fmsg_obj_nest_start(reporter->dump_fmsg);
+>  
+>  	err = reporter->ops->dump(reporter, reporter->dump_fmsg,
+>  				  priv_ctx, extack);
+>  	if (err)
+>  		goto dump_err;
+>  
+> -	err = devlink_fmsg_obj_nest_end(reporter->dump_fmsg);
+> -	if (err)
+> +	devlink_fmsg_obj_nest_end(reporter->dump_fmsg);
+> +	if (reporter->dump_fmsg->err)
 
 Hi Przemek,
 
-The code above this hunk looks like this:
+Smatch warns that err is not set to an error value here.
 
-        do {
-                cmd_err = mlx5_rsc_dump_next(mdev, cmd, page, &size);
-                if (cmd_err < 0) {
-                        err = cmd_err;
-
-clang-16 W=1 warns that err, which is used as the return value of the
-function, will be uninitialised if the loop never hits this condition.
-
-Smatch also warns about this.
-
->  			goto destroy_cmd;
->  		}
+>  		goto dump_err;
 >  
-> -		err = mlx5e_health_rsc_fmsg_binary(fmsg, page_address(page), size);
-> -		if (err)
-> -			goto destroy_cmd;
-> -
-> +		mlx5e_health_rsc_fmsg_binary(fmsg, page_address(page), size);
->  	} while (cmd_err > 0);
->  
->  destroy_cmd:
->  	mlx5_rsc_dump_cmd_destroy(cmd);
-> -	end_err = devlink_fmsg_binary_pair_nest_end(fmsg);
-> -	if (end_err)
-> -		err = end_err;
-> +	devlink_fmsg_binary_pair_nest_end(fmsg);
->  free_page:
->  	__free_page(page);
->  	return err;
->  }
+>  	reporter->dump_ts = jiffies;
 
 ...
 
