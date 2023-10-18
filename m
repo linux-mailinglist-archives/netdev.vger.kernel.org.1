@@ -1,216 +1,462 @@
-Return-Path: <netdev+bounces-42226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5E677CDBB1
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:31:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC1ED7CDBB9
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:32:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 337AE281DD9
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:31:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91C26281C84
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC93339B4;
-	Wed, 18 Oct 2023 12:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211631DDDA;
+	Wed, 18 Oct 2023 12:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IFLiLxM4"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="NyCP1/w2"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087FE347A8
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 12:30:58 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 314DE186;
-	Wed, 18 Oct 2023 05:30:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697632255; x=1729168255;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=61hT63srfJuPAjmgw+FKiZ+qdjjBz+sh5Robtgb5tHE=;
-  b=IFLiLxM4GstozHok18hg6lQsNHemJqP3iA71Tsk8PtbK4GwRYuRIvEpt
-   UAq7JoyRPOR4+wcC8tTaTM5PmLOXpI9n67/+fU386zIwGH9yJZ3FRdyHF
-   U2rh28M3W9r1Kz7kAqSmkGLPelKV9Pn/Rnw9RvIzDUMCAiMdz7yshFiHL
-   ukXVbcwfFg0S/AyF+idtpPyDFzReZxZRd0WqMy6/9NUxSfQe+6WBa1c1Y
-   0HwW/qEvCZ0ZWBkk2Ho9cPdU1qnxXGPHgFmvHGhfBLuro3v9aecNS6Q10
-   ki+Y8muNmDgST/8YUN5WkVjRdxhTF2t9pWGnehwD1EzF56yR1KgaDthCh
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="7552904"
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="7552904"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 05:30:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="826871804"
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="826871804"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Oct 2023 05:30:52 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 18 Oct 2023 05:30:52 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 18 Oct 2023 05:30:51 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Wed, 18 Oct 2023 05:30:51 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 18 Oct 2023 05:30:50 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S4NjvyAf1CN7BozVzPv6fwsXBv6FnIeulGHHbzCN1NC8+gmQ1t9RsmJdN/rjv0f06UgNHuDajKaHDnARubQXLrn7gwG/fw8YgDcE1x9ty28PQIlmFoXGkCZba4GTRonXfURzVxmCzT3inrU3l9fC2eJyBWwU41X7zY9Ae4v35Ml6MRuaXxL3YzPYp2sYHVEatu2YbGPHg+11ehzgSUlsQmBkbHgozEAMz1OliTblCeMxWKRvApLbv50pQDC4RyHbFJT+zladaKpY1g6A716rd7qyJGyoa3bA98qc/uCFTVUFhyZGztRZM/1gS/yPUmRVuU0tgZqYlbYCPiE1GAa2hg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FOgKv9UVlYU9+LIwLBhroK0E1T8rxsMBvQ9ysg3FW8Y=;
- b=XUXM1ZMJt/6NJc/oxUFy/Iq8AQyf3QH9U8kXw+Lf2Wp4l1dK7PHscmVKVFChPbAYlLTgKsKhtkN9y167vTGB+KCNKsRzc31UqAFkFnkp1/Fp0F9IOeiaOEv4Dy6/ruuSTqfuo9PEtvC9k+U9Osoe8eaYHGmM3xBTMCOtLXEaz+nBTsK+Lqw6bCL4yV9mxmusW8mmme6gy+qSI+EUrN5cuje4E8w2p6thaxnCSUMv4hXXLLVox9/vBkPX+OyAhPN4ZANXtSCC4tnkfKUbmYjxR/bwvhLka1RMueTltB1K6PaA8lYw3RXZhfxNc8fn6gNDRbFTG0PL8hAmesUmP17n0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
- by SJ0PR11MB5677.namprd11.prod.outlook.com (2603:10b6:a03:37e::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.24; Wed, 18 Oct
- 2023 12:30:47 +0000
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::7666:c666:e6b6:6e48]) by BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::7666:c666:e6b6:6e48%4]) with mapi id 15.20.6907.021; Wed, 18 Oct 2023
- 12:30:47 +0000
-Message-ID: <4bedad2b-cdf6-471e-a8bd-51ba3564aa6a@intel.com>
-Date: Wed, 18 Oct 2023 14:30:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH net] i40e: Fix I40E_FLAG_VF_VLAN_PRUNING value
-To: Ivan Vecera <ivecera@redhat.com>, <netdev@vger.kernel.org>
-CC: Mateusz Palczewski <mateusz.palczewski@intel.com>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "moderated
- list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list
-	<linux-kernel@vger.kernel.org>
-References: <20231018112621.463893-1-ivecera@redhat.com>
-Content-Language: en-US
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20231018112621.463893-1-ivecera@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0133.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:97::11) To BYAPR11MB3672.namprd11.prod.outlook.com
- (2603:10b6:a03:fa::30)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F0334CC8
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 12:32:23 +0000 (UTC)
+X-Greylist: delayed 196 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 18 Oct 2023 05:32:21 PDT
+Received: from smtp-bc0d.mail.infomaniak.ch (smtp-bc0d.mail.infomaniak.ch [45.157.188.13])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E611120
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 05:32:20 -0700 (PDT)
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
+	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4S9Vbl2NjJzMpnw0;
+	Wed, 18 Oct 2023 12:32:19 +0000 (UTC)
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4S9Vbk67HWzMppC1;
+	Wed, 18 Oct 2023 14:32:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1697632339;
+	bh=aa6pncm5zcJg8l7+9ze3hApwsDn1Pd9rDGyYpu5vSwQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NyCP1/w2a1cjV3HpgUYxh2HJvelTd4aETIf7GDcefxYpL1WK8DjPOqnuDJdrPLHDg
+	 uWPzxnTmOVPq4UbNNUGRd5OuuX64CdiJe3fOcSV7mUdaB04JLU9Es0JjUO4bdNHkTT
+	 khZ914nGczSAlwFfR4Z/w8CPhkf2Pj0UVfmJfMII=
+Date: Wed, 18 Oct 2023 14:32:17 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com
+Subject: Re: [PATCH v13 10/12] selftests/landlock: Add 7 new test variants
+ dedicated to network
+Message-ID: <20231016.phei8Is2weod@digikod.net>
+References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
+ <20231016015030.1684504-11-konstantin.meskhidze@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|SJ0PR11MB5677:EE_
-X-MS-Office365-Filtering-Correlation-Id: cd4fb637-11bb-4bd8-671a-08dbcfd60dd1
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /KSbskBVHvRqRZPWLjF6/bCQhSuhABzBap/V3R+KeJnmZsYZXW2T6W1EucHx5J0MY0iSwLTPF6gxe/SrXSUAYN4Cj66918BIU8/e7N2CGZoadoSaN5xbkK3ZjG3zxZOfQW5FiHsds2Z18d/meKj6vN3R0eU5TqffnycXR4+KTiEadB3mzeAW62IqSipdRWNX+OFwlDrmOsT+c/lv+fVBRaew+lXECATFeHSSpKY4NJtPhcSeZqXP5GUI+81lSxQ3UBzwCjOD0uW2EYGMToC7uY3ALJ3zKAH1/f4HZkkv6r54OVgx63q8ZRpv1UMGR4iL966ONHNiHlNwgRHdf8Sr5v3eFiOHSpRQ70k7Y3K0EdQzMhTlhoGoFmfLz5IGP0g50II2sbL8uSaazonlZjgotoI/hZ0oQecrrUvboSW2mXyRnheuhZAfhhwOL5p02XamUlE9VhYAf58REf+7NRjBa7HFa0St47fc3sq5PqUuCbtcXX1tk8EnCf5vrsXeCmZaiZNna3fkC3/iZ43Y31gH4UksqdgdhLQFcQbajP6z0hrg+2EmqGOM0p39UfjZzau6rrwFMn5tO98kwY4LdWfmb1S2V6jcPbmFGCDbK6yaz7OTNeyHcTQK7/bLyqaHqs7W/b6Z4YkULURvJrcm/hKfeA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(346002)(376002)(136003)(39860400002)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(31686004)(6666004)(6506007)(53546011)(6512007)(83380400001)(54906003)(66476007)(66556008)(66946007)(316002)(2906002)(41300700001)(4326008)(8676002)(8936002)(38100700002)(26005)(82960400001)(6486002)(478600001)(86362001)(31696002)(5660300002)(2616005)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ajhMSTZGdDJoTFNEWXhlTmVEalovdW03aEZuclJKVUkyUm5RN1J2QXNENmU4?=
- =?utf-8?B?eWhWYVRoYlUrVnoxcmJBbldTK04xbFplcE5ibDFudk1CTUk3ck5sVTVVRHVX?=
- =?utf-8?B?MWdWOHJyYXdFV0E5S1JvVjJ0VVVnck5LOGsxcVEzUmJpN2E0VkF1eWRobDdM?=
- =?utf-8?B?UUhnWTByRWFmQ2JSY1V5TXcyTVF4VXBZcndkdDBVcVhyRnc4M2lST09lbnZX?=
- =?utf-8?B?ZkhMSm95dE9rVk56RXlHcGpzWWoxeW1xUlNUY2tFcVFBNnA4bW41M0ZuNWtl?=
- =?utf-8?B?MkltVjFLOHJJU1RQcUxRR0R0ZEJVYjU3Nm9jNnNOV0F5bENYa3dHWjFoL0tu?=
- =?utf-8?B?ZUh3S2JKYk53QW4xYWlxS2szNmdwcTZmZitVUGpkOFJSTHFad0s2QXEyTjVS?=
- =?utf-8?B?ckFPZHpoc05BMk1aZ2lrdVBrZDNYRE4yWW12Wk94dnBocjhacU9Wai96Szk2?=
- =?utf-8?B?ZjBOeUdTWThwUFdXVng3VVIxVDlHUVZxbU1tTnVvS1ROUUxLVnRIY29pNzZj?=
- =?utf-8?B?TExlVTE1eFFDeWlxVXFWWDlNQ1J2Lzg0S3dwQ1VmUU5OMS9EeVk2LzM3eW96?=
- =?utf-8?B?VWpYa3B0ZVc4Q25rS1FscXlXNGFmYXE4SUtGdWRqQlpXZG5vZ0RqUlR1TUpy?=
- =?utf-8?B?UEFyK2V5Ylg1VStjenpzRC81TGs5a3kyMU1ETGM4YVNiMVZ1SndjdDlHVWU0?=
- =?utf-8?B?d2RRMW5Qdm9zS1pyZFFKREIyZ1ZaSzVkRWx6b2p4UmxoSVZ5dGM4c01jdEJp?=
- =?utf-8?B?RFF3WEsrcFBBZGtkUXBHenNUN21ab1J2cXR4VndRc0VjZ0hKTklERXdKVXlQ?=
- =?utf-8?B?SmRUNWptYUE4RTFhcThUcEFrbktzTUpQSmJMcU9BME5zc0NKK3U5RXA2UnQ5?=
- =?utf-8?B?ZEFyUHZkUk5SZ3hYOXJUYVFNREhHZDBxNDZoZmFIM2xBcmE4TlVvR2hQUzNI?=
- =?utf-8?B?N2d4UE1Yd3NaQlNVNWJEOUdiSzhWM2ZBWU8yZmx0R2tpQ1AxT01za0dGcWVL?=
- =?utf-8?B?N2NVQUEvb1VuS2U1UnJyVjYzWUMwb28xdi9zZkJqWXZvZElLMlJoMjFaWmdI?=
- =?utf-8?B?L3lzSzA2bzAvNS9RUXMwMzJ1VXdkNU5yTm9QaEtQekk5cnoxMW9lUG5zbk5P?=
- =?utf-8?B?bVIxMEl1OVp6bWZCNGRId09RT1RCcWdsYUt3ZjR6bXE2cE81NnZKL0lwejFU?=
- =?utf-8?B?VDBLQTZaYllPeUl3NHlFZ2NzSjVwekVCNnJLbzJLQXBkZHRxdUVGMnlrRUVk?=
- =?utf-8?B?Q256d1JSZWVIbWJPY2J6a1pJYWs2b0swRDNJVTZyUlJ4dktQZ0toOHVYeEJp?=
- =?utf-8?B?SkJGRGVoRWgzTkpoWkwzVEVtd0ZvK21IaHB4cmN4Q0d4eFEwUkNoMFZ0RzE1?=
- =?utf-8?B?bW91WlJUeVJibk1HdjhxS3ZQMFpHUWZ6d3RqT2hDaFUzTVVvYTVrcHp4WDFV?=
- =?utf-8?B?ZFJiMjlvcGlWbGNxUEI2bWpGWUlpVG93QlMyUDU4Tlc0a3VDdFozVVpUOVhY?=
- =?utf-8?B?UlV2QzlMR3dNTmlXZW4zZXIvRFRqeXUxcXhpcjE0WUlXTVc2MDlvQzVDMkVl?=
- =?utf-8?B?ZFZId3VoakVnU0xGODdKRXgyR242TFg4TlFyZk0zSWVyRW14RTJITEdWaW90?=
- =?utf-8?B?cEp4YXRjNGF5QXlEKzl4a2NDU3Jjd09FbFpmeDhURFdraGtvaEFxaVQwRWZ1?=
- =?utf-8?B?YU44N3BDb0Ezb0U3Q3FtMFliM3lTOEZBODlrSTNkSU5BdmJaUVdac2ZqVWht?=
- =?utf-8?B?VExoWHFoeDdhTzZBWHoyY292ellGWmo0N2g1a0NobjlkOGlLak8zc1JTM0dK?=
- =?utf-8?B?Z1BkdWZETWxzVVRLaUxYU1E2Nm1tV3ZIcmJuMVVQTjVGWk1EdmtHbS9ZdHl4?=
- =?utf-8?B?S3NpczdiTm9nakxWSnBBS3pqdklSekJUdFIra1ZqSDI2andiNHBxaHZiREpp?=
- =?utf-8?B?K3BoeGxKUkRDcWJ1QXBIRDZDNWFwK3k4dExtUXo3VG1pbFhTOHJhdHR4dE5y?=
- =?utf-8?B?c1NJTVk4OVVkTVdlK2owdjJDNlZ1U1RBdnFodmlaaGo3ZnJUc0JUNzZuT3M2?=
- =?utf-8?B?d0M0ZkRhUkRvQXNQTDJsOXAyUDRuRENFb2F2L2w3bitIRFZueTIvekNnVTVY?=
- =?utf-8?B?SVlPL2UxSWlPTGhxemgwZE5TcGNsZE9icjVkUGZZSy8wbjRoR3IybFJIWmpn?=
- =?utf-8?B?cUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd4fb637-11bb-4bd8-671a-08dbcfd60dd1
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 12:30:47.0122
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 61FaXDfQpZKuYFbF/oEhe6uTfEDz8ATJ7LRN0UkPbuNAl8g0Xs6/k/J/T7buRFFbr3hloqSTQOFGiBhyQK8Mdd+swPr83wEDSJ34fzJIGdA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5677
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231016015030.1684504-11-konstantin.meskhidze@huawei.com>
+X-Infomaniak-Routing: alpha
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/18/23 13:26, Ivan Vecera wrote:
-> Commit c87c938f62d8f1 ("i40e: Add VF VLAN pruning") added new
-> PF flag I40E_FLAG_VF_VLAN_PRUNING but its value collides with
-> existing I40E_FLAG_TOTAL_PORT_SHUTDOWN_ENABLED flag.
+You can update the subject with:
+"selftests/landlock: Add network tests"
+
+On Mon, Oct 16, 2023 at 09:50:28AM +0800, Konstantin Meskhidze wrote:
+> These test suites try to check edge cases for TCP sockets
+> bind() and connect() actions.
+
+You can replace with that:
+Add 77 test suites to check edge cases related to bind() and connect()
+actions. They are defined with 6 fixtures and their variants:
+
 > 
-> Move the affected flag at the end of the flags and fix its value.
+> protocol:
+> * bind: Tests with non-landlocked/landlocked ipv4, ipv6 and unix sockets.
+
+As you already did, you can write one paragraph per fixture, but
+starting by explaining the fixture and its related variants, and then
+listing the tests and explaining their specificities. For instance:
+
+The "protocol" fixture is extended with 12 variants defined as a matrix
+of: sandboxed/not-sandboxed, IPv4/IPv6/unix network domain, and
+stream/datagram socket. 4 related tests suites are defined:
+* bind: Test bind combinations with increasingly more
+  restricting domains.
+* connect: Test connect combinations with increasingly more
+  restricting domains.
+...
+
+s/ipv/IPv/g
+
+> * connect: Tests with non-landlocked/landlocked ipv4, ipv6 and unix
+> sockets.
+> * bind_unspec: Tests with non-landlocked/landlocked restrictions
+> for bind action with AF_UNSPEC socket family.
+> * connect_unspec: Tests with non-landlocked/landlocked restrictions
+> for connect action with AF_UNSPEC socket family.
 > 
-> Cc: Mateusz Palczewski <mateusz.palczewski@intel.com>
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ipv4:
+> * from_unix_to_inet: Tests to make sure unix sockets' actions are not
+> restricted by Landlock rules applied to TCP ones.
+> 
+> tcp_layers:
+> * ruleset_overlap.
+> * ruleset_expand.
+> 
+> mini:
+> * network_access_rights: Tests with  legitimate access values.
+> * unknown_access_rights: Tests with invalid attributes, out of access range.
+> * inval:
+>     - unhandled allowed access.
+>     - zero access value.
+> * tcp_port_overflow: Tests with wrong port values more than U16_MAX.
+> 
+> ipv4_tcp:
+> * port_endianness: Tests with big/little endian port formats.
+> 
+> port_specific:
+> * bind_connect: Tests with specific port values.
+> 
+> layout1:
+> * with_net: Tests with network bind() socket action within
+> filesystem directory access test.
+> 
+> Test coverage for security/landlock is 94.5% of 932 lines according
+> to gcc/gcov-11.
+> 
+> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> Link: https://lore.kernel.org/r/20230920092641.832134-11-konstantin.meskhidze@huawei.com
+> Co-developed-by:: Mickaël Salaün <mic@digikod.net>
+> Signed-off-by: Mickaël Salaün <mic@digikod.net>
 > ---
->   drivers/net/ethernet/intel/i40e/i40e.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-> index 6e310a53946782..55bb0b5310d5b4 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
-> @@ -580,7 +580,6 @@ struct i40e_pf {
->   #define I40E_FLAG_DISABLE_FW_LLDP		BIT(24)
->   #define I40E_FLAG_RS_FEC			BIT(25)
->   #define I40E_FLAG_BASE_R_FEC			BIT(26)
-> -#define I40E_FLAG_VF_VLAN_PRUNING		BIT(27)
->   /* TOTAL_PORT_SHUTDOWN
->    * Allows to physically disable the link on the NIC's port.
->    * If enabled, (after link down request from the OS)
-> @@ -603,6 +602,7 @@ struct i40e_pf {
+> Changes since v12:
+> * Renames port_zero to port_specific fixture.
+> * Refactors port_specific test:
+>     - Adds set_port() and get_binded_port() helpers.
+>     - Adds checks for port 0, allowed by Landlock in this version.
+>     - Adds checks for port 1023.
+> * Refactors commit message.
+> 
 
-such mistake happened only because list of flags is dispersed so much :/
+> +static void set_port(struct service_fixture *const srv, in_port_t port)
+> +{
+> +	switch (srv->protocol.domain) {
+> +	case AF_UNSPEC:
+> +	case AF_INET:
+> +		srv->ipv4_addr.sin_port = port;
 
->    *   in abilities field of i40e_aq_set_phy_config structure
->    */
->   #define I40E_FLAG_TOTAL_PORT_SHUTDOWN_ENABLED	BIT(27)
-> +#define I40E_FLAG_VF_VLAN_PRUNING		BIT(28)
->   
->   	struct i40e_client_instance *cinst;
->   	bool stat_offsets_loaded;
+We should call htons() here, and make port a uint16_t.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> +		return;
+> +
+> +	case AF_INET6:
+> +		srv->ipv6_addr.sin6_port = port;
+> +		return;
+> +
+> +	default:
+> +		return;
+> +	}
+> +}
+> +
+> +static in_port_t get_binded_port(int socket_fd,
+
+The returned type should be uint16_t (i.e. host endianess).
+
+> +				 const struct protocol_variant *const prot)
+> +{
+> +	struct sockaddr_in ipv4_addr;
+> +	struct sockaddr_in6 ipv6_addr;
+> +	socklen_t ipv4_addr_len, ipv6_addr_len;
+> +
+> +	/* Gets binded port. */
+> +	switch (prot->domain) {
+> +	case AF_UNSPEC:
+> +	case AF_INET:
+> +		ipv4_addr_len = sizeof(ipv4_addr);
+> +		getsockname(socket_fd, &ipv4_addr, &ipv4_addr_len);
+> +		return ntohs(ipv4_addr.sin_port);
+> +
+> +	case AF_INET6:
+> +		ipv6_addr_len = sizeof(ipv6_addr);
+> +		getsockname(socket_fd, &ipv6_addr, &ipv6_addr_len);
+> +		return ntohs(ipv6_addr.sin6_port);
+> +
+> +	default:
+> +		return 0;
+> +	}
+> +}
+
+These are good helpers!
+
+
+> +FIXTURE_TEARDOWN(ipv4)
+> +{
+> +}
+> +
+> +// Kernel FIXME: tcp_sandbox_with_tcp and tcp_sandbox_with_udp
+
+No FIXME should remain.
+
+> +TEST_F(ipv4, from_unix_to_inet)
+
+> +TEST_F(mini, network_access_rights)
+> +{
+> +	const struct landlock_ruleset_attr ruleset_attr = {
+> +		.handled_access_net = ACCESS_ALL,
+> +	};
+> +	struct landlock_net_port_attr net_service = {
+
+Please rename to "net_port" everywhere.
+
+> +TEST_F(port_specific, bind_connect)
+> +{
+> +	int socket_fd, ret;
+> +
+> +	/* Adds the first rule layer with bind and connect actions. */
+> +	if (variant->sandbox == TCP_SANDBOX) {
+> +		const struct landlock_ruleset_attr ruleset_attr = {
+> +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+> +					      LANDLOCK_ACCESS_NET_CONNECT_TCP
+> +		};
+> +		const struct landlock_net_port_attr tcp_bind_connect_zero = {
+> +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+> +					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +			.port = htons(0),
+
+We don't need any htons() calls anymore. It doesn't change the 0 value
+in this case but this is not correct.
+
+> +		};
+> +
+
+Useless new line.
+
+> +		int ruleset_fd;
+> +
+> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+> +						     sizeof(ruleset_attr), 0);
+> +		ASSERT_LE(0, ruleset_fd);
+> +
+> +		/* Checks zero port value on bind and connect actions. */
+> +		EXPECT_EQ(0,
+> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> +					    &tcp_bind_connect_zero, 0));
+> +
+> +		enforce_ruleset(_metadata, ruleset_fd);
+> +		EXPECT_EQ(0, close(ruleset_fd));
+> +	}
+> +
+> +	socket_fd = socket_variant(&self->srv0);
+> +	ASSERT_LE(0, socket_fd);
+> +
+> +	/* Sets address port to 0 for both protocol families. */
+> +	set_port(&self->srv0, htons(0));
+
+ditto
+
+> +
+> +	/* Binds on port 0. */
+> +	ret = bind_variant(socket_fd, &self->srv0);
+> +	if (is_restricted(&variant->prot, variant->sandbox)) {
+> +		/* Binds to a random port within ip_local_port_range. */
+> +		EXPECT_EQ(0, ret);
+> +	} else {
+> +		/* Binds to a random port within ip_local_port_range. */
+> +		EXPECT_EQ(0, ret);
+
+If the results are the same, no need to add an if block.
+
+> +	}
+> +
+> +	/* Connects on port 0. */
+> +	ret = connect_variant(socket_fd, &self->srv0);
+> +	if (is_restricted(&variant->prot, variant->sandbox)) {
+> +		EXPECT_EQ(-ECONNREFUSED, ret);
+> +	} else {
+> +		EXPECT_EQ(-ECONNREFUSED, ret);
+> +	}
+
+ditto
+
+> +
+> +	/* Binds on port 0. */
+
+Please close sockets once they are used, and recreate one for another
+bind/connect to avoid wrong checks.
+
+> +	ret = bind_variant(socket_fd, &self->srv0);
+> +	if (is_restricted(&variant->prot, variant->sandbox)) {
+> +		/* Binds to a random port within ip_local_port_range. */
+> +		EXPECT_EQ(0, ret);
+> +	} else {
+> +		/* Binds to a random port within ip_local_port_range. */
+> +		EXPECT_EQ(0, ret);
+> +	}
+
+Why this second bind() block? Furthermore, it is using the same
+socket_fd.
+
+> +
+> +	/* Sets binded port for both protocol families. */
+> +	set_port(&self->srv0,
+> +		 htons(get_binded_port(socket_fd, &variant->prot)));
+
+Ditto, these two endianess translations are useless.
+
+You can also add this to make sure the returned port is not 0:
+port = get_binded_port(socket_fd, &variant->prot);
+EXPECT_NE(0, port);
+set_port(&self->srv0, port);
+
+> +
+> +	/* Connects on the binded port. */
+> +	ret = connect_variant(socket_fd, &self->srv0);
+> +	if (is_restricted(&variant->prot, variant->sandbox)) {
+> +		/* Denied by Landlock. */
+> +		EXPECT_EQ(-EACCES, ret);
+> +	} else {
+> +		EXPECT_EQ(0, ret);
+> +	}
+> +
+> +	EXPECT_EQ(0, close(socket_fd));
+> +
+
+
+
+> +	/* Adds the second rule layer with just bind action. */
+
+There is not only bind actions here.
+
+This second part of the tests should be in a dedicated
+TEST_F(port_specific, bind_1023).
+
+> +	if (variant->sandbox == TCP_SANDBOX) {
+> +		const struct landlock_ruleset_attr ruleset_attr = {
+> +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+> +					      LANDLOCK_ACCESS_NET_CONNECT_TCP
+> +		};
+> +
+> +		const struct landlock_net_port_attr tcp_bind_zero = {
+> +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+> +			.port = htons(0),
+> +		};
+> +
+
+Useless new lines.
+
+> +		/* A rule with port value less than 1024. */
+> +		const struct landlock_net_port_attr tcp_bind_lower_range = {
+> +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+> +			.port = htons(1023),
+> +		};
+> +
+
+Useless new line.
+
+> +		int ruleset_fd;
+> +
+> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+> +						     sizeof(ruleset_attr), 0);
+> +		ASSERT_LE(0, ruleset_fd);
+> +
+> +		ASSERT_EQ(0,
+> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> +					    &tcp_bind_lower_range, 0));
+> +		ASSERT_EQ(0,
+> +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> +					    &tcp_bind_zero, 0));
+> +
+> +		enforce_ruleset(_metadata, ruleset_fd);
+> +		EXPECT_EQ(0, close(ruleset_fd));
+> +	}
+> +
+> +	socket_fd = socket_variant(&self->srv0);
+
+We must have one socket FD dedicated to bind an another dedicated to
+connect, e.g. bind_fd and connect_fd, an close them after each use,
+otherwise tests might be inconsistent.
+
+> +	ASSERT_LE(0, socket_fd);
+> +
+> +	/* Sets address port to 1023 for both protocol families. */
+> +	set_port(&self->srv0, htons(1023));
+> +
+> +	/* Binds on port 1023. */
+> +	ret = bind_variant(socket_fd, &self->srv0);
+> +	if (is_restricted(&variant->prot, variant->sandbox)) {
+
+No need to add this check if the result is the same for sandboxed and
+not sandboxed tests.
+
+Instead, use set_cap(_metadata, CAP_NET_BIND_SERVICE) and clear_cap()
+around this bind_variant() to make this test useful.
+
+You will also need to patch common.h like this:
+@@ -112,10 +112,13 @@ static void _init_caps(struct __test_metadata *const _metadata, bool drop_all)
+        cap_t cap_p;
+        /* Only these three capabilities are useful for the tests. */
+        const cap_value_t caps[] = {
++               /* clang-format off */
+                CAP_DAC_OVERRIDE,
+                CAP_MKNOD,
+                CAP_SYS_ADMIN,
+                CAP_SYS_CHROOT,
++               CAP_NET_BIND_SERVICE,
++               /* clang-format on */
+        };
+
+> +		/* Denied by the system. */
+> +		EXPECT_EQ(-EACCES, ret);
+> +	} else {
+> +		/* Denied by the system. */
+> +		EXPECT_EQ(-EACCES, ret);
+> +	}
+> +
+
+I don't see why the following part is useful. Why did you add it?
+Why tcp_bind_zero?
+
+The other parts are good though!
+
+> +	/* Sets address port to 0 for both protocol families. */
+> +	set_port(&self->srv0, htons(0));
+> +
+> +	/* Binds on port 0. */
+> +	ret = bind_variant(socket_fd, &self->srv0);
+> +	if (is_restricted(&variant->prot, variant->sandbox)) {
+> +		/* Binds to a random port within ip_local_port_range. */
+> +		EXPECT_EQ(0, ret);
+> +	} else {
+> +		/* Binds to a random port within ip_local_port_range. */
+> +		EXPECT_EQ(0, ret);
+> +	}
+> +
+> +	/* Sets binded port for both protocol families. */
+> +	set_port(&self->srv0,
+> +		 htons(get_binded_port(socket_fd, &variant->prot)));
+> +
+> +	/* Connects on the binded port. */
+> +	ret = connect_variant(socket_fd, &self->srv0);
+> +	if (is_restricted(&variant->prot, variant->sandbox)) {
+> +		/* Denied by Landlock. */
+> +		EXPECT_EQ(-EACCES, ret);
+> +	} else {
+> +		EXPECT_EQ(0, ret);
+> +	}
+> +
+> +	EXPECT_EQ(0, close(socket_fd));
+> +}
+> +
+> +TEST_HARNESS_MAIN
+> --
+> 2.25.1
+> 
 
