@@ -1,57 +1,51 @@
-Return-Path: <netdev+bounces-42262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3DB7CDE8F
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:12:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AC0E7CDEA0
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 911771C20D01
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:12:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC1851C20D13
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C67837174;
-	Wed, 18 Oct 2023 14:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C4737179;
+	Wed, 18 Oct 2023 14:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2Q4ehWB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c8EwJaB8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5173136B1A
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 14:12:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73D57C433C9;
-	Wed, 18 Oct 2023 14:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841B336B1A
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 14:13:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1FC0C433C7;
+	Wed, 18 Oct 2023 14:13:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697638356;
-	bh=JWEf90H0pNK8AbCNDAoueXopIud5IbmnlbfDPhWUca8=;
+	s=k20201202; t=1697638384;
+	bh=B7dxUlq/kdSdbybS/JUI4ITP3ZFzYrqJM2aaibW8JOE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=K2Q4ehWB7BiYfpahWyJAJXl2DvDD7qPyM5BnKVSIllqj0/HCCKtTdX/vcsFb8Dnav
-	 hiwHnm2uNHppKlNnPlswtGgp+1j+JjSzDuCzvWEJjDiDfNL4pvVn9JkyKeKQ3u0QY4
-	 mwpIdA0zRvZR1FnFTHhu814UkQm3VY+Gfoy8c9PM4hxQvjrjYPp0HYCZiHodYM8VPB
-	 krQS638mL24BLi9W+03CcY3kvwM2sK1EAXgzvwPnitIpb1ovBDPnGgqu0UNr6CPGCb
-	 G8aEMn8fYOLheE/3w//aqaUI7q7uwm40s8/6VKE1FAjwwlYBafUcSnheVkq75bcVHp
-	 NQLUlqwAnw3yA==
+	b=c8EwJaB88lELsEe3OhKmCChqLnfYyGHrPeZx1d3+ilSrx83R/cEDm57BItFzSsRYr
+	 xtti7uHBKZD6G6HE2rUOmL77o9RJoLr+e/FeXR73wkQMwS8sfl6zCRNrwEer4DVHTl
+	 Ff5sMif0aaoqvkO9d4TShm6GDEf0rsKnNhqfGJca+HhNnML2gu6gOnkltYX7nlHsg7
+	 rgug4PyB9xp6SL1YWTbLV6eufTqZEpxemi3EEd0fFzh7Uv0VGjrMNiF2lVHtj0uZGO
+	 4LtgAGwdkWdc4H5ugzpvgC0sTJsMs98Boi98EHi9T/55jN4weXwWAxp6iLh3jik8YC
+	 KVxn4V86fNxVQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Haibo Chen <haibo.chen@nxp.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
+Cc: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	wg@grandegger.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	mailhol.vincent@wanadoo.fr,
-	socketcan@hartkopp.net,
-	ruanjinjie@huawei.com,
-	u.kleine-koenig@pengutronix.de,
-	linux-can@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.5 16/31] can: flexcan: remove the auto stop mode for IMX93
-Date: Wed, 18 Oct 2023 10:11:33 -0400
-Message-Id: <20231018141151.1334501-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.5 26/31] net: macsec: indicate next pn update when offloading
+Date: Wed, 18 Oct 2023 10:11:43 -0400
+Message-Id: <20231018141151.1334501-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231018141151.1334501-1-sashal@kernel.org>
 References: <20231018141151.1334501-1-sashal@kernel.org>
@@ -66,146 +60,70 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.5.7
 Content-Transfer-Encoding: 8bit
 
-From: Haibo Chen <haibo.chen@nxp.com>
+From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
 
-[ Upstream commit 63ead535570f13d0e06fda3f2d020c8f5394e998 ]
+[ Upstream commit 0412cc846a1ef38697c3f321f9b174da91ecd3b5 ]
 
-IMX93 A0 chip involve the internal q-channel handshake in LPCG and
-CCM to automatically handle the Flex-CAN IPG STOP signal. Only after
-FLEX-CAN enter stop mode then can support the self-wakeup feature.
-But meet issue when do the continue system PM stress test. When config
-the CAN as wakeup source, the first time after system suspend, any data
-on CAN bus can wakeup the system, this is as expect. But the second time
-when system suspend, data on CAN bus can't wakeup the system. If continue
-this test, we find in odd time system enter suspend, CAN can wakeup the
-system, but in even number system enter suspend, CAN can't wakeup the
-system. IC find a bug in the auto stop mode logic, and can't fix it easily.
-So for the new imx93 A1, IC drop the auto stop mode and involve the
-GPR to support stop mode (used before). IC define a bit in GPR which can
-trigger the IPG STOP signal to Flex-CAN, let it go into stop mode.
-And NXP claim to drop IMX93 A0, and only support IMX93 A1. So this patch
-remove the auto stop mode, and add flag FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR
-to imx93.
+Indicate next PN update using update_pn flag in macsec_context.
+Offloaded MACsec implementations does not know whether or not the
+MACSEC_SA_ATTR_PN attribute was passed for an SA update and assume
+that next PN should always updated, but this is not always true.
 
-Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
-Link: https://lore.kernel.org/all/20230726112458.3524165-2-haibo.chen@nxp.com
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+The PN can be reset to its initial value using the following command:
+$ ip macsec set macsec0 tx sa 0 off #octeontx2-pf case
+
+Or, the update PN command will succeed even if the driver does not support
+PN updates.
+$ ip macsec set macsec0 tx sa 0 pn 1 on #mscc phy driver case
+
+Comparing the initial PN with the new PN value is not a solution. When
+the user updates the PN using its initial value the command will
+succeed, even if the driver does not support it. Like this:
+$ ip macsec add macsec0 tx sa 0 pn 1 on key 00 \
+ead3664f508eb06c40ac7104cdae4ce5
+$ ip macsec set macsec0 tx sa 0 pn 1 on #mlx5 case
+
+Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/can/flexcan/flexcan-core.c | 46 ++++++++------------------
- drivers/net/can/flexcan/flexcan.h      |  2 --
- 2 files changed, 13 insertions(+), 35 deletions(-)
+ drivers/net/macsec.c | 2 ++
+ include/net/macsec.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
-index ff0fc18baf133..d8be69f4a0c3f 100644
---- a/drivers/net/can/flexcan/flexcan-core.c
-+++ b/drivers/net/can/flexcan/flexcan-core.c
-@@ -348,7 +348,7 @@ static struct flexcan_devtype_data fsl_imx8mp_devtype_data = {
- static struct flexcan_devtype_data fsl_imx93_devtype_data = {
- 	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS |
- 		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_USE_RX_MAILBOX |
--		FLEXCAN_QUIRK_BROKEN_PERR_STATE | FLEXCAN_QUIRK_AUTO_STOP_MODE |
-+		FLEXCAN_QUIRK_BROKEN_PERR_STATE | FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR |
- 		FLEXCAN_QUIRK_SUPPORT_FD | FLEXCAN_QUIRK_SUPPORT_ECC |
- 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
- 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
-@@ -544,11 +544,6 @@ static inline int flexcan_enter_stop_mode(struct flexcan_priv *priv)
- 	} else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR) {
- 		regmap_update_bits(priv->stm.gpr, priv->stm.req_gpr,
- 				   1 << priv->stm.req_bit, 1 << priv->stm.req_bit);
--	} else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_AUTO_STOP_MODE) {
--		/* For the auto stop mode, software do nothing, hardware will cover
--		 * all the operation automatically after system go into low power mode.
--		 */
--		return 0;
- 	}
+diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+index 2d64650f4eb3c..1c60548c1ddde 100644
+--- a/drivers/net/macsec.c
++++ b/drivers/net/macsec.c
+@@ -2394,6 +2394,7 @@ static int macsec_upd_txsa(struct sk_buff *skb, struct genl_info *info)
  
- 	return flexcan_low_power_enter_ack(priv);
-@@ -574,12 +569,6 @@ static inline int flexcan_exit_stop_mode(struct flexcan_priv *priv)
- 	reg_mcr &= ~FLEXCAN_MCR_SLF_WAK;
- 	priv->write(reg_mcr, &regs->mcr);
+ 		ctx.sa.assoc_num = assoc_num;
+ 		ctx.sa.tx_sa = tx_sa;
++		ctx.sa.update_pn = !!prev_pn.full64;
+ 		ctx.secy = secy;
  
--	/* For the auto stop mode, hardware will exist stop mode
--	 * automatically after system go out of low power mode.
--	 */
--	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_AUTO_STOP_MODE)
--		return 0;
--
- 	return flexcan_low_power_exit_ack(priv);
- }
+ 		ret = macsec_offload(ops->mdo_upd_txsa, &ctx);
+@@ -2487,6 +2488,7 @@ static int macsec_upd_rxsa(struct sk_buff *skb, struct genl_info *info)
  
-@@ -1994,13 +1983,18 @@ static int flexcan_setup_stop_mode(struct platform_device *pdev)
- 		ret = flexcan_setup_stop_mode_scfw(pdev);
- 	else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR)
- 		ret = flexcan_setup_stop_mode_gpr(pdev);
--	else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_AUTO_STOP_MODE)
--		ret = 0;
- 	else
- 		/* return 0 directly if doesn't support stop mode feature */
- 		return 0;
+ 		ctx.sa.assoc_num = assoc_num;
+ 		ctx.sa.rx_sa = rx_sa;
++		ctx.sa.update_pn = !!prev_pn.full64;
+ 		ctx.secy = secy;
  
--	if (ret)
-+	/* If ret is -EINVAL, this means SoC claim to support stop mode, but
-+	 * dts file lack the stop mode property definition. For this case,
-+	 * directly return 0, this will skip the wakeup capable setting and
-+	 * will not block the driver probe.
-+	 */
-+	if (ret == -EINVAL)
-+		return 0;
-+	else if (ret)
- 		return ret;
- 
- 	device_set_wakeup_capable(&pdev->dev, true);
-@@ -2320,16 +2314,8 @@ static int __maybe_unused flexcan_noirq_suspend(struct device *device)
- 	if (netif_running(dev)) {
- 		int err;
- 
--		if (device_may_wakeup(device)) {
-+		if (device_may_wakeup(device))
- 			flexcan_enable_wakeup_irq(priv, true);
--			/* For auto stop mode, need to keep the clock on before
--			 * system go into low power mode. After system go into
--			 * low power mode, hardware will config the flexcan into
--			 * stop mode, and gate off the clock automatically.
--			 */
--			if (priv->devtype_data.quirks & FLEXCAN_QUIRK_AUTO_STOP_MODE)
--				return 0;
--		}
- 
- 		err = pm_runtime_force_suspend(device);
- 		if (err)
-@@ -2347,15 +2333,9 @@ static int __maybe_unused flexcan_noirq_resume(struct device *device)
- 	if (netif_running(dev)) {
- 		int err;
- 
--		/* For the wakeup in auto stop mode, no need to gate on the
--		 * clock here, hardware will do this automatically.
--		 */
--		if (!(device_may_wakeup(device) &&
--		      priv->devtype_data.quirks & FLEXCAN_QUIRK_AUTO_STOP_MODE)) {
--			err = pm_runtime_force_resume(device);
--			if (err)
--				return err;
--		}
-+		err = pm_runtime_force_resume(device);
-+		if (err)
-+			return err;
- 
- 		if (device_may_wakeup(device))
- 			flexcan_enable_wakeup_irq(priv, false);
-diff --git a/drivers/net/can/flexcan/flexcan.h b/drivers/net/can/flexcan/flexcan.h
-index 91402977780b2..025c3417031f4 100644
---- a/drivers/net/can/flexcan/flexcan.h
-+++ b/drivers/net/can/flexcan/flexcan.h
-@@ -68,8 +68,6 @@
- #define FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR BIT(15)
- /* Device supports RX via FIFO */
- #define FLEXCAN_QUIRK_SUPPORT_RX_FIFO BIT(16)
--/* auto enter stop mode to support wakeup */
--#define FLEXCAN_QUIRK_AUTO_STOP_MODE BIT(17)
- 
- struct flexcan_devtype_data {
- 	u32 quirks;		/* quirks needed for different IP cores */
+ 		ret = macsec_offload(ops->mdo_upd_rxsa, &ctx);
+diff --git a/include/net/macsec.h b/include/net/macsec.h
+index 441ed8fd4b5f6..41c1884a3e419 100644
+--- a/include/net/macsec.h
++++ b/include/net/macsec.h
+@@ -258,6 +258,7 @@ struct macsec_context {
+ 	struct macsec_secy *secy;
+ 	struct macsec_rx_sc *rx_sc;
+ 	struct {
++		bool update_pn;
+ 		unsigned char assoc_num;
+ 		u8 key[MACSEC_MAX_KEY_LEN];
+ 		union {
 -- 
 2.40.1
 
