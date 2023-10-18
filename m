@@ -1,433 +1,381 @@
-Return-Path: <netdev+bounces-42088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C2F7CD194
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:02:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 025417CD19E
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:07:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B316E1C20921
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:02:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8361E28148C
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14B3A5B;
-	Wed, 18 Oct 2023 01:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB2DFEC3;
+	Wed, 18 Oct 2023 01:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dr+QwibV"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="ilS3hH4y"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A719964A
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:02:39 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B4092
-	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 18:02:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697590956;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=708yCv54P4JVoCiQ6JH8cSx49ZwY8SdV/TaMd4E7cYs=;
-	b=dr+QwibV24ZEH4BffHhUpBI9/MPcEd6Ut33GL/feiyy19H1SXNrQOQ2wihRrW0QrmRCC0V
-	G48oLdSYvFspDqx3MnU1oCGvZUhi7w9rZilOub7gDX7h6/odjTGHCpzyft3vgfc5lF+gta
-	GrbJhEn9ybjJDZsf68pb34y28nMWrvA=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-329-TdWD3k_KNFWdlCoL5LG0bQ-1; Tue, 17 Oct 2023 21:02:33 -0400
-X-MC-Unique: TdWD3k_KNFWdlCoL5LG0bQ-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-502fff967ccso6092782e87.1
-        for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 18:02:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697590951; x=1698195751;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=708yCv54P4JVoCiQ6JH8cSx49ZwY8SdV/TaMd4E7cYs=;
-        b=rDTQuKyZJRPf0UYlXyaQHdT3hu+8q6xdN5hoqTnhUblv3bXEIWRU6Z2oETGZWEJmxl
-         SEtjwkyk1dgTRNQNmLJMaRj1MW2bMg6EERfNWpeaYZjgwCIRKF8YcUk5G4Br/f7S0zwn
-         SoP+WitVJODNyE4QnlY2+iO2DzsXEQ3bVk1r0wIQD/05JPpscIMtLZIoNT/dn/O7r8JY
-         GTdXKeV3+81q+Gier3ppyplg58/6aVyPC/uODtEvyj/2knyWLpp+rmyHG0LkUz0N8gCG
-         mFlf14xb9jw+FeCVJNPyhG37RPLgWbOt3ph+E/rFwO1iH0upThGhrNwx0mRZRLVuU00q
-         UuBg==
-X-Gm-Message-State: AOJu0YxqkMzzr9ssYAtMcYblc7/SnZsoXS8j9/U2z4dZW5VEoXXTmzZ9
-	ee5dZzp1L7vkXLGvUhVQxTU7eeizUKYe3h3yXM4YQyBsxf3Mgijb82oESqhJ1yl7AK8rShFvSfe
-	lguxGm/lhkd7zJAYpjH8AP1Tzc7nvjR04dPaa13i++co=
-X-Received: by 2002:ac2:4a82:0:b0:4f3:9136:9cd0 with SMTP id l2-20020ac24a82000000b004f391369cd0mr3051537lfp.44.1697590951276;
-        Tue, 17 Oct 2023 18:02:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGO/0ZMWi3AR3AtyvO2i9CNQlIt3P4oJVby8gdM1h61xPGgGF6aNEsia2aJ7+8Rv/FxVufGvZ1ClVSop6SbMCI=
-X-Received: by 2002:ac2:4a82:0:b0:4f3:9136:9cd0 with SMTP id
- l2-20020ac24a82000000b004f391369cd0mr3051527lfp.44.1697590950887; Tue, 17 Oct
- 2023 18:02:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C082A5B
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:07:18 +0000 (UTC)
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6B7CB0
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 18:07:15 -0700 (PDT)
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39I0fDBu025083;
+	Tue, 17 Oct 2023 18:06:57 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding:content-type; s=
+	PPS06212021; bh=eajqLSnJ0iAkhm2N9jsiChtNf6J/FM0O9C/DvlWXgXw=; b=
+	ilS3hH4yne/TacltAY6GGOkvQ+eJ9pYQtscQyRGoq3qmsWOrkGBFL7q4Zu3EHUEo
+	BuBMUgO+qtEYDA9uR3UZSsEVgR5FiKtuP5IMVglwLe4pTsru8XkLaLdJ5X6lFwQk
+	R7cvtvFB/xOgRhjFR9eRIpN3Qw3f2gCwnOp2/CDgR+fYf/yaeiVSf1j28edqFqPn
+	kcvr/Q6FwPXKrgfcy2snwWPJFJ3OiLn8cRruyaWjQuAhsBFiTfU9PrA5sTFNlNvi
+	sRGGHt3Z9dKnNDzEY4z++gJy4AbhNx+TU7bAZqfX6BlQS62wDlueOdYz+2tNy+kG
+	1P82BXYECKzishc9AC2msw==
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3tt147g6qn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 17 Oct 2023 18:06:56 -0700 (PDT)
+Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 17 Oct 2023 18:06:54 -0700
+Received: from pek-lpd-ccm3.wrs.com (147.11.1.11) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
+ 15.1.2507.32 via Frontend Transport; Tue, 17 Oct 2023 18:06:51 -0700
+From: Heng Guo <heng.guo@windriver.com>
+To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <filip.pudak@windriver.com>,
+        <heng.guo@windriver.com>, <kun.song@windriver.com>
+Subject: [PATCH net-next V2] net: fix IPSTATS_MIB_OUTPKGS increment in OutForwDatagrams.
+Date: Wed, 18 Oct 2023 09:06:47 +0800
+Message-ID: <20231018010647.30574-1-heng.guo@windriver.com>
+X-Mailer: git-send-email 2.35.2
+In-Reply-To: <20231017062838.4897-1-heng.guo@windriver.com>
+References: <20231017062838.4897-1-heng.guo@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEs4u-4ch2UAK14hNfKeORjqMu4BX7=46OfaXpvxW+VT7w@mail.gmail.com>
- <1697511725.2037013-1-xuanzhuo@linux.alibaba.com> <CACGkMEskfXDo+bnx5hbGU3JRwOgBRwOC-bYDdFYSmEO2jjgPnA@mail.gmail.com>
- <1697512950.0813534-1-xuanzhuo@linux.alibaba.com> <CACGkMEtppjoX_WAM+vjzkMKaMQQ0iZL=C_xS4RObuoLbm0udUw@mail.gmail.com>
- <CACGkMEvWAhH3uj2DEo=m7qWg3-pQjE-EtEBvTT8JXzqZ+RYEXQ@mail.gmail.com>
- <1697522771.0390663-2-xuanzhuo@linux.alibaba.com> <CACGkMEu4tSHd4RVo0zEp1A6uM-6h42y+yAB2xzHTv8SzYdZPXQ@mail.gmail.com>
- <1697525013.7650406-3-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1697525013.7650406-3-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 18 Oct 2023 09:02:19 +0800
-Message-ID: <CACGkMEs2Z1Cc7dV8cO9NsQn-FH=yKkggPHerS_hKoaC0-_iyUw@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 00/19] virtio-net: support AF_XDP zero copy
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: dIpQ0LSbcN89nj7XTlOzIscPWvLAnQTb
+X-Proofpoint-GUID: dIpQ0LSbcN89nj7XTlOzIscPWvLAnQTb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-17_08,2023-10-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ adultscore=0 bulkscore=0 phishscore=0 malwarescore=0 impostorscore=0
+ clxscore=1015 lowpriorityscore=0 spamscore=0 mlxlogscore=834
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2309180000 definitions=main-2310180008
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 3:00=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> On Tue, 17 Oct 2023 14:26:01 +0800, Jason Wang <jasowang@redhat.com> wrot=
-e:
-> > On Tue, Oct 17, 2023 at 2:17=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
-ba.com> wrote:
-> > >
-> > > On Tue, 17 Oct 2023 13:27:47 +0800, Jason Wang <jasowang@redhat.com> =
-wrote:
-> > > > On Tue, Oct 17, 2023 at 11:28=E2=80=AFAM Jason Wang <jasowang@redha=
-t.com> wrote:
-> > > > >
-> > > > > On Tue, Oct 17, 2023 at 11:26=E2=80=AFAM Xuan Zhuo <xuanzhuo@linu=
-x.alibaba.com> wrote:
-> > > > > >
-> > > > > > On Tue, 17 Oct 2023 11:20:41 +0800, Jason Wang <jasowang@redhat=
-.com> wrote:
-> > > > > > > On Tue, Oct 17, 2023 at 11:11=E2=80=AFAM Xuan Zhuo <xuanzhuo@=
-linux.alibaba.com> wrote:
-> > > > > > > >
-> > > > > > > > On Tue, 17 Oct 2023 10:53:44 +0800, Jason Wang <jasowang@re=
-dhat.com> wrote:
-> > > > > > > > > On Mon, Oct 16, 2023 at 8:00=E2=80=AFPM Xuan Zhuo <xuanzh=
-uo@linux.alibaba.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > ## AF_XDP
-> > > > > > > > > >
-> > > > > > > > > > XDP socket(AF_XDP) is an excellent bypass kernel networ=
-k framework. The zero
-> > > > > > > > > > copy feature of xsk (XDP socket) needs to be supported =
-by the driver. The
-> > > > > > > > > > performance of zero copy is very good. mlx5 and intel i=
-xgbe already support
-> > > > > > > > > > this feature, This patch set allows virtio-net to suppo=
-rt xsk's zerocopy xmit
-> > > > > > > > > > feature.
-> > > > > > > > > >
-> > > > > > > > > > At present, we have completed some preparation:
-> > > > > > > > > >
-> > > > > > > > > > 1. vq-reset (virtio spec and kernel code)
-> > > > > > > > > > 2. virtio-core premapped dma
-> > > > > > > > > > 3. virtio-net xdp refactor
-> > > > > > > > > >
-> > > > > > > > > > So it is time for Virtio-Net to complete the support fo=
-r the XDP Socket
-> > > > > > > > > > Zerocopy.
-> > > > > > > > > >
-> > > > > > > > > > Virtio-net can not increase the queue num at will, so x=
-sk shares the queue with
-> > > > > > > > > > kernel.
-> > > > > > > > > >
-> > > > > > > > > > On the other hand, Virtio-Net does not support generate=
- interrupt from driver
-> > > > > > > > > > manually, so when we wakeup tx xmit, we used some tips.=
- If the CPU run by TX
-> > > > > > > > > > NAPI last time is other CPUs, use IPI to wake up NAPI o=
-n the remote CPU. If it
-> > > > > > > > > > is also the local CPU, then we wake up napi directly.
-> > > > > > > > > >
-> > > > > > > > > > This patch set includes some refactor to the virtio-net=
- to let that to support
-> > > > > > > > > > AF_XDP.
-> > > > > > > > > >
-> > > > > > > > > > ## performance
-> > > > > > > > > >
-> > > > > > > > > > ENV: Qemu with vhost-user(polling mode).
-> > > > > > > > > >
-> > > > > > > > > > Sockperf: https://github.com/Mellanox/sockperf
-> > > > > > > > > > I use this tool to send udp packet by kernel syscall.
-> > > > > > > > > >
-> > > > > > > > > > xmit command: sockperf tp -i 10.0.3.1 -t 1000
-> > > > > > > > > >
-> > > > > > > > > > I write a tool that sends udp packets or recvs udp pack=
-ets by AF_XDP.
-> > > > > > > > > >
-> > > > > > > > > >                   | Guest APP CPU |Guest Softirq CPU | =
-UDP PPS
-> > > > > > > > > > ------------------|---------------|------------------|-=
------------
-> > > > > > > > > > xmit by syscall   |   100%        |                  | =
-  676,915
-> > > > > > > > > > xmit by xsk       |   59.1%       |   100%           | =
-5,447,168
-> > > > > > > > > > recv by syscall   |   60%         |   100%           | =
-  932,288
-> > > > > > > > > > recv by xsk       |   35.7%       |   100%           | =
-3,343,168
-> > > > > > > > >
-> > > > > > > > > Any chance we can get a testpmd result (which I guess sho=
-uld be better
-> > > > > > > > > than PPS above)?
-> > > > > > > >
-> > > > > > > > Do you mean testpmd + DPDK + AF_XDP?
-> > > > > > >
-> > > > > > > Yes.
-> > > > > > >
-> > > > > > > >
-> > > > > > > > Yes. This is probably better because my tool does more work=
-. That is not a
-> > > > > > > > complete testing tool used by our business.
-> > > > > > >
-> > > > > > > Probably, but it would be appealing for others. Especially co=
-nsidering
-> > > > > > > DPDK supports AF_XDP PMD now.
-> > > > > >
-> > > > > > OK.
-> > > > > >
-> > > > > > Let me try.
-> > > > > >
-> > > > > > But could you start to review firstly?
-> > > > >
-> > > > > Yes, it's in my todo list.
-> > > >
-> > > > Speaking too fast, I think if it doesn't take too long time, I woul=
-d
-> > > > wait for the result first as netdim series. One reason is that I
-> > > > remember claims to be only 10% to 20% loss comparing to wire speed,=
- so
-> > > > I'd expect it should be much faster. I vaguely remember, even a vho=
-st
-> > > > can gives us more than 3M PPS if we disable SMAP, so the numbers he=
-re
-> > > > are not as impressive as expected.
-> > >
-> > >
-> > > What is SMAP? Cloud you give me more info?
-> >
-> > Supervisor Mode Access Prevention
-> >
-> > Vhost suffers from this.
-> >
-> > >
-> > > So if we think the 3M as the wire speed, you expect the result
-> > > can reach 2.8M pps/core, right?
-> >
-> > It's AF_XDP that claims to be 80% if my memory is correct. So a
-> > correct AF_XDP implementation should not sit behind this too much.
-> >
-> > > Now the recv result is 2.5M(2463646) pps/core.
-> > > Do you think there is a huge gap?
-> >
-> > You never describe your testing environment in details. For example,
-> > is this a virtual environment? What's the CPU model and frequency etc.
-> >
-> > Because I never see a NIC whose wire speed is 3M.
-> >
-> > >
-> > > My tool makes udp packet and lookup route, so it take more much cpu.
-> >
-> > That's why I suggest you to test raw PPS.
->
-> OK. Let's align some info.
->
-> 1. My test env is vhost-user. Qemu + vhost-user(polling mode).
->    I do not use the DPDK, because that there is some trouble for me.
->    I use the VAPP (https://github.com/fengidri/vapp) as the vhost-user de=
-vice.
->    That has two threads all are busy mode for tx and rx.
->    tx thread consumes the tx ring and drop the packet.
->    rx thread put the packet to the rx ring.
->
-> 2. My Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
->
-> 3. From this http://fast.dpdk.org/doc/perf/DPDK_23_03_Intel_virtio_perfor=
-mance_report.pdf
->    I think we can align that the vhost max speed is 8.5 MPPS.
->    Is that ok?
+Reproduce environment:
+network with 3 VM linuxs is connected as below:
+VM1<---->VM2(latest kernel 6.5.0-rc7)<---->VM3
+VM1: eth0 ip: 192.168.122.207 MTU 1500
+VM2: eth0 ip: 192.168.122.208, eth1 ip: 192.168.123.224 MTU 1500
+VM3: eth0 ip: 192.168.123.240 MTU 1500
 
-Let's have an apple to apple comparison.
+Reproduce:
+VM1 send 1400 bytes UDP data to VM3 using tools scapy with flags=0.
+scapy command:
+send(IP(dst="192.168.123.240",flags=0)/UDP()/str('0'*1400),count=1,
+inter=1.000000)
 
-Firstly, I would test AF_XDP on virtio-net hardware which I guess you
-should have some. Then we don't need any test as baseline but the wire
-speed.
+Result:
+Before IP data is sent.
+----------------------------------------------------------------------
+root@qemux86-64:~# cat /proc/net/snmp
+Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
+  ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
+  OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs ReasmFails
+  FragOKs FragFails FragCreates
+Ip: 1 64 11 0 3 4 0 0 4 7 0 0 0 0 0 0 0 0 0
+......
+----------------------------------------------------------------------
+After IP data is sent.
+----------------------------------------------------------------------
+root@qemux86-64:~# cat /proc/net/snmp
+Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
+  ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
+  OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs ReasmFails
+  FragOKs FragFails FragCreates
+Ip: 1 64 12 0 3 5 0 0 4 8 0 0 0 0 0 0 0 0 0
+......
+----------------------------------------------------------------------
+"ForwDatagrams" increase from 4 to 5 and "OutRequests" also increase
+from 7 to 8.
 
-Secondly, if it can't be done, let's do something much more simple:
+Issue description and patch:
+IPSTATS_MIB_OUTPKTS("OutRequests") is counted with IPSTATS_MIB_OUTOCTETS
+("OutOctets") in ip_finish_output2().
+According to RFC 4293, it is "OutOctets" counted with "OutTransmits" but
+not "OutRequests". "OutRequests" does not include any datagrams counted
+in "ForwDatagrams".
+ipSystemStatsOutOctets OBJECT-TYPE
+    DESCRIPTION
+           "The total number of octets in IP datagrams delivered to the
+            lower layers for transmission.  Octets from datagrams
+            counted in ipIfStatsOutTransmits MUST be counted here.
+ipSystemStatsOutRequests OBJECT-TYPE
+    DESCRIPTION
+           "The total number of IP datagrams that local IP user-
+            protocols (including ICMP) supplied to IP in requests for
+            transmission.  Note that this counter does not include any
+            datagrams counted in ipSystemStatsOutForwDatagrams.
+So do patch to define IPSTATS_MIB_OUTPKTS to "OutTransmits" and add
+IPSTATS_MIB_OUTREQUESTS for "OutRequests".
+Add IPSTATS_MIB_OUTREQUESTS counter in __ip_local_out() for ipv4 and add
+IPSTATS_MIB_OUT counter in ip6_finish_output2() for ipv6.
 
-1) Boot Qemu with vhost-user and wire it to testpmd
-2) Testing
-2.1) virtio PMD in guest with testpmd
-2.2) AF_XDP PMD in guest with testpmd
+Test result with patch:
+Before IP data is sent.
+----------------------------------------------------------------------
+root@qemux86-64:~# cat /proc/net/snmp
+Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
+  ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
+  OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs ReasmFails
+  FragOKs FragFails FragCreates OutTransmits
+Ip: 1 64 9 0 5 1 0 0 3 3 0 0 0 0 0 0 0 0 0 4
+......
+root@qemux86-64:~# cat /proc/net/netstat
+......
+IpExt: InNoRoutes InTruncatedPkts InMcastPkts OutMcastPkts InBcastPkts
+  OutBcastPkts InOctets OutOctets InMcastOctets OutMcastOctets
+  InBcastOctets OutBcastOctets InCsumErrors InNoECTPkts InECT1Pkts
+  InECT0Pkts InCEPkts ReasmOverlaps
+IpExt: 0 0 0 0 0 0 2976 1896 0 0 0 0 0 9 0 0 0 0
+----------------------------------------------------------------------
+After IP data is sent.
+----------------------------------------------------------------------
+root@qemux86-64:~# cat /proc/net/snmp
+Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
+  ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
+  OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs ReasmFails
+  FragOKs FragFails FragCreates OutTransmits
+Ip: 1 64 10 0 5 2 0 0 3 3 0 0 0 0 0 0 0 0 0 5
+......
+root@qemux86-64:~# cat /proc/net/netstat
+......
+IpExt: InNoRoutes InTruncatedPkts InMcastPkts OutMcastPkts InBcastPkts
+  OutBcastPkts InOctets OutOctets InMcastOctets OutMcastOctets
+  InBcastOctets OutBcastOctets InCsumErrors InNoECTPkts InECT1Pkts
+  InECT0Pkts InCEPkts ReasmOverlaps
+IpExt: 0 0 0 0 0 0 4404 3324 0 0 0 0 0 10 0 0 0 0
+----------------------------------------------------------------------
+"ForwDatagrams" increase from 1 to 2 and "OutRequests" is keeping 3.
+"OutTransmits" increase from 4 to 5 and "OutOctets" increase 1428.
 
-Then let's compare.
+Signed-off-by: Heng Guo <heng.guo@windriver.com>
+Reviewed-by: Kun Song <Kun.Song@windriver.com>
+Reviewed-by: Filip Pudak <filip.pudak@windriver.com>
+---
+V2: fix the missing space after a comma.
 
-Thanks
+ include/uapi/linux/snmp.h | 3 ++-
+ net/ipv4/ip_output.c      | 2 ++
+ net/ipv4/proc.c           | 3 ++-
+ net/ipv6/ip6_output.c     | 6 ++++--
+ net/ipv6/mcast.c          | 5 ++---
+ net/ipv6/ndisc.c          | 2 +-
+ net/ipv6/proc.c           | 3 ++-
+ net/ipv6/raw.c            | 2 +-
+ net/mpls/af_mpls.c        | 6 +++---
+ 9 files changed, 19 insertions(+), 13 deletions(-)
 
-
->    And the expected AF_XDP pps is about 6 MPPS.
->
-> 4. About the raw PPS, I agree that. I will test with testpmd.
->
->
-> Thanks.
->
->
-> >
-> > Thanks
-> >
-> > >
-> > > I am confused.
-> > >
-> > >
-> > > What is SMAP? Could you give me more information?
-> > >
-> > > So if we use 3M as the wire speed, you would expect the result to be =
-2.8M
-> > > pps/core, right?
-> > >
-> > > Now the recv result is 2.5M (2463646 =3D 3,343,168/1.357) pps/core. D=
-o you think
-> > > the difference is big?
-> > >
-> > > My tool makes udp packets and looks up routes, so it requires more CP=
-U.
-> > >
-> > > I'm confused. Is there something I misunderstood?
-> > >
-> > > Thanks.
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > > > >
-> > > > > >
-> > > > > >
-> > > > > > >
-> > > > > > > >
-> > > > > > > > What I noticed is that the hotspot is the driver writing vi=
-rtio desc. Because
-> > > > > > > > the device is in busy mode. So there is race between driver=
- and device.
-> > > > > > > > So I modified the virtio core and lazily updated avail idx.=
- Then pps can reach
-> > > > > > > > 10,000,000.
-> > > > > > >
-> > > > > > > Care to post a draft for this?
-> > > > > >
-> > > > > > YES, I is thinking for this.
-> > > > > > But maybe that is just work for split. The packed mode has some=
- troubles.
-> > > > >
-> > > > > Ok.
-> > > > >
-> > > > > Thanks
-> > > > >
-> > > > > >
-> > > > > > Thanks.
-> > > > > >
-> > > > > > >
-> > > > > > > Thanks
-> > > > > > >
-> > > > > > > >
-> > > > > > > > Thanks.
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > > Thanks
-> > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > ## maintain
-> > > > > > > > > >
-> > > > > > > > > > I am currently a reviewer for virtio-net. I commit to m=
-aintain AF_XDP support in
-> > > > > > > > > > virtio-net.
-> > > > > > > > > >
-> > > > > > > > > > Please review.
-> > > > > > > > > >
-> > > > > > > > > > Thanks.
-> > > > > > > > > >
-> > > > > > > > > > v1:
-> > > > > > > > > >     1. remove two virtio commits. Push this patchset to=
- net-next
-> > > > > > > > > >     2. squash "virtio_net: virtnet_poll_tx support resc=
-heduled" to xsk: support tx
-> > > > > > > > > >     3. fix some warnings
-> > > > > > > > > >
-> > > > > > > > > > Xuan Zhuo (19):
-> > > > > > > > > >   virtio_net: rename free_old_xmit_skbs to free_old_xmi=
-t
-> > > > > > > > > >   virtio_net: unify the code for recycling the xmit ptr
-> > > > > > > > > >   virtio_net: independent directory
-> > > > > > > > > >   virtio_net: move to virtio_net.h
-> > > > > > > > > >   virtio_net: add prefix virtnet to all struct/api insi=
-de virtio_net.h
-> > > > > > > > > >   virtio_net: separate virtnet_rx_resize()
-> > > > > > > > > >   virtio_net: separate virtnet_tx_resize()
-> > > > > > > > > >   virtio_net: sq support premapped mode
-> > > > > > > > > >   virtio_net: xsk: bind/unbind xsk
-> > > > > > > > > >   virtio_net: xsk: prevent disable tx napi
-> > > > > > > > > >   virtio_net: xsk: tx: support tx
-> > > > > > > > > >   virtio_net: xsk: tx: support wakeup
-> > > > > > > > > >   virtio_net: xsk: tx: virtnet_free_old_xmit() distingu=
-ishes xsk buffer
-> > > > > > > > > >   virtio_net: xsk: tx: virtnet_sq_free_unused_buf() che=
-ck xsk buffer
-> > > > > > > > > >   virtio_net: xsk: rx: introduce add_recvbuf_xsk()
-> > > > > > > > > >   virtio_net: xsk: rx: introduce receive_xsk() to recv =
-xsk buffer
-> > > > > > > > > >   virtio_net: xsk: rx: virtnet_rq_free_unused_buf() che=
-ck xsk buffer
-> > > > > > > > > >   virtio_net: update tx timeout record
-> > > > > > > > > >   virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROC=
-OPY
-> > > > > > > > > >
-> > > > > > > > > >  MAINTAINERS                                 |   2 +-
-> > > > > > > > > >  drivers/net/Kconfig                         |   8 +-
-> > > > > > > > > >  drivers/net/Makefile                        |   2 +-
-> > > > > > > > > >  drivers/net/virtio/Kconfig                  |  13 +
-> > > > > > > > > >  drivers/net/virtio/Makefile                 |   8 +
-> > > > > > > > > >  drivers/net/{virtio_net.c =3D> virtio/main.c} | 652 ++=
-+++++++-----------
-> > > > > > > > > >  drivers/net/virtio/virtio_net.h             | 359 ++++=
-+++++++
-> > > > > > > > > >  drivers/net/virtio/xsk.c                    | 545 ++++=
-++++++++++++
-> > > > > > > > > >  drivers/net/virtio/xsk.h                    |  32 +
-> > > > > > > > > >  9 files changed, 1247 insertions(+), 374 deletions(-)
-> > > > > > > > > >  create mode 100644 drivers/net/virtio/Kconfig
-> > > > > > > > > >  create mode 100644 drivers/net/virtio/Makefile
-> > > > > > > > > >  rename drivers/net/{virtio_net.c =3D> virtio/main.c} (=
-91%)
-> > > > > > > > > >  create mode 100644 drivers/net/virtio/virtio_net.h
-> > > > > > > > > >  create mode 100644 drivers/net/virtio/xsk.c
-> > > > > > > > > >  create mode 100644 drivers/net/virtio/xsk.h
-> > > > > > > > > >
-> > > > > > > > > > --
-> > > > > > > > > > 2.32.0.3.g01195cf9f
-> > > > > > > > > >
-> > > > > > > > >
-> > > > > > > >
-> > > > > > >
-> > > > > >
-> > > >
-> > >
-> >
->
+diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
+index 26f33a4c253d..b2b72886cb6d 100644
+--- a/include/uapi/linux/snmp.h
++++ b/include/uapi/linux/snmp.h
+@@ -24,7 +24,7 @@ enum
+ 	IPSTATS_MIB_INOCTETS,			/* InOctets */
+ 	IPSTATS_MIB_INDELIVERS,			/* InDelivers */
+ 	IPSTATS_MIB_OUTFORWDATAGRAMS,		/* OutForwDatagrams */
+-	IPSTATS_MIB_OUTPKTS,			/* OutRequests */
++	IPSTATS_MIB_OUTREQUESTS,		/* OutRequests */
+ 	IPSTATS_MIB_OUTOCTETS,			/* OutOctets */
+ /* other fields */
+ 	IPSTATS_MIB_INHDRERRORS,		/* InHdrErrors */
+@@ -57,6 +57,7 @@ enum
+ 	IPSTATS_MIB_ECT0PKTS,			/* InECT0Pkts */
+ 	IPSTATS_MIB_CEPKTS,			/* InCEPkts */
+ 	IPSTATS_MIB_REASM_OVERLAPS,		/* ReasmOverlaps */
++	IPSTATS_MIB_OUTPKTS,			/* OutTransmits */
+ 	__IPSTATS_MIB_MAX
+ };
+ 
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 4ab877cf6d35..32f3027fe51c 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -101,6 +101,8 @@ int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct iphdr *iph = ip_hdr(skb);
+ 
++	IP_INC_STATS(net, IPSTATS_MIB_OUTREQUESTS);
++
+ 	iph_set_totlen(iph, skb->len);
+ 	ip_send_check(iph);
+ 
+diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
+index eaf1d3113b62..a85b0aba3646 100644
+--- a/net/ipv4/proc.c
++++ b/net/ipv4/proc.c
+@@ -83,7 +83,7 @@ static const struct snmp_mib snmp4_ipstats_list[] = {
+ 	SNMP_MIB_ITEM("InUnknownProtos", IPSTATS_MIB_INUNKNOWNPROTOS),
+ 	SNMP_MIB_ITEM("InDiscards", IPSTATS_MIB_INDISCARDS),
+ 	SNMP_MIB_ITEM("InDelivers", IPSTATS_MIB_INDELIVERS),
+-	SNMP_MIB_ITEM("OutRequests", IPSTATS_MIB_OUTPKTS),
++	SNMP_MIB_ITEM("OutRequests", IPSTATS_MIB_OUTREQUESTS),
+ 	SNMP_MIB_ITEM("OutDiscards", IPSTATS_MIB_OUTDISCARDS),
+ 	SNMP_MIB_ITEM("OutNoRoutes", IPSTATS_MIB_OUTNOROUTES),
+ 	SNMP_MIB_ITEM("ReasmTimeout", IPSTATS_MIB_REASMTIMEOUT),
+@@ -93,6 +93,7 @@ static const struct snmp_mib snmp4_ipstats_list[] = {
+ 	SNMP_MIB_ITEM("FragOKs", IPSTATS_MIB_FRAGOKS),
+ 	SNMP_MIB_ITEM("FragFails", IPSTATS_MIB_FRAGFAILS),
+ 	SNMP_MIB_ITEM("FragCreates", IPSTATS_MIB_FRAGCREATES),
++	SNMP_MIB_ITEM("OutTransmits", IPSTATS_MIB_OUTPKTS),
+ 	SNMP_MIB_SENTINEL
+ };
+ 
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 54fc4c711f2c..357b8ed33308 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -117,6 +117,8 @@ static int ip6_finish_output2(struct net *net, struct sock *sk, struct sk_buff *
+ 			return res;
+ 	}
+ 
++	IP6_UPD_PO_STATS(net, idev, IPSTATS_MIB_OUT, skb->len);
++
+ 	rcu_read_lock();
+ 	nexthop = rt6_nexthop((struct rt6_info *)dst, daddr);
+ 	neigh = __ipv6_neigh_lookup_noref(dev, nexthop);
+@@ -329,7 +331,7 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
+ 
+ 	mtu = dst_mtu(dst);
+ 	if ((skb->len <= mtu) || skb->ignore_df || skb_is_gso(skb)) {
+-		IP6_UPD_PO_STATS(net, idev, IPSTATS_MIB_OUT, skb->len);
++		IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTREQUESTS);
+ 
+ 		/* if egress device is enslaved to an L3 master device pass the
+ 		 * skb to its handler for processing
+@@ -1989,7 +1991,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
+ 	skb->tstamp = cork->base.transmit_time;
+ 
+ 	ip6_cork_steal_dst(skb, cork);
+-	IP6_UPD_PO_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUT, skb->len);
++	IP6_INC_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUTREQUESTS);
+ 	if (proto == IPPROTO_ICMPV6) {
+ 		struct inet6_dev *idev = ip6_dst_idev(skb_dst(skb));
+ 		u8 icmp6_type;
+diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+index 5ce25bcb9974..2ed5f479223c 100644
+--- a/net/ipv6/mcast.c
++++ b/net/ipv6/mcast.c
+@@ -1789,7 +1789,7 @@ static void mld_sendpack(struct sk_buff *skb)
+ 
+ 	rcu_read_lock();
+ 	idev = __in6_dev_get(skb->dev);
+-	IP6_UPD_PO_STATS(net, idev, IPSTATS_MIB_OUT, skb->len);
++	IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTREQUESTS);
+ 
+ 	payload_len = (skb_tail_pointer(skb) - skb_network_header(skb)) -
+ 		sizeof(*pip6);
+@@ -2147,8 +2147,7 @@ static void igmp6_send(struct in6_addr *addr, struct net_device *dev, int type)
+ 	full_len = sizeof(struct ipv6hdr) + payload_len;
+ 
+ 	rcu_read_lock();
+-	IP6_UPD_PO_STATS(net, __in6_dev_get(dev),
+-		      IPSTATS_MIB_OUT, full_len);
++	IP6_INC_STATS(net, __in6_dev_get(dev), IPSTATS_MIB_OUTREQUESTS);
+ 	rcu_read_unlock();
+ 
+ 	skb = sock_alloc_send_skb(sk, hlen + tlen + full_len, 1, &err);
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index 553c8664e0a7..68debc78189c 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -504,7 +504,7 @@ void ndisc_send_skb(struct sk_buff *skb, const struct in6_addr *daddr,
+ 
+ 	rcu_read_lock();
+ 	idev = __in6_dev_get(dst->dev);
+-	IP6_UPD_PO_STATS(net, idev, IPSTATS_MIB_OUT, skb->len);
++	IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTREQUESTS);
+ 
+ 	err = NF_HOOK(NFPROTO_IPV6, NF_INET_LOCAL_OUT,
+ 		      net, sk, skb, NULL, dst->dev,
+diff --git a/net/ipv6/proc.c b/net/ipv6/proc.c
+index e20b3705c2d2..6d1d9221649d 100644
+--- a/net/ipv6/proc.c
++++ b/net/ipv6/proc.c
+@@ -61,7 +61,7 @@ static const struct snmp_mib snmp6_ipstats_list[] = {
+ 	SNMP_MIB_ITEM("Ip6InDiscards", IPSTATS_MIB_INDISCARDS),
+ 	SNMP_MIB_ITEM("Ip6InDelivers", IPSTATS_MIB_INDELIVERS),
+ 	SNMP_MIB_ITEM("Ip6OutForwDatagrams", IPSTATS_MIB_OUTFORWDATAGRAMS),
+-	SNMP_MIB_ITEM("Ip6OutRequests", IPSTATS_MIB_OUTPKTS),
++	SNMP_MIB_ITEM("Ip6OutRequests", IPSTATS_MIB_OUTREQUESTS),
+ 	SNMP_MIB_ITEM("Ip6OutDiscards", IPSTATS_MIB_OUTDISCARDS),
+ 	SNMP_MIB_ITEM("Ip6OutNoRoutes", IPSTATS_MIB_OUTNOROUTES),
+ 	SNMP_MIB_ITEM("Ip6ReasmTimeout", IPSTATS_MIB_REASMTIMEOUT),
+@@ -84,6 +84,7 @@ static const struct snmp_mib snmp6_ipstats_list[] = {
+ 	SNMP_MIB_ITEM("Ip6InECT1Pkts", IPSTATS_MIB_ECT1PKTS),
+ 	SNMP_MIB_ITEM("Ip6InECT0Pkts", IPSTATS_MIB_ECT0PKTS),
+ 	SNMP_MIB_ITEM("Ip6InCEPkts", IPSTATS_MIB_CEPKTS),
++	SNMP_MIB_ITEM("Ip6OutTransmits", IPSTATS_MIB_OUTPKTS),
+ 	SNMP_MIB_SENTINEL
+ };
+ 
+diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
+index 42fcec3ecf5e..0a3e12502b05 100644
+--- a/net/ipv6/raw.c
++++ b/net/ipv6/raw.c
+@@ -651,7 +651,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
+ 	 * have been queued for deletion.
+ 	 */
+ 	rcu_read_lock();
+-	IP6_UPD_PO_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUT, skb->len);
++	IP6_INC_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUTREQUESTS);
+ 	err = NF_HOOK(NFPROTO_IPV6, NF_INET_LOCAL_OUT, net, sk, skb,
+ 		      NULL, rt->dst.dev, dst_output);
+ 	if (err > 0)
+diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
+index 1af29af65388..15988e5a745b 100644
+--- a/net/mpls/af_mpls.c
++++ b/net/mpls/af_mpls.c
+@@ -141,14 +141,14 @@ void mpls_stats_inc_outucastpkts(struct net_device *dev,
+ 					   tx_packets,
+ 					   tx_bytes);
+ 	} else if (skb->protocol == htons(ETH_P_IP)) {
+-		IP_UPD_PO_STATS(dev_net(dev), IPSTATS_MIB_OUT, skb->len);
++		IP_INC_STATS(dev_net(dev), IPSTATS_MIB_OUTREQUESTS);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	} else if (skb->protocol == htons(ETH_P_IPV6)) {
+ 		struct inet6_dev *in6dev = __in6_dev_get(dev);
+ 
+ 		if (in6dev)
+-			IP6_UPD_PO_STATS(dev_net(dev), in6dev,
+-					 IPSTATS_MIB_OUT, skb->len);
++			IP6_INC_STATS(dev_net(dev), in6dev,
++				      IPSTATS_MIB_OUTREQUESTS);
+ #endif
+ 	}
+ }
+-- 
+2.35.2
 
 
