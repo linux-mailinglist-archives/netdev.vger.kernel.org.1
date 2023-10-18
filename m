@@ -1,76 +1,110 @@
-Return-Path: <netdev+bounces-42124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D307CD390
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:31:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CACB47CD3B4
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D380B281B0F
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 05:31:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0975D1C209C1
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 05:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185FC8C0C;
-	Wed, 18 Oct 2023 05:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4632A8F44;
+	Wed, 18 Oct 2023 05:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486A343112;
-	Wed, 18 Oct 2023 05:31:53 +0000 (UTC)
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB897BA;
-	Tue, 17 Oct 2023 22:31:51 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1099367373; Wed, 18 Oct 2023 07:31:47 +0200 (CEST)
-Date: Wed, 18 Oct 2023 07:31:46 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Christoph Hellwig <hch@lst.de>, Luis Chamberlain <mcgrof@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Daniel Mack <daniel@zonque.org>,
-	Haojian Zhuang <haojian.zhuang@gmail.com>,
-	Robert Jarzmik <robert.jarzmik@free.fr>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Manuel Lauss <manuel.lauss@gmail.com>,
-	Yangbo Lu <yangbo.lu@nxp.com>, Joshua Kinard <kumba@gentoo.org>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Arnd Bergmann <arnd@arndb.de>, linux-arm-kernel@lists.infradead.org,
-	open list <linux-kernel@vger.kernel.org>, linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-modules@vger.kernel.org
-Subject: Re: [PATCH 5/5] modules: only allow symbol_get of
- EXPORT_SYMBOL_GPL modules
-Message-ID: <20231018053146.GA16765@lst.de>
-References: <20230801173544.1929519-1-hch@lst.de> <20230801173544.1929519-6-hch@lst.de> <bf555c2a4df5196533b6e614cc57638004dfb426.camel@infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45AF7493
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 05:55:36 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F33BC6
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 22:55:35 -0700 (PDT)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qszWg-0007hK-2U; Wed, 18 Oct 2023 07:55:26 +0200
+Message-ID: <24f14f0f-2a1b-401d-b5f8-314387d0aaef@pengutronix.de>
+Date: Wed, 18 Oct 2023 07:55:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bf555c2a4df5196533b6e614cc57638004dfb426.camel@infradead.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/5] net: stmmac: fix PPS capture input index
+Content-Language: en-US, de-DE
+To: Jakub Kicinski <kuba@kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Richard Cochran <richardcochran@gmail.com>,
+ Kurt Kanzenbach <kurt@linutronix.de>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ linux-stm32@st-md-mailman.stormreply.com, Eric Dumazet
+ <edumazet@google.com>, Jose Abreu <joabreu@synopsys.com>,
+ Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ linux-arm-kernel@lists.infradead.org, patchwork-jzi@pengutronix.de
+References: <20231010-stmmac_fix_auxiliary_event_capture-v1-0-3eeca9e844fa@pengutronix.de>
+ <20231010-stmmac_fix_auxiliary_event_capture-v1-2-3eeca9e844fa@pengutronix.de>
+ <20231014144428.GA1386676@kernel.org>
+ <004d6ce9-7d15-4944-b31c-c9e628e7483a@pengutronix.de>
+ <20231017082618.4558ad06@kernel.org>
+ <20231017-transfer-refurbish-5cfaf12a524c-mkl@pengutronix.de>
+ <20231017165042.30fa9061@kernel.org>
+From: Johannes Zink <j.zink@pengutronix.de>
+In-Reply-To: <20231017165042.30fa9061@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: j.zink@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 18, 2023 at 01:30:18AM +0100, David Woodhouse wrote:
+Hi Jakub, hi Marc,
+
+On 10/18/23 01:50, Jakub Kicinski wrote:
+> On Tue, 17 Oct 2023 22:27:41 +0200 Marc Kleine-Budde wrote:
+>>> Would be good to clarify what impact on device operation the problem
+>>> has. How would end user notice the problem?
+>>> Does it mean snapshots were always or never enabled, previously?
+>>
+>> On all dwmac devices not covered by dwmac-intel.c (INTEL 10/100/1000
+>> Ethernet PCI driver), PPS capture can be requested from user-space, but
+>> is not enabled in HW. There is no error message or other feedback to the
+>> user space. The user space will not get any PPS events.
+>>
+>> As this change also affects the Intel driver, and we don't have any
+>> hardware to test, I think it's better that this goes via net-next to
+>> give it a bit more time of testing.
+
+I have also CC'ed Kurt in this series, as I know he has at least some hardware 
+at hand, though I cannot tell whether he has any chance to test the PPS 
+capture. Maybe he has a possibility to try it out. However, giving it a spin in 
+net-next SGTM.
+
 > 
-> But if we're going to tolerate the core kernel still exporting some
-> stuff with EXPORT_SYMBOL, why isn't OK for a GPL-licensed module do to
-> the same? Even an *in-tree* GPL-licensed module now can't export
-> functionality with EXPORT_SYMBOL and have it used with symbol_get().
+> SGTM, we can chalk it up to "never worked, doesn't hurt anyone"
+> and put it in net-next. But then the Fixes tag must go.
+> 
 
-Anything using symbol_get is by intent very deeply internal for tightly
-coupled modules working together, and thus not a non-GPL export.
+sure, that's fine for me. I will reword the commit messages and send a v2.
 
-In fact the current series is just a stepping stone.  Once some mess
-in the kvm/vfio integration is fixed up we'll require a new explicit
-EXPORT_SYMBOL variant as symbol_get wasn't ever intended to be used
-on totally random symbols not exported for use by symbol_get.
+Best regards,
+Johannes
+
+-- 
+Pengutronix e.K.                | Johannes Zink                  |
+Steuerwalder Str. 21            | https://www.pengutronix.de/    |
+31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
+Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
+
 
