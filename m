@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-42398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6E87CE8E0
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 22:29:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1B927CE8D4
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 22:28:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77F2E28264A
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:29:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41BA5B20CEB
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 073E73DFEF;
-	Wed, 18 Oct 2023 20:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807DF3DFE5;
+	Wed, 18 Oct 2023 20:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gdlENQ/N"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="alXd+jUV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960403DFE6
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 20:29:33 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F64B19B;
-	Wed, 18 Oct 2023 13:29:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F107F3DFE1
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 20:28:44 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047AA181;
+	Wed, 18 Oct 2023 13:28:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697660951; x=1729196951;
+  t=1697660913; x=1729196913;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=PZ8f3OZuezOZo142PHMaLRSZJL/PRKIZGCjiSFaWGRc=;
-  b=gdlENQ/Nos8jCYrBcT1Yd+/i4iDotNS1XJiYbIExemGlNKACPEMT/6Rf
-   +euzMMLTfRa7EVhqDfMLpl+o6W3deoxSw3nxvdcUcx0mb28kR4I0v9FSc
-   0yLg0pMSCaCMG+BvIH0cbSogzEolDGGSp+CfvyrJUSpzFXjCFJZB11G2F
-   T6sx0/ylcJT8hLagNYHDri1h8fBoqJLq0ijqNwbuPFYhgXoL9bkS5lJRk
-   OP05eOHtEV3hAPn5EI4z4Zvwnjtq7HG7/8LzMjbWc9+ottozraQpSRsVl
-   KDIUnmeFViTv4Z0z6moqsX2Lf80nBH4S2gAiTcj+G0Xk8wVDkcvEwttfQ
+  bh=41Cw0M5oWSuOe/byt5eX4fcv0uhH1yjV2sbnWcgT1iQ=;
+  b=alXd+jUVz8lbLSi62cNi/x8Pb+wcWXmd0bTmB0UPPljTOUGbZlVeDkLs
+   qfVvrY4AwdnFqzsFhrjhPd9IzFZantBM1p2FQK2RAnOJEd+ggL9NWIj2l
+   jWszCyeBmxEFcccS0YKeKclzA0u7kNKX7a1C/udFQRJUy+553uBlwaBdP
+   Adx01rmzwEv4q8v46Bb1kVUbHbw9q9BNnFZzdVQAoA6WdB30vUTm8BCRY
+   FhllaYakrJEZcSISUwYf1JpzanaArkpbKTbnOpX8sHwUmomeVwv3k0ecB
+   L7fLm3yVlpd6s1W1mLpbXTghszTW1wq+87KxA2JzV1q1Tc7JIjegXABuN
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="389984432"
+X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="371168140"
 X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="389984432"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 13:28:22 -0700
+   d="scan'208";a="371168140"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 13:28:32 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="1003937708"
+X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="756722410"
 X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="1003937708"
+   d="scan'208";a="756722410"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmsmga006.fm.intel.com with ESMTP; 18 Oct 2023 13:28:15 -0700
+  by orsmga002.jf.intel.com with ESMTP; 18 Oct 2023 13:28:23 -0700
 Received: from pkitszel-desk.intel.com (unknown [10.255.194.180])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 3880A33BF5;
-	Wed, 18 Oct 2023 21:28:09 +0100 (IST)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 8C3B033E8B;
+	Wed, 18 Oct 2023 21:28:15 +0100 (IST)
 From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 To: Jiri Pirko <jiri@resnulli.us>,
 	netdev@vger.kernel.org,
@@ -85,9 +85,9 @@ Cc: Brett Creeley <brett.creeley@amd.com>,
 	Benjamin Poirier <bpoirier@suse.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next v3 09/11] qed: devlink health: use retained error fmsg API
-Date: Wed, 18 Oct 2023 22:26:45 +0200
-Message-Id: <20231018202647.44769-10-przemyslaw.kitszel@intel.com>
+Subject: [PATCH net-next v3 10/11] staging: qlge: devlink health: use retained error fmsg API
+Date: Wed, 18 Oct 2023 22:26:46 +0200
+Message-Id: <20231018202647.44769-11-przemyslaw.kitszel@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20231018202647.44769-1-przemyslaw.kitszel@intel.com>
 References: <20231018202647.44769-1-przemyslaw.kitszel@intel.com>
@@ -107,31 +107,104 @@ so there is no need to check for them after each call.
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
-add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-2 (-2)
----
- drivers/net/ethernet/qlogic/qed/qed_devlink.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/staging/qlge/qlge_devlink.c | 60 ++++++++---------------------
+ 1 file changed, 16 insertions(+), 44 deletions(-)
 
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_devlink.c b/drivers/net/ethernet/qlogic/qed/qed_devlink.c
-index be5cc8b79bd5..dad8e617c393 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_devlink.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_devlink.c
-@@ -66,12 +66,12 @@ qed_fw_fatal_reporter_dump(struct devlink_health_reporter *reporter,
- 		return err;
+diff --git a/drivers/staging/qlge/qlge_devlink.c b/drivers/staging/qlge/qlge_devlink.c
+index 0ab02d6d3817..0b19363ca2e9 100644
+--- a/drivers/staging/qlge/qlge_devlink.c
++++ b/drivers/staging/qlge/qlge_devlink.c
+@@ -2,51 +2,29 @@
+ #include "qlge.h"
+ #include "qlge_devlink.h"
+ 
+-static int qlge_fill_seg_(struct devlink_fmsg *fmsg,
+-			  struct mpi_coredump_segment_header *seg_header,
+-			  u32 *reg_data)
++static void qlge_fill_seg_(struct devlink_fmsg *fmsg,
++			   struct mpi_coredump_segment_header *seg_header,
++			   u32 *reg_data)
+ {
+ 	int regs_num = (seg_header->seg_size
+ 			- sizeof(struct mpi_coredump_segment_header)) / sizeof(u32);
+-	int err;
+ 	int i;
+ 
+-	err = devlink_fmsg_pair_nest_start(fmsg, seg_header->description);
+-	if (err)
+-		return err;
+-	err = devlink_fmsg_obj_nest_start(fmsg);
+-	if (err)
+-		return err;
+-	err = devlink_fmsg_u32_pair_put(fmsg, "segment", seg_header->seg_num);
+-	if (err)
+-		return err;
+-	err = devlink_fmsg_arr_pair_nest_start(fmsg, "values");
+-	if (err)
+-		return err;
++	devlink_fmsg_pair_nest_start(fmsg, seg_header->description);
++	devlink_fmsg_obj_nest_start(fmsg);
++	devlink_fmsg_u32_pair_put(fmsg, "segment", seg_header->seg_num);
++	devlink_fmsg_arr_pair_nest_start(fmsg, "values");
+ 	for (i = 0; i < regs_num; i++) {
+-		err = devlink_fmsg_u32_put(fmsg, *reg_data);
+-		if (err)
+-			return err;
++		devlink_fmsg_u32_put(fmsg, *reg_data);
+ 		reg_data++;
  	}
+-	err = devlink_fmsg_obj_nest_end(fmsg);
+-	if (err)
+-		return err;
+-	err = devlink_fmsg_arr_pair_nest_end(fmsg);
+-	if (err)
+-		return err;
+-	err = devlink_fmsg_pair_nest_end(fmsg);
+-	return err;
++	devlink_fmsg_obj_nest_end(fmsg);
++	devlink_fmsg_arr_pair_nest_end(fmsg);
++	devlink_fmsg_pair_nest_end(fmsg);
+ }
  
--	err = devlink_fmsg_binary_pair_put(fmsg, "dump_data",
--					   p_dbg_data_buf, dbg_data_buf_size);
-+	devlink_fmsg_binary_pair_put(fmsg, "dump_data", p_dbg_data_buf,
-+				     dbg_data_buf_size);
+-#define FILL_SEG(seg_hdr, seg_regs)			                    \
+-	do {                                                                \
+-		err = qlge_fill_seg_(fmsg, &dump->seg_hdr, dump->seg_regs); \
+-		if (err) {					            \
+-			kvfree(dump);                                       \
+-			return err;				            \
+-		}                                                           \
+-	} while (0)
++#define FILL_SEG(seg_hdr, seg_regs) \
++	qlge_fill_seg_(fmsg, &dump->seg_hdr, dump->seg_regs)
  
- 	vfree(p_dbg_data_buf);
+ static int qlge_reporter_coredump(struct devlink_health_reporter *reporter,
+ 				  struct devlink_fmsg *fmsg, void *priv_ctx,
+@@ -114,14 +92,8 @@ static int qlge_reporter_coredump(struct devlink_health_reporter *reporter,
+ 	FILL_SEG(xfi_hss_tx_hdr, serdes_xfi_hss_tx);
+ 	FILL_SEG(xfi_hss_rx_hdr, serdes_xfi_hss_rx);
+ 	FILL_SEG(xfi_hss_pll_hdr, serdes_xfi_hss_pll);
+-
+-	err = qlge_fill_seg_(fmsg, &dump->misc_nic_seg_hdr,
+-			     (u32 *)&dump->misc_nic_info);
+-	if (err) {
+-		kvfree(dump);
+-		return err;
+-	}
+-
++	qlge_fill_seg_(fmsg, &dump->misc_nic_seg_hdr,
++		       (u32 *)&dump->misc_nic_info);
+ 	FILL_SEG(intr_states_seg_hdr, intr_states);
+ 	FILL_SEG(cam_entries_seg_hdr, cam_entries);
+ 	FILL_SEG(nic_routing_words_seg_hdr, nic_routing_words);
+@@ -140,7 +112,7 @@ static int qlge_reporter_coredump(struct devlink_health_reporter *reporter,
+ 	FILL_SEG(sem_regs_seg_hdr, sem_regs);
  
+ 	kvfree(dump);
 -	return err;
 +	return 0;
  }
  
- static int
+ static const struct devlink_health_reporter_ops qlge_reporter_ops = {
 -- 
 2.38.1
 
