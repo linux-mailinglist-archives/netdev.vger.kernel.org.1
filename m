@@ -1,75 +1,71 @@
-Return-Path: <netdev+bounces-42425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00DBB7CE9F6
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:29:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 990717CE9FA
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F106B20E06
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:29:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7B4D1C20D67
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9654B42935;
-	Wed, 18 Oct 2023 21:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3655742935;
+	Wed, 18 Oct 2023 21:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JN+6DP89"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BJrnU4dN"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB76642920;
-	Wed, 18 Oct 2023 21:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689F51EB24
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 21:30:24 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 458569B;
-	Wed, 18 Oct 2023 14:29:06 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B900B0
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 14:30:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697664546; x=1729200546;
+  t=1697664622; x=1729200622;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=c3vZH+t+Ksy0i3FaLg+mu+1zqhSZWx4eXQQ3WBoffjg=;
-  b=JN+6DP89KBKz5CdN57OZEUqc/jUIT9mgGOFHy4Rlw9DAFj7sndcN3hNi
-   pCWB2//Hw9NvhvSbo8b5IJpjQ825vJMeqhXZ/s8zakXPH5kphZjmyrlxc
-   YKKKpuqb6wyR3iasmnU7Q/Mkc8oiNzfatjlRXd8ZGPT7eFHUyq/kVAR6K
-   5x4nuFPK68Z7Po0SNEQI6J9iYVdkacWg/EQzYSGoBrDIAy0jnNK6GV1qe
-   0WUTXQHki0YT4B7mPJ90VqG8SmVxEZuKQp5llCjChOAIbRL7JQPo1BiiN
-   FVV9y9YfonlnaIakPXHKCTiNtIhtVq1q3r9gWY4B5dXS/CBD7thNDtrcv
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="4707590"
+  bh=bcqaBECpD0JMWieUPkXs1PLTQaFttMxQaT8hz2/16xY=;
+  b=BJrnU4dN7wOPPN26j5fP3KTA7WoL54TVeArWNLCqV+DXCgNnUsJiCG+I
+   P/Vw96VjaGTx9F6+DjFShE7XelPVm0hcYngfpvFvuMkvY/Fz1wo6G28gt
+   yAKmB3lU2OasQMyyXPqtmrNKEruqxEXAIQSGuufzoKtqrGigqaycHf33q
+   4dXMgkP/Z2Lshp6XIGDBeLtotfjFIun2auxPrarVp49ozTUS5fYHMkPvx
+   s5Pj0xQMN/Em+LYlZtI1LffM2Mt9nqOl0gNM5sWjnxwL5WnXtfDLxaI/a
+   vo1XvGTdNIZtUBsdT9/0ytE+o27nAO8JGs3Eair9J8BTCFDVmCuZry06Q
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="4708120"
 X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
-   d="scan'208";a="4707590"
+   d="scan'208";a="4708120"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 14:29:02 -0700
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 14:30:22 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="1003957479"
+X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="1003958561"
 X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
-   d="scan'208";a="1003957479"
+   d="scan'208";a="1003958561"
 Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Oct 2023 14:28:58 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Oct 2023 14:30:21 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
  fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 18 Oct 2023 14:28:58 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 18 Oct 2023 14:28:58 -0700
+ 15.1.2507.32; Wed, 18 Oct 2023 14:30:20 -0700
 Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Wed, 18 Oct 2023 14:28:58 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ 15.1.2507.32 via Frontend Transport; Wed, 18 Oct 2023 14:30:20 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
  by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 18 Oct 2023 14:28:57 -0700
+ 15.1.2507.32; Wed, 18 Oct 2023 14:30:18 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ldWqyEueWkY8GOv3ojrQeGF0xtth9HNUay+davxh1QuesnkATtTn00vs6VFOBpLv2FJ/s5rexllD0YFHyveNwcvJ56WP5Ib16TJLHgz0mArTOTE+10rWfNqcrbMhxzrFFIga2Miomo1NoHj2btjRtarzqsbSktk8m+G6eDu69BJcwsehfRE2u1c3YdUHh+UIMhzr8J7cBfxc0VvECmqJ9tm0/36dJv7Dom0/xbb21Ht7IqZAUL0mgl28ooweoIIXFEo9rOqkN1SwVATqZEdQdnzazqOS9XyGyL9dJaBvsjetWEd7Ow6KcRTh7VTdWPOgZPVTxRQf1UI1VehPT5CH/Q==
+ b=DbEohWacdWBkkzOMoExXRmSzKo/30e+lW1Fmxm3SaSgJzY8QM6sXTyNvrWAHzyucbu3O8XLzjK2MZTb5ItBAWhkOcde3nioYjLik9G6k5CvQhU53ix5mcjJHr2eL9Qo7kp8WiRTTAEi5QmRdczTePIjCKd7MFRBZZej5Vl9lrv8PNcuqT3hCDioFimsZxO8CPXOY4bIoDBWL+OiFkpEUKC3+6i+wUTbXBC8avyU01uUjL9IPieBY7NrlNsdPConwH9t4Lw8RAh4qEq73UPIGoPU4lJx+oziWi0UGBJ55PlFSmcmUDdT6RRuCBfKTVmORMfXzAxpXu2hWRpTjYWvD2A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AcTWbPDOJkybGdaqgKlex/suzyD9GVVNimoJQiR940Q=;
- b=cW+lM0SHs3TzAwJWfX5x9cgIVh2eAM9M8/lWic8VLearPK4uOvnJrbRfR+tNbfYJe9WIM1VRklY2eWxh8wAjujBtI4ak1KfswBEwYa5yRFZjZotuaDmTmzAO3+J/tILHp4874iBM6qOs1Wy2hoz3mTP+96pxn4Z8AWREprjMh0N0+bPDSRJGK31De1BharsVTkfy773hSQwLnng3n7PAvhmROaAnSOZDPo0TyNAQZRzbylag09vR1yzcLxpvL7qpXBgKvHGg+bJ9PZ4hl4XrCwc7+Ou2rTmXsJihIiW+xgOT6Tz/pzWdSzEZy/qk7BCMKxM80hMYLgEtJCg5wzPgIg==
+ bh=Ptoi/t4CpySYGWq/pDPfMn8tuWavKagB/2CFYUK8lmk=;
+ b=ZX3mJhsIE+szP2GrBDWilERPZ/4edTwvuWtyA4P15EAFMQWK2ofBLNwgGlgHHS+R7p9hLsUtXrYCJP48GcXzpjMJXP0G2BvY4WRNjXaZgz0dML/RLBBBUzcKLa+QskN+bftkAgmJYSjSI1M3oH2JYo7gQqm0/fKvMV54ReNhg5Z2YwiNjpa9OapZtoKfQl94dy+gIfuPALX5Ab0RyThOKbhoMuF6h63IDUpzdDzU9mV3M2/ws65869/PZLV+s+YZYCoroG5RPNh1dt09r1eJQc9ir5QvXsBw8Aq5SdvHtLJtSMpiCwUtAomZxPisYWTFGa4a7xPZ+NWzYtE7T2JrbQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
@@ -79,28 +75,23 @@ Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
  by SJ2PR11MB8298.namprd11.prod.outlook.com (2603:10b6:a03:545::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Wed, 18 Oct
- 2023 21:28:53 +0000
+ 2023 21:30:14 +0000
 Received: from CO1PR11MB5089.namprd11.prod.outlook.com
  ([fe80::34a7:52c3:3b8b:75f4]) by CO1PR11MB5089.namprd11.prod.outlook.com
  ([fe80::34a7:52c3:3b8b:75f4%4]) with mapi id 15.20.6907.022; Wed, 18 Oct 2023
- 21:28:53 +0000
-Message-ID: <acf0b2db-c254-4537-97d3-14cce1ad4e39@intel.com>
-Date: Wed, 18 Oct 2023 14:28:51 -0700
+ 21:30:14 +0000
+Message-ID: <a686004d-8a5e-409c-9071-237ded8df68e@intel.com>
+Date: Wed, 18 Oct 2023 14:30:13 -0700
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] i40e: Align devlink info versions with ice
- driver and add docs
-To: Ivan Vecera <ivecera@redhat.com>, <netdev@vger.kernel.org>
-CC: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, "Jesse
- Brandeburg" <jesse.brandeburg@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, "open list:DOCUMENTATION"
-	<linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>
-References: <20231018123558.552453-1-ivecera@redhat.com>
+Subject: Re: [PATCH net-next] iavf: delete unused iavf_mac_info fields
 Content-Language: en-US
+To: Michal Schmidt <mschmidt@redhat.com>, <intel-wired-lan@lists.osuosl.org>
+CC: Wojciech Drewek <wojciech.drewek@intel.com>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	<netdev@vger.kernel.org>
+References: <20231018111527.78194-1-mschmidt@redhat.com>
 From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20231018123558.552453-1-ivecera@redhat.com>
+In-Reply-To: <20231018111527.78194-1-mschmidt@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: MW2PR16CA0061.namprd16.prod.outlook.com
@@ -114,212 +105,195 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ2PR11MB8298:EE_
-X-MS-Office365-Filtering-Correlation-Id: 007632fd-9c45-4ff1-bf19-08dbd0213a42
+X-MS-Office365-Filtering-Correlation-Id: 017eb54d-175b-43fc-07d2-08dbd0216ad0
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: w+cAGuD5Q7Bn5NkCR/wJwFIEU3ZBGpQm4oZFNoScT5MYgJJVZS/sqlzxnL/WFek4cW/7ky9CW65wfyHYMxF0A55+u3a4jbF26TIz8G7IO36KqqWMJM/XBkv5b4ocuNd1SXGLpZmt6f7YAyFj85RNyS+ms6tirnTfLKLgR2fyUGetIkV5xZzmrySl0NUGznN6G3a6uCPQikkdgpmnyFoNVuVMU2f+g+phPM7xyNRISmglsLGlA7J2+nfeYxdQo3wLlz3dQsqOy8+3yPcN4brrxNBf07WunA+gJm8+TmFS1+nX6WTqeTIDiCr2rUhoRPCmfmooKLGWIb0KTLnJ9hXF/un7xhnzFXRmU4mycWxnHCPimEORMogH3gW5Sg38GTlrJ1+yBcSfig9mjBCtbUY8AyouKsmG0MDEpyDN9Ax8u1ARRqJBSPDBvmk+WbCnCaHJtJ6IXH3/HVv3HAppB2p434YeMwr0WNPoUEECDj1ITnnsdWhBVm8Eyt9SNObQa5MkOvLsDz9Q9SL8M6Y/eIXzQyHGwXRtj2F/8KdZ4T1VCiEdEjuMePCuwEwLusbCsSRafXr5c40DoVeAIm6ikJXT/Qr2GD6sgJl+bfEMA8xt731agEVQwKfUeA0BCt9kb4yV8iYPhQx6WEHPNqsc8I7cwg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(39860400002)(346002)(396003)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(31686004)(54906003)(316002)(66946007)(478600001)(6486002)(66556008)(66476007)(82960400001)(83380400001)(5660300002)(38100700002)(6512007)(53546011)(6506007)(31696002)(36756003)(86362001)(2616005)(26005)(4326008)(7416002)(8936002)(41300700001)(8676002)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: ZxaRDoKOiV2WiYJqi4b8CMj67NxqcvFYanafKIx4t1WGMQD62SMPT6vK52ZJOzRT/HbSHkrva3KVQdmwyJIOeEkzKxOtGsWIB7JBbn6rwCkVLqOMGUnSsJlsvwrynKjuusrwX9Wop8ot/tZJ80CVEK3D6iiGtK45rZBBQ3qa5/9YiUVKLBQEhqvsLwm/JljNaYFviQAZv2c1SyFiyYulI1F4zux2dsefUl7mEn+d6mUbAmZYjpTtiy3nIw03z2CIZ1uzDkP1Ga/lIWKL6jfmntTM18plZkXU9mRYUD1DZ6ZnuNcDHk2j2O/9WCpi9L582uTiPzZg7Q1dRXNV6kw7z1twW7RrvagzT4CMjFRL5fD5lhbOv/AC4Gl02jBnC1koR/9EXPOTyDz+g/decDJLVNRgAbDJopCetwnp++fdIoYN0q6mmTe3H0QSwGIPIz9aJIJWURbNNbyyVGZYtEkUu4ogm2YjQVOs0hxRDqJA5AMpn50g8M/RfPfmR7KSxeEIYbO5CbBDYd2eUd5U50kPAYMss5vFIKtwT1wvox9ohXuZOpAuCZQj3+NM1KwXXwdn5osWK6UK2vM2Q96X4d4NZbbYOmXhKlgJnG19d0GMh0pi25aswFr9ToPa9YsXBe0NecO3VE6AK1cCVqVR51kHcQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(39860400002)(346002)(396003)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(31686004)(54906003)(316002)(66946007)(478600001)(6486002)(66556008)(66476007)(82960400001)(83380400001)(5660300002)(38100700002)(6512007)(53546011)(6506007)(31696002)(36756003)(86362001)(2616005)(26005)(4326008)(8936002)(41300700001)(8676002)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K2krT21tcnRuLy96d3ZlaWVkaXU5cStXaWRsSnd3S0lQMm5tR0o1WDh0YXA1?=
- =?utf-8?B?aDZzSGdmL2hVNGsvMldPQ1RjOC9pMUpYb1RFWVBvS2lKQkt2a0s0Qk0ydnF1?=
- =?utf-8?B?NlpubVYrNkVCWXMyQ2wxNVVFV0xpNmtjb2d4aGtwd0ZhSFowMXJVWDdYQzhI?=
- =?utf-8?B?SXR1WE10SkU5cWpRZTBqWmxUc3NBdC9WOGlsRGU1ei9XalkzVm9xOVgvd2hC?=
- =?utf-8?B?MUs3VGVWNjBCcXk2SFU5VkxmVHNlazg0TkxkQ1dWT2hhMUgxTWZ1OHRnQjU5?=
- =?utf-8?B?L0puZkRvR25GQ0p4M3dNa1gydHJhZitKazJCdTE2VEYzdS9EQWdCellhSi9I?=
- =?utf-8?B?UHpaN1VCY3A5dkJQK2NkWnZxdjZTZWZUOU1Zb2t2UVg4YjI2RnZVZHJrQWZJ?=
- =?utf-8?B?RHZhZXdCaVpmT0VUSDFLWmZldVhBNklYdlE4ZTVIdmE0YjZlNjRIR2hVcThE?=
- =?utf-8?B?NDd6YnRJWnd1N0VHOXcwV2tGU2pPYmNKRm03ZzU3d0FTMFFjU25CREJCQUZN?=
- =?utf-8?B?SmMzbnVOQlJBdFdvUWpVYThsZlZ4bWZqb2NhdERiK1hTWDBUZXFQM0h3bFQ2?=
- =?utf-8?B?aXlwVXFzaWJnbVg1NXNHdDdYaHhIbEsxa2RTeE50aEVORHdZUkc3L0Q1RGJw?=
- =?utf-8?B?eE9vRDM0Nk9XWEd6NVB0ZnlENkV4ZmtPSSt4ckFaVHd5c1cyME9adk5hbXFT?=
- =?utf-8?B?WW9oNlFKd25lc0dZTHVJcDYyMFpHRDlYS3NyTnpGVjM2MklQT1Y0WGVSZjNr?=
- =?utf-8?B?bE50Yy9ZMnpyV3c5Wm1Vdmh0R25XZTRjcVNzc0t6Z0FhRnJCM3pHNnNJMFJV?=
- =?utf-8?B?d3huaDNjWjE3dEFTUFhEcFhPb0tZQm5pUzFtempnYmlrcEd5TFZIakxNNmJB?=
- =?utf-8?B?YjFSSFNVNVdZaWR1TnMzMzY0SFBvSkcxeGNjYW1uS1A5K3hLR2pXWWEwSVV1?=
- =?utf-8?B?NW5BOTU1VEZ3THlUYW1TQVR2czJFSXJwTTduSEMwaVdWTW5lNUxIOFRZOGt0?=
- =?utf-8?B?b29udGtoaDdBWHpDR0d1QXplczhRRkJ4NXlsanRnUCtlb1Q3V0F4Q2srdFRp?=
- =?utf-8?B?dEI0VFZxVE5ucjZzWk9DUWxFcGxITnBjMVFBSm0wZkNNd3hUNWJ3dXNSSHpx?=
- =?utf-8?B?eml5UDVKdlRVeHRyZXhsOXNSZ21EUm9RaXJuRzVqS3p1NmpCOHF2cSt5OHE2?=
- =?utf-8?B?Z3d2aG51OEJoK2x2OVlzRTFtQ1p4cjhONnhncHdnOEowWDFYYWE2SUpyU1FP?=
- =?utf-8?B?K2JzNkhja2hJUm96UWR6L0ErOU5GQmN1UlNReTI3NTlyT2RUVjg5Q3ZXL1JL?=
- =?utf-8?B?cXd0L3o1YlR6bGJ5TjNZT1A4LzFaaGpZZUNpb0Ewb01UdG5QQ2F3bUw5Q1hx?=
- =?utf-8?B?Vk5PM2hHOWtBeVBPRTR3T1o3N3R2czdDMjJ3NkZib2dCZUlZaXhXMkZ4MHhS?=
- =?utf-8?B?blYyT0c5LytJR2FXMWM3b05IeC9NRktMbEFxNUFCbnlMK2Nkb2dmMDBPT3Jv?=
- =?utf-8?B?cHN4RFpnQXdPMXRFbW1YcndadUJ6aDk3a3ZFclJlSnRMVHVQQjZjTGpHMVM2?=
- =?utf-8?B?QWNlU3BiOHZqSEc1TDBvdlR4eFYyRVh3SldNcVdTa0RGT0xZazBIRk9pd2ZT?=
- =?utf-8?B?cjFMeWpQRFoxckpNdkFVdzdhLzBuZ3JDV2toeHd5RE42ZWFHL2YvZUlvK0o5?=
- =?utf-8?B?Rlp6WEg1WkFWanJNZDVHV0tFVFBwT2Qza2Iwb29KK1JzRE9FdWlIRGZodmtk?=
- =?utf-8?B?MEZKcXRXZ1pyNXRhMGt6NEV0bUR0UEJCSmtVRzlpcWUvZTNpdzVSYUIySldO?=
- =?utf-8?B?eW9GSFp4cDJDRGVXTVExaDF1V1JRQXV0eHI5TC84dEVTZFU0dXloRVFmaUhB?=
- =?utf-8?B?dDgxOU9MeWlrZGJLTUZJN1BxYVphOTJubUJYTk1pWHk0d0l0SG5NdXJpcDhy?=
- =?utf-8?B?RjE2b2IydmdDem85SGFnQlgrWEl0TjlESXJhRFcrNmQxN1VaYzRmSXFmQ3N4?=
- =?utf-8?B?eUw4ZGtSbjZnS1IrWGgvMWNxbXFONUc1YW4wVElhaGhId2ducEJFWGZMWlRL?=
- =?utf-8?B?bHhReGZoZUR6Z2FReDhaeXlYem9zZWkvMVJDMHpLNklZK0NkNWtKeUNYUjBW?=
- =?utf-8?B?WkZEbWM2MVpGdFQ3NHBTaitHL2hGRHNaaEJEZURIN0cyTmxlTHZrUjhRV205?=
- =?utf-8?B?SVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 007632fd-9c45-4ff1-bf19-08dbd0213a42
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aWwvckloUzc0dzhiam9Gd09uWVREL0E0N2RQdXRpUjVrd1BKcEN6dC9zSW9K?=
+ =?utf-8?B?aUJBZnhhWC9oVXh1WEFQV3ZxWCtZKytQSlFTRStCZDB4YUFYZ2ZvNFl3cS9R?=
+ =?utf-8?B?SW5yVVluVTBLalZpbXNDLytQZm94UWlOV1RBRytHNWkzcFhYVTIyTzZxUG5G?=
+ =?utf-8?B?QmdRS25ocWFiUFNYaVpJa0lOL1ZVQ2JIbjE3TzFYcUZYcmJzUWU5UWY3Q3Rx?=
+ =?utf-8?B?bE53ck44VlIvTUtlWGpOemJsSlpoSy8ydkJ6RS8wZGczVjk1TkJCaytoSDJ5?=
+ =?utf-8?B?c1J1MHlWWnF2NVBxSklpQ1dML0VMdkQxdEV5UVFNYjBGaUtMRmRwMi9rLy92?=
+ =?utf-8?B?QUdtejVvWHV1Tm83SkVSaVd1cE5rd0FqYm9VUkRDRmxtaUVmRUZjVm40RlNN?=
+ =?utf-8?B?K0krTGRwQmhnWkk5Mk5IamZrem5TRjdDdGZreFBQZ1FWdWN2OThwRHVtY2ZH?=
+ =?utf-8?B?cEx0SVJrR0tWbkJrRzVmd0hHNjlKbmRGT0Njdk91cGd3VzVQc0lScUxPbW8x?=
+ =?utf-8?B?RmxpTVVHQkdJN2V6RlozRTJUb3lzVjVMa3Fnc1lqdlhPTzI4elBrR2NLN0pt?=
+ =?utf-8?B?R1NUV29hb3AvME1DSzQ2c0EySFJhamtxdG1hY0dBaEVTUS85VFZEY3ZEMEJC?=
+ =?utf-8?B?TmlWWDdVUFFwaXFvZVIrVjVQS25Ec0w3LzBpNDIwOFBTcU4xVkp1Z1d0YWkz?=
+ =?utf-8?B?eDJ4L2grYm5neDRVTEI5MytOMW5ySitoTUh3YklJTEhMZDhNaVNwNDRVS1Mv?=
+ =?utf-8?B?WDR0QXN1YjlrMDhqZnBZWnRVK3ppeTVhZllqUG1rdk4xR2NIUlVZck9Cd0Y4?=
+ =?utf-8?B?YUdVZExEdVNsSkVLbGJES2pzdnBLTXErem9lYi9UTHMyV2dlcmo5TWRiVGta?=
+ =?utf-8?B?dldYU3NvdjNwWUpjZUdqek1vQ2VyaWdja05vaWxEZCtHK01zbnprZVZQYWdP?=
+ =?utf-8?B?RXE5S1VneUs3bkk0UHZuVVlqM1BBeDk0NGM2cFdMYjVZcVdQMFJvYURTeTJt?=
+ =?utf-8?B?cS9OVjZoOWlOL29QQy83S1J4RWY5cUp1WklsdUpJeHg1VHcvZjJLZjdrV2dK?=
+ =?utf-8?B?enZKVW9JaGl5YnFZT3FFZEM0a2tpY2pnaTd5eGloMjNwNy9LR1dnbExxSHU5?=
+ =?utf-8?B?aHJXNG1BSWJYMUlhY21XQ2llV2FDUGJzUzYwZEVZZjltT0gySVhNaUp2N1pM?=
+ =?utf-8?B?dFJZN0FzckZ2U1lsZ0V1N0piMFlzaWFxV25pNjFuMHhJV2djampjT05nSWhw?=
+ =?utf-8?B?SlZXTHFjNk5LTzg3MmlpQkdVbCszdm9pWjd1UzFScFUrWU45SDNWSTdWMlpt?=
+ =?utf-8?B?NkhMNENDaEpmNXNWeXZraEN2bjUxUnZoZmdnWWtWYnpjUk5aM2wvZStzZUo2?=
+ =?utf-8?B?b0NIdlFWditTbVdlSTQxUjR6ckVTS2Y4djkrQjYrMnl5QzBLZThXQmJqejlV?=
+ =?utf-8?B?L0svNEtXQ1BhN1U2cGZmcHFZaEFMM29VRTJBRmljOGx4TGo1b1pOZ1BSZlY1?=
+ =?utf-8?B?TEJLVk5ySVJYMVpnL3JSVHJkbHlPN2IrRDVDYzVVTzZNR1lST1VYZ3hKNzZI?=
+ =?utf-8?B?WCtIZUV1MjdjUGkwcGFTQll4RWprUGFiMElWZVVSemZlYnpDY2NvTnJtRVpQ?=
+ =?utf-8?B?eE1BeTcva2Y5dW93bkN6eWZjRHE0M1c2d0lzWmFoZW9kdnVndDdDZkQ2WDEw?=
+ =?utf-8?B?OWxpc3M0OGcvUGw4K1ZETERlTkpzZElkby9OMmlrWncvek9tc0h4Z0J0STR1?=
+ =?utf-8?B?WnZ0bXFYeTJ2NUQyZmFkdG1HaHNkUEtvUXFLVmJHNmNkSE95MWlYYkJESVls?=
+ =?utf-8?B?d1NTNDlSYkRVekpaMjJETk5sTW9sSHo1MFdVN3BzcFIzcVFUWmpXWUZLOGYx?=
+ =?utf-8?B?YWdmeU44alkrTzVnTUY2SzcwZlVtUU8wZDFFN05JazhpVFE4Vmk1amZzK1lO?=
+ =?utf-8?B?RFhGb0p1aWhiTVdHd1QyRnFlWkY4REt4cVQrUkVVd0dXdTdFTzNMRDFwQURV?=
+ =?utf-8?B?QkhOOHZBU2pCaVpGVmJGRWtUVUZvUG8wOHdhYmZONVd6dlM4NUFTdTNwNHIy?=
+ =?utf-8?B?cGR0K2RJMVhzWm1MWFlZTFdFeHgzZkdva0ZhRFJYS0FtQ3ZqZ0JTUGZjNWdw?=
+ =?utf-8?B?SDRhQUxZcFBaVUtHdG0wK0ovWm82dXdEa1AzL2pXNjFNYjJINGhyNmdOWEF3?=
+ =?utf-8?B?UkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 017eb54d-175b-43fc-07d2-08dbd0216ad0
 X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 21:28:53.4354
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 21:30:14.8356
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lPAW78Z5HMC5Rq98DeOgzlN9mh6WYmh6h0lXvPb4YhmZ2n3UVcEHXQD9D/2AE25cWsQF737ukiP+2w+0xDPTnUGvE/UygcWcOWrK7Ul+xyk=
+X-MS-Exchange-CrossTenant-UserPrincipalName: eiYmvOC+Wuyq1z5hFevXY+at1D2cDZfhzsQDssdWRIVebEYukjkS/T5+aybxC+86y4Ckeqqy2GtCYk2qkVMrvOyXN1JTTzSq1bxbb9Yftkc=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8298
 X-OriginatorOrg: intel.com
 
 
 
-On 10/18/2023 5:35 AM, Ivan Vecera wrote:
-> Align devlink info versions with ice driver so change 'fw.mgmt'
-> version to be 2-digit version [major.minor], add 'fw.mgmt.build'
-> that reports mgmt firmware build number and use '"fw.psid.api'
-> for NVM format version instead of incorrect '"fw.psid'.
-> Additionally add missing i40e devlink documentation.
+On 10/18/2023 4:15 AM, Michal Schmidt wrote:
+> 'san_addr' and 'mac_fcoeq' members of struct iavf_mac_info are unused.
+> 'type' is write-only. Delete all three.
 > 
-> Fixes: 5a423552e0d9 ("i40e: Add handler for devlink .info_get")
-> Cc: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
+> The function iavf_set_mac_type that sets 'type' also checks if the PCI
+> vendor ID is Intel. This is unnecessary. Delete the whole function.
+> 
+> If in the future there's a need for the MAC type (or other PCI
+> ID-dependent data), I would prefer to use .driver_data in iavf_pci_tbl[]
+> for this purpose.
+> 
 
-Great, thanks for cleaning this up.
+I suspect a handful of information across the Intel drivers could belong
+in .driver_data instead of the current method we've used.
 
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
-I'm happy for this to go straight to net-next without queuing in
-iwl-next since the relevant i40e series also just merged there last
-weekend :)
 
 Thanks,
 Jake
 
->  Documentation/networking/devlink/i40e.rst     | 59 +++++++++++++++++++
->  Documentation/networking/devlink/index.rst    |  1 +
->  .../net/ethernet/intel/i40e/i40e_devlink.c    | 18 +++++-
->  3 files changed, 75 insertions(+), 3 deletions(-)
->  create mode 100644 Documentation/networking/devlink/i40e.rst
+> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+> ---
+>  drivers/net/ethernet/intel/iavf/iavf_common.c | 32 -------------------
+>  drivers/net/ethernet/intel/iavf/iavf_main.c   |  5 ---
+>  .../net/ethernet/intel/iavf/iavf_prototype.h  |  2 --
+>  drivers/net/ethernet/intel/iavf/iavf_type.h   | 12 -------
+>  4 files changed, 51 deletions(-)
 > 
-> diff --git a/Documentation/networking/devlink/i40e.rst b/Documentation/networking/devlink/i40e.rst
-> new file mode 100644
-> index 000000000000..d3cb5bb5197e
-> --- /dev/null
-> +++ b/Documentation/networking/devlink/i40e.rst
-> @@ -0,0 +1,59 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +====================
-> +i40e devlink support
-> +====================
-> +
-> +This document describes the devlink features implemented by the ``i40e``
-> +device driver.
-> +
-> +Info versions
-> +=============
-> +
-> +The ``i40e`` driver reports the following versions
-> +
-> +.. list-table:: devlink info versions implemented
-> +    :widths: 5 5 5 90
-> +
-> +    * - Name
-> +      - Type
-> +      - Example
-> +      - Description
-> +    * - ``board.id``
-> +      - fixed
-> +      - K15190-000
-> +      - The Product Board Assembly (PBA) identifier of the board.
-> +    * - ``fw.mgmt``
-> +      - running
-> +      - 9.130
-> +      - 2-digit version number of the management firmware that controls the
-> +        PHY, link, etc.
-> +    * - ``fw.mgmt.api``
-> +      - running
-> +      - 1.15
-> +      - 2-digit version number of the API exported over the AdminQ by the
-> +        management firmware. Used by the driver to identify what commands
-> +        are supported.
-> +    * - ``fw.mgmt.build``
-> +      - running
-> +      - 73618
-> +      - Build number of the source for the management firmware.
-> +    * - ``fw.undi``
-> +      - running
-> +      - 1.3429.0
-> +      - Version of the Option ROM containing the UEFI driver. The version is
-> +        reported in ``major.minor.patch`` format. The major version is
-> +        incremented whenever a major breaking change occurs, or when the
-> +        minor version would overflow. The minor version is incremented for
-> +        non-breaking changes and reset to 1 when the major version is
-> +        incremented. The patch version is normally 0 but is incremented when
-> +        a fix is delivered as a patch against an older base Option ROM.
-> +    * - ``fw.psid.api``
-> +      - running
-> +      - 9.30
-> +      - Version defining the format of the flash contents.
-> +    * - ``fw.bundle_id``
-> +      - running
-> +      - 0x8000e5f3
-> +      - Unique identifier of the firmware image file that was loaded onto
-> +        the device. Also referred to as the EETRACK identifier of the NVM.
-> diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
-> index b49749e2b9a6..2b78060aaa58 100644
-> --- a/Documentation/networking/devlink/index.rst
-> +++ b/Documentation/networking/devlink/index.rst
-> @@ -52,6 +52,7 @@ parameters, info versions, and other features it supports.
->     bnxt
->     etas_es58x
->     hns3
-> +   i40e
->     ionic
->     ice
->     mlx4
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-> index 9168ade8da47..74bc111b4849 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
-> @@ -18,8 +18,14 @@ static void i40e_info_fw_mgmt(struct i40e_hw *hw, char *buf, size_t len)
->  {
->  	struct i40e_adminq_info *aq = &hw->aq;
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_common.c b/drivers/net/ethernet/intel/iavf/iavf_common.c
+> index 1afd761d8052..8091e6feca01 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_common.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_common.c
+> @@ -6,38 +6,6 @@
+>  #include "iavf_prototype.h"
+>  #include <linux/avf/virtchnl.h>
 >  
-> -	snprintf(buf, len, "%u.%u.%05d",
-> -		 aq->fw_maj_ver, aq->fw_min_ver, aq->fw_build);
-> +	snprintf(buf, len, "%u.%u", aq->fw_maj_ver, aq->fw_min_ver);
-> +}
-> +
-> +static void i40e_info_fw_mgmt_build(struct i40e_hw *hw, char *buf, size_t len)
-> +{
-> +	struct i40e_adminq_info *aq = &hw->aq;
-> +
-> +	snprintf(buf, len, "%05d", aq->fw_build);
->  }
+> -/**
+> - * iavf_set_mac_type - Sets MAC type
+> - * @hw: pointer to the HW structure
+> - *
+> - * This function sets the mac type of the adapter based on the
+> - * vendor ID and device ID stored in the hw structure.
+> - **/
+> -enum iavf_status iavf_set_mac_type(struct iavf_hw *hw)
+> -{
+> -	enum iavf_status status = 0;
+> -
+> -	if (hw->vendor_id == PCI_VENDOR_ID_INTEL) {
+> -		switch (hw->device_id) {
+> -		case IAVF_DEV_ID_X722_VF:
+> -			hw->mac.type = IAVF_MAC_X722_VF;
+> -			break;
+> -		case IAVF_DEV_ID_VF:
+> -		case IAVF_DEV_ID_VF_HV:
+> -		case IAVF_DEV_ID_ADAPTIVE_VF:
+> -			hw->mac.type = IAVF_MAC_VF;
+> -			break;
+> -		default:
+> -			hw->mac.type = IAVF_MAC_GENERIC;
+> -			break;
+> -		}
+> -	} else {
+> -		status = IAVF_ERR_DEVICE_NOT_SUPPORTED;
+> -	}
+> -
+> -	return status;
+> -}
+> -
+>  /**
+>   * iavf_aq_str - convert AQ err code to a string
+>   * @hw: pointer to the HW structure
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> index 768bec67825a..c862ebcd2e39 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -2363,11 +2363,6 @@ static void iavf_startup(struct iavf_adapter *adapter)
+>  	/* driver loaded, probe complete */
+>  	adapter->flags &= ~IAVF_FLAG_PF_COMMS_FAILED;
+>  	adapter->flags &= ~IAVF_FLAG_RESET_PENDING;
+> -	status = iavf_set_mac_type(hw);
+> -	if (status) {
+> -		dev_err(&pdev->dev, "Failed to set MAC type (%d)\n", status);
+> -		goto err;
+> -	}
 >  
->  static void i40e_info_fw_api(struct i40e_hw *hw, char *buf, size_t len)
-> @@ -77,6 +83,12 @@ static int i40e_devlink_info_get(struct devlink *dl,
->  	if (err)
->  		return err;
+>  	ret = iavf_check_reset_complete(hw);
+>  	if (ret) {
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_prototype.h b/drivers/net/ethernet/intel/iavf/iavf_prototype.h
+> index 940cb4203fbe..4a48e6171405 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_prototype.h
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_prototype.h
+> @@ -45,8 +45,6 @@ enum iavf_status iavf_aq_set_rss_lut(struct iavf_hw *hw, u16 seid,
+>  enum iavf_status iavf_aq_set_rss_key(struct iavf_hw *hw, u16 seid,
+>  				     struct iavf_aqc_get_set_rss_key_data *key);
 >  
-> +	i40e_info_fw_mgmt_build(hw, buf, sizeof(buf));
-> +	err = i40e_devlink_info_put(req, I40E_DL_VERSION_RUNNING,
-> +				    "fw.mgmt.build", buf);
-> +	if (err)
-> +		return err;
-> +
->  	i40e_info_fw_api(hw, buf, sizeof(buf));
->  	err = i40e_devlink_info_put(req, I40E_DL_VERSION_RUNNING,
->  				    DEVLINK_INFO_VERSION_GENERIC_FW_MGMT_API,
-> @@ -86,7 +98,7 @@ static int i40e_devlink_info_get(struct devlink *dl,
+> -enum iavf_status iavf_set_mac_type(struct iavf_hw *hw);
+> -
+>  extern struct iavf_rx_ptype_decoded iavf_ptype_lookup[];
 >  
->  	i40e_info_nvm_ver(hw, buf, sizeof(buf));
->  	err = i40e_devlink_info_put(req, I40E_DL_VERSION_RUNNING,
-> -				    DEVLINK_INFO_VERSION_GENERIC_FW_PSID, buf);
-> +				    "fw.psid.api", buf);
->  	if (err)
->  		return err;
+>  static inline struct iavf_rx_ptype_decoded decode_rx_desc_ptype(u8 ptype)
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_type.h b/drivers/net/ethernet/intel/iavf/iavf_type.h
+> index 9f1f523807c4..2b6a207fa441 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_type.h
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_type.h
+> @@ -69,15 +69,6 @@ enum iavf_debug_mask {
+>   * the Firmware and AdminQ are intended to insulate the driver from most of the
+>   * future changes, but these structures will also do part of the job.
+>   */
+> -enum iavf_mac_type {
+> -	IAVF_MAC_UNKNOWN = 0,
+> -	IAVF_MAC_XL710,
+> -	IAVF_MAC_VF,
+> -	IAVF_MAC_X722,
+> -	IAVF_MAC_X722_VF,
+> -	IAVF_MAC_GENERIC,
+> -};
+> -
+>  enum iavf_vsi_type {
+>  	IAVF_VSI_MAIN	= 0,
+>  	IAVF_VSI_VMDQ1	= 1,
+> @@ -110,11 +101,8 @@ struct iavf_hw_capabilities {
+>  };
 >  
+>  struct iavf_mac_info {
+> -	enum iavf_mac_type type;
+>  	u8 addr[ETH_ALEN];
+>  	u8 perm_addr[ETH_ALEN];
+> -	u8 san_addr[ETH_ALEN];
+> -	u16 max_fcoeq;
+>  };
+>  
+>  /* PCI bus types */
 
