@@ -1,98 +1,72 @@
-Return-Path: <netdev+bounces-42278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 962AE7CE06A
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:53:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B062A7CE071
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:55:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EF721C20A8C
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:53:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAB9E1C20C26
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF93B347DE;
-	Wed, 18 Oct 2023 14:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7667237170;
+	Wed, 18 Oct 2023 14:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="leamzhtN"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E3911C80;
-	Wed, 18 Oct 2023 14:53:01 +0000 (UTC)
-Received: from gw.red-soft.ru (red-soft.ru [188.246.186.2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 498DA95;
-	Wed, 18 Oct 2023 07:52:56 -0700 (PDT)
-Received: from localhost.biz (unknown [10.81.81.211])
-	by gw.red-soft.ru (Postfix) with ESMTPA id 99E463E1DD0;
-	Wed, 18 Oct 2023 17:52:48 +0300 (MSK)
-From: Artem Chernyshev <artem.chernyshev@red-soft.ru>
-To: Louis Peens <louis.peens@corigine.com>
-Cc: Artem Chernyshev <artem.chernyshev@red-soft.ru>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	bpf@vger.kernel.org,
-	oss-drivers@corigine.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH] nfp: bpf: offload: Check prog before dereference
-Date: Wed, 18 Oct 2023 17:52:44 +0300
-Message-Id: <20231018145244.591454-1-artem.chernyshev@red-soft.ru>
-X-Mailer: git-send-email 2.37.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577DC36AFD
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 14:55:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61D71C433C8;
+	Wed, 18 Oct 2023 14:55:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697640945;
+	bh=oP7fTCFlMRrcd/x0Q2hhflCiMNLLkunsvaQEJjeLFJg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=leamzhtNqSxHtnclv/c5u/BKFtmZsg0BKV8ihjZyxu3nfkcOvOGiMIu7ZQhQ9RXD6
+	 FuGMjYnOP251aYV4U2EH1GYsVblqQend5OWRLBUD/Rng5bdOsES2caZsnbpdWy2q6l
+	 Ld9mKNbgBtrvGt9gUipLAhgrjINUYD4wFjJbSU3dUmNvMRVvWTOqdIuK+0msy27R5F
+	 glXHqowhRUIbnAJQzhzRL1MNWtkgBPLHN52dXPdQ1dcLcJ1pMENF0dhErUiPHsPtis
+	 kSIyl0j4Uxc+Fj1bzmOjKb2XJ36Mds0zKNvJR7IJbWe+I9GySppHJPcPIZMx0rdrQs
+	 t3X0LeH+9Vqeg==
+Message-ID: <0e826d9b-cdb6-b0a3-195e-25ead1faf484@kernel.org>
+Date: Wed, 18 Oct 2023 08:55:44 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-KLMS-Rule-ID: 1
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Lua-Profiles: 180708 [Oct 18 2023]
-X-KLMS-AntiSpam-Version: 6.0.0.2
-X-KLMS-AntiSpam-Envelope-From: artem.chernyshev@red-soft.ru
-X-KLMS-AntiSpam-Rate: 0
-X-KLMS-AntiSpam-Status: not_detected
-X-KLMS-AntiSpam-Method: none
-X-KLMS-AntiSpam-Auth: dkim=none
-X-KLMS-AntiSpam-Info: LuaCore: 541 541 6f62a06a82e8ec968d29b8e7c7bba6aeceb34f57, {Tracking_from_domain_doesnt_match_to}, red-soft.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;localhost.biz:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KLMS-AntiSpam-Interceptor-Info: scan successful
-X-KLMS-AntiPhishing: Clean, bases: 2023/10/18 12:41:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2023/10/18 12:07:00 #22221112
-X-KLMS-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH v2 net-next 2/5] net-smnp: reorganize SNMP fast path
+ variables
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: Coco Li <lixiaoyan@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>,
+ Mubashir Adnan Qureshi <mubashirq@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>
+References: <20231017014716.3944813-1-lixiaoyan@google.com>
+ <20231017014716.3944813-3-lixiaoyan@google.com>
+ <a666cea7-078d-4dc0-bad9-87fa15e44036@lunn.ch>
+ <CANn89iJVGQ0hpX8aSXjyfubntfy_a9xrZ5gGrx+ekY0THZ4p+Q@mail.gmail.com>
+ <353dcd1e-a191-488c-8802-fede2a644453@lunn.ch>
+ <CANn89iKfXxaLr0b-rp0_+X7QY82pK21zeLCVjqxNipfKkwOnDg@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CANn89iKfXxaLr0b-rp0_+X7QY82pK21zeLCVjqxNipfKkwOnDg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In nfp_net_bpf_offload() it is possible to dereference a
-NULL pointer.
+On 10/17/23 1:15 PM, Eric Dumazet wrote:
+> Perhaps add a big comment in the file itself, instead of repeating it
+> on future commit changelogs ?
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Signed-off-by: Artem Chernyshev <artem.chernyshev@red-soft.ru>
----
- drivers/net/ethernet/netronome/nfp/bpf/offload.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/netronome/nfp/bpf/offload.c b/drivers/net/ethernet/netronome/nfp/bpf/offload.c
-index 9d97cd281f18..925862f7b7d6 100644
---- a/drivers/net/ethernet/netronome/nfp/bpf/offload.c
-+++ b/drivers/net/ethernet/netronome/nfp/bpf/offload.c
-@@ -598,8 +598,7 @@ int nfp_net_bpf_offload(struct nfp_net *nn, struct bpf_prog *prog,
- 	if (old_prog && !prog)
- 		return nfp_net_bpf_stop(nn);
- 
--	err = nfp_net_bpf_load(nn, prog, extack);
--	if (err)
-+	if (prog && (err = nfp_net_bpf_load(nn, prog, extack)))
- 		return err;
- 
- 	if (!old_prog)
--- 
-2.37.3
-
+I think a comment in the file would be better. I spent a fair amount of
+time reviewing code double checking the impact of the moves; a comment
+in that header file would have been helpful.
 
