@@ -1,410 +1,317 @@
-Return-Path: <netdev+bounces-42199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E967CDA3D
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:25:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 327417CDA3E
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:26:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12EF7B21050
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:25:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B6B8B20B10
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:26:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348B01A733;
-	Wed, 18 Oct 2023 11:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CAC1CFBD;
+	Wed, 18 Oct 2023 11:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ss6hcxZ5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eOn3CKfa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8191A5BE
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 11:25:30 +0000 (UTC)
-Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C121111;
-	Wed, 18 Oct 2023 04:25:26 -0700 (PDT)
-Received: by mail-vs1-xe2d.google.com with SMTP id ada2fe7eead31-457c82cd87bso2105960137.0;
-        Wed, 18 Oct 2023 04:25:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697628325; x=1698233125; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uog0X8NGG+6RwwBXjN2m0QDwRr3OPkoe3namh/lxFrw=;
-        b=Ss6hcxZ5gEfbugEDOFIF0Bd3oZ0i5h/zjsie65PDcGLmH7l4irfg9Se47cz+Fn8IO7
-         QRFRjccoHmN0BiXWGEPUT4y2iZndIvY1+diiudxuKzq/ylY/HeRjkDqvoFICk8TIdtw6
-         38qUtIMmUsFDAfrmH+y9kq4UDgk+xTWG4oh/8+elcrx7XFhoPhjbcb+XcLEB2DH9tdTc
-         52QZS+/VY4BHVXlkY94ohSh8j6cxbhrUxks12GKvT5kUxUKChOBAxJgxDEC5zhqI7kBo
-         VAAeQDh7Y/DLQ89NFpXJtJ8Hho531kKB1Y5D3shBlmTfIS1NpZsJFvieR6GVdrnZXwXb
-         9NNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697628325; x=1698233125;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uog0X8NGG+6RwwBXjN2m0QDwRr3OPkoe3namh/lxFrw=;
-        b=e0Y699/7hGtIm/a42wi1owBrZ9Ft9otb3eGr/t8s00XUciT6Tzceo8UUvYAChg7gqz
-         ggBUYbpkzoUiAPCjtP4uKVekaJSo7qc/fN8paSX5uhiKjv9ljzx/Zu9ddK1tPbxeqcLh
-         1OA7qKhPVHFuw9jDVaB+O9LMp4DnlV/U7JSOWGhsKleviP+OYHfjAxCGLudF2nQFPhL/
-         +hwW18T3OmsU4Z93S8O5J8El6G3URhydwCpqpTFuhhCNyrsV0QP3+zh/w9yvj6vcThcC
-         sKukXdzdsM6yMnQeZmJzKYEscBrV18F0OizDBq1unq+16TuT5I5j01cwEzEaxPSlHYV1
-         mYcw==
-X-Gm-Message-State: AOJu0YwfqdX71myCQm7wtSQo7T1ZlWc6V9GGcDex6rTwZkDP8vZxfr1L
-	SjU0k2tZ7Mm9bXDhmREELQSa1AphUJeY48LIQZteoCN2rbo=
-X-Google-Smtp-Source: AGHT+IFfniU1dTm3Weyj7grHzg3MEVDzBw2VR9Ln9g7eEvOHx/cqLE2U9+uMLGe7Ig445ZD4ATasQleyCOoaOj8K0zc=
-X-Received: by 2002:a67:c093:0:b0:452:78ea:4aec with SMTP id
- x19-20020a67c093000000b0045278ea4aecmr4457965vsi.7.1697628324727; Wed, 18 Oct
- 2023 04:25:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9A116427
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 11:26:02 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81CB9FE
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 04:26:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697628360; x=1729164360;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=QWD2xkr2YEtiFJYMO4fpbLSJBZfXGrOiMMA96m8iecI=;
+  b=eOn3CKfaaj0/KjERhqHq+n3iMacMBm8fiHpDrLCCEhGbIFOC9f3vrIB+
+   TmfzlO56hG9w/45/wk6TalpkP+aU5iz6l2NqanH/TVwGFiGWrJy/ZqzNJ
+   x82vreaErhI6UQHfZi35zJCu+CdNiBwMRu5JxSBb1x6+1nQwwtwREWioF
+   7G+UHo5IiJnN5B0fgfKLjcaIdeS/fojaZQrZyXi8P49wGnyN93Mhg0ezv
+   OJijk5eC5+vwrXVeulCprQ7hWx4ZS1S6UH/bsuCClmiTqQvrjm7hM574G
+   wKOI/2lRv+bEiBKScN2wmsSvR1YRVl9r/GYlx/jWTBcxoMp2SLKm+FJhz
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="388855263"
+X-IronPort-AV: E=Sophos;i="6.03,234,1694761200"; 
+   d="scan'208";a="388855263"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 04:25:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="822410385"
+X-IronPort-AV: E=Sophos;i="6.03,234,1694761200"; 
+   d="scan'208";a="822410385"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Oct 2023 04:25:57 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 18 Oct 2023 04:25:56 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Wed, 18 Oct 2023 04:25:56 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Wed, 18 Oct 2023 04:25:56 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EloKeMdknCHDKjU/ClErAhuxkVohbv4j8WU1ublJiRUaZc7RTCUMZ/rryO+XPaVHYvMQcCN0WanL5oTgAKG9XoEl1H4+jBknoh04pAfIxsfwmIni9Lxsd+W/zX0waLaWm8LHTp5Zr7UL4FrVbo31mGRBoIDI3AaMFIlgD0X/kFtq17FpiPGJXWumbZECicubXsVZdtsoVrl8ct+ujsuuPDIrpi9NiQV3vk58pq83otZu/duyCNzdyDIlY8mkCiVe9WftxtSdjsvWYr95k43zFwxDJL4ohL60UNn+A5/hxZO7MtL0DSu/UPKZb+RGCG3OJOqkmSVvRduXD9pXhMlmGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kvApNHECqY0pCyzq6jWplIo5SXzu4khGOBIWvvlP8Pk=;
+ b=PrlggiMPAEWq1YGFlj2a/ITD6WirdjMnUO0I35/DU+aAP09aZ9bzpTOCuAgTYOrXrO1R8jC1b7EDVk6wtCY+42Dv3NLZ/MUhlbgqwyI6Zv5or7lXaocc/LN9OE5izl6ODGmZycdYoRktQ6zHmvOvFhQJE2egu6t9cRsTn0EERV5Uck+HGnaPe90ITIEGy6ik7ODJW9bhRTHQkl7MX1hq7xkg7PI6X1hgHPYHy0Peu/ciJj2CRcjtQ6WQg6DXaiKA4sdglAOR1bR+Y7DMWRcxpvMOr+gQR0Gwjn4k3jB4S2ILanpQS71YmFuEuHnxvCeboe+v2YQtSwwBbSlkNnhsNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by LV3PR11MB8676.namprd11.prod.outlook.com (2603:10b6:408:20f::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Wed, 18 Oct
+ 2023 11:25:49 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ec0:108e:7afe:f1a4]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ec0:108e:7afe:f1a4%5]) with mapi id 15.20.6886.034; Wed, 18 Oct 2023
+ 11:25:48 +0000
+From: "Drewek, Wojciech" <wojciech.drewek@intel.com>
+To: mschmidt <mschmidt@redhat.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "Keller, Jacob E" <jacob.e.keller@intel.com>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH net-next] iavf: delete unused iavf_mac_info fields
+Thread-Topic: [PATCH net-next] iavf: delete unused iavf_mac_info fields
+Thread-Index: AQHaAbR9JXgcf/Pn70eESBvCd9QlvLBPZgPg
+Date: Wed, 18 Oct 2023 11:25:48 +0000
+Message-ID: <MW4PR11MB577642AB058202687D511502FDD5A@MW4PR11MB5776.namprd11.prod.outlook.com>
+References: <20231018111527.78194-1-mschmidt@redhat.com>
+In-Reply-To: <20231018111527.78194-1-mschmidt@redhat.com>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB5776:EE_|LV3PR11MB8676:EE_
+x-ms-office365-filtering-correlation-id: 91f19bd4-6603-472a-4c2f-08dbcfccfab5
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: O9WbP/9jDh/RrvQ2UzyTFptrg2WU8d4RTSxw4eB9sEkaSIw6y6SmTDAtq9nAXQOPuJbWs+7z7C0VWBkyUNk08oo43GKcpv6pbuI7z12LYf0hJbTebIqJ1iUmzdb/Gz99G96JmSNFQkUfvhz5YdxzK5IJZKuBTNWF66zICbfT8EGkEhJIs8xprv6epzv+UwZL/ESqZcCCf/YkiWQQZ1ng9G4quZjrUG2cUajoUiqCEmBrKdYN5qXfhdDrUyie0r7ZhWIDGfGqmf20DrRmRFmHOdCA0W8oGtF2CUYRJOHvApmwYzCLR+ySa4N4JInBywZ0PG0dlTvfh+0/PxtYeNScZ471+ljTlCzf64qllx3Z5PSEci4Mra2+bovfB2U5k0jhZ1aFq2K/wRGUlAA+jckN/PDq+WwcpMIwx35iGlcgtlyaeyICLYNyxagE2HjhP8oDSvyC9rEC84HcGuUlDsJDLUkj4PKw/dtcYk2Xe28CwOK+x8yhRVzoQ/KoGzPqgLbifV8cJSOjpEtpaqgILN7Xu2OhKEzk7p7q+4xYa4j1eIdhR/F9uBSaKYBIrYiw0Yd5p0OmBu0hP0GWLTpICU7BkOnOk4rMBdTNouNdJDs5L4g=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(376002)(396003)(366004)(39860400002)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(9686003)(7696005)(71200400001)(53546011)(6506007)(41300700001)(2906002)(4326008)(38070700005)(478600001)(83380400001)(82960400001)(26005)(110136005)(86362001)(33656002)(316002)(55016003)(64756008)(54906003)(66476007)(66946007)(66556008)(76116006)(66446008)(8936002)(8676002)(122000001)(5660300002)(38100700002)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fbElwjZwY/m4xQbgFz2ATWGJkBo/iJksCnFnoQnYs9r6pjBYMsUgUFf/4c2t?=
+ =?us-ascii?Q?uilGcZ6bFKJ9xRNxbnDrN57M3W3KFkDsv1D0i52IhYv8FBKrxs0Kz6lYaCyh?=
+ =?us-ascii?Q?mrd22x8YGuX5cRPi5CDubWWhGKWaLJhkqd/R+hDTrmgpdJE3PIFGLT0C8Or5?=
+ =?us-ascii?Q?FLl6iNW2UINqCcNqW4s0eSuvW9dn1KShWRndIqgCvsgZod6ejn91wPOaTmXj?=
+ =?us-ascii?Q?qMxwovFpV576SElLGlBynYS4d0YPyk3JOVSY9X10LjnpbnTxoCHSXHMCkkMk?=
+ =?us-ascii?Q?yAmwDC9xxWfHTksQCCqDANx+H/uW01DOsW9zaHmkuhsxbLtaezoxAbE3a7gG?=
+ =?us-ascii?Q?P/R+O6g1o5vi/GMycl3TKgyu2kQ/DS3JtJfEFmKT/IiWp3i8kWeatrYdEnSA?=
+ =?us-ascii?Q?yxvdTWKFxX9ZbCUQQTRI+osxzJvWxxx1VEmHQbLjHtIkzbytX10BA6p5nT+E?=
+ =?us-ascii?Q?wDYcvMyH12Vr+OTl/xfNi7hCOcXnTfnCuMnvG/KYPbjjS0oS2YWQULkF3QSe?=
+ =?us-ascii?Q?oGFewfX+hOWv7EGnshe2dKVnt4Rson2Kd9wd3I/dbEkrTPICFlu1hBhwu6yD?=
+ =?us-ascii?Q?rSY6dp/c98viLqu5ek0TGt9pU0YR0jRy9dRzqBLEGunMEnpVtZ0oXx1Phl54?=
+ =?us-ascii?Q?Dmf+svp/p0q9e3YCoMiIcrXAwTMu+VaVa4WaSCF+S0PMnkyYA6WMj4RUL0LQ?=
+ =?us-ascii?Q?B/iCXluqPisPM0Uc2YJRJE6Paez5OnL+89sdN3Gy6XQxMfIYwZUt1Uz+PBF6?=
+ =?us-ascii?Q?3myeX7naBpTl9fFLqQ5osNrE1r8TEnTG3fFHmnBrDpMFxt+qm2c/VEe6sh9o?=
+ =?us-ascii?Q?JcL2UcEGmobES4Sqa1MxteYzJ8h+88czZV9ctP7rYcdOx6sgxfu+/zBPFvv7?=
+ =?us-ascii?Q?EvFMLzqlBUad2c8EDf9wTrOf34SepwLeLxWzHysV2+I5JOFsx164JgFluhk0?=
+ =?us-ascii?Q?AikFifKMHijn0i6tIL21e/8lbv+HBfE+GVFcHBYo40kYSg5fch4qNT5OlO89?=
+ =?us-ascii?Q?p05/iT2/93Ksg+GCsFgxS58Q30fMdXPeQ3ewv4n6hLkZBPldSBa8krNJTFY9?=
+ =?us-ascii?Q?WD6G8BGP7RXe7W6YrVX6G3oMLXfFROsIXBpoG8IxFGw3Qe7ncwxTJbcZufub?=
+ =?us-ascii?Q?vwuRa90SLUCp2IAM6/As+ICJsqXYVeof2FyypSNMwEU9qIzWMC/EDV87w+e/?=
+ =?us-ascii?Q?wMYbl7EUPzMq9S8e06kRnQasOi+VvmKzYRkno9pQn8Pc58ATzF1VM8ATf0jy?=
+ =?us-ascii?Q?7wthIn6v1DN714gw1za4bLzlYsbS8VkE1PsVy5oK59upiEy4JmyEsD/wBa5Y?=
+ =?us-ascii?Q?o0qxs6mD0qkiyXZB8BJ0mk6WmGH588OB3ZaWO/PQ8IFsPYVjZtg9Le8Md4AH?=
+ =?us-ascii?Q?46GlQOKMT9o95AC2VCZOwvzNVzm/e0kEJUDvW4Xq+sKQ2tQlTYrH3iKcwV4n?=
+ =?us-ascii?Q?CjFuBdZonL3KSZf6jvMPXM44SYehL/ClTFTUSfeRsv9VWk4V0qvlcKOXreQf?=
+ =?us-ascii?Q?aZOzUY8exirKB/qnH12bg/KzrcHk+8Ee+FBegod0NMJJHMOV45WHwzQRTz2g?=
+ =?us-ascii?Q?AkH+lSAE/Dix+EL9l4hpkTY/mWhymSaZhNoBcjbQ?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Wed, 18 Oct 2023 13:25:13 +0200
-Message-ID: <CAA85sZsdfcbPRm+hZrasMG1SWW-Qh8OCmcM2Cbh-HvhRruU-tQ@mail.gmail.com>
-Subject: [BUG] 6.5.7 nf_flow_offload_work_gc unable to handle page fault
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91f19bd4-6603-472a-4c2f-08dbcfccfab5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Oct 2023 11:25:48.9127
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XuNMgPVpM6Nk0R67z7SO7eTOUvkKLCfuCHhsRPoGuJ9LZpyVT8MNYf6/8xC8/NMmzmJZQ98VcUNIWs1Hjk0kdPf+94nkZPqABITK8mIDZfA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8676
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-So this happened yesterday....
-
-cat bug.txt | ./scripts/decode_stacktrace.sh vmlinux
-[97639.618937] BUG: unable to handle page fault for address: 00000000d400008b
-[97639.625928] #PF: supervisor write access in kernel mode
-[97639.631244] #PF: error_code(0x0002) - not-present page
-[97639.636472] PGD 0 P4D 0
-[97639.639099] Oops: 0002 [#1] PREEMPT SMP NOPTI
-[97639.643553] CPU: 9 PID: 24400 Comm: kworker/9:2 Not tainted 6.5.7 #393
-[97639.650173] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
-BIOS 1.7a 10/13/2022
-[97639.658354] Workqueue: events_power_efficient nf_flow_offload_work_gc
-[97639.664896] RIP: 0010:flow_offload_teardown
-(./arch/x86/include/asm/bitops.h:75
-./include/asm-generic/bitops/instrumented-atomic.h:42
-net/netfilter/nf_flow_table_core.c:344)
-[97639.669957] Code: 00 00 e9 96 fd ff ff 66 0f 1f 44 00 00 48 83 c7
-08 be 32 00 00 00 e9 82 fd ff ff 66 90 48 8b 87 b0 00 00 00 48 05 81
-00 00 00 <f0> 80 20 bf f0 80 8f b8 00 00 00 04 48 8b 97 b0 00 00 00 0f
-b6 42
-All code
-========
-   0: 00 00                add    %al,(%rax)
-   2: e9 96 fd ff ff        jmp    0xfffffffffffffd9d
-   7: 66 0f 1f 44 00 00    nopw   0x0(%rax,%rax,1)
-   d: 48 83 c7 08          add    $0x8,%rdi
-  11: be 32 00 00 00        mov    $0x32,%esi
-  16: e9 82 fd ff ff        jmp    0xfffffffffffffd9d
-  1b: 66 90                xchg   %ax,%ax
-  1d: 48 8b 87 b0 00 00 00 mov    0xb0(%rdi),%rax
-  24: 48 05 81 00 00 00    add    $0x81,%rax
-  2a:* f0 80 20 bf          lock andb $0xbf,(%rax) <-- trapping instruction
-  2e: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
-  35: 04
-  36: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
-  3d: 0f                    .byte 0xf
-  3e: b6 42                mov    $0x42,%dh
-
-Code starting with the faulting instruction
-===========================================
-   0: f0 80 20 bf          lock andb $0xbf,(%rax)
-   4: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
-   b: 04
-   c: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
-  13: 0f                    .byte 0xf
-  14: b6 42                mov    $0x42,%dh
-[97639.688823] RSP: 0018:ffffa59e889ebe10 EFLAGS: 00010206
-[97639.694145] RAX: 00000000d400008b RBX: ffff8aa5801ee6f8 RCX: 0000000000000001
-[97639.701374] RDX: 0000000105cd52c0 RSI: ffff8aa89302a558 RDI: ffff8aa89302a558
-[97639.708602] RBP: ffff8aa5801ee650 R08: ffff8aa5801ee650 R09: ffff8aa7d5284e00
-[97639.715831] R10: 0000000000000000 R11: 000000000000000e R12: ffff8aa8efc6b500
-[97639.723058] R13: ffff8aa8efc70000 R14: ffff8aa8efc70005 R15: ffff8aa580051ab0
-[97639.730286] FS:  0000000000000000(0000) GS:ffff8aa8efc40000(0000)
-knlGS:0000000000000000
-[97639.738503] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[97639.744361] CR2: 00000000d400008b CR3: 00000001115f2000 CR4: 00000000003526e0
-[97639.751606] Call Trace:
-[97639.754158]  <TASK>
-[97639.756365] ? __die (arch/x86/kernel/dumpstack.c:421
-arch/x86/kernel/dumpstack.c:434)
-[97639.759535] ? page_fault_oops (arch/x86/mm/fault.c:707)
-[97639.763748] ? chacha_block_generic (lib/crypto/chacha.c:83)
-[97639.768220] ? exc_page_fault (arch/x86/mm/fault.c:1279
-arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
-[97639.772346] ? asm_exc_page_fault (./arch/x86/include/asm/idtentry.h:570)
-[97639.776646] ? flow_offload_teardown
-(./arch/x86/include/asm/bitops.h:75
-./include/asm-generic/bitops/instrumented-atomic.h:42
-net/netfilter/nf_flow_table_core.c:344)
-[97639.781116] nf_flow_offload_gc_step
-(./arch/x86/include/asm/bitops.h:207
-./arch/x86/include/asm/bitops.h:239
-./include/asm-generic/bitops/instrumented-non-atomic.h:142
-net/netfilter/nf_flow_table_core.c:418)
-[97639.785673] nf_flow_offload_work_gc
-(net/netfilter/nf_flow_table_core.c:389
-net/netfilter/nf_flow_table_core.c:434
-net/netfilter/nf_flow_table_core.c:442)
-[97639.790226] process_one_work (kernel/workqueue.c:2605)
-[97639.794351] worker_thread (./include/linux/list.h:292
-kernel/workqueue.c:2752)
-[97639.798129] ? process_one_work (kernel/workqueue.c:2694)
-[97639.802427] kthread (kernel/kthread.c:389)
-[97639.805675] ? kthread_complete_and_exit (kernel/kthread.c:342)
-[97639.810580] ret_from_fork (arch/x86/kernel/process.c:151)
-[97639.814273] ? kthread_complete_and_exit (kernel/kthread.c:342)
-[97639.819168] ret_from_fork_asm (arch/x86/entry/entry_64.S:312)
-[97639.823203]  </TASK>
-[97639.825497] Modules linked in: chaoskey
-[97639.829450] CR2: 00000000d400008b
-[97639.832874] ---[ end trace 0000000000000000 ]---
-[97639.853625] pstore: backend (erst) writing error (-28)
-[97639.858880] RIP: 0010:flow_offload_teardown
-(./arch/x86/include/asm/bitops.h:75
-./include/asm-generic/bitops/instrumented-atomic.h:42
-net/netfilter/nf_flow_table_core.c:344)
-[97639.863960] Code: 00 00 e9 96 fd ff ff 66 0f 1f 44 00 00 48 83 c7
-08 be 32 00 00 00 e9 82 fd ff ff 66 90 48 8b 87 b0 00 00 00 48 05 81
-00 00 00 <f0> 80 20 bf f0 80 8f b8 00 00 00 04 48 8b 97 b0 00 00 00 0f
-b6 42
-All code
-========
-   0: 00 00                add    %al,(%rax)
-   2: e9 96 fd ff ff        jmp    0xfffffffffffffd9d
-   7: 66 0f 1f 44 00 00    nopw   0x0(%rax,%rax,1)
-   d: 48 83 c7 08          add    $0x8,%rdi
-  11: be 32 00 00 00        mov    $0x32,%esi
-  16: e9 82 fd ff ff        jmp    0xfffffffffffffd9d
-  1b: 66 90                xchg   %ax,%ax
-  1d: 48 8b 87 b0 00 00 00 mov    0xb0(%rdi),%rax
-  24: 48 05 81 00 00 00    add    $0x81,%rax
-  2a:* f0 80 20 bf          lock andb $0xbf,(%rax) <-- trapping instruction
-  2e: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
-  35: 04
-  36: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
-  3d: 0f                    .byte 0xf
-  3e: b6 42                mov    $0x42,%dh
-
-Code starting with the faulting instruction
-===========================================
-   0: f0 80 20 bf          lock andb $0xbf,(%rax)
-   4: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
-   b: 04
-   c: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
-  13: 0f                    .byte 0xf
-  14: b6 42                mov    $0x42,%dh
-[97639.882876] RSP: 0018:ffffa59e889ebe10 EFLAGS: 00010206
-[97639.888215] RAX: 00000000d400008b RBX: ffff8aa5801ee6f8 RCX: 0000000000000001
-[97639.895461] RDX: 0000000105cd52c0 RSI: ffff8aa89302a558 RDI: ffff8aa89302a558
-[97639.902707] RBP: ffff8aa5801ee650 R08: ffff8aa5801ee650 R09: ffff8aa7d5284e00
-[97639.909951] R10: 0000000000000000 R11: 000000000000000e R12: ffff8aa8efc6b500
-[97639.917196] R13: ffff8aa8efc70000 R14: ffff8aa8efc70005 R15: ffff8aa580051ab0
-[97639.924441] FS:  0000000000000000(0000) GS:ffff8aa8efc40000(0000)
-knlGS:0000000000000000
-[97639.932657] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[97639.938505] CR2: 00000000d400008b CR3: 00000001115f2000 CR4: 00000000003526e0
-[97639.945752] note: kworker/9:2[24400] exited with irqs disabled
-[97641.461257] BUG: unable to handle page fault for address: 0000000000001000
-[97641.468255] #PF: supervisor read access in kernel mode
-[97641.473503] #PF: error_code(0x0000) - not-present page
-[97641.478748] PGD 0 P4D 0
-[97641.481392] Oops: 0000 [#2] PREEMPT SMP NOPTI
-[97641.485856] CPU: 9 PID: 35705 Comm: kworker/9:1 Tainted: G      D
-         6.5.7 #393
-[97641.493992] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
-BIOS 1.7a 10/13/2022
-[97641.502209] Workqueue: events rht_deferred_worker
-[97641.507038] RIP: 0010:rht_deferred_worker (lib/rhashtable.c:244
-lib/rhashtable.c:288 lib/rhashtable.c:328 lib/rhashtable.c:432)
-[97641.512201] Code: 00 48 83 e2 fe 48 0f 44 14 24 48 89 d0 f6 c2 01
-0f 85 af 01 00 00 48 8b 2a 40 f6 c5 01 74 0b e9 87 02 00 00 48 89 e8
-4c 89 e5 <4c> 8b 65 00 41 f6 c4 01 74 f0 48 89 c3 41 0f b7 56 d6 49 8b
-46 e8
-All code
-========
-   0: 00 48 83              add    %cl,-0x7d(%rax)
-   3: e2 fe                loop   0x3
-   5: 48 0f 44 14 24        cmove  (%rsp),%rdx
-   a: 48 89 d0              mov    %rdx,%rax
-   d: f6 c2 01              test   $0x1,%dl
-  10: 0f 85 af 01 00 00    jne    0x1c5
-  16: 48 8b 2a              mov    (%rdx),%rbp
-  19: 40 f6 c5 01          test   $0x1,%bpl
-  1d: 74 0b                je     0x2a
-  1f: e9 87 02 00 00        jmp    0x2ab
-  24: 48 89 e8              mov    %rbp,%rax
-  27: 4c 89 e5              mov    %r12,%rbp
-  2a:* 4c 8b 65 00          mov    0x0(%rbp),%r12 <-- trapping instruction
-  2e: 41 f6 c4 01          test   $0x1,%r12b
-  32: 74 f0                je     0x24
-  34: 48 89 c3              mov    %rax,%rbx
-  37: 41 0f b7 56 d6        movzwl -0x2a(%r14),%edx
-  3c: 49 8b 46 e8          mov    -0x18(%r14),%rax
-
-Code starting with the faulting instruction
-===========================================
-   0: 4c 8b 65 00          mov    0x0(%rbp),%r12
-   4: 41 f6 c4 01          test   $0x1,%r12b
-   8: 74 f0                je     0xfffffffffffffffa
-   a: 48 89 c3              mov    %rax,%rbx
-   d: 41 0f b7 56 d6        movzwl -0x2a(%r14),%edx
-  12: 49 8b 46 e8          mov    -0x18(%r14),%rax
-[97641.531118] RSP: 0018:ffffa59e85e1fe18 EFLAGS: 00010046
-[97641.536457] RAX: ffff8aa89302a558 RBX: 0000000000000000 RCX: ffff8aa587720000
-[97641.543703] RDX: ffff8aa89302a558 RSI: 0000000000000002 RDI: ffff8aa587720000
-[97641.550948] RBP: 0000000000001000 R08: 000000003f542bae R09: 0000000000000000
-[97641.558194] R10: ffffffff9fbfdf80 R11: 0000000000000000 R12: ffff8aa5877200a1
-[97641.565438] R13: ffff8aa5877200b0 R14: ffff8aa5801ee6a0 R15: ffff8aa61a00d000
-[97641.572683] FS:  0000000000000000(0000) GS:ffff8aa8efc40000(0000)
-knlGS:0000000000000000
-[97641.580899] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[97641.586749] CR2: 0000000000001000 CR3: 00000001115f2000 CR4: 00000000003526e0
-[97641.593994] Call Trace:
-[97641.596545]  <TASK>
-[97641.598754] ? __die (arch/x86/kernel/dumpstack.c:421
-arch/x86/kernel/dumpstack.c:434)
-[97641.601924] ? page_fault_oops (arch/x86/mm/fault.c:707)
-[97641.606140] ? exc_page_fault (arch/x86/mm/fault.c:1279
-arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
-[97641.610263] ? asm_exc_page_fault (./arch/x86/include/asm/idtentry.h:570)
-[97641.614563] ? flow_offload_fill_dir (net/netfilter/nf_flow_table_core.c:219)
-[97641.619120] ? rht_deferred_worker (lib/rhashtable.c:244
-lib/rhashtable.c:288 lib/rhashtable.c:328 lib/rhashtable.c:432)
-[97641.623679] process_one_work (kernel/workqueue.c:2605)
-[97641.627807] worker_thread (./include/linux/list.h:292
-kernel/workqueue.c:2752)
-[97641.631582] ? process_one_work (kernel/workqueue.c:2694)
-[97641.635870] kthread (kernel/kthread.c:389)
-[97641.639122] ? kthread_complete_and_exit (kernel/kthread.c:342)
-[97641.644026] ret_from_fork (arch/x86/kernel/process.c:151)
-[97641.647719] ? kthread_complete_and_exit (kernel/kthread.c:342)
-[97641.652623] ret_from_fork_asm (arch/x86/entry/entry_64.S:312)
-[97641.656658]  </TASK>
-[97641.658951] Modules linked in: chaoskey
-[97641.662894] CR2: 0000000000001000
-[97641.666321] ---[ end trace 0000000000000000 ]---
-[97641.668308] BUG: unable to handle page fault for address: 0000000000001008
-[97641.678038] #PF: supervisor read access in kernel mode
-[97641.683287] #PF: error_code(0x0000) - not-present page
-[97641.687778] RIP: 0010:flow_offload_teardown
-(./arch/x86/include/asm/bitops.h:75
-./include/asm-generic/bitops/instrumented-atomic.h:42
-net/netfilter/nf_flow_table_core.c:344)
-[97641.688538] PGD 0
-[97641.688646] Code: 00 00 e9 96 fd ff ff 66 0f 1f 44 00 00 48 83 c7
-08 be 32 00 00 00 e9 82 fd ff ff 66 90 48 8b 87 b0 00 00 00 48 05 81
-00 00 00 <f0> 80 20 bf f0 80 8f b8 00 00 00 04 48 8b 97 b0 00 00 00 0f
-b6 42
-All code
-========
-   0: 00 00                add    %al,(%rax)
-   2: e9 96 fd ff ff        jmp    0xfffffffffffffd9d
-   7: 66 0f 1f 44 00 00    nopw   0x0(%rax,%rax,1)
-   d: 48 83 c7 08          add    $0x8,%rdi
-  11: be 32 00 00 00        mov    $0x32,%esi
-  16: e9 82 fd ff ff        jmp    0xfffffffffffffd9d
-  1b: 66 90                xchg   %ax,%ax
-  1d: 48 8b 87 b0 00 00 00 mov    0xb0(%rdi),%rax
-  24: 48 05 81 00 00 00    add    $0x81,%rax
-  2a:* f0 80 20 bf          lock andb $0xbf,(%rax) <-- trapping instruction
-  2e: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
-  35: 04
-  36: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
-  3d: 0f                    .byte 0xf
-  3e: b6 42                mov    $0x42,%dh
-
-Code starting with the faulting instruction
-===========================================
-   0: f0 80 20 bf          lock andb $0xbf,(%rax)
-   4: f0 80 8f b8 00 00 00 lock orb $0x4,0xb8(%rdi)
-   b: 04
-   c: 48 8b 97 b0 00 00 00 mov    0xb0(%rdi),%rdx
-  13: 0f                    .byte 0xf
-  14: b6 42                mov    $0x42,%dh
-[97641.693605] P4D 0
-[97641.693705] RSP: 0018:ffffa59e889ebe10 EFLAGS: 00010206
 
 
-[97641.694081] Oops: 0000 [#3] PREEMPT SMP NOPTI
-[97641.694179] RAX: 00000000d400008b RBX: ffff8aa5801ee6f8 RCX: 0000000000000001
-[97641.694280] CPU: 8 PID: 0 Comm: swapper/8 Tainted: G      D
-   6.5.7 #393
-[97641.694383] RDX: 0000000105cd52c0 RSI: ffff8aa89302a558 RDI: ffff8aa89302a558
-[97641.694494] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
-BIOS 1.7a 10/13/2022
-[97641.694622] RBP: ffff8aa5801ee650 R08: ffff8aa5801ee650 R09: ffff8aa7d5284e00
-[97641.694733] RIP: 0010:memcmp (lib/string.c:681)
-[97641.694862] R10: 0000000000000000 R11: 000000000000000e R12: ffff8aa8efc6b500
-[97641.694973] Code: cc cc cc 48 85 c0 75 f3 0f b6 4f 01 48 83 c7 01
-84 c9 75 bc eb e3 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 eb 14
-48 8b 06 <48> 39 07 75 17 48 83 c7 08 48 83 c6 08 48 83 ea 08 48 83 fa
-07 77
-All code
-========
-   0: cc                    int3
-   1: cc                    int3
-   2: cc                    int3
-   3: 48 85 c0              test   %rax,%rax
-   6: 75 f3                jne    0xfffffffffffffffb
-   8: 0f b6 4f 01          movzbl 0x1(%rdi),%ecx
-   c: 48 83 c7 01          add    $0x1,%rdi
-  10: 84 c9                test   %cl,%cl
-  12: 75 bc                jne    0xffffffffffffffd0
-  14: eb e3                jmp    0xfffffffffffffff9
-  16: 66 66 2e 0f 1f 84 00 data16 cs nopw 0x0(%rax,%rax,1)
-  1d: 00 00 00 00
-  21: 0f 1f 40 00          nopl   0x0(%rax)
-  25: eb 14                jmp    0x3b
-  27: 48 8b 06              mov    (%rsi),%rax
-  2a:* 48 39 07              cmp    %rax,(%rdi) <-- trapping instruction
-  2d: 75 17                jne    0x46
-  2f: 48 83 c7 08          add    $0x8,%rdi
-  33: 48 83 c6 08          add    $0x8,%rsi
-  37: 48 83 ea 08          sub    $0x8,%rdx
-  3b: 48 83 fa 07          cmp    $0x7,%rdx
-  3f: 77                    .byte 0x77
+> -----Original Message-----
+> From: Michal Schmidt <mschmidt@redhat.com>
+> Sent: Wednesday, October 18, 2023 1:15 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Keller, Jacob E <jacob.e.keller@intel.com>; Drewek, Wojciech
+> <wojciech.drewek@intel.com>; Brandeburg, Jesse
+> <jesse.brandeburg@intel.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; netdev@vger.kernel.org
+> Subject: [PATCH net-next] iavf: delete unused iavf_mac_info fields
+>=20
+> 'san_addr' and 'mac_fcoeq' members of struct iavf_mac_info are unused.
+> 'type' is write-only. Delete all three.
+>=20
+> The function iavf_set_mac_type that sets 'type' also checks if the PCI
+> vendor ID is Intel. This is unnecessary. Delete the whole function.
+>=20
+> If in the future there's a need for the MAC type (or other PCI
+> ID-dependent data), I would prefer to use .driver_data in iavf_pci_tbl[]
+> for this purpose.
+>=20
+> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
 
-Code starting with the faulting instruction
-===========================================
-   0: 48 39 07              cmp    %rax,(%rdi)
-   3: 75 17                jne    0x1c
-   5: 48 83 c7 08          add    $0x8,%rdi
-   9: 48 83 c6 08          add    $0x8,%rsi
-   d: 48 83 ea 08          sub    $0x8,%rdx
-  11: 48 83 fa 07          cmp    $0x7,%rdx
-  15: 77                    .byte 0x77
-[97641.695076] R13: ffff8aa8efc70000 R14: ffff8aa8efc70005 R15: ffff8aa580051ab0
-[97641.695187] RSP: 0018:ffffa59e80258ae8 EFLAGS: 00010216
-[97641.695355] FS:  0000000000000000(0000) GS:ffff8aa8efc40000(0000)
-knlGS:0000000000000000
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 
-[97641.695467] RAX: 17da23f697af96fd RBX: ffff8aa5801ee650 RCX: 0000000000000000
-[97641.695571] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[97641.695700] RDX: 0000000000000032 RSI: ffffa59e80258ba0 RDI: 0000000000001008
-[97641.695800] CR2: 0000000000001000 CR3: 00000001115f2000 CR4: 00000000003526e0
-[97641.695910] RBP: ffff8aa5877200b0 R08: 00000000000000fd R09: 0000000000000001
-[97641.696019] note: kworker/9:1[35705] exited with irqs disabled
-[97641.696128] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-[97641.697007] note: kworker/9:1[35705] exited with preempt_count 1
-[97641.698365] R13: ffff8aa5801ee660 R14: ffff8aa587720000 R15: 0000000000001000
-[97641.698370] FS:  0000000000000000(0000) GS:ffff8aa8efc00000(0000)
-knlGS:0000000000000000
-[97641.698376] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[97641.698381] CR2: 0000000000001008 CR3: 0000000103466000 CR4: 00000000003526e0
-[97641.698386] Call Trace:
-[97641.698392]  <IRQ>
-[97641.698396] ? __die (arch/x86/kernel/dumpstack.c:421
-arch/x86/kernel/dumpstack.c:434)
-[97641.698405] ? page_fault_oops (arch/x86/mm/fault.c:707)
-[97641.698415] ? ttwu_queue_wakelist (kernel/sched/core.c:4005)
-[97641.698422] ? try_to_wake_up (kernel/sched/core.c:4349)
-[97641.698432] ? exc_page_fault (arch/x86/mm/fault.c:1279
-arch/x86/mm/fault.c:1486 arch/x86/mm/fault.c:1542)
-[97641.698440] ? pollwake (fs/select.c:219)
+Nice cleanup, I've seen similar unused fields in i40e as well.
+Any plans for i40e cleanup?
+
+> ---
+>  drivers/net/ethernet/intel/iavf/iavf_common.c | 32 -------------------
+>  drivers/net/ethernet/intel/iavf/iavf_main.c   |  5 ---
+>  .../net/ethernet/intel/iavf/iavf_prototype.h  |  2 --
+>  drivers/net/ethernet/intel/iavf/iavf_type.h   | 12 -------
+>  4 files changed, 51 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_common.c
+> b/drivers/net/ethernet/intel/iavf/iavf_common.c
+> index 1afd761d8052..8091e6feca01 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_common.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_common.c
+> @@ -6,38 +6,6 @@
+>  #include "iavf_prototype.h"
+>  #include <linux/avf/virtchnl.h>
+>=20
+> -/**
+> - * iavf_set_mac_type - Sets MAC type
+> - * @hw: pointer to the HW structure
+> - *
+> - * This function sets the mac type of the adapter based on the
+> - * vendor ID and device ID stored in the hw structure.
+> - **/
+> -enum iavf_status iavf_set_mac_type(struct iavf_hw *hw)
+> -{
+> -	enum iavf_status status =3D 0;
+> -
+> -	if (hw->vendor_id =3D=3D PCI_VENDOR_ID_INTEL) {
+> -		switch (hw->device_id) {
+> -		case IAVF_DEV_ID_X722_VF:
+> -			hw->mac.type =3D IAVF_MAC_X722_VF;
+> -			break;
+> -		case IAVF_DEV_ID_VF:
+> -		case IAVF_DEV_ID_VF_HV:
+> -		case IAVF_DEV_ID_ADAPTIVE_VF:
+> -			hw->mac.type =3D IAVF_MAC_VF;
+> -			break;
+> -		default:
+> -			hw->mac.type =3D IAVF_MAC_GENERIC;
+> -			break;
+> -		}
+> -	} else {
+> -		status =3D IAVF_ERR_DEVICE_NOT_SUPPORTED;
+> -	}
+> -
+> -	return status;
+> -}
+> -
+>  /**
+>   * iavf_aq_str - convert AQ err code to a string
+>   * @hw: pointer to the HW structure
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> index 768bec67825a..c862ebcd2e39 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -2363,11 +2363,6 @@ static void iavf_startup(struct iavf_adapter
+> *adapter)
+>  	/* driver loaded, probe complete */
+>  	adapter->flags &=3D ~IAVF_FLAG_PF_COMMS_FAILED;
+>  	adapter->flags &=3D ~IAVF_FLAG_RESET_PENDING;
+> -	status =3D iavf_set_mac_type(hw);
+> -	if (status) {
+> -		dev_err(&pdev->dev, "Failed to set MAC type (%d)\n",
+> status);
+> -		goto err;
+> -	}
+>=20
+>  	ret =3D iavf_check_reset_complete(hw);
+>  	if (ret) {
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_prototype.h
+> b/drivers/net/ethernet/intel/iavf/iavf_prototype.h
+> index 940cb4203fbe..4a48e6171405 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_prototype.h
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_prototype.h
+> @@ -45,8 +45,6 @@ enum iavf_status iavf_aq_set_rss_lut(struct iavf_hw
+> *hw, u16 seid,
+>  enum iavf_status iavf_aq_set_rss_key(struct iavf_hw *hw, u16 seid,
+>  				     struct iavf_aqc_get_set_rss_key_data *key);
+>=20
+> -enum iavf_status iavf_set_mac_type(struct iavf_hw *hw);
+> -
+>  extern struct iavf_rx_ptype_decoded iavf_ptype_lookup[];
+>=20
+>  static inline struct iavf_rx_ptype_decoded decode_rx_desc_ptype(u8 ptype=
+)
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_type.h
+> b/drivers/net/ethernet/intel/iavf/iavf_type.h
+> index 9f1f523807c4..2b6a207fa441 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_type.h
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_type.h
+> @@ -69,15 +69,6 @@ enum iavf_debug_mask {
+>   * the Firmware and AdminQ are intended to insulate the driver from most=
+ of
+> the
+>   * future changes, but these structures will also do part of the job.
+>   */
+> -enum iavf_mac_type {
+> -	IAVF_MAC_UNKNOWN =3D 0,
+> -	IAVF_MAC_XL710,
+> -	IAVF_MAC_VF,
+> -	IAVF_MAC_X722,
+> -	IAVF_MAC_X722_VF,
+> -	IAVF_MAC_GENERIC,
+> -};
+> -
+>  enum iavf_vsi_type {
+>  	IAVF_VSI_MAIN	=3D 0,
+>  	IAVF_VSI_VMDQ1	=3D 1,
+> @@ -110,11 +101,8 @@ struct iavf_hw_capabilities {
+>  };
+>=20
+>  struct iavf_mac_info {
+> -	enum iavf_mac_type type;
+>  	u8 addr[ETH_ALEN];
+>  	u8 perm_addr[ETH_ALEN];
+> -	u8 san_addr[ETH_ALEN];
+> -	u16 max_fcoeq;
+>  };
+>=20
+>  /* PCI bus types */
+> --
+> 2.41.0
+
 
