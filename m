@@ -1,99 +1,121 @@
-Return-Path: <netdev+bounces-42241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 897327CDCDE
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 15:12:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F557CDD20
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 15:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAB291C20A8C
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:12:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 251DEB20EC9
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDA235892;
-	Wed, 18 Oct 2023 13:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50ADE3588D;
+	Wed, 18 Oct 2023 13:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="c52XKerL"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qqmQ6GQ8"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA362F531
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 13:11:59 +0000 (UTC)
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CEB3131
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 06:11:55 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-9be7e3fa1daso717262166b.3
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 06:11:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1697634714; x=1698239514; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=XINWG75d/tw1LWTjmyxq3SU0daBRIYX71zDB994atYg=;
-        b=c52XKerLtnPCsMFnHzPJ5znXcTxy/X2aL7msjEBsBnQdVdpAQlZFim+Gs5ARm9yfmJ
-         obvesuSQuGNTGv1HOPGszy38bGZuR6b8r50wBIeiA6fRjjDNAaolY+ZpdTliTR5Py5iE
-         8cdpR8Xe4QghIqbAuCBfCIONohG6mqfGOgK0fLp5G/HtHMFYg3d0tI7lco0ipM51gYmN
-         qWdMpA1aGLBSmtjVoaAVR+yuq9thTr7MMl/ALQmPKYBnbW0+3CAU508SCwJsvMAi0yH/
-         l57hYrAHEdjjInAL82pNB7fgUku7ijfeioiSw0zBntuTeyHiN/Jqhg9NBBDDbdKwm4dD
-         qIGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697634714; x=1698239514;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XINWG75d/tw1LWTjmyxq3SU0daBRIYX71zDB994atYg=;
-        b=DwTBaM7mgcuFjnpyNfzPNSmSetV+Bkva4rLDHeFilGdV6FRyWZwo4wOTOEjpiaplmq
-         XbkVCezqpQAkgX76PHDXlTLbcjTprqF0g4ou7QSM5rhSHKkxAPQt+SHxfE5QzZaEZS8Q
-         yKCyKh5i09SUmbnB8UZMQcCQy4vkU5emZL6lk9OO3yD9YrnX4fjMuSeIL7l/1oHxEUWm
-         rB3PPtwVLlo7gPhIcPuAsBcjmbOOJwG3YrbSzVA0SGBzlCTlb6cWwqc17x4UWM/Msz44
-         WiNY6/pMTjZ88eCWIkwRkCIzrQ7EdvXHoUqQBWk6YWsmCVTHhU9YuFzcO1jMwqu45WPM
-         cHKg==
-X-Gm-Message-State: AOJu0Yx1MfCN4O2ech0Au82JC2FhHc5SavBC+g10SlMNs6TBS1YTJUx8
-	F2qx2CB6RxayNzBP3Hzu/w2gta8jruCF1E24QTrSKg==
-X-Google-Smtp-Source: AGHT+IFqb1I+/iFl7h9OQKSgyAurOeel5WcE3c+AP7zy28gZyBF91PDTgLwIZUhgIqeVr1Pr8mTIkg==
-X-Received: by 2002:a17:906:dac4:b0:9a1:c659:7c56 with SMTP id xi4-20020a170906dac400b009a1c6597c56mr4235720ejb.22.1697634713932;
-        Wed, 18 Oct 2023 06:11:53 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:1ae])
-        by smtp.gmail.com with ESMTPSA id t3-20020a1709064f0300b009c3f1b3e988sm1633025eju.90.2023.10.18.06.11.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 06:11:53 -0700 (PDT)
-References: <8f99194c698bcef12666f0a9a999c58f8b1cb52c.1697557782.git.pabeni@redhat.com>
-User-agent: mu4e 1.6.10; emacs 28.3
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>, Eric
- Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- bpf@vger.kernel.org
-Subject: Re: [PATCH net] tcp_bpf: properly release resources on error paths
-Date: Wed, 18 Oct 2023 15:11:31 +0200
-In-reply-to: <8f99194c698bcef12666f0a9a999c58f8b1cb52c.1697557782.git.pabeni@redhat.com>
-Message-ID: <87bkcw9iso.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26D41A733
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 13:24:19 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB40B83;
+	Wed, 18 Oct 2023 06:24:16 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39IDMRVm009680;
+	Wed, 18 Oct 2023 13:24:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=TiOX6dll2bvGdWalE9/Utntb+gAx0yYM4DDzC7MoWvI=;
+ b=qqmQ6GQ8skPeKGNU7xDyOwp5sPN2w/xmnR/1t9AKSRONMnrj/iNWWvLPg9KJsLX8Fi1V
+ 3dKaz1WYlPSQtfMQXyvBqgDRz2OLGDuw9xpvt7Ql5jFA5DRG4D0mYOMG3Y9n/SGxjIk3
+ KR20neAE6ZGjKxYC6iyLUpmc9ql8+FP+h98AYBGXalanNlUnQ5N5IAWcFv+Bks7o6Qg5
+ CN4zuIG+Jf3Xfb4+SY02mwF6FnrB9cLDpcj/Gh3L0btZ+YPWqvN2Qtsp84YIr4cHs/e8
+ 7cWgmKT9OQrR/W9+WzKEDczz5eXcQU0zX/vMG5xbh36NFePqBeCxc4trZcc9/FbYH71w NQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ttg6g8396-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Oct 2023 13:24:13 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39IDMWfV010043;
+	Wed, 18 Oct 2023 13:24:12 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ttg6g8382-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Oct 2023 13:24:12 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39IBBhAx030719;
+	Wed, 18 Oct 2023 13:24:11 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tr7hjrafv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Oct 2023 13:24:11 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39IDO83n18088602
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 18 Oct 2023 13:24:08 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0F11B20043;
+	Wed, 18 Oct 2023 13:24:08 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B039A20040;
+	Wed, 18 Oct 2023 13:24:07 +0000 (GMT)
+Received: from [9.152.224.54] (unknown [9.152.224.54])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 18 Oct 2023 13:24:07 +0000 (GMT)
+Message-ID: <0d6c3a16-bba1-4f7d-bfbc-44efb7e73706@linux.ibm.com>
+Date: Wed, 18 Oct 2023 15:24:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 10/18] net/smc: implement ID-related
+ operations of loopback
+Content-Language: en-US
+To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
+        wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
+ <1695568613-125057-11-git-send-email-guwen@linux.alibaba.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <1695568613-125057-11-git-send-email-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ugbjpdp0hi_8TGux2-ODi44VSmBAfyAA
+X-Proofpoint-GUID: i8QepzJQ-DOyQjH0mORVfHrOJtpPRnsK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-18_12,2023-10-18_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ priorityscore=1501 mlxlogscore=650 bulkscore=0 lowpriorityscore=0
+ malwarescore=0 clxscore=1015 adultscore=0 impostorscore=0 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310180111
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 05:49 PM +02, Paolo Abeni wrote:
-> In the blamed commit below, I completely forgot to release the acquired
-> resources before erroring out in the TCP BPF code, as reported by Dan.
->
-> Address the issues by replacing the bogus return with a jump to the
-> relevant cleanup code.
->
-> Fixes: 419ce133ab92 ("tcp: allow again tcp_disconnect() when threads are waiting")
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
 
-Acked-by: Jakub Sitnicki <jakub@cloudflare.com>
+
+On 24.09.23 17:16, Wen Gu wrote:
+> This patch implements GID/CHID/SEID related operations of SMC-D loopback device. In loopback device, GID is generated by UUIDv4 algorithm, CHID is reserved 0xFFFF, SEID is generated using the same algorithm as ISM device under s390 architecture, and is 0 and disabled under non-s390 architecture. Signed-off-by: Wen Gu <guwen@linux.alibaba.com> ---
+
+IMO, get_system_eid should not be part of smcd_ops. And should not be provided by an smcd device.
+It is a system_eid is a global value that is valid for all smcd interfaces of this system (os instance).
+So I think it should be provided by the smc module. 
+
+I agree it needs to be architecture dependent and same as today for s390.
 
