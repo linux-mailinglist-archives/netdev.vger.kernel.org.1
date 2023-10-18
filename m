@@ -1,113 +1,245 @@
-Return-Path: <netdev+bounces-42363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEFA27CE788
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:18:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B8627CE7BF
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25D951C20CCB
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 19:18:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74EE91C20AA8
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 19:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6234448C;
-	Wed, 18 Oct 2023 19:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3C6339AF;
+	Wed, 18 Oct 2023 19:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IVdqhlsu"
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="JHL3uEbQ";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="ug//8ap9"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487421F16B;
-	Wed, 18 Oct 2023 19:18:25 +0000 (UTC)
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B32AB;
-	Wed, 18 Oct 2023 12:18:24 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1c9b7c234a7so62366965ad.3;
-        Wed, 18 Oct 2023 12:18:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697656703; x=1698261503; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NG8xDx7terS9QmCT7NO8n1XBkFKCFD9jcbOnlRt+1sE=;
-        b=IVdqhlsuEeCvj7ajTysNzvgvMso/qXMJp5sCpFMd2NqTEoiREMa8BmaCRipvsMGlg+
-         /PYk+AOSH0xoLjRpRV75NRI9UtzZDxGBl2o1tCwsPni6iRYzjFaU9fnA1UyowXnryz+4
-         sIRtwTdM3VYxbeZcfPaTUOH7nWh+kNqoUBdTMS3VZLQzhimxhNx7NQgNZMit+WTDlX9s
-         ZEYGVM6jWh0FH7WDX9D//gTMES9pWlroS4LiOC82NHXd8GTVotANaKKTsr8hGSREV5fV
-         QTu4HkaLa3fEpVyI4riHRqexqxY1OdeJTEwR2GQQUi4+N0cS7aUKL8Oij2Kl1gorZMa5
-         qB0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697656703; x=1698261503;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NG8xDx7terS9QmCT7NO8n1XBkFKCFD9jcbOnlRt+1sE=;
-        b=c3Xo21YfJQI1woV8Plavg+fFUHiwybw4/IIDeoBaRU96AKSBTKqMika5hCDxvBVDsC
-         ylw4PfO8ZwmVwZxHleLdZKHDcH/OhI2HY5zQX9VCoTNf8DABnTX/Xx66i3GpBnLe0ex5
-         KSQ0PkP28x5PH5n04rBI04Qbtr5J8w03Q3CWx6ZUHVQmF0iMVOjkHsVN1+v4kSoAd0FW
-         SSpOm3YFXPd7e6VFBWIOCVanKnySp6wPXz8K/WDkl+6iNFXMkBezfHpFY1JAc/AyDOHR
-         okNbMrha/nVr4n2tGmYp5ylc1SPPBKAmjMvlD9qw9Y7dD6t9gxu3UVQhMUYRWaww+0vO
-         Oapg==
-X-Gm-Message-State: AOJu0YwZBDa2MWFwXwLI+lCfIsDp9DHkO11hm91MtdcjWv10+kEe1djm
-	EoEXqkTXegqpdFC6it0UYds=
-X-Google-Smtp-Source: AGHT+IHn7rNC99r0ByBx32gdk/BLbwNNlRWv/DFUH2OGhQqUimXjSgIsEMHnKxp+O9tcFEGeaYBEbQ==
-X-Received: by 2002:a17:902:f549:b0:1ca:754a:692e with SMTP id h9-20020a170902f54900b001ca754a692emr400672plf.30.1697656703324;
-        Wed, 18 Oct 2023 12:18:23 -0700 (PDT)
-Received: from localhost ([2605:59c8:148:ba00:f357:1d39:9540:831f])
-        by smtp.gmail.com with ESMTPSA id p9-20020a170902bd0900b001c7283d3089sm270654pls.273.2023.10.18.12.18.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 12:18:22 -0700 (PDT)
-Date: Wed, 18 Oct 2023 12:18:21 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, 
- John Fastabend <john.fastabend@gmail.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, 
- bpf@vger.kernel.org
-Message-ID: <65302f7d693a8_b74c20846@john.notmuch>
-In-Reply-To: <CANn89iL0f+RWFm1FuNmKjoeMTMZQZHW8=83ZQnUxiY8B6hHxrg@mail.gmail.com>
-References: <8f99194c698bcef12666f0a9a999c58f8b1cb52c.1697557782.git.pabeni@redhat.com>
- <CANn89iL0f+RWFm1FuNmKjoeMTMZQZHW8=83ZQnUxiY8B6hHxrg@mail.gmail.com>
-Subject: Re: [PATCH net] tcp_bpf: properly release resources on error paths
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B443545F42
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 19:30:33 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B76E2AB;
+	Wed, 18 Oct 2023 12:30:30 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 215206017F;
+	Wed, 18 Oct 2023 21:30:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1697657428; bh=XkKql79KvtYio+gIsoamLBoAA43GneTQXqGS71oA1/o=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JHL3uEbQKJnuX1Fj1RxtZP0awkogRce8jPBOILqwzv8Sw+08rWLIshIyCQ1vEPSmP
+	 ajrUCrPdhTLmz8gNA1aPCEsxDnq6nggk/FEne5XR4uMGcafrtKwx4oWas+zih99nze
+	 5j0LGMpevAwVaHY8i+cTvLmTd73J9Cx27h+beEmHTwxoNNG1zDb/MWSTuIRtbOuZTd
+	 RcZhnv2MaKCCGAcyFVhMa6kLuD5BpSdbiBdqdMuqK7bSYr4sTvXG/7tZkYxrHiOytm
+	 ++6pvow4NyBenrUGcEMQk3KOc7pIPGRCg7boU5pPZvo52o8nPzsQqppfSOtOeL+jDo
+	 7GZN+RceDqsLQ==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id PHCQU5ZtOC5t; Wed, 18 Oct 2023 21:30:25 +0200 (CEST)
+Received: from defiant.home (78-2-200-105.adsl.net.t-com.hr [78.2.200.105])
+	by domac.alu.hr (Postfix) with ESMTPSA id 7093D6017E;
+	Wed, 18 Oct 2023 21:30:24 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1697657425; bh=XkKql79KvtYio+gIsoamLBoAA43GneTQXqGS71oA1/o=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ug//8ap9RpG3lYPrg3JT4BK3xvdWEP9jcZW0vRaIp7xyaL/z5drdfWw0I0Uh/GLOb
+	 /nnibIVUMAvJ320TbsWX2nHHBpPOssYXrtz7FYcOoJj8JpRhEsD9MpFyQKRR8/2C6F
+	 VlZ6rNuP7yAileVKx1MOUFlJpKCsDsWf0P32pDKcSJQVNilLYtWmNa+ZoJj72kbx3q
+	 vFpA+9nt53Q3H9bqwdwq/NCVebb928b5h4c/dTILcAlvJ0+UVhby6YVTP5Y3AcMFzV
+	 AWsfOZAVrDDnGvGF8q3ze+SNXXf9ubFt5ovbMR3QOLQ1miZT9ALPQL4YUcdBokRWbI
+	 0RFx6cu+16hpA==
+From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: nic_swsd@realtek.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>,
+	Marco Elver <elver@google.com>
+Subject: [PATCH v3 1/3] r8169: fix the KCSAN reported data-race in rtl_tx() while reading tp->cur_tx
+Date: Wed, 18 Oct 2023 21:28:27 +0200
+Message-Id: <20231018192828.343562-1-mirsad.todorovac@alu.unizg.hr>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Eric Dumazet wrote:
-> On Tue, Oct 17, 2023 at 5:50=E2=80=AFPM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> >
-> > In the blamed commit below, I completely forgot to release the acquir=
-ed
-> > resources before erroring out in the TCP BPF code, as reported by Dan=
-.
-> >
-> > Address the issues by replacing the bogus return with a jump to the
-> > relevant cleanup code.
-> >
-> > Fixes: 419ce133ab92 ("tcp: allow again tcp_disconnect() when threads =
-are waiting")
-> > Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> =
+KCSAN reported the following data-race:
 
-> Right :)
-> =
+==================================================================
+BUG: KCSAN: data-race in rtl8169_poll [r8169] / rtl8169_start_xmit [r8169]
 
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
+write (marked) to 0xffff888102474b74 of 4 bytes by task 5358 on cpu 29:
+rtl8169_start_xmit (drivers/net/ethernet/realtek/r8169_main.c:4254) r8169
+dev_hard_start_xmit (./include/linux/netdevice.h:4889 ./include/linux/netdevice.h:4903 net/core/dev.c:3544 net/core/dev.c:3560)
+sch_direct_xmit (net/sched/sch_generic.c:342)
+__dev_queue_xmit (net/core/dev.c:3817 net/core/dev.c:4306)
+ip_finish_output2 (./include/linux/netdevice.h:3082 ./include/net/neighbour.h:526 ./include/net/neighbour.h:540 net/ipv4/ip_output.c:233)
+__ip_finish_output (net/ipv4/ip_output.c:311 net/ipv4/ip_output.c:293)
+ip_finish_output (net/ipv4/ip_output.c:328)
+ip_output (net/ipv4/ip_output.c:435)
+ip_send_skb (./include/net/dst.h:458 net/ipv4/ip_output.c:127 net/ipv4/ip_output.c:1486)
+udp_send_skb (net/ipv4/udp.c:963)
+udp_sendmsg (net/ipv4/udp.c:1246)
+inet_sendmsg (net/ipv4/af_inet.c:840 (discriminator 4))
+sock_sendmsg (net/socket.c:730 net/socket.c:753)
+__sys_sendto (net/socket.c:2177)
+__x64_sys_sendto (net/socket.c:2185)
+do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
 
-Thanks.
+read to 0xffff888102474b74 of 4 bytes by interrupt on cpu 21:
+rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4397 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
+__napi_poll (net/core/dev.c:6527)
+net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
+__do_softirq (kernel/softirq.c:553)
+__irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
+irq_exit_rcu (kernel/softirq.c:647)
+common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 14))
+asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636)
+cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
+cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
+call_cpuidle (kernel/sched/idle.c:135)
+do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
+cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
+start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:294)
+secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
 
-Reviewed-by: John Fastabend <john.fastabend@gmail.com>=
+value changed: 0x002f4815 -> 0x002f4816
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kcsan-00143-gb5cbe7c00aa0 #41
+Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04/26/2023
+==================================================================
+
+The write side of drivers/net/ethernet/realtek/r8169_main.c is:
+==================
+   4251         /* rtl_tx needs to see descriptor changes before updated tp->cur_tx */
+   4252         smp_wmb();
+   4253
+ → 4254         WRITE_ONCE(tp->cur_tx, tp->cur_tx + frags + 1);
+   4255
+   4256         stop_queue = !netif_subqueue_maybe_stop(dev, 0, rtl_tx_slots_avail(tp),
+   4257                                                 R8169_TX_STOP_THRS,
+   4258                                                 R8169_TX_START_THRS);
+
+The read side is the function rtl_tx():
+
+   4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+   4356                    int budget)
+   4357 {
+   4358         unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
+   4359         struct sk_buff *skb;
+   4360
+   4361         dirty_tx = tp->dirty_tx;
+   4362
+   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+   4364                 unsigned int entry = dirty_tx % NUM_TX_DESC;
+   4365                 u32 status;
+   4366
+   4367                 status = le32_to_cpu(tp->TxDescArray[entry].opts1);
+   4368                 if (status & DescOwn)
+   4369                         break;
+   4370
+   4371                 skb = tp->tx_skb[entry].skb;
+   4372                 rtl8169_unmap_tx_skb(tp, entry);
+   4373
+   4374                 if (skb) {
+   4375                         pkts_compl++;
+   4376                         bytes_compl += skb->len;
+   4377                         napi_consume_skb(skb, budget);
+   4378                 }
+   4379                 dirty_tx++;
+   4380         }
+   4381
+   4382         if (tp->dirty_tx != dirty_tx) {
+   4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_compl);
+   4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
+   4385
+   4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl, bytes_compl,
+   4387                                               rtl_tx_slots_avail(tp),
+   4388                                               R8169_TX_START_THRS);
+   4389                 /*
+   4390                  * 8168 hack: TxPoll requests are lost when the Tx packets are
+   4391                  * too close. Let's kick an extra TxPoll request when a burst
+   4392                  * of start_xmit activity is detected (if it is not detected,
+   4393                  * it is slow enough). -- FR
+   4394                  * If skb is NULL then we come here again once a tx irq is
+   4395                  * triggered after the last fragment is marked transmitted.
+   4396                  */
+ → 4397                 if (tp->cur_tx != dirty_tx && skb)
+   4398                         rtl8169_doorbell(tp);
+   4399         }
+   4400 }
+
+Obviously from the code, an earlier detected data-race for tp->cur_tx was fixed in the
+line 4363:
+
+   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+
+but the same solution is required for protecting the other access to tp->cur_tx:
+
+ → 4397                 if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+   4398                         rtl8169_doorbell(tp);
+
+The write in the line 4254 is protected with WRITE_ONCE(), but the read in the line 4397
+might have suffered read tearing under some compiler optimisations.
+
+The fix eliminated the KCSAN data-race report for this bug.
+
+It is yet to be evaluated what happens if tp->cur_tx changes between the test in line 4363
+and line 4397. This test should certainly not be cached by the compiler in some register
+for such a long time, while asynchronous writes to tp->cur_tx might have occurred in line
+4254 in the meantime.
+
+Fixes: 94d8a98e6235c ("r8169: reduce number of workaround doorbell rings")
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Marco Elver <elver@google.com>
+Cc: netdev@vger.kernel.org
+Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@alu.unizg.hr/
+Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+Acked-by: Marco Elver <elver@google.com>
+---
+v3:
+ fixed the Fixes: tag for 3/3.
+
+v2:
+ fixed double Signed-off-by: tag
+
+ drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 6351a2dc13bc..281aaa851847 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4394,7 +4394,7 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+ 		 * If skb is NULL then we come here again once a tx irq is
+ 		 * triggered after the last fragment is marked transmitted.
+ 		 */
+-		if (tp->cur_tx != dirty_tx && skb)
++		if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+ 			rtl8169_doorbell(tp);
+ 	}
+ }
+-- 
+2.34.1
+
 
