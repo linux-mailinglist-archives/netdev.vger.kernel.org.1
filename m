@@ -1,50 +1,49 @@
-Return-Path: <netdev+bounces-42123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 260EB7CD36F
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:13:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66D307CD390
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:31:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5B4DB20FB5
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 05:13:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D380B281B0F
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 05:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589B37493;
-	Wed, 18 Oct 2023 05:13:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rV/nO/ot"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185FC8C0C;
+	Wed, 18 Oct 2023 05:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BDB95696
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 05:13:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F36CC433C7;
-	Wed, 18 Oct 2023 05:13:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697605995;
-	bh=Bvr83CzE9C2+DADG4mJzrwV2INtN9QlDi2Yweo0cJKE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rV/nO/otcyDhkrGAAzHl6+tkjEM979ioLxkETkIkvcbxCsd2VuGUjZA857uLYCCf6
-	 pIshumTe3QV89pSAMGw119ehMBI9wMUx6pI4H6BhUBl4rNj+xFfo18LcRgPqq4s5QH
-	 vFHgyjZtcSQqQdZajBOTrluRZ+kek88T5TLSl0btC9rRtlYZvN9qbjTyVjJ/XNXF7Z
-	 q7fSp026phvgx9laBnXU5gk+ZoJ18PcX9Xem58K+3q6A0jVAZqIehu0YzwVUej8jaY
-	 LJIGnclH38BYXqIeh2eByAgDj4+59W1de/3+DZorsTLI9j0zjCzmohwmMuhvUAvZUd
-	 LZGK5JPkaX5tQ==
-Date: Wed, 18 Oct 2023 08:13:11 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Patrisious Haddad <phaddad@nvidia.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	Raed Salem <raeds@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>
-Subject: Re: [PATCH xfrm-next 5/9] net/mlx5e: Unify esw and normal IPsec
- status table creation/destruction
-Message-ID: <20231018051311.GE5392@unreal>
-References: <cover.1697444728.git.leon@kernel.org>
- <d0bc0651c0d5f9afe79942577cf71e7d30859608.1697444728.git.leon@kernel.org>
- <ZS5WK8V0+JoTlNmu@gauss3.secunet.de>
- <20231017121357.GC5392@unreal>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486A343112;
+	Wed, 18 Oct 2023 05:31:53 +0000 (UTC)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB897BA;
+	Tue, 17 Oct 2023 22:31:51 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 1099367373; Wed, 18 Oct 2023 07:31:47 +0200 (CEST)
+Date: Wed, 18 Oct 2023 07:31:46 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Christoph Hellwig <hch@lst.de>, Luis Chamberlain <mcgrof@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Daniel Mack <daniel@zonque.org>,
+	Haojian Zhuang <haojian.zhuang@gmail.com>,
+	Robert Jarzmik <robert.jarzmik@free.fr>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Manuel Lauss <manuel.lauss@gmail.com>,
+	Yangbo Lu <yangbo.lu@nxp.com>, Joshua Kinard <kumba@gentoo.org>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Arnd Bergmann <arnd@arndb.de>, linux-arm-kernel@lists.infradead.org,
+	open list <linux-kernel@vger.kernel.org>, linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-modules@vger.kernel.org
+Subject: Re: [PATCH 5/5] modules: only allow symbol_get of
+ EXPORT_SYMBOL_GPL modules
+Message-ID: <20231018053146.GA16765@lst.de>
+References: <20230801173544.1929519-1-hch@lst.de> <20230801173544.1929519-6-hch@lst.de> <bf555c2a4df5196533b6e614cc57638004dfb426.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,44 +52,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231017121357.GC5392@unreal>
+In-Reply-To: <bf555c2a4df5196533b6e614cc57638004dfb426.camel@infradead.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 03:13:57PM +0300, Leon Romanovsky wrote:
-> On Tue, Oct 17, 2023 at 11:38:51AM +0200, Steffen Klassert wrote:
-> > On Mon, Oct 16, 2023 at 12:15:13PM +0300, Leon Romanovsky wrote:
-> > > From: Patrisious Haddad <phaddad@nvidia.com>
-> > > 
-> > > Change normal IPsec flow to use the same creation/destruction functions
-> > > for status flow table as that of ESW, which first of all refines the
-> > > code to have less code duplication.
-> > > 
-> > > And more importantly, the ESW status table handles IPsec syndrome
-> > > checks at steering by HW, which is more efficient than the previous
-> > > behaviour we had where it was copied to WQE meta data and checked
-> > > by the driver.
-> > > 
-> > > Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
-> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > This one does not apply to the ipsec-next tree.
+On Wed, Oct 18, 2023 at 01:30:18AM +0100, David Woodhouse wrote:
 > 
-> You are right, sorry about that. It is based on two net-next series
-> and I didn't expect such a fast response. 
-> 
-> 1. https://lore.kernel.org/netdev/20231002083832.19746-1-leon@kernel.org/ - accepted.
-> 2. https://lore.kernel.org/netdev/20231014171908.290428-16-saeed@kernel.org/#t - not accepted yet.
-> 
-> Do you feel comfortable with the series/xfrm patches? If yes, Saeed can
-> resend the series directly to net-next once patch #2 is accepted.
+> But if we're going to tolerate the core kernel still exporting some
+> stuff with EXPORT_SYMBOL, why isn't OK for a GPL-licensed module do to
+> the same? Even an *in-tree* GPL-licensed module now can't export
+> functionality with EXPORT_SYMBOL and have it used with symbol_get().
 
-Steffen, second patch was accepted too.
-https://lore.kernel.org/all/169759322682.7564.2475141741118387188.git-patchwork-notify@kernel.org
+Anything using symbol_get is by intent very deeply internal for tightly
+coupled modules working together, and thus not a non-GPL export.
 
-This series applies cleanly to net-next now.
-
-Thanks
-
-> 
-> Thanks
-> 
+In fact the current series is just a stepping stone.  Once some mess
+in the kvm/vfio integration is fixed up we'll require a new explicit
+EXPORT_SYMBOL variant as symbol_get wasn't ever intended to be used
+on totally random symbols not exported for use by symbol_get.
 
