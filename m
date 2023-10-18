@@ -1,125 +1,255 @@
-Return-Path: <netdev+bounces-42090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 291467CD1A0
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:08:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C91787CD1A2
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:08:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D945E281839
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:08:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB552817DE
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 01:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29F1ECC;
-	Wed, 18 Oct 2023 01:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852331115;
+	Wed, 18 Oct 2023 01:08:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MRC30WUM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vjWJMqVN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CECF3A5B;
-	Wed, 18 Oct 2023 01:08:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FD4DC433C8;
-	Wed, 18 Oct 2023 01:08:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697591281;
-	bh=59vR46bvuqiPB0urnwSGzHyDUKCLr3i2AhjG3vuElWU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=MRC30WUMYsWZFaB8jEOuzyQ4Scjb3qySmsyt2S+y4Y1jLdAFZK1NQuo+Y12nRrgL2
-	 Z5n4sOW5K+0+kEwGwo7DQv1oayKFR3Bu+c2S/4JoDx6KjKK3hfoZuAOzZSRTqBN0SF
-	 fYe4vp3rFWbSZ8AaJEnTD16Wlge5DM3zEx5+Rma+xyTn8R4/mnSYhMlCyp/5z3B+HT
-	 6hwhZVYFC4rpupLXQxrvNVICLD+mFK7TF6nd4afmZs4NX/GMCtXdqvbBbW2fWMRA5s
-	 +6mTGyeUKs+AOrUZU+fZdDFXgYiae0PWWlWbDa96fJ+W7U255gPfeGlcyrlR7icuMM
-	 wzS92xp3FPTJw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	ecree.xilinx@gmail.com,
-	corbet@lwn.net,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net-next] docs: networking: document multi-RSS context
-Date: Tue, 17 Oct 2023 18:07:58 -0700
-Message-ID: <20231018010758.2382742-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D1B15A6
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:08:48 +0000 (UTC)
+Received: from out-210.mta0.migadu.com (out-210.mta0.migadu.com [IPv6:2001:41d0:1004:224b::d2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51B59B6
+	for <netdev@vger.kernel.org>; Tue, 17 Oct 2023 18:08:47 -0700 (PDT)
+Message-ID: <66f72518-f9d6-f19b-60a6-eff0f30c2590@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1697591325;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zpO9FTXa+fhm6ZQzWsVc1/KbMEhxQzk0sUT4lhmZ+1I=;
+	b=vjWJMqVNF3+XXR+J/pFcY+x87JUslzkbKINWb7jFPFjPy/yAgakVeHKc3KGuYtjMp8NoNB
+	w8j5qhBtWo5Yy40+ScL3LyxgvuU3jxfE5YJ/tk+OsM326tXGuFLEoAgmz7ly56F6sE6Hf6
+	8KvovsLmkS9+lC1NUq3nMrmVLCIjIVg=
+Date: Tue, 17 Oct 2023 18:08:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 bpf-next 10/11] bpf: tcp: Make WS, SACK, ECN
+ configurable from BPF SYN Cookie.
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>
+References: <20231013220433.70792-1-kuniyu@amazon.com>
+ <20231013220433.70792-11-kuniyu@amazon.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231013220433.70792-11-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-There seems to be no docs for the concept of multiple RSS
-contexts and how to configure it. I had to explain it three
-times recently, the last one being the charm, document it.
+On 10/13/23 3:04 PM, Kuniyuki Iwashima wrote:
+> This patch allows BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB hook to enable WScale,
+> SACK, and ECN by passing corresponding flags to bpf_sock_ops.replylong[1].
+> 
+> The same flags are passed to BPF_SOCK_OPS_GEN_SYNCOOKIE_CB hook as
+> bpf_sock_ops.args[1] so that the BPF prog need not parse the TCP header to
+> check if WScale, SACK, ECN, and TS are available in SYN.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>   include/uapi/linux/bpf.h       | 18 ++++++++++++++++++
+>   net/ipv4/syncookies.c          | 20 ++++++++++++++++++++
+>   net/ipv4/tcp_input.c           | 11 +++++++++++
+>   tools/include/uapi/linux/bpf.h | 18 ++++++++++++++++++
+>   4 files changed, 67 insertions(+)
+> 
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 24f673d88c0d..cdae4dd5d797 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -6869,6 +6869,7 @@ enum {
+>   					 * option.
+>   					 *
+>   					 * args[0]: MSS
+> +					 * args[1]: BPF_SYNCOOKIE_XXX
+>   					 *
+>   					 * replylong[0]: ISN
+>   					 * replylong[1]: TS
+> @@ -6883,6 +6884,7 @@ enum {
+>   					 * args[1]: TS
+>   					 *
+>   					 * replylong[0]: MSS
+> +					 * replylong[1]: BPF_SYNCOOKIE_XXX
+>   					 */
+>   };
+>   
+> @@ -6970,6 +6972,22 @@ enum {
+>   						 */
+>   };
+>   
+> +/* arg[1] value for BPF_SOCK_OPS_GEN_SYNCOOKIE_CB and
+> + * replylong[1] for BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB.
+> + *
+> + * MSB                                LSB
+> + * | 31 ... | 6  | 5   | 4    | 3 2 1 0 |
+> + * |    ... | TS | ECN | SACK | WScale  |
+> + */
+> +enum {
+> +	/* 0xf is invalid thus means that SYN did not have WScale. */
+> +	BPF_SYNCOOKIE_WSCALE_MASK	= (1 << 4) - 1,
+> +	BPF_SYNCOOKIE_SACK		= (1 << 4),
+> +	BPF_SYNCOOKIE_ECN		= (1 << 5),
+> +	/* Only available for BPF_SOCK_OPS_GEN_SYNCOOKIE_CB to check if SYN has TS */
+> +	BPF_SYNCOOKIE_TS		= (1 << 6),
+> +};
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: ecree.xilinx@gmail.com
-CC: corbet@lwn.net
-CC: linux-doc@vger.kernel.org
----
- Documentation/networking/scaling.rst | 42 ++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+This details should not be exposed to uapi (more below).
 
-diff --git a/Documentation/networking/scaling.rst b/Documentation/networking/scaling.rst
-index 92c9fb46d6a2..03ae19a689fc 100644
---- a/Documentation/networking/scaling.rst
-+++ b/Documentation/networking/scaling.rst
-@@ -105,6 +105,48 @@ a separate CPU. For interrupt handling, HT has shown no benefit in
- initial tests, so limit the number of queues to the number of CPU cores
- in the system.
- 
-+Dedicated RSS contexts
-+~~~~~~~~~~~~~~~~~~~~~~
-+
-+Modern NICs support creating multiple co-existing RSS configurations
-+which are selected based on explicit matching rules. This can be very
-+useful when application wants to constrain the set of queues receiving
-+traffic for e.g. a particular destination port or IP address.
-+The example below shows how to direct all traffic to TCP port 22
-+to queues 0 and 1.
-+
-+To create an additional RSS context use::
-+
-+  # ethtool -X eth0 hfunc toeplitz context new
-+  New RSS context is 1
-+
-+Kernel reports back the ID of the allocated context (the default, always
-+present RSS context has ID of 0). The new context can be queried and
-+modified using the same APIs as the default context::
-+
-+  # ethtool -x eth0 context 1
-+  RX flow hash indirection table for eth0 with 13 RX ring(s):
-+    0:      0     1     2     3     4     5     6     7
-+    8:      8     9    10    11    12     0     1     2
-+  [...]
-+  # ethtool -X eth0 equal 2 context 1
-+  # ethtool -x eth0 context 1
-+  RX flow hash indirection table for eth0 with 13 RX ring(s):
-+    0:      0     1     0     1     0     1     0     1
-+    8:      0     1     0     1     0     1     0     1
-+  [...]
-+
-+To make use of the new context direct traffic to it using an n-tuple
-+filter::
-+
-+  # ethtool -N eth0 flow-type tcp6 dst-port 22 context 1
-+  Added rule with ID 1023
-+
-+When done, remove the context and the rule::
-+
-+  # ethtool -N eth0 delete 1023
-+  # ethtool -X eth0 context 1 delete
-+
- 
- RPS: Receive Packet Steering
- ============================
--- 
-2.41.0
+> +
+>   struct bpf_perf_event_value {
+>   	__u64 counter;
+>   	__u64 enabled;
+> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> index ff979cc314da..22353a9af52d 100644
+> --- a/net/ipv4/syncookies.c
+> +++ b/net/ipv4/syncookies.c
+> @@ -286,6 +286,7 @@ int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_
+>   {
+>   	struct bpf_sock_ops_kern sock_ops;
+>   	struct net *net = sock_net(sk);
+> +	u32 options;
+>   
+>   	if (tcp_opt->saw_tstamp) {
+>   		if (!READ_ONCE(net->ipv4.sysctl_tcp_timestamps))
+> @@ -309,6 +310,25 @@ int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_
+>   	if (!sock_ops.replylong[0])
+>   		goto err;
+>   
+> +	options = sock_ops.replylong[1];
+> +
+> +	if ((options & BPF_SYNCOOKIE_WSCALE_MASK) != BPF_SYNCOOKIE_WSCALE_MASK) {
+> +		if (!READ_ONCE(net->ipv4.sysctl_tcp_window_scaling))
+> +			goto err;
+> +
+> +		tcp_opt->wscale_ok = 1;
+> +		tcp_opt->snd_wscale = options & BPF_SYNCOOKIE_WSCALE_MASK;
+> +	}
+> +
+> +	if (options & BPF_SYNCOOKIE_SACK) {
+> +		if (!READ_ONCE(net->ipv4.sysctl_tcp_sack))
+> +			goto err;
+> +
+> +		tcp_opt->sack_ok = 1;
+> +	}
+> +
+> +	inet_rsk(req)->ecn_ok = options & BPF_SYNCOOKIE_ECN;
+> +
+>   	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESRECV);
+>   
+>   	return sock_ops.replylong[0];
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index feb44bff29ef..483e2f36afe5 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -6970,14 +6970,25 @@ EXPORT_SYMBOL_GPL(tcp_get_syncookie_mss);
+>   static int bpf_skops_cookie_init_sequence(struct sock *sk, struct request_sock *req,
+>   					  struct sk_buff *skb, __u32 *isn)
+>   {
+> +	struct inet_request_sock *ireq = inet_rsk(req);
+>   	struct bpf_sock_ops_kern sock_ops;
+> +	u32 options;
+>   	int ret;
+>   
+> +	options = ireq->wscale_ok ? ireq->snd_wscale : BPF_SYNCOOKIE_WSCALE_MASK;
+> +	if (ireq->sack_ok)
+> +		options |= BPF_SYNCOOKIE_SACK;
+> +	if (ireq->ecn_ok)
+> +		options |= BPF_SYNCOOKIE_ECN;
+> +	if (ireq->tstamp_ok)
+> +		options |= BPF_SYNCOOKIE_TS;
+
+No need to set "options" (which becomes args[1]). sock_ops.sk is available to 
+the bpf prog. The bpf prog can directly read it. The recent AF_UNIX bpf support 
+could be a reference on how the bpf_cast_to_kern_ctx() and bpf_rdonly_cast() are 
+used.
+
+https://lore.kernel.org/bpf/20231011185113.140426-10-daan.j.demeyer@gmail.com/
+
+> +
+>   	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
+>   
+>   	sock_ops.op = BPF_SOCK_OPS_GEN_SYNCOOKIE_CB;
+>   	sock_ops.sk = req_to_sk(req);
+>   	sock_ops.args[0] = req->mss;
+> +	sock_ops.args[1] = options;
+>   
+>   	bpf_skops_init_skb(&sock_ops, skb, tcp_hdrlen(skb));
+>   
+> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+> index 24f673d88c0d..cdae4dd5d797 100644
+> --- a/tools/include/uapi/linux/bpf.h
+> +++ b/tools/include/uapi/linux/bpf.h
+> @@ -6869,6 +6869,7 @@ enum {
+>   					 * option.
+>   					 *
+>   					 * args[0]: MSS
+> +					 * args[1]: BPF_SYNCOOKIE_XXX
+>   					 *
+>   					 * replylong[0]: ISN
+>   					 * replylong[1]: TS
+> @@ -6883,6 +6884,7 @@ enum {
+>   					 * args[1]: TS
+>   					 *
+>   					 * replylong[0]: MSS
+> +					 * replylong[1]: BPF_SYNCOOKIE_XXX
+>   					 */
+>   };
+>   
+> @@ -6970,6 +6972,22 @@ enum {
+>   						 */
+>   };
+>   
+> +/* arg[1] value for BPF_SOCK_OPS_GEN_SYNCOOKIE_CB and
+> + * replylong[1] for BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB.
+> + *
+> + * MSB                                LSB
+> + * | 31 ... | 6  | 5   | 4    | 3 2 1 0 |
+> + * |    ... | TS | ECN | SACK | WScale  |
+> + */
+> +enum {
+> +	/* 0xf is invalid thus means that SYN did not have WScale. */
+> +	BPF_SYNCOOKIE_WSCALE_MASK	= (1 << 4) - 1,
+> +	BPF_SYNCOOKIE_SACK		= (1 << 4),
+> +	BPF_SYNCOOKIE_ECN		= (1 << 5),
+> +	/* Only available for BPF_SOCK_OPS_GEN_SYNCOOKIE_CB to check if SYN has TS */
+> +	BPF_SYNCOOKIE_TS		= (1 << 6),
+> +};
+> +
+>   struct bpf_perf_event_value {
+>   	__u64 counter;
+>   	__u64 enabled;
 
 
