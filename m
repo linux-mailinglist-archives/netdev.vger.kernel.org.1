@@ -1,109 +1,225 @@
-Return-Path: <netdev+bounces-42317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 065657CE342
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 19:01:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006027CE345
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 19:02:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C4A5B2125A
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:01:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1044C1C20A2A
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:02:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2023C686;
-	Wed, 18 Oct 2023 17:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B4D3C686;
+	Wed, 18 Oct 2023 17:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ABCO/aww"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="YF0DbO2J"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47AE33C09F
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 17:01:19 +0000 (UTC)
-Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFFF3B0;
-	Wed, 18 Oct 2023 10:01:17 -0700 (PDT)
-Received: by mail-oo1-xc29.google.com with SMTP id 006d021491bc7-581e5a9413bso942539eaf.1;
-        Wed, 18 Oct 2023 10:01:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5175F3C071;
+	Wed, 18 Oct 2023 17:02:34 +0000 (UTC)
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C294A111;
+	Wed, 18 Oct 2023 10:02:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697648477; x=1698253277; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hr0ycA5aHb6vFQVTChWOwllkgCks7I3a7aaUZga0s58=;
-        b=ABCO/awwwHbIMTVqnGp24qorbg0akprQMUcS9TFiRKIsluD4mEElu+OPS/1PyXwscg
-         cRTlIW60oXcbs0W8HbhyYHwRYh9OTM5Aj6wQv3nL8jv8HTQYPuSgE+HYxejTkJ3RoqJQ
-         wgQvPrzlk6UPl6vYXXXk2qf23BHdVAk2hX6l5wB5Hmnp7+yguZPZ55myutNvzyUhoePd
-         eu1ptI029MSa0QVfyTDYVlThSKISFtIb0BVF/e7ExGRinMNIjSGSS1phz20mwFo0bDhy
-         Ms+IThkxUzQPsy/pkic5C9NpwtyhRrrBohJdAJzvMW3/RlKA214hFusEVDNzkvQE96cZ
-         knJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697648477; x=1698253277;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hr0ycA5aHb6vFQVTChWOwllkgCks7I3a7aaUZga0s58=;
-        b=v9rRIOUF2VShTUGKUFogBgKx2NSZ3q+8BdRChaDPCfe7SiHuDOvPS7RSa7LKJk6v+f
-         Zx5+ZECM76mGR337TcaZoHNSgaNRuw6ady5pR6mfw+ojs7RVfypjgaJ23njivbFgx8Le
-         bAkOeMXpn0syBzOX5/Kpg8BZU5oxENX+Qy0btFgymIuIQfS6zz8aHJdetY7nAoI8yR9P
-         YGQvwYIXzwQyLu5IjJGJDRIR1tJg0vhPVXGWC5jh7r+Jfp8uZ2HliFfjzK0afG7kJ7vk
-         FNcoUC6RDm5nVmwkAMlRO03Sb+urK9NFkKP3qJSzH+bZRp30UFk/VhAd/+ihR9Vl29xJ
-         iqEQ==
-X-Gm-Message-State: AOJu0Yyg6XEB1cbgsx67bpcQZt0rnrvUWmYgXgtmRhgRBQOVJOsSIf2i
-	rY9TOqzb47pVT/JyRVdl6kg=
-X-Google-Smtp-Source: AGHT+IGAR9FT9S+HPbNUPuOZJAwG3+pwoP70aGYbDGxtB3QICfIgpn1ejznN/Qqo1qW4b5zRSrP3bg==
-X-Received: by 2002:a05:6358:ed7:b0:166:94b8:da17 with SMTP id 23-20020a0563580ed700b0016694b8da17mr6604656rwh.16.1697648476989;
-        Wed, 18 Oct 2023 10:01:16 -0700 (PDT)
-Received: from ubuntu ([223.226.54.200])
-        by smtp.gmail.com with ESMTPSA id v14-20020aa799ce000000b006bd6a0a4678sm3574595pfi.80.2023.10.18.10.01.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 10:01:15 -0700 (PDT)
-Date: Wed, 18 Oct 2023 10:01:11 -0700
-From: Nandha Kumar Singaram <nandhakumar.singaram@gmail.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Coiby Xu <coiby.xu@gmail.com>, netdev@vger.kernel.org,
-	linux-staging@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kumaran.4353@gmail.com
-Subject: Re: [PATCH 0/2] staging: qlge: Replace the occurrences of (1<<x) by
- BIT(x)
-Message-ID: <20231018170111.GA3452@ubuntu>
-References: <cover.1697568757.git.nandhakumar.singaram@gmail.com>
- <2023101856-visa-unlimited-a365@gregkh>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697648553; x=1729184553;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=yufWILeJIcU7vxg5cLT0ChCVEOVQwU7OL/NaxwWlnig=;
+  b=YF0DbO2JwB4cPdqz+FO0yNS4WBeWubE/D7g+7xYNWGKbUIAu1ry4aYBB
+   /HLyElOtHp6JTunSVnVHBzLPzPL6KwBu93Lc/oj7Rh0BLOzyPnCTd+xEK
+   3IbV5jFB528QKNw4Q8G5NmGIZEjbZr/SltMmiLFLu699PM3+mbwmjhOXI
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.03,235,1694736000"; 
+   d="scan'208";a="160750732"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 17:02:29 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com (Postfix) with ESMTPS id 9CFE440D52;
+	Wed, 18 Oct 2023 17:02:27 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:13852]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.81:2525] with esmtp (Farcaster)
+ id 184ea7e1-aed1-43c9-8a59-f6ddba66683a; Wed, 18 Oct 2023 17:02:27 +0000 (UTC)
+X-Farcaster-Flow-ID: 184ea7e1-aed1-43c9-8a59-f6ddba66683a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 18 Oct 2023 17:02:26 +0000
+Received: from 88665a182662.ant.amazon.com (10.111.146.69) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 18 Oct 2023 17:02:23 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <martin.lau@linux.dev>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
+	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <mykolal@fb.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
+	<song@kernel.org>, <yonghong.song@linux.dev>
+Subject: Re: [PATCH v1 bpf-next 10/11] bpf: tcp: Make WS, SACK, ECN configurable from BPF SYN Cookie.
+Date: Wed, 18 Oct 2023 10:02:15 -0700
+Message-ID: <20231018170215.8830-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <66f72518-f9d6-f19b-60a6-eff0f30c2590@linux.dev>
+References: <66f72518-f9d6-f19b-60a6-eff0f30c2590@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2023101856-visa-unlimited-a365@gregkh>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.111.146.69]
+X-ClientProxiedBy: EX19D039UWA004.ant.amazon.com (10.13.139.68) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 18, 2023 at 03:28:30PM +0200, Greg Kroah-Hartman wrote:
-> On Tue, Oct 17, 2023 at 12:03:57PM -0700, Nandha Kumar Singaram wrote:
-> > This patchset performs code cleanup in qlge driver as per
-> > linux coding style and may be applied in any sequence.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Date: Tue, 17 Oct 2023 18:08:34 -0700
+> On 10/13/23 3:04 PM, Kuniyuki Iwashima wrote:
+> > This patch allows BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB hook to enable WScale,
+> > SACK, and ECN by passing corresponding flags to bpf_sock_ops.replylong[1].
 > > 
-> > Nandha Kumar Singaram (2):
-> >   staging: qlge: Replace the occurrences of (1<<x) by BIT(x)
-> >   staging: qlge: Replace the occurrences of (1<<x) by BIT(x)
+> > The same flags are passed to BPF_SOCK_OPS_GEN_SYNCOOKIE_CB hook as
+> > bpf_sock_ops.args[1] so that the BPF prog need not parse the TCP header to
+> > check if WScale, SACK, ECN, and TS are available in SYN.
+> > 
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >   include/uapi/linux/bpf.h       | 18 ++++++++++++++++++
+> >   net/ipv4/syncookies.c          | 20 ++++++++++++++++++++
+> >   net/ipv4/tcp_input.c           | 11 +++++++++++
+> >   tools/include/uapi/linux/bpf.h | 18 ++++++++++++++++++
+> >   4 files changed, 67 insertions(+)
+> > 
+> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> > index 24f673d88c0d..cdae4dd5d797 100644
+> > --- a/include/uapi/linux/bpf.h
+> > +++ b/include/uapi/linux/bpf.h
+> > @@ -6869,6 +6869,7 @@ enum {
+> >   					 * option.
+> >   					 *
+> >   					 * args[0]: MSS
+> > +					 * args[1]: BPF_SYNCOOKIE_XXX
+> >   					 *
+> >   					 * replylong[0]: ISN
+> >   					 * replylong[1]: TS
+> > @@ -6883,6 +6884,7 @@ enum {
+> >   					 * args[1]: TS
+> >   					 *
+> >   					 * replylong[0]: MSS
+> > +					 * replylong[1]: BPF_SYNCOOKIE_XXX
+> >   					 */
+> >   };
+> >   
+> > @@ -6970,6 +6972,22 @@ enum {
+> >   						 */
+> >   };
+> >   
+> > +/* arg[1] value for BPF_SOCK_OPS_GEN_SYNCOOKIE_CB and
+> > + * replylong[1] for BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB.
+> > + *
+> > + * MSB                                LSB
+> > + * | 31 ... | 6  | 5   | 4    | 3 2 1 0 |
+> > + * |    ... | TS | ECN | SACK | WScale  |
+> > + */
+> > +enum {
+> > +	/* 0xf is invalid thus means that SYN did not have WScale. */
+> > +	BPF_SYNCOOKIE_WSCALE_MASK	= (1 << 4) - 1,
+> > +	BPF_SYNCOOKIE_SACK		= (1 << 4),
+> > +	BPF_SYNCOOKIE_ECN		= (1 << 5),
+> > +	/* Only available for BPF_SOCK_OPS_GEN_SYNCOOKIE_CB to check if SYN has TS */
+> > +	BPF_SYNCOOKIE_TS		= (1 << 6),
+> > +};
 > 
-> You have two different patches doing different things yet they have the
-> same identical subject lines.  That's not ok, sorry, please make unique
-> subject lines as obviously you are doing different things.
+> This details should not be exposed to uapi (more below).
 > 
-> thanks,
+> > +
+> >   struct bpf_perf_event_value {
+> >   	__u64 counter;
+> >   	__u64 enabled;
+> > diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> > index ff979cc314da..22353a9af52d 100644
+> > --- a/net/ipv4/syncookies.c
+> > +++ b/net/ipv4/syncookies.c
+> > @@ -286,6 +286,7 @@ int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_
+> >   {
+> >   	struct bpf_sock_ops_kern sock_ops;
+> >   	struct net *net = sock_net(sk);
+> > +	u32 options;
+> >   
+> >   	if (tcp_opt->saw_tstamp) {
+> >   		if (!READ_ONCE(net->ipv4.sysctl_tcp_timestamps))
+> > @@ -309,6 +310,25 @@ int bpf_skops_cookie_check(struct sock *sk, struct request_sock *req, struct sk_
+> >   	if (!sock_ops.replylong[0])
+> >   		goto err;
+> >   
+> > +	options = sock_ops.replylong[1];
+> > +
+> > +	if ((options & BPF_SYNCOOKIE_WSCALE_MASK) != BPF_SYNCOOKIE_WSCALE_MASK) {
+> > +		if (!READ_ONCE(net->ipv4.sysctl_tcp_window_scaling))
+> > +			goto err;
+> > +
+> > +		tcp_opt->wscale_ok = 1;
+> > +		tcp_opt->snd_wscale = options & BPF_SYNCOOKIE_WSCALE_MASK;
+> > +	}
+> > +
+> > +	if (options & BPF_SYNCOOKIE_SACK) {
+> > +		if (!READ_ONCE(net->ipv4.sysctl_tcp_sack))
+> > +			goto err;
+> > +
+> > +		tcp_opt->sack_ok = 1;
+> > +	}
+> > +
+> > +	inet_rsk(req)->ecn_ok = options & BPF_SYNCOOKIE_ECN;
+> > +
+> >   	__NET_INC_STATS(sock_net(sk), LINUX_MIB_SYNCOOKIESRECV);
+> >   
+> >   	return sock_ops.replylong[0];
+> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> > index feb44bff29ef..483e2f36afe5 100644
+> > --- a/net/ipv4/tcp_input.c
+> > +++ b/net/ipv4/tcp_input.c
+> > @@ -6970,14 +6970,25 @@ EXPORT_SYMBOL_GPL(tcp_get_syncookie_mss);
+> >   static int bpf_skops_cookie_init_sequence(struct sock *sk, struct request_sock *req,
+> >   					  struct sk_buff *skb, __u32 *isn)
+> >   {
+> > +	struct inet_request_sock *ireq = inet_rsk(req);
+> >   	struct bpf_sock_ops_kern sock_ops;
+> > +	u32 options;
+> >   	int ret;
+> >   
+> > +	options = ireq->wscale_ok ? ireq->snd_wscale : BPF_SYNCOOKIE_WSCALE_MASK;
+> > +	if (ireq->sack_ok)
+> > +		options |= BPF_SYNCOOKIE_SACK;
+> > +	if (ireq->ecn_ok)
+> > +		options |= BPF_SYNCOOKIE_ECN;
+> > +	if (ireq->tstamp_ok)
+> > +		options |= BPF_SYNCOOKIE_TS;
 > 
-> greg k-h
+> No need to set "options" (which becomes args[1]). sock_ops.sk is available to 
+> the bpf prog. The bpf prog can directly read it. The recent AF_UNIX bpf support 
+> could be a reference on how the bpf_cast_to_kern_ctx() and bpf_rdonly_cast() are 
+> used.
+> 
+> https://lore.kernel.org/bpf/20231011185113.140426-10-daan.j.demeyer@gmail.com/
 
-Sorry greg, thanks for your feedback. Will update the patch
+I just tried bpf_cast_to_kern_ctx() and bpf_rdonly_cast() and found
+it's quite useful, thanks!
 
-Regards,
-Nandha Kumar Singaram
+If we want to set {sack_ok,ecn_ok,snd_wscale} in one shot, it would
+be good to expose such flags and a helper.
 
