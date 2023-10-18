@@ -1,212 +1,122 @@
-Return-Path: <netdev+bounces-42215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 174687CDAC6
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:40:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B1807CDAD1
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:40:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C093D281CE9
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:40:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B0081C20EC8
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21514341AF;
-	Wed, 18 Oct 2023 11:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745F12EAEF;
+	Wed, 18 Oct 2023 11:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nGv8WXFG"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBAA335AC
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 11:39:39 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 617BE122
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 04:39:36 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qt4tP-0002JS-KA; Wed, 18 Oct 2023 13:39:15 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qt4tO-002Xiw-Ka; Wed, 18 Oct 2023 13:39:14 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qt4tO-00FE8n-1i;
-	Wed, 18 Oct 2023 13:39:14 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: [PATCH net-next v5 9/9] net: dsa: microchip: Ensure Stable PME Pin State for Wake-on-LAN
-Date: Wed, 18 Oct 2023 13:39:13 +0200
-Message-Id: <20231018113913.3629151-10-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231018113913.3629151-1-o.rempel@pengutronix.de>
-References: <20231018113913.3629151-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0FC2DF64
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 11:40:04 +0000 (UTC)
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA1D8D53
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 04:39:57 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-5a7c08b7744so81387447b3.3
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 04:39:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697629196; x=1698233996; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=seUdplTAMb/zRp5FDRW3ieCXWuBCH/+x0BQ3MBVM2m0=;
+        b=nGv8WXFGFB/xUG42snGADeTohgk11NlPAXED8Xn1vzcosZuH65oLc0DMOYJP1FnQMm
+         h5j2zwTGZsQdafrdca9b9Lrw16d0hn22Al3FH+XL3T7ALzFOOaoQZ7w/dFgddVz34AYk
+         AxZ335FLmBojzFhs6kh3pIcjbKHRLSNHReH0Nh76NHIrKOexVddJe68pzvOLBHXs+uo1
+         r6ttOJIhNeBJKCpSYHlK96femSM35QMOjwMn3vPy7fcSlX+BdiS2Ka+MPPqgEZt9WjVx
+         N4r+c6ykcQVr3TAxfuhXMkJJzKVlvFZS8wTibWs2YFGQPP8IuDszo6wukzHJOSWl9yAE
+         H/sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697629196; x=1698233996;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=seUdplTAMb/zRp5FDRW3ieCXWuBCH/+x0BQ3MBVM2m0=;
+        b=NFHOKQfpK6Qv/IJkK98ztwE9a+Y6s15wKwFbZY68QZCtZk4Dlw3c2yj2RZ88kNH/ky
+         T+jbhhq8fopq38BjdGkjzVsBqACp1ucN+0SESiMpCkgGHsjz5NiKXszbUhAEINj1N71U
+         4EyNoNmBIGThO25GPpXP+UTX0KLjwJBhfUpCfbf/8akY52v7Hi45BTXyVpW+3eG5gzfs
+         yunYqCNni5TowmDPkYLkjzG9JJyB1f+k1ctz0XAVi3I+qj0ogIMFxgR9jHZyZYIQEuK6
+         jh7j7fZlQWBO9JL4N4/IARQhGOlfKds4WrSpqpJtT56uoAIx/3zerqDsUW9tIDkXJZRp
+         s5zw==
+X-Gm-Message-State: AOJu0Yy/DY4c2EUxl4IRt4qVeVGmLiYrCPtrl/7UYpSQQgKP0j1sH7L9
+	fNJ7uega9aBitQuGdi+OVQF0prquaOnp7S3fm+qI5w==
+X-Google-Smtp-Source: AGHT+IGd6pMmcUmYhIP19DAntAI7kjrqy+WPuQL4RuNHhD2KtYzr3w/qLLHu6U4w6Mo5RaObRLXBuuHLDdyNrlBBvQI=
+X-Received: by 2002:a0d:e8c2:0:b0:5a4:db86:4ea8 with SMTP id
+ r185-20020a0de8c2000000b005a4db864ea8mr4887814ywe.31.1697629196493; Wed, 18
+ Oct 2023 04:39:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
+ <20231018-marvell-88e6152-wan-led-v4-6-3ee0c67383be@linaro.org> <169762516805.391872.4190043734592153628.robh@kernel.org>
+In-Reply-To: <169762516805.391872.4190043734592153628.robh@kernel.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 18 Oct 2023 13:39:45 +0200
+Message-ID: <CACRpkdZz_+WAt7GG4Chm_xRiBNBP=pin2dx39z27Nx0PuyVN7w@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 6/7] dt-bindings: marvell: Rewrite MV88E6xxx
+ in schema
+To: Rob Herring <robh@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Christian Marangi <ansuelsmth@gmail.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Gregory Clement <gregory.clement@bootlin.com>, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Andrew Lunn <andrew@lunn.ch>, 
+	Vladimir Oltean <olteanv@gmail.com>, linux-kernel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
+	Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Russell King <linux@armlinux.org.uk>, Rob Herring <robh+dt@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Ensures a stable PME (Power Management Event) pin state by disabling PME
-on system start and enabling it on shutdown only if WoL (Wake-on-LAN) is
-configured. This is needed to avoid issues with some PMICs (Power
-Management ICs).
+On Wed, Oct 18, 2023 at 12:32=E2=80=AFPM Rob Herring <robh@kernel.org> wrot=
+e:
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz9477.c    | 46 ++++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz9477.h    |  1 +
- drivers/net/dsa/microchip/ksz_common.c |  8 ++++-
- drivers/net/dsa/microchip/ksz_common.h |  1 +
- 4 files changed, 55 insertions(+), 1 deletion(-)
+> yamllint warnings/errors:
+>
+> dtschema/dtc warnings/errors:
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/marvell,mvusb.example.dtb: switch@0: ports: '#address-cells' is a requir=
+ed property
+>         from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv=
+88e6xxx.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/marvell,mvusb.example.dtb: switch@0: ports: '#size-cells' is a required =
+property
+>         from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv=
+88e6xxx.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/marvell,mvusb.example.dtb: switch@0: ports: '#address-cells' is a requir=
+ed property
+>         from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv=
+88e6xxx.yaml#
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/n=
+et/marvell,mvusb.example.dtb: switch@0: ports: '#size-cells' is a required =
+property
+>         from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv=
+88e6xxx.yaml#
 
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-index acc5d845363f..0e2ace0f8001 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -196,6 +196,46 @@ int ksz9477_set_wol(struct ksz_device *dev, int port,
- 	return 0;
- }
- 
-+/**
-+ * ksz9477_wol_pre_shutdown - Prepares the switch device for shutdown while
-+ *                            considering Wake-on-LAN (WoL) settings.
-+ * @dev: The switch device structure.
-+ * @wol_enabled: Pointer to a boolean which will be set to true if WoL is
-+ *               enabled on any port.
-+ *
-+ * This function prepares the switch device for a safe shutdown while taking
-+ * into account the Wake-on-LAN (WoL) settings on the user ports. It updates
-+ * the wol_enabled flag accordingly to reflect whether WoL is active on any
-+ * port.
-+ */
-+void ksz9477_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled)
-+{
-+	struct dsa_port *dp;
-+	int ret;
-+
-+	*wol_enabled = false;
-+
-+	if (!dev->wakeup_source)
-+		return;
-+
-+	dsa_switch_for_each_user_port(dp, dev->ds) {
-+		u8 pme_ctrl = 0;
-+
-+		ret = ksz_pread8(dev, dp->index, REG_PORT_PME_CTRL, &pme_ctrl);
-+		if (!ret && pme_ctrl)
-+			*wol_enabled = true;
-+
-+		/* make sure there are no pending wake events which would
-+		 * prevent the device from going to sleep/shutdown.
-+		 */
-+		ksz9477_handle_wake_reason(dev, dp->index);
-+	}
-+
-+	/* Now we are save to enable PME pin. */
-+	if (*wol_enabled)
-+		ksz_write8(dev, REG_SW_PME_CTRL, PME_ENABLE);
-+}
-+
- static int ksz9477_wait_vlan_ctrl_ready(struct ksz_device *dev)
- {
- 	unsigned int val;
-@@ -1276,6 +1316,12 @@ int ksz9477_setup(struct dsa_switch *ds)
- 	/* enable global MIB counter freeze function */
- 	ksz_cfg(dev, REG_SW_MAC_CTRL_6, SW_MIB_COUNTER_FREEZE, true);
- 
-+	/* Make sure PME (WoL) is not enabled. If requested, it will be
-+	 * enabled by ksz9477_wol_pre_shutdown(). Otherwise, some PMICs do not
-+	 * like PME events changes before shutdown.
-+	 */
-+	ksz_write8(dev, REG_SW_PME_CTRL, 0);
-+
- 	return 0;
- }
- 
-diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microchip/ksz9477.h
-index fa8d0318b437..9e6f1e4b57b7 100644
---- a/drivers/net/dsa/microchip/ksz9477.h
-+++ b/drivers/net/dsa/microchip/ksz9477.h
-@@ -62,6 +62,7 @@ void ksz9477_get_wol(struct ksz_device *dev, int port,
- 		     struct ethtool_wolinfo *wol);
- int ksz9477_set_wol(struct ksz_device *dev, int port,
- 		    struct ethtool_wolinfo *wol);
-+void ksz9477_wol_pre_shutdown(struct ksz_device *dev, bool *wol_is_on);
- 
- int ksz9477_port_acl_init(struct ksz_device *dev, int port);
- void ksz9477_port_acl_free(struct ksz_device *dev, int port);
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index fe2cf1de5a5c..17eca902d48c 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -321,6 +321,7 @@ static const struct ksz_dev_ops ksz9477_dev_ops = {
- 	.phylink_mac_link_up = ksz9477_phylink_mac_link_up,
- 	.get_wol = ksz9477_get_wol,
- 	.set_wol = ksz9477_set_wol,
-+	.wol_pre_shutdown = ksz9477_wol_pre_shutdown,
- 	.config_cpu_port = ksz9477_config_cpu_port,
- 	.tc_cbs_set_cinc = ksz9477_tc_cbs_set_cinc,
- 	.enable_stp_addr = ksz9477_enable_stp_addr,
-@@ -3822,7 +3823,12 @@ EXPORT_SYMBOL(ksz_switch_alloc);
-  */
- void ksz_switch_shutdown(struct ksz_device *dev)
- {
--	if (dev->dev_ops->reset)
-+	bool wol_enabled = false;
-+
-+	if (dev->dev_ops->wol_pre_shutdown)
-+		dev->dev_ops->wol_pre_shutdown(dev, &wol_enabled);
-+
-+	if (dev->dev_ops->reset && !wol_enabled)
- 		dev->dev_ops->reset(dev);
- 
- 	dsa_switch_shutdown(dev->ds);
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 34a8e9784cca..41917de15ba3 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -378,6 +378,7 @@ struct ksz_dev_ops {
- 			struct ethtool_wolinfo *wol);
- 	int (*set_wol)(struct ksz_device *dev, int port,
- 		       struct ethtool_wolinfo *wol);
-+	void (*wol_pre_shutdown)(struct ksz_device *dev, bool *wol_enabled);
- 	void (*config_cpu_port)(struct dsa_switch *ds);
- 	int (*enable_stp_addr)(struct ksz_device *dev);
- 	int (*reset)(struct ksz_device *dev);
--- 
-2.39.2
+Fixed in patch 2/7?
 
+Yours,
+Linus Walleij
 
