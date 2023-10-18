@@ -1,54 +1,57 @@
-Return-Path: <netdev+bounces-42261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF19C7CDE86
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:12:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3DB7CDE8F
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:12:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 334CDB20D5F
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:12:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 911771C20D01
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7750A37171;
-	Wed, 18 Oct 2023 14:12:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C67837174;
+	Wed, 18 Oct 2023 14:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dz7ibN8v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2Q4ehWB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580AD36B1A
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 14:12:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE0FC433CC;
-	Wed, 18 Oct 2023 14:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5173136B1A
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 14:12:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73D57C433C9;
+	Wed, 18 Oct 2023 14:12:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697638346;
-	bh=DpBF6ZbRwFLOmgLcUNEs8T24t3r9g/7TPEYW9l39YVk=;
+	s=k20201202; t=1697638356;
+	bh=JWEf90H0pNK8AbCNDAoueXopIud5IbmnlbfDPhWUca8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Dz7ibN8vD+Cq8G49IWI6ydnOxtV0e5f8K3CHVyJHm7A0gIGMcNeYWr9oIRgBAoX60
-	 FywNVoQAXhuaExydzbn7brd9w3xnwyL2/fy1ejD+Dqqp79fX6dQgY/LAitsqi6rkmM
-	 Hh9reWMsTYG8LUSH4TrbD7PmGS5o/bN0lLymTWsXBnVAqx2QqgtoIRvSRzgiha/loo
-	 H/Lj8Lp0UnLW63GM2AfKYGR2eXcETpedWt2S9jPNfshgQpsYJmJz6ZcrdrIsdy8pLp
-	 gf5edkG5pLx8WYJ/gf/dpO6QnD7A2F8rqUltGgMdkQeC3JQ6/wf4utnx1hrO7aW+N/
-	 7D7xinGvyhx8g==
+	b=K2Q4ehWB7BiYfpahWyJAJXl2DvDD7qPyM5BnKVSIllqj0/HCCKtTdX/vcsFb8Dnav
+	 hiwHnm2uNHppKlNnPlswtGgp+1j+JjSzDuCzvWEJjDiDfNL4pvVn9JkyKeKQ3u0QY4
+	 mwpIdA0zRvZR1FnFTHhu814UkQm3VY+Gfoy8c9PM4hxQvjrjYPp0HYCZiHodYM8VPB
+	 krQS638mL24BLi9W+03CcY3kvwM2sK1EAXgzvwPnitIpb1ovBDPnGgqu0UNr6CPGCb
+	 G8aEMn8fYOLheE/3w//aqaUI7q7uwm40s8/6VKE1FAjwwlYBafUcSnheVkq75bcVHp
+	 NQLUlqwAnw3yA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Alejandro Colomar <alx@kernel.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Haibo Chen <haibo.chen@nxp.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
 	Sasha Levin <sashal@kernel.org>,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
+	wg@grandegger.com,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	mailhol.vincent@wanadoo.fr,
+	socketcan@hartkopp.net,
+	ruanjinjie@huawei.com,
+	u.kleine-koenig@pengutronix.de,
+	linux-can@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.5 14/31] net: sched: cls_u32: Fix allocation size in u32_init()
-Date: Wed, 18 Oct 2023 10:11:31 -0400
-Message-Id: <20231018141151.1334501-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.5 16/31] can: flexcan: remove the auto stop mode for IMX93
+Date: Wed, 18 Oct 2023 10:11:33 -0400
+Message-Id: <20231018141151.1334501-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231018141151.1334501-1-sashal@kernel.org>
 References: <20231018141151.1334501-1-sashal@kernel.org>
@@ -63,103 +66,146 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.5.7
 Content-Transfer-Encoding: 8bit
 
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+From: Haibo Chen <haibo.chen@nxp.com>
 
-[ Upstream commit c4d49196ceec80e30e8d981410d73331b49b7850 ]
+[ Upstream commit 63ead535570f13d0e06fda3f2d020c8f5394e998 ]
 
-commit d61491a51f7e ("net/sched: cls_u32: Replace one-element array
-with flexible-array member") incorrecly replaced an instance of
-`sizeof(*tp_c)` with `struct_size(tp_c, hlist->ht, 1)`. This results
-in a an over-allocation of 8 bytes.
+IMX93 A0 chip involve the internal q-channel handshake in LPCG and
+CCM to automatically handle the Flex-CAN IPG STOP signal. Only after
+FLEX-CAN enter stop mode then can support the self-wakeup feature.
+But meet issue when do the continue system PM stress test. When config
+the CAN as wakeup source, the first time after system suspend, any data
+on CAN bus can wakeup the system, this is as expect. But the second time
+when system suspend, data on CAN bus can't wakeup the system. If continue
+this test, we find in odd time system enter suspend, CAN can wakeup the
+system, but in even number system enter suspend, CAN can't wakeup the
+system. IC find a bug in the auto stop mode logic, and can't fix it easily.
+So for the new imx93 A1, IC drop the auto stop mode and involve the
+GPR to support stop mode (used before). IC define a bit in GPR which can
+trigger the IPG STOP signal to Flex-CAN, let it go into stop mode.
+And NXP claim to drop IMX93 A0, and only support IMX93 A1. So this patch
+remove the auto stop mode, and add flag FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR
+to imx93.
 
-This change is wrong because `hlist` in `struct tc_u_common` is a
-pointer:
-
-net/sched/cls_u32.c:
-struct tc_u_common {
-        struct tc_u_hnode __rcu *hlist;
-        void                    *ptr;
-        int                     refcnt;
-        struct idr              handle_idr;
-        struct hlist_node       hnode;
-        long                    knodes;
-};
-
-So, the use of `struct_size()` makes no sense: we don't need to allocate
-any extra space for a flexible-array member. `sizeof(*tp_c)` is just fine.
-
-So, `struct_size(tp_c, hlist->ht, 1)` translates to:
-
-sizeof(*tp_c) + sizeof(tp_c->hlist->ht) ==
-sizeof(struct tc_u_common) + sizeof(struct tc_u_knode *) ==
-						144 + 8  == 0x98 (byes)
-						     ^^^
-						      |
-						unnecessary extra
-						allocation size
-
-$ pahole -C tc_u_common net/sched/cls_u32.o
-struct tc_u_common {
-	struct tc_u_hnode *        hlist;                /*     0     8 */
-	void *                     ptr;                  /*     8     8 */
-	int                        refcnt;               /*    16     4 */
-
-	/* XXX 4 bytes hole, try to pack */
-
-	struct idr                 handle_idr;           /*    24    96 */
-	/* --- cacheline 1 boundary (64 bytes) was 56 bytes ago --- */
-	struct hlist_node          hnode;                /*   120    16 */
-	/* --- cacheline 2 boundary (128 bytes) was 8 bytes ago --- */
-	long int                   knodes;               /*   136     8 */
-
-	/* size: 144, cachelines: 3, members: 6 */
-	/* sum members: 140, holes: 1, sum holes: 4 */
-	/* last cacheline: 16 bytes */
-};
-
-And with `sizeof(*tp_c)`, we have:
-
-	sizeof(*tp_c) == sizeof(struct tc_u_common) == 144 == 0x90 (bytes)
-
-which is the correct and original allocation size.
-
-Fix this issue by replacing `struct_size(tp_c, hlist->ht, 1)` with
-`sizeof(*tp_c)`, and avoid allocating 8 too many bytes.
-
-The following difference in binary output is expected and reflects the
-desired change:
-
-| net/sched/cls_u32.o
-| @@ -6148,7 +6148,7 @@
-| include/linux/slab.h:599
-|     2cf5:      mov    0x0(%rip),%rdi        # 2cfc <u32_init+0xfc>
-|                        2cf8: R_X86_64_PC32     kmalloc_caches+0xc
-|-    2cfc:      mov    $0x98,%edx
-|+    2cfc:      mov    $0x90,%edx
-
-Reported-by: Alejandro Colomar <alx@kernel.org>
-Closes: https://lore.kernel.org/lkml/09b4a2ce-da74-3a19-6961-67883f634d98@kernel.org/
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
+Link: https://lore.kernel.org/all/20230726112458.3524165-2-haibo.chen@nxp.com
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/sched/cls_u32.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/can/flexcan/flexcan-core.c | 46 ++++++++------------------
+ drivers/net/can/flexcan/flexcan.h      |  2 --
+ 2 files changed, 13 insertions(+), 35 deletions(-)
 
-diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-index da4c179a4d418..6663e971a13e7 100644
---- a/net/sched/cls_u32.c
-+++ b/net/sched/cls_u32.c
-@@ -366,7 +366,7 @@ static int u32_init(struct tcf_proto *tp)
- 	idr_init(&root_ht->handle_idr);
+diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
+index ff0fc18baf133..d8be69f4a0c3f 100644
+--- a/drivers/net/can/flexcan/flexcan-core.c
++++ b/drivers/net/can/flexcan/flexcan-core.c
+@@ -348,7 +348,7 @@ static struct flexcan_devtype_data fsl_imx8mp_devtype_data = {
+ static struct flexcan_devtype_data fsl_imx93_devtype_data = {
+ 	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS |
+ 		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_USE_RX_MAILBOX |
+-		FLEXCAN_QUIRK_BROKEN_PERR_STATE | FLEXCAN_QUIRK_AUTO_STOP_MODE |
++		FLEXCAN_QUIRK_BROKEN_PERR_STATE | FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR |
+ 		FLEXCAN_QUIRK_SUPPORT_FD | FLEXCAN_QUIRK_SUPPORT_ECC |
+ 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
+ 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
+@@ -544,11 +544,6 @@ static inline int flexcan_enter_stop_mode(struct flexcan_priv *priv)
+ 	} else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR) {
+ 		regmap_update_bits(priv->stm.gpr, priv->stm.req_gpr,
+ 				   1 << priv->stm.req_bit, 1 << priv->stm.req_bit);
+-	} else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_AUTO_STOP_MODE) {
+-		/* For the auto stop mode, software do nothing, hardware will cover
+-		 * all the operation automatically after system go into low power mode.
+-		 */
+-		return 0;
+ 	}
  
- 	if (tp_c == NULL) {
--		tp_c = kzalloc(struct_size(tp_c, hlist->ht, 1), GFP_KERNEL);
-+		tp_c = kzalloc(sizeof(*tp_c), GFP_KERNEL);
- 		if (tp_c == NULL) {
- 			kfree(root_ht);
- 			return -ENOBUFS;
+ 	return flexcan_low_power_enter_ack(priv);
+@@ -574,12 +569,6 @@ static inline int flexcan_exit_stop_mode(struct flexcan_priv *priv)
+ 	reg_mcr &= ~FLEXCAN_MCR_SLF_WAK;
+ 	priv->write(reg_mcr, &regs->mcr);
+ 
+-	/* For the auto stop mode, hardware will exist stop mode
+-	 * automatically after system go out of low power mode.
+-	 */
+-	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_AUTO_STOP_MODE)
+-		return 0;
+-
+ 	return flexcan_low_power_exit_ack(priv);
+ }
+ 
+@@ -1994,13 +1983,18 @@ static int flexcan_setup_stop_mode(struct platform_device *pdev)
+ 		ret = flexcan_setup_stop_mode_scfw(pdev);
+ 	else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR)
+ 		ret = flexcan_setup_stop_mode_gpr(pdev);
+-	else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_AUTO_STOP_MODE)
+-		ret = 0;
+ 	else
+ 		/* return 0 directly if doesn't support stop mode feature */
+ 		return 0;
+ 
+-	if (ret)
++	/* If ret is -EINVAL, this means SoC claim to support stop mode, but
++	 * dts file lack the stop mode property definition. For this case,
++	 * directly return 0, this will skip the wakeup capable setting and
++	 * will not block the driver probe.
++	 */
++	if (ret == -EINVAL)
++		return 0;
++	else if (ret)
+ 		return ret;
+ 
+ 	device_set_wakeup_capable(&pdev->dev, true);
+@@ -2320,16 +2314,8 @@ static int __maybe_unused flexcan_noirq_suspend(struct device *device)
+ 	if (netif_running(dev)) {
+ 		int err;
+ 
+-		if (device_may_wakeup(device)) {
++		if (device_may_wakeup(device))
+ 			flexcan_enable_wakeup_irq(priv, true);
+-			/* For auto stop mode, need to keep the clock on before
+-			 * system go into low power mode. After system go into
+-			 * low power mode, hardware will config the flexcan into
+-			 * stop mode, and gate off the clock automatically.
+-			 */
+-			if (priv->devtype_data.quirks & FLEXCAN_QUIRK_AUTO_STOP_MODE)
+-				return 0;
+-		}
+ 
+ 		err = pm_runtime_force_suspend(device);
+ 		if (err)
+@@ -2347,15 +2333,9 @@ static int __maybe_unused flexcan_noirq_resume(struct device *device)
+ 	if (netif_running(dev)) {
+ 		int err;
+ 
+-		/* For the wakeup in auto stop mode, no need to gate on the
+-		 * clock here, hardware will do this automatically.
+-		 */
+-		if (!(device_may_wakeup(device) &&
+-		      priv->devtype_data.quirks & FLEXCAN_QUIRK_AUTO_STOP_MODE)) {
+-			err = pm_runtime_force_resume(device);
+-			if (err)
+-				return err;
+-		}
++		err = pm_runtime_force_resume(device);
++		if (err)
++			return err;
+ 
+ 		if (device_may_wakeup(device))
+ 			flexcan_enable_wakeup_irq(priv, false);
+diff --git a/drivers/net/can/flexcan/flexcan.h b/drivers/net/can/flexcan/flexcan.h
+index 91402977780b2..025c3417031f4 100644
+--- a/drivers/net/can/flexcan/flexcan.h
++++ b/drivers/net/can/flexcan/flexcan.h
+@@ -68,8 +68,6 @@
+ #define FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR BIT(15)
+ /* Device supports RX via FIFO */
+ #define FLEXCAN_QUIRK_SUPPORT_RX_FIFO BIT(16)
+-/* auto enter stop mode to support wakeup */
+-#define FLEXCAN_QUIRK_AUTO_STOP_MODE BIT(17)
+ 
+ struct flexcan_devtype_data {
+ 	u32 quirks;		/* quirks needed for different IP cores */
 -- 
 2.40.1
 
