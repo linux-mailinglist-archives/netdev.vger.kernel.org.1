@@ -1,131 +1,86 @@
-Return-Path: <netdev+bounces-42181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EE2F7CD7B6
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:19:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C8A17CD7B9
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EFE0281BA4
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:19:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC90C281C54
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C931775B;
-	Wed, 18 Oct 2023 09:19:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B901775B;
+	Wed, 18 Oct 2023 09:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g24BS5KA"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7745E134BF;
-	Wed, 18 Oct 2023 09:19:34 +0000 (UTC)
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 784B5F9;
-	Wed, 18 Oct 2023 02:19:32 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R921e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VuQCd7i_1697620768;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VuQCd7i_1697620768)
-          by smtp.aliyun-inc.com;
-          Wed, 18 Oct 2023 17:19:29 +0800
-Message-ID: <1697620622.3183842-4-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost 02/22] virtio_ring: introduce virtqueue_dma_[un]map_page_attrs
-Date: Wed, 18 Oct 2023 17:17:02 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org,
- bpf@vger.kernel.org,
- virtualization@lists.linux-foundation.org
-References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
- <20231011092728.105904-3-xuanzhuo@linux.alibaba.com>
- <1697615580.6880193-1-xuanzhuo@linux.alibaba.com>
- <20231018035751-mutt-send-email-mst@kernel.org>
- <1697616022.630633-2-xuanzhuo@linux.alibaba.com>
- <20231018044204-mutt-send-email-mst@kernel.org>
- <1697619441.5367694-3-xuanzhuo@linux.alibaba.com>
- <20231018051201-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231018051201-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866E315AFE
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 09:20:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EDA89C433C9;
+	Wed, 18 Oct 2023 09:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697620824;
+	bh=5dhYRc+zirG3v+xL8lCr9litt6Xv19Db8q0bpo0dXb0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=g24BS5KAk3/YL1O4j/vK+DqmVW/CodwOUGAuppMJNNg+dbjgGQTZnQiECvGScTyH7
+	 GkurggucP532q9lynpjcrl3/YsBr8+t7GayCgLftRHzWWlHOr2ZK094qE3F0S8xmnD
+	 lYjHtyfPff0+0n7d6mGtaFB5LfhGIucIhMqZekIkIPiCBjH2TJC/nOnHnsyblhugFV
+	 Z4/SaWyw8N48ddnu/seBBFE9sc94op0oqxHFAkA98sOMBKop4ljE3h0g3Dx+yXmVYD
+	 5M0AQidGeGI4ajmYfOtsKtxmgFo7HRGHujMm9/WMcWOS9qAQW8zYOZSWFRna5aovjj
+	 g+ar6eoj2wGfA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE1B0C04DD9;
+	Wed, 18 Oct 2023 09:20:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: pktgen: Fix interface flags printing
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169762082384.4908.15716073327666227322.git-patchwork-notify@kernel.org>
+Date: Wed, 18 Oct 2023 09:20:23 +0000
+References: <20231016140631.1245318-1-Ilia.Gavrilov@infotecs.ru>
+In-Reply-To: <20231016140631.1245318-1-Ilia.Gavrilov@infotecs.ru>
+To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jgg@ziepe.ca, gregkh@linuxfoundation.org, Jason@zx2c4.com,
+ keescook@chromium.org, linyunsheng@huawei.com, 0x7f454c46@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
 
-On Wed, 18 Oct 2023 05:13:44 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Wed, Oct 18, 2023 at 04:57:21PM +0800, Xuan Zhuo wrote:
-> > On Wed, 18 Oct 2023 04:44:24 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > On Wed, Oct 18, 2023 at 04:00:22PM +0800, Xuan Zhuo wrote:
-> > > > On Wed, 18 Oct 2023 03:59:03 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > > On Wed, Oct 18, 2023 at 03:53:00PM +0800, Xuan Zhuo wrote:
-> > > > > > Hi Michael,
-> > > > > >
-> > > > > > Do you think it's appropriate to push the first two patches of this patch set to
-> > > > > > linux 6.6?
-> > > > > >
-> > > > > > Thanks.
-> > > > >
-> > > > > I generally treat patchsets as a whole unless someone asks me to do
-> > > > > otherwise. Why do you want this?
-> > > >
-> > > > As we discussed, the patch set supporting AF_XDP will be push to net-next.
-> > > > But the two patchs belong to the vhost.
-> > > >
-> > > > So, if you think that is appropriate, I will post a new patchset(include the two
-> > > > patchs without virtio-net + AF_XDP) to vhost. I wish that can be merged to 6.6.
-> > >
-> > > Oh wait 6.6? Too late really, merge window has been closed for weeks.
-> >
-> > I mean as a fix. So I ask you do you think it is appropriate?
->
-> Sure if there's a bugfix please post is separately - what issues do
-> these two patches fix? this is the part I'm missing. Especially patch 2
-> which just adds a new API.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Mon, 16 Oct 2023 14:08:59 +0000 you wrote:
+> Device flags are displayed incorrectly:
+> 1) The comparison (i == F_FLOW_SEQ) is always false, because F_FLOW_SEQ
+> is equal to (1 << FLOW_SEQ_SHIFT) == 2048, and the maximum value
+> of the 'i' variable is (NR_PKT_FLAG - 1) == 17. It should be compared
+> with FLOW_SEQ_SHIFT.
+> 
+> 2) Similarly to the F_IPSEC flag.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: pktgen: Fix interface flags printing
+    https://git.kernel.org/netdev/net/c/1d30162f35c7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-No bugfix. That is the requirement of the supporting AF_XDP.
-
-So please ignore my question. Sorry ^_^.
-
-Thanks.
-
-
->
-> > >
-> > > > Then when the 6.7 net-next merge window is open, I can push this patch set to 6.7.
-> > > > The v1 version use the virtqueue_dma_map_single_attrs to replace
-> > > > virtqueue_dma_map_page_attrs. But I think we should use virtqueue_dma_map_page_attrs.
-> > > >
-> > > > Thanks.
-> > > >
-> > >
-> > > Get a complete working patchset that causes no regressions posted first please
-> > > then we will discuss merge strategy.
-> > > I would maybe just put everything in one file for now, easier to merge,
-> > > refactor later when it's all upstream. But up to you.
-> >
-> > OK. I will get a working patchset firstly.
-> >
-> > Thanks.
-> >
-> > >
-> > >
-> > > > >
-> > > > > --
-> > > > > MST
-> > > > >
-> > >
->
 
