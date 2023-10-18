@@ -1,171 +1,151 @@
-Return-Path: <netdev+bounces-42434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA5397CEB02
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 00:10:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF1697CEB07
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 00:15:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31A4A281CE6
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 22:10:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0FB31C20BAC
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 22:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74EF743A88;
-	Wed, 18 Oct 2023 22:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7022F3DFEF;
+	Wed, 18 Oct 2023 22:15:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rjmcmahon.com header.i=@rjmcmahon.com header.b="L3v6l5WC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rpD9nXDr"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB873FB0D
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 22:10:12 +0000 (UTC)
-Received: from bobcat.rjmcmahon.com (bobcat.rjmcmahon.com [45.33.58.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1B5A113
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:10:09 -0700 (PDT)
-Received: from mail.rjmcmahon.com (bobcat.rjmcmahon.com [45.33.58.123])
-	by bobcat.rjmcmahon.com (Postfix) with ESMTPA id 6988A1B26F
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:10:09 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 bobcat.rjmcmahon.com 6988A1B26F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rjmcmahon.com;
-	s=bobcat; t=1697667009;
-	bh=ga81rokYqtwAcvC9+E0HgR9iqsXmt1dkUI1iOJEZ0BI=;
-	h=Date:From:To:Subject:From;
-	b=L3v6l5WCBXPcJber1IEOh7R+ytTgem6Y8R2SoLUcEf0l/g+IxpPCBQ8v39Lcmk7Av
-	 hLLuIMfcLpO0pgLD1kolXIEtJH6DKkcjzHkyB2dQBd+THdsedRdsbvMk909o7MpvLF
-	 CAXBSFEda46NBPgmxXRqEHRTkhoyVMdnQGbniNhQ=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DABDA1A737
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 22:14:58 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D87118
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:14:56 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7af69a4baso112005617b3.0
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:14:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697667296; x=1698272096; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PlQsMleo8ndyb1BkvS8psG/NpipwSb1Ibvd6wvaptgE=;
+        b=rpD9nXDr8ZV4X1Zjrx1Lpkbi8PcVhM+FAsPQEkE/bgGqvJdPH1dZ/7vggwFyV7nhEA
+         X8bQ+c4ABe5Lv0Lx4UdVxd3dONLa3xGFTYGjnsytjjaPuWHDgsSwaDQqOqxNYmUHL3E8
+         fd6cI8mvnnYu0l+EvsSOxOG18UhCTsNL6jB/fhq9pjPCpnyyxwUQHxSZ87gnNTZIS6r+
+         iRqmgKZXyA5v+lImVMteIruljC+BI0JQ11H/uZKwoOFulZPDL9CV4UpMWYejLAO+vAfZ
+         /dHi5bk0o61IOex9EqNmqWyAwgpM35REgb1kPuw72D9Xa/TL/git7S9ZvXE7Ceui1EnK
+         6sYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697667296; x=1698272096;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PlQsMleo8ndyb1BkvS8psG/NpipwSb1Ibvd6wvaptgE=;
+        b=Fe5DKH7Toiex4/y+qid3Gqk2EfJFJheLvsfte1ua88zoJsjiJhNaffHMzANNzmk771
+         waWBZLfMdU1xcRSPZgQ9p9RMDpqAhpWqKAGatNnYtC8VMsWKn0IijCilVk3T3kdQA3G6
+         O0Tm05+lqrZWR4ZpJJh4Lsj4a9SaJ8c4aB8q0oyqr+m/ayanM2PL2/dSXtp86hfMuRXq
+         cb3zjcwZKTAu/pENER4YotMx9MnieGlq0C3WzH5d42slzf1oukc5+xyxsx7AAkoY28/8
+         R7RBKE7VbWtQmpnIuffib53UGwXAA//29wVvkpwX1xbxBmeGy22OTK+zFMRI4zxTM2Cm
+         1DyA==
+X-Gm-Message-State: AOJu0YwJyFJO30vn6DI6zr/YCxU4pN7+YyOlHsFCFW/NSnziCST468Kx
+	ypvWwNExqxlyimjjiM5sqZq2lWmjPPLiesfP4Q==
+X-Google-Smtp-Source: AGHT+IFCGhabYMIAAC6XiL9TzzjSCY6BQgj3jImjG5X7Fcyl/tbrVb3NWUepotJZi0+qdYwrlX/ZrUxtd4WudCjg7Q==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a0d:d9d2:0:b0:5a7:be10:461d with SMTP
+ id b201-20020a0dd9d2000000b005a7be10461dmr15636ywe.2.1697667295839; Wed, 18
+ Oct 2023 15:14:55 -0700 (PDT)
+Date: Wed, 18 Oct 2023 22:14:55 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Date: Wed, 18 Oct 2023 15:10:09 -0700
-From: rjmcmahon <rjmcmahon@rjmcmahon.com>
-To: Netdev <netdev@vger.kernel.org>
-Subject: iperf 2 & clock unsync detection
-Message-ID: <67af57222b0fb1c97b190e66678f44e2@rjmcmahon.com>
-X-Sender: rjmcmahon@rjmcmahon.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAN5YMGUC/x2NywrCMBAAf6Xs2YU8oIi/IlJCsqkLGsNuaJXSf
+ 2/qbeYys4GSMCnchg2EFlb+lC72MkB8hjITcuoOzjhvjb2iNimx/jAJLySKhRquaygo9a3zdOI Um7wwos+jMyHk5N0IPViFMn//s/tj3w8hAG6ffAAAAA==
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1697667294; l=2364;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=+RiFAuTFDYeSx5+FsqkeyVgCujTXIxMDn3P2javi3XY=; b=123OWlCw+sopcVGOlRvo8H8eZ3pupMbwmZbCt7KUM82cnX6fdX3BK+EJUTP0xC4c1b3gbO3IB
+ 1w6u2cozf6AB/MUjQvfMIuLfOn9l4T+IXmXkdkHqvfMcPANOo65c801
+X-Mailer: b4 0.12.3
+Message-ID: <20231018-strncpy-drivers-net-wwan-rpmsg_wwan_ctrl-c-v1-1-4e343270373a@google.com>
+Subject: [PATCH] net: wwan: replace deprecated strncpy with strscpy_pad
+From: Justin Stitt <justinstitt@google.com>
+To: Stephan Gerhold <stephan@gerhold.net>, Loic Poulain <loic.poulain@linaro.org>, 
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-Hi all,
+strncpy() is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-One can use the bounceback test to check if the clock's are not 
-synchronized relative to the bb time.  (you'll need to compile the 
-latest iperf from master to get this 
-https://sourceforge.net/projects/iperf2/
+We expect chinfo.name to be NUL-terminated based on its use with format
+strings and sprintf:
+rpmsg/rpmsg_char.c
+165:            dev_err(dev, "failed to open %s\n", eptdev->chinfo.name);
+368:    return sprintf(buf, "%s\n", eptdev->chinfo.name);
 
-Below is an example:
+... and with strcmp():
+|  static struct rpmsg_endpoint *qcom_glink_create_ept(struct rpmsg_device *rpdev,
+|  						    rpmsg_rx_cb_t cb,
+|  						    void *priv,
+|  						    struct rpmsg_channel_info
+|  									chinfo)
+|  ...
+|  const char *name = chinfo.name;
+|  ...
+|  		if (!strcmp(channel->name, name))
 
-root@raspberrypi:/usr/local/src/iperf2-code# iperf -c 192.168.1.33 -e -i 
-1 --trip-times --bounceback --bounceback-period 0
-------------------------------------------------------------
-Client connecting to 192.168.1.33, TCP port 5001 with pid 38489 (1/0 
-flows/load)
-Bounceback test (req/reply size = 100 Byte/ 100 Byte) (server hold req=0 
-usecs & tcp_quickack)
-TCP congestion control using cubic
-TOS set to 0x0 and nodelay (Nagle off)
-TCP window size: 85.0 KByte (default)
-Event based writes (pending queue watermark at 16384 bytes)
-------------------------------------------------------------
-[  1] local 192.168.1.32%eth0 port 42258 connected with 192.168.1.33 
-port 5001 (prefetch=16384) (bb w/quickack req/reply/hold=100/100/0) 
-(trip-times) (sock=3) (icwnd/mss/irtt=14/1448/265) (ct=0.43 ms) on 
-2023-10-18 14:49:24.047 (PDT)
-[ ID] Interval        Transfer    Bandwidth         BB 
-cnt=avg/min/max/stdev         Rtry  Cwnd/RTT    RPS(avg)
-[  1] 0.00-1.00 sec   998 KBytes  8.18 Mbits/sec    
-10223=0.093/0.078/1.057/0.027 ms    0   14K/62 us    10729 rps
-[  1] 1.00-2.00 sec  1.06 MBytes  8.93 Mbits/sec    
-11166=0.086/0.077/0.225/0.003 ms    0   14K/61 us    11631 rps
-[  1] 2.00-3.00 sec  1.07 MBytes  8.94 Mbits/sec    
-11172=0.086/0.077/0.434/0.004 ms    0   14K/60 us    11633 rps
-[  1] 3.00-4.00 sec  1.06 MBytes  8.87 Mbits/sec    
-11092=0.087/0.079/0.376/0.005 ms    0   14K/62 us    11547 rps
-[  1] 4.00-5.00 sec   979 KBytes  8.02 Mbits/sec    
-10025=0.096/0.090/0.442/0.004 ms    0   14K/61 us    10402 rps
-[  1] 5.00-6.00 sec   960 KBytes  7.86 Mbits/sec    
-9831=0.098/0.090/0.413/0.008 ms    0   14K/61 us    10213 rps
-[  1] 6.00-7.00 sec   984 KBytes  8.06 Mbits/sec    
-10080=0.096/0.090/0.150/0.002 ms    0   14K/61 us    10461 rps
-[  1] 7.00-8.00 sec   983 KBytes  8.06 Mbits/sec    
-10070=0.096/0.090/0.168/0.002 ms    0   14K/61 us    10452 rps
-[  1] 8.00-9.00 sec   984 KBytes  8.06 Mbits/sec    
-10074=0.096/0.092/0.149/0.002 ms    0   14K/61 us    10455 rps
-[  1] 9.00-10.00 sec   982 KBytes  8.04 Mbits/sec    
-10056=0.096/0.087/0.446/0.004 ms    0   14K/64 us    10434 rps
-[  1] 0.00-10.01 sec  9.90 MBytes  8.29 Mbits/sec    
-103791=0.093/0.077/1.057/0.011 ms    0   14K/1729 us    10795 rps
-[  1] 0.00-10.01 sec  OWD (ms) Cnt=103791 TX=0.770/-0.357/4.012/1.683 
-RX=-0.678/-3.709/0.789/1.686 Asymmetry=2.299/0.001/7.702/2.857
-[  1] 0.00-10.01 sec  OWD-TX-PDF: 
-bin(w=100us):cnt(103791)=1:14920,2:263,3:275,4:271,5:273,6:272,7:272,8:272,9:271,10:272,11:270,12:275,13:273,14:272,15:269,16:272,17:272,18:272,19:272,20:273,21:271,22:269,23:273,24:271,25:272,26:273,27:273,28:270,29:272,30:271,31:272,32:271,33:273,34:270,35:271,36:272,37:269,38:20475,39:625,40:2,41:1 
-(5.00/95.00/99.7%=1/100000/100000,Outliers=0,obl/obu=57994/0)
-[  1] 0.00-10.01 sec  OWD-RX-PDF: 
-bin(w=100us):cnt(103791)=1:12175,2:3139,3:3132,4:3136,5:51552,6:5,8:2 
-(5.00/95.00/99.7%=1/100000/100000,Outliers=0,obl/obu=30650/0)
-[  1] 0.00-10.01 sec  BB8-PDF: 
-bin(w=100us):cnt(103791)=1:100388,2:3136,3:258,4:4,5:4,11:1 
-(5.00/95.00/99.7%=1/1/2,Outliers=0,obl/obu=0/0)
-[  1] 0.00-10.01 sec  Clock sync error count = 92028
+Moreover, as chinfo is not kzalloc'd, let's opt to NUL-pad the
+destination buffer
 
-Below is an example where the clock are sync'd - there is no Clock sync 
-error count message
+Similar change to:
+Commit 766279a8f85d ("rpmsg: qcom: glink: replace strncpy() with strscpy_pad()")
+and
+Commit 08de420a8014 ("rpmsg: glink: Replace strncpy() with strscpy_pad()")
 
-root@raspberrypi:/usr/local/src/iperf2-code# iperf -c 192.168.1.33 -e -i 
-1 --trip-times --bounceback --bounceback-period 0
-------------------------------------------------------------
-Client connecting to 192.168.1.33, TCP port 5001 with pid 38492 (1/0 
-flows/load)
-Bounceback test (req/reply size = 100 Byte/ 100 Byte) (server hold req=0 
-usecs & tcp_quickack)
-TCP congestion control using cubic
-TOS set to 0x0 and nodelay (Nagle off)
-TCP window size: 85.0 KByte (default)
-Event based writes (pending queue watermark at 16384 bytes)
-------------------------------------------------------------
-[  1] local 192.168.1.32%eth0 port 46112 connected with 192.168.1.33 
-port 5001 (prefetch=16384) (bb w/quickack req/reply/hold=100/100/0) 
-(trip-times) (sock=3) (icwnd/mss/irtt=14/1448/291) (ct=0.46 ms) on 
-2023-10-18 14:51:27.555 (PDT)
-[ ID] Interval        Transfer    Bandwidth         BB 
-cnt=avg/min/max/stdev         Rtry  Cwnd/RTT    RPS(avg)
-[  1] 0.00-1.00 sec  1003 KBytes  8.22 Mbits/sec    
-10270=0.093/0.079/1.218/0.025 ms    0   14K/61 us    10775 rps
-[  1] 1.00-2.00 sec  1.06 MBytes  8.93 Mbits/sec    
-11166=0.086/0.078/0.322/0.005 ms    0   14K/60 us    11628 rps
-[  1] 2.00-3.00 sec  1.07 MBytes  8.94 Mbits/sec    
-11175=0.086/0.078/0.263/0.003 ms    0   14K/61 us    11635 rps
-[  1] 3.00-4.00 sec  1.06 MBytes  8.93 Mbits/sec    
-11167=0.086/0.078/0.313/0.004 ms    0   14K/60 us    11630 rps
-[  1] 4.00-5.00 sec   998 KBytes  8.18 Mbits/sec    
-10224=0.094/0.080/0.410/0.006 ms    0   14K/62 us    10614 rps
-[  1] 5.00-6.00 sec   958 KBytes  7.85 Mbits/sec    
-9811=0.098/0.088/0.432/0.009 ms    0   14K/61 us    10187 rps
-[  1] 6.00-7.00 sec   982 KBytes  8.05 Mbits/sec    
-10060=0.096/0.090/0.306/0.003 ms    0   14K/61 us    10437 rps
-[  1] 7.00-8.00 sec   980 KBytes  8.03 Mbits/sec    
-10035=0.096/0.090/0.927/0.015 ms    0   14K/61 us    10409 rps
-[  1] 8.00-9.00 sec   981 KBytes  8.04 Mbits/sec    
-10048=0.096/0.090/0.763/0.010 ms    0   14K/61 us    10424 rps
-[  1] 9.00-10.00 sec   982 KBytes  8.04 Mbits/sec    
-10054=0.096/0.092/0.287/0.003 ms    0   14K/61 us    10432 rps
-[  1] 0.00-10.01 sec  9.92 MBytes  8.31 Mbits/sec    
-104011=0.092/0.078/1.218/0.012 ms    0   14K/1009 us    10816 rps
-[  1] 0.00-10.01 sec  OWD (ms) Cnt=104011 TX=0.040/0.030/0.680/0.005 
-RX=0.053/0.045/0.887/0.008 Asymmetry=0.013/0.000/0.847/0.006
-[  1] 0.00-10.01 sec  OWD-TX-PDF: 
-bin(w=100us):cnt(104011)=1:103967,2:31,3:9,4:2,6:1,7:1 
-(5.00/95.00/99.7%=1/1/1,Outliers=0,obl/obu=0/0)
-[  1] 0.00-10.01 sec  OWD-RX-PDF: 
-bin(w=100us):cnt(104011)=1:103769,2:226,3:13,4:1,8:1,9:1 
-(5.00/95.00/99.7%=1/1/1,Outliers=0,obl/obu=0/0)
-[  1] 0.00-10.01 sec  BB8-PDF: 
-bin(w=100us):cnt(104011)=1:100646,2:3146,3:198,4:10,5:4,6:1,7:1,8:2,10:2,13:1 
-(5.00/95.00/99.7%=1/1/2,Outliers=0,obl/obu=0/0)
+Considering the above, a suitable replacement is `strscpy_pad` due to
+the fact that it guarantees both NUL-termination and NUL-padding on the
+destination buffer.
 
-Bob
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Note: build-tested only.
+
+Found with: $ rg "strncpy\("
+---
+ drivers/net/wwan/rpmsg_wwan_ctrl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/wwan/rpmsg_wwan_ctrl.c b/drivers/net/wwan/rpmsg_wwan_ctrl.c
+index 86b60aadfa11..39f5e780c478 100644
+--- a/drivers/net/wwan/rpmsg_wwan_ctrl.c
++++ b/drivers/net/wwan/rpmsg_wwan_ctrl.c
+@@ -37,7 +37,7 @@ static int rpmsg_wwan_ctrl_start(struct wwan_port *port)
+ 		.dst = RPMSG_ADDR_ANY,
+ 	};
+ 
+-	strncpy(chinfo.name, rpwwan->rpdev->id.name, RPMSG_NAME_SIZE);
++	strscpy_pad(chinfo.name, rpwwan->rpdev->id.name, sizeof(chinfo.name));
+ 	rpwwan->ept = rpmsg_create_ept(rpwwan->rpdev, rpmsg_wwan_ctrl_callback,
+ 				       rpwwan, chinfo);
+ 	if (!rpwwan->ept)
+
+---
+base-commit: 58720809f52779dc0f08e53e54b014209d13eebb
+change-id: 20231018-strncpy-drivers-net-wwan-rpmsg_wwan_ctrl-c-3f620aafd326
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
+
 
