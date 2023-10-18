@@ -1,152 +1,116 @@
-Return-Path: <netdev+bounces-42218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB8E87CDADD
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:41:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 494C77CDAEF
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:47:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B1C3B210F6
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:41:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D3A6B210A4
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BF02E40F;
-	Wed, 18 Oct 2023 11:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 045862F51D;
+	Wed, 18 Oct 2023 11:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CECA1F951;
-	Wed, 18 Oct 2023 11:41:40 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27A2111;
-	Wed, 18 Oct 2023 04:41:38 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 39IBepoP71505718, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.93/5.92) with ESMTPS id 39IBepoP71505718
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 18 Oct 2023 19:40:51 +0800
-Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Wed, 18 Oct 2023 19:40:51 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Wed, 18 Oct 2023 19:40:50 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
- RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
- 15.01.2375.007; Wed, 18 Oct 2023 19:40:50 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Doug Anderson <dianders@chromium.org>
-CC: Jakub Kicinski <kuba@kernel.org>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Simon Horman
-	<horms@kernel.org>, Edward Hill <ecgh@chromium.org>,
-        Laura Nao
-	<laura.nao@collabora.com>,
-        "linux-usb@vger.kernel.org"
-	<linux-usb@vger.kernel.org>,
-        Grant Grundler <grundler@chromium.org>,
-        =?utf-8?B?QmrDuHJuIE1vcms=?= <bjorn@mork.no>,
-        Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH v3 5/5] r8152: Block future register access if register access fails
-Thread-Topic: [PATCH v3 5/5] r8152: Block future register access if register
- access fails
-Thread-Index: AQHZ/UKPr2uppqw2y0WH24Vf4SC1orBMGX/AgAAGioCAAVSUAIAAE/SAgAGw82A=
-Date: Wed, 18 Oct 2023 11:40:50 +0000
-Message-ID: <34d7d7c7b5914674b55a6dc21ced1190@realtek.com>
-References: <20231012192552.3900360-1-dianders@chromium.org>
- <20231012122458.v3.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
- <29f9a2ff1979406489213909b940184f@realtek.com>
- <CAD=FV=U4rGozXHoK8+ejPgRtyoACy1971ftoatQivqzk2tk5ng@mail.gmail.com>
- <052401da00fa$dacccd90$906668b0$@realtek.com>
- <CAD=FV=XQswgKZh-JQ6PuKGRmrDMfDmZwM+MUpAcOk1=7Ppjyiw@mail.gmail.com>
-In-Reply-To: <CAD=FV=XQswgKZh-JQ6PuKGRmrDMfDmZwM+MUpAcOk1=7Ppjyiw@mail.gmail.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXMBS02.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA56814F8F;
+	Wed, 18 Oct 2023 11:47:20 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75152112;
+	Wed, 18 Oct 2023 04:47:19 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4S9TVJ4M6WzvQ7d;
+	Wed, 18 Oct 2023 19:42:32 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 18 Oct
+ 2023 19:47:17 +0800
+Subject: Re: [PATCH net-next v11 0/6] introduce page_pool_alloc() related API
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, <bpf@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	Alexander Duyck <alexander.duyck@gmail.com>
+References: <20231013064827.61135-1-linyunsheng@huawei.com>
+ <20231016182725.6aa5544f@kernel.org>
+ <2059ea42-f5cb-1366-804e-7036fb40cdaa@huawei.com>
+ <20231017081303.769e4fbe@kernel.org>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <67f2af29-59b8-a9e2-1c31-c9a625e4c4b3@huawei.com>
+Date: Wed, 18 Oct 2023 19:47:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20231017081303.769e4fbe@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-RG91ZyBBbmRlcnNvbiA8ZGlhbmRlcnNAY2hyb21pdW0ub3JnPg0KPiBTZW50OiBUdWVzZGF5LCBP
-Y3RvYmVyIDE3LCAyMDIzIDEwOjE3IFBNDQpbLi4uXQ0KPiA+IFRoYXQgaXMsIHRoZSBsb29wIHdv
-dWxkIGJlIGJyb2tlbiB3aGVuIHRoZSBmYWlsIHJhdGUgb2YgdGhlIGNvbnRyb2wgdHJhbnNmZXIg
-aXMgaGlnaCBvciBsb3cgZW5vdWdoLg0KPiA+IE90aGVyd2lzZSwgeW91IHdvdWxkIHF1ZXVlIGEg
-dXNiIHJlc2V0IGFnYWluIGFuZCBhZ2Fpbi4NCj4gPiBGb3IgZXhhbXBsZSwgaWYgdGhlIGZhaWwg
-cmF0ZSBvZiB0aGUgY29udHJvbCB0cmFuc2ZlciBpcyAxMCUgfiA2MCUsDQo+ID4gSSB0aGluayB5
-b3UgaGF2ZSBoaWdoIHByb2JhYmlsaXR5IHRvIGtlZXAgdGhlIGxvb3AgY29udGludWFsbHkuDQo+
-ID4gV291bGQgaXQgbmV2ZXIgaGFwcGVuPw0KPiANCj4gQWN0dWFsbHksIGV2ZW4gd2l0aCBhIGZh
-aWx1cmUgcmF0ZSBvZiAxMCUgSSBkb24ndCB0aGluayB5b3UnbGwgZW5kIHVwDQo+IHdpdGggYSBm
-dWxseSBjb250aW51b3VzIGxvb3AsIHJpZ2h0PyBBbGwgeW91IG5lZWQgaXMgdG8gZ2V0IDMgZmFp
-bHVyZXMNCj4gaW4gYSByb3cgaW4gcnRsODE1Ml9nZXRfdmVyc2lvbigpIHRvIGdldCBvdXQgb2Yg
-dGhlIGxvb3AuIFNvIHdpdGggYQ0KPiAxMCUgZmFpbHVyZSByYXRlIHlvdSdkIHVuYmluZC9iaW5k
-IDEwMDAgdGltZXMgKG9uIGF2ZXJhZ2UpIGFuZCB0aGVuDQo+IChmaW5hbGx5KSBnaXZlIHVwLiBX
-aXRoIGEgNTAlIGZhaWx1cmUgcmF0ZSBJIHRoaW5rIHlvdSdkIG9ubHkNCj4gdW5iaW5kL2JpbmQg
-OCB0aW1lcyBvbiBhdmVyYWdlLCByaWdodD8gT2YgY291cnNlLCBJIGd1ZXNzIDEwMDAgbG9vcHMN
-Cj4gaXMgcHJldHR5IGNsb3NlIHRvIGluZmluaXRlLg0KPiANCj4gSW4gYW55IGNhc2UsIHdlIGhh
-dmVuJ3QgYWN0dWFsbHkgc2VlbiBoYXJkd2FyZSB0aGF0IGZhaWxzIGxpa2UgdGhpcy4NCj4gV2Un
-dmUgc2VlbiBmYWlsdXJlIHJhdGVzIHRoYXQgYXJlIG11Y2ggbXVjaCBsb3dlciBhbmQgd2UgY2Fu
-IGltYWdpbmUNCj4gZmFpbHVyZSByYXRlcyB0aGF0IGFyZSAxMDAlIGlmIHdlJ3JlIGdvdCByZWFs
-bHkgYnJva2VuIGhhcmR3YXJlLiBEbw0KPiB5b3UgdGhpbmsgY2FzZXMgd2hlcmUgZmFpbHVyZSBy
-YXRlcyBhcmUgbWlkZGxlLW9mLXRoZS1yb2FkIGFyZSBsaWtlbHk/DQoNClRoYXQgaXMgbXkgcXVl
-c3Rpb24sIHRvby4NCkkgZG9uJ3Qga25vdyBpZiBzb21ldGhpbmcgd291bGQgY2F1c2UgdGhlIHNp
-dHVhdGlvbiwgZWl0aGVyLg0KVGhpcyBpcyBvdXQgb2YgbXkga25vd2xlZGdlLg0KSSBhbSB3YWl0
-aW5nIGZvciB0aGUgcHJvZmVzc2lvbmFsIGFuc3dlcnMsIHRvby4NCg0KQSBsb3Qgb2YgcmVhc29u
-cyBtYXkgY2F1c2UgdGhlIGZhaWwgb2YgdGhlIGNvbnRyb2wgdHJhbnNmZXIuDQpJIGRvbid0IGhh
-dmUgYWxsIG9mIHRoZSByZWFsIHNpdHVhdGlvbiB0byBhbmFseXplIHRoZW0uDQpUaGVyZWZvcmUs
-IHdoYXQgSSBjb3VsZCBkbyBpcyB0byBhc3N1bWUgZGlmZmVyZW50IHNpdHVhdGlvbnMuDQpZb3Ug
-Y291bGQgc2F5IG15IGh5cG90aGVzZXMgYXJlIHVucmVhc29uYWJsZS4NCkhvd2V2ZXIsIEkgaGF2
-ZSB0byB0ZWxsIHlvdSB3aGF0IEkgd29ycnkuDQoNCj4gSSB3b3VsZCBhbHNvIHNheSB0aGF0IG5v
-dGhpbmcgd2UgY2FuIGRvIGNhbiBwZXJmZWN0bHkgaGFuZGxlIGZhdWx0eQ0KPiBoYXJkd2FyZS4g
-SWYgd2UncmUgaW1hZ2luaW5nIHRoZW9yZXRpY2FsIGhhcmR3YXJlLCB3ZSBjb3VsZCBpbWFnaW5l
-DQo+IHRoZW9yZXRpY2FsIGhhcmR3YXJlIHRoYXQgZGUtZW51bWVyYXRlZCBpdHNlbGYgYW5kIHJl
-LWVudW1lcmF0ZWQNCj4gaXRzZWxmIGV2ZXJ5IGhhbGYgc2Vjb25kIGJlY2F1c2UgdGhlIGZpcm13
-YXJlIG9uIHRoZSBkZXZpY2UgY3Jhc2hlZCBvcg0KPiBzb21lIHJlZ3VsYXRvciBrZXB0IGRyb3Bw
-aW5nLiBUaGlzIGZhdWx0eSBoYXJkd2FyZSB3b3VsZCBhbHNvIGNhdXNlIGFuDQo+IGluZmluaXRl
-IGxvb3Agb2YgZGUtZW51bWVyYXRpb24gYW5kIHJlLWVudW1lcmF0aW9uLCByaWdodD8NCj4gDQo+
-IFByZXN1bWFibHkgaWYgd2UgZ2V0IGludG8gZWl0aGVyIGNhc2UsIHRoZSB1c2VyIHdpbGwgcmVh
-bGl6ZSB0aGF0IHRoZQ0KPiBoYXJkd2FyZSBpc24ndCB3b3JraW5nIGFuZCB3aWxsIHVucGx1ZyBp
-dCBmcm9tIHRoZSBzeXN0ZW0uIFdoaWxlIHRoZQ0KDQpTb21lIG9mIG91ciBkZXZpY2VzIGFyZSBv
-bmJvYXJkLiBUaGF0IGlzLCB0aGV5IGNvdWxkbid0IGJlIHVucGx1Z2dlZC4NClRoYXQgaXMgd2h5
-IEkgaGF2ZSB0byBjb25zaWRlciBhIGxvdCBvZiBzaXR1YXRpb25zLg0KDQo+IHN5c3RlbSBpcyBk
-b2luZyB0aGUgbG9vcCBvZiB0cnlpbmcgdG8gZW51bWVyYXRlIHRoZSBoYXJkd2FyZSwgaXQgd2ls
-bA0KPiBiZSB0YWtpbmcgdXAgYSBidW5jaCBvZiBleHRyYSBDUFUgY3ljbGVzIGJ1dCAoSSBiZWxp
-ZXZlKSBpdCB3b24ndCBiZQ0KPiBmdWxseSBsb2NrZWQgdXAgb3IgYW55dGhpbmcuIFRoZSBtYWNo
-aW5lIHdpbGwgc3RpbGwgZnVuY3Rpb24gYW5kIGJlDQo+IGFibGUgdG8gZG8gbm9uLUV0aGVybmV0
-IGFjdGl2aXRpZXMsIHJpZ2h0PyBJIHdvdWxkIHNheSB0aGF0IHRoZSB3b3JzdA0KPiB0aGluZyBh
-Ym91dCB0aGlzIHN0YXRlIHdvdWxkIGJlIHRoYXQgaXQgd291bGQgc3RyZXNzIGNvcm5lciBjYXNl
-cyBpbg0KPiB0aGUgcmVzZXQgb2YgdGhlIFVTQiBzdWJzeXN0ZW0sIHBvc3NpYmx5IHRpY2tpbmcg
-YnVncy4NCj4gDQo+IFNvIEkgZ3Vlc3MgSSB3b3VsZCBzdW1tYXJpemUgYWxsIHRoZSBhYm92ZSBh
-czoNCj4gDQo+IElmIGhhcmR3YXJlIGlzIGJyb2tlbiBpbiBqdXN0IHRoZSByaWdodCB3YXkgdGhl
-biB0aGlzIHBhdGNoIGNvdWxkDQo+IGNhdXNlIGEgbmVhcmx5IGluZmluaXRlIHVuYmluZGluZy9y
-ZWJpbmRpbmcgb2YgdGhlIHI4MTUyIGRyaXZlci4NCj4gSG93ZXZlcjoNCj4gDQo+IDEuIEl0IGRv
-ZXNuJ3Qgc2VlbSB0ZXJyaWJseSBsaWtlbHkgZm9yIGhhcmR3YXJlIHRvIGJlIGJyb2tlbiBpbiBq
-dXN0IHRoaXMgd2F5Lg0KPiANCj4gMi4gV2UgaGF2ZW4ndCBzZWVuIGhhcmR3YXJlIGJyb2tlbiBp
-biBqdXN0IHRoaXMgd2F5Lg0KPiANCj4gMy4gSGFyZHdhcmUgYnJva2VuIGluIGEgc2xpZ2h0bHkg
-ZGlmZmVyZW50IHdheSBjb3VsZCBjYXVzZSBpbmZpbml0ZQ0KPiB1bmJpbmRpbmcvcmViaW5kaW5n
-IGV2ZW4gd2l0aG91dCB0aGlzIHBhdGNoLg0KPiANCj4gNC4gSW5maW5pdGUgdW5iaW5kaW5nL3Jl
-YmluZGluZyBvZiBhIFVTQiBhZGFwdGVyIGlzbid0IGdyZWF0LCBidXQgbm90DQo+IHRoZSBhYnNv
-bHV0ZSB3b3JzdCB0aGluZy4NCg0KSXQgaXMgZmluZSBpZiBldmVyeW9uZSBhZ3JlZXMgdGhlc2Uu
-DQoNCkJlc3QgUmVnYXJkcywNCkhheWVzDQoNCg==
+On 2023/10/17 23:13, Jakub Kicinski wrote:
+> On Tue, 17 Oct 2023 15:56:48 +0800 Yunsheng Lin wrote:
+>>> And I can't figure out now what the "cache" in the name is referring to.
+>>> Looks like these are just convenience wrappers which return VA instead
+>>> of struct page..  
+>>
+>> Yes, it is corresponding to some API like napi_alloc_frag() returning va
+>> instead of 'struct page' mentioned in patch 5.
+>>
+>> Anyway, naming is hard, any suggestion for a better naming is always
+>> welcomed:)
+> 
+> I'd just throw a _va (for virtual address) at the end. And not really
+
+_va seems fine:)
+
+> mention it in the documentation. Plus the kdoc of the function should
+> say that this is just a thin wrapper around other page pool APIs, and
+> it's safe to mix it with other page pool APIs?
+
+I am not sure I understand what do 'safe' and 'mix' mean here.
+
+For 'safe' part, I suppose you mean if there is a va accociated with
+a 'struct page' without calling some API like kmap()? For that, I suppose
+it is safe when the driver is calling page_pool API without the
+__GFP_HIGHMEM flag. Maybe we should mention that in the kdoc and give a
+warning if page_pool_*alloc_va() is called with the __GFP_HIGHMEM flag?
+
+For the 'mix', I suppose you mean the below:
+1. Allocate a page with the page_pool_*alloc_va() API and free a page with
+   page_pool_free() API.
+2. Allocate a page with the page_pool_*alloc() API and free a page with
+   page_pool_free_va() API.
+
+For 1, it seems it is ok as some virt_to_head_page() and page_address() call
+between va and 'struct page' does not seem to change anything if we have
+enforce page_pool_*alloc_va() to be called without the __GFP_HIGHMEM flag.
+
+For 2, If the va is returned from page_address() which the allocation API is
+called without __GFP_HIGHMEM flag. If not, the va is from kmap*()? which means
+we may be calling page_pool_free_va() before kunmap*()? Is that possible?
+
+
+> .
+> 
 
