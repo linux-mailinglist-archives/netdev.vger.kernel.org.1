@@ -1,96 +1,76 @@
-Return-Path: <netdev+bounces-42222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B3E27CDB86
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:26:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B6F17CDB9C
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:28:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C518B213A0
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:26:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C62D8B20F40
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 12:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 791781DDFC;
-	Wed, 18 Oct 2023 12:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE675347A3;
+	Wed, 18 Oct 2023 12:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="py0lZkyh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5DC2E63E
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 12:26:04 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B83C998;
-	Wed, 18 Oct 2023 05:26:02 -0700 (PDT)
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.54])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4S9VPJ6ZLSz15NZL;
-	Wed, 18 Oct 2023 20:23:16 +0800 (CST)
-Received: from [192.168.98.231] (10.67.165.2) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 18 Oct 2023 20:25:59 +0800
-Message-ID: <f256ba6b-b0e7-333a-10a7-57b73892d626@huawei.com>
-Date: Wed, 18 Oct 2023 20:25:58 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8E43419C
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 12:28:36 +0000 (UTC)
+Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [IPv6:2001:1600:3:17::42a9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A7E5112
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 05:28:34 -0700 (PDT)
+Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
+	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4S9VWN6SB9zMpnyK;
+	Wed, 18 Oct 2023 12:28:32 +0000 (UTC)
+Received: from unknown by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4S9VWN3LfdzMppDh;
+	Wed, 18 Oct 2023 14:28:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1697632112;
+	bh=XLbZRMw4Qoxopp6BBhbSCSC9GK1oZ5vo3gS8znzlotU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=py0lZkyh9vcmSTPk0an7v1ye2el4ANTPJSB5h/r2L0Pf9+SY4IBzcXif+YM43nS69
+	 2CGZUe9Q2dAFtWHQ9MXHdmM3idT0hjOl5xNUFhRfYceJaagurCV4dVoAZdKRyqdv/a
+	 mkhOsNAlRgOKdHOrjvkWdy7MlQ0ytypcFIXrD7Uw=
+Date: Wed, 18 Oct 2023 14:28:30 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com
+Subject: Re: [PATCH v13 01/12] landlock: Make ruleset's access masks more
+ generic
+Message-ID: <20231017.UXu7UP2ahree@digikod.net>
+References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
+ <20231016015030.1684504-2-konstantin.meskhidze@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
-	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <shenjian15@huawei.com>,
-	<wangjie125@huawei.com>, <liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>,
-	<netdev@vger.kernel.org>, <stable@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 5/6] net: hns3: fix wrong print link down up
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20230728075840.4022760-1-shaojijie@huawei.com>
- <20230728075840.4022760-6-shaojijie@huawei.com>
- <7ce32389-550b-4beb-82b1-1b6183fdeabb@lunn.ch>
- <2c6514a7-db97-f345-9bc4-affd4eba2dda@huawei.com>
- <73b41fe2-12dd-4fc0-a44d-f6f94e6541fc@lunn.ch>
- <ef5489f9-43b4-ee59-699b-3f54a30c00aa@huawei.com>
- <e7219114-774f-49d0-8985-8875fd351b60@lunn.ch>
- <a21beff2-9f38-d354-6049-aed20c18c8d4@huawei.com>
- <150d8d95-a6cd-dc28-618b-6cc5295b4bf9@huawei.com>
- <06cd6f53-e0af-4bdf-a684-68fc55b9b436@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <06cd6f53-e0af-4bdf-a684-68fc55b9b436@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.165.2]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231016015030.1684504-2-konstantin.meskhidze@huawei.com>
+X-Infomaniak-Routing: alpha
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, Oct 16, 2023 at 09:50:19AM +0800, Konstantin Meskhidze wrote:
+> To support network type rules, this modification renames ruleset's
+> access masks and modifies it's type to access_masks_t. This patch
+> adds filesystem helper functions to add and get filesystem mask.
+> 
+> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> Link: https://lore.kernel.org/r/20230920092641.832134-2-konstantin.meskhidze@huawei.com
 
-on 2023/10/17 21:59, Andrew Lunn wrote
-> I still think this is totally valid and correct.
->
-> When you turn auto-neg off the link partner is going to react to that,
-> it might drop the link. After a while, the link partner will give up
-> trying to perform auto-neg and might fall back to 10/Half. At which
-> point, the link might allow traffic flow. However, in this example,
-> you have a duplex mis-match, so it might not work correctly.
->
-> Turning off auto-neg is something you need to do at both ends, and you
-> need to then force both ends to the same settings. Link down is
-> expected. I would actually be suppressed if no link down events were
-> reported.
->
-> 	Andrew
-
-Hi Andrew,
-Thank you for your comments, we are re-evaluating this issue and may drop this patch.
-
-Regards
-Jijie
-
+Please don't include Link that points to the previous patch series. I
+add them when I apply a patch series to identify its source.
 
