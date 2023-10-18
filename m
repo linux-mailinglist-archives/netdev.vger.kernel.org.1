@@ -1,590 +1,325 @@
-Return-Path: <netdev+bounces-42424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF1C7CE9A3
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:00:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00DBB7CE9F6
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:29:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14A02281ED9
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:00:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F106B20E06
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 21:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1904D4293F;
-	Wed, 18 Oct 2023 20:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9654B42935;
+	Wed, 18 Oct 2023 21:29:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="QfZAzsq0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JN+6DP89"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4B742905
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 20:59:42 +0000 (UTC)
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36D4D10F7
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 13:59:03 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-405497850dbso68123025e9.0
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 13:59:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1697662741; x=1698267541; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i1qaHrqVtSrGJTiCvr5M49PYhV5KV1LtHFCXx9SrGjo=;
-        b=QfZAzsq08XMicw/wKs8ZlTNhWEMKNMGGLUxyo1nNmWKeXLIpahmX/2RrY7ycmui5TR
-         kiEPU6F0TztPFS83eGhhFrq+YSb3JzKkulJiv/xrV8o192zvB5IeC270BUF5KcDyFrtq
-         wpcONO89E9Yk2m8fZi3gaUDJ/k3ev+f4M6hahSE52tffiltbsqIk7EKoTNAVZy0AeTB7
-         gjXR3PnJWLtAqeAFAEglXKIQD9l5tnoMSx7mRDqoqrNqELVPmTFJY0PacmVoC6g+mA1G
-         aw+XAgYP7jf03n28TBUA5NNFqlntiAjTG5HEV/qWUUmXJpnVO7IQwZwFOg2ZUhEg2wn6
-         gO2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697662741; x=1698267541;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i1qaHrqVtSrGJTiCvr5M49PYhV5KV1LtHFCXx9SrGjo=;
-        b=e4Fa21rSA0UmlqCk6WEOBZB2XPdZkRkpuCp83NO2amcrO6jJeswsvqAzQJAiIK964W
-         3isnUJD7frqezTMwv7jN1JjGPGCMHTtUKRAmBNVLw93CVr6HGQcg5dIF2hNF/do2gbH0
-         vFU5txV+tqEk/7V/9c8MpMHwjdeL0NhEgx4vmRpXAuHbSIt/RvJsaxwP6gM+DL1QpVqm
-         k34wU+bbFArgH0hirpJuLTsro2uCODMEuYuyRy68xuYqY3CAkD5/flQCxqw7Rw3ThV1D
-         t7/6AIjWo5YIxeYMe/2pern5NhQxHR7iDFZURubU6umSGH8uUNTT3yE/twAnX8bDiCs5
-         itow==
-X-Gm-Message-State: AOJu0YwYr1UHS+bkCmGaZo8PxnLeefFJ4px9/xG0yIcj3/vr318GueUn
-	G1vwg50bhsgM8yEP8kS8rwiK4w==
-X-Google-Smtp-Source: AGHT+IGWY2yAYWUAz7G/z3UVzLf64ecSS4zmmqALUWcgIaqP+P82QuRvIT3KmWbNXUO5X+mVi7rcAQ==
-X-Received: by 2002:a05:600c:4688:b0:403:cc64:2dbf with SMTP id p8-20020a05600c468800b00403cc642dbfmr349434wmo.27.1697662740777;
-        Wed, 18 Oct 2023 13:59:00 -0700 (PDT)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id x19-20020a05600c421300b003fc16ee2864sm2569006wmh.48.2023.10.18.13.58.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 13:59:00 -0700 (PDT)
-From: Dmitry Safonov <dima@arista.com>
-To: David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org,
-	Dmitry Safonov <dima@arista.com>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Bob Gilligan <gilligan@arista.com>,
-	Dan Carpenter <error27@gmail.com>,
-	David Laight <David.Laight@aculab.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Donald Cassidy <dcassidy@redhat.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Eric W. Biederman" <ebiederm@xmission.com>,
-	Francesco Ruggeri <fruggeri05@gmail.com>,
-	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Ivan Delalande <colona@arista.com>,
-	Leonard Crestez <cdleonard@gmail.com>,
-	"Nassiri, Mohammad" <mnassiri@ciena.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	Simon Horman <horms@kernel.org>,
-	"Tetreault, Francois" <ftetreau@ciena.com>,
-	netdev@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v15 net-next 23/23] Documentation/tcp: Add TCP-AO documentation
-Date: Wed, 18 Oct 2023 21:57:37 +0100
-Message-ID: <20231018205806.322831-24-dima@arista.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231018205806.322831-1-dima@arista.com>
-References: <20231018205806.322831-1-dima@arista.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB76642920;
+	Wed, 18 Oct 2023 21:29:07 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 458569B;
+	Wed, 18 Oct 2023 14:29:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697664546; x=1729200546;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=c3vZH+t+Ksy0i3FaLg+mu+1zqhSZWx4eXQQ3WBoffjg=;
+  b=JN+6DP89KBKz5CdN57OZEUqc/jUIT9mgGOFHy4Rlw9DAFj7sndcN3hNi
+   pCWB2//Hw9NvhvSbo8b5IJpjQ825vJMeqhXZ/s8zakXPH5kphZjmyrlxc
+   YKKKpuqb6wyR3iasmnU7Q/Mkc8oiNzfatjlRXd8ZGPT7eFHUyq/kVAR6K
+   5x4nuFPK68Z7Po0SNEQI6J9iYVdkacWg/EQzYSGoBrDIAy0jnNK6GV1qe
+   0WUTXQHki0YT4B7mPJ90VqG8SmVxEZuKQp5llCjChOAIbRL7JQPo1BiiN
+   FVV9y9YfonlnaIakPXHKCTiNtIhtVq1q3r9gWY4B5dXS/CBD7thNDtrcv
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="4707590"
+X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
+   d="scan'208";a="4707590"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 14:29:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="1003957479"
+X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
+   d="scan'208";a="1003957479"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Oct 2023 14:28:58 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 18 Oct 2023 14:28:58 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 18 Oct 2023 14:28:58 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Wed, 18 Oct 2023 14:28:58 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Wed, 18 Oct 2023 14:28:57 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ldWqyEueWkY8GOv3ojrQeGF0xtth9HNUay+davxh1QuesnkATtTn00vs6VFOBpLv2FJ/s5rexllD0YFHyveNwcvJ56WP5Ib16TJLHgz0mArTOTE+10rWfNqcrbMhxzrFFIga2Miomo1NoHj2btjRtarzqsbSktk8m+G6eDu69BJcwsehfRE2u1c3YdUHh+UIMhzr8J7cBfxc0VvECmqJ9tm0/36dJv7Dom0/xbb21Ht7IqZAUL0mgl28ooweoIIXFEo9rOqkN1SwVATqZEdQdnzazqOS9XyGyL9dJaBvsjetWEd7Ow6KcRTh7VTdWPOgZPVTxRQf1UI1VehPT5CH/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AcTWbPDOJkybGdaqgKlex/suzyD9GVVNimoJQiR940Q=;
+ b=cW+lM0SHs3TzAwJWfX5x9cgIVh2eAM9M8/lWic8VLearPK4uOvnJrbRfR+tNbfYJe9WIM1VRklY2eWxh8wAjujBtI4ak1KfswBEwYa5yRFZjZotuaDmTmzAO3+J/tILHp4874iBM6qOs1Wy2hoz3mTP+96pxn4Z8AWREprjMh0N0+bPDSRJGK31De1BharsVTkfy773hSQwLnng3n7PAvhmROaAnSOZDPo0TyNAQZRzbylag09vR1yzcLxpvL7qpXBgKvHGg+bJ9PZ4hl4XrCwc7+Ou2rTmXsJihIiW+xgOT6Tz/pzWdSzEZy/qk7BCMKxM80hMYLgEtJCg5wzPgIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SJ2PR11MB8298.namprd11.prod.outlook.com (2603:10b6:a03:545::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36; Wed, 18 Oct
+ 2023 21:28:53 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::34a7:52c3:3b8b:75f4]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::34a7:52c3:3b8b:75f4%4]) with mapi id 15.20.6907.022; Wed, 18 Oct 2023
+ 21:28:53 +0000
+Message-ID: <acf0b2db-c254-4537-97d3-14cce1ad4e39@intel.com>
+Date: Wed, 18 Oct 2023 14:28:51 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] i40e: Align devlink info versions with ice
+ driver and add docs
+To: Ivan Vecera <ivecera@redhat.com>, <netdev@vger.kernel.org>
+CC: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, "Jesse
+ Brandeburg" <jesse.brandeburg@intel.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, "open list:DOCUMENTATION"
+	<linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>
+References: <20231018123558.552453-1-ivecera@redhat.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20231018123558.552453-1-ivecera@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW2PR16CA0061.namprd16.prod.outlook.com
+ (2603:10b6:907:1::38) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ2PR11MB8298:EE_
+X-MS-Office365-Filtering-Correlation-Id: 007632fd-9c45-4ff1-bf19-08dbd0213a42
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: w+cAGuD5Q7Bn5NkCR/wJwFIEU3ZBGpQm4oZFNoScT5MYgJJVZS/sqlzxnL/WFek4cW/7ky9CW65wfyHYMxF0A55+u3a4jbF26TIz8G7IO36KqqWMJM/XBkv5b4ocuNd1SXGLpZmt6f7YAyFj85RNyS+ms6tirnTfLKLgR2fyUGetIkV5xZzmrySl0NUGznN6G3a6uCPQikkdgpmnyFoNVuVMU2f+g+phPM7xyNRISmglsLGlA7J2+nfeYxdQo3wLlz3dQsqOy8+3yPcN4brrxNBf07WunA+gJm8+TmFS1+nX6WTqeTIDiCr2rUhoRPCmfmooKLGWIb0KTLnJ9hXF/un7xhnzFXRmU4mycWxnHCPimEORMogH3gW5Sg38GTlrJ1+yBcSfig9mjBCtbUY8AyouKsmG0MDEpyDN9Ax8u1ARRqJBSPDBvmk+WbCnCaHJtJ6IXH3/HVv3HAppB2p434YeMwr0WNPoUEECDj1ITnnsdWhBVm8Eyt9SNObQa5MkOvLsDz9Q9SL8M6Y/eIXzQyHGwXRtj2F/8KdZ4T1VCiEdEjuMePCuwEwLusbCsSRafXr5c40DoVeAIm6ikJXT/Qr2GD6sgJl+bfEMA8xt731agEVQwKfUeA0BCt9kb4yV8iYPhQx6WEHPNqsc8I7cwg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(39860400002)(346002)(396003)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(31686004)(54906003)(316002)(66946007)(478600001)(6486002)(66556008)(66476007)(82960400001)(83380400001)(5660300002)(38100700002)(6512007)(53546011)(6506007)(31696002)(36756003)(86362001)(2616005)(26005)(4326008)(7416002)(8936002)(41300700001)(8676002)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K2krT21tcnRuLy96d3ZlaWVkaXU5cStXaWRsSnd3S0lQMm5tR0o1WDh0YXA1?=
+ =?utf-8?B?aDZzSGdmL2hVNGsvMldPQ1RjOC9pMUpYb1RFWVBvS2lKQkt2a0s0Qk0ydnF1?=
+ =?utf-8?B?NlpubVYrNkVCWXMyQ2wxNVVFV0xpNmtjb2d4aGtwd0ZhSFowMXJVWDdYQzhI?=
+ =?utf-8?B?SXR1WE10SkU5cWpRZTBqWmxUc3NBdC9WOGlsRGU1ei9XalkzVm9xOVgvd2hC?=
+ =?utf-8?B?MUs3VGVWNjBCcXk2SFU5VkxmVHNlazg0TkxkQ1dWT2hhMUgxTWZ1OHRnQjU5?=
+ =?utf-8?B?L0puZkRvR25GQ0p4M3dNa1gydHJhZitKazJCdTE2VEYzdS9EQWdCellhSi9I?=
+ =?utf-8?B?UHpaN1VCY3A5dkJQK2NkWnZxdjZTZWZUOU1Zb2t2UVg4YjI2RnZVZHJrQWZJ?=
+ =?utf-8?B?RHZhZXdCaVpmT0VUSDFLWmZldVhBNklYdlE4ZTVIdmE0YjZlNjRIR2hVcThE?=
+ =?utf-8?B?NDd6YnRJWnd1N0VHOXcwV2tGU2pPYmNKRm03ZzU3d0FTMFFjU25CREJCQUZN?=
+ =?utf-8?B?SmMzbnVOQlJBdFdvUWpVYThsZlZ4bWZqb2NhdERiK1hTWDBUZXFQM0h3bFQ2?=
+ =?utf-8?B?aXlwVXFzaWJnbVg1NXNHdDdYaHhIbEsxa2RTeE50aEVORHdZUkc3L0Q1RGJw?=
+ =?utf-8?B?eE9vRDM0Nk9XWEd6NVB0ZnlENkV4ZmtPSSt4ckFaVHd5c1cyME9adk5hbXFT?=
+ =?utf-8?B?WW9oNlFKd25lc0dZTHVJcDYyMFpHRDlYS3NyTnpGVjM2MklQT1Y0WGVSZjNr?=
+ =?utf-8?B?bE50Yy9ZMnpyV3c5Wm1Vdmh0R25XZTRjcVNzc0t6Z0FhRnJCM3pHNnNJMFJV?=
+ =?utf-8?B?d3huaDNjWjE3dEFTUFhEcFhPb0tZQm5pUzFtempnYmlrcEd5TFZIakxNNmJB?=
+ =?utf-8?B?YjFSSFNVNVdZaWR1TnMzMzY0SFBvSkcxeGNjYW1uS1A5K3hLR2pXWWEwSVV1?=
+ =?utf-8?B?NW5BOTU1VEZ3THlUYW1TQVR2czJFSXJwTTduSEMwaVdWTW5lNUxIOFRZOGt0?=
+ =?utf-8?B?b29udGtoaDdBWHpDR0d1QXplczhRRkJ4NXlsanRnUCtlb1Q3V0F4Q2srdFRp?=
+ =?utf-8?B?dEI0VFZxVE5ucjZzWk9DUWxFcGxITnBjMVFBSm0wZkNNd3hUNWJ3dXNSSHpx?=
+ =?utf-8?B?eml5UDVKdlRVeHRyZXhsOXNSZ21EUm9RaXJuRzVqS3p1NmpCOHF2cSt5OHE2?=
+ =?utf-8?B?Z3d2aG51OEJoK2x2OVlzRTFtQ1p4cjhONnhncHdnOEowWDFYYWE2SUpyU1FP?=
+ =?utf-8?B?K2JzNkhja2hJUm96UWR6L0ErOU5GQmN1UlNReTI3NTlyT2RUVjg5Q3ZXL1JL?=
+ =?utf-8?B?cXd0L3o1YlR6bGJ5TjNZT1A4LzFaaGpZZUNpb0Ewb01UdG5QQ2F3bUw5Q1hx?=
+ =?utf-8?B?Vk5PM2hHOWtBeVBPRTR3T1o3N3R2czdDMjJ3NkZib2dCZUlZaXhXMkZ4MHhS?=
+ =?utf-8?B?blYyT0c5LytJR2FXMWM3b05IeC9NRktMbEFxNUFCbnlMK2Nkb2dmMDBPT3Jv?=
+ =?utf-8?B?cHN4RFpnQXdPMXRFbW1YcndadUJ6aDk3a3ZFclJlSnRMVHVQQjZjTGpHMVM2?=
+ =?utf-8?B?QWNlU3BiOHZqSEc1TDBvdlR4eFYyRVh3SldNcVdTa0RGT0xZazBIRk9pd2ZT?=
+ =?utf-8?B?cjFMeWpQRFoxckpNdkFVdzdhLzBuZ3JDV2toeHd5RE42ZWFHL2YvZUlvK0o5?=
+ =?utf-8?B?Rlp6WEg1WkFWanJNZDVHV0tFVFBwT2Qza2Iwb29KK1JzRE9FdWlIRGZodmtk?=
+ =?utf-8?B?MEZKcXRXZ1pyNXRhMGt6NEV0bUR0UEJCSmtVRzlpcWUvZTNpdzVSYUIySldO?=
+ =?utf-8?B?eW9GSFp4cDJDRGVXTVExaDF1V1JRQXV0eHI5TC84dEVTZFU0dXloRVFmaUhB?=
+ =?utf-8?B?dDgxOU9MeWlrZGJLTUZJN1BxYVphOTJubUJYTk1pWHk0d0l0SG5NdXJpcDhy?=
+ =?utf-8?B?RjE2b2IydmdDem85SGFnQlgrWEl0TjlESXJhRFcrNmQxN1VaYzRmSXFmQ3N4?=
+ =?utf-8?B?eUw4ZGtSbjZnS1IrWGgvMWNxbXFONUc1YW4wVElhaGhId2ducEJFWGZMWlRL?=
+ =?utf-8?B?bHhReGZoZUR6Z2FReDhaeXlYem9zZWkvMVJDMHpLNklZK0NkNWtKeUNYUjBW?=
+ =?utf-8?B?WkZEbWM2MVpGdFQ3NHBTaitHL2hGRHNaaEJEZURIN0cyTmxlTHZrUjhRV205?=
+ =?utf-8?B?SVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 007632fd-9c45-4ff1-bf19-08dbd0213a42
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 21:28:53.4354
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lPAW78Z5HMC5Rq98DeOgzlN9mh6WYmh6h0lXvPb4YhmZ2n3UVcEHXQD9D/2AE25cWsQF737ukiP+2w+0xDPTnUGvE/UygcWcOWrK7Ul+xyk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8298
+X-OriginatorOrg: intel.com
 
-It has Frequently Asked Questions (FAQ) on RFC 5925 - I found it very
-useful answering those before writing the actual code. It provides answers
-to common questions that arise on a quick read of the RFC, as well as how
-they were answered. There's also comparison to TCP-MD5 option,
-evaluation of per-socket vs in-kernel-DB approaches and description of
-uAPI provided.
 
-Hopefully, it will be as useful for reviewing the code as it was for writing.
 
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: linux-doc@vger.kernel.org
-Signed-off-by: Dmitry Safonov <dima@arista.com>
-Acked-by: David Ahern <dsahern@kernel.org>
----
- Documentation/networking/index.rst  |   1 +
- Documentation/networking/tcp_ao.rst | 444 ++++++++++++++++++++++++++++
- 2 files changed, 445 insertions(+)
- create mode 100644 Documentation/networking/tcp_ao.rst
+On 10/18/2023 5:35 AM, Ivan Vecera wrote:
+> Align devlink info versions with ice driver so change 'fw.mgmt'
+> version to be 2-digit version [major.minor], add 'fw.mgmt.build'
+> that reports mgmt firmware build number and use '"fw.psid.api'
+> for NVM format version instead of incorrect '"fw.psid'.
+> Additionally add missing i40e devlink documentation.
+> 
+> Fixes: 5a423552e0d9 ("i40e: Add handler for devlink .info_get")
+> Cc: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 2ffc5ad10295..683eb42309cc 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -106,6 +106,7 @@ Contents:
-    sysfs-tagging
-    tc-actions-env-rules
-    tc-queue-filters
-+   tcp_ao
-    tcp-thin
-    team
-    timestamping
-diff --git a/Documentation/networking/tcp_ao.rst b/Documentation/networking/tcp_ao.rst
-new file mode 100644
-index 000000000000..cfa5bf1cc542
---- /dev/null
-+++ b/Documentation/networking/tcp_ao.rst
-@@ -0,0 +1,444 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+========================================================
-+TCP Authentication Option Linux implementation (RFC5925)
-+========================================================
-+
-+TCP Authentication Option (TCP-AO) provides a TCP extension aimed at verifying
-+segments between trusted peers. It adds a new TCP header option with
-+a Message Authentication Code (MAC). MACs are produced from the content
-+of a TCP segment using a hashing function with a password known to both peers.
-+The intent of TCP-AO is to deprecate TCP-MD5 providing better security,
-+key rotation and support for variety of hashing algorithms.
-+
-+1. Introduction
-+===============
-+
-+.. table:: Short and Limited Comparison of TCP-AO and TCP-MD5
-+
-+ +----------------------+------------------------+-----------------------+
-+ |                      |       TCP-MD5          |         TCP-AO        |
-+ +======================+========================+=======================+
-+ |Supported hashing     |MD5                     |Must support HMAC-SHA1 |
-+ |algorithms            |(cryptographically weak)|(chosen-prefix attacks)|
-+ |                      |                        |and CMAC-AES-128 (only |
-+ |                      |                        |side-channel attacks). |
-+ |                      |                        |May support any hashing|
-+ |                      |                        |algorithm.             |
-+ +----------------------+------------------------+-----------------------+
-+ |Length of MACs (bytes)|16                      |Typically 12-16.       |
-+ |                      |                        |Other variants that fit|
-+ |                      |                        |TCP header permitted.  |
-+ +----------------------+------------------------+-----------------------+
-+ |Number of keys per    |1                       |Many                   |
-+ |TCP connection        |                        |                       |
-+ +----------------------+------------------------+-----------------------+
-+ |Possibility to change |Non-practical (both     |Supported by protocol  |
-+ |an active key         |peers have to change    |                       |
-+ |                      |them during MSL)        |                       |
-+ +----------------------+------------------------+-----------------------+
-+ |Protection against    |No                      |Yes: ignoring them     |
-+ |ICMP 'hard errors'    |                        |by default on          |
-+ |                      |                        |established connections|
-+ +----------------------+------------------------+-----------------------+
-+ |Protection against    |No                      |Yes: pseudo-header     |
-+ |traffic-crossing      |                        |includes TCP ports.    |
-+ |attack                |                        |                       |
-+ +----------------------+------------------------+-----------------------+
-+ |Protection against    |No                      |Sequence Number        |
-+ |replayed TCP segments |                        |Extension (SNE) and    |
-+ |                      |                        |Initial Sequence       |
-+ |                      |                        |Numbers (ISNs)         |
-+ +----------------------+------------------------+-----------------------+
-+ |Supports              |Yes                     |No. ISNs+SNE are needed|
-+ |Connectionless Resets |                        |to correctly sign RST. |
-+ +----------------------+------------------------+-----------------------+
-+ |Standards             |RFC 2385                |RFC 5925, RFC 5926     |
-+ +----------------------+------------------------+-----------------------+
-+
-+
-+1.1 Frequently Asked Questions (FAQ) with references to RFC 5925
-+----------------------------------------------------------------
-+
-+Q: Can either SendID or RecvID be non-unique for the same 4-tuple
-+(srcaddr, srcport, dstaddr, dstport)?
-+
-+A: No [3.1]::
-+
-+   >> The IDs of MKTs MUST NOT overlap where their TCP connection
-+   identifiers overlap.
-+
-+Q: Can Master Key Tuple (MKT) for an active connection be removed?
-+
-+A: No, unless it's copied to Transport Control Block (TCB) [3.1]::
-+
-+   It is presumed that an MKT affecting a particular connection cannot
-+   be destroyed during an active connection -- or, equivalently, that
-+   its parameters are copied to an area local to the connection (i.e.,
-+   instantiated) and so changes would affect only new connections.
-+
-+Q: If an old MKT needs to be deleted, how should it be done in order
-+to not remove it for an active connection? (As it can be still in use
-+at any moment later)
-+
-+A: Not specified by RFC 5925, seems to be a problem for key management
-+to ensure that no one uses such MKT before trying to remove it.
-+
-+Q: Can an old MKT exist forever and be used by another peer?
-+
-+A: It can, it's a key management task to decide when to remove an old key [6.1]::
-+
-+   Deciding when to start using a key is a performance issue. Deciding
-+   when to remove an MKT is a security issue. Invalid MKTs are expected
-+   to be removed. TCP-AO provides no mechanism to coordinate their removal,
-+   as we consider this a key management operation.
-+
-+also [6.1]::
-+
-+   The only way to avoid reuse of previously used MKTs is to remove the MKT
-+   when it is no longer considered permitted.
-+
-+Linux TCP-AO will try its best to prevent you from removing a key that's
-+being used, considering it a key management failure. But sine keeping
-+an outdated key may become a security issue and as a peer may
-+unintentionally prevent the removal of an old key by always setting
-+it as RNextKeyID - a forced key removal mechanism is provided, where
-+userspace has to supply KeyID to use instead of the one that's being removed
-+and the kernel will atomically delete the old key, even if the peer is
-+still requesting it. There are no guarantees for force-delete as the peer
-+may yet not have the new key - the TCP connection may just break.
-+Alternatively, one may choose to shut down the socket.
-+
-+Q: What happens when a packet is received on a new connection with no known
-+MKT's RecvID?
-+
-+A: RFC 5925 specifies that by default it is accepted with a warning logged, but
-+the behaviour can be configured by the user [7.5.1.a]::
-+
-+   If the segment is a SYN, then this is the first segment of a new
-+   connection. Find the matching MKT for this segment, using the segment's
-+   socket pair and its TCP-AO KeyID, matched against the MKT's TCP connection
-+   identifier and the MKT's RecvID.
-+
-+      i. If there is no matching MKT, remove TCP-AO from the segment.
-+         Proceed with further TCP handling of the segment.
-+         NOTE: this presumes that connections that do not match any MKT
-+         should be silently accepted, as noted in Section 7.3.
-+
-+[7.3]::
-+
-+   >> A TCP-AO implementation MUST allow for configuration of the behavior
-+   of segments with TCP-AO but that do not match an MKT. The initial default
-+   of this configuration SHOULD be to silently accept such connections.
-+   If this is not the desired case, an MKT can be included to match such
-+   connections, or the connection can indicate that TCP-AO is required.
-+   Alternately, the configuration can be changed to discard segments with
-+   the AO option not matching an MKT.
-+
-+[10.2.b]::
-+
-+   Connections not matching any MKT do not require TCP-AO. Further, incoming
-+   segments with TCP-AO are not discarded solely because they include
-+   the option, provided they do not match any MKT.
-+
-+Note that Linux TCP-AO implementation differs in this aspect. Currently, TCP-AO
-+segments with unknown key signatures are discarded with warnings logged.
-+
-+Q: Does the RFC imply centralized kernel key management in any way?
-+(i.e. that a key on all connections MUST be rotated at the same time?)
-+
-+A: Not specified. MKTs can be managed in userspace, the only relevant part to
-+key changes is [7.3]::
-+
-+   >> All TCP segments MUST be checked against the set of MKTs for matching
-+   TCP connection identifiers.
-+
-+Q: What happens when RNextKeyID requested by a peer is unknown? Should
-+the connection be reset?
-+
-+A: It should not, no action needs to be performed [7.5.2.e]::
-+
-+   ii. If they differ, determine whether the RNextKeyID MKT is ready.
-+
-+       1. If the MKT corresponding to the segment’s socket pair and RNextKeyID
-+       is not available, no action is required (RNextKeyID of a received
-+       segment needs to match the MKT’s SendID).
-+
-+Q: How current_key is set and when does it change? It is a user-triggered
-+change, or is it by a request from the remote peer? Is it set by the user
-+explicitly, or by a matching rule?
-+
-+A: current_key is set by RNextKeyID [6.1]::
-+
-+   Rnext_key is changed only by manual user intervention or MKT management
-+   protocol operation. It is not manipulated by TCP-AO. Current_key is updated
-+   by TCP-AO when processing received TCP segments as discussed in the segment
-+   processing description in Section 7.5. Note that the algorithm allows
-+   the current_key to change to a new MKT, then change back to a previously
-+   used MKT (known as "backing up"). This can occur during an MKT change when
-+   segments are received out of order, and is considered a feature of TCP-AO,
-+   because reordering does not result in drops.
-+
-+[7.5.2.e.ii]::
-+
-+   2. If the matching MKT corresponding to the segment’s socket pair and
-+   RNextKeyID is available:
-+
-+      a. Set current_key to the RNextKeyID MKT.
-+
-+Q: If both peers have multiple MKTs matching the connection's socket pair
-+(with different KeyIDs), how should the sender/receiver pick KeyID to use?
-+
-+A: Some mechanism should pick the "desired" MKT [3.3]::
-+
-+   Multiple MKTs may match a single outgoing segment, e.g., when MKTs
-+   are being changed. Those MKTs cannot have conflicting IDs (as noted
-+   elsewhere), and some mechanism must determine which MKT to use for each
-+   given outgoing segment.
-+
-+   >> An outgoing TCP segment MUST match at most one desired MKT, indicated
-+   by the segment’s socket pair. The segment MAY match multiple MKTs, provided
-+   that exactly one MKT is indicated as desired. Other information in
-+   the segment MAY be used to determine the desired MKT when multiple MKTs
-+   match; such information MUST NOT include values in any TCP option fields.
-+
-+Q: Can TCP-MD5 connection migrate to TCP-AO (and vice-versa):
-+
-+A: No [1]::
-+
-+   TCP MD5-protected connections cannot be migrated to TCP-AO because TCP MD5
-+   does not support any changes to a connection’s security algorithm
-+   once established.
-+
-+Q: If all MKTs are removed on a connection, can it become a non-TCP-AO signed
-+connection?
-+
-+A: [7.5.2] doesn't have the same choice as SYN packet handling in [7.5.1.i]
-+that would allow accepting segments without a sign (which would be insecure).
-+While switching to non-TCP-AO connection is not prohibited directly, it seems
-+what the RFC means. Also, there's a requirement for TCP-AO connections to
-+always have one current_key [3.3]::
-+
-+   TCP-AO requires that every protected TCP segment match exactly one MKT.
-+
-+[3.3]::
-+
-+   >> An incoming TCP segment including TCP-AO MUST match exactly one MKT,
-+   indicated solely by the segment’s socket pair and its TCP-AO KeyID.
-+
-+[4.4]::
-+
-+   One or more MKTs. These are the MKTs that match this connection’s
-+   socket pair.
-+
-+Q: Can a non-TCP-AO connection become a TCP-AO-enabled one?
-+
-+A: No: for already established non-TCP-AO connection it would be impossible
-+to switch using TCP-AO as the traffic key generation requires the initial
-+sequence numbers. Paraphrasing, starting using TCP-AO would require
-+re-establishing the TCP connection.
-+
-+2. In-kernel MKTs database vs database in userspace
-+===================================================
-+
-+Linux TCP-AO support is implemented using ``setsockopt()s``, in a similar way
-+to TCP-MD5. It means that a userspace application that wants to use TCP-AO
-+should perform ``setsockopt()`` on a TCP socket when it wants to add,
-+remove or rotate MKTs. This approach moves the key management responsibility
-+to userspace as well as decisions on corner cases, i.e. what to do if
-+the peer doesn't respect RNextKeyID; moving more code to userspace, especially
-+responsible for the policy decisions. Besides, it's flexible and scales well
-+(with less locking needed than in the case of an in-kernel database). One also
-+should keep in mind that mainly intended users are BGP processes, not any
-+random applications, which means that compared to IPsec tunnels,
-+no transparency is really needed and modern BGP daemons already have
-+``setsockopt()s`` for TCP-MD5 support.
-+
-+.. table:: Considered pros and cons of the approaches
-+
-+ +----------------------+------------------------+-----------------------+
-+ |                      |    ``setsockopt()``    |      in-kernel DB     |
-+ +======================+========================+=======================+
-+ | Extendability        | ``setsockopt()``       | Netlink messages are  |
-+ |                      | commands should be     | simple and extendable |
-+ |                      | extendable syscalls    |                       |
-+ +----------------------+------------------------+-----------------------+
-+ | Required userspace   | BGP or any application | could be transparent  |
-+ | changes              | that wants TCP-AO needs| as tunnels, providing |
-+ |                      | to perform             | something like        |
-+ |                      | ``setsockopt()s``      | ``ip tcpao add key``  |
-+ |                      | and do key management  | (delete/show/rotate)  |
-+ +----------------------+------------------------+-----------------------+
-+ |MKTs removal or adding| harder for userspace   | harder for kernel     |
-+ +----------------------+------------------------+-----------------------+
-+ | Dump-ability         | ``getsockopt()``       | Netlink .dump()       |
-+ |                      |                        | callback              |
-+ +----------------------+------------------------+-----------------------+
-+ | Limits on kernel     |                      equal                     |
-+ | resources/memory     |                                                |
-+ +----------------------+------------------------+-----------------------+
-+ | Scalability          | contention on          | contention on         |
-+ |                      | ``TCP_LISTEN`` sockets | the whole database    |
-+ +----------------------+------------------------+-----------------------+
-+ | Monitoring & warnings| ``TCP_DIAG``           | same Netlink socket   |
-+ +----------------------+------------------------+-----------------------+
-+ | Matching of MKTs     | half-problem: only     | hard                  |
-+ |                      | listen sockets         |                       |
-+ +----------------------+------------------------+-----------------------+
-+
-+
-+3. uAPI
-+=======
-+
-+Linux provides a set of ``setsockopt()s`` and ``getsockopt()s`` that let
-+userspace manage TCP-AO on a per-socket basis. In order to add/delete MKTs
-+``TCP_AO_ADD_KEY`` and ``TCP_AO_DEL_KEY`` TCP socket options must be used
-+It is not allowed to add a key on an established non-TCP-AO connection
-+as well as to remove the last key from TCP-AO connection.
-+
-+``setsockopt(TCP_AO_DEL_KEY)`` command may specify ``tcp_ao_del::current_key``
-++ ``tcp_ao_del::set_current`` and/or ``tcp_ao_del::rnext``
-++ ``tcp_ao_del::set_rnext`` which makes such delete "forced": it
-+provides userspace a way to delete a key that's being used and atomically set
-+another one instead. This is not intended for normal use and should be used
-+only when the peer ignores RNextKeyID and keeps requesting/using an old key.
-+It provides a way to force-delete a key that's not trusted but may break
-+the TCP-AO connection.
-+
-+The usual/normal key-rotation can be performed with ``setsockopt(TCP_AO_INFO)``.
-+It also provides a uAPI to change per-socket TCP-AO settings, such as
-+ignoring ICMPs, as well as clear per-socket TCP-AO packet counters.
-+The corresponding ``getsockopt(TCP_AO_INFO)`` can be used to get those
-+per-socket TCP-AO settings.
-+
-+Another useful command is ``getsockopt(TCP_AO_GET_KEYS)``. One can use it
-+to list all MKTs on a TCP socket or use a filter to get keys for a specific
-+peer and/or sndid/rcvid, VRF L3 interface or get current_key/rnext_key.
-+
-+To repair TCP-AO connections ``setsockopt(TCP_AO_REPAIR)`` is available,
-+provided that the user previously has checkpointed/dumped the socket with
-+``getsockopt(TCP_AO_REPAIR)``.
-+
-+A tip here for scaled TCP_LISTEN sockets, that may have some thousands TCP-AO
-+keys, is: use filters in ``getsockopt(TCP_AO_GET_KEYS)`` and asynchronous
-+delete with ``setsockopt(TCP_AO_DEL_KEY)``.
-+
-+Linux TCP-AO also provides a bunch of segment counters that can be helpful
-+with troubleshooting/debugging issues. Every MKT has good/bad counters
-+that reflect how many packets passed/failed verification.
-+Each TCP-AO socket has the following counters:
-+- for good segments (properly signed)
-+- for bad segments (failed TCP-AO verification)
-+- for segments with unknown keys
-+- for segments where an AO signature was expected, but wasn't found
-+- for the number of ignored ICMPs
-+
-+TCP-AO per-socket counters are also duplicated with per-netns counters,
-+exposed with SNMP. Those are ``TCPAOGood``, ``TCPAOBad``, ``TCPAOKeyNotFound``,
-+``TCPAORequired`` and ``TCPAODroppedIcmps``.
-+
-+RFC 5925 very permissively specifies how TCP port matching can be done for
-+MKTs::
-+
-+   TCP connection identifier. A TCP socket pair, i.e., a local IP
-+   address, a remote IP address, a TCP local port, and a TCP remote port.
-+   Values can be partially specified using ranges (e.g., 2-30), masks
-+   (e.g., 0xF0), wildcards (e.g., "*"), or any other suitable indication.
-+
-+Currently Linux TCP-AO implementation doesn't provide any TCP port matching.
-+Probably, port ranges are the most flexible for uAPI, but so far
-+not implemented.
-+
-+4. ``setsockopt()`` vs ``accept()`` race
-+========================================
-+
-+In contrast with TCP-MD5 established connection which has just one key,
-+TCP-AO connections may have many keys, which means that accepted connections
-+on a listen socket may have any amount of keys as well. As copying all those
-+keys on a first properly signed SYN would make the request socket bigger, that
-+would be undesirable. Currently, the implementation doesn't copy keys
-+to request sockets, but rather look them up on the "parent" listener socket.
-+
-+The result is that when userspace removes TCP-AO keys, that may break
-+not-yet-established connections on request sockets as well as not removing
-+keys from sockets that were already established, but not yet ``accept()``'ed,
-+hanging in the accept queue.
-+
-+The reverse is valid as well: if userspace adds a new key for a peer on
-+a listener socket, the established sockets in accept queue won't
-+have the new keys.
-+
-+At this moment, the resolution for the two races:
-+``setsockopt(TCP_AO_ADD_KEY)`` vs ``accept()``
-+and ``setsockopt(TCP_AO_DEL_KEY)`` vs ``accept()`` is delegated to userspace.
-+This means that it's expected that userspace would check the MKTs on the socket
-+that was returned by ``accept()`` to verify that any key rotation that
-+happened on listen socket is reflected on the newly established connection.
-+
-+This is a similar "do-nothing" approach to TCP-MD5 from the kernel side and
-+may be changed later by introducing new flags to ``tcp_ao_add``
-+and ``tcp_ao_del``.
-+
-+Note that this race is rare for it needs TCP-AO key rotation to happen
-+during the 3-way handshake for the new TCP connection.
-+
-+5. Interaction with TCP-MD5
-+===========================
-+
-+A TCP connection can not migrate between TCP-AO and TCP-MD5 options. The
-+established sockets that have either AO or MD5 keys are restricted for
-+adding keys of the other option.
-+
-+For listening sockets the picture is different: BGP server may want to receive
-+both TCP-AO and (deprecated) TCP-MD5 clients. As a result, both types of keys
-+may be added to TCP_CLOSED or TCP_LISTEN sockets. It's not allowed to add
-+different types of keys for the same peer.
-+
-+6. SNE Linux implementation
-+===========================
-+
-+RFC 5925 [6.2] describes the algorithm of how to extend TCP sequence numbers
-+with SNE.  In short: TCP has to track the previous sequence numbers and set
-+sne_flag when the current SEQ number rolls over. The flag is cleared when
-+both current and previous SEQ numbers cross 0x7fff, which is 32Kb.
-+
-+In times when sne_flag is set, the algorithm compares SEQ for each packet with
-+0x7fff and if it's higher than 32Kb, it assumes that the packet should be
-+verified with SNE before the increment. As a result, there's
-+this [0; 32Kb] window, when packets with (SNE - 1) can be accepted.
-+
-+Linux implementation simplifies this a bit: as the network stack already tracks
-+the first SEQ byte that ACK is wanted for (snd_una) and the next SEQ byte that
-+is wanted (rcv_nxt) - that's enough information for a rough estimation
-+on where in the 4GB SEQ number space both sender and receiver are.
-+When they roll over to zero, the corresponding SNE gets incremented.
-+
-+tcp_ao_compute_sne() is called for each TCP-AO segment. It compares SEQ numbers
-+from the segment with snd_una or rcv_nxt and fits the result into a 2GB window around them,
-+detecting SEQ numbers rolling over. That simplifies the code a lot and only
-+requires SNE numbers to be stored on every TCP-AO socket.
-+
-+The 2GB window at first glance seems much more permissive compared to
-+RFC 5926. But that is only used to pick the correct SNE before/after
-+a rollover. It allows more TCP segment replays, but yet all regular
-+TCP checks in tcp_sequence() are applied on the verified segment.
-+So, it trades a bit more permissive acceptance of replayed/retransmitted
-+segments for the simplicity of the algorithm and what seems better behaviour
-+for large TCP windows.
-+
-+7. Links
-+========
-+
-+RFC 5925 The TCP Authentication Option
-+   https://www.rfc-editor.org/rfc/pdfrfc/rfc5925.txt.pdf
-+
-+RFC 5926 Cryptographic Algorithms for the TCP Authentication Option (TCP-AO)
-+   https://www.rfc-editor.org/rfc/pdfrfc/rfc5926.txt.pdf
-+
-+Draft "SHA-2 Algorithm for the TCP Authentication Option (TCP-AO)"
-+   https://datatracker.ietf.org/doc/html/draft-nayak-tcp-sha2-03
-+
-+RFC 2385 Protection of BGP Sessions via the TCP MD5 Signature Option
-+   https://www.rfc-editor.org/rfc/pdfrfc/rfc2385.txt.pdf
-+
-+:Author: Dmitry Safonov <dima@arista.com>
--- 
-2.42.0
+Great, thanks for cleaning this up.
 
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+I'm happy for this to go straight to net-next without queuing in
+iwl-next since the relevant i40e series also just merged there last
+weekend :)
+
+Thanks,
+Jake
+
+>  Documentation/networking/devlink/i40e.rst     | 59 +++++++++++++++++++
+>  Documentation/networking/devlink/index.rst    |  1 +
+>  .../net/ethernet/intel/i40e/i40e_devlink.c    | 18 +++++-
+>  3 files changed, 75 insertions(+), 3 deletions(-)
+>  create mode 100644 Documentation/networking/devlink/i40e.rst
+> 
+> diff --git a/Documentation/networking/devlink/i40e.rst b/Documentation/networking/devlink/i40e.rst
+> new file mode 100644
+> index 000000000000..d3cb5bb5197e
+> --- /dev/null
+> +++ b/Documentation/networking/devlink/i40e.rst
+> @@ -0,0 +1,59 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +====================
+> +i40e devlink support
+> +====================
+> +
+> +This document describes the devlink features implemented by the ``i40e``
+> +device driver.
+> +
+> +Info versions
+> +=============
+> +
+> +The ``i40e`` driver reports the following versions
+> +
+> +.. list-table:: devlink info versions implemented
+> +    :widths: 5 5 5 90
+> +
+> +    * - Name
+> +      - Type
+> +      - Example
+> +      - Description
+> +    * - ``board.id``
+> +      - fixed
+> +      - K15190-000
+> +      - The Product Board Assembly (PBA) identifier of the board.
+> +    * - ``fw.mgmt``
+> +      - running
+> +      - 9.130
+> +      - 2-digit version number of the management firmware that controls the
+> +        PHY, link, etc.
+> +    * - ``fw.mgmt.api``
+> +      - running
+> +      - 1.15
+> +      - 2-digit version number of the API exported over the AdminQ by the
+> +        management firmware. Used by the driver to identify what commands
+> +        are supported.
+> +    * - ``fw.mgmt.build``
+> +      - running
+> +      - 73618
+> +      - Build number of the source for the management firmware.
+> +    * - ``fw.undi``
+> +      - running
+> +      - 1.3429.0
+> +      - Version of the Option ROM containing the UEFI driver. The version is
+> +        reported in ``major.minor.patch`` format. The major version is
+> +        incremented whenever a major breaking change occurs, or when the
+> +        minor version would overflow. The minor version is incremented for
+> +        non-breaking changes and reset to 1 when the major version is
+> +        incremented. The patch version is normally 0 but is incremented when
+> +        a fix is delivered as a patch against an older base Option ROM.
+> +    * - ``fw.psid.api``
+> +      - running
+> +      - 9.30
+> +      - Version defining the format of the flash contents.
+> +    * - ``fw.bundle_id``
+> +      - running
+> +      - 0x8000e5f3
+> +      - Unique identifier of the firmware image file that was loaded onto
+> +        the device. Also referred to as the EETRACK identifier of the NVM.
+> diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
+> index b49749e2b9a6..2b78060aaa58 100644
+> --- a/Documentation/networking/devlink/index.rst
+> +++ b/Documentation/networking/devlink/index.rst
+> @@ -52,6 +52,7 @@ parameters, info versions, and other features it supports.
+>     bnxt
+>     etas_es58x
+>     hns3
+> +   i40e
+>     ionic
+>     ice
+>     mlx4
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+> index 9168ade8da47..74bc111b4849 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+> @@ -18,8 +18,14 @@ static void i40e_info_fw_mgmt(struct i40e_hw *hw, char *buf, size_t len)
+>  {
+>  	struct i40e_adminq_info *aq = &hw->aq;
+>  
+> -	snprintf(buf, len, "%u.%u.%05d",
+> -		 aq->fw_maj_ver, aq->fw_min_ver, aq->fw_build);
+> +	snprintf(buf, len, "%u.%u", aq->fw_maj_ver, aq->fw_min_ver);
+> +}
+> +
+> +static void i40e_info_fw_mgmt_build(struct i40e_hw *hw, char *buf, size_t len)
+> +{
+> +	struct i40e_adminq_info *aq = &hw->aq;
+> +
+> +	snprintf(buf, len, "%05d", aq->fw_build);
+>  }
+>  
+>  static void i40e_info_fw_api(struct i40e_hw *hw, char *buf, size_t len)
+> @@ -77,6 +83,12 @@ static int i40e_devlink_info_get(struct devlink *dl,
+>  	if (err)
+>  		return err;
+>  
+> +	i40e_info_fw_mgmt_build(hw, buf, sizeof(buf));
+> +	err = i40e_devlink_info_put(req, I40E_DL_VERSION_RUNNING,
+> +				    "fw.mgmt.build", buf);
+> +	if (err)
+> +		return err;
+> +
+>  	i40e_info_fw_api(hw, buf, sizeof(buf));
+>  	err = i40e_devlink_info_put(req, I40E_DL_VERSION_RUNNING,
+>  				    DEVLINK_INFO_VERSION_GENERIC_FW_MGMT_API,
+> @@ -86,7 +98,7 @@ static int i40e_devlink_info_get(struct devlink *dl,
+>  
+>  	i40e_info_nvm_ver(hw, buf, sizeof(buf));
+>  	err = i40e_devlink_info_put(req, I40E_DL_VERSION_RUNNING,
+> -				    DEVLINK_INFO_VERSION_GENERIC_FW_PSID, buf);
+> +				    "fw.psid.api", buf);
+>  	if (err)
+>  		return err;
+>  
 
