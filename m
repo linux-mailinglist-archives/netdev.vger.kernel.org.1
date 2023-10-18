@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-42288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ACF97CE0DD
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:12:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FFC67CE0E7
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:13:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEAFCB210C0
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 15:12:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F0F21C20D16
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 15:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA6838BC3;
-	Wed, 18 Oct 2023 15:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68B538BBC;
+	Wed, 18 Oct 2023 15:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Cbpn6cgn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kO6R+J/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C4538BAB
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:12:34 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B1EAB;
-	Wed, 18 Oct 2023 08:12:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Saeiu582BeTftGfoCdo3+uSAyDpjbcJKLZ0RCOQjPZI=; b=Cbpn6cgnddyf6L42/fz8VlEd0H
-	u9SkaSE2jMt5GH0Dc8q6b7OzGk9Wl9H6kHEGNrzwZt2FZ9QFAbrCnDD4xCHwt7YhcCnCpYd7PV5IW
-	9BAhHcUevbtrc/uXkMmk4qHtyrdCVnfC2mmEzdiq8eZf7kfANQPIwWTeLr4oUN1Edz5w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qt8Df-002b01-4L; Wed, 18 Oct 2023 17:12:23 +0200
-Date: Wed, 18 Oct 2023 17:12:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Grygorii Strashko <grygorii.strashko@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
-	r-gunasekaran@ti.com
-Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Fix r30 CMDs bitmasks
-Message-ID: <ecc4bd4a-4489-4a07-92af-17b2ecc3205c@lunn.ch>
-References: <20231018150715.3085380-1-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF7438BB0
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:13:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27BECC433C8;
+	Wed, 18 Oct 2023 15:13:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697642022;
+	bh=OtMZJC4ksDaFAbMIle5La8GtkKZfjR5M26IvH6z9TWU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kO6R+J/9Pjw9QBJnmDA2dT9dlrqIiqw1mN3yDaPTh1L2g1FW0y+UZJW1nB9AvKBs3
+	 QDYketdSOC0FIM/ve73XTnjD+kbXkyHsUu3Kr+W91MyvpoIB1JH4J4Q+DRpFdf3MM+
+	 S/egBCRBG71SzmuRmrjLcXr9gOTG9hx+8mukHykzXzUrG6GpkE3aiwFGE+IljAOSeZ
+	 Us9zKmSuUy0Y9XmKY8BypEa0pfKJ4afJEph/0VUYzkbwCWEBj79KOuIPDkxnaC8m/l
+	 fuJ2LJWj1ExUHIcWaRSHLfYldLno99SOyVwP1anXX4AHl4guEF949WrOKWg1yRgt6f
+	 ZDHW9K21i2FkQ==
+Date: Wed, 18 Oct 2023 08:13:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, przemyslaw.kitszel@intel.com, daniel@iogearbox.net,
+ opurdila@ixiacom.com
+Subject: Re: [PATCH net v2 1/5] net: fix ifname in netlink ntf during netns
+ move
+Message-ID: <20231018081341.66bf393b@kernel.org>
+In-Reply-To: <ZS+FehME4fC4b7w4@nanopsycho>
+References: <20231018013817.2391509-1-kuba@kernel.org>
+	<20231018013817.2391509-2-kuba@kernel.org>
+	<ZS+FehME4fC4b7w4@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231018150715.3085380-1-danishanwar@ti.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 18, 2023 at 08:37:15PM +0530, MD Danish Anwar wrote:
-> The bitmasks for EMAC_PORT_DISABLE and EMAC_PORT_FORWARD r30 commands are
-> wrong in the driver.
+On Wed, 18 Oct 2023 09:12:58 +0200 Jiri Pirko wrote:
+> >+static int dev_prep_valid_name(struct net *net, struct net_device *dev,
+> >+			       const char *want_name, char *out_name)
+> >+{
+> >+	int ret;
+> >+
+> >+	if (!dev_valid_name(want_name))
+> >+		return -EINVAL;
+> >+
+> >+	if (strchr(want_name, '%')) {
+> >+		ret = __dev_alloc_name(net, want_name, out_name);
+> >+		return ret < 0 ? ret : 0;
+> >+	} else if (netdev_name_in_use(net, want_name)) {
+> >+		return -EEXIST;
+> >+	} else if (out_name != want_name) {  
 > 
-> Update the bitmasks of these commands to the correct ones as used by the
-> ICSSG firmware. These bitmasks are backwards compatible and work with
-> any ICSSG firmware version.
+> How this can happen?
+> You call dev_prep_valid_name() twice:
+> 	ret = dev_prep_valid_name(net, dev, name, buf);
+> 	err = dev_prep_valid_name(net, dev, pat, new_name);
 > 
-> Fixes: e9b4ece7d74b ("net: ti: icssg-prueth: Add Firmware config and classification APIs.")
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> Both buf and new_name are on stack tmp variables.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+I'm moving this code 1-to-1. I have patches queued up to clean all 
+this up in net-next. Please let me know if you see any bugs.
 
