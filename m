@@ -1,184 +1,112 @@
-Return-Path: <netdev+bounces-42358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B3717CE735
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:51:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB93E7CE738
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:52:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7485B1C20A05
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:51:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B0B91F221E6
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 18:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC4033B7B7;
-	Wed, 18 Oct 2023 18:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4112E42BE3;
+	Wed, 18 Oct 2023 18:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=skym.fi header.i=@skym.fi header.b="eq2R009k";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NOdSoo0I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2fabzfQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B311018E24
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 18:51:02 +0000 (UTC)
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF401128
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 11:50:59 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id AE6605C0145;
-	Wed, 18 Oct 2023 14:50:56 -0400 (EDT)
-Received: from imap49 ([10.202.2.99])
-  by compute5.internal (MEProxy); Wed, 18 Oct 2023 14:50:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=skym.fi; h=cc:cc
-	:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm1; t=
-	1697655056; x=1697741456; bh=6UXiDK5F4hL02ap4g9syLjADuw9582HbofF
-	tHs675Og=; b=eq2R009keRrx9/kf+PI9nBrNvitEoRyTgRHer34JiOX6wyQ2bIl
-	xnfkltdy1LYGhBvAwZROxsnZ9yaSEK+JZkBRRmPlotCl9m+gXuXBUu3HC9B0zHWJ
-	dYEzQ21w6qAAtCYA60aeSz87dn6mYfLhVhdz4K+ge8YVnyg6R9NOrLg374/4yPPP
-	FI0G9jmAkxlUumkASOKSzY/7qM1WbK+U6uQq85Lr2lnjeiZWInF8+uM+t1zZxlSB
-	ah3wH3V9MzKDkDhFRtsPdS3YLQ5TH8FzBEMbNSIWgGT9koF+Qcf8Db6ZcxDsN3bf
-	QeZJYuiCDPk1XHotwFjes069uArFMnl5Qfg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1697655056; x=1697741456; bh=6UXiDK5F4hL02ap4g9syLjADuw9582HbofF
-	tHs675Og=; b=NOdSoo0IIfGLT8hyzhaDEAD7yHOPXf5U7onpibZV+6g2e+2lmdU
-	WGA/TufbYBO/tGMQchIkNLfZayqEu3s1jVmmSe06tKqLJywE4kAm0gybcG00eWja
-	/d9kYsvNIP4/VJVSkIIBsBM5asLQrVyMYyyBT0VlJJ2cLm0jYKBjs73P1Nhbh4Ee
-	NKWqaNS/SZH8SukAZ3XXjKTRz0SR+gWxRQd5mdlHiNjtOSnpdBfl+CBIAjxT07ow
-	qFqUT/iU9OXiJY9zFN2wHfpRK9sEAwYAIabu139aZepZs07s0d9ESMTZABNcnL78
-	OIqciGuQyRWg4GIO9Iz/Mi1QASVLYAUELIA==
-X-ME-Sender: <xms:ECkwZZ7RzYHGOJQzWe_ZjTh2H9ZZJIKUh46I8CTptgSTiBijkCljBw>
-    <xme:ECkwZW5QlLhlA06mv1KDeTZUsWUjHbd6s46vjGilJO9gdDzNaRa9a1PxG72mK5i4X
-    I6tQf0vZ6dIf726mRU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrjeeggdduvdejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepufhk
-    hihlvghrucfomohnthihshgrrghrihcuoehsmhdolhhishhtshesshhkhihmrdhfiheqne
-    cuggftrfgrthhtvghrnhepueduveevfeeuudeuleevgeehleffgeelteefieekfedulefg
-    lefgtedufeduvddvnecuffhomhgrihhnpehvhihoshdrihhopdhkrghpshhirdhfihenuc
-    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsmhdolhhi
-    shhtshesshhkhihmrdhfih
-X-ME-Proxy: <xmx:ECkwZQdrMVj3IuR63GIlWY0s3X-gBNfaVlYgQMhCk65yDw49XNQhYQ>
-    <xmx:ECkwZSJIivTtBOxZCGjORoax44EPhRSr33UB13vQn93xtijK8iplyQ>
-    <xmx:ECkwZdIGS5NZhDU6JrDNZ4hVYK8TC-eAxEQ-f3RdSABNbTv6nP3BRw>
-    <xmx:ECkwZfxBKAnkDJFwd9C8-_reUJI64aV0uD1Z6gfZktwl5eIk742wZA>
-Feedback-ID: id05146f6:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 58D4015A0092; Wed, 18 Oct 2023 14:50:56 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1019-ged83ad8595-fm-20231002.001-ged83ad85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F033B2AE
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 18:52:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7210BC433C8;
+	Wed, 18 Oct 2023 18:52:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697655155;
+	bh=0dIQ/gAybuCcQehKEtt6P/pIePD9JqS3NZyzeFwG+CQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=f2fabzfQBdKMfHCySwfPrw+bumY2rE05Dc5s5Z/dLfoG0LLRCCnpYQLhiT3unmI/N
+	 kWA4eeOC639eutASh9NNNd1I52WMdZAt7FcopSbrNjk77vBQgVOGqc2Zm5r6OeMIFf
+	 qZhVcxdCXvYai3Zc63gWxBBXdYGgGw4FJz11gT5+mUDknsQ5e40IX+vNU/NbfkKs3R
+	 PPj/ZSfAkKdEy57sWANmeg9j2qSvIZVqU7kePTb9Otzm/MEFCDAOa3i7mSn3M1P6i5
+	 JHrofScHknVWcoxnXT2KZvMjYZ+xc/j8fCXncXtMkYG2GLpOxqJ9mU0tAjOLcwUgCt
+	 Y/oUg1nMaIk7A==
+Date: Wed, 18 Oct 2023 11:52:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Wheeler <netdev@lists.ewheeler.net>
+Cc: netdev@vger.kernel.org, drbd-dev@lists.linbit.com, Philipp Reisner
+ <philipp.reisner@linbit.com>, Lars Ellenberg <lars.ellenberg@linbit.com>,
+ Christoph =?UTF-8?B?QsO2aG13YWxkZXI=?= <christoph.boehmwalder@linbit.com>
+Subject: Re: BUG: looking up invalid subclass: 8
+Message-ID: <20231018115234.42070e51@kernel.org>
+In-Reply-To: <44d7fba4-3887-50ff-3dd1-3ca39164e6a@ewheeler.net>
+References: <cea84b66-2ad5-76af-3feb-418b78cdd87@ewheeler.net>
+	<20231017170900.62f951cd@kernel.org>
+	<44d7fba4-3887-50ff-3dd1-3ca39164e6a@ewheeler.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <03c9e8a4-5adc-4293-a720-fe4342ed723b@app.fastmail.com>
-In-Reply-To: <10804893-d035-4ac9-86f0-161257922be7@app.fastmail.com>
-References: <ee7f6320-0742-65d4-7411-400d55daebf8@skym.fi>
- <994cebfe-c97a-4e11-8dad-b3c589e9f094@intel.com>
- <c526d946-2779-434b-b8ec-423a48f71e36@skym.fi>
- <6e48c3ba-8d17-41db-ca8d-0a7881d122c9@intel.com>
- <4330a47e-aa31-4248-9d9d-95c54f74cdd9@app.fastmail.com>
- <10804893-d035-4ac9-86f0-161257922be7@app.fastmail.com>
-Date: Wed, 18 Oct 2023 21:50:35 +0300
-From: =?UTF-8?Q?Skyler_M=C3=A4ntysaari?= <sm+lists@skym.fi>
-To: "Jesse Brandeburg" <jesse.brandeburg@intel.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
-Subject: Re: [Intel-wired-lan] The difference between linux kernel driver and FreeBSD's
- with Intel X533
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 10, 2023, at 03:39, Skyler M=C3=A4ntysaari wrote:
-> On Tue, Oct 10, 2023, at 02:50, Skyler M=C3=A4ntysaari wrote:
->> On Mon, Oct 9, 2023, at 18:33, Jesse Brandeburg wrote:
->>> On 10/4/2023 10:08 AM, Skyler M=C3=A4ntysaari wrote:
->>>>>> Hi there,
->>>>>>
->>>>>> It seems that for reasons unknown to me, my Intel X533 based 10G =
-SFP+
->>>>>> doesn't want to work with kernel 6.1.55 in VyOS 1.4 nor Debian 12=
- but
->>>>>> it does in OPNsense which is based on FreeBSD 13.2.
->>>>>>
->>>>>> How would I go about debugging this properly? Both sides see ligh=
-t,
->>>>>> but no link unless I'm using FreeBSD.
->>>> https://forum.vyos.io/t/10g-sfp-trouble-with-linking-intel-x553/122=
-53/11?u=3Dsamip537
->>>
->>> Hi Skyler,
->>>
->>> Response from Intel team:
->>>
->>> In the ethtool -m output pasted I see TX and RX optical power is fin=
-e.
->>> Could you request fault status on both sides? Just want to check if =
-link
->>> is down because we are at local-fault or link partner is at local-fa=
-ult.
->>>
->>> rmmod ixgbe
->>> modprobe ixgbe
->>> ethtool -S eth0 | grep fault
->>>
->>> Since it is 10G, if our side TX is ON (power level says it is) then =
-we
->>> should expect link partner RX to be locked so cannot be at Local Fau=
-lt.
->>>
->>> Skyler, please gather that ethtool -S data for us.
->>>
->>> Jesse
->>>
->>>
->>>
->>>=20
->>
->> Hi Jesse,
->>
->> As the other side of the link is an Juniper, I'm not quite sure how I=20
->> would gather the same data from it as it doesn't have ethtool?
->>
->> I have also somewhat given up hope on it working on VyOS and instead =
-I=20
->> am using OPNsense for the moment but I still have VyOS installed as=20
->> well.
->>
->> Skyler
->
-> Hi Jesse,
->
-> I did verify that the grep doesn't yield any results on the VyOS box=20
-> and all of the data returned has an value of 0. Paste of which is here=
-:=20
-> https://p.kapsi.fi/?4a82cedb4f4801ec#DcEgFMFK7cH13EqypsY4ZaHS5taeA1zXe=
-vmmTSVW3P9x
->
-> I really think something weird is going on with the driver in Linux as=20
-> otherwise the same exact config on Juniper wouldn't work there either.=20
-> The VyOS box also says that it's unable to modify autoneg settings, or=20
-> speed/duplex of the interface.
->
-> Skyler
+On Wed, 18 Oct 2023 11:44:43 -0700 (PDT) Eric Wheeler wrote:
+> Here it is from two different hosts.
+> 
+> This is vanilla v6.5.7:
+> 
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: BUG: looking up invalid subclass: 8
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: turning off the locking correctness validator.
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: CPU: 8 PID: 13275 Comm: drbdsetup-84 Tainted: G            E      6.5.7 #23
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: Hardware name: Supermicro Super Server/H11SSL-i, BIOS 2.4 12/27/2021
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: Call Trace:
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: <TASK>
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: dump_stack_lvl+0x60/0xa0
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: look_up_lock_class+0x10b/0x150
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: register_lock_class+0x48/0x500
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ? srso_return_thunk+0x5/0x10
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: __lock_acquire+0x5f/0xb80
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: lock_acquire.part.0+0x90/0x210
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ? lock_all_resources+0x5a/0x90 [drbd]
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ? lock_all_resources+0x5a/0x90 [drbd]
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ? srso_return_thunk+0x5/0x10
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ? lock_acquire+0x10b/0x120
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ? lock_all_resources+0x5a/0x90 [drbd]
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: _raw_spin_lock_nested+0x33/0x80
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ? lock_all_resources+0x5a/0x90 [drbd]
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: lock_all_resources+0x5a/0x90 [drbd]
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: drbd_adm_attach+0x748/0x1340 [drbd]
 
-It has been  verified that the driver in kernel version 5.4.255 seems to=
- work aka 1.3 VyOS.  Post from another user in the same thread about it:=
- https://forum.vyos.io/t/10g-sfp-trouble-with-linking-intel-x553/12253/46
 
-I have also verified that the out-of-tree ixgbe driver does work, but in=
--kernel doesn't in kernel 6.1.58.
+Oh, that's much clearer, thank you.
+The warnings comes from DRBD, genl is just the entry point.
+Adding DRBD folks.
 
-Please share these findings with the correct Intel team so that this cou=
-ld be fixed.
-
-- Skyler
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ? __nla_validate_parse+0x13f/0x1f0
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: genl_family_rcv_msg_doit.isra.0+0xe4/0x150
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: genl_family_rcv_msg+0x187/0x260
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ? __pfx_drbd_adm_attach+0x10/0x10 [drbd]
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: genl_rcv_msg+0x4b/0xb0
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ? __pfx_genl_rcv_msg+0x10/0x10
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: netlink_rcv_skb+0x66/0x120
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: genl_rcv+0x28/0x40
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: netlink_unicast+0x1b8/0x280
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: netlink_sendmsg+0x273/0x520
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: sock_write_iter+0x188/0x190
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: vfs_write+0x3e5/0x520
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: ksys_write+0xc8/0x100
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: do_syscall_64+0x3f/0xa0
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: RIP: 0033:0x7f41c473e987
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: RSP: 002b:00007ffe80a28648 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: RAX: ffffffffffffffda RBX: 00000000000000c8 RCX: 00007f41c473e987
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: RDX: 00000000000000c8 RSI: 000055be8e4f7320 RDI: 0000000000000004
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: RBP: 000055be8e4f7320 R08: 0000000000000000 R09: 0000000000000000
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: R10: 0000000000001000 R11: 0000000000000246 R12: 00000000000000c8
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: R13: 0000000000000004 R14: 00007ffe80a28970 R15: 000055be8d383848
+> Oct 16 09:48:47 hv1.ewheeler.net kernel: </TASK>
 
