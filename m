@@ -1,100 +1,153 @@
-Return-Path: <netdev+bounces-42292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 712EF7CE14C
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:35:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3234D7CE16C
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 17:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE3FAB20F57
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 15:35:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34A97B2135A
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 15:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEE43AC34;
-	Wed, 18 Oct 2023 15:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5FC3B2AE;
+	Wed, 18 Oct 2023 15:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dX0U2cBo"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Oe+C2tKY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD28127700;
-	Wed, 18 Oct 2023 15:35:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0DD1C433CB;
-	Wed, 18 Oct 2023 15:35:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697643318;
-	bh=G5i8rgjTCdOtkBia7NJ0E9GJAWq1PZebZiERkTNe52E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dX0U2cBoWRWmcHydY9D9KSYvZpUnGeb2cpV+ocZB3ONcBjC3T4ZKs49Ew9dA+8BoC
-	 Y0JPEkDF4yajF2eBhJ2V0Xt0Ymf5AVbFjbu7VEgW+wXLXOuC5GFq583ukUYgH3JqbC
-	 cA2L5DP6sa+LLunVH0l3Zpyj01qBLs5QkH2MhH3ArZ0m9ZXiLJh9qrgFwVWTIO3q37
-	 jhOkDnSFGhKwCNxgk+tm9i9uYhM+dyQgI63KXCo9F+zea3MBS38B69SG+xmcY2yo42
-	 C5seO0cGRTia54M0QNvEF5igJu2sECklqwkMi50rOnnVSffkQlmb2ftQ/g7t3wenX7
-	 hSUx4dsqOuHiw==
-Date: Wed, 18 Oct 2023 08:35:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Matthias Brugger
- <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, <bpf@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>,
- <linux-mediatek@lists.infradead.org>, Alexander Duyck
- <alexander.duyck@gmail.com>
-Subject: Re: [PATCH net-next v11 0/6] introduce page_pool_alloc() related
- API
-Message-ID: <20231018083516.60f64c1a@kernel.org>
-In-Reply-To: <67f2af29-59b8-a9e2-1c31-c9a625e4c4b3@huawei.com>
-References: <20231013064827.61135-1-linyunsheng@huawei.com>
-	<20231016182725.6aa5544f@kernel.org>
-	<2059ea42-f5cb-1366-804e-7036fb40cdaa@huawei.com>
-	<20231017081303.769e4fbe@kernel.org>
-	<67f2af29-59b8-a9e2-1c31-c9a625e4c4b3@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CECDF3B288
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 15:45:05 +0000 (UTC)
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36EFC118;
+	Wed, 18 Oct 2023 08:45:04 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39IFinrK079557;
+	Wed, 18 Oct 2023 10:44:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1697643889;
+	bh=/ZywHds19OF8HgvTVTSGg8Wo3OLLlAOYwDmxLDtIUMI=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=Oe+C2tKY9UB/+03MhksDPTI9LlmzUpd1II2ZhfYIPlV+t5hcan100OuXwJfrBF33J
+	 W93rOEkMI0mR5RdGp32+ZBNEXgBnGP3VV4TNHGQ8Duzndv8AAHKE55QqLUgcRbIxoY
+	 dE4EmZwVR/R+KHAup/hz7dOT44ShcigrueL5XLOs=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39IFin8o029902
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 18 Oct 2023 10:44:49 -0500
+Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 18
+ Oct 2023 10:44:48 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE114.ent.ti.com
+ (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 18 Oct 2023 10:44:48 -0500
+Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39IFim0D005933;
+	Wed, 18 Oct 2023 10:44:48 -0500
+Date: Wed, 18 Oct 2023 10:44:48 -0500
+From: Nishanth Menon <nm@ti.com>
+To: Ravi Gunasekaran <r-gunasekaran@ti.com>,
+        Neha Malcom Francis
+	<n-francis@ti.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <rogerq@ti.com>, <andrew@lunn.ch>,
+        <f.fainelli@gmail.com>, <horms@kernel.org>,
+        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        Thejasvi Konduru <t-konduru@ti.com>,
+        <linux-arm-kernel@lists.infradead.org>, <u-kumar1@ti.com>
+Subject: Re: [PATCH net-next] net: ethernet: ti: davinci_mdio: Fix the
+ revision string for J721E
+Message-ID: <20231018154448.vlunpwbw67xeh4rj@unfasten>
+References: <20231018140009.1725-1-r-gunasekaran@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231018140009.1725-1-r-gunasekaran@ti.com>
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 18 Oct 2023 19:47:16 +0800 Yunsheng Lin wrote:
-> > mention it in the documentation. Plus the kdoc of the function should
-> > say that this is just a thin wrapper around other page pool APIs, and
-> > it's safe to mix it with other page pool APIs?  
+On 19:30-20231018, Ravi Gunasekaran wrote:
+> Prior to the commit 07e651db2d78 ("soc: ti: k3-socinfo: Revamp driver
+> to accommodate different rev structs"), K3 SoC's revision was
+> interpreted as an incremental value or one-to-one mapping of the
+> JTAG_ID's variant field. Now that the revision mapping is fixed,
+> update the correct revision string for J721E in k3_mdio_socinfo,
+> so that MDIO errata i2329 is applied for J721E SR1.1.
 > 
-> I am not sure I understand what do 'safe' and 'mix' mean here.
+> Fixes: 07e651db2d78 ("soc: ti: k3-socinfo: Revamp driver to accommodate different rev structs")
+> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+> ---
+>  drivers/net/ethernet/ti/davinci_mdio.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> For 'safe' part, I suppose you mean if there is a va accociated with
-> a 'struct page' without calling some API like kmap()? For that, I suppose
-> it is safe when the driver is calling page_pool API without the
-> __GFP_HIGHMEM flag. Maybe we should mention that in the kdoc and give a
-> warning if page_pool_*alloc_va() is called with the __GFP_HIGHMEM flag?
-
-Sounds good. Warning wrapped in #if CONFIG_DEBUG_NET perhaps?
-
-> For the 'mix', I suppose you mean the below:
-> 1. Allocate a page with the page_pool_*alloc_va() API and free a page with
->    page_pool_free() API.
-> 2. Allocate a page with the page_pool_*alloc() API and free a page with
->    page_pool_free_va() API.
+> diff --git a/drivers/net/ethernet/ti/davinci_mdio.c b/drivers/net/ethernet/ti/davinci_mdio.c
+> index 628c87dc1d28..998fe2717cf9 100644
+> --- a/drivers/net/ethernet/ti/davinci_mdio.c
+> +++ b/drivers/net/ethernet/ti/davinci_mdio.c
+> @@ -519,7 +519,7 @@ static const struct soc_device_attribute k3_mdio_socinfo[] = {
+>  	{ .family = "J7200", .revision = "SR1.0", .data = &am65_mdio_soc_data },
+>  	{ .family = "J7200", .revision = "SR2.0", .data = &am65_mdio_soc_data },
+>  	{ .family = "J721E", .revision = "SR1.0", .data = &am65_mdio_soc_data },
+> -	{ .family = "J721E", .revision = "SR2.0", .data = &am65_mdio_soc_data },
+> +	{ .family = "J721E", .revision = "SR1.1", .data = &am65_mdio_soc_data },
+>  	{ .family = "J721S2", .revision = "SR1.0", .data = &am65_mdio_soc_data},
+>  	{ /* sentinel */ },
+>  };
 > 
-> For 1, it seems it is ok as some virt_to_head_page() and page_address() call
-> between va and 'struct page' does not seem to change anything if we have
-> enforce page_pool_*alloc_va() to be called without the __GFP_HIGHMEM flag.
-> 
-> For 2, If the va is returned from page_address() which the allocation API is
-> called without __GFP_HIGHMEM flag. If not, the va is from kmap*()? which means
-> we may be calling page_pool_free_va() before kunmap*()? Is that possible?
+> base-commit: 2dac75696c6da3c848daa118a729827541c89d33
 
-Right, if someone passes kmap()'ed address they are trying quite hard
-to break their own driver. Technically possible but I wouldn't worry.
+Uggh.. This is a bit of chicken or hen problem here that creates
+bisectability issues (thanks for linux-next for exposing this).
 
-I just mean that in the common case of non-HIGHMEM page, calling
-page_pool_free_va() with the address returned by page_address() 
-is perfectly legal.
+Neha's patch I picked up is a valid fix, though this side effect was
+unfortunate.
+
+My suggestion is:
+a) I will drop
+   https://lore.kernel.org/all/20231016101608.993921-4-n-francis@ti.com/
+   from my queue for this window.
+b) please identify other places where we could have this situation.
+https://www.ti.com/lit/pdf/spruiu1 seems to indicate just SR1.0 for
+J7200.
+
+We then have the following steps potentially
+
+Drop the fixes and Maintain both SR2.0 and SR1.0 (add SR1.1) so that
+we can merge the socinfo fixes without breaking bisectability.
+
+To merge, the following options exist:
+A) netdev maintainers could provide me an rc1 based immutable tag
+B) if netdev maintainers can give me a ack to carry this patch(or patch
+   series for relevant SoCs) on my tree, I can apply the fixes before
+   picking up the socinfo fixups.
+C) I can wait a kernel window to the nearest rc1 *after* netdev fixes
+   are merged in to pick up socinfo fix.
+
+Once A/B/C is done (I would like netdev maintainers to suggest which way
+to go), we can drop the "invalid" SoC SR ID.
+
+I don't see a cleaner way to get this inter-dependency integrated.
+
+Also in the future, please CC me as the reporter and for Soc-fixes
+dependency issues (I am listed in the MAINTAINERS file).
+
+-- 
+Regards,
+Nishanth Menon
+Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
 
