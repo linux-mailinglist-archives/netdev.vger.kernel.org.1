@@ -1,203 +1,293 @@
-Return-Path: <netdev+bounces-42400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AEA67CE968
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 22:51:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B0C27CE978
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 22:58:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A43DD1C208D9
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:51:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADCBB1C20BA4
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 20:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A96A199B8;
-	Wed, 18 Oct 2023 20:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC44F1EB55;
+	Wed, 18 Oct 2023 20:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YN8zqvo5"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="dqahTBii"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC0F3E017
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 20:51:15 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BB739B;
-	Wed, 18 Oct 2023 13:51:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697662275; x=1729198275;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=u9DO9876tOY+pPgtwgiaEgaKpQMj1fbOYHNHjIJ7/mw=;
-  b=YN8zqvo5qLWpEiE8qE3GfsfjMXOYrhrwXu4+qDyZyLjsTyaeM46JSkpS
-   FfccDFL3K7i1wmK2+GigaB05RAkImNRLC6zoZqcfe1WBQwgTiugJ2xcKj
-   dLsY0UNl5kAZSmSuPaMeG0zUjuaTidBcpVqnVK/xNE3TZit0BHP1ccYnB
-   YgTSlk06XV1HeQ/TMZbdgxDic8a6Xj/DNiev7GA2PUyj3BJ7GcbwxfX3Q
-   pVSVmaRTwkQ/oWXGOGRXHnOaNK8OF/a1x6vqN4yARD3JSA27ED/5TnTb6
-   Xiopgv2YOXIb2uMmHxkbUvURQ9G0QfjcTq1inXEbFkjKMYHQHaL60HQbT
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="7658641"
-X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
-   d="scan'208";a="7658641"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 13:34:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,235,1694761200"; 
-   d="scan'208";a="4492757"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Oct 2023 13:33:22 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 18 Oct 2023 13:34:29 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 18 Oct 2023 13:34:29 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Wed, 18 Oct 2023 13:34:29 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 18 Oct 2023 13:34:28 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QQU7R+wNx+Yxfdne1EVasbQcYAd9kaqHQUj8g8I54omPIgJ35vrBwsaRdpUjMvKgyhcoT7m5+cSfGt30mRB27bRFOIvr2RKjuCk0si/BWUETwPLIv2KJaWMT0ha+CeE100kXVSZNwms37sY4EVjDYQr4un9JdAFoKHpnhmKJwtTysjAPimnBg7Vfkn25/E7hgQ17WYtxqq54XK9M49sGDzwZSEhj8ljYY8Lcn7MTa0CGnuw3JF0L3ZnflZprSP1uNGi6ZqHBoSzMPPS6FQ7pQAFxkizBp5I9iI3FsEB+q6Z6KHHK/bTC0gMGCoBfThN2Y9GEKkIbH8IN5fe9IZ/bnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jrvFcnZzvD4NxjpqTuvHhCV46sISBuKglVL6Go0cpf0=;
- b=Ybog6zM5Yay9RsfL2mLDK69CpN5zZybQqzhbRN6rVKvcyKEnZ7axlWfcIycnSoj0MZMdhECvYy+xxpQloKdiQFra/w2dluqahtVsAaI0Cw7ZbQMBLu8X4L9a8TYfFDtaSZZvDL5yOFZkWFLjajqGVcRrc2aUZ1JaHnsQPffIXQ3PTvK7xq5U9yRKjRTPgStFek1s+4dK6i0oMpGmhEqKGc4Xn/ChQ2UwyqJOGu4pY05mwOvlyln07IIJ9xL+4xk8fUY9NmS6MUcW6Y4ZekrmtMfpXvpSPWxbcJzsuZxggaVlGicG+HJbii7wdD6xpwaQrua6YwY0UdSyWpQVTIsQGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
- by DM4PR11MB5487.namprd11.prod.outlook.com (2603:10b6:5:39f::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.23; Wed, 18 Oct
- 2023 20:34:27 +0000
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::7666:c666:e6b6:6e48]) by BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::7666:c666:e6b6:6e48%4]) with mapi id 15.20.6907.021; Wed, 18 Oct 2023
- 20:34:27 +0000
-Message-ID: <ef479074-966f-142d-2839-f5bb690b5d76@intel.com>
-Date: Wed, 18 Oct 2023 22:34:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH net-next] ptp: prevent string overflow
-Content-Language: en-US
-To: Dan Carpenter <dan.carpenter@linaro.org>, Xabier Marquiegui
-	<reibax@gmail.com>
-CC: Richard Cochran <richardcochran@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, <netdev@vger.kernel.org>,
-	<kernel-janitors@vger.kernel.org>
-References: <d4b1a995-a0cb-4125-aa1d-5fd5044aba1d@moroto.mountain>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <d4b1a995-a0cb-4125-aa1d-5fd5044aba1d@moroto.mountain>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0010.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:c8::9) To BYAPR11MB3672.namprd11.prod.outlook.com
- (2603:10b6:a03:fa::30)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5EF134BF
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 20:58:18 +0000 (UTC)
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3097FA
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 13:58:15 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-405497850dbso68118475e9.0
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 13:58:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1697662694; x=1698267494; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PGehmYN8Ky9/qdFKGljwOvuW+bvnZbHPSI7WueW+eeI=;
+        b=dqahTBiibTygGNpA4nmG9R7uMrkk1KTWppoGv4Z/+eK9p0dS3hPLRNm+xO57HwpU1t
+         A8mzrRdDypU5C0HHHdDy4NMNsL8nILe/u+e0pyZ1jB8Q9ekNbiUvro2/OR9VZVvmkAeW
+         cVWzkdf5gXorczZGvuMSuksCD3IVtOWNZ6r+zIJr8GoCatgoxmRunjesDzKXHb0A25Go
+         uc2OFUwO/mXlC9QwQx6DoNfoIgUU12ODmF8I6e+8KPcBIItpVXPzm4T27xFa/5HZj3Y3
+         7Ygmnoh/8zRojQFxLsB95QeXTuXWSY+DeyvqgtdyJ8mXrsjdk9fGD/b3AJawSlyKEXVL
+         JJAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697662694; x=1698267494;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PGehmYN8Ky9/qdFKGljwOvuW+bvnZbHPSI7WueW+eeI=;
+        b=vOrbE9I0n0Mf0ujhRyelXyxerhWLjTrghTsix5CX4yRB1BhGBZgVCdlpBRUvhk7eMS
+         fPtIZvVuqRmAnz7SmyMQUv02rP9APWB/kam+H97zak4Gcsb9KsI/NfBEoynVhEdGWIaU
+         NDkQc7/CkZnHX0I69hgcwSGmOiJkA1+lGdXlgsLp0uXiVZxj/m3b07E++YstGGSxtT+U
+         X5LdcbbvxWAIc7Z083UZ7Q204c4cMoZ7yJrSm8U7rWExnNcUE+CnpN/7tBVizooLIVvS
+         GW5Q7p3Yhz9XeZpzz2VWJ2SUfSoKVFJY2PlC7ims5Iiz2xpaab4BGEhJAyufo/o46g/w
+         o9qw==
+X-Gm-Message-State: AOJu0YzD91JLiPw+jaIOLb15D1ok6RgGLXSg5xAbrQsw8QXE7E1NOxyj
+	Zz//xKNO66aBGi5gRiEbAkSX6A==
+X-Google-Smtp-Source: AGHT+IG60tbaNUvk1jN5vD1KFbEiMcP6M0PQBK1rS5pG6qb1LHSMiub03bai6DdYhZHjL5WpNkKbJA==
+X-Received: by 2002:a05:600c:4714:b0:405:3d41:5646 with SMTP id v20-20020a05600c471400b004053d415646mr408301wmo.2.1697662694320;
+        Wed, 18 Oct 2023 13:58:14 -0700 (PDT)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id x19-20020a05600c421300b003fc16ee2864sm2569006wmh.48.2023.10.18.13.58.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Oct 2023 13:58:13 -0700 (PDT)
+From: Dmitry Safonov <dima@arista.com>
+To: David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org,
+	Dmitry Safonov <dima@arista.com>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Bob Gilligan <gilligan@arista.com>,
+	Dan Carpenter <error27@gmail.com>,
+	David Laight <David.Laight@aculab.com>,
+	Dmitry Safonov <0x7f454c46@gmail.com>,
+	Donald Cassidy <dcassidy@redhat.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	Francesco Ruggeri <fruggeri05@gmail.com>,
+	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Ivan Delalande <colona@arista.com>,
+	Leonard Crestez <cdleonard@gmail.com>,
+	"Nassiri, Mohammad" <mnassiri@ciena.com>,
+	Salam Noureddine <noureddine@arista.com>,
+	Simon Horman <horms@kernel.org>,
+	"Tetreault, Francois" <ftetreau@ciena.com>,
+	netdev@vger.kernel.org,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v15 net-next 00/23] net/tcp: Add TCP-AO support
+Date: Wed, 18 Oct 2023 21:57:14 +0100
+Message-ID: <20231018205806.322831-1-dima@arista.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|DM4PR11MB5487:EE_
-X-MS-Office365-Filtering-Correlation-Id: 02b2be1f-e221-414a-b7a8-08dbd0199ec8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0egI8Hdi1xkGsix0oPXy8+fvauUbvW6IVw+OXHddQvqvNXANqVfS+t46rPcDdRNqnA8R6YfAuXTZgsmktGGaSIiuy84t1pgqUWyNtZ+tvM0+LtLSY9aCcpP8rjhy7Looy4dVrF0iyp20qcHMmalg14/z+sZBQrjssNvtJAthXP0kc1Vvv6V46AKJwIE3QH/4T0fCPgeAr8+vfyPs4oM1W2Vo42XMECNMjMF9RlfbTaWQwFr99viZqP0AU/dIANBz83pqKgbczCGF62k+tJWqVwU4tfVgjIoEy3bcnuoi4P1vHV41ggcOjAwBWVFvh/XUTlDeb/13iwyxNdVH5jyyI560Ntje8SGyuZYaodg9jiNSGUmezn507cla9U3yz/O6pxYEjLIvNNoYagCzOBLZ4abTCZVYDWCm41Hu6yVPvvFuLUzBNV+pNj3oZcrjNgYOoXkvfEtyY7ESITgAguFhesPxkmwX9rbsqh033nM6lSz59e0lX2jgjiROZs/843dYa4M6awtHmhNki/UdJED7sstA/ZZ1wzYPKG9Wcx76VCkp/dWNfCY71Jz6KPv6MDXQ9834OKsccmOXIWxKoOUQfVPpDSATHNwNtJSJZWZZGgOayQxEb++eWg8a7gAwunHlwjsKNAg34XaY+t0APB5ytw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(136003)(396003)(39860400002)(230922051799003)(1800799009)(451199024)(64100799003)(186009)(83380400001)(38100700002)(66476007)(6512007)(36756003)(2616005)(316002)(31696002)(86362001)(110136005)(8936002)(66556008)(54906003)(41300700001)(5660300002)(6666004)(2906002)(8676002)(4326008)(66946007)(478600001)(53546011)(6506007)(6486002)(82960400001)(26005)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MkZSV0swWlNBWWlJSnVXbkJFUURnb2dVaW5qQy9kNzZ6TXh6bVl2b2ZHMnRL?=
- =?utf-8?B?QVZ2a3lNcE5MeC8wV1hQK3NkL3lmUHpNb0RXcldJOUdhdWd2b3lEM0JyeE1x?=
- =?utf-8?B?USttRms4UlYvMWhNQXNLZHlRVzZ0TG5MeWVIdW1FNWhwQy8zaEVrNVN4blJz?=
- =?utf-8?B?anRZQWdHZVNjdFBqcW50U0h5ZHRKOFhSMVFJbTNBS2ZyN0RIeUg2ZmxZeHJo?=
- =?utf-8?B?bWcvbWd5eWg1bFdzeW9keTdnZFV3amd3RnJiL0R0R2tFTHFId3lFbGxON1JX?=
- =?utf-8?B?bEZJTDk1RmJGWXIwOU5lZEV5NlFOV3ZEQm15d1hzamlUUnBzZy82NXhlSFVr?=
- =?utf-8?B?MHM5N2JEOUlwdGJYZHo4bnhaQU1YU1VlN2FDRFduZklRMWFXU1d3S3ZiU2Zm?=
- =?utf-8?B?TUttbHYvNVdwRDBtK2M0R2NqS2FUUFJ5YjJUejNvbGEwN0l5akFtSmlBb1RL?=
- =?utf-8?B?SVJXb055RE1kUlZWR0F4ZTRubml3REI2cVhwdTYxK2l4VnBwbWNnTmthOURx?=
- =?utf-8?B?cG5zMk5ya1dIQ1VMTVVSMUNEcVhON25XU1JtUWdPVXZSNmgyU0RtOG1XV1E3?=
- =?utf-8?B?ME16M1VhRFRrSWdaekNUWlgvL1BjamV4NHZJSU1HVm94NWRSMDN0Ykx4a0RL?=
- =?utf-8?B?cFBKVmdvWVVVZFZNUHVCRkszbm5qNy9Zbk1LZ1FRSnFYN1JpRmUwYUxYNVJn?=
- =?utf-8?B?Wm95c000ZW1yNXJLTGNCTFBidWg2YzVmdzJDRUNlcGp4ZUpibVhXTk1UWHVS?=
- =?utf-8?B?RFBZNURsSmFPVk90ZjVmNnZGZGFmbHJPMFNoeUJWRXVrdDJ0VnBiek91VkY4?=
- =?utf-8?B?dE42aDk1YkFQSVdQV2Y1MXdRdGl5Qld0S28wY0hObEZtazVDNjhtWjdCNEF5?=
- =?utf-8?B?Uks5UldXcHo1SHZJRFJ1YldvSk9hV0JFU05TOVVHUGo3RGFjclNVYlVJQVlK?=
- =?utf-8?B?b3gwZmh5NEg1YkRkN1RRNWlDM2Q5YTFxNEdyYzErSEtKKzRLemlXYXJycjVx?=
- =?utf-8?B?aXhDRzlVdDlOWFR6OW40NnpTemd2ZUpnL01zYkdHQkdOWmVsOUY0Q3g5c0lx?=
- =?utf-8?B?Qi83d3hpK3J3UTZxaHpxWVNkQ1paNHJIaE9GenBUS2RIU2tVVkN6VUtpNlVT?=
- =?utf-8?B?YzRTd2xMZktYc0tObWIvbENGMmtzRXY4Qi91R0pqaG5VVVJ0eEorTUhVRjV5?=
- =?utf-8?B?cVFiQ2hEMUFMSFo5NWVtaUZOKy9jWnFhL0ZSbHVJakVYU255cEF1OXM0a3Jt?=
- =?utf-8?B?TFl0VnVQZW1IQ1hXcm0zYWY0aU5KR3ZuWmFhb3VmQUdnSzRsZDFsZElhbWFE?=
- =?utf-8?B?L1d4ZDh1QS9OSExmTkdReDdISWp2RTMvZXpXalMvVnRzdWVkYTNENjZ6bUM2?=
- =?utf-8?B?SXEvMWlxWkpVQ1h3bzFxb2ZpUktQa3ZFaXErNGgvQ0J4ZFIyeDNiNnNHaURR?=
- =?utf-8?B?N0JmdWVVT2V0SjNZWDRqamRxbkZ0MmVCenRWR3JNRzVGclRoNGl0dUdxQ3V2?=
- =?utf-8?B?VVllVDZrUkRFaGRucHVOT3hkOGVjVi9qMlpaejRyMUJ2K2NvVU9KRzRoUzhl?=
- =?utf-8?B?bDFOYXFYOHFjRHdsbkZKcHRIY1hlRGFDTXA1TERkeDBmNXk4TkNsNW1lcmF6?=
- =?utf-8?B?RXhod25USkUyUHNLczkvWWJnMVBCUmMveTVsakJlcHZ6bDRPaUtrS1pIaTls?=
- =?utf-8?B?eUJjK0lDMnA0WTZxNURqa1dqRzg2QmFWRWU1aDZqam9IaDMzajZRUElyQWk2?=
- =?utf-8?B?MG9XM1JtUUdndlZPYzM1UDFDUzRsVUlTWUNaN3haZ21KT1ZlNWI0alJ1Uzh6?=
- =?utf-8?B?NVFxbmlCMitVV0MydEN6dGVxUWNWUC9WNkhKOEk4TjZNOGNUNUs4MFVTbWs3?=
- =?utf-8?B?a1F0SjN5UDdDdUVWYnZoS2xFS2ZKN2QxMmM1ZzU5NHh0RTc2MkJxcktQWU5j?=
- =?utf-8?B?c1hGdTA2UjVoWXRXUS9wYVFRZk9UNFRKUW12SlkzKzZlZjhzYUVZOWxRYmV3?=
- =?utf-8?B?QW5EenJmWWNLUktqSDZYM0M2N24yb1VZTlN2MmhmZTR1MnJTbUVpVmptMHJk?=
- =?utf-8?B?N2pyRWZKelQ0TENMR1pCcW0rT3krZnBRRVNlUThPNFZUUkMzQTE4dERKTlJD?=
- =?utf-8?B?YkJzSTQ1UjdDTHFjamRWbmMxdVFzQk9DL21rUmFoVHFQZVhBNENqRU9XaWV4?=
- =?utf-8?B?SXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02b2be1f-e221-414a-b7a8-08dbd0199ec8
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2023 20:34:26.6373
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AR9Gty9+XyyVwnSjSFOROWjh3/zSmGCYASNnpNOeG6TVHnDIuFzJyyfHudGavZK6357pYnhNV1meI8MqicW4IGOe28nd6jFGIVb9OBBdfCk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5487
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 10/18/23 16:20, Dan Carpenter wrote:
-> The ida_alloc_max() function can return up to INT_MAX so this buffer is
-> not large enough.  Also use snprintf() for extra safety.
-> 
-> Fixes: 403376ddb422 ("ptp: add debugfs interface to see applied channel masks")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->   drivers/ptp/ptp_clock.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index 2e801cd33220..3d1b0a97301c 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -220,7 +220,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->   	struct ptp_clock *ptp;
->   	struct timestamp_event_queue *queue = NULL;
->   	int err = 0, index, major = MAJOR(ptp_devt);
-> -	char debugfsname[8];
-> +	char debugfsname[16];
->   	size_t size;
->   
->   	if (info->n_alarm > PTP_MAX_ALARMS)
-> @@ -343,7 +343,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->   	}
->   
->   	/* Debugfs initialization */
-> -	sprintf(debugfsname, "ptp%d", ptp->index);
-> +	snprintf(debugfsname, sizeof(debugfsname), "ptp%d", ptp->index);
->   	ptp->debugfs_root = debugfs_create_dir(debugfsname, NULL);
->   
->   	return ptp;
+Hi,
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+This is version 15 of TCP-AO support. It addresses Eric's review
+comments (thanks!) and fixes the issue reported by kernel test
+robot (by Oliver). Other than that, selftests refactoring changes.
+
+There's one Sparse warning introduced by tcp_sigpool_start():
+__cond_acquires() seems to currently being broken. I've described
+the reasoning for it on v9 cover letter. Also, checkpatch.pl warnings
+were addressed, but yet I've left the ones that are more personal
+preferences (i.e. 80 columns limit). Please, ping me if you have
+a strong feeling about one of them.
+
+The following changes since commit c4eee56e14fe001e1cff54f0b438a5e2d0dd7454:
+
+  net: skb_find_text: Ignore patterns extending past 'to' (2023-10-18 11:09:55 +0100)
+
+are available in the Git repository at:
+
+  git@github.com:0x7f454c46/linux.git tcp-ao-v15
+
+for you to fetch changes up to 70168f1d401f70f0a952f9738f62e45acba6ae9f:
+
+  Documentation/tcp: Add TCP-AO documentation (2023-10-18 20:53:16 +0100)
+
+----------------------------------------------------------------
+
+And another branch with selftests, that will be sent later separately:
+
+  git@github.com:0x7f454c46/linux.git tcp-ao-v15-with-selftests
+
+Thanks for your time and reviews,
+         Dmitry
+
+--- Changelog ---
+
+Changes from v14:
+- selftests: Refactored (enum test_fault) into tcp_ao selftest's lib/
+- selftests: Refactored should_skip_test(), TEST_NEEDS_MD5,
+  TEST_NEEDS_VRF, check_*_support() into lib/kconfig.c
+- selftests: checked that tests are properly SKIPed when kernel config
+  doesn't have required options enabled: net_ns, veth, tcp_ao and
+  optionally tcp_md5, net_vrf
+- Corrected Simon's email as his corigine address bounces back
+- Fix missed ifdeffery for rcu_read_lock() in tcp_v6_send_reset()
+  (kernel test robot <oliver.sang@intel.com>)
+- Move tcp_key::sne after tcp_key::traffic_key to avoid a hole (Eric)
+- In patch that wires up RST packets move TCPF_TIME_WAIT sk_state check
+  to (TCPF_LISTEN | TCPF_NEW_SYN_RECV) checks in
+  tcp_ao_prepare_reset(). (Eric)
+- Converted tcp_ao_info::refcnt from atomic_t to refcount_t (Eric)
+- Removed TODO comment in tcp_ao_connect_init(): can't happen because of
+  the checks in tcp_connect(). Added WARN_ON_ONCE() if anything gets
+  broken.
+
+Version 14: https://lore.kernel.org/all/20231009230722.76268-1-dima@arista.com/T/#u
+
+Changes from v13:
+- Converted Documentation/ page from human unreadable list-table::
+  to grid-table(s) (Jonathan)
+
+Version 13: https://lore.kernel.org/all/20231004223629.166300-1-dima@arista.com/T/#u
+
+Changes from v12:
+- Separate TCP-AO sign from __tcp_transmit_skb() into a separate
+  function for code locality and readability (Paolo)
+- Add TCP-AO self-connect selftest, which by its nature is a selftest
+  for TCP simultaneous open, use different keyids and check tcp repair
+- Fix simultaneous open: take correct ISNs for verification,
+  pre-calculate sending traffic key on SYN-ACK, calculate receiving
+  traffic key before going into TCP_ESTABLISHED
+- Use kfree_sensitive() for hardening purposes
+- Use READ_ONCE() on sk->sk_family when not under socket lock to prevent
+  any possible race with IPV6_ADDRFORM
+
+Version 12: https://lore.kernel.org/all/20230918190027.613430-1-dima@arista.com/T/#u
+
+Changes from v11:
+- Define (struct tcp_key) for tcp-fast path and detect by type what key
+  was used. This also benefits from TCP-MD5/TCP-AO static branches (Eric)
+- Remove sk_gso_disable() from TCP-AO fast-path in __tcp_transmit_skb()
+  (Eric)
+- Don't leak skb on failed kmalloc() in __tcp_transmit_skb() (Eric)
+- skb_dst_drop() is not necessary as kfree_skb() calls it (Eric)
+- Don't dereference tcp_ao_key in net_warn_ratelimited(), outside of
+  rcu_read_lock() (Eric)
+
+Version 11: https://lore.kernel.org/all/20230911210346.301750-1-dima@arista.com/T/#u
+
+Changes from v10:
+- Make seq (u32) in tcp_ao_prepare_reset() and declare the argument
+  in "net/tcp: Add TCP-AO SNE support", where it gets used (Simon)
+- Fix rebase artifact in tcp_v6_reqsk_send_ack(), which adds
+  compile-error on a patch in the middle of series (Simon)
+- Another rebase artifact in tcp_v6_reqsk_send_ack() that makes
+  keyid, requested by peer on ipv6 reqsk ACKs not respected (Simon)
+
+Version 10: https://lore.kernel.org/all/20230815191455.1872316-1-dima@arista.com/T/#u
+
+The pre-v10 changelog is on version 10 cover-letter.
+
+Cc: Andy Lutomirski <luto@amacapital.net>
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: Bob Gilligan <gilligan@arista.com>
+Cc: Dan Carpenter <error27@gmail.com>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: David Laight <David.Laight@aculab.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Donald Cassidy <dcassidy@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: "Eric W. Biederman" <ebiederm@xmission.com>
+Cc: Francesco Ruggeri <fruggeri05@gmail.com>
+Cc: Gaillardetz, Dominik <dgaillar@ciena.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+Cc: Ivan Delalande <colona@arista.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Leonard Crestez <cdleonard@gmail.com>
+Cc: Nassiri, Mohammad <mnassiri@ciena.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Salam Noureddine <noureddine@arista.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Tetreault, Francois <ftetreau@ciena.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+Dmitry Safonov (23):
+  net/tcp: Prepare tcp_md5sig_pool for TCP-AO
+  net/tcp: Add TCP-AO config and structures
+  net/tcp: Introduce TCP_AO setsockopt()s
+  net/tcp: Prevent TCP-MD5 with TCP-AO being set
+  net/tcp: Calculate TCP-AO traffic keys
+  net/tcp: Add TCP-AO sign to outgoing packets
+  net/tcp: Add tcp_parse_auth_options()
+  net/tcp: Add AO sign to RST packets
+  net/tcp: Add TCP-AO sign to twsk
+  net/tcp: Wire TCP-AO to request sockets
+  net/tcp: Sign SYN-ACK segments with TCP-AO
+  net/tcp: Verify inbound TCP-AO signed segments
+  net/tcp: Add TCP-AO segments counters
+  net/tcp: Add TCP-AO SNE support
+  net/tcp: Add tcp_hash_fail() ratelimited logs
+  net/tcp: Ignore specific ICMPs for TCP-AO connections
+  net/tcp: Add option for TCP-AO to (not) hash header
+  net/tcp: Add TCP-AO getsockopt()s
+  net/tcp: Allow asynchronous delete for TCP-AO keys (MKTs)
+  net/tcp: Add static_key for TCP-AO
+  net/tcp: Wire up l3index to TCP-AO
+  net/tcp: Add TCP_AO_REPAIR
+  Documentation/tcp: Add TCP-AO documentation
+
+ Documentation/networking/index.rst  |    1 +
+ Documentation/networking/tcp_ao.rst |  444 +++++
+ include/linux/sockptr.h             |   23 +
+ include/linux/tcp.h                 |   30 +-
+ include/net/dropreason-core.h       |   30 +
+ include/net/tcp.h                   |  288 +++-
+ include/net/tcp_ao.h                |  362 ++++
+ include/uapi/linux/snmp.h           |    5 +
+ include/uapi/linux/tcp.h            |  105 ++
+ net/ipv4/Kconfig                    |   17 +
+ net/ipv4/Makefile                   |    2 +
+ net/ipv4/proc.c                     |    5 +
+ net/ipv4/syncookies.c               |    4 +
+ net/ipv4/tcp.c                      |  246 +--
+ net/ipv4/tcp_ao.c                   | 2392 +++++++++++++++++++++++++++
+ net/ipv4/tcp_input.c                |   98 +-
+ net/ipv4/tcp_ipv4.c                 |  363 +++-
+ net/ipv4/tcp_minisocks.c            |   50 +-
+ net/ipv4/tcp_output.c               |  236 ++-
+ net/ipv4/tcp_sigpool.c              |  358 ++++
+ net/ipv6/Makefile                   |    1 +
+ net/ipv6/syncookies.c               |    5 +
+ net/ipv6/tcp_ao.c                   |  168 ++
+ net/ipv6/tcp_ipv6.c                 |  376 +++--
+ 24 files changed, 5174 insertions(+), 435 deletions(-)
+ create mode 100644 Documentation/networking/tcp_ao.rst
+ create mode 100644 include/net/tcp_ao.h
+ create mode 100644 net/ipv4/tcp_ao.c
+ create mode 100644 net/ipv4/tcp_sigpool.c
+ create mode 100644 net/ipv6/tcp_ao.c
+
+
+base-commit: c4eee56e14fe001e1cff54f0b438a5e2d0dd7454
+-- 
+2.42.0
+
 
