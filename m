@@ -1,130 +1,116 @@
-Return-Path: <netdev+bounces-42269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A5C47CDEEA
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:15:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B46297CDF66
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 16:21:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8422B21232
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:15:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4496DB212DF
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 14:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187BF374E3;
-	Wed, 18 Oct 2023 14:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5D437140;
+	Wed, 18 Oct 2023 14:21:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ht7n8uxp"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ziRE6AGi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBCA436B1A
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 14:15:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB807C4167D;
-	Wed, 18 Oct 2023 14:15:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697638508;
-	bh=Xpvl+g0oNeFoWTwknJBrTtcMvQrL8AL0rpbHBPxgMAU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ht7n8uxp5nPUteoKrTJEgRgLWvYsM8zdvEHp8uKxIVkQ4QPTQYfR1nEQcK7Pux6N2
-	 UJloOZbK8+RIoaryUNKMQSZ+Sk64IFovezKZNBIuhHiYSpyeVj0SryJajs+St/zZC2
-	 YdvQBx4zG7ZLutqQdYX2nTP/NvdvVoGnQMPLTXUgh6iaAAFVlWF65j0mi/+IlY+Jmz
-	 2vM0okQM6GK8WzcdnTtYzAc9/qXRkov5HR6MO2lrHfuyze8RIOV6TogBDVhXpfMDuP
-	 0veAFouKR1920ddGJeyh1OqZtDrCeFDGVtcOY9/inFOr0PtbCeHFeroGuFcv2KD2VX
-	 6ZUhbPz8mitMg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 08/11] net: macsec: indicate next pn update when offloading
-Date: Wed, 18 Oct 2023 10:14:50 -0400
-Message-Id: <20231018141455.1335353-8-sashal@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231018141455.1335353-1-sashal@kernel.org>
-References: <20231018141455.1335353-1-sashal@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD386374F5
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 14:21:37 +0000 (UTC)
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBF4F9000
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 07:20:17 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-32d849cc152so6175382f8f.1
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 07:20:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697638816; x=1698243616; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VMwfTW5sLakF4hd5w4/oY7o5mpcFlkM3nBeiv13a35Y=;
+        b=ziRE6AGiXzQE+pPOFRVDq9a0lYmPHXfkG7//tc488N1x6hhebXjWusjXX8zdjGfi1a
+         B1UPITjiwVyIpPrC4wm04cp7aHpUqwMKn1RNSZSf5wYSg16gJw1zNL+y1u1ZPOzR2l+d
+         msmPnYIbe+8QwBiSnmt8oOtN0bJ11uYKPOJKinCbvOKP8ZMUAprre30cPicM4Hz+D8a9
+         EWgo+IOXkZcqGtZEiS0NxHwTncjO6QhJ+UgVtFtjSEflgfh77+/9uFVWNJoD+4tcBfxX
+         ZXRjUiCpVP5oJo0wP88MqI/nWtL0nbRfGJqpaFIyNcO/KQew50LBCHi0v4kaic/yoj/j
+         3O/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697638816; x=1698243616;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VMwfTW5sLakF4hd5w4/oY7o5mpcFlkM3nBeiv13a35Y=;
+        b=PQXYPHMGMT43DU9kywyzQHsAZyauSVBbIxjIfYJ1N9yn/nuiuuCvPsbnuN9wumFmQV
+         ft/w+mYNxP1RlsiSLfs76AmB+MQI+FDqFNGYyIGF1XqRVqKCq805HgfgOobcPY/YccTf
+         rHl6+kxxsSYwqVvmi3v+kUz2nVfWJny8UqY6eRULk0ZdUN5l6YJW2NKNltSphZtATwY9
+         1fcI9TTxTPN6Sd17FpiUkmMlY8uVJ9EFyy6v5MiKoUBmnuhuZVzPWlriq1nX6Qq27nhw
+         KBNcqFQkWVCE6lswzcfwEt9X0kZSlxLDQhqiCfuJ2Jwi4K99StWEUmT1Euwji777SyIr
+         Szwg==
+X-Gm-Message-State: AOJu0Yxu+Uaz9WqAHDvj0aeJ21BbGJ1fLj9GcNssRe+Beokzj/pdUM60
+	yE0WgOHYIgnfh02KE86G7r2B+XN62JRazRTqoRM=
+X-Google-Smtp-Source: AGHT+IFnFsKqE7pLQfOFoMoo7c2gVgpY0VQGFq1MNOxPSVPFDy/2kfATaJYsqON657eh+It9ATQN/Q==
+X-Received: by 2002:a5d:568b:0:b0:317:393f:8633 with SMTP id f11-20020a5d568b000000b00317393f8633mr4087284wrv.58.1697638815705;
+        Wed, 18 Oct 2023 07:20:15 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id p14-20020adfcc8e000000b0032db1d741a6sm2222382wrj.99.2023.10.18.07.20.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Oct 2023 07:20:15 -0700 (PDT)
+Date: Wed, 18 Oct 2023 17:20:11 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Xabier Marquiegui <reibax@gmail.com>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] ptp: prevent string overflow
+Message-ID: <d4b1a995-a0cb-4125-aa1d-5fd5044aba1d@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.198
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+The ida_alloc_max() function can return up to INT_MAX so this buffer is
+not large enough.  Also use snprintf() for extra safety.
 
-[ Upstream commit 0412cc846a1ef38697c3f321f9b174da91ecd3b5 ]
-
-Indicate next PN update using update_pn flag in macsec_context.
-Offloaded MACsec implementations does not know whether or not the
-MACSEC_SA_ATTR_PN attribute was passed for an SA update and assume
-that next PN should always updated, but this is not always true.
-
-The PN can be reset to its initial value using the following command:
-$ ip macsec set macsec0 tx sa 0 off #octeontx2-pf case
-
-Or, the update PN command will succeed even if the driver does not support
-PN updates.
-$ ip macsec set macsec0 tx sa 0 pn 1 on #mscc phy driver case
-
-Comparing the initial PN with the new PN value is not a solution. When
-the user updates the PN using its initial value the command will
-succeed, even if the driver does not support it. Like this:
-$ ip macsec add macsec0 tx sa 0 pn 1 on key 00 \
-ead3664f508eb06c40ac7104cdae4ce5
-$ ip macsec set macsec0 tx sa 0 pn 1 on #mlx5 case
-
-Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: 403376ddb422 ("ptp: add debugfs interface to see applied channel masks")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
- drivers/net/macsec.c | 2 ++
- include/net/macsec.h | 1 +
- 2 files changed, 3 insertions(+)
+ drivers/ptp/ptp_clock.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-index 4fb58fc5ec95a..0ffcef2fa10af 100644
---- a/drivers/net/macsec.c
-+++ b/drivers/net/macsec.c
-@@ -2414,6 +2414,7 @@ static int macsec_upd_txsa(struct sk_buff *skb, struct genl_info *info)
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 2e801cd33220..3d1b0a97301c 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -220,7 +220,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	struct ptp_clock *ptp;
+ 	struct timestamp_event_queue *queue = NULL;
+ 	int err = 0, index, major = MAJOR(ptp_devt);
+-	char debugfsname[8];
++	char debugfsname[16];
+ 	size_t size;
  
- 		ctx.sa.assoc_num = assoc_num;
- 		ctx.sa.tx_sa = tx_sa;
-+		ctx.sa.update_pn = !!prev_pn.full64;
- 		ctx.secy = secy;
+ 	if (info->n_alarm > PTP_MAX_ALARMS)
+@@ -343,7 +343,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	}
  
- 		ret = macsec_offload(ops->mdo_upd_txsa, &ctx);
-@@ -2507,6 +2508,7 @@ static int macsec_upd_rxsa(struct sk_buff *skb, struct genl_info *info)
+ 	/* Debugfs initialization */
+-	sprintf(debugfsname, "ptp%d", ptp->index);
++	snprintf(debugfsname, sizeof(debugfsname), "ptp%d", ptp->index);
+ 	ptp->debugfs_root = debugfs_create_dir(debugfsname, NULL);
  
- 		ctx.sa.assoc_num = assoc_num;
- 		ctx.sa.rx_sa = rx_sa;
-+		ctx.sa.update_pn = !!prev_pn.full64;
- 		ctx.secy = secy;
- 
- 		ret = macsec_offload(ops->mdo_upd_rxsa, &ctx);
-diff --git a/include/net/macsec.h b/include/net/macsec.h
-index d6fa6b97f6efa..0dc4303329391 100644
---- a/include/net/macsec.h
-+++ b/include/net/macsec.h
-@@ -240,6 +240,7 @@ struct macsec_context {
- 	struct macsec_secy *secy;
- 	struct macsec_rx_sc *rx_sc;
- 	struct {
-+		bool update_pn;
- 		unsigned char assoc_num;
- 		u8 key[MACSEC_MAX_KEY_LEN];
- 		union {
+ 	return ptp;
 -- 
-2.40.1
+2.42.0
 
 
