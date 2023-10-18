@@ -1,71 +1,103 @@
-Return-Path: <netdev+bounces-42205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9204F7CDA81
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:33:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21B147CDA9C
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 13:37:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AF5F1C20A68
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:33:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B39AF281C6B
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2BA22F00;
-	Wed, 18 Oct 2023 11:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93A92E3E6;
+	Wed, 18 Oct 2023 11:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LbKF3B97"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q2lLG2lw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F243320338
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 11:33:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 992D7C433C8;
-	Wed, 18 Oct 2023 11:33:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697628814;
-	bh=vSmucRbdmxNfM/ypGsamkt/MH6nNlrA+0et1C5k6Y5w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LbKF3B97Er06Q3ZA6squSNECuJA5M+SrDufUjwhv+U1wp1cyIhnLfDaeU6LGlusgW
-	 ld6/i0qc4bW6oOQ5pZtLK2cjpz8YLXOgVwghwdMi4ojM9/bKfF6vDtBv3I+lZsTnDX
-	 bPZ40ewMR6BvHz0jyPbgGUy5qYxHqWoBzuzDKcnpM1ukHJtr9YT3Jy0NwECEBCa4Ip
-	 6yWFdoUYk97MpZ9ZAH9Z7TPQh5DVZX0NPrKG+64hOHXYjI3kYJTaQapIkKTIA63nE9
-	 l5Sxhv0VOJRjZcYARSk8X7vqRiWqp/P7Kh+zmASHOE8qia8yfb7FGdcyRw/WIsRcbn
-	 4fPCL0SWoTvRQ==
-Date: Wed, 18 Oct 2023 13:33:30 +0200
-From: Simon Horman <horms@kernel.org>
-To: Alexander Stein <alexander.stein@ew.tq-group.com>
-Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>, NXP Linux Team <linux-imx@nxp.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] net: fec: Fix device_get_match_data usage
-Message-ID: <20231018113330.GN1940501@kernel.org>
-References: <20231017063419.925266-1-alexander.stein@ew.tq-group.com>
- <20231017063419.925266-2-alexander.stein@ew.tq-group.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1565B2D03A
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 11:37:24 +0000 (UTC)
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 932BEFE
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 04:37:22 -0700 (PDT)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5a7afd45199so84707307b3.0
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 04:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697629042; x=1698233842; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ibBJyoflxMS2afxFGqsv5c5GwukKSXqA1+zh4x2as+k=;
+        b=q2lLG2lw8LkDsY/Fcj+qsMhuRDPN30MnTc6ddL82FBkdpEdyxTO4PwArBProNwvQtI
+         +fc3FHXUgjaej4mUJLCnu4N585chfulmBWStl9EsHShSPYBWn12H+t6ww4iV4rcIPOEm
+         eoM0abM+Y8ep7Uz47kZuBSFtq/6Ewd6Vk0/h/wYWplmFBrI32qMNYsGKsc1BFO6eqUph
+         HLLBZbrDSa+yFgW4Fx+MG4yjmcYrR/osRuEWbZTRvn8rsuW2X6N4fAdHqZHEltD2SN2P
+         150+rY5UVnzX2M/pAY+EJVkyavc3WSxk/rsqyPt5ouB4qsTi296AgTgVl6al03/WI7Sn
+         og1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697629042; x=1698233842;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ibBJyoflxMS2afxFGqsv5c5GwukKSXqA1+zh4x2as+k=;
+        b=KPCQvTb7Dpg4KU0Obr1w21+nMUubCIT/dOTma0ZZoCj83L2wPKuxybmEoj/gAGlkRU
+         8FfvGz5EQVqtmuOafQqz5MpFzrecDWV04Mip0YCEi4//ojEU3BmyP+c60Yt4KeFO/I0M
+         jdCWOCbQ0LAo+jHkOy8/wyAFAizEfFJapTFuSDe1rdTici0qbPDE5tg1GJV3mqMAi/PS
+         5nJj4h5bo2T8iABG2YqnmVdvNT+wNXKziCB1yWFjc+NMr4/FD+ObAaqV+r/oXMkwWY9a
+         N6XytyZh7/eBAF8pVerdjEQikDCl7PvGFpcxWQJP3Mq0WyrSsSkaATrW0kK8G0IhWnf8
+         PVAQ==
+X-Gm-Message-State: AOJu0YxVNyHTvePuddftGjjKXt8QshJloVkb5jFddUoyQgaIa94Xh3lx
+	R0FNMdAHN7nWXJxQ9pJhIQ0gT4Ho/wf8bSJrZvsSIA==
+X-Google-Smtp-Source: AGHT+IE75mXYYgUQv5l73Vl5L22dr+4CYg+Lk4Ei4q1AvQqBIy5FH+CDcNjtjq5F7t62tXm4y3QBwhP/N0B5gX/8qPo=
+X-Received: by 2002:a81:6dca:0:b0:5a7:a874:d83e with SMTP id
+ i193-20020a816dca000000b005a7a874d83emr4891684ywc.42.1697629041772; Wed, 18
+ Oct 2023 04:37:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231017063419.925266-2-alexander.stein@ew.tq-group.com>
+References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
+ <20231018-marvell-88e6152-wan-led-v4-2-3ee0c67383be@linaro.org> <169762516741.391849.18342287891015837205.robh@kernel.org>
+In-Reply-To: <169762516741.391849.18342287891015837205.robh@kernel.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 18 Oct 2023 13:37:10 +0200
+Message-ID: <CACRpkdZff9fbeJdxqudCtjad=FVKTKQtvo_=GiEBOvnw5xQapw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/7] dt-bindings: net: mvusb: Fix up DSA example
+To: Rob Herring <robh@kernel.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	linux-arm-kernel@lists.infradead.org, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, devicetree@vger.kernel.org, 
+	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org, 
+	Gregory Clement <gregory.clement@bootlin.com>, Conor Dooley <conor+dt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 08:34:18AM +0200, Alexander Stein wrote:
-> device_get_match_data() expects that of_device_id->data points to actual
-> fec_devinfo data, not a platform_device_id entry.
-> Fix this by adjusting OF device data pointers to their corresponding
-> structs.
-> enum imx_fec_type is now unused and can be removed.
-> 
-> Fixes: b0377116decd ("net: ethernet: Use device_get_match_data()")
-> Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+On Wed, Oct 18, 2023 at 12:32=E2=80=AFPM Rob Herring <robh@kernel.org> wrot=
+e:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> dtschema/dtc warnings/errors:
+> Documentation/devicetree/bindings/net/marvell,mvusb.example.dtb: /example=
+-0/usb/mdio@1/ethernet-switch@0: failed to match any schema with compatible=
+: ['marvell,mv88e6190']
 
+Isn't that just because the bindings now come last in the series.
+Which is in response to a review comment, hence this warning
+didn't appear before.
+
+Yours,
+Linus Walleij
 
