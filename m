@@ -1,149 +1,241 @@
-Return-Path: <netdev+bounces-42132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54D067CD4C3
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:01:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6B337CD50F
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:05:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C733B20FFE
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:01:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 913B92819CD
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 07:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5743D8F5F;
-	Wed, 18 Oct 2023 07:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2CC3C2C5;
+	Wed, 18 Oct 2023 07:05:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="ZOnGh8go"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B4E8833
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 07:01:49 +0000 (UTC)
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C95B6;
-	Wed, 18 Oct 2023 00:01:46 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VuPoH2N_1697612502;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VuPoH2N_1697612502)
-          by smtp.aliyun-inc.com;
-          Wed, 18 Oct 2023 15:01:43 +0800
-Date: Wed, 18 Oct 2023 15:01:42 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: tonylu@linux.alibaba.com, alibuda@linux.alibaba.com,
-	guwen@linux.alibaba.com, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 2/2] net/smc: correct the reason code in
- smc_listen_find_device when fallback
-Message-ID: <20231018070142.GY92403@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20231017124234.99574-1-guangguan.wang@linux.alibaba.com>
- <20231017124234.99574-3-guangguan.wang@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581968BEB
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 07:05:16 +0000 (UTC)
+Received: from mail.avm.de (mail.avm.de [IPv6:2001:bf0:244:244::94])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA46B0
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 00:05:13 -0700 (PDT)
+Received: from mail-auth.avm.de (unknown [IPv6:2001:bf0:244:244::71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Wed, 18 Oct 2023 09:05:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
+	t=1697612711; bh=7duyYS4uKMmrIiJWnBLeesAW+mofu1JAMbtCZUOvg80=;
+	h=From:Date:Subject:To:Cc:From;
+	b=ZOnGh8gou7ff4faNHPcPaZ1D16L+X1M0G9DSEGMgYsv5yHt9Ct5UXomH2UpkgPVWD
+	 u2hwo0keqMABgOFowcHebKBA+oX+Hq3qGDEIPP/pcF4kkT2AWxqJgFAVGcQh8HIArr
+	 2JrHEJmi32i/LAfgNQOPjRBoEoqqizv/PC7tl2Fg=
+Received: from localhost (unknown [172.17.88.63])
+	by mail-auth.avm.de (Postfix) with ESMTPSA id 80F4B81FE6;
+	Wed, 18 Oct 2023 09:05:10 +0200 (CEST)
+From: Johannes Nixdorf <jnixdorf-oss@avm.de>
+Date: Wed, 18 Oct 2023 09:04:43 +0200
+Subject: [PATCH iproute2-next v5] iplink: bridge: Add support for bridge
+ FDB learning limits
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231017124234.99574-3-guangguan.wang@linux.alibaba.com>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20231018-fdb_limit-v5-1-7ca3b3eb7c1f@avm.de>
+X-B4-Tracking: v=1; b=H4sIAIqDL2UC/02NwQ6CMBAFf4Xs2ZpSCgon/8MQU9qtbCKFtLXBE
+ P7dBi8eJ28yb4OAnjBAV2zgMVGg2WWoTwXoUbknMjKZQXBR8ZbXzJrh8aKJIlMaS9lcdKOuErK
+ /eLS0Hq070OLnd0TBHK4R+jyPFOLsP8dTkof0i5btXzRJVrJBGmG0NLbi9qbSdDYI/b7vXyqTH
+ IauAAAA
+To: David Ahern <dsahern@gmail.com>, Roopa Prabhu <roopa@nvidia.com>, 
+ Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, 
+ Petr Machata <petrm@nvidia.com>
+Cc: bridge@lists.linux-foundation.org, netdev@vger.kernel.org, 
+ Johannes Nixdorf <jnixdorf-oss@avm.de>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1697612682; l=5381;
+ i=jnixdorf-oss@avm.de; s=20230906; h=from:subject:message-id;
+ bh=7duyYS4uKMmrIiJWnBLeesAW+mofu1JAMbtCZUOvg80=;
+ b=zv1GAGzIqwcXgxBPRXjOTzIz3Lc/894YncC79u++wRhb82LuxnQhc+ZKtIRnt7KFWGMX3WSso
+ 8HRZ/LSTZv+BSOixJ4x16pfBETF+eEzQSa6vZRO58fzks89qC6eW/ES
+X-Developer-Key: i=jnixdorf-oss@avm.de; a=ed25519;
+ pk=KMraV4q7ANHRrwjf9EVhvU346JsqGGNSbPKeNILOQfo=
+X-purgate-ID: 149429::1697612710-7862642D-443DAE41/0/0
+X-purgate-type: clean
+X-purgate-size: 5383
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
+X-purgate: clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 17, 2023 at 08:42:34PM +0800, Guangguan Wang wrote:
->The ini->rc is used to store the last error happened when finding usable
->ism or rdma device in smc_listen_find_device, and is set by calling smc_
->find_device_store_rc. Once the ini->rc is assigned to an none-zero value,
->the value can not be overwritten anymore. So the ini-rc should be set to
->the error reason only when an error actually occurs.
->
->When finding ISM/RDMA devices, device not found is not a real error, as
->not all machine have ISM/RDMA devices. Failures after device found, when
->initializing device or when initializing connection, is real errors, and
->should be store in ini->rc.
->
->SMC_CLC_DECL_DIFFPREFIX also is not a real error, as for SMC-RV2, it is
->not require same prefix.
->
->Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
->---
-> net/smc/af_smc.c | 12 +++---------
-> 1 file changed, 3 insertions(+), 9 deletions(-)
->
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index b3a67a168495..21e9c6ec4d01 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -2163,10 +2163,8 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
-> 	}
-> 	mutex_unlock(&smcd_dev_list.mutex);
-> 
->-	if (!ini->ism_dev[0]) {
->-		smc_find_device_store_rc(SMC_CLC_DECL_NOSMCD2DEV, ini);
->+	if (!ini->ism_dev[0])
+Support setting the FDB limit through ip link. The arguments is:
+ - fdb_max_learned: A 32-bit unsigned integer specifying the maximum
+                    number of learned FDB entries, with 0 disabling
+                    the limit.
 
-Hi Guangguan,
+Also support reading back the current number of learned FDB entries in
+the bridge by this count. The returned value's name is:
+ - fdb_n_learned: A 32-bit unsigned integer specifying the current number
+                  of learned FDB entries.
 
-Generally, I think this is right. Fallback in one kind of device should
-not be the final fallback reason.
+Example:
 
-But what if we have more than one device and failed more than once, for
-example:
-Let's say we have an ISM device, a RDMA device. First we looked the ISM device
-and failed during the initialization, we got a fallback reason A. Then we
-looked for the RDMA device, and failed again, with another reason B.
-Finally, we fallback to TCP. What should fallback reason be ?
+ # ip -d -j -p link show br0
+[ {
+...
+        "linkinfo": {
+            "info_kind": "bridge",
+            "info_data": {
+...
+                "fdb_n_learned": 2,
+                "fdb_max_learned": 0,
+...
+            }
+        },
+...
+    } ]
+ # ip link set br0 type bridge fdb_max_learned 1024
+ # ip -d -j -p link show br0
+[ {
+...
+        "linkinfo": {
+            "info_kind": "bridge",
+            "info_data": {
+...
+                "fdb_n_learned": 2,
+                "fdb_max_learned": 1024,
+...
+            }
+        },
+...
+    } ]
 
-OTOH, SMC_CLC_DECL_NOSMCD2DEV is only used here. Removing it would mean
-that we would never see SMC_CLC_DECL_NOSMCD2DEV in the fallback reason,
-which makes it meaningless.
+Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
+---
+The corresponding kernel changes are in net-next.git as commit
+ddd1ad68826d ("net: bridge: Add netlink knobs for number / max learned
+FDB entries").
+---
+Changes in v5:
+ - Removed the RFC status again, as the kernel changes landed.
+ - Link to v4: https://lore.kernel.org/r/20230919-fdb_limit-v4-1-b4d2dc4df30f@avm.de
+
+Changes in v4:
+ - Removed _entries from the names. (from review)
+ - Removed the UAPI change, to be synced from linux separately by the
+   maintainer. (from review)
+   For local testing e.g. `make CCOPTS="-O2 -pipe
+   -I${path_to_dev_kernel_headers}"` works as a workaround.
+ - Downgraded to an RFC until the kernel changes land.
+ - Link to v3: https://lore.kernel.org/netdev/20230905-fdb_limit-v3-1-34bb124556d8@avm.de/
+
+Changes in v3:
+ - Properly split the net-next and iproute2-next threads. (from review)
+ - Changed to *_n_* instead of *_cur_*. (from review)
+ - Use strcmp() instead of matches(). (from review)
+ - Made names in code and documentation consistent. (from review)
+ - Various documentation fixes. (from review)
+ - Link to v2: https://lore.kernel.org/netdev/20230619071444.14625-1-jnixdorf-oss@avm.de/
+
+Changes in v2:
+ - Sent out the first corresponding iproute2 patches.
+ - Link to v1: https://lore.kernel.org/netdev/20230515085046.4457-1-jnixdorf-oss@avm.de/
+---
+ ip/iplink_bridge.c    | 21 +++++++++++++++++++++
+ man/man8/ip-link.8.in | 10 ++++++++++
+ 2 files changed, 31 insertions(+)
+
+diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
+index 462075295308..6b70ffbb6f5f 100644
+--- a/ip/iplink_bridge.c
++++ b/ip/iplink_bridge.c
+@@ -34,6 +34,7 @@ static void print_explain(FILE *f)
+ 		"		  [ group_fwd_mask MASK ]\n"
+ 		"		  [ group_address ADDRESS ]\n"
+ 		"		  [ no_linklocal_learn NO_LINKLOCAL_LEARN ]\n"
++		"		  [ fdb_max_learned FDB_MAX_LEARNED ]\n"
+ 		"		  [ vlan_filtering VLAN_FILTERING ]\n"
+ 		"		  [ vlan_protocol VLAN_PROTOCOL ]\n"
+ 		"		  [ vlan_default_pvid VLAN_DEFAULT_PVID ]\n"
+@@ -168,6 +169,14 @@ static int bridge_parse_opt(struct link_util *lu, int argc, char **argv,
+ 				bm.optval |= no_ll_learn_bit;
+ 			else
+ 				bm.optval &= ~no_ll_learn_bit;
++		} else if (strcmp(*argv, "fdb_max_learned") == 0) {
++			__u32 fdb_max_learned;
++
++			NEXT_ARG();
++			if (get_u32(&fdb_max_learned, *argv, 0))
++				invarg("invalid fdb_max_learned", *argv);
++
++			addattr32(n, 1024, IFLA_BR_FDB_MAX_LEARNED, fdb_max_learned);
+ 		} else if (matches(*argv, "fdb_flush") == 0) {
+ 			addattr(n, 1024, IFLA_BR_FDB_FLUSH);
+ 		} else if (matches(*argv, "vlan_default_pvid") == 0) {
+@@ -544,6 +553,18 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 	if (tb[IFLA_BR_GC_TIMER])
+ 		_bridge_print_timer(f, "gc_timer", tb[IFLA_BR_GC_TIMER]);
+ 
++	if (tb[IFLA_BR_FDB_N_LEARNED])
++		print_uint(PRINT_ANY,
++			   "fdb_n_learned",
++			   "fdb_n_learned %u ",
++			   rta_getattr_u32(tb[IFLA_BR_FDB_N_LEARNED]));
++
++	if (tb[IFLA_BR_FDB_MAX_LEARNED])
++		print_uint(PRINT_ANY,
++			   "fdb_max_learned",
++			   "fdb_max_learned %u ",
++			   rta_getattr_u32(tb[IFLA_BR_FDB_MAX_LEARNED]));
++
+ 	if (tb[IFLA_BR_VLAN_DEFAULT_PVID])
+ 		print_uint(PRINT_ANY,
+ 			   "vlan_default_pvid",
+diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
+index 7365d0c6b14f..e82b2dbb0070 100644
+--- a/man/man8/ip-link.8.in
++++ b/man/man8/ip-link.8.in
+@@ -1630,6 +1630,8 @@ the following additional arguments are supported:
+ ] [
+ .BI no_linklocal_learn " NO_LINKLOCAL_LEARN "
+ ] [
++.BI fdb_max_learned " FDB_MAX_LEARNED "
++] [
+ .BI vlan_filtering " VLAN_FILTERING "
+ ] [
+ .BI vlan_protocol " VLAN_PROTOCOL "
+@@ -1741,6 +1743,14 @@ or off
+ When disabled, the bridge will not learn from link-local frames (default:
+ enabled).
+ 
++.BI fdb_max_learned " FDB_MAX_LEARNED "
++- set the maximum number of learned FDB entries. If
++.RI ( FDB_MAX_LEARNED " == 0) "
++the feature is disabled. Default is
++.BR 0 .
++.I FDB_MAX_LEARNED
++is a 32bit unsigned integer.
++
+ .BI vlan_filtering " VLAN_FILTERING "
+ - turn VLAN filtering on
+ .RI ( VLAN_FILTERING " > 0) "
+
+---
+base-commit: 582453de1b65e9eada669d9aea4aca88509e7658
+change-id: 20230905-fdb_limit-ace1467c6a84
 
 Best regards,
-Dust
+-- 
+Johannes Nixdorf <jnixdorf-oss@avm.de>
 
-> 		goto not_found;
->-	}
-> 
-> 	smc_ism_get_system_eid(&eid);
-> 	if (!smc_clc_match_eid(ini->negotiated_eid, smc_v2_ext,
->@@ -2216,9 +2214,9 @@ static void smc_find_ism_v1_device_serv(struct smc_sock *new_smc,
-> 	rc = smc_listen_ism_init(new_smc, ini);
-> 	if (!rc)
-> 		return;		/* V1 ISM device found */
->+	smc_find_device_store_rc(rc, ini);
-> 
-> not_found:
->-	smc_find_device_store_rc(rc, ini);
-> 	ini->smcd_version &= ~SMC_V1;
-> 	ini->ism_dev[0] = NULL;
-> 	ini->is_smcd = false;
->@@ -2267,10 +2265,8 @@ static void smc_find_rdma_v2_device_serv(struct smc_sock *new_smc,
-> 	ini->smcrv2.saddr = new_smc->clcsock->sk->sk_rcv_saddr;
-> 	ini->smcrv2.daddr = smc_ib_gid_to_ipv4(smc_v2_ext->roce);
-> 	rc = smc_find_rdma_device(new_smc, ini);
->-	if (rc) {
->-		smc_find_device_store_rc(rc, ini);
->+	if (rc)
-> 		goto not_found;
->-	}
-> 	if (!ini->smcrv2.uses_gateway)
-> 		memcpy(ini->smcrv2.nexthop_mac, pclc->lcl.mac, ETH_ALEN);
-> 
->@@ -2331,8 +2327,6 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
-> 
-> 	/* check for matching IP prefix and subnet length (V1) */
-> 	prfx_rc = smc_listen_prfx_check(new_smc, pclc);
->-	if (prfx_rc)
->-		smc_find_device_store_rc(prfx_rc, ini);
-> 
-> 	/* get vlan id from IP device */
-> 	if (smc_vlan_by_tcpsk(new_smc->clcsock, ini))
->-- 
->2.24.3 (Apple Git-128)
 
