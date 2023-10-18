@@ -1,113 +1,149 @@
-Return-Path: <netdev+bounces-42113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BF237CD28A
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 05:11:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 645007CD295
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 05:16:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1721D28167C
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:11:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F40401F22C3A
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 03:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 322EB1C2B;
-	Wed, 18 Oct 2023 03:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF66C1FB8;
+	Wed, 18 Oct 2023 03:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fRZYt6aJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eNv10mp3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A237D6101
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 03:11:32 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29D48C4;
-	Tue, 17 Oct 2023 20:11:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697598691; x=1729134691;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Yn9ROtkQUbrVMJYFJ3Gpu6KvcZ63WcxQJEA/jUOtYz8=;
-  b=fRZYt6aJDfrFnNkg5i+HmjdQWhPaHsQIYz+5kmpWEd0FGHARM8Xmth9y
-   0Ch1TBIyJ5lQ2mVLkrcNLuP+rDUt2Ilacbqjm1RUfZrh8FlRJ2yWdxiEk
-   4VlfqRByX9Z3X5TyJFBglzoj8siq2H9sc55bYRZiMJjF6rSHU3I3i6aqw
-   b0406EdQ9PbxWvczFp7ZpYVWzk48jBqV0iYgylJ7fippA9yP4LD6EK9b5
-   zQvwctVTtvy9KnLOU1eN4X2iDlKn9lX51at1RhWS2YKDHuyuehfTx7oqO
-   I7uaQUwzfIS1cxcf9OIe1GrOGKf/ZE9lvxR8vOBzoQUTQJ9DgeQhJo5dg
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="389802481"
-X-IronPort-AV: E=Sophos;i="6.03,234,1694761200"; 
-   d="scan'208";a="389802481"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2023 20:11:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10866"; a="929993822"
-X-IronPort-AV: E=Sophos;i="6.03,234,1694761200"; 
-   d="scan'208";a="929993822"
-Received: from ssid-ilbpg3-teeminta.png.intel.com ([10.88.227.74])
-  by orsmga005.jf.intel.com with ESMTP; 17 Oct 2023 20:11:26 -0700
-From: "Gan, Yi Fang" <yi.fang.gan@intel.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Looi Hong Aun <hong.aun.looi@intel.com>,
-	Voon Weifeng <weifeng.voon@intel.com>,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Gan Yi Fang <yi.fang.gan@intel.com>
-Subject: [PATCH net-next v2 1/1] net: stmmac: Remove redundant checking for rx_coalesce_usecs
-Date: Wed, 18 Oct 2023 11:08:02 +0800
-Message-Id: <20231018030802.741923-1-yi.fang.gan@intel.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7CF4311C
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 03:16:26 +0000 (UTC)
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C9F1FC;
+	Tue, 17 Oct 2023 20:16:25 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-77774120c6eso91953685a.2;
+        Tue, 17 Oct 2023 20:16:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697598984; x=1698203784; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aIp2RLOAcqFx00rkPR5HeZvSV49G7fFYfRT94xyZEGI=;
+        b=eNv10mp3IghWzhLL2h3+pEuNE6zjRAqkBrgD3cWeQZyZkNScLcsCGdqUxz88KKE+ru
+         hR3lz6M1ksOYrZSjoIkfvECC8RhhltKEF5XGMg73X5nhqV8hU7NFrCKNTkc1tR1vV2kW
+         ocumSPlnEQKt3xFoEIuclypNXN/7j4amG2Rz8wa+PyHEk6MRamezMesBjuPybLQ2hbuG
+         JqqoDHR544/N5gdiajsHvCuB9ey1xnshQI84+l/jjUKWqZZaa6KTMxSXH5M3REazIMj+
+         YScp1huyDlHYxlFPxMS7ncB/Ymsm+vOse1mJZXpGgw19qQjlj4JZmuby/6gKKYIE/iLQ
+         MQAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697598984; x=1698203784;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aIp2RLOAcqFx00rkPR5HeZvSV49G7fFYfRT94xyZEGI=;
+        b=DmPUItuhJZocWVnks1HJbW1Y4ouclFDbthI1VIfZvJhSkB84v9yv29K/ufC4LY9l07
+         md+xfqy2tTAsX+r+07CU3t+ZreofnquuYGMMDO4nEoGTc3lwevkOK6l0L4wIS5f9Fk1S
+         alql678k9WeTurM8l276IV87terg1UuLbAvlVW9xh/Gm7hiQ9+bCrI2hlexzQEZ97aUD
+         zQAaFkyTw40YKwfGXMTdgkrUj1/Vexkw57FyLJPbjh1RC0u+MnLwB+4HCg1431XJn9nm
+         u/L6fRWUa9MnfSHUxcr8gTm1O8PdGxvZQGMvkxDEkuGjWFiKr/VNjuFXI5KkaYmaOgaM
+         X1Dw==
+X-Gm-Message-State: AOJu0YzNExI8VGAxfRFUyiTlZxNCHW36M0NeXzMrO8xddGv3ww56cXTe
+	gNTRPaS7yPQjDKshDvkA0Pw=
+X-Google-Smtp-Source: AGHT+IHpjjCwmmAnmZkIF00SeJ3rMEQbk9ykQ7ElHnUryr96SNgD5Gu1F9kgZnH7CFrRnWE1iMMkmA==
+X-Received: by 2002:a05:620a:1d81:b0:775:806d:5389 with SMTP id pj1-20020a05620a1d8100b00775806d5389mr4029805qkn.70.1697598983977;
+        Tue, 17 Oct 2023 20:16:23 -0700 (PDT)
+Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
+        by smtp.gmail.com with ESMTPSA id ts12-20020a05620a3d8c00b0076cdc3b5beasm1165104qkn.86.2023.10.17.20.16.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 20:16:21 -0700 (PDT)
+Message-ID: <127d957f-0af5-4a6b-9c06-003750daaf9c@gmail.com>
+Date: Tue, 17 Oct 2023 20:16:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=0.2 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
-	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=no
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/2] net: dsa: Use conduit and user terms
+Content-Language: en-US
+To: Vladimir Oltean <olteanv@gmail.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ "open list:ARM/Mediatek SoC support" <linux-kernel@vger.kernel.org>,
+ "moderated list:ARM/Mediatek SoC support"
+ <linux-arm-kernel@lists.infradead.org>
+References: <20231016164742.264613-1-florian.fainelli@broadcom.com>
+ <20231016164742.264613-1-florian.fainelli@broadcom.com>
+ <20231016164742.264613-2-florian.fainelli@broadcom.com>
+ <20231016164742.264613-2-florian.fainelli@broadcom.com>
+ <20231017100328.qmwi2dnqay7syoki@skbuf>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <20231017100328.qmwi2dnqay7syoki@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Gan Yi Fang <yi.fang.gan@intel.com>
 
-The datatype of rx_coalesce_usecs is u32, always larger or equal to zero.
-Previous checking does not include value 0, this patch removes the
-checking to handle the value 0. This change in behaviour making the
-value of 0 cause an error is not a problem because 0 is out of
-range of rx_coalesce_usecs.
 
-Signed-off-by: Gan Yi Fang <yi.fang.gan@intel.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 10/17/2023 3:03 AM, Vladimir Oltean wrote:
+> On Mon, Oct 16, 2023 at 09:47:41AM -0700, Florian Fainelli wrote:
+>> Use more inclusive terms throughout the DSA subsystem by moving away
+>> from "master" which is replaced by "conduit" and "slave" which is
+>> replaced by "user". No functional changes.
+>>
+>> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+>> ---
+> 
+> Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> 
+> Note that you left the following unconverted:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-index 6aa5c0556d22..f628411ae4ae 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-@@ -981,7 +981,7 @@ static int __stmmac_set_coalesce(struct net_device *dev,
- 	else if (queue >= max_cnt)
- 		return -EINVAL;
- 
--	if (priv->use_riwt && (ec->rx_coalesce_usecs > 0)) {
-+	if (priv->use_riwt) {
- 		rx_riwt = stmmac_usec2riwt(ec->rx_coalesce_usecs, priv);
- 
- 		if ((rx_riwt > MAX_DMA_RIWT) || (rx_riwt < MIN_DMA_RIWT))
+Bah, thanks, sent a v5 with those additions. Thank you!
 -- 
-2.34.1
-
+Florian
 
