@@ -1,124 +1,113 @@
-Return-Path: <netdev+bounces-42165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F04B67CD70F
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 10:53:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63B677CD794
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 11:10:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81C78B2103F
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 08:53:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E9EA281E89
+	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 09:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BBDF15AC8;
-	Wed, 18 Oct 2023 08:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A/Pk8h49"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E952168DA;
+	Wed, 18 Oct 2023 09:10:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA05014F8F
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 08:53:16 +0000 (UTC)
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 386E5F9
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:53:14 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-5a8628e54d4so30647957b3.0
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 01:53:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697619193; x=1698223993; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nIfc9x+57+MR4MQsFxr/3D1qUh4GWaKbi6uC5iQj2KM=;
-        b=A/Pk8h49ehZ29O0w0iKml7ynBA8zowwZ5tmiz45VAgsXWt7kmtGmzeQLBfhkHzocYl
-         Krfv2TOEq2SVD/VItz5ABk6HxJbMYAFmI5NgVtu8e2f9RgaU5s7jlgzu9SMwYQOLxWAS
-         qZxzejJDGQAomxCUjC+c/WlbPPjnrnBX9GwoRbM0oRAzJYgoKmhIJ/edzmtE4aYiUWgl
-         FAp+pMvng8pSd6SIYe2AueMxTEYhSOyi3nXpbYUix38ROoX4JexPwxOnk1JP7IFWHIgT
-         BTeuw3dZ3A3PBzYvmuDC/Z0RgtQOnTttCGN9mrOb+G7+VBRzuMmpanNXn+LX/K05Tsbc
-         2hZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697619193; x=1698223993;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nIfc9x+57+MR4MQsFxr/3D1qUh4GWaKbi6uC5iQj2KM=;
-        b=tzCKosUqegLiqJt7vEkT2bzNK1L0NJa+knP2QV9ZogoV7Pc19avK9ipQreVxd7nee5
-         vPAepdXmKk2NhyU+XXGQ1I/PTAy22LFLAFlveuTjqUyuD+IClJ3wJGg0L/amEhIIB4Ty
-         n32d1Re9+8wSCHOnboKadIAmCvKvjkmBNME7S868F0jwQAlFEpTGm7VKpiun/g2PEsvu
-         3aJxsKkL+ceMu9G0O3elcj3Mo6ZxoSt+vaRqIiMJC2BhWSfWBBFxhDGEbQ4upAlHaD1n
-         a4eK19mQHWJ/dlSRkWEJIkDxx9laIBXyfh6Q9qBJ/7W1kjUBOt+C76E7MBjaWjBTdZRR
-         Rxfg==
-X-Gm-Message-State: AOJu0YzfC/9HHC1Sov+S3j0xojSeLuRRW9kAmFRM65a42bvkgbtbitoz
-	AOiUx0QEdvl4JK1MIGgFLuPnuGTylDo7NV4UHsDEjQ==
-X-Google-Smtp-Source: AGHT+IFeFSERqZ0ts/x8xJld6sINEyqZb9YdNFdgX/IXWU45eqvj1p1KrrBezJyPl0/qLY0DPRMIhme6p1Fr7jMtf+o=
-X-Received: by 2002:a05:690c:ed1:b0:5a7:cb5f:ee0a with SMTP id
- cs17-20020a05690c0ed100b005a7cb5fee0amr4033573ywb.17.1697619193088; Wed, 18
- Oct 2023 01:53:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BEF915AFE;
+	Wed, 18 Oct 2023 09:09:59 +0000 (UTC)
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B430CF7;
+	Wed, 18 Oct 2023 02:09:55 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VuQR8Kf_1697620191;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VuQR8Kf_1697620191)
+          by smtp.aliyun-inc.com;
+          Wed, 18 Oct 2023 17:09:51 +0800
+Message-ID: <1697619441.5367694-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost 02/22] virtio_ring: introduce virtqueue_dma_[un]map_page_attrs
+Date: Wed, 18 Oct 2023 16:57:21 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ netdev@vger.kernel.org,
+ bpf@vger.kernel.org,
+ virtualization@lists.linux-foundation.org
+References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
+ <20231011092728.105904-3-xuanzhuo@linux.alibaba.com>
+ <1697615580.6880193-1-xuanzhuo@linux.alibaba.com>
+ <20231018035751-mutt-send-email-mst@kernel.org>
+ <1697616022.630633-2-xuanzhuo@linux.alibaba.com>
+ <20231018044204-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231018044204-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
-In-Reply-To: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 18 Oct 2023 10:53:01 +0200
-Message-ID: <CACRpkdaie8-0W+=9AD49KqyW+-Zrtkhs8BjHJCVDrkxF6hVAkQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/8] dt-bindings: net: Child node schema cleanups
-To: Rob Herring <robh@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
-	Samuel Holland <samuel@sholland.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	Maxime Ripard <mripard@kernel.org>, =?UTF-8?B?bsOnIMOcTkFM?= <arinc.unal@arinc9.com>, 
-	Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>, 
-	John Crispin <john@phrozen.org>, Gerhard Engleder <gerhard@engleder-embedded.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
-	Sergei Shtylyov <sergei.shtylyov@gmail.com>, Justin Chen <justin.chen@broadcom.com>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>, 
-	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
-	bcm-kernel-feedback-list@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Mon, Oct 16, 2023 at 11:44=E2=80=AFPM Rob Herring <robh@kernel.org> wrot=
-e:
-
-> This is a series of clean-ups related to ensuring that child node
-> schemas are constrained to not allow undefined properties. Typically,
-> that means just adding additionalProperties or unevaluatedProperties as
-> appropriate. The DSA/switch schemas turned out to be a bit more
-> involved, so there's some more fixes and a bit of restructuring in them.
+On Wed, 18 Oct 2023 04:44:24 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Wed, Oct 18, 2023 at 04:00:22PM +0800, Xuan Zhuo wrote:
+> > On Wed, 18 Oct 2023 03:59:03 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > On Wed, Oct 18, 2023 at 03:53:00PM +0800, Xuan Zhuo wrote:
+> > > > Hi Michael,
+> > > >
+> > > > Do you think it's appropriate to push the first two patches of this patch set to
+> > > > linux 6.6?
+> > > >
+> > > > Thanks.
+> > >
+> > > I generally treat patchsets as a whole unless someone asks me to do
+> > > otherwise. Why do you want this?
+> >
+> > As we discussed, the patch set supporting AF_XDP will be push to net-next.
+> > But the two patchs belong to the vhost.
+> >
+> > So, if you think that is appropriate, I will post a new patchset(include the two
+> > patchs without virtio-net + AF_XDP) to vhost. I wish that can be merged to 6.6.
 >
-> Signed-off-by: Rob Herring <robh@kernel.org>
+> Oh wait 6.6? Too late really, merge window has been closed for weeks.
 
-Oh this drives a truck through my Marvell binding work. Luckily it
-also solves my most annoying problems so I will just rebase on this
-and continue, all good!
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
+I mean as a fix. So I ask you do you think it is appropriate?
 
-Yours,
-Linus Walleij
+>
+> > Then when the 6.7 net-next merge window is open, I can push this patch set to 6.7.
+> > The v1 version use the virtqueue_dma_map_single_attrs to replace
+> > virtqueue_dma_map_page_attrs. But I think we should use virtqueue_dma_map_page_attrs.
+> >
+> > Thanks.
+> >
+>
+> Get a complete working patchset that causes no regressions posted first please
+> then we will discuss merge strategy.
+> I would maybe just put everything in one file for now, easier to merge,
+> refactor later when it's all upstream. But up to you.
+
+OK. I will get a working patchset firstly.
+
+Thanks.
+
+>
+>
+> > >
+> > > --
+> > > MST
+> > >
+>
 
