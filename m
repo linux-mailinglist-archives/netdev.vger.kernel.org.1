@@ -1,159 +1,123 @@
-Return-Path: <netdev+bounces-42805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C8C87D0335
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 22:38:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 990377D033B
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 22:39:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 463CB2822AC
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:38:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F1E5B212AE
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE5563C4;
-	Thu, 19 Oct 2023 20:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CFA8F6B;
+	Thu, 19 Oct 2023 20:39:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="byX+cBYx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kgzRWwcZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6FA3DFE5
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 20:38:06 +0000 (UTC)
-Received: from out-196.mta1.migadu.com (out-196.mta1.migadu.com [95.215.58.196])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC3AE12D
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 13:38:04 -0700 (PDT)
-Message-ID: <21dc6507-e1f5-a261-7a9c-7e0cb22e1fc7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1697747882;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kMGt99Xkqblx8LvlSkYl/7sJkNjzJz3wZOFEvGWa3Zk=;
-	b=byX+cBYxDZ4lxvU3JOpwEvNm1++LM4xfxRj161PkE4sJCHcM2Ao3Nlry/GnyZTjyuc5rFq
-	zuzgIHEJ575EHk7r8mdge924ILnz6BefOPHEKiK/53t97CjE9a2Q3++vtNT0LohK67x0zU
-	a53NhybACyDCAr//dG3t8StREr3dGQE=
-Date: Thu, 19 Oct 2023 13:37:51 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB57D6AB3
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 20:38:59 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE728A3
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 13:38:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697747938; x=1729283938;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=JqG7ksi4MXRGQ2MDZSN0SVj5pEm9xYqMmaI183g6ZQY=;
+  b=kgzRWwcZZi5yaTOUuYS6ifdIp4HjIMJ8AS9bGTDJfMjDdY6DyF8hFwmg
+   CcNGbeg+Nz3MLJKn3S+VBZRqbPzafuY6bcyAAFJzS5CrZh4UUXCwxVTYK
+   JZAg6sOYlNhrYabtqXk1SPMfJ4ctZJJcOUydEplRh0DfW+gwowkwbW/v/
+   JN8SzQxf9F4++lJzNb8BN+gJB9DWKdSENaAkgApSRvJdcsK5jXvJGg9G6
+   kkLJV4HqygqEKocUV3hRKDMvuszITGPFYYmw9kawCE94K6kaq/IZtVRBG
+   7crGGKDEk6IrktNcbH8YnRmxYzYkz9K5abyk4ifjh6SaL2Xp/hk9JfH6m
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="472591285"
+X-IronPort-AV: E=Sophos;i="6.03,238,1694761200"; 
+   d="scan'208";a="472591285"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 13:38:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="760788256"
+X-IronPort-AV: E=Sophos;i="6.03,238,1694761200"; 
+   d="scan'208";a="760788256"
+Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 13:38:58 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: netdev@vger.kernel.org,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Tirthendu Sarkar <tirthendu.sarkar@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	hq.dev+kernel@msdfc.xyz,
+	Arpana Arland <arpanax.arland@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net] i40e: sync next_to_clean and next_to_process for programming status desc
+Date: Thu, 19 Oct 2023 13:38:52 -0700
+Message-ID: <20231019203852.3663665-1-jacob.e.keller@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v7 04/11] net/socket: Break down __sys_getsockopt
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, Breno Leitao <leitao@debian.org>
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, io-uring@vger.kernel.org,
- Kuniyuki Iwashima <kuniyu@amazon.com>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- David Howells <dhowells@redhat.com>, sdf@google.com, asml.silence@gmail.com,
- willemdebruijn.kernel@gmail.com, kuba@kernel.org, pabeni@redhat.com,
- krisman@suse.de, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-References: <20231016134750.1381153-1-leitao@debian.org>
- <20231016134750.1381153-5-leitao@debian.org>
- <1074c1f1-e676-fbe6-04bc-783821d746a1@linux.dev>
- <e1920ac4-18ad-4b97-a3a3-9604724937d6@kernel.dk>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <e1920ac4-18ad-4b97-a3a3-9604724937d6@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 10/19/23 1:04 PM, Jens Axboe wrote:
-> On 10/19/23 1:12 PM, Martin KaFai Lau wrote:
->> On 10/16/23 6:47?AM, Breno Leitao wrote:
->>> diff --git a/net/socket.c b/net/socket.c
->>> index 0087f8c071e7..f4c156a1987e 100644
->>> --- a/net/socket.c
->>> +++ b/net/socket.c
->>> @@ -2350,6 +2350,42 @@ SYSCALL_DEFINE5(setsockopt, int, fd, int, level, int, optname,
->>>    INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
->>>                                 int optname));
->>>    +int do_sock_getsockopt(struct socket *sock, bool compat, int level,
->>> +               int optname, sockptr_t optval, sockptr_t optlen)
->>> +{
->>> +    int max_optlen __maybe_unused;
->>> +    const struct proto_ops *ops;
->>> +    int err;
->>> +
->>> +    err = security_socket_getsockopt(sock, level, optname);
->>> +    if (err)
->>> +        return err;
->>> +
->>> +    ops = READ_ONCE(sock->ops);
->>> +    if (level == SOL_SOCKET) {
->>> +        err = sk_getsockopt(sock->sk, level, optname, optval, optlen);
->>> +    } else if (unlikely(!ops->getsockopt)) {
->>> +        err = -EOPNOTSUPP;
->>> +    } else {
->>> +        if (WARN_ONCE(optval.is_kernel || optlen.is_kernel,
->>> +                  "Invalid argument type"))
->>> +            return -EOPNOTSUPP;
->>> +
->>> +        err = ops->getsockopt(sock, level, optname, optval.user,
->>> +                      optlen.user);
->>> +    }
->>> +
->>> +    if (!compat) {
->>> +        max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
->>
->> The max_optlen was done before the above sk_getsockopt. The bpf CI cannot catch it because it cannot apply patch 5 cleanly. I ran the following out of the linux-block tree:
->>
->> $> ./test_progs -t sockopt_sk
->> test_sockopt_sk:PASS:join_cgroup /sockopt_sk 0 nsec
->> run_test:PASS:skel_load 0 nsec
->> run_test:PASS:setsockopt_link 0 nsec
->> run_test:PASS:getsockopt_link 0 nsec
->> (/data/users/kafai/fb-kernel/linux/tools/testing/selftests/bpf/prog_tests/sockopt_sk.c:111: errno: Operation not permitted) Failed to call getsockopt, ret=-1
->> run_test:FAIL:getsetsockopt unexpected error: -1 (errno 1)
->> #217     sockopt_sk:FAIL
-> 
-> Does it work with this incremental? I can fold that in, will rebase
-> anyway to collect acks.
+From: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
 
-Yes, that should work.
+When a programming status desc is encountered on the rx_ring,
+next_to_process is bumped along with cleaned_count but next_to_clean is
+not. This causes I40E_DESC_UNUSED() macro to misbehave resulting in
+overwriting whole ring with new buffers.
 
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
+Update next_to_clean to point to next_to_process on seeing a programming
+status desc if not in the middle of handling a multi-frag packet. Also,
+bump cleaned_count only for such case as otherwise next_to_clean buffer
+may be returned to hardware on reaching clean_threshold.
 
-> 
-> 
-> diff --git a/net/socket.c b/net/socket.c
-> index bccd257e13fe..eb6960958026 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -2344,6 +2344,9 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
->   	if (err)
->   		return err;
->   
-> +	if (!compat)
-> +		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
-> +
->   	ops = READ_ONCE(sock->ops);
->   	if (level == SOL_SOCKET) {
->   		err = sk_getsockopt(sock->sk, level, optname, optval, optlen);
-> @@ -2358,12 +2361,10 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
->   				      optlen.user);
->   	}
->   
-> -	if (!compat) {
-> -		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
-> +	if (!compat)
->   		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
->   						     optval, optlen, max_optlen,
->   						     err);
-> -	}
->   
->   	return err;
->   }
-> 
+Fixes: e9031f2da1ae ("i40e: introduce next_to_process to i40e_ring")
+Suggested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Reported-by: hq.dev+kernel@msdfc.xyz
+Reported by: Solomon Peachy <pizza@shaftnet.org>
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217678
+Tested-by: hq.dev+kernel@msdfc.xyz
+Tested by: Indrek Järve <incx@dustbite.net>
+Signed-off-by: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
+Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+index 0b3a27f118fb..50c70a8e470a 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+@@ -2544,7 +2544,14 @@ static int i40e_clean_rx_irq(struct i40e_ring *rx_ring, int budget,
+ 			rx_buffer = i40e_rx_bi(rx_ring, ntp);
+ 			i40e_inc_ntp(rx_ring);
+ 			i40e_reuse_rx_page(rx_ring, rx_buffer);
+-			cleaned_count++;
++			/* Update ntc and bump cleaned count if not in the
++			 * middle of mb packet.
++			 */
++			if (rx_ring->next_to_clean == ntp) {
++				rx_ring->next_to_clean =
++					rx_ring->next_to_process;
++				cleaned_count++;
++			}
+ 			continue;
+ 		}
+ 
+
+base-commit: ce55c22ec8b223a90ff3e084d842f73cfba35588
+-- 
+2.41.0
 
 
