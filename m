@@ -1,143 +1,74 @@
-Return-Path: <netdev+bounces-42593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 622EB7CF7BF
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:58:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 375137CF7D0
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:59:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 936741C20B28
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:58:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4BD0280FA1
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D6E1DFD7;
-	Thu, 19 Oct 2023 11:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BiHQUzki"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2AEC1DFDA;
+	Thu, 19 Oct 2023 11:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E569C14F7D;
-	Thu, 19 Oct 2023 11:58:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5F70C433C7;
-	Thu, 19 Oct 2023 11:58:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697716732;
-	bh=pQ29kk3ro7C4ElFonv3EiTyV06E9AE6VC1caQ8VJxwM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BiHQUzkiiwPx41o8oTijdhqMqEXP1W25W/6P2gxP333hdS1fWElZGUXwcZOFKHvAE
-	 cmXg9p1vLYgAgLAP0tWcEU4XVlSaZtjlrl+jJV6sX4fFeL2/dYheIuuDxyReA2yPWK
-	 dmnnFSGr4MMGkrX6NWzxT6aimA2DsamgEPvcRhqZ8+AX+gWX0VK8IJ6GmEHVhjaGvb
-	 4stUNkFTprB1mcaYGVqaR0HEx2Rhpqryf1F76igl+q5oeYNRQ0vAtdsKM5vxrnGxok
-	 yBgfszESwHukgx/1g2Or0UuShMbAsnnWlya4MgSz/uUxSpN1pg8AdDRYQmSl4ItAq5
-	 cNlksfeV7wqbg==
-Date: Thu, 19 Oct 2023 12:58:46 +0100
-From: Conor Dooley <conor@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org,
-	Gregory Clement <gregory.clement@bootlin.com>
-Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: dsa: Require ports or
- ethernet-ports
-Message-ID: <20231019-pulse-autopilot-166bb6c96090@spud>
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-1-3ee0c67383be@linaro.org>
- <169762516670.391804.7528295251386913602.robh@kernel.org>
- <CACRpkdZ4hkiD6jwENqjZRX8ZHH9+3MSMMLcJe6tJa=6Yhn1w=g@mail.gmail.com>
- <ZTEL6Yw+Xcc0E4TJ@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D1D1DFD5
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 11:59:41 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 612481A6;
+	Thu, 19 Oct 2023 04:59:37 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.206])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SB5lX4TlBz6HJMk;
+	Thu, 19 Oct 2023 19:56:08 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Thu, 19 Oct 2023 12:59:32 +0100
+Message-ID: <2ba5b64b-b0d9-4b6d-cca4-098291ad858b@huawei.com>
+Date: Thu, 19 Oct 2023 14:59:31 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Y6vV29njl6hI4/69"
-Content-Disposition: inline
-In-Reply-To: <ZTEL6Yw+Xcc0E4TJ@shell.armlinux.org.uk>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v13 07/12] landlock: Refactor landlock_add_rule() syscall
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
+ <20231016015030.1684504-8-konstantin.meskhidze@huawei.com>
+ <20231018.uiP3miepaXah@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <20231018.uiP3miepaXah@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
 
 
---Y6vV29njl6hI4/69
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 19, 2023 at 11:58:49AM +0100, Russell King (Oracle) wrote:
-> On Wed, Oct 18, 2023 at 01:11:45PM +0200, Linus Walleij wrote:
-> > On Wed, Oct 18, 2023 at 12:32=E2=80=AFPM Rob Herring <robh@kernel.org> =
-wrote:
-> > > On Wed, 18 Oct 2023 11:03:40 +0200, Linus Walleij wrote:
-> >=20
-> > > > Bindings using dsa.yaml#/$defs/ethernet-ports specify that
-> > > > a DSA switch node need to have a ports or ethernet-ports
-> > > > subnode, and that is actually required, so add requirements
-> > > > using oneOf.
-> > > >
-> > > > Suggested-by: Rob Herring <robh@kernel.org>
-> > > > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> > > > ---
-> > > >  Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 ++++++
-> > > >  1 file changed, 6 insertions(+)
-> > > >
-> > >
-> > > My bot found errors running 'make DT_CHECKER_FLAGS=3D-m dt_binding_ch=
-eck'
-> > > on your patch (DT_CHECKER_FLAGS is new in v5.13):
-> > >
-> > > yamllint warnings/errors:
-> > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:60:7: [warning] =
-wrong indentation: expected 8 but found 6 (indentation)
-> > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:62:7: [warning] =
-wrong indentation: expected 8 but found 6 (indentation)
-> >=20
-> > Really?
-> >=20
-> > +  oneOf:
-> > +    - required:
-> > +      - ports
-> > +    - required:
-> > +      - ethernet-ports
-> >=20
-> > Two spaces after the oneOf, 2 spaces after a required as usual.
-> > I don't get it.
->=20
-> Given the other python errors spat out in Rob's report, I would suggest
-> that the "bot" is running a development version that hasn't been fully
-> tested, so anything it spits out is suspect. Maybe Rob can comment on
-> the validity of the warnings in the report.
+10/18/2023 3:28 PM, Mickaël Salaün пишет:
+> On Mon, Oct 16, 2023 at 09:50:25AM +0800, Konstantin Meskhidze wrote:
+>> Change the landlock_add_rule() syscall to support new rule types
+>> in future Landlock versions. Add the add_rule_path_beneath() helper
+> 
+> with next commits. Add the add_rule_path_beneath() helper
 
-In this case, I think it is correct.
-2 spaces for the oneOf, 2 spaces the start of the required for the
-nested list, so:
-oneOf:
-  - required:
-      - ports
-  - required:
-      - ethernet-ports
-
---Y6vV29njl6hI4/69
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZTEZ9gAKCRB4tDGHoIJi
-0iD0AP9nnypeoKCSb5p1jYVtkd/GxlHX1dmnIRWn/6opBLMHGQD+IqlWgD04icVW
-jyfkLzfNK6BmN32rgviaunCpTobjLAY=
-=HyDl
------END PGP SIGNATURE-----
-
---Y6vV29njl6hI4/69--
+  Done.
+> 
+>> to support current filesystem rules.
+> .
 
