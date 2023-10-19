@@ -1,297 +1,189 @@
-Return-Path: <netdev+bounces-42622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED7DF7CF8DD
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:29:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41B867CF8C2
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:29:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F3EA28215A
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:29:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF553282055
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:28:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C929225B0;
-	Thu, 19 Oct 2023 12:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441CE21375;
+	Thu, 19 Oct 2023 12:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wze9bdvh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE3B225CE
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:29:21 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CEE318B
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:29:19 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qtS8y-0006Ku-OT; Thu, 19 Oct 2023 14:28:52 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qtS8x-002mro-I7; Thu, 19 Oct 2023 14:28:51 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qtS8x-00529C-1Z;
-	Thu, 19 Oct 2023 14:28:51 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: [PATCH net-next v6 4/9] net: dsa: microchip: ksz9477: add Wake on LAN support
-Date: Thu, 19 Oct 2023 14:28:45 +0200
-Message-Id: <20231019122850.1199821-5-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231019122850.1199821-1-o.rempel@pengutronix.de>
-References: <20231019122850.1199821-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45E828F7
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:28:56 +0000 (UTC)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D4F4182
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:28:54 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-99357737980so1298763466b.2
+        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:28:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697718533; x=1698323333; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AXROsG5vlLmgOR5vm8tBBIkDMN6+wko0/gA2kZBbTEQ=;
+        b=Wze9bdvh2iHHYTXKn044ReKloT5jL7xmqdwVmohqB7yiioS3LGCVYgCrhbXL4vuGMM
+         4XJXSzWihJFna2dbbSqB4JRu+9YHnMzjVnE6W7gI2vDq2lp3aaTk8kNjYlQvU2pkOLfi
+         bkZoAgDxrRfFM+/OPOOL0cxOJ5SJSBaVIr5Xt2fnl4YjFtkabVvYsGTr6d/Sel1QSWvR
+         Vqkfq1F0fTSksbPbz27yM280Guf9qq+fkmQ7IurZTUUBAKmnIn/rq4lheOVuzLGpeIu1
+         Ns6ngb1xW+G5+uu5tHWI5V/rOZce2vPExd5anAtS5yhLv95dkvnVOeuPS9ulZkJNCNCj
+         PBKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697718533; x=1698323333;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AXROsG5vlLmgOR5vm8tBBIkDMN6+wko0/gA2kZBbTEQ=;
+        b=Pp4PlvzLxnTVq0Pz3pgzrbOyhd7odsDimSa5Z6va+jL80+uOCVEIJgNpdkJSYcUDht
+         H3kKFi6rz7FNB4DgsTRacgqzhCIiBgX/5XF/inVa1hobEWKBCf96B0MBnm3vplNhU/wo
+         I1/biuI5LZcdEhqJPKXkdcbAiox8lU8V5Frj5Oc4G03vctACm+gZojT2IxVKAyVUiiBi
+         xv24OkZ/EkKw+JYnBpBgJDK7gx72/7Bo/ND1LrJY4qxIOhBbS2jFqAUZ/18ZA5yUSEwl
+         MYeYJw8IeBJl8orSqRv+8THCq9+ugxFwvINJWK9YYAjjbqMVLlLcmBuLRqqYOnmOTJe7
+         xuLw==
+X-Gm-Message-State: AOJu0YxWbmOPvrcFdCRMAQRIa0wYelbdWm9n+EdJM/vNlUzp/hTs4vu5
+	7/4va+woVrOHiSAqqyUszZXx2A==
+X-Google-Smtp-Source: AGHT+IGDxOb3ZPKVZdkvKXrBgWAQhru6CcdjnMGVzkYPvlAm/gE18M7J10+BZeq9+zlPA/CMSAdPXg==
+X-Received: by 2002:a17:907:9306:b0:9ae:5f51:2e4a with SMTP id bu6-20020a170907930600b009ae5f512e4amr1815266ejc.36.1697718532893;
+        Thu, 19 Oct 2023 05:28:52 -0700 (PDT)
+Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
+        by smtp.gmail.com with ESMTPSA id fi10-20020a170906da0a00b0098669cc16b2sm3427218ejb.83.2023.10.19.05.28.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 05:28:52 -0700 (PDT)
+Date: Thu, 19 Oct 2023 12:28:46 +0000
+From: Matt Bobrowski <mattbobrowski@google.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>,
+	Yonghong Song <yhs@fb.com>, Marek Majkowski <marek@cloudflare.com>,
+	Lorenz Bauer <lmb@cloudflare.com>,
+	Alan Maguire <alan.maguire@oracle.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>,
+	David Miller <davem@davemloft.net>,
+	Network Development <netdev@vger.kernel.org>,
+	bpf <bpf@vger.kernel.org>
+Subject: Re: bpf indirect calls
+Message-ID: <ZTEg_lJ9QE3VvLP5@google.com>
+References: <87o8yqjqg0.fsf@toke.dk>
+ <20191010044156.2hno4sszysu3c35g@ast-mbp.dhcp.thefacebook.com>
+ <87v9srijxa.fsf@toke.dk>
+ <20191016022849.weomgfdtep4aojpm@ast-mbp>
+ <8736fshk7b.fsf@toke.dk>
+ <20191019200939.kiwuaj7c4bg25vqs@ast-mbp>
+ <ZRQtsyYM810Oh4px@google.com>
+ <CAADnVQJpCe9e2Qrnsaj4+ab47z00-bEYyHhN_mmpCh4+9i17vQ@mail.gmail.com>
+ <ZR_VBYHYKZzHqjb8@google.com>
+ <CAADnVQK+_1-d0mHJzvsq4FZmL+GSY+uo6HjQRLu2tJybCAO9+g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <CAADnVQK+_1-d0mHJzvsq4FZmL+GSY+uo6HjQRLu2tJybCAO9+g@mail.gmail.com>
 
-Add WoL support for KSZ9477 family of switches. This code was tested on
-KSZ8563 chip.
+On Fri, Oct 06, 2023 at 11:49:37AM -0700, Alexei Starovoitov wrote:
+> On Fri, Oct 6, 2023 at 2:36 AM Matt Bobrowski <mattbobrowski@google.com> wrote:
+> > On Fri, Sep 29, 2023 at 02:06:10PM -0700, Alexei Starovoitov wrote:
+> > > On Wed, Sep 27, 2023 at 6:27 AM Matt Bobrowski <mattbobrowski@google.com> wrote:
+> > > > static void testing(void) {
+> > > >   bpf_printk("testing");
+> > > > }
+> > > >
+> > > > struct iter_ctx {
+> > > >   void (*f) (void);
+> > > > };
+> > > > static u64 iter_callback(struct bpf_map *map, u32 *key,
+> > > >                          u64 *value, struct iter_ctx *ctx) {
+> > > >   if (ctx->f) {
+> > > >     ctx->f();
+> > > >   }
+> > > >   return 0;
+> > > > }
+> > > >
+> > > > SEC("lsm.s/file_open")
+> > > > int BPF_PROG(file_open, struct file *file)
+> > > > {
+> > > >   struct iter_ctx iter_ctx = {
+> > > >     .f = testing,
+> > > >   };
+> > > >   bpf_for_each_map_elem(&map, iter_callback, &iter_ctx, 0);
+> > > >   return 0;
+> > > > }
+> > > > ```
+> > > ...
+> > > > The fundamental difference between the two call instructions if I'm
+> > > > not mistaken is that one attempts to perform a call using an immediate
+> > > > value as its source operand, whereas the other attempts to perform a
+> > > > call using a source register as its source operand. AFAIU, the latter
+> > > > is not currently permitted by the BPF verifier. Is that right?
+> > >
+> > > Correct. Indirect calls via 'callx' instruction are not supported yet.
+> > > Please use bpf_tail_call() as a workaround for now.
+> >
+> > Noted.
+> >
+> > > Over the years the verifier became progressively smarter and maybe
+> > > now is a good time to support true indirect calls.
+> >
+> > This is something that I wouldn't mind exploring myself as a little
+> > research/contribution project. Would you object to me taking this on?
+> > I feel as though this would give me an opportunity to develop a better
+> > understanding when it comes to the internals of the BPF subsystem.
+> 
+> Please go ahead, but let's get to the bottom of your concern first.
+> See below.
 
-KSZ9477 family of switches supports multiple PHY events:
-- wake on Link Up
-- wake on Energy Detect.
-Since current UAPI can't differentiate between this PHY events, map all of them
-to WAKE_PHY.
+OK, sure.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- drivers/net/dsa/microchip/ksz9477.c    | 100 +++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz9477.h    |   4 +
- drivers/net/dsa/microchip/ksz_common.c |  24 ++++++
- drivers/net/dsa/microchip/ksz_common.h |   4 +
- 4 files changed, 132 insertions(+)
+> > > For certain cases like your example above it's relatively easy to
+> > > add such support, but before we do that please describe the full use
+> > > case that you wanted to implement with indirect calls.
+> >
+> > For the specific example I provided above, using indirect calls was an
+> > approach that I considered using within one of our BPF programs in
+> > order to work around this [0] specific BPF verifier shortcoming. For
+> > the workaround, I needed to implement 2 BPF programs that more or less
+> > done the same thing using the same set of routines, but differed ever
+> > so slightly for one particular routine. The way I envisioned
+> > controlling that one small difference between the 2 BPF programs is by
+> > supplying in different function pointers within the iteration context
+> > passed to bpf_for_each_map_elem(),
+> 
+> Early in that [0] link you were asking about kfunc detection and
+> the issue was that it's not backported to older kernels.
+> Here you're proposing a totally new feature of indirect calls which
+> is a magnitude bigger than kfunc detection.
+> Highly unlikely it will be backported to older kernels.
+> For google kernels you can backport anything you want, of course.
 
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-index cde8ef33d029..b9419d4b5e7b 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -56,6 +56,103 @@ int ksz9477_change_mtu(struct ksz_device *dev, int port, int mtu)
- 				  REG_SW_MTU_MASK, frame_size);
- }
- 
-+/**
-+ * ksz9477_handle_wake_reason - Handle wake reason on a specified port.
-+ * @dev: The device structure.
-+ * @port: The port number.
-+ *
-+ * This function reads the PME (Power Management Event) status register of a
-+ * specified port to determine the wake reason. If there is no wake event, it
-+ * returns early. Otherwise, it logs the wake reason which could be due to a
-+ * "Magic Packet", "Link Up", or "Energy Detect" event. The PME status register
-+ * is then cleared to acknowledge the handling of the wake event.
-+ *
-+ * Return: 0 on success, or an error code on failure.
-+ */
-+static int ksz9477_handle_wake_reason(struct ksz_device *dev, int port)
-+{
-+	u8 pme_status;
-+	int ret;
-+
-+	ret = ksz_pread8(dev, port, REG_PORT_PME_STATUS, &pme_status);
-+	if (ret)
-+		return ret;
-+
-+	if (!pme_status)
-+		return 0;
-+
-+	dev_dbg(dev->dev, "Wake event on port %d due to: %s %s\n", port,
-+		pme_status & PME_WOL_LINKUP ? "\"Link Up\"" : "",
-+		pme_status & PME_WOL_ENERGY ? "\"Enery detect\"" : "");
-+
-+	return ksz_pwrite8(dev, port, REG_PORT_PME_STATUS, pme_status);
-+}
-+
-+/**
-+ * ksz9477_get_wol - Get Wake-on-LAN settings for a specified port.
-+ * @dev: The device structure.
-+ * @port: The port number.
-+ * @wol: Pointer to ethtool Wake-on-LAN settings structure.
-+ *
-+ * This function checks the PME Pin Control Register to see if  PME Pin Output
-+ * Enable is set, indicating PME is enabled. If enabled, it sets the supported
-+ * and active WoL flags.
-+ */
-+void ksz9477_get_wol(struct ksz_device *dev, int port,
-+		     struct ethtool_wolinfo *wol)
-+{
-+	u8 pme_ctrl;
-+	int ret;
-+
-+	if (!dev->wakeup_source)
-+		return;
-+
-+	wol->supported = WAKE_PHY;
-+
-+	ret = ksz_pread8(dev, port, REG_PORT_PME_CTRL, &pme_ctrl);
-+	if (ret)
-+		return;
-+
-+	if (pme_ctrl & (PME_WOL_LINKUP | PME_WOL_ENERGY))
-+		wol->wolopts |= WAKE_PHY;
-+}
-+
-+/**
-+ * ksz9477_set_wol - Set Wake-on-LAN settings for a specified port.
-+ * @dev: The device structure.
-+ * @port: The port number.
-+ * @wol: Pointer to ethtool Wake-on-LAN settings structure.
-+ *
-+ * This function configures Wake-on-LAN (WoL) settings for a specified port.
-+ * It validates the provided WoL options, checks if PME is enabled via the
-+ * switch's PME Pin Control Register, clears any previous wake reasons,
-+ * and sets the Magic Packet flag in the port's PME control register if
-+ * specified.
-+ *
-+ * Return: 0 on success, or other error codes on failure.
-+ */
-+int ksz9477_set_wol(struct ksz_device *dev, int port,
-+		    struct ethtool_wolinfo *wol)
-+{
-+	u8 pme_ctrl = 0;
-+	int ret;
-+
-+	if (wol->wolopts & ~WAKE_PHY)
-+		return -EINVAL;
-+
-+	if (!dev->wakeup_source)
-+		return -EOPNOTSUPP;
-+
-+	ret = ksz9477_handle_wake_reason(dev, port);
-+	if (ret)
-+		return ret;
-+
-+	if (wol->wolopts & WAKE_PHY)
-+		pme_ctrl |= PME_WOL_LINKUP | PME_WOL_ENERGY;
-+
-+	return ksz_pwrite8(dev, port, REG_PORT_PME_CTRL, pme_ctrl);
-+}
-+
- static int ksz9477_wait_vlan_ctrl_ready(struct ksz_device *dev)
- {
- 	unsigned int val;
-@@ -1006,6 +1103,9 @@ void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
- 		ksz_pread16(dev, port, REG_PORT_PHY_INT_ENABLE, &data16);
- 
- 	ksz9477_port_acl_init(dev, port);
-+
-+	/* clear pending wake flags */
-+	ksz9477_handle_wake_reason(dev, port);
- }
- 
- void ksz9477_config_cpu_port(struct dsa_switch *ds)
-diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microchip/ksz9477.h
-index f90e2e8ebe80..fa8d0318b437 100644
---- a/drivers/net/dsa/microchip/ksz9477.h
-+++ b/drivers/net/dsa/microchip/ksz9477.h
-@@ -58,6 +58,10 @@ void ksz9477_switch_exit(struct ksz_device *dev);
- void ksz9477_port_queue_split(struct ksz_device *dev, int port);
- void ksz9477_hsr_join(struct dsa_switch *ds, int port, struct net_device *hsr);
- void ksz9477_hsr_leave(struct dsa_switch *ds, int port, struct net_device *hsr);
-+void ksz9477_get_wol(struct ksz_device *dev, int port,
-+		     struct ethtool_wolinfo *wol);
-+int ksz9477_set_wol(struct ksz_device *dev, int port,
-+		    struct ethtool_wolinfo *wol);
- 
- int ksz9477_port_acl_init(struct ksz_device *dev, int port);
- void ksz9477_port_acl_free(struct ksz_device *dev, int port);
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 11adae8a2037..3f7c86e545a7 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -319,6 +319,8 @@ static const struct ksz_dev_ops ksz9477_dev_ops = {
- 	.mdb_del = ksz9477_mdb_del,
- 	.change_mtu = ksz9477_change_mtu,
- 	.phylink_mac_link_up = ksz9477_phylink_mac_link_up,
-+	.get_wol = ksz9477_get_wol,
-+	.set_wol = ksz9477_set_wol,
- 	.config_cpu_port = ksz9477_config_cpu_port,
- 	.tc_cbs_set_cinc = ksz9477_tc_cbs_set_cinc,
- 	.enable_stp_addr = ksz9477_enable_stp_addr,
-@@ -3543,6 +3545,26 @@ static int ksz_setup_tc(struct dsa_switch *ds, int port,
- 	}
- }
- 
-+static void ksz_get_wol(struct dsa_switch *ds, int port,
-+			struct ethtool_wolinfo *wol)
-+{
-+	struct ksz_device *dev = ds->priv;
-+
-+	if (dev->dev_ops->get_wol)
-+		dev->dev_ops->get_wol(dev, port, wol);
-+}
-+
-+static int ksz_set_wol(struct dsa_switch *ds, int port,
-+		       struct ethtool_wolinfo *wol)
-+{
-+	struct ksz_device *dev = ds->priv;
-+
-+	if (dev->dev_ops->set_wol)
-+		return dev->dev_ops->set_wol(dev, port, wol);
-+
-+	return -EOPNOTSUPP;
-+}
-+
- static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
- 				    const unsigned char *addr)
- {
-@@ -3727,6 +3749,8 @@ static const struct dsa_switch_ops ksz_switch_ops = {
- 	.get_pause_stats	= ksz_get_pause_stats,
- 	.port_change_mtu	= ksz_change_mtu,
- 	.port_max_mtu		= ksz_max_mtu,
-+	.get_wol		= ksz_get_wol,
-+	.set_wol		= ksz_set_wol,
- 	.get_ts_info		= ksz_get_ts_info,
- 	.port_hwtstamp_get	= ksz_hwtstamp_get,
- 	.port_hwtstamp_set	= ksz_hwtstamp_set,
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index f7c471bc040f..a7394175fcf6 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -374,6 +374,10 @@ struct ksz_dev_ops {
- 				    int duplex, bool tx_pause, bool rx_pause);
- 	void (*setup_rgmii_delay)(struct ksz_device *dev, int port);
- 	int (*tc_cbs_set_cinc)(struct ksz_device *dev, int port, u32 val);
-+	void (*get_wol)(struct ksz_device *dev, int port,
-+			struct ethtool_wolinfo *wol);
-+	int (*set_wol)(struct ksz_device *dev, int port,
-+		       struct ethtool_wolinfo *wol);
- 	void (*config_cpu_port)(struct dsa_switch *ds);
- 	int (*enable_stp_addr)(struct ksz_device *dev);
- 	int (*reset)(struct ksz_device *dev);
--- 
-2.39.2
+Well, that holds true most of the time, but it also depends on the
+context you're talking about of course. As you can also imagine, some
+areas are a little more receptive at applying a specific backport then
+others.
 
+> So backport of kfunc detection would have been enough and
+> you wouldn't need indirect calls ?
+
+Yes, I agree that backporting a specific patch would fundamentally
+address the specific problem that I ran into here, but we didn't take
+that route so I was left scrambling looking for alternate
+approaches. Regardless of the decision made in this specific scenario
+on whether to backport or not, it doesn't go to say that we shouldn't
+look at implementing indirect call support, right?
+
+/M
 
