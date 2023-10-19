@@ -1,170 +1,90 @@
-Return-Path: <netdev+bounces-42534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE6A7CF37D
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:05:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A68077CF39C
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2746CB20DB5
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 09:05:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D88A61C208A5
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 09:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B182F16428;
-	Thu, 19 Oct 2023 09:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A0F168A3;
+	Thu, 19 Oct 2023 09:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NH5YXUvF"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2F916416
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 09:05:15 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8D9FA;
-	Thu, 19 Oct 2023 02:05:14 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-	by smtp-out1.suse.de (Postfix) with ESMTP id E7F3821861;
-	Thu, 19 Oct 2023 09:05:12 +0000 (UTC)
-Received: from lion.mk-sys.cz (unknown [10.163.44.94])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by relay2.suse.de (Postfix) with ESMTPS id 283F82C4CD;
-	Thu, 19 Oct 2023 09:05:12 +0000 (UTC)
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 30EBB2016B; Thu, 19 Oct 2023 11:05:10 +0200 (CEST)
-Date: Thu, 19 Oct 2023 11:05:10 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] ethtool: fix clearing of WoL flags
-Message-ID: <20231019090510.bbcmh7stzqqgchdd@lion.mk-sys.cz>
-References: <20231019070904.521718-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16BDA16416
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 09:10:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8A988C433C9;
+	Thu, 19 Oct 2023 09:10:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697706624;
+	bh=Ebub719cRz9G5ACNsmDwbxaKVkRnz5JEOIBNJDMXBA8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NH5YXUvFrRWaZ2D+vykw34JsWFGdgzdgBFdmrdsOkJ/7vgNwqKuRdUna3jxCLdWfM
+	 c0TCEAurZcBgBtTV91z4sJoVQ3Cc1hOgbne7exSLOUnPuCyQLp+eYYRUCgf5BcHUWa
+	 MhE6OZSxPXtE8zSelO6WqCL8S538G2Qo+u2B0Lpodumu+pF7EyomOGjwZGXVZkGtFg
+	 VjkFYe4WsWg/k9gEnGEy/OU/0z2916DotNZz0Ue5G4zaMqINaA2+A6vYxGiogcpHM3
+	 W5SeCJhIi9JK1FWib/1iTfzkxjPalG6YRR5oXs5MZIsIA7AuVXUSF9BO/xvGIzU2+K
+	 RBeGFKh3YQCpQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6D81AC73FE1;
+	Thu, 19 Oct 2023 09:10:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rxorobu3bnor6cuj"
-Content-Disposition: inline
-In-Reply-To: <20231019070904.521718-1-o.rempel@pengutronix.de>
-X-Spam-Level: 
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Rspamd-Server: rspamd2
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	 TAGGED_RCPT(0.00)[];
-	 REPLY(-4.00)[]
-X-Spam-Score: -4.00
-X-Rspamd-Queue-Id: E7F3821861
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/2] rswitch: Add PM ops
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169770662444.23024.10068818834489019175.git-patchwork-notify@kernel.org>
+Date: Thu, 19 Oct 2023 09:10:24 +0000
+References: <20231017113402.849735-1-yoshihiro.shimoda.uh@renesas.com>
+In-Reply-To: <20231017113402.849735-1-yoshihiro.shimoda.uh@renesas.com>
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
+
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 17 Oct 2023 20:34:00 +0900 you wrote:
+> This patch is based on the latest net-next.git / next branch.
+> After applied this patch with the following patches, the system can
+> enter/exit Suspend to Idle without any error:
+> https://git.kernel.org/pub/scm/linux/kernel/git/phy/linux-phy.git/commit/?h=next&id=aa4c0bbf820ddb9dd8105a403aa12df57b9e5129
+> https://git.kernel.org/pub/scm/linux/kernel/git/phy/linux-phy.git/commit/?h=next&id=1a5361189b7acac15b9b086b2300a11b7aa84c06
+> 
+> Changes from v2:
+> https://lore.kernel.org/all/20231013121936.364678-1-yoshihiro.shimoda.uh@renesas.com/
+>  - Based on the latest net-next.git / main branch.
+>  - Change the subject in the patch 1/2.
+>  - Fix a condition to avoid endless loop in the patch 1/2.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3,1/2] rswitch: Use unsigned int for port related array index
+    https://git.kernel.org/netdev/net-next/c/1bf55630694e
+  - [net-next,v3,2/2] rswitch: Add PM ops
+    https://git.kernel.org/netdev/net-next/c/35b78409e1c7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---rxorobu3bnor6cuj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Oct 19, 2023 at 09:09:04AM +0200, Oleksij Rempel wrote:
-> With current kernel it is possible to set flags, but not possible to remo=
-ve
-> existing WoL flags. For example:
-> ~$ ethtool lan2
-> ...
->         Supports Wake-on: pg
->         Wake-on: d
-> ...
-> ~$ ethtool -s lan2 wol gp
-> ~$ ethtool lan2
-> ...
->         Wake-on: pg
-> ...
-> ~$ ethtool -s lan2 wol d
-> ~$ ethtool lan2
-> ...
->         Wake-on: pg
-> ...
->=20
-> This patch makes it work as expected
->=20
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
->  net/ethtool/wol.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->=20
-> diff --git a/net/ethtool/wol.c b/net/ethtool/wol.c
-> index 0ed56c9ac1bc..fcefc1bbfa2e 100644
-> --- a/net/ethtool/wol.c
-> +++ b/net/ethtool/wol.c
-> @@ -108,15 +108,16 @@ ethnl_set_wol(struct ethnl_req_info *req_info, stru=
-ct genl_info *info)
->  	struct net_device *dev =3D req_info->dev;
->  	struct nlattr **tb =3D info->attrs;
->  	bool mod =3D false;
-> +	u32 wolopts =3D 0;
->  	int ret;
-> =20
->  	dev->ethtool_ops->get_wol(dev, &wol);
-> -	ret =3D ethnl_update_bitset32(&wol.wolopts, WOL_MODE_COUNT,
-> +	ret =3D ethnl_update_bitset32(&wolopts, WOL_MODE_COUNT,
->  				    tb[ETHTOOL_A_WOL_MODES], wol_mode_names,
->  				    info->extack, &mod);
->  	if (ret < 0)
->  		return ret;
-> -	if (wol.wolopts & ~wol.supported) {
-> +	if (wolopts & ~wol.supported) {
->  		NL_SET_ERR_MSG_ATTR(info->extack, tb[ETHTOOL_A_WOL_MODES],
->  				    "cannot enable unsupported WoL mode");
->  		return -EINVAL;
-> @@ -132,8 +133,9 @@ ethnl_set_wol(struct ethnl_req_info *req_info, struct=
- genl_info *info)
->  				    tb[ETHTOOL_A_WOL_SOPASS], &mod);
->  	}
-> =20
-> -	if (!mod)
-> +	if (!mod && wolopts =3D=3D wol.wolopts)
->  		return 0;
-> +	wol.wolopts =3D wolopts;
->  	ret =3D dev->ethtool_ops->set_wol(dev, &wol);
->  	if (ret)
->  		return ret;
-> --=20
-> 2.39.2
-
-This doesn't look right, AFAICS with this patch, the resulting WoL flags
-would not depend on current values at all, i.e. it would certainly break
-non-absolute commands like
-
-  ethtool -s eth0 wol +g
-  ethtool -s eth0 wol -u+g
-  ethtool -s etho wol 32/34
-
-How recent was the kernel where you encountered the issue? I suspect the
-issue might be related to recent 108a36d07c01 ("ethtool: Fix mod state
-of verbose no_mask bitset"), I'll look into it closer.
-
-Michal
-
---rxorobu3bnor6cuj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmUw8UIACgkQ538sG/LR
-dpWtggf+Lk2CxYPUS9ik4oz2X5eoDAAvN9rI80fF2DckMVDfGF6mK7n0KOpBN+6o
-Ag8CxEt1FyVKp96fYts93EjYPwByvqFpeNkQnhNHOpVPo9HUNAZl2eiGZtyZabU9
-FbM04TlORojQbS+4h7qrv4bYW3Tg1w9EzQbtXvfF8gve/fqbYWqVYGSrEY3QO7z9
-tWD6YuOpmeZog8dkLljA7bjV2kocDpYa5+pW8eUSfdut+VF8e13WK9PsMcYCNdk+
-mpgo7RURmd8pYTYSO5GySbTSxf4V9PBWUUBYtGT0VwdigHLk/XATArmywppjMvSW
-PAQOzhgZlIUEs1aUXjiJyBH47oNdMw==
-=Np2f
------END PGP SIGNATURE-----
-
---rxorobu3bnor6cuj--
 
