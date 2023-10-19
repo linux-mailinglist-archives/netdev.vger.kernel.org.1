@@ -1,124 +1,123 @@
-Return-Path: <netdev+bounces-42551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9BC07CF504
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:21:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D2057CF522
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16AAE1C209AC
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:21:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DFAC1C209AF
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B95A182AC;
-	Thu, 19 Oct 2023 10:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C8F182C1;
+	Thu, 19 Oct 2023 10:25:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="i7n7Db79"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QvpnKZBx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC5F18030
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:21:20 +0000 (UTC)
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8798F11F;
-	Thu, 19 Oct 2023 03:21:18 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 71BA56000B;
-	Thu, 19 Oct 2023 10:21:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1697710877;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD76617985
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:25:16 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7421911F
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 03:25:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697711114;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Z2ydsXXBaNBGMFpju1QSEdkFSa9tXDTzQRBfxsG6otY=;
-	b=i7n7Db79nY/VWXnDbI9SYtt/qtDyAdtROrcJASSglaQq0S4kA0BCkd9sH+O7h8PCbPWgRZ
-	BpXnW+ddcdjoh8XF0Jfvl+SSKd8up7VDJ33nVsqTqeyOPogF8KIE627ydCwtKPpHU+RoBv
-	KEi8ACvEKF0qNEIXM7RYM2UDSL5qcQIoLZ+yoDDivxUHAAF13DeItCECs0Og7eLXlxPt1M
-	nmzbaaPynO6UmIY5CrH86Swy4LVOalHZaHWCJQA6lAPi1ILMRTfJuBZTTIeedopl1nQIIL
-	7YZtXtrsK7P+/y0jfv43LjGtkmThadBK6WfQviqnJzZs4wLIqhnPfW5JF+Z6yQ==
-Date: Thu, 19 Oct 2023 12:21:14 +0200
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vladimir
- Oltean <olteanv@gmail.com>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] ethtool: fix clearing of WoL flags
-Message-ID: <20231019122114.5b4a13a9@kmaincent-XPS-13-7390>
-In-Reply-To: <20231019095140.l6fffnszraeb6iiw@lion.mk-sys.cz>
-References: <20231019070904.521718-1-o.rempel@pengutronix.de>
-	<20231019090510.bbcmh7stzqqgchdd@lion.mk-sys.cz>
-	<20231019095140.l6fffnszraeb6iiw@lion.mk-sys.cz>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	bh=2XntUvuhro1ALXornIv7c5rBfNf1FPsxFvHaqSzLuXQ=;
+	b=QvpnKZBxhWLN1d1vVPB6MP7Ge2UF4dTSx1u1F7RofHfq1JmDa9MTpnnxhxIwlgkBD8ZqJr
+	0mu64sPqPrPIeEbvmLkqrMMh1YoREuwyOBhUTJisJAl9Ho6exO10R/fcpE06UBNya/GpER
+	3KhNSiPGIoVBRVEpW4/FvyHmAmwmERs=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-wl_l-4zqNHOQutBABy5opw-1; Thu, 19 Oct 2023 06:25:03 -0400
+X-MC-Unique: wl_l-4zqNHOQutBABy5opw-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-53eaedf5711so704824a12.1
+        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 03:25:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697711102; x=1698315902;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2XntUvuhro1ALXornIv7c5rBfNf1FPsxFvHaqSzLuXQ=;
+        b=YPyWllPO6wxwMDvCOzo1mGlijE3KtjEwCaNn6T4gIBeKF8ZHgy5PyGnFuns7+QpboX
+         Q9pS6ca49I2kgIYfMPwb5qVbCHQ4Y8TyEmYXcgofOv7o8EG8xmVCvI3kbvh/rr+/sHaT
+         4TPnwF3SJIWDsXmq05OUigbQb9GU4Ekicvkzp7beL/SE2WWrWg7Re9pnVSws6pj419Rd
+         iSjcKaMbhlNrrLnFh97VuRDSjxVoasWkM8i2gEKdv0AUhOhhMC8rD0yvfM/7fkRnjsla
+         Kyb6SqWMUm3AVEETlfzfeN3nT0URAcdsIIoHVep2l8YI2lx31/xyM25IPuPHT8ctImyU
+         9RvA==
+X-Gm-Message-State: AOJu0YyyfuoCk9LfEk+9u5zscEdcHKdg/1eChcD/eLXCoxGbX6p84moR
+	UhGstpmxFQZpnQ6PdDnGXKZpROhekbA4oF99LR/DNhbqHsjwOuhxTPK1DBKofAeP/o5fiS1vyZh
+	Kg+X48B2MPXeT0UqT
+X-Received: by 2002:a50:c359:0:b0:53f:1aff:4dc2 with SMTP id q25-20020a50c359000000b0053f1aff4dc2mr1251332edb.4.1697711102122;
+        Thu, 19 Oct 2023 03:25:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGF/kxTzU+9JHxinXDTjDZm13nI6jLL/SOYN5tFsvK+CZA1Q2UYBbHY6ENsgHZX0due/fqSyA==
+X-Received: by 2002:a50:c359:0:b0:53f:1aff:4dc2 with SMTP id q25-20020a50c359000000b0053f1aff4dc2mr1251321edb.4.1697711101772;
+        Thu, 19 Oct 2023 03:25:01 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-237-142.dyn.eolo.it. [146.241.237.142])
+        by smtp.gmail.com with ESMTPSA id s10-20020a508dca000000b005340d9d042bsm4109287edh.40.2023.10.19.03.25.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 03:25:01 -0700 (PDT)
+Message-ID: <84fbe8a5d47c81142c5eb07b77288711970051e1.camel@redhat.com>
+Subject: Re: [PATCH net 1/1] net: stmmac: update MAC capabilities when tx
+ queues are updated
+From: Paolo Abeni <pabeni@redhat.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>, "Gan, Yi Fang"
+	 <yi.fang.gan@intel.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Ong Boon Leong
+ <boon.leong.ong@intel.com>,  netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Michael
+ Sit Wei Hong <michael.wei.hong.sit@intel.com>, Looi Hong Aun
+ <hong.aun.looi@intel.com>, Voon Weifeng <weifeng.voon@intel.com>, Song
+ Yoong Siang <yoong.siang.song@intel.com>
+Date: Thu, 19 Oct 2023 12:24:59 +0200
+In-Reply-To: <ZS+IUo5q/AnYm1Gb@shell.armlinux.org.uk>
+References: <20231018023137.652132-1-yi.fang.gan@intel.com>
+	 <ZS+IUo5q/AnYm1Gb@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, 19 Oct 2023 11:51:40 +0200
-Michal Kubecek <mkubecek@suse.cz> wrote:
+On Wed, 2023-10-18 at 08:25 +0100, Russell King (Oracle) wrote:
+> On Wed, Oct 18, 2023 at 10:31:36AM +0800, Gan, Yi Fang wrote:
+> > From: Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>
+> >=20
+> > Upon boot up, the driver will configure the MAC capabilities based on
+> > the maximum number of tx and rx queues. When the user changes the
+> > tx queues to single queue, the MAC should be capable of supporting Half
+> > Duplex, but the driver does not update the MAC capabilities when it is
+> > configured so.
+> >=20
+> > Using the stmmac_reinit_queues() to check the number of tx queues
+> > and set the MAC capabilities accordingly.
+>=20
+> There is other setup elsewhere in the driver that fiddles with this in
+> stmmac_phy_setup(). Maybe provide a helper function so that this
+> decision making can be made in one function called from both these
+> locations, so if the decision making for HD support changes, only one
+> place needs changing?
 
-> On Thu, Oct 19, 2023 at 11:05:10AM +0200, Michal Kubecek wrote:
-> > On Thu, Oct 19, 2023 at 09:09:04AM +0200, Oleksij Rempel wrote:  
-> > > With current kernel it is possible to set flags, but not possible to
-> > > remove existing WoL flags. For example:
-> > > ~$ ethtool lan2
-> > > ...
-> > >         Supports Wake-on: pg
-> > >         Wake-on: d
-> > > ...
-> > > ~$ ethtool -s lan2 wol gp
-> > > ~$ ethtool lan2
-> > > ...
-> > >         Wake-on: pg
-> > > ...
-> > > ~$ ethtool -s lan2 wol d
-> > > ~$ ethtool lan2
-> > > ...
-> > >         Wake-on: pg
-> > > ...
-> > >   
-> > 
-> > How recent was the kernel where you encountered the issue? I suspect the
-> > issue might be related to recent 108a36d07c01 ("ethtool: Fix mod state
-> > of verbose no_mask bitset"), I'll look into it closer.  
-> 
-> The issue was indeed introduced by commit 108a36d07c01 ("ethtool: Fix
-> mod state of verbose no_mask bitset"). The problem is that a "no mask"
-> verbose bitset only contains bit attributes for bits to be set. This
-> worked correctly before this commit because we were always updating
-> a zero bitmap (since commit 6699170376ab ("ethtool: fix application of
-> verbose no_mask bitset"), that is) so that the rest was left zero
-> naturally. But now the 1->0 change (old_val is true, bit not present in
-> netlink nest) no longer works.
+Indeed that looks both straight-forward and more robust.
 
-Doh I had not seen this issue! Thanks you for reporting it.
-I will send the revert then and will update the fix for next merge-window.
+@Gan, Yi Fang: please send a v2 introducing and using such helper,
+thanks!
 
-> To fix the issue while keeping more precise modification tracking
-> introduced by commit 108a36d07c01 ("ethtool: Fix mod state of verbose
-> no_mask bitset"), we would have to either iterate through all possible
-> bits in "no mask" case or update a temporary zero bitmap and then set
-> mod by comparing it to the original (and rewrite the target if they
-> differ). This is exactly what I was trying to avoid from the start but
-> it wouldn't be more complicated than current code.
-> 
-> As we are rather late in the 6.6 cycle (rc6 out), the safest solution
-> seems to be reverting commit 108a36d07c01 ("ethtool: Fix mod state of
-> verbose no_mask bitset") in net tree as sending a notification even on
-> a request which turns out to be no-op is not a serious problem (after
-> all, this is what happens for ioctl requests most of the time and IIRC
-> there are more cases where it happens for netlink requests). Then we can
-> fix the change detection properly in net-next in the way proposed in
-> previous paragraph (I would prefer not risking more intrusive changes at
-> this stage).
+Paolo
+
 
