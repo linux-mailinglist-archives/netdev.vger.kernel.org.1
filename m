@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-42559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96EB77CF533
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:28:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 032A17CF53C
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45FB428204C
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:28:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B576E282062
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81AF018C0A;
-	Thu, 19 Oct 2023 10:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D8E1DFC7;
+	Thu, 19 Oct 2023 10:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PIdCqBr+"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MTpqBD2i"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2572199A8
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:28:15 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2077.outbound.protection.outlook.com [40.107.223.77])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67665119
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 03:28:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8494718AFB
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:28:18 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2062.outbound.protection.outlook.com [40.107.92.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF13E12A
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 03:28:16 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SzX6IxP3thUVf8oay3mg57gfHZ/HmuXx5RXBAXjPxyxnMZy6DCSwTcn+u2h1E2MzVdTZ7yJIGf8ZANQ4KpSzYDNYLE3HpxEh54vd1HrS7sSvdUX+x1H7olIwTQRgwGwQWi7CtKU0XgXmj+wlbNlAWdRgfBQi15TtFlXCwlc0VPgxeMTrKeR0PaREMlUIeyqMHfVffmK5BxmKlzhIReWywFPvpgsA/Yxzr9szKXmOPPFZNWIap4DjlFBL7yO5ifhAd+in6hB4ljNTbnkh1So550r3AHCpNsNSjE4tsAVeqlGM1QEdAaoQ8CgqtQJ32Y3mOvfiT2je4Q0965phe7Kotg==
+ b=a96LGuMauHx1XGSFPJfEGiJy7Dk5QyENCU01+xl8XDtW4fbzLyvoVHwaHiSNVNGccuWVhIuKaG64a2x3S5MPU+OPqTsioCrYBigdyp1X/IRoVb0FPmaGHaEUL3/9rT7gGzSga+U9xflu6xbLpDyNGiBSMAuVtIxDtMTE3w5HLVFH3I9XdxyrfldUgegjHn2UUw9ywjWqBzkDCehyrNx5nJB65N0dECBsHxrIgb69aC7RLSGMlgDLuuKuRYJZUAqaexrpztPTGh7k9zZKsTDfs1iOs39Lq1B9ctSBVVZxQfDaejKHaQvQcbJOldwmfz/MNr9pOvdoAO9cA56Uu/rU5w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G1+hiBRJbjuHXhyCd4Lp+6duLUW4ST5GyxVuEXrdvCU=;
- b=DGSul5uaeS0nBgyVUgLquD6geL5BVXil6Tewj5778OkkkrzyG/2YNyQ5hgHyRhIRgiLdXOMlVNqCYFXmlgBSYcAE+zHUfE7Rh5RM58TfamFPTVohtX6yGuE7AJzPncZlIDq13vcyZCZN9HTttKxkW7PYgRhiJIPJuMtfDsCeW5VE7PiSYDb1HpJ59W1qqYFFRSVS5ulUkUJQxTGK9+nwzB3NhnmCqwj9GYqmLwYICvxyJeUv25qb4jNZ7Fkqr/HX7ThhItbvgSwmTEbLTcusHZovWGs9vUw45T681wUS9r11ZQXtV3gbri7cNCFejBD7VNgS5gojhtDOdYgQnOQ/zQ==
+ bh=W3Te5DtNGR1ydOeaPMBsy8xdzAAOieRfJJ7hOTm6+LI=;
+ b=dV2cMphuBrAcSNY+shT6Scg9/ISB+ACqBtJVs2DySc8rq4VlycAkxYIioNQssdebSSfCT9aRXI+P4lyxpS8CQf4xd/ORkMeREAeAWEzGTd7YaBn0Fph+38PsklY1WknmkHTnCSalDqngp3uI5NvBjSd+GHSTlped3XWmrJwv22Jhg+ONf3auyTvNZBX1YZLWNYch+0H/fO0VklWRE0NmAawoATijAy84wRcOx4JTanqXcSltkOylrFvYkDZF60oJsAkwT6iZ2OhQ/iY4d0sK6OJ3sBdrH1bPw+t0+21ZKnIbvGJzuVehCzq4mhUUN1mg9/5rovH0eHvLt30Q7zVQkA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -37,18 +37,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G1+hiBRJbjuHXhyCd4Lp+6duLUW4ST5GyxVuEXrdvCU=;
- b=PIdCqBr+R000eve3ZcmYAGKXeUhSj7ucnsHDPis0fD2G/RMkuD+Za5LNaxyMJasMfeRv94buy6QPfaWs8+rmK/xHfE5EnnI29THeY0PF0CXpqfkiWwrc1K3XXAEnZk0PzpnpWe50GZZbB+Sd3XsU9QWeJbB8rrncW4fwsrFukuqkinTfppKhPgCO7ZPGn+L4aeWZF9fBaCZvsHGH+W2ci3Fwqfw61/pAc3Rd7pUJW+ODVLgqWODHXkT7Z/m5YWLnkyk82n5G0IDGqbTi+pO9+H8oBv4W55gyfEbvnifbSf1xXBBkZm/Ar2gphhhPBFo36PlnDB9d3Dj+yUJxZ1la5A==
-Received: from MN2PR12CA0016.namprd12.prod.outlook.com (2603:10b6:208:a8::29)
- by BY5PR12MB4051.namprd12.prod.outlook.com (2603:10b6:a03:20c::7) with
+ bh=W3Te5DtNGR1ydOeaPMBsy8xdzAAOieRfJJ7hOTm6+LI=;
+ b=MTpqBD2iL48aZ9wY1xiZbi5NtLDfd2NwF10ZAqJ1ymX90uHBAmGxWLTmx1Phu3h/qd7hG7EgnsWZq5Mxc/5GXcco/6j2K0Iy92Ne3CHYB2LuoXgVIMA4DgapCT0OQlUynKS/SQ7BWnAracALdDKNWYfx7kOL/e5XIlk69f1hzvIa1MwblfFpfBRVZNVRzhSl5uRa0G3KH5tqoSbY6nstvmTp++Y5ZVKlAl/4ZIgUtqBqs7kv2/W72J2hpWSOnFOskjw1vSlRa6EhRc2DCNnxBcsj4hRzjPOGE6tVnPhoxKSBCK6u3PoGBtwzmaB6ZoScrAUH7LplGnRBy5HM6yDIAg==
+Received: from MN2PR20CA0008.namprd20.prod.outlook.com (2603:10b6:208:e8::21)
+ by IA1PR12MB6211.namprd12.prod.outlook.com (2603:10b6:208:3e5::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.35; Thu, 19 Oct
- 2023 10:28:12 +0000
-Received: from BL6PEPF0001AB52.namprd02.prod.outlook.com
- (2603:10b6:208:a8:cafe::51) by MN2PR12CA0016.outlook.office365.com
- (2603:10b6:208:a8::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.24 via Frontend
- Transport; Thu, 19 Oct 2023 10:28:11 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.23; Thu, 19 Oct
+ 2023 10:28:14 +0000
+Received: from BL6PEPF0001AB55.namprd02.prod.outlook.com
+ (2603:10b6:208:e8:cafe::80) by MN2PR20CA0008.outlook.office365.com
+ (2603:10b6:208:e8::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.23 via Frontend
+ Transport; Thu, 19 Oct 2023 10:28:14 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -56,26 +56,26 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- BL6PEPF0001AB52.mail.protection.outlook.com (10.167.241.4) with Microsoft
+ BL6PEPF0001AB55.mail.protection.outlook.com (10.167.241.7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.22 via Frontend Transport; Thu, 19 Oct 2023 10:28:11 +0000
+ 15.20.6838.22 via Frontend Transport; Thu, 19 Oct 2023 10:28:14 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 19 Oct
- 2023 03:27:55 -0700
+ 2023 03:27:57 -0700
 Received: from yaviefel.vdiclient.nvidia.com (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Thu, 19 Oct 2023 03:27:52 -0700
+ 15.2.986.41; Thu, 19 Oct 2023 03:27:55 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH net-next 07/11] mlxsw: pci: Permit toggling LAG mode
-Date: Thu, 19 Oct 2023 12:27:16 +0200
-Message-ID: <8ecead4979d95abbbfc69be4e80c0514fdbc024f.1697710282.git.petrm@nvidia.com>
+Subject: [PATCH net-next 08/11] mlxsw: spectrum_fid: Allocate PGT for the whole FID family in one go
+Date: Thu, 19 Oct 2023 12:27:17 +0200
+Message-ID: <3b8a3df3ec6a31bf3d7cf808defd4b50fe4fb824.1697710282.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1697710282.git.petrm@nvidia.com>
 References: <cover.1697710282.git.petrm@nvidia.com>
@@ -92,84 +92,169 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB52:EE_|BY5PR12MB4051:EE_
-X-MS-Office365-Filtering-Correlation-Id: 83caee40-b94e-4cb2-1447-08dbd08e1876
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB55:EE_|IA1PR12MB6211:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8e4c0f2e-614a-4798-a640-08dbd08e1a3c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	noSwqgYEqxN1YMEbaBD+ID/fNkPcaTx7Xm5mGUFzJ+w2fZ6oMNvWsGVlcY2oRXimA5VWQX0Pwciz8NIGU3PS7iQSceqorcSlSm5YyAYIq89cnX+yF3AgWG7Yj55L01o3lXfIE2lwrIgi5ZBt4KC/bl5GN7LzjrjJkjt0/YxSoVjggBR2wxPTp8xZfEEp82ssGBlrzQ/xsVFoKSP0zlE6MCSEIBMPjvMwykLcC+hrlKDSV8WHTteLFGA0wdPm8Aw91Bp2E0RIUOE76DJkouPOYHIRsKTXo7Uj78SFq2F56kOrBB6PS6cx5FaceODMWnHqiUNPSIKc7Pe5R6a5ChwV6+ACG5mXKgXey0fMgAxSJ/ETGFX7p1gCC3/JtDvmZwuhS3k5YYmDugjEvTBfjpr4wnudy0L/3C9B5p0+/UffhZRAsD4gY6NP+cZvsxZ7mDAwXtrKU+ClUTK709lMlYUTKr3BVn85rQFWke7VB7cPcVQFmjKiET0xt47/22lzCFo/A2CWh/+QdEjq31hdegQ8vwXfku2Y567reCc/VSKskgoGZZgTzLpvcNWsl/bEZA+cbj3nV5kQYdSGoTYyeXgfblFKoNq191XOqF9y0T4Jgehz2OVKEbtfPcmqUSyDKV/i3/h20JYtlI8MxdbeVIOz7MJWHq1nXMuOmKX/rKuCRRSkY0hisZ7N5+L+Q72OSm4KDSYI5T6gyJrcnTzogiOC6PETvaABap91FDYpyvCiPp0ZXR8npWKGgB+tkTYnt66E
+	E2+fC6ZITTSl7Upd4qkSAjhBB+/kTKcpJfnnFvj6IsKyyCm16yyLf5djh+LoR9SfD0d7vehhSd358R04gRw89N73OhLjJKpWidTuRi19S/Phl+D5rFZqI9aiAatsC/i+9AlByrpNJ60xh+OI/80phxBoooKwnOv6kl70r2NUNNQvWujLFnaK7drL51SfCMCXtjB/FH3+v8vJBvVonqbIcocOHc+XNZlPf+NIO+H5D8pj01+iaz/6mcg57kcrseP4O9NyWf0DD5HDGFEuohw82xCg/9IDg99ixFc2vahSgdTbDh766vQwC7+jiCBF9CtzoK9LGdpr2Cs/kVMuXwKzMm7RZpNPOld+GNfIsifr3EjYtFcy9+NBHswEBOeyamPRzsSEs2ZUjwwqSLH1l+PviNanjUyMzZg+c8m/CpGFVgrmZhV54E66MsNfXTjZST8j2G47VdvJSsb/NN7ERZ6tSm7Z28V0j+B0dSqq6i7H7yJRO8XFzQDca+9h0uU+vNF58BxVo7Ht38r0I2mDMvOeCrTSfjxWdfWfkl1RoowN4rDVwqxZHWQ7DeV0gXQ08Y1yseGPGpazM8e3bFxurN0DiOPJBvJN4Af1wf+KvIBDjw9VFjxi0SMfMVtadCauX1BFZepG+VPNrMSg1fgiiC2qwagJiWJKgbv/nvwRVA3MDz5WlD2QAewDV8P5vt8xkXh9wfy92OU8qYZcnxgDEAalmlQ/hs81o6sg8LxU4cW1vrpqK4GC5eNdSryLsr0SY5yN
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(136003)(39860400002)(376002)(346002)(230922051799003)(82310400011)(64100799003)(1800799009)(451199024)(186009)(40470700004)(46966006)(36840700001)(54906003)(6666004)(110136005)(107886003)(5660300002)(26005)(336012)(16526019)(426003)(8676002)(70586007)(2616005)(8936002)(316002)(7696005)(41300700001)(83380400001)(2906002)(356005)(36860700001)(4326008)(70206006)(7636003)(478600001)(47076005)(82740400003)(86362001)(40460700003)(36756003)(40480700001);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(346002)(396003)(376002)(230922051799003)(451199024)(82310400011)(64100799003)(186009)(1800799009)(40470700004)(46966006)(36840700001)(54906003)(316002)(70586007)(70206006)(41300700001)(40480700001)(8936002)(8676002)(4326008)(5660300002)(6666004)(7696005)(110136005)(40460700003)(478600001)(2906002)(36860700001)(47076005)(83380400001)(7636003)(336012)(86362001)(356005)(26005)(16526019)(2616005)(107886003)(426003)(36756003)(82740400003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 10:28:11.5350
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 10:28:14.4985
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 83caee40-b94e-4cb2-1447-08dbd08e1876
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e4c0f2e-614a-4798-a640-08dbd08e1a3c
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB52.namprd02.prod.outlook.com
+	BL6PEPF0001AB55.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4051
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6211
 
-Add to struct mlxsw_config_profile a field lag_mode_prefer_sw for the
-driver to indicate that SW LAG mode should be configured if possible. Add
-to the PCI module code to set lag_mode as appropriate.
+PGT blocks are allocated through the function
+mlxsw_sp_pgt_mid_alloc_range(). The interface assumes that the caller knows
+which piece of PGT exactly they want to get. That was fine while the FID
+code was the only client allocating blocks of PGT. However for SW-allocated
+LAG table, there will be an additional client: mlxsw_sp_lag_init(). The
+interface should therefore be changed to not require particular
+coordinates, but to take just the requested size, allocate the block
+wherever, and give back the PGT address.
+
+The current FID mode has one place where PGT address can be stored: the FID
+family's pgt_base. The allocation scheme should therefore be changed from
+allocating a block per FID flood table, to allocating a block per FID
+family.
+
+Do just that in this patch.
+
+The per-family allocation is going to be useful for another related feature
+as well: the CFF mode.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlxsw/core.h |  1 +
- drivers/net/ethernet/mellanox/mlxsw/pci.c  | 16 ++++++++++++----
- 2 files changed, 13 insertions(+), 4 deletions(-)
+ .../ethernet/mellanox/mlxsw/spectrum_fid.c    | 63 ++++++++++---------
+ 1 file changed, 33 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/core.h b/drivers/net/ethernet/mellanox/mlxsw/core.h
-index 5692f34b2a63..764d14bd5bc0 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/core.h
-+++ b/drivers/net/ethernet/mellanox/mlxsw/core.h
-@@ -337,6 +337,7 @@ struct mlxsw_config_profile {
- 	u8	kvd_hash_single_parts;
- 	u8	kvd_hash_double_parts;
- 	u8	cqe_time_stamp_type;
-+	bool	lag_mode_prefer_sw;
- 	struct mlxsw_swid_config swid_config[MLXSW_CONFIG_PROFILE_SWID_COUNT];
- };
- 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-index 3e8347585e42..5b1f2483a3cc 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-@@ -1315,7 +1315,16 @@ static int mlxsw_pci_config_profile(struct mlxsw_pci *mlxsw_pci, char *mbox,
- 					profile->cqe_time_stamp_type);
- 	}
- 
--	mlxsw_pci->lag_mode = MLXSW_CMD_MBOX_CONFIG_PROFILE_LAG_MODE_FW;
-+	if (profile->lag_mode_prefer_sw && mlxsw_pci->lag_mode_support) {
-+		enum mlxsw_cmd_mbox_config_profile_lag_mode lag_mode =
-+			MLXSW_CMD_MBOX_CONFIG_PROFILE_LAG_MODE_SW;
-+
-+		mlxsw_cmd_mbox_config_profile_set_lag_mode_set(mbox, 1);
-+		mlxsw_cmd_mbox_config_profile_lag_mode_set(mbox, lag_mode);
-+		mlxsw_pci->lag_mode = lag_mode;
-+	} else {
-+		mlxsw_pci->lag_mode = MLXSW_CMD_MBOX_CONFIG_PROFILE_LAG_MODE_FW;
-+	}
- 	return mlxsw_cmd_config_profile_set(mlxsw_pci->core, mbox);
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
+index 9df098474743..4d0b72fbfebe 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
+@@ -320,6 +320,14 @@ mlxsw_sp_fid_family_num_fids(const struct mlxsw_sp_fid_family *fid_family)
+ 	return fid_family->end_index - fid_family->start_index + 1;
  }
  
-@@ -1677,9 +1686,8 @@ static int mlxsw_pci_init(void *bus_priv, struct mlxsw_core *mlxsw_core,
- 	if (err)
- 		goto err_config_profile;
++static u16
++mlxsw_sp_fid_family_pgt_size(const struct mlxsw_sp_fid_family *fid_family)
++{
++	u16 num_fids = mlxsw_sp_fid_family_num_fids(fid_family);
++
++	return num_fids * fid_family->nr_flood_tables;
++}
++
+ static u16
+ mlxsw_sp_fid_flood_table_mid(const struct mlxsw_sp_fid_family *fid_family,
+ 			     const struct mlxsw_sp_flood_table *flood_table,
+@@ -1654,14 +1662,10 @@ mlxsw_sp_fid_flood_table_init(struct mlxsw_sp_fid_family *fid_family,
+ 	enum mlxsw_sp_flood_type packet_type = flood_table->packet_type;
+ 	struct mlxsw_sp *mlxsw_sp = fid_family->mlxsw_sp;
+ 	const int *sfgc_packet_types;
+-	u16 num_fids, mid_base;
++	u16 mid_base;
+ 	int err, i;
  
--	/* Some resources depend on unified bridge model, which is configured
--	 * as part of config_profile. Query the resources again to get correct
--	 * values.
-+	/* Some resources depend on details of config_profile, such as unified
-+	 * bridge model. Query the resources again to get correct values.
- 	 */
- 	err = mlxsw_core_resources_query(mlxsw_core, mbox, res);
- 	if (err)
+ 	mid_base = mlxsw_sp_fid_flood_table_mid(fid_family, flood_table, 0);
+-	num_fids = mlxsw_sp_fid_family_num_fids(fid_family);
+-	err = mlxsw_sp_pgt_mid_alloc_range(mlxsw_sp, mid_base, num_fids);
+-	if (err)
+-		return err;
+ 
+ 	sfgc_packet_types = mlxsw_sp_packet_type_sfgc_types[packet_type];
+ 	for (i = 0; i < MLXSW_REG_SFGC_TYPE_MAX; i++) {
+@@ -1675,57 +1679,56 @@ mlxsw_sp_fid_flood_table_init(struct mlxsw_sp_fid_family *fid_family,
+ 
+ 		err = mlxsw_reg_write(mlxsw_sp->core, MLXSW_REG(sfgc), sfgc_pl);
+ 		if (err)
+-			goto err_reg_write;
++			return err;
+ 	}
+ 
+ 	return 0;
+-
+-err_reg_write:
+-	mlxsw_sp_pgt_mid_free_range(mlxsw_sp, mid_base, num_fids);
+-	return err;
+-}
+-
+-static void
+-mlxsw_sp_fid_flood_table_fini(struct mlxsw_sp_fid_family *fid_family,
+-			      const struct mlxsw_sp_flood_table *flood_table)
+-{
+-	struct mlxsw_sp *mlxsw_sp = fid_family->mlxsw_sp;
+-	u16 num_fids, mid_base;
+-
+-	mid_base = mlxsw_sp_fid_flood_table_mid(fid_family, flood_table, 0);
+-	num_fids = mlxsw_sp_fid_family_num_fids(fid_family);
+-	mlxsw_sp_pgt_mid_free_range(mlxsw_sp, mid_base, num_fids);
+ }
+ 
+ static int
+ mlxsw_sp_fid_flood_tables_init(struct mlxsw_sp_fid_family *fid_family)
+ {
++	struct mlxsw_sp *mlxsw_sp = fid_family->mlxsw_sp;
++	u16 pgt_size;
++	int err;
+ 	int i;
+ 
++	if (!fid_family->nr_flood_tables)
++		return 0;
++
++	pgt_size = mlxsw_sp_fid_family_pgt_size(fid_family);
++	err = mlxsw_sp_pgt_mid_alloc_range(mlxsw_sp, fid_family->pgt_base,
++					   pgt_size);
++	if (err)
++		return err;
++
+ 	for (i = 0; i < fid_family->nr_flood_tables; i++) {
+ 		const struct mlxsw_sp_flood_table *flood_table;
+-		int err;
+ 
+ 		flood_table = &fid_family->flood_tables[i];
+ 		err = mlxsw_sp_fid_flood_table_init(fid_family, flood_table);
+ 		if (err)
+-			return err;
++			goto err_flood_table_init;
+ 	}
+ 
+ 	return 0;
++
++err_flood_table_init:
++	mlxsw_sp_pgt_mid_free_range(mlxsw_sp, fid_family->pgt_base, pgt_size);
++	return err;
+ }
+ 
+ static void
+ mlxsw_sp_fid_flood_tables_fini(struct mlxsw_sp_fid_family *fid_family)
+ {
+-	int i;
++	struct mlxsw_sp *mlxsw_sp = fid_family->mlxsw_sp;
++	u16 pgt_size;
+ 
+-	for (i = 0; i < fid_family->nr_flood_tables; i++) {
+-		const struct mlxsw_sp_flood_table *flood_table;
++	if (!fid_family->nr_flood_tables)
++		return;
+ 
+-		flood_table = &fid_family->flood_tables[i];
+-		mlxsw_sp_fid_flood_table_fini(fid_family, flood_table);
+-	}
++	pgt_size = mlxsw_sp_fid_family_pgt_size(fid_family);
++	mlxsw_sp_pgt_mid_free_range(mlxsw_sp, fid_family->pgt_base, pgt_size);
+ }
+ 
+ static int mlxsw_sp_fid_family_register(struct mlxsw_sp *mlxsw_sp,
 -- 
 2.41.0
 
