@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-42479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87CC97CED77
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 03:20:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 296F97CED79
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 03:20:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F613B21232
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:20:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A39D1C20E2F
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B67659;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3E981E;
 	Thu, 19 Oct 2023 01:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P58/zLHM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VUPjHnZw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADEB396
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BD95CC433C7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48962656
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EBF02C433BB;
 	Thu, 19 Oct 2023 01:20:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697678424;
-	bh=HTCjJhlFszvmvCqEYsW59oZr5ScGqJa+2J5YY7HxwCI=;
+	s=k20201202; t=1697678425;
+	bh=1VeVn9f9GXJSHSqi4WntOvylPGGVFII5L4gGzP6XraQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=P58/zLHMKQ2rye7/v3GTxbk/WSsMMA9rz7KhIJrKbOu4cWEpBZ3MBQfZXdT8qHwJC
-	 6BzL5NsHr7u4LhfAtwNyyBXifpvOOqIYxiDVDDIwKHNka+PAU7aXAd/Yiy29+gqoEE
-	 f4hdAv4dBbQ8EfVnZUz0kBIXDdvWk/rurm2nH/BtlTWzKQAnGZUXQsisemMqCntjMu
-	 zqJ8CFGYUHiKR33PE5eAhlI5ONKtpqq5pGgygMUtyjbKNIUxqC+YkoTcSgYFDXIZIF
-	 2UTc+B9J61cQcU8KfItssh0Te4Qc2Q/cuCaRS57cVhuSfmz0/+vs25R471Mul3a1Cl
-	 qekvmogsliuBg==
+	b=VUPjHnZwxAXjupZ8i3XJ+D6hsU5gzFDKm/xR9fdq8PI5ABHbiRdebLVtUSfk6WweT
+	 5ETzw+tI9ZNCEVIz0cV6RhCIT4dkJJUtXIasptwXhVYSuBleVFzIOqJdYbeyggK7CW
+	 wFbd3r/yOqt1ufYHRInKAy2wABJ3wjYHFecV1N29EDVkbsCBne6nznhSmU5mUDOMCc
+	 JJq87Dybd5kSt84BPiH/zxyN9YQFdZJRGMMSTZiAzd8utecvEmBOVYarTwv36in4aF
+	 Pz6SnuIKkdUaxLrIOarrqEpkmeeKvaBlQ68y0+5//Hi1EYhy9N8bxeSXy1KQ5Cz2C4
+	 OFqutEUculhFw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A0082C04E27;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CD1C1E00086;
 	Thu, 19 Oct 2023 01:20:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,41 +43,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net/sched: sch_hfsc: upgrade 'rt' to 'sc' when it
- becomes a inner curve
+Subject: Re: [PATCH net v2] net: phy: bcm7xxx: Add missing 16nm EPHY statistics
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169767842465.18183.14052204345631097399.git-patchwork-notify@kernel.org>
+ <169767842483.18183.2953568289650219207.git-patchwork-notify@kernel.org>
 Date: Thu, 19 Oct 2023 01:20:24 +0000
-References: <20231017143602.3191556-1-pctammela@mojatatu.com>
-In-Reply-To: <20231017143602.3191556-1-pctammela@mojatatu.com>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ct@flyingcircus.io, markovicbudimir@gmail.com
+References: <20231017205119.416392-1-florian.fainelli@broadcom.com>
+In-Reply-To: <20231017205119.416392-1-florian.fainelli@broadcom.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, justin.chen@broadcom.com, andrew@lunn.ch,
+ bcm-kernel-feedback-list@broadcom.com, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 17 Oct 2023 11:36:02 -0300 you wrote:
-> Christian Theune says:
->    I upgraded from 6.1.38 to 6.1.55 this morning and it broke my traffic shaping script,
->    leaving me with a non-functional uplink on a remote router.
+On Tue, 17 Oct 2023 13:51:19 -0700 you wrote:
+> The .probe() function would allocate the necessary space and ensure that
+> the library call sizes the nunber of statistics but the callbacks
+> necessary to fetch the name and values were not wired up.
 > 
-> A 'rt' curve cannot be used as a inner curve (parent class), but we were
-> allowing such configurations since the qdisc was introduced. Such
-> configurations would trigger a UAF as Budimir explains:
->    The parent will have vttree_insert() called on it in init_vf(),
->    but will not have vttree_remove() called on it in update_vf()
->    because it does not have the HFSC_FSC flag set.
+> Reported-by: Justin Chen <justin.chen@broadcom.com>
+> Fixes: f68d08c437f9 ("net: phy: bcm7xxx: Add EPHY entry for 72165")
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net/sched: sch_hfsc: upgrade 'rt' to 'sc' when it becomes a inner curve
-    https://git.kernel.org/netdev/net/c/a13b67c9a015
+  - [net,v2] net: phy: bcm7xxx: Add missing 16nm EPHY statistics
+    https://git.kernel.org/netdev/net/c/6200e00e112c
 
 You are awesome, thank you!
 -- 
