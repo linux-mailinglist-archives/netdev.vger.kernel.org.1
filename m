@@ -1,184 +1,164 @@
-Return-Path: <netdev+bounces-42629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B47F7CF947
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:46:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB1A57CF95D
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:51:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4EC8B20DDD
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:46:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C906B20D6D
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EDED19467;
-	Thu, 19 Oct 2023 12:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O/pjOKSw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F4D20313;
+	Thu, 19 Oct 2023 12:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B72D611B;
-	Thu, 19 Oct 2023 12:46:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D4F4C433C7;
-	Thu, 19 Oct 2023 12:46:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697719603;
-	bh=zrChmdwZjapKXHOuDShzo54XNW6c5+Js5gqYUObtK/o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O/pjOKSw15Eyq52t9nl85klJ8UdBJwT/YwJwJS+3+usiTv2DShKdWaInjqc3GJBu+
-	 On2MmXCrAFp44XHG2X55Os2Y3DDHncbNWMtbFB8F6peVVN4RyLmSfgvt39KYcVOkVp
-	 9ygwmt/C+n0oHLdJj5fl2VqHRxsZgDDb6abF925Jn8yGcmYFTkNFLVbPJAXL+814dF
-	 mb/nJdZEIbkYb3dJhS+APNwFZH4GGhkOYbjyzYeqHOWwU9bZ7oXivEdvkVC+0j4jSn
-	 5/T22RVnwa07bAzIKK1YarpkufcGDt0zrqKSDC2PoFcm9C4/IgHwiIQRJcR8Vdhhgu
-	 5+3dfibFfiV1Q==
-Date: Thu, 19 Oct 2023 13:46:36 +0100
-From: Conor Dooley <conor@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org,
-	Gregory Clement <gregory.clement@bootlin.com>
-Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: dsa: Require ports or
- ethernet-ports
-Message-ID: <20231019-friday-fabulous-4882c4048b8c@spud>
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-1-3ee0c67383be@linaro.org>
- <169762516670.391804.7528295251386913602.robh@kernel.org>
- <CACRpkdZ4hkiD6jwENqjZRX8ZHH9+3MSMMLcJe6tJa=6Yhn1w=g@mail.gmail.com>
- <ZTEL6Yw+Xcc0E4TJ@shell.armlinux.org.uk>
- <20231019-pulse-autopilot-166bb6c96090@spud>
- <ZTEgnUP0rFL2frkk@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17251865A;
+	Thu, 19 Oct 2023 12:50:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A383C433C8;
+	Thu, 19 Oct 2023 12:50:53 +0000 (UTC)
+Message-ID: <572668b5-48b5-4bac-8712-75a5e2c096bd@linux-m68k.org>
+Date: Thu, 19 Oct 2023 22:50:50 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hRWpvk1HDqmaTX1z"
-Content-Disposition: inline
-In-Reply-To: <ZTEgnUP0rFL2frkk@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 09/12] m68k: use the coherent DMA code for coldfire
+ without data cache
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, iommu@lists.linux.dev
+Cc: Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>, Robin Murphy <robin.murphy@arm.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Wei Fang <wei.fang@nxp.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
+ netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-renesas-soc@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>
+References: <20231016054755.915155-1-hch@lst.de>
+ <20231016054755.915155-10-hch@lst.de>
+From: Greg Ungerer <gerg@linux-m68k.org>
+In-Reply-To: <20231016054755.915155-10-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Hi Christoph,
+
+On 16/10/23 15:47, Christoph Hellwig wrote:
+> Coldfire cores configured without a data cache are DMA coherent and
+> should thus simply use the simple coherent version of dma-direct.
+> 
+> Introduce a new COLDFIRE_COHERENT_DMA Kconfig symbol as a convenient
+> short hand for such configurations, and a M68K_NONCOHERENT_DMA symbol
+> for all cases where we need to build non-coherent DMA infrastructure
+> to simplify the Kconfig and code conditionals.
+> 
+> Not building the non-coherent DMA code slightly reduces the code
+> size for such configurations.
+> 
+> Numers for m5249evb_defconfig below:
+> 
+>    text	   data	    bss	    dec	    hex	filename
+> 2896158	 401052	  65392	3362602	 334f2a	vmlinux.before
+> 2895166	 400988	  65392	3361546	 334b0a	vmlinux.after
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   arch/m68k/Kconfig         |  8 ++++----
+>   arch/m68k/Kconfig.cpu     | 12 ++++++++++++
+>   arch/m68k/kernel/Makefile |  2 +-
+>   arch/m68k/kernel/dma.c    |  2 +-
+>   4 files changed, 18 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/m68k/Kconfig b/arch/m68k/Kconfig
+> index 0430b8ba6b5cc6..6c585eae89f4dc 100644
+> --- a/arch/m68k/Kconfig
+> +++ b/arch/m68k/Kconfig
+> @@ -3,19 +3,19 @@ config M68K
+>   	bool
+>   	default y
+>   	select ARCH_32BIT_OFF_T
+> -	select ARCH_DMA_ALLOC if !MMU || COLDFIRE
+> +	select ARCH_DMA_ALLOC if M68K_NONCOHERENT_DMA && COLDFIRE
+>   	select ARCH_HAS_BINFMT_FLAT
+>   	select ARCH_HAS_CPU_FINALIZE_INIT if MMU
+>   	select ARCH_HAS_CURRENT_STACK_POINTER
+> -	select ARCH_HAS_DMA_PREP_COHERENT if HAS_DMA && MMU && !COLDFIRE
+> -	select ARCH_HAS_SYNC_DMA_FOR_DEVICE if HAS_DMA
+> +	select ARCH_HAS_DMA_PREP_COHERENT if M68K_NONCOHERENT_DMA && !COLDFIRE
+> +	select ARCH_HAS_SYNC_DMA_FOR_DEVICE if M68K_NONCOHERENT_DMA
+>   	select ARCH_HAVE_NMI_SAFE_CMPXCHG if RMW_INSNS
+>   	select ARCH_MIGHT_HAVE_PC_PARPORT if ISA
+>   	select ARCH_NO_PREEMPT if !COLDFIRE
+>   	select ARCH_USE_MEMTEST if MMU_MOTOROLA
+>   	select ARCH_WANT_IPC_PARSE_VERSION
+>   	select BINFMT_FLAT_ARGVP_ENVP_ON_STACK
+> -	select DMA_DIRECT_REMAP if HAS_DMA && MMU && !COLDFIRE
+> +	select DMA_DIRECT_REMAP if M68K_NONCOHERENT_DMA && !COLDFIRE
+>   	select GENERIC_ATOMIC64
+>   	select GENERIC_CPU_DEVICES
+>   	select GENERIC_IOMAP
+> diff --git a/arch/m68k/Kconfig.cpu b/arch/m68k/Kconfig.cpu
+> index b826e9c677b2ae..e8905d38c714c4 100644
+> --- a/arch/m68k/Kconfig.cpu
+> +++ b/arch/m68k/Kconfig.cpu
+> @@ -535,3 +535,15 @@ config CACHE_COPYBACK
+>   	  The ColdFire CPU cache is set into Copy-back mode.
+>   endchoice
+>   endif # HAVE_CACHE_CB
+> +
+> +# Coldfire cores that do not have a data cache configured can do coherent DMA.
+> +config COLDFIRE_COHERENT_DMA
+> +	bool
+> +	default y
+> +	depends on COLDFIRE
+> +	depends on !HAVE_CACHE_CB && !CONFIG_CACHE_D && !CONFIG_CACHE_BOTH
+                                       ^^^^^^             ^^^^^^
+
+This needs to be "depends on !HAVE_CACHE_CB && !CACHE_D && !CACHE_BOTH".
+
+Regards
+Greg
 
 
---hRWpvk1HDqmaTX1z
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Oct 19, 2023 at 01:27:09PM +0100, Russell King (Oracle) wrote:
-> On Thu, Oct 19, 2023 at 12:58:46PM +0100, Conor Dooley wrote:
-> > On Thu, Oct 19, 2023 at 11:58:49AM +0100, Russell King (Oracle) wrote:
-> > > On Wed, Oct 18, 2023 at 01:11:45PM +0200, Linus Walleij wrote:
-> > > > On Wed, Oct 18, 2023 at 12:32=E2=80=AFPM Rob Herring <robh@kernel.o=
-rg> wrote:
-> > > > > On Wed, 18 Oct 2023 11:03:40 +0200, Linus Walleij wrote:
-> > > >=20
-> > > > > > Bindings using dsa.yaml#/$defs/ethernet-ports specify that
-> > > > > > a DSA switch node need to have a ports or ethernet-ports
-> > > > > > subnode, and that is actually required, so add requirements
-> > > > > > using oneOf.
-> > > > > >
-> > > > > > Suggested-by: Rob Herring <robh@kernel.org>
-> > > > > > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> > > > > > ---
-> > > > > >  Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 ++++++
-> > > > > >  1 file changed, 6 insertions(+)
-> > > > > >
-> > > > >
-> > > > > My bot found errors running 'make DT_CHECKER_FLAGS=3D-m dt_bindin=
-g_check'
-> > > > > on your patch (DT_CHECKER_FLAGS is new in v5.13):
-> > > > >
-> > > > > yamllint warnings/errors:
-> > > > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:60:7: [warni=
-ng] wrong indentation: expected 8 but found 6 (indentation)
-> > > > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:62:7: [warni=
-ng] wrong indentation: expected 8 but found 6 (indentation)
-> > > >=20
-> > > > Really?
-> > > >=20
-> > > > +  oneOf:
-> > > > +    - required:
-> > > > +      - ports
-> > > > +    - required:
-> > > > +      - ethernet-ports
-> > > >=20
-> > > > Two spaces after the oneOf, 2 spaces after a required as usual.
-> > > > I don't get it.
-> > >=20
-> > > Given the other python errors spat out in Rob's report, I would sugge=
-st
-> > > that the "bot" is running a development version that hasn't been fully
-> > > tested, so anything it spits out is suspect. Maybe Rob can comment on
-> > > the validity of the warnings in the report.
-> >=20
-> > In this case, I think it is correct.
-> > 2 spaces for the oneOf, 2 spaces the start of the required for the
-> > nested list, so:
-> > oneOf:
-> >   - required:
->=20
-> This is a total of two spaces indentation.
->=20
-> >       - ports
->=20
-> This is a total of six spaces indentation.
->=20
-> You mention 2 spaces for the oneOf, which explains why the "- required"
-> needs to be indented by two spaces. You also say 2 spaces for the
-> required nested list, but what about the other two spaces?
-
-I a word that might've made it more clear.
-It is 2 spaces for the oneOf and 2 spaces _from_ the start of the
-required for the nested list.
-
-In theory you might have a contrived example that looks like:
-
-oneOf:
-  - required:
-      - ports
-    properties:
-      ethernet-ports: false
-
-  - required:
-      - ethernet-ports
-    properties:
-      ports: false
-
-Maybe with that example you can see that each option of the oneOf
-contains a `required` and a `properties` component at 4 spaces of
-indent, and then in turn the required properties, being sub-components
-of `required` grow 2 more spaces for 6.
-
-> I guess if you're a YAML expert, this all makes sense, but to those of
-> us who aren't, these quirky "features" of it just seem totally
-> illogical.
-
-If I were a yaml expert, I would probably be able to use the correct
-terminology to explain this better, but hopefully the example is useful.
-
---hRWpvk1HDqmaTX1z
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZTElLAAKCRB4tDGHoIJi
-0nGyAQCSissEbIBxRaCcFxF/SsIhIEna84/VQZA/TgqU6R+5eQEAqIrUvOveubc0
-111rEtBQs+tzwLNM+TuvJiUKGztktg0=
-=HXqE
------END PGP SIGNATURE-----
-
---hRWpvk1HDqmaTX1z--
+> +
+> +config M68K_NONCOHERENT_DMA
+> +	bool
+> +	default y
+> +	depends on HAS_DMA && !COLDFIRE_COHERENT_DMA
+> diff --git a/arch/m68k/kernel/Makefile b/arch/m68k/kernel/Makefile
+> index af015447dfb4c1..01fb69a5095f43 100644
+> --- a/arch/m68k/kernel/Makefile
+> +++ b/arch/m68k/kernel/Makefile
+> @@ -23,7 +23,7 @@ obj-$(CONFIG_MMU_MOTOROLA) += ints.o vectors.o
+>   obj-$(CONFIG_MMU_SUN3) += ints.o vectors.o
+>   obj-$(CONFIG_PCI) += pcibios.o
+>   
+> -obj-$(CONFIG_HAS_DMA)	+= dma.o
+> +obj-$(CONFIG_M68K_NONCOHERENT_DMA) += dma.o
+>   
+>   obj-$(CONFIG_KEXEC)		+= machine_kexec.o relocate_kernel.o
+>   obj-$(CONFIG_BOOTINFO_PROC)	+= bootinfo_proc.o
+> diff --git a/arch/m68k/kernel/dma.c b/arch/m68k/kernel/dma.c
+> index 2e192a5df949bb..f83870cfa79b37 100644
+> --- a/arch/m68k/kernel/dma.c
+> +++ b/arch/m68k/kernel/dma.c
+> @@ -17,7 +17,7 @@
+>   
+>   #include <asm/cacheflush.h>
+>   
+> -#if defined(CONFIG_MMU) && !defined(CONFIG_COLDFIRE)
+> +#ifndef CONFIG_COLDFIRE
+>   void arch_dma_prep_coherent(struct page *page, size_t size)
+>   {
+>   	cache_push(page_to_phys(page), size);
 
