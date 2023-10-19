@@ -1,163 +1,97 @@
-Return-Path: <netdev+bounces-42640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D3EA7CFAD8
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:22:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA0597CFAF4
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:27:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F1921C20E82
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:22:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3BF2B20B4C
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4227B27452;
-	Thu, 19 Oct 2023 13:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE71227453;
+	Thu, 19 Oct 2023 13:27:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MV7QCSQ1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA11F2744B;
-	Thu, 19 Oct 2023 13:22:14 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A96B114;
-	Thu, 19 Oct 2023 06:22:11 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SB7ZV1q4wzRt4X;
-	Thu, 19 Oct 2023 21:18:26 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 19 Oct
- 2023 21:22:08 +0800
-Subject: Re: [PATCH net-next v11 0/6] introduce page_pool_alloc() related API
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, Matthias Brugger
-	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
-	<angelogioacchino.delregno@collabora.com>, <bpf@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
-	Alexander Duyck <alexander.duyck@gmail.com>
-References: <20231013064827.61135-1-linyunsheng@huawei.com>
- <20231016182725.6aa5544f@kernel.org>
- <2059ea42-f5cb-1366-804e-7036fb40cdaa@huawei.com>
- <20231017081303.769e4fbe@kernel.org>
- <67f2af29-59b8-a9e2-1c31-c9a625e4c4b3@huawei.com>
- <20231018083516.60f64c1a@kernel.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <fd8a3e6d-579f-666d-7674-67732e250978@huawei.com>
-Date: Thu, 19 Oct 2023 21:22:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD11DDA6
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 13:27:47 +0000 (UTC)
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D09C112;
+	Thu, 19 Oct 2023 06:27:46 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 274A460007;
+	Thu, 19 Oct 2023 13:27:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1697722065;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tb30KokhMfhJFg4x7SAE9KT+pO7hqq9T0nfilt18P3g=;
+	b=MV7QCSQ1J88BtyakxCd7vSwceC0N69+8kKIiYqzwgw7dzB5U11hLTrmGq/4UbsqVWR+yWA
+	i+0rHiSEuSyznUvi+jJNhdk455Bg6rc9Qu0r5+c5fZkKv8dgQMxAJqb5uMJAAXeAkjN9t9
+	NDQb6gxEmI61qG4SeuZBEffFToiQVuAvNFMrF1fF/LFfacEpkAeDAJWk1e6MHRd1xG2wHH
+	6lchYuSz65Dh5x4xMQbCbxwW79/cHVyNcPLm+iylS+Ez8pw763cCHoT2+ZOVA0y4phOkkA
+	IVm3Zp6ozPuXj6Rm2aX0Ne5mFr8glYJCzA5zqvx18Ze5lD8LXWL6GFvbdTARVQ==
+Date: Thu, 19 Oct 2023 15:27:43 +0200
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
+ <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vladimir
+ Oltean <olteanv@gmail.com>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net v1 1/1] ethtool: fix clearing of WoL flags
+Message-ID: <20231019152743.09b28ef4@kmaincent-XPS-13-7390>
+In-Reply-To: <20231019105048.l64jp2nd46fxjewt@lion.mk-sys.cz>
+References: <20231019070904.521718-1-o.rempel@pengutronix.de>
+	<20231019090510.bbcmh7stzqqgchdd@lion.mk-sys.cz>
+	<20231019095140.l6fffnszraeb6iiw@lion.mk-sys.cz>
+	<20231019122114.5b4a13a9@kmaincent-XPS-13-7390>
+	<20231019105048.l64jp2nd46fxjewt@lion.mk-sys.cz>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231018083516.60f64c1a@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 2023/10/18 23:35, Jakub Kicinski wrote:
-> On Wed, 18 Oct 2023 19:47:16 +0800 Yunsheng Lin wrote:
->>> mention it in the documentation. Plus the kdoc of the function should
->>> say that this is just a thin wrapper around other page pool APIs, and
->>> it's safe to mix it with other page pool APIs?  
->>
->> I am not sure I understand what do 'safe' and 'mix' mean here.
->>
->> For 'safe' part, I suppose you mean if there is a va accociated with
->> a 'struct page' without calling some API like kmap()? For that, I suppose
->> it is safe when the driver is calling page_pool API without the
->> __GFP_HIGHMEM flag. Maybe we should mention that in the kdoc and give a
->> warning if page_pool_*alloc_va() is called with the __GFP_HIGHMEM flag?
-> 
-> Sounds good. Warning wrapped in #if CONFIG_DEBUG_NET perhaps?
+On Thu, 19 Oct 2023 12:50:48 +0200
+Michal Kubecek <mkubecek@suse.cz> wrote:
 
-How about something like __get_free_pages() does with gfp flags?
-https://elixir.free-electrons.com/linux/v6.4-rc6/source/mm/page_alloc.c#L4818
+> On Thu, Oct 19, 2023 at 12:21:14PM +0200, K=C3=B6ry Maincent wrote:
+> > On Thu, 19 Oct 2023 11:51:40 +0200 > Michal Kubecek <mkubecek@suse.cz>
+> > wrote: =20
+> > >=20
+> > > The issue was indeed introduced by commit 108a36d07c01 ("ethtool: Fix
+> > > mod state of verbose no_mask bitset"). The problem is that a "no mask"
+> > > verbose bitset only contains bit attributes for bits to be set. This
+> > > worked correctly before this commit because we were always updating
+> > > a zero bitmap (since commit 6699170376ab ("ethtool: fix application of
+> > > verbose no_mask bitset"), that is) so that the rest was left zero
+> > > naturally. But now the 1->0 change (old_val is true, bit not present =
+in
+> > > netlink nest) no longer works. =20
+> >=20
+> > Doh I had not seen this issue! Thanks you for reporting it.
+> > I will send the revert then and will update the fix for next merge-wind=
+ow. =20
+>=20
+> Something like the diff below (against current mainline) might do the
+> trick but it's just an idea, not even build tested.
 
-how about something like below on top of this patchset:
-diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-index 7550beeacf3d..61cee55606c0 100644
---- a/include/net/page_pool/helpers.h
-+++ b/include/net/page_pool/helpers.h
-@@ -167,13 +167,13 @@ static inline struct page *page_pool_dev_alloc(struct page_pool *pool,
-        return page_pool_alloc(pool, offset, size, gfp);
- }
+Seems a good idea without adding too much complexity to the code.
+Will try that and send it in next merge window.
 
--static inline void *page_pool_cache_alloc(struct page_pool *pool,
--                                         unsigned int *size, gfp_t gfp)
-+static inline void *page_pool_alloc_va(struct page_pool *pool,
-+                                      unsigned int *size, gfp_t gfp)
- {
-        unsigned int offset;
-        struct page *page;
-
--       page = page_pool_alloc(pool, &offset, size, gfp);
-+       page = page_pool_alloc(pool, &offset, size, gfp & ~__GFP_HIGHMEM);
-        if (unlikely(!page))
-                return NULL;
-
-@@ -181,21 +181,22 @@ static inline void *page_pool_cache_alloc(struct page_pool *pool,
- }
-
- /**
-- * page_pool_dev_cache_alloc() - allocate a cache.
-+ * page_pool_dev_alloc_va() - allocate a page or a page fragment.
-  * @pool: pool from which to allocate
-  * @size: in as the requested size, out as the allocated size
-  *
-- * Get a cache from the page allocator or page_pool caches.
-+ * This is just a thin wrapper around the page_pool_alloc() API, and
-+ * it returns va of the allocated page or page fragment.
-  *
-  * Return:
-- * Return the addr for the allocated cache, otherwise return NULL.
-+ * Return the va for the allocated page or page fragment, otherwise return NULL.
-  */
--static inline void *page_pool_dev_cache_alloc(struct page_pool *pool,
--                                             unsigned int *size)
-+static inline void *page_pool_dev_alloc_va(struct page_pool *pool,
-+                                          unsigned int *size)
- {
-        gfp_t gfp = (GFP_ATOMIC | __GFP_NOWARN);
-
--       return page_pool_cache_alloc(pool, size, gfp);
-+       return page_pool_alloc_va(pool, size, gfp);
- }
-
- /**
-@@ -338,17 +339,17 @@ static inline void page_pool_recycle_direct(struct page_pool *pool,
-                (sizeof(dma_addr_t) > sizeof(unsigned long))
-
- /**
-- * page_pool_cache_free() - free a cache into the page_pool
-- * @pool: pool from which cache was allocated
-- * @data: addr of cache to be free
-+ * page_pool_free_va() - free a va into the page_pool
-+ * @pool: pool from which va was allocated
-+ * @va: va to be free
-  * @allow_direct: freed by the consumer, allow lockless caching
-  *
-  * Free a cache allocated from page_pool_dev_cache_alloc().
-  */
--static inline void page_pool_cache_free(struct page_pool *pool, void *data,
--                                       bool allow_direct)
-+static inline void page_pool_free_va(struct page_pool *pool, void *va,
-+                                    bool allow_direct)
- {
--       page_pool_put_page(pool, virt_to_head_page(data), -1, allow_direct);
-+       page_pool_put_page(pool, virt_to_head_page(va), -1, allow_direct);
- }
-
-
-
+K=C3=B6ry
 
