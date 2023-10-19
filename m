@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-42471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF7A47CED0E
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 03:00:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 779EF7CED0D
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 03:00:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70572B20E1A
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2CC01C20D5F
 	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1A6391;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F60E393;
 	Thu, 19 Oct 2023 01:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ISG5FG5l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HHkvjVa5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322F538C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322E4390
 	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D2B2EC433C7;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CA22AC433C9;
 	Thu, 19 Oct 2023 01:00:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1697677223;
-	bh=jhqylZ1kbUblqylLlif48g5pTl+ZU53wYTDMSwgJjhY=;
+	bh=ppPnL3hdGI779ndscvmZJkrXiE/cXOnJ6qpeMJAvQ6o=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ISG5FG5lO9n/A9rh8MO4aQPQ4xTuvW8DQPBvMvReqXaCCM9IIymOQzsVH8DP/n+oD
-	 lGjbk2Zyc7+wnKA/10mwhjbuW9dlqIxVrJccdpbNQcwwF1zh75/A2f1S8XQreBDycN
-	 G7lnqfZB/PkVSySwTHtH5Y1oPBNpiHg+ARfZBnx8kj9Xgs3C35U4HGgKPfWuZ3j7y8
-	 bjfZkAORrfT8MTY3LO4be4I3be8hirsXLVVqZNcjinWeySD2GKC3ge5N8rRen4Suv1
-	 LtQcgzEXQ0TlxgVIufANX4PgZbr12PY7mzcZ+srRbK3CwwV+pQhbrfX/EiulsNODi2
-	 5ZjQcqCjVlqwA==
+	b=HHkvjVa5jA1GI7eXhpNgVptS+s+hCjegY2Bj4ZzJc4eNFohmdISzEDOq/b91aJ4Ft
+	 2VcPo7UAQ+xnkKTn4QvhS+BrpL8LhKHNbVDjvekMrE+g/FDaQP8/640unEfZQFP6Ox
+	 4sFDukUzU22Kj2fyZbH0weOawSabyRhSDjeix/qlPADH7nwrC/2XMv9+9qTIblXig+
+	 MDyT/+uO8TUlZ2fkWgqtwiLNLqx9KZEMkW2QIhMHoJiarF3K+8MKM6Qg3hqS1GM7Rn
+	 9PqcTGWajFL8iD//MU5wohjIJGPj78xfKLpu26jxmkWDY4+YI/DCvLt1jnPW7TElIS
+	 LiFIgLTe5vDRg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BAF8BE00080;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B2BA0C04E27;
 	Thu, 19 Oct 2023 01:00:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,36 +43,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] drivers: net: wwan: iosm: Fixed multiple typos in multiple
- files
+Subject: Re: [PATCH v2 0/2] net: fec: Fix device_get_match_data usage
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169767722376.5576.467230838370578760.git-patchwork-notify@kernel.org>
+ <169767722372.5576.17707408430157555954.git-patchwork-notify@kernel.org>
 Date: Thu, 19 Oct 2023 01:00:23 +0000
-References: <20231014121407.10012-1-m.muzzammilashraf@gmail.com>
-In-Reply-To: <20231014121407.10012-1-m.muzzammilashraf@gmail.com>
-To: Muhammad Muzammil <m.muzzammilashraf@gmail.com>
-Cc: m.chetan.kumar@intel.com, linuxwwan@intel.com, loic.poulain@linaro.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231017063419.925266-1-alexander.stein@ew.tq-group.com>
+In-Reply-To: <20231017063419.925266-1-alexander.stein@ew.tq-group.com>
+To: Alexander Stein <alexander.stein@ew.tq-group.com>
+Cc: wei.fang@nxp.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ robh@kernel.org, linux-imx@nxp.com, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 14 Oct 2023 17:14:07 +0500 you wrote:
-> iosm_ipc_chnl_cfg.h: Fixed typo
-> iosm_ipc_imem_ops.h: Fixed typo
-> iosm_ipc_mux.h: Fixed typo
-> iosm_ipc_pm.h: Fixed typo
-> iosm_ipc_port.h: Fixed typo
-> iosm_ipc_trace.h: Fixed typo
+On Tue, 17 Oct 2023 08:34:17 +0200 you wrote:
+> Hi,
+> 
+> this is v2 adressing the regression introduced by commit b0377116decd
+> ("net: ethernet: Use device_get_match_data()").
+> 
+> Changes in v2:
+> * Update the OF device data pointers to the actual device specific struct
+>   fec_devinfo.
+> * Add Patch 2 (unrelated to regression) to remove platform IDs for
+>   non-Coldfire
 > 
 > [...]
 
 Here is the summary with links:
-  - drivers: net: wwan: iosm: Fixed multiple typos in multiple files
-    https://git.kernel.org/netdev/net-next/c/2c6370a13f0e
+  - [v2,1/2] net: fec: Fix device_get_match_data usage
+    https://git.kernel.org/netdev/net-next/c/e6809dba5ec3
+  - [v2,2/2] net: fec: Remove non-Coldfire platform IDs
+    https://git.kernel.org/netdev/net-next/c/50254bfe1438
 
 You are awesome, thank you!
 -- 
