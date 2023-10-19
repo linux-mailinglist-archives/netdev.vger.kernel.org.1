@@ -1,109 +1,158 @@
-Return-Path: <netdev+bounces-42530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FB1B7CF31E
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:46:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79AF27CF340
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:52:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08F58281B1C
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:46:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34A23281EBD
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51FD15AD2;
-	Thu, 19 Oct 2023 08:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C4915AEB;
+	Thu, 19 Oct 2023 08:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7233063A1
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 08:46:14 +0000 (UTC)
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 093DF136
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:46:12 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id D77BB206D0;
-	Thu, 19 Oct 2023 10:46:06 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1EQu7fvTyBy9; Thu, 19 Oct 2023 10:46:06 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 26D9F20539;
-	Thu, 19 Oct 2023 10:46:06 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout1.secunet.com (Postfix) with ESMTP id 1B2FE80004A;
-	Thu, 19 Oct 2023 10:46:06 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 19 Oct 2023 10:46:05 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Thu, 19 Oct
- 2023 10:46:05 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 246D2318302F; Thu, 19 Oct 2023 10:46:05 +0200 (CEST)
-Date: Thu, 19 Oct 2023 10:46:05 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Patrisious Haddad <phaddad@nvidia.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, Raed Salem
-	<raeds@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>
-Subject: Re: [PATCH xfrm-next 5/9] net/mlx5e: Unify esw and normal IPsec
- status table creation/destruction
-Message-ID: <ZTDszYAuNv16bGBO@gauss3.secunet.de>
-References: <cover.1697444728.git.leon@kernel.org>
- <d0bc0651c0d5f9afe79942577cf71e7d30859608.1697444728.git.leon@kernel.org>
- <ZS5WK8V0+JoTlNmu@gauss3.secunet.de>
- <20231017121357.GC5392@unreal>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4FB414F7D
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 08:52:27 +0000 (UTC)
+Received: from elvis.franken.de (elvis.franken.de [193.175.24.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9FDEEAB;
+	Thu, 19 Oct 2023 01:52:22 -0700 (PDT)
+Received: from uucp by elvis.franken.de with local-rmail (Exim 3.36 #1)
+	id 1qtOlP-0004JJ-00; Thu, 19 Oct 2023 10:52:19 +0200
+Received: by alpha.franken.de (Postfix, from userid 1000)
+	id 81227C0198; Thu, 19 Oct 2023 10:50:05 +0200 (CEST)
+Date: Thu, 19 Oct 2023 10:50:05 +0200
+From: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc: linux-mips@vger.kernel.org, Jonas Gorski <jonas.gorski@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-mtd@lists.infradead.org, linux-serial@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 0/6] remove AR7 platform and associated drivers
+Message-ID: <ZTDtvR732kzchtxF@alpha.franken.de>
+References: <20230922061530.3121-1-wsa+renesas@sang-engineering.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231017121357.GC5392@unreal>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <20230922061530.3121-1-wsa+renesas@sang-engineering.com>
 
-On Tue, Oct 17, 2023 at 03:13:57PM +0300, Leon Romanovsky wrote:
-> On Tue, Oct 17, 2023 at 11:38:51AM +0200, Steffen Klassert wrote:
-> > On Mon, Oct 16, 2023 at 12:15:13PM +0300, Leon Romanovsky wrote:
-> > > From: Patrisious Haddad <phaddad@nvidia.com>
-> > > 
-> > > Change normal IPsec flow to use the same creation/destruction functions
-> > > for status flow table as that of ESW, which first of all refines the
-> > > code to have less code duplication.
-> > > 
-> > > And more importantly, the ESW status table handles IPsec syndrome
-> > > checks at steering by HW, which is more efficient than the previous
-> > > behaviour we had where it was copied to WQE meta data and checked
-> > > by the driver.
-> > > 
-> > > Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
-> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > This one does not apply to the ipsec-next tree.
+On Fri, Sep 22, 2023 at 08:15:21AM +0200, Wolfram Sang wrote:
+> Changes since v1:
+> * kept uapi define for for serial port type
+> * added acks
 > 
-> You are right, sorry about that. It is based on two net-next series
-> and I didn't expect such a fast response. 
+> Still valid cover letter from v1:
 > 
-> 1. https://lore.kernel.org/netdev/20231002083832.19746-1-leon@kernel.org/ - accepted.
-> 2. https://lore.kernel.org/netdev/20231014171908.290428-16-saeed@kernel.org/#t - not accepted yet.
+> When trying to get rid of the obsolete VLYNQ bus, Jonas and Florian
+> pointed out that its only user, the AR7 platform can probaly go entirely
+> [1]. This series does exactly that. Even OpenWRT has removed support
+> because these devices are "stuck with 3.18" [2].
 > 
-> Do you feel comfortable with the series/xfrm patches? If yes, Saeed can
-> resend the series directly to net-next once patch #2 is accepted.
+> It removes the drivers first, because watchdog and network include
+> platform specific headers. Once the drivers are gone, we remove the
+> platform. The patches are based on 6.6-rc2 and created with
+> "--irreversible-delete" to save some space.
+> 
+> My suggestion is that everything is merged via the MIPS tree in one go,
+> so we don't have broken drivers because of missing platform headers. But
+> maybe there are reasons for a two-cycle removal with the drivers first
+> and the platform later?
+> 
+> Looking forward to comments.
+> 
+> Happy hacking,
+> 
+>    Wolfram
+> 
+> 
+> [1] https://lore.kernel.org/r/3395161f-2543-46f0-83d9-b918800305e1@gmail.com
+> [2] https://openwrt.org/docs/techref/targets/ar7
+> 
+> 
+> Wolfram Sang (6):
+>   serial: 8250: remove AR7 support
+>   mtd: parsers: ar7: remove support
+>   vlynq: remove bus driver
+>   watchdog: ar7_wdt: remove driver to prepare for platform removal
+>   net: cpmac: remove driver to prepare for platform removal
+>   MIPS: AR7: remove platform
+> 
+>  MAINTAINERS                             |   13 -
+>  arch/arm/configs/pxa_defconfig          |    1 -
+>  arch/mips/Kbuild.platforms              |    1 -
+>  arch/mips/Kconfig                       |   22 -
+>  arch/mips/ar7/Makefile                  |   11 -
+>  arch/mips/ar7/Platform                  |    5 -
+>  arch/mips/ar7/clock.c                   |  439 --------
+>  arch/mips/ar7/gpio.c                    |  332 ------
+>  arch/mips/ar7/irq.c                     |  165 ---
+>  arch/mips/ar7/memory.c                  |   51 -
+>  arch/mips/ar7/platform.c                |  722 -------------
+>  arch/mips/ar7/prom.c                    |  256 -----
+>  arch/mips/ar7/setup.c                   |   93 --
+>  arch/mips/ar7/time.c                    |   31 -
+>  arch/mips/boot/compressed/uart-16550.c  |    5 -
+>  arch/mips/configs/ar7_defconfig         |  119 ---
+>  arch/mips/include/asm/mach-ar7/ar7.h    |  191 ----
+>  arch/mips/include/asm/mach-ar7/irq.h    |   16 -
+>  arch/mips/include/asm/mach-ar7/prom.h   |   12 -
+>  arch/mips/include/asm/mach-ar7/spaces.h |   22 -
+>  drivers/Kconfig                         |    2 -
+>  drivers/Makefile                        |    1 -
+>  drivers/mtd/parsers/Kconfig             |    5 -
+>  drivers/mtd/parsers/Makefile            |    1 -
+>  drivers/mtd/parsers/ar7part.c           |  129 ---
+>  drivers/net/ethernet/ti/Kconfig         |    9 +-
+>  drivers/net/ethernet/ti/Makefile        |    1 -
+>  drivers/net/ethernet/ti/cpmac.c         | 1251 -----------------------
+>  drivers/tty/serial/8250/8250_port.c     |    7 -
+>  drivers/vlynq/Kconfig                   |   21 -
+>  drivers/vlynq/Makefile                  |    6 -
+>  drivers/vlynq/vlynq.c                   |  799 ---------------
+>  drivers/watchdog/Kconfig                |    6 -
+>  drivers/watchdog/Makefile               |    1 -
+>  drivers/watchdog/ar7_wdt.c              |  315 ------
+>  include/linux/vlynq.h                   |  149 ---
+>  36 files changed, 1 insertion(+), 5209 deletions(-)
+>  delete mode 100644 arch/mips/ar7/Makefile
+>  delete mode 100644 arch/mips/ar7/Platform
+>  delete mode 100644 arch/mips/ar7/clock.c
+>  delete mode 100644 arch/mips/ar7/gpio.c
+>  delete mode 100644 arch/mips/ar7/irq.c
+>  delete mode 100644 arch/mips/ar7/memory.c
+>  delete mode 100644 arch/mips/ar7/platform.c
+>  delete mode 100644 arch/mips/ar7/prom.c
+>  delete mode 100644 arch/mips/ar7/setup.c
+>  delete mode 100644 arch/mips/ar7/time.c
+>  delete mode 100644 arch/mips/configs/ar7_defconfig
+>  delete mode 100644 arch/mips/include/asm/mach-ar7/ar7.h
+>  delete mode 100644 arch/mips/include/asm/mach-ar7/irq.h
+>  delete mode 100644 arch/mips/include/asm/mach-ar7/prom.h
+>  delete mode 100644 arch/mips/include/asm/mach-ar7/spaces.h
+>  delete mode 100644 drivers/mtd/parsers/ar7part.c
+>  delete mode 100644 drivers/net/ethernet/ti/cpmac.c
+>  delete mode 100644 drivers/vlynq/Kconfig
+>  delete mode 100644 drivers/vlynq/Makefile
+>  delete mode 100644 drivers/vlynq/vlynq.c
+>  delete mode 100644 drivers/watchdog/ar7_wdt.c
+>  delete mode 100644 include/linux/vlynq.h
 
-The xfrm changes look good and it does not conflict
-to anything that is in ipsec-next currently. So
-send it to net-next and I'll Ack it.
+applied to mips-next, minus patch 5, which is already applied to net-next.
 
-Thanks!
+Thomas.
+
+-- 
+Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+good idea.                                                [ RFC1925, 2.3 ]
 
