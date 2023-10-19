@@ -1,166 +1,190 @@
-Return-Path: <netdev+bounces-42636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39EB37CFA86
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:12:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 784A27CFAB4
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0A36281FB3
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:12:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4DC81C20AF6
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0448F225D8;
-	Thu, 19 Oct 2023 13:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1422A22EE5;
+	Thu, 19 Oct 2023 13:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="w/A1F/E1"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="evznZ03x"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97C9225D6
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 13:12:34 +0000 (UTC)
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60F2FF7
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 06:12:33 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32d8c2c6dfdso7087635f8f.1
-        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 06:12:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1697721152; x=1698325952; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=v1QQy/TzuYABfNuKOiHX44LqVgl9CKlKEp054v57jP8=;
-        b=w/A1F/E1M5ZzFJVzk3pYMPOVDhfaYYwwuUhefsP+TBxCapTghjPfUFZlgLbC3iqLQf
-         UtW2DOLeACHW7vuTN1KJSnG8goGgnrNXwxbrilsuEU3GpJs8FKa3o2e9B61D47kJHh0w
-         HjTV3W93cD6SOaxNAq/D/3aY3zreEHvXaY0kyXXc3u3OquvnGqeyb/V49w/2YoiA09XK
-         d/zKGSbAz/6UtovCbxz+3izNGQMUHOn64qwISrEMxlz+LBvXfbhOGfCK6ysklKaapqjv
-         MmCc6U4GWC7ttH5PBbZxVBJvne/IpEOEcRfJgydkI4s4F1UFVlt4prW+X2vJv5Qkwam5
-         86Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697721152; x=1698325952;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v1QQy/TzuYABfNuKOiHX44LqVgl9CKlKEp054v57jP8=;
-        b=au3dhSdFMwGude2AJ8qxcL87N8DBksHtUu/v/2obUdAj75MeMUQcgLPXNK9UbBLYLl
-         7hxI/97fRabB5rAsBmVWjg8TSk31aw7ofh20Qfk/AmHXIz/eqEImJhtEzRZx2bQtdebY
-         bAhA4yyKmjdJSGCOi1nV2qq6mx8FxLR0WpFK9nEso9pCzOfbbUcBa07MiCwlXrjUruPY
-         HQdlU193KFGnijavtuZeoENHGgR5wxsfOT0SpK9RgtKSw4NiQ5r6Vj81vQLWTp5YOEq6
-         4eBE9UIOBDCrXpm/RuXCfHAIl3hXe0gTGSLSNM6JG02OEt08zl9ueI4KDqmBJ6gDAGqr
-         Fm4A==
-X-Gm-Message-State: AOJu0YxVuCyecILmpG/pcWqf0R0aJy91YUpQuQlmuUf3hUCJwLYMwH8z
-	Zv/IerQHnVmomHSVM+LwjRH5Lw==
-X-Google-Smtp-Source: AGHT+IFexvu64+meSkENrUA+zLK1LPB2h7F55aVILI31rqt8hwPhK57eKqM4fL7YoWVbrjtBB7nRvQ==
-X-Received: by 2002:a05:6000:1112:b0:32d:8958:c570 with SMTP id z18-20020a056000111200b0032d8958c570mr1674797wrw.29.1697721151677;
-        Thu, 19 Oct 2023 06:12:31 -0700 (PDT)
-Received: from [192.168.0.106] (haunt.prize.volia.net. [93.72.109.136])
-        by smtp.gmail.com with ESMTPSA id d15-20020adfef8f000000b003231ca246b6sm4472800wro.95.2023.10.19.06.12.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Oct 2023 06:12:31 -0700 (PDT)
-Message-ID: <632c55ba-9adb-8afb-3558-94ea5f0168f8@blackwall.org>
-Date: Thu, 19 Oct 2023 16:12:29 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59758179B1
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 13:17:21 +0000 (UTC)
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1C8998;
+	Thu, 19 Oct 2023 06:17:15 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8106F240002;
+	Thu, 19 Oct 2023 13:17:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1697721434;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7kubKUOdyt7koTXOXKhU8wFECVMZDVp8kCAlvbhKcUI=;
+	b=evznZ03xPa0BEwhJfOpNDV6d3q5E4Ku96L8mhZfSmZ0WUAyqSyXEHUqqaCyyVLtItEGvJG
+	iI6qrODCXFvYvK78X9EaXwnN1EdVV5EAKy2i+nJLs5gM8vPTgBk+GtMRLOzf8QBS83sGmg
+	gmdd5uackLlA7rCLXeUjimx1JzlpafuKGeeXAcKIKTRILR+l8WSVFibee3PrOXIX+c03pf
+	niu31RkRhCXonSiGBCR+L6uJv25Lt15MaLuEN70pGQBMMk0ytJ5KRB5B/bXiQK13Mhdo/s
+	PYa9WxihA5q8z5ZuHkvs1Bbj0fK9rMBqAZ7Tw05nMfPXahSVtClavHN/lPGQhQ==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Date: Thu, 19 Oct 2023 15:16:41 +0200
+Subject: [PATCH net] Revert "ethtool: Fix mod state of verbose no_mask
+ bitset"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH iproute2-next v5] iplink: bridge: Add support for bridge
- FDB learning limits
-Content-Language: en-US
-To: Johannes Nixdorf <jnixdorf-oss@avm.de>, David Ahern <dsahern@gmail.com>,
- Roopa Prabhu <roopa@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
- Petr Machata <petrm@nvidia.com>
-Cc: bridge@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20231018-fdb_limit-v5-1-7ca3b3eb7c1f@avm.de>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20231018-fdb_limit-v5-1-7ca3b3eb7c1f@avm.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20231019-feature_ptp_bitset_fix-v1-1-70f3c429a221@bootlin.com>
+X-B4-Tracking: v=1; b=H4sIADgsMWUC/x2M0QqEIBQFfyXuc0ImFfUrEZJ13L0vJnqLhejfV
+ 3qcgZmbMhIj01TdlHBx5iMU0HVF23cNHyjeC1PbtEY3elQeq5wJNkq0jiVDrOef6p0fun7Qzhh
+ QiWNC0e94pgCh5Xn+yXvplG0AAAA=
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Simon Horman <horms@kernel.org>, Michal Kubecek <mkubecek@suse.cz>, 
+ stable@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>, 
+ Oleksij Rempel <linux@rempel-privat.de>
+X-Mailer: b4 0.12.3
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 10/18/23 10:04, Johannes Nixdorf wrote:
-> Support setting the FDB limit through ip link. The arguments is:
->   - fdb_max_learned: A 32-bit unsigned integer specifying the maximum
->                      number of learned FDB entries, with 0 disabling
->                      the limit.
-> 
-> Also support reading back the current number of learned FDB entries in
-> the bridge by this count. The returned value's name is:
->   - fdb_n_learned: A 32-bit unsigned integer specifying the current number
->                    of learned FDB entries.
-> 
-> Example:
-> 
->   # ip -d -j -p link show br0
-> [ {
-> ...
->          "linkinfo": {
->              "info_kind": "bridge",
->              "info_data": {
-> ...
->                  "fdb_n_learned": 2,
->                  "fdb_max_learned": 0,
-> ...
->              }
->          },
-> ...
->      } ]
->   # ip link set br0 type bridge fdb_max_learned 1024
->   # ip -d -j -p link show br0
-> [ {
-> ...
->          "linkinfo": {
->              "info_kind": "bridge",
->              "info_data": {
-> ...
->                  "fdb_n_learned": 2,
->                  "fdb_max_learned": 1024,
-> ...
->              }
->          },
-> ...
->      } ]
-> 
-> Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
-> ---
-> The corresponding kernel changes are in net-next.git as commit
-> ddd1ad68826d ("net: bridge: Add netlink knobs for number / max learned
-> FDB entries").
-> ---
-> Changes in v5:
->   - Removed the RFC status again, as the kernel changes landed.
->   - Link to v4: https://lore.kernel.org/r/20230919-fdb_limit-v4-1-b4d2dc4df30f@avm.de
-> 
-> Changes in v4:
->   - Removed _entries from the names. (from review)
->   - Removed the UAPI change, to be synced from linux separately by the
->     maintainer. (from review)
->     For local testing e.g. `make CCOPTS="-O2 -pipe
->     -I${path_to_dev_kernel_headers}"` works as a workaround.
->   - Downgraded to an RFC until the kernel changes land.
->   - Link to v3: https://lore.kernel.org/netdev/20230905-fdb_limit-v3-1-34bb124556d8@avm.de/
-> 
-> Changes in v3:
->   - Properly split the net-next and iproute2-next threads. (from review)
->   - Changed to *_n_* instead of *_cur_*. (from review)
->   - Use strcmp() instead of matches(). (from review)
->   - Made names in code and documentation consistent. (from review)
->   - Various documentation fixes. (from review)
->   - Link to v2: https://lore.kernel.org/netdev/20230619071444.14625-1-jnixdorf-oss@avm.de/
-> 
-> Changes in v2:
->   - Sent out the first corresponding iproute2 patches.
->   - Link to v1: https://lore.kernel.org/netdev/20230515085046.4457-1-jnixdorf-oss@avm.de/
-> ---
->   ip/iplink_bridge.c    | 21 +++++++++++++++++++++
->   man/man8/ip-link.8.in | 10 ++++++++++
->   2 files changed, 31 insertions(+)
-> 
+This reverts commit 108a36d07c01edbc5942d27c92494d1c6e4d45a0.
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+It was reported that this fix breaks the possibility to remove existing WoL
+flags. For example:
+~$ ethtool lan2
+...
+        Supports Wake-on: pg
+        Wake-on: d
+...
+~$ ethtool -s lan2 wol gp
+~$ ethtool lan2
+...
+        Wake-on: pg
+...
+~$ ethtool -s lan2 wol d
+~$ ethtool lan2
+...
+        Wake-on: pg
+...
 
+This worked correctly before this commit because we were always updating
+a zero bitmap (since commit 6699170376ab ("ethtool: fix application of
+verbose no_mask bitset"), that is) so that the rest was left zero
+naturally. But now the 1->0 change (old_val is true, bit not present in
+netlink nest) no longer works.
+
+Reported-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reported-by: Michal Kubecek <mkubecek@suse.cz>
+Closes: https://lore.kernel.org/netdev/20231019095140.l6fffnszraeb6iiw@lion.mk-sys.cz/
+Cc: stable@vger.kernel.org
+Fixes: 108a36d07c01 ("ethtool: Fix mod state of verbose no_mask bitset")
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+
+This patch is reverted for now as we are approaching the end of the
+merge-window. The real fix that fix the mod value will be sent later
+on the next merge-window.
+---
+ net/ethtool/bitset.c | 32 ++++++--------------------------
+ 1 file changed, 6 insertions(+), 26 deletions(-)
+
+diff --git a/net/ethtool/bitset.c b/net/ethtool/bitset.c
+index 883ed9be81f9..0515d6604b3b 100644
+--- a/net/ethtool/bitset.c
++++ b/net/ethtool/bitset.c
+@@ -431,10 +431,8 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
+ 			      ethnl_string_array_t names,
+ 			      struct netlink_ext_ack *extack, bool *mod)
+ {
+-	u32 *orig_bitmap, *saved_bitmap = NULL;
+ 	struct nlattr *bit_attr;
+ 	bool no_mask;
+-	bool dummy;
+ 	int rem;
+ 	int ret;
+ 
+@@ -450,22 +448,8 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
+ 	}
+ 
+ 	no_mask = tb[ETHTOOL_A_BITSET_NOMASK];
+-	if (no_mask) {
+-		unsigned int nwords = DIV_ROUND_UP(nbits, 32);
+-		unsigned int nbytes = nwords * sizeof(u32);
+-
+-		/* The bitmap size is only the size of the map part without
+-		 * its mask part.
+-		 */
+-		saved_bitmap = kcalloc(nwords, sizeof(u32), GFP_KERNEL);
+-		if (!saved_bitmap)
+-			return -ENOMEM;
+-		memcpy(saved_bitmap, bitmap, nbytes);
+-		ethnl_bitmap32_clear(bitmap, 0, nbits, &dummy);
+-		orig_bitmap = saved_bitmap;
+-	} else {
+-		orig_bitmap = bitmap;
+-	}
++	if (no_mask)
++		ethnl_bitmap32_clear(bitmap, 0, nbits, mod);
+ 
+ 	nla_for_each_nested(bit_attr, tb[ETHTOOL_A_BITSET_BITS], rem) {
+ 		bool old_val, new_val;
+@@ -474,14 +458,13 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
+ 		if (nla_type(bit_attr) != ETHTOOL_A_BITSET_BITS_BIT) {
+ 			NL_SET_ERR_MSG_ATTR(extack, bit_attr,
+ 					    "only ETHTOOL_A_BITSET_BITS_BIT allowed in ETHTOOL_A_BITSET_BITS");
+-			ret = -EINVAL;
+-			goto out;
++			return -EINVAL;
+ 		}
+ 		ret = ethnl_parse_bit(&idx, &new_val, nbits, bit_attr, no_mask,
+ 				      names, extack);
+ 		if (ret < 0)
+-			goto out;
+-		old_val = orig_bitmap[idx / 32] & ((u32)1 << (idx % 32));
++			return ret;
++		old_val = bitmap[idx / 32] & ((u32)1 << (idx % 32));
+ 		if (new_val != old_val) {
+ 			if (new_val)
+ 				bitmap[idx / 32] |= ((u32)1 << (idx % 32));
+@@ -491,10 +474,7 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
+ 		}
+ 	}
+ 
+-	ret = 0;
+-out:
+-	kfree(saved_bitmap);
+-	return ret;
++	return 0;
+ }
+ 
+ static int ethnl_compact_sanity_checks(unsigned int nbits,
+
+---
+base-commit: a602ee3176a81280b829c9f0cf259450f7982168
+change-id: 20231019-feature_ptp_bitset_fix-6bf75671b33e
+
+Best regards,
+-- 
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
 
