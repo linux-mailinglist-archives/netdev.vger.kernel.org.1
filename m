@@ -1,66 +1,74 @@
-Return-Path: <netdev+bounces-42495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0E57CEEED
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 07:19:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC3DF7CEF13
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 07:35:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB38FB20E77
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 05:19:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09ABA1C20D39
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 05:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E064667B;
-	Thu, 19 Oct 2023 05:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742FE46689;
+	Thu, 19 Oct 2023 05:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dcTZyYdn"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fQuPntFt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E6517C8
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:18:55 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F266DA4
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 22:18:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697692733; x=1729228733;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4tfSi/T4VJvhJ/85obP0QG0Ut4JUkF78KROB9ye20UM=;
-  b=dcTZyYdnGsTdKh4Tw+edZTb2zcJo8aoC4rYGr2Upj1ZBqA5Aof3kqYXz
-   Evhdbj8AOsP3RhgLTRIqdqieILhOvdA+mkx5RXmvEcM5R3SH8FmEVIhqG
-   syBUUtb+OJHGpp0ivK0E42iqK8yDtmEqrCtQeIa1sDxWiAxTP5l1Ob83t
-   0MA4W04SI+9780Q/6SLODEvX6tYeK4XAsCTKEJcPYLu22dF3dmQAFhYf7
-   jYSVZFupoOo6JEQ59AS8TjMXCQoNgbDKJtbOXYHI7LCK4XZPxfIHu/ZNo
-   MPyjYeCtkxQQG/xyPQzSPxpgvQ8V8E2tfzcfLcx/Wc3raxjgviT9vnQUl
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="450396005"
-X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
-   d="scan'208";a="450396005"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 22:18:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="1004095964"
-X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
-   d="scan'208";a="1004095964"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 18 Oct 2023 22:18:51 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qtLQn-0001fe-1L;
-	Thu, 19 Oct 2023 05:18:49 +0000
-Date: Thu, 19 Oct 2023 13:18:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Amritha Nambiar <amritha.nambiar@intel.com>, netdev@vger.kernel.org,
-	kuba@kernel.org, pabeni@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, sridhar.samudrala@intel.com,
-	amritha.nambiar@intel.com
-Subject: Re: [net-next PATCH v5 03/10] ice: Add support in the driver for
- associating queue with napi
-Message-ID: <202310191339.JfORBqdK-lkp@intel.com>
-References: <169767397753.6692.15797121214738496388.stgit@anambiarhost.jf.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E846B186C
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:35:30 +0000 (UTC)
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4D9A124
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 22:35:28 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1ca052ec63bso51792905ad.1
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 22:35:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1697693728; x=1698298528; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NfobpSr7vKEGPH54g86JM2Np+bjWhjxTMm3BnchjKQ0=;
+        b=fQuPntFtrXBrqOA5X1FYTkpOT/zHpG9OLlVqSGDGS8Zudy7WmI5zDxOrqmQjO8kMBJ
+         /niDxix/PjtbdpJMHtFgTG8VGqY7VTQZJUUWoPqiw7hUMZbWki2yh6HwXTlZYLLlGOPU
+         Ou8sgYBgOZyRUdEP/5IlqkprlDahC6At1/5E4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697693728; x=1698298528;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NfobpSr7vKEGPH54g86JM2Np+bjWhjxTMm3BnchjKQ0=;
+        b=K2BXJnpflRBqEpvhL5/CyrN0eD/kjjG64mJOjYSALCSx/9v40Ye15KKfDnUKSbJw+S
+         vN0hwyNGBIxGcwW0EWzlT/YNxdTFwoQXyFyvNxe0DqahwbkpsE2EqfOUvidGTP6a8imk
+         vv3uNoUIGg/JWKIHxzXwMNhht4uAshu7bbuHVhLJm32nzpbysQCK0hi8qba21u4kUK5i
+         wFEg+wRxfwWDNjyIEficJSjxSUTM0nWfHaCTvM1tfKGOSU04C2EkeaC1babvbOF64J8m
+         0WDjQ/38zdH6/FvqLEvZnUnF0FHbIeFd2s9oYMR/RHq93ZCaSM3Gx89ca3QYdks1MPS2
+         9eKQ==
+X-Gm-Message-State: AOJu0YzhpniXTAoiS4jyk8QMaaT2gydw4SVpcbyIZYNY9HqYk9fcnfIA
+	g7O5MN0YVBUJRiIrXgP15T9Mvw==
+X-Google-Smtp-Source: AGHT+IHWgfmf8zIXxwIjD4ZleHld0EiD88e4q1WNeVI5olT0uObTayiLltt3PVMa2zo4Kom7Jk92AA==
+X-Received: by 2002:a17:903:1cb:b0:1c6:a0b:7b9a with SMTP id e11-20020a17090301cb00b001c60a0b7b9amr1450654plh.3.1697693728114;
+        Wed, 18 Oct 2023 22:35:28 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id u2-20020a17090341c200b001c74df14e6esm903825ple.51.2023.10.18.22.35.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Oct 2023 22:35:27 -0700 (PDT)
+Date: Wed, 18 Oct 2023 22:35:26 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Stephan Gerhold <stephan@gerhold.net>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] net: wwan: replace deprecated strncpy with strscpy_pad
+Message-ID: <202310182232.A569D262@keescook>
+References: <20231018-strncpy-drivers-net-wwan-rpmsg_wwan_ctrl-c-v1-1-4e343270373a@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,57 +77,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <169767397753.6692.15797121214738496388.stgit@anambiarhost.jf.intel.com>
+In-Reply-To: <20231018-strncpy-drivers-net-wwan-rpmsg_wwan_ctrl-c-v1-1-4e343270373a@google.com>
 
-Hi Amritha,
+On Wed, Oct 18, 2023 at 10:14:55PM +0000, Justin Stitt wrote:
+> strncpy() is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
+> 
+> We expect chinfo.name to be NUL-terminated based on its use with format
+> strings and sprintf:
+> rpmsg/rpmsg_char.c
+> 165:            dev_err(dev, "failed to open %s\n", eptdev->chinfo.name);
+> 368:    return sprintf(buf, "%s\n", eptdev->chinfo.name);
+> 
+> ... and with strcmp():
+> |  static struct rpmsg_endpoint *qcom_glink_create_ept(struct rpmsg_device *rpdev,
+> |  						    rpmsg_rx_cb_t cb,
+> |  						    void *priv,
+> |  						    struct rpmsg_channel_info
+> |  									chinfo)
+> |  ...
+> |  const char *name = chinfo.name;
+> |  ...
+> |  		if (!strcmp(channel->name, name))
+> 
+> Moreover, as chinfo is not kzalloc'd, let's opt to NUL-pad the
+> destination buffer
+> 
+> Similar change to:
+> Commit 766279a8f85d ("rpmsg: qcom: glink: replace strncpy() with strscpy_pad()")
+> and
+> Commit 08de420a8014 ("rpmsg: glink: Replace strncpy() with strscpy_pad()")
+> 
+> Considering the above, a suitable replacement is `strscpy_pad` due to
+> the fact that it guarantees both NUL-termination and NUL-padding on the
+> destination buffer.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
+> ---
+> Note: build-tested only.
+> 
+> Found with: $ rg "strncpy\("
+> ---
+>  drivers/net/wwan/rpmsg_wwan_ctrl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/wwan/rpmsg_wwan_ctrl.c b/drivers/net/wwan/rpmsg_wwan_ctrl.c
+> index 86b60aadfa11..39f5e780c478 100644
+> --- a/drivers/net/wwan/rpmsg_wwan_ctrl.c
+> +++ b/drivers/net/wwan/rpmsg_wwan_ctrl.c
+> @@ -37,7 +37,7 @@ static int rpmsg_wwan_ctrl_start(struct wwan_port *port)
+>  		.dst = RPMSG_ADDR_ANY,
+>  	};
 
-kernel test robot noticed the following build warnings:
+"chinfo" is initialized immediately above here, which means that it is
+actually already zero filled for all the members that aren't explicitly
+initialized, so the _pad variant isn't needed. I suspect Dead Store
+Elimination will optimize it all away anyway, so this is probably fine.
 
-[auto build test WARNING on net-next/main]
+>  
+> -	strncpy(chinfo.name, rpwwan->rpdev->id.name, RPMSG_NAME_SIZE);
+> +	strscpy_pad(chinfo.name, rpwwan->rpdev->id.name, sizeof(chinfo.name));
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Amritha-Nambiar/netdev-genl-spec-Extend-netdev-netlink-spec-in-YAML-for-queue/20231019-082941
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/169767397753.6692.15797121214738496388.stgit%40anambiarhost.jf.intel.com
-patch subject: [net-next PATCH v5 03/10] ice: Add support in the driver for associating queue with napi
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20231019/202310191339.JfORBqdK-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231019/202310191339.JfORBqdK-lkp@intel.com/reproduce)
+Yup, sizeof() replacement looks correct:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310191339.JfORBqdK-lkp@intel.com/
+struct rpmsg_channel_info {
+        char name[RPMSG_NAME_SIZE];
 
-All warnings (new ones prefixed by >>):
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
->> drivers/net/ethernet/intel/ice/ice_lib.c:2943:6: warning: no previous prototype for 'ice_queue_set_napi' [-Wmissing-prototypes]
-    2943 | void ice_queue_set_napi(unsigned int queue_index, enum netdev_queue_type type,
-         |      ^~~~~~~~~~~~~~~~~~
-
-
-vim +/ice_queue_set_napi +2943 drivers/net/ethernet/intel/ice/ice_lib.c
-
-  2933	
-  2934	/**
-  2935	 * ice_queue_set_napi - Set the napi instance for the queue
-  2936	 * @queue_index: Index of queue
-  2937	 * @type: queue type as RX or TX
-  2938	 * @napi: NAPI context
-  2939	 * @locked: is the rtnl_lock already held
-  2940	 *
-  2941	 * Set the napi instance for the queue
-  2942	 */
-> 2943	void ice_queue_set_napi(unsigned int queue_index, enum netdev_queue_type type,
-  2944				struct napi_struct *napi, bool locked)
-  2945	{
-  2946		if (locked)
-  2947			__netif_queue_set_napi(queue_index, type, napi);
-  2948		else
-  2949			netif_queue_set_napi(queue_index, type, napi);
-  2950	}
-  2951	
+-Kees
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Kees Cook
 
