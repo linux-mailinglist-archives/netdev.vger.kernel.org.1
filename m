@@ -1,164 +1,396 @@
-Return-Path: <netdev+bounces-42542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03287CF46E
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:51:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF6A57CF46C
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A75DDB20F8D
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 09:51:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E505B20EDB
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 09:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CA01772E;
-	Thu, 19 Oct 2023 09:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8961772E;
+	Thu, 19 Oct 2023 09:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="B0Ie6D8s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IBnGan2u"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2C81772F
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 09:51:27 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEBEAB8
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 02:51:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XHXcU1ejJULAy5E2IZOkzlJh7mLyQKpCxh6aT1SdkehiGgUQyvk4eRlOzaxqtEbGApzFWBgWYmvfOhNmAQ3YTTJuGXIUEZcw+t03ayb7cjJlky0wKB7FrpRe8qqWJSR7UWodK6OboihJGtDkeE+GDG8Xsl760yH6NepFZCTxigHoaEYAcX8nGSANFgHLk4pf548fs2K0Fsw0W8dXxBYFQ0XOGwC1FmQmatO1Q+pJHcpLUF3hIvyP4lrJw7kb4njiENVPAD38VMv9ajcdmlq32IAgVTQePoov3leySSCf23+/ex/qG2Tt3zU5ddQ3F2RRCpG/XFg/+CLUDmEYghiGoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kkQljl9YXTzUNjyCU+BBoU8goswv4g544fi0YEtVCWI=;
- b=gm2nytoseIEJhKswZS6mP5dxeSaCBcrA2z1fCpT6dxw4BP16+dOMmvItezKLWJsoOfZJJAaKdU+oHg/aAkNzoa8TwGnPWuGiTWbeBnCqFXQfJxZIEBmOieWuC0ZtQ9Z5WUGPnv6xlhzT/5AbGVn2OK9de4Ass+RWUKBKgnslwQDdCYnlg8UrNnsOl79DiC8L8HDhKYPDXuSW9TEbgiqA5YTZfWwo5QZhO2mHY531lF3dmpLJ0XjzWtmf0gkcoVWGPVx85IO8h7uwdOZWs5Cw8azfpOQQ3+nGXmaZCSSiSD8zEBR4W5QqzqefQIt3n9ZD+4dv0ka0rLA3S1ndhrqwFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kkQljl9YXTzUNjyCU+BBoU8goswv4g544fi0YEtVCWI=;
- b=B0Ie6D8s7F3WGLT8vNY0aSdn75ddJYQ2Nrg327r0K7lWwZyPGotQ+3Lcu3+SxXclRASQwFX/c41A4WVwMiImBzoVVTlgXFodNRZ5S0agRCimTxa1qrSYlSVRWL813ktLw/lLi7TIWZ2A4D4cJYYZOsH+3k3jjxcWe3G6NfE1EVrrQxLbwg9jlWfSazqnszQAbrRVXImjxun1LPzYB2klRLHmz6C27HJFP0B032YhOhJByZJumVWos65QOK2p2dNqBzybq85gkh2JUm8cko5MkE56FyHyAQNlkZbc/met9eXg6O0jfLzpEUADkm9FFNWnrJQRzgeQjEL1i+fJ8m2nEQ==
-Received: from CYXPR03CA0071.namprd03.prod.outlook.com (2603:10b6:930:d1::12)
- by IA1PR12MB9062.namprd12.prod.outlook.com (2603:10b6:208:3aa::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.21; Thu, 19 Oct
- 2023 09:51:25 +0000
-Received: from CY4PEPF0000EE33.namprd05.prod.outlook.com
- (2603:10b6:930:d1:cafe::4f) by CYXPR03CA0071.outlook.office365.com
- (2603:10b6:930:d1::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.25 via Frontend
- Transport; Thu, 19 Oct 2023 09:51:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000EE33.mail.protection.outlook.com (10.167.242.39) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.22 via Frontend Transport; Thu, 19 Oct 2023 09:51:24 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 19 Oct
- 2023 02:51:15 -0700
-Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 19 Oct
- 2023 02:51:12 -0700
-References: <20231018-fdb_limit-v5-1-7ca3b3eb7c1f@avm.de>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Johannes Nixdorf <jnixdorf-oss@avm.de>
-CC: David Ahern <dsahern@gmail.com>, Roopa Prabhu <roopa@nvidia.com>, "Nikolay
- Aleksandrov" <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, "Petr
- Machata" <petrm@nvidia.com>, <bridge@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH iproute2-next v5] iplink: bridge: Add support for bridge
- FDB learning limits
-Date: Thu, 19 Oct 2023 11:50:21 +0200
-In-Reply-To: <20231018-fdb_limit-v5-1-7ca3b3eb7c1f@avm.de>
-Message-ID: <87il730wkx.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6121400B
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 09:51:18 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BA9BB8
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 02:51:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697709075;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=opD4K+lhLgpQnt4PMFVWJ2GlfEpmbjN6nDHAsiU0UgE=;
+	b=IBnGan2uoKJNAvvNFOfSwqNe+ogKde95NyUzADDFzhAi/HuLqChT0A1zNEPl9+IG4uL8wE
+	o7E5oEg4l68B0A3Qv5Xgx2LMrD80GuRaBTJFIMr5li88Xd4bqRk7C/s27bjb+CbIZz8A5u
+	3/EMuoDRud/31AGIK21GiziXhJNWiTk=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-581-WxW_eBdrOiWbsUr_P5VY5A-1; Thu, 19 Oct 2023 05:50:59 -0400
+X-MC-Unique: WxW_eBdrOiWbsUr_P5VY5A-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-534838150afso887492a12.0
+        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 02:50:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697709058; x=1698313858;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=opD4K+lhLgpQnt4PMFVWJ2GlfEpmbjN6nDHAsiU0UgE=;
+        b=XbOm4aQdaybY0BosDNSPQ9hKVuhZ+R78Re9aiaPVcgh4Ban82ZSV9Up7JVYJsMC3aB
+         wlESqiLB/vLbPRWIFbm6xkq3Yh2kvjW27lBM3HTZKCekH4Y8CxPJ/UmnDRmbFj/cMm8P
+         9uMxyevGavDMYsz+ftj7Wcg8WojFOsG6wqnHoZ9c5SKZ4t57VkwIGnx+Xlz5fMjBwIZj
+         DcPu23r0ypLG7e9smnZzTqxtSdgc/C3/pF/+Rnas1ulCB30kp76yh6EolN3lrfOYcEX1
+         gcnXg7LMZypAYoeTU8Fn9ebLOnLQQXQ4f8xUi/VJ90MRC4f8oSNTp+QXAPrgxJu+arxx
+         Ok7Q==
+X-Gm-Message-State: AOJu0YxG16GAhHC5305coPFlju5btWSM7oJsovhQKLuQM+/gYvhZVv32
+	vxTBO2XV6BC9Hz1pPeDgVTsmMNtujf7pHX6y8dkgqX4h8qfSC6XWE+vj8eL8eluQTG4Ebv26J7P
+	vKksfyhk9L1wL8XyC
+X-Received: by 2002:aa7:df99:0:b0:53f:9311:6002 with SMTP id b25-20020aa7df99000000b0053f93116002mr898111edy.2.1697709058199;
+        Thu, 19 Oct 2023 02:50:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IERzrf2nVVATjtrHBX9UQAFHkPln439uEI+PP2ld4u3vfRp9uKaiPbReASQjl8OZKwsITQdrQ==
+X-Received: by 2002:aa7:df99:0:b0:53f:9311:6002 with SMTP id b25-20020aa7df99000000b0053f93116002mr898089edy.2.1697709057816;
+        Thu, 19 Oct 2023 02:50:57 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-237-142.dyn.eolo.it. [146.241.237.142])
+        by smtp.gmail.com with ESMTPSA id ck25-20020a0564021c1900b0053dab756073sm4117338edb.84.2023.10.19.02.50.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 02:50:57 -0700 (PDT)
+Message-ID: <582ccc0600aea90e32e4c6416d40d0a8047f9eae.camel@redhat.com>
+Subject: Re: [PATCH net-next v8 3/3] net: axienet: Introduce dmaengine
+ support
+From: Paolo Abeni <pabeni@redhat.com>
+To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, robh+dt@kernel.org, 
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ michal.simek@amd.com,  linux@armlinux.org.uk, f.fainelli@gmail.com
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ git@amd.com
+Date: Thu, 19 Oct 2023 11:50:55 +0200
+In-Reply-To: <1697570274-798170-4-git-send-email-radhey.shyam.pandey@amd.com>
+References: <1697570274-798170-1-git-send-email-radhey.shyam.pandey@amd.com>
+	 <1697570274-798170-4-git-send-email-radhey.shyam.pandey@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE33:EE_|IA1PR12MB9062:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4636702d-2a52-4353-d695-08dbd088f4f5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	eDOYL4ke8FRE5VVUGRtXECL1lu6hcZj5FrOiXWEzLGKHFT6YNuL3bklYA0PCKTXZhJ2PqKDbKznf8y0YhVferO77z/CwaqUQYAh0yKRr4C+/yGL5WMaiYk1xDqJ344pxUHUb62UjIghH1gWebdssbuvMvq4FtyWS+UUoitwnj2t6srKRBooCHwcPuqegu7jbRFXxfnp95XU9yJNYNttpaLhF1h9cxVI5adlhKMQnt9T7MzZXwPlZ4tlFIE6zswE37FCUqVVGB7bMla6Cr5C4s8ObLrQXTl+d5VbwjUb/I65pLsouZm3r+YI4FbpxFazP51/EWrQWI1GcX38Tk1il4O/f0KHfAHVXXx1yUGLXNEPA08pwGiMJSAugj+pQEYT2Zz1rMc4M+KwOGdYEf1Bjw2R5O0RXFT9Xnzw+jQSztctflobNs+sSHAao/Les8SZg7sIKamHHUOrePe9cAON29OE51dZk9YbHkx/vN3XsZv1b+2Orzc4YPw8dL2oa03gykBHbC4ipE3q07R+5zxFTTtrEYm3U6zS03fx5Na8I1fzoOP9iz0pAUlm4Dsy7qrX5ZFvD+orbqiSC4PC5udA+DKPFi6bPR4oiFQB8uN2/wRFv2MwlaU4DdRPzmJw1CJTIwv07OOtN8hgsLppOAms2+apgHDZTjY2Z2P1tPRAZyg4HSOAzLtwZRRAOHYo/lUzpVrNBD39pbHw2VV8YIFZipXv8NucQZkKm+/z4FuGnJpowb/gaXn0hr5R50PWtJqkS
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(136003)(376002)(396003)(39860400002)(230922051799003)(1800799009)(82310400011)(186009)(451199024)(64100799003)(46966006)(36840700001)(40470700004)(36756003)(478600001)(40460700003)(70206006)(70586007)(54906003)(6916009)(336012)(47076005)(16526019)(356005)(82740400003)(7636003)(2616005)(26005)(86362001)(83380400001)(426003)(316002)(36860700001)(2906002)(6666004)(40480700001)(41300700001)(8676002)(5660300002)(8936002)(4326008);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 09:51:24.5376
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4636702d-2a52-4353-d695-08dbd088f4f5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE33.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB9062
+
+On Wed, 2023-10-18 at 00:47 +0530, Radhey Shyam Pandey wrote:
+[...]
+> @@ -727,6 +746,122 @@ static inline int axienet_check_tx_bd_space(struct =
+axienet_local *lp,
+>  	return 0;
+>  }
+> =20
+> +/**
+> + * axienet_dma_tx_cb - DMA engine callback for TX channel.
+> + * @data:       Pointer to the axienet_local structure.
+> + * @result:     error reporting through dmaengine_result.
+> + * This function is called by dmaengine driver for TX channel to notify
+> + * that the transmit is done.
+> + */
+> +static void axienet_dma_tx_cb(void *data, const struct dmaengine_result =
+*result)
+> +{
+> +	struct axienet_local *lp =3D data;
+> +	struct skbuf_dma_descriptor *skbuf_dma;
+
+Minor nit: please use the reverse x-mas tree order
+
+> +
+> +	skbuf_dma =3D axienet_get_tx_desc(lp, lp->tx_ring_tail++);
+> +	u64_stats_update_begin(&lp->tx_stat_sync);
+> +	u64_stats_add(&lp->tx_bytes, skbuf_dma->skb->len);
+> +	u64_stats_add(&lp->tx_packets, 1);
+> +	u64_stats_update_end(&lp->tx_stat_sync);
+> +	dma_unmap_sg(lp->dev, skbuf_dma->sgl, skbuf_dma->sg_len, DMA_TO_DEVICE)=
+;
+> +	dev_consume_skb_any(skbuf_dma->skb);
+> +	if (CIRC_SPACE(lp->tx_ring_head, lp->tx_ring_tail, TX_BD_NUM_MAX) > MAX=
+_SKB_FRAGS + 1)
+> +		netif_wake_queue(lp->ndev);
+> +}
+> +
+> +/**
+> + * axienet_start_xmit_dmaengine - Starts the transmission.
+> + * @skb:        sk_buff pointer that contains data to be Txed.
+> + * @ndev:       Pointer to net_device structure.
+> + *
+> + * Return: NETDEV_TX_OK on success or any non space errors.
+> + *         NETDEV_TX_BUSY when free element in TX skb ring buffer
+> + *         is not available.
+> + *
+> + * This function is invoked to initiate transmission. The
+> + * function sets the skbs, register dma callback API and submit
+> + * the dma transaction.
+> + * Additionally if checksum offloading is supported,
+> + * it populates AXI Stream Control fields with appropriate values.
+> + */
+> +static netdev_tx_t
+> +axienet_start_xmit_dmaengine(struct sk_buff *skb, struct net_device *nde=
+v)
+> +{
+> +	struct dma_async_tx_descriptor *dma_tx_desc =3D NULL;
+> +	struct axienet_local *lp =3D netdev_priv(ndev);
+> +	u32 app_metadata[DMA_NUM_APP_WORDS] =3D {0};
+> +	struct skbuf_dma_descriptor *skbuf_dma;
+> +	struct dma_device *dma_dev;
+> +	u32 csum_start_off;
+> +	u32 csum_index_off;
+> +	int sg_len;
+> +	int ret;
+> +
+> +	dma_dev =3D lp->tx_chan->device;
+> +	sg_len =3D skb_shinfo(skb)->nr_frags + 1;
+> +	if (CIRC_SPACE(lp->tx_ring_head, lp->tx_ring_tail, TX_BD_NUM_MAX) <=3D =
+sg_len) {
+> +		netif_stop_queue(ndev);
+> +		if (net_ratelimit())
+> +			netdev_warn(ndev, "TX ring unexpectedly full\n");
+> +		return NETDEV_TX_BUSY;
+> +	}
+> +
+> +	skbuf_dma =3D axienet_get_tx_desc(lp, lp->tx_ring_head);
+> +	if (!skbuf_dma) {
+> +		dev_kfree_skb_any(skb);
+> +		return NETDEV_TX_OK;
+
+You can avoid some duplicate code with:
+		goto drop_skb;
+
+and adding at the bottom of this function:
+
+drop_skb:
+	dev_kfree_skb_any(skb);
+	return NETDEV_TX_OK;
+
+> +	}
+> +
+> +	lp->tx_ring_head++;
+> +	sg_init_table(skbuf_dma->sgl, sg_len);
+> +	ret =3D skb_to_sgvec(skb, skbuf_dma->sgl, 0, skb->len);
+> +	if (ret < 0) {
+> +		dev_kfree_skb_any(skb);
+> +		return NETDEV_TX_OK;
+
+Same here and below.
+
+> +	}
+> +
+> +	ret =3D dma_map_sg(lp->dev, skbuf_dma->sgl, sg_len, DMA_TO_DEVICE);
+> +	if (!ret) {
+> +		dev_kfree_skb_any(skb);
+> +		return NETDEV_TX_OK;
+> +	}
+> +
+> +	/* Fill up app fields for checksum */
+> +	if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
+> +		if (lp->features & XAE_FEATURE_FULL_TX_CSUM) {
+> +			/* Tx Full Checksum Offload Enabled */
+> +			app_metadata[0] |=3D 2;
+> +		} else if (lp->features & XAE_FEATURE_PARTIAL_TX_CSUM) {
+> +			csum_start_off =3D skb_transport_offset(skb);
+> +			csum_index_off =3D csum_start_off + skb->csum_offset;
+> +			/* Tx Partial Checksum Offload Enabled */
+> +			app_metadata[0] |=3D 1;
+> +			app_metadata[1] =3D (csum_start_off << 16) | csum_index_off;
+> +		}
+> +	} else if (skb->ip_summed =3D=3D CHECKSUM_UNNECESSARY) {
+> +		app_metadata[0] |=3D 2; /* Tx Full Checksum Offload Enabled */
+> +	}
+> +
+> +	dma_tx_desc =3D dma_dev->device_prep_slave_sg(lp->tx_chan, skbuf_dma->s=
+gl,
+> +			sg_len, DMA_MEM_TO_DEV,
+> +			DMA_PREP_INTERRUPT, (void *)app_metadata);
+> +	if (!dma_tx_desc)
+> +		goto xmit_error_unmap_sg;
+
+Are you leaking an skb here?
+
+You forgot to add the netif_txq_maybe_stop() call, as suggested by
+Jakub in the previous revision.
+
+> +
+> +	skbuf_dma->skb =3D skb;
+> +	skbuf_dma->sg_len =3D sg_len;
+> +	dma_tx_desc->callback_param =3D lp;
+> +	dma_tx_desc->callback_result =3D axienet_dma_tx_cb;
+> +	dmaengine_submit(dma_tx_desc);
+> +	dma_async_issue_pending(lp->tx_chan);
+> +
+> +	return NETDEV_TX_OK;
+> +
+> +xmit_error_unmap_sg:
+> +	dma_unmap_sg(lp->dev, skbuf_dma->sgl, sg_len, DMA_TO_DEVICE);
+
+If you need to drop the skb (as I suspect), you can reuse the drop_skb
+label here:
+
+drop_skb:
+	dev_kfree_skb_any(skb);
+> +	return NETDEV_TX_OK;
+> +}
+> +
+>  /**
+>   * axienet_tx_poll - Invoked once a transmit is completed by the
+>   * Axi DMA Tx channel.
+> @@ -893,6 +1028,42 @@ axienet_start_xmit(struct sk_buff *skb, struct net_=
+device *ndev)
+>  	return NETDEV_TX_OK;
+>  }
+> =20
+> +/**
+> + * axienet_dma_rx_cb - DMA engine callback for RX channel.
+> + * @data:       Pointer to the skbuf_dma_descriptor structure.
+> + * @result:     error reporting through dmaengine_result.
+> + * This function is called by dmaengine driver for RX channel to notify
+> + * that the packet is received.
+> + */
+> +static void axienet_dma_rx_cb(void *data, const struct dmaengine_result =
+*result)
+> +{
+> +	struct axienet_local *lp =3D data;
+> +	struct skbuf_dma_descriptor *skbuf_dma;
+> +	size_t meta_len, meta_max_len, rx_len;
+> +	struct sk_buff *skb;
+> +	u32 *app_metadata;
+
+Minor nit: please respect the reverse x-mas tree order
+
+> +
+> +	skbuf_dma =3D axienet_get_rx_desc(lp, lp->rx_ring_tail++);
+> +	skb =3D skbuf_dma->skb;
+> +	app_metadata =3D dmaengine_desc_get_metadata_ptr(skbuf_dma->desc, &meta=
+_len,
+> +						       &meta_max_len);
+> +	dma_unmap_single(lp->dev, skbuf_dma->dma_address, lp->max_frm_size,
+> +			 DMA_FROM_DEVICE);
+> +	/* TODO: Derive app word index programmatically */
+> +	rx_len =3D (app_metadata[LEN_APP] & 0xFFFF);
+> +	skb_put(skb, rx_len);
+> +	skb->protocol =3D eth_type_trans(skb, lp->ndev);
+> +	skb->ip_summed =3D CHECKSUM_NONE;
+> +
+> +	__netif_rx(skb);
+
+It's a pity you can't leverage NAPI here.
+
+I think that could be doable as a follow-up, but I'm unsure if that
+would fit the DMA engine model: in this callback you could cache the
+ready dma index (a single range should suffice) and schedule the napi
+instance. The actual dma processing will be done in napi poll.
+
+Another possible follow-up could be introducing a "bulk" RX callback in
+the DMA engine, to mitigate the indirect call overhead on a burst of RX
+DMA completion - assuming the DMA engine actually generates such burst.
+
+> +	u64_stats_update_begin(&lp->rx_stat_sync);
+> +	u64_stats_add(&lp->rx_packets, 1);
+> +	u64_stats_add(&lp->rx_bytes, rx_len);
+> +	u64_stats_update_end(&lp->rx_stat_sync);
+> +	axienet_rx_submit_desc(lp->ndev);
+> +	dma_async_issue_pending(lp->rx_chan);
+> +}
+> +
+>  /**
+>   * axienet_rx_poll - Triggered by RX ISR to complete the BD processing.
+>   * @napi:	Pointer to NAPI structure.
+> @@ -1126,6 +1297,150 @@ static irqreturn_t axienet_eth_irq(int irq, void =
+*_ndev)
+> =20
+>  static void axienet_dma_err_handler(struct work_struct *work);
+> =20
+> +/**
+> + * axienet_rx_submit_desc - Submit the rx descriptors to dmaengine.
+> + * allocate skbuff, map the scatterlist and obtain a descriptor
+> + * and then add the callback information and submit descriptor.
+> + *
+> + * @ndev:	net_device pointer
+> + *
+> + *Return: 0, on success.
+> + *          non-zero error value on failure
+> + */
+> +static int axienet_rx_submit_desc(struct net_device *ndev)
+> +{
+> +	struct dma_async_tx_descriptor *dma_rx_desc =3D NULL;
+> +	struct axienet_local *lp =3D netdev_priv(ndev);
+> +	struct skbuf_dma_descriptor *skbuf_dma;
+> +	struct sk_buff *skb;
+> +	dma_addr_t addr;
+> +	int ret;
+> +
+> +	skbuf_dma =3D axienet_get_rx_desc(lp, lp->rx_ring_head);
+> +	if (!skbuf_dma)
+> +		return -ENOMEM;
+
+Minor nit: here a newline would make the core more readable
+
+> +	lp->rx_ring_head++;
+> +	skb =3D netdev_alloc_skb(ndev, lp->max_frm_size);
+> +	if (!skb)
+> +		return -ENOMEM;
+
+Another possible follow-up: usually the skb header is allocated just
+before sending it to the network stack (e.g. just before the
+__netif_rx() call) to be cache friendly. Here you could allocate just
+the data part and later use e.g. build_skb_around()
+
+> +
+> +	sg_init_table(skbuf_dma->sgl, 1);
+> +	addr =3D dma_map_single(lp->dev, skb->data, lp->max_frm_size, DMA_FROM_=
+DEVICE);
+> +	if (unlikely(dma_mapping_error(lp->dev, addr))) {
+> +		if (net_ratelimit())
+> +			netdev_err(ndev, "DMA mapping error\n");
+> +		ret =3D -ENOMEM;
+> +		goto rx_submit_err_free_skb;
+> +	}
+> +	sg_dma_address(skbuf_dma->sgl) =3D addr;
+> +	sg_dma_len(skbuf_dma->sgl) =3D lp->max_frm_size;
+> +	dma_rx_desc =3D dmaengine_prep_slave_sg(lp->rx_chan, skbuf_dma->sgl,
+> +					      1, DMA_DEV_TO_MEM,
+> +					      DMA_PREP_INTERRUPT);
+> +	if (!dma_rx_desc) {
+> +		ret =3D -EINVAL;
+> +		goto rx_submit_err_unmap_skb;
+> +	}
+> +
+> +	skbuf_dma->skb =3D skb;
+> +	skbuf_dma->dma_address =3D sg_dma_address(skbuf_dma->sgl);
+> +	skbuf_dma->desc =3D dma_rx_desc;
+> +	dma_rx_desc->callback_param =3D lp;
+> +	dma_rx_desc->callback_result =3D axienet_dma_rx_cb;
+> +	dmaengine_submit(dma_rx_desc);
+> +
+> +	return 0;
+> +
+> +rx_submit_err_unmap_skb:
+> +	dma_unmap_single(lp->dev, addr, lp->max_frm_size, DMA_FROM_DEVICE);
+> +rx_submit_err_free_skb:
+> +	dev_kfree_skb(skb);
+> +	return ret;
+
+It looks like the error code is ignored by the caller. Possibly you can
+change this to a 'void' function.
 
 
-Johannes Nixdorf <jnixdorf-oss@avm.de> writes:
+Cheers,
 
-> Support setting the FDB limit through ip link. The arguments is:
->  - fdb_max_learned: A 32-bit unsigned integer specifying the maximum
->                     number of learned FDB entries, with 0 disabling
->                     the limit.
->
-> Also support reading back the current number of learned FDB entries in
-> the bridge by this count. The returned value's name is:
->  - fdb_n_learned: A 32-bit unsigned integer specifying the current number
->                   of learned FDB entries.
->
-> Example:
->
->  # ip -d -j -p link show br0
-> [ {
-> ...
->         "linkinfo": {
->             "info_kind": "bridge",
->             "info_data": {
-> ...
->                 "fdb_n_learned": 2,
->                 "fdb_max_learned": 0,
-> ...
->             }
->         },
-> ...
->     } ]
->  # ip link set br0 type bridge fdb_max_learned 1024
->  # ip -d -j -p link show br0
-> [ {
-> ...
->         "linkinfo": {
->             "info_kind": "bridge",
->             "info_data": {
-> ...
->                 "fdb_n_learned": 2,
->                 "fdb_max_learned": 1024,
-> ...
->             }
->         },
-> ...
->     } ]
->
-> Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
+Paolo
 
-Reviewed-by: Petr Machata <petrm@nvidia.com>
 
