@@ -1,182 +1,199 @@
-Return-Path: <netdev+bounces-42498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 785287CEF54
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 07:49:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 774AA7CEFE2
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:10:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 740341C20849
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 05:49:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD2C7B20E81
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 06:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2DB46699;
-	Thu, 19 Oct 2023 05:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47C2610A;
+	Thu, 19 Oct 2023 06:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="W1EOf7KB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xxf9VBAe"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3594F46698
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:48:55 +0000 (UTC)
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF3E8B6;
-	Wed, 18 Oct 2023 22:48:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1697694527;
-	bh=CR7dWSEwjH6imZHnVlXAbeQgnXp1ZZMTjjN1Ld5riCc=;
-	h=Date:From:To:Cc:Subject:From;
-	b=W1EOf7KB8sRaSXlw9dVE0T0wXyu1Oyqnzkx0PJNcwP5Q2nbMp0apO4UJHlIciNHRk
-	 3kMzxiWUH5Z2mV0xY95EP9WXEl3If65YbcBpSNzCvrE3J4Xn94sj67kQhNEjObHOTi
-	 1Dbx4XTWm49rA+UA9tv98qjsngmFQ8VxvJptN6cTEKReQsdLK68fUf4Hs0QKUe8tC7
-	 ArKUDEs2nKzd8JVTR8hHeBNyx2I8oS/3Z1LlzQc5yMg9ZpKUwwzwh2uWIxjUgtbNMS
-	 zWmsBN6FGZf+sjrYpM0NaXgVljCVXIfYJWI/kH/KpFK3okTvGn8Qg67ECIg5vvRxVo
-	 YhDorjcy8HzEw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4S9xbf4FkWz4xQQ;
-	Thu, 19 Oct 2023 16:48:46 +1100 (AEDT)
-Date: Thu, 19 Oct 2023 16:48:44 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Yury Norov <yury.norov@gmail.com>, David Miller <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Paul Greenwalt <paul.greenwalt@intel.com>,
- Pawel Chmielewski <pawel.chmielewski@intel.com>
-Subject: linux-next: manual merge of the bitmap tree with the net-next tree
-Message-ID: <20231019164844.4cc37f93@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560AA17FD
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 06:10:40 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C080E116
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 23:10:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697695838;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+UhCiLXC3GKhC7LBn7PFGeNEM6rzFh/63mwCf1MnfRg=;
+	b=Xxf9VBAeobViURHWhb2q4lBv8yTdaEvZWWhvzx9qMclmUzfSvVn11Iau+jpiaJbzLwpMg/
+	weG7ofwfmhyXa4R/byFrLScbcApPj8A3W3jMua/GBmXl4v//nFrP4WAtnPA4Nvn1Y0n1Xt
+	KxH6f6C2yLkSbTm5Aenm9izlltdEjSw=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-583--Io5An_1Ni-b5pxBCDVJKA-1; Thu, 19 Oct 2023 02:10:34 -0400
+X-MC-Unique: -Io5An_1Ni-b5pxBCDVJKA-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c51ca27f71so42660701fa.2
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 23:10:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697695833; x=1698300633;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+UhCiLXC3GKhC7LBn7PFGeNEM6rzFh/63mwCf1MnfRg=;
+        b=UsKYxQCVXr9V2RzCiHpdR3hI//73CtIMJCwFWSscMVt3I542PsYwj1Z3H6Pj505LzM
+         9a9/P916PSSwwJ56TEIkSlgEqzCFjmteRfI9T/Ow1dwTrpqdoX8bTwxKG8EeNeTgP+Mb
+         tShcgKB30srCWvVW/+Nz4qetaX8gTeJwH3ebTiQwNkKiFAF2+vDE5JHPclewmiLt+IZS
+         LR51WZARpwTdojcmk+iCxOJFbDXFJGH44D10lcDOtasIHo13itmUN0qz8qwZq+7+ZSGX
+         VR1JYw4x59XcVQ3PARghcGJTuQv/TZ8mJA4s25fp+52Vv8wUo3L0BZlhpxjzRtmX4aO6
+         p9yQ==
+X-Gm-Message-State: AOJu0YxKd3AnLx2JCMEkmgZkOD2udzTV3pt0CPW2dRlRPt6KSE85Uk1Z
+	zdYW1ILjZNN8+Xv0JfW7ax2bwz6OqxvzCFTpsPOw75Bg/8N1MT957jcOfEmO+lAeuIkCkuwB/HT
+	DaH6kKaE54mj9lcS6AJ6zVjEAqMlY08qN
+X-Received: by 2002:a05:6512:15a2:b0:507:ce49:81bd with SMTP id bp34-20020a05651215a200b00507ce4981bdmr896110lfb.61.1697695832952;
+        Wed, 18 Oct 2023 23:10:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF8sj9k9xpWrn8oW1b/1IrnZYzb/HZkAuesmJBQStjDAxGGfZvTonP0LgNbiePQysfQCChTXRtGf1G0Iwe7dDw=
+X-Received: by 2002:a05:6512:15a2:b0:507:ce49:81bd with SMTP id
+ bp34-20020a05651215a200b00507ce4981bdmr896094lfb.61.1697695832620; Wed, 18
+ Oct 2023 23:10:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/iYTkWDP_1_tS6QBLU_WRv4Z";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/iYTkWDP_1_tS6QBLU_WRv4Z
-Content-Type: text/plain; charset=US-ASCII
+References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com> <20231016120033.26933-4-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20231016120033.26933-4-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 19 Oct 2023 14:10:21 +0800
+Message-ID: <CACGkMEtR_OKWQC03HY-pnBGXsMqnD92uS3qHC+DwZy38tDKnwg@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 03/19] virtio_net: independent directory
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On Mon, Oct 16, 2023 at 8:01=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> Create a separate directory for virtio-net. AF_XDP support will be added
+> later, then a separate xsk.c file will be added, so we should create a
+> directory for virtio-net.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-Today's linux-next merge of the bitmap tree got a conflict in:
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-  include/linux/linkmode.h
+Thanks
 
-between commit:
+> ---
+>  MAINTAINERS                                 |  2 +-
+>  drivers/net/Kconfig                         |  8 +-------
+>  drivers/net/Makefile                        |  2 +-
+>  drivers/net/virtio/Kconfig                  | 13 +++++++++++++
+>  drivers/net/virtio/Makefile                 |  8 ++++++++
+>  drivers/net/{virtio_net.c =3D> virtio/main.c} |  0
+>  6 files changed, 24 insertions(+), 9 deletions(-)
+>  create mode 100644 drivers/net/virtio/Kconfig
+>  create mode 100644 drivers/net/virtio/Makefile
+>  rename drivers/net/{virtio_net.c =3D> virtio/main.c} (100%)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 9c186c214c54..e4fbcbc100e3 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -22768,7 +22768,7 @@ F:      Documentation/devicetree/bindings/virtio/
+>  F:     Documentation/driver-api/virtio/
+>  F:     drivers/block/virtio_blk.c
+>  F:     drivers/crypto/virtio/
+> -F:     drivers/net/virtio_net.c
+> +F:     drivers/net/virtio/
+>  F:     drivers/vdpa/
+>  F:     drivers/virtio/
+>  F:     include/linux/vdpa.h
+> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+> index 44eeb5d61ba9..54ee6fa4f4a6 100644
+> --- a/drivers/net/Kconfig
+> +++ b/drivers/net/Kconfig
+> @@ -430,13 +430,7 @@ config VETH
+>           When one end receives the packet it appears on its pair and vic=
+e
+>           versa.
+>
+> -config VIRTIO_NET
+> -       tristate "Virtio network driver"
+> -       depends on VIRTIO
+> -       select NET_FAILOVER
+> -       help
+> -         This is the virtual network driver for virtio.  It can be used =
+with
+> -         QEMU based VMMs (like KVM or Xen).  Say Y or M.
+> +source "drivers/net/virtio/Kconfig"
+>
+>  config NLMON
+>         tristate "Virtual netlink monitoring device"
+> diff --git a/drivers/net/Makefile b/drivers/net/Makefile
+> index e26f98f897c5..47537dd0f120 100644
+> --- a/drivers/net/Makefile
+> +++ b/drivers/net/Makefile
+> @@ -31,7 +31,7 @@ obj-$(CONFIG_NET_TEAM) +=3D team/
+>  obj-$(CONFIG_TUN) +=3D tun.o
+>  obj-$(CONFIG_TAP) +=3D tap.o
+>  obj-$(CONFIG_VETH) +=3D veth.o
+> -obj-$(CONFIG_VIRTIO_NET) +=3D virtio_net.o
+> +obj-$(CONFIG_VIRTIO_NET) +=3D virtio/
+>  obj-$(CONFIG_VXLAN) +=3D vxlan/
+>  obj-$(CONFIG_GENEVE) +=3D geneve.o
+>  obj-$(CONFIG_BAREUDP) +=3D bareudp.o
+> diff --git a/drivers/net/virtio/Kconfig b/drivers/net/virtio/Kconfig
+> new file mode 100644
+> index 000000000000..d8ccb3ac49df
+> --- /dev/null
+> +++ b/drivers/net/virtio/Kconfig
+> @@ -0,0 +1,13 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +#
+> +# virtio-net device configuration
+> +#
+> +config VIRTIO_NET
+> +       tristate "Virtio network driver"
+> +       depends on VIRTIO
+> +       select NET_FAILOVER
+> +       help
+> +         This is the virtual network driver for virtio.  It can be used =
+with
+> +         QEMU based VMMs (like KVM or Xen).
+> +
+> +         Say Y or M.
+> diff --git a/drivers/net/virtio/Makefile b/drivers/net/virtio/Makefile
+> new file mode 100644
+> index 000000000000..15ed7c97fd4f
+> --- /dev/null
+> +++ b/drivers/net/virtio/Makefile
+> @@ -0,0 +1,8 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# Makefile for the virtio network device drivers.
+> +#
+> +
+> +obj-$(CONFIG_VIRTIO_NET) +=3D virtio_net.o
+> +
+> +virtio_net-y :=3D main.o
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio/main.c
+> similarity index 100%
+> rename from drivers/net/virtio_net.c
+> rename to drivers/net/virtio/main.c
+> --
+> 2.32.0.3.g01195cf9f
+>
 
-  26c5334d344d ("ethtool: Add forced speed to supported link modes maps")
-
-from the net-next tree and commit:
-
-  f849608560af ("linkmode: convert linkmode_{test,set,clear,mod}_bit() to m=
-acros")
-
-from the bitmap tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc include/linux/linkmode.h
-index cd38f89553e6,f231e2edbfa5..000000000000
---- a/include/linux/linkmode.h
-+++ b/include/linux/linkmode.h
-@@@ -2,21 -2,6 +2,18 @@@
-  #define __LINKMODE_H
- =20
-  #include <linux/bitmap.h>
- +
-- static inline void linkmode_set_bit(int nr, volatile unsigned long *addr)
-- {
-- 	__set_bit(nr, addr);
-- }
-++#define linkmode_set_bit	__set_bit
- +
- +static inline void linkmode_set_bit_array(const int *array, int array_siz=
-e,
- +					  unsigned long *addr)
- +{
- +	int i;
- +
- +	for (i =3D 0; i < array_size; i++)
- +		linkmode_set_bit(array[i], addr);
- +}
- +
-  #include <linux/ethtool.h>
-  #include <uapi/linux/ethtool.h>
- =20
-@@@ -53,25 -38,20 +50,10 @@@ static inline int linkmode_andnot(unsig
-  	return bitmap_andnot(dst, src1, src2,  __ETHTOOL_LINK_MODE_MASK_NBITS);
-  }
- =20
-- static inline void linkmode_clear_bit(int nr, volatile unsigned long *add=
-r)
-- {
-- 	__clear_bit(nr, addr);
-- }
--=20
-- static inline void linkmode_mod_bit(int nr, volatile unsigned long *addr,
-- 				    int set)
-- {
-- 	if (set)
-- 		linkmode_set_bit(nr, addr);
-- 	else
-- 		linkmode_clear_bit(nr, addr);
-- }
--=20
-- static inline int linkmode_test_bit(int nr, const volatile unsigned long =
-*addr)
-- {
-- 	return test_bit(nr, addr);
-- }
-+ #define linkmode_test_bit	test_bit
- -#define linkmode_set_bit	__set_bit
-+ #define linkmode_clear_bit	__clear_bit
-+ #define linkmode_mod_bit	__assign_bit
- =20
- -static inline void linkmode_set_bit_array(const int *array, int array_siz=
-e,
- -					  unsigned long *addr)
- -{
- -	int i;
- -
- -	for (i =3D 0; i < array_size; i++)
- -		linkmode_set_bit(array[i], addr);
- -}
- -
-  static inline int linkmode_equal(const unsigned long *src1,
-  				 const unsigned long *src2)
-  {
-
---Sig_/iYTkWDP_1_tS6QBLU_WRv4Z
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmUwwzwACgkQAVBC80lX
-0Gw8dQf/ckBlyqp0x9E8fPVAlHEGxWz7oIixRXFmyKVZtQX+FBMrvd+8ZgWRtjvk
-UjnR7VBJnwW5dPik7yaw+9dkdwZX7xFx8ALRAt24bMdf3idw2nD3/djdr+EjnEz7
-rlAajFjWOFfCuvbx3DAMwZT5yWJkdCzy5qxhhmNMHpku0oQv2E13W+bgb/rGFQbb
-kyXJwRITcfuoVkLZDv3dfcwueSFu29kty8hBP2dej037TgBSPaG2kej62HWyKH4s
-gZEATqGiQQgKvwRHLAmGk7B08TZBqrjieO/mwF+V7sGvaf+UF8R6BP/+UpmrLx8V
-mXGwoP4E023L9ekDlPpSK8Z2DeK+FQ==
-=C7Mx
------END PGP SIGNATURE-----
-
---Sig_/iYTkWDP_1_tS6QBLU_WRv4Z--
 
