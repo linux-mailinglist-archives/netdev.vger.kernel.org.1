@@ -1,132 +1,125 @@
-Return-Path: <netdev+bounces-42494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F20B87CEED2
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 06:50:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A0E57CEEED
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 07:19:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CCB6281E5F
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 04:50:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB38FB20E77
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 05:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452034666B;
-	Thu, 19 Oct 2023 04:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E064667B;
+	Thu, 19 Oct 2023 05:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dcTZyYdn"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2885A55
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 04:50:37 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55849F
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 21:50:35 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qtKz1-0006Fb-1L; Thu, 19 Oct 2023 06:50:07 +0200
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qtKyz-002iBt-EU; Thu, 19 Oct 2023 06:50:05 +0200
-Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qtKyz-00FDKV-BM; Thu, 19 Oct 2023 06:50:05 +0200
-Date: Thu, 19 Oct 2023 06:50:05 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v5 5/9] net: dsa: microchip: ksz9477: Add Wake
- on Magic Packet support
-Message-ID: <20231019045005.GC3595737@pengutronix.de>
-References: <20231018113913.3629151-1-o.rempel@pengutronix.de>
- <20231018113913.3629151-6-o.rempel@pengutronix.de>
- <f4cfb974-42c6-492c-80fd-85bbeaada9d1@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E6517C8
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:18:55 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F266DA4
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 22:18:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697692733; x=1729228733;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4tfSi/T4VJvhJ/85obP0QG0Ut4JUkF78KROB9ye20UM=;
+  b=dcTZyYdnGsTdKh4Tw+edZTb2zcJo8aoC4rYGr2Upj1ZBqA5Aof3kqYXz
+   Evhdbj8AOsP3RhgLTRIqdqieILhOvdA+mkx5RXmvEcM5R3SH8FmEVIhqG
+   syBUUtb+OJHGpp0ivK0E42iqK8yDtmEqrCtQeIa1sDxWiAxTP5l1Ob83t
+   0MA4W04SI+9780Q/6SLODEvX6tYeK4XAsCTKEJcPYLu22dF3dmQAFhYf7
+   jYSVZFupoOo6JEQ59AS8TjMXCQoNgbDKJtbOXYHI7LCK4XZPxfIHu/ZNo
+   MPyjYeCtkxQQG/xyPQzSPxpgvQ8V8E2tfzcfLcx/Wc3raxjgviT9vnQUl
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="450396005"
+X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
+   d="scan'208";a="450396005"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 22:18:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="1004095964"
+X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
+   d="scan'208";a="1004095964"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 18 Oct 2023 22:18:51 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qtLQn-0001fe-1L;
+	Thu, 19 Oct 2023 05:18:49 +0000
+Date: Thu, 19 Oct 2023 13:18:26 +0800
+From: kernel test robot <lkp@intel.com>
+To: Amritha Nambiar <amritha.nambiar@intel.com>, netdev@vger.kernel.org,
+	kuba@kernel.org, pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, sridhar.samudrala@intel.com,
+	amritha.nambiar@intel.com
+Subject: Re: [net-next PATCH v5 03/10] ice: Add support in the driver for
+ associating queue with napi
+Message-ID: <202310191339.JfORBqdK-lkp@intel.com>
+References: <169767397753.6692.15797121214738496388.stgit@anambiarhost.jf.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f4cfb974-42c6-492c-80fd-85bbeaada9d1@gmail.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <169767397753.6692.15797121214738496388.stgit@anambiarhost.jf.intel.com>
 
-On Wed, Oct 18, 2023 at 11:20:50AM -0700, Florian Fainelli wrote:
-> On 10/18/23 04:39, Oleksij Rempel wrote:
-> > Introduce Wake on Magic Packet (WoL) functionality to the ksz9477
-> > driver.
-> > 
-> > Major changes include:
-> > 
-> > 1. Extending the `ksz9477_handle_wake_reason` function to identify Magic
-> >     Packet wake events alongside existing wake reasons.
-> > 
-> > 2. Updating the `ksz9477_get_wol` and `ksz9477_set_wol` functions to
-> >     handle WAKE_MAGIC alongside the existing WAKE_PHY option, and to
-> >     program the switch's MAC address register accordingly when Magic
-> >     Packet wake-up is enabled. This change will prevent WAKE_MAGIC
-> >     activation if the related port has a different MAC address compared
-> >     to a MAC address already used by HSR or an already active WAKE_MAGIC
-> >     on another port.
-> > 
-> > 3. Adding a restriction in `ksz_port_set_mac_address` to prevent MAC
-> >     address changes on ports with active Wake on Magic Packet, as the
-> >     switch's MAC address register is utilized for this feature.
-> > 
-> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> 
-> This looks good to me, just one suggestion below
-> 
-> [snip]
-> 
-> > +	if (pme_ctrl_old == pme_ctrl)
-> > +		return 0;
-> > +
-> > +	/* To keep reference count of MAC address, we should do this
-> > +	 * operation only on change of WOL settings.
-> > +	 */
-> > +	if (!(pme_ctrl_old & PME_WOL_MAGICPKT) &&
-> > +	    (pme_ctrl & PME_WOL_MAGICPKT)) {
-> 
-> Maybe use a temporary variable for that condition since you re-use it below
-> in case you failed to perform the write of the pme_ctrl value. It would be
-> more readable IMHO, something like:
-> 
-> 	bool magicpkt_was_disabled = !(pme_ctrl_old & PME_WOL_MAGICPKT) &&
-> (pme_ctrl & PME_WOL_MAGICPKT));
+Hi Amritha,
 
-Sounds good. I'll update it.
+kernel test robot noticed the following build warnings:
 
-Regards,
-Oleksij
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Amritha-Nambiar/netdev-genl-spec-Extend-netdev-netlink-spec-in-YAML-for-queue/20231019-082941
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/169767397753.6692.15797121214738496388.stgit%40anambiarhost.jf.intel.com
+patch subject: [net-next PATCH v5 03/10] ice: Add support in the driver for associating queue with napi
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20231019/202310191339.JfORBqdK-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231019/202310191339.JfORBqdK-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310191339.JfORBqdK-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/intel/ice/ice_lib.c:2943:6: warning: no previous prototype for 'ice_queue_set_napi' [-Wmissing-prototypes]
+    2943 | void ice_queue_set_napi(unsigned int queue_index, enum netdev_queue_type type,
+         |      ^~~~~~~~~~~~~~~~~~
+
+
+vim +/ice_queue_set_napi +2943 drivers/net/ethernet/intel/ice/ice_lib.c
+
+  2933	
+  2934	/**
+  2935	 * ice_queue_set_napi - Set the napi instance for the queue
+  2936	 * @queue_index: Index of queue
+  2937	 * @type: queue type as RX or TX
+  2938	 * @napi: NAPI context
+  2939	 * @locked: is the rtnl_lock already held
+  2940	 *
+  2941	 * Set the napi instance for the queue
+  2942	 */
+> 2943	void ice_queue_set_napi(unsigned int queue_index, enum netdev_queue_type type,
+  2944				struct napi_struct *napi, bool locked)
+  2945	{
+  2946		if (locked)
+  2947			__netif_queue_set_napi(queue_index, type, napi);
+  2948		else
+  2949			netif_queue_set_napi(queue_index, type, napi);
+  2950	}
+  2951	
+
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
