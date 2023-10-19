@@ -1,228 +1,160 @@
-Return-Path: <netdev+bounces-42693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8FE7CFDB9
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:21:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E3AA7CFDD0
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:27:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0EAE2820D0
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:21:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80E691C20EB2
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:27:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3872FE1F;
-	Thu, 19 Oct 2023 15:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF422FE3A;
+	Thu, 19 Oct 2023 15:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="c1zN6LDN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qkfFqJqR"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2992FE1D;
-	Thu, 19 Oct 2023 15:21:10 +0000 (UTC)
-Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7158138;
-	Thu, 19 Oct 2023 08:21:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1697728864; x=1697988064;
-	bh=gSIBCUVFkXS9f9uN3ALCSQfYKKLDT6D80K45dyGIRkQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=c1zN6LDN3YpMsvzwjBY703VZneh/thw11uujVWxLCXiq529Hwg/gtm3xxfDWGJ8+9
-	 nWWdWlzljInKjEA1t808B3so0cXAWGQQyHunOO2tmJSgBviSAhJwhUwrq3C2WNrVOA
-	 dZfOMQLXtg3J9gUbgSngZLR/hDlIy/k3ZCPH6uE8YvxGq1s7wQo2ZxzV2cH31VR8QP
-	 ELGl3MzF4sUh4SmXJ3zNl5i3XOh0kJpb1BpLbm5FxAStDtX86wVgTNpjbeHWbbCFeA
-	 KSE02AIn9JqgG0STZo3SJvxb3h8gkLQVUNUMLQ9BFxd4LJkwLac+x8QehdAQsQMvOJ
-	 rr1PGJs8mcvOQ==
-Date: Thu, 19 Oct 2023 15:20:51 +0000
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
-Message-ID: <64db34c0-a50a-4321-a3d8-b692e26899d9@proton.me>
-In-Reply-To: <20231019.234210.1772681043146865420.fujita.tomonori@gmail.com>
-References: <e361ef91-607d-400b-a721-f846c21e2400@proton.me> <20231019.092436.1433321157817125498.fujita.tomonori@gmail.com> <0e8d2538-284b-4811-a2e7-99151338c255@proton.me> <20231019.234210.1772681043146865420.fujita.tomonori@gmail.com>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6652747A;
+	Thu, 19 Oct 2023 15:26:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7418DC433C9;
+	Thu, 19 Oct 2023 15:26:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697729217;
+	bh=gJBYevQ+y1P+nfW5qqXc8AdSviknrFQ4+3Gq6tjeXvw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qkfFqJqRqFTNMtJGgufHNXok8NJKVDKJ0XzXyr3io3sQ+4lM/JrK/Pm6tEZS7xJvc
+	 dzZ03b8zs4yvDkY6BZYdPuwsvraWX6LbcqojqOhHz4+JCrw6DPRbPDCF4QV80jSa1Z
+	 koiEsxRDsgLNsQgud6nj1LBZYOpQM+9UKsmyKh4MSxXE/oja5x+73gqWXw5svWnfPs
+	 W3JwFqJ+mhZ7l0DwqeAztTUB+9Ya3D5T6l1R2LK9R0bcDGBZtYqNmetCcCNS41FtQs
+	 tXfH2nNfI6qCG2CmTscApEv/KIEczMf0A55eO4AmuNahX/oVu/ROVuf7f8uougufB8
+	 i8+3GpNZ3sN8w==
+Date: Thu, 19 Oct 2023 17:26:49 +0200
+From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
+ Gregory Clement <gregory.clement@bootlin.com>, Sebastian Hesselbarth
+ <sebastian.hesselbarth@gmail.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+ <conor+dt@kernel.org>, Russell King <linux@armlinux.org.uk>, Florian
+ Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Christian Marangi <ansuelsmth@gmail.com>,
+ linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 5/7] ARM64: dts: marvell: Fix some common
+ switch mistakes
+Message-ID: <20231019172649.784a60d4@dellmb>
+In-Reply-To: <20231019144935.3wrnqyipiq3vkxb7@skbuf>
+References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
+	<20231018-marvell-88e6152-wan-led-v4-5-3ee0c67383be@linaro.org>
+	<20231019144021.ksymhjpvawv42vhj@skbuf>
+	<20231019144935.3wrnqyipiq3vkxb7@skbuf>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 19.10.23 16:42, FUJITA Tomonori wrote:
->>>>> +/// Registration structure for a PHY driver.
->>>>> +///
->>>>> +/// # Invariants
->>>>> +///
->>>>> +/// The `drivers` slice are currently registered to the kernel via `=
-phy_drivers_register`.
->>>>> +pub struct Registration {
->>>>> +    drivers: &'static [DriverType],
->>>>> +}
->>>>
->>>> You did not reply to my suggestion [2] to remove this type,
->>>> what do you think?
->>>>
->>>> [2]: https://lore.kernel.org/rust-for-linux/85d5c498-efbc-4c1a-8d12-f1=
-eca63c45cf@proton.me/
->>>
->>> I tried before but I'm not sure it simplifies the implementation.
->>>
->>> Firstly, instead of Reservation, we need a public function like
->>>
->>> pub fn phy_drivers_register(module: &'static crate::ThisModule, drivers=
-: &[DriverVTable]) -> Result {
->>>       to_result(unsafe {
->>>           bindings::phy_drivers_register(drivers[0].0.get(), drivers.le=
-n().try_into()?, module.0)
->>>       })
->>> }
->>>
->>> This is because module.0 is private.
->>
->> Why can't this be part of the macro?
->=20
-> I'm not sure I correctly understand what you suggest so you meant the fol=
-lowing?
->=20
->      (drivers: [$($driver:ident),+], device_table: [$($dev:expr),+], $($f=
-:tt)*) =3D> {
->          struct Module {
->               _drv:  [
->                  ::kernel::net::phy::DriverVTable;
->                  $crate::module_phy_driver!(@count_devices $($driver),+)
->              ],
->          }
->          unsafe impl Sync for Module {}
->=20
->          $crate::prelude::module! {
->              type: Module,
->              $($f)*
->          }
->=20
->          impl ::kernel::Module for Module {
->              fn init(module: &'static ThisModule) -> Result<Self> {
->                  let drv =3D [
->                      $(::kernel::net::phy::create_phy_driver::<$driver>()=
-),+
->                  ];
->                  ::kernel::error::to_result(unsafe {
->                      ::kernel::bindings::phy_drivers_register(drv[0].0.ge=
-t(), drv.len().try_into()?, module.0)
+On Thu, 19 Oct 2023 17:49:35 +0300
+Vladimir Oltean <olteanv@gmail.com> wrote:
 
-You can just do this (I omitted the `::kernel::` prefix for
-readability, if you add this in the macro, please include it):
+> On Thu, Oct 19, 2023 at 05:40:22PM +0300, Vladimir Oltean wrote:
+> > +Marek
+> > 
+> > On Wed, Oct 18, 2023 at 11:03:44AM +0200, Linus Walleij wrote:  
+> > > Fix some errors in the Marvell MV88E6xxx switch descriptions:
+> > > - The top node had no address size or cells.
+> > > - switch0@0 is not OK, should be switch@0.
+> > > 
+> > > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> > > ---
+> > > diff --git a/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts b/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
+> > > index 9eab2bb22134..c69cb4e191e5 100644
+> > > --- a/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
+> > > +++ b/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
+> > > @@ -305,7 +305,7 @@ phy1: ethernet-phy@1 {
+> > >  	};
+> > >  
+> > >  	/* switch nodes are enabled by U-Boot if modules are present */
+> > > -	switch0@10 {
+> > > +	switch@10 {  
+> > 
+> > As the comment says: U-Boot
+> > (https://elixir.bootlin.com/u-boot/latest/source/board/CZ.NIC/turris_mox/turris_mox.c#L728)
+> > sets up status = "okay" for these nodes depending on the MOXTET
+> > configuration. It doesn't look as if it's doing that by alias, just by
+> > path ("%s/switch%i@%x").
+> > 
+> > I have a Turris MOX, please allow me some time to test if the node name
+> > change is going to be significant and cause regressions. I expect the
+> > answer to be yes (sadly).  
+> 
+> Yeah, it's bad.
+> 
+> U-Boot 2018.11 (Dec 16 2018 - 12:50:19 +0000), Build: jenkins-turris-os-packages-kittens-mox-90
+> 
+> DRAM:  1 GiB
+> Enabling Armada 3720 wComphy-0: SGMII1        3.125 Gbps
+> Comphy-1: PEX0          5 Gbps
+> Comphy-2: USB3_HOST0    5 Gbps
+> MMC:   sdhci@d8000: 0
+> Loading Environment from SPI Flash... SF: Detected w25q64dw with page size 256 Bytes, erase size 4 KiB, total 8 MiB
+> OK
+> Model: CZ.NIC Turris Mox Board
+> Net:   eth0: neta@30000
+> Turris Mox:
+>   Board version: 22
+>   RAM size: 1024 MiB
+>   SD/eMMC version: SD
+> Module Topology:
+>    1: Peridot Switch Module (8-port)
+>    2: Peridot Switch Module (8-port)
+>    3: Peridot Switch Module (8-port)
+>    4: SFP Module
+> 
+> Hit any key to stop autoboot:  0
+> => run sd_tftp_boot  
+> neta@30000 Waiting for PHY auto negotiation to complete....... done
+> BOOTP broadcast 1
+> BOOTP broadcast 2
+> DHCP client bound to address 10.0.0.117 (254 ms)
+> Using neta@30000 device
+> TFTP from server 10.0.0.1; our IP address is 10.0.0.117
+> Filename 'mox/armada-3720-turris-mox.dtb'.
+> Load address: 0x4f00000
+> Loading: ####
+>          1.5 MiB/s
+> done
+> Bytes transferred = 19479 (4c17 hex)
+> Using neta@30000 device
+> TFTP from server 10.0.0.1; our IP address is 10.0.0.117
+> Filename 'mox/Image'.
+> Load address: 0x5000000
+> Loading: #################################################################
+>          ##########################################
+>          6 MiB/s
+> done
+> Bytes transferred = 54069760 (3390a00 hex)
+> ## Flattened Device Tree blob at 04f00000
+>    Booting using the fdt blob at 0x4f00000
+>    Loading Device Tree to 000000003bf16000, end 000000003bf1dc16 ... OK
+> ERROR: board-specific fdt fixup failed: FDT_ERR_NOTFOUND
+>  - must RESET the board to recover.
+> 
+> FDT creation failed! hanging...### ERROR ### Please RESET the board ###
 
-     // CAST: `DriverVTable` is `repr(transparent)` and wrapping `bindings:=
-:phy_driver`.
-     let ptr =3D drv.as_mut_ptr().cast::<bindings::phy_driver>();
-     let len =3D drv.len().try_into()?;
-     // SAFETY: ...
-     to_result(unsafe { bindings::phy_drivers_register(ptr, len, module.0) =
-})?;
+Yes, unfortunately changing that node name will break booting.
 
->                  })?;
->=20
->                  Ok(Module {
->                      _drv: drv,
->                  })
->              }
->          }
->=20
-> Then we got the following error:
->=20
-> error[E0616]: field `0` of struct `DriverVTable` is private
->    --> drivers/net/phy/ax88796b_rust.rs:12:1
->       |
->       12 | / kernel::module_phy_driver! {
->       13 | |     drivers: [PhyAX88772A, PhyAX88772C, PhyAX88796B],
->       14 | |     device_table: [
->       15 | |         DeviceId::new_with_driver::<PhyAX88772A>(),
->       ...  |
->       22 | |     license: "GPL",
->       23 | | }
->          | |_^ private field
-> =09   |
-> =09      =3D note: this error originates in the macro
-> =09      `kernel::module_phy_driver` (in Nightly builds, run with
-> =09      -Z macro-backtrace for more info)
->=20
-> error[E0616]: field `0` of struct `kernel::ThisModule` is private
->    --> drivers/net/phy/ax88796b_rust.rs:12:1
->       |
->       12 | / kernel::module_phy_driver! {
->       13 | |     drivers: [PhyAX88772A, PhyAX88772C, PhyAX88796B],
->       14 | |     device_table: [
->       15 | |         DeviceId::new_with_driver::<PhyAX88772A>(),
->       ...  |
->       22 | |     license: "GPL",
->       23 | | }
->          | |_^ private field
->=20
->=20
->>> Also if we keep DriverVtable.0 private, we need another public function=
-.
->>>
->>> pub unsafe fn phy_drivers_unregister(drivers: &'static [DriverVTable])
->>> {
->>>       unsafe {
->>>           bindings::phy_drivers_unregister(drivers[0].0.get(), drivers.=
-len() as i32)
->>>       };
->>> }
->>>
->>> DriverVTable isn't guaranteed to be registered to the kernel so needs
->>> to be unsafe, I guesss.
->>
->> In one of the options I suggest to make that an invariant of `DriverVTab=
-le`.
->>
->>>
->>> Also Module trait support exit()?
->>
->> Yes, just implement `Drop` and do the cleanup there.
->>
->> In the two options that I suggested there is a trade off. I do not know
->> which option is better, I hoped that you or Andrew would know more:
->> Option 1:
->> * advantages:
->>     - manual creation of a phy driver module becomes possible.
->>     - less complex `module_phy_driver` macro.
->>     - no static variable needed.
->> * disadvantages:
->>     - calls `phy_drivers_register` for every driver on module
->>       initialization.
->>     - calls `phy_drivers_unregister` for every driver on module
->>       exit.
->>
->> Option 2:
->> * advantages:
->>     - less complex `module_phy_driver` macro.
->>     - no static variable needed.
->>     - only a single call to
->>       `phy_drivers_register`/`phy_drivers_unregister`.
->> * disadvantages:
->>     - no safe manual creation of phy drivers possible, the only safe
->>       way is to use the `module_phy_driver` macro.
->>
->> I suppose that it would be ok to call the register function multiple
->> times, since it only is on module startup/shutdown and it is not
->> performance critical.
->=20
-> I think that we can use the current implantation using Reservation
-> struct until someone requests manual creation. I doubt that we will
-> need to support such.
+Maybe we could add a comment into the DTS to describe this unfortunate
+state of things? :)
 
-I would like to remove the mutable static variable and simplify
-the macro.
-
---=20
-Cheers,
-Benno
-
-
+Marek
 
