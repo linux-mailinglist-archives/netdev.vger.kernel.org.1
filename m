@@ -1,231 +1,461 @@
-Return-Path: <netdev+bounces-42757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF6437D00CD
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:41:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31EAF7D00D6
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6782C2810EB
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:41:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7EF4B2116A
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:47:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D09354E9;
-	Thu, 19 Oct 2023 17:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA3B3550E;
+	Thu, 19 Oct 2023 17:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cxTD0TFa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MMZiJCG8"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D80E354E5
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:41:08 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 045E2CF;
-	Thu, 19 Oct 2023 10:41:06 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39JHNp5h017916;
-	Thu, 19 Oct 2023 17:40:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=XNxuSWlmwFpqmROgKJVOTG1Nz3hnSDWsr+Z+rZVP7lo=;
- b=cxTD0TFaWM/zkb98jUifI8qBrJi5k0q9QFvPjbgbiYj1nmZTKlZ+g3fshLAyVoQ7/Dm5
- WDUMUHXfS9qvY6biW8/o3GgMCvAh5CCuOglTnai25Gl9U5EwI7jB545XNFAZGXvZ+EoF
- 9XDyWsNlGyb6GZkf1NnB0+DtcHxQTeQvbQPUC3kPO0DDctqelFPEOX82BNzvLVpC4CHR
- UHWPwXwuIVv4mVHDp4xgTufULRYJrVFaKI0h3272it9OTEl8vbVoSa0E7ZhIafBMWOlv
- flgPUDkt/YyZJhJJrixcgoGf4GEGPJaPrVU+9BzHHm94c3eHfeMo2+84Gj9ol4qXYHv9 7Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tu8pd0nuv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 19 Oct 2023 17:40:55 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39JHeHEw004606;
-	Thu, 19 Oct 2023 17:40:54 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tu8pd0nuh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 19 Oct 2023 17:40:54 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39JFVHgP019700;
-	Thu, 19 Oct 2023 17:40:54 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tr8121yrc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 19 Oct 2023 17:40:54 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39JHerKK20644464
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 19 Oct 2023 17:40:53 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5E27258065;
-	Thu, 19 Oct 2023 17:40:53 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 418D458052;
-	Thu, 19 Oct 2023 17:40:47 +0000 (GMT)
-Received: from [9.179.18.71] (unknown [9.179.18.71])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 19 Oct 2023 17:40:47 +0000 (GMT)
-Message-ID: <990a6b09-135a-41fb-a375-c37ffec6fe99@linux.ibm.com>
-Date: Thu, 19 Oct 2023 19:40:46 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8D132C7E
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:47:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDADCC433C8;
+	Thu, 19 Oct 2023 17:47:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697737657;
+	bh=Cv+5AyH2vKzunvSMtHg7hEMfbpW4c9qOwmuC8rQWkxE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MMZiJCG8W7HuZr/VWpAcq7V4bPjRk+W5Jb4BX+l8i5YEnUXMEsNJ7WJg/diIsLECV
+	 dTDUjSRQ7u2H2uD+O3zJe/OVMMqsQD/+nO3eZVyaMP9VYV7vX1/oWhJRgVBA4r+G3x
+	 bk8oAtdhM0eS+PI1jJBq82M17P//QoEsdRnFtSDU8kZoqHymXonVB7zsoq5DNDiGJa
+	 hzWMbtga6fiU7lFNVEcYk3FqLZmWw4RdzTq30xWozjJCuRD3H5Soju0t3IsoY2yJMl
+	 luClwsN66Nc5rHN0bxchGnDPh6RXv+FZPMMImxLUYzVbPF+RMNu74BBT7DBPoKm9oZ
+	 YJt6rLe1taVSw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.6-rc7
+Date: Thu, 19 Oct 2023 10:47:35 -0700
+Message-ID: <20231019174735.1177985-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 5/5] net/smc: put sk reference if close work was
- canceled
-Content-Language: en-GB
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-        jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
- <1697009600-22367-6-git-send-email-alibuda@linux.alibaba.com>
- <bdcb307f-d2a8-4aef-bb7d-dd87e56ff740@linux.ibm.com>
- <ee641ca5-104b-d1ec-5b2a-e20237c5378a@linux.alibaba.com>
- <ad5e4191-227e-4a62-a110-472618ef7de1@linux.ibm.com>
- <305c7ae2-a902-3e30-5e67-b590d848d0ba@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <305c7ae2-a902-3e30-5e67-b590d848d0ba@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: C0quyvYEP4WhzEn6KStJRDVYT6ASe0AI
-X-Proofpoint-ORIG-GUID: vYMkW1jrXkGUBppO7mOHdx9bREvSSiN0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-19_16,2023-10-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- mlxscore=0 adultscore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0
- spamscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310190148
 
+Hi Linus!
 
+Happy Nov 1st to you and your surrounding spirits.
 
-On 19.10.23 09:33, D. Wythe wrote:
-> 
-> 
-> On 10/19/23 4:26 AM, Wenjia Zhang wrote:
->>
->>
->> On 17.10.23 04:06, D. Wythe wrote:
->>>
->>>
->>> On 10/13/23 3:04 AM, Wenjia Zhang wrote:
->>>>
->>>>
->>>> On 11.10.23 09:33, D. Wythe wrote:
->>>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>>>>
->>>>> Note that we always hold a reference to sock when attempting
->>>>> to submit close_work. 
->>>> yes
->>>> Therefore, if we have successfully
->>>>> canceled close_work from pending, we MUST release that reference
->>>>> to avoid potential leaks.
->>>>>
->>>> Isn't the corresponding reference already released inside the 
->>>> smc_close_passive_work()?
->>>>
->>>
->>> Hi Wenjia,
->>>
->>> If we successfully cancel the close work from the pending state,
->>> it means that smc_close_passive_work() has never been executed.
->>>
->>> You can find more details here.
->>>
->>> /**
->>> * cancel_work_sync - cancel a work and wait for it to finish
->>> * @work:the work to cancel
->>> *
->>> * Cancel @work and wait for its execution to finish. This function
->>> * can be used even if the work re-queues itself or migrates to
->>> * another workqueue. On return from this function, @work is
->>> * guaranteed to be not pending or executing on any CPU.
->>> *
->>> * cancel_work_sync(&delayed_work->work) must not be used for
->>> * delayed_work's. Use cancel_delayed_work_sync() instead.
->>> *
->>> * The caller must ensure that the workqueue on which @work was last
->>> * queued can't be destroyed before this function returns.
->>> *
->>> * Return:
->>> * %true if @work was pending, %false otherwise.
->>> */
->>> boolcancel_work_sync(structwork_struct *work)
->>> {
->>> return__cancel_work_timer(work, false);
->>> }
->>>
->>> Best wishes,
->>> D. Wythe
->> As I understand, queue_work() would wake up the work if the work is 
->> not already on the queue. And the sock_hold() is just prio to the 
->> queue_work(). That means, cancel_work_sync() would cancel the work 
->> either before its execution or after. If your fix refers to the former 
->> case, at this moment, I don't think the reference can be hold, thus it 
->> is unnecessary to put it.
->>>
-> 
-> I am quite confuse about why you think when we cancel the work before 
-> its execution,
-> the reference can not be hold ?
-> 
-> 
-> Perhaps the following diagram can describe the problem in better way :
-> 
-> smc_close_cancel_work
-> smc_cdc_msg_recv_action
-> 
-> 
-> sock_hold
-> queue_work
->                                                                 if 
-> (cancel_work_sync())        // successfully cancel before execution
-> sock_put()                        //  need to put it since we already 
-> hold a ref before   queue_work()
-> 
-> 
-ha, I already thought you might ask such question:P
+The following changes since commit e8c127b0576660da9195504fe8393fe9da3de9ce:
 
-I think here two Problems need to be clarified:
+  Merge tag 'net-6.6-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-10-12 13:07:00 -0700)
 
-1) Do you think the bh_lock_sock/bh_unlock_sock in the smc_cdc_msg_recv 
-does not protect the smc_cdc_msg_recv_action() from cancel_work_sync()?
-Maybe that would go back to the discussion in the other patch on the 
-behaviors of the locks.
+are available in the Git repository at:
 
-2) If the queue_work returns true, as I said in the last main, the work 
-should be (being) executed. How could the cancel_work_sync() cancel the 
-work before execution successgully?
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.6-rc7
 
->>>>> Fixes: 42bfba9eaa33 ("net/smc: immediate termination for SMCD link 
->>>>> groups")
->>>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->>>>> ---
->>>>>   net/smc/smc_close.c | 3 ++-
->>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
->>>>> index 449ef45..10219f5 100644
->>>>> --- a/net/smc/smc_close.c
->>>>> +++ b/net/smc/smc_close.c
->>>>> @@ -116,7 +116,8 @@ static void smc_close_cancel_work(struct 
->>>>> smc_sock *smc)
->>>>>       struct sock *sk = &smc->sk;
->>>>>         release_sock(sk);
->>>>> -    cancel_work_sync(&smc->conn.close_work);
->>>>> +    if (cancel_work_sync(&smc->conn.close_work))
->>>>> +        sock_put(sk);
->>>>>       cancel_delayed_work_sync(&smc->conn.tx_work);
->>>>>       lock_sock(sk);
->>>>>   }
->>>
-> 
-> 
+for you to fetch changes up to 524515020f2552759a7ef1c9d03e7dac9b1ff3c2:
+
+  Revert "ethtool: Fix mod state of verbose no_mask bitset" (2023-10-19 09:27:12 -0700)
+
+----------------------------------------------------------------
+Including fixes from bluetooth, netfilter, WiFi.
+
+Feels like an up-tick in regression fixes, mostly for older releases.
+The hfsc fix, tcp_disconnect() and Intel WWAN fixes stand out as fairly
+clear-cut user reported regressions. The mlx5 DMA bug was causing strife
+for 390x folks. The fixes themselves are not particularly scary, tho.
+No open investigations / outstanding reports at the time of writing.
+
+Current release - regressions:
+
+ - eth: mlx5: perform DMA operations in the right locations,
+   make devices usable on s390x, again
+
+ - sched: sch_hfsc: upgrade 'rt' to 'sc' when it becomes a inner curve,
+   previous fix of rejecting invalid config broke some scripts
+
+ - rfkill: reduce data->mtx scope in rfkill_fop_open, avoid deadlock
+
+ - revert "ethtool: Fix mod state of verbose no_mask bitset",
+   needs more work
+
+Current release - new code bugs:
+
+ - tcp: fix listen() warning with v4-mapped-v6 address
+
+Previous releases - regressions:
+
+ - tcp: allow tcp_disconnect() again when threads are waiting,
+   it was denied to plug a constant source of bugs but turns out
+   .NET depends on it
+
+ - eth: mlx5: fix double-free if buffer refill fails under OOM
+
+ - revert "net: wwan: iosm: enable runtime pm support for 7560",
+   it's causing regressions and the WWAN team at Intel disappeared
+
+ - tcp: tsq: relax tcp_small_queue_check() when rtx queue contains
+   a single skb, fix single-stream perf regression on some devices
+
+Previous releases - always broken:
+
+ - Bluetooth:
+   - fix issues in legacy BR/EDR PIN code pairing
+   - correctly bounds check and pad HCI_MON_NEW_INDEX name
+
+ - netfilter:
+   - more fixes / follow ups for the large "commit protocol" rework,
+     which went in as a fix to 6.5
+   - fix null-derefs on netlink attrs which user may not pass in
+
+ - tcp: fix excessive TLP and RACK timeouts from HZ rounding
+   (bless Debian for keeping HZ=250 alive)
+
+ - net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation, prevent
+   letting frankenstein UDP super-frames from getting into the stack
+
+ - net: fix interface altnames when ifc moves to a new namespace
+
+ - eth: qed: fix the size of the RX buffers
+
+ - mptcp: avoid sending RST when closing the initial subflow
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Aaron Conole (4):
+      selftests: openvswitch: Add version check for pyroute2
+      selftests: openvswitch: Catch cases where the tests are killed
+      selftests: openvswitch: Skip drop testing on older kernels
+      selftests: openvswitch: Fix the ct_tuple for v4
+
+Albert Huang (1):
+      net/smc: fix smc clc failed issue when netdevice not in init_net
+
+Amir Tzin (1):
+      net/mlx5e: Fix VF representors reporting zero counters to "ip -s" command
+
+Arkadiusz Bokowy (1):
+      Bluetooth: vhci: Fix race when opening vhci device
+
+Arnd Bergmann (1):
+      Bluetooth: avoid memcmp() out of bounds warning
+
+Bagas Sanjaya (1):
+      Revert "net: wwan: iosm: enable runtime pm support for 7560"
+
+Christoph Paasch (1):
+      netlink: Correct offload_xstats size
+
+Dan Carpenter (1):
+      net: usb: smsc95xx: Fix an error code in smsc95xx_reset()
+
+David S. Miller (1):
+      Merge branch 'ovs-selftests'
+
+Dong Chenchen (1):
+      net: xfrm: skip policies marked as dead while reinserting policies
+
+Dragos Tatulea (3):
+      net/mlx5e: RX, Fix page_pool allocation failure recovery for striding rq
+      net/mlx5e: RX, Fix page_pool allocation failure recovery for legacy rq
+      net/mlx5e: XDP, Fix XDP_REDIRECT mpwqe page fragment leaks on shutdown
+
+Dust Li (1):
+      net/smc: return the right falback reason when prefix checks fail
+
+Edward AD (1):
+      Bluetooth: hci_sock: fix slab oob read in create_monitor_event
+
+Eric Dumazet (6):
+      xfrm: interface: use DEV_STATS_INC()
+      xfrm: fix a data-race in xfrm_gen_index()
+      xfrm: fix a data-race in xfrm_lookup_with_ifid()
+      tun: prevent negative ifindex
+      tcp: tsq: relax tcp_small_queue_check() when rtx queue contains a single skb
+      ipv4: fib: annotate races around nh->nh_saddr_genid and nh->nh_saddr
+
+Florian Fainelli (1):
+      net: phy: bcm7xxx: Add missing 16nm EPHY statistics
+
+Florian Westphal (2):
+      netfilter: nfnetlink_log: silence bogus compiler warning
+      netfilter: nft_payload: fix wrong mac header matching
+
+Gavrilov Ilia (1):
+      net: pktgen: Fix interface flags printing
+
+Geert Uytterhoeven (1):
+      neighbor: tracing: Move pin6 inside CONFIG_IPV6=y section
+
+Geliang Tang (1):
+      mptcp: avoid sending RST when closing the initial subflow
+
+Ido Schimmel (2):
+      selftests: fib_tests: Disable RP filter in multipath list receive test
+      selftests: fib_tests: Count all trace point invocations
+
+Iulia Tanasescu (1):
+      Bluetooth: ISO: Fix invalid context error
+
+Jakub Kicinski (14):
+      Merge branch 'selftests-fib_tests-fixes-for-multipath-list-receive-tests'
+      Merge tag 'nf-23-10-12' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      Merge branch 'intel-wired-lan-driver-updates-2023-10-11-i40e-ice'
+      Merge tag 'mlx5-fixes-2023-10-12' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux
+      Merge tag 'for-net-2023-10-13' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+      Merge tag 'ipsec-2023-10-17' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
+      Merge tag 'wireless-2023-10-18' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
+      Merge tag 'nf-23-10-18' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      net: fix ifname in netlink ntf during netns move
+      net: check for altname conflicts when changing netdev's netns
+      net: avoid UAF on deleted altname
+      net: move altnames together with the netdevice
+      selftests: net: add very basic test for netdev names and namespaces
+      Merge branch 'mptcp-fixes-for-v6-6'
+
+Jesse Brandeburg (2):
+      ice: fix over-shifted variable
+      ice: reset first in crash dump kernels
+
+Jianbo Liu (1):
+      net/mlx5e: Don't offload internal port if filter device is out device
+
+Jinjie Ruan (1):
+      net: dsa: bcm_sf2: Fix possible memory leak in bcm_sf2_mdio_register()
+
+Jiri Pirko (1):
+      netlink: specs: devlink: fix reply command values
+
+Jiri Wiesner (1):
+      bonding: Return pointer to data after pull on skb
+
+Johannes Berg (3):
+      wifi: cfg80211: use system_unbound_wq for wiphy work
+      wifi: mac80211: fix error path key leak
+      net: rfkill: reduce data->mtx scope in rfkill_fop_open
+
+Josua Mayer (1):
+      net: rfkill: gpio: prevent value glitch during probe
+
+Kees Cook (2):
+      netfilter: nf_tables: Annotate struct nft_pipapo_match with __counted_by
+      Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
+
+Kory Maincent (1):
+      Revert "ethtool: Fix mod state of verbose no_mask bitset"
+
+Krzysztof Kozlowski (1):
+      nfc: nci: fix possible NULL pointer dereference in send_acknowledge()
+
+Kuniyuki Iwashima (1):
+      tcp: Fix listen() warning with v4-mapped-v6 address.
+
+Lama Kayal (1):
+      net/mlx5e: Take RTNL lock before triggering netdev notifiers
+
+Lee, Chun-Yi (2):
+      Bluetooth: hci_event: Ignore NULL link key
+      Bluetooth: Reject connection with the device which has same BD_ADDR
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_event: Fix using memcmp when comparing keys
+      Bluetooth: hci_event: Fix coding style
+
+MD Danish Anwar (3):
+      net: ti: icssg-prueth: Fix tx_total_bytes count
+      net: ethernet: ti: Fix mixed module-builtin object
+      net: ti: icssg-prueth: Fix r30 CMDs bitmasks
+
+Ma Ke (2):
+      net: ipv6: fix return value check in esp_remove_trailer
+      net: ipv4: fix return value check in esp_remove_trailer
+
+Maher Sanalla (1):
+      net/mlx5: Handle fw tracer change ownership event based on MTRC
+
+Manish Chopra (1):
+      qed: fix LL2 RX buffer allocation
+
+Mateusz Pacuszka (1):
+      ice: Fix safe mode when DDP is missing
+
+Mateusz Polchlopek (1):
+      docs: fix info about representor identification
+
+Matthieu Baerts (2):
+      selftests: mptcp: join: correctly check for no RST
+      selftests: mptcp: join: no RST when rm subflow/addr
+
+Max Chou (1):
+      Bluetooth: btrtl: Ignore error return for hci_devcd_register()
+
+Michal Schmidt (1):
+      i40e: prevent crash on probe if hw registers have invalid values
+
+Neal Cardwell (1):
+      tcp: fix excessive TLP and RACK timeouts from HZ rounding
+
+Pablo Neira Ayuso (4):
+      netfilter: nf_tables: do not remove elements if set backend implements .abort
+      netfilter: nf_tables: do not refresh timeout when resetting element
+      netfilter: nft_set_rbtree: .deactivate fails if element has expired
+      netfilter: nf_tables: revert do not remove elements if set backend implements .abort
+
+Paolo Abeni (5):
+      tcp: allow again tcp_disconnect() when threads are waiting
+      tcp_bpf: properly release resources on error paths
+      Merge branch 'net-fix-bugs-in-device-netns-move-and-rename'
+      tcp: check mptcp-level constraints for backlog coalescing
+      mptcp: more conservative check for zero probes
+
+Pauli Virtanen (1):
+      Bluetooth: hci_sync: always check if connection is alive before deleting
+
+Pedro Tammela (1):
+      net/sched: sch_hfsc: upgrade 'rt' to 'sc' when it becomes a inner curve
+
+Phil Sutter (2):
+      netfilter: nf_tables: audit log object reset once per table
+      selftests: netfilter: Run nft_audit.sh in its own netns
+
+Shailend Chand (1):
+      gve: Do not fully free QPL pages on prefill errors
+
+Shay Drory (2):
+      net/mlx5: Perform DMA operations in the right locations
+      net/mlx5: E-switch, register event handler before arming the event
+
+Shinas Rasheed (1):
+      octeon_ep: update BQL sent bytes before ringing doorbell
+
+Vlad Buslov (1):
+      net/mlx5: Bridge, fix peer entry ageing in LAG mode
+
+Vladimir Oltean (1):
+      net: mdio-mux: fix C45 access returning -EIO after API change
+
+Willem de Bruijn (1):
+      net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation
+
+Xingyuan Mo (2):
+      nf_tables: fix NULL pointer dereference in nft_inner_init()
+      nf_tables: fix NULL pointer dereference in nft_expr_inner_parse()
+
+Zhang Changzhong (1):
+      xfrm6: fix inet6_dev refcount underflow problem
+
+Ziyang Xuan (1):
+      Bluetooth: Fix a refcnt underflow problem for hci_conn
+
+ Documentation/netlink/specs/devlink.yaml           | 18 ++---
+ Documentation/networking/representors.rst          |  8 +-
+ drivers/bluetooth/btrtl.c                          | 10 +--
+ drivers/bluetooth/hci_vhci.c                       |  3 +
+ drivers/net/bonding/bond_main.c                    |  2 +-
+ drivers/net/dsa/bcm_sf2.c                          | 24 +++---
+ .../chelsio/inline_crypto/chtls/chtls_io.c         | 36 +++++++--
+ drivers/net/ethernet/google/gve/gve_rx.c           | 18 ++++-
+ drivers/net/ethernet/intel/i40e/i40e_common.c      |  4 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c           |  3 +-
+ drivers/net/ethernet/intel/ice/ice_main.c          | 18 +++++
+ .../net/ethernet/marvell/octeon_ep/octep_main.c    | 13 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/cmd.c      | 64 +++++++---------
+ .../ethernet/mellanox/mlx5/core/diag/fw_tracer.c   |  2 +-
+ .../ethernet/mellanox/mlx5/core/en/rep/bridge.c    | 11 +++
+ .../ethernet/mellanox/mlx5/core/en/tc_tun_encap.c  |  3 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c   |  8 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   | 10 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c    | 35 ++++++---
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.h | 11 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  5 +-
+ .../net/ethernet/mellanox/mlx5/core/esw/bridge.c   | 25 ++++++-
+ .../net/ethernet/mellanox/mlx5/core/esw/bridge.h   |  3 +
+ .../ethernet/mellanox/mlx5/core/esw/bridge_priv.h  |  1 +
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.c  | 17 ++---
+ drivers/net/ethernet/qlogic/qed/qed_ll2.c          |  7 +-
+ drivers/net/ethernet/ti/Kconfig                    |  5 ++
+ drivers/net/ethernet/ti/Makefile                   |  7 +-
+ drivers/net/ethernet/ti/icssg/icssg_config.c       |  4 +-
+ drivers/net/ethernet/ti/icssg/icssg_stats.c        |  9 +++
+ drivers/net/ethernet/ti/k3-cppi-desc-pool.c        | 10 +++
+ drivers/net/mdio/mdio-mux.c                        | 47 ++++++++++++
+ drivers/net/phy/bcm7xxx.c                          |  3 +
+ drivers/net/tun.c                                  |  7 +-
+ drivers/net/usb/smsc95xx.c                         |  2 +-
+ drivers/net/wwan/iosm/iosm_ipc_imem.c              | 17 -----
+ drivers/net/wwan/iosm/iosm_ipc_imem.h              |  2 -
+ drivers/net/wwan/iosm/iosm_ipc_pcie.c              |  4 +-
+ drivers/net/wwan/iosm/iosm_ipc_port.c              | 17 +----
+ drivers/net/wwan/iosm/iosm_ipc_trace.c             |  8 --
+ drivers/net/wwan/iosm/iosm_ipc_wwan.c              | 21 +-----
+ include/linux/virtio_net.h                         | 19 ++++-
+ include/net/bluetooth/hci_mon.h                    |  2 +-
+ include/net/netns/xfrm.h                           |  1 +
+ include/net/sock.h                                 | 10 +--
+ include/net/tcp.h                                  |  3 +
+ include/trace/events/neigh.h                       |  4 +-
+ net/bluetooth/hci_conn.c                           |  9 +++
+ net/bluetooth/hci_event.c                          | 48 +++++++++---
+ net/bluetooth/hci_sock.c                           |  3 +-
+ net/bluetooth/hci_sync.c                           | 26 +++----
+ net/core/dev.c                                     | 65 ++++++++++++----
+ net/core/dev.h                                     |  3 +
+ net/core/pktgen.c                                  | 14 ++--
+ net/core/rtnetlink.c                               |  4 +-
+ net/core/stream.c                                  | 12 +--
+ net/ethtool/bitset.c                               | 32 ++------
+ net/ipv4/af_inet.c                                 | 10 ++-
+ net/ipv4/esp4.c                                    |  4 +-
+ net/ipv4/fib_semantics.c                           | 14 ++--
+ net/ipv4/inet_connection_sock.c                    |  1 -
+ net/ipv4/inet_hashtables.c                         | 24 +++---
+ net/ipv4/tcp.c                                     | 16 ++--
+ net/ipv4/tcp_bpf.c                                 | 12 +++
+ net/ipv4/tcp_ipv4.c                                |  1 +
+ net/ipv4/tcp_output.c                              | 25 +++++--
+ net/ipv4/tcp_recovery.c                            |  2 +-
+ net/ipv6/esp6.c                                    |  4 +-
+ net/ipv6/xfrm6_policy.c                            |  4 +-
+ net/mac80211/key.c                                 |  3 +-
+ net/mptcp/protocol.c                               | 43 ++++++-----
+ net/netfilter/nf_tables_api.c                      | 70 +++++++++--------
+ net/netfilter/nfnetlink_log.c                      |  2 +-
+ net/netfilter/nft_inner.c                          |  1 +
+ net/netfilter/nft_payload.c                        |  2 +-
+ net/netfilter/nft_set_pipapo.h                     |  2 +-
+ net/netfilter/nft_set_rbtree.c                     |  2 +
+ net/nfc/nci/spi.c                                  |  2 +
+ net/rfkill/core.c                                  |  5 +-
+ net/rfkill/rfkill-gpio.c                           |  4 +-
+ net/sched/sch_hfsc.c                               | 18 ++++-
+ net/smc/af_smc.c                                   |  5 +-
+ net/smc/smc_ib.c                                   |  7 +-
+ net/smc/smc_ib.h                                   |  2 +-
+ net/tls/tls_main.c                                 | 10 ++-
+ net/tls/tls_sw.c                                   | 19 +++--
+ net/wireless/core.c                                |  2 +-
+ net/xfrm/xfrm_interface_core.c                     | 22 +++---
+ net/xfrm/xfrm_policy.c                             | 27 ++++---
+ tools/net/ynl/generated/devlink-user.c             | 54 +++++++-------
+ tools/testing/selftests/net/Makefile               |  1 +
+ tools/testing/selftests/net/fib_tests.sh           |  7 +-
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    | 21 +++++-
+ tools/testing/selftests/net/netns-name.sh          | 87 ++++++++++++++++++++++
+ .../selftests/net/openvswitch/openvswitch.sh       | 21 +++++-
+ .../testing/selftests/net/openvswitch/ovs-dpctl.py | 48 +++++++++++-
+ tools/testing/selftests/netfilter/nft_audit.sh     | 52 +++++++++++++
+ 97 files changed, 967 insertions(+), 466 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netns-name.sh
 
