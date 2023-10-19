@@ -1,158 +1,118 @@
-Return-Path: <netdev+bounces-42531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79AF27CF340
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:52:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE767CF348
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:53:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34A23281EBD
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:52:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BFB41C20AAE
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C4915AEB;
-	Thu, 19 Oct 2023 08:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3145815AEF;
+	Thu, 19 Oct 2023 08:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WAg2vyxH"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4FB414F7D
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 08:52:27 +0000 (UTC)
-Received: from elvis.franken.de (elvis.franken.de [193.175.24.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9FDEEAB;
-	Thu, 19 Oct 2023 01:52:22 -0700 (PDT)
-Received: from uucp by elvis.franken.de with local-rmail (Exim 3.36 #1)
-	id 1qtOlP-0004JJ-00; Thu, 19 Oct 2023 10:52:19 +0200
-Received: by alpha.franken.de (Postfix, from userid 1000)
-	id 81227C0198; Thu, 19 Oct 2023 10:50:05 +0200 (CEST)
-Date: Thu, 19 Oct 2023 10:50:05 +0200
-From: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc: linux-mips@vger.kernel.org, Jonas Gorski <jonas.gorski@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-mtd@lists.infradead.org, linux-serial@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 0/6] remove AR7 platform and associated drivers
-Message-ID: <ZTDtvR732kzchtxF@alpha.franken.de>
-References: <20230922061530.3121-1-wsa+renesas@sang-engineering.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9233E14F6F
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 08:53:50 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EBBD9F
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:53:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697705628;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lKYvltGDTZPHmBBUWHHWQGHBOyryxG9yuCEoL9SPiSs=;
+	b=WAg2vyxHelCIf1LGecRpKCTeOil0N+c1Kfv4F4z89Og1Svawoh2apIFvOrDIwmaWDHKWlG
+	DWfaJwypauxNAWctyPo+8FaYpDhZGeHr1ENvyHw7Ctt77Zvl5hP3ztNEs8UJLsy1k+rjzN
+	rs/ohPDaLHXZDIbARIJttdQLJ2NaYqU=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-12-KKQLYcTON828GD3Sf3bTMA-1; Thu, 19 Oct 2023 04:53:47 -0400
+X-MC-Unique: KKQLYcTON828GD3Sf3bTMA-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-53eaedf5711so693140a12.1
+        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:53:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697705626; x=1698310426;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lKYvltGDTZPHmBBUWHHWQGHBOyryxG9yuCEoL9SPiSs=;
+        b=msvqKACvqgrxlIdo76QhhrsHuYrcK1QbUbI1NwKuktjQJsx1nAP7oyQqzzOdrz/i2Y
+         Zs3U+pSj3OEQYblS/hp9Dw/5qW7CKJrH3Yu+jwJWSiGA/RHqAjhHNRfQru0JdB7MO9Ms
+         GzxyL6X+x8KUmeGYPeP2Wjt1weHxqBapM91bgdncjTNZkuzazMHTHYgZ2/4zYoWpaKGg
+         vytS+Cwuk7eB0bhaivPVBX3RzR1HxJ7avGz7eoBtuc2NMFKzg/lPmV56gNh+hkiNkHd9
+         Z0egw+w1c4cIbqBXRGeDpXWZK4cnVSTZUw7tS7FcVWU7mg1Zgic1Qoa+gyQRfcABaDSd
+         pfFg==
+X-Gm-Message-State: AOJu0YyWQNAL1EB7aGP3lA7XuwB/cuPvfjytmPghdIcLjF0jFKjs5vq2
+	MXzn6aOAVZ1sznzbKyz9lX4+8AGhhuxSnuENDf9DsARgxUNJBWCzAOWdTVCBhQZGyzTFtdh36qN
+	sF9Ce4VgUmp+xTmzWGZghM/4g
+X-Received: by 2002:a50:9f82:0:b0:53f:1a04:e4e4 with SMTP id c2-20020a509f82000000b0053f1a04e4e4mr1054315edf.2.1697705625851;
+        Thu, 19 Oct 2023 01:53:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEAUZUJc0kzm+7kKUWEc28P8pZT8ZjRc38n6nk/Neu6/YYJzX8nberMRXNYx7or9BO1aWDr3A==
+X-Received: by 2002:a50:9f82:0:b0:53f:1a04:e4e4 with SMTP id c2-20020a509f82000000b0053f1a04e4e4mr1054298edf.2.1697705625468;
+        Thu, 19 Oct 2023 01:53:45 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-237-142.dyn.eolo.it. [146.241.237.142])
+        by smtp.gmail.com with ESMTPSA id a6-20020aa7cf06000000b0053e625da9absm4050443edy.41.2023.10.19.01.53.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 01:53:44 -0700 (PDT)
+Message-ID: <d1271d557adb68b5f77649861faf470f265e9f6b.camel@redhat.com>
+Subject: Re: [PATCH net-next v2 3/3] sock: Fix improper heuristic on raising
+ memory
+From: Paolo Abeni <pabeni@redhat.com>
+To: Abel Wu <wuyun.abel@bytedance.com>, "David S . Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Shakeel Butt <shakeelb@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Thu, 19 Oct 2023 10:53:43 +0200
+In-Reply-To: <20231016132812.63703-3-wuyun.abel@bytedance.com>
+References: <20231016132812.63703-1-wuyun.abel@bytedance.com>
+	 <20231016132812.63703-3-wuyun.abel@bytedance.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230922061530.3121-1-wsa+renesas@sang-engineering.com>
 
-On Fri, Sep 22, 2023 at 08:15:21AM +0200, Wolfram Sang wrote:
-> Changes since v1:
-> * kept uapi define for for serial port type
-> * added acks
-> 
-> Still valid cover letter from v1:
-> 
-> When trying to get rid of the obsolete VLYNQ bus, Jonas and Florian
-> pointed out that its only user, the AR7 platform can probaly go entirely
-> [1]. This series does exactly that. Even OpenWRT has removed support
-> because these devices are "stuck with 3.18" [2].
-> 
-> It removes the drivers first, because watchdog and network include
-> platform specific headers. Once the drivers are gone, we remove the
-> platform. The patches are based on 6.6-rc2 and created with
-> "--irreversible-delete" to save some space.
-> 
-> My suggestion is that everything is merged via the MIPS tree in one go,
-> so we don't have broken drivers because of missing platform headers. But
-> maybe there are reasons for a two-cycle removal with the drivers first
-> and the platform later?
-> 
-> Looking forward to comments.
-> 
-> Happy hacking,
-> 
->    Wolfram
-> 
-> 
-> [1] https://lore.kernel.org/r/3395161f-2543-46f0-83d9-b918800305e1@gmail.com
-> [2] https://openwrt.org/docs/techref/targets/ar7
-> 
-> 
-> Wolfram Sang (6):
->   serial: 8250: remove AR7 support
->   mtd: parsers: ar7: remove support
->   vlynq: remove bus driver
->   watchdog: ar7_wdt: remove driver to prepare for platform removal
->   net: cpmac: remove driver to prepare for platform removal
->   MIPS: AR7: remove platform
-> 
->  MAINTAINERS                             |   13 -
->  arch/arm/configs/pxa_defconfig          |    1 -
->  arch/mips/Kbuild.platforms              |    1 -
->  arch/mips/Kconfig                       |   22 -
->  arch/mips/ar7/Makefile                  |   11 -
->  arch/mips/ar7/Platform                  |    5 -
->  arch/mips/ar7/clock.c                   |  439 --------
->  arch/mips/ar7/gpio.c                    |  332 ------
->  arch/mips/ar7/irq.c                     |  165 ---
->  arch/mips/ar7/memory.c                  |   51 -
->  arch/mips/ar7/platform.c                |  722 -------------
->  arch/mips/ar7/prom.c                    |  256 -----
->  arch/mips/ar7/setup.c                   |   93 --
->  arch/mips/ar7/time.c                    |   31 -
->  arch/mips/boot/compressed/uart-16550.c  |    5 -
->  arch/mips/configs/ar7_defconfig         |  119 ---
->  arch/mips/include/asm/mach-ar7/ar7.h    |  191 ----
->  arch/mips/include/asm/mach-ar7/irq.h    |   16 -
->  arch/mips/include/asm/mach-ar7/prom.h   |   12 -
->  arch/mips/include/asm/mach-ar7/spaces.h |   22 -
->  drivers/Kconfig                         |    2 -
->  drivers/Makefile                        |    1 -
->  drivers/mtd/parsers/Kconfig             |    5 -
->  drivers/mtd/parsers/Makefile            |    1 -
->  drivers/mtd/parsers/ar7part.c           |  129 ---
->  drivers/net/ethernet/ti/Kconfig         |    9 +-
->  drivers/net/ethernet/ti/Makefile        |    1 -
->  drivers/net/ethernet/ti/cpmac.c         | 1251 -----------------------
->  drivers/tty/serial/8250/8250_port.c     |    7 -
->  drivers/vlynq/Kconfig                   |   21 -
->  drivers/vlynq/Makefile                  |    6 -
->  drivers/vlynq/vlynq.c                   |  799 ---------------
->  drivers/watchdog/Kconfig                |    6 -
->  drivers/watchdog/Makefile               |    1 -
->  drivers/watchdog/ar7_wdt.c              |  315 ------
->  include/linux/vlynq.h                   |  149 ---
->  36 files changed, 1 insertion(+), 5209 deletions(-)
->  delete mode 100644 arch/mips/ar7/Makefile
->  delete mode 100644 arch/mips/ar7/Platform
->  delete mode 100644 arch/mips/ar7/clock.c
->  delete mode 100644 arch/mips/ar7/gpio.c
->  delete mode 100644 arch/mips/ar7/irq.c
->  delete mode 100644 arch/mips/ar7/memory.c
->  delete mode 100644 arch/mips/ar7/platform.c
->  delete mode 100644 arch/mips/ar7/prom.c
->  delete mode 100644 arch/mips/ar7/setup.c
->  delete mode 100644 arch/mips/ar7/time.c
->  delete mode 100644 arch/mips/configs/ar7_defconfig
->  delete mode 100644 arch/mips/include/asm/mach-ar7/ar7.h
->  delete mode 100644 arch/mips/include/asm/mach-ar7/irq.h
->  delete mode 100644 arch/mips/include/asm/mach-ar7/prom.h
->  delete mode 100644 arch/mips/include/asm/mach-ar7/spaces.h
->  delete mode 100644 drivers/mtd/parsers/ar7part.c
->  delete mode 100644 drivers/net/ethernet/ti/cpmac.c
->  delete mode 100644 drivers/vlynq/Kconfig
->  delete mode 100644 drivers/vlynq/Makefile
->  delete mode 100644 drivers/vlynq/vlynq.c
->  delete mode 100644 drivers/watchdog/ar7_wdt.c
->  delete mode 100644 include/linux/vlynq.h
+On Mon, 2023-10-16 at 21:28 +0800, Abel Wu wrote:
+> Before sockets became aware of net-memcg's memory pressure since
+> commit e1aab161e013 ("socket: initial cgroup code."), the memory
+> usage would be granted to raise if below average even when under
+> protocol's pressure. This provides fairness among the sockets of
+> same protocol.
+>=20
+> That commit changes this because the heuristic will also be
+> effective when only memcg is under pressure which makes no sense.
+> Fix this by reverting to the behavior before that commit.
+>=20
+> After this fix, __sk_mem_raise_allocated() no longer considers
+> memcg's pressure. As memcgs are isolated from each other w.r.t.
+> memory accounting, consuming one's budget won't affect others.
+> So except the places where buffer sizes are needed to be tuned,
+> allow workloads to use the memory they are provisioned.
+>=20
+> Fixes: e1aab161e013 ("socket: initial cgroup code.")
 
-applied to mips-next, minus patch 5, which is already applied to net-next.
+I think it's better to drop this fixes tag. This is a functional change
+and with such tag on at this point of the cycle, will land soon into
+every stable tree. That feels not appropriate.
 
-Thomas.
+Please repost without such tag, thanks!
 
--- 
-Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
-good idea.                                                [ RFC1925, 2.3 ]
+You can send the change to stables trees later, if needed.
+
+Paolo
+
 
