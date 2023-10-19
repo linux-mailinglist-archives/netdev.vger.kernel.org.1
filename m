@@ -1,377 +1,172 @@
-Return-Path: <netdev+bounces-42651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2828D7CFB82
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:45:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BE4A7CFB87
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:46:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B5D21C20D1C
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:45:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29A4B2820B1
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A1127477;
-	Thu, 19 Oct 2023 13:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B247727704;
+	Thu, 19 Oct 2023 13:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="a/kX2NAt"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="WEZZqTK7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B033DDA6;
-	Thu, 19 Oct 2023 13:45:40 +0000 (UTC)
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAC669B;
-	Thu, 19 Oct 2023 06:45:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1697723134; x=1697982334;
-	bh=EiI9bLDH0OdYLGe7aBG2i8406QJY+5bMoCJHU+OywOs=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=a/kX2NAtx7a9jm2ubPX0kPZ3x4PPH15mrQglzJ3V4yDK4WYF37FWIMu9nieobODpC
-	 Tyswr1Afw9JZc7yWH2RceYypZxQW6NFYGK1HeTpTWPsSS6UQZunVdtnTE59XDPHu6q
-	 eT7xHhU2J7hcniW7vM3vLTqTtfxroLVUYixUvde/jUGUyfJeXwoxMa9kMSreps6+Lh
-	 i8sevU+Yi20wQnbkJ9MVF9Nd5760ollY5ECQ0fNB3GwSDVNi6chYSpV5tVVDSb1RKt
-	 BwYlymErFD5FWQ1kdMGu22ZnjQOdTZCGXePNTDfz6NO8dUtXFlBtA2ukxzWoM2oe02
-	 xAX4cBLmc84zg==
-Date: Thu, 19 Oct 2023 13:45:27 +0000
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
-Message-ID: <0e8d2538-284b-4811-a2e7-99151338c255@proton.me>
-In-Reply-To: <20231019.092436.1433321157817125498.fujita.tomonori@gmail.com>
-References: <20231017113014.3492773-1-fujita.tomonori@gmail.com> <20231017113014.3492773-2-fujita.tomonori@gmail.com> <e361ef91-607d-400b-a721-f846c21e2400@proton.me> <20231019.092436.1433321157817125498.fujita.tomonori@gmail.com>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0591F2747C;
+	Thu, 19 Oct 2023 13:46:28 +0000 (UTC)
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2050.outbound.protection.outlook.com [40.107.13.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7E549B;
+	Thu, 19 Oct 2023 06:46:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kmjwbw6DTfZEgKME31vTJRDVTGnFBcmHtUkgGA/HXJDwyVdJc7HaLifytS7mP1NEUmOlwIpPUuu5RUyt1Uh01c7F2u0SuX24Bxc9Yl9tqY8ZbOIWpCdFVeEUaNt5Euk9rzLaZwJAL2XKFpDPu6c85mspGU3dLGzXWHG1aPkwzaMU1AsGlfaOPPy4uLWSD9aqu7Q0hqT4S8OBQBA+V6C91y/kHFuEsE0FoM8iUG7gaxWwX4F5WCERUArSPUVjUi9B2lJgmottpQbGrPjCgKCrZb+kpx/cZaJbpgJtT3GnH0/BpuVje80iEVqfI5/8lsA1qwhDiaG6i6YlcIhr62L06g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K3mwt5nw460vXINK+wpi3SEgSSNYict5iHn7gFHWn5Y=;
+ b=nOqcymUDO0s/gByBV3VVzJqIxt+6LVaLrfLamBHtXeEQUWE1hvxC0R58tiQHFPn/Gm+ls5yzq2BuUAeMx4Y8qQzHnxSxKXfx+kf9yO8555KFCnx6CBQdvHxUMSzOPS5MgSYS9oO/TVfSarlMheUtHhcMF6An10Engrdg+3AJPg/vN3xzPeVbB9ho/qoox+vzZqEoW7JRDyosLlyt3EcOt8V6itjyLNAxTG3B15H7o62nYpMsX6XKI2uu8H1b2gdmjp3OtdqKqUV1SA0Y0vOb0KY9g0l0I5Ktjn5lNl1l6YHip38jw5+257vzUrl8OVpUxCWFrgx/DnmBiJlhsU6sPg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K3mwt5nw460vXINK+wpi3SEgSSNYict5iHn7gFHWn5Y=;
+ b=WEZZqTK7fGmLvVnHu+HL6KBUwvR69/vbZuv/x8d5DatK+VXbJLwYuyT1k/lwAY2RV9eM6NIcxs91w5GDAHV6BGBztnErGgoYX1fXqUvGLIK0gJhAeycsjsiHBRmN+655NpVqqZ+3DsPY57XXswpngBuveRfKd9qrwXFYJ5eR4qU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DB9PR04MB8201.eurprd04.prod.outlook.com (2603:10a6:10:25e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.23; Thu, 19 Oct
+ 2023 13:46:24 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::992:76c8:4771:8367]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::992:76c8:4771:8367%7]) with mapi id 15.20.6907.022; Thu, 19 Oct 2023
+ 13:46:24 +0000
+Date: Thu, 19 Oct 2023 16:46:19 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	=?utf-8?B?bsOnIMOcTkFM?= <arinc.unal@arinc9.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	John Crispin <john@phrozen.org>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Sergei Shtylyov <sergei.shtylyov@gmail.com>,
+	Justin Chen <justin.chen@broadcom.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Sekhar Nori <nsekhar@ti.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com
+Subject: Re: [PATCH net-next 7/8] dt-bindings: net: mscc,vsc7514-switch:
+ Simplify DSA and switch references
+Message-ID: <20231019134619.p5avpmsbttzhfmwn@skbuf>
+References: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
+ <20231016-dt-net-cleanups-v1-7-a525a090b444@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016-dt-net-cleanups-v1-7-a525a090b444@kernel.org>
+X-ClientProxiedBy: AM0PR02CA0102.eurprd02.prod.outlook.com
+ (2603:10a6:208:154::43) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DB9PR04MB8201:EE_
+X-MS-Office365-Filtering-Correlation-Id: 37df4bdb-3170-42ee-cc41-08dbd0a9c922
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	/4I+XjfK8/va8A3mQNTESEHqAhkmPgp8wA89IiC2TVP5uOVEAU0CNzX/gMCX5ZLZ9X1J3hiSAp0DZE3w1wcYpgb/2DDQwtEMtuoD4VikIppxqf0nUhOmRRwMykYqHPnrs5i35wwvWJVsbcPAs8bGLtQASDgQ5U+LeOsldOqKr83boa0c4BXx2WS/CJrI8RlK/BTrpt/LMvH7JDmDADIhefPBnn2RJJaqT3vJTlVMLBMQGxCYrR5R18+mQDrf+L/Oj1N6PJTGOSPuTqPOvnHc6Cb1JxDmBH4dVAapRsdPAgCXrhf0OnC70tiAo989uUXhFUuJ0yP0RImXuQdBDyk0lZcyhbuDfiKi/vKoujgOvPnf1/aVS+s6PPe/Jq8dj0/Zu8jdw+5OK2eKr3ajlZxYU0q3tYF0G/6jUHfLYzYkc62owIx4g7YPakKAAwL9e7QTi3FZX8Eyu+xKK686cvX9JNdgDxEGdFtrpYDST2cKyjulw9BO4NsLAAMOLTM241b+hFRitnesLUU/dhqzqbz2LjfeSgrqJMfVpPuwsZrBK5aeuVhyCAm7ZexUYXhG3fhf
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(376002)(396003)(136003)(346002)(366004)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(41300700001)(38100700002)(33716001)(9686003)(6512007)(4744005)(1076003)(2906002)(6916009)(66476007)(316002)(54906003)(44832011)(66556008)(8676002)(7416002)(4326008)(5660300002)(86362001)(8936002)(66946007)(7406005)(6666004)(6506007)(478600001)(6486002)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?sXe6YNxFcBmKZ4kvtnKPs88FXqKCEP6RCoWKSIPpTz3akTLLCxrhRN8hqyKT?=
+ =?us-ascii?Q?8PPc+tIt4sjf+oe9iZ8Qf54e5HBScVZsA8qLCbrLM+xVCuI5E6tYB8d9nmZs?=
+ =?us-ascii?Q?xE7VmgGJYonFwXlXyGRLBqSmwnSg/PXk44tdUKH752i9vfL0tsTOc+bhHiDI?=
+ =?us-ascii?Q?wdMiu3XcXvgfQYFlxLGjPI7PtKjx+ncMWxKwzBYhbHAVtRYCgQbUDrSJv34y?=
+ =?us-ascii?Q?oa65AmVPa3VV9mkrIdRaPtAHlXI1Ax9Q2xqrXxdssbY38xkIXPARBuPlNqEl?=
+ =?us-ascii?Q?0hmOR621HvK/zEqp5BolHTSlyuOXtYwbH9hHGmSXkXC73zpbOeffs69bO+ER?=
+ =?us-ascii?Q?uA/8Whu9KixzE9HcXUVsKsbqjwnftAwXvWyj1/oWVoqeEvhm1yVvbFYVUWyn?=
+ =?us-ascii?Q?cIjZsPMk0jznE3Uv1sB7YsVgx1+gTt5MUDD9MQF2NHvRE6zQTMrXMagwTQvK?=
+ =?us-ascii?Q?y5Qr/ZuA+rR5ULpkqd4lHW1pqhXT7daHR5xPXTSJJ31+L9Ber0mDYtxpZ7Ie?=
+ =?us-ascii?Q?O8anutglECmFugJmpdsUR83wF15KH3kodwV+3KIiEmWQ5ntxgSmllUZRUuBr?=
+ =?us-ascii?Q?yivgqeZMdAVopv2rk9T0w1cEd2ea0K1Fg5gZbCSzjeVsWwSOXsVnduT9g9BC?=
+ =?us-ascii?Q?3OHINCFQnha/3cvBhHYGPTiy/CJDTeJi7d3P1Vg0K2tatG054z1uWjJ4vHep?=
+ =?us-ascii?Q?SwaoL0J+nOV1ZQboaLIF6vOm1EK8cZDQ53XKEaXsnX+0x3p3Mf+gm8tTkYyE?=
+ =?us-ascii?Q?R/cUJES652AMKAIdEJu2hOC+66qS5FuqwRGucth2T0aKQM0UYVdINrrEWxPj?=
+ =?us-ascii?Q?Vd37I7tcauWf77kyixQmTdNyfPCYC3UUlxacrV9xaPeUjF7Mml67QkqEn+TS?=
+ =?us-ascii?Q?v6uG4800ZtAt0MXOTlstECGekP+JNUN08ZTXH9ZHG5pTCVivAlPzCQlnb/8f?=
+ =?us-ascii?Q?ZoKkWLJeIHRX/P3mXaP0YQn2RZzQoQm+N7YkGwDCVdZTDBL4EbBinFefcwTR?=
+ =?us-ascii?Q?PK4He9iZHvVNitOIKmjwFWev4q02+ORmnaLkF225YyZCulW7t6yhhc/rALne?=
+ =?us-ascii?Q?F0oQf1kdI8VrVtdw77FrrVoZkScLwv5WPgThl5d7CA+B87Grn6d0SnBOlypV?=
+ =?us-ascii?Q?poSqGD0A4/Ycpsf/CLq6jsUO1pFsY0nhxJIJd9gP1hC+NS03EV7GaJASlLMc?=
+ =?us-ascii?Q?smxn/eju4QbiZ9flQK++LZ+4DeeHGiZ6dsNJWbDTMhXcEqSxJ0UL1qAEBgxm?=
+ =?us-ascii?Q?rvU5RrQV44tjonj7O82FfMm02s+7kFQFMEhKNlBfxnep5evwTGHPwOAZdCRW?=
+ =?us-ascii?Q?hMOEZFTBEyCh5mmNOVkJM9gOAqwOtAbsc6n0onZBLj6Hqj4aZV5RpQtycX4m?=
+ =?us-ascii?Q?K1J1U5DG7iFbr64on/APY2YRYFJvIhWuVOkNCMXrrCaQ/l//woRbw/lWUHGW?=
+ =?us-ascii?Q?Jvy8Mnd59Q0LxcPE8x/REl1dkkioF/4WTGH916k2Xks5kzpPJiYwsuYDn9pD?=
+ =?us-ascii?Q?uZtopudAslQuH/NAbErjfvfn26RkOuN9j05dmPHAUSUsZWJtPb73WM+L/U9X?=
+ =?us-ascii?Q?KaxTjNreT96tz0mu06TBiCiAZcT+Dl7H9az0ePavur1GsSCO35kAQ6idm9NP?=
+ =?us-ascii?Q?jw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 37df4bdb-3170-42ee-cc41-08dbd0a9c922
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 13:46:24.6919
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DrCNt1Ve8mnVwE0jTjmsxd8+XGg7dRFGV6zB/70dcmNQaKvhKpfyllk2b41rfSFamHCnOg1uQLtw1Hg+X9SY8Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8201
 
-On 19.10.23 02:24, FUJITA Tomonori wrote:
-> On Wed, 18 Oct 2023 15:07:52 +0000
-> Benno Lossin <benno.lossin@proton.me> wrote:
->=20
->>> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
->>> new file mode 100644
->>> index 000000000000..7d4927ece32f
->>> --- /dev/null
->>> +++ b/rust/kernel/net/phy.rs
->>> @@ -0,0 +1,701 @@
->>> +// SPDX-License-Identifier: GPL-2.0
->>> +
->>> +// Copyright (C) 2023 FUJITA Tomonori <fujita.tomonori@gmail.com>
->>> +
->>> +//! Network PHY device.
->>> +//!
->>> +//! C headers: [`include/linux/phy.h`](../../../../include/linux/phy.h=
-).
->>> +//!
->>
->> Add a new section "# Abstraction Overview" or similar.
->=20
-> With the rest of comments on this secsion addressed, how about the follow=
-ing?
->=20
-> //! Network PHY device.
-> //!
-> //! C headers: [`include/linux/phy.h`](../../../../include/linux/phy.h).
-> //!
-> //! # Abstraction Overview
-> //!
-> //! "During the calls to most functions in [`Driver`], the C side (`PHYLI=
-B`) holds a lock that is unique
+On Mon, Oct 16, 2023 at 04:44:26PM -0500, Rob Herring wrote:
+> The mscc,vsc7514-switch schema doesn't add any custom port properties,
+> so it can just reference ethernet-switch.yaml#/$defs/base and
+> dsa.yaml#/$defs/ethernet-ports instead of the base file and can skip
+> defining port nodes.
+> 
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
 
-Please remove the quotes ", they were intended to separate my comments
-from my suggestion.
-
-> //! for every instance of [`Device`]". `PHYLIB` uses a different serializ=
-ation technique for
-> //! [`Driver::resume`] and [`Driver::suspend`]: `PHYLIB` updates `phy_dev=
-ice`'s state with the lock hold,
-
-hold -> held
-
-> //! to guarantee that [`Driver::resume`] accesses to the instance exclusi=
-vely. [`Driver::resume`] and
-
-to guarantee -> thus guaranteeing
-accesses to the instance exclusively. -> has exclusive access to the instan=
-ce.
-
-> //! [`Driver::suspend`] also are called where only one thread can access =
-to the instance.
-> //!
-> //! All the PHYLIB helper functions for [`Device`] modify some members in=
- [`Device`]. Except for
-
-PHYLIB -> `PHYLIB`
-
-> //! getter functions, [`Device`] methods take `&mut self`. This also appl=
-ied to `[Device::read]`,
-
-`[Device::read]` -> [`Device::read`]
-
-> //! which reads a hardware register and updates the stats.
-
-Otherwise this looks good.
-
-[...]
-
->>> +impl Device {
->>> +    /// Creates a new [`Device`] instance from a raw pointer.
->>> +    ///
->>> +    /// # Safety
->>> +    ///
->>> +    /// This function must only be called from the callbacks in `phy_d=
-river`. PHYLIB guarantees
->>> +    /// the exclusive access for the duration of the lifetime `'a`.
->>
->> I would not put the second sentence in the `# Safety` section. Just move=
- it
->> above. The reason behind this is the following: the second sentence is n=
-ot
->> a precondition needed to call the function.
->=20
-> Where is the `above`? You meant the following?
->=20
-> impl Device {
->      /// Creates a new [`Device`] instance from a raw pointer.
->      ///
->      /// `PHYLIB` guarantees the exclusive access for the duration of the=
- lifetime `'a`.
->      ///
->      /// # Safety
->      ///
->      /// This function must only be called from the callbacks in `phy_dri=
-ver`.
->      unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a  mut S=
-elf {
-
-Yes this is what I had in mind. Although now that I see it in code,
-I am not so sure that this comment is needed. If you feel the same
-way, just remove it.
-
-That being said, I am not too happy with the safety requirement of this
-function. It does not really match with the safety comment in the function
-body. Since I have not yet finished my safety standardization, I think we
-can defer that problem until it is finished. Unless some other reviewer
-wants to change this, you can keep it as is.
-
->>> +    unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut =
-Self {
->>> +        // CAST: `Self` is a `repr(transparent)` wrapper around `bindi=
-ngs::phy_device`.
->>> +        let ptr =3D ptr.cast::<Self>();
->>> +        // SAFETY: by the function requirements the pointer is valid a=
-nd we have unique access for
->>> +        // the duration of `'a`.
->>> +        unsafe { &mut *ptr }
->>> +    }
->>> +
->>> +    /// Gets the id of the PHY.
->>> +    pub fn phy_id(&self) -> u32 {
->>> +        let phydev =3D self.0.get();
->>> +        // SAFETY: `phydev` is pointing to a valid object by the type =
-invariant of `Self`.
->>> +        unsafe { (*phydev).phy_id }
->>> +    }
->>> +
->>> +    /// Gets the state of the PHY.
->>> +    pub fn state(&self) -> DeviceState {
->>> +        let phydev =3D self.0.get();
->>> +        // SAFETY: `phydev` is pointing to a valid object by the type =
-invariant of `Self`.
->>> +        let state =3D unsafe { (*phydev).state };
->>> +        // TODO: this conversion code will be replaced with automatica=
-lly generated code by bindgen
->>> +        // when it becomes possible.
->>> +        // better to call WARN_ONCE() when the state is out-of-range (=
-needs to add WARN_ONCE support).
->>> +        match state {
->>> +            bindings::phy_state_PHY_DOWN =3D> DeviceState::Down,
->>> +            bindings::phy_state_PHY_READY =3D> DeviceState::Ready,
->>> +            bindings::phy_state_PHY_HALTED =3D> DeviceState::Halted,
->>> +            bindings::phy_state_PHY_ERROR =3D> DeviceState::Error,
->>> +            bindings::phy_state_PHY_UP =3D> DeviceState::Up,
->>> +            bindings::phy_state_PHY_RUNNING =3D> DeviceState::Running,
->>> +            bindings::phy_state_PHY_NOLINK =3D> DeviceState::NoLink,
->>> +            bindings::phy_state_PHY_CABLETEST =3D> DeviceState::CableT=
-est,
->>> +            _ =3D> DeviceState::Error,
->>> +        }
->>> +    }
->>> +
->>> +    /// Returns true if the link is up.
->>> +    pub fn get_link(&self) -> bool {
->>
->> I still think this name should be changed. My response at [1] has not ye=
-t
->> been replied to. This has already been discussed before:
->> - https://lore.kernel.org/rust-for-linux/2023100237-satirical-prance-bd5=
-7@gregkh/
->> - https://lore.kernel.org/rust-for-linux/20231004.084644.507845339593987=
-55.fujita.tomonori@gmail.com/
->> - https://lore.kernel.org/rust-for-linux/CALNs47syMxiZBUwKLk3vKxzmCbX0FS=
-5A37FjwUzZO9Fn-iPaoA@mail.gmail.com/
->>
->> And I want to suggest to change it to `is_link_up`.
->>
->> Reasons why I do not like the name:
->> - `get_`/`put_` are used for ref counting on the C side, I would like to
->>     avoid confusion.
->> - `get` in Rust is often used to fetch a value from e.g. a datastructure
->>     such as a hashmap, so I expect the call to do some computation.
->> - getters in Rust usually are not prefixed with `get_`, but rather are
->>     just the name of the field.
->> - in this case I like the name `is_link_up` much better, since code beco=
-mes
->>     a lot more readable with that.
->> - I do not want this pattern as an example for other drivers.
->>
->> [1]: https://lore.kernel.org/rust-for-linux/f5878806-5ba2-d932-858d-dda3=
-f55ceb67@proton.me/
->=20
-> IIRC, Andrew suggested the current name. If the change is fine by him,
-> I'll rename.
->=20
->=20
->>> +/// An instance of a PHY driver.
->>> +///
->>> +/// Wraps the kernel's `struct phy_driver`.
->>> +///
->>> +/// # Invariants
->>> +///
->>> +/// `self.0` is always in a valid state.
->>> +#[repr(transparent)]
->>> +pub struct DriverType(Opaque<bindings::phy_driver>);
->>
->> I think `DriverVTable` is a better name.
->=20
-> Renamed.
->=20
->>> +/// Creates the kernel's `phy_driver` instance.
->>
->> This function returns a `DriverType`, not a `phy_driver`.
->=20
-> How about?
->=20
-> /// Creates the [`DriverVTable`] instance from [`Driver`] trait.
-
-Sounds good, but to this sounds a bit more natural:
-
-     /// Creates a [`DriverVTable`] instance from a [`Driver`].
-
->>> +///
->>> +/// This is used by [`module_phy_driver`] macro to create a static arr=
-ay of `phy_driver`.
->>> +///
->>> +/// [`module_phy_driver`]: crate::module_phy_driver
->>> +pub const fn create_phy_driver<T: Driver>() -> DriverType {
->>> +    // All the fields of `struct phy_driver` are initialized properly.
->>> +    // It ensures the invariants.
->>
->> Use `// INVARIANT: `.
->=20
-> Oops,
->=20
-> // INVARIANT: All the fields of `struct phy_driver` are initialized prope=
-rly.
-> DriverVTable(Opaque::new(bindings::phy_driver {
->      name: T::NAME.as_char_ptr().cast_mut(),
-
-Seems good.
-
->=20
->=20
->>> +/// Registration structure for a PHY driver.
->>> +///
->>> +/// # Invariants
->>> +///
->>> +/// The `drivers` slice are currently registered to the kernel via `ph=
-y_drivers_register`.
->>> +pub struct Registration {
->>> +    drivers: &'static [DriverType],
->>> +}
->>
->> You did not reply to my suggestion [2] to remove this type,
->> what do you think?
->>
->> [2]: https://lore.kernel.org/rust-for-linux/85d5c498-efbc-4c1a-8d12-f1ec=
-a63c45cf@proton.me/
->=20
-> I tried before but I'm not sure it simplifies the implementation.
->=20
-> Firstly, instead of Reservation, we need a public function like
->=20
-> pub fn phy_drivers_register(module: &'static crate::ThisModule, drivers: =
-&[DriverVTable]) -> Result {
->      to_result(unsafe {
->          bindings::phy_drivers_register(drivers[0].0.get(), drivers.len()=
-.try_into()?, module.0)
->      })
-> }
->=20
-> This is because module.0 is private.
-
-Why can't this be part of the macro?
-
-> Also if we keep DriverVtable.0 private, we need another public function.
->=20
-> pub unsafe fn phy_drivers_unregister(drivers: &'static [DriverVTable])
-> {
->      unsafe {
->          bindings::phy_drivers_unregister(drivers[0].0.get(), drivers.len=
-() as i32)
->      };
-> }
->=20
-> DriverVTable isn't guaranteed to be registered to the kernel so needs
-> to be unsafe, I guesss.
-
-In one of the options I suggest to make that an invariant of `DriverVTable`=
-.
-
->=20
-> Also Module trait support exit()?
-
-Yes, just implement `Drop` and do the cleanup there.
-
-In the two options that I suggested there is a trade off. I do not know
-which option is better, I hoped that you or Andrew would know more:
-Option 1:
-* advantages:
-   - manual creation of a phy driver module becomes possible.
-   - less complex `module_phy_driver` macro.
-   - no static variable needed.
-* disadvantages:
-   - calls `phy_drivers_register` for every driver on module
-     initialization.
-   - calls `phy_drivers_unregister` for every driver on module
-     exit.
-
-Option 2:
-* advantages:
-   - less complex `module_phy_driver` macro.
-   - no static variable needed.
-   - only a single call to
-     `phy_drivers_register`/`phy_drivers_unregister`.
-* disadvantages:
-   - no safe manual creation of phy drivers possible, the only safe
-     way is to use the `module_phy_driver` macro.
-
-I suppose that it would be ok to call the register function multiple
-times, since it only is on module startup/shutdown and it is not
-performance critical.
-
---=20
-Cheers,
-Benno
-
-
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
