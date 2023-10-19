@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-42718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874F77CFF27
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:10:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D48957CFF24
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0BE51C208DB
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 676E91F22D69
 	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4F0321BA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E8D321B5;
 	Thu, 19 Oct 2023 16:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g58PwMQZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O0PDjHsl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60659321AF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64721321B0;
 	Thu, 19 Oct 2023 16:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E1016C433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E9B79C433CC;
 	Thu, 19 Oct 2023 16:10:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1697731824;
-	bh=ZSHnlwGKVf0pTTc0ZzD9hgMl3t8ZCUhEI3/eJiY4aFQ=;
+	bh=BE/4wyJzn7vqO89mbnyTMDJ6LgXLjJtglZRTGIZ98Lk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g58PwMQZnJ4RJRiO8+msu58Y6jNJM9gZ3qsxvkA+6vQIFHiWzFHQQOIZxVuCWBrFR
-	 5Dtsl2Zf05Y4rwNHAyL9m2zN+PY9HDSs0NHl71IMKtAhzpdXc3HaNx0scB1fp04qxX
-	 brDITEHGT8UEBpqrIuZ7EiKyvTYeRFEH9t6WKc+n708rud1MlD9zsWPmqErjz6jlKs
-	 l8l+Jzk4NhPjURhEVmFfUwUX+eVb0x2+CbChHH6GVYEA1sb1HuPpN9Fz4mjCK7Wcft
-	 +UYvJSvS7rNgu5Hcs3ocbdlgU54v0aSXBHNcZqZSjwOwWNMVe6A3n+JIeK1nr8uPfM
-	 QYn7P3uPixRpQ==
+	b=O0PDjHslPWAMHNN4aF8/IAecO1ZQWt/JoKB5AETbSUvQ96Og4SvHXWY3j91yqxw7f
+	 Bt6D358sBjNeI9D+WfCm8eiepZ5xoMjJV5J4Vi7ES4PqgV+YBVIERzBjztMT8Oi4VY
+	 uHO1lEOLmN5wjD/hiHMYMkFvjIQSlU4YW3Hnw52EiGkMNNblFCnJS0eXVSPDVGyjNo
+	 tYY+XknbRmrwn6Tq4zZD/LfaUf71s53f5nF8oIPT4ddUpmeXETE0KNqBuvlZ/7JaFU
+	 +XquT1KJb89B4kpOWHHTfP7z0Mig/D3uY352JBWIqxJ/6S1e74T/LM0GgfXAHVUs42
+	 qvq76xZbPAbMQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BDDF7C04E27;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D2C9FC73FE4;
 	Thu, 19 Oct 2023 16:10:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,65 +43,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/8] dt-bindings: net: Child node schema cleanups
+Subject: Re: [PATCH net-next] i40e: Align devlink info versions with ice driver
+ and add docs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169773182376.32102.12284978532277554063.git-patchwork-notify@kernel.org>
+ <169773182385.32102.13500484487081368542.git-patchwork-notify@kernel.org>
 Date: Thu, 19 Oct 2023 16:10:23 +0000
-References: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
-In-Reply-To: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- wens@csie.org, jernej.skrabec@gmail.com, samuel@sholland.org, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, woojung.huh@microchip.com,
- UNGLinuxDriver@microchip.com, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
- clement.leger@bootlin.com, geert+renesas@glider.be, magnus.damm@gmail.com,
- mripard@kernel.org, arinc.unal@arinc9.com, Landen.Chao@mediatek.com,
- dqfext@gmail.com, sean.wang@mediatek.com, daniel@makrotopia.org,
- john@phrozen.org, gerhard@engleder-embedded.com, hkallweit1@gmail.com,
- s.shtylyov@omp.ru, sergei.shtylyov@gmail.com, justin.chen@broadcom.com,
- florian.fainelli@broadcom.com, grygorii.strashko@ti.com, nsekhar@ti.com,
- claudiu.manoil@nxp.com, alexandre.belloni@bootlin.com,
- vladimir.oltean@nxp.com, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-renesas-soc@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com
+References: <20231018123558.552453-1-ivecera@redhat.com>
+In-Reply-To: <20231018123558.552453-1-ivecera@redhat.com>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, jacob.e.keller@intel.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ corbet@lwn.net, jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 16 Oct 2023 16:44:19 -0500 you wrote:
-> This is a series of clean-ups related to ensuring that child node
-> schemas are constrained to not allow undefined properties. Typically,
-> that means just adding additionalProperties or unevaluatedProperties as
-> appropriate. The DSA/switch schemas turned out to be a bit more
-> involved, so there's some more fixes and a bit of restructuring in them.
+On Wed, 18 Oct 2023 14:35:55 +0200 you wrote:
+> Align devlink info versions with ice driver so change 'fw.mgmt'
+> version to be 2-digit version [major.minor], add 'fw.mgmt.build'
+> that reports mgmt firmware build number and use '"fw.psid.api'
+> for NVM format version instead of incorrect '"fw.psid'.
+> Additionally add missing i40e devlink documentation.
 > 
-> Signed-off-by: Rob Herring <robh@kernel.org>
+> Fixes: 5a423552e0d9 ("i40e: Add handler for devlink .info_get")
+> Cc: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/8] dt-bindings: net: Add missing (unevaluated|additional)Properties on child node schemas
-    https://git.kernel.org/netdev/net-next/c/659fd097b098
-  - [net-next,2/8] dt-bindings: net: renesas: Drop ethernet-phy node schema
-    https://git.kernel.org/netdev/net-next/c/ac8fe40c3628
-  - [net-next,3/8] dt-bindings: net: dsa/switch: Make 'ethernet-port' node addresses hex
-    https://git.kernel.org/netdev/net-next/c/51ff5150258a
-  - [net-next,4/8] dt-bindings: net: ethernet-switch: Add missing 'ethernet-ports' level
-    https://git.kernel.org/netdev/net-next/c/f0fdec925fe7
-  - [net-next,5/8] dt-bindings: net: ethernet-switch: Rename $defs "base" to 'ethernet-ports'
-    https://git.kernel.org/netdev/net-next/c/b9823df7bbad
-  - [net-next,6/8] dt-bindings: net: mscc,vsc7514-switch: Clean-up example indentation
-    https://git.kernel.org/netdev/net-next/c/491ec40d67a5
-  - [net-next,7/8] dt-bindings: net: mscc,vsc7514-switch: Simplify DSA and switch references
-    https://git.kernel.org/netdev/net-next/c/7c93392d754e
-  - [net-next,8/8] dt-bindings: net: dsa: Drop 'ethernet-ports' node properties
-    https://git.kernel.org/netdev/net-next/c/31f47f303c6b
+  - [net-next] i40e: Align devlink info versions with ice driver and add docs
+    https://git.kernel.org/netdev/net-next/c/f2cab25b0eb7
 
 You are awesome, thank you!
 -- 
