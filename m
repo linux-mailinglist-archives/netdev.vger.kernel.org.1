@@ -1,102 +1,68 @@
-Return-Path: <netdev+bounces-42456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 502B67CEC59
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:51:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 423827CEC8F
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 02:06:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B2F9280FA0
-	for <lists+netdev@lfdr.de>; Wed, 18 Oct 2023 23:51:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4BB5281471
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 00:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB1C46668;
-	Wed, 18 Oct 2023 23:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86BA181;
+	Thu, 19 Oct 2023 00:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iDmggQ+N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gn3QZbYr"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FBC1EB27
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 23:51:03 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80DFA113
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 16:51:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697673062; x=1729209062;
-  h=subject:from:to:cc:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1IMC3PdUiUX8T4WA6Sj1FO8MyKaO4rh4sCxoia6ubWM=;
-  b=iDmggQ+NnLWD8WIXURN0T56iMbxZaMZiUe1pWHGziZX5plTJDC8I5sue
-   +VyNH9EAVC8dZG8MN+fNswfA+UUYu63DTZ1SKHI5/6vA6S0U4P3ntKpm0
-   Kwjv+XVrYUiaGhigvfhLnJLJHyw9oktddjQkqsIHlMqDNtqVV3i53A7c0
-   Twjo/aIXW4W/DbHgmbwwdJfCr2kwKdGxN89bsXPGrPSnRGqFh8zBEpjiv
-   oeCNW+kXkJEtMwUEZLwHwkb/9s4XjSnfoEXBWH6kHouS5+Y44t2XFAiAO
-   Mg9nh7Qdjcydvbt7bfuo/Vv46ln2hDtdjsqhP+rF3OB2srRIej8kjdFSr
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="366383259"
-X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
-   d="scan'208";a="366383259"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Oct 2023 16:51:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10867"; a="847459729"
-X-IronPort-AV: E=Sophos;i="6.03,236,1694761200"; 
-   d="scan'208";a="847459729"
-Received: from anambiarhost.jf.intel.com ([10.166.29.163])
-  by FMSMGA003.fm.intel.com with ESMTP; 18 Oct 2023 16:51:02 -0700
-Subject: [net-next PATCH v5 10/10] netdev-genl: Add PID for the NAPI thread
-From: Amritha Nambiar <amritha.nambiar@intel.com>
-To: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
-Cc: sridhar.samudrala@intel.com, amritha.nambiar@intel.com
-Date: Wed, 18 Oct 2023 17:06:55 -0700
-Message-ID: <169767401536.6692.10530784084869425614.stgit@anambiarhost.jf.intel.com>
-In-Reply-To: <169767295948.6692.18077536155633460138.stgit@anambiarhost.jf.intel.com>
-References: <169767295948.6692.18077536155633460138.stgit@anambiarhost.jf.intel.com>
-User-Agent: StGit/unknown-version
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEA917E
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 00:06:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABF6BC433C8;
+	Thu, 19 Oct 2023 00:06:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697673968;
+	bh=FewQDix5K2xzAqhEssDfKbDVEbx1s5sPncq91M85278=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Gn3QZbYryeidX644ynsDuCfrmYPm2P5XG6htQ/pOT3DE3q8AMTNv9ptmyIome970B
+	 nC2jsZZByDg1FKnz6AyBJkvCXqHRCua1y+C4faqDnx1a6xuqRA6Zbyqwh0qRdzE6TH
+	 Z0QYkWuXRnlj38OUXIoz12qV/giPYe38FlDGGoFdfNQr6+Omgxyg51xRlNC42nT4Eu
+	 A+72j/DJ1U8w4xkqz9g2EQDoW1pDGt06vEev/lIS+5RQgk6v7k2GzC+Qm4dToazk6t
+	 YpmozOK/cditkAO773VxfnUwBLYxWslhsB6qWZ0ZdLhp+A6M0NJJStHto4HOcEeXIk
+	 P8eeM3NaDUncA==
+Date: Wed, 18 Oct 2023 17:06:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: <horms@kernel.org>, <linux-kernel@vger.kernel.org>, <pabeni@redhat.com>,
+ <davem@davemloft.net>, <edumazet@google.com>, <egallen@redhat.com>,
+ <hgani@marvell.com>, <mschmidt@redhat.com>, <netdev@vger.kernel.org>,
+ <sedara@marvell.com>, <vburru@marvell.com>, <vimleshk@marvell.com>
+Subject: Re: [net-next PATCH v3] octeon_ep: pack hardware structure
+Message-ID: <20231018170605.392efc0d@kernel.org>
+In-Reply-To: <20231016092051.2306831-1-srasheed@marvell.com>
+References: <20231016092051.2306831-1-srasheed@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-In the threaded NAPI mode, expose the PID of the NAPI thread.
+On Mon, 16 Oct 2023 02:20:51 -0700 Shinas Rasheed wrote:
+> Clean up structure defines related to hardware data to be
+> attributed 'packed' in the code, as padding is not allowed
+> by hardware.
 
-Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
----
- net/core/netdev-genl.c |    7 +++++++
- 1 file changed, 7 insertions(+)
+Looks like the patch was marked as Changes Requested in pw.
+I'm guessing it's because we generally discourage __packed.
+It's better to add size asserts, e.g.:
 
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index ad4b1ee0a2d1..e05fbdac2a58 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -152,6 +152,7 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
- 			const struct genl_info *info)
- {
- 	void *hdr;
-+	pid_t pid;
- 
- 	if (WARN_ON_ONCE(!napi->dev))
- 		return -EINVAL;
-@@ -170,6 +171,12 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
- 	if (napi->irq >= 0 && nla_put_u32(rsp, NETDEV_A_NAPI_IRQ, napi->irq))
- 		goto nla_put_failure;
- 
-+	if (napi->thread) {
-+		pid = task_pid_nr(napi->thread);
-+		if (nla_put_s32(rsp, NETDEV_A_NAPI_PID, pid))
-+			goto nla_put_failure;
-+	}
-+
- 	genlmsg_end(rsp, hdr);
- 
- 	return 0;
+static_assert(sizeof(struct octep_oq_desc_hw) == 16);
 
+__packed also implies lack of alignment, which may force compiler 
+to generate worse code.
 
