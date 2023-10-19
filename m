@@ -1,162 +1,98 @@
-Return-Path: <netdev+bounces-42776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 210A37D0147
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:21:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F12F07D0155
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:23:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B6281C20AF4
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:21:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD941281D87
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A4238DDB;
-	Thu, 19 Oct 2023 18:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UlxO7jfJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6194838DDB;
+	Thu, 19 Oct 2023 18:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C8C354EC
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 18:21:25 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36112121
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 11:21:24 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9b9aeb4962so7725758276.3
-        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 11:21:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697739683; x=1698344483; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=d4Js1cGoVd6Is4II9UaSATIKgACWkFcGE+hiHb+zhb4=;
-        b=UlxO7jfJT7LrfqoagBtOhuJDKklt5UatDzxoL19uExnG3cHnbhVlAteA8K+lq02Oak
-         dWEfb5nmtOerLFmeSsKEkQag+GAyLAycW9koeRTLFwOEbvIQRHLcY4wAly7fJoAmBk1L
-         Y7C3fOlOdIXERSKauJTLIvPRvu0hKm7itahJNkLNu39jtxbL1yEunOBXMJbZBCm99yPK
-         +JZmI6xScf3C7E4CXYZBnWj7fUBGNSyaHk0sN5uk2I5WmAJwxfrQfSoGmt+C/MNtNHZs
-         cl1adaMhd5QgbswD6DIPUXRI2DaHdgPX370WE7OhwZf9uDvCX/Ctb4puB+id2KI07K76
-         Y1TA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C540632C6B
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 18:23:46 +0000 (UTC)
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CED2AB;
+	Thu, 19 Oct 2023 11:23:45 -0700 (PDT)
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-581de3e691dso1786739eaf.3;
+        Thu, 19 Oct 2023 11:23:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697739683; x=1698344483;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=d4Js1cGoVd6Is4II9UaSATIKgACWkFcGE+hiHb+zhb4=;
-        b=pVAxv3WsfP0JwGIEhe9j+j1kWq51J9e2XWJeuDubPd2kwGpmAaDwB93TsceeTglJWQ
-         YGAzJ4UovgYawCdiqN5LN5TRTq1+CqS8TRnLZcjvLgKHPBbZikmaIiVUULFIMXLthXhc
-         PKnScNSzPJs1ukbHO6evO21yTP3l2MM2VxEoIFCAZHNYEf7jX51H0dZbHHu8+rFvmKLf
-         YrOZh9OoE2kdPHFcO5jB42DU6RvisJv2uCkoO+1jlpTu12EpQIB1AM5z7QuQInM/85Ck
-         c3M5TiocsRTLoi8e6SH+n/xDKFc6vbIE7bSPnuIJWfKVVRl46R+PZlK1f2wo4H7HpVoU
-         6zmA==
-X-Gm-Message-State: AOJu0YwkWjp1zMljuB80N6Cg9yjtM/y2gPyfI/PsV4VQIX5cBH3WEhAz
-	GFQ1g/KL+lRHDWmSXgDI8FulfVfW1QRXxidEQQ==
-X-Google-Smtp-Source: AGHT+IFlXICmJcfbDSmoO7A7EUA6iVEF74betNl2k852/gxnaf3TEuSWEbGfjZQ7BNIH7NpUBEkFg+ungfm4ArnZtQ==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a25:ec02:0:b0:d9a:3dac:6c1a with SMTP
- id j2-20020a25ec02000000b00d9a3dac6c1amr73575ybh.11.1697739683357; Thu, 19
- Oct 2023 11:21:23 -0700 (PDT)
-Date: Thu, 19 Oct 2023 18:21:22 +0000
+        d=1e100.net; s=20230601; t=1697739824; x=1698344624;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fFkZbO4vMx0fKP71/OzTPXf/Ja62nWjUdlsbvXHUr7w=;
+        b=O5CI4X4eNiBBFgN32tJtQ+8i+LztCvXUGJ87N2IQnzQmTT2mpI1WUhVZCXJfaPGcI2
+         k/OTvMewjOoz6eHEvKhzIpIJWi2DRLGxpeBy686JZM1tVmABZnCeQ+PSAKFRClV4JYKR
+         5hR5anbkI0ywGpB6Cwy4TkcMy34WatGwOyI9+frxTOiC49j/ZmygPLuCxGCB8ze6ZzIx
+         hHIk/KjG5gndvkMbRhitlWgLqbWHZMt4WQqAEV1CMZbaAkKL0nFwrpxFWEgNjr/cb9bn
+         XtGY/eLWKjbUCfyNIuAPX/is4+2MDsku5AAvtj9iv6e97XPgTvj9H+hDjS/1fOTLqanY
+         Elgg==
+X-Gm-Message-State: AOJu0Ywr0WyaXu+hNsMJzalyNEygXV2DeoMMFxBvX+qzs7SJeH0y0YyX
+	DoRbOaM+jnfGDJwSezCyMQ==
+X-Google-Smtp-Source: AGHT+IGb/FnylUDVtQcmpg/Pk0kEV1gtN5J3K1Nd2RU9hzJq1AKrVYC0cPmLqUzbCsi7QV4MqMtg/w==
+X-Received: by 2002:a4a:b441:0:b0:581:ed9a:4fde with SMTP id h1-20020a4ab441000000b00581ed9a4fdemr3537198ooo.1.1697739824538;
+        Thu, 19 Oct 2023 11:23:44 -0700 (PDT)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id z127-20020a4a4985000000b0057e88d4f8aesm39553ooa.27.2023.10.19.11.23.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 11:23:43 -0700 (PDT)
+Received: (nullmailer pid 833096 invoked by uid 1000);
+	Thu, 19 Oct 2023 18:23:42 -0000
+From: Rob Herring <robh@kernel.org>
+To: Iyappan Subramanian <iyappan@os.amperecomputing.com>, Keyur Chudgar <keyur@os.amperecomputing.com>, Quan Nguyen <quan@os.amperecomputing.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: kernel test robot <lkp@intel.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] net: xgene: Fix unused xgene_enet_of_match warning for !CONFIG_OF
+Date: Thu, 19 Oct 2023 13:23:37 -0500
+Message-ID: <20231019182338.832913-1-robh@kernel.org>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAKFzMWUC/52NSwqDMBRFt1Iy7iv5iJaOuo8iEuIzBjSRlxAr4
- t4bXUJn99zBOTuLSA4je912RphddMEXkPcbM6P2FsH1hZnkUgkunhATebNs0JPLSBE8JlhX7YG
- WOdrunJ1JNIEBNdSSaz30StasCBfCwX2v2KctPLqYAm1XO4vz/SuTBQioUFVKNlw1Sr9tCHbCh wkza4/j+AHiV2SL5QAAAA==
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1697739682; l=2821;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=fmlQfhWbiCM67LS2nuJX0KI/1NzFMdegLgKJe+cta+Q=; b=wDUtP3Ror/d2KFXBRlN9RT2CDGzEW5TDMAgY6ZpEV6DYbx7hZuns1er9Wb2wR7lXEPmqCtncN
- RTkxhUuMmpTDTdSDV0A6ncnIw87LXyDFbMHjm6T7oMQfm5T/3jQHUTh
-X-Mailer: b4 0.12.3
-Message-ID: <20231019-strncpy-drivers-net-wwan-rpmsg_wwan_ctrl-c-v2-1-ecf9b5a39430@google.com>
-Subject: [PATCH v2] net: wwan: replace deprecated strncpy with strscpy
-From: Justin Stitt <justinstitt@google.com>
-To: Stephan Gerhold <stephan@gerhold.net>, Loic Poulain <loic.poulain@linaro.org>, 
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	Justin Stitt <justinstitt@google.com>, Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-strncpy() is deprecated for use on NUL-terminated destination strings
-[1] and as such we should prefer more robust and less ambiguous string
-interfaces.
+Commit b0377116decd ("net: ethernet: Use device_get_match_data()") dropped
+the unconditional use of xgene_enet_of_match resulting in this warning:
 
-We expect chinfo.name to be NUL-terminated based on its use with format
-strings and sprintf:
-rpmsg/rpmsg_char.c
-165:            dev_err(dev, "failed to open %s\n", eptdev->chinfo.name);
-368:    return sprintf(buf, "%s\n", eptdev->chinfo.name);
+drivers/net/ethernet/apm/xgene/xgene_enet_main.c:2004:34: warning: unused variable 'xgene_enet_of_match' [-Wunused-const-variable]
 
-... and with strcmp():
-|  static struct rpmsg_endpoint *qcom_glink_create_ept(struct rpmsg_device *rpdev,
-|  						    rpmsg_rx_cb_t cb,
-|  						    void *priv,
-|  						    struct rpmsg_channel_info
-|  									chinfo)
-|  ...
-|  const char *name = chinfo.name;
-|  ...
-|  		if (!strcmp(channel->name, name))
+The fix is to drop of_match_ptr() which is not necessary because DT is
+always used for this driver (well, it could in theory support ACPI only,
+but CONFIG_OF is always enabled for arm64).
 
-Since chinfo is initialized as such (just above the strscpy()):
-
-|       struct rpmsg_channel_info chinfo = {
-|               .src = rpwwan->rpdev->src,
-|               .dst = RPMSG_ADDR_ANY,
-|       };
-
-... we know other members are zero-initialized. This means no
-NUL-padding is required (as any NUL-byte assignments are redundant).
-
-Considering the above, a suitable replacement is `strscpy` due to the
-fact that it guarantees NUL-termination on the destination buffer
-without unnecessarily NUL-padding.
-
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
-Signed-off-by: Justin Stitt <justinstitt@google.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Fixes: b0377116decd ("net: ethernet: Use device_get_match_data()")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202310170627.2Kvf6ZHY-lkp@intel.com/
+Signed-off-by: Rob Herring <robh@kernel.org>
 ---
-Changes in v2:
-- clarify chinfo _is_ zero-init'd in commit msg (thanks Stephan)
-- use strscpy instead (thanks Kees, Stephan)
-- Link to v1: https://lore.kernel.org/r/20231018-strncpy-drivers-net-wwan-rpmsg_wwan_ctrl-c-v1-1-4e343270373a@google.com
----
-Note: found with grep
-Note: build-tested only
-
-I've rolled Kees' RB into this patch from v1 as it matches his previous
-review.
----
- drivers/net/wwan/rpmsg_wwan_ctrl.c | 2 +-
+ drivers/net/ethernet/apm/xgene/xgene_enet_main.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/wwan/rpmsg_wwan_ctrl.c b/drivers/net/wwan/rpmsg_wwan_ctrl.c
-index 86b60aadfa11..26756ff0e44d 100644
---- a/drivers/net/wwan/rpmsg_wwan_ctrl.c
-+++ b/drivers/net/wwan/rpmsg_wwan_ctrl.c
-@@ -37,7 +37,7 @@ static int rpmsg_wwan_ctrl_start(struct wwan_port *port)
- 		.dst = RPMSG_ADDR_ANY,
- 	};
- 
--	strncpy(chinfo.name, rpwwan->rpdev->id.name, RPMSG_NAME_SIZE);
-+	strscpy(chinfo.name, rpwwan->rpdev->id.name, sizeof(chinfo.name));
- 	rpwwan->ept = rpmsg_create_ept(rpwwan->rpdev, rpmsg_wwan_ctrl_callback,
- 				       rpwwan, chinfo);
- 	if (!rpwwan->ept)
-
----
-base-commit: 58720809f52779dc0f08e53e54b014209d13eebb
-change-id: 20231018-strncpy-drivers-net-wwan-rpmsg_wwan_ctrl-c-3f620aafd326
-
-Best regards,
---
-Justin Stitt <justinstitt@google.com>
+diff --git a/drivers/net/ethernet/apm/xgene/xgene_enet_main.c b/drivers/net/ethernet/apm/xgene/xgene_enet_main.c
+index 56f2b3c229af..44900026d11b 100644
+--- a/drivers/net/ethernet/apm/xgene/xgene_enet_main.c
++++ b/drivers/net/ethernet/apm/xgene/xgene_enet_main.c
+@@ -2155,7 +2155,7 @@ static void xgene_enet_shutdown(struct platform_device *pdev)
+ static struct platform_driver xgene_enet_driver = {
+ 	.driver = {
+ 		   .name = "xgene-enet",
+-		   .of_match_table = of_match_ptr(xgene_enet_of_match),
++		   .of_match_table = xgene_enet_of_match,
+ 		   .acpi_match_table = ACPI_PTR(xgene_enet_acpi_match),
+ 	},
+ 	.probe = xgene_enet_probe,
+-- 
+2.42.0
 
 
