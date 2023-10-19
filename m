@@ -1,109 +1,182 @@
-Return-Path: <netdev+bounces-42497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF2C77CEF2B
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 07:41:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 785287CEF54
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 07:49:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F01621C20A05
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 05:41:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 740341C20849
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 05:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C8D446689;
-	Thu, 19 Oct 2023 05:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2DB46699;
+	Thu, 19 Oct 2023 05:48:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="KAbuq3aO"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="W1EOf7KB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EFB17C2
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:41:40 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 410931B5;
-	Wed, 18 Oct 2023 22:41:31 -0700 (PDT)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39J5fFtu048503;
-	Thu, 19 Oct 2023 00:41:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1697694075;
-	bh=Vk+cRnHo6muGejtbpUC0xCLLcp+NHau3bYlkm4WogkI=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=KAbuq3aOYa6iy4bTY7mQUxuZHSz5sctfiTPXo2F0dmB7KbJBpObOyMtun+QrF4Dt2
-	 DGLLoFkUgpv5LpNq1OLumrQe6giytJs6ApGxNwz7zUQjBEsYOPMywqNxjB/jbpaXUD
-	 AZa8iSrncuOoZun8+6RlhWEneCmMJPGPgrHhuFI8=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39J5fFne118705
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 19 Oct 2023 00:41:15 -0500
-Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 19
- Oct 2023 00:41:14 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 19 Oct 2023 00:41:15 -0500
-Received: from [172.24.227.83] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39J5f6SO041333;
-	Thu, 19 Oct 2023 00:41:07 -0500
-Message-ID: <4131fd06-0e46-5454-fbdb-85ccabc0e8b0@ti.com>
-Date: Thu, 19 Oct 2023 11:11:06 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3594F46698
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:48:55 +0000 (UTC)
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF3E8B6;
+	Wed, 18 Oct 2023 22:48:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1697694527;
+	bh=CR7dWSEwjH6imZHnVlXAbeQgnXp1ZZMTjjN1Ld5riCc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=W1EOf7KB8sRaSXlw9dVE0T0wXyu1Oyqnzkx0PJNcwP5Q2nbMp0apO4UJHlIciNHRk
+	 3kMzxiWUH5Z2mV0xY95EP9WXEl3If65YbcBpSNzCvrE3J4Xn94sj67kQhNEjObHOTi
+	 1Dbx4XTWm49rA+UA9tv98qjsngmFQ8VxvJptN6cTEKReQsdLK68fUf4Hs0QKUe8tC7
+	 ArKUDEs2nKzd8JVTR8hHeBNyx2I8oS/3Z1LlzQc5yMg9ZpKUwwzwh2uWIxjUgtbNMS
+	 zWmsBN6FGZf+sjrYpM0NaXgVljCVXIfYJWI/kH/KpFK3okTvGn8Qg67ECIg5vvRxVo
+	 YhDorjcy8HzEw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4S9xbf4FkWz4xQQ;
+	Thu, 19 Oct 2023 16:48:46 +1100 (AEDT)
+Date: Thu, 19 Oct 2023 16:48:44 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Yury Norov <yury.norov@gmail.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Paul Greenwalt <paul.greenwalt@intel.com>,
+ Pawel Chmielewski <pawel.chmielewski@intel.com>
+Subject: linux-next: manual merge of the bitmap tree with the net-next tree
+Message-ID: <20231019164844.4cc37f93@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net-next] net: ethernet: ti: davinci_mdio: Fix the
- revision string for J721E
-Content-Language: en-US
-To: Nishanth Menon <nm@ti.com>, <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <rogerq@ti.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
-        <horms@kernel.org>, <linux-omap@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        Thejasvi Konduru
-	<t-konduru@ti.com>,
-        <linux-arm-kernel@lists.infradead.org>, <u-kumar1@ti.com>,
-        Neha Malcom Francis <n-francis@ti.com>
-References: <20231018140009.1725-1-r-gunasekaran@ti.com>
- <20231018154448.vlunpwbw67xeh4rj@unfasten>
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
-In-Reply-To: <20231018154448.vlunpwbw67xeh4rj@unfasten>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: multipart/signed; boundary="Sig_/iYTkWDP_1_tS6QBLU_WRv4Z";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Nishanth, Jakub,
+--Sig_/iYTkWDP_1_tS6QBLU_WRv4Z
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 10/18/23 9:14 PM, Nishanth Menon wrote:
-> 
-> We then have the following steps potentially
-> 
-> Drop the fixes and Maintain both SR2.0 and SR1.0 (add SR1.1) so that
-> we can merge the socinfo fixes without breaking bisectability.
+Hi all,
 
-I will drop the fixes tag then and maintain SR1.0, SR1.1, SR2.0 for J721E
-and mention in the commit msg that this is a preparatory patch to fix the
-incorrect revision string generation. And in the next cycle, I will
-send out a patch removing the invalid revision IDs.
+Today's linux-next merge of the bitmap tree got a conflict in:
 
-Ideally I would prefer to do this for all the SoCs, but I would need some
-time to compile the list. So for now, I will send a v2 targeting only J721E.
+  include/linux/linkmode.h
 
-Please let me know your thoughts on this.
+between commit:
 
-> 
-> Also in the future, please CC me as the reporter and for Soc-fixes
-> dependency issues (I am listed in the MAINTAINERS file).
-> 
-Sure.
+  26c5334d344d ("ethtool: Add forced speed to supported link modes maps")
 
--- 
-Regards,
-Ravi
+from the net-next tree and commit:
+
+  f849608560af ("linkmode: convert linkmode_{test,set,clear,mod}_bit() to m=
+acros")
+
+from the bitmap tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc include/linux/linkmode.h
+index cd38f89553e6,f231e2edbfa5..000000000000
+--- a/include/linux/linkmode.h
++++ b/include/linux/linkmode.h
+@@@ -2,21 -2,6 +2,18 @@@
+  #define __LINKMODE_H
+ =20
+  #include <linux/bitmap.h>
+ +
+- static inline void linkmode_set_bit(int nr, volatile unsigned long *addr)
+- {
+- 	__set_bit(nr, addr);
+- }
+++#define linkmode_set_bit	__set_bit
+ +
+ +static inline void linkmode_set_bit_array(const int *array, int array_siz=
+e,
+ +					  unsigned long *addr)
+ +{
+ +	int i;
+ +
+ +	for (i =3D 0; i < array_size; i++)
+ +		linkmode_set_bit(array[i], addr);
+ +}
+ +
+  #include <linux/ethtool.h>
+  #include <uapi/linux/ethtool.h>
+ =20
+@@@ -53,25 -38,20 +50,10 @@@ static inline int linkmode_andnot(unsig
+  	return bitmap_andnot(dst, src1, src2,  __ETHTOOL_LINK_MODE_MASK_NBITS);
+  }
+ =20
+- static inline void linkmode_clear_bit(int nr, volatile unsigned long *add=
+r)
+- {
+- 	__clear_bit(nr, addr);
+- }
+-=20
+- static inline void linkmode_mod_bit(int nr, volatile unsigned long *addr,
+- 				    int set)
+- {
+- 	if (set)
+- 		linkmode_set_bit(nr, addr);
+- 	else
+- 		linkmode_clear_bit(nr, addr);
+- }
+-=20
+- static inline int linkmode_test_bit(int nr, const volatile unsigned long =
+*addr)
+- {
+- 	return test_bit(nr, addr);
+- }
++ #define linkmode_test_bit	test_bit
+ -#define linkmode_set_bit	__set_bit
++ #define linkmode_clear_bit	__clear_bit
++ #define linkmode_mod_bit	__assign_bit
+ =20
+ -static inline void linkmode_set_bit_array(const int *array, int array_siz=
+e,
+ -					  unsigned long *addr)
+ -{
+ -	int i;
+ -
+ -	for (i =3D 0; i < array_size; i++)
+ -		linkmode_set_bit(array[i], addr);
+ -}
+ -
+  static inline int linkmode_equal(const unsigned long *src1,
+  				 const unsigned long *src2)
+  {
+
+--Sig_/iYTkWDP_1_tS6QBLU_WRv4Z
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmUwwzwACgkQAVBC80lX
+0Gw8dQf/ckBlyqp0x9E8fPVAlHEGxWz7oIixRXFmyKVZtQX+FBMrvd+8ZgWRtjvk
+UjnR7VBJnwW5dPik7yaw+9dkdwZX7xFx8ALRAt24bMdf3idw2nD3/djdr+EjnEz7
+rlAajFjWOFfCuvbx3DAMwZT5yWJkdCzy5qxhhmNMHpku0oQv2E13W+bgb/rGFQbb
+kyXJwRITcfuoVkLZDv3dfcwueSFu29kty8hBP2dej037TgBSPaG2kej62HWyKH4s
+gZEATqGiQQgKvwRHLAmGk7B08TZBqrjieO/mwF+V7sGvaf+UF8R6BP/+UpmrLx8V
+mXGwoP4E023L9ekDlPpSK8Z2DeK+FQ==
+=C7Mx
+-----END PGP SIGNATURE-----
+
+--Sig_/iYTkWDP_1_tS6QBLU_WRv4Z--
 
