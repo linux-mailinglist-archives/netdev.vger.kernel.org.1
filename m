@@ -1,141 +1,137 @@
-Return-Path: <netdev+bounces-42754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0BD77D009C
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:33:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B07177D00AC
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:35:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0BF31C20B2D
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:33:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14E2AB213A9
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B97339BF;
-	Thu, 19 Oct 2023 17:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A77335DB;
+	Thu, 19 Oct 2023 17:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NMpLnKVJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D05tFMRf"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7050D35516
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:32:41 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58050132
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:32:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697736759; x=1729272759;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2e5umfMsab6ue4cMJEuaxUB+RQvPHIiRu+TRKMkOg9M=;
-  b=NMpLnKVJ1q8yP/qBdd3UkqXxqB4db+s7RbteIAUWW7n6C9lUkNPXy9hr
-   eOhFud8rCAQnReKuP1XXOf8Uohy7GmBX0eCxXptMcPEMR37TC8cqoWTAv
-   0L/cWhl5tiECiqXJZlvRlDNDidLmzHY1mnlimMDPlE0DKLRoZq1ACvNVK
-   +5GkFMLK1SpXYZiznGfI0jboStDS5DS7QtTDkOhM71RNsuB6E0EWiOUV8
-   54Koxr+BKumxRaOcE7j+PwbBylF511u8zLV5iYG8mgepcpKGWoO/upf2O
-   DCdwu0JL0NCwxPGqq/BZvItNNeRhUC7iRwP7kRoBrzpdQLB0U0tR9ZFy2
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="389183726"
-X-IronPort-AV: E=Sophos;i="6.03,237,1694761200"; 
-   d="scan'208";a="389183726"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 10:32:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="760722710"
-X-IronPort-AV: E=Sophos;i="6.03,237,1694761200"; 
-   d="scan'208";a="760722710"
-Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 10:32:36 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: netdev@vger.kernel.org,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Simon Horman <horms@kernel.org>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next 11/11] ixgbe: fix end of loop test in ixgbe_set_vf_macvlan()
-Date: Thu, 19 Oct 2023 10:32:27 -0700
-Message-ID: <20231019173227.3175575-12-jacob.e.keller@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231019173227.3175575-1-jacob.e.keller@intel.com>
-References: <20231019173227.3175575-1-jacob.e.keller@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D571438DD7
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:34:54 +0000 (UTC)
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3DE9CF;
+	Thu, 19 Oct 2023 10:34:53 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3b2ec9a79bdso1245793b6e.3;
+        Thu, 19 Oct 2023 10:34:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697736893; x=1698341693; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/62ZgoTi3SSzkbLGsJ1Vo2TqsEllvmMDi2mGJdwfjxg=;
+        b=D05tFMRfJaT0G+qaDSQzOxN4sUNGrhkEoqb0AFPn/0/z30y+26w3HEvUWf3VrPFSK0
+         bvyen7jb5Ru9GavQC69zHaJBzNrLiz6CFrZtNhS1CWey0NdHV/GEgy0GEpU8+0TUdwT8
+         /GFjafz4Hj2e8M4KSF9JIvzB8VVmGC8C2UtwivvsJjk8TwpWepxWTkMv533yQC2PJDWm
+         +BP7MysscyMWIi8OJsP7cFffFiN0YZFp9rXeRGjODYM/r032h4mMQlJumy3KtUzF/f+y
+         HhegkCdHtUWGhIFkRGu+Zw/GWSAgiDE+Ugmqi8ImN8jXPFKWcpp2rwtXBPFuIuNi/nUp
+         p2bA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697736893; x=1698341693;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/62ZgoTi3SSzkbLGsJ1Vo2TqsEllvmMDi2mGJdwfjxg=;
+        b=L/HnUf9pMr/kZVdmcGAYdtVp+GRZz/UKqrUIJoGJZV+UCBL0/qCHms+/kiw5tlzZgs
+         D1bxmFFdNgyM6FHaR6cB1sggCgpfiikiPCwSTdtsCXd9s33j8p+YY+aZQW4LLbXPh/PT
+         NfjaUlRRkzHJd6Buym9pvyLJsZhUDfRspLT5aYcC6YKArRno61Lfq5opEy/5SWTed0nC
+         mpZdK3f0ZONtN/eSs7LEcE6EvsuI6mmfWEShFc77clgKg3YzDmziROmS+vaXrHICgh7H
+         SQm8JeDUxYgLNDjBqEUFQ9i5NGoOz6UBPeHETPeK1OWAwpqrUQ3Mu0IFeUyTpCxctifM
+         C31Q==
+X-Gm-Message-State: AOJu0YwcmNn17mKq+ojWgasZav9A3QfLwIpiMbFVjCzS1stwdwOQHFhc
+	M2JiGJ4qDiFuoF7tI2/LI0Y=
+X-Google-Smtp-Source: AGHT+IFzK8OJRCXovwSUpAWCNgFhVZ0dOThZwS+dQBOQj9NV+mZfr+sn/sgCC+FNpjGYB1/KPSStpg==
+X-Received: by 2002:a05:6358:facd:b0:143:a15f:65d4 with SMTP id ts13-20020a056358facd00b00143a15f65d4mr2511206rwb.26.1697736892795;
+        Thu, 19 Oct 2023 10:34:52 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id bv8-20020a632e08000000b00578b8fab907sm16521pgb.73.2023.10.19.10.34.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Oct 2023 10:34:52 -0700 (PDT)
+Message-ID: <68d7e387-aa2b-40a6-b0bf-f2f57053df8e@gmail.com>
+Date: Thu, 19 Oct 2023 10:34:47 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1 1/1] ethtool: fix clearing of WoL flags
+Content-Language: en-US
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20231019070904.521718-1-o.rempel@pengutronix.de>
+ <20231019090510.bbcmh7stzqqgchdd@lion.mk-sys.cz>
+ <20231019095140.l6fffnszraeb6iiw@lion.mk-sys.cz>
+ <20231019122114.5b4a13a9@kmaincent-XPS-13-7390>
+ <20231019105048.l64jp2nd46fxjewt@lion.mk-sys.cz>
+ <20231019152743.09b28ef4@kmaincent-XPS-13-7390>
+ <c0f98227-459f-43c6-9c0e-db0a7ea07c9e@gmail.com>
+ <20231019164553.zcc6d2vbxzw4m4c2@lion.mk-sys.cz>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20231019164553.zcc6d2vbxzw4m4c2@lion.mk-sys.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Dan Carpenter <dan.carpenter@linaro.org>
+On 10/19/23 09:45, Michal Kubecek wrote:
+> On Thu, Oct 19, 2023 at 09:20:31AM -0700, Florian Fainelli wrote:
+>> On 10/19/23 06:27, Köry Maincent wrote:
+>>> On Thu, 19 Oct 2023 12:50:48 +0200
+>>> Michal Kubecek <mkubecek@suse.cz> wrote:
+>>>
+>>>> On Thu, Oct 19, 2023 at 12:21:14PM +0200, Köry Maincent wrote:
+>>>>> On Thu, 19 Oct 2023 11:51:40 +0200 > Michal Kubecek <mkubecek@suse.cz>
+>>>>> wrote:
+>>>>>>
+>>>>>> The issue was indeed introduced by commit 108a36d07c01 ("ethtool: Fix
+>>>>>> mod state of verbose no_mask bitset"). The problem is that a "no mask"
+>>>>>> verbose bitset only contains bit attributes for bits to be set. This
+>>>>>> worked correctly before this commit because we were always updating
+>>>>>> a zero bitmap (since commit 6699170376ab ("ethtool: fix application of
+>>>>>> verbose no_mask bitset"), that is) so that the rest was left zero
+>>>>>> naturally. But now the 1->0 change (old_val is true, bit not present in
+>>>>>> netlink nest) no longer works.
+>>>>>
+>>>>> Doh I had not seen this issue! Thanks you for reporting it.
+>>>>> I will send the revert then and will update the fix for next merge-window.
+>>>>
+>>>> Something like the diff below (against current mainline) might do the
+>>>> trick but it's just an idea, not even build tested.
+>>>
+>>> Seems a good idea without adding too much complexity to the code.
+>>> Will try that and send it in next merge window.
+>>
+>> Not sure what you mean by next merge window, we need a fix for right now, or
+>> we need to revert 6699170376ab ("ethtool: fix application of verbose no_mask
+>> bitset").
+> 
+> Not that one, that's an old commit that was correct from functional
+> point of view (the only problem was that it sometimes triggered
+> a notification even when the value was not changed but that also happens
+> in other places).
+> 
+> A revert of commit 108a36d07c01 ("ethtool: Fix mod state of verbose
+> no_mask bitset") is already in net tree as commit 524515020f25 ("Revert
+> "ethtool: Fix mod state of verbose no_mask bitset"").
 
-The list iterator in a list_for_each_entry() loop can never be NULL.
-If the loop exits without hitting a break then the iterator points
-to an offset off the list head and dereferencing it is an out of
-bounds access.
-
-Before we transitioned to using list_for_each_entry() loops, then
-it was possible for "entry" to be NULL and the comments mention
-this.  I have updated the comments to match the new code.
-
-Fixes: c1fec890458a ("ethernet/intel: Use list_for_each_entry() helper")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-index cd593f5719e1..9cfdfa8a4355 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-@@ -640,6 +640,7 @@ static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
- 				int vf, int index, unsigned char *mac_addr)
- {
- 	struct vf_macvlans *entry;
-+	bool found = false;
- 	int retval = 0;
- 
- 	if (index <= 1) {
-@@ -661,22 +662,22 @@ static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
- 	if (!index)
- 		return 0;
- 
--	entry = NULL;
--
- 	list_for_each_entry(entry, &adapter->vf_mvs.l, l) {
--		if (entry->free)
-+		if (entry->free) {
-+			found = true;
- 			break;
-+		}
- 	}
- 
- 	/*
- 	 * If we traversed the entire list and didn't find a free entry
--	 * then we're out of space on the RAR table.  Also entry may
--	 * be NULL because the original memory allocation for the list
--	 * failed, which is not fatal but does mean we can't support
--	 * VF requests for MACVLAN because we couldn't allocate
--	 * memory for the list management required.
-+	 * then we're out of space on the RAR table.  It's also possible
-+	 * for the &adapter->vf_mvs.l list to be empty because the original
-+	 * memory allocation for the list failed, which is not fatal but does
-+	 * mean we can't support VF requests for MACVLAN because we couldn't
-+	 * allocate memory for the list management required.
- 	 */
--	if (!entry || !entry->free)
-+	if (!found)
- 		return -ENOSPC;
- 
- 	retval = ixgbe_add_mac_filter(adapter, mac_addr, vf);
+Got it, thanks!
 -- 
-2.41.0
+Florian
 
 
