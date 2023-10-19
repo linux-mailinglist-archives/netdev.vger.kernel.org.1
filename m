@@ -1,108 +1,69 @@
-Return-Path: <netdev+bounces-42704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C397CFEA4
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:48:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 042897CFEB7
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9A651C20D4F
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:48:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33DE51C20BB9
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C38315AE;
-	Thu, 19 Oct 2023 15:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 686FF315B3;
+	Thu, 19 Oct 2023 15:53:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Igeq/pus"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="yIW4Akfd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAD530FB0
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 15:47:58 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1397124
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 08:47:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697730476; x=1729266476;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=gfP/iTQ6rphMmppoGcCiQW7XvEV/+CTyMnIb5DtW9o4=;
-  b=Igeq/pusdL2/8VhyPOafzKq0xO+P8rX6ME4x7UrKEzzHq9BuA/pKKVAc
-   Nv8xXsGLb/TvH+pMdczlJkXsLqlR06D6Ygmae2undk2V3in5b/ogsCvZ/
-   e4udo5P9n/fI8H80wg+nyRlcg0rCRCJudDfYOuejfjBBwM9dAjX9UIzua
-   ayT7r5rgX3GzPH0dpBXBTB++PfD+dzYPFO+Mf3Du+xAYdhCUuT6/64fiy
-   Cn+Xx9iJUyUmO17fuO7Cd0xmcXBb0EACY4TGBQ9JBc4Uge7S8elTOjqJP
-   mrIRHe51aAMfJob1hwg59Tl0dsPr2MmysSyFa/An/q/tpgZHHMfrQqIdG
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="390173814"
-X-IronPort-AV: E=Sophos;i="6.03,237,1694761200"; 
-   d="scan'208";a="390173814"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 08:47:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="900788719"
-X-IronPort-AV: E=Sophos;i="6.03,237,1694761200"; 
-   d="scan'208";a="900788719"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Oct 2023 08:45:43 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 19 Oct 2023 08:47:49 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 19 Oct 2023 08:47:48 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Thu, 19 Oct 2023 08:47:48 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Thu, 19 Oct 2023 08:47:47 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCEC230FB0
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 15:53:01 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2AE93;
+	Thu, 19 Oct 2023 08:53:00 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J/eeq46t8VUSwUrEEYoB8bhDCuRz0G+tl5YkCZtMhDqOSHNZCKPzJB9FULTAMDUDjlykblBoM1W7phY0EQ6PvhDaB4gadbXLtr/nx20AHvQohvcX85HswF3Ihf0MaUoOSbbxDBipuAN2f3P3050CPh1bEqVSzcKuYuxbIou5Y5ls8e/RTFe7V8zBI1/d3uSwIDqm+QrUCNjzxRBDhmFq0fBMyP4p/1LB70m8aFnkW7QmNDL6D2EZ4fq567ybLiNY23TlBMXRP/UGc4tU7B99C4o27TdcUDj7LSFVKPwTOWH9f5/zNQUWiuvY0ChKjZwWBRooExvnRugXNXHH+3AGdw==
+ b=Stx5/N+dezBItwtYnDtY+rLledCd2/I9e0dcTTGKn7Gsv3I/JEOXPz7lepLoV1DJi3EjAKu/SWbHe3DCs54W5g03NAQxcFwbDGgDshDYPaZRmpjQi+MQc/p3WveQQM0hKy9PicZdGaatJps1y1sDqWKPidXxs96Y2lXKOyXPGD+AxN/W28RTuOIu6/536shoQEPREqfSsx2Na3e3vMrSMhlWurONXKxzsnygfVd/SM1Co1XjlW1cxpe+Xnx4/T2US9ZJnME34Lel7MfNkhFElIFXuleusNd/BZwje10kKB/syAx/Mt58yogzvUEurD3bV7WCdW6p6YH3Bw7U0a8rsw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rNxRWJ6J8qWMMGROg1u3Qk5CzQAtYkQ4FvCX3Z5ryco=;
- b=P/0xMh8y4gXAdnsBtKqxcLFCrPlpNvl113r7uvcB4H6OigcQgzDAC30SPniimKH2Poe6twYu0VQluQD75Q3kHN3HBrnZ0rnjWN1ik7cVqh3XL4+7Lv4/huhXkA2HT0Gj3CZPHCduK6jDJvHBRyADuRdbk3UoHk9lgg7PdtGXvJdBF0htBUZEkErzdgbefynlBFNu8AQmLJHDkBa3TIDkrOua5QevpnLe4xPepNoMcezNfbjalwpneFFS/Y8Hb6d0bbposCbNEg1o2wGMzh4+5uGK69w99Pq9c5YskoAmh3xey5jj4Miz0TdsjjnMCwhg+Azxi7O0vCdsVwVN5fb8Rw==
+ bh=o6HyOtaYVrGZp/sX39K3pEqkmVfgIuuKL3KesR0ck9k=;
+ b=Uk8rPMWe+Y7Jzj8dGY3Bie/7M+fxxntZ6yJcvgvrQBoANNi+KdNrsIyobfTj7pG5o4GKWt44HMRHE8bbfm3uwqdOC22vX/HOhUgLfSKHFypsHZhOG8op/b1B0ucu7UifUJ7i6f9A0Hycliwg5znuV4mdG42lhTOoZfNuj6lavrEleWW2uLLN4msmxLKq1hnaVdS+p0bFSu2PVF24jG3pNwV3ivCN520ai6pjeIo7TxAJ5SL/iT/lRXmtxA/5yslqfQDrH+UGJF1LZ17CjVLJEax7kEeXx0AzduY2JlGqeMG+HG/nAhdCEPhzEkg/Fn0XOTIiVjObg/dfJm4k73AMQA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=o6HyOtaYVrGZp/sX39K3pEqkmVfgIuuKL3KesR0ck9k=;
+ b=yIW4Akfd0V3X1XdljUPgbgfjU0gE3pnV/4Uv4uoUUGsN0wPuY+tHFczpxzygckPUlBhgRH0f6cSDH+3MxINExz/wYEXmOOtXmF4rlT79BiIkc6JFGm4f/C5IFUP+RIYULRuUMZ7Zi2iNOAEpIoZfR5cLfTaCgF6LNMIR/A95svY=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5140.namprd11.prod.outlook.com (2603:10b6:303:9e::21)
- by CH0PR11MB5707.namprd11.prod.outlook.com (2603:10b6:610:110::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.24; Thu, 19 Oct
- 2023 15:47:44 +0000
-Received: from CO1PR11MB5140.namprd11.prod.outlook.com
- ([fe80::db8e:c076:1c95:fb66]) by CO1PR11MB5140.namprd11.prod.outlook.com
- ([fe80::db8e:c076:1c95:fb66%4]) with mapi id 15.20.6907.025; Thu, 19 Oct 2023
- 15:47:43 +0000
-Message-ID: <412e63a7-278e-369d-1ed4-9d930770d9e0@intel.com>
-Date: Thu, 19 Oct 2023 08:47:41 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH net-next] ethtool: untangle the linkmode and ethtool
- headers
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ DS0PR12MB8071.namprd12.prod.outlook.com (2603:10b6:8:df::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6886.40; Thu, 19 Oct 2023 15:52:56 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::e31c:de3c:af9d:cd2c]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::e31c:de3c:af9d:cd2c%5]) with mapi id 15.20.6886.034; Thu, 19 Oct 2023
+ 15:52:56 +0000
+Message-ID: <c418625c-755f-4e2f-93e7-f2a5d8c7fba3@amd.com>
+Date: Thu, 19 Oct 2023 08:52:52 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] pds_core: add an error code check in pdsc_dl_info_get
+To: Su Hui <suhui@nfschina.com>, brett.creeley@amd.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+References: <20231019083351.1526484-1-suhui@nfschina.com>
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>
-CC: <netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<vladimir.oltean@nxp.com>, <gal@nvidia.com>
-References: <20231019152815.2840783-1-kuba@kernel.org>
-From: "Greenwalt, Paul" <paul.greenwalt@intel.com>
-In-Reply-To: <20231019152815.2840783-1-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20231019083351.1526484-1-suhui@nfschina.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0058.namprd04.prod.outlook.com
- (2603:10b6:303:6a::33) To CO1PR11MB5140.namprd11.prod.outlook.com
- (2603:10b6:303:9e::21)
+X-ClientProxiedBy: PH7PR17CA0055.namprd17.prod.outlook.com
+ (2603:10b6:510:325::16) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,213 +71,93 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5140:EE_|CH0PR11MB5707:EE_
-X-MS-Office365-Filtering-Correlation-Id: 73a60629-7e2b-4fd7-52c8-08dbd0babb62
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|DS0PR12MB8071:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9fb85e3d-6780-4fd7-a8ed-08dbd0bb75fa
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SL0z+6b6loWacDn4lOSOJYmUBeVytcHalL/U5AiMO6mCaJuvXwROokX7IEsURlodJTvhqY3zLrr0WwWvwuIdFRk9l28vLKKYNY3LvmFuI2N5gaI2WYnjkslklBzhl9jQu/nYoeSF/K8Pr8mLpDmlU8JlCGNxRqSPGaaS9xJuRYolMlgX+boQG5690edYoyNT3IaYSdYzzRxEW0IuK7yBHjmwdFppjLfcUhJCsC+R0+H9j87OK63zJ1lEC6sRuzJdgun9urna3ae23b60b1n5fxt7haQn9cp6w9+eXmdTa8SRlxiOluUQIoyt9E+abdQ+A8S9wGlN0LDz4b87DFtbgcY5FDn2kpe6T6D7DwdrJ/RWs6dG6A80hyH821U80uYS3dL9S5ErMidhPzgW+r9qJnl5Btj70ltkV9LwCEZn8EmIkFO6TN56LtNUNkAibFbhrsCqAdXxxKmvAEZvnlbc8CXxuALuU9ixMIsfInMz1yp419rAj8IgQUMw1ZWd0/gRRA/yqNYzoddwJIMvRjxwfmd6N4nqWGvsm4E1skBKMFV0yMglQg1KfolDQCayvl0EKjMAI8dCusZmyBZ+p9fBh3V2dHfVMhIKHfRhilAu6puDMFnePxazUoRQpnxohJ1bEgfNTOZDJDdiYaHMmeI3cQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5140.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(396003)(376002)(366004)(39860400002)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(82960400001)(26005)(31686004)(38100700002)(83380400001)(5660300002)(66946007)(7416002)(8676002)(4326008)(8936002)(66476007)(316002)(86362001)(2906002)(66556008)(6486002)(53546011)(6506007)(478600001)(31696002)(6512007)(41300700001)(2616005)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info:
+	qGoNHj63UTSRb4+N2iV3FemDhbvN31tU60JdIAp7B8thwIU6+c+2jLxOSrMSJ9rwTa5eUrOKbrdSjxCYvNp98i6qaqzgTlyO0EpWwUb+gWLBTxCEjsOxCrXgwjDz3QST1QLSRFElynV6kuRaUqBC/Ok98CkN3irW53d3oTS+VNjiUuTsqXUrkb/SZslYfjaCGRcszQjiV9IufHmJlUhNs4/jjCWJJy5bQ1ioyTLj9fyNgs9w5Fs1jSGXT0eIaJt6ww/Cuegpn+JonWYYXJJaNeATdGF3E5ebGADj81nTMZj9j8H0e/g6efN9rKgR6VFryQZAjx6SA9DKDmM2l4yooV6BqeItgBHYqWGnr2U5wM4mbpP71B6rmJ0NAkVWZA72c+eYz4F9OQc1llyPG7KEhrHuxFC0lnYvMwpFa8yhe+zrRsovd09F7ZLPy8EfRT3eZnDjEFUX605541v5qjPRZrxhyI3oPy1nCjUcNAfWDDlYDYOkpuz6Yk+iG4xxPeFKtz/Af/QE1PKv7hRQhAO5JPoSxthVF6t+xKkzP91rgnZPDhRx3ahgYMQHi+zOyKozDAPQD+uFXyy1ESpeaqU4DQCEJ/PLsA7VuKRD5Mu27T0HeO4mouL27k/Z54Zx+dSfSoQkJtiPArq8bkHEEm6pOA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(346002)(376002)(396003)(39860400002)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(6666004)(6506007)(66476007)(66556008)(41300700001)(66946007)(6486002)(316002)(478600001)(6512007)(8936002)(36756003)(5660300002)(8676002)(4326008)(2906002)(86362001)(4744005)(38100700002)(2616005)(26005)(53546011)(31696002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bkFURjZBT3JEeWhLNzZkMGw0azN5Z1BUYzJpL3E1bVRVMHNoeGVLTzBadVZv?=
- =?utf-8?B?Y0hjdjlnNjc0SlpBN1cwNS9oZTAvVzNmSjk3V2djMFk4Q1hSeUVXWmRkajl5?=
- =?utf-8?B?K0FBa2xTNkJ1bXhXdlYxdElVRHJUQjNHaEtFQzQ1NXpXdlNYZW8rcVpjcTlo?=
- =?utf-8?B?WjdUODFzcU5xSy9KbHMzQTlDWmFjQzBTbFpVaUt1NmhLNzFJQm5IMkdhcGRB?=
- =?utf-8?B?b09sd1RPclFJVXRTQ3ZYMkhzc1JEMFlIK0IzTnZNNXdwR3YxdmFLa0IycGh6?=
- =?utf-8?B?MVExNXhoVHpkMlhxYzNzcUJvRVM5dGEvSUEyYjk5WWs1eDhjbXA2ZjV1VTBQ?=
- =?utf-8?B?ZDh0Ni9nTVJOUG5HWmVlWlNjS3VUTEpsQ25UTit0VCtWWHZtc3luV0RJWVJh?=
- =?utf-8?B?cVpLbG9zNkc0bVo0QTlxN2R1REdOaFBBNFVtckJ2L1duNGpQeWN3aVRFcDBp?=
- =?utf-8?B?UGdsZHJmZ1MyYXM2ckZkVzZrTm43ZnF3MjZyN2ZvMVdlUmZHb1RNUHBmOVlM?=
- =?utf-8?B?Wm8wa01oTU1lMkVMMU0zSzNjS1NJeTdRbkJsWUlWQnJxVTN6UzdZUTB1YlJN?=
- =?utf-8?B?eXpDSy9CMjMxNnhqclcrZmxCbGQwWmRZaWY3eldCWk1TWFMxUTVLZUN1NHNO?=
- =?utf-8?B?cWhXbjg3dlpUWDBkbzh4VkY2QjRWOCtaL2RaMWFyK3UxL2QzTzRIRFlkR1ZW?=
- =?utf-8?B?NktzakhudjUyZnNDT3k3WHdjQVBYYmVDcWlZV1ZzSmRBazhJY21BSjlvVENZ?=
- =?utf-8?B?MVF0cEY3US9hNjBPOEloQktPZWJpNWNEMHVpM3ZVekQzMTlVb2ZkRE1nU2hT?=
- =?utf-8?B?YmlqZVlESWRvSXhiWFAvT0lkVVRPMXhIK1FOR3NTb1lpWkJLejNGZVRSbEFi?=
- =?utf-8?B?V0RJcnJ5cmJyRlBJREhsWHB3d1Mzd0Ewa1JKQlhBRlREU09iNFlacTJVaEEw?=
- =?utf-8?B?amNjaDdHQTFSazh1YzVGS0V1THNhMkduNGdZbUVDNmZoRVUxNWRrNGdQVFY3?=
- =?utf-8?B?VXFKYVRuMGVQZjFRRFk5TW5KZ2J6TCtERjN6UDlHM0RhcTQzd090NCtyeTNh?=
- =?utf-8?B?blMzaDVSWm5iWXh1N2FHU1dlSkptL1hoRytDOWVRWXJtTnVEKzBYc3hyUWhp?=
- =?utf-8?B?TVVKb0RTUGhlekxVV244NC85MldiemZRTHFIaC84T3IxR3NhTWl3NTRKYnBK?=
- =?utf-8?B?WUtabzZvY0V1bDVJdXlUeHY3bVlmQVRMcUwwTklNRGc4OCsrcTNvN2grV24v?=
- =?utf-8?B?SkwxTk1Oa2o3S3VaeU1vVTVWRjY2Z1Q2ZkxMVmY0L1lhWmVSNGtZc1RYUFJ6?=
- =?utf-8?B?NVh5MjRRRmEwV1hsdTc1alVXVmVKVjhQYUdBbm9lL2Y5Z1gxUnZuaE5RU3c2?=
- =?utf-8?B?V1JCTEE1NitYY1NPOGV4aEk2cjB5U3VDMUtraG9nUnpVU2hGUHBSZXZOT0tG?=
- =?utf-8?B?NmNRbjFJOXhJQ2VqUW9yWlczdjNQdzRldXRiZFFWbVJRRUJaQTdkR3NDa0Qw?=
- =?utf-8?B?Nnd5YzVWSkh4RHplVUFyTGlTSCtmb0JZSkxua29BR3dJcithSHNoTVFLV2c2?=
- =?utf-8?B?NmZ2bGgzODdFVjkwYnB2SGNuRkE3TGM1bkYwWFZ3UEViQmxJSktLZWZxTDlP?=
- =?utf-8?B?NTlBUVpMK2RhUHlKaTA5SEZGcW5kSzYxamFrRHVpVXV2SndVYzZQQURpaFVm?=
- =?utf-8?B?K0NoVlc5UW9ITDZuK0xZdk42OUNXVmNWODFsNUlpMkt3eHoyTDdtSVVYU20z?=
- =?utf-8?B?Wnd6WVNEL3JZTkNhaUx6YSsvREhrSWs5UDlZZFhJZDJrQ2tYT2R1R2JkRkg3?=
- =?utf-8?B?M0ExNXhmMlc5ZkROOWpnU2g3WVRabHREb0ZLRHdGT3JRS3pyS3ptaTcyclgv?=
- =?utf-8?B?bm1iMXc0VTNYYjFPUXgzZDYvSjBFenVweGRuWSt3Uk5TQVRpbzBPMHpNeXFn?=
- =?utf-8?B?VjJzRlR0Q3p1WFdpVGVOMTZNaHpmRTB4QVA0M0pVU1VLdTJOTndCV2VCVEE5?=
- =?utf-8?B?dnc4K0FiclJrQk1ZVXVDZVJPaGxJV3lUZ2IzVDNpcU9vVmJSQXdpK0tCR1Nv?=
- =?utf-8?B?UlZYK05nQks2RFN0anZqSytxSDVxV1NCL1FlMHFrZzRiTzE3UlFMUW5McHJz?=
- =?utf-8?B?Skk3QTdEUjk0NUNEbngxQmdMeDNWbEk3QVBJUUw4aUMvTnc1U1FKZ2ExYTgz?=
- =?utf-8?B?cnc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 73a60629-7e2b-4fd7-52c8-08dbd0babb62
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5140.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dFIyQTkydGVOSFQ3OU9tYlJCU3RONko5UkVvL1Q5TVhPWm5LYXBYcEZBdTJh?=
+ =?utf-8?B?c2doUWorYUhKRmsvSURLVllYQTNxbjVYaFMxME4xcnpwenpZV1JhSTU1Z0hy?=
+ =?utf-8?B?dC9OT3pnZnlKZ2JWWjNjTzhRaVBaMWRRVlAvbFZ2Y2dMRzJ2WXk2VXV2QU5C?=
+ =?utf-8?B?L096d29DVkpMNzQvUG9EQm5XTzVXck5RWmV1b2c5OThsM1lzT3UxY0I1dzhG?=
+ =?utf-8?B?bm8xL3NGZ3o2TklzREQxalA2c0RIVlVmMmtzSUNkaGlKamwyWjNyeThYS3do?=
+ =?utf-8?B?ajkzczlIV2tPMkxWTkFFQTNjMHVLNmMzM0VTNkpuNytaR1IvTExlWTFmZEdv?=
+ =?utf-8?B?UTVScXRBbCtPNWFBcXJUM2cxNlZqVHBuZ3lDQmhYRGtyQ0ZjeWxwcVdycmpI?=
+ =?utf-8?B?bDVVTmtweE96NmVvK01Ld3VCYlBsTk45MUZjd3lmMFF0a0ZIeW5Pakw3bUhH?=
+ =?utf-8?B?dFN1QW41VzJMUWFNS29HN1BGc3VVRmlxelppNzRxNDVYR0JBRHFLOTBOeUt5?=
+ =?utf-8?B?UXhjTlJFb2NoaEc2UmdLUnZyTmNPdk14dzA5N045NFBJZzBnNWxCdzRPZSti?=
+ =?utf-8?B?UTZ2R3RFQnFsNXZneXIzdnFUcXU1eXg1TnJKQlQ3dUJTcDNINUVxUW1wT3BJ?=
+ =?utf-8?B?RWJiREx5bWk3dmRrWEQ3SlVYSTBHM2FRTk10cFZVQ2Z1L2xuZlRNUGx3blht?=
+ =?utf-8?B?T2xjMDRPOUQ4WWdUZit1bHN5L0JsZ3BvcXBVZmF6aXhhVDEvUjM5WTR5bXE2?=
+ =?utf-8?B?YndyOEZaMk1wbGxKdUYxV1ZhcDJKeU9xQ2ZOa0hzNDlaWXVxdWpHNHFGTGVs?=
+ =?utf-8?B?aG54Y2s0alN3bW0waURKRjRESStPNnJOWmNoQlB2U1lyQXRHcmZKNVd2MHdx?=
+ =?utf-8?B?RC90UUc5REl4QTRiS2h2eWZsNEg4MW5NeWFsUkVMNXpJZDFFWEppRjV0Tm5M?=
+ =?utf-8?B?VnozaG1xa29xSmU1eklCYjBjVHRtdlR0Qm54dlBUbnA3WlpoTkFzclZLUjhN?=
+ =?utf-8?B?V3o1TVEvVElwNFk3aWlOeW10bTBka2g1U2l5RGN5bVoyTG1zTFJuR2FuNVVI?=
+ =?utf-8?B?TjZTY0U3elZBWVFkZmxKeVVPbm9mRGpXNS9IaFlJNEl2UnRkQURtTUpwbmFz?=
+ =?utf-8?B?K2YzR3Fuc1VwV2Q0bTVNYWtVbGRUeHZFRG1Ud0VHVlFUR2IrOVJtdW9mcjBY?=
+ =?utf-8?B?Tmp4UmN6QWpzZEFqRHhxZ01zMWQrNWQ3ekwrbG14c2pvbW9DWnpmM3VqWDc1?=
+ =?utf-8?B?NitFTkhONkQxelYwbVI2bHVPTVFqR25NMGs3U1B3cHdXbEhaSGNMQzdYalFp?=
+ =?utf-8?B?M3dKL21RYW5ja0J3ZkNuZExQM2wxNmRBeG5BRVA3ekluNG5KUFZsaEYzSXZ6?=
+ =?utf-8?B?YWIwVWJtOEFYU2ZqaGp1YXVFaVhwNkhVV2tCbDYzeENGd3NkOC91YVRFOTlv?=
+ =?utf-8?B?T20wYSs3a3NIak5QaTUzTy9PMzdDbkQrajVKQTZURGhrWDlyK0FHSkNVNlRm?=
+ =?utf-8?B?eW9EYWhxRFNDTVBiR2VQb2JSdVI5ZmdnSHRFM1c1dnNmR2RaV0M1L0JEYWtI?=
+ =?utf-8?B?S2hJKzhYMHl4eEFuK1pPYzVyY0plN2pyb3dXWmRIZWZpTFNQeXlRekpBc0NW?=
+ =?utf-8?B?clRBalEvazVIVVBQVWs5YnpSNHNnOUFDMmxXZDF6cmpXUDdadFVXaXlmTmlm?=
+ =?utf-8?B?ZGVjOXV2YTlpYlljNDFrNFY3UnR2RjlLZDM1NFlaa204UFl5VWYvVUtZK3NF?=
+ =?utf-8?B?Vyt2enB1dklETWpRL3JoUzl3S2thUmZKaUZsdjNmUDRZZnp6ejZNdERvK280?=
+ =?utf-8?B?UHJldmhPZU5HT3pMMTA3T2xqOCtsa05Ea0dYbUI5cjhvQ212c3pTUGRET3VO?=
+ =?utf-8?B?TXhHaVZpNCtLMTAxTERqTlBMd1hjOUZnM2FXOUNVMEwrMFk0ckc4ZnBGUHVz?=
+ =?utf-8?B?Mm1mMVN4UXlCT0FydGs3Z1ZaOGVWZFZIVDVGSjcxQjhVUGxGZjNQZ0hmN1p6?=
+ =?utf-8?B?NjM5YzdjdUZIUDRwdDVMeXR2bFNqWGtBKzk5dGNldFIvRVhJVHRKM3dCUVBO?=
+ =?utf-8?B?QWpTUGtkNERaLzdvdU1tOTlLQU53VHBvK3dHN0JkRHQxSDlqVWY5d3NRNE1Y?=
+ =?utf-8?Q?UGxCVBoQxudsbAFpE6L0LKix8?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9fb85e3d-6780-4fd7-a8ed-08dbd0bb75fa
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 15:47:43.0912
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 15:52:56.1396
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1w3z+d5CrMkWgAA9AS155XVx0iNU5Y4TOsmEELw1XHTIhhMRekHLPtTL2HdwNAUQIPJsVed4AnVHaIClQEDtQuste552MBp4OElO5XSn8wk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5707
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: GrMjaly2loqpsSLtY5VBoek+Sl94qaBfzVzj6rD9DXbj+ywoNGky7M/SdLw6/HzMQmAC7ZgarPndNnqeYepQow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8071
 
-
-
-On 10/19/2023 8:28 AM, Jakub Kicinski wrote:
-> Commit 26c5334d344d ("ethtool: Add forced speed to supported link
-> modes maps") added a dependency between ethtool.h and linkmode.h.
-> The dependency in the opposite direction already exists so the
-> new code was inserted in an awkward place.
+On 10/19/2023 1:33 AM, Su Hui wrote:
 > 
-> The reason for ethtool.h to include linkmode.h, is that
-> ethtool_forced_speed_maps_init() is a static inline helper.
-> That's not really necessary.
+> check the value of 'ret' after call 'devlink_info_version_stored_put'.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Su Hui <suhui@nfschina.com>
+
+Thanks.
+
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+
 > ---
-> CC: andrew@lunn.ch
-> CC: paul.greenwalt@intel.com
-> CC: hkallweit1@gmail.com
-> CC: linux@armlinux.org.uk
-> CC: vladimir.oltean@nxp.com
-> CC: gal@nvidia.com
-> ---
-
-Thanks Jakub, this is better.
-
-Reviewed-by: Paul Greenwalt <paul.greenwalt@intel.com>
-
->  include/linux/ethtool.h  | 22 ++--------------------
->  include/linux/linkmode.h | 29 ++++++++++++++---------------
->  net/ethtool/common.c     | 21 +++++++++++++++++++++
->  3 files changed, 37 insertions(+), 35 deletions(-)
+>   drivers/net/ethernet/amd/pds_core/devlink.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
-> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-> index 8e91e8b8a693..226a36ed5aa1 100644
-> --- a/include/linux/ethtool.h
-> +++ b/include/linux/ethtool.h
-> @@ -13,7 +13,6 @@
->  #ifndef _LINUX_ETHTOOL_H
->  #define _LINUX_ETHTOOL_H
->  
-> -#include <linux/linkmode.h>
->  #include <linux/bitmap.h>
->  #include <linux/compat.h>
->  #include <linux/if_ether.h>
-> @@ -1070,23 +1069,6 @@ struct ethtool_forced_speed_map {
->  	.arr_size	= ARRAY_SIZE(prefix##_##value),			\
->  }
->  
-> -/**
-> - * ethtool_forced_speed_maps_init
-> - * @maps: Pointer to an array of Ethtool forced speed map
-> - * @size: Array size
-> - *
-> - * Initialize an array of Ethtool forced speed map to Ethtool link modes. This
-> - * should be called during driver module init.
-> - */
-> -static inline void
-> -ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps, u32 size)
-> -{
-> -	for (u32 i = 0; i < size; i++) {
-> -		struct ethtool_forced_speed_map *map = &maps[i];
-> -
-> -		linkmode_set_bit_array(map->cap_arr, map->arr_size, map->caps);
-> -		map->cap_arr = NULL;
-> -		map->arr_size = 0;
-> -	}
-> -}
-> +void
-> +ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps, u32 size);
->  #endif /* _LINUX_ETHTOOL_H */
-> diff --git a/include/linux/linkmode.h b/include/linux/linkmode.h
-> index cd38f89553e6..7303b4bc2ce0 100644
-> --- a/include/linux/linkmode.h
-> +++ b/include/linux/linkmode.h
-> @@ -2,21 +2,6 @@
->  #define __LINKMODE_H
->  
->  #include <linux/bitmap.h>
-> -
-> -static inline void linkmode_set_bit(int nr, volatile unsigned long *addr)
-> -{
-> -	__set_bit(nr, addr);
-> -}
-> -
-> -static inline void linkmode_set_bit_array(const int *array, int array_size,
-> -					  unsigned long *addr)
-> -{
-> -	int i;
-> -
-> -	for (i = 0; i < array_size; i++)
-> -		linkmode_set_bit(array[i], addr);
-> -}
-> -
->  #include <linux/ethtool.h>
->  #include <uapi/linux/ethtool.h>
->  
-> @@ -53,6 +38,11 @@ static inline int linkmode_andnot(unsigned long *dst, const unsigned long *src1,
->  	return bitmap_andnot(dst, src1, src2,  __ETHTOOL_LINK_MODE_MASK_NBITS);
->  }
->  
-> +static inline void linkmode_set_bit(int nr, volatile unsigned long *addr)
-> +{
-> +	__set_bit(nr, addr);
-> +}
-> +
->  static inline void linkmode_clear_bit(int nr, volatile unsigned long *addr)
->  {
->  	__clear_bit(nr, addr);
-> @@ -72,6 +62,15 @@ static inline int linkmode_test_bit(int nr, const volatile unsigned long *addr)
->  	return test_bit(nr, addr);
->  }
->  
-> +static inline void linkmode_set_bit_array(const int *array, int array_size,
-> +					  unsigned long *addr)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < array_size; i++)
-> +		linkmode_set_bit(array[i], addr);
-> +}
-> +
->  static inline int linkmode_equal(const unsigned long *src1,
->  				 const unsigned long *src2)
->  {
-> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-> index f5598c5f50de..b4419fb6df6a 100644
-> --- a/net/ethtool/common.c
-> +++ b/net/ethtool/common.c
-> @@ -685,3 +685,24 @@ ethtool_params_from_link_mode(struct ethtool_link_ksettings *link_ksettings,
->  	link_ksettings->base.duplex = link_info->duplex;
->  }
->  EXPORT_SYMBOL_GPL(ethtool_params_from_link_mode);
-> +
-> +/**
-> + * ethtool_forced_speed_maps_init
-> + * @maps: Pointer to an array of Ethtool forced speed map
-> + * @size: Array size
-> + *
-> + * Initialize an array of Ethtool forced speed map to Ethtool link modes. This
-> + * should be called during driver module init.
-> + */
-> +void
-> +ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps, u32 size)
-> +{
-> +	for (u32 i = 0; i < size; i++) {
-> +		struct ethtool_forced_speed_map *map = &maps[i];
-> +
-> +		linkmode_set_bit_array(map->cap_arr, map->arr_size, map->caps);
-> +		map->cap_arr = NULL;
-> +		map->arr_size = 0;
-> +	}
-> +}
-> +EXPORT_SYMBOL_GPL(ethtool_forced_speed_maps_init);
+> diff --git a/drivers/net/ethernet/amd/pds_core/devlink.c b/drivers/net/ethernet/amd/pds_core/devlink.c
+> index d9607033bbf2..09041f7fccaf 100644
+> --- a/drivers/net/ethernet/amd/pds_core/devlink.c
+> +++ b/drivers/net/ethernet/amd/pds_core/devlink.c
+> @@ -124,6 +124,8 @@ int pdsc_dl_info_get(struct devlink *dl, struct devlink_info_req *req,
+>                          snprintf(buf, sizeof(buf), "fw.slot_%d", i);
+>                  err = devlink_info_version_stored_put(req, buf,
+>                                                        fw_list.fw_names[i].fw_version);
+> +               if (err)
+> +                       return err;
+>          }
+> 
+>          err = devlink_info_version_running_put(req,
+> --
+> 2.30.2
+> 
 
