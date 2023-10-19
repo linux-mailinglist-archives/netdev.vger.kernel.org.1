@@ -1,109 +1,102 @@
-Return-Path: <netdev+bounces-42509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E3E47CF0D8
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 09:14:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CECCB7CF0DC
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 09:15:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E808B2110D
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 07:14:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88273281DA8
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 07:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008F6C8E7;
-	Thu, 19 Oct 2023 07:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cam3HMtR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C134A8F74;
+	Thu, 19 Oct 2023 07:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D0E8F6B
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 07:14:06 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A67112F
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 00:14:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697699644;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=j/E58SfVgh2tMBXaLp4Ka5VvQ2Ys2tWX2mDdsAUOQAo=;
-	b=Cam3HMtRu5IQWi857+tlarl9Cmn2Cxsi0iYDTllGBnxyS11V7FeqLc4v0ov73DEMAcpug9
-	sf7txdXmSgtibZLYuFr8lCgAqDZKvPTlbV7vjoTIRlW+GlQ5ZtMALDYZ3tWxp0W6VjIxYB
-	AF5WFK1cn3vJkvLJ9YdNhXEMSFhVwKY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-546-Skt814XLNyCLZgiVPIz0Pw-1; Thu, 19 Oct 2023 03:14:00 -0400
-X-MC-Unique: Skt814XLNyCLZgiVPIz0Pw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A95E510201E0;
-	Thu, 19 Oct 2023 07:13:58 +0000 (UTC)
-Received: from toolbox.redhat.com (unknown [10.45.224.114])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 08ABF503B;
-	Thu, 19 Oct 2023 07:13:56 +0000 (UTC)
-From: Michal Schmidt <mschmidt@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Subject: [PATCH net] iavf: initialize waitqueues before starting watchdog_task
-Date: Thu, 19 Oct 2023 09:13:46 +0200
-Message-ID: <20231019071346.55949-1-mschmidt@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C44D262;
+	Thu, 19 Oct 2023 07:15:23 +0000 (UTC)
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C689130;
+	Thu, 19 Oct 2023 00:15:20 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VuT9Ext_1697699715;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VuT9Ext_1697699715)
+          by smtp.aliyun-inc.com;
+          Thu, 19 Oct 2023 15:15:16 +0800
+Message-ID: <1697699628.4189832-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v1 13/19] virtio_net: xsk: tx: virtnet_free_old_xmit() distinguishes xsk buffer
+Date: Thu, 19 Oct 2023 15:13:48 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux-foundation.org,
+ bpf@vger.kernel.org
+References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com>
+ <20231016120033.26933-14-xuanzhuo@linux.alibaba.com>
+ <20231016164434.3a1a51e1@kernel.org>
+ <1697508125.07194-1-xuanzhuo@linux.alibaba.com>
+ <20231019023739-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231019023739-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-It is not safe to initialize the waitqueues after queueing the
-watchdog_task. It will be using them.
+On Thu, 19 Oct 2023 02:38:16 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Tue, Oct 17, 2023 at 10:02:05AM +0800, Xuan Zhuo wrote:
+> > On Mon, 16 Oct 2023 16:44:34 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
+> > > On Mon, 16 Oct 2023 20:00:27 +0800 Xuan Zhuo wrote:
+> > > > @@ -305,9 +311,15 @@ static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
+> > > >
+> > > >  			stats->bytes += xdp_get_frame_len(frame);
+> > > >  			xdp_return_frame(frame);
+> > > > +		} else {
+> > > > +			stats->bytes += virtnet_ptr_to_xsk(ptr);
+> > > > +			++xsknum;
+> > > >  		}
+> > > >  		stats->packets++;
+> > > >  	}
+> > > > +
+> > > > +	if (xsknum)
+> > > > +		xsk_tx_completed(sq->xsk.pool, xsknum);
+> > > >  }
+> > >
+> > > sparse complains:
+> > >
+> > > drivers/net/virtio/virtio_net.h:322:41: warning: incorrect type in argument 1 (different address spaces)
+> > > drivers/net/virtio/virtio_net.h:322:41:    expected struct xsk_buff_pool *pool
+> > > drivers/net/virtio/virtio_net.h:322:41:    got struct xsk_buff_pool
+> > > [noderef] __rcu *pool
+> > >
+> > > please build test with W=1 C=1
+> >
+> > OK. I will add C=1 to may script.
+> >
+> > Thanks.
+>
+> And I hope we all understand, rcu has to be used properly it's not just
+> about casting the warning away.
 
-The chance of this causing a real problem is very small, because
-there will be some sleeping before any of the waitqueues get used.
-I got a crash only after inserting an artificial sleep in iavf_probe.
 
-Queue the watchdog_task as the last step in iavf_probe. Add a comment to
-prevent repeating the mistake.
+Yes. I see. I will use rcu_dereference() and rcu_read_xxx().
 
-Fixes: fe2647ab0c99 ("i40evf: prevent VF close returning before state transitions to DOWN")
-Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
----
- drivers/net/ethernet/intel/iavf/iavf_main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Thanks.
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 6a2e6d64bc3a..5b5c0525aa13 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -4982,8 +4982,6 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	INIT_WORK(&adapter->finish_config, iavf_finish_config);
- 	INIT_DELAYED_WORK(&adapter->watchdog_task, iavf_watchdog_task);
- 	INIT_DELAYED_WORK(&adapter->client_task, iavf_client_task);
--	queue_delayed_work(adapter->wq, &adapter->watchdog_task,
--			   msecs_to_jiffies(5 * (pdev->devfn & 0x07)));
- 
- 	/* Setup the wait queue for indicating transition to down status */
- 	init_waitqueue_head(&adapter->down_waitqueue);
-@@ -4994,6 +4992,9 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	/* Setup the wait queue for indicating virtchannel events */
- 	init_waitqueue_head(&adapter->vc_waitqueue);
- 
-+	queue_delayed_work(adapter->wq, &adapter->watchdog_task,
-+			   msecs_to_jiffies(5 * (pdev->devfn & 0x07)));
-+	/* Initialization goes on in the work. Do not add more of it below. */
- 	return 0;
- 
- err_ioremap:
--- 
-2.41.0
-
+>
+> --
+> MST
+>
 
