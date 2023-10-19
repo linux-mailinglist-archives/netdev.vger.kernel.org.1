@@ -1,95 +1,183 @@
-Return-Path: <netdev+bounces-42624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A16F7CF8F1
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:31:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A57BE7CF903
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:33:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72D1B1C20E81
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:31:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A242B211AE
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A838D225A8;
-	Thu, 19 Oct 2023 12:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57AC6225B8;
+	Thu, 19 Oct 2023 12:33:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="K7K9y0/B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDRtQflQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0409D225B5;
-	Thu, 19 Oct 2023 12:31:13 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B585910DA;
-	Thu, 19 Oct 2023 05:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dgELyED6+F38UhOTwa9DtDSqYRRUMkO9IvfhJWk2HrI=; b=K7K9y0/B4+mibCVcpUC1mHDKUj
-	G/rMaaA3JQARb0KJxe1N6EQhfTQqM3LFNpIs/eK5dbToSQC/WLgnQkOGw5bdoyizB84C0YqVBPtDz
-	KvqKLCBjThg89SIJ3aiYaHjFpVYzDocyL63Yt2nU1QUipJLSe/X1J9Jwuew/U64joQoE4Cz6k65re
-	Z3ppkrB4fGi7r4l4gnK1Sl1lwxb5CXJguM9F+h0Ym/X1IpuS5a6UOK4KzuCp3bwo5Tlb525fqHCK8
-	NI81tmFDc+80o4paMdNxnllIBaiualxqj3VHB7Z6XpJM6N2U1ydQyAc0Fu4Ds/rOXtwh35hdnjDqc
-	JIz7HIHQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44426)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qtSAm-000738-2k;
-	Thu, 19 Oct 2023 13:30:44 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qtSAn-0000Rk-Mg; Thu, 19 Oct 2023 13:30:45 +0100
-Date: Thu, 19 Oct 2023 13:30:45 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350F5225B5;
+	Thu, 19 Oct 2023 12:33:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD9BAC433C7;
+	Thu, 19 Oct 2023 12:33:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697718790;
+	bh=HXrV7kCYq+8dGIOhmNM9cZKQg6C/pYcpWNZuJJdFHk0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DDRtQflQ6DoRnGhXyU8596WQTVwkxzEN9rM6R/RJmkwLdsw3cawUCn8QNo1m4jAD/
+	 vcl4xzr0V03AkmOH2QIb3YNUlVewXZj0RDWhhXXyV4SUMbyeqMx/kvTOULLgT2Laib
+	 badFdSUcZ4/URHh+P+31XdJZvVHlmpbfOGAK5mkxVj4uurGy9Pfu3dejUyvo2LrTzQ
+	 OGvmEQdCDtu1zNgwsj0mDikkTyq+wfYH7RfSECzN9Nc5xwnpYJwIxs/HSytsfK4+Uh
+	 LVIl6h8TSo2wnWeOSzmeosotOONJEZam7+JTQWWct9hWe/OrAF4H4cSxZo+5KycU0p
+	 1HJJvWpEztZsw==
+Date: Thu, 19 Oct 2023 13:33:04 +0100
+From: Conor Dooley <conor@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Rob Herring <robh@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add missing MAC
- address register offset for ksz8863
-Message-ID: <ZTEhdawWKec4XtRb@shell.armlinux.org.uk>
-References: <20231019122850.1199821-1-o.rempel@pengutronix.de>
- <20231019122850.1199821-2-o.rempel@pengutronix.de>
+	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org,
+	Gregory Clement <gregory.clement@bootlin.com>
+Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: dsa: Require ports or
+ ethernet-ports
+Message-ID: <20231019-retake-hash-ec6741c9f372@spud>
+References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
+ <20231018-marvell-88e6152-wan-led-v4-1-3ee0c67383be@linaro.org>
+ <169762516670.391804.7528295251386913602.robh@kernel.org>
+ <20231019-repacking-scrunch-f2435c2fd7e8@spud>
+ <ZTEg62nZtYXW2Uid@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="7TsvOlYB329qfCR5"
+Content-Disposition: inline
+In-Reply-To: <ZTEg62nZtYXW2Uid@shell.armlinux.org.uk>
+
+
+--7TsvOlYB329qfCR5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231019122850.1199821-2-o.rempel@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 19, 2023 at 02:28:42PM +0200, Oleksij Rempel wrote:
-> Add the missing offset for the global MAC address register
-> (REG_SW_MAC_ADDR) for the ksz8863 family of switches.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+On Thu, Oct 19, 2023 at 01:28:27PM +0100, Russell King (Oracle) wrote:
+> On Thu, Oct 19, 2023 at 01:03:41PM +0100, Conor Dooley wrote:
+> > On Wed, Oct 18, 2023 at 05:32:48AM -0500, Rob Herring wrote:
+> > >=20
+> > > On Wed, 18 Oct 2023 11:03:40 +0200, Linus Walleij wrote:
+> > > > Bindings using dsa.yaml#/$defs/ethernet-ports specify that
+> > > > a DSA switch node need to have a ports or ethernet-ports
+> > > > subnode, and that is actually required, so add requirements
+> > > > using oneOf.
+> > > >=20
+> > > > Suggested-by: Rob Herring <robh@kernel.org>
+> > > > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> > > > ---
+> > > >  Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 ++++++
+> > > >  1 file changed, 6 insertions(+)
+> > > >=20
+> > >=20
+> > > My bot found errors running 'make DT_CHECKER_FLAGS=3D-m dt_binding_ch=
+eck'
+> > > on your patch (DT_CHECKER_FLAGS is new in v5.13):
+> > >=20
+> > > yamllint warnings/errors:
+> > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:60:7: [warning] =
+wrong indentation: expected 8 but found 6 (indentation)
+> > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:62:7: [warning] =
+wrong indentation: expected 8 but found 6 (indentation)
+> > >=20
+> > > dtschema/dtc warnings/errors:
+> > > Traceback (most recent call last):
+> > >   File "/usr/local/bin/dt-doc-validate", line 64, in <module>
+> > >     ret |=3D check_doc(f)
+> > >            ^^^^^^^^^^^^
+> > >   File "/usr/local/bin/dt-doc-validate", line 32, in check_doc
+> > >     for error in sorted(dtsch.iter_errors(), key=3Dlambda e: e.lineco=
+l):
+> > >                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > >   File "/usr/local/lib/python3.11/dist-packages/dtschema/schema.py", =
+line 125, in iter_errors
+> > >     self.annotate_error(scherr, meta_schema, scherr.schema_path)
+> > >   File "/usr/local/lib/python3.11/dist-packages/dtschema/schema.py", =
+line 104, in annotate_error
+> > >     schema =3D schema[p]
+> > >              ~~~~~~^^^
+> > > KeyError: 'type'
+> >=20
+> > Locally, on an older version of dt-schema, I see
+> > /stuff/linux-dt/Documentation/devicetree/bindings/net/dsa/dsa.yaml: $de=
+fs: 'oneOf' should not be valid under {'$ref': '#/definitions/json-schema-p=
+rop-names'}
+> > 	hint: A json-schema keyword was found in $defs key.
+> > 	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
+> > /stuff/linux-dt/Documentation/devicetree/bindings/net/dsa/dsa.yaml: $de=
+fs:oneOf: [{'required': ['ports']}, {'required': ['ethernet-ports']}] is no=
+t of type 'object'
+> > 	hint: $defs entries must contain schemas
+> > 	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
+> >   SCHEMA  Documentation/devicetree/bindings/processed-schema.json
+> >=20
+> > On the latest version I see the error from the bot.
+> >=20
+> > Doing=20
+> > diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Docum=
+entation/devicetree/bindings/net/dsa/dsa.yaml
+> > index bd6948e4fd9e..25e5950d51ae 100644
+> > --- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
+> > +++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
+> > @@ -55,10 +55,10 @@ $defs:
+> >              $ref: dsa-port.yaml#
+> >              unevaluatedProperties: false
+> > =20
+> > -  oneOf:
+> > -    - required:
+> > -      - ports
+> > -    - required:
+> > -      - ethernet-ports
+> > +oneOf:
+> > +  - required:
+> > +    - ports
+> > +  - required:
+> > +    - ethernet-ports
+> > =20
+> >  ...
+> >=20
+> > resolves both issues, but the older version of dt-schema definitely had
+> > better error reporting in this case!
+>=20
+> And now I'm even more confused... your example in your other reply had
+> six spaces before "- ports" and "- ethernet-ports" but here you're
+> using four spaces.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Sorry! I thought it would be less confusing to provide a diff that
+resolved one issue only.
 
-Thanks!
+--7TsvOlYB329qfCR5
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZTEiAAAKCRB4tDGHoIJi
+0oxWAQDuOmv+NcWDC3gILLXySzfFGVR0cKMUHRRHUBJromR8AAD/cMdUKC8Bs4bi
+CdvZFiEvi0/huqirb1bbmciszrNddQ8=
+=rpyb
+-----END PGP SIGNATURE-----
+
+--7TsvOlYB329qfCR5--
 
