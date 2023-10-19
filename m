@@ -1,132 +1,130 @@
-Return-Path: <netdev+bounces-42507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AECAC7CF035
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:38:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D527CF0CC
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 09:09:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57E58B20DE7
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 06:38:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F75281E8F
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 07:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F54446671;
-	Thu, 19 Oct 2023 06:38:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c2f5P9yJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9122E8F6B;
+	Thu, 19 Oct 2023 07:09:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DD18C07
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 06:38:36 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90DFBBE
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 23:38:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697697514;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Blqwk8CZOAuxak9k7tu36Lndth1mX4n5z0UG75CC1Vc=;
-	b=c2f5P9yJM4Mx+EXLr9aGW6a8ddtt29niz27T6OdaS3Zfiin/nNfQhcjS08M5Dj7KjaJpgR
-	pGjeL9/fwRuy90br9E4XxXTFMBedXnofl1UxloWe+9nQW61naBSQozon6mAdRhXjm7KeRF
-	iTRGp51m0+ZDEr+l6eS7TQCWGTMyaIM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-449-bLKYZySlMNKLW8WdVJ8H4Q-1; Thu, 19 Oct 2023 02:38:23 -0400
-X-MC-Unique: bLKYZySlMNKLW8WdVJ8H4Q-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4084a9e637eso560705e9.2
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 23:38:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697697502; x=1698302302;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Blqwk8CZOAuxak9k7tu36Lndth1mX4n5z0UG75CC1Vc=;
-        b=IPmZjg7C0gMyabUa2fXgmJf1EWlng6M/WCFV3p0EtvbRgYby5WWu/tBo6y1C/Cjnz/
-         RIk3Dc8P3XkF0oYEwzbliMowBC4CPV+sorG9ARRQIua6LaE68rVGm5BeKK3ApILysZLG
-         xtpWndpZPA6m84ZbEW+I0ZyQzzA3GI/Flwt2KQTvpXbM7I93M4CNgWAYcFEz4kgGKlpw
-         ua1qF8rxyoBm1/kXrIynxK9rX6FOeb7nir4DMfHAbDsGG6fjWrjMwMi8liPZQNPAd2Zc
-         fwMsLV5e3Wa4luvu9FqtEFLhUfE+jbQcDMIWh1fDeVw9InQK2cw2r9xxPdnkwoenCv7E
-         tu/w==
-X-Gm-Message-State: AOJu0YxplpF7ustOGCcN8EZIz8eQp/1MsjYX4Prv4z1XD0YzWjoNAdc9
-	Wfd1k0SiwrMAXH7eDQ4xiYiRyZrrEhiLRosz5cujspb1uup+aKAiwTtSg188FPIZb+tMfVNm8Rm
-	nNCeSBA8l5oRjKha1d+J/1x70hc8=
-X-Received: by 2002:a05:600c:c0c:b0:407:7e5f:ffb9 with SMTP id fm12-20020a05600c0c0c00b004077e5fffb9mr1104340wmb.9.1697697502082;
-        Wed, 18 Oct 2023 23:38:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9qh0cDCENMRB0qEBa29pUmbeWcdQ3FQ1ygusFYggBDj+0Bntc+WUE/xD8GAaiDYHR1Jei5w==
-X-Received: by 2002:a05:600c:c0c:b0:407:7e5f:ffb9 with SMTP id fm12-20020a05600c0c0c00b004077e5fffb9mr1104320wmb.9.1697697501762;
-        Wed, 18 Oct 2023 23:38:21 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1f2:2037:f34:d61b:7da0:a7be])
-        by smtp.gmail.com with ESMTPSA id j20-20020a05600c1c1400b004065daba6casm3604423wms.46.2023.10.18.23.38.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 23:38:21 -0700 (PDT)
-Date: Thu, 19 Oct 2023 02:38:16 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v1 13/19] virtio_net: xsk: tx:
- virtnet_free_old_xmit() distinguishes xsk buffer
-Message-ID: <20231019023739-mutt-send-email-mst@kernel.org>
-References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com>
- <20231016120033.26933-14-xuanzhuo@linux.alibaba.com>
- <20231016164434.3a1a51e1@kernel.org>
- <1697508125.07194-1-xuanzhuo@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D96F8F64
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 07:09:17 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27499130
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 00:09:16 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qtN9X-0002RO-TQ; Thu, 19 Oct 2023 09:09:07 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qtN9W-002jpd-Oi; Thu, 19 Oct 2023 09:09:06 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qtN9W-002Bj7-2H;
+	Thu, 19 Oct 2023 09:09:06 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Michal Kubecek <mkubecek@suse.cz>
+Subject: [PATCH net v1 1/1] ethtool: fix clearing of WoL flags
+Date: Thu, 19 Oct 2023 09:09:04 +0200
+Message-Id: <20231019070904.521718-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1697508125.07194-1-xuanzhuo@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Oct 17, 2023 at 10:02:05AM +0800, Xuan Zhuo wrote:
-> On Mon, 16 Oct 2023 16:44:34 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
-> > On Mon, 16 Oct 2023 20:00:27 +0800 Xuan Zhuo wrote:
-> > > @@ -305,9 +311,15 @@ static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
-> > >
-> > >  			stats->bytes += xdp_get_frame_len(frame);
-> > >  			xdp_return_frame(frame);
-> > > +		} else {
-> > > +			stats->bytes += virtnet_ptr_to_xsk(ptr);
-> > > +			++xsknum;
-> > >  		}
-> > >  		stats->packets++;
-> > >  	}
-> > > +
-> > > +	if (xsknum)
-> > > +		xsk_tx_completed(sq->xsk.pool, xsknum);
-> > >  }
-> >
-> > sparse complains:
-> >
-> > drivers/net/virtio/virtio_net.h:322:41: warning: incorrect type in argument 1 (different address spaces)
-> > drivers/net/virtio/virtio_net.h:322:41:    expected struct xsk_buff_pool *pool
-> > drivers/net/virtio/virtio_net.h:322:41:    got struct xsk_buff_pool
-> > [noderef] __rcu *pool
-> >
-> > please build test with W=1 C=1
-> 
-> OK. I will add C=1 to may script.
-> 
-> Thanks.
+With current kernel it is possible to set flags, but not possible to remove
+existing WoL flags. For example:
+~$ ethtool lan2
+...
+        Supports Wake-on: pg
+        Wake-on: d
+...
+~$ ethtool -s lan2 wol gp
+~$ ethtool lan2
+...
+        Wake-on: pg
+...
+~$ ethtool -s lan2 wol d
+~$ ethtool lan2
+...
+        Wake-on: pg
+...
 
-And I hope we all understand, rcu has to be used properly it's not just
-about casting the warning away.
+This patch makes it work as expected
 
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ net/ethtool/wol.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/net/ethtool/wol.c b/net/ethtool/wol.c
+index 0ed56c9ac1bc..fcefc1bbfa2e 100644
+--- a/net/ethtool/wol.c
++++ b/net/ethtool/wol.c
+@@ -108,15 +108,16 @@ ethnl_set_wol(struct ethnl_req_info *req_info, struct genl_info *info)
+ 	struct net_device *dev = req_info->dev;
+ 	struct nlattr **tb = info->attrs;
+ 	bool mod = false;
++	u32 wolopts = 0;
+ 	int ret;
+ 
+ 	dev->ethtool_ops->get_wol(dev, &wol);
+-	ret = ethnl_update_bitset32(&wol.wolopts, WOL_MODE_COUNT,
++	ret = ethnl_update_bitset32(&wolopts, WOL_MODE_COUNT,
+ 				    tb[ETHTOOL_A_WOL_MODES], wol_mode_names,
+ 				    info->extack, &mod);
+ 	if (ret < 0)
+ 		return ret;
+-	if (wol.wolopts & ~wol.supported) {
++	if (wolopts & ~wol.supported) {
+ 		NL_SET_ERR_MSG_ATTR(info->extack, tb[ETHTOOL_A_WOL_MODES],
+ 				    "cannot enable unsupported WoL mode");
+ 		return -EINVAL;
+@@ -132,8 +133,9 @@ ethnl_set_wol(struct ethnl_req_info *req_info, struct genl_info *info)
+ 				    tb[ETHTOOL_A_WOL_SOPASS], &mod);
+ 	}
+ 
+-	if (!mod)
++	if (!mod && wolopts == wol.wolopts)
+ 		return 0;
++	wol.wolopts = wolopts;
+ 	ret = dev->ethtool_ops->set_wol(dev, &wol);
+ 	if (ret)
+ 		return ret;
 -- 
-MST
+2.39.2
 
 
