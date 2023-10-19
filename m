@@ -1,190 +1,163 @@
-Return-Path: <netdev+bounces-42637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 784A27CFAB4
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:17:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A7D67CFAC1
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:18:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4DC81C20AF6
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:17:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA042B2107B
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1422A22EE5;
-	Thu, 19 Oct 2023 13:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40FDA273C2;
+	Thu, 19 Oct 2023 13:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="evznZ03x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TlmrLvUL"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59758179B1
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 13:17:21 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1C8998;
-	Thu, 19 Oct 2023 06:17:15 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8106F240002;
-	Thu, 19 Oct 2023 13:17:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1697721434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7kubKUOdyt7koTXOXKhU8wFECVMZDVp8kCAlvbhKcUI=;
-	b=evznZ03xPa0BEwhJfOpNDV6d3q5E4Ku96L8mhZfSmZ0WUAyqSyXEHUqqaCyyVLtItEGvJG
-	iI6qrODCXFvYvK78X9EaXwnN1EdVV5EAKy2i+nJLs5gM8vPTgBk+GtMRLOzf8QBS83sGmg
-	gmdd5uackLlA7rCLXeUjimx1JzlpafuKGeeXAcKIKTRILR+l8WSVFibee3PrOXIX+c03pf
-	niu31RkRhCXonSiGBCR+L6uJv25Lt15MaLuEN70pGQBMMk0ytJ5KRB5B/bXiQK13Mhdo/s
-	PYa9WxihA5q8z5ZuHkvs1Bbj0fK9rMBqAZ7Tw05nMfPXahSVtClavHN/lPGQhQ==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Thu, 19 Oct 2023 15:16:41 +0200
-Subject: [PATCH net] Revert "ethtool: Fix mod state of verbose no_mask
- bitset"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2FF52F32;
+	Thu, 19 Oct 2023 13:18:13 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 344EC9F;
+	Thu, 19 Oct 2023 06:18:12 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-53de0d1dc46so13664191a12.3;
+        Thu, 19 Oct 2023 06:18:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697721490; x=1698326290; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dOMFQ4KhhgNN9uiVFnKX2Q/Idi24XPkIW6kBXq+OOHE=;
+        b=TlmrLvULlTB+gpOGgRWxIu72f6iPqOEm44A4k/wIZMeqBmvifechdif/eT3IPvwdVN
+         k2FENZI0u+CzJNFgBHf/ZMMIZ4BaG1hvJjim7kRzAssOV1lV+ELhoc+t4cnLpI8ppKFV
+         Dm1MDOlPT2po/Qm2pu4pToKCi9SNeDnWMMuA+Tp/Nc7l0C/rBuul2s0bt4b/MX1PLSRJ
+         PYKGKhrMuxb2nafmFdXjDGzHWTf9DsaUcYAEdvv4QQdnu/VmkNSuKO21IR+ItcMh0Sfy
+         GjFlHNjoDGtvjHN8oi9leUEBEirJ6Wrf4mMw7VpZWo8V7fKW2w5tgk8YDPaMblyQiiDN
+         bi1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697721490; x=1698326290;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dOMFQ4KhhgNN9uiVFnKX2Q/Idi24XPkIW6kBXq+OOHE=;
+        b=Oyx5UoFfxKqQbSef7q0y7pQbRPBUqJ0o7KbOI5mdeQNDluNTJhs8iR9KqrvQMQ6g6A
+         RrXfeIwbskrkA9V0+s9199lycWSQOp+S3TiWqZU8kmT/rKca8jQG5YT8SIy4+VbpypNu
+         kLymyQbtTo6xcR4wL/Grfx6/s9+taY4HOkPA+uq2alntSCqn4jC3HwNFGJsnTSMsQJ5j
+         uZh4B/2fYIFzRIw14Kd8NeCV87fEU01ueNds0F6PabVlyRUhMH/Eum/IJCk5j9lN+cOI
+         FPneJ2XTMqfqxVYPVMzLDmE3ZNIGucVzH5VqwKftw60iI1CmpIYH5YHJzOjzGCknSoUU
+         l2jA==
+X-Gm-Message-State: AOJu0YxuiTgzCjWO7F+9xPG6s2nk+cbxTAbuzBtFU2AzfAxBDsVlkj4a
+	09vXnKtwMO5wpg+yApsdY+w=
+X-Google-Smtp-Source: AGHT+IGeV/PAyeS5ZcSZyKizUQ5u38iNo53UbAIyLr9nNzHgjNSBIjErmYPUXpk3hLMaNF1I+onEEQ==
+X-Received: by 2002:a17:907:97d0:b0:9aa:63d:9ede with SMTP id js16-20020a17090797d000b009aa063d9edemr2084080ejc.9.1697721490291;
+        Thu, 19 Oct 2023 06:18:10 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id qt16-20020a170906ecf000b0099c53c44083sm3596979ejb.79.2023.10.19.06.18.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 06:18:09 -0700 (PDT)
+Date: Thu, 19 Oct 2023 16:18:06 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	=?utf-8?B?bsOnIMOcTkFM?= <arinc.unal@arinc9.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	John Crispin <john@phrozen.org>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Sergei Shtylyov <sergei.shtylyov@gmail.com>,
+	Justin Chen <justin.chen@broadcom.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Sekhar Nori <nsekhar@ti.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com
+Subject: Re: [PATCH net-next 1/8] dt-bindings: net: Add missing
+ (unevaluated|additional)Properties on child node schemas
+Message-ID: <20231019131806.lbzydoplodybvb62@skbuf>
+References: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
+ <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
+ <20231016-dt-net-cleanups-v1-1-a525a090b444@kernel.org>
+ <20231016-dt-net-cleanups-v1-1-a525a090b444@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20231019-feature_ptp_bitset_fix-v1-1-70f3c429a221@bootlin.com>
-X-B4-Tracking: v=1; b=H4sIADgsMWUC/x2M0QqEIBQFfyXuc0ImFfUrEZJ13L0vJnqLhejfV
- 3qcgZmbMhIj01TdlHBx5iMU0HVF23cNHyjeC1PbtEY3elQeq5wJNkq0jiVDrOef6p0fun7Qzhh
- QiWNC0e94pgCh5Xn+yXvplG0AAAA=
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
- Simon Horman <horms@kernel.org>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Simon Horman <horms@kernel.org>, Michal Kubecek <mkubecek@suse.cz>, 
- stable@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>, 
- Oleksij Rempel <linux@rempel-privat.de>
-X-Mailer: b4 0.12.3
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016-dt-net-cleanups-v1-1-a525a090b444@kernel.org>
+ <20231016-dt-net-cleanups-v1-1-a525a090b444@kernel.org>
 
-This reverts commit 108a36d07c01edbc5942d27c92494d1c6e4d45a0.
+Hi Rob,
 
-It was reported that this fix breaks the possibility to remove existing WoL
-flags. For example:
-~$ ethtool lan2
-...
-        Supports Wake-on: pg
-        Wake-on: d
-...
-~$ ethtool -s lan2 wol gp
-~$ ethtool lan2
-...
-        Wake-on: pg
-...
-~$ ethtool -s lan2 wol d
-~$ ethtool lan2
-...
-        Wake-on: pg
-...
+On Mon, Oct 16, 2023 at 04:44:20PM -0500, Rob Herring wrote:
+> Just as unevaluatedProperties or additionalProperties are required at
+> the top level of schemas, they should (and will) also be required for
+> child node schemas. That ensures only documented properties are
+> present for any node.
+> 
+> Add unevaluatedProperties or additionalProperties as appropriate.
+> 
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+> diff --git a/Documentation/devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml b/Documentation/devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml
+> index 833d2f68daa1..ea285ef3e64f 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml
+> @@ -61,17 +61,11 @@ properties:
+>  
+>    ethernet-ports:
+>      type: object
+> -    properties:
+> -      '#address-cells':
+> -        const: 1
+> -      '#size-cells':
+> -        const: 0
+> -
+> +    additionalProperties: true
+>      patternProperties:
+>        "^(ethernet-)?port@[0-4]$":
+>          type: object
+> -        description: Ethernet switch ports
+> -
+> +        additionalProperties: true
+>          properties:
+>            pcs-handle:
+>              maxItems: 1
 
-This worked correctly before this commit because we were always updating
-a zero bitmap (since commit 6699170376ab ("ethtool: fix application of
-verbose no_mask bitset"), that is) so that the rest was left zero
-naturally. But now the 1->0 change (old_val is true, bit not present in
-netlink nest) no longer works.
-
-Reported-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reported-by: Michal Kubecek <mkubecek@suse.cz>
-Closes: https://lore.kernel.org/netdev/20231019095140.l6fffnszraeb6iiw@lion.mk-sys.cz/
-Cc: stable@vger.kernel.org
-Fixes: 108a36d07c01 ("ethtool: Fix mod state of verbose no_mask bitset")
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
-
-This patch is reverted for now as we are approaching the end of the
-merge-window. The real fix that fix the mod value will be sent later
-on the next merge-window.
----
- net/ethtool/bitset.c | 32 ++++++--------------------------
- 1 file changed, 6 insertions(+), 26 deletions(-)
-
-diff --git a/net/ethtool/bitset.c b/net/ethtool/bitset.c
-index 883ed9be81f9..0515d6604b3b 100644
---- a/net/ethtool/bitset.c
-+++ b/net/ethtool/bitset.c
-@@ -431,10 +431,8 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
- 			      ethnl_string_array_t names,
- 			      struct netlink_ext_ack *extack, bool *mod)
- {
--	u32 *orig_bitmap, *saved_bitmap = NULL;
- 	struct nlattr *bit_attr;
- 	bool no_mask;
--	bool dummy;
- 	int rem;
- 	int ret;
- 
-@@ -450,22 +448,8 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
- 	}
- 
- 	no_mask = tb[ETHTOOL_A_BITSET_NOMASK];
--	if (no_mask) {
--		unsigned int nwords = DIV_ROUND_UP(nbits, 32);
--		unsigned int nbytes = nwords * sizeof(u32);
--
--		/* The bitmap size is only the size of the map part without
--		 * its mask part.
--		 */
--		saved_bitmap = kcalloc(nwords, sizeof(u32), GFP_KERNEL);
--		if (!saved_bitmap)
--			return -ENOMEM;
--		memcpy(saved_bitmap, bitmap, nbytes);
--		ethnl_bitmap32_clear(bitmap, 0, nbits, &dummy);
--		orig_bitmap = saved_bitmap;
--	} else {
--		orig_bitmap = bitmap;
--	}
-+	if (no_mask)
-+		ethnl_bitmap32_clear(bitmap, 0, nbits, mod);
- 
- 	nla_for_each_nested(bit_attr, tb[ETHTOOL_A_BITSET_BITS], rem) {
- 		bool old_val, new_val;
-@@ -474,14 +458,13 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
- 		if (nla_type(bit_attr) != ETHTOOL_A_BITSET_BITS_BIT) {
- 			NL_SET_ERR_MSG_ATTR(extack, bit_attr,
- 					    "only ETHTOOL_A_BITSET_BITS_BIT allowed in ETHTOOL_A_BITSET_BITS");
--			ret = -EINVAL;
--			goto out;
-+			return -EINVAL;
- 		}
- 		ret = ethnl_parse_bit(&idx, &new_val, nbits, bit_attr, no_mask,
- 				      names, extack);
- 		if (ret < 0)
--			goto out;
--		old_val = orig_bitmap[idx / 32] & ((u32)1 << (idx % 32));
-+			return ret;
-+		old_val = bitmap[idx / 32] & ((u32)1 << (idx % 32));
- 		if (new_val != old_val) {
- 			if (new_val)
- 				bitmap[idx / 32] |= ((u32)1 << (idx % 32));
-@@ -491,10 +474,7 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
- 		}
- 	}
- 
--	ret = 0;
--out:
--	kfree(saved_bitmap);
--	return ret;
-+	return 0;
- }
- 
- static int ethnl_compact_sanity_checks(unsigned int nbits,
-
----
-base-commit: a602ee3176a81280b829c9f0cf259450f7982168
-change-id: 20231019-feature_ptp_bitset_fix-6bf75671b33e
-
-Best regards,
--- 
-Köry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
-
+For my edification, this patch removes #address-cells and #size-cells
+at the same time, because "additionalProperties: true" (which was also
+implied before) doesn't care if they aren't defined in this sub-schema,
+and they are defined through $ref: dsa.yaml#/$defs/ethernet-ports,
+right?
 
