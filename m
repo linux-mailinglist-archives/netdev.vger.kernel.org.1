@@ -1,141 +1,119 @@
-Return-Path: <netdev+bounces-42719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6449F7CFF31
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:11:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2F947CFF46
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:18:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95B161C2087B
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:11:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D359282031
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371F0321B1;
-	Thu, 19 Oct 2023 16:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10333321B9;
+	Thu, 19 Oct 2023 16:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BYg7Eka5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ok/ZlHJI"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F1BD314;
-	Thu, 19 Oct 2023 16:11:39 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FEF0131;
-	Thu, 19 Oct 2023 09:11:37 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-53e2308198eso12994222a12.1;
-        Thu, 19 Oct 2023 09:11:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B12BD314;
+	Thu, 19 Oct 2023 16:18:23 +0000 (UTC)
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E421126;
+	Thu, 19 Oct 2023 09:18:22 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-41cc776ccb4so6170311cf.1;
+        Thu, 19 Oct 2023 09:18:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697731896; x=1698336696; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X32GunGHAK2140SJxVQVQfNtK2QC/jeLmazDGROMOOY=;
-        b=BYg7Eka51OAb6+D7Re3L3yLEhZ91MDLhE5jFXxwpSfm7zm2VsUS0Se34BgBjdVqiBQ
-         ozxHZ5nTxWByR76u5iGJBJqb7ftF4a40tNJT9ltysqcbD5a2a8z+Q/mOQ/Ym5lOjCrQo
-         g3Qz0w07yUUgpyMg6IZut2OgstBxrw5bFp3pzW4SSStEAYGkoe7VfOXKJ6s0bJ20Y68G
-         L94o+JRfgwiFBLK0E4zMM0M3Otg1a9ndKtgCTznvjXyeDi/46G8ZzSeglN4gt14YEjE1
-         9hZrcTFOrq6HeQCCcbPOqIJmwtZn54Ol3rYpkyGW31LsVxFuaP4DSfkC6Rnw2OL/BJiv
-         lWPA==
+        d=gmail.com; s=20230601; t=1697732301; x=1698337101; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uapV51mLN8WMmYGSnBZfefCdK6ozT3UVGFGF24qIeuY=;
+        b=Ok/ZlHJIr8NEYHVFvYHSOv7Lj6afaG8jpmG/NJVlBivlUtviGn2jX6HMptrogT+3s+
+         ACG+194lnIICGjRvbdDsXqilN1PEu6JmH8q59H30GrT7rxekReU1huejLWO+G4mxHRPM
+         ZqG+XjqB11x0pq0dTmq9wzB1MIBUiR62dtrSh3ioLG6hzeKTDB5N6ESQL7oJE5tZG0b6
+         1A8NDDO3RtrfE3DVWNrLuax0ONKyg8TFOJb2T+JoSyfdxWMZx/9u98VJFTjRYadA1VI2
+         qlkmm1RbC5tiklcgA8DW1Jd6/PHXZwfuD65p7s5zlEWkwkHFXvL5SKOS0yRg44NKgd25
+         z/EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697731896; x=1698336696;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X32GunGHAK2140SJxVQVQfNtK2QC/jeLmazDGROMOOY=;
-        b=MdP/X9RET7Olp0qPsZ7FMzv05qEyCPcBtTLE4r4rULXSsgPFZ9pL9EDma3d06WdIzq
-         Q0DZPTQj+hc6o5hi+Emfak5cpxcayHmbAlqN2AGo8PtLBn5+JPdEu95Fhm7e5fmwwZVD
-         7udZfwQZ1CVzf4mfk/fQJpFA0FA8bjJiQqiwJr7ZmOfq4S5c30nSLFOXqVUocHr3/3mD
-         YCgC/lyaFrQ4wNDYjH2QAN+AF7HMexO3QUGwtkYETVrbCo76cHrELDTZGHbKKp1d6EZA
-         baJLlrpcrfuSxFiMBB6wzOXUWrkq+ECML6ZKiYjxMNz3m/mjt0SNrnvAzrW7eOqifNw6
-         0a4A==
-X-Gm-Message-State: AOJu0Yzsm6F989ZVZR71ODQI6UnVkpeh7UsTrrPcEfdHlWSxq/ZUBmxh
-	5ArGkhL3xiHi4fNnXaeJR8c=
-X-Google-Smtp-Source: AGHT+IHY+o8DsaC0r/9+4lEIrMX/sedP3iT7Pw3eQ1iwcKm7sYN1yH+7U61MsQeH4xScEluX4QndhQ==
-X-Received: by 2002:a05:6402:5186:b0:53e:2a65:1d9c with SMTP id q6-20020a056402518600b0053e2a651d9cmr1927370edd.25.1697731895574;
-        Thu, 19 Oct 2023 09:11:35 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id t29-20020a50ab5d000000b0053ed70ebd7csm4740536edc.31.2023.10.19.09.11.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 09:11:35 -0700 (PDT)
-Date: Thu, 19 Oct 2023 19:11:32 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 7/7] dt-bindings: marvell: Add Marvell
- MV88E6060 DSA schema
-Message-ID: <20231019161132.24hcgqfufotg7w7e@skbuf>
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-7-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-7-3ee0c67383be@linaro.org>
+        d=1e100.net; s=20230601; t=1697732301; x=1698337101;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uapV51mLN8WMmYGSnBZfefCdK6ozT3UVGFGF24qIeuY=;
+        b=KtLyPZRqsOtZRFMGndeYNFGLw1KLntOWPapRZ0YPIdxbBiQ6IihHOEcVURSo5Sy1Ng
+         pSl4xI70mCpqVmshat3cxXTk1kHg7AwdQfdaW853qwNZitMK1NH7adtC7ui1fxSeJYUv
+         mEc59M2y+Gf6x50hUmDfi5TVBxj/6n7hi00FMX4UqN7Q+AzaneHsOAH6XALTwbhm4McA
+         2IyjwS3U5dg3HN+3c4XPOZvqOXZ/0AAb52LCO242E4ItvPGop/wkFwPYxc/JFpBgOYYk
+         S/89JA9Yo+AOhmYg086uTj0OkHFlOgpXcUo+sgp/f+CVJ3YFissBwt0ofMMgVxHzzd9Z
+         NAlg==
+X-Gm-Message-State: AOJu0YwS0GaIOqMeNNFmeKw73n9tabx6DB3YsKwAFuSyLSA3uzCJmnPb
+	iuHe+nFsIpUM/jnJL6eLAMo=
+X-Google-Smtp-Source: AGHT+IGjvhJfLKuDs5DfvJnYwes/BIJO6xmXm1HYK7qwm3adZqHNq/BSUWQbhp/V1oYQa1lhQTLq8w==
+X-Received: by 2002:ac8:5b86:0:b0:41c:b617:8529 with SMTP id a6-20020ac85b86000000b0041cb6178529mr2752525qta.21.1697732300989;
+        Thu, 19 Oct 2023 09:18:20 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id fp7-20020a05622a508700b00405502aaf76sm836120qtb.57.2023.10.19.09.18.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Oct 2023 09:18:20 -0700 (PDT)
+Message-ID: <8ba336f9-b2e3-43e1-a3b7-06022ea9ac00@gmail.com>
+Date: Thu, 19 Oct 2023 09:18:14 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231018-marvell-88e6152-wan-led-v4-7-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-7-3ee0c67383be@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 5/9] net: dsa: microchip: ksz9477: Add Wake on
+ Magic Packet support
+Content-Language: en-US
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
+ Woojung Huh <woojung.huh@microchip.com>,
+ Arun Ramadoss <arun.ramadoss@microchip.com>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Rob Herring <robh+dt@kernel.org>
+Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>, devicetree@vger.kernel.org
+References: <20231019122850.1199821-1-o.rempel@pengutronix.de>
+ <20231019122850.1199821-6-o.rempel@pengutronix.de>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20231019122850.1199821-6-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 18, 2023 at 11:03:46AM +0200, Linus Walleij wrote:
-> The Marvell MV88E6060 is one of the oldest DSA switches from
-> Marvell, and it has DT bindings used in the wild. Let's define
-> them properly.
+On 10/19/23 05:28, Oleksij Rempel wrote:
+> Introduce Wake on Magic Packet (WoL) functionality to the ksz9477
+> driver.
 > 
-> It is different enough from the rest of the MV88E6xxx switches
-> that it deserves its own binding.
+> Major changes include:
 > 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  .../bindings/net/dsa/marvell,mv88e6060.yaml        | 90 ++++++++++++++++++++++
->  MAINTAINERS                                        |  1 +
->  2 files changed, 91 insertions(+)
+> 1. Extending the `ksz9477_handle_wake_reason` function to identify Magic
+>     Packet wake events alongside existing wake reasons.
 > 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
-> new file mode 100644
-> index 000000000000..787f328551f6
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
-> @@ -0,0 +1,90 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6060.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Marvell MV88E6060 DSA switch
-> +
-> +maintainers:
-> +  - Andrew Lunn <andrew@lunn.ch>
-> +
-> +description:
-> +  The Marvell MV88E6060 switch has been produced and sold by Marvell
-> +  since at least 2010. The switch has one pin ADDR4 that controls the
-> +  MDIO address of the switch to be 0x10 or 0x00, and on the MDIO bus
-> +  connected to the switch, the PHYs inside the switch appear as
-> +  independent devices on address 0x00-0x04 or 0x10-0x14, so in difference
-> +  from many other DSA switches this switch does not have an internal
-> +  MDIO bus for the PHY devices.
+> 2. Updating the `ksz9477_get_wol` and `ksz9477_set_wol` functions to
+>     handle WAKE_MAGIC alongside the existing WAKE_PHY option, and to
+>     program the switch's MAC address register accordingly when Magic
+>     Packet wake-up is enabled. This change will prevent WAKE_MAGIC
+>     activation if the related port has a different MAC address compared
+>     to a MAC address already used by HSR or an already active WAKE_MAGIC
+>     on another port.
+> 
+> 3. Adding a restriction in `ksz_port_set_mac_address` to prevent MAC
+>     address changes on ports with active Wake on Magic Packet, as the
+>     switch's MAC address register is utilized for this feature.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-Where does 2010 come from (both here and in the other Marvell schema)?
-Lennert Buytenhek added Linux support for this switch family in 2008.
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
-Anyway,
-
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
