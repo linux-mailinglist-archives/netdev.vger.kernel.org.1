@@ -1,511 +1,205 @@
-Return-Path: <netdev+bounces-42588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B72BB7CF754
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:46:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8142E7CF75F
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:48:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA1C11C20B28
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:46:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D642B281F92
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4461CAA4;
-	Thu, 19 Oct 2023 11:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC71F1DFC6;
+	Thu, 19 Oct 2023 11:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB64DDDD
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 11:46:17 +0000 (UTC)
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B3AE9F;
-	Thu, 19 Oct 2023 04:46:12 -0700 (PDT)
-Received: from [78.30.34.192] (port=53402 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1qtRTZ-002j2d-0X; Thu, 19 Oct 2023 13:46:08 +0200
-Date: Thu, 19 Oct 2023 13:46:04 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter <netfilter@vger.kernel.org>,
-	netfilter-devel <netfilter-devel@vger.kernel.org>
-Cc: netdev@vger.kernel.org, netfilter-announce@lists.netfilter.org,
-	lwn@lwn.net
-Subject: [ANNOUNCE] nftables 1.0.9 release
-Message-ID: <ZTEW/A8ze+8HrI2u@calendula>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED6E1CFB0;
+	Thu, 19 Oct 2023 11:48:43 +0000 (UTC)
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64AD59F;
+	Thu, 19 Oct 2023 04:48:40 -0700 (PDT)
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2c515527310so72764721fa.2;
+        Thu, 19 Oct 2023 04:48:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697716118; x=1698320918;
+        h=mime-version:user-agent:content-transfer-encoding:date:cc:to:from
+         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=haIfe1rTg5FLIyWwujChtjmUQ5q/aYls2nWYt7faFhU=;
+        b=dVZ4FhmYj6s9HZwYSvAIiiqp38NeBucnewWWjm1R0ttJRhhlJsLLndCBvAx7+SL5bt
+         TOi8OymVusLEdK3Be+aDR+xy/16jUs0/jiokFfC4blMPwzhYIBRPoszHThQ1xxRqBfQG
+         Y25sHthoWbypSHTiaBCMqC7ycXTWw+SJkDPpx6I5tSK2dc+ckyOGK/6sve1pttlsMAc6
+         NtDbwDxXnuOzRfMpnpUf91HhqeZ/FYEuZSLpa+OGcUmtHpCG0kANltKuAuMuGI0Ouf63
+         GU9RxNzi+GnzZR+RUZfNZsgWzKA32pX+Vh/MQtqLpneXA5S0Y7ItE+s6QhnzcsfVhVNu
+         N0qw==
+X-Gm-Message-State: AOJu0YwJHQnwBDbzq1FLLssLP4ZQGO9jiTAueJckGi191l0NJza3d4eV
+	F/TQZ8kqEeM/if7RU2fjCzNBRNI8A/Z75w==
+X-Google-Smtp-Source: AGHT+IGCo4vjapnaMd0UV5JbKGhXhkMN6/U3sLtY6n/m1JqnNMsqx9wWJWXJcyXy4TpazR2rcgNtCg==
+X-Received: by 2002:a05:651c:1990:b0:2c0:1fb4:446f with SMTP id bx16-20020a05651c199000b002c01fb4446fmr1381342ljb.14.1697716117748;
+        Thu, 19 Oct 2023 04:48:37 -0700 (PDT)
+Received: from [10.148.84.122] (business-89-135-192-225.business.broadband.hu. [89.135.192.225])
+        by smtp.gmail.com with ESMTPSA id u26-20020a2e9b1a000000b002c50b040e94sm1073040lji.85.2023.10.19.04.48.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 04:48:36 -0700 (PDT)
+Message-ID: <aff833bb8b202f12feed5b2682f1361f13e37581.camel@inf.elte.hu>
+Subject: r8152: error when loading the module
+From: Ferenc Fejes <fejes@inf.elte.hu>
+To: netdev <netdev@vger.kernel.org>
+Cc: linux-usb@vger.kernel.org, linux-usb@vger.kernel.org
+Date: Thu, 19 Oct 2023 13:48:35 +0200
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.0-1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="Q6Lf2IgjCzW7D6s9"
-Content-Disposition: inline
-X-Spam-Score: -1.7 (-)
-
-
---Q6Lf2IgjCzW7D6s9
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 
 Hi!
 
-The Netfilter project proudly presents:
-
-        nftables 1.0.9
-
-This release contains enhancements and fixes such as:
-
-- Speed up chain listing:
-
-     # time nft list chain inet raw input
-     table inet raw {
-         chain input {
-             type filter hook input priority filter; policy accept;
-             ip6 saddr @bogons6 counter drop
-         }
-     }
-
-     before:
-     real    0m2,913s
-     user    0m1,345s
-     sys     0m1,568s
-
-     after:
-     real    0m0,056s
-     user    0m0,018s
-     sys     0m0,039s
-
-- Allow custom conntrack timeouts to use time specification (not only
-  seconds), e.g.
-
-    table inet x {
-        ct timeout customtimeout {
-                protocol tcp
-                l3proto ip
-                policy = { established: 2m, close: 20s }
-        }
-
-        chain y {
-                type filter hook prerouting priority filter; policy accept;
-                tcp dport 8888 ct timeout set "customtimeout"
-        }
-    }
-
-- Allow to combine dnat with numgen, eg.
-
-     ... dnat to numgen inc mod 8 offset 0xc0a864c8
-
-  where offset 0xc0a864c8 represents 192.168.100.200, to fan out packets
-  using stateful DNAT from 192.168.100.200 to 192.168.100.207.
-
-- Allow for using constants as key in dynamic sets.
-
-    table inet x {
-        chain y {
-                type filter hook input priority 0; policy drop;
-                udp dport 45378 add @dynmark { 10.2.3.4 timeout 3s : 0x00000002 }
-        }
-    }
-
-- Fix get element command with concatenated set:
-
-    table ip filter {
-            set test {
-                    type ipv4_addr . ether_addr . mark
-                    flags interval
-                    elements = { 198.51.100.0/25 . 00:0b:0c:ca:cc:10-c1:a0:c1:cc:10:00 . 0x0000006f, }
-            }
-    }
-
-  then allow to check if element is present with:
-
-    # nft get element ip filter test { 198.51.100.1 . 00:0b:0c:ca:cc:10 . 0x6f }
-
-- Support for matching on the target address of a IPv6 neighbour
-  solicitation/advertisement.
-
-    ... icmpv6 type nd-neighbor-solicit icmpv6 taddr 2001:db8::133 counter
-
-- Provide a pyproject.toml config file and legacy setup.py script
-  to install Python support. Using pip:
-
-        python -m pip install py/
-
-  or, alternatively, legacy setup.py script:
-
-        cd py && python setup.py install
-
-- Fix incorrect bytecode to set meta and ct mark using smaller size
-  selector results in incorrect bytecode, e.g. set meta mark to
-  ip dscp header field.
-
-    ... meta mark set ip dscp
-
-  Support for this is available since 1.0.8, but bytecode generation
-  was not correct.
-
-- Empty internal cache in -o/--optimize (which implicitly pulls in
-  -c/--check mode) otherwise stale objects remain in place, triggering BUG:
-
-     BUG: invalid input descriptor type 151665524
-     nft: erec.c:161: erec_print: Assertion `0' failed.
-     Aborted
-
-- Fix memleak in prefix evaluation with wildcard interface name
-
-    The following ruleset:
-
-      table ip x {
-            chain y {
-                    meta iifname { abcde*, xyz }
-            }
-      }
-
-- Restore interval maps, broken since 1.0.7. e.g.
-
-    table inet filter {
-           counter TEST {
-                   packets 0 bytes 0
-           }
-
-           map testmap {
-                   type ipv4_addr : counter
-                   flags interval
-                   elements = { 192.168.0.0/24 : "TEST" }
-           }
-    }
-
-- Restore bitwise operations in combination with maps, eg. jump to
-  chain depending on bitwise operation on packet mark.
-
-    table ip x {
-           map sctm_o0 {
-               type mark : verdict
-               elements = { 0x00000000 : jump sctm_o0_0, 0x00000001 : jump sctm_o0_1 }
-           }
-
-           chain sctm_o0_0 {
-                counter
-           }
-
-           chain sctm_o0_1 {
-                counter
-           }
-
-           chain SET_ctmark_RPLYroute {
-                   meta mark >> 8 & 0xf vmap @sctm_o0
-           }
-    }
-
-- Display default burst of 5 packets in limit statement, this was not
-  printed for historical reasons, now this is shown in the listing, e.g.
-
-  ... limit rate 400/minute burst 5 packets accept
-
-- Restore use of conntrack label in concatenations, eg.
-
-  ... ct label . ct mark  { 0x1 . 0x1 }
-
-- Do not merge expressions across non-expression statements, e.g.
-
-  .... ether saddr 00:11:22:33:44:55 counter ether type 8021q
-
-  is not merged because the counter statement falls in between these
-  two candidate expressions that could be coalesced in one single
-  expression to match at ethernet source address offset and the
-  ether type field coming next.
-
-- Fix crash with log prefix longer that 127 bytes.
-
-- Fixes for JSON support.
-
-- ... and many unsorted fixes found via proactive code inspection.
-
-... as well as asorted fixes and manpage documentation updates.
-
-See changelog for more details (attached to this email).
-
-You can download this new release from:
-
-https://www.netfilter.org/projects/nftables/downloads.html
-https://www.netfilter.org/pub/nftables/
-
-[ NOTE: We have switched to .tar.xz files for releases. ]
-
-To build the code, libnftnl >= 1.2.6 and libmnl >= 1.0.4 are required:
-
-* https://netfilter.org/projects/libnftnl/index.html
-* https://netfilter.org/projects/libmnl/index.html
-
-Visit our wikipage for user documentation at:
-
-* https://wiki.nftables.org
-
-For the manpage reference, check man(8) nft.
-
-In case of bugs and feature requests, file them via:
-
-* https://bugzilla.netfilter.org
-
-Happy firewalling.
-
---Q6Lf2IgjCzW7D6s9
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: attachment; filename="changes-nftables-1.0.9.txt"
-
-Arturo Borrero Gonzalez (1):
-      tests/build/run-tests.sh: fix issues reported by shellcheck
-
-Brennan Paciorek (1):
-      doc: document add chain device parameter
-
-Florian Westphal (48):
-      exthdr: prefer raw_type instead of desc->type
-      tests: shell: auto-run kmemleak if its available
-      netlink: delinearize: copy set keytype if needed
-      rule: allow src/dstnat prios in input and output
-      ct expectation: fix 'list object x' vs. 'list objects in table' confusion
-      tests: fix inet nat prio tests
-      tests: add dynmap datapath add/delete test case
-      parser: allow ct timeouts to use time_spec values
-      parser: deduplicate map with data interval
-      tests: shell: add test case for double-deactivation
-      tests: add test with concatenation, vmap and timeout
-      tests: add transaction stress test with parallel delete/add/flush and netns deletion
-      tests: add one more chain jump in vmap test
-      tests: add table validation check
-      tests: update bad_expression test case
-      tests: 30s-stress: add failslab and abort phase tests
-      parser: permit gc-interval in map declarations
-      tests/shell: expand vmap test case to also cause batch abort
-      evaluate: fix get element for concatenated set
-      tests: shell: 0043concatenated_ranges_0: re-enable all tests
-      tests/shell: make delete_by_handle test work on older releases
-      tests/shell: typeof_integer/raw: prefer @nh for payload matching
-      tests: shell: fix dump validation message
-      tests: shell: add sample ruleset reproducer
-      tests/shell: add and use chain binding feature probe
-      tests/shell: skip netdev_chain_0 if kernel requires netdev device
-      tests/shell: skip map query if kernel lacks support
-      tests/shell: skip inner matching tests if unsupported
-      tests/shell: skip bitshift tests if kernel lacks support
-      tests/shell: skip some tests if kernel lacks netdev egress support
-      tests/shell: skip inet ingress tests if kernel lacks support
-      tests/shell: skip destroy tests if kernel lacks support
-      tests/shell: skip catchall tests if kernel lacks support
-      tests/shell: skip test cases involving osf match if kernel lacks support
-      tests/shell: skip test cases if ct expectation and/or timeout lacks support
-      tests/shell: skip reset tests if kernel lacks support
-      tests: shell: skip adding catchall elements if unuspported
-      tests: shell: add feature probe for sets with more than one element
-      tests: shell: add feature probe for sctp chunk matching
-      tests: shell: skip flowtable-uaf if we lack table owner support
-      rule: never merge across non-expression statements
-      tests: never merge across non-expression statements redux
-      libnftables: refuse to open onput files other than named pipes or regular files
-      scanner: restrict include directive to regular files
-      tests: never merge across non-expression statements redux 2
-      tests: add test for dormant on/off/on bug
-      tests: shell: add vlan match test case
-      evaluate: suggest != in negation error message
-
-Jeremy Sowden (5):
-      py: move package source into src directory
-      py: use setup.cfg to configure setuptools
-      py: add pyproject.toml to support PEP-517-compatible build-systems
-      doc: move man-pages to `dist_man_MANS`
-      doc: move man-pages to `MAINTAINERCLEANFILES`
-
-Jorge Ortiz (1):
-      evaluate: place byteorder conversion after numgen for IP address datatypes
-
-Nicolas Cavallari (1):
-      icmpv6: Allow matching target address in NS/NA, redirect and MLD
-
-Pablo Neira Ayuso (33):
-      meta: stash context statement length when generating payload/meta dependency
-      update INSTALL file
-      tests: shell: extend implicit chain map with flush command
-      py: remove setup.py integration with autotools
-      libnftables: Drop cache in -c/--check mode
-      INSTALL: provide examples to install python bindings
-      cache: chain listing implicitly sets on terse option
-      evaluate: error out on meter overlap with an existing set/map declaration
-      tests: shell: use minutes granularity in sets/0036add_set_element_expiration_0
-      evaluate: do not remove anonymous set with protocol flags and single element
-      proto: use hexadecimal to display ip frag-off field
-      tests: py: extend ip frag-off coverage
-      tests: py: debloat frag.t.payload.netdev
-      src: use internal_location for unspecified location at allocation time
-      src: remove check for NULL before calling expr_free()
-      src: simplify chain_alloc()
-      rule: set internal_location for table and chain
-      evaluate: revisit anonymous set with single element optimization
-      doc: describe behaviour of {ip,ip6} length
-      evaluate: fix memleak in prefix evaluation with wildcard interface name
-      evaluate: expand sets and maps before evaluation
-      evaluate: perform mark datatype compatibility check from maps
-      limit: display default burst when listing ruleset
-      datatype: initialize TYPE_CT_LABEL slot in datatype array
-      datatype: initialize TYPE_CT_EVENTBIT slot in datatype array
-      tests: py: add map support
-      json: expose dynamic flag
-      netlink_linearize: skip set element expression in map statement key
-      tests: shell: fix spurious errors in sets/0036add_set_element_expiration_0
-      json: add missing map statement stub
-      doc: remove references to timeout in reset command
-      evaluate: validate maximum log statement prefix length
-      build: Bump version to 1.0.9
-
-Phil Sutter (21):
-      tests: monitor: Summarize failures per test case
-      tests: shell: Review test-cases for destroy command
-      tests: shell: Stabilize sets/reset_command_0 test
-      tests: shell: Stabilize sets/0043concatenated_ranges_0 test
-      evaluate: Drop dead code from expr_evaluate_mapping()
-      tests: monitor: Fix monitor JSON output for insert command
-      tests: monitor: Fix time format in ct timeout test
-      tests: monitor: Fix for wrong syntax in set-interval.t
-      tests: monitor: Fix for wrong ordering in expected JSON output
-      parser_json: Catch wrong "reset" payload
-      parser_json: Fix typo in json_parse_cmd_add_object()
-      parser_json: Proper ct expectation attribute parsing
-      parser_json: Fix flowtable prio value parsing
-      parser_json: Fix limit object burst value parsing
-      parser_json: Fix synproxy object mss/wscale parsing
-      parser_json: Wrong check in json_parse_ct_timeout_policy()
-      parser_json: Catch nonsense ops in match statement
-      parser_json: Default meter size to zero
-      tests: shell: features: Fix table owner flag check
-      tests: shell: Fix for failing nft-f/sample-ruleset
-      tests: shell: sets/reset_command_0: Fix drop_seconds()
-
-Thomas Haller (121):
-      py: return boolean value from Nftables.__[gs]et_output_flag()
-      json: use strtok_r() instead of strtok()
-      nftutils: add and use wrappers for getprotoby{name,number}_r(), getservbyport_r()
-      meta: don't assume time_t is 64 bit in date_type_print()
-      meta: use reentrant localtime_r()/gmtime_r() functions
-      gitignore: ignore cscope files
-      src: add input flags for nft_ctx
-      src: add input flag NFT_CTX_INPUT_NO_DNS to avoid blocking
-      src: add input flag NFT_CTX_INPUT_JSON to enable JSON parsing
-      py: fix exception during cleanup of half-initialized Nftables
-      py: extract flags helper functions for set_debug()/get_debug()
-      py: add Nftables.{get,set}_input_flags() API
-      meta: define _GNU_SOURCE to get strptime() from <time.h>
-      src: add <nft.h> header and include it as first
-      include: don't define _GNU_SOURCE in public header
-      configure: use AC_USE_SYSTEM_EXTENSIONS to get _GNU_SOURCE
-      include: include <std{bool,int}.h> via <nft.h>
-      configure: drop AM_PROG_CC_C_O autoconf check
-      netlink: avoid "-Wenum-conversion" warning in dtype_map_from_kernel()
-      netlink: avoid "-Wenum-conversion" warning in parser_bison.y
-      datatype: avoid cast-align warning with struct sockaddr result from getaddrinfo()
-      evaluate: fix check for truncation in stmt_evaluate_log_prefix()
-      src: rework SNPRINTF_BUFFER_SIZE() and handle truncation
-      evaluate: don't needlessly clear full string buffer in stmt_evaluate_log_prefix()
-      src: suppress "-Wunused-but-set-variable" warning with "parser_bison.c"
-      include: drop "format" attribute from nft_gmp_print()
-      rule: fix "const static" declaration
-      utils: call abort() after BUG() macro
-      src: silence "implicit-fallthrough" warnings
-      xt: avoid "-Wmissing-field-initializers" for "original_opts"
-      tests/shell: rework command line parsing in "run-tests.sh"
-      tests/shell: rework finding tests and add "--list-tests" option
-      tests/shell: check test names before start and support directories
-      tests/shell: export NFT_TEST_BASEDIR and NFT_TEST_TMPDIR for tests
-      tests/shell: normalize boolean configuration in environment variables
-      tests/shell: print test configuration
-      tests/shell: run each test in separate namespace and allow rootless
-      tests/shell: interpret an exit code of 77 from scripts as "skipped"
-      tests/shell: support --keep-logs option (NFT_TEST_KEEP_LOGS=y) to preserve test output
-      tests/shell: move the dump diff handling inside "test-wrapper.sh"
-      tests/shell: rework printing of test results
-      tests/shell: move taint check to "test-wrapper.sh"
-      tests/shell: move valgrind wrapper script to separate script
-      tests/shell: support running tests in parallel
-      tests/shell: bind mount private /var/run/netns in test container
-      tests/shell: skip test in rootless that hit socket buffer size limit
-      tests/shell: record the test duration (wall time) in the result data
-      tests/shell: fix "0003includepath_0" for different TMPDIR
-      tests/shell: set TMPDIR for tests in "test-wrapper.sh"
-      tests/shell: return 77/skip for tests that fail to create dummy device
-      tests/shell: cleanup result handling in "test-wrapper.sh"
-      tests/shell: cleanup print_test_result() and show TAINTED error code
-      tests/shell: colorize terminal output with test result
-      tests/shell: fix handling failures with VALGRIND=y
-      tests/shell: print the NFT setting with the VALGRIND=y wrapper
-      tests/shell: don't redirect error/warning messages to stderr
-      tests/shell: redirect output of test script to file too
-      tests/shell: print "kernel is tainted" separate from test result
-      tests/shell: no longer enable verbose output when selecting a test
-      tests/shell: record wall time of test run in result data
-      tests/shell: set NFT_TEST_JOBS based on $(nproc)
-      cache: avoid accessing uninitialized varible in implicit_chain_cache()
-      datatype: rename "dtype_clone()" to datatype_clone()
-      tests/shell: honor .nodump file for tests without nft dumps
-      tests/shell: generate and add ".nft" dump files for existing tests
-      tests/shell: add missing ".nodump" file for tests without dumps
-      tests/shell: add ".nft" dump files for tests without dumps/ directory
-      tests/shell: set valgrind's "--vgdb-prefix=" to orignal TMPDIR
-      tests/shell: print number of completed tests to show progress
-      tests/shell: skip tests if nft does not support JSON mode
-      tests/shell: add "--quick" option to skip slow tests (via NFT_TEST_SKIP_slow=y)
-      parser_bison: include <nft.h> for base C environment to "parser_bison.y"
-      include: include <stdlib.h> in <nft.h>
-      tests/shell: kill running child processes when aborting "run-tests.sh"
-      tests/shell: ensure vgdb-pipe files are deleted from "nft-valgrind-wrapper.sh"
-      datatype: fix leak and cleanup reference counting for struct datatype
-      tests/shell: export NFT_TEST_RANDOM_SEED variable for tests
-      tests/shell: add "random-source.sh" helper for random-source for sort/shuf
-      tests/shell: add option to shuffle execution order of tests
-      tests/shell: remove spurious .nft dump files
-      tests/shell: drop unstable dump for "transactions/0051map_0" test
-      tests/shell: add missing nft/nodump files for tests
-      tests/shell: special handle base path starting with "./"
-      tests/shell: in find_tests() use C locale for sorting tests names
-      tools: add "tools/check-tree.sh" script to check consistency of nft dumps
-      tests/shell: exit 77 from "run-tests.sh" if all tests were skipped
-      tests/shell: accept $NFT_TEST_TMPDIR_TAG for the result directory
-      tests/shell: honor CLICOLOR_FORCE to force coloring in run-tests.sh
-      tests/build: capture more output from "tests/build/run-tests.sh" script
-      tests/shell: add feature probing via "features/*.nft" files
-      tests/shell: colorize NFT_TEST_SKIP_/NFT_TEST_HAVE_ in test output
-      tests/shell: suggest 4Mb /proc/sys/net/core/{wmem_max,rmem_max} for rootless
-      tests/shell: cleanup creating dummy interfaces in tests
-      tests/shell: implement NFT_TEST_HAVE_json feature detection as script
-      tests/shell: check diff in "maps/typeof_maps_0" and "sets/typeof_sets_0" test
-      tests/shell: fix preserving ruleset diff after test
-      tests/shell: set C locale in "run-tests.sh"
-      tests/shell: don't show the exit status for failed tests
-      tests/shell: colorize NFT_TEST_HAS_SOCKET_LIMITS
-      tests/shell: simplify collecting error result in "test-wrapper.sh"
-      netlink: fix leaking typeof_expr_data/typeof_expr_key in netlink_delinearize_set()
-      libnftables: drop gmp_init() and mp_set_memory_functions()
-      libnftables: move init-once guard inside xt_init()
-      tests/shell: run `nft --check` on persisted dump files
-      src: fix indentation/whitespace
-      proto: add missing proto_definitions for PROTO_DESC_GENEVE
-      include: fix missing definitions in <cache.h>/<headers.h>
-      netlink: handle invalid etype in set_make_key()
-      datatype: use "enum byteorder" instead of int in set_datatype_alloc()
-      payload: use enum icmp_hdr_field_type in payload_may_dependency_kill_icmp()
-      datatype: return const pointer from datatype_get()
-      tests/shell: honor NFT_TEST_FAIL_ON_SKIP variable to fail on any skipped tests
-      expression: cleanup expr_ops_by_type() and handle u32 input
-      mergesort: avoid cloning value in expr_msort_cmp()
-      include: include <string.h> in <nft.h>
-      datatype: use xmalloc() for allocating datatype in datatype_clone()
-      tests/shell: mount all of "/var/run" in "test-wrapper.sh"
-      tests/shell: preserve result directory with NFT_TEST_FAIL_ON_SKIP
-      tests/shell: add "-S|--setup-host" option to set sysctl for rootless tests
-      tests/shell: add missing "vlan_8021ad_tag.nodump" file
-      tests/shell: use bash instead of /bin/sh for tests
-
-
---Q6Lf2IgjCzW7D6s9--
+On my machine r8152 module loading takes about one minute.
+
+Its a Debian Sid:=C2=A0
+uname -a
+Linux pc 6.5.0-2-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.5.6-1 (2023-10-
+07) x86_64 GNU/Linux
+
+dmesg:
+
+
+[  899.522306] usbcore: registered new device driver r8152-cfgselector
+[  899.601295] r8152-cfgselector 2-1.3: reset SuperSpeed USB device
+number 4 using xhci_hcd
+[  927.789526] r8152 2-1.3:1.0: firmware: direct-loading firmware
+rtl_nic/rtl8156b-2.fw
+[  942.033905] r8152 2-1.3:1.0: load rtl8156b-2 v2 04/27/23
+successfully
+[  956.269444] ------------[ cut here ]------------
+[  956.269447] WARNING: CPU: 7 PID: 211 at drivers/net/usb/r8152.c:7668
+r8156b_hw_phy_cfg+0x1417/0x1430 [r8152]
+[  956.269458] Modules linked in: r8152(+) hid_logitech_hidpp uhid ccm
+rfcomm cmac algif_hash algif_skcipher af_alg snd_seq_dummy snd_hrtimer
+snd_seq qrtr openvswitch nsh nf_conncount nf_nat nf_conntrack
+nf_defrag_ipv6 nf_defrag_ipv4 bnep binfmt_misc nls_ascii nls_cp437 vfat
+fat snd_ctl_led snd_soc_skl_hda_dsp snd_soc_intel_hda_dsp_common
+snd_sof_probes snd_soc_hdac_hdmi x86_pkg_temp_thermal intel_powerclamp
+coretemp kvm_intel snd_hda_codec_hdmi snd_hda_codec_realtek
+snd_hda_codec_generic ledtrig_audio kvm iwlmvm snd_soc_dmic
+snd_sof_pci_intel_tgl snd_sof_intel_hda_common btusb btrtl btbcm
+soundwire_intel btintel btmtk irqbypass soundwire_generic_allocation
+mac80211 mei_pxp mei_wdt mei_hdcp snd_sof_intel_hda_mlink bluetooth
+ghash_clmulni_intel soundwire_cadence snd_sof_intel_hda snd_sof_pci
+pmt_telemetry pmt_class intel_rapl_msr snd_sof_xtensa_dsp snd_sof
+libarc4 aesni_intel snd_sof_utils snd_soc_hdac_hda snd_hda_ext_core
+snd_soc_acpi_intel_match snd_soc_acpi crypto_simd snd_soc_core cryptd
+iwlwifi sha3_generic
+[  956.269502]  jitterentropy_rng rapl snd_compress soundwire_bus
+sha512_ssse3 snd_hda_intel iTCO_wdt intel_cstate intel_pmc_bxt
+sha512_generic snd_intel_dspcfg hp_wmi iTCO_vendor_support
+snd_intel_sdw_acpi intel_uncore cfg80211 platform_profile snd_usb_audio
+snd_hda_codec ctr pcspkr watchdog snd_hda_core mei_me drbg wmi_bmof
+snd_usbmidi_lib ansi_cprng snd_hwdep snd_rawmidi mei ecdh_generic
+uvcvideo snd_seq_device snd_pcm videobuf2_vmalloc uvc videobuf2_memops
+hid_sensor_incl_3d videobuf2_v4l2 hid_sensor_magn_3d hid_sensor_als
+hid_sensor_rotation hid_sensor_accel_3d hid_sensor_gyro_3d rfkill
+snd_timer hid_sensor_trigger videobuf2_common snd hid_sensor_iio_common
+ecc processor_thermal_device_pci_legacy industrialio_triggered_buffer
+kfifo_buf processor_thermal_device soundcore industrialio
+processor_thermal_rfim processor_thermal_mbox ucsi_acpi typec_ucsi
+processor_thermal_rapl roles intel_vsec intel_rapl_common
+intel_soc_dts_iosf igen6_edac typec int3403_thermal soc_button_array
+int340x_thermal_zone int3400_thermal
+[  956.269530]  intel_hid acpi_pad intel_pmc_core ac acpi_thermal_rel
+sparse_keymap joydev hid_multitouch serio_raw evdev squashfs msr
+videodev mc parport_pc ppdev lp parport dm_mod loop efi_pstore configfs
+ip_tables x_tables autofs4 ext4 crc16 mbcache jbd2 efivarfs raid10
+raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor
+raid6_pq libcrc32c crc32c_generic raid1 raid0 multipath linear md_mod
+virtiofs virtio_ring fuse virtio cdc_ncm cdc_ether usbnet hid_jabra
+hid_sensor_custom hid_sensor_hub intel_ishtp_hid mii i915 drm_buddy
+i2c_algo_bit drm_display_helper wacom usbhid cec hid_generic rc_core
+nvme nvme_core ttm xhci_pci t10_pi drm_kms_helper xhci_hcd
+crc64_rocksoft crc64 crc_t10dif iosm crct10dif_generic i2c_hid_acpi
+crc32_pclmul crct10dif_pclmul intel_ish_ipc intel_lpss_pci i2c_i801
+crc32c_intel drm usbcore thunderbolt i2c_smbus intel_lpss intel_ishtp
+wwan crct10dif_common vmd idma64 usb_common i2c_hid battery hid video
+wmi button [last unloaded: r8152]
+[  956.269572] CPU: 7 PID: 211 Comm: kworker/7:2 Tainted: G        W =20
+6.5.0-2-amd64 #1  Debian 6.5.6-1
+[  956.269574] Hardware name: HP HP EliteBook x360 1040 G8 Notebook
+PC/8720, BIOS T93 Ver. 01.14.00 06/26/2023
+[  956.269575] Workqueue: events_long rtl_hw_phy_work_func_t [r8152]
+[  956.269580] RIP: 0010:r8156b_hw_phy_cfg+0x1417/0x1430 [r8152]
+[  956.269584] Code: be 00 a4 00 00 48 89 df 81 e2 ff f7 00 00 e8 00 49
+ff ff e9 a3 ec ff ff be 01 00 00 00 48 89 df e8 ae 6d ff ff e9 eb f0 ff
+ff <0f> 0b e9 b5 ec ff ff e8 5d 7e e1 d3 66 66 2e 0f 1f 84 00 00 00 00
+[  956.269585] RSP: 0018:ffffac368073bde0 EFLAGS: 00010293
+[  956.269586] RAX: 0000000000000000 RBX: ffffa0c848d939c0 RCX:
+0000000000000000
+[  956.269587] RDX: 0000000000000000 RSI: 0000000000000246 RDI:
+0000000000000000
+[  956.269588] RBP: ffffa0c848d93da8 R08: 0000000000000000 R09:
+0000000000000000
+[  956.269589] R10: 0000000000000001 R11: 0000000000000000 R12:
+ffffa0c848d939c0
+[  956.269589] R13: ffffac368023cc50 R14: ffffa0c8a3ab3360 R15:
+0000000000001c50
+[  956.269590] FS:  0000000000000000(0000) GS:ffffa0cfcf9c0000(0000)
+knlGS:0000000000000000
+[  956.269591] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  956.269592] CR2: 00007fbc793e5000 CR3: 00000001ddd70002 CR4:
+0000000000f70ee0
+[  956.269593] PKRU: 55555554
+[  956.269593] Call Trace:
+[  956.269595]  <TASK>
+[  956.269596]  ? r8156b_hw_phy_cfg+0x1417/0x1430 [r8152]
+[  956.269600]  ? __warn+0x81/0x130
+[  956.269605]  ? r8156b_hw_phy_cfg+0x1417/0x1430 [r8152]
+[  956.269609]  ? report_bug+0x191/0x1c0
+[  956.269613]  ? handle_bug+0x3c/0x80
+[  956.269615]  ? exc_invalid_op+0x17/0x70
+[  956.269617]  ? asm_exc_invalid_op+0x1a/0x20
+[  956.269620]  ? r8156b_hw_phy_cfg+0x1417/0x1430 [r8152]
+[  956.269624]  rtl_hw_phy_work_func_t+0x263/0xf50 [r8152]
+[  956.269629]  process_one_work+0x1de/0x3f0
+[  956.269632]  worker_thread+0x51/0x390
+[  956.269633]  ? _raw_spin_lock_irqsave+0x27/0x60
+[  956.269635]  ? __pfx_worker_thread+0x10/0x10
+[  956.269637]  kthread+0xf4/0x130
+[  956.269639]  ? __pfx_kthread+0x10/0x10
+[  956.269640]  ret_from_fork+0x31/0x50
+[  956.269643]  ? __pfx_kthread+0x10/0x10
+[  956.269645]  ret_from_fork_asm+0x1b/0x30
+[  956.269648]  </TASK>
+[  956.269648] ---[ end trace 0000000000000000 ]---
+[  966.304141] r8152 2-1.3:1.0: PHY patch request fail
+[  966.304935] r8152 2-1.3:1.0 eth0: v1.12.13
+[  966.304983] usbcore: registered new interface driver r8152
+
+Which in my case points to line 7668:
+
+(gdb) l *(r8156b_hw_phy_cfg+0x1417)
+0x12577 is in r8156b_hw_phy_cfg (drivers/net/usb/r8152.c:7668).
+7663=09
+7664		/* disable EEE before updating the PHY parameters */
+7665		rtl_eee_enable(tp, false);
+7666=09
+7667		data =3D r8153_phy_status(tp, PHY_STAT_LAN_ON);
+7668		WARN_ON_ONCE(data !=3D PHY_STAT_LAN_ON);
+7669=09
+7670		ocp_data =3D ocp_read_word(tp, MCU_TYPE_PLA,
+PLA_PHY_PWR);
+7671		ocp_data |=3D PFM_PWM_SWITCH;
+7672		ocp_write_word(tp, MCU_TYPE_PLA, PLA_PHY_PWR,
+ocp_data);
+
+
+Thanks,
+Ferenc
 
