@@ -1,224 +1,179 @@
-Return-Path: <netdev+bounces-42783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 047387D0219
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:53:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F5DF7D0249
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 21:12:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2825B1C20E1A
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:53:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35C0F1C20ECE
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 934CF38DF0;
-	Thu, 19 Oct 2023 18:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056E037CB5;
+	Thu, 19 Oct 2023 19:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bhjwJqfy"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d+FTlL4N"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9DD225BD
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 18:53:31 +0000 (UTC)
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DE21CA
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 11:53:30 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id 6a1803df08f44-66d09b6d007so415306d6.1
-        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 11:53:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1697741609; x=1698346409; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yn6niGlVpik1+e+QCgKyj4LwqQJ4sOlytoLY2dyj1/U=;
-        b=bhjwJqfypnluTrn3G/UtC3Ak8ZpGpPh87efjol51rLZcb1qLl6VaxLK3oKRihtzWop
-         3u0wvJz909b2KHqOlGySVwCdqxUMAH7880LmPUwmjcNsLwy/t1LEiwvE2k9O3Brc7fao
-         49+M6BZd4t9GQ/IpMquNJFSZRpGKhF29gZ7vo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697741609; x=1698346409;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yn6niGlVpik1+e+QCgKyj4LwqQJ4sOlytoLY2dyj1/U=;
-        b=koD9Lr0ZbleqRFUQSjGBHtcELiJz0vzfkrAzVnBD1ayFkLJYx/5MhZ0aj3SJoqevn0
-         a+CuB3OKHgFxDOsSlyM5fltOHyGcLaSVWXqI9i1DMKRxnCD8Rm/kQSHJQmUmD2pTNzVm
-         2hb4WAXpZLVrxh3rHU6fPP4MqGFqu3yzzVf8ZgEBmSJjS/VkHT8fx+zmuK5mKpEOFAdE
-         e7XCx5vQkGFjedQw9MxZnQGKiNUEgzztsjaZGwEcx9H4juWF7fhBC7hIdoblRSkPWmAm
-         QHsssrcUUBGijxTGf4h2ZQJdAXXEwd5zv4yOfyTAxScmBQa1hOBaKLpPng5dw7mGvl7R
-         xG7Q==
-X-Gm-Message-State: AOJu0YyPj+uFxjA4iVd3oxFdw8sgHtySJdKkhocAmWifRZtXrgr1u3fM
-	/Pf2tJnTttHZhgilPm7RP8w7Gw==
-X-Google-Smtp-Source: AGHT+IEUIodrBgLlcDiSMs6WrrTGyJdWjnMs4k2fRYKjhHr0jibKeof1Cq//0hKN+bWK/VWsbe76rA==
-X-Received: by 2002:a05:6214:20ea:b0:66d:3723:294b with SMTP id 10-20020a05621420ea00b0066d3723294bmr2798523qvk.64.1697741609651;
-        Thu, 19 Oct 2023 11:53:29 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id dz16-20020ad45890000000b006263a9e7c63sm63368qvb.104.2023.10.19.11.53.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Oct 2023 11:53:28 -0700 (PDT)
-Message-ID: <eb976fa1-f0e2-4158-bacd-c55655bbf025@broadcom.com>
-Date: Thu, 19 Oct 2023 11:53:19 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EC6335BA
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 19:12:14 +0000 (UTC)
+Received: from out-199.mta0.migadu.com (out-199.mta0.migadu.com [91.218.175.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E341CA
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:12:13 -0700 (PDT)
+Message-ID: <1074c1f1-e676-fbe6-04bc-783821d746a1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1697742730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P0h5fWMyT5Vo7k2V5ZPXS3Hx5Ml7GFIc3I0D99ZWvRU=;
+	b=d+FTlL4N6Sg5LI52khLUWtya9wxh3NUBk02cIuaOnCLy+SLqFNSa5lIBw8RSaHQ725A9gd
+	snoj8Tm3/rt+fez+p3f/x75NDTq0AcO+LumuU/EybX4CSNIYRVU2FjzDFxUR3euju4mNcA
+	oT/hqzu2F5LYIUr8MbDVOUBmmPWg1Ig=
+Date: Thu, 19 Oct 2023 12:12:03 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 05/16] net: Make dev_set_hwtstamp_phylib
- accessible
-To: Kory Maincent <kory.maincent@bootlin.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
- Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com,
- Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-References: <20231019-feature_ptp_netnext-v6-0-71affc27b0e5@bootlin.com>
- <20231019-feature_ptp_netnext-v6-5-71affc27b0e5@bootlin.com>
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- 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
-In-Reply-To: <20231019-feature_ptp_netnext-v6-5-71affc27b0e5@bootlin.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000948b2e0608164588"
-
---000000000000948b2e0608164588
+Subject: Re: [PATCH v7 04/11] net/socket: Break down __sys_getsockopt
 Content-Language: en-US
+To: Breno Leitao <leitao@debian.org>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, io-uring@vger.kernel.org,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+ David Howells <dhowells@redhat.com>, sdf@google.com, axboe@kernel.dk,
+ asml.silence@gmail.com, willemdebruijn.kernel@gmail.com, kuba@kernel.org,
+ pabeni@redhat.com, krisman@suse.de, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+References: <20231016134750.1381153-1-leitao@debian.org>
+ <20231016134750.1381153-5-leitao@debian.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231016134750.1381153-5-leitao@debian.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 10/19/23 07:29, Kory Maincent wrote:
-> Make the dev_set_hwtstamp_phylib function accessible in prevision to use
-> it from ethtool to reset the tstamp current configuration.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+On 10/16/23 6:47 AM, Breno Leitao wrote:
+> diff --git a/net/socket.c b/net/socket.c
+> index 0087f8c071e7..f4c156a1987e 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -2350,6 +2350,42 @@ SYSCALL_DEFINE5(setsockopt, int, fd, int, level, int, optname,
+>   INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
+>   							 int optname));
+>   
+> +int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+> +		       int optname, sockptr_t optval, sockptr_t optlen)
+> +{
+> +	int max_optlen __maybe_unused;
+> +	const struct proto_ops *ops;
+> +	int err;
+> +
+> +	err = security_socket_getsockopt(sock, level, optname);
+> +	if (err)
+> +		return err;
+> +
+> +	ops = READ_ONCE(sock->ops);
+> +	if (level == SOL_SOCKET) {
+> +		err = sk_getsockopt(sock->sk, level, optname, optval, optlen);
+> +	} else if (unlikely(!ops->getsockopt)) {
+> +		err = -EOPNOTSUPP;
+> +	} else {
+> +		if (WARN_ONCE(optval.is_kernel || optlen.is_kernel,
+> +			      "Invalid argument type"))
+> +			return -EOPNOTSUPP;
+> +
+> +		err = ops->getsockopt(sock, level, optname, optval.user,
+> +				      optlen.user);
+> +	}
+> +
+> +	if (!compat) {
+> +		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+The max_optlen was done before the above sk_getsockopt. The bpf CI cannot catch 
+it because it cannot apply patch 5 cleanly. I ran the following out of the 
+linux-block tree:
+
+$> ./test_progs -t sockopt_sk
+test_sockopt_sk:PASS:join_cgroup /sockopt_sk 0 nsec
+run_test:PASS:skel_load 0 nsec
+run_test:PASS:setsockopt_link 0 nsec
+run_test:PASS:getsockopt_link 0 nsec
+(/data/users/kafai/fb-kernel/linux/tools/testing/selftests/bpf/prog_tests/sockopt_sk.c:111: 
+errno: Operation not permitted) Failed to call getsockopt, ret=-1
+run_test:FAIL:getsetsockopt unexpected error: -1 (errno 1)
+#217     sockopt_sk:FAIL
 
 
---000000000000948b2e0608164588
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+> +		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
+> +						     optval, optlen, max_optlen,
+> +						     err);
+> +	}
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL(do_sock_getsockopt);
+> +
+>   /*
+>    *	Get a socket option. Because we don't know the option lengths we have
+>    *	to pass a user mode parameter for the protocols to sort out.
+> @@ -2357,37 +2393,18 @@ INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
+>   int __sys_getsockopt(int fd, int level, int optname, char __user *optval,
+>   		int __user *optlen)
+>   {
+> -	int max_optlen __maybe_unused;
+> -	const struct proto_ops *ops;
+>   	int err, fput_needed;
+>   	struct socket *sock;
+> +	bool compat;
+>   
+>   	sock = sockfd_lookup_light(fd, &err, &fput_needed);
+>   	if (!sock)
+>   		return err;
+>   
+> -	err = security_socket_getsockopt(sock, level, optname);
+> -	if (err)
+> -		goto out_put;
+> -
+> -	if (!in_compat_syscall())
+> -		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJzFuztY0gVdZZVR
-xFXH/JSvvNCqJe8yqqm09xzcAge5MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTAxOTE4NTMyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQD3UIHc1HTHIKt7Yq5plkqZqLjBHyuK7DWg
-vN+ksTs6SZG33Zq7RixarKEvpoxOWFPMt/8Opz14OqEZHbrW3v3MGmzX+X6EicP22xwvSeGY36aq
-8LaiM8r0pUlXoU0B5LXfkka5+kWZx1Gr+UCaL5NROXDKALq1fxVMNoXaA8AUgqUjSQOg9k8PWveF
-yrd9kQfEWF1gOsGJo9kqXLzTE++gqjt3vl6vyyfSNc7wGuCnQOvlQqCRikRwIbBuD0E1ou/B8yu/
-x5/qBqMbK1C6r+6FmHaClruk/K/UzLD3BWMH9QxL238lEjt1pIq+zHBq6cCpxVn1Is2FCLcB1rKD
-UAle
---000000000000948b2e0608164588--
+The old max_optlen was done here.
+
+> +	compat = in_compat_syscall();
+> +	err = do_sock_getsockopt(sock, compat, level, optname,
+> +				 USER_SOCKPTR(optval), USER_SOCKPTR(optlen));
+>   
+> -	ops = READ_ONCE(sock->ops);
+> -	if (level == SOL_SOCKET)
+> -		err = sock_getsockopt(sock, level, optname, optval, optlen);
+> -	else if (unlikely(!ops->getsockopt))
+> -		err = -EOPNOTSUPP;
+> -	else
+> -		err = ops->getsockopt(sock, level, optname, optval,
+> -					    optlen);
+> -
+> -	if (!in_compat_syscall())
+> -		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
+> -						     USER_SOCKPTR(optval),
+> -						     USER_SOCKPTR(optlen),
+> -						     max_optlen, err);
+> -out_put:
+>   	fput_light(sock->file, fput_needed);
+>   	return err;
+>   }
+
 
