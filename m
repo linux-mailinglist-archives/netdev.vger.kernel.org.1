@@ -1,174 +1,143 @@
-Return-Path: <netdev+bounces-42592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 836597CF7B0
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:57:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 622EB7CF7BF
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:58:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17290281F99
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:57:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 936741C20B28
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:58:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BEF51DFD2;
-	Thu, 19 Oct 2023 11:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D6E1DFD7;
+	Thu, 19 Oct 2023 11:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BiHQUzki"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609A4156F3
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 11:57:26 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96C2ACF;
-	Thu, 19 Oct 2023 04:57:24 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.226])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SB5j152jMz6HJLt;
-	Thu, 19 Oct 2023 19:53:57 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 19 Oct 2023 12:57:21 +0100
-Message-ID: <d2ac366a-c929-0d2f-8855-0d7cf5e1704f@huawei.com>
-Date: Thu, 19 Oct 2023 14:57:20 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E569C14F7D;
+	Thu, 19 Oct 2023 11:58:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5F70C433C7;
+	Thu, 19 Oct 2023 11:58:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697716732;
+	bh=pQ29kk3ro7C4ElFonv3EiTyV06E9AE6VC1caQ8VJxwM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BiHQUzkiiwPx41o8oTijdhqMqEXP1W25W/6P2gxP333hdS1fWElZGUXwcZOFKHvAE
+	 cmXg9p1vLYgAgLAP0tWcEU4XVlSaZtjlrl+jJV6sX4fFeL2/dYheIuuDxyReA2yPWK
+	 dmnnFSGr4MMGkrX6NWzxT6aimA2DsamgEPvcRhqZ8+AX+gWX0VK8IJ6GmEHVhjaGvb
+	 4stUNkFTprB1mcaYGVqaR0HEx2Rhpqryf1F76igl+q5oeYNRQ0vAtdsKM5vxrnGxok
+	 yBgfszESwHukgx/1g2Or0UuShMbAsnnWlya4MgSz/uUxSpN1pg8AdDRYQmSl4ItAq5
+	 cNlksfeV7wqbg==
+Date: Thu, 19 Oct 2023 12:58:46 +0100
+From: Conor Dooley <conor@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org,
+	Gregory Clement <gregory.clement@bootlin.com>
+Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: dsa: Require ports or
+ ethernet-ports
+Message-ID: <20231019-pulse-autopilot-166bb6c96090@spud>
+References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
+ <20231018-marvell-88e6152-wan-led-v4-1-3ee0c67383be@linaro.org>
+ <169762516670.391804.7528295251386913602.robh@kernel.org>
+ <CACRpkdZ4hkiD6jwENqjZRX8ZHH9+3MSMMLcJe6tJa=6Yhn1w=g@mail.gmail.com>
+ <ZTEL6Yw+Xcc0E4TJ@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v13 07/12] landlock: Refactor landlock_add_rule() syscall
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>
-References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
- <20231016015030.1684504-8-konstantin.meskhidze@huawei.com>
- <20231018.quie0uuphieB@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <20231018.quie0uuphieB@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Y6vV29njl6hI4/69"
+Content-Disposition: inline
+In-Reply-To: <ZTEL6Yw+Xcc0E4TJ@shell.armlinux.org.uk>
 
 
+--Y6vV29njl6hI4/69
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-10/18/2023 7:34 PM, Mickaël Salaün пишет:
-> On Mon, Oct 16, 2023 at 09:50:25AM +0800, Konstantin Meskhidze wrote:
->> Change the landlock_add_rule() syscall to support new rule types
->> in future Landlock versions. Add the add_rule_path_beneath() helper
->> to support current filesystem rules.
->> 
->> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
->> Link: https://lore.kernel.org/r/20230920092641.832134-8-konstantin.meskhidze@huawei.com
->> Signed-off-by: Mickaël Salaün <mic@digikod.net>
->> ---
->> 
->> Changes since v12:
->> * None.
->> 
->> Changes since v11:
->> * None.
->> 
->> Changes since v10:
->> * None.
->> 
->> Changes since v9:
->> * Minor fixes:
->> 	- deletes unnecessary curly braces.
->> 	- deletes unnecessary empty line.
->> 
->> Changes since v8:
->> * Refactors commit message.
->> * Minor fixes.
->> 
->> Changes since v7:
->> * None
->> 
->> Changes since v6:
->> * None
->> 
->> Changes since v5:
->> * Refactors syscall landlock_add_rule() and add_rule_path_beneath() helper
->> to make argument check ordering consistent and get rid of partial revertings
->> in following patches.
->> * Rolls back refactoring base_test.c seltest.
->> * Formats code with clang-format-14.
->> 
->> Changes since v4:
->> * Refactors add_rule_path_beneath() and landlock_add_rule() functions
->> to optimize code usage.
->> * Refactors base_test.c seltest: adds LANDLOCK_RULE_PATH_BENEATH
->> rule type in landlock_add_rule() call.
->> 
->> Changes since v3:
->> * Split commit.
->> * Refactors landlock_add_rule syscall.
->> 
->> ---
->>  security/landlock/syscalls.c | 92 +++++++++++++++++++-----------------
->>  1 file changed, 48 insertions(+), 44 deletions(-)
->> 
->> diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
->> index d35cd5d304db..8a54e87dbb17 100644
->> --- a/security/landlock/syscalls.c
->> +++ b/security/landlock/syscalls.c
->> @@ -274,6 +274,47 @@ static int get_path_from_fd(const s32 fd, struct path *const path)
->>  	return err;
->>  }
->> 
->> +static int add_rule_path_beneath(struct landlock_ruleset *const ruleset,
->> +				 const void __user *const rule_attr)
->> +{
->> +	struct landlock_path_beneath_attr path_beneath_attr;
->> +	struct path path;
->> +	int res, err;
->> +	access_mask_t mask;
->> +
->> +	/* Copies raw user space buffer, only one type for now. */
->> +	res = copy_from_user(&path_beneath_attr, rule_attr,
->> +			     sizeof(path_beneath_attr));
->> +	if (res)
->> +		return -EFAULT;
->> +
->> +	/*
->> +	 * Informs about useless rule: empty allowed_access (i.e. deny rules)
->> +	 * are ignored in path walks.
->> +	 */
->> +	if (!path_beneath_attr.allowed_access)
->> +		return -ENOMSG;
->> +
->> +	/*
->> +	 * Checks that allowed_access matches the @ruleset constraints
->> +	 * (ruleset->access_masks[0] is automatically upgraded to 64-bits).
->> +	 */
-> 
-> You now can replace this comment block with that:
-> +	/* Checks that allowed_access matches the @ruleset constraints. */
+On Thu, Oct 19, 2023 at 11:58:49AM +0100, Russell King (Oracle) wrote:
+> On Wed, Oct 18, 2023 at 01:11:45PM +0200, Linus Walleij wrote:
+> > On Wed, Oct 18, 2023 at 12:32=E2=80=AFPM Rob Herring <robh@kernel.org> =
+wrote:
+> > > On Wed, 18 Oct 2023 11:03:40 +0200, Linus Walleij wrote:
+> >=20
+> > > > Bindings using dsa.yaml#/$defs/ethernet-ports specify that
+> > > > a DSA switch node need to have a ports or ethernet-ports
+> > > > subnode, and that is actually required, so add requirements
+> > > > using oneOf.
+> > > >
+> > > > Suggested-by: Rob Herring <robh@kernel.org>
+> > > > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> > > > ---
+> > > >  Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 ++++++
+> > > >  1 file changed, 6 insertions(+)
+> > > >
+> > >
+> > > My bot found errors running 'make DT_CHECKER_FLAGS=3D-m dt_binding_ch=
+eck'
+> > > on your patch (DT_CHECKER_FLAGS is new in v5.13):
+> > >
+> > > yamllint warnings/errors:
+> > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:60:7: [warning] =
+wrong indentation: expected 8 but found 6 (indentation)
+> > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:62:7: [warning] =
+wrong indentation: expected 8 but found 6 (indentation)
+> >=20
+> > Really?
+> >=20
+> > +  oneOf:
+> > +    - required:
+> > +      - ports
+> > +    - required:
+> > +      - ethernet-ports
+> >=20
+> > Two spaces after the oneOf, 2 spaces after a required as usual.
+> > I don't get it.
+>=20
+> Given the other python errors spat out in Rob's report, I would suggest
+> that the "bot" is running a development version that hasn't been fully
+> tested, so anything it spits out is suspect. Maybe Rob can comment on
+> the validity of the warnings in the report.
 
-   Done.
-> 
->> +	mask = landlock_get_raw_fs_access_mask(ruleset, 0);
->> +	if ((path_beneath_attr.allowed_access | mask) != mask)
->> +		return -EINVAL;
->> +
->> +	/* Gets and checks the new rule. */
->> +	err = get_path_from_fd(path_beneath_attr.parent_fd, &path);
->> +	if (err)
->> +		return err;
->> +
->> +	/* Imports the new rule. */
->> +	err = landlock_append_fs_rule(ruleset, &path,
->> +				      path_beneath_attr.allowed_access);
->> +	path_put(&path);
->> +	return err;
->> +}
-> .
+In this case, I think it is correct.
+2 spaces for the oneOf, 2 spaces the start of the required for the
+nested list, so:
+oneOf:
+  - required:
+      - ports
+  - required:
+      - ethernet-ports
+
+--Y6vV29njl6hI4/69
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZTEZ9gAKCRB4tDGHoIJi
+0iD0AP9nnypeoKCSb5p1jYVtkd/GxlHX1dmnIRWn/6opBLMHGQD+IqlWgD04icVW
+jyfkLzfNK6BmN32rgviaunCpTobjLAY=
+=HyDl
+-----END PGP SIGNATURE-----
+
+--Y6vV29njl6hI4/69--
 
