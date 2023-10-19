@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-42604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 301C17CF7F9
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:03:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 405E27CF7F4
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:03:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98C8EB21320
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:03:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBFC12820B2
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A84A1EB25;
-	Thu, 19 Oct 2023 12:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816451DFF8;
+	Thu, 19 Oct 2023 12:03:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="flgfNy2x"
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="Ji/sneTp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DB21DFDA
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:03:18 +0000 (UTC)
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2070.outbound.protection.outlook.com [40.107.13.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5308110FE;
-	Thu, 19 Oct 2023 05:03:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048B41DFE4
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:03:08 +0000 (UTC)
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2089.outbound.protection.outlook.com [40.107.6.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A1C71B8;
+	Thu, 19 Oct 2023 05:03:02 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VYvNO7fT7KU80/DyZPBhj3h5oOddZul50o37CEY1AVvHUgrvoO4+ILNYtIuGeqehm4j2rdrM7ci2A0jq2QZfOf9jItK1qR8ONLdm1Fj+54Odr+xxI+q+i1Plsj9J8E7HJgZHtC4vEJu69jIeUUMtPYwEH/ONYnBJayTsoSq4My/abvuSh6nSYiiES8EPF3WQTah1blzX8EKQ40ypWMk24F8zRhT4z/0dns2Dtbq0MOx7EvVsv/POGbE2Jgq8OIE/kXUx+fW/j/Ip03DwgDnz3z4C+Qd8TLzDAtTgCf7UXq8u58K9TKcre7uuOWU7sVEfV02aFBxyq89E2gCdfvwhfw==
+ b=mtDUKVNOblY66JeIlgylMUKomfmmK4NFrwQtoGsznJ1415S1caKTymHLdkSRv9Z7lGeQuTs0hIF9mjtK3vFAMiXlikUsduG3BqBB+HzzY1wWRn8DmtECQSH6CL2LdHSkOtnXYQY06mWNSstRM56x3BCkzm2QrxM089ZP11WdjJjes8y1HVxk7Jy24tuC+Wc7u2VEgARQjMdPJBPv683co1qYBGZM+82F1G1tnaZmTNG2pUOEOpU9O9M09L9b9s20PCJgP4ufgX+hAw8BIJ9xTrU+h54pmelwWm8gjw770V4JU0RA0WsRSzOXiMh+KeIswTHKiogKJl8iipDJJGXgEQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=07+UITJkCos34l0ZZDPSxIy8XokMSdr4WhkcskSbtMo=;
- b=cD27C5u9vm8cQIhHqOIqDEbw1t7uJjVNeoghXBJfTIRCox8ebldcsOq7tGtfZflslm/+JmPaItK8+3fAgsohgWO9ewx9kvMTdmskTYZM1NzZEy/fIA2a8SwDCtUfXjHbRsDB+KoltkHmW60dxsIiVN604rFyZ0SznT2J59fVkle4krNukNO5Hla69KaWIzNfkDGNdekvUOyYfZHtg0D8vhM4S+pxYbgtmB/CRVKr/q3XGY+XFnyhKqwx8W9x9fi/fDPST2ug3lHM4t6My8TtiCvG3ggna+PMlzGe1MF0QVWz8eEAGQOHSofLHRW53C0a8aYmIuqCCMwxL6yuWSgD9w==
+ bh=keNHFqYO2lAwgTo0OIDsPObxKQcCS6dG9oAzEZp/wO4=;
+ b=CSu6wBnvu81A7OsisuIppgEvTWGmhW6vP1PyaJE8HV79Ikbj5qIhJn9OATl3saZQ8AiZLf+h20fWe1yNjjmZSqmmeKA3jTESM4H+L8ZoHRslUz84xyM8EjNYVEg9WSXpmHNzg5dqInoYL0BLQhhrbtqUFB02DUJ8z/SWyJ3Fl4UJt+1kIiUVt4tJ3RX1ziNM/2Db3n0+UQdFrnFH0RZI1NFgZ3e9939+7iUzdkmZ+ubsedczBo3z27z4K/HEI/X9qrVdwXXDdZHt2501X3Gu5DiZPATZDoYvkQOx7c5h6JEG6PJmIwFJ3LqdPgAQ4ErUQvZM+sCYieOR/ERUhkD00Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
  dkim=pass header.d=oss.nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
  s=selector2-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=07+UITJkCos34l0ZZDPSxIy8XokMSdr4WhkcskSbtMo=;
- b=flgfNy2xhXnOxqDPDdBVt6wqF//ECFSj3Yi2RZG0Xv3rIH472OjFrwc7HkwHAfXi2m4t4tB+NTrltqOqXb/qwZRkkZ7kji7zFTy5xkui4K3s6p6XKPQpC37tcQlZ6nEmhPq+P/o1hHZ7XXVwlhMuKx7TvOhnHnArm9ywNpW3pCE=
+ bh=keNHFqYO2lAwgTo0OIDsPObxKQcCS6dG9oAzEZp/wO4=;
+ b=Ji/sneTprlXouZt0rHHXGiNwRge8H+Efl3U081QjCHx9UgeZJOb1urYrTOsewr+C3oKIvoUM6b/gHcmEXBjlKebIrldG6pRv8cNMdwtSElfPssEomvloA20hvxidfmzkLwDEAIV4uRl2bsF+tVsQbJv0KngTL2DIf+i6jLKQYMM=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=oss.nxp.com;
 Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
- by DBBPR04MB7961.eurprd04.prod.outlook.com (2603:10a6:10:1ee::14) with
+ by PR3PR04MB7436.eurprd04.prod.outlook.com (2603:10a6:102:87::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.7; Thu, 19 Oct
- 2023 12:02:57 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.8; Thu, 19 Oct
+ 2023 12:02:59 +0000
 Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
  ([fe80::e109:7026:7d76:5617]) by AM9PR04MB8954.eurprd04.prod.outlook.com
  ([fe80::e109:7026:7d76:5617%7]) with mapi id 15.20.6933.008; Thu, 19 Oct 2023
- 12:02:57 +0000
+ 12:02:59 +0000
 From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
 To: sd@queasysnail.net,
 	davem@davemloft.net,
@@ -63,9 +63,9 @@ Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	sebastian.tobuschat@oss.nxp.com,
 	"Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Subject: [PATCH net-next v7 4/7] net: macsec: introduce mdo_insert_tx_tag
-Date: Thu, 19 Oct 2023 15:02:06 +0300
-Message-Id: <20231019120209.290480-5-radu-nicolae.pirea@oss.nxp.com>
+Subject: [PATCH net-next v7 6/7] net: phy: nxp-c45-tja11xx: add MACsec statistics
+Date: Thu, 19 Oct 2023 15:02:08 +0300
+Message-Id: <20231019120209.290480-7-radu-nicolae.pirea@oss.nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231019120209.290480-1-radu-nicolae.pirea@oss.nxp.com>
 References: <20231019120209.290480-1-radu-nicolae.pirea@oss.nxp.com>
@@ -82,274 +82,556 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|DBBPR04MB7961:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8c1ebaf0-6756-4003-c87f-08dbd09b54f9
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|PR3PR04MB7436:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ec9de73-e0c8-4aeb-2f26-08dbd09b5645
 X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	plY1p2wHBo2nZYxcpwwsctUTIgnaR2Jc7V2yjQIg6abvlpWBi7wZRRB5Sqyw6Mlbry59ejca6q1XNyqbLAtt13YVrIjrhO3GZh3JTe45uEEZYwFG1MYREw1nvRsRmicGQr2eoy517w6ceYaMmqdtYHRxnSBYpddOCjpP0jLYI9kxuTcSgZaikWjHzmcLxxJ8fV/nreovwal5s5WCu27MjQj0lEqD8E8T0V4IBC9RINEH9H3Tl9N/1vqmFnaieal++JswpAjBymspXl7b9THPFBL6goTE1JcWU+ytTwrWG6VZoiVkP5Pe53E2sfXGJXbQjI5lYjS2YjiHAYVQRo5a6IXCopOjFoyB93FPWT7oqLyZR0TXBGnjz00ryVM1KOtq0HTnfSMGx5UfxLfkIBm7lKCUh1O3FwuCUwHqh5J2TaInzRW2Mz97aV0oVsn0RvI/wkTjiZMCcD5B0VvmIK2mXPLmpQgqqej2fHcMxLSDK+uzKen4d8JSI9YZHFMc/d9iN7A0PRcA+NAENxAmjRBxLYp7v/yaEfIAzoAi3XCFL79vqdVW8FdrAkmHlYJfpr20zzpObZnlTD3ynK8g8QUV85VumXqBf8vbfXcHrVdNqyHNuP6MaU0TIVzk5r6C/tkD
+	NFoSbenk6dmXoJdPIvUEHsuz2UFMoiSO43vIBNe/13HCeoqIqbnOFAYqsX6dId/hV1q8pHuUgEF6UY/ls4nsjzda41VX1aNZVRIAiF4X4pEIGewy0b0arRiYBThevjezZ7HO2QqbKVRv0naG8LQtlK5VV4tGO5ySbJBncQ/4TdP1//3RtgpaxIwLb+N0FfSApUy8tJHYcrK8QSyKVj/E4HBpsLJA0wNHlHFOs3TEUNch+6Hr+fOGNLd2eUqHKvQnX9MDuF82phVyM7/l7Gc9icNa6ecNVjajOffwMOosFoUckZgLqfa48BKXYSzoj5jmiV+s3ffJyAFBqLijLAxozecG1FrCxzSk7dSahMVZOfZPiDe7+fNL8DD/gYGOpDRKuvnSXlLp1DdfNKtl5Tb5nMUzBibJW4apuXhngANGrEGy2SvDFxF22EC5bnxbPpn2K+vkwyY6HFBPw4o3GgY0wNpZEUTk70A3gHVbR3DlYHARRcy5ji7EPjXB4dsCsLTswEVGAh2BJmIjTh0w+2edU8uZlmuMY/8CNXgvHhv3bOIMD0EQG87N6TFmnXvX6fV4nf/9LEUGv411hQgn/V1dEjv4RLZATJ3bPHpAFsqUCMk61e/1VMn+pc0DF66vJRdu
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(346002)(136003)(39860400002)(376002)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(38350700005)(41300700001)(6506007)(38100700002)(4326008)(8676002)(2906002)(7416002)(86362001)(83380400001)(1076003)(26005)(6512007)(2616005)(52116002)(5660300002)(66899024)(6486002)(6666004)(478600001)(8936002)(316002)(66476007)(66556008)(66946007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(366004)(136003)(396003)(346002)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(2906002)(5660300002)(4326008)(30864003)(66476007)(66946007)(8936002)(66556008)(316002)(6666004)(478600001)(6486002)(8676002)(41300700001)(7416002)(86362001)(38100700002)(52116002)(2616005)(6506007)(83380400001)(1076003)(26005)(6512007)(38350700005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sL1GYSMduGDGHpbfOBnyK4XVabR+N34zz/7QDDoX3rJATy/5zkfcu/wnF6kM?=
- =?us-ascii?Q?DZhKm3Ec/2V0Jh3XXVhsPmMqmbWc/qy02iI2+AA2ZATxC7MJzvxjc9aA+SVk?=
- =?us-ascii?Q?2RbKeiRzaIEjrWWVrTeoqoAzpmO7Ibx5y4De50TQmcClFsx6Ez5xaO6+lROO?=
- =?us-ascii?Q?UgFBjDVSWIPHJe6NxPab7KPSGV13BIRDRMUxJeSUADz02lYVCre1awowgS6w?=
- =?us-ascii?Q?ZlejJmejLV7NffYTImpZH6yZaCQoPdh4m4wLoHST5jTL488caezZou2flYrU?=
- =?us-ascii?Q?tGsXR2mWqugAddTJalA1HdHWJlXuIT/As2+WDIvdYardnITsWfisw4YGp/UO?=
- =?us-ascii?Q?B2OMtioGe30QeXgwzh1W2H/JOkMOncU87JLVNsr58fD5b39Zcy7FHMX41agd?=
- =?us-ascii?Q?gwaYQicsjUVzCPVVSVglIkosIG+0asvCdcY8sQUwyvonlC3H5jiUaY66NFEL?=
- =?us-ascii?Q?5WAXNsU2oSCNc2JUVA54XHW99Vy2UOe3Oyo08bRlJLV+e1TJU2CjuLnB6rCH?=
- =?us-ascii?Q?aJkp4yIrDLDddh7NLmwaEXaWfjuINijrXqxQuxrkzRJ3GFK5SormcpgjtGDF?=
- =?us-ascii?Q?vHUTuKE+iItnNnCNSwQpveRj5GldvoNkPXFPRW4uPcEBzLMXR0QLStnvVHwf?=
- =?us-ascii?Q?sHsRwqVoXmsKtJ8RGeKxS0Nb8RwpdMluFrgivw3oVQJ4i6WixRLNPWtK62qc?=
- =?us-ascii?Q?T91sNd4KtutL3MwXZEokBeXkBos2fKbzzQz0v9ZS1zjAFY57itmJ5ufIKuhb?=
- =?us-ascii?Q?9YQi8Tv13kwIDLzUfRzJxbBV+Udho21DwH3MBAEaTthMKir4FQLUPXkcyV1z?=
- =?us-ascii?Q?EFB67XbjPDena+P5QAyhrou6GYw352HPJo5NZtclMivDo6Xop+4TZUktkNBu?=
- =?us-ascii?Q?rqVvnQgGxDQM8pQKQFgAXXdv1t2pYhwgXX3vJxCwbssezA30DuVWfKGBdoog?=
- =?us-ascii?Q?2h2Qimgr9xqRQ7Pmq/hkm17nyyh2oi2awgkRBPFj+8qw7ymt9K0ZIfw5g3hR?=
- =?us-ascii?Q?R4KTfs4FhgWPisErtns7qewoNLijmmq1l2E6iYE6NmQ4xyLFNA9+9Ray2WGt?=
- =?us-ascii?Q?X9TYW6zWfgJbMkyrnYQGXT0fqx0twpYaLOv4yAOSOp5Pu0xrU37QCpUoAjZq?=
- =?us-ascii?Q?u+BFem0NTjT7w8MHxtuw8P88kH/6tTkbCN0Pq/rcJEyJ/fgxZTm4k8xCSmJh?=
- =?us-ascii?Q?zBPVHOcwh0KBoYlKvdQ35CGUuauMI700I6a5h7BMJOqOAKL5YWfYCPTX+YNW?=
- =?us-ascii?Q?RH0eTfvObNc7Sy2c4TXTmLSkS7nYwK0/IfuaFboSyAEuThGtYqypfuXIa3fc?=
- =?us-ascii?Q?rZCrWigHOHHn5pdPZIMcMudr3WmerE2zNfzsy5903IkJJ2zTNnKKGD84KkIc?=
- =?us-ascii?Q?u6UokixgOv0V7bfbK0yAwdVNLhodCmDc9tJieOJUaVOKX74aWvWYUhc74fYM?=
- =?us-ascii?Q?Y1VToWgG3JuwlFpgF5r+PNNlbcokgjQV9Y+ambOeayLsWuSGxFnmjdX/Ijc8?=
- =?us-ascii?Q?uGYbrH5lsG842b1VtxEaQ5svWu1WXNiugWi7bAmhcG/ybeNCSe1/4XjRRXWB?=
- =?us-ascii?Q?zd+F+fvPyhBaGqKLw3nJR20/gPKRJ4+8vl9YDGtHZJJd9MUVbp05k8Pi3fXb?=
- =?us-ascii?Q?QQ=3D=3D?=
+	=?us-ascii?Q?IHE9iKE4jiVb8C/NFqhLFKZyzKPFiWLYELV9V4VytebmHsnwIlYgDWrKl44S?=
+ =?us-ascii?Q?Xx0A0QRdXjBYVgxFR4zPSLAsClAOiteWXIVlftgY78IzJO6PE3Ykc7uTw+k9?=
+ =?us-ascii?Q?inqqFqKbULa7UqVy2ROV1I9Goll+HWC026cU53oDf7JDtO15hAh10a/lkVRT?=
+ =?us-ascii?Q?t3vKPLo0RkcYmncr+jlLJnOh7qFACCzeil+bGS6ud+0b2gUD34f3QpGl2T2C?=
+ =?us-ascii?Q?DpA9MTfGO9siZ/XOQe5baZ60MA8Z3iDAtHB+j7Hgo1afV5GQzVaHrWANhglE?=
+ =?us-ascii?Q?50EbVAQl3cH89I2O69tiKyYtalriE795fjGgGtnOV4CDnbch8cw5SaNLGEBZ?=
+ =?us-ascii?Q?q2+ZppzVkCkgY8hEfkeGZA8xJmRA+7uFUjTUrQkPZU4M7yjQYrTDAExbnEUV?=
+ =?us-ascii?Q?gZg1ZIoP/8diaJF0Wf3BDjZCZs86mss3utwnw0i5qTvpoRpuouoSAhXBiCVz?=
+ =?us-ascii?Q?sWaHmQ4qUFevUvKMtnGpoIRiia1cQvMdo14Ln2KJVL6eR0rebrI5uQbSJn5D?=
+ =?us-ascii?Q?rR3RigeJ8YxHt9PV9yym+JqLCnYUPUrFO6wVKr3HzMzwfgb9I7e1N78vLM73?=
+ =?us-ascii?Q?+x2tdar47XODxBBxZwL7cjXrD+WUZ5/1wZQswyW7PUOxEY708BpJcYfGdPjn?=
+ =?us-ascii?Q?yglz7PUjLIF4IS8DXVQF5b6R13pnkp0NCTIX4IIHXSkJILHmzbftZ13i4cXH?=
+ =?us-ascii?Q?Gkc+nef7TYikmFViAAdipy5D0oirCZCm2rRRJk9Q+cgiUnH85EZjGdwVTLGj?=
+ =?us-ascii?Q?7Fv8mytPkgwGMc7sMeiZe+ASkQQGIrDsT0oRfW0eHzZ4RLsnYM74f6N8E9vs?=
+ =?us-ascii?Q?2Q1w5TWMuhvGiDbOeaWzIhIFiJ6mTNUYJIzML0sTjiMzA9fA5+HVL0FSiotH?=
+ =?us-ascii?Q?pD+jbybjBjfULryua+AjD93lUuox3UQzbPpGPqNBx75C+/b/IcqbjY/TLExV?=
+ =?us-ascii?Q?cRHHaJBdOPsTTXOEPGCGoJ4KmXf2xjUkNSzjbS93C2epo9P8p3iDV4G3FKsf?=
+ =?us-ascii?Q?LEnRlqU4zYZBAsT1yQUhkJ3o2C/lFuTDZTr7oSvnYH3U4Hf0G2mHsH9+wGDB?=
+ =?us-ascii?Q?VrCb4qZffTJqXTJ3XXVK/f0IEu3TSmhLaYXQxDvXHk2xSCkLvWhHqUDNngDb?=
+ =?us-ascii?Q?oBrGZx5TP+QtOWA0+BCdo/d+NDp6asU8/Qjogh+iN8X9iSCh3MvtW109E2AO?=
+ =?us-ascii?Q?WObr5MnuxEDn8JEPiYh4qy2ZnFGAg/D8X0Au/Q9F5QHdtXejlZ0aSRYHGapC?=
+ =?us-ascii?Q?D1AQcA4SKQ7bluY7n8omKs5gwmdWiKdz45IGXGT6pYMSv2521FCSDk8NmYL8?=
+ =?us-ascii?Q?zaqCyR3zYBDYirbRMD4xzImDFYIzImRqkbIKNiSzUwlYVlrTib7Veu092kCc?=
+ =?us-ascii?Q?KtKRAlAvB81v0qO5NZqPSmb22HpEyIaBZG7H1huMyw4HBro2M2QZf2L5ENlX?=
+ =?us-ascii?Q?E/2GbOsGLhDxcAJlZXyMh6UUodXpss72AbeTs9MMs4Yjm49ZspdFG+Iuwy9f?=
+ =?us-ascii?Q?8FAFSFBaphNGb9DWg/i4PucZbpDQ6T0S8PnIdFCp7pLd4JQg7iJqt1tAk7Iw?=
+ =?us-ascii?Q?1sa9fnVMuWeF22f4MGmzQT1fbcOQ4A570Lxul503HSkvf24KQrmCMOrsYWJh?=
+ =?us-ascii?Q?ZQ=3D=3D?=
 X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c1ebaf0-6756-4003-c87f-08dbd09b54f9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ec9de73-e0c8-4aeb-2f26-08dbd09b5645
 X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 12:02:56.8486
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 12:02:59.0263
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7IXGDv81Lv81jvzzboTfwro9NhZpQ/8aCYhLu8pMy2h+1DmGGthrITSecFWPQsdpQql6I+zMmDoP6BpZQQwU+/XTD9dwuMD0wFjA8nXNEAM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7961
+X-MS-Exchange-CrossTenant-UserPrincipalName: qsNcwPB3cnqPDxrfyJmQS3Yt6V7QcqEsCPZ33+u9YHTAuksrWYpf7PVaFoLmXIp1ZW2qIclhMNVJQyfV5a1Q2psIYF5er6S6954zp5qo/WI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR04MB7436
 
-Offloading MACsec in PHYs requires inserting the SecTAG and the ICV in
-the ethernet frame. This operation will increase the frame size with up
-to 32 bytes. If the frames are sent at line rate, the PHY will not have
-enough room to insert the SecTAG and the ICV.
-
-Some PHYs use a hardware buffer to store a number of ethernet frames and,
-if it fills up, a pause frame is sent to the MAC to control the flow.
-This HW implementation does not need any modification in the stack.
-
-Other PHYs might offer to use a specific ethertype with some padding
-bytes present in the ethernet frame. This ethertype and its associated
-bytes will be replaced by the SecTAG and ICV.
-
-mdo_insert_tx_tag allows the PHY drivers to add any specific tag in the
-skb.
+Add MACsec statistics callbacks.
+The statistic registers must be set to 0 if the SC/SA is
+deleted to read relevant values next time when the SC/SA is used.
 
 Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
 ---
-Changes in v4-v7:
+Changes in v5-v7:
 - none
 
+Changes in v4:
+- Added nxp_c45_macsec_read32_64 function to read 32b counters into u64
+variables.
+- Added nxp_c45_macsec_read64 function to read 64b counters.
+
 Changes in v3:
-- improved insert_tx_tag flag description
-- macsec_adjust_room uses the difference between MACsec room and 
-device room to adjust the macsec netdev room.
-- macsec_update_offload return error instead of goto
-- macsec_can_insert_tx_tag renamed to macsec_needs_tx_tag
-- insert_tx_tag flag is checked in macsec_start_xmit
-- "TX offload tag" replaced with "TX tag"
+- reworked the implementation around struct nxp_c45_sa
+- changed the way how OutOctetsEncrypted are propagated to the userspace
+- changed the way how OutOctetsProtected are propagated to the userspace
+- read and clear OutOctetsProtected
 
 Changes in v2:
-- added new fields documentation
-- removed unnecesary checks in insert_tx_tag
-- adjusted mdo_insert_tx_tag parameters. macsec_context replaced with 
-phy_device and sk_buff
-- statistiscs incremented with DEV_STATS_INC
-- improved patch description
+- split the patch from "net: phy: nxp-c45-tja11xx: add MACsec support"
 
- drivers/net/macsec.c | 92 +++++++++++++++++++++++++++++++++++++++++++-
- include/net/macsec.h | 10 +++++
- 2 files changed, 101 insertions(+), 1 deletion(-)
+ drivers/net/phy/nxp-c45-tja11xx-macsec.c | 345 +++++++++++++++++++++++
+ 1 file changed, 345 insertions(+)
 
-diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-index 569b27b2e276..57c7d34dcc13 100644
---- a/drivers/net/macsec.c
-+++ b/drivers/net/macsec.c
-@@ -93,6 +93,8 @@ struct pcpu_secy_stats {
-  * @secys: linked list of SecY's on the underlying device
-  * @gro_cells: pointer to the Generic Receive Offload cell
-  * @offload: status of offloading on the MACsec device
-+ * @insert_tx_tag: when offloading, device requires to insert an
-+ *	additional tag
-  */
- struct macsec_dev {
- 	struct macsec_secy secy;
-@@ -102,6 +104,7 @@ struct macsec_dev {
- 	struct list_head secys;
- 	struct gro_cells gro_cells;
- 	enum macsec_offload offload;
-+	bool insert_tx_tag;
+diff --git a/drivers/net/phy/nxp-c45-tja11xx-macsec.c b/drivers/net/phy/nxp-c45-tja11xx-macsec.c
+index 821f8926f7f2..4dd10ea6e06c 100644
+--- a/drivers/net/phy/nxp-c45-tja11xx-macsec.c
++++ b/drivers/net/phy/nxp-c45-tja11xx-macsec.c
+@@ -137,6 +137,35 @@
+ #define ADAPTER_EN	BIT(6)
+ #define MACSEC_EN	BIT(5)
+ 
++#define MACSEC_INOV1HS			0x0140
++#define MACSEC_INOV2HS			0x0144
++#define MACSEC_INOD1HS			0x0148
++#define MACSEC_INOD2HS			0x014C
++#define MACSEC_RXSCIPUS			0x0150
++#define MACSEC_RXSCIPDS			0x0154
++#define MACSEC_RXSCIPLS			0x0158
++#define MACSEC_RXAN0INUSS		0x0160
++#define MACSEC_RXAN0IPUSS		0x0170
++#define MACSEC_RXSA_A_IPOS		0x0194
++#define MACSEC_RXSA_A_IPIS		0x01B0
++#define MACSEC_RXSA_A_IPNVS		0x01B4
++#define MACSEC_RXSA_B_IPOS		0x01D4
++#define MACSEC_RXSA_B_IPIS		0x01F0
++#define MACSEC_RXSA_B_IPNVS		0x01F4
++#define MACSEC_OPUS			0x021C
++#define MACSEC_OPTLS			0x022C
++#define MACSEC_OOP1HS			0x0240
++#define MACSEC_OOP2HS			0x0244
++#define MACSEC_OOE1HS			0x0248
++#define MACSEC_OOE2HS			0x024C
++#define MACSEC_TXSA_A_OPPS		0x028C
++#define MACSEC_TXSA_A_OPES		0x0290
++#define MACSEC_TXSA_B_OPPS		0x02CC
++#define MACSEC_TXSA_B_OPES		0x02D0
++#define MACSEC_INPWTS			0x0630
++#define MACSEC_INPBTS			0x0638
++#define MACSEC_IPSNFS			0x063C
++
+ enum nxp_c45_sa_type {
+ 	TX_SA,
+ 	RX_SA,
+@@ -175,6 +204,11 @@ struct nxp_c45_sa_regs {
+ 	u16 ka;
+ 	u16 ssci;
+ 	u16 salt;
++	u16 ipis;
++	u16 ipnvs;
++	u16 ipos;
++	u16 opps;
++	u16 opes;
  };
  
- /**
-@@ -2583,6 +2586,29 @@ static bool macsec_is_configured(struct macsec_dev *macsec)
- 	return false;
+ static const struct nxp_c45_sa_regs rx_sa_a_regs = {
+@@ -186,6 +220,9 @@ static const struct nxp_c45_sa_regs rx_sa_a_regs = {
+ 	.ka	= MACSEC_RXSA_A_KA,
+ 	.ssci	= MACSEC_RXSA_A_SSCI,
+ 	.salt	= MACSEC_RXSA_A_SALT,
++	.ipis	= MACSEC_RXSA_A_IPIS,
++	.ipnvs	= MACSEC_RXSA_A_IPNVS,
++	.ipos	= MACSEC_RXSA_A_IPOS,
+ };
+ 
+ static const struct nxp_c45_sa_regs rx_sa_b_regs = {
+@@ -197,6 +234,9 @@ static const struct nxp_c45_sa_regs rx_sa_b_regs = {
+ 	.ka	= MACSEC_RXSA_B_KA,
+ 	.ssci	= MACSEC_RXSA_B_SSCI,
+ 	.salt	= MACSEC_RXSA_B_SALT,
++	.ipis	= MACSEC_RXSA_B_IPIS,
++	.ipnvs	= MACSEC_RXSA_B_IPNVS,
++	.ipos	= MACSEC_RXSA_B_IPOS,
+ };
+ 
+ static const struct nxp_c45_sa_regs tx_sa_a_regs = {
+@@ -206,6 +246,8 @@ static const struct nxp_c45_sa_regs tx_sa_a_regs = {
+ 	.ka	= MACSEC_TXSA_A_KA,
+ 	.ssci	= MACSEC_TXSA_A_SSCI,
+ 	.salt	= MACSEC_TXSA_A_SALT,
++	.opps	= MACSEC_TXSA_A_OPPS,
++	.opes	= MACSEC_TXSA_A_OPES,
+ };
+ 
+ static const struct nxp_c45_sa_regs tx_sa_b_regs = {
+@@ -215,6 +257,8 @@ static const struct nxp_c45_sa_regs tx_sa_b_regs = {
+ 	.ka	= MACSEC_TXSA_B_KA,
+ 	.ssci	= MACSEC_TXSA_B_SSCI,
+ 	.salt	= MACSEC_TXSA_B_SALT,
++	.opps	= MACSEC_TXSA_B_OPPS,
++	.opes	= MACSEC_TXSA_B_OPES,
+ };
+ 
+ static const
+@@ -284,6 +328,26 @@ static int nxp_c45_macsec_read(struct phy_device *phydev, u16 addr, u32 *value)
+ 	return 0;
  }
  
-+static bool macsec_needs_tx_tag(struct macsec_dev *macsec,
-+				const struct macsec_ops *ops)
++static void nxp_c45_macsec_read32_64(struct phy_device *phydev, u16 addr,
++				     u64 *value)
 +{
-+	return macsec->offload == MACSEC_OFFLOAD_PHY &&
-+		ops->mdo_insert_tx_tag;
++	u32 lvalue;
++
++	nxp_c45_macsec_read(phydev, addr, &lvalue);
++	*value = lvalue;
 +}
 +
-+static void macsec_adjust_room(struct net_device *dev,
-+			       const struct macsec_ops *ops)
++static void nxp_c45_macsec_read64(struct phy_device *phydev, u16 addr,
++				  u64 *value)
 +{
-+	int diff_headroom = MACSEC_NEEDED_HEADROOM - ops->needed_headroom;
-+	int diff_tailroom = MACSEC_NEEDED_TAILROOM - ops->needed_tailroom;
-+	struct macsec_dev *macsec = macsec_priv(dev);
++	u32 lvalue;
 +
-+	if (macsec_is_offloaded(macsec)) {
-+		dev->needed_headroom -= diff_headroom;
-+		dev->needed_tailroom -= diff_tailroom;
-+	} else {
-+		dev->needed_headroom += diff_headroom;
-+		dev->needed_tailroom += diff_tailroom;
-+	}
++	nxp_c45_macsec_read(phydev, addr, &lvalue);
++	*value = (u64)lvalue << 32;
++	nxp_c45_macsec_read(phydev, addr + 4, &lvalue);
++	*value |= lvalue;
 +}
 +
- static int macsec_update_offload(struct net_device *dev, enum macsec_offload offload)
+ static void nxp_c45_secy_irq_en(struct phy_device *phydev,
+ 				struct nxp_c45_secy *phy_secy, bool en)
  {
- 	enum macsec_offload prev_offload;
-@@ -2620,8 +2646,13 @@ static int macsec_update_offload(struct net_device *dev, enum macsec_offload off
- 	ctx.secy = &macsec->secy;
- 	ret = offload == MACSEC_OFFLOAD_OFF ? macsec_offload(ops->mdo_del_secy, &ctx)
- 					    : macsec_offload(ops->mdo_add_secy, &ctx);
--	if (ret)
-+	if (ret) {
- 		macsec->offload = prev_offload;
-+		return ret;
-+	}
-+
-+	macsec_adjust_room(dev, ops);
-+	macsec->insert_tx_tag = macsec_needs_tx_tag(macsec, ops);
- 
- 	return ret;
+@@ -432,6 +496,41 @@ static void nxp_c45_sa_set_key(struct macsec_context *ctx,
+ 	nxp_c45_macsec_write(phydev, sa_regs->cs, MACSEC_SA_CS_A);
  }
-@@ -3379,6 +3410,52 @@ static struct genl_family macsec_fam __ro_after_init = {
- 	.resv_start_op	= MACSEC_CMD_UPD_OFFLOAD + 1,
- };
  
-+static struct sk_buff *macsec_insert_tx_tag(struct sk_buff *skb,
-+					    struct net_device *dev)
++static void nxp_c45_rx_sa_clear_stats(struct phy_device *phydev,
++				      struct nxp_c45_sa *sa)
 +{
-+	struct macsec_dev *macsec = macsec_priv(dev);
-+	const struct macsec_ops *ops;
-+	struct phy_device *phydev;
-+	struct macsec_context ctx;
-+	int err;
++	nxp_c45_macsec_write(phydev, sa->regs->ipis, 0);
++	nxp_c45_macsec_write(phydev, sa->regs->ipnvs, 0);
++	nxp_c45_macsec_write(phydev, sa->regs->ipos, 0);
 +
-+	ops = macsec_get_ops(macsec, &ctx);
-+	phydev = macsec->real_dev->phydev;
-+
-+	if (unlikely(skb_headroom(skb) < ops->needed_headroom ||
-+		     skb_tailroom(skb) < ops->needed_tailroom)) {
-+		struct sk_buff *nskb = skb_copy_expand(skb,
-+						       ops->needed_headroom,
-+						       ops->needed_tailroom,
-+						       GFP_ATOMIC);
-+		if (likely(nskb)) {
-+			consume_skb(skb);
-+			skb = nskb;
-+		} else {
-+			err = -ENOMEM;
-+			goto cleanup;
-+		}
-+	} else {
-+		skb = skb_unshare(skb, GFP_ATOMIC);
-+		if (!skb)
-+			return ERR_PTR(-ENOMEM);
-+	}
-+
-+	err = ops->mdo_insert_tx_tag(phydev, skb);
-+	if (unlikely(err))
-+		goto cleanup;
-+
-+	if (unlikely(skb->len - ETH_HLEN > macsec_priv(dev)->real_dev->mtu)) {
-+		err = -EINVAL;
-+		goto cleanup;
-+	}
-+
-+	return skb;
-+cleanup:
-+	kfree_skb(skb);
-+	return ERR_PTR(err);
++	nxp_c45_macsec_write(phydev, MACSEC_RXAN0INUSS + sa->an * 4, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_RXAN0IPUSS + sa->an * 4, 0);
 +}
 +
- static netdev_tx_t macsec_start_xmit(struct sk_buff *skb,
- 				     struct net_device *dev)
++static void nxp_c45_rx_sa_read_stats(struct phy_device *phydev,
++				     struct nxp_c45_sa *sa,
++				     struct macsec_rx_sa_stats *stats)
++{
++	nxp_c45_macsec_read(phydev, sa->regs->ipis, &stats->InPktsInvalid);
++	nxp_c45_macsec_read(phydev, sa->regs->ipnvs, &stats->InPktsNotValid);
++	nxp_c45_macsec_read(phydev, sa->regs->ipos, &stats->InPktsOK);
++}
++
++static void nxp_c45_tx_sa_clear_stats(struct phy_device *phydev,
++				      struct nxp_c45_sa *sa)
++{
++	nxp_c45_macsec_write(phydev, sa->regs->opps, 0);
++	nxp_c45_macsec_write(phydev, sa->regs->opes, 0);
++}
++
++static void nxp_c45_tx_sa_read_stats(struct phy_device *phydev,
++				     struct nxp_c45_sa *sa,
++				     struct macsec_tx_sa_stats *stats)
++{
++	nxp_c45_macsec_read(phydev, sa->regs->opps, &stats->OutPktsProtected);
++	nxp_c45_macsec_read(phydev, sa->regs->opes, &stats->OutPktsEncrypted);
++}
++
+ static void nxp_c45_rx_sa_update(struct phy_device *phydev,
+ 				 struct nxp_c45_sa *sa, bool en)
  {
-@@ -3393,6 +3470,15 @@ static netdev_tx_t macsec_start_xmit(struct sk_buff *skb,
- 		skb_dst_drop(skb);
- 		dst_hold(&md_dst->dst);
- 		skb_dst_set(skb, &md_dst->dst);
-+
-+		if (macsec->insert_tx_tag) {
-+			skb = macsec_insert_tx_tag(skb, dev);
-+			if (IS_ERR(skb)) {
-+				DEV_STATS_INC(dev, tx_dropped);
-+				return NETDEV_TX_OK;
-+			}
-+		}
-+
- 		skb->dev = macsec->real_dev;
- 		return dev_queue_xmit(skb);
- 	}
-@@ -4160,6 +4246,10 @@ static int macsec_newlink(struct net *net, struct net_device *dev,
- 			err = macsec_offload(ops->mdo_add_secy, &ctx);
- 			if (err)
- 				goto del_dev;
-+
-+			macsec_adjust_room(dev, ops);
-+			macsec->insert_tx_tag =
-+				macsec_needs_tx_tag(macsec, ops);
- 		}
- 	}
+@@ -646,6 +745,23 @@ static void nxp_c45_tx_sc_update(struct phy_device *phydev,
+ 	nxp_c45_macsec_write(phydev, MACSEC_TXSC_CFG, cfg);
+ }
  
-diff --git a/include/net/macsec.h b/include/net/macsec.h
-index 0821fa5088c0..dbd22180cc5c 100644
---- a/include/net/macsec.h
-+++ b/include/net/macsec.h
-@@ -316,6 +316,11 @@ struct macsec_context {
-  * @mdo_get_tx_sa_stats: called when TX SA stats are read
-  * @mdo_get_rx_sc_stats: called when RX SC stats are read
-  * @mdo_get_rx_sa_stats: called when RX SA stats are read
-+ * @mdo_insert_tx_tag: called to insert the TX tag
-+ * @needed_headroom: number of bytes reserved at the beginning of the sk_buff
-+ *	for the TX tag
-+ * @needed_tailroom: number of bytes reserved at the end of the sk_buff for the
-+ *	TX tag
-  */
- struct macsec_ops {
- 	/* Device wide */
-@@ -342,6 +347,11 @@ struct macsec_ops {
- 	int (*mdo_get_tx_sa_stats)(struct macsec_context *ctx);
- 	int (*mdo_get_rx_sc_stats)(struct macsec_context *ctx);
- 	int (*mdo_get_rx_sa_stats)(struct macsec_context *ctx);
-+	/* Offload tag */
-+	int (*mdo_insert_tx_tag)(struct phy_device *phydev,
-+				 struct sk_buff *skb);
-+	unsigned int needed_headroom;
-+	unsigned int needed_tailroom;
++static void nxp_c45_tx_sc_clear_stats(struct phy_device *phydev,
++				      struct nxp_c45_secy *phy_secy)
++{
++	struct nxp_c45_sa *pos, *tmp;
++
++	list_for_each_entry_safe(pos, tmp, &phy_secy->sa_list, list)
++		if (pos->type == TX_SA)
++			nxp_c45_tx_sa_clear_stats(phydev, pos);
++
++	nxp_c45_macsec_write(phydev, MACSEC_OPUS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_OPTLS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_OOP1HS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_OOP2HS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_OOE1HS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_OOE2HS, 0);
++}
++
+ static void nxp_c45_set_rx_sc0_impl(struct phy_device *phydev,
+ 				    bool enable)
+ {
+@@ -735,6 +851,32 @@ static void nxp_c45_rx_sc_update(struct phy_device *phydev,
+ 	nxp_c45_macsec_write(phydev, MACSEC_RXSC_CFG, cfg);
+ }
+ 
++static void nxp_c45_rx_sc_clear_stats(struct phy_device *phydev,
++				      struct nxp_c45_secy *phy_secy)
++{
++	struct nxp_c45_sa *pos, *tmp;
++	int i;
++
++	list_for_each_entry_safe(pos, tmp, &phy_secy->sa_list, list)
++		if (pos->type == RX_SA)
++			nxp_c45_rx_sa_clear_stats(phydev, pos);
++
++	nxp_c45_macsec_write(phydev, MACSEC_INOD1HS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_INOD2HS, 0);
++
++	nxp_c45_macsec_write(phydev, MACSEC_INOV1HS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_INOV2HS, 0);
++
++	nxp_c45_macsec_write(phydev, MACSEC_RXSCIPDS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_RXSCIPLS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_RXSCIPUS, 0);
++
++	for (i = 0; i < MACSEC_NUM_AN; i++) {
++		nxp_c45_macsec_write(phydev, MACSEC_RXAN0INUSS + i * 4, 0);
++		nxp_c45_macsec_write(phydev, MACSEC_RXAN0IPUSS + i * 4, 0);
++	}
++}
++
+ static void nxp_c45_rx_sc_del(struct phy_device *phydev,
+ 			      struct nxp_c45_secy *phy_secy)
+ {
+@@ -744,11 +886,20 @@ static void nxp_c45_rx_sc_del(struct phy_device *phydev,
+ 	nxp_c45_macsec_write(phydev, MACSEC_RPW, 0);
+ 	nxp_c45_set_sci(phydev, MACSEC_RXSC_SCI_1H, 0);
+ 
++	nxp_c45_rx_sc_clear_stats(phydev, phy_secy);
++
+ 	list_for_each_entry_safe(pos, tmp, &phy_secy->sa_list, list)
+ 		if (pos->type == RX_SA)
+ 			nxp_c45_rx_sa_update(phydev, pos, false);
+ }
+ 
++static void nxp_c45_clear_global_stats(struct phy_device *phydev)
++{
++	nxp_c45_macsec_write(phydev, MACSEC_INPBTS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_INPWTS, 0);
++	nxp_c45_macsec_write(phydev, MACSEC_IPSNFS, 0);
++}
++
+ static void nxp_c45_macsec_en(struct phy_device *phydev, bool en)
+ {
+ 	u32 reg;
+@@ -939,6 +1090,7 @@ static int nxp_c45_mdo_del_secy(struct macsec_context *ctx)
+ 	nxp_c45_mdo_dev_stop(ctx);
+ 	nxp_c45_tx_sa_next(phy_secy, &next_sa, encoding_sa);
+ 	nxp_c45_tx_sa_update(phydev, &next_sa, false);
++	nxp_c45_tx_sc_clear_stats(phydev, phy_secy);
+ 	if (phy_secy->rx_sc)
+ 		nxp_c45_rx_sc_del(phydev, phy_secy);
+ 
+@@ -949,6 +1101,9 @@ static int nxp_c45_mdo_del_secy(struct macsec_context *ctx)
+ 	clear_bit(phy_secy->secy_id, priv->macsec->tx_sc_bitmap);
+ 	nxp_c45_secy_free(phy_secy);
+ 
++	if (list_empty(&priv->macsec->secy_list))
++		nxp_c45_clear_global_stats(phydev);
++
+ 	return 0;
+ }
+ 
+@@ -1106,6 +1261,7 @@ static int nxp_c45_mdo_del_rxsa(struct macsec_context *ctx)
+ 
+ 	nxp_c45_select_secy(phydev, phy_secy->secy_id);
+ 	nxp_c45_rx_sa_update(phydev, sa, false);
++	nxp_c45_rx_sa_clear_stats(phydev, sa);
+ 
+ 	nxp_c45_sa_free(sa);
+ 
+@@ -1195,12 +1351,196 @@ static int nxp_c45_mdo_del_txsa(struct macsec_context *ctx)
+ 	nxp_c45_select_secy(phydev, phy_secy->secy_id);
+ 	if (ctx->secy->tx_sc.encoding_sa  == sa->an)
+ 		nxp_c45_tx_sa_update(phydev, sa, false);
++	nxp_c45_tx_sa_clear_stats(phydev, sa);
+ 
+ 	nxp_c45_sa_free(sa);
+ 
+ 	return 0;
+ }
+ 
++static int nxp_c45_mdo_get_dev_stats(struct macsec_context *ctx)
++{
++	struct phy_device *phydev = ctx->phydev;
++	struct nxp_c45_phy *priv = phydev->priv;
++	struct macsec_dev_stats  *dev_stats;
++	struct nxp_c45_secy *phy_secy;
++
++	phy_secy = nxp_c45_find_secy(&priv->macsec->secy_list, ctx->secy->sci);
++	if (IS_ERR(phy_secy))
++		return PTR_ERR(phy_secy);
++
++	dev_stats = ctx->stats.dev_stats;
++	nxp_c45_select_secy(phydev, phy_secy->secy_id);
++
++	nxp_c45_macsec_read32_64(phydev, MACSEC_OPUS,
++				 &dev_stats->OutPktsUntagged);
++	nxp_c45_macsec_read32_64(phydev, MACSEC_OPTLS,
++				 &dev_stats->OutPktsTooLong);
++	nxp_c45_macsec_read32_64(phydev, MACSEC_INPBTS,
++				 &dev_stats->InPktsBadTag);
++
++	if (phy_secy->secy->validate_frames == MACSEC_VALIDATE_STRICT)
++		nxp_c45_macsec_read32_64(phydev, MACSEC_INPWTS,
++					 &dev_stats->InPktsNoTag);
++	else
++		nxp_c45_macsec_read32_64(phydev, MACSEC_INPWTS,
++					 &dev_stats->InPktsUntagged);
++
++	if (phy_secy->secy->validate_frames == MACSEC_VALIDATE_STRICT)
++		nxp_c45_macsec_read32_64(phydev, MACSEC_IPSNFS,
++					 &dev_stats->InPktsNoSCI);
++	else
++		nxp_c45_macsec_read32_64(phydev, MACSEC_IPSNFS,
++					 &dev_stats->InPktsUnknownSCI);
++
++	/* Always 0. */
++	dev_stats->InPktsOverrun = 0;
++
++	return 0;
++}
++
++static int nxp_c45_mdo_get_tx_sc_stats(struct macsec_context *ctx)
++{
++	struct phy_device *phydev = ctx->phydev;
++	struct nxp_c45_phy *priv = phydev->priv;
++	struct macsec_tx_sa_stats tx_sa_stats;
++	struct macsec_tx_sc_stats *stats;
++	struct nxp_c45_secy *phy_secy;
++	struct nxp_c45_sa *pos, *tmp;
++
++	phy_secy = nxp_c45_find_secy(&priv->macsec->secy_list, ctx->secy->sci);
++	if (IS_ERR(phy_secy))
++		return PTR_ERR(phy_secy);
++
++	stats = ctx->stats.tx_sc_stats;
++	nxp_c45_select_secy(phydev, phy_secy->secy_id);
++
++	nxp_c45_macsec_read64(phydev, MACSEC_OOE1HS,
++			      &stats->OutOctetsEncrypted);
++	nxp_c45_macsec_read64(phydev, MACSEC_OOP1HS,
++			      &stats->OutOctetsProtected);
++	list_for_each_entry_safe(pos, tmp, &phy_secy->sa_list, list) {
++		if (pos->type != TX_SA)
++			continue;
++
++		memset(&tx_sa_stats, 0, sizeof(tx_sa_stats));
++		nxp_c45_tx_sa_read_stats(phydev, pos, &tx_sa_stats);
++
++		stats->OutPktsEncrypted += tx_sa_stats.OutPktsEncrypted;
++		stats->OutPktsProtected += tx_sa_stats.OutPktsProtected;
++	}
++
++	return 0;
++}
++
++static int nxp_c45_mdo_get_tx_sa_stats(struct macsec_context *ctx)
++{
++	struct phy_device *phydev = ctx->phydev;
++	struct nxp_c45_phy *priv = phydev->priv;
++	struct macsec_tx_sa_stats *stats;
++	struct nxp_c45_secy *phy_secy;
++	u8 an = ctx->sa.assoc_num;
++	struct nxp_c45_sa *sa;
++
++	phy_secy = nxp_c45_find_secy(&priv->macsec->secy_list, ctx->secy->sci);
++	if (IS_ERR(phy_secy))
++		return PTR_ERR(phy_secy);
++
++	sa = nxp_c45_find_sa(&phy_secy->sa_list, TX_SA, an);
++	if (IS_ERR(sa))
++		return PTR_ERR(sa);
++
++	stats = ctx->stats.tx_sa_stats;
++	nxp_c45_select_secy(phydev, phy_secy->secy_id);
++	nxp_c45_tx_sa_read_stats(phydev, sa, stats);
++
++	return 0;
++}
++
++static int nxp_c45_mdo_get_rx_sc_stats(struct macsec_context *ctx)
++{
++	struct phy_device *phydev = ctx->phydev;
++	struct nxp_c45_phy *priv = phydev->priv;
++	struct macsec_rx_sa_stats rx_sa_stats;
++	struct macsec_rx_sc_stats *stats;
++	struct nxp_c45_secy *phy_secy;
++	struct nxp_c45_sa *pos, *tmp;
++	u32 reg = 0;
++	int i;
++
++	phy_secy = nxp_c45_find_secy(&priv->macsec->secy_list, ctx->secy->sci);
++	if (IS_ERR(phy_secy))
++		return PTR_ERR(phy_secy);
++
++	if (phy_secy->rx_sc != ctx->rx_sc)
++		return -EINVAL;
++
++	stats = ctx->stats.rx_sc_stats;
++	nxp_c45_select_secy(phydev, phy_secy->secy_id);
++
++	list_for_each_entry_safe(pos, tmp, &phy_secy->sa_list, list) {
++		if (pos->type != RX_SA)
++			continue;
++
++		memset(&rx_sa_stats, 0, sizeof(rx_sa_stats));
++		nxp_c45_rx_sa_read_stats(phydev, pos, &rx_sa_stats);
++
++		stats->InPktsInvalid += rx_sa_stats.InPktsInvalid;
++		stats->InPktsNotValid += rx_sa_stats.InPktsNotValid;
++		stats->InPktsOK += rx_sa_stats.InPktsOK;
++	}
++
++	for (i = 0; i < MACSEC_NUM_AN; i++) {
++		nxp_c45_macsec_read(phydev, MACSEC_RXAN0INUSS + i * 4, &reg);
++		stats->InPktsNotUsingSA += reg;
++		nxp_c45_macsec_read(phydev, MACSEC_RXAN0IPUSS + i * 4, &reg);
++		stats->InPktsUnusedSA += reg;
++	}
++
++	nxp_c45_macsec_read64(phydev, MACSEC_INOD1HS,
++			      &stats->InOctetsDecrypted);
++	nxp_c45_macsec_read64(phydev, MACSEC_INOV1HS,
++			      &stats->InOctetsValidated);
++
++	nxp_c45_macsec_read32_64(phydev, MACSEC_RXSCIPDS,
++				 &stats->InPktsDelayed);
++	nxp_c45_macsec_read32_64(phydev, MACSEC_RXSCIPLS,
++				 &stats->InPktsLate);
++	nxp_c45_macsec_read32_64(phydev, MACSEC_RXSCIPUS,
++				 &stats->InPktsUnchecked);
++
++	return 0;
++}
++
++static int nxp_c45_mdo_get_rx_sa_stats(struct macsec_context *ctx)
++{
++	struct phy_device *phydev = ctx->phydev;
++	struct nxp_c45_phy *priv = phydev->priv;
++	struct macsec_rx_sa_stats *stats;
++	struct nxp_c45_secy *phy_secy;
++	u8 an = ctx->sa.assoc_num;
++	struct nxp_c45_sa *sa;
++
++	phy_secy = nxp_c45_find_secy(&priv->macsec->secy_list, ctx->secy->sci);
++	if (IS_ERR(phy_secy))
++		return PTR_ERR(phy_secy);
++
++	sa = nxp_c45_find_sa(&phy_secy->sa_list, RX_SA, an);
++	if (IS_ERR(sa))
++		return PTR_ERR(sa);
++
++	stats = ctx->stats.rx_sa_stats;
++	nxp_c45_select_secy(phydev, phy_secy->secy_id);
++
++	nxp_c45_rx_sa_read_stats(phydev, sa, stats);
++	nxp_c45_macsec_read(phydev, MACSEC_RXAN0INUSS + an * 4,
++			    &stats->InPktsNotUsingSA);
++	nxp_c45_macsec_read(phydev, MACSEC_RXAN0IPUSS + an * 4,
++			    &stats->InPktsUnusedSA);
++
++	return 0;
++}
++
+ static const struct macsec_ops nxp_c45_macsec_ops = {
+ 	.mdo_dev_open = nxp_c45_mdo_dev_open,
+ 	.mdo_dev_stop = nxp_c45_mdo_dev_stop,
+@@ -1216,6 +1556,11 @@ static const struct macsec_ops nxp_c45_macsec_ops = {
+ 	.mdo_add_txsa = nxp_c45_mdo_add_txsa,
+ 	.mdo_upd_txsa = nxp_c45_mdo_upd_txsa,
+ 	.mdo_del_txsa = nxp_c45_mdo_del_txsa,
++	.mdo_get_dev_stats = nxp_c45_mdo_get_dev_stats,
++	.mdo_get_tx_sc_stats = nxp_c45_mdo_get_tx_sc_stats,
++	.mdo_get_tx_sa_stats = nxp_c45_mdo_get_tx_sa_stats,
++	.mdo_get_rx_sc_stats = nxp_c45_mdo_get_rx_sc_stats,
++	.mdo_get_rx_sa_stats = nxp_c45_mdo_get_rx_sa_stats,
  };
  
- void macsec_pn_wrapped(struct macsec_secy *secy, struct macsec_tx_sa *tx_sa);
+ int nxp_c45_macsec_config_init(struct phy_device *phydev)
 -- 
 2.34.1
 
