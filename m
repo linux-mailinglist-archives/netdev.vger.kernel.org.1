@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-42478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA217CED76
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF4A7CED75
 	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 03:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 718F1B2117A
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:20:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EE8A1C20DF9
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4663964F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0A17F5;
 	Thu, 19 Oct 2023 01:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O7yRsKdm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BDVbdYx0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2701F394
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:20:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EBE3BC433BA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7D4642;
+	Thu, 19 Oct 2023 01:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C84E6C433CA;
 	Thu, 19 Oct 2023 01:20:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697678425;
-	bh=CNs0BKDEjfOa2gcNkk744AMJR6d0l87ZEc8H5ukVQ0U=;
+	s=k20201202; t=1697678424;
+	bh=C54e0EHjIdmAtJezDx02TQI4F+oCNKxLB5pVdsRSu9k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=O7yRsKdm44uB9FCtS4JFnCgTBJ9fWQKDSpcSlFOE8AMjXmqHambnuwV4AhXKtYtpu
-	 p+OxYZGIWmMuvVq2V8kFJcaKbSV1z0xsLunTtJFDtzClugIxwNvH+Ck9UeAf380HdZ
-	 zMQCr/aa51aL3m3owfGbWnuQff4hThHOZM8HP2P5XgYHAZ3V2hxYJgH7N8RQb8AEap
-	 QNQjRHIUTE35f4S1pIlMMSivS4iuhbKricMFLgW4uTAh3vUcPWx2zS2lb7YWlsaEGv
-	 fYrFB7Lz9cR+PgFnrgSMIWcw76G7yOx3MbMz7QMOorTkavdv/hX0Tm1aoeGM1Ybyf0
-	 o+XoaiMLQScqA==
+	b=BDVbdYx0ME2eifnXLZgmBnKxNhMmEXaTogVRvupA80TFgFhX/roQOBbgie5+4nPo6
+	 B15TKEdmT3PVWV125yPcbobLvr8mf//dsCFwWhJXKawU26IpqLeH5O174KuHVp7Fh2
+	 UYE6H006MZ14da1hkp8y4+wFyYLiFc3z7627kxpiIZYDK94T/ql/T0Xd0Qo+pZDLpO
+	 h0TwUoQuId857Z9MXwEYXFUcfixi8lGRC12tcSiGFqg3f67j5sQTZPOilvIfQHrwLl
+	 gK7/AgWXfLRtdOOtGnlYfaT54MfunbkoD7mj2/dk8yHAgJj+cezaKKORJfzEdwyYdi
+	 2OcEgxyG4u77A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BCC78E00084;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AE7F3E00082;
 	Thu, 19 Oct 2023 01:20:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,40 +43,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: wireless-2023-10-18
+Subject: Re: [PATCH net] tcp_bpf: properly release resources on error paths
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169767842477.18183.16659092882709250447.git-patchwork-notify@kernel.org>
+ <169767842471.18183.10678870196810764634.git-patchwork-notify@kernel.org>
 Date: Thu, 19 Oct 2023 01:20:24 +0000
-References: <20231018071041.8175-2-johannes@sipsolutions.net>
-In-Reply-To: <20231018071041.8175-2-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+References: <8f99194c698bcef12666f0a9a999c58f8b1cb52c.1697557782.git.pabeni@redhat.com>
+In-Reply-To: <8f99194c698bcef12666f0a9a999c58f8b1cb52c.1697557782.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, john.fastabend@gmail.com, jakub@cloudflare.com,
+ edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+ kuba@kernel.org, bpf@vger.kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 18 Oct 2023 09:10:42 +0200 you wrote:
-> Hi,
+On Tue, 17 Oct 2023 17:49:51 +0200 you wrote:
+> In the blamed commit below, I completely forgot to release the acquired
+> resources before erroring out in the TCP BPF code, as reported by Dan.
 > 
-> So we have a couple more fixes, all in the stack this time.
+> Address the issues by replacing the bogus return with a jump to the
+> relevant cleanup code.
 > 
-> Unfortunately, one of them is for an issue I noticed during
-> the merge between wireless and wireless-next last time, and
-> while it was already resolved in wireless-next, the issue
-> also existed in wireless; as a result, this causes a merge
-> conflict again when merging wireless and wireless-next (or
-> obviously net/net-next after pulling this in, etc.). This is
-> (pretty easily) resolved by taking the version without the
-> lock, as the lock doesn't exist any more in -next.
+> Fixes: 419ce133ab92 ("tcp: allow again tcp_disconnect() when threads are waiting")
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - pull-request: wireless-2023-10-18
-    https://git.kernel.org/netdev/net/c/88343fbe5a13
+  - [net] tcp_bpf: properly release resources on error paths
+    https://git.kernel.org/netdev/net/c/68b54aeff804
 
 You are awesome, thank you!
 -- 
