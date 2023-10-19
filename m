@@ -1,780 +1,206 @@
-Return-Path: <netdev+bounces-42501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D977CEFF2
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:15:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCF377CF001
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:17:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 974FC281E32
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 06:15:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 502DEB20F40
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 06:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6995A20FD;
-	Thu, 19 Oct 2023 06:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E48B2104;
+	Thu, 19 Oct 2023 06:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fjQUnnad"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="35iKzvkz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E67A186C
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 06:14:57 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2A32129
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 23:14:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697696093;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LaoX9q6thKlB+2I1d+DCIncQXMpQXvV56vmw4EL+YqE=;
-	b=fjQUnnadKVLl1kPGuAdn+is1iJx7q8R8ESId/7hwaUd3s6u84biiGwXIAmvXK0bQsFt0Vr
-	m/QI1faUhmICF6thkE1jERpHkDPoanzvT65OxjYVdzPkCcvkN1VOwkKwjoZ8Aj3nIjSVFr
-	cqMtypOn0aWHGVBwFEnY7LFj9GXt9yI=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-299-XadBGG3PO4GoMD-AssMtig-1; Thu, 19 Oct 2023 02:14:41 -0400
-X-MC-Unique: XadBGG3PO4GoMD-AssMtig-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2c50c873604so55384681fa.1
-        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 23:14:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697696079; x=1698300879;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LaoX9q6thKlB+2I1d+DCIncQXMpQXvV56vmw4EL+YqE=;
-        b=AmGDwvBLSegJPoyMkB2mjLEiWK5GE8xLVXfWwqzeYNJ2tVHV71jiZ2q/JVj9vMRt7q
-         PR1RwAODRTev9dLqXdt8ShRTSrb5PhC02xqCyJyHB2SzErLuNgCa72sLAcCNUEwRF233
-         07B1YwermQhfr27eId3cNOIwuFNrjG+gWcb1RQ41nRp9iwx+uQnrjGs4td+mmv1rIeS2
-         9pwsOJnPwrBCUMn9+ic18FwsaVtmoWj6Btq920upZa0VKy+9nVYGJ9AyH3mMEEO1fn5v
-         +yVGnQJ/hk2o04tEmB+zPCb/Cp9lH2HC/TABlO27BOG38AfOAb5g01wFsBm0Wd4CDKce
-         597Q==
-X-Gm-Message-State: AOJu0YwzJAsBwqC2aUp+1YFGSkekB394VWdk7LAeDX1AIbVfYkFTgtn4
-	+zENppUsH5hu6Xg8X8E6usFnAO9Ct07YTwvlVv1XPFWqEx3uQjQcqI+v7ClBRjuou/TiU2YAIUB
-	Py+u9eFBTy6666FIGfy+g93XxTL6x4cTJ
-X-Received: by 2002:a05:651c:504:b0:2c1:375a:b37c with SMTP id o4-20020a05651c050400b002c1375ab37cmr641282ljp.40.1697696079170;
-        Wed, 18 Oct 2023 23:14:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGBTT2NYXRh+ikFuqxWTl27ffuH4vUMzVfxcxXtJwXaHCwNGlO3S5qn+SOdMBy2fmayTRTyUnd1rLTyH1rnC0E=
-X-Received: by 2002:a05:651c:504:b0:2c1:375a:b37c with SMTP id
- o4-20020a05651c050400b002c1375ab37cmr641265ljp.40.1697696078563; Wed, 18 Oct
- 2023 23:14:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4D42913;
+	Thu, 19 Oct 2023 06:17:31 +0000 (UTC)
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2055.outbound.protection.outlook.com [40.107.101.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE1A0BE;
+	Wed, 18 Oct 2023 23:17:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lIiZTC8SUCZUuqu0tpLuReSNlmWb1y4B7u+5RAvtv1D2eVptQUEF0MWj3Z/g3kGy0/jttu5EsyTdayERkwgkH1yO/q5GcR91kUxrNPmJ8zSLOXhA3PXzETHfpEbJruMLMpUI0dY+z1e6jqM7mfwrZHpeLXO+/atoacbuTcTUxPrcEn9NLYwejfhqaai9hby6aY/S3E8dosoVoRKJ7nRm/Da8UXV1j4g1cBznzuFRJuPMaYgeuVPJihLDILmTUxVLLaqF3rq6qTwrMMBlCRoRTM+qq8y5E1E4mYYdmyruIcfWDBghLIFqRqb3E6nuecxzrCK42+8cnT5BmYXbjrPWDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cBqT9M2T6hc5bLw1aqb0YQoiwrwBpKLwAnvUhAfWy8g=;
+ b=W2KhIdmjCAn6cwbW3CFSzJkUeaOfsc+1LXp/MzLhNt+YI1zPpLY+HrvzeB8lwqHUPUlQBbdr/fotk3SEaGO7WG7c5kuDrHqxOZFFx5dpqhIBRCkHbws0jM6SMILyScleqLDR6HwZ+ussooq/OzXTS7tj7Pyix6PNfvKFiaeJYKuhNX+YwddVQdFP/kmopuYTYldCyFdVHkzKCBco3OPtdjzrUs2O1Gx21L6ZGmZDDzmmHzgpYX9B8xYpwVllOP/jmmq0RjpWLiUsbSTN+FbTjNef1JEL0YxAPCU1wjCQCwoB0+stj9Rwvewf0PPSEr80WyUYQR0Nq/vvSYEoM/qiRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cBqT9M2T6hc5bLw1aqb0YQoiwrwBpKLwAnvUhAfWy8g=;
+ b=35iKzvkzgI9992OSfHS2FRca8buagfQy9pSWUtc8PUpG+Eru+fxSt/JWfNNWxOI7IAqo5DRYdmk5TuByaJ5OIuMgIwKgArTQJdebnSgq6XTU+Vk7aCje9XAJsREpc2mvz05Ea8f7UGRQjuMs1PYKO7N/wD9eLW14h5z1O57fHWs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB6351.namprd12.prod.outlook.com (2603:10b6:8:a2::6) by
+ CY5PR12MB6624.namprd12.prod.outlook.com (2603:10b6:930:40::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6907.21; Thu, 19 Oct 2023 06:17:27 +0000
+Received: from DM4PR12MB6351.namprd12.prod.outlook.com
+ ([fe80::4ead:d69:799a:281e]) by DM4PR12MB6351.namprd12.prod.outlook.com
+ ([fe80::4ead:d69:799a:281e%5]) with mapi id 15.20.6886.034; Thu, 19 Oct 2023
+ 06:17:27 +0000
+Message-ID: <5f85eb72-3f34-4006-85ca-2a2181113008@amd.com>
+Date: Thu, 19 Oct 2023 14:17:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Cc: majun@amd.com, netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH v12 0/9] Enable Wifi RFI interference mitigation feature
+ support
+To: Ma Jun <Jun.Ma2@amd.com>, amd-gfx@lists.freedesktop.org, lenb@kernel.org,
+ johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, alexander.deucher@amd.com,
+ Lijo.Lazar@amd.com, mario.limonciello@amd.com
+References: <20231017025358.1773598-1-Jun.Ma2@amd.com>
+Content-Language: en-US
+From: "Ma, Jun" <majun@amd.com>
+In-Reply-To: <20231017025358.1773598-1-Jun.Ma2@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR02CA0030.apcprd02.prod.outlook.com
+ (2603:1096:3:18::18) To DM4PR12MB6351.namprd12.prod.outlook.com
+ (2603:10b6:8:a2::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com> <20231016120033.26933-6-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20231016120033.26933-6-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 19 Oct 2023 14:14:27 +0800
-Message-ID: <CACGkMEvQvyjxX7PKVtTjMMtQNX3PzuviL=sA5sMftEToduZ5RA@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 05/19] virtio_net: add prefix virtnet to all
- struct/api inside virtio_net.h
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB6351:EE_|CY5PR12MB6624:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9b615315-c40e-4d10-ff8b-08dbd06b10f7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ii/tGh10VP9UnPb2VjGTclKf5AICZQUkYGgCjJiiGpBQc6BjUibPyx9Zq5Mx3HTdEi4gYZSD42H/0nP3D6ihNto6rTULo+aY4YvxepRdwz9cf3QfJFzuuxvDiOj/g6BIFpDyne+N8706DmGT2r/50JaPn6oxEyi5+E7YCxZFJ1EyuOKuXOy7mQjOzCSWQf4dOiJwSaGUezzahoIey9hqEZZQRZQFYXXrR9g1Kk8UgHwrx5CrOeDWO2Cloxb/knUuBqRlAEP+xIvwIhkiJF5QZbYfYGXBoweLpTuASgvNW04SKOW98kwnCpuQWKbN+hbrSuUrsG+Q1uc7hWxMy2/c+aLwOVWH3FK+2Q92W/jnSfH+B5X7At8RCDDPXRHo2RoPK66Uig1lthSKVSrSSoSwO5vNyC6yDu5rWLsfpVmBXMQ2OWySKhf56fkh+i/gd5sZFPiQdaAL0NSCF+WssRcVKEO2bSRsyEEaXYsrcJYZ6r210FdIYNBah+WhQcqYCW4q5MRcd6s8wIpuzjUX2yMICzmFFLwKp/oXTo2hjQ42SE+WjTJnL9vmnt2PgzeaYrXQ/Gk+c7f2Vth0I+8H/UYRKSDuWFe0AA2DFgaeAtkaI5r4EEqwknHMsyyWiWJMzKhF7OWWvWkXI9R8IDCpX1uPCOoOFQx6mh8+Em9novH0THA=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6351.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(366004)(39860400002)(376002)(346002)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(36756003)(31686004)(66476007)(6636002)(66556008)(31696002)(38100700002)(921005)(53546011)(316002)(6666004)(26005)(2616005)(83380400001)(6512007)(6506007)(66946007)(4326008)(8936002)(478600001)(8676002)(2906002)(7416002)(5660300002)(6486002)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NzErOVMrdFJib1FUTFZRR0xDMGRpTW16Tk1lUnEyL1FOSng3TTRmeGd4WFpj?=
+ =?utf-8?B?eG1aTE0yL283aXJJZWVQNGdDUG5QUEE5Y1Q5OFU3amIzN0YwN0FHdXkvenpZ?=
+ =?utf-8?B?MGxVQ3c3RXU2YnJHd1UyQWU5VnZYYUEza1Rkc25VbkJYMHZMakhYdXhwUXRy?=
+ =?utf-8?B?dmhPSnNYMkNIWmhBMFBOL1RmU1N6Qk9aS3F5b3k5Um1yYmtrQXB2eGxNcU5a?=
+ =?utf-8?B?Ukt0clJFYTZnZXFxL2RFWG9CRmxDQnRIMjlIU0hXQzY0SEZNaUpjT2xYMDZ4?=
+ =?utf-8?B?aURDZWtJSENrMXZLYVlGakYrTURzYmRQYzU2WmRjSEJ6Q3gzV2d0ZkhjdFQ1?=
+ =?utf-8?B?TmVyYkNsZ29BQ25LRnVidm9pZldMSWlGY1pFd29VN2pMVDNSdlFSUTErRCt0?=
+ =?utf-8?B?WXZxY0toclFOZFVtbXJWaFJJNldJLzBUNDNqOFpKZS8xTjdITVFIRHBydlFH?=
+ =?utf-8?B?MklpSVhQUHoxVTNpSXNWNU4rbHBWUmhDdEgzNjViYzFERDVFSEV1a3RQOXJF?=
+ =?utf-8?B?cTlJOFdXM2NPa1FSVGpZWitialVrTENlRGsrclJvMnU2NW5qZnBWZEJpR25R?=
+ =?utf-8?B?QXlDSEQreXA2YW56OFkwYTJkU2RxT25YNjBIUVVCM2UzVHVrU2RldXYyRmxv?=
+ =?utf-8?B?RDU0d0c4d1pVWGNiRm5POXJ4a2xHZy9xTVpMeVNTZy9OK1AyalAxZ3VxUHNZ?=
+ =?utf-8?B?M013VlRaNmlDN3YvKzZFYkZCcFJFMnFTMnB4cVFGeWRodCtKWnFQMWUydmhW?=
+ =?utf-8?B?eS95Qzd4MDBXL2IrVkVlb2VKNXlzUlRkQnB6M1hDcVNackh1RVhxWTVhRGQ5?=
+ =?utf-8?B?S0V3UHV2VHkzcHdYVW9ZcjBBazVncWJ3VEU1ZE9OdEROd2wzUU8zY05lbmxB?=
+ =?utf-8?B?R1JyR2pLcGk4d2g1YWROcVVMcGE0ZVdheVB1NzNQNWE5TEhQT1F1NzlXQ1Bp?=
+ =?utf-8?B?U0F1OXNWMUw5bW9tSkpZalFMSU1JTkdnQWIrVEJkQ2pDaXFzbUJwQ2gxcklM?=
+ =?utf-8?B?MldMOVlIczl5QS9HeElWZmFUeWFsNEhUM1hDQXUzZGJBZW8xTU4zTnh1ekhN?=
+ =?utf-8?B?TWNWNlptam96bnZtNnJoT09FRFpHQ09neThNYzIreHdOZStmbUoydnJoQjBh?=
+ =?utf-8?B?K2h2RUYvdUo0dlZqdW0vZjFac3gzSE5HcG0yMjlYQnpnOUN5ZjU4V00yRjJV?=
+ =?utf-8?B?NVVyTnNwZUJzZTYyczRISlJqNUE1MGcyZWVaV0RVQXFhMkgwUnY3cU16VThp?=
+ =?utf-8?B?aWtUSFVxSEtEaWdlbFNiV3pFcVJaaGtocE9TUmwrNnBSOS8wdjd3MXhKU09r?=
+ =?utf-8?B?MzVGeXFMSjNONDBPdUVpdXFRUFo5N0lab1lTQUhManMvSGZXVnJMa00xMHhQ?=
+ =?utf-8?B?V3pSRkdIZ0JLZVpidGNUaVFoNHB2bHpkL0NoMXlEY1NQWWdZUThqVmtIMGly?=
+ =?utf-8?B?T0tPTkhodG5NQk9yNDhac05uWVBXTktTSTdjbTlGQnUrSnZoKzRUZ1Rrd25V?=
+ =?utf-8?B?bmtQclZESGpkOE5OQkYwNThMR0l4OXlCT2dmTHRFR3FjcGdnRStsNFlNQ3lM?=
+ =?utf-8?B?ZEhUTDZ1ODQxeE1uNjkwMDhKVDQyQzd4ZjZIaDdFUjdPYThadjlicFRFZXdH?=
+ =?utf-8?B?emhsTUVQeVpUdUtFeVFEMDhSTzdvZ0JYaytoWUhFRC9vUHNDTWdjOVYxcTBu?=
+ =?utf-8?B?dGRhMjBTSDBZZFVFdFdGODZSbkJ2T0JjR0gwdjArdlowNFRPSlNpM2hGckx3?=
+ =?utf-8?B?YkxoQmlDTkxxNmFiZ1Z1ZTFnTXlUeWcxM2dBVGh1aHpiZDBLb3YxeG8zL2ZE?=
+ =?utf-8?B?SU00ak1CbmRuODFqSVNQL2VoVElDZmZLSjUvK3FySFlZQ2pTdUVyTkdNWFEv?=
+ =?utf-8?B?R1ZwRWk4dC9nbTViUXIrSUVVamNMSi9Xd0s0NmsxWVFlUXMzVU9kdGFPSnUr?=
+ =?utf-8?B?dFRpZk4yTzZVNFpBSGI5TG5OSHBaSzRVYm9BMGlTNENiY3lLM29WU3lkWDh1?=
+ =?utf-8?B?cG94NmFOL2h1TkxLSW9helc0Q1ZEbzNIajBldGlIbngwc2NjSlNBWjYycmtY?=
+ =?utf-8?B?ejdFTG4yek9CODBJS0pmZzZuVGo5dzVac0t2dHg1NFdEaUNuMTEyalcvRHNy?=
+ =?utf-8?Q?W+ZWdbQWlmK9a/0CM6ApDJuBd?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9b615315-c40e-4d10-ff8b-08dbd06b10f7
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6351.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 06:17:27.0476
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4H7oxub/tPvGJovCWG0BtUXh6ypfXoyVox79Ye9oFsd9VBLguZySFA74kWpLkINC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6624
 
-On Mon, Oct 16, 2023 at 8:01=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> We move some structures and APIs to the header file, but these
-> structures and APIs do not prefixed with virtnet. This patch adds
-> virtnet for these.
+ping...
+Any other comments?
 
-What's the benefit of doing this? AFAIK virtio-net is the only user
-for virtio-net.h?
+Regards,
+Ma Jun
 
-THanks
-
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  drivers/net/virtio/main.c       | 122 ++++++++++++++++----------------
->  drivers/net/virtio/virtio_net.h |  30 ++++----
->  2 files changed, 76 insertions(+), 76 deletions(-)
->
-> diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
-> index d8b6c0d86f29..ba38b6078e1d 100644
-> --- a/drivers/net/virtio/main.c
-> +++ b/drivers/net/virtio/main.c
-> @@ -180,7 +180,7 @@ skb_vnet_common_hdr(struct sk_buff *skb)
->   * private is used to chain pages for big packets, put the whole
->   * most recent used list in the beginning for reuse
->   */
-> -static void give_pages(struct receive_queue *rq, struct page *page)
-> +static void give_pages(struct virtnet_rq *rq, struct page *page)
->  {
->         struct page *end;
->
-> @@ -190,7 +190,7 @@ static void give_pages(struct receive_queue *rq, stru=
-ct page *page)
->         rq->pages =3D page;
->  }
->
-> -static struct page *get_a_page(struct receive_queue *rq, gfp_t gfp_mask)
-> +static struct page *get_a_page(struct virtnet_rq *rq, gfp_t gfp_mask)
->  {
->         struct page *p =3D rq->pages;
->
-> @@ -225,7 +225,7 @@ static void virtqueue_napi_complete(struct napi_struc=
-t *napi,
->         opaque =3D virtqueue_enable_cb_prepare(vq);
->         if (napi_complete_done(napi, processed)) {
->                 if (unlikely(virtqueue_poll(vq, opaque)))
-> -                       virtqueue_napi_schedule(napi, vq);
-> +                       virtnet_vq_napi_schedule(napi, vq);
->         } else {
->                 virtqueue_disable_cb(vq);
->         }
-> @@ -240,7 +240,7 @@ static void skb_xmit_done(struct virtqueue *vq)
->         virtqueue_disable_cb(vq);
->
->         if (napi->weight)
-> -               virtqueue_napi_schedule(napi, vq);
-> +               virtnet_vq_napi_schedule(napi, vq);
->         else
->                 /* We were probably waiting for more output buffers. */
->                 netif_wake_subqueue(vi->dev, vq2txq(vq));
-> @@ -281,7 +281,7 @@ static struct sk_buff *virtnet_build_skb(void *buf, u=
-nsigned int buflen,
->
->  /* Called from bottom half context */
->  static struct sk_buff *page_to_skb(struct virtnet_info *vi,
-> -                                  struct receive_queue *rq,
-> +                                  struct virtnet_rq *rq,
->                                    struct page *page, unsigned int offset=
-,
->                                    unsigned int len, unsigned int truesiz=
-e,
->                                    unsigned int headroom)
-> @@ -380,7 +380,7 @@ static struct sk_buff *page_to_skb(struct virtnet_inf=
-o *vi,
->         return skb;
->  }
->
-> -static void virtnet_rq_unmap(struct receive_queue *rq, void *buf, u32 le=
-n)
-> +static void virtnet_rq_unmap(struct virtnet_rq *rq, void *buf, u32 len)
->  {
->         struct page *page =3D virt_to_head_page(buf);
->         struct virtnet_rq_dma *dma;
-> @@ -409,7 +409,7 @@ static void virtnet_rq_unmap(struct receive_queue *rq=
-, void *buf, u32 len)
->         put_page(page);
->  }
->
-> -static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void=
- **ctx)
-> +static void *virtnet_rq_get_buf(struct virtnet_rq *rq, u32 *len, void **=
-ctx)
->  {
->         void *buf;
->
-> @@ -420,7 +420,7 @@ static void *virtnet_rq_get_buf(struct receive_queue =
-*rq, u32 *len, void **ctx)
->         return buf;
->  }
->
-> -static void *virtnet_rq_detach_unused_buf(struct receive_queue *rq)
-> +static void *virtnet_rq_detach_unused_buf(struct virtnet_rq *rq)
->  {
->         void *buf;
->
-> @@ -431,7 +431,7 @@ static void *virtnet_rq_detach_unused_buf(struct rece=
-ive_queue *rq)
->         return buf;
->  }
->
-> -static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, =
-u32 len)
-> +static void virtnet_rq_init_one_sg(struct virtnet_rq *rq, void *buf, u32=
- len)
->  {
->         struct virtnet_rq_dma *dma;
->         dma_addr_t addr;
-> @@ -456,7 +456,7 @@ static void virtnet_rq_init_one_sg(struct receive_que=
-ue *rq, void *buf, u32 len)
->         rq->sg[0].length =3D len;
->  }
->
-> -static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t =
-gfp)
-> +static void *virtnet_rq_alloc(struct virtnet_rq *rq, u32 size, gfp_t gfp=
-)
->  {
->         struct page_frag *alloc_frag =3D &rq->alloc_frag;
->         struct virtnet_rq_dma *dma;
-> @@ -530,11 +530,11 @@ static void virtnet_rq_set_premapped(struct virtnet=
-_info *vi)
->         }
->  }
->
-> -static void free_old_xmit(struct send_queue *sq, bool in_napi)
-> +static void free_old_xmit(struct virtnet_sq *sq, bool in_napi)
->  {
->         struct virtnet_sq_stats stats =3D {};
->
-> -       __free_old_xmit(sq, in_napi, &stats);
-> +       virtnet_free_old_xmit(sq, in_napi, &stats);
->
->         /* Avoid overhead when no packets have been processed
->          * happens when called speculatively from start_xmit.
-> @@ -550,7 +550,7 @@ static void free_old_xmit(struct send_queue *sq, bool=
- in_napi)
->
->  static void check_sq_full_and_disable(struct virtnet_info *vi,
->                                       struct net_device *dev,
-> -                                     struct send_queue *sq)
-> +                                     struct virtnet_sq *sq)
->  {
->         bool use_napi =3D sq->napi.weight;
->         int qnum;
-> @@ -571,7 +571,7 @@ static void check_sq_full_and_disable(struct virtnet_=
-info *vi,
->                 netif_stop_subqueue(dev, qnum);
->                 if (use_napi) {
->                         if (unlikely(!virtqueue_enable_cb_delayed(sq->vq)=
-))
-> -                               virtqueue_napi_schedule(&sq->napi, sq->vq=
-);
-> +                               virtnet_vq_napi_schedule(&sq->napi, sq->v=
-q);
->                 } else if (unlikely(!virtqueue_enable_cb_delayed(sq->vq))=
-) {
->                         /* More just got used, free them then recheck. */
->                         free_old_xmit(sq, false);
-> @@ -584,7 +584,7 @@ static void check_sq_full_and_disable(struct virtnet_=
-info *vi,
->  }
->
->  static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
-> -                                  struct send_queue *sq,
-> +                                  struct virtnet_sq *sq,
->                                    struct xdp_frame *xdpf)
->  {
->         struct virtio_net_hdr_mrg_rxbuf *hdr;
-> @@ -674,9 +674,9 @@ static int virtnet_xdp_xmit(struct net_device *dev,
->  {
->         struct virtnet_info *vi =3D netdev_priv(dev);
->         struct virtnet_sq_stats stats =3D {};
-> -       struct receive_queue *rq =3D vi->rq;
-> +       struct virtnet_rq *rq =3D vi->rq;
->         struct bpf_prog *xdp_prog;
-> -       struct send_queue *sq;
-> +       struct virtnet_sq *sq;
->         int nxmit =3D 0;
->         int kicks =3D 0;
->         int ret;
-> @@ -697,7 +697,7 @@ static int virtnet_xdp_xmit(struct net_device *dev,
->         }
->
->         /* Free up any pending old buffers before queueing new ones. */
-> -       __free_old_xmit(sq, false, &stats);
-> +       virtnet_free_old_xmit(sq, false, &stats);
->
->         for (i =3D 0; i < n; i++) {
->                 struct xdp_frame *xdpf =3D frames[i];
-> @@ -708,7 +708,7 @@ static int virtnet_xdp_xmit(struct net_device *dev,
->         }
->         ret =3D nxmit;
->
-> -       if (!is_xdp_raw_buffer_queue(vi, sq - vi->sq))
-> +       if (!virtnet_is_xdp_raw_buffer_queue(vi, sq - vi->sq))
->                 check_sq_full_and_disable(vi, dev, sq);
->
->         if (flags & XDP_XMIT_FLUSH) {
-> @@ -816,7 +816,7 @@ static unsigned int virtnet_get_headroom(struct virtn=
-et_info *vi)
->   * across multiple buffers (num_buf > 1), and we make sure buffers
->   * have enough headroom.
->   */
-> -static struct page *xdp_linearize_page(struct receive_queue *rq,
-> +static struct page *xdp_linearize_page(struct virtnet_rq *rq,
->                                        int *num_buf,
->                                        struct page *p,
->                                        int offset,
-> @@ -897,7 +897,7 @@ static struct sk_buff *receive_small_build_skb(struct=
- virtnet_info *vi,
->
->  static struct sk_buff *receive_small_xdp(struct net_device *dev,
->                                          struct virtnet_info *vi,
-> -                                        struct receive_queue *rq,
-> +                                        struct virtnet_rq *rq,
->                                          struct bpf_prog *xdp_prog,
->                                          void *buf,
->                                          unsigned int xdp_headroom,
-> @@ -984,7 +984,7 @@ static struct sk_buff *receive_small_xdp(struct net_d=
-evice *dev,
->
->  static struct sk_buff *receive_small(struct net_device *dev,
->                                      struct virtnet_info *vi,
-> -                                    struct receive_queue *rq,
-> +                                    struct virtnet_rq *rq,
->                                      void *buf, void *ctx,
->                                      unsigned int len,
->                                      unsigned int *xdp_xmit,
-> @@ -1031,7 +1031,7 @@ static struct sk_buff *receive_small(struct net_dev=
-ice *dev,
->
->  static struct sk_buff *receive_big(struct net_device *dev,
->                                    struct virtnet_info *vi,
-> -                                  struct receive_queue *rq,
-> +                                  struct virtnet_rq *rq,
->                                    void *buf,
->                                    unsigned int len,
->                                    struct virtnet_rq_stats *stats)
-> @@ -1052,7 +1052,7 @@ static struct sk_buff *receive_big(struct net_devic=
-e *dev,
->         return NULL;
->  }
->
-> -static void mergeable_buf_free(struct receive_queue *rq, int num_buf,
-> +static void mergeable_buf_free(struct virtnet_rq *rq, int num_buf,
->                                struct net_device *dev,
->                                struct virtnet_rq_stats *stats)
->  {
-> @@ -1126,7 +1126,7 @@ static struct sk_buff *build_skb_from_xdp_buff(stru=
-ct net_device *dev,
->  /* TODO: build xdp in big mode */
->  static int virtnet_build_xdp_buff_mrg(struct net_device *dev,
->                                       struct virtnet_info *vi,
-> -                                     struct receive_queue *rq,
-> +                                     struct virtnet_rq *rq,
->                                       struct xdp_buff *xdp,
->                                       void *buf,
->                                       unsigned int len,
-> @@ -1214,7 +1214,7 @@ static int virtnet_build_xdp_buff_mrg(struct net_de=
-vice *dev,
->  }
->
->  static void *mergeable_xdp_get_buf(struct virtnet_info *vi,
-> -                                  struct receive_queue *rq,
-> +                                  struct virtnet_rq *rq,
->                                    struct bpf_prog *xdp_prog,
->                                    void *ctx,
->                                    unsigned int *frame_sz,
-> @@ -1289,7 +1289,7 @@ static void *mergeable_xdp_get_buf(struct virtnet_i=
-nfo *vi,
->
->  static struct sk_buff *receive_mergeable_xdp(struct net_device *dev,
->                                              struct virtnet_info *vi,
-> -                                            struct receive_queue *rq,
-> +                                            struct virtnet_rq *rq,
->                                              struct bpf_prog *xdp_prog,
->                                              void *buf,
->                                              void *ctx,
-> @@ -1349,7 +1349,7 @@ static struct sk_buff *receive_mergeable_xdp(struct=
- net_device *dev,
->
->  static struct sk_buff *receive_mergeable(struct net_device *dev,
->                                          struct virtnet_info *vi,
-> -                                        struct receive_queue *rq,
-> +                                        struct virtnet_rq *rq,
->                                          void *buf,
->                                          void *ctx,
->                                          unsigned int len,
-> @@ -1494,7 +1494,7 @@ static void virtio_skb_set_hash(const struct virtio=
-_net_hdr_v1_hash *hdr_hash,
->         skb_set_hash(skb, __le32_to_cpu(hdr_hash->hash_value), rss_hash_t=
-ype);
->  }
->
-> -static void receive_buf(struct virtnet_info *vi, struct receive_queue *r=
-q,
-> +static void receive_buf(struct virtnet_info *vi, struct virtnet_rq *rq,
->                         void *buf, unsigned int len, void **ctx,
->                         unsigned int *xdp_xmit,
->                         struct virtnet_rq_stats *stats)
-> @@ -1554,7 +1554,7 @@ static void receive_buf(struct virtnet_info *vi, st=
-ruct receive_queue *rq,
->   * not need to use  mergeable_len_to_ctx here - it is enough
->   * to store the headroom as the context ignoring the truesize.
->   */
-> -static int add_recvbuf_small(struct virtnet_info *vi, struct receive_que=
-ue *rq,
-> +static int add_recvbuf_small(struct virtnet_info *vi, struct virtnet_rq =
-*rq,
->                              gfp_t gfp)
->  {
->         char *buf;
-> @@ -1583,7 +1583,7 @@ static int add_recvbuf_small(struct virtnet_info *v=
-i, struct receive_queue *rq,
->         return err;
->  }
->
-> -static int add_recvbuf_big(struct virtnet_info *vi, struct receive_queue=
- *rq,
-> +static int add_recvbuf_big(struct virtnet_info *vi, struct virtnet_rq *r=
-q,
->                            gfp_t gfp)
->  {
->         struct page *first, *list =3D NULL;
-> @@ -1632,7 +1632,7 @@ static int add_recvbuf_big(struct virtnet_info *vi,=
- struct receive_queue *rq,
->         return err;
->  }
->
-> -static unsigned int get_mergeable_buf_len(struct receive_queue *rq,
-> +static unsigned int get_mergeable_buf_len(struct virtnet_rq *rq,
->                                           struct ewma_pkt_len *avg_pkt_le=
-n,
->                                           unsigned int room)
->  {
-> @@ -1650,7 +1650,7 @@ static unsigned int get_mergeable_buf_len(struct re=
-ceive_queue *rq,
->  }
->
->  static int add_recvbuf_mergeable(struct virtnet_info *vi,
-> -                                struct receive_queue *rq, gfp_t gfp)
-> +                                struct virtnet_rq *rq, gfp_t gfp)
->  {
->         struct page_frag *alloc_frag =3D &rq->alloc_frag;
->         unsigned int headroom =3D virtnet_get_headroom(vi);
-> @@ -1705,7 +1705,7 @@ static int add_recvbuf_mergeable(struct virtnet_inf=
-o *vi,
->   * before we're receiving packets, or from refill_work which is
->   * careful to disable receiving (using napi_disable).
->   */
-> -static bool try_fill_recv(struct virtnet_info *vi, struct receive_queue =
-*rq,
-> +static bool try_fill_recv(struct virtnet_info *vi, struct virtnet_rq *rq=
-,
->                           gfp_t gfp)
->  {
->         int err;
-> @@ -1737,9 +1737,9 @@ static bool try_fill_recv(struct virtnet_info *vi, =
-struct receive_queue *rq,
->  static void skb_recv_done(struct virtqueue *rvq)
->  {
->         struct virtnet_info *vi =3D rvq->vdev->priv;
-> -       struct receive_queue *rq =3D &vi->rq[vq2rxq(rvq)];
-> +       struct virtnet_rq *rq =3D &vi->rq[vq2rxq(rvq)];
->
-> -       virtqueue_napi_schedule(&rq->napi, rvq);
-> +       virtnet_vq_napi_schedule(&rq->napi, rvq);
->  }
->
->  static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct=
- *napi)
-> @@ -1751,7 +1751,7 @@ static void virtnet_napi_enable(struct virtqueue *v=
-q, struct napi_struct *napi)
->          * Call local_bh_enable after to trigger softIRQ processing.
->          */
->         local_bh_disable();
-> -       virtqueue_napi_schedule(napi, vq);
-> +       virtnet_vq_napi_schedule(napi, vq);
->         local_bh_enable();
->  }
->
-> @@ -1787,7 +1787,7 @@ static void refill_work(struct work_struct *work)
->         int i;
->
->         for (i =3D 0; i < vi->curr_queue_pairs; i++) {
-> -               struct receive_queue *rq =3D &vi->rq[i];
-> +               struct virtnet_rq *rq =3D &vi->rq[i];
->
->                 napi_disable(&rq->napi);
->                 still_empty =3D !try_fill_recv(vi, rq, GFP_KERNEL);
-> @@ -1801,7 +1801,7 @@ static void refill_work(struct work_struct *work)
->         }
->  }
->
-> -static int virtnet_receive(struct receive_queue *rq, int budget,
-> +static int virtnet_receive(struct virtnet_rq *rq, int budget,
->                            unsigned int *xdp_xmit)
->  {
->         struct virtnet_info *vi =3D rq->vq->vdev->priv;
-> @@ -1848,14 +1848,14 @@ static int virtnet_receive(struct receive_queue *=
-rq, int budget,
->         return stats.packets;
->  }
->
-> -static void virtnet_poll_cleantx(struct receive_queue *rq)
-> +static void virtnet_poll_cleantx(struct virtnet_rq *rq)
->  {
->         struct virtnet_info *vi =3D rq->vq->vdev->priv;
->         unsigned int index =3D vq2rxq(rq->vq);
-> -       struct send_queue *sq =3D &vi->sq[index];
-> +       struct virtnet_sq *sq =3D &vi->sq[index];
->         struct netdev_queue *txq =3D netdev_get_tx_queue(vi->dev, index);
->
-> -       if (!sq->napi.weight || is_xdp_raw_buffer_queue(vi, index))
-> +       if (!sq->napi.weight || virtnet_is_xdp_raw_buffer_queue(vi, index=
-))
->                 return;
->
->         if (__netif_tx_trylock(txq)) {
-> @@ -1878,10 +1878,10 @@ static void virtnet_poll_cleantx(struct receive_q=
-ueue *rq)
->
->  static int virtnet_poll(struct napi_struct *napi, int budget)
->  {
-> -       struct receive_queue *rq =3D
-> -               container_of(napi, struct receive_queue, napi);
-> +       struct virtnet_rq *rq =3D
-> +               container_of(napi, struct virtnet_rq, napi);
->         struct virtnet_info *vi =3D rq->vq->vdev->priv;
-> -       struct send_queue *sq;
-> +       struct virtnet_sq *sq;
->         unsigned int received;
->         unsigned int xdp_xmit =3D 0;
->
-> @@ -1972,14 +1972,14 @@ static int virtnet_open(struct net_device *dev)
->
->  static int virtnet_poll_tx(struct napi_struct *napi, int budget)
->  {
-> -       struct send_queue *sq =3D container_of(napi, struct send_queue, n=
-api);
-> +       struct virtnet_sq *sq =3D container_of(napi, struct virtnet_sq, n=
-api);
->         struct virtnet_info *vi =3D sq->vq->vdev->priv;
->         unsigned int index =3D vq2txq(sq->vq);
->         struct netdev_queue *txq;
->         int opaque;
->         bool done;
->
-> -       if (unlikely(is_xdp_raw_buffer_queue(vi, index))) {
-> +       if (unlikely(virtnet_is_xdp_raw_buffer_queue(vi, index))) {
->                 /* We don't need to enable cb for XDP */
->                 napi_complete_done(napi, 0);
->                 return 0;
-> @@ -2016,7 +2016,7 @@ static int virtnet_poll_tx(struct napi_struct *napi=
-, int budget)
->         return 0;
->  }
->
-> -static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
-> +static int xmit_skb(struct virtnet_sq *sq, struct sk_buff *skb)
->  {
->         struct virtio_net_hdr_mrg_rxbuf *hdr;
->         const unsigned char *dest =3D ((struct ethhdr *)skb->data)->h_des=
-t;
-> @@ -2067,7 +2067,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, =
-struct net_device *dev)
->  {
->         struct virtnet_info *vi =3D netdev_priv(dev);
->         int qnum =3D skb_get_queue_mapping(skb);
-> -       struct send_queue *sq =3D &vi->sq[qnum];
-> +       struct virtnet_sq *sq =3D &vi->sq[qnum];
->         int err;
->         struct netdev_queue *txq =3D netdev_get_tx_queue(dev, qnum);
->         bool kick =3D !netdev_xmit_more();
-> @@ -2121,7 +2121,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, =
-struct net_device *dev)
->  }
->
->  static int virtnet_rx_resize(struct virtnet_info *vi,
-> -                            struct receive_queue *rq, u32 ring_num)
-> +                            struct virtnet_rq *rq, u32 ring_num)
->  {
->         bool running =3D netif_running(vi->dev);
->         int err, qindex;
-> @@ -2144,7 +2144,7 @@ static int virtnet_rx_resize(struct virtnet_info *v=
-i,
->  }
->
->  static int virtnet_tx_resize(struct virtnet_info *vi,
-> -                            struct send_queue *sq, u32 ring_num)
-> +                            struct virtnet_sq *sq, u32 ring_num)
->  {
->         bool running =3D netif_running(vi->dev);
->         struct netdev_queue *txq;
-> @@ -2290,8 +2290,8 @@ static void virtnet_stats(struct net_device *dev,
->
->         for (i =3D 0; i < vi->max_queue_pairs; i++) {
->                 u64 tpackets, tbytes, terrors, rpackets, rbytes, rdrops;
-> -               struct receive_queue *rq =3D &vi->rq[i];
-> -               struct send_queue *sq =3D &vi->sq[i];
-> +               struct virtnet_rq *rq =3D &vi->rq[i];
-> +               struct virtnet_sq *sq =3D &vi->sq[i];
->
->                 do {
->                         start =3D u64_stats_fetch_begin(&sq->stats.syncp)=
-;
-> @@ -2604,8 +2604,8 @@ static int virtnet_set_ringparam(struct net_device =
-*dev,
->  {
->         struct virtnet_info *vi =3D netdev_priv(dev);
->         u32 rx_pending, tx_pending;
-> -       struct receive_queue *rq;
-> -       struct send_queue *sq;
-> +       struct virtnet_rq *rq;
-> +       struct virtnet_sq *sq;
->         int i, err;
->
->         if (ring->rx_mini_pending || ring->rx_jumbo_pending)
-> @@ -2909,7 +2909,7 @@ static void virtnet_get_ethtool_stats(struct net_de=
-vice *dev,
->         size_t offset;
->
->         for (i =3D 0; i < vi->curr_queue_pairs; i++) {
-> -               struct receive_queue *rq =3D &vi->rq[i];
-> +               struct virtnet_rq *rq =3D &vi->rq[i];
->
->                 stats_base =3D (u8 *)&rq->stats;
->                 do {
-> @@ -2923,7 +2923,7 @@ static void virtnet_get_ethtool_stats(struct net_de=
-vice *dev,
->         }
->
->         for (i =3D 0; i < vi->curr_queue_pairs; i++) {
-> -               struct send_queue *sq =3D &vi->sq[i];
-> +               struct virtnet_sq *sq =3D &vi->sq[i];
->
->                 stats_base =3D (u8 *)&sq->stats;
->                 do {
-> @@ -3604,7 +3604,7 @@ static int virtnet_set_features(struct net_device *=
-dev,
->  static void virtnet_tx_timeout(struct net_device *dev, unsigned int txqu=
-eue)
->  {
->         struct virtnet_info *priv =3D netdev_priv(dev);
-> -       struct send_queue *sq =3D &priv->sq[txqueue];
-> +       struct virtnet_sq *sq =3D &priv->sq[txqueue];
->         struct netdev_queue *txq =3D netdev_get_tx_queue(dev, txqueue);
->
->         u64_stats_update_begin(&sq->stats.syncp);
-> @@ -3729,10 +3729,10 @@ static void free_receive_page_frags(struct virtne=
-t_info *vi)
->
->  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
->  {
-> -       if (!is_xdp_frame(buf))
-> +       if (!virtnet_is_xdp_frame(buf))
->                 dev_kfree_skb(buf);
->         else
-> -               xdp_return_frame(ptr_to_xdp(buf));
-> +               xdp_return_frame(virtnet_ptr_to_xdp(buf));
->  }
->
->  static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
-> @@ -3761,7 +3761,7 @@ static void free_unused_bufs(struct virtnet_info *v=
-i)
->         }
->
->         for (i =3D 0; i < vi->max_queue_pairs; i++) {
-> -               struct receive_queue *rq =3D &vi->rq[i];
-> +               struct virtnet_rq *rq =3D &vi->rq[i];
->
->                 while ((buf =3D virtnet_rq_detach_unused_buf(rq)) !=3D NU=
-LL)
->                         virtnet_rq_free_unused_buf(rq->vq, buf);
-> diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_=
-net.h
-> index ddaf0ecf4d9d..282504d6639a 100644
-> --- a/drivers/net/virtio/virtio_net.h
-> +++ b/drivers/net/virtio/virtio_net.h
-> @@ -59,8 +59,8 @@ struct virtnet_rq_dma {
->  };
->
->  /* Internal representation of a send virtqueue */
-> -struct send_queue {
-> -       /* Virtqueue associated with this send _queue */
-> +struct virtnet_sq {
-> +       /* Virtqueue associated with this virtnet_sq */
->         struct virtqueue *vq;
->
->         /* TX: fragments + linear part + virtio header */
-> @@ -80,8 +80,8 @@ struct send_queue {
->  };
->
->  /* Internal representation of a receive virtqueue */
-> -struct receive_queue {
-> -       /* Virtqueue associated with this receive_queue */
-> +struct virtnet_rq {
-> +       /* Virtqueue associated with this virtnet_rq */
->         struct virtqueue *vq;
->
->         struct napi_struct napi;
-> @@ -123,8 +123,8 @@ struct virtnet_info {
->         struct virtio_device *vdev;
->         struct virtqueue *cvq;
->         struct net_device *dev;
-> -       struct send_queue *sq;
-> -       struct receive_queue *rq;
-> +       struct virtnet_sq *sq;
-> +       struct virtnet_rq *rq;
->         unsigned int status;
->
->         /* Max # of queue pairs supported by the device */
-> @@ -201,24 +201,24 @@ struct virtnet_info {
->         struct failover *failover;
->  };
->
-> -static inline bool is_xdp_frame(void *ptr)
-> +static inline bool virtnet_is_xdp_frame(void *ptr)
->  {
->         return (unsigned long)ptr & VIRTIO_XDP_FLAG;
->  }
->
-> -static inline struct xdp_frame *ptr_to_xdp(void *ptr)
-> +static inline struct xdp_frame *virtnet_ptr_to_xdp(void *ptr)
->  {
->         return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG=
-);
->  }
->
-> -static inline void __free_old_xmit(struct send_queue *sq, bool in_napi,
-> -                                  struct virtnet_sq_stats *stats)
-> +static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_=
-napi,
-> +                                        struct virtnet_sq_stats *stats)
->  {
->         unsigned int len;
->         void *ptr;
->
->         while ((ptr =3D virtqueue_get_buf(sq->vq, &len)) !=3D NULL) {
-> -               if (!is_xdp_frame(ptr)) {
-> +               if (!virtnet_is_xdp_frame(ptr)) {
->                         struct sk_buff *skb =3D ptr;
->
->                         pr_debug("Sent skb %p\n", skb);
-> @@ -226,7 +226,7 @@ static inline void __free_old_xmit(struct send_queue =
-*sq, bool in_napi,
->                         stats->bytes +=3D skb->len;
->                         napi_consume_skb(skb, in_napi);
->                 } else {
-> -                       struct xdp_frame *frame =3D ptr_to_xdp(ptr);
-> +                       struct xdp_frame *frame =3D virtnet_ptr_to_xdp(pt=
-r);
->
->                         stats->bytes +=3D xdp_get_frame_len(frame);
->                         xdp_return_frame(frame);
-> @@ -235,8 +235,8 @@ static inline void __free_old_xmit(struct send_queue =
-*sq, bool in_napi,
->         }
->  }
->
-> -static inline void virtqueue_napi_schedule(struct napi_struct *napi,
-> -                                          struct virtqueue *vq)
-> +static inline void virtnet_vq_napi_schedule(struct napi_struct *napi,
-> +                                           struct virtqueue *vq)
->  {
->         if (napi_schedule_prep(napi)) {
->                 virtqueue_disable_cb(vq);
-> @@ -244,7 +244,7 @@ static inline void virtqueue_napi_schedule(struct nap=
-i_struct *napi,
->         }
->  }
->
-> -static inline bool is_xdp_raw_buffer_queue(struct virtnet_info *vi, int =
-q)
-> +static inline bool virtnet_is_xdp_raw_buffer_queue(struct virtnet_info *=
-vi, int q)
->  {
->         if (q < (vi->curr_queue_pairs - vi->xdp_queue_pairs))
->                 return false;
-> --
-> 2.32.0.3.g01195cf9f
->
-
+On 10/17/2023 10:53 AM, Ma Jun wrote:
+> Due to electrical and mechanical constraints in certain platform designs there
+> may be likely interference of relatively high-powered harmonics of the (G-)DDR
+> memory clocks with local radio module frequency bands used by Wifi 6/6e/7. To
+> mitigate possible RFI interference we introuduced WBRF(Wifi Band RFI mitigation Feature).
+> Producers can advertise the frequencies in use and consumers can use this information
+> to avoid using these frequencies for sensitive features.
+> 
+> The whole patch set is based on Linux 6.5.0. With some brief introductions
+> as below:
+> Patch1:      Document about WBRF
+> Patch2:      Core functionality setup for WBRF feature support
+> Patch3 - 4:  Bring WBRF support to wifi subsystem.
+> Patch5 - 9:  Bring WBRF support to AMD graphics driver.
+> 
+> Evan Quan (7):
+>   cfg80211: expose nl80211_chan_width_to_mhz for wide sharing
+>   wifi: mac80211: Add support for WBRF features
+>   drm/amd/pm: update driver_if and ppsmc headers for coming wbrf feature
+>   drm/amd/pm: setup the framework to support Wifi RFI mitigation feature
+>   drm/amd/pm: add flood detection for wbrf events
+>   drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.0
+>   drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
+> 
+> Ma Jun (2):
+>   Documentation/driver-api: Add document about WBRF mechanism
+>   platform/x86/amd: Add support for AMD ACPI based Wifi band RFI
+>     mitigation feature
+> 
+>  Documentation/driver-api/wbrf.rst             |  71 +++
+>  drivers/gpu/drm/amd/amdgpu/amdgpu.h           |   2 +
+>  drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c       |  17 +
+>  drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c     | 214 +++++++++
+>  drivers/gpu/drm/amd/pm/swsmu/inc/amdgpu_smu.h |  33 ++
+>  .../inc/pmfw_if/smu13_driver_if_v13_0_0.h     |  14 +-
+>  .../inc/pmfw_if/smu13_driver_if_v13_0_7.h     |  14 +-
+>  .../pm/swsmu/inc/pmfw_if/smu_v13_0_0_ppsmc.h  |   3 +-
+>  .../pm/swsmu/inc/pmfw_if/smu_v13_0_7_ppsmc.h  |   3 +-
+>  drivers/gpu/drm/amd/pm/swsmu/inc/smu_types.h  |   3 +-
+>  drivers/gpu/drm/amd/pm/swsmu/inc/smu_v13_0.h  |   3 +
+>  .../gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c    |   9 +
+>  .../drm/amd/pm/swsmu/smu13/smu_v13_0_0_ppt.c  |  60 +++
+>  .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  |  59 +++
+>  drivers/gpu/drm/amd/pm/swsmu/smu_internal.h   |   3 +
+>  drivers/platform/x86/amd/Kconfig              |  15 +
+>  drivers/platform/x86/amd/Makefile             |   1 +
+>  drivers/platform/x86/amd/wbrf.c               | 422 ++++++++++++++++++
+>  include/linux/acpi_amd_wbrf.h                 | 101 +++++
+>  include/linux/ieee80211.h                     |   1 +
+>  include/net/cfg80211.h                        |   8 +
+>  net/mac80211/Makefile                         |   2 +
+>  net/mac80211/chan.c                           |   9 +
+>  net/mac80211/ieee80211_i.h                    |   9 +
+>  net/mac80211/main.c                           |   2 +
+>  net/mac80211/wbrf.c                           | 105 +++++
+>  net/wireless/chan.c                           |   3 +-
+>  27 files changed, 1180 insertions(+), 6 deletions(-)
+>  create mode 100644 Documentation/driver-api/wbrf.rst
+>  create mode 100644 drivers/platform/x86/amd/wbrf.c
+>  create mode 100644 include/linux/acpi_amd_wbrf.h
+>  create mode 100644 net/mac80211/wbrf.c
+> 
 
