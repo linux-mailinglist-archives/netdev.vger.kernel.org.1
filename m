@@ -1,142 +1,98 @@
-Return-Path: <netdev+bounces-42467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 357C07CECE6
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 02:41:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3460C7CECE7
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 02:43:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E6921C209C2
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 00:41:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65A2E1C20A63
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 00:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2808D38D;
-	Thu, 19 Oct 2023 00:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A09E38D;
+	Thu, 19 Oct 2023 00:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CmXMP/4y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OS8GOY5S"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BCF38C;
-	Thu, 19 Oct 2023 00:41:50 +0000 (UTC)
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE1B0115;
-	Wed, 18 Oct 2023 17:41:48 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-6b390036045so1222529b3a.1;
-        Wed, 18 Oct 2023 17:41:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0890238C
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 00:42:57 +0000 (UTC)
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F76C11D;
+	Wed, 18 Oct 2023 17:42:54 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-4083dbc43cfso8928235e9.3;
+        Wed, 18 Oct 2023 17:42:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697676108; x=1698280908; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xYnilDjHoPuUF5aYegr0iG9VgVec34Vh/+0lNHw8/zs=;
-        b=CmXMP/4ymEI2qmmfNXmvJ0m/6XHjiNA4fWEGFtjrgeaMKbMYiBkXmohlvoGqHcgOkA
-         fW+c2JpTrizytQXlVUPpCafTup5IflYkW5yC0btsUXRYS8/QCWmwgtf2QmCyBc/7nruk
-         jNfQnHpWpyULBwWYKTOnHQkW1ypJHHGIM4PCKODDlGcWIR1Bq0lPWjgME4S5OE99O8Wa
-         SwTxHcCehzwt+wRTcuyOysOmPMZ0CE342QausFdblx9bucDSa6ar+PLgajk1NsVXoJmq
-         uI/s1IJxq1FRYNBuA/lJG48R7kWTOBgnu4EqpA4vR9uFAIktdo4yBUHAhoQKI0aAXp/S
-         0h0w==
+        d=gmail.com; s=20230601; t=1697676172; x=1698280972; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oEsE/+qks89QI4eb1Y3e4mK4O1PQPTOYfAd9vXSG79U=;
+        b=OS8GOY5Sb+i/NZ62vayvgzkRgmOhzdhdOy32dV4bsPYeqRzqw5UHU0Q3+nO4rDMaF2
+         nopASjIMZTRnoTF+3XLLR0CPeXpEgbHpOftEgpPihvIo6oXDeYnlVw0QF+P+hZkEV+TF
+         j1b5Z69DN5hYwaiPNUPjGNwKxofHXHzzXLeKsko+/EU+cyp1tRuFJly0CYhTt4UbLS1H
+         J607LOYy6PrXANpWqkd2rYnl7mUp5uScIqIY8HY3uotQAILOB4uYbT4NbuT7th2fMDCF
+         alHClvvZTmhitMA8OjigiyYWD/tDOReEscSnw9Gj+mo42iZq2D8cpNf+hvEKifhhc0pF
+         1QdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697676108; x=1698280908;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xYnilDjHoPuUF5aYegr0iG9VgVec34Vh/+0lNHw8/zs=;
-        b=Tc3/jICBuWcV3Su1PxGv+Bsz2nAkX1Nka/ERxgyAjd5CR7I7oQWwCa62Kc+w26nP4R
-         80tIpnhoQ4+WRlLq3lEWbOKpviog73QFmRckRFjyF6hqnXx29UX2tPUh72bSx8+06WCG
-         ev8YOQkc3siTAASgZUTauu1lPKiQG6lVB+331DRFc9n3SVHwi5AWpOR6wW2cx5cC7PL5
-         qBg9l/44QpVBX9yBDm6S/WN8hxMiNjsrrexrk4GlLm9xJ8SHLjh1WciGpThqFZp3oRXx
-         zKjSxQvO0LRTtVpAkjEMFnB0o5FuNbvqIrTeanLp1CgvJpOit88oJ5CBa67O8yQml61O
-         jzyw==
-X-Gm-Message-State: AOJu0YxLZHI90dahaR9QZiHhaGyTQuyFcEoDGQjiJwAuS2QYAmiZwrnV
-	bqJjDb9xDEAL7DskBZymBHM=
-X-Google-Smtp-Source: AGHT+IHuhIIm3Sb5smbcYLBmb1wD289fqTDhfUqTNOe0ZZ6KFbvH10xe2Q+BMpBVNmLfvQx9VF5xTQ==
-X-Received: by 2002:a17:902:c994:b0:1bb:9e6e:a9f3 with SMTP id g20-20020a170902c99400b001bb9e6ea9f3mr891382plc.4.1697676108183;
-        Wed, 18 Oct 2023 17:41:48 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id y7-20020a17090322c700b001ca21e05c69sm538258plg.109.2023.10.18.17.41.47
+        d=1e100.net; s=20230601; t=1697676172; x=1698280972;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oEsE/+qks89QI4eb1Y3e4mK4O1PQPTOYfAd9vXSG79U=;
+        b=tX758ttfJAHNnuFbP/AwqrZ4urmMjSGuBbPvRlfjNiXT7eaxO8xb/AldGAL1fbFLPg
+         DE7UedzuPmDkeBRseIqEIUmJHNR3RFLj11clQRrTUD06HEBMZ/oyg6wfquhHEmzDbk7W
+         Xta7vU/1/3x4XWxC46gSk+PnpNneNcCKdVynenTiOYF9BQUfNYXwhA4U3Ksc3DlSW2qO
+         E5CtB+1bRwMF7Ff//3JuePaz+BYo7schTEy1/g9Oghldgt4sjzBLCLlVpWJ8yFq5Naps
+         1avpGfE6geiP3f41KKTaW5iRh8/W8lMdiVIjWex9IRUfj8GkOXefmCZRKSjCQo6sEF6V
+         x/bA==
+X-Gm-Message-State: AOJu0Yypb7y0yWQEri6cfwRcUd1qRrARGwAKzK5tpFnb3S2bjblk95Tw
+	Gwe22wwupRwOhy1rbJPZ718=
+X-Google-Smtp-Source: AGHT+IF4BhRxQY0I79+pOR23Kn9puugy8LkI+A2ymuJCK9OGr71dSyxlcqy0ilVsg4LAZ1g/arAemA==
+X-Received: by 2002:a05:600c:a44:b0:401:bf87:9898 with SMTP id c4-20020a05600c0a4400b00401bf879898mr666226wmq.25.1697676172221;
+        Wed, 18 Oct 2023 17:42:52 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id n13-20020adffe0d000000b0031ad2f9269dsm3186662wrr.40.2023.10.18.17.42.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Oct 2023 17:41:47 -0700 (PDT)
-Date: Thu, 19 Oct 2023 09:41:47 +0900 (JST)
-Message-Id: <20231019.094147.1808345526469629486.fujita.tomonori@gmail.com>
-To: andrew@lunn.ch
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
- tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com,
- benno.lossin@proton.me, greg@kroah.com
-Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network
- PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <de9d1b30-ab19-44f9-99a3-073c6d2b36e1@lunn.ch>
-References: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
-	<20231017113014.3492773-2-fujita.tomonori@gmail.com>
-	<de9d1b30-ab19-44f9-99a3-073c6d2b36e1@lunn.ch>
+        Wed, 18 Oct 2023 17:42:52 -0700 (PDT)
+Date: Thu, 19 Oct 2023 03:42:49 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"open list:ARM/Mediatek SoC support" <linux-kernel@vger.kernel.org>,
+	"moderated list:ARM/Mediatek SoC support" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH net-next v6 2/2] net: dsa: Rename IFLA_DSA_MASTER to
+ IFLA_DSA_CONDUIT
+Message-ID: <20231019004249.as4zlbb754eyagwz@skbuf>
+References: <20231018175820.455893-1-florian.fainelli@broadcom.com>
+ <20231018175820.455893-1-florian.fainelli@broadcom.com>
+ <20231018175820.455893-3-florian.fainelli@broadcom.com>
+ <20231018175820.455893-3-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231018175820.455893-3-florian.fainelli@broadcom.com>
+ <20231018175820.455893-3-florian.fainelli@broadcom.com>
 
-On Wed, 18 Oct 2023 22:27:55 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
-
->> +    /// Reads a given C22 PHY register.
->> +    pub fn read(&mut self, regnum: u16) -> Result<u16> {
->> +        let phydev = self.0.get();
->> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
->> +        // So an FFI call with a valid pointer.
->> +        let ret = unsafe {
->> +            bindings::mdiobus_read((*phydev).mdio.bus, (*phydev).mdio.addr, regnum.into())
+On Wed, Oct 18, 2023 at 10:58:20AM -0700, Florian Fainelli wrote:
+> This preserves the existing IFLA_DSA_MASTER which is part of the uAPI
+> and creates an alias named IFLA_DSA_CONDUIT.
 > 
-> If i've understood the discussion about &mut, it is not needed here,
-> and for write. Performing a read/write does not change anything in
-> phydev. There was mention of statistics, but they are in the mii_bus
-> structure, which is pointed to by this structure, but is not part of
-> this structure.
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> ---
 
-If I understand correctly, he said that either (&self or &mut self) is
-fine for read().
-
-https://lore.kernel.org/netdev/3469de1c-0e6f-4fe5-9d93-2542f87ffd0d@proton.me/
-
-Since `&mut self` is unique, only one thread per instance of `Self`
-can call that function. So use this when the C side would use a lock.
-(or requires that only one thread calls that code)
-
-Since multiple `&self` references are allowed to coexist, you should
-use this for functions which perform their own serialization/do not
-require serialization.
-
-
-I applied the first case here.
-
-
->> +        };
->> +        if ret < 0 {
->> +            Err(Error::from_errno(ret))
->> +        } else {
->> +            Ok(ret as u16)
->> +        }
->> +    }
->> +
->> +    /// Writes a given C22 PHY register.
->> +    pub fn write(&mut self, regnum: u16, val: u16) -> Result {
->> +        let phydev = self.0.get();
->> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
->> +        // So an FFI call with a valid pointer.
->> +        to_result(unsafe {
->> +            bindings::mdiobus_write((*phydev).mdio.bus, (*phydev).mdio.addr, regnum.into(), val)
->> +        })
->> +    }
->> +
->> +    /// Reads a paged register.
->> +    pub fn read_paged(&mut self, page: u16, regnum: u16) -> Result<u16> {
-> 
-> From my reading of the code, read_paged also does not modify phydev.
-
-__phy_read is called so I use &mut self like read().
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
