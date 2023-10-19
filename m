@@ -1,138 +1,160 @@
-Return-Path: <netdev+bounces-42779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 745947D0196
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:32:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84CDD7D01FD
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:46:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E34B282236
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:32:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C1C4282286
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:46:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DBA32C64;
-	Thu, 19 Oct 2023 18:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45EC1225BD;
+	Thu, 19 Oct 2023 18:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bkYHGvJz"
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="EqE/HHv1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4A338DF3
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 18:32:23 +0000 (UTC)
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E0FFAB;
-	Thu, 19 Oct 2023 11:32:21 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id 6a1803df08f44-66d17fd450aso9626326d6.1;
-        Thu, 19 Oct 2023 11:32:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987F01D691
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 18:46:21 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6CC8124;
+	Thu, 19 Oct 2023 11:46:20 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39JCkOId008134;
+	Thu, 19 Oct 2023 11:46:13 -0700
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2169.outbound.protection.outlook.com [104.47.56.169])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3ttshuc3rm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Oct 2023 11:46:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Wunjn6MWS7Wgqh6vqg0tzPrXq7gOXQv8kSoG5wF1XsovkQO6boSrFH3dzajlQ8eGrR05DodwVdHW+9yFSF7+1M0APGVOu7fyg5I7g78Y/8rEsIBdbLJYYi9mb0ydRR1nOSuT58LK/8eZQfaAt6uJhGN/qDfqJC35y16kP9XjXCbrcQ4osLtLyWBRR05EBSPN4Ec91XsIZkpFKH9QKYmC3ZprnPklr7wBL3vLov5WTAnV6YmBMTPNOqyVW451eZvjzmNsaYQNRLVIHM5WAQ9yC7AeFfFEnfjHYOSkkyPu8p6jk/K+vLS9IxmVfRwYL3nSSI8cg6xnksBm8KrV61tiMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bPtJLfJIuto2sp+jKyTFRHbA4vZdl9dXks8WMomGjrY=;
+ b=U6qhrJPC74UB+oKUC1tnWY/cd5TAwCArPXeg1xt28waw4LMVf0h+UHb+kOT3u12anoQN0aF92x+pdd7n0oNf8gg1hxw5ixkTaYgIQXntfD7ZfOcCd+Gyvc3SVOGZ4Q/nuO8zMzmkIf1h8aY/F46bbjWURP1M9Bj3XvmIuuYBfwgvBgz0NBJyW3l6QHVqVxMb+tzInKQvfiz3ynXxp0Vhcq1VBVv7YgmZ5cJdNhH9C5C2N+EAHJhbDD0H5Myn80Yfw2iUaTpCtGIMORhumV6UOp7SS1opzOarpvxdWqOHgTSGXHh4K6CKIgBcjpStkRhYXj2BVWfCTAGN6jtpaIP5Wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697740341; x=1698345141; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ft90dWBJApXtAhUm1RnQBdoBvUODZdeb3PjPbGGFMdA=;
-        b=bkYHGvJzR1w2LlYExksZm51GPo79n9Xaqv6nXr1PU57UiDO5SdBHEF+DpNo5tGDo62
-         /a3cV5Pu1zzyBvOPOPN93INOZPn7MOwDAhNasgMV7tcmujqS5FoHTpvO3mwXw30Oy4fN
-         dQm7WuGLXttz0fMhQWOf2YoyfZ742E0JHXCFt4MPNsFKDqxh+ce6Y5InVLB757M/rzrv
-         I3zagniwTpjXYOBd3/Fkfs2S0xKYGpUwNkiE3zSCS3DzbXNyfEwuWhsA+by8EhB8Mz/q
-         FCoPDVf370EHq9q3PwovU0e19yxcCa3HV7dmD9vZmmB7F9KvlC3t96ygbV/gK/GIH/ZG
-         Zn2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697740341; x=1698345141;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ft90dWBJApXtAhUm1RnQBdoBvUODZdeb3PjPbGGFMdA=;
-        b=EvgMH3ZRth/uoma0gEG4BqImbYemuJI8DR4hKe8AeswUiVkRBhMbRKxbkXhHF4recr
-         7Try61/1E7/7gOeSgGSedHlhOd9gVqeUaqiCzaco3GP10udLhqI/y0+QAdDqFmAochE0
-         MRrU9aPAOCXk0Ys17VyROpsLoKvxrgGt1+B/yMrWLR5gjf8yQvkaii8JUVB5URwu6QvK
-         Xack9PYZZXr8H361DCRWj5ADwLuvD0PlH+QPQRQaflk6AAjweRl+0hK0uiBmqaBzVTqO
-         jkH2lpYfVnp8o5/Rwc04d4gh/jY/q71g7vAKx21Ht3i6cd3a3qdfmrtIyAqsB+DDARmw
-         mjSA==
-X-Gm-Message-State: AOJu0YwTnSQ19VaTAEHAmCGpDmkldTFbF2c6sw8zET8c4tyd/gfdUhQE
-	MlkToM2YhtXvwWpKuN4nrFTo6rEOV1KBLQ==
-X-Google-Smtp-Source: AGHT+IFH+dVil1kyt0ldQCREh4X2dQJyQQcMik3vx+6aczWqZln1swi2uCDzNG0jVxSPxltwj1oVOA==
-X-Received: by 2002:a05:6214:b68:b0:66d:5a3a:c5e6 with SMTP id ey8-20020a0562140b6800b0066d5a3ac5e6mr4934754qvb.18.1697740340752;
-        Thu, 19 Oct 2023 11:32:20 -0700 (PDT)
-Received: from localhost (modemcable065.128-200-24.mc.videotron.ca. [24.200.128.65])
-        by smtp.gmail.com with ESMTPSA id dr9-20020a05621408e900b0066d1e20455bsm52069qvb.96.2023.10.19.11.32.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 11:32:20 -0700 (PDT)
-Date: Thu, 19 Oct 2023 14:32:19 -0400
-From: Benjamin Poirier <benjamin.poirier@gmail.com>
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bPtJLfJIuto2sp+jKyTFRHbA4vZdl9dXks8WMomGjrY=;
+ b=EqE/HHv1e9skP0vrrBitBOFcRS5Y8eA6LDYKpEBzia5B7ZPvURtgxoK2maii47qzVGwslJHouxVcXeIofSV/c3SXd31++BS9/+hytwNyYKfUpverIa8+Jocia9hy35tL3ty+laLn7h7dhnMu81XZKDChCF3+HtAds4qL9/k1ZAc=
+Received: from PH0PR18MB4734.namprd18.prod.outlook.com (2603:10b6:510:cd::24)
+ by BL1PR18MB4165.namprd18.prod.outlook.com (2603:10b6:208:310::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.24; Thu, 19 Oct
+ 2023 18:46:09 +0000
+Received: from PH0PR18MB4734.namprd18.prod.outlook.com
+ ([fe80::7652:bbbf:784a:bd40]) by PH0PR18MB4734.namprd18.prod.outlook.com
+ ([fe80::7652:bbbf:784a:bd40%6]) with mapi id 15.20.6907.025; Thu, 19 Oct 2023
+ 18:46:09 +0000
+From: Shinas Rasheed <srasheed@marvell.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Coiby Xu <coiby.xu@gmail.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Cai Huoqing <cai.huoqing@linux.dev>,
-	George Cherian <george.cherian@marvell.com>,
-	Danielle Ratson <danieller@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Igor Russkikh <irusskikh@marvell.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>,
-	Leon Romanovsky <leon@kernel.org>, linux-kernel@vger.kernel.org,
-	Shung-Hsi Yu <shung-hsi.yu@suse.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH net-next v2 10/11] staging: qlge: devlink health: use
- retained error fmsg API
-Message-ID: <ZTF2M7VeNtisGBm7@d3>
-References: <20231017105341.415466-1-przemyslaw.kitszel@intel.com>
- <20231017105341.415466-11-przemyslaw.kitszel@intel.com>
- <20231017181543.70a75b82@kernel.org>
- <ZTE884nkvAxKy2G3@d3>
- <20231019074237.7ef255d7@kernel.org>
+CC: "horms@kernel.org" <horms@kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "egallen@redhat.com" <egallen@redhat.com>,
+        Haseeb Gani
+	<hgani@marvell.com>,
+        "mschmidt@redhat.com" <mschmidt@redhat.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Sathesh B Edara
+	<sedara@marvell.com>,
+        Veerasenareddy Burru <vburru@marvell.com>,
+        Vimlesh
+ Kumar <vimleshk@marvell.com>
+Subject: Re: [EXT] Re: [net-next PATCH v3] octeon_ep: pack hardware structure
+Thread-Topic: [EXT] Re: [net-next PATCH v3] octeon_ep: pack hardware structure
+Thread-Index: AQHaABIUJ5/HUS8g4Eig936RtZ8cVbBQP/aAgABYbq4=
+Date: Thu, 19 Oct 2023 18:46:09 +0000
+Message-ID: 
+ <PH0PR18MB4734672BE30C49F09E2C7D65C7D4A@PH0PR18MB4734.namprd18.prod.outlook.com>
+References: <20231016092051.2306831-1-srasheed@marvell.com>
+ <20231018170605.392efc0d@kernel.org>
+In-Reply-To: <20231018170605.392efc0d@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR18MB4734:EE_|BL1PR18MB4165:EE_
+x-ms-office365-filtering-correlation-id: d09650ee-7d1d-4172-d22b-08dbd0d3a8f1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ vRV6atAPS2+BfEyuM/vpDC/+Oh9+95njKMH6z1X5pAgfw0cYrxhIObMSKMfnqNnsdlAMg+YDydMedZkYh/lYBXsTQYUqCJBybKELW232Jp0vx+Gz1uMG1GfIazgFs4vAhZUiEv728EFdyFlu/D+dmoGoJtLWRLQlC9pp930FPyUqL0e9vak+hfiyJDMXqH5HGUrE6bWzw6iXYRTqBh3ZyfNEPgiBbfB6/fp7ACp4Z57KLKOJp/AvBIzRS80yIAQCMzjkU9oRSILWu47HVAgYUMjRot9hBjQwNe/ITgP7uW//kLrL/PZFvi3l1iNMRGiL9Ksd1A5jqvuT7z2n0P3Z4wstl63Y7oGf3lxPTYLhDgv956WM7UUfZfFtoOrphCf/LHLtXZfmGofJLtPNX5ZjmPvjnXvacpWXQCx7z7MyKiz4hubdgFlGaiqi1yY0rZIfejKOfpky/O6WtX0rbQIXpUunWL+eyzWerRkKbghtbZKULutzLSm14LO/X6gumg8JYoUWgFjpKRbLzv/kvb3L6xYLEbVcMR2iOVwEFZn25hWYvMOcBHvT4VZNUYWTQLNFGf/8uk3Tdq/0d6PcX2Ez3BCT/kbR29UnD3q+J4UuZZTZg2iog8Qt6vbuh4qIgzU9
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4734.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(346002)(396003)(136003)(39860400002)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(38070700009)(26005)(38100700002)(55016003)(6916009)(54906003)(5660300002)(66946007)(66446008)(76116006)(64756008)(52536014)(91956017)(8676002)(4326008)(8936002)(86362001)(2906002)(66476007)(66556008)(558084003)(71200400001)(7696005)(6506007)(478600001)(33656002)(316002)(107886003)(122000001)(41300700001)(9686003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?iso-8859-1?Q?BW3QmEFFhtlWpXUY4dmn7y8ST3cC+KJoSgSKtV4VWw4tliYj/n2tX5wZmB?=
+ =?iso-8859-1?Q?2AMfEgy+jbP1/9R6z78dOKdC2b3O7iGNPHOQwOcr88V5RGvipzYhan7dk+?=
+ =?iso-8859-1?Q?/pnUfPb0GmFK38ZtuyCN+cUP/9Lflf4IeklzfOA7+PXspPRNLH/GNPMZVB?=
+ =?iso-8859-1?Q?tJ/FUwy3JZubaxrCYTCb4RoypDbifNBkWCeUL0VnsbsOMHBB07b1/6RJiQ?=
+ =?iso-8859-1?Q?Wu4nqi1PH7AJ2LG7LBuMXhYOQBTyqQ2Og6UibW5YGlka4DarLvP6196xDG?=
+ =?iso-8859-1?Q?V/r+n20tcqLihR2QbGKE/0BoghHtseOaqUTgZ6pmzMiWcCbQCeZMged01y?=
+ =?iso-8859-1?Q?eXFiQR1fVYq8u5YZ9jnduBQjNOloU+fSCX8j7FWFdLuBVC4K6kr9j/GbVp?=
+ =?iso-8859-1?Q?qyxj6EclWA0O2qFq31OXz6poWd3en2a/VpYK8FZJwYa8gORTrPtN3/vn5y?=
+ =?iso-8859-1?Q?V5UjBXdgY0pFOEqbEisOtzuFzT/R1yWKRBYc1/Ur0S6wtlyNrweLuZuZmJ?=
+ =?iso-8859-1?Q?JcLmjhCp9uKja6yWeDyevWhDtFnBjPs1o4vitc6E0BYJucD0XklqQytd3d?=
+ =?iso-8859-1?Q?p+XKayEj4lg77CNRDIXU/M00Gmhvwg/Lz8pY+sq6zHYXeDRsmLrYr6ctWR?=
+ =?iso-8859-1?Q?ujnHnRepk5H3QPIF4QjKGyIEtAJK1+onOhjlv4nhaRFP8N/d3z2nrMuJuc?=
+ =?iso-8859-1?Q?vL8NpG+uOtDCVUvKE0nTo+FpYIy+ZdY8Gf0iRVjw0kTeISXW3FP0e0W4/q?=
+ =?iso-8859-1?Q?/17/dwWPegUz4rm7010fcOKbYW+PHQ5TlLsNtugSvhsEV6C315A0lShsB4?=
+ =?iso-8859-1?Q?buBfw8PE7vHctdkxYUQepcTGIIX+OqcvmICq3VdIh/jYG5KA89tt9FbeGK?=
+ =?iso-8859-1?Q?S7a+m5NV1x4p1P5hA5ChsamMVeXfFvl5PWcr4kj279vbkvK4+xEezvKqsj?=
+ =?iso-8859-1?Q?U/FdEuWlZU0286z2D1jC5ZSgVTsfgxNtpxr/0Xe4kFnANjKfff+oycrj+d?=
+ =?iso-8859-1?Q?ZfBk8p3hi4cQishBSOOujhVuOh1/cQ9fysxWskBIdMmHGZUpnR60eqwwrG?=
+ =?iso-8859-1?Q?flMDKemXQC/5Oo1IzaIdmSYqXBENToSO7AXBaDZZuyh2nv9OPzpRdYdlDP?=
+ =?iso-8859-1?Q?L/A/8+DoNDTzebL7WJxjaV7o5W4JkYQWYwstXdDN6ucOxH/zfhl+YiwVcu?=
+ =?iso-8859-1?Q?BamuplPcA/rAHkQ4CfVHk4oH5tVQVjA3PzrvzWK4OzxGkbOVwSHg3Wp7N8?=
+ =?iso-8859-1?Q?xDuHOY3475SXzFVBKihEra+aVeIss9RqZEPCRhfd4OCzohsYQ8v7kUwwDj?=
+ =?iso-8859-1?Q?g4MpdKMAJOO1PM00Gw8CMDCXhYUSnyR8Mmdlj+mvuNGzBrSBlOWGdVoeZf?=
+ =?iso-8859-1?Q?59IAynKf4Vh4XmwRC241g8LnwvtjGhs78B3bxtR5BA2dQyzY4+QSVSnKPz?=
+ =?iso-8859-1?Q?lYwVShVIhs5cWggjJDe50XBpYXj7tClwiZnbS2hAoFlf2NMneVB4c1scLn?=
+ =?iso-8859-1?Q?uWLGv2MBO0IdaDPPi40BUDZzKXXoUPEa1LFpnQqu+aom1NOOn5F0XD+V4v?=
+ =?iso-8859-1?Q?+6317PmBCmbkvRr8DUPmYESEExgZW9E7xvJAQf1eWw3A6uCCJ36nBJtyG8?=
+ =?iso-8859-1?Q?UY6i7vJlM12O9HOtHcSbrscn68uQoXxAky?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231019074237.7ef255d7@kernel.org>
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4734.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d09650ee-7d1d-4172-d22b-08dbd0d3a8f1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Oct 2023 18:46:09.4080
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5aTABF3lM/Q6fHaHHOOYJbnBiqayhB/VGxXQlesEZG/BC7poJRACuBFS/tUoKhHbbEf85iqTTp/LON6/Ol1atA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR18MB4165
+X-Proofpoint-GUID: L9zBjJGZZEjEVhzJw-a30EFWxTTeUxFg
+X-Proofpoint-ORIG-GUID: L9zBjJGZZEjEVhzJw-a30EFWxTTeUxFg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-19_18,2023-10-19_01,2023-05-22_02
 
-On 2023-10-19 07:42 -0700, Jakub Kicinski wrote:
-> On Thu, 19 Oct 2023 10:28:03 -0400 Benjamin Poirier wrote:
-> > > Humpf. Unrelated to the set, when did qlge grow devlink support?!
-> > > 
-> > > Coiby, do you still use this HW?
-> > > 
-> > > It looks like the driver was moved to staging on account of being
-> > > old and unused, and expecting that we'll delete it. Clearly that's
-> > > not the case if people are adding devlink support, so should we
-> > > move it back?  
-> > 
-> > AFAIK this was done by Coiby as an exercise in kernel programming.
-> > Improving the debugging dump facilities was one of the tasks in the TODO
-> > file.
-> > 
-> > I moved the driver to staging because it had many problems and it had
-> > been abandoned by the vendor. There might be some qlge users left but is
-> > that reason enough to move the driver back to drivers/net/
-> > if there is no one who is interested in doing more than checkpatch
-> > fixes on the driver?
-> 
-> Staging is usually an area for code entering the kernel, not leaving.
-> We should either suffer with it under drivers/net/ or delete it,
-> as you say, nobody is working on significant improvements so having 
-> the driver in staging is serving no purpose.
-> 
-> How about we delete it completely, and if someone complains bring 
-> it back under drivers/net ?
-
-That sounds like a reasonable way forward, thank you. I'll send a patch
-to do the removal.
+Hi Jakub,=0A=
+=0A=
+Since these structures represent how hardware expects data, there can be a =
+lack of alignment. I'm afraid static asserting all the hardware data struct=
+ures might force some compilers to fail? =
 
