@@ -1,97 +1,210 @@
-Return-Path: <netdev+bounces-42641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA0597CFAF4
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:27:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 733E47CFB2D
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:34:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3BF2B20B4C
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:27:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F34A1C20D4F
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:34:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE71227453;
-	Thu, 19 Oct 2023 13:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0221627460;
+	Thu, 19 Oct 2023 13:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MV7QCSQ1"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="WZRtvd6u"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD11DDA6
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 13:27:47 +0000 (UTC)
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D09C112;
-	Thu, 19 Oct 2023 06:27:46 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 274A460007;
-	Thu, 19 Oct 2023 13:27:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1697722065;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tb30KokhMfhJFg4x7SAE9KT+pO7hqq9T0nfilt18P3g=;
-	b=MV7QCSQ1J88BtyakxCd7vSwceC0N69+8kKIiYqzwgw7dzB5U11hLTrmGq/4UbsqVWR+yWA
-	i+0rHiSEuSyznUvi+jJNhdk455Bg6rc9Qu0r5+c5fZkKv8dgQMxAJqb5uMJAAXeAkjN9t9
-	NDQb6gxEmI61qG4SeuZBEffFToiQVuAvNFMrF1fF/LFfacEpkAeDAJWk1e6MHRd1xG2wHH
-	6lchYuSz65Dh5x4xMQbCbxwW79/cHVyNcPLm+iylS+Ez8pw763cCHoT2+ZOVA0y4phOkkA
-	IVm3Zp6ozPuXj6Rm2aX0Ne5mFr8glYJCzA5zqvx18Ze5lD8LXWL6GFvbdTARVQ==
-Date: Thu, 19 Oct 2023 15:27:43 +0200
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vladimir
- Oltean <olteanv@gmail.com>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net v1 1/1] ethtool: fix clearing of WoL flags
-Message-ID: <20231019152743.09b28ef4@kmaincent-XPS-13-7390>
-In-Reply-To: <20231019105048.l64jp2nd46fxjewt@lion.mk-sys.cz>
-References: <20231019070904.521718-1-o.rempel@pengutronix.de>
-	<20231019090510.bbcmh7stzqqgchdd@lion.mk-sys.cz>
-	<20231019095140.l6fffnszraeb6iiw@lion.mk-sys.cz>
-	<20231019122114.5b4a13a9@kmaincent-XPS-13-7390>
-	<20231019105048.l64jp2nd46fxjewt@lion.mk-sys.cz>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA822745C;
+	Thu, 19 Oct 2023 13:34:47 +0000 (UTC)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2089.outbound.protection.outlook.com [40.107.20.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D1C11D;
+	Thu, 19 Oct 2023 06:34:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CPF3gxeqwj5GlY+5zGIuOKmbDiUQI866jEGIu7tO9yUkpIImazDYhG7Z6QPfEIyyUkmPlfQmMXL2FTOUf+YX40lGRUOMLE8ujMQh1MTg7Lg+IbmaClS9ZPGSkECWon74eg5Wj8fQJ4IYVc3Pl3D9uCJqn9jVnFhxpPcka+sPCTXeJWgiVPEmc2YQRL2bHlJKfIC20QK0i/H3X3HBdTeHEcPBZqHHrm8p9pVJPa+WneU3z5MK4+yOa9PAkcKDwr6qy57KYMIv0v5W1p5u/zL+EYO0e+4i+N/K1rlwObPQAzKLpcZIXgLL4/Z6JwDhwIZDqJWpSEc/AgcSblo7HGtQ6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W0kqFBNo98aU4IfNBMZu4u7+sSyE3KNHVRewog815zo=;
+ b=ceh141Rb2h/6w+lpRcsOJ/WYKjL3Hk/xA5N7niHAew/9Bl2y0hIg7Mz+d5PlqKBufHurGqAyUFc15b/ebA6mfsVFqGnqaZpQuMGdSdDZ+3vhhwQv/DA3jlYVq7v6TLqSL6HzSeJRITfUSUXOj1kiaaocDaHAvHN6M3wQIEPVQXjuGl9qb1UclubEXesf3yEU6BakioSOwIJD5wE66vyXZNPuODbbw+KeQeIDTJBdg+nprWT9s+NFwV0BpRbc6/XSfOEt0CXl6RYlNvNoDL3pK9oBCT3goaRTFmVNiVblwFSq+goV+Ua+70C5SrWOy3JIifa0oSryYXsUeCZggJ72jg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W0kqFBNo98aU4IfNBMZu4u7+sSyE3KNHVRewog815zo=;
+ b=WZRtvd6u2cumpcMKoRGMOiA0Z87v2VKFW2ZwMNsG7PW+H4sIN+0NP4GcSf/SK7X2DMP+/8GbqAPJ3FBho4O4sMqR23nCOqH0ADPHIGyIGlJSfQJKl6udJnAklrzJi474syLXlZQ56BKDGL9MA+GHTsii7oNDZnGOnf+jICYqXjU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DBBPR04MB7803.eurprd04.prod.outlook.com (2603:10a6:10:1e5::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.23; Thu, 19 Oct
+ 2023 13:34:44 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::992:76c8:4771:8367]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::992:76c8:4771:8367%7]) with mapi id 15.20.6907.022; Thu, 19 Oct 2023
+ 13:34:43 +0000
+Date: Thu, 19 Oct 2023 16:34:37 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Rob Herring <robh@kernel.org>,
+	Colin Foster <colin.foster@in-advantage.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	=?utf-8?B?bsOnIMOcTkFM?= <arinc.unal@arinc9.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	John Crispin <john@phrozen.org>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Sergei Shtylyov <sergei.shtylyov@gmail.com>,
+	Justin Chen <justin.chen@broadcom.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Sekhar Nori <nsekhar@ti.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com
+Subject: Re: [PATCH net-next 4/8] dt-bindings: net: ethernet-switch: Add
+ missing 'ethernet-ports' level
+Message-ID: <20231019133437.24p5sakrile4ceah@skbuf>
+References: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
+ <20231016-dt-net-cleanups-v1-4-a525a090b444@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016-dt-net-cleanups-v1-4-a525a090b444@kernel.org>
+X-ClientProxiedBy: AM0PR03CA0023.eurprd03.prod.outlook.com
+ (2603:10a6:208:14::36) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBBPR04MB7803:EE_
+X-MS-Office365-Filtering-Correlation-Id: 46b3c85e-36d1-4705-14b6-08dbd0a82732
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	F3Hwe79EJ6V3FMFlmr6mLa3UiTfB6ftI/Gc1nBdB4bCgszKeyglI6/Mq8uaWfyr5lZXxLdKc6JoRJ9EFI8zvOzgkx5RLw5Jj7MC+rwkFtKyAvPDB84CxJ0ovCVW/YpDZCWA1rsnwkl+jpFLh6Kp3uCl8Za6XWyi1z1DsGINk8HbJ74CU4+PoWTDYBQGqCLn/NDWpm8Grq7mDcymGmik3SuLDq0YrlwbKfHHMg+zAzqlZEq4W9rpHZadUwIbr2VZI4XVWTgDbqgQceZRlwToyzyz38Ld0Eynghbji1Tf23eIQ5jRTSFBvHbH6B/P2mfgN6yiPUJhsgm5jV24f+7ZRSCOKbH5cM/ekba7swP1Zzs5FLwZxeo6GCqZ0c6v9gu7ewnaWzii+ZXpVTKugAztobSWLsjdJwQ3b/7SccaEONryvrvfNKbj4HR2I2RnBMOfwpiZVJrO8F+vsgUBiHuZf4aOwmqp5D2EufdxLdXSB+nkW9FEGoMOGa142ASN2f7KABnxd8OqX68DGQ1UVdAh/FzoY8OiyK/dQXYvmtO6VpjlkT4gMR2Li1Ak3SS4moL2r
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(39860400002)(396003)(366004)(346002)(376002)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(9686003)(6512007)(26005)(1076003)(6506007)(33716001)(8676002)(83380400001)(7406005)(478600001)(7416002)(2906002)(8936002)(4326008)(110136005)(6486002)(66476007)(41300700001)(5660300002)(66946007)(54906003)(316002)(66556008)(6666004)(44832011)(38100700002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?+LfafpbwDlbpN74M6LEv1ugDc8jZRNS5F10A/9O31p0LsC1ZfQFRKvAp+tM0?=
+ =?us-ascii?Q?WoZKmO+e+PUvmfKmzg41L1RAVGVRQxpZnY/tpPIPnNRzqGktJ+W16UzrQaGx?=
+ =?us-ascii?Q?hGgI0Ml0psPY89+HCaz3Q5pn+6xefKYnF9Ar3goLpcLGS5Uv3TzI87TdD/Rq?=
+ =?us-ascii?Q?qK0wn91jpKlTosEDQIoK+g/Bcd1aqlXY8qY0lunoLmIOdOBMLyrNkvEo8JdP?=
+ =?us-ascii?Q?R1UnPAHjHcgROFUHLNeu3EGDYN3NuwcEFL6o1jaW77PjB3a52sbHgr+G+ELa?=
+ =?us-ascii?Q?RZmex7GX/FP0yKH/q/juou9ZN2yeyHIz4xx1b58os7S7jDB25M/hGqnGGmyI?=
+ =?us-ascii?Q?I2GXsNFxz78NtzkeTC2sgwcoheQ2EoBSWieX93hPhx9mVBejCyi3iYsHYUbm?=
+ =?us-ascii?Q?F0h0z/kHvB9uo+MSJoWKVJymuXRvGuxgMXWtnenyV8ZuT8LDcccgc7AQXokr?=
+ =?us-ascii?Q?8DT38NvkX7ttu/GiF30+Q9VEAiCaBeNt3230OatM+P0tpp9mdMNESNRi81GM?=
+ =?us-ascii?Q?Mj0d1vtk8x58D7C2TGXoXsAnLIzB7mMe5UF88mHkSp0huPNZc6VoA8/iJzBg?=
+ =?us-ascii?Q?z0+rDdUckdUCSp0ZlLGPQNTeqnjnj7eu49VUZ8iU5SONE8Jpf2iykIb7DlQC?=
+ =?us-ascii?Q?54j9sW9U650B3vZvSSWhria5pJR288hwJR5cBOENzD79N/gfLvTxsAVhU4vu?=
+ =?us-ascii?Q?Qt5GiGSnYL4SeWp8iCoxkSSYRDFtaIM4xfUKeAXytQHpovtxEaT5AoTHGgHJ?=
+ =?us-ascii?Q?rI3jJIChmfQFcKdxyAyqKk36Kry5UOrwipZaHyq3PJ6sqs9TZIsPkkwsaG4h?=
+ =?us-ascii?Q?amXc5stSkhRzHMUIsvtde0H8ciYNaX5N2DJNx6jMqom/wM91OAjIZRITu3D1?=
+ =?us-ascii?Q?QhzOBLG86hW1Lu2DUDigj1e2hXSqtDdi9hZ5Mm7ai5ro8FhoTfOpymH/8yzt?=
+ =?us-ascii?Q?EicE5rMZoiiwT+INk8OWj6owSg+d4MS+GdMJ3nNDi5OXR2VhrsCKDoToVTn8?=
+ =?us-ascii?Q?BVJVe8LpBKh9Awdq6x+W1IqqCLCootrmuBh733OqD0c3bOFRMTJ6Dc2KeDae?=
+ =?us-ascii?Q?fe7jKRL1lL5FRqD6Pu5V9Op6gA1/eJEZeKta+QJl3qUhu3Dlt/c4PLhNz/Nc?=
+ =?us-ascii?Q?WZwLoa8IkfR5rn77n0drqjyuIYGLULg5XXajeMfWCsWyHDnECifbPSbRvwna?=
+ =?us-ascii?Q?uKL/D4eO0nMVNxEdXLGkf78YrX6FQ5ODXo2TSbCNGl7RodfPqAin3uRujyg/?=
+ =?us-ascii?Q?bpJkbv0jVPbpJu611WYkg9cKz9FAc62o+uj7t0cBcER/1YKKLtaPHA9Nhs9T?=
+ =?us-ascii?Q?Wg+j1mHPYF6NVal6vvU+iYp9V68EJtp/2VeLPEmXoO1QxhHAWlaloSghSwq9?=
+ =?us-ascii?Q?tDJyWFKW61gUhXudk5X88fPuIhI1J8fZ/5rz7Y0B1M4zppBYJFw8aAP4ECAZ?=
+ =?us-ascii?Q?CU9ecSeEi7GwEXT8nLC/TwI3PbdADFPb6Xkr9xsSTlQXTdT4jRln/xkhibxg?=
+ =?us-ascii?Q?spEA+q3I5rbHCdWnoTd20SC66eUjVULW2gJh0YpPzg6iTMFWrTWrxaUB9HfO?=
+ =?us-ascii?Q?ACR1rRYcSIwgd/cMo5aFEx//NtNeBSzWn6/WSPBsIjg3aZyMDvpvlwsBVON/?=
+ =?us-ascii?Q?vQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46b3c85e-36d1-4705-14b6-08dbd0a82732
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 13:34:43.7193
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cdBlmn0RdBfHkXHCatIN6sa+9ifNN/1oGotmTm1+fKMw+OSsW51sUxhFT9G+8AVe+fN3d4YiNw8Ear2jymfhfA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7803
 
-On Thu, 19 Oct 2023 12:50:48 +0200
-Michal Kubecek <mkubecek@suse.cz> wrote:
+On Mon, Oct 16, 2023 at 04:44:23PM -0500, Rob Herring wrote:
+> The '$defs/ethernet-ports' schema is referenced by schemas defining a
+> child node 'ethernet-ports', but this schema misses the
+> 'ethernet-ports' node. It would work if referring schemas made a
+> reference like this:
+> 
+> properties:
+>   ethernet-ports:
+>     $ref: ethernet-switch.yaml#/$defs/ethernet-ports
+> 
+> However, that would be different from how dsa.yaml works. For
+> consistency, align the schema definition with dsa.yaml and add the
+> missing level.
+> 
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+>  Documentation/devicetree/bindings/net/ethernet-switch.yaml | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-switch.yaml b/Documentation/devicetree/bindings/net/ethernet-switch.yaml
+> index dcbffe19d71a..688938c2e261 100644
+> --- a/Documentation/devicetree/bindings/net/ethernet-switch.yaml
+> +++ b/Documentation/devicetree/bindings/net/ethernet-switch.yaml
+> @@ -58,9 +58,11 @@ $defs:
+>      $ref: '#'
+>  
+>      patternProperties:
+> -      "^(ethernet-)?port@[0-9a-f]+$":
+> -        description: Ethernet switch ports
+> -        $ref: ethernet-switch-port.yaml#
+> -        unevaluatedProperties: false
+> +      "^(ethernet-)?ports$":
+> +        patternProperties:
+> +          "^(ethernet-)?port@[0-9a-f]+$":
+> +            description: Ethernet switch ports
+> +            $ref: ethernet-switch-port.yaml#
+> +            unevaluatedProperties: false
+>  
+>  ...
+> 
+> -- 
+> 2.42.0
+>
 
-> On Thu, Oct 19, 2023 at 12:21:14PM +0200, K=C3=B6ry Maincent wrote:
-> > On Thu, 19 Oct 2023 11:51:40 +0200 > Michal Kubecek <mkubecek@suse.cz>
-> > wrote: =20
-> > >=20
-> > > The issue was indeed introduced by commit 108a36d07c01 ("ethtool: Fix
-> > > mod state of verbose no_mask bitset"). The problem is that a "no mask"
-> > > verbose bitset only contains bit attributes for bits to be set. This
-> > > worked correctly before this commit because we were always updating
-> > > a zero bitmap (since commit 6699170376ab ("ethtool: fix application of
-> > > verbose no_mask bitset"), that is) so that the rest was left zero
-> > > naturally. But now the 1->0 change (old_val is true, bit not present =
-in
-> > > netlink nest) no longer works. =20
-> >=20
-> > Doh I had not seen this issue! Thanks you for reporting it.
-> > I will send the revert then and will update the fix for next merge-wind=
-ow. =20
->=20
-> Something like the diff below (against current mainline) might do the
-> trick but it's just an idea, not even build tested.
+Huh, interesting.
 
-Seems a good idea without adding too much complexity to the code.
-Will try that and send it in next merge window.
-
-K=C3=B6ry
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
