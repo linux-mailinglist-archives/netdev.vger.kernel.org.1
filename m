@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-42619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03F897CF8D5
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:29:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 100047CF8D7
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:29:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C1F21C20EED
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:29:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70992B212F0
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:29:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD2F2744B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C970A2744C;
 	Thu, 19 Oct 2023 12:29:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F71225C9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA837225C6
 	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:29:20 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4B1718A
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:29:18 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 137B5AB
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:29:19 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1qtS8y-0006Kz-OX; Thu, 19 Oct 2023 14:28:52 +0200
+	id 1qtS8y-0006L0-D6; Thu, 19 Oct 2023 14:28:52 +0200
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1qtS8x-002mrt-N3; Thu, 19 Oct 2023 14:28:51 +0200
+	id 1qtS8x-002mry-NY; Thu, 19 Oct 2023 14:28:51 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1qtS8x-00529r-1u;
+	id 1qtS8x-0052A2-20;
 	Thu, 19 Oct 2023 14:28:51 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -50,16 +50,15 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	Rob Herring <robh+dt@kernel.org>
 Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	UNGLinuxDriver@microchip.com,
 	"Russell King (Oracle)" <linux@armlinux.org.uk>,
 	devicetree@vger.kernel.org
-Subject: [PATCH net-next v6 8/9] net: dsa: microchip: Refactor switch shutdown routine for WoL preparation
-Date: Thu, 19 Oct 2023 14:28:49 +0200
-Message-Id: <20231019122850.1199821-9-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v6 9/9] net: dsa: microchip: Ensure Stable PME Pin State for Wake-on-LAN
+Date: Thu, 19 Oct 2023 14:28:50 +0200
+Message-Id: <20231019122850.1199821-10-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231019122850.1199821-1-o.rempel@pengutronix.de>
 References: <20231019122850.1199821-1-o.rempel@pengutronix.de>
@@ -75,97 +74,133 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Centralize the switch shutdown routine in a dedicated function,
-ksz_switch_shutdown(), to enhance code maintainability and reduce
-redundancy. This change abstracts the common shutdown operations
-previously duplicated in ksz9477_i2c_shutdown() and ksz_spi_shutdown().
-
-This refactoring is a preparatory step for an upcoming patch to avoid
-reset on shutdown if Wake-on-LAN (WoL) is enabled.
+Ensures a stable PME (Power Management Event) pin state by disabling PME
+on system start and enabling it on shutdown only if WoL (Wake-on-LAN) is
+configured. This is needed to avoid issues with some PMICs (Power
+Management ICs).
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 ---
- drivers/net/dsa/microchip/ksz9477_i2c.c |  5 +----
- drivers/net/dsa/microchip/ksz_common.c  | 19 +++++++++++++++++++
- drivers/net/dsa/microchip/ksz_common.h  |  1 +
- drivers/net/dsa/microchip/ksz_spi.c     |  5 +----
- 4 files changed, 22 insertions(+), 8 deletions(-)
+ drivers/net/dsa/microchip/ksz9477.c    | 46 ++++++++++++++++++++++++++
+ drivers/net/dsa/microchip/ksz9477.h    |  1 +
+ drivers/net/dsa/microchip/ksz_common.c |  8 ++++-
+ drivers/net/dsa/microchip/ksz_common.h |  1 +
+ 4 files changed, 55 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz9477_i2c.c b/drivers/net/dsa/microchip/ksz9477_i2c.c
-index 2710afad4f3a..cac4a607e54a 100644
---- a/drivers/net/dsa/microchip/ksz9477_i2c.c
-+++ b/drivers/net/dsa/microchip/ksz9477_i2c.c
-@@ -66,10 +66,7 @@ static void ksz9477_i2c_shutdown(struct i2c_client *i2c)
- 	if (!dev)
- 		return;
- 
--	if (dev->dev_ops->reset)
--		dev->dev_ops->reset(dev);
--
--	dsa_switch_shutdown(dev->ds);
-+	ksz_switch_shutdown(dev);
- 
- 	i2c_set_clientdata(i2c, NULL);
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+index bcc8863951ca..d893dfd68815 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -200,6 +200,46 @@ int ksz9477_set_wol(struct ksz_device *dev, int port,
+ 	return 0;
  }
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 79052a54880c..08556b1dc452 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -3810,6 +3810,25 @@ struct ksz_device *ksz_switch_alloc(struct device *base, void *priv)
- }
- EXPORT_SYMBOL(ksz_switch_alloc);
  
 +/**
-+ * ksz_switch_shutdown - Shutdown routine for the switch device.
++ * ksz9477_wol_pre_shutdown - Prepares the switch device for shutdown while
++ *                            considering Wake-on-LAN (WoL) settings.
 + * @dev: The switch device structure.
++ * @wol_enabled: Pointer to a boolean which will be set to true if WoL is
++ *               enabled on any port.
 + *
-+ * This function is responsible for initiating a shutdown sequence for the
-+ * switch device. It invokes the reset operation defined in the device
-+ * operations, if available, to reset the switch. Subsequently, it calls the
-+ * DSA framework's shutdown function to ensure a proper shutdown of the DSA
-+ * switch.
++ * This function prepares the switch device for a safe shutdown while taking
++ * into account the Wake-on-LAN (WoL) settings on the user ports. It updates
++ * the wol_enabled flag accordingly to reflect whether WoL is active on any
++ * port.
 + */
-+void ksz_switch_shutdown(struct ksz_device *dev)
++void ksz9477_wol_pre_shutdown(struct ksz_device *dev, bool *wol_enabled)
 +{
-+	if (dev->dev_ops->reset)
-+		dev->dev_ops->reset(dev);
++	struct dsa_port *dp;
++	int ret;
 +
-+	dsa_switch_shutdown(dev->ds);
++	*wol_enabled = false;
++
++	if (!dev->wakeup_source)
++		return;
++
++	dsa_switch_for_each_user_port(dp, dev->ds) {
++		u8 pme_ctrl = 0;
++
++		ret = ksz_pread8(dev, dp->index, REG_PORT_PME_CTRL, &pme_ctrl);
++		if (!ret && pme_ctrl)
++			*wol_enabled = true;
++
++		/* make sure there are no pending wake events which would
++		 * prevent the device from going to sleep/shutdown.
++		 */
++		ksz9477_handle_wake_reason(dev, dp->index);
++	}
++
++	/* Now we are save to enable PME pin. */
++	if (*wol_enabled)
++		ksz_write8(dev, REG_SW_PME_CTRL, PME_ENABLE);
 +}
-+EXPORT_SYMBOL(ksz_switch_shutdown);
 +
- static void ksz_parse_rgmii_delay(struct ksz_device *dev, int port_num,
- 				  struct device_node *port_dn)
+ static int ksz9477_wait_vlan_ctrl_ready(struct ksz_device *dev)
  {
+ 	unsigned int val;
+@@ -1280,6 +1320,12 @@ int ksz9477_setup(struct dsa_switch *ds)
+ 	/* enable global MIB counter freeze function */
+ 	ksz_cfg(dev, REG_SW_MAC_CTRL_6, SW_MIB_COUNTER_FREEZE, true);
+ 
++	/* Make sure PME (WoL) is not enabled. If requested, it will be
++	 * enabled by ksz9477_wol_pre_shutdown(). Otherwise, some PMICs do not
++	 * like PME events changes before shutdown.
++	 */
++	ksz_write8(dev, REG_SW_PME_CTRL, 0);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microchip/ksz9477.h
+index fa8d0318b437..9e6f1e4b57b7 100644
+--- a/drivers/net/dsa/microchip/ksz9477.h
++++ b/drivers/net/dsa/microchip/ksz9477.h
+@@ -62,6 +62,7 @@ void ksz9477_get_wol(struct ksz_device *dev, int port,
+ 		     struct ethtool_wolinfo *wol);
+ int ksz9477_set_wol(struct ksz_device *dev, int port,
+ 		    struct ethtool_wolinfo *wol);
++void ksz9477_wol_pre_shutdown(struct ksz_device *dev, bool *wol_is_on);
+ 
+ int ksz9477_port_acl_init(struct ksz_device *dev, int port);
+ void ksz9477_port_acl_free(struct ksz_device *dev, int port);
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 08556b1dc452..6945ea4febd0 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -321,6 +321,7 @@ static const struct ksz_dev_ops ksz9477_dev_ops = {
+ 	.phylink_mac_link_up = ksz9477_phylink_mac_link_up,
+ 	.get_wol = ksz9477_get_wol,
+ 	.set_wol = ksz9477_set_wol,
++	.wol_pre_shutdown = ksz9477_wol_pre_shutdown,
+ 	.config_cpu_port = ksz9477_config_cpu_port,
+ 	.tc_cbs_set_cinc = ksz9477_tc_cbs_set_cinc,
+ 	.enable_stp_addr = ksz9477_enable_stp_addr,
+@@ -3822,7 +3823,12 @@ EXPORT_SYMBOL(ksz_switch_alloc);
+  */
+ void ksz_switch_shutdown(struct ksz_device *dev)
+ {
+-	if (dev->dev_ops->reset)
++	bool wol_enabled = false;
++
++	if (dev->dev_ops->wol_pre_shutdown)
++		dev->dev_ops->wol_pre_shutdown(dev, &wol_enabled);
++
++	if (dev->dev_ops->reset && !wol_enabled)
+ 		dev->dev_ops->reset(dev);
+ 
+ 	dsa_switch_shutdown(dev->ds);
 diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 8fc3210d7a3d..34a8e9784cca 100644
+index 34a8e9784cca..41917de15ba3 100644
 --- a/drivers/net/dsa/microchip/ksz_common.h
 +++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -399,6 +399,7 @@ extern const struct ksz_chip_data ksz_switch_chips[];
- int ksz_switch_macaddr_get(struct dsa_switch *ds, int port,
- 			   struct netlink_ext_ack *extack);
- void ksz_switch_macaddr_put(struct dsa_switch *ds);
-+void ksz_switch_shutdown(struct ksz_device *dev);
- 
- /* Common register access functions */
- static inline struct regmap *ksz_regmap_8(struct ksz_device *dev)
-diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-index 279338451621..6f6d878e742c 100644
---- a/drivers/net/dsa/microchip/ksz_spi.c
-+++ b/drivers/net/dsa/microchip/ksz_spi.c
-@@ -114,10 +114,7 @@ static void ksz_spi_shutdown(struct spi_device *spi)
- 	if (!dev)
- 		return;
- 
--	if (dev->dev_ops->reset)
--		dev->dev_ops->reset(dev);
--
--	dsa_switch_shutdown(dev->ds);
-+	ksz_switch_shutdown(dev);
- 
- 	spi_set_drvdata(spi, NULL);
- }
+@@ -378,6 +378,7 @@ struct ksz_dev_ops {
+ 			struct ethtool_wolinfo *wol);
+ 	int (*set_wol)(struct ksz_device *dev, int port,
+ 		       struct ethtool_wolinfo *wol);
++	void (*wol_pre_shutdown)(struct ksz_device *dev, bool *wol_enabled);
+ 	void (*config_cpu_port)(struct dsa_switch *ds);
+ 	int (*enable_stp_addr)(struct ksz_device *dev);
+ 	int (*reset)(struct ksz_device *dev);
 -- 
 2.39.2
 
