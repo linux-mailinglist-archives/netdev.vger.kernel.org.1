@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-42735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D74A7D0026
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:05:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06FF7D0047
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:10:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38289282137
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:05:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8029FB20F15
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905B2321B5;
-	Thu, 19 Oct 2023 17:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F42932C6B;
+	Thu, 19 Oct 2023 17:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HlVlFh1l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S6znQmKa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3BAE30F82;
-	Thu, 19 Oct 2023 17:05:25 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1100612D;
-	Thu, 19 Oct 2023 10:05:24 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9bdf5829000so1010043566b.0;
-        Thu, 19 Oct 2023 10:05:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FEDA32C62;
+	Thu, 19 Oct 2023 17:10:25 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F9EECF;
+	Thu, 19 Oct 2023 10:10:24 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-99357737980so1352058766b.2;
+        Thu, 19 Oct 2023 10:10:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697735122; x=1698339922; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1697735422; x=1698340222; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bveSVA+HFDA8Wqrpoim/LrAEl8uS+yqVoMbn6rwNYss=;
-        b=HlVlFh1lvj+dT2xpPkUzq4AdgCXTjn+prEyOFLx0B6f3UfHz0n202HCtrS2ydVt0b8
-         mirGv/RBMdy69V2uFVqNfli3QVjoAbRKH3QQ9yvbZFh0TYBQwgRHIbM6L8ZkqK6gKFxO
-         sI6U12njP6/A58P/NFd/8ELHelLzeMzN57+W30//Kn9CwjfMBVdnEJXBMqF7hl3hSOij
-         c2XoRiFM0BMuv1VE0MSleqGrJEIfhlgj5G4DHsiLY+8E1ESMbri+spEZzHCuR5qF/TBw
-         CKCWkyo7jk++iZJeLlIae38Gybh4MrlTya37T8Lw/z92/iTsHyRDe3UIYlBO+ORIO9xF
-         E6Nw==
+        bh=c3EG8voekuiDu8+1WrOXrX0b/udoq4F/afXtMElXqbE=;
+        b=S6znQmKaaKY8rFw4hGY3y7As2MONtPbPGLYbZbOJfw5Zje4w+QiTTiVf5yjHi2Pd9M
+         ABErBCeZe6SjvS4MVJmzRUP/Zz/DYxrHwRpjpmLEq91oX+px9gZY5tqRzDY257PBicBk
+         WteJY4OcHDROx4RW4tFxcAFhcHwaU7cePpG895PAVf2IsP3ddStOHjo8SuJgoJ8OgLyr
+         43Zv0iPL59yqz3wgIkHYVFP5ooxbWB2OmHclYXho7NIaA9D3FUNbWKMGOGZ1sXFWD+35
+         Uh3jqFYcBY1ofHYomFZXvwwLlIaNQTprEmRH+6tXT3awoQecjMRkdOked2KAKRWBW7VG
+         OXdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697735122; x=1698339922;
+        d=1e100.net; s=20230601; t=1697735422; x=1698340222;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bveSVA+HFDA8Wqrpoim/LrAEl8uS+yqVoMbn6rwNYss=;
-        b=ukRXz/Azd/FOCzpaSG+KXif8oUWPiR1zYjyUwYSoBH/Bos6oeNA91y8uzJAuLcu+si
-         YWRyTrN+mR1M2BxqrkRXNMfAbWVNxDfS7gFaV1W/jfI+kIM3WoZhgUUt3K1BDs4SywbL
-         6dd3QnqxNErHMbHAruchOxlHl+mZDLcVrL/c9zwCy0Ge/c8+deACCe4mxoMft+Y39paA
-         ErNxfuCW/+0wt/U+Zi0/it73qL9sHxztO+MPLI4oJnBFn/nYJZT5Zng1zPxlQI7TqRGQ
-         KRy1irzqTyrq7jqJnizxzPsmyOdTw++g7gfvZ46z6nqgo3/29xS7gWhqIzngGl9vvEpe
-         oIdg==
-X-Gm-Message-State: AOJu0YzJUj6j5j0otj1dh6icAN3xGcYYGpETEg02aoXxE9SaQdLDhNXX
-	Zs6Np6s/Lg8kgx2v7bRNnSM=
-X-Google-Smtp-Source: AGHT+IFUP+9w2s21EXX2dFd9XByPLS5jZCcAR6p1QJThCOs445IfVJcfeU2Jhkj4TKigivsQH/rIow==
-X-Received: by 2002:a17:907:7b8f:b0:9bf:b8f7:1fa8 with SMTP id ne15-20020a1709077b8f00b009bfb8f71fa8mr2398496ejc.76.1697735122415;
-        Thu, 19 Oct 2023 10:05:22 -0700 (PDT)
+        bh=c3EG8voekuiDu8+1WrOXrX0b/udoq4F/afXtMElXqbE=;
+        b=p0ecfXIPnUT+P8qyn8xMLgAkOqMKpIgDQ2SYr2zYmEkgmfChS7GLnKbZZN149hteh6
+         +uam0AklZsHAAdapN2yl94MN6wsLbSvkoRt73163/VXRdGqYI/zGfCmHA5j2ub9ZHaON
+         XdQKsut4FiqOS7KqQFRc3dp+GIPDYLyyjg2171tgR8NzDP5ZFgn6Fp2iRTQkHMZ4phoW
+         6sF07eZ6SqMXTf0SaA0wdM8ZD+tYE8jyTiaw3eidzCTu52DyeQU4J6ya/okRaGN2iZrR
+         Q5ZJTqnCil5ew1lYdbK3SLtq2GAKeHlFi4i/oTroR9FP4ck4wTQA8oLuB/1HCCi7i79n
+         +zZQ==
+X-Gm-Message-State: AOJu0YwPcK3oKqYzqwwIF0r3fJge/WfjUmqIiuGQexIs33WEr88KW8XW
+	l4Vr4ZwBK9kUiJNQElHOses=
+X-Google-Smtp-Source: AGHT+IGb+lVx1YdI/MeXvJ0XTmH9AvemAYqYeJu16szeci0NKpPRvdgw8ZLbOdJXBsSavccDYtT8Og==
+X-Received: by 2002:a17:907:980c:b0:9c7:5186:de1a with SMTP id ji12-20020a170907980c00b009c75186de1amr2669932ejc.8.1697735422441;
+        Thu, 19 Oct 2023 10:10:22 -0700 (PDT)
 Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id lz21-20020a170906fb1500b009ad829ed144sm3818101ejb.130.2023.10.19.10.05.21
+        by smtp.gmail.com with ESMTPSA id bh12-20020a170906a0cc00b0099bd7b26639sm3966785ejb.6.2023.10.19.10.10.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 10:05:22 -0700 (PDT)
-Date: Thu, 19 Oct 2023 20:05:19 +0300
+        Thu, 19 Oct 2023 10:10:22 -0700 (PDT)
+Date: Thu, 19 Oct 2023 20:10:19 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>
 Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
@@ -74,11 +74,11 @@ Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
 	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
 	"Russell King (Oracle)" <linux@armlinux.org.uk>,
 	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v6 1/9] net: dsa: microchip: Add missing MAC
- address register offset for ksz8863
-Message-ID: <20231019170519.bfoqhelgbm2w63hn@skbuf>
+Subject: Re: [PATCH net-next v6 6/9] net: dsa: microchip: Refactor comment
+ for ksz_switch_macaddr_get() function
+Message-ID: <20231019171019.h5er2mdarrjk43o5@skbuf>
 References: <20231019122850.1199821-1-o.rempel@pengutronix.de>
- <20231019122850.1199821-2-o.rempel@pengutronix.de>
+ <20231019122850.1199821-7-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,14 +87,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231019122850.1199821-2-o.rempel@pengutronix.de>
+In-Reply-To: <20231019122850.1199821-7-o.rempel@pengutronix.de>
 
-On Thu, Oct 19, 2023 at 02:28:42PM +0200, Oleksij Rempel wrote:
-> Add the missing offset for the global MAC address register
-> (REG_SW_MAC_ADDR) for the ksz8863 family of switches.
+On Thu, Oct 19, 2023 at 02:28:47PM +0200, Oleksij Rempel wrote:
+> Update the comment to follow kernel-doc format.
 > 
 > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 > Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 > ---
 
