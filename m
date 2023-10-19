@@ -1,135 +1,147 @@
-Return-Path: <netdev+bounces-42626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4011E7CF912
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:36:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C996B7CF93A
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:42:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A22EB2125D
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:36:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D96E28204B
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:42:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F79417743;
-	Thu, 19 Oct 2023 12:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018A2182B9;
+	Thu, 19 Oct 2023 12:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a7X2aQSR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCD9225B1
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:36:21 +0000 (UTC)
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E626BCF;
-	Thu, 19 Oct 2023 05:36:19 -0700 (PDT)
-Received: from [192.168.1.103] (31.173.85.253) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Thu, 19 Oct
- 2023 15:36:09 +0300
-Subject: Re: [PATCH net v2] ravb: Fix races between ravb_tx_timeout_work() and
- net related ops
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>
-References: <20231019113308.1133944-1-yoshihiro.shimoda.uh@renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <f5421248-3341-a5f7-84e6-c601df470a63@omp.ru>
-Date: Thu, 19 Oct 2023 15:36:08 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E711225A5
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:42:08 +0000 (UTC)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A912A4;
+	Thu, 19 Oct 2023 05:42:07 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9adb9fa7200so162716066b.0;
+        Thu, 19 Oct 2023 05:42:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697719325; x=1698324125; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HbETqJO7gr5G309pfc0V+D4Oi3AQtNMOXUVI2EJql7Y=;
+        b=a7X2aQSRu5NcrOL4cn7ghK5Kb8B7uDshis1OU7/CSyumlzk2wUGhmetuib14Vkbjkr
+         Je4I6/5b0A7+5f2mj9fbFNioFhfujZ15jhivPp+VKVtUGaKmZamCdQNqHkJ9BLRJLPYs
+         DY7V9dxleOSsJy/XvaiwwBo6cBJjYHVz7qOG+1QK76fVfnWBsSZ4kd40yPtoodSslcSA
+         42W7JzVtt4enf6HKAT2oY99zbpVU7KyJn3PvLr3kFIIN/phV3VJBSlIhk0mQzI62WSTl
+         YmIa+H7GioLdcGvH6/1BZLGXYx36gi8gcCj9Fe3jODOmrbyyST6VAbnvQN0Cpf7R1j7a
+         uTqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697719325; x=1698324125;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HbETqJO7gr5G309pfc0V+D4Oi3AQtNMOXUVI2EJql7Y=;
+        b=fMwH+Z1Lw64JxKrafH0R6JKMOuEfv1VKQxxQLGmqNJujbpIgPELbND2UP8B5q7jKZv
+         3rfaO0zwGeen2N97WrzdE9Izg8cveDEZd8N7oFvMz5mg4dPOCBcX5FpsN702x8bW/v0i
+         stGHfzWq5eYFmQiLwHtuGcpnezxp6F3vQKVITGNdmdm1lx4KeMdcZSwh0HlAt8+5PN22
+         HAEr8aw3zWlOfSaOVENmGA5H6Ings4IQvzP9FDxP6AYsZRwyUAbyRRNl/Mp2zu0RskxI
+         xYXhQdTOhctaA0pJuzWqB9VL7Mns2U8E+aMP3DsSaSQJFdRNAo+CAZleFwpPNiKvA4rv
+         3Hng==
+X-Gm-Message-State: AOJu0Yy9U1Eyg81gk94tD31OQarWM64HMnFxzicuKn9hfl1fF6H7o0ND
+	mnIZ8LRBGHBgLpXunCRBSEU=
+X-Google-Smtp-Source: AGHT+IEUbOe0aJdiDWwgZ49Mqf0FMEQpzhd5DOtuFo/cZUxDF9/XU8HxW5TldQf5jZL60tohfvemyw==
+X-Received: by 2002:a17:907:9490:b0:9ae:5a56:be32 with SMTP id dm16-20020a170907949000b009ae5a56be32mr1688089ejc.38.1697719325237;
+        Thu, 19 Oct 2023 05:42:05 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id cd9-20020a170906b34900b009a193a5acffsm3486374ejb.121.2023.10.19.05.42.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 05:42:04 -0700 (PDT)
+Date: Thu, 19 Oct 2023 15:42:02 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Gerhard Engleder <gerhard@engleder-embedded.com>,
+	Lai Peter Jun Ann <jun.ann.lai@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/1] taprio: Add boundary check for
+ sched-entry values
+Message-ID: <20231019124202.fldo2cc5s6w4hrxz@skbuf>
+References: <1697599707-3546-1-git-send-email-jun.ann.lai@intel.com>
+ <27912b49-eb1a-4100-a260-03299e8efdd4@engleder-embedded.com>
+ <bca0aca50914367fffccf33b2f2ac880808d6cd9.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231019113308.1133944-1-yoshihiro.shimoda.uh@renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [31.173.85.253]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 10/19/2023 12:26:29
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 180733 [Oct 19 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 542 542 3d23828e213bab96daa5e52f9cef518f74e40214
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.85.253 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.85.253
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 10/19/2023 12:31:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 10/19/2023 10:41:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bca0aca50914367fffccf33b2f2ac880808d6cd9.camel@redhat.com>
 
-Hello!
+On Thu, Oct 19, 2023 at 12:35:30PM +0200, Paolo Abeni wrote:
+> On Wed, 2023-10-18 at 19:56 +0200, Gerhard Engleder wrote:
+> > On 18.10.23 05:28, Lai Peter Jun Ann wrote:
+> > > Adds boundary checks for the gatemask provided against the number of
+> > > traffic class defined for each sched-entry.
+> > > 
+> > > Without this check, the user would not know that the gatemask provided is
+> > > invalid and the driver has already truncated the gatemask provided to
+> > > match the number of traffic class defined.
+> > > 
+> > > Signed-off-by: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+> > > Signed-off-by: Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>
+> > > Signed-off-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
+> > > ---
+> > >   net/sched/sch_taprio.c | 8 ++++++++
+> > >   1 file changed, 8 insertions(+)
+> > > 
+> > > diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+> > > index 1cb5e41..44b9e21 100644
+> > > --- a/net/sched/sch_taprio.c
+> > > +++ b/net/sched/sch_taprio.c
+> > > @@ -102,6 +102,7 @@ struct taprio_sched {
+> > >   	u32 max_sdu[TC_MAX_QUEUE]; /* save info from the user */
+> > >   	u32 fp[TC_QOPT_MAX_QUEUE]; /* only for dump and offloading */
+> > >   	u32 txtime_delay;
+> > > +	u8 num_tc;
 
-On 10/19/23 2:33 PM, Yoshihiro Shimoda wrote:
+To the patch: I would oppose introducing an "u8 num_tc" to struct
+taprio_sched for one purpose only. It is a duplication of
+netdev->num_tc, the only problem is that it hasn't yet been set, which
+can be solved with a bit of code reorganization.
 
-> Fix races between ravb_tx_timeout_work() and functions of net_device_ops
-> and ethtool_ops by using rtnl_trylock() and rtnl_unlock(). Note that
-> since ravb_close() is under the rtnl lock and calls cancel_work_sync(),
-> ravb_tx_timeout_work() should calls rtnl_trylock(). Otherwise, a deadlock
-> may happen in ravb_tx_timeout_work() like below:
+> > >   };
+> > >   
+> > >   struct __tc_taprio_qopt_offload {
+> > > @@ -1063,6 +1064,11 @@ static int fill_sched_entry(struct taprio_sched *q, struct nlattr **tb,
+> > >   		return -EINVAL;
+> > >   	}
+> > >   
+> > > +	if (entry->gate_mask >= q->num_tc) {
+> > 
+> > As far as I know within gate_mask every bit represents a traffic class.
+> > So for 3 traffic classes at gate_mask of 0x7 is valid but this check
+> > fails with 0x7 >= 3.
 > 
-> CPU0			CPU1
-> 			ravb_tx_timeout()
-> 			schedule_work()
-> ...
-> __dev_close_many()
-> // Under rtnl lock
-> ravb_close()
-> cancel_work_sync()
-> // Waiting
-> 			ravb_tx_timeout_work()
-> 			rtnl_lock()
-> 			// This is possible to cause a deadlock
-> 
-> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> Additionally whatever check we put in place previously just ignored by
+> the existing code, could break the existing user-space: we can't accept
+> such change. 
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+I agree, and I would oppose erroring out.
 
-[...]
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 0ef0b88b7145..300c1885e1e1 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -1874,6 +1874,9 @@ static void ravb_tx_timeout_work(struct work_struct *work)
->  	struct net_device *ndev = priv->ndev;
->  	int error;
->  
-> +	if (!rtnl_trylock())
-> +		return;
+I used to have this patch which simply masks off the excess bits,
+calling netdev_warn() - which can be transformed into a warning netlink
+extack - instead.
+https://patchwork.kernel.org/project/netdevbpf/patch/20230130173145.475943-15-vladimir.oltean@nxp.com/
 
-   I wonder if we should reschedule the work here...
-
-[...]
-
-MBR, Sergey
+I didn't have a strong motivation for the patch, and I dropped it.
+If Lai Peter Jun Ann can come with the motivation, we can go with that
+approach.
 
