@@ -1,170 +1,181 @@
-Return-Path: <netdev+bounces-42645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B258A7CFB46
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:37:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AED467CFB73
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 15:42:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3AA10B20B72
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:37:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14E47282033
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 13:42:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D184827468;
-	Thu, 19 Oct 2023 13:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA0B2746E;
+	Thu, 19 Oct 2023 13:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Hizg/8dh"
+	dkim=pass (2048-bit key) header.d=gerhold.net header.i=@gerhold.net header.b="CXRdo6q2";
+	dkim=permerror (0-bit key) header.d=gerhold.net header.i=@gerhold.net header.b="JM9fLk3T"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096DD2745C;
-	Thu, 19 Oct 2023 13:37:28 +0000 (UTC)
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2047.outbound.protection.outlook.com [40.107.20.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E6F189;
-	Thu, 19 Oct 2023 06:37:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m+D7vQjQ3sjXU5Olh+q8N1kbUEivK8qLzkf6YVhmixG/Hfaza+Qq5znJxP3/7Qe8/FEsLFnHu7AIhMHZZKf6nTdS6A7LoaVEuNAlXvkLJOIqvGyScTriLw23hwrRHNnOcuSj9b2eKmtc6/uDOvLaciRZKYZOR3EdPt5iPHKn4CPQKVf2+lJ8HvhKzkonhcRldD1aLQ9pwDTEE86zjopwO6p+gNwF/WQBwPGWebbk/PUVvC/YTGBmq+Zok3DroGG5GHkfOYllHm8VvNJOcqvUuuH/CGYAlPZOmeU+m4HXA5fYJtPUBd/R9fBch5ji9J4M4bHmcOE2HRsDUZYefgOecw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8ZYDskkM+3xrKpRFklBOEFZMrJLxAwO18NQ9GwgSzMQ=;
- b=mTQ6/w1yp2MUqArNIJ3/xLz2cBpuwuOxrD7BIQpyDlPAYwsP3qYObkzkSlpCZNzcS4mDpJm9f3KIx0S4cluP12LQ8Bq4Ta7ZPiyrJAjBQAeTIuuoxS7aW0yfoSfbIbXy9Lqyq7DTzmlZOoQBg6wHzLWHhhr6JQFc2rkOJHsC2ex08/WyxUlsZnLJU8wfzSZIYtTUC0lp2s2SBa+5Gv/eRG67ovOqEZp4BWnYRJwgwM8QfUYDCdvpfphi4hhwcEreWf1ZGBiVhoAw1rip3FuwdEb9Q+bGspKLGJFSrbxKMla34jq0A3edyQHWZ+oauIX8KQyLL+9WA+Xcl0WlZa2EMA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8ZYDskkM+3xrKpRFklBOEFZMrJLxAwO18NQ9GwgSzMQ=;
- b=Hizg/8dh1o9AwGWN8wKLO1kYut3wYCPztRF96fwqpRhUhztHKbFxIiewc7R1lUSyi1gus35sEIfsSj8RVs+oS7J51t33mNGAv1bbhHCFbzPJrSUagAF7FHQl67l8YZF7ABk+Frz3mygYB+7c3XMxhrEFW7CARf9LilHz18ob0KU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AS8PR04MB7654.eurprd04.prod.outlook.com (2603:10a6:20b:290::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.21; Thu, 19 Oct
- 2023 13:37:24 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::992:76c8:4771:8367]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::992:76c8:4771:8367%7]) with mapi id 15.20.6907.022; Thu, 19 Oct 2023
- 13:37:24 +0000
-Date: Thu, 19 Oct 2023 16:37:19 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Rob Herring <robh@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B2CDDA6;
+	Thu, 19 Oct 2023 13:42:25 +0000 (UTC)
+X-Greylist: delayed 184 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 19 Oct 2023 06:42:23 PDT
+Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [81.169.146.169])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60188124;
+	Thu, 19 Oct 2023 06:42:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1697722756; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=EFD3QYbBNAwdIpiJCeXqcDPAWe8hCm0JWYvEzP88ly6Xj65qtskAfhsbd6dcrjPGQy
+    MD7awJq1dw6or2Uv+SaN+L+sra8ss5jqNJxp63+tz/lcNHE1n+JLk2g4MLVWg2gLUOrQ
+    JxC2L8btf3fJbiSB3AYrkuJjpdGdiACScE08DSroIUGfYXFkyBX/EjP84XUgxipMz7GQ
+    aCOGDbmAzKo6WZYvGgvKORuGNm45yGPOxPpu3EKb1uJf2+WjlGmGlZDSdt5KAYniaVK1
+    INhePkKyWz7YNTegGUkByLL3LTZoyknd8a5M2wgqqipzLnzlt/xWemvaviU++ZSytiAw
+    c65g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1697722756;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:Cc:Date:
+    From:Subject:Sender;
+    bh=IiAUACoAmD1dZiYlatQomGi3MwVID43ZHiBQH5Q1d+0=;
+    b=ljIvctqtJvBDkdGnIRJ89iB7acCc9h66+A11crb8qzilgureOvyhJmqOEaozHstcy4
+    sJvR3TpqSPwzJf/14S0vCHfJP9HiYLZjuipQF//++FlYHuOY2wVIYpj/Ansb6Uv3e5be
+    QevS51b6PuYjtrSqj2oDJ67Ans3cl1I0yz+RoruXCc/+CSCl5BCQGoUlj7JRn0ZA5RAd
+    LXNd2PdqNqLJPbxAkcsh/gNS0IBpbMU6hzZiLjbNYPBQG0aaezuA36KLtk8kcDLOkc0r
+    xpn8nYQJMGTYDRaXstoWXszfIbfGJdxuc63ht2MSS07IckNWnpfZVVQuPR5y4Q4EqZz1
+    Lepg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo02
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1697722756;
+    s=strato-dkim-0002; d=gerhold.net;
+    h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:Cc:Date:
+    From:Subject:Sender;
+    bh=IiAUACoAmD1dZiYlatQomGi3MwVID43ZHiBQH5Q1d+0=;
+    b=CXRdo6q2oEJBSO1pHcZjrJTrxUYyk04S2kUpFRHmpcxV8LaWVhb+Jtt3ec8qszNyGd
+    ZkOjqu3sOS0A+XVDJZL7tWoW1fQFepK4BR7TkOLIOyQH9CWbZpNGL2MRNkQNWXC1S4gc
+    8ZmZBFGFEhSGp4efXVDyHLs9+FIrRqyhTchT/Yd7L40fSy4cDjFWTDFnRFg6hseKto+/
+    DA+EYkHsEg1NdS+v98hBFIm1GyivoRUCMokKnqiM3ncmn1VrBdQGmUbW4lnwCAK7pX1n
+    Bfqd2HA5eIigfii4pDdz/W7u1sdijTNdf8SlCA1OqOpHz7cPk99jPu5PJy3pyho7bYiZ
+    S47w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1697722756;
+    s=strato-dkim-0003; d=gerhold.net;
+    h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:Cc:Date:
+    From:Subject:Sender;
+    bh=IiAUACoAmD1dZiYlatQomGi3MwVID43ZHiBQH5Q1d+0=;
+    b=JM9fLk3TtDDldKevllM9q3uJh8Tp3iozbo0xtn50KB3M9rODzOytQBlRSWBClThq4r
+    YdYZC6BDhDtiYyB5zLBQ==
+X-RZG-AUTH: ":P3gBZUipdd93FF5ZZvYFPugejmSTVR2nRPhVOQ/OcYgojyw4j34+u261EJF5OxJD4paA95vh"
+Received: from gerhold.net
+    by smtp.strato.de (RZmta 49.9.0 DYNA|AUTH)
+    with ESMTPSA id j34a49z9JDdFDo9
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Thu, 19 Oct 2023 15:39:15 +0200 (CEST)
+Date: Thu, 19 Oct 2023 15:39:10 +0200
+From: Stephan Gerhold <stephan@gerhold.net>
+To: Kees Cook <keescook@chromium.org>,
+	Justin Stitt <justinstitt@google.com>
+Cc: Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	=?utf-8?B?bsOnIMOcTkFM?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	John Crispin <john@phrozen.org>,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Sergei Shtylyov <sergei.shtylyov@gmail.com>,
-	Justin Chen <justin.chen@broadcom.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Sekhar Nori <nsekhar@ti.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org,
-	bcm-kernel-feedback-list@broadcom.com
-Subject: Re: [PATCH net-next 6/8] dt-bindings: net: mscc,vsc7514-switch:
- Clean-up example indentation
-Message-ID: <20231019133719.3gldtyqbptqr4el7@skbuf>
-References: <20231016-dt-net-cleanups-v1-0-a525a090b444@kernel.org>
- <20231016-dt-net-cleanups-v1-6-a525a090b444@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231016-dt-net-cleanups-v1-6-a525a090b444@kernel.org>
-X-ClientProxiedBy: AS4P189CA0004.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d7::7) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] net: wwan: replace deprecated strncpy with strscpy_pad
+Message-ID: <ZTExfv2aHPD2B1ze@gerhold.net>
+References: <20231018-strncpy-drivers-net-wwan-rpmsg_wwan_ctrl-c-v1-1-4e343270373a@google.com>
+ <202310182232.A569D262@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB7654:EE_
-X-MS-Office365-Filtering-Correlation-Id: 34d6b6a4-65bb-4f21-8e32-08dbd0a88737
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	aBklWBk2sKE3BU0TIpB2WX/UHcYPjPZFNZGNPMadBRkhHtP7Pf/leLtXwNQkVvmvhz05Ky9/NZKbeP3Kqe7G6e+9zhhozo3jU+Fc3l16NCQFBTYnsD1WlI/mq/UYCMxv9hUrt6NXAmvE4u5XCyVNq8ZqkCBSsZcj+ynpPDF+tP5TfxG2A3SHjfTuDudA4fY5fyfXQqi5PUZs7CicFCJ3M4itNcqEUKeTkiCEOyMtxw0AAb7P3NZjK2EeZka0CvE7P5j1QKztQgsDGHuOmS9wbVcBY58U/bXk7qmOFBrTne4TG3Eg6qqriRNIZcZhMtzdv+Nbh5HhHt/AHQMW5Cc8KqoRVNnOXEkTPWLFgZBAuKxa64upMuBuc6kGfOMEaidg1HrGammBU9Qya6zTsfRJ39vdb5js4dkwrPHlNqNojeBBjlxpRhg06cAewkdYivumKHL/M+KicPHwzIbKqHlPRl50wk616Bgt8tJLP3lr3ZLQ84JquEFRqM5ME4uQj0bLSaCLYijXtTg7iOYvLAivqsLU7YU8pJbNWMLDIv0y/hdx7xvEQ4Y7XJERefWBXiEK
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(39860400002)(366004)(396003)(136003)(346002)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(86362001)(7416002)(2906002)(54906003)(8936002)(4326008)(8676002)(66946007)(6916009)(44832011)(5660300002)(41300700001)(33716001)(66476007)(558084003)(7406005)(38100700002)(66556008)(478600001)(1076003)(6506007)(26005)(9686003)(6666004)(6512007)(316002)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?A/VOIcgQofWlBJPbtC0pFdcl2W3AlPz4Na1GV4R7Ue9huYtjTTA0JDU8/Ccu?=
- =?us-ascii?Q?FVU52OF8NzB9eb5S9uB+4JZfVjauSpr8pJIN4FuAkmi/45RSQmClWWISfX2O?=
- =?us-ascii?Q?pvu91/PWzfkZr0Rg9aSwEHkNtWnjbhsC9zRJdNbI4CJrYaQKir71gdYKfHdB?=
- =?us-ascii?Q?wfqBakGPcbgRTesAjWnQ4MxLvyhT+QfFfgTQueHuDwEr6cR4Fu4hkaOYKpAq?=
- =?us-ascii?Q?gNN+06cf5wokeDDBTYWxtliUjqY3VdgngqHTzSS1O6AtkMNi6iMPR/5zHAIb?=
- =?us-ascii?Q?b0bpvC/x77EPq1TgrGEvCqBREb0kmNh7wLxVADBCpuQuig4JWrGorfvHPWk9?=
- =?us-ascii?Q?5o9R3WpkYsmeU88O/okPa5GNteO7ROcnnMhLx1sXvE4b/FPNpmoGw4fCOtEO?=
- =?us-ascii?Q?sxUSyEGs7dlzCpGv75KzxhIfVmM7r7fLj5ODaTNdJk+QBeMXRNEoWQ6eABQO?=
- =?us-ascii?Q?/aBbOqwMlEpPbSLJxZooFUYHjoOdhXs5wX8EQwLWp4hYO0ZAfo+8+a9mV/9V?=
- =?us-ascii?Q?s4sjx9a8PPcKMuJIPket9JcVcEO9W7azqOTnnOPqnI5SD0fMsfknFyenkVBR?=
- =?us-ascii?Q?H4zl100YQJBMgB6UnZSbFe3qGhbFTSgArSmxa2QVjWfKw+rm3JG3DMhqMWSH?=
- =?us-ascii?Q?ibwL/QzlVVIGjKVVqK6EFD+EFKbyvPVcaYne0qTAgTuEUkdXrWs2dudf8PEJ?=
- =?us-ascii?Q?ie7YjZ6AwLdUrtXsLoIXZv3HrZVUJV6CoiqPpisbp62AEWw0I2XsprC6r/5d?=
- =?us-ascii?Q?z5kpUsn6B2549aMFGmplM7Hj+LPPggDubDGoOQQe3UAFQQDBjPArb2L9TZQG?=
- =?us-ascii?Q?bYK/ZmH05LqayAPTVk2zGNrc0wdYiD6eoeUkGAOsheXdEOmwJFB3nNU+Ocvb?=
- =?us-ascii?Q?orea7E32XIZj9h/wH0mhfLlW7YZp5h6XZ5byCfXMEcdLUnWgn3d3I4DqyXj8?=
- =?us-ascii?Q?S1wR57AtFXpWC2foGccMHrTJbGIYmNWhga/hVrnKZxrpk1lJl6DXSp8YNMTp?=
- =?us-ascii?Q?l5IIcbT4EmRC4oAPw3ITqhjvtAnf3wTG0EiO8oZhWPHRc2Yd5lNeubuy0oMf?=
- =?us-ascii?Q?4uySRFwhSt3MKmp07X+YewrqYNaVHVYGZuHzScV17i46dajTvGTzc8iamJkp?=
- =?us-ascii?Q?Utzqw2GSBzi476sfMuO6BMcJSx4HV1CUXHq5FX8Wos8PkPVpNoQok4H6TBb/?=
- =?us-ascii?Q?egCmA4L6QehObBZHtEWgfknnRqtLnh0kgmUrg/MXVP3VJX48MPTZlGPfrQp5?=
- =?us-ascii?Q?vu03fAuz2rBQXF5L0vS3NJzjzR4Zxvgzwxh/WlNaP3EJEn3mChM+4i+RmYhP?=
- =?us-ascii?Q?9ccC5AeXzeDxbBoWGI+KXIrhk39vtd/0q2QasV3096FVFlGty2ldv96VQNdb?=
- =?us-ascii?Q?c6Z35Uhg9NGgpt2KkpuXe8a8Yx4ljEbzsvLfTg09W0xl+q/i1plRfjKQ1BI/?=
- =?us-ascii?Q?WcpNo2TMF1tcPMj2nMiSgLnSNnnehhsYL5thybfunctGyoLCBPnJ8MWjV0my?=
- =?us-ascii?Q?9O2JMbbQ0UG/6jzE5A03rQkRQ1h5Uxs2qVnJrIu6wAdnD0qvZh1cPyGholx+?=
- =?us-ascii?Q?ULhXKDUZwnB2/fZh7PfdSQmuY9B5CbiN4sMDAi/gRcy6L6wJ8eNRit7UC7SF?=
- =?us-ascii?Q?IA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34d6b6a4-65bb-4f21-8e32-08dbd0a88737
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 13:37:24.5880
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7bB/Q+Eq/ZSecePCMZ42vLJvz6jcot0KOcry06F5TXttFBCBts+DfjJlm3ZvHwIE4xwbCn7rw50+yDlJCwluRw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7654
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202310182232.A569D262@keescook>
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 16, 2023 at 04:44:25PM -0500, Rob Herring wrote:
-> The indentation for the example is completely messed up for
-> 'ethernet-ports'. Fix it.
+On Wed, Oct 18, 2023 at 10:35:26PM -0700, Kees Cook wrote:
+> On Wed, Oct 18, 2023 at 10:14:55PM +0000, Justin Stitt wrote:
+> > strncpy() is deprecated for use on NUL-terminated destination strings
+> > [1] and as such we should prefer more robust and less ambiguous string
+> > interfaces.
+> > 
+> > We expect chinfo.name to be NUL-terminated based on its use with format
+> > strings and sprintf:
+> > rpmsg/rpmsg_char.c
+> > 165:            dev_err(dev, "failed to open %s\n", eptdev->chinfo.name);
+> > 368:    return sprintf(buf, "%s\n", eptdev->chinfo.name);
+> > 
+> > ... and with strcmp():
+> > |  static struct rpmsg_endpoint *qcom_glink_create_ept(struct rpmsg_device *rpdev,
+> > |  						    rpmsg_rx_cb_t cb,
+> > |  						    void *priv,
+> > |  						    struct rpmsg_channel_info
+> > |  									chinfo)
+> > |  ...
+> > |  const char *name = chinfo.name;
+> > |  ...
+> > |  		if (!strcmp(channel->name, name))
+> > 
+> > Moreover, as chinfo is not kzalloc'd, let's opt to NUL-pad the
+> > destination buffer
+> > 
+> > Similar change to:
+> > Commit 766279a8f85d ("rpmsg: qcom: glink: replace strncpy() with strscpy_pad()")
+> > and
+> > Commit 08de420a8014 ("rpmsg: glink: Replace strncpy() with strscpy_pad()")
+> > 
+> > Considering the above, a suitable replacement is `strscpy_pad` due to
+> > the fact that it guarantees both NUL-termination and NUL-padding on the
+> > destination buffer.
+> > 
+> > Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> > Link: https://github.com/KSPP/linux/issues/90
+> > Cc: linux-hardening@vger.kernel.org
+> > Signed-off-by: Justin Stitt <justinstitt@google.com>
+> > ---
+> > Note: build-tested only.
+> > 
+> > Found with: $ rg "strncpy\("
+> > ---
+> >  drivers/net/wwan/rpmsg_wwan_ctrl.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/wwan/rpmsg_wwan_ctrl.c b/drivers/net/wwan/rpmsg_wwan_ctrl.c
+> > index 86b60aadfa11..39f5e780c478 100644
+> > --- a/drivers/net/wwan/rpmsg_wwan_ctrl.c
+> > +++ b/drivers/net/wwan/rpmsg_wwan_ctrl.c
+> > @@ -37,7 +37,7 @@ static int rpmsg_wwan_ctrl_start(struct wwan_port *port)
+> >  		.dst = RPMSG_ADDR_ANY,
+> >  	};
 > 
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
+> "chinfo" is initialized immediately above here, which means that it is
+> actually already zero filled for all the members that aren't explicitly
+> initialized, so the _pad variant isn't needed. I suspect Dead Store
+> Elimination will optimize it all away anyway, so this is probably fine.
+> 
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Hm, strscpy_pad() is neither a typical compiler builtin nor an inline
+function, so my naive assumption would be that this could only be
+optimized away with LTO?
+
+But I don't think this is particularly performance critical code, so
+maybe it's even better to be explicit in case someone ever changes the
+way chinfo is allocated.
+
+@Justin: Nevertheless I would appreciate if you could briefly reword the
+commit message and add a note about this. Someone reading it later might
+get confused or mislead by the "Moreover, as chinfo is not kzalloc'd,"
+part. As Kees wrote, even without kzalloc the struct initializer of
+chinfo does actually ensure proper zero initialization of the missing
+members.
+
+Thanks!
+Stephan
 
