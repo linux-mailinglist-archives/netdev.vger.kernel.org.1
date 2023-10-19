@@ -1,211 +1,286 @@
-Return-Path: <netdev+bounces-42772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5481D7D011A
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:02:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F8647D011E
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:05:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F2AC28224C
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:02:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF055282255
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:04:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9612374DB;
-	Thu, 19 Oct 2023 18:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E6F374DB;
+	Thu, 19 Oct 2023 18:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WNuhgC96"
+	dkim=pass (1024-bit key) header.d=lafranque.net header.i=@lafranque.net header.b="wJW8rfAb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10FC14F90;
-	Thu, 19 Oct 2023 18:02:24 +0000 (UTC)
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D09B3121;
-	Thu, 19 Oct 2023 11:02:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1697738543; x=1729274543;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AqTc+kSMJCv4b7o2301HQA9kKRyS99hPwO3SqBo8Cfk=;
-  b=WNuhgC96IuEFL+bPIpSBA1wCLP4kQBFY0Trx/i9fbTLrMspi4bxcgjaJ
-   4SkxnIKHMqDQtKqSSV/n0aNLu4/GGw3AxFoG0R6Nccb8W1i6JP9/+9WOh
-   DF+eMmLDcasb4/mNnzshwIQz6jP0rNypOKwNBlo6umMUiVg1993wkDiFi
-   g=;
-X-IronPort-AV: E=Sophos;i="6.03,238,1694736000"; 
-   d="scan'208";a="679481337"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 18:02:15 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com (Postfix) with ESMTPS id F042448353;
-	Thu, 19 Oct 2023 18:02:08 +0000 (UTC)
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:34185]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.211:2525] with esmtp (Farcaster)
- id 7afacc76-ecef-4ef9-b76a-fb2782a29c7b; Thu, 19 Oct 2023 18:02:08 +0000 (UTC)
-X-Farcaster-Flow-ID: 7afacc76-ecef-4ef9-b76a-fb2782a29c7b
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Thu, 19 Oct 2023 18:02:07 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.12) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Thu, 19 Oct 2023 18:02:03 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <martin.lau@linux.dev>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
-	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <mykolal@fb.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
-	<sinquersw@gmail.com>, <song@kernel.org>, <yonghong.song@linux.dev>
-Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie generation/validation SOCK_OPS hooks.
-Date: Thu, 19 Oct 2023 11:01:54 -0700
-Message-ID: <20231019180154.69237-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <33ff226e-a5b2-b222-c178-199e9c504e73@linux.dev>
-References: <33ff226e-a5b2-b222-c178-199e9c504e73@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B299314F90
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 18:04:53 +0000 (UTC)
+Received: from mail.lac-coloc.fr (unknown [45.90.160.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEECF11D
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 11:04:50 -0700 (PDT)
+Authentication-Results: mail.lac-coloc.fr;
+	auth=pass (plain)
+From: Alce Lafranque <alce@lafranque.net>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	netdev@vger.kernel.org
+Cc: Alce Lafranque <alce@lafranque.net>,
+	Vincent Bernat <vincent@bernat.ch>
+Subject: [PATCH net-next v5] vxlan: add support for flowlabel inherit
+Date: Thu, 19 Oct 2023 13:04:17 -0500
+Message-Id: <20231019180417.210523-1-alce@lafranque.net>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.106.101.12]
-X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Received: from localhost (Unknown [127.0.0.1])
+	by mail.lac-coloc.fr (Haraka/3.0.1) with ESMTPSA id 2E4FE418-9600-4047-8513-A5BADD28F30E.1
+	envelope-from <alce@lafranque.net>
+	tls TLS_AES_256_GCM_SHA384 (authenticated bits=0);
+	Thu, 19 Oct 2023 18:04:48 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=lafranque.net; s=s20211111873;
+	h=from:subject:date:message-id:to:cc:mime-version;
+	bh=uEogNkZNsOd69ps3Fyo4W212mZ03CAoK3v8VtNzUcDQ=;
+	b=wJW8rfAbIl/LTiGEA6E34zY7YxwLpVQU5HwmOGRNYPwMy64v4mugLz3b1pr8pXbmu16cfMOh1C
+	P7IleHrSVHimBz2XAsa5LfsRIh8Kna7c+A7nSIHCEBNyYZW0a3fdISUV5bjCCqeF8QIrUusrSie6
+	dLgjkkN2WJrFEXmgaZUCU=
 
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Date: Thu, 19 Oct 2023 00:25:00 -0700
-> On 10/18/23 3:31 PM, Kuniyuki Iwashima wrote:
-> > From: Kui-Feng Lee <sinquersw@gmail.com>
-> > Date: Wed, 18 Oct 2023 14:47:43 -0700
-> >> On 10/18/23 10:20, Kuniyuki Iwashima wrote:
-> >>> From: Eric Dumazet <edumazet@google.com>
-> >>> Date: Wed, 18 Oct 2023 10:02:51 +0200
-> >>>> On Wed, Oct 18, 2023 at 8:19 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
-> >>>>>
-> >>>>> On 10/17/23 9:48 AM, Kuniyuki Iwashima wrote:
-> >>>>>> From: Martin KaFai Lau <martin.lau@linux.dev>
-> >>>>>> Date: Mon, 16 Oct 2023 22:53:15 -0700
-> >>>>>>> On 10/13/23 3:04 PM, Kuniyuki Iwashima wrote:
-> >>>>>>>> Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
-> >>>>>>>> After 3WHS, the proxy restores SYN and forwards it and ACK to the backend
-> >>>>>>>> server.  Our kernel module works at Netfilter input/output hooks and first
-> >>>>>>>> feeds SYN to the TCP stack to initiate 3WHS.  When the module is triggered
-> >>>>>>>> for SYN+ACK, it looks up the corresponding request socket and overwrites
-> >>>>>>>> tcp_rsk(req)->snt_isn with the proxy's cookie.  Then, the module can
-> >>>>>>>> complete 3WHS with the original ACK as is.
-> >>>>>>>
-> >>>>>>> Does the current kernel module also use the timestamp bits differently?
-> >>>>>>> (something like patch 8 and patch 10 trying to do)
-> >>>>>>
-> >>>>>> Our SYN Proxy uses TS as is.  The proxy nodes generate a random number
-> >>>>>> if TS is in SYN.
-> >>>>>>
-> >>>>>> But I thought someone would suggest making TS available so that we can
-> >>>>>> mock the default behaviour at least, and it would be more acceptable.
-> >>>>>>
-> >>>>>> The selftest uses TS just to strengthen security by validating 32-bits
-> >>>>>> hash.  Dropping a part of hash makes collision easier to happen, but
-> >>>>>> 24-bits were sufficient for us to reduce SYN flood to the managable
-> >>>>>> level at the backend.
-> >>>>>
-> >>>>> While enabling bpf to customize the syncookie (and timestamp), I want to explore
-> >>>>> where can this also be done other than at the tcp layer.
-> >>>>>
-> >>>>> Have you thought about directly sending the SYNACK back at a lower layer like
-> >>>>> tc/xdp after receiving the SYN?
-> >>>
-> >>> Yes.  Actually, at netconf I mentioned the cookie generation hook will not
-> >>> be necessary and should be replaced with XDP.
-> 
-> Right, it is also what I have been thinking when seeing the 
-> BPF_SOCK_OPS_GEN_SYNCOOKIE_CB carrying the bpf generated timestamp to the 
-> tcp_make_synack. It feels like trying hard to work with the tcp want_cookie 
-> logic while there is an existing better alternative in tc/xdp to deal with synflood.
-> 
-> >>>
-> >>>
-> >>>>> There are already bpf_tcp_{gen,check}_syncookie
-> >>>>> helper that allows to do this for the performance reason to absorb synflood. It
-> >>>>> will be natural to extend it to handle the customized syncookie also.
-> >>>
-> >>> Maybe we even need not extend it and can use XDP as said below.
-> >>>
-> >>>
-> >>>>>
-> >>>>> I think it should already be doable to send a SYNACK back with customized
-> >>>>> syncookie (and timestamp) at tc/xdp today.
-> >>>>>
-> >>>>> When ack is received, the prog@tc/xdp can verify the cookie. It will probably
-> >>>>> need some new kfuncs to create the ireq and queue the child socket. The bpf prog
-> >>>>> can change the ireq->{snd_wscale, sack_ok...} if needed. The details of the
-> >>>>> kfuncs need some more thoughts. I think most of the bpf-side infra is ready,
-> >>>>> e.g. acquire/release/ref-tracking...etc.
-> >>>>>
-> >>>>
-> >>>> I think I mostly agree with this.
-> >>>
-> >>> I didn't come up with kfunc to create ireq and queue it to listener, so
-> >>> cookie_v[46]_check() were best place for me to extend easily, but now it
-> >>> sounds like kfunc would be the way to go.
-> >>>
-> >>> Maybe we can move the core part of cookie_v[46]_check() except for kernel
-> >>> cookie's validation to __cookie_v[46]_check() and expose a wrapper of it
-> >>> as kfunc ?
-> >>>
-> >>> Then, we can look up sk and pass the listener, skb, and flags (for sack_ok,
-> >>> etc) to the kfunc.  (It could still introduce some conflicts with Eric's
-> >>> patch though...)
-> >>
-> >> Does that mean the packets handled in this way (in XDP) will skip all
-> >> netfilter at all?
-> > 
-> > Good point.
-> > 
-> > If we want not to skip other layers, maybe we can use tc ?
-> > 
-> > 1) allocate ireq and set sack_ok etc with kfunc
-> > 2) bpf_sk_assign() to set ireq to skb (this could be done in kfunc above)
-> > 3) let inet_steal_sock() return req->sk_listener if not sk_fullsock(sk)
-> > 4) if skb->sk is reqsk in cookie_v[46]_check(), skip validation and
-> >     req allocation and create full sk
-> 
-> Haven't looked at the details. The above feels reasonable and would be nice if 
-> it works out. don't know if the skb at tc can be used in cookie_v[46]_check() as 
-> is. It probably needs more thoughts.  [ note, xdp does not have skb. ]
-> 
-> Regarding the "allocate ireq and set sack_ok etc with kfunc", do you think it 
-> will be useful (and potentially cleaner) even for the 
-> BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB if it needed to go back to consider skops? Then 
-> only do the BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB and the xdp/tc can generate SYNACK. 
-> The xdp/tc can still do the check and drop the bad ACK earlier in the stack.
+By default, VXLAN encapsulation over IPv6 sets the flow label to 0, with
+an option for a fixed value. This commits add the ability to inherit the
+flow label from the inner packet, like for other tunnel implementations.
+This enables devices using only L3 headers for ECMP to correctly balance
+VXLAN-encapsulated IPv6 packets.
 
-kfunc would be useful if we want to fall back to the default
-validation, but I think we should not allocate ireq in kfunc.
+```
+$ ./ip/ip link add dummy1 type dummy
+$ ./ip/ip addr add 2001:db8::2/64 dev dummy1
+$ ./ip/ip link set up dev dummy1
+$ ./ip/ip link add vxlan1 type vxlan id 100 flowlabel inherit remote 2001:db8::1 local 2001:db8::2
+$ ./ip/ip link set up dev vxlan1
+$ ./ip/ip addr add 2001:db8:1::2/64 dev vxlan1
+$ ./ip/ip link set arp off dev vxlan1
+$ ping -q 2001:db8:1::1 &
+$ tshark -d udp.port==8472,vxlan -Vpni dummy1 -c1
+[...]
+Internet Protocol Version 6, Src: 2001:db8::2, Dst: 2001:db8::1
+    0110 .... = Version: 6
+    .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
+        .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
+        .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+    .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
+[...]
+Virtual eXtensible Local Area Network
+    Flags: 0x0800, VXLAN Network ID (VNI)
+    Group Policy ID: 0
+    VXLAN Network Identifier (VNI): 100
+[...]
+Internet Protocol Version 6, Src: 2001:db8:1::2, Dst: 2001:db8:1::1
+    0110 .... = Version: 6
+    .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
+        .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
+        .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+    .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
+```
 
-The SOCK_OPS prog only returns a binary value.  If we decide whether
-we skip validation or not based on kfunc call (ireq allocation), the
-flow would be like :
+Signed-off-by: Alce Lafranque <alce@lafranque.net>
+Co-developed-by: Vincent Bernat <vincent@bernat.ch>
+Signed-off-by: Vincent Bernat <vincent@bernat.ch>
 
-  1. CG_OK & ireq is allocated -> skip validation and req allocation
-  2. CG_OK & no ireq           -> default validation
-  3. CG_ERR                    -> RST
+---
+v5:
+  - Rollback policy label to fixed by default
+v4: https://lore.kernel.org/all/20231014132102.54051-1-alce@lafranque.net/
+  - Fix tabs
+v3: https://lore.kernel.org/all/20231014131320.51810-1-alce@lafranque.net/
+  - Adopt policy label inherit by default
+  - Set policy to label fixed when flowlabel is set
+  - Rename IFLA_VXLAN_LABEL_BEHAVIOR to IFLA_VXLAN_LABEL_POLICY
+v2: https://lore.kernel.org/all/20231007142624.739192-1-alce@lafranque.net/
+  - Use an enum instead of flag to define label behavior
+v1: https://lore.kernel.org/all/4444C5AE-FA5A-49A4-9700-7DD9D7916C0F.1@mail.lac-coloc.fr/
+---
+ drivers/net/vxlan/vxlan_core.c | 23 ++++++++++++++++++++++-
+ include/net/ip_tunnels.h       | 11 +++++++++++
+ include/net/vxlan.h            | 33 +++++++++++++++++----------------
+ include/uapi/linux/if_link.h   |  8 ++++++++
+ 4 files changed, 58 insertions(+), 17 deletions(-)
 
-The problem here is that if kfunc fails with -ENOMEM and cookie
-is valid, we need a way to tell the kernel to drop the ACK instead
-of sending RST.  (I hope the prog could return CG_DROP...)
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 5b5597073b00..9d1e41dc5548 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -2475,7 +2475,17 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 		else
+ 			udp_sum = !(flags & VXLAN_F_UDP_ZERO_CSUM6_TX);
+ #if IS_ENABLED(CONFIG_IPV6)
+-		label = vxlan->cfg.label;
++		switch (vxlan->cfg.label_policy) {
++		case VXLAN_LABEL_FIXED:
++			label = vxlan->cfg.label;
++			break;
++		case VXLAN_LABEL_INHERIT:
++			label = ip_tunnel_get_flowlabel(old_iph, skb);
++			break;
++		default:
++			DEBUG_NET_WARN_ON_ONCE(1);
++			goto drop;
++		}
+ #endif
+ 	} else {
+ 		if (!info) {
+@@ -3286,6 +3296,7 @@ static const struct nla_policy vxlan_policy[IFLA_VXLAN_MAX + 1] = {
+ 	[IFLA_VXLAN_DF]		= { .type = NLA_U8 },
+ 	[IFLA_VXLAN_VNIFILTER]	= { .type = NLA_U8 },
+ 	[IFLA_VXLAN_LOCALBYPASS]	= NLA_POLICY_MAX(NLA_U8, 1),
++	[IFLA_VXLAN_LABEL_POLICY]	= NLA_POLICY_MAX(NLA_U8, VXLAN_LABEL_MAX),
+ };
+ 
+ static int vxlan_validate(struct nlattr *tb[], struct nlattr *data[],
+@@ -3660,6 +3671,12 @@ static int vxlan_config_validate(struct net *src_net, struct vxlan_config *conf,
+ 		return -EINVAL;
+ 	}
+ 
++	if (conf->label_policy && !use_ipv6) {
++		NL_SET_ERR_MSG(extack,
++			       "Label policy only applies to IPv6 VXLAN devices");
++		return -EINVAL;
++	}
++
+ 	if (conf->remote_ifindex) {
+ 		struct net_device *lowerdev;
+ 
+@@ -4002,6 +4019,8 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
+ 	if (data[IFLA_VXLAN_LABEL])
+ 		conf->label = nla_get_be32(data[IFLA_VXLAN_LABEL]) &
+ 			     IPV6_FLOWLABEL_MASK;
++	if (data[IFLA_VXLAN_LABEL_POLICY])
++		conf->label_policy = nla_get_u8(data[IFLA_VXLAN_LABEL_POLICY]);
+ 
+ 	if (data[IFLA_VXLAN_LEARNING]) {
+ 		err = vxlan_nl2flag(conf, data, IFLA_VXLAN_LEARNING,
+@@ -4315,6 +4334,7 @@ static size_t vxlan_get_size(const struct net_device *dev)
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_TOS */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_DF */
+ 		nla_total_size(sizeof(__be32)) + /* IFLA_VXLAN_LABEL */
++		nla_total_size(sizeof(__u8)) +  /* IFLA_VXLAN_LABEL_POLICY */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_LEARNING */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_PROXY */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_RSC */
+@@ -4387,6 +4407,7 @@ static int vxlan_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ 	    nla_put_u8(skb, IFLA_VXLAN_TOS, vxlan->cfg.tos) ||
+ 	    nla_put_u8(skb, IFLA_VXLAN_DF, vxlan->cfg.df) ||
+ 	    nla_put_be32(skb, IFLA_VXLAN_LABEL, vxlan->cfg.label) ||
++	    nla_put_u8(skb, IFLA_VXLAN_LABEL_POLICY, vxlan->cfg.label_policy) ||
+ 	    nla_put_u8(skb, IFLA_VXLAN_LEARNING,
+ 		       !!(vxlan->cfg.flags & VXLAN_F_LEARN)) ||
+ 	    nla_put_u8(skb, IFLA_VXLAN_PROXY,
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index f346b4efbc30..2d746f4c9a0a 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -416,6 +416,17 @@ static inline u8 ip_tunnel_get_dsfield(const struct iphdr *iph,
+ 		return 0;
+ }
+ 
++static inline __be32 ip_tunnel_get_flowlabel(const struct iphdr *iph,
++					     const struct sk_buff *skb)
++{
++	__be16 payload_protocol = skb_protocol(skb, true);
++
++	if (payload_protocol == htons(ETH_P_IPV6))
++		return ip6_flowlabel((const struct ipv6hdr *)iph);
++	else
++		return 0;
++}
++
+ static inline u8 ip_tunnel_get_ttl(const struct iphdr *iph,
+ 				       const struct sk_buff *skb)
+ {
+diff --git a/include/net/vxlan.h b/include/net/vxlan.h
+index 6a9f8a5f387c..33ba6fc151cf 100644
+--- a/include/net/vxlan.h
++++ b/include/net/vxlan.h
+@@ -210,22 +210,23 @@ struct vxlan_rdst {
+ };
+ 
+ struct vxlan_config {
+-	union vxlan_addr	remote_ip;
+-	union vxlan_addr	saddr;
+-	__be32			vni;
+-	int			remote_ifindex;
+-	int			mtu;
+-	__be16			dst_port;
+-	u16			port_min;
+-	u16			port_max;
+-	u8			tos;
+-	u8			ttl;
+-	__be32			label;
+-	u32			flags;
+-	unsigned long		age_interval;
+-	unsigned int		addrmax;
+-	bool			no_share;
+-	enum ifla_vxlan_df	df;
++	union vxlan_addr		remote_ip;
++	union vxlan_addr		saddr;
++	__be32				vni;
++	int				remote_ifindex;
++	int				mtu;
++	__be16				dst_port;
++	u16				port_min;
++	u16				port_max;
++	u8				tos;
++	u8				ttl;
++	__be32				label;
++	enum ifla_vxlan_label_policy	label_policy;
++	u32				flags;
++	unsigned long			age_interval;
++	unsigned int			addrmax;
++	bool				no_share;
++	enum ifla_vxlan_df		df;
+ };
+ 
+ enum {
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index fac351a93aed..e89cf3c53ea4 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -830,6 +830,7 @@ enum {
+ 	IFLA_VXLAN_DF,
+ 	IFLA_VXLAN_VNIFILTER, /* only applicable with COLLECT_METADATA mode */
+ 	IFLA_VXLAN_LOCALBYPASS,
++	IFLA_VXLAN_LABEL_POLICY,
+ 	__IFLA_VXLAN_MAX
+ };
+ #define IFLA_VXLAN_MAX	(__IFLA_VXLAN_MAX - 1)
+@@ -847,6 +848,13 @@ enum ifla_vxlan_df {
+ 	VXLAN_DF_MAX = __VXLAN_DF_END - 1,
+ };
+ 
++enum ifla_vxlan_label_policy {
++	VXLAN_LABEL_FIXED = 0,
++	VXLAN_LABEL_INHERIT = 1,
++	__VXLAN_LABEL_END,
++	VXLAN_LABEL_MAX = __VXLAN_LABEL_END - 1,
++};
++
+ /* GENEVE section */
+ enum {
+ 	IFLA_GENEVE_UNSPEC,
+-- 
+2.39.2
 
-If we allocate ireq first, it would be cleaner as bpf need not care
-about the drop path.
-
-  1. CG_OK & mss is set -> skip validation
-  2. CG_OK & no mss set -> default validation
-  3. CG_ERR             -> RST
 
