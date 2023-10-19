@@ -1,116 +1,129 @@
-Return-Path: <netdev+bounces-42663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0C507CFC75
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:27:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32C347CFC7D
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:28:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ED17B20C10
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:27:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0C34280F72
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CAD129D19;
-	Thu, 19 Oct 2023 14:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D422A29D19;
+	Thu, 19 Oct 2023 14:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H1OppBzy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2hnKkqu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42D129D0A;
-	Thu, 19 Oct 2023 14:26:57 +0000 (UTC)
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E2EBD76;
-	Thu, 19 Oct 2023 07:26:51 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9bdf5829000so978876566b.0;
-        Thu, 19 Oct 2023 07:26:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B97C29CF3
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 14:28:07 +0000 (UTC)
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0B70189;
+	Thu, 19 Oct 2023 07:28:05 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-d9a7a3e17d1so9330166276.2;
+        Thu, 19 Oct 2023 07:28:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697725610; x=1698330410; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ANPRrxI+fIR5f5AhEGCz13wMOFrWpvb4MuqzDfnz8fE=;
-        b=H1OppBzygoiSoS4oxmRZpZVT714+wEjKurBUkgNlu4RjpMeEya9rpe0D262qXu//Mp
-         fxvVGJquYQ7O3akmuHp6uh0tutchAHmNQ3fn7nkUa3ffyTfbyncrRczWnZNtEEEwsy6v
-         d+QU9NYaTxLwirpvnbtuYxKhslbm2WWI5KithNkSgBnzTImBFYeqrEiYHK/jNc8rfDiB
-         X1KSMGg7ZajSv4RH3KKdBG/VwrLQm1ZLnUrwskWl6sR1XZxdQfkY2eddbPb4jSZqXUu+
-         zWVmp5nxruC3WDQ+CQWsiDXVmuIV9zfDcWlWoYerZZrEj3/Vy16Ov+0mjz+aMhT9n25q
-         /dMQ==
+        d=gmail.com; s=20230601; t=1697725685; x=1698330485; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oBMpoyva4vl1WYLwrQEM86CCdZibJLAIkHQxuLCt39w=;
+        b=J2hnKkqur7ibUKV8S1SCpQrulpgOYNU8uBCm218d47KxD/7VFnz8x/q90p5x4tn0/s
+         fxqD6qH/5uVmqA5mNINfvYkU/6S2nAzcmesSqVH4ulEzm7tz0cgUAL0zTxCA0rs7fXJm
+         zc00g3sjBHPIsKaguSltmmKohlf1CvWEDQ0bwK2VXztGzfuaEKlO2RFTp6+cMiISExII
+         vPtN0NDQAPAziNQNibeizM/EqV14jihvK4/oNybk4CjfCQStSN1HRSjVVzqA7ES3hg24
+         zlLjdpedE99TVEJTPdQvs4QKpMz2vStw2Ht0Vrrne8wLPXnWtrDVsg0A7no7B+rXPbGu
+         7+Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697725610; x=1698330410;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ANPRrxI+fIR5f5AhEGCz13wMOFrWpvb4MuqzDfnz8fE=;
-        b=f3p/jKwxma6RkJDSRrI9psMhnyJLpbcq4lu5hYvEma1JDfLcui2G7Xxtm4vcW1ttCp
-         Kx0bHbxR6kHXBtMd6c4lOppAT/uBzQMSNzV1TUnqSkhUXTauq4MpR9o2BtD3q1YKOJ/y
-         L6EpK0ZxFVAx5iavDGfbP+Njb39jtIVIZ5RrMY/CNhdQP2I8RUl4IxIb2+GRu6o713Tx
-         sWNvRQdgXx+bBENDr/A9KR7oG84jHhdtDWFKwsenOI0N1Bo5MbtBkBgf6eRRg7vlrz4p
-         PDb1f78nUKJX63gBqW7tMVGwajuzUOTvO77nbt8tfj1DHT8GFTpR3KQkG16v/FkR6HbH
-         LRvw==
-X-Gm-Message-State: AOJu0YzvspNGxPCLXYHL27gDN0uZQebgPBbkQ88p7FKmjvIec04mmSY6
-	XpDQUUPIX0jutL1C00QUlNg=
-X-Google-Smtp-Source: AGHT+IELS/atS/J8KuLWpafdm5LGQoyw401tryiwKpNzWoBHZRQBCOdAVuGKRa7iX1Bms1/0BFyDYw==
-X-Received: by 2002:a17:906:db07:b0:9be:aebc:d479 with SMTP id xj7-20020a170906db0700b009beaebcd479mr2001505ejb.19.1697725609594;
-        Thu, 19 Oct 2023 07:26:49 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id g11-20020a170906348b00b009ad8acac02asm3703327ejb.172.2023.10.19.07.26.48
+        d=1e100.net; s=20230601; t=1697725685; x=1698330485;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oBMpoyva4vl1WYLwrQEM86CCdZibJLAIkHQxuLCt39w=;
+        b=OY9IOz1EUSK0Ob4wtfaFU03ryfAva5JJGYlWeyAyS84RmCzGREbkjKEnxqOeeNWWX0
+         35nFEl7YJWADP7Wg8mSgel0aninvDGGykRwxGGd1ycpOfCBNJ03r5xTrzo5TNhIEQl0C
+         e8BT+6kEPJv67OOWmPgb4vx7VZwKeRzuThYIzfqudOntK6vYXZ8FjISFsYv6RKMS49m6
+         PolN/x6pIVxGk1dAIqHByWLkTxCxfbgBGmBnr/IaqWej1unfrJGItWjta8ErFw4lbZqG
+         AMtlnejlLipvbljjeGXsOmyYxxNhacrOvKmSHiaww237cAJj6ClBPpJwq+E2tl1rnQ8b
+         xBtQ==
+X-Gm-Message-State: AOJu0Yze/9tFzH6Q+sykkXIK5rkXpQ7QvjaH6GmeUzpS1m/1Jb3Xf3e+
+	8kx/z0m13fWPVD5s4u7Xxm2wKrI1StVC9g==
+X-Google-Smtp-Source: AGHT+IGRM7KqfY5SHNFk503Wz2rQrxExX77omLZ0a0zHhWZO1QvrPGH/BlBWfUmXbRCdZOCwOLUM6g==
+X-Received: by 2002:a25:8a0b:0:b0:d9b:4c61:26f1 with SMTP id g11-20020a258a0b000000b00d9b4c6126f1mr2375244ybl.24.1697725684902;
+        Thu, 19 Oct 2023 07:28:04 -0700 (PDT)
+Received: from localhost (modemcable065.128-200-24.mc.videotron.ca. [24.200.128.65])
+        by smtp.gmail.com with ESMTPSA id q8-20020ac84508000000b0041cb8732d57sm769355qtn.38.2023.10.19.07.28.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 07:26:49 -0700 (PDT)
-Date: Thu, 19 Oct 2023 17:26:46 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>, devicetree@vger.kernel.org,
-	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	Conor Dooley <conor+dt@kernel.org>
-Subject: Re: [PATCH net-next v4 2/7] dt-bindings: net: mvusb: Fix up DSA
- example
-Message-ID: <20231019142646.iw6x72y6sqt4q2uw@skbuf>
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-2-3ee0c67383be@linaro.org>
- <169762516741.391849.18342287891015837205.robh@kernel.org>
- <CACRpkdZff9fbeJdxqudCtjad=FVKTKQtvo_=GiEBOvnw5xQapw@mail.gmail.com>
- <20231019134514.GA193647-robh@kernel.org>
+        Thu, 19 Oct 2023 07:28:04 -0700 (PDT)
+Date: Thu, 19 Oct 2023 10:28:03 -0400
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Coiby Xu <coiby.xu@gmail.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Cai Huoqing <cai.huoqing@linux.dev>,
+	George Cherian <george.cherian@marvell.com>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Igor Russkikh <irusskikh@marvell.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>,
+	Leon Romanovsky <leon@kernel.org>, linux-kernel@vger.kernel.org,
+	Shung-Hsi Yu <shung-hsi.yu@suse.com>
+Subject: Re: [PATCH net-next v2 10/11] staging: qlge: devlink health: use
+ retained error fmsg API
+Message-ID: <ZTE884nkvAxKy2G3@d3>
+References: <20231017105341.415466-1-przemyslaw.kitszel@intel.com>
+ <20231017105341.415466-11-przemyslaw.kitszel@intel.com>
+ <20231017181543.70a75b82@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231019134514.GA193647-robh@kernel.org>
+In-Reply-To: <20231017181543.70a75b82@kernel.org>
 
-On Thu, Oct 19, 2023 at 08:45:14AM -0500, Rob Herring wrote:
-> On Wed, Oct 18, 2023 at 01:37:10PM +0200, Linus Walleij wrote:
-> > On Wed, Oct 18, 2023 at 12:32 PM Rob Herring <robh@kernel.org> wrote:
+On 2023-10-17 18:15 -0700, Jakub Kicinski wrote:
+> On Tue, 17 Oct 2023 12:53:40 +0200 Przemek Kitszel wrote:
+> > Drop unneeded error checking.
 > > 
-> > > dtschema/dtc warnings/errors:
-> > > Documentation/devicetree/bindings/net/marvell,mvusb.example.dtb: /example-0/usb/mdio@1/ethernet-switch@0: failed to match any schema with compatible: ['marvell,mv88e6190']
-> > 
-> > Isn't that just because the bindings now come last in the series.
-> > Which is in response to a review comment, hence this warning
-> > didn't appear before.
+> > devlink_fmsg_*() family of functions is now retaining errors,
+> > so there is no need to check for them after each call.
 > 
-> Yes. The only option that avoids this is squashing the 2 patches. I 
-> think it is fine to leave this as-is.
+> Humpf. Unrelated to the set, when did qlge grow devlink support?!
 > 
-> Rob
+> Coiby, do you still use this HW?
+> 
+> It looks like the driver was moved to staging on account of being
+> old and unused, and expecting that we'll delete it. Clearly that's
+> not the case if people are adding devlink support, so should we
+> move it back?
 
-Anyway, I'm surprised that the bot would send this email, since the
-warning existed prior to this patch, and I would expect that the bot
-only notifies of newly introduced issues.
+AFAIK this was done by Coiby as an exercise in kernel programming.
+Improving the debugging dump facilities was one of the tasks in the TODO
+file.
+
+I moved the driver to staging because it had many problems and it had
+been abandoned by the vendor. There might be some qlge users left but is
+that reason enough to move the driver back to drivers/net/ if there is
+no one who is interested in doing more than checkpatch fixes on the
+driver?
 
