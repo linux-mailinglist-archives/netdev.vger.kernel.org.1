@@ -1,124 +1,98 @@
-Return-Path: <netdev+bounces-42730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A8B37CFFB6
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:37:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C368A7CFFBA
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:38:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D867D2820A1
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:37:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51C3EB2118A
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD5D27458;
-	Thu, 19 Oct 2023 16:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B71727466;
+	Thu, 19 Oct 2023 16:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NGW35ebD"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="cnxw4E/P"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD1C32C68
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 16:37:32 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0BB4124
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 09:37:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697733450;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=aCk5y5U6S6pBpWhKJtSh1SurFp9oD5gnKu4jbHvlKmo=;
-	b=NGW35ebDzS11SfHqb63WcU9VdCOYi7ofFv5tm9xM1Jx5A+IqhOW7VgY2/PJREj0Pz2aaUP
-	68DfLTNd9rDvSqOU47mor35vvpoMiCrtmficM9AbxMtM/UukJeAHLFk4SVGTUi+kBAgiF0
-	vndICMyDF/t7LDMpzGmxTuZoQt4V5L0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-444-TxVd3RA4PPiZ1DhsYil0lA-1; Thu, 19 Oct 2023 12:37:24 -0400
-X-MC-Unique: TxVd3RA4PPiZ1DhsYil0lA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E3B828E6D01;
-	Thu, 19 Oct 2023 16:37:23 +0000 (UTC)
-Received: from p1.luc.com (unknown [10.45.226.105])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0379925C8;
-	Thu, 19 Oct 2023 16:37:21 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Mateusz Palczewski <mateusz.palczewski@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Przemyslaw Patynowski <przemyslawx.patynowski@intel.com>,
-	Sylwester Dziedziuch <sylwesterx.dziedziuch@intel.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net v2] i40e: Fix I40E_FLAG_VF_VLAN_PRUNING value
-Date: Thu, 19 Oct 2023 18:37:20 +0200
-Message-ID: <20231019163721.1333370-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8C032C73
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 16:38:00 +0000 (UTC)
+Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EECBB132
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 09:37:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1697733474; x=1697992674;
+	bh=Fuy5J52TyHo0W8QuUdMldiH4VtV/X5O0X6u7+caa8Po=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=cnxw4E/PYdjRxO1JSLIuKXxj2yiGW9Qd1LLqJ8wP5cjp73MffoNGR8Jw9Q1HBuztB
+	 yvovZHUCK9FHzCpOvGICd9AW7LX/gEM5ifN2MOkHcFOTNYsjg0mk27ZNGVN53wp47G
+	 jEVjVxKZ5jpgbFDeNHS0pGT3w6ioEaZHuA8xPsXvbq2+T6lsx724EeaoZFV9/Xhgua
+	 bOK4NYKesQbHYcKb3jq/nNJBMfxD2I6znwe7LH9Qh2mX9kVA2K1PFrPJURv31Io2XO
+	 1uKWSVUrRscssHyDWGUv7JDuq5kCh4Zf6uDk7Y30StqHioHTC8SiEk1efnta28Vpj+
+	 2jQgtuXla403g==
+Date: Thu, 19 Oct 2023 16:37:46 +0000
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
+Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
+Message-ID: <398ec812-3dce-40b1-b4eb-bfff7e3feb6a@proton.me>
+In-Reply-To: <20231020.003219.1788909848908453261.fujita.tomonori@gmail.com>
+References: <0e8d2538-284b-4811-a2e7-99151338c255@proton.me> <20231019.234210.1772681043146865420.fujita.tomonori@gmail.com> <64db34c0-a50a-4321-a3d8-b692e26899d9@proton.me> <20231020.003219.1788909848908453261.fujita.tomonori@gmail.com>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Commit c87c938f62d8f1 ("i40e: Add VF VLAN pruning") added new
-PF flag I40E_FLAG_VF_VLAN_PRUNING but its value collides with
-existing I40E_FLAG_TOTAL_PORT_SHUTDOWN_ENABLED flag.
+On 19.10.23 17:32, FUJITA Tomonori wrote:
+>> You can just do this (I omitted the `::kernel::` prefix for
+>> readability, if you add this in the macro, please include it):
+>>
+>>       // CAST: `DriverVTable` is `repr(transparent)` and wrapping `bindi=
+ngs::phy_driver`.
+>>       let ptr =3D drv.as_mut_ptr().cast::<bindings::phy_driver>();
+>>       let len =3D drv.len().try_into()?;
+>>       // SAFETY: ...
+>>       to_result(unsafe { bindings::phy_drivers_register(ptr, len, module=
+.0) })?;
+>>
+>>>                   })?;
+>=20
+> The above solves DriverVTable.0 but still the macro can't access to
+> kernel::ThisModule.0. I got the following error:
 
-Move the affected flag at the end of the flags and fix its value.
+I think we could just provide an `as_ptr` getter function
+for `ThisModule`. But need to check with the others.
 
-Reproducer:
-[root@cnb-03 ~]# ethtool --set-priv-flags enp2s0f0np0 link-down-on-close on
-[root@cnb-03 ~]# ethtool --set-priv-flags enp2s0f0np0 vf-vlan-pruning on
-[root@cnb-03 ~]# ethtool --set-priv-flags enp2s0f0np0 link-down-on-close off
-[ 6323.142585] i40e 0000:02:00.0: Setting link-down-on-close not supported on this port (because total-port-shutdown is enabled)
-netlink error: Operation not supported
-[root@cnb-03 ~]# ethtool --set-priv-flags enp2s0f0np0 vf-vlan-pruning off
-[root@cnb-03 ~]# ethtool --set-priv-flags enp2s0f0np0 link-down-on-close off
+[...]
 
-The link-down-on-close flag cannot be modified after setting vf-vlan-pruning
-because vf-vlan-pruning shares the same bit with total-port-shutdown flag
-that prevents any modification of link-down-on-close flag.
+>>>> I suppose that it would be ok to call the register function multiple
+>>>> times, since it only is on module startup/shutdown and it is not
+>>>> performance critical.
+>>>
+>>> I think that we can use the current implantation using Reservation
+>>> struct until someone requests manual creation. I doubt that we will
+>>> need to support such.
+>>
+>> I would like to remove the mutable static variable and simplify
+>> the macro.
+>=20
+> It's worse than having public unsafe function (phy_drivers_unregister)?
 
-Fixes: c87c938f62d8 ("i40e: Add VF VLAN pruning")
-Cc: Mateusz Palczewski <mateusz.palczewski@intel.com>
-Cc: Simon Horman <horms@kernel.org>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Why would that function have to be public?
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index 6e310a53946782..55bb0b5310d5b4 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -580,7 +580,6 @@ struct i40e_pf {
- #define I40E_FLAG_DISABLE_FW_LLDP		BIT(24)
- #define I40E_FLAG_RS_FEC			BIT(25)
- #define I40E_FLAG_BASE_R_FEC			BIT(26)
--#define I40E_FLAG_VF_VLAN_PRUNING		BIT(27)
- /* TOTAL_PORT_SHUTDOWN
-  * Allows to physically disable the link on the NIC's port.
-  * If enabled, (after link down request from the OS)
-@@ -603,6 +602,7 @@ struct i40e_pf {
-  *   in abilities field of i40e_aq_set_phy_config structure
-  */
- #define I40E_FLAG_TOTAL_PORT_SHUTDOWN_ENABLED	BIT(27)
-+#define I40E_FLAG_VF_VLAN_PRUNING		BIT(28)
- 
- 	struct i40e_client_instance *cinst;
- 	bool stat_offsets_loaded;
--- 
-2.41.0
+--=20
+Cheers,
+Benno
+
 
 
