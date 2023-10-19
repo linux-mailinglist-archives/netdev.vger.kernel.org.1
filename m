@@ -1,64 +1,59 @@
-Return-Path: <netdev+bounces-42807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D2D37D033D
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 22:40:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3567D0359
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 22:50:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB2F1282297
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:40:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D613F282295
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464A89472;
-	Thu, 19 Oct 2023 20:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E6E0208B8;
+	Thu, 19 Oct 2023 20:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MUNzOfuX"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Ijc9450L"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED706AB3
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 20:40:45 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A76AA3
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 13:40:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697748044; x=1729284044;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=kluU1UeCwhjpqbdTJq/CRzLxP2XtfihuKrUmoGqgbf4=;
-  b=MUNzOfuXv+VcrTzZOgzZhS1fXpN/o+KaV0mMXmRSUibtWUF+Xb8VXDDG
-   4EFF5XHZDV8NYDeFB8Z8AXYxddBWrejES372TbwI5m+FKzpvu4bz7/FPJ
-   FVOAes+vx7GzuSSlsjLUmc+UH+aFYvDV5rv6XM3jM+4J6Ly+/uC2WnpAY
-   6DHJ28auScxz6wKq0GtKvAoAEQKzBt8KGbslWR73cWIizWOqyXD7nHmkl
-   4I6krN6ygN/sDmv0uuIH0eLFyRA9rSPpN9aB8Fzif9jhneOMj6/zJQsO1
-   rbW7qlXD5eofs0FWgrV6qTrPHD+TSYWVg7D+3vK1EfnekT8gVYUA1Bn0P
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="4970325"
-X-IronPort-AV: E=Sophos;i="6.03,238,1694761200"; 
-   d="scan'208";a="4970325"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 13:40:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="822972471"
-X-IronPort-AV: E=Sophos;i="6.03,238,1694761200"; 
-   d="scan'208";a="822972471"
-Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 13:40:43 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: netdev@vger.kernel.org,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Mateusz Palczewski <mateusz.palczewski@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Arpana Arland <arpanax.arland@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net] igb: Fix potential memory leak in igb_add_ethtool_nfc_entry
-Date: Thu, 19 Oct 2023 13:40:35 -0700
-Message-ID: <20231019204035.3665021-1-jacob.e.keller@intel.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E8F9472;
+	Thu, 19 Oct 2023 20:50:03 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FCEC113;
+	Thu, 19 Oct 2023 13:50:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=eeg4r8JFfBfEn2IXpmpDMMf/UGYFXmzLW7hoM0qMqX8=; b=Ijc9450LPZXDZlJ2lND9l8qVEi
+	/50jTWnADFD21TApHVriUit0M0Nk/N7l0SvWnvHEHwFZNJslFwlWLfuj9bZI4xVkBrEqQ597wgXjK
+	Ww6p+oTOt7vwgymFko4CUQvVMN5PtCyrXpsMATBOIa16hMHifmIyciawqryCtcM5fBRqUGy8TJQq2
+	zcWW4g5RiJwU68ffWaO7/23eWo/X3T9Ieneckrj+ESxhC+meo66TrDeWK+x5Xi8X9tQf7bMnIX5H8
+	AdOzQkuZxXzvaqLCfUncHNZIjDKFapQCmJb1AI3KTbWK3tlfwB7WSfaqcpX+QzooBXpYaWs0jjoF3
+	FkTg9F/A==;
+Received: from 21.249.197.178.dynamic.dsl-lte-bonding.lssmb00p-msn.res.cust.swisscom.ch ([178.197.249.21] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qtZxm-000NdM-85; Thu, 19 Oct 2023 22:49:50 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	martin.lau@linux.dev,
+	razor@blackwall.org,
+	ast@kernel.org,
+	andrii@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@google.com,
+	toke@kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: [PATCH bpf-next v2 0/7] Add bpf programmable net device
+Date: Thu, 19 Oct 2023 22:49:12 +0200
+Message-Id: <20231019204919.4203-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,45 +61,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27066/Thu Oct 19 09:45:47 2023)
+X-Spam-Level: *
 
-From: Mateusz Palczewski <mateusz.palczewski@intel.com>
+This work adds a BPF programmable device which can operate in L3 or L2
+mode where the BPF program is part of the xmit routine. It's program
+management is done via bpf_mprog and it comes with BPF link support.
+For details see patch 1 and following. Thanks!
 
-Add check for return of igb_update_ethtool_nfc_entry so that in case
-of any potential errors the memory alocated for input will be freed.
+v1 -> v2:
+  - Rename from meta (Toke, Andrii, Alexei)
+  - Reuse skb_scrub_packet (Stan)
+  - Remove IFF_META and use netdev_ops (Toke)
+  - Add comment to multicast handler (Toke)
+  - Remove silly version info (Toke)
+  - Fix attach_type_name (Quentin)
+  - Rework libbpf link attach api to be similar
+    as tcx (Andrii)
+  - Move flags last for bpf_netkit_opts (Andrii)
+  - Rebased to bpf_mprog query api changes
+  - Folded link support patch into main one
 
-Fixes: 0e71def25281 ("igb: add support of RX network flow classification")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
-Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/igb/igb_ethtool.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Daniel Borkmann (7):
+  netkit, bpf: Add bpf programmable net device
+  tools: Sync if_link uapi header
+  libbpf: Add link-based API for netkit
+  bpftool: Implement link show support for netkit
+  bpftool: Extend net dump with netkit progs
+  selftests/bpf: Add netlink helper library
+  selftests/bpf: Add selftests for netkit
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-index 319ed601eaa1..4ee849985e2b 100644
---- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-+++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-@@ -2978,11 +2978,15 @@ static int igb_add_ethtool_nfc_entry(struct igb_adapter *adapter,
- 	if (err)
- 		goto err_out_w_lock;
- 
--	igb_update_ethtool_nfc_entry(adapter, input, input->sw_idx);
-+	err = igb_update_ethtool_nfc_entry(adapter, input, input->sw_idx);
-+	if (err)
-+		goto err_out_input_filter;
- 
- 	spin_unlock(&adapter->nfc_lock);
- 	return 0;
- 
-+err_out_input_filter:
-+	igb_erase_filter(adapter, input);
- err_out_w_lock:
- 	spin_unlock(&adapter->nfc_lock);
- err_out:
+ MAINTAINERS                                   |   9 +
+ drivers/net/Kconfig                           |   9 +
+ drivers/net/Makefile                          |   1 +
+ drivers/net/netkit.c                          | 926 ++++++++++++++++++
+ include/net/netkit.h                          |  38 +
+ include/uapi/linux/bpf.h                      |  13 +
+ include/uapi/linux/if_link.h                  |  24 +
+ kernel/bpf/syscall.c                          |  30 +-
+ .../bpf/bpftool/Documentation/bpftool-net.rst |   8 +-
+ tools/bpf/bpftool/link.c                      |   7 +
+ tools/bpf/bpftool/net.c                       |   7 +-
+ tools/include/uapi/linux/bpf.h                |  13 +
+ tools/include/uapi/linux/if_link.h            | 141 +++
+ tools/lib/bpf/bpf.c                           |  16 +
+ tools/lib/bpf/bpf.h                           |   5 +
+ tools/lib/bpf/libbpf.c                        |  39 +
+ tools/lib/bpf/libbpf.h                        |  15 +
+ tools/lib/bpf/libbpf.map                      |   1 +
+ tools/testing/selftests/bpf/Makefile          |  19 +-
+ tools/testing/selftests/bpf/config            |   1 +
+ tools/testing/selftests/bpf/netlink_helpers.c | 358 +++++++
+ tools/testing/selftests/bpf/netlink_helpers.h |  46 +
+ .../selftests/bpf/prog_tests/tc_helpers.h     |   4 +
+ .../selftests/bpf/prog_tests/tc_netkit.c      | 687 +++++++++++++
+ .../selftests/bpf/progs/test_tc_link.c        |  13 +
+ 25 files changed, 2415 insertions(+), 15 deletions(-)
+ create mode 100644 drivers/net/netkit.c
+ create mode 100644 include/net/netkit.h
+ create mode 100644 tools/testing/selftests/bpf/netlink_helpers.c
+ create mode 100644 tools/testing/selftests/bpf/netlink_helpers.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_netkit.c
 
-base-commit: ce55c22ec8b223a90ff3e084d842f73cfba35588
 -- 
-2.41.0
+2.34.1
 
 
