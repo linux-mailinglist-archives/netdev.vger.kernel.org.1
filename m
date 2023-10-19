@@ -1,142 +1,173 @@
-Return-Path: <netdev+bounces-42597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450407CF7D7
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:01:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6AB47CF7EE
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:03:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0A12B2131B
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:01:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3146A281A83
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690321DFDC;
-	Thu, 19 Oct 2023 12:00:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5D61DFE3;
+	Thu, 19 Oct 2023 12:02:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="ICciGBf5"
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="TQM2dRoy"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B7D1DFF4
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:00:56 +0000 (UTC)
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0290132
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:00:54 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6be0277c05bso3579801b3a.0
-        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 05:00:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1697716854; x=1698321654; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rkvXWDkzUdqkRQ+D3sDYU4OvGGZLi1kyLlJlX/MPCKc=;
-        b=ICciGBf5r9JZGnS2VRdr67YntpMrbbQZFCvDQFj++1wwui82x6N7cop+vhyKLrX3SS
-         G8r+oGcoZGB6kkwMA76NnVTh3V47wgkROcLDOyojU9SbeTUNecRT8RdBxFzJW9o0DiSQ
-         YcQcUnzfDPCIR2hTVSy7wb9sIT8th7aTOS62Cvm6IqbIdR49He9cOZpPA5xVbRbmgxId
-         gE/d/k6KY1pGXdLbvregAbe6O4WqyebGQFjx/neRlhERcTujD1ipKMqd2UFyXX8dFYmW
-         rFlrDQTtZ8GqLp70BdbBjiyxNPQ3Na1YGYacPFnb6qVFXen7AsRBzYbJGWR9CGf7qx4/
-         o8SQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697716854; x=1698321654;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rkvXWDkzUdqkRQ+D3sDYU4OvGGZLi1kyLlJlX/MPCKc=;
-        b=hdeD8c4BATag4rnluwiqK7Y9gqvxRE/ZknP0YQGO4ftxZUuLTHhZ1gor2qqBzAcsFF
-         3w0kMkJr4CbMTzLKJ967+q5Pv14a2+y0SLquQbwhb0zZafKtzPXbhxyV6QDwHdu0FgwL
-         vAq9h3o/aqiMaGrSRJNu9OfpnXhaIT/DKuMytVO0gXfOV5yNCYFALi1UEtI57/RvioaP
-         Rk26bGYl63trP9NTKTUDIo+BIJLkBAr95WMh6pC1W4nomQJyDvB7VCItowIe9Vckv3ru
-         fSqsAR1NeBAnnNfbDW2FsZArmxz07DQoo7RIr9TiD8npEW8tCgnvVBvbnXIcVsP4PyGp
-         lIxQ==
-X-Gm-Message-State: AOJu0YzYAk4GrQvwbiGUYSnNoKGKT09QV3rcV7ymViCTT3E8nybuQ6Cj
-	fynIspwyCjr/TeK9iqWLjYAWkA==
-X-Google-Smtp-Source: AGHT+IHvyW0QSlMwAWAA0xidP7Zv3fC3Zs9hQWuI1QW0RwfCBEES+98tXPWRsWP1awV9zWwmh3MYTw==
-X-Received: by 2002:a05:6a21:1509:b0:13d:1d14:6693 with SMTP id nq9-20020a056a21150900b0013d1d146693mr1867657pzb.45.1697716854436;
-        Thu, 19 Oct 2023 05:00:54 -0700 (PDT)
-Received: from C02DV8HUMD6R.bytedance.net ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id jg9-20020a17090326c900b001c727d3ea6bsm1785646plb.74.2023.10.19.05.00.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 05:00:54 -0700 (PDT)
-From: Abel Wu <wuyun.abel@bytedance.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shakeel Butt <shakeelb@google.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Abel Wu <wuyun.abel@bytedance.com>
-Subject: [PATCH net v3 3/3] sock: Ignore memcg pressure heuristics when raising allocated
-Date: Thu, 19 Oct 2023 20:00:26 +0800
-Message-Id: <20231019120026.42215-3-wuyun.abel@bytedance.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20231019120026.42215-1-wuyun.abel@bytedance.com>
-References: <20231019120026.42215-1-wuyun.abel@bytedance.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F2A1DFE0
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:02:56 +0000 (UTC)
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2070.outbound.protection.outlook.com [40.107.13.70])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15A9C19A;
+	Thu, 19 Oct 2023 05:02:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UAJCGfgTWUyyF7SzrVJSnujcS+paps8VNoKa9VBmOYNddqhkuxsbmfJyeocXbXWRkmDUb9PD2I9V3nKKQmqtzsL5uzHTzQWBr7uAQV0+hGoNrYNOb06/tjGO2rCscxhmiftxmz4T0fp5x/mz1vtYPp+4T5HG4fFk+aXrD+JZOCGF/5habShmGgOzkPygPK4ZX1jE7TsYJDAV1g77Y1/nSjHXmCSX6FdbvuQ7gMMPgg0D0TtcQKr+cUkggiJx7cRgWXK4zdJbIv+PXqXGcgJg8Y39vhqmlL8KOhQTEGvG3Y6V+3IM5kYd8fxA/59LFeKfFOPqb1Ln+lD2v31TDMKeVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tJ6IWB1eO23xxxCaqkfHUdzdxtoCCVxgxW7CGg8ub4o=;
+ b=HCH1reW/UuyAmIO3IWsAnK28um9by+lQeFlzyZqGYG7obojBvYlMkYid9y62SY1nrTHZwwZsLfD9wlJw4WXXQrnsD3JZtPcBxaE9VNmT1N/XK4xR2rQ2NHofPNtq+uNH3Vty5bJBGQyhHHuDSkfmc/1bv2iovFnpkkCWFwkVELoEHAoKq5x0gWLDoZA9RtmsqazzriVbPguaXsXqW3OzU4H/1p30u1uiy8t7NO+dBTukmJogOSdUkiDuxFehCyZVmetJmsUyr2LdXNOfBWOU/nBgkbhFmJHqXGhw3zhbYEzvs9t6Xe5n3Wh2f1sBfx99R0DgmsLNxHyIr1NOTjHNpg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tJ6IWB1eO23xxxCaqkfHUdzdxtoCCVxgxW7CGg8ub4o=;
+ b=TQM2dRoyPja4XbBpCzeacslMIBI66nalXNW5p8Yk/QvCHFqEgSYb1W4pJ3daXCHg7PTMOTThOaC91wbnZnXVsRNPS+JIS5rAx4NrVvgJqy8jYCL8vaS2dycyspZdbW75ixvdrp+c8Yq73Dbnx600TjM3IC6TIDbj7/tHTi8GbgU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by DBBPR04MB7961.eurprd04.prod.outlook.com (2603:10a6:10:1ee::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.7; Thu, 19 Oct
+ 2023 12:02:50 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::e109:7026:7d76:5617]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::e109:7026:7d76:5617%7]) with mapi id 15.20.6933.008; Thu, 19 Oct 2023
+ 12:02:50 +0000
+From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+To: sd@queasysnail.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	richardcochran@gmail.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	sebastian.tobuschat@oss.nxp.com,
+	"Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Subject: [PATCH net-next v7 0/7] Add MACsec support for TJA11XX C45 PHYs
+Date: Thu, 19 Oct 2023 15:02:02 +0300
+Message-Id: <20231019120209.290480-1-radu-nicolae.pirea@oss.nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VI1PR08CA0236.eurprd08.prod.outlook.com
+ (2603:10a6:802:15::45) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|DBBPR04MB7961:EE_
+X-MS-Office365-Filtering-Correlation-Id: ca1cec73-e0da-4642-92b8-08dbd09b505d
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	9bf5XIhjFIZuDqJQRaWqTI65TS00jSiQF4rL684lwxorYOazs6TdZPy+Pq08+X6VRH8CiBtMFFDKyv2uZgaksvQr2QAVtrKEjs/v0CFG+RKIivPPUqH+dAySqklAl2E/gH6MBCqIxswcgNjPxZMsht5xRAFuQD+2uX63fKSLFOcQvHcgKeyi0C4fahZxnQD2TojsyiZ7/Mlbq36PQr2yzSHWHMOgqsItQwwGuyWJGgeI7PwmkSFq8PZVWfRTTGeAXMzl0khasrDLOHUUr0+Mkhuo+KWXMe3vAPWY6j+sg1c2PeF5BaZC2QE/UZxxWiufaSE/h88FdMTPYJdReG8fKHYGjyNviM7sCG9uMFZv7U5D9Czfu79IQmF5yPPGi69q+WN6SPl9rbgnbUS8EiPqiNoACscg5Vyn7GEzPCJrSiEkmJp2U60gO/HuGl/h/8rukuOVwYnc97/pBhLncmQRx8sgXeko+0IZyul168cHEC6zN23iCnDrsDrFehRUAeHUE89NbblSN6j3/WHqGo4zgKswvT7d06tZwVdjXpCBqYEwb24Sg/EI520DWlsOi3EMFBRXWv7qq4WPBD8AmnFelwtWvLJTHZRGWvFtCY1zxe3Bhv5x85NxKFAwEhtgSdr4
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(346002)(136003)(39860400002)(376002)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(38350700005)(41300700001)(6506007)(38100700002)(4326008)(8676002)(2906002)(7416002)(86362001)(83380400001)(1076003)(26005)(6512007)(2616005)(52116002)(5660300002)(6486002)(6666004)(478600001)(8936002)(316002)(66476007)(66556008)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?metzaYOjr+vGbllQd66niENEKQ1KQZV9eIV7hgYMspR9QKE9CtIc/4HOSlMx?=
+ =?us-ascii?Q?sc6Bxt+Y7KqHFbF4VdvFHSaZYoWwRFTFpsJW+CJpAh9P+4yf3gnbIMk42iiS?=
+ =?us-ascii?Q?EBT5yyuyetCv/Y/gLkZxI9UWooWUFZkB9ykv60kY0CzlJm3jfahHhl6FAbtD?=
+ =?us-ascii?Q?I998tRNAKRKQwbpJ2aGW5Rzryaty3mhb2ymb2tX33JUqv4ZwZ2FNXkJQcumy?=
+ =?us-ascii?Q?ALZMOU+v9xVL5s1M0TvaVnmLNfLZBiBFsHCxMTj64P5RDLQF3eqIpKxuP1xL?=
+ =?us-ascii?Q?Rca+qB78U5zLqHgIUjXr4UDLdrL4WEzsWWY0Xwk+njS54Fd1vekBOfrK3LTY?=
+ =?us-ascii?Q?65JlLKsmtHNQ2w2oj6GxfMpy4oMoj+Q9B09p4xKXEwSlGzFslbZ1+X7gtw4n?=
+ =?us-ascii?Q?fXiVPu9nC6CMV5z997owgWiFgfFH9X7TNWO6lS1tgilYfgcwBAjeU50W0kVB?=
+ =?us-ascii?Q?Emn+I5IxUxuXhPonUj9ZgmtgDJFuFflyqovX7tuI1zlx5iuJsV69jSsw7a9R?=
+ =?us-ascii?Q?OapJFBW90JrqUXDNnIJZDVR3RGoCqqxsQqpx2BwJP1smPV0flkcioJWniwyo?=
+ =?us-ascii?Q?ybArfyGBIZoP7JmXQ+PxRmsmnH3UAvDAhNk575z9O+xwAAapZ+wQzbG65FKI?=
+ =?us-ascii?Q?uAfDKBRHOauZKu4vuT58hCGRUGXjfmTauBBEExT9WY8zWHel5vAWOux8e+/T?=
+ =?us-ascii?Q?u5F96oHCOBbWgUlv5FgqFGOSGTGJ420g8iXm3sS+Vi+NkkO//n0B0KstCEJN?=
+ =?us-ascii?Q?9TZOBv9d6yJFQF5gg0JWb6u9TDD5YpIh+Yeixc1TfyXKT1MM/XzX5j906M71?=
+ =?us-ascii?Q?OII0BGRf1V4HQ+w/MZvm8Hf4N2ZjFio7PPiFktqQBzj/oB2JnjpfwXFzZn6K?=
+ =?us-ascii?Q?e1+CrbNLXClcKW63glLPIVWfmW7AFBZorwA6qtI4HNw3I2dnSuN0Ho1Qb5Eo?=
+ =?us-ascii?Q?zl3LeChwf40oXUNUy+Jci5Mo0V78gD5JxOGWPezY9bhW+ZioWiUgKuXRGhjP?=
+ =?us-ascii?Q?5+q0eSJMzCkDOWfBA8U33xk5Q5dFJZuVcl6+oxCy7dfsFHUG3EPto7yCVrX7?=
+ =?us-ascii?Q?Tx0nBwb+kYIt+bjvp5wgKMgwv6VGW21/zVJDJ6lfyqrD8RzrsW1N+LXIJnrw?=
+ =?us-ascii?Q?D1cb5/7o8eZOOejJBc0K5khcVtkkoeuyEFkcoXGCNXdbrSUKBh2NaMWlwoWO?=
+ =?us-ascii?Q?V1dPWoTrLuukDFFyxVrKg7osYSacuhFGaC9lXqaW6wbaAT+/Kcy20q3ALEIc?=
+ =?us-ascii?Q?OvfGIX6hre5rhWqIWOx4uZRTXY3PG+C76r2ZH7C8g4NMUU51Ms7RAMy7CIAu?=
+ =?us-ascii?Q?3ELENa1qBY8+G2XwXQTfoJg9y77JP+Wg1HuPF2azudNykR0Y/SDjRLZ0cWYu?=
+ =?us-ascii?Q?oaTfL4qEgXW/7AEYo8vsvSzZ8cYQW/uVfxaqDn0QimItVA7I0bEhK8FpFQ5o?=
+ =?us-ascii?Q?/tZUH+Aq9iC7CimwvLGzCTjUHjNl6mypfTS+XgUB73RFoaX09XSwcYLeexOe?=
+ =?us-ascii?Q?90s404JM4fs8cFwOmxTBYxh6gYWuBeD88MfF29joouCV4zQZ24Od7p8Kc/qg?=
+ =?us-ascii?Q?BR06zpm+rglt4cLOTh1NNBSxj7TgSenn+TcW+2A6dpDgI114SnxESFWN9eeF?=
+ =?us-ascii?Q?GQ=3D=3D?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca1cec73-e0da-4642-92b8-08dbd09b505d
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 12:02:50.0511
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HOgZTuWkoFmG1BGHTsuIyj+g1MTTr13ramXJEjiI/iEYUce55RPbhHlNdJQ1QgmKC+ONBumRd5eMSpwsOTBB3so5/yMkdQ4n82I9R4nulik=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7961
 
-Before sockets became aware of net-memcg's memory pressure since
-commit e1aab161e013 ("socket: initial cgroup code."), the memory
-usage would be granted to raise if below average even when under
-protocol's pressure. This provides fairness among the sockets of
-same protocol.
+This is the MACsec support for TJA11XX PHYs. The MACsec block encrypts
+the ethernet frames on the fly and has no buffering. This operation will
+grow the frames by 32 bytes. If the frames are sent back to back, the
+MACsec block will not have enough room to insert the SecTAG and the ICV
+and the frames will be dropped.
 
-That commit changes this because the heuristic will also be
-effective when only memcg is under pressure which makes no sense.
-So revert that behavior.
+To mitigate this, the PHY can parse a specific ethertype with some
+padding bytes and replace them with the SecTAG and ICV. These padding
+bytes might be dummy or might contain information about TX SC that must
+be used to encrypt the frame.
 
-After reverting, __sk_mem_raise_allocated() no longer considers
-memcg's pressure. As memcgs are isolated from each other w.r.t.
-memory accounting, consuming one's budget won't affect others.
-So except the places where buffer sizes are needed to be tuned,
-allow workloads to use the memory they are provisioned.
+Radu P.
 
-Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
-Acked-by: Shakeel Butt <shakeelb@google.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
----
- net/core/sock.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+Radu Pirea (NXP OSS) (7):
+  net: macsec: move sci_to_cpu to macsec header
+  net: macsec: documentation for macsec_context and macsec_ops
+  net: macsec: revert the MAC address if mdo_upd_secy fails
+  net: macsec: introduce mdo_insert_tx_tag
+  net: phy: nxp-c45-tja11xx: add MACsec support
+  net: phy: nxp-c45-tja11xx: add MACsec statistics
+  net: phy: nxp-c45-tja11xx: implement mdo_insert_tx_tag
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 45841a5689b6..0ec3f5d70715 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3037,7 +3037,13 @@ EXPORT_SYMBOL(sk_wait_data);
-  *	@amt: pages to allocate
-  *	@kind: allocation type
-  *
-- *	Similar to __sk_mem_schedule(), but does not update sk_forward_alloc
-+ *	Similar to __sk_mem_schedule(), but does not update sk_forward_alloc.
-+ *
-+ *	Unlike the globally shared limits among the sockets under same protocol,
-+ *	consuming the budget of a memcg won't have direct effect on other ones.
-+ *	So be optimistic about memcg's tolerance, and leave the callers to decide
-+ *	whether or not to raise allocated through sk_under_memory_pressure() or
-+ *	its variants.
-  */
- int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
- {
-@@ -3095,7 +3101,11 @@ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
- 	if (sk_has_memory_pressure(sk)) {
- 		u64 alloc;
- 
--		if (!sk_under_memory_pressure(sk))
-+		/* The following 'average' heuristic is within the
-+		 * scope of global accounting, so it only makes
-+		 * sense for global memory pressure.
-+		 */
-+		if (!sk_under_global_memory_pressure(sk))
- 			return 1;
- 
- 		/* Try to be fair among all the sockets under global
+ MAINTAINERS                              |    2 +-
+ drivers/net/macsec.c                     |  144 +-
+ drivers/net/netdevsim/macsec.c           |    5 -
+ drivers/net/phy/Kconfig                  |    2 +-
+ drivers/net/phy/Makefile                 |    6 +-
+ drivers/net/phy/nxp-c45-tja11xx-macsec.c | 1724 ++++++++++++++++++++++
+ drivers/net/phy/nxp-c45-tja11xx.c        |   77 +-
+ drivers/net/phy/nxp-c45-tja11xx.h        |   62 +
+ include/net/macsec.h                     |   54 +
+ 9 files changed, 2028 insertions(+), 48 deletions(-)
+ create mode 100644 drivers/net/phy/nxp-c45-tja11xx-macsec.c
+ create mode 100644 drivers/net/phy/nxp-c45-tja11xx.h
+
 -- 
-2.37.3
+2.34.1
 
 
