@@ -1,65 +1,73 @@
-Return-Path: <netdev+bounces-42756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B07177D00AC
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:35:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF6437D00CD
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:41:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14E2AB213A9
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:35:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6782C2810EB
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A77335DB;
-	Thu, 19 Oct 2023 17:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D09354E9;
+	Thu, 19 Oct 2023 17:41:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D05tFMRf"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cxTD0TFa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D571438DD7
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:34:54 +0000 (UTC)
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3DE9CF;
-	Thu, 19 Oct 2023 10:34:53 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3b2ec9a79bdso1245793b6e.3;
-        Thu, 19 Oct 2023 10:34:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697736893; x=1698341693; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/62ZgoTi3SSzkbLGsJ1Vo2TqsEllvmMDi2mGJdwfjxg=;
-        b=D05tFMRfJaT0G+qaDSQzOxN4sUNGrhkEoqb0AFPn/0/z30y+26w3HEvUWf3VrPFSK0
-         bvyen7jb5Ru9GavQC69zHaJBzNrLiz6CFrZtNhS1CWey0NdHV/GEgy0GEpU8+0TUdwT8
-         /GFjafz4Hj2e8M4KSF9JIvzB8VVmGC8C2UtwivvsJjk8TwpWepxWTkMv533yQC2PJDWm
-         +BP7MysscyMWIi8OJsP7cFffFiN0YZFp9rXeRGjODYM/r032h4mMQlJumy3KtUzF/f+y
-         HhegkCdHtUWGhIFkRGu+Zw/GWSAgiDE+Ugmqi8ImN8jXPFKWcpp2rwtXBPFuIuNi/nUp
-         p2bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697736893; x=1698341693;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/62ZgoTi3SSzkbLGsJ1Vo2TqsEllvmMDi2mGJdwfjxg=;
-        b=L/HnUf9pMr/kZVdmcGAYdtVp+GRZz/UKqrUIJoGJZV+UCBL0/qCHms+/kiw5tlzZgs
-         D1bxmFFdNgyM6FHaR6cB1sggCgpfiikiPCwSTdtsCXd9s33j8p+YY+aZQW4LLbXPh/PT
-         NfjaUlRRkzHJd6Buym9pvyLJsZhUDfRspLT5aYcC6YKArRno61Lfq5opEy/5SWTed0nC
-         mpZdK3f0ZONtN/eSs7LEcE6EvsuI6mmfWEShFc77clgKg3YzDmziROmS+vaXrHICgh7H
-         SQm8JeDUxYgLNDjBqEUFQ9i5NGoOz6UBPeHETPeK1OWAwpqrUQ3Mu0IFeUyTpCxctifM
-         C31Q==
-X-Gm-Message-State: AOJu0YwcmNn17mKq+ojWgasZav9A3QfLwIpiMbFVjCzS1stwdwOQHFhc
-	M2JiGJ4qDiFuoF7tI2/LI0Y=
-X-Google-Smtp-Source: AGHT+IFzK8OJRCXovwSUpAWCNgFhVZ0dOThZwS+dQBOQj9NV+mZfr+sn/sgCC+FNpjGYB1/KPSStpg==
-X-Received: by 2002:a05:6358:facd:b0:143:a15f:65d4 with SMTP id ts13-20020a056358facd00b00143a15f65d4mr2511206rwb.26.1697736892795;
-        Thu, 19 Oct 2023 10:34:52 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id bv8-20020a632e08000000b00578b8fab907sm16521pgb.73.2023.10.19.10.34.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Oct 2023 10:34:52 -0700 (PDT)
-Message-ID: <68d7e387-aa2b-40a6-b0bf-f2f57053df8e@gmail.com>
-Date: Thu, 19 Oct 2023 10:34:47 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D80E354E5
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:41:08 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 045E2CF;
+	Thu, 19 Oct 2023 10:41:06 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39JHNp5h017916;
+	Thu, 19 Oct 2023 17:40:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XNxuSWlmwFpqmROgKJVOTG1Nz3hnSDWsr+Z+rZVP7lo=;
+ b=cxTD0TFaWM/zkb98jUifI8qBrJi5k0q9QFvPjbgbiYj1nmZTKlZ+g3fshLAyVoQ7/Dm5
+ WDUMUHXfS9qvY6biW8/o3GgMCvAh5CCuOglTnai25Gl9U5EwI7jB545XNFAZGXvZ+EoF
+ 9XDyWsNlGyb6GZkf1NnB0+DtcHxQTeQvbQPUC3kPO0DDctqelFPEOX82BNzvLVpC4CHR
+ UHWPwXwuIVv4mVHDp4xgTufULRYJrVFaKI0h3272it9OTEl8vbVoSa0E7ZhIafBMWOlv
+ flgPUDkt/YyZJhJJrixcgoGf4GEGPJaPrVU+9BzHHm94c3eHfeMo2+84Gj9ol4qXYHv9 7Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tu8pd0nuv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Oct 2023 17:40:55 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39JHeHEw004606;
+	Thu, 19 Oct 2023 17:40:54 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tu8pd0nuh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Oct 2023 17:40:54 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39JFVHgP019700;
+	Thu, 19 Oct 2023 17:40:54 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tr8121yrc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Oct 2023 17:40:54 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39JHerKK20644464
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 19 Oct 2023 17:40:53 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5E27258065;
+	Thu, 19 Oct 2023 17:40:53 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 418D458052;
+	Thu, 19 Oct 2023 17:40:47 +0000 (GMT)
+Received: from [9.179.18.71] (unknown [9.179.18.71])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 19 Oct 2023 17:40:47 +0000 (GMT)
+Message-ID: <990a6b09-135a-41fb-a375-c37ffec6fe99@linux.ibm.com>
+Date: Thu, 19 Oct 2023 19:40:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,71 +75,157 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v1 1/1] ethtool: fix clearing of WoL flags
-Content-Language: en-US
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20231019070904.521718-1-o.rempel@pengutronix.de>
- <20231019090510.bbcmh7stzqqgchdd@lion.mk-sys.cz>
- <20231019095140.l6fffnszraeb6iiw@lion.mk-sys.cz>
- <20231019122114.5b4a13a9@kmaincent-XPS-13-7390>
- <20231019105048.l64jp2nd46fxjewt@lion.mk-sys.cz>
- <20231019152743.09b28ef4@kmaincent-XPS-13-7390>
- <c0f98227-459f-43c6-9c0e-db0a7ea07c9e@gmail.com>
- <20231019164553.zcc6d2vbxzw4m4c2@lion.mk-sys.cz>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231019164553.zcc6d2vbxzw4m4c2@lion.mk-sys.cz>
+Subject: Re: [PATCH net 5/5] net/smc: put sk reference if close work was
+ canceled
+Content-Language: en-GB
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
+ <1697009600-22367-6-git-send-email-alibuda@linux.alibaba.com>
+ <bdcb307f-d2a8-4aef-bb7d-dd87e56ff740@linux.ibm.com>
+ <ee641ca5-104b-d1ec-5b2a-e20237c5378a@linux.alibaba.com>
+ <ad5e4191-227e-4a62-a110-472618ef7de1@linux.ibm.com>
+ <305c7ae2-a902-3e30-5e67-b590d848d0ba@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <305c7ae2-a902-3e30-5e67-b590d848d0ba@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: C0quyvYEP4WhzEn6KStJRDVYT6ASe0AI
+X-Proofpoint-ORIG-GUID: vYMkW1jrXkGUBppO7mOHdx9bREvSSiN0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-19_16,2023-10-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ mlxscore=0 adultscore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0
+ spamscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310190148
 
-On 10/19/23 09:45, Michal Kubecek wrote:
-> On Thu, Oct 19, 2023 at 09:20:31AM -0700, Florian Fainelli wrote:
->> On 10/19/23 06:27, Köry Maincent wrote:
->>> On Thu, 19 Oct 2023 12:50:48 +0200
->>> Michal Kubecek <mkubecek@suse.cz> wrote:
->>>
->>>> On Thu, Oct 19, 2023 at 12:21:14PM +0200, Köry Maincent wrote:
->>>>> On Thu, 19 Oct 2023 11:51:40 +0200 > Michal Kubecek <mkubecek@suse.cz>
->>>>> wrote:
->>>>>>
->>>>>> The issue was indeed introduced by commit 108a36d07c01 ("ethtool: Fix
->>>>>> mod state of verbose no_mask bitset"). The problem is that a "no mask"
->>>>>> verbose bitset only contains bit attributes for bits to be set. This
->>>>>> worked correctly before this commit because we were always updating
->>>>>> a zero bitmap (since commit 6699170376ab ("ethtool: fix application of
->>>>>> verbose no_mask bitset"), that is) so that the rest was left zero
->>>>>> naturally. But now the 1->0 change (old_val is true, bit not present in
->>>>>> netlink nest) no longer works.
->>>>>
->>>>> Doh I had not seen this issue! Thanks you for reporting it.
->>>>> I will send the revert then and will update the fix for next merge-window.
->>>>
->>>> Something like the diff below (against current mainline) might do the
->>>> trick but it's just an idea, not even build tested.
->>>
->>> Seems a good idea without adding too much complexity to the code.
->>> Will try that and send it in next merge window.
+
+
+On 19.10.23 09:33, D. Wythe wrote:
+> 
+> 
+> On 10/19/23 4:26 AM, Wenjia Zhang wrote:
 >>
->> Not sure what you mean by next merge window, we need a fix for right now, or
->> we need to revert 6699170376ab ("ethtool: fix application of verbose no_mask
->> bitset").
+>>
+>> On 17.10.23 04:06, D. Wythe wrote:
+>>>
+>>>
+>>> On 10/13/23 3:04 AM, Wenjia Zhang wrote:
+>>>>
+>>>>
+>>>> On 11.10.23 09:33, D. Wythe wrote:
+>>>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>>>>
+>>>>> Note that we always hold a reference to sock when attempting
+>>>>> to submit close_work. 
+>>>> yes
+>>>> Therefore, if we have successfully
+>>>>> canceled close_work from pending, we MUST release that reference
+>>>>> to avoid potential leaks.
+>>>>>
+>>>> Isn't the corresponding reference already released inside the 
+>>>> smc_close_passive_work()?
+>>>>
+>>>
+>>> Hi Wenjia,
+>>>
+>>> If we successfully cancel the close work from the pending state,
+>>> it means that smc_close_passive_work() has never been executed.
+>>>
+>>> You can find more details here.
+>>>
+>>> /**
+>>> * cancel_work_sync - cancel a work and wait for it to finish
+>>> * @work:the work to cancel
+>>> *
+>>> * Cancel @work and wait for its execution to finish. This function
+>>> * can be used even if the work re-queues itself or migrates to
+>>> * another workqueue. On return from this function, @work is
+>>> * guaranteed to be not pending or executing on any CPU.
+>>> *
+>>> * cancel_work_sync(&delayed_work->work) must not be used for
+>>> * delayed_work's. Use cancel_delayed_work_sync() instead.
+>>> *
+>>> * The caller must ensure that the workqueue on which @work was last
+>>> * queued can't be destroyed before this function returns.
+>>> *
+>>> * Return:
+>>> * %true if @work was pending, %false otherwise.
+>>> */
+>>> boolcancel_work_sync(structwork_struct *work)
+>>> {
+>>> return__cancel_work_timer(work, false);
+>>> }
+>>>
+>>> Best wishes,
+>>> D. Wythe
+>> As I understand, queue_work() would wake up the work if the work is 
+>> not already on the queue. And the sock_hold() is just prio to the 
+>> queue_work(). That means, cancel_work_sync() would cancel the work 
+>> either before its execution or after. If your fix refers to the former 
+>> case, at this moment, I don't think the reference can be hold, thus it 
+>> is unnecessary to put it.
+>>>
 > 
-> Not that one, that's an old commit that was correct from functional
-> point of view (the only problem was that it sometimes triggered
-> a notification even when the value was not changed but that also happens
-> in other places).
+> I am quite confuse about why you think when we cancel the work before 
+> its execution,
+> the reference can not be hold ?
 > 
-> A revert of commit 108a36d07c01 ("ethtool: Fix mod state of verbose
-> no_mask bitset") is already in net tree as commit 524515020f25 ("Revert
-> "ethtool: Fix mod state of verbose no_mask bitset"").
+> 
+> Perhaps the following diagram can describe the problem in better way :
+> 
+> smc_close_cancel_work
+> smc_cdc_msg_recv_action
+> 
+> 
+> sock_hold
+> queue_work
+>                                                                 if 
+> (cancel_work_sync())        // successfully cancel before execution
+> sock_put()                        //  need to put it since we already 
+> hold a ref before   queue_work()
+> 
+> 
+ha, I already thought you might ask such question:P
 
-Got it, thanks!
--- 
-Florian
+I think here two Problems need to be clarified:
 
+1) Do you think the bh_lock_sock/bh_unlock_sock in the smc_cdc_msg_recv 
+does not protect the smc_cdc_msg_recv_action() from cancel_work_sync()?
+Maybe that would go back to the discussion in the other patch on the 
+behaviors of the locks.
+
+2) If the queue_work returns true, as I said in the last main, the work 
+should be (being) executed. How could the cancel_work_sync() cancel the 
+work before execution successgully?
+
+>>>>> Fixes: 42bfba9eaa33 ("net/smc: immediate termination for SMCD link 
+>>>>> groups")
+>>>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>>>>> ---
+>>>>>   net/smc/smc_close.c | 3 ++-
+>>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
+>>>>> index 449ef45..10219f5 100644
+>>>>> --- a/net/smc/smc_close.c
+>>>>> +++ b/net/smc/smc_close.c
+>>>>> @@ -116,7 +116,8 @@ static void smc_close_cancel_work(struct 
+>>>>> smc_sock *smc)
+>>>>>       struct sock *sk = &smc->sk;
+>>>>>         release_sock(sk);
+>>>>> -    cancel_work_sync(&smc->conn.close_work);
+>>>>> +    if (cancel_work_sync(&smc->conn.close_work))
+>>>>> +        sock_put(sk);
+>>>>>       cancel_delayed_work_sync(&smc->conn.tx_work);
+>>>>>       lock_sock(sk);
+>>>>>   }
+>>>
+> 
+> 
 
