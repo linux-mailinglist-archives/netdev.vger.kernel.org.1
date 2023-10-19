@@ -1,153 +1,163 @@
-Return-Path: <netdev+bounces-42516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 447627CF1CB
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 09:56:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 685517CF1E2
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:02:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D985BB20F13
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 07:56:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFC77B20F1D
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF798DF57;
-	Thu, 19 Oct 2023 07:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31692134BF;
+	Thu, 19 Oct 2023 08:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jBOTQ4Rc"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23ABAD515
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 07:56:23 +0000 (UTC)
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A81D918F;
-	Thu, 19 Oct 2023 00:56:20 -0700 (PDT)
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5a877e0f0d8so4131977b3.1;
-        Thu, 19 Oct 2023 00:56:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84334DF57
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 08:02:32 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3709121
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:02:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697702549;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YkgXc+bIQhSWbzeEfBW5BEA6kfzhB8N4rA+lukaPFCw=;
+	b=jBOTQ4RcVtU0oszTW8TxYtgU8F0LhYQe9kUX5nB+PmXjX6/85bifIhrrrgI7NYiWtosayr
+	TKoepKJRtsXvBsNnvdDdUXuDg7cg2x6J89C2ZCi4ZCYiPYlVRp7aT5IGVb7/z87+i0/qoe
+	KqCL8RbkI8GoD4W+kUaBAUSh44WX8Mc=
+Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
+ [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-680-a4B6TgO5OoGrpb10ovi7IQ-1; Thu, 19 Oct 2023 04:02:17 -0400
+X-MC-Unique: a4B6TgO5OoGrpb10ovi7IQ-1
+Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-49ab22f0e07so422920e0c.1
+        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:02:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697702179; x=1698306979;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ILA4o27dVPsrTvX39+vJ0cM2vmBOHexNEBZq7C7F7Q4=;
-        b=vkqwqUniFC7sHrHyeBnoLDG5xu3k0+4HgdrqzlT3kkwKs7bPqa9tx5bDjK+nbJ5bNG
-         ttfftdb60tEpNzPW/0K1fmEiDwCCTBk95n1LdpMnKC2Oormn7h4X4jgOr1OK71tchw1f
-         YmFUHsGN9yS/xi4RNldCttQ5Z0LxcIZiFLpHhBNIoFngYF1mB06zj+56hGruWuo2hiPY
-         WIBvp+d8GdQoTh0aMz2PeF7/u40PPFSn5SYWV9TSzRBC/d23qo7OHu9FZvV+Ofy0wgM0
-         irGeOelCzjbA7vUs1qtlAf5EgV2qJd16YdsbbS5M03CE+F98QObV21cGUKNMqEXl0UE3
-         U7TA==
-X-Gm-Message-State: AOJu0Yyi8d2S/vjBl3NE55uzryfuia5okf7k9nVLybVvDXmoq0kXAvaH
-	tYxu8H6zp1C1bR4+tuiVMga7LJ/M9PYDww==
-X-Google-Smtp-Source: AGHT+IG21ROdISrPbCBLp5cWx5y/1gsWfelir/oiXSoqjVmIxzGmkckdwAlHEmmxbYvw6iliPtcUYQ==
-X-Received: by 2002:a05:6902:1346:b0:d9a:c54d:6fbb with SMTP id g6-20020a056902134600b00d9ac54d6fbbmr850072ybu.0.1697702179595;
-        Thu, 19 Oct 2023 00:56:19 -0700 (PDT)
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com. [209.85.219.180])
-        by smtp.gmail.com with ESMTPSA id u66-20020a25ab48000000b00d9c7bf8f32fsm1154360ybi.42.2023.10.19.00.56.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Oct 2023 00:56:19 -0700 (PDT)
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-d9ac3b4f42cso441396276.0;
-        Thu, 19 Oct 2023 00:56:18 -0700 (PDT)
-X-Received: by 2002:a05:690c:dcb:b0:5a7:b892:b299 with SMTP id
- db11-20020a05690c0dcb00b005a7b892b299mr897843ywb.19.1697702177865; Thu, 19
- Oct 2023 00:56:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697702536; x=1698307336;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YkgXc+bIQhSWbzeEfBW5BEA6kfzhB8N4rA+lukaPFCw=;
+        b=roVlu07kFbkjGCWPiSxxklDvY5GN9qE+M400YmKh0oVe6poKGxxiLzNe6It9sYxIa3
+         adV63izgaJV/S/6dzpwuci9receuDZyKeStEdPuuvnn+PaPQSxRYkFibOOsKuF6BKlmC
+         XrmdPQpamp0qAWDn7a3O9Hi7DqS7AQ321iyUf2N6d3OC8hu5EKGY5ej9O5ryM1kVNu+v
+         aLRlxRIR3ABSrbgH5eSl8E/X255O9wFuIEKwtk82HJ+FYnbgZyshNVNJN3DbWOd5kr4o
+         duD/U0jDB+kwY/bP7XE3u2vfn+oU5ZwrG8x3WmuITdl83auw9MHnQ5H6esEMd+mOx+OZ
+         Yj2Q==
+X-Gm-Message-State: AOJu0YwPNmd9y8Ooiy2EnSJ7PTMAw63MEx067kEIendgO9a7773mhXrs
+	iaNqRFT+97TlT8lmRp8LxskCafydGCx4STp7vBrzvuC11zIoFfd6R2iCqmNjptJsNqix9VmnCbu
+	8fE7nmPRCt9LesK4C41KHfkTB
+X-Received: by 2002:a05:6102:308d:b0:457:bd7e:3832 with SMTP id l13-20020a056102308d00b00457bd7e3832mr884517vsb.0.1697702536669;
+        Thu, 19 Oct 2023 01:02:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEM/XVjCo5XISBz32LDGZnbS07IzVzgTcM3mHDa8Ity94U25ZCi2Au4jP8mNGnsxBXLMjaLcg==
+X-Received: by 2002:a05:6102:308d:b0:457:bd7e:3832 with SMTP id l13-20020a056102308d00b00457bd7e3832mr884494vsb.0.1697702536230;
+        Thu, 19 Oct 2023 01:02:16 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-237-142.dyn.eolo.it. [146.241.237.142])
+        by smtp.gmail.com with ESMTPSA id b10-20020ac86bca000000b00419c39dd28fsm565293qtt.20.2023.10.19.01.02.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Oct 2023 01:02:15 -0700 (PDT)
+Message-ID: <8c6a71aaaabc0a8ea4c36ce609cb097857b68a96.camel@redhat.com>
+Subject: Re: [PATCH net-next v2 3/3] sock: Fix improper heuristic on raising
+ memory
+From: Paolo Abeni <pabeni@redhat.com>
+To: Abel Wu <wuyun.abel@bytedance.com>, "David S . Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Shakeel Butt <shakeelb@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Thu, 19 Oct 2023 10:02:12 +0200
+In-Reply-To: <20231016132812.63703-3-wuyun.abel@bytedance.com>
+References: <20231016132812.63703-1-wuyun.abel@bytedance.com>
+	 <20231016132812.63703-3-wuyun.abel@bytedance.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1697460614.git.geert+renesas@glider.be> <180fd042261dcd4243fad90660b114b8f0a78dcd.1697460614.git.geert+renesas@glider.be>
-In-Reply-To: <180fd042261dcd4243fad90660b114b8f0a78dcd.1697460614.git.geert+renesas@glider.be>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 19 Oct 2023 09:56:05 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXnnr0cH66nwtk1Tj7odMKSQyAWCezQFMzVe+xa+0Kx1w@mail.gmail.com>
-Message-ID: <CAMuHMdXnnr0cH66nwtk1Tj7odMKSQyAWCezQFMzVe+xa+0Kx1w@mail.gmail.com>
-Subject: Re: [PATCH -next v3 2/2] sunrpc: Use no_printk() in dfprintk*() dummies
-To: Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <dai.ngo@oracle.com>, Tom Talpey <tom@talpey.com>
-Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 16, 2023 at 3:09=E2=80=AFPM Geert Uytterhoeven
-<geert+renesas@glider.be> wrote:
-> When building NFS with W=3D1 and CONFIG_WERROR=3Dy, but
-> CONFIG_SUNRPC_DEBUG=3Dn:
->
->     fs/nfs/nfs4proc.c: In function =E2=80=98nfs4_proc_create_session=E2=
-=80=99:
->     fs/nfs/nfs4proc.c:9276:19: error: variable =E2=80=98ptr=E2=80=99 set =
-but not used [-Werror=3Dunused-but-set-variable]
->      9276 |         unsigned *ptr;
->           |                   ^~~
->       CC      fs/nfs/callback.o
->     fs/nfs/callback.c: In function =E2=80=98nfs41_callback_svc=E2=80=99:
->     fs/nfs/callback.c:98:13: error: variable =E2=80=98error=E2=80=99 set =
-but not used [-Werror=3Dunused-but-set-variable]
->        98 |         int error;
->           |             ^~~~~
->       CC      fs/nfs/flexfilelayout/flexfilelayout.o
->     fs/nfs/flexfilelayout/flexfilelayout.c: In function =E2=80=98ff_layou=
-t_io_track_ds_error=E2=80=99:
->     fs/nfs/flexfilelayout/flexfilelayout.c:1230:13: error: variable =E2=
-=80=98err=E2=80=99 set but not used [-Werror=3Dunused-but-set-variable]
->      1230 |         int err;
->           |             ^~~
->       CC      fs/nfs/flexfilelayout/flexfilelayoutdev.o
->     fs/nfs/flexfilelayout/flexfilelayoutdev.c: In function =E2=80=98nfs4_=
-ff_alloc_deviceid_node=E2=80=99:
->     fs/nfs/flexfilelayout/flexfilelayoutdev.c:55:16: error: variable =E2=
-=80=98ret=E2=80=99 set but not used [-Werror=3Dunused-but-set-variable]
->        55 |         int i, ret =3D -ENOMEM;
->           |                ^~~
->
-> All these are due to variables that are set unconditionally, but are
-> used only when debugging is enabled.
->
-> Fix this by changing the dfprintk*() dummy macros from empty loops to
-> calls to the no_printk() helper.  This informs the compiler that the
-> passed debug parameters are actually used, and enables format specifier
-> checking as a bonus.
->
-> This requires removing the protection by CONFIG_SUNRPC_DEBUG of the
-> declaration of nlmdbg_cookie2a() in fs/lockd/svclock.c, as its reference
-> is now visible to the compiler, but optimized away.
->
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Acked-by: Jeff Layton <jlayton@kernel.org>
+On Mon, 2023-10-16 at 21:28 +0800, Abel Wu wrote:
+> Before sockets became aware of net-memcg's memory pressure since
+> commit e1aab161e013 ("socket: initial cgroup code."), the memory
+> usage would be granted to raise if below average even when under
+> protocol's pressure. This provides fairness among the sockets of
+> same protocol.
+>=20
+> That commit changes this because the heuristic will also be
+> effective when only memcg is under pressure which makes no sense.
+> Fix this by reverting to the behavior before that commit.
+>=20
+> After this fix, __sk_mem_raise_allocated() no longer considers
+> memcg's pressure. As memcgs are isolated from each other w.r.t.
+> memory accounting, consuming one's budget won't affect others.
+> So except the places where buffer sizes are needed to be tuned,
+> allow workloads to use the memory they are provisioned.
+>=20
+> Fixes: e1aab161e013 ("socket: initial cgroup code.")
+> Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
+> ---
+> v2:
+>   - Ignore memcg pressure when raising memory allocated.
+> ---
+>  net/core/sock.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 9f969e3c2ddf..1d28e3e87970 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3035,7 +3035,13 @@ EXPORT_SYMBOL(sk_wait_data);
+>   *	@amt: pages to allocate
+>   *	@kind: allocation type
+>   *
+> - *	Similar to __sk_mem_schedule(), but does not update sk_forward_alloc
+> + *	Similar to __sk_mem_schedule(), but does not update sk_forward_alloc.
+> + *
+> + *	Unlike the globally shared limits among the sockets under same protoc=
+ol,
+> + *	consuming the budget of a memcg won't have direct effect on other one=
+s.
+> + *	So be optimistic about memcg's tolerance, and leave the callers to de=
+cide
+> + *	whether or not to raise allocated through sk_under_memory_pressure() =
+or
+> + *	its variants.
+>   */
+>  int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kin=
+d)
+>  {
+> @@ -3093,7 +3099,11 @@ int __sk_mem_raise_allocated(struct sock *sk, int =
+size, int amt, int kind)
+>  	if (sk_has_memory_pressure(sk)) {
+>  		u64 alloc;
+> =20
+> -		if (!sk_under_memory_pressure(sk))
+> +		/* The following 'average' heuristic is within the
+> +		 * scope of global accounting, so it only makes
+> +		 * sense for global memory pressure.
+> +		 */
+> +		if (!sk_under_global_memory_pressure(sk))
+>  			return 1;
 
-> --- a/include/linux/sunrpc/debug.h
-> +++ b/include/linux/sunrpc/debug.h
-> @@ -67,9 +67,9 @@ do {                                                   =
-               \
->  # define RPC_IFDEBUG(x)                x
->  #else
->  # define ifdebug(fac)          if (0)
-> -# define dfprintk(fac, fmt, ...)       do {} while (0)
-> -# define dfprintk_cont(fac, fmt, ...)  do {} while (0)
-> -# define dfprintk_rcu(fac, fmt, ...)   do {} while (0)
-> +# define dfprintk(fac, fmt, ...)       no_printk(fmt, ##__VA_ARGS__)
-> +# define dfprintk_cont(fac, fmt, ...)  no_printk(fmt, ##__VA_ARGS__)
-> +# define dfprintk_rcu(fac, fmt, ...)   no_printk(fmt, ##__VA_ARGS__)
->  # define RPC_IFDEBUG(x)
->  #endif
+Since the whole logic is fairly non trivial I'd like to explicitly note
+(for my own future memory) that I think this is the correct approach.=C2=A0
 
-I discovered a new build issue related to the use of RPC_IFDEBUG()
-in fs/nfsd/nfsfh.c. So there will be a v4...
+The memcg granted the current allocation via the
+mem_cgroup_charge_skmem() call above, the heuristic to eventually
+suppress the allocation should be outside the memcg scope.
 
-Gr{oetje,eeting}s,
+LGTM, thanks!
 
-                        Geert
+Paolo
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
