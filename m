@@ -1,90 +1,166 @@
-Return-Path: <netdev+bounces-42535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68077CF39C
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:10:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 570E77CF3AC
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 11:12:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D88A61C208A5
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 09:10:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D01E2B20D49
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 09:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A0F168A3;
-	Thu, 19 Oct 2023 09:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NH5YXUvF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9247168CD;
+	Thu, 19 Oct 2023 09:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16BDA16416
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 09:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8A988C433C9;
-	Thu, 19 Oct 2023 09:10:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697706624;
-	bh=Ebub719cRz9G5ACNsmDwbxaKVkRnz5JEOIBNJDMXBA8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NH5YXUvFrRWaZ2D+vykw34JsWFGdgzdgBFdmrdsOkJ/7vgNwqKuRdUna3jxCLdWfM
-	 c0TCEAurZcBgBtTV91z4sJoVQ3Cc1hOgbne7exSLOUnPuCyQLp+eYYRUCgf5BcHUWa
-	 MhE6OZSxPXtE8zSelO6WqCL8S538G2Qo+u2B0Lpodumu+pF7EyomOGjwZGXVZkGtFg
-	 VjkFYe4WsWg/k9gEnGEy/OU/0z2916DotNZz0Ue5G4zaMqINaA2+A6vYxGiogcpHM3
-	 W5SeCJhIi9JK1FWib/1iTfzkxjPalG6YRR5oXs5MZIsIA7AuVXUSF9BO/xvGIzU2+K
-	 RBeGFKh3YQCpQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6D81AC73FE1;
-	Thu, 19 Oct 2023 09:10:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A831168A3
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 09:12:41 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC1212D
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 02:12:37 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qtP4v-0001No-Cs; Thu, 19 Oct 2023 11:12:29 +0200
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qtP4u-002kgS-6v; Thu, 19 Oct 2023 11:12:28 +0200
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qtP4u-00FFUF-4A; Thu, 19 Oct 2023 11:12:28 +0200
+Date: Thu, 19 Oct 2023 11:12:28 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net v1 1/1] ethtool: fix clearing of WoL flags
+Message-ID: <20231019091228.GA3632494@pengutronix.de>
+References: <20231019070904.521718-1-o.rempel@pengutronix.de>
+ <20231019090510.bbcmh7stzqqgchdd@lion.mk-sys.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/2] rswitch: Add PM ops
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169770662444.23024.10068818834489019175.git-patchwork-notify@kernel.org>
-Date: Thu, 19 Oct 2023 09:10:24 +0000
-References: <20231017113402.849735-1-yoshihiro.shimoda.uh@renesas.com>
-In-Reply-To: <20231017113402.849735-1-yoshihiro.shimoda.uh@renesas.com>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231019090510.bbcmh7stzqqgchdd@lion.mk-sys.cz>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello:
+On Thu, Oct 19, 2023 at 11:05:10AM +0200, Michal Kubecek wrote:
+> On Thu, Oct 19, 2023 at 09:09:04AM +0200, Oleksij Rempel wrote:
+> > With current kernel it is possible to set flags, but not possible to re=
+move
+> > existing WoL flags. For example:
+> > ~$ ethtool lan2
+> > ...
+> >         Supports Wake-on: pg
+> >         Wake-on: d
+> > ...
+> > ~$ ethtool -s lan2 wol gp
+> > ~$ ethtool lan2
+> > ...
+> >         Wake-on: pg
+> > ...
+> > ~$ ethtool -s lan2 wol d
+> > ~$ ethtool lan2
+> > ...
+> >         Wake-on: pg
+> > ...
+> >=20
+> > This patch makes it work as expected
+> >=20
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > ---
+> >  net/ethtool/wol.c | 8 +++++---
+> >  1 file changed, 5 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/net/ethtool/wol.c b/net/ethtool/wol.c
+> > index 0ed56c9ac1bc..fcefc1bbfa2e 100644
+> > --- a/net/ethtool/wol.c
+> > +++ b/net/ethtool/wol.c
+> > @@ -108,15 +108,16 @@ ethnl_set_wol(struct ethnl_req_info *req_info, st=
+ruct genl_info *info)
+> >  	struct net_device *dev =3D req_info->dev;
+> >  	struct nlattr **tb =3D info->attrs;
+> >  	bool mod =3D false;
+> > +	u32 wolopts =3D 0;
+> >  	int ret;
+> > =20
+> >  	dev->ethtool_ops->get_wol(dev, &wol);
+> > -	ret =3D ethnl_update_bitset32(&wol.wolopts, WOL_MODE_COUNT,
+> > +	ret =3D ethnl_update_bitset32(&wolopts, WOL_MODE_COUNT,
+> >  				    tb[ETHTOOL_A_WOL_MODES], wol_mode_names,
+> >  				    info->extack, &mod);
+> >  	if (ret < 0)
+> >  		return ret;
+> > -	if (wol.wolopts & ~wol.supported) {
+> > +	if (wolopts & ~wol.supported) {
+> >  		NL_SET_ERR_MSG_ATTR(info->extack, tb[ETHTOOL_A_WOL_MODES],
+> >  				    "cannot enable unsupported WoL mode");
+> >  		return -EINVAL;
+> > @@ -132,8 +133,9 @@ ethnl_set_wol(struct ethnl_req_info *req_info, stru=
+ct genl_info *info)
+> >  				    tb[ETHTOOL_A_WOL_SOPASS], &mod);
+> >  	}
+> > =20
+> > -	if (!mod)
+> > +	if (!mod && wolopts =3D=3D wol.wolopts)
+> >  		return 0;
+> > +	wol.wolopts =3D wolopts;
+> >  	ret =3D dev->ethtool_ops->set_wol(dev, &wol);
+> >  	if (ret)
+> >  		return ret;
+> > --=20
+> > 2.39.2
+>=20
+> This doesn't look right, AFAICS with this patch, the resulting WoL flags
+> would not depend on current values at all, i.e. it would certainly break
+> non-absolute commands like
+>=20
+>   ethtool -s eth0 wol +g
+>   ethtool -s eth0 wol -u+g
+>   ethtool -s etho wol 32/34
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Wow, I have learned something new :)
 
-On Tue, 17 Oct 2023 20:34:00 +0900 you wrote:
-> This patch is based on the latest net-next.git / next branch.
-> After applied this patch with the following patches, the system can
-> enter/exit Suspend to Idle without any error:
-> https://git.kernel.org/pub/scm/linux/kernel/git/phy/linux-phy.git/commit/?h=next&id=aa4c0bbf820ddb9dd8105a403aa12df57b9e5129
-> https://git.kernel.org/pub/scm/linux/kernel/git/phy/linux-phy.git/commit/?h=next&id=1a5361189b7acac15b9b086b2300a11b7aa84c06
-> 
-> Changes from v2:
-> https://lore.kernel.org/all/20231013121936.364678-1-yoshihiro.shimoda.uh@renesas.com/
->  - Based on the latest net-next.git / main branch.
->  - Change the subject in the patch 1/2.
->  - Fix a condition to avoid endless loop in the patch 1/2.
-> 
-> [...]
+> How recent was the kernel where you encountered the issue?
 
-Here is the summary with links:
-  - [net-next,v3,1/2] rswitch: Use unsigned int for port related array index
-    https://git.kernel.org/netdev/net-next/c/1bf55630694e
-  - [net-next,v3,2/2] rswitch: Add PM ops
-    https://git.kernel.org/netdev/net-next/c/35b78409e1c7
+It is latest net-next.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> I suspect the
+> issue might be related to recent 108a36d07c01 ("ethtool: Fix mod state
+> of verbose no_mask bitset"), I'll look into it closer.
 
+Thx!
 
+Regards,
+Oleksij
+--=20
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
