@@ -1,150 +1,68 @@
-Return-Path: <netdev+bounces-42609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 098117CF8B3
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:27:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC3467CF8B5
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:27:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6420282054
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:27:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 291D01C20AD9
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829D4210FC;
-	Thu, 19 Oct 2023 12:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EB4210FC;
+	Thu, 19 Oct 2023 12:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aGGHIh3G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TNsTLVhE"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836D828F7;
-	Thu, 19 Oct 2023 12:27:20 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3F70114;
-	Thu, 19 Oct 2023 05:27:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=yA8MKqdNKQuWdRri1Z3csm7362aeLdSeAXDg+Y/AEeM=; b=aGGHIh3GLpgB0t52zr8cM/UHwA
-	r+n1oNfBUUz+8QnT/LT4RCxC5JzdyI9hvnuXHbpUy4UubkufoJ3K/MYZ+rKaTZGN1xpWB7fSZea60
-	Tvu23Aj93FxMcHi4PuNISORpelVnxHRAttM/w7hHVjqeaz3ytgjf3nPsAzdXTIKZw0tkG5QZX2fLU
-	QjFKWydbbYaQXmflRIXdtjefPMU16xDeYahMRAYHgD86/4yFXC3XDG2dOxCt25C7Pj4FEtKTTXaf3
-	AL5yzYEc4S2x0bu57zWFa+7W+e/BLUlHatDAVaC0yd3VIMQIjUTcg6NjaZUD7UJPnr5zUmxTc8UGe
-	YAiedX8g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45182)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qtS7K-00071V-00;
-	Thu, 19 Oct 2023 13:27:10 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qtS7J-0000RU-VQ; Thu, 19 Oct 2023 13:27:09 +0100
-Date: Thu, 19 Oct 2023 13:27:09 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Conor Dooley <conor@kernel.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org,
-	Gregory Clement <gregory.clement@bootlin.com>
-Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: dsa: Require ports or
- ethernet-ports
-Message-ID: <ZTEgnUP0rFL2frkk@shell.armlinux.org.uk>
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-1-3ee0c67383be@linaro.org>
- <169762516670.391804.7528295251386913602.robh@kernel.org>
- <CACRpkdZ4hkiD6jwENqjZRX8ZHH9+3MSMMLcJe6tJa=6Yhn1w=g@mail.gmail.com>
- <ZTEL6Yw+Xcc0E4TJ@shell.armlinux.org.uk>
- <20231019-pulse-autopilot-166bb6c96090@spud>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F3F1DFC3;
+	Thu, 19 Oct 2023 12:27:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67101C433C8;
+	Thu, 19 Oct 2023 12:27:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697718464;
+	bh=6pLtasYutjsQq5OHpq4USMERf4M+2OpzADP2WRftPh8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TNsTLVhE1DiIT6iCpLU2mPTrlzxXXXgtBTRQP0L7NT0GtwPwo5O7WH9heGe5EDkqc
+	 0G4zqWNDK4j4tYb5y5BWSgiIm36j2sGOUDSaoHE74Yk8SahZoGuEZySMsorGVLO5bG
+	 kvLZhP8c0bK41Io+r/mHQwsfyDWR1MouHiRp/gPgSHH4cJ2lPrdp2vWT7K8GpFLLsc
+	 ZbwcTt6gFL5Y1rFW/IqzugorVTlbxnNJn+l3XiEKQ4bxISw9F6/bOKI0rXRWvWhhJq
+	 kNkJdIuEv+sTLdD6P3UeJJVahYJS0y3AZx0ffiBfavr+V4TXvRUl1goN/Cr8wahjtY
+	 3RuyAvXpnu9QQ==
+Date: Thu, 19 Oct 2023 14:27:40 +0200
+From: Simon Horman <horms@kernel.org>
+To: Nandha Kumar Singaram <nandhakumar.singaram@gmail.com>
+Cc: Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+	Coiby Xu <coiby.xu@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	netdev@vger.kernel.org, linux-staging@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kumaran.4353@gmail.com
+Subject: Re: [PATCH v2 1/2] staging: qlge: Fix coding style in qlge.h
+Message-ID: <20231019122740.GG2100445@kernel.org>
+References: <cover.1697657604.git.nandhakumar.singaram@gmail.com>
+ <cec5ab120f3c110a4699757c8b364f4be1575ad7.1697657604.git.nandhakumar.singaram@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231019-pulse-autopilot-166bb6c96090@spud>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <cec5ab120f3c110a4699757c8b364f4be1575ad7.1697657604.git.nandhakumar.singaram@gmail.com>
 
-On Thu, Oct 19, 2023 at 12:58:46PM +0100, Conor Dooley wrote:
-> On Thu, Oct 19, 2023 at 11:58:49AM +0100, Russell King (Oracle) wrote:
-> > On Wed, Oct 18, 2023 at 01:11:45PM +0200, Linus Walleij wrote:
-> > > On Wed, Oct 18, 2023 at 12:32 PM Rob Herring <robh@kernel.org> wrote:
-> > > > On Wed, 18 Oct 2023 11:03:40 +0200, Linus Walleij wrote:
-> > > 
-> > > > > Bindings using dsa.yaml#/$defs/ethernet-ports specify that
-> > > > > a DSA switch node need to have a ports or ethernet-ports
-> > > > > subnode, and that is actually required, so add requirements
-> > > > > using oneOf.
-> > > > >
-> > > > > Suggested-by: Rob Herring <robh@kernel.org>
-> > > > > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> > > > > ---
-> > > > >  Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 ++++++
-> > > > >  1 file changed, 6 insertions(+)
-> > > > >
-> > > >
-> > > > My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-> > > > on your patch (DT_CHECKER_FLAGS is new in v5.13):
-> > > >
-> > > > yamllint warnings/errors:
-> > > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:60:7: [warning] wrong indentation: expected 8 but found 6 (indentation)
-> > > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:62:7: [warning] wrong indentation: expected 8 but found 6 (indentation)
-> > > 
-> > > Really?
-> > > 
-> > > +  oneOf:
-> > > +    - required:
-> > > +      - ports
-> > > +    - required:
-> > > +      - ethernet-ports
-> > > 
-> > > Two spaces after the oneOf, 2 spaces after a required as usual.
-> > > I don't get it.
-> > 
-> > Given the other python errors spat out in Rob's report, I would suggest
-> > that the "bot" is running a development version that hasn't been fully
-> > tested, so anything it spits out is suspect. Maybe Rob can comment on
-> > the validity of the warnings in the report.
+On Wed, Oct 18, 2023 at 12:46:00PM -0700, Nandha Kumar Singaram wrote:
+> Replace all occurrnces of (1<<x) by BIT(x) to get rid of checkpatch.pl
+> "CHECK" output "Prefer using the BIT macro"
 > 
-> In this case, I think it is correct.
-> 2 spaces for the oneOf, 2 spaces the start of the required for the
-> nested list, so:
-> oneOf:
->   - required:
+> Signed-off-by: Nandha Kumar Singaram <nandhakumar.singaram@gmail.com>
 
-This is a total of two spaces indentation.
+Thanks Nandha,
 
->       - ports
-
-This is a total of six spaces indentation.
-
-You mention 2 spaces for the oneOf, which explains why the "- required"
-needs to be indented by two spaces. You also say 2 spaces for the
-required nested list, but what about the other two spaces?
-
-I guess if you're a YAML expert, this all makes sense, but to those of
-us who aren't, these quirky "features" of it just seem totally
-illogical.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+these changes look good to me.
+But I would like to ask if not updating
+Q_LEN_V and LEN_V is intentional.
 
