@@ -1,145 +1,106 @@
-Return-Path: <netdev+bounces-42738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F8527D005B
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:19:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3230F7D0072
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E1541C20AF6
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:19:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE17F281E6D
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF7932C77;
-	Thu, 19 Oct 2023 17:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6252632C8B;
+	Thu, 19 Oct 2023 17:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ku1mMqYl"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="dTyUqNUE"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9827D30F82;
-	Thu, 19 Oct 2023 17:19:22 +0000 (UTC)
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBAACCF;
-	Thu, 19 Oct 2023 10:19:20 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-53dd752685fso14195246a12.3;
-        Thu, 19 Oct 2023 10:19:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697735959; x=1698340759; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kuVTxDXsD5zLqnlIbrRzu0NzyI0nKgFfjwxin/PFwlU=;
-        b=ku1mMqYloz5mUBTRrXbNrE7DHw23gB1v7mpQhrMI6W32f2y4TM8ctFbxFcY4sDMAfj
-         sxZhXXgaYwa3GZPLmMApDObsKfxDOhx0lAhKkKiu+9/RVU5OHSTQWp+j/XiSCR+C/h5Z
-         0TBaysj/6dD2UWVkgmAVTSkbfjKxS/MHtQySVaItGcGHY43I0nuknng4O9mMp0mBoYeF
-         FpDer/brljutb5y3kYvYXOurpqzPzIYqQeg7iiIApu7uyEzCadLlJhfsI9lw450IosIy
-         iUFvZdEhOwPV0OIRBf9pUn3TzxJHb7meENGjvYfF7qYr/L3iUgBYSheKxOD0oI4Z2ziS
-         XXYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697735959; x=1698340759;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kuVTxDXsD5zLqnlIbrRzu0NzyI0nKgFfjwxin/PFwlU=;
-        b=PGkZkhlLsGHwnoqMIbSqzuq52d4iWP6H0QhlRafdRT0FZNAB7Y8AJ124bkal7Wvp1k
-         GVhLWFauUqp7NqiQpnp4iOnQbaoc024ykb02cpUHAsxlvvn5j+EbOgtOIUbhi6kDcQEP
-         FsbeRP47aCjl+S0c2x2IsimCZVk13lWq1hYEQhIF6zjO56+aDfRpwE3jwTVWs45rMTdN
-         GZ9y1+6aG6p78b02Q+XML7lOfRN2Lm1au0fH1qmUkHd17LZIqF9hO4Lp0cbsT68dgdVA
-         QF5SHqxSiF76500N4y/QsyD3UUi7+g+zjYR6gGzksjS+dqHo3q4J+UwLBcFr1USRgc3Z
-         avyA==
-X-Gm-Message-State: AOJu0YwPHqJ3CuJ85QdVTqX6++Q/3pnnZ2U+C/eXXftlWqITyhcFfOec
-	0H+oXBPUE3wTlKs4+vCL4ac=
-X-Google-Smtp-Source: AGHT+IGhfVwmPgjwxlHZqbpAewteoE+DkWqCmtTGfr9oV2jyUKq+NC85tBuQJGggMWKJhJhDvj3OMQ==
-X-Received: by 2002:a05:6402:27ca:b0:53e:f321:e6fd with SMTP id c10-20020a05640227ca00b0053ef321e6fdmr2359570ede.9.1697735959051;
-        Thu, 19 Oct 2023 10:19:19 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id ee16-20020a056402291000b0053e8f1f79afsm4810370edb.30.2023.10.19.10.19.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 10:19:18 -0700 (PDT)
-Date: Thu, 19 Oct 2023 20:19:16 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v6 7/9] net: dsa: microchip: Add error handling
- for ksz_switch_macaddr_get()
-Message-ID: <20231019171916.nu4aptbxl6owg2gi@skbuf>
-References: <20231019122850.1199821-1-o.rempel@pengutronix.de>
- <20231019122850.1199821-8-o.rempel@pengutronix.de>
- <20231019171308.tpjdevvnrqhly6cu@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F17D32C7F
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:24:22 +0000 (UTC)
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5617C106;
+	Thu, 19 Oct 2023 10:24:20 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39JHNosS111926;
+	Thu, 19 Oct 2023 12:23:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1697736230;
+	bh=cnCHnIviGvR5LlFZrHE55hEYXebBD3jVoaFYztQJ+iw=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=dTyUqNUE5KKIWmH92x7b0jdlT00mo2uehOZ+gXlzvHx07A7JU5/LSJCQiUcKsRgUu
+	 AY3V6V6gZ/rtCtwOWsG9G87CP71MckBjaXlw6PwAVuNTb+neZ6n51bzRdAxMzrBn/8
+	 VLO/ma3DL59zSzQyyvXLeVX7apBJKqt4MIcUAM9c=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39JHNo2l118711
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 19 Oct 2023 12:23:50 -0500
+Received: from DLEE103.ent.ti.com (157.170.170.33) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 19
+ Oct 2023 12:23:49 -0500
+Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 19 Oct 2023 12:23:49 -0500
+Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39JHNnhb043119;
+	Thu, 19 Oct 2023 12:23:49 -0500
+Date: Thu, 19 Oct 2023 12:23:49 -0500
+From: Nishanth Menon <nm@ti.com>
+To: Ravi Gunasekaran <r-gunasekaran@ti.com>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <pabeni@redhat.com>, <rogerq@ti.com>, <andrew@lunn.ch>,
+        <f.fainelli@gmail.com>, <horms@kernel.org>,
+        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        Thejasvi Konduru <t-konduru@ti.com>,
+        <linux-arm-kernel@lists.infradead.org>, <u-kumar1@ti.com>,
+        Neha Malcom Francis <n-francis@ti.com>
+Subject: Re: [PATCH net-next] net: ethernet: ti: davinci_mdio: Fix the
+ revision string for J721E
+Message-ID: <20231019172349.mwtxt5he222d6zrj@engraved>
+References: <20231018140009.1725-1-r-gunasekaran@ti.com>
+ <20231018154448.vlunpwbw67xeh4rj@unfasten>
+ <4131fd06-0e46-5454-fbdb-85ccabc0e8b0@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20231019171308.tpjdevvnrqhly6cu@skbuf>
+In-Reply-To: <4131fd06-0e46-5454-fbdb-85ccabc0e8b0@ti.com>
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Thu, Oct 19, 2023 at 08:13:08PM +0300, Vladimir Oltean wrote:
-> On Thu, Oct 19, 2023 at 02:28:48PM +0200, Oleksij Rempel wrote:
-> > Enhance the ksz_switch_macaddr_get() function to handle errors that may
-> > occur during the call to ksz_write8(). Specifically, this update checks
-> > the return value of ksz_write8(), which may fail if regmap ranges
-> > validation is not passed and returns the error code.
-> > 
-> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> > Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> > ---
-> >  drivers/net/dsa/microchip/ksz_common.c | 9 ++++++---
-> >  1 file changed, 6 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> > index 7b05de6fe987..79052a54880c 100644
-> > --- a/drivers/net/dsa/microchip/ksz_common.c
-> > +++ b/drivers/net/dsa/microchip/ksz_common.c
-> > @@ -3612,7 +3612,7 @@ int ksz_switch_macaddr_get(struct dsa_switch *ds, int port,
-> >  	struct ksz_switch_macaddr *switch_macaddr;
-> >  	struct ksz_device *dev = ds->priv;
-> >  	const u16 *regs = dev->info->regs;
-> > -	int i;
-> > +	int i, ret;
-> >  
-> >  	/* Make sure concurrent MAC address changes are blocked */
-> >  	ASSERT_RTNL();
-> > @@ -3639,8 +3639,11 @@ int ksz_switch_macaddr_get(struct dsa_switch *ds, int port,
-> >  	dev->switch_macaddr = switch_macaddr;
-> >  
-> >  	/* Program the switch MAC address to hardware */
-> > -	for (i = 0; i < ETH_ALEN; i++)
-> > -		ksz_write8(dev, regs[REG_SW_MAC_ADDR] + i, addr[i]);
-> > +	for (i = 0; i < ETH_ALEN; i++) {
-> > +		ret = ksz_write8(dev, regs[REG_SW_MAC_ADDR] + i, addr[i]);
-> > +		if (ret)
-> > +			return ret;
-> > +	}
+On 11:11-20231019, Ravi Gunasekaran wrote:
+> Nishanth, Jakub,
 > 
-> I understand that you intend the error to be fatal, but this leaks memory and a refcount.
+> On 10/18/23 9:14 PM, Nishanth Menon wrote:
+> > 
+> > We then have the following steps potentially
+> > 
+> > Drop the fixes and Maintain both SR2.0 and SR1.0 (add SR1.1) so that
+> > we can merge the socinfo fixes without breaking bisectability.
+> 
+> I will drop the fixes tag then and maintain SR1.0, SR1.1, SR2.0 for J721E
+> and mention in the commit msg that this is a preparatory patch to fix the
+> incorrect revision string generation. And in the next cycle, I will
+> send out a patch removing the invalid revision IDs.
+> 
+> Ideally I would prefer to do this for all the SoCs, but I would need some
+> time to compile the list. So for now, I will send a v2 targeting only J721E.
+> 
+> Please let me know your thoughts on this.
 
-I didn't estimate correctly what would happen.
+just do the full list in one shot. it is easier that way than having to
+repeat this sync over and over again.
 
-If ksz_write8() fails as you say, we will leave behind the reference to
-dev->switch_macaddr, which points to valid memory. Which means that the
-second time around, the call to ksz_switch_macaddr_get() will succeed,
-because the driver thinks that the address has been programmed to
-hardware, and it is unaware of the previous failure. But it will not
-work. Am I correct?
-
-If so, it needs to tear down properly, because if ksz_switch_macaddr_get()
-fails once to write to hardware, it should fail always.
+-- 
+Regards,
+Nishanth Menon
+Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
 
