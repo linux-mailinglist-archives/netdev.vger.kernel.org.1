@@ -1,461 +1,242 @@
-Return-Path: <netdev+bounces-42758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31EAF7D00D6
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:47:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA84C7D00DE
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7EF4B2116A
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:47:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E653D1C20D1C
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA3B3550E;
-	Thu, 19 Oct 2023 17:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DEA3589D;
+	Thu, 19 Oct 2023 17:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MMZiJCG8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v0nWVKDq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8D132C7E
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:47:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDADCC433C8;
-	Thu, 19 Oct 2023 17:47:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697737657;
-	bh=Cv+5AyH2vKzunvSMtHg7hEMfbpW4c9qOwmuC8rQWkxE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=MMZiJCG8W7HuZr/VWpAcq7V4bPjRk+W5Jb4BX+l8i5YEnUXMEsNJ7WJg/diIsLECV
-	 dTDUjSRQ7u2H2uD+O3zJe/OVMMqsQD/+nO3eZVyaMP9VYV7vX1/oWhJRgVBA4r+G3x
-	 bk8oAtdhM0eS+PI1jJBq82M17P//QoEsdRnFtSDU8kZoqHymXonVB7zsoq5DNDiGJa
-	 hzWMbtga6fiU7lFNVEcYk3FqLZmWw4RdzTq30xWozjJCuRD3H5Soju0t3IsoY2yJMl
-	 luClwsN66Nc5rHN0bxchGnDPh6RXv+FZPMMImxLUYzVbPF+RMNu74BBT7DBPoKm9oZ
-	 YJt6rLe1taVSw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com
-Subject: [GIT PULL] Networking for v6.6-rc7
-Date: Thu, 19 Oct 2023 10:47:35 -0700
-Message-ID: <20231019174735.1177985-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA93832C7E
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:49:48 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1FE712A
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:49:46 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9bc6447193so6790649276.3
+        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:49:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697737786; x=1698342586; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rrFQU2bFRBFpPcRm9Nxjx/Z6u7CxoFEaEVXQ+Tv7bs0=;
+        b=v0nWVKDqEhMKHyybKHW8vJ/xcbK+65PM/LEJxJ4UiJh9CKTvk1X+nA7Qq/IeLohknT
+         8smBnP3p2A1H7538ugvKNXsECVmNcCjzYAofRSsqzLDkj3CX2KhB+nBjdkpODlW7aN2n
+         y5OEMe3dQl1p6E/u0h9A/+ZjWddj84GponVJIqqRnd9yHYMNFdTwcvkPug5R9u4XIbc6
+         9GdmPxk2+Rmj4oIPCIM+DebEgusB7UBzDtoYTXPhxBkG2+b1x7v0CvNPDpxjE36oCgsj
+         Qr2Vjjl1FpF2P0/VChK5hvg7ajQxpPh4r22W8TxcYXJsnvpLdKIPvH420E2PhlGzGe7I
+         uVvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697737786; x=1698342586;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rrFQU2bFRBFpPcRm9Nxjx/Z6u7CxoFEaEVXQ+Tv7bs0=;
+        b=vBDhkTaSR9Llb+BFjYds+Mt9il+6XtUNpC9iQmuQ2lpgzW+WffTKaqzQB5Ro3VFSV1
+         NUj0NvpjWjTcKSnw/f2F9zc0ujzNVC5xQgyw/qAMw4bAWjMrA9BraRcAXUfD1ntuWdh/
+         HO+0/rfrmA570oZNjwpii1pGJsnzGilIHN1U+UYjTeME7HyEHrbIcg4cjbd3HohYCOUB
+         W48mDessYaJXR+E0AeQUkjr4gK2mV4RHmiqgUWloYN0DUefLq6/wzAVOELlJAw1WvJKo
+         KIl6CqiSScsJFi/6nEPG/kl0HUnPwpVPvIaa5ZD9PNAhtT62CmG1K6OMS9zDKnyzIucA
+         fc9A==
+X-Gm-Message-State: AOJu0YwX2IViiux2XA7lDKuLDYWa7TdP7I6bqKa4tLd39yVWgJIVrQQl
+	/cWPNnUvRFC6zZSZLjOYp5Z5kzA=
+X-Google-Smtp-Source: AGHT+IGTjKhwxaANxpwYVu7ii6AsOWPP+5GGTt2Q8zvwWpCfr3sVhLcSfhnAhPLE1ishYjOelsxH8L8=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a25:5ca:0:b0:d77:f7c3:37db with SMTP id
+ 193-20020a2505ca000000b00d77f7c337dbmr66089ybf.8.1697737785870; Thu, 19 Oct
+ 2023 10:49:45 -0700 (PDT)
+Date: Thu, 19 Oct 2023 10:49:33 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
+Message-ID: <20231019174944.3376335-1-sdf@google.com>
+Subject: [PATCH bpf-next v4 00/11] xsk: TX metadata
+From: Stanislav Fomichev <sdf@google.com>
+To: bpf@vger.kernel.org
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
+	kuba@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org, 
+	magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com, 
+	hawk@kernel.org, yoong.siang.song@intel.com, netdev@vger.kernel.org, 
+	xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="UTF-8"
+
+This series implements initial TX metadata (offloads) for AF_XDP.
+See patch #2 for the main implementation and mlx5/stmmac ones for the
+example on how to consume the metadata on the device side.
+
+Starting with two types of offloads:
+- request TX timestamp (and write it back into the metadata area)
+- request TX checksum offload
+
+Changes since v3:
+- fix xsk_tx_metadata_ops kdoc (Song Yoong Siang)
+- add missing xsk_tx_metadata_to_compl for XDP_SOCKETS=n (Vinicius Costa Gomes and Intel bots)
+- add reference timestamps to the selftests + refactor existing ones (Jesper)
+
+v3: https://lore.kernel.org/bpf/20231003200522.1914523-1-sdf@google.com/
+
+Performance (mlx5):
+
+I've implemented a small xskgen tool to try to saturate single tx queue:
+https://github.com/fomichev/xskgen/tree/master
+
+Here are the performance numbers with some analysis.
+
+1. Baseline. Running with commit eb62e6aef940 ("Merge branch 'bpf:
+Support bpf_get_func_ip helper in uprobes'"), nothing from this series:
+
+- with 1400 bytes of payload: 98 gbps, 8 mpps
+./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189130 sec, 98.357623 gbps 8.409509 mpps
+
+- with 200 bytes of payload: 49 gbps, 23 mpps
+./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000064 packets 20960134144 bits, took 0.422235 sec, 49.640921 gbps 23.683645 mpps
+
+2. Adding single commit that supports reserving tx_metadata_len
+   changes nothing numbers-wise.
+
+- baseline for 1400
+./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189247 sec, 98.347946 gbps 8.408682 mpps
+
+- baseline for 200
+./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 20960000000 bits, took 0.421248 sec, 49.756913 gbps 23.738985 mpps
+
+3. Adding -M flag causes xskgen to reserve the metadata and fill it, but
+   doesn't set XDP_TX_METADATA descriptor option.
+
+- new baseline for 1400 (with only filling the metadata)
+./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.188767 sec, 98.387657 gbps 8.412077 mpps
+
+- new baseline for 200 (with only filling the metadata)
+./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 20960000000 bits, took 0.410213 sec, 51.095407 gbps 24.377579 mpps
+(the numbers go sligtly up here, not really sure why, maybe some cache-related
+side-effects?
+
+4. Next, I'm running the same test but with the commit that adds actual
+   general infra to parse XDP_TX_METADATA (but no driver support).
+   Essentially applying "xsk: add TX timestamp and TX checksum offload support"
+   from this series. Numbers are the same.
+
+- fill metadata for 1400
+./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.188430 sec, 98.415557 gbps 8.414463 mpps
+
+- fill metadata for 200
+./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 20960000000 bits, took 0.411559 sec, 50.928299 gbps 24.297853 mpps
+
+- request metadata for 1400
+./xskgen -m -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.188723 sec, 98.391299 gbps 8.412389 mpps
+
+- request metadata for 200
+./xskgen -m -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000064 packets 20960134144 bits, took 0.411240 sec, 50.968131 gbps 24.316856 mpps
+
+5. Now, for the most interesting part, I'm adding mlx5 driver support.
+   The mpps for 200 bytes case goes down from 23 mpps to 19 mpps, but
+   _only_ when I enable the metadata. This looks like a side effect
+   of me pushing extra metadata pointer via mlx5e_xdpi_fifo_push.
+   Hence, this part is wrapped into 'if (xp_tx_metadata_enabled)'
+   to not affect the existing non-metadata use-cases. Since this is not
+   regressing existing workloads, I'm not spending any time trying to
+   optimize it more (and leaving it up to mlx owners to purse if
+   they see any good way to do it).
+
+- same baseline
+./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189434 sec, 98.332484 gbps 8.407360 mpps
+
+./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000128 packets 20960268288 bits, took 0.425254 sec, 49.288821 gbps 23.515659 mpps
+
+- fill metadata for 1400
+./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189528 sec, 98.324714 gbps 8.406696 mpps
+
+- fill metadata for 200
+./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000128 packets 20960268288 bits, took 0.519085 sec, 40.379260 gbps 19.264914 mpps
+
+- request metadata for 1400
+./xskgen -m -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189329 sec, 98.341165 gbps 8.408102 mpps
+
+- request metadata for 200
+./xskgen -m -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000128 packets 20960268288 bits, took 0.519929 sec, 40.313713 gbps 19.233642 mpps
+
+Song Yoong Siang (1):
+  net: stmmac: Add Tx HWTS support to XDP ZC
+
+Stanislav Fomichev (10):
+  xsk: Support tx_metadata_len
+  xsk: Add TX timestamp and TX checksum offload support
+  tools: ynl: Print xsk-features from the sample
+  net/mlx5e: Implement AF_XDP TX timestamp and checksum offload
+  selftests/xsk: Support tx_metadata_len
+  selftests/bpf: Add csum helpers
+  selftests/bpf: Add TX side to xdp_metadata
+  selftests/bpf: Convert xdp_hw_metadata to XDP_USE_NEED_WAKEUP
+  selftests/bpf: Add TX side to xdp_hw_metadata
+  xsk: Document tx_metadata_len layout
+
+ Documentation/netlink/specs/netdev.yaml       |  19 ++
+ Documentation/networking/index.rst            |   1 +
+ Documentation/networking/xsk-tx-metadata.rst  |  77 ++++++
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  72 +++++-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.h  |  11 +-
+ .../ethernet/mellanox/mlx5/core/en/xsk/tx.c   |  17 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  12 +
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  63 ++++-
+ include/linux/netdevice.h                     |  27 ++
+ include/linux/skbuff.h                        |  14 +-
+ include/net/xdp_sock.h                        |  86 +++++++
+ include/net/xdp_sock_drv.h                    |  13 +
+ include/net/xsk_buff_pool.h                   |   7 +
+ include/uapi/linux/if_xdp.h                   |  41 ++++
+ include/uapi/linux/netdev.h                   |  16 ++
+ net/core/netdev-genl.c                        |  12 +-
+ net/xdp/xdp_umem.c                            |   4 +
+ net/xdp/xsk.c                                 |  51 +++-
+ net/xdp/xsk_buff_pool.c                       |   1 +
+ net/xdp/xsk_queue.h                           |  19 +-
+ tools/include/uapi/linux/if_xdp.h             |  55 ++++-
+ tools/include/uapi/linux/netdev.h             |  16 ++
+ tools/net/ynl/generated/netdev-user.c         |  19 ++
+ tools/net/ynl/generated/netdev-user.h         |   3 +
+ tools/net/ynl/samples/netdev.c                |   6 +
+ tools/testing/selftests/bpf/network_helpers.h |  43 ++++
+ .../selftests/bpf/prog_tests/xdp_metadata.c   |  31 ++-
+ tools/testing/selftests/bpf/xdp_hw_metadata.c | 230 ++++++++++++++++--
+ tools/testing/selftests/bpf/xsk.c             |   3 +
+ tools/testing/selftests/bpf/xsk.h             |   1 +
+ 32 files changed, 914 insertions(+), 61 deletions(-)
+ create mode 100644 Documentation/networking/xsk-tx-metadata.rst
+
+-- 
+2.42.0.655.g421f12c284-goog
 
-Hi Linus!
-
-Happy Nov 1st to you and your surrounding spirits.
-
-The following changes since commit e8c127b0576660da9195504fe8393fe9da3de9ce:
-
-  Merge tag 'net-6.6-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-10-12 13:07:00 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.6-rc7
-
-for you to fetch changes up to 524515020f2552759a7ef1c9d03e7dac9b1ff3c2:
-
-  Revert "ethtool: Fix mod state of verbose no_mask bitset" (2023-10-19 09:27:12 -0700)
-
-----------------------------------------------------------------
-Including fixes from bluetooth, netfilter, WiFi.
-
-Feels like an up-tick in regression fixes, mostly for older releases.
-The hfsc fix, tcp_disconnect() and Intel WWAN fixes stand out as fairly
-clear-cut user reported regressions. The mlx5 DMA bug was causing strife
-for 390x folks. The fixes themselves are not particularly scary, tho.
-No open investigations / outstanding reports at the time of writing.
-
-Current release - regressions:
-
- - eth: mlx5: perform DMA operations in the right locations,
-   make devices usable on s390x, again
-
- - sched: sch_hfsc: upgrade 'rt' to 'sc' when it becomes a inner curve,
-   previous fix of rejecting invalid config broke some scripts
-
- - rfkill: reduce data->mtx scope in rfkill_fop_open, avoid deadlock
-
- - revert "ethtool: Fix mod state of verbose no_mask bitset",
-   needs more work
-
-Current release - new code bugs:
-
- - tcp: fix listen() warning with v4-mapped-v6 address
-
-Previous releases - regressions:
-
- - tcp: allow tcp_disconnect() again when threads are waiting,
-   it was denied to plug a constant source of bugs but turns out
-   .NET depends on it
-
- - eth: mlx5: fix double-free if buffer refill fails under OOM
-
- - revert "net: wwan: iosm: enable runtime pm support for 7560",
-   it's causing regressions and the WWAN team at Intel disappeared
-
- - tcp: tsq: relax tcp_small_queue_check() when rtx queue contains
-   a single skb, fix single-stream perf regression on some devices
-
-Previous releases - always broken:
-
- - Bluetooth:
-   - fix issues in legacy BR/EDR PIN code pairing
-   - correctly bounds check and pad HCI_MON_NEW_INDEX name
-
- - netfilter:
-   - more fixes / follow ups for the large "commit protocol" rework,
-     which went in as a fix to 6.5
-   - fix null-derefs on netlink attrs which user may not pass in
-
- - tcp: fix excessive TLP and RACK timeouts from HZ rounding
-   (bless Debian for keeping HZ=250 alive)
-
- - net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation, prevent
-   letting frankenstein UDP super-frames from getting into the stack
-
- - net: fix interface altnames when ifc moves to a new namespace
-
- - eth: qed: fix the size of the RX buffers
-
- - mptcp: avoid sending RST when closing the initial subflow
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-----------------------------------------------------------------
-Aaron Conole (4):
-      selftests: openvswitch: Add version check for pyroute2
-      selftests: openvswitch: Catch cases where the tests are killed
-      selftests: openvswitch: Skip drop testing on older kernels
-      selftests: openvswitch: Fix the ct_tuple for v4
-
-Albert Huang (1):
-      net/smc: fix smc clc failed issue when netdevice not in init_net
-
-Amir Tzin (1):
-      net/mlx5e: Fix VF representors reporting zero counters to "ip -s" command
-
-Arkadiusz Bokowy (1):
-      Bluetooth: vhci: Fix race when opening vhci device
-
-Arnd Bergmann (1):
-      Bluetooth: avoid memcmp() out of bounds warning
-
-Bagas Sanjaya (1):
-      Revert "net: wwan: iosm: enable runtime pm support for 7560"
-
-Christoph Paasch (1):
-      netlink: Correct offload_xstats size
-
-Dan Carpenter (1):
-      net: usb: smsc95xx: Fix an error code in smsc95xx_reset()
-
-David S. Miller (1):
-      Merge branch 'ovs-selftests'
-
-Dong Chenchen (1):
-      net: xfrm: skip policies marked as dead while reinserting policies
-
-Dragos Tatulea (3):
-      net/mlx5e: RX, Fix page_pool allocation failure recovery for striding rq
-      net/mlx5e: RX, Fix page_pool allocation failure recovery for legacy rq
-      net/mlx5e: XDP, Fix XDP_REDIRECT mpwqe page fragment leaks on shutdown
-
-Dust Li (1):
-      net/smc: return the right falback reason when prefix checks fail
-
-Edward AD (1):
-      Bluetooth: hci_sock: fix slab oob read in create_monitor_event
-
-Eric Dumazet (6):
-      xfrm: interface: use DEV_STATS_INC()
-      xfrm: fix a data-race in xfrm_gen_index()
-      xfrm: fix a data-race in xfrm_lookup_with_ifid()
-      tun: prevent negative ifindex
-      tcp: tsq: relax tcp_small_queue_check() when rtx queue contains a single skb
-      ipv4: fib: annotate races around nh->nh_saddr_genid and nh->nh_saddr
-
-Florian Fainelli (1):
-      net: phy: bcm7xxx: Add missing 16nm EPHY statistics
-
-Florian Westphal (2):
-      netfilter: nfnetlink_log: silence bogus compiler warning
-      netfilter: nft_payload: fix wrong mac header matching
-
-Gavrilov Ilia (1):
-      net: pktgen: Fix interface flags printing
-
-Geert Uytterhoeven (1):
-      neighbor: tracing: Move pin6 inside CONFIG_IPV6=y section
-
-Geliang Tang (1):
-      mptcp: avoid sending RST when closing the initial subflow
-
-Ido Schimmel (2):
-      selftests: fib_tests: Disable RP filter in multipath list receive test
-      selftests: fib_tests: Count all trace point invocations
-
-Iulia Tanasescu (1):
-      Bluetooth: ISO: Fix invalid context error
-
-Jakub Kicinski (14):
-      Merge branch 'selftests-fib_tests-fixes-for-multipath-list-receive-tests'
-      Merge tag 'nf-23-10-12' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-      Merge branch 'intel-wired-lan-driver-updates-2023-10-11-i40e-ice'
-      Merge tag 'mlx5-fixes-2023-10-12' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux
-      Merge tag 'for-net-2023-10-13' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-      Merge tag 'ipsec-2023-10-17' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
-      Merge tag 'wireless-2023-10-18' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-      Merge tag 'nf-23-10-18' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-      net: fix ifname in netlink ntf during netns move
-      net: check for altname conflicts when changing netdev's netns
-      net: avoid UAF on deleted altname
-      net: move altnames together with the netdevice
-      selftests: net: add very basic test for netdev names and namespaces
-      Merge branch 'mptcp-fixes-for-v6-6'
-
-Jesse Brandeburg (2):
-      ice: fix over-shifted variable
-      ice: reset first in crash dump kernels
-
-Jianbo Liu (1):
-      net/mlx5e: Don't offload internal port if filter device is out device
-
-Jinjie Ruan (1):
-      net: dsa: bcm_sf2: Fix possible memory leak in bcm_sf2_mdio_register()
-
-Jiri Pirko (1):
-      netlink: specs: devlink: fix reply command values
-
-Jiri Wiesner (1):
-      bonding: Return pointer to data after pull on skb
-
-Johannes Berg (3):
-      wifi: cfg80211: use system_unbound_wq for wiphy work
-      wifi: mac80211: fix error path key leak
-      net: rfkill: reduce data->mtx scope in rfkill_fop_open
-
-Josua Mayer (1):
-      net: rfkill: gpio: prevent value glitch during probe
-
-Kees Cook (2):
-      netfilter: nf_tables: Annotate struct nft_pipapo_match with __counted_by
-      Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
-
-Kory Maincent (1):
-      Revert "ethtool: Fix mod state of verbose no_mask bitset"
-
-Krzysztof Kozlowski (1):
-      nfc: nci: fix possible NULL pointer dereference in send_acknowledge()
-
-Kuniyuki Iwashima (1):
-      tcp: Fix listen() warning with v4-mapped-v6 address.
-
-Lama Kayal (1):
-      net/mlx5e: Take RTNL lock before triggering netdev notifiers
-
-Lee, Chun-Yi (2):
-      Bluetooth: hci_event: Ignore NULL link key
-      Bluetooth: Reject connection with the device which has same BD_ADDR
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_event: Fix using memcmp when comparing keys
-      Bluetooth: hci_event: Fix coding style
-
-MD Danish Anwar (3):
-      net: ti: icssg-prueth: Fix tx_total_bytes count
-      net: ethernet: ti: Fix mixed module-builtin object
-      net: ti: icssg-prueth: Fix r30 CMDs bitmasks
-
-Ma Ke (2):
-      net: ipv6: fix return value check in esp_remove_trailer
-      net: ipv4: fix return value check in esp_remove_trailer
-
-Maher Sanalla (1):
-      net/mlx5: Handle fw tracer change ownership event based on MTRC
-
-Manish Chopra (1):
-      qed: fix LL2 RX buffer allocation
-
-Mateusz Pacuszka (1):
-      ice: Fix safe mode when DDP is missing
-
-Mateusz Polchlopek (1):
-      docs: fix info about representor identification
-
-Matthieu Baerts (2):
-      selftests: mptcp: join: correctly check for no RST
-      selftests: mptcp: join: no RST when rm subflow/addr
-
-Max Chou (1):
-      Bluetooth: btrtl: Ignore error return for hci_devcd_register()
-
-Michal Schmidt (1):
-      i40e: prevent crash on probe if hw registers have invalid values
-
-Neal Cardwell (1):
-      tcp: fix excessive TLP and RACK timeouts from HZ rounding
-
-Pablo Neira Ayuso (4):
-      netfilter: nf_tables: do not remove elements if set backend implements .abort
-      netfilter: nf_tables: do not refresh timeout when resetting element
-      netfilter: nft_set_rbtree: .deactivate fails if element has expired
-      netfilter: nf_tables: revert do not remove elements if set backend implements .abort
-
-Paolo Abeni (5):
-      tcp: allow again tcp_disconnect() when threads are waiting
-      tcp_bpf: properly release resources on error paths
-      Merge branch 'net-fix-bugs-in-device-netns-move-and-rename'
-      tcp: check mptcp-level constraints for backlog coalescing
-      mptcp: more conservative check for zero probes
-
-Pauli Virtanen (1):
-      Bluetooth: hci_sync: always check if connection is alive before deleting
-
-Pedro Tammela (1):
-      net/sched: sch_hfsc: upgrade 'rt' to 'sc' when it becomes a inner curve
-
-Phil Sutter (2):
-      netfilter: nf_tables: audit log object reset once per table
-      selftests: netfilter: Run nft_audit.sh in its own netns
-
-Shailend Chand (1):
-      gve: Do not fully free QPL pages on prefill errors
-
-Shay Drory (2):
-      net/mlx5: Perform DMA operations in the right locations
-      net/mlx5: E-switch, register event handler before arming the event
-
-Shinas Rasheed (1):
-      octeon_ep: update BQL sent bytes before ringing doorbell
-
-Vlad Buslov (1):
-      net/mlx5: Bridge, fix peer entry ageing in LAG mode
-
-Vladimir Oltean (1):
-      net: mdio-mux: fix C45 access returning -EIO after API change
-
-Willem de Bruijn (1):
-      net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation
-
-Xingyuan Mo (2):
-      nf_tables: fix NULL pointer dereference in nft_inner_init()
-      nf_tables: fix NULL pointer dereference in nft_expr_inner_parse()
-
-Zhang Changzhong (1):
-      xfrm6: fix inet6_dev refcount underflow problem
-
-Ziyang Xuan (1):
-      Bluetooth: Fix a refcnt underflow problem for hci_conn
-
- Documentation/netlink/specs/devlink.yaml           | 18 ++---
- Documentation/networking/representors.rst          |  8 +-
- drivers/bluetooth/btrtl.c                          | 10 +--
- drivers/bluetooth/hci_vhci.c                       |  3 +
- drivers/net/bonding/bond_main.c                    |  2 +-
- drivers/net/dsa/bcm_sf2.c                          | 24 +++---
- .../chelsio/inline_crypto/chtls/chtls_io.c         | 36 +++++++--
- drivers/net/ethernet/google/gve/gve_rx.c           | 18 ++++-
- drivers/net/ethernet/intel/i40e/i40e_common.c      |  4 +-
- drivers/net/ethernet/intel/ice/ice_lib.c           |  3 +-
- drivers/net/ethernet/intel/ice/ice_main.c          | 18 +++++
- .../net/ethernet/marvell/octeon_ep/octep_main.c    | 13 ++--
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c      | 64 +++++++---------
- .../ethernet/mellanox/mlx5/core/diag/fw_tracer.c   |  2 +-
- .../ethernet/mellanox/mlx5/core/en/rep/bridge.c    | 11 +++
- .../ethernet/mellanox/mlx5/core/en/tc_tun_encap.c  |  3 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c   |  8 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   | 10 ++-
- drivers/net/ethernet/mellanox/mlx5/core/en_rx.c    | 35 ++++++---
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.h | 11 ++-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  5 +-
- .../net/ethernet/mellanox/mlx5/core/esw/bridge.c   | 25 ++++++-
- .../net/ethernet/mellanox/mlx5/core/esw/bridge.h   |  3 +
- .../ethernet/mellanox/mlx5/core/esw/bridge_priv.h  |  1 +
- drivers/net/ethernet/mellanox/mlx5/core/eswitch.c  | 17 ++---
- drivers/net/ethernet/qlogic/qed/qed_ll2.c          |  7 +-
- drivers/net/ethernet/ti/Kconfig                    |  5 ++
- drivers/net/ethernet/ti/Makefile                   |  7 +-
- drivers/net/ethernet/ti/icssg/icssg_config.c       |  4 +-
- drivers/net/ethernet/ti/icssg/icssg_stats.c        |  9 +++
- drivers/net/ethernet/ti/k3-cppi-desc-pool.c        | 10 +++
- drivers/net/mdio/mdio-mux.c                        | 47 ++++++++++++
- drivers/net/phy/bcm7xxx.c                          |  3 +
- drivers/net/tun.c                                  |  7 +-
- drivers/net/usb/smsc95xx.c                         |  2 +-
- drivers/net/wwan/iosm/iosm_ipc_imem.c              | 17 -----
- drivers/net/wwan/iosm/iosm_ipc_imem.h              |  2 -
- drivers/net/wwan/iosm/iosm_ipc_pcie.c              |  4 +-
- drivers/net/wwan/iosm/iosm_ipc_port.c              | 17 +----
- drivers/net/wwan/iosm/iosm_ipc_trace.c             |  8 --
- drivers/net/wwan/iosm/iosm_ipc_wwan.c              | 21 +-----
- include/linux/virtio_net.h                         | 19 ++++-
- include/net/bluetooth/hci_mon.h                    |  2 +-
- include/net/netns/xfrm.h                           |  1 +
- include/net/sock.h                                 | 10 +--
- include/net/tcp.h                                  |  3 +
- include/trace/events/neigh.h                       |  4 +-
- net/bluetooth/hci_conn.c                           |  9 +++
- net/bluetooth/hci_event.c                          | 48 +++++++++---
- net/bluetooth/hci_sock.c                           |  3 +-
- net/bluetooth/hci_sync.c                           | 26 +++----
- net/core/dev.c                                     | 65 ++++++++++++----
- net/core/dev.h                                     |  3 +
- net/core/pktgen.c                                  | 14 ++--
- net/core/rtnetlink.c                               |  4 +-
- net/core/stream.c                                  | 12 +--
- net/ethtool/bitset.c                               | 32 ++------
- net/ipv4/af_inet.c                                 | 10 ++-
- net/ipv4/esp4.c                                    |  4 +-
- net/ipv4/fib_semantics.c                           | 14 ++--
- net/ipv4/inet_connection_sock.c                    |  1 -
- net/ipv4/inet_hashtables.c                         | 24 +++---
- net/ipv4/tcp.c                                     | 16 ++--
- net/ipv4/tcp_bpf.c                                 | 12 +++
- net/ipv4/tcp_ipv4.c                                |  1 +
- net/ipv4/tcp_output.c                              | 25 +++++--
- net/ipv4/tcp_recovery.c                            |  2 +-
- net/ipv6/esp6.c                                    |  4 +-
- net/ipv6/xfrm6_policy.c                            |  4 +-
- net/mac80211/key.c                                 |  3 +-
- net/mptcp/protocol.c                               | 43 ++++++-----
- net/netfilter/nf_tables_api.c                      | 70 +++++++++--------
- net/netfilter/nfnetlink_log.c                      |  2 +-
- net/netfilter/nft_inner.c                          |  1 +
- net/netfilter/nft_payload.c                        |  2 +-
- net/netfilter/nft_set_pipapo.h                     |  2 +-
- net/netfilter/nft_set_rbtree.c                     |  2 +
- net/nfc/nci/spi.c                                  |  2 +
- net/rfkill/core.c                                  |  5 +-
- net/rfkill/rfkill-gpio.c                           |  4 +-
- net/sched/sch_hfsc.c                               | 18 ++++-
- net/smc/af_smc.c                                   |  5 +-
- net/smc/smc_ib.c                                   |  7 +-
- net/smc/smc_ib.h                                   |  2 +-
- net/tls/tls_main.c                                 | 10 ++-
- net/tls/tls_sw.c                                   | 19 +++--
- net/wireless/core.c                                |  2 +-
- net/xfrm/xfrm_interface_core.c                     | 22 +++---
- net/xfrm/xfrm_policy.c                             | 27 ++++---
- tools/net/ynl/generated/devlink-user.c             | 54 +++++++-------
- tools/testing/selftests/net/Makefile               |  1 +
- tools/testing/selftests/net/fib_tests.sh           |  7 +-
- tools/testing/selftests/net/mptcp/mptcp_join.sh    | 21 +++++-
- tools/testing/selftests/net/netns-name.sh          | 87 ++++++++++++++++++++++
- .../selftests/net/openvswitch/openvswitch.sh       | 21 +++++-
- .../testing/selftests/net/openvswitch/ovs-dpctl.py | 48 +++++++++++-
- tools/testing/selftests/netfilter/nft_audit.sh     | 52 +++++++++++++
- 97 files changed, 967 insertions(+), 466 deletions(-)
- create mode 100755 tools/testing/selftests/net/netns-name.sh
 
