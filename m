@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-42746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2B367D0094
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:32:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA727D0099
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD7BA282205
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:32:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F4EC1C20FA3
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B98A354E5;
-	Thu, 19 Oct 2023 17:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFD037155;
+	Thu, 19 Oct 2023 17:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B6iHfwRS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WkURxDa6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1A1335DB
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483D4341AC
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:32:38 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9469106
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:32:35 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FCB2126
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:32:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697736755; x=1729272755;
+  t=1697736756; x=1729272756;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=29EwiZeWJbTgdpl9zHpYHLwrbaH7QWv/7LIAvrQhDuQ=;
-  b=B6iHfwRSaIaIXyOhFl/qeRV3ebGfSaAVS1PTPHhXXzw9RhyCY7sFOPlf
-   ooVjNw2hdLqNxjNhtLrzmKQBoTJa7MOeBTQL7HsNFUCxJwOoEQSXW2Sx/
-   4ICGRvtdqxOPFqbDfF+w3MD5xqXhQ0tcRmVyOFMIgJ1ZE4ay5UxJf80XZ
-   07mazeZ7i/gYsRylPBQgn9O8TJywxcQtyF5DCezbFGA6eQ00FZr4WAH1y
-   gQmbf8EknZvEeJ/uLPCk88TqmA6UbW8x+Ypqm7jmwsY/hPOuKv9Q5kExE
-   mjx4dAz5iWOeji2mwt4mStlVvh/m3W9iaj/smsGwkm2x4ocwKOUTFdVdg
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="389183679"
+  bh=sIadEwKa1pNDOFRukWp4a2jsmlR9TkC+Zor4xv7CoQw=;
+  b=WkURxDa6h3iLaoW1H25Wt9NnsQNbZRGpoTEIPJwkTQZQswT94TRVhKou
+   F/51OBLdRdTbGGMG8N69PoQi0K/QoeULWLN1+k+jamIh04CqvRaPhg6q1
+   PkFSOwrAr78NsE0QfNwET5ns3v/lnIx9B7eCvyFeQwgnNrFPLnBVO8DxZ
+   dxhch1SM0YHq8hlXXmbO/iGTk0WCgS9zEMiUSVzVBaaitlhopowfekEfs
+   TL5JhCgJbOgfP3I6RDxFBmuMNKJnLXV9+Tn6qobEPukTg45sJfvXo3tdo
+   t4xlmfHHKN0chh8xEuj1ZSzXXHBFSY26rUOqwTViipas4dLw9IQdDidlO
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="389183686"
 X-IronPort-AV: E=Sophos;i="6.03,237,1694761200"; 
-   d="scan'208";a="389183679"
+   d="scan'208";a="389183686"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 10:32:34 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="760722674"
+X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="760722678"
 X-IronPort-AV: E=Sophos;i="6.03,237,1694761200"; 
-   d="scan'208";a="760722674"
+   d="scan'208";a="760722678"
 Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 10:32:33 -0700
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 10:32:34 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
 To: netdev@vger.kernel.org,
 	David Miller <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Marcin Szycik <marcin.szycik@intel.com>,
-	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next 02/11] ice: add drop rule matching on not active lport
-Date: Thu, 19 Oct 2023 10:32:18 -0700
-Message-ID: <20231019173227.3175575-3-jacob.e.keller@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Rafal Romanowski <rafal.romanowski@intel.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next 03/11] ice: store VF's pci_dev ptr in ice_vf
+Date: Thu, 19 Oct 2023 10:32:19 -0700
+Message-ID: <20231019173227.3175575-4-jacob.e.keller@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231019173227.3175575-1-jacob.e.keller@intel.com>
 References: <20231019173227.3175575-1-jacob.e.keller@intel.com>
@@ -70,271 +71,179 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-Inactive LAG port should not receive any packets, as it can cause adding
-invalid FDBs (bridge offload). Add a drop rule matching on inactive lport
-in LAG.
+Extend struct ice_vf by vfdev.
+Calculation of vfdev falls more nicely into ice_create_vf_entries().
 
+Caching of vfdev enables simplification of ice_restore_all_vfs_msi_state().
+
+Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
-Co-developed-by: Marcin Szycik <marcin.szycik@intel.com>
-Signed-off-by: Marcin Szycik <marcin.szycik@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- .../net/ethernet/intel/ice/ice_eswitch_br.c   |  6 +-
- drivers/net/ethernet/intel/ice/ice_lag.c      | 87 +++++++++++++++----
- drivers/net/ethernet/intel/ice/ice_lag.h      |  2 +
- 3 files changed, 75 insertions(+), 20 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_main.c   |  2 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c  | 50 +++++++++++----------
+ drivers/net/ethernet/intel/ice/ice_sriov.h  |  4 +-
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c |  2 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h |  2 +-
+ 5 files changed, 32 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
-index 67bfd1f61cdd..6ae0269bdf73 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
-@@ -73,7 +73,7 @@ ice_eswitch_br_ingress_rule_setup(struct ice_adv_rule_info *rule_info,
- 	rule_info->sw_act.vsi_handle = vf_vsi_idx;
- 	rule_info->sw_act.flag |= ICE_FLTR_RX;
- 	rule_info->sw_act.src = pf_id;
--	rule_info->priority = 5;
-+	rule_info->priority = 2;
- }
- 
- static void
-@@ -84,7 +84,7 @@ ice_eswitch_br_egress_rule_setup(struct ice_adv_rule_info *rule_info,
- 	rule_info->sw_act.flag |= ICE_FLTR_TX;
- 	rule_info->flags_info.act = ICE_SINGLE_ACT_LAN_ENABLE;
- 	rule_info->flags_info.act_valid = true;
--	rule_info->priority = 5;
-+	rule_info->priority = 2;
- }
- 
- static int
-@@ -207,7 +207,7 @@ ice_eswitch_br_guard_rule_create(struct ice_hw *hw, u16 vsi_idx,
- 	rule_info.allow_pass_l2 = true;
- 	rule_info.sw_act.vsi_handle = vsi_idx;
- 	rule_info.sw_act.fltr_act = ICE_NOP;
--	rule_info.priority = 5;
-+	rule_info.priority = 2;
- 
- 	err = ice_add_adv_rule(hw, list, lkups_cnt, &rule_info, rule);
- 	if (err)
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index 165a9d512ce2..b980f89dc892 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -19,8 +19,11 @@ static const u8 lacp_train_pkt[LACP_TRAIN_PKT_LEN] = { 0, 0, 0, 0, 0, 0,
- static const u8 ice_dflt_vsi_rcp[ICE_RECIPE_LEN] = {
- 	0x05, 0, 0, 0, 0x20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 	0x85, 0, 0x01, 0, 0, 0, 0xff, 0xff, 0x08, 0, 0, 0, 0, 0, 0, 0,
--	0, 0, 0, 0, 0, 0, 0x30, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-+	0, 0, 0, 0, 0, 0, 0x30 };
-+static const u8 ice_lport_rcp[ICE_RECIPE_LEN] = {
-+	0x05, 0, 0, 0, 0x20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-+	0x85, 0, 0x16, 0, 0, 0, 0xff, 0xff, 0x07, 0, 0, 0, 0, 0, 0, 0,
-+	0, 0, 0, 0, 0, 0, 0x30 };
- 
- /**
-  * ice_lag_set_primary - set PF LAG state as Primary
-@@ -173,18 +176,22 @@ static struct ice_lag *ice_lag_find_primary(struct ice_lag *lag)
- }
- 
- /**
-- * ice_lag_cfg_dflt_fltr - Add/Remove default VSI rule for LAG
-+ * ice_lag_cfg_fltr - Add/Remove rule for LAG
-  * @lag: lag struct for local interface
-+ * @act: rule action
-+ * @recipe_id: recipe id for the new rule
-+ * @rule_idx: pointer to rule index
-  * @add: boolean on whether we are adding filters
-  */
- static int
--ice_lag_cfg_dflt_fltr(struct ice_lag *lag, bool add)
-+ice_lag_cfg_fltr(struct ice_lag *lag, u32 act, u16 recipe_id, u16 *rule_idx,
-+		 bool add)
- {
- 	struct ice_sw_rule_lkup_rx_tx *s_rule;
- 	u16 s_rule_sz, vsi_num;
- 	struct ice_hw *hw;
--	u32 act, opc;
- 	u8 *eth_hdr;
-+	u32 opc;
- 	int err;
- 
- 	hw = &lag->pf->hw;
-@@ -193,7 +200,7 @@ ice_lag_cfg_dflt_fltr(struct ice_lag *lag, bool add)
- 	s_rule_sz = ICE_SW_RULE_RX_TX_ETH_HDR_SIZE(s_rule);
- 	s_rule = kzalloc(s_rule_sz, GFP_KERNEL);
- 	if (!s_rule) {
--		dev_err(ice_pf_to_dev(lag->pf), "error allocating rule for LAG default VSI\n");
-+		dev_err(ice_pf_to_dev(lag->pf), "error allocating rule for LAG\n");
- 		return -ENOMEM;
- 	}
- 
-@@ -201,19 +208,17 @@ ice_lag_cfg_dflt_fltr(struct ice_lag *lag, bool add)
- 		eth_hdr = s_rule->hdr_data;
- 		ice_fill_eth_hdr(eth_hdr);
- 
--		act = (vsi_num << ICE_SINGLE_ACT_VSI_ID_S) &
-+		act |= (vsi_num << ICE_SINGLE_ACT_VSI_ID_S) &
- 			ICE_SINGLE_ACT_VSI_ID_M;
--		act |= ICE_SINGLE_ACT_VSI_FORWARDING |
--			ICE_SINGLE_ACT_VALID_BIT | ICE_SINGLE_ACT_LAN_ENABLE;
- 
- 		s_rule->hdr.type = cpu_to_le16(ICE_AQC_SW_RULES_T_LKUP_RX);
--		s_rule->recipe_id = cpu_to_le16(lag->pf_recipe);
-+		s_rule->recipe_id = cpu_to_le16(recipe_id);
- 		s_rule->src = cpu_to_le16(hw->port_info->lport);
- 		s_rule->act = cpu_to_le32(act);
- 		s_rule->hdr_len = cpu_to_le16(DUMMY_ETH_HDR_LEN);
- 		opc = ice_aqc_opc_add_sw_rules;
- 	} else {
--		s_rule->index = cpu_to_le16(lag->pf_rule_id);
-+		s_rule->index = cpu_to_le16(*rule_idx);
- 		opc = ice_aqc_opc_remove_sw_rules;
- 	}
- 
-@@ -222,15 +227,46 @@ ice_lag_cfg_dflt_fltr(struct ice_lag *lag, bool add)
- 		goto dflt_fltr_free;
- 
- 	if (add)
--		lag->pf_rule_id = le16_to_cpu(s_rule->index);
-+		*rule_idx = le16_to_cpu(s_rule->index);
- 	else
--		lag->pf_rule_id = 0;
-+		*rule_idx = 0;
- 
- dflt_fltr_free:
- 	kfree(s_rule);
- 	return err;
- }
- 
-+/**
-+ * ice_lag_cfg_dflt_fltr - Add/Remove default VSI rule for LAG
-+ * @lag: lag struct for local interface
-+ * @add: boolean on whether to add filter
-+ */
-+static int
-+ice_lag_cfg_dflt_fltr(struct ice_lag *lag, bool add)
-+{
-+	u32 act = ICE_SINGLE_ACT_VSI_FORWARDING |
-+		ICE_SINGLE_ACT_VALID_BIT | ICE_SINGLE_ACT_LAN_ENABLE;
-+
-+	return ice_lag_cfg_fltr(lag, act, lag->pf_recipe,
-+				&lag->pf_rule_id, add);
-+}
-+
-+/**
-+ * ice_lag_cfg_drop_fltr - Add/Remove lport drop rule
-+ * @lag: lag struct for local interface
-+ * @add: boolean on whether to add filter
-+ */
-+static int
-+ice_lag_cfg_drop_fltr(struct ice_lag *lag, bool add)
-+{
-+	u32 act = ICE_SINGLE_ACT_VSI_FORWARDING |
-+		  ICE_SINGLE_ACT_VALID_BIT |
-+		  ICE_SINGLE_ACT_DROP;
-+
-+	return ice_lag_cfg_fltr(lag, act, lag->lport_recipe,
-+				&lag->lport_rule_idx, add);
-+}
-+
- /**
-  * ice_lag_cfg_pf_fltrs - set filters up for new active port
-  * @lag: local interfaces lag struct
-@@ -257,13 +293,18 @@ ice_lag_cfg_pf_fltrs(struct ice_lag *lag, void *ptr)
- 	if (bonding_info->slave.state && lag->pf_rule_id) {
- 		if (ice_lag_cfg_dflt_fltr(lag, false))
- 			dev_err(dev, "Error removing old default VSI filter\n");
-+		if (ice_lag_cfg_drop_fltr(lag, true))
-+			dev_err(dev, "Error adding new drop filter\n");
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 0dd7f23395b0..646b407d465c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5523,7 +5523,7 @@ static void ice_pci_err_resume(struct pci_dev *pdev)
  		return;
  	}
  
- 	/* interface becoming active - add new default VSI rule */
--	if (!bonding_info->slave.state && !lag->pf_rule_id)
-+	if (!bonding_info->slave.state && !lag->pf_rule_id) {
- 		if (ice_lag_cfg_dflt_fltr(lag, true))
- 			dev_err(dev, "Error adding new default VSI filter\n");
-+		if (lag->lport_rule_idx && ice_lag_cfg_drop_fltr(lag, false))
-+			dev_err(dev, "Error removing old drop filter\n");
-+	}
- }
+-	ice_restore_all_vfs_msi_state(pdev);
++	ice_restore_all_vfs_msi_state(pf);
  
- /**
-@@ -1179,6 +1220,7 @@ static void ice_lag_changeupper_event(struct ice_lag *lag, void *ptr)
- 			swid = primary_lag->pf->hw.port_info->sw_id;
- 			ice_lag_set_swid(swid, lag, true);
- 			ice_lag_add_prune_list(primary_lag, lag->pf);
-+			ice_lag_cfg_drop_fltr(lag, true);
- 		}
- 		/* add filter for primary control packets */
- 		ice_lag_cfg_cp_fltr(lag, true);
-@@ -1929,11 +1971,16 @@ int ice_init_lag(struct ice_pf *pf)
- 		goto lag_error;
+ 	ice_do_reset(pf, ICE_RESET_PFR);
+ 	ice_service_task_restart(pf);
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+index 31314e7540f8..4ae59c59e22b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+@@ -789,14 +789,19 @@ static const struct ice_vf_ops ice_sriov_vf_ops = {
+  */
+ static int ice_create_vf_entries(struct ice_pf *pf, u16 num_vfs)
+ {
++	struct pci_dev *pdev = pf->pdev;
+ 	struct ice_vfs *vfs = &pf->vfs;
++	struct pci_dev *vfdev = NULL;
+ 	struct ice_vf *vf;
+-	u16 vf_id;
+-	int err;
++	u16 vf_pdev_id;
++	int err, pos;
+ 
+ 	lockdep_assert_held(&vfs->table_lock);
+ 
+-	for (vf_id = 0; vf_id < num_vfs; vf_id++) {
++	pos = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_SRIOV);
++	pci_read_config_word(pdev, pos + PCI_SRIOV_VF_DID, &vf_pdev_id);
++
++	for (u16 vf_id = 0; vf_id < num_vfs; vf_id++) {
+ 		vf = kzalloc(sizeof(*vf), GFP_KERNEL);
+ 		if (!vf) {
+ 			err = -ENOMEM;
+@@ -812,11 +817,23 @@ static int ice_create_vf_entries(struct ice_pf *pf, u16 num_vfs)
+ 
+ 		ice_initialize_vf_entry(vf);
+ 
++		do {
++			vfdev = pci_get_device(pdev->vendor, vf_pdev_id, vfdev);
++		} while (vfdev && vfdev->physfn != pdev);
++		vf->vfdev = vfdev;
+ 		vf->vf_sw_id = pf->first_sw;
+ 
++		pci_dev_get(vfdev);
++
+ 		hash_add_rcu(vfs->table, &vf->entry, vf_id);
  	}
  
--	err = ice_create_lag_recipe(&pf->hw, &lag->pf_recipe, ice_dflt_vsi_rcp,
--				    1);
-+	err = ice_create_lag_recipe(&pf->hw, &lag->pf_recipe,
-+				    ice_dflt_vsi_rcp, 1);
- 	if (err)
- 		goto lag_error;
- 
-+	err = ice_create_lag_recipe(&pf->hw, &lag->lport_recipe,
-+				    ice_lport_rcp, 3);
-+	if (err)
-+		goto free_rcp_res;
++	/* Decrement of refcount done by pci_get_device() inside the loop does
++	 * not touch the last iteration's vfdev, so it has to be done manually
++	 * to balance pci_dev_get() added within the loop.
++	 */
++	pci_dev_put(vfdev);
 +
- 	/* associate recipes to profiles */
- 	for (n = 0; n < ICE_PROFID_IPV6_GTPU_IPV6_TCP_INNER; n++) {
- 		err = ice_aq_get_recipe_to_profile(&pf->hw, n,
-@@ -1942,7 +1989,8 @@ int ice_init_lag(struct ice_pf *pf)
- 			continue;
- 
- 		if (recipe_bits & BIT(ICE_SW_LKUP_DFLT)) {
--			recipe_bits |= BIT(lag->pf_recipe);
-+			recipe_bits |= BIT(lag->pf_recipe) |
-+				       BIT(lag->lport_recipe);
- 			ice_aq_map_recipe_to_profile(&pf->hw, n,
- 						     (u8 *)&recipe_bits, NULL);
- 		}
-@@ -1953,6 +2001,9 @@ int ice_init_lag(struct ice_pf *pf)
- 	dev_dbg(dev, "INIT LAG complete\n");
  	return 0;
  
-+free_rcp_res:
-+	ice_free_hw_res(&pf->hw, ICE_AQC_RES_TYPE_RECIPE, 1,
-+			&pf->lag->pf_recipe);
- lag_error:
- 	kfree(lag);
- 	pf->lag = NULL;
-@@ -1982,6 +2033,8 @@ void ice_deinit_lag(struct ice_pf *pf)
+ err_free_entries:
+@@ -1709,31 +1726,16 @@ void ice_print_vfs_mdd_events(struct ice_pf *pf)
  
- 	ice_free_hw_res(&pf->hw, ICE_AQC_RES_TYPE_RECIPE, 1,
- 			&pf->lag->pf_recipe);
-+	ice_free_hw_res(&pf->hw, ICE_AQC_RES_TYPE_RECIPE, 1,
-+			&pf->lag->lport_recipe);
+ /**
+  * ice_restore_all_vfs_msi_state - restore VF MSI state after PF FLR
+- * @pdev: pointer to a pci_dev structure
++ * @pf: pointer to the PF structure
+  *
+  * Called when recovering from a PF FLR to restore interrupt capability to
+  * the VFs.
+  */
+-void ice_restore_all_vfs_msi_state(struct pci_dev *pdev)
++void ice_restore_all_vfs_msi_state(struct ice_pf *pf)
+ {
+-	u16 vf_id;
+-	int pos;
++	struct ice_vf *vf;
++	u32 bkt;
  
- 	kfree(lag);
+-	if (!pci_num_vf(pdev))
+-		return;
+-
+-	pos = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_SRIOV);
+-	if (pos) {
+-		struct pci_dev *vfdev;
+-
+-		pci_read_config_word(pdev, pos + PCI_SRIOV_VF_DID,
+-				     &vf_id);
+-		vfdev = pci_get_device(pdev->vendor, vf_id, NULL);
+-		while (vfdev) {
+-			if (vfdev->is_virtfn && vfdev->physfn == pdev)
+-				pci_restore_msi_state(vfdev);
+-			vfdev = pci_get_device(pdev->vendor, vf_id,
+-					       vfdev);
+-		}
+-	}
++	ice_for_each_vf(pf, bkt, vf)
++		pci_restore_msi_state(vf->vfdev);
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.h b/drivers/net/ethernet/intel/ice/ice_sriov.h
+index 346cb2666f3a..06829443d540 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.h
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.h
+@@ -33,7 +33,7 @@ int
+ ice_get_vf_cfg(struct net_device *netdev, int vf_id, struct ifla_vf_info *ivi);
  
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.h b/drivers/net/ethernet/intel/ice/ice_lag.h
-index facb6c894b6d..9557e8605a07 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.h
-@@ -39,8 +39,10 @@ struct ice_lag {
- 	u8 bonded:1; /* currently bonded */
- 	u8 primary:1; /* this is primary */
- 	u16 pf_recipe;
-+	u16 lport_recipe;
- 	u16 pf_rule_id;
- 	u16 cp_rule_idx;
-+	u16 lport_rule_idx;
- 	u8 role;
- };
+ void ice_free_vfs(struct ice_pf *pf);
+-void ice_restore_all_vfs_msi_state(struct pci_dev *pdev);
++void ice_restore_all_vfs_msi_state(struct ice_pf *pf);
  
+ int
+ ice_set_vf_port_vlan(struct net_device *netdev, int vf_id, u16 vlan_id, u8 qos,
+@@ -67,7 +67,7 @@ static inline
+ void ice_vf_lan_overflow_event(struct ice_pf *pf, struct ice_rq_event_info *event) { }
+ static inline void ice_print_vfs_mdd_events(struct ice_pf *pf) { }
+ static inline void ice_print_vf_rx_mdd_event(struct ice_vf *vf) { }
+-static inline void ice_restore_all_vfs_msi_state(struct pci_dev *pdev) { }
++static inline void ice_restore_all_vfs_msi_state(struct ice_pf *pf) { }
+ 
+ static inline int
+ ice_sriov_configure(struct pci_dev __always_unused *pdev,
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+index 24e4f4d897b6..aca1f2ea5034 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+@@ -56,6 +56,8 @@ static void ice_release_vf(struct kref *ref)
+ {
+ 	struct ice_vf *vf = container_of(ref, struct ice_vf, refcnt);
+ 
++	pci_dev_put(vf->vfdev);
++
+ 	vf->vf_ops->free(vf);
+ }
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+index 31a082e8a827..628396aa4a04 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+@@ -82,7 +82,7 @@ struct ice_vf {
+ 	struct rcu_head rcu;
+ 	struct kref refcnt;
+ 	struct ice_pf *pf;
+-
++	struct pci_dev *vfdev;
+ 	/* Used during virtchnl message handling and NDO ops against the VF
+ 	 * that will trigger a VFR
+ 	 */
 -- 
 2.41.0
 
