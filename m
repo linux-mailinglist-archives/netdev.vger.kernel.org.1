@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-42677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83E987CFCAC
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:30:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B59337CFCAF
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:30:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D9281C20AF6
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:30:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C928281200
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40FE732194;
-	Thu, 19 Oct 2023 14:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E73F1DFCE;
+	Thu, 19 Oct 2023 14:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZwkAqxoo"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hFcr6wWa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B849932188;
-	Thu, 19 Oct 2023 14:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0F432197;
+	Thu, 19 Oct 2023 14:30:00 +0000 (UTC)
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FF8A182;
-	Thu, 19 Oct 2023 07:29:56 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D976260007;
-	Thu, 19 Oct 2023 14:29:53 +0000 (UTC)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F33A0185;
+	Thu, 19 Oct 2023 07:29:57 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4AC2B60005;
+	Thu, 19 Oct 2023 14:29:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1697725795;
+	t=1697725796;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ctQqRyF0VKpba4qDoD9bfkE+XzRdvDu4EZKoEFJZ5Y8=;
-	b=ZwkAqxooU+fvld0S9DTZQdLs/SHO4YlQHDJ17vJfZE9XulwB7WkLfItcN6kO174entp4hr
-	reDx7Pur2OHObXNdshmTQ4j9ZzhNcFes9XPLG2L6y9PpTJdVvlPPMQAWwLsOPqQuByG618
-	jCquTcIUWMrts0Jp0ei1Rad0B1OaV+83XV2NPg/py19RXqpnDmn1Nj2s9AYEQBLAxIafd+
-	hcUl+IcEPy2qaE3XNxtOH5FIeLTq+/NHfz/6NU6nWGKQgJ4IdqD3FtRcb66Q1rA13OsIaj
-	EnXDMe27K9wolTH5J2L7Tujpj07ZNQiosGSRouwN/b8Ok4AsTzjA2OLXCNVfFA==
+	bh=UxRIH04gHYFpivoTq2QvwMiiy7tjZUo+mRSPNYqTLJ8=;
+	b=hFcr6wWa8kngQUjQfgfOV49ytC3LN0hfvlBi9cOpNH9VR84D9XpSi97NTdiiJ69ibLf0H8
+	FA1cgilfUlf27UMnZa4cMkML3vLppYbDqFH5dhN6IzZ0EA2OuBCb1J9cVHoHimeYACWslA
+	eGlgn4A6QqcDjOMJ+c4R4m+TnrMnq8Z+mVNqjkHY/beHrnqiLpJUmLX1iyRiW35fpG3qEJ
+	BsZT6izoonm/YPHKnU2mU612/mhMtfmTzpYP9pOKj5EQlJQtbkxSa5wOfyAdp4gn6VkIpl
+	UwEp+0LzkfHki3NHKmy4tkHOdIfIE3Dbob6E0lOKkPFrfdO+K3I9tXWyl7/znA==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Thu, 19 Oct 2023 16:29:26 +0200
-Subject: [PATCH net-next v6 11/16] netlink: specs: Introduce new netlink
- command to list available time stamping layers
+Date: Thu, 19 Oct 2023 16:29:27 +0200
+Subject: [PATCH net-next v6 12/16] net: Replace hwtstamp_source by
+ timestamping layer
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231019-feature_ptp_netnext-v6-11-71affc27b0e5@bootlin.com>
+Message-Id: <20231019-feature_ptp_netnext-v6-12-71affc27b0e5@bootlin.com>
 References: <20231019-feature_ptp_netnext-v6-0-71affc27b0e5@bootlin.com>
 In-Reply-To: <20231019-feature_ptp_netnext-v6-0-71affc27b0e5@bootlin.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>, 
@@ -74,60 +74,93 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
 X-Mailer: b4 0.12.3
 X-GND-Sasl: kory.maincent@bootlin.com
 
-Add a new commands allowing to list available time stamping layers on a
-netdevice's link.
-
-Example usage :
-./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema \
-	     --do ts-list-get \
-	     --json '{"header":{"dev-name":"eth0"}}'
-{'header': {'dev-index': 3, 'dev-name': 'eth0'},
- 'ts-list-layer': b'\x01\x00\x00\x00\x05\x00\x00\x00'}
+Replace hwtstamp_source which is only used by the kernel_hwtstamp_config
+structure by the more widely use timestamp_layer structure. This is done
+to prepare the support of selectable timestamping source.
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- Documentation/netlink/specs/ethtool.yaml | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 49ee028e97ca..81ed8e5f2f55 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -952,6 +952,16 @@ attribute-sets:
-       -
-         name: ts-layer
-         type: u32
-+  -
-+    name: ts-list
-+    attributes:
-+      -
-+        name: header
-+        type: nest
-+        nested-attributes: header
-+      -
-+        name: ts-list-layer
-+        type: binary
+Change in v6:
+- Follow timestamping layer naming update.
+---
+ drivers/net/ethernet/microchip/lan966x/lan966x_main.c |  6 +++---
+ include/linux/net_tstamp.h                            | 11 +++--------
+ net/core/dev_ioctl.c                                  |  2 +-
+ 3 files changed, 7 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+index 8e4101628fbd..b219259600e7 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+@@ -470,15 +470,15 @@ static int lan966x_port_hwtstamp_set(struct net_device *dev,
+ 	struct lan966x_port *port = netdev_priv(dev);
+ 	int err;
  
- operations:
-   enum-model: directional
-@@ -1716,3 +1726,17 @@ operations:
-           attributes: &ts
-             - header
-             - ts-layer
-+    -
-+      name: ts-list-get
-+      doc: Get list of timestamp devices available on an interface
-+
-+      attribute-set: ts-list
-+
-+      do:
-+        request:
-+          attributes:
-+            - header
-+        reply:
-+          attributes:
-+            - header
-+            - ts-list-layer
+-	if (cfg->source != HWTSTAMP_SOURCE_NETDEV &&
+-	    cfg->source != HWTSTAMP_SOURCE_PHYLIB)
++	if (cfg->source != MAC_TIMESTAMPING &&
++	    cfg->source != PHY_TIMESTAMPING)
+ 		return -EOPNOTSUPP;
+ 
+ 	err = lan966x_ptp_setup_traps(port, cfg);
+ 	if (err)
+ 		return err;
+ 
+-	if (cfg->source == HWTSTAMP_SOURCE_NETDEV) {
++	if (cfg->source == MAC_TIMESTAMPING) {
+ 		if (!port->lan966x->ptp)
+ 			return -EOPNOTSUPP;
+ 
+diff --git a/include/linux/net_tstamp.h b/include/linux/net_tstamp.h
+index eb01c37e71e0..bb289c2ad376 100644
+--- a/include/linux/net_tstamp.h
++++ b/include/linux/net_tstamp.h
+@@ -5,11 +5,6 @@
+ 
+ #include <uapi/linux/net_tstamp.h>
+ 
+-enum hwtstamp_source {
+-	HWTSTAMP_SOURCE_NETDEV,
+-	HWTSTAMP_SOURCE_PHYLIB,
+-};
+-
+ /**
+  * struct kernel_hwtstamp_config - Kernel copy of struct hwtstamp_config
+  *
+@@ -20,8 +15,8 @@ enum hwtstamp_source {
+  *	a legacy implementation of a lower driver
+  * @copied_to_user: request was passed to a legacy implementation which already
+  *	copied the ioctl request back to user space
+- * @source: indication whether timestamps should come from the netdev or from
+- *	an attached phylib PHY
++ * @source: indication whether timestamps should come from software, the netdev
++ *	or from an attached phylib PHY
+  *
+  * Prefer using this structure for in-kernel processing of hardware
+  * timestamping configuration, over the inextensible struct hwtstamp_config
+@@ -33,7 +28,7 @@ struct kernel_hwtstamp_config {
+ 	int rx_filter;
+ 	struct ifreq *ifr;
+ 	bool copied_to_user;
+-	enum hwtstamp_source source;
++	enum timestamping_layer source;
+ };
+ 
+ static inline void hwtstamp_config_to_kernel(struct kernel_hwtstamp_config *kernel_cfg,
+diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+index cb60b0b9c31d..57d9f25f16b8 100644
+--- a/net/core/dev_ioctl.c
++++ b/net/core/dev_ioctl.c
+@@ -332,7 +332,7 @@ int dev_set_hwtstamp_phylib(struct net_device *dev,
+ 	bool changed = false;
+ 	int err;
+ 
+-	cfg->source = phy_ts ? HWTSTAMP_SOURCE_PHYLIB : HWTSTAMP_SOURCE_NETDEV;
++	cfg->source = phy_ts ? PHY_TIMESTAMPING : NET_TIMESTAMPING;
+ 
+ 	if (phy_ts && (dev->priv_flags & IFF_SEE_ALL_HWTSTAMP_REQUESTS)) {
+ 		err = ops->ndo_hwtstamp_get(dev, &old_cfg);
 
 -- 
 2.25.1
