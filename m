@@ -1,98 +1,205 @@
-Return-Path: <netdev+bounces-42731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C368A7CFFBA
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:38:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C727CFFD0
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:42:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51C3EB2118A
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:38:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7509CB210AE
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 16:42:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B71727466;
-	Thu, 19 Oct 2023 16:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831B1225DA;
+	Thu, 19 Oct 2023 16:42:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="cnxw4E/P"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="asUdQaPc"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8C032C73
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 16:38:00 +0000 (UTC)
-Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EECBB132
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 09:37:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1697733474; x=1697992674;
-	bh=Fuy5J52TyHo0W8QuUdMldiH4VtV/X5O0X6u7+caa8Po=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=cnxw4E/PYdjRxO1JSLIuKXxj2yiGW9Qd1LLqJ8wP5cjp73MffoNGR8Jw9Q1HBuztB
-	 yvovZHUCK9FHzCpOvGICd9AW7LX/gEM5ifN2MOkHcFOTNYsjg0mk27ZNGVN53wp47G
-	 jEVjVxKZ5jpgbFDeNHS0pGT3w6ioEaZHuA8xPsXvbq2+T6lsx724EeaoZFV9/Xhgua
-	 bOK4NYKesQbHYcKb3jq/nNJBMfxD2I6znwe7LH9Qh2mX9kVA2K1PFrPJURv31Io2XO
-	 1uKWSVUrRscssHyDWGUv7JDuq5kCh4Zf6uDk7Y30StqHioHTC8SiEk1efnta28Vpj+
-	 2jQgtuXla403g==
-Date: Thu, 19 Oct 2023 16:37:46 +0000
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
-Message-ID: <398ec812-3dce-40b1-b4eb-bfff7e3feb6a@proton.me>
-In-Reply-To: <20231020.003219.1788909848908453261.fujita.tomonori@gmail.com>
-References: <0e8d2538-284b-4811-a2e7-99151338c255@proton.me> <20231019.234210.1772681043146865420.fujita.tomonori@gmail.com> <64db34c0-a50a-4321-a3d8-b692e26899d9@proton.me> <20231020.003219.1788909848908453261.fujita.tomonori@gmail.com>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16B5208DD
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 16:42:34 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5F611F
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 09:42:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697733753; x=1729269753;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=drI8XTvaV7fk3rFMSIbXvg9nmmCADtfAtm+kzy1Us7c=;
+  b=asUdQaPcGswQmG8oy6a+de8a0MZ9aD9eMGHyYJ79lYV1VEbR43tk6V6L
+   3vKTWwulgforEb8MemwzkM2P61SXZ920nKR3jzSfffUtWmC9WTcEBlMaY
+   nZ7LoGsaVKGQgd4klopA9oeuZSIFI5IEPb01xDZdUf77bQzmt2fpd+x3V
+   ZPRvYeSbkXEZai8PcPf6FJPjla/pOLL5NRaClU0oiCxNoUkLqRtZQA5Pw
+   bCGWjPFvV1Xoth6QCvcoJKpf4f4hUhOH5gtLob+DeLZBDxuyoXIQJ5ACp
+   HA5uERThKlACM5jgZGMPEebLN0HX3zwVIPmcEY8pLo9tgxrl21R52i/zp
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10868"; a="365652478"
+X-IronPort-AV: E=Sophos;i="6.03,237,1694761200"; 
+   d="scan'208";a="365652478"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2023 09:42:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,237,1694761200"; 
+   d="scan'208";a="5043847"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Oct 2023 09:42:34 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 19 Oct 2023 09:42:31 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Thu, 19 Oct 2023 09:42:31 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.41) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Thu, 19 Oct 2023 09:42:31 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aXvWjC4IKKnzW+kHJaOOh0yAHAyjC+YNh/s5yuclVS/CD4DcbkIn7q3wn/dYVlX7cuQphT5AzTRN/XHCdw9M+Z6IQUxoD6PugJBygsl2qLvysFXTauLdGCdPuYVbebz1z59sO2MiCN1//h95VQs6LtiPAwr4WULZ/Md50QyK7YaYL/uiCvdO3wKep+6dvSjIx9rQHMopgeDf4dejuT3w3UiIEBZRR6SacU0Y6K7Jg0aFBXCLIv6SEbu2Jj3AtuHiIdQqMjhRNKKkVvMPLbygbbeoq4uJzOWTZKdkaWrzVMhPfHnCa6a7G06yV1tYsmAmFRsC7bWy3zrhC997cCDBiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Mhjuo1Ej8k0eM8AMRs+IRpHIW83KDZmOc4RlE7+E/cY=;
+ b=inwnsNxWzaHXfp/+gnW/VBvkG+hEhFTkiY08CSt/nwEdFsJsyudL4gn62g5fWIWljmkVo4JP7wDG1eF6TSq1yeK/zD6OP5NinhdUi+nHs8th8Ge5FxPfnKdWjpWa53y/Sw8cPrJ5vgFC2udqSEtsOxdbArv9xB71L53xS78fgW1oWS4oOKEPrPisw2Ic4CvhtB7KlRsefHls1IGis1xhGEQFeQm/wNfwas8Jby0Od5IzQ4G+cfcqKF6X8CO+OcWUElD9PmN57U6yqhXdcz1NeiJ9yerObiRYFQZUiJR2tUxeJvEMbrwhOX0pjZoCQZrVnuDJn0MXbTB4UUqvLAhPKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by BN9PR11MB5339.namprd11.prod.outlook.com (2603:10b6:408:118::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Thu, 19 Oct
+ 2023 16:42:23 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::34a7:52c3:3b8b:75f4]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::34a7:52c3:3b8b:75f4%4]) with mapi id 15.20.6907.022; Thu, 19 Oct 2023
+ 16:42:23 +0000
+Message-ID: <bcf47a78-da23-41d6-b2d6-5df5b5d73e66@intel.com>
+Date: Thu, 19 Oct 2023 09:42:20 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] i40e: xsk: remove count_mask
+Content-Language: en-US
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<anthony.l.nguyen@intel.com>, <magnus.karlsson@intel.com>, Tushar Vyavahare
+	<tushar.vyavahare@intel.com>
+References: <20231018163908.40841-1-maciej.fijalkowski@intel.com>
+ <17b4725f-b81f-4760-bb90-ac8fa9467227@intel.com> <ZTEcmh2GNi0Ugn3/@boxer>
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <ZTEcmh2GNi0Ugn3/@boxer>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR02CA0028.namprd02.prod.outlook.com
+ (2603:10b6:303:16d::7) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|BN9PR11MB5339:EE_
+X-MS-Office365-Filtering-Correlation-Id: d9691316-4a92-4f24-2489-08dbd0c25e7d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: EMBqOP55KXzgyYep9vvG+mzhsIvvmEevae54FrgmJR43tmUIeLbyAJNjr5ute4ycePj9NzdoO3BQaqlNRsiypWTFDKatljmrXt0fQYxaMw6zXiugTjl/fxMuxctwYlx7uRiZQM8pAP20ky/CGsmz7w55mEGhUb/eYo5uXOAIZxLiberjOPxMFkZwTI9CwMQzcfKKOxnYpwuYVhCZsXaQcgeUfogvLX8nxSUa9zSWybBS9BzNsTmD+730c9JeX151RDNQOZIzKsAkVYH+IJmQrLrhT8BbQFhZAyQaA2B+kS0/CwZ46mkpyQeEvSksD5Vl3LXqaOyLN/zTxXxxntUc+iIlggSoxBvUch9P7589Iz/HYYwsPPagGej1Ful7VXT7ni6ngh3V2t7HCpLpRgVL7i614F8CjSloVWybd7Da4pxHqLG8DAipVr0ekBqs93IvDMv4csFZyfCwtCOkP4xKe/jK8Wmmx6NqK7WNzJ2g1Yx4UQe2pqqt8RO3CkBlPsovlx0vvoVm5Ot7rEXgSpp1yaQY0qLxqkrgsORg9M+7hJAbMZWrnRAiVi9/nRzQbvEpXpiHZAEWG7C0ntL2Cho+4ZFfJtV6521haBXUEdJiDGfW/uqz+gjH+Ozl64JVq7cTetZxr18+aKNQFQVuB7zjwQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(366004)(396003)(376002)(346002)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(86362001)(66476007)(66946007)(37006003)(66556008)(6636002)(316002)(8676002)(6486002)(478600001)(8936002)(5660300002)(6862004)(36756003)(41300700001)(31696002)(2906002)(4326008)(38100700002)(6506007)(107886003)(2616005)(53546011)(6512007)(83380400001)(26005)(82960400001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ckdscExvei9nNkk1VVk0VTA4bkZmYjB0T0tTMHZCQ2JybEVnQW9qclJIRkl0?=
+ =?utf-8?B?emthZmFvajJPbjg4dG1BclZzekVObnFjd0I4NHhINWRTRWl6U1c5bkNEZVJ5?=
+ =?utf-8?B?YnJobGV4RC9PbTU0anNDbkpERUV3cUdVb1F4NGs2MUd3Q3FvTGMwRWVxNkJ2?=
+ =?utf-8?B?WjhCSzRGcWZjV2pOMFVUeFFhZm12UkZMN2c1Z2N3Ly9ENXlhc2NnRjhUSHlo?=
+ =?utf-8?B?ZEZzVlRNQ1lzK2tqVjNkOEFvOVpWWmxtZkkyaXg5akhFdUhNNVdsWEtZejZT?=
+ =?utf-8?B?SjE3L2tXOFN4Q29qZ2JYUUtxcElnVU9CVldjdzhOaWtqWmxaeDZPTVM1TG43?=
+ =?utf-8?B?dGZyek5jYjlTNWtiTG1EcWcrQUdSU2N3NjEvTmN4OWRkdFpoYS9zUTRPSmRW?=
+ =?utf-8?B?YVEyc2VOSmhUVFZmanlJZWZpalh5RVYyWm5vZTlIQmdJN1AvWk9oTU00YzA5?=
+ =?utf-8?B?Qkl2OHNoa2g0VWkrVnFpL3hObzQ3VFh3RjkrVVJ4ZXFYUUtHOWk0MExDRWZU?=
+ =?utf-8?B?VEhWWDk3cDZmUGxQNExsT1hKazJoR2tveEdya0F0L2Eva1l2d3RxZFhMUzlJ?=
+ =?utf-8?B?TU50aGpLK291OTZaMTRmUTgvTmgySWJRKzZHNEVWcnVINlhkUnlqVzdTbm0x?=
+ =?utf-8?B?em5mV1UwR2k2cXNlTGhNa1o1UEh3RmM2bC9XMFpkUTRTZ0xiWEtTSEhQT0Ey?=
+ =?utf-8?B?VmpPWHRGU0lBOE90MHp3aXdXUFQzL1AwYjhrZHdEMzgxLzJua3FMWTNLcnJF?=
+ =?utf-8?B?UXVmbkc3RXhscDlwbDNhc0ZzYzd4YzQraUh5cmJzekN1Tzh4K1RraStjK01u?=
+ =?utf-8?B?eDFFdVAwMUtOcE1hbk5WUGMyS1BJVzljZnd3SlFSdXRQNnQ0N1paWmphcVlP?=
+ =?utf-8?B?LzJKeitPMEhpeFJjY2I5SzNLYktYeVA5MDErTERNa0lGZFpzNGYzTlZDem5G?=
+ =?utf-8?B?Zi92T3Q1cUdGQmRZV2VFL0p3TzdTbDA5K0dWd01XaWo5M3BoOHcrTEFBWUNH?=
+ =?utf-8?B?cEViVExpUTluQXBBM1BndVdUNVZZTHRrUUErZytxWlJVRTd6V3FDZjNhN3lJ?=
+ =?utf-8?B?S0lEWXBqUjl5anpFTnc4b0dvR2hQbThBbFVRRWhsYVhyMGIxZlh6aC9VZjc3?=
+ =?utf-8?B?MEN5Q1FuSTlNV1o1enlabUI5RVQzSXhldmVGdUxqaW1xVzBPQ2crdUdZK0o4?=
+ =?utf-8?B?U1BxZjJSODZKU0NweXhrNXVzdGFSMzFxUkdsVW5SSUJOeHJmS1FHNGc2RUZJ?=
+ =?utf-8?B?b0dzOTRXSHZHdExiWDVxY0pKSUtHTTVnazlHNmlmMUhhM0dTQXVnZjdPZ2Fw?=
+ =?utf-8?B?RlVhNzFjL0hxbWJnb1ZadzJoR3luYktrMzlOZUJqYnN5dGtUOHBzVE9LQ0hl?=
+ =?utf-8?B?andSekVqM3ltb2FWYmRhVjJFUk9wcTU3cXQ4WUo0MmIrdUFVaEh5eXd0R0Nj?=
+ =?utf-8?B?aGNFR1FQTU1kWnRUeExFR3JZcHFPM1RuTWxJUGN6YlpIbE5Ma29tS3VhcmI5?=
+ =?utf-8?B?aEJ1ZTRCcmhORjUwM3JwekpVMEtMdDV5SjFreTloeW5IZ2FqNDhGSWhDUlRY?=
+ =?utf-8?B?ckl3LzB4M1ZIdUtNS2dub3pVc1F1MTYydy8vTG42Vnc5SkF4S045c05lMEkx?=
+ =?utf-8?B?b1phM2tmY2J2WTNpeFA1V3hIWmQyNUdDVVU4SUtBRkJCTXU0VUlYUWJobC9p?=
+ =?utf-8?B?dVlZMGFOcGI5ZzkvdjVzcGRHVVZwcVYzbFRRRWQrN1ZRN1N6L3RjZDlBK1dN?=
+ =?utf-8?B?RFB3YVJkOVlFeHFwdGdkV1VmcFhGKzRFWXpIa2plM0FCQm4vb3ZoS0hPTUpp?=
+ =?utf-8?B?WUprVzRkcG1EaTVJaWdOZHVUM1RNWUgxM3FQbllrMzRLdDhMMjNjYUlyckVQ?=
+ =?utf-8?B?VlBCejFxNFlFanlJYTdKNFR0ODd3ZmJKMDZCaDFMQTc3V0hnZDJBNjFZSUt1?=
+ =?utf-8?B?M1JrN3lSWE5nMUhNVERHTE9zWUxWc1FTait6b1ZnVm5PdHlTcFJocUdnUzlp?=
+ =?utf-8?B?NFcva2U0YzlmOUZKbFYrZTdDNmtJSWlUcWpsUjE3Y0p3L3RGYmgvYm5NTGFW?=
+ =?utf-8?B?RmQ5SGRKcktKcGI0OTBhYXBWdjRBNzZMR3ZOSXVCSEpZRWFReFJ2WFZ4UjRk?=
+ =?utf-8?B?TnFabnpLcVhkc0VpaFRoTk1ZS0JjMFFYOXRsdVUwMVZvd3M3emtwemxCMmY1?=
+ =?utf-8?B?Wnc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9691316-4a92-4f24-2489-08dbd0c25e7d
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 16:42:23.1543
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AVSlkiPFMjdoOpWVr1oFKnE9hf/DNyEf7zaPCWLd0a7l/Na9coG8WsWeyco/Mao5WBz9UYvlvpDiPivJkn6YyyBgsNMdC3A2tCE3x26FpHs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5339
+X-OriginatorOrg: intel.com
 
-On 19.10.23 17:32, FUJITA Tomonori wrote:
->> You can just do this (I omitted the `::kernel::` prefix for
->> readability, if you add this in the macro, please include it):
+
+
+On 10/19/2023 5:10 AM, Maciej Fijalkowski wrote:
+> On Wed, Oct 18, 2023 at 03:03:13PM -0700, Jacob Keller wrote:
 >>
->>       // CAST: `DriverVTable` is `repr(transparent)` and wrapping `bindi=
-ngs::phy_driver`.
->>       let ptr =3D drv.as_mut_ptr().cast::<bindings::phy_driver>();
->>       let len =3D drv.len().try_into()?;
->>       // SAFETY: ...
->>       to_result(unsafe { bindings::phy_drivers_register(ptr, len, module=
-.0) })?;
 >>
->>>                   })?;
->=20
-> The above solves DriverVTable.0 but still the macro can't access to
-> kernel::ThisModule.0. I got the following error:
-
-I think we could just provide an `as_ptr` getter function
-for `ThisModule`. But need to check with the others.
-
-[...]
-
->>>> I suppose that it would be ok to call the register function multiple
->>>> times, since it only is on module startup/shutdown and it is not
->>>> performance critical.
+>> On 10/18/2023 9:39 AM, Maciej Fijalkowski wrote:
+>>> Cited commit introduced a neat way of updating next_to_clean that does
+>>> not require boundary checks on each increment. This was done by masking
+>>> the new value with (ring length - 1) mask. Problem is that this is
+>>> applicable only for power of 2 ring sizes, for every other size this
+>>> assumption can not be made. In turn, it leads to cleaning descriptors
+>>> out of order as well as splats:
 >>>
->>> I think that we can use the current implantation using Reservation
->>> struct until someone requests manual creation. I doubt that we will
->>> need to support such.
 >>
->> I would like to remove the mutable static variable and simplify
->> the macro.
->=20
-> It's worse than having public unsafe function (phy_drivers_unregister)?
+>> I assume that since ring size isn't a constant it isn't worth trying to
+>> check if power of 2 and then use the shortcut?
+> 
+> That would kill what we were gaining from that micro optimization (lack of
+> branching). I was thinking about INDIRECT_CALL() for ntc update based on
+> ring size but I came down to conclusion it would be overengineered.
+> 
 
-Why would that function have to be public?
+Right, thats what I imagined as well.
 
---=20
-Cheers,
-Benno
+>>
+>> What about just enforcing ring size is a power of 2? Any reason not to
+>> do that?
+> 
+> We used to do that on ice but then customers yelled at us that they can't
+> use max ring size (8192). I know i40e's max is 4096 which is pow-2 but I
+> am not aware of all of the use cases that people have out there.
+> 
 
+And we've supported non-power-of-2 sizes for some time. Ok.
 
+Sure, lets take this fix then. How recent was the bug? Looks like v5.12,
+so its been a while but the default size is power of 2 so that could
+explain why it hasn't been noticed much in the wild. Ok.
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
