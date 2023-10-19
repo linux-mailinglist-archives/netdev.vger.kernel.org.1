@@ -1,97 +1,106 @@
-Return-Path: <netdev+bounces-42519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAEF37CF224
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:13:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5EB27CF230
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 10:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFCC11C2098E
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:13:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30C43281EBA
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:15:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA17514F6D;
-	Thu, 19 Oct 2023 08:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BY8ma3DE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2275C14F6F;
+	Thu, 19 Oct 2023 08:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC6163D5
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 08:13:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD261C433C7;
-	Thu, 19 Oct 2023 08:13:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697703212;
-	bh=0hv3HV8AdYWgPJNSAVVsWOvT4OLWnZ3vpDnwGzK8GYo=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=BY8ma3DE8Ia/VEbMfQvOvOgt44LNDgSTdlB4k/lEJoHtS46giScwjCPTKug+6Fu4n
-	 JPrRPVjrQkh5kHAVimRBT9mKd6Yp2Tl4Nrtve111u1Iq8DM0lPT+mznzXKpz/99OP2
-	 l8JTCuta1Um83dC6OotFgB2IPfrZRXV1vcylxcZMyDmCzX4DLY123r9KnN8slTiRJ0
-	 2jRVIJwEv6fXDush0m1PFgWEfht830N4F4NTIxV+dBBa608T6dXN28L6VaLS2R8Zqq
-	 gCH9o0npRlAYD0iANr6pqRbIfefjk9Gsh2tMy3QSrmmojTBTERdgXWuQDT86Gtnum6
-	 aPPAWxYpPTLtQ==
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A8014F6D
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 08:15:24 +0000 (UTC)
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BFBC0
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:15:22 -0700 (PDT)
+Received: from [10.0.101.84] (unknown [62.214.191.67])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CD71A61E5FE01;
+	Thu, 19 Oct 2023 10:14:52 +0200 (CEST)
+Message-ID: <5fe36894-5554-4861-8119-e013b80583b9@molgen.mpg.de>
+Date: Thu, 19 Oct 2023 10:14:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <2023101840-scabbed-visitor-3fdd@gregkh>
-References: <20231018154804.420823-1-atenart@kernel.org> <20231018154804.420823-2-atenart@kernel.org> <2023101840-scabbed-visitor-3fdd@gregkh>
-Subject: Re: [RFC PATCH net-next 1/4] net-sysfs: remove rtnl_trylock from device attributes
-From: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org, mhocko@suse.com, stephen@networkplumber.org
-To: Greg KH <gregkh@linuxfoundation.org>
-Date: Thu, 19 Oct 2023 10:13:29 +0200
-Message-ID: <169770320930.433869.5743241833039124669@kwain>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net] iavf: initialize waitqueues before
+ starting watchdog_task
+Content-Language: en-US
+To: Michal Schmidt <mschmidt@redhat.com>
+Cc: netdev@vger.kernel.org,
+ Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>,
+ intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>
+References: <20231019071346.55949-1-mschmidt@redhat.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20231019071346.55949-1-mschmidt@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Quoting Greg KH (2023-10-18 18:49:18)
-> On Wed, Oct 18, 2023 at 05:47:43PM +0200, Antoine Tenart wrote:
-> > +static inline struct kernfs_node *sysfs_rtnl_lock(struct kobject *kobj,
-> > +                                               struct attribute *attr,
-> > +                                               struct net_device *ndev)
-> > +{
-> > +     struct kernfs_node *kn;
-> > +
-> > +     /* First, we hold a reference to the net device we might use in t=
-he
-> > +      * locking section as the unregistration path might run in parall=
-el.
-> > +      * This will ensure the net device won't be freed before we retur=
-n.
-> > +      */
-> > +     dev_hold(ndev);
-> > +     /* sysfs_break_active_protection was introduced to allow self-rem=
-oval of
-> > +      * devices and their associated sysfs files by bailing out of the
-> > +      * sysfs/kernfs protection. We do this here to allow the unregist=
-ration
-> > +      * path to complete in parallel. The following takes a reference =
-on the
-> > +      * kobject and the kernfs_node being accessed.
-> > +      *
-> > +      * This works because we hold a reference onto the net device and=
- the
-> > +      * unregistration path will wait for us eventually in netdev_run_=
-todo
-> > +      * (outside an rtnl lock section).
-> > +      */
-> > +     kn =3D sysfs_break_active_protection(kobj, attr);
-> > +     WARN_ON_ONCE(!kn);
->=20
-> If this triggers, you will end up rebooting the machines that set
-> panic-on-warn, do you mean to do that?  And note, the huge majority of
-> Linux systems in the world have that enabled, so be careful.
+Dear Michal,
 
-Right. My understanding was this can not happen here and I added this
-one as a "that should not happen and something is really wrong", as the
-attribute should be valid until at least the call to
-sysfs_break_active_protection.
 
-Thanks,
-Antoine
+Am 19.10.23 um 09:13 schrieb Michal Schmidt:
+> It is not safe to initialize the waitqueues after queueing the
+> watchdog_task. It will be using them.
+> 
+> The chance of this causing a real problem is very small, because
+> there will be some sleeping before any of the waitqueues get used.
+> I got a crash only after inserting an artificial sleep in iavf_probe.
+> 
+> Queue the watchdog_task as the last step in iavf_probe. Add a comment to
+> prevent repeating the mistake.
+> 
+> Fixes: fe2647ab0c99 ("i40evf: prevent VF close returning before state transitions to DOWN")
+> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+> ---
+>   drivers/net/ethernet/intel/iavf/iavf_main.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> index 6a2e6d64bc3a..5b5c0525aa13 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -4982,8 +4982,6 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>   	INIT_WORK(&adapter->finish_config, iavf_finish_config);
+>   	INIT_DELAYED_WORK(&adapter->watchdog_task, iavf_watchdog_task);
+>   	INIT_DELAYED_WORK(&adapter->client_task, iavf_client_task);
+> -	queue_delayed_work(adapter->wq, &adapter->watchdog_task,
+> -			   msecs_to_jiffies(5 * (pdev->devfn & 0x07)));
+>   
+>   	/* Setup the wait queue for indicating transition to down status */
+>   	init_waitqueue_head(&adapter->down_waitqueue);
+> @@ -4994,6 +4992,9 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>   	/* Setup the wait queue for indicating virtchannel events */
+>   	init_waitqueue_head(&adapter->vc_waitqueue);
+>   
+> +	queue_delayed_work(adapter->wq, &adapter->watchdog_task,
+> +			   msecs_to_jiffies(5 * (pdev->devfn & 0x07)));
+> +	/* Initialization goes on in the work. Do not add more of it below. */
+>   	return 0;
+>   
+>   err_ioremap:
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
