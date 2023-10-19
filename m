@@ -1,354 +1,77 @@
-Return-Path: <netdev+bounces-42485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EAF57CED81
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 03:21:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16F1D7CED93
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 03:26:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23D83281E36
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:21:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48F831C209BD
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB36393;
-	Thu, 19 Oct 2023 01:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBC0396;
+	Thu, 19 Oct 2023 01:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="Ds8e7KVs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sMU+hWZx"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D79738C
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:21:16 +0000 (UTC)
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63422122
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 18:21:13 -0700 (PDT)
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 39J0xMcD022626;
-	Wed, 18 Oct 2023 18:20:57 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	PPS06212021; bh=Bmf1uKjk4ifAxtZvH4QCTtJoZhUzIJ9lsP5bg+Ri5jg=; b=
-	Ds8e7KVs9ROGGXw9w69SM/QT986OZvKt1b2TGUGf52zW1cZXB0mRa9fseHy7gZDh
-	fVMqtEgWox7vVzMrVQALaI9coko/GEeL+o3/vgKEEYe8NsVpn62GB3qODsA7lCgj
-	Ku/jkKyGfPOzJOkkQkX1+Fw7huTSiwixrRX/O2Y2/0HlAS6QJMvTDq5dsyPJRPE3
-	MkK11v5HMxrMnwT5/RglflV0VB/GJgxxA/jBI9lzr/YiKiMYnF7XthvkeBztVFHi
-	nWv/x/dHjJB85A+43uPM3WxcqTxMx5wlXfigZnW9XMjRvvyUB8GjfDJRSPMlSifT
-	u8F/mvcIpk6A4EcqFMmcyQ==
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3tqtgfmqxt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 18 Oct 2023 18:20:57 -0700 (PDT)
-Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 18 Oct 2023 18:20:56 -0700
-Received: from pek-lpd-ccm3.wrs.com (147.11.1.11) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
- 15.1.2507.32 via Frontend Transport; Wed, 18 Oct 2023 18:20:53 -0700
-From: Heng Guo <heng.guo@windriver.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <filip.pudak@windriver.com>,
-        <heng.guo@windriver.com>, <kun.song@windriver.com>
-Subject: [PATCH net-next V3] net: fix IPSTATS_MIB_OUTPKGS increment in OutForwDatagrams.
-Date: Thu, 19 Oct 2023 09:20:53 +0800
-Message-ID: <20231019012053.19049-1-heng.guo@windriver.com>
-X-Mailer: git-send-email 2.35.2
-In-Reply-To: <20231017062838.4897-1-heng.guo@windriver.com>
-References: <20231017062838.4897-1-heng.guo@windriver.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057057FD
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:25:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6704C433C8;
+	Thu, 19 Oct 2023 01:25:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697678756;
+	bh=Bo2rNx1P5rqGaRjEElKR9ESp+uBQTFt4srxoPCP49qg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sMU+hWZx+AHKSSgK5/4oSCK2E6eC9t2jpi3nyN5NybU+tl2tCFztBba96/APfBvvq
+	 u/qJp3EtjORVy7stL42taf3tyMTEI213hGi0U+r5iH2qAwdLwTfxURxu9Z29EDSRnS
+	 5Kfkm6s2DzVngw5z1tzt9dguOMfONFXhab5MIE590zpON8/3hJnjVjg1JdmaSwcYe9
+	 RwIxwSU+x+FGYErCc5CwSe3ipiRRhmkAOM0F8me9v/oioEr+u+JZBe08YCfSfA8CJW
+	 HxPgYb+V5eGyrExTi/yKZG3TKXYJWyVcJQ4cSvoEreID/PpI8fhCDPx6Gj51r8/ym3
+	 u22ebC2xUj6+A==
+Date: Wed, 18 Oct 2023 18:25:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Juntong Deng <juntong.deng@outlook.com>
+Cc: borisp@nvidia.com, john.fastabend@gmail.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ linux-kernel-mentees@lists.linuxfoundation.org,
+ syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com, Sabrina Dubroca
+ <sd@queasysnail.net>
+Subject: Re: [PATCH v2] net/tls: Fix slab-use-after-free in tls_encrypt_done
+Message-ID: <20231018182555.28f1a774@kernel.org>
+In-Reply-To: <VI1P193MB0752321F24623E024C87886A99D6A@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
+References: <VI1P193MB0752321F24623E024C87886A99D6A@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: vIVoQV2BLAHVvfJ9uuQX2TOzHYRy7GUZ
-X-Proofpoint-ORIG-GUID: vIVoQV2BLAHVvfJ9uuQX2TOzHYRy7GUZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-19_01,2023-10-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- mlxlogscore=868 adultscore=0 impostorscore=0 spamscore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 mlxscore=0
- lowpriorityscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2309180000 definitions=main-2310190009
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Reproduce environment:
-network with 3 VM linuxs is connected as below:
-VM1<---->VM2(latest kernel 6.5.0-rc7)<---->VM3
-VM1: eth0 ip: 192.168.122.207 MTU 1500
-VM2: eth0 ip: 192.168.122.208, eth1 ip: 192.168.123.224 MTU 1500
-VM3: eth0 ip: 192.168.123.240 MTU 1500
+On Wed, 18 Oct 2023 00:22:15 +0800 Juntong Deng wrote:
+> In the current implementation, ctx->async_wait.completion is completed
+> after spin_lock_bh, which causes tls_sw_release_resources_tx to
+> continue executing and return to tls_sk_proto_cleanup, then return
+> to tls_sk_proto_close, and after that enter tls_sw_free_ctx_tx to kfree
+> the entire struct tls_sw_context_tx (including ctx->encrypt_compl_lock).
+> 
+> Since ctx->encrypt_compl_lock has been freed, subsequent spin_unlock_bh
+> will result in slab-use-after-free error. Due to SMP, even using
+> spin_lock_bh does not prevent tls_sw_release_resources_tx from continuing
+> on other CPUs. After tls_sw_release_resources_tx is woken up, there is no
+> attempt to hold ctx->encrypt_compl_lock again, therefore everything
+> described above is possible.
 
-Reproduce:
-VM1 send 1400 bytes UDP data to VM3 using tools scapy with flags=0.
-scapy command:
-send(IP(dst="192.168.123.240",flags=0)/UDP()/str('0'*1400),count=1,
-inter=1.000000)
-
-Result:
-Before IP data is sent.
-----------------------------------------------------------------------
-root@qemux86-64:~# cat /proc/net/snmp
-Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
-  ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
-  OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs ReasmFails
-  FragOKs FragFails FragCreates
-Ip: 1 64 11 0 3 4 0 0 4 7 0 0 0 0 0 0 0 0 0
-......
-----------------------------------------------------------------------
-After IP data is sent.
-----------------------------------------------------------------------
-root@qemux86-64:~# cat /proc/net/snmp
-Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
-  ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
-  OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs ReasmFails
-  FragOKs FragFails FragCreates
-Ip: 1 64 12 0 3 5 0 0 4 8 0 0 0 0 0 0 0 0 0
-......
-----------------------------------------------------------------------
-"ForwDatagrams" increase from 4 to 5 and "OutRequests" also increase
-from 7 to 8.
-
-Issue description and patch:
-IPSTATS_MIB_OUTPKTS("OutRequests") is counted with IPSTATS_MIB_OUTOCTETS
-("OutOctets") in ip_finish_output2().
-According to RFC 4293, it is "OutOctets" counted with "OutTransmits" but
-not "OutRequests". "OutRequests" does not include any datagrams counted
-in "ForwDatagrams".
-ipSystemStatsOutOctets OBJECT-TYPE
-    DESCRIPTION
-           "The total number of octets in IP datagrams delivered to the
-            lower layers for transmission.  Octets from datagrams
-            counted in ipIfStatsOutTransmits MUST be counted here.
-ipSystemStatsOutRequests OBJECT-TYPE
-    DESCRIPTION
-           "The total number of IP datagrams that local IP user-
-            protocols (including ICMP) supplied to IP in requests for
-            transmission.  Note that this counter does not include any
-            datagrams counted in ipSystemStatsOutForwDatagrams.
-So do patch to define IPSTATS_MIB_OUTPKTS to "OutTransmits" and add
-IPSTATS_MIB_OUTREQUESTS for "OutRequests".
-Add IPSTATS_MIB_OUTREQUESTS counter in __ip_local_out() for ipv4 and add
-IPSTATS_MIB_OUT counter in ip6_finish_output2() for ipv6.
-
-Test result with patch:
-Before IP data is sent.
-----------------------------------------------------------------------
-root@qemux86-64:~# cat /proc/net/snmp
-Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
-  ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
-  OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs ReasmFails
-  FragOKs FragFails FragCreates OutTransmits
-Ip: 1 64 9 0 5 1 0 0 3 3 0 0 0 0 0 0 0 0 0 4
-......
-root@qemux86-64:~# cat /proc/net/netstat
-......
-IpExt: InNoRoutes InTruncatedPkts InMcastPkts OutMcastPkts InBcastPkts
-  OutBcastPkts InOctets OutOctets InMcastOctets OutMcastOctets
-  InBcastOctets OutBcastOctets InCsumErrors InNoECTPkts InECT1Pkts
-  InECT0Pkts InCEPkts ReasmOverlaps
-IpExt: 0 0 0 0 0 0 2976 1896 0 0 0 0 0 9 0 0 0 0
-----------------------------------------------------------------------
-After IP data is sent.
-----------------------------------------------------------------------
-root@qemux86-64:~# cat /proc/net/snmp
-Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
-  ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
-  OutDiscards OutNoRoutes ReasmTimeout ReasmReqds ReasmOKs ReasmFails
-  FragOKs FragFails FragCreates OutTransmits
-Ip: 1 64 10 0 5 2 0 0 3 3 0 0 0 0 0 0 0 0 0 5
-......
-root@qemux86-64:~# cat /proc/net/netstat
-......
-IpExt: InNoRoutes InTruncatedPkts InMcastPkts OutMcastPkts InBcastPkts
-  OutBcastPkts InOctets OutOctets InMcastOctets OutMcastOctets
-  InBcastOctets OutBcastOctets InCsumErrors InNoECTPkts InECT1Pkts
-  InECT0Pkts InCEPkts ReasmOverlaps
-IpExt: 0 0 0 0 0 0 4404 3324 0 0 0 0 0 10 0 0 0 0
-----------------------------------------------------------------------
-"ForwDatagrams" increase from 1 to 2 and "OutRequests" is keeping 3.
-"OutTransmits" increase from 4 to 5 and "OutOctets" increase 1428.
-
-Signed-off-by: Heng Guo <heng.guo@windriver.com>
-Reviewed-by: Kun Song <Kun.Song@windriver.com>
-Reviewed-by: Filip Pudak <filip.pudak@windriver.com>
----
-V2: fix the missing space after a comma.
-V3: keep original counter in mpls_stats_inc_outucastpkts(), because
-both forward and local outputs are in it.
-
- include/uapi/linux/snmp.h | 3 ++-
- net/ipv4/ip_output.c      | 2 ++
- net/ipv4/proc.c           | 3 ++-
- net/ipv6/ip6_output.c     | 6 ++++--
- net/ipv6/mcast.c          | 5 ++---
- net/ipv6/ndisc.c          | 2 +-
- net/ipv6/proc.c           | 3 ++-
- net/ipv6/raw.c            | 2 +-
- 8 files changed, 16 insertions(+), 10 deletions(-)
-
-diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
-index 26f33a4c253d..b2b72886cb6d 100644
---- a/include/uapi/linux/snmp.h
-+++ b/include/uapi/linux/snmp.h
-@@ -24,7 +24,7 @@ enum
- 	IPSTATS_MIB_INOCTETS,			/* InOctets */
- 	IPSTATS_MIB_INDELIVERS,			/* InDelivers */
- 	IPSTATS_MIB_OUTFORWDATAGRAMS,		/* OutForwDatagrams */
--	IPSTATS_MIB_OUTPKTS,			/* OutRequests */
-+	IPSTATS_MIB_OUTREQUESTS,		/* OutRequests */
- 	IPSTATS_MIB_OUTOCTETS,			/* OutOctets */
- /* other fields */
- 	IPSTATS_MIB_INHDRERRORS,		/* InHdrErrors */
-@@ -57,6 +57,7 @@ enum
- 	IPSTATS_MIB_ECT0PKTS,			/* InECT0Pkts */
- 	IPSTATS_MIB_CEPKTS,			/* InCEPkts */
- 	IPSTATS_MIB_REASM_OVERLAPS,		/* ReasmOverlaps */
-+	IPSTATS_MIB_OUTPKTS,			/* OutTransmits */
- 	__IPSTATS_MIB_MAX
- };
- 
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 4ab877cf6d35..32f3027fe51c 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -101,6 +101,8 @@ int __ip_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
- {
- 	struct iphdr *iph = ip_hdr(skb);
- 
-+	IP_INC_STATS(net, IPSTATS_MIB_OUTREQUESTS);
-+
- 	iph_set_totlen(iph, skb->len);
- 	ip_send_check(iph);
- 
-diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
-index eaf1d3113b62..a85b0aba3646 100644
---- a/net/ipv4/proc.c
-+++ b/net/ipv4/proc.c
-@@ -83,7 +83,7 @@ static const struct snmp_mib snmp4_ipstats_list[] = {
- 	SNMP_MIB_ITEM("InUnknownProtos", IPSTATS_MIB_INUNKNOWNPROTOS),
- 	SNMP_MIB_ITEM("InDiscards", IPSTATS_MIB_INDISCARDS),
- 	SNMP_MIB_ITEM("InDelivers", IPSTATS_MIB_INDELIVERS),
--	SNMP_MIB_ITEM("OutRequests", IPSTATS_MIB_OUTPKTS),
-+	SNMP_MIB_ITEM("OutRequests", IPSTATS_MIB_OUTREQUESTS),
- 	SNMP_MIB_ITEM("OutDiscards", IPSTATS_MIB_OUTDISCARDS),
- 	SNMP_MIB_ITEM("OutNoRoutes", IPSTATS_MIB_OUTNOROUTES),
- 	SNMP_MIB_ITEM("ReasmTimeout", IPSTATS_MIB_REASMTIMEOUT),
-@@ -93,6 +93,7 @@ static const struct snmp_mib snmp4_ipstats_list[] = {
- 	SNMP_MIB_ITEM("FragOKs", IPSTATS_MIB_FRAGOKS),
- 	SNMP_MIB_ITEM("FragFails", IPSTATS_MIB_FRAGFAILS),
- 	SNMP_MIB_ITEM("FragCreates", IPSTATS_MIB_FRAGCREATES),
-+	SNMP_MIB_ITEM("OutTransmits", IPSTATS_MIB_OUTPKTS),
- 	SNMP_MIB_SENTINEL
- };
- 
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 54fc4c711f2c..357b8ed33308 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -117,6 +117,8 @@ static int ip6_finish_output2(struct net *net, struct sock *sk, struct sk_buff *
- 			return res;
- 	}
- 
-+	IP6_UPD_PO_STATS(net, idev, IPSTATS_MIB_OUT, skb->len);
-+
- 	rcu_read_lock();
- 	nexthop = rt6_nexthop((struct rt6_info *)dst, daddr);
- 	neigh = __ipv6_neigh_lookup_noref(dev, nexthop);
-@@ -329,7 +331,7 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
- 
- 	mtu = dst_mtu(dst);
- 	if ((skb->len <= mtu) || skb->ignore_df || skb_is_gso(skb)) {
--		IP6_UPD_PO_STATS(net, idev, IPSTATS_MIB_OUT, skb->len);
-+		IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTREQUESTS);
- 
- 		/* if egress device is enslaved to an L3 master device pass the
- 		 * skb to its handler for processing
-@@ -1989,7 +1991,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
- 	skb->tstamp = cork->base.transmit_time;
- 
- 	ip6_cork_steal_dst(skb, cork);
--	IP6_UPD_PO_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUT, skb->len);
-+	IP6_INC_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUTREQUESTS);
- 	if (proto == IPPROTO_ICMPV6) {
- 		struct inet6_dev *idev = ip6_dst_idev(skb_dst(skb));
- 		u8 icmp6_type;
-diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index 5ce25bcb9974..2ed5f479223c 100644
---- a/net/ipv6/mcast.c
-+++ b/net/ipv6/mcast.c
-@@ -1789,7 +1789,7 @@ static void mld_sendpack(struct sk_buff *skb)
- 
- 	rcu_read_lock();
- 	idev = __in6_dev_get(skb->dev);
--	IP6_UPD_PO_STATS(net, idev, IPSTATS_MIB_OUT, skb->len);
-+	IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTREQUESTS);
- 
- 	payload_len = (skb_tail_pointer(skb) - skb_network_header(skb)) -
- 		sizeof(*pip6);
-@@ -2147,8 +2147,7 @@ static void igmp6_send(struct in6_addr *addr, struct net_device *dev, int type)
- 	full_len = sizeof(struct ipv6hdr) + payload_len;
- 
- 	rcu_read_lock();
--	IP6_UPD_PO_STATS(net, __in6_dev_get(dev),
--		      IPSTATS_MIB_OUT, full_len);
-+	IP6_INC_STATS(net, __in6_dev_get(dev), IPSTATS_MIB_OUTREQUESTS);
- 	rcu_read_unlock();
- 
- 	skb = sock_alloc_send_skb(sk, hlen + tlen + full_len, 1, &err);
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index 553c8664e0a7..68debc78189c 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -504,7 +504,7 @@ void ndisc_send_skb(struct sk_buff *skb, const struct in6_addr *daddr,
- 
- 	rcu_read_lock();
- 	idev = __in6_dev_get(dst->dev);
--	IP6_UPD_PO_STATS(net, idev, IPSTATS_MIB_OUT, skb->len);
-+	IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTREQUESTS);
- 
- 	err = NF_HOOK(NFPROTO_IPV6, NF_INET_LOCAL_OUT,
- 		      net, sk, skb, NULL, dst->dev,
-diff --git a/net/ipv6/proc.c b/net/ipv6/proc.c
-index e20b3705c2d2..6d1d9221649d 100644
---- a/net/ipv6/proc.c
-+++ b/net/ipv6/proc.c
-@@ -61,7 +61,7 @@ static const struct snmp_mib snmp6_ipstats_list[] = {
- 	SNMP_MIB_ITEM("Ip6InDiscards", IPSTATS_MIB_INDISCARDS),
- 	SNMP_MIB_ITEM("Ip6InDelivers", IPSTATS_MIB_INDELIVERS),
- 	SNMP_MIB_ITEM("Ip6OutForwDatagrams", IPSTATS_MIB_OUTFORWDATAGRAMS),
--	SNMP_MIB_ITEM("Ip6OutRequests", IPSTATS_MIB_OUTPKTS),
-+	SNMP_MIB_ITEM("Ip6OutRequests", IPSTATS_MIB_OUTREQUESTS),
- 	SNMP_MIB_ITEM("Ip6OutDiscards", IPSTATS_MIB_OUTDISCARDS),
- 	SNMP_MIB_ITEM("Ip6OutNoRoutes", IPSTATS_MIB_OUTNOROUTES),
- 	SNMP_MIB_ITEM("Ip6ReasmTimeout", IPSTATS_MIB_REASMTIMEOUT),
-@@ -84,6 +84,7 @@ static const struct snmp_mib snmp6_ipstats_list[] = {
- 	SNMP_MIB_ITEM("Ip6InECT1Pkts", IPSTATS_MIB_ECT1PKTS),
- 	SNMP_MIB_ITEM("Ip6InECT0Pkts", IPSTATS_MIB_ECT0PKTS),
- 	SNMP_MIB_ITEM("Ip6InCEPkts", IPSTATS_MIB_CEPKTS),
-+	SNMP_MIB_ITEM("Ip6OutTransmits", IPSTATS_MIB_OUTPKTS),
- 	SNMP_MIB_SENTINEL
- };
- 
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index 42fcec3ecf5e..0a3e12502b05 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -651,7 +651,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
- 	 * have been queued for deletion.
- 	 */
- 	rcu_read_lock();
--	IP6_UPD_PO_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUT, skb->len);
-+	IP6_INC_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUTREQUESTS);
- 	err = NF_HOOK(NFPROTO_IPV6, NF_INET_LOCAL_OUT, net, sk, skb,
- 		      NULL, rt->dst.dev, dst_output);
- 	if (err > 0)
+Whoever triggered the Tx should wait for all outstanding encryption 
+to finish before exiting sendmsg() (or alike).  This looks like 
+a band-aid. Sabrina is working on fixes for the async code, lets
+get those in first before attempting spot fixes.
 -- 
-2.35.2
-
+pw-bot: cr
 
