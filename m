@@ -1,413 +1,165 @@
-Return-Path: <netdev+bounces-42488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A3E87CEDB3
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 03:49:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B37287CEDCF
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 03:58:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DF751C20AC1
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:49:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E77FB20DA5
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 01:58:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F04B839F;
-	Thu, 19 Oct 2023 01:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB1E65C;
+	Thu, 19 Oct 2023 01:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NHTDNQrB"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="CXUxKg/X"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533D1659
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:49:13 +0000 (UTC)
-Received: from out-205.mta0.migadu.com (out-205.mta0.migadu.com [IPv6:2001:41d0:1004:224b::cd])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A5A5111
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 18:49:11 -0700 (PDT)
-Message-ID: <72104b12-4573-7f6d-183e-4761673329e2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1697680149;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1kJ1FC/30ukOvp+mxYXuhEadyJg35Ys0dgFah0ptykE=;
-	b=NHTDNQrBcQnMD+BE/LG8BdNA3c7Hvo1ilu/pY2kqbqXuFQaejDlilQ/bSe2Gsqnb67A8s3
-	JH02ddwuSYwJSPygEZm8p0frI1akYKXIfnFZI+rYHOL24arZd33QU39ixQqr/YyW2DWkCY
-	PX2c92QhEpg6h7iYYrWwZ9tIoqO36L4=
-Date: Wed, 18 Oct 2023 18:49:01 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD8D656
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 01:58:42 +0000 (UTC)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2073.outbound.protection.outlook.com [40.107.21.73])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 080E7FA
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 18:58:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HttAvpOwyW31F3zwc2/EHt+POXsw6FktISjKVYpzp3dv6LBilt0GweZdlJ+WB09Bk0sJIToG0pqHJUJNLSnILj2ilFe9BCyIkAkowVhkU5JlnZDiy5drHU10cIHOnPBCVfux2E2b2zFRK0J/+hr0wWhrz8Lt8udmS+ij9akAP3NIM8bbgczzPkXuubWF7RRwFsDly1vVNF3DjgZji2RxpmghdTCHvuzeQQBB3KGtedVIo4F/adUrlVcLSRcHTY+81qg6TDHUsBri2kXp624351AnBrdqcH+H6u92oHvFt0A0Fz8CE0YlynyKonYsKApLgpdbmbx7XcSgzZYtjGLXJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=72PeqzRsKIWONlMMGXEeLVCrjmCYas65kR67l11XwAo=;
+ b=QL5jitQoyR9mwj9RF067+E+vUJoihGzuR3ALnTHAw/hsVxMiynnJRL2ueX0c677rZDbgHEN0smb+gNyUurSlI54+P+R079xddSkImfhnBT1kFlarrd1oZM5CPAq2V3zv/8A5+NwJqEFGAXF1ViyUmh4uXWKNuDi41h6MPr+vQ2lg2qgh8Zo7N9s0bAM1OWfk1t+8tVJP4W/HZHr+RwjQY67hq3UV3RnBES2OwF0un3gscApgdE35M/2A0fGixCEvrEtqnoMK9AC+LNDWQ5PZ64LHjmMjWaA+0eYRBnC0wSz+zDcI5KGa2Ce6EUTgflIxPbIzloDD5vaoHZOxDod73w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=72PeqzRsKIWONlMMGXEeLVCrjmCYas65kR67l11XwAo=;
+ b=CXUxKg/XTEKDo/ndPEgHCJ0JSvR/h+YtiVGSx/s5YF+ZV+wfXmoM0ErDBD9/AobXvkECo5A6EtUmPrgHpmZOX7shPnP8CeDbzzCpO/OQaWXM2ABvnwP7z43Wu0VaOzAFPaeRpDJalOPZ4ACfiUdDZsDdDyNyCeTiUSB9i6cYT5g=
+Received: from AM5PR04MB3139.eurprd04.prod.outlook.com (2603:10a6:206:8::20)
+ by PA4PR04MB9592.eurprd04.prod.outlook.com (2603:10a6:102:271::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.21; Thu, 19 Oct
+ 2023 01:58:37 +0000
+Received: from AM5PR04MB3139.eurprd04.prod.outlook.com
+ ([fe80::9c92:d343:b025:6b07]) by AM5PR04MB3139.eurprd04.prod.outlook.com
+ ([fe80::9c92:d343:b025:6b07%4]) with mapi id 15.20.6933.008; Thu, 19 Oct 2023
+ 01:58:37 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: "Radu-nicolae Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>, Shenwei Wang
+	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>
+CC: "Sebastian Tobuschat (OSS)" <sebastian.tobuschat@oss.nxp.com>,
+	dl-linux-imx <linux-imx@nxp.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH net-next] net: fec: fix dev_info pointer
+Thread-Topic: [PATCH net-next] net: fec: fix dev_info pointer
+Thread-Index: AQHaAfW15oqaaW9tDECF9MekfTEN6bBQWO1A
+Date: Thu, 19 Oct 2023 01:58:37 +0000
+Message-ID:
+ <AM5PR04MB313962280DF8C65B2D72ABE188D4A@AM5PR04MB3139.eurprd04.prod.outlook.com>
+References: <20231018190229.1880170-1-radu-nicolae.pirea@oss.nxp.com>
+In-Reply-To: <20231018190229.1880170-1-radu-nicolae.pirea@oss.nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM5PR04MB3139:EE_|PA4PR04MB9592:EE_
+x-ms-office365-filtering-correlation-id: 525af59e-04f0-4818-f34b-08dbd046e8b3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ M2Y2H8cj++eHIACO6cTyroeCxgJAX5f7R4OuRS6pSrKb1jQxMaQPDj23obM/d1fDiW0JnpZTLSy0AZHCZCFxU1XSR0KpeFItW84M3VBgRhyyOZMmAO/TmeYT0HwYHIPrSrkq2Ri6r0Nmj5UGnT1G9AejDzHEBDeqD5GhkRVMHm1S+Nq40IbOsZkcmQ1+E5cWNJvd4GSUIoDQ1i2pF81s63KSXGwdxr9rfoe2VRF+7uf0x8vpc4eNCgEMl1Gb9bbg09w5uw0OoNjv/WeX8JxiXL3gxOVeg6tf2ltFsRPvJljAISwPue+aaptYs7oRwSa5ywSytf24a7z9h19MJxCohJ3moNNMbmfqG9kT2+ICtVk/bpgjLRl+mKwrn8YqpbU0a689ajCPcBqbLeZgQeReiC8B8eOMixplCcuBun4hp6VQVnF9UZjM/nKOZU2rCXPUBIJsECEfk885GDMQZoDGwhHb7JCJbj1PoHD5+Uxivn8ThcAhnxVbX0QfYT4ZijedrVrGQFcl70rjrOtIL7yy8/aEy19K7QOPTaiv3iSIM7d/9s7/vfhZMPiI3+AK0wR2isWNNN/CAPZ8g4Lqhu4pSV4TLKiUuOT1vH25br8YKpI=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM5PR04MB3139.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(396003)(346002)(376002)(136003)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(966005)(38070700005)(53546011)(38100700002)(122000001)(41300700001)(66946007)(6506007)(76116006)(110136005)(71200400001)(7696005)(478600001)(54906003)(26005)(66476007)(64756008)(9686003)(66556008)(316002)(83380400001)(66446008)(2906002)(86362001)(44832011)(5660300002)(52536014)(33656002)(8936002)(4326008)(8676002)(55016003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?gb2312?B?S3NiVnA2V3lsSjhHQkJId2JhNDhaR3IvK0wxdGp2Y0VwVEc0a0paZmpkNk8y?=
+ =?gb2312?B?c1o4eXhQbGhLU1lFdjNVcnpkSE5LalZReXZpajNZT091aUxzeUhCWnRMRXNC?=
+ =?gb2312?B?elUvYnBkK3lVT1BLOVg3Ri85T3d5c3pIb21IY0FPbjVzYXUzemV2cTJQZTgr?=
+ =?gb2312?B?ZEZxZnkxbmtGQS9yVEdJV0Q4djFjaUlESzZPWVQ5TWw2VlpZaFRXcjJCNEZ1?=
+ =?gb2312?B?TmdyYlJsOU52WUdzakU1ZkUwdTBzVHVEbWlCZzlxZk9HZ1U1TC9kU1dMeTZF?=
+ =?gb2312?B?aGVPNjY1S0M0RHNsVUxyVk5VYnZNbVN5UE4wYXRBZVJ0UnRLTmRtUmJlVjJG?=
+ =?gb2312?B?QWhENzBBWjRuQkJ6TkdYZTE5TXZucmZOVG1VQWdtMUNhK1haTExDbzdYM1Fk?=
+ =?gb2312?B?SHAxWm1qS1NGQVFxdVNGcWdoZWlCQklSOGZTU2t4YnJ4b2NnVkM0YVMrUzBB?=
+ =?gb2312?B?aFhta3RxOEhxaXpIQnljc3hUTzVteGJIZkE5SURGTVNvaXNCQ2dsQjhKQVU5?=
+ =?gb2312?B?UVFlM0hzRTVwOW85Ty83V3R4NDNUblJSYlVKWTFEMnMvSU5Uc3M5WXI5TDJS?=
+ =?gb2312?B?TG1IN2diZ29wQThNenNEY2NpZk9tUkpqUjBnSGdBeFhUekJPZ0d4OFpVSkhG?=
+ =?gb2312?B?ZSsyblpZem1yMk56a0F4bFducGtVL2xwTmhtb3J2M2htTnBqUkZIcHovL2t0?=
+ =?gb2312?B?dDNNTDlLR2NpMVN4U0s1OVVXa3NhazhNMjg5Ry9NSFhDenVjbnhaMUtJSDkw?=
+ =?gb2312?B?Yk5oSlN4cmY2cHEvZkRCdDdKWjgzUFFPdlRQWHJMdjk3K0xvK3pyVktQaFcv?=
+ =?gb2312?B?N1NlSDFNN2c1YVpzNU5CK0x3Ymw2aFM0N2puRk5YcHFpd1hZZE5oUmxDb29Y?=
+ =?gb2312?B?RDhVUHZtQU41bnpSWCtwbnRvY2pIMncvcFo5RGppNkFkbVh6TFFoaDk2WmJp?=
+ =?gb2312?B?bldkeExZdDVRM2g2aDZpMzRVSG9hK0RIYlNTSnRTVmh5UEUzdHQvYWdEakoz?=
+ =?gb2312?B?QU81dFZiVFBKQU0xaFVzTmxrdUsxL0lqUHJSaXJ5d0tRV0RENHlwajFXN0V1?=
+ =?gb2312?B?eDFpcVQzV2RybjdSVGhLZ3N5a1V5cFpDazFyaDFmVS9oZDNscW5jR2VaNG8x?=
+ =?gb2312?B?aFdSaXJiYjBSTElkWXFWQmtpM3BqbFgveUNRZjQwTTRsY2dmMVRoR0Y0em5I?=
+ =?gb2312?B?eGZxdEUyTmwvY0FZOFZROFBxZEVKd2JIZ09BVmM0V0ZKcUF6RmFWUTVwTGho?=
+ =?gb2312?B?a2ZCRDhIWHFiMlVLeDhTOU9IcDdtL0VEN3hqdEV3SWl4VTNYSHBzQUZtWnN3?=
+ =?gb2312?B?SUQ0Y0x6dFdEanoxTGRxbG5vb3UzbFo0bkpqa3RHemsrM2RhNkFQVlc2aElX?=
+ =?gb2312?B?TzBZYUVRazM0RWk5d3BUOFBTdTEwSTh0ZkJwejlOdERwcmRSdmdvZmUxazNw?=
+ =?gb2312?B?Sk9pZ3NtdmNXanZ2RHovZXdSUUVhUU5WakloRm93Q3YrbW9ySGllcVE0OUlz?=
+ =?gb2312?B?dVVqQjIzWUZpNlN1RUpheGp2Z25yRXRYbGl2U01YeFd5MFJRak5UMVpVVnEv?=
+ =?gb2312?B?ZkI2SEkxYUF6aVRjS1RTTllPYXRJdjdSSXpwWmJRZGZJc0N5Slpxb2NmdlBW?=
+ =?gb2312?B?K2V1MDJkYUd2dEtVY1FVazZsbktCc0xOUHZWaGlHaVg5YVIxd1pLNkFIdkdK?=
+ =?gb2312?B?azRwWWs2M3JIWmovYmpBSWNaUm4zS2piOUZVbjVqaExRSmV0bmJMRGR1REM3?=
+ =?gb2312?B?M3R0R01IR05OeEZmaVVvR05FK0c2RWtoVHliNkExZ3laSS80U1Q2TUZzQVBV?=
+ =?gb2312?B?S20wQlBjNGpVUk9KOGxqZFhYYXo5RHFnYTN2RHVUanBwZjZ5ZjhuSVk2dTV2?=
+ =?gb2312?B?R1pUNURXbXR6OVV6K1NmY0RWOEJKUWUxditWemxxNVhEak1sVXF3VFJwQUZa?=
+ =?gb2312?B?QTEwV1Y3WlNEWlFJdHNtbUg4NWNXSFYvb2VtSTFoczAzaE50Rk5rZG5FNGhu?=
+ =?gb2312?B?MTEvM3Q2Ui95RXlxRFdGS3JPYitvSTNKZzNKMU9FdU43Wi8xYWE5Zmt3a2ZU?=
+ =?gb2312?B?R2d0a3d3RkVzazRiajgyazR6SmovSnp2cTBhQm5tQzRka0NQNm8wb0dwVGkx?=
+ =?gb2312?Q?qaWU=3D?=
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v5 6/9] bpf, net: switch to dynamic registration
-Content-Language: en-US
-To: thinker.li@gmail.com
-Cc: sinquersw@gmail.com, kuifeng@meta.com, netdev@vger.kernel.org,
- bpf@vger.kernel.org, ast@kernel.org, song@kernel.org, kernel-team@meta.com,
- andrii@kernel.org, drosen@google.com
-References: <20231017162306.176586-1-thinker.li@gmail.com>
- <20231017162306.176586-7-thinker.li@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231017162306.176586-7-thinker.li@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM5PR04MB3139.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 525af59e-04f0-4818-f34b-08dbd046e8b3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Oct 2023 01:58:37.3247
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lSY68UVA4LdHrhWTuCACwPGxL+dvFd71ins+RyhcCdhG44V9u4NggQdpgNCc1ESs2598a9gJKv7kB3W99+KRZw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB9592
 
-On 10/17/23 9:23 AM, thinker.li@gmail.com wrote:
-> From: Kui-Feng Lee <thinker.li@gmail.com>
-> 
-> Replace the static list of struct_ops types with pre-btf struct_ops_tab to
-> enable dynamic registration.
-> 
-> Both bpf_dummy_ops and bpf_tcp_ca now utilize the registration function
-> instead of being listed in bpf_struct_ops_types.h.
-> 
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
-> ---
->   include/linux/bpf.h               |   2 +
->   include/linux/btf.h               |  29 +++++++
->   kernel/bpf/bpf_struct_ops.c       | 124 +++++++++++++++---------------
->   kernel/bpf/bpf_struct_ops_types.h |  12 ---
->   kernel/bpf/btf.c                  |   2 +-
->   net/bpf/bpf_dummy_struct_ops.c    |  14 +++-
->   net/ipv4/bpf_tcp_ca.c             |  16 +++-
->   7 files changed, 119 insertions(+), 80 deletions(-)
->   delete mode 100644 kernel/bpf/bpf_struct_ops_types.h
-> 
-> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> index 1e1647c8b0ce..b0f33147aa93 100644
-> --- a/include/linux/bpf.h
-> +++ b/include/linux/bpf.h
-> @@ -3207,4 +3207,6 @@ static inline bool bpf_is_subprog(const struct bpf_prog *prog)
->   	return prog->aux->func_idx != 0;
->   }
->   
-> +int register_bpf_struct_ops(struct bpf_struct_ops *st_ops);
-> +
->   #endif /* _LINUX_BPF_H */
-> diff --git a/include/linux/btf.h b/include/linux/btf.h
-> index aa2ba77648be..fdc83aa10462 100644
-> --- a/include/linux/btf.h
-> +++ b/include/linux/btf.h
-> @@ -12,6 +12,8 @@
->   #include <uapi/linux/bpf.h>
->   
->   #define BTF_TYPE_EMIT(type) ((void)(type *)0)
-> +#define BTF_STRUCT_OPS_TYPE_EMIT(type) {((void)(struct type *)0);	\
-> +		((void)(struct bpf_struct_ops_##type *)0); }
->   #define BTF_TYPE_EMIT_ENUM(enum_val) ((void)enum_val)
->   
->   /* These need to be macros, as the expressions are used in assembler input */
-> @@ -200,6 +202,7 @@ u32 btf_obj_id(const struct btf *btf);
->   bool btf_is_kernel(const struct btf *btf);
->   bool btf_is_module(const struct btf *btf);
->   struct module *btf_try_get_module(const struct btf *btf);
-> +struct btf *btf_get_module_btf(const struct module *module);
->   u32 btf_nr_types(const struct btf *btf);
->   bool btf_member_is_reg_int(const struct btf *btf, const struct btf_type *s,
->   			   const struct btf_member *m,
-> @@ -577,4 +580,30 @@ int btf_add_struct_ops(struct bpf_struct_ops *st_ops);
->   const struct bpf_struct_ops **
->   btf_get_struct_ops(struct btf *btf, u32 *ret_cnt);
->   
-> +enum bpf_struct_ops_state {
-> +	BPF_STRUCT_OPS_STATE_INIT,
-> +	BPF_STRUCT_OPS_STATE_INUSE,
-> +	BPF_STRUCT_OPS_STATE_TOBEFREE,
-> +	BPF_STRUCT_OPS_STATE_READY,
-> +};
-> +
-> +struct bpf_struct_ops_common_value {
-> +	refcount_t refcnt;
-> +	enum bpf_struct_ops_state state;
-> +};
-> +#define BPF_STRUCT_OPS_COMMON_VALUE struct bpf_struct_ops_common_value common
-
-Since there is 'struct bpf_struct_ops_common_value' now, the 
-BPF_STRUCT_OPS_COMMON_VALUE macro is not as useful as before. Lets remove it.
-
-> +
-> +/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
-> + * the map's value exposed to the userspace and its btf-type-id is
-> + * stored at the map->btf_vmlinux_value_type_id.
-> + *
-> + */
-> +#define DEFINE_STRUCT_OPS_VALUE_TYPE(_name)			\
-> +extern struct bpf_struct_ops bpf_##_name;			\
-> +								\
-> +struct bpf_struct_ops_##_name {					\
-> +	BPF_STRUCT_OPS_COMMON_VALUE;				\
-> +	struct _name data ____cacheline_aligned_in_smp;		\
-> +}
-
-I think the bpp_struct_ops_* should not be in btf.h. Probably move them to bpf.h 
-instead. or there is some other considerations I am missing?
-
-> +
->   #endif
-> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-> index 60445ff32275..175068b083cb 100644
-> --- a/kernel/bpf/bpf_struct_ops.c
-> +++ b/kernel/bpf/bpf_struct_ops.c
-> @@ -13,19 +13,6 @@
->   #include <linux/btf_ids.h>
->   #include <linux/rcupdate_wait.h>
->   
-> -enum bpf_struct_ops_state {
-> -	BPF_STRUCT_OPS_STATE_INIT,
-> -	BPF_STRUCT_OPS_STATE_INUSE,
-> -	BPF_STRUCT_OPS_STATE_TOBEFREE,
-> -	BPF_STRUCT_OPS_STATE_READY,
-> -};
-> -
-> -struct bpf_struct_ops_common_value {
-> -	refcount_t refcnt;
-> -	enum bpf_struct_ops_state state;
-> -};
-> -#define BPF_STRUCT_OPS_COMMON_VALUE struct bpf_struct_ops_common_value common
-> -
->   struct bpf_struct_ops_value {
->   	BPF_STRUCT_OPS_COMMON_VALUE;
->   	char data[] ____cacheline_aligned_in_smp;
-> @@ -72,35 +59,6 @@ static DEFINE_MUTEX(update_mutex);
->   #define VALUE_PREFIX "bpf_struct_ops_"
->   #define VALUE_PREFIX_LEN (sizeof(VALUE_PREFIX) - 1)
->   
-> -/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
-> - * the map's value exposed to the userspace and its btf-type-id is
-> - * stored at the map->btf_vmlinux_value_type_id.
-> - *
-> - */
-> -#define BPF_STRUCT_OPS_TYPE(_name)				\
-> -extern struct bpf_struct_ops bpf_##_name;			\
-> -								\
-> -struct bpf_struct_ops_##_name {						\
-> -	BPF_STRUCT_OPS_COMMON_VALUE;				\
-> -	struct _name data ____cacheline_aligned_in_smp;		\
-> -};
-> -#include "bpf_struct_ops_types.h"
-> -#undef BPF_STRUCT_OPS_TYPE
-> -
-> -enum {
-> -#define BPF_STRUCT_OPS_TYPE(_name) BPF_STRUCT_OPS_TYPE_##_name,
-> -#include "bpf_struct_ops_types.h"
-> -#undef BPF_STRUCT_OPS_TYPE
-> -	__NR_BPF_STRUCT_OPS_TYPE,
-> -};
-> -
-> -static struct bpf_struct_ops * const bpf_struct_ops[] = {
-> -#define BPF_STRUCT_OPS_TYPE(_name)				\
-> -	[BPF_STRUCT_OPS_TYPE_##_name] = &bpf_##_name,
-> -#include "bpf_struct_ops_types.h"
-> -#undef BPF_STRUCT_OPS_TYPE
-> -};
-> -
->   const struct bpf_verifier_ops bpf_struct_ops_verifier_ops = {
->   };
->   
-> @@ -234,16 +192,51 @@ static void bpf_struct_ops_init_one(struct bpf_struct_ops *st_ops,
->   
->   }
->   
-> +static int register_bpf_struct_ops_btf(struct bpf_struct_ops *st_ops,
-> +				       struct btf *btf)
-
-Please combine this function into register_bpf_struct_ops(). They are both very 
-short.
-
-> +{
-> +	struct bpf_verifier_log *log;
-> +	int err;
-> +
-> +	if (st_ops == NULL)
-> +		return -EINVAL;
-> +
-> +	log = kzalloc(sizeof(*log), GFP_KERNEL | __GFP_NOWARN);
-> +	if (!log) {
-> +		err = -ENOMEM;
-> +		goto errout;
-> +	}
-> +
-> +	log->level = BPF_LOG_KERNEL;
-> +
-> +	bpf_struct_ops_init_one(st_ops, btf, st_ops->owner, log);
-> +
-> +	err = btf_add_struct_ops(st_ops);
-> +
-> +errout:
-> +	kfree(log);
-> +
-> +	return err;
-> +}
-> +
-> +int register_bpf_struct_ops(struct bpf_struct_ops *st_ops)
-
-Similar to the register kfunc counterpart, can this be moved to btf.c instead by 
-extern-ing bpf_struct_ops_init_one()? or there are some other structs/functions 
-need to extern?
-
-> +{
-> +	struct btf *btf;
-> +	int err;
-> +
-> +	btf = btf_get_module_btf(st_ops->owner);
-> +	if (!btf)
-> +		return -EINVAL;
-> +	err = register_bpf_struct_ops_btf(st_ops, btf);
-> +	btf_put(btf);
-> +
-> +	return err;
-> +}
-> +EXPORT_SYMBOL_GPL(register_bpf_struct_ops);
-> +
->   void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log)
-
-The bpf_struct_ops_init() is pretty much only finding the btf "module_id" and 
-"common_value_id". Lets use the BTF_ID_LIST to do it instead. Then the newly 
-added bpf_struct_ops_init_one() could use a proper name bpf_struct_ops_init() 
-instead of having the special "_one" suffix.
-
->   {
-> -	struct bpf_struct_ops *st_ops;
->   	s32 module_id, common_value_id;
-> -	u32 i;
-> -
-> -	/* Ensure BTF type is emitted for "struct bpf_struct_ops_##_name" */
-> -#define BPF_STRUCT_OPS_TYPE(_name) BTF_TYPE_EMIT(struct bpf_struct_ops_##_name);
-> -#include "bpf_struct_ops_types.h"
-> -#undef BPF_STRUCT_OPS_TYPE
->   
->   	module_id = btf_find_by_name_kind(btf, "module", BTF_KIND_STRUCT);
->   	if (module_id < 0) {
-> @@ -259,11 +252,6 @@ void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log)
->   		return;
->   	}
->   	common_value_type = btf_type_by_id(btf, common_value_id);
-> -
-> -	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
-> -		st_ops = bpf_struct_ops[i];
-> -		bpf_struct_ops_init_one(st_ops, btf, NULL, log);
-> -	}
->   }
->   
->   extern struct btf *btf_vmlinux;
-> @@ -271,32 +259,44 @@ extern struct btf *btf_vmlinux;
->   static const struct bpf_struct_ops *
->   bpf_struct_ops_find_value(struct btf *btf, u32 value_id)
->   {
-> +	const struct bpf_struct_ops *st_ops = NULL;
-> +	const struct bpf_struct_ops **st_ops_list;
->   	unsigned int i;
-> +	u32 cnt = 0;
->   
->   	if (!value_id || !btf_vmlinux)
-
-The "!btf_vmlinux" should have been changed to "!btf" in the earlier patch 
-(patch 2?),
-
-and is this null check still needed now?
-
->   		return NULL;
->   
-> -	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
-> -		if (bpf_struct_ops[i]->value_id == value_id)
-> -			return bpf_struct_ops[i];
-> +	st_ops_list = btf_get_struct_ops(btf, &cnt);
-> +	for (i = 0; i < cnt; i++) {
-> +		if (st_ops_list[i]->value_id == value_id) {
-> +			st_ops = st_ops_list[i];
-
-nit. Like the change in the earlier patch that is being replaced here,
-directly "return st_ops_list[i];".
-
-> +			break;
-> +		}
->   	}
->   
-> -	return NULL;
-> +	return st_ops;
->   }
->   
->   const struct bpf_struct_ops *bpf_struct_ops_find(struct btf *btf, u32 type_id)
->   {
-> +	const struct bpf_struct_ops *st_ops = NULL;
-> +	const struct bpf_struct_ops **st_ops_list;
->   	unsigned int i;
-> +	u32 cnt;
->   
->   	if (!type_id || !btf_vmlinux)
->   		return NULL;
->   
-> -	for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
-> -		if (bpf_struct_ops[i]->type_id == type_id)
-> -			return bpf_struct_ops[i];
-> +	st_ops_list = btf_get_struct_ops(btf, &cnt);
-> +	for (i = 0; i < cnt; i++) {
-> +		if (st_ops_list[i]->type_id == type_id) {
-> +			st_ops = st_ops_list[i];
-
-Same.
-
-> +			break;
-> +		}
->   	}
->   
-> -	return NULL;
-> +	return st_ops;
->   }
->   
->   static int bpf_struct_ops_map_get_next_key(struct bpf_map *map, void *key,
-> diff --git a/kernel/bpf/bpf_struct_ops_types.h b/kernel/bpf/bpf_struct_ops_types.h
-> deleted file mode 100644
-> index 5678a9ddf817..000000000000
-> --- a/kernel/bpf/bpf_struct_ops_types.h
-> +++ /dev/null
-> @@ -1,12 +0,0 @@
-> -/* SPDX-License-Identifier: GPL-2.0 */
-> -/* internal file - do not include directly */
-> -
-> -#ifdef CONFIG_BPF_JIT
-> -#ifdef CONFIG_NET
-> -BPF_STRUCT_OPS_TYPE(bpf_dummy_ops)
-> -#endif
-> -#ifdef CONFIG_INET
-> -#include <net/tcp.h>
-> -BPF_STRUCT_OPS_TYPE(tcp_congestion_ops)
-> -#endif
-> -#endif
-
-Seeing this gone is satisfying.
-
-> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> index be5144dbb53d..990973d6057d 100644
-> --- a/kernel/bpf/btf.c
-> +++ b/kernel/bpf/btf.c
-> @@ -7532,7 +7532,7 @@ struct module *btf_try_get_module(const struct btf *btf)
->   /* Returns struct btf corresponding to the struct module.
->    * This function can return NULL or ERR_PTR.
->    */
-> -static struct btf *btf_get_module_btf(const struct module *module)
-> +struct btf *btf_get_module_btf(const struct module *module)
->   {
->   #ifdef CONFIG_DEBUG_INFO_BTF_MODULES
->   	struct btf_module *btf_mod, *tmp;
-> diff --git a/net/bpf/bpf_dummy_struct_ops.c b/net/bpf/bpf_dummy_struct_ops.c
-> index 5918d1b32e19..724bb7224079 100644
-> --- a/net/bpf/bpf_dummy_struct_ops.c
-> +++ b/net/bpf/bpf_dummy_struct_ops.c
-> @@ -7,7 +7,7 @@
->   #include <linux/bpf.h>
->   #include <linux/btf.h>
->   
-> -extern struct bpf_struct_ops bpf_bpf_dummy_ops;
-> +static struct bpf_struct_ops bpf_bpf_dummy_ops;
-
-Is it still needed ?
-
-
-
+SGkgUmFkdSwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBSYWR1LW5p
+Y29sYWUgUGlyZWEgKE9TUykgPHJhZHUtbmljb2xhZS5waXJlYUBvc3MubnhwLmNvbT4NCj4gU2Vu
+dDogMjAyM8TqMTDUwjE5yNUgMzowMg0KPiBUbzogV2VpIEZhbmcgPHdlaS5mYW5nQG54cC5jb20+
+OyBTaGVud2VpIFdhbmcNCj4gPHNoZW53ZWkud2FuZ0BueHAuY29tPjsgQ2xhcmsgV2FuZyA8eGlh
+b25pbmcud2FuZ0BueHAuY29tPjsNCj4gZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1bWF6ZXRAZ29v
+Z2xlLmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiBwYWJlbmlAcmVkaGF0LmNvbTsgcm9iaEBrZXJu
+ZWwub3JnDQo+IENjOiBTZWJhc3RpYW4gVG9idXNjaGF0IChPU1MpIDxzZWJhc3RpYW4udG9idXNj
+aGF0QG9zcy5ueHAuY29tPjsNCj4gZGwtbGludXgtaW14IDxsaW51eC1pbXhAbnhwLmNvbT47IG5l
+dGRldkB2Z2VyLmtlcm5lbC5vcmc7IFJhZHUtbmljb2xhZQ0KPiBQaXJlYSAoT1NTKSA8cmFkdS1u
+aWNvbGFlLnBpcmVhQG9zcy5ueHAuY29tPg0KPiBTdWJqZWN0OiBbUEFUQ0ggbmV0LW5leHRdIG5l
+dDogZmVjOiBmaXggZGV2X2luZm8gcG9pbnRlcg0KPiANCj4gb2ZfbWF0Y2hfdGFibGUuZGF0YSBj
+b250YWlucyBwb2ludGVycyB0byBzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlX2lkLCBub3QNCj4gc3Ry
+dWN0IGZlY19kZXZpbmZvLiBBIHBvaW50ZXIgdG8gYSBmZWNfZGV2aW5mbyBzdHJ1Y3R1cmUgaXMg
+c3RvcmVkIGluDQo+IHBsYXRmb3JtX2RldmljZV9pZC0+ZHJpdmVyX2RhdGEuDQo+IA0KPiBUaGlz
+IEJVRyBtYWtlcyB0aGUgZHJpdmVyIGNvbm5lY3QgdG8gYSBHZW5lcmljIFBIWS4NCj4gDQo+IERp
+c2NvdmVyZWQgb24gRnJlZXNjYWxlIGkuTVg2IFF1YWQgU0FCUkUgQXV0b21vdGl2ZSBCb2FyZC4N
+Cj4gDQo+IEZpeGVzOiBiMDM3NzExNmRlY2QgKCJuZXQ6IGV0aGVybmV0OiBVc2UgZGV2aWNlX2dl
+dF9tYXRjaF9kYXRhKCkiKQ0KPiBTaWduZWQtb2ZmLWJ5OiBSYWR1IFBpcmVhIChOWFAgT1NTKSA8
+cmFkdS1uaWNvbGFlLnBpcmVhQG9zcy5ueHAuY29tPg0KPiAtLS0NCg0KQSBwYXRjaCBzZXQgWzFd
+WzJdIGhhcyBiZWVuIGFwcGxpZWQgdG8gbmV0ZGV2L25ldC1uZXh0LmdpdCB0b2RheS4gSSB0aGlu
+ayB0aGlzDQpwYXRjaCBzZXQgY2FuIGZpeCB0aGUgcHJvYmxlbSB5b3UgZm91bmQuDQoNClsxXSBo
+dHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9uZXRkZXYvbmV0
+LW5leHQuZ2l0L2NvbW1pdC8/aWQ9ZTY4MDlkYmE1ZWMzDQpbMl0gaHR0cHM6Ly9naXQua2VybmVs
+Lm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQvbmV0ZGV2L25ldC1uZXh0LmdpdC9jb21taXQv
+P2lkPTUwMjU0YmZlMTQzOCANCg==
 
