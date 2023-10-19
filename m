@@ -1,102 +1,68 @@
-Return-Path: <netdev+bounces-42459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 941D77CECA0
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 02:12:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 312137CECB0
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 02:20:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A73421C20933
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 00:12:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC2C3281D80
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 00:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE6517E;
-	Thu, 19 Oct 2023 00:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BBA194;
+	Thu, 19 Oct 2023 00:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gYDHfis9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EtTjOL6T"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFE7361
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 00:12:43 +0000 (UTC)
-Received: from out-195.mta1.migadu.com (out-195.mta1.migadu.com [95.215.58.195])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA1DB125
-	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 17:12:41 -0700 (PDT)
-Message-ID: <f2d0aaad-70ca-4417-bf8e-0d7006be6ebc@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1697674360;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eiFGcXBir5895gbTnSvVkUAxBA2ZOAi3wV+AILiCiwU=;
-	b=gYDHfis9ygwRm6l48oBXXssrXFtLKWBA7IorJAjoGE8Y7cjSK3C6oXw0KLLLCpy6zE4dCc
-	ZDd5n0hHsdxcVwqeXXZddcG8WfkDBsqheECQ//wETBy+XTwaaYas4ig9BUhzqjjEnFnkgT
-	OsgHmHHIzL+WgaterzAipWgib/DnH2Y=
-Date: Thu, 19 Oct 2023 01:12:34 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B2717E;
+	Thu, 19 Oct 2023 00:20:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1753FC433C8;
+	Thu, 19 Oct 2023 00:20:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697674806;
+	bh=dxFpRFGQyZYIt12hrHgMufWeqE05AdXR2afP4eEpMLU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EtTjOL6T7kpVGiMQBlY9JUSeIpRaurrIM4JwgzxgVfML6zjp89ZXotZhHt0JTWOk7
+	 uDzhIRAcEWdRCHC/LLDwrIbj0fQKwQz1Vze+94phMo0XZbKViWkJie8TY89DF7gl4i
+	 aPjAd7qDPTPyI0RCzmsoPFesF9ZAZDFnC/NrQw7TAwp5E+KCe3IK3dB7Pwqij6bLlC
+	 BkF0xxU5lXKleXt6sJyC7zT71JpESUlIjVSiTGb2Jvejo35jb/ykViTcbOs9Gh3e/3
+	 fnMDSMq5MgN/NFn4khDuhTqF4m38BINMJ6M7769H9qzcYxGKMudRLN8GPgylceOstA
+	 CdAZAkyJpbyaw==
+Date: Wed, 18 Oct 2023 17:20:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: sdf@google.com, axboe@kernel.dk, asml.silence@gmail.com,
+ willemdebruijn.kernel@gmail.com, pabeni@redhat.com, martin.lau@linux.dev,
+ krisman@suse.de, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, io-uring@vger.kernel.org, Willem de Bruijn
+ <willemb@google.com>
+Subject: Re: [PATCH v7 03/11] net/socket: Break down __sys_setsockopt
+Message-ID: <20231018172005.6c43c7ca@kernel.org>
+In-Reply-To: <20231016134750.1381153-4-leitao@debian.org>
+References: <20231016134750.1381153-1-leitao@debian.org>
+	<20231016134750.1381153-4-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] vsock: initialize the_virtio_vsock before using VQs
-Content-Language: en-US
-To: Alexandru Matei <alexandru.matei@uipath.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Mihai Petrisor <mihai.petrisor@uipath.com>,
- Viorel Canja <viorel.canja@uipath.com>
-References: <20231018183247.1827-1-alexandru.matei@uipath.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20231018183247.1827-1-alexandru.matei@uipath.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 18/10/2023 19:32, Alexandru Matei wrote:
-> Once VQs are filled with empty buffers and we kick the host, it can send
-> connection requests. If 'the_virtio_vsock' is not initialized before,
-> replies are silently dropped and do not reach the host.
+On Mon, 16 Oct 2023 06:47:41 -0700 Breno Leitao wrote:
+> Split __sys_setsockopt() into two functions by removing the core
+> logic into a sub-function (do_sock_setsockopt()). This will avoid
+> code duplication when doing the same operation in other callers, for
+> instance.
 > 
-> Fixes: 0deab087b16a ("vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock")
-> Signed-off-by: Alexandru Matei <alexandru.matei@uipath.com>
-> ---
->   net/vmw_vsock/virtio_transport.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> index e95df847176b..eae0867133f8 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -658,12 +658,13 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->   		vsock->seqpacket_allow = true;
->   
->   	vdev->priv = vsock;
-> +	rcu_assign_pointer(the_virtio_vsock, vsock);
->   
->   	ret = virtio_vsock_vqs_init(vsock);
-> -	if (ret < 0)
-> +	if (ret < 0) {
-> +		rcu_assign_pointer(the_virtio_vsock, NULL);
->   		goto out;
-> -
-> -	rcu_assign_pointer(the_virtio_vsock, vsock);
-> +	}
->   
->   	mutex_unlock(&the_virtio_vsock_mutex);
->   
+> do_sock_setsockopt() will be called by io_uring setsockopt() command
+> operation in the following patch.
 
-Looks like virtio_vsock_restore() needs the same changes. But
-virtio_vsock_vqs_init() can fail only in virtio_find_vqs(). Maybe it can 
-be split into 2 functions to avoid second rcu_assign_pointer() in case
-of error?
-
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 
