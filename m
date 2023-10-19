@@ -1,237 +1,140 @@
-Return-Path: <netdev+bounces-42781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E68A87D01D1
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:37:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ADEA7D013F
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48E08B2150A
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:37:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCCDD1C20C91
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 18:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C4837CB8;
-	Thu, 19 Oct 2023 18:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B0737CB5;
+	Thu, 19 Oct 2023 18:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YkSHs/c6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1563C685;
-	Thu, 19 Oct 2023 18:36:57 +0000 (UTC)
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB38196;
-	Thu, 19 Oct 2023 11:36:54 -0700 (PDT)
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-53e07db272cso13123661a12.3;
-        Thu, 19 Oct 2023 11:36:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697740613; x=1698345413;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FpAc9JR2llpI5jbz/4KyEoDjDKwVg7PxCT40QCvua5I=;
-        b=sZKZlls9FjrlXZG8l3YYDwdt1fS0tbCDa3vOKS/MXDlitc4UHV2/BtBDTaDBSRfG2z
-         2kl6ozcE01biBe5zt3bOk8DgwSXszVxAdoWjX2N0CVtLXitexekuhJAH8xHIcoameOXe
-         /PSA2yndIAsAd4wFeLaYYRqABXWlNn+XSLCHmbSfCOLNfgH1VWfvhrl0C7rQFzZA50Y5
-         t3ylOREg1LAnV66swyWYV6Uw6SpWeJWq+VL3TjDSWFlE9oDSFKI8O4juBKIUuf8dMael
-         Mj7+1lbRWHoPF3CXlM+VAXsfZCqzrGWSC/7SpSPBIWWDfMtM8QdLzIyhISwQGRfOtZHY
-         iw7Q==
-X-Gm-Message-State: AOJu0Yy5Cora7JMDLbN0Vyw0rLb4WMM9pek9VjHvJ914GFWCzKBf2Aaz
-	UleAvqRBgo3w/AW6bWjU80E=
-X-Google-Smtp-Source: AGHT+IE4lt0hm/EIQpi1vFV/0R90YEfOuEUK0F7ZljzjTlQtUBBLLT7wATGinjmXlESRF+RJfhsPCA==
-X-Received: by 2002:a17:907:928b:b0:9bf:3c7d:5f53 with SMTP id bw11-20020a170907928b00b009bf3c7d5f53mr2290910ejc.45.1697740613060;
-        Thu, 19 Oct 2023 11:36:53 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-020.fbsv.net. [2a03:2880:31ff:14::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a6-20020a1709064a4600b009ae05f9eab3sm24469ejv.65.2023.10.19.11.36.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 11:36:52 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: jpoimboe@kernel.org,
-	mingo@redhat.com,
-	tglx@linutronix.de,
-	bp@alien8.de,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A0338DD3;
+	Thu, 19 Oct 2023 18:17:51 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E730121;
+	Thu, 19 Oct 2023 11:17:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=uxwGnWen6+9j+YrnXgkstw0OS38g943IHLCh1byhVXQ=; b=YkSHs/c6vw0CI2h0ml3QB50utc
+	KZ/evPEkt1PQ0DcvCfPoqbqzZWcz5sRY/XQ7IWqN6c6TDLE2HlovDg/Gsh91OYA/znrvzCBlmldsv
+	CoRtxHDccp+vF75IMLCl+pQSJlNca7p9iLJxD1KM/5hN4tL3FgLzwZ+iJ2bzf4l/0FIZ95vvBIGkQ
+	pk2qm2LMWhjbndq/NXPt53vI6BAedGUDi8yAXHKPbQEpAbND5O7uO6iPTxwM3QufJ0rMrGkUHwsDP
+	eoetCQKUb2bBOMNdE3m81R87zukgw3fen/Dh7OxY2JrIqAXUyyNRP5lV7ZZZTgbK2wtRRbOTHx2rC
+	VE58zs7w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40222)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qtXaO-0007gD-1r;
+	Thu, 19 Oct 2023 19:17:32 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qtXaO-0000f1-Bm; Thu, 19 Oct 2023 19:17:32 +0100
+Date: Thu, 19 Oct 2023 19:17:32 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Nicolas Schier <nicolas@fjasle.eu>
-Cc: leit@meta.com,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@kernel.org>,
-	Vincent Whitchurch <vincent.whitchurch@axis.com>,
-	Jinghao Jia <jinghao@linux.ibm.com>,
-	Kees Cook <keescook@chromium.org>,
-	linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-	linux-trace-kernel@vger.kernel.org (open list:FUNCTION HOOKS (FTRACE)),
-	bpf@vger.kernel.org (open list:BPF [GENERAL] (Safe Dynamic Programs and Tools)),
-	netdev@vger.kernel.org (open list:NETWORKING [IPv4/IPv6])
-Subject: [PATCH v5 06/12] x86/bugs: Rename SLS to CONFIG_MITIGATION_SLS
-Date: Thu, 19 Oct 2023 11:11:52 -0700
-Message-Id: <20231019181158.1982205-7-leitao@debian.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231019181158.1982205-1-leitao@debian.org>
-References: <20231019181158.1982205-1-leitao@debian.org>
+	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v6 5/9] net: dsa: microchip: ksz9477: Add Wake
+ on Magic Packet support
+Message-ID: <ZTFyvDLgmaTy2Csx@shell.armlinux.org.uk>
+References: <20231019122850.1199821-1-o.rempel@pengutronix.de>
+ <20231019122850.1199821-1-o.rempel@pengutronix.de>
+ <20231019122850.1199821-6-o.rempel@pengutronix.de>
+ <20231019122850.1199821-6-o.rempel@pengutronix.de>
+ <20231019172953.ajqtmnnthohnlek7@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231019172953.ajqtmnnthohnlek7@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-CPU mitigations config entries are inconsistent, and names are hard to
-related. There are concrete benefits for both users and developers of
-having all the mitigation config options living in the same config
-namespace.
+On Thu, Oct 19, 2023 at 08:29:53PM +0300, Vladimir Oltean wrote:
+> On Thu, Oct 19, 2023 at 02:28:46PM +0200, Oleksij Rempel wrote:
+> > Introduce Wake on Magic Packet (WoL) functionality to the ksz9477
+> > driver.
+> > 
+> > Major changes include:
+> > 
+> > 1. Extending the `ksz9477_handle_wake_reason` function to identify Magic
+> >    Packet wake events alongside existing wake reasons.
+> > 
+> > 2. Updating the `ksz9477_get_wol` and `ksz9477_set_wol` functions to
+> >    handle WAKE_MAGIC alongside the existing WAKE_PHY option, and to
+> >    program the switch's MAC address register accordingly when Magic
+> >    Packet wake-up is enabled. This change will prevent WAKE_MAGIC
+> >    activation if the related port has a different MAC address compared
+> >    to a MAC address already used by HSR or an already active WAKE_MAGIC
+> >    on another port.
+> > 
+> > 3. Adding a restriction in `ksz_port_set_mac_address` to prevent MAC
+> >    address changes on ports with active Wake on Magic Packet, as the
+> >    switch's MAC address register is utilized for this feature.
+> > 
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > ---
+> >  drivers/net/dsa/microchip/ksz9477.c    | 60 ++++++++++++++++++++++++--
+> >  drivers/net/dsa/microchip/ksz_common.c | 15 +++++--
+> >  drivers/net/dsa/microchip/ksz_common.h |  3 ++
+> >  3 files changed, 71 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+> > index b9419d4b5e7b..bcc8863951ca 100644
+> > --- a/drivers/net/dsa/microchip/ksz9477.c
+> > +++ b/drivers/net/dsa/microchip/ksz9477.c
+> > @@ -81,7 +81,8 @@ static int ksz9477_handle_wake_reason(struct ksz_device *dev, int port)
+> >  	if (!pme_status)
+> >  		return 0;
+> >  
+> > -	dev_dbg(dev->dev, "Wake event on port %d due to: %s %s\n", port,
+> > +	dev_dbg(dev->dev, "Wake event on port %d due to: %s %s %s\n", port,
+> > +		pme_status & PME_WOL_MAGICPKT ? "\"Magic Packet\"" : "",
+> >  		pme_status & PME_WOL_LINKUP ? "\"Link Up\"" : "",
+> >  		pme_status & PME_WOL_ENERGY ? "\"Enery detect\"" : "");
+> 
+> Trivial: if you format the printf string as %s%s%s and the arguments as
+> "\"Magic Packet\" " : "", then the printed line won't have a trailing
+> space at the end.
 
-The mitigation options should have consistency and start with
-MITIGATION.
+Sadly, it still will. The best solution is to prepend the space
+character to each entry in the "list" and remove the space characters
+after the : in the format string thusly:
 
-Rename the Kconfig entry from SLS to MITIGATION_SLS.
+	dev_dbg(dev->dev, "Wake event on port %d due to:%s%s%s\n", port,
+		pme_status & PME_WOL_MAGICPKT ? " \"Magic Packet\"" : "",
+		pme_status & PME_WOL_LINKUP ? " \"Link Up\"" : "",
+		pme_status & PME_WOL_ENERGY ? " \"Enery detect\"" : "");
 
-Suggested-by: Josh Poimboeuf <jpoimboe@kernel.org>
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- arch/x86/Kconfig               | 2 +-
- arch/x86/Makefile              | 2 +-
- arch/x86/include/asm/linkage.h | 4 ++--
- arch/x86/kernel/alternative.c  | 4 ++--
- arch/x86/kernel/ftrace.c       | 3 ++-
- arch/x86/net/bpf_jit_comp.c    | 4 ++--
- scripts/Makefile.lib           | 2 +-
- 7 files changed, 11 insertions(+), 10 deletions(-)
-
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index f3593461ce35..9dd2fb555973 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -2556,7 +2556,7 @@ config CPU_SRSO
- 	help
- 	  Enable the SRSO mitigation needed on AMD Zen1-4 machines.
- 
--config SLS
-+config MITIGATION_SLS
- 	bool "Mitigate Straight-Line-Speculation"
- 	depends on CC_HAS_SLS && X86_64
- 	select OBJTOOL if HAVE_OBJTOOL
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 3053b60f017b..1ac5d6002f5f 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -204,7 +204,7 @@ ifdef CONFIG_MITIGATION_RETPOLINE
-   endif
- endif
- 
--ifdef CONFIG_SLS
-+ifdef CONFIG_MITIGATION_SLS
-   KBUILD_CFLAGS += -mharden-sls=all
- endif
- 
-diff --git a/arch/x86/include/asm/linkage.h b/arch/x86/include/asm/linkage.h
-index c5165204c66f..09e2d026df33 100644
---- a/arch/x86/include/asm/linkage.h
-+++ b/arch/x86/include/asm/linkage.h
-@@ -43,7 +43,7 @@
- #if defined(CONFIG_RETHUNK) && !defined(__DISABLE_EXPORTS) && !defined(BUILD_VDSO)
- #define RET	jmp __x86_return_thunk
- #else /* CONFIG_MITIGATION_RETPOLINE */
--#ifdef CONFIG_SLS
-+#ifdef CONFIG_MITIGATION_SLS
- #define RET	ret; int3
- #else
- #define RET	ret
-@@ -55,7 +55,7 @@
- #if defined(CONFIG_RETHUNK) && !defined(__DISABLE_EXPORTS) && !defined(BUILD_VDSO)
- #define ASM_RET	"jmp __x86_return_thunk\n\t"
- #else /* CONFIG_MITIGATION_RETPOLINE */
--#ifdef CONFIG_SLS
-+#ifdef CONFIG_MITIGATION_SLS
- #define ASM_RET	"ret; int3\n\t"
- #else
- #define ASM_RET	"ret\n\t"
-diff --git a/arch/x86/kernel/alternative.c b/arch/x86/kernel/alternative.c
-index 8932f524c935..ea9652eb455b 100644
---- a/arch/x86/kernel/alternative.c
-+++ b/arch/x86/kernel/alternative.c
-@@ -624,8 +624,8 @@ static int patch_retpoline(void *addr, struct insn *insn, u8 *bytes)
- 	/*
- 	 * The compiler is supposed to EMIT an INT3 after every unconditional
- 	 * JMP instruction due to AMD BTC. However, if the compiler is too old
--	 * or SLS isn't enabled, we still need an INT3 after indirect JMPs
--	 * even on Intel.
-+	 * or MITIGATION_SLS isn't enabled, we still need an INT3 after
-+	 * indirect JMPs even on Intel.
- 	 */
- 	if (op == JMP32_INSN_OPCODE && i < insn->length)
- 		bytes[i++] = INT3_INSN_OPCODE;
-diff --git a/arch/x86/kernel/ftrace.c b/arch/x86/kernel/ftrace.c
-index 0f26758c7a93..b000158b781a 100644
---- a/arch/x86/kernel/ftrace.c
-+++ b/arch/x86/kernel/ftrace.c
-@@ -297,7 +297,8 @@ union ftrace_op_code_union {
- 	} __attribute__((packed));
- };
- 
--#define RET_SIZE	(IS_ENABLED(CONFIG_MITIGATION_RETPOLINE) ? 5 : 1 + IS_ENABLED(CONFIG_SLS))
-+#define RET_SIZE \
-+	(IS_ENABLED(CONFIG_MITIGATION_RETPOLINE) ? 5 : 1 + IS_ENABLED(CONFIG_MITIGATION_SLS))
- 
- static unsigned long
- create_trampoline(struct ftrace_ops *ops, unsigned int *tramp_size)
-diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-index ef732f323926..96a63c4386a9 100644
---- a/arch/x86/net/bpf_jit_comp.c
-+++ b/arch/x86/net/bpf_jit_comp.c
-@@ -469,7 +469,7 @@ static void emit_indirect_jump(u8 **pprog, int reg, u8 *ip)
- 			emit_jump(&prog, &__x86_indirect_thunk_array[reg], ip);
- 	} else {
- 		EMIT2(0xFF, 0xE0 + reg);	/* jmp *%\reg */
--		if (IS_ENABLED(CONFIG_MITIGATION_RETPOLINE) || IS_ENABLED(CONFIG_SLS))
-+		if (IS_ENABLED(CONFIG_MITIGATION_RETPOLINE) || IS_ENABLED(CONFIG_MITIGATION_SLS))
- 			EMIT1(0xCC);		/* int3 */
- 	}
- 
-@@ -484,7 +484,7 @@ static void emit_return(u8 **pprog, u8 *ip)
- 		emit_jump(&prog, x86_return_thunk, ip);
- 	} else {
- 		EMIT1(0xC3);		/* ret */
--		if (IS_ENABLED(CONFIG_SLS))
-+		if (IS_ENABLED(CONFIG_MITIGATION_SLS))
- 			EMIT1(0xCC);	/* int3 */
- 	}
- 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index d6e157938b5f..0d5461276179 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -264,7 +264,7 @@ endif
- objtool-args-$(CONFIG_UNWINDER_ORC)			+= --orc
- objtool-args-$(CONFIG_MITIGATION_RETPOLINE)		+= --retpoline
- objtool-args-$(CONFIG_RETHUNK)				+= --rethunk
--objtool-args-$(CONFIG_SLS)				+= --sls
-+objtool-args-$(CONFIG_MITIGATION_SLS)			+= --sls
- objtool-args-$(CONFIG_STACK_VALIDATION)			+= --stackval
- objtool-args-$(CONFIG_HAVE_STATIC_CALL_INLINE)		+= --static-call
- objtool-args-$(CONFIG_HAVE_UACCESS_VALIDATION)		+= --uaccess
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
