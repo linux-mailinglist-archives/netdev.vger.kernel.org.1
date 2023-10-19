@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-42761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F6C57D00E3
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:50:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BC807D00E4
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 19:50:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 173302822EA
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3ED1282311
 	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 17:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F8836AEB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F4C38BA9;
 	Thu, 19 Oct 2023 17:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b9BvVqpg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pfhCicow"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8484B374EE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58FF37C80
 	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 17:49:53 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC3F126
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:49:50 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7cfdacf8fso8820137b3.0
-        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:49:50 -0700 (PDT)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7430D112
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:49:52 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9a5a3f2d4fso11339941276.3
+        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 10:49:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697737789; x=1698342589; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697737791; x=1698342591; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L5rtM2gXD5wtJiZnn20HdzhoSxZSQQdMNok5j897698=;
-        b=b9BvVqpgyyEuUDwG3qTn5BmzPS5S+jDqa65c8HXUZeYcLdEO+q3DKZH83INZ1HcziR
-         vTyVAB2qe5hcTJ3WFb9Py1EdE2DFrOujlwM4omxANO4qr5hEKKQc4/0qnY/rCt6dT7BZ
-         b4QRJ9bxuRNlF1ZLiA80Z/rU9W7igQhNv7PCcat+NHKCMAWOnwXl7TJ7xsr/Ik+dsC7n
-         tch9ZGcFf1I5VooQlDCbDOJj5BGxOBqD8mj5J2Zqe8fHYBCul8jnOuxnz/C6ba4WCF10
-         WgwmUO75ZqC0NL6vZmODaomTXieXrOPwMotNJXokRT84U6CT6vKahk9YBGQ4yf89iZlr
-         hegw==
+        bh=O+5AYyR/jNBakDxt1zQNoJ6ixNt0+bT1Lc6TVZJfgZI=;
+        b=pfhCicowlpiEkplNiIemD+OQzieaAb9EUoDDo3Sn0J+bXRq0YpsVq/wZqPoXIRKtDf
+         Oy4ER5dCOMc4exoWo6bKaOj04G4RkRkvF4RTrnnVctSpJDGYePp5C8wvaentgypKmrXq
+         UZ7XmsgU8A8Drj/dg6EZpkC6BBlp+Wk8tQp4lKFbrZWBoCAd77Zp3SfrbqTfyJWasTxZ
+         LKV/W9s2JuSDfKECx85EHApRJ7N46zhm/M1qBjnOht5vtJdjF86WkJKZPS17LsR3bxoi
+         Upxp1gAzlFuG0h8HV7UPwoLb10KzG/C7xLPHVXlDXP6Aov+mCYGUpC15PwKFGIhaVwne
+         CI5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697737789; x=1698342589;
+        d=1e100.net; s=20230601; t=1697737791; x=1698342591;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L5rtM2gXD5wtJiZnn20HdzhoSxZSQQdMNok5j897698=;
-        b=Z2fbHJedRjJSrEQFJ54lQvUgM13V0XLkbxssRKCmIrTdBFcNXP/Atc1aqBlYk+rj5w
-         9Zg3vphvy9W/imM2Fy860Ms7CkFh/ablrohyN0bhpFt8e+Er3mkq7xTxwTL7JxW2uhve
-         DyvqCpRZYfHY/PG6pxTDi5YeCZl4+DLBH88k3JuMQ83DAzCmaoODLbU7beXdsImykO1g
-         N34m21RqVboojvhJAB++aipeYJZKrue1aiVkMTZ6366z2RGT2L0IRRCtn9XlGhJXwTgS
-         oBs0+I1qOHaHYueIS0ECWkXAedWfIDhaCi2xiRo+mbH+K7LcfbgLOwGMdYMm+yvl0aye
-         6+Fg==
-X-Gm-Message-State: AOJu0YyAHrWa7vlxtduVzYra0y13m82ThGNznEfLqYujR2ffWF9f2yq3
-	qfuFspA9OTKg09i+QGf3kNmXxEk=
-X-Google-Smtp-Source: AGHT+IHHZVZurXg7SPQHTKs4p9JkiDXSarhC/aTs4/N5NTsRgYtQdOo9pKOo1ukJTEE1CP/eFaXKqNE=
+        bh=O+5AYyR/jNBakDxt1zQNoJ6ixNt0+bT1Lc6TVZJfgZI=;
+        b=c23EuVSbcf8V5OJm1TqofZZmH7eeW+MfEzBmZAiEFdJ4RdJdkFmohCBs4fNLuFXvVj
+         qlsGdAd7DDcJEteKVpHFn0jXZ9/jTMfqWmTqlCNiR4onLE2YYX+SAaBB+LemKTuMba3V
+         vMuwUSx0HwI/atnSJLvsBSB6InNFPub/n/RwP8mOcfAzN+GJyRP6uQIY1gnmVbtvxVSm
+         RA186oD7lBm30c6QbcvDvif8xAE64IHp7ybWY+kfr3qhg08j/2p3uoL4KtxtSyOcMBaI
+         AGRhTXGfFviZXgBZ2gcF1LerCIXyeIEVh4fjVN11RSUAzagZLCJXdOrQ9Dee5h9wCfEg
+         rYDA==
+X-Gm-Message-State: AOJu0Ywdb92jlmaf3wQAB10REeACrnKXUzZxN/XBLm/sVyFzMdH1E1Q2
+	3OCgPCCMzP2IZS8qTgB0KrkMsNg=
+X-Google-Smtp-Source: AGHT+IF+6U1K2o1M3yW8aAnZpqMUW+oqpAG0sSbv/wmlpowAAYZII2r8d15MKzo3vCTr/bt0q2l4tzg=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a0d:cac1:0:b0:5a4:fd03:2516 with SMTP id
- m184-20020a0dcac1000000b005a4fd032516mr79708ywd.1.1697737789566; Thu, 19 Oct
- 2023 10:49:49 -0700 (PDT)
-Date: Thu, 19 Oct 2023 10:49:35 -0700
+ (user=sdf job=sendgmr) by 2002:a25:8490:0:b0:d9a:6b49:433d with SMTP id
+ v16-20020a258490000000b00d9a6b49433dmr66530ybk.6.1697737791334; Thu, 19 Oct
+ 2023 10:49:51 -0700 (PDT)
+Date: Thu, 19 Oct 2023 10:49:36 -0700
 In-Reply-To: <20231019174944.3376335-1-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -64,9 +64,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231019174944.3376335-1-sdf@google.com>
 X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
-Message-ID: <20231019174944.3376335-3-sdf@google.com>
-Subject: [PATCH bpf-next v4 02/11] xsk: Add TX timestamp and TX checksum
- offload support
+Message-ID: <20231019174944.3376335-4-sdf@google.com>
+Subject: [PATCH bpf-next v4 03/11] tools: ynl: Print xsk-features from the sample
 From: Stanislav Fomichev <sdf@google.com>
 To: bpf@vger.kernel.org
 Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
@@ -78,746 +77,30 @@ Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
 	xdp-hints@xdp-project.net
 Content-Type: text/plain; charset="UTF-8"
 
-This change actually defines the (initial) metadata layout
-that should be used by AF_XDP userspace (xsk_tx_metadata).
-The first field is flags which requests appropriate offloads,
-followed by the offload-specific fields. The supported per-device
-offloads are exported via netlink (new xsk-flags).
-
-The offloads themselves are still implemented in a bit of a
-framework-y fashion that's left from my initial kfunc attempt.
-I'm introducing new xsk_tx_metadata_ops which drivers are
-supposed to implement. The drivers are also supposed
-to call xsk_tx_metadata_request/xsk_tx_metadata_complete in
-the right places. Since xsk_tx_metadata_{request,_complete}
-are static inline, we don't incur any extra overhead doing
-indirect calls.
-
-The benefit of this scheme is as follows:
-- keeps all metadata layout parsing away from driver code
-- makes it easy to grep and see which drivers implement what
-- don't need any extra flags to maintain to keep track of what
-  offloads are implemented; if the callback is implemented - the offload
-  is supported (used by netlink reporting code)
-
-Two offloads are defined right now:
-1. XDP_TX_METADATA_CHECKSUM: skb-style csum_start+csum_offset
-2. XDP_TX_METADATA_TIMESTAMP: writes TX timestamp back into metadata
-   area upon completion (tx_timestamp field)
-
-The offloads are also implemented for copy mode:
-1. Extra XDP_TX_METADATA_CHECKSUM_SW to trigger skb_checksum_help; this
-   might be useful as a reference implementation and for testing
-2. XDP_TX_METADATA_TIMESTAMP writes SW timestamp from the skb
-   destructor (note I'm reusing hwtstamps to pass metadata pointer)
-
-The struct is forward-compatible and can be extended in the future
-by appending more fields.
+Regenerate the userspace specs and print xsk-features bitmask.
 
 Signed-off-by: Stanislav Fomichev <sdf@google.com>
 ---
- Documentation/netlink/specs/netdev.yaml | 19 ++++++
- include/linux/netdevice.h               | 27 ++++++++
- include/linux/skbuff.h                  | 14 +++-
- include/net/xdp_sock.h                  | 85 +++++++++++++++++++++++++
- include/net/xdp_sock_drv.h              | 13 ++++
- include/net/xsk_buff_pool.h             |  6 ++
- include/uapi/linux/if_xdp.h             | 40 ++++++++++++
- include/uapi/linux/netdev.h             | 16 +++++
- net/core/netdev-genl.c                  | 12 +++-
- net/xdp/xsk.c                           | 39 ++++++++++++
- net/xdp/xsk_queue.h                     |  2 +-
- tools/include/uapi/linux/if_xdp.h       | 54 ++++++++++++++--
- tools/include/uapi/linux/netdev.h       | 16 +++++
- tools/net/ynl/generated/netdev-user.c   | 19 ++++++
- tools/net/ynl/generated/netdev-user.h   |  3 +
- 15 files changed, 357 insertions(+), 8 deletions(-)
+ tools/net/ynl/samples/netdev.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 14511b13f305..22d2649a34ee 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -55,6 +55,19 @@ name: netdev
-         name: hash
-         doc:
-           Device is capable of exposing receive packet hash via bpf_xdp_metadata_rx_hash().
-+  -
-+    type: flags
-+    name: xsk-flags
-+    render-max: true
-+    entries:
-+      -
-+        name: tx-timestamp
-+        doc:
-+          HW timestamping egress packets is supported by the driver.
-+      -
-+        name: tx-checksum
-+        doc:
-+          L3 checksum HW offload is supported by the driver.
+diff --git a/tools/net/ynl/samples/netdev.c b/tools/net/ynl/samples/netdev.c
+index b828225daad0..da7c2848f773 100644
+--- a/tools/net/ynl/samples/netdev.c
++++ b/tools/net/ynl/samples/netdev.c
+@@ -44,6 +44,12 @@ static void netdev_print_device(struct netdev_dev_get_rsp *d, unsigned int op)
+ 			printf(" %s", netdev_xdp_rx_metadata_str(1 << i));
+ 	}
  
- attribute-sets:
-   -
-@@ -86,6 +99,11 @@ name: netdev
-              See Documentation/networking/xdp-rx-metadata.rst for more details.
-         type: u64
-         enum: xdp-rx-metadata
-+      -
-+        name: xsk-features
-+        doc: Bitmask of enabled AF_XDP features.
-+        type: u64
-+        enum: xsk-flags
- 
- operations:
-   list:
-@@ -103,6 +121,7 @@ name: netdev
-             - xdp-features
-             - xdp-zc-max-segs
-             - xdp-rx-metadata-features
-+            - xsk-features
-       dump:
-         reply: *dev-all
-     -
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 1c7681263d30..f0903a1ac791 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1643,6 +1643,31 @@ struct net_device_ops {
- 						    struct netlink_ext_ack *extack);
- };
- 
-+/*
-+ * This structure defines the AF_XDP TX metadata hooks for network devices.
-+ * The following hooks can be defined; unless noted otherwise, they are
-+ * optional and can be filled with a null pointer.
-+ *
-+ * void (*tmo_request_timestamp)(void *priv)
-+ *     This function is called when AF_XDP frame requested egress timestamp.
-+ *
-+ * u64 (*tmo_fill_timestamp)(void *priv)
-+ *     This function is called when AF_XDP frame, that had requested
-+ *     egress timestamp, received a completion. The hook needs to return
-+ *     the actual HW timestamp.
-+ *
-+ * void (*tmo_request_checksum)(u16 csum_start, u16 csum_offset, void *priv)
-+ *     This function is called when AF_XDP frame requested HW checksum
-+ *     offload. csum_start indicates position where checksumming should start.
-+ *     csum_offset indicates position where checksum should be stored.
-+ *
-+ */
-+struct xsk_tx_metadata_ops {
-+	void	(*tmo_request_timestamp)(void *priv);
-+	u64	(*tmo_fill_timestamp)(void *priv);
-+	void	(*tmo_request_checksum)(u16 csum_start, u16 csum_offset, void *priv);
-+};
-+
- /**
-  * enum netdev_priv_flags - &struct net_device priv_flags
-  *
-@@ -1831,6 +1856,7 @@ enum netdev_ml_priv_type {
-  *	@netdev_ops:	Includes several pointers to callbacks,
-  *			if one wants to override the ndo_*() functions
-  *	@xdp_metadata_ops:	Includes pointers to XDP metadata callbacks.
-+ *	@xsk_tx_metadata_ops:	Includes pointers to AF_XDP TX metadata callbacks.
-  *	@ethtool_ops:	Management operations
-  *	@l3mdev_ops:	Layer 3 master device operations
-  *	@ndisc_ops:	Includes callbacks for different IPv6 neighbour
-@@ -2090,6 +2116,7 @@ struct net_device {
- 	unsigned long long	priv_flags;
- 	const struct net_device_ops *netdev_ops;
- 	const struct xdp_metadata_ops *xdp_metadata_ops;
-+	const struct xsk_tx_metadata_ops *xsk_tx_metadata_ops;
- 	int			ifindex;
- 	unsigned short		gflags;
- 	unsigned short		hard_header_len;
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 97bfef071255..5b79d7fe9f9c 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -566,6 +566,15 @@ struct ubuf_info_msgzc {
- int mm_account_pinned_pages(struct mmpin *mmp, size_t size);
- void mm_unaccount_pinned_pages(struct mmpin *mmp);
- 
-+/* Preserve some data across TX submission and completion.
-+ *
-+ * Note, this state is stored in the driver. Extending the layout
-+ * might need some special care.
-+ */
-+struct xsk_tx_metadata_compl {
-+	__u64 *tx_timestamp;
-+};
-+
- /* This data is invariant across clones and lives at
-  * the end of the header data, ie. at skb->end.
-  */
-@@ -578,7 +587,10 @@ struct skb_shared_info {
- 	/* Warning: this field is not always filled in (UFO)! */
- 	unsigned short	gso_segs;
- 	struct sk_buff	*frag_list;
--	struct skb_shared_hwtstamps hwtstamps;
-+	union {
-+		struct skb_shared_hwtstamps hwtstamps;
-+		struct xsk_tx_metadata_compl xsk_meta;
-+	};
- 	unsigned int	gso_type;
- 	u32		tskey;
- 
-diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index 5ae88a00f34a..9f09ee47b434 100644
---- a/include/net/xdp_sock.h
-+++ b/include/net/xdp_sock.h
-@@ -92,6 +92,74 @@ int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp);
- int __xsk_map_redirect(struct xdp_sock *xs, struct xdp_buff *xdp);
- void __xsk_map_flush(void);
- 
-+/**
-+ *  xsk_tx_metadata_to_compl - Save enough relevant metadata information
-+ *  to perform tx completion in the future.
-+ *  @meta: pointer to AF_XDP metadata area
-+ *  @compl: pointer to output struct xsk_tx_metadata_to_compl
-+ *
-+ *  This function should be called by the networking device when
-+ *  it prepares AF_XDP egress packet. The value of @compl should be stored
-+ *  and passed to xsk_tx_metadata_complete upon TX completion.
-+ */
-+static inline void xsk_tx_metadata_to_compl(struct xsk_tx_metadata *meta,
-+					    struct xsk_tx_metadata_compl *compl)
-+{
-+	if (!meta)
-+		return;
-+
-+	if (meta->flags & XDP_TX_METADATA_TIMESTAMP)
-+		compl->tx_timestamp = &meta->completion.tx_timestamp;
-+	else
-+		compl->tx_timestamp = NULL;
-+}
-+
-+/**
-+ *  xsk_tx_metadata_request - Evaluate AF_XDP TX metadata at submission
-+ *  and call appropriate xsk_tx_metadata_ops operation.
-+ *  @meta: pointer to AF_XDP metadata area
-+ *  @ops: pointer to struct xsk_tx_metadata_ops
-+ *  @priv: pointer to driver-private aread
-+ *
-+ *  This function should be called by the networking device when
-+ *  it prepares AF_XDP egress packet.
-+ */
-+static inline void xsk_tx_metadata_request(const struct xsk_tx_metadata *meta,
-+					   const struct xsk_tx_metadata_ops *ops,
-+					   void *priv)
-+{
-+	if (!meta)
-+		return;
-+
-+	if (ops->tmo_request_timestamp)
-+		if (meta->flags & XDP_TX_METADATA_TIMESTAMP)
-+			ops->tmo_request_timestamp(priv);
-+
-+	if (ops->tmo_request_checksum)
-+		if (meta->flags & XDP_TX_METADATA_CHECKSUM)
-+			ops->tmo_request_checksum(meta->csum_start, meta->csum_offset, priv);
-+}
-+
-+/**
-+ *  xsk_tx_metadata_complete - Evaluate AF_XDP TX metadata at completion
-+ *  and call appropriate xsk_tx_metadata_ops operation.
-+ *  @compl: pointer to completion metadata produced from xsk_tx_metadata_to_compl
-+ *  @ops: pointer to struct xsk_tx_metadata_ops
-+ *  @priv: pointer to driver-private aread
-+ *
-+ *  This function should be called by the networking device upon
-+ *  AF_XDP egress completion.
-+ */
-+static inline void xsk_tx_metadata_complete(struct xsk_tx_metadata_compl *compl,
-+					    const struct xsk_tx_metadata_ops *ops,
-+					    void *priv)
-+{
-+	if (!compl)
-+		return;
-+
-+	*compl->tx_timestamp = ops->tmo_fill_timestamp(priv);
-+}
-+
- #else
- 
- static inline int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp)
-@@ -108,6 +176,23 @@ static inline void __xsk_map_flush(void)
- {
- }
- 
-+static inline void xsk_tx_metadata_to_compl(struct xsk_tx_metadata *meta,
-+					    struct xsk_tx_metadata_compl *compl)
-+{
-+}
-+
-+static inline void xsk_tx_metadata_request(struct xsk_tx_metadata *meta,
-+					   const struct xsk_tx_metadata_ops *ops,
-+					   void *priv)
-+{
-+}
-+
-+static inline void xsk_tx_metadata_complete(struct xsk_tx_metadata_compl *compl,
-+					    const struct xsk_tx_metadata_ops *ops,
-+					    void *priv)
-+{
-+}
-+
- #endif /* CONFIG_XDP_SOCKETS */
- 
- #if defined(CONFIG_XDP_SOCKETS) && defined(CONFIG_DEBUG_NET)
-diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
-index 1f6fc8c7a84c..e2558ac3e195 100644
---- a/include/net/xdp_sock_drv.h
-+++ b/include/net/xdp_sock_drv.h
-@@ -165,6 +165,14 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
- 	return xp_raw_get_data(pool, addr);
- }
- 
-+static inline struct xsk_tx_metadata *xsk_buff_get_metadata(struct xsk_buff_pool *pool, u64 addr)
-+{
-+	if (!pool->tx_metadata_len)
-+		return NULL;
-+
-+	return xp_raw_get_data(pool, addr) - pool->tx_metadata_len;
-+}
-+
- static inline void xsk_buff_dma_sync_for_cpu(struct xdp_buff *xdp, struct xsk_buff_pool *pool)
- {
- 	struct xdp_buff_xsk *xskb = container_of(xdp, struct xdp_buff_xsk, xdp);
-@@ -324,6 +332,11 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
- 	return NULL;
- }
- 
-+static inline struct xsk_tx_metadata *xsk_buff_get_metadata(struct xsk_buff_pool *pool, u64 addr)
-+{
-+	return NULL;
-+}
-+
- static inline void xsk_buff_dma_sync_for_cpu(struct xdp_buff *xdp, struct xsk_buff_pool *pool)
- {
- }
-diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-index 1985ffaf9b0c..97f5cc10d79e 100644
---- a/include/net/xsk_buff_pool.h
-+++ b/include/net/xsk_buff_pool.h
-@@ -33,6 +33,7 @@ struct xdp_buff_xsk {
- };
- 
- #define XSK_CHECK_PRIV_TYPE(t) BUILD_BUG_ON(sizeof(t) > offsetofend(struct xdp_buff_xsk, cb))
-+#define XSK_TX_COMPL_FITS(t) BUILD_BUG_ON(sizeof(struct xsk_tx_metadata_compl) > sizeof(t))
- 
- struct xsk_dma_map {
- 	dma_addr_t *dma_pages;
-@@ -234,4 +235,9 @@ static inline u64 xp_get_handle(struct xdp_buff_xsk *xskb)
- 	return xskb->orig_addr + (offset << XSK_UNALIGNED_BUF_OFFSET_SHIFT);
- }
- 
-+static inline bool xp_tx_metadata_enabled(const struct xsk_buff_pool *pool)
-+{
-+	return pool->tx_metadata_len > 0;
-+}
-+
- #endif /* XSK_BUFF_POOL_H_ */
-diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
-index 2ecf79282c26..ecfd67988283 100644
---- a/include/uapi/linux/if_xdp.h
-+++ b/include/uapi/linux/if_xdp.h
-@@ -106,6 +106,43 @@ struct xdp_options {
- #define XSK_UNALIGNED_BUF_ADDR_MASK \
- 	((1ULL << XSK_UNALIGNED_BUF_OFFSET_SHIFT) - 1)
- 
-+/* Request transmit timestamp. Upon completion, put it into tx_timestamp
-+ * field of struct xsk_tx_metadata.
-+ */
-+#define XDP_TX_METADATA_TIMESTAMP		(1 << 0)
-+
-+/* Request transmit checksum offload. Checksum start position and offset
-+ * are communicated via csum_start and csum_offset fields of struct
-+ * xsk_tx_metadata.
-+ */
-+#define XDP_TX_METADATA_CHECKSUM		(1 << 1)
-+
-+/* Force checksum calculation in software. Can be used for testing or
-+ * working around potential HW issues. This option causes performance
-+ * degradation and only works in XDP_COPY mode.
-+ */
-+#define XDP_TX_METADATA_CHECKSUM_SW		(1 << 2)
-+
-+struct xsk_tx_metadata {
-+	union {
-+		struct {
-+			__u32 flags;
-+
-+			/* XDP_TX_METADATA_CHECKSUM */
-+
-+			/* Offset from desc->addr where checksumming should start. */
-+			__u16 csum_start;
-+			/* Offset from csum_start where checksum should be stored. */
-+			__u16 csum_offset;
-+		};
-+
-+		struct {
-+			/* XDP_TX_METADATA_TIMESTAMP */
-+			__u64 tx_timestamp;
-+		} completion;
-+	};
-+};
-+
- /* Rx/Tx descriptor */
- struct xdp_desc {
- 	__u64 addr;
-@@ -122,4 +159,7 @@ struct xdp_desc {
-  */
- #define XDP_PKT_CONTD (1 << 0)
- 
-+/* TX packet carries valid metadata. */
-+#define XDP_TX_METADATA (1 << 1)
-+
- #endif /* _LINUX_IF_XDP_H */
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 2943a151d4f1..48d5477a668c 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -53,12 +53,28 @@ enum netdev_xdp_rx_metadata {
- 	NETDEV_XDP_RX_METADATA_MASK = 3,
- };
- 
-+/**
-+ * enum netdev_xsk_flags
-+ * @NETDEV_XSK_FLAGS_TX_TIMESTAMP: HW timestamping egress packets is supported
-+ *   by the driver.
-+ * @NETDEV_XSK_FLAGS_TX_CHECKSUM: L3 checksum HW offload is supported by the
-+ *   driver.
-+ */
-+enum netdev_xsk_flags {
-+	NETDEV_XSK_FLAGS_TX_TIMESTAMP = 1,
-+	NETDEV_XSK_FLAGS_TX_CHECKSUM = 2,
-+
-+	/* private: */
-+	NETDEV_XSK_FLAGS_MASK = 3,
-+};
-+
- enum {
- 	NETDEV_A_DEV_IFINDEX = 1,
- 	NETDEV_A_DEV_PAD,
- 	NETDEV_A_DEV_XDP_FEATURES,
- 	NETDEV_A_DEV_XDP_ZC_MAX_SEGS,
- 	NETDEV_A_DEV_XDP_RX_METADATA_FEATURES,
-+	NETDEV_A_DEV_XSK_FEATURES,
- 
- 	__NETDEV_A_DEV_MAX,
- 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index fe61f85bcf33..5d889c2425fd 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -14,6 +14,7 @@ netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
- 		   const struct genl_info *info)
- {
- 	u64 xdp_rx_meta = 0;
-+	u64 xsk_features = 0;
- 	void *hdr;
- 
- 	hdr = genlmsg_iput(rsp, info);
-@@ -26,11 +27,20 @@ netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
- XDP_METADATA_KFUNC_xxx
- #undef XDP_METADATA_KFUNC
- 
-+	if (netdev->xsk_tx_metadata_ops) {
-+		if (netdev->xsk_tx_metadata_ops->tmo_fill_timestamp)
-+			xsk_features |= NETDEV_XSK_FLAGS_TX_TIMESTAMP;
-+		if (netdev->xsk_tx_metadata_ops->tmo_request_checksum)
-+			xsk_features |= NETDEV_XSK_FLAGS_TX_CHECKSUM;
++	printf(" xsk-features (%llx):", d->xsk_features);
++	for (int i = 0; d->xsk_features > 1U << i; i++) {
++		if (d->xsk_features & (1U << i))
++			printf(" %s", netdev_xsk_flags_str(1 << i));
 +	}
 +
- 	if (nla_put_u32(rsp, NETDEV_A_DEV_IFINDEX, netdev->ifindex) ||
- 	    nla_put_u64_64bit(rsp, NETDEV_A_DEV_XDP_FEATURES,
- 			      netdev->xdp_features, NETDEV_A_DEV_PAD) ||
- 	    nla_put_u64_64bit(rsp, NETDEV_A_DEV_XDP_RX_METADATA_FEATURES,
--			      xdp_rx_meta, NETDEV_A_DEV_PAD)) {
-+			      xdp_rx_meta, NETDEV_A_DEV_PAD) ||
-+	    nla_put_u64_64bit(rsp, NETDEV_A_DEV_XSK_FEATURES,
-+			      xsk_features, NETDEV_A_DEV_PAD)) {
- 		genlmsg_cancel(rsp, hdr);
- 		return -EINVAL;
- 	}
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index ba4c77a24a83..c441a9eadbd5 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -553,6 +553,13 @@ static u32 xsk_get_num_desc(struct sk_buff *skb)
+ 	printf(" xdp-zc-max-segs=%u", d->xdp_zc_max_segs);
  
- static void xsk_destruct_skb(struct sk_buff *skb)
- {
-+	struct xsk_tx_metadata_compl *compl = &skb_shinfo(skb)->xsk_meta;
-+
-+	if (compl->tx_timestamp) {
-+		/* sw completion timestamp, not a real one */
-+		*compl->tx_timestamp = ktime_get_tai_fast_ns();
-+	}
-+
- 	xsk_cq_submit_locked(xdp_sk(skb->sk), xsk_get_num_desc(skb));
- 	sock_wfree(skb);
- }
-@@ -637,8 +644,10 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 				     struct xdp_desc *desc)
- {
-+	struct xsk_tx_metadata *meta = NULL;
- 	struct net_device *dev = xs->dev;
- 	struct sk_buff *skb = xs->skb;
-+	bool first_frag = false;
- 	int err;
- 
- 	if (dev->priv_flags & IFF_TX_SKB_NO_LINEAR) {
-@@ -669,6 +678,8 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 				kfree_skb(skb);
- 				goto free_err;
- 			}
-+
-+			first_frag = true;
- 		} else {
- 			int nr_frags = skb_shinfo(skb)->nr_frags;
- 			struct page *page;
-@@ -691,12 +702,40 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 
- 			skb_add_rx_frag(skb, nr_frags, page, 0, len, 0);
- 		}
-+
-+		if (first_frag && desc->options & XDP_TX_METADATA) {
-+			if (unlikely(xs->pool->tx_metadata_len == 0)) {
-+				err = -EINVAL;
-+				goto free_err;
-+			}
-+
-+			meta = buffer - xs->pool->tx_metadata_len;
-+
-+			if (meta->flags & XDP_TX_METADATA_CHECKSUM) {
-+				if (unlikely(meta->csum_start + meta->csum_offset +
-+					     sizeof(__sum16) > len)) {
-+					err = -EINVAL;
-+					goto free_err;
-+				}
-+
-+				skb->csum_start = hr + meta->csum_start;
-+				skb->csum_offset = meta->csum_offset;
-+				skb->ip_summed = CHECKSUM_PARTIAL;
-+
-+				if (unlikely(meta->flags & XDP_TX_METADATA_CHECKSUM_SW)) {
-+					err = skb_checksum_help(skb);
-+					if (err)
-+						goto free_err;
-+				}
-+			}
-+		}
- 	}
- 
- 	skb->dev = dev;
- 	skb->priority = READ_ONCE(xs->sk.sk_priority);
- 	skb->mark = READ_ONCE(xs->sk.sk_mark);
- 	skb->destructor = xsk_destruct_skb;
-+	xsk_tx_metadata_to_compl(meta, &skb_shinfo(skb)->xsk_meta);
- 	xsk_set_destructor_arg(skb);
- 
- 	return skb;
-diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
-index c74a1372bcb9..6f2d1621c992 100644
---- a/net/xdp/xsk_queue.h
-+++ b/net/xdp/xsk_queue.h
-@@ -137,7 +137,7 @@ static inline bool xskq_cons_read_addr_unchecked(struct xsk_queue *q, u64 *addr)
- 
- static inline bool xp_unused_options_set(u32 options)
- {
--	return options & ~XDP_PKT_CONTD;
-+	return options & ~(XDP_PKT_CONTD | XDP_TX_METADATA);
- }
- 
- static inline bool xp_aligned_validate_desc(struct xsk_buff_pool *pool,
-diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/linux/if_xdp.h
-index 34411a2e5b6c..53ceaae10dd1 100644
---- a/tools/include/uapi/linux/if_xdp.h
-+++ b/tools/include/uapi/linux/if_xdp.h
-@@ -26,11 +26,11 @@
-  */
- #define XDP_USE_NEED_WAKEUP (1 << 3)
- /* By setting this option, userspace application indicates that it can
-- * handle multiple descriptors per packet thus enabling xsk core to split
-+ * handle multiple descriptors per packet thus enabling AF_XDP to split
-  * multi-buffer XDP frames into multiple Rx descriptors. Without this set
-- * such frames will be dropped by xsk.
-+ * such frames will be dropped.
-  */
--#define XDP_USE_SG     (1 << 4)
-+#define XDP_USE_SG	(1 << 4)
- 
- /* Flags for xsk_umem_config flags */
- #define XDP_UMEM_UNALIGNED_CHUNK_FLAG (1 << 0)
-@@ -106,6 +106,43 @@ struct xdp_options {
- #define XSK_UNALIGNED_BUF_ADDR_MASK \
- 	((1ULL << XSK_UNALIGNED_BUF_OFFSET_SHIFT) - 1)
- 
-+/* Request transmit timestamp. Upon completion, put it into tx_timestamp
-+ * field of union xsk_tx_metadata.
-+ */
-+#define XDP_TX_METADATA_TIMESTAMP		(1 << 0)
-+
-+/* Request transmit checksum offload. Checksum start position and offset
-+ * are communicated via csum_start and csum_offset fields of union
-+ * xsk_tx_metadata.
-+ */
-+#define XDP_TX_METADATA_CHECKSUM		(1 << 1)
-+
-+/* Force checksum calculation in software. Can be used for testing or
-+ * working around potential HW issues. This option causes performance
-+ * degradation and only works in XDP_COPY mode.
-+ */
-+#define XDP_TX_METADATA_CHECKSUM_SW		(1 << 2)
-+
-+struct xsk_tx_metadata {
-+	union {
-+		struct {
-+			__u32 flags;
-+
-+			/* XDP_TX_METADATA_CHECKSUM */
-+
-+			/* Offset from desc->addr where checksumming should start. */
-+			__u16 csum_start;
-+			/* Offset from csum_start where checksum should be stored. */
-+			__u16 csum_offset;
-+		};
-+
-+		struct {
-+			/* XDP_TX_METADATA_TIMESTAMP */
-+			__u64 tx_timestamp;
-+		} completion;
-+	};
-+};
-+
- /* Rx/Tx descriptor */
- struct xdp_desc {
- 	__u64 addr;
-@@ -113,9 +150,16 @@ struct xdp_desc {
- 	__u32 options;
- };
- 
--/* Flag indicating packet constitutes of multiple buffers*/
-+/* UMEM descriptor is __u64 */
-+
-+/* Flag indicating that the packet continues with the buffer pointed out by the
-+ * next frame in the ring. The end of the packet is signalled by setting this
-+ * bit to zero. For single buffer packets, every descriptor has 'options' set
-+ * to 0 and this maintains backward compatibility.
-+ */
- #define XDP_PKT_CONTD (1 << 0)
- 
--/* UMEM descriptor is __u64 */
-+/* TX packet carries valid metadata. */
-+#define XDP_TX_METADATA (1 << 1)
- 
- #endif /* _LINUX_IF_XDP_H */
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 2943a151d4f1..48d5477a668c 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -53,12 +53,28 @@ enum netdev_xdp_rx_metadata {
- 	NETDEV_XDP_RX_METADATA_MASK = 3,
- };
- 
-+/**
-+ * enum netdev_xsk_flags
-+ * @NETDEV_XSK_FLAGS_TX_TIMESTAMP: HW timestamping egress packets is supported
-+ *   by the driver.
-+ * @NETDEV_XSK_FLAGS_TX_CHECKSUM: L3 checksum HW offload is supported by the
-+ *   driver.
-+ */
-+enum netdev_xsk_flags {
-+	NETDEV_XSK_FLAGS_TX_TIMESTAMP = 1,
-+	NETDEV_XSK_FLAGS_TX_CHECKSUM = 2,
-+
-+	/* private: */
-+	NETDEV_XSK_FLAGS_MASK = 3,
-+};
-+
- enum {
- 	NETDEV_A_DEV_IFINDEX = 1,
- 	NETDEV_A_DEV_PAD,
- 	NETDEV_A_DEV_XDP_FEATURES,
- 	NETDEV_A_DEV_XDP_ZC_MAX_SEGS,
- 	NETDEV_A_DEV_XDP_RX_METADATA_FEATURES,
-+	NETDEV_A_DEV_XSK_FEATURES,
- 
- 	__NETDEV_A_DEV_MAX,
- 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
-diff --git a/tools/net/ynl/generated/netdev-user.c b/tools/net/ynl/generated/netdev-user.c
-index b5ffe8cd1144..6283d87dad37 100644
---- a/tools/net/ynl/generated/netdev-user.c
-+++ b/tools/net/ynl/generated/netdev-user.c
-@@ -58,6 +58,19 @@ const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value)
- 	return netdev_xdp_rx_metadata_strmap[value];
- }
- 
-+static const char * const netdev_xsk_flags_strmap[] = {
-+	[0] = "tx-timestamp",
-+	[1] = "tx-checksum",
-+};
-+
-+const char *netdev_xsk_flags_str(enum netdev_xsk_flags value)
-+{
-+	value = ffs(value) - 1;
-+	if (value < 0 || value >= (int)MNL_ARRAY_SIZE(netdev_xsk_flags_strmap))
-+		return NULL;
-+	return netdev_xsk_flags_strmap[value];
-+}
-+
- /* Policies */
- struct ynl_policy_attr netdev_dev_policy[NETDEV_A_DEV_MAX + 1] = {
- 	[NETDEV_A_DEV_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
-@@ -65,6 +78,7 @@ struct ynl_policy_attr netdev_dev_policy[NETDEV_A_DEV_MAX + 1] = {
- 	[NETDEV_A_DEV_XDP_FEATURES] = { .name = "xdp-features", .type = YNL_PT_U64, },
- 	[NETDEV_A_DEV_XDP_ZC_MAX_SEGS] = { .name = "xdp-zc-max-segs", .type = YNL_PT_U32, },
- 	[NETDEV_A_DEV_XDP_RX_METADATA_FEATURES] = { .name = "xdp-rx-metadata-features", .type = YNL_PT_U64, },
-+	[NETDEV_A_DEV_XSK_FEATURES] = { .name = "xsk-features", .type = YNL_PT_U64, },
- };
- 
- struct ynl_policy_nest netdev_dev_nest = {
-@@ -116,6 +130,11 @@ int netdev_dev_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
- 				return MNL_CB_ERROR;
- 			dst->_present.xdp_rx_metadata_features = 1;
- 			dst->xdp_rx_metadata_features = mnl_attr_get_u64(attr);
-+		} else if (type == NETDEV_A_DEV_XSK_FEATURES) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.xsk_features = 1;
-+			dst->xsk_features = mnl_attr_get_u64(attr);
- 		}
- 	}
- 
-diff --git a/tools/net/ynl/generated/netdev-user.h b/tools/net/ynl/generated/netdev-user.h
-index b4351ff34595..bdbd1766ce46 100644
---- a/tools/net/ynl/generated/netdev-user.h
-+++ b/tools/net/ynl/generated/netdev-user.h
-@@ -19,6 +19,7 @@ extern const struct ynl_family ynl_netdev_family;
- const char *netdev_op_str(int op);
- const char *netdev_xdp_act_str(enum netdev_xdp_act value);
- const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value);
-+const char *netdev_xsk_flags_str(enum netdev_xsk_flags value);
- 
- /* Common nested types */
- /* ============== NETDEV_CMD_DEV_GET ============== */
-@@ -50,12 +51,14 @@ struct netdev_dev_get_rsp {
- 		__u32 xdp_features:1;
- 		__u32 xdp_zc_max_segs:1;
- 		__u32 xdp_rx_metadata_features:1;
-+		__u32 xsk_features:1;
- 	} _present;
- 
- 	__u32 ifindex;
- 	__u64 xdp_features;
- 	__u32 xdp_zc_max_segs;
- 	__u64 xdp_rx_metadata_features;
-+	__u64 xsk_features;
- };
- 
- void netdev_dev_get_rsp_free(struct netdev_dev_get_rsp *rsp);
+ 	name = netdev_op_str(op);
 -- 
 2.42.0.655.g421f12c284-goog
 
