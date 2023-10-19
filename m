@@ -1,206 +1,181 @@
-Return-Path: <netdev+bounces-42502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF377CF001
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:17:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80BBA7CF004
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 08:18:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 502DEB20F40
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 06:17:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E202281EA1
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 06:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E48B2104;
-	Thu, 19 Oct 2023 06:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC5120FD;
+	Thu, 19 Oct 2023 06:18:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="35iKzvkz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmpqQwqA"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4D42913;
-	Thu, 19 Oct 2023 06:17:31 +0000 (UTC)
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2055.outbound.protection.outlook.com [40.107.101.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE1A0BE;
-	Wed, 18 Oct 2023 23:17:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lIiZTC8SUCZUuqu0tpLuReSNlmWb1y4B7u+5RAvtv1D2eVptQUEF0MWj3Z/g3kGy0/jttu5EsyTdayERkwgkH1yO/q5GcR91kUxrNPmJ8zSLOXhA3PXzETHfpEbJruMLMpUI0dY+z1e6jqM7mfwrZHpeLXO+/atoacbuTcTUxPrcEn9NLYwejfhqaai9hby6aY/S3E8dosoVoRKJ7nRm/Da8UXV1j4g1cBznzuFRJuPMaYgeuVPJihLDILmTUxVLLaqF3rq6qTwrMMBlCRoRTM+qq8y5E1E4mYYdmyruIcfWDBghLIFqRqb3E6nuecxzrCK42+8cnT5BmYXbjrPWDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cBqT9M2T6hc5bLw1aqb0YQoiwrwBpKLwAnvUhAfWy8g=;
- b=W2KhIdmjCAn6cwbW3CFSzJkUeaOfsc+1LXp/MzLhNt+YI1zPpLY+HrvzeB8lwqHUPUlQBbdr/fotk3SEaGO7WG7c5kuDrHqxOZFFx5dpqhIBRCkHbws0jM6SMILyScleqLDR6HwZ+ussooq/OzXTS7tj7Pyix6PNfvKFiaeJYKuhNX+YwddVQdFP/kmopuYTYldCyFdVHkzKCBco3OPtdjzrUs2O1Gx21L6ZGmZDDzmmHzgpYX9B8xYpwVllOP/jmmq0RjpWLiUsbSTN+FbTjNef1JEL0YxAPCU1wjCQCwoB0+stj9Rwvewf0PPSEr80WyUYQR0Nq/vvSYEoM/qiRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cBqT9M2T6hc5bLw1aqb0YQoiwrwBpKLwAnvUhAfWy8g=;
- b=35iKzvkzgI9992OSfHS2FRca8buagfQy9pSWUtc8PUpG+Eru+fxSt/JWfNNWxOI7IAqo5DRYdmk5TuByaJ5OIuMgIwKgArTQJdebnSgq6XTU+Vk7aCje9XAJsREpc2mvz05Ea8f7UGRQjuMs1PYKO7N/wD9eLW14h5z1O57fHWs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB6351.namprd12.prod.outlook.com (2603:10b6:8:a2::6) by
- CY5PR12MB6624.namprd12.prod.outlook.com (2603:10b6:930:40::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6907.21; Thu, 19 Oct 2023 06:17:27 +0000
-Received: from DM4PR12MB6351.namprd12.prod.outlook.com
- ([fe80::4ead:d69:799a:281e]) by DM4PR12MB6351.namprd12.prod.outlook.com
- ([fe80::4ead:d69:799a:281e%5]) with mapi id 15.20.6886.034; Thu, 19 Oct 2023
- 06:17:27 +0000
-Message-ID: <5f85eb72-3f34-4006-85ca-2a2181113008@amd.com>
-Date: Thu, 19 Oct 2023 14:17:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Cc: majun@amd.com, netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH v12 0/9] Enable Wifi RFI interference mitigation feature
- support
-To: Ma Jun <Jun.Ma2@amd.com>, amd-gfx@lists.freedesktop.org, lenb@kernel.org,
- johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, alexander.deucher@amd.com,
- Lijo.Lazar@amd.com, mario.limonciello@amd.com
-References: <20231017025358.1773598-1-Jun.Ma2@amd.com>
-Content-Language: en-US
-From: "Ma, Jun" <majun@amd.com>
-In-Reply-To: <20231017025358.1773598-1-Jun.Ma2@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0030.apcprd02.prod.outlook.com
- (2603:1096:3:18::18) To DM4PR12MB6351.namprd12.prod.outlook.com
- (2603:10b6:8:a2::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D98063A4
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 06:18:03 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA356FE
+	for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 23:18:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697696281;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/PuqaXTNUDAuY+PkSea1LqeAPr02g4Cwph0Z+g7436c=;
+	b=QmpqQwqAQ0n6ECPavxfRU/wqwqoxTF8xA6RXAzP/Gu9IVU+kwCyo2GRRwRMse003h4EDFW
+	t5luJ1hGEs99TxAS8JAB4nLOVbxiJIt3+WEQnfJIDAmgGXgJszGqJXWK3uYX+UvNvutMih
+	PetjxcpAadJF2qXun3xzOldWVnTMSJ8=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-339-9c3HnxRxPaivNracARVCWA-1; Thu, 19 Oct 2023 02:17:48 -0400
+X-MC-Unique: 9c3HnxRxPaivNracARVCWA-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5079fd9754cso5563753e87.0
+        for <netdev@vger.kernel.org>; Wed, 18 Oct 2023 23:17:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697696267; x=1698301067;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/PuqaXTNUDAuY+PkSea1LqeAPr02g4Cwph0Z+g7436c=;
+        b=ufPCj2q8eZvspOHzQToHQ5VbUOptOVNISv3u4OTPg6uC8+pQABYwwt+fYYMjQFYafa
+         VW7qZco5W2BLbaxuLSbDBwDndIdVrBC4vb83Cz9p/DUf5qMMQJUPN/s1eT6OYf806Lm7
+         PRCJRYqmeiFh0+sKQVo2axoh7Ljklhdqy+R4QRyckF47AOWZiGub/o23zDa07p5IbkMJ
+         1wDKs+2z5FvRv9j4g0JsU7RY1itzqkL2VHq99GYeldnLZIDTAw3mJxuA4nXzVaQptUDE
+         kyxzNqc9xK22Pw3joY/KlfR6eCn8W/SMQfIvInOjEHDdCx+DwjGEe68oZGN0jHeaBU6M
+         rqOQ==
+X-Gm-Message-State: AOJu0Yxi9xeQKN8MgyyITMUg8lvtcwcOeitaPnJMzdEKdXyCGkX3HiH6
+	Bk+xze7z94jhqYji6KwAc/l37vEonDmTcAVQ2NoViUPhsDC+K/RwRgFsvPlLJSR8sUgK0FzBW2y
+	xrKx/XbG59zJ8RFzIH/HSrSatM2c7RpSb
+X-Received: by 2002:a19:ee16:0:b0:507:ab62:48a5 with SMTP id g22-20020a19ee16000000b00507ab6248a5mr646487lfb.21.1697696266876;
+        Wed, 18 Oct 2023 23:17:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHByP6mfsSCluk9sCZUGdaOPomDtr6n3wTg6/xe3nrOw8ffMYgY2ZllbvDXPQDB1aq7nf0tgU5oMzZ6tOpqzqk=
+X-Received: by 2002:a19:ee16:0:b0:507:ab62:48a5 with SMTP id
+ g22-20020a19ee16000000b00507ab6248a5mr646467lfb.21.1697696266555; Wed, 18 Oct
+ 2023 23:17:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB6351:EE_|CY5PR12MB6624:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9b615315-c40e-4d10-ff8b-08dbd06b10f7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	ii/tGh10VP9UnPb2VjGTclKf5AICZQUkYGgCjJiiGpBQc6BjUibPyx9Zq5Mx3HTdEi4gYZSD42H/0nP3D6ihNto6rTULo+aY4YvxepRdwz9cf3QfJFzuuxvDiOj/g6BIFpDyne+N8706DmGT2r/50JaPn6oxEyi5+E7YCxZFJ1EyuOKuXOy7mQjOzCSWQf4dOiJwSaGUezzahoIey9hqEZZQRZQFYXXrR9g1Kk8UgHwrx5CrOeDWO2Cloxb/knUuBqRlAEP+xIvwIhkiJF5QZbYfYGXBoweLpTuASgvNW04SKOW98kwnCpuQWKbN+hbrSuUrsG+Q1uc7hWxMy2/c+aLwOVWH3FK+2Q92W/jnSfH+B5X7At8RCDDPXRHo2RoPK66Uig1lthSKVSrSSoSwO5vNyC6yDu5rWLsfpVmBXMQ2OWySKhf56fkh+i/gd5sZFPiQdaAL0NSCF+WssRcVKEO2bSRsyEEaXYsrcJYZ6r210FdIYNBah+WhQcqYCW4q5MRcd6s8wIpuzjUX2yMICzmFFLwKp/oXTo2hjQ42SE+WjTJnL9vmnt2PgzeaYrXQ/Gk+c7f2Vth0I+8H/UYRKSDuWFe0AA2DFgaeAtkaI5r4EEqwknHMsyyWiWJMzKhF7OWWvWkXI9R8IDCpX1uPCOoOFQx6mh8+Em9novH0THA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6351.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(366004)(39860400002)(376002)(346002)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(36756003)(31686004)(66476007)(6636002)(66556008)(31696002)(38100700002)(921005)(53546011)(316002)(6666004)(26005)(2616005)(83380400001)(6512007)(6506007)(66946007)(4326008)(8936002)(478600001)(8676002)(2906002)(7416002)(5660300002)(6486002)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NzErOVMrdFJib1FUTFZRR0xDMGRpTW16Tk1lUnEyL1FOSng3TTRmeGd4WFpj?=
- =?utf-8?B?eG1aTE0yL283aXJJZWVQNGdDUG5QUEE5Y1Q5OFU3amIzN0YwN0FHdXkvenpZ?=
- =?utf-8?B?MGxVQ3c3RXU2YnJHd1UyQWU5VnZYYUEza1Rkc25VbkJYMHZMakhYdXhwUXRy?=
- =?utf-8?B?dmhPSnNYMkNIWmhBMFBOL1RmU1N6Qk9aS3F5b3k5Um1yYmtrQXB2eGxNcU5a?=
- =?utf-8?B?Ukt0clJFYTZnZXFxL2RFWG9CRmxDQnRIMjlIU0hXQzY0SEZNaUpjT2xYMDZ4?=
- =?utf-8?B?aURDZWtJSENrMXZLYVlGakYrTURzYmRQYzU2WmRjSEJ6Q3gzV2d0ZkhjdFQ1?=
- =?utf-8?B?TmVyYkNsZ29BQ25LRnVidm9pZldMSWlGY1pFd29VN2pMVDNSdlFSUTErRCt0?=
- =?utf-8?B?WXZxY0toclFOZFVtbXJWaFJJNldJLzBUNDNqOFpKZS8xTjdITVFIRHBydlFH?=
- =?utf-8?B?MklpSVhQUHoxVTNpSXNWNU4rbHBWUmhDdEgzNjViYzFERDVFSEV1a3RQOXJF?=
- =?utf-8?B?cTlJOFdXM2NPa1FSVGpZWitialVrTENlRGsrclJvMnU2NW5qZnBWZEJpR25R?=
- =?utf-8?B?QXlDSEQreXA2YW56OFkwYTJkU2RxT25YNjBIUVVCM2UzVHVrU2RldXYyRmxv?=
- =?utf-8?B?RDU0d0c4d1pVWGNiRm5POXJ4a2xHZy9xTVpMeVNTZy9OK1AyalAxZ3VxUHNZ?=
- =?utf-8?B?M013VlRaNmlDN3YvKzZFYkZCcFJFMnFTMnB4cVFGeWRodCtKWnFQMWUydmhW?=
- =?utf-8?B?eS95Qzd4MDBXL2IrVkVlb2VKNXlzUlRkQnB6M1hDcVNackh1RVhxWTVhRGQ5?=
- =?utf-8?B?S0V3UHV2VHkzcHdYVW9ZcjBBazVncWJ3VEU1ZE9OdEROd2wzUU8zY05lbmxB?=
- =?utf-8?B?R1JyR2pLcGk4d2g1YWROcVVMcGE0ZVdheVB1NzNQNWE5TEhQT1F1NzlXQ1Bp?=
- =?utf-8?B?U0F1OXNWMUw5bW9tSkpZalFMSU1JTkdnQWIrVEJkQ2pDaXFzbUJwQ2gxcklM?=
- =?utf-8?B?MldMOVlIczl5QS9HeElWZmFUeWFsNEhUM1hDQXUzZGJBZW8xTU4zTnh1ekhN?=
- =?utf-8?B?TWNWNlptam96bnZtNnJoT09FRFpHQ09neThNYzIreHdOZStmbUoydnJoQjBh?=
- =?utf-8?B?K2h2RUYvdUo0dlZqdW0vZjFac3gzSE5HcG0yMjlYQnpnOUN5ZjU4V00yRjJV?=
- =?utf-8?B?NVVyTnNwZUJzZTYyczRISlJqNUE1MGcyZWVaV0RVQXFhMkgwUnY3cU16VThp?=
- =?utf-8?B?aWtUSFVxSEtEaWdlbFNiV3pFcVJaaGtocE9TUmwrNnBSOS8wdjd3MXhKU09r?=
- =?utf-8?B?MzVGeXFMSjNONDBPdUVpdXFRUFo5N0lab1lTQUhManMvSGZXVnJMa00xMHhQ?=
- =?utf-8?B?V3pSRkdIZ0JLZVpidGNUaVFoNHB2bHpkL0NoMXlEY1NQWWdZUThqVmtIMGly?=
- =?utf-8?B?T0tPTkhodG5NQk9yNDhac05uWVBXTktTSTdjbTlGQnUrSnZoKzRUZ1Rrd25V?=
- =?utf-8?B?bmtQclZESGpkOE5OQkYwNThMR0l4OXlCT2dmTHRFR3FjcGdnRStsNFlNQ3lM?=
- =?utf-8?B?ZEhUTDZ1ODQxeE1uNjkwMDhKVDQyQzd4ZjZIaDdFUjdPYThadjlicFRFZXdH?=
- =?utf-8?B?emhsTUVQeVpUdUtFeVFEMDhSTzdvZ0JYaytoWUhFRC9vUHNDTWdjOVYxcTBu?=
- =?utf-8?B?dGRhMjBTSDBZZFVFdFdGODZSbkJ2T0JjR0gwdjArdlowNFRPSlNpM2hGckx3?=
- =?utf-8?B?YkxoQmlDTkxxNmFiZ1Z1ZTFnTXlUeWcxM2dBVGh1aHpiZDBLb3YxeG8zL2ZE?=
- =?utf-8?B?SU00ak1CbmRuODFqSVNQL2VoVElDZmZLSjUvK3FySFlZQ2pTdUVyTkdNWFEv?=
- =?utf-8?B?R1ZwRWk4dC9nbTViUXIrSUVVamNMSi9Xd0s0NmsxWVFlUXMzVU9kdGFPSnUr?=
- =?utf-8?B?dFRpZk4yTzZVNFpBSGI5TG5OSHBaSzRVYm9BMGlTNENiY3lLM29WU3lkWDh1?=
- =?utf-8?B?cG94NmFOL2h1TkxLSW9helc0Q1ZEbzNIajBldGlIbngwc2NjSlNBWjYycmtY?=
- =?utf-8?B?ejdFTG4yek9CODBJS0pmZzZuVGo5dzVac0t2dHg1NFdEaUNuMTEyalcvRHNy?=
- =?utf-8?Q?W+ZWdbQWlmK9a/0CM6ApDJuBd?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b615315-c40e-4d10-ff8b-08dbd06b10f7
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6351.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 06:17:27.0476
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4H7oxub/tPvGJovCWG0BtUXh6ypfXoyVox79Ye9oFsd9VBLguZySFA74kWpLkINC
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6624
+References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com> <20231016120033.26933-7-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20231016120033.26933-7-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 19 Oct 2023 14:17:35 +0800
+Message-ID: <CACGkMEsMhapWJAjqQAYiJ5LFbSEojK5Z-W2Ncwg=F+u=xsu-bg@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 06/19] virtio_net: separate virtnet_rx_resize()
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-ping...
-Any other comments?
+On Mon, Oct 16, 2023 at 8:00=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> This patch separates two sub-functions from virtnet_rx_resize():
+>
+> * virtnet_rx_pause
+> * virtnet_rx_resume
+>
+> Then the subsequent reset rx for xsk can share these two functions.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-Regards,
-Ma Jun
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-On 10/17/2023 10:53 AM, Ma Jun wrote:
-> Due to electrical and mechanical constraints in certain platform designs there
-> may be likely interference of relatively high-powered harmonics of the (G-)DDR
-> memory clocks with local radio module frequency bands used by Wifi 6/6e/7. To
-> mitigate possible RFI interference we introuduced WBRF(Wifi Band RFI mitigation Feature).
-> Producers can advertise the frequencies in use and consumers can use this information
-> to avoid using these frequencies for sensitive features.
-> 
-> The whole patch set is based on Linux 6.5.0. With some brief introductions
-> as below:
-> Patch1:      Document about WBRF
-> Patch2:      Core functionality setup for WBRF feature support
-> Patch3 - 4:  Bring WBRF support to wifi subsystem.
-> Patch5 - 9:  Bring WBRF support to AMD graphics driver.
-> 
-> Evan Quan (7):
->   cfg80211: expose nl80211_chan_width_to_mhz for wide sharing
->   wifi: mac80211: Add support for WBRF features
->   drm/amd/pm: update driver_if and ppsmc headers for coming wbrf feature
->   drm/amd/pm: setup the framework to support Wifi RFI mitigation feature
->   drm/amd/pm: add flood detection for wbrf events
->   drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.0
->   drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
-> 
-> Ma Jun (2):
->   Documentation/driver-api: Add document about WBRF mechanism
->   platform/x86/amd: Add support for AMD ACPI based Wifi band RFI
->     mitigation feature
-> 
->  Documentation/driver-api/wbrf.rst             |  71 +++
->  drivers/gpu/drm/amd/amdgpu/amdgpu.h           |   2 +
->  drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c       |  17 +
->  drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c     | 214 +++++++++
->  drivers/gpu/drm/amd/pm/swsmu/inc/amdgpu_smu.h |  33 ++
->  .../inc/pmfw_if/smu13_driver_if_v13_0_0.h     |  14 +-
->  .../inc/pmfw_if/smu13_driver_if_v13_0_7.h     |  14 +-
->  .../pm/swsmu/inc/pmfw_if/smu_v13_0_0_ppsmc.h  |   3 +-
->  .../pm/swsmu/inc/pmfw_if/smu_v13_0_7_ppsmc.h  |   3 +-
->  drivers/gpu/drm/amd/pm/swsmu/inc/smu_types.h  |   3 +-
->  drivers/gpu/drm/amd/pm/swsmu/inc/smu_v13_0.h  |   3 +
->  .../gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c    |   9 +
->  .../drm/amd/pm/swsmu/smu13/smu_v13_0_0_ppt.c  |  60 +++
->  .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  |  59 +++
->  drivers/gpu/drm/amd/pm/swsmu/smu_internal.h   |   3 +
->  drivers/platform/x86/amd/Kconfig              |  15 +
->  drivers/platform/x86/amd/Makefile             |   1 +
->  drivers/platform/x86/amd/wbrf.c               | 422 ++++++++++++++++++
->  include/linux/acpi_amd_wbrf.h                 | 101 +++++
->  include/linux/ieee80211.h                     |   1 +
->  include/net/cfg80211.h                        |   8 +
->  net/mac80211/Makefile                         |   2 +
->  net/mac80211/chan.c                           |   9 +
->  net/mac80211/ieee80211_i.h                    |   9 +
->  net/mac80211/main.c                           |   2 +
->  net/mac80211/wbrf.c                           | 105 +++++
->  net/wireless/chan.c                           |   3 +-
->  27 files changed, 1180 insertions(+), 6 deletions(-)
->  create mode 100644 Documentation/driver-api/wbrf.rst
->  create mode 100644 drivers/platform/x86/amd/wbrf.c
->  create mode 100644 include/linux/acpi_amd_wbrf.h
->  create mode 100644 net/mac80211/wbrf.c
-> 
+Thanks
+
+> ---
+>  drivers/net/virtio/main.c       | 29 +++++++++++++++++++++--------
+>  drivers/net/virtio/virtio_net.h |  3 +++
+>  2 files changed, 24 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
+> index ba38b6078e1d..e6b262341619 100644
+> --- a/drivers/net/virtio/main.c
+> +++ b/drivers/net/virtio/main.c
+> @@ -2120,26 +2120,39 @@ static netdev_tx_t start_xmit(struct sk_buff *skb=
+, struct net_device *dev)
+>         return NETDEV_TX_OK;
+>  }
+>
+> -static int virtnet_rx_resize(struct virtnet_info *vi,
+> -                            struct virtnet_rq *rq, u32 ring_num)
+> +void virtnet_rx_pause(struct virtnet_info *vi, struct virtnet_rq *rq)
+>  {
+>         bool running =3D netif_running(vi->dev);
+> -       int err, qindex;
+> -
+> -       qindex =3D rq - vi->rq;
+>
+>         if (running)
+>                 napi_disable(&rq->napi);
+> +}
+>
+> -       err =3D virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_unused=
+_buf);
+> -       if (err)
+> -               netdev_err(vi->dev, "resize rx fail: rx queue index: %d e=
+rr: %d\n", qindex, err);
+> +void virtnet_rx_resume(struct virtnet_info *vi, struct virtnet_rq *rq)
+> +{
+> +       bool running =3D netif_running(vi->dev);
+>
+>         if (!try_fill_recv(vi, rq, GFP_KERNEL))
+>                 schedule_delayed_work(&vi->refill, 0);
+>
+>         if (running)
+>                 virtnet_napi_enable(rq->vq, &rq->napi);
+> +}
+> +
+> +static int virtnet_rx_resize(struct virtnet_info *vi,
+> +                            struct virtnet_rq *rq, u32 ring_num)
+> +{
+> +       int err, qindex;
+> +
+> +       qindex =3D rq - vi->rq;
+> +
+> +       virtnet_rx_pause(vi, rq);
+> +
+> +       err =3D virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_unused=
+_buf);
+> +       if (err)
+> +               netdev_err(vi->dev, "resize rx fail: rx queue index: %d e=
+rr: %d\n", qindex, err);
+> +
+> +       virtnet_rx_resume(vi, rq);
+>         return err;
+>  }
+>
+> diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_=
+net.h
+> index 282504d6639a..70eea23adba6 100644
+> --- a/drivers/net/virtio/virtio_net.h
+> +++ b/drivers/net/virtio/virtio_net.h
+> @@ -253,4 +253,7 @@ static inline bool virtnet_is_xdp_raw_buffer_queue(st=
+ruct virtnet_info *vi, int
+>         else
+>                 return false;
+>  }
+> +
+> +void virtnet_rx_pause(struct virtnet_info *vi, struct virtnet_rq *rq);
+> +void virtnet_rx_resume(struct virtnet_info *vi, struct virtnet_rq *rq);
+>  #endif
+> --
+> 2.32.0.3.g01195cf9f
+>
+
 
