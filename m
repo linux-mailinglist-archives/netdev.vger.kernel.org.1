@@ -1,856 +1,203 @@
-Return-Path: <netdev+bounces-42813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88E777D0364
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 22:50:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDD337D0386
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 23:10:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 943BE1C20F0D
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:50:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 228C6B212A0
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 21:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA13208B8;
-	Thu, 19 Oct 2023 20:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F278354F2;
+	Thu, 19 Oct 2023 21:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="S4O6pghl"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="glKCxlQS"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC8C32C98;
-	Thu, 19 Oct 2023 20:50:06 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B8DC11D;
-	Thu, 19 Oct 2023 13:50:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=k9bkGcQTofbD+79kqVgLAUMlWkZqKhHynXFwsY9k2sc=; b=S4O6pghlgUAl7l15JESNIL+lN1
-	EZWlCPEs+cdnfAJvXOOy87yuJVRExPxFvXGOJjXXmC9lOGw9YORYeM4w5J2S4d81exKqb/4PtiVRP
-	AAuYmXH8Mq28gFZ7KH2b1oHPDwa4KZqYWkp8EDEa6afok1RFRdumk8vs0oXqgWqXN7/he7kh57KCr
-	Aidx7fW3Itfds8aydVJnqdIqDS1cylP6ych5XuhLs4XyWcve7/GrRF8aZRchvS3zMxHsJsOuLzVHk
-	NSie0BzO//y/cbxAt3tqsz5eD+W14hInG2w6ueH/bATekjarufniIKg4ffb8k2U01fLwFEIDDZP+I
-	/btB7HMA==;
-Received: from 21.249.197.178.dynamic.dsl-lte-bonding.lssmb00p-msn.res.cust.swisscom.ch ([178.197.249.21] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qtZxr-000Neh-Gf; Thu, 19 Oct 2023 22:49:55 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	martin.lau@linux.dev,
-	razor@blackwall.org,
-	ast@kernel.org,
-	andrii@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@google.com,
-	toke@kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH bpf-next v2 7/7] selftests/bpf: Add selftests for netkit
-Date: Thu, 19 Oct 2023 22:49:19 +0200
-Message-Id: <20231019204919.4203-8-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20231019204919.4203-1-daniel@iogearbox.net>
-References: <20231019204919.4203-1-daniel@iogearbox.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFE2208B8
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 21:10:17 +0000 (UTC)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2072.outbound.protection.outlook.com [40.107.237.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8A5FCA
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 14:10:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RkJK45X1IausikkyhSapW6FT4SglB/0kkYsijpCBVc/DZsArgIRhbsKIOKowgCwMgc0zSI1n0rM3gv0Vi5IcOULPX+00XldKG1yIzsiGbqIh3u9PCJUXX38o0OpK/uKCewx2qa4fH2z3gvW3smZSOAUTZC+aGKNNXYV844fqXJJIAHgt+FmAqi8kY/G7tS0drPyTcVIGdu/p8TKBA22cRnnhej3iUaUVlMF2nrORedYF7QEtH0iuzx16g5sJV1pt750yJXEC7QdY/5rFyblFPDisH9bF5KnBu5O+TxAc6b1nzGhEGu/INBwzgfvVRmdLF/UWMXh9gFIjCM59gb1yMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IdrBKm+TYxMITgdVQEqXFJciCILNgAURbS9BIrCgVTY=;
+ b=TClVfzdVC8HMZ5ZQ8XWitrGINM1jezuNL4iZmBVeeXyks6FIxi3wyHoXnHZ+q733S9rP8R93YryBRZN9EyGnFL4vBIYFKc1AfEVbu0gaFGGJLDQDBjuojfcuJOjN9mazi/BK1RV1ZVunyik7+E2nDdRLNQjNoZMmrs7Slpm6XOgWWwNTJdoug6I6/asCVKHqxJ9bP0oeP3H168+Lkd3zKzmTtybhXwWuUYh4oCAPPy4MK4QSRtEvn2/1TQ1ztb57bumJYzHPC8j5lyp0T6/8nC5/7xGhU0JKjxAPLOTTqDHmQsfe/aHVjRNuEFA449C52ZKNyBElQ0/kOe/CLRYKhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IdrBKm+TYxMITgdVQEqXFJciCILNgAURbS9BIrCgVTY=;
+ b=glKCxlQSho4QW+/9JO+t+rOLLC/bJcn//LCqy7eR6Ne0zXAikgKfPwEXX0BH13TBVhpfS0FdsFbyGnacQpfhXVoZvEmysdkiqTwbuOJzxlw+NF+EMAuBCjDtZmETqhAraYhD8Nno4nR91YR0EO6xn0rUrH4ZT+2yGRAWFruKI94=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by MW3PR12MB4586.namprd12.prod.outlook.com (2603:10b6:303:53::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.24; Thu, 19 Oct
+ 2023 21:10:13 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::a13:336d:96a5:b7bf]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::a13:336d:96a5:b7bf%4]) with mapi id 15.20.6907.022; Thu, 19 Oct 2023
+ 21:10:13 +0000
+Message-ID: <cac1a6e5-80f1-48de-ad1b-3a75c4802957@amd.com>
+Date: Thu, 19 Oct 2023 16:10:11 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/2] amd-xgbe: add support for AMD Crater
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, Shyam-sundar.S-k@amd.com
+References: <20231018144450.2061125-1-Raju.Rangoju@amd.com>
+Content-Language: en-US
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Autocrypt: addr=thomas.lendacky@amd.com; keydata=
+ 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
+ 1NhFSLKvfA==
+In-Reply-To: <20231018144450.2061125-1-Raju.Rangoju@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR2101CA0008.namprd21.prod.outlook.com
+ (2603:10b6:805:106::18) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27066/Thu Oct 19 09:45:47 2023)
-X-Spam-Level: *
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|MW3PR12MB4586:EE_
+X-MS-Office365-Filtering-Correlation-Id: ab2c760e-2c9d-49af-41a0-08dbd0e7c913
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	RvbxKCCR9nckOMS18PbDqkODdVPHxrHCmD7OHOhvt11Xtll2jr6KSHw5e0LeDNY9VHC3vTKZKUgBT3oKuLUVO3v9ekFMqQUE9fwISMOar1leTbXusJhw9BF8s/Bjvr0GlQs4vMV71iJXamm8M2dKwgMfcVYa1M7PTa6wqGaysT42HPHd4hma4OCNV3UoSGzGNAXN8OBICKO1dwIwZ6hA2KGNsbbYvwNgwiwAeBo+iIuNi45mGRfeJdsuqkj6pwkZN0InZuYvJ2PDsaefbxqVWkk0ya+0HDs0XY2lTz0X11x0RBBHx2o4nueewZLkeYaXeuACDmH+WtDDtSuhNtqA+pjxNX+IwqL5uXEaa2gjbEipp2i2gxKVdKJVJgmNV+8Ybcm9x+3c0M5Dy1pLHAGHeIJ62K4NGzlN8OFBBnDK6hTbpeaXt6v7sqEcIouD8nU3BkAAPU5Y+JCsd7XBHI8CxVl44LCUIUDF4wcwUqe2YB3y08Bbz4tbUmnlKmj+WmHG4bpcFDxMX069903fUcV11sV6eRvHiRAhkRtx/z/NxaOZhqb2r6amr44s8i4dUziHcqyTnJf3drTyAdNNu9fYrXdxxD0wUaD26gBsawou5PmVGAMRJfDNYOFNJ5qRZKUPhoHcfVU4SwCWLvCRlV2k7RwxADD/4ByaBgOE5OoCLUZxva4ENb678jsoHLaMJioU
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(376002)(346002)(396003)(366004)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(2906002)(66476007)(66556008)(66946007)(8936002)(316002)(6486002)(478600001)(8676002)(5660300002)(36756003)(31696002)(4326008)(41300700001)(86362001)(38100700002)(53546011)(2616005)(6506007)(83380400001)(26005)(6512007)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WkgvelVhN1dGNE5zeG51OERuWWpaNXFNT2toUWJqcythNkRZWFZSOFR2RytE?=
+ =?utf-8?B?b0hqcER0d0VaTVh0SnVhTk5LWWRwTGt5V09iWUx4a1JmdStPb2RNcFI2a2tE?=
+ =?utf-8?B?elM4b0U2Z0dpa0ZtSUkvMWZnTFJWYnRnSkNCVkxvWmZERnZ1c0w4QWJRRU90?=
+ =?utf-8?B?WVNKSS9GanRCYmJaK21wQTZ1UFozYStFQXViSStRWnFUZ04wSk1lZ1F1Qmd6?=
+ =?utf-8?B?R01HOVpWcW0rc2haVVZnajNyaWc1WnozZUt4Z09jYUhJektZaXU5WGVHZTd1?=
+ =?utf-8?B?cHphRGt3dlhDWWdvN3RNNWl5U3gvdnpnbnp0VHhxV2VaTmE1ZndXTUkwZnhl?=
+ =?utf-8?B?N1NULzRYMXhPeDB1ZVE4cGszN2J5eGdFbzNLVzZYQzh4SzJCZjIxRU5ZK3VC?=
+ =?utf-8?B?TDBhK1JNTU8xTXVDU2hzcExncmxrMVRoWURzS29KMUg2Z0JaTE0vbmRQaWVN?=
+ =?utf-8?B?ZHlyc3UyNUNyOVJ3bENWTVRSbTQ1OXBmai9kVkhhZnl0VnlUSWh5ZWtWaURW?=
+ =?utf-8?B?cmU3YXZIMkwrNldrRnUrdlFHeW1waW80dGYzQ3p0dmlCVG94RVE5bXRkZUVH?=
+ =?utf-8?B?NXY0N2FoK0E3RmZFaXdTY0R1Mk15YkJEYzJqY2Nlb0VZOUlUL2NiQWhpRW1T?=
+ =?utf-8?B?MkpDbE1KQWJRZDJsOGJwYThtUzU3ejFCQkQwNjZnWEs5ekhnbmtlZjBJaWJo?=
+ =?utf-8?B?am9oQ2pyd0VBVlBzTk1tVE9QbHVCaHIzbFVDN3BkTHBhNWNodFhQVWN0MWtU?=
+ =?utf-8?B?ck5FWmdKY2szTmprQUxqbzUzbGhMR3Fpd0xBMW9aNHF4MWxlbTdjbE8wRkwy?=
+ =?utf-8?B?TzFpY281cWp6VEdxbnJCNFRMSC9zc1pPb2J4OVVvekJKRUVpY3UyN3JqN2dk?=
+ =?utf-8?B?ZnViUUpMWjN0amg1ejZTNVI4blhpUUEyYU1EbTJQb3BOQ2E5dmxDZXI2dkcz?=
+ =?utf-8?B?K2hNa04yTTgxTFNzS096V0lRZlNrUUJ0QmRka0ZTSmhoM2RhZFUweHcrcGZD?=
+ =?utf-8?B?VWFtQlh3Y2FHVFFCN2Y3SlRmRW9wQ3Y3VHhOVW41T1l1ZGpock1DcVNOZXdw?=
+ =?utf-8?B?V2JqVkE2RGxoMnU1K2ttdlM3T1NZMFQ3TjdZUHFXN3hEZ0p2Ym5HdDJxeGQ4?=
+ =?utf-8?B?WGtyNVJDVi84OWFoTCtFblg2U25FbHNzN0paT0lEVkVPU1NXdDZHdmxmSXI5?=
+ =?utf-8?B?V0FoejJQZER0UnZTb1l0MU51TE00aGxJbks2Qml3aGt5eFh2dG52bVhBVzNz?=
+ =?utf-8?B?M0luZlkwU2Q2U3ozV1krOVdaUVdZdm1Eb202YWFEdkEwdGVUT2ppeE9VcmUr?=
+ =?utf-8?B?Um9FcjF1THE4dHpkcWoyMjFpOFAyUFIzRW5kZUt4Q2VzZEQvZEd6ZkF4NTA1?=
+ =?utf-8?B?Rk42QTU5d3k1M2R4ZDFlYTZaMGNLNFlPN1JoMVFoWHJUNUp1WVQvZ2lNODFa?=
+ =?utf-8?B?cUJuaEhwcUZhRENGRGdUNENNaVY1eHkxc3JueWIxKzRaSU5XTEJ3UEVxWXY1?=
+ =?utf-8?B?VzdNY3lNUHpXREZaa0FEdmpCZG5zd2ZnRlM4RTdNYkNCdFo5VHhGZ1JLYTJP?=
+ =?utf-8?B?YXRvQ3Q0VHpUQW9DeTBCSFVNK252SWxvN1IzYkorckJmMnhVcFZ0K3EvcUdR?=
+ =?utf-8?B?MGN5a2JpbkIySkp0TFFtMmZPMlpPM1g4eVpwV3pnaVRtalh5MHVsdXl6UTBD?=
+ =?utf-8?B?cVd3ZXphZEs1Yk1DQTZ1Qkh4NmVmdmhDYnRkZVF4Nm45V0lSWTVJMVpnME9j?=
+ =?utf-8?B?dmRoY2VxZ0I4bUE0aVRIZFB0TnhRaU9wTDJhZ0dWL3c2UVhWYVZTMkRtYm5D?=
+ =?utf-8?B?bUNWTjBBMjFiOEozTmVKZFpMZ2c3SmkxTkgyT01zeUM3TkNyaDBqcTlRbjEz?=
+ =?utf-8?B?TUl2bldEUWxXV3dxYi8rL05CaWJQZHJFYVdsdjdZRVhmUGJUOG5kYTFTQnUz?=
+ =?utf-8?B?MlE3amNoUGxaUWNkMGR3NmpWaFFoY1FuazdxYTJkeGR5dnVuN2pRYjRJUUQ0?=
+ =?utf-8?B?Q1ZhTUk5VG5lajZjOGtaVzBKNUlHRjhaSkxPN0oxVVJzNWcrNThPMkc3WDJT?=
+ =?utf-8?B?SzN1U0YvdzQycnlnZGZIYkNFSU1xSVZIRG1MNzRGN2JGcGttOGdLRjFGOXNm?=
+ =?utf-8?Q?WTdDiQH40Fd02zSK2/Yx8grHS?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab2c760e-2c9d-49af-41a0-08dbd0e7c913
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2023 21:10:13.3879
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lzTZwE2+OFRkrxiNcsnD1QzQgEwuxwlRNe7FYZSDX0/qAq3TPqajYQW/F359EU9u5t/s4gvX+pojSPvXRHKteA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4586
 
-Add a bigger batch of test coverage to assert correct operation of
-netkit devices and their BPF program management:
+On 10/18/23 09:44, Raju Rangoju wrote:
+> Add support for a new AMD Ethernet device called "Crater". It has a new
+> PCI ID, add this to the current list of supported devices in the
+> amd-xgbe devices.Also, the BAR1 addresses cannot be used to access the
+> PCS registers on Crater platform, use the indirect addressing via SMN
+> instead.
 
-  # ./test_progs -t tc_netkit
-  [...]
-  [    1.166267] bpf_testmod: loading out-of-tree module taints kernel.
-  [    1.166831] bpf_testmod: module verification failed: signature and/or required key missing - tainting kernel
-  [    1.270957] tsc: Refined TSC clocksource calibration: 3407.988 MHz
-  [    1.272579] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x311fc932722, max_idle_ns: 440795381586 ns
-  [    1.275336] clocksource: Switched to clocksource tsc
-  #257     tc_netkit_basic:OK
-  #258     tc_netkit_device:OK
-  #259     tc_netkit_multi_links:OK
-  #260     tc_netkit_multi_opts:OK
-  #261     tc_netkit_neigh_links:OK
-  Summary: 5/0 PASSED, 0 SKIPPED, 0 FAILED
-  [...]
+It looks like this should be a three patch series with new "Crater" device 
+support, followed by a quirk/exception for the BAR1 address issue, and 
+then finally your first patch being the last patch so that the device 
+isn't enabled until the final patch.
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- tools/testing/selftests/bpf/config            |   1 +
- .../selftests/bpf/prog_tests/tc_helpers.h     |   4 +
- .../selftests/bpf/prog_tests/tc_netkit.c      | 687 ++++++++++++++++++
- .../selftests/bpf/progs/test_tc_link.c        |  13 +
- 4 files changed, 705 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_netkit.c
+Thanks,
+Tom
 
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 02dd4409200e..3ec5927ec3e5 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -71,6 +71,7 @@ CONFIG_NETFILTER_SYNPROXY=y
- CONFIG_NETFILTER_XT_CONNMARK=y
- CONFIG_NETFILTER_XT_MATCH_STATE=y
- CONFIG_NETFILTER_XT_TARGET_CT=y
-+CONFIG_NETKIT=y
- CONFIG_NF_CONNTRACK=y
- CONFIG_NF_CONNTRACK_MARK=y
- CONFIG_NF_DEFRAG_IPV4=y
-diff --git a/tools/testing/selftests/bpf/prog_tests/tc_helpers.h b/tools/testing/selftests/bpf/prog_tests/tc_helpers.h
-index 67f985f7d215..924d0e25320c 100644
---- a/tools/testing/selftests/bpf/prog_tests/tc_helpers.h
-+++ b/tools/testing/selftests/bpf/prog_tests/tc_helpers.h
-@@ -4,6 +4,10 @@
- #define TC_HELPERS
- #include <test_progs.h>
- 
-+#ifndef loopback
-+# define loopback 1
-+#endif
-+
- static inline __u32 id_from_prog_fd(int fd)
- {
- 	struct bpf_prog_info prog_info = {};
-diff --git a/tools/testing/selftests/bpf/prog_tests/tc_netkit.c b/tools/testing/selftests/bpf/prog_tests/tc_netkit.c
-new file mode 100644
-index 000000000000..2c025a630deb
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/tc_netkit.c
-@@ -0,0 +1,687 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023 Isovalent */
-+#include <uapi/linux/if_link.h>
-+#include <net/if.h>
-+#include <test_progs.h>
-+
-+#define netkit_peer "nk0"
-+#define netkit_name "nk1"
-+
-+#define ping_addr_neigh		0x0a000002 /* 10.0.0.2 */
-+#define ping_addr_noneigh	0x0a000003 /* 10.0.0.3 */
-+
-+#include "test_tc_link.skel.h"
-+#include "netlink_helpers.h"
-+#include "tc_helpers.h"
-+
-+#define ICMP_ECHO 8
-+
-+struct icmphdr {
-+	__u8		type;
-+	__u8		code;
-+	__sum16		checksum;
-+	struct {
-+		__be16	id;
-+		__be16	sequence;
-+	} echo;
-+};
-+
-+struct iplink_req {
-+	struct nlmsghdr  n;
-+	struct ifinfomsg i;
-+	char             buf[1024];
-+};
-+
-+static int create_netkit(int mode, int policy, int peer_policy, int *ifindex,
-+			 bool same_netns)
-+{
-+	struct rtnl_handle rth = { .fd = -1 };
-+	struct iplink_req req = {};
-+	struct rtattr *linkinfo, *data;
-+	const char *type = "netkit";
-+	int err;
-+
-+	err = rtnl_open(&rth, 0);
-+	if (!ASSERT_OK(err, "open_rtnetlink"))
-+		return err;
-+
-+	memset(&req, 0, sizeof(req));
-+	req.n.nlmsg_len = NLMSG_LENGTH(sizeof(struct ifinfomsg));
-+	req.n.nlmsg_flags = NLM_F_REQUEST | NLM_F_CREATE | NLM_F_EXCL;
-+	req.n.nlmsg_type = RTM_NEWLINK;
-+	req.i.ifi_family = AF_UNSPEC;
-+
-+	addattr_l(&req.n, sizeof(req), IFLA_IFNAME, netkit_name,
-+		  strlen(netkit_name));
-+	linkinfo = addattr_nest(&req.n, sizeof(req), IFLA_LINKINFO);
-+	addattr_l(&req.n, sizeof(req), IFLA_INFO_KIND, type, strlen(type));
-+	data = addattr_nest(&req.n, sizeof(req), IFLA_INFO_DATA);
-+	addattr32(&req.n, sizeof(req), IFLA_NETKIT_POLICY, policy);
-+	addattr32(&req.n, sizeof(req), IFLA_NETKIT_PEER_POLICY, peer_policy);
-+	addattr32(&req.n, sizeof(req), IFLA_NETKIT_MODE, mode);
-+	addattr_nest_end(&req.n, data);
-+	addattr_nest_end(&req.n, linkinfo);
-+
-+	err = rtnl_talk(&rth, &req.n, NULL);
-+	ASSERT_OK(err, "talk_rtnetlink");
-+	rtnl_close(&rth);
-+	*ifindex = if_nametoindex(netkit_name);
-+
-+	ASSERT_GT(*ifindex, 0, "retrieve_ifindex");
-+	ASSERT_OK(system("ip netns add foo"), "create netns");
-+	ASSERT_OK(system("ip link set dev " netkit_name " up"),
-+			 "up primary");
-+	ASSERT_OK(system("ip addr add dev " netkit_name " 10.0.0.1/24"),
-+			 "addr primary");
-+	if (same_netns) {
-+		ASSERT_OK(system("ip link set dev " netkit_peer " up"),
-+				 "up peer");
-+		ASSERT_OK(system("ip addr add dev " netkit_peer " 10.0.0.2/24"),
-+				 "addr peer");
-+	} else {
-+		ASSERT_OK(system("ip link set " netkit_peer " netns foo"),
-+				 "move peer");
-+		ASSERT_OK(system("ip netns exec foo ip link set dev "
-+				 netkit_peer " up"), "up peer");
-+		ASSERT_OK(system("ip netns exec foo ip addr add dev "
-+				 netkit_peer " 10.0.0.2/24"), "addr peer");
-+	}
-+	return err;
-+}
-+
-+static void destroy_netkit(void)
-+{
-+	ASSERT_OK(system("ip link del dev " netkit_name), "del primary");
-+	ASSERT_OK(system("ip netns del foo"), "delete netns");
-+	ASSERT_EQ(if_nametoindex(netkit_name), 0, netkit_name "_ifindex");
-+}
-+
-+static int __send_icmp(__u32 dest)
-+{
-+	struct sockaddr_in addr;
-+	struct icmphdr icmp;
-+	int sock, ret;
-+
-+	ret = write_sysctl("/proc/sys/net/ipv4/ping_group_range", "0 0");
-+	if (!ASSERT_OK(ret, "write_sysctl(net.ipv4.ping_group_range)"))
-+		return ret;
-+
-+	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
-+	if (!ASSERT_GE(sock, 0, "icmp_socket"))
-+		return -errno;
-+
-+	ret = setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE,
-+			 netkit_name, strlen(netkit_name) + 1);
-+	if (!ASSERT_OK(ret, "setsockopt(SO_BINDTODEVICE)"))
-+		goto out;
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sin_family = AF_INET;
-+	addr.sin_addr.s_addr = htonl(dest);
-+
-+	memset(&icmp, 0, sizeof(icmp));
-+	icmp.type = ICMP_ECHO;
-+	icmp.echo.id = 1234;
-+	icmp.echo.sequence = 1;
-+
-+	ret = sendto(sock, &icmp, sizeof(icmp), 0,
-+		     (struct sockaddr *)&addr, sizeof(addr));
-+	if (!ASSERT_GE(ret, 0, "icmp_sendto"))
-+		ret = -errno;
-+	else
-+		ret = 0;
-+out:
-+	close(sock);
-+	return ret;
-+}
-+
-+static int send_icmp(void)
-+{
-+	return __send_icmp(ping_addr_neigh);
-+}
-+
-+void serial_test_tc_netkit_basic(void)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_netkit_opts, optl);
-+	__u32 prog_ids[2], link_ids[2];
-+	__u32 pid1, pid2, lid1, lid2;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err, ifindex;
-+
-+	err = create_netkit(NETKIT_L2, NETKIT_PASS, NETKIT_PASS,
-+			    &ifindex, false);
-+	if (err)
-+		return;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1,
-+		  BPF_NETKIT_PRIMARY), 0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2,
-+		  BPF_NETKIT_PEER), 0, "tc2_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 0);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 0);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, false, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+
-+	link = bpf_program__attach_netkit(skel->progs.tc1, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 1);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 0);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(ifindex, BPF_NETKIT_PRIMARY, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 1, "count");
-+	ASSERT_EQ(optq.revision, 2, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], 0, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], 0, "link_ids[1]");
-+
-+	tc_skel_reset_all_seen(skel);
-+	ASSERT_EQ(send_icmp(), 0, "icmp_pkt");
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+
-+	link = bpf_program__attach_netkit(skel->progs.tc2, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	lid2 = id_from_link_fd(bpf_link__fd(skel->links.tc2));
-+	ASSERT_NEQ(lid1, lid2, "link_ids_1_2");
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 1);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 1);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(ifindex, BPF_NETKIT_PEER, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 1, "count");
-+	ASSERT_EQ(optq.revision, 2, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid2, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid2, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], 0, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], 0, "link_ids[1]");
-+
-+	tc_skel_reset_all_seen(skel);
-+	ASSERT_EQ(send_icmp(), 0, "icmp_pkt");
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 0);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 0);
-+	destroy_netkit();
-+}
-+
-+void serial_test_tc_netkit_multi_links_target(int mode, int target)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_netkit_opts, optl);
-+	__u32 prog_ids[3], link_ids[3];
-+	__u32 pid1, pid2, lid1, lid2;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err, ifindex;
-+
-+	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
-+			    &ifindex, false);
-+	if (err)
-+		return;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1,
-+		  target), 0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2,
-+		  target), 0, "tc2_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+
-+	assert_mprog_count_ifindex(ifindex, target, 0);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, false, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_eth, false, "seen_eth");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+
-+	link = bpf_program__attach_netkit(skel->progs.tc1, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count_ifindex(ifindex, target, 1);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(ifindex, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 1, "count");
-+	ASSERT_EQ(optq.revision, 2, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], 0, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], 0, "link_ids[1]");
-+
-+	tc_skel_reset_all_seen(skel);
-+	ASSERT_EQ(send_icmp(), 0, "icmp_pkt");
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_eth, true, "seen_eth");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+
-+	LIBBPF_OPTS_RESET(optl,
-+		.flags = BPF_F_BEFORE,
-+		.relative_fd = bpf_program__fd(skel->progs.tc1),
-+	);
-+
-+	link = bpf_program__attach_netkit(skel->progs.tc2, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc2 = link;
-+
-+	lid2 = id_from_link_fd(bpf_link__fd(skel->links.tc2));
-+	ASSERT_NEQ(lid1, lid2, "link_ids_1_2");
-+
-+	assert_mprog_count_ifindex(ifindex, target, 2);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(ifindex, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 2, "count");
-+	ASSERT_EQ(optq.revision, 3, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid2, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid2, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid1, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], lid1, "link_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], 0, "prog_ids[2]");
-+	ASSERT_EQ(optq.link_ids[2], 0, "link_ids[2]");
-+
-+	tc_skel_reset_all_seen(skel);
-+	ASSERT_EQ(send_icmp(), 0, "icmp_pkt");
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_eth, true, "seen_eth");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+
-+	assert_mprog_count_ifindex(ifindex, target, 0);
-+	destroy_netkit();
-+}
-+
-+void serial_test_tc_netkit_multi_links(void)
-+{
-+	serial_test_tc_netkit_multi_links_target(NETKIT_L2, BPF_NETKIT_PRIMARY);
-+	serial_test_tc_netkit_multi_links_target(NETKIT_L3, BPF_NETKIT_PRIMARY);
-+	serial_test_tc_netkit_multi_links_target(NETKIT_L2, BPF_NETKIT_PEER);
-+	serial_test_tc_netkit_multi_links_target(NETKIT_L3, BPF_NETKIT_PEER);
-+}
-+
-+void serial_test_tc_netkit_multi_opts_target(int mode, int target)
-+{
-+	LIBBPF_OPTS(bpf_prog_attach_opts, opta);
-+	LIBBPF_OPTS(bpf_prog_detach_opts, optd);
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	__u32 pid1, pid2, fd1, fd2;
-+	__u32 prog_ids[3];
-+	struct test_tc_link *skel;
-+	int err, ifindex;
-+
-+	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
-+			    &ifindex, false);
-+	if (err)
-+		return;
-+
-+	skel = test_tc_link__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_load"))
-+		goto cleanup;
-+
-+	fd1 = bpf_program__fd(skel->progs.tc1);
-+	fd2 = bpf_program__fd(skel->progs.tc2);
-+
-+	pid1 = id_from_prog_fd(fd1);
-+	pid2 = id_from_prog_fd(fd2);
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+
-+	assert_mprog_count_ifindex(ifindex, target, 0);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, false, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_eth, false, "seen_eth");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+
-+	err = bpf_prog_attach_opts(fd1, ifindex, target, &opta);
-+	if (!ASSERT_EQ(err, 0, "prog_attach"))
-+		goto cleanup;
-+
-+	assert_mprog_count_ifindex(ifindex, target, 1);
-+
-+	optq.prog_ids = prog_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(ifindex, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup_fd1;
-+
-+	ASSERT_EQ(optq.count, 1, "count");
-+	ASSERT_EQ(optq.revision, 2, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], 0, "prog_ids[1]");
-+
-+	tc_skel_reset_all_seen(skel);
-+	ASSERT_EQ(send_icmp(), 0, "icmp_pkt");
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_eth, true, "seen_eth");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+
-+	LIBBPF_OPTS_RESET(opta,
-+		.flags = BPF_F_BEFORE,
-+		.relative_fd = fd1,
-+	);
-+
-+	err = bpf_prog_attach_opts(fd2, ifindex, target, &opta);
-+	if (!ASSERT_EQ(err, 0, "prog_attach"))
-+		goto cleanup_fd1;
-+
-+	assert_mprog_count_ifindex(ifindex, target, 2);
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(ifindex, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup_fd2;
-+
-+	ASSERT_EQ(optq.count, 2, "count");
-+	ASSERT_EQ(optq.revision, 3, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid2, "prog_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], pid1, "prog_ids[1]");
-+	ASSERT_EQ(optq.prog_ids[2], 0, "prog_ids[2]");
-+
-+	tc_skel_reset_all_seen(skel);
-+	ASSERT_EQ(send_icmp(), 0, "icmp_pkt");
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_eth, true, "seen_eth");
-+	ASSERT_EQ(skel->bss->seen_tc2, true, "seen_tc2");
-+
-+cleanup_fd2:
-+	err = bpf_prog_detach_opts(fd2, ifindex, target, &optd);
-+	ASSERT_OK(err, "prog_detach");
-+	assert_mprog_count_ifindex(ifindex, target, 1);
-+cleanup_fd1:
-+	err = bpf_prog_detach_opts(fd1, ifindex, target, &optd);
-+	ASSERT_OK(err, "prog_detach");
-+	assert_mprog_count_ifindex(ifindex, target, 0);
-+cleanup:
-+	test_tc_link__destroy(skel);
-+
-+	assert_mprog_count_ifindex(ifindex, target, 0);
-+	destroy_netkit();
-+}
-+
-+void serial_test_tc_netkit_multi_opts(void)
-+{
-+	serial_test_tc_netkit_multi_opts_target(NETKIT_L2, BPF_NETKIT_PRIMARY);
-+	serial_test_tc_netkit_multi_opts_target(NETKIT_L3, BPF_NETKIT_PRIMARY);
-+	serial_test_tc_netkit_multi_opts_target(NETKIT_L2, BPF_NETKIT_PEER);
-+	serial_test_tc_netkit_multi_opts_target(NETKIT_L3, BPF_NETKIT_PEER);
-+}
-+
-+void serial_test_tc_netkit_device(void)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_netkit_opts, optl);
-+	__u32 prog_ids[2], link_ids[2];
-+	__u32 pid1, pid2, lid1;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err, ifindex, ifindex2;
-+
-+	err = create_netkit(NETKIT_L3, NETKIT_PASS, NETKIT_PASS,
-+			    &ifindex, true);
-+	if (err)
-+		return;
-+
-+	ifindex2 = if_nametoindex(netkit_peer);
-+	ASSERT_NEQ(ifindex, ifindex2, "ifindex_1_2");
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1,
-+		  BPF_NETKIT_PRIMARY), 0, "tc1_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc2,
-+		  BPF_NETKIT_PEER), 0, "tc2_attach_type");
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc3,
-+		  BPF_NETKIT_PRIMARY), 0, "tc3_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+	pid2 = id_from_prog_fd(bpf_program__fd(skel->progs.tc2));
-+
-+	ASSERT_NEQ(pid1, pid2, "prog_ids_1_2");
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 0);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 0);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, false, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+
-+	link = bpf_program__attach_netkit(skel->progs.tc1, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 1);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 0);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(ifindex, BPF_NETKIT_PRIMARY, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 1, "count");
-+	ASSERT_EQ(optq.revision, 2, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], 0, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], 0, "link_ids[1]");
-+
-+	tc_skel_reset_all_seen(skel);
-+	ASSERT_EQ(send_icmp(), 0, "icmp_pkt");
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_tc2, false, "seen_tc2");
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(ifindex2, BPF_NETKIT_PRIMARY, &optq);
-+	ASSERT_EQ(err, -EACCES, "prog_query_should_fail");
-+
-+	err = bpf_prog_query_opts(ifindex2, BPF_NETKIT_PEER, &optq);
-+	ASSERT_EQ(err, -EACCES, "prog_query_should_fail");
-+
-+	link = bpf_program__attach_netkit(skel->progs.tc2, ifindex2, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	link = bpf_program__attach_netkit(skel->progs.tc3, ifindex2, &optl);
-+	if (!ASSERT_ERR_PTR(link, "link_attach_should_fail")) {
-+		bpf_link__destroy(link);
-+		goto cleanup;
-+	}
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 1);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 0);
-+cleanup:
-+	test_tc_link__destroy(skel);
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 0);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 0);
-+	destroy_netkit();
-+}
-+
-+void serial_test_tc_netkit_neigh_links_target(int mode, int target)
-+{
-+	LIBBPF_OPTS(bpf_prog_query_opts, optq);
-+	LIBBPF_OPTS(bpf_netkit_opts, optl);
-+	__u32 prog_ids[2], link_ids[2];
-+	__u32 pid1, lid1;
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err, ifindex;
-+
-+	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
-+			    &ifindex, false);
-+	if (err)
-+		return;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc1,
-+		  BPF_NETKIT_PRIMARY), 0, "tc1_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	pid1 = id_from_prog_fd(bpf_program__fd(skel->progs.tc1));
-+
-+	assert_mprog_count_ifindex(ifindex, target, 0);
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, false, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_eth, false, "seen_eth");
-+
-+	link = bpf_program__attach_netkit(skel->progs.tc1, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc1 = link;
-+
-+	lid1 = id_from_link_fd(bpf_link__fd(skel->links.tc1));
-+
-+	assert_mprog_count_ifindex(ifindex, target, 1);
-+
-+	optq.prog_ids = prog_ids;
-+	optq.link_ids = link_ids;
-+
-+	memset(prog_ids, 0, sizeof(prog_ids));
-+	memset(link_ids, 0, sizeof(link_ids));
-+	optq.count = ARRAY_SIZE(prog_ids);
-+
-+	err = bpf_prog_query_opts(ifindex, target, &optq);
-+	if (!ASSERT_OK(err, "prog_query"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(optq.count, 1, "count");
-+	ASSERT_EQ(optq.revision, 2, "revision");
-+	ASSERT_EQ(optq.prog_ids[0], pid1, "prog_ids[0]");
-+	ASSERT_EQ(optq.link_ids[0], lid1, "link_ids[0]");
-+	ASSERT_EQ(optq.prog_ids[1], 0, "prog_ids[1]");
-+	ASSERT_EQ(optq.link_ids[1], 0, "link_ids[1]");
-+
-+	tc_skel_reset_all_seen(skel);
-+	ASSERT_EQ(__send_icmp(ping_addr_noneigh), 0, "icmp_pkt");
-+
-+	ASSERT_EQ(skel->bss->seen_tc1, true /* L2: ARP */, "seen_tc1");
-+	ASSERT_EQ(skel->bss->seen_eth, mode == NETKIT_L3, "seen_eth");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+
-+	assert_mprog_count_ifindex(ifindex, target, 0);
-+	destroy_netkit();
-+}
-+
-+void serial_test_tc_netkit_neigh_links(void)
-+{
-+	serial_test_tc_netkit_neigh_links_target(NETKIT_L2, BPF_NETKIT_PRIMARY);
-+	serial_test_tc_netkit_neigh_links_target(NETKIT_L3, BPF_NETKIT_PRIMARY);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/test_tc_link.c b/tools/testing/selftests/bpf/progs/test_tc_link.c
-index 30e7124c49a1..992400acb957 100644
---- a/tools/testing/selftests/bpf/progs/test_tc_link.c
-+++ b/tools/testing/selftests/bpf/progs/test_tc_link.c
-@@ -1,7 +1,11 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright (c) 2023 Isovalent */
- #include <stdbool.h>
-+
- #include <linux/bpf.h>
-+#include <linux/if_ether.h>
-+
-+#include <bpf/bpf_endian.h>
- #include <bpf/bpf_helpers.h>
- 
- char LICENSE[] SEC("license") = "GPL";
-@@ -12,10 +16,19 @@ bool seen_tc3;
- bool seen_tc4;
- bool seen_tc5;
- bool seen_tc6;
-+bool seen_eth;
- 
- SEC("tc/ingress")
- int tc1(struct __sk_buff *skb)
- {
-+	struct ethhdr eth = {};
-+
-+	if (skb->protocol != __bpf_constant_htons(ETH_P_IP))
-+		goto out;
-+	if (bpf_skb_load_bytes(skb, 0, &eth, sizeof(eth)))
-+		goto out;
-+	seen_eth = eth.h_proto == bpf_htons(ETH_P_IP);
-+out:
- 	seen_tc1 = true;
- 	return TCX_NEXT;
- }
--- 
-2.34.1
-
+> 
+> Raju Rangoju (2):
+>    amd-xgbe: add support for new pci device id 0x1641
+>    amd-xgbe: Add support for AMD Crater ethernet device
+> 
+>   drivers/net/ethernet/amd/xgbe/xgbe-common.h |  5 +++
+>   drivers/net/ethernet/amd/xgbe/xgbe-dev.c    | 33 +++++++++++++++++---
+>   drivers/net/ethernet/amd/xgbe/xgbe-pci.c    | 34 ++++++++++++++++-----
+>   drivers/net/ethernet/amd/xgbe/xgbe.h        |  6 ++++
+>   4 files changed, 65 insertions(+), 13 deletions(-)
+> 
 
