@@ -1,147 +1,184 @@
-Return-Path: <netdev+bounces-42628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C996B7CF93A
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:42:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B47F7CF947
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 14:46:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D96E28204B
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:42:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4EC8B20DDD
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 12:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018A2182B9;
-	Thu, 19 Oct 2023 12:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EDED19467;
+	Thu, 19 Oct 2023 12:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a7X2aQSR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O/pjOKSw"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E711225A5
-	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 12:42:08 +0000 (UTC)
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A912A4;
-	Thu, 19 Oct 2023 05:42:07 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9adb9fa7200so162716066b.0;
-        Thu, 19 Oct 2023 05:42:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697719325; x=1698324125; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HbETqJO7gr5G309pfc0V+D4Oi3AQtNMOXUVI2EJql7Y=;
-        b=a7X2aQSRu5NcrOL4cn7ghK5Kb8B7uDshis1OU7/CSyumlzk2wUGhmetuib14Vkbjkr
-         Je4I6/5b0A7+5f2mj9fbFNioFhfujZ15jhivPp+VKVtUGaKmZamCdQNqHkJ9BLRJLPYs
-         DY7V9dxleOSsJy/XvaiwwBo6cBJjYHVz7qOG+1QK76fVfnWBsSZ4kd40yPtoodSslcSA
-         42W7JzVtt4enf6HKAT2oY99zbpVU7KyJn3PvLr3kFIIN/phV3VJBSlIhk0mQzI62WSTl
-         YmIa+H7GioLdcGvH6/1BZLGXYx36gi8gcCj9Fe3jODOmrbyyST6VAbnvQN0Cpf7R1j7a
-         uTqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697719325; x=1698324125;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HbETqJO7gr5G309pfc0V+D4Oi3AQtNMOXUVI2EJql7Y=;
-        b=fMwH+Z1Lw64JxKrafH0R6JKMOuEfv1VKQxxQLGmqNJujbpIgPELbND2UP8B5q7jKZv
-         3rfaO0zwGeen2N97WrzdE9Izg8cveDEZd8N7oFvMz5mg4dPOCBcX5FpsN702x8bW/v0i
-         stGHfzWq5eYFmQiLwHtuGcpnezxp6F3vQKVITGNdmdm1lx4KeMdcZSwh0HlAt8+5PN22
-         HAEr8aw3zWlOfSaOVENmGA5H6Ings4IQvzP9FDxP6AYsZRwyUAbyRRNl/Mp2zu0RskxI
-         xYXhQdTOhctaA0pJuzWqB9VL7Mns2U8E+aMP3DsSaSQJFdRNAo+CAZleFwpPNiKvA4rv
-         3Hng==
-X-Gm-Message-State: AOJu0Yy9U1Eyg81gk94tD31OQarWM64HMnFxzicuKn9hfl1fF6H7o0ND
-	mnIZ8LRBGHBgLpXunCRBSEU=
-X-Google-Smtp-Source: AGHT+IEUbOe0aJdiDWwgZ49Mqf0FMEQpzhd5DOtuFo/cZUxDF9/XU8HxW5TldQf5jZL60tohfvemyw==
-X-Received: by 2002:a17:907:9490:b0:9ae:5a56:be32 with SMTP id dm16-20020a170907949000b009ae5a56be32mr1688089ejc.38.1697719325237;
-        Thu, 19 Oct 2023 05:42:05 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id cd9-20020a170906b34900b009a193a5acffsm3486374ejb.121.2023.10.19.05.42.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 05:42:04 -0700 (PDT)
-Date: Thu, 19 Oct 2023 15:42:02 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B72D611B;
+	Thu, 19 Oct 2023 12:46:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D4F4C433C7;
+	Thu, 19 Oct 2023 12:46:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697719603;
+	bh=zrChmdwZjapKXHOuDShzo54XNW6c5+Js5gqYUObtK/o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O/pjOKSw15Eyq52t9nl85klJ8UdBJwT/YwJwJS+3+usiTv2DShKdWaInjqc3GJBu+
+	 On2MmXCrAFp44XHG2X55Os2Y3DDHncbNWMtbFB8F6peVVN4RyLmSfgvt39KYcVOkVp
+	 9ygwmt/C+n0oHLdJj5fl2VqHRxsZgDDb6abF925Jn8yGcmYFTkNFLVbPJAXL+814dF
+	 mb/nJdZEIbkYb3dJhS+APNwFZH4GGhkOYbjyzYeqHOWwU9bZ7oXivEdvkVC+0j4jSn
+	 5/T22RVnwa07bAzIKK1YarpkufcGDt0zrqKSDC2PoFcm9C4/IgHwiIQRJcR8Vdhhgu
+	 5+3dfibFfiV1Q==
+Date: Thu, 19 Oct 2023 13:46:36 +0100
+From: Conor Dooley <conor@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/1] taprio: Add boundary check for
- sched-entry values
-Message-ID: <20231019124202.fldo2cc5s6w4hrxz@skbuf>
-References: <1697599707-3546-1-git-send-email-jun.ann.lai@intel.com>
- <27912b49-eb1a-4100-a260-03299e8efdd4@engleder-embedded.com>
- <bca0aca50914367fffccf33b2f2ac880808d6cd9.camel@redhat.com>
+	Vladimir Oltean <olteanv@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org,
+	Gregory Clement <gregory.clement@bootlin.com>
+Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: dsa: Require ports or
+ ethernet-ports
+Message-ID: <20231019-friday-fabulous-4882c4048b8c@spud>
+References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
+ <20231018-marvell-88e6152-wan-led-v4-1-3ee0c67383be@linaro.org>
+ <169762516670.391804.7528295251386913602.robh@kernel.org>
+ <CACRpkdZ4hkiD6jwENqjZRX8ZHH9+3MSMMLcJe6tJa=6Yhn1w=g@mail.gmail.com>
+ <ZTEL6Yw+Xcc0E4TJ@shell.armlinux.org.uk>
+ <20231019-pulse-autopilot-166bb6c96090@spud>
+ <ZTEgnUP0rFL2frkk@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="hRWpvk1HDqmaTX1z"
 Content-Disposition: inline
-In-Reply-To: <bca0aca50914367fffccf33b2f2ac880808d6cd9.camel@redhat.com>
+In-Reply-To: <ZTEgnUP0rFL2frkk@shell.armlinux.org.uk>
 
-On Thu, Oct 19, 2023 at 12:35:30PM +0200, Paolo Abeni wrote:
-> On Wed, 2023-10-18 at 19:56 +0200, Gerhard Engleder wrote:
-> > On 18.10.23 05:28, Lai Peter Jun Ann wrote:
-> > > Adds boundary checks for the gatemask provided against the number of
-> > > traffic class defined for each sched-entry.
-> > > 
-> > > Without this check, the user would not know that the gatemask provided is
-> > > invalid and the driver has already truncated the gatemask provided to
-> > > match the number of traffic class defined.
-> > > 
-> > > Signed-off-by: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
-> > > Signed-off-by: Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>
-> > > Signed-off-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
-> > > ---
-> > >   net/sched/sch_taprio.c | 8 ++++++++
-> > >   1 file changed, 8 insertions(+)
-> > > 
-> > > diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-> > > index 1cb5e41..44b9e21 100644
-> > > --- a/net/sched/sch_taprio.c
-> > > +++ b/net/sched/sch_taprio.c
-> > > @@ -102,6 +102,7 @@ struct taprio_sched {
-> > >   	u32 max_sdu[TC_MAX_QUEUE]; /* save info from the user */
-> > >   	u32 fp[TC_QOPT_MAX_QUEUE]; /* only for dump and offloading */
-> > >   	u32 txtime_delay;
-> > > +	u8 num_tc;
 
-To the patch: I would oppose introducing an "u8 num_tc" to struct
-taprio_sched for one purpose only. It is a duplication of
-netdev->num_tc, the only problem is that it hasn't yet been set, which
-can be solved with a bit of code reorganization.
+--hRWpvk1HDqmaTX1z
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > >   };
-> > >   
-> > >   struct __tc_taprio_qopt_offload {
-> > > @@ -1063,6 +1064,11 @@ static int fill_sched_entry(struct taprio_sched *q, struct nlattr **tb,
-> > >   		return -EINVAL;
-> > >   	}
-> > >   
-> > > +	if (entry->gate_mask >= q->num_tc) {
-> > 
-> > As far as I know within gate_mask every bit represents a traffic class.
-> > So for 3 traffic classes at gate_mask of 0x7 is valid but this check
-> > fails with 0x7 >= 3.
-> 
-> Additionally whatever check we put in place previously just ignored by
-> the existing code, could break the existing user-space: we can't accept
-> such change. 
+On Thu, Oct 19, 2023 at 01:27:09PM +0100, Russell King (Oracle) wrote:
+> On Thu, Oct 19, 2023 at 12:58:46PM +0100, Conor Dooley wrote:
+> > On Thu, Oct 19, 2023 at 11:58:49AM +0100, Russell King (Oracle) wrote:
+> > > On Wed, Oct 18, 2023 at 01:11:45PM +0200, Linus Walleij wrote:
+> > > > On Wed, Oct 18, 2023 at 12:32=E2=80=AFPM Rob Herring <robh@kernel.o=
+rg> wrote:
+> > > > > On Wed, 18 Oct 2023 11:03:40 +0200, Linus Walleij wrote:
+> > > >=20
+> > > > > > Bindings using dsa.yaml#/$defs/ethernet-ports specify that
+> > > > > > a DSA switch node need to have a ports or ethernet-ports
+> > > > > > subnode, and that is actually required, so add requirements
+> > > > > > using oneOf.
+> > > > > >
+> > > > > > Suggested-by: Rob Herring <robh@kernel.org>
+> > > > > > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> > > > > > ---
+> > > > > >  Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 ++++++
+> > > > > >  1 file changed, 6 insertions(+)
+> > > > > >
+> > > > >
+> > > > > My bot found errors running 'make DT_CHECKER_FLAGS=3D-m dt_bindin=
+g_check'
+> > > > > on your patch (DT_CHECKER_FLAGS is new in v5.13):
+> > > > >
+> > > > > yamllint warnings/errors:
+> > > > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:60:7: [warni=
+ng] wrong indentation: expected 8 but found 6 (indentation)
+> > > > > ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:62:7: [warni=
+ng] wrong indentation: expected 8 but found 6 (indentation)
+> > > >=20
+> > > > Really?
+> > > >=20
+> > > > +  oneOf:
+> > > > +    - required:
+> > > > +      - ports
+> > > > +    - required:
+> > > > +      - ethernet-ports
+> > > >=20
+> > > > Two spaces after the oneOf, 2 spaces after a required as usual.
+> > > > I don't get it.
+> > >=20
+> > > Given the other python errors spat out in Rob's report, I would sugge=
+st
+> > > that the "bot" is running a development version that hasn't been fully
+> > > tested, so anything it spits out is suspect. Maybe Rob can comment on
+> > > the validity of the warnings in the report.
+> >=20
+> > In this case, I think it is correct.
+> > 2 spaces for the oneOf, 2 spaces the start of the required for the
+> > nested list, so:
+> > oneOf:
+> >   - required:
+>=20
+> This is a total of two spaces indentation.
+>=20
+> >       - ports
+>=20
+> This is a total of six spaces indentation.
+>=20
+> You mention 2 spaces for the oneOf, which explains why the "- required"
+> needs to be indented by two spaces. You also say 2 spaces for the
+> required nested list, but what about the other two spaces?
 
-I agree, and I would oppose erroring out.
+I a word that might've made it more clear.
+It is 2 spaces for the oneOf and 2 spaces _from_ the start of the
+required for the nested list.
 
-I used to have this patch which simply masks off the excess bits,
-calling netdev_warn() - which can be transformed into a warning netlink
-extack - instead.
-https://patchwork.kernel.org/project/netdevbpf/patch/20230130173145.475943-15-vladimir.oltean@nxp.com/
+In theory you might have a contrived example that looks like:
 
-I didn't have a strong motivation for the patch, and I dropped it.
-If Lai Peter Jun Ann can come with the motivation, we can go with that
-approach.
+oneOf:
+  - required:
+      - ports
+    properties:
+      ethernet-ports: false
+
+  - required:
+      - ethernet-ports
+    properties:
+      ports: false
+
+Maybe with that example you can see that each option of the oneOf
+contains a `required` and a `properties` component at 4 spaces of
+indent, and then in turn the required properties, being sub-components
+of `required` grow 2 more spaces for 6.
+
+> I guess if you're a YAML expert, this all makes sense, but to those of
+> us who aren't, these quirky "features" of it just seem totally
+> illogical.
+
+If I were a yaml expert, I would probably be able to use the correct
+terminology to explain this better, but hopefully the example is useful.
+
+--hRWpvk1HDqmaTX1z
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZTElLAAKCRB4tDGHoIJi
+0nGyAQCSissEbIBxRaCcFxF/SsIhIEna84/VQZA/TgqU6R+5eQEAqIrUvOveubc0
+111rEtBQs+tzwLNM+TuvJiUKGztktg0=
+=HXqE
+-----END PGP SIGNATURE-----
+
+--hRWpvk1HDqmaTX1z--
 
