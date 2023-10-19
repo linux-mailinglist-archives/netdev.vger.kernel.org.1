@@ -1,113 +1,178 @@
-Return-Path: <netdev+bounces-42800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F4F07D02F0
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 22:02:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DF437D02F9
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 22:04:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBFEA1C20E45
-	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:02:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E4F31C20AF4
+	for <lists+netdev@lfdr.de>; Thu, 19 Oct 2023 20:04:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58ADD3D391;
-	Thu, 19 Oct 2023 20:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21DE3D382;
+	Thu, 19 Oct 2023 20:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RiedKH/Y"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="hVJSsOgi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314DE38F9E;
-	Thu, 19 Oct 2023 20:02:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C358C433C8;
-	Thu, 19 Oct 2023 20:02:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697745773;
-	bh=2MggdwhgnildvMk7NTDjOnoS6Jg5jQXkqNkqB0aYHMA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=RiedKH/Y9dbYa6ubDlG7uoC+WUOghwhKS6eWHt3VkrGMdKiVpXgjr3wa1Syt8GXzb
-	 aSB+8hDbY/HNr9zWPmh72fzVc8GWH6W+XurEWZqjj3vVuJBbCPtrrW/G/J1v2DaTpA
-	 ZsbVxpeds1O29uH8kEZLDd9zKF+bkYcUw34+b2WjZNQHf/KTADVgYG04uGSniuLo33
-	 Fo+oLOfnmd9qbPJ5MdS3C5zbsyiNyTJq3NAGDbqj4j6DslvZ/IYJqV+KYeiy76VqQJ
-	 Hlyp8sUZp8E3iRaOCKosL3bacUhMlLBYdcV78uPcq/PwPb+8a0xG4neCLulkJzM5pO
-	 /nbDUji07J9oQ==
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5079eed8bfbso50783e87.1;
-        Thu, 19 Oct 2023 13:02:53 -0700 (PDT)
-X-Gm-Message-State: AOJu0YwKZGhiaRU7dSDQiRJDADsL8AtWjbqaob/EHCWVsn3mZYf5LWrz
-	vbQm1kQbyWln1yZe/YIcnH/72IjY+1aclfxTJA==
-X-Google-Smtp-Source: AGHT+IHnua5COj4QgtXUHQNJd1cUfAW0WlEMmymFNUywVpcrDbobt71n9JgwhpVYyWQmFIz6kp8EPizyDSqyxeaxEtQ=
-X-Received: by 2002:ac2:54af:0:b0:502:9fce:b6cc with SMTP id
- w15-20020ac254af000000b005029fceb6ccmr2235339lfk.11.1697745771855; Thu, 19
- Oct 2023 13:02:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85183DFE5
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 20:04:49 +0000 (UTC)
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B18C6130
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 13:04:46 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id 98e67ed59e1d1-27d21168d26so28572a91.0
+        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 13:04:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1697745886; x=1698350686; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VHSM7lgOK3HTJKxso8W1sPPHXik4YHTdjZ5i3zqRGx4=;
+        b=hVJSsOgikFx2v0hDLza9QGjIV8a6tJluJcV/pZEW9BAreZr3dBUcXEAy3rnQt/sGQi
+         0db2gX+WccmzYGJP+aj0NWsgRvZgSHh3hSjVXaxZ4z3j0vyCV6pKpauW4vI1WDQGPNjQ
+         lipLElDOc/SIyqkGCcFk/oO/tH/RRPL8/o7wGzlbdWg4wwH4m6yDS0ou6RP/wSULDDcw
+         XDMn+1NvPWDlI5XfEQQfNccI/IjYR0cqhSrw3m97oQcbeUcUDNIfkHrz8KQtFMnrG/7z
+         KYudnlhakY/Ikm8706uLWES7qUFJpX5tkeYrfj528xnocTyIrwTyb2tcOTTs9LuRMV45
+         H7dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697745886; x=1698350686;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VHSM7lgOK3HTJKxso8W1sPPHXik4YHTdjZ5i3zqRGx4=;
+        b=LqjDIyxv9feOOGgLft/TO6zSqXh8kYij4TG8SS/wLKt5++hNRfS7m6jCLcCdAHco0Q
+         KtWYjGrEjG+NsDGLiUvLm5nhUfidGxf8kAQX++RZj9YIL7D92V1FhZu+jS6P2Qr4z/bz
+         3ziHqt0SsU/P49XK533u5/OCszjk2wJF8fGN0khbHQG9MyXPuDzwTuGu1QZz9/1fv9EG
+         jr5w9Wx97hm7joIw0O2vzIEUSKk+iHkbdRiW157tMzV4xXEl7E66gbL7p+SobFFU3x7h
+         m2ryOGzKZE9ywfpaIWMOpqU4N6dRHJIHBUUXdvSO2oJtHGT9kmkMLmk091KccvZIXJOy
+         V3HQ==
+X-Gm-Message-State: AOJu0YyOOP0Ljl7yo+U3t80T20ILOpnjrhhDyQIiXuSwD6feY4CyovET
+	DaUnEvdBXNs/YxMnmggbXGy6Eg==
+X-Google-Smtp-Source: AGHT+IGbCrBvmsRbosyDyHhFgwB9uD9EKZDkSeQTftL9H2qEaLZcX5FXO2SKmc7h7coRIOruRtobPQ==
+X-Received: by 2002:a17:90b:1d0e:b0:274:99ed:a80c with SMTP id on14-20020a17090b1d0e00b0027499eda80cmr3295469pjb.3.1697745886045;
+        Thu, 19 Oct 2023 13:04:46 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id jb14-20020a17090b408e00b002774d7e2fefsm157717pjb.36.2023.10.19.13.04.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Oct 2023 13:04:45 -0700 (PDT)
+Message-ID: <e1920ac4-18ad-4b97-a3a3-9604724937d6@kernel.dk>
+Date: Thu, 19 Oct 2023 14:04:43 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-6-3ee0c67383be@linaro.org>
- <169762516805.391872.4190043734592153628.robh@kernel.org> <CACRpkdZz_+WAt7GG4Chm_xRiBNBP=pin2dx39z27Nx0PuyVN7w@mail.gmail.com>
- <20231019134902.GB193647-robh@kernel.org>
-In-Reply-To: <20231019134902.GB193647-robh@kernel.org>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 19 Oct 2023 15:02:39 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqKSex0o_jPV=MNsF7oUnaLx97FpiqJXPhUZH=kv7JZM0w@mail.gmail.com>
-Message-ID: <CAL_JsqKSex0o_jPV=MNsF7oUnaLx97FpiqJXPhUZH=kv7JZM0w@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 6/7] dt-bindings: marvell: Rewrite MV88E6xxx
- in schema
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Christian Marangi <ansuelsmth@gmail.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Gregory Clement <gregory.clement@bootlin.com>, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, linux-kernel@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
-	Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 04/11] net/socket: Break down __sys_getsockopt
+Content-Language: en-US
+To: Martin KaFai Lau <martin.lau@linux.dev>, Breno Leitao <leitao@debian.org>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, io-uring@vger.kernel.org,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+ David Howells <dhowells@redhat.com>, sdf@google.com, asml.silence@gmail.com,
+ willemdebruijn.kernel@gmail.com, kuba@kernel.org, pabeni@redhat.com,
+ krisman@suse.de, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+References: <20231016134750.1381153-1-leitao@debian.org>
+ <20231016134750.1381153-5-leitao@debian.org>
+ <1074c1f1-e676-fbe6-04bc-783821d746a1@linux.dev>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <1074c1f1-e676-fbe6-04bc-783821d746a1@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 19, 2023 at 8:49=E2=80=AFAM Rob Herring <robh@kernel.org> wrote=
-:
->
-> On Wed, Oct 18, 2023 at 01:39:45PM +0200, Linus Walleij wrote:
-> > On Wed, Oct 18, 2023 at 12:32=E2=80=AFPM Rob Herring <robh@kernel.org> =
-wrote:
-> >
-> > > yamllint warnings/errors:
-> > >
-> > > dtschema/dtc warnings/errors:
-> > > /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindin=
-gs/net/marvell,mvusb.example.dtb: switch@0: ports: '#address-cells' is a re=
-quired property
-> > >         from schema $id: http://devicetree.org/schemas/net/dsa/marvel=
-l,mv88e6xxx.yaml#
-> > > /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindin=
-gs/net/marvell,mvusb.example.dtb: switch@0: ports: '#size-cells' is a requi=
-red property
-> > >         from schema $id: http://devicetree.org/schemas/net/dsa/marvel=
-l,mv88e6xxx.yaml#
-> > > /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindin=
-gs/net/marvell,mvusb.example.dtb: switch@0: ports: '#address-cells' is a re=
-quired property
-> > >         from schema $id: http://devicetree.org/schemas/net/dsa/marvel=
-l,mv88e6xxx.yaml#
-> > > /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindin=
-gs/net/marvell,mvusb.example.dtb: switch@0: ports: '#size-cells' is a requi=
-red property
-> > >         from schema $id: http://devicetree.org/schemas/net/dsa/marvel=
-l,mv88e6xxx.yaml#
-> >
-> > Fixed in patch 2/7?
->
-> Yes. If one patch has errors we drop it. I should probably just give up
-> on the rest of the series instead.
+On 10/19/23 1:12 PM, Martin KaFai Lau wrote:
+> On 10/16/23 6:47?AM, Breno Leitao wrote:
+>> diff --git a/net/socket.c b/net/socket.c
+>> index 0087f8c071e7..f4c156a1987e 100644
+>> --- a/net/socket.c
+>> +++ b/net/socket.c
+>> @@ -2350,6 +2350,42 @@ SYSCALL_DEFINE5(setsockopt, int, fd, int, level, int, optname,
+>>   INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
+>>                                int optname));
+>>   +int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+>> +               int optname, sockptr_t optval, sockptr_t optlen)
+>> +{
+>> +    int max_optlen __maybe_unused;
+>> +    const struct proto_ops *ops;
+>> +    int err;
+>> +
+>> +    err = security_socket_getsockopt(sock, level, optname);
+>> +    if (err)
+>> +        return err;
+>> +
+>> +    ops = READ_ONCE(sock->ops);
+>> +    if (level == SOL_SOCKET) {
+>> +        err = sk_getsockopt(sock->sk, level, optname, optval, optlen);
+>> +    } else if (unlikely(!ops->getsockopt)) {
+>> +        err = -EOPNOTSUPP;
+>> +    } else {
+>> +        if (WARN_ONCE(optval.is_kernel || optlen.is_kernel,
+>> +                  "Invalid argument type"))
+>> +            return -EOPNOTSUPP;
+>> +
+>> +        err = ops->getsockopt(sock, level, optname, optval.user,
+>> +                      optlen.user);
+>> +    }
+>> +
+>> +    if (!compat) {
+>> +        max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
+> 
+> The max_optlen was done before the above sk_getsockopt. The bpf CI cannot catch it because it cannot apply patch 5 cleanly. I ran the following out of the linux-block tree:
+> 
+> $> ./test_progs -t sockopt_sk
+> test_sockopt_sk:PASS:join_cgroup /sockopt_sk 0 nsec
+> run_test:PASS:skel_load 0 nsec
+> run_test:PASS:setsockopt_link 0 nsec
+> run_test:PASS:getsockopt_link 0 nsec
+> (/data/users/kafai/fb-kernel/linux/tools/testing/selftests/bpf/prog_tests/sockopt_sk.c:111: errno: Operation not permitted) Failed to call getsockopt, ret=-1
+> run_test:FAIL:getsetsockopt unexpected error: -1 (errno 1)
+> #217     sockopt_sk:FAIL
 
-The bot should work better now not dropping patches when there are
-warnings. It will give incremental new warnings with each patch.
+Does it work with this incremental? I can fold that in, will rebase
+anyway to collect acks.
 
-Rob
+
+diff --git a/net/socket.c b/net/socket.c
+index bccd257e13fe..eb6960958026 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2344,6 +2344,9 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 	if (err)
+ 		return err;
+ 
++	if (!compat)
++		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
++
+ 	ops = READ_ONCE(sock->ops);
+ 	if (level == SOL_SOCKET) {
+ 		err = sk_getsockopt(sock->sk, level, optname, optval, optlen);
+@@ -2358,12 +2361,10 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 				      optlen.user);
+ 	}
+ 
+-	if (!compat) {
+-		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
++	if (!compat)
+ 		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
+ 						     optval, optlen, max_optlen,
+ 						     err);
+-	}
+ 
+ 	return err;
+ }
+
+-- 
+Jens Axboe
+
 
