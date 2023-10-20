@@ -1,288 +1,89 @@
-Return-Path: <netdev+bounces-43098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D64FD7D165D
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:38:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 606C37D1688
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:50:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F17BDB213EF
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:38:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F36D1C20A38
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8CB72232C;
-	Fri, 20 Oct 2023 19:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1574B22333;
+	Fri, 20 Oct 2023 19:50:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BSuKyfsP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o9XlXrrg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0121B22326
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 19:38:21 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B63F6D63
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 12:38:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697830696;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ml4RORcasGomkLklFLPVGJJgQIs51tajiJ4KZNMKsYM=;
-	b=BSuKyfsPOkVuva2YrWfjfI4CgDpAV5SQZGwFFKu6EWWIcqdbygP/zQsiQNajT0m0k+HV5J
-	bS4Hw/lUq2dyBLsAbNE11NFBfe/ffWc1Mdxu9rsvLrSAHkjXAMFjb/SwzVmw8eF739cPCU
-	Rx5CpEQ30buHjsbWbt5wXloPSu2ZQzo=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-113-1S7bJ7BeNmyYl0EEeXgHpA-1; Fri, 20 Oct 2023 15:38:03 -0400
-X-MC-Unique: 1S7bJ7BeNmyYl0EEeXgHpA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F224729AA2D1;
-	Fri, 20 Oct 2023 19:38:02 +0000 (UTC)
-Received: from p1.luc.com (unknown [10.45.226.105])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 24611C1596D;
-	Fri, 20 Oct 2023 19:38:01 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	mschmidt@redhat.com,
-	dacampbe@redhat.com,
-	poros@redhat.com,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH iwl-next 6/6] i40e: Initialize hardware capabilities at single place
-Date: Fri, 20 Oct 2023 21:37:42 +0200
-Message-ID: <20231020193746.2274379-6-ivecera@redhat.com>
-In-Reply-To: <20231020193746.2274379-1-ivecera@redhat.com>
-References: <20231020193746.2274379-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A741802E;
+	Fri, 20 Oct 2023 19:50:39 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1C04D57;
+	Fri, 20 Oct 2023 12:50:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=WGQNwyoQWo+MRR4XU1PpD0x0wGN+nDRTV2R1AIAROkE=; b=o9XlXrrgvDkaQB8dOSgWRKnbje
+	nEPc++gmlnk3C19A4gCMY5ttwsdiZLtN7NKuyjwBcxcvogbGeOvSAgoSa2rVMQirMBnGGm5h581zz
+	NDiM3dN1HtFXLp+jWrfzNmS4FNrMWmTFzVuGCGVYiH5abRxWYLD7dBScaMvT1q3f9A+8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qtvVx-002oW3-V3; Fri, 20 Oct 2023 21:50:33 +0200
+Date: Fri, 20 Oct 2023 21:50:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
+	tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com,
+	greg@kroah.com
+Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY
+ drivers
+Message-ID: <b58e0874-b0d4-4218-a457-4e2e753e0b17@lunn.ch>
+References: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
+ <20231017113014.3492773-2-fujita.tomonori@gmail.com>
+ <de9d1b30-ab19-44f9-99a3-073c6d2b36e1@lunn.ch>
+ <20231019.094147.1808345526469629486.fujita.tomonori@gmail.com>
+ <64748f96-ac67-492b-89c7-aea859f1d419@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64748f96-ac67-492b-89c7-aea859f1d419@proton.me>
 
-Some i40e_hw.caps bits are set in i40e_set_hw_caps(), some of them
-in i40e_init_adminq() and the rest of them in i40e_sw_init().
-Consolidate the initialization to single proper place i40e_set_hw_caps().
+> I will try to explain things a bit more.
+> 
+> So this case is a bit difficult to figure out, because what is
+> going on is not really a pattern that is used in Rust.
 
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e_adminq.c | 66 ++++++++++++++-----
- drivers/net/ethernet/intel/i40e/i40e_debug.h  |  1 +
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 55 +---------------
- .../net/ethernet/intel/i40e/i40e_register.h   |  1 +
- 4 files changed, 51 insertions(+), 72 deletions(-)
+It is however a reasonably common pattern in the kernel. It stems from
+driver writers often don't understand locking. So the core does the
+locking, leaving the driver writers to just handle the problems of the
+hardware.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.c b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-index 6754f6b3508c..86591140f748 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-@@ -522,10 +522,52 @@ static void i40e_set_hw_caps(struct i40e_hw *hw)
- 			/* The ability to RX (not drop) 802.1ad frames */
- 			set_bit(I40E_HW_CAP_802_1AD, hw->caps);
- 		}
-+		if ((aq->api_maj_ver == 1 && aq->api_min_ver > 4) ||
-+		    aq->api_maj_ver > 1) {
-+			/* Supported in FW API version higher than 1.4 */
-+			set_bit(I40E_HW_CAP_GENEVE_OFFLOAD, hw->caps);
-+		}
-+		if ((aq->fw_maj_ver == 4 && aq->fw_min_ver < 33) ||
-+		    aq->fw_maj_ver < 4) {
-+			set_bit(I40E_HW_CAP_RESTART_AUTONEG, hw->caps);
-+			/* No DCB support  for FW < v4.33 */
-+			set_bit(I40E_HW_CAP_NO_DCB_SUPPORT, hw->caps);
-+		}
-+		if ((aq->fw_maj_ver == 4 && aq->fw_min_ver < 3) ||
-+		    aq->fw_maj_ver < 4) {
-+			/* Disable FW LLDP if FW < v4.3 */
-+			set_bit(I40E_HW_CAP_STOP_FW_LLDP, hw->caps);
-+		}
-+		if ((aq->fw_maj_ver == 4 && aq->fw_min_ver >= 40) ||
-+		    aq->fw_maj_ver >= 5) {
-+			/* Use the FW Set LLDP MIB API if FW > v4.40 */
-+			set_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, hw->caps);
-+		}
-+		if (aq->fw_maj_ver >= 6) {
-+			/* Enable PTP L4 if FW > v6.0 */
-+			set_bit(I40E_HW_CAP_PTP_L4, hw->caps);
-+		}
- 		break;
- 	case I40E_MAC_X722:
- 		set_bit(I40E_HW_CAP_AQ_SRCTL_ACCESS_ENABLE, hw->caps);
- 		set_bit(I40E_HW_CAP_NVM_READ_REQUIRES_LOCK, hw->caps);
-+		set_bit(I40E_HW_CAP_RSS_AQ, hw->caps);
-+		set_bit(I40E_HW_CAP_128_QP_RSS, hw->caps);
-+		set_bit(I40E_HW_CAP_ATR_EVICT, hw->caps);
-+		set_bit(I40E_HW_CAP_WB_ON_ITR, hw->caps);
-+		set_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE, hw->caps);
-+		set_bit(I40E_HW_CAP_NO_PCI_LINK_CHECK, hw->caps);
-+		set_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, hw->caps);
-+		set_bit(I40E_HW_CAP_GENEVE_OFFLOAD, hw->caps);
-+		set_bit(I40E_HW_CAP_PTP_L4, hw->caps);
-+		set_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, hw->caps);
-+		set_bit(I40E_HW_CAP_OUTER_UDP_CSUM, hw->caps);
-+
-+		if (rd32(hw, I40E_GLQF_FDEVICTENA(1)) !=
-+		    I40E_FDEVICT_PCTYPE_DEFAULT) {
-+			hw_warn(hw, "FD EVICT PCTYPES are not right, disable FD HW EVICT\n");
-+			clear_bit(I40E_HW_CAP_ATR_EVICT, hw->caps);
-+		}
- 
- 		if (aq->api_maj_ver > 1 ||
- 		    (aq->api_maj_ver == 1 &&
-@@ -553,6 +595,12 @@ static void i40e_set_hw_caps(struct i40e_hw *hw)
- 	     aq->api_min_ver >= 5))
- 		set_bit(I40E_HW_CAP_NVM_READ_REQUIRES_LOCK, hw->caps);
- 
-+	/* The ability to RX (not drop) 802.1ad frames was added in API 1.7 */
-+	if (aq->api_maj_ver > 1 ||
-+	    (aq->api_maj_ver == 1 &&
-+	     aq->api_min_ver >= 7))
-+		set_bit(I40E_HW_CAP_802_1AD, hw->caps);
-+
- 	if (aq->api_maj_ver > 1 ||
- 	    (aq->api_maj_ver == 1 &&
- 	     aq->api_min_ver >= 8))
-@@ -646,24 +694,6 @@ int i40e_init_adminq(struct i40e_hw *hw)
- 			   &oem_lo);
- 	hw->nvm.oem_ver = ((u32)oem_hi << 16) | oem_lo;
- 
--	if (hw->mac.type == I40E_MAC_XL710 &&
--	    hw->aq.api_maj_ver == I40E_FW_API_VERSION_MAJOR &&
--	    hw->aq.api_min_ver >= I40E_MINOR_VER_GET_LINK_INFO_XL710) {
--		set_bit(I40E_HW_CAP_AQ_PHY_ACCESS, hw->caps);
--		set_bit(I40E_HW_CAP_FW_LLDP_STOPPABLE, hw->caps);
--	}
--	if (hw->mac.type == I40E_MAC_X722 &&
--	    hw->aq.api_maj_ver == I40E_FW_API_VERSION_MAJOR &&
--	    hw->aq.api_min_ver >= I40E_MINOR_VER_FW_LLDP_STOPPABLE_X722) {
--		set_bit(I40E_HW_CAP_FW_LLDP_STOPPABLE, hw->caps);
--	}
--
--	/* The ability to RX (not drop) 802.1ad frames was added in API 1.7 */
--	if (hw->aq.api_maj_ver > 1 ||
--	    (hw->aq.api_maj_ver == 1 &&
--	     hw->aq.api_min_ver >= 7))
--		set_bit(I40E_HW_CAP_802_1AD, hw->caps);
--
- 	if (hw->aq.api_maj_ver > I40E_FW_API_VERSION_MAJOR) {
- 		ret_code = -EIO;
- 		goto init_adminq_free_arq;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_debug.h b/drivers/net/ethernet/intel/i40e/i40e_debug.h
-index 27ebc72d8bfe..e9871dfb32bd 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_debug.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_debug.h
-@@ -37,6 +37,7 @@ struct i40e_hw;
- struct device *i40e_hw_to_dev(struct i40e_hw *hw);
- 
- #define hw_dbg(hw, S, A...) dev_dbg(i40e_hw_to_dev(hw), S, ##A)
-+#define hw_warn(hw, S, A...) dev_warn(i40e_hw_to_dev(hw), S, ##A)
- 
- #define i40e_debug(h, m, s, ...)				\
- do {								\
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 998f9a5f4836..7001fe2870c4 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -12798,62 +12798,10 @@ static int i40e_sw_init(struct i40e_pf *pf)
- 				 pf->hw.func_caps.fd_filters_best_effort;
- 	}
- 
--	if (pf->hw.mac.type == I40E_MAC_X722) {
--		set_bit(I40E_HW_CAP_RSS_AQ, pf->hw.caps);
--		set_bit(I40E_HW_CAP_128_QP_RSS, pf->hw.caps);
--		set_bit(I40E_HW_CAP_ATR_EVICT, pf->hw.caps);
--		set_bit(I40E_HW_CAP_WB_ON_ITR, pf->hw.caps);
--		set_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE, pf->hw.caps);
--		set_bit(I40E_HW_CAP_NO_PCI_LINK_CHECK, pf->hw.caps);
--		set_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, pf->hw.caps);
--		set_bit(I40E_HW_CAP_GENEVE_OFFLOAD, pf->hw.caps);
--		set_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps);
--		set_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps);
--		set_bit(I40E_HW_CAP_OUTER_UDP_CSUM, pf->hw.caps);
--
--#define I40E_FDEVICT_PCTYPE_DEFAULT 0xc03
--		if (rd32(&pf->hw, I40E_GLQF_FDEVICTENA(1)) !=
--		    I40E_FDEVICT_PCTYPE_DEFAULT) {
--			dev_warn(&pf->pdev->dev,
--				 "FD EVICT PCTYPES are not right, disable FD HW EVICT\n");
--			clear_bit(I40E_HW_CAP_ATR_EVICT, pf->hw.caps);
--		}
--	} else if ((pf->hw.aq.api_maj_ver > 1) ||
--		   ((pf->hw.aq.api_maj_ver == 1) &&
--		    (pf->hw.aq.api_min_ver > 4))) {
--		/* Supported in FW API version higher than 1.4 */
--		set_bit(I40E_HW_CAP_GENEVE_OFFLOAD, pf->hw.caps);
--	}
--
- 	/* Enable HW ATR eviction if possible */
- 	if (test_bit(I40E_HW_CAP_ATR_EVICT, pf->hw.caps))
- 		set_bit(I40E_FLAG_HW_ATR_EVICT_ENA, pf->flags);
- 
--	if ((pf->hw.mac.type == I40E_MAC_XL710) &&
--	    (((pf->hw.aq.fw_maj_ver == 4) && (pf->hw.aq.fw_min_ver < 33)) ||
--	    (pf->hw.aq.fw_maj_ver < 4))) {
--		set_bit(I40E_HW_CAP_RESTART_AUTONEG, pf->hw.caps);
--		/* No DCB support  for FW < v4.33 */
--		set_bit(I40E_HW_CAP_NO_DCB_SUPPORT, pf->hw.caps);
--	}
--
--	/* Disable FW LLDP if FW < v4.3 */
--	if ((pf->hw.mac.type == I40E_MAC_XL710) &&
--	    (((pf->hw.aq.fw_maj_ver == 4) && (pf->hw.aq.fw_min_ver < 3)) ||
--	    (pf->hw.aq.fw_maj_ver < 4)))
--		set_bit(I40E_HW_CAP_STOP_FW_LLDP, pf->hw.caps);
--
--	/* Use the FW Set LLDP MIB API if FW > v4.40 */
--	if ((pf->hw.mac.type == I40E_MAC_XL710) &&
--	    (((pf->hw.aq.fw_maj_ver == 4) && (pf->hw.aq.fw_min_ver >= 40)) ||
--	    (pf->hw.aq.fw_maj_ver >= 5)))
--		set_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, pf->hw.caps);
--
--	/* Enable PTP L4 if FW > v6.0 */
--	if (pf->hw.mac.type == I40E_MAC_XL710 &&
--	    pf->hw.aq.fw_maj_ver >= 6)
--		set_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps);
--
- 	if (pf->hw.func_caps.vmdq && num_online_cpus() != 1) {
- 		pf->num_vmdq_vsis = I40E_DEFAULT_NUM_VMDQ_VSI;
- 		set_bit(I40E_FLAG_VMDQ_ENA, pf->flags);
-@@ -12871,8 +12819,7 @@ static int i40e_sw_init(struct i40e_pf *pf)
- 	 * if NPAR is functioning so unset this hw flag in this case.
- 	 */
- 	if (pf->hw.mac.type == I40E_MAC_XL710 &&
--	    pf->hw.func_caps.npar_enable &&
--	    test_bit(I40E_HW_CAP_FW_LLDP_STOPPABLE, pf->hw.caps))
-+	    pf->hw.func_caps.npar_enable)
- 		clear_bit(I40E_HW_CAP_FW_LLDP_STOPPABLE, pf->hw.caps);
- 
- #ifdef CONFIG_PCI_IOV
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/net/ethernet/intel/i40e/i40e_register.h
-index f408fcf23ce8..d561687303ea 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_register.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
-@@ -899,6 +899,7 @@
- #define I40E_GLQF_ORT_FLX_PAYLOAD_SHIFT 7
- #define I40E_GLQF_ORT_FLX_PAYLOAD_MASK I40E_MASK(0x1, I40E_GLQF_ORT_FLX_PAYLOAD_SHIFT)
- #define I40E_GLQF_FDEVICTENA(_i) (0x00270384 + ((_i) * 4)) /* _i=0...1 */ /* Reset: CORER */
-+#define I40E_FDEVICT_PCTYPE_DEFAULT 0xc03
- /* Redefined for X722 family */
- #define I40E_GLGEN_STAT_CLEAR 0x00390004 /* Reset: CORER */
- #endif /* _I40E_REGISTER_H_ */
--- 
-2.41.0
+Rust maybe makes locking more of a visible issue, but if driver
+writers don't understand locking, the language itself does not make
+much difference.
 
+> We already have exclusive access to the `phy_device`, so in Rust
+> you would not need to lock anything to also have exclusive access to the
+> embedded `mii_bus`.
+
+I would actually say its not the PHY drivers problem at all. The
+mii_bus is a property of the MDIO layers, and it is the MDIO layers
+problem to impose whatever locking it needs for its properties.
+
+Also, mii_bus is not embedded. Its a pointer to an mii_bus. The phy
+lock protects the pointer. But its the MDIO layer which needs to
+protect what the pointer points to.
+
+	Andrew
 
