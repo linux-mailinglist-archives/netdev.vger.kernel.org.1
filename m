@@ -1,163 +1,215 @@
-Return-Path: <netdev+bounces-43050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 992D67D130B
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:41:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9BD17D1312
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:42:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A270F1C20F21
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 15:41:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02EB6B21403
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 15:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84801DDF6;
-	Fri, 20 Oct 2023 15:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6334E1DDFB;
+	Fri, 20 Oct 2023 15:42:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="Qql6P41n"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="J13NetEm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6433B1DA49
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 15:41:25 +0000 (UTC)
-Received: from smtp-190d.mail.infomaniak.ch (smtp-190d.mail.infomaniak.ch [IPv6:2001:1600:3:17::190d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 665CABE
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 08:41:23 -0700 (PDT)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4SBphx0XSyzMqcll;
-	Fri, 20 Oct 2023 15:41:21 +0000 (UTC)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4SBphw4YT5zMppBK;
-	Fri, 20 Oct 2023 17:41:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1697816480;
-	bh=OnLN8o3RQ3e1UP4L2D0yH+VFcgnK10SAJ+afLlFP/WY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Qql6P41nNBb5JXq9kLx00oXXWqlSSjonZI3Bmj379AhB5ILCabF+r77VQ+4PoY6sA
-	 wAIJu7OFaRceJIO0+XT2ufu4avv33OCh58JGXWj5o//7cvLS8jUJDjdmq2vXtzt+lo
-	 cdJt1WYQNGsBOJXvmSGtlsyoYDH8A7zpLclxA64M=
-Date: Fri, 20 Oct 2023 17:41:18 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com
-Subject: Re: [PATCH v13 08/12] landlock: Add network rules and TCP hooks
- support
-Message-ID: <20231020.ooS5Phaiqu6k@digikod.net>
-References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
- <20231016015030.1684504-9-konstantin.meskhidze@huawei.com>
- <20231017.xahKoo9Koo8v@digikod.net>
- <57f150b2-0920-8567-8351-1bdb74684cfa@huawei.com>
- <20231020.ido6Aih0eiGh@digikod.net>
- <ae62c363-e9bf-3ab8-991a-0902b0d195cb@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4881DA49
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 15:42:33 +0000 (UTC)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A631FD71
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 08:42:30 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9b96c3b4be4so148188766b.1
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 08:42:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1697816546; x=1698421346; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zGC+3Kmw+D+b5Dj58mb9CrKsjrP+aMd2+KprUNQqghc=;
+        b=J13NetEmn6UJVj4RNFAMlmVDcXV9It1K5L4R91DVK+Gc402XcTqMkJlWHzBybOH0Bw
+         tn+UGf/0m26Ij8t76V2irnXxUYm7qTr1jWAg9ooMYWQoDg3HPK6uDTxePgub3LV3Lt9a
+         Ar4P2jJB5LdtqDnZ7Nf7/VCoyvg/K1qcDKB+o=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697816546; x=1698421346;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zGC+3Kmw+D+b5Dj58mb9CrKsjrP+aMd2+KprUNQqghc=;
+        b=vJqzzZqrOiii1hPOCHN2mOUjczvHiWPr1KJg57Z4efBErMQZel/3qLNee4E3FCxPXI
+         34fX8ByCoIHwusc8j+Y/LQcoEUhQ10bPmr3FMbTQ9BqC3Fzd8624qKnsrwcp9cvZh/jS
+         Ex1mi55RhvIjiRJLdvfdWfdJjYy00xgIIK+mxcVGnYhz7jzckBiCkkr5j76Cl3EFhqGp
+         TUron1afxmoS8nzGBMhZ7wbEYo9to+dQFA2Yi0WZOS6YRq3HhVm/be4EWkjPUZlV7yw+
+         /uJuVBWS1MWGlGOJ9er2ith390Z932Wf9kHM5byZhht2RzIqhxC/8B5J6kP7jYAmLxtr
+         QwHQ==
+X-Gm-Message-State: AOJu0YzSmlvbZEaL2IB2uuLehflqa6QBRL1pKUvlUymG0U6Pm7wtPkJH
+	xlBNzdGgAr5JCr3a8YKnCW4FtAjpZwgclH1Bo3rR7+Pq
+X-Google-Smtp-Source: AGHT+IF8OqADSY/3106PRv7nv5yKd4JeHqV/k7IoKOuDaGI/H37+WJJvunGu7EFeeZlbzxtoEBPnyg==
+X-Received: by 2002:a17:907:36cc:b0:9c7:657f:8e85 with SMTP id bj12-20020a17090736cc00b009c7657f8e85mr1478143ejc.66.1697816545938;
+        Fri, 20 Oct 2023 08:42:25 -0700 (PDT)
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com. [209.85.128.54])
+        by smtp.gmail.com with ESMTPSA id la5-20020a170906ad8500b009adce1c97ccsm1694634ejb.53.2023.10.20.08.42.25
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Oct 2023 08:42:25 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40662119cd0so76965e9.1
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 08:42:25 -0700 (PDT)
+X-Received: by 2002:a05:600c:4a22:b0:408:2b:5956 with SMTP id
+ c34-20020a05600c4a2200b00408002b5956mr119419wmp.6.1697816544811; Fri, 20 Oct
+ 2023 08:42:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ae62c363-e9bf-3ab8-991a-0902b0d195cb@huawei.com>
-X-Infomaniak-Routing: alpha
+References: <20231019212130.3146151-1-dianders@chromium.org>
+ <20231019142019.v4.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid> <eaf05cf1486c418790a1b54cbcda3a98@realtek.com>
+In-Reply-To: <eaf05cf1486c418790a1b54cbcda3a98@realtek.com>
+From: Doug Anderson <dianders@chromium.org>
+Date: Fri, 20 Oct 2023 08:42:07 -0700
+X-Gmail-Original-Message-ID: <CAD=FV=XZQ0XXY7XpX2_ubOwGsi0Hw5otHyuJS2=9QzDJsaSGWg@mail.gmail.com>
+Message-ID: <CAD=FV=XZQ0XXY7XpX2_ubOwGsi0Hw5otHyuJS2=9QzDJsaSGWg@mail.gmail.com>
+Subject: Re: [PATCH v4 5/5] r8152: Block future register access if register
+ access fails
+To: Hayes Wang <hayeswang@realtek.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Grant Grundler <grundler@chromium.org>, Edward Hill <ecgh@chromium.org>, 
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>, Simon Horman <horms@kernel.org>, 
+	Laura Nao <laura.nao@collabora.com>, Alan Stern <stern@rowland.harvard.edu>, 
+	=?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 20, 2023 at 02:58:31PM +0300, Konstantin Meskhidze (A) wrote:
-> 
-> 
-> 10/20/2023 12:49 PM, Mickaël Salaün пишет:
-> > On Fri, Oct 20, 2023 at 07:08:33AM +0300, Konstantin Meskhidze (A) wrote:
-> > > 
-> > > 
-> > > 10/18/2023 3:29 PM, Mickaël Salaün пишет:
-> > > > On Mon, Oct 16, 2023 at 09:50:26AM +0800, Konstantin Meskhidze wrote:
+Hi,
 
-> > > > > diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
-> > > > > index 4c209acee01e..1fe4298ff4a7 100644
-> > > > > --- a/security/landlock/ruleset.c
-> > > > > +++ b/security/landlock/ruleset.c
-> > > > > @@ -36,6 +36,11 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
-> > > > >  	refcount_set(&new_ruleset->usage, 1);
-> > > > >  	mutex_init(&new_ruleset->lock);
-> > > > >  	new_ruleset->root_inode = RB_ROOT;
-> > > > > +
-> > > > > +#if IS_ENABLED(CONFIG_INET)
-> > > > > +	new_ruleset->root_net_port = RB_ROOT;
-> > > > > +#endif /* IS_ENABLED(CONFIG_INET) */
-> > > > > +
-> > > > >  	new_ruleset->num_layers = num_layers;
-> > > > >  	/*
-> > > > >  	 * hierarchy = NULL
-> > > > > @@ -46,16 +51,21 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
-> > > > >  }
-> > > > > > >  struct landlock_ruleset *
-> > > > > -landlock_create_ruleset(const access_mask_t fs_access_mask)
-> > > > > +landlock_create_ruleset(const access_mask_t fs_access_mask,
-> > > > > +			const access_mask_t net_access_mask)
-> > > > >  {
-> > > > >  	struct landlock_ruleset *new_ruleset;
-> > > > > > >  	/* Informs about useless ruleset. */
-> > > > > -	if (!fs_access_mask)
-> > > > > +	if (!fs_access_mask && !net_access_mask)
-> > > > >  		return ERR_PTR(-ENOMSG);
-> > > > >  	new_ruleset = create_ruleset(1);
-> > > > > -	if (!IS_ERR(new_ruleset))
-> > > > > +	if (IS_ERR(new_ruleset))
-> > > > > +		return new_ruleset;
-> > > > > +	if (fs_access_mask)
-> > > > >  		landlock_add_fs_access_mask(new_ruleset, fs_access_mask, 0);
-> > > > > +	if (net_access_mask)
-> > > > > +		landlock_add_net_access_mask(new_ruleset, net_access_mask, 0);
-> > > > > This is good, but it is not tested: we need to add a test that
-> > > both
-> > > > handle FS and net restrictions. You can add one in net.c, just handling
-> > > > LANDLOCK_ACCESS_FS_READ_DIR and LANDLOCK_ACCESS_NET_BIND_TCP, add one
-> > > > rule with path_beneath (e.g. /dev) and another with net_port, and check
-> > > > that open("/") is denied, open("/dev") is allowed, and and only the
-> > > > allowed port is allowed with bind(). This test should be simple and can
-> > > > only check against an IPv4 socket, i.e. using ipv4_tcp fixture, just
-> > > > after port_endianness. fcntl.h should then be included by net.c
-> > > 
-> > >   Ok.
-> > > > > I guess that was the purpose of layout1.with_net (in fs_test.c)
-> > > but it
-> > > 
-> > >   Yep. I added this kind of nest in fs_test.c to test both fs and network
-> > > rules together.
-> > > > is not complete. You can revamp this test and move it to net.c
-> > > > following the above suggestions, keeping it consistent with other tests
-> > > > in net.c . You don't need the test_open() nor create_ruleset() helpers.
-> > > > > This test must failed if we change
-> > > "ruleset->access_masks[layer_level] |="
-> > > > to "ruleset->access_masks[layer_level] =" in
-> > > > landlock_add_fs_access_mask() or landlock_add_net_access_mask().
-> > > 
-> > >   Do you want to change it? Why?
-> > 
-> > The kernel code is correct and must not be changed. However, if by
-> > mistake we change it and remove the OR, a test should catch that. We
-> > need a test to assert this assumption.
-> > 
->   OK. I will add additional assert simulating
-> "ruleset->access_masks[layer_level] =" kernel code.
-> > >   Fs and network masks are ORed to not intersect with each other.
-> > 
-> > Yes, they are ORed, and we need a test to check that. Noting is
-> > currently testing this OR (and the different rule type consistency).
-> > I'm suggesting to revamp the layout1.with_net test into
-> > ipv4_tcp.with_fs and make it check ruleset->access_masks[] and rule
-> > addition of different types.
-> 
->   I will move layout1.with_net test into net.c and rename it. Looks like
->   it just needed to add "ruleset->access_masks[layer_level] =" assert
->   because the test already has rule addition with different types.
+On Fri, Oct 20, 2023 at 4:31=E2=80=AFAM Hayes Wang <hayeswang@realtek.com> =
+wrote:
+>
+> Douglas Anderson <dianders@chromium.org>
+> > Sent: Friday, October 20, 2023 5:20 AM
+> [...]
+> >  static int generic_ocp_read(struct r8152 *tp, u16 index, u16 size,
+> > @@ -8265,6 +8353,17 @@ static int rtl8152_pre_reset(struct usb_interfac=
+e *intf)
+> >         if (!tp)
+> >                 return 0;
+> >
+> > +       /* We can only use the optimized reset if we made it to the end=
+ of
+> > +        * probe without any register access fails, which sets
+> > +        * `PROBED_WITH_NO_ERRORS` to true. If we didn't have that then=
+ return
+> > +        * an error here which tells the USB framework to fully unbind/=
+rebind
+> > +        * our driver.
+> > +        */
+> > +       if (!test_bit(PROBED_WITH_NO_ERRORS, &tp->flags)) {
+> > +               mutex_unlock(&tp->control);
+>
+> I think you forget to remove mutex_unlock here.
 
-The with_net test doesn't have FS rules, which is the main missing part.
-You'll need to rely on the net.c helpers, use the hardcoded paths, and
-only handle one access right of each type as I suggested above.
+Ugh, thanks for catching. I tested it with a bootup or two but I
+didn't re-run all tests or spend lots of time looking through the logs
+so I missed this. I'll run a few more cycles this time.
 
-> 
->   Do you have any more review updates so far?
 
-That's all for this patch series. :)
+> > +               return -EIO;
+> > +       }
+> > +
+> >         netdev =3D tp->netdev;
+> >         if (!netif_running(netdev))
+> >                 return 0;
+> > @@ -8277,7 +8376,9 @@ static int rtl8152_pre_reset(struct usb_interface=
+ *intf)
+> >         napi_disable(&tp->napi);
+> >         if (netif_carrier_ok(netdev)) {
+> >                 mutex_lock(&tp->control);
+> > +               set_bit(IN_PRE_RESET, &tp->flags);
+> >                 tp->rtl_ops.disable(tp);
+> > +               clear_bit(IN_PRE_RESET, &tp->flags);
+> >                 mutex_unlock(&tp->control);
+> >         }
+> >
+> > @@ -8293,6 +8394,8 @@ static int rtl8152_post_reset(struct usb_interfac=
+e *intf)
+> >         if (!tp)
+> >                 return 0;
+> >
+> > +       rtl_set_accessible(tp);
+> > +
+>
+> Excuse me. I have a new idea. You could check if it is possible.
+> If you remove test_bit(PROBED_WITH_NO_ERRORS, &tp->flags) in pre_reset(),
+> the driver wouldn't be unbound and rebound. Instead, you test PROBED_WITH=
+_NO_ERRORS
+> here to re-initialize the device. Then, you could limit the times of USB =
+reset, and
+> the infinite loop wouldn't occur. The code would be like the following,
+>
+>         if (!test_bit(PROBED_WITH_NO_ERRORS, &tp->flags)) {
+>                 /* re-init */
+>                 mutex_lock(&tp->control);
+>                 tp->rtl_ops.init(tp);
+>                 mutex_unlock(&tp->control);
+>                 rtl_hw_phy_work_func_t(&tp->hw_phy_work.work);
+>
+>                 /* re-open(). Maybe move after checking netif_running(net=
+dev) */
+>                 mutex_lock(&tp->control);
+>                 tp->rtl_ops.up(tp);
+>                 mutex_unlock(&tp->control);
+>
+>                 /* check if there is any control error */
+>                 if (test_bit(RTL8152_INACCESSIBLE, &tp->flags) {
+>                         if (tp->reg_access_reset_count < REGISTER_ACCESS_=
+MAX_RESETS) {
+>                                 /* queue reset again ? */
+>                         } else {
+>                                 ...
+>                         }
+>                         /* return 0 ? */
+>                 } else {
+>                         set_bit(PROBED_WITH_NO_ERRORS, &tp->flags)
+>                 }
+>         }
+
+The above solution worries me.
+
+I guess one part of this is that it replicates some logic that's in
+probe(). That's not necessarily awful, but we'd at least want to
+reorganize things so that they could share code if possible, though
+maybe that's hard to do with the extra grabs of the mutex?
+
+The other part that worries me is that in the core when we added the
+network device that something in the core might have cached bogus data
+about our network device. This doesn't seem wonderful to me.
+
+I guess yet another part is that your proposed solution there has a
+whole bunch of question marks on it. If it's not necessarily obvious
+what we should do in this case then it doesn't feel like a robust
+solution.
+
+It seems like your main concern here is with the potential for an
+infinite number of resets. I have sent up a small patch to the USB
+core [1] addressing this concern. Let's see what folks say about that
+patch. If it is accepted then it seems like we could just not worry
+about it. If it's not accepted then perhaps feedback on that patch
+will give us additional guidance.
+
+In the meantime I'll at least post v5 since I don't want to leave the
+patch up there with the mismatched mutex. I'll have my v5 point at my
+USB core patch.
+
+[1] https://lore.kernel.org/r/20231020083125.1.I3e5f7abcbf6f08d392e31a5826b=
+7f234df662276@changeid
+
+-Doug
 
