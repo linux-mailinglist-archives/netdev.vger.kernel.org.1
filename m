@@ -1,180 +1,121 @@
-Return-Path: <netdev+bounces-42909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A81BB7D0974
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 09:24:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86DBE7D0977
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 09:24:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B51CB21512
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 07:24:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F90DB2138B
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 07:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA8EDD51E;
-	Fri, 20 Oct 2023 07:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B603D2E9;
+	Fri, 20 Oct 2023 07:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TX75/Qy5"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="N51RZM0w"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30E2D2F9
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 07:23:53 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A64561735
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 00:23:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697786630;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9ps48hhG6wzB4Y+L3PoxO3ps+/OQgTevPQsiK41ym/g=;
-	b=TX75/Qy51C9q15LQPdZc5GIFR3rj6VVFvcwLfLYKwALGFdZj+aValLlF7Lv5twCrJFkrbs
-	1SgjkAgJIBllJayFF60xkAlgoal9ZdGeZ0OJVABQk0K6kZ7kQUSIsDxiM/K6tAX8TRurfe
-	Z4+F7892GBNz1TasFMpEUrrqdxWbZDs=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-530-cTSkX-F7NSiZOUaNBInlKw-1; Fri, 20 Oct 2023 03:23:48 -0400
-X-MC-Unique: cTSkX-F7NSiZOUaNBInlKw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9b98d8f6bafso36858066b.1
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 00:23:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77893DDA2
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 07:24:23 +0000 (UTC)
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D3E1D69
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 00:24:21 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-5079eed8bfbso650322e87.1
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 00:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1697786659; x=1698391459; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9NKu6mUsoqfAL1uZvXUdGi9EKeYA/QVff2QYGWkp0uA=;
+        b=N51RZM0wD5s6xge0oqtN3qu3moS0dZ58bdVWx5qeRmsXU075rdH11w4t1W8+iXgBFc
+         sU0i9KCXIOuYIWelCc7JGi42KTmuc4HVhKIg8EMC41P05T2Fw2F1KebBZEpvCe2Ablp9
+         g7seHF01PtMYQLxIg+8/qWt45WV7iro4TzdlyizRsPGs1qwZ0kKr4gcCSkF5JDfDDeCy
+         DI2NKSq9eCq2ioCz/2qyQygyI5HS5WW5M6X8JibZjDYuAJFsbPUUmHDk8wVDdFgV/nN3
+         tRNYTLp6Igee5SBCv+tdpYDoy/aCfOJiMK1mvt5zs79c9uvO7u11SUZPYm8QddlLaOkz
+         JbkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697786627; x=1698391427;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1697786659; x=1698391459;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9ps48hhG6wzB4Y+L3PoxO3ps+/OQgTevPQsiK41ym/g=;
-        b=g3WychO/nzpMddMtsHFDC7Vwz3LeZLtXGlwi5pDiT3Ymb66I6ET05ayEUdoSTFV4B6
-         VKOikAjl/wq1qANYjJQu3PpHEyg9wgpFBN1UJfmzXmFlfK82mD81UhXudEOowoCieRdJ
-         5vrpv9iWTvRzvAZZ8YipnWhUEZTheHIcETYKxuw6ww4pAXPQjFphO7yun9sbBGavqxyn
-         bbYwgyD+1iZzK05iUNJYsFQV5IL0wQLbPVvpOM4/XxjwqNvuh5GATldizRpvf0kF3oLL
-         rm6LigEq8VrYaG3PgEuz4v1yV0ShR9xQBeQyeBX+koQZBB+exoL8pzQtF7xjy6XYr3fC
-         Xdzg==
-X-Gm-Message-State: AOJu0Yz1xZ0I8tRy4b+Hi8RhOAun8NsElZ4MUwQmf92cDx+jIPKu/tuU
-	KpAzP6jKZ/eA8as53a7JXTRCvfAheVxhikMCpRxNguYQ6u1P/QXLyUvHf00am14Q6DlPEC0Zy1q
-	jzhCtggiFCLczJyWH
-X-Received: by 2002:a17:907:d9f:b0:9bd:d1e8:57f1 with SMTP id go31-20020a1709070d9f00b009bdd1e857f1mr730069ejc.50.1697786627590;
-        Fri, 20 Oct 2023 00:23:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEsH0nFxuej6eEPp+AcxKRS1ZQmvLl9sf1mVsowX0cImCTldmzH0B405XVBoNVXTKEyFrRrXA==
-X-Received: by 2002:a17:907:d9f:b0:9bd:d1e8:57f1 with SMTP id go31-20020a1709070d9f00b009bdd1e857f1mr730049ejc.50.1697786627165;
-        Fri, 20 Oct 2023 00:23:47 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-185-56.business.telecomitalia.it. [87.12.185.56])
-        by smtp.gmail.com with ESMTPSA id e27-20020a170906749b00b0097404f4a124sm935380ejl.2.2023.10.20.00.23.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 00:23:46 -0700 (PDT)
-Date: Fri, 20 Oct 2023 09:23:31 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Alexandru Matei <alexandru.matei@uipath.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Mihai Petrisor <mihai.petrisor@uipath.com>, Viorel Canja <viorel.canja@uipath.com>
-Subject: Re: [PATCH] vsock: initialize the_virtio_vsock before using VQs
-Message-ID: <uidej33c7o5gudvdvq2ggultubangijsuwyl53cmhd2jqrdxbg@2plf2qy4vyqy>
-References: <20231018183247.1827-1-alexandru.matei@uipath.com>
- <a5lw3t5uaqoeeu5j3ertyoprgsyxxrsfqawyuqxjkkbsuxjywh@vh7povjz2s2c>
- <f0112021-c664-41ad-981c-08311286bb43@uipath.com>
+        bh=9NKu6mUsoqfAL1uZvXUdGi9EKeYA/QVff2QYGWkp0uA=;
+        b=DvPHCzbOXbI6mhH6r3lYuZTM8buG21s6PFOB21EtR+Cqu5LuiGC7pax7Iv/gtLvfbx
+         RO0EjDkT5DU3pInrVJnKtzdkcXZvLwrFudFdFnCm8J1cMRoiQc4iwTSdd8Xy61OrLo9N
+         xVN/5Z4ATdu+5thhLYB5Fq4doHJ9f/kzXhtqJ9OenqBuMCnHfyv9OCa3GE6itQDRXL48
+         PEdEcKvkwhK9f6LmmeN55GKeE8snVdyQquuwQGVnEPdo/N6Fec8D5tidrh7SxbLjJJeK
+         ckKv29oCyOBxjXhbtDPvTJgtow0SW8KpxhciCRh2rqBe8NqP0itBoI3WDc6a3FqYinPF
+         3c0Q==
+X-Gm-Message-State: AOJu0YzV6aGfqTaNcPDCFuBOc1ZCnm4YiweuN8f6eiz4zknSrTIUsEWT
+	nvYpqknxqP6UKZ+jC96aAHP0xN3zJwN3bQ00Zp9jcg==
+X-Google-Smtp-Source: AGHT+IGvXcrwf5f5ZS8UTYdNYCBoBkQPavOrnnAtBUhiTMxEU6Cjs4uotlglmT1kg42yOtmGGHtRig==
+X-Received: by 2002:ac2:52b0:0:b0:500:bd6f:a320 with SMTP id r16-20020ac252b0000000b00500bd6fa320mr570281lfm.42.1697786659332;
+        Fri, 20 Oct 2023 00:24:19 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:4cb:3d1b:4444:11a6? ([2a01:e0a:b41:c160:4cb:3d1b:4444:11a6])
+        by smtp.gmail.com with ESMTPSA id c8-20020a05600c0a4800b0040775fd5bf9sm1508944wmq.0.2023.10.20.00.24.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Oct 2023 00:24:18 -0700 (PDT)
+Message-ID: <ce718606-df08-4249-b29d-6ec30a4c4648@6wind.com>
+Date: Fri, 20 Oct 2023 09:24:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <f0112021-c664-41ad-981c-08311286bb43@uipath.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next 0/3] netlink: add variable-length / auto integers
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com
+References: <20231018213921.2694459-1-kuba@kernel.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <20231018213921.2694459-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 20, 2023 at 12:12:04AM +0300, Alexandru Matei wrote:
->On 10/19/2023 11:54 AM, Stefano Garzarella wrote:
->> On Wed, Oct 18, 2023 at 09:32:47PM +0300, Alexandru Matei wrote:
->>> Once VQs are filled with empty buffers and we kick the host, it can send
->>> connection requests. If 'the_virtio_vsock' is not initialized before,
->>> replies are silently dropped and do not reach the host.
->>
->> Are replies really dropped or we just miss the notification?
->>
->> Could the reverse now happen, i.e., the guest wants to send a connection request, finds the pointer assigned but can't use virtqueues because they haven't been initialized yet?
->>
->> Perhaps to avoid your problem, we could just queue vsock->rx_work at the bottom of the probe to see if anything was queued in the meantime.
->>
->> Nit: please use "vsock/virtio" to point out that this problem is of the virtio transport.
->>
->> Thanks,
->> Stefano
->
->The replies are dropped , the scenario goes like this:
->
->  Once rx_run is set to true and rx queue is filled with empty buffers, the host sends a connection request.
+Le 18/10/2023 à 23:39, Jakub Kicinski a écrit :
+> Add netlink support for "common" / variable-length / auto integers
+> which are carried at the message level as either 4B or 8B depending
+> on the exact value. This saves space and will hopefully decrease
+> the number of instances where we realize that we needed more bits
+> after uAPI is set is stone. It also loosens the alignment requirements,
+> avoiding the need for padding.
+> 
+> This mini-series is a fuller version of the previous RFC:
+> https://lore.kernel.org/netdev/20121204.130914.1457976839967676240.davem@davemloft.net/
+Probably https://lore.kernel.org/all/20231011003313.105315-1-kuba@kernel.org/ ;-)
 
-Oh, I see now, I thought virtio_transport_rx_work() returned early if 
-'the_virtio_vsock' was not set.
+Nicolas
 
->  The request is processed in virtio_transport_recv_pkt(), and since there is no bound socket, it calls virtio_transport_reset_no_sock() which tries to send a reset packet.
->  In virtio_transport_send_pkt() it checks 'the_virtio_vsock' and because it is null it exits with -ENODEV, basically dropping the packet.
->
->I looked on your scenario and there is an issue from the moment we set the_virtio_vsock (in this patch) up until vsock->tx_run is set to TRUE.
->virtio_transport_send_pkt() will queue the packet, but virtio_transport_send_pkt_work() will exit because tx_run is FALSE. This could be fixed by moving rcu_assign_pointer() after tx_run is set to TRUE.
->virtio_transport_cancel_pkt() uses the rx virtqueue once the_virtio_vsock is set, so rcu_assign_pointer() should be moved after virtio_find_vqs() is called.
->
->I think the way to go is to split virtio_vsock_vqs_init() in two: 
->virtio_vsock_vqs_init() and virtio_vsock_vqs_fill(), as Vadim 
->suggested. This should fix all the cases:
-
-Yep, LGTM!
-
-Thank you both for the fix, please send a v2 with this approach!
-
-Stefano
-
->
->---
-> net/vmw_vsock/virtio_transport.c | 9 +++++++--
-> 1 file changed, 7 insertions(+), 2 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index ad64f403536a..1f95f98ddd3f 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -594,6 +594,11 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
-> 	vsock->tx_run = true;
-> 	mutex_unlock(&vsock->tx_lock);
->
->+	return 0;
->+}
->+
->+static void virtio_vsock_vqs_fill(struct virtio_vsock *vsock)
->+{
-> 	mutex_lock(&vsock->rx_lock);
-> 	virtio_vsock_rx_fill(vsock);
-> 	vsock->rx_run = true;
->@@ -603,8 +608,6 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
-> 	virtio_vsock_event_fill(vsock);
-> 	vsock->event_run = true;
-> 	mutex_unlock(&vsock->event_lock);
->-
->-	return 0;
-> }
->
-> static void virtio_vsock_vqs_del(struct virtio_vsock *vsock)
->@@ -707,6 +710,7 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
-> 		goto out;
->
-> 	rcu_assign_pointer(the_virtio_vsock, vsock);
->+	virtio_vsock_vqs_fill(vsock);
->
-> 	mutex_unlock(&the_virtio_vsock_mutex);
->
->@@ -779,6 +783,7 @@ static int virtio_vsock_restore(struct virtio_device *vdev)
-> 		goto out;
->
-> 	rcu_assign_pointer(the_virtio_vsock, vsock);
->+	virtio_vsock_vqs_fill(vsock);
->
-> out:
-> 	mutex_unlock(&the_virtio_vsock_mutex);
->-- 
->
-
+> No user included here. I have tested (and will use) it
+> in the upcoming page pool API but the assumption is that
+> it will be widely applicable. So sending without a user.
+> 
+> Jakub Kicinski (3):
+>   tools: ynl-gen: make the mnl_type() method public
+>   netlink: add variable-length / auto integers
+>   netlink: specs: add support for auto-sized scalars
+> 
+>  Documentation/netlink/genetlink-c.yaml        |  3 +-
+>  Documentation/netlink/genetlink-legacy.yaml   |  3 +-
+>  Documentation/netlink/genetlink.yaml          |  3 +-
+>  Documentation/userspace-api/netlink/specs.rst | 18 ++++-
+>  include/net/netlink.h                         | 69 ++++++++++++++++++-
+>  include/uapi/linux/netlink.h                  |  5 ++
+>  lib/nlattr.c                                  | 22 ++++++
+>  net/netlink/policy.c                          | 14 +++-
+>  tools/net/ynl/lib/nlspec.py                   |  6 ++
+>  tools/net/ynl/lib/ynl.c                       |  6 ++
+>  tools/net/ynl/lib/ynl.h                       | 17 +++++
+>  tools/net/ynl/lib/ynl.py                      | 14 ++++
+>  tools/net/ynl/ynl-gen-c.py                    | 44 ++++++------
+>  13 files changed, 192 insertions(+), 32 deletions(-)
+> 
 
