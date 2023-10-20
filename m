@@ -1,88 +1,112 @@
-Return-Path: <netdev+bounces-42967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D22857D0D7C
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:39:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 376347D0D82
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:40:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EB751C20F5E
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:39:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E67D52824C6
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8BF14261;
-	Fri, 20 Oct 2023 10:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72883DDAB;
+	Fri, 20 Oct 2023 10:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Ap8T4AUQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E9dVDyGm"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02AE17982
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:39:15 +0000 (UTC)
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7EDCD5D
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:39:13 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-53d9f001b35so868341a12.2
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:39:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697798352; x=1698403152; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hlt3dKdZAJnwjJTDglxbdWFabRE707sklJcoLLFAhQ4=;
-        b=Ap8T4AUQyMZuKAE+Uf3n8ZMNTTAJ6LNTMAswR/c7cpJ1Q8Txk4DNdR492JW+28fw1W
-         +bvfTz1uvQI9CBi4f61T97xbjmeoKqCY0Y0ua/+Lqau+I6ts9oNWYlGQi14/7D0zB0J8
-         vEQDjIKtjDpFOHpmcqSxIRRJ2dtlLv9ITVJcEKLoW53oId9jWAfTx7/5QI7kxWpnwvdC
-         OMB5SqNRLfyXg4V8ktfpNyaot+6+aGKfLa/Q55Jqb3FryqDzfGizF7Y6r0+IRuZPpeG7
-         Pp02ahgnce1yhLws7t06Q8S0xvkWPNrwjSu3sDzbYMhvg/UJK9VS+BTzHSPt7gMGiCBN
-         iLpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697798352; x=1698403152;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hlt3dKdZAJnwjJTDglxbdWFabRE707sklJcoLLFAhQ4=;
-        b=kObQf+fqXv9gf4doFNYREWKnyWftmS4fF4FwDRwGP1fdrZMiB+k9sqV0CL6VzMQmkq
-         AVRx0lsxP21IM9CAA9Zkvi0+Mt9yGUUtA7p1G/sdFL873J8Uodapjgx0VM9INceQxhpe
-         andZRZwqXFGzS81P+Sahpfyyo60pkgszU1f2BBNp1cVdGDCFyd/z1RcWglh6h7aaL1HG
-         x0EFcG4NuiWbExz67srj76dCe9EIfgOt+oudA2AU1cEu82BkCmtJoSKypbY05jhgciHM
-         psZkIcthuipPye3byKA+pqpCgBLjA/JiFIr3cnOAXCzZYxOo1C6xSuk28/kth2hyWBAY
-         KelA==
-X-Gm-Message-State: AOJu0YwVSERzEzgfYW0LawlPQeyd4SC8i6b/dgYfZekAIXwsFdZQtdBW
-	Ci+TITNjpri1+Xh+7cOb0YY/59FR4vDeBk++qOM=
-X-Google-Smtp-Source: AGHT+IHcEjj8FPIKIcnZ7gOZj19v/pBTRrbIQfw/oHSYIgq40O8QEjHVLtMrTuSsVgxipE99Xq8Y0w==
-X-Received: by 2002:a17:906:7311:b0:9bd:9507:ed1c with SMTP id di17-20020a170906731100b009bd9507ed1cmr1110575ejc.18.1697798351840;
-        Fri, 20 Oct 2023 03:39:11 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id j14-20020a1709064b4e00b0099bd1a78ef5sm1223644ejv.74.2023.10.20.03.39.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 03:39:11 -0700 (PDT)
-Date: Fri, 20 Oct 2023 12:39:09 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, johannes.berg@intel.com, mpe@ellerman.id.au,
-	j@w1.fi
-Subject: Re: [PATCH net-next 5/6] net: remove dev_valid_name() check from
- __dev_alloc_name()
-Message-ID: <ZTJYzc0O69b1zN90@nanopsycho>
-References: <20231020011856.3244410-1-kuba@kernel.org>
- <20231020011856.3244410-6-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539F118E11
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:40:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C8303C433C7;
+	Fri, 20 Oct 2023 10:40:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697798424;
+	bh=UrcYS+ZaQOX5RRsIuEqjxnymUeTFytovx7cOTsprRGc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=E9dVDyGmZX2O/ToVdDsq4NTe/B13WwzisCBsle7UyOFV8IHEsXlYUX5Xq8EJ8dWic
+	 O82T4R8To+T8BW9G6lLdrd5NLnRiYvWlPFgoboYlef708V7asiSNwXQVfM9vsy2IYw
+	 6CRrT5b/AFeTd8AadQoEZakclmG4eoSxgxB7L45pKhhmQIdSIZkH0ufAYy33dQz/la
+	 bHzpe4rjB6yac/P/lrtVjW9nnoiw1zcCPMnP5PAbOAzAU7BEcd0+JrwX7ZwaBXz3Ge
+	 RlNBgvH+YBoeTWOAQVd1bedl4+SsArXxWZjxBZnqteBxsqZQhdQ7sjIepZbxZfvurH
+	 OSlvY2HSR3vcA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9F6B3C73FE2;
+	Fri, 20 Oct 2023 10:40:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231020011856.3244410-6-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 00/11] devlink: retain error in struct
+ devlink_fmsg
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169779842464.30774.4987417905807311634.git-patchwork-notify@kernel.org>
+Date: Fri, 20 Oct 2023 10:40:24 +0000
+References: <20231018202647.44769-1-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20231018202647.44769-1-przemyslaw.kitszel@intel.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: jiri@resnulli.us, netdev@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shannon.nelson@amd.com, michael.chan@broadcom.com, cai.huoqing@linux.dev,
+ george.cherian@marvell.com, danieller@nvidia.com, moshe@nvidia.com,
+ saeedm@nvidia.com, aelior@marvell.com, manishc@marvell.com,
+ irusskikh@marvell.com, coiby.xu@gmail.com, horms@kernel.org,
+ brett.creeley@amd.com, sgoutham@marvell.com, lcherian@marvell.com,
+ gakula@marvell.com, jerinj@marvell.com, hkelam@marvell.com,
+ sbhatta@marvell.com, idosch@nvidia.com, petrm@nvidia.com, eranbe@nvidia.com,
+ ayal@mellanox.com, leon@kernel.org, linux-kernel@vger.kernel.org,
+ bpoirier@suse.com
 
-Fri, Oct 20, 2023 at 03:18:55AM CEST, kuba@kernel.org wrote:
->__dev_alloc_name() is only called by dev_prep_valid_name(),
->which already checks that name is valid.
->
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Hello:
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed, 18 Oct 2023 22:26:36 +0200 you wrote:
+> Extend devlink fmsg to retain error (patch 1),
+> so drivers could omit error checks after devlink_fmsg_*() (patches 2-10),
+> and finally enforce future uses to follow this practice by change to
+> return void (patch 11)
+> 
+> Note that it was compile tested only.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3,01/11] devlink: retain error in struct devlink_fmsg
+    (no matching commit)
+  - [net-next,v3,02/11] netdevsim: devlink health: use retained error fmsg API
+    (no matching commit)
+  - [net-next,v3,03/11] pds_core: devlink health: use retained error fmsg API
+    https://git.kernel.org/netdev/net-next/c/47957bb3f783
+  - [net-next,v3,04/11] bnxt_en: devlink health: use retained error fmsg API
+    (no matching commit)
+  - [net-next,v3,05/11] hinic: devlink health: use retained error fmsg API
+    (no matching commit)
+  - [net-next,v3,06/11] octeontx2-af: devlink health: use retained error fmsg API
+    https://git.kernel.org/netdev/net-next/c/d8cf03fca341
+  - [net-next,v3,07/11] mlxsw: core: devlink health: use retained error fmsg API
+    https://git.kernel.org/netdev/net-next/c/1d434b48495d
+  - [net-next,v3,08/11] net/mlx5: devlink health: use retained error fmsg API
+    (no matching commit)
+  - [net-next,v3,09/11] qed: devlink health: use retained error fmsg API
+    https://git.kernel.org/netdev/net-next/c/18256cb2d4a0
+  - [net-next,v3,10/11] staging: qlge: devlink health: use retained error fmsg API
+    https://git.kernel.org/netdev/net-next/c/3465915e9985
+  - [net-next,v3,11/11] devlink: convert most of devlink_fmsg_*() to return void
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
