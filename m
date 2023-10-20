@@ -1,68 +1,171 @@
-Return-Path: <netdev+bounces-43147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F287D1936
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 00:35:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB0877D193F
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 00:38:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68813282712
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 22:35:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A4FFB21574
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 22:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0636B225DF;
-	Fri, 20 Oct 2023 22:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C75522328;
+	Fri, 20 Oct 2023 22:38:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qQYq4SID"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Ot/144jq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56DC39925
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 22:35:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72018C433C7;
-	Fri, 20 Oct 2023 22:35:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697841315;
-	bh=645CvLhogLuWXyyZifMO8kxY7yxiYjy3ZA3sngJkXIo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qQYq4SIDZbbWAGhpeEAwx/MyZjmh4oFZv9QnQg3vebw10yIk246XGtbp1BRfGbcqB
-	 amRvfnunCIsZhsNfaPGV+AJOfHNPjVXp/89XFORuSuDZjSkTxB54ZyC4YkHGMSxxIY
-	 uafk6vXShwx4Jgx8lNcuv1rLTbvi7XDZdomKXfaEbtJ41+9PPiYOEoHkDUOarsBuIg
-	 Oznf+O+P/gKt6xOoGqkO40xXZeLHx1Vlthn5EWsm15U7bLOgyNl3EFMrnMxOIBB5Rs
-	 mYNaUYGIjmI2cM0wKWJ1CD1s+gic3iwWfDIDiWenRHqebUjFr7JF7ikhHKIvX7SoLk
-	 Ai8/xm1DJyatg==
-Date: Fri, 20 Oct 2023 15:35:14 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com
-Subject: Re: [PATCH net-next 0/3] netlink: add variable-length / auto
- integers
-Message-ID: <20231020153514.4e65269f@kernel.org>
-In-Reply-To: <20231018213921.2694459-1-kuba@kernel.org>
-References: <20231018213921.2694459-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BE735505;
+	Fri, 20 Oct 2023 22:38:38 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E4B791;
+	Fri, 20 Oct 2023 15:38:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=kPveCGwDQzw44KmBN2s9cemxnEV3T4s1jd00sY+o42s=; b=Ot/144jqhOJN6lYzObeZBWQQQK
+	KMAppdfBgjam/SzvvzJvCxkAQc7W5p89PBjFU4uEik5SYKQIeXbMDOcSAQxqLEURFdLzJaVfeFd0p
+	NdWFMULtXPrxDQvfsTFU5G5HB03o/qtFPSCbZHbR1ZA3XKl1D1bmiHlrlDgPuTqdpHQM7TumOlV7e
+	AKp8xTbEcacx2yiihNZx5yr3w5PPWJYlLthnPonZFmg2qH77Si8AN0o7wdWotkyVgleDRMTFNes0N
+	r7CS2pf6DmhXn4TywNvs0lBgnMFwJfbRYh0wID9QKSfkLofwZE9pyqydjTqRFQKbNzfZD+nZpHyAD
+	wjD8Duwg==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qty8V-000Jy7-Ka; Sat, 21 Oct 2023 00:38:31 +0200
+Received: from [178.197.249.50] (helo=linux.home)
+	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qty8V-000ICz-6o; Sat, 21 Oct 2023 00:38:31 +0200
+Subject: Re: [PATCH bpf-next v2 1/7] netkit, bpf: Add bpf programmable net
+ device
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@linux.dev,
+ razor@blackwall.org, ast@kernel.org, andrii@kernel.org,
+ john.fastabend@gmail.com, sdf@google.com, toke@kernel.org
+References: <20231019204919.4203-1-daniel@iogearbox.net>
+ <20231019204919.4203-2-daniel@iogearbox.net>
+ <33467f55-4bbf-4078-af21-d91c6aab82ee@lunn.ch>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <f57df221-0790-3a93-c7e2-d85136fb07c8@iogearbox.net>
+Date: Sat, 21 Oct 2023 00:38:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <33467f55-4bbf-4078-af21-d91c6aab82ee@lunn.ch>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27067/Fri Oct 20 09:48:05 2023)
 
-On Wed, 18 Oct 2023 14:39:18 -0700 Jakub Kicinski wrote:
-> Add netlink support for "common" / variable-length / auto integers
-> which are carried at the message level as either 4B or 8B depending
-> on the exact value. This saves space and will hopefully decrease
-> the number of instances where we realize that we needed more bits
-> after uAPI is set is stone. It also loosens the alignment requirements,
-> avoiding the need for padding.
+On 10/21/23 12:18 AM, Andrew Lunn wrote:
+>> +static void netkit_get_drvinfo(struct net_device *dev,
+>> +			       struct ethtool_drvinfo *info)
+>> +{
+>> +	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+>> +	strscpy(info->version, "n/a", sizeof(info->version));
 > 
-> This mini-series is a fuller version of the previous RFC:
-> https://lore.kernel.org/netdev/20121204.130914.1457976839967676240.davem@davemloft.net/
-> No user included here. I have tested (and will use) it
-> in the upcoming page pool API but the assumption is that
-> it will be widely applicable. So sending without a user.
+> If you don't put anything in version, the core will put in the git
+> hash of the kernel. Its more useful than "n/a".
 
-For the record looks like DaveM merged this last night.
+Thanks, I wasn't aware of this! Agree that this is better!
+
+>> +	ether_setup(dev);
+>> +	dev->min_mtu = ETH_MIN_MTU;
+> 
+> ether_setup() sets min_mtu to ETH_MIN_MTU.
+
+Will fix.
+
+>> +static int netkit_new_link(struct net *src_net, struct net_device *dev,
+>> +			   struct nlattr *tb[], struct nlattr *data[],
+>> +			   struct netlink_ext_ack *extack)
+>> +{
+> 
+> ...
+> 
+>> +	err = register_netdevice(peer);
+>> +	put_net(net);
+>> +	if (err < 0)
+>> +		goto err_register_peer;
+>> +
+>> +	netif_carrier_off(peer);
+>> +
+>> +	err = rtnl_configure_link(peer, ifmp, 0, NULL);
+>> +	if (err < 0)
+>> +		goto err_configure_peer;
+> 
+> Seeing code after calling register_netdevice() often means bugs. The
+> interface is live, and in use before the function even returns. The
+> kernel can try to get an IP address, mount an NFS root etc. This might
+> be safe, because you have two linked interfaces here, and the other
+> one is not yet registered. Maybe some comment about this would be
+> good, or can the rtnl_configure_link() be done earlier?
+
+I'll check if it's possible to reorder resp. add a comment if not.
+
+>> +
+>> +	if (mode == NETKIT_L2)
+>> +		eth_hw_addr_random(dev);
+>> +	if (tb[IFLA_IFNAME])
+>> +		nla_strscpy(dev->name, tb[IFLA_IFNAME], IFNAMSIZ);
+>> +	else
+>> +		snprintf(dev->name, IFNAMSIZ, "m%%d");
+>> +
+>> +	err = register_netdevice(dev);
+>> +	if (err < 0)
+>> +		goto err_configure_peer;
+> 
+> We have the same here, but now we have both peers registers, the
+> kernel could of configured both up in order to find its NFS root etc.
+> Is it safe to have packets flowing at this point? Before the remaining
+> configuration happens?
+
+They would be dropped in xmit if the peer is linked yet.
+
+>> +	netif_carrier_off(dev);
+>> +
+>> +	nk = netdev_priv(dev);
+>> +	nk->primary = true;
+>> +	nk->policy = default_prim;
+>> +	nk->mode = mode;
+>> +	if (nk->mode == NETKIT_L2)
+>> +		dev_change_flags(dev, dev->flags & ~IFF_NOARP, NULL);
+>> +	bpf_mprog_bundle_init(&nk->bundle);
+>> +	RCU_INIT_POINTER(nk->active, NULL);
+>> +	rcu_assign_pointer(nk->peer, peer);
+>> +
+>> +	nk = netdev_priv(peer);
+>> +	nk->primary = false;
+>> +	nk->policy = default_peer;
+>> +	nk->mode = mode;
+>> +	if (nk->mode == NETKIT_L2)
+>> +		dev_change_flags(peer, peer->flags & ~IFF_NOARP, NULL);
+>> +	bpf_mprog_bundle_init(&nk->bundle);
+>> +	RCU_INIT_POINTER(nk->active, NULL);
+>> +	rcu_assign_pointer(nk->peer, dev);
+>> +	return 0;
+>> +err_configure_peer:
+>> +	unregister_netdevice(peer);
+>> +	return err;
+>> +err_register_peer:
+>> +	free_netdev(peer);
+>> +	return err;
+>> +}
+
+Thanks,
+Daniel
 
