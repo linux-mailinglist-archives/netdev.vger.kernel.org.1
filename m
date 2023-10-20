@@ -1,67 +1,41 @@
-Return-Path: <netdev+bounces-42983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30F847D0F02
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:44:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61D097D0F1D
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B56CC2824A6
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 11:44:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00DC7B21441
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 11:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28149199AF;
-	Fri, 20 Oct 2023 11:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E05A199B6;
+	Fri, 20 Oct 2023 11:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="NiIk52O+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ex002MOg"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DE019471
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:44:33 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24C0A6597;
-	Fri, 20 Oct 2023 04:44:01 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39KAYH8u014089;
-	Fri, 20 Oct 2023 04:43:10 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=lT/SSeJWOwvaoxmw8OJwj/hd5bY2fzUWYDEH7M+KLj0=;
- b=NiIk52O+vx/OnBko+OrSfLD6j39n4DMdZHCrGIZYriHqfOXM75od1gPgUApdOhKCGQxl
- eyYcwWHaM7Rdv4whtfkF9m1eJ103wd2BG/YAa8v0RoDK6ri5bOtnybaaIw64xwdDB8yX
- wNVq6NIldmHE2jq81aZ0PSXkI6ePr5e1WgaIH2GspdiG6OD1vLFzMTkx7tFgIgiyz1ic
- Y7y5db5J4Cvnhzi9Ezn8PGYj1ScdtjRwav41OdsSzgMUo5hH2MTefZTSWMf68DEu3bhy
- vnbVQDMfR4qajC64O8JEvule86FUyO7dXEniHkkfVHU8ZsjH4yanv5Et0XXUt1sok6uG IQ== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3tubwyjar6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 20 Oct 2023 04:43:10 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 20 Oct
- 2023 04:43:07 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 20 Oct 2023 04:43:07 -0700
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 7DF655B692C;
-	Fri, 20 Oct 2023 04:43:07 -0700 (PDT)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>,
-        Shinas Rasheed
-	<srasheed@marvell.com>,
-        Veerasenareddy Burru <vburru@marvell.com>,
-        "Sathesh
- Edara" <sedara@marvell.com>,
-        Eric Dumazet <edumazet@google.com>
-Subject: [PATCH net-next v4] octeon_ep: assert hardware structure sizes
-Date: Fri, 20 Oct 2023 04:43:01 -0700
-Message-ID: <20231020114302.2334660-1-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E22199AF
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:50:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E67D9C433C9;
+	Fri, 20 Oct 2023 11:50:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697802623;
+	bh=RVmO07tzj/SdstlG+yv3cQ+Z3KTGbsEa4x6K3JeX8Tk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Ex002MOg19HBM5FGfap7svZaYUyGagyQPAGgB/z5cj2O1yTVeMWZ/4oeRybYG7QfE
+	 Axu8iQShHGlcJtS0kDe+2vBNWmOJTX6aYVxczAogp+Mwta2X4gOpFi/VNYktTKK2jN
+	 u+AG0VfyXDHiTjppmn1ZO5LAE99E5DjgOmULXd4kqg0Q/chDi3Q1vGl9CQWPWSWh9A
+	 CzJKJLN//TxUKtQaGcaFGNBix4EdJ4jeEKiMh4vwg2SpAZJ4Pxgo/mrWaLsjpGf06z
+	 Am9b8+3Kj2ZJiqg0IAqTOjBDDFeyNaD7pp8ocBEGaSfrE72EY0joYy1sthJknDfLPp
+	 30b71p/q8G9Rg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CA898C595CB;
+	Fri, 20 Oct 2023 11:50:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,96 +43,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: jqrUGGDjF8UxTtIgPJMkC0ciSg5G0a8Y
-X-Proofpoint-GUID: jqrUGGDjF8UxTtIgPJMkC0ciSg5G0a8Y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-20_10,2023-10-19_01,2023-05-22_02
+Subject: Re: [PATCH net-next] ethtool: untangle the linkmode and ethtool headers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169780262282.5050.306569060404791845.git-patchwork-notify@kernel.org>
+Date: Fri, 20 Oct 2023 11:50:22 +0000
+References: <20231019152815.2840783-1-kuba@kernel.org>
+In-Reply-To: <20231019152815.2840783-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew@lunn.ch, paul.greenwalt@intel.com,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, vladimir.oltean@nxp.com,
+ gal@nvidia.com
 
-Clean up structure defines related to hardware data to be
-asserted to fixed sizes, as padding is not allowed
-by hardware.
+Hello:
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V4:
-  - Changed packed attributes to static assertions for fixed sizes
-V3: https://lore.kernel.org/all/20231016092051.2306831-1-srasheed@marvell.com/
-  - Updated changelog to indicate this is a cleanup
-V2: https://lore.kernel.org/all/20231010194026.2284786-1-srasheed@marvell.com/
-  - Updated changelog to provide more information
-V1: https://lore.kernel.org/all/20231006120225.2259533-1-srasheed@marvell.com/
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
- drivers/net/ethernet/marvell/octeon_ep/octep_rx.h | 3 +++
- drivers/net/ethernet/marvell/octeon_ep/octep_tx.h | 4 ++++
- 2 files changed, 7 insertions(+)
+On Thu, 19 Oct 2023 08:28:15 -0700 you wrote:
+> Commit 26c5334d344d ("ethtool: Add forced speed to supported link
+> modes maps") added a dependency between ethtool.h and linkmode.h.
+> The dependency in the opposite direction already exists so the
+> new code was inserted in an awkward place.
+> 
+> The reason for ethtool.h to include linkmode.h, is that
+> ethtool_forced_speed_maps_init() is a static inline helper.
+> That's not really necessary.
+> 
+> [...]
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h
-index 782a24f27f3e..49feae80d7d2 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h
-@@ -20,6 +20,7 @@ struct octep_oq_desc_hw {
- 	dma_addr_t buffer_ptr;
- 	u64 info_ptr;
- };
-+static_assert(sizeof(struct octep_oq_desc_hw) == 16);
- 
- #define OCTEP_OQ_DESC_SIZE    (sizeof(struct octep_oq_desc_hw))
- 
-@@ -39,6 +40,7 @@ struct octep_oq_resp_hw_ext {
- 	/* checksum verified. */
- 	u64 csum_verified:2;
- };
-+static_assert(sizeof(struct octep_oq_resp_hw_ext) == 8);
- 
- #define  OCTEP_OQ_RESP_HW_EXT_SIZE   (sizeof(struct octep_oq_resp_hw_ext))
- 
-@@ -50,6 +52,7 @@ struct octep_oq_resp_hw {
- 	/* The Length of the packet. */
- 	__be64 length;
- };
-+static_assert(sizeof(struct octep_oq_resp_hw) == 8);
- 
- #define OCTEP_OQ_RESP_HW_SIZE   (sizeof(struct octep_oq_resp_hw))
- 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-index 21e75ff9f5e7..86c98b13fc44 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-@@ -36,6 +36,7 @@ struct octep_tx_sglist_desc {
- 	u16 len[4];
- 	dma_addr_t dma_ptr[4];
- };
-+static_assert(sizeof(struct octep_tx_sglist_desc) == 40);
- 
- /* Each Scatter/Gather entry sent to hardwar hold four pointers.
-  * So, number of entries required is (MAX_SKB_FRAGS + 1)/4, where '+1'
-@@ -239,6 +240,7 @@ struct octep_instr_hdr {
- 	/* Reserved3 */
- 	u64 reserved3:1;
- };
-+static_assert(sizeof(struct octep_instr_hdr) == 8);
- 
- /* Hardware Tx completion response header */
- struct octep_instr_resp_hdr {
-@@ -263,6 +265,7 @@ struct octep_instr_resp_hdr {
- 	/* Opcode for the return packet  */
- 	u64 opcode:16;
- };
-+static_assert(sizeof(struct octep_instr_hdr) == 8);
- 
- /* 64-byte Tx instruction format.
-  * Format of instruction for a 64-byte mode input queue.
-@@ -293,6 +296,7 @@ struct octep_tx_desc_hw {
- 	/* Additional headers available in a 64-byte instruction. */
- 	u64 exhdr[4];
- };
-+static_assert(sizeof(struct octep_tx_desc_hw) == 64);
- 
- #define OCTEP_IQ_DESC_SIZE (sizeof(struct octep_tx_desc_hw))
- #endif /* _OCTEP_TX_H_ */
+Here is the summary with links:
+  - [net-next] ethtool: untangle the linkmode and ethtool headers
+    https://git.kernel.org/netdev/net-next/c/20c6e05bd33d
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
