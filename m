@@ -1,347 +1,148 @@
-Return-Path: <netdev+bounces-42916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0EAB7D0A35
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:05:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EDA47D0A39
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:06:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 014D31C20F21
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 08:05:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E621B20D6F
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 08:06:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE661101F6;
-	Fri, 20 Oct 2023 08:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA6D101F6;
+	Fri, 20 Oct 2023 08:06:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28F7101CA;
-	Fri, 20 Oct 2023 08:05:17 +0000 (UTC)
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6294BE8;
-	Fri, 20 Oct 2023 01:05:14 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VuWbBuF_1697789110;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VuWbBuF_1697789110)
-          by smtp.aliyun-inc.com;
-          Fri, 20 Oct 2023 16:05:10 +0800
-Message-ID: <1697786930.9987535-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v1 09/19] virtio_net: xsk: bind/unbind xsk
-Date: Fri, 20 Oct 2023 15:28:50 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux-foundation.org,
- bpf@vger.kernel.org
-References: <20231016120033.26933-1-xuanzhuo@linux.alibaba.com>
- <20231016120033.26933-10-xuanzhuo@linux.alibaba.com>
- <CACGkMEstVnDZ03E0s_+kOAkHy1wdTxG716gFGfR2mwNEFrpiKQ@mail.gmail.com>
-In-Reply-To: <CACGkMEstVnDZ03E0s_+kOAkHy1wdTxG716gFGfR2mwNEFrpiKQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2437C610B
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 08:06:00 +0000 (UTC)
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247EEE8;
+	Fri, 20 Oct 2023 01:05:59 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 4FF1320820;
+	Fri, 20 Oct 2023 10:05:57 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id ma7TU1Btuyr6; Fri, 20 Oct 2023 10:05:56 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id C4BF2207A4;
+	Fri, 20 Oct 2023 10:05:56 +0200 (CEST)
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout1.secunet.com (Postfix) with ESMTP id B702680004A;
+	Fri, 20 Oct 2023 10:05:56 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 20 Oct 2023 10:05:56 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Fri, 20 Oct
+ 2023 10:05:56 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id B183B3183E88; Fri, 20 Oct 2023 10:05:55 +0200 (CEST)
+Date: Fri, 20 Oct 2023 10:05:55 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: <netdev@vger.kernel.org>
+CC: Antony Antony <antony.antony@secunet.com>, Dan Carpenter
+	<dan.carpenter@linaro.org>, <kernel-janitors@vger.kernel.org>
+Subject: [PATCH ipsec-next] xfrm Fix use after free in __xfrm6_udp_encap_rcv.
+Message-ID: <ZTI0452CF5hoHRoA@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Fri, 20 Oct 2023 14:51:15 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Mon, Oct 16, 2023 at 8:01=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > This patch implement the logic of bind/unbind xsk pool to sq and rq.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio/Makefile     |   2 +-
-> >  drivers/net/virtio/main.c       |  10 +-
-> >  drivers/net/virtio/virtio_net.h |  18 ++++
-> >  drivers/net/virtio/xsk.c        | 186 ++++++++++++++++++++++++++++++++
-> >  drivers/net/virtio/xsk.h        |   7 ++
-> >  5 files changed, 216 insertions(+), 7 deletions(-)
-> >  create mode 100644 drivers/net/virtio/xsk.c
-> >  create mode 100644 drivers/net/virtio/xsk.h
-> >
-> > diff --git a/drivers/net/virtio/Makefile b/drivers/net/virtio/Makefile
-> > index 15ed7c97fd4f..8c2a884d2dba 100644
-> > --- a/drivers/net/virtio/Makefile
-> > +++ b/drivers/net/virtio/Makefile
-> > @@ -5,4 +5,4 @@
-> >
-> >  obj-$(CONFIG_VIRTIO_NET) +=3D virtio_net.o
-> >
-> > -virtio_net-y :=3D main.o
-> > +virtio_net-y :=3D main.o xsk.o
-> > diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
-> > index 02d27101fef1..38733a782f12 100644
-> > --- a/drivers/net/virtio/main.c
-> > +++ b/drivers/net/virtio/main.c
-> > @@ -8,7 +8,6 @@
-> >  #include <linux/etherdevice.h>
-> >  #include <linux/module.h>
-> >  #include <linux/virtio.h>
-> > -#include <linux/virtio_net.h>
-> >  #include <linux/bpf.h>
-> >  #include <linux/bpf_trace.h>
-> >  #include <linux/scatterlist.h>
-> > @@ -139,9 +138,6 @@ struct virtio_net_common_hdr {
-> >         };
-> >  };
-> >
-> > -static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf=
-);
-> > -static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf=
-);
-> > -
-> >  static void *xdp_to_ptr(struct xdp_frame *ptr)
-> >  {
-> >         return (void *)((unsigned long)ptr | VIRTIO_XDP_FLAG);
-> > @@ -3664,6 +3660,8 @@ static int virtnet_xdp(struct net_device *dev, st=
-ruct netdev_bpf *xdp)
-> >         switch (xdp->command) {
-> >         case XDP_SETUP_PROG:
-> >                 return virtnet_xdp_set(dev, xdp->prog, xdp->extack);
-> > +       case XDP_SETUP_XSK_POOL:
-> > +               return virtnet_xsk_pool_setup(dev, xdp);
-> >         default:
-> >                 return -EINVAL;
-> >         }
-> > @@ -3849,7 +3847,7 @@ static void free_receive_page_frags(struct virtne=
-t_info *vi)
-> >                 }
-> >  }
-> >
-> > -static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
-> > +void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
-> >  {
-> >         if (!virtnet_is_xdp_frame(buf))
-> >                 dev_kfree_skb(buf);
-> > @@ -3857,7 +3855,7 @@ static void virtnet_sq_free_unused_buf(struct vir=
-tqueue *vq, void *buf)
-> >                 xdp_return_frame(virtnet_ptr_to_xdp(buf));
-> >  }
-> >
-> > -static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
-> > +void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
-> >  {
-> >         struct virtnet_info *vi =3D vq->vdev->priv;
-> >         int i =3D vq2rxq(vq);
-> > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virti=
-o_net.h
-> > index cc742756e19a..9e69b6c5921b 100644
-> > --- a/drivers/net/virtio/virtio_net.h
-> > +++ b/drivers/net/virtio/virtio_net.h
-> > @@ -5,6 +5,8 @@
-> >
-> >  #include <linux/ethtool.h>
-> >  #include <linux/average.h>
-> > +#include <linux/virtio_net.h>
-> > +#include <net/xdp_sock_drv.h>
-> >
-> >  #define VIRTIO_XDP_FLAG        BIT(0)
-> >  #define VIRTIO_XMIT_DATA_MASK (VIRTIO_XDP_FLAG)
-> > @@ -94,6 +96,11 @@ struct virtnet_sq {
-> >         bool do_dma;
-> >
-> >         struct virtnet_sq_dma_head dmainfo;
-> > +       struct {
-> > +               struct xsk_buff_pool __rcu *pool;
-> > +
-> > +               dma_addr_t hdr_dma_address;
-> > +       } xsk;
-> >  };
-> >
-> >  /* Internal representation of a receive virtqueue */
-> > @@ -134,6 +141,13 @@ struct virtnet_rq {
-> >
-> >         /* Do dma by self */
-> >         bool do_dma;
-> > +
-> > +       struct {
-> > +               struct xsk_buff_pool __rcu *pool;
-> > +
-> > +               /* xdp rxq used by xsk */
-> > +               struct xdp_rxq_info xdp_rxq;
-> > +       } xsk;
-> >  };
-> >
-> >  struct virtnet_info {
-> > @@ -218,6 +232,8 @@ struct virtnet_info {
-> >         struct failover *failover;
-> >  };
-> >
-> > +#include "xsk.h"
-> > +
->
-> Any reason we don't do it with other headers?
+A recent patch changed xfrm6_udp_encap_rcv to not
+free the skb itself anymore but fogot the case
+where xfrm4_udp_encap_rcv is called subsequently.
 
-Because xsk.h will reference the struct virtnet_sq..., if we put xsk.h
-at the start of virtio_net.h, the gcc will not happy.
-But the virtio-net.h references the api(virtnet_ptr_to_xsk) of the xsk.h.
+Fix this by moving the call to xfrm4_udp_encap_rcv
+from __xfrm6_udp_encap_rcv to xfrm6_udp_encap_rcv.
 
+Fixes: 221ddb723d90 ("xfrm: Support GRO for IPv6 ESP in UDP encapsulation")
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ net/ipv4/xfrm4_input.c | 3 ++-
+ net/ipv6/xfrm6_input.c | 9 ++++++---
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
->
-> >  static inline bool virtnet_is_xdp_frame(void *ptr)
-> >  {
-> >         return (unsigned long)ptr & VIRTIO_XDP_FLAG;
-> > @@ -308,4 +324,6 @@ void virtnet_rx_pause(struct virtnet_info *vi, stru=
-ct virtnet_rq *rq);
-> >  void virtnet_rx_resume(struct virtnet_info *vi, struct virtnet_rq *rq);
-> >  void virtnet_tx_pause(struct virtnet_info *vi, struct virtnet_sq *sq);
-> >  void virtnet_tx_resume(struct virtnet_info *vi, struct virtnet_sq *sq);
-> > +void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf);
-> > +void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf);
-> >  #endif
-> > diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
-> > new file mode 100644
-> > index 000000000000..dddd01962a3f
-> > --- /dev/null
-> > +++ b/drivers/net/virtio/xsk.c
-> > @@ -0,0 +1,186 @@
+diff --git a/net/ipv4/xfrm4_input.c b/net/ipv4/xfrm4_input.c
+index 42879c5e026a..c54676998eb6 100644
+--- a/net/ipv4/xfrm4_input.c
++++ b/net/ipv4/xfrm4_input.c
+@@ -159,7 +159,6 @@ static int __xfrm4_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
+ 	/* process ESP */
+ 	return 0;
+ }
+-EXPORT_SYMBOL(xfrm4_udp_encap_rcv);
+ 
+ /* If it's a keepalive packet, then just eat it.
+  * If it's an encapsulated packet, then pass it to the
+@@ -184,6 +183,7 @@ int xfrm4_udp_encap_rcv(struct sock *sk, struct sk_buff *skb)
+ 
+ 	return ret;
+ }
++EXPORT_SYMBOL(xfrm4_udp_encap_rcv);
+ 
+ struct sk_buff *xfrm4_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
+ 					struct sk_buff *skb)
+@@ -223,6 +223,7 @@ struct sk_buff *xfrm4_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
+ 
+ 	return NULL;
+ }
++EXPORT_SYMBOL(xfrm4_gro_udp_encap_rcv);
+ 
+ int xfrm4_rcv(struct sk_buff *skb)
+ {
+diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
+index ccf79b84c061..6e36e5047fba 100644
+--- a/net/ipv6/xfrm6_input.c
++++ b/net/ipv6/xfrm6_input.c
+@@ -80,9 +80,6 @@ static int __xfrm6_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
+ 	__be32 *udpdata32;
+ 	u16 encap_type;
+ 
+-	if (skb->protocol == htons(ETH_P_IP))
+-		return xfrm4_udp_encap_rcv(sk, skb);
+-
+ 	encap_type = READ_ONCE(up->encap_type);
+ 	/* if this is not encapsulated socket, then just return now */
+ 	if (!encap_type)
+@@ -169,6 +166,9 @@ int xfrm6_udp_encap_rcv(struct sock *sk, struct sk_buff *skb)
+ {
+ 	int ret;
+ 
++	if (skb->protocol == htons(ETH_P_IP))
++		return xfrm4_udp_encap_rcv(sk, skb);
++
+ 	ret = __xfrm6_udp_encap_rcv(sk, skb, true);
+ 	if (!ret)
+ 		return xfrm6_rcv_encap(skb, IPPROTO_ESP, 0,
+@@ -190,6 +190,9 @@ struct sk_buff *xfrm6_gro_udp_encap_rcv(struct sock *sk, struct list_head *head,
+ 	struct sk_buff *pp = NULL;
+ 	int ret;
+ 
++	if (skb->protocol == htons(ETH_P_IP))
++		return xfrm4_gro_udp_encap_rcv(sk, head, skb);
++
+ 	offset = offset - sizeof(struct udphdr);
+ 
+ 	if (!pskb_pull(skb, offset))
+-- 
+2.34.1
 
-[...]
-
-> > +
-> > +       if (!rq->do_dma || !sq->do_dma)
-> > +               return -EPERM;
-> > +
-> > +       if (virtqueue_dma_dev(rq->vq) !=3D virtqueue_dma_dev(sq->vq))
-> > +               return -EPERM;
->
-> Any reason we need this check? Is there any code that has this
-> assumption? E.g dma sync in XDP_TX?
-
-For the xsk, the tx and rx should have the same dev.
-But vq->dma_dev allows every vq has the respective dma dev.
-
-So I check the dma dev of vq and sq is the same dev.
-
->
-> > +
-> > +       dma_dev =3D virtqueue_dma_dev(rq->vq);
-> > +       if (!dma_dev)
-> > +               return -EPERM;
-> > +
-> > +       hdr_dma =3D dma_map_single(dma_dev, &xsk_hdr, vi->hdr_len, DMA_=
-TO_DEVICE);
-> > +       if (dma_mapping_error(dma_dev, hdr_dma))
-> > +               return -ENOMEM;
-> > +
-> > +       err =3D xsk_pool_dma_map(pool, dma_dev, 0);
-> > +       if (err)
-> > +               goto err_xsk_map;
-> > +
-> > +       err =3D virtnet_rq_bind_xsk_pool(vi, rq, pool);
-> > +       if (err)
-> > +               goto err_rq;
-> > +
-> > +       err =3D virtnet_sq_bind_xsk_pool(vi, sq, pool);
-> > +       if (err)
-> > +               goto err_sq;
-> > +
-> > +       sq->xsk.hdr_dma_address =3D hdr_dma;
->
-> I think we probably need some comments to explain why a single hdr can
-> work. Like it means we use the same hdr for all XSK packets?
-
-Will fix.
-
->
-> > +
-> > +       return 0;
-> > +
-> > +err_sq:
-> > +       virtnet_rq_bind_xsk_pool(vi, rq, NULL);
-> > +err_rq:
-> > +       xsk_pool_dma_unmap(pool, 0);
-> > +err_xsk_map:
-> > +       dma_unmap_single(dma_dev, hdr_dma, vi->hdr_len, DMA_TO_DEVICE);
-> > +       return err;
-> > +}
-> > +
-> > +static int virtnet_xsk_pool_disable(struct net_device *dev, u16 qid)
-> > +{
-> > +       struct virtnet_info *vi =3D netdev_priv(dev);
-> > +       struct xsk_buff_pool *pool;
-> > +       struct device *dma_dev;
-> > +       struct virtnet_rq *rq;
-> > +       struct virtnet_sq *sq;
-> > +       int err1, err2;
-> > +
-> > +       if (qid >=3D vi->curr_queue_pairs)
-> > +               return -EINVAL;
-> > +
-> > +       sq =3D &vi->sq[qid];
-> > +       rq =3D &vi->rq[qid];
-> > +
-> > +       dma_dev =3D virtqueue_dma_dev(rq->vq);
-> > +
-> > +       /* Sync with the XSK wakeup and NAPI. */
-> > +       synchronize_net();
->
-> Any reason we couldn't do bind_xsk_pool(NULL) here? It seems easier.
-
-Do you mean rcu_assign_pointer() is enough?
-
-Let me check it.
-
-Thanks
-
-
->
-> Thanks
->
->
-> > +
-> > +       dma_unmap_single(dma_dev, sq->xsk.hdr_dma_address, vi->hdr_len,=
- DMA_TO_DEVICE);
-> > +
-> > +       rcu_read_lock();
-> > +       pool =3D rcu_dereference(sq->xsk.pool);
-> > +       xsk_pool_dma_unmap(pool, 0);
-> > +       rcu_read_unlock();
-> > +
-> > +       err1 =3D virtnet_sq_bind_xsk_pool(vi, sq, NULL);
-> > +       err2 =3D virtnet_rq_bind_xsk_pool(vi, rq, NULL);
-> > +
-> > +       return err1 | err2;
-> > +}
-> > +
-> > +int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *=
-xdp)
-> > +{
-> > +       if (xdp->xsk.pool)
-> > +               return virtnet_xsk_pool_enable(dev, xdp->xsk.pool,
-> > +                                              xdp->xsk.queue_id);
-> > +       else
-> > +               return virtnet_xsk_pool_disable(dev, xdp->xsk.queue_id);
-> > +}
-> > diff --git a/drivers/net/virtio/xsk.h b/drivers/net/virtio/xsk.h
-> > new file mode 100644
-> > index 000000000000..1918285c310c
-> > --- /dev/null
-> > +++ b/drivers/net/virtio/xsk.h
-> > @@ -0,0 +1,7 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> > +
-> > +#ifndef __XSK_H__
-> > +#define __XSK_H__
-> > +
-> > +int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *=
-xdp);
-> > +#endif
-> > --
-> > 2.32.0.3.g01195cf9f
-> >
->
 
