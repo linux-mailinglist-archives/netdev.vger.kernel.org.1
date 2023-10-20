@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-42961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A328D7D0CB0
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:07:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E8C7D0CF4
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:15:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D61D282454
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:07:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 577AA282455
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:15:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A3D15E97;
-	Fri, 20 Oct 2023 10:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F08F15E9A;
+	Fri, 20 Oct 2023 10:15:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/1H7+mx"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="HzL6FMIm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E15A15E81
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:07:16 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF5DCD64;
-	Fri, 20 Oct 2023 03:07:14 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-4083cd3917eso5305535e9.3;
-        Fri, 20 Oct 2023 03:07:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B8F1640F
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:15:14 +0000 (UTC)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 273FDB6
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:15:08 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9be3b66f254so94634366b.3
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:15:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697796433; x=1698401233; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697796906; x=1698401706; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eg/csZTe11WF84HY2bC30HCtKA95bWgVvxI9p/8afRY=;
-        b=W/1H7+mxcgaW2CIZYzlMcgQmGAkNadgMutA1aQstRAx9seq239n1cCjK/Hb3GePFU7
-         oTyN5GT+MGBb7uwWj39MSJTqvbVL+rM+zFhdKRTn4KXT3M4uS39UxDxbuQKTCibZEZ79
-         kDVkcFl3q08PLSlfw9O9SV0KVxz83GGdKedAFdvdA0N2gaPbuU0qDCiSUK1IXeRQUBuJ
-         yClwWAe5ZQJCuN9DuDm19GaHekHy7k+sriVO270bN6Meo6kSbMTTsUp6BKLEqOJcoZ4o
-         rVSQ9BJZ3ZWcbzB6EVwFuAZGQb7sqKloI7CQH9MBWLZtBvY96xKCIOnS1pKVSvdEEUyN
-         i+uA==
+        bh=cHY0jaF10Yx/Se+7J24DgyevrpF28GDqLCzUygdCLno=;
+        b=HzL6FMImGrxrAXAccmfdirSX3HoStKhAfUF2hgvtf1hOIQ4AjgOTBkvh7b3m63ZRB9
+         kmXR0N3E/yM/hxyPAt6V1xW5G5Vn9gt3BOzjjbxL9IlV3vUPZgGDGwp9kBhGmtdP9YVS
+         cgLEjqsqHbVhwi5IjetQ5NkW8rgeN2iBtoLSFWkTU/zHVQJqHc1yfulIOcH36QaTJZe1
+         D5iVzys/RDDw5yOBYGjo2cFHt8legZb8BLWyXqX2AsmU4Crv5F/RMeGq4Ig3yhcCTBbp
+         qt+zTan3OlLs1/FwUltPDZSLQfkhs+ZcIbu+We0kkq+x/GxPGBmCdQ2hSvLL775DKXoZ
+         Gmtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697796433; x=1698401233;
+        d=1e100.net; s=20230601; t=1697796906; x=1698401706;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eg/csZTe11WF84HY2bC30HCtKA95bWgVvxI9p/8afRY=;
-        b=MedMJRwlHgNMeTbIGyJX7TKd+FKnmNJVzeuNcNncpKGuT1niv7qr2Qv91CT0to9Onc
-         1gBe64QnjDfMbKmSqsDeoUL/L9hObYQ62bE1l6uJ5EKXgOKGNqOQpty8tOJbYUgONnp4
-         DVqAUNmM45moPum67EL9huBX2t92y38EuQe7R0d/bYQEoKrquRQ+6JwBE9bfLwt6eZmJ
-         J2jUL0zHsFVnofyfOFhGFuwzAQKaFydiDKJAZiGvLmS5jKbZjijM5TFnKObetybCGeBY
-         ub3KjOkPTYDxxDQJDZCfElFhFUujs2IWbfBPLE88joK/8VbmH46zSnPfsHK2WNlh5lrU
-         Wn6g==
-X-Gm-Message-State: AOJu0Ywv7/SaSRthovZesJ1yGF8rLM98NW4+/1QyC5FTBRZxYFiPDN76
-	o89UVSym26DFQUgeY5dN/jY=
-X-Google-Smtp-Source: AGHT+IEqZwxXRL66lw1+cuj95TIKompxhoWp5WEAhk2qvUt3UtBRe+YVmcGEZrYV3uvDzSEbs5b0Rg==
-X-Received: by 2002:a05:600c:510d:b0:406:53f1:d629 with SMTP id o13-20020a05600c510d00b0040653f1d629mr1084077wms.5.1697796432432;
-        Fri, 20 Oct 2023 03:07:12 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id w15-20020a5d608f000000b0032dbf32bd56sm1343204wrt.37.2023.10.20.03.07.11
+        bh=cHY0jaF10Yx/Se+7J24DgyevrpF28GDqLCzUygdCLno=;
+        b=frVcqbp7mWINv7P1v0+3PLByt3jLPr6FU5moKiPKnpZp0VaiTtRq6K9B/zgV/RooHk
+         EwnxIZa3CiXr3H9qzirA1uzUsVRytnNylvh31lJxyMRTeSvNT++V0lC/3sBkAbHp5TG8
+         D61Yd09XhpNzuTRw+6lEtmN0MkipQqPVJv5MkW9LnirZKCvAkOp62Y91sDPA4HcWRw6m
+         9otnK2yd5BkJG8znIx+WoJIDEgdkOtZqVlOk2W9y51qwEqrPqJsdqatqZofv9EODlNJ7
+         t+SF5QxvsEGPROdCaYlPKH4FcpPW9AqHtLlKwev9ri4o8OGtMie+e9DNKcuZNN8ZkSaF
+         89CA==
+X-Gm-Message-State: AOJu0YyECH154L3oZb3jIC+d5YkG2wvdGQrekCeHHg6APqPPrLr62mdW
+	upgNs35q8DpVqSQ+fbducNywGA==
+X-Google-Smtp-Source: AGHT+IG8qb3AKfSrliLJe3NBKz+HAyDGXBjW4XRbEmumOt1WLbfyhxldHURkqCzPEcmbzC29EHidTw==
+X-Received: by 2002:a17:907:7b99:b0:9c4:6893:ccc5 with SMTP id ne25-20020a1709077b9900b009c46893ccc5mr907702ejc.57.1697796906493;
+        Fri, 20 Oct 2023 03:15:06 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id pw17-20020a17090720b100b009bd9ac83a9fsm1164551ejb.152.2023.10.20.03.15.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 03:07:12 -0700 (PDT)
-Date: Fri, 20 Oct 2023 13:07:09 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Su Hui <suhui@nfschina.com>
-Cc: andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	richardcochran@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: add an error code check in
- mv88e6352_tai_event_work
-Message-ID: <20231020100709.yy2ovjm3q2hphek6@skbuf>
-References: <20231020090003.200092-1-suhui@nfschina.com>
+        Fri, 20 Oct 2023 03:15:05 -0700 (PDT)
+Date: Fri, 20 Oct 2023 12:15:04 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, johannes.berg@intel.com, mpe@ellerman.id.au,
+	j@w1.fi
+Subject: Re: [PATCH net-next 1/6] net: don't use input buffer of
+ __dev_alloc_name() as a scratch space
+Message-ID: <ZTJTKN5wzf4lWRfk@nanopsycho>
+References: <20231020011856.3244410-1-kuba@kernel.org>
+ <20231020011856.3244410-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,26 +76,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231020090003.200092-1-suhui@nfschina.com>
+In-Reply-To: <20231020011856.3244410-2-kuba@kernel.org>
 
-On Fri, Oct 20, 2023 at 05:00:04PM +0800, Su Hui wrote:
-> mv88e6xxx_tai_write() can return error code (-EOPNOTSUPP ...) if failed.
-> So check the value of 'ret' after calling mv88e6xxx_tai_write().
-> 
-> Signed-off-by: Su Hui <suhui@nfschina.com>
-> ---
+Fri, Oct 20, 2023 at 03:18:51AM CEST, kuba@kernel.org wrote:
+>Callers of __dev_alloc_name() want to pass dev->name as
+>the output buffer. Make __dev_alloc_name() not clobber
+>that buffer on failure, and remove the workarounds
+>in callers.
+>
+>dev_alloc_name_ns() is now completely unnecessary.
+>
+>The extra strscpy() added here will be gone by the end
+>of the patch series.
+>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-mv88e6xxx_avb_ops :: tai_read() and tai_write() come in pairs for the
-existing implementations. So, a missing tai_write() method also implies
-a missing tai_read() and would have been caught by the previous call to
-mv88e6xxx_tai_read() in this function.
-
-But, ok.
-
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-
-This is a patch for net-next, as it doesn't fix any user-visible issue
-and is just an improvement. For future changes, please note your
-expectation regarding the target tree yourself, by formatting the patch
-as "[PATCH net-next]".
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
