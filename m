@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-43128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA8557D180B
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:28:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 556C47D180C
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:28:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 192C21C2106D
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:28:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09D67282692
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A086F2B746;
-	Fri, 20 Oct 2023 21:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89F9329CFF;
+	Fri, 20 Oct 2023 21:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GcCvvuWe"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Rvdfltn8"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DDB29CFF
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 21:28:16 +0000 (UTC)
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DD05D6D
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:28:11 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-27dc1e4d8b6so1095897a91.0
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:28:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAC52B74B
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 21:28:19 +0000 (UTC)
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C097D73
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:28:12 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-577fff1cae6so964252a12.1
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:28:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1697837290; x=1698442090; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1697837292; x=1698442092; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wsewz1O4dEf/OJMpchk/NqM6K0iIx4UKdLiZScLmVBU=;
-        b=GcCvvuWe/HDWngM6e2EGQ6f0lqjutSjEAhm4bsuQhVq1evX45yw5NO6Nu8+pLpQJ2S
-         G6iHNmGF7DnOKs3aZh6++fuqQ/b8Iw+Mc6kQDhc+zNFs7ey61JDWseEQEbFk+4vByIKz
-         NtJOjOMTgnwm1mc3NrnCTb1fv2/zVjbvIEKXc=
+        bh=AUn6Gv2Mvm1SEyJDYH34HDT/kJsxCkTeewpUSCKfxYg=;
+        b=Rvdfltn8wqR9p4YuPm+EOP6x4Oxr3Oi4mL+M8H8qJl+8ccWlZR1/IYNei+9cVy7Sxn
+         261cJghXZicrf8grYXQxRAn9/OdU7+9HdDLLuOImt4enxsHRaPEAe+Wo0RXjvCr07/HJ
+         tLckIm7PGRJoteV7EyXp2FIv5vw/Va7WVoQMk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697837290; x=1698442090;
+        d=1e100.net; s=20230601; t=1697837292; x=1698442092;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wsewz1O4dEf/OJMpchk/NqM6K0iIx4UKdLiZScLmVBU=;
-        b=ho26lEe4umfMr2cu1F+aj6VQF/PlGjaBnTWKYhCdPIeVIGZxN/Ef4U0qHG5ELUsCfZ
-         AiIckUXrVwr50CurlJigj105ISM1grJ0TEeoFIbe8Vt5+wIPcJ6qCmI79G00cRW3v2uC
-         qGN+4UhoY0NLrdPbrA6F78XobCXLUWunukd+IVGgdwRCAilIvQu0mwkyNMHgyu4gtAQx
-         0oVrfecv2Y2cbv51Y1x7wnTQo678nn96kh+sqa7YtaLMhCf82uMdaw6WPrzKtw60lOEo
-         6DwRxWcKLzh+A6kbD4n1jd6nHNp7JtwS0+7Fntq/+Q3QbzmgC5BW9RI8nPlXN11d5KK8
-         M3GQ==
-X-Gm-Message-State: AOJu0YwIC1+cD13fv3PAhZuPAaqJHv000Xl8AklLnwP4veZWSneRiNrM
-	5javy4Ue6TVz2Z3R/7f3Oeeffg==
-X-Google-Smtp-Source: AGHT+IEoJ+tHcxjjs3qYCkaLDPFI4oVj2sL8HJi/7Dw2oSSRlWFE7/Jltm361WKxeIMEZZWLyA7KnQ==
-X-Received: by 2002:a17:90a:1996:b0:27d:2054:9641 with SMTP id 22-20020a17090a199600b0027d20549641mr3158023pji.36.1697837290335;
-        Fri, 20 Oct 2023 14:28:10 -0700 (PDT)
+        bh=AUn6Gv2Mvm1SEyJDYH34HDT/kJsxCkTeewpUSCKfxYg=;
+        b=hFaivwBDolrUKlHnm0VFLA4XHQ4wzBq/GzkHwdCf7hYsXquRsKMgceumPWqixNimVJ
+         3AuURNgiKCuEEFdosYzvCj4Xj8oYhHJBEkwzsyZiSIPjvYzZ2NsfQ1kQjbmb9No0C+sI
+         dhDZ5x2r9vviYRGTk2gtGL4pPvFQR/Cz1bSSWzqYncLTOFfZQW3I0IHDJQiWrk7dsGC6
+         6TYKsQjFKpzhQxRP4rWv/j02RzF7mPc44Mflhz4HDisyigfLwHDLNsoq/K/dqXlxv3re
+         Zr2I+zkbrS1XbDzcTkvM/dgGV2G/suj96NI4dzFkB9eJmZkAFnIt3Qji0kgDutZFpQgQ
+         DKwA==
+X-Gm-Message-State: AOJu0YxuGwz6wHSylqFfrFWRqKqzfqdJmsxmPpYkmt53vwnnymALg+RU
+	+Mi3A7ekTomfCe8QqStN74+iyg==
+X-Google-Smtp-Source: AGHT+IGOgAtQ75WGFOOQ6QTgHTMO6XXymP2oHsw0Hehja/CMftJiV4piNnYhCY29LyuRlq18NxFOuQ==
+X-Received: by 2002:a17:90a:1943:b0:27d:63f1:2d24 with SMTP id 3-20020a17090a194300b0027d63f12d24mr4632821pjh.0.1697837291658;
+        Fri, 20 Oct 2023 14:28:11 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id j13-20020a17090a7e8d00b0026d4100e0e8sm1843348pjl.10.2023.10.20.14.28.09
+        by smtp.gmail.com with ESMTPSA id j13-20020a17090a7e8d00b0026d4100e0e8sm1843348pjl.10.2023.10.20.14.28.10
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 20 Oct 2023 14:28:09 -0700 (PDT)
+        Fri, 20 Oct 2023 14:28:11 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -61,10 +61,12 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
 	kalesh-anakkur.purayil@broadcom.com,
-	Guenter Roeck <linux@roeck-us.net>
-Subject: [PATCH net-next 1/8] bnxt_en: Do not call sleeping hwmon_notify_event() from NAPI
-Date: Fri, 20 Oct 2023 14:27:50 -0700
-Message-Id: <20231020212757.173551-2-michael.chan@broadcom.com>
+	Guenter Roeck <linux@roeck-us.net>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: [PATCH net-next 2/8] bnxt_en: Fix invoking hwmon_notify_event
+Date: Fri, 20 Oct 2023 14:27:51 -0700
+Message-Id: <20231020212757.173551-3-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231020212757.173551-1-michael.chan@broadcom.com>
 References: <20231020212757.173551-1-michael.chan@broadcom.com>
@@ -75,174 +77,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000009b1d7c06082c8cbe"
+	boundary="000000000000aeb21606082c8c5d"
 
---0000000000009b1d7c06082c8cbe
+--000000000000aeb21606082c8c5d
 Content-Transfer-Encoding: 8bit
 
 From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-Defer hwmon_notify_event() to bnxt_sp_task() workqueue because
-hwmon_notify_event() can try to acquire a mutex shown in the stack trace
-below.  Modify bnxt_event_error_report() to return true if we need to
-schedule bnxt_sp_task() to notify hwmon.
-
-  __schedule+0x68/0x520
-  hwmon_notify_event+0xe8/0x114
-  schedule+0x60/0xe0
-  schedule_preempt_disabled+0x28/0x40
-  __mutex_lock.constprop.0+0x534/0x550
-  __mutex_lock_slowpath+0x18/0x20
-  mutex_lock+0x5c/0x70
-  kobject_uevent_env+0x2f4/0x3d0
-  kobject_uevent+0x10/0x20
-  hwmon_notify_event+0x94/0x114
-  bnxt_hwmon_notify_event+0x40/0x70 [bnxt_en]
-  bnxt_event_error_report+0x260/0x290 [bnxt_en]
-  bnxt_async_event_process.isra.0+0x250/0x850 [bnxt_en]
-  bnxt_hwrm_handler.isra.0+0xc8/0x120 [bnxt_en]
-  bnxt_poll_p5+0x150/0x350 [bnxt_en]
-  __napi_poll+0x3c/0x210
-  net_rx_action+0x308/0x3b0
-  __do_softirq+0x120/0x3e0
+FW sends the async event to the driver when the device temperature goes
+above or below the threshold values.  Only notify hwmon if the
+temperature is increasing to the next alert level, not when it is
+decreasing.
 
 Cc: Guenter Roeck <linux@roeck-us.net>
-Fixes: a19b4801457b ("bnxt_en: Event handler for Thermal event")
+Reviewed-by: Kashyap Desai <kashyap.desai@broadcom.com>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c       | 17 ++++++++++++-----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h       |  2 ++
- drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c |  4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.h |  4 ++--
- 4 files changed, 18 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 16eb7a7af970..7837e22f237b 100644
+index 7837e22f237b..65092150d451 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -2147,7 +2147,8 @@ static u16 bnxt_agg_ring_id_to_grp_idx(struct bnxt *bp, u16 ring_id)
- 	  ASYNC_EVENT_CMPL_ERROR_REPORT_THERMAL_EVENT_DATA1_TRANSITION_DIR) ==\
- 	 ASYNC_EVENT_CMPL_ERROR_REPORT_THERMAL_EVENT_DATA1_TRANSITION_DIR_INCREASING)
+@@ -2166,6 +2166,7 @@ static bool bnxt_event_error_report(struct bnxt *bp, u32 data1, u32 data2)
+ 	case ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_THERMAL_THRESHOLD: {
+ 		u32 type = EVENT_DATA1_THERMAL_THRESHOLD_TYPE(data1);
+ 		char *threshold_type;
++		bool notify = false;
+ 		char *dir_str;
  
--static void bnxt_event_error_report(struct bnxt *bp, u32 data1, u32 data2)
-+/* Return true if the workqueue has to be scheduled */
-+static bool bnxt_event_error_report(struct bnxt *bp, u32 data1, u32 data2)
- {
- 	u32 err_type = BNXT_EVENT_ERROR_REPORT_TYPE(data1);
- 
-@@ -2182,7 +2183,7 @@ static void bnxt_event_error_report(struct bnxt *bp, u32 data1, u32 data2)
- 			break;
- 		default:
+ 		switch (type) {
+@@ -2185,18 +2186,23 @@ static bool bnxt_event_error_report(struct bnxt *bp, u32 data1, u32 data2)
  			netdev_err(bp->dev, "Unknown Thermal threshold type event\n");
--			return;
-+			return false;
+ 			return false;
  		}
- 		if (EVENT_DATA1_THERMAL_THRESHOLD_DIR_INCREASING(data1))
+-		if (EVENT_DATA1_THERMAL_THRESHOLD_DIR_INCREASING(data1))
++		if (EVENT_DATA1_THERMAL_THRESHOLD_DIR_INCREASING(data1)) {
  			dir_str = "above";
-@@ -2193,14 +2194,16 @@ static void bnxt_event_error_report(struct bnxt *bp, u32 data1, u32 data2)
+-		else
++			notify = true;
++		} else {
+ 			dir_str = "below";
++		}
+ 		netdev_warn(bp->dev, "Chip temperature has gone %s the %s thermal threshold!\n",
+ 			    dir_str, threshold_type);
  		netdev_warn(bp->dev, "Temperature (In Celsius), Current: %lu, threshold: %lu\n",
  			    BNXT_EVENT_THERMAL_CURRENT_TEMP(data2),
  			    BNXT_EVENT_THERMAL_THRESHOLD_TEMP(data2));
--		bnxt_hwmon_notify_event(bp, type);
--		break;
-+		bp->thermal_threshold_type = type;
-+		set_bit(BNXT_THERMAL_THRESHOLD_SP_EVENT, &bp->sp_event);
-+		return true;
+-		bp->thermal_threshold_type = type;
+-		set_bit(BNXT_THERMAL_THRESHOLD_SP_EVENT, &bp->sp_event);
+-		return true;
++		if (notify) {
++			bp->thermal_threshold_type = type;
++			set_bit(BNXT_THERMAL_THRESHOLD_SP_EVENT, &bp->sp_event);
++			return true;
++		}
++		return false;
  	}
  	default:
  		netdev_err(bp->dev, "FW reported unknown error type %u\n",
- 			   err_type);
- 		break;
- 	}
-+	return false;
- }
- 
- #define BNXT_GET_EVENT_PORT(data)	\
-@@ -2401,7 +2404,8 @@ static int bnxt_async_event_process(struct bnxt *bp,
- 		goto async_event_process_exit;
- 	}
- 	case ASYNC_EVENT_CMPL_EVENT_ID_ERROR_REPORT: {
--		bnxt_event_error_report(bp, data1, data2);
-+		if (bnxt_event_error_report(bp, data1, data2))
-+			break;
- 		goto async_event_process_exit;
- 	}
- 	case ASYNC_EVENT_CMPL_EVENT_ID_PHC_UPDATE: {
-@@ -12085,6 +12089,9 @@ static void bnxt_sp_task(struct work_struct *work)
- 	if (test_and_clear_bit(BNXT_FW_ECHO_REQUEST_SP_EVENT, &bp->sp_event))
- 		bnxt_fw_echo_reply(bp);
- 
-+	if (test_and_clear_bit(BNXT_THERMAL_THRESHOLD_SP_EVENT, &bp->sp_event))
-+		bnxt_hwmon_notify_event(bp);
-+
- 	/* These functions below will clear BNXT_STATE_IN_SP_TASK.  They
- 	 * must be the last functions to be called before exiting.
- 	 */
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 9ce0193798d4..80846c3ca9fc 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2094,6 +2094,7 @@ struct bnxt {
- #define BNXT_FW_RESET_NOTIFY_SP_EVENT	18
- #define BNXT_FW_EXCEPTION_SP_EVENT	19
- #define BNXT_LINK_CFG_CHANGE_SP_EVENT	21
-+#define BNXT_THERMAL_THRESHOLD_SP_EVENT	22
- #define BNXT_FW_ECHO_REQUEST_SP_EVENT	23
- 
- 	struct delayed_work	fw_reset_task;
-@@ -2196,6 +2197,7 @@ struct bnxt {
- 	u8			fatal_thresh_temp;
- 	u8			shutdown_thresh_temp;
- #endif
-+	u32			thermal_threshold_type;
- 	enum board_idx		board_idx;
- };
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
-index e48094043c3b..669d24ba0e87 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.c
-@@ -18,14 +18,14 @@
- #include "bnxt_hwrm.h"
- #include "bnxt_hwmon.h"
- 
--void bnxt_hwmon_notify_event(struct bnxt *bp, u32 type)
-+void bnxt_hwmon_notify_event(struct bnxt *bp)
- {
- 	u32 attr;
- 
- 	if (!bp->hwmon_dev)
- 		return;
- 
--	switch (type) {
-+	switch (bp->thermal_threshold_type) {
- 	case ASYNC_EVENT_CMPL_ERROR_REPORT_THERMAL_EVENT_DATA1_THRESHOLD_TYPE_WARN:
- 		attr = hwmon_temp_max_alarm;
- 		break;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.h
-index 76d9f599ebc0..de54a562e06a 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwmon.h
-@@ -11,11 +11,11 @@
- #define BNXT_HWMON_H
- 
- #ifdef CONFIG_BNXT_HWMON
--void bnxt_hwmon_notify_event(struct bnxt *bp, u32 type);
-+void bnxt_hwmon_notify_event(struct bnxt *bp);
- void bnxt_hwmon_uninit(struct bnxt *bp);
- void bnxt_hwmon_init(struct bnxt *bp);
- #else
--static inline void bnxt_hwmon_notify_event(struct bnxt *bp, u32 type)
-+static inline void bnxt_hwmon_notify_event(struct bnxt *bp)
- {
- }
- 
 -- 
 2.30.1
 
 
---0000000000009b1d7c06082c8cbe
+--000000000000aeb21606082c8c5d
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -313,14 +214,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGqbI89ILJWfVXPsFt08Vs1SBUDzGHYd
-dXEqDKlVY25zMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTAy
-MDIxMjgxMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGBKuwMujlXR3U9SqB/6ElDW/Sz6dW6w
+pY6h+ckR8WQkMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTAy
+MDIxMjgxMlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBC2H2fDIa0W9rxVQ+08fuFpMzDSQNCKOQjLrFHJjMjU/cTFfLn
-3aM31pJT+Pkbe/vakmSeWZFcsbrebED+9wOlWJd2APeQBOQF31mv35kIF1t29cpXZdMoiBUDY/6U
-aopV7mOgvIyowrjaLzQawbE3dS5d0BElQ+7Lq6rqL3A9fA46cF3TKFdgb8w2uKyp9WOSmRxYQYEj
-E41CfpY/qrulZDriJgKl7oEMSzhCIhsQ9J7mOGxqXhg9Fnw6NvjHtUQz8Ho7MezPv5BekYkl7cMW
-pcNqSmdVwUOpAGqphmVQ0y+9USdVpLUgmO2t5z6Wg7D1gloETmHpiyKQbzLC9Q0j
---0000000000009b1d7c06082c8cbe--
+ATANBgkqhkiG9w0BAQEFAASCAQBVp3iKk10+uDiDtH0nAtHQetqk277PXC+YOiJmix+1mQfHGzT2
+eaPz+QQkDNy16wkNNDYNJwiOrnWel5cUQ/abp9PvxhhLMdIs6GsF5WO8JDASaBIrtwAFXRmTmSbz
+TSGDTqWDyiY9qnNYSipAO3Zr2idl/StCjn8DQLXZHj7ymEqqMnaaPwZmL9uu/z1aUKllhvv+TH0m
+hDGs1wZcEtrlzauGb7FuiRvahJhwJW11+txeOMuvkyaWiRd5TI8EaWLaYeEtCKzjDL3O9cw2vocm
+B3g8xjyQQ+z8CE9Iuay21IZ+JAe869i44YZuyyCSoAOX9mZMZvUxTC6vJcE08iu2
+--000000000000aeb21606082c8c5d--
 
