@@ -1,520 +1,196 @@
-Return-Path: <netdev+bounces-43120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5ED97D17CE
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:09:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5984A7D17D1
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:09:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C90EF1C2100A
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:09:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CB1E282645
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C3729CF0;
-	Fri, 20 Oct 2023 21:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7999D249EE;
+	Fri, 20 Oct 2023 21:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Iu/XNEEY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kRj67JXR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E65327459
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 21:08:30 +0000 (UTC)
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FE4210C1
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:08:25 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6bd0e1b1890so1111148b3a.3
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:08:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1697836105; x=1698440905; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DXnBfDlArT8QQ+dhtd2r5fMDGlrQTZfL2E4sRwVy3fU=;
-        b=Iu/XNEEYGxohnwSTLvfv4m9v02bvuXPrDS4a+kAt8x9UsUqVZTeSwHLL4YKPeXVQs4
-         3ynwaL2GtPp5f5wRpdTyi/ogfvgaiB5o7cREBGrdgsDJcmxQbV4wH4ioCzOl3Arp7xZD
-         fqZwyiF8+rmfK6DfjM1CJf8+NV+JqobTm4mZM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697836105; x=1698440905;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DXnBfDlArT8QQ+dhtd2r5fMDGlrQTZfL2E4sRwVy3fU=;
-        b=jJ7JQBU7WYgtYtePg+usHwfioR/m0vGnqDksXBxd6NiG2efeRQ8KjXV3xp6DuGWKnE
-         PSkCiZwk0kC0jcEMEdFFC73F6X7t6WZVZ+JxcPrCamLyagtAicdA7jWiI5QkHiMIf1WC
-         ubtBXxSOiAUqd7xK+5MCRIa4WCOi3n276423KJHvsQeXucnDkVKHkx4Yg1sTUYDuniWW
-         FQP7Mt1HTmovl6sQ8plTz7WkeizAwuDZJbsjv6qzxAJsmnNwgfc6Y32hd/OfT5yJ0bPi
-         VWGm3/e/Cxu6BE0rzJeBvLzcgWGQ1acLA6zTHAdKD8/gScllUn6PML+eQkCsectzKQo3
-         cZtQ==
-X-Gm-Message-State: AOJu0Ywpgg3TmILFOP3KUEE7uz0mE1SbjfDpLW0RuSnbawUAhfgSVFla
-	fXVVKD88PB9kTfNl/O/DhOSyzg==
-X-Google-Smtp-Source: AGHT+IEb1MKkvrdCiTUUHUx2844H+lZouwvUUGZUYdWYX+sKgbuQD171isy8pFxgtyU5nlBqGpwG0Q==
-X-Received: by 2002:a05:6a21:7748:b0:15d:8409:8804 with SMTP id bc8-20020a056a21774800b0015d84098804mr3161452pzc.57.1697836104815;
-        Fri, 20 Oct 2023 14:08:24 -0700 (PDT)
-Received: from tictac2.mtv.corp.google.com ([2620:15c:9d:2:c078:ee4f:479f:8486])
-        by smtp.gmail.com with ESMTPSA id w14-20020aa7954e000000b00686b649cdd0sm1969278pfq.86.2023.10.20.14.08.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 14:08:24 -0700 (PDT)
-From: Douglas Anderson <dianders@chromium.org>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Hayes Wang <hayeswang@realtek.com>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: Edward Hill <ecgh@chromium.org>,
-	Laura Nao <laura.nao@collabora.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Simon Horman <horms@kernel.org>,
-	linux-usb@vger.kernel.org,
-	Grant Grundler <grundler@chromium.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v5 8/8] r8152: Block future register access if register access fails
-Date: Fri, 20 Oct 2023 14:06:59 -0700
-Message-ID: <20231020140655.v5.8.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
-X-Mailer: git-send-email 2.42.0.758.gaed0368e0e-goog
-In-Reply-To: <20231020210751.3415723-1-dianders@chromium.org>
-References: <20231020210751.3415723-1-dianders@chromium.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAFC20315
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 21:09:28 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 097E910D0;
+	Fri, 20 Oct 2023 14:09:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697836157; x=1729372157;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=rt8O7XlpB4afsDAYwHKIstdoBb4nGvURt45fkCkg4FI=;
+  b=kRj67JXRwZHixZIdxrwQdZQrMy7BnHRO5s2gtB9b9zHGE7beHOpPrRz8
+   qaMeNhHyFYY/Yo8qyK20mfYBy4fHh+m6Mj7i5uZihuACYYe6tM30ki30S
+   C9zYaB8g/HzY5pQE91cDNSga2IZ1W5Z3it9mh9LhzBCiQiRSgYogxm8v4
+   xlhUBKSmgW7vqEJdU6Y3cd4voGL7L2r4uZwdm7o980hmSjRuXB+zq27tc
+   qosWJyFDILKPphHFL1F1AexE67KTs22sOw1DWlFE114EvEKODmoyeDAEX
+   hCqC3D7sZKoLNenc4n7zEwxO3IU3xnaSj1MjRQvLjqSA3NSWWdFAgz/W2
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="472797630"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="472797630"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 14:09:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="823379076"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="823379076"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Oct 2023 14:09:14 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 20 Oct 2023 14:09:13 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Fri, 20 Oct 2023 14:09:13 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Fri, 20 Oct 2023 14:09:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BF9O7v9Ft2h1g25imwHI3aviCxcPPvsiKwKAhw0UK0DJZexWbfGxGS5rK9Nu+lYTptkKbjJkjwfNeDN+i6lDC3H+Z/2+IXIAyyNYYAmz32jOmrOx11A3OajpbvRm6a6rw91d9T0xJZV1oqr9m3Xt4jjtSALg6hz3OruNlzMMgvXbRzE3eS41VRpax32TZzvxcBjue4Xi4e121zL83LMxjciBBejxs2cfhG+v8uJtM+lrLBQP+IO/ky1fsGCmBXRAA+3pk4WPEI5EyX9T/DoI16ZDMc840MypYNWirk9ExsvrdyB1cTMFk2ZE+ofIA5k2hvbFFDDymIqE82BOKn2yHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6VSs39qRDQvc1OM6e+2rgRvo4j94tgTtNYPhd1F5fdo=;
+ b=eRmG19QSEjq94Ri+ZgpopYChqwjdGWxkcJLkGedsfLT+tipao5O5PKfUg7y59z/4yl2vC9EJrwg5kaEorjte5aoNcaEQd4ZrWktxkpjlE9gDXPI08kSPFjooW/a2KTmp8bXV6KbPlFWLZarrCkxbq9eWXyQF/ouN5w27zfB32x/qFDohopLhWmeIGH0VE5qzZCpzGDRTITGw/oJfrh9SknMA4OzxqyGAlUj4s/bAWIXPaWHHvwPlXQ3yiBdgioF+THHK4qTuU4an9A5PqQueuqT1CKzTPyHhDQxlI+dLCUIrjYmMIzCDC5tctjaoiEXisnzpf5lycYK5PEOCJ23ChA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DM8PR11MB5704.namprd11.prod.outlook.com (2603:10b6:8:23::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6907.26; Fri, 20 Oct 2023 21:09:11 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::34a7:52c3:3b8b:75f4]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::34a7:52c3:3b8b:75f4%4]) with mapi id 15.20.6907.025; Fri, 20 Oct 2023
+ 21:09:11 +0000
+Message-ID: <58d18354-dbd6-47d3-93a8-ba0446dcc8f6@intel.com>
+Date: Fri, 20 Oct 2023 14:09:08 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] i40e: add an error code check in i40e_vsi_setup
+Content-Language: en-US
+To: Dan Carpenter <dan.carpenter@linaro.org>, Su Hui <suhui@nfschina.com>
+CC: <jesse.brandeburg@intel.com>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel-janitors@vger.kernel.org>
+References: <20231020024308.46630-1-suhui@nfschina.com>
+ <be0b618a-4732-467f-bb99-f623fe4da962@kadam.mountain>
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <be0b618a-4732-467f-bb99-f623fe4da962@kadam.mountain>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0126.namprd03.prod.outlook.com
+ (2603:10b6:303:8c::11) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DM8PR11MB5704:EE_
+X-MS-Office365-Filtering-Correlation-Id: 011f073d-2ca7-4272-1f27-08dbd1b0ce5e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3CxSn8QZZAX/Aodi0I8kSnJgbFWhW/DRF/pyLwySxLWJP9bu69ONeDFCyR/HJCAt5Nt1dUhQ35irVauV9NJJvQO+iH02shZqbEJi3rZLJHa5olfQV2bak+pvfQqdaGsAiiuQtjP0GYYUnW21GHnJj3Eeh57nXNHzj7bm8747zin8pjiJqVph4EppfX84Qb+Va1zMBA4pUk6xI2VuMFC5zr5Gb/va4D5QWCa8aJ2P9R/DEM1w3F58z2GDFfIUlL/nPoL+bjwmD5cD3Rv3EEgtTGiT2bBBde0e0KXn9cyLoR4DHtkznE6bsnSh61ciyu3+MipyrDYtFRkCRMV3ELGJ6eyIgdzLLWtW5E21eqNaEVPGuHHy/sxc4st8dEFF1Unlrx/niUNO+tGhSHuiexfOMud4lP3HYC2kZIYsFKwEqCnIjNoc4wAmeKxxHN+DFaxkSbn9mB9F7e9wqL/DAjSrTnrNM/BODqf9kFbmq6bx9IbIn3Dh8/jJjUMoDVTYpR0id3SWFqEcLIv38kd98oNKSgX9I2paWiF3IlTKFnVvrUZtvo4fKbNzaMYLYZaRCMEI0p8b46x8YOFZEhQW2onjSi3oqHyV/6isPNnExYdjWDd8o3g9MVNOkhg7wxfhGGDLl0uzOKaHvldoNZ0fI+Jekg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(136003)(376002)(346002)(366004)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(31686004)(7416002)(4326008)(4744005)(8676002)(5660300002)(8936002)(41300700001)(53546011)(26005)(6512007)(6506007)(2906002)(38100700002)(2616005)(110136005)(6666004)(31696002)(86362001)(36756003)(66556008)(66946007)(66476007)(316002)(82960400001)(478600001)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YlJ4VVFNZXYzRGRRMVFrSW1xNUd2ZTh3QmRuSXk0U0hDcDFXTXR4MlNBdVow?=
+ =?utf-8?B?MlZqOFQ0T0cyRDFFN2ZRM0VraU5BWjZ0cEk0dnJVUlExdGtiZnVUYTNZN2Rm?=
+ =?utf-8?B?UHh3aUlhcXF3NEFRSWdTSWpPOGpkQ0tKUGU0L3FEMXB3YnVUMENOOXl2cHJI?=
+ =?utf-8?B?eW9ZZzd4RWwyT01ObVc0ZzlvTk9JUkdHZ3AyUnEyeXI4bWg0c2pUUHMybDkw?=
+ =?utf-8?B?VU5WNnc1R3ViUDM1a21TNG95UGVodXh6MndLaTdwcUFtdVdvU3Y3OE1idG44?=
+ =?utf-8?B?MWRUazJybXBYTllkZnI1eWxqNStKNEhLNXJ3dVZIZHo0eEZVTGpCd0dQZWZr?=
+ =?utf-8?B?eGVPcFlHYXFVQWNSOHI5MDdGSlhzbWQveit1WGRQV0pGSmJtL3Nudm5RcEpP?=
+ =?utf-8?B?cnIxdWNuUGl4YlhTNTVRVHVGTGtMN2QrZ2RHWFNwb24yNC9OQ2JLOG8zdVEv?=
+ =?utf-8?B?anEwQ0NtYWJzNmRyRFpOZW4ydHZUSU1JTVEwb3VVSThvWlhKT2J5cS9Nek5H?=
+ =?utf-8?B?NVdEVGxnYkoxcFNYQnJtV0lScU1nOCtSZWZ2ZzhYVEtGandJamhwVzJENnRX?=
+ =?utf-8?B?M2tuT1VIZnQrMFJNWmJFeWZJT05Ca0JHOFEyaEJVN21Mb2JyNUROWVBSTk1s?=
+ =?utf-8?B?YXdpZEhXRXo5YzZncFFHZ29IV2ZEYzlRWW4zTUFmT25pczJyVG1aVDd2Q2pW?=
+ =?utf-8?B?c0tBT0ZtR1J4UXQ3eHpGQ1JqVUhxamVtWDQza09lU2Y4V1Q1SjQ3R1puN0Zi?=
+ =?utf-8?B?SlI0T2swMlpBSDFWUEpFcndYaGlkZGMzWTNvamc2T1NGbDhnOUZ0S3ZtUEhK?=
+ =?utf-8?B?TWhDQm5LR2RzMEtETHJVcWV2YlphcVJaZjRsM2s1U0R1eU1MT3RMY2NSajJJ?=
+ =?utf-8?B?UFVNK2JaRFRPc29VT1FNYytWMDhubEJ6U2NmYmhOU1cvS1gyMS9iVWxYV1Nv?=
+ =?utf-8?B?QTFBWDN4eWdFVVNvdGs3OTFWblU2emxZYkNySVNhdkxFaFRoY0VSWXRCbU81?=
+ =?utf-8?B?cGhaakZnbHBzd25nYnh4dGJNTHVZeE1yNTlVNGZGQ1ZBclNPSjk5N1RYcTNr?=
+ =?utf-8?B?WlRaSlZvMVM3VzBkTzBUSUExMmt5Y1lPSDZJeXVmeCthQ3pwa1JidkhkZGxj?=
+ =?utf-8?B?ekh3NmpRL1ViZzk1Q0ViWVZmcC9oc0NHMDN0SkYwa0dpWEFGTXZLRzZQSUlG?=
+ =?utf-8?B?T2NndWx2Tm13Sjh2eWExek9XYUxVNkFNcmZibFBqaUQrVlJmYzRGNi9tRWYy?=
+ =?utf-8?B?bzRub0U0dU9mN0QrUDFxRC9vamtMOU9vdXZWZUNYUE1haERqazVYbHoxZ05t?=
+ =?utf-8?B?dnFpOTdTRXVnOWp3aFJEWWdmbGVIRmttd0lQalJxUEQ3MEpqOFNSemNYajNa?=
+ =?utf-8?B?bEJaeWVWZjg1aHFSbGoyc2RrdWdvc2lwcW5XTWc1OVkxL1lQbVRTbG9iSkNj?=
+ =?utf-8?B?UXNrS3dGM2hxVDJkZFdxK2R0TjlIaklXSzZRb2l3dFBaZk1qWlIySnpTMWZE?=
+ =?utf-8?B?ZGpFNzZibjNSdHNWQkZyQkE1TTJ3NUxxQWlLbTBXdXE3ZFN1dlJFK3BwT2kr?=
+ =?utf-8?B?azQzOFZ3dExNLzUyMC9wenNmT05yVUlNbVN4NSt5OFk4eEFKY2FPcjBQR0Fv?=
+ =?utf-8?B?VVBQTVgwalAySFhBRG5oNm14MjV4R2s2eG5rT2NXdWFCZzI3L042aENsNXl2?=
+ =?utf-8?B?bUJtOWtrSjR0REZOQmhqd05kMFVlZ0dROWtrUGtYWXBsc09Ca29tR2N2T0I5?=
+ =?utf-8?B?OG1VMGdReFJacG9qZXdGdVBRRWZkQnB0RklTVUE4anRvSnVaWlF3dzN5RjZF?=
+ =?utf-8?B?enhPRitoRHozeGNTajVUTkJyd3k2WjFLbk1jK0tBbEM3WEYxdTNya2kycUpK?=
+ =?utf-8?B?K0FoY1NYeEIycXdBODg5ak9RSEhvVGxiWlpEQytnUVVUZTk3OUh6VUt1ZGsw?=
+ =?utf-8?B?dTl4Q3ZnMEE4THJXNUJpVVFha00vZ1hCb2IxbVJUakU2WE5FQlViSjZoKzU1?=
+ =?utf-8?B?UHpsMEFVRTZrSXpSSDhwMnEyUWVwOHRiNkFDWXR6V1Y1RWd0MjZkVlE0cCti?=
+ =?utf-8?B?d2E5WFZpWEoycW5XT0d5SVhFTHZid3FNOG5oQytycjNJUVk2WlBqTTdhS1ZP?=
+ =?utf-8?B?c3QrTHJiS3hMdk1jZEt0eWQ4eDBUdGdUQXBqeDJ1RDJabTF1cDBhRnZGVjB2?=
+ =?utf-8?B?UEE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 011f073d-2ca7-4272-1f27-08dbd1b0ce5e
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 21:09:11.1810
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rZbsc7IrYwME3OEOo1+4rsG5ImfjwT1RY0MjQerPlvUAFMeF8gMWTWhNZeikynRUzP8F1+CRqLGHpN32QSW8JdWXKuKs7LU8qqqNVTmIBBE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR11MB5704
+X-OriginatorOrg: intel.com
 
-Even though the functions to read/write registers can fail, most of
-the places in the r8152 driver that read/write register values don't
-check error codes. The lack of error code checking is problematic in
-at least two ways.
 
-The first problem is that the r8152 driver often uses code patterns
-similar to this:
-  x = read_register()
-  x = x | SOME_BIT;
-  write_register(x);
 
-...with the above pattern, if the read_register() fails and returns
-garbage then we'll end up trying to write modified garbage back to the
-Realtek adapter. If the write_register() succeeds that's bad. Note
-that as of commit f53a7ad18959 ("r8152: Set memory to all 0xFFs on
-failed reg reads") the "garbage" returned by read_register() will at
-least be consistent garbage, but it is still garbage.
+On 10/19/2023 11:56 PM, Dan Carpenter wrote:
+> On Fri, Oct 20, 2023 at 10:43:09AM +0800, Su Hui wrote:
+>> check the value of 'ret' after calling 'i40e_vsi_config_rss'.
+>>
+>> Signed-off-by: Su Hui <suhui@nfschina.com>
+>> ---
+>> v2: 
+>> - call i40e_vsi_clear_rings() to free rings(thank dan carpenter for
+>>   pointing out this).
+> 
+> Looks okay now.
+> 
+> Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
+> 
+> regards,
+> dan carpenter
+> 
+> 
 
-It turns out that this problem is very serious. Writing garbage to
-some of the hardware registers on the Ethernet adapter can put the
-adapter in such a bad state that it needs to be power cycled (fully
-unplugged and plugged in again) before it can enumerate again.
+For some reason this patch doesn't appear to have hit the
+intel-wired-lan list and is thus not being recorded in patchwork for IWL.
 
-The second problem is that the r8152 driver generally has functions
-that are long sequences of register writes. Assuming everything will
-be OK if a random register write fails in the middle isn't a great
-assumption.
+Su Hui, would you mind please re-sending this so that it gets picked up
+by patchwork? Otherwise I'm afraid that it might get lost inbetween when
+Tony returns from vacation.
 
-One might wonder if the above two problems are real. You could ask if
-we would really have a successful write after a failed read. It turns
-out that the answer appears to be "yes, this can happen". In fact,
-we've seen at least two distinct failure modes where this happens.
-
-On a sc7180-trogdor Chromebook if you drop into kdb for a while and
-then resume, you can see:
-1. We get a "Tx timeout"
-2. The "Tx timeout" queues up a USB reset.
-3. In rtl8152_pre_reset() we try to reinit the hardware.
-4. The first several (2-9) register accesses fail with a timeout, then
-   things recover.
-
-The above test case was actually fixed by the patch ("r8152: Increase
-USB control msg timeout to 5000ms as per spec") but at least shows
-that we really can see successful calls after failed ones.
-
-On a different (AMD) based Chromebook with a particular adapter, we
-found that during reboot tests we'd also sometimes get a transitory
-failure. In this case we saw -EPIPE being returned sometimes. Retrying
-worked, but retrying is not always safe for all register accesses
-since reading/writing some registers might have side effects (like
-registers that clear on read).
-
-Let's fully lock out all register access if a register access fails.
-When we do this, we'll try to queue up a USB reset and try to unlock
-register access after the reset. This is slightly tricker than it
-sounds since the r8152 driver has an optimized reset sequence that
-only works reliably after probe happens. In order to handle this, we
-avoid the optimized reset if probe didn't finish. Instead, we simply
-retry the probe routine in this case.
-
-When locking out access, we'll use the existing infrastructure that
-the driver was using when it detected we were unplugged. This keeps us
-from getting stuck in delay loops in some parts of the driver.
-
-Signed-off-by: Douglas Anderson <dianders@chromium.org>
----
-Originally when looking at this problem I thought that the obvious
-solution was to "just" add better error handling to the driver. This
-_sounds_ appealing, but it's a massive change and touches a
-significant portion of the lines in this driver. It's also not always
-obvious what the driver should be doing to handle errors.
-
-If you feel like you need to be convinced and to see what it looked
-like to add better error handling, I put up my "work in progress"
-patch when I was investigating this at: https://crrev.com/c/4937290
-
-There is still some active debate between the two approaches, though,
-so it would be interesting to hear if anyone had any opinions.
-
-NOTE: Grant's review tag was removed in v5 since v5 changed somewhat
-significantly.
-
-Changes in v5:
-- Removed extra mutex_unlock() left over in v4.
-- Fixed minor typos.
-- Don't do queue an unbind/bind reset if probe fails; just retry probe.
-
-Changes in v4:
-- Took out some unnecessary locks/unlocks of the control mutex.
-- Added comment about reading version causing probe fail if 3 fails.
-- Added text to commit msg about the potential unbind/bind loop.
-
-Changes in v3:
-- Fixed v2 changelog ending up in the commit message.
-- farmework -> framework in comments.
-
-Changes in v2:
-- Reset patch no longer based on retry patch, since that was dropped.
-- Reset patch should be robust even if failures happen in probe.
-- Switched booleans to bits in the "flags" variable.
-- Check for -ENODEV instead of "udev->state == USB_STATE_NOTATTACHED"
-
- drivers/net/usb/r8152.c | 207 ++++++++++++++++++++++++++++++++++------
- 1 file changed, 176 insertions(+), 31 deletions(-)
-
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 65232848b31d..afb20c0ed688 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -773,6 +773,9 @@ enum rtl8152_flags {
- 	SCHEDULE_TASKLET,
- 	GREEN_ETHERNET,
- 	RX_EPROTO,
-+	IN_PRE_RESET,
-+	PROBED_WITH_NO_ERRORS,
-+	PROBE_SHOULD_RETRY,
- };
- 
- #define DEVICE_ID_LENOVO_USB_C_TRAVEL_HUB		0x721e
-@@ -953,6 +956,8 @@ struct r8152 {
- 	u8 version;
- 	u8 duplex;
- 	u8 autoneg;
-+
-+	unsigned int reg_access_reset_count;
- };
- 
- /**
-@@ -1200,6 +1205,96 @@ static unsigned int agg_buf_sz = 16384;
- 
- #define RTL_LIMITED_TSO_SIZE	(size_to_mtu(agg_buf_sz) - sizeof(struct tx_desc))
- 
-+/* If register access fails then we block access and issue a reset. If this
-+ * happens too many times in a row without a successful access then we stop
-+ * trying to reset and just leave access blocked.
-+ */
-+#define REGISTER_ACCESS_MAX_RESETS	3
-+
-+static void rtl_set_inaccessible(struct r8152 *tp)
-+{
-+	set_bit(RTL8152_INACCESSIBLE, &tp->flags);
-+	smp_mb__after_atomic();
-+}
-+
-+static void rtl_set_accessible(struct r8152 *tp)
-+{
-+	clear_bit(RTL8152_INACCESSIBLE, &tp->flags);
-+	smp_mb__after_atomic();
-+}
-+
-+static
-+int r8152_control_msg(struct r8152 *tp, unsigned int pipe, __u8 request,
-+		      __u8 requesttype, __u16 value, __u16 index, void *data,
-+		      __u16 size, const char *msg_tag)
-+{
-+	struct usb_device *udev = tp->udev;
-+	int ret;
-+
-+	if (test_bit(RTL8152_INACCESSIBLE, &tp->flags))
-+		return -ENODEV;
-+
-+	ret = usb_control_msg(udev, pipe, request, requesttype,
-+			      value, index, data, size,
-+			      USB_CTRL_GET_TIMEOUT);
-+
-+	/* No need to issue a reset to report an error if the USB device got
-+	 * unplugged; just return immediately.
-+	 */
-+	if (ret == -ENODEV)
-+		return ret;
-+
-+	/* If the write was successful then we're done */
-+	if (ret >= 0) {
-+		tp->reg_access_reset_count = 0;
-+		return ret;
-+	}
-+
-+	dev_err(&udev->dev,
-+		"Failed to %s %d bytes at %#06x/%#06x (%d)\n",
-+		msg_tag, size, value, index, ret);
-+
-+	/* Block all future register access until we reset. Much of the code
-+	 * in the driver doesn't check for errors. Notably, many parts of the
-+	 * driver do a read/modify/write of a register value without
-+	 * confirming that the read succeeded. Writing back modified garbage
-+	 * like this can fully wedge the adapter, requiring a power cycle.
-+	 */
-+	rtl_set_inaccessible(tp);
-+
-+	/* If probe hasn't yet finished, then we'll request a retry of the
-+	 * whole probe routine if we get any control transfer errors. We
-+	 * never have to clear this bit since we free/reallocate the whole "tp"
-+	 * structure if we retry probe.
-+	 */
-+	if (!test_bit(PROBED_WITH_NO_ERRORS, &tp->flags)) {
-+		set_bit(PROBE_SHOULD_RETRY, &tp->flags);
-+		return ret;
-+	}
-+
-+	/* Failing to access registers in pre-reset is not surprising since we
-+	 * wouldn't be resetting if things were behaving normally. The register
-+	 * access we do in pre-reset isn't truly mandatory--we're just reusing
-+	 * the disable() function and trying to be nice by powering the
-+	 * adapter down before resetting it. Thus, if we're in pre-reset,
-+	 * we'll return right away and not try to queue up yet another reset.
-+	 * We know the post-reset is already coming.
-+	 */
-+	if (test_bit(IN_PRE_RESET, &tp->flags))
-+		return ret;
-+
-+	if (tp->reg_access_reset_count < REGISTER_ACCESS_MAX_RESETS) {
-+		usb_queue_reset_device(tp->intf);
-+		tp->reg_access_reset_count++;
-+	} else if (tp->reg_access_reset_count == REGISTER_ACCESS_MAX_RESETS) {
-+		dev_err(&udev->dev,
-+			"Tried to reset %d times; giving up.\n",
-+			REGISTER_ACCESS_MAX_RESETS);
-+	}
-+
-+	return ret;
-+}
-+
- static
- int get_registers(struct r8152 *tp, u16 value, u16 index, u16 size, void *data)
- {
-@@ -1210,9 +1305,10 @@ int get_registers(struct r8152 *tp, u16 value, u16 index, u16 size, void *data)
- 	if (!tmp)
- 		return -ENOMEM;
- 
--	ret = usb_control_msg(tp->udev, tp->pipe_ctrl_in,
--			      RTL8152_REQ_GET_REGS, RTL8152_REQT_READ,
--			      value, index, tmp, size, USB_CTRL_GET_TIMEOUT);
-+	ret = r8152_control_msg(tp, tp->pipe_ctrl_in,
-+				RTL8152_REQ_GET_REGS, RTL8152_REQT_READ,
-+				value, index, tmp, size, "read");
-+
- 	if (ret < 0)
- 		memset(data, 0xff, size);
- 	else
-@@ -1233,9 +1329,9 @@ int set_registers(struct r8152 *tp, u16 value, u16 index, u16 size, void *data)
- 	if (!tmp)
- 		return -ENOMEM;
- 
--	ret = usb_control_msg(tp->udev, tp->pipe_ctrl_out,
--			      RTL8152_REQ_SET_REGS, RTL8152_REQT_WRITE,
--			      value, index, tmp, size, USB_CTRL_SET_TIMEOUT);
-+	ret = r8152_control_msg(tp, tp->pipe_ctrl_out,
-+				RTL8152_REQ_SET_REGS, RTL8152_REQT_WRITE,
-+				value, index, tmp, size, "write");
- 
- 	kfree(tmp);
- 
-@@ -1244,10 +1340,8 @@ int set_registers(struct r8152 *tp, u16 value, u16 index, u16 size, void *data)
- 
- static void rtl_set_unplug(struct r8152 *tp)
- {
--	if (tp->udev->state == USB_STATE_NOTATTACHED) {
--		set_bit(RTL8152_INACCESSIBLE, &tp->flags);
--		smp_mb__after_atomic();
--	}
-+	if (tp->udev->state == USB_STATE_NOTATTACHED)
-+		rtl_set_inaccessible(tp);
- }
- 
- static int generic_ocp_read(struct r8152 *tp, u16 index, u16 size,
-@@ -8262,7 +8356,7 @@ static int rtl8152_pre_reset(struct usb_interface *intf)
- 	struct r8152 *tp = usb_get_intfdata(intf);
- 	struct net_device *netdev;
- 
--	if (!tp)
-+	if (!tp || !test_bit(PROBED_WITH_NO_ERRORS, &tp->flags))
- 		return 0;
- 
- 	netdev = tp->netdev;
-@@ -8277,7 +8371,9 @@ static int rtl8152_pre_reset(struct usb_interface *intf)
- 	napi_disable(&tp->napi);
- 	if (netif_carrier_ok(netdev)) {
- 		mutex_lock(&tp->control);
-+		set_bit(IN_PRE_RESET, &tp->flags);
- 		tp->rtl_ops.disable(tp);
-+		clear_bit(IN_PRE_RESET, &tp->flags);
- 		mutex_unlock(&tp->control);
- 	}
- 
-@@ -8290,9 +8386,11 @@ static int rtl8152_post_reset(struct usb_interface *intf)
- 	struct net_device *netdev;
- 	struct sockaddr sa;
- 
--	if (!tp)
-+	if (!tp || !test_bit(PROBED_WITH_NO_ERRORS, &tp->flags))
- 		return 0;
- 
-+	rtl_set_accessible(tp);
-+
- 	/* reset the MAC address in case of policy change */
- 	if (determine_ethernet_addr(tp, &sa) >= 0) {
- 		rtnl_lock();
-@@ -9494,17 +9592,29 @@ static u8 __rtl_get_hw_ver(struct usb_device *udev)
- 	__le32 *tmp;
- 	u8 version;
- 	int ret;
-+	int i;
- 
- 	tmp = kmalloc(sizeof(*tmp), GFP_KERNEL);
- 	if (!tmp)
- 		return 0;
- 
--	ret = usb_control_msg(udev, usb_rcvctrlpipe(udev, 0),
--			      RTL8152_REQ_GET_REGS, RTL8152_REQT_READ,
--			      PLA_TCR0, MCU_TYPE_PLA, tmp, sizeof(*tmp),
--			      USB_CTRL_GET_TIMEOUT);
--	if (ret > 0)
--		ocp_data = (__le32_to_cpu(*tmp) >> 16) & VERSION_MASK;
-+	/* Retry up to 3 times in case there is a transitory error. We do this
-+	 * since retrying a read of the version is always safe and this
-+	 * function doesn't take advantage of r8152_control_msg().
-+	 */
-+	for (i = 0; i < 3; i++) {
-+		ret = usb_control_msg(udev, usb_rcvctrlpipe(udev, 0),
-+				      RTL8152_REQ_GET_REGS, RTL8152_REQT_READ,
-+				      PLA_TCR0, MCU_TYPE_PLA, tmp, sizeof(*tmp),
-+				      USB_CTRL_GET_TIMEOUT);
-+		if (ret > 0) {
-+			ocp_data = (__le32_to_cpu(*tmp) >> 16) & VERSION_MASK;
-+			break;
-+		}
-+	}
-+
-+	if (i != 0 && ret > 0)
-+		dev_warn(&udev->dev, "Needed %d retries to read version\n", i);
- 
- 	kfree(tmp);
- 
-@@ -9603,25 +9713,14 @@ static bool rtl8152_supports_lenovo_macpassthru(struct usb_device *udev)
- 	return 0;
- }
- 
--static int rtl8152_probe(struct usb_interface *intf,
--			 const struct usb_device_id *id)
-+static int rtl8152_probe_once(struct usb_interface *intf,
-+			      const struct usb_device_id *id, u8 version)
- {
- 	struct usb_device *udev = interface_to_usbdev(intf);
- 	struct r8152 *tp;
- 	struct net_device *netdev;
--	u8 version;
- 	int ret;
- 
--	if (intf->cur_altsetting->desc.bInterfaceClass != USB_CLASS_VENDOR_SPEC)
--		return -ENODEV;
--
--	if (!rtl_check_vendor_ok(intf))
--		return -ENODEV;
--
--	version = rtl8152_get_version(intf);
--	if (version == RTL_VER_UNKNOWN)
--		return -ENODEV;
--
- 	usb_reset_device(udev);
- 	netdev = alloc_etherdev(sizeof(struct r8152));
- 	if (!netdev) {
-@@ -9784,10 +9883,20 @@ static int rtl8152_probe(struct usb_interface *intf,
- 	else
- 		device_set_wakeup_enable(&udev->dev, false);
- 
-+	/* If we saw a control transfer error while probing then we may
-+	 * want to try probe() again. Consider this an error.
-+	 */
-+	if (test_bit(PROBE_SHOULD_RETRY, &tp->flags))
-+		goto out2;
-+
-+	set_bit(PROBED_WITH_NO_ERRORS, &tp->flags);
- 	netif_info(tp, probe, netdev, "%s\n", DRIVER_VERSION);
- 
- 	return 0;
- 
-+out2:
-+	unregister_netdev(netdev);
-+
- out1:
- 	tasklet_kill(&tp->tx_tl);
- 	cancel_delayed_work_sync(&tp->hw_phy_work);
-@@ -9796,10 +9905,46 @@ static int rtl8152_probe(struct usb_interface *intf,
- 	rtl8152_release_firmware(tp);
- 	usb_set_intfdata(intf, NULL);
- out:
-+	if (test_bit(PROBE_SHOULD_RETRY, &tp->flags))
-+		ret = -EAGAIN;
-+
- 	free_netdev(netdev);
- 	return ret;
- }
- 
-+#define RTL8152_PROBE_TRIES	3
-+
-+static int rtl8152_probe(struct usb_interface *intf,
-+			 const struct usb_device_id *id)
-+{
-+	u8 version;
-+	int ret;
-+	int i;
-+
-+	if (intf->cur_altsetting->desc.bInterfaceClass != USB_CLASS_VENDOR_SPEC)
-+		return -ENODEV;
-+
-+	if (!rtl_check_vendor_ok(intf))
-+		return -ENODEV;
-+
-+	version = rtl8152_get_version(intf);
-+	if (version == RTL_VER_UNKNOWN)
-+		return -ENODEV;
-+
-+	for (i = 0; i < RTL8152_PROBE_TRIES; i++) {
-+		ret = rtl8152_probe_once(intf, id, version);
-+		if (ret != -EAGAIN)
-+			break;
-+	}
-+	if (ret == -EAGAIN) {
-+		dev_err(&intf->dev,
-+			"r8152 failed probe after %d tries; giving up\n", i);
-+		return -ENODEV;
-+	}
-+
-+	return ret;
-+}
-+
- static void rtl8152_disconnect(struct usb_interface *intf)
- {
- 	struct r8152 *tp = usb_get_intfdata(intf);
--- 
-2.42.0.758.gaed0368e0e-goog
-
+Thanks,
+Jake
 
