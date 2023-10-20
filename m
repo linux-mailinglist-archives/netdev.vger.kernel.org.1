@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-42865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0076F7D06BF
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 05:05:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4841B7D06C0
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 05:05:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94D40B21386
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 03:05:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93546B2148F
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 03:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7E41C38;
-	Fri, 20 Oct 2023 03:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A410B1FB0;
+	Fri, 20 Oct 2023 03:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ndHYoYpq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fUQ891g1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62851BA32
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:04:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 245A6C433C7;
-	Fri, 20 Oct 2023 03:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DCEC13B
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:04:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 466F7C433C9;
+	Fri, 20 Oct 2023 03:04:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697771088;
-	bh=h+TraR7U/vpasMo1QJNshUN9yRlswbJs8I0ZXV20E6I=;
+	s=k20201202; t=1697771089;
+	bh=R8wuU+UMidG/UrbMWjmaWSPZEk6sJ4s4Fy3AJN0wLjI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ndHYoYpq38KPRKGccXZVjYK/eRximV2ntdTj+WSPXGhc7rA3mMiPXgA4MGmwrAbQ3
-	 HGjJp0aP8MqsAt+mLnW+HlXAomfW+7S9GNSnmCtzisjQaMNAccAiTsVapkZKGNZGBg
-	 +PX5Gkn0eeccUqHBxIdWkJ9J8eFA5vo0DzpOW1mCU/KI5ujPe5UnyBlC8GatEcOfWL
-	 J+wa1Fqbh4YazuH09j2XvXpQcKg3IRjZY+6a1JshSQsb7AYCtd+oKKRa7djJwawuwI
-	 nX8l6DdayoPpnlYYLWCQiDOFIXZeLIT8Dx3JleM+YwqXW/eWrfcqxNhwbfh8fP45nf
-	 6j3yhKU/KxhwQ==
+	b=fUQ891g1rvJROPVMqtRDGsXev4qIo1vuD/TTLKAeiH4I7McUp8ZEjRA2Joh8D3NBX
+	 B/X5sUsOxUQE213f+QVKX0ouKSzKUcff7jnVj9+LjvtntOQoovx0wnOnRSIVcFu+lW
+	 3RRIYO1hWzTwWos+SOZU1wpD4HH5GsUX+iFS0x7QR7mWlC0xvF6XW00XeW1PX7HVDB
+	 UNwCbNAGFxbuTU0Maa6QaGu2CtNO9VqyTwnMIyoLZtXPYKYmnfeF/jqw4y9JyB/YRH
+	 HpVryO97l7PgXEJKi6fOyniuYZHImYHI30zoX9E21Gy5v8xUskgSP662ytob4PzsIG
+	 x5YUnZ8WQ4CJA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -41,11 +41,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>
-Subject: [net-next 14/15] net/mlx5: print change on SW reset semaphore returns busy
-Date: Thu, 19 Oct 2023 20:04:21 -0700
-Message-ID: <20231020030422.67049-15-saeed@kernel.org>
+	Moshe Shemesh <moshe@nvidia.com>
+Subject: [net-next 15/15] net/mlx5: Allow sync reset flow when BF MGT interface device is present
+Date: Thu, 19 Oct 2023 20:04:22 -0700
+Message-ID: <20231020030422.67049-16-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231020030422.67049-1-saeed@kernel.org>
 References: <20231020030422.67049-1-saeed@kernel.org>
@@ -59,34 +58,74 @@ Content-Transfer-Encoding: 8bit
 
 From: Moshe Shemesh <moshe@nvidia.com>
 
-While collecting crdump as part of fw_fatal health reporter dump the PF
-may fail to lock the SW reset semaphore. Change the print to indicate if
-it was due to another PF locked the semaphore already and so trying to
-lock the semaphore returned -EBUSY.
+In sync reset flow, PF is checking that only devices of same device ID
+as itself present on the PCIe bridge, otherwise it will NACK the reset.
+Since the PCIe bridge connection to NIC card has to be 1 to 1, this is
+valid.
+
+However, the BlueField device may also expose another sub-device to the
+PCI called management interface, which only provides an ethernet channel
+between the host and the smart NIC.
+
+Allow sync reset flow also when management interface sub-device present
+when checking devices on the PCIe bridge.
 
 Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
-Reviewed-by: Shay Drory <shayd@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/diag/crdump.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ .../ethernet/mellanox/mlx5/core/fw_reset.c    | 32 ++++++++++++++++---
+ 1 file changed, 28 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/diag/crdump.c b/drivers/net/ethernet/mellanox/mlx5/core/diag/crdump.c
-index 28d02749d3c4..7659ad21e6e5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/diag/crdump.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/diag/crdump.c
-@@ -55,7 +55,10 @@ int mlx5_crdump_collect(struct mlx5_core_dev *dev, u32 *cr_data)
- 	ret = mlx5_vsc_sem_set_space(dev, MLX5_SEMAPHORE_SW_RESET,
- 				     MLX5_VSC_LOCK);
- 	if (ret) {
--		mlx5_core_warn(dev, "Failed to lock SW reset semaphore\n");
-+		if (ret == -EBUSY)
-+			mlx5_core_info(dev, "SW reset semaphore is already in use\n");
-+		else
-+			mlx5_core_warn(dev, "Failed to lock SW reset semaphore\n");
- 		goto unlock_gw;
- 	}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
+index b568988e92e3..4b8cb120362b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
+@@ -325,6 +325,25 @@ static void mlx5_fw_live_patch_event(struct work_struct *work)
+ 		mlx5_core_err(dev, "Failed to reload FW tracer\n");
+ }
  
++static const struct pci_device_id mgt_ifc_device_ids[] = {
++	{ PCI_VDEVICE(MELLANOX, 0xc2d2) }, /* BlueField1 MGT interface device ID */
++	{ PCI_VDEVICE(MELLANOX, 0xc2d3) }, /* BlueField2 MGT interface device ID */
++	{ PCI_VDEVICE(MELLANOX, 0xc2d4) }, /* BlueField3-Lx MGT interface device ID */
++	{ PCI_VDEVICE(MELLANOX, 0xc2d5) }, /* BlueField3 MGT interface device ID */
++	{ PCI_VDEVICE(MELLANOX, 0xc2d6) }, /* BlueField4 MGT interface device ID */
++};
++
++static bool mlx5_is_mgt_ifc_pci_device(struct mlx5_core_dev *dev, u16 dev_id)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(mgt_ifc_device_ids); ++i)
++		if (mgt_ifc_device_ids[i].device == dev_id)
++			return true;
++
++	return false;
++}
++
+ static int mlx5_check_dev_ids(struct mlx5_core_dev *dev, u16 dev_id)
+ {
+ 	struct pci_bus *bridge_bus = dev->pdev->bus;
+@@ -339,10 +358,15 @@ static int mlx5_check_dev_ids(struct mlx5_core_dev *dev, u16 dev_id)
+ 		err = pci_read_config_word(sdev, PCI_DEVICE_ID, &sdev_id);
+ 		if (err)
+ 			return pcibios_err_to_errno(err);
+-		if (sdev_id != dev_id) {
+-			mlx5_core_warn(dev, "unrecognized dev_id (0x%x)\n", sdev_id);
+-			return -EPERM;
+-		}
++
++		if (sdev_id == dev_id)
++			continue;
++
++		if (mlx5_is_mgt_ifc_pci_device(dev, sdev_id))
++			continue;
++
++		mlx5_core_warn(dev, "unrecognized dev_id (0x%x)\n", sdev_id);
++		return -EPERM;
+ 	}
+ 	return 0;
+ }
 -- 
 2.41.0
 
