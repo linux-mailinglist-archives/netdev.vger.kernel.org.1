@@ -1,50 +1,51 @@
-Return-Path: <netdev+bounces-43094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA8887D1655
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:38:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A110C7D1654
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:38:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 798F6282698
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:38:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED522B2145B
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116A422326;
-	Fri, 20 Oct 2023 19:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE3E22323;
+	Fri, 20 Oct 2023 19:38:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bcehIks0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/m5sh4w"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436C222323
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 19:38:06 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7C07D65
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 12:38:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D7F22318
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 19:37:59 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 303DED5D
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 12:37:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697830683;
+	s=mimecast20190719; t=1697830677;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=W3RsnyeipnBfFTo07NnrzIlV7yB7g314ddY+RHz4USc=;
-	b=bcehIks0CZEbK0GBey0HZXKkiU+itwfc1TC3defbb+ZEJ9y6JwaYzeRZaWn7yA9OCwL5wf
-	wThe4KYRlyJX/99BOxPdq2ngigvISYgH0Oh5rxwFCCzXCOwbH79GzHmyvVmxptKdlwjYSS
-	rrQK5nlTMkngiL0ZDbuXl1cWmj6nurE=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-664-Wn8qypecNgCyS0PD6FYezg-1; Fri, 20 Oct 2023 15:37:49 -0400
-X-MC-Unique: Wn8qypecNgCyS0PD6FYezg-1
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5NtRMAxR+Ue4rX4KZZUpffz2stN0dFpO9Ia6gRLh85E=;
+	b=c/m5sh4w2emn+2+NfK6W0O3G5eXV2JMyYYroa7fnL3lk8UasXyw8eploOyN/1nVPRZl580
+	JbqVgwk1z0uwNvYiXOzGQnQB4jnkFhzG9gQT3v+jZb/WqPs3UDLFC367XUddPg1tF2RapS
+	4UBNzjkXWNK/l3XWbky5ucc296BcxPI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-663-MpDWGtoANyumZVIETc3cJA-1; Fri, 20 Oct 2023 15:37:52 -0400
+X-MC-Unique: MpDWGtoANyumZVIETc3cJA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 20A1C3C1016C;
-	Fri, 20 Oct 2023 19:37:49 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 87859185A7A7;
+	Fri, 20 Oct 2023 19:37:51 +0000 (UTC)
 Received: from p1.luc.com (unknown [10.45.226.105])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 341A7C15BB8;
-	Fri, 20 Oct 2023 19:37:47 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9491DC15BB8;
+	Fri, 20 Oct 2023 19:37:49 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Jacob Keller <jacob.e.keller@intel.com>,
@@ -57,11 +58,14 @@ Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
 	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH iwl-next 1/6] i40e: Remove unused flags
-Date: Fri, 20 Oct 2023 21:37:37 +0200
-Message-ID: <20231020193746.2274379-1-ivecera@redhat.com>
+Subject: [PATCH iwl-next 2/6] i40e: Remove _t suffix from enum type names
+Date: Fri, 20 Oct 2023 21:37:38 +0200
+Message-ID: <20231020193746.2274379-2-ivecera@redhat.com>
+In-Reply-To: <20231020193746.2274379-1-ivecera@redhat.com>
+References: <20231020193746.2274379-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,137 +75,92 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-The flag I40E_FLAG_RX_CSUM_ENABLED and I40E_HW_FLAG_DROP_MODE are
-set and never read. Remove them.
+Enum type names should not be suffixed by '_t'. Either to use
+'typedef enum name name_t' to so plain 'name_t var' instead of
+'enum name_t var'.
 
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e.h        | 57 +++++++++----------
- drivers/net/ethernet/intel/i40e/i40e_adminq.c |  4 +-
- drivers/net/ethernet/intel/i40e/i40e_main.c   |  4 +-
- drivers/net/ethernet/intel/i40e/i40e_type.h   |  3 +-
- 4 files changed, 31 insertions(+), 37 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e.h      | 4 ++--
+ drivers/net/ethernet/intel/i40e/i40e_ptp.c  | 6 +++---
+ drivers/net/ethernet/intel/i40e/i40e_txrx.h | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index f86a4241eca2..6e3e2a6d18c4 100644
+index 6e3e2a6d18c4..b3cb79fb8791 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e.h
 +++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -501,33 +501,32 @@ struct i40e_pf {
- #define I40E_HW_RESTART_AUTONEG			BIT(18)
+@@ -78,7 +78,7 @@
+ #define I40E_MAX_BW_INACTIVE_ACCUM	4 /* accumulate 4 credits max */
  
- 	u32 flags;
--#define I40E_FLAG_RX_CSUM_ENABLED		BIT(0)
--#define I40E_FLAG_MSI_ENABLED			BIT(1)
--#define I40E_FLAG_MSIX_ENABLED			BIT(2)
--#define I40E_FLAG_RSS_ENABLED			BIT(3)
--#define I40E_FLAG_VMDQ_ENABLED			BIT(4)
--#define I40E_FLAG_SRIOV_ENABLED			BIT(5)
--#define I40E_FLAG_DCB_CAPABLE			BIT(6)
--#define I40E_FLAG_DCB_ENABLED			BIT(7)
--#define I40E_FLAG_FD_SB_ENABLED			BIT(8)
--#define I40E_FLAG_FD_ATR_ENABLED		BIT(9)
--#define I40E_FLAG_MFP_ENABLED			BIT(10)
--#define I40E_FLAG_HW_ATR_EVICT_ENABLED		BIT(11)
--#define I40E_FLAG_VEB_MODE_ENABLED		BIT(12)
--#define I40E_FLAG_VEB_STATS_ENABLED		BIT(13)
--#define I40E_FLAG_LINK_POLLING_ENABLED		BIT(14)
--#define I40E_FLAG_TRUE_PROMISC_SUPPORT		BIT(15)
--#define I40E_FLAG_LEGACY_RX			BIT(16)
--#define I40E_FLAG_PTP				BIT(17)
--#define I40E_FLAG_IWARP_ENABLED			BIT(18)
--#define I40E_FLAG_LINK_DOWN_ON_CLOSE_ENABLED	BIT(19)
--#define I40E_FLAG_SOURCE_PRUNING_DISABLED       BIT(20)
--#define I40E_FLAG_TC_MQPRIO			BIT(21)
--#define I40E_FLAG_FD_SB_INACTIVE		BIT(22)
--#define I40E_FLAG_FD_SB_TO_CLOUD_FILTER		BIT(23)
--#define I40E_FLAG_DISABLE_FW_LLDP		BIT(24)
--#define I40E_FLAG_RS_FEC			BIT(25)
--#define I40E_FLAG_BASE_R_FEC			BIT(26)
-+#define I40E_FLAG_MSI_ENABLED			BIT(0)
-+#define I40E_FLAG_MSIX_ENABLED			BIT(1)
-+#define I40E_FLAG_RSS_ENABLED			BIT(2)
-+#define I40E_FLAG_VMDQ_ENABLED			BIT(3)
-+#define I40E_FLAG_SRIOV_ENABLED			BIT(4)
-+#define I40E_FLAG_DCB_CAPABLE			BIT(5)
-+#define I40E_FLAG_DCB_ENABLED			BIT(6)
-+#define I40E_FLAG_FD_SB_ENABLED			BIT(7)
-+#define I40E_FLAG_FD_ATR_ENABLED		BIT(8)
-+#define I40E_FLAG_MFP_ENABLED			BIT(9)
-+#define I40E_FLAG_HW_ATR_EVICT_ENABLED		BIT(10)
-+#define I40E_FLAG_VEB_MODE_ENABLED		BIT(11)
-+#define I40E_FLAG_VEB_STATS_ENABLED		BIT(12)
-+#define I40E_FLAG_LINK_POLLING_ENABLED		BIT(13)
-+#define I40E_FLAG_TRUE_PROMISC_SUPPORT		BIT(14)
-+#define I40E_FLAG_LEGACY_RX			BIT(15)
-+#define I40E_FLAG_PTP				BIT(16)
-+#define I40E_FLAG_IWARP_ENABLED			BIT(17)
-+#define I40E_FLAG_LINK_DOWN_ON_CLOSE_ENABLED	BIT(18)
-+#define I40E_FLAG_SOURCE_PRUNING_DISABLED       BIT(19)
-+#define I40E_FLAG_TC_MQPRIO			BIT(20)
-+#define I40E_FLAG_FD_SB_INACTIVE		BIT(21)
-+#define I40E_FLAG_FD_SB_TO_CLOUD_FILTER		BIT(22)
-+#define I40E_FLAG_DISABLE_FW_LLDP		BIT(23)
-+#define I40E_FLAG_RS_FEC			BIT(24)
-+#define I40E_FLAG_BASE_R_FEC			BIT(25)
- /* TOTAL_PORT_SHUTDOWN
-  * Allows to physically disable the link on the NIC's port.
-  * If enabled, (after link down request from the OS)
-@@ -549,8 +548,8 @@ struct i40e_pf {
-  *   the link is being brought down by clearing bit (I40E_AQ_PHY_ENABLE_LINK)
-  *   in abilities field of i40e_aq_set_phy_config structure
+ /* driver state flags */
+-enum i40e_state_t {
++enum i40e_state {
+ 	__I40E_TESTING,
+ 	__I40E_CONFIG_BUSY,
+ 	__I40E_CONFIG_DONE,
+@@ -126,7 +126,7 @@ enum i40e_state_t {
+ 	BIT_ULL(__I40E_PF_RESET_AND_REBUILD_REQUESTED)
+ 
+ /* VSI state flags */
+-enum i40e_vsi_state_t {
++enum i40e_vsi_state {
+ 	__I40E_VSI_DOWN,
+ 	__I40E_VSI_NEEDS_RESTART,
+ 	__I40E_VSI_SYNCING_FILTERS,
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+index 20b77398f060..65c714d0bfff 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+@@ -35,7 +35,7 @@ enum i40e_ptp_pin {
+ 	GPIO_4
+ };
+ 
+-enum i40e_can_set_pins_t {
++enum i40e_can_set_pins {
+ 	CANT_DO_PINS = -1,
+ 	CAN_SET_PINS,
+ 	CAN_DO_PINS
+@@ -193,7 +193,7 @@ static bool i40e_is_ptp_pin_dev(struct i40e_hw *hw)
+  * return CAN_DO_PINS if pins can be manipulated within a NIC or
+  * return CANT_DO_PINS otherwise.
+  **/
+-static enum i40e_can_set_pins_t i40e_can_set_pins(struct i40e_pf *pf)
++static enum i40e_can_set_pins i40e_can_set_pins(struct i40e_pf *pf)
+ {
+ 	if (!i40e_is_ptp_pin_dev(&pf->hw)) {
+ 		dev_warn(&pf->pdev->dev,
+@@ -1071,7 +1071,7 @@ static void i40e_ptp_set_pins_hw(struct i40e_pf *pf)
+ static int i40e_ptp_set_pins(struct i40e_pf *pf,
+ 			     struct i40e_ptp_pins_settings *pins)
+ {
+-	enum i40e_can_set_pins_t pin_caps = i40e_can_set_pins(pf);
++	enum i40e_can_set_pins pin_caps = i40e_can_set_pins(pf);
+ 	int i = 0;
+ 
+ 	if (pin_caps == CANT_DO_PINS)
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.h b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+index 421fe5675584..1c667408f687 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_txrx.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+@@ -58,7 +58,7 @@ static inline u16 i40e_intrl_usec_to_reg(int intrl)
+  * mentioning ITR_INDX, ITR_NONE cannot be used as an index 'n' into any
+  * register but instead is a special value meaning "don't update" ITR0/1/2.
   */
--#define I40E_FLAG_TOTAL_PORT_SHUTDOWN_ENABLED	BIT(27)
--#define I40E_FLAG_VF_VLAN_PRUNING		BIT(28)
-+#define I40E_FLAG_TOTAL_PORT_SHUTDOWN_ENABLED	BIT(26)
-+#define I40E_FLAG_VF_VLAN_PRUNING		BIT(27)
+-enum i40e_dyn_idx_t {
++enum i40e_dyn_idx {
+ 	I40E_IDX_ITR0 = 0,
+ 	I40E_IDX_ITR1 = 1,
+ 	I40E_IDX_ITR2 = 2,
+@@ -306,7 +306,7 @@ struct i40e_rx_queue_stats {
+ 	u64 page_busy_count;
+ };
  
- 	struct i40e_client_instance *cinst;
- 	bool stat_offsets_loaded;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.c b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-index 9ce6e633cc2f..9a5a47b29bb7 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-@@ -555,10 +555,8 @@ static void i40e_set_hw_flags(struct i40e_hw *hw)
- 
- 	if (aq->api_maj_ver > 1 ||
- 	    (aq->api_maj_ver == 1 &&
--	     aq->api_min_ver >= 8)) {
-+	     aq->api_min_ver >= 8))
- 		hw->flags |= I40E_HW_FLAG_FW_LLDP_PERSISTENT;
--		hw->flags |= I40E_HW_FLAG_DROP_MODE;
--	}
- 
- 	if (aq->api_maj_ver > 1 ||
- 	    (aq->api_maj_ver == 1 &&
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index f24d2e13fcd1..b44d8d8b0474 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -12733,9 +12733,7 @@ static int i40e_sw_init(struct i40e_pf *pf)
- 	u16 pow;
- 
- 	/* Set default capability flags */
--	pf->flags = I40E_FLAG_RX_CSUM_ENABLED |
--		    I40E_FLAG_MSI_ENABLED     |
--		    I40E_FLAG_MSIX_ENABLED;
-+	pf->flags = I40E_FLAG_MSI_ENABLED | I40E_FLAG_MSIX_ENABLED;
- 
- 	/* Set default ITR */
- 	pf->rx_itr_default = I40E_ITR_RX_DEF;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
-index 2a5c7aec0bb1..2c791b7342b9 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_type.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
-@@ -553,8 +553,7 @@ struct i40e_hw {
- #define I40E_HW_FLAG_FW_LLDP_STOPPABLE      BIT_ULL(4)
- #define I40E_HW_FLAG_FW_LLDP_PERSISTENT     BIT_ULL(5)
- #define I40E_HW_FLAG_AQ_PHY_ACCESS_EXTENDED BIT_ULL(6)
--#define I40E_HW_FLAG_DROP_MODE              BIT_ULL(7)
--#define I40E_HW_FLAG_X722_FEC_REQUEST_CAPABLE BIT_ULL(8)
-+#define I40E_HW_FLAG_X722_FEC_REQUEST_CAPABLE BIT_ULL(7)
- 	u64 flags;
- 
- 	/* Used in set switch config AQ command */
+-enum i40e_ring_state_t {
++enum i40e_ring_state {
+ 	__I40E_TX_FDIR_INIT_DONE,
+ 	__I40E_TX_XPS_INIT_DONE,
+ 	__I40E_RING_STATE_NBITS /* must be last */
 -- 
 2.41.0
 
