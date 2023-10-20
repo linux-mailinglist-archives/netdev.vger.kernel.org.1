@@ -1,139 +1,123 @@
-Return-Path: <netdev+bounces-42891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AF2C7D0887
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 08:33:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B6A7D089B
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 08:39:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CF6BB21415
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 06:33:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74E6D28224F
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 06:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1CDEB652;
-	Fri, 20 Oct 2023 06:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6F0B652;
+	Fri, 20 Oct 2023 06:39:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="XxLFdweu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19061CA57;
-	Fri, 20 Oct 2023 06:33:47 +0000 (UTC)
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65432A3;
-	Thu, 19 Oct 2023 23:33:44 -0700 (PDT)
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-323ef9a8b59so302642f8f.3;
-        Thu, 19 Oct 2023 23:33:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A4B6112
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 06:39:46 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDA54CE
+	for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 23:39:44 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-53e2308198eso591116a12.1
+        for <netdev@vger.kernel.org>; Thu, 19 Oct 2023 23:39:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1697783983; x=1698388783; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B2yp/+uoXDPdDZvc0A60oXmXPqC6NUCSNebw398N6I0=;
+        b=XxLFdweuaY6glNwcHvo3S7tU0HFKADCe+pwHRndN3UueSXOtJnXSCiyLSUmRh+Y85R
+         lgS3j5cBmQ5gHiu9Z4d/esviIgP+DPeGQ8th8Y+v9AB2D9KrzOpFI0QTycgibbxnVikY
+         t2UH4odyUE77znhmX/QwYPGF7zk3gTWU0r67wXenzMgsXpc/PvEBhl2WMkMKdiE/ZPwZ
+         qnMmiCL2spjKFRMuMm/tvCX7bxd5rbS/UZKZ0V+tkshfUw/9rtG1+hR2kow3Xs9sg7/P
+         fWxMMLFCT9q6DHfZIJpnJB9UgHtrZgJPLsPZB+MYe82Rrz+PK5kSN36ykgzFpURkZjcT
+         36ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697783623; x=1698388423;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zt/QV+A+m2+lk94Yp3iCuYUpdAhjPGwWV2MUu0sAeuA=;
-        b=izz3oxuU/WYAaJxccT8XGUnMYQu58EchudB3bnn6zuCNEw9LsPaHLJ2qNF26ShR356
-         KWcGM2/l7qV++/NZwdNjGOs3n2wpNIWTBTPeCE+LmfmFXJWwLxlY7fCoJmIED2lWtKr+
-         52PRMsYbDmRx1MOr25CZ30TDIxRUWj0xBjA+09Kd9rt6VGutDNR4EktYo+Qz2ByAQIQv
-         Y6y+ilUUW/7E0BO/mCHMLbgIPbiT+zPAdkPh2Jwqsg70Ol54LhnXX7A5Di68uN4xV6XO
-         0BlfoBRk26PiS65vok8+lll0DxXknhMT75MueTyHraYbj2mKR/BptU4Td27iJ08QBaZ1
-         I0Ng==
-X-Gm-Message-State: AOJu0Yy5wdZN3NZYAuRrIRbV1k/pIUdv22OTTjPsXikMdHt18x44qB84
-	6JmGLL/i6wKP655vOR6Aa4Y=
-X-Google-Smtp-Source: AGHT+IGNqsKl6kpfdFm9jTKgDdguNeqQvXM2QnVGaLh+PmnV+mhNX9rAdayn5snLfEmZeuWgX0Mdwg==
-X-Received: by 2002:adf:fe87:0:b0:32d:ccef:ec1c with SMTP id l7-20020adffe87000000b0032dccefec1cmr667901wrr.43.1697783622401;
-        Thu, 19 Oct 2023 23:33:42 -0700 (PDT)
-Received: from [10.148.84.122] (business-89-135-192-225.business.broadband.hu. [89.135.192.225])
-        by smtp.gmail.com with ESMTPSA id a3-20020a5d4d43000000b003196b1bb528sm965527wru.64.2023.10.19.23.33.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Oct 2023 23:33:41 -0700 (PDT)
-Message-ID: <47d463bce1ef62ecb34b666f21d7dd0d7439ac23.camel@inf.elte.hu>
-Subject: Re: r8152: error when loading the module
-From: Ferenc Fejes <fejes@inf.elte.hu>
-To: Hayes Wang <hayeswang@realtek.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev <netdev@vger.kernel.org>, "linux-usb@vger.kernel.org"
-	 <linux-usb@vger.kernel.org>
-Date: Fri, 20 Oct 2023 08:33:41 +0200
-In-Reply-To: <a05475db018e4e5ea8d24a62e6aab4e4@realtek.com>
-References: <aff833bb8b202f12feed5b2682f1361f13e37581.camel@inf.elte.hu>
-	 <20231019174514.384ccca8@kernel.org>
-	 <a05475db018e4e5ea8d24a62e6aab4e4@realtek.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.0-1 
+        d=1e100.net; s=20230601; t=1697783983; x=1698388783;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B2yp/+uoXDPdDZvc0A60oXmXPqC6NUCSNebw398N6I0=;
+        b=c8lozENB6tBFzAlUb0phsQSR1eFu57NM5fmjHzOYlgNgmmmZQ6Q/d6Cs7f2huBxNso
+         D5+YHKLndIYoU6K1DCEehgvYQx3VuDRw9Ow/hKy9UTPjQefUAgJd3l/rBuz/SNNzatxQ
+         TTFev/JuCvuj7b9Cp61vnm8nh6YWT2QVjG5Nuhd5XZHVremKhoTMFC2Arw0duVQTjVq2
+         6Ge/eDKMDyOMy2mlnvK4gWEcrQqMKTGBRhCFY5S+mUyzJ1FifsBZRvT/+RyOOgz8C51V
+         CiPdQyFQqPmr3xBS2UMFRnJg9qssZ29W6Oa9iII1X5YFNTSCjsp8VKYeQdbK68SdK16b
+         nx7g==
+X-Gm-Message-State: AOJu0YzRds6qFls2I1BOdJSo1CgLj+80BfcjbLrqCb0MUDpsMR55DmV+
+	h/Se73qbKNeQPKFz5W2953Ys1oO14NT6s3O5Ix3m4Q==
+X-Google-Smtp-Source: AGHT+IHB35/EOIOr35HN++ZRTCy6gPZn5GdWe6FQtupPL660MqWX2OkTGpZVDEc2RaXXWPPDHowi48EH0tOyEkBNITA=
+X-Received: by 2002:a50:d742:0:b0:53f:6ed5:4dab with SMTP id
+ i2-20020a50d742000000b0053f6ed54dabmr805859edj.24.1697783983308; Thu, 19 Oct
+ 2023 23:39:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <cover.1697779681.git.yan@cloudflare.com> <e721c615e22fc4d3d53bfa230d5d71462ae9c9a8.1697779681.git.yan@cloudflare.com>
+ <CANn89iKU6-htPJh3YwvDEDhnVtkXgPOE+2rvzWCbKCpU25kbDw@mail.gmail.com>
+In-Reply-To: <CANn89iKU6-htPJh3YwvDEDhnVtkXgPOE+2rvzWCbKCpU25kbDw@mail.gmail.com>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Fri, 20 Oct 2023 01:39:31 -0500
+Message-ID: <CAO3-PbqtEPQro4wsQbaD-UbF-2RpxsVKVvs3M0X10-oE7K1LXA@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 1/3] ipv6: remove dst_allfrag test on ipv6 output
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Aya Levin <ayal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org, 
+	kernel-team@cloudflare.com, Florian Westphal <fw@strlen.de>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Alexander H Duyck <alexander.duyck@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-10-20 at 05:59 +0000, Hayes Wang wrote:
-> [...]
-> > > On my machine r8152 module loading takes about one minute.
-> > >=20
-> > > Its a Debian Sid:
-> > > uname -a
-> > > Linux pc 6.5.0-2-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.5.6-1
-> > > (2023-10-07) x86_64 GNU/Linux
-> >=20
-> > Did this device work fine with older kernels or this is the only
-> > one
-> > you tried? The code doesn't seem to have changed all that much
-> > since
-> > RTL8156B support was added.
+On Fri, Oct 20, 2023 at 1:06=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Fri, Oct 20, 2023 at 7:32=E2=80=AFAM Yan Zhai <yan@cloudflare.com> wro=
+te:
+> >
+> > dst_allfrag was added before the first git commit:
+> >
+> > https://www.mail-archive.com/bk-commits-head@vger.kernel.org/msg03399.h=
+tml
+> >
+> > The feature would send packets to the fragmentation path if a box
+> > receives a PMTU value with less than 1280 byte. However, since commit
+> > 9d289715eb5c ("ipv6: stop sending PTB packets for MTU < 1280"), such
+> > message would be simply discarded. The feature flag is neither supporte=
+d
+> > in iproute2 utility. In theory one can still manipulate it with direct
+> > netlink message, but it is not ideal because it was based on obsoleted
+> > guidance of RFC-2460 (replaced by RFC-8200).
+> >
+> > The feature test would always return false at the moment, so remove it
+> > from the output path.
+>
+> What about other callers of dst_allfrag() ?
+>
+> This feature seems broken atm.
 
-Thanks for pointing this out. Indeed, its probably not the kernel as I
-suggested before, see below.
+It is broken as far as I can tell. The reason I removed just one
+caller here is to keep the code simpler and consistent. If I don't do
+so, I ought to test it for both GSO fast path and slow path to be
+logically consistent. Seems an overkill to me. For the removal of the
+rest, I'd hope it could come in as a standalone patch(set) because it
+is not just callers but also those unnecessary flags and tests on IP
+corks and sockets, not quite aligned with this patch's intention. I
+noted you have drafted something like this in the past:
 
-> >=20
-> > > dmesg:
-> > >=20
-> > >=20
-> > > [=C2=A0 899.522306] usbcore: registered new device driver r8152-
-> > > cfgselector
-> > > [=C2=A0 899.601295] r8152-cfgselector 2-1.3: reset SuperSpeed USB
-> > > device number 4 using xhci_hcd
-> > > [=C2=A0 927.789526] r8152 2-1.3:1.0: firmware: direct-loading firmwar=
-e
-> > > rtl_nic/rtl8156b-2.fw
-> > > [=C2=A0 942.033905] r8152 2-1.3:1.0: load rtl8156b-2 v2 04/27/23
-> > > successfully
->=20
-> Someone reports there is an error message when loading rtl8156b-2 v2
-> 04/27/23.
-> 	r8152 6-1:1.0: ram code speedup mode fail
-> I don't find the same message for you.
+https://lkml.kernel.org/netdev/1335348157.3274.30.camel@edumazet-glaptop/
 
-That line was also in dmesg for sure, I just failed to copy-paste every
-related bits.
+I guess it might be a good base point to work on as a new patch(set)?
+What's your call on this?
 
-> However, I check the firmware and find some wrong content.
-> Could you remove /lib/firmware/rtl_nic/rtl8156b-2.fw and unplug the
-> device.
-> Then, plug the device and check it again.
-
-Yes, I'll do that, but strangely enough the error has disappeared since
-then. I played with the setup yesterday a little more. The NIC is
-actually built into my monitor, which is always powered on - so
-regardless if my laptop connected or not, the NIC is probably on. I
-rebooted to Windows, and then rebooted to Linux, and magically the bug
-just disappeared.
-
-Is this possible/makes sense to you?
-
->=20
-> > > [=C2=A0 956.269444] ------------[ cut here ]------------
-> > > [=C2=A0 956.269447] WARNING: CPU: 7 PID: 211 at
-> > > drivers/net/usb/r8152.c:7668 r8156b_hw_phy_cfg+0x1417/0x1430
-> > > [r8152]
-> > > [=C2=A0 956.269458] Modules linked in: r8152(+) hid_logitech_hidpp
-> > > uhid ccm
->=20
->=20
-> Best Regards,
-> Hayes
->=20
->=20
-
-Best,
-Ferenc
+Yan
 
