@@ -1,186 +1,183 @@
-Return-Path: <netdev+bounces-43070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC0F7D146C
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:54:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 615DA7D1484
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0FE92824FF
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 16:54:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AC7E28259F
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:04:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CADAA1EA77;
-	Fri, 20 Oct 2023 16:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7985200BB;
+	Fri, 20 Oct 2023 17:04:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hGbfGWXK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JAJke9EP"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308B61EA64
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 16:54:34 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0A5318F
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 09:54:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697820873; x=1729356873;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=li9uqBZB5qlVulj3jVFlbFGun7HTN9Su3IWRU0uieKI=;
-  b=hGbfGWXKLgbJpyebO/JB0VGpreYnj0dGSI1VJv4PgRxdVOGokYStmLXl
-   5lesg2YGfgduloOqbi/ACZJaUaBqSu+3JKzciFUpvSURhcWRBIVbOgHWl
-   Ft558PK2X9iNRGw0ypSzvCpVM4hyzoHVLM8lCYNRUH2nAonCvczJKyEdR
-   8sYU9d5e0BBaANHiAyu1D/vww+hOBHT6+t7rcSIJZALZhagYWTbItSF7/
-   BivjB65RZSJWP6ocMCMTSqfN60RoFn5Lsjwq5bL3JWKoy/NLERGCeUdrE
-   RaBx5jhu9Yquo73sTSHsAPSj1SVYnMWY58XwxhzeOPy0Jhjl4pyse4tzj
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="472756857"
-X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="472756857"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 09:54:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="1088799769"
-X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="1088799769"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Oct 2023 09:54:33 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Fri, 20 Oct 2023 09:54:32 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Fri, 20 Oct 2023 09:54:32 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Fri, 20 Oct 2023 09:54:32 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Fri, 20 Oct 2023 09:54:31 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GeA3Q7IRtqxu5z7Yuxedyl6xKLt2rkj/8+oiKrws5jbLRk5XxT8vclZFpNwHEOR8TkFnDhYRhWC/Gjk13LaO0a+AQZCquqoXu9feFjv1qdf+5qQQcIidRm2IttnGBjqkZVij8xvD1k2Jxi5XJXRKMw5/Oig+sdYV8XzOwLDNvudvzUrHXR1WWHevotr2F/8km4145t10g206f9aEDa6iFzUJLBT1t+NtL80yxxJKph2KtfPnq23GdRdUIJT2LtVTYttI/waj5ESlvrgJ6dhc8mOFodWJB/c3Vocn2tpZHMHir2V6MlWPqD/5aTiiUUpqPhUOlD+bvC9vZiTkI61RTA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TW4NiRApuez3t8qcplL0YSTtt5gH/m8czP1FvoehGkU=;
- b=jmDCMCirc++KnhFn5ry5YyOSO0hCED9+OcSA2HV6imSFeKcxJTHcGePx+2qvNLjyw/IeUVvDGizjRYBhSZFJ7tM0iZ1lEbJDvwLBUiaG3/RqBWKcXCnb6ZEgp9FKraazWNgpGwCE6szKsYfEhcsQTH4HIt7YGRlIkcmiowrQbSGZO91kVh/iIOVEibb8Ok1TSmUqlN0+ObyHiAAXk1IO7y8hHZzCG8icCm4ZxK3FD6C1NeqTezOkqj2V0YZQVwEUgsy+Xjq9VlgamCmy2H6m7qIjCot7kUmsEPw8QrU3Jn8O55i+yfWPMbyURZ3Nsy1Don3A3Wbhpiyn70RdME0p6g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5140.namprd11.prod.outlook.com (2603:10b6:303:9e::21)
- by MW4PR11MB6811.namprd11.prod.outlook.com (2603:10b6:303:208::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Fri, 20 Oct
- 2023 16:54:30 +0000
-Received: from CO1PR11MB5140.namprd11.prod.outlook.com
- ([fe80::db8e:c076:1c95:fb66]) by CO1PR11MB5140.namprd11.prod.outlook.com
- ([fe80::db8e:c076:1c95:fb66%4]) with mapi id 15.20.6907.025; Fri, 20 Oct 2023
- 16:54:30 +0000
-Message-ID: <f48526f8-4e7c-ed94-ff18-eeaf475097ef@intel.com>
-Date: Fri, 20 Oct 2023 09:54:28 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH net-next v5 0/6] ice: Add basic E830 support
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<andrew@lunn.ch>, <horms@kernel.org>, <anthony.l.nguyen@intel.com>, "Pawel
- Chmielewski" <pawel.chmielewski@intel.com>
-References: <20231018231643.2356-1-paul.greenwalt@intel.com>
- <20231019174900.29d93b3d@kernel.org>
-From: "Greenwalt, Paul" <paul.greenwalt@intel.com>
-In-Reply-To: <20231019174900.29d93b3d@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0167.namprd04.prod.outlook.com
- (2603:10b6:303:85::22) To CO1PR11MB5140.namprd11.prod.outlook.com
- (2603:10b6:303:9e::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D731F940
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 17:04:06 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01EF7D6C
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:04:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697821444;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=PXnWK6yDEEFlU5gQ/qSZhO9jwWsn8uutZ2XsLCYTa64=;
+	b=JAJke9EPeN6qBwdUDu6MXOUeMHu2s5xJThDFL+kPQH0a6Vvx+6Fa388AtGOZBa/mayCXvv
+	WcsAq8H/IB70IhccgrxC/0HiYTLdv0oa8ncL+UWyupRuZfIZkpbC9NP3Q06jOTw1tpbV88
+	LbdGjVcqwowrSGsS2m7aBdrXKPQeTK4=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-248-ONf2oWEbO6u0l-47fhm_CQ-1; Fri, 20 Oct 2023 13:03:52 -0400
+X-MC-Unique: ONf2oWEbO6u0l-47fhm_CQ-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5b83bc7c7b4so751324a12.2
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:03:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697821431; x=1698426231;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PXnWK6yDEEFlU5gQ/qSZhO9jwWsn8uutZ2XsLCYTa64=;
+        b=v1UU+pbadfjHlQMsPoQKmRoqoQWjhDAs741INb3cljEzp2t2BBfwsP+P5P/zsHrNIC
+         JGPEl1+8T/EleJNlXEm+6no/0vinez5qxeRHDwkhfG4snYSRhApK8ajcpw39Pou+bbFZ
+         p51ktISz9VDk0DpJ87z5X6zKs/4z6J3enuovmBPThj4WUiGqsvWsmGoXr2kMTsQbc6FI
+         GAvAr/tFgsAVxlZcfTH/bKqGDiTVgcfttBDBzIciDoOz6OvZ6CwJMqrgjsLgiMOzR0Bo
+         turj5NyR08FG4zYNz+RYVBtaYGFg7DP0tNIdSAckXjHVz4CcuHkqvutg/7XCprOC1ei5
+         XURw==
+X-Gm-Message-State: AOJu0Yz6BEQZGi5l4ihrIYxuGNEsS8AGRD8D0I3HOt2no8+gON2Xb1GZ
+	lV8pmA+dhX1BaVS0IK+EGjoKVzshR+I6PPu5rKL2i4Qq8CNFGnf5AnFAXcv2ZBv2gWzZPTt5pjC
+	VJs9AgugoiVqpyWbQ
+X-Received: by 2002:a17:90b:f98:b0:27d:3e90:9ee1 with SMTP id ft24-20020a17090b0f9800b0027d3e909ee1mr2761555pjb.23.1697821431522;
+        Fri, 20 Oct 2023 10:03:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGV8u8SqB5Zdp0bgC5MrhdPqfvH5+OIPyzDIxgGi/T0fslThxyuZrH20I+BlC/7gEG2T8j8vA==
+X-Received: by 2002:a17:90b:f98:b0:27d:3e90:9ee1 with SMTP id ft24-20020a17090b0f9800b0027d3e909ee1mr2761514pjb.23.1697821431106;
+        Fri, 20 Oct 2023 10:03:51 -0700 (PDT)
+Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
+        by smtp.gmail.com with ESMTPSA id 7-20020a17090a1a0700b0027d04d05d77sm3850299pjk.8.2023.10.20.10.03.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Oct 2023 10:03:50 -0700 (PDT)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: steve.glendinning@shawell.net,
+	UNGLinuxDriver@microchip.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	syzbot+c74c24b43c9ae534f0e0@syzkaller.appspotmail.com,
+	syzbot+2c97a98a5ba9ea9c23bd@syzkaller.appspotmail.com
+Subject: [PATCH net] net: usb: smsc95xx: Fix uninit-value access in smsc95xx_read_reg
+Date: Sat, 21 Oct 2023 02:03:44 +0900
+Message-ID: <20231020170344.2450248-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5140:EE_|MW4PR11MB6811:EE_
-X-MS-Office365-Filtering-Correlation-Id: a2c58f2f-23e5-4d19-012b-08dbd18d3a31
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6mfIQOAZ51VIw9Uh1/D6u+qYo4h6cM2Ar2k6yc7BpnR4U+oa0nqMe8S7ZtEitS8u7h6xBzAdbity58yy6ttSfCi4bVY+5kL5O/PTrff0YprUk3xNgFZ6LbV+yT/Vx5MRJkxG1FYJ6jApxCxnfFfNm2z8/qywb/Mwl00CpQzlNpVO9CCjgQ8bSW5sDODJloxW0swXtKvnaS0sJFRyZvWWHckNUMu27tow3movWXtmmVrhbJ8ltIX0xTC7eJyXJUZ/kqNL4o3sOzY/vkPxyMl7kRYDtGXn+4ObZ0G7mGfh6/YjRmOYyP0Tj6CNxhO6Ue3mZAqnkGPkZxz4ml2c4TUeSvR3zRMnKnMN5iTwCsG/suEojK4mmHgy5N9aOMT6zANDiafSUGmV+gxDOAt9bZ3oUtz00bBDlnmSt+VdOsUFz+at16rG5whlqkvm3LTxn6mBYKvIlzB25b1UgXOiAOJLCXZQhA5JR6UTwgdWxjIT6tt5taQ20bRjpSaKi3hZZcpPLv9ljRZ1RNsVC3YzbQWCp4Q6OTr/uKiCre+M8a6ud6j5TUfB9UtjxGlFTetMUeVszcL/vuCsWUJjxcF8Vv/SOQSNim8VOfoq+XBDyHb+60ayOfHC5KRKFlhFlOl/k8lh4vG0RXMxYfWljoEp/6zJcA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5140.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(396003)(366004)(136003)(346002)(230922051799003)(451199024)(1800799009)(186009)(64100799003)(41300700001)(36756003)(2906002)(26005)(107886003)(4326008)(8936002)(31696002)(86362001)(8676002)(38100700002)(2616005)(82960400001)(83380400001)(4744005)(6512007)(53546011)(6506007)(6916009)(5660300002)(316002)(478600001)(6486002)(66946007)(66476007)(66556008)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UnowTU1VUlFyRTBkY29RSllhZ0FpWTNtTVR3cmF0TUNOdGdGRXh4Rmd0RkFv?=
- =?utf-8?B?MlpqL0U4Yld6RDR5eERFUnhIRWZjakk3TEMwWFRORWpGSWppQkVYbVo2MkZh?=
- =?utf-8?B?bHV1QmxMNnlsZVRMdkg1Ym1BZlcvMjJ3RzhaU1lmWGNtZGMvblFiNGtGZ3g3?=
- =?utf-8?B?R0hYYmpIdDBDWnF0eVF5QnAvaTNuS3l5N05XRTVZUGRieFdEeFZuZkpJUG1C?=
- =?utf-8?B?aUlib1h0dWRRTEVEbk9BbElQMXpaSWVKTmNNWWprYyt0SkIzUTdabEQ5M1dl?=
- =?utf-8?B?ZmNJb3dDcmUyRDhoa1pQenIwOHBtQXl5ZXN0am82WCtMVkt1eDZNaVpyQjQv?=
- =?utf-8?B?QUFRSW9LQXZTejhJUC9zUk0xSnZWYkNzWXpLekNzRWtBV3pEaGd3eGZWWE9J?=
- =?utf-8?B?YXhQMjJTNzBiOXNOOXlod3hrSy85MWhXODRsWHJjdTlMTTZLVk9GRi9YYmFB?=
- =?utf-8?B?N0RGNFRDODREOWdmVlBLL3V2SWRCSkxDSjRCRlc1S1IxOUZYaTE0d1FENUM3?=
- =?utf-8?B?QXJQUmZYSjlWWE4rOFJkWnZJTEJCVTZHSVJkTlAwTXN1UWpzS0NaRnZ2dmR6?=
- =?utf-8?B?aFF3SlFrZkl4ekIzM3RmUzN5NmYwWlRaYXVUTm52N3dmakpPM2ZoSUJFQ0sw?=
- =?utf-8?B?aTl2UVJBMGNLVVVXYWxUeE1uNEdZZkd2OGNPZ2s2dGZYcmlvNWNPbHFidm5M?=
- =?utf-8?B?UXZoQ0R5QUZQbU9ON05PamViQllJdUNRUXZGK1EvTGZDYXBLaVhSdVRCWU5z?=
- =?utf-8?B?ejY2c1hUNEFmSXAyeFhDS29FN0YzVFRlUld5SGh5MEs4bUNQMUdGNFhqaTlD?=
- =?utf-8?B?TkxLMHNRWkZ6SFEwOEVTcElJN3lWNE9OdlVSMEdIV0dmQVVUZXlKRnNqR3pJ?=
- =?utf-8?B?UU9Lb1lhREdDUk00UEtyNTQrZWxoOVJOanVGQ3lJcG16L3o3ZFQ2V3lLK3VP?=
- =?utf-8?B?UHFrd25hOHZscTZWUXRweHByT3dyNVdtaVM4eVFZUzdnT2NSWjYxZjlxV2xX?=
- =?utf-8?B?ajNyRXpJSEdqY2tNQi9ENWNZS1NNZTBGZ2RPV1ZCU2pVWlJYR1JGK051bGZz?=
- =?utf-8?B?Y2hST2thUlA1NnlWZlBvdVppSFhsVFBJN25UeVBkQ0owbUtNaGptS00wNDZm?=
- =?utf-8?B?VjFMV28xVDBoUVlBRU1sTDJKa0VKbVduQXV2RmpvcC9Ed3EyTWljTzhHRElZ?=
- =?utf-8?B?Y3dNcEcybzhaMEpGRndtaWRYeTI1VFpPeE5XNEorY3V2VkR5ZVdXZUJUdFRZ?=
- =?utf-8?B?V0JFcGFNZVJudmJIdGxJS0gvdEpaUkJUNC9CbGlCOEt5cjIxbnFvZGhHUk85?=
- =?utf-8?B?NlpUMDcrQTRFWGRocklkYUk2aVhaemhkRlFNaFpLczB3ZXRxRFpmTjA5VmN4?=
- =?utf-8?B?ck1WNU5icUZaZDgzWThzL1pDeXZhK2V2K2ZVRDI1WDNCVmRRVmpsaDUrTzRM?=
- =?utf-8?B?ZWljTWJNUzlpb00zRHd6TGpPdHRqYlM2V0ZscHo0eGxLK2J5aUhvbk40NnVT?=
- =?utf-8?B?Z0o3UzA3bHZydWtlcWhLcTR6UmNLbkFCME55dHdCR0xhUEFKSmtweDlod2RL?=
- =?utf-8?B?SStiT0pYczhCdU1WclN2VUN3WElFTWhGaklVM1RIdDBZdGpxUnI1Mkl3TVk2?=
- =?utf-8?B?R09FMFFDVG1Hb05ycTdIc1MrTVNDRWZjVm5HaHM4N0VzYWppYXJVV25ML0Nj?=
- =?utf-8?B?OUtvNWtIb1BuRXByWXVoMFFPeUgxZTB0VHF1RFRpVFNHOUk1TVhWZDVyYTJW?=
- =?utf-8?B?MXl0NEF5c1ZlcEx5UjRIdjQwOGxIUVdKSXp6eTNBTEwrbE8vL3RFMFlqOXJm?=
- =?utf-8?B?cHlSNEJoaWtIU2JmWTQrVGt3WktsRmVLekN4YzNGd3NUKzczdzdnbWZmaFRr?=
- =?utf-8?B?TXB6NTNPVnZUQ3h3djNhNDMybGJOQ1BkUzhwUllsUTlGRXh1Z296b3ZhS05X?=
- =?utf-8?B?QWFkbE5rZGdUaVlBOXM3VkVOdWZuTUovYjJwRG4vOFljNVJNM2NvT254RFdV?=
- =?utf-8?B?eEFteHBqb2t4d2xkdFN6SlYyNFo3dUdGZW1QS2wyaGRDWWhwd3R0VFRVMHZH?=
- =?utf-8?B?cWNzbHhmb0hJWHBHUlB1eFRQem5kK3J3R2c5ZHFobzY4QXdXUk9FOHEzaDd1?=
- =?utf-8?B?K1RQeEcxYjFISVBTd0g5ZElLaGw5Z2ZOM0dzSlVTT1l2Q3hHMlljK1N4ZjEx?=
- =?utf-8?B?Vmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a2c58f2f-23e5-4d19-012b-08dbd18d3a31
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5140.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 16:54:30.1641
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QmnREGVqBd9OYHZk/90AVHvQQBZYDwCba07q0OpK9jXVTdebhVoSvdgHc8siz5XWLi/0c5TKz779h9hc5ujL5njB27Rp8Gxz/Z4YR4jVfbg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6811
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
+syzbot reported the following uninit-value access issue [1]:
 
+smsc95xx 1-1:0.0 (unnamed net_device) (uninitialized): Failed to read reg index 0x00000030: -32
+smsc95xx 1-1:0.0 (unnamed net_device) (uninitialized): Error reading E2P_CMD
+=====================================================
+BUG: KMSAN: uninit-value in smsc95xx_reset+0x409/0x25f0 drivers/net/usb/smsc95xx.c:896
+ smsc95xx_reset+0x409/0x25f0 drivers/net/usb/smsc95xx.c:896
+ smsc95xx_bind+0x9bc/0x22e0 drivers/net/usb/smsc95xx.c:1131
+ usbnet_probe+0x100b/0x4060 drivers/net/usb/usbnet.c:1750
+ usb_probe_interface+0xc75/0x1210 drivers/usb/core/driver.c:396
+ really_probe+0x506/0xf40 drivers/base/dd.c:658
+ __driver_probe_device+0x2a7/0x5d0 drivers/base/dd.c:800
+ driver_probe_device+0x72/0x7b0 drivers/base/dd.c:830
+ __device_attach_driver+0x55a/0x8f0 drivers/base/dd.c:958
+ bus_for_each_drv+0x3ff/0x620 drivers/base/bus.c:457
+ __device_attach+0x3bd/0x640 drivers/base/dd.c:1030
+ device_initial_probe+0x32/0x40 drivers/base/dd.c:1079
+ bus_probe_device+0x3d8/0x5a0 drivers/base/bus.c:532
+ device_add+0x16ae/0x1f20 drivers/base/core.c:3622
+ usb_set_configuration+0x31c9/0x38c0 drivers/usb/core/message.c:2207
+ usb_generic_driver_probe+0x109/0x2a0 drivers/usb/core/generic.c:238
+ usb_probe_device+0x290/0x4a0 drivers/usb/core/driver.c:293
+ really_probe+0x506/0xf40 drivers/base/dd.c:658
+ __driver_probe_device+0x2a7/0x5d0 drivers/base/dd.c:800
+ driver_probe_device+0x72/0x7b0 drivers/base/dd.c:830
+ __device_attach_driver+0x55a/0x8f0 drivers/base/dd.c:958
+ bus_for_each_drv+0x3ff/0x620 drivers/base/bus.c:457
+ __device_attach+0x3bd/0x640 drivers/base/dd.c:1030
+ device_initial_probe+0x32/0x40 drivers/base/dd.c:1079
+ bus_probe_device+0x3d8/0x5a0 drivers/base/bus.c:532
+ device_add+0x16ae/0x1f20 drivers/base/core.c:3622
+ usb_new_device+0x15f6/0x22f0 drivers/usb/core/hub.c:2589
+ hub_port_connect drivers/usb/core/hub.c:5440 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5580 [inline]
+ port_event drivers/usb/core/hub.c:5740 [inline]
+ hub_event+0x53bc/0x7290 drivers/usb/core/hub.c:5822
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
+ worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
+ kthread+0x3e8/0x540 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
-On 10/19/2023 5:49 PM, Jakub Kicinski wrote:
-> On Wed, 18 Oct 2023 19:16:37 -0400 Paul Greenwalt wrote:
->> This is an initial patchset adding the basic support for E830. E830 is
->> the 200G ethernet controller family that is a follow on to the E810 100G
->> family. The series adds new devices IDs, a new MAC type, several registers
->> and a support for new link speeds. As the new devices use another version
->> of ice_aqc_get_link_status_data admin command, the driver should use
->> different buffer length for this AQ command when loaded on E830.
-> 
-> Please make sure to mark purely Intel driver patch sets as iwl-next
-> rather than net-next.
+Local variable buf.i225 created at:
+ smsc95xx_read_reg drivers/net/usb/smsc95xx.c:90 [inline]
+ smsc95xx_reset+0x203/0x25f0 drivers/net/usb/smsc95xx.c:892
+ smsc95xx_bind+0x9bc/0x22e0 drivers/net/usb/smsc95xx.c:1131
 
-Sorry about the mistake and I'll make sure to avoid that in the future.
-Thanks
+CPU: 1 PID: 773 Comm: kworker/1:2 Not tainted 6.6.0-rc1-syzkaller-00125-ge42bebf6db29 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
+Workqueue: usb_hub_wq hub_event
+=====================================================
+
+Similar to e9c65989920f ("net: usb: smsc75xx: Fix uninit-value access in
+__smsc75xx_read_reg"), this issue is caused because usbnet_read_cmd() reads
+less bytes than requested (zero byte in the reproducer). In this case,
+'buf' is not properly filled.
+
+This patch fixes the issue by returning -ENODATA if usbnet_read_cmd() reads
+less bytes than requested.
+
+sysbot reported similar uninit-value access issue [2]. The root cause is
+the same as mentioned above, and this patch addresses it as well.
+
+Fixes: 2f7ca802bdae ("net: Add SMSC LAN9500 USB2.0 10/100 ethernet adapter driver")
+Reported-and-tested-by: syzbot+c74c24b43c9ae534f0e0@syzkaller.appspotmail.com
+Reported-and-tested-by: syzbot+2c97a98a5ba9ea9c23bd@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=c74c24b43c9ae534f0e0 [1]
+Closes: https://syzkaller.appspot.com/bug?extid=2c97a98a5ba9ea9c23bd [2]
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+ drivers/net/usb/smsc95xx.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
+index 563ecd27b93e..0c875d18e93f 100644
+--- a/drivers/net/usb/smsc95xx.c
++++ b/drivers/net/usb/smsc95xx.c
+@@ -95,7 +95,9 @@ static int __must_check smsc95xx_read_reg(struct usbnet *dev, u32 index,
+ 	ret = fn(dev, USB_VENDOR_REQUEST_READ_REGISTER, USB_DIR_IN
+ 		 | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+ 		 0, index, &buf, 4);
+-	if (ret < 0) {
++	if (ret < 4) {
++		ret = ret < 0 ? ret : -ENODATA;
++
+ 		if (ret != -ENODEV)
+ 			netdev_warn(dev->net, "Failed to read reg index 0x%08x: %d\n",
+ 				    index, ret);
+-- 
+2.41.0
+
 
