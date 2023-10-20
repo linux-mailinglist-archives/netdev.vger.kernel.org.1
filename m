@@ -1,165 +1,78 @@
-Return-Path: <netdev+bounces-43062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 463E37D13E5
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:20:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 905D57D13E9
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:21:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76E261C20AB1
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 16:20:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C14E11C20AB7
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 16:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02951EA66;
-	Fri, 20 Oct 2023 16:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560851EA6F;
+	Fri, 20 Oct 2023 16:21:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3yPymM6j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="txg7yZOP"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DBC1CF9B
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 16:20:05 +0000 (UTC)
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7F7C1A4
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 09:20:03 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-507c9305727so3480e87.1
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 09:20:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697818802; x=1698423602; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RFgpwKxJwpiltsg/qurEhmUre1y2LPCH4+cza9etRiY=;
-        b=3yPymM6jxYEa7PPHWjXiD6hnodhOtzo1Y5phFwSH0sKT1nQYQPb3IM2yGJssGsI4ST
-         cwY3/E/COg4AJ7UhB/szTOVIfR0/Xjq8XaskpF7R3pHdoyB8Lq9xPtQw39XTYyEnNPas
-         VEJs0KTDGEAerOVw1OpSEn/68PLRVUyeV7472sqGATFR+5QZ1FrXepy/HxxozTMUCWdQ
-         wFseoczT8YEpe5JqetcRUw0cA86eewCAoR+4WIAp8m0YQ93wOWcfSQmX2G2suJ9SDfsT
-         l7hwaQVG41jFa1aHAf14gmJjX0QdMBaA62b6ai7WB9+Fo8H0+WkZS4+pvTCuJnZbY9Kg
-         1Dpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697818802; x=1698423602;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RFgpwKxJwpiltsg/qurEhmUre1y2LPCH4+cza9etRiY=;
-        b=ge8+SYbzoSnECISes1+KwYdXk2zLGQ2exSs9ItmAUsUw+ogyzeMThuOvrRcR4m1qST
-         WqoRyA7d6xgoNuKRMt9kv7Awe5xrqQJx+9u5yNGHozErKmOyeki54SjH+BKn3aunRSNy
-         vOcomPUVPHvQZtsscUBsKrfZ+XEJJiI/crLgPz9Vu4XiMdZ044bHgSgIyPpxXgH4nGWZ
-         416OnFI7ZHHpKDS7DthxHtMpmrjBKCCzg/Mcrk85PZgChq03DZ01L8GGVV17TUkIaC1A
-         73y8dSOx1+waJ3LkUW/F0BKsLYnKTFHZQlxxNsJHeLmAQDG/prLVvUhFGr15hJRqwVm7
-         Bo1Q==
-X-Gm-Message-State: AOJu0YwAtcJil63b2cmmlKPjbBJPqK3+VMeN8WsSc+vcMCIxg1ShR9h9
-	Mvf8iwUN3ImxPD4tcVpcJi9QyVwbb2O2JZCGUUizig==
-X-Google-Smtp-Source: AGHT+IG2A5Q/LOwxc1RP0TeYAhfvCEKEu+p6VrGLTI32ysAKplEMCq/NuWhaJxsLt5+98P8wqQSR6qX2L0kLb+dFpv0=
-X-Received: by 2002:ac2:58c7:0:b0:505:715f:d36b with SMTP id
- u7-20020ac258c7000000b00505715fd36bmr84036lfo.5.1697818801710; Fri, 20 Oct
- 2023 09:20:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389C7171C6
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 16:21:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A44DC433C7;
+	Fri, 20 Oct 2023 16:21:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697818912;
+	bh=4U2Hcig7AOmbj97TCWnTmbt6ooNBVztm307/ivsP/2I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=txg7yZOPZLkERJ/EGgmEuz/5o91LMSIKH2ak4SWH5k3yk7qsYYKmH4KKR5SAlx3md
+	 cjc7zMYBGY/QjIjTAP1qhdesIKZ1kU3gN20J/7qPUcramLFu71st9id1FQGfuiTgD7
+	 ainIXRpqLOrFrINarI8O72d5SXL+Pzxr8hhDujeoqBgNWtjqzbFQpfXS4HvuU7UFMr
+	 ri5V+I7LwFtlIAt7/fmfE2o+A4bOQL21DoxfmKDfX1gmJPmfVFZTRIDDzRjqRKx82E
+	 TYb8DGrp2pwE3BPKuvZakZ4m3ENRZ2AR7fz6n7dpA5PMSWv3GUy1u76/6XrT3dFWS6
+	 0L463ie+iw52A==
+Date: Fri, 20 Oct 2023 09:21:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew@lunn.ch, paul.greenwalt@intel.com,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, gal@nvidia.com
+Subject: Re: [PATCH net-next] ethtool: untangle the linkmode and ethtool
+ headers
+Message-ID: <20231020092151.00a20fcf@kernel.org>
+In-Reply-To: <20231020092429.3pitbl3s6x6aonss@skbuf>
+References: <20231019152815.2840783-1-kuba@kernel.org>
+	<20231020092429.3pitbl3s6x6aonss@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231020125748.122792-1-edumazet@google.com> <CAK6E8=dZHwS3ULq2zxyBNcnff8z=8E+1W=SYQdOm8qjn5cQTAg@mail.gmail.com>
-In-Reply-To: <CAK6E8=dZHwS3ULq2zxyBNcnff8z=8E+1W=SYQdOm8qjn5cQTAg@mail.gmail.com>
-From: Soheil Hassas Yeganeh <soheil@google.com>
-Date: Fri, 20 Oct 2023 12:19:25 -0400
-Message-ID: <CACSApvZkh_TvFd8G9uD_AMyJv=3NfdbszW7FeTjCexMnS6z1Pg@mail.gmail.com>
-Subject: Re: [PATCH net-next 00/13] tcp: add optional usec resolution to TCP TS
-To: Yuchung Cheng <ycheng@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>, Kevin Yang <yyd@google.com>, Wei Wang <weiwan@google.com>, 
-	Van Jacobson <vanj@google.com>, Florian Westphal <fw@strlen.de>, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 20, 2023 at 12:11=E2=80=AFPM Yuchung Cheng <ycheng@google.com> =
-wrote:
->
-> On Fri, Oct 20, 2023 at 5:57=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > As discussed in various public places in 2016, Google adopted
-> > usec resolution in RFC 7323 TS values, at Van Jacobson suggestion.
-> >
-> > Goals were :
-> >
-> > 1) better observability of delays in networking stacks/fabrics.
-> >
-> > 2) better disambiguation of events based on TSval/ecr values.
-> >
-> > 3) building block for congestion control modules needing usec resolutio=
-n.
-> >
-> > Back then we implemented a schem based on private SYN options
-> > to safely negotiate the feature.
-> >
-> > For upstream submission, we chose to use a much simpler route
-> > attribute because this feature is probably going to be used
-> > in private networks.
-> >
-> > ip route add 10/8 ... features tcp_usec_ts
-> >
-> > References:
-> >
-> > https://www.ietf.org/proceedings/97/slides/slides-97-tcpm-tcp-options-f=
-or-low-latency-00.pdf
-> > https://datatracker.ietf.org/doc/draft-wang-tcpm-low-latency-opt/
-> >
-> > First two patches are fixing old minor bugs and might be taken
-> > by stable teams (thanks to appropriate Fixes: tags)
->
-> Huge thanks to Eric for making this happen for real :-) an immediate
-> benefit is enabling TCP timestamp based undos (Eifel) for short RTT
-> transactions. This allows datacenter TCP to use more aggressive
-> timeout w/o worrying too much of spurious timeout cwnd effect
->
-> Acked-by: Yuchung Cheng <ycheng@google.com>
+On Fri, 20 Oct 2023 12:24:29 +0300 Vladimir Oltean wrote:
+> On Thu, Oct 19, 2023 at 08:28:15AM -0700, Jakub Kicinski wrote:
+> > +EXPORT_SYMBOL_GPL(ethtool_forced_speed_maps_init);  
+> 
+> Is there a rule for EXPORT_SYMBOL() vs EXPORT_SYMBOL_GPL()? My rule of
+> thumb was that symbols used by drivers should get EXPORT_SYMBOL() for
+> maximum compatibility with their respective licenses, while symbols
+> exported for other core kernel modules should get EXPORT_SYMBOL_GPL().
 
-Thank you so much, Eric, for upstreaming the feature!  This is a major
-milestone.
+I think that Russell is right that it's author's preference. I don't
+have a strong one so I just copy what's in the file. Luck would have 
+it that the closest was EXPORT_SYMBOL_GPL(ethtool_set_ethtool_phy_ops);
 
-Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
+We should perhaps have clearer guidance. You say drivers but even what
+we put under drivers/net/ vs net/ is not crystal clear. With some
+protocols leaving in one place and others in the other. Pretty core
+things like netconsole are under drivers/ and qdiscs which have a
+non-GPL API (IIRC) are under net/.
 
->
-> >
-> > Eric Dumazet (13):
-> >   chtls: fix tp->rcv_tstamp initialization
-> >   tcp: fix cookie_init_timestamp() overflows
-> >   tcp: add tcp_time_stamp_ms() helper
-> >   tcp: introduce tcp_clock_ms()
-> >   tcp: replace tcp_time_stamp_raw()
-> >   tcp: rename tcp_skb_timestamp()
-> >   tcp: move tcp_ns_to_ts() to net/ipv4/syncookies.c
-> >   tcp: rename tcp_time_stamp() to tcp_time_stamp_ts()
-> >   tcp: add tcp_rtt_tsopt_us()
-> >   tcp: add RTAX_FEATURE_TCP_USEC_TS
-> >   tcp: introduce TCP_PAWS_WRAP
-> >   tcp: add support for usec resolution in TCP TS values
-> >   tcp: add TCPI_OPT_USEC_TS
-> >
-> >  .../chelsio/inline_crypto/chtls/chtls_cm.c    |  2 +-
-> >  include/linux/tcp.h                           |  9 ++-
-> >  include/net/inet_timewait_sock.h              |  3 +-
-> >  include/net/tcp.h                             | 59 ++++++++++++++-----
-> >  include/uapi/linux/rtnetlink.h                | 18 +++---
-> >  include/uapi/linux/tcp.h                      |  1 +
-> >  net/ipv4/syncookies.c                         | 32 ++++++----
-> >  net/ipv4/tcp.c                                | 26 +++++---
-> >  net/ipv4/tcp_input.c                          | 52 ++++++++--------
-> >  net/ipv4/tcp_ipv4.c                           |  5 +-
-> >  net/ipv4/tcp_lp.c                             |  2 +-
-> >  net/ipv4/tcp_minisocks.c                      | 19 ++++--
-> >  net/ipv4/tcp_output.c                         | 14 +++--
-> >  net/ipv4/tcp_timer.c                          | 44 +++++++++-----
-> >  net/ipv6/tcp_ipv6.c                           |  5 +-
-> >  net/netfilter/nf_synproxy_core.c              |  2 +-
-> >  .../selftests/bpf/progs/xdp_synproxy_kern.c   |  4 +-
-> >  17 files changed, 193 insertions(+), 104 deletions(-)
-> >
-> > --
-> > 2.42.0.655.g421f12c284-goog
-> >
+We'd need to consult with people who have more exposure to proprietary
+code to figure out good rules. For better or worse I'm not one of them
+:(
 
