@@ -1,183 +1,155 @@
-Return-Path: <netdev+bounces-43071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 615DA7D1484
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:04:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1CC37D1486
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:04:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AC7E28259F
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:04:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A3D3B21300
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7985200BB;
-	Fri, 20 Oct 2023 17:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A927200BC;
+	Fri, 20 Oct 2023 17:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JAJke9EP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ide65ezk"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D731F940
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 17:04:06 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01EF7D6C
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:04:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FA31A73F
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 17:04:18 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69C4EA3
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:04:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697821444;
+	s=mimecast20190719; t=1697821456;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PXnWK6yDEEFlU5gQ/qSZhO9jwWsn8uutZ2XsLCYTa64=;
-	b=JAJke9EPeN6qBwdUDu6MXOUeMHu2s5xJThDFL+kPQH0a6Vvx+6Fa388AtGOZBa/mayCXvv
-	WcsAq8H/IB70IhccgrxC/0HiYTLdv0oa8ncL+UWyupRuZfIZkpbC9NP3Q06jOTw1tpbV88
-	LbdGjVcqwowrSGsS2m7aBdrXKPQeTK4=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-248-ONf2oWEbO6u0l-47fhm_CQ-1; Fri, 20 Oct 2023 13:03:52 -0400
-X-MC-Unique: ONf2oWEbO6u0l-47fhm_CQ-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5b83bc7c7b4so751324a12.2
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:03:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697821431; x=1698426231;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PXnWK6yDEEFlU5gQ/qSZhO9jwWsn8uutZ2XsLCYTa64=;
-        b=v1UU+pbadfjHlQMsPoQKmRoqoQWjhDAs741INb3cljEzp2t2BBfwsP+P5P/zsHrNIC
-         JGPEl1+8T/EleJNlXEm+6no/0vinez5qxeRHDwkhfG4snYSRhApK8ajcpw39Pou+bbFZ
-         p51ktISz9VDk0DpJ87z5X6zKs/4z6J3enuovmBPThj4WUiGqsvWsmGoXr2kMTsQbc6FI
-         GAvAr/tFgsAVxlZcfTH/bKqGDiTVgcfttBDBzIciDoOz6OvZ6CwJMqrgjsLgiMOzR0Bo
-         turj5NyR08FG4zYNz+RYVBtaYGFg7DP0tNIdSAckXjHVz4CcuHkqvutg/7XCprOC1ei5
-         XURw==
-X-Gm-Message-State: AOJu0Yz6BEQZGi5l4ihrIYxuGNEsS8AGRD8D0I3HOt2no8+gON2Xb1GZ
-	lV8pmA+dhX1BaVS0IK+EGjoKVzshR+I6PPu5rKL2i4Qq8CNFGnf5AnFAXcv2ZBv2gWzZPTt5pjC
-	VJs9AgugoiVqpyWbQ
-X-Received: by 2002:a17:90b:f98:b0:27d:3e90:9ee1 with SMTP id ft24-20020a17090b0f9800b0027d3e909ee1mr2761555pjb.23.1697821431522;
-        Fri, 20 Oct 2023 10:03:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGV8u8SqB5Zdp0bgC5MrhdPqfvH5+OIPyzDIxgGi/T0fslThxyuZrH20I+BlC/7gEG2T8j8vA==
-X-Received: by 2002:a17:90b:f98:b0:27d:3e90:9ee1 with SMTP id ft24-20020a17090b0f9800b0027d3e909ee1mr2761514pjb.23.1697821431106;
-        Fri, 20 Oct 2023 10:03:51 -0700 (PDT)
-Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
-        by smtp.gmail.com with ESMTPSA id 7-20020a17090a1a0700b0027d04d05d77sm3850299pjk.8.2023.10.20.10.03.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 10:03:50 -0700 (PDT)
-From: Shigeru Yoshida <syoshida@redhat.com>
-To: steve.glendinning@shawell.net,
-	UNGLinuxDriver@microchip.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	syzbot+c74c24b43c9ae534f0e0@syzkaller.appspotmail.com,
-	syzbot+2c97a98a5ba9ea9c23bd@syzkaller.appspotmail.com
-Subject: [PATCH net] net: usb: smsc95xx: Fix uninit-value access in smsc95xx_read_reg
-Date: Sat, 21 Oct 2023 02:03:44 +0900
-Message-ID: <20231020170344.2450248-1-syoshida@redhat.com>
-X-Mailer: git-send-email 2.41.0
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fY/+7D/WwSGP0A+iL/7hmdI+NWxLC5hyOEm5LxOpZX8=;
+	b=ide65ezkTYWzAUNlMeuxGpJZbrb8YVHBxXGnPMsQ6J5k70JxWkVGgXEbLShcqKvwSuUTqV
+	GngP1dmBah2Y8mghBC7DB7WUZ9zXyQE1sO5rBVC2+qW6Q+Cu4/PTWfG2J9YKFH7GQEws4z
+	/HSSUwXE5XgOnVdDsbtDGHMkRESbML0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-5-1CqoROwjOm-LHURhRFPsOA-1; Fri, 20 Oct 2023 13:04:15 -0400
+X-MC-Unique: 1CqoROwjOm-LHURhRFPsOA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 73F5210201F1;
+	Fri, 20 Oct 2023 17:04:14 +0000 (UTC)
+Received: from RHTPC1VM0NT (unknown [10.22.9.53])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C7F8111D794;
+	Fri, 20 Oct 2023 17:04:13 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: "Nicholas Piggin" <npiggin@gmail.com>
+Cc: <netdev@vger.kernel.org>,  <dev@openvswitch.org>,  "Pravin B Shelar"
+ <pshelar@ovn.org>,  "Eelco Chaudron" <echaudro@redhat.com>,  "Ilya
+ Maximets" <imaximet@redhat.com>,  "Flavio Leitner" <fbl@redhat.com>,
+  "Paolo Abeni" <pabeni@redhat.com>,  "Jakub Kicinski" <kuba@kernel.org>,
+  "David S. Miller" <davem@davemloft.net>,  "Eric Dumazet"
+ <edumazet@google.com>
+Subject: Re: [PATCH 0/7] net: openvswitch: Reduce stack usage
+References: <20231011034344.104398-1-npiggin@gmail.com>
+	<f7ta5spe1ix.fsf@redhat.com> <CW62DEF1LEWB.3KK4CQJNGIRYO@wheely>
+Date: Fri, 20 Oct 2023 13:04:13 -0400
+In-Reply-To: <CW62DEF1LEWB.3KK4CQJNGIRYO@wheely> (Nicholas Piggin's message of
+	"Thu, 12 Oct 2023 11:19:28 +1000")
+Message-ID: <f7til71dy42.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-syzbot reported the following uninit-value access issue [1]:
+"Nicholas Piggin" <npiggin@gmail.com> writes:
 
-smsc95xx 1-1:0.0 (unnamed net_device) (uninitialized): Failed to read reg index 0x00000030: -32
-smsc95xx 1-1:0.0 (unnamed net_device) (uninitialized): Error reading E2P_CMD
-=====================================================
-BUG: KMSAN: uninit-value in smsc95xx_reset+0x409/0x25f0 drivers/net/usb/smsc95xx.c:896
- smsc95xx_reset+0x409/0x25f0 drivers/net/usb/smsc95xx.c:896
- smsc95xx_bind+0x9bc/0x22e0 drivers/net/usb/smsc95xx.c:1131
- usbnet_probe+0x100b/0x4060 drivers/net/usb/usbnet.c:1750
- usb_probe_interface+0xc75/0x1210 drivers/usb/core/driver.c:396
- really_probe+0x506/0xf40 drivers/base/dd.c:658
- __driver_probe_device+0x2a7/0x5d0 drivers/base/dd.c:800
- driver_probe_device+0x72/0x7b0 drivers/base/dd.c:830
- __device_attach_driver+0x55a/0x8f0 drivers/base/dd.c:958
- bus_for_each_drv+0x3ff/0x620 drivers/base/bus.c:457
- __device_attach+0x3bd/0x640 drivers/base/dd.c:1030
- device_initial_probe+0x32/0x40 drivers/base/dd.c:1079
- bus_probe_device+0x3d8/0x5a0 drivers/base/bus.c:532
- device_add+0x16ae/0x1f20 drivers/base/core.c:3622
- usb_set_configuration+0x31c9/0x38c0 drivers/usb/core/message.c:2207
- usb_generic_driver_probe+0x109/0x2a0 drivers/usb/core/generic.c:238
- usb_probe_device+0x290/0x4a0 drivers/usb/core/driver.c:293
- really_probe+0x506/0xf40 drivers/base/dd.c:658
- __driver_probe_device+0x2a7/0x5d0 drivers/base/dd.c:800
- driver_probe_device+0x72/0x7b0 drivers/base/dd.c:830
- __device_attach_driver+0x55a/0x8f0 drivers/base/dd.c:958
- bus_for_each_drv+0x3ff/0x620 drivers/base/bus.c:457
- __device_attach+0x3bd/0x640 drivers/base/dd.c:1030
- device_initial_probe+0x32/0x40 drivers/base/dd.c:1079
- bus_probe_device+0x3d8/0x5a0 drivers/base/bus.c:532
- device_add+0x16ae/0x1f20 drivers/base/core.c:3622
- usb_new_device+0x15f6/0x22f0 drivers/usb/core/hub.c:2589
- hub_port_connect drivers/usb/core/hub.c:5440 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5580 [inline]
- port_event drivers/usb/core/hub.c:5740 [inline]
- hub_event+0x53bc/0x7290 drivers/usb/core/hub.c:5822
- process_one_work kernel/workqueue.c:2630 [inline]
- process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
- worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
- kthread+0x3e8/0x540 kernel/kthread.c:388
- ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+> On Wed Oct 11, 2023 at 11:23 PM AEST, Aaron Conole wrote:
+>> Nicholas Piggin <npiggin@gmail.com> writes:
+>>
+>> > Hi,
+>> >
+>> > I'll post this out again to keep discussion going. Thanks all for the
+>> > testing and comments so far.
+>>
+>> Thanks for the update - did you mean for this to be tagged RFC as well?
+>
+> Yeah, it wasn't intended for merge with no RB or tests of course.
+> I intended to tag it RFC v2.
 
-Local variable buf.i225 created at:
- smsc95xx_read_reg drivers/net/usb/smsc95xx.c:90 [inline]
- smsc95xx_reset+0x203/0x25f0 drivers/net/usb/smsc95xx.c:892
- smsc95xx_bind+0x9bc/0x22e0 drivers/net/usb/smsc95xx.c:1131
+I only did a basic test with this because of some other stuff, and I
+only tested 1, 2, and 3.  I didn't see any real performance changes, but
+that is only with a simple port-port test.  I plan to do some additional
+testing with some recursive calls.  That will also help to understand
+the limits a bit.
 
-CPU: 1 PID: 773 Comm: kworker/1:2 Not tainted 6.6.0-rc1-syzkaller-00125-ge42bebf6db29 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
-Workqueue: usb_hub_wq hub_event
-=====================================================
+That said, I'm very nervous about the key allocator, especially if it is
+possible that it runs out.  We probably will need the limit to be
+bigger, but I want to get a worst-case flow from OVN side to understand.
 
-Similar to e9c65989920f ("net: usb: smsc75xx: Fix uninit-value access in
-__smsc75xx_read_reg"), this issue is caused because usbnet_read_cmd() reads
-less bytes than requested (zero byte in the reproducer). In this case,
-'buf' is not properly filled.
+>>
+>> I don't see any performance data with the deployments on x86_64 and
+>> ppc64le that cause these stack overflows.  Are you able to provide the
+>> impact on ppc64le and x86_64?
+>
+> Don't think it'll be easy but they are not be pushing such rates
+> so it wouldn't say much.  If you want to show the worst case, those
+> tput and latency microbenchmarks should do it.
+>
+> It's the same tradeoff and reasons the per-cpu key allocator was
+> added in the first place, presumably. Probably more expensive than
+> stack, but similar order of magnitude O(cycles) vs slab which is
+> probably O(100s cycles).
+>
+>> I guess the change probably should be tagged as -next since it doesn't
+>> really have a specific set of commits it is "fixing."  It's really like
+>> a major change and shouldn't really go through stable trees, but I'll
+>> let the maintainers tell me off if I got it wrong.
+>
+> It should go upstream first if anything. I thought it was relatively
+> simple and elegant to reuse the per-cpu key allocator though :(
+>
+> It is a kernel crash, so we need something for stable. But In a case
+> like this there's not one single problem. Linux kernel stack use has
+> always been pretty dumb - "don't use too much", for some values of
+> too much, and just cross fingers config and compiler and worlkoad
+> doesn't hit some overflow case.
+>
+> And powerpc has always used more stack x86, so probably it should stay
+> one power-of-two larger to be safe. And that may be the best fix for
+> -stable.
 
-This patch fixes the issue by returning -ENODATA if usbnet_read_cmd() reads
-less bytes than requested.
+Given the reply from David (with msg-id:
+<ff6cd12e28894f158d9a6c9f7157487f@AcuMS.aculab.com>), are there other
+things we can look at with respect to the compiler as well?
 
-sysbot reported similar uninit-value access issue [2]. The root cause is
-the same as mentioned above, and this patch addresses it as well.
+> But also, ovs uses too much stack. Look at the stack sizes in the first
+> RFC patch, and ovs takes the 5 largest. That's because it has always
+> been the practice to not put large variables on stack, and when you're
+> introducing significant recursion that puts extra onus on you to be
+> lean. Even if it costs a percent. There are probably lots of places in
+> the kernel that could get a few cycles by sticking large structures on
+> stack, but unfortunately we can't all do that.
 
-Fixes: 2f7ca802bdae ("net: Add SMSC LAN9500 USB2.0 10/100 ethernet adapter driver")
-Reported-and-tested-by: syzbot+c74c24b43c9ae534f0e0@syzkaller.appspotmail.com
-Reported-and-tested-by: syzbot+2c97a98a5ba9ea9c23bd@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=c74c24b43c9ae534f0e0 [1]
-Closes: https://syzkaller.appspot.com/bug?extid=2c97a98a5ba9ea9c23bd [2]
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
----
- drivers/net/usb/smsc95xx.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Well, OVS operated this way for at least 6 years, so it isn't a recent
+thing.  But we should look at it.
 
-diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
-index 563ecd27b93e..0c875d18e93f 100644
---- a/drivers/net/usb/smsc95xx.c
-+++ b/drivers/net/usb/smsc95xx.c
-@@ -95,7 +95,9 @@ static int __must_check smsc95xx_read_reg(struct usbnet *dev, u32 index,
- 	ret = fn(dev, USB_VENDOR_REQUEST_READ_REGISTER, USB_DIR_IN
- 		 | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
- 		 0, index, &buf, 4);
--	if (ret < 0) {
-+	if (ret < 4) {
-+		ret = ret < 0 ? ret : -ENODATA;
-+
- 		if (ret != -ENODEV)
- 			netdev_warn(dev->net, "Failed to read reg index 0x%08x: %d\n",
- 				    index, ret);
--- 
-2.41.0
+I also wonder if we need to recurse in the internal devices, or if we
+shouldn't just push the skb into the packet queue.  That will cut out
+1/3 of the stack frame that you reported originally, and then when doing
+the xmit, will cut out 2/3rds. I have no idea what the performance
+impact hit there might be.  Maybe it looks more like a latency hit
+rather than a throughput hit, but just speculating.
+
+> Thanks,
+> Nick
 
 
