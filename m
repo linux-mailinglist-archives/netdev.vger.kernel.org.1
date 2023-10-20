@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-42859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1E417D06B8
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 05:05:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F5287D06B9
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 05:05:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3ECF1C20F6C
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 03:05:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91A4A1C20F6D
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 03:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F16AEDF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E519579DB;
 	Fri, 20 Oct 2023 03:04:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jlkmrErh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jYknzI0W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D3A7476
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:04:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D2DCC433C9;
-	Fri, 20 Oct 2023 03:04:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C867563C2
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:04:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86FF3C433C9;
+	Fri, 20 Oct 2023 03:04:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697771081;
-	bh=qM/kEWEAJdWZ0FZLWZAPZFFrBRowmZg/sacMb+wtza8=;
+	s=k20201202; t=1697771082;
+	bh=UxngwBlUbUpx/VYnXGQ+KLs7Utudb4KYEW4Lbzvu7VI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jlkmrErhG/X8aBPl/rSM2/N/Az5qlRWQYVh8iEyeMOOxd7BsqSnLsBYSN79c/xk8s
-	 KmsKKlK/OV2J01cZlKRC9pXUCGfSoWW/5IDOc5E81hgQsDOEiVv5H0fvvdMSBse1zz
-	 aURZZr/n+UE4QrdJdWzIxvfUDdvDGsJqePbPWgZMzOOV7JWVuRrMuRDSEyugeP2wHH
-	 ZXK1Z3aGZbQZdP/43fuQXHNMuzKYwhKdPovCaurYaalbtOzymHT6O2sBqk7vnZhJsr
-	 pb007+jCbl1pcOuW77istkutezjLeoYQbC5JmmLJb/CSt6/2477jy1TZbf7gtzsqlM
-	 LJUdw5fq69+cg==
+	b=jYknzI0WK9nv4HSQBEfcuigLk65v30+Nxfmy1uZ0x64JGOLn3MmZ6xzCmGsCDAgJv
+	 qXuUe6dufoJCPKDVXP4kMuYTfUOWmltUz3CIT6jR3Z19Ixy2pxxXXmAd6B+nq5p6E0
+	 nUEVTz8s8z/QUqP3JRvS+n7ay9Z85bu7PM8VsnpCHSguTt7Bj3SF8WLTo0Mq/TT558
+	 oR9wvoCgiAF/0ejXEiZ+n0OvT7X9nQa/ubG6f/AgSCFg0zNW945PHzPJfXoyZ4oO73
+	 YEZ4q0nRELsssZU9xjq6mMYt/GvNqhhBy4ir3jYMplvdkiGFxsjMfaTjSr0iipQu4H
+	 JtIKLy8fSjboA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -41,9 +41,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net-next 08/15] net/mlx5e: Connect mlx5 IPsec statistics with XFRM core
-Date: Thu, 19 Oct 2023 20:04:15 -0700
-Message-ID: <20231020030422.67049-9-saeed@kernel.org>
+Subject: [net-next 09/15] net/mlx5e: Delete obsolete IPsec code
+Date: Thu, 19 Oct 2023 20:04:16 -0700
+Message-ID: <20231020030422.67049-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231020030422.67049-1-saeed@kernel.org>
 References: <20231020030422.67049-1-saeed@kernel.org>
@@ -57,66 +57,106 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Fill integrity, replay and bad trailer counters.
+After addition of HW managed counters and implementation drop
+in flow steering logic, the code in driver which checks syndrome
+is not reachable anymore.
 
-As an example, after simulating replay window attack with 5 packets:
-[leonro@c ~]$ grep XfrmInStateSeqError /proc/net/xfrm_stat
-XfrmInStateSeqError     	5
-[leonro@c ~]$ sudo ip -s x s
-<...>
-	stats:
-	  replay-window 0 replay 5 failed 0
+Let's delete it.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mellanox/mlx5/core/en_accel/ipsec.c       | 22 +++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ .../mellanox/mlx5/core/en_accel/ipsec.h       |  1 -
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.c  | 25 ++-----------------
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h  |  1 -
+ .../mellanox/mlx5/core/en_accel/ipsec_stats.c |  1 -
+ 4 files changed, 2 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-index bf88232a2fc2..5b2660662811 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
-@@ -980,19 +980,37 @@ static void mlx5e_xfrm_update_stats(struct xfrm_state *x)
- {
- 	struct mlx5e_ipsec_sa_entry *sa_entry = to_ipsec_sa_entry(x);
- 	struct mlx5e_ipsec_rule *ipsec_rule = &sa_entry->ipsec_rule;
-+	struct net *net = dev_net(x->xso.dev);
- 	u64 packets, bytes, lastuse;
- 
- 	lockdep_assert(lockdep_is_held(&x->lock) ||
- 		       lockdep_is_held(&dev_net(x->xso.real_dev)->xfrm.xfrm_cfg_mutex) ||
- 		       lockdep_is_held(&dev_net(x->xso.real_dev)->xfrm.xfrm_state_lock));
- 
--	if (x->xso.flags & XFRM_DEV_OFFLOAD_FLAG_ACQ ||
--	    x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
-+	if (x->xso.flags & XFRM_DEV_OFFLOAD_FLAG_ACQ)
-+		return;
-+
-+	if (sa_entry->attrs.dir == XFRM_DEV_OFFLOAD_IN) {
-+		mlx5_fc_query_cached(ipsec_rule->auth.fc, &bytes, &packets, &lastuse);
-+		x->stats.integrity_failed += packets;
-+		XFRM_ADD_STATS(net, LINUX_MIB_XFRMINSTATEPROTOERROR, packets);
-+
-+		mlx5_fc_query_cached(ipsec_rule->trailer.fc, &bytes, &packets, &lastuse);
-+		XFRM_ADD_STATS(net, LINUX_MIB_XFRMINHDRERROR, packets);
-+	}
-+
-+	if (x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
- 		return;
- 
- 	mlx5_fc_query_cached(ipsec_rule->fc, &bytes, &packets, &lastuse);
- 	x->curlft.packets += packets;
- 	x->curlft.bytes += bytes;
-+
-+	if (sa_entry->attrs.dir == XFRM_DEV_OFFLOAD_IN) {
-+		mlx5_fc_query_cached(ipsec_rule->replay.fc, &bytes, &packets, &lastuse);
-+		x->stats.replay += packets;
-+		XFRM_ADD_STATS(net, LINUX_MIB_XFRMINSTATESEQERROR, packets);
-+	}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h
+index adaea3493193..7d943e93cf6d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h
+@@ -137,7 +137,6 @@ struct mlx5e_ipsec_hw_stats {
+ struct mlx5e_ipsec_sw_stats {
+ 	atomic64_t ipsec_rx_drop_sp_alloc;
+ 	atomic64_t ipsec_rx_drop_sadb_miss;
+-	atomic64_t ipsec_rx_drop_syndrome;
+ 	atomic64_t ipsec_tx_drop_bundle;
+ 	atomic64_t ipsec_tx_drop_no_state;
+ 	atomic64_t ipsec_tx_drop_not_ip;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c
+index 51a144246ea6..727fa7c18523 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.c
+@@ -304,12 +304,6 @@ bool mlx5e_ipsec_handle_tx_skb(struct net_device *netdev,
+ 	return false;
  }
  
- static int mlx5e_xfrm_validate_policy(struct mlx5_core_dev *mdev,
+-enum {
+-	MLX5E_IPSEC_OFFLOAD_RX_SYNDROME_DECRYPTED,
+-	MLX5E_IPSEC_OFFLOAD_RX_SYNDROME_AUTH_FAILED,
+-	MLX5E_IPSEC_OFFLOAD_RX_SYNDROME_BAD_TRAILER,
+-};
+-
+ void mlx5e_ipsec_offload_handle_rx_skb(struct net_device *netdev,
+ 				       struct sk_buff *skb,
+ 				       u32 ipsec_meta_data)
+@@ -343,20 +337,7 @@ void mlx5e_ipsec_offload_handle_rx_skb(struct net_device *netdev,
+ 
+ 	xo = xfrm_offload(skb);
+ 	xo->flags = CRYPTO_DONE;
+-
+-	switch (MLX5_IPSEC_METADATA_SYNDROM(ipsec_meta_data)) {
+-	case MLX5E_IPSEC_OFFLOAD_RX_SYNDROME_DECRYPTED:
+-		xo->status = CRYPTO_SUCCESS;
+-		break;
+-	case MLX5E_IPSEC_OFFLOAD_RX_SYNDROME_AUTH_FAILED:
+-		xo->status = CRYPTO_TUNNEL_ESP_AUTH_FAILED;
+-		break;
+-	case MLX5E_IPSEC_OFFLOAD_RX_SYNDROME_BAD_TRAILER:
+-		xo->status = CRYPTO_INVALID_PACKET_SYNTAX;
+-		break;
+-	default:
+-		atomic64_inc(&ipsec->sw_stats.ipsec_rx_drop_syndrome);
+-	}
++	xo->status = CRYPTO_SUCCESS;
+ }
+ 
+ int mlx5_esw_ipsec_rx_make_metadata(struct mlx5e_priv *priv, u32 id, u32 *metadata)
+@@ -374,8 +355,6 @@ int mlx5_esw_ipsec_rx_make_metadata(struct mlx5e_priv *priv, u32 id, u32 *metada
+ 		return err;
+ 	}
+ 
+-	*metadata = MLX5_IPSEC_METADATA_CREATE(ipsec_obj_id,
+-					       MLX5E_IPSEC_OFFLOAD_RX_SYNDROME_DECRYPTED);
+-
++	*metadata = ipsec_obj_id;
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h
+index 2ed99772f168..82064614846f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h
+@@ -43,7 +43,6 @@
+ #define MLX5_IPSEC_METADATA_MARKER(metadata)  (((metadata) >> 31) & 0x1)
+ #define MLX5_IPSEC_METADATA_SYNDROM(metadata) (((metadata) >> 24) & GENMASK(5, 0))
+ #define MLX5_IPSEC_METADATA_HANDLE(metadata)  ((metadata) & GENMASK(23, 0))
+-#define MLX5_IPSEC_METADATA_CREATE(id, syndrome) ((id) | ((syndrome) << 24))
+ 
+ struct mlx5e_accel_tx_ipsec_state {
+ 	struct xfrm_offload *xo;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_stats.c
+index e0e36a09721c..dd36b04e30a0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_stats.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_stats.c
+@@ -51,7 +51,6 @@ static const struct counter_desc mlx5e_ipsec_hw_stats_desc[] = {
+ static const struct counter_desc mlx5e_ipsec_sw_stats_desc[] = {
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_ipsec_sw_stats, ipsec_rx_drop_sp_alloc) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_ipsec_sw_stats, ipsec_rx_drop_sadb_miss) },
+-	{ MLX5E_DECLARE_STAT(struct mlx5e_ipsec_sw_stats, ipsec_rx_drop_syndrome) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_ipsec_sw_stats, ipsec_tx_drop_bundle) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_ipsec_sw_stats, ipsec_tx_drop_no_state) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_ipsec_sw_stats, ipsec_tx_drop_not_ip) },
 -- 
 2.41.0
 
