@@ -1,69 +1,49 @@
-Return-Path: <netdev+bounces-43153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D4F7D19AE
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 01:49:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BB8C7D19B4
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 01:50:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAB6C1C2102C
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:49:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EC66B214D1
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B1B935515;
-	Fri, 20 Oct 2023 23:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4FAB35515;
+	Fri, 20 Oct 2023 23:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKW0EPNk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9Qcrij8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D90A35509;
-	Fri, 20 Oct 2023 23:49:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5DBCC433C7;
-	Fri, 20 Oct 2023 23:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83B035507
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 23:50:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FF7AC433C9;
+	Fri, 20 Oct 2023 23:50:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697845759;
-	bh=loI0on5ZzUtt+TaOW1sABdlRBDhAZ7YRBCQ6BuFriVI=;
+	s=k20201202; t=1697845849;
+	bh=rD7i5HWfwFAX1Xen8caIl4ANRUZrjeYhCRejmepVOaY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LKW0EPNkFkN8eCHVM7IaiF6+PbnRmx5oxq9FHwfSbZoMYP2az69DRLa3zNht6Ya/9
-	 CC0L/iiw3vCpTzVf6Azx7By152nt0g/bfnkTL5S1I6zQK/RZ0YblWo/7W/4rJ54NJO
-	 YRG64VYitDcGLJQ68FgZ9qoJAZLRZR+4aZZUt2iQkyuYWbZzmgCjc440Hqp1pZ2Y/q
-	 +weFo3EZTVlAq7lCQPYEug2RIuaIJWuw4gjwQLPnPxj1w3T8tp4mXJxZA8uLG6g04s
-	 agUMEd87THivCYoy1cVsdwRgs+JZB4V/leDMaz7sbr79FFgLJ1Wrgjhc4FMVmeNDLl
-	 Y1r+29QTL64eg==
-Date: Fri, 20 Oct 2023 16:49:17 -0700
+	b=u9Qcrij8zEyJ81UKuhvdfHd9FG5ySDX9V3mhYiV7QnK4tZkpk2Yyo21/3m47v65Qc
+	 JvvhNaZ85DL4OsBJ/gCXR6sMa8w18eiZSbLkmFKSS0EOwMwwcPgPIDSIzjed/xmcet
+	 OYFbnu9Zj3iFMDYX6V8Q0rcowAcpYaQRxhRqfqZ274zxEfq3gnddfGj6I4fKjYU53W
+	 rAeBUNi9uXWuXckxGmePshU7v7CiBy/V5w05B1oGxUsh3pr0xfFkLbZZx8OEL+fbbj
+	 zYP4bKRs9s62bAM0aJY4u0MPmGVJEpayqi52QE1vcWM8htBEKC50tVdJ4e3Uir2zc2
+	 ojqHp/DjRDfdw==
+Date: Fri, 20 Oct 2023 16:50:48 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: <mkubecek@suse.cz>, <andrew@lunn.ch>, <willemdebruijn.kernel@gmail.com>,
- Wojciech Drewek <wojciech.drewek@intel.com>, <corbet@lwn.net>,
- <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <jesse.brandeburg@intel.com>, <edumazet@google.com>,
- <anthony.l.nguyen@intel.com>, <horms@kernel.org>,
- <vladimir.oltean@nxp.com>, Jacob Keller <jacob.e.keller@intel.com>,
- <intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>,
- <davem@davemloft.net>
-Subject: Re: [Intel-wired-lan] [PATCH net-next v4 1/6] net: ethtool: allow
- symmetric-xor RSS hash for any flow type
-Message-ID: <20231020164917.69d5cd44@kernel.org>
-In-Reply-To: <c2c0dbe8-eee5-4e87-a115-7424ba06d21b@intel.com>
-References: <20231016154937.41224-1-ahmed.zaki@intel.com>
-	<20231016154937.41224-2-ahmed.zaki@intel.com>
-	<8d1b1494cfd733530be887806385cde70e077ed1.camel@gmail.com>
-	<26812a57-bdd8-4a39-8dd2-b0ebcfd1073e@intel.com>
-	<CAKgT0Ud7JjUiE32jJbMbBGVexrndSCepG54PcGYWHJ+OC9pOtQ@mail.gmail.com>
-	<14feb89d-7b4a-40c5-8983-5ef331953224@intel.com>
-	<CAKgT0UfcT5cEDRBzCxU9UrQzbBEgFt89vJZjz8Tow=yAfEYERw@mail.gmail.com>
-	<20231016163059.23799429@kernel.org>
-	<CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
-	<20231017131727.78e96449@kernel.org>
-	<CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
-	<20231017173448.3f1c35aa@kernel.org>
-	<CAKgT0Udz+YdkmtO2Gbhr7CccHtBbTpKich4er3qQXY-b2inUoA@mail.gmail.com>
-	<20231018165020.55cc4a79@kernel.org>
-	<45c6ab9f-50f6-4e9e-a035-060a4491bded@intel.com>
-	<20231020153316.1c152c80@kernel.org>
-	<c2c0dbe8-eee5-4e87-a115-7424ba06d21b@intel.com>
+To: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nic_swsd@realtek.com, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Marco Elver <elver@google.com>
+Subject: Re: [PATCH v4 1/3] r8169: fix the KCSAN reported data-race in
+ rtl_tx() while reading tp->cur_tx
+Message-ID: <20231020165048.33d3bff2@kernel.org>
+In-Reply-To: <20231018193434.344176-1-mirsad.todorovac@alu.unizg.hr>
+References: <20231018193434.344176-1-mirsad.todorovac@alu.unizg.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,23 +53,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 20 Oct 2023 17:14:11 -0600 Ahmed Zaki wrote:
-> I replied to that here:
-> 
-> https://lore.kernel.org/all/afb4a06f-cfba-47ba-adb3-09bea7cb5f00@intel.com/
-> 
-> I am kind of confused now so please bear with me. ethtool either sends 
-> "ethtool_rxfh" or "ethtool_rxnfc". AFAIK "ethtool_rxfh" is the interface 
-> for "ethtool -X" which is used to set the RSS algorithm. But we kind of 
-> agreed to go with "ethtool -U|-N" for symmetric-xor, and that uses 
-> "ethtool_rxnfc" (as implemented in this series).
+On Wed, 18 Oct 2023 21:34:34 +0200 Mirsad Goran Todorovac wrote:
+> KCSAN reported the following data-race:
 
-I have no strong preference. Sounds like Alex prefers to keep it closer
-to algo, which is "ethtool_rxfh".
-
-> Do you mean use "ethtool_rxfh" instead of "ethtool_rxnfc"? how would 
-> that work on the ethtool user interface?
-
-I don't know what you're asking of us. If you find the code to confusing
-maybe someone at Intel can help you :|
+All 3 patches seem to have been applied to net, thank you!
 
