@@ -1,119 +1,147 @@
-Return-Path: <netdev+bounces-43032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C65E7D105F
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 15:18:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76D617D10BA
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 15:45:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CDE11C20F2A
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:18:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8059280EAC
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20571A73A;
-	Fri, 20 Oct 2023 13:18:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="KUOW6tHo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 163B91C6A0;
+	Fri, 20 Oct 2023 13:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE931A727
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 13:18:46 +0000 (UTC)
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 156411BF
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 06:18:44 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9c3aec5f326so412109766b.1
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 06:18:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1697807922; x=1698412722; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/RjDLc0f7CsZ3ZAhf+7oO+KfDgSRyr9/BS+BP5jxyc4=;
-        b=KUOW6tHoH0YoRWmfTiYARPJh3y1s6CDX5alQWBN3z01Pox70KX1YmMeO4X8gmj80tz
-         K4RAjFE7F6eu6sKWA8DNl5+VOzXiOhmW2Purw1TYWmojIpSfMpme5ITPOvFlXJW6gkOs
-         RUxubMSHkKeGzfJUt/vfeX5Uvqu3tle5S0pJ1kJxeDkH9ty7a5MtTh6X0UWOjNkr/NSy
-         GR2ERAP5mG5IONJh4g0dqFblVKeR620s2ZyBbRuOvXXt+WPG/xWFf1UHvocjUakUUMWV
-         Sy7YWU6fCNmb4JC58tx/qKchZHrcWyHiJcH9jxYAOKOnVZzjUG9M47GXWwKI/rtndEKX
-         BwcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697807922; x=1698412722;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/RjDLc0f7CsZ3ZAhf+7oO+KfDgSRyr9/BS+BP5jxyc4=;
-        b=mjxPAVnxdaoYgYBDXN9kHB4clcDxkVDWcDXQUZRCfpEoxRpsVA/mEcmJ7inAFyXaaG
-         pO4TUeGH37e7jFROKZgW/gtgLyTlli9sUBFN3Se4Xd6r1oOBNlqLoEAsl3z7yFHEsoZ7
-         dtJ2OjO9PPcBu54M8ds82Sj/30W+/M8Fs5fpNV/L1jmlM2N8ZK/J0jDkWhWKArxb4Kby
-         gT5fqaXaJxNHYVgDKilvKaFNhDkx4jExc88NNP8kN158XTpGMMc2rT2/hWVr/SnblwKe
-         kWPXQwdob3JTaObwtI6MPnZzZ+myvmhS2KHyZAdnY3+EdOIpuGmUTn6A6ipQ4dPPV13I
-         yKUA==
-X-Gm-Message-State: AOJu0Yw6Tjva0UWKnpTsHi9dJQNjoPczF9gZN+4Q7shN/6Wh/gKYQ8xr
-	FDPBlO/CFR4enz1difRKNDwRzxcAyjHSc4KRB2ruoQ==
-X-Google-Smtp-Source: AGHT+IHJ0YVjts5wXBN5Jqp31pQ7zOyCplhCxmKRWiIG/OBUb9hPTVLkywcsxvesYEBUsruBmhSCSDcUubMxrq+Mqbc=
-X-Received: by 2002:a17:907:7f2a:b0:9ae:659f:4d2f with SMTP id
- qf42-20020a1709077f2a00b009ae659f4d2fmr1364024ejc.26.1697807922329; Fri, 20
- Oct 2023 06:18:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A6C1BDDA
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 13:45:49 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B50319E
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 06:45:46 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-692-GTqKNN5rMLCOyLdXtv-uwQ-1; Fri, 20 Oct 2023 09:45:34 -0400
+X-MC-Unique: GTqKNN5rMLCOyLdXtv-uwQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 97F11102020A;
+	Fri, 20 Oct 2023 13:45:29 +0000 (UTC)
+Received: from hog (unknown [10.39.192.51])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DEF032026D4C;
+	Fri, 20 Oct 2023 13:45:27 +0000 (UTC)
+Date: Fri, 20 Oct 2023 15:45:26 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew@lunn.ch, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, richardcochran@gmail.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	sebastian.tobuschat@oss.nxp.com
+Subject: Re: [PATCH net-next v7 3/7] net: macsec: revert the MAC address if
+ mdo_upd_secy fails
+Message-ID: <ZTKEdvpNl-gwGpk6@hog>
+References: <20231019120209.290480-1-radu-nicolae.pirea@oss.nxp.com>
+ <20231019120209.290480-4-radu-nicolae.pirea@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016180220.3866105-1-andrii@kernel.org>
-In-Reply-To: <20231016180220.3866105-1-andrii@kernel.org>
-From: Lorenz Bauer <lorenz.bauer@isovalent.com>
-Date: Fri, 20 Oct 2023 14:18:31 +0100
-Message-ID: <CAN+4W8hu+zWiWejWtc72WwQb6ydL3U3LXvaFBdc0o826JKzoAQ@mail.gmail.com>
-Subject: Re: [PATCH v8 bpf-next 00/18] BPF token and BPF FS-based delegation
-To: Andrii Nakryiko <andrii@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, keescook@chromium.org, 
-	brauner@kernel.org, lennart@poettering.net, kernel-team@meta.com, 
-	sargun@sargun.me
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231019120209.290480-4-radu-nicolae.pirea@oss.nxp.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Mon, Oct 16, 2023 at 7:03=E2=80=AFPM Andrii Nakryiko <andrii@kernel.org>=
- wrote:
-...
-> This patch set adds a basic minimum of functionality to make BPF token id=
-ea
-> useful and to discuss API and functionality. Currently only low-level lib=
-bpf
-> APIs support creating and passing BPF token around, allowing to test kern=
-el
-> functionality, but for the most part is not sufficient for real-world
-> applications, which typically use high-level libbpf APIs based on `struct
-> bpf_object` type. This was done with the intent to limit the size of patc=
-h set
-> and concentrate on mostly kernel-side changes. All the necessary plumbing=
- for
-> libbpf will be sent as a separate follow up patch set kernel support make=
-s it
-> upstream.
->
-> Another part that should happen once kernel-side BPF token is established=
-, is
-> a set of conventions between applications (e.g., systemd), tools (e.g.,
-> bpftool), and libraries (e.g., libbpf) on exposing delegatable BPF FS
-> instance(s) at well-defined locations to allow applications take advantag=
-e of
-> this in automatic fashion without explicit code changes on BPF applicatio=
-n's
-> side. But I'd like to postpone this discussion to after BPF token concept
-> lands.
+2023-10-19, 15:02:05 +0300, Radu Pirea (NXP OSS) wrote:
+>  	/* If h/w offloading is available, propagate to the device */
+> -	if (macsec_is_offloaded(macsec)) {
+> +	if (offloaded) {
+>  		const struct macsec_ops *ops;
+>  		struct macsec_context ctx;
+>  
+>  		ops = macsec_get_ops(macsec, &ctx);
+> -		if (ops) {
+> -			ctx.secy = &macsec->secy;
+> -			macsec_offload(ops->mdo_upd_secy, &ctx);
+> +		if (!ops) {
+> +			err = -EINVAL;
 
-In the patch set you've extended MAP_CREATE, PROG_LOAD and BTF_LOAD to
-accept an additional token_fd. How many more commands will need a
-token as a context like this? It would cause a lot of churn to support
-many BPF commands like this, since every command will have token_fd at
-a different offset in bpf_attr. This means we need to write extra code
-for each new command, both in kernel as well as user space.
+For consistency with other places where macsec_get_ops fails, this
+should probably be -EOPNOTSUPP.
 
-Could we pass the token in a way that is uniform across commands?
-Something like additional arg to the syscall or similar.
+I'm not opposed to this change, but I'm not sure how it's related to
+the missing rollback issue. Can you explain that a bit?
 
-Lorenz
+> +			goto restore_old_addr;
+>  		}
+> +
+> +		ctx.secy = &macsec->secy;
+> +		err = macsec_offload(ops->mdo_upd_secy, &ctx);
+> +		if (err)
+> +			goto restore_old_addr;
+>  	}
+>  
+>  	return 0;
+> +
+> +restore_old_addr:
+> +	if (dev->flags & IFF_UP) {
+> +		int err;
+
+[This bit confused me quite a bit, seeing the declaration and the
+"return err" out of this block]
+
+> +		err = macsec_dev_uc_update(dev, old_addr);
+> +		if (err)
+> +			return err;
+
+If we can avoid it, we should try to have a rollback path without any
+possible failures, otherwise we'll leave things in a broken state (in
+this case, telling the user that the MAC address change failed, but
+leaving the new address set on the macsec device).
+
+Paolo suggested to postpone the dev_uc_del until after the offload
+code, so we'd end up with something like this [completely untested]:
+
+
+	if (dev->flags & IFF_UP) {
+		err = dev_uc_add(real_dev, addr->sa_data);
+		if (err < 0)
+			return err;
+	}
+
+	ether_addr_copy(old_addr, dev->dev_addr);
+	eth_hw_addr_set(dev, addr->sa_data);
+
+	/* If h/w offloading is available, propagate to the device */
+	if (macsec_is_offloaded(macsec)) {
+		// ...
+	}
+
+	if (dev->flags & IFF_UP)
+		dev_uc_del(real_dev, old_addr);
+
+	return 0;
+
+restore_old_addr:
+	if (dev->flags & IFF_UP)
+		dev_uc_del(real_dev, addr->sa_data);
+
+	eth_hw_addr_set(dev, old_addr);
+
+	return err;
+
+
+Install both UC addresses, then remove the one we don't need.
+
+
+-- 
+Sabrina
+
 
