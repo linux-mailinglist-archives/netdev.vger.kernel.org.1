@@ -1,156 +1,119 @@
-Return-Path: <netdev+bounces-43087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0D047D15ED
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 20:42:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 504F37D15EE
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 20:42:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 780A32825F0
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:42:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1288C282623
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2901D1D6BE;
-	Fri, 20 Oct 2023 18:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7A01DFE3;
+	Fri, 20 Oct 2023 18:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v4tmyFOO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bri4C+w5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4618F74
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 18:42:02 +0000 (UTC)
-Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBAAE114
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:42:00 -0700 (PDT)
-Received: by mail-vs1-xe2e.google.com with SMTP id ada2fe7eead31-457c7177a42so465544137.2
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:42:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697827320; x=1698432120; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mz8cRirWbUk9y7q5BrLgqfbyUWDIhOOYJWU8Exrqr68=;
-        b=v4tmyFOOsYDzw6SfNVtNKQY6CDrizMPxhRPOfUdrQcIc6LAw3vNVbRIperafUcZ8EO
-         G9jy03k1eeLFSeUkTrsKsQCz0gR8yhi+SGRflX114I07ojxaD+4OB0OvIGX7uEFD/8sc
-         Ts1PqAvCbwtRyfOd7NuTX9gnndlOefngp6lshuMbvfFfMSfUMGallh+FB0vMgI72FQCX
-         dG/GW0aOndHQDu9LVWxAQ8f12idlj9oGUnABtdvmgEE6+Uur2UIaBeW4pV/b62N8+y4C
-         y4CO3Rk4YA6cYIVUbNoNsp3a+lk6A2MyOq04P2ipGUP5oywYbVo6dJr3St4N/YGQ3/AG
-         t2CA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697827320; x=1698432120;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mz8cRirWbUk9y7q5BrLgqfbyUWDIhOOYJWU8Exrqr68=;
-        b=WLTayaeu5rAD4RVoKiN1U0RQ7GBUZ4+jv6Jv15LDZ/tDO7GPQBJCkqk6/o0gtffBQQ
-         xRq1gc4+zb09dzGyR7hQs2BIlhIeaPj4gvVjN7BpPfZH9RS1VnHIrnnSO3ReaLwoo6vG
-         VaR0ZUuWxPTDm04V7Uh3Fvds/jyAPFkZZTiEXw9A2WMQktKheK1x0EE4Cl6xtEBnR9aN
-         1s500f50msvaAVfx9jTUOerl9PiK4IPeFebe3GSDm+0wH3mmUreBOiuOT4f2UuPvfoAk
-         b1hapzDFB/I0o7VOxM5o0ymZs55jESWcYRDE+A//DSvwKudF+3XvZcMleVP7UZkVxnQI
-         8j6g==
-X-Gm-Message-State: AOJu0YybNWjK8NDgyStoVs+tsowE9fjRnW3XrpcXoVPNAXAjH0Av+eJg
-	rcRoHEX2Es3KHL40MlahI7o1YdYu1Hq0NzIWYl8KKbliHM0qmK1/nKlMBg==
-X-Google-Smtp-Source: AGHT+IFvUlN8cBlIukSVpyXX7zwgq2rUW/hsEMeBr7MzuL3vU9JuoGBbDJd+Q4LcBBQ4IiSwNnE/jUHZjw1tyCmuY9M=
-X-Received: by 2002:a05:6102:2005:b0:44d:626b:94da with SMTP id
- p5-20020a056102200500b0044d626b94damr3028553vsr.32.1697827319811; Fri, 20 Oct
- 2023 11:41:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAA91D6BE;
+	Fri, 20 Oct 2023 18:42:16 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DC5D1A8;
+	Fri, 20 Oct 2023 11:42:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=fzLPwxBO4eTsZi7lhB7UsZ4CqCFBDHmJkwyiD5oBlHs=; b=bri4C+w5o+dRM/auPkE+tsUaGM
+	AfW58BYEC2JPdNoNmjK0Q3uBlCQ1xjncZgXawAg8KrIJ2PSU+sEA4lCRuBSP3Uvhnmhv/OqKLWrvQ
+	fDe0QwBThDZtaUvIhuJ6o9cAQbrLQL9iyBh7AG2n8Q9gyU9A9XTGWvLVhbYMOdW6bsRs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qtuRm-002oIw-SV; Fri, 20 Oct 2023 20:42:10 +0200
+Date: Fri, 20 Oct 2023 20:42:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
+	tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com,
+	greg@kroah.com
+Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY
+ drivers
+Message-ID: <4935f458-4719-4472-b937-0da8b16ebbaa@lunn.ch>
+References: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
+ <20231017113014.3492773-2-fujita.tomonori@gmail.com>
+ <e361ef91-607d-400b-a721-f846c21e2400@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231020125748.122792-1-edumazet@google.com>
-In-Reply-To: <20231020125748.122792-1-edumazet@google.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Fri, 20 Oct 2023 14:41:42 -0400
-Message-ID: <CADVnQymW05vi9nj3FBUEwCsZcqkEihXoMQrG7Oa-21Rv36Z9_Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 00/13] tcp: add optional usec resolution to TCP TS
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Yuchung Cheng <ycheng@google.com>, Kevin Yang <yyd@google.com>, 
-	Soheil Hassas Yeganeh <soheil@google.com>, Wei Wang <weiwan@google.com>, Van Jacobson <vanj@google.com>, 
-	Florian Westphal <fw@strlen.de>, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e361ef91-607d-400b-a721-f846c21e2400@proton.me>
 
-On Fri, Oct 20, 2023 at 8:57=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> As discussed in various public places in 2016, Google adopted
-> usec resolution in RFC 7323 TS values, at Van Jacobson suggestion.
->
-> Goals were :
->
-> 1) better observability of delays in networking stacks/fabrics.
->
-> 2) better disambiguation of events based on TSval/ecr values.
->
-> 3) building block for congestion control modules needing usec resolution.
->
-> Back then we implemented a schem based on private SYN options
-> to safely negotiate the feature.
->
-> For upstream submission, we chose to use a much simpler route
-> attribute because this feature is probably going to be used
-> in private networks.
->
-> ip route add 10/8 ... features tcp_usec_ts
->
-> References:
->
-> https://www.ietf.org/proceedings/97/slides/slides-97-tcpm-tcp-options-for=
--low-latency-00.pdf
-> https://datatracker.ietf.org/doc/draft-wang-tcpm-low-latency-opt/
->
-> First two patches are fixing old minor bugs and might be taken
-> by stable teams (thanks to appropriate Fixes: tags)
->
-> Eric Dumazet (13):
->   chtls: fix tp->rcv_tstamp initialization
->   tcp: fix cookie_init_timestamp() overflows
->   tcp: add tcp_time_stamp_ms() helper
->   tcp: introduce tcp_clock_ms()
->   tcp: replace tcp_time_stamp_raw()
->   tcp: rename tcp_skb_timestamp()
->   tcp: move tcp_ns_to_ts() to net/ipv4/syncookies.c
->   tcp: rename tcp_time_stamp() to tcp_time_stamp_ts()
->   tcp: add tcp_rtt_tsopt_us()
->   tcp: add RTAX_FEATURE_TCP_USEC_TS
->   tcp: introduce TCP_PAWS_WRAP
->   tcp: add support for usec resolution in TCP TS values
->   tcp: add TCPI_OPT_USEC_TS
->
->  .../chelsio/inline_crypto/chtls/chtls_cm.c    |  2 +-
->  include/linux/tcp.h                           |  9 ++-
->  include/net/inet_timewait_sock.h              |  3 +-
->  include/net/tcp.h                             | 59 ++++++++++++++-----
->  include/uapi/linux/rtnetlink.h                | 18 +++---
->  include/uapi/linux/tcp.h                      |  1 +
->  net/ipv4/syncookies.c                         | 32 ++++++----
->  net/ipv4/tcp.c                                | 26 +++++---
->  net/ipv4/tcp_input.c                          | 52 ++++++++--------
->  net/ipv4/tcp_ipv4.c                           |  5 +-
->  net/ipv4/tcp_lp.c                             |  2 +-
->  net/ipv4/tcp_minisocks.c                      | 19 ++++--
->  net/ipv4/tcp_output.c                         | 14 +++--
->  net/ipv4/tcp_timer.c                          | 44 +++++++++-----
->  net/ipv6/tcp_ipv6.c                           |  5 +-
->  net/netfilter/nf_synproxy_core.c              |  2 +-
->  .../selftests/bpf/progs/xdp_synproxy_kern.c   |  4 +-
->  17 files changed, 193 insertions(+), 104 deletions(-)
->
-> --
+> > +//! All the PHYLIB helper functions for `phy_device` modify some members in `phy_device`. Except for
+> > +//! getter functions, [`Device`] methods take `&mut self`. This also applied to `read()`, which reads
+> > +//! a hardware register and updates the stats.
+> 
+> I would use [`Device`] instead of `phy_device`, since the Rust reader
+> might not be aware what wraps `phy_device`.
 
-Thanks for sending this upstream, Eric! Great to have this upstream.
-+1 to the nice benefits mentioned by Yuchung and Van.
+We don't want to hide phy_device too much, since at the moment, the
+abstraction is very minimal. Anybody writing a driver is going to need
+a good understanding of the C code in order to find the helpers they
+need, and then add them to the abstraction. So i would say we need to
+explain the relationship between the C structure and the Rust
+structure, to aid developers.
 
-The whole patch series looks great to me.
+> > +    /// Returns true if the link is up.
+> > +    pub fn get_link(&self) -> bool {
+> 
+> I still think this name should be changed. My response at [1] has not yet
+> been replied to. This has already been discussed before:
+> - https://lore.kernel.org/rust-for-linux/2023100237-satirical-prance-bd57@gregkh/
+> - https://lore.kernel.org/rust-for-linux/20231004.084644.50784533959398755.fujita.tomonori@gmail.com/
+> - https://lore.kernel.org/rust-for-linux/CALNs47syMxiZBUwKLk3vKxzmCbX0FS5A37FjwUzZO9Fn-iPaoA@mail.gmail.com/
+> 
+> And I want to suggest to change it to `is_link_up`.
+> 
+> Reasons why I do not like the name:
+> - `get_`/`put_` are used for ref counting on the C side, I would like to
+>    avoid confusion.
+> - `get` in Rust is often used to fetch a value from e.g. a datastructure
+>    such as a hashmap, so I expect the call to do some computation.
+> - getters in Rust usually are not prefixed with `get_`, but rather are
+>    just the name of the field.
+> - in this case I like the name `is_link_up` much better, since code becomes
+>    a lot more readable with that.
+> - I do not want this pattern as an example for other drivers.
+> 
+> [1]: https://lore.kernel.org/rust-for-linux/f5878806-5ba2-d932-858d-dda3f55ceb67@proton.me/
+> 
+> > +        const LINK_IS_UP: u32 = 1;
+> > +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+> > +        let phydev = unsafe { *self.0.get() };
+> > +        phydev.link() == LINK_IS_UP
+> > +    }
 
-Acked-by: Neal Cardwell <ncardwell@google.com>
+During the reviews we have had a lot of misunderstanding what this
+actually does, given its name. Some thought it poked around in
+registers to get the current state of the link. Some thought it
+triggered the PHY to establish a link. When in fact its just a dumb
+getter. And we have a few other dumb getters and setters.
 
-thanks,
-neal
+So i would prefer something which indicates its a dumb getter. If the
+norm of Rust is just the field name, lets just use the field name. But
+we should do that for all the getters and setters. Is there a naming
+convention for things which take real actions?
+
+And maybe we need to add a comment: Get the current link state, as
+stored in the [`Device`]. Set the duplex value in [`Device`], etc.
+
+   Andrew
 
