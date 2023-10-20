@@ -1,78 +1,73 @@
-Return-Path: <netdev+bounces-42964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7E3E7D0D0E
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:26:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EBBB7D0D0F
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:26:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6042BB213AB
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:26:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB949B215EB
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:26:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA552168AC;
-	Fri, 20 Oct 2023 10:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431EF16433;
+	Fri, 20 Oct 2023 10:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SoedXVhA"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="wZfArvZ6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4195A15EBD;
-	Fri, 20 Oct 2023 10:26:26 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39F4EB8;
-	Fri, 20 Oct 2023 03:26:24 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53e2308198eso922540a12.1;
-        Fri, 20 Oct 2023 03:26:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF0E17744
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:26:33 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 975B1D52
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:26:31 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-507a98517f3so835551e87.0
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:26:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697797582; x=1698402382; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697797590; x=1698402390; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rqPy64WSZA+4wUylMe4RJhArwfqJFkAGmouyl6GLC3U=;
-        b=SoedXVhAXGqFPCgRlijCipN0O+FNqeOjo42goy00lCcoIiAxuieNLAzYrX3NXLZ9i0
-         BlG8vc4xBIXbnB70FsUVieC4fpvqi0T/N/6usK7g2Lxs4kLUvNx415xJMTFIz3sAkJCk
-         sukpaHBhvMIne9pXx4i2OsKoolK6tsH5DeLQBsjmUSrPIpETpICLTd7Px61OmpupH2bk
-         CHFUD4aSi6QFidV/XWaqxkVRwoKbbBJbBudnD01Sfopjl5ImZQE4oxuTC22E/8gfyv2o
-         EM1nJoLMg91oBMMdZFb2NN85zUUcVKqEROdkZRPANLbCCyWYIZn27FGOS1bB/O00y473
-         58wQ==
+        bh=FpUv3lYsvCWnwDR/g06Egfp3kFhU4jUb0bzrOwuya/Q=;
+        b=wZfArvZ6iByfsgEMWXFipVST/DE4x9aW5Tz0xr3WCV/SG6HAeN5DLin7xBRSZuOwPv
+         Sd+m+ZWgXyINHbCQistdFklbSLi9lOkTPHW16t0kCNrNk5+VAZGQ6CZIAq81fxTlTmcC
+         6MaOTC3ye2Vukk3YdMw/nbT8/H/e82lfbY5KYMOSk0eM4/72EGMGV1NVkM+blFoXrhaM
+         Demcuhh0Uf9remWGrNUmk/atIF0LJPoALb7mBXJiL0p6DxLmtkHeEtacEugmP8vIdBcg
+         7QE90fOmPl4c4A3hsmurWQIOldh9oBPNCsKpRmMjp3stlAcbZc1gJj2RGy3d2tuWya+z
+         acLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697797582; x=1698402382;
+        d=1e100.net; s=20230601; t=1697797590; x=1698402390;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rqPy64WSZA+4wUylMe4RJhArwfqJFkAGmouyl6GLC3U=;
-        b=PlRcsbTZiezfsl9aiG268dof0810fyXXMRUxwYte45qgqly37PosI0W2/o8wCWgOBn
-         hFB681fYaIU/lIBvo+aoFm+q+yZw0wXE6oggthrCDYgNrOuf1wdZcW2iCroBYt18xben
-         vlomAF7wvpLG9zIVbVWQYwqY1hM3N0nwloCpQU3Z7Id2P0HXmlr39reNPjpmaGVNsoV3
-         SqykcWVIk68LSDRJnva889RlGuHzcG5XswalZsL8FuRgR7WJ1Wb9jlYEOqcN006iXKGm
-         nzvzybweiWbyK6hX6bgrb8TeMRovqszodU949VdiApeccw09LfCiEOmQwreHtdAjlNbZ
-         Chgw==
-X-Gm-Message-State: AOJu0YwYlyYgh0eq6fFXElcqHY40ZZr8ZdQKiBK2RAAVXdlcLlpru3M7
-	JnU0KmUwrd1ndFMFaHCtY04=
-X-Google-Smtp-Source: AGHT+IEnlFPzgFG5Txjbr+/GrDtBQ71LyQiWuJ/n2/IlW+m/PujVaS1JJ1mqNN/tW7RHg3Sul40//g==
-X-Received: by 2002:a17:907:2d27:b0:9a1:c991:a521 with SMTP id gs39-20020a1709072d2700b009a1c991a521mr929212ejc.4.1697797582567;
-        Fri, 20 Oct 2023 03:26:22 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id t15-20020a1709066bcf00b009a13fdc139fsm1183335ejs.183.2023.10.20.03.26.21
+        bh=FpUv3lYsvCWnwDR/g06Egfp3kFhU4jUb0bzrOwuya/Q=;
+        b=F4y1sjH97pdA08uys3nYFRWk9qemnhlhIHSASWDo49fm6aTTpr+xBrSHn3OEeN49XM
+         DGKLVMdQk4CnLs/U1goc5X1hr1ArBLxvNpiDRjgcBRjSKXHu3ShGVYFaGbLH/aag5roO
+         bKNPLHOTuVAHVZ169T/5vK4U6pP71Y+FepZyzOHdvwTQeHCkHzsUp8mBZgkvR6k/sHjn
+         k4Lq4SUPi3gLf/Tz50VdKM/EFUFO4cPCl22IDM5ZO1tn1D3pWctp65KbzXPbdDXuozXZ
+         13uYAFoxsCLB2NqeYa1qWCoeYKrb2DeOVgw5M0lxYlMg5jGyqWQSstIyvlBGA7qs3uEK
+         4ADA==
+X-Gm-Message-State: AOJu0Yyyynk50nM3/yimIhc3oIxns4uMzKF5rZld4WruggTwClNSZeoD
+	uNP4X/u/YLcNbxUpwKSLuYpm3Q==
+X-Google-Smtp-Source: AGHT+IFfbY2lxYPjc9TEMdYAcsK2WwHjA5HaM22K0vA0GSapL5rxGSmu5Fxsposuk3KDUd72mVgdbg==
+X-Received: by 2002:ac2:5311:0:b0:507:a1e0:22f4 with SMTP id c17-20020ac25311000000b00507a1e022f4mr896238lfh.29.1697797589649;
+        Fri, 20 Oct 2023 03:26:29 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id u25-20020a05600c00d900b004068495910csm6552099wmm.23.2023.10.20.03.26.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 03:26:22 -0700 (PDT)
-Date: Fri, 20 Oct 2023 13:26:19 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Ante Knezic <ante.knezic@helmholz.de>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: UNGLinuxDriver@microchip.com, andrew@lunn.ch, conor+dt@kernel.org,
-	davem@davemloft.net, devicetree@vger.kernel.org,
-	edumazet@google.com, f.fainelli@gmail.com,
-	krzysztof.kozlowski+dt@linaro.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, marex@denx.de, netdev@vger.kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org, woojung.huh@microchip.com
-Subject: Re: [PATCH net-next v3 2/2] net:dsa:microchip: add property to select
-Message-ID: <20231020102619.67fc3aaknvukwij4@skbuf>
-References: <20231019165409.5sgkyvxsidrrptgh@skbuf>
- <20231020084620.4603-1-ante.knezic@helmholz.de>
- <20231020092729.gpbr7s2cbmznmal7@skbuf>
- <20231020100053.wf3jivdkdfaunfgh@skbuf>
+        Fri, 20 Oct 2023 03:26:29 -0700 (PDT)
+Date: Fri, 20 Oct 2023 12:26:28 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, johannes.berg@intel.com, mpe@ellerman.id.au,
+	j@w1.fi
+Subject: Re: [PATCH net-next 3/6] net: reduce indentation of
+ __dev_alloc_name()
+Message-ID: <ZTJV1KpirMjxBUBE@nanopsycho>
+References: <20231020011856.3244410-1-kuba@kernel.org>
+ <20231020011856.3244410-4-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,35 +76,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231020100053.wf3jivdkdfaunfgh@skbuf>
+In-Reply-To: <20231020011856.3244410-4-kuba@kernel.org>
 
-+Oleksij
+Fri, Oct 20, 2023 at 03:18:53AM CEST, kuba@kernel.org wrote:
+>All callers of __dev_valid_name() go thru dev_prep_valid_name()
+>which handles the non-printf case. Focus __dev_alloc_name() on
+>the sprintf case, remove the indentation level.
+>
+>Minor functional change of returning -EINVAL if % is not found,
+>which should now never happen.
+>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-On Fri, Oct 20, 2023 at 01:00:53PM +0300, Vladimir Oltean wrote:
-> On Fri, Oct 20, 2023 at 12:27:29PM +0300, Vladimir Oltean wrote:
-> > On Fri, Oct 20, 2023 at 10:46:20AM +0200, Ante Knezic wrote:
-> > > Ok, will do. I am guessing I should leave the existing 
-> > > ksz8795_cpu_interface_select() as it is?
-> > 
-> > I would encourage moving it to the simpler call path as well, but
-> > ultimately this is up to you.
-> 
-> Also, could you please put spaces in the commit prefix ("net: dsa: microchip: ")?
-
-One more thing. You two are working on separate things on the KSZ
-driver (Oleksij on
-https://patchwork.kernel.org/project/netdevbpf/cover/20231019122850.1199821-1-o.rempel@pengutronix.de/),
-and this creates conflicts in the DT schema and in ksz_common.h.
-For the most part, those are avoidable. Could you coordinate so that
-both of your next submissions do not conflict with each other? That
-means that each of your series can be applied independently of the other
-(Ante's first, or Oleksij's first).
-
-For example, the dt-schema properties do not seem alphabetically sorted
-(microchip,synclko-125 comes after reset-gpios), so putting
-wakeup-source after reset-gpios, and leaving microchip,rmii-clk-internal
-at the end, seems a viable strategy in avoiding that conflict.
-
-The conflict in ksz_common.h will be automatically avoided when
-rmii_clk_internal stops being stored in struct ksz_device.
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
