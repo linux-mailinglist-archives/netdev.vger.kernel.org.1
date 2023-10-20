@@ -1,134 +1,119 @@
-Return-Path: <netdev+bounces-43031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B4447D101D
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 15:00:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C65E7D105F
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 15:18:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFE44B2136D
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:00:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CDE11C20F2A
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7CD21A70E;
-	Fri, 20 Oct 2023 13:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20571A73A;
+	Fri, 20 Oct 2023 13:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2SgyYv8"
+	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="KUOW6tHo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F7C1A709
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 13:00:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D351C433C8;
-	Fri, 20 Oct 2023 13:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697806827;
-	bh=FF6yIFgoZsRm6vs9OFR60yPujPa1CtpzINti2B/DlPc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f2SgyYv8aEte9ACMcLyW24NZiEiMTnJxONXzWhc9dOSd8nJdnNFhQrig3QpEAPWNh
-	 mUq2PIfl9TLdVBJehXxRX7Gu9nUwHEWel3hcEWH6cRl2R5aqi8jOkuR3kCpHH/Y40b
-	 4iC/D/qKtxlPVbSMargJ6wNfufPOQrbmZJw9j/9+8lMiHOaNtIstf35/EpFz3OaH22
-	 PnetrhLkJagA9y8fxIoKbPFCV2cL2BtodTdd6hBbwN0KkY5yX198rhh5dBY6gn3irs
-	 Kc9kVTF+MubqO1J//EkB5jTkkylD6qhcBB06r+N5axxqDlC5dwagWAUckF2FcdFEhi
-	 gOSvtfkafrtlw==
-Date: Fri, 20 Oct 2023 15:00:23 +0200
-From: Simon Horman <horms@kernel.org>
-To: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, nic_swsd@realtek.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marco Elver <elver@google.com>
-Subject: Re: [PATCH v4 3/3] r8169: fix the KCSAN reported data race in rtl_rx
- while reading desc->opts1
-Message-ID: <20231020130023.GF2208164@kernel.org>
-References: <20231018193434.344176-1-mirsad.todorovac@alu.unizg.hr>
- <20231018193434.344176-3-mirsad.todorovac@alu.unizg.hr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE931A727
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 13:18:46 +0000 (UTC)
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 156411BF
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 06:18:44 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9c3aec5f326so412109766b.1
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 06:18:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=isovalent.com; s=google; t=1697807922; x=1698412722; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/RjDLc0f7CsZ3ZAhf+7oO+KfDgSRyr9/BS+BP5jxyc4=;
+        b=KUOW6tHoH0YoRWmfTiYARPJh3y1s6CDX5alQWBN3z01Pox70KX1YmMeO4X8gmj80tz
+         K4RAjFE7F6eu6sKWA8DNl5+VOzXiOhmW2Purw1TYWmojIpSfMpme5ITPOvFlXJW6gkOs
+         RUxubMSHkKeGzfJUt/vfeX5Uvqu3tle5S0pJ1kJxeDkH9ty7a5MtTh6X0UWOjNkr/NSy
+         GR2ERAP5mG5IONJh4g0dqFblVKeR620s2ZyBbRuOvXXt+WPG/xWFf1UHvocjUakUUMWV
+         Sy7YWU6fCNmb4JC58tx/qKchZHrcWyHiJcH9jxYAOKOnVZzjUG9M47GXWwKI/rtndEKX
+         BwcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697807922; x=1698412722;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/RjDLc0f7CsZ3ZAhf+7oO+KfDgSRyr9/BS+BP5jxyc4=;
+        b=mjxPAVnxdaoYgYBDXN9kHB4clcDxkVDWcDXQUZRCfpEoxRpsVA/mEcmJ7inAFyXaaG
+         pO4TUeGH37e7jFROKZgW/gtgLyTlli9sUBFN3Se4Xd6r1oOBNlqLoEAsl3z7yFHEsoZ7
+         dtJ2OjO9PPcBu54M8ds82Sj/30W+/M8Fs5fpNV/L1jmlM2N8ZK/J0jDkWhWKArxb4Kby
+         gT5fqaXaJxNHYVgDKilvKaFNhDkx4jExc88NNP8kN158XTpGMMc2rT2/hWVr/SnblwKe
+         kWPXQwdob3JTaObwtI6MPnZzZ+myvmhS2KHyZAdnY3+EdOIpuGmUTn6A6ipQ4dPPV13I
+         yKUA==
+X-Gm-Message-State: AOJu0Yw6Tjva0UWKnpTsHi9dJQNjoPczF9gZN+4Q7shN/6Wh/gKYQ8xr
+	FDPBlO/CFR4enz1difRKNDwRzxcAyjHSc4KRB2ruoQ==
+X-Google-Smtp-Source: AGHT+IHJ0YVjts5wXBN5Jqp31pQ7zOyCplhCxmKRWiIG/OBUb9hPTVLkywcsxvesYEBUsruBmhSCSDcUubMxrq+Mqbc=
+X-Received: by 2002:a17:907:7f2a:b0:9ae:659f:4d2f with SMTP id
+ qf42-20020a1709077f2a00b009ae659f4d2fmr1364024ejc.26.1697807922329; Fri, 20
+ Oct 2023 06:18:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231018193434.344176-3-mirsad.todorovac@alu.unizg.hr>
+References: <20231016180220.3866105-1-andrii@kernel.org>
+In-Reply-To: <20231016180220.3866105-1-andrii@kernel.org>
+From: Lorenz Bauer <lorenz.bauer@isovalent.com>
+Date: Fri, 20 Oct 2023 14:18:31 +0100
+Message-ID: <CAN+4W8hu+zWiWejWtc72WwQb6ydL3U3LXvaFBdc0o826JKzoAQ@mail.gmail.com>
+Subject: Re: [PATCH v8 bpf-next 00/18] BPF token and BPF FS-based delegation
+To: Andrii Nakryiko <andrii@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, 
+	brauner@kernel.org, lennart@poettering.net, kernel-team@meta.com, 
+	sargun@sargun.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 18, 2023 at 09:34:38PM +0200, Mirsad Goran Todorovac wrote:
-> KCSAN reported the following data-race bug:
-> 
-> ==================================================================
-> BUG: KCSAN: data-race in rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4430 drivers/net/ethernet/realtek/r8169_main.c:4583) r8169
-> 
-> race at unknown origin, with read to 0xffff888117e43510 of 4 bytes by interrupt on cpu 21:
-> rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4430 drivers/net/ethernet/realtek/r8169_main.c:4583) r8169
-> __napi_poll (net/core/dev.c:6527)
-> net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
-> __do_softirq (kernel/softirq.c:553)
-> __irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
-> irq_exit_rcu (kernel/softirq.c:647)
-> sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1074 (discriminator 14))
-> asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:645)
-> cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
-> cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
-> call_cpuidle (kernel/sched/idle.c:135)
-> do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
-> cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
-> start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:294)
-> secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
-> 
-> value changed: 0x80003fff -> 0x3402805f
-> 
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kcsan-00143-gb5cbe7c00aa0 #41
-> Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04/26/2023
-> ==================================================================
-> 
-> drivers/net/ethernet/realtek/r8169_main.c:
-> ==========================================
->    4429
->  → 4430                 status = le32_to_cpu(desc->opts1);
->    4431                 if (status & DescOwn)
->    4432                         break;
->    4433
->    4434                 /* This barrier is needed to keep us from reading
->    4435                  * any other fields out of the Rx descriptor until
->    4436                  * we know the status of DescOwn
->    4437                  */
->    4438                 dma_rmb();
->    4439
->    4440                 if (unlikely(status & RxRES)) {
->    4441                         if (net_ratelimit())
->    4442                                 netdev_warn(dev, "Rx ERROR. status = %08x\n",
-> 
-> Marco Elver explained that dma_rmb() doesn't prevent the compiler to tear up the access to
-> desc->opts1 which can be written to concurrently. READ_ONCE() should prevent that from
-> happening:
-> 
->    4429
->  → 4430                 status = le32_to_cpu(READ_ONCE(desc->opts1));
->    4431                 if (status & DescOwn)
->    4432                         break;
->    4433
-> 
-> As the consequence of this fix, this KCSAN warning was eliminated.
-> 
-> Fixes: 6202806e7c03a ("r8169: drop member opts1_mask from struct rtl8169_private")
-> Suggested-by: Marco Elver <elver@google.com>
-> Cc: Heiner Kallweit <hkallweit1@gmail.com>
-> Cc: nic_swsd@realtek.com
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@alu.unizg.hr/
-> Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-> Acked-by: Marco Elver <elver@google.com>
+On Mon, Oct 16, 2023 at 7:03=E2=80=AFPM Andrii Nakryiko <andrii@kernel.org>=
+ wrote:
+...
+> This patch set adds a basic minimum of functionality to make BPF token id=
+ea
+> useful and to discuss API and functionality. Currently only low-level lib=
+bpf
+> APIs support creating and passing BPF token around, allowing to test kern=
+el
+> functionality, but for the most part is not sufficient for real-world
+> applications, which typically use high-level libbpf APIs based on `struct
+> bpf_object` type. This was done with the intent to limit the size of patc=
+h set
+> and concentrate on mostly kernel-side changes. All the necessary plumbing=
+ for
+> libbpf will be sent as a separate follow up patch set kernel support make=
+s it
+> upstream.
+>
+> Another part that should happen once kernel-side BPF token is established=
+, is
+> a set of conventions between applications (e.g., systemd), tools (e.g.,
+> bpftool), and libraries (e.g., libbpf) on exposing delegatable BPF FS
+> instance(s) at well-defined locations to allow applications take advantag=
+e of
+> this in automatic fashion without explicit code changes on BPF applicatio=
+n's
+> side. But I'd like to postpone this discussion to after BPF token concept
+> lands.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+In the patch set you've extended MAP_CREATE, PROG_LOAD and BTF_LOAD to
+accept an additional token_fd. How many more commands will need a
+token as a context like this? It would cause a lot of churn to support
+many BPF commands like this, since every command will have token_fd at
+a different offset in bpf_attr. This means we need to write extra code
+for each new command, both in kernel as well as user space.
 
+Could we pass the token in a way that is uniform across commands?
+Something like additional arg to the syscall or similar.
+
+Lorenz
 
