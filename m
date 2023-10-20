@@ -1,161 +1,156 @@
-Return-Path: <netdev+bounces-43086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9DC57D158C
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 20:12:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0D047D15ED
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 20:42:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6894DB21291
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:12:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 780A32825F0
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3933221113;
-	Fri, 20 Oct 2023 18:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2901D1D6BE;
+	Fri, 20 Oct 2023 18:42:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="qH2lVI/D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v4tmyFOO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A722032B
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 18:12:27 +0000 (UTC)
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A674D5E;
-	Fri, 20 Oct 2023 11:12:25 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39KIC64N091271;
-	Fri, 20 Oct 2023 13:12:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1697825526;
-	bh=O5tj34Fk5wcP36nJvs/VWBsQMe3mczk8/9535aCy8Cs=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=qH2lVI/DPwvFiAPkUgK0c3L8GzueZfyeV/J3s82kxt6ZcGOChVhj40p23ZHtGS5kY
-	 HTS5HZMBw7F9u8cEN6jqzMwd0I4LL39Mva+RLS+0/F/X3GdYzrT2MJ+6f9mP0iwu8/
-	 U0fAFQzL5x5YZ0/Ki1e6a+IupEx1BF8ZlIuZXNLY=
-Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39KIC6E3095769
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 20 Oct 2023 13:12:06 -0500
-Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 20
- Oct 2023 13:12:06 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 20 Oct 2023 13:12:05 -0500
-Received: from localhost (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39KIC5JD078186;
-	Fri, 20 Oct 2023 13:12:06 -0500
-Date: Fri, 20 Oct 2023 13:12:05 -0500
-From: Nishanth Menon <nm@ti.com>
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <pabeni@redhat.com>, <rogerq@kernel.org>, <andrew@lunn.ch>,
-        <f.fainelli@gmail.com>, <horms@kernel.org>,
-        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH net-next v2] net: ethernet: ti: davinci_mdio: Update K3
- SoCs list for errata i2329
-Message-ID: <20231020181205.7zfsfq3aue6dazp2@theme>
-References: <20231020111738.14671-1-r-gunasekaran@ti.com>
- <20231020122359.vwia7sxrcjyeo3ov@pushover>
- <2046f9ad-b5c2-bc42-03de-6254d6ed92d3@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4618F74
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 18:42:02 +0000 (UTC)
+Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBAAE114
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:42:00 -0700 (PDT)
+Received: by mail-vs1-xe2e.google.com with SMTP id ada2fe7eead31-457c7177a42so465544137.2
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:42:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697827320; x=1698432120; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mz8cRirWbUk9y7q5BrLgqfbyUWDIhOOYJWU8Exrqr68=;
+        b=v4tmyFOOsYDzw6SfNVtNKQY6CDrizMPxhRPOfUdrQcIc6LAw3vNVbRIperafUcZ8EO
+         G9jy03k1eeLFSeUkTrsKsQCz0gR8yhi+SGRflX114I07ojxaD+4OB0OvIGX7uEFD/8sc
+         Ts1PqAvCbwtRyfOd7NuTX9gnndlOefngp6lshuMbvfFfMSfUMGallh+FB0vMgI72FQCX
+         dG/GW0aOndHQDu9LVWxAQ8f12idlj9oGUnABtdvmgEE6+Uur2UIaBeW4pV/b62N8+y4C
+         y4CO3Rk4YA6cYIVUbNoNsp3a+lk6A2MyOq04P2ipGUP5oywYbVo6dJr3St4N/YGQ3/AG
+         t2CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697827320; x=1698432120;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mz8cRirWbUk9y7q5BrLgqfbyUWDIhOOYJWU8Exrqr68=;
+        b=WLTayaeu5rAD4RVoKiN1U0RQ7GBUZ4+jv6Jv15LDZ/tDO7GPQBJCkqk6/o0gtffBQQ
+         xRq1gc4+zb09dzGyR7hQs2BIlhIeaPj4gvVjN7BpPfZH9RS1VnHIrnnSO3ReaLwoo6vG
+         VaR0ZUuWxPTDm04V7Uh3Fvds/jyAPFkZZTiEXw9A2WMQktKheK1x0EE4Cl6xtEBnR9aN
+         1s500f50msvaAVfx9jTUOerl9PiK4IPeFebe3GSDm+0wH3mmUreBOiuOT4f2UuPvfoAk
+         b1hapzDFB/I0o7VOxM5o0ymZs55jESWcYRDE+A//DSvwKudF+3XvZcMleVP7UZkVxnQI
+         8j6g==
+X-Gm-Message-State: AOJu0YybNWjK8NDgyStoVs+tsowE9fjRnW3XrpcXoVPNAXAjH0Av+eJg
+	rcRoHEX2Es3KHL40MlahI7o1YdYu1Hq0NzIWYl8KKbliHM0qmK1/nKlMBg==
+X-Google-Smtp-Source: AGHT+IFvUlN8cBlIukSVpyXX7zwgq2rUW/hsEMeBr7MzuL3vU9JuoGBbDJd+Q4LcBBQ4IiSwNnE/jUHZjw1tyCmuY9M=
+X-Received: by 2002:a05:6102:2005:b0:44d:626b:94da with SMTP id
+ p5-20020a056102200500b0044d626b94damr3028553vsr.32.1697827319811; Fri, 20 Oct
+ 2023 11:41:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <2046f9ad-b5c2-bc42-03de-6254d6ed92d3@ti.com>
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+References: <20231020125748.122792-1-edumazet@google.com>
+In-Reply-To: <20231020125748.122792-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 20 Oct 2023 14:41:42 -0400
+Message-ID: <CADVnQymW05vi9nj3FBUEwCsZcqkEihXoMQrG7Oa-21Rv36Z9_Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/13] tcp: add optional usec resolution to TCP TS
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Yuchung Cheng <ycheng@google.com>, Kevin Yang <yyd@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, Wei Wang <weiwan@google.com>, Van Jacobson <vanj@google.com>, 
+	Florian Westphal <fw@strlen.de>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 23:35-20231020, Ravi Gunasekaran wrote:
-> 
-> 
-> On 10/20/2023 5:53 PM, Nishanth Menon wrote:
-> > On 16:47-20231020, Ravi Gunasekaran wrote:
-> >> The errata i2329 affects certain K3 SoC versions. The k3-socinfo.c
-> >> driver generates the revision string for different variants of the
-> >> same SoC in an incremental fashion. This is not true for all SoCs.
-> >> An example case being J721E, for which the actual silicon revision
-> >> names are 1.0, 1.1 for its variants, while the k3-socinfo.c driver
-> >> interprets these variants as revisions 1.0, 2.0 respectively,
-> >> which is incorrect.
-> >>
-> >> While the work to fixup the silicon revision string is posted
-> >> to the soc tree, this patch serves as a fail-safe step by maintaining
-> >> a list of correct and incorrect revision strings, so that the fixup
-> >> work does not break the errata workaround for such corrected SoCs.
-> >>
-> >> The silicon revisions affected by the errata i2329 can be found under
-> >> the MDIO module in the "Advisories by Modules" section of each
-> >> SoC errata document listed below
-> >>
-> >> AM62x: https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
-> >> AM64X: https://www.ti.com/lit/er/sprz457g/sprz457g.pdf
-> >> AM65X: https://www.ti.com/lit/er/sprz452i/sprz452i.pdf
-> >> J7200: https://www.ti.com/lit/er/sprz491d/sprz491d.pdf
-> >> J721E: https://www.ti.com/lit/er/sprz455d/sprz455d.pdf
-> >> J721S2: https://www.ti.com/lit/er/sprz530b/sprz530b.pdf
-> >>
-> >> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
-> >> ---
-> >>
-> >> Changes since v1:
-> >> * For J721E, retained the incorrect SR ID and added the correct one
-> >> * Add AM65x SR2.1 to the workaround list
-> >>
-> >> v1: https://lore.kernel.org/all/20231018140009.1725-1-r-gunasekaran@ti.com/
-> >>
-> >>  drivers/net/ethernet/ti/davinci_mdio.c | 2 ++
-> >>  1 file changed, 2 insertions(+)
-> >>
-> >> diff --git a/drivers/net/ethernet/ti/davinci_mdio.c b/drivers/net/ethernet/ti/davinci_mdio.c
-> >> index 628c87dc1d28..25aaef502edc 100644
-> >> --- a/drivers/net/ethernet/ti/davinci_mdio.c
-> >> +++ b/drivers/net/ethernet/ti/davinci_mdio.c
-> >> @@ -516,9 +516,11 @@ static const struct soc_device_attribute k3_mdio_socinfo[] = {
-> >>  	{ .family = "AM64X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
-> >>  	{ .family = "AM65X", .revision = "SR1.0", .data = &am65_mdio_soc_data },
-> >>  	{ .family = "AM65X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
-> >> +	{ .family = "AM65X", .revision = "SR2.1", .data = &am65_mdio_soc_data },
-> >>  	{ .family = "J7200", .revision = "SR1.0", .data = &am65_mdio_soc_data },
-> >>  	{ .family = "J7200", .revision = "SR2.0", .data = &am65_mdio_soc_data },
-> >>  	{ .family = "J721E", .revision = "SR1.0", .data = &am65_mdio_soc_data },
-> >> +	{ .family = "J721E", .revision = "SR1.1", .data = &am65_mdio_soc_data },
-> >>  	{ .family = "J721E", .revision = "SR2.0", .data = &am65_mdio_soc_data },
-> >>  	{ .family = "J721S2", .revision = "SR1.0", .data = &am65_mdio_soc_data},
-> >>  	{ /* sentinel */ },
-> >>
-> > Looks like every device is impacted -> so, why not just flip the
-> > logic to indicate devices that are NOT impacted? is'nt that a smaller
-> > list?
-> >
-> 
-> At the moment, the list of unaffected devices is small. But as and when we
-> introduce more devices,
-> this list will need update. Also I feel that few years down the line, when
-> someone looks at the code,
-> a list of affected devices provides a better context as it is easier to trace it
-> back to the errata document.
+On Fri, Oct 20, 2023 at 8:57=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> As discussed in various public places in 2016, Google adopted
+> usec resolution in RFC 7323 TS values, at Van Jacobson suggestion.
+>
+> Goals were :
+>
+> 1) better observability of delays in networking stacks/fabrics.
+>
+> 2) better disambiguation of events based on TSval/ecr values.
+>
+> 3) building block for congestion control modules needing usec resolution.
+>
+> Back then we implemented a schem based on private SYN options
+> to safely negotiate the feature.
+>
+> For upstream submission, we chose to use a much simpler route
+> attribute because this feature is probably going to be used
+> in private networks.
+>
+> ip route add 10/8 ... features tcp_usec_ts
+>
+> References:
+>
+> https://www.ietf.org/proceedings/97/slides/slides-97-tcpm-tcp-options-for=
+-low-latency-00.pdf
+> https://datatracker.ietf.org/doc/draft-wang-tcpm-low-latency-opt/
+>
+> First two patches are fixing old minor bugs and might be taken
+> by stable teams (thanks to appropriate Fixes: tags)
+>
+> Eric Dumazet (13):
+>   chtls: fix tp->rcv_tstamp initialization
+>   tcp: fix cookie_init_timestamp() overflows
+>   tcp: add tcp_time_stamp_ms() helper
+>   tcp: introduce tcp_clock_ms()
+>   tcp: replace tcp_time_stamp_raw()
+>   tcp: rename tcp_skb_timestamp()
+>   tcp: move tcp_ns_to_ts() to net/ipv4/syncookies.c
+>   tcp: rename tcp_time_stamp() to tcp_time_stamp_ts()
+>   tcp: add tcp_rtt_tsopt_us()
+>   tcp: add RTAX_FEATURE_TCP_USEC_TS
+>   tcp: introduce TCP_PAWS_WRAP
+>   tcp: add support for usec resolution in TCP TS values
+>   tcp: add TCPI_OPT_USEC_TS
+>
+>  .../chelsio/inline_crypto/chtls/chtls_cm.c    |  2 +-
+>  include/linux/tcp.h                           |  9 ++-
+>  include/net/inet_timewait_sock.h              |  3 +-
+>  include/net/tcp.h                             | 59 ++++++++++++++-----
+>  include/uapi/linux/rtnetlink.h                | 18 +++---
+>  include/uapi/linux/tcp.h                      |  1 +
+>  net/ipv4/syncookies.c                         | 32 ++++++----
+>  net/ipv4/tcp.c                                | 26 +++++---
+>  net/ipv4/tcp_input.c                          | 52 ++++++++--------
+>  net/ipv4/tcp_ipv4.c                           |  5 +-
+>  net/ipv4/tcp_lp.c                             |  2 +-
+>  net/ipv4/tcp_minisocks.c                      | 19 ++++--
+>  net/ipv4/tcp_output.c                         | 14 +++--
+>  net/ipv4/tcp_timer.c                          | 44 +++++++++-----
+>  net/ipv6/tcp_ipv6.c                           |  5 +-
+>  net/netfilter/nf_synproxy_core.c              |  2 +-
+>  .../selftests/bpf/progs/xdp_synproxy_kern.c   |  4 +-
+>  17 files changed, 193 insertions(+), 104 deletions(-)
+>
+> --
 
-Just handle it with a different compatible if needed. There is no loss
-of readability as the check is still readable based on soc_data. but
-this removes this entire mess of interdependency of merges completely
-out. There are still ROM only spins that are happening and as far as I
-see this mess just keeps growing. Alternatively, reading some IP level
-version register helps detect the fixed versions, uses that (infact
-you should probably insist to the design team to update the revision
-for the fix for this very purpose) - that way, the ones that may have
-been missed could be limited by soc_data management.
+Thanks for sending this upstream, Eric! Great to have this upstream.
++1 to the nice benefits mentioned by Yuchung and Van.
 
--- 
-Regards,
-Nishanth Menon
-Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
+The whole patch series looks great to me.
+
+Acked-by: Neal Cardwell <ncardwell@google.com>
+
+thanks,
+neal
 
