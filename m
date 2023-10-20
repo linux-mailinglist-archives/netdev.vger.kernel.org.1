@@ -1,122 +1,183 @@
-Return-Path: <netdev+bounces-42976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62E027D0E21
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:07:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99B847D0E2A
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:10:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 938D81C209EF
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 11:07:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F179B20E9C
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 11:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B1918AEE;
-	Fri, 20 Oct 2023 11:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04DFF18C08;
+	Fri, 20 Oct 2023 11:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nCQaw9sR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48BC18029
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:07:52 +0000 (UTC)
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9C84114;
-	Fri, 20 Oct 2023 04:07:50 -0700 (PDT)
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-5a7eef0b931so7507947b3.0;
-        Fri, 20 Oct 2023 04:07:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BFF18B04
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:10:49 +0000 (UTC)
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B73418F
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 04:10:46 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-53e08b60febso989849a12.1
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 04:10:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697800245; x=1698405045; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UG+PVmid3Mo6+0CvXodjlEjuponhPh1fREwsE8Af67A=;
+        b=nCQaw9sRzKTFrvvDVmzq2rI9yAJm4Ufd9xziuKUHWeeileOUrd0Nr1RdB4aW0/JwsP
+         M6c2+V64ubiIncKQrTKYL4JBmswJMun8ctADOFKUvsh+Y8PiYH4WbnNuy0Vr/HTxMxBC
+         xz5AaBCZ6abqlvfRGnO+7rxF1/GB0R9/fCuX4VgrUuBhGKbH+4yPg6mk+od5J59IbgDs
+         I26yAguv3nFyxm1lxLpLpiQgjWeH/488feSsw7N/TqAiyGmlGarxgngqYycEg/o9ZT5l
+         8F7fHW02lag+jK3MHDB9zWIeGcxUGZ7bCW5bdGctLJw4Du9UJj0tGV0EbyWYHM2ObjMP
+         w4iA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697800070; x=1698404870;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W0tXFYyVXNiSpns+Mi0YzAxeIB5UtoY4Qzk6NSDbAd4=;
-        b=kzNu9acOSzq0sJfdrkPgJlcLBJfz2F4+MftYhBeF0AojnncWE2sxBbvu+lUmqjoFWL
-         VtGU1MMwQnf3PYJAGVIQAHJPx31WaF/649M4htfGCpREUKtn6i093cNPyNoUcrQDAoLF
-         fqbhnHXGGwXKGW7vXMG4KEvAc4D3CYy/uIgaZhLvXx6x+X1mwG3n3Rdiw6ZeCanAdJKQ
-         E4BTnLG8WBbfUvwrJpzVa30WJYNLi20JSHRaN+ANbDJNoh/G975mBWcX93QlSMb3aH9C
-         qHRUGOFeG8qpNMGDhHWGE0VKQVtGkA8bQUNSOtq4K9pWOQtfwb38RS1h5uW55Wqj3X3b
-         trZA==
-X-Gm-Message-State: AOJu0YzqQQEUGoyNHFP34/2vA6hSDHtbVi1jSNh7do4KdusoioIsTvVJ
-	HAasJRDubS57fJ/It/ltL85xdIYbs4Rukw==
-X-Google-Smtp-Source: AGHT+IGIZEg1HuLGLlr2eGSX9BYh/8ZCnhY8T8FXaP/IEPn0CJakK4NQT8xAMUW+w61S5kNg18ca9g==
-X-Received: by 2002:a05:690c:ed0:b0:599:da80:e1e4 with SMTP id cs16-20020a05690c0ed000b00599da80e1e4mr1965841ywb.30.1697800069822;
-        Fri, 20 Oct 2023 04:07:49 -0700 (PDT)
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com. [209.85.128.178])
-        by smtp.gmail.com with ESMTPSA id z63-20020a0dd742000000b0059be6a5fcffsm599715ywd.44.2023.10.20.04.07.47
+        d=1e100.net; s=20230601; t=1697800245; x=1698405045;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UG+PVmid3Mo6+0CvXodjlEjuponhPh1fREwsE8Af67A=;
+        b=cGsZq6tKn4uqpe89C1aEKULdDcnLYDoSwUhQm6WFmubAbzcl5h7TCPbuWZIJPcWavv
+         LKgaCSerTj7bnUyooqk72d8GtPAgd/aj9nSOvAP/ZE6JKLEs/5DAUKKpLUQQQIR3wFcS
+         QQGZ70ygJanzYFL7bEcRdLciuq/nGOc4PYdN8RDBce95PlbBn8EvHgluEqELmmrGgyx4
+         YSi+T+lzUeyXh11Bv3To0Y631frq2YBubG9+QFGRxM6Zh6GCGmSaHMhdUeRGDyUOkqXE
+         aLARnomQnSPcQmFwdFGM9xYW9zJ9e26A6bSqxRoFEdbr7+A4mPC3TWA5u7wh9kVopGAp
+         2PJQ==
+X-Gm-Message-State: AOJu0YxAbug0xjco0+XV78+6z2JWUY+bwh1i9dnxpWnHtwiYFbxjqPpG
+	Ixok1FOHdfxw7RLiiM6PP0IhPg==
+X-Google-Smtp-Source: AGHT+IFsLSySwKPr+GKVj6cvW2IJBj5IgvG55nmvngR8Oj4tLEiHODHLCNnKDxbvwRCF35UlKlYi5g==
+X-Received: by 2002:a05:6402:1d48:b0:53d:d8ad:4d46 with SMTP id dz8-20020a0564021d4800b0053dd8ad4d46mr1763127edb.36.1697800245047;
+        Fri, 20 Oct 2023 04:10:45 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.218.126])
+        by smtp.gmail.com with ESMTPSA id a16-20020aa7cf10000000b0053ecef8786asm1230075edy.75.2023.10.20.04.10.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Oct 2023 04:07:48 -0700 (PDT)
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-5a7eef0b931so7507537b3.0;
-        Fri, 20 Oct 2023 04:07:47 -0700 (PDT)
-X-Received: by 2002:a81:4e09:0:b0:5a7:c50e:8df with SMTP id
- c9-20020a814e09000000b005a7c50e08dfmr1699674ywb.18.1697800067486; Fri, 20 Oct
- 2023 04:07:47 -0700 (PDT)
+        Fri, 20 Oct 2023 04:10:44 -0700 (PDT)
+Message-ID: <cfc0375e-50eb-4772-9104-3b1a95b7ca4a@linaro.org>
+Date: Fri, 20 Oct 2023 13:10:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231020093156.538856-1-chentao@kylinos.cn>
-In-Reply-To: <20231020093156.538856-1-chentao@kylinos.cn>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 20 Oct 2023 13:07:35 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdUo8tEBQa6soZm=MUWLy2AnkL6Vszt7vzbs-peb20=myQ@mail.gmail.com>
-Message-ID: <CAMuHMdUo8tEBQa6soZm=MUWLy2AnkL6Vszt7vzbs-peb20=myQ@mail.gmail.com>
-Subject: Re: [PATCH] treewide: Spelling fix in comment
-To: Kunwu Chan <chentao@kylinos.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, mpe@ellerman.id.au, npiggin@gmail.com, 
-	christophe.leroy@csgroup.eu, mokuno@sm.sony.co.jp, linville@tuxdriver.com, 
-	dcbw@redhat.com, jeff@garzik.org, netdev@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
-	kunwu.chan@hotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: dsa: Require ports or
+ ethernet-ports
+Content-Language: en-US
+To: Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>
+Cc: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ linux-arm-kernel@lists.infradead.org,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>,
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+ Eric Dumazet <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>,
+ Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+ Gregory Clement <gregory.clement@bootlin.com>
+References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
+ <20231018-marvell-88e6152-wan-led-v4-1-3ee0c67383be@linaro.org>
+ <169762516670.391804.7528295251386913602.robh@kernel.org>
+ <CACRpkdZ4hkiD6jwENqjZRX8ZHH9+3MSMMLcJe6tJa=6Yhn1w=g@mail.gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzTRLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+wsGUBBMBCgA+FiEE
+ m9B+DgxR+NWWd7dUG5NDfTtBYpsFAmI+BxMCGwMFCRRfreEFCwkIBwIGFQoJCAsCBBYCAwEC
+ HgECF4AACgkQG5NDfTtBYptgbhAAjAGunRoOTduBeC7V6GGOQMYIT5n3OuDSzG1oZyM4kyvO
+ XeodvvYv49/ng473E8ZFhXfrre+c1olbr1A8pnz9vKVQs9JGVa6wwr/6ddH7/yvcaCQnHRPK
+ mnXyP2BViBlyDWQ71UC3N12YCoHE2cVmfrn4JeyK/gHCvcW3hUW4i5rMd5M5WZAeiJj3rvYh
+ v8WMKDJOtZFXxwaYGbvFJNDdvdTHc2x2fGaWwmXMJn2xs1ZyFAeHQvrp49mS6PBQZzcx0XL5
+ cU9ZjhzOZDn6Apv45/C/lUJvPc3lo/pr5cmlOvPq1AsP6/xRXsEFX/SdvdxJ8w9KtGaxdJuf
+ rpzLQ8Ht+H0lY2On1duYhmro8WglOypHy+TusYrDEry2qDNlc/bApQKtd9uqyDZ+rx8bGxyY
+ qBP6bvsQx5YACI4p8R0J43tSqWwJTP/R5oPRQW2O1Ye1DEcdeyzZfifrQz58aoZrVQq+innR
+ aDwu8qDB5UgmMQ7cjDSeAQABdghq7pqrA4P8lkA7qTG+aw8Z21OoAyZdUNm8NWJoQy8m4nUP
+ gmeeQPRc0vjp5JkYPgTqwf08cluqO6vQuYL2YmwVBIbO7cE7LNGkPDA3RYMu+zPY9UUi/ln5
+ dcKuEStFZ5eqVyqVoZ9eu3RTCGIXAHe1NcfcMT9HT0DPp3+ieTxFx6RjY3kYTGLOwU0EVUNc
+ NAEQAM2StBhJERQvgPcbCzjokShn0cRA4q2SvCOvOXD+0KapXMRFE+/PZeDyfv4dEKuCqeh0
+ hihSHlaxTzg3TcqUu54w2xYskG8Fq5tg3gm4kh1Gvh1LijIXX99ABA8eHxOGmLPRIBkXHqJY
+ oHtCvPc6sYKNM9xbp6I4yF56xVLmHGJ61KaWKf5KKWYgA9kfHufbja7qR0c6H79LIsiYqf92
+ H1HNq1WlQpu/fh4/XAAaV1axHFt/dY/2kU05tLMj8GjeQDz1fHas7augL4argt4e+jum3Nwt
+ yupodQBxncKAUbzwKcDrPqUFmfRbJ7ARw8491xQHZDsP82JRj4cOJX32sBg8nO2N5OsFJOcd
+ 5IE9v6qfllkZDAh1Rb1h6DFYq9dcdPAHl4zOj9EHq99/CpyccOh7SrtWDNFFknCmLpowhct9
+ 5ZnlavBrDbOV0W47gO33WkXMFI4il4y1+Bv89979rVYn8aBohEgET41SpyQz7fMkcaZU+ok/
+ +HYjC/qfDxT7tjKXqBQEscVODaFicsUkjheOD4BfWEcVUqa+XdUEciwG/SgNyxBZepj41oVq
+ FPSVE+Ni2tNrW/e16b8mgXNngHSnbsr6pAIXZH3qFW+4TKPMGZ2rZ6zITrMip+12jgw4mGjy
+ 5y06JZvA02rZT2k9aa7i9dUUFggaanI09jNGbRA/ABEBAAHCwXwEGAEKACYCGwwWIQSb0H4O
+ DFH41ZZ3t1Qbk0N9O0FimwUCYDzvagUJFF+UtgAKCRAbk0N9O0Fim9JzD/0auoGtUu4mgnna
+ oEEpQEOjgT7l9TVuO3Qa/SeH+E0m55y5Fjpp6ZToc481za3xAcxK/BtIX5Wn1mQ6+szfrJQ6
+ 59y2io437BeuWIRjQniSxHz1kgtFECiV30yHRgOoQlzUea7FgsnuWdstgfWi6LxstswEzxLZ
+ Sj1EqpXYZE4uLjh6dW292sO+j4LEqPYr53hyV4I2LPmptPE9Rb9yCTAbSUlzgjiyyjuXhcwM
+ qf3lzsm02y7Ooq+ERVKiJzlvLd9tSe4jRx6Z6LMXhB21fa5DGs/tHAcUF35hSJrvMJzPT/+u
+ /oVmYDFZkbLlqs2XpWaVCo2jv8+iHxZZ9FL7F6AHFzqEFdqGnJQqmEApiRqH6b4jRBOgJ+cY
+ qc+rJggwMQcJL9F+oDm3wX47nr6jIsEB5ZftdybIzpMZ5V9v45lUwmdnMrSzZVgC4jRGXzsU
+ EViBQt2CopXtHtYfPAO5nAkIvKSNp3jmGxZw4aTc5xoAZBLo0OV+Ezo71pg3AYvq0a3/oGRG
+ KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
+ fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <CACRpkdZ4hkiD6jwENqjZRX8ZHH9+3MSMMLcJe6tJa=6Yhn1w=g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Kunwu,
+On 18/10/2023 13:11, Linus Walleij wrote:
+> On Wed, Oct 18, 2023 at 12:32 PM Rob Herring <robh@kernel.org> wrote:
+>> On Wed, 18 Oct 2023 11:03:40 +0200, Linus Walleij wrote:
+> 
+>>> Bindings using dsa.yaml#/$defs/ethernet-ports specify that
+>>> a DSA switch node need to have a ports or ethernet-ports
+>>> subnode, and that is actually required, so add requirements
+>>> using oneOf.
+>>>
+>>> Suggested-by: Rob Herring <robh@kernel.org>
+>>> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+>>> ---
+>>>  Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 ++++++
+>>>  1 file changed, 6 insertions(+)
+>>>
+>>
+>> My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+>> on your patch (DT_CHECKER_FLAGS is new in v5.13):
+>>
+>> yamllint warnings/errors:
+>> ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:60:7: [warning] wrong indentation: expected 8 but found 6 (indentation)
+>> ./Documentation/devicetree/bindings/net/dsa/dsa.yaml:62:7: [warning] wrong indentation: expected 8 but found 6 (indentation)
+> 
+> Really?
+> 
+> +  oneOf:
+> +    - required:
+> +      - ports
 
-Thanks for your patch!
+.........^ here
 
-This is not a treewide change. Hence the oneline-summary should be
-something prefixed by "[net-next] ps3_gelic"
+> +    - required:
+> +      - ethernet-ports
+> 
+> Two spaces after the oneOf, 2 spaces after a required as usual.
+> I don't get it.
 
-On Fri, Oct 20, 2023 at 11:32=E2=80=AFAM Kunwu Chan <chentao@kylinos.cn> wr=
-ote:
-> reques -> request
->
-> Fixes: 09dde54c6a69 ("PS3: gelic: Add wireless support for PS3")
+Although YAML accepts your indentation, yamllint does not and we always,
+always, expected yamllint flavor of syntax.
 
-No need for a Fixes tag for a spelling fix in a comment.
 
-> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+Best regards,
+Krzysztof
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-
-> --- a/drivers/net/ethernet/toshiba/ps3_gelic_wireless.c
-> +++ b/drivers/net/ethernet/toshiba/ps3_gelic_wireless.c
-> @@ -1217,7 +1217,7 @@ static int gelic_wl_set_encodeext(struct net_device=
- *netdev,
->                 key_index =3D wl->current_key;
->
->         if (!enc->length && (ext->ext_flags & IW_ENCODE_EXT_SET_TX_KEY)) =
-{
-> -               /* reques to change default key index */
-> +               /* request to change default key index */
->                 pr_debug("%s: request to change default key to %d\n",
->                          __func__, key_index);
->                 wl->current_key =3D key_index;
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
