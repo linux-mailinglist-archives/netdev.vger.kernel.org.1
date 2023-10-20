@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-43131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C33B7D180E
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:28:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84D147D1810
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:28:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A65EB21592
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:28:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6CC61C21031
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839FC2FE06;
-	Fri, 20 Oct 2023 21:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 247002B749;
+	Fri, 20 Oct 2023 21:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="eQpyb627"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Nb8Eu2HC"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EB12747B
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 21:28:20 +0000 (UTC)
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7959BD76
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:28:15 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-27d329a704bso968892a91.0
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:28:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9EA12FE09
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 21:28:23 +0000 (UTC)
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67F11D68
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:28:16 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-5a9bf4fbd3fso934713a12.1
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:28:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1697837295; x=1698442095; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1697837296; x=1698442096; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0iDsdde1UpxLJuddoHTlaXetG59akoEUYg8dcbi1CJE=;
-        b=eQpyb627xlAu7E6gWopaxMwxWoPGWMi0/8WNTVBe5n58rsYCgy8bw6MShrLohP6Ki4
-         AMLsWXUJSR/v61nFTR5qvN1c56pwGWN9l56dJ03kXM9rqgR9wGNdj0n/0Ju5sbiUXHDw
-         Tnej2O/IvhcNHxcbUuPVgMKyTMtAxpk7x3rVU=
+        bh=TjTk5x/BMqIltJXEN+AOADHZlZUg3zOJJYeLJ4J4OpY=;
+        b=Nb8Eu2HChxrA6wOeJ7I94Oes8CxFOGOnvvt8xfkYA+gx6cfez10QDY74oxT4v3KTdN
+         748z3PfV9I5W7//4Zv58ZRsUpJcgXJaldSegPSHXTv3kn3BlQpxMDV7zCUJ2IykgG4+m
+         5WuSZt9F3XuzWHiETX/oz/fRMM2s6IHWY/lkk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697837295; x=1698442095;
+        d=1e100.net; s=20230601; t=1697837296; x=1698442096;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0iDsdde1UpxLJuddoHTlaXetG59akoEUYg8dcbi1CJE=;
-        b=FrCOEZQzqJZJMQVth2UGTmbLHjKcnS0daI56X/IYL7RpcI2aePXjI/C4JKhIgoMeMm
-         WCYVaYFjIebgnDFhilhXMOcUZ/ol7BO32gJ31p2O05lyklZ+9OSUOyhtlQNpWNNo1Htp
-         fcWy+q6Oq8y/GZ+I1OEMQnM2y8bQ/T9GLnAZ2lxgK4RME02zvXNpBhUmI9roQ9IvS5ww
-         6tSh0DWH4SToirhiW/qpHmfXrm7jkISVJbqt2zbGJ4Ptra3uoI87rH9E4uwIzqORFuCa
-         aZI8lXewTuViTX9P7sgfO7oIuB2zvFnx8a9rRHNzUH3SnfBHZCrvRuKkZnBzT1fk2ld3
-         w5aQ==
-X-Gm-Message-State: AOJu0Yzi5Xlhr0i29CcIpyoG0yRwsnC38vyf5aFhbukOpygwEffFcXCI
-	6YOG9znEmaszqZBijbS2KXgh+A==
-X-Google-Smtp-Source: AGHT+IHOw0XdzSLntTJaYdycuB63yxn48hUMo6IxfzHQE1hAssUYZ/G7ZNTB+kqTgLvbm7G7oKr9Mw==
-X-Received: by 2002:a17:90a:8a12:b0:27d:1af5:3b17 with SMTP id w18-20020a17090a8a1200b0027d1af53b17mr2893733pjn.26.1697837294383;
-        Fri, 20 Oct 2023 14:28:14 -0700 (PDT)
+        bh=TjTk5x/BMqIltJXEN+AOADHZlZUg3zOJJYeLJ4J4OpY=;
+        b=aMCjH8KkkXPE22F+RQJHjiEaEUYAlatfbYUTDxF57qIbknlLo7fbtEYPQSKdsOkntp
+         3HcxsUbagmgJQusuf1qlCpkUd9p79BH+8KwMq0V3GZE5Qk4vUHmL8ItDK6xsGUJ8Uv+f
+         lgsR7omzMbYy8+J5nAH2EMm7CFJxdRwuk3VhT9zRbZarvsRG2DREl9TrKYdoVaENFvbe
+         icwEq1/Dj/VBlVrvijJ9bMyHiwPWgVEQrZZ8n7tzKt9wx1xk+zqgsDATxPZuK1lPRb+3
+         iSHRKbMyYRvGagijw2o8rSU7C4z9sIjDrPTWfyZbzTw/0x5Aoq9wOASm0SUAp2t94hVQ
+         akTg==
+X-Gm-Message-State: AOJu0YxEe+kVm/23c53y1ZM3PlCW0IdccgMus1JexRui5rXCYHCG8IgX
+	q/3yaDy9ZzTBcUuDki/jOCnwyA==
+X-Google-Smtp-Source: AGHT+IHEk8F2bAy2kWj8gYpd7i6aoc0i/OUmIKASpDsi/LJan3q1UUaC/PmnCieP8Tm2DKPnOEN6Mg==
+X-Received: by 2002:a17:90b:35c4:b0:27c:f48e:e245 with SMTP id nb4-20020a17090b35c400b0027cf48ee245mr3094844pjb.24.1697837295463;
+        Fri, 20 Oct 2023 14:28:15 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id j13-20020a17090a7e8d00b0026d4100e0e8sm1843348pjl.10.2023.10.20.14.28.13
+        by smtp.gmail.com with ESMTPSA id j13-20020a17090a7e8d00b0026d4100e0e8sm1843348pjl.10.2023.10.20.14.28.14
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 20 Oct 2023 14:28:13 -0700 (PDT)
+        Fri, 20 Oct 2023 14:28:15 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
 	kalesh-anakkur.purayil@broadcom.com
-Subject: [PATCH net-next 4/8] bnxt_en: support lane configuration via ethtool
-Date: Fri, 20 Oct 2023 14:27:53 -0700
-Message-Id: <20231020212757.173551-5-michael.chan@broadcom.com>
+Subject: [PATCH net-next 5/8] bnxt_en: refactor speed independent ethtool modes
+Date: Fri, 20 Oct 2023 14:27:54 -0700
+Message-Id: <20231020212757.173551-6-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231020212757.173551-1-michael.chan@broadcom.com>
 References: <20231020212757.173551-1-michael.chan@broadcom.com>
@@ -74,142 +74,177 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000de999806082c8c8c"
+	boundary="000000000000ec953806082c8ccd"
 
---000000000000de999806082c8c8c
+--000000000000ec953806082c8ccd
 Content-Transfer-Encoding: 8bit
 
 From: Edwin Peer <edwin.peer@broadcom.com>
 
-Recent kernels support changing the number of link lanes via ethtool.
-This is useful for determining the appropriate signal mode to use when
-a given link speed can be achieved using different lane configurations.
+A future patch in this series will change the algorithm used to
+determine ethtool speed and media modes. Extract the handling of
+the unrelated pause, autoneg modes into an independent function.
+Also separate FEC handling out of bnxt_fw_to_ethtool_*_spds().
 
-Accept the ethtool lanes parameter when configuring forced speed.  If
-there is no lanes parameter, select a default.
+No functional change.
 
 Signed-off-by: Edwin Peer <edwin.peer@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 32 +++++++++++++++----
- 1 file changed, 25 insertions(+), 7 deletions(-)
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 78 ++++++++++---------
+ 1 file changed, 40 insertions(+), 38 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index c925e21eadec..19b0bff9c590 100644
+index 19b0bff9c590..98a767becd0d 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -2019,13 +2019,15 @@ static int bnxt_get_link_ksettings(struct net_device *dev,
- 	return 0;
+@@ -1730,7 +1730,7 @@ bnxt_get_link_mode(struct bnxt_link_info *link_info)
+ 	return link_mode;
  }
  
--static int bnxt_force_link_speed(struct net_device *dev, u32 ethtool_speed)
-+static int
-+bnxt_force_link_speed(struct net_device *dev, u32 ethtool_speed, u32 lanes)
- {
- 	struct bnxt *bp = netdev_priv(dev);
- 	struct bnxt_link_info *link_info = &bp->link_info;
- 	u16 support_pam4_spds = link_info->support_pam4_speeds;
- 	u16 support_spds = link_info->support_speeds;
- 	u8 sig_mode = BNXT_SIG_MODE_NRZ;
-+	u32 lanes_needed = 1;
- 	u16 fw_speed = 0;
+-#define BNXT_FW_TO_ETHTOOL_SPDS(fw_speeds, fw_pause, lk_ksettings, name)\
++#define BNXT_FW_TO_ETHTOOL_SPDS(fw_speeds, lk_ksettings, name)		\
+ {									\
+ 	if ((fw_speeds) & BNXT_LINK_SPEED_MSK_100MB)			\
+ 		ethtool_link_ksettings_add_link_mode(lk_ksettings, name,\
+@@ -1753,16 +1753,6 @@ bnxt_get_link_mode(struct bnxt_link_info *link_info)
+ 	if ((fw_speeds) & BNXT_LINK_SPEED_MSK_100GB)			\
+ 		ethtool_link_ksettings_add_link_mode(lk_ksettings, name,\
+ 						     100000baseCR4_Full);\
+-	if ((fw_pause) & BNXT_LINK_PAUSE_RX) {				\
+-		ethtool_link_ksettings_add_link_mode(lk_ksettings, name,\
+-						     Pause);		\
+-		if (!((fw_pause) & BNXT_LINK_PAUSE_TX))			\
+-			ethtool_link_ksettings_add_link_mode(		\
+-					lk_ksettings, name, Asym_Pause);\
+-	} else if ((fw_pause) & BNXT_LINK_PAUSE_TX) {			\
+-		ethtool_link_ksettings_add_link_mode(lk_ksettings, name,\
+-						     Asym_Pause);	\
+-	}								\
+ }
  
- 	switch (ethtool_speed) {
-@@ -2046,37 +2048,46 @@ static int bnxt_force_link_speed(struct net_device *dev, u32 ethtool_speed)
- 			fw_speed = PORT_PHY_CFG_REQ_FORCE_LINK_SPEED_10GB;
- 		break;
- 	case SPEED_20000:
--		if (support_spds & BNXT_LINK_SPEED_MSK_20GB)
-+		if (support_spds & BNXT_LINK_SPEED_MSK_20GB) {
- 			fw_speed = PORT_PHY_CFG_REQ_FORCE_LINK_SPEED_20GB;
-+			lanes_needed = 2;
-+		}
- 		break;
- 	case SPEED_25000:
- 		if (support_spds & BNXT_LINK_SPEED_MSK_25GB)
- 			fw_speed = PORT_PHY_CFG_REQ_FORCE_LINK_SPEED_25GB;
- 		break;
- 	case SPEED_40000:
--		if (support_spds & BNXT_LINK_SPEED_MSK_40GB)
-+		if (support_spds & BNXT_LINK_SPEED_MSK_40GB) {
- 			fw_speed = PORT_PHY_CFG_REQ_FORCE_LINK_SPEED_40GB;
-+			lanes_needed = 4;
-+		}
- 		break;
- 	case SPEED_50000:
--		if (support_spds & BNXT_LINK_SPEED_MSK_50GB) {
-+		if ((support_spds & BNXT_LINK_SPEED_MSK_50GB) && lanes != 1) {
- 			fw_speed = PORT_PHY_CFG_REQ_FORCE_LINK_SPEED_50GB;
-+			lanes_needed = 2;
- 		} else if (support_pam4_spds & BNXT_LINK_PAM4_SPEED_MSK_50GB) {
- 			fw_speed = PORT_PHY_CFG_REQ_FORCE_PAM4_LINK_SPEED_50GB;
- 			sig_mode = BNXT_SIG_MODE_PAM4;
- 		}
- 		break;
- 	case SPEED_100000:
--		if (support_spds & BNXT_LINK_SPEED_MSK_100GB) {
-+		if ((support_spds & BNXT_LINK_SPEED_MSK_100GB) &&
-+		    lanes != 2 && lanes != 1) {
- 			fw_speed = PORT_PHY_CFG_REQ_FORCE_LINK_SPEED_100GB;
-+			lanes_needed = 4;
- 		} else if (support_pam4_spds & BNXT_LINK_PAM4_SPEED_MSK_100GB) {
- 			fw_speed = PORT_PHY_CFG_REQ_FORCE_PAM4_LINK_SPEED_100GB;
- 			sig_mode = BNXT_SIG_MODE_PAM4;
-+			lanes_needed = 2;
- 		}
- 		break;
- 	case SPEED_200000:
- 		if (support_pam4_spds & BNXT_LINK_PAM4_SPEED_MSK_200GB) {
- 			fw_speed = PORT_PHY_CFG_REQ_FORCE_PAM4_LINK_SPEED_200GB;
- 			sig_mode = BNXT_SIG_MODE_PAM4;
-+			lanes_needed = 4;
- 		}
- 		break;
- 	}
-@@ -2086,6 +2097,11 @@ static int bnxt_force_link_speed(struct net_device *dev, u32 ethtool_speed)
- 		return -EINVAL;
- 	}
+ #define BNXT_ETHTOOL_TO_FW_SPDS(fw_speeds, lk_ksettings, name)		\
+@@ -1820,6 +1810,39 @@ bnxt_get_link_mode(struct bnxt_link_info *link_info)
+ 		(fw_speeds) |= BNXT_LINK_PAM4_SPEED_MSK_200GB;		\
+ }
  
-+	if (lanes && lanes != lanes_needed) {
-+		netdev_err(dev, "unsupported number of lanes for speed\n");
-+		return -EINVAL;
++static void bnxt_get_ethtool_modes(struct bnxt_link_info *link_info,
++				   struct ethtool_link_ksettings *lk_ksettings)
++{
++	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
++
++	if (!(bp->phy_flags & BNXT_PHY_FL_NO_PAUSE)) {
++		ethtool_link_ksettings_add_link_mode(lk_ksettings, supported,
++						     Pause);
++		ethtool_link_ksettings_add_link_mode(lk_ksettings, supported,
++						     Asym_Pause);
 +	}
 +
- 	if (link_info->req_link_speed == fw_speed &&
- 	    link_info->req_signal_mode == sig_mode &&
- 	    link_info->autoneg == 0)
-@@ -2130,7 +2146,7 @@ static int bnxt_set_link_ksettings(struct net_device *dev,
- 	struct bnxt_link_info *link_info = &bp->link_info;
- 	const struct ethtool_link_settings *base = &lk_ksettings->base;
- 	bool set_pause = false;
--	u32 speed;
-+	u32 speed, lanes = 0;
- 	int rc = 0;
++	if (link_info->support_auto_speeds || link_info->support_pam4_auto_speeds)
++		ethtool_link_ksettings_add_link_mode(lk_ksettings, supported,
++						     Autoneg);
++
++	if (~link_info->autoneg & BNXT_AUTONEG_FLOW_CTRL)
++		return;
++
++	if (link_info->auto_pause_setting & BNXT_LINK_PAUSE_RX)
++		ethtool_link_ksettings_add_link_mode(lk_ksettings, advertising,
++						     Pause);
++	if (hweight8(link_info->auto_pause_setting & BNXT_LINK_PAUSE_BOTH) == 1)
++		ethtool_link_ksettings_add_link_mode(lk_ksettings, advertising,
++						     Asym_Pause);
++	if (link_info->lp_pause & BNXT_LINK_PAUSE_RX)
++		ethtool_link_ksettings_add_link_mode(lk_ksettings,
++						     lp_advertising, Pause);
++	if (hweight8(link_info->lp_pause & BNXT_LINK_PAUSE_BOTH) == 1)
++		ethtool_link_ksettings_add_link_mode(lk_ksettings,
++						     lp_advertising, Asym_Pause);
++}
++
+ static void bnxt_fw_to_ethtool_advertised_fec(struct bnxt_link_info *link_info,
+ 				struct ethtool_link_ksettings *lk_ksettings)
+ {
+@@ -1845,28 +1868,18 @@ static void bnxt_fw_to_ethtool_advertised_spds(struct bnxt_link_info *link_info,
+ 				struct ethtool_link_ksettings *lk_ksettings)
+ {
+ 	u16 fw_speeds = link_info->advertising;
+-	u8 fw_pause = 0;
  
- 	if (!BNXT_PHY_CFG_ABLE(bp))
-@@ -2171,7 +2187,8 @@ static int bnxt_set_link_ksettings(struct net_device *dev,
- 			goto set_setting_exit;
- 		}
- 		speed = base->speed;
--		rc = bnxt_force_link_speed(dev, speed);
-+		lanes = lk_ksettings->lanes;
-+		rc = bnxt_force_link_speed(dev, speed, lanes);
- 		if (rc) {
- 			if (rc == -EALREADY)
- 				rc = 0;
-@@ -4377,6 +4394,7 @@ void bnxt_ethtool_free(struct bnxt *bp)
+-	if (link_info->autoneg & BNXT_AUTONEG_FLOW_CTRL)
+-		fw_pause = link_info->auto_pause_setting;
+-
+-	BNXT_FW_TO_ETHTOOL_SPDS(fw_speeds, fw_pause, lk_ksettings, advertising);
++	BNXT_FW_TO_ETHTOOL_SPDS(fw_speeds, lk_ksettings, advertising);
+ 	fw_speeds = link_info->advertising_pam4;
+ 	BNXT_FW_TO_ETHTOOL_PAM4_SPDS(fw_speeds, lk_ksettings, advertising);
+-	bnxt_fw_to_ethtool_advertised_fec(link_info, lk_ksettings);
  }
  
- const struct ethtool_ops bnxt_ethtool_ops = {
-+	.cap_link_lanes_supported	= 1,
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_MAX_FRAMES |
- 				     ETHTOOL_COALESCE_USECS_IRQ |
+ static void bnxt_fw_to_ethtool_lp_adv(struct bnxt_link_info *link_info,
+ 				struct ethtool_link_ksettings *lk_ksettings)
+ {
+ 	u16 fw_speeds = link_info->lp_auto_link_speeds;
+-	u8 fw_pause = 0;
+-
+-	if (link_info->autoneg & BNXT_AUTONEG_FLOW_CTRL)
+-		fw_pause = link_info->lp_pause;
+ 
+-	BNXT_FW_TO_ETHTOOL_SPDS(fw_speeds, fw_pause, lk_ksettings,
+-				lp_advertising);
++	BNXT_FW_TO_ETHTOOL_SPDS(fw_speeds, lk_ksettings, lp_advertising);
+ 	fw_speeds = link_info->lp_auto_pam4_link_speeds;
+ 	BNXT_FW_TO_ETHTOOL_PAM4_SPDS(fw_speeds, lk_ksettings, lp_advertising);
+ }
+@@ -1895,25 +1908,11 @@ static void bnxt_fw_to_ethtool_support_fec(struct bnxt_link_info *link_info,
+ static void bnxt_fw_to_ethtool_support_spds(struct bnxt_link_info *link_info,
+ 				struct ethtool_link_ksettings *lk_ksettings)
+ {
+-	struct bnxt *bp = container_of(link_info, struct bnxt, link_info);
+ 	u16 fw_speeds = link_info->support_speeds;
+ 
+-	BNXT_FW_TO_ETHTOOL_SPDS(fw_speeds, 0, lk_ksettings, supported);
++	BNXT_FW_TO_ETHTOOL_SPDS(fw_speeds, lk_ksettings, supported);
+ 	fw_speeds = link_info->support_pam4_speeds;
+ 	BNXT_FW_TO_ETHTOOL_PAM4_SPDS(fw_speeds, lk_ksettings, supported);
+-
+-	if (!(bp->phy_flags & BNXT_PHY_FL_NO_PAUSE)) {
+-		ethtool_link_ksettings_add_link_mode(lk_ksettings, supported,
+-						     Pause);
+-		ethtool_link_ksettings_add_link_mode(lk_ksettings, supported,
+-						     Asym_Pause);
+-	}
+-
+-	if (link_info->support_auto_speeds ||
+-	    link_info->support_pam4_auto_speeds)
+-		ethtool_link_ksettings_add_link_mode(lk_ksettings, supported,
+-						     Autoneg);
+-	bnxt_fw_to_ethtool_support_fec(link_info, lk_ksettings);
+ }
+ 
+ u32 bnxt_fw_to_ethtool_speed(u16 fw_link_speed)
+@@ -1977,7 +1976,9 @@ static int bnxt_get_link_ksettings(struct net_device *dev,
+ 	link_info = &bp->link_info;
+ 
+ 	mutex_lock(&bp->link_lock);
++	bnxt_get_ethtool_modes(link_info, lk_ksettings);
+ 	bnxt_fw_to_ethtool_support_spds(link_info, lk_ksettings);
++	bnxt_fw_to_ethtool_support_fec(link_info, lk_ksettings);
+ 	link_mode = bnxt_get_link_mode(link_info);
+ 	if (link_mode != BNXT_LINK_MODE_UNKNOWN)
+ 		ethtool_params_from_link_mode(lk_ksettings, link_mode);
+@@ -1986,6 +1987,7 @@ static int bnxt_get_link_ksettings(struct net_device *dev,
+ 
+ 	if (link_info->autoneg) {
+ 		bnxt_fw_to_ethtool_advertised_spds(link_info, lk_ksettings);
++		bnxt_fw_to_ethtool_advertised_fec(link_info, lk_ksettings);
+ 		ethtool_link_ksettings_add_link_mode(lk_ksettings,
+ 						     advertising, Autoneg);
+ 		base->autoneg = AUTONEG_ENABLE;
 -- 
 2.30.1
 
 
---000000000000de999806082c8c8c
+--000000000000ec953806082c8ccd
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -280,14 +315,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAm5NSzECIc+Xzo9fBQMkIaqkAUQPmxb
-gi9W2vbY7RyBMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTAy
-MDIxMjgxNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIE7x2lk6EVx1Ingh5l8k+raBjoyJCIfZ
+yjeSeyDRhUZLMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTAy
+MDIxMjgxNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBMV5aeDaK8pMizNMYjY/24EnGdatS2ivbA7yfMEBW/tjzVJnlK
-Ul+9/4H+GxgIMav4N0KTIRDgf8PWh/EqBNOiAxs7CZDIi/EztXu9zbkjc6bsNkH3gqV6b3REdBhp
-amgMlOIgf8EY4xOAc82pMK0hMJZLd0M3hfrlVNk4iVQYAHNp23ECxmu9qt4qP5lBNRwHIfkvTbwT
-Oq+iXCvnXc8sgb0C9VEAZzhhA00xm9Mg6Z9U9Ucasg8nprFN1J9SzJhQusrBwpkKfLat8iiXOld4
-P5HPMeBm+MFMbPMr7b+QOMIxiCLywt6LfDtGxkoR8YNZ/gEZJ8my+F4raTwWUnyS
---000000000000de999806082c8c8c--
+ATANBgkqhkiG9w0BAQEFAASCAQCYhzcpgOnW8mO3ATJFL6YA9Qe/hn+snZO0CTtQzVh69od32vsE
+yjl5wYVWlkaQRWJ5FsJ+gjCs/3aoPJ7mnHynke/NInPneRz41driWwQWv8AXgX8lCcBqiKQ3TvO5
+pjRcp2lJNvZIWDuKQXXRwIxQUflMgTTdg+D/NRGJtAp/XPvMyZvAB1qv1S4pSnZ+VENSYbHL/fJm
+uc5einvSgnwOJTPah66RAukI2alX1zvhePiQtAI1fhGGq+9ZojSSoowqq+zK3hWLNX6BXVLOViu+
+IdYQEc8BFrQmjed9gX9sVMePTRIX5aNlw6PrOfH/6iwKRq5fcYoTPu4QytamcQMq
+--000000000000ec953806082c8ccd--
 
