@@ -1,119 +1,73 @@
-Return-Path: <netdev+bounces-43088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 504F37D15EE
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 20:42:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD3857D160D
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 21:02:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1288C282623
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:42:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9DE91C2106B
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7A01DFE3;
-	Fri, 20 Oct 2023 18:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EB4208BE;
+	Fri, 20 Oct 2023 19:01:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bri4C+w5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="at+VTJtp"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAA91D6BE;
-	Fri, 20 Oct 2023 18:42:16 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DC5D1A8;
-	Fri, 20 Oct 2023 11:42:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fzLPwxBO4eTsZi7lhB7UsZ4CqCFBDHmJkwyiD5oBlHs=; b=bri4C+w5o+dRM/auPkE+tsUaGM
-	AfW58BYEC2JPdNoNmjK0Q3uBlCQ1xjncZgXawAg8KrIJ2PSU+sEA4lCRuBSP3Uvhnmhv/OqKLWrvQ
-	fDe0QwBThDZtaUvIhuJ6o9cAQbrLQL9iyBh7AG2n8Q9gyU9A9XTGWvLVhbYMOdW6bsRs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qtuRm-002oIw-SV; Fri, 20 Oct 2023 20:42:10 +0200
-Date: Fri, 20 Oct 2023 20:42:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
-	tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com,
-	greg@kroah.com
-Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY
- drivers
-Message-ID: <4935f458-4719-4472-b937-0da8b16ebbaa@lunn.ch>
-References: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
- <20231017113014.3492773-2-fujita.tomonori@gmail.com>
- <e361ef91-607d-400b-a721-f846c21e2400@proton.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85C522324
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 19:01:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6A8EC433C7;
+	Fri, 20 Oct 2023 19:01:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697828510;
+	bh=nTx/W/92XN6pkmt3zmCga9EKjwgfnj26//5Z7IUrGhs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=at+VTJtpX9Dw0tP0AUTRHUshXeYTUNB6zfKopqnsNGM9kOE+ywuMYPmTQxPH/Pyy+
+	 aSCj+JOWKd6/6bnURdCvMMlpTvWpX4UXxZ5IgPHJ2RH3Q0INmbwFQzb3tdbB0goV7R
+	 cZvhx/YpZHvXWT9Q6QmS4MfkuClKujyOadQ8yZERB/xKdnRrFwT0eOnENGQwkvGC8i
+	 oMwRh+RXhg6f/rgcq1vQwA6VcXTOnAfaVaUDgUJJzE7sNFJVBKQ1sYX84UMn6f3JRc
+	 RrryjxiQ25SQImsqcYN+4ggpNlato4FKsaFndBcXvnKlN+Ba1ekk5kwowmgnnAdnFb
+	 X1/TqwCketkpQ==
+Date: Fri, 20 Oct 2023 12:01:49 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, johannes.berg@intel.com, mpe@ellerman.id.au, j@w1.fi
+Subject: Re: [PATCH net-next 2/6] net: make dev_alloc_name() call
+ dev_prep_valid_name()
+Message-ID: <20231020120149.3a569db7@kernel.org>
+In-Reply-To: <ZTJVeUJy9WhOgiAU@nanopsycho>
+References: <20231020011856.3244410-1-kuba@kernel.org>
+	<20231020011856.3244410-3-kuba@kernel.org>
+	<ZTJVeUJy9WhOgiAU@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e361ef91-607d-400b-a721-f846c21e2400@proton.me>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> > +//! All the PHYLIB helper functions for `phy_device` modify some members in `phy_device`. Except for
-> > +//! getter functions, [`Device`] methods take `&mut self`. This also applied to `read()`, which reads
-> > +//! a hardware register and updates the stats.
+On Fri, 20 Oct 2023 12:24:57 +0200 Jiri Pirko wrote:
+> > static int dev_get_valid_name(struct net *net, struct net_device *dev,
+> > 			      const char *name)
+> > {
+> >-	return dev_prep_valid_name(net, dev, name, dev->name);
+> >+	int ret;
+> >+
+> >+	ret = dev_prep_valid_name(net, dev, name, dev->name, EEXIST);
+> >+	return ret < 0 ? ret : 0;  
 > 
-> I would use [`Device`] instead of `phy_device`, since the Rust reader
-> might not be aware what wraps `phy_device`.
-
-We don't want to hide phy_device too much, since at the moment, the
-abstraction is very minimal. Anybody writing a driver is going to need
-a good understanding of the C code in order to find the helpers they
-need, and then add them to the abstraction. So i would say we need to
-explain the relationship between the C structure and the Rust
-structure, to aid developers.
-
-> > +    /// Returns true if the link is up.
-> > +    pub fn get_link(&self) -> bool {
+> Why can't you just return dev_prep_valid_name() ?
 > 
-> I still think this name should be changed. My response at [1] has not yet
-> been replied to. This has already been discussed before:
-> - https://lore.kernel.org/rust-for-linux/2023100237-satirical-prance-bd57@gregkh/
-> - https://lore.kernel.org/rust-for-linux/20231004.084644.50784533959398755.fujita.tomonori@gmail.com/
-> - https://lore.kernel.org/rust-for-linux/CALNs47syMxiZBUwKLk3vKxzmCbX0FS5A37FjwUzZO9Fn-iPaoA@mail.gmail.com/
-> 
-> And I want to suggest to change it to `is_link_up`.
-> 
-> Reasons why I do not like the name:
-> - `get_`/`put_` are used for ref counting on the C side, I would like to
->    avoid confusion.
-> - `get` in Rust is often used to fetch a value from e.g. a datastructure
->    such as a hashmap, so I expect the call to do some computation.
-> - getters in Rust usually are not prefixed with `get_`, but rather are
->    just the name of the field.
-> - in this case I like the name `is_link_up` much better, since code becomes
->    a lot more readable with that.
-> - I do not want this pattern as an example for other drivers.
-> 
-> [1]: https://lore.kernel.org/rust-for-linux/f5878806-5ba2-d932-858d-dda3f55ceb67@proton.me/
-> 
-> > +        const LINK_IS_UP: u32 = 1;
-> > +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-> > +        let phydev = unsafe { *self.0.get() };
-> > +        phydev.link() == LINK_IS_UP
-> > +    }
+> No caller seems to care about ret > 0
 
-During the reviews we have had a lot of misunderstanding what this
-actually does, given its name. Some thought it poked around in
-registers to get the current state of the link. Some thought it
-triggered the PHY to establish a link. When in fact its just a dumb
-getter. And we have a few other dumb getters and setters.
-
-So i would prefer something which indicates its a dumb getter. If the
-norm of Rust is just the field name, lets just use the field name. But
-we should do that for all the getters and setters. Is there a naming
-convention for things which take real actions?
-
-And maybe we need to add a comment: Get the current link state, as
-stored in the [`Device`]. Set the duplex value in [`Device`], etc.
-
-   Andrew
+AFACT dev_change_name() has some weird code that ends up return 
+the value all the way to the ioctl and user space. Note that it
+has both err and ret variables :S
 
