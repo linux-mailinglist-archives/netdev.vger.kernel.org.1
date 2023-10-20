@@ -1,153 +1,230 @@
-Return-Path: <netdev+bounces-43075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184B17D14D3
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:25:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37E777D1509
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10DA31C20AF4
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:25:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC014B2156A
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7952C20306;
-	Fri, 20 Oct 2023 17:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268E22032C;
+	Fri, 20 Oct 2023 17:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="BV2Znb0v"
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="tdWjCYqb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207C720302
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 17:25:40 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF002D6A
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:25:38 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-53e08e439c7so1657690a12.0
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:25:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4831EA84
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 17:42:05 +0000 (UTC)
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF92D68
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:42:04 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d9ac3b4f42cso1935398276.0
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:42:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1697822737; x=1698427537; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vFL5iFVqH1m9kZwhGzflcon42CaVngVznmVmEIhmRWY=;
-        b=BV2Znb0vBe22LbXjsB4Q3jfGBBM0t2vQrlyrdPMayg+G2oTwpcWOEzYE/k0Ffoz3Ve
-         wUJt8mTwgB7qMBEfmbKP3cqo5X91+k+q/MZ//wWoymNVATe0u6MpOtpzimijGSPzngIW
-         HtAUKLAfW+LBQ/w0FGVBxq4XsfKiGchu3lb5DsF9gW2fl0bK6PH0W+4LadLdXu+x7Tki
-         ETBInNHvVrwD042lRYFvBWw9p5AqAzPfIbcBWLcSumnJgl3Ap+JUQFx8dpf8gFdm2cr7
-         w0P9Lr7+wLQeDQuetED0tpWl6X9FVKQUhDw7A98jFDs2ZiqkVYcaeOCZAO9KUo6FtDxB
-         GZnA==
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1697823723; x=1698428523; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=eFO3WxhoSDwvEcTSlIa/b9H0IgcXK0MUsf+q6YIIp9A=;
+        b=tdWjCYqbbWB9spa5KlD4e0Tgs4lVoelyPkyBsEFHG6B6yWxXEV7aZ704/tnIrkZLi5
+         I4wpTvuQ9c0qlO4oBvJ1mLUt1nVd57PC8J8noU7KMqJAab97T+GtxSf6JTNlj6z++ElF
+         97DiFyNPNataKSdvQBG+mV+1JNxXR9UdMsLK7rUEtJo7DbAQ6Woj+f1hRrcOn3BBs6nz
+         xhTFWHIGRjOnL3l9XPCsSHfFKXbEX1W1T5qzoMRhC0wUSvckIEknqaGF5kiVuWzYB2Ad
+         mR/xszVKlBrGfdtc3d/myVfOL8HjmODLDNb2EKpzJTud1tc8MG8UWP31FKIi1oe+VFp1
+         LFww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697822737; x=1698427537;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vFL5iFVqH1m9kZwhGzflcon42CaVngVznmVmEIhmRWY=;
-        b=Qqh969tNpSA5Y4n5Z5L4LxMmaH9j08hR2VJF3Xin5rWviKKfFQllduzB4fblCLXnGs
-         NMHnFkJA9LV3Ei4AsOkB+/hjavf/zgEY03s5wLFe5A28fNRbVTyzT5N1uwEibWgJuhhe
-         xu3kyS1WSXGqXvYAS/nPzIBVtRMuhxYKgK0iElX7WkCCYjqyB6h4peDs0/DBY8/YdYXf
-         8pi812pEbudE46UgYXhRwbCIwedRblF6pypmb/fvLdovZ0UPLa0yaQJL/xJopvDnUbDP
-         CxXI5YyDxmS2OrrSilVdA4vOSXJIqhr85YIg8fMp4sfm4opK32IUk/eaPaTnvCkgMDHC
-         Dg7g==
-X-Gm-Message-State: AOJu0Yy5mtyzVjpPmmcyHcXJ2WNQ5XXWv3N4jNfnam68V/EHSEylh9BD
-	ZygGUsc5oELjA2MSrRSbh10nyg9ZYOm2PDmHwB2g6Q==
-X-Google-Smtp-Source: AGHT+IEAJxJYH65UAOp0CGVbMLP+IaF4gPQ3JhAlGuol2lCyWHsYGBw+wUyT3+khfALaMw3q5iEsltZ+ywYBL7uUP44=
-X-Received: by 2002:a05:6402:50d2:b0:53d:f09a:4eef with SMTP id
- h18-20020a05640250d200b0053df09a4eefmr1994810edb.41.1697822736950; Fri, 20
- Oct 2023 10:25:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697823723; x=1698428523;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eFO3WxhoSDwvEcTSlIa/b9H0IgcXK0MUsf+q6YIIp9A=;
+        b=wN4k1lrwg4lHzkfBTz4o5HxiphjJaSqia2LV6eWuj+PHUpon5ApdOhpw1ZDFaGSU39
+         nQZPFsa5Y/l/b1a5xqhuJG0sFY/4JHSMJIm1WC2a5dDoIe9xR6f7q8irDVb/HyW6D+p9
+         pv+h7VfFTPXEdDQYBQcw46GzXAAFUjC1oHGaWyLSWT5CzrkdiZhzViZ9O7dFGgdoDJC9
+         ouoX4sR8u2SZ4Pk9589dOzZVEkRAXIZA7vDjH5qUqTs/56wgMpF357uH9+5gl8bLv/Q0
+         VJWdWhT7k1d9vdSuS7nWji2cITRry8spz5XnK04H8HdanI8Wqh/VsRAZlmlZ1ncKT/tr
+         Rnkg==
+X-Gm-Message-State: AOJu0Yz9aDh2PX7R0WYdjQHqu6k3YY3Q/YKQdEF+RRCIS4WsDESM+ulN
+	Kf3eEPzv1o6h85nf2ovfFtUuig==
+X-Google-Smtp-Source: AGHT+IExBI+MgyKdvO5f26M3zft7xsCoQac77C6ROsUpDbAaFnOgwhT3X1+PuJ5IpKlGVJGNBJJDCw==
+X-Received: by 2002:a25:b4e:0:b0:d9a:5f53:1732 with SMTP id 75-20020a250b4e000000b00d9a5f531732mr2099871ybl.18.1697823723378;
+        Fri, 20 Oct 2023 10:42:03 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id e136-20020a25698e000000b00d9ab46073f1sm702482ybc.52.2023.10.20.10.42.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Oct 2023 10:42:02 -0700 (PDT)
+References: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
+ <20231017113014.3492773-2-fujita.tomonori@gmail.com>
+User-agent: mu4e 1.10.7; emacs 28.2.50
+From: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com,
+ wedsonaf@gmail.com, benno.lossin@proton.me, greg@kroah.com
+Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY
+ drivers
+Date: Fri, 20 Oct 2023 19:26:50 +0200
+In-reply-to: <20231017113014.3492773-2-fujita.tomonori@gmail.com>
+Message-ID: <87sf65gpi0.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABWYdi1kiu1g1mAq6DpQWczg78tMzaVFnytNMemZATFHqYSqYw@mail.gmail.com>
- <20231020104728.2060-1-hdanton@sina.com>
-In-Reply-To: <20231020104728.2060-1-hdanton@sina.com>
-From: Ivan Babrou <ivan@cloudflare.com>
-Date: Fri, 20 Oct 2023 10:25:25 -0700
-Message-ID: <CABWYdi0N7uvDex5CdKD60hNQ6UFuqoB=Ss52yQu6UoMJm0MFPw@mail.gmail.com>
-Subject: Re: wait_for_unix_gc can cause CPU overload for well behaved programs
-To: Hillf Danton <hdanton@sina.com>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Fri, Oct 20, 2023 at 3:47=E2=80=AFAM Hillf Danton <hdanton@sina.com> wro=
-te:
->
-> On Thu, 19 Oct 2023 15:35:01 -0700 Ivan Babrou <ivan@cloudflare.com>
-> > Hello,
-> >
-> > We have observed this issue twice (2019 and 2023): a well behaved
-> > service that doesn't pass any file descriptors around starts to spend
-> > a ton of CPU time in wait_for_unix_gc.
->
-> See if the diff below works for you, which prevents concurrent spinning
-> of unix_gc_lock, a variant of spin_trylock().
->
-> Hillf
-> --- x/net/unix/garbage.c
-> +++ y/net/unix/garbage.c
-> @@ -211,15 +211,10 @@ void unix_gc(void)
->         struct list_head cursor;
->         LIST_HEAD(not_cycle_list);
->
-> +       if (test_and_set_bit(0, &gc_in_progress))
-> +               return;
->         spin_lock(&unix_gc_lock);
->
-> -       /* Avoid a recursive GC. */
-> -       if (gc_in_progress)
-> -               goto out;
-> -
-> -       /* Paired with READ_ONCE() in wait_for_unix_gc(). */
-> -       WRITE_ONCE(gc_in_progress, true);
-> -
->         /* First, select candidates for garbage collection.  Only
->          * in-flight sockets are considered, and from those only ones
->          * which don't have any external reference.
-> --
 
-This could solve wait_for_unix_gc spinning, but it wouldn't affect
-unix_gc itself, from what I understand. There would always be one
-socket writer or destroyer punished by running the gc still. My linked
-repro code exercises that path rather than the waiting spinlock
-(there's a single writer thread), so it's something you can see for
-yourself.
+Hi,
 
-Your patch doesn't build, so I wasn't able to try it out:
+FUJITA Tomonori <fujita.tomonori@gmail.com> writes:
 
-#26 154.3 /build/linux-source/net/unix/garbage.c: In function 'unix_gc':
-#26 154.3 /build/linux-source/net/unix/garbage.c:214:33: error:
-passing argument 2 of 'test_and_set_bit' from incompatible pointer
-type [-Werror=3Dincompatible-pointer-types]
-#26 154.3   214 |         if (test_and_set_bit(0, &gc_in_progress))
-#26 154.3       |                                 ^~~~~~~~~~~~~~~
-#26 154.3       |                                 |
-#26 154.3       |                                 bool * {aka _Bool *}
-#26 154.3 In file included from
-/build/linux-source/include/asm-generic/bitops/atomic.h:68,
-#26 154.3                  from
-/build/linux-source/arch/arm64/include/asm/bitops.h:25,
-#26 154.3                  from /build/linux-source/include/linux/bitops.h:=
-68,
-#26 154.3                  from /build/linux-source/include/linux/kernel.h:=
-22,
-#26 154.3                  from /build/linux-source/net/unix/garbage.c:66:
-#26 154.3 /build/linux-source/include/asm-generic/bitops/instrumented-atomi=
-c.h:68:79:
-note: expected 'volatile long unsigned int *' but argument is of type
-'bool *' {aka '_Bool *'}
-#26 154.3    68 | static __always_inline bool test_and_set_bit(long
-nr, volatile unsigned long *addr)
-#26 154.3       |
- ~~~~~~~~~~~~~~~~~~~~~~~~^~~~
-#26 154.3 /build/linux-source/net/unix/garbage.c:328:2: error: label
-'out' defined but not used [-Werror=3Dunused-label]
-#26 154.3   328 |  out:
-#26 154.3       |  ^~~
-#26 154.3 cc1: all warnings being treated as errors
+<cut>
+
+> +
+> +    /// Returns true if the link is up.
+> +    pub fn get_link(&self) -> bool {
+> +        const LINK_IS_UP: u32 = 1;
+> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+> +        let phydev = unsafe { *self.0.get() };
+> +        phydev.link() == LINK_IS_UP
+> +    }
+
+I would prefer `is_link_up` or `link_is_up`.
+
+> +
+> +    /// Returns true if auto-negotiation is enabled.
+> +    pub fn is_autoneg_enabled(&self) -> bool {
+> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+> +        let phydev = unsafe { *self.0.get() };
+> +        phydev.autoneg() == bindings::AUTONEG_ENABLE
+> +    }
+> +
+> +    /// Returns true if auto-negotiation is completed.
+> +    pub fn is_autoneg_completed(&self) -> bool {
+> +        const AUTONEG_COMPLETED: u32 = 1;
+> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+> +        let phydev = unsafe { *self.0.get() };
+> +        phydev.autoneg_complete() == AUTONEG_COMPLETED
+> +    }
+> +
+> +    /// Sets the speed of the PHY.
+> +    pub fn set_speed(&mut self, speed: u32) {
+> +        let phydev = self.0.get();
+> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+> +        unsafe { (*phydev).speed = speed as i32 };
+> +    }
+
+If this function is called with `u32::MAX` `(*phydev).speed` will become -1. Is that OK?
+
+<cut>
+
+> +
+> +/// An instance of a PHY driver.
+> +///
+> +/// Wraps the kernel's `struct phy_driver`.
+> +///
+> +/// # Invariants
+> +///
+> +/// `self.0` is always in a valid state.
+> +#[repr(transparent)]
+> +pub struct DriverType(Opaque<bindings::phy_driver>);
+
+I don't like the name `DriverType`. How about `DriverDesciptor` or
+something like that?
+
+<cut>
+
+> +
+> +/// Corresponds to functions in `struct phy_driver`.
+> +///
+> +/// This is used to register a PHY driver.
+> +#[vtable]
+> +pub trait Driver {
+> +    /// Defines certain other features this PHY supports.
+> +    /// It is a combination of the flags in the [`flags`] module.
+> +    const FLAGS: u32 = 0;
+> +
+> +    /// The friendly name of this PHY type.
+> +    const NAME: &'static CStr;
+> +
+> +    /// This driver only works for PHYs with IDs which match this field.
+> +    /// The default id and mask are zero.
+> +    const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_custom_mask(0, 0);
+> +
+> +    /// Issues a PHY software reset.
+> +    fn soft_reset(_dev: &mut Device) -> Result {
+> +        Err(code::ENOTSUPP)
+> +    }
+> +
+> +    /// Probes the hardware to determine what abilities it has.
+> +    fn get_features(_dev: &mut Device) -> Result {
+> +        Err(code::ENOTSUPP)
+> +    }
+> +
+> +    /// Returns true if this is a suitable driver for the given phydev.
+> +    /// If not implemented, matching is based on [`Driver::PHY_DEVICE_ID`].
+> +    fn match_phy_device(_dev: &Device) -> bool {
+> +        false
+> +    }
+> +
+> +    /// Configures the advertisement and resets auto-negotiation
+> +    /// if auto-negotiation is enabled.
+> +    fn config_aneg(_dev: &mut Device) -> Result {
+> +        Err(code::ENOTSUPP)
+> +    }
+> +
+> +    /// Determines the negotiated speed and duplex.
+> +    fn read_status(_dev: &mut Device) -> Result<u16> {
+> +        Err(code::ENOTSUPP)
+> +    }
+> +
+> +    /// Suspends the hardware, saving state if needed.
+> +    fn suspend(_dev: &mut Device) -> Result {
+> +        Err(code::ENOTSUPP)
+> +    }
+> +
+> +    /// Resumes the hardware, restoring state if needed.
+> +    fn resume(_dev: &mut Device) -> Result {
+> +        Err(code::ENOTSUPP)
+> +    }
+> +
+> +    /// Overrides the default MMD read function for reading a MMD register.
+> +    fn read_mmd(_dev: &mut Device, _devnum: u8, _regnum: u16) -> Result<u16> {
+> +        Err(code::ENOTSUPP)
+> +    }
+> +
+> +    /// Overrides the default MMD write function for writing a MMD register.
+> +    fn write_mmd(_dev: &mut Device, _devnum: u8, _regnum: u16, _val: u16) -> Result {
+> +        Err(code::ENOTSUPP)
+> +    }
+> +
+> +    /// Callback for notification of link change.
+> +    fn link_change_notify(_dev: &mut Device) {}
+
+It is probably an error if these functions are called, and so BUG() would be
+appropriate? See the discussion in [1].
+
+[1] https://lore.kernel.org/rust-for-linux/20231019171540.259173-1-benno.lossin@proton.me/
+
+<cut>
+
+> +
+> +    // macro use only
+> +    #[doc(hidden)]
+> +    pub const fn mdio_device_id(&self) -> bindings::mdio_device_id {
+> +        bindings::mdio_device_id {
+> +            phy_id: self.id,
+> +            phy_id_mask: self.mask.as_int(),
+> +        }
+> +    }
+
+Would it make sense to move this function to the macro patch?
+
+Best regards,
+Andreas
 
