@@ -1,111 +1,94 @@
-Return-Path: <netdev+bounces-43002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BAA17D0FAD
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:31:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8243C7D0FB9
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:35:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56529B20C19
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:31:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 107A6B2142A
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:35:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD9219471;
-	Fri, 20 Oct 2023 12:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 575A212B91;
+	Fri, 20 Oct 2023 12:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TweTCJmW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aGtCdQGA"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47681A711
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 12:30:59 +0000 (UTC)
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46542D49;
-	Fri, 20 Oct 2023 05:30:58 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-5a8ada42c2aso7762647b3.3;
-        Fri, 20 Oct 2023 05:30:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCAFB1A700;
+	Fri, 20 Oct 2023 12:34:57 +0000 (UTC)
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E8B2D49;
+	Fri, 20 Oct 2023 05:34:56 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-59e88a28b98so6711257b3.1;
+        Fri, 20 Oct 2023 05:34:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697805057; x=1698409857; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=po603pLa6+WCSRfB+kSK68fxdf9syke8GemdI09pYiI=;
-        b=TweTCJmWt58QJ7k5GsMn9IadDX1CerCnT3A+hwl+vEzMtCDu3kzuq7TH4t9QlnMRc4
-         six2o5MvuoaWvz4uX2LnlfZ+DuSIzVH2hkLahj1IoGTSkGqMgTZhBghdG4kvI75gba1e
-         YfWC3hDFv+Nu7BeNO+mgihl0RNmGPH67/UIPE9WCXWqt0xLHAhYH+q96vPe+v8D5gm9L
-         XIU0i1PSP6KsYdj7JwLJvUWgkZ/VhI4Kc0IGLNz1JB673YZx6LF/XrMff9hKMVHbAhus
-         NJZL5Docy8NojZezpvn+jlk1CTgW/fQ16A3NjeQtES+BugVj34Arl+0L4Zuh281MVPWq
-         DxMw==
+        d=gmail.com; s=20230601; t=1697805296; x=1698410096; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e+uTffmpyQEAmlrNXImaq/tNp+a5U7h5eJl7wq14bSA=;
+        b=aGtCdQGA5CIOxnjz7aH9/Dpo127uwokymSuw5HuoteJMvelO7FNJQeyPxDURrNz9ID
+         7rBYRdGWIX+MnPIgb4LhvjmCbxci1B29fDgXyJiYw65Nw/P1HgEm39dGNoCnktsyZaFs
+         FQLA8RCjvkMRkvl6QRsOInAMuok1i5Fly3Dnjq3nDFlOkBoFNX/ynfzNX+hdXvWGUvq7
+         /ASeHdbetD2HlyCYelHKxd43PETD7h7QHbbNc4KJf5S0sl0uCvPE6w6w0yog9ZzL/cxV
+         5+X/LVOYBM/qO6APyz84wQrE3zCA/9s3GkOhQaX0rRWQXhOy5aBFsrWyDR73yAFWBke1
+         w6yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697805057; x=1698409857;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=po603pLa6+WCSRfB+kSK68fxdf9syke8GemdI09pYiI=;
-        b=MkwtQsBAjSq+wUOzCO50p03KezTzlKsGmhht1mWcHEFj9Ur0s0A72d9pkovdQMqrzw
-         5srzuxdy2R3eF++0hf2cRppvVByEMjmB9sjkXiaakvyb0x2jr0HNZRnou2Sdv27kk1OP
-         ausBWtHynB5oZ6GNLyfx648exc6ZXfWXyCm6EpbtyKqk45v5/sHZMvLcFVt73chdQQ8Y
-         uBwwuG7j19f5Tx/f6PuFxYt19VshZyZPh1BO9jahu80aIZwdw8uulq2b5WTtSxxN8SG9
-         4PlaxtSaWLRQ6FT+VVd0TydV8Sjdg59to5mIYnuDwfnoO82HkvZIGD/kYmHcAv8FJzSb
-         u4zA==
-X-Gm-Message-State: AOJu0Ywrf7wwYFWSBbxws/i+/geabpZTMI60k8PW4Fwiy/gqLTXCWx+x
-	RC4Rqj9TAYK41YW2SimMcnU=
-X-Google-Smtp-Source: AGHT+IEOIarenbX043L5oIbX6lbvtuAP32bTGnwRaigZvMyalrTwJO+TskT/MUvUAG4FNXSH60Yzgw==
-X-Received: by 2002:a81:4f57:0:b0:5a7:b8d4:60e1 with SMTP id d84-20020a814f57000000b005a7b8d460e1mr1817405ywb.9.1697805057406;
-        Fri, 20 Oct 2023 05:30:57 -0700 (PDT)
-Received: from localhost ([2607:fb90:3e1a:8bc6:bf58:5f88:bb90:604])
-        by smtp.gmail.com with ESMTPSA id v77-20020a814850000000b005a7daa09f43sm641359ywa.125.2023.10.20.05.30.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 05:30:56 -0700 (PDT)
-Date: Fri, 20 Oct 2023 05:30:55 -0700
-From: Yury Norov <yury.norov@gmail.com>
-To: Alexander Potapenko <glider@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, dm-devel@redhat.com,
-	ntfs3@lists.linux.dev, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 11/13] ip_tunnel: convert __be16 tunnel flags to
- bitmaps
-Message-ID: <ZTJy/7PMX/kGw2EL@yury-ThinkPad>
-References: <20231016165247.14212-1-aleksander.lobakin@intel.com>
- <20231016165247.14212-12-aleksander.lobakin@intel.com>
- <20231018172747.305c65bd@kernel.org>
- <CAG_fn=XP819PnkoR0G6_anRNq0t_r=drCFx4PT2VgRnrBaUjdA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1697805296; x=1698410096;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e+uTffmpyQEAmlrNXImaq/tNp+a5U7h5eJl7wq14bSA=;
+        b=VUNN6zQX48sleBW7alittX2Kp7oTyPVdoszvvbH/RK59mK7siwPTBKZ4QmNK8BztI3
+         x+kjz3GQqqdI6NGnI907zxRdY57JllOeIJ19B32vJsZi98NI2r6iuvo+fLjcq1loq91K
+         J8VGHCAOjom72vGHYCAxcZq5lFoqdorjzyq764gCyOdbv1G8JBx/CG3KBPDwup9jQWzW
+         sO0nKu8qOmKfdWN1c3R7pOOYoudkap0ykTO90VS5hIzRNdd0sL+6SbP3i4kJ6y5Y/2yN
+         pA0L+BfjMVwnJApNX5GF1yxPY+wFYXDrsMm8k2uGjVx4m0we3Bz2lCdC6tSpot+DVMfJ
+         pmWw==
+X-Gm-Message-State: AOJu0YzFamMYfit/I3Nz3QYgSQ9rTTCONy2zIcYpUlMj++0jem7YC++Y
+	xmyAB9a1jCS7bzSMrQxe0QQtR2bbhvcHIS73/+C7OwIiuYSTkA==
+X-Google-Smtp-Source: AGHT+IENLbktdvw237qo8nPz4Cx3UNK57HbjST9dq24dpZxiNVudl9Is1VvuH3KxGosVcIVkGNggDePmAVtPsJEO12E=
+X-Received: by 2002:a0d:d444:0:b0:5a7:bf2b:4729 with SMTP id
+ w65-20020a0dd444000000b005a7bf2b4729mr4078992ywd.23.1697805295842; Fri, 20
+ Oct 2023 05:34:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG_fn=XP819PnkoR0G6_anRNq0t_r=drCFx4PT2VgRnrBaUjdA@mail.gmail.com>
+References: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
+ <20231017113014.3492773-4-fujita.tomonori@gmail.com> <871qdpikq9.fsf@metaspace.dk>
+In-Reply-To: <871qdpikq9.fsf@metaspace.dk>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 20 Oct 2023 14:34:44 +0200
+Message-ID: <CANiq72kWu-zNbhYxvcM7TVFLOEoRczK434J2t4rLhU31AMWAwQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 3/5] WIP rust: add second `bindgen` pass for
+ enum exhaustiveness checking
+To: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, 
+	boqun.feng@gmail.com, wedsonaf@gmail.com, benno.lossin@proton.me, 
+	greg@kroah.com, Miguel Ojeda <ojeda@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 20, 2023 at 09:41:10AM +0200, Alexander Potapenko wrote:
-> On Thu, Oct 19, 2023 at 2:27 AM Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > On Mon, 16 Oct 2023 18:52:45 +0200 Alexander Lobakin wrote:
-> > >  40 files changed, 715 insertions(+), 415 deletions(-)
-> >
-> > This already has at least two conflicts with networking if I'm looking
-> > right. Please let the pre-req's go in via Yury's tree and then send
-> > this for net-next in the next release cycle.
-> 
-> Yury, Andy,
-> 
-> The MTE part of my series will need to be reworked, so it might take a while.
-> Shall I maybe send v8 of
-> https://lore.kernel.org/lkml/20231011172836.2579017-1-glider@google.com/
-> (plus the test) separately to unblock Alexander?
- 
-You better ask Alexander :). No objections from me.
+On Fri, Oct 20, 2023 at 1:42=E2=80=AFPM Andreas Hindborg (Samsung)
+<nmi@metaspace.dk> wrote:
+>
+> This patch does not build for me. Do I need to do something to make it
+> work?
+
+Please change:
+
+-        --crate-name enum_check $(obj)/bindings/bindings_enum_check.rs
++        --crate-name enum_check
+$(srctree)/$(src)/bindings/bindings_enum_check.rs
+
+Cheers,
+Miguel
 
