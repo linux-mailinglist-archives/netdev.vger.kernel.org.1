@@ -1,267 +1,116 @@
-Return-Path: <netdev+bounces-42979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06A607D0E6C
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:32:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A5E7D0EFA
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:42:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 341A51C20E61
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 11:32:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F2581C20AF4
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 11:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A9A18E29;
-	Fri, 20 Oct 2023 11:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A1519471;
+	Fri, 20 Oct 2023 11:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=metaspace-dk.20230601.gappssmtp.com header.i=@metaspace-dk.20230601.gappssmtp.com header.b="P64bq5/3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E583CA75;
-	Fri, 20 Oct 2023 11:32:26 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97DD21A8;
-	Fri, 20 Oct 2023 04:32:21 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 39KBVHwcC4163596, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.93/5.92) with ESMTPS id 39KBVHwcC4163596
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 20 Oct 2023 19:31:17 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Fri, 20 Oct 2023 19:31:17 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Fri, 20 Oct 2023 19:31:17 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
- RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
- 15.01.2375.007; Fri, 20 Oct 2023 19:31:16 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Douglas Anderson <dianders@chromium.org>,
-        Jakub Kicinski
-	<kuba@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>
-CC: Grant Grundler <grundler@chromium.org>, Edward Hill <ecgh@chromium.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        Simon Horman
-	<horms@kernel.org>, Laura Nao <laura.nao@collabora.com>,
-        Alan Stern
-	<stern@rowland.harvard.edu>,
-        =?iso-8859-1?Q?Bj=F8rn_Mork?= <bjorn@mork.no>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH v4 5/5] r8152: Block future register access if register access fails
-Thread-Topic: [PATCH v4 5/5] r8152: Block future register access if register
- access fails
-Thread-Index: AQHaAtJRIbIHTuR1b0yzMA85nEY4kLBSW1lw
-Date: Fri, 20 Oct 2023 11:31:16 +0000
-Message-ID: <eaf05cf1486c418790a1b54cbcda3a98@realtek.com>
-References: <20231019212130.3146151-1-dianders@chromium.org>
- <20231019142019.v4.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
-In-Reply-To: <20231019142019.v4.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6282D199AF
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:42:47 +0000 (UTC)
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 644FAB8
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 04:42:11 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40850b244beso4811885e9.2
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 04:42:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20230601.gappssmtp.com; s=20230601; t=1697802128; x=1698406928; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=B8agxK5u1gb+Af+evzfFp7uhKxonxV/B9zlrWUsY0ZQ=;
+        b=P64bq5/3dBJ3J+2RTnWDp2QEGQvWGKrLGaBR+FSGyZ1FomQt2ciW8X1m+Yp9rye+xF
+         /6GAbUroTqIunAtYCQC1SmJW+lI9rAlxPX3U9ZMYjlbibp9qgbVWIaHZcsvFlWGG/L7c
+         f2tkDSttuaDBu6iwBlj4j3tVCRQNAjXlkIQ2DO1+dfMm8QXIxQjsqyUnnXUzxpKgcNGO
+         xNXA01RSqh9ApphtyNByrnum9tV5ULjrDOgogsieVgInAqCbccH2lSvQmjzDg9JTBb4B
+         34MBldHxvqgSrlCYuimk68pUq8A6iZ132LBTlrQ4kT7zoGQOljeXhfsbE8znp5BdfDcZ
+         wGOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697802128; x=1698406928;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B8agxK5u1gb+Af+evzfFp7uhKxonxV/B9zlrWUsY0ZQ=;
+        b=o6Y7fNbADShGF3otmJpckzZe4eJxEwKuKnZ9pYzRSGGQ0a+l0UBgw2uGvza9Ukmqd+
+         LGREsW+jUXYiLSfvWTdRai/Ab1yZrgwB8xb0LLOK2jW/SLGQWPM2/BuviZPmNPpRlfcv
+         /c/zjJJl1SQoAGe4eX12rkU9vpxKaU2sC47sPgk1r0fVq3afawqe5CD10Z8mKhYgeRBd
+         2JDQyDGeM1hjPf4usK9iW8Jw3tY4Wc6RRy7APpNytruAY9usy1Uvuxtc21P3Ut1aAUB4
+         RstOrWLtFa2gTknquzTXIjBSQdPUPZLHGfK/XE6aPPnhMTbXFjT0HGgdyO79L3ShTTrU
+         I4cg==
+X-Gm-Message-State: AOJu0YxFa8JVlkP9nP3QwXfH9NwSC43iJx4Od4w6x+kxy6SjMESum40w
+	5qrnsp+QsDpTHVA9DDetw6fllQ==
+X-Google-Smtp-Source: AGHT+IE5s73v0RZapWCkmx3g4kuKn7rTxmtt16EJW65x15y6+Xp4nQcwQz9jDN8Ti/5KwvZRw8Kv3g==
+X-Received: by 2002:a05:600c:4f88:b0:406:4a32:52fc with SMTP id n8-20020a05600c4f8800b004064a3252fcmr1249068wmq.21.1697802128068;
+        Fri, 20 Oct 2023 04:42:08 -0700 (PDT)
+Received: from localhost ([165.225.194.193])
+        by smtp.gmail.com with ESMTPSA id a6-20020adfeec6000000b0032da8fb0d05sm1503862wrp.110.2023.10.20.04.42.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Oct 2023 04:42:07 -0700 (PDT)
+References: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
+ <20231017113014.3492773-4-fujita.tomonori@gmail.com>
+User-agent: mu4e 1.10.7; emacs 28.2.50
+From: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com,
+ wedsonaf@gmail.com, benno.lossin@proton.me, greg@kroah.com, Miguel Ojeda
+ <ojeda@kernel.org>
+Subject: Re: [PATCH net-next v5 3/5] WIP rust: add second `bindgen` pass for
+ enum exhaustiveness checking
+Date: Fri, 20 Oct 2023 13:37:14 +0200
+In-reply-to: <20231017113014.3492773-4-fujita.tomonori@gmail.com>
+Message-ID: <871qdpikq9.fsf@metaspace.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-
-Douglas Anderson <dianders@chromium.org>
-> Sent: Friday, October 20, 2023 5:20 AM
-[...]
->  static int generic_ocp_read(struct r8152 *tp, u16 index, u16 size,
-> @@ -8265,6 +8353,17 @@ static int rtl8152_pre_reset(struct usb_interface =
-*intf)
->         if (!tp)
->                 return 0;
->=20
-> +       /* We can only use the optimized reset if we made it to the end o=
-f
-> +        * probe without any register access fails, which sets
-> +        * `PROBED_WITH_NO_ERRORS` to true. If we didn't have that then r=
-eturn
-> +        * an error here which tells the USB framework to fully unbind/re=
-bind
-> +        * our driver.
-> +        */
-> +       if (!test_bit(PROBED_WITH_NO_ERRORS, &tp->flags)) {
-> +               mutex_unlock(&tp->control);
-
-I think you forget to remove mutex_unlock here.
-
-> +               return -EIO;
-> +       }
-> +
->         netdev =3D tp->netdev;
->         if (!netif_running(netdev))
->                 return 0;
-> @@ -8277,7 +8376,9 @@ static int rtl8152_pre_reset(struct usb_interface *=
-intf)
->         napi_disable(&tp->napi);
->         if (netif_carrier_ok(netdev)) {
->                 mutex_lock(&tp->control);
-> +               set_bit(IN_PRE_RESET, &tp->flags);
->                 tp->rtl_ops.disable(tp);
-> +               clear_bit(IN_PRE_RESET, &tp->flags);
->                 mutex_unlock(&tp->control);
->         }
->=20
-> @@ -8293,6 +8394,8 @@ static int rtl8152_post_reset(struct usb_interface =
-*intf)
->         if (!tp)
->                 return 0;
->=20
-> +       rtl_set_accessible(tp);
-> +
-
-Excuse me. I have a new idea. You could check if it is possible.
-If you remove test_bit(PROBED_WITH_NO_ERRORS, &tp->flags) in pre_reset(),
-the driver wouldn't be unbound and rebound. Instead, you test PROBED_WITH_N=
-O_ERRORS
-here to re-initialize the device. Then, you could limit the times of USB re=
-set, and
-the infinite loop wouldn't occur. The code would be like the following,
-
-	if (!test_bit(PROBED_WITH_NO_ERRORS, &tp->flags)) {
-		/* re-init */
-		mutex_lock(&tp->control);
-		tp->rtl_ops.init(tp);
-		mutex_unlock(&tp->control);
-		rtl_hw_phy_work_func_t(&tp->hw_phy_work.work);
-
-		/* re-open(). Maybe move after checking netif_running(netdev) */
-		mutex_lock(&tp->control);
-		tp->rtl_ops.up(tp);
-		mutex_unlock(&tp->control);
-
-		/* check if there is any control error */
-		if (test_bit(RTL8152_INACCESSIBLE, &tp->flags) {
-			if (tp->reg_access_reset_count < REGISTER_ACCESS_MAX_RESETS) {
-				/* queue reset again ? */
-			} else {
-				...
-			}
-			/* return 0 ? */
-		} else {
-			set_bit(PROBED_WITH_NO_ERRORS, &tp->flags)
-		}
-	}
+Content-Type: text/plain
 
 
-Best Regards,
-Hayes
+FUJITA Tomonori <fujita.tomonori@gmail.com> writes:
 
->         /* reset the MAC address in case of policy change */
->         if (determine_ethernet_addr(tp, &sa) >=3D 0) {
->                 rtnl_lock();
-> @@ -9494,17 +9597,35 @@ static u8 __rtl_get_hw_ver(struct usb_device *ude=
-v)
->         __le32 *tmp;
->         u8 version;
->         int ret;
-> +       int i;
->=20
->         tmp =3D kmalloc(sizeof(*tmp), GFP_KERNEL);
->         if (!tmp)
->                 return 0;
->=20
-> -       ret =3D usb_control_msg(udev, usb_rcvctrlpipe(udev, 0),
-> -                             RTL8152_REQ_GET_REGS, RTL8152_REQT_READ,
-> -                             PLA_TCR0, MCU_TYPE_PLA, tmp, sizeof(*tmp),
-> -                             USB_CTRL_GET_TIMEOUT);
-> -       if (ret > 0)
-> -               ocp_data =3D (__le32_to_cpu(*tmp) >> 16) & VERSION_MASK;
-> +       /* Retry up to 3 times in case there is a transitory error. We do=
- this
-> +        * since retrying a read of the version is always safe and this
-> +        * function doesn't take advantage of r8152_control_msg() which w=
-ould
-> +        * queue up a reset upon error.
-> +        *
-> +        * NOTE: The fact that this read never queues up a reset prevents=
- us
-> +        * from getting into a unbind/bind loop if usb_control_msg() fail=
-s
-> +        * 100% of the time. This is the first control message we do at
-> +        * probe time and 3 failures in a row here will cause probe to fa=
-il.
-> +        */
-> +       for (i =3D 0; i < 3; i++) {
-> +               ret =3D usb_control_msg(udev, usb_rcvctrlpipe(udev, 0),
-> +                                     RTL8152_REQ_GET_REGS, RTL8152_REQT_=
-READ,
-> +                                     PLA_TCR0, MCU_TYPE_PLA, tmp, sizeof=
-(*tmp),
-> +                                     USB_CTRL_GET_TIMEOUT);
-> +               if (ret > 0) {
-> +                       ocp_data =3D (__le32_to_cpu(*tmp) >> 16) & VERSIO=
-N_MASK;
-> +                       break;
-> +               }
-> +       }
-> +
-> +       if (i !=3D 0 && ret > 0)
-> +               dev_warn(&udev->dev, "Needed %d retries to read version\n=
-", i);
->=20
->         kfree(tmp);
->=20
-> @@ -9784,7 +9905,29 @@ static int rtl8152_probe(struct usb_interface *int=
-f,
->         else
->                 device_set_wakeup_enable(&udev->dev, false);
->=20
-> -       netif_info(tp, probe, netdev, "%s\n", DRIVER_VERSION);
-> +       mutex_lock(&tp->control);
-> +       if (test_bit(RTL8152_INACCESSIBLE, &tp->flags)) {
-> +               /* If the device is marked inaccessible before probe even
-> +                * finished then one of two things happened. Either we go=
-t a
-> +                * USB error during probe or the user already unplugged t=
-he
-> +                * device.
-> +                *
-> +                * If we got a USB error during probe then we skipped doi=
-ng a
-> +                * reset in r8152_control_msg() and deferred it to here. =
-This
-> +                * is because the queued reset will give up after 1 secon=
-d
-> +                * (see usb_lock_device_for_reset()) and we want to make =
-sure
-> +                * that we queue things up right before probe finishes.
-> +                *
-> +                * If the user already unplugged the device then the USB
-> +                * framework will call unbind right away for us. The extr=
-a
-> +                * reset we queue up here will be harmless.
-> +                */
-> +               usb_queue_reset_device(tp->intf);
-> +       } else {
-> +               set_bit(PROBED_WITH_NO_ERRORS, &tp->flags);
-> +               netif_info(tp, probe, netdev, "%s\n", DRIVER_VERSION);
-> +       }
-> +       mutex_unlock(&tp->control);
->=20
->         return 0;
->=20
-> --
-> 2.42.0.758.gaed0368e0e-goog
+> From: Miguel Ojeda <ojeda@kernel.org>
+>
+>     error[E0005]: refutable pattern in function argument
+>          --> rust/bindings/bindings_enum_check.rs:29:6
+>           |
+>     29    |       (phy_state::PHY_DOWN
+>           |  ______^
+>     30    | |     | phy_state::PHY_READY
+>     31    | |     | phy_state::PHY_HALTED
+>     32    | |     | phy_state::PHY_ERROR
+>     ...     |
+>     35    | |     | phy_state::PHY_NOLINK
+>     36    | |     | phy_state::PHY_CABLETEST): phy_state,
+>           | |______________________________^ pattern `phy_state::PHY_NEW` not covered
+>           |
+>     note: `phy_state` defined here
+>          --> rust/bindings/bindings_generated_enum_check.rs:60739:10
+>           |
+>     60739 | pub enum phy_state {
+>           |          ^^^^^^^^^
+>     ...
+>     60745 |     PHY_NEW = 5,
+>           |     ------- not covered
+>           = note: the matched value is of type `phy_state`
+>
+> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
 
+This patch does not build for me. Do I need to do something to make it
+work?
+
+BR Andreas
 
