@@ -1,146 +1,176 @@
-Return-Path: <netdev+bounces-43064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FEB87D13EF
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:25:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F13E7D13FC
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:29:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E332EB21406
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 16:25:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D4971C20F12
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 16:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8E01EA7B;
-	Fri, 20 Oct 2023 16:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A5D21EA80;
+	Fri, 20 Oct 2023 16:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FBiYMpU8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MP9Nijrj"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E22018C14;
-	Fri, 20 Oct 2023 16:25:30 +0000 (UTC)
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BDE91A4;
-	Fri, 20 Oct 2023 09:25:28 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-53e2308198eso1539232a12.1;
-        Fri, 20 Oct 2023 09:25:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93D91D538
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 16:29:32 +0000 (UTC)
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6C6FD57
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 09:29:28 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-32db188e254so761214f8f.0
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 09:29:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697819127; x=1698423927; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697819367; x=1698424167; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0Zh2IXK6vdHBvlCvwZsvPMmXUhqBdB70AvUaXtJ3lng=;
-        b=FBiYMpU8uptcyIUEjnm6JlOah1D2zGrqOhYwlNIjEkvdx+dbpgyxm7QFRmrG7Rva6J
-         IvrwGeijCv4QYfDSYpYLw5RIk9iB4E/K9D4QSvuPM/SDmJqGuTKQ+2jmBBGE89y+mIQm
-         8eXBXJt0z9S0RpqcPVSLwPcVQitLOsCxsC6GV+tqXWLejnPhoC8GVx5A802ovnufF16N
-         YMWBIEsHoFvxrsPxkiP4y53Tey8nloSXd6DAqIBqE7b0tLC1tHkMY2li4TNR41MMxZUn
-         XFXvFiIPyijy2p3CUmDMNrmkN3WPe0lqvI4TB9PoNnFmnEK+EvNfiZnvaz9hzp+qAe2Y
-         RwJw==
+        bh=5R2sOCCTir7Xw+JKgM+XdLzZ1DA4pt+bpUcx//aqhq4=;
+        b=MP9NijrjT3nUCrCy4QyyZ0ca2pGjKADUZ/7PsUrxFDSkS5LEdVpzoyHqnyR7u7av/P
+         DWDH0wM+sO4LQI7qEx8NvTqCiigXKv2iiSHFpioAGK2FAUa48QWOXrAWRV7m+Oc9RK3Q
+         +5e68O5uVdKV8B2KAXAx0wn5qsqBGgCj3ozVh17yeZLcwkvGV644ZhPb/aVBrfEI0rvt
+         cy/meutJpU4wG3pAJhPOhcGu9HJVc0euVtF/GKmqjPIoRZva7+Hm15nNpN0JDqMsUySw
+         NdbaKfPscB7rnflqErVqEwLrdHC3babBS/vyo3Wmj9aPIWx0V/BcS/jRh++r6aXhLBte
+         cbWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697819127; x=1698423927;
+        d=1e100.net; s=20230601; t=1697819367; x=1698424167;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0Zh2IXK6vdHBvlCvwZsvPMmXUhqBdB70AvUaXtJ3lng=;
-        b=uo+uhrQW7eGCZqnN2cf4UTEMdYU+RCkhY907CZZWFWiATUxIRRDYotXgqwPu/gyLA1
-         CA0/fLhAjjtkj+3owPHzl0J2lC8aHHLPG5ISbSerOWZleoaW3fnGFirISLxL4jKFgIZp
-         j1CQrgI3NeiMfWQPqXbwbco2CLvtlaKgovH/4n6SlR8lgwd+7HRzj8dok6qccTbd6GiM
-         lYDVYZTNNwrztkC7psuIR+YEEZ70lOkD5mrxAFUtU7llBdA1J/XA0MDGOnui7bCE9l4E
-         o4KCEf05rBsSJg0XVM/yBrCcIxsXXXAACAu/aMi7aS8AWCK50o0K1hJzq0JA9eB/xRhA
-         UIKA==
-X-Gm-Message-State: AOJu0YzoGpcIrMZCKZA5PdFn0xQbtRGsxilMaOWf1LjPgs6DFXssgLV8
-	3p3rWtTz2ZEA39QVDqNw+b1fOzi24wyWfYD6Lyk=
-X-Google-Smtp-Source: AGHT+IHR3P0GY5oHeM7ZfYPG/nM9zShbnUgp0/H4u/l4uQFiRoimeJtGseDXHUsWqIm3AUVKeuFWnhB+ruOti/4Xtqk=
-X-Received: by 2002:a05:6402:430f:b0:53e:2a65:1d9c with SMTP id
- m15-20020a056402430f00b0053e2a651d9cmr2171650edc.25.1697819126717; Fri, 20
- Oct 2023 09:25:26 -0700 (PDT)
+        bh=5R2sOCCTir7Xw+JKgM+XdLzZ1DA4pt+bpUcx//aqhq4=;
+        b=EnWfWJkgtf7p64CCPSWmBQKn9lFq+L2Vnw7C0np16JYgm1Iu5LoDUK2bM1LEeGjQSG
+         xOc5EzNiLmTOxTeeSNqGrLmQcBLYz8Lfkb1weLvVENb5dKPtZat99j0WcMZhZHXJSbr7
+         YfztD6vY+RgbCuHF4WabOItI68WYX22ZAfRn5qX8IT0Xq8GMg0tFncd5Ph/BQSV3AMqG
+         CiUJAVWXoYRkuJMTR4l5c3mVprfhG99Kbp1SETmXQPWTY/aMgaqiSooPBcQXYo+rBDot
+         EHEMf+IZkymLSgrOvUqxSS5cSfvJOhpUipkBp9kvK5wdkRcw3qyPD3zy/vecVAzj2H7/
+         Qr/g==
+X-Gm-Message-State: AOJu0YwWrl5hoBgE0ifR39uc+KOzXkfCXFlcf0FhlDEpFGDDBc16CABc
+	VfRuAftAsPgu5pVuaBbSzCcXARLSDCjI53wA93CIk3x/vFYmt0BWTJDaSafQ
+X-Google-Smtp-Source: AGHT+IGVZEo+oNWIul83nw5KU2f2We1KdDcsvn1lS4gsZ/mwdIT9YliXjcCWO2VrCiGONN0czsB7LSHtZytrmNAkdvE=
+X-Received: by 2002:adf:e10a:0:b0:319:867e:97d7 with SMTP id
+ t10-20020adfe10a000000b00319867e97d7mr1968017wrz.52.1697819367061; Fri, 20
+ Oct 2023 09:29:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016180220.3866105-1-andrii@kernel.org> <CAN+4W8hu+zWiWejWtc72WwQb6ydL3U3LXvaFBdc0o826JKzoAQ@mail.gmail.com>
-In-Reply-To: <CAN+4W8hu+zWiWejWtc72WwQb6ydL3U3LXvaFBdc0o826JKzoAQ@mail.gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 20 Oct 2023 09:25:15 -0700
-Message-ID: <CAEf4BzbK2JkJwcwtXzhnazxT7dasjpSbScOoE=N9wkcepJu81w@mail.gmail.com>
-Subject: Re: [PATCH v8 bpf-next 00/18] BPF token and BPF FS-based delegation
-To: Lorenz Bauer <lorenz.bauer@isovalent.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	keescook@chromium.org, brauner@kernel.org, lennart@poettering.net, 
-	kernel-team@meta.com, sargun@sargun.me
+References: <20231020125748.122792-1-edumazet@google.com> <CAK6E8=dZHwS3ULq2zxyBNcnff8z=8E+1W=SYQdOm8qjn5cQTAg@mail.gmail.com>
+ <CACSApvZkh_TvFd8G9uD_AMyJv=3NfdbszW7FeTjCexMnS6z1Pg@mail.gmail.com>
+In-Reply-To: <CACSApvZkh_TvFd8G9uD_AMyJv=3NfdbszW7FeTjCexMnS6z1Pg@mail.gmail.com>
+From: Kevin Yang <yyd@google.com>
+Date: Fri, 20 Oct 2023 12:29:15 -0400
+Message-ID: <CAPREpbZ8p-uEEot=temVGHd5QuDnuJhj7sARM+A6hv22TfkU5Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/13] tcp: add optional usec resolution to TCP TS
+To: Soheil Hassas Yeganeh <soheil@google.com>
+Cc: Yuchung Cheng <ycheng@google.com>, Eric Dumazet <edumazet@google.com>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, Wei Wang <weiwan@google.com>, 
+	Van Jacobson <vanj@google.com>, Florian Westphal <fw@strlen.de>, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 20, 2023 at 6:18=E2=80=AFAM Lorenz Bauer <lorenz.bauer@isovalen=
-t.com> wrote:
+Thanks Eric, this nice feature has been beneficial to Google for so
+many years and is finally happening upstream :)
+
+Acked-by: Kevin Yang <yyd@google.com>
+
+
+On Fri, Oct 20, 2023 at 12:20=E2=80=AFPM Soheil Hassas Yeganeh
+<soheil@google.com> wrote:
 >
-> On Mon, Oct 16, 2023 at 7:03=E2=80=AFPM Andrii Nakryiko <andrii@kernel.or=
-g> wrote:
-> ...
-> > This patch set adds a basic minimum of functionality to make BPF token =
-idea
-> > useful and to discuss API and functionality. Currently only low-level l=
-ibbpf
-> > APIs support creating and passing BPF token around, allowing to test ke=
-rnel
-> > functionality, but for the most part is not sufficient for real-world
-> > applications, which typically use high-level libbpf APIs based on `stru=
-ct
-> > bpf_object` type. This was done with the intent to limit the size of pa=
-tch set
-> > and concentrate on mostly kernel-side changes. All the necessary plumbi=
-ng for
-> > libbpf will be sent as a separate follow up patch set kernel support ma=
-kes it
-> > upstream.
+> On Fri, Oct 20, 2023 at 12:11=E2=80=AFPM Yuchung Cheng <ycheng@google.com=
+> wrote:
 > >
-> > Another part that should happen once kernel-side BPF token is establish=
-ed, is
-> > a set of conventions between applications (e.g., systemd), tools (e.g.,
-> > bpftool), and libraries (e.g., libbpf) on exposing delegatable BPF FS
-> > instance(s) at well-defined locations to allow applications take advant=
-age of
-> > this in automatic fashion without explicit code changes on BPF applicat=
-ion's
-> > side. But I'd like to postpone this discussion to after BPF token conce=
-pt
-> > lands.
+> > On Fri, Oct 20, 2023 at 5:57=E2=80=AFAM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > As discussed in various public places in 2016, Google adopted
+> > > usec resolution in RFC 7323 TS values, at Van Jacobson suggestion.
+> > >
+> > > Goals were :
+> > >
+> > > 1) better observability of delays in networking stacks/fabrics.
+> > >
+> > > 2) better disambiguation of events based on TSval/ecr values.
+> > >
+> > > 3) building block for congestion control modules needing usec resolut=
+ion.
+> > >
+> > > Back then we implemented a schem based on private SYN options
+> > > to safely negotiate the feature.
+> > >
+> > > For upstream submission, we chose to use a much simpler route
+> > > attribute because this feature is probably going to be used
+> > > in private networks.
+> > >
+> > > ip route add 10/8 ... features tcp_usec_ts
+> > >
+> > > References:
+> > >
+> > > https://www.ietf.org/proceedings/97/slides/slides-97-tcpm-tcp-options=
+-for-low-latency-00.pdf
+> > > https://datatracker.ietf.org/doc/draft-wang-tcpm-low-latency-opt/
+> > >
+> > > First two patches are fixing old minor bugs and might be taken
+> > > by stable teams (thanks to appropriate Fixes: tags)
+> >
+> > Huge thanks to Eric for making this happen for real :-) an immediate
+> > benefit is enabling TCP timestamp based undos (Eifel) for short RTT
+> > transactions. This allows datacenter TCP to use more aggressive
+> > timeout w/o worrying too much of spurious timeout cwnd effect
+> >
+> > Acked-by: Yuchung Cheng <ycheng@google.com>
 >
-> In the patch set you've extended MAP_CREATE, PROG_LOAD and BTF_LOAD to
-> accept an additional token_fd. How many more commands will need a
-> token as a context like this? It would cause a lot of churn to support
-
-There are few more commands that do capable() checks (GET_NEXT_ID and
-GET_FD_BY_ID commands, TASK_QUERY, maybe few others), so if those
-would be necessary to delegate, we can probably add token support
-there as well. Other than that LINK_CREATE seems like a likely
-candidate in the future. This will probably be driven by concrete
-customer use cases.
-
-> many BPF commands like this, since every command will have token_fd at
-> a different offset in bpf_attr. This means we need to write extra code
-> for each new command, both in kernel as well as user space.
-
-Yes, but that's generally true for anything else added to BPF syscall
-(like verifier log, for example). Luckily it's not really a lot of
-commands and definitely not a lot of code.
-
+> Thank you so much, Eric, for upstreaming the feature!  This is a major
+> milestone.
 >
-> Could we pass the token in a way that is uniform across commands?
-> Something like additional arg to the syscall or similar.
-
-Adding a new argument means adding a new syscall (bpf2()) due to
-backwards compatibility requirements. Adding bpf2() syscall means
-adding even more code to all existing libraries to support them (and
-still keeping backwards compatibility with bpf() syscall).
-
-It doesn't really seem worth it just for passing token_fd to a few
-commands, IMO.
-
+> Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
 >
-> Lorenz
+> >
+> > >
+> > > Eric Dumazet (13):
+> > >   chtls: fix tp->rcv_tstamp initialization
+> > >   tcp: fix cookie_init_timestamp() overflows
+> > >   tcp: add tcp_time_stamp_ms() helper
+> > >   tcp: introduce tcp_clock_ms()
+> > >   tcp: replace tcp_time_stamp_raw()
+> > >   tcp: rename tcp_skb_timestamp()
+> > >   tcp: move tcp_ns_to_ts() to net/ipv4/syncookies.c
+> > >   tcp: rename tcp_time_stamp() to tcp_time_stamp_ts()
+> > >   tcp: add tcp_rtt_tsopt_us()
+> > >   tcp: add RTAX_FEATURE_TCP_USEC_TS
+> > >   tcp: introduce TCP_PAWS_WRAP
+> > >   tcp: add support for usec resolution in TCP TS values
+> > >   tcp: add TCPI_OPT_USEC_TS
+> > >
+> > >  .../chelsio/inline_crypto/chtls/chtls_cm.c    |  2 +-
+> > >  include/linux/tcp.h                           |  9 ++-
+> > >  include/net/inet_timewait_sock.h              |  3 +-
+> > >  include/net/tcp.h                             | 59 ++++++++++++++---=
+--
+> > >  include/uapi/linux/rtnetlink.h                | 18 +++---
+> > >  include/uapi/linux/tcp.h                      |  1 +
+> > >  net/ipv4/syncookies.c                         | 32 ++++++----
+> > >  net/ipv4/tcp.c                                | 26 +++++---
+> > >  net/ipv4/tcp_input.c                          | 52 ++++++++--------
+> > >  net/ipv4/tcp_ipv4.c                           |  5 +-
+> > >  net/ipv4/tcp_lp.c                             |  2 +-
+> > >  net/ipv4/tcp_minisocks.c                      | 19 ++++--
+> > >  net/ipv4/tcp_output.c                         | 14 +++--
+> > >  net/ipv4/tcp_timer.c                          | 44 +++++++++-----
+> > >  net/ipv6/tcp_ipv6.c                           |  5 +-
+> > >  net/netfilter/nf_synproxy_core.c              |  2 +-
+> > >  .../selftests/bpf/progs/xdp_synproxy_kern.c   |  4 +-
+> > >  17 files changed, 193 insertions(+), 104 deletions(-)
+> > >
+> > > --
+> > > 2.42.0.655.g421f12c284-goog
+> > >
 
