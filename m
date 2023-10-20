@@ -1,180 +1,197 @@
-Return-Path: <netdev+bounces-43045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5EC97D124F
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:12:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D08027D129E
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:27:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78F542824B9
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 15:12:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09D5BB213F0
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 15:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3671DA46;
-	Fri, 20 Oct 2023 15:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7C21DA5F;
+	Fri, 20 Oct 2023 15:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hRQ0+ABG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LSzgmYLo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3EC1DA43;
-	Fri, 20 Oct 2023 15:12:47 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAEE8FA;
-	Fri, 20 Oct 2023 08:12:44 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9a58dbd5daeso145722466b.2;
-        Fri, 20 Oct 2023 08:12:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697814763; x=1698419563; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ZU5hBj8/e4oDuCRh8BssYew0LlrPlrgUCeK6Uhar2WQ=;
-        b=hRQ0+ABGvWBkF2Q1fXlM+GQl2LcHIPMLpchIFGBPlahA/NP40FKcgNofnqbNVStStt
-         GWKGrXX1v9lqCIUn7L/HibwqF5d8UzDvc+8tSxa7KDOvPoTiJ+SUSplPxeU6nXwzv8zm
-         2+81Z8jfeZQrS3As3q4cllMz5n8p7S8FRVOoJlWfqJdC/mDyIM22aXr9K9Sh/7thNAG+
-         E4lsLyvzdnIWV6Nt1pDqCjU0xP6uIlfU/Uul/PjYLq8/YN6/Mb75RcyLJa6C5hLBt915
-         kRobuu8P/RmPGvF83ZnEGci04CblVclAuYAXJKrAhYtyrV7ovp5ikC8iH8Ij2YKxXbr1
-         dtcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697814763; x=1698419563;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZU5hBj8/e4oDuCRh8BssYew0LlrPlrgUCeK6Uhar2WQ=;
-        b=uD2g8aseqaxe3b79Odjs14hDLxhsf4Eehg85f5MWRtX/VZfpGJuhMherqo9i7u9sfx
-         5iKR/fYD4B0WsLhfMxBDmYrqo0tmIp3Dk1ed00lMtGsrc4zUx2o/UP5ZBYSg5RpVw3/V
-         f/Qi2HkjBcAjBQ4kkM65m15S4rAt5/4pA5NMeBzJJxfqtsYvqnw0zlytEN/9jG8QFX+G
-         iB13aYX3jgvuQPY1PNAL0QTfzv5FMyg/KYewSqGU+8clu5xf4fmjYOUQDYjv+DIVURMu
-         Wy3T371Xg3a44HEN29azAu6s/jLoha64xGwPkl3fTR7QwuPx1MIH9gfd3SBeuHV5dCmu
-         /GJg==
-X-Gm-Message-State: AOJu0Yx9gQbHsftQrEgqhNIm7FBL2eh8ssONNnq0IyO2LS9ej14uqpME
-	OTGVFs6T/au2k0uoAFdz27I=
-X-Google-Smtp-Source: AGHT+IHpR9r/JHxcLJl5Vxxatg7b/wgqRKDdY/W5Fw63VB9oSzgnCKlz5RaNbTQa568EZAW9WyPbsA==
-X-Received: by 2002:a17:907:3f22:b0:9bd:a063:39d2 with SMTP id hq34-20020a1709073f2200b009bda06339d2mr2130957ejc.16.1697814762995;
-        Fri, 20 Oct 2023 08:12:42 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id d13-20020a1709064c4d00b009a5f1d15642sm1650051ejw.158.2023.10.20.08.12.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 08:12:42 -0700 (PDT)
-Date: Fri, 20 Oct 2023 18:12:40 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 6/7] dt-bindings: marvell: Rewrite MV88E6xxx
- in schema
-Message-ID: <20231020151240.3gdcftg2aaz7bnal@skbuf>
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-6-3ee0c67383be@linaro.org>
- <20231019153552.nndysafvblrkl2zn@skbuf>
- <CACRpkdbskk22SLmopUTD78kMWL_gcOa=YWHLFtrkDAD5=W=HFw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D0119BAD
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 15:26:53 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E224AB
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 08:26:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697815611; x=1729351611;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=xiyifNavXjVU8+evEro1ykgvQmdF9x4cuufEpxjfHsc=;
+  b=LSzgmYLooX0+xiuGcRlDwlhETJ6dVp+PPY3Y8YgmjyFlGs7xJfkjvBtn
+   hkyiA1p8zSO4BOg5GHQWk5XSEOMwtIwL/iX1gRtzrO272+xDLm2WaLTNj
+   Zh3sKcqXzjK+UJbTgK3dx6Vviy+x6c5Gui2zcohcYooIlghAjlzJ3u+tS
+   DEVef57ZzcTjOxu3WMA0KgGAZlgEOqRhXaZklOruv7pR9Ry8bDXeZeIA1
+   Ko/Kbc4VSYxH79BmkNLWIs6mgNaawMIF8CW3VnA2CNERFtYgeTYF+FPB8
+   U6/YwXvJzVPVFGn8jlYUUO0D3Cu32BcTy/qJyrQ1ifrWZM/a/bJVMaEFh
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="8080140"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="8080140"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 08:26:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="707254710"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="707254710"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Oct 2023 08:26:50 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 20 Oct 2023 08:26:49 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 20 Oct 2023 08:26:49 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Fri, 20 Oct 2023 08:26:49 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Fri, 20 Oct 2023 08:26:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WZq4y3nBPqcTrX+C2Cv5OS/g2e85D08oPoXXmqo2DZeBbgbRbLbY5o1PYNUUieCwfNBS/nUuCv/3X+gIJVrpMf1kKZOg7+AWwhRj5rYgLLwHrpNmlDFI38e7PYkejodckjwrtztXOEzwg0kX3wlpoPauie7mI7f7YColB9j6NRC+pQAL1n7mZuoe8OO0EgOg4OM3ape8D8UHcBmAikDT67E1KBI1Gy58xouoq6puphL8DTxKJK4wWWCrNJJxaAEmpfXBYxhl0sLF5XYWKQaOPaT5CNysErYTCImaE/VRknMPVBqRsa1AtXUa/fRQojdQF49LEWXwjT9g/C4/B0Wing==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FcXIe+QmqjafyycVE10ZQMxwyVBJPQZRQg2L0ZScL/w=;
+ b=Kbb91w0yc5p/mb4nqhWHsNLs6lBOJyOdw13D2UsAwJb/zP3KyGhwh9negChvlY0MmPDy+890sVjRaPGW7JW2E6wObRvQxsbgPjVFUxVWD4A/ZqtNUsPDzBC/6CSH7GI2VY4AeZ8Kxwb9Uvys1D/p5Nf9YrCL34n3gWKCAzAKPG7AozwdFD4ZrceyCov8IqShwAtjW8HsG86dOQpQgh414YdwvM8HVCMxcFHuKRlzU8hK0/GXtc4yjrEaOJXjDthQPIy3P4zfQXbDeqaZWaxorq7G/sGyG9rMqJTPeQfDbt4Ap8qX6aEp1bU5BrIE7Q9AnLB/DPCPqT3+n4kNZi69rQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5911.namprd11.prod.outlook.com (2603:10b6:303:16b::16)
+ by DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6907.26; Fri, 20 Oct 2023 15:26:47 +0000
+Received: from MW4PR11MB5911.namprd11.prod.outlook.com
+ ([fe80::ad15:2445:10e:7677]) by MW4PR11MB5911.namprd11.prod.outlook.com
+ ([fe80::ad15:2445:10e:7677%3]) with mapi id 15.20.6907.022; Fri, 20 Oct 2023
+ 15:26:47 +0000
+From: "Singh, Krishneil K" <krishneil.k.singh@intel.com>
+To: "Kubiak, Michal" <michal.kubiak@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Tantilov, Emil S" <emil.s.tantilov@intel.com>, "Zaremba, Larysa"
+	<larysa.zaremba@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Hay, Joshua A" <joshua.a.hay@intel.com>, "Lobakin,
+ Aleksander" <aleksander.lobakin@intel.com>, "Kubiak, Michal"
+	<michal.kubiak@intel.com>, "Brady, Alan" <alan.brady@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next] idpf: set scheduling mode for
+ completion queue
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next] idpf: set scheduling mode for
+ completion queue
+Thread-Index: AQHZ7XEJWw3h4IAAU06hV5+AJeB2QbBS+ESg
+Date: Fri, 20 Oct 2023 15:26:47 +0000
+Message-ID: <MW4PR11MB591162F65D0EA2CCC606A172BADBA@MW4PR11MB5911.namprd11.prod.outlook.com>
+References: <20230922161603.3461104-1-michal.kubiak@intel.com>
+In-Reply-To: <20230922161603.3461104-1-michal.kubiak@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB5911:EE_|DS7PR11MB5966:EE_
+x-ms-office365-filtering-correlation-id: 83939c51-0b41-42a1-8bf0-08dbd180f94f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: u+i+awQ2H7gdPkvuuOrLYP87qimlrEh+ypJ4h3x/kQnGRts74+aZjFfm5FOLlj604v7Ix5iebv9wz7TlCMKG0ul6QAyn7aHJ6A0n7PRzHMNbeWjca55qQx5hPbAkO1u5AArLf5y4IsYDHoy4ufGCc2Zh0CeCnejovyMZFaoVfbp4wUnTIPYc6Kw3B1JKKPqQFVza1LspaxQd91+TGwxy2Tb/fBX9g+GAib7ATRZWKt2gYbNOafJhQmT9VF4sMZC0TCbMTWYQ1QW6PiqOtEj3teDrfXfsQKiHeD7HzKKkJBqdGfJSwvI/H00IxrCBFZWkraWEHZgn63D21mvlywRk0Bo9CU/HikerLAykKQTzRKOQVjJ3gpcJjo4PSTCFKF7R6BXspjK8sdG4+nFeg8McJYt82WLFsmeoX1Br7PktGKH6QHhpiiH4P6vreYyb6Mo0tsm/OmBxF/aD61qtbCu6AFZSJ4tVTDkwElhFlxhReQy2BVXBC8B2SBikTsnJBIAdtz8ZInYfpPu71vq0FRRt9nQcm2RnN0dSFs0nGxjj3w7SpC2POdLF+opi2Q3bB1OXnmsqvobH2jWDthZ8elmSwgGn7XBKM3ImJ0alrAFEHTSj1KgTPtDVEIOx0mgwGAIe
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5911.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(366004)(39860400002)(396003)(346002)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(33656002)(41300700001)(55016003)(8936002)(8676002)(4326008)(5660300002)(52536014)(2906002)(86362001)(53546011)(6506007)(7696005)(71200400001)(83380400001)(478600001)(38100700002)(316002)(107886003)(9686003)(38070700009)(26005)(122000001)(54906003)(64756008)(82960400001)(66476007)(66946007)(76116006)(66446008)(110136005)(66556008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Rkrsrh4+8WXLSEFsvH3FhczcCc1Xf76xAjQbbrvMkfWaqd/fAxt40PGPJwnK?=
+ =?us-ascii?Q?BPftycmJaA2kyMVikaTis9A/x94KIwpPWsK3H4Dy/P48Dq/WGHRwldvjcvnk?=
+ =?us-ascii?Q?YWmLzjGhmxr/BHLi3U4vhLptwU2wOz3HVnIDBhjDq1aj6IstEFFszAKbKfa/?=
+ =?us-ascii?Q?KvudTrJ/mo58JpkiABNjwZRWfgdaapvBkM9jZx136I/hX6/pzGR51fyutL74?=
+ =?us-ascii?Q?sWIgzrBFxojz1BNQbe7LUk2/3lUFAjxxco1QIa7bWh3u86ZqGdlvVcTieqaZ?=
+ =?us-ascii?Q?TArXWLknDxeRa8muEfMEOiKzoy86Ba7mq3x/bYyonshZvced4iyOn/XLf7Vf?=
+ =?us-ascii?Q?2CHA4m6WGc5xiNSmvktE+8OTi3Iu6ybC2YCRdM22T5Xe+LFgTWsWHd88CGwQ?=
+ =?us-ascii?Q?Nu1fT++weSECQwevEvodjO+1A8fd/5n06DMC9k1PAJVuAoszb+1eQw+VrlP6?=
+ =?us-ascii?Q?Oegarkqf2kki2OGnBH8cyZBhmMqp6GDzP2EtY1cV7ux3gKDWE3GgHKLW17xw?=
+ =?us-ascii?Q?okDjfW0WDzdpPKV12AII6hb7uZ5vvdEigs21nGLvBlItR7lUx6GHSrFRpymi?=
+ =?us-ascii?Q?gl64CuLtHlqxfNjPAkCtUmTNIESaMiK+X2kG0/QVNpUhnjCiKxhWdl2kYg1L?=
+ =?us-ascii?Q?e07AJEsos4dMXZ6Xm+33Wz6JxGHMIjJSM06pBYeXtcPIbMpI9X8cJE5gPZvB?=
+ =?us-ascii?Q?SxQMuhZV57Y+80Y7YcXl9qPxWhULOgysuXBM897XM8iejqFbcUtFoBcb8S1p?=
+ =?us-ascii?Q?QNfgWSRklhw6aAFOmv8JtcanMj3A/GWtq5whtAAkCL1uwGOk7UAd2b0p518Y?=
+ =?us-ascii?Q?8Z0qWs5o6AVaoZSlwC7wOgczdrmUP2JNgU4ac5A1Isu/TijqfBZDdUQ+s/gH?=
+ =?us-ascii?Q?npMg68KZMyuhkiCokcPYqKLbA07raXqqEFs2kX1Bg8curj4XLXhHNKyG45n1?=
+ =?us-ascii?Q?hHbEq1xkUNHEk+tOVDLe4oCZykURaGdrkw9Fyn/f8g9i6aT6BT2hvfWM3aqN?=
+ =?us-ascii?Q?ugM3A7oQjiVBV6NY49kpwlvUGtEbYAUMfS+NjRBHEb5H1TtyMWX9EjnjBUf3?=
+ =?us-ascii?Q?VyiOQakTUsQOiLeLeylLcJ13mfF8NEs8oMdYNxTmXMh3i7Gsn40DZ3CXntYs?=
+ =?us-ascii?Q?tzccVs/8PaUgN5JsR/X/fDjDWojcxU9/AWPzO37g8i0bdc1F9rWI0/EWhX/b?=
+ =?us-ascii?Q?3EUhK1EoijkN86uTFz849+1wWGdbWAFklMHP4t5UGN4GsXASYXEEFcqfl16t?=
+ =?us-ascii?Q?ZODJuWg4tUKRaGiwFZ8FsHjn8iEOTvxiWi8r4tesdAzZ3yxayCiH2nLFgGO0?=
+ =?us-ascii?Q?m+QXioNonGgdJQMDYSbE5jyjH6M8OXgFSt2eYeXicCHAyfcFPC69x52JN0c6?=
+ =?us-ascii?Q?iGemy+etlTKKh9+ONtpGW4dZn0A1dvwzCF7MBbJhDzZc1HJCsV2c29gV174J?=
+ =?us-ascii?Q?O0BpyMZSWeTejZMLfwHI59zFeJiTe3VwoL8FpmnOpTMDl4DGkyqYtnCY7FTU?=
+ =?us-ascii?Q?d72Riqn5V+5HxzJd27KbQw3Uo8oTCMzsxT2NM3m8OJ8pnpKAq4T5Iv7maPYk?=
+ =?us-ascii?Q?IFYG98dV4G7y9uUZFLGL8RF2guGn1HEGzYwM+mF72YuKWlp5t7YOBZ12id0A?=
+ =?us-ascii?Q?/Q=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACRpkdbskk22SLmopUTD78kMWL_gcOa=YWHLFtrkDAD5=W=HFw@mail.gmail.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5911.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 83939c51-0b41-42a1-8bf0-08dbd180f94f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Oct 2023 15:26:47.1282
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: drFXLHCCpHIlbzfs3cVm8Ev/iMB4qUp83grmO/HJfjvpwqLXmhHy2ML7VwuupG0MsetL2Esk1c4foE89RRBPKJqxv1EVlP22xQAA4Oj5KKU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB5966
+X-OriginatorOrg: intel.com
 
-On Fri, Oct 20, 2023 at 02:47:20PM +0200, Linus Walleij wrote:
-> On Thu, Oct 19, 2023 at 5:35 PM Vladimir Oltean <olteanv@gmail.com> wrote:
-> 
-> > Yikes, both these examples are actually broken,
-> 
-> As you can see from the patch, they are just carried over from
-> Documentation/devicetree/bindings/net/dsa/marvell.txt
-> 
-> +/- fixes to make them pass schema checks.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Michal Kubiak
+> Sent: Friday, September 22, 2023 9:16 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Tantilov, Emil S <emil.s.tantilov@intel.com>; Zaremba, Larysa
+> <larysa.zaremba@intel.com>; netdev@vger.kernel.org; Hay, Joshua A
+> <joshua.a.hay@intel.com>; Lobakin, Aleksander
+> <aleksander.lobakin@intel.com>; Kubiak, Michal <michal.kubiak@intel.com>;
+> Brady, Alan <alan.brady@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next] idpf: set scheduling mode for
+> completion queue
+>=20
+> The HW must be programmed differently for queue-based scheduling mode.
+> To program the completion queue context correctly, the control plane
+> must know the scheduling mode not only for the Tx queue, but also for
+> the completion queue.
+> Unfortunately, currently the driver sets the scheduling mode only for
+> the Tx queues.
+>=20
+> Propagate the scheduling mode data for the completion queue as
+> well when sending the queue configuration messages.
+>=20
+> Fixes: 1c325aac10a8 ("idpf: configure resources for TX queues")
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+> ---
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.c     | 10 ++++++++--
+>  drivers/net/ethernet/intel/idpf/idpf_virtchnl.c |  8 +++++++-
+>  2 files changed, 15 insertions(+), 3 deletions(-)
+>=20
+Tested-by: Krishneil Singh  <krishneil.k.singh@intel.com>
 
-(...)
-
-> These examples are already in the kernel. Migrating them
-> from marvell.txt to marvell,mv88e6xxx.yaml doesn't make
-> the situation worse, it's not like people magically start trusting
-> the examples more because they are in YAML than in .txt.
-> 
-> But sure let's try to put in better examples!
-
-You are not correct here. The examples from
-Documentation/devicetree/bindings/net/dsa/marvell.txt don't have ports,
-and the way in which you added the ports is wrong (at least relative to
-the way in which you kept the mdio node).
-
-> > What you have now is exactly what won't work, i.e. an OF-based
-> > slave_mii_bus with a non-OF-based phy_connect().
-> 
-> Yeah when I run check_dtbs I get a few (not many) warnings
-> like this on aarch64 and armv7_multi:
-> 
-> arch/arm/boot/dts/nxp/imx/imx6q-b450v3.dtb: switch@0: ports:port@4:
-> 'phy-mode' is a required property
->     from schema $id:
-> http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
-
-Ok, the warning is valid, but I don't know what phy-mode to put there.
-It is unrelated anyway. Some warnings will be expected after the schema
-conversion, and they are not all mechanical to fix. When we put schema
-validation in place for checking that CPU ports have valid link
-descriptions that phylink can use, we decided to be lax in the kernel,
-but strict in the dt-schema. Hmm, not sure what were we thinking.
-We didn't have a schema for Marvell, so we weren't even seeing many of
-the validation errors that you're now uncovering.
-
-> Isn't there some in-kernel DTS file with a *good* example of how
-> a Marvell mv88e6xxx switch is supposed to look I can just
-> copy instead? We shouldn't conjure synthetic examples.
-
-(...)
-
-> I'm game. Point out the DTS file and I will take that.
-
-You can use https://elixir.bootlin.com/u-boot/latest/source/arch/arm/dts/imx6qdl-gw5904.dtsi#L211
-(optionally renaming switch to ethernet-switch, and ports to ethernet-ports).
-That uses the subset of the mv88e6xxx kernel bindings that U-Boot also
-understands, so taking a U-Boot example is actually preferable.
-
-> > One other thing I see as a deal breaker for this schema conversion is
-> > that $nodename for Marvell needs to allow basically anything (invalidating
-> > the constraint from ethernet-switch.yaml), because we can't change node
-> > names in the case of some boards, otherwise we risk breaking them
-> > (see MOX). If the schema starts emitting warnings for those node names,
-> > then it's inevitable that some pixie in the future will eventually break
-> > them by "fixing" the node name.
-> 
-> I already did a bit of hippo-in-china-porcelain store in the patches
-> in this series mostly renaming things like "switch0@0" to "switch@0"
-> (yeah that's all).
-> 
-> Is this part of the problem or something else?
-
-Yes, for most of the switches, renaming their OF nodes should not be a problem.
-
-For Marvell, I'd exercise extra caution and only rename those OF nodes
-where I can confirm that doing so won't break anything. Marvell is one
-of the oldest DSA drivers, and you can tell that the bindings have gone
-through a lot before becoming more or less uniform.
-
-Anyway, for the $nodename constraint, it _looks_ all mechanical and trivial
-to fix (unlike the missing phy-mode that you point to, above), so someone
-will jump to fix it. I would like to avoid that, because boot testing
-will be key, and a board is not always available.
 
