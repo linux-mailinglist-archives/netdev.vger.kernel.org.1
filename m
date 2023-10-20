@@ -1,81 +1,58 @@
-Return-Path: <netdev+bounces-42924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA6D17D0A86
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:29:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A46267D0A98
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:34:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8592B281F5D
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 08:29:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36B7FB21649
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 08:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A4710964;
-	Fri, 20 Oct 2023 08:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zd8AjeQ4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E64481097D;
+	Fri, 20 Oct 2023 08:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0209110955;
-	Fri, 20 Oct 2023 08:29:40 +0000 (UTC)
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B248112;
-	Fri, 20 Oct 2023 01:29:39 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-507d7b73b74so728544e87.3;
-        Fri, 20 Oct 2023 01:29:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697790577; x=1698395377; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HjHnYS/roHyURAgzXLOkXsDbtDs4sZ8GsZC8irxBauc=;
-        b=Zd8AjeQ4qDi1StKGmV5r1XgzlJk/MjRKwv0zkewW3UsVxelTteNEQQlgmSGRYeK1El
-         9Kr35/z6ssYaJakFMhMU3k9GMNXZ04h745w4ej7GO08ZW7xqsQ00T1MQRZUPxjFdOzIq
-         aTd5OWjVJUZhVUOMnnKx52vXi8qM9Jko7c6XybCQbVc26S1Z3NlAfcFpo3bER/zkPDDx
-         VtX3qQ4bqhlbmHi86m5t8HqTLolgRxkq8WU6atEveGkYdsOF+K81OAJlyNkLWMSb7gj3
-         7xDDPAYPmEufj8SzsaI3u1yiSFztSZJa1ICbIYbJQRn/I9kPhHF+h2rTxDyZ1GVWG4Um
-         2z1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697790577; x=1698395377;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HjHnYS/roHyURAgzXLOkXsDbtDs4sZ8GsZC8irxBauc=;
-        b=PtQEv6+JbOJak6eSrXNu3BMbmNx6TEj4pddrQ6hD2y1RKblpDEq4y2I04zaMjBr01/
-         MfVAXYf9OwXQvHvP1deieGReZ5GuIOMJhroVw9a9Xxw1QRzSaScae+v4eJ3CU9CUIerG
-         QRcEmSgEiSMRQefPWiPwKygYxxwSswWoFPpYZBDk8wXDLGWlyoGS6G+etltektVySFQj
-         kk5z21+FQdvoyPyy8yHeMHypHTGirWkqZJKaVyF6KidiIzuvsLeBi5ac4f6ZMK4glda9
-         lcxSyhBN2ejdDKa+CinZ3Vqj76qnx3HsWvOlbG10jzocuq+8IH45kA1HYRjD2lMOiX32
-         MMqQ==
-X-Gm-Message-State: AOJu0YwHxhhj+kMOsU4CBdu0/tdUdy0dn5wRfcPrDRdtmJcaOieK8IPH
-	fj6IyymhRe1CloA7QbLlquU=
-X-Google-Smtp-Source: AGHT+IGA/e5+nN72zB3XtxDhDZwdP+Bj0yTuHoesZIEDzpmiKotKlFPQ5wsRmuGhTq8XVsjeuPnzzg==
-X-Received: by 2002:ac2:4e85:0:b0:507:ab58:7f7a with SMTP id o5-20020ac24e85000000b00507ab587f7amr660874lfr.10.1697790576929;
-        Fri, 20 Oct 2023 01:29:36 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id k17-20020a5d6291000000b003217cbab88bsm1192220wru.16.2023.10.20.01.29.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 01:29:36 -0700 (PDT)
-Date: Fri, 20 Oct 2023 11:29:34 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34A110A19
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 08:34:44 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 860D1D49
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 01:34:43 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qtkxs-0002nG-8p; Fri, 20 Oct 2023 10:34:40 +0200
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qtkxq-002z2N-QK; Fri, 20 Oct 2023 10:34:38 +0200
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qtkxq-00FPk0-NI; Fri, 20 Oct 2023 10:34:38 +0200
+Date: Fri, 20 Oct 2023 10:34:38 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
 	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>, kernel@pengutronix.de,
+	devicetree@vger.kernel.org,
 	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
+	netdev@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	Eric Dumazet <edumazet@google.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>
 Subject: Re: [PATCH net-next v6 5/9] net: dsa: microchip: ksz9477: Add Wake
  on Magic Packet support
-Message-ID: <20231020082934.teh24h557qox5hna@skbuf>
+Message-ID: <20231020083438.GD3637381@pengutronix.de>
 References: <20231019122850.1199821-1-o.rempel@pengutronix.de>
  <20231019122850.1199821-1-o.rempel@pengutronix.de>
  <20231019122850.1199821-6-o.rempel@pengutronix.de>
@@ -89,9 +66,18 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20231020082350.f3ttjnn6qfcmskno@skbuf>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 On Fri, Oct 20, 2023 at 11:23:50AM +0300, Vladimir Oltean wrote:
 > On Fri, Oct 20, 2023 at 07:08:56AM +0200, Oleksij Rempel wrote:
@@ -114,8 +100,12 @@ On Fri, Oct 20, 2023 at 11:23:50AM +0300, Vladimir Oltean wrote:
 > which returns bool (true if dev->switch_macaddr is NULL, or if non-NULL
 > and ether_addr_equal(dev->switch_macaddr->addr, port addr))?
 
-Hmm, I've checked other uses of the "tryget" name in the kernel and
-their semantics all seem to imply that upon success, a reference is
-acquired. That would not be the case here, so the naming would be
-confusing. How about a bool ksz_switch_macaddr_check(ds, port)?
+Ack, something like this.
+I'll send new version later.
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
