@@ -1,84 +1,153 @@
-Return-Path: <netdev+bounces-43083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD4D27D1548
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:56:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 264897D156D
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 20:06:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97397282402
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:56:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D372E28239C
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9D4208B1;
-	Fri, 20 Oct 2023 17:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C35E9208D8;
+	Fri, 20 Oct 2023 18:06:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="UjGxl25L"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="eSLjZ+TK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3FC2032F
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 17:56:35 +0000 (UTC)
-Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B65D55
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:56:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1697824590; x=1698083790;
-	bh=k33+/p34dbe/7wIvgqR0uJAbAz0eZCxXH/bmotNqR3Q=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=UjGxl25Lt+JNfpT73ZnYXl2qb72Y832itb0ZR/e1my8f/hBaLgCNsZqNaZKI6x9C5
-	 lLrdTSwNOE9b72ZsXRgxAnUxk5g4n1LNc8XIgL97zmCE+cn5u28MuNPFOcAx4/iptV
-	 pzZ2IhYoPfNrFV9esMQsfOGDKutrLfG4ICDRsbAogIwwpKWTSUmMxRrGe3BX46dyJH
-	 EBit/aLbDHSrBDfzM2xSL7amTkDKmBlwTXcnxQQPl6i6KWXxPqxkEJgPWuLggYKVDM
-	 PdiOtlqX9LnJkEGm6Z7k3hnzVWAfguTgOorgtB6KRuFamjAQRu1QeZfYmXqBMHGzi/
-	 vM3Xs6uEg3F7A==
-Date: Fri, 20 Oct 2023 17:56:17 +0000
-To: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>, FUJITA Tomonori <fujita.tomonori@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
-Message-ID: <92fca611-a87c-4994-b2fe-bda146ca6c5f@proton.me>
-In-Reply-To: <87sf65gpi0.fsf@metaspace.dk>
-References: <20231017113014.3492773-1-fujita.tomonori@gmail.com> <20231017113014.3492773-2-fujita.tomonori@gmail.com> <87sf65gpi0.fsf@metaspace.dk>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172282032B
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 18:06:07 +0000 (UTC)
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C61CD55;
+	Fri, 20 Oct 2023 11:06:05 -0700 (PDT)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39KI5gRV001704;
+	Fri, 20 Oct 2023 13:05:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1697825142;
+	bh=Tt/fIyWx2eVjmIhHw49aSnaSV1HhVIsOz95Owu+KIcw=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=eSLjZ+TKBH/7J8GgW7943gSNsFfqyqyQ0aUX9mlYjT9MhdjKYlXojZuz0/kJ1o+dO
+	 1BtEyD/l4c4GpijdPlGc8KXn7FzzzjOYjlYfVfwQkiwQFCAQkgFKwAnGhIvPxJmWhx
+	 8+IbBYbp/cwM9cvnJNI+wred6fKKo8/ZJX7QJZ4A=
+Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39KI5gPG102663
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 20 Oct 2023 13:05:42 -0500
+Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 20
+ Oct 2023 13:05:42 -0500
+Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 20 Oct 2023 13:05:42 -0500
+Received: from [10.249.130.150] (ileaxei01-snat.itg.ti.com [10.180.69.5])
+	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39KI5ZCX072364;
+	Fri, 20 Oct 2023 13:05:36 -0500
+Message-ID: <2046f9ad-b5c2-bc42-03de-6254d6ed92d3@ti.com>
+Date: Fri, 20 Oct 2023 23:35:34 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v2] net: ethernet: ti: davinci_mdio: Update K3
+ SoCs list for errata i2329
+To: Nishanth Menon <nm@ti.com>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <pabeni@redhat.com>, <rogerq@kernel.org>, <andrew@lunn.ch>,
+        <f.fainelli@gmail.com>, <horms@kernel.org>,
+        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Ravi Gunasekaran
+	<r-gunasekaran@ti.com>
+References: <20231020111738.14671-1-r-gunasekaran@ti.com>
+ <20231020122359.vwia7sxrcjyeo3ov@pushover>
+Content-Language: en-US
+From: Ravi Gunasekaran <r-gunasekaran@ti.com>
+In-Reply-To: <20231020122359.vwia7sxrcjyeo3ov@pushover>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On 20.10.23 19:26, Andreas Hindborg (Samsung) wrote:
->> +
->> +    /// Overrides the default MMD write function for writing a MMD regi=
-ster.
->> +    fn write_mmd(_dev: &mut Device, _devnum: u8, _regnum: u16, _val: u1=
-6) -> Result {
->> +        Err(code::ENOTSUPP)
->> +    }
->> +
->> +    /// Callback for notification of link change.
->> +    fn link_change_notify(_dev: &mut Device) {}
->=20
-> It is probably an error if these functions are called, and so BUG() would=
- be
-> appropriate? See the discussion in [1].
 
-Please do not use `BUG()` I wanted to wait for my patch [1] to be merged
-before suggesting this, since then Tomo can then just use the constant
-that I introduced.
 
-> [1] https://lore.kernel.org/rust-for-linux/20231019171540.259173-1-benno.=
-lossin@proton.me/
+On 10/20/2023 5:53 PM, Nishanth Menon wrote:
+> On 16:47-20231020, Ravi Gunasekaran wrote:
+>> The errata i2329 affects certain K3 SoC versions. The k3-socinfo.c
+>> driver generates the revision string for different variants of the
+>> same SoC in an incremental fashion. This is not true for all SoCs.
+>> An example case being J721E, for which the actual silicon revision
+>> names are 1.0, 1.1 for its variants, while the k3-socinfo.c driver
+>> interprets these variants as revisions 1.0, 2.0 respectively,
+>> which is incorrect.
+>>
+>> While the work to fixup the silicon revision string is posted
+>> to the soc tree, this patch serves as a fail-safe step by maintaining
+>> a list of correct and incorrect revision strings, so that the fixup
+>> work does not break the errata workaround for such corrected SoCs.
+>>
+>> The silicon revisions affected by the errata i2329 can be found under
+>> the MDIO module in the "Advisories by Modules" section of each
+>> SoC errata document listed below
+>>
+>> AM62x: https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
+>> AM64X: https://www.ti.com/lit/er/sprz457g/sprz457g.pdf
+>> AM65X: https://www.ti.com/lit/er/sprz452i/sprz452i.pdf
+>> J7200: https://www.ti.com/lit/er/sprz491d/sprz491d.pdf
+>> J721E: https://www.ti.com/lit/er/sprz455d/sprz455d.pdf
+>> J721S2: https://www.ti.com/lit/er/sprz530b/sprz530b.pdf
+>>
+>> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+>> ---
+>>
+>> Changes since v1:
+>> * For J721E, retained the incorrect SR ID and added the correct one
+>> * Add AM65x SR2.1 to the workaround list
+>>
+>> v1: https://lore.kernel.org/all/20231018140009.1725-1-r-gunasekaran@ti.com/
+>>
+>>  drivers/net/ethernet/ti/davinci_mdio.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/ti/davinci_mdio.c b/drivers/net/ethernet/ti/davinci_mdio.c
+>> index 628c87dc1d28..25aaef502edc 100644
+>> --- a/drivers/net/ethernet/ti/davinci_mdio.c
+>> +++ b/drivers/net/ethernet/ti/davinci_mdio.c
+>> @@ -516,9 +516,11 @@ static const struct soc_device_attribute k3_mdio_socinfo[] = {
+>>  	{ .family = "AM64X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
+>>  	{ .family = "AM65X", .revision = "SR1.0", .data = &am65_mdio_soc_data },
+>>  	{ .family = "AM65X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
+>> +	{ .family = "AM65X", .revision = "SR2.1", .data = &am65_mdio_soc_data },
+>>  	{ .family = "J7200", .revision = "SR1.0", .data = &am65_mdio_soc_data },
+>>  	{ .family = "J7200", .revision = "SR2.0", .data = &am65_mdio_soc_data },
+>>  	{ .family = "J721E", .revision = "SR1.0", .data = &am65_mdio_soc_data },
+>> +	{ .family = "J721E", .revision = "SR1.1", .data = &am65_mdio_soc_data },
+>>  	{ .family = "J721E", .revision = "SR2.0", .data = &am65_mdio_soc_data },
+>>  	{ .family = "J721S2", .revision = "SR1.0", .data = &am65_mdio_soc_data},
+>>  	{ /* sentinel */ },
+>>
+> Looks like every device is impacted -> so, why not just flip the
+> logic to indicate devices that are NOT impacted? is'nt that a smaller
+> list?
+>
 
---=20
-Cheers,
-Benno
+At the moment, the list of unaffected devices is small. But as and when we
+introduce more devices,
+this list will need update. Also I feel that few years down the line, when
+someone looks at the code,
+a list of affected devices provides a better context as it is easier to trace it
+back to the errata document.
 
+Regards,
+Ravi
 
 
