@@ -1,135 +1,91 @@
-Return-Path: <netdev+bounces-42911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E837D0978
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 09:24:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFD847D09A1
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 09:40:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 651EA2823A3
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 07:24:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAB3C280D50
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 07:40:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6A8D2ED;
-	Fri, 20 Oct 2023 07:24:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="YTUKyOrG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B5FD51E;
+	Fri, 20 Oct 2023 07:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9D1D2E9
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 07:24:38 +0000 (UTC)
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 182F593
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 00:24:37 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-4081ccf69dcso9355155e9.0
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 00:24:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1697786675; x=1698391475; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=r8pT1s1kfw0GJwmKhQGn88Ip0iEpewkZfNcKow1l4UE=;
-        b=YTUKyOrGAE1DvKgFBm89ifys9gdWKSAnG8pbHdrQHwm+AgVvLFGN5I6MGVHDr1sRnS
-         Br1IPajYKtu6Lyul9onmgAYDRsxN8vDcDrzHmPU2WwY4KWMd6YcCviV8M/HvC4WA8u9n
-         jkf/m2tS0FPA1edpTPDgWe8FiYskUWhb5Fdse2dCP8Y1OGi2ekXgTDnABzIBFdVyj2Js
-         qYgwT0wmVmw6B0DJPebBaGhSVdUckjPJk+JdkjFSr4zU+JtjomW75uMi7126Kfmmph5f
-         2ZDFIR212kMmy5EIAu1gYrxoWqzJuiHXDQJbOW6rq6S9rt1T/fLdNST6GGP/AdHOVm86
-         FDGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697786675; x=1698391475;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r8pT1s1kfw0GJwmKhQGn88Ip0iEpewkZfNcKow1l4UE=;
-        b=WfWELACBxMzh+rhK2AL+7L4sBWRI+QlVrFk1NmStNoh7anw8LICrdW3l4K3Zrw1C39
-         6GbmMWRO9bzCA6gJn0q92MvI0oJmO+DdUtpzl678xn5BqfFK+WStUEjoiz9Onv3DtFud
-         z8/PyTFc1p7HbeWlqKu/QbHCfQWA2Fz5AjqveO2HzW/PeeKsm/X+MLRnDp748547tfeP
-         OzzS6P9fR4PNrM3bveOz1TyMReoDvOUsihC3gP3K+wE+68KDBj3KXsrTn4eUF79udyYB
-         MKrpsmCzwCnaRsMHzJ9Lsb6PwNNSVP2kzFviRhgSwyifYahJb7P803JKrOOZ6IfXZK33
-         F2YQ==
-X-Gm-Message-State: AOJu0YzXDueYG/WF+8RMHdBsHSNEw2IxaWHpBuM2OqGHJo0Tp8cEKW1Z
-	rWz0EkFARlwEWfcteSUUDemD6Q==
-X-Google-Smtp-Source: AGHT+IHjLzkWkbS4gDN5abkloPHZhvpXu91Mtc7ljOj1ESpZgHcX2SyfWrz4Qwk+DYmnIhh8H10Erw==
-X-Received: by 2002:a05:600c:46d1:b0:3fe:1fd9:bedf with SMTP id q17-20020a05600c46d100b003fe1fd9bedfmr847152wmo.11.1697786675604;
-        Fri, 20 Oct 2023 00:24:35 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:4cb:3d1b:4444:11a6? ([2a01:e0a:b41:c160:4cb:3d1b:4444:11a6])
-        by smtp.gmail.com with ESMTPSA id c8-20020a05600c0a4800b0040775fd5bf9sm1508944wmq.0.2023.10.20.00.24.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Oct 2023 00:24:35 -0700 (PDT)
-Message-ID: <62714d2c-8afc-4d9b-b8b2-85f9caf18eeb@6wind.com>
-Date: Fri, 20 Oct 2023 09:24:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85ED2D2EF;
+	Fri, 20 Oct 2023 07:40:48 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 060CD93;
+	Fri, 20 Oct 2023 00:40:46 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 39K7eWK013948985, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.93/5.92) with ESMTPS id 39K7eWK013948985
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 20 Oct 2023 15:40:33 +0800
+Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Fri, 20 Oct 2023 15:40:32 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Fri, 20 Oct 2023 15:40:32 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
+ 15.01.2375.007; Fri, 20 Oct 2023 15:40:32 +0800
+From: Hayes Wang <hayeswang@realtek.com>
+To: Ferenc Fejes <fejes@inf.elte.hu>, Jakub Kicinski <kuba@kernel.org>
+CC: netdev <netdev@vger.kernel.org>,
+        "linux-usb@vger.kernel.org"
+	<linux-usb@vger.kernel.org>
+Subject: RE: r8152: error when loading the module
+Thread-Topic: r8152: error when loading the module
+Thread-Index: AQHaAu61PEdzvjx070SbRfjHpmK89LBSKe1Q//+I1ICAAJAQwA==
+Date: Fri, 20 Oct 2023 07:40:32 +0000
+Message-ID: <d9c75e609001461d8eb0e38c18771cb2@realtek.com>
+References: <aff833bb8b202f12feed5b2682f1361f13e37581.camel@inf.elte.hu>
+	 <20231019174514.384ccca8@kernel.org>
+	 <a05475db018e4e5ea8d24a62e6aab4e4@realtek.com>
+ <47d463bce1ef62ecb34b666f21d7dd0d7439ac23.camel@inf.elte.hu>
+In-Reply-To: <47d463bce1ef62ecb34b666f21d7dd0d7439ac23.camel@inf.elte.hu>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-originating-ip: [172.22.228.6]
+x-kse-serverinfo: RTEXMBS02.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next 2/3] netlink: add variable-length / auto integers
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- johannes@sipsolutions.net, stephen@networkplumber.org, jiri@resnulli.us
-References: <20231018213921.2694459-1-kuba@kernel.org>
- <20231018213921.2694459-3-kuba@kernel.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <20231018213921.2694459-3-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-Le 18/10/2023 à 23:39, Jakub Kicinski a écrit :
-> We currently push everyone to use padding to align 64b values
-> in netlink. Un-padded nla_put_u64() doesn't even exist any more.
-> 
-> The story behind this possibly start with this thread:
-> https://lore.kernel.org/netdev/20121204.130914.1457976839967676240.davem@davemloft.net/
-> where DaveM was concerned about the alignment of a structure
-> containing 64b stats. If user space tries to access such struct
-> directly:
-> 
-> 	struct some_stats *stats = nla_data(attr);
-> 	printf("A: %llu", stats->a);
-> 
-> lack of alignment may become problematic for some architectures.
-> These days we most often put every single member in a separate
-> attribute, meaning that the code above would use a helper like
-> nla_get_u64(), which can deal with alignment internally.
-> Even for arches which don't have good unaligned access - access
-> aligned to 4B should be pretty efficient.
-> Kernel and well known libraries deal with unaligned input already.
-> 
-> Padded 64b is quite space-inefficient (64b + pad means at worst 16B
-> per attr vs 32b which takes 8B). It is also more typing:
-> 
->     if (nla_put_u64_pad(rsp, NETDEV_A_SOMETHING_SOMETHING,
->                         value, NETDEV_A_SOMETHING_PAD))
-> 
-> Create a new attribute type which will use 32 bits at netlink
-> level if value is small enough (probably most of the time?),
-> and (4B-aligned) 64 bits otherwise. Kernel API is just:
-> 
->     if (nla_put_uint(rsp, NETDEV_A_SOMETHING_SOMETHING, value))
-> 
-> Calling this new type "just" sint / uint with no specific size
-> will hopefully also make people more comfortable with using it.
-> Currently telling people "don't use u8, you may need the bits,
-> and netlink will round up to 4B, anyway" is the #1 comment
-> we give to newcomers.
-> 
-> In terms of netlink layout it looks like this:
-> 
->          0       4       8       12      16
-> 32b:     [nlattr][ u32  ]
-> 64b:     [  pad ][nlattr][     u64      ]
-> uint(32) [nlattr][ u32  ]
-> uint(64) [nlattr][     u64      ]
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+RmVyZW5jIEZlamVzIDxmZWplc0BpbmYuZWx0ZS5odT4NCj4gU2VudDogRnJpZGF5LCBPY3RvYmVy
+IDIwLCAyMDIzIDI6MzQgUE0NClsuLi5dDQo+ID4gSG93ZXZlciwgSSBjaGVjayB0aGUgZmlybXdh
+cmUgYW5kIGZpbmQgc29tZSB3cm9uZyBjb250ZW50Lg0KPiA+IENvdWxkIHlvdSByZW1vdmUgL2xp
+Yi9maXJtd2FyZS9ydGxfbmljL3J0bDgxNTZiLTIuZncgYW5kIHVucGx1ZyB0aGUgZGV2aWNlLg0K
+PiA+IFRoZW4sIHBsdWcgdGhlIGRldmljZSBhbmQgY2hlY2sgaXQgYWdhaW4uDQo+IA0KPiBZZXMs
+IEknbGwgZG8gdGhhdCwgYnV0IHN0cmFuZ2VseSBlbm91Z2ggdGhlIGVycm9yIGhhcyBkaXNhcHBl
+YXJlZCBzaW5jZQ0KPiB0aGVuLiBJIHBsYXllZCB3aXRoIHRoZSBzZXR1cCB5ZXN0ZXJkYXkgYSBs
+aXR0bGUgbW9yZS4gVGhlIE5JQyBpcw0KPiBhY3R1YWxseSBidWlsdCBpbnRvIG15IG1vbml0b3Is
+IHdoaWNoIGlzIGFsd2F5cyBwb3dlcmVkIG9uIC0gc28NCj4gcmVnYXJkbGVzcyBpZiBteSBsYXB0
+b3AgY29ubmVjdGVkIG9yIG5vdCwgdGhlIE5JQyBpcyBwcm9iYWJseSBvbi4gSQ0KPiByZWJvb3Rl
+ZCB0byBXaW5kb3dzLCBhbmQgdGhlbiByZWJvb3RlZCB0byBMaW51eCwgYW5kIG1hZ2ljYWxseSB0
+aGUgYnVnDQo+IGp1c3QgZGlzYXBwZWFyZWQuDQo+IA0KPiBJcyB0aGlzIHBvc3NpYmxlL21ha2Vz
+IHNlbnNlIHRvIHlvdT8NCg0KSSBndWVzcyBpdCBpcyByZWxhdGl2ZSB0byB0aGUgZmlybXdhcmUu
+DQpNYXliZSB0aGUgd2luZG93cyBsb2FkIHRoZSBjb3JyZWN0IGZpcm13YXJlLCBhbmQgZml4IGl0
+Lg0KDQpCZXN0IFJlZ2FyZHMsDQpIYXllcw0KDQoNCg==
 
