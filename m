@@ -1,128 +1,267 @@
-Return-Path: <netdev+bounces-42978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC5857D0E4A
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:18:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06A607D0E6C
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 13:32:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86FBB28241D
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 11:18:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 341A51C20E61
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 11:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CFE18C24;
-	Fri, 20 Oct 2023 11:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="izV7M6VY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A9A18E29;
+	Fri, 20 Oct 2023 11:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475DA18B04
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:18:09 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50CC0CA;
-	Fri, 20 Oct 2023 04:18:07 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39KBHhj2034034;
-	Fri, 20 Oct 2023 06:17:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1697800663;
-	bh=lsAeSoK43n/QTcYg4kVAxzU7Yseh9TpDXJToFJLPGy0=;
-	h=From:To:CC:Subject:Date;
-	b=izV7M6VYkysbLu+/iIr8qmIiWUhriC6gaQutRJ8boYmoZeSud70WGh7XKu2015igZ
-	 fSLUgh2ExPno2Zkxdpyb4XOrWRy2S6a3D/cj2wFEg9ickerZi7BW+YOj6FO1KTnQdF
-	 kgGVBPnyjLObOKOd40tmMq2Nz4em9V8tjkQY1AJ8=
-Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39KBHheH015355
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 20 Oct 2023 06:17:43 -0500
-Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE113.ent.ti.com
- (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 20
- Oct 2023 06:17:43 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 20 Oct 2023 06:17:43 -0500
-Received: from uda0500640.dal.design.ti.com (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39KBHciW020272;
-	Fri, 20 Oct 2023 06:17:39 -0500
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
-To: <nm@ti.com>, <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <rogerq@kernel.org>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
-        <horms@kernel.org>, <linux-omap@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH net-next v2] net: ethernet: ti: davinci_mdio: Update K3 SoCs list for errata i2329
-Date: Fri, 20 Oct 2023 16:47:38 +0530
-Message-ID: <20231020111738.14671-1-r-gunasekaran@ti.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E583CA75;
+	Fri, 20 Oct 2023 11:32:26 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97DD21A8;
+	Fri, 20 Oct 2023 04:32:21 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 39KBVHwcC4163596, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.93/5.92) with ESMTPS id 39KBVHwcC4163596
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 20 Oct 2023 19:31:17 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Fri, 20 Oct 2023 19:31:17 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Fri, 20 Oct 2023 19:31:17 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
+ 15.01.2375.007; Fri, 20 Oct 2023 19:31:16 +0800
+From: Hayes Wang <hayeswang@realtek.com>
+To: Douglas Anderson <dianders@chromium.org>,
+        Jakub Kicinski
+	<kuba@kernel.org>,
+        "David S . Miller" <davem@davemloft.net>
+CC: Grant Grundler <grundler@chromium.org>, Edward Hill <ecgh@chromium.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        Simon Horman
+	<horms@kernel.org>, Laura Nao <laura.nao@collabora.com>,
+        Alan Stern
+	<stern@rowland.harvard.edu>,
+        =?iso-8859-1?Q?Bj=F8rn_Mork?= <bjorn@mork.no>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH v4 5/5] r8152: Block future register access if register access fails
+Thread-Topic: [PATCH v4 5/5] r8152: Block future register access if register
+ access fails
+Thread-Index: AQHaAtJRIbIHTuR1b0yzMA85nEY4kLBSW1lw
+Date: Fri, 20 Oct 2023 11:31:16 +0000
+Message-ID: <eaf05cf1486c418790a1b54cbcda3a98@realtek.com>
+References: <20231019212130.3146151-1-dianders@chromium.org>
+ <20231019142019.v4.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
+In-Reply-To: <20231019142019.v4.5.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-originating-ip: [172.22.228.6]
+x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-The errata i2329 affects certain K3 SoC versions. The k3-socinfo.c
-driver generates the revision string for different variants of the
-same SoC in an incremental fashion. This is not true for all SoCs.
-An example case being J721E, for which the actual silicon revision
-names are 1.0, 1.1 for its variants, while the k3-socinfo.c driver
-interprets these variants as revisions 1.0, 2.0 respectively,
-which is incorrect.
+Douglas Anderson <dianders@chromium.org>
+> Sent: Friday, October 20, 2023 5:20 AM
+[...]
+>  static int generic_ocp_read(struct r8152 *tp, u16 index, u16 size,
+> @@ -8265,6 +8353,17 @@ static int rtl8152_pre_reset(struct usb_interface =
+*intf)
+>         if (!tp)
+>                 return 0;
+>=20
+> +       /* We can only use the optimized reset if we made it to the end o=
+f
+> +        * probe without any register access fails, which sets
+> +        * `PROBED_WITH_NO_ERRORS` to true. If we didn't have that then r=
+eturn
+> +        * an error here which tells the USB framework to fully unbind/re=
+bind
+> +        * our driver.
+> +        */
+> +       if (!test_bit(PROBED_WITH_NO_ERRORS, &tp->flags)) {
+> +               mutex_unlock(&tp->control);
 
-While the work to fixup the silicon revision string is posted
-to the soc tree, this patch serves as a fail-safe step by maintaining
-a list of correct and incorrect revision strings, so that the fixup
-work does not break the errata workaround for such corrected SoCs.
+I think you forget to remove mutex_unlock here.
 
-The silicon revisions affected by the errata i2329 can be found under
-the MDIO module in the "Advisories by Modules" section of each
-SoC errata document listed below
+> +               return -EIO;
+> +       }
+> +
+>         netdev =3D tp->netdev;
+>         if (!netif_running(netdev))
+>                 return 0;
+> @@ -8277,7 +8376,9 @@ static int rtl8152_pre_reset(struct usb_interface *=
+intf)
+>         napi_disable(&tp->napi);
+>         if (netif_carrier_ok(netdev)) {
+>                 mutex_lock(&tp->control);
+> +               set_bit(IN_PRE_RESET, &tp->flags);
+>                 tp->rtl_ops.disable(tp);
+> +               clear_bit(IN_PRE_RESET, &tp->flags);
+>                 mutex_unlock(&tp->control);
+>         }
+>=20
+> @@ -8293,6 +8394,8 @@ static int rtl8152_post_reset(struct usb_interface =
+*intf)
+>         if (!tp)
+>                 return 0;
+>=20
+> +       rtl_set_accessible(tp);
+> +
 
-AM62x: https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
-AM64X: https://www.ti.com/lit/er/sprz457g/sprz457g.pdf
-AM65X: https://www.ti.com/lit/er/sprz452i/sprz452i.pdf
-J7200: https://www.ti.com/lit/er/sprz491d/sprz491d.pdf
-J721E: https://www.ti.com/lit/er/sprz455d/sprz455d.pdf
-J721S2: https://www.ti.com/lit/er/sprz530b/sprz530b.pdf
+Excuse me. I have a new idea. You could check if it is possible.
+If you remove test_bit(PROBED_WITH_NO_ERRORS, &tp->flags) in pre_reset(),
+the driver wouldn't be unbound and rebound. Instead, you test PROBED_WITH_N=
+O_ERRORS
+here to re-initialize the device. Then, you could limit the times of USB re=
+set, and
+the infinite loop wouldn't occur. The code would be like the following,
 
-Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
----
+	if (!test_bit(PROBED_WITH_NO_ERRORS, &tp->flags)) {
+		/* re-init */
+		mutex_lock(&tp->control);
+		tp->rtl_ops.init(tp);
+		mutex_unlock(&tp->control);
+		rtl_hw_phy_work_func_t(&tp->hw_phy_work.work);
 
-Changes since v1:
-* For J721E, retained the incorrect SR ID and added the correct one
-* Add AM65x SR2.1 to the workaround list
+		/* re-open(). Maybe move after checking netif_running(netdev) */
+		mutex_lock(&tp->control);
+		tp->rtl_ops.up(tp);
+		mutex_unlock(&tp->control);
 
-v1: https://lore.kernel.org/all/20231018140009.1725-1-r-gunasekaran@ti.com/
+		/* check if there is any control error */
+		if (test_bit(RTL8152_INACCESSIBLE, &tp->flags) {
+			if (tp->reg_access_reset_count < REGISTER_ACCESS_MAX_RESETS) {
+				/* queue reset again ? */
+			} else {
+				...
+			}
+			/* return 0 ? */
+		} else {
+			set_bit(PROBED_WITH_NO_ERRORS, &tp->flags)
+		}
+	}
 
- drivers/net/ethernet/ti/davinci_mdio.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/ti/davinci_mdio.c b/drivers/net/ethernet/ti/davinci_mdio.c
-index 628c87dc1d28..25aaef502edc 100644
---- a/drivers/net/ethernet/ti/davinci_mdio.c
-+++ b/drivers/net/ethernet/ti/davinci_mdio.c
-@@ -516,9 +516,11 @@ static const struct soc_device_attribute k3_mdio_socinfo[] = {
- 	{ .family = "AM64X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
- 	{ .family = "AM65X", .revision = "SR1.0", .data = &am65_mdio_soc_data },
- 	{ .family = "AM65X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
-+	{ .family = "AM65X", .revision = "SR2.1", .data = &am65_mdio_soc_data },
- 	{ .family = "J7200", .revision = "SR1.0", .data = &am65_mdio_soc_data },
- 	{ .family = "J7200", .revision = "SR2.0", .data = &am65_mdio_soc_data },
- 	{ .family = "J721E", .revision = "SR1.0", .data = &am65_mdio_soc_data },
-+	{ .family = "J721E", .revision = "SR1.1", .data = &am65_mdio_soc_data },
- 	{ .family = "J721E", .revision = "SR2.0", .data = &am65_mdio_soc_data },
- 	{ .family = "J721S2", .revision = "SR1.0", .data = &am65_mdio_soc_data},
- 	{ /* sentinel */ },
+Best Regards,
+Hayes
 
-base-commit: 2030579113a1b1b5bfd7ff24c0852847836d8fd1
--- 
-2.17.1
+>         /* reset the MAC address in case of policy change */
+>         if (determine_ethernet_addr(tp, &sa) >=3D 0) {
+>                 rtnl_lock();
+> @@ -9494,17 +9597,35 @@ static u8 __rtl_get_hw_ver(struct usb_device *ude=
+v)
+>         __le32 *tmp;
+>         u8 version;
+>         int ret;
+> +       int i;
+>=20
+>         tmp =3D kmalloc(sizeof(*tmp), GFP_KERNEL);
+>         if (!tmp)
+>                 return 0;
+>=20
+> -       ret =3D usb_control_msg(udev, usb_rcvctrlpipe(udev, 0),
+> -                             RTL8152_REQ_GET_REGS, RTL8152_REQT_READ,
+> -                             PLA_TCR0, MCU_TYPE_PLA, tmp, sizeof(*tmp),
+> -                             USB_CTRL_GET_TIMEOUT);
+> -       if (ret > 0)
+> -               ocp_data =3D (__le32_to_cpu(*tmp) >> 16) & VERSION_MASK;
+> +       /* Retry up to 3 times in case there is a transitory error. We do=
+ this
+> +        * since retrying a read of the version is always safe and this
+> +        * function doesn't take advantage of r8152_control_msg() which w=
+ould
+> +        * queue up a reset upon error.
+> +        *
+> +        * NOTE: The fact that this read never queues up a reset prevents=
+ us
+> +        * from getting into a unbind/bind loop if usb_control_msg() fail=
+s
+> +        * 100% of the time. This is the first control message we do at
+> +        * probe time and 3 failures in a row here will cause probe to fa=
+il.
+> +        */
+> +       for (i =3D 0; i < 3; i++) {
+> +               ret =3D usb_control_msg(udev, usb_rcvctrlpipe(udev, 0),
+> +                                     RTL8152_REQ_GET_REGS, RTL8152_REQT_=
+READ,
+> +                                     PLA_TCR0, MCU_TYPE_PLA, tmp, sizeof=
+(*tmp),
+> +                                     USB_CTRL_GET_TIMEOUT);
+> +               if (ret > 0) {
+> +                       ocp_data =3D (__le32_to_cpu(*tmp) >> 16) & VERSIO=
+N_MASK;
+> +                       break;
+> +               }
+> +       }
+> +
+> +       if (i !=3D 0 && ret > 0)
+> +               dev_warn(&udev->dev, "Needed %d retries to read version\n=
+", i);
+>=20
+>         kfree(tmp);
+>=20
+> @@ -9784,7 +9905,29 @@ static int rtl8152_probe(struct usb_interface *int=
+f,
+>         else
+>                 device_set_wakeup_enable(&udev->dev, false);
+>=20
+> -       netif_info(tp, probe, netdev, "%s\n", DRIVER_VERSION);
+> +       mutex_lock(&tp->control);
+> +       if (test_bit(RTL8152_INACCESSIBLE, &tp->flags)) {
+> +               /* If the device is marked inaccessible before probe even
+> +                * finished then one of two things happened. Either we go=
+t a
+> +                * USB error during probe or the user already unplugged t=
+he
+> +                * device.
+> +                *
+> +                * If we got a USB error during probe then we skipped doi=
+ng a
+> +                * reset in r8152_control_msg() and deferred it to here. =
+This
+> +                * is because the queued reset will give up after 1 secon=
+d
+> +                * (see usb_lock_device_for_reset()) and we want to make =
+sure
+> +                * that we queue things up right before probe finishes.
+> +                *
+> +                * If the user already unplugged the device then the USB
+> +                * framework will call unbind right away for us. The extr=
+a
+> +                * reset we queue up here will be harmless.
+> +                */
+> +               usb_queue_reset_device(tp->intf);
+> +       } else {
+> +               set_bit(PROBED_WITH_NO_ERRORS, &tp->flags);
+> +               netif_info(tp, probe, netdev, "%s\n", DRIVER_VERSION);
+> +       }
+> +       mutex_unlock(&tp->control);
+>=20
+>         return 0;
+>=20
+> --
+> 2.42.0.758.gaed0368e0e-goog
 
 
