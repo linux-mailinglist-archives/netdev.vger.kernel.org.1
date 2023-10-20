@@ -1,259 +1,227 @@
-Return-Path: <netdev+bounces-43149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18AEE7D197B
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 01:10:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2400A7D1981
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 01:14:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BD8F1F22456
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCE922826EB
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F5E354E7;
-	Fri, 20 Oct 2023 23:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50800354F3;
+	Fri, 20 Oct 2023 23:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="olB2ipdp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZaD4G/iU"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0661A71B;
-	Fri, 20 Oct 2023 23:10:25 +0000 (UTC)
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CBFD46;
-	Fri, 20 Oct 2023 16:10:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1697843425; x=1729379425;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=c2MTKVsVzkxUvuTXCIBYynqyIqF6GoiRRdW1Io8kXV0=;
-  b=olB2ipdpmrErNEPPqkAcvHeE5XPGI+ZRg5cNoud+FquCGIR0YvzcoaJ5
-   CwwQKJMVvYh+tVIh4dQohISTEwKRgJOxLD9yF6qevp6caJFG1g+9itvj6
-   xCuBhh0vTiwBenGFIwR62FH8c4CSTkhfAuzP3OucwYn01MYbPSLP5AOVf
-   4=;
-X-IronPort-AV: E=Sophos;i="6.03,239,1694736000"; 
-   d="scan'208";a="611265191"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 23:10:23 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com (Postfix) with ESMTPS id 2429E486DE;
-	Fri, 20 Oct 2023 23:10:16 +0000 (UTC)
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:9435]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.246:2525] with esmtp (Farcaster)
- id 9fe161c2-9fba-4e93-9c67-a745e55eb32a; Fri, 20 Oct 2023 23:10:16 +0000 (UTC)
-X-Farcaster-Flow-ID: 9fe161c2-9fba-4e93-9c67-a745e55eb32a
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09DD1A71B;
+	Fri, 20 Oct 2023 23:14:28 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F24AD4C;
+	Fri, 20 Oct 2023 16:14:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697843663; x=1729379663;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bLcPcHZbkrvAw5FiOXY4tD18ENRrMbEIaIa+BiVqaA8=;
+  b=ZaD4G/iU2xDpBpyLZPTvliCeYjiJqb1s9XNwOXO/+sWmEZUzseFahZeV
+   7CHwqqUBxufyKXyV8dWiUX4DstnAdCkcbcnB6HWL5FTyqaS1IJxa+pzQD
+   8muB6XCcVL3UzQv7BMiOEqR/5S/Iky6goO8lQeA+GKF0sM/pmxqQapPdk
+   w5ZGKODd8igBht62Q+t3zBGxqWxzD6q7+0hAbr29vnClMo2YfThBcF+rx
+   DxX4COyyVDNNmHxb7B9lTlHYaKERv3bTXdPfF87cku2OYghMFwL7iiiLU
+   MwERw2Mp/9LNkcjxWF3v4o9wohht3n+SfCW57KHeAoC34RMOFqD99tU6Q
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="417721976"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="417721976"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 16:14:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="757605163"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="757605163"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Oct 2023 16:14:22 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 20 Oct 2023 16:14:22 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 20 Oct 2023 16:14:21 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Fri, 20 Oct 2023 16:14:21 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Fri, 20 Oct 2023 23:10:15 +0000
-Received: from 88665a182662.ant.amazon.com (10.142.223.91) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Fri, 20 Oct 2023 23:10:11 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <martin.lau@linux.dev>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <haoluo@google.com>, <john.fastabend@gmail.com>,
-	<jolsa@kernel.org>, <kpsingh@kernel.org>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <mykolal@fb.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@google.com>,
-	<sinquersw@gmail.com>, <song@kernel.org>, <yonghong.song@linux.dev>
-Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie generation/validation SOCK_OPS hooks.
-Date: Fri, 20 Oct 2023 16:10:03 -0700
-Message-ID: <20231020231003.51313-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <16bad14a-a99c-a2a2-ccdc-6c44c9c4ad1d@linux.dev>
-References: <16bad14a-a99c-a2a2-ccdc-6c44c9c4ad1d@linux.dev>
+ 15.1.2507.32; Fri, 20 Oct 2023 16:14:21 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UD6PbJH5jPSbp8Hp9MV4HObgMZsb3rar4eShQPyTjCsuDTK4hd4ht58ZGLcI3t1L0ObY/OC3DbZib80bySF6rucOksazLaEL3x8DirLat7lW/l4YFMxfdDDUReWQ6ioRC0hrsS5XIwE2/ZHATMFHjDyJITTBf47DiA2uEIFbnfOCH5OApfhjzqbOpHRDfbSErCrIolwyzV8y9QHes3iCHxJXORHjQpUzcs/F8UdSuluIQQ+XJpZi/x4X/DDT1hH2Jh4oR98FYvnRPsImQb7J6Umz/qvj+H7WpCJ5eK9MLTkAz3ui9JY+AyXtgFe2iSjcJTL09D3NcMj7OMzZDDk7EA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S4wAw7ZscDvpTEZUNlD/v8/uREucx48kM3UnJbT4d/s=;
+ b=T5fTk7LKU8g2BBdWhARRWBH4EyE8sS8+HBok16EReeUrI35Fi+dcomfx6PYEeNH563ZtlgoppBAyuLcY14vZKlK9fw4cKEsy/mf8bBvV7E8OOzMgzxtHxucqjiWapsELVnXGPhe+J7PsvhtwkSipeWTGtbitGOZiRXzDuRn6JA7rGcnn9U1A1J4R1mVIpl9suPFLonORyxqkoRieDt2FNOLferMtUkDAHC8ZYykcMV4IHENnak1sQVH97C/cJMd4GfkxfxYQcOA1D3tCQe67uS48sc6xWyq+3OAy2k9i6Q5v1jJzRizV3FsytDxsRgHt1i2VY7yWgLt56v6a8WI1mQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
+ by IA1PR11MB7248.namprd11.prod.outlook.com (2603:10b6:208:42c::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Fri, 20 Oct
+ 2023 23:14:19 +0000
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::2329:7c5f:350:9f8]) by SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::2329:7c5f:350:9f8%7]) with mapi id 15.20.6907.022; Fri, 20 Oct 2023
+ 23:14:19 +0000
+Message-ID: <c2c0dbe8-eee5-4e87-a115-7424ba06d21b@intel.com>
+Date: Fri, 20 Oct 2023 17:14:11 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next v4 1/6] net: ethtool: allow
+ symmetric-xor RSS hash for any flow type
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <mkubecek@suse.cz>, <andrew@lunn.ch>, <willemdebruijn.kernel@gmail.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>, <corbet@lwn.net>,
+	<netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<jesse.brandeburg@intel.com>, <edumazet@google.com>,
+	<anthony.l.nguyen@intel.com>, <horms@kernel.org>, <vladimir.oltean@nxp.com>,
+	Jacob Keller <jacob.e.keller@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+	<pabeni@redhat.com>, <davem@davemloft.net>
+References: <20231016154937.41224-1-ahmed.zaki@intel.com>
+ <20231016154937.41224-2-ahmed.zaki@intel.com>
+ <8d1b1494cfd733530be887806385cde70e077ed1.camel@gmail.com>
+ <26812a57-bdd8-4a39-8dd2-b0ebcfd1073e@intel.com>
+ <CAKgT0Ud7JjUiE32jJbMbBGVexrndSCepG54PcGYWHJ+OC9pOtQ@mail.gmail.com>
+ <14feb89d-7b4a-40c5-8983-5ef331953224@intel.com>
+ <CAKgT0UfcT5cEDRBzCxU9UrQzbBEgFt89vJZjz8Tow=yAfEYERw@mail.gmail.com>
+ <20231016163059.23799429@kernel.org>
+ <CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
+ <20231017131727.78e96449@kernel.org>
+ <CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
+ <20231017173448.3f1c35aa@kernel.org>
+ <CAKgT0Udz+YdkmtO2Gbhr7CccHtBbTpKich4er3qQXY-b2inUoA@mail.gmail.com>
+ <20231018165020.55cc4a79@kernel.org>
+ <45c6ab9f-50f6-4e9e-a035-060a4491bded@intel.com>
+ <20231020153316.1c152c80@kernel.org>
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+In-Reply-To: <20231020153316.1c152c80@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0184.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b3::7) To SN7PR11MB7420.namprd11.prod.outlook.com
+ (2603:10b6:806:328::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.142.223.91]
-X-ClientProxiedBy: EX19D044UWA004.ant.amazon.com (10.13.139.7) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|IA1PR11MB7248:EE_
+X-MS-Office365-Filtering-Correlation-Id: 66131e54-db63-45c3-98bf-08dbd1c2494f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TFMnbvmHOHiejPOHimxUAxbXWq3qN+gumryjGMioXDRWB8zfUlhDVSdjM+UVFNE5J7mgrnOkjhbDIpi0g1E9836CmBYEOu7mPKQ+zUHITdp32CQkUx4qMggoHSwyI/gJeGDxnicFb1jJlRQBWmAbaBdRICFxxK5k7mIsOma/lt5ALN5ZFSGYainbVusEXzmuRLNE2Ywi+S0e/+IIfmdtIsPFk1UmDg67gr4oOkCv3/tkjrQ01wiSX9oIS+YYsZNli+/jXLRd2Gr26tdCb+Tnp0fxogHU/kgWukDdGXf3sSn5lvuCDTeJ3RtUOT0MImYcPAYPgSbg09afqC7RFit3v8NZIH89j7Xa72CiTV7AdGmOZpT8MhSHduBHrE+6eVUrXv46PPKLTbkrWgQG3ooKKNRMUx8uk1spA0uwrXd+W2Beemw0jZncLA/U7SzFNUH29u+kfYa0+ljB4ZVLCwwhgc4B20Lvk0ZGgm2EYa9RVKSYnqeMoiGQ0aGIY7+McNhwmR0DHwy4j2wpsjbQhE5MTSsG0veo3F4JxNPhRVkjQgRCG3NB0Svwz2q1dH2PiFN+7evsYlsXEd1wpuxNA6CzQwXjMMWQvHFLP+MhHNbAwauIEgK+zlE8WA6ylAGb6cWFXJ37V2N34dLsblqI1ifEJrC9bfqP8wnVp31r1JE44n0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(346002)(376002)(396003)(136003)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(26005)(6666004)(6506007)(6512007)(53546011)(2616005)(83380400001)(41300700001)(5660300002)(4326008)(8676002)(44832011)(7416002)(8936002)(2906002)(4001150100001)(966005)(478600001)(6486002)(66476007)(66946007)(6916009)(66556008)(54906003)(316002)(82960400001)(86362001)(38100700002)(31696002)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VmVRYUdSSTF6VnZnbldmT1NvZXVyMUJOREVmYkp5UFp4NnBQTXpsM25sZGs5?=
+ =?utf-8?B?ZmcxdHFidkNRdkJKNGNnU2VFWWluN1AvWVF6dDh3NHhtYncwNkVGbzV3V0Uw?=
+ =?utf-8?B?d1hCdjkrRGxNSFZyLzdXM01walo3WUcrRWh1M0xhNTgxWWY5T0l6OVR5cTFn?=
+ =?utf-8?B?M01UVk1aemhMaDBsY2VtdGh2MngzbGZkbEg3cjNXUStOMXl1WFFkaHJhNjlQ?=
+ =?utf-8?B?RThuUE5QVE9HQWs4ZVlzbDd5OU05bjd3QzY1NmhYYzJjYnRuNmZJRjZkdGhv?=
+ =?utf-8?B?S3Y5MGNhMDR0RDl0eGYvYTVOYkNzcXNvRmhpeThMT2djOWdaOU1HOUNzRmk0?=
+ =?utf-8?B?d3lMT2ZUU2pKVjh2dHRqV3A3VEdRcXJFenBhVkpEb01sakh0Rk5ubGxqQU4z?=
+ =?utf-8?B?aytSSEtZQmlmaXBDUnlEdmFiYmNQK3NSTUhOeXNLcVpmWUZvQUlyenIrUkIy?=
+ =?utf-8?B?SjRVVzQyVndwYVdSUEZKOVB4NHcyQmgwQW1SdG45U21iU0xEdzBXQzBGZ3Bo?=
+ =?utf-8?B?azB1ZStIak5qNDdVaUJyam96S29ML2ZGUEVrY2RpWUIwZU9HeW5VQUpOZ0xN?=
+ =?utf-8?B?QXFaSnB4NHZLM1VGM2ZRRDY5UmVhSDEwVVUxdEtTbkZVd1VyeEozRWVSRXBF?=
+ =?utf-8?B?WllCUmlqLzI1M3N3L3hLemJDM1Y2dkFyaFcxSExBS0g3YTZpOTdoNHZYbmtP?=
+ =?utf-8?B?enUvV3FoNkpham1KeTd0eWpRUTMxR0oyeXdFN0dSNkgwWnAvZVF1c3hSYlFn?=
+ =?utf-8?B?RFBEcHd0SUg2TzFReWhyZ2Q5b25lSW1RbWJXQ2JZRTdHTnYzV3RFV2xTaHhj?=
+ =?utf-8?B?TU1USVVxMkd2UFpNM0c2QUtwUi9IbzZEdUNLUEhxdE5TeTdwRHBod1RRK3lx?=
+ =?utf-8?B?NGNuYldNcnM3OVdTaTJnaVRiM2g2Nm5HVVIvMU02TGxyRXdFSnRoSUpPbU1C?=
+ =?utf-8?B?NkZXMmlLTjhzWmZTM3ZsbklKSnR1QjZpaUs0M1NtTnZmM1NsYW1pc0xJb2FN?=
+ =?utf-8?B?cndKaE9tVEwzQW1jaGJBSWo4dFYzS0tUY28vbkxBRTdWUEs2Z2JqRFdRaG4x?=
+ =?utf-8?B?SDNNRXl6NC8rdEd3RUhQR3FZa2ZoRU13cTdNdmd5TCtjZnYybXdybzkvSnN5?=
+ =?utf-8?B?ZWUyeEg0TC9wRlpqZmZkMWRSVWFHcEtkZFZSOC9XbVdGaXEyUHd0UkFHQWta?=
+ =?utf-8?B?a3JEMEp4R2F3dmlCMzJWc1k2VGJ1eG9SVFhEVkJQTFVGaE5OdXdicndpN2FV?=
+ =?utf-8?B?NCtBODZidkczMkhMN1ZWLzk5WkloTVVuYi9idzkzc0s5Rm51THd0Vm5sclMr?=
+ =?utf-8?B?cWtPVFJFbU5nZlc4SXpPZmNxN0tEUkVKVFhKVDluOFBGNG9aWHh4TWNScVM1?=
+ =?utf-8?B?bjFiSERYVnRXZVZ4ZkZpOWoxdFN3b2hzVHBvc2tEOGFCcHlyZmVaSXh4dkx3?=
+ =?utf-8?B?T1R2YlFXdU4yMzJwdFRDMldjQXRlK0NGelczcnZ5UWZSS2dmcHRlbnhMbDNR?=
+ =?utf-8?B?SjNoUXFnc0N3K0syNTI4NTNGaTZ1S0thNExuMnZJM0ZHazVMUDhWWHM1V1p3?=
+ =?utf-8?B?azhOOTBvWk1hSlk3S3dEUE1GaHErRk1DWXlhckJrLy81WEJtWUQ3djRRKzRa?=
+ =?utf-8?B?NFJuQ3dsMWtDSHhBRDRhV0w2QmpTSFR1QlY1WVV1emxRRzBpc01lWVVCcC9G?=
+ =?utf-8?B?alJGWWhqVXR3R1RNMkZWM1c2WGk0VXV2MWdXY0t5SzNBOGJONlRIOFJzanJj?=
+ =?utf-8?B?dW5SN0J0VUV5R08rRGdBWm9hOVZRQnFEVkM4YTBQVWhYRVBaa1dheEo1SG5S?=
+ =?utf-8?B?ZjZ5TXNkUmI4b0RRZjBCazB3ZVNyS1JXaGkrRHpNNHdrY05pWjlldzdqZFFT?=
+ =?utf-8?B?N2U5M1RjYjNZZ2xJUWN6akM0SE8xTHdJVDRFcVBFS2RxSzBEdHJuS3JhT3Mr?=
+ =?utf-8?B?d3NMd0hlUXNPaGFuNGF3Zmovbm1TWjhqZlREV1JRNnBxRWR6cFRmcVdtYk5s?=
+ =?utf-8?B?c2tqOFZKTHMzRDdtVUdIZVZxUlpqSzRhUkJzank5L1RTd0tKQjNSSWRmTTR3?=
+ =?utf-8?B?VGg4clQyYkdxdTR1VWxaanRYdVFFemdJaTY1K1h5cENYbzJONXJ2c2phWGNC?=
+ =?utf-8?Q?rY8vSQ+bQtNnx1NwpYQyoL/Lo?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66131e54-db63-45c3-98bf-08dbd1c2494f
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 23:14:18.9021
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 69/Lr1pehUGF0iqcOzXYCU18tCSyepNwkecb7K7Ud0aAgeSPQCBled9x+Ru9fEITF6kb8xSmSzZ6iKAXYyi9RQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7248
+X-OriginatorOrg: intel.com
 
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Date: Fri, 20 Oct 2023 12:59:00 -0700
-> On 10/19/23 11:01 AM, Kuniyuki Iwashima wrote:
-> > From: Martin KaFai Lau <martin.lau@linux.dev>
-> > Date: Thu, 19 Oct 2023 00:25:00 -0700
-> >> On 10/18/23 3:31 PM, Kuniyuki Iwashima wrote:
-> >>> From: Kui-Feng Lee <sinquersw@gmail.com>
-> >>> Date: Wed, 18 Oct 2023 14:47:43 -0700
-> >>>> On 10/18/23 10:20, Kuniyuki Iwashima wrote:
-> >>>>> From: Eric Dumazet <edumazet@google.com>
-> >>>>> Date: Wed, 18 Oct 2023 10:02:51 +0200
-> >>>>>> On Wed, Oct 18, 2023 at 8:19 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
-> >>>>>>>
-> >>>>>>> On 10/17/23 9:48 AM, Kuniyuki Iwashima wrote:
-> >>>>>>>> From: Martin KaFai Lau <martin.lau@linux.dev>
-> >>>>>>>> Date: Mon, 16 Oct 2023 22:53:15 -0700
-> >>>>>>>>> On 10/13/23 3:04 PM, Kuniyuki Iwashima wrote:
-> >>>>>>>>>> Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
-> >>>>>>>>>> After 3WHS, the proxy restores SYN and forwards it and ACK to the backend
-> >>>>>>>>>> server.  Our kernel module works at Netfilter input/output hooks and first
-> >>>>>>>>>> feeds SYN to the TCP stack to initiate 3WHS.  When the module is triggered
-> >>>>>>>>>> for SYN+ACK, it looks up the corresponding request socket and overwrites
-> >>>>>>>>>> tcp_rsk(req)->snt_isn with the proxy's cookie.  Then, the module can
-> >>>>>>>>>> complete 3WHS with the original ACK as is.
-> >>>>>>>>>
-> >>>>>>>>> Does the current kernel module also use the timestamp bits differently?
-> >>>>>>>>> (something like patch 8 and patch 10 trying to do)
-> >>>>>>>>
-> >>>>>>>> Our SYN Proxy uses TS as is.  The proxy nodes generate a random number
-> >>>>>>>> if TS is in SYN.
-> >>>>>>>>
-> >>>>>>>> But I thought someone would suggest making TS available so that we can
-> >>>>>>>> mock the default behaviour at least, and it would be more acceptable.
-> >>>>>>>>
-> >>>>>>>> The selftest uses TS just to strengthen security by validating 32-bits
-> >>>>>>>> hash.  Dropping a part of hash makes collision easier to happen, but
-> >>>>>>>> 24-bits were sufficient for us to reduce SYN flood to the managable
-> >>>>>>>> level at the backend.
-> >>>>>>>
-> >>>>>>> While enabling bpf to customize the syncookie (and timestamp), I want to explore
-> >>>>>>> where can this also be done other than at the tcp layer.
-> >>>>>>>
-> >>>>>>> Have you thought about directly sending the SYNACK back at a lower layer like
-> >>>>>>> tc/xdp after receiving the SYN?
-> >>>>>
-> >>>>> Yes.  Actually, at netconf I mentioned the cookie generation hook will not
-> >>>>> be necessary and should be replaced with XDP.
-> >>
-> >> Right, it is also what I have been thinking when seeing the
-> >> BPF_SOCK_OPS_GEN_SYNCOOKIE_CB carrying the bpf generated timestamp to the
-> >> tcp_make_synack. It feels like trying hard to work with the tcp want_cookie
-> >> logic while there is an existing better alternative in tc/xdp to deal with synflood.
-> >>
-> >>>>>
-> >>>>>
-> >>>>>>> There are already bpf_tcp_{gen,check}_syncookie
-> >>>>>>> helper that allows to do this for the performance reason to absorb synflood. It
-> >>>>>>> will be natural to extend it to handle the customized syncookie also.
-> >>>>>
-> >>>>> Maybe we even need not extend it and can use XDP as said below.
-> >>>>>
-> >>>>>
-> >>>>>>>
-> >>>>>>> I think it should already be doable to send a SYNACK back with customized
-> >>>>>>> syncookie (and timestamp) at tc/xdp today.
-> >>>>>>>
-> >>>>>>> When ack is received, the prog@tc/xdp can verify the cookie. It will probably
-> >>>>>>> need some new kfuncs to create the ireq and queue the child socket. The bpf prog
-> >>>>>>> can change the ireq->{snd_wscale, sack_ok...} if needed. The details of the
-> >>>>>>> kfuncs need some more thoughts. I think most of the bpf-side infra is ready,
-> >>>>>>> e.g. acquire/release/ref-tracking...etc.
-> >>>>>>>
-> >>>>>>
-> >>>>>> I think I mostly agree with this.
-> >>>>>
-> >>>>> I didn't come up with kfunc to create ireq and queue it to listener, so
-> >>>>> cookie_v[46]_check() were best place for me to extend easily, but now it
-> >>>>> sounds like kfunc would be the way to go.
-> >>>>>
-> >>>>> Maybe we can move the core part of cookie_v[46]_check() except for kernel
-> >>>>> cookie's validation to __cookie_v[46]_check() and expose a wrapper of it
-> >>>>> as kfunc ?
-> >>>>>
-> >>>>> Then, we can look up sk and pass the listener, skb, and flags (for sack_ok,
-> >>>>> etc) to the kfunc.  (It could still introduce some conflicts with Eric's
-> >>>>> patch though...)
-> >>>>
-> >>>> Does that mean the packets handled in this way (in XDP) will skip all
-> >>>> netfilter at all?
-> >>>
-> >>> Good point.
-> >>>
-> >>> If we want not to skip other layers, maybe we can use tc ?
-> >>>
-> >>> 1) allocate ireq and set sack_ok etc with kfunc
-> >>> 2) bpf_sk_assign() to set ireq to skb (this could be done in kfunc above)
-> >>> 3) let inet_steal_sock() return req->sk_listener if not sk_fullsock(sk)
-> >>> 4) if skb->sk is reqsk in cookie_v[46]_check(), skip validation and
-> >>>      req allocation and create full sk
-> >>
-> >> Haven't looked at the details. The above feels reasonable and would be nice if
-> >> it works out. don't know if the skb at tc can be used in cookie_v[46]_check() as
-> >> is. It probably needs more thoughts.  [ note, xdp does not have skb. ]
-> >>
-> >> Regarding the "allocate ireq and set sack_ok etc with kfunc", do you think it
-> >> will be useful (and potentially cleaner) even for the
-> >> BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB if it needed to go back to consider skops? Then
-> >> only do the BPF_SOCK_OPS_CHECK_SYNCOOKIE_CB and the xdp/tc can generate SYNACK.
-> >> The xdp/tc can still do the check and drop the bad ACK earlier in the stack.
-> > 
-> > kfunc would be useful if we want to fall back to the default
-> > validation, but I think we should not allocate ireq in kfunc.
-> > 
-> > The SOCK_OPS prog only returns a binary value.  If we decide whether
-> > we skip validation or not based on kfunc call (ireq allocation), the
-> > flow would be like :
-> > 
-> >    1. CG_OK & ireq is allocated -> skip validation and req allocation
-> >    2. CG_OK & no ireq           -> default validation
-> >    3. CG_ERR                    -> RST
-> > 
-> > The problem here is that if kfunc fails with -ENOMEM and cookie
-> > is valid, we need a way to tell the kernel to drop the ACK instead
-> > of sending RST.  (I hope the prog could return CG_DROP...)
+
+
+On 2023-10-20 16:33, Jakub Kicinski wrote:
+> On Fri, 20 Oct 2023 15:24:41 -0600 Ahmed Zaki wrote:
+>>> IMO fat warning in the documentation and ethtool man saying that this
+>>> makes the algo (any / all) vulnerable to attack would be enough.
+>>> Willem?
+>>
+>> Please advise on the next step. Should I send a new version with the Doc
+>> warning, or will you use v5?
 > 
-> bpf_set_retval() helper allows the cgrp bpf prog to return -ENOMEM. Take a look 
-> at how __cgroup_bpf_run_filter_getsockopt is using the return value of 
-> bpf_prog_run_array_cg() and an example in progs/cgroup_getset_retval_getsockopt.c.
-
-Oh, this is nice, I assumed -EPERM was always returned.
-
-
-> > If we allocate ireq first, it would be cleaner as bpf need not care
-> > about the drop path.
-> > 
-> >    1. CG_OK & mss is set -> skip validation
-> >    2. CG_OK & no mss set -> default validation
-> >    3. CG_ERR             -> RST
+> Not just the doc changes:
 > 
-> Even if it uses the mss set/not-set like above to decide drop/rst. Does it 
-> really need to pre-allocate ireq? Looking at the test, the bpf prog is not using 
-> the skops->sk either.
-
-It uses skops->remote_ip4 etc, maybe this was another reason why
-I chose pre-alloc, but yes, it's not needed.  The same value can
-be extraced from skb with bpf_skb_load_bytes_relative(BPF_HDR_START_NET).
-
-
-> It would be nice to allow bpf prog to check the cookie first before creating 
-> ireq. The kernel also checks the cookie first before tcp_parse_option and ireq 
-> creation. Beside, I suspect the multiple "if ([!]bpf_cookie)" checks in 
-> cookie_v[46]_check() is due to the pre-alloc ireq requirement.
+> | We can use one of the reserved fields of struct ethtool_rxfh to carry
+> | this extension. I think I asked for this at some point, but there's
+> | only so much repeated feedback one can send in a day :(
 > 
-> What does it take to create an ireq? sk, skb, tcp_opt, and mss? Potentially, it 
-> could have a "bpf_skops_parse_tcp_options(struct bpf_sock_ops_kern *skops, 
-> struct tcp_options_received *opt_rx, u32 opt_rx__sz)" to initialize the tcp_opt. 
-> I think the bpf prog should be able to parse the tcp options by itself also and 
-> directly initialize the tcp_opt.
+> https://lore.kernel.org/all/20231016163059.23799429@kernel.org/
 
-Yes, also the prog will not need to parse all the options unless
-the validation algorithm needs to becaues SACK_PERMITTED, WSCALE,
-MSS (and ECN bits) are only available in SYN.
+I replied to that here:
 
-So, the prog will just need to parse timestamps option with
-bpf_load_hdr_opt() and can initialise tcp_opt based on ISN
-(and/or TS).
+https://lore.kernel.org/all/afb4a06f-cfba-47ba-adb3-09bea7cb5f00@intel.com/
 
+I am kind of confused now so please bear with me. ethtool either sends 
+"ethtool_rxfh" or "ethtool_rxnfc". AFAIK "ethtool_rxfh" is the interface 
+for "ethtool -X" which is used to set the RSS algorithm. But we kind of 
+agreed to go with "ethtool -U|-N" for symmetric-xor, and that uses 
+"ethtool_rxnfc" (as implemented in this series).
 
-> The "bpf_skops_alloc_tcp_req(struct bpf_sock_ops_kern *skops, struct 
-> tcp_options_received *opt_rx, u32 opt_rx__size, int mss,...)" could directly 
-> save the "ireq" in skops->ireq (new member). If skops->ireq is available, the 
-> kernel could then skip most of the ireq initialization and directly continue the 
-> remaining processing (e.g. directly to security_inet_conn_request() ?). would 
-> that work?
+Do you mean use "ethtool_rxfh" instead of "ethtool_rxnfc"? how would 
+that work on the ethtool user interface?
 
-Yes, that will work.
+Finally, a note on Alex's comment:
+ >It doesn't make sense to place it in the input flags and will just
+ > cause quick congestion as things get added there. This is an algorithm
+ > change so it makes more sense to place it there.
+
+the "ethtool_rxnfc->data" is 64 bits and we are only using 8 bits so far.
+
+Thank you.
 
