@@ -1,138 +1,104 @@
-Return-Path: <netdev+bounces-43000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F017D0F99
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:24:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A19D7D0FA1
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:27:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F41942824D9
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:24:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B93312824A5
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C2319BBA;
-	Fri, 20 Oct 2023 12:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4FE19BC3;
+	Fri, 20 Oct 2023 12:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="OeXVPHWj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B9ScRoQw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E38219BB9
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 12:24:22 +0000 (UTC)
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B546811B;
-	Fri, 20 Oct 2023 05:24:20 -0700 (PDT)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39KCO0vV047247;
-	Fri, 20 Oct 2023 07:24:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1697804640;
-	bh=bleI4hpWyyBKUFt0bBQEFx8HzzITluGATb+vZs7VYt8=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=OeXVPHWjvXRcjbTO+bazmngXBveqtbabpXRmcbib5HuBrLQ5YRxe2aUNYNFIFP40B
-	 9yiY5kiWch6CLp+Exj369cTtnFY/EXkZY8KjxrgtJBxEvRHvuyr/fYTl1mddQAXor/
-	 KkfLl5UJPVAytjOkGrjxYwOQFG00j3IQpti/FoGU=
-Received: from DFLE111.ent.ti.com (dfle111.ent.ti.com [10.64.6.32])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39KCO0EQ053300
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 20 Oct 2023 07:24:00 -0500
-Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 20
- Oct 2023 07:23:59 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 20 Oct 2023 07:23:59 -0500
-Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39KCNxEc121092;
-	Fri, 20 Oct 2023 07:23:59 -0500
-Date: Fri, 20 Oct 2023 07:23:59 -0500
-From: Nishanth Menon <nm@ti.com>
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <pabeni@redhat.com>, <rogerq@kernel.org>, <andrew@lunn.ch>,
-        <f.fainelli@gmail.com>, <horms@kernel.org>,
-        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH net-next v2] net: ethernet: ti: davinci_mdio: Update K3
- SoCs list for errata i2329
-Message-ID: <20231020122359.vwia7sxrcjyeo3ov@pushover>
-References: <20231020111738.14671-1-r-gunasekaran@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEDD1549A;
+	Fri, 20 Oct 2023 12:27:31 +0000 (UTC)
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020FB11B;
+	Fri, 20 Oct 2023 05:27:30 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-9be02fcf268so115235266b.3;
+        Fri, 20 Oct 2023 05:27:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697804848; x=1698409648; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OKzUbAm0CD7VIaW1XEsEu4drZXTXz0teauAQXRdleN8=;
+        b=B9ScRoQwiS38jUL1MK6XSaEVQcG1y0CfW0/WeNNjW7rfXsVI9zpXKSvsJVGXpWryh0
+         ueH4LBQLtziWxBZRYEth8jFkp5PJgPgrFnwdro9ZIORI0UF+poMfMGflf8yN4zN1u9SB
+         mmqyXmJbbH7pXYD6aMan2Qa3B+nWmGt08S4/zddlRceHB9m4UXel49iS55p0yXnQZFAM
+         /MBikar/EKoSxIDcpjVuMkwD98/mIyKXbTMFplzCjI4dCeVT1EeOZ2dTbWZvvUeOm4+O
+         sf1smE5P92X840eQy6SY/DsHct264Nerk4lH7OzDuxxq1cVE5X+TlGCKCdhjcOiK0f+8
+         AyVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697804848; x=1698409648;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OKzUbAm0CD7VIaW1XEsEu4drZXTXz0teauAQXRdleN8=;
+        b=ROH+MYZX2DXB7+zTZdyNHGWIhu0g7NkvKg6ZysLFlO1VrM9Ek/dhB2dq2nvcwOteh9
+         oTDCEEiXNgXH0W4ZHY0qLFL61sUg/bI6fx6KID4ZziIRvx49jvzGxhhoyqRG/eryWw6L
+         0FgKtWZyHNzDoaOjFkuceQ4l2vdm+8FLHgcwVELvPzig4UJcaG7xFOJLuq781A7UPCcG
+         HPuRfvnLACCEYhDmpG4sOk1/B3XfJ+qBKJgAtHqPRIVI4++g19Po9rcRWTf/CzT9O6Bh
+         tYF3PNeEYTQDujMYKkTDb3YeN7T1c0nBIO0fea3QNKHKDnB1AXas2ghfKGeCtTwrRdUc
+         BJyg==
+X-Gm-Message-State: AOJu0YxqkjIVJYDX77RjYq/V/5vBC2h/IDKtJqXDbVDTtCziI36HPb2E
+	kj1uFHLbVoHlSYeQhxJ+MYI=
+X-Google-Smtp-Source: AGHT+IEkaDt4p+jBPoM1BNqVVTJsTIgpikA/nhvf4/pah9cW8W7yFnCtrDIlmywp9daPxLcMJ1hJpQ==
+X-Received: by 2002:a17:907:25c4:b0:9c1:bee1:b7eb with SMTP id ae4-20020a17090725c400b009c1bee1b7ebmr1311347ejc.37.1697804848144;
+        Fri, 20 Oct 2023 05:27:28 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id n17-20020a170906089100b009c3f8f46c22sm1411263eje.77.2023.10.20.05.27.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Oct 2023 05:27:27 -0700 (PDT)
+Date: Fri, 20 Oct 2023 15:27:25 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Rob Herring <robh@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org,
+	Gregory Clement <gregory.clement@bootlin.com>
+Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: dsa: Require ports or
+ ethernet-ports
+Message-ID: <20231020122725.2fotbdwmmu575ndd@skbuf>
+References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
+ <20231018-marvell-88e6152-wan-led-v4-1-3ee0c67383be@linaro.org>
+ <169762516670.391804.7528295251386913602.robh@kernel.org>
+ <CACRpkdZ4hkiD6jwENqjZRX8ZHH9+3MSMMLcJe6tJa=6Yhn1w=g@mail.gmail.com>
+ <cfc0375e-50eb-4772-9104-3b1a95b7ca4a@linaro.org>
+ <CACRpkdbKxmMk+-OcB6zgH7Nf_jL-AV7H_S4eEcjjjywK0xCJ4Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231020111738.14671-1-r-gunasekaran@ti.com>
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+In-Reply-To: <CACRpkdbKxmMk+-OcB6zgH7Nf_jL-AV7H_S4eEcjjjywK0xCJ4Q@mail.gmail.com>
 
-On 16:47-20231020, Ravi Gunasekaran wrote:
-> The errata i2329 affects certain K3 SoC versions. The k3-socinfo.c
-> driver generates the revision string for different variants of the
-> same SoC in an incremental fashion. This is not true for all SoCs.
-> An example case being J721E, for which the actual silicon revision
-> names are 1.0, 1.1 for its variants, while the k3-socinfo.c driver
-> interprets these variants as revisions 1.0, 2.0 respectively,
-> which is incorrect.
-> 
-> While the work to fixup the silicon revision string is posted
-> to the soc tree, this patch serves as a fail-safe step by maintaining
-> a list of correct and incorrect revision strings, so that the fixup
-> work does not break the errata workaround for such corrected SoCs.
-> 
-> The silicon revisions affected by the errata i2329 can be found under
-> the MDIO module in the "Advisories by Modules" section of each
-> SoC errata document listed below
-> 
-> AM62x: https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
-> AM64X: https://www.ti.com/lit/er/sprz457g/sprz457g.pdf
-> AM65X: https://www.ti.com/lit/er/sprz452i/sprz452i.pdf
-> J7200: https://www.ti.com/lit/er/sprz491d/sprz491d.pdf
-> J721E: https://www.ti.com/lit/er/sprz455d/sprz455d.pdf
-> J721S2: https://www.ti.com/lit/er/sprz530b/sprz530b.pdf
-> 
-> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
-> ---
-> 
-> Changes since v1:
-> * For J721E, retained the incorrect SR ID and added the correct one
-> * Add AM65x SR2.1 to the workaround list
-> 
-> v1: https://lore.kernel.org/all/20231018140009.1725-1-r-gunasekaran@ti.com/
-> 
->  drivers/net/ethernet/ti/davinci_mdio.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/davinci_mdio.c b/drivers/net/ethernet/ti/davinci_mdio.c
-> index 628c87dc1d28..25aaef502edc 100644
-> --- a/drivers/net/ethernet/ti/davinci_mdio.c
-> +++ b/drivers/net/ethernet/ti/davinci_mdio.c
-> @@ -516,9 +516,11 @@ static const struct soc_device_attribute k3_mdio_socinfo[] = {
->  	{ .family = "AM64X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
->  	{ .family = "AM65X", .revision = "SR1.0", .data = &am65_mdio_soc_data },
->  	{ .family = "AM65X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
-> +	{ .family = "AM65X", .revision = "SR2.1", .data = &am65_mdio_soc_data },
->  	{ .family = "J7200", .revision = "SR1.0", .data = &am65_mdio_soc_data },
->  	{ .family = "J7200", .revision = "SR2.0", .data = &am65_mdio_soc_data },
->  	{ .family = "J721E", .revision = "SR1.0", .data = &am65_mdio_soc_data },
-> +	{ .family = "J721E", .revision = "SR1.1", .data = &am65_mdio_soc_data },
->  	{ .family = "J721E", .revision = "SR2.0", .data = &am65_mdio_soc_data },
->  	{ .family = "J721S2", .revision = "SR1.0", .data = &am65_mdio_soc_data},
->  	{ /* sentinel */ },
-> 
+On Fri, Oct 20, 2023 at 01:41:22PM +0200, Linus Walleij wrote:
+> I can't reproduce this, make dt_bindings_check in the mainline kernel
+> does not yield this warning
 
-Looks like every device is impacted -> so, why not just flip the
-logic to indicate devices that are NOT impacted? is'nt that a smaller
-list?
-
--- 
-Regards,
-Nishanth Menon
-Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
+You used the actual command that the bot posted, right? aka "make DT_CHECKER_FLAGS=-m dt_binding_check"?
+I am also seeing the yamllint warning.
 
