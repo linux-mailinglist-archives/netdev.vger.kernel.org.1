@@ -1,168 +1,229 @@
-Return-Path: <netdev+bounces-43039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82A327D1192
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 16:27:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 573E57D1194
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 16:28:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B444C1C20FBC
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:27:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12CEE28200A
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:28:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF45D1D6B1;
-	Fri, 20 Oct 2023 14:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4321D69D;
+	Fri, 20 Oct 2023 14:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="jeGUr4pu"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="E4vhIFOt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DCD1D54D
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:27:02 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A424D69
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 07:27:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=tQiuhQrJ8ggo4FBxFW6ZKQfCGt5PUIz5lmq5edpww0o=; b=jeGUr4pu7mYokLopgNibLUhvYP
-	07tPURncISwq5m+nYCcghK5Ta+K6EMPO4cxG/KdBMPSrNOaxdmtYMIFFIgS1EA164iiOv0Ed3DAZ8
-	99oXxnAeeoMk9/RQslBt1mgKYOnPIBe4lgujORjW4+u0S4Owa1sHGmJSYd0RsIG1dKsFBwBGd3J42
-	J2U7T3oZRgzqIax22N15HRU05bfDcpRHKnmw2lHwDQTwfJiw7i+Pg4mUbCOl2j/FGpYkQ3V2wcr+n
-	7DZHmF4ixw4RopxMvWKHWz1KTBTd+17+Ikq4cKxpvtzUwCuintsocjG6lino+94sYukF2gKuJbFgc
-	0e5fUP/g==;
-Received: from [192.168.1.4] (port=55476 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qtqR6-00076N-1Y;
-	Fri, 20 Oct 2023 16:25:12 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Fri, 20 Oct 2023 16:25:11 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <netdev@vger.kernel.org>
-CC: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
-	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>, <marex@denx.de>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, <o.rempel@pengutronix.de>, Ante Knezic
-	<ante.knezic@helmholz.de>
-Subject: [PATCH net-next v4 2/2] net: dsa: microchip: add property to select internal RMII reference clock
-Date: Fri, 20 Oct 2023 16:25:04 +0200
-Message-ID: <492ba34018bd5035bcc33402746df121df172f73.1697811160.git.ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <cover.1697811160.git.ante.knezic@helmholz.de>
-References: <cover.1697811160.git.ante.knezic@helmholz.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CFE1D54D
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 14:28:11 +0000 (UTC)
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07A55D46
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 07:28:10 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-5a9d8f4388bso557356a12.3
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 07:28:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1697812089; x=1698416889; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KNIldaP6dGH6fW7mflhfYV57Ti5cupkMZt+LwhjnSho=;
+        b=E4vhIFOttetC01XyunM9CY03bWxEuH8bFbcROhtqfsFusxzXerFbVpjhR5IObn4oyb
+         RsI1qzx/aGXYcEDa8v7D2Nv3H0TCFgmaGi1o39QJHahu1FJx8DTP6iM+WTYnZipaSiHG
+         wtvrB1peUl+x5jqSURncii4/x1JNQ4s9ZJFzeed6Q4Z/mZWQ7HiD623hMFAZwfEioHNP
+         AofTdbcDVj2ngEwx+DkEoRsyJNzUhDWi5brryGKpZAoE69nPns4UwADvqktCJ/yVxmDb
+         strAB23+NJlbojOJNydDmj38wvH8q8LN1CvkvNMFTBHsK/IuCTmIkv9zsn8hUwKb8Zty
+         svAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697812089; x=1698416889;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KNIldaP6dGH6fW7mflhfYV57Ti5cupkMZt+LwhjnSho=;
+        b=bvk7/TG+GkvsCJlmn7t0SAj1ZYaff2g9SdRq43aS7qeQnTqA3zM84zhs0lx3ND0Xrs
+         U7f7MaDTHdK064fzdudedX+lWoXADWsHHSN741AV735bLQsiR3uwR3xMO4hwht+WmYXU
+         1IiwaJWtC4b0r53G5b+oAssWGWKpiZbEsD+Fy47X63PY97XJ2WlrpISzHKHpFxjTIqnt
+         ml740v1/L+M43jCjNjPwBuBtq9Yae3+SHnQwsGj7ZxoQqOg3KstA07QiKwWIyGLb9vma
+         D/S/lYEKEARw8V2Cpj54jYTKu7+QCenDDRx78Rs1JIB6C5aopEgDjtkwAqKBg7EzIX9K
+         BOJw==
+X-Gm-Message-State: AOJu0YzgCiIPqKIzcIKmZoTwQ7t3alYo2L9qPwC/3RVoNdTN+CydGHmD
+	ySXYsccGFDFQYDzAZdx0mrICKTAEY7mfum6d458=
+X-Google-Smtp-Source: AGHT+IHoOjF3baM+niuh84n4gp8OixBneRGVPSUnvejudzNS2Ea8E1gZ7fjR6kBxM3hXUyx1eGouKg==
+X-Received: by 2002:a05:6a20:432c:b0:17b:1696:e5ea with SMTP id h44-20020a056a20432c00b0017b1696e5eamr2283269pzk.14.1697812089399;
+        Fri, 20 Oct 2023 07:28:09 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c5e:44fb:1ae7:ff4d:7ac7:3fe0? ([2804:14d:5c5e:44fb:1ae7:ff4d:7ac7:3fe0])
+        by smtp.gmail.com with ESMTPSA id p22-20020a1709028a9600b001c9bca1d705sm1582087plo.242.2023.10.20.07.28.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Oct 2023 07:28:09 -0700 (PDT)
+Message-ID: <6bd93499-97d1-4a43-ac8e-1432f2799b3b@mojatatu.com>
+Date: Fri, 20 Oct 2023 11:28:04 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] sched: act_ct: switch to per-action label
+ counting
+To: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
+References: <20231020124551.10764-1-fw@strlen.de>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20231020124551.10764-1-fw@strlen.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Microchip KSZ8863/KSZ8873 have the ability to select between internal
-and external RMII reference clock. By default, reference clock
-needs to be provided via REFCLKI_3 pin. If required, device can be
-setup to provide RMII clock internally so that REFCLKI_3 pin can be
-left unconnected.
-Add a new "microchip,rmii-clk-internal" property which will set
-RMII clock reference to internal. If property is not set, reference
-clock needs to be provided externally.
+On 20/10/2023 09:45, Florian Westphal wrote:
+> net->ct.labels_used was meant to convey 'number of ip/nftables rules
+> that need the label extension allocated'.
+> 
+> act_ct enables this for each net namespace, which voids all attempts
+> to avoid ct->ext allocation when possible.
+> 
+> Move this increment to the control plane to request label extension
+> space allocation only when its needed.
+> 
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> ---
+>   "tdc.py -c ct" still passes with this applied.
+> 
+>   include/net/tc_act/tc_ct.h |  1 +
+>   net/sched/act_ct.c         | 41 +++++++++++++++++---------------------
+>   2 files changed, 19 insertions(+), 23 deletions(-)
+> 
+> diff --git a/include/net/tc_act/tc_ct.h b/include/net/tc_act/tc_ct.h
+> index b24ea2d9400b..8a6dbfb23336 100644
+> --- a/include/net/tc_act/tc_ct.h
+> +++ b/include/net/tc_act/tc_ct.h
+> @@ -22,6 +22,7 @@ struct tcf_ct_params {
+>   
+>   	struct nf_nat_range2 range;
+>   	bool ipv4_range;
+> +	bool put_labels;
+>   
+>   	u16 ct_action;
+>   
+> diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
+> index 7c652d14528b..9422686f73b0 100644
+> --- a/net/sched/act_ct.c
+> +++ b/net/sched/act_ct.c
+> @@ -690,7 +690,6 @@ static struct tc_action_ops act_ct_ops;
+>   
+>   struct tc_ct_action_net {
+>   	struct tc_action_net tn; /* Must be first */
+> -	bool labels;
+>   };
+>   
+>   /* Determine whether skb->_nfct is equal to the result of conntrack lookup. */
+> @@ -829,8 +828,13 @@ static void tcf_ct_params_free(struct tcf_ct_params *params)
+>   	}
+>   	if (params->ct_ft)
+>   		tcf_ct_flow_table_put(params->ct_ft);
+> -	if (params->tmpl)
+> +	if (params->tmpl) {
+> +		if (params->put_labels)
+> +			nf_connlabels_put(nf_ct_net(params->tmpl));
+> +
+>   		nf_ct_put(params->tmpl);
+> +	}
+> +
+>   	kfree(params);
+>   }
+>   
+> @@ -1154,10 +1158,10 @@ static int tcf_ct_fill_params(struct net *net,
+>   			      struct nlattr **tb,
+>   			      struct netlink_ext_ack *extack)
+>   {
+> -	struct tc_ct_action_net *tn = net_generic(net, act_ct_ops.net_id);
+>   	struct nf_conntrack_zone zone;
+>   	int err, family, proto, len;
+>   	struct nf_conn *tmpl;
+> +	bool put_labels = false;
 
-While at it, move the ksz8795_cpu_interface_select() to
-ksz8_config_cpu_port() to get a cleaner call path for cpu port.
+Shouldn't this be after `struct nf_conntrack_zone zone` to conform to 
+rev-xmas-tree?
 
-Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
----
- drivers/net/dsa/microchip/ksz8795.c     | 28 ++++++++++++++++++++++------
- drivers/net/dsa/microchip/ksz8795_reg.h |  3 +++
- 2 files changed, 25 insertions(+), 6 deletions(-)
+Other than that,
+Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
 
-diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
-index 4bf4d67557dc..b0a305b7c37e 100644
---- a/drivers/net/dsa/microchip/ksz8795.c
-+++ b/drivers/net/dsa/microchip/ksz8795.c
-@@ -1358,6 +1358,9 @@ static void ksz8795_cpu_interface_select(struct ksz_device *dev, int port)
- {
- 	struct ksz_port *p = &dev->ports[port];
- 
-+	if (!ksz_is_ksz87xx(dev))
-+		return;
-+
- 	if (!p->interface && dev->compat_interface) {
- 		dev_warn(dev->dev,
- 			 "Using legacy switch \"phy-mode\" property, because it is missing on port %d node. "
-@@ -1391,18 +1394,28 @@ void ksz8_port_setup(struct ksz_device *dev, int port, bool cpu_port)
- 	/* enable 802.1p priority */
- 	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_802_1P_ENABLE, true);
- 
--	if (cpu_port) {
--		if (!ksz_is_ksz88x3(dev))
--			ksz8795_cpu_interface_select(dev, port);
--
-+	if (cpu_port)
- 		member = dsa_user_ports(ds);
--	} else {
-+	else
- 		member = BIT(dsa_upstream_port(ds, port));
--	}
- 
- 	ksz8_cfg_port_member(dev, port, member);
- }
- 
-+static void ksz88x3_config_rmii_clk(struct ksz_device *dev)
-+{
-+	bool rmii_clk_internal;
-+
-+	if (!ksz_is_ksz88x3(dev))
-+		return;
-+
-+	rmii_clk_internal = of_property_read_bool(dev->dev->of_node,
-+						  "microchip,rmii-clk-internal");
-+
-+	ksz_cfg(dev, KSZ88X3_REG_FVID_AND_HOST_MODE,
-+		KSZ88X3_PORT3_RMII_CLK_INTERNAL, rmii_clk_internal);
-+}
-+
- void ksz8_config_cpu_port(struct dsa_switch *ds)
- {
- 	struct ksz_device *dev = ds->priv;
-@@ -1419,6 +1432,9 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
- 
- 	ksz8_port_setup(dev, dev->cpu_port, true);
- 
-+	ksz8795_cpu_interface_select(dev, dev->cpu_port);
-+	ksz88x3_config_rmii_clk(dev);
-+
- 	for (i = 0; i < dev->phy_port_cnt; i++) {
- 		ksz_port_stp_state_set(ds, i, BR_STATE_DISABLED);
- 	}
-diff --git a/drivers/net/dsa/microchip/ksz8795_reg.h b/drivers/net/dsa/microchip/ksz8795_reg.h
-index 3c9dae53e4d8..beca974e0171 100644
---- a/drivers/net/dsa/microchip/ksz8795_reg.h
-+++ b/drivers/net/dsa/microchip/ksz8795_reg.h
-@@ -22,6 +22,9 @@
- #define KSZ8863_GLOBAL_SOFTWARE_RESET	BIT(4)
- #define KSZ8863_PCS_RESET		BIT(0)
- 
-+#define KSZ88X3_REG_FVID_AND_HOST_MODE  0xC6
-+#define KSZ88X3_PORT3_RMII_CLK_INTERNAL BIT(3)
-+
- #define REG_SW_CTRL_0			0x02
- 
- #define SW_NEW_BACKOFF			BIT(7)
--- 
-2.11.0
+>   	char *name;
+>   
+>   	p->zone = NF_CT_DEFAULT_ZONE_ID;
+> @@ -1186,15 +1190,20 @@ static int tcf_ct_fill_params(struct net *net,
+>   	}
+>   
+>   	if (tb[TCA_CT_LABELS]) {
+> +		unsigned int n_bits = sizeof_field(struct tcf_ct_params, labels) * 8;
+> +
+>   		if (!IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS)) {
+>   			NL_SET_ERR_MSG_MOD(extack, "Conntrack labels isn't enabled.");
+>   			return -EOPNOTSUPP;
+>   		}
+>   
+> -		if (!tn->labels) {
+> +		if (nf_connlabels_get(net, n_bits - 1)) {
+>   			NL_SET_ERR_MSG_MOD(extack, "Failed to set connlabel length");
+>   			return -EOPNOTSUPP;
+> +		} else {
+> +			put_labels = true;
+>   		}
+> +
+>   		tcf_ct_set_key_val(tb,
+>   				   p->labels, TCA_CT_LABELS,
+>   				   p->labels_mask, TCA_CT_LABELS_MASK,
+> @@ -1238,10 +1247,15 @@ static int tcf_ct_fill_params(struct net *net,
+>   		}
+>   	}
+>   
+> +	p->put_labels = put_labels;
+> +
+>   	if (p->ct_action & TCA_CT_ACT_COMMIT)
+>   		__set_bit(IPS_CONFIRMED_BIT, &tmpl->status);
+>   	return 0;
+>   err:
+> +	if (put_labels)
+> +		nf_connlabels_put(net);
+> +
+>   	nf_ct_put(p->tmpl);
+>   	p->tmpl = NULL;
+>   	return err;
+> @@ -1542,32 +1556,13 @@ static struct tc_action_ops act_ct_ops = {
+>   
+>   static __net_init int ct_init_net(struct net *net)
+>   {
+> -	unsigned int n_bits = sizeof_field(struct tcf_ct_params, labels) * 8;
+>   	struct tc_ct_action_net *tn = net_generic(net, act_ct_ops.net_id);
+>   
+> -	if (nf_connlabels_get(net, n_bits - 1)) {
+> -		tn->labels = false;
+> -		pr_err("act_ct: Failed to set connlabels length");
+> -	} else {
+> -		tn->labels = true;
+> -	}
+> -
+>   	return tc_action_net_init(net, &tn->tn, &act_ct_ops);
+>   }
+>   
+>   static void __net_exit ct_exit_net(struct list_head *net_list)
+>   {
+> -	struct net *net;
+> -
+> -	rtnl_lock();
+> -	list_for_each_entry(net, net_list, exit_list) {
+> -		struct tc_ct_action_net *tn = net_generic(net, act_ct_ops.net_id);
+> -
+> -		if (tn->labels)
+> -			nf_connlabels_put(net);
+> -	}
+> -	rtnl_unlock();
+> -
+>   	tc_action_net_exit(net_list, act_ct_ops.net_id);
+>   }
+>   
 
 
