@@ -1,188 +1,150 @@
-Return-Path: <netdev+bounces-43009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACDDC7D0FDB
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:46:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8BA77D0FDC
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:46:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDF0D1C20F12
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:46:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04BF11C20FF7
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:46:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C81814007;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5F415E93;
 	Fri, 20 Oct 2023 12:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="laXN9bG1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AB710A25
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 12:46:04 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04A7610F1
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 05:46:02 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qtot6-0007Rx-HZ; Fri, 20 Oct 2023 14:46:00 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH net-next] sched: act_ct: switch to per-action label counting
-Date: Fri, 20 Oct 2023 14:45:41 +0200
-Message-ID: <20231020124551.10764-1-fw@strlen.de>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8597312E5E
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 12:46:05 +0000 (UTC)
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A21A610F0;
+	Fri, 20 Oct 2023 05:46:03 -0700 (PDT)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5a81ab75f21so8124947b3.2;
+        Fri, 20 Oct 2023 05:46:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697805963; x=1698410763; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jps82JBDACzoR3tUfyIbEtBbVZCxrcf9ApmwOX34umg=;
+        b=laXN9bG1zVF8AtIP8UkdsW4iRjoCMsoW78sUky8pqGfIcUCKqVF3FjUMaqPVB0aEIL
+         ku62I1LU5ZzawW4qAepATyBTtIpAj047WXFJ2Rk67D3TnSRHuGhKP+1IF9HsScbgq3ZF
+         LlLL6M/td5VDMMdOm5eWny9ezycVrh/AYKwnN6g8uBfkldhZAwetXX6HmhKkyZ56LwFb
+         4zFtVi5Nk8hiKI+xlolDk5yPwcLx783Gk25bf55nY4VoGR+EDnSNWpAPClKNMJ1VpxiU
+         z0G5SdkX3fdaVud8BbJGZbXNGgrLeQf1OXj9iAu1BxZpsQ+g9Mt4x3nQ8yGfOn0pqNsx
+         kDBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697805963; x=1698410763;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jps82JBDACzoR3tUfyIbEtBbVZCxrcf9ApmwOX34umg=;
+        b=qhuh/oRxJJJgUOCEPj+/kKXMzOgkjr7fL9gBRn6SAElBVOWH858SZblwIGsgmkiaxA
+         +Xszia2hqTZ6i6y81L2LLECOnYmDvJzB1Pm5ctrvy71+ZcmlhpzqfQAsdrljlNcD8rjK
+         T0aGk0GpJQUVcTll1KvBXUYn24HHtLmgSBBiU3nymeAx736cTTBSXz/FEuAn+Cv2aOQu
+         j2H/jvtSaslQHVqwm4Yk3kxFSEied0IXl8tIFccV9NQyHPSbzgVXRZCrtF3zJXPIq5TU
+         ln2ITDKAZJU3VrTCmkwxvNVzlB6qD6HOA7DQRPBVQMP+Q+o6Iyk2nq4yjj9tkohWa1qJ
+         idXw==
+X-Gm-Message-State: AOJu0YyU70G84/rrY/EOfaMmxuxuAOeVssndcSr1hKLOcMFnSLrfQFyR
+	W+1mZRGhwQvdvkrr8y+JZMQ=
+X-Google-Smtp-Source: AGHT+IE6t/1v27h+fcqmTdO36JdundJNToc6FICMQ+l92k0VypVbJHWYvo6kei8XbZDOyOkNc3/wwA==
+X-Received: by 2002:a05:690c:dc4:b0:5a7:aa54:42b1 with SMTP id db4-20020a05690c0dc400b005a7aa5442b1mr2232055ywb.28.1697805962604;
+        Fri, 20 Oct 2023 05:46:02 -0700 (PDT)
+Received: from localhost ([2607:fb90:3e1a:8bc6:bf58:5f88:bb90:604])
+        by smtp.gmail.com with ESMTPSA id m205-20020a8171d6000000b0059af121d0b8sm654571ywc.52.2023.10.20.05.46.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Oct 2023 05:46:01 -0700 (PDT)
+Date: Fri, 20 Oct 2023 05:46:00 -0700
+From: Yury Norov <yury.norov@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Alexander Potapenko <glider@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-btrfs@vger.kernel.org, dm-devel@redhat.com,
+	ntfs3@lists.linux.dev, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 00/13] ip_tunnel: convert __be16 tunnel flags to
+ bitmaps
+Message-ID: <ZTJ2iKk3sBFzVQJl@yury-ThinkPad>
+References: <20231016165247.14212-1-aleksander.lobakin@intel.com>
+ <ZS148saIsG7WY8ul@yury-ThinkPad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZS148saIsG7WY8ul@yury-ThinkPad>
 
-net->ct.labels_used was meant to convey 'number of ip/nftables rules
-that need the label extension allocated'.
++ Stephen
 
-act_ct enables this for each net namespace, which voids all attempts
-to avoid ct->ext allocation when possible.
+On Mon, Oct 16, 2023 at 10:55:02AM -0700, Yury Norov wrote:
+> On Mon, Oct 16, 2023 at 06:52:34PM +0200, Alexander Lobakin wrote:
+> > Based on top of "Implement MTE tag compression for swapped pages"[0]
+> > from Alexander Potapenko as it uses its bitmap_{read,write}() functions
+> > to not introduce another pair of similar ones.
+> > 
+> > Derived from the PFCP support series[1] as this grew bigger (2 -> 13
+> > commits) and involved more core bitmap changes. Only commits 10 and 11
+> > are from the mentioned tree, the rest is new. PFCP itself still depends
+> > on this series.
+> > 
+> > IP tunnels have their flags defined as `__be16`, including UAPI, and
+> > after GTP was accepted, there are no more free bits left. UAPI (incl.
+> > direct usage of one of the user structs) and explicit Endianness only
+> > complicate things.
+> > Since it would either way end up with hundreds of locs due to all that,
+> > pick bitmaps right from the start to store the flags in the most native
+> > and scalable format with rich API. I don't think it's worth trying to
+> > praise luck and pick smth like u32 only to redo everything in x years :)
+> > More details regarding the IP tunnel flags is in 11 and 13.
+> > 
+> > The rest is just a good bunch of prereqs and tests: a couple of new
+> > helpers and extensions to the old ones, a few optimizations to partially
+> > mitigate IP tunnel object code growth due to __be16 -> long, and
+> > decouping one UAPI struct used throughout the whole kernel into the
+> > userspace and the kernel space counterparts to eliminate the dependency.
+> > 
+> > [0] https://lore.kernel.org/lkml/20231011172836.2579017-1-glider@google.com
+> > [1] https://lore.kernel.org/netdev/20230721071532.613888-1-marcin.szycik@linux.intel.com
 
-Move this increment to the control plane to request label extension
-space allocation only when its needed.
+[...]
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- "tdc.py -c ct" still passes with this applied.
+> > ---
+> > Not sure whether it's fine to have that all in one series, but OTOH
+> > there's not much stuff I could split (like, 3 commits), it either
+> > depends directly (new helpers etc.) or will just generate suboptimal
+> > code w/o some of the commits.
+> > 
+> > I'm also thinking of which tree this would ideally be taken through.
+> > The main subject is networking, but most of the commits are generic.
+> > My idea is to push this via Yury / bitmaps and then ask the netdev
+> > maintainers to pull his tree before they take PFCP (dependent on this
+> > one).
+> 
+> Let's wait for more comments, but I'm generally OK with the generic
+> part, and have nothing against moving it, or the whole series, through
+> bitmap-for-next.
 
- include/net/tc_act/tc_ct.h |  1 +
- net/sched/act_ct.c         | 41 +++++++++++++++++---------------------
- 2 files changed, 19 insertions(+), 23 deletions(-)
+I put this into bitmap-for-next, and it caused build failures for
+Stephen:
 
-diff --git a/include/net/tc_act/tc_ct.h b/include/net/tc_act/tc_ct.h
-index b24ea2d9400b..8a6dbfb23336 100644
---- a/include/net/tc_act/tc_ct.h
-+++ b/include/net/tc_act/tc_ct.h
-@@ -22,6 +22,7 @@ struct tcf_ct_params {
- 
- 	struct nf_nat_range2 range;
- 	bool ipv4_range;
-+	bool put_labels;
- 
- 	u16 ct_action;
- 
-diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-index 7c652d14528b..9422686f73b0 100644
---- a/net/sched/act_ct.c
-+++ b/net/sched/act_ct.c
-@@ -690,7 +690,6 @@ static struct tc_action_ops act_ct_ops;
- 
- struct tc_ct_action_net {
- 	struct tc_action_net tn; /* Must be first */
--	bool labels;
- };
- 
- /* Determine whether skb->_nfct is equal to the result of conntrack lookup. */
-@@ -829,8 +828,13 @@ static void tcf_ct_params_free(struct tcf_ct_params *params)
- 	}
- 	if (params->ct_ft)
- 		tcf_ct_flow_table_put(params->ct_ft);
--	if (params->tmpl)
-+	if (params->tmpl) {
-+		if (params->put_labels)
-+			nf_connlabels_put(nf_ct_net(params->tmpl));
-+
- 		nf_ct_put(params->tmpl);
-+	}
-+
- 	kfree(params);
- }
- 
-@@ -1154,10 +1158,10 @@ static int tcf_ct_fill_params(struct net *net,
- 			      struct nlattr **tb,
- 			      struct netlink_ext_ack *extack)
- {
--	struct tc_ct_action_net *tn = net_generic(net, act_ct_ops.net_id);
- 	struct nf_conntrack_zone zone;
- 	int err, family, proto, len;
- 	struct nf_conn *tmpl;
-+	bool put_labels = false;
- 	char *name;
- 
- 	p->zone = NF_CT_DEFAULT_ZONE_ID;
-@@ -1186,15 +1190,20 @@ static int tcf_ct_fill_params(struct net *net,
- 	}
- 
- 	if (tb[TCA_CT_LABELS]) {
-+		unsigned int n_bits = sizeof_field(struct tcf_ct_params, labels) * 8;
-+
- 		if (!IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS)) {
- 			NL_SET_ERR_MSG_MOD(extack, "Conntrack labels isn't enabled.");
- 			return -EOPNOTSUPP;
- 		}
- 
--		if (!tn->labels) {
-+		if (nf_connlabels_get(net, n_bits - 1)) {
- 			NL_SET_ERR_MSG_MOD(extack, "Failed to set connlabel length");
- 			return -EOPNOTSUPP;
-+		} else {
-+			put_labels = true;
- 		}
-+
- 		tcf_ct_set_key_val(tb,
- 				   p->labels, TCA_CT_LABELS,
- 				   p->labels_mask, TCA_CT_LABELS_MASK,
-@@ -1238,10 +1247,15 @@ static int tcf_ct_fill_params(struct net *net,
- 		}
- 	}
- 
-+	p->put_labels = put_labels;
-+
- 	if (p->ct_action & TCA_CT_ACT_COMMIT)
- 		__set_bit(IPS_CONFIRMED_BIT, &tmpl->status);
- 	return 0;
- err:
-+	if (put_labels)
-+		nf_connlabels_put(net);
-+
- 	nf_ct_put(p->tmpl);
- 	p->tmpl = NULL;
- 	return err;
-@@ -1542,32 +1556,13 @@ static struct tc_action_ops act_ct_ops = {
- 
- static __net_init int ct_init_net(struct net *net)
- {
--	unsigned int n_bits = sizeof_field(struct tcf_ct_params, labels) * 8;
- 	struct tc_ct_action_net *tn = net_generic(net, act_ct_ops.net_id);
- 
--	if (nf_connlabels_get(net, n_bits - 1)) {
--		tn->labels = false;
--		pr_err("act_ct: Failed to set connlabels length");
--	} else {
--		tn->labels = true;
--	}
--
- 	return tc_action_net_init(net, &tn->tn, &act_ct_ops);
- }
- 
- static void __net_exit ct_exit_net(struct list_head *net_list)
- {
--	struct net *net;
--
--	rtnl_lock();
--	list_for_each_entry(net, net_list, exit_list) {
--		struct tc_ct_action_net *tn = net_generic(net, act_ct_ops.net_id);
--
--		if (tn->labels)
--			nf_connlabels_put(net);
--	}
--	rtnl_unlock();
--
- 	tc_action_net_exit(net_list, act_ct_ops.net_id);
- }
- 
--- 
-2.41.0
+https://lore.kernel.org/lkml/20220722191657.1d7282c2@canb.auug.org.au/
 
+I can reproduce them too. So, removing from -next. Alexander, can you
+run another round with all found issues fixed?
+
+Thanks,
+Yury
 
