@@ -1,104 +1,111 @@
-Return-Path: <netdev+bounces-43001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A19D7D0FA1
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:27:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BAA17D0FAD
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:31:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B93312824A5
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:27:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56529B20C19
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4FE19BC3;
-	Fri, 20 Oct 2023 12:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD9219471;
+	Fri, 20 Oct 2023 12:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B9ScRoQw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TweTCJmW"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEDD1549A;
-	Fri, 20 Oct 2023 12:27:31 +0000 (UTC)
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020FB11B;
-	Fri, 20 Oct 2023 05:27:30 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-9be02fcf268so115235266b.3;
-        Fri, 20 Oct 2023 05:27:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47681A711
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 12:30:59 +0000 (UTC)
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46542D49;
+	Fri, 20 Oct 2023 05:30:58 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-5a8ada42c2aso7762647b3.3;
+        Fri, 20 Oct 2023 05:30:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697804848; x=1698409648; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OKzUbAm0CD7VIaW1XEsEu4drZXTXz0teauAQXRdleN8=;
-        b=B9ScRoQwiS38jUL1MK6XSaEVQcG1y0CfW0/WeNNjW7rfXsVI9zpXKSvsJVGXpWryh0
-         ueH4LBQLtziWxBZRYEth8jFkp5PJgPgrFnwdro9ZIORI0UF+poMfMGflf8yN4zN1u9SB
-         mmqyXmJbbH7pXYD6aMan2Qa3B+nWmGt08S4/zddlRceHB9m4UXel49iS55p0yXnQZFAM
-         /MBikar/EKoSxIDcpjVuMkwD98/mIyKXbTMFplzCjI4dCeVT1EeOZ2dTbWZvvUeOm4+O
-         sf1smE5P92X840eQy6SY/DsHct264Nerk4lH7OzDuxxq1cVE5X+TlGCKCdhjcOiK0f+8
-         AyVA==
+        d=gmail.com; s=20230601; t=1697805057; x=1698409857; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=po603pLa6+WCSRfB+kSK68fxdf9syke8GemdI09pYiI=;
+        b=TweTCJmWt58QJ7k5GsMn9IadDX1CerCnT3A+hwl+vEzMtCDu3kzuq7TH4t9QlnMRc4
+         six2o5MvuoaWvz4uX2LnlfZ+DuSIzVH2hkLahj1IoGTSkGqMgTZhBghdG4kvI75gba1e
+         YfWC3hDFv+Nu7BeNO+mgihl0RNmGPH67/UIPE9WCXWqt0xLHAhYH+q96vPe+v8D5gm9L
+         XIU0i1PSP6KsYdj7JwLJvUWgkZ/VhI4Kc0IGLNz1JB673YZx6LF/XrMff9hKMVHbAhus
+         NJZL5Docy8NojZezpvn+jlk1CTgW/fQ16A3NjeQtES+BugVj34Arl+0L4Zuh281MVPWq
+         DxMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697804848; x=1698409648;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OKzUbAm0CD7VIaW1XEsEu4drZXTXz0teauAQXRdleN8=;
-        b=ROH+MYZX2DXB7+zTZdyNHGWIhu0g7NkvKg6ZysLFlO1VrM9Ek/dhB2dq2nvcwOteh9
-         oTDCEEiXNgXH0W4ZHY0qLFL61sUg/bI6fx6KID4ZziIRvx49jvzGxhhoyqRG/eryWw6L
-         0FgKtWZyHNzDoaOjFkuceQ4l2vdm+8FLHgcwVELvPzig4UJcaG7xFOJLuq781A7UPCcG
-         HPuRfvnLACCEYhDmpG4sOk1/B3XfJ+qBKJgAtHqPRIVI4++g19Po9rcRWTf/CzT9O6Bh
-         tYF3PNeEYTQDujMYKkTDb3YeN7T1c0nBIO0fea3QNKHKDnB1AXas2ghfKGeCtTwrRdUc
-         BJyg==
-X-Gm-Message-State: AOJu0YxqkjIVJYDX77RjYq/V/5vBC2h/IDKtJqXDbVDTtCziI36HPb2E
-	kj1uFHLbVoHlSYeQhxJ+MYI=
-X-Google-Smtp-Source: AGHT+IEkaDt4p+jBPoM1BNqVVTJsTIgpikA/nhvf4/pah9cW8W7yFnCtrDIlmywp9daPxLcMJ1hJpQ==
-X-Received: by 2002:a17:907:25c4:b0:9c1:bee1:b7eb with SMTP id ae4-20020a17090725c400b009c1bee1b7ebmr1311347ejc.37.1697804848144;
-        Fri, 20 Oct 2023 05:27:28 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id n17-20020a170906089100b009c3f8f46c22sm1411263eje.77.2023.10.20.05.27.26
+        d=1e100.net; s=20230601; t=1697805057; x=1698409857;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=po603pLa6+WCSRfB+kSK68fxdf9syke8GemdI09pYiI=;
+        b=MkwtQsBAjSq+wUOzCO50p03KezTzlKsGmhht1mWcHEFj9Ur0s0A72d9pkovdQMqrzw
+         5srzuxdy2R3eF++0hf2cRppvVByEMjmB9sjkXiaakvyb0x2jr0HNZRnou2Sdv27kk1OP
+         ausBWtHynB5oZ6GNLyfx648exc6ZXfWXyCm6EpbtyKqk45v5/sHZMvLcFVt73chdQQ8Y
+         uBwwuG7j19f5Tx/f6PuFxYt19VshZyZPh1BO9jahu80aIZwdw8uulq2b5WTtSxxN8SG9
+         4PlaxtSaWLRQ6FT+VVd0TydV8Sjdg59to5mIYnuDwfnoO82HkvZIGD/kYmHcAv8FJzSb
+         u4zA==
+X-Gm-Message-State: AOJu0Ywrf7wwYFWSBbxws/i+/geabpZTMI60k8PW4Fwiy/gqLTXCWx+x
+	RC4Rqj9TAYK41YW2SimMcnU=
+X-Google-Smtp-Source: AGHT+IEOIarenbX043L5oIbX6lbvtuAP32bTGnwRaigZvMyalrTwJO+TskT/MUvUAG4FNXSH60Yzgw==
+X-Received: by 2002:a81:4f57:0:b0:5a7:b8d4:60e1 with SMTP id d84-20020a814f57000000b005a7b8d460e1mr1817405ywb.9.1697805057406;
+        Fri, 20 Oct 2023 05:30:57 -0700 (PDT)
+Received: from localhost ([2607:fb90:3e1a:8bc6:bf58:5f88:bb90:604])
+        by smtp.gmail.com with ESMTPSA id v77-20020a814850000000b005a7daa09f43sm641359ywa.125.2023.10.20.05.30.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 05:27:27 -0700 (PDT)
-Date: Fri, 20 Oct 2023 15:27:25 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Rob Herring <robh@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Fri, 20 Oct 2023 05:30:56 -0700 (PDT)
+Date: Fri, 20 Oct 2023 05:30:55 -0700
+From: Yury Norov <yury.norov@gmail.com>
+To: Alexander Potapenko <glider@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
 	Eric Dumazet <edumazet@google.com>,
-	Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org,
-	Gregory Clement <gregory.clement@bootlin.com>
-Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: dsa: Require ports or
- ethernet-ports
-Message-ID: <20231020122725.2fotbdwmmu575ndd@skbuf>
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-1-3ee0c67383be@linaro.org>
- <169762516670.391804.7528295251386913602.robh@kernel.org>
- <CACRpkdZ4hkiD6jwENqjZRX8ZHH9+3MSMMLcJe6tJa=6Yhn1w=g@mail.gmail.com>
- <cfc0375e-50eb-4772-9104-3b1a95b7ca4a@linaro.org>
- <CACRpkdbKxmMk+-OcB6zgH7Nf_jL-AV7H_S4eEcjjjywK0xCJ4Q@mail.gmail.com>
+	David Ahern <dsahern@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, dm-devel@redhat.com,
+	ntfs3@lists.linux.dev, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 11/13] ip_tunnel: convert __be16 tunnel flags to
+ bitmaps
+Message-ID: <ZTJy/7PMX/kGw2EL@yury-ThinkPad>
+References: <20231016165247.14212-1-aleksander.lobakin@intel.com>
+ <20231016165247.14212-12-aleksander.lobakin@intel.com>
+ <20231018172747.305c65bd@kernel.org>
+ <CAG_fn=XP819PnkoR0G6_anRNq0t_r=drCFx4PT2VgRnrBaUjdA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CACRpkdbKxmMk+-OcB6zgH7Nf_jL-AV7H_S4eEcjjjywK0xCJ4Q@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG_fn=XP819PnkoR0G6_anRNq0t_r=drCFx4PT2VgRnrBaUjdA@mail.gmail.com>
 
-On Fri, Oct 20, 2023 at 01:41:22PM +0200, Linus Walleij wrote:
-> I can't reproduce this, make dt_bindings_check in the mainline kernel
-> does not yield this warning
-
-You used the actual command that the bot posted, right? aka "make DT_CHECKER_FLAGS=-m dt_binding_check"?
-I am also seeing the yamllint warning.
+On Fri, Oct 20, 2023 at 09:41:10AM +0200, Alexander Potapenko wrote:
+> On Thu, Oct 19, 2023 at 2:27 AM Jakub Kicinski <kuba@kernel.org> wrote:
+> >
+> > On Mon, 16 Oct 2023 18:52:45 +0200 Alexander Lobakin wrote:
+> > >  40 files changed, 715 insertions(+), 415 deletions(-)
+> >
+> > This already has at least two conflicts with networking if I'm looking
+> > right. Please let the pre-req's go in via Yury's tree and then send
+> > this for net-next in the next release cycle.
+> 
+> Yury, Andy,
+> 
+> The MTE part of my series will need to be reworked, so it might take a while.
+> Shall I maybe send v8 of
+> https://lore.kernel.org/lkml/20231011172836.2579017-1-glider@google.com/
+> (plus the test) separately to unblock Alexander?
+ 
+You better ask Alexander :). No objections from me.
 
