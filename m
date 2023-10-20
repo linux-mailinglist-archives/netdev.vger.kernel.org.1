@@ -1,145 +1,112 @@
-Return-Path: <netdev+bounces-43078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F3637D1525
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:49:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 219387D1534
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:54:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC9EA281FBD
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:49:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D04C328239C
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952B4208A2;
-	Fri, 20 Oct 2023 17:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E79208AA;
+	Fri, 20 Oct 2023 17:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpjATt11"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WWgkIzPx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3C51DA22;
-	Fri, 20 Oct 2023 17:49:46 +0000 (UTC)
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84E36D67;
-	Fri, 20 Oct 2023 10:49:45 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1ca215cc713so8229115ad.3;
-        Fri, 20 Oct 2023 10:49:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCD91E530;
+	Fri, 20 Oct 2023 17:53:55 +0000 (UTC)
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DB4D55;
+	Fri, 20 Oct 2023 10:53:54 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-59b5484fbe6so12327697b3.1;
+        Fri, 20 Oct 2023 10:53:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697824185; x=1698428985; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A5RsvVPeK0HG7sfE95t4B3GsOpnKWLyM2VBqKfrYhJQ=;
-        b=IpjATt11bOObIE1H7VHclnrtkf8ZPO8Bebk8QNdUIz1FjQG96FHdpM2gY25raD9lWk
-         JGfqUPCiNMCUMc/sAb59kd029UxaC7A9N6vAMKGQBpqDoLrS4wCMZrtQr2ep9wV1UqGv
-         BI38JxoGhz5bPR9TBELvOuRB83FkNjt3B7D+lVkMfRcTSz3trlvkO8f++EE5CGO2Q0WZ
-         Px6VvZsGMjChuQQQAk/M24F33sHpD4fHsoB4XW5+8Gq4ikNHGokUGHBWc4UHj4H4Y5vi
-         HhgLb8skHN644K3QxO5NgZlqShyN9JvFrAGr7BxdyiSxNpwjF8SzSayRiRp97uDH+Qw+
-         YVYA==
+        d=gmail.com; s=20230601; t=1697824434; x=1698429234; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WrkktZKBRPlFCzqyWlpvovV2LO5dRVDhRGH6sL1EBdg=;
+        b=WWgkIzPxn4p4m2QCyxnn7HjZ2WiJYZsQJeqmJbzvY980pNPal5jh/TIX543wbQkry2
+         Or2aB8hqcHlEvTtCuEiE0yunVPxyTMoJzquJxnnBrbBbAtKCJqOHufgS4C6G2f+5n0dg
+         8d2nKRgPR5omRxKPWN256Gh0NalOZLfRl7jYoouCsr2kOQX47qNy7PZbZ0Frbuk3FFf1
+         MxGNem6XS9FWlfCw1j036USuodgRkM4/GFlGnk2WE9I5/PGzxs/wFfZed7TVbe0vJ94U
+         GTseM1cjw9Dn/8gP/VCelRHZqNrHYDdnN/fHmugX6eHIsfTPK7aZdJfO+iHOU2+Jb0f0
+         fcXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697824185; x=1698428985;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A5RsvVPeK0HG7sfE95t4B3GsOpnKWLyM2VBqKfrYhJQ=;
-        b=Djw4FiqNnE65bCvclcKgxTArm+Cj0QgMXVzAKjLZtPe2p2qD/MObg3QD5clQImsVIQ
-         suzgkUc0eCJ6e1fHaGY02P3iibq6UoV8KNlijh/TNxce39Sf3xnF3e1NftAMuREGEEwR
-         IuLmnDBAWfWy9gO+kcKRPKqZSZIFrhSLAZQDRvh89MpAyGYQI9+mEFjliSiwvbn1Gmeq
-         gPlAoTuGKRKqRMs8HqQ7wntAdl6lzjDYgCbPtni6XP3qv90NaYDhPb49Sdp/+k0pO1F1
-         B7Hy4WWckBQgvIhcv968NA03eJC8TejcnY68nuzzZGYZ4CoqnFYU/cdoecAIMWc0igYY
-         oJpg==
-X-Gm-Message-State: AOJu0Yy+Ab81LgllTR+ziIvf8JvORhjErxjqwS5WP/F2fC1MKGRp3kxO
-	IfGIzEnhwfdv5YELFiiYHk8=
-X-Google-Smtp-Source: AGHT+IFnz68PR5GXy3/PUKZX+fizAkSM9rw7oE4h4HRWFmkYlG0Adre5E2jREon0GalpZ47vUsiDKA==
-X-Received: by 2002:a17:903:11cc:b0:1c3:3363:8aea with SMTP id q12-20020a17090311cc00b001c333638aeamr2755996plh.61.1697824184869;
-        Fri, 20 Oct 2023 10:49:44 -0700 (PDT)
-Received: from MacBook-Pro-49.local ([2620:10d:c090:400::4:821f])
-        by smtp.gmail.com with ESMTPSA id ix4-20020a170902f80400b001c74718f2f3sm1801104plb.119.2023.10.20.10.49.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Oct 2023 10:49:44 -0700 (PDT)
-Date: Fri, 20 Oct 2023 10:49:40 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	haoluo@google.com, jolsa@kernel.org, kuba@kernel.org,
-	toke@kernel.org, willemb@google.com, dsahern@kernel.org,
-	magnus.karlsson@intel.com, bjorn@kernel.org,
-	maciej.fijalkowski@intel.com, hawk@kernel.org,
-	yoong.siang.song@intel.com, netdev@vger.kernel.org,
-	xdp-hints@xdp-project.net
-Subject: Re: [PATCH bpf-next v4 02/11] xsk: Add TX timestamp and TX checksum
- offload support
-Message-ID: <20231020174940.gjubehkouns2hmgz@MacBook-Pro-49.local>
-References: <20231019174944.3376335-1-sdf@google.com>
- <20231019174944.3376335-3-sdf@google.com>
+        d=1e100.net; s=20230601; t=1697824434; x=1698429234;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WrkktZKBRPlFCzqyWlpvovV2LO5dRVDhRGH6sL1EBdg=;
+        b=cb7IfFksNjeUnTcRfZRcn2vevWeyk+ASv9dsX9bXOKQY9aAec5NHH5d99N1ph7mk++
+         lXHn04VWymCa4cBK+ru0S/wE3WNmu/J3/k1ctbK21JNS/TTvps1+YdB3XSXJWo/8KN1w
+         +/0zWLJnmLs2JV4300/HoxgTtFTB2VjsC/bRYJKyQYjKigltSndoLj9yDIpqY+E544NB
+         PjiCB5YTtQN4eg9NLwNtBlbgXlhDVGb888y25TJJIQ5jA7t7Zil8y+JP/DwYxKOVrRxC
+         57laMaQ348pahIxCxR8WuvLnSjBhspWl7nmVXryE5IPa+jhTituhGPySeuhVOAzhbc5/
+         XNqQ==
+X-Gm-Message-State: AOJu0YyKapU66870eaCj6NdAT2n/e7tND6fq0EoP0CkoEtMWftkML0qE
+	UAn5syadNKSQEx90Z/iRMRk=
+X-Google-Smtp-Source: AGHT+IFtURqb6fN+sYUYMlRQVStxudTfcXAC9A3VU4s4N5kleYFIUozk0gwuopi37iYAOB4GDZjZiw==
+X-Received: by 2002:a0d:ea8b:0:b0:5a7:aad1:6567 with SMTP id t133-20020a0dea8b000000b005a7aad16567mr2938236ywe.7.1697824433997;
+        Fri, 20 Oct 2023 10:53:53 -0700 (PDT)
+Received: from ?IPV6:2600:1700:6cf8:1240:74bb:66ec:3132:3e97? ([2600:1700:6cf8:1240:74bb:66ec:3132:3e97])
+        by smtp.gmail.com with ESMTPSA id o11-20020a81de4b000000b0059511008958sm828029ywl.76.2023.10.20.10.53.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Oct 2023 10:53:53 -0700 (PDT)
+Message-ID: <bef24789-819c-4a7b-bbb0-f38ffe9f67f0@gmail.com>
+Date: Fri, 20 Oct 2023 10:53:52 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231019174944.3376335-3-sdf@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v5 6/9] bpf, net: switch to dynamic registration
+Content-Language: en-US
+From: Kui-Feng Lee <sinquersw@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, thinker.li@gmail.com
+Cc: kuifeng@meta.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ ast@kernel.org, song@kernel.org, kernel-team@meta.com, andrii@kernel.org,
+ drosen@google.com
+References: <20231017162306.176586-1-thinker.li@gmail.com>
+ <20231017162306.176586-7-thinker.li@gmail.com>
+ <72104b12-4573-7f6d-183e-4761673329e2@linux.dev>
+ <9e7ec07f-bc03-4e62-a0f6-28f668a1ec42@gmail.com>
+In-Reply-To: <9e7ec07f-bc03-4e62-a0f6-28f668a1ec42@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 19, 2023 at 10:49:35AM -0700, Stanislav Fomichev wrote:
-> diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
-> index 2ecf79282c26..ecfd67988283 100644
-> --- a/include/uapi/linux/if_xdp.h
-> +++ b/include/uapi/linux/if_xdp.h
-> @@ -106,6 +106,43 @@ struct xdp_options {
->  #define XSK_UNALIGNED_BUF_ADDR_MASK \
->  	((1ULL << XSK_UNALIGNED_BUF_OFFSET_SHIFT) - 1)
->  
-> +/* Request transmit timestamp. Upon completion, put it into tx_timestamp
-> + * field of struct xsk_tx_metadata.
-> + */
-> +#define XDP_TX_METADATA_TIMESTAMP		(1 << 0)
-> +
-> +/* Request transmit checksum offload. Checksum start position and offset
-> + * are communicated via csum_start and csum_offset fields of struct
-> + * xsk_tx_metadata.
-> + */
-> +#define XDP_TX_METADATA_CHECKSUM		(1 << 1)
-> +
-> +/* Force checksum calculation in software. Can be used for testing or
-> + * working around potential HW issues. This option causes performance
-> + * degradation and only works in XDP_COPY mode.
-> + */
-> +#define XDP_TX_METADATA_CHECKSUM_SW		(1 << 2)
-> +
-> +struct xsk_tx_metadata {
-> +	union {
-> +		struct {
-> +			__u32 flags;
-> +
-> +			/* XDP_TX_METADATA_CHECKSUM */
-> +
-> +			/* Offset from desc->addr where checksumming should start. */
-> +			__u16 csum_start;
-> +			/* Offset from csum_start where checksum should be stored. */
-> +			__u16 csum_offset;
-> +		};
-> +
-> +		struct {
-> +			/* XDP_TX_METADATA_TIMESTAMP */
-> +			__u64 tx_timestamp;
-> +		} completion;
-> +	};
-> +};
 
-Could you add a comment to above union that csum fields are consumed by the driver
-before it xmits the packet while timestamp is filled during xmit, so union
-doesn't prevent using both features simultaneously.
-It's clear from the example, but not obvious from uapi and the doc in patch 11
-doesn't clarify it either.
 
-Also please add a name to csum part of the union like you did for completion.
-We've learned it the hard way with bpf_attr. All anon structs better have field name
-within a union. Helps extensibility (avoid conflicts) in the long term.
+On 10/20/23 08:12, Kui-Feng Lee wrote:
+> 
+> 
+> On 10/18/23 18:49, Martin KaFai Lau wrote:
+>> On 10/17/23 9:23 AM, thinker.li@gmail.com wrote:
+>>> From: Kui-Feng Lee <thinker.li@gmail.com>
+>>>   static const struct bpf_struct_ops *
+>>>   bpf_struct_ops_find_value(struct btf *btf, u32 value_id)
+>>>   {
+>>> +    const struct bpf_struct_ops *st_ops = NULL;
+>>> +    const struct bpf_struct_ops **st_ops_list;
+>>>       unsigned int i;
+>>> +    u32 cnt = 0;
+>>>       if (!value_id || !btf_vmlinux)
+>>
+>> The "!btf_vmlinux" should have been changed to "!btf" in the earlier 
+>> patch (patch 2?),
+> 
+> This is not btf. It mean to check if btf_vmlinux is initialized.
+> It is not necessary anymore.
+> For checking btf, the following btf_get_struct_ops() will keep cnt zero
+> if btf is NULL, so it is unnecessary as well.
 
-Other than this the patch set looks great to me.
-With Saeed and Magnus acks we can take it in.
+Forget my previous comment.  I think you are right!
+
 
