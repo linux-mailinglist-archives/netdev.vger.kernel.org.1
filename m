@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-42910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86DBE7D0977
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 09:24:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0E837D0978
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 09:24:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F90DB2138B
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 07:24:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 651EA2823A3
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 07:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B603D2E9;
-	Fri, 20 Oct 2023 07:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6A8D2ED;
+	Fri, 20 Oct 2023 07:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="N51RZM0w"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="YTUKyOrG"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77893DDA2
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 07:24:23 +0000 (UTC)
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D3E1D69
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 00:24:21 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-5079eed8bfbso650322e87.1
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 00:24:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9D1D2E9
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 07:24:38 +0000 (UTC)
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 182F593
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 00:24:37 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-4081ccf69dcso9355155e9.0
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 00:24:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1697786659; x=1698391459; darn=vger.kernel.org;
+        d=6wind.com; s=google; t=1697786675; x=1698391475; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:from:references
          :cc:to:content-language:subject:reply-to:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=9NKu6mUsoqfAL1uZvXUdGi9EKeYA/QVff2QYGWkp0uA=;
-        b=N51RZM0wD5s6xge0oqtN3qu3moS0dZ58bdVWx5qeRmsXU075rdH11w4t1W8+iXgBFc
-         sU0i9KCXIOuYIWelCc7JGi42KTmuc4HVhKIg8EMC41P05T2Fw2F1KebBZEpvCe2Ablp9
-         g7seHF01PtMYQLxIg+8/qWt45WV7iro4TzdlyizRsPGs1qwZ0kKr4gcCSkF5JDfDDeCy
-         DI2NKSq9eCq2ioCz/2qyQygyI5HS5WW5M6X8JibZjDYuAJFsbPUUmHDk8wVDdFgV/nN3
-         tRNYTLp6Igee5SBCv+tdpYDoy/aCfOJiMK1mvt5zs79c9uvO7u11SUZPYm8QddlLaOkz
-         JbkA==
+        bh=r8pT1s1kfw0GJwmKhQGn88Ip0iEpewkZfNcKow1l4UE=;
+        b=YTUKyOrGAE1DvKgFBm89ifys9gdWKSAnG8pbHdrQHwm+AgVvLFGN5I6MGVHDr1sRnS
+         Br1IPajYKtu6Lyul9onmgAYDRsxN8vDcDrzHmPU2WwY4KWMd6YcCviV8M/HvC4WA8u9n
+         jkf/m2tS0FPA1edpTPDgWe8FiYskUWhb5Fdse2dCP8Y1OGi2ekXgTDnABzIBFdVyj2Js
+         qYgwT0wmVmw6B0DJPebBaGhSVdUckjPJk+JdkjFSr4zU+JtjomW75uMi7126Kfmmph5f
+         2ZDFIR212kMmy5EIAu1gYrxoWqzJuiHXDQJbOW6rq6S9rt1T/fLdNST6GGP/AdHOVm86
+         FDGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697786659; x=1698391459;
+        d=1e100.net; s=20230601; t=1697786675; x=1698391475;
         h=content-transfer-encoding:in-reply-to:organization:from:references
          :cc:to:content-language:subject:reply-to:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9NKu6mUsoqfAL1uZvXUdGi9EKeYA/QVff2QYGWkp0uA=;
-        b=DvPHCzbOXbI6mhH6r3lYuZTM8buG21s6PFOB21EtR+Cqu5LuiGC7pax7Iv/gtLvfbx
-         RO0EjDkT5DU3pInrVJnKtzdkcXZvLwrFudFdFnCm8J1cMRoiQc4iwTSdd8Xy61OrLo9N
-         xVN/5Z4ATdu+5thhLYB5Fq4doHJ9f/kzXhtqJ9OenqBuMCnHfyv9OCa3GE6itQDRXL48
-         PEdEcKvkwhK9f6LmmeN55GKeE8snVdyQquuwQGVnEPdo/N6Fec8D5tidrh7SxbLjJJeK
-         ckKv29oCyOBxjXhbtDPvTJgtow0SW8KpxhciCRh2rqBe8NqP0itBoI3WDc6a3FqYinPF
-         3c0Q==
-X-Gm-Message-State: AOJu0YzV6aGfqTaNcPDCFuBOc1ZCnm4YiweuN8f6eiz4zknSrTIUsEWT
-	nvYpqknxqP6UKZ+jC96aAHP0xN3zJwN3bQ00Zp9jcg==
-X-Google-Smtp-Source: AGHT+IGvXcrwf5f5ZS8UTYdNYCBoBkQPavOrnnAtBUhiTMxEU6Cjs4uotlglmT1kg42yOtmGGHtRig==
-X-Received: by 2002:ac2:52b0:0:b0:500:bd6f:a320 with SMTP id r16-20020ac252b0000000b00500bd6fa320mr570281lfm.42.1697786659332;
-        Fri, 20 Oct 2023 00:24:19 -0700 (PDT)
+        bh=r8pT1s1kfw0GJwmKhQGn88Ip0iEpewkZfNcKow1l4UE=;
+        b=WfWELACBxMzh+rhK2AL+7L4sBWRI+QlVrFk1NmStNoh7anw8LICrdW3l4K3Zrw1C39
+         6GbmMWRO9bzCA6gJn0q92MvI0oJmO+DdUtpzl678xn5BqfFK+WStUEjoiz9Onv3DtFud
+         z8/PyTFc1p7HbeWlqKu/QbHCfQWA2Fz5AjqveO2HzW/PeeKsm/X+MLRnDp748547tfeP
+         OzzS6P9fR4PNrM3bveOz1TyMReoDvOUsihC3gP3K+wE+68KDBj3KXsrTn4eUF79udyYB
+         MKrpsmCzwCnaRsMHzJ9Lsb6PwNNSVP2kzFviRhgSwyifYahJb7P803JKrOOZ6IfXZK33
+         F2YQ==
+X-Gm-Message-State: AOJu0YzXDueYG/WF+8RMHdBsHSNEw2IxaWHpBuM2OqGHJo0Tp8cEKW1Z
+	rWz0EkFARlwEWfcteSUUDemD6Q==
+X-Google-Smtp-Source: AGHT+IHjLzkWkbS4gDN5abkloPHZhvpXu91Mtc7ljOj1ESpZgHcX2SyfWrz4Qwk+DYmnIhh8H10Erw==
+X-Received: by 2002:a05:600c:46d1:b0:3fe:1fd9:bedf with SMTP id q17-20020a05600c46d100b003fe1fd9bedfmr847152wmo.11.1697786675604;
+        Fri, 20 Oct 2023 00:24:35 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:b41:c160:4cb:3d1b:4444:11a6? ([2a01:e0a:b41:c160:4cb:3d1b:4444:11a6])
-        by smtp.gmail.com with ESMTPSA id c8-20020a05600c0a4800b0040775fd5bf9sm1508944wmq.0.2023.10.20.00.24.18
+        by smtp.gmail.com with ESMTPSA id c8-20020a05600c0a4800b0040775fd5bf9sm1508944wmq.0.2023.10.20.00.24.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Oct 2023 00:24:18 -0700 (PDT)
-Message-ID: <ce718606-df08-4249-b29d-6ec30a4c4648@6wind.com>
-Date: Fri, 20 Oct 2023 09:24:18 +0200
+        Fri, 20 Oct 2023 00:24:35 -0700 (PDT)
+Message-ID: <62714d2c-8afc-4d9b-b8b2-85f9caf18eeb@6wind.com>
+Date: Fri, 20 Oct 2023 09:24:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,53 +69,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next 0/3] netlink: add variable-length / auto integers
+Subject: Re: [PATCH net-next 2/3] netlink: add variable-length / auto integers
 Content-Language: en-US
 To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ johannes@sipsolutions.net, stephen@networkplumber.org, jiri@resnulli.us
 References: <20231018213921.2694459-1-kuba@kernel.org>
+ <20231018213921.2694459-3-kuba@kernel.org>
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Organization: 6WIND
-In-Reply-To: <20231018213921.2694459-1-kuba@kernel.org>
+In-Reply-To: <20231018213921.2694459-3-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 Le 18/10/2023 à 23:39, Jakub Kicinski a écrit :
-> Add netlink support for "common" / variable-length / auto integers
-> which are carried at the message level as either 4B or 8B depending
-> on the exact value. This saves space and will hopefully decrease
-> the number of instances where we realize that we needed more bits
-> after uAPI is set is stone. It also loosens the alignment requirements,
-> avoiding the need for padding.
+> We currently push everyone to use padding to align 64b values
+> in netlink. Un-padded nla_put_u64() doesn't even exist any more.
 > 
-> This mini-series is a fuller version of the previous RFC:
+> The story behind this possibly start with this thread:
 > https://lore.kernel.org/netdev/20121204.130914.1457976839967676240.davem@davemloft.net/
-Probably https://lore.kernel.org/all/20231011003313.105315-1-kuba@kernel.org/ ;-)
-
-Nicolas
-
-> No user included here. I have tested (and will use) it
-> in the upcoming page pool API but the assumption is that
-> it will be widely applicable. So sending without a user.
+> where DaveM was concerned about the alignment of a structure
+> containing 64b stats. If user space tries to access such struct
+> directly:
 > 
-> Jakub Kicinski (3):
->   tools: ynl-gen: make the mnl_type() method public
->   netlink: add variable-length / auto integers
->   netlink: specs: add support for auto-sized scalars
+> 	struct some_stats *stats = nla_data(attr);
+> 	printf("A: %llu", stats->a);
 > 
->  Documentation/netlink/genetlink-c.yaml        |  3 +-
->  Documentation/netlink/genetlink-legacy.yaml   |  3 +-
->  Documentation/netlink/genetlink.yaml          |  3 +-
->  Documentation/userspace-api/netlink/specs.rst | 18 ++++-
->  include/net/netlink.h                         | 69 ++++++++++++++++++-
->  include/uapi/linux/netlink.h                  |  5 ++
->  lib/nlattr.c                                  | 22 ++++++
->  net/netlink/policy.c                          | 14 +++-
->  tools/net/ynl/lib/nlspec.py                   |  6 ++
->  tools/net/ynl/lib/ynl.c                       |  6 ++
->  tools/net/ynl/lib/ynl.h                       | 17 +++++
->  tools/net/ynl/lib/ynl.py                      | 14 ++++
->  tools/net/ynl/ynl-gen-c.py                    | 44 ++++++------
->  13 files changed, 192 insertions(+), 32 deletions(-)
+> lack of alignment may become problematic for some architectures.
+> These days we most often put every single member in a separate
+> attribute, meaning that the code above would use a helper like
+> nla_get_u64(), which can deal with alignment internally.
+> Even for arches which don't have good unaligned access - access
+> aligned to 4B should be pretty efficient.
+> Kernel and well known libraries deal with unaligned input already.
 > 
+> Padded 64b is quite space-inefficient (64b + pad means at worst 16B
+> per attr vs 32b which takes 8B). It is also more typing:
+> 
+>     if (nla_put_u64_pad(rsp, NETDEV_A_SOMETHING_SOMETHING,
+>                         value, NETDEV_A_SOMETHING_PAD))
+> 
+> Create a new attribute type which will use 32 bits at netlink
+> level if value is small enough (probably most of the time?),
+> and (4B-aligned) 64 bits otherwise. Kernel API is just:
+> 
+>     if (nla_put_uint(rsp, NETDEV_A_SOMETHING_SOMETHING, value))
+> 
+> Calling this new type "just" sint / uint with no specific size
+> will hopefully also make people more comfortable with using it.
+> Currently telling people "don't use u8, you may need the bits,
+> and netlink will round up to 4B, anyway" is the #1 comment
+> we give to newcomers.
+> 
+> In terms of netlink layout it looks like this:
+> 
+>          0       4       8       12      16
+> 32b:     [nlattr][ u32  ]
+> 64b:     [  pad ][nlattr][     u64      ]
+> uint(32) [nlattr][ u32  ]
+> uint(64) [nlattr][     u64      ]
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
