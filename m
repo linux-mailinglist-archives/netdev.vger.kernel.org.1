@@ -1,112 +1,90 @@
-Return-Path: <netdev+bounces-43079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 219387D1534
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:54:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A95B07D1541
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:56:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D04C328239C
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:53:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2840B21326
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:56:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E79208AA;
-	Fri, 20 Oct 2023 17:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26FA5208B1;
+	Fri, 20 Oct 2023 17:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WWgkIzPx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GWGUcHkl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCD91E530;
-	Fri, 20 Oct 2023 17:53:55 +0000 (UTC)
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DB4D55;
-	Fri, 20 Oct 2023 10:53:54 -0700 (PDT)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-59b5484fbe6so12327697b3.1;
-        Fri, 20 Oct 2023 10:53:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697824434; x=1698429234; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WrkktZKBRPlFCzqyWlpvovV2LO5dRVDhRGH6sL1EBdg=;
-        b=WWgkIzPxn4p4m2QCyxnn7HjZ2WiJYZsQJeqmJbzvY980pNPal5jh/TIX543wbQkry2
-         Or2aB8hqcHlEvTtCuEiE0yunVPxyTMoJzquJxnnBrbBbAtKCJqOHufgS4C6G2f+5n0dg
-         8d2nKRgPR5omRxKPWN256Gh0NalOZLfRl7jYoouCsr2kOQX47qNy7PZbZ0Frbuk3FFf1
-         MxGNem6XS9FWlfCw1j036USuodgRkM4/GFlGnk2WE9I5/PGzxs/wFfZed7TVbe0vJ94U
-         GTseM1cjw9Dn/8gP/VCelRHZqNrHYDdnN/fHmugX6eHIsfTPK7aZdJfO+iHOU2+Jb0f0
-         fcXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697824434; x=1698429234;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WrkktZKBRPlFCzqyWlpvovV2LO5dRVDhRGH6sL1EBdg=;
-        b=cb7IfFksNjeUnTcRfZRcn2vevWeyk+ASv9dsX9bXOKQY9aAec5NHH5d99N1ph7mk++
-         lXHn04VWymCa4cBK+ru0S/wE3WNmu/J3/k1ctbK21JNS/TTvps1+YdB3XSXJWo/8KN1w
-         +/0zWLJnmLs2JV4300/HoxgTtFTB2VjsC/bRYJKyQYjKigltSndoLj9yDIpqY+E544NB
-         PjiCB5YTtQN4eg9NLwNtBlbgXlhDVGb888y25TJJIQ5jA7t7Zil8y+JP/DwYxKOVrRxC
-         57laMaQ348pahIxCxR8WuvLnSjBhspWl7nmVXryE5IPa+jhTituhGPySeuhVOAzhbc5/
-         XNqQ==
-X-Gm-Message-State: AOJu0YyKapU66870eaCj6NdAT2n/e7tND6fq0EoP0CkoEtMWftkML0qE
-	UAn5syadNKSQEx90Z/iRMRk=
-X-Google-Smtp-Source: AGHT+IFtURqb6fN+sYUYMlRQVStxudTfcXAC9A3VU4s4N5kleYFIUozk0gwuopi37iYAOB4GDZjZiw==
-X-Received: by 2002:a0d:ea8b:0:b0:5a7:aad1:6567 with SMTP id t133-20020a0dea8b000000b005a7aad16567mr2938236ywe.7.1697824433997;
-        Fri, 20 Oct 2023 10:53:53 -0700 (PDT)
-Received: from ?IPV6:2600:1700:6cf8:1240:74bb:66ec:3132:3e97? ([2600:1700:6cf8:1240:74bb:66ec:3132:3e97])
-        by smtp.gmail.com with ESMTPSA id o11-20020a81de4b000000b0059511008958sm828029ywl.76.2023.10.20.10.53.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Oct 2023 10:53:53 -0700 (PDT)
-Message-ID: <bef24789-819c-4a7b-bbb0-f38ffe9f67f0@gmail.com>
-Date: Fri, 20 Oct 2023 10:53:52 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA7C2032F
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 17:56:10 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2C52D5A
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:56:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697824568; x=1729360568;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Gxnk7yHwCdSv6SzLuCS2G3He4Fa4XDKYwaLUL51MTwg=;
+  b=GWGUcHkl4K7oK8wts7nffCSssFtj6x7uutq9txy4ZN8fPRDcajifgubl
+   AbVJMeQpOW7kHSXdJkMsWWBM9cVYnIV1cwZ0e6Ky0//uG/uLxNCzS2v+h
+   EJHa+o2uxNeCX7IRIhVOn1ZOV1YZkNeu2LywudHj+PVR9yOhOW0Klw+ET
+   zvEA8OvrqPZXcE0TXttl6C/rMc6TdzGTes3pRvBe/T72s2xBFpbggx122
+   ZP1PUdMFVgrUUlklQV9pH00MEH0Jo86MXLDLIbtC3XgzKynt5v21iwy+3
+   o5wA2wY+xk14adJsNiFUDhzYpQWKRuzi2R7Q1dfD10e3OCUzh6wZTZb2b
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="386357489"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="386357489"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 10:56:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="750997533"
+X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
+   d="scan'208";a="750997533"
+Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 10:56:07 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: netdev@vger.kernel.org,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH next 0/2] Intel Wired LAN Driver Updates 2023-10-19 (idpf)
+Date: Fri, 20 Oct 2023 10:55:58 -0700
+Message-ID: <20231020175600.24412-1-jacob.e.keller@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v5 6/9] bpf, net: switch to dynamic registration
-Content-Language: en-US
-From: Kui-Feng Lee <sinquersw@gmail.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>, thinker.li@gmail.com
-Cc: kuifeng@meta.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- ast@kernel.org, song@kernel.org, kernel-team@meta.com, andrii@kernel.org,
- drosen@google.com
-References: <20231017162306.176586-1-thinker.li@gmail.com>
- <20231017162306.176586-7-thinker.li@gmail.com>
- <72104b12-4573-7f6d-183e-4761673329e2@linux.dev>
- <9e7ec07f-bc03-4e62-a0f6-28f668a1ec42@gmail.com>
-In-Reply-To: <9e7ec07f-bc03-4e62-a0f6-28f668a1ec42@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+This series contains two fixes for the recently merged idpf driver.
+
+Michal adds missing logic for programming the scheduling mode of completion
+queues.
+
+Pavan fixes a call trace caused by the mailbox work item not being canceled
+properly if an error occurred during initialization.
+
+Michal Kubiak (1):
+  idpf: set scheduling mode for completion queue
+
+Pavan Kumar Linga (1):
+  idpf: cancel mailbox work in error path
+
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c     | 10 ++++++++--
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c |  9 ++++++++-
+ 2 files changed, 16 insertions(+), 3 deletions(-)
 
 
-On 10/20/23 08:12, Kui-Feng Lee wrote:
-> 
-> 
-> On 10/18/23 18:49, Martin KaFai Lau wrote:
->> On 10/17/23 9:23 AM, thinker.li@gmail.com wrote:
->>> From: Kui-Feng Lee <thinker.li@gmail.com>
->>>   static const struct bpf_struct_ops *
->>>   bpf_struct_ops_find_value(struct btf *btf, u32 value_id)
->>>   {
->>> +    const struct bpf_struct_ops *st_ops = NULL;
->>> +    const struct bpf_struct_ops **st_ops_list;
->>>       unsigned int i;
->>> +    u32 cnt = 0;
->>>       if (!value_id || !btf_vmlinux)
->>
->> The "!btf_vmlinux" should have been changed to "!btf" in the earlier 
->> patch (patch 2?),
-> 
-> This is not btf. It mean to check if btf_vmlinux is initialized.
-> It is not necessary anymore.
-> For checking btf, the following btf_get_struct_ops() will keep cnt zero
-> if btf is NULL, so it is unnecessary as well.
-
-Forget my previous comment.  I think you are right!
+base-commit: 041c3466f39d7073bbc7fb91c4e5d14170d5eb08
+-- 
+2.41.0
 
 
