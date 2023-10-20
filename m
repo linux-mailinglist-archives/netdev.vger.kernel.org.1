@@ -1,108 +1,95 @@
-Return-Path: <netdev+bounces-43152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DBBD7D19A9
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 01:41:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9D4F7D19AE
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 01:49:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B10E0B214A4
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:41:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAB6C1C2102C
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 23:49:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33B935507;
-	Fri, 20 Oct 2023 23:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B1B935515;
+	Fri, 20 Oct 2023 23:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="wpWTTgpC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKW0EPNk"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1C01A71B
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 23:41:09 +0000 (UTC)
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55FEBD51;
-	Fri, 20 Oct 2023 16:41:08 -0700 (PDT)
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39KLZUkP018479;
-	Fri, 20 Oct 2023 23:41:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2023-03-30; bh=bKFZg/LBpXWZUAVfLFf4lWiUNapQ7Gl7Xv4yj0bgCu4=;
- b=wpWTTgpCHWQmuFke7ehdHYwwbIGEEV+vloZwin7o6xyre/7+L7dBa4Hz8FREDi4/fm9S
- 7doWa5mYErpYPW3SF2ObUbt/wYlGqaMFqEjFMLGTPgYuE2ho+kaGnyrigTwVFNn6AeQD
- DV0V3S01/PQPzD+RZX5rRGDuvmEtbpKnNBJkEKOoy9nwLh8qs68KHmdeCoT5tQNRV9CB
- b9om/PkdcDb3s0F8Gw17gpthqeaqCTtkra0wgDDxIo70frod0+/aj5SiglSL8ES/Vuex
- +A4nTqT5FlUFhHBjLegM8ZWuRFnuZKVnPDjKnRI5KYtbCMk+i4FxUCO6WvoU0qSe2kCZ ug== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tubw82vgv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 20 Oct 2023 23:41:01 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39KLWMsq014110;
-	Fri, 20 Oct 2023 23:41:00 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3tubwfw1gu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 20 Oct 2023 23:41:00 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39KNf06m002147;
-	Fri, 20 Oct 2023 23:41:00 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3tubwfw1gd-1;
-	Fri, 20 Oct 2023 23:40:59 +0000
-From: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-To: linux-kernel@vger.kernel.org
-Cc: davem@davemloft.net, Liam.Howlett@oracle.com, netdev@vger.kernel.org,
-        oliver.sang@intel.com, kuba@kernel.org, horms@kernel.org,
-        anjali.k.kulkarni@oracle.com
-Subject: [PATCH v2] Fix NULL pointer dereference in cn_filter()
-Date: Fri, 20 Oct 2023 16:40:58 -0700
-Message-ID: <20231020234058.2232347-1-anjali.k.kulkarni@oracle.com>
-X-Mailer: git-send-email 2.42.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D90A35509;
+	Fri, 20 Oct 2023 23:49:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5DBCC433C7;
+	Fri, 20 Oct 2023 23:49:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697845759;
+	bh=loI0on5ZzUtt+TaOW1sABdlRBDhAZ7YRBCQ6BuFriVI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LKW0EPNkFkN8eCHVM7IaiF6+PbnRmx5oxq9FHwfSbZoMYP2az69DRLa3zNht6Ya/9
+	 CC0L/iiw3vCpTzVf6Azx7By152nt0g/bfnkTL5S1I6zQK/RZ0YblWo/7W/4rJ54NJO
+	 YRG64VYitDcGLJQ68FgZ9qoJAZLRZR+4aZZUt2iQkyuYWbZzmgCjc440Hqp1pZ2Y/q
+	 +weFo3EZTVlAq7lCQPYEug2RIuaIJWuw4gjwQLPnPxj1w3T8tp4mXJxZA8uLG6g04s
+	 agUMEd87THivCYoy1cVsdwRgs+JZB4V/leDMaz7sbr79FFgLJ1Wrgjhc4FMVmeNDLl
+	 Y1r+29QTL64eg==
+Date: Fri, 20 Oct 2023 16:49:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: <mkubecek@suse.cz>, <andrew@lunn.ch>, <willemdebruijn.kernel@gmail.com>,
+ Wojciech Drewek <wojciech.drewek@intel.com>, <corbet@lwn.net>,
+ <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+ <jesse.brandeburg@intel.com>, <edumazet@google.com>,
+ <anthony.l.nguyen@intel.com>, <horms@kernel.org>,
+ <vladimir.oltean@nxp.com>, Jacob Keller <jacob.e.keller@intel.com>,
+ <intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>,
+ <davem@davemloft.net>
+Subject: Re: [Intel-wired-lan] [PATCH net-next v4 1/6] net: ethtool: allow
+ symmetric-xor RSS hash for any flow type
+Message-ID: <20231020164917.69d5cd44@kernel.org>
+In-Reply-To: <c2c0dbe8-eee5-4e87-a115-7424ba06d21b@intel.com>
+References: <20231016154937.41224-1-ahmed.zaki@intel.com>
+	<20231016154937.41224-2-ahmed.zaki@intel.com>
+	<8d1b1494cfd733530be887806385cde70e077ed1.camel@gmail.com>
+	<26812a57-bdd8-4a39-8dd2-b0ebcfd1073e@intel.com>
+	<CAKgT0Ud7JjUiE32jJbMbBGVexrndSCepG54PcGYWHJ+OC9pOtQ@mail.gmail.com>
+	<14feb89d-7b4a-40c5-8983-5ef331953224@intel.com>
+	<CAKgT0UfcT5cEDRBzCxU9UrQzbBEgFt89vJZjz8Tow=yAfEYERw@mail.gmail.com>
+	<20231016163059.23799429@kernel.org>
+	<CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
+	<20231017131727.78e96449@kernel.org>
+	<CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
+	<20231017173448.3f1c35aa@kernel.org>
+	<CAKgT0Udz+YdkmtO2Gbhr7CccHtBbTpKich4er3qQXY-b2inUoA@mail.gmail.com>
+	<20231018165020.55cc4a79@kernel.org>
+	<45c6ab9f-50f6-4e9e-a035-060a4491bded@intel.com>
+	<20231020153316.1c152c80@kernel.org>
+	<c2c0dbe8-eee5-4e87-a115-7424ba06d21b@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-20_10,2023-10-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 malwarescore=0
- mlxscore=0 suspectscore=0 spamscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310170001
- definitions=main-2310200202
-X-Proofpoint-GUID: CFmDnzAWFB6owU8ti8ggAm50QlMlrWJi
-X-Proofpoint-ORIG-GUID: CFmDnzAWFB6owU8ti8ggAm50QlMlrWJi
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Check that sk_user_data is not NULL, else return from cn_filter().
-Could not reproduce this issue, but Oliver Sang verified it has fixed
-the "Closes" problem below.
+On Fri, 20 Oct 2023 17:14:11 -0600 Ahmed Zaki wrote:
+> I replied to that here:
+> 
+> https://lore.kernel.org/all/afb4a06f-cfba-47ba-adb3-09bea7cb5f00@intel.com/
+> 
+> I am kind of confused now so please bear with me. ethtool either sends 
+> "ethtool_rxfh" or "ethtool_rxnfc". AFAIK "ethtool_rxfh" is the interface 
+> for "ethtool -X" which is used to set the RSS algorithm. But we kind of 
+> agreed to go with "ethtool -U|-N" for symmetric-xor, and that uses 
+> "ethtool_rxnfc" (as implemented in this series).
 
-Fixes: 2aa1f7a1f47c ("connector/cn_proc: Add filtering to fix some bugs")
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202309201456.84c19e27-oliver.sang@intel.com/
-Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
----
- drivers/connector/cn_proc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I have no strong preference. Sounds like Alex prefers to keep it closer
+to algo, which is "ethtool_rxfh".
 
-diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
-index 05d562e9c8b1..44b19e696176 100644
---- a/drivers/connector/cn_proc.c
-+++ b/drivers/connector/cn_proc.c
-@@ -54,7 +54,7 @@ static int cn_filter(struct sock *dsk, struct sk_buff *skb, void *data)
- 	enum proc_cn_mcast_op mc_op;
- 	uintptr_t val;
- 
--	if (!dsk || !data)
-+	if (!dsk || !dsk->sk_user_data || !data)
- 		return 0;
- 
- 	ptr = (__u32 *)data;
--- 
-2.42.0
+> Do you mean use "ethtool_rxfh" instead of "ethtool_rxnfc"? how would 
+> that work on the ethtool user interface?
 
+I don't know what you're asking of us. If you find the code to confusing
+maybe someone at Intel can help you :|
 
