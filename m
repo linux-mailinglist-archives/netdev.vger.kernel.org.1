@@ -1,105 +1,141 @@
-Return-Path: <netdev+bounces-43013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0925E7D0FF7
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:56:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD3CA7D0FFD
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 14:57:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A6AB1C20EFA
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:56:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75876281BA4
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5BEF1A588;
-	Fri, 20 Oct 2023 12:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0D318E33;
+	Fri, 20 Oct 2023 12:57:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tg2pYOHd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YRP7RHNe"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD3D18E33
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 12:56:27 +0000 (UTC)
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36010D5D
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 05:56:26 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5a7ab31fb8bso8164167b3.1
-        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 05:56:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0F910A12
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 12:57:52 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C76A7AB
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 05:57:50 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7e4745acdso14211977b3.3
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 05:57:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697806585; x=1698411385; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yrcL+xKT1Haqzn96R/mZhFMvTo6rkNolacJ4Cmk/A44=;
-        b=Tg2pYOHdpZsN+CW46JWHwJhGGFR7os++Mbd3U0w6RYUE/+L1Rk3kGdhei0ing/Yoao
-         4wmwnaH6gn/Znz+Ij3K8mv5cfF6tf70oMVTMy9F8uzsLA4B2CAv7yzyg1qpP2J3EdRQn
-         mjhluWsrQqFy7XhMO7rGRuRxQQn29xDALIgtK83ThCvwUCtdCoal1DTMDfd3UEKkDGGC
-         g/+R0BrM0x6tWIslOSzzp+zHnaATRnGE82mZeV0WWMmIKOeRsReFKZKBjR/pjIA+MjTT
-         uJ5vBaP34rQ+OQ6zjD1s2os1zslKxc9VjBe6TDYm93qhCpV6SW2boud55joMHT5iTG92
-         o76w==
+        d=google.com; s=20230601; t=1697806670; x=1698411470; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aHa4DtT1PlNOzzJDH3ABKFnZ2iLwqUUCPMBAwifRhP0=;
+        b=YRP7RHNeESLXlnsmKJR3LGJqoIagodKhgFBnAxU7z2C+mraTgYKE1qIFpTvv0IB2QU
+         DjAs5q7O5H5x1KJqpKKL3C6wTXdxCPYbem4EGfp1E8xbRkFHKiE1nwARUDG2JdStjiui
+         gJoJKA54/q+wa0tk18pMWYZVCgzQrQ0mgy5g8UPg/7hNv/Gc0jG35JsFThqV9nCh2aoe
+         UoUKFswr82nT+pI59LT45LEL3Ps/3EDdSxEjzZxroscr0XzCbdEwZsMT97h1pmZQEgxi
+         u+UsSZ6NexpfKe+QhaaFUpoQ1gu2Pklnrx8/Ky6ZDBKXwGnIuBjM50eA5tlJaQJ07C77
+         UJMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697806585; x=1698411385;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yrcL+xKT1Haqzn96R/mZhFMvTo6rkNolacJ4Cmk/A44=;
-        b=AEoqYE5rRKBIyGsz6UzJccXfSiobcRiSCtHdSU0u4+PMzGqCvlxePV2awBbu3KYJBc
-         fa6LTqS99md8ZSNedTuOdxYfEGW6/QC2D9pMo/O3JVv+IDISNNBCCQI4juBqP2yypLVr
-         PBcokjbpynoVz4jHzRSR5/R2onxoxcMBmzxzge/sRZ0phXyBFP4k0HU+i9gWe6a7CrVb
-         aFnfUabnOasrmtWOw4STvBvR7MqEdhO9CjyUijFpbqnm+hJ/SPTBJ6xdFfAGVZRuHr49
-         UoTHH8B/MLIhnUvNolTyGCoNOMRkzy4OplIXrNFwxfsQLKTwSWlsQG9Liyor0xbKs+b0
-         y1Dw==
-X-Gm-Message-State: AOJu0YxrW3eEK/tsMgw6Jaj4oTyGbktRAiLZCsODhZT3MaxlfucDdoyA
-	h7WYzidKbNPx/kDn8BBLl34B5cQhnJYysA4IU43bvQ==
-X-Google-Smtp-Source: AGHT+IGrmN5jknlgIsjAyhgTDyk0Jj0AJJ69byvTmw81BZ3lafG/4P93aegl+ccQttzXcDL8T8XrYIIK66wdeeleL1c=
-X-Received: by 2002:a0d:d488:0:b0:594:e97b:f6fa with SMTP id
- w130-20020a0dd488000000b00594e97bf6famr2050189ywd.30.1697806585447; Fri, 20
- Oct 2023 05:56:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697806670; x=1698411470;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aHa4DtT1PlNOzzJDH3ABKFnZ2iLwqUUCPMBAwifRhP0=;
+        b=atEKgouHyY6bpP+ehGaoBEyIGeTtvtpBCxc1kmz/Ij+XdMXX4y+L2M6slYwWqdp0cU
+         kY9cn8L6/fO0PCDGC4OGb2EM48A78ZsV0Dx0lxFxTux+PIHITrxP4mqnf0wAAojenBJR
+         niIh6jdlK2G+5t2g53hg+2LCMYPCfRFzpZPY/tzA9jZWtGVhBMuNpdwZvecGbJp+/3sy
+         LUsBjw/H7TH4P5Igr7BA6cfX2tDtTWO0AKwlfEPagYUF76hDiVCAdAIJIo1TprK367mr
+         hGtp1kscKIejMzaURNsxXD8CNe/5wDEkCCAtJH6AhHuyGYovq37ZELAV2uim+DYuMq9Z
+         /ldQ==
+X-Gm-Message-State: AOJu0Yyw/MD+HUWcQo/O1fmZCXhOXl2Uwd16QnrKRZqDzqI9PeV3za7R
+	5lMIW0wg2U262tuW1I7v75naTjaRejDkpw==
+X-Google-Smtp-Source: AGHT+IH/SEam0bwJnqPIIOlavq1RpW95EghX7lb1tHtKX4jXdZyBS9pi0Db7vTSKXDa9wIsvM8y5+zShZRKiPg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:40c:0:b0:d9c:c8c:123 with SMTP id
+ 12-20020a25040c000000b00d9c0c8c0123mr33182ybe.13.1697806670022; Fri, 20 Oct
+ 2023 05:57:50 -0700 (PDT)
+Date: Fri, 20 Oct 2023 12:57:35 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-1-3ee0c67383be@linaro.org>
- <169762516670.391804.7528295251386913602.robh@kernel.org> <CACRpkdZ4hkiD6jwENqjZRX8ZHH9+3MSMMLcJe6tJa=6Yhn1w=g@mail.gmail.com>
- <cfc0375e-50eb-4772-9104-3b1a95b7ca4a@linaro.org> <CACRpkdbKxmMk+-OcB6zgH7Nf_jL-AV7H_S4eEcjjjywK0xCJ4Q@mail.gmail.com>
- <20231020122725.2fotbdwmmu575ndd@skbuf>
-In-Reply-To: <20231020122725.2fotbdwmmu575ndd@skbuf>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 20 Oct 2023 14:56:13 +0200
-Message-ID: <CACRpkdZGT=iWGjc+ROpd=Ofa6EMY761pudxcRsUKLvHZ3Ke5zg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/7] dt-bindings: net: dsa: Require ports or ethernet-ports
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Rob Herring <robh@kernel.org>, 
-	Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, linux-arm-kernel@lists.infradead.org, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Russell King <linux@armlinux.org.uk>, 
-	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
-	Gregory Clement <gregory.clement@bootlin.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
+Message-ID: <20231020125748.122792-1-edumazet@google.com>
+Subject: [PATCH net-next 00/13] tcp: add optional usec resolution to TCP TS
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	Yuchung Cheng <ycheng@google.com>, Kevin Yang <yyd@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, Wei Wang <weiwan@google.com>, Van Jacobson <vanj@google.com>, 
+	Florian Westphal <fw@strlen.de>, eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 20, 2023 at 2:27=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
-> On Fri, Oct 20, 2023 at 01:41:22PM +0200, Linus Walleij wrote:
-> > I can't reproduce this, make dt_bindings_check in the mainline kernel
-> > does not yield this warning
->
-> You used the actual command that the bot posted, right? aka "make DT_CHEC=
-KER_FLAGS=3D-m dt_binding_check"?
-> I am also seeing the yamllint warning.
+As discussed in various public places in 2016, Google adopted
+usec resolution in RFC 7323 TS values, at Van Jacobson suggestion.
 
-Yep I added that.
+Goals were :
 
-(But I think the kernels dt_binding_check should ultimately add
-the same flag, otherwise the world gets super confusing.)
+1) better observability of delays in networking stacks/fabrics.
 
-Yours,
-Linus Walleij
+2) better disambiguation of events based on TSval/ecr values.
+
+3) building block for congestion control modules needing usec resolution.
+
+Back then we implemented a schem based on private SYN options
+to safely negotiate the feature.
+
+For upstream submission, we chose to use a much simpler route
+attribute because this feature is probably going to be used
+in private networks.
+
+ip route add 10/8 ... features tcp_usec_ts
+
+References:
+
+https://www.ietf.org/proceedings/97/slides/slides-97-tcpm-tcp-options-for-low-latency-00.pdf
+https://datatracker.ietf.org/doc/draft-wang-tcpm-low-latency-opt/
+
+First two patches are fixing old minor bugs and might be taken
+by stable teams (thanks to appropriate Fixes: tags)
+
+Eric Dumazet (13):
+  chtls: fix tp->rcv_tstamp initialization
+  tcp: fix cookie_init_timestamp() overflows
+  tcp: add tcp_time_stamp_ms() helper
+  tcp: introduce tcp_clock_ms()
+  tcp: replace tcp_time_stamp_raw()
+  tcp: rename tcp_skb_timestamp()
+  tcp: move tcp_ns_to_ts() to net/ipv4/syncookies.c
+  tcp: rename tcp_time_stamp() to tcp_time_stamp_ts()
+  tcp: add tcp_rtt_tsopt_us()
+  tcp: add RTAX_FEATURE_TCP_USEC_TS
+  tcp: introduce TCP_PAWS_WRAP
+  tcp: add support for usec resolution in TCP TS values
+  tcp: add TCPI_OPT_USEC_TS
+
+ .../chelsio/inline_crypto/chtls/chtls_cm.c    |  2 +-
+ include/linux/tcp.h                           |  9 ++-
+ include/net/inet_timewait_sock.h              |  3 +-
+ include/net/tcp.h                             | 59 ++++++++++++++-----
+ include/uapi/linux/rtnetlink.h                | 18 +++---
+ include/uapi/linux/tcp.h                      |  1 +
+ net/ipv4/syncookies.c                         | 32 ++++++----
+ net/ipv4/tcp.c                                | 26 +++++---
+ net/ipv4/tcp_input.c                          | 52 ++++++++--------
+ net/ipv4/tcp_ipv4.c                           |  5 +-
+ net/ipv4/tcp_lp.c                             |  2 +-
+ net/ipv4/tcp_minisocks.c                      | 19 ++++--
+ net/ipv4/tcp_output.c                         | 14 +++--
+ net/ipv4/tcp_timer.c                          | 44 +++++++++-----
+ net/ipv6/tcp_ipv6.c                           |  5 +-
+ net/netfilter/nf_synproxy_core.c              |  2 +-
+ .../selftests/bpf/progs/xdp_synproxy_kern.c   |  4 +-
+ 17 files changed, 193 insertions(+), 104 deletions(-)
+
+-- 
+2.42.0.655.g421f12c284-goog
+
 
