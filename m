@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-42862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA04B7D06BC
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 05:05:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A5187D06BD
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 05:05:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F68EB21436
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 03:05:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04CC8282397
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 03:05:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 318F663C2;
-	Fri, 20 Oct 2023 03:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485D41873;
+	Fri, 20 Oct 2023 03:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o4NL8JHC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E2pHpD6B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5D39470
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:04:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5FCCC433C8;
-	Fri, 20 Oct 2023 03:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29F4BAD32
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 03:04:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF977C433C8;
+	Fri, 20 Oct 2023 03:04:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697771084;
-	bh=OzRc6NTniZFOXiMKmyu2ai2V4Maj9af1zmafa4c6QOk=;
+	s=k20201202; t=1697771086;
+	bh=xcm8cyWQLcVwRoW7GP8NDlHto+s/eCgzRdEaDNVR9WQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o4NL8JHCQeGr16uNzRvjfaeuQ4WJPGuv6Giryc1VxjPrmaIFo3YSpNLaA37wwVJEp
-	 qTMwMr2sKgZTLCpDdVIgs5BVDvOKOQY5MJIT+Uw24DFHu3HoczyKz1l6XXP/47cujf
-	 O/KCZ2D6lX8uB2C3AqhFs8hCOO4lFFtJvy3T02GEjo8d4tzNtjssfzBVUTcjPFTKtL
-	 svuFMVYb48INmGZh9Va3SiBItDG3iZn9ermIB1CAx0+jWsRSftyKjkb3BpY/4+OX0p
-	 rbSWjCVTwTW4shk32ez62Oeegg1xVYYlRaxWdsrePuUfz8sSXsyOLmycGe4YNkftYo
-	 ooupf+rxWGx0Q==
+	b=E2pHpD6BNEkrUKFR62fBzgPnEw5qX+3H5CEVUXARnp93wu6zXM8QVR9dEtEfzuAMJ
+	 MH+2aWE0SeNuNTrWovD8nW6tG2ULxo85aVeXpTYkDN6hKEZZis3la67f2IoBFn6vP+
+	 SzyoU7HggDpzAA4A76b9eEbPioNwCJ568X568oUYuSeqpX7UYtuWjA6F4sAMcJrl0h
+	 FkHO0OKVMKv086HZtsPcM/WrYi3L996M48CM7YMjS/AL94YMNLlg5I4aJNelT10s2Q
+	 ufrvHNY/JtrZoa9mrV8LyHCrRtcLKiqDTM0ceM79dVaHT8WVz17DnUoPtr7bZd7/jD
+	 lJKvTBo/9UTWA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,10 +40,12 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net-next 11/15] net/mlx5e: Reduce the size of icosq_str
-Date: Thu, 19 Oct 2023 20:04:18 -0700
-Message-ID: <20231020030422.67049-12-saeed@kernel.org>
+	Leon Romanovsky <leonro@nvidia.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [net-next 12/15] net/mlx5e: Check return value of snprintf writing to fw_version buffer
+Date: Thu, 19 Oct 2023 20:04:19 -0700
+Message-ID: <20231020030422.67049-13-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231020030422.67049-1-saeed@kernel.org>
 References: <20231020030422.67049-1-saeed@kernel.org>
@@ -55,64 +57,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
-icosq_str size is unnecessarily too long, and it causes a build warning
--Wformat-truncation with W=1. Looking closely, It doesn't need to be 255B,
-hence this patch reduces the size to 32B which should be more than enough
-to host the string: "ICOSQ: 0x%x, ".
+Treat the operation as an error case when the return value is equivalent to
+the size of the name buffer. Failed to write null terminator to the name
+buffer, making the string malformed and should not be used. Provide a
+string with only the firmware version when forming the string with the
+board id fails.
 
-While here, add a missing space in the formatted string.
+Without check, will trigger -Wformat-truncation with W=1.
 
-This fixes the following build warning:
+    drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c: In function 'mlx5e_ethtool_get_drvinfo':
+    drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c:49:31: warning: '%.16s' directive output may be truncated writing up to 16 bytes into a region of size between 13 and 22 [-Wformat-truncation=]
+      49 |                  "%d.%d.%04d (%.16s)",
+         |                               ^~~~~
+    drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c:48:9: note: 'snprintf' output between 12 and 37 bytes into a destination of size 32
+      48 |         snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version),
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      49 |                  "%d.%d.%04d (%.16s)",
+         |                  ~~~~~~~~~~~~~~~~~~~~~
+      50 |                  fw_rev_maj(mdev), fw_rev_min(mdev), fw_rev_sub(mdev),
+         |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      51 |                  mdev->board_id);
+         |                  ~~~~~~~~~~~~~~~
 
-$ KCFLAGS='-Wall -Werror'
-$ make O=/tmp/kbuild/linux W=1 -s -j12 drivers/net/ethernet/mellanox/mlx5/core/
-
-drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c: In function 'mlx5e_reporter_rx_timeout':
-drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c:718:56:
-error: ', CQ: 0x' directive output may be truncated writing 8 bytes into a region of size between 0 and 255 [-Werror=format-truncation=]
-  718 |                  "RX timeout on channel: %d, %sRQ: 0x%x, CQ: 0x%x",
-      |                                                        ^~~~~~~~
-drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c:717:9: note: 'snprintf' output between 43 and 322 bytes into a destination of size 288
-  717 |         snprintf(err_str, sizeof(err_str),
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  718 |                  "RX timeout on channel: %d, %sRQ: 0x%x, CQ: 0x%x",
-      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  719 |                  rq->ix, icosq_str, rq->rqn, rq->cq.mcq.cqn);
-      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6d4ab2e97dcfbcd748ae71761a9d8e5e41cc732c
+Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c    | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-index e8eea9ffd5eb..03b119a434bc 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-@@ -702,11 +702,11 @@ static int mlx5e_rx_reporter_dump(struct devlink_health_reporter *reporter,
- 
- void mlx5e_reporter_rx_timeout(struct mlx5e_rq *rq)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+index 215261a69255..792a0ea544cd 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+@@ -43,12 +43,17 @@ void mlx5e_ethtool_get_drvinfo(struct mlx5e_priv *priv,
+ 			       struct ethtool_drvinfo *drvinfo)
  {
--	char icosq_str[MLX5E_REPORTER_PER_Q_MAX_LEN] = {};
- 	char err_str[MLX5E_REPORTER_PER_Q_MAX_LEN];
- 	struct mlx5e_icosq *icosq = rq->icosq;
- 	struct mlx5e_priv *priv = rq->priv;
- 	struct mlx5e_err_ctx err_ctx = {};
-+	char icosq_str[32] = {};
+ 	struct mlx5_core_dev *mdev = priv->mdev;
++	int count;
  
- 	err_ctx.ctx = rq;
- 	err_ctx.recover = mlx5e_rx_reporter_timeout_recover;
-@@ -715,7 +715,7 @@ void mlx5e_reporter_rx_timeout(struct mlx5e_rq *rq)
- 	if (icosq)
- 		snprintf(icosq_str, sizeof(icosq_str), "ICOSQ: 0x%x, ", icosq->sqn);
- 	snprintf(err_str, sizeof(err_str),
--		 "RX timeout on channel: %d, %sRQ: 0x%x, CQ: 0x%x",
-+		 "RX timeout on channel: %d, %s RQ: 0x%x, CQ: 0x%x",
- 		 rq->ix, icosq_str, rq->rqn, rq->cq.mcq.cqn);
- 
- 	mlx5e_health_report(priv, priv->rx_reporter, err_str, &err_ctx);
+ 	strscpy(drvinfo->driver, KBUILD_MODNAME, sizeof(drvinfo->driver));
+-	snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version),
+-		 "%d.%d.%04d (%.16s)",
+-		 fw_rev_maj(mdev), fw_rev_min(mdev), fw_rev_sub(mdev),
+-		 mdev->board_id);
++	count = snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version),
++			 "%d.%d.%04d (%.16s)", fw_rev_maj(mdev),
++			 fw_rev_min(mdev), fw_rev_sub(mdev), mdev->board_id);
++	if (count == sizeof(drvinfo->fw_version))
++		snprintf(drvinfo->fw_version, sizeof(drvinfo->fw_version),
++			 "%d.%d.%04d", fw_rev_maj(mdev),
++			 fw_rev_min(mdev), fw_rev_sub(mdev));
++
+ 	strscpy(drvinfo->bus_info, dev_name(mdev->device),
+ 		sizeof(drvinfo->bus_info));
+ }
 -- 
 2.41.0
 
