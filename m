@@ -1,224 +1,86 @@
-Return-Path: <netdev+bounces-42848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38FBE7D068F
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 04:41:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 792947D0696
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 04:43:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78598B212CA
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 02:41:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D72D2822B9
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 02:43:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1057439C;
-	Fri, 20 Oct 2023 02:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA43369;
+	Fri, 20 Oct 2023 02:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC1D369
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 02:41:22 +0000 (UTC)
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BAB6124;
-	Thu, 19 Oct 2023 19:41:18 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R221e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VuVbE4E_1697769674;
-Received: from 30.221.149.58(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VuVbE4E_1697769674)
-          by smtp.aliyun-inc.com;
-          Fri, 20 Oct 2023 10:41:15 +0800
-Message-ID: <94f89147-cedc-b8b2-415f-942ec14cd670@linux.alibaba.com>
-Date: Fri, 20 Oct 2023 10:41:13 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFB280B
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 02:43:42 +0000 (UTC)
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 69B3412D;
+	Thu, 19 Oct 2023 19:43:41 -0700 (PDT)
+Received: from localhost.localdomain (unknown [180.167.10.98])
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 5CD3F604C5033;
+	Fri, 20 Oct 2023 10:43:38 +0800 (CST)
+X-MD-Sfrom: suhui@nfschina.com
+X-MD-SrcIP: 180.167.10.98
+From: Su Hui <suhui@nfschina.com>
+To: dan.carpenter@linaro.org,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: Su Hui <suhui@nfschina.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH v2] i40e: add an error code check in i40e_vsi_setup
+Date: Fri, 20 Oct 2023 10:43:09 +0800
+Message-Id: <20231020024308.46630-1-suhui@nfschina.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net 5/5] net/smc: put sk reference if close work was
- canceled
-Content-Language: en-US
-To: Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com,
- jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
- <1697009600-22367-6-git-send-email-alibuda@linux.alibaba.com>
- <bdcb307f-d2a8-4aef-bb7d-dd87e56ff740@linux.ibm.com>
- <ee641ca5-104b-d1ec-5b2a-e20237c5378a@linux.alibaba.com>
- <ad5e4191-227e-4a62-a110-472618ef7de1@linux.ibm.com>
- <305c7ae2-a902-3e30-5e67-b590d848d0ba@linux.alibaba.com>
- <990a6b09-135a-41fb-a375-c37ffec6fe99@linux.ibm.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <990a6b09-135a-41fb-a375-c37ffec6fe99@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+check the value of 'ret' after calling 'i40e_vsi_config_rss'.
 
+Signed-off-by: Su Hui <suhui@nfschina.com>
+---
+v2: 
+- call i40e_vsi_clear_rings() to free rings(thank dan carpenter for
+  pointing out this).
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-On 10/20/23 1:40 AM, Wenjia Zhang wrote:
->
->
-> On 19.10.23 09:33, D. Wythe wrote:
->>
->>
->> On 10/19/23 4:26 AM, Wenjia Zhang wrote:
->>>
->>>
->>> On 17.10.23 04:06, D. Wythe wrote:
->>>>
->>>>
->>>> On 10/13/23 3:04 AM, Wenjia Zhang wrote:
->>>>>
->>>>>
->>>>> On 11.10.23 09:33, D. Wythe wrote:
->>>>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>>>>>
->>>>>> Note that we always hold a reference to sock when attempting
->>>>>> to submit close_work. 
->>>>> yes
->>>>> Therefore, if we have successfully
->>>>>> canceled close_work from pending, we MUST release that reference
->>>>>> to avoid potential leaks.
->>>>>>
->>>>> Isn't the corresponding reference already released inside the 
->>>>> smc_close_passive_work()?
->>>>>
->>>>
->>>> Hi Wenjia,
->>>>
->>>> If we successfully cancel the close work from the pending state,
->>>> it means that smc_close_passive_work() has never been executed.
->>>>
->>>> You can find more details here.
->>>>
->>>> /**
->>>> * cancel_work_sync - cancel a work and wait for it to finish
->>>> * @work:the work to cancel
->>>> *
->>>> * Cancel @work and wait for its execution to finish. This function
->>>> * can be used even if the work re-queues itself or migrates to
->>>> * another workqueue. On return from this function, @work is
->>>> * guaranteed to be not pending or executing on any CPU.
->>>> *
->>>> * cancel_work_sync(&delayed_work->work) must not be used for
->>>> * delayed_work's. Use cancel_delayed_work_sync() instead.
->>>> *
->>>> * The caller must ensure that the workqueue on which @work was last
->>>> * queued can't be destroyed before this function returns.
->>>> *
->>>> * Return:
->>>> * %true if @work was pending, %false otherwise.
->>>> */
->>>> boolcancel_work_sync(structwork_struct *work)
->>>> {
->>>> return__cancel_work_timer(work, false);
->>>> }
->>>>
->>>> Best wishes,
->>>> D. Wythe
->>> As I understand, queue_work() would wake up the work if the work is 
->>> not already on the queue. And the sock_hold() is just prio to the 
->>> queue_work(). That means, cancel_work_sync() would cancel the work 
->>> either before its execution or after. If your fix refers to the 
->>> former case, at this moment, I don't think the reference can be 
->>> hold, thus it is unnecessary to put it.
->>>>
->>
->> I am quite confuse about why you think when we cancel the work before 
->> its execution,
->> the reference can not be hold ?
->>
->>
->> Perhaps the following diagram can describe the problem in better way :
->>
->> smc_close_cancel_work
->> smc_cdc_msg_recv_action
->>
->>
->> sock_hold
->> queue_work
->> if (cancel_work_sync())        // successfully cancel before execution
->> sock_put()                        //  need to put it since we already 
->> hold a ref before   queue_work()
->>
->>
-> ha, I already thought you might ask such question:P
->
-> I think here two Problems need to be clarified:
->
-> 1) Do you think the bh_lock_sock/bh_unlock_sock in the 
-> smc_cdc_msg_recv does not protect the smc_cdc_msg_recv_action() from 
-> cancel_work_sync()?
-> Maybe that would go back to the discussion in the other patch on the 
-> behaviors of the locks.
->
-
-Yes. bh_lock_sock/bh_unlock_sock can not block code execution protected 
-by lock_sock/unlock(). That is to say, they are not exclusive.
-
-We can use a very simple example to infer that since bh_lock_sock is 
-type of spin-lock, if bh_lock_sock/bh_unlock_sock can block 
-lock_sock/unlock(),
-then lock_sock/unlock() can also block bh_lock_sock/bh_unlock_sock.
-
-If this is true, when the process context already lock_sock(), the 
-interrupt context must wait for the process to call
-release_sock(). Obviously, this is very unreasonable.
-
-
-> 2) If the queue_work returns true, as I said in the last main, the 
-> work should be (being) executed. How could the cancel_work_sync() 
-> cancel the work before execution successgully?
-
-No, that's not true. In fact, if queue_work returns true, it simply 
-means that we have added the task to the queue and may schedule a worker 
-to execute it,
-but it does not guarantee that the task will be executed or is being 
-executed when it returns true,
-the task might still in the list and waiting some worker to execute it.
-
-We can make a simple inference,
-
-1. A known fact is that if no special flag (WORK_UNBOUND) is given, 
-tasks submitted will eventually be executed on the CPU where they were 
-submitted.
-
-2. If the queue_work returns true, the work should be or is being executed
-
-If all of the above are true, when we invoke queue_work in an interrupt 
-context, does it mean that the submitted task will be executed in the 
-interrupt context?
-
-
-Best wishes,
-D. Wythe
-
->
->>>>>> Fixes: 42bfba9eaa33 ("net/smc: immediate termination for SMCD 
->>>>>> link groups")
->>>>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->>>>>> ---
->>>>>>   net/smc/smc_close.c | 3 ++-
->>>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
->>>>>> index 449ef45..10219f5 100644
->>>>>> --- a/net/smc/smc_close.c
->>>>>> +++ b/net/smc/smc_close.c
->>>>>> @@ -116,7 +116,8 @@ static void smc_close_cancel_work(struct 
->>>>>> smc_sock *smc)
->>>>>>       struct sock *sk = &smc->sk;
->>>>>>         release_sock(sk);
->>>>>> -    cancel_work_sync(&smc->conn.close_work);
->>>>>> +    if (cancel_work_sync(&smc->conn.close_work))
->>>>>> +        sock_put(sk);
->>>>>> cancel_delayed_work_sync(&smc->conn.tx_work);
->>>>>>       lock_sock(sk);
->>>>>>   }
->>>>
->>
->>
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index de7fd43dc11c..4904bc8f5777 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -14567,9 +14567,13 @@ struct i40e_vsi *i40e_vsi_setup(struct i40e_pf *pf, u8 type,
+ 	if ((pf->hw_features & I40E_HW_RSS_AQ_CAPABLE) &&
+ 	    (vsi->type == I40E_VSI_VMDQ2)) {
+ 		ret = i40e_vsi_config_rss(vsi);
++		if (ret)
++			goto err_config;
+ 	}
+ 	return vsi;
+ 
++err_config:
++	i40e_vsi_clear_rings(vsi);
+ err_rings:
+ 	i40e_vsi_free_q_vectors(vsi);
+ err_msix:
+-- 
+2.30.2
 
 
