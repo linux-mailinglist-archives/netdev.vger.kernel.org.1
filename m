@@ -1,144 +1,93 @@
-Return-Path: <netdev+bounces-42958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-42959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B9D27D0C8D
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:00:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 319007D0C94
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 12:01:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF07D282508
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:00:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B48ECB20DE8
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 10:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD0B01798E;
-	Fri, 20 Oct 2023 09:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED8C6156C4;
+	Fri, 20 Oct 2023 10:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAt6zkRr"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE88A171A0;
-	Fri, 20 Oct 2023 09:59:39 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3389BD66;
-	Fri, 20 Oct 2023 02:59:38 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SBg136Nf6zcd6k;
-	Fri, 20 Oct 2023 17:54:47 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Fri, 20 Oct 2023 17:59:34 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Alexander
- Duyck <alexander.duyck@gmail.com>, Liang Chen <liangchen.linux@gmail.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Eric Dumazet
-	<edumazet@google.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, <bpf@vger.kernel.org>
-Subject: [PATCH net-next v12 5/5] net: veth: use newly added page pool API for veth with xdp
-Date: Fri, 20 Oct 2023 17:59:52 +0800
-Message-ID: <20231020095952.11055-6-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20231020095952.11055-1-linyunsheng@huawei.com>
-References: <20231020095952.11055-1-linyunsheng@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DDA15E81;
+	Fri, 20 Oct 2023 10:01:05 +0000 (UTC)
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88394D66;
+	Fri, 20 Oct 2023 03:00:58 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-4064876e8b8so5430605e9.0;
+        Fri, 20 Oct 2023 03:00:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697796056; x=1698400856; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=peRqXjQQQ45HJmDIxv6CwSEgU//1lNonAjtSzwx3PGU=;
+        b=WAt6zkRrXTXbvp7uV9zadEt2O1sBo7iFog6EsgZnH/d3Pk1Dz2kI3NFcdhF5UN7hm4
+         mXtMixQebrkU7+DXfCSEavCu7vXffxc1vdFZjcuP+eqZRMvncs0hX67kN2dYefUXEXcp
+         W9Qo//N9Av9pmWUnX8CAUVN4Te2RwVLOlRQrFs/PnWegi56YuLU7tuxhLCqhpbEt6ZNY
+         GswuoyV5wn8lq6i9RqyjLWurTb+L7rri57jXx5riMLTjuG4EX3d7MTE/+8Ju5CWcd1RW
+         QipibBOLPnpLWdJvh5eHoCHNy/GDohXkMyqG1m/cFeTaMUJxMavubDluUcc5eRuFPa59
+         wy+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697796056; x=1698400856;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=peRqXjQQQ45HJmDIxv6CwSEgU//1lNonAjtSzwx3PGU=;
+        b=wzC2xsfrFnhPeh26GH24fQNurpsxq4ffcFHUnqUBgV08SwVvHFFg6V9vmPfDsCVMhU
+         QtzGXA+SISdVVdEr9gb3tTUNS+9fIlTJbZMfumKTO17WbgW4mqdhB25lrBrTKOIl379G
+         Suc6esTWrftN5qo2TnE65ENXkdTzmjFgSClA9wPXssGKigdHaOv4oeyUaAcNzVXukX22
+         UIcaZruBlf+qQtK2jmvdNq43BCUoly4J5fY7bnx6DZUwuaydaop9bhfjj4fPlwJTYiOu
+         ErjCf/0sYzJz7OI+sSVAeStgrbJtU6scnPm4njo4uG1D7ap+0NIta/esqmdhEo5NyPOC
+         2FJA==
+X-Gm-Message-State: AOJu0YzSNzzfWgoEMVWe2vP4Vo9cFeUH+/MLoq8KB4EvrFbPDp0wdJML
+	/vYDFreDmezL2A+uFE4TBBE=
+X-Google-Smtp-Source: AGHT+IHsoOcv7yGlkWUObueKECjKOC+XTO4SUe7WvsjAk0W10IRiMeQ2aLBhTMS9jRCqxjmQxecx/Q==
+X-Received: by 2002:adf:f387:0:b0:319:68ce:2c53 with SMTP id m7-20020adff387000000b0031968ce2c53mr991596wro.25.1697796056321;
+        Fri, 20 Oct 2023 03:00:56 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id d14-20020adffd8e000000b0031984b370f2sm1320027wrr.47.2023.10.20.03.00.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Oct 2023 03:00:55 -0700 (PDT)
+Date: Fri, 20 Oct 2023 13:00:53 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Ante Knezic <ante.knezic@helmholz.de>
+Cc: UNGLinuxDriver@microchip.com, andrew@lunn.ch, conor+dt@kernel.org,
+	davem@davemloft.net, devicetree@vger.kernel.org,
+	edumazet@google.com, f.fainelli@gmail.com,
+	krzysztof.kozlowski+dt@linaro.org, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, marex@denx.de, netdev@vger.kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org, woojung.huh@microchip.com
+Subject: Re: [PATCH net-next v3 2/2] net:dsa:microchip: add property to select
+Message-ID: <20231020100053.wf3jivdkdfaunfgh@skbuf>
+References: <20231019165409.5sgkyvxsidrrptgh@skbuf>
+ <20231020084620.4603-1-ante.knezic@helmholz.de>
+ <20231020092729.gpbr7s2cbmznmal7@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231020092729.gpbr7s2cbmznmal7@skbuf>
 
-Use page_pool_alloc() API to allocate memory with least
-memory utilization and performance penalty.
+On Fri, Oct 20, 2023 at 12:27:29PM +0300, Vladimir Oltean wrote:
+> On Fri, Oct 20, 2023 at 10:46:20AM +0200, Ante Knezic wrote:
+> > Ok, will do. I am guessing I should leave the existing 
+> > ksz8795_cpu_interface_select() as it is?
+> 
+> I would encourage moving it to the simpler call path as well, but
+> ultimately this is up to you.
 
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-CC: Lorenzo Bianconi <lorenzo@kernel.org>
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-CC: Liang Chen <liangchen.linux@gmail.com>
-CC: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/net/veth.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 0deefd1573cf..9980517ed8b0 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -737,10 +737,11 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 	if (skb_shared(skb) || skb_head_is_locked(skb) ||
- 	    skb_shinfo(skb)->nr_frags ||
- 	    skb_headroom(skb) < XDP_PACKET_HEADROOM) {
--		u32 size, len, max_head_size, off;
-+		u32 size, len, max_head_size, off, truesize, page_offset;
- 		struct sk_buff *nskb;
- 		struct page *page;
- 		int i, head_off;
-+		void *va;
- 
- 		/* We need a private copy of the skb and data buffers since
- 		 * the ebpf program can modify it. We segment the original skb
-@@ -753,14 +754,17 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 		if (skb->len > PAGE_SIZE * MAX_SKB_FRAGS + max_head_size)
- 			goto drop;
- 
-+		size = min_t(u32, skb->len, max_head_size);
-+		truesize = SKB_HEAD_ALIGN(size) + VETH_XDP_HEADROOM;
-+
- 		/* Allocate skb head */
--		page = page_pool_dev_alloc_pages(rq->page_pool);
--		if (!page)
-+		va = page_pool_dev_alloc_va(rq->page_pool, &truesize);
-+		if (!va)
- 			goto drop;
- 
--		nskb = napi_build_skb(page_address(page), PAGE_SIZE);
-+		nskb = napi_build_skb(va, truesize);
- 		if (!nskb) {
--			page_pool_put_full_page(rq->page_pool, page, true);
-+			page_pool_free_va(rq->page_pool, va, true);
- 			goto drop;
- 		}
- 
-@@ -768,7 +772,6 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 		skb_copy_header(nskb, skb);
- 		skb_mark_for_recycle(nskb);
- 
--		size = min_t(u32, skb->len, max_head_size);
- 		if (skb_copy_bits(skb, 0, nskb->data, size)) {
- 			consume_skb(nskb);
- 			goto drop;
-@@ -783,14 +786,18 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 		len = skb->len - off;
- 
- 		for (i = 0; i < MAX_SKB_FRAGS && off < skb->len; i++) {
--			page = page_pool_dev_alloc_pages(rq->page_pool);
-+			size = min_t(u32, len, PAGE_SIZE);
-+			truesize = size;
-+
-+			page = page_pool_dev_alloc(rq->page_pool, &page_offset,
-+						   &truesize);
- 			if (!page) {
- 				consume_skb(nskb);
- 				goto drop;
- 			}
- 
--			size = min_t(u32, len, PAGE_SIZE);
--			skb_add_rx_frag(nskb, i, page, 0, size, PAGE_SIZE);
-+			skb_add_rx_frag(nskb, i, page, page_offset, size,
-+					truesize);
- 			if (skb_copy_bits(skb, off, page_address(page),
- 					  size)) {
- 				consume_skb(nskb);
--- 
-2.33.0
-
+Also, could you please put spaces in the commit prefix ("net: dsa: microchip: ")?
 
