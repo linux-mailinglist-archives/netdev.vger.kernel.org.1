@@ -1,471 +1,180 @@
-Return-Path: <netdev+bounces-43044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FFB47D124C
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:12:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5EC97D124F
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:12:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71E82B2146D
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 15:12:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78F542824B9
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 15:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B501E1DA44;
-	Fri, 20 Oct 2023 15:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3671DA46;
+	Fri, 20 Oct 2023 15:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KhTkQLww"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hRQ0+ABG"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21671DA3F;
-	Fri, 20 Oct 2023 15:12:29 +0000 (UTC)
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BE77FA;
-	Fri, 20 Oct 2023 08:12:27 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5a7af45084eso10571007b3.0;
-        Fri, 20 Oct 2023 08:12:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3EC1DA43;
+	Fri, 20 Oct 2023 15:12:47 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAEE8FA;
+	Fri, 20 Oct 2023 08:12:44 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9a58dbd5daeso145722466b.2;
+        Fri, 20 Oct 2023 08:12:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697814746; x=1698419546; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+        d=gmail.com; s=20230601; t=1697814763; x=1698419563; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=jkIX9pkO5/Tsxh3X28JoJEQJmjUmQKmAAJHUvc8itGc=;
-        b=KhTkQLww2IiXES/RxJdc1HC8JmjXhZA6AxCUnEqlY8pi2JvryAzjCTs3i4gP7uGDgN
-         9bbgG2UzIw0GZ8n2KSWsTLHRFO81Cuvf/a0jt0pMXCU1Yfjc0oj7fW0H7W4wezHoQYyl
-         dSLL2W0EBVI40jycaSFoOvSrxQdCT/nh4nINky4SeYRkc/HGhCk28yqU11L9ckYQEs+Z
-         jhWvjrfO9nOOCI6HE0LoyrYE3hScS95cLKzTVPj43S/AdJG7qRK4Rr3AoABweqLtHpky
-         YEUVbTat4F8h4ApisWNeP7u6HH/2CkUCu1aMiJBabKWjfKzi2/3XwCY52rs7McleIQaI
-         iHIw==
+        bh=ZU5hBj8/e4oDuCRh8BssYew0LlrPlrgUCeK6Uhar2WQ=;
+        b=hRQ0+ABGvWBkF2Q1fXlM+GQl2LcHIPMLpchIFGBPlahA/NP40FKcgNofnqbNVStStt
+         GWKGrXX1v9lqCIUn7L/HibwqF5d8UzDvc+8tSxa7KDOvPoTiJ+SUSplPxeU6nXwzv8zm
+         2+81Z8jfeZQrS3As3q4cllMz5n8p7S8FRVOoJlWfqJdC/mDyIM22aXr9K9Sh/7thNAG+
+         E4lsLyvzdnIWV6Nt1pDqCjU0xP6uIlfU/Uul/PjYLq8/YN6/Mb75RcyLJa6C5hLBt915
+         kRobuu8P/RmPGvF83ZnEGci04CblVclAuYAXJKrAhYtyrV7ovp5ikC8iH8Ij2YKxXbr1
+         dtcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697814746; x=1698419546;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1697814763; x=1698419563;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jkIX9pkO5/Tsxh3X28JoJEQJmjUmQKmAAJHUvc8itGc=;
-        b=PdQxXN4RPX98CXwx0byAGXd1YTxYEv5wlNX1SaADPGToLvLaaPIViP21oo2fsUJo6V
-         ME2jl3B7DKxKoWdc9TiAtKSh8IMu8xGiHSC6UUBiFzxGUBDye+1qwcOoGD3eynD5Z2kg
-         50OYndRLKUY+5q3k074XsW7WagAKeNmCmRsbNQCzOJp1nZa0xRTkgiIehsi5DNfAvhRY
-         GlO5AWlyzyi85AoxR6kvyEeBEnjmVJULLm57UgKxPuUEut5IK5UhIkmAdKnP+kIptVKz
-         /+6y0d9aSNpoIbifBl+HZ0ko2DsER+8sFnn/9rXML5r2XOQlCYSbZLhZYuPtm+wFwj/i
-         EJHQ==
-X-Gm-Message-State: AOJu0YxOy4u8dRipoF+gnkRh6EZ2FEKQcVkXQn0m5YCE4ou5W06jqcwf
-	abyopYqWcHax3d2+9ng1l2o=
-X-Google-Smtp-Source: AGHT+IEEitKGpoHWJfRDrz3lMA1sSvMPWQl7klCdmBN/wkKoqOKr9prEOoLCHiwJ1ru/DkDHUUHmOQ==
-X-Received: by 2002:a81:5258:0:b0:5a7:b797:d1e4 with SMTP id g85-20020a815258000000b005a7b797d1e4mr2218035ywb.21.1697814746035;
-        Fri, 20 Oct 2023 08:12:26 -0700 (PDT)
-Received: from ?IPV6:2600:1700:6cf8:1240:74bb:66ec:3132:3e97? ([2600:1700:6cf8:1240:74bb:66ec:3132:3e97])
-        by smtp.gmail.com with ESMTPSA id g142-20020a0ddd94000000b005a8073e2062sm752011ywe.33.2023.10.20.08.12.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Oct 2023 08:12:25 -0700 (PDT)
-Message-ID: <9e7ec07f-bc03-4e62-a0f6-28f668a1ec42@gmail.com>
-Date: Fri, 20 Oct 2023 08:12:23 -0700
+        bh=ZU5hBj8/e4oDuCRh8BssYew0LlrPlrgUCeK6Uhar2WQ=;
+        b=uD2g8aseqaxe3b79Odjs14hDLxhsf4Eehg85f5MWRtX/VZfpGJuhMherqo9i7u9sfx
+         5iKR/fYD4B0WsLhfMxBDmYrqo0tmIp3Dk1ed00lMtGsrc4zUx2o/UP5ZBYSg5RpVw3/V
+         f/Qi2HkjBcAjBQ4kkM65m15S4rAt5/4pA5NMeBzJJxfqtsYvqnw0zlytEN/9jG8QFX+G
+         iB13aYX3jgvuQPY1PNAL0QTfzv5FMyg/KYewSqGU+8clu5xf4fmjYOUQDYjv+DIVURMu
+         Wy3T371Xg3a44HEN29azAu6s/jLoha64xGwPkl3fTR7QwuPx1MIH9gfd3SBeuHV5dCmu
+         /GJg==
+X-Gm-Message-State: AOJu0Yx9gQbHsftQrEgqhNIm7FBL2eh8ssONNnq0IyO2LS9ej14uqpME
+	OTGVFs6T/au2k0uoAFdz27I=
+X-Google-Smtp-Source: AGHT+IHpR9r/JHxcLJl5Vxxatg7b/wgqRKDdY/W5Fw63VB9oSzgnCKlz5RaNbTQa568EZAW9WyPbsA==
+X-Received: by 2002:a17:907:3f22:b0:9bd:a063:39d2 with SMTP id hq34-20020a1709073f2200b009bda06339d2mr2130957ejc.16.1697814762995;
+        Fri, 20 Oct 2023 08:12:42 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id d13-20020a1709064c4d00b009a5f1d15642sm1650051ejw.158.2023.10.20.08.12.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Oct 2023 08:12:42 -0700 (PDT)
+Date: Fri, 20 Oct 2023 18:12:40 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 6/7] dt-bindings: marvell: Rewrite MV88E6xxx
+ in schema
+Message-ID: <20231020151240.3gdcftg2aaz7bnal@skbuf>
+References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
+ <20231018-marvell-88e6152-wan-led-v4-6-3ee0c67383be@linaro.org>
+ <20231019153552.nndysafvblrkl2zn@skbuf>
+ <CACRpkdbskk22SLmopUTD78kMWL_gcOa=YWHLFtrkDAD5=W=HFw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Kui-Feng Lee <sinquersw@gmail.com>
-Subject: Re: [PATCH bpf-next v5 6/9] bpf, net: switch to dynamic registration
-To: Martin KaFai Lau <martin.lau@linux.dev>, thinker.li@gmail.com
-Cc: kuifeng@meta.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- ast@kernel.org, song@kernel.org, kernel-team@meta.com, andrii@kernel.org,
- drosen@google.com
-References: <20231017162306.176586-1-thinker.li@gmail.com>
- <20231017162306.176586-7-thinker.li@gmail.com>
- <72104b12-4573-7f6d-183e-4761673329e2@linux.dev>
-Content-Language: en-US
-In-Reply-To: <72104b12-4573-7f6d-183e-4761673329e2@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACRpkdbskk22SLmopUTD78kMWL_gcOa=YWHLFtrkDAD5=W=HFw@mail.gmail.com>
 
+On Fri, Oct 20, 2023 at 02:47:20PM +0200, Linus Walleij wrote:
+> On Thu, Oct 19, 2023 at 5:35 PM Vladimir Oltean <olteanv@gmail.com> wrote:
+> 
+> > Yikes, both these examples are actually broken,
+> 
+> As you can see from the patch, they are just carried over from
+> Documentation/devicetree/bindings/net/dsa/marvell.txt
+> 
+> +/- fixes to make them pass schema checks.
 
+(...)
 
-On 10/18/23 18:49, Martin KaFai Lau wrote:
-> On 10/17/23 9:23 AM, thinker.li@gmail.com wrote:
->> From: Kui-Feng Lee <thinker.li@gmail.com>
->>
->> Replace the static list of struct_ops types with pre-btf 
->> struct_ops_tab to
->> enable dynamic registration.
->>
->> Both bpf_dummy_ops and bpf_tcp_ca now utilize the registration function
->> instead of being listed in bpf_struct_ops_types.h.
->>
->> Cc: netdev@vger.kernel.org
->> Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
->> ---
->>   include/linux/bpf.h               |   2 +
->>   include/linux/btf.h               |  29 +++++++
->>   kernel/bpf/bpf_struct_ops.c       | 124 +++++++++++++++---------------
->>   kernel/bpf/bpf_struct_ops_types.h |  12 ---
->>   kernel/bpf/btf.c                  |   2 +-
->>   net/bpf/bpf_dummy_struct_ops.c    |  14 +++-
->>   net/ipv4/bpf_tcp_ca.c             |  16 +++-
->>   7 files changed, 119 insertions(+), 80 deletions(-)
->>   delete mode 100644 kernel/bpf/bpf_struct_ops_types.h
->>
->> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
->> index 1e1647c8b0ce..b0f33147aa93 100644
->> --- a/include/linux/bpf.h
->> +++ b/include/linux/bpf.h
->> @@ -3207,4 +3207,6 @@ static inline bool bpf_is_subprog(const struct 
->> bpf_prog *prog)
->>       return prog->aux->func_idx != 0;
->>   }
->> +int register_bpf_struct_ops(struct bpf_struct_ops *st_ops);
->> +
->>   #endif /* _LINUX_BPF_H */
->> diff --git a/include/linux/btf.h b/include/linux/btf.h
->> index aa2ba77648be..fdc83aa10462 100644
->> --- a/include/linux/btf.h
->> +++ b/include/linux/btf.h
->> @@ -12,6 +12,8 @@
->>   #include <uapi/linux/bpf.h>
->>   #define BTF_TYPE_EMIT(type) ((void)(type *)0)
->> +#define BTF_STRUCT_OPS_TYPE_EMIT(type) {((void)(struct type *)0);    \
->> +        ((void)(struct bpf_struct_ops_##type *)0); }
->>   #define BTF_TYPE_EMIT_ENUM(enum_val) ((void)enum_val)
->>   /* These need to be macros, as the expressions are used in assembler 
->> input */
->> @@ -200,6 +202,7 @@ u32 btf_obj_id(const struct btf *btf);
->>   bool btf_is_kernel(const struct btf *btf);
->>   bool btf_is_module(const struct btf *btf);
->>   struct module *btf_try_get_module(const struct btf *btf);
->> +struct btf *btf_get_module_btf(const struct module *module);
->>   u32 btf_nr_types(const struct btf *btf);
->>   bool btf_member_is_reg_int(const struct btf *btf, const struct 
->> btf_type *s,
->>                  const struct btf_member *m,
->> @@ -577,4 +580,30 @@ int btf_add_struct_ops(struct bpf_struct_ops 
->> *st_ops);
->>   const struct bpf_struct_ops **
->>   btf_get_struct_ops(struct btf *btf, u32 *ret_cnt);
->> +enum bpf_struct_ops_state {
->> +    BPF_STRUCT_OPS_STATE_INIT,
->> +    BPF_STRUCT_OPS_STATE_INUSE,
->> +    BPF_STRUCT_OPS_STATE_TOBEFREE,
->> +    BPF_STRUCT_OPS_STATE_READY,
->> +};
->> +
->> +struct bpf_struct_ops_common_value {
->> +    refcount_t refcnt;
->> +    enum bpf_struct_ops_state state;
->> +};
->> +#define BPF_STRUCT_OPS_COMMON_VALUE struct 
->> bpf_struct_ops_common_value common
+> These examples are already in the kernel. Migrating them
+> from marvell.txt to marvell,mv88e6xxx.yaml doesn't make
+> the situation worse, it's not like people magically start trusting
+> the examples more because they are in YAML than in .txt.
 > 
-> Since there is 'struct bpf_struct_ops_common_value' now, the 
-> BPF_STRUCT_OPS_COMMON_VALUE macro is not as useful as before. Lets 
-> remove it.
+> But sure let's try to put in better examples!
 
-Agree
+You are not correct here. The examples from
+Documentation/devicetree/bindings/net/dsa/marvell.txt don't have ports,
+and the way in which you added the ports is wrong (at least relative to
+the way in which you kept the mdio node).
 
+> > What you have now is exactly what won't work, i.e. an OF-based
+> > slave_mii_bus with a non-OF-based phy_connect().
 > 
->> +
->> +/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
->> + * the map's value exposed to the userspace and its btf-type-id is
->> + * stored at the map->btf_vmlinux_value_type_id.
->> + *
->> + */
->> +#define DEFINE_STRUCT_OPS_VALUE_TYPE(_name)            \
->> +extern struct bpf_struct_ops bpf_##_name;            \
->> +                                \
->> +struct bpf_struct_ops_##_name {                    \
->> +    BPF_STRUCT_OPS_COMMON_VALUE;                \
->> +    struct _name data ____cacheline_aligned_in_smp;        \
->> +}
+> Yeah when I run check_dtbs I get a few (not many) warnings
+> like this on aarch64 and armv7_multi:
 > 
-> I think the bpp_struct_ops_* should not be in btf.h. Probably move them 
-> to bpf.h instead. or there is some other considerations I am missing?
+> arch/arm/boot/dts/nxp/imx/imx6q-b450v3.dtb: switch@0: ports:port@4:
+> 'phy-mode' is a required property
+>     from schema $id:
+> http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
 
-Yes, I think bpf.h is the right place.
+Ok, the warning is valid, but I don't know what phy-mode to put there.
+It is unrelated anyway. Some warnings will be expected after the schema
+conversion, and they are not all mechanical to fix. When we put schema
+validation in place for checking that CPU ports have valid link
+descriptions that phylink can use, we decided to be lax in the kernel,
+but strict in the dt-schema. Hmm, not sure what were we thinking.
+We didn't have a schema for Marvell, so we weren't even seeing many of
+the validation errors that you're now uncovering.
 
-> 
->> +
->>   #endif
->> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
->> index 60445ff32275..175068b083cb 100644
->> --- a/kernel/bpf/bpf_struct_ops.c
->> +++ b/kernel/bpf/bpf_struct_ops.c
->> @@ -13,19 +13,6 @@
->>   #include <linux/btf_ids.h>
->>   #include <linux/rcupdate_wait.h>
->> -enum bpf_struct_ops_state {
->> -    BPF_STRUCT_OPS_STATE_INIT,
->> -    BPF_STRUCT_OPS_STATE_INUSE,
->> -    BPF_STRUCT_OPS_STATE_TOBEFREE,
->> -    BPF_STRUCT_OPS_STATE_READY,
->> -};
->> -
->> -struct bpf_struct_ops_common_value {
->> -    refcount_t refcnt;
->> -    enum bpf_struct_ops_state state;
->> -};
->> -#define BPF_STRUCT_OPS_COMMON_VALUE struct 
->> bpf_struct_ops_common_value common
->> -
->>   struct bpf_struct_ops_value {
->>       BPF_STRUCT_OPS_COMMON_VALUE;
->>       char data[] ____cacheline_aligned_in_smp;
->> @@ -72,35 +59,6 @@ static DEFINE_MUTEX(update_mutex);
->>   #define VALUE_PREFIX "bpf_struct_ops_"
->>   #define VALUE_PREFIX_LEN (sizeof(VALUE_PREFIX) - 1)
->> -/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
->> - * the map's value exposed to the userspace and its btf-type-id is
->> - * stored at the map->btf_vmlinux_value_type_id.
->> - *
->> - */
->> -#define BPF_STRUCT_OPS_TYPE(_name)                \
->> -extern struct bpf_struct_ops bpf_##_name;            \
->> -                                \
->> -struct bpf_struct_ops_##_name {                        \
->> -    BPF_STRUCT_OPS_COMMON_VALUE;                \
->> -    struct _name data ____cacheline_aligned_in_smp;        \
->> -};
->> -#include "bpf_struct_ops_types.h"
->> -#undef BPF_STRUCT_OPS_TYPE
->> -
->> -enum {
->> -#define BPF_STRUCT_OPS_TYPE(_name) BPF_STRUCT_OPS_TYPE_##_name,
->> -#include "bpf_struct_ops_types.h"
->> -#undef BPF_STRUCT_OPS_TYPE
->> -    __NR_BPF_STRUCT_OPS_TYPE,
->> -};
->> -
->> -static struct bpf_struct_ops * const bpf_struct_ops[] = {
->> -#define BPF_STRUCT_OPS_TYPE(_name)                \
->> -    [BPF_STRUCT_OPS_TYPE_##_name] = &bpf_##_name,
->> -#include "bpf_struct_ops_types.h"
->> -#undef BPF_STRUCT_OPS_TYPE
->> -};
->> -
->>   const struct bpf_verifier_ops bpf_struct_ops_verifier_ops = {
->>   };
->> @@ -234,16 +192,51 @@ static void bpf_struct_ops_init_one(struct 
->> bpf_struct_ops *st_ops,
->>   }
->> +static int register_bpf_struct_ops_btf(struct bpf_struct_ops *st_ops,
->> +                       struct btf *btf)
-> 
-> Please combine this function into register_bpf_struct_ops(). They are 
-> both very short.
-> 
+> Isn't there some in-kernel DTS file with a *good* example of how
+> a Marvell mv88e6xxx switch is supposed to look I can just
+> copy instead? We shouldn't conjure synthetic examples.
 
-Got it!
+(...)
 
->> +{
->> +    struct bpf_verifier_log *log;
->> +    int err;
->> +
->> +    if (st_ops == NULL)
->> +        return -EINVAL;
->> +
->> +    log = kzalloc(sizeof(*log), GFP_KERNEL | __GFP_NOWARN);
->> +    if (!log) {
->> +        err = -ENOMEM;
->> +        goto errout;
->> +    }
->> +
->> +    log->level = BPF_LOG_KERNEL;
->> +
->> +    bpf_struct_ops_init_one(st_ops, btf, st_ops->owner, log);
->> +
->> +    err = btf_add_struct_ops(st_ops);
->> +
->> +errout:
->> +    kfree(log);
->> +
->> +    return err;
->> +}
->> +
->> +int register_bpf_struct_ops(struct bpf_struct_ops *st_ops)
-> 
-> Similar to the register kfunc counterpart, can this be moved to btf.c 
-> instead by extern-ing bpf_struct_ops_init_one()? or there are some other 
-> structs/functions need to extern?
+> I'm game. Point out the DTS file and I will take that.
 
-It is wierd to move a function of bpf_struct_ops to btf.
-But, kfunc already did that, I don't mind to follow it.
+You can use https://elixir.bootlin.com/u-boot/latest/source/arch/arm/dts/imx6qdl-gw5904.dtsi#L211
+(optionally renaming switch to ethernet-switch, and ports to ethernet-ports).
+That uses the subset of the mv88e6xxx kernel bindings that U-Boot also
+understands, so taking a U-Boot example is actually preferable.
 
+> > One other thing I see as a deal breaker for this schema conversion is
+> > that $nodename for Marvell needs to allow basically anything (invalidating
+> > the constraint from ethernet-switch.yaml), because we can't change node
+> > names in the case of some boards, otherwise we risk breaking them
+> > (see MOX). If the schema starts emitting warnings for those node names,
+> > then it's inevitable that some pixie in the future will eventually break
+> > them by "fixing" the node name.
 > 
->> +{
->> +    struct btf *btf;
->> +    int err;
->> +
->> +    btf = btf_get_module_btf(st_ops->owner);
->> +    if (!btf)
->> +        return -EINVAL;
->> +    err = register_bpf_struct_ops_btf(st_ops, btf);
->> +    btf_put(btf);
->> +
->> +    return err;
->> +}
->> +EXPORT_SYMBOL_GPL(register_bpf_struct_ops);
->> +
->>   void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log)
+> I already did a bit of hippo-in-china-porcelain store in the patches
+> in this series mostly renaming things like "switch0@0" to "switch@0"
+> (yeah that's all).
 > 
-> The bpf_struct_ops_init() is pretty much only finding the btf 
-> "module_id" and "common_value_id". Lets use the BTF_ID_LIST to do it 
-> instead. Then the newly added bpf_struct_ops_init_one() could use a 
-> proper name bpf_struct_ops_init() instead of having the special "_one" 
-> suffix.
+> Is this part of the problem or something else?
 
-Got it!
+Yes, for most of the switches, renaming their OF nodes should not be a problem.
 
-> 
->>   {
->> -    struct bpf_struct_ops *st_ops;
->>       s32 module_id, common_value_id;
->> -    u32 i;
->> -
->> -    /* Ensure BTF type is emitted for "struct bpf_struct_ops_##_name" */
->> -#define BPF_STRUCT_OPS_TYPE(_name) BTF_TYPE_EMIT(struct 
->> bpf_struct_ops_##_name);
->> -#include "bpf_struct_ops_types.h"
->> -#undef BPF_STRUCT_OPS_TYPE
->>       module_id = btf_find_by_name_kind(btf, "module", BTF_KIND_STRUCT);
->>       if (module_id < 0) {
->> @@ -259,11 +252,6 @@ void bpf_struct_ops_init(struct btf *btf, struct 
->> bpf_verifier_log *log)
->>           return;
->>       }
->>       common_value_type = btf_type_by_id(btf, common_value_id);
->> -
->> -    for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
->> -        st_ops = bpf_struct_ops[i];
->> -        bpf_struct_ops_init_one(st_ops, btf, NULL, log);
->> -    }
->>   }
->>   extern struct btf *btf_vmlinux;
->> @@ -271,32 +259,44 @@ extern struct btf *btf_vmlinux;
->>   static const struct bpf_struct_ops *
->>   bpf_struct_ops_find_value(struct btf *btf, u32 value_id)
->>   {
->> +    const struct bpf_struct_ops *st_ops = NULL;
->> +    const struct bpf_struct_ops **st_ops_list;
->>       unsigned int i;
->> +    u32 cnt = 0;
->>       if (!value_id || !btf_vmlinux)
-> 
-> The "!btf_vmlinux" should have been changed to "!btf" in the earlier 
-> patch (patch 2?),
+For Marvell, I'd exercise extra caution and only rename those OF nodes
+where I can confirm that doing so won't break anything. Marvell is one
+of the oldest DSA drivers, and you can tell that the bindings have gone
+through a lot before becoming more or less uniform.
 
-This is not btf. It mean to check if btf_vmlinux is initialized.
-It is not necessary anymore.
-For checking btf, the following btf_get_struct_ops() will keep cnt zero
-if btf is NULL, so it is unnecessary as well.
-
-> 
-> and is this null check still needed now?
-> 
->>           return NULL;
->> -    for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
->> -        if (bpf_struct_ops[i]->value_id == value_id)
->> -            return bpf_struct_ops[i];
->> +    st_ops_list = btf_get_struct_ops(btf, &cnt);
->> +    for (i = 0; i < cnt; i++) {
->> +        if (st_ops_list[i]->value_id == value_id) {
->> +            st_ops = st_ops_list[i];
-> 
-> nit. Like the change in the earlier patch that is being replaced here,
-> directly "return st_ops_list[i];".
-
-Got it!
-
-> 
->> +            break;
->> +        }
->>       }
->> -    return NULL;
->> +    return st_ops;
->>   }
->>   const struct bpf_struct_ops *bpf_struct_ops_find(struct btf *btf, 
->> u32 type_id)
->>   {
->> +    const struct bpf_struct_ops *st_ops = NULL;
->> +    const struct bpf_struct_ops **st_ops_list;
->>       unsigned int i;
->> +    u32 cnt;
->>       if (!type_id || !btf_vmlinux)
->>           return NULL;
->> -    for (i = 0; i < ARRAY_SIZE(bpf_struct_ops); i++) {
->> -        if (bpf_struct_ops[i]->type_id == type_id)
->> -            return bpf_struct_ops[i];
->> +    st_ops_list = btf_get_struct_ops(btf, &cnt);
->> +    for (i = 0; i < cnt; i++) {
->> +        if (st_ops_list[i]->type_id == type_id) {
->> +            st_ops = st_ops_list[i];
-> 
-> Same.
-
-Ack!
-
-> 
->> +            break;
->> +        }
->>       }
->> -    return NULL;
->> +    return st_ops;
->>   }
->>   static int bpf_struct_ops_map_get_next_key(struct bpf_map *map, void 
->> *key,
->> diff --git a/kernel/bpf/bpf_struct_ops_types.h 
->> b/kernel/bpf/bpf_struct_ops_types.h
->> deleted file mode 100644
->> index 5678a9ddf817..000000000000
->> --- a/kernel/bpf/bpf_struct_ops_types.h
->> +++ /dev/null
->> @@ -1,12 +0,0 @@
->> -/* SPDX-License-Identifier: GPL-2.0 */
->> -/* internal file - do not include directly */
->> -
->> -#ifdef CONFIG_BPF_JIT
->> -#ifdef CONFIG_NET
->> -BPF_STRUCT_OPS_TYPE(bpf_dummy_ops)
->> -#endif
->> -#ifdef CONFIG_INET
->> -#include <net/tcp.h>
->> -BPF_STRUCT_OPS_TYPE(tcp_congestion_ops)
->> -#endif
->> -#endif
-> 
-> Seeing this gone is satisfying
-> 
->> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
->> index be5144dbb53d..990973d6057d 100644
->> --- a/kernel/bpf/btf.c
->> +++ b/kernel/bpf/btf.c
->> @@ -7532,7 +7532,7 @@ struct module *btf_try_get_module(const struct 
->> btf *btf)
->>   /* Returns struct btf corresponding to the struct module.
->>    * This function can return NULL or ERR_PTR.
->>    */
->> -static struct btf *btf_get_module_btf(const struct module *module)
->> +struct btf *btf_get_module_btf(const struct module *module)
->>   {
->>   #ifdef CONFIG_DEBUG_INFO_BTF_MODULES
->>       struct btf_module *btf_mod, *tmp;
->> diff --git a/net/bpf/bpf_dummy_struct_ops.c 
->> b/net/bpf/bpf_dummy_struct_ops.c
->> index 5918d1b32e19..724bb7224079 100644
->> --- a/net/bpf/bpf_dummy_struct_ops.c
->> +++ b/net/bpf/bpf_dummy_struct_ops.c
->> @@ -7,7 +7,7 @@
->>   #include <linux/bpf.h>
->>   #include <linux/btf.h>
->> -extern struct bpf_struct_ops bpf_bpf_dummy_ops;
->> +static struct bpf_struct_ops bpf_bpf_dummy_ops;
-> 
-> Is it still needed ?
-
-Yes, it will be used by bpf_struct_ops_test_run().
-
-
-> 
-> 
-> 
-
+Anyway, for the $nodename constraint, it _looks_ all mechanical and trivial
+to fix (unlike the missing phy-mode that you point to, above), so someone
+will jump to fix it. I would like to avoid that, because boot testing
+will be key, and a board is not always available.
 
