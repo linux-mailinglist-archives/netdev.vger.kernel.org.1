@@ -1,153 +1,148 @@
-Return-Path: <netdev+bounces-43084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 264897D156D
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 20:06:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF40E7D1570
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 20:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D372E28239C
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:06:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75A72282651
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 18:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C35E9208D8;
-	Fri, 20 Oct 2023 18:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE65B2230F;
+	Fri, 20 Oct 2023 18:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="eSLjZ+TK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ycjniwuV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172282032B
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 18:06:07 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C61CD55;
-	Fri, 20 Oct 2023 11:06:05 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39KI5gRV001704;
-	Fri, 20 Oct 2023 13:05:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1697825142;
-	bh=Tt/fIyWx2eVjmIhHw49aSnaSV1HhVIsOz95Owu+KIcw=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=eSLjZ+TKBH/7J8GgW7943gSNsFfqyqyQ0aUX9mlYjT9MhdjKYlXojZuz0/kJ1o+dO
-	 1BtEyD/l4c4GpijdPlGc8KXn7FzzzjOYjlYfVfwQkiwQFCAQkgFKwAnGhIvPxJmWhx
-	 8+IbBYbp/cwM9cvnJNI+wred6fKKo8/ZJX7QJZ4A=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39KI5gPG102663
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 20 Oct 2023 13:05:42 -0500
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 20
- Oct 2023 13:05:42 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 20 Oct 2023 13:05:42 -0500
-Received: from [10.249.130.150] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39KI5ZCX072364;
-	Fri, 20 Oct 2023 13:05:36 -0500
-Message-ID: <2046f9ad-b5c2-bc42-03de-6254d6ed92d3@ti.com>
-Date: Fri, 20 Oct 2023 23:35:34 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D4721A1F
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 18:06:11 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74731C0
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:06:10 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a528c2c8bso1385046276.1
+        for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 11:06:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697825169; x=1698429969; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KjKRhB2ZGmjdY+V3m2wDwglDBkT5iWSc3BrmrIM618A=;
+        b=ycjniwuVeSpgdfeugajcQNeScrR2+Us4p9Gs1Vo+UITIZW87KjntuhiVY/OjPMcBkF
+         1NAjWs80Jx14JEnTJy0pwb+83q7LxVK4h+l8MmExfP88sCVqLL+UkdlNSXmnjNvnG40y
+         QOT60t6qK8u/DFTFz+E+ODqZzMCrXCDh9cuzOHx+HpcJkAwnPosRsU3XkPVgn7H4jnx0
+         HbaKqFEUdh+A3/qi3VmdHP1IAZ1Get76y6os7tzpoiC+rSPhBrQu7U+HPvMOgGVDGDyl
+         04owHNdrdSL1qNCsNrXX6O7IxHwg+OEFSA2kGlZZc/fq4T3jx4dHBoVW3CxfA3E3+sAj
+         QooA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697825169; x=1698429969;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KjKRhB2ZGmjdY+V3m2wDwglDBkT5iWSc3BrmrIM618A=;
+        b=ZvjEaY+ao+9xuH3MOY+C4aUXjfKBun/ViuU2oxOMsCXbJjQ/kQIxt8OjswblLzg7LZ
+         yxoSZBv38bBTSufDREhuQ1z/Dfx4QeuzPGvgmwbzjRTVf5Xk04xxOI3BCuFYzttPGy10
+         tbVq1B1CB/OkFf/ETDfMN6pWaBw5AWLFXrX4WGo+S0huz++1+ndERVdpAEPpKl6PGnvo
+         qumigpmNfI5Bg0lrzqIgJ+pdzO3PsnUo3IZu1Zx+KDM8mwVHepWuxHEBYMIu4DXhm1jy
+         Kdlnk/Kc1o05kWGzya3FLQFcCAH3LS3ngmENCRuPWVLWjzRl0eGsmbEXssuxcIhlj+mC
+         4MMw==
+X-Gm-Message-State: AOJu0YyLjneXpvkPFHH/y3oL8SW5RDXp8MLDg1Afi7D4eEXA8uceST12
+	IjUzzQAgFblvQZfM6+BF4wKUlRg=
+X-Google-Smtp-Source: AGHT+IFZSNaTZQdlBfpXvahW6QtUTkP5/JLdYWQRsMYTIf7kO/MHQaXtfOceBtkfAcpN9Lzos6/xzT8=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a25:8e05:0:b0:d74:93a1:70a2 with SMTP id
+ p5-20020a258e05000000b00d7493a170a2mr58369ybl.5.1697825169671; Fri, 20 Oct
+ 2023 11:06:09 -0700 (PDT)
+Date: Fri, 20 Oct 2023 11:06:07 -0700
+In-Reply-To: <20231020174940.gjubehkouns2hmgz@MacBook-Pro-49.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v2] net: ethernet: ti: davinci_mdio: Update K3
- SoCs list for errata i2329
-To: Nishanth Menon <nm@ti.com>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <pabeni@redhat.com>, <rogerq@kernel.org>, <andrew@lunn.ch>,
-        <f.fainelli@gmail.com>, <horms@kernel.org>,
-        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Ravi Gunasekaran
-	<r-gunasekaran@ti.com>
-References: <20231020111738.14671-1-r-gunasekaran@ti.com>
- <20231020122359.vwia7sxrcjyeo3ov@pushover>
-Content-Language: en-US
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
-In-Reply-To: <20231020122359.vwia7sxrcjyeo3ov@pushover>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Mime-Version: 1.0
+References: <20231019174944.3376335-1-sdf@google.com> <20231019174944.3376335-3-sdf@google.com>
+ <20231020174940.gjubehkouns2hmgz@MacBook-Pro-49.local>
+Message-ID: <ZTLBj2AffYWKD-HP@google.com>
+Subject: Re: [PATCH bpf-next v4 02/11] xsk: Add TX timestamp and TX checksum
+ offload support
+From: Stanislav Fomichev <sdf@google.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
+	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
+	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
+	maciej.fijalkowski@intel.com, hawk@kernel.org, yoong.siang.song@intel.com, 
+	netdev@vger.kernel.org, xdp-hints@xdp-project.net, saeedm@nvidia.com
+Content-Type: text/plain; charset="utf-8"
 
+On 10/20, Alexei Starovoitov wrote:
+> On Thu, Oct 19, 2023 at 10:49:35AM -0700, Stanislav Fomichev wrote:
+> > diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
+> > index 2ecf79282c26..ecfd67988283 100644
+> > --- a/include/uapi/linux/if_xdp.h
+> > +++ b/include/uapi/linux/if_xdp.h
+> > @@ -106,6 +106,43 @@ struct xdp_options {
+> >  #define XSK_UNALIGNED_BUF_ADDR_MASK \
+> >  	((1ULL << XSK_UNALIGNED_BUF_OFFSET_SHIFT) - 1)
+> >  
+> > +/* Request transmit timestamp. Upon completion, put it into tx_timestamp
+> > + * field of struct xsk_tx_metadata.
+> > + */
+> > +#define XDP_TX_METADATA_TIMESTAMP		(1 << 0)
+> > +
+> > +/* Request transmit checksum offload. Checksum start position and offset
+> > + * are communicated via csum_start and csum_offset fields of struct
+> > + * xsk_tx_metadata.
+> > + */
+> > +#define XDP_TX_METADATA_CHECKSUM		(1 << 1)
+> > +
+> > +/* Force checksum calculation in software. Can be used for testing or
+> > + * working around potential HW issues. This option causes performance
+> > + * degradation and only works in XDP_COPY mode.
+> > + */
+> > +#define XDP_TX_METADATA_CHECKSUM_SW		(1 << 2)
+> > +
+> > +struct xsk_tx_metadata {
+> > +	union {
+> > +		struct {
+> > +			__u32 flags;
+> > +
+> > +			/* XDP_TX_METADATA_CHECKSUM */
+> > +
+> > +			/* Offset from desc->addr where checksumming should start. */
+> > +			__u16 csum_start;
+> > +			/* Offset from csum_start where checksum should be stored. */
+> > +			__u16 csum_offset;
+> > +		};
+> > +
+> > +		struct {
+> > +			/* XDP_TX_METADATA_TIMESTAMP */
+> > +			__u64 tx_timestamp;
+> > +		} completion;
+> > +	};
+> > +};
+> 
+> Could you add a comment to above union that csum fields are consumed by the driver
+> before it xmits the packet while timestamp is filled during xmit, so union
+> doesn't prevent using both features simultaneously.
+> It's clear from the example, but not obvious from uapi and the doc in patch 11
+> doesn't clarify it either.
+> 
+> Also please add a name to csum part of the union like you did for completion.
+> We've learned it the hard way with bpf_attr. All anon structs better have field name
+> within a union. Helps extensibility (avoid conflicts) in the long term.
 
+Sure, will do, thanks!
 
-On 10/20/2023 5:53 PM, Nishanth Menon wrote:
-> On 16:47-20231020, Ravi Gunasekaran wrote:
->> The errata i2329 affects certain K3 SoC versions. The k3-socinfo.c
->> driver generates the revision string for different variants of the
->> same SoC in an incremental fashion. This is not true for all SoCs.
->> An example case being J721E, for which the actual silicon revision
->> names are 1.0, 1.1 for its variants, while the k3-socinfo.c driver
->> interprets these variants as revisions 1.0, 2.0 respectively,
->> which is incorrect.
->>
->> While the work to fixup the silicon revision string is posted
->> to the soc tree, this patch serves as a fail-safe step by maintaining
->> a list of correct and incorrect revision strings, so that the fixup
->> work does not break the errata workaround for such corrected SoCs.
->>
->> The silicon revisions affected by the errata i2329 can be found under
->> the MDIO module in the "Advisories by Modules" section of each
->> SoC errata document listed below
->>
->> AM62x: https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
->> AM64X: https://www.ti.com/lit/er/sprz457g/sprz457g.pdf
->> AM65X: https://www.ti.com/lit/er/sprz452i/sprz452i.pdf
->> J7200: https://www.ti.com/lit/er/sprz491d/sprz491d.pdf
->> J721E: https://www.ti.com/lit/er/sprz455d/sprz455d.pdf
->> J721S2: https://www.ti.com/lit/er/sprz530b/sprz530b.pdf
->>
->> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
->> ---
->>
->> Changes since v1:
->> * For J721E, retained the incorrect SR ID and added the correct one
->> * Add AM65x SR2.1 to the workaround list
->>
->> v1: https://lore.kernel.org/all/20231018140009.1725-1-r-gunasekaran@ti.com/
->>
->>  drivers/net/ethernet/ti/davinci_mdio.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/ti/davinci_mdio.c b/drivers/net/ethernet/ti/davinci_mdio.c
->> index 628c87dc1d28..25aaef502edc 100644
->> --- a/drivers/net/ethernet/ti/davinci_mdio.c
->> +++ b/drivers/net/ethernet/ti/davinci_mdio.c
->> @@ -516,9 +516,11 @@ static const struct soc_device_attribute k3_mdio_socinfo[] = {
->>  	{ .family = "AM64X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
->>  	{ .family = "AM65X", .revision = "SR1.0", .data = &am65_mdio_soc_data },
->>  	{ .family = "AM65X", .revision = "SR2.0", .data = &am65_mdio_soc_data },
->> +	{ .family = "AM65X", .revision = "SR2.1", .data = &am65_mdio_soc_data },
->>  	{ .family = "J7200", .revision = "SR1.0", .data = &am65_mdio_soc_data },
->>  	{ .family = "J7200", .revision = "SR2.0", .data = &am65_mdio_soc_data },
->>  	{ .family = "J721E", .revision = "SR1.0", .data = &am65_mdio_soc_data },
->> +	{ .family = "J721E", .revision = "SR1.1", .data = &am65_mdio_soc_data },
->>  	{ .family = "J721E", .revision = "SR2.0", .data = &am65_mdio_soc_data },
->>  	{ .family = "J721S2", .revision = "SR1.0", .data = &am65_mdio_soc_data},
->>  	{ /* sentinel */ },
->>
-> Looks like every device is impacted -> so, why not just flip the
-> logic to indicate devices that are NOT impacted? is'nt that a smaller
-> list?
->
+> Other than this the patch set looks great to me.
+> With Saeed and Magnus acks we can take it in.
 
-At the moment, the list of unaffected devices is small. But as and when we
-introduce more devices,
-this list will need update. Also I feel that few years down the line, when
-someone looks at the code,
-a list of affected devices provides a better context as it is easier to trace it
-back to the errata document.
+Magnus is on CC, so I hope see sees the request.
 
-Regards,
-Ravi
-
+Added Saeed here as well. Saeed, can you please take a look at the mlx part?
+You've been on CC for a particular patch, but just in case:
+https://lore.kernel.org/bpf/20231019174944.3376335-5-sdf@google.com/T/#u
 
