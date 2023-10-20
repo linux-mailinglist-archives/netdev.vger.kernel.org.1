@@ -1,104 +1,84 @@
-Return-Path: <netdev+bounces-43081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3537B7D1540
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:56:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD4D27D1548
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 19:56:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59D061C20B28
-	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:56:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97397282402
+	for <lists+netdev@lfdr.de>; Fri, 20 Oct 2023 17:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B69208BB;
-	Fri, 20 Oct 2023 17:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9D4208B1;
+	Fri, 20 Oct 2023 17:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VtYL1jP+"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="UjGxl25L"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAEB208A6
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 17:56:11 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F367D51
-	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:56:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697824570; x=1729360570;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=e3xvzO1I/7D7XokUIhjcDmi5gd8LjFo+Y2LYucZAzno=;
-  b=VtYL1jP+meDGkSuWqJW80GwcmZDX3ZJkjLKtp2ILXy8rwRS9nCcRsN/O
-   erA1Ymksy/c+MYyJxJ0jqtbOBeXNOfAIdx9ELchk7Ok6rW7k+KipG/zVw
-   dn/fTSG9OqzwtD++Oa2MtP736thtMW7J9W3YQhnh9bLwuACXFaiDw6zzf
-   RMQBzZ+Lq3QEW1Q5DN4zJzzeRZUxDFF8KlHgtf0NRroBanwgE1DsedxD6
-   rgVyQB5ijGms+D9WOZowFRvHTmg/Dnr+swSGRxbSDwN1uUO0hMGtaeB5E
-   EqzziPOCC5hDhFb6FSJ8NWtY5e+86hlpH8lc2Ju+ATo2L5Yb+PcYDh1P1
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="386357492"
-X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="386357492"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 10:56:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10869"; a="750997540"
-X-IronPort-AV: E=Sophos;i="6.03,239,1694761200"; 
-   d="scan'208";a="750997540"
-Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2023 10:56:07 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: netdev@vger.kernel.org,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Krishneil Singh <krishneil.k.singh@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH next 2/2] idpf: cancel mailbox work in error path
-Date: Fri, 20 Oct 2023 10:56:00 -0700
-Message-ID: <20231020175600.24412-3-jacob.e.keller@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231020175600.24412-1-jacob.e.keller@intel.com>
-References: <20231020175600.24412-1-jacob.e.keller@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3FC2032F
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 17:56:35 +0000 (UTC)
+Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B65D55
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 10:56:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1697824590; x=1698083790;
+	bh=k33+/p34dbe/7wIvgqR0uJAbAz0eZCxXH/bmotNqR3Q=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=UjGxl25Lt+JNfpT73ZnYXl2qb72Y832itb0ZR/e1my8f/hBaLgCNsZqNaZKI6x9C5
+	 lLrdTSwNOE9b72ZsXRgxAnUxk5g4n1LNc8XIgL97zmCE+cn5u28MuNPFOcAx4/iptV
+	 pzZ2IhYoPfNrFV9esMQsfOGDKutrLfG4ICDRsbAogIwwpKWTSUmMxRrGe3BX46dyJH
+	 EBit/aLbDHSrBDfzM2xSL7amTkDKmBlwTXcnxQQPl6i6KWXxPqxkEJgPWuLggYKVDM
+	 PdiOtlqX9LnJkEGm6Z7k3hnzVWAfguTgOorgtB6KRuFamjAQRu1QeZfYmXqBMHGzi/
+	 vM3Xs6uEg3F7A==
+Date: Fri, 20 Oct 2023 17:56:17 +0000
+To: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>, FUJITA Tomonori <fujita.tomonori@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
+Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
+Message-ID: <92fca611-a87c-4994-b2fe-bda146ca6c5f@proton.me>
+In-Reply-To: <87sf65gpi0.fsf@metaspace.dk>
+References: <20231017113014.3492773-1-fujita.tomonori@gmail.com> <20231017113014.3492773-2-fujita.tomonori@gmail.com> <87sf65gpi0.fsf@metaspace.dk>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+On 20.10.23 19:26, Andreas Hindborg (Samsung) wrote:
+>> +
+>> +    /// Overrides the default MMD write function for writing a MMD regi=
+ster.
+>> +    fn write_mmd(_dev: &mut Device, _devnum: u8, _regnum: u16, _val: u1=
+6) -> Result {
+>> +        Err(code::ENOTSUPP)
+>> +    }
+>> +
+>> +    /// Callback for notification of link change.
+>> +    fn link_change_notify(_dev: &mut Device) {}
+>=20
+> It is probably an error if these functions are called, and so BUG() would=
+ be
+> appropriate? See the discussion in [1].
 
-In idpf_vc_core_init, the mailbox work is queued
-on a mailbox workqueue but it is not cancelled on error.
-This results in a call trace when idpf_mbx_task tries
-to access the freed mailbox queue pointer. Fix it by
-cancelling the mailbox work in the error path.
+Please do not use `BUG()` I wanted to wait for my patch [1] to be merged
+before suggesting this, since then Tomo can then just use the constant
+that I introduced.
 
-Fixes: 4930fbf419a7 ("idpf: add core init and interrupt request")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Tested-by: Krishneil Singh  <krishneil.k.singh@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 1 +
- 1 file changed, 1 insertion(+)
+> [1] https://lore.kernel.org/rust-for-linux/20231019171540.259173-1-benno.=
+lossin@proton.me/
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index e276b5360c2e..2c1b051fdc0d 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -3146,6 +3146,7 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
- 
- err_intr_req:
- 	cancel_delayed_work_sync(&adapter->serv_task);
-+	cancel_delayed_work_sync(&adapter->mbx_task);
- 	idpf_vport_params_buf_rel(adapter);
- err_netdev_alloc:
- 	kfree(adapter->vports);
--- 
-2.41.0
+--=20
+Cheers,
+Benno
+
 
 
