@@ -1,108 +1,83 @@
-Return-Path: <netdev+bounces-43260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BB1E7D1EDC
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 20:04:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 829747D1F46
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 22:03:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D8E8B20E7F
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 18:04:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96DF41C20929
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 20:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B73F1E536;
-	Sat, 21 Oct 2023 18:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="az72N/+V"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D5E208C2;
+	Sat, 21 Oct 2023 20:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208EEDF4F
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 18:04:02 +0000 (UTC)
-Received: from smtp.smtpout.orange.fr (smtp-14.smtpout.orange.fr [80.12.242.14])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ECB2E0
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 11:04:00 -0700 (PDT)
-Received: from pop-os.home ([86.243.2.178])
-	by smtp.orange.fr with ESMTPA
-	id uGKJqVjkbvhM3uGKKqJsb4; Sat, 21 Oct 2023 20:03:59 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1697911439;
-	bh=WGG4h3fjFFGpf7YbjWTDEm1O70pn20++HFr6LfKdydw=;
-	h=From:To:Cc:Subject:Date;
-	b=az72N/+VVqLJjQfVTcgZ4ikmpD61YAW5vF1x8FXwB4ztn4zLiyLT8trgH+bnLdIIl
-	 Kj1fX7IhGKpLllE/jz9ugHU7aeEtzbsC/qLpem930KKhixLtBl1s+96flijMwKy8hm
-	 JGH6RpVsS9NGSv6SANu0DfjDyD6a/riJs5AkiPSvD9UPehB6FBBOm9oNxIIvHtU4WU
-	 pvzQDqQYtm0+MqsPrTGPxA06EGnG5nvU3FRIEeRirCWBenTNqxDqwt9sBsicrzJLq6
-	 HKAj/kO4BiNCT2eDRw55nOzwdhFi8R02vudrIFBFn4YBB5MBvT2CMyK2r6L7O10/kP
-	 /mw23XndOpY0g==
-X-ME-Helo: pop-os.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 21 Oct 2023 20:03:59 +0200
-X-ME-IP: 86.243.2.178
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: keescook@chromium.org,
-	Michael Hennerich <michael.hennerich@analog.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-hardening@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Stefan Schmidt <stefan@osg.samsung.com>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net] net: ieee802154: adf7242: Fix some potential buffer overflow in adf7242_stats_show()
-Date: Sat, 21 Oct 2023 20:03:53 +0200
-Message-Id: <7ba06db8987298f082f83a425769fe6fa6715fe7.1697911385.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA5A2030C
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 20:03:37 +0000 (UTC)
+Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com [209.85.160.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE28DB0
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 13:03:32 -0700 (PDT)
+Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1e9877c1bf7so3273471fac.3
+        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 13:03:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697918611; x=1698523411;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WAzTyFISqHdjSyvCMXj3Ko54bxjdlHu7tjC7EE4Bclk=;
+        b=eSyUvsiiZU0QmqDjInr14JorPJiTeQPAEx9YaPODiwO9yotd4sJ1ebhLovLGEINJHU
+         Oa1u8CMByTWwK8EL+TFwi9+4+GsU5TZvQpLJSGnGy1PmaOH2Xx7cqVk2rXeQloqaXS9D
+         CTwayzACIMp6orYYOcASHJ8OiPvnJJ+28sUq6HppQI7J56uYSfMLRwfLJ+2oHOmXQKhB
+         yuzrE/YKK4PxsME0NLKWKYGfXTZmsz/FU32OngvE0/gxIFP5JXi8AhnOM/HTHpiI8qe7
+         x+WjsoX6kfATVXBkeGWUSxWNUv0Bi/k/LCk1g41M5xf1EKpMRE1dcNWUDElxlE0O8sac
+         RtbA==
+X-Gm-Message-State: AOJu0YySnfOBlxd/HyR8Vh7K0Ve/DtQThvFWuKqiUJYsA8g5uVWsuxfH
+	QOkG3rj7NNTZp00Gfq6QwzsbjnX8J8kyRf2ElixN6RTUSrqt
+X-Google-Smtp-Source: AGHT+IGp54TDvOaC30bVb/2e7+ssX1s1YmK9GXb8Z+InCir5Vag8UcafHsFUhYKPux1Sx6Z9mt/2BVsltYo1xzUr9MU+BK0yKHjl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6870:f205:b0:1ea:2dd6:6a86 with SMTP id
+ t5-20020a056870f20500b001ea2dd66a86mr2577551oao.9.1697918611301; Sat, 21 Oct
+ 2023 13:03:31 -0700 (PDT)
+Date: Sat, 21 Oct 2023 13:03:31 -0700
+In-Reply-To: <0000000000008f824606052a2d9b@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000af2dbf06083f7baf@google.com>
+Subject: Re: [syzbot] [kernel?] general protection fault in wpan_phy_register
+From: syzbot <syzbot+b8bf7edf9f83071ea0a9@syzkaller.appspotmail.com>
+To: andriy.shevchenko@linux.intel.com, gregkh@linuxfoundation.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, rafael@kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-strncat() usage in adf7242_debugfs_init() is wrong.
-The size given to strncat() is the maximum number of bytes that can be
-written, excluding the trailing NULL.
+syzbot suspects this issue was fixed by commit:
 
-Here, the size that is passed, DNAME_INLINE_LEN, does not take into account
-the size of "adf7242-" that is already in the array.
+commit fd6f7ad2fd4d53fa14f4fd190f9b05d043973892
+Author: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Date:   Mon Aug 28 14:58:24 2023 +0000
 
-In order to fix it, use snprintf() instead.
+    driver core: return an error when dev_set_name() hasn't happened
 
-Fixes: 7302b9d90117 ("ieee802154/adf7242: Driver for ADF7242 MAC IEEE802154")
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- drivers/net/ieee802154/adf7242.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13ea2e89680000
+start commit:   ac28b1ec6135 net: ipv4: fix one memleak in __inet_del_ifa()
+git tree:       net
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e82a7781f9208c0d
+dashboard link: https://syzkaller.appspot.com/bug?extid=b8bf7edf9f83071ea0a9
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14871d58680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14ace678680000
 
-diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
-index a03490ba2e5b..cc7ddc40020f 100644
---- a/drivers/net/ieee802154/adf7242.c
-+++ b/drivers/net/ieee802154/adf7242.c
-@@ -1162,9 +1162,10 @@ static int adf7242_stats_show(struct seq_file *file, void *offset)
- 
- static void adf7242_debugfs_init(struct adf7242_local *lp)
- {
--	char debugfs_dir_name[DNAME_INLINE_LEN + 1] = "adf7242-";
-+	char debugfs_dir_name[DNAME_INLINE_LEN + 1];
- 
--	strncat(debugfs_dir_name, dev_name(&lp->spi->dev), DNAME_INLINE_LEN);
-+	snprintf(debugfs_dir_name, sizeof(debugfs_dir_name),
-+		 "adf7242-%s", dev_name(&lp->spi->dev));
- 
- 	lp->debugfs_root = debugfs_create_dir(debugfs_dir_name, NULL);
- 
--- 
-2.34.1
+If the result looks correct, please mark the issue as fixed by replying with:
 
+#syz fix: driver core: return an error when dev_set_name() hasn't happened
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
