@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-43248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3D447D1DC5
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 17:03:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 265397D1DC9
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 17:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FB17B20EB8
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 15:03:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D64BB20E99
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 15:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5D3A12E5C;
-	Sat, 21 Oct 2023 15:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE0814A83;
+	Sat, 21 Oct 2023 15:05:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QNlNBCBo"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SDlIfAu3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCC66125
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 15:03:37 +0000 (UTC)
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E114A6
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 08:03:33 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1c9d4f08d7cso122725ad.0
-        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 08:03:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AF9137E
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 15:05:35 +0000 (UTC)
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B018BDA
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 08:05:30 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c9c496c114so118375ad.0
+        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 08:05:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1697900613; x=1698505413; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1697900730; x=1698505530; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GuPSmAl7Gc08Rh/pvJ8sfj5/IRqjGMuojTRoU/8OXYE=;
-        b=QNlNBCBoy05xt0KD1KD48HNlwcuASk5aj32NtGTPpc15s/53yLCT3H/+qOymWQdT8e
-         /aeIe0PiyL0Ik9lD/65yusPh6GjlnGe0llonlYvpXBQMS902bcHdcY+FZltZbqQAU+n7
-         veCP4VjbZ4C/ym9Ud5QlUcb6xgRfNSPYp9sn0=
+        bh=w8KjYiWmBScABIuDtiMMncZnICHnoOPuW6DFu0n03Co=;
+        b=SDlIfAu3s6+n8hsKGnhmsqC8Br5Oyt13S1ImxgsR2tqN/MNMJB1vC633Vm3HhS1io1
+         aUuoH+7k+uQ0R2FrFTejqwmL6Qhx+Av8ZCaF6Zvt6tiTUc8RR1G3LjR2B410BHSekSnc
+         6Lej37Yce3nzEJACeUN7NSKOEoBM3bHvmr8xc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697900613; x=1698505413;
+        d=1e100.net; s=20230601; t=1697900730; x=1698505530;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GuPSmAl7Gc08Rh/pvJ8sfj5/IRqjGMuojTRoU/8OXYE=;
-        b=ujB8eZMuICgdulefno4tQa9xylHnHlUCLMROFdisqbU8XDPeRklF1czeGgJEhGbqyu
-         +7eHZGOzT5ui1D9sE3MBFDG6N8/Er2xIjAfng1qYy+D59lBQUPNHd6d/DJm33s1x6ABv
-         1MUR56fK6Y7FId0b90Wa/ytFNTDSlus5gpibY0vNQ6TSFApYdxijLYzMRsaWVMPk4RWA
-         Ua2/utwd53YEqd4UOQ+pnTqaEZkuqIfBwo3WLp7rax4ugDAI6pVqUQVz6aWGQIRZIF3k
-         e2BT4Dk3mQ91TocGOYAJKLSg5XMquz1A4ZfOA5HYPoFHnJxeP6BSoFAKMZ6VZ6o6mvVC
-         zPoA==
-X-Gm-Message-State: AOJu0Yxg3mR8RxZCc4mVG/QOp/4XGP7wqcyPMwxknmxfKLtRtY1Z7N1d
-	BEMDCp7rp2u+/i5rWjKQjcFJum5HfMy1pWyH8OfxFg==
-X-Google-Smtp-Source: AGHT+IEUrjQpbqzmBCjf5tVoCSi89bnrApkE030h0X34HlZN2zt0Z3EiPkzND/i5smqKbYe58V947QrGj8SmVsPevu8=
-X-Received: by 2002:a17:902:d551:b0:1c7:47ca:f075 with SMTP id
- z17-20020a170902d55100b001c747caf075mr408500plf.15.1697900612332; Sat, 21 Oct
- 2023 08:03:32 -0700 (PDT)
+        bh=w8KjYiWmBScABIuDtiMMncZnICHnoOPuW6DFu0n03Co=;
+        b=Pr5DhC/Zi4qSEnMYI8aGjcJ96cmktMgOFryDhV7BBU1kACscDu2w6Wsj2OZ3A3nClT
+         DzvYipnQXcNvtuQ8bEM8rVrBLOI5jgNUG8db0UKmXevO9U/BE4Hz7pFWVW8IHSYUm1Gp
+         8B0arxhIYwWM5V+GKjnqu1/oDYkpa8WLz9bq+k87MNcs0cado3k0jdr8oTn6MuglTqgd
+         H67TycSfFRuSr1a37PImWQjDKnUrSdM2QXF+zWHIcbVB2IGeYOHiDaXBIcpmn2xQb+ET
+         +kbdmUKWZAY34ATdv2XtkwXcfXJBycEkeWOdLlimR7LwIT80k8VLoMoWygEKC4U27Efg
+         INlA==
+X-Gm-Message-State: AOJu0YxJ0CFF/km7UbbS/NZEh1t7BJrtTaSVp5T76TRkSGqSPc/EHTeU
+	w+ztK7pharUJUozLiBskrnKHcDZuFbuQYqGkF10V5w==
+X-Google-Smtp-Source: AGHT+IFZM53rLwdSL4zLJjFCgja09RLXFY4PbcwJmF4VO64lGjKNAOvBSbN9z57Vmt/saKmcBQTSDgpDDrsTUJkcJPI=
+X-Received: by 2002:a17:902:f70d:b0:1c9:c480:1797 with SMTP id
+ h13-20020a170902f70d00b001c9c4801797mr383690plo.11.1697900729915; Sat, 21 Oct
+ 2023 08:05:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231020210751.3415723-1-dianders@chromium.org> <20231020140655.v5.5.I300ed6c3269c77756bdd10dd0d6f97db85470186@changeid>
-In-Reply-To: <20231020140655.v5.5.I300ed6c3269c77756bdd10dd0d6f97db85470186@changeid>
+References: <20231020210751.3415723-1-dianders@chromium.org> <20231020140655.v5.6.I6405b1587446c157c6d6263957571f2b11f330a7@changeid>
+In-Reply-To: <20231020140655.v5.6.I6405b1587446c157c6d6263957571f2b11f330a7@changeid>
 From: Grant Grundler <grundler@chromium.org>
-Date: Sat, 21 Oct 2023 08:03:21 -0700
-Message-ID: <CANEJEGsrJvss-MGfGwV+M5kgTokrF+HX_nZb+ASoEKuUKV7gGg@mail.gmail.com>
-Subject: Re: [PATCH v5 5/8] r8152: Check for unplug in rtl_phy_patch_request()
+Date: Sat, 21 Oct 2023 08:05:18 -0700
+Message-ID: <CANEJEGudwc1=f69L5TAB4+Bdv0aa+y6BQCfLwoDgQ8dizx2=5A@mail.gmail.com>
+Subject: Re: [PATCH v5 6/8] r8152: Check for unplug in r8153b_ups_en() / r8153c_ups_en()
 To: Douglas Anderson <dianders@chromium.org>
 Cc: Jakub Kicinski <kuba@kernel.org>, Hayes Wang <hayeswang@realtek.com>, 
 	"David S . Miller" <davem@davemloft.net>, Edward Hill <ecgh@chromium.org>, 
@@ -78,10 +78,10 @@ Content-Transfer-Encoding: quoted-printable
 On Fri, Oct 20, 2023 at 2:08=E2=80=AFPM Douglas Anderson <dianders@chromium=
 .org> wrote:
 >
-> If the adapter is unplugged while we're looping in
-> rtl_phy_patch_request() we could end up looping for 10 seconds (2 ms *
-> 5000 loops). Add code similar to what's done in other places in the
-> driver to check for unplug and bail.
+> If the adapter is unplugged while we're looping in r8153b_ups_en() /
+> r8153c_ups_en() we could end up looping for 10 seconds (20 ms * 500
+> loops). Add code similar to what's done in other places in the driver
+> to check for unplug and bail.
 >
 > Signed-off-by: Douglas Anderson <dianders@chromium.org>
 
@@ -92,26 +92,37 @@ Reviewed-by: Grant Grundler <grundler@chromium.org>
 > (no changes since v2)
 >
 > Changes in v2:
-> - ("Check for unplug in rtl_phy_patch_request()") new for v2.
+> - ("Check for unplug in r8153b_ups_en() / r8153c_ups_en()") new for v2.
 >
->  drivers/net/usb/r8152.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  drivers/net/usb/r8152.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
 > diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-> index 656fe90734fc..9888bc43e903 100644
+> index 9888bc43e903..982f9ca03e7a 100644
 > --- a/drivers/net/usb/r8152.c
 > +++ b/drivers/net/usb/r8152.c
-> @@ -4046,6 +4046,9 @@ static int rtl_phy_patch_request(struct r8152 *tp, =
-bool request, bool wait)
->         for (i =3D 0; wait && i < 5000; i++) {
->                 u32 ocp_data;
+> @@ -3663,6 +3663,8 @@ static void r8153b_ups_en(struct r8152 *tp, bool en=
+able)
+>                         int i;
 >
-> +               if (test_bit(RTL8152_UNPLUG, &tp->flags))
-> +                       break;
-> +
->                 usleep_range(1000, 2000);
->                 ocp_data =3D ocp_reg_read(tp, OCP_PHY_PATCH_STAT);
->                 if ((ocp_data & PATCH_READY) ^ check)
+>                         for (i =3D 0; i < 500; i++) {
+> +                               if (test_bit(RTL8152_UNPLUG, &tp->flags))
+> +                                       return;
+>                                 if (ocp_read_word(tp, MCU_TYPE_PLA, PLA_B=
+OOT_CTRL) &
+>                                     AUTOLOAD_DONE)
+>                                         break;
+> @@ -3703,6 +3705,8 @@ static void r8153c_ups_en(struct r8152 *tp, bool en=
+able)
+>                         int i;
+>
+>                         for (i =3D 0; i < 500; i++) {
+> +                               if (test_bit(RTL8152_UNPLUG, &tp->flags))
+> +                                       return;
+>                                 if (ocp_read_word(tp, MCU_TYPE_PLA, PLA_B=
+OOT_CTRL) &
+>                                     AUTOLOAD_DONE)
+>                                         break;
 > --
 > 2.42.0.758.gaed0368e0e-goog
 >
