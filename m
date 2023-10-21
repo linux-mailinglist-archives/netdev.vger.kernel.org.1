@@ -1,81 +1,113 @@
-Return-Path: <netdev+bounces-43257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60CE97D1E65
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 18:50:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB9727D1E68
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 18:51:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14133282038
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 16:50:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AB341C20948
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 16:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3CFDDCC;
-	Sat, 21 Oct 2023 16:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0DDFC0B;
+	Sat, 21 Oct 2023 16:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="THofxUXH"
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="2AzgjsUK";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="fGIn5a73"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD24A52
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 16:50:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BE86BC433C9;
-	Sat, 21 Oct 2023 16:50:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697907022;
-	bh=Uhkr0bB1pEXa9rW5VOWvgR7lAGMVpfpJAMHhfRSvu1Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=THofxUXHX6/bLUgSZAZD9Z/xQWBMPAl4FM+XoaF4+GSxMeI8n9L88j56m6OIrbCom
-	 7ABOO+cSIyrQJINIoBLteEDjJLm/lfhIxEK2+MI7/LQrJoMICbukLziO9A8Z+C2M7f
-	 ExmLKpeTll93ueVx3x8JdUh9785YtqVux1oQ0QP93hj0ph3lHp3swgaOzoiobmRiXJ
-	 6W1jz1hK1WTg/fEkVzmq6FFAP0Q4pA8HvsUAl/fbxIJizTV93VrlmHYjAsqkym1GXT
-	 t1aka48e1FhDzG/iZpSFTR5w5ULzhXX6pxtpjLxt7bKY1YmdbvNXtrttcuF3jAfOIX
-	 OV8zRcCY6Iy9A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A26F1C04DD9;
-	Sat, 21 Oct 2023 16:50:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC47CDF4F
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 16:51:52 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C59D2C9;
+	Sat, 21 Oct 2023 09:51:47 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 645DE60182;
+	Sat, 21 Oct 2023 18:51:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1697907104; bh=ho6UWRd8O8SyFiWrb+dKpDDb+6uyTrQVuzw6q8B8OnE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=2AzgjsUKHy8cIfc4/YF9vouRvVxUfcEPnJ71GoLvGfY5EsIXFGlgkqYR7qQu48Kft
+	 t8tRYDV2Y39Bz87BDjr70cEegs/CIN+vGoS25zILm1MNz/1lKF984YwTlC7EIKeGXk
+	 uarntQBQE0knldHEpxsPuiRzxSUtTpUaEbg1PIcxzv2K4ooHlczsu4PMPKg629p5pD
+	 11TY1ccrK4GWDYAX+VcwPGh24TwFw3DSSEqh3iLtWqOEiWbcVuGju9gTbg9DBuHrsn
+	 ipjuQOzBcHIyupu88bnJbRU11cPT5vye6HQric4skEfEE2+nym9PCGI+Cc8uEo8DZz
+	 ZTcER7DG/zsYA==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id sCekpWZPGBwn; Sat, 21 Oct 2023 18:51:41 +0200 (CEST)
+Received: from [192.168.1.3] (78-2-88-137.adsl.net.t-com.hr [78.2.88.137])
+	by domac.alu.hr (Postfix) with ESMTPSA id 48B0960171;
+	Sat, 21 Oct 2023 18:51:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1697907101; bh=ho6UWRd8O8SyFiWrb+dKpDDb+6uyTrQVuzw6q8B8OnE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fGIn5a73y21Ax/gwObg/pWet5UEH7qZkedirNqvAVgKx9ICWBVu5MpHMvG6/xjaia
+	 TSRs6beOqR9YHJcs9ESXfQmwBzPW6kz2+3Dp2WkQG4BJ1XbMY7WyxLvuDl6cEHckRc
+	 V0gSZ/UzNTV0ael0XHX9cxYNzhjQmjLGa0iJoyaNUp0M8riHUGgbDysxiMFCe/+ZKW
+	 o95tMBuoiBlMCVelGj2DS+EIE0ph3T3ws3b4rAWW6m7no7sQatq8V20wg+BgBKvEWZ
+	 f2JDaj71/vyw+G4V2MCLfnrtLCJacTNo2Eu1f8CM+UIE/+8m+gG8sre5MMwkNne6MW
+	 Jgf1SofKYSjiA==
+Message-ID: <7f6612a5-2647-4918-a2c1-492d3ffcf800@alu.unizg.hr>
+Date: Sat, 21 Oct 2023 18:51:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/3] r8169: fix the KCSAN reported data-race in
+ rtl_tx() while reading tp->cur_tx
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nic_swsd@realtek.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Marco Elver <elver@google.com>
+References: <20231018193434.344176-1-mirsad.todorovac@alu.unizg.hr>
+ <20231020165048.33d3bff2@kernel.org>
+Content-Language: en-US
+From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+Autocrypt: addr=mirsad.todorovac@alu.unizg.hr; keydata=
+ xjMEYp0QmBYJKwYBBAHaRw8BAQdAI14D1/OE3jLBYycg8HaOJOYrvEaox0abFZtJf3vagyLN
+ Nk1pcnNhZCBHb3JhbiBUb2Rvcm92YWMgPG1pcnNhZC50b2Rvcm92YWNAYWx1LnVuaXpnLmhy
+ PsKPBBMWCAA3FiEEdCs8n09L2Xwp/ytk6p9/SWOJhIAFAmKdEJgFCQ0oaIACGwMECwkIBwUV
+ CAkKCwUWAgMBAAAKCRDqn39JY4mEgIf/AP9hx09nve6VH6D/F3m5jRT5m1lzt5YzSMpxLGGU
+ vGlI4QEAvOvGI6gPCQMhuQQrOfRr1CnnTXeaXHhlp9GaZEW45QzOOARinRCZEgorBgEEAZdV
+ AQUBAQdAqJ1CxZGdTsiS0cqW3AvoufnWUIC/h3W2rpJ+HUxm61QDAQgHwn4EGBYIACYWIQR0
+ KzyfT0vZfCn/K2Tqn39JY4mEgAUCYp0QmQUJDShogAIbDAAKCRDqn39JY4mEgIMnAQDPKMJJ
+ fs8+QnWS2xx299NkVTRsZwfg54z9NIvH5L3HiAD9FT3zfHfvQxIViWEzcj0q+FLWoRkOh02P
+ Ny0lWTyFlgc=
+Organization: Academy of Fine Arts, University of Zagreb
+In-Reply-To: <20231020165048.33d3bff2@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] ss: fix directory leak when -T option is used
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169790702265.24876.16927993046229278944.git-patchwork-notify@kernel.org>
-Date: Sat, 21 Oct 2023 16:50:22 +0000
-References: <0451403b-0326-4723-a3bb-8acf465fcf45@gmail.com>
-In-Reply-To: <0451403b-0326-4723-a3bb-8acf465fcf45@gmail.com>
-To: Maxim Petrov <mmrmaximuzz@gmail.com>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org
 
-Hello:
-
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
-
-On Sat, 21 Oct 2023 10:44:08 +0200 you wrote:
-> To get information about threads used in a process, the /proc/$PID/task
-> directory content is analyzed by ss code. However, the opened 'dirent'
-> object is not closed after use, leading to memory leaks. Add missing
-> closedir call in 'user_ent_hash_build' to avoid it.
+On 10/21/2023 1:50 AM, Jakub Kicinski wrote:
+> On Wed, 18 Oct 2023 21:34:34 +0200 Mirsad Goran Todorovac wrote:
+>> KCSAN reported the following data-race:
 > 
-> Detected by valgrind: "valgrind ./misc/ss -T"
-> 
-> [...]
+> All 3 patches seem to have been applied to net, thank you!
 
-Here is the summary with links:
-  - [iproute2] ss: fix directory leak when -T option is used
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=d233ff0f984a
+That sounds like great news. Many thanks to Heiner, Marco, and Simon as well for reviewing
+and advice.
 
-You are awesome, thank you!
+Best regards,
+Mirsad Todorovac
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Mirsad Todorovac
+Sistem inženjer
+Grafički fakultet | Akademija likovnih umjetnosti
+Sveučilište u Zagrebu
 
-
+System engineer
+Faculty of Graphic Arts | Academy of Fine Arts
+University of Zagreb, Republic of Croatia
+tel. +385 (0)1 3711 451
+mob. +385 91 57 88 355
 
