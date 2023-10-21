@@ -1,455 +1,248 @@
-Return-Path: <netdev+bounces-43231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F53D7D1CD5
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 13:28:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EF857D1CDB
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 13:36:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D93D7B214D5
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 11:27:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADCA81F21CD6
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 11:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8829101C2;
-	Sat, 21 Oct 2023 11:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FE7DF5C;
+	Sat, 21 Oct 2023 11:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="1FWgbHTk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MVKr4wbO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1D7FC12
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 11:27:34 +0000 (UTC)
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9291E1A3
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 04:27:32 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9be1ee3dc86so247797266b.1
-        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 04:27:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913A6D313;
+	Sat, 21 Oct 2023 11:36:29 +0000 (UTC)
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3784C1A4;
+	Sat, 21 Oct 2023 04:36:24 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-27d27026dc2so500936a91.0;
+        Sat, 21 Oct 2023 04:36:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697887651; x=1698492451; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5afGkkeJDJQIwueDAOXQKmn2OfT88cQRGV1V2HneC5g=;
-        b=1FWgbHTkGhY0pAocWJoCzGSj7XhC0dkCO7gp42vjNHHc78qh3MKmqDwF/Eu0s2uZWZ
-         Xc/+w/DGeah8NymPo5sdaig2YOOvHb7g5/Q8g1YLsMurxZhGjtR3e7keNtrekx1aOqsD
-         JlcddP2t5bhyApyMXlhx4nq6fU5MV8Uw51VF9G8XCwNseSdZ+TapBEIheZP71dLH10GW
-         vmBWJ9GqMjq92BUO7nAz45A0/fzZNFnig3jInf2qqYxWNooT7WlBOji664JDLWwvRF9V
-         UqGZdLHxsELUdXY74CV79ocTxFI3dOTMgzcrbq5Fhexjp3NbklI2LCKURcqYVgK6zOBz
-         vgZw==
+        d=gmail.com; s=20230601; t=1697888183; x=1698492983; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=owbeeYpVzZ73tMjz7dmgBH9T/s/2Ttd2PFihL1Ia2d0=;
+        b=MVKr4wbORZu1Ly2M8wnthDya5qUDD0eAPOJq2S0RWByR/h9L9NJqTV/i+OExEk8D3Q
+         z9uMZKCvM3VGuOdLeWFM0HNbdWz9vi6l58vNI1b5iWOApLQBb6lRUiGZtnQnl3NM5vNw
+         k1WB+J0+fCKel0gZT25oDuQUbyJ/2ZFVeAFriShUuOURzlrjviLx1hNKzB1WJbXAeYQP
+         gONYfwfMPIblSyGQAXV+3O8YrcQVFkZ68/VU3U2SXmBk3WnjrYJwDuoL6Ln9E1cEkGgo
+         07st7S5BDIpy8oBQnaAeNJkYCqWL+7vm1cHxVAu2JkMp045k9tCFuwlprU8YVr2WOU51
+         K9OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697887651; x=1698492451;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5afGkkeJDJQIwueDAOXQKmn2OfT88cQRGV1V2HneC5g=;
-        b=R8e8ydn3nlkZ5BmiBunzWXs6dKwyR6oga4Zt+jRs3zqwTb1kaFPYkUdCrQBLWg3XQi
-         vK5PVJChxUx4WqF0BovEJ/iV+PZWS2GjxWDykblJKz8FqH2WlLKTUIsGWQa2IC2mU0o1
-         D98MA1BnNLuARlMILCBVxNeBjIT4m7Ct1x2fvzykdVSHx7+AcUT1i2pXArc+BfYqR/pz
-         /74eGNOjCL3DuvISaS3jUvmoeFSVd1Qq9AVQ6WOnKalvY293vu0ikOHD381hDsNJwjMI
-         yJzhgWTdsrE2S2jkh2ousiCGBr0gVkK1LJxHXGvkm/GE2+Yu8gxFCZT0MJ/lH5naSPtZ
-         M3xA==
-X-Gm-Message-State: AOJu0YyrsJNnGYdSoiTd0XaxhpaYqcc4vDy7LPidPEM5W0KgofuQXwYs
-	iEwR4Kfmo0lz8ZkO+J1J72n8YVMwc49lUrU11GA=
-X-Google-Smtp-Source: AGHT+IHt5diSGmrADkC7VA/B9riGqoP7Km67Ob106RzeCz33i9rJfVbRTcKalFT5K3uMWUTeb2flFQ==
-X-Received: by 2002:a17:907:6093:b0:9c7:59d1:b2c6 with SMTP id ht19-20020a170907609300b009c759d1b2c6mr3291313ejc.11.1697887651041;
-        Sat, 21 Oct 2023 04:27:31 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id n13-20020a17090673cd00b00991faf3810esm3530348ejl.146.2023.10.21.04.27.30
+        d=1e100.net; s=20230601; t=1697888183; x=1698492983;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=owbeeYpVzZ73tMjz7dmgBH9T/s/2Ttd2PFihL1Ia2d0=;
+        b=rVkSv9bhIMPAcy2ZQyaqeghN5Oe0/gwXh0p1uasohNfUcE+8PBkTvG72zDcWrJ64xl
+         rFGeINgOoD2B8IgkSez40JYZG1RDVjvyXo7ECncsB5sTFDsnm0lr0Fk4P250l1mRYATv
+         SdyxRfwqtXjGwd1flYu4aPkJ7bUbtSV+3RMw4x0iKvHOCaFv3eao2+O8WPv4TcW9IQ47
+         7MYkiwdF9QAQozVOqRPjpefKMa4GKhonEObgrS19yy4d/9RNGsXGCAXBesaHoR/O5+NG
+         LqRVtninQe6W6ayIDjVwRJTZIIFrnb2iFfIWmHSVv6kPDVqggLtjjeQFa/Ho2hbr76kz
+         ejPQ==
+X-Gm-Message-State: AOJu0YxHy5Vq7GhF4LFuLPFk5FiKRJylxjqozhSoNErsmRHJorXpfEjM
+	9YhDY1/Df/CZRNku4hqa45w=
+X-Google-Smtp-Source: AGHT+IHotfB2sZSs4qd1GsIN6q+4toschiovcinyh2+QNpmEM/xv8ZW7ruPygzhcIc1vzZ/J/av1lw==
+X-Received: by 2002:a17:90b:3e8e:b0:27d:32d8:5f23 with SMTP id rj14-20020a17090b3e8e00b0027d32d85f23mr4899051pjb.2.1697888183480;
+        Sat, 21 Oct 2023 04:36:23 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id 20-20020a17090a005400b0026cecddfc58sm5175166pjb.42.2023.10.21.04.36.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Oct 2023 04:27:30 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	jacob.e.keller@intel.com,
-	johannes@sipsolutions.net
-Subject: [patch net-next v3 10/10] devlink: remove netlink small_ops
-Date: Sat, 21 Oct 2023 13:27:11 +0200
-Message-ID: <20231021112711.660606-11-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231021112711.660606-1-jiri@resnulli.us>
-References: <20231021112711.660606-1-jiri@resnulli.us>
+        Sat, 21 Oct 2023 04:36:22 -0700 (PDT)
+Date: Sat, 21 Oct 2023 20:36:22 +0900 (JST)
+Message-Id: <20231021.203622.624978584179221727.fujita.tomonori@gmail.com>
+To: benno.lossin@proton.me
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com,
+ wedsonaf@gmail.com, greg@kroah.com
+Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <fa420b54-b381-4534-8568-91286eb7d28b@proton.me>
+References: <4e3e0801-b8b2-457b-aee1-086d20365890@proton.me>
+	<20231021.192741.2305009064677924338.fujita.tomonori@gmail.com>
+	<fa420b54-b381-4534-8568-91286eb7d28b@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Sat, 21 Oct 2023 11:21:12 +0000
+Benno Lossin <benno.lossin@proton.me> wrote:
 
-All commands are now covered by generated split_ops. Remove the
-small_ops entirely alongside with unified devlink netlink policy array.
+> On 21.10.23 12:27, FUJITA Tomonori wrote:
+>> On Sat, 21 Oct 2023 08:37:08 +0000
+>> Benno Lossin <benno.lossin@proton.me> wrote:
+>> 
+>>> On 21.10.23 09:30, FUJITA Tomonori wrote:
+>>>> On Sat, 21 Oct 2023 07:25:17 +0000
+>>>> Benno Lossin <benno.lossin@proton.me> wrote:
+>>>>
+>>>>> On 20.10.23 14:54, FUJITA Tomonori wrote:
+>>>>>> On Fri, 20 Oct 2023 09:34:46 +0900 (JST)
+>>>>>> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+>>>>>>
+>>>>>>> On Thu, 19 Oct 2023 15:20:51 +0000
+>>>>>>> Benno Lossin <benno.lossin@proton.me> wrote:
+>>>>>>>
+>>>>>>>> I would like to remove the mutable static variable and simplify
+>>>>>>>> the macro.
+>>>>>>>
+>>>>>>> How about adding DriverVTable array to Registration?
+>>>>>>>
+>>>>>>> /// Registration structure for a PHY driver.
+>>>>>>> ///
+>>>>>>> /// # Invariants
+>>>>>>> ///
+>>>>>>> /// The `drivers` slice are currently registered to the kernel via `phy_drivers_register`.
+>>>>>>> pub struct Registration<const N: usize> {
+>>>>>>>        drivers: [DriverVTable; N],
+>>>>>>> }
+>>>>>>>
+>>>>>>> impl<const N: usize> Registration<{ N }> {
+>>>>>>>        /// Registers a PHY driver.
+>>>>>>>        pub fn register(
+>>>>>>>            module: &'static crate::ThisModule,
+>>>>>>>            drivers: [DriverVTable; N],
+>>>>>>>        ) -> Result<Self> {
+>>>>>>>            let mut reg = Registration { drivers };
+>>>>>>>            let ptr = reg.drivers.as_mut_ptr().cast::<bindings::phy_driver>();
+>>>>>>>            // SAFETY: The type invariants of [`DriverVTable`] ensure that all elements of the `drivers` slice
+>>>>>>>            // are initialized properly. So an FFI call with a valid pointer.
+>>>>>>>            to_result(unsafe {
+>>>>>>>                bindings::phy_drivers_register(ptr, reg.drivers.len().try_into()?, module.0)
+>>>>>>>            })?;
+>>>>>>>            // INVARIANT: The `drivers` slice is successfully registered to the kernel via `phy_drivers_register`.
+>>>>>>>            Ok(reg)
+>>>>>>>        }
+>>>>>>> }
+>>>>>>
+>>>>>> Scratch this.
+>>>>>>
+>>>>>> This doesn't work. Also simply putting slice of DriverVTable into
+>>>>>> Module strcut doesn't work.
+>>>>>
+>>>>> Why does it not work? I tried it and it compiled fine for me.
+>>>>
+>>>> You can compile but the kernel crashes. The addresses of the callback
+>>>> functions are invalid.
+>>>
+>>> Can you please share your setup and the error? For me it booted
+>>> fine.
+>> 
+>> You use ASIX PHY hardware?
+> 
+> It seems I have configured something wrong. Can you share your testing
+> setup? Do you use a virtual PHY device in qemu, or do you boot it from
+> real hardware with a real ASIX PHY device?
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- net/devlink/netlink.c | 328 +-----------------------------------------
- 1 file changed, 1 insertion(+), 327 deletions(-)
+real hardware with real ASIX PHY device.
 
-diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index ca63e59a5e92..d0b90ebc8b15 100644
---- a/net/devlink/netlink.c
-+++ b/net/devlink/netlink.c
-@@ -13,75 +13,6 @@ static const struct genl_multicast_group devlink_nl_mcgrps[] = {
- 	[DEVLINK_MCGRP_CONFIG] = { .name = DEVLINK_GENL_MCGRP_CONFIG_NAME },
- };
- 
--static const struct nla_policy devlink_nl_policy[DEVLINK_ATTR_MAX + 1] = {
--	[DEVLINK_ATTR_UNSPEC] = { .strict_start_type =
--		DEVLINK_ATTR_TRAP_POLICER_ID },
--	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_PORT_TYPE] = NLA_POLICY_RANGE(NLA_U16, DEVLINK_PORT_TYPE_AUTO,
--						    DEVLINK_PORT_TYPE_IB),
--	[DEVLINK_ATTR_PORT_SPLIT_COUNT] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_SB_INDEX] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_SB_POOL_INDEX] = { .type = NLA_U16 },
--	[DEVLINK_ATTR_SB_POOL_TYPE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_SB_POOL_SIZE] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_SB_POOL_THRESHOLD_TYPE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_SB_THRESHOLD] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_SB_TC_INDEX] = { .type = NLA_U16 },
--	[DEVLINK_ATTR_ESWITCH_MODE] = NLA_POLICY_RANGE(NLA_U16, DEVLINK_ESWITCH_MODE_LEGACY,
--						       DEVLINK_ESWITCH_MODE_SWITCHDEV),
--	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_DPIPE_TABLE_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_DPIPE_TABLE_COUNTERS_ENABLED] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_RESOURCE_ID] = { .type = NLA_U64},
--	[DEVLINK_ATTR_RESOURCE_SIZE] = { .type = NLA_U64},
--	[DEVLINK_ATTR_PARAM_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_PARAM_TYPE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_PARAM_VALUE_CMODE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_REGION_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_REGION_SNAPSHOT_ID] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_REGION_CHUNK_ADDR] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_REGION_CHUNK_LEN] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_HEALTH_REPORTER_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_HEALTH_REPORTER_GRACEFUL_PERIOD] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_HEALTH_REPORTER_AUTO_RECOVER] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_FLASH_UPDATE_FILE_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_FLASH_UPDATE_COMPONENT] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_FLASH_UPDATE_OVERWRITE_MASK] =
--		NLA_POLICY_BITFIELD32(DEVLINK_SUPPORTED_FLASH_OVERWRITE_SECTIONS),
--	[DEVLINK_ATTR_TRAP_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_TRAP_ACTION] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_TRAP_GROUP_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_NETNS_PID] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_NETNS_FD] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_NETNS_ID] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_HEALTH_REPORTER_AUTO_DUMP] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_TRAP_POLICER_ID] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_TRAP_POLICER_RATE] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_TRAP_POLICER_BURST] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_PORT_FUNCTION] = { .type = NLA_NESTED },
--	[DEVLINK_ATTR_RELOAD_ACTION] = NLA_POLICY_RANGE(NLA_U8, DEVLINK_RELOAD_ACTION_DRIVER_REINIT,
--							DEVLINK_RELOAD_ACTION_MAX),
--	[DEVLINK_ATTR_RELOAD_LIMITS] = NLA_POLICY_BITFIELD32(DEVLINK_RELOAD_LIMITS_VALID_MASK),
--	[DEVLINK_ATTR_PORT_FLAVOUR] = { .type = NLA_U16 },
--	[DEVLINK_ATTR_PORT_PCI_PF_NUMBER] = { .type = NLA_U16 },
--	[DEVLINK_ATTR_PORT_PCI_SF_NUMBER] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_PORT_CONTROLLER_NUMBER] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_RATE_TYPE] = { .type = NLA_U16 },
--	[DEVLINK_ATTR_RATE_TX_SHARE] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_RATE_TX_MAX] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_RATE_NODE_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_LINECARD_INDEX] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_LINECARD_TYPE] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_SELFTESTS] = { .type = NLA_NESTED },
--	[DEVLINK_ATTR_RATE_TX_PRIORITY] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_RATE_TX_WEIGHT] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_REGION_DIRECT] = { .type = NLA_FLAG },
--};
--
- int devlink_nl_put_nested_handle(struct sk_buff *msg, struct net *net,
- 				 struct devlink *devlink, int attrtype)
- {
-@@ -191,7 +122,7 @@ static int __devlink_nl_pre_doit(struct sk_buff *skb, struct genl_info *info,
- int devlink_nl_pre_doit(const struct genl_split_ops *ops,
- 			struct sk_buff *skb, struct genl_info *info)
- {
--	return __devlink_nl_pre_doit(skb, info, ops->internal_flags);
-+	return __devlink_nl_pre_doit(skb, info, 0);
- }
- 
- int devlink_nl_pre_doit_port(const struct genl_split_ops *ops,
-@@ -287,269 +218,12 @@ int devlink_nl_dumpit(struct sk_buff *msg, struct netlink_callback *cb,
- 		return devlink_nl_inst_iter_dumpit(msg, cb, flags, dump_one);
- }
- 
--static const struct genl_small_ops devlink_nl_small_ops[40] = {
--	{
--		.cmd = DEVLINK_CMD_PORT_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_port_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_RATE_SET,
--		.doit = devlink_nl_rate_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RATE_NEW,
--		.doit = devlink_nl_rate_new_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RATE_DEL,
--		.doit = devlink_nl_rate_del_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_SPLIT,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_port_split_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_UNSPLIT,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_port_unsplit_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_NEW,
--		.doit = devlink_nl_port_new_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_DEL,
--		.doit = devlink_nl_port_del_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--
--	{
--		.cmd = DEVLINK_CMD_LINECARD_SET,
--		.doit = devlink_nl_linecard_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_POOL_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_sb_pool_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_PORT_POOL_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_sb_port_pool_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_TC_POOL_BIND_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_sb_tc_pool_bind_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_OCC_SNAPSHOT,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_sb_occ_snapshot_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_OCC_MAX_CLEAR,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_sb_occ_max_clear_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_ESWITCH_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_eswitch_get_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_ESWITCH_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_eswitch_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_TABLE_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_dpipe_table_get_doit,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_ENTRIES_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_dpipe_entries_get_doit,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_HEADERS_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_dpipe_headers_get_doit,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_TABLE_COUNTERS_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_dpipe_table_counters_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RESOURCE_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_resource_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RESOURCE_DUMP,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_resource_dump_doit,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_RELOAD,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_reload_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PARAM_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_param_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_PARAM_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_port_param_get_doit,
--		.dumpit = devlink_nl_port_param_get_dumpit,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_PARAM_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_port_param_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_REGION_NEW,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_region_new_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_REGION_DEL,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_region_del_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_REGION_READ,
--		.validate = GENL_DONT_VALIDATE_STRICT |
--			    GENL_DONT_VALIDATE_DUMP_STRICT,
--		.dumpit = devlink_nl_region_read_dumpit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_health_reporter_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_RECOVER,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_health_reporter_recover_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DIAGNOSE,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_health_reporter_diagnose_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DUMP_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT |
--			    GENL_DONT_VALIDATE_DUMP_STRICT,
--		.dumpit = devlink_nl_health_reporter_dump_get_dumpit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DUMP_CLEAR,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_health_reporter_dump_clear_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_TEST,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_health_reporter_test_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_FLASH_UPDATE,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_flash_update_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_TRAP_SET,
--		.doit = devlink_nl_trap_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_TRAP_GROUP_SET,
--		.doit = devlink_nl_trap_group_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_TRAP_POLICER_SET,
--		.doit = devlink_nl_trap_policer_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SELFTESTS_RUN,
--		.doit = devlink_nl_selftests_run_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	/* -- No new ops here! Use split ops going forward! -- */
--};
--
- struct genl_family devlink_nl_family __ro_after_init = {
- 	.name		= DEVLINK_GENL_NAME,
- 	.version	= DEVLINK_GENL_VERSION,
--	.maxattr	= DEVLINK_ATTR_MAX,
--	.policy		= devlink_nl_policy,
- 	.netnsok	= true,
- 	.parallel_ops	= true,
--	.pre_doit	= devlink_nl_pre_doit,
--	.post_doit	= devlink_nl_post_doit,
- 	.module		= THIS_MODULE,
--	.small_ops	= devlink_nl_small_ops,
--	.n_small_ops	= ARRAY_SIZE(devlink_nl_small_ops),
- 	.split_ops	= devlink_nl_ops,
- 	.n_split_ops	= ARRAY_SIZE(devlink_nl_ops),
- 	.resv_start_op	= DEVLINK_CMD_SELFTESTS_RUN + 1,
--- 
-2.41.0
+Qemu supports a virtual PHY device?
 
+
+>> I use the following macro:
+>> 
+>>      (drivers: [$($driver:ident),+], device_table: [$($dev:expr),+], $($f:tt)*) => {
+>>          const N: usize = $crate::module_phy_driver!(@count_devices $($driver),+);
+>>          struct Module {
+>>              _drivers: [::kernel::net::phy::DriverVTable; N],
+>>          }
+>> 
+>>          $crate::prelude::module! {
+>>              type: Module,
+>>              $($f)*
+>>          }
+>> 
+>>          unsafe impl Sync for Module {}
+>> 
+>>          impl ::kernel::Module for Module {
+>>              fn init(module: &'static ThisModule) -> Result<Self> {
+>>                  let mut m = Module {
+>>                      _drivers:[$(::kernel::net::phy::create_phy_driver::<$driver>()),+],
+>>                  };
+>>                  let ptr = m._drivers.as_mut_ptr().cast::<::kernel::bindings::phy_driver>();
+>>                  ::kernel::error::to_result(unsafe {
+>>                      kernel::bindings::phy_drivers_register(ptr, m._drivers.len().try_into()?, module.as_ptr())
+>>                  })?;
+>>                  Ok(m)
+>>              }
+>>          }
+>> 
+
+(snip)
+
+>> [  615.365054] RIP: 0010:phy_check_link_status+0x28/0xd0
+>> [  615.365065] Code: 1f 00 0f 1f 44 00 00 55 48 89 e5 41 56 53 f6 87 dd 03 00 00 01 0f 85 ac 00 00 00 49 89 fe 48 8b 87 40 03 00 00 48 85 c0 74 13 <48> 8b 80 10 01 00 00 4c 89 f7 48 85 c0 74 0e ff d0 eb 0f bb fb ff
+>> [  615.365104] RSP: 0018:ffffc90000823de8 EFLAGS: 00010286
+>> [  615.365116] RAX: ffffc90000752d88 RBX: ffff8881023524e0 RCX: ffff888102e39980
+>> [  615.365130] RDX: ffff88846fbb18e8 RSI: 0000000000000000 RDI: ffff888102352000
+>> [  615.365144] RBP: ffffc90000823df8 R08: 8080808080808080 R09: fefefefefefefeff
+>> [  615.365157] R10: 0000000000000007 R11: 6666655f7265776f R12: ffff88846fbb18c0
+>> [  615.365171] R13: ffff888102b75000 R14: ffff888102352000 R15: ffff888102352000
+>> [  615.365185] FS:  0000000000000000(0000) GS:ffff88846fb80000(0000) knlGS:0000000000000000
+>> [  615.365210] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> [  615.365222] CR2: ffffc90000752e98 CR3: 0000000111635000 CR4: 0000000000750ee0
+>> [  615.365237] PKRU: 55555554
+>> [  615.365247] note: kworker/14:1[147] exited with irqs disabled
+> 
+> I think this is very weird, do you have any idea why this
+> could happen?
+
+DriverVtable is created on kernel stack, I guess.
+
+> If you don't mind, could you try if the following changes
+> anything?
+
+I don't think it works. If you use const for DriverTable, DriverTable
+is placed on read-only pages. The C side modifies DriverVTable array
+so it does't work.
+
+
+>      (drivers: [$($driver:ident),+], device_table: [$($dev:expr),+], $($f:tt)*) => {
+>          const N: usize = $crate::module_phy_driver!(@count_devices $($driver),+);
+>          struct Module {
+>              _drivers: [::kernel::net::phy::DriverVTable; N],
+>          }
+> 
+>          $crate::prelude::module! {
+>              type: Module,
+>              $($f)*
+>          }
+> 
+>          unsafe impl Sync for Module {}
+> 
+>          impl ::kernel::Module for Module {
+>              fn init(module: &'static ThisModule) -> Result<Self> {
+> 		const DRIVERS: [::kernel::net::phy::DriverVTable; N] = [$(::kernel::net::phy::create_phy_driver::<$driver>()),+];
+>                  let mut m = Module {
+>                      _drivers: unsafe { core::ptr::read(&DRIVERS) },
+>                  };
+>                  let ptr = m._drivers.as_mut_ptr().cast::<::kernel::bindings::phy_driver>();
+>                  ::kernel::error::to_result(unsafe {
+>                      kernel::bindings::phy_drivers_register(ptr, m._drivers.len().try_into()?, module.as_ptr())
+>                  })?;
+>                  Ok(m)
+>              }
+>          }
+> 
+> and also the variation where you replace `const DRIVERS` with
+> `static DRIVERS`.
+
+Probably works. But looks like similar with the current code? This is
+simpler?
 
