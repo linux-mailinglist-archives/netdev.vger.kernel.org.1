@@ -1,41 +1,52 @@
-Return-Path: <netdev+bounces-43172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A37D97D1A42
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 03:20:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE3D17D1A44
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 03:23:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 476522826FF
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 01:20:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57B34B214E7
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 01:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655BF657;
-	Sat, 21 Oct 2023 01:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nu5c44zh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C1AF658;
+	Sat, 21 Oct 2023 01:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49471654
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 01:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C3309C433C9;
-	Sat, 21 Oct 2023 01:20:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697851222;
-	bh=K+QqKg5XmpNKj22Pg+sw+LAJMCY310atdtuOddvhuls=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nu5c44zhTs/hfFz9S1wCvtVb9HF1xrWHCMbCTziknXG8jU9q7uMaZBnEVW74hQEF8
-	 Y+GYI7UYNmNQaSBPYBE6LwGkvObcswdIC3AsVh2gkR9j2UOCT2k1wuFMIlAUBaPwdU
-	 R+cV7c1eJ/Sk65TMV98p/taru8674bh9utPLg4BL3tq8dcouJJhCcaKLu0O3yNmlGL
-	 y6NX2+zq7WrkmZW3HO0ZCF2ZegHdhlsyvJCwUHbFDBxKDULPEaeq0s0p8l+IP/k63n
-	 wBboTkNwSr5ZyCzooMc4Q1hjOdgv8+O+IX0VVTHuXPAgMIuHQa2utwkzNP0BRNBJEO
-	 Op4Hjeub8FR+g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A5807C595D7;
-	Sat, 21 Oct 2023 01:20:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86797EA
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 01:23:43 +0000 (UTC)
+Received: from mail78-36.sinamail.sina.com.cn (mail78-36.sinamail.sina.com.cn [219.142.78.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2841AD69
+	for <netdev@vger.kernel.org>; Fri, 20 Oct 2023 18:23:41 -0700 (PDT)
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.118.70.203])
+	by sina.com (172.16.235.25) with ESMTP
+	id 65332815000002C6; Sat, 21 Oct 2023 09:23:37 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 53730834210857
+X-SMAIL-UIID: 96D766E791A64224BF0FE1776099F234-20231021-092337
+From: Hillf Danton <hdanton@sina.com>
+To: Ivan Babrou <ivan@cloudflare.com>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
+	kernel-team <kernel-team@cloudflare.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: wait_for_unix_gc can cause CPU overload for well behaved programs
+Date: Sat, 21 Oct 2023 09:23:22 +0800
+Message-Id: <20231021012322.1799-1-hdanton@sina.com>
+In-Reply-To: <CABWYdi0N7uvDex5CdKD60hNQ6UFuqoB=Ss52yQu6UoMJm0MFPw@mail.gmail.com>
+References: <CABWYdi1kiu1g1mAq6DpQWczg78tMzaVFnytNMemZATFHqYSqYw@mail.gmail.com> <20231020104728.2060-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,41 +54,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] igc: Fix ambiguity in the ethtool advertising
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169785122267.29089.10589419785434237648.git-patchwork-notify@kernel.org>
-Date: Sat, 21 Oct 2023 01:20:22 +0000
-References: <20231019203641.3661960-1-jacob.e.keller@intel.com>
-In-Reply-To: <20231019203641.3661960-1-jacob.e.keller@intel.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- sasha.neftin@intel.com, dima.ruinskiy@intel.com, vitaly.lifshits@intel.com,
- naamax.meir@linux.intel.com
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 19 Oct 2023 13:36:41 -0700 you wrote:
-> From: Sasha Neftin <sasha.neftin@intel.com>
+On Fri, 20 Oct 2023 10:25:25 -0700 Ivan Babrou <ivan@cloudflare.com>
 > 
-> The 'ethtool_convert_link_mode_to_legacy_u32' method does not allow us to
-> advertise 2500M speed support and TP (twisted pair) properly. Convert to
-> 'ethtool_link_ksettings_test_link_mode' to advertise supported speed and
-> eliminate ambiguity.
-> 
-> [...]
+> This could solve wait_for_unix_gc spinning, but it wouldn't affect
+> unix_gc itself, from what I understand. There would always be one
+> socket writer or destroyer punished by running the gc still.
 
-Here is the summary with links:
-  - [net] igc: Fix ambiguity in the ethtool advertising
-    https://git.kernel.org/netdev/net/c/e7684d29efdf
+See what you want. The innocents are rescued by kicking a worker off.
+Only for thoughts.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--- x/net/unix/garbage.c
++++ y/net/unix/garbage.c
+@@ -86,7 +86,6 @@
+ /* Internal data structures and random procedures: */
+ 
+ static LIST_HEAD(gc_candidates);
+-static DECLARE_WAIT_QUEUE_HEAD(unix_gc_wait);
+ 
+ static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
+ 			  struct sk_buff_head *hitlist)
+@@ -185,24 +184,25 @@ static void inc_inflight_move_tail(struc
+ 		list_move_tail(&u->link, &gc_candidates);
+ }
+ 
+-static bool gc_in_progress;
++static void __unix_gc(struct work_struct *w);
++static DECLARE_WORK(unix_gc_work, __unix_gc);
++
+ #define UNIX_INFLIGHT_TRIGGER_GC 16000
+ 
+ void wait_for_unix_gc(void)
+ {
+ 	/* If number of inflight sockets is insane,
+-	 * force a garbage collect right now.
+-	 * Paired with the WRITE_ONCE() in unix_inflight(),
+-	 * unix_notinflight() and gc_in_progress().
+-	 */
+-	if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_GC &&
+-	    !READ_ONCE(gc_in_progress))
+-		unix_gc();
+-	wait_event(unix_gc_wait, gc_in_progress == false);
++	 * kick a garbage collect right now.
++	 *
++	 * todo s/wait_for_unix_gc/kick_unix_gc/
++	 */
++	if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_GC /2)
++		queue_work(system_unbound_wq, &unix_gc_work);
+ }
+ 
+-/* The external entry point: unix_gc() */
+-void unix_gc(void)
++static DEFINE_MUTEX(unix_gc_mutex);
++
++static void __unix_gc(struct work_struct *w)
+ {
+ 	struct sk_buff *next_skb, *skb;
+ 	struct unix_sock *u;
+@@ -211,15 +211,10 @@ void unix_gc(void)
+ 	struct list_head cursor;
+ 	LIST_HEAD(not_cycle_list);
+ 
++	if (!mutex_trylock(&unix_gc_mutex))
++		return;
+ 	spin_lock(&unix_gc_lock);
+ 
+-	/* Avoid a recursive GC. */
+-	if (gc_in_progress)
+-		goto out;
+-
+-	/* Paired with READ_ONCE() in wait_for_unix_gc(). */
+-	WRITE_ONCE(gc_in_progress, true);
+-
+ 	/* First, select candidates for garbage collection.  Only
+ 	 * in-flight sockets are considered, and from those only ones
+ 	 * which don't have any external reference.
+@@ -325,11 +320,12 @@ void unix_gc(void)
+ 	/* All candidates should have been detached by now. */
+ 	BUG_ON(!list_empty(&gc_candidates));
+ 
+-	/* Paired with READ_ONCE() in wait_for_unix_gc(). */
+-	WRITE_ONCE(gc_in_progress, false);
+-
+-	wake_up(&unix_gc_wait);
+-
+- out:
+ 	spin_unlock(&unix_gc_lock);
++	mutex_unlock(&unix_gc_mutex);
++}
++
++/* The external entry point: unix_gc() */
++void unix_gc(void)
++{
++	__unix_gc(NULL);
+ }
+--
 
