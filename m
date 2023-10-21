@@ -1,91 +1,117 @@
-Return-Path: <netdev+bounces-43244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B63D37D1D94
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 16:50:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A46A67D1DA4
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 16:53:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7AD11C2097D
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 14:50:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 505912821F4
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 14:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FCBA101D2;
-	Sat, 21 Oct 2023 14:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8209D12E5C;
+	Sat, 21 Oct 2023 14:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jJhBkWhy"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="LbExNEax"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAFBCA61
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 14:50:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CEBABC433CA;
-	Sat, 21 Oct 2023 14:50:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697899823;
-	bh=63bWoIAADl1KfBX8RMDtq+J3PdFVRKm7FKjSpaJLOTc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jJhBkWhyU7I/UOtnCCoYXYYM0pYDJe1n3a56+5tBY4gtbb+OrzsPk/T87286EZ9O8
-	 2gVCDlTIYM/189yH59Fq0HR5wP1aOu1Hkrhk2+pum3gUqZnNKVkBYAj5g3ZxA4w+r9
-	 L9dWaWFTp71+8vRjeAOWpfH/5ymVO5Bqd9DOC2zAlKWL3ccgKtpTB5dF/cFYpQMDZv
-	 bKOixYAUXvREa2cwdmvdYAUP7uQl3D45GjLyD6602NjTUc8bxXF1eh8DCItWrRbhwo
-	 norgy13H+/7Ruld3t4zwKatZ9kD2/J1co5D2fastGDPwkcrYDXio2KFoUSkatMJ/ni
-	 J8EHoPmLdJGaQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AD9A4C04DD9;
-	Sat, 21 Oct 2023 14:50:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B52A6125
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 14:52:51 +0000 (UTC)
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD70D71
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 07:52:45 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c9b70b9671so83815ad.1
+        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 07:52:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1697899965; x=1698504765; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1HsFB5tlx9FQRvIXi6ryYvjnX1UG/8hzi6eFKlM5SgY=;
+        b=LbExNEax0RbR/RB6vlWzYAzyWLKDtTpdayRjZQ24DPrIjQHtHx2CbqIiIlDOVCuPr+
+         Vop6VHLWqCvg/ECCh7yzbQAQhTDCq/EQys13IslhETuAitq9YHbASsECoM3HJmVZ82UP
+         1HnLsKBprvitDk0GRp2OCI6nfnvsxIXWjpToY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697899965; x=1698504765;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1HsFB5tlx9FQRvIXi6ryYvjnX1UG/8hzi6eFKlM5SgY=;
+        b=Xk0mRXVufVc4Q53PsWcxxxTrVvV+/6uOMJ0gQTu/V0nqscc6uhigFGkC9NIuEvYWoF
+         Wir94aL60POYq8IQpExppV/lNKA2VWmPCMKZPL2GBdsSXu1Xysq3TpSAf+QJaIfW8Irn
+         um0B3ZVxhGYlnCaSkb7VJWEHqkIMDqDLGV5SPrEYXjoVcJr3Qp+ii9ay/O8Fyf0jn9NV
+         FpUvcDpZMcORpC3T+qbYuWIGuQ/X+Htb9ljzNG/ot45oNKxl4ZFGXXWeynkoaKo9tAAv
+         DU8R33mdBZoHa40b3XJr54rXqXBU2f5t0ckAEnlStfUlqxdajj4cGHTEWOVR2ksudPpK
+         kRQw==
+X-Gm-Message-State: AOJu0YyjddVEp8tkh3DWHR5qm7SAATt3hGiNMcWxsJ/oWRwA3rfWHEVp
+	j+cFKzgSw38lZDUzASIcFxGDE6l9BK/+ed5l03twWg==
+X-Google-Smtp-Source: AGHT+IHubZ+DRcpnIydaHeTMIC0WTzLW0aG0Ilm3AeFdLRSeiPMxSatpnwZZ4BjeimzRga4YfBDoS6n13h4SC3fNUAk=
+X-Received: by 2002:a17:902:f70d:b0:1c9:c480:1797 with SMTP id
+ h13-20020a170902f70d00b001c9c4801797mr383011plo.11.1697899964770; Sat, 21 Oct
+ 2023 07:52:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4] octeon_ep: assert hardware structure sizes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169789982370.32227.5493366972449498212.git-patchwork-notify@kernel.org>
-Date: Sat, 21 Oct 2023 14:50:23 +0000
-References: <20231020114302.2334660-1-srasheed@marvell.com>
-In-Reply-To: <20231020114302.2334660-1-srasheed@marvell.com>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com,
- vimleshk@marvell.com, egallen@redhat.com, mschmidt@redhat.com,
- pabeni@redhat.com, horms@kernel.org, kuba@kernel.org, davem@davemloft.net,
- vburru@marvell.com, sedara@marvell.com, edumazet@google.com
+References: <20231020210751.3415723-1-dianders@chromium.org> <20231020140655.v5.3.I33c8decabd2e77c37524db02b4e6b9b4dbc3a8d6@changeid>
+In-Reply-To: <20231020140655.v5.3.I33c8decabd2e77c37524db02b4e6b9b4dbc3a8d6@changeid>
+From: Grant Grundler <grundler@chromium.org>
+Date: Sat, 21 Oct 2023 07:52:33 -0700
+Message-ID: <CANEJEGsdm5XokPmYgMm4NXFx0eoLdYAfgx+W88jeox337cNRbg@mail.gmail.com>
+Subject: Re: [PATCH v5 3/8] r8152: Cancel hw_phy_work if we have an error in probe
+To: Douglas Anderson <dianders@chromium.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Hayes Wang <hayeswang@realtek.com>, 
+	"David S . Miller" <davem@davemloft.net>, Edward Hill <ecgh@chromium.org>, 
+	Laura Nao <laura.nao@collabora.com>, Alan Stern <stern@rowland.harvard.edu>, 
+	Simon Horman <horms@kernel.org>, linux-usb@vger.kernel.org, 
+	Grant Grundler <grundler@chromium.org>, =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Fri, Oct 20, 2023 at 2:08=E2=80=AFPM Douglas Anderson <dianders@chromium=
+.org> wrote:
+>
+> The error handling in rtl8152_probe() is missing a call to cancel the
+> hw_phy_work. Add it in to match what's in the cleanup code in
+> rtl8152_disconnect().
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Sounds like there is a future opportunity for someone (not Doug) to
+refactor code.
 
-On Fri, 20 Oct 2023 04:43:01 -0700 you wrote:
-> Clean up structure defines related to hardware data to be
-> asserted to fixed sizes, as padding is not allowed
-> by hardware.
-> 
-> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+> Fixes: a028a9e003f2 ("r8152: move the settings of PHY to a work queue")
+> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+
+Reviewed-by: Grant Grundler <grundler@chromium.org>
+
 > ---
-> V4:
->   - Changed packed attributes to static assertions for fixed sizes
-> V3: https://lore.kernel.org/all/20231016092051.2306831-1-srasheed@marvell.com/
->   - Updated changelog to indicate this is a cleanup
-> V2: https://lore.kernel.org/all/20231010194026.2284786-1-srasheed@marvell.com/
->   - Updated changelog to provide more information
-> V1: https://lore.kernel.org/all/20231006120225.2259533-1-srasheed@marvell.com/
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v4] octeon_ep: assert hardware structure sizes
-    https://git.kernel.org/netdev/net-next/c/e10f4019b18d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+>
+> Changes in v5:
+> - ("Cancel hw_phy_work if we have an error in probe") new for v5.
+>
+>  drivers/net/usb/r8152.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+> index 201c688e3e3f..d10b0886b652 100644
+> --- a/drivers/net/usb/r8152.c
+> +++ b/drivers/net/usb/r8152.c
+> @@ -9783,6 +9783,7 @@ static int rtl8152_probe(struct usb_interface *intf=
+,
+>
+>  out1:
+>         tasklet_kill(&tp->tx_tl);
+> +       cancel_delayed_work_sync(&tp->hw_phy_work);
+>         if (tp->rtl_ops.unload)
+>                 tp->rtl_ops.unload(tp);
+>         usb_set_intfdata(intf, NULL);
+> --
+> 2.42.0.758.gaed0368e0e-goog
+>
 
