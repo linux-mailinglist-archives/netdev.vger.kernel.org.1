@@ -1,107 +1,150 @@
-Return-Path: <netdev+bounces-43221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D422D7D1CC5
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 13:23:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE6E7D1CCD
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 13:27:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 810E32824D2
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 11:23:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7141F2824CF
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 11:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F738DF45;
-	Sat, 21 Oct 2023 11:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A0DFDF61;
+	Sat, 21 Oct 2023 11:27:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="wA0wOA71"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="UDmHyZ9W"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6C0DDA7
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 11:23:27 +0000 (UTC)
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B29E19E
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 04:23:24 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2bb9a063f26so24710241fa.2
-        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 04:23:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D9FD534
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 11:27:20 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5C031A3
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 04:27:14 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53df747cfe5so2499661a12.2
+        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 04:27:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697887403; x=1698492203; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=auJxdlqCgjCa51dXoMwvYuZbIGGCcYwEiqzQrnnI3tg=;
-        b=wA0wOA71XofW47gyE3EZrgkNKfdp6lUyXjp9gjQAnvRa+fHpRLYQlw/XHWtPINVZxO
-         fqlA7NgsMjhJ4QzhyAYFIA2D9loMFPXDnaLtXF1u2Pn/59ZNbCWIkhVgqEHIuad17RnO
-         pi5+W6oHqNJhLBbIk2+bjZYVUkN1Z9XmTk2exYsvHEXNOcLun4fBqJK8q+LKMkodfXzx
-         Bn0JbnM501XUB/PyS1gIn1I9Uin+/VTZ/ZvbxzlSqWKhRjoHkuBDudSBf0+jkwpwSucX
-         dfQFmuqjhVJpqgN7/R96g0n9cSdNUOaicKIeQrjFdd5PQZnAXSojnrA19Yn1kk2gaGn4
-         ONCw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697887633; x=1698492433; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hpk0k0ogme2d1cv2E0/I1viGOjA7QZt5vgfeWptNu8M=;
+        b=UDmHyZ9WGw+9XwbL74iEDCDlhLpA2gncQYwylRRKmdCeELIjHICP1KhKEEzR42aHot
+         y4x62aBKend52HuB8jxOtW5sWWSNTHBY3Jkj6Xq5q2+XEikMeKOtZXQIRIPe7m1O7W10
+         QPAXxu582N5/H+4AzPbPe2bSFHaTmgHbJDzqhAR9GE924i9ZYTbtDlNLdbEddZ2pZ/D6
+         8oeDD7hyHNxKPYgd1I9x9m1RcMTvu91WhYia6ccwEy9WkX/z12cp4wphvE8CFZGpvkGS
+         j/TwRbXTLBTJa3ECx8tEa1wzfFZnPekpyy9e0U3sfbuvVo9OHPhpKvor84MKwWnvuWJm
+         qWMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697887403; x=1698492203;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=auJxdlqCgjCa51dXoMwvYuZbIGGCcYwEiqzQrnnI3tg=;
-        b=fJSwc2k/E4+YV29eEOok8fYN+PvInOSPJ/XrTRVb8PyrNLPuMrQRl1NWrTlPmltN8q
-         vJknApv6JJIKc6OJ0XXc0t5/UEEmufYcfSrf3o3DyeDEpvTFkbl6bfTG+lEjmjeP+bIA
-         5eG8v57075eHvAeE8bHDkqPLHuV7rBQcWTnPTJWjxGtgIeSOAZtN7w0RQHV9tn5guita
-         dLjiyuLZEUmmv8Xc0YL0wZSODtUrN1NpMYFBK8yay05N/F8Z3LGLhdNcBLjKPn1OJZKh
-         AhuOFeEeMA6z9FWlLzN5IC+W6cnPk87XTwe4lucYUzQyQjlMPab7R/eLytalL3j2prCN
-         LTsw==
-X-Gm-Message-State: AOJu0YwEQThuv4ovy2UYtYghVkU9HvfBNoMH3kKdZSnKBNLGPIganC1P
-	T8q/tSwrTk4du7TCrIevBuGYxg==
-X-Google-Smtp-Source: AGHT+IGwO7ncLDRx5LQbKJ+3n+z05E1Fme4DWYSzI4K+ip7jz7ELeGmm6SWdpoRPFoi4MGcMMVuTCA==
-X-Received: by 2002:a2e:b8cc:0:b0:2c5:1f57:1ef5 with SMTP id s12-20020a2eb8cc000000b002c51f571ef5mr3396213ljp.39.1697887402637;
-        Sat, 21 Oct 2023 04:23:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697887633; x=1698492433;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hpk0k0ogme2d1cv2E0/I1viGOjA7QZt5vgfeWptNu8M=;
+        b=pQ7JtQInDZyZ2SJPM08CFPaF3p+e4JsvcQDfTOSBoTSNAS/OMWkL/YlySRF/zcqVXU
+         OiHuDyYIl1Kpcx9mH7x8REcaR1lI+jydmGWtXP067yFghs5ALVylZu9hQ8Tw4Oy8Tctz
+         D/sNzk1V0hD8MvQVFLaoD0EhUMi7aHrewd5AzQUYsCMSyVyMAnXTMQswSkz3ukMIQC6W
+         lVobMj2E4Im3o380hhaLcfvF01/f4eQRxtSuG0A3ySl8TAk1o5GJiGtpqxFhCsElO2ve
+         D/m8KpI96TONPJwboSZqXi7owVTfz9EC7Uc7N9bbJY1FBATl7ohOI6tJWyL22i0LG+Oc
+         rE2g==
+X-Gm-Message-State: AOJu0YyY+o5xfTAdUTmrMgYmTmWbm7r+t8Kut1px9us+0mVCsQQN+piU
+	X42B/ePttX4SILjtKnhpBAoOiLc2ETPZ0PxhQbU=
+X-Google-Smtp-Source: AGHT+IHcufC2yMRxfTtyLYa2Z6OE2pPCuy0UGyTSITevGeYHuZzOoZf9G/JBOdhwbrNjg5gh2ucr3g==
+X-Received: by 2002:a17:906:73ca:b0:9ae:7081:402e with SMTP id n10-20020a17090673ca00b009ae7081402emr2476521ejl.64.1697887632974;
+        Sat, 21 Oct 2023 04:27:12 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id b14-20020a05600c4e0e00b0040607da271asm9159864wmq.31.2023.10.21.04.23.21
+        by smtp.gmail.com with ESMTPSA id do6-20020a170906c10600b009ad7fc17b2asm3452858ejc.224.2023.10.21.04.27.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Oct 2023 04:23:21 -0700 (PDT)
-Date: Sat, 21 Oct 2023 13:23:20 +0200
+        Sat, 21 Oct 2023 04:27:12 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, amritha.nambiar@intel.com,
-	donald.hunter@gmail.com, chuck.lever@oracle.com, sdf@google.com
-Subject: Re: [PATCH net-next] tools: ynl-gen: change spacing around
- __attribute__
-Message-ID: <ZTO0qBkkSJGauYlU@nanopsycho>
-References: <20231020221827.3436697-1-kuba@kernel.org>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	jacob.e.keller@intel.com,
+	johannes@sipsolutions.net
+Subject: [patch net-next v3 00/10] devlink: finish conversion to generated split_ops
+Date: Sat, 21 Oct 2023 13:27:01 +0200
+Message-ID: <20231021112711.660606-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231020221827.3436697-1-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-Sat, Oct 21, 2023 at 12:18:27AM CEST, kuba@kernel.org wrote:
->checkpatch gets confused and treats __attribute__ as a function call.
->It complains about white space before "(":
->
->WARNING:SPACING: space prohibited between function name and open parenthesis '('
->+	struct netdev_queue_get_rsp obj __attribute__ ((aligned (8)));
->
->No spaces wins in the kernel:
->
->  $ git grep 'attribute__((.*aligned(' | wc -l
->  480
->  $ git grep 'attribute__ ((.*aligned (' | wc -l
->  110
->  $ git grep 'attribute__ ((.*aligned(' | wc -l
->  94
->  $ git grep 'attribute__((.*aligned (' | wc -l
->  63
->
->So, whatever, change the codegen.
->
->Note that checkpatch also thinks we should use __aligned(),
->but this is user space code.
->
->Link: https://lore.kernel.org/all/202310190900.9Dzgkbev-lkp@intel.com/
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+From: Jiri Pirko <jiri@nvidia.com>
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+This patchset converts the remaining genetlink commands to generated
+split_ops and removes the existing small_ops arrays entirely
+alongside with shared netlink attribute policy.
+
+Patches #1-#6 are just small preparations and small fixes on multiple
+              places. Note that couple of patches contain the "Fixes"
+              tag but no need to put them into -net tree.
+Patch #7 is a simple rename preparation
+Patch #8 is the main one in this set and adds actual definitions of cmds
+         in to yaml file.
+Patches #9-#10 finalize the change removing bits that are no longer in
+               use.
+
+---
+v2->v3:
+- just small fix and rebase in patch #2
+v1->v2:
+- see individual patches for changelog
+- patch #3 is new
+- patch "netlink: specs: devlink: fix reply command values" was removed
+  from the set and sent separately to -net
+
+Jiri Pirko (10):
+  genetlink: don't merge dumpit split op for different cmds into single
+    iter
+  tools: ynl-gen: introduce support for bitfield32 attribute type
+  tools: ynl-gen: render rsp_parse() helpers if cmd has only dump op
+  netlink: specs: devlink: remove reload-action from devlink-get cmd
+    reply
+  netlink: specs: devlink: make dont-validate single line
+  devlink: make devlink_flash_overwrite enum named one
+  devlink: rename netlink callback to be aligned with the generated ones
+  netlink: specs: devlink: add the remaining command to generate
+    complete split_ops
+  devlink: remove duplicated netlink callback prototypes
+  devlink: remove netlink small_ops
+
+ Documentation/netlink/genetlink-legacy.yaml   |    2 +-
+ Documentation/netlink/specs/devlink.yaml      | 1604 +++++-
+ .../netlink/genetlink-legacy.rst              |    2 +-
+ include/uapi/linux/devlink.h                  |    2 +-
+ net/devlink/dev.c                             |   10 +-
+ net/devlink/devl_internal.h                   |   64 -
+ net/devlink/dpipe.c                           |   14 +-
+ net/devlink/health.c                          |   24 +-
+ net/devlink/linecard.c                        |    3 +-
+ net/devlink/netlink.c                         |  328 +-
+ net/devlink/netlink_gen.c                     |  757 ++-
+ net/devlink/netlink_gen.h                     |   64 +-
+ net/devlink/param.c                           |   14 +-
+ net/devlink/port.c                            |   11 +-
+ net/devlink/rate.c                            |    6 +-
+ net/devlink/region.c                          |    8 +-
+ net/devlink/resource.c                        |    4 +-
+ net/devlink/sb.c                              |   17 +-
+ net/devlink/trap.c                            |    9 +-
+ net/netlink/genetlink.c                       |    3 +-
+ tools/net/ynl/generated/devlink-user.c        | 5075 +++++++++++++++--
+ tools/net/ynl/generated/devlink-user.h        | 4213 ++++++++++++--
+ tools/net/ynl/lib/ynl.c                       |    6 +
+ tools/net/ynl/lib/ynl.h                       |    1 +
+ tools/net/ynl/lib/ynl.py                      |   13 +-
+ tools/net/ynl/ynl-gen-c.py                    |   50 +-
+ 26 files changed, 10644 insertions(+), 1660 deletions(-)
+
+-- 
+2.41.0
+
 
