@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-43206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DC6E7D1B80
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 09:21:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 141D27D1B83
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 09:25:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F274DB2141E
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 07:21:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92BCD282749
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 07:25:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A586ADB;
-	Sat, 21 Oct 2023 07:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72DAD270;
+	Sat, 21 Oct 2023 07:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="R4VlTAzM"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="bHoK6P9x"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F124D186F
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 07:21:29 +0000 (UTC)
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6A0BD65
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 00:21:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736AC8BF0
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 07:25:38 +0000 (UTC)
+Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDC16D7D
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 00:25:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1697872880; x=1698132080;
-	bh=oZ51bXZnucMgUGKZr/Gf//4zUxvdPjcWcZzOiOcUei0=;
+	s=protonmail; t=1697873130; x=1698132330;
+	bh=f9wr7mZkBF8WY7lzCPRnAh0rU/gISs3zka4QrYHnsSQ=;
 	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
 	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
 	 Message-ID:BIMI-Selector;
-	b=R4VlTAzMqbZAsWRYiYqRjs2QZ34row2911hSGcRZtDIfg+AolECppZRinLkQ7194O
-	 X9vuvEXHDtNquHH3JuQKdbIAsjFAZqlOO1ElWwB0M2RI4l+MI4pii+H4AiOzbtlIlU
-	 CDeEuVJiqsLTKDbi4tw+3Ndozwjk5VH7ycdRLr3M7gdts986eeWIpXoF6v0TBm8spA
-	 uM6xn7I0CBqCsQk4mRMdeE81ZELdqiWuGq8smIm9qmj6KF+R2i5J0e6xZZMlRIbyRm
-	 LPnHx4HinLhuuENmxnW1pw+/9kK3i2rnkulo7g4i/3ni5X3o4bB/N4FD+hFp1yvaGT
-	 eYW9isPTwjo6g==
-Date: Sat, 21 Oct 2023 07:21:07 +0000
+	b=bHoK6P9x4s/NEci4S1k+0dm1BmxRyfT6cWo1Fw3XkG4vnWqvtY+hkXRqhG3z7Dzey
+	 gGcCjzYpndn45WKyzV+1sfda1hHD4gzxNNmSKC7XYn1HHFf7rYmXsGm/oorc9oktB4
+	 4DuAU3kS+sK23+HmrzQ1S9bUTC3nXAYnUOoUr19s6gzu7B24CWmtw6odkXuEEQnBST
+	 HKWRS5SqxpR68D72v7SbM/0zT3vzLde2FRL/ZR8PTpxBdXAEkiY5JPTu+2AsWxO2BV
+	 +IJZok7evZovsl+hxO5sE4HiVm3jBNChiHARb52qYAcnoGGE0VsbABU+V66Xn50MPS
+	 Oa6mFS9XSCcdQ==
+Date: Sat, 21 Oct 2023 07:25:17 +0000
 To: FUJITA Tomonori <fujita.tomonori@gmail.com>
 From: Benno Lossin <benno.lossin@proton.me>
 Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
 Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
-Message-ID: <f7b625af-64aa-42db-9b9c-95c0125564ee@proton.me>
-In-Reply-To: <20231020.065103.1042445600809743171.fujita.tomonori@gmail.com>
-References: <64db34c0-a50a-4321-a3d8-b692e26899d9@proton.me> <20231020.003219.1788909848908453261.fujita.tomonori@gmail.com> <398ec812-3dce-40b1-b4eb-bfff7e3feb6a@proton.me> <20231020.065103.1042445600809743171.fujita.tomonori@gmail.com>
+Message-ID: <b218e543-d61c-4317-9b19-05ac6ce47d15@proton.me>
+In-Reply-To: <20231020.215448.1421599168007259810.fujita.tomonori@gmail.com>
+References: <20231019.234210.1772681043146865420.fujita.tomonori@gmail.com> <64db34c0-a50a-4321-a3d8-b692e26899d9@proton.me> <20231020.093446.482864708938996774.fujita.tomonori@gmail.com> <20231020.215448.1421599168007259810.fujita.tomonori@gmail.com>
 Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -53,43 +53,67 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 19.10.23 23:51, FUJITA Tomonori wrote:
-> On Thu, 19 Oct 2023 16:37:46 +0000
-> Benno Lossin <benno.lossin@proton.me> wrote:
+On 20.10.23 14:54, FUJITA Tomonori wrote:
+> On Fri, 20 Oct 2023 09:34:46 +0900 (JST)
+> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
 >=20
->> On 19.10.23 17:32, FUJITA Tomonori wrote:
->>>> You can just do this (I omitted the `::kernel::` prefix for
->>>> readability, if you add this in the macro, please include it):
->>>>
->>>>        // CAST: `DriverVTable` is `repr(transparent)` and wrapping `bi=
-ndings::phy_driver`.
->>>>        let ptr =3D drv.as_mut_ptr().cast::<bindings::phy_driver>();
->>>>        let len =3D drv.len().try_into()?;
->>>>        // SAFETY: ...
->>>>        to_result(unsafe { bindings::phy_drivers_register(ptr, len, mod=
-ule.0) })?;
->>>>
->>>>>                    })?;
->>>
->>> The above solves DriverVTable.0 but still the macro can't access to
->>> kernel::ThisModule.0. I got the following error:
+>> On Thu, 19 Oct 2023 15:20:51 +0000
+>> Benno Lossin <benno.lossin@proton.me> wrote:
 >>
->> I think we could just provide an `as_ptr` getter function
->> for `ThisModule`. But need to check with the others.
+>>> I would like to remove the mutable static variable and simplify
+>>> the macro.
 >>
+>> How about adding DriverVTable array to Registration?
+>>
+>> /// Registration structure for a PHY driver.
+>> ///
+>> /// # Invariants
+>> ///
+>> /// The `drivers` slice are currently registered to the kernel via `phy_=
+drivers_register`.
+>> pub struct Registration<const N: usize> {
+>>      drivers: [DriverVTable; N],
+>> }
+>>
+>> impl<const N: usize> Registration<{ N }> {
+>>      /// Registers a PHY driver.
+>>      pub fn register(
+>>          module: &'static crate::ThisModule,
+>>          drivers: [DriverVTable; N],
+>>      ) -> Result<Self> {
+>>          let mut reg =3D Registration { drivers };
+>>          let ptr =3D reg.drivers.as_mut_ptr().cast::<bindings::phy_drive=
+r>();
+>>          // SAFETY: The type invariants of [`DriverVTable`] ensure that =
+all elements of the `drivers` slice
+>>          // are initialized properly. So an FFI call with a valid pointe=
+r.
+>>          to_result(unsafe {
+>>              bindings::phy_drivers_register(ptr, reg.drivers.len().try_i=
+nto()?, module.0)
+>>          })?;
+>>          // INVARIANT: The `drivers` slice is successfully registered to=
+ the kernel via `phy_drivers_register`.
+>>          Ok(reg)
+>>      }
+>> }
 >=20
-> ThisModule.0 is *mut bindings::module. Drivers should not use
-> bindings?
+> Scratch this.
+>=20
+> This doesn't work. Also simply putting slice of DriverVTable into
+> Module strcut doesn't work.
 
-This is a special case, since it `module` is used on a lot of functions
-(and it does not make sense to provide abstractions for those on
-`ThisModule`). Additionally, `ThisModule` already has a public `from_raw`
-function that takes a `*mut bindings::module`.
+Why does it not work? I tried it and it compiled fine for me.
 
-If you add a `as_ptr` function, please create a separate patch for it.
+> We cannot move a slice of DriverVTable. Except for static allocation,
+> is there a simple way?
+
+I do not know what you are referring to, you can certainly move an array
+of `DriverVTable`s.
 
 --=20
 Cheers,
 Benno
+
 
 
