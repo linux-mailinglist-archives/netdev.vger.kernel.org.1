@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-43217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 829137D1C92
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 12:50:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 000CF7D1C91
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 12:50:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D1821C20A47
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 10:50:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 291161C2098D
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 10:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87CE0D53A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540D0D28A;
 	Sat, 21 Oct 2023 10:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iRdbPhZS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dMMJJLi5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AFFD50C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2963563B3
 	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 10:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C326DC43391;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 86B96C433C9;
 	Sat, 21 Oct 2023 10:50:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1697885421;
-	bh=E36pEEuQvHdVJk6tczCg3Ru6GTEyPhENNZmsRocCFg8=;
+	bh=UBLlCnEVvwYlCti4O20ZYEFk3yYjavGU3fi94jtFESQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iRdbPhZSlYgDzA2RxwDX6kEPhkFT2fLzGgkbJo+FL21xSg6X0gCKnAftrSUuFUzWS
-	 rxPVMGJ5HGSUQ7nyNmzq8ywRXx42Sit2b3TKOcMwrQmgz24MktrAsPHRPbNY/pFYms
-	 YDvucM5pY3z2Pq22F3u/eu4Jc7EBHRgMxrFmrkYQ8LRQhEMr9lE7xgN314Cz7rMY/+
-	 SlLx4PBOpZVgDKoNCfKMG4SREBRn52ioe0sLKm1T9aB/9LMna0rkor/wTOI+BkbL15
-	 pO/AR+p0k6Cip7DrWEyZRUL1Fgvgq+KIQ81phZc2RCJIn8Kxvn1lE0VQCIltybczrK
-	 OaJjcTsZENTEQ==
+	b=dMMJJLi5OocQhNzCbIqur/k2IQdBdg2VWst9rkuINemJy2sKWdyxjfpbofKrKkiu8
+	 wSm5Vli7voSo5IAR+eXqPcp7LtjcVjUE9abQHeTlcBWeQ0hpUBc1j0mUnr4m02K+DA
+	 INjSsR99YMXLlE5rgGYX8QgUZB5ggaOXmAigUynYA4MldelmwyjI52pZ3D4inyzZ8Z
+	 WVWfdqHCoTSj5IDgttTM7lL+nUDmNFYz+rB+hPvuFe997IUtW8K6rI+7RZ8HbW1VK+
+	 T2xBLofRi61gW8aJycqE6LBIShsa/jmJo5jAVi7foiIAonuJ+IMgRfLPHYQIjx+WnJ
+	 QhhIMYNuCeK0g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AEDA9C04DD9;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6EBEFC04DD9;
 	Sat, 21 Oct 2023 10:50:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,35 +43,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: tc-testing: add test for 'rt' upgrade on
- hfsc
+Subject: Re: [PATCH] net: xgene: Fix unused xgene_enet_of_match warning for
+ !CONFIG_OF
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169788542170.19468.4002464511745802917.git-patchwork-notify@kernel.org>
+ <169788542145.19468.17978327279203895124.git-patchwork-notify@kernel.org>
 Date: Sat, 21 Oct 2023 10:50:21 +0000
-References: <20231019172944.3398419-1-pctammela@mojatatu.com>
-In-Reply-To: <20231019172944.3398419-1-pctammela@mojatatu.com>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com
+References: <20231019182338.832913-1-robh@kernel.org>
+In-Reply-To: <20231019182338.832913-1-robh@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: iyappan@os.amperecomputing.com, keyur@os.amperecomputing.com,
+ quan@os.amperecomputing.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, lkp@intel.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 19 Oct 2023 14:29:44 -0300 you wrote:
-> Add a test to check if inner rt curves are upgraded to sc curves.
+On Thu, 19 Oct 2023 13:23:37 -0500 you wrote:
+> Commit b0377116decd ("net: ethernet: Use device_get_match_data()") dropped
+> the unconditional use of xgene_enet_of_match resulting in this warning:
 > 
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> ---
->  .../tc-testing/tc-tests/qdiscs/hfsc.json      | 32 +++++++++++++++----
->  1 file changed, 26 insertions(+), 6 deletions(-)
+> drivers/net/ethernet/apm/xgene/xgene_enet_main.c:2004:34: warning: unused variable 'xgene_enet_of_match' [-Wunused-const-variable]
+> 
+> The fix is to drop of_match_ptr() which is not necessary because DT is
+> always used for this driver (well, it could in theory support ACPI only,
+> but CONFIG_OF is always enabled for arm64).
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] selftests: tc-testing: add test for 'rt' upgrade on hfsc
-    https://git.kernel.org/netdev/net-next/c/ee3d12285471
+  - net: xgene: Fix unused xgene_enet_of_match warning for !CONFIG_OF
+    https://git.kernel.org/netdev/net/c/d2ca43f30611
 
 You are awesome, thank you!
 -- 
