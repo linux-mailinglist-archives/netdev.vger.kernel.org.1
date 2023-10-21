@@ -1,92 +1,81 @@
-Return-Path: <netdev+bounces-43256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01B257D1E43
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 18:32:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60CE97D1E65
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 18:50:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48DF8B20E5C
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 16:31:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14133282038
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 16:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 322FAFBEE;
-	Sat, 21 Oct 2023 16:31:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3CFDDCC;
+	Sat, 21 Oct 2023 16:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="VajpImTp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="THofxUXH"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF22208B1
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 16:31:51 +0000 (UTC)
-Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C5FE112
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 09:31:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1697905903; x=1698165103;
-	bh=/R3b3Uby0tPUxUMEGn7N7zK5JjMjmZWHqpWHTu+T4zo=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=VajpImTpwW7K5kNGfWpUVB9Olyyj8OiINDjZRSZrg6gqI8B7MYkhoaME99ghUlcZR
-	 toKjMq0YeNPN658vOe8r7eqM2P1YDU2jKF5QKZplg8+p3q+u7v4444IjD1Pf67jfkL
-	 U5ZDN9TXUm6fHejKx5Yo4Ra/wUBbr/RjrmwXCA9w4zxHIYhQ5ZIgHk/8jlSAy3PU0Z
-	 GR9us/ATjAbIEHhGD0hEQqqCpnIN9oyj8FXd1WMXyCXgPTDsTNmMxh1LMZFfueoxdp
-	 sMHVU7Zmwoiy4rRry6hc8mbnFUA/XtNvgtLFCp+638ZvATCQkzpld3ZCT4NalefUtC
-	 xcrZ8QE9tyC7w==
-Date: Sat, 21 Oct 2023 16:31:32 +0000
-To: Andrew Lunn <andrew@lunn.ch>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
-Message-ID: <5e493b59-728a-43ee-a503-3ad989579720@proton.me>
-In-Reply-To: <bbd1b455-a228-4523-a18c-58792925dd85@lunn.ch>
-References: <d8b23faa-4041-4789-ae96-5d8bf87070ad@proton.me> <20231021.213834.76499402455687702.fujita.tomonori@gmail.com> <23348649-2ef2-4b2d-9745-86587a72ae5e@proton.me> <20231021.220012.2089903288409349337.fujita.tomonori@gmail.com> <fb45d4aa-2816-4457-93e9-aec72f8ec64e@proton.me> <bbd1b455-a228-4523-a18c-58792925dd85@lunn.ch>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD24A52
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 16:50:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BE86BC433C9;
+	Sat, 21 Oct 2023 16:50:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697907022;
+	bh=Uhkr0bB1pEXa9rW5VOWvgR7lAGMVpfpJAMHhfRSvu1Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=THofxUXHX6/bLUgSZAZD9Z/xQWBMPAl4FM+XoaF4+GSxMeI8n9L88j56m6OIrbCom
+	 7ABOO+cSIyrQJINIoBLteEDjJLm/lfhIxEK2+MI7/LQrJoMICbukLziO9A8Z+C2M7f
+	 ExmLKpeTll93ueVx3x8JdUh9785YtqVux1oQ0QP93hj0ph3lHp3swgaOzoiobmRiXJ
+	 6W1jz1hK1WTg/fEkVzmq6FFAP0Q4pA8HvsUAl/fbxIJizTV93VrlmHYjAsqkym1GXT
+	 t1aka48e1FhDzG/iZpSFTR5w5ULzhXX6pxtpjLxt7bKY1YmdbvNXtrttcuF3jAfOIX
+	 OV8zRcCY6Iy9A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A26F1C04DD9;
+	Sat, 21 Oct 2023 16:50:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2] ss: fix directory leak when -T option is used
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169790702265.24876.16927993046229278944.git-patchwork-notify@kernel.org>
+Date: Sat, 21 Oct 2023 16:50:22 +0000
+References: <0451403b-0326-4723-a3bb-8acf465fcf45@gmail.com>
+In-Reply-To: <0451403b-0326-4723-a3bb-8acf465fcf45@gmail.com>
+To: Maxim Petrov <mmrmaximuzz@gmail.com>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org
 
-On 21.10.23 17:57, Andrew Lunn wrote:
->> I see, what exactly is the problem with that? In other words:
->> why does PHYLIB need `phy_driver` to stay at the same address?
->=20
-> Again, pretty standard kernel behaviour. The core keeps a linked list
-> of drivers which have been registered with it. So when the driver
-> loads, it calls phy_driver_register() and the core adds the passed
-> structure to a linked list of drivers. Sometime later, the bus is
-> enumerated and devices found. The core will read a couple of registers
-> which contain the manufactures ID, model and revision. The linked list
-> of drivers is walked and a match is performed on the IDs. When a match
-> is found, phydev->drv is set to the driver structure. Calls into the
-> driver are then performed through this pointer.
+Hello:
 
-We have several examples of abstractions over things that embed linked
-lists upstream already (e.g. `mutex`) and have developed a special API
-that handles them very well. This API ensures that the values cannot be
-moved (and if one tries to move it, the compiler errors). In this case
-I was not aware of the requirement -- and it was also not noted in any
-SAFETY comment (e.g. on `phy_drivers_register`).
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
-> A typically C driver has statically initialised driver structures
-> which are placed in the data section, or better still the rodata
-> section. They are not going anywhere until the driver is unloaded. So
-> there is no problem keeping them on a linked list. Dynamically
-> creating them is unusual. They are just structures of pointers to
-> functions, everything is known at link time.
+On Sat, 21 Oct 2023 10:44:08 +0200 you wrote:
+> To get information about threads used in a process, the /proc/$PID/task
+> directory content is analyzed by ss code. However, the opened 'dirent'
+> object is not closed after use, leading to memory leaks. Add missing
+> closedir call in 'user_ent_hash_build' to avoid it.
+> 
+> Detected by valgrind: "valgrind ./misc/ss -T"
+> 
+> [...]
 
-In the ideal case I would just like to store them inside of the
-`Module` struct (which is placed in the data section). However,
-that requires Wedson's patch I linked in this thread.
+Here is the summary with links:
+  - [iproute2] ss: fix directory leak when -T option is used
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=d233ff0f984a
 
---=20
-Cheers,
-Benno
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
