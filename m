@@ -1,99 +1,203 @@
-Return-Path: <netdev+bounces-43234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 663DF7D1CFB
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 14:06:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD5827D1D13
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 14:13:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEE3DB20DC4
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 12:06:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C0D1281857
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 12:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A37A2109;
-	Sat, 21 Oct 2023 12:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2523DDC7;
+	Sat, 21 Oct 2023 12:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TK5tffe3"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="DXE6ZjRB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DEED528;
-	Sat, 21 Oct 2023 12:06:06 +0000 (UTC)
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECC3D1A4;
-	Sat, 21 Oct 2023 05:06:05 -0700 (PDT)
-Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-d9ca471cf3aso1713963276.2;
-        Sat, 21 Oct 2023 05:06:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697889965; x=1698494765; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+Ja1C2VFP0W2/pxJ8cQiAC3kI+L/k337SubWCWnvoB4=;
-        b=TK5tffe36yN+b2LW2qSkNWL4b6nmkFIwJ6AI/zPCV+Fehz3ufGWeyRRfG1pGYzAc8i
-         fSz7nNU1ecVMJuxCiEtX6wtYCWd6hk4ec0uQtf1Lho4BKE/uHHJKgTJfwaRddbAKypdf
-         rj6NLKi1rO4mN7Ge5GXguT+6eNmSe9nASyTgPPn3PEasdRZ2yTT2TKcXPgvnTVQ7n0Qp
-         Yd5kIbB+dPqFjXyJVH/asaySYCcAgiW80lEPefJD7u2yEHi3y/9AhEBr1xekRUJ0eU8F
-         nr0EiCk5vhzULjqwRuHs2CclKlwRtJOwg3/M+MvRc1GWWJ0N9oYW66mWKFNFWLj47hMG
-         Qx5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697889965; x=1698494765;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+Ja1C2VFP0W2/pxJ8cQiAC3kI+L/k337SubWCWnvoB4=;
-        b=esbYIBEVd9C86r5W+w0WnAmh6vxo7043C3eSpkKdASbySUC4JR1JcpBoRlbj27zhDy
-         8ua2kPUgDGkopyGnt6HWt78viAZkVtar1VU3CzhW2g7Rk/E/KEkvodhqo54uLUDyGTRz
-         m5iEpg+WRTlQsaG3Ia2GJMrvfTpeGyxeBGN79n2CETlEDlpSru+qLameE47xcMiJNuhI
-         d6Yayiy8awn5jYq09TYa3Fn0ugIgPNQ8+K7Mc5QjzvCLtucU1Enk4qXpABgQ963xwwJ7
-         7k9LVwe+7pYjxLNvf7tzn3z9W/ER4I6riIgd6LgdgeNkyWJBVE4TdmcgHVpI+AjqsJh9
-         LuiA==
-X-Gm-Message-State: AOJu0YzOI64tS1Lv7ySqhtkHtkY3tf/HmlXzpdBPwgn48BXUTpnDTk23
-	CORyZMPmCEhJukwKCF0+V2fC8dzgpu84uSPrpqCy77S2hCNYejGY
-X-Google-Smtp-Source: AGHT+IHntCB1vKalHz97mC2scksJb0FfyDYZj7Z3fLLgOhY+uGG9dCKxW2nncF1aO19fMGb+HqZezGjcyTkW+TBc7fQ=
-X-Received: by 2002:a25:abb3:0:b0:d9a:b7cb:53bb with SMTP id
- v48-20020a25abb3000000b00d9ab7cb53bbmr5208233ybi.11.1697889965146; Sat, 21
- Oct 2023 05:06:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B22BCA7E;
+	Sat, 21 Oct 2023 12:13:43 +0000 (UTC)
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2764E9;
+	Sat, 21 Oct 2023 05:13:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1697890415; x=1698149615;
+	bh=F2xYuKb48Gv1cahjkNPH3fWN6sBk6ZkPotVy7QzC7d0=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=DXE6ZjRBPgOy5kqIvlKznKpcuHzoGi2anyQQE+ovUGupVu9pNikMW/d3ToC8MRaBx
+	 jidZanLSJmjeUyzhVvDDSV8R4MMb4dORt6zzKAKSWjFUoZzAm84zCSJXrnt+/PfWLx
+	 4r+Ae8cn5zr0ZGUibfwfNu44gW9ME/cpZNImB9h7YPuYR+XU8Ma2rfGlHrsTGBRjnZ
+	 ijuWQdVufpRg16UaTtuNxUoHGdv9O/WQpINfp3x5dFzbPPVnriRzxLTJ30/ljbm7Am
+	 YOyj5FPVngmJLueTktH1Yd2K9MEzQGvvAU0r+S1iPwHg2sVkW9QP3IG5WOE6HgmJkx
+	 Cvo/D999tJ8Zg==
+Date: Sat, 21 Oct 2023 12:13:32 +0000
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
+Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
+Message-ID: <d8b23faa-4041-4789-ae96-5d8bf87070ad@proton.me>
+In-Reply-To: <20231021.203622.624978584179221727.fujita.tomonori@gmail.com>
+References: <4e3e0801-b8b2-457b-aee1-086d20365890@proton.me> <20231021.192741.2305009064677924338.fujita.tomonori@gmail.com> <fa420b54-b381-4534-8568-91286eb7d28b@proton.me> <20231021.203622.624978584179221727.fujita.tomonori@gmail.com>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
- <20231017113014.3492773-4-fujita.tomonori@gmail.com> <871qdpikq9.fsf@metaspace.dk>
- <20231021.125125.1778736907764380293.fujita.tomonori@gmail.com>
-In-Reply-To: <20231021.125125.1778736907764380293.fujita.tomonori@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Sat, 21 Oct 2023 14:05:53 +0200
-Message-ID: <CANiq72nc+pZ2fsNzNkaB01im92X1F4mhESZonyvD2G1rd9dNDA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 3/5] WIP rust: add second `bindgen` pass for
- enum exhaustiveness checking
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: nmi@metaspace.dk, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	andrew@lunn.ch, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, 
-	benno.lossin@proton.me, greg@kroah.com, ojeda@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Oct 21, 2023 at 5:51=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> Hmm, this works for me.
+On 21.10.23 13:36, FUJITA Tomonori wrote:
+> On Sat, 21 Oct 2023 11:21:12 +0000
+> Benno Lossin <benno.lossin@proton.me> wrote:
+>=20
+>> On 21.10.23 12:27, FUJITA Tomonori wrote:
+>>> On Sat, 21 Oct 2023 08:37:08 +0000
+>>> Benno Lossin <benno.lossin@proton.me> wrote:
+>>>
+>>>> On 21.10.23 09:30, FUJITA Tomonori wrote:
+>>>>> On Sat, 21 Oct 2023 07:25:17 +0000
+>>>>> Benno Lossin <benno.lossin@proton.me> wrote:
+>>>>>
+>>>>>> On 20.10.23 14:54, FUJITA Tomonori wrote:
+>>>>>>> On Fri, 20 Oct 2023 09:34:46 +0900 (JST)
+>>>>>>> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+>>>>>>>
+>>>>>>>> On Thu, 19 Oct 2023 15:20:51 +0000
+>>>>>>>> Benno Lossin <benno.lossin@proton.me> wrote:
+>>>>>>>>
+>>>>>>>>> I would like to remove the mutable static variable and simplify
+>>>>>>>>> the macro.
+>>>>>>>>
+>>>>>>>> How about adding DriverVTable array to Registration?
+>>>>>>>>
+>>>>>>>> /// Registration structure for a PHY driver.
+>>>>>>>> ///
+>>>>>>>> /// # Invariants
+>>>>>>>> ///
+>>>>>>>> /// The `drivers` slice are currently registered to the kernel via=
+ `phy_drivers_register`.
+>>>>>>>> pub struct Registration<const N: usize> {
+>>>>>>>>         drivers: [DriverVTable; N],
+>>>>>>>> }
+>>>>>>>>
+>>>>>>>> impl<const N: usize> Registration<{ N }> {
+>>>>>>>>         /// Registers a PHY driver.
+>>>>>>>>         pub fn register(
+>>>>>>>>             module: &'static crate::ThisModule,
+>>>>>>>>             drivers: [DriverVTable; N],
+>>>>>>>>         ) -> Result<Self> {
+>>>>>>>>             let mut reg =3D Registration { drivers };
+>>>>>>>>             let ptr =3D reg.drivers.as_mut_ptr().cast::<bindings::=
+phy_driver>();
+>>>>>>>>             // SAFETY: The type invariants of [`DriverVTable`] ens=
+ure that all elements of the `drivers` slice
+>>>>>>>>             // are initialized properly. So an FFI call with a val=
+id pointer.
+>>>>>>>>             to_result(unsafe {
+>>>>>>>>                 bindings::phy_drivers_register(ptr, reg.drivers.le=
+n().try_into()?, module.0)
+>>>>>>>>             })?;
+>>>>>>>>             // INVARIANT: The `drivers` slice is successfully regi=
+stered to the kernel via `phy_drivers_register`.
+>>>>>>>>             Ok(reg)
+>>>>>>>>         }
+>>>>>>>> }
+>>>>>>>
+>>>>>>> Scratch this.
+>>>>>>>
+>>>>>>> This doesn't work. Also simply putting slice of DriverVTable into
+>>>>>>> Module strcut doesn't work.
+>>>>>>
+>>>>>> Why does it not work? I tried it and it compiled fine for me.
+>>>>>
+>>>>> You can compile but the kernel crashes. The addresses of the callback
+>>>>> functions are invalid.
+>>>>
+>>>> Can you please share your setup and the error? For me it booted
+>>>> fine.
+>>>
+>>> You use ASIX PHY hardware?
+>>
+>> It seems I have configured something wrong. Can you share your testing
+>> setup? Do you use a virtual PHY device in qemu, or do you boot it from
+>> real hardware with a real ASIX PHY device?
+>=20
+> real hardware with real ASIX PHY device.
 
-Andreas was probably using `O=3D`, but you were not.
+I see.
 
-At least that is what I guessed yesterday and what the suggestion I gave fi=
-xes.
+> Qemu supports a virtual PHY device?
 
-This is also why sending unfinished work by someone else is not the
-best idea. I would also have marked that patch as RFC and put it at
-the end perhaps, to make it clearer.
+I have no idea.
 
-By the way, the patch is missing your SoB. I would recommend using
-`--signoff` in Git and b4's `am`, `cherry-pick` etc.
+[...]
 
+>> I think this is very weird, do you have any idea why this
+>> could happen?
+>=20
+> DriverVtable is created on kernel stack, I guess.
+
+But how does that invalidate the function pointers?
+
+>> If you don't mind, could you try if the following changes
+>> anything?
+>=20
+> I don't think it works. If you use const for DriverTable, DriverTable
+> is placed on read-only pages. The C side modifies DriverVTable array
+> so it does't work.
+
+Did you try it? Note that I copy the `DriverVTable` into the Module
+struct, so it will not be placed on a read-only page.
+
+>>       (drivers: [$($driver:ident),+], device_table: [$($dev:expr),+], $(=
+$f:tt)*) =3D> {
+>>           const N: usize =3D $crate::module_phy_driver!(@count_devices $=
+($driver),+);
+>>           struct Module {
+>>               _drivers: [::kernel::net::phy::DriverVTable; N],
+>>           }
+>>
+>>           $crate::prelude::module! {
+>>               type: Module,
+>>               $($f)*
+>>           }
+>>
+>>           unsafe impl Sync for Module {}
+>>
+>>           impl ::kernel::Module for Module {
+>>               fn init(module: &'static ThisModule) -> Result<Self> {
+>> =09=09const DRIVERS: [::kernel::net::phy::DriverVTable; N] =3D [$(::kern=
+el::net::phy::create_phy_driver::<$driver>()),+];
+>>                   let mut m =3D Module {
+>>                       _drivers: unsafe { core::ptr::read(&DRIVERS) },
+>>                   };
+>>                   let ptr =3D m._drivers.as_mut_ptr().cast::<::kernel::b=
+indings::phy_driver>();
+>>                   ::kernel::error::to_result(unsafe {
+>>                       kernel::bindings::phy_drivers_register(ptr, m._dri=
+vers.len().try_into()?, module.as_ptr())
+>>                   })?;
+>>                   Ok(m)
+>>               }
+>>           }
+>>
+>> and also the variation where you replace `const DRIVERS` with
+>> `static DRIVERS`.
+>=20
+> Probably works. But looks like similar with the current code? This is
+> simpler?
+
+Just curious if it has to do with using `static` vs `const`.
+
+--=20
 Cheers,
-Miguel
+Benno
+
 
