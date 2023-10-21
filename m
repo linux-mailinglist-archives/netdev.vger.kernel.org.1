@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-43227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 520BF7D1CD1
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 13:27:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B88B77D1CCE
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 13:27:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F8A6B21552
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 11:27:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F9C02825B3
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 11:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54591DF63;
-	Sat, 21 Oct 2023 11:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C983DDF45;
+	Sat, 21 Oct 2023 11:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="hLQ3iCUR"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="jX349BJ2"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C7CFC13
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 11:27:25 +0000 (UTC)
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FC22D67
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 04:27:19 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9becde9ea7bso592374466b.0
-        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 04:27:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90227F515
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 11:27:24 +0000 (UTC)
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F61B1A4
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 04:27:21 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-53dd3f169d8so2388703a12.3
+        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 04:27:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697887638; x=1698492438; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697887640; x=1698492440; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZshBnGVoh1JZ8w5Eh4vOVzn5wmfkWpBLxOOGKLNfaB4=;
-        b=hLQ3iCURLUVFfXGBCL/RXOb9FgdaDjy8IfaEG1y10r7utWyQp3B4zfv/zjddO69+4P
-         DSGHUbWfkaO56Hqgc1nDbG5ThPnB84DwHBJ0c+gEcuukvWdyU6YTs829UKBCKRV7TLfx
-         RQKEgSyOJxgoph5kC5Si+Vzelxil4XeISrXQqUCChvwsIERFETozNA+Egj5M58/kfsMR
-         zMJ1855WGhMZ0VgBYu9UY+WE7DwOodceJpHsYsFtVne7DkQ83Lorm0r7hauqtD77gLIz
-         x9d8G5M77fD+wj35TuaukpI0MamzSB7ZtOvGH2qqxF4JMCJDJnUZHS9hdEJ5BB6RNIfh
-         70OQ==
+        bh=FxYbZL7pdVoxFWQTW59ElwR4qST6nZRNnQGFPjrE3Vw=;
+        b=jX349BJ28x1RaSX5iKtUhgB5lO8Q+7umBWoO7URnHc/B3HWis6ARuBFmRie02UYYb3
+         LKgKyN4SJVMHOj0FtkOlpVkUZ9Vm+R/7p/657x1cpZcJ/lapZC5Iiek01XRVNSsJG8LX
+         /g3yqDPKA3px1aPVmtrOL4lloPyKV4+bmBoStZSG5SWWVaUh1IWUuSv5xtHCMh88FbzN
+         1ACbkPlpJS2SWMvoTGfVBcaJh8p7JskgYBi09CXEd334LRgandaNCwDNqjjAurBqP2LS
+         tp44yV+kqn09F2Q7WK6biWgruuvfIO+hPmx1g173jmkzY47V4DSMFLiSspJEkfqxt6LU
+         wnsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697887638; x=1698492438;
+        d=1e100.net; s=20230601; t=1697887640; x=1698492440;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZshBnGVoh1JZ8w5Eh4vOVzn5wmfkWpBLxOOGKLNfaB4=;
-        b=sjoia9m3qCjRmLk5wbU5Ff5OhjtKSU5CetzZaoNCNLoAFWEMqHyBrVmbHmGecsQAI4
-         xCLUAGK0Agb9yrhnLIeTo8lxI4EPE1Ax9Qvf45//k8gSx62MsC7eZdX0S4FXCrimD9TD
-         OrSFVYAKMTtNqJDXNCRF2h86JoDRmua7/eVguwUenXdxhtCax3xpDKwd26VU95VfSBkp
-         S6tUXA9phA/Dy32QpXzsTeDeB/o9YC7CKGQE2wYeerOkE7wv8YZK0O61AEBTAL0JbHV+
-         x9nHQPR7Xh1SLkftn5/ihiNZIdPiW6tWiJwe0AXTyaQgn1Rg1Baotsgydu8ZKNlsWLZs
-         J6hw==
-X-Gm-Message-State: AOJu0YzhHw4wtV8ia2AehzoecXn9FpUtvPrTn3I3A17+fNanXJCsKTrL
-	0pl4+BsiK3DCR7ryLZEnt78vJ50XrG4tDDKEJW8=
-X-Google-Smtp-Source: AGHT+IH3JW+y99LZzJKc54b/nh2rXkXnSPocWGvxDsfiqjwr0uvOhvxsJtKco7qhuCfQphw0xiJirA==
-X-Received: by 2002:a17:906:fe06:b0:9a9:f042:deb9 with SMTP id wy6-20020a170906fe0600b009a9f042deb9mr4069595ejb.19.1697887637996;
-        Sat, 21 Oct 2023 04:27:17 -0700 (PDT)
+        bh=FxYbZL7pdVoxFWQTW59ElwR4qST6nZRNnQGFPjrE3Vw=;
+        b=vn0VjaKADmRICEa9ixk1oMOLc1qbVQ0AsTi9/bkKH545hipIYThMvL8OBC8mn48/kO
+         A7rwMgf9pt7As99PkUeJiJweurSaMvdvPJ3WBua84FlT6L87t39ZJAn0KaE+cM7IsYqh
+         D1izKF5IcWpMMuhD9TPkFmphbVypNqj/5BCvi+kO7RIT6u+RsEqEx8T3AGW02+QZDcDw
+         qb50ND8enfQV/hvHnCR9rRGJIbaJInN07uNUmg/olfub/GixYZHLoAsYRs7Rp0CCKHey
+         Cg6kIBq0TnhuxoMedG4rJF4IYH1G8RHeZz2eFxNNbE/hOKpTaKuvKYQI3SFwCpjPi2Hj
+         zkiQ==
+X-Gm-Message-State: AOJu0YwZ9SF6TqhuVwOnWDUFL7PvAIFuz3ffQBYXppm7vFRFFd6/0+/E
+	bBM6l8kg7COMttM+vA2HUpYaZZEAMXlR3oOsR94=
+X-Google-Smtp-Source: AGHT+IENmHaYtLc+WWbWxeu3mnc5ndvmL2IIC7S9ykDVphzQppjvzO98i8y45A1KunYD4uM03l03Vg==
+X-Received: by 2002:a17:907:26c2:b0:9ae:6ffd:bdf7 with SMTP id bp2-20020a17090726c200b009ae6ffdbdf7mr3306802ejc.39.1697887639867;
+        Sat, 21 Oct 2023 04:27:19 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id g3-20020a1709064e4300b0099b76c3041csm3469473ejw.7.2023.10.21.04.27.17
+        by smtp.gmail.com with ESMTPSA id s19-20020a170906bc5300b009b957d5237asm3440520ejv.80.2023.10.21.04.27.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Oct 2023 04:27:17 -0700 (PDT)
+        Sat, 21 Oct 2023 04:27:19 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,9 +66,9 @@ Cc: kuba@kernel.org,
 	edumazet@google.com,
 	jacob.e.keller@intel.com,
 	johannes@sipsolutions.net
-Subject: [patch net-next v3 03/10] tools: ynl-gen: render rsp_parse() helpers if cmd has only dump op
-Date: Sat, 21 Oct 2023 13:27:04 +0200
-Message-ID: <20231021112711.660606-4-jiri@resnulli.us>
+Subject: [patch net-next v3 04/10] netlink: specs: devlink: remove reload-action from devlink-get cmd reply
+Date: Sat, 21 Oct 2023 13:27:05 +0200
+Message-ID: <20231021112711.660606-5-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231021112711.660606-1-jiri@resnulli.us>
 References: <20231021112711.660606-1-jiri@resnulli.us>
@@ -82,41 +82,63 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Due to the check in RenderInfo class constructor, type_consistent
-flag is set to False to avoid rendering the same response parsing
-helper for do and dump ops. However, in case there is no do, the helper
-needs to be rendered for dump op. So split check to achieve that.
+devlink-get command does not contain reload-action attr in reply.
+Remove it.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
-v1->v2:
-- new patch
----
- tools/net/ynl/ynl-gen-c.py | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ Documentation/netlink/specs/devlink.yaml | 1 -
+ tools/net/ynl/generated/devlink-user.c   | 5 -----
+ tools/net/ynl/generated/devlink-user.h   | 2 --
+ 3 files changed, 8 deletions(-)
 
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 7d6c318397be..ed35a307c960 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -1112,10 +1112,13 @@ class RenderInfo:
+diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+index dec130d2507c..94a1ca10f5fc 100644
+--- a/Documentation/netlink/specs/devlink.yaml
++++ b/Documentation/netlink/specs/devlink.yaml
+@@ -263,7 +263,6 @@ operations:
+             - bus-name
+             - dev-name
+             - reload-failed
+-            - reload-action
+             - dev-stats
+       dump:
+         reply: *get-reply
+diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
+index 2cb2518500cb..a002f71d6068 100644
+--- a/tools/net/ynl/generated/devlink-user.c
++++ b/tools/net/ynl/generated/devlink-user.c
+@@ -475,11 +475,6 @@ int devlink_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
+ 				return MNL_CB_ERROR;
+ 			dst->_present.reload_failed = 1;
+ 			dst->reload_failed = mnl_attr_get_u8(attr);
+-		} else if (type == DEVLINK_ATTR_RELOAD_ACTION) {
+-			if (ynl_attr_validate(yarg, attr))
+-				return MNL_CB_ERROR;
+-			dst->_present.reload_action = 1;
+-			dst->reload_action = mnl_attr_get_u8(attr);
+ 		} else if (type == DEVLINK_ATTR_DEV_STATS) {
+ 			if (ynl_attr_validate(yarg, attr))
+ 				return MNL_CB_ERROR;
+diff --git a/tools/net/ynl/generated/devlink-user.h b/tools/net/ynl/generated/devlink-user.h
+index 4b686d147613..d00bcf79fa0d 100644
+--- a/tools/net/ynl/generated/devlink-user.h
++++ b/tools/net/ynl/generated/devlink-user.h
+@@ -112,14 +112,12 @@ struct devlink_get_rsp {
+ 		__u32 bus_name_len;
+ 		__u32 dev_name_len;
+ 		__u32 reload_failed:1;
+-		__u32 reload_action:1;
+ 		__u32 dev_stats:1;
+ 	} _present;
  
-         # 'do' and 'dump' response parsing is identical
-         self.type_consistent = True
--        if op_mode != 'do' and 'dump' in op and 'do' in op:
--            if ('reply' in op['do']) != ('reply' in op["dump"]):
--                self.type_consistent = False
--            elif 'reply' in op['do'] and op["do"]["reply"] != op["dump"]["reply"]:
-+        if op_mode != 'do' and 'dump' in op:
-+            if 'do' in op:
-+                if ('reply' in op['do']) != ('reply' in op["dump"]):
-+                    self.type_consistent = False
-+                elif 'reply' in op['do'] and op["do"]["reply"] != op["dump"]["reply"]:
-+                    self.type_consistent = False
-+            else:
-                 self.type_consistent = False
+ 	char *bus_name;
+ 	char *dev_name;
+ 	__u8 reload_failed;
+-	__u8 reload_action;
+ 	struct devlink_dl_dev_stats dev_stats;
+ };
  
-         self.attr_set = attr_set
 -- 
 2.41.0
 
