@@ -1,51 +1,62 @@
-Return-Path: <netdev+bounces-43176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D171A7D1A54
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 03:43:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC4F27D1A59
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 03:47:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 342E0282717
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 01:43:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5600B2151C
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 01:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CBF7EE;
-	Sat, 21 Oct 2023 01:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678A17ED;
+	Sat, 21 Oct 2023 01:47:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PRzDPHby"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnO42zON"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A547EA;
-	Sat, 21 Oct 2023 01:43:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57AC6C433C8;
-	Sat, 21 Oct 2023 01:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C001A32;
+	Sat, 21 Oct 2023 01:47:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAE7EC433C7;
+	Sat, 21 Oct 2023 01:47:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697852629;
-	bh=yRTFPCC2dwBRVws+NAy33Dgp5z84UryexE3MFZt2oD8=;
+	s=k20201202; t=1697852836;
+	bh=aClrMzzQ6vcC0uIRuh6OiAn7D8pu4quUTjxdrHylDGs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PRzDPHbyixDF7pJmIt2h/K8P1i1HVGxwnyOczVDfgBQis5rqbiQKVUN7uL5f+GCeM
-	 jrC9As7bSj9UPIyltdtW3Pw2u9qqUvIosZ1JonYOzbc86lqnEgToHbRGaHRtH3eF9e
-	 7jGt6xyaO0JFH2wPUP/1XTOIx2E+7GCAYNs1CAHfITcKr9MbeE1BKwSigX/7xncjKT
-	 32iUTqJFwYCaA2y87XBb+n49zoFMsEcWyVwt+LM/DT82UCUotID6/oevqBgxWKoUI+
-	 T7GT+0Iu+GcLpVoJDv7AqY3/vSL5tY/f+BZhjGZYBrTI+Sq6iTdBtewUhDVATS6tek
-	 EVPmZleqofOVw==
-Date: Fri, 20 Oct 2023 18:43:48 -0700
+	b=ZnO42zON+eFtPVfDaAJLTbzxaoEkp0d+xqHseMQ1lAYfbybAfI+CVbPc7MhEd9B3R
+	 Vl+rvcwkJNWxAjxN8Qav8+st6JplEYZirV0pxrxBChr8Vi26GXUd1BWaUAchOTje4A
+	 aE1k/tlWvSsyvSTAHvKuLIbT9OUjdB4DFqEP5Z7cvCOj+S6aYhhMXcZZSwVMh+EEl/
+	 yeQlTPsK+sNRJWlLcqjC1A6HDCKOt65bpVk3RnUQKzebsUHqlWp8ZCiRiyvNpwo/Xx
+	 bH6+mG05LXn3x4lNDNk2VpiNRNPpjWdTkrJIVdR7ppSZxUrr2NbxvDrkSzMLi4N6gG
+	 WFRYEaa2TMMyQ==
+Date: Fri, 20 Oct 2023 18:47:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, martin.lau@linux.dev, razor@blackwall.org,
- ast@kernel.org, andrii@kernel.org, john.fastabend@gmail.com,
- sdf@google.com, toke@kernel.org
-Subject: Re: [PATCH bpf-next v2 1/7] netkit, bpf: Add bpf programmable net
- device
-Message-ID: <20231020184348.528aa62c@kernel.org>
-In-Reply-To: <33467f55-4bbf-4078-af21-d91c6aab82ee@lunn.ch>
-References: <20231019204919.4203-1-daniel@iogearbox.net>
-	<20231019204919.4203-2-daniel@iogearbox.net>
-	<33467f55-4bbf-4078-af21-d91c6aab82ee@lunn.ch>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v6 12/16] net: Replace hwtstamp_source by
+ timestamping layer
+Message-ID: <20231020184714.3b3816fd@kernel.org>
+In-Reply-To: <20231019-feature_ptp_netnext-v6-12-71affc27b0e5@bootlin.com>
+References: <20231019-feature_ptp_netnext-v6-0-71affc27b0e5@bootlin.com>
+	<20231019-feature_ptp_netnext-v6-12-71affc27b0e5@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,19 +66,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 21 Oct 2023 00:18:53 +0200 Andrew Lunn wrote:
-> > +	err = rtnl_configure_link(peer, ifmp, 0, NULL);
-> > +	if (err < 0)
-> > +		goto err_configure_peer;  
+On Thu, 19 Oct 2023 16:29:27 +0200 Kory Maincent wrote:
+> Replace hwtstamp_source which is only used by the kernel_hwtstamp_config
+> structure by the more widely use timestamp_layer structure. This is done
+> to prepare the support of selectable timestamping source.
 > 
-> Seeing code after calling register_netdevice() often means bugs. The
-> interface is live, and in use before the function even returns. The
-> kernel can try to get an IP address, mount an NFS root etc. This might
-> be safe, because you have two linked interfaces here, and the other
-> one is not yet registered. Maybe some comment about this would be
-> good, or can the rtnl_configure_link() be done earlier?
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-These are in the newlink callback, rtnl is held throughout.
-Which is not to say that corresponding code in veth wasn't 
-a source of many bugs :S
+Temporarily breaks the build :(
+
+net/core/dev_ioctl.c:335:44: error: use of undeclared identifier 'NET_TIMESTAMPING'; did you mean 'NO_TIMESTAMPING'?
+        cfg->source = phy_ts ? PHY_TIMESTAMPING : NET_TIMESTAMPING;
+                                                  ^~~~~~~~~~~~~~~~
+                                                  NO_TIMESTAMPING
+include/uapi/linux/net_tstamp.h:18:2: note: 'NO_TIMESTAMPING' declared here
+        NO_TIMESTAMPING,
+        ^
+-- 
+pw-bot: cr
 
