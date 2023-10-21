@@ -1,168 +1,141 @@
-Return-Path: <netdev+bounces-43236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7CE37D1D29
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 14:38:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6D4A7D1D2A
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 14:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87C8E282062
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 12:38:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B5F428230B
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 12:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE7315D5;
-	Sat, 21 Oct 2023 12:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36501C2D;
+	Sat, 21 Oct 2023 12:47:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LU1xEtzv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="imxkYajm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21AA1A48;
-	Sat, 21 Oct 2023 12:38:38 +0000 (UTC)
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1737A1A4;
-	Sat, 21 Oct 2023 05:38:37 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6bf20d466cdso319819b3a.1;
-        Sat, 21 Oct 2023 05:38:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7575A48;
+	Sat, 21 Oct 2023 12:47:21 +0000 (UTC)
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186DB1A4;
+	Sat, 21 Oct 2023 05:47:17 -0700 (PDT)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-5a87ac9d245so18604647b3.3;
+        Sat, 21 Oct 2023 05:47:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697891916; x=1698496716; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7pT2a60W5b99aNzf8nFI9/WY2ze+GwSU3HjJQSnLWIQ=;
-        b=LU1xEtzvdLyA4WalJzlHX41uPC/IzlYtromAVMK7fbzvgBuAdDYohZQDNIgUuJ7oEO
-         GOiPp14yvPF9fScXs5aDPYrRNApC1A0r103o/gwUjZwvd9BhTXiiYMskwphiZxPklaT8
-         CyPaLb56yl96uslWjr/D5vbbs+n26PsfaivOABRcbGD/Zi7ZWK13Iziifp7KxHyZdM7S
-         cqn6zm9cm3fx4A6KY7h1FE2s7C+3LLKnd5hkbDXhlVx/pvgQZLtr5LzLvJDVaJt0qAZ6
-         21UGcImel+/5cFYJtU3nqe4TWZX0WiY4bQr06NpfCbKBnhOxtauCmpBAM9qa8vuSlK/K
-         e+Bg==
+        d=gmail.com; s=20230601; t=1697892436; x=1698497236; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ak0J9I1wxFXOFeFSUtB9w8Likk7tXaYYsKRE/whJO7k=;
+        b=imxkYajmixTDAXaGgQgmwQgfo6S9yksyu+7MDR6/F6Lqkx+jgREH2PzuZ5zaJY8Uch
+         0sOEic10PcGPqYtKCzYumGVmWKmCCQd916TJJYWi1gtjt4lpohqd99dZ1wv+2gWvvgX9
+         cD93pbVGM+Dej+chn91OFQXXtXqqZ+VEIjGNX9JTPjY9tBSSiEfr7XVusy47p7QTgWjO
+         akdcEwMzZxvwmraQeHZqUC0L4PPRekB4/crW3DApyCdYQiCari1S1y3BeAKPWA5KMpE9
+         IUSfAXDRQLnalX57Q+01okVLL5vjO/xXqlvSPtJ1co99qVv8UGyYaq2pc8B32w+FTUgC
+         GddQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697891916; x=1698496716;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7pT2a60W5b99aNzf8nFI9/WY2ze+GwSU3HjJQSnLWIQ=;
-        b=CCUiTvx0MnI3DkUm/gveV6IrnbBuTD+uqMwr1cmn8rNMg92y/WJenNANLN7PwiwJBs
-         eeW8zh095mfbcnjCNBZERKbRW1HUMOhkdxGgpxWlGH4cFmhfDuQgqtZuPBMTu1JzBPo3
-         6z3dWfPUI8vM5S6P5c7NkRcih7RabkCt5+LprbHk7ptutd2tHmTmMW68kKxhDQT89tnm
-         TVt2kU3maBmXndsXYFHPO9Qg8pHvL3YHNyo67Y0mV6c/H9BhD0wyA+dcQXtsH2/Pmmk3
-         CWkFycJb6uj2Sv8DIHErXLqqMC0mruawwjI2Z/IF3SkYJ4Nf4tz9oemS8iWYR/ogEZEz
-         5Z7g==
-X-Gm-Message-State: AOJu0YxJFJzsb6FCkmPSQ6pyZMoxqFKDTeWnXyCSp4r+sWzWXMy0m0CF
-	b42FsAT4WkEhlTOoZrTdvAsWBohJHtvrosRW
-X-Google-Smtp-Source: AGHT+IHpZ4awz7glluPHL6WIkq8CJfFuSxqZ/PjUcTyKujtEvlPdtFvy6RgV5FKpgP6if4F0ddd3wQ==
-X-Received: by 2002:a05:6a00:3a0a:b0:690:d0d4:6fb0 with SMTP id fj10-20020a056a003a0a00b00690d0d46fb0mr4449944pfb.3.1697891916353;
-        Sat, 21 Oct 2023 05:38:36 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id r26-20020aa7989a000000b00696e8215d28sm3200367pfl.20.2023.10.21.05.38.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Oct 2023 05:38:35 -0700 (PDT)
-Date: Sat, 21 Oct 2023 21:38:34 +0900 (JST)
-Message-Id: <20231021.213834.76499402455687702.fujita.tomonori@gmail.com>
-To: benno.lossin@proton.me
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com,
- wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network
- PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <d8b23faa-4041-4789-ae96-5d8bf87070ad@proton.me>
-References: <fa420b54-b381-4534-8568-91286eb7d28b@proton.me>
-	<20231021.203622.624978584179221727.fujita.tomonori@gmail.com>
-	<d8b23faa-4041-4789-ae96-5d8bf87070ad@proton.me>
+        d=1e100.net; s=20230601; t=1697892436; x=1698497236;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ak0J9I1wxFXOFeFSUtB9w8Likk7tXaYYsKRE/whJO7k=;
+        b=g11McG/HGcHmgWVBL9W+CrrD3Yl6L+4Mv5yETZ1lOQgYbtg3pFiCIc8JOxdFPllgf7
+         f3qOAhtwcWM5YEoJB4wVMKPQwGYex5TO9qkpAEWgZciLek2j5lvDoAJaPGqjMO0fiYTy
+         OGqync3m/cUEcOip7yTumqSDtZe0lINJQQfaiZhOl4uY1OEWZnPxrspE1FTyxvywc2XM
+         gQWLYsN36DcN+nCoj11wKRgC0N+bdRhMiFMZmXCNZznRiJrfmGGBnvpgPMGO80I32HCu
+         XZAcopP1IWnYgeT4+d2+ZnxQY23cwIe+GAWfu9KEPw2iUFu/j0yy6uWk2y/u4ioZkuIq
+         bbkA==
+X-Gm-Message-State: AOJu0Yyr5kRzgiuGeiaNnDY7Ep9h6ZwBpU8QeEHg/z1R+EqTOnN++z1k
+	ydq0BqQT9wox5mtOiWPZaIxtoy5lsUUKhp+PKrPquT/Pp0Da2ULl
+X-Google-Smtp-Source: AGHT+IEeqtZaOp4XqRgyXGo/jA+okPIOTbzyiTwAKkpSrVQPXQcZCy/7MUrRMlw8uZKFEGWHDGRB177BLApEYx+MMtM=
+X-Received: by 2002:a05:690c:10:b0:5a7:b53f:c304 with SMTP id
+ bc16-20020a05690c001000b005a7b53fc304mr5334065ywb.37.1697892436166; Sat, 21
+ Oct 2023 05:47:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20231017113014.3492773-1-fujita.tomonori@gmail.com>
+ <20231017113014.3492773-2-fujita.tomonori@gmail.com> <e361ef91-607d-400b-a721-f846c21e2400@proton.me>
+ <4935f458-4719-4472-b937-0da8b16ebbaa@lunn.ch>
+In-Reply-To: <4935f458-4719-4472-b937-0da8b16ebbaa@lunn.ch>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Sat, 21 Oct 2023 14:47:04 +0200
+Message-ID: <CANiq72nOCv-TfE3ODgVyQoOxNc80BtH+5cV2XFBFZ=ztTgVhaw@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Benno Lossin <benno.lossin@proton.me>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu, 
+	boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 21 Oct 2023 12:13:32 +0000
-Benno Lossin <benno.lossin@proton.me> wrote:
+On Fri, Oct 20, 2023 at 8:42=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> We don't want to hide phy_device too much, since at the moment, the
+> abstraction is very minimal. Anybody writing a driver is going to need
+> a good understanding of the C code in order to find the helpers they
+> need, and then add them to the abstraction. So i would say we need to
+> explain the relationship between the C structure and the Rust
+> structure, to aid developers.
 
->>>>> Can you please share your setup and the error? For me it booted
->>>>> fine.
->>>>
->>>> You use ASIX PHY hardware?
->>>
->>> It seems I have configured something wrong. Can you share your testing
->>> setup? Do you use a virtual PHY device in qemu, or do you boot it from
->>> real hardware with a real ASIX PHY device?
->> 
->> real hardware with real ASIX PHY device.
-> 
-> I see.
-> 
->> Qemu supports a virtual PHY device?
-> 
-> I have no idea.
+I don't see how exposing `phy_device` in the documentation (note: not
+the implementation) helps with that. If someone has to add things to
+the abstraction, then at that point they need to be reading the
+implementation of the abstraction, and thus they should read the
+comments.
 
-When I had a look at Qemu several months ago, it didn't support such.
+That is why the helpers should in general not be mentioned in the
+documentation, i.e. a Rust API user should not care / need to know
+about them.
 
-> [...]
-> 
->>> I think this is very weird, do you have any idea why this
->>> could happen?
->> 
->> DriverVtable is created on kernel stack, I guess.
-> 
-> But how does that invalidate the function pointers?
+If we mix things up in the docs, then it actually becomes harder later
+on to properly split it; and in the Rust side we want to maintain this
+ "API documentation" vs. "implementation comments" split. Thus it is
+important to do it right in the first examples we will have in-tree.
 
-Not only funciton pointers. You can't store something on stack for
-later use.
+And if an API is not abstracted yet, it should not be documented. APIs
+and their docs should be added together, in the same patch, wherever
+possible. Of course, implementation comments are different, and
+possibly a designer of an abstraction may establish some rules or
+guidelines for future APIs added -- that is fine, but if the user does
+not need to know, it should not be in the docs, even if it is added
+early.
 
+Regarding this, part of the `phy` module documentation (i.e. the three
+paragraphs) in this patch currently sounds more like an implementation
+comment to me. It should probably be rewritten/split properly in docs
+vs. comments.
 
->>> If you don't mind, could you try if the following changes
->>> anything?
->> 
->> I don't think it works. If you use const for DriverTable, DriverTable
->> is placed on read-only pages. The C side modifies DriverVTable array
->> so it does't work.
-> 
-> Did you try it? Note that I copy the `DriverVTable` into the Module
-> struct, so it will not be placed on a read-only page.
+> During the reviews we have had a lot of misunderstanding what this
+> actually does, given its name. Some thought it poked around in
+> registers to get the current state of the link. Some thought it
+> triggered the PHY to establish a link. When in fact its just a dumb
+> getter. And we have a few other dumb getters and setters.
+>
+> So i would prefer something which indicates its a dumb getter. If the
 
-Ah, I misunderstood code. It doesn't work. DriverVTable on stack.
+Agreed.
 
+> norm of Rust is just the field name, lets just use the field name. But
+> we should do that for all the getters and setters. Is there a naming
+> convention for things which take real actions?
 
->>>       (drivers: [$($driver:ident),+], device_table: [$($dev:expr),+], $($f:tt)*) => {
->>>           const N: usize = $crate::module_phy_driver!(@count_devices $($driver),+);
->>>           struct Module {
->>>               _drivers: [::kernel::net::phy::DriverVTable; N],
->>>           }
->>>
->>>           $crate::prelude::module! {
->>>               type: Module,
->>>               $($f)*
->>>           }
->>>
->>>           unsafe impl Sync for Module {}
->>>
->>>           impl ::kernel::Module for Module {
->>>               fn init(module: &'static ThisModule) -> Result<Self> {
->>> 		const DRIVERS: [::kernel::net::phy::DriverVTable; N] = [$(::kernel::net::phy::create_phy_driver::<$driver>()),+];
->>>                   let mut m = Module {
->>>                       _drivers: unsafe { core::ptr::read(&DRIVERS) },
->>>                   };
->>>                   let ptr = m._drivers.as_mut_ptr().cast::<::kernel::bindings::phy_driver>();
->>>                   ::kernel::error::to_result(unsafe {
->>>                       kernel::bindings::phy_drivers_register(ptr, m._drivers.len().try_into()?, module.as_ptr())
->>>                   })?;
->>>                   Ok(m)
->>>               }
->>>           }
->>>
->>> and also the variation where you replace `const DRIVERS` with
->>> `static DRIVERS`.
->> 
->> Probably works. But looks like similar with the current code? This is
->> simpler?
-> 
-> Just curious if it has to do with using `static` vs `const`.
+For the getters, there is
+https://rust-lang.github.io/api-guidelines/naming.html#getter-names-follow-=
+rust-convention-c-getter.
 
-static doesn't work too due to the same reason.
+For "actual actions" that are non-trivial, starting with a prefix that
+is not `set_*` would probably be ideal, i.e. things like read, load,
+push, init, register, attach, resolve, link, lock, add, create,
+find...
+
+Cheers,
+Miguel
 
