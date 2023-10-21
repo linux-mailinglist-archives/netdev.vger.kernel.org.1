@@ -1,122 +1,105 @@
-Return-Path: <netdev+bounces-43211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A83B7D1BC4
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 10:37:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 034537D1BD1
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 10:44:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B64C28263D
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 08:37:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82778B21413
+	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 08:44:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C334C1110;
-	Sat, 21 Oct 2023 08:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDE615CD;
+	Sat, 21 Oct 2023 08:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="NNpfMn0H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grnfSk2G"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFD2ECB;
-	Sat, 21 Oct 2023 08:37:26 +0000 (UTC)
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D97F6D41;
-	Sat, 21 Oct 2023 01:37:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=7oaxramkdzhmthip2otxkhsjwe.protonmail; t=1697877439; x=1698136639;
-	bh=Y/X2uQ1TS5PSlfnefO+l81KvFhzKGzXxmTQaYzYiZLs=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=NNpfMn0HUjyvym2UpbIazFLwUVpyxfdIC+BMVMbjFCBtdIORvdPju609hG+0JD2Lx
-	 Ku1R82dbgG55hY9D0eZ5HxesK+VK/RGCmxupFnD2IQ43MF3PqiwOSe8D9kE1mfLtXL
-	 RYvwEs7TM8N+7WdsRlWw/gGoF16yE0NZp1i2SXoOTjAS0iJABEjZCShCUFUqOkHQ25
-	 w/3o2C0qo0/rgP4zU0/izONVy7hOC/NvG1sHBUggCd5JlZ2kQXY0EvoSLCKXztAAFf
-	 wrPHTmJ68Iukd7kR8f02Xt30ta04JsC7BSKs9B0+Wz2IsgW45iHXANM4jxM5l88WId
-	 enWSinsC7KJdg==
-Date: Sat, 21 Oct 2023 08:37:08 +0000
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
-Message-ID: <4e3e0801-b8b2-457b-aee1-086d20365890@proton.me>
-In-Reply-To: <20231021.163015.27220410326177568.fujita.tomonori@gmail.com>
-References: <20231020.093446.482864708938996774.fujita.tomonori@gmail.com> <20231020.215448.1421599168007259810.fujita.tomonori@gmail.com> <b218e543-d61c-4317-9b19-05ac6ce47d15@proton.me> <20231021.163015.27220410326177568.fujita.tomonori@gmail.com>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDC01113
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 08:44:13 +0000 (UTC)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B627A3
+	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 01:44:12 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9c773ac9b15so174832666b.2
+        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 01:44:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697877849; x=1698482649; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nonsXEsi5WuX1Fh9OG9wtMjhQBwDKMRR69tj3c0V9fA=;
+        b=grnfSk2G09Bp4WePUdisFqIM1+fKDrkwqn+kxVVQSM2bAla4sZZeggO6ROeu3L/QyW
+         v/HwHdWi1+T1nsoZTJi2e2AO9FkFJ1qW3j3fh1yWJ9tPssOHj+jFLPvBFaQ/jngqA800
+         j3G/l8X6m0buGROP6ttu3Wq4ZpS87lSHP+Ssa9hI1CjD9Njzz6+uI4Eh6/xzwKHR8Zjf
+         SsVNg8KN+K6oTaJ1EOtcx/R/Jb2CiwWQduD17L/8duFa4kkqjfUA6yLqn0n2wc4FmfYn
+         nZKeq5hgNqNw9bsh85/U3ICulO7sLhbTFT+J/uTKm7VAEh5YaXPiNsmWXA3tP/rvKXRV
+         2WnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697877849; x=1698482649;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=nonsXEsi5WuX1Fh9OG9wtMjhQBwDKMRR69tj3c0V9fA=;
+        b=OiNMyFwng/ej/Is0dz53mlOLKpkDP/GnQGWxuNemrWt7mr1gyQ6FwspbRrbNtWDawM
+         76B354XL8B3Z09rt82JiwOfXMdJpUUIOkTTL4TLAE+NqiDxztmzYt1J6KJJd2xUUwEuu
+         z4nateRNFLWFHdzudklKoi4Ob613F0chhKfaCzos1BDBOe5ysTtNEOoZPIwr+jQwTl3T
+         5jfgYAZcOjwpdsBb2WBLgGj9OMxBzhdGSdM9Qb6NM85UpKu3bCeJR5mVgOkcC7l+QLAV
+         TI1OXuMxx2gOM09v7VEG0q1gMVTnQKsOlP69WYSdvunicvkNRMJLW7rGL+zlDdlQRDBn
+         oCzQ==
+X-Gm-Message-State: AOJu0YzeIu1DfI56nSQixlx4nPSBVeLzAR33hV7nszJXVDiyr1d+u6Z1
+	zeOwPqD8CE1gDZQQAlRxPyF8iQXQYR4=
+X-Google-Smtp-Source: AGHT+IGefXT+Vw1ARe+jnkOmJ0QzcU3s+jpbpPC/tHbs09+5Hn6sGW00QvRdfOVIfvzv8OiowdOGpw==
+X-Received: by 2002:a17:907:3688:b0:9c6:1143:b52 with SMTP id bi8-20020a170907368800b009c611430b52mr2584214ejc.55.1697877849313;
+        Sat, 21 Oct 2023 01:44:09 -0700 (PDT)
+Received: from [10.139.141.58] ([146.70.193.96])
+        by smtp.gmail.com with ESMTPSA id pw17-20020a17090720b100b009bd9ac83a9fsm3146106ejb.152.2023.10.21.01.44.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 21 Oct 2023 01:44:08 -0700 (PDT)
+Message-ID: <0451403b-0326-4723-a3bb-8acf465fcf45@gmail.com>
+Date: Sat, 21 Oct 2023 10:44:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+From: Maxim Petrov <mmrmaximuzz@gmail.com>
+Subject: [PATCH iproute2] ss: fix directory leak when -T option is used
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 21.10.23 09:30, FUJITA Tomonori wrote:
-> On Sat, 21 Oct 2023 07:25:17 +0000
-> Benno Lossin <benno.lossin@proton.me> wrote:
->=20
->> On 20.10.23 14:54, FUJITA Tomonori wrote:
->>> On Fri, 20 Oct 2023 09:34:46 +0900 (JST)
->>> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
->>>
->>>> On Thu, 19 Oct 2023 15:20:51 +0000
->>>> Benno Lossin <benno.lossin@proton.me> wrote:
->>>>
->>>>> I would like to remove the mutable static variable and simplify
->>>>> the macro.
->>>>
->>>> How about adding DriverVTable array to Registration?
->>>>
->>>> /// Registration structure for a PHY driver.
->>>> ///
->>>> /// # Invariants
->>>> ///
->>>> /// The `drivers` slice are currently registered to the kernel via `ph=
-y_drivers_register`.
->>>> pub struct Registration<const N: usize> {
->>>>       drivers: [DriverVTable; N],
->>>> }
->>>>
->>>> impl<const N: usize> Registration<{ N }> {
->>>>       /// Registers a PHY driver.
->>>>       pub fn register(
->>>>           module: &'static crate::ThisModule,
->>>>           drivers: [DriverVTable; N],
->>>>       ) -> Result<Self> {
->>>>           let mut reg =3D Registration { drivers };
->>>>           let ptr =3D reg.drivers.as_mut_ptr().cast::<bindings::phy_dr=
-iver>();
->>>>           // SAFETY: The type invariants of [`DriverVTable`] ensure th=
-at all elements of the `drivers` slice
->>>>           // are initialized properly. So an FFI call with a valid poi=
-nter.
->>>>           to_result(unsafe {
->>>>               bindings::phy_drivers_register(ptr, reg.drivers.len().tr=
-y_into()?, module.0)
->>>>           })?;
->>>>           // INVARIANT: The `drivers` slice is successfully registered=
- to the kernel via `phy_drivers_register`.
->>>>           Ok(reg)
->>>>       }
->>>> }
->>>
->>> Scratch this.
->>>
->>> This doesn't work. Also simply putting slice of DriverVTable into
->>> Module strcut doesn't work.
->>
->> Why does it not work? I tried it and it compiled fine for me.
->=20
-> You can compile but the kernel crashes. The addresses of the callback
-> functions are invalid.
+To get information about threads used in a process, the /proc/$PID/task
+directory content is analyzed by ss code. However, the opened 'dirent'
+object is not closed after use, leading to memory leaks. Add missing
+closedir call in 'user_ent_hash_build' to avoid it.
 
-Can you please share your setup and the error? For me it booted fine.
+Detected by valgrind: "valgrind ./misc/ss -T"
 
---=20
-Cheers,
-Benno
+Fixes: e2267e68b9b5 ("ss: Introduce -T, --threads option")
+Signed-off-by: Maxim Petrov <mmrmaximuzz@gmail.com>
+---
+ misc/ss.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-
+diff --git a/misc/ss.c b/misc/ss.c
+index 7e67dbe4..2628c2e0 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -678,6 +678,7 @@ static void user_ent_hash_build(void)
+ 				snprintf(name + nameoff, sizeof(name) - nameoff, "%d/", tid);
+ 				user_ent_hash_build_task(name, pid, tid);
+ 			}
++			closedir(task_dir);
+ 		}
+ 	}
+ 	closedir(dir);
+-- 
+2.30.2
 
