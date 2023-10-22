@@ -1,156 +1,220 @@
-Return-Path: <netdev+bounces-43270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C077D219E
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 09:20:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C0CE7D21A9
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 09:42:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11C00B20CDA
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 07:20:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B52251F218EB
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 07:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374E415AF;
-	Sun, 22 Oct 2023 07:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1242217DB;
+	Sun, 22 Oct 2023 07:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5undhit"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="J0xMNYlX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14FA10E1
-	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 07:20:25 +0000 (UTC)
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D76E5C2;
-	Sun, 22 Oct 2023 00:20:20 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c9d922c039so18330515ad.3;
-        Sun, 22 Oct 2023 00:20:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697959220; x=1698564020; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KTMy4jRMjdPSok66h5pvXOKtTYMVZRMrenI1NsIR3i8=;
-        b=Y5undhitor7bZPDwO4DCLA/lgmQzw3VUrI5h7jENG2ht22tUsampundGD/KNPkARpq
-         o00GVWCVXmcYq/LbgGwNyJ0UBOP5KmPXtPIXN4XhsGCcvl7rxhH+AlseZYa9pT0qH1ZV
-         t10Yde9eteVZcRBqM8a7LtqSt+TlQWA3ercIOM3zGJWzpUXq1dF6SdI2yHDlSib1IeJz
-         dvRxNOzyimeFcBSn8Thx63Wmjl4+ZMQ+FCVtR6i/bU1uHKi/zG5kmJuli2Nwyai2npvU
-         tFvlCtJvcgaolz4czxkEtZNVjTc7HSBzOP2OP9XK9WZZQ24qzPavQwvpWZZwIgk1bHgU
-         szOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697959220; x=1698564020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KTMy4jRMjdPSok66h5pvXOKtTYMVZRMrenI1NsIR3i8=;
-        b=TzlPxyQtazuLFv0upSsHHYFd9qEv4zf0r/tu6SmhDfFa0Qmucv6q1j5ZsZEaDLTHXv
-         hzA6h9OKa5H3qTyWebJuOxPfparvmZm2ljjPQ9Z4ZpKK7PB4nK5gvzlXGUcQL+/MSk+0
-         gTqzm4g8dHOOwQtkFSSlJd2L24t7wxrioVQKk4w2nHLXZFvPOIGMo+A2F1ASqbfp4ztd
-         vdKOgxSgcvcLp1SbyR1+ba81mMNmHXLRyAGKbg6Tfcr/24ixriPKY0sjyoxLciOCyXMJ
-         28BGpOaWPVs7jYYZXRONwgyXxiglGtM6gFK380Xrxfpi9wHf/3sRXd9XiAPYTCgXYyYK
-         54NQ==
-X-Gm-Message-State: AOJu0YzKS4Oy6TMsO6aaqGvDlDmRuIMrj2uIanBx+3bvkiWX6Flo6eyk
-	9ZLY31Ux+lg9Ylnl3NV+kYXpIxY00vbS135cFag=
-X-Google-Smtp-Source: AGHT+IGrq1BbWBxZjWr9/xngYvuWV2Dt0B1uacT4bxHZZ4QuMYLFehe5KZuXx9ful0NTGvqgqtzMOrAbcq02kmppJII=
-X-Received: by 2002:a17:902:ec88:b0:1c7:733b:27c7 with SMTP id
- x8-20020a170902ec8800b001c7733b27c7mr6767226plg.56.1697959220188; Sun, 22 Oct
- 2023 00:20:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2754715AF
+	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 07:42:18 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2056.outbound.protection.outlook.com [40.107.223.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1042D46;
+	Sun, 22 Oct 2023 00:42:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XG/4Fq5FPZg3DkYTI9GEkQa2d5MbE2jDtvmm65QR65zfUgLVOo1qOJyan/QGxS0yjHltDH8yP5TjWsZma0tgUlSy+BubQO6eSNLZyg55H48bUQJmrDYt4ewU4RBG91VGpFkHeC330VdtLgnBVD2lXxo8JGhPDPSl+3SasZCQeeSeIcGTJcoL2nWWuT5xGv11hzf84Bu/i+Umsg66n7IBjaAxFucAAj9aTEO2sHpY4QRHLuopufd7gsz8sFf1ve9DoxxlozYaa9fXjxt9PhTRkBR3AR9x7o6L1HRfcs347BZLCvx+KHD+XI11olE6eZ/Pjc9ZyQor8No9t4mm9Q+fmA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XjwedUKLcn4UDPQBnphl7+OE1AMHJw1grSTKrC8vN6c=;
+ b=Vro4O7DY58I4N+M8pRPoqdtdnTtWBMXzgcU1SrVu5u3AR2rWHjaSwJCwz8arxYxn4bwgSAsUOSRMtcyixiaf15SJxalI0xQ5rHRrx2GJMglVPlS9KfjoL5paV9NQ9LVtV8AaGCSk6WpnxjQ8GYQpAlZc05mF0yF60pficvFFpJyf/byjT9lKMngy6v1rBUVIExoGTBkhu0c/wocdWsmPfCpeO2ejvF6cCuLfoHtNe37jnGPB7cJEOEyBleAAxl5vhv2nFL+GI60nUSA1pecQkDYcoV0zI1arcT73S2SPJFYQuhKkDaTtPr86dEnLRnsDVxcCZjfMzFRN9ARz+nHQHA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XjwedUKLcn4UDPQBnphl7+OE1AMHJw1grSTKrC8vN6c=;
+ b=J0xMNYlXc2gnTiPMRpQC5CSS78b+1AVeHKQJzfIuhoRMeoJwGk9brgdYfroOGMHlUirU1/iY8ZOsUYka83tiro0levLZO8psNCsRNYMHa467AbPebI+erSBKavm3vYJF5XzCUQv3Yr7IA02DmWbgwvma0pOqsjhCAK7Dlc/7VzZUtvddeGYMqxAIDL6DBMEMrkKh2whAehH0IZl5RFQ6LfJXxp1bNKnuvuChSE9KCa1P8QR7rHtOTWOkhh0jz4f/OP0gbT/77lTy6JE+0lokWVqKtrE9UR9CL755tDeWSNtSBgw/S2JNAH+TvDvMpyomH/Cf17QgKheCnQnDrx71YA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH7PR12MB6660.namprd12.prod.outlook.com (2603:10b6:510:212::10)
+ by PH7PR12MB8825.namprd12.prod.outlook.com (2603:10b6:510:26a::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Sun, 22 Oct
+ 2023 07:42:11 +0000
+Received: from PH7PR12MB6660.namprd12.prod.outlook.com
+ ([fe80::4ecd:16b8:fd21:7cf4]) by PH7PR12MB6660.namprd12.prod.outlook.com
+ ([fe80::4ecd:16b8:fd21:7cf4%7]) with mapi id 15.20.6907.022; Sun, 22 Oct 2023
+ 07:42:11 +0000
+Message-ID: <c7c9562a-5c6d-eec5-3255-70238a13e96c@nvidia.com>
+Date: Sun, 22 Oct 2023 10:41:56 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH iproute2-next 2/3] rdma: Add an option to set privileged
+ QKEY parameter
+Content-Language: en-US
+To: Petr Machata <petrm@nvidia.com>
+Cc: jgg@ziepe.ca, leon@kernel.org, dsahern@gmail.com,
+ stephen@networkplumber.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linuxarm@huawei.com,
+ linux-kernel@vger.kernel.org, huangjunxian6@hisilicon.com,
+ michaelgur@nvidia.com
+References: <20231019082138.18889-1-phaddad@nvidia.com>
+ <20231019082138.18889-3-phaddad@nvidia.com> <87il72aiqm.fsf@nvidia.com>
+From: Patrisious Haddad <phaddad@nvidia.com>
+In-Reply-To: <87il72aiqm.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DO2P289CA0009.QATP289.PROD.OUTLOOK.COM
+ (2603:1096:790:6::14) To PH7PR12MB6660.namprd12.prod.outlook.com
+ (2603:10b6:510:212::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231020061158.6716-1-hkelam@marvell.com> <CAM0EoMkawLKubMdrTOAcOhYq8Jicc5XuXuytBVi-yy-_QgiTuA@mail.gmail.com>
- <PH0PR18MB4474C304575E55092A2C7377DEDBA@PH0PR18MB4474.namprd18.prod.outlook.com>
- <0329924b-a868-49b9-ab98-0b3f8bd545cb@intel.com> <CA+sq2Cd51mYHbSsjUKL23MbLkHr=oKYWvuubspg37AEo2fE8vg@mail.gmail.com>
-In-Reply-To: <CA+sq2Cd51mYHbSsjUKL23MbLkHr=oKYWvuubspg37AEo2fE8vg@mail.gmail.com>
-From: Dave Taht <dave.taht@gmail.com>
-Date: Sun, 22 Oct 2023 00:20:06 -0700
-Message-ID: <CAA93jw4ZmG3A=20SpeXZeFP=4Xf=oAuK+tjwZrPR6zwtHdi9vg@mail.gmail.com>
-Subject: Re: [net-next] net: sched: extend flow action with RSS
-To: Sunil Kovvuri <sunil.kovvuri@gmail.com>
-Cc: "Nambiar, Amritha" <amritha.nambiar@intel.com>, Hariprasad Kelam <hkelam@marvell.com>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, 
-	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kuba@kernel.org" <kuba@kernel.org>, 
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>, "edumazet@google.com" <edumazet@google.com>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, "xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, 
-	"jiri@resnulli.us" <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, Oct 21, 2023 at 10:53=E2=80=AFPM Sunil Kovvuri <sunil.kovvuri@gmail=
-.com> wrote:
->
-> On Sat, Oct 21, 2023 at 1:43=E2=80=AFAM Nambiar, Amritha
-> <amritha.nambiar@intel.com> wrote:
-> >
-> > >> On Fri, Oct 20, 2023 at 2:12=E2=80=AFAM Hariprasad Kelam <hkelam@mar=
-vell.com>
-> > >> wrote:
-> > >>>
-> > >>> This patch extends current flow action with RSS, such that the user
-> > >>> can install flower offloads with action RSS followed by a group id.
-> > >>> Since this is done in hardware skip_sw flag is enforced.
-> > >>
-> > >> Our typical rule for TC is we need s/w equivalence for offloads. How=
- would
-> > >> this work in absence of offload?
-> > >>
-> > > [Hari]
-> > > Our typical rule for TC is we need s/w equivalence for offloads. How =
-would this work in absence of offload?
-> > >
-> > > This patch we added as an extension to receive queue selection in har=
-dware.
-> > > This patch "act_skbedit: skbedit queue mapping for receive queue" ena=
-bled receive queue selection in hardware
-> > > and skip_sw is enforced.
-> > >
-> > > Adding stakeholders of this patch, to get their opinion.
-> > > sridhar.samudrala@intel.com  amritha.nambiar@intel.com
-> > >
-> > > incase of RSS, hardware makes decisions about incoming packets before=
- they are even received in the queue.
-
-Is there any way to do a LPM to queue match on inbound?
-
-> > >
-> >
-> > The skip_sw for skbedit receive queue action was enforced as the only
-> > other alternative was a new hw-only action, or changing the action
-> > mirred. See discussion at
-> > https://lore.kernel.org/netdev/20220921132929.3f4ca04d@kernel.org/
-> >
-> > Few questions WRT this patch:
-> > How are the rss groups created? ethtool rss contexts? Any reason to use
-> > TC to direct to rss contexts over using ethtool context ids?
-> >
->
-> Yes, RSS groups are created using ethtool.
-> Ethtool ntuple is very limited in expressing flow rules and since the
-> general direction
-> is to use 'TC', we are attempting to add RSS action to 'TC'.
->
->
-> > IIUC, skbedit is meant to only edit skb metadata such as mark, packet
-> > type, queue mapping, priority etc. Even if this is a HW only action and
-> > has no use in the stack, would skbedit be the right fit here?
-> >
->
-> The thought was to keep related actions like RQ, RSS group etc under
-> one action ie skbedit.
-> If that's not the right place we can add a separate action.
->
-> Thanks,
-> Sunil.
->
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB6660:EE_|PH7PR12MB8825:EE_
+X-MS-Office365-Filtering-Correlation-Id: fe406faf-77c8-4c1c-2fa7-08dbd2d266b3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	KOqUr/oUlPLUGyFyYp1tucHrd4huZJFpTMms6vAygyw3Ik7ADuDX8J61C1m5E44vwClkXHHeuPQrqOlAyS2pvlxZd5wWz3ZasIqINaCOPOqosH4pQg9aXnDdtwJmh3OrGF8kSR5cxDc3yFd+JvGRZom1Uml1l4yTtZIsdBxl0f3zMQA6aoKuEy9lVLfETj48vqaasqMCNnE+JaNrOgZVrdzvyJShuHprSm7U3mILU0V2NmT5SHlkt3a0oEHZiO8AnwWVYxgmCUUN3aLmhP8W/5op4lf7Z2uDIyXp1alGbUand6qHTG+/wc0xm4tLl76JOu/LFcJoGR0/kQjzAKgPRFjw61fNYxIMj3DZC1S+BbwA2P5HXdzhPBqv9OetbEOigCEckHvb6hbkOEevzdn8mi81Tal9pFgPJUlLkrenPV5d7XBXn5a0/BQGKonIQC09AJjZBIzJ7kFiYaFSy0HoB1gzdNY/k1RWqYLBbR1sgdSwR3b8d/qejXHycSZ0AbbQI9LTS0Mqj0W9TdfhB3lGMGQsZ9QFV5GQRU4qWaMDYNyTGlSRQibmXczJfNgffg7qmoi3r0yYpU8MlpjbJdsBcmmjHwnZq0H8mH//V8gliu/wCi7BppODUmP/nMDOsHY4q0UXzbUeMlUg+cmN6/wBeQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB6660.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(230922051799003)(451199024)(1800799009)(186009)(6636002)(66946007)(66556008)(508600001)(66476007)(37006003)(6486002)(86362001)(31696002)(36756003)(6666004)(5660300002)(8676002)(8936002)(4326008)(6862004)(38100700002)(53546011)(6512007)(6506007)(2906002)(107886003)(2616005)(26005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Zzk1TTc1NFRJS1d0emUxb1A5cWRMSERaWktwdUlYdmxoajdVL3ZXWHFnYmlH?=
+ =?utf-8?B?MzZ0am1mbFlmdkREajl0VkJzdkhlVUJETitodC83aXVVTVFzdmtUNUp4Ympa?=
+ =?utf-8?B?NDBLMnlvOE90Z2xnZlJmbHFJY0EvamZpcGFQU2ZqM2lpYWcvaUxKdFlzRjg1?=
+ =?utf-8?B?WDkzbkxTZXNRczNRa0ZLS2ZwNURWOGRhZ0Q3b1Y0NDdBMkI4VzQvZDd1dld0?=
+ =?utf-8?B?cFlXWlZkb2VFR2g1cmZ0MGVVcjB1a2VuZXRjZTVpa1hHRmxwVUkzS0lsSlRm?=
+ =?utf-8?B?OVYzWlpsQ01NbHV4clp1LzVJM25ZcExVaHFxSFN6QjdpVXFscXdVeFpLeEpm?=
+ =?utf-8?B?RlRVN1BEb2xMY25qdkRSKzlNbHhvcit6Q1gwcndLZUVUQUo3R3pVallCVkgr?=
+ =?utf-8?B?SEVGdm10LytMcjlpamxrWStrdFRRYmhvdTlXaGZhaFhZUHdkL01jWTNsZ2Vj?=
+ =?utf-8?B?MUdWdWR6aitBSE1tcHNXTGQxM0pwMUY1c1g3Ny8yYkh4NTVHODJKVXNiRTlZ?=
+ =?utf-8?B?dlNYL1VWVXV2d3hOcTFPT096K3ZXWVRZTUxkZlZ3cEY4Vm5rQXhGOU5jUkI5?=
+ =?utf-8?B?YW1ET1BQSmVKVDMyVzJIZkFrc25nWnVhclkxa0JFRHFaNGQ4TGd4OC9qYVRj?=
+ =?utf-8?B?WGVFRi9ycjFqNWhpYUhYMDFXSUFmVy9zRVhTK1ovZ01XVFNmaXgycnh5TzZ0?=
+ =?utf-8?B?VXc3OUoxK20rbVkxbkFQSmZKcFFNTXJnQzkrMkpZLzFTSHRxSWIwK0hib2g3?=
+ =?utf-8?B?WU5ZbDFNdWI1aG96ZGphWFRpSSs4N2p6YUFOenhDaUpCVitHT0d0cnd4Q3pX?=
+ =?utf-8?B?SHdEVnJUaCtxVkdYSmlSMzlodnk2NjFoRllOaEdRellIVFV5aDQrME5yd1ZY?=
+ =?utf-8?B?SGkrNkYxNjByd1lGQXdaYWIzTkxRK3QwWXVGeG9NMFdjRlhDcFBUek1pRmlC?=
+ =?utf-8?B?VlhabnE0VXhhVnBnNjN0MUlqTExjVHo3NGFBZjZRakJhcG9yNVBPYkxKYzBl?=
+ =?utf-8?B?SVlZaWVjR0tMNDNqS3lPV3poMjhKRDhIa2MrY2ZYb2ptN0RJQVkzL3llOTRB?=
+ =?utf-8?B?R1pLbjNGbktDaE11NWFWN2tDTloxYmhyQXNIQ2didzVuaFRyWW9DOHVzdEIr?=
+ =?utf-8?B?OEs4Z0tqamdSYlZUTUY1Z0h3dzVzbUxXL05VUktXeWx5dUkveERGN3ZWVFoz?=
+ =?utf-8?B?VUdhdmJsL05XM1lrK2RhK3h1eXd6VzlSSDl3RHRHSUJobW9DSEtJd3lpOU1n?=
+ =?utf-8?B?MDdMZW9LZ0kybkFyd1FkeUNiN3R4clN3SzZuN3U4cUFVbFZTRGs3SGdEa0NJ?=
+ =?utf-8?B?Q09PTFNxN1FnZk9qZVVwNyt6b3R5cDhVZitVOWJrZXp1UVR3Zkt3TzZ1Wlg3?=
+ =?utf-8?B?RnUrcmFEUzFmSkYxOTdBV29KZW9OTEJYbGIxeVA0d3Z0V1NHTDlrdXp6K0dW?=
+ =?utf-8?B?bHpHaWtVSEFiVjVUTUhHRFVoL0Rmd1ROOEY3NDhlSEdGT0NiRUlaQ1B6STY3?=
+ =?utf-8?B?am4wUHp1eTVRNDhuYkJFYlYvOUJFV0FuOTBQeFprTEUzRUo3aUtZbVc0VzNG?=
+ =?utf-8?B?T0pWQmdsT0RWOExqcUVQMTQzdCtoRW9RWHJKWUtUVHFYcUFIRURyZ0prbnBV?=
+ =?utf-8?B?bWljZ1RTRVAzQno1Mi90ak5TQnF1bWtsUDhkMlFJTXl5L0RHWnZsczVlYzJm?=
+ =?utf-8?B?eWtuQTBDQUsvQTlxZ2w3bC9zR2djb2o5N0xTaEVSY0FzUGpnTGxlVWo1R0VP?=
+ =?utf-8?B?ZThpZ2JEQnRZbzBNdWsrcUJEdGxqMWdJT25oaTVTRUx5ZGJ6bjJ2OHRFcEpX?=
+ =?utf-8?B?bnphL0l5OTh5TFVMNFBoY1Q4TlRXYUxXMUdxOGlWRTIvUVloOGt1bUs5K2gx?=
+ =?utf-8?B?akhDSC9vMWdqV29pSjRhZXlOS1lWQzRwZGRramtCM1ZWMzRxY3lyUUk4cFBh?=
+ =?utf-8?B?SlNxVis0WnFrR2pXMVllVkNuOWd0YitDTnJUWWwzREhUcmphUUEvQUxudGVW?=
+ =?utf-8?B?RTQ5S0I1ckpYY2ViZjhKTkx4ZnlJSW9lT3JHemtDalB3ZXMvZE4ybjFFNzl5?=
+ =?utf-8?B?K3RlRTdSRDNUakYzQWZTQ2J5UXFFRm5ZRnEvTlg5WmdVSmxVUUQ0RWFsUG5D?=
+ =?utf-8?Q?uYicx1BmZAtdLzj5aszhmm+E1?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe406faf-77c8-4c1c-2fa7-08dbd2d266b3
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB6660.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2023 07:42:11.5161
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1SX5CFS4Nm9yQr9M8lWoYanBXbiZ9F/BEy7OCfUt1KdZTSv/32qkh+EKXxaM5IeU7oZAU4abnqg5t8oaLIzhqA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8825
 
 
---=20
-Oct 30: https://netdevconf.info/0x17/news/the-maestro-and-the-music-bof.htm=
-l
-Dave T=C3=A4ht CSO, LibreQos
+On 10/19/2023 1:38 PM, Petr Machata wrote:
+> Patrisious Haddad <phaddad@nvidia.com> writes:
+>
+>> @@ -40,6 +45,22 @@ static int sys_show_parse_cb(const struct nlmsghdr *nlh, void *data)
+>>   				   mode_str);
+>>   	}
+>>   
+>> +	if (tb[RDMA_NLDEV_SYS_ATTR_PRIVILEGED_QKEY_MODE]) {
+>> +		const char *pqkey_str;
+>> +		uint8_t pqkey_mode;
+>> +
+>> +		pqkey_mode =
+>> +			mnl_attr_get_u8(tb[RDMA_NLDEV_SYS_ATTR_PRIVILEGED_QKEY_MODE]);
+>> +
+>> +		if (pqkey_mode < ARRAY_SIZE(privileged_qkey_str))
+>> +			pqkey_str = privileged_qkey_str[pqkey_mode];
+>> +		else
+>> +			pqkey_str = "unknown";
+>> +
+>> +		print_color_string(PRINT_ANY, COLOR_NONE, "privileged-qkey",
+>> +				   "privileged-qkey %s ", pqkey_str);
+>> +	}
+>> +
+> Elsewhere in the file, you just use print_color_on_off(), why not here?
+
+The print_color_on_off was used for copy-on-fork which as you see has no 
+set function,
+
+I was simply trying to be consistent with this file convention & style, 
+whereas print_color_string was used for the other configurable value 
+("netns"), I can obviously change that if you all see it as necessary.
+
+>
+>>   	if (tb[RDMA_NLDEV_SYS_ATTR_COPY_ON_FORK])
+>>   		cof = mnl_attr_get_u8(tb[RDMA_NLDEV_SYS_ATTR_COPY_ON_FORK]);
+>>   
+>> @@ -111,10 +155,25 @@ static int sys_set_netns_args(struct rd *rd)
+>>   	return sys_set_netns_cmd(rd, cmd);
+>>   }
+>>   
+>> +static int sys_set_privileged_qkey_args(struct rd *rd)
+>> +{
+>> +	bool cmd;
+>> +
+>> +	if (rd_no_arg(rd) || !sys_valid_privileged_qkey_cmd(rd_argv(rd))) {
+>> +		pr_err("valid options are: { on | off }\n");
+>> +		return -EINVAL;
+>> +	}
+> This could use parse_on_off().
+You are absolutely correct, but just as well was trying to maintain same 
+code style as the previous configurable value we have here, but I think 
+using parse_on_off here can save us some code.
+>
+>> +
+>> +	cmd = (strcmp(rd_argv(rd), "on") == 0) ? true : false;
+>> +
+>> +	return sys_set_privileged_qkey_cmd(rd, cmd);
+>> +}
+>> +
+>>   static int sys_set_help(struct rd *rd)
+>>   {
+>>   	pr_out("Usage: %s system set [PARAM] value\n", rd->filename);
+>>   	pr_out("            system set netns { shared | exclusive }\n");
+>> +	pr_out("            system set privileged-qkey { on | off }\n");
+>>   	return 0;
+>>   }
+>>   
+>> @@ -124,6 +183,7 @@ static int sys_set(struct rd *rd)
+>>   		{ NULL,			sys_set_help },
+>>   		{ "help",		sys_set_help },
+>>   		{ "netns",		sys_set_netns_args},
+>> +		{ "privileged-qkey",	sys_set_privileged_qkey_args},
+>>   		{ 0 }
+>>   	};
+> The rest of the code looks sane to me, but I'm not familiar with the
+> feature.
+If no one else has any comments soon, and these two comments are 
+actually considered critical I can re-send my patches with those issues 
+fixed.
 
