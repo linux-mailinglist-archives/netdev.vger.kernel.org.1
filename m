@@ -1,100 +1,128 @@
-Return-Path: <netdev+bounces-43275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D53A07D2265
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 11:46:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 521347D2266
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 11:47:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E81628157D
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 09:46:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6487FB20D46
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 09:47:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309471C3A;
-	Sun, 22 Oct 2023 09:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69261C3A;
+	Sun, 22 Oct 2023 09:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xb+z1ERq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQ/BfiAN"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A5C1875
-	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 09:46:14 +0000 (UTC)
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0EBDC
-	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 02:46:12 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-507bd644a96so3337426e87.3
-        for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 02:46:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B70515B0;
+	Sun, 22 Oct 2023 09:47:05 +0000 (UTC)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 647A2112;
+	Sun, 22 Oct 2023 02:47:04 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6bf20d466cdso478216b3a.1;
+        Sun, 22 Oct 2023 02:47:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697967970; x=1698572770; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OT8NQtExuF3HMHiil8WHD2dltgv1lNqqQ5cT4R0t6aQ=;
-        b=xb+z1ERqqsCYv0lyKqsgE1Pkk19BboZ4bCXt+43ZwDhNrA1TPFs2NMQhasoYBLedvS
-         KycnJMOGS89bzW44N0d5bW0Mqhfi58m0xDsfwq+rkB4hQsYMpV8fVWC1BrQDtnoAEBVI
-         gJtZ6SZHq7eB94U7aYGhDa3Jpdhq9cZZvqrS3jnDmt//t4+gi0micCz1gcfj2XNt1uxC
-         v8PAVMZkLUK7EcBPMRF9aOVhsJkApdvXGgmNbCVFXEMeQoxwM8JOlFGEVuP9cL82gW2l
-         dSZr/PmKIm7WRCIUeuKNx5VgGl9WzoqgT+nATCZlcGaJPjaeOSSeeXKasTuj0+zpDzXi
-         kCWw==
+        d=gmail.com; s=20230601; t=1697968024; x=1698572824; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WSf1P8x6waV39pWhY+7q0DWkZtMI9mXMRQzObdm/cx4=;
+        b=NQ/BfiAN0zhd0PwZyNrrJtVqgyKaseAhvF0dYMsmXo8Lm1QTWpV12qhire3AuKQhuz
+         8s/qDno29fx06/wlsKlflPDTWl3oJYJg9H2CpN/nKf32Omv0YYRPoO2HxuFky8Wyo60n
+         hpoKviF9lo2oOODmDvKK+JWGzvkl6HKhEEHIp7IutSJuHgaISFNIOv1F1jR/jerUvsO2
+         qJdVHYasGkko+Bsxb3c/xm/etFcdm/KS7GIAlzf5sj3K7pRPVhwj6sJWYee0ZNFZFWeU
+         FfJ3Jfc6tmOCPTDgQj6hBioGSFqNggflBbLHyYfxBbLuSoyWv/8QvO8+l4acmCf+zbAu
+         E1ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697967970; x=1698572770;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OT8NQtExuF3HMHiil8WHD2dltgv1lNqqQ5cT4R0t6aQ=;
-        b=Zi/DqP0ZU7aDFG8a0GrpkDQilx7qOsTI1rCboBhn1oZxGbadsZ+g0IGufj6Qfwwez8
-         fNO26Kp6KJR8zCMY5Q+/NFUgE70t318+/T1Dgq8dxLBYRmPLCmio6KRtsbZ/Exl2cGVU
-         n6VwAXc1wnN0Msi2GUlCZePzpI+Xhsy7dRYjFZ6owBuoXgMJgaLhUPjKpaHZLhwnMe5D
-         gXqPbsZYjm4IYIRyVZc3leQ4k/7nJd1Y2yAGRX2Mx0WW+erEjNS8iePHzQgGbv9lPJUP
-         s/b7ZcczB49sd5JP5xkKk/fAn6CdOR0lQ8Fuh/DXGZRYs14GGPKEWQGNm40TFVd13ndX
-         p0Iw==
-X-Gm-Message-State: AOJu0YwpkU9Xye1LuKhNPMMHrNbSrXgC0eM+Bt6ERQReOb8xT8HLeTtY
-	bdruIai7Ie7aafK+L0BcTvfO4wV/YB0dkS8VDP0=
-X-Google-Smtp-Source: AGHT+IExI6Vc2RBTVW0umlxDiyhbyW8Ff/B7MNW/fotNxuFKW1BwheppsFU8K0zjidaZbU/v5A7csg==
-X-Received: by 2002:ac2:5398:0:b0:506:926c:9b0d with SMTP id g24-20020ac25398000000b00506926c9b0dmr4301164lfh.20.1697967970374;
-        Sun, 22 Oct 2023 02:46:10 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id u13-20020a05600c19cd00b004068e09a70bsm6601663wmq.31.2023.10.22.02.46.08
+        d=1e100.net; s=20230601; t=1697968024; x=1698572824;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WSf1P8x6waV39pWhY+7q0DWkZtMI9mXMRQzObdm/cx4=;
+        b=vbjDW9Xf2KjgwGmsZadoYj/B4Oyy4HET6AyWeZ7zr5aUGhruN99eWxO6dxgSuHU0mZ
+         Cn9fA+4Aw9eDHjF335lvdfxqRoBo14t6WndfjoTcRf3Zcm28n3k7cnlGcGSOc+gfW6Ys
+         d6PDX0rKz+S8KOf7O6X5daqmByYId7W4KKeYujed0JEssT1sGJtWExJRhq0Ig9kRYApY
+         V2HcLYti6iom19ymYQrATMGZjT+obSfdJr8PZzERLJYnyS0vLkUO40zFdj54sxIyDPK4
+         jS7n3Kvrme3u9B3J9LlQMNozCPuodFJFfBtsmFTn9/1E8/FjhZhQGiXObOSksrX6BQzt
+         8U2g==
+X-Gm-Message-State: AOJu0YxwOneCXPbDrnFfqanmjsZFRCWN2RU8TctWXuiQvW+l1gbbp68f
+	NyOTAl+199x8i3CMevrqgBs=
+X-Google-Smtp-Source: AGHT+IFVH/MEml8TL55eOO3lPuYnol0fy7RYDkYUWwzUzcyy1G5qUxJKh/loze3gyyN+1mouJf8TBA==
+X-Received: by 2002:a05:6a20:4420:b0:163:f945:42c4 with SMTP id ce32-20020a056a20442000b00163f94542c4mr9314307pzb.1.1697968023783;
+        Sun, 22 Oct 2023 02:47:03 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id z64-20020a633343000000b005898a3619c7sm4036358pgz.48.2023.10.22.02.47.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Oct 2023 02:46:09 -0700 (PDT)
-Date: Sun, 22 Oct 2023 11:46:08 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: kernel test robot <lkp@intel.com>
-Cc: netdev@vger.kernel.org, oe-kbuild-all@lists.linux.dev
-Subject: Re: [patch net-next v3 08/10] netlink: specs: devlink: add the
- remaining command to generate complete split_ops
-Message-ID: <ZTTvYIGmJPrZKtX5@nanopsycho>
-References: <20231021112711.660606-9-jiri@resnulli.us>
- <202310212326.u0Z0O9Hx-lkp@intel.com>
+        Sun, 22 Oct 2023 02:47:03 -0700 (PDT)
+Date: Sun, 22 Oct 2023 18:47:02 +0900 (JST)
+Message-Id: <20231022.184702.1777825182430453165.fujita.tomonori@gmail.com>
+To: miguel.ojeda.sandonis@gmail.com
+Cc: andrew@lunn.ch, benno.lossin@proton.me, fujita.tomonori@gmail.com,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+ boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
+Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CANiq72nOCv-TfE3ODgVyQoOxNc80BtH+5cV2XFBFZ=ztTgVhaw@mail.gmail.com>
+References: <e361ef91-607d-400b-a721-f846c21e2400@proton.me>
+	<4935f458-4719-4472-b937-0da8b16ebbaa@lunn.ch>
+	<CANiq72nOCv-TfE3ODgVyQoOxNc80BtH+5cV2XFBFZ=ztTgVhaw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202310212326.u0Z0O9Hx-lkp@intel.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: base64
 
-Sat, Oct 21, 2023 at 06:04:36PM CEST, lkp@intel.com wrote:
->Hi Jiri,
->
->kernel test robot noticed the following build warnings:
->
->[auto build test WARNING on net-next/main]
->
->url:    https://github.com/intel-lab-lkp/linux/commits/Jiri-Pirko/genetlink-don-t-merge-dumpit-split-op-for-different-cmds-into-single-iter/20231021-192916
->base:   net-next/main
->patch link:    https://lore.kernel.org/r/20231021112711.660606-9-jiri%40resnulli.us
->patch subject: [patch net-next v3 08/10] netlink: specs: devlink: add the remaining command to generate complete split_ops
->reproduce: (https://download.01.org/0day-ci/archive/20231021/202310212326.u0Z0O9Hx-lkp@intel.com/reproduce)
->
->If you fix the issue in a separate patch/commit (i.e. not just a new version of
->the same patch/commit), kindly add following tags
->| Reported-by: kernel test robot <lkp@intel.com>
->| Closes: https://lore.kernel.org/oe-kbuild-all/202310212326.u0Z0O9Hx-lkp@intel.com/
->
-># many are suggestions rather than must-fix
-
-All in generated code.
+T24gU2F0LCAyMSBPY3QgMjAyMyAxNDo0NzowNCArMDIwMA0KTWlndWVsIE9qZWRhIDxtaWd1ZWwu
+b2plZGEuc2FuZG9uaXNAZ21haWwuY29tPiB3cm90ZToNCg0KPiBPbiBGcmksIE9jdCAyMCwgMjAy
+MyBhdCA4OjQy4oCvUE0gQW5kcmV3IEx1bm4gPGFuZHJld0BsdW5uLmNoPiB3cm90ZToNCj4+DQo+
+PiBXZSBkb24ndCB3YW50IHRvIGhpZGUgcGh5X2RldmljZSB0b28gbXVjaCwgc2luY2UgYXQgdGhl
+IG1vbWVudCwgdGhlDQo+PiBhYnN0cmFjdGlvbiBpcyB2ZXJ5IG1pbmltYWwuIEFueWJvZHkgd3Jp
+dGluZyBhIGRyaXZlciBpcyBnb2luZyB0byBuZWVkDQo+PiBhIGdvb2QgdW5kZXJzdGFuZGluZyBv
+ZiB0aGUgQyBjb2RlIGluIG9yZGVyIHRvIGZpbmQgdGhlIGhlbHBlcnMgdGhleQ0KPj4gbmVlZCwg
+YW5kIHRoZW4gYWRkIHRoZW0gdG8gdGhlIGFic3RyYWN0aW9uLiBTbyBpIHdvdWxkIHNheSB3ZSBu
+ZWVkIHRvDQo+PiBleHBsYWluIHRoZSByZWxhdGlvbnNoaXAgYmV0d2VlbiB0aGUgQyBzdHJ1Y3R1
+cmUgYW5kIHRoZSBSdXN0DQo+PiBzdHJ1Y3R1cmUsIHRvIGFpZCBkZXZlbG9wZXJzLg0KPiANCj4g
+SSBkb24ndCBzZWUgaG93IGV4cG9zaW5nIGBwaHlfZGV2aWNlYCBpbiB0aGUgZG9jdW1lbnRhdGlv
+biAobm90ZTogbm90DQo+IHRoZSBpbXBsZW1lbnRhdGlvbikgaGVscHMgd2l0aCB0aGF0LiBJZiBz
+b21lb25lIGhhcyB0byBhZGQgdGhpbmdzIHRvDQo+IHRoZSBhYnN0cmFjdGlvbiwgdGhlbiBhdCB0
+aGF0IHBvaW50IHRoZXkgbmVlZCB0byBiZSByZWFkaW5nIHRoZQ0KPiBpbXBsZW1lbnRhdGlvbiBv
+ZiB0aGUgYWJzdHJhY3Rpb24sIGFuZCB0aHVzIHRoZXkgc2hvdWxkIHJlYWQgdGhlDQo+IGNvbW1l
+bnRzLg0KPiANCj4gVGhhdCBpcyB3aHkgdGhlIGhlbHBlcnMgc2hvdWxkIGluIGdlbmVyYWwgbm90
+IGJlIG1lbnRpb25lZCBpbiB0aGUNCj4gZG9jdW1lbnRhdGlvbiwgaS5lLiBhIFJ1c3QgQVBJIHVz
+ZXIgc2hvdWxkIG5vdCBjYXJlIC8gbmVlZCB0byBrbm93DQo+IGFib3V0IHRoZW0uDQo+IA0KPiBJ
+ZiB3ZSBtaXggdGhpbmdzIHVwIGluIHRoZSBkb2NzLCB0aGVuIGl0IGFjdHVhbGx5IGJlY29tZXMg
+aGFyZGVyIGxhdGVyDQo+IG9uIHRvIHByb3Blcmx5IHNwbGl0IGl0OyBhbmQgaW4gdGhlIFJ1c3Qg
+c2lkZSB3ZSB3YW50IHRvIG1haW50YWluIHRoaXMNCj4gICJBUEkgZG9jdW1lbnRhdGlvbiIgdnMu
+ICJpbXBsZW1lbnRhdGlvbiBjb21tZW50cyIgc3BsaXQuIFRodXMgaXQgaXMNCj4gaW1wb3J0YW50
+IHRvIGRvIGl0IHJpZ2h0IGluIHRoZSBmaXJzdCBleGFtcGxlcyB3ZSB3aWxsIGhhdmUgaW4tdHJl
+ZS4NCj4gDQo+IEFuZCBpZiBhbiBBUEkgaXMgbm90IGFic3RyYWN0ZWQgeWV0LCBpdCBzaG91bGQg
+bm90IGJlIGRvY3VtZW50ZWQuIEFQSXMNCj4gYW5kIHRoZWlyIGRvY3Mgc2hvdWxkIGJlIGFkZGVk
+IHRvZ2V0aGVyLCBpbiB0aGUgc2FtZSBwYXRjaCwgd2hlcmV2ZXINCj4gcG9zc2libGUuIE9mIGNv
+dXJzZSwgaW1wbGVtZW50YXRpb24gY29tbWVudHMgYXJlIGRpZmZlcmVudCwgYW5kDQo+IHBvc3Np
+Ymx5IGEgZGVzaWduZXIgb2YgYW4gYWJzdHJhY3Rpb24gbWF5IGVzdGFibGlzaCBzb21lIHJ1bGVz
+IG9yDQo+IGd1aWRlbGluZXMgZm9yIGZ1dHVyZSBBUElzIGFkZGVkIC0tIHRoYXQgaXMgZmluZSwg
+YnV0IGlmIHRoZSB1c2VyIGRvZXMNCj4gbm90IG5lZWQgdG8ga25vdywgaXQgc2hvdWxkIG5vdCBi
+ZSBpbiB0aGUgZG9jcywgZXZlbiBpZiBpdCBpcyBhZGRlZA0KPiBlYXJseS4NCj4gDQo+IFJlZ2Fy
+ZGluZyB0aGlzLCBwYXJ0IG9mIHRoZSBgcGh5YCBtb2R1bGUgZG9jdW1lbnRhdGlvbiAoaS5lLiB0
+aGUgdGhyZWUNCj4gcGFyYWdyYXBocykgaW4gdGhpcyBwYXRjaCBjdXJyZW50bHkgc291bmRzIG1v
+cmUgbGlrZSBhbiBpbXBsZW1lbnRhdGlvbg0KPiBjb21tZW50IHRvIG1lLiBJdCBzaG91bGQgcHJv
+YmFibHkgYmUgcmV3cml0dGVuL3NwbGl0IHByb3Blcmx5IGluIGRvY3MNCj4gdnMuIGNvbW1lbnRz
+Lg0KDQpBZ3JlZWQgdGhhdCB0aGUgZmlyc3QgdGhyZWUgcGFyYWdyYXBocyBhdCB0aGUgdG9wIG9m
+IHRoZSBmaWxlIGFyZQ0KaW1wbGVtZW50YXRpb24gY29tbWVudHMuIEFyZSB0aGVyZSBhbnkgb3Ro
+ZXIgY29tbWVudHMgaW4gdGhlIGZpbGUsDQp3aGljaCBsb29rIGltcGxlbWVudGF0aW9uIGNvbW1l
+bnRzIHRvIHlvdT8gVG8gbWUsIHRoZSByZXN0IGxvb2sgdGhlDQpkb2NzIGZvciBSdXN0IEFQSSB1
+c2Vycy4NCg0KSSdtIG5vdCBzdXJlIHRoYXQgYSBjb21tZW50IG9uIHRoZSByZWxhdGlvbnNoaXAg
+YmV0d2VlbiBDIGFuZCBSdXN0DQpzdHJ1Y3R1cmVzIGxpa2UgIldyYXBzIHRoZSBrZXJuZWwncyBg
+c3RydWN0IHBoeV9kcml2ZXJgIiBpcyBBUEkgZG9jcw0KYnV0IHRoZSBpbi10cmVlIGZpbGVzIGxp
+a2UgbXV0ZXgucnMgaGF2ZSB0aGUgc2ltaWxhciBzbyBJIGFzc3VtZSBpdCdzDQpmaW5lLg0KDQpX
+aGVyZSB0aGUgaW1wbGVtZW50YXRpb24gY29tbWVudHMgYXJlIHN1cHBvc2VkIHRvIGJlIHBsYWNl
+ZD8NCkRvY3VtZW50YXRpb24vbmV0d29ya2luZz8NCg==
 
