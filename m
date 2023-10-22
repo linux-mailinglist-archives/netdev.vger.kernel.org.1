@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-43272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C07947D21ED
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 10:23:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08BC07D2200
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 10:56:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48814281518
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 08:23:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD2D91C208D3
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 08:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D9F2109;
-	Sun, 22 Oct 2023 08:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC6710F1;
+	Sun, 22 Oct 2023 08:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AA+z8pZ/"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="EYb7t8Qh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE8720E6
-	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 08:23:19 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2087.outbound.protection.outlook.com [40.107.237.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FF33BF;
-	Sun, 22 Oct 2023 01:23:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 116EBA51
+	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 08:56:28 +0000 (UTC)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2045.outbound.protection.outlook.com [40.107.20.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DC8BF4;
+	Sun, 22 Oct 2023 01:56:27 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QAFjXp1ulliXfEkcHRRqb5GHTsukhQQ/BKhDz7UaLs7ejJa6Oi+3nC3NU8tvkSwqSfRxs4tBQr7b0l04d794PaFeujbK+UYXgSuTb4kk2ujUNhZP4lsUXmpD/RCoK4VdpY2SEXadeMHhqbzAuLudRcTQIjiixmBGpHt7Vf00MTdvDEtw5+LV0Itao/aD8XLSmR655nE8eT23XNPOw1SeNMRPJ6/9SK5VSeh69tPV+h5AYm9vcDg89L5gZq88v3PzEuAwNvGpYk+uYsuR4mZSZGb/Z7Nmjl4D1H5zLAcHjlflxDA7lvWuhU6HXxYaih9ENXxGW3d7MQ5LfosJclt0wQ==
+ b=heuc4dlKagMKJIG7W46UKfA9DUaeyf7573jZWZwmc07llnTNItkPvaF9X5jckrUERyKUPctnd+kNQ46uaUzSD+NWbW+duSWEGmlc+WqyHeFBkUzs/BgLKM8fC5N/SPSpY7QmQvCPgoje+2f0FP+OqPu9fYjCAqvB5rRMI0qAPDPGctvU2WsVBsbSL2Jry9/wnrE4lolK/E2Alsd3ZeTLvIP50bnvI3yD1q5GL64xcf30SGEm4OMZZkHGkit7cA222ka4gsY4gzFS/U7DS1NYCJExlBZFbOYcYuJ6apbIs5HdUpyFUtnsRdXkJx83BD79jJcN/1YIgk7c/yrbJE+Ipw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7pWvyPJVsdN76GpHoeM83MmFjZjUZbRfUj7xrGKq18Q=;
- b=X78KtLAHXPlgf5a+2ReJA271dlrzDRLex5+Ks329ykEiBMV5CYBbAZiummuxhEN7a6Qxo7udBeXWFYlQlUxOM/GtqySURvkAVV/051RWGiS/nGxtPdUphQZ7wOPuflAtICDrITGnv19+7QPq9kTLcwsaXQQZGWE/PSy6OXDbeSbWmQb4OMSCnpDNA7AqNSOJrTpvQhP2fd8uTU2uo8PC2ddT9+eCdQrK6asTkVvJUiXIfXDPMBidgeXkfxu/ZTcu4OV2BpMZEaEvt3uIQID5B6SVqY2+fupOFjrdvlcXQ06w+nqSQUhFvX49Qo9XCLJUMidD8awBCTKz+qNFEvPWSw==
+ bh=U0mN5A8kLa9tAVoIzDWEiZrnvpll+/l3Kr8ECEfw0GQ=;
+ b=RLnmgU/mhB3/fwHT/o1BRrhkXL/R0aLWeq3uitNEjx7rVD7Pqc/H4nIqfe7DlOM6aExmI1u/0NryOiDEefdyI3vtZAcNfopmcCfDPsT1jHDxAaglrftJWaG7Lg9h2Cf5hUTuE5Rp/W21svAREM+izt5mEgaEnFVexM5q+vktsyhkTJvoU+Nmb8WYTxfeuxgkGmNAX9YdCNhXymXn7/hHulaSiON/739f6wNLXIFU+zR8mRlplNb0ylzDf7fZTMxIqowFv09puPgdAEbbmbLYZEfQ+82nTmQtYQn5axZZXmgPLo3fWCpZaEoiLaT7H71xdDSA/W2sSijaiWnpHB78PQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
+ dkim=pass header.d=siemens.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7pWvyPJVsdN76GpHoeM83MmFjZjUZbRfUj7xrGKq18Q=;
- b=AA+z8pZ/tAfVgkj0XuMiWBfVvDEfvGB/zIeiqaQ48DP1p0lDBrY66zduqRRSy30L+b5aQJxe+PcUnHBzXCAUKrAhWG/b+eN57aFFpP9a30j1javLc+uV3128SjT3PAx61NOusLYbwY0mlphi3e+GtFMp6qU6kF915WnQ7ITd8865u4woHgaemljt31zOnQsWvGDatSj0A1zUPMo6psnqmIll9m+AlNzJWmJlCHB1D6X/K5plonVzcqLEthL/MRkApmZqEA0oX2hJNjru52+4J6Z4o6FWzX6lu8bMwuWK5Q866oMrhiwKnD5p0ZMm/EcbqxinunYnuR7tB/zcXxRVwg==
+ bh=U0mN5A8kLa9tAVoIzDWEiZrnvpll+/l3Kr8ECEfw0GQ=;
+ b=EYb7t8QhUmw8mAJtj/dvlzYzcNMNGMKYrbalIPHkgbkrCh7We4UiRZL6YUA2yvfOmcyKZK6Hirde6/hbivuCmz8U2wu3YQXX22Djgl/MAtl4aXXNu4tf9JeDNtjkkzFQCPhMCpVuqiwPbjUyT5vDnV94Tv18nfX+g8KPhaHPHRupfAzrFx4l5ldtnwIP/vaW3NxqXnoT/cc0ofmFoC+jHZadGqjhsO6U/BIMcoVB4EC6SjhCbmsn81/DBXRyIA9/zgejvW6lxRWcHDyZ2+dwQpByR1AFqHpb7sKFCDbX99RyBAlNeuqIs3AC9arj6IjxJbLbbxPjFpkX63VJdskJNg==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by CH0PR12MB8508.namprd12.prod.outlook.com (2603:10b6:610:18c::10) with
+ header.d=none;dmarc=none action=none header.from=siemens.com;
+Received: from AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:588::19)
+ by AM9PR10MB4005.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:1f5::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Sun, 22 Oct
- 2023 08:23:15 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::6f24:e252:5c2f:d3c9]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::6f24:e252:5c2f:d3c9%7]) with mapi id 15.20.6907.030; Sun, 22 Oct 2023
- 08:23:15 +0000
-Date: Sun, 22 Oct 2023 11:23:08 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: netdev@vger.kernel.org, linux-pci@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	bhelgaas@google.com, alex.williamson@redhat.com, lukas@wunner.de,
-	petrm@nvidia.com, jiri@nvidia.com, mlxsw@nvidia.com
-Subject: Re: [RFC PATCH net-next 04/12] PCI: Add no PM reset quirk for NVIDIA
- Spectrum devices
-Message-ID: <ZTTb7KSgdQcvxdDq@shredder>
-References: <20231017074257.3389177-5-idosch@nvidia.com>
- <20231018194041.GA1370549@bhelgaas>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231018194041.GA1370549@bhelgaas>
-X-ClientProxiedBy: TL2P290CA0012.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::16) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+ 2023 08:56:24 +0000
+Received: from AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::2a90:96cb:b3f:6e5]) by AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::2a90:96cb:b3f:6e5%2]) with mapi id 15.20.6907.025; Sun, 22 Oct 2023
+ 08:56:24 +0000
+Message-ID: <895ae9c1-b6dd-4a97-be14-6f2b73c7b2b5@siemens.com>
+Date: Sun, 22 Oct 2023 10:56:22 +0200
+User-Agent: Mozilla Thunderbird
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Subject: [PATCH] net: ti: icssg-prueth: Add phys_port_name support
+Content-Language: en-US
+To: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar <danishanwar@ti.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "Lopes Ivo, Diogo Miguel (T CED IFD-PT)" <diogo.ivo@siemens.com>,
+ Nishanth Menon <nm@ti.com>,
+ "Su, Bao Cheng (RC-CN DF FA R&D)" <baocheng.su@siemens.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0106.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a8::7) To AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:588::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,85 +74,111 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|CH0PR12MB8508:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ddb5ed5-9817-4db3-be30-08dbd2d8231b
+X-MS-TrafficTypeDiagnostic: AS4PR10MB6181:EE_|AM9PR10MB4005:EE_
+X-MS-Office365-Filtering-Correlation-Id: b6e09368-9ba2-429a-d447-08dbd2dcc4f9
+X-LD-Processed: 38ae3bcd-9579-4fd4-adda-b42e1495d55a,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	q3FP3eNdRwaNs2aluv3c62e9iY25nY9FOrR4dO9BVq0ZAkIzqpRrRCgKqPmkN2apQFA/Gh0CewGIgsyMo9NOiQZ4k1B0Q34A1Gnn9b0XjNEXxO5IgfBBfb7oygqgZTAWJtsz30pSXPOVk14+JeZre9JbotqKDJ+1XeAWdWlY1wjs8O0aPx/8jap70lXqqGbrJvAxkhowUZ4cWzmrRxD3JT1ZW0IR5nncYnpIlnsgZOvUXEbaFs5BpcLdEC6TyEHWyPbemdK0sNFJ1Bs4wyYis74WaMyeQjQqNeHGFZ02g1h4W35NOcWlSGyo4NzCKvkNRrEajef6d8Snh8JuX+BqFmuCUCTJDjYIMCcJQx2sKhKiVuWuRRObSr+yHG0Sz6JVjm2OT4hTPUd2TlVJThrluNZKwlD+TUmIhXOUIQ1n5eGsKUjnmB4FcFvew2rEEvsIituVQhlPXUoWg5WnUjVC90hmY37cUKB4xI9jhO83Z2hZjRtdKc1Yc1tsqS90oMH5CvUa7XcIBK2mCWG4DunPfLND1RagQUHx9abws9W94FdFJzHr1F48QN3qD+S9qk+a
+	VNCrGJaFLqpQHeoDBOGRVaAcMbmITykxAGkxf0tvvWsPf+AQgzDGN7spaDEqvzqxjOVx2R43qBiRYuGEguzTmPBow29cJ/b+VMqhDNmpXeNdNKzKyRHiDwv6Mpve5zagNG1lFcDu+Kdn6EfRS3QnGh06hcAlWN/hDGXB3REcvzUyM+0tZ0TIH0eNZPnqbhOEUx7Ph/r9x3n1zfL2bpfe64fX81CMuL4ulvxH2kes8MlLw3+e2tcYzsJuzdP4t8oodUvrLRBKnpcH6aTMyMP4BkzAhvyfm56nMlOQ19wyrHRNEqORMiE7p9Fv5wXxT74ViAwvmT1HUpR/fikKUxTwdz2AXz5svm8ROnmwQcqiGwr3IGwf2p3GMYycOtLyomvr9dW46nCNXk7y3Xm1/MbzjZMRqdnewv1hk0UkUwDVw0hwvsS43CH4IlmKQw1jssaz+ef5HTtcQuaMLoXNBMPdOSwQAZWVjQxCPR2GiZk8vDsKz15EJlWKbQ3M5wF7fzOHhDL9orlEBvWYsz86PG4U3ElIav1pegcHo24m3nfqypueENUms4LVGCt2XRGY5Jrzbqsl2AinoRPUWxGnkChcJv7mWvOMXmc8DQgT+zY/+pDeZ1ZawiCTQJuYzGqPGDsxCPnoqJA3yqdjzi5frNhAQw==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(396003)(346002)(366004)(136003)(376002)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(478600001)(316002)(6486002)(7416002)(66946007)(66556008)(6916009)(66476007)(4326008)(8676002)(8936002)(86362001)(5660300002)(6506007)(38100700002)(33716001)(9686003)(6512007)(2906002)(107886003)(26005)(41300700001)(6666004);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(136003)(366004)(39860400002)(230922051799003)(451199024)(1800799009)(186009)(64100799003)(316002)(66556008)(54906003)(66476007)(66946007)(41300700001)(110136005)(4326008)(2616005)(31696002)(8936002)(82960400001)(2906002)(6486002)(44832011)(107886003)(31686004)(86362001)(5660300002)(6506007)(8676002)(478600001)(36756003)(26005)(6512007)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?DGAk+aNgVaYQ3ZcRd7iQpMAbkHvIupqSQKf+lQTx6rjhjQzVk/pllbbSXqes?=
- =?us-ascii?Q?b/reBk2A/y3oN+Xu3y6c9L3f77YehRffFyhqLhA2UVYo0Mt6MWkAoG4JgTSA?=
- =?us-ascii?Q?HRUB2e84lBtOBcZf807OWCk8V//TBlZGihsTprGq7Jt+RgA+jZRWaYA5XvT6?=
- =?us-ascii?Q?ogKm12O9+2oAn8hablI7UXyITUoJTwCdWvagrTdwauUgDhjkLLkFUHhL4Xu4?=
- =?us-ascii?Q?uVPnmLtc885cWWlpTrKsvpkB7BYeXM6c+WOz3mu3zwwiMFvKPNcfJqzGmSJa?=
- =?us-ascii?Q?Nv000mjGuLzw17QYbAlWrWn8TP1PGWuXt1qKMQ/WXXvBCxlVcLDfruBUkd1b?=
- =?us-ascii?Q?FptMQzuBmh4NIr7Chv6TstcFJLo4nLXxxvrFN/+/8iotthb9U63m0Rx5VC1B?=
- =?us-ascii?Q?VshHmLSfyyki5O8s+9hJeQMHDtJQi/ujy0DHMqtkgmotvaAaeOfyVqjS8kto?=
- =?us-ascii?Q?FnZSBtOv4DB6JcNn+dmFn2h63viJFW5ARWchECJkZPF8vrFTQG/c0e1FzPWV?=
- =?us-ascii?Q?jm8XaTTgLPF5x3z7pTqOjBh8osZDkbzjKM7gP6TyrYmCHrAfJHMLoDZ24DnD?=
- =?us-ascii?Q?wvwvdo+LwKojK8UIWJDKJjZyhYc5oyxOCavqL6bFQfrQet3ZfqQveorkBBhQ?=
- =?us-ascii?Q?RdW2ZFfeHdcl1FXR764XgA7ucqxcDxCI/Un1S0XRWk3DRxGz/3mgJboIaV9o?=
- =?us-ascii?Q?rVM2dCbQnO3oJ4B3/guUxwW58l9W/nPPMn3VX/0tatA+FMPG+ne9dRfx1k2C?=
- =?us-ascii?Q?6l2ZU75Gn4z4IsP68ATXUKcUDlw0m92owctCYQzhPT16LDN5vKs3+psgOCF0?=
- =?us-ascii?Q?f3keFjJnhWOsqCIOybQgTyUlBrhVfecZN+5kyr5D5u6UKFReHeZlgCBpK9FB?=
- =?us-ascii?Q?qInd4a+SqqMBy8FTjlnGCuAlYkjHAzN+NrwXarJxaWxvQVCY4NFfqbz0AQdk?=
- =?us-ascii?Q?v2qlIUlIIMuEycoN0gS8ybEpNPcBZmbHx+/8gdVdQmy/CYiw0Kj3FKDZgiYD?=
- =?us-ascii?Q?OhzcENhFopYLgeu6LnpxW7OJXyn5CRwuzns6j/iszQyInoeGq5MY6LnQM0us?=
- =?us-ascii?Q?VcPAF4H+WepqrzeQVk/C5hEl8/+OGc5EcwC2ewol1UyN0V8dG8vxIT5dTHP8?=
- =?us-ascii?Q?G+wEsWF+SKduguYofnZjPIRWL4soSSKpnOXd+NroFUyOCdNMh1gIuJe8w8lT?=
- =?us-ascii?Q?PxXABxt0UcPLZSJz6PpIsLt0u3tgR3ymSwu1+GOAq5QxEcdgQOjIGlHcx7YE?=
- =?us-ascii?Q?XTPhl+5ZrthRSp8e7GXgPbrNTtj/Bam7m8lqSZdhRjr3XKaIJXFIQ+ISI/p+?=
- =?us-ascii?Q?ceUAG7SJg51+otbPpYy1d5dP9pew/plO2CVZr+vMzhkm4J8uhPPnN2yqvDpm?=
- =?us-ascii?Q?t/EbpfH/GvWyLHC1HavjTDcylbfdE23eEyjrdxo+KM+ui+pZgQfnbJTY/yPo?=
- =?us-ascii?Q?ZyieORD0VAzeWbOg4DrNNrEsAjVprS/XpCFoyj8SQcFdNilFSbL9aS3rrYOV?=
- =?us-ascii?Q?HOaALXWUyNnYRQ4dkF0DLmQR65NZdPJd1KA3BQiJap2adDH6VPlll6yvBUV7?=
- =?us-ascii?Q?VemIEfNRfKzg7wyvEllTjSpYT2PZuzhlJdk7iCqy?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ddb5ed5-9817-4db3-be30-08dbd2d8231b
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
+	=?utf-8?B?dUZNajh4anpWb0JpbG1jKy9kNWM0U09MYm5aWkYxdDUrSitobit1anJvRlpM?=
+ =?utf-8?B?Myt5OEsraGR2MUF3OS9IQkczV3BBT2FIMG5PalhudFlxTDZxY0N1MURUd1JK?=
+ =?utf-8?B?WkNPWHFNcldzVU1vdy8zTVJPdDEzYzdRYVdHRllIVDkzUGpRVzBYYjZrQ2wz?=
+ =?utf-8?B?Q09NTVFMbjVWSkV4NU01WEMzUjUrTmV6anFiTU9VYWw5UTdtSFkyV3V6Nkhh?=
+ =?utf-8?B?c2lMZUxaeXR6UmI3ZU1Oejlubk1YbW0wRDFhcDk0SVR3SWgxRzJET0VSWXhu?=
+ =?utf-8?B?bjVaOHJZR3pCSXJoT0xuMDNMMHlnc3JHOEF1amhmSkJmcHpqVmFPdWl4Ump5?=
+ =?utf-8?B?S245Y2E2U1pLYVZaaEp6OENEVnU4V2VXZVhiYmdFbGZvZTVmcFdBU0hFMGZV?=
+ =?utf-8?B?aGVlTDcyR01sakIxZ1p3ZldiTHh6L0x5dnVlZHloM1RCaUFoRjg1Z1lHa3Jj?=
+ =?utf-8?B?S3NvZ1d0a0dROEN0WUQrTFdEQ0Uxem4zZnVNQitaUFBpUlBnY3hXdklsdWgw?=
+ =?utf-8?B?aGxOczZaN2ZJbFRWblR6RmtHeWhPc3N3aHFtK0pXQ1h5VHlHbk45dSttZk5C?=
+ =?utf-8?B?ZU0vRmlyVE5KdWQzU1I4Vkl1QktzeEZOTEFtM0V3SUxWQWN4UGgyU0w1YWVU?=
+ =?utf-8?B?ODliV2xGQTB4dCtJZ2VFR0svNE00cC9rc3pNRFZjM0V1TmkvL01xTlBRaml4?=
+ =?utf-8?B?eXg5U3ZTT1pJa1dQRkVYdnR3WHl0UVNOUDhxTkZ4VUpEN3ltK2l3cnpwaFpV?=
+ =?utf-8?B?dFFTMTdwMjhBQWVCQjlYQVh2d0lkV0owUHhzZVU5cXZ0NENXUzl5MC9tYnMv?=
+ =?utf-8?B?cndocFc0cktLVUZsY1pVRithc2sxNnBpMGRteDBZUm1hZk5OY3ZCUGk2Q2Mr?=
+ =?utf-8?B?N1RVYWNLUHh4YVJPc3UvdTIvWmpBSytTc0J5ZkRwNHY4QjFVN2tmdnRoRWd5?=
+ =?utf-8?B?WVVHWm5lRnYzcDlDQWpacmp4Z2F1S01hNUdaM0xqSngxcGp4Tk1peWFITjI5?=
+ =?utf-8?B?aWRoN2hIRTY3Y3lvbXdxdlVUYzVocUFPMmRIZEs4Sm8vNG1CL21MU2xQSnRw?=
+ =?utf-8?B?N09RZktZZlpvbDJCVHRnZUhuWTFJcXpZV3B6QTNsczlvaGFKSDQreERZcTR1?=
+ =?utf-8?B?STFTMWRBVUZwUVVSdS9sWlBtekNVdWFZeTFFcUtxY1VubDNMcjFBdlVuckh5?=
+ =?utf-8?B?UWRkU09oUFE0bW1uNTYvZE94OWVoL0JWK1lNUDkrdDkxMHVtTHRZMjJsUFQx?=
+ =?utf-8?B?MzdmeS9QNXp0SE1Xd250VnhienJmdjN3dzMxbmYzSUxiMzNSaG9JSmM3MHk5?=
+ =?utf-8?B?ZzRKMS9xMEpCK1NBeWxzdHpWVXd5b1UyaU1yNnV4RGJqKzRzY2xBdm1rRlpy?=
+ =?utf-8?B?TllTSlR6OE9vQWhzdW1VdXZIUjZhZ2o4K093Rkwwd2xKN2kyYWRQdWpqSjZ3?=
+ =?utf-8?B?aW5oeTBmY1c4TUdPKzB5bWhUTWRKSEsvdEhtYy9ScStNRzBRRWFFdDErYlBp?=
+ =?utf-8?B?Q1RHT3NFQ2JMaE51M3JkeVQ5MWJZaDlVUXBXSk1IZ0kvV1ZTaVpEb3ZtOFFo?=
+ =?utf-8?B?ZWM4UldUaGhxSXRRQ1NSOHJvelA1MFVzWlcyNkxiL1hHUSsyTi9wNzNDVEQr?=
+ =?utf-8?B?UWF3QkRiTGRqUERIZzRrQlZXSElMZWt4bkh0OGp5dHg3LzNlMHd2a0hVMmwr?=
+ =?utf-8?B?WS9FTHpQbmhMS3k1K2xJYmt1elNkaXBQcUFHakZJOHZFL0hUSmVVL1lSay9s?=
+ =?utf-8?B?ZFVzT2k0TDZKTW1jSlVlbVhiZlA0OEFEYXJQWlNyaVlHVUQ3OGxaSzVIUlRs?=
+ =?utf-8?B?RnVpd2pUWDJ6OEZ6YVVaQWVEcjVKTGRuRWRlUENKemtHOUI3clhxb0ZYNXdL?=
+ =?utf-8?B?bVB3SjQxTzMzMitwSkZQdkZaKzBWVjlIL1kycEpsQjhGSjR6aGplbFdNeHNy?=
+ =?utf-8?B?K1FHaUtnQlZESEFuNU14cTllNXVTMnpkd1RHR0hGcXExRVZRR1Jzd0RpSlZE?=
+ =?utf-8?B?ZTc0aXkvZG10NkltWkVDMk5nTUZBM2pVVU5aTW42TkhmdHhTY1QzeGtGOUwy?=
+ =?utf-8?B?UnJLRG45OFYzMXo4TVdwRFd1cFhLWDk1ZnR2czl2UThKeUp4TTNaNytGNlBY?=
+ =?utf-8?Q?NS789PIuPDt4bBSOHq4QHiJct?=
+X-OriginatorOrg: siemens.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6e09368-9ba2-429a-d447-08dbd2dcc4f9
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2023 08:23:14.9716
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2023 08:56:24.3521
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jrtCS/mLVWv/7vj13q1ONrQ9OrNmA+RI+B+IkU6oVEmKDu2ZOc3+Qe9PqxBvHC5ZuN26zh+2oOZO1MchnMkmQQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8508
+X-MS-Exchange-CrossTenant-UserPrincipalName: i+8JdtuHq4bGIG9unJKcJuoTFT1j6pkxdSUaYnKf0rSzDVyMWNBTPsIzMv1aKMmp192ZpvNP1iyDi3MzEKjaDA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR10MB4005
 
-On Wed, Oct 18, 2023 at 02:40:41PM -0500, Bjorn Helgaas wrote:
-> On Tue, Oct 17, 2023 at 10:42:49AM +0300, Ido Schimmel wrote:
-> > Spectrum-{1,2,3,4} devices report that a D3hot->D0 transition causes a
-> > reset (i.e., they advertise NoSoftRst-). However, this transition seems
-> > to have no effect on the device: It continues to be operational and
-> > network ports remain up. Advertising this support makes it seem as if a
-> > PM reset is viable for these devices. Mark it as unavailable to skip it
-> > when testing reset methods.
-> > 
-> > Before:
-> > 
-> >  # cat /sys/bus/pci/devices/0000\:03\:00.0/reset_method
-> >  pm bus
-> > 
-> > After:
-> > 
-> >  # cat /sys/bus/pci/devices/0000\:03\:00.0/reset_method
-> >  bus
-> > 
-> > Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> 
-> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> 
-> Hopefully since these are NVIDIA parts and you work at NVIDIA, this is
-> stronger than "this transition *seems* to have no effect" :)
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-Yes. Reworded to "this transition does not have any effect on the
-device" and kept your tag.
+Helps identifying the ports in udev rules e.g.
 
-FYI, new devices will not advertise support for PM reset so I don't
-expect this list to grow.
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+
+Seems such logic was lost during the upstream rewrite of the SDK 
+version.
+
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 4914d0ef58e9..ffae89a6ccc5 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -1653,6 +1653,19 @@ static void emac_ndo_get_stats64(struct net_device *ndev,
+ 	stats->tx_dropped = ndev->stats.tx_dropped;
+ }
+ 
++static int emac_ndo_get_phys_port_name(struct net_device *ndev, char *name,
++				       size_t len)
++{
++	struct prueth_emac *emac = netdev_priv(ndev);
++	int ret;
++
++	ret = snprintf(name, len, "p%d", emac->port_id);
++	if (ret >= len)
++		return -EINVAL;
++
++	return 0;
++}
++
+ static const struct net_device_ops emac_netdev_ops = {
+ 	.ndo_open = emac_ndo_open,
+ 	.ndo_stop = emac_ndo_stop,
+@@ -1663,6 +1676,7 @@ static const struct net_device_ops emac_netdev_ops = {
+ 	.ndo_set_rx_mode = emac_ndo_set_rx_mode,
+ 	.ndo_eth_ioctl = emac_ndo_ioctl,
+ 	.ndo_get_stats64 = emac_ndo_get_stats64,
++	.ndo_get_phys_port_name = emac_ndo_get_phys_port_name,
+ };
+ 
+ /* get emac_port corresponding to eth_node name */
+-- 
+2.35.3
 
