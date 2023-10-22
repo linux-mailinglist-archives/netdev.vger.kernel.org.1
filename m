@@ -1,181 +1,156 @@
-Return-Path: <netdev+bounces-43269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DC2E7D2190
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 08:30:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C077D219E
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 09:20:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DA7DB20D98
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 06:30:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11C00B20CDA
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 07:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85B7362;
-	Sun, 22 Oct 2023 06:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374E415AF;
+	Sun, 22 Oct 2023 07:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXLXU/Eo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5undhit"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200F81C3B;
-	Sun, 22 Oct 2023 06:30:14 +0000 (UTC)
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B043E6;
-	Sat, 21 Oct 2023 23:30:12 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-27d5fd02e3dso632761a91.1;
-        Sat, 21 Oct 2023 23:30:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14FA10E1
+	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 07:20:25 +0000 (UTC)
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D76E5C2;
+	Sun, 22 Oct 2023 00:20:20 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c9d922c039so18330515ad.3;
+        Sun, 22 Oct 2023 00:20:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697956211; x=1698561011; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ikHvQ+mqtYjrNg+ceZzguZKr6AdCJaO/aWUwnRkjCxc=;
-        b=WXLXU/EofLA7GXSmkRsaU118e1G0meV9XLaEL8npaeDEkQdJlwz83ZtNhAAZPdIESu
-         02mUbr5XmHAF9sHBVBl+s8m1wWQkbLnJcFt1DiUW+V6ELBnxu/gI4Nf4JmeJHDaG6IIr
-         99wnnCepV9JQZxZk0Vq1xXX7W6UmVXCnKYO8W2MyMSWcUG4GIYcxDY51/uAUm8KE5o3t
-         aE6HjX50W4mKYuv+uJ1rmhPBeIjGk6dnJAM5PbpGgu1up1vlC+pqRRE1S+eQ7UAshtmF
-         oq2YDfoQn63UbRBPYUBpVn4w3W2hicod5lqE2v4XAvN+id4vLJO1mIDRHTB2gn/J2ypf
-         Crww==
+        d=gmail.com; s=20230601; t=1697959220; x=1698564020; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KTMy4jRMjdPSok66h5pvXOKtTYMVZRMrenI1NsIR3i8=;
+        b=Y5undhitor7bZPDwO4DCLA/lgmQzw3VUrI5h7jENG2ht22tUsampundGD/KNPkARpq
+         o00GVWCVXmcYq/LbgGwNyJ0UBOP5KmPXtPIXN4XhsGCcvl7rxhH+AlseZYa9pT0qH1ZV
+         t10Yde9eteVZcRBqM8a7LtqSt+TlQWA3ercIOM3zGJWzpUXq1dF6SdI2yHDlSib1IeJz
+         dvRxNOzyimeFcBSn8Thx63Wmjl4+ZMQ+FCVtR6i/bU1uHKi/zG5kmJuli2Nwyai2npvU
+         tFvlCtJvcgaolz4czxkEtZNVjTc7HSBzOP2OP9XK9WZZQ24qzPavQwvpWZZwIgk1bHgU
+         szOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697956211; x=1698561011;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ikHvQ+mqtYjrNg+ceZzguZKr6AdCJaO/aWUwnRkjCxc=;
-        b=TkBxvnzDsTc8uAMKFhrsvZpg18HF9W9dRzz0FdyY8zzOVRiUxPKj0PrcbrpsSyp6qh
-         R0h+VfiCRi6ANS7SrwGKcbjbM/5+pcKayu5Dco2cyX1n4SpvR3k2kLitzvmjkgzAO8Iz
-         Tnd4JDNvQsvJCmPERJ7cS7r9uwSTjBzKfyhqbQzqdA8yg4M0/oH6ObnmKbvHRsi/iVUM
-         SE9Pti+JOMy7LLNiT/nmsU4YIqvGoCR1V7okq0Yl2hCJi4SoYLs8FygmYycLIT4R12uN
-         W/OUrs5yXn9Vn11HwsLA1/uUxg89goPcqavfrMAgjPTQwFpz+YaztsFVdd2yjHkeJXbh
-         wWzQ==
-X-Gm-Message-State: AOJu0Yw033ojrbANlEiLOAboZtNNp9orOr12jcgD7AjbpKz6j/XthTT+
-	Mrd1huvjJfqHxgfvI65mXEQ=
-X-Google-Smtp-Source: AGHT+IGlZ5W1+BKcFq6yUdsecFwhWYVkoDmrh+oqE0DLZaeHaE8x+6o8EXHZZ9iTTNBe6/Pnvki3FQ==
-X-Received: by 2002:a17:902:f98f:b0:1c4:1e65:1e5e with SMTP id ky15-20020a170902f98f00b001c41e651e5emr5982497plb.0.1697956211116;
-        Sat, 21 Oct 2023 23:30:11 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id w17-20020a1709029a9100b001b89466a5f4sm3960982plp.105.2023.10.21.23.30.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Oct 2023 23:30:10 -0700 (PDT)
-Date: Sun, 22 Oct 2023 15:30:09 +0900 (JST)
-Message-Id: <20231022.153009.202146429329494922.fujita.tomonori@gmail.com>
-To: miguel.ojeda.sandonis@gmail.com
-Cc: fujita.tomonori@gmail.com, nmi@metaspace.dk, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
- boqun.feng@gmail.com, wedsonaf@gmail.com, benno.lossin@proton.me,
- greg@kroah.com, ojeda@kernel.org
-Subject: Re: [PATCH net-next v5 3/5] WIP rust: add second `bindgen` pass
- for enum exhaustiveness checking
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CANiq72nc+pZ2fsNzNkaB01im92X1F4mhESZonyvD2G1rd9dNDA@mail.gmail.com>
-References: <871qdpikq9.fsf@metaspace.dk>
-	<20231021.125125.1778736907764380293.fujita.tomonori@gmail.com>
-	<CANiq72nc+pZ2fsNzNkaB01im92X1F4mhESZonyvD2G1rd9dNDA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1697959220; x=1698564020;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KTMy4jRMjdPSok66h5pvXOKtTYMVZRMrenI1NsIR3i8=;
+        b=TzlPxyQtazuLFv0upSsHHYFd9qEv4zf0r/tu6SmhDfFa0Qmucv6q1j5ZsZEaDLTHXv
+         hzA6h9OKa5H3qTyWebJuOxPfparvmZm2ljjPQ9Z4ZpKK7PB4nK5gvzlXGUcQL+/MSk+0
+         gTqzm4g8dHOOwQtkFSSlJd2L24t7wxrioVQKk4w2nHLXZFvPOIGMo+A2F1ASqbfp4ztd
+         vdKOgxSgcvcLp1SbyR1+ba81mMNmHXLRyAGKbg6Tfcr/24ixriPKY0sjyoxLciOCyXMJ
+         28BGpOaWPVs7jYYZXRONwgyXxiglGtM6gFK380Xrxfpi9wHf/3sRXd9XiAPYTCgXYyYK
+         54NQ==
+X-Gm-Message-State: AOJu0YzKS4Oy6TMsO6aaqGvDlDmRuIMrj2uIanBx+3bvkiWX6Flo6eyk
+	9ZLY31Ux+lg9Ylnl3NV+kYXpIxY00vbS135cFag=
+X-Google-Smtp-Source: AGHT+IGrq1BbWBxZjWr9/xngYvuWV2Dt0B1uacT4bxHZZ4QuMYLFehe5KZuXx9ful0NTGvqgqtzMOrAbcq02kmppJII=
+X-Received: by 2002:a17:902:ec88:b0:1c7:733b:27c7 with SMTP id
+ x8-20020a170902ec8800b001c7733b27c7mr6767226plg.56.1697959220188; Sun, 22 Oct
+ 2023 00:20:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+References: <20231020061158.6716-1-hkelam@marvell.com> <CAM0EoMkawLKubMdrTOAcOhYq8Jicc5XuXuytBVi-yy-_QgiTuA@mail.gmail.com>
+ <PH0PR18MB4474C304575E55092A2C7377DEDBA@PH0PR18MB4474.namprd18.prod.outlook.com>
+ <0329924b-a868-49b9-ab98-0b3f8bd545cb@intel.com> <CA+sq2Cd51mYHbSsjUKL23MbLkHr=oKYWvuubspg37AEo2fE8vg@mail.gmail.com>
+In-Reply-To: <CA+sq2Cd51mYHbSsjUKL23MbLkHr=oKYWvuubspg37AEo2fE8vg@mail.gmail.com>
+From: Dave Taht <dave.taht@gmail.com>
+Date: Sun, 22 Oct 2023 00:20:06 -0700
+Message-ID: <CAA93jw4ZmG3A=20SpeXZeFP=4Xf=oAuK+tjwZrPR6zwtHdi9vg@mail.gmail.com>
+Subject: Re: [net-next] net: sched: extend flow action with RSS
+To: Sunil Kovvuri <sunil.kovvuri@gmail.com>
+Cc: "Nambiar, Amritha" <amritha.nambiar@intel.com>, Hariprasad Kelam <hkelam@marvell.com>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, 
+	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kuba@kernel.org" <kuba@kernel.org>, 
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>, "edumazet@google.com" <edumazet@google.com>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, "xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, 
+	"jiri@resnulli.us" <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gU2F0LCAyMSBPY3QgMjAyMyAxNDowNTo1MyArMDIwMA0KTWlndWVsIE9qZWRhIDxtaWd1ZWwu
-b2plZGEuc2FuZG9uaXNAZ21haWwuY29tPiB3cm90ZToNCg0KPiBPbiBTYXQsIE9jdCAyMSwgMjAy
-MyBhdCA1OjUx4oCvQU0gRlVKSVRBIFRvbW9ub3JpDQo+IDxmdWppdGEudG9tb25vcmlAZ21haWwu
-Y29tPiB3cm90ZToNCj4+DQo+PiBIbW0sIHRoaXMgd29ya3MgZm9yIG1lLg0KPiANCj4gQW5kcmVh
-cyB3YXMgcHJvYmFibHkgdXNpbmcgYE89YCwgYnV0IHlvdSB3ZXJlIG5vdC4NCj4gDQo+IEF0IGxl
-YXN0IHRoYXQgaXMgd2hhdCBJIGd1ZXNzZWQgeWVzdGVyZGF5IGFuZCB3aGF0IHRoZSBzdWdnZXN0
-aW9uIEkgZ2F2ZSBmaXhlcy4NCg0KSSBzZWUsIHRoYW5rcy4NCg0KPiBUaGlzIGlzIGFsc28gd2h5
-IHNlbmRpbmcgdW5maW5pc2hlZCB3b3JrIGJ5IHNvbWVvbmUgZWxzZSBpcyBub3QgdGhlDQo+IGJl
-c3QgaWRlYS4gSSB3b3VsZCBhbHNvIGhhdmUgbWFya2VkIHRoYXQgcGF0Y2ggYXMgUkZDIGFuZCBw
-dXQgaXQgYXQNCj4gdGhlIGVuZCBwZXJoYXBzLCB0byBtYWtlIGl0IGNsZWFyZXIuDQo+IA0KPiBC
-eSB0aGUgd2F5LCB0aGUgcGF0Y2ggaXMgbWlzc2luZyB5b3VyIFNvQi4gSSB3b3VsZCByZWNvbW1l
-bmQgdXNpbmcNCj4gYC0tc2lnbm9mZmAgaW4gR2l0IGFuZCBiNCdzIGBhbWAsIGBjaGVycnktcGlj
-a2AgZXRjLg0KDQpJbmNvcnBvcmF0ZWQgdGhlIE1ha2VmaWxlIGZpeCBhbmQgYWRkZWQgbXkgU2ln
-bmVkLW9mZi1ieS4gWW91IHdvdWxkDQpsaWtlIHRvIGtlZXAgV0lQIGluIHRoZSBzdWJqZWN0Pw0K
-DQo9DQpGcm9tIGZmNWI1NjdhOGI0ZTRhNDhmOGEwYzdmMWFjNzFmOGVmMmMyZWQyMjYgTW9uIFNl
-cCAxNyAwMDowMDowMCAyMDAxDQpGcm9tOiBNaWd1ZWwgT2plZGEgPG9qZWRhQGtlcm5lbC5vcmc+
-DQpEYXRlOiBGcmksIDEzIE9jdCAyMDIzIDEyOjM3OjU4ICswMjAwDQpTdWJqZWN0OiBbUEFUQ0hd
-IFdJUCBydXN0OiBhZGQgc2Vjb25kIGBiaW5kZ2VuYCBwYXNzIGZvciBlbnVtIGV4aGF1c3RpdmVu
-ZXNzDQogY2hlY2tpbmcNCg0KICAgIGVycm9yW0UwMDA1XTogcmVmdXRhYmxlIHBhdHRlcm4gaW4g
-ZnVuY3Rpb24gYXJndW1lbnQNCiAgICAgICAgIC0tPiBydXN0L2JpbmRpbmdzL2JpbmRpbmdzX2Vu
-dW1fY2hlY2sucnM6Mjk6Ng0KICAgICAgICAgIHwNCiAgICAyOSAgICB8ICAgICAgIChwaHlfc3Rh
-dGU6OlBIWV9ET1dODQogICAgICAgICAgfCAgX19fX19fXg0KICAgIDMwICAgIHwgfCAgICAgfCBw
-aHlfc3RhdGU6OlBIWV9SRUFEWQ0KICAgIDMxICAgIHwgfCAgICAgfCBwaHlfc3RhdGU6OlBIWV9I
-QUxURUQNCiAgICAzMiAgICB8IHwgICAgIHwgcGh5X3N0YXRlOjpQSFlfRVJST1INCiAgICAuLi4g
-ICAgIHwNCiAgICAzNSAgICB8IHwgICAgIHwgcGh5X3N0YXRlOjpQSFlfTk9MSU5LDQogICAgMzYg
-ICAgfCB8ICAgICB8IHBoeV9zdGF0ZTo6UEhZX0NBQkxFVEVTVCk6IHBoeV9zdGF0ZSwNCiAgICAg
-ICAgICB8IHxfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19eIHBhdHRlcm4gYHBoeV9zdGF0
-ZTo6UEhZX05FV2Agbm90IGNvdmVyZWQNCiAgICAgICAgICB8DQogICAgbm90ZTogYHBoeV9zdGF0
-ZWAgZGVmaW5lZCBoZXJlDQogICAgICAgICAtLT4gcnVzdC9iaW5kaW5ncy9iaW5kaW5nc19nZW5l
-cmF0ZWRfZW51bV9jaGVjay5yczo2MDczOToxMA0KICAgICAgICAgIHwNCiAgICA2MDczOSB8IHB1
-YiBlbnVtIHBoeV9zdGF0ZSB7DQogICAgICAgICAgfCAgICAgICAgICBeXl5eXl5eXl4NCiAgICAu
-Li4NCiAgICA2MDc0NSB8ICAgICBQSFlfTkVXID0gNSwNCiAgICAgICAgICB8ICAgICAtLS0tLS0t
-IG5vdCBjb3ZlcmVkDQogICAgICAgICAgPSBub3RlOiB0aGUgbWF0Y2hlZCB2YWx1ZSBpcyBvZiB0
-eXBlIGBwaHlfc3RhdGVgDQoNClNpZ25lZC1vZmYtYnk6IE1pZ3VlbCBPamVkYSA8b2plZGFAa2Vy
-bmVsLm9yZz4NClNpZ25lZC1vZmYtYnk6IEZVSklUQSBUb21vbm9yaSA8ZnVqaXRhLnRvbW9ub3Jp
-QGdtYWlsLmNvbT4NCi0tLQ0KIHJ1c3QvLmdpdGlnbm9yZSAgICAgICAgICAgICAgICAgICAgICB8
-ICAxICsNCiBydXN0L01ha2VmaWxlICAgICAgICAgICAgICAgICAgICAgICAgfCAxNCArKysrKysr
-KysrKw0KIHJ1c3QvYmluZGluZ3MvYmluZGluZ3NfZW51bV9jaGVjay5ycyB8IDM2ICsrKysrKysr
-KysrKysrKysrKysrKysrKysrKysNCiAzIGZpbGVzIGNoYW5nZWQsIDUxIGluc2VydGlvbnMoKykN
-CiBjcmVhdGUgbW9kZSAxMDA2NDQgcnVzdC9iaW5kaW5ncy9iaW5kaW5nc19lbnVtX2NoZWNrLnJz
-DQoNCmRpZmYgLS1naXQgYS9ydXN0Ly5naXRpZ25vcmUgYi9ydXN0Ly5naXRpZ25vcmUNCmluZGV4
-IGQzODI5ZmZhYjgwYi4uMWE3NmFkMGQ2NjAzIDEwMDY0NA0KLS0tIGEvcnVzdC8uZ2l0aWdub3Jl
-DQorKysgYi9ydXN0Ly5naXRpZ25vcmUNCkBAIC0xLDYgKzEsNyBAQA0KICMgU1BEWC1MaWNlbnNl
-LUlkZW50aWZpZXI6IEdQTC0yLjANCiANCiBiaW5kaW5nc19nZW5lcmF0ZWQucnMNCitiaW5kaW5n
-c19nZW5lcmF0ZWRfZW51bV9jaGVjay5ycw0KIGJpbmRpbmdzX2hlbHBlcnNfZ2VuZXJhdGVkLnJz
-DQogZG9jdGVzdHNfa2VybmVsX2dlbmVyYXRlZC5ycw0KIGRvY3Rlc3RzX2tlcm5lbF9nZW5lcmF0
-ZWRfa3VuaXQuYw0KZGlmZiAtLWdpdCBhL3J1c3QvTWFrZWZpbGUgYi9ydXN0L01ha2VmaWxlDQpp
-bmRleCBhMjdmMzVmOTI0ZWMuLmIzNzg0MjEyMGI3NCAxMDA2NDQNCi0tLSBhL3J1c3QvTWFrZWZp
-bGUNCisrKyBiL3J1c3QvTWFrZWZpbGUNCkBAIC0xNSw2ICsxNSw3IEBAIGFsd2F5cy0kKENPTkZJ
-R19SVVNUKSArPSBsaWJtYWNyb3Muc28NCiBuby1jbGVhbi1maWxlcyArPSBsaWJtYWNyb3Muc28N
-CiANCiBhbHdheXMtJChDT05GSUdfUlVTVCkgKz0gYmluZGluZ3MvYmluZGluZ3NfZ2VuZXJhdGVk
-LnJzIGJpbmRpbmdzL2JpbmRpbmdzX2hlbHBlcnNfZ2VuZXJhdGVkLnJzDQorYWx3YXlzLSQoQ09O
-RklHX1JVU1QpICs9IGJpbmRpbmdzL2JpbmRpbmdzX2dlbmVyYXRlZF9lbnVtX2NoZWNrLnJzDQog
-b2JqLSQoQ09ORklHX1JVU1QpICs9IGFsbG9jLm8gYmluZGluZ3MubyBrZXJuZWwubw0KIGFsd2F5
-cy0kKENPTkZJR19SVVNUKSArPSBleHBvcnRzX2FsbG9jX2dlbmVyYXRlZC5oIGV4cG9ydHNfYmlu
-ZGluZ3NfZ2VuZXJhdGVkLmggXA0KICAgICBleHBvcnRzX2tlcm5lbF9nZW5lcmF0ZWQuaA0KQEAg
-LTM0MSw2ICszNDIsMTkgQEAgJChvYmopL2JpbmRpbmdzL2JpbmRpbmdzX2dlbmVyYXRlZC5yczog
-JChzcmMpL2JpbmRpbmdzL2JpbmRpbmdzX2hlbHBlci5oIFwNCiAgICAgJChzcmMpL2JpbmRnZW5f
-cGFyYW1ldGVycyBGT1JDRQ0KIAkkKGNhbGwgaWZfY2hhbmdlZF9kZXAsYmluZGdlbikNCiANCisk
-KG9iaikvYmluZGluZ3MvYmluZGluZ3NfZ2VuZXJhdGVkX2VudW1fY2hlY2sucnM6IHByaXZhdGUg
-YmluZGdlbl90YXJnZXRfZmxhZ3MgPSBcDQorICAgICQoc2hlbGwgZ3JlcCAtdiAnXiNcfF4kJCcg
-JChzcmN0cmVlKS8kKHNyYykvYmluZGdlbl9wYXJhbWV0ZXJzKSBcDQorICAgIC0tZGVmYXVsdC1l
-bnVtLXN0eWxlIHJ1c3QNCiskKG9iaikvYmluZGluZ3MvYmluZGluZ3NfZ2VuZXJhdGVkX2VudW1f
-Y2hlY2sucnM6IHByaXZhdGUgYmluZGdlbl90YXJnZXRfZXh0cmEgPSA7IFwNCisgICAgT0JKVFJF
-RT0kKGFic3BhdGggJChvYmp0cmVlKSkgJChSVVNUQ19PUl9DTElQUFkpICQocnVzdF9mbGFncykg
-JChydXN0Y190YXJnZXRfZmxhZ3MpIFwNCisgICAgICAgIC0tY3JhdGUtdHlwZSBybGliIC1MJChv
-Ymp0cmVlKS8kKG9iaikgXA0KKyAgICAgICAgLS1lbWl0PWRlcC1pbmZvPSQob2JqKS9iaW5kaW5n
-cy8uYmluZGluZ3NfZW51bV9jaGVjay5ycy5kIFwNCisgICAgICAgIC0tZW1pdD1tZXRhZGF0YT0k
-KG9iaikvYmluZGluZ3MvbGliYmluZGluZ3NfZW51bV9jaGVjay5ybWV0YSBcDQorICAgICAgICAt
-LWNyYXRlLW5hbWUgZW51bV9jaGVjayAkKHNyY3RyZWUpLyQoc3JjKS9iaW5kaW5ncy9iaW5kaW5n
-c19lbnVtX2NoZWNrLnJzDQorJChvYmopL2JpbmRpbmdzL2JpbmRpbmdzX2dlbmVyYXRlZF9lbnVt
-X2NoZWNrLnJzOiAkKHNyYykvYmluZGluZ3MvYmluZGluZ3NfaGVscGVyLmggXA0KKyAgICAkKHNy
-YykvYmluZGluZ3MvYmluZGluZ3NfZW51bV9jaGVjay5ycyAkKHNyYykvYmluZGdlbl9wYXJhbWV0
-ZXJzIEZPUkNFDQorCSQoY2FsbCBpZl9jaGFuZ2VkX2RlcCxiaW5kZ2VuKQ0KKw0KICQob2JqKS91
-YXBpL3VhcGlfZ2VuZXJhdGVkLnJzOiBwcml2YXRlIGJpbmRnZW5fdGFyZ2V0X2ZsYWdzID0gXA0K
-ICAgICAkKHNoZWxsIGdyZXAgLUV2ICdeI3xeJCQnICQoc3JjdHJlZSkvJChzcmMpL2JpbmRnZW5f
-cGFyYW1ldGVycykNCiAkKG9iaikvdWFwaS91YXBpX2dlbmVyYXRlZC5yczogJChzcmMpL3VhcGkv
-dWFwaV9oZWxwZXIuaCBcDQpkaWZmIC0tZ2l0IGEvcnVzdC9iaW5kaW5ncy9iaW5kaW5nc19lbnVt
-X2NoZWNrLnJzIGIvcnVzdC9iaW5kaW5ncy9iaW5kaW5nc19lbnVtX2NoZWNrLnJzDQpuZXcgZmls
-ZSBtb2RlIDEwMDY0NA0KaW5kZXggMDAwMDAwMDAwMDAwLi5lZWY3ZTljYTNjNTQNCi0tLSAvZGV2
-L251bGwNCisrKyBiL3J1c3QvYmluZGluZ3MvYmluZGluZ3NfZW51bV9jaGVjay5ycw0KQEAgLTAs
-MCArMSwzNiBAQA0KKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wDQorDQorLy8h
-IEJpbmRpbmdzJyBlbnVtIGV4aGF1c3RpdmVuZXNzIGNoZWNrLg0KKy8vIQ0KKy8vISBFdmVudHVh
-bGx5LCB0aGlzIHNob3VsZCBiZSByZXBsYWNlZCBieSBhIHNhZmUgdmVyc2lvbiBvZiBgLS1ydXN0
-aWZpZWQtZW51bWAsIHNlZQ0KKy8vISBodHRwczovL2dpdGh1Yi5jb20vcnVzdC1sYW5nL3J1c3Qt
-YmluZGdlbi9pc3N1ZXMvMjY0Ni4NCisNCisjIVtub19zdGRdDQorIyFbYWxsb3coDQorICAgIGNs
-aXBweTo6YWxsLA0KKyAgICBkZWFkX2NvZGUsDQorICAgIG1pc3NpbmdfZG9jcywNCisgICAgbm9u
-X2NhbWVsX2Nhc2VfdHlwZXMsDQorICAgIG5vbl91cHBlcl9jYXNlX2dsb2JhbHMsDQorICAgIG5v
-bl9zbmFrZV9jYXNlLA0KKyAgICBpbXByb3Blcl9jdHlwZXMsDQorICAgIHVucmVhY2hhYmxlX3B1
-YiwNCisgICAgdW5zYWZlX29wX2luX3Vuc2FmZV9mbg0KKyldDQorDQoraW5jbHVkZSEoY29uY2F0
-ISgNCisgICAgZW52ISgiT0JKVFJFRSIpLA0KKyAgICAiL3J1c3QvYmluZGluZ3MvYmluZGluZ3Nf
-Z2VuZXJhdGVkX2VudW1fY2hlY2sucnMiDQorKSk7DQorDQorZm4gY2hlY2tfcGh5X3N0YXRlKA0K
-KyAgICAocGh5X3N0YXRlOjpQSFlfRE9XTg0KKyAgICB8IHBoeV9zdGF0ZTo6UEhZX1JFQURZDQor
-ICAgIHwgcGh5X3N0YXRlOjpQSFlfSEFMVEVEDQorICAgIHwgcGh5X3N0YXRlOjpQSFlfRVJST1IN
-CisgICAgfCBwaHlfc3RhdGU6OlBIWV9VUA0KKyAgICB8IHBoeV9zdGF0ZTo6UEhZX1JVTk5JTkcN
-CisgICAgfCBwaHlfc3RhdGU6OlBIWV9OT0xJTksNCisgICAgfCBwaHlfc3RhdGU6OlBIWV9DQUJM
-RVRFU1QpOiBwaHlfc3RhdGUsDQorKSB7DQorfQ0KLS0gDQoyLjM0LjENCg0K
+On Sat, Oct 21, 2023 at 10:53=E2=80=AFPM Sunil Kovvuri <sunil.kovvuri@gmail=
+.com> wrote:
+>
+> On Sat, Oct 21, 2023 at 1:43=E2=80=AFAM Nambiar, Amritha
+> <amritha.nambiar@intel.com> wrote:
+> >
+> > >> On Fri, Oct 20, 2023 at 2:12=E2=80=AFAM Hariprasad Kelam <hkelam@mar=
+vell.com>
+> > >> wrote:
+> > >>>
+> > >>> This patch extends current flow action with RSS, such that the user
+> > >>> can install flower offloads with action RSS followed by a group id.
+> > >>> Since this is done in hardware skip_sw flag is enforced.
+> > >>
+> > >> Our typical rule for TC is we need s/w equivalence for offloads. How=
+ would
+> > >> this work in absence of offload?
+> > >>
+> > > [Hari]
+> > > Our typical rule for TC is we need s/w equivalence for offloads. How =
+would this work in absence of offload?
+> > >
+> > > This patch we added as an extension to receive queue selection in har=
+dware.
+> > > This patch "act_skbedit: skbedit queue mapping for receive queue" ena=
+bled receive queue selection in hardware
+> > > and skip_sw is enforced.
+> > >
+> > > Adding stakeholders of this patch, to get their opinion.
+> > > sridhar.samudrala@intel.com  amritha.nambiar@intel.com
+> > >
+> > > incase of RSS, hardware makes decisions about incoming packets before=
+ they are even received in the queue.
+
+Is there any way to do a LPM to queue match on inbound?
+
+> > >
+> >
+> > The skip_sw for skbedit receive queue action was enforced as the only
+> > other alternative was a new hw-only action, or changing the action
+> > mirred. See discussion at
+> > https://lore.kernel.org/netdev/20220921132929.3f4ca04d@kernel.org/
+> >
+> > Few questions WRT this patch:
+> > How are the rss groups created? ethtool rss contexts? Any reason to use
+> > TC to direct to rss contexts over using ethtool context ids?
+> >
+>
+> Yes, RSS groups are created using ethtool.
+> Ethtool ntuple is very limited in expressing flow rules and since the
+> general direction
+> is to use 'TC', we are attempting to add RSS action to 'TC'.
+>
+>
+> > IIUC, skbedit is meant to only edit skb metadata such as mark, packet
+> > type, queue mapping, priority etc. Even if this is a HW only action and
+> > has no use in the stack, would skbedit be the right fit here?
+> >
+>
+> The thought was to keep related actions like RQ, RSS group etc under
+> one action ie skbedit.
+> If that's not the right place we can add a separate action.
+>
+> Thanks,
+> Sunil.
+>
+
+
+--=20
+Oct 30: https://netdevconf.info/0x17/news/the-maestro-and-the-music-bof.htm=
+l
+Dave T=C3=A4ht CSO, LibreQos
 
