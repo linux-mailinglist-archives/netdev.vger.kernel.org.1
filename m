@@ -1,174 +1,133 @@
-Return-Path: <netdev+bounces-43263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11D537D2080
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 01:57:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 264757D2083
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 02:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70745B20DA1
-	for <lists+netdev@lfdr.de>; Sat, 21 Oct 2023 23:57:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D5CC28129A
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 00:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A0B20B2E;
-	Sat, 21 Oct 2023 23:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5317C170;
+	Sun, 22 Oct 2023 00:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xKKnOrEz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="boT5bfiF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF30809
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 23:57:21 +0000 (UTC)
-Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D454E4
-	for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 16:57:20 -0700 (PDT)
-Received: by mail-vs1-xe2f.google.com with SMTP id ada2fe7eead31-45853ab5556so642058137.2
-        for <netdev@vger.kernel.org>; Sat, 21 Oct 2023 16:57:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697932639; x=1698537439; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rqnmzhclvOwwqTGAwkq/nEDEAnrVxCndy+B1Qnb4eVE=;
-        b=xKKnOrEzvQw3KL1nqvg+a1igbPEqDm9SPtLHB11rJ+t2gwWGM4dBkqpRDVvyEBWZcv
-         qVmALw3fcCo8BuW26kye3WRTpfuJ4TcHsZFT9cZ31eKoWlMm2mZh7aLgvDYzrfrZ3rEQ
-         bwAvrO7NR5tU2I14Q4kEEoFtDJe4OjUWsWM9xQ/eKFfsBryzw4nxfKvKVYSg8RNeur3l
-         riwq3XvcVsDIzTFOnZf8tK1LBl1UGBnGRAIC8M1oveF2PPk+WhaqK9U0Rp3LqefeGpaN
-         GAGyRonxpgdAAYH5DnjDD2/CwxyllV5knyx69hUmIIQMFfHrLXP7lkaKnhZTqX30JvpT
-         lnOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697932639; x=1698537439;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rqnmzhclvOwwqTGAwkq/nEDEAnrVxCndy+B1Qnb4eVE=;
-        b=uHTpqSvtV6syYqlUgSE6nIA60dxOLdXJcMbt1T5RwY46iKFbSl6gCJQ3sNJMaRHP9r
-         mjMKvNXwiSD8OGdp9uOaP/7slY7kM4mgGflYmUjTdyu94DaIW2bW77uT+9kLvWq7ULD3
-         ifxlDCB1Y4jC3s2mD6Do2Nyed43Lk/EUJm3lPtTlWQh+ON3/LBJ1NO/E5OGcpyVAmeQy
-         D3cZ5fhlJ2qWbUjyDVrP8EqgvMw2L86IXJSEIjZsq3Sy8jtzEscguaANu0ZPAIIV+KQG
-         78clpdTAqsviPD+jXaiY4EqlMKpYkVEl9VZSAR8POhAMGaCH8sfNRPIudCICcHX+rPpP
-         5npQ==
-X-Gm-Message-State: AOJu0Yx0OsehSDD3vUOwLM6y747AwUIs+El+OfSnO9Rnjw8Xy+OdWZfL
-	Qre3OTWSdiQkr1U61fjt+59b28OMiTeon4ow7FJnp7x51gz7fOtgxJLwbw==
-X-Google-Smtp-Source: AGHT+IHbMZr4SiEUcEfBSSW7Z3hs9Vd2eGh3Gh7PTUECYcdvCeeQc+BKmI1uWKTKi+yN6trTCWv9Ar1XRMlxqV7HlOQ=
-X-Received: by 2002:a67:c21e:0:b0:457:c982:57f9 with SMTP id
- i30-20020a67c21e000000b00457c98257f9mr5233478vsj.23.1697932638956; Sat, 21
- Oct 2023 16:57:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D39F363
+	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 00:16:43 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3981BF4;
+	Sat, 21 Oct 2023 17:16:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697933798; x=1729469798;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1PiMnn0i3KT3YYOJNg9IYf4n+r48HTbs7kDucILde3I=;
+  b=boT5bfiFYK/vc+lYd3EFdQrp2D3lOA3l64gThX9cGSWJfbTSNNB7GwDV
+   5N6xFoGpUyH+iXRzYaUGhnAikvZ7JvTG+M1rW/VORREEbXA5LfrPszlQu
+   80HKU7FprD1M/vNr32drQDxVZO4lQ7figbeBfUuEdpl9LndlcznLpxswN
+   Kwv9IHIDRpLzW4DfnrabdfWG8EtsXh5a4yWWIS9PuS2A8WbP2vKKe9KLf
+   EQ0H75v1Wd3p4o+zswr8G21dN/x7+og4UujGLnc4rhj2dVQdukBh8+dOn
+   Gj36U0e8jsywzN72Ultg57ZaR9VOEO6kp1poYgYEPkTyhBBwPmmRd31Pa
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10870"; a="385554727"
+X-IronPort-AV: E=Sophos;i="6.03,242,1694761200"; 
+   d="scan'208";a="385554727"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2023 17:16:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10870"; a="761389573"
+X-IronPort-AV: E=Sophos;i="6.03,242,1694761200"; 
+   d="scan'208";a="761389573"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 21 Oct 2023 17:16:31 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1quM8s-0005Py-24;
+	Sun, 22 Oct 2023 00:16:30 +0000
+Date: Sun, 22 Oct 2023 08:16:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Konstantin Aladyshev <aladyshev22@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, minyard@acm.org, joel@jms.id.au,
+	andrew@aj.id.au, avifishman70@gmail.com, tmaimon77@gmail.com,
+	tali.perry1@gmail.com, venture@google.com, yuenn@google.com,
+	benjaminfair@google.com, aladyshev22@gmail.com,
+	jk@codeconstruct.com.au, matt@codeconstruct.com.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, openipmi-developer@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-aspeed@lists.ozlabs.org, openbmc@lists.ozlabs.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v5 1/3] ipmi: Move KCS headers to common include folder
+Message-ID: <202310220806.BmOW2atE-lkp@intel.com>
+References: <20231010122321.823-2-aladyshev22@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1697847587-6850-1-git-send-email-fred.chenchen03@gmail.com>
-In-Reply-To: <1697847587-6850-1-git-send-email-fred.chenchen03@gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Sat, 21 Oct 2023 19:57:02 -0400
-Message-ID: <CADVnQyks4eWus9k5cZnZhVFS17r45RS8V776UgOkFhUF=HTS=A@mail.gmail.com>
-Subject: Re: [PATCH v1] tcp: fix wrong RTO timeout when received SACK reneging
-To: Fred Chen <fred.chenchen03@gmail.com>
-Cc: edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org, 
-	yangpc@wangsu.com, ycheng@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231010122321.823-2-aladyshev22@gmail.com>
 
-On Fri, Oct 20, 2023 at 8:20=E2=80=AFPM Fred Chen <fred.chenchen03@gmail.co=
-m> wrote:
->
-> This commit fix wrong RTO timeout when received SACK reneging.
->
-> When an ACK arrived pointing to a SACK reneging, tcp_check_sack_reneging(=
-)
-> will rearm the RTO timer for min(1/2*srtt, 10ms) into to the future.
->
-> But since the commit 62d9f1a6945b ("tcp: fix TLP timer not set when
-> CA_STATE changes from DISORDER to OPEN") merged, the tcp_set_xmit_timer()
-> is moved after tcp_fastretrans_alert()(which do the SACK reneging check),
-> so the RTO timeout will be overwrited by tcp_set_xmit_timer() with
-> icsk_rto instead of 1/2*srtt.
->
-> Here is a packetdrill script to check this bug:
-> 0     socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
-> +0    bind(3, ..., ...) =3D 0
-> +0    listen(3, 1) =3D 0
->
-> // simulate srtt to 100ms
-> +0    < S 0:0(0) win 32792 <mss 1000, sackOK,nop,nop,nop,wscale 7>
-> +0    > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK,nop,wscale 7>
-> +.1    < . 1:1(0) ack 1 win 1024
->
-> +0    accept(3, ..., ...) =3D 4
->
-> +0    write(4, ..., 10000) =3D 10000
-> +0    > P. 1:10001(10000) ack 1
->
-> // inject sack
-> +.1    < . 1:1(0) ack 1 win 257 <sack 1001:10001,nop,nop>
-> +0    > . 1:1001(1000) ack 1
->
-> // inject sack reneging
-> +.1    < . 1:1(0) ack 1001 win 257 <sack 9001:10001,nop,nop>
->
-> // we expect rto fired in 1/2*srtt (50ms)
-> +.05    > . 1001:2001(1000) ack 1
->
-> This fix remove the FLAG_SET_XMIT_TIMER from ack_flag when
-> tcp_check_sack_reneging() set RTO timer with 1/2*srtt to avoid
-> being overwrited later.
->
-> Fixes: 62d9f1a6945b ("tcp: fix TLP timer not set when CA_STATE changes fr=
-om DISORDER to OPEN")
-> Signed-off-by: Fred Chen <fred.chenchen03@gmail.com>
-> ---
->  net/ipv4/tcp_input.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index ab87f02..eee4e95 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -2222,16 +2222,17 @@ void tcp_enter_loss(struct sock *sk)
->   * restore sanity to the SACK scoreboard. If the apparent reneging
->   * persists until this RTO then we'll clear the SACK scoreboard.
->   */
-> -static bool tcp_check_sack_reneging(struct sock *sk, int flag)
-> +static bool tcp_check_sack_reneging(struct sock *sk, int *ack_flag)
->  {
-> -       if (flag & FLAG_SACK_RENEGING &&
-> -           flag & FLAG_SND_UNA_ADVANCED) {
-> +       if (*ack_flag & FLAG_SACK_RENEGING &&
-> +           *ack_flag & FLAG_SND_UNA_ADVANCED) {
->                 struct tcp_sock *tp =3D tcp_sk(sk);
->                 unsigned long delay =3D max(usecs_to_jiffies(tp->srtt_us =
->> 4),
->                                           msecs_to_jiffies(10));
->
->                 inet_csk_reset_xmit_timer(sk, ICSK_TIME_RETRANS,
->                                           delay, TCP_RTO_MAX);
-> +               *ack_flag &=3D ~FLAG_SET_XMIT_TIMER;
->                 return true;
->         }
->         return false;
-> @@ -3009,7 +3010,7 @@ static void tcp_fastretrans_alert(struct sock *sk, =
-const u32 prior_snd_una,
->                 tp->prior_ssthresh =3D 0;
->
->         /* B. In all the states check for reneging SACKs. */
-> -       if (tcp_check_sack_reneging(sk, flag))
-> +       if (tcp_check_sack_reneging(sk, ack_flag))
->                 return;
->
->         /* C. Check consistency of the current state. */
-> --
+Hi Konstantin,
 
-Thanks a lot for the fix! The code looks good to me, and I ran it
-through our internal packetdrill test suite, and, with a few expected
-tweaks to reflect the fix, the tests all pass.
+kernel test robot noticed the following build errors:
 
-Reviewed-by: Neal Cardwell <ncardwell@google.com>
-Tested-by: Neal Cardwell <ncardwell@google.com>
+[auto build test ERROR on cminyard-ipmi/for-next]
+[also build test ERROR on linus/master v6.6-rc6 next-20231020]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-thanks,
-neal
+url:    https://github.com/intel-lab-lkp/linux/commits/Konstantin-Aladyshev/ipmi-Move-KCS-headers-to-common-include-folder/20231010-202425
+base:   https://github.com/cminyard/linux-ipmi for-next
+patch link:    https://lore.kernel.org/r/20231010122321.823-2-aladyshev22%40gmail.com
+patch subject: [PATCH v5 1/3] ipmi: Move KCS headers to common include folder
+config: mips-allmodconfig (https://download.01.org/0day-ci/archive/20231022/202310220806.BmOW2atE-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231022/202310220806.BmOW2atE-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310220806.BmOW2atE-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/linux/kcs_bmc_client.h:8,
+                    from drivers/char/ipmi/kcs_bmc_cdev_ipmi.c:11:
+>> include/linux/kcs_bmc.h:42:9: error: unknown type name 'spinlock_t'
+      42 |         spinlock_t lock;
+         |         ^~~~~~~~~~
+
+
+vim +/spinlock_t +42 include/linux/kcs_bmc.h
+
+faae6e391eda73 drivers/char/ipmi/kcs_bmc.h Andrew Jeffery 2021-06-08  31  
+d4e7ac68f771ad drivers/char/ipmi/kcs_bmc.h Andrew Jeffery 2021-06-08  32  struct kcs_bmc_device {
+d4e7ac68f771ad drivers/char/ipmi/kcs_bmc.h Andrew Jeffery 2021-06-08  33  	struct list_head entry;
+20d60f61c58e8c drivers/char/ipmi/kcs_bmc.h Haiyue Wang    2018-02-02  34  
+d4e7ac68f771ad drivers/char/ipmi/kcs_bmc.h Andrew Jeffery 2021-06-08  35  	struct device *dev;
+20d60f61c58e8c drivers/char/ipmi/kcs_bmc.h Haiyue Wang    2018-02-02  36  	u32 channel;
+20d60f61c58e8c drivers/char/ipmi/kcs_bmc.h Haiyue Wang    2018-02-02  37  
+20d60f61c58e8c drivers/char/ipmi/kcs_bmc.h Haiyue Wang    2018-02-02  38  	struct kcs_ioreg ioreg;
+20d60f61c58e8c drivers/char/ipmi/kcs_bmc.h Haiyue Wang    2018-02-02  39  
+d4e7ac68f771ad drivers/char/ipmi/kcs_bmc.h Andrew Jeffery 2021-06-08  40  	const struct kcs_bmc_device_ops *ops;
+20d60f61c58e8c drivers/char/ipmi/kcs_bmc.h Haiyue Wang    2018-02-02  41  
+d4e7ac68f771ad drivers/char/ipmi/kcs_bmc.h Andrew Jeffery 2021-06-08 @42  	spinlock_t lock;
+d4e7ac68f771ad drivers/char/ipmi/kcs_bmc.h Andrew Jeffery 2021-06-08  43  	struct kcs_bmc_client *client;
+20d60f61c58e8c drivers/char/ipmi/kcs_bmc.h Haiyue Wang    2018-02-02  44  };
+d4e7ac68f771ad drivers/char/ipmi/kcs_bmc.h Andrew Jeffery 2021-06-08  45  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
