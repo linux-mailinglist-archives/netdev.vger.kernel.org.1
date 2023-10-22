@@ -1,149 +1,121 @@
-Return-Path: <netdev+bounces-43293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96FE47D23C9
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 17:52:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A40C27D244E
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 18:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8AE51C208C5
-	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 15:52:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EF822814F1
+	for <lists+netdev@lfdr.de>; Sun, 22 Oct 2023 16:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7260410782;
-	Sun, 22 Oct 2023 15:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE4910A00;
+	Sun, 22 Oct 2023 16:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bMmP6Zto"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YN1BFlhE"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849051094D
-	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 15:52:17 +0000 (UTC)
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AB95B4
-	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 08:52:15 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6b5e6301a19so2365068b3a.0
-        for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 08:52:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C17101C9
+	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 16:19:59 +0000 (UTC)
+Received: from mail-oo1-xc2a.google.com (mail-oo1-xc2a.google.com [IPv6:2607:f8b0:4864:20::c2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F00E1;
+	Sun, 22 Oct 2023 09:19:58 -0700 (PDT)
+Received: by mail-oo1-xc2a.google.com with SMTP id 006d021491bc7-57d086365f7so1584190eaf.0;
+        Sun, 22 Oct 2023 09:19:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697989935; x=1698594735; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=9YYJ0xeR12CjS4RheaJo5V7O1DXA2irz7hax5XTAEFU=;
-        b=bMmP6Ztox8hXM0wB+1oquXjepGUtaJQS1RMl/YsQ5YzskqPqmBp/Ewolpcow+wuOKt
-         zvA4t3x8maXiFDAhe4DMJBWBEFBI8yE8zsm8f4wbsX/OZxTkciCnSkwzEJhlrjDXJiX4
-         045uAZ93/q5DXOe4MBCw7DuglSgetC7T2Bqpga7ufH3Gl8R5d8gDb7acJeoO9Aj3ZesB
-         u26TTK/JslM1Tw1sOcnPo/eKUG6LDFCGyo9ZhwlG+ShjOPwd/MpcSY9zVyFDoAC15Xvs
-         Yf3+a3al2Wk2baKGgRdD5K2p2iQxvwvaid93fgrgvIt9nCs0D+xtwDPuTMQKwoi88Iug
-         y91A==
+        d=gmail.com; s=20230601; t=1697991598; x=1698596398; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ot75iBZaZUeJ5MEWunC8jIOcs8JwsIEUJRHg5ojxiKo=;
+        b=YN1BFlhEJnsQms0aNNnwx6W3lInmO+aVGqbQ4UnPVIasWyM0pZOLB/dEpFIMVH6ZQU
+         DCq3OADVV1ed/QDEESv5NcDTUKHm3o81iDU444QUAasgVeGye02FijAoWBzbDrCWhVlP
+         Fo0bMvC6RT9St2cZmhYB4VFOosyr0METtY82zWYMFmsn+C1kfqF2SejruXAK+OyhTd4G
+         sPAA0Z97iqVcYlobjQWEjavvHpzzyVII17JPt4Q0tdclGcX/IC44n5u+ZdbfmENagJFJ
+         UIceqQLUiSSOWykEW9K5bjxLPAupIG0t51sNQKYfak2j8Rc/bciuF73AzBrNawB/ASD+
+         aegw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697989935; x=1698594735;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9YYJ0xeR12CjS4RheaJo5V7O1DXA2irz7hax5XTAEFU=;
-        b=kEVOtAfRFe7tQpVLaENTd3QZzyPoCTkUUILCLRAbT0YTvM4lXIbI6LsxW28aGfPMUP
-         MtFnQOnfOWP+mxbBNGpLbghjuBE+/TJdrPsBrG1Z9DXDYYTcL97sYn2NNg4rSPoY1MLb
-         a0emcsUvwnUG+iRmdlsCxRF3EsNOzHnoIPLVWiBuI+KHhD4fpJvc0ZgU9fuMwWbf7mjo
-         6XSpL3Zz+zUoLqXKO4Rsq1oy7ZDHjZLL1ai5mWNnKnB+iiwShx18UZ65+xk9Hf1TwlI0
-         sdzviKmTTowthPUjsn0l8WPZeAxWTVD6AWf1CNOnNoBN8VzY0Gy9thtOq5TPpmOOTW90
-         wjaQ==
-X-Gm-Message-State: AOJu0Yx0sJSPBTjJGF1zsYG8Nt83yHavLyWbeC/+AquP+Vmus1XDacSQ
-	7+WEySPK1domn0eA35LRTmcCYEmDXjA=
-X-Google-Smtp-Source: AGHT+IFPeY+GJP3UfuU4CfR5D1285pk7/tstwYbu0lwIHsBl2VqYGh80S2bYT4DHuT2b8iUFL2jSMg==
-X-Received: by 2002:a05:6a20:5487:b0:169:7d6f:9f22 with SMTP id i7-20020a056a20548700b001697d6f9f22mr10068088pzk.54.1697989935397;
-        Sun, 22 Oct 2023 08:52:15 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id z6-20020aa79f86000000b006be4bb0d2dcsm4861524pfr.149.2023.10.22.08.52.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Oct 2023 08:52:15 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <5e209398-3262-da47-1f6c-aa6fdab8a22f@roeck-us.net>
-Date: Sun, 22 Oct 2023 08:52:13 -0700
+        d=1e100.net; s=20230601; t=1697991598; x=1698596398;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ot75iBZaZUeJ5MEWunC8jIOcs8JwsIEUJRHg5ojxiKo=;
+        b=bfGmlENfMGBVnOnJpoNoinb34Ua4U093cgV7jj6bmZM01zRbl/xjoJXc5N/8daII4H
+         fJPFy8MmCmW7NxDigPk7wBaBlVj95oRijJFB6z+VR1vgPWLEH3Z3iOrTfjEMofnkg/aY
+         /Gz0LP0Q0w4RxFzD4G3y7RieAOznzfSTCLOVYy1OW5Ek+KT+YU9TL1OYbcbcYOccKxDS
+         7IBYb1XB2pbJrwdK+Y6Wxdz3d67fIeJK8xVHrlefg9PkR5WNtwGmr/pRq25i8Mbi+FYd
+         X8wReQdU/oBq1tgIu/M9oOyLHsGf+uC8FKoL4SMfoReI3FhaGxDSR/kE4Vp9++V5h3RJ
+         1r5A==
+X-Gm-Message-State: AOJu0YzA53p1NRqppn0XA2uoy7yATpGtvv+mhfwNhZxIQo6D3+tFCGwS
+	M70+pgstrlNeCgYuCl190Emq8N1+2SC1pJom
+X-Google-Smtp-Source: AGHT+IGXkVzwrQC64A/3aNw8JIkf5iZEaBnyeiNQwAz8Obm+W5cpMvuzccQmVnyiYNhRYoq6JBNb2Q==
+X-Received: by 2002:a05:6870:5252:b0:1e9:8182:a29d with SMTP id o18-20020a056870525200b001e98182a29dmr8669730oai.41.1697991597843;
+        Sun, 22 Oct 2023 09:19:57 -0700 (PDT)
+Received: from localhost ([2601:8c:502:14f0:d6de:9959:3c29:509b])
+        by smtp.gmail.com with ESMTPSA id 10-20020ac84e8a000000b0041520676966sm2119718qtp.47.2023.10.22.09.19.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Oct 2023 09:19:57 -0700 (PDT)
+Date: Sun, 22 Oct 2023 12:19:56 -0400
+From: Oliver Crumrine <ozlinuxc@gmail.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: davem@davemloft.n
+Subject: [PATCH net-next 00/17] Change cork to a pointer in sockets
+Message-ID: <cover.1697989543.git.ozlinuxc@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 2/8] bnxt_en: Fix invoking hwmon_notify_event
-Content-Language: en-US
-To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, gospo@broadcom.com, kalesh-anakkur.purayil@broadcom.com,
- Kashyap Desai <kashyap.desai@broadcom.com>,
- Somnath Kotur <somnath.kotur@broadcom.com>
-References: <20231020212757.173551-1-michael.chan@broadcom.com>
- <20231020212757.173551-3-michael.chan@broadcom.com>
-From: Guenter Roeck <linux@roeck-us.net>
-In-Reply-To: <20231020212757.173551-3-michael.chan@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 10/20/23 14:27, Michael Chan wrote:
-> From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-> 
-> FW sends the async event to the driver when the device temperature goes
-> above or below the threshold values.  Only notify hwmon if the
-> temperature is increasing to the next alert level, not when it is
-> decreasing.
-> 
-> Cc: Guenter Roeck <linux@roeck-us.net>
-> Reviewed-by: Kashyap Desai <kashyap.desai@broadcom.com>
-> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+This patch changes the cork field of both the inet_sock and inet6_sk
+structs to a pointer, reducing their size.
 
-Reviewed-by: Guenter Roeck <linux@roeck-us.net>
+Oliver Crumrine (17):
+  Make cork in inet_sock a pointer.
+  Allocate and free cork in inet_create and inet_release in file
+    net/ipv4/af_inet.c
+  Change cork in ipv6_pinfo to a pointer.
+  Allocate and free cork in inet6_sk.
+  Change occurence of cork in inet_sock to pointer in include/net/ip.h
+  Since cork in inet_sock and inet6_sk will be a pointer, they don't
+    need to be referenced in this function in include/net/ipv6.h
+  Change occurences of cork in inet_sock to pointer in file
+    net/ipv4/af_inet.c
+  Change occurence of cork to pointer in file net/ipv4/datagram.c
+  Change instances of cork in net/ipv4/inet_connection_sock.c to
+    pointer.
+  Change instances of cork to pointer in net/ipv4/ip_output.c
+  Update occurences of cork to pointer in net/ipv4/syncookies.c
+  Change occurences of cork to pointer in net/ipv4/tcp_output.c
+  Change instances of cork to a pointer in file net/ipv4/udp.c
+  Update usages of cork in net/ipv6/ip6_output.c to pointer.
+  Modify occurences of cork in net/ipv6/raw.c to use a pointer
+  Change usages of cork to pointer in net/ipv6/udp.c
+  Change instance of cork to pointer in net/ipv4/tcp_ipv4.c
 
-> ---
->   drivers/net/ethernet/broadcom/bnxt/bnxt.c | 16 +++++++++++-----
->   1 file changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index 7837e22f237b..65092150d451 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -2166,6 +2166,7 @@ static bool bnxt_event_error_report(struct bnxt *bp, u32 data1, u32 data2)
->   	case ASYNC_EVENT_CMPL_ERROR_REPORT_BASE_EVENT_DATA1_ERROR_TYPE_THERMAL_THRESHOLD: {
->   		u32 type = EVENT_DATA1_THERMAL_THRESHOLD_TYPE(data1);
->   		char *threshold_type;
-> +		bool notify = false;
->   		char *dir_str;
->   
->   		switch (type) {
-> @@ -2185,18 +2186,23 @@ static bool bnxt_event_error_report(struct bnxt *bp, u32 data1, u32 data2)
->   			netdev_err(bp->dev, "Unknown Thermal threshold type event\n");
->   			return false;
->   		}
-> -		if (EVENT_DATA1_THERMAL_THRESHOLD_DIR_INCREASING(data1))
-> +		if (EVENT_DATA1_THERMAL_THRESHOLD_DIR_INCREASING(data1)) {
->   			dir_str = "above";
-> -		else
-> +			notify = true;
-> +		} else {
->   			dir_str = "below";
-> +		}
->   		netdev_warn(bp->dev, "Chip temperature has gone %s the %s thermal threshold!\n",
->   			    dir_str, threshold_type);
->   		netdev_warn(bp->dev, "Temperature (In Celsius), Current: %lu, threshold: %lu\n",
->   			    BNXT_EVENT_THERMAL_CURRENT_TEMP(data2),
->   			    BNXT_EVENT_THERMAL_THRESHOLD_TEMP(data2));
-> -		bp->thermal_threshold_type = type;
-> -		set_bit(BNXT_THERMAL_THRESHOLD_SP_EVENT, &bp->sp_event);
-> -		return true;
-> +		if (notify) {
-> +			bp->thermal_threshold_type = type;
-> +			set_bit(BNXT_THERMAL_THRESHOLD_SP_EVENT, &bp->sp_event);
-> +			return true;
-> +		}
-> +		return false;
->   	}
->   	default:
->   		netdev_err(bp->dev, "FW reported unknown error type %u\n",
+ include/linux/ipv6.h            |  2 +-
+ include/net/inet_sock.h         |  2 +-
+ include/net/ip.h                |  2 +-
+ include/net/ipv6.h              |  4 ++--
+ net/ipv4/af_inet.c              |  6 ++++--
+ net/ipv4/datagram.c             |  2 +-
+ net/ipv4/inet_connection_sock.c |  6 +++---
+ net/ipv4/ip_output.c            |  6 +++---
+ net/ipv4/syncookies.c           |  2 +-
+ net/ipv4/tcp_ipv4.c             |  2 +-
+ net/ipv4/tcp_output.c           |  2 +-
+ net/ipv4/udp.c                  |  8 ++++----
+ net/ipv6/af_inet6.c             |  5 +++++
+ net/ipv6/ip6_output.c           | 10 +++++-----
+ net/ipv6/raw.c                  |  4 ++--
+ net/ipv6/udp.c                  |  4 ++--
+ 16 files changed, 37 insertions(+), 30 deletions(-)
+
+-- 
+2.42.0
 
 
