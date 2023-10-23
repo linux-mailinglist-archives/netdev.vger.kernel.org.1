@@ -1,274 +1,138 @@
-Return-Path: <netdev+bounces-43538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B89A57D3D2B
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:14:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 168847D3D43
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:19:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C25F2815BF
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:14:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 404ED1C20A8F
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D101E536;
-	Mon, 23 Oct 2023 17:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA1B200AE;
+	Mon, 23 Oct 2023 17:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MeuEwtvu"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="E0uIgfeu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D221134C6;
-	Mon, 23 Oct 2023 17:14:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43161C433C9;
-	Mon, 23 Oct 2023 17:14:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698081270;
-	bh=Ja8s9hHWNsMl9rR/A2vkVRwGBByDHecu9TUfTmLK5O0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MeuEwtvuDFO5yp5iwwuVEJNzg9RfG0g2iSphmorTs1YHktZPSgAIBmOgSnoaQJdHm
-	 nUlWIMj2sV40TRQksuLqdyoEUZOrZ4YgskSrGgA2/nhb9IFL78IFLLm5ChkY8qJxOI
-	 XvSk9ecB7rzX1Id68w7pVTn+QD7K44RzxoL0JXDRTA8j3sh2U4yTDlfwo97LvPAH00
-	 RUnsGssWWAdudZuWTwU1hLYa0ovrTsWm97cFrfjCEL0C5VQBb75ldMMm5wnopS8rdo
-	 ma5otrvqzXBMC9YyKDYNnhopzPnGbtq133bDGxB7c+u2v5Gw+ZIgVNda5UvccMxt+p
-	 Sq/U+bn87cRzw==
-Date: Mon, 23 Oct 2023 18:14:20 +0100
-From: Will Deacon <will@kernel.org>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, bpf@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-mm@kvack.org, linux-modules@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
-	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v3 04/13] mm/execmem, arch: convert remaining overrides
- of module_alloc to execmem
-Message-ID: <20231023171420.GA4041@willie-the-truck>
-References: <20230918072955.2507221-1-rppt@kernel.org>
- <20230918072955.2507221-5-rppt@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD311EA73;
+	Mon, 23 Oct 2023 17:19:13 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02C92EE;
+	Mon, 23 Oct 2023 10:19:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=Xvdm2nlWUsjr8Nk0q5x2uduxl+Asd3Qw4JFB76l2a2s=; b=E0uIgfeuP989sKTiMQ2OERyWYW
+	FOLKozUw/ulgcoOtR88leGUYPBynEeYCZxaOIqx+v3ekn6CC4H3jE0Ii8OKNbxL6QkwGlVRDhsoX/
+	I/UpcPKuT4p2e3MFEaMbYnFAtBeWIsGa8XwBCmqp3TctcMSYtUX0T8unUiVtwBJWuw+LXnPZ0OKvh
+	arfvbugoH69rejYDnLeADGeEgSriQQdZFXgXVuTHUklOhRudIiB2wXfElPVFxiHRBbKgMB1liaiVy
+	FrNh7blEu4I10aN16bueRqmo9Ja3k2H+et85Ib2sm1rT6Nyd7vgPH3xHN92vYkiZhiyuX2d1BEG1w
+	pJYMZKsw==;
+Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1quyZx-000PQZ-0F; Mon, 23 Oct 2023 19:19:01 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	martin.lau@linux.dev,
+	razor@blackwall.org,
+	ast@kernel.org,
+	andrii@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@google.com,
+	toke@kernel.org,
+	kuba@kernel.org,
+	andrew@lunn.ch,
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: [PATCH bpf-next v3 0/7] Add bpf programmable net device
+Date: Mon, 23 Oct 2023 19:18:49 +0200
+Message-Id: <20231023171856.18324-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230918072955.2507221-5-rppt@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27070/Mon Oct 23 09:53:01 2023)
 
-Hi Mike,
+This work adds a BPF programmable device which can operate in L3 or L2
+mode where the BPF program is part of the xmit routine. It's program
+management is done via bpf_mprog and it comes with BPF link support.
+For details see patch 1 and following. Thanks!
 
-On Mon, Sep 18, 2023 at 10:29:46AM +0300, Mike Rapoport wrote:
-> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
-> 
-> Extend execmem parameters to accommodate more complex overrides of
-> module_alloc() by architectures.
-> 
-> This includes specification of a fallback range required by arm, arm64
-> and powerpc and support for allocation of KASAN shadow required by
-> arm64, s390 and x86.
-> 
-> The core implementation of execmem_alloc() takes care of suppressing
-> warnings when the initial allocation fails but there is a fallback range
-> defined.
-> 
-> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
-> ---
->  arch/arm/kernel/module.c     | 38 ++++++++++++---------
->  arch/arm64/kernel/module.c   | 57 ++++++++++++++------------------
->  arch/powerpc/kernel/module.c | 52 ++++++++++++++---------------
->  arch/s390/kernel/module.c    | 52 +++++++++++------------------
->  arch/x86/kernel/module.c     | 64 +++++++++++-------------------------
->  include/linux/execmem.h      | 14 ++++++++
->  mm/execmem.c                 | 43 ++++++++++++++++++++++--
->  7 files changed, 167 insertions(+), 153 deletions(-)
+v2 -> v3:
+  - Remove setting dev->min_mtu to ETH_MIN_MTU (Andrew)
+  - Do not populate ethtool info->version (Andrew)
+  - Populate netdev private data before register_netdevice (Andrew)
+  - Use strscpy for ifname template (Jakub)
+  - Use GFP_KERNEL_ACCOUNT for link kzalloc (Jakub)
+  - Carry and dump link attach type for bpftool (Toke)
+v1 -> v2:
+  - Rename from meta (Toke, Andrii, Alexei)
+  - Reuse skb_scrub_packet (Stan)
+  - Remove IFF_META and use netdev_ops (Toke)
+  - Add comment to multicast handler (Toke)
+  - Remove silly version info (Toke)
+  - Fix attach_type_name (Quentin)
+  - Rework libbpf link attach api to be similar
+    as tcx (Andrii)
+  - Move flags last for bpf_netkit_opts (Andrii)
+  - Rebased to bpf_mprog query api changes
+  - Folded link support patch into main one
 
-[...]
+Daniel Borkmann (7):
+  netkit, bpf: Add bpf programmable net device
+  tools: Sync if_link uapi header
+  libbpf: Add link-based API for netkit
+  bpftool: Implement link show support for netkit
+  bpftool: Extend net dump with netkit progs
+  selftests/bpf: Add netlink helper library
+  selftests/bpf: Add selftests for netkit
 
-> diff --git a/arch/arm64/kernel/module.c b/arch/arm64/kernel/module.c
-> index dd851297596e..cd6320de1c54 100644
-> --- a/arch/arm64/kernel/module.c
-> +++ b/arch/arm64/kernel/module.c
-> @@ -20,6 +20,7 @@
->  #include <linux/random.h>
->  #include <linux/scs.h>
->  #include <linux/vmalloc.h>
-> +#include <linux/execmem.h>
->  
->  #include <asm/alternative.h>
->  #include <asm/insn.h>
-> @@ -108,46 +109,38 @@ static int __init module_init_limits(void)
->  
->  	return 0;
->  }
-> -subsys_initcall(module_init_limits);
->  
-> -void *module_alloc(unsigned long size)
-> +static struct execmem_params execmem_params __ro_after_init = {
-> +	.ranges = {
-> +		[EXECMEM_DEFAULT] = {
-> +			.flags = EXECMEM_KASAN_SHADOW,
-> +			.alignment = MODULE_ALIGN,
-> +		},
-> +	},
-> +};
-> +
-> +struct execmem_params __init *execmem_arch_params(void)
->  {
-> -	void *p = NULL;
-> +	struct execmem_range *r = &execmem_params.ranges[EXECMEM_DEFAULT];
->  
-> -	/*
-> -	 * Where possible, prefer to allocate within direct branch range of the
-> -	 * kernel such that no PLTs are necessary.
-> -	 */
+ MAINTAINERS                                   |   9 +
+ drivers/net/Kconfig                           |   9 +
+ drivers/net/Makefile                          |   1 +
+ drivers/net/netkit.c                          | 934 ++++++++++++++++++
+ include/net/netkit.h                          |  38 +
+ include/uapi/linux/bpf.h                      |  14 +
+ include/uapi/linux/if_link.h                  |  24 +
+ kernel/bpf/syscall.c                          |  30 +-
+ .../bpf/bpftool/Documentation/bpftool-net.rst |   8 +-
+ tools/bpf/bpftool/link.c                      |   9 +
+ tools/bpf/bpftool/net.c                       |   7 +-
+ tools/include/uapi/linux/bpf.h                |  14 +
+ tools/include/uapi/linux/if_link.h            | 141 +++
+ tools/lib/bpf/bpf.c                           |  16 +
+ tools/lib/bpf/bpf.h                           |   5 +
+ tools/lib/bpf/libbpf.c                        |  39 +
+ tools/lib/bpf/libbpf.h                        |  15 +
+ tools/lib/bpf/libbpf.map                      |   1 +
+ tools/testing/selftests/bpf/Makefile          |  19 +-
+ tools/testing/selftests/bpf/config            |   1 +
+ tools/testing/selftests/bpf/netlink_helpers.c | 358 +++++++
+ tools/testing/selftests/bpf/netlink_helpers.h |  46 +
+ .../selftests/bpf/prog_tests/tc_helpers.h     |   4 +
+ .../selftests/bpf/prog_tests/tc_netkit.c      | 687 +++++++++++++
+ .../selftests/bpf/progs/test_tc_link.c        |  13 +
+ 25 files changed, 2427 insertions(+), 15 deletions(-)
+ create mode 100644 drivers/net/netkit.c
+ create mode 100644 include/net/netkit.h
+ create mode 100644 tools/testing/selftests/bpf/netlink_helpers.c
+ create mode 100644 tools/testing/selftests/bpf/netlink_helpers.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_netkit.c
 
-Why are you removing this comment? I think you could just move it next
-to the part where we set a 128MiB range.
+-- 
+2.34.1
 
-> -	if (module_direct_base) {
-> -		p = __vmalloc_node_range(size, MODULE_ALIGN,
-> -					 module_direct_base,
-> -					 module_direct_base + SZ_128M,
-> -					 GFP_KERNEL | __GFP_NOWARN,
-> -					 PAGE_KERNEL, 0, NUMA_NO_NODE,
-> -					 __builtin_return_address(0));
-> -	}
-> +	module_init_limits();
-
-Hmm, this used to be run from subsys_initcall(), but now you're running
-it _really_ early, before random_init(), so randomization of the module
-space is no longer going to be very random if we don't have early entropy
-from the firmware or the CPU, which is likely to be the case on most SoCs.
-
->  
-> -	if (!p && module_plt_base) {
-> -		p = __vmalloc_node_range(size, MODULE_ALIGN,
-> -					 module_plt_base,
-> -					 module_plt_base + SZ_2G,
-> -					 GFP_KERNEL | __GFP_NOWARN,
-> -					 PAGE_KERNEL, 0, NUMA_NO_NODE,
-> -					 __builtin_return_address(0));
-> -	}
-> +	r->pgprot = PAGE_KERNEL;
->  
-> -	if (!p) {
-> -		pr_warn_ratelimited("%s: unable to allocate memory\n",
-> -				    __func__);
-> -	}
-> +	if (module_direct_base) {
-> +		r->start = module_direct_base;
-> +		r->end = module_direct_base + SZ_128M;
->  
-> -	if (p && (kasan_alloc_module_shadow(p, size, GFP_KERNEL) < 0)) {
-> -		vfree(p);
-> -		return NULL;
-> +		if (module_plt_base) {
-> +			r->fallback_start = module_plt_base;
-> +			r->fallback_end = module_plt_base + SZ_2G;
-> +		}
-> +	} else if (module_plt_base) {
-> +		r->start = module_plt_base;
-> +		r->end = module_plt_base + SZ_2G;
->  	}
->  
-> -	/* Memory is intended to be executable, reset the pointer tag. */
-> -	return kasan_reset_tag(p);
-> +	return &execmem_params;
->  }
->  
->  enum aarch64_reloc_op {
-
-[...]
-
-> diff --git a/include/linux/execmem.h b/include/linux/execmem.h
-> index 44e213625053..806ad1a0088d 100644
-> --- a/include/linux/execmem.h
-> +++ b/include/linux/execmem.h
-> @@ -32,19 +32,33 @@ enum execmem_type {
->  	EXECMEM_TYPE_MAX,
->  };
->  
-> +/**
-> + * enum execmem_module_flags - options for executable memory allocations
-> + * @EXECMEM_KASAN_SHADOW:	allocate kasan shadow
-> + */
-> +enum execmem_range_flags {
-> +	EXECMEM_KASAN_SHADOW	= (1 << 0),
-> +};
-> +
->  /**
->   * struct execmem_range - definition of a memory range suitable for code and
->   *			  related data allocations
->   * @start:	address space start
->   * @end:	address space end (inclusive)
-> + * @fallback_start:	start of the range for fallback allocations
-> + * @fallback_end:	end of the range for fallback allocations (inclusive)
->   * @pgprot:	permissions for memory in this address space
->   * @alignment:	alignment required for text allocations
-> + * @flags:	options for memory allocations for this range
->   */
->  struct execmem_range {
->  	unsigned long   start;
->  	unsigned long   end;
-> +	unsigned long   fallback_start;
-> +	unsigned long   fallback_end;
->  	pgprot_t        pgprot;
->  	unsigned int	alignment;
-> +	enum execmem_range_flags flags;
->  };
->  
->  /**
-> diff --git a/mm/execmem.c b/mm/execmem.c
-> index f25a5e064886..a8c2f44d0133 100644
-> --- a/mm/execmem.c
-> +++ b/mm/execmem.c
-> @@ -11,12 +11,46 @@ static void *execmem_alloc(size_t size, struct execmem_range *range)
->  {
->  	unsigned long start = range->start;
->  	unsigned long end = range->end;
-> +	unsigned long fallback_start = range->fallback_start;
-> +	unsigned long fallback_end = range->fallback_end;
->  	unsigned int align = range->alignment;
->  	pgprot_t pgprot = range->pgprot;
-> +	bool kasan = range->flags & EXECMEM_KASAN_SHADOW;
-> +	unsigned long vm_flags  = VM_FLUSH_RESET_PERMS;
-> +	bool fallback  = !!fallback_start;
-> +	gfp_t gfp_flags = GFP_KERNEL;
-> +	void *p;
->  
-> -	return __vmalloc_node_range(size, align, start, end,
-> -				   GFP_KERNEL, pgprot, VM_FLUSH_RESET_PERMS,
-> -				   NUMA_NO_NODE, __builtin_return_address(0));
-> +	if (PAGE_ALIGN(size) > (end - start))
-> +		return NULL;
-> +
-> +	if (kasan)
-> +		vm_flags |= VM_DEFER_KMEMLEAK;
-
-Hmm, I don't think we passed this before on arm64, should we have done?
-
-Will
 
