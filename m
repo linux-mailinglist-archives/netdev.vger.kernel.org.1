@@ -1,156 +1,168 @@
-Return-Path: <netdev+bounces-43579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE6B7D3EFF
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:19:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E577D3F09
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E89B62812E1
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:19:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6C37B20C2F
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5545621370;
-	Mon, 23 Oct 2023 18:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335BF21366;
+	Mon, 23 Oct 2023 18:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NyvvKiLG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LK8vNysg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D9A1BDC6
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:19:22 +0000 (UTC)
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B3B18F
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:19:20 -0700 (PDT)
-Received: by mail-oo1-xc35.google.com with SMTP id 006d021491bc7-581b6b93bd1so2160615eaf.1
-        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:19:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDB91DA32
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:21:24 +0000 (UTC)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 279E58F;
+	Mon, 23 Oct 2023 11:21:22 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-27d129e2e7cso2586386a91.3;
+        Mon, 23 Oct 2023 11:21:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1698085160; x=1698689960; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5yhnxnJ0EZnskjvE/QTX7vSmqovRzfbb8ia1T/C3p/w=;
-        b=NyvvKiLGkDipoUL+ktH5jSIOJQ7BjzCz/p4tcrLcYT25HeQx2iZzxeo+EQbcRNJWZv
-         1F5fqWQ507lJTujJPuPYnj2vEX/UsbaSYldUCBKL2+hQypZG6TMGxLtaMmBSTjTRGUQB
-         zRMDjZkMtVck9txkdna0lhf/Ve/EK1PFB6qZQEsZHdEMGujYXNju0BgEBw0CIW/xyZcr
-         KneBTqOvNWPsUW6NuxHMS10GZopv2hyKQMvRN1pc2rblJWY4NMf0K4zyCkLV4wtxSuxb
-         3eL4Iok9kMl917iJ+aMFbjerKOwrf112D5zLT2/Q5q/dxweZYq4WnKZnoTGMNREXDnFA
-         8cOg==
+        d=gmail.com; s=20230601; t=1698085281; x=1698690081; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gPyUiOJZ2q35fZ0XB5Sq4AM4l5aO57NWrIRPv3lvLC8=;
+        b=LK8vNysg+Om0pDW/bw4VXm8L9hugFRAK0WPXIJlzAALNtVG36gfRqFPS819QSXdbAZ
+         n1+00juRzimB9GeE60y3cG8EltMzyc6lJYIrMg5LTTwQBYalP7XBNBkotySPglOYfjFD
+         p+XW6sp+PcvtfXISb/S+5SN7wvzdUI2XxN4XiOGNnQnX9aoR8u+U1x54HlDlEdQCxCpV
+         +9fCHQOSqXBTG4vaBW8Zu6idnEZKXhoKOTA0bpqVMTtScjQZvBag7K/PVeAg1uDj2SnV
+         akN+nljqqY86a4sPP3jFNHr2Y0yHVlkT9Vx2HB3RSVL/qLrbkLvIP3JvuFa45KiyJQ3v
+         fw/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698085160; x=1698689960;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5yhnxnJ0EZnskjvE/QTX7vSmqovRzfbb8ia1T/C3p/w=;
-        b=XP2vCj7nSq5t2KQJ9Q6F9v4fRPHGFCB+HxC50n4EgIl6D4hQmKnZcDVWMrR/gUNvHy
-         +DBb87BxlssSOfk7p8sjH3WlM5tkQKMl9Q47Vhg49gkqK49BDryxyBPVDEipNHNFxsCp
-         LuW1mVpqAi4oaPoK0GeOKsqtXFwzVJCfZHzSwAoQa/taMP1LfIoN2GartGwyGpMBBW6n
-         TZ4bBeeJlGPvlLVKGXMm2t/6FIIcegI5tVXOOHUjyuaDFW59XVaIFAWM9rxxYBurUoXS
-         n3YnLEmLEbcP6HFqIZ0anm4sqLFAalnbpJ0QW//M84nHgxfw9CNugMDXRFt+2V2osIjK
-         vGzw==
-X-Gm-Message-State: AOJu0Yw6M/UAQJ//gdUVEfZYzrCvMMpGpXuNjB7fG0OIHCh8nbV9hf3e
-	Ms+viuI1sD4Xz8hCHbDXX0neYA==
-X-Google-Smtp-Source: AGHT+IGdDXmlG8NU9SWCpEcJVTGZGo8oiVXha6x2olGHUS9he9wLHOzuwKgBBQJwmlQ8KyiRplOMwA==
-X-Received: by 2002:a4a:e782:0:b0:56e:466c:7393 with SMTP id x2-20020a4ae782000000b0056e466c7393mr9638941oov.5.1698085159795;
-        Mon, 23 Oct 2023 11:19:19 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
-        by smtp.gmail.com with ESMTPSA id y22-20020a4ade16000000b0057b38a94f38sm1591165oot.12.2023.10.23.11.19.19
+        d=1e100.net; s=20230601; t=1698085281; x=1698690081;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gPyUiOJZ2q35fZ0XB5Sq4AM4l5aO57NWrIRPv3lvLC8=;
+        b=FoKsQyzSys350ul5dGk43JlnC8nXvqDPPCKWMxOY2lISNM7p9i+gdD0l6DeV/C8zl0
+         u9pYdZygFuhIK41p1oGApobQL5twt77UdtfKHZFLyZUH8VCtL/7j5RaMMYMlE/rw/7gP
+         cVslOyf6vDbO2lD6LWLpMgwXZ71GspgXVKvnsKFCIrh8Puhgr+Shk7t4gI8PHUzU8zoG
+         v4XVPMeSlkR8I1R3Gz1y3OOCN5zdGeW6/P/7+qMx7J9sIOFYVpBmVsjJKR/5vHD7CF4T
+         Stqs7183674OyPhe7QKU6MZLDghmmipkzwwJ1vin0Pl3q2wnDDds7xIHcEJEKkFsrVUV
+         P/KA==
+X-Gm-Message-State: AOJu0YwYtRY7KMpCa4EGwb+ZgrSK1hdtYsa+2+QmZSXTfuuOGDhpCG0S
+	SJBs4NBd3i7wq0bnNDgxg1Q=
+X-Google-Smtp-Source: AGHT+IFoEt17HWYkQBkTd5gf+xEa9oBMi7JNVrUhDIs1qlYCY9vg1nZrhP6wnLF58WJSYTYycXydBQ==
+X-Received: by 2002:a17:90a:fa8f:b0:268:2658:3b01 with SMTP id cu15-20020a17090afa8f00b0026826583b01mr6924882pjb.39.1698085281334;
+        Mon, 23 Oct 2023 11:21:21 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
+        by smtp.gmail.com with ESMTPSA id d6-20020a170903230600b001c5bcc9d916sm6205360plh.176.2023.10.23.11.21.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 11:19:19 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1quzWI-003jPw-9O;
-	Mon, 23 Oct 2023 15:19:18 -0300
-Date: Mon, 23 Oct 2023 15:19:18 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: sharmaajay@linuxonhyperv.com
-Cc: Long Li <longli@microsoft.com>, Leon Romanovsky <leon@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ajay Sharma <sharmaajay@microsoft.com>
-Subject: Re: [Patch v7 2/5] RDMA/mana_ib: Register Mana IB  device with
- Management SW
-Message-ID: <20231023181918.GJ691768@ziepe.ca>
-References: <1697494322-26814-1-git-send-email-sharmaajay@linuxonhyperv.com>
- <1697494322-26814-3-git-send-email-sharmaajay@linuxonhyperv.com>
+        Mon, 23 Oct 2023 11:21:20 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2023-10-23
+Date: Mon, 23 Oct 2023 11:21:19 -0700
+Message-ID: <20231023182119.3629194-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1697494322-26814-3-git-send-email-sharmaajay@linuxonhyperv.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 16, 2023 at 03:11:59PM -0700, sharmaajay@linuxonhyperv.com wrote:
+The following changes since commit d6e48462e88fe7efc78b455ecde5b0ca43ec50b7:
 
-> diff --git a/drivers/infiniband/hw/mana/device.c b/drivers/infiniband/hw/mana/device.c
-> index 083f27246ba8..ea4c8c8fc10d 100644
-> --- a/drivers/infiniband/hw/mana/device.c
-> +++ b/drivers/infiniband/hw/mana/device.c
-> @@ -78,22 +78,34 @@ static int mana_ib_probe(struct auxiliary_device *adev,
->  	mib_dev->ib_dev.num_comp_vectors = 1;
->  	mib_dev->ib_dev.dev.parent = mdev->gdma_context->dev;
->  
-> -	ret = ib_register_device(&mib_dev->ib_dev, "mana_%d",
-> -				 mdev->gdma_context->dev);
-> +	ret = mana_gd_register_device(&mib_dev->gc->mana_ib);
->  	if (ret) {
-> -		ib_dealloc_device(&mib_dev->ib_dev);
-> -		return ret;
-> +		ibdev_err(&mib_dev->ib_dev, "Failed to register device, ret %d",
-> +			  ret);
-> +		goto free_ib_device;
->  	}
->  
-> +	ret = ib_register_device(&mib_dev->ib_dev, "mana_%d",
-> +				 mdev->gdma_context->dev);
-> +	if (ret)
-> +		goto deregister_device;
-> +
->  	dev_set_drvdata(&adev->dev, mib_dev);
->  
->  	return 0;
-> +
-> +deregister_device:
-> +	mana_gd_deregister_device(&mib_dev->gc->mana_ib);
-> +free_ib_device:
-> +	ib_dealloc_device(&mib_dev->ib_dev);
-> +	return ret;
->  }
->  
->  static void mana_ib_remove(struct auxiliary_device *adev)
->  {
->  	struct mana_ib_dev *mib_dev = dev_get_drvdata(&adev->dev);
->  
-> +	mana_gd_deregister_device(&mib_dev->gc->mana_ib);
->  	ib_unregister_device(&mib_dev->ib_dev);
->  	ib_dealloc_device(&mib_dev->ib_dev);
->  }
+  net: mdio: xgene: Fix unused xgene_mdio_of_match warning for !CONFIG_OF (2023-10-23 10:16:47 -0700)
 
-That's definitely in the wrong order
+are available in the Git repository at:
 
-Are you shure these things should just be part of
-ops->enable_driver/dealloc_driver?
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-10-23
 
-> diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
-> index 189e774cdab6..2c4e3c496644 100644
-> --- a/drivers/infiniband/hw/mana/main.c
-> +++ b/drivers/infiniband/hw/mana/main.c
-> @@ -8,7 +8,7 @@
->  void mana_ib_uncfg_vport(struct mana_ib_dev *mib_dev, struct mana_ib_pd *pd,
->  			 u32 port)
->  {
-> -	struct gdma_dev *gd = mib_dev->gdma_dev;
-> +	struct gdma_dev *gd = &mib_dev->gc->mana;
+for you to fetch changes up to 530886897c789cf77c9a0d4a7cc5549f0768b5f8:
 
-What is this stuff doing in this patch? Make another patch if you want
-to remove gdma_dev
+  Bluetooth: hci_sync: Fix Opcode prints in bt_dev_dbg/err (2023-10-23 11:05:32 -0700)
 
-Jason
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
+
+ - Add 0bda:b85b for Fn-Link RTL8852BE
+ - ISO: Many fixes for broadcast support
+ - Mark bcm4378/bcm4387 as BROKEN_LE_CODED
+ - Add support ITTIM PE50-M75C
+ - Add RTW8852BE device 13d3:3570
+ - Add support for QCA2066
+ - Add support for Intel Misty Peak - 8087:0038
+
+----------------------------------------------------------------
+Claudia Draghicescu (1):
+      Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID
+
+Dan Carpenter (1):
+      Bluetooth: msft: __hci_cmd_sync() doesn't return NULL
+
+Guan Wentao (1):
+      Bluetooth: btusb: Add 0bda:b85b for Fn-Link RTL8852BE
+
+Iulia Tanasescu (5):
+      Bluetooth: ISO: Fix BIS cleanup
+      Bluetooth: ISO: Pass BIG encryption info through QoS
+      Bluetooth: ISO: Allow binding a bcast listener to 0 bises
+      Bluetooth: ISO: Match QoS adv handle with BIG handle
+      Bluetooth: ISO: Fix bcast listener cleanup
+
+Janne Grunau (1):
+      Bluetooth: hci_bcm4377: Mark bcm4378/bcm4387 as BROKEN_LE_CODED
+
+Jingyang Wang (1):
+      Bluetooth: Add support ITTIM PE50-M75C
+
+Marcel Ziswiler (1):
+      Bluetooth: hci_sync: Fix Opcode prints in bt_dev_dbg/err
+
+Masum Reza (1):
+      Bluetooth: btusb: Add RTW8852BE device 13d3:3570 to device tables
+
+Tim Jiang (1):
+      Bluetooth: qca: add support for QCA2066
+
+Vijay Satija (1):
+      Bluetooth: Add support for Intel Misty Peak - 8087:0038
+
+Vlad Pruteanu (1):
+      Bluetooth: ISO: Set CIS bit only for devices with CIS support
+
+ZhengHan Wang (1):
+      Bluetooth: Fix double free in hci_conn_cleanup
+
+Zhengping Jiang (1):
+      Bluetooth: btmtksdio: enable bluetooth wakeup in system suspend
+
+Ziyang Xuan (1):
+      Bluetooth: Make handle of hci_conn be unique
+
+youwan Wang (1):
+      Bluetooth: btusb: Add date->evt_skb is NULL check
+
+ drivers/bluetooth/btmtksdio.c    |  44 ++++++++++++--
+ drivers/bluetooth/btqca.c        |  68 ++++++++++++++++++++++
+ drivers/bluetooth/btqca.h        |   5 +-
+ drivers/bluetooth/btusb.c        |  11 ++++
+ drivers/bluetooth/hci_bcm4377.c  |   5 ++
+ drivers/bluetooth/hci_qca.c      |  11 ++++
+ include/net/bluetooth/hci.h      |   3 +
+ include/net/bluetooth/hci_core.h |  40 ++++++++++---
+ include/net/bluetooth/hci_sync.h |   2 +
+ net/bluetooth/amp.c              |   3 +-
+ net/bluetooth/hci_conn.c         | 123 +++++++++++++++++++++++++++------------
+ net/bluetooth/hci_core.c         |   3 +
+ net/bluetooth/hci_event.c        |  92 ++++++++++++++++-------------
+ net/bluetooth/hci_sync.c         |  36 +++++-------
+ net/bluetooth/hci_sysfs.c        |  23 ++++----
+ net/bluetooth/iso.c              |  38 ++++++++----
+ net/bluetooth/msft.c             |  20 +++----
+ 17 files changed, 375 insertions(+), 152 deletions(-)
 
