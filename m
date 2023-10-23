@@ -1,401 +1,323 @@
-Return-Path: <netdev+bounces-43431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 716EE7D2FC5
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:25:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D19977D2FDD
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB36BB20CE9
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 10:25:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED2B01C2088D
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 10:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F2C1429B;
-	Mon, 23 Oct 2023 10:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6754B13AC9;
+	Mon, 23 Oct 2023 10:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AN/PrI38"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mTTUA0Rp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B05F14A81;
-	Mon, 23 Oct 2023 10:25:13 +0000 (UTC)
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E7F2DB;
-	Mon, 23 Oct 2023 03:25:10 -0700 (PDT)
-Received: by mail-qt1-x831.google.com with SMTP id d75a77b69052e-41cd4450c79so3865651cf.0;
-        Mon, 23 Oct 2023 03:25:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698056709; x=1698661509; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wVH4K1NnGARKSXYIw4n1F4TDwvMMZ5jkOdUPeFeVWpg=;
-        b=AN/PrI38wFS9BqXRCHrBMKJ31G/BFuxOBT12wBeo9yPek2pY4qJdDBjRs04j7Q5uLp
-         7g+Td6SsA/9XT0OG5+UtkKlbCcT+/1Z0Ay8liuTIAGxcgaVYFdv7lcLZvjNMpASDIeMy
-         OqGawwrluaHts7SAEgZqUtJGLxKANqsySDWvIijAyROsmPpk8+3in22B1Q/XQBmThhDR
-         Pj8SDwjJTXgAVu568Nz94/aqT0/2YzauaUUiJ1yCXrvDRYAqFWUwC8fzETi894BcQ1d1
-         lRCGRQKbVJomGdd9+vo9Wlbl1QXdQq6RJThXZNuee1kbnfCHQ9sz7i/hzxzflmBIA4bw
-         Jm6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698056709; x=1698661509;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wVH4K1NnGARKSXYIw4n1F4TDwvMMZ5jkOdUPeFeVWpg=;
-        b=f6hDWkYLRm2tmDe1ZQrUHvhXHJVeyPTRv+NPSZI1rHuKdRff+TUxdpyNy4toQV7yy2
-         l+LYy2oKQfKHTxLtCaur2sHVIbBe4yQJehJAPHtgDsgtuq3yTBn6Btm+4ard2qFQlutd
-         sIKDylj5vicVQhI3fb7El+Uy5VZgFHC70i7L5kMYEj3TM4Rpm8iZFcC9CHv0V3sO+IWc
-         A5WLizXWBPEMgpYhsrc3qKFiCyLDnE5W0ybS2egf1ReLC/7mAHKN3nCb3a4vnNGJ6gRm
-         tHfUz4dKr6sKCqJkevrqgs4FrxUP+gSpUJpC/lDuZTRN7gH0u6gaEt9mrXUowmNk9s48
-         5E4Q==
-X-Gm-Message-State: AOJu0YxMOq9RRvrqQ7yaofxl/6H50/qdlxahgzZ+cxGvX9TOwpA0HTjg
-	WL8fdSJ6Rr+xZxGkkkuoWewRnyTE20dCJYOLWYM=
-X-Google-Smtp-Source: AGHT+IFvcwEZ020RUmWYKhdHB7LQjDBBag+UV3TQuEWrDX07Iosm3sZlfkSkS1/IX2i9wcYAq9aJ0TKHHMV0S8U6ZmA=
-X-Received: by 2002:a05:6214:21ec:b0:66a:d2c1:992d with SMTP id
- p12-20020a05621421ec00b0066ad2c1992dmr8938026qvj.0.1698056709348; Mon, 23 Oct
- 2023 03:25:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF056FA5
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 10:28:28 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6E6D79;
+	Mon, 23 Oct 2023 03:28:25 -0700 (PDT)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39NAHJJv026438;
+	Mon, 23 Oct 2023 10:28:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=fpYWhfGZJIbxbu2Kjyhz4Grm6wytg0wX8wN0sqL73QY=;
+ b=mTTUA0RpHrzv0BcXz40Aj4SGdIiefSkw1sByoNBSkhn7ZVEYRJeBWDgzPt/F5CtG3x8A
+ 705TkKKdPrk4WHfol9zDz7OHiiyVmvzCOoB/nf06fKIu7ujPBsoPscx58lzFnNCvpUBb
+ 1HCX+j86K3nSg0XTiC09lcfyWK/hOuq8reTOKaYqJAdcNMPaaaIY08QzFdrJenSsXwDG
+ lIzsezP6EcjcH7MnCMEB+E69MmYO+XIGBjQMKUw7GIArWxVg5fgdzq1gdOkuKl+smzxd
+ jiGFpBabak13w9djR0ZBprlg7u8c/py8mFH9oEkMEdT6WiCnNhpPF5KsWSo+RurBlsiG eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3twpxpgavy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Oct 2023 10:28:22 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39NAI2GB029798;
+	Mon, 23 Oct 2023 10:28:21 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3twpxpgavf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Oct 2023 10:28:21 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39N94VaA023834;
+	Mon, 23 Oct 2023 10:28:20 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tvrysr97a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Oct 2023 10:28:20 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39NASJl420775632
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 23 Oct 2023 10:28:19 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3376F58051;
+	Mon, 23 Oct 2023 10:28:19 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A6BD458065;
+	Mon, 23 Oct 2023 10:28:17 +0000 (GMT)
+Received: from [9.171.5.241] (unknown [9.171.5.241])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 23 Oct 2023 10:28:17 +0000 (GMT)
+Message-ID: <ea0dcf7d-8406-476c-b027-145af207873a@linux.ibm.com>
+Date: Mon, 23 Oct 2023 12:28:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016031649.35088-1-huangjie.albert@bytedance.com>
- <CAJ8uoz2DUe3xySTKuLbA5=QDAGuTzPdGu3P_=ZvJmna25VtHCQ@mail.gmail.com>
- <CABKxMyONtPR1pWLdBiK5M-NJoc5S6rpyYYUQWa0J2R+eyajOsg@mail.gmail.com>
- <CAJ8uoz3Vq1aHzB6Ew-yCQF8On9EP_9BSB4rOvqEgMXeA5=wZgw@mail.gmail.com> <CABKxMyNy-jOqEuQYCLrOUu1r3M-dJp+RD-KDsXbytXtwJqO4hg@mail.gmail.com>
-In-Reply-To: <CABKxMyNy-jOqEuQYCLrOUu1r3M-dJp+RD-KDsXbytXtwJqO4hg@mail.gmail.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Mon, 23 Oct 2023 12:24:58 +0200
-Message-ID: <CAJ8uoz0MfVw2gZFuJJec51_8qaN0SS4gHStorivVpCprG2LY-w@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] xsk: Avoid starving xsk at the end of the list
-To: =?UTF-8?B?6buE5p2w?= <huangjie.albert@bytedance.com>
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
-	"open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 5/5] net/smc: put sk reference if close work was
+ canceled
+Content-Language: en-GB
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
+ <1697009600-22367-6-git-send-email-alibuda@linux.alibaba.com>
+ <bdcb307f-d2a8-4aef-bb7d-dd87e56ff740@linux.ibm.com>
+ <ee641ca5-104b-d1ec-5b2a-e20237c5378a@linux.alibaba.com>
+ <ad5e4191-227e-4a62-a110-472618ef7de1@linux.ibm.com>
+ <305c7ae2-a902-3e30-5e67-b590d848d0ba@linux.alibaba.com>
+ <990a6b09-135a-41fb-a375-c37ffec6fe99@linux.ibm.com>
+ <94f89147-cedc-b8b2-415f-942ec14cd670@linux.alibaba.com>
+ <83476aac-a2f6-4705-8aec-762b1f165210@linux.ibm.com>
+ <567c792e-33e0-9ff6-f5c2-0eae356c7eb1@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <567c792e-33e0-9ff6-f5c2-0eae356c7eb1@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -uvqdCW3UUCvUE7dzYuhwZhSmIGZhtob
+X-Proofpoint-ORIG-GUID: TooYV33VuxTfBE8kYI2MVLcst3Esjq1A
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-23_09,2023-10-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ malwarescore=0 clxscore=1015 impostorscore=0 mlxlogscore=999
+ lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0 priorityscore=1501
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310170001 definitions=main-2310230090
 
-On Mon, 23 Oct 2023 at 11:37, =E9=BB=84=E6=9D=B0 <huangjie.albert@bytedance=
-.com> wrote:
->
-> Magnus Karlsson <magnus.karlsson@gmail.com> =E4=BA=8E2023=E5=B9=B410=E6=
-=9C=8819=E6=97=A5=E5=91=A8=E5=9B=9B 17:13=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > On Thu, 19 Oct 2023 at 10:41, =E9=BB=84=E6=9D=B0 <huangjie.albert@byted=
-ance.com> wrote:
-> > >
-> > > Magnus Karlsson <magnus.karlsson@gmail.com> =E4=BA=8E2023=E5=B9=B410=
-=E6=9C=8816=E6=97=A5=E5=91=A8=E4=B8=80 14:41=E5=86=99=E9=81=93=EF=BC=9A
-> > > >
-> > > > On Mon, 16 Oct 2023 at 05:17, Albert Huang
-> > > > <huangjie.albert@bytedance.com> wrote:
-> > > > >
-> > > > > In the previous implementation, when multiple xsk sockets were
-> > > > > associated with a single xsk_buff_pool, a situation could arise
-> > > > > where the xsk_tx_list maintained data at the front for one xsk
-> > > > > socket while starving the xsk sockets at the back of the list.
-> > > > > This could result in issues such as the inability to transmit pac=
-kets,
-> > > > > increased latency, and jitter. To address this problem, we introd=
-uced
-> > > > > a new variable called tx_budget_cache, which limits each xsk to t=
-ransmit
-> > > > > a maximum of MAX_XSK_TX_BUDGET tx descriptors. This allocation en=
-sures
-> > > > > equitable opportunities for subsequent xsk sockets to send tx des=
-criptors.
-> > > > > The value of MAX_XSK_TX_BUDGET is temporarily set to 16.
-> > > >
-> > > > Hi Albert. Yes you are correct that there is nothing hindering this=
- to
-> > > > happen in the code at the moment, so let us fix it.
-> > > >
-> > > > > Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
-> > > > > ---
-> > > > >  include/net/xdp_sock.h |  6 ++++++
-> > > > >  net/xdp/xsk.c          | 18 ++++++++++++++++++
-> > > > >  2 files changed, 24 insertions(+)
-> > > > >
-> > > > > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-> > > > > index 69b472604b86..f617ff54e38c 100644
-> > > > > --- a/include/net/xdp_sock.h
-> > > > > +++ b/include/net/xdp_sock.h
-> > > > > @@ -44,6 +44,7 @@ struct xsk_map {
-> > > > >         struct xdp_sock __rcu *xsk_map[];
-> > > > >  };
-> > > > >
-> > > > > +#define MAX_XSK_TX_BUDGET 16
-> > > >
-> > > > I think something like MAX_PER_SOCKET_BUDGET would be clearer.
-> > > >
-> > > > >  struct xdp_sock {
-> > > > >         /* struct sock must be the first member of struct xdp_soc=
-k */
-> > > > >         struct sock sk;
-> > > > > @@ -63,6 +64,11 @@ struct xdp_sock {
-> > > > >
-> > > > >         struct xsk_queue *tx ____cacheline_aligned_in_smp;
-> > > > >         struct list_head tx_list;
-> > > > > +       /* Record the actual number of times xsk has transmitted =
-a tx
-> > > > > +        * descriptor, with a maximum limit not exceeding MAX_XSK=
-_TX_BUDGET
-> > > > > +        */
-> > > > > +       u32 tx_budget_cache;
-> > > > > +
-> > > > >         /* Protects generic receive. */
-> > > > >         spinlock_t rx_lock;
-> > > > >
-> > > > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > > > > index f5e96e0d6e01..087f2675333c 100644
-> > > > > --- a/net/xdp/xsk.c
-> > > > > +++ b/net/xdp/xsk.c
-> > > > > @@ -413,16 +413,25 @@ EXPORT_SYMBOL(xsk_tx_release);
-> > > > >
-> > > > >  bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_des=
-c *desc)
-> > > > >  {
-> > > > > +       u32 xsk_full_count =3D 0;
-> > > >
-> > > > Enough with a bool;
-> > > >
-> > > > >         struct xdp_sock *xs;
-> > > > >
-> > > > >         rcu_read_lock();
-> > > > > +again:
-> > > > >         list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) =
-{
-> > > > > +               if (xs->tx_budget_cache >=3D MAX_XSK_TX_BUDGET) {
-> > > > > +                       xsk_full_count++;
-> > > > > +                       continue;
-> > > > > +               }
-> > > >
-> > > > The problem here is that the fixed MAX_XSK_TX_BUDGET is only useful
-> > > > for the <=3D 2 socket case. If I have 3 sockets sharing a
-> > > > netdev/queue_id, the two first sockets can still starve the third o=
-ne
-> > > > since the total budget per send is 32. You need to go through the l=
-ist
-> > > > of sockets in the beginning to compute the MAX_XSK_TX_BUDGET to
-> > > > compute this dynamically before each call. Or cache this value
-> > > > somehow, in the pool for example. Actually, the refcount in the
-> > > > buf_pool will tell you how many sockets are sharing the same buf_po=
-ol.
-> > > > Try using that to form MAX_XSK_TX_BUDGET on the fly.
-> > > >
-> > > > Another simpler way of accomplishing this would be to just reorder =
-the
-> > > > list every time. Put the first socket last in the list every time. =
-The
-> > > > drawback of this is that you need to hold the xsk_tx_list_lock whil=
-e
-> > > > doing this so might be slower. The per socket batch size would also=
- be
-> > > > 32 and you would not receive "fairness" over a single call to
-> > > > sendto(). Would that be a problem for you?
-> > > >
-> > >
-> > > Currently, there are two paths in the kernel that consume TX queue de=
-scriptors:
-> > >
-> > > 1=E3=80=81Native XSK
-> > > xsk_tx_peek_desc
-> > >      xskq_cons_peek_desc
-> > >
-> > > In the first scenario, we consume TX descriptors by sequentially
-> > > traversing the pool->xsk_tx_list
-> > > without any implicit code logic to ensure fairness. This can lead to =
-a
-> > > scenario of starvation,
-> > > making it a top priority for us to address.
-> > >
-> > > 2=E3=80=81Generic XSK
-> > > __xsk_sendmsg (or xsk_poll)
-> > >      xsk_generic_xmit
-> > >         __xsk_generic_xmit
-> > >               xskq_cons_peek_desc
-> > >
-> > > In the second scenario, TX descriptors are consumed by using sendto.
-> > > Currently, __xsk_generic_xmit
-> > > sends a maximum of 32 TX descriptors each time, and the process
-> > > scheduling strategy already
-> > > ensures a certain level of fairness. In this scenario, should we
-> > > consider not addressing it and
-> > > instead prioritize the first scenario?
-> >
-> > Agree. The first scenario is the problematic one. One problem we have
-> > to solve there is that the batch size is up to the driver in the
-> > zero-copy case so the xsk core has no idea. Maybe introduce a pointer
-> > that tells us what socket to get packets from first and make sure this
-> > pointer gets updated to the next socket in the list every time the
-> > function is exited? Please make sure that the one socket case is not
-> > hurt.
->
-> The method of "introducing a pointer that tells us which socket to get
-> packets from first" is useful, but it requires us to manage socket
-> additions and removals. This would introduce
-> locking operations.
->
-> So it seems that the following code is simple enough and appears to
-> solve the problem:
->
-> 1.During each iteration, check if the current socket being traversed
-> has exhausted its quota. If it has, skip it and continue iterating
-> through the remaining sockets.
-> 2.If all sockets have been traversed, and no available transmission
-> descriptors (tx desc) have been found, consider whether it's time to
-> start a fresh iteration.
-> 3.The logic for a fresh iteration involves checking if any socket has
-> used up its quota during the traversal. If any socket has reached its
-> quota, set the tx_budget_cache of all sockets to 0 and begin a new
-> iteration of the list.
->
-> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> index f5e96e0d6e01..2cf2822e9d16 100644
-> --- a/net/xdp/xsk.c
-> +++ b/net/xdp/xsk.c
-> @@ -413,16 +413,25 @@ EXPORT_SYMBOL(xsk_tx_release);
->
->  bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
->  {
-> +       bool xsk_cache_full =3D false;
->         struct xdp_sock *xs;
->
->         rcu_read_lock();
-> +again:
->         list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
-> +               if (xs->tx_budget_cache >=3D MAX_PER_SOCKET_BUDGET) {
 
-The problem here is what to set this MAX_PER_SOCKET_BUDGET to? We do
-not want to penalize the one socket per page pool case, so this would
-then have to be very large. But this might not be a problem as all new
-drivers are using the batched interface (since Maciej is forcing
-everyone to use it :-) ), and it will only go this path that you are
-modifying in the multiple sockets per page pool case. So I think it's
-fine. But still, what is a good value? 32 or 64?
 
-> +                       xsk_cache_full =3D true;
-> +                       continue;
-> +               }
-> +
->                 if (!xskq_cons_peek_desc(xs->tx, desc, pool)) {
->                         if (xskq_has_descs(xs->tx))
->                                 xskq_cons_release(xs->tx);
->                         continue;
->                 }
->
-> +               xs->tx_budget_cache++;
-> +
->                 /* This is the backpressure mechanism for the Tx path.
->                  * Reserve space in the completion queue and only proceed
->                  * if there is space in it. This avoids having to impleme=
-nt
-> @@ -436,6 +445,15 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool,
-> struct xdp_desc *desc)
->                 return true;
->         }
->
-> +not_found:
+On 23.10.23 10:52, D. Wythe wrote:
+> 
+> 
+> On 10/23/23 4:19 PM, Wenjia Zhang wrote:
+>>
+>>
+>> On 20.10.23 04:41, D. Wythe wrote:
+>>>
+>>>
+>>> On 10/20/23 1:40 AM, Wenjia Zhang wrote:
+>>>>
+>>>>
+>>>> On 19.10.23 09:33, D. Wythe wrote:
+>>>>>
+>>>>>
+>>>>> On 10/19/23 4:26 AM, Wenjia Zhang wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 17.10.23 04:06, D. Wythe wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 10/13/23 3:04 AM, Wenjia Zhang wrote:
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> On 11.10.23 09:33, D. Wythe wrote:
+>>>>>>>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>>>>>>>>
+>>>>>>>>> Note that we always hold a reference to sock when attempting
+>>>>>>>>> to submit close_work. 
+>>>>>>>> yes
+>>>>>>>> Therefore, if we have successfully
+>>>>>>>>> canceled close_work from pending, we MUST release that reference
+>>>>>>>>> to avoid potential leaks.
+>>>>>>>>>
+>>>>>>>> Isn't the corresponding reference already released inside the 
+>>>>>>>> smc_close_passive_work()?
+>>>>>>>>
+>>>>>>>
+>>>>>>> Hi Wenjia,
+>>>>>>>
+>>>>>>> If we successfully cancel the close work from the pending state,
+>>>>>>> it means that smc_close_passive_work() has never been executed.
+>>>>>>>
+>>>>>>> You can find more details here.
+>>>>>>>
+>>>>>>> /**
+>>>>>>> * cancel_work_sync - cancel a work and wait for it to finish
+>>>>>>> * @work:the work to cancel
+>>>>>>> *
+>>>>>>> * Cancel @work and wait for its execution to finish. This function
+>>>>>>> * can be used even if the work re-queues itself or migrates to
+>>>>>>> * another workqueue. On return from this function, @work is
+>>>>>>> * guaranteed to be not pending or executing on any CPU.
+>>>>>>> *
+>>>>>>> * cancel_work_sync(&delayed_work->work) must not be used for
+>>>>>>> * delayed_work's. Use cancel_delayed_work_sync() instead.
+>>>>>>> *
+>>>>>>> * The caller must ensure that the workqueue on which @work was last
+>>>>>>> * queued can't be destroyed before this function returns.
+>>>>>>> *
+>>>>>>> * Return:
+>>>>>>> * %true if @work was pending, %false otherwise.
+>>>>>>> */
+>>>>>>> boolcancel_work_sync(structwork_struct *work)
+>>>>>>> {
+>>>>>>> return__cancel_work_timer(work, false);
+>>>>>>> }
+>>>>>>>
+>>>>>>> Best wishes,
+>>>>>>> D. Wythe
+>>>>>> As I understand, queue_work() would wake up the work if the work 
+>>>>>> is not already on the queue. And the sock_hold() is just prio to 
+>>>>>> the queue_work(). That means, cancel_work_sync() would cancel the 
+>>>>>> work either before its execution or after. If your fix refers to 
+>>>>>> the former case, at this moment, I don't think the reference can 
+>>>>>> be hold, thus it is unnecessary to put it.
+>>>>>>>
+>>>>>
+>>>>> I am quite confuse about why you think when we cancel the work 
+>>>>> before its execution,
+>>>>> the reference can not be hold ?
+>>>>>
+>>>>>
+>>>>> Perhaps the following diagram can describe the problem in better way :
+>>>>>
+>>>>> smc_close_cancel_work
+>>>>> smc_cdc_msg_recv_action
+>>>>>
+>>>>>
+>>>>> sock_hold
+>>>>> queue_work
+>>>>> if (cancel_work_sync())        // successfully cancel before execution
+>>>>> sock_put()                        //  need to put it since we 
+>>>>> already hold a ref before   queue_work()
+>>>>>
+>>>>>
+>>>> ha, I already thought you might ask such question:P
+>>>>
+>>>> I think here two Problems need to be clarified:
+>>>>
+>>>> 1) Do you think the bh_lock_sock/bh_unlock_sock in the 
+>>>> smc_cdc_msg_recv does not protect the smc_cdc_msg_recv_action() from 
+>>>> cancel_work_sync()?
+>>>> Maybe that would go back to the discussion in the other patch on the 
+>>>> behaviors of the locks.
+>>>>
+>>>
+>>> Yes. bh_lock_sock/bh_unlock_sock can not block code execution 
+>>> protected by lock_sock/unlock(). That is to say, they are not exclusive.
+>>>
+>> No, the logic of the inference is very vague to me. My understand is 
+>> completely different. That is what I read from the kernel code. They 
+>> are not *completely* exclusive, because while the bottom half context 
+>> holds the lock i.e. bh_lock_sock, the process context can not get the 
+>> lock by lock_sock. (This is actually my main point of my argument for 
+>> these fixes, and I didn't see any clarify from you). However, while 
+>> the process context holds the lock by lock_sock, the bottom half 
+>> context can still get it by bh_lock_sock, this is just like what you 
+>> showed in the code in lock_sock. Once it gets the ownership, it 
+>> release the spinlock.
+>>
+> 
+> “ while the process context holds the lock by lock_sock, the bottom half 
+> context can still get it by bh_lock_sock,  ”
+> 
+> You already got that, so why that sock_set_flag(DONE) and 
+> sock_set_flag(DEAD) can not happen concurrently ?
+> 
 
-You are not using this label, but I am probably not seeing all the code her=
-e.
-
-> +       if (xsk_cache_full =3D=3D true) {
-> +               list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) =
-{
-> +                       xs->tx_budget_cache =3D 0;
-> +               }
-> +               xsk_cache_full =3D false;
-> +               goto again;
-> +       }
-> +
->  out:
->         rcu_read_unlock();
->         return false;
->
-> Although this method cannot achieve perfect fairness, it prevents any
-> sockets from starving
-
-That is perfectly fine. We should not aim for perfect fairness since
-that would be prohibitively expensive. If someone wants that, they can
-implement that code on top of this.
-
-Your approach looks good to me. Please produce a patch.
-
-Thanks!
-
-> >
-> > > Additionally, based on my understanding, there should not be
-> > > applications concurrently using generic
-> > > XSK and native XSK on the same pool.
-> >
-> > That is correct.
-> >
-> > > Magnus, how do you view this issue? I'm concerned that striving for
-> > > absolute fairness might introduce
-> > > additional complexity in the logic.
-> >
-> > Is this a problem that you have observed or need to guard against in
-> > an application? If so, let us fix it.
->
-> Currently, we are facing issue 1.
->
-> >
-> > > BR
-> > > Albert
-> > >
-> > >
-> > >
-> > > > > +
-> > > > >                 if (!xskq_cons_peek_desc(xs->tx, desc, pool)) {
-> > > > >                         if (xskq_has_descs(xs->tx))
-> > > > >                                 xskq_cons_release(xs->tx);
-> > > > >                         continue;
-> > > > >                 }
-> > > > >
-> > > > > +               xs->tx_budget_cache++;
-> > > > > +
-> > > > >                 /* This is the backpressure mechanism for the Tx =
-path.
-> > > > >                  * Reserve space in the completion queue and only=
- proceed
-> > > > >                  * if there is space in it. This avoids having to=
- implement
-> > > > > @@ -436,6 +445,14 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *=
-pool, struct xdp_desc *desc)
-> > > > >                 return true;
-> > > > >         }
-> > > > >
-> > > > > +       if (unlikely(xsk_full_count > 0)) {
-> > > > > +               list_for_each_entry_rcu(xs, &pool->xsk_tx_list, t=
-x_list) {
-> > > > > +                       xs->tx_budget_cache =3D 0;
-> > > > > +               }
-> > > > > +               xsk_full_count =3D 0;
-> > > > > +               goto again;
-> > > > > +       }
-> > > > > +
-> > > > >  out:
-> > > > >         rcu_read_unlock();
-> > > > >         return false;
-> > > > > @@ -1230,6 +1247,7 @@ static int xsk_bind(struct socket *sock, st=
-ruct sockaddr *addr, int addr_len)
-> > > > >         xs->zc =3D xs->umem->zc;
-> > > > >         xs->sg =3D !!(xs->umem->flags & XDP_UMEM_SG_FLAG);
-> > > > >         xs->queue_id =3D qid;
-> > > > > +       xs->tx_budget_cache =3D 0;
-> > > > >         xp_add_xsk(xs->pool, xs);
-> > > > >
-> > > > >  out_unlock:
-> > > > > --
-> > > > > 2.20.1
-> > > > >
-> > > > >
+Then I'd ask how do you understand this sentence I wrote? "while the 
+bottom half context holds the lock i.e. bh_lock_sock, the process 
+context can not get the lock by lock_sock."
+> 
+>>> We can use a very simple example to infer that since bh_lock_sock is 
+>>> type of spin-lock, if bh_lock_sock/bh_unlock_sock can block 
+>>> lock_sock/unlock(),
+>>> then lock_sock/unlock() can also block bh_lock_sock/bh_unlock_sock.
+>>>
+>>> If this is true, when the process context already lock_sock(), the 
+>>> interrupt context must wait for the process to call
+>>> release_sock(). Obviously, this is very unreasonable.
+>>>
+>>>
+>>>> 2) If the queue_work returns true, as I said in the last main, the 
+>>>> work should be (being) executed. How could the cancel_work_sync() 
+>>>> cancel the work before execution successgully?
+>>>
+>>> No, that's not true. In fact, if queue_work returns true, it simply 
+>>> means that we have added the task to the queue and may schedule a 
+>>> worker to execute it,
+>>> but it does not guarantee that the task will be executed or is being 
+>>> executed when it returns true,
+>>> the task might still in the list and waiting some worker to execute it.
+>>>
+>>> We can make a simple inference,
+>>>
+>>> 1. A known fact is that if no special flag (WORK_UNBOUND) is given, 
+>>> tasks submitted will eventually be executed on the CPU where they 
+>>> were submitted.
+>>>
+>>> 2. If the queue_work returns true, the work should be or is being 
+>>> executed
+>>>
+>>> If all of the above are true, when we invoke queue_work in an 
+>>> interrupt context, does it mean that the submitted task will be 
+>>> executed in the interrupt context?
+>>>
+>>>
+>>> Best wishes,
+>>> D. Wythe
+>>>
+>> If you say the thread is not gauranteed to be waken up in then 
+>> queue_work to execute the work, please explain what the kick_pool 
+>> function does.
+> 
+> I never said that.
+> 
+What do you understand on the kick_pool there?
+>>
+>> However, the spin_lock understanding is still the key problem in the 
+>> cases. As I said, if it is not get clarify, we don't really need to go 
+>> on to disucss this.
+>>
+>>>>
+>>>>>>>>> Fixes: 42bfba9eaa33 ("net/smc: immediate termination for SMCD 
+>>>>>>>>> link groups")
+>>>>>>>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>>>>>>>>> ---
+>>>>>>>>>   net/smc/smc_close.c | 3 ++-
+>>>>>>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>>>>>
+>>>>>>>>> diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
+>>>>>>>>> index 449ef45..10219f5 100644
+>>>>>>>>> --- a/net/smc/smc_close.c
+>>>>>>>>> +++ b/net/smc/smc_close.c
+>>>>>>>>> @@ -116,7 +116,8 @@ static void smc_close_cancel_work(struct 
+>>>>>>>>> smc_sock *smc)
+>>>>>>>>>       struct sock *sk = &smc->sk;
+>>>>>>>>>         release_sock(sk);
+>>>>>>>>> -    cancel_work_sync(&smc->conn.close_work);
+>>>>>>>>> +    if (cancel_work_sync(&smc->conn.close_work))
+>>>>>>>>> +        sock_put(sk);
+>>>>>>>>> cancel_delayed_work_sync(&smc->conn.tx_work);
+>>>>>>>>>       lock_sock(sk);
+>>>>>>>>>   }
+>>>>>>>
+>>>>>
+>>>>>
+>>>
+> 
 
