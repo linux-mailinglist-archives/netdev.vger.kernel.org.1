@@ -1,152 +1,186 @@
-Return-Path: <netdev+bounces-43462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F667D3590
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:49:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 052B87D35D5
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:53:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FE49B20D3D
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:49:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 280B71C20A00
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E69171DA;
-	Mon, 23 Oct 2023 11:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2C91803B;
+	Mon, 23 Oct 2023 11:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="AgFW9mzk"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B721640A
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:49:28 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F1E9E8
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 04:49:27 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qutQt-0007fH-7U; Mon, 23 Oct 2023 13:49:19 +0200
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qutQq-003hJw-Mt; Mon, 23 Oct 2023 13:49:16 +0200
-Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qutQq-00FvNG-Jo; Mon, 23 Oct 2023 13:49:16 +0200
-Date: Mon, 23 Oct 2023 13:49:16 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Ante Knezic <ante.knezic@helmholz.de>
-Cc: UNGLinuxDriver@microchip.com, andrew@lunn.ch, conor+dt@kernel.org,
-	davem@davemloft.net, devicetree@vger.kernel.org,
-	edumazet@google.com, f.fainelli@gmail.com,
-	krzysztof.kozlowski+dt@linaro.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, marex@denx.de, netdev@vger.kernel.org,
-	olteanv@gmail.com, pabeni@redhat.com, robh+dt@kernel.org,
-	woojung.huh@microchip.com
-Subject: Re: [PATCH net-next v4 2/2] net:dsa:microchip: add property to select
-Message-ID: <20231023114916.GC3787187@pengutronix.de>
-References: <20231023084150.GB3787187@pengutronix.de>
- <20231023085750.8537-1-ante.knezic@helmholz.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD04918021
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:53:14 +0000 (UTC)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A167EAF
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 04:53:12 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1c9d3a21f7aso25986815ad.2
+        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 04:53:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1698061992; x=1698666792; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5OpOO/ujxo7qV6VnFj/vbc7gRpnZ29/Hl135s51sMGA=;
+        b=AgFW9mzkVt5FKvoQ/pxyV5mJZJjs+7GrsRwDsUEtNH4aHIjgwT2TP+eCfbdxkrK3mW
+         I1NzBQImL3xztARwgZMBzJi4aiIjN+17FAndZVaDTHMwPvdBcg2M1Nz+N9e9j0gRJZIY
+         NMeS8D/HbCjpDJA2jV3e8uk2Q5ZF9TZaxQ5j6ImFga90Bz9fvxdweQ3Zg4OWd6vVwFJV
+         kb3OumdXJS5wl+tF5D4aHeSJWyvbjc+uOLBJpj2Sx0+2rscTdrjZArVyzxtiF44Pp54g
+         oV3A5H/WoS4eAgmKV3qPzkKhv3pEeMPECvSP2EEZo+d+Qi4u8wIb1n/UbFsBFtC+5WDX
+         4ibA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698061992; x=1698666792;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5OpOO/ujxo7qV6VnFj/vbc7gRpnZ29/Hl135s51sMGA=;
+        b=n5jfEcxiAEQPhRAeoLtKC8DEGEx4LZxhxeutLeLtrbga3RRFt9VsLoLRYf/RyCoqVo
+         zn/gV5PvSYeezoo4riVIgUPf6q3L7l9RJd8hvWYEkBmiQYrH672UrluJEhsGL1B6AKbX
+         kpOmYa8Z7tDUXoOWqOqCRA9PWXHFNou3aQ06h/yh5k68FWBOO18bupCyLz0/uCqL0hXe
+         f2o23S9sMDxWlp/QZFI+hIFP3G+BvuMy/2ofg/hMa/AMkGtVSm5nsDMibaUKtWZzDyWF
+         bvN0NPSu2lq4PcNaxzjfcSWyY2byIAwlXb7aQgINFdLUp1IY+naWYgfeE7xll5uaDy+F
+         7wCw==
+X-Gm-Message-State: AOJu0YyzLC0wKa9VO5Te4S0Y4HOUOjIHOFkT7J/UCiRUsFZFnBe9VLRP
+	AYBcLlhsJZE8L3gVO8fE1pG9aA==
+X-Google-Smtp-Source: AGHT+IFSlvp9BLy+fu0YpJY2csGQHLq69ECo5byZ1gpHhXI2w9sJlTLTHPD+Z/0+59+tBVs/MvoO3Q==
+X-Received: by 2002:a17:902:d506:b0:1ca:abe:a090 with SMTP id b6-20020a170902d50600b001ca0abea090mr9388853plg.62.1698061992110;
+        Mon, 23 Oct 2023 04:53:12 -0700 (PDT)
+Received: from C02FG34NMD6R.bytedance.net ([240e:6b1:c0:120::2:3])
+        by smtp.gmail.com with ESMTPSA id l20-20020a170903005400b001bba7aab822sm5835142pla.5.2023.10.23.04.53.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Oct 2023 04:53:11 -0700 (PDT)
+From: Albert Huang <huangjie.albert@bytedance.com>
+To: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>
+Cc: Albert Huang <huangjie.albert@bytedance.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 net-next] xsk: avoid starving the xsk further down the list
+Date: Mon, 23 Oct 2023 19:52:54 +0800
+Message-Id: <20231023115255.76934-1-huangjie.albert@bytedance.com>
+X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231023085750.8537-1-ante.knezic@helmholz.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 23, 2023 at 10:57:50AM +0200, Ante Knezic wrote:
-> On Mon, 23 Oct 2023 10:41:50 +0200, Oleksij Rempel wrote:
-> 
-> > Here is KSZ8873 as initial reference:
-> > https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/DataSheets/00002348A.pdf
-> > 3.3.9 RMII INTERFACE OPERATION:
-> > "When EN_REFCLKO_3 is high, KSZ8873RLL will output a 50 MHz in REFCLKO_3.
-> > Register 198 bit[3] is used to select internal or external reference
-> > clock. Internal reference clock means that the clock for the RMII of
-> > KSZ8873RLL will be provided by the KSZ8873RLL internally and the
-> > REFCLKI_3 pin is unconnected. For the external reference clock, the
-> > clock will provide to KSZ8873RLL via REFCLKI_3."
-> > 
-> > KSZ9897:
-> > http://ww1.microchip.com/downloads/en/DeviceDoc/00002330B.pdf
-> > 4.11.2 REDUCED MEDIA INDEPENDENT INTERFACE (RMII)
-> 
-> The upper paragraph refers to the case when switch is acting as a clock
-> provider (regardless whether its set as internal or external reference
-> clock). You can see this if you look at the next paragraph:
-> "If KSZ8863RLL does not provide the reference clock, this 50 MHz reference 
-> clock with divide-by-2 (25 MHz) has to be used in X1 pin instead of the 
-> 25 MHz crystal, since the ..."
-> So rmii-clk-internal property does not select whether switch is acting
-> as a clock provider or clock consumer which is what you are refering to
-> I believe? The clock provider/consumer is set via strapping pins.
-> 
-> Real case scenario: I have a board where switch is acting as a clock
-> provider, generating output to REFCLKO pin and feeding it to uC. 
-> This board does not have externally routed copper track from REFCLKO 
-> to REFCLKI, thus making the RMII interface not operable, unless the 
-> rmii-clk-internal bit is set.
-> If this bit is not set, only way to make it running is to solder a
-> jumper wire from REFCLKO to REFCLKI.
+In the previous implementation, when multiple xsk sockets were
+associated with a single xsk_buff_pool, a situation could arise
+where the xsk_tx_list maintained data at the front for one xsk
+socket while starving the xsk sockets at the back of the list.
+This could result in issues such as the inability to transmit packets,
+increased latency, and jitter. To address this problem, we introduced
+a new variable called tx_budget_cache, which limits each xsk to transmit
+a maximum of MAX_PER_SOCKET_BUDGET tx descriptors. This allocation ensures
+equitable opportunities for subsequent xsk sockets to send tx descriptors.
+The value of MAX_PER_SOCKET_BUDGET is temporarily set to TX_BATCH_SIZE(32).
 
-In case of KSZ8873 we seems to have something like:
+Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+---
+ include/net/xdp_sock.h |  5 +++++
+ net/xdp/xsk.c          | 19 +++++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-Switch MAC<-.
-            |
-  PLL -> clk sel -> REFCLKO
-            \-----< REFCLKI
-
-Clock select in this case is controlled by Register 198 (0xC6).
-
-In case of KSZ9897 we probably have something like:
-
-Switch MAC<-.
-            |
-  PLL -> clk sel -> REFCLKO
-            \--x--< REFCLKI
-	       |
-            Gate REFCLKI if REFCLKO is used.
-
-In both cases:
-- KSZ8873, Setting bit3 in Register 198 (0xC6) will control use of clk
-  select
-- KSZ9897, setting bit2 in Register 0xN301, will controll use of clk
-  select and probably gate REFCLKI.
-
-So far, it looks very similar to me and it is usually handled by
-phy-mode rmii vs revrmii. Correct?
-
-So, the main question is still, do we need this kind of configuration
-per port or it is enough to have it per switch?
-
-For some reasons KSZ8863MLL datasheet provides RMII clock select
-configuration for two ports (port 1 and 3)
-https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/DataSheets/KSZ8863MLL-FLL-RLL-Data-Sheet-00002335C.pdf
-May be there are variants with two RMIIs?
-
-Something similar but with multiple RMII interfaces seems to be
-supported by KSZ8864CNX:
-https://eu.mouser.com/datasheet/2/268/00002229A-1082534.pdf
-
-And all KSZ9xxx series seems to handle it per port as well. 
-
+diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+index 69b472604b86..08cbdf6fca85 100644
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -63,6 +63,11 @@ struct xdp_sock {
+ 
+ 	struct xsk_queue *tx ____cacheline_aligned_in_smp;
+ 	struct list_head tx_list;
++	/* Record the actual number of times xsk has transmitted a tx
++	 * descriptor, with a maximum limit not exceeding MAX_PER_SOCKET_BUDGET
++	 */
++	u32 tx_budget_cache;
++
+ 	/* Protects generic receive. */
+ 	spinlock_t rx_lock;
+ 
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index f5e96e0d6e01..fd0d54b7c046 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -33,6 +33,7 @@
+ #include "xsk.h"
+ 
+ #define TX_BATCH_SIZE 32
++#define MAX_PER_SOCKET_BUDGET (TX_BATCH_SIZE)
+ 
+ static DEFINE_PER_CPU(struct list_head, xskmap_flush_list);
+ 
+@@ -413,16 +414,25 @@ EXPORT_SYMBOL(xsk_tx_release);
+ 
+ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
+ {
++	bool xsk_cache_full = false;
+ 	struct xdp_sock *xs;
+ 
+ 	rcu_read_lock();
++again:
+ 	list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
++		if (xs->tx_budget_cache >= MAX_PER_SOCKET_BUDGET) {
++			xsk_cache_full = true;
++			continue;
++		}
++
+ 		if (!xskq_cons_peek_desc(xs->tx, desc, pool)) {
+ 			if (xskq_has_descs(xs->tx))
+ 				xskq_cons_release(xs->tx);
+ 			continue;
+ 		}
+ 
++		xs->tx_budget_cache++;
++
+ 		/* This is the backpressure mechanism for the Tx path.
+ 		 * Reserve space in the completion queue and only proceed
+ 		 * if there is space in it. This avoids having to implement
+@@ -436,6 +446,14 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
+ 		return true;
+ 	}
+ 
++	if (xsk_cache_full) {
++		list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
++			xs->tx_budget_cache = 0;
++		}
++		xsk_cache_full = false;
++		goto again;
++	}
++
+ out:
+ 	rcu_read_unlock();
+ 	return false;
+@@ -1230,6 +1248,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
+ 	xs->zc = xs->umem->zc;
+ 	xs->sg = !!(xs->umem->flags & XDP_UMEM_SG_FLAG);
+ 	xs->queue_id = qid;
++	xs->tx_budget_cache = 0;
+ 	xp_add_xsk(xs->pool, xs);
+ 
+ out_unlock:
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.20.1
+
 
