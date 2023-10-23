@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-43500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 849BF7D3A9D
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:24:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C47857D3A9E
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:24:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 850921C2095A
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 15:24:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40021B20D2E
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 15:24:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B501C282;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433DF1C28A;
 	Mon, 23 Oct 2023 15:23:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CymZUY9X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VcPcblnd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE99C1BDFF
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 15:23:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C7AEC433CD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2194A1C283
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 15:23:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F283C43395;
 	Mon, 23 Oct 2023 15:23:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1698074629;
-	bh=QA9GEVBIRSRF4wOSHtS3lLaM/EEh15jDC/cig/sgPYU=;
+	bh=DKDkRNSnXzhTGGNSSBp7bEj76rJrv16ueNO8snSn1xE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CymZUY9XEUOOIbzcEEBCVMVqqis6Rl+ISlq85iMFbm085NAHvceAV5F6Z3AGF7ZhV
-	 k3y988bxujplQwF30k3C60bvy3NfElrKPFR2NR0Xt+hw3Fc3XeNNhAyuGYCqrT1gPA
-	 SBf40Qyx4haw4d4QUiHMWpFaaIMBefFbX8GW+qNpzXSNZKptil++1VuNsFtwKyOgpS
-	 JWZawLIK8rHbjKhU1E+ZwTNnsTBoUuRwkfn+mpFNZG1dfy065zemf/bRjDO5eR8qkA
-	 2DDFpNOs0rD9wG31r1AOndLlFfz8/FbscyryQIBToyK9UE7o/FZLIhym7TiBtB3EIK
-	 5Bz0uKLxkQmMw==
+	b=VcPcblndPjltM3kPpB1dNBMKkG9OmDe6DBKHwdmhUxw+v48xPWdvpgtWSQNFuYnSm
+	 8Kh538Lhp/sYcbvyk68w9U60ksCl3X7SnA479k58jOkT0AVyt6U109EBu3eIj8Ea7C
+	 KLaINIVpvxZ5BqjZB5DiKvU1nyaVMgm63PzpLffv3cO24wKpxogOQoJXi1aK79NJIH
+	 tFO8hVaKU7qjBYSf3CWybMEAjXNSYTQLc9SPWG9rEjmS5lgYv+BqYJ2wfWnl01T0HB
+	 tvSDGWkWSeBG5mEz2c+05C1Z+gGWPNQ+GIXnZ+3tvrTjiCuswtqi4+43SqJna3IYCm
+	 Er5MnJkiJPAww==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: netdev@vger.kernel.org,
 	mpe@ellerman.id.au,
 	j@w1.fi,
 	jiri@resnulli.us
-Subject: [PATCH net-next v2 3/6] net: reduce indentation of __dev_alloc_name()
-Date: Mon, 23 Oct 2023 08:23:43 -0700
-Message-ID: <20231023152346.3639749-4-kuba@kernel.org>
+Subject: [PATCH net-next v2 4/6] net: trust the bitmap in __dev_alloc_name()
+Date: Mon, 23 Oct 2023 08:23:44 -0700
+Message-ID: <20231023152346.3639749-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231023152346.3639749-1-kuba@kernel.org>
 References: <20231023152346.3639749-1-kuba@kernel.org>
@@ -55,100 +55,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-All callers of __dev_valid_name() go thru dev_prep_valid_name()
-which handles the non-printf case. Focus __dev_alloc_name() on
-the sprintf case, remove the indentation level.
+Prior to restructuring __dev_alloc_name() handled both printf
+and non-printf names. In a clever attempt at code reuse it
+always prints the name into a buffer and checks if it's
+a duplicate.
 
-Minor functional change of returning -EINVAL if % is not found,
-which should now never happen.
+Trust the bitmap, and return an error if its full.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+This shrinks the possible ID space by one from 32K to 32K - 1,
+as previously the max value would have been tried as a valid ID.
+It seems very unlikely that anyone would care as we heard
+no requests to increase the max beyond 32k.
+
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/core/dev.c | 56 +++++++++++++++++++++++---------------------------
- 1 file changed, 26 insertions(+), 30 deletions(-)
+v2:
+ - mention the loss of 1 entry in the commit message
+---
+ net/core/dev.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 004e9f26b160..bbfb02b4a228 100644
+index bbfb02b4a228..d2698b4bbad4 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -1080,50 +1080,46 @@ static int __dev_alloc_name(struct net *net, const char *name, char *res)
- 	if (!dev_valid_name(name))
- 		return -EINVAL;
+@@ -1119,18 +1119,11 @@ static int __dev_alloc_name(struct net *net, const char *name, char *res)
  
-+	/* Verify the string as this thing may have come from the user.
-+	 * There must be one "%d" and no other "%" characters.
-+	 */
- 	p = strchr(name, '%');
--	if (p) {
--		/*
--		 * Verify the string as this thing may have come from
--		 * the user.  There must be either one "%d" and no other "%"
--		 * characters.
--		 */
--		if (p[1] != 'd' || strchr(p + 2, '%'))
--			return -EINVAL;
-+	if (!p || p[1] != 'd' || strchr(p + 2, '%'))
-+		return -EINVAL;
+ 	i = find_first_zero_bit(inuse, max_netdevices);
+ 	bitmap_free(inuse);
++	if (i == max_netdevices)
++		return -ENFILE;
  
--		/* Use one page as a bit array of possible slots */
--		inuse = bitmap_zalloc(max_netdevices, GFP_ATOMIC);
--		if (!inuse)
--			return -ENOMEM;
-+	/* Use one page as a bit array of possible slots */
-+	inuse = bitmap_zalloc(max_netdevices, GFP_ATOMIC);
-+	if (!inuse)
-+		return -ENOMEM;
- 
--		for_each_netdev(net, d) {
--			struct netdev_name_node *name_node;
-+	for_each_netdev(net, d) {
-+		struct netdev_name_node *name_node;
- 
--			netdev_for_each_altname(d, name_node) {
--				if (!sscanf(name_node->name, name, &i))
--					continue;
--				if (i < 0 || i >= max_netdevices)
--					continue;
+-	snprintf(buf, IFNAMSIZ, name, i);
+-	if (!netdev_name_in_use(net, buf)) {
+-		strscpy(res, buf, IFNAMSIZ);
+-		return i;
+-	}
 -
--				/*  avoid cases where sscanf is not exact inverse of printf */
--				snprintf(buf, IFNAMSIZ, name, i);
--				if (!strncmp(buf, name_node->name, IFNAMSIZ))
--					__set_bit(i, inuse);
--			}
--			if (!sscanf(d->name, name, &i))
-+		netdev_for_each_altname(d, name_node) {
-+			if (!sscanf(name_node->name, name, &i))
- 				continue;
- 			if (i < 0 || i >= max_netdevices)
- 				continue;
+-	/* It is possible to run out of possible slots
+-	 * when the name is long and there isn't enough space left
+-	 * for the digits, or if all bits are used.
+-	 */
+-	return -ENFILE;
++	snprintf(res, IFNAMSIZ, name, i);
++	return i;
+ }
  
--			/*  avoid cases where sscanf is not exact inverse of printf */
-+			/* avoid cases where sscanf is not exact inverse of printf */
- 			snprintf(buf, IFNAMSIZ, name, i);
--			if (!strncmp(buf, d->name, IFNAMSIZ))
-+			if (!strncmp(buf, name_node->name, IFNAMSIZ))
- 				__set_bit(i, inuse);
- 		}
-+		if (!sscanf(d->name, name, &i))
-+			continue;
-+		if (i < 0 || i >= max_netdevices)
-+			continue;
- 
--		i = find_first_zero_bit(inuse, max_netdevices);
--		bitmap_free(inuse);
-+		/* avoid cases where sscanf is not exact inverse of printf */
-+		snprintf(buf, IFNAMSIZ, name, i);
-+		if (!strncmp(buf, d->name, IFNAMSIZ))
-+			__set_bit(i, inuse);
- 	}
- 
-+	i = find_first_zero_bit(inuse, max_netdevices);
-+	bitmap_free(inuse);
-+
- 	snprintf(buf, IFNAMSIZ, name, i);
- 	if (!netdev_name_in_use(net, buf)) {
- 		strscpy(res, buf, IFNAMSIZ);
+ /* Returns negative errno or allocated unit id (see __dev_alloc_name()) */
 -- 
 2.41.0
 
