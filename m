@@ -1,100 +1,214 @@
-Return-Path: <netdev+bounces-43491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E88757D3A07
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:47:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B58737D3A11
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:52:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A155B281333
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:47:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E11E2813A5
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C521C18E22;
-	Mon, 23 Oct 2023 14:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2724B1640B;
+	Mon, 23 Oct 2023 14:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="H+gPMoKS"
+	dkim=pass (2048-bit key) header.d=uipath.com header.i=@uipath.com header.b="VHarjz+F"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B411805C;
-	Mon, 23 Oct 2023 14:46:59 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1C7B171B;
-	Mon, 23 Oct 2023 07:46:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=1u1Kl8+jTBlvjcn5Y8E8suLdFi2oN6a+RJ6jIb/EgK8=; b=H+gPMoKSVW3s9FuBVaBw/l/SHU
-	FI4AWeCHareKm6BrnWAb3ITLdzyyv1jI2wY37l8HTgn8iLvnOeW/k48jaM6ssKXY1WKaHmhQ9rZUT
-	4LpQxc9zOmnvUOseKpC3w97WKjk7SfhmHq/YlNJ31NL1NrDVr3heZinKFhKsXZFu6ccNRtzhnSzYy
-	VaotKR9z61ytjAZmW7rMSRI7EHdZqs+UQKWMA61QqYGJf7WAd4G7FEB11XnKmI3707x2eGvB2qHdY
-	Q+RpDyGasjIsytMKcAZHdbooRJyCVNKnsmnzAvpiXkED/idb7cVJ5WVYfJZf9lzHDVGlBwBt/8Bc5
-	6Fkn9OUQ==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1quwCl-0008pD-HT; Mon, 23 Oct 2023 16:46:55 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1quwCl-000FBQ-3y; Mon, 23 Oct 2023 16:46:55 +0200
-Subject: Re: [PATCH bpf-next v2 4/7] bpftool: Implement link show support for
- netkit
-To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@kernel.org>,
- bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, martin.lau@linux.dev, razor@blackwall.org,
- ast@kernel.org, andrii@kernel.org, john.fastabend@gmail.com, sdf@google.com,
- Quentin Monnet <quentin@isovalent.com>
-References: <20231019204919.4203-1-daniel@iogearbox.net>
- <20231019204919.4203-5-daniel@iogearbox.net> <87lebtqusi.fsf@toke.dk>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <813f501e-34b9-c46b-fc6f-1e927458a743@iogearbox.net>
-Date: Mon, 23 Oct 2023 16:46:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7891FA3
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 14:52:20 +0000 (UTC)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2134.outbound.protection.outlook.com [40.107.21.134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8A381A4;
+	Mon, 23 Oct 2023 07:52:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bG03PNRkmeHy7Rz/fn9UmTudhuMfqstMJLTlV9p1UhyL025IGXF0UEjyYoAwy3drB4vxNs7FJgxwA6rKU+ZQx49KcVVWvMFeZf4tClPlqHDWAduxpQqxxz2tClaSlYRj+z8FRjh0ScgkP1+0Eq3ZZIWNRWehH3f78x546qBJQ2ZZhkBNSRSVz1dzEx4cwET3+tqG+r9cyoVePpCjMz29oLQcO2ELqr0aewrxrQWmTREE+EIPNMSjdNvqGFBuVOINk3GBgQNUavV3OfT+YQJ/9BvSvWiLFTzi1pWMXsVwfEUsWCRUMD1aKA9lm95PJe6stm8BeeaUfa2ry5cEjE0Cgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wUquwOTVALOaStmQjLfBaupOJ/IMlrj/jhRXHn/6QdY=;
+ b=Ij02u0DWM6USExhku4pipSts4hq0QAcLNHCLxvAagkN+adRpul2gqPWguvsPwwRODdp4MApCif4yhVA2Ba8WyAExYtP+5H4gRoL1hot50xiqhqbDpss93f0/gaKndGUFXaWFbFVx9MSLXS/fSU6hBioExXlzMKfpl79LAowsF6Jb5YJY/RL3YrzRfNmBrvCrSFPyBcywouipVzGHB48b2SxbBBd9tYprVrLjl3vK6LpM1tYeqMB7R+ltXxIO3o/7LPNuFoVHbaBdMXEJB19eaQpEkdNXYqoO3vm3Pt0k275EbjEDfzgqz05b6wpbKfo0lReW6jbAVdj/Awf+r92f5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=uipath.com; dmarc=pass action=none header.from=uipath.com;
+ dkim=pass header.d=uipath.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uipath.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wUquwOTVALOaStmQjLfBaupOJ/IMlrj/jhRXHn/6QdY=;
+ b=VHarjz+FRZwsQwVthjjqs7otg0dlI8j4KgpbDWyEGsuboAOkjBMpTzjrrYIei18eA9ROo7jXDfZjIar3njfAFxwzlne1gEvl13V5CgvUACvOhuOApFPF2Wq6KePYakqT0QRRG9ssIBid1Zlto+7jaJmReb6M/wzzszIi3HA3jvON7cRwG1Of6SIpyN+H7vH968xU47PqG7shx7bjGCOWuYZXwgHrBlh0CMNCDc6o5Dbd4JTYHEiQMJaydTR4WfENdzN+eqdcsbwtu8f+HcGilyDm/R05I0ykONoLoFjaayLPtxWLWnze2xQZjimNblezL1Jo5wOU/MWQhMLZAjgkRQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=uipath.com;
+Received: from VI1PR02MB4527.eurprd02.prod.outlook.com (2603:10a6:803:b1::28)
+ by AS4PR02MB7855.eurprd02.prod.outlook.com (2603:10a6:20b:4c2::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.34; Mon, 23 Oct
+ 2023 14:52:15 +0000
+Received: from VI1PR02MB4527.eurprd02.prod.outlook.com
+ ([fe80::717d:6e0d:ec4b:7668]) by VI1PR02MB4527.eurprd02.prod.outlook.com
+ ([fe80::717d:6e0d:ec4b:7668%6]) with mapi id 15.20.6907.030; Mon, 23 Oct 2023
+ 14:52:15 +0000
+Message-ID: <0624137c-85cf-4086-8256-af2b8405f434@uipath.com>
+Date: Mon, 23 Oct 2023 17:52:03 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] vsock/virtio: initialize the_virtio_vsock before using
+ VQs
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Mihai Petrisor <mihai.petrisor@uipath.com>,
+ Viorel Canja <viorel.canja@uipath.com>,
+ Alexandru Matei <alexandru.matei@uipath.com>
+References: <20231023140833.11206-1-alexandru.matei@uipath.com>
+ <2tc56vwgs5xwqzfqbv5vud346uzagwtygdhkngdt3wjqaslbmh@zauky5czyfkg>
+Content-Language: en-US
+From: Alexandru Matei <alexandru.matei@uipath.com>
+In-Reply-To: <2tc56vwgs5xwqzfqbv5vud346uzagwtygdhkngdt3wjqaslbmh@zauky5czyfkg>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: VI1P189CA0023.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:802:2a::36) To VI1PR02MB4527.eurprd02.prod.outlook.com
+ (2603:10a6:803:b1::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87lebtqusi.fsf@toke.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27070/Mon Oct 23 09:53:01 2023)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI1PR02MB4527:EE_|AS4PR02MB7855:EE_
+X-MS-Office365-Filtering-Correlation-Id: 53aa348a-3a0f-4b3e-39f4-08dbd3d7a57b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	LDTDE9b7kJKI9rk6KcqcpVZRVsXMg58PZv3VNoG/BVhODHb2rAJAYC2mOax7M1c12JGOTXvfKP0M+PI/Xi9b7by2WkGYgogUgltJx1IldjIaWbrLytK2Y1Pk+6GruemkKmnXbMv7wJiP4QU08IS8uED6zA2zNSRbvj6FH1uA+uXgD/FRKAQIJg3oUMRQEf7bBKTWvQCu+DV0/4ZlfkhYt88hKXXB+hqFgSsG4Ld5jHwOWLtOO9p0gGSd5srSW8wkwtP7ijHoht+BdFi+6TVCw51ebMy9c1qh1ZU0GQbb8c4xD1b2R0wkrRBOPKX6UHVcYq0eoDXUjhigSIK/cWxp3pTBxgbSPkqsz4uc6xZnkExIPOEz0OhAcihiEOr6XTq4u3PngoJyCXO/uiRRV/Qr/l79ehPHCFvLJTUPDc1Sfof9F3p3BWWrPkedFrJ5eVwnLj3eeFsN73nSYDQvvYsRT69PoSg33/O8y3F61TPwQmlcfiD4Rbgt2iWvVRms0sxD1bNJyQadRIG6dcXw2/d/1o1y8FmyhgoGAFP0lb1fxcDMqOaNfkgxmIKrn2hqAw7O/bqpIdrtBwu0+ulqX4FlbF+hZmLkcXhQchalmd4q6VHiviXJ+8mNe3tddLFLfEoz6T2sj5NwLqF+6RlVSWDSIQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR02MB4527.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(346002)(136003)(366004)(396003)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(6666004)(6486002)(316002)(38100700002)(54906003)(6512007)(66556008)(66476007)(66946007)(26005)(2616005)(6506007)(478600001)(8676002)(107886003)(53546011)(8936002)(6916009)(7416002)(83380400001)(86362001)(31696002)(4326008)(5660300002)(41300700001)(36756003)(2906002)(44832011)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZCtXZnc0T29veTNib0lxbXExQkFZRzN1eExKczEwdGdyeEN6a09XWllXbTI1?=
+ =?utf-8?B?RUpqWk55bXVMejFaejg4KytSWk5EeHBUTklWZWZnQzhyeVFiUmFRc3NEcXhM?=
+ =?utf-8?B?RUtvV0NYQko0b2I3T3hlTkdMS2dSMGZKcnRjZ210UWxFckNFRmlwTmFuVGt2?=
+ =?utf-8?B?emJlbWdFQXovQ2oySWVMNmo2S2ErZnA5ZGhUN2RsYlZxejh4MnpxSXo0V0Mx?=
+ =?utf-8?B?OE8yYUQ5SjVIaXZRUndWUEFuKzg5OVBVUGRkb1FNTWVrekJFdm41M042bm43?=
+ =?utf-8?B?MHd1ODlnY2lsWjR6eEdxR1lCelhKZXQ4c3NEL3pncFpEWTYvWjU5UGdKUjEx?=
+ =?utf-8?B?NmNvemxlZzJjUC9LNnB0d0xSTVdvQzlHWE42NUpSbzFBWmZOalNmcHpTY0Zh?=
+ =?utf-8?B?eEdDZUxQMk1PUDU4MkI1ZExrRlFhUyttS0tsZ1VlUysvNFptNzJ5anRaWksz?=
+ =?utf-8?B?dHgrTDJNbXUzWU4wU3NIVlB6M0U2ZXl5ZTdDcEJoUlE1cXlmQmVxSG5xTWtz?=
+ =?utf-8?B?Um44TUNabTlzN0c3bzl2WmJjR2FuSSs5VGVPZDlFNVZkN092WUVqUEpkcnRl?=
+ =?utf-8?B?eG5mTklEZG5ZKzlOOWdZQXFwbnE4TXQwV2NvbFVsdUhkZ1pTUmsrVWFHcDNE?=
+ =?utf-8?B?aDZpZHZzcmZqZFFCUDU5anZCdVFtMEFBaDJxUmFSNmsyN1hzMHB5Yi9hRUdy?=
+ =?utf-8?B?SzNmQTA5TUJLdE04RDFpem1aYjB1dDcySWdMa09Jc2VBRTVISXJsUGlvS1Ry?=
+ =?utf-8?B?SzJxWTkvc1dJU2NEckFzNUpzMjR4Wk5sSG0zN1VWc3JXZjJ6VlM0Qmp4TXp2?=
+ =?utf-8?B?SU5qbzV0SUZoUlZNY2oyeUl2bmg3VnQ4WDZzMUhybVl3czNHRC9nN3Z3SHRq?=
+ =?utf-8?B?bWYwdmkxTVVwbUhLZTNkaXNYd2N6bVFBVFJROHlMRG03eCtVNWpFNU9FelhU?=
+ =?utf-8?B?LzV0VVQxQnpDQ3ZRaGxOL1ZEMFYwVW9yRjZVaUZvNFJvblMvNElJcldKU3gy?=
+ =?utf-8?B?VHR4OUMrRk5nSEQ4Y1gvN0duQlZPZUUra0RMTGNXL0pSZ2ZTYXV5ZHJiL3BE?=
+ =?utf-8?B?Q1FURy83KzhPc1FySE8ydmJVNDBCVExsYlp6em13NEZNak96UmpJdkxjdGd1?=
+ =?utf-8?B?d1AxS2ZkQ0RXRWFtYW1ON2JBdThERlBqNjF0RmlGTXkzdUcvL1ZuelZOZjdw?=
+ =?utf-8?B?MWZQWmlxMXJPV3g1YW0rSGo0NGVLZmRIREszb0ZDMExidXo5SWt3N3AyWkhj?=
+ =?utf-8?B?ZzVTaVlPS0o4SmZac0VaalljeHhjSVMvNkpxWjZqbE51SVlqbE9iMmEwMm9Q?=
+ =?utf-8?B?ZlZOVU9ST3FLVnZ4TDEyalNqUitqbUZ0cGVyUkNyMGtDdzFNczViWkR3N2k1?=
+ =?utf-8?B?c3lYZVRUUlJBTVlyZjZSQi93ckN0TTFCK1lOczM1NVpSTTNpeDl2bU5rN0lY?=
+ =?utf-8?B?ZXNNdUQyOThxbE1HbWtvc3dMU3ljK2NlVzRkMFdabG02QXlGRjB3ZmhtK09j?=
+ =?utf-8?B?WlloNzlPM3RUa1M5Q3JDUVV1V2dUQmhPbVByZDN4K010NWxmR0dqb29UOXRq?=
+ =?utf-8?B?ZlJtZUhIS3RGNjlhSFd4RnFLZ1hONGtHa2d1Q1NvZlFGNklkdnRpeElITWVz?=
+ =?utf-8?B?dFlUVlhNV29nTU1OYkJPR01Na1YwaDR6NFhlS0ZuZG1HVUMycDZqNTZYR1ZJ?=
+ =?utf-8?B?eWNjYlRSSG5sdkZ3c0NLblZKaVh2YUtxSExaR3k5bVJUbUdJQ0JrQjN1d2Ja?=
+ =?utf-8?B?M1FzNDhEVkpaNVJ5TXlaRGRtbHBCSGJrMldqU2M3eXp0Y2YrL0dDUTJob24v?=
+ =?utf-8?B?TGRZa1Z5M2ZCZnVMNHFnaThnOUliVTA2cU5kK2JCVDNVYUVhOWpsSlNOTlIz?=
+ =?utf-8?B?TlE3QjZYKzdaQU1NQi9ScXVnbnFnSC9ZS2h0U3RGbUJucGxIUXRCeEEwcXFa?=
+ =?utf-8?B?alpPc2Rzc3BUbDByR05SeHQrMU50SzVFQndhNE1RSXZ3YTNGeFYxZitqMm5T?=
+ =?utf-8?B?RGREdDRvcmhPRGVZbHBnZHRCTUlwUDlTRUhYMjRHem1qaVc1dVpUTEhoQnQy?=
+ =?utf-8?B?YXRsOXRBaTFEQ1AyOTJkaitybUY2VDdNR0RmeVFoZ2tKSXpDQWV1M1F3YzVj?=
+ =?utf-8?B?WGEzcjZuSGZWYnpqdW0yYjRoWDU4VmxLbm1admJOcWpyR2Zvbk9LSHFkTG1Y?=
+ =?utf-8?B?ZFE9PQ==?=
+X-OriginatorOrg: uipath.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 53aa348a-3a0f-4b3e-39f4-08dbd3d7a57b
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR02MB4527.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2023 14:52:15.2968
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: d8353d2a-b153-4d17-8827-902c51f72357
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kJK2gSKTizDsxd9w/84Wb/cKLCJ1rHmrcsoe5Aj7ySlHmyMl61P3vb0r/bEP3MXSYA3v8pwd4SimQIutNh2undbj1mSqFBJsDXdq6F4k898=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR02MB7855
 
-On 10/23/23 4:26 PM, Toke Høiland-Jørgensen wrote:
-> Daniel Borkmann <daniel@iogearbox.net> writes:
-> 
->> Add support to dump netkit link information to bpftool in similar way as
->> we have for XDP. The netkit link info only exposes the ifindex.
+On 10/23/2023 5:29 PM, Stefano Garzarella wrote:
+> On Mon, Oct 23, 2023 at 05:08:33PM +0300, Alexandru Matei wrote:
+>> Once VQs are filled with empty buffers and we kick the host,
+>> it can send connection requests.  If 'the_virtio_vsock' is not
+>> initialized before, replies are silently dropped and do not reach the host.
 >>
->> Below shows an example link dump output, and a cgroup link is included for
->> comparison, too:
+>> Fixes: 0deab087b16a ("vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock")
+>> Signed-off-by: Alexandru Matei <alexandru.matei@uipath.com>
+>> ---
+>> v2:
+>> - split virtio_vsock_vqs_init in vqs_init and vqs_fill and moved
+>>  the_virtio_vsock initialization after vqs_init
 >>
->>    # bpftool link
->>    [...]
->>    10: cgroup  prog 2466
->>          cgroup_id 1  attach_type cgroup_inet6_post_bind
->>    [...]
->>    8: netkit  prog 35
->>          ifindex nk1(18)
->>    [...]
+>> net/vmw_vsock/virtio_transport.c | 9 +++++++--
+>> 1 file changed, 7 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> index e95df847176b..92738d1697c1 100644
+>> --- a/net/vmw_vsock/virtio_transport.c
+>> +++ b/net/vmw_vsock/virtio_transport.c
+>> @@ -559,6 +559,11 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+>>     vsock->tx_run = true;
+>>     mutex_unlock(&vsock->tx_lock);
+>>
+>> +    return 0;
+>> +}
+>> +
+>> +static void virtio_vsock_vqs_fill(struct virtio_vsock *vsock)
 > 
-> Couldn't we make this show whether the program is attached as
-> primary/peer as well? Seems like that would be useful (like in the
-> cgroup output above)?
+> What about renaming this function in virtio_vsock_vqs_start() and move also the setting of `tx_run` here?
 
-Makes sense, will add it.
+It works but in this case we also need to move rcu_assign_pointer in virtio_vsock_vqs_start(), 
+the assignment needs to be right after setting tx_run to true and before filling the VQs.
 
-Thanks,
-Daniel
+> 
+> Thanks,
+> Stefano
+> 
+>> +{
+>>     mutex_lock(&vsock->rx_lock);
+>>     virtio_vsock_rx_fill(vsock);
+>>     vsock->rx_run = true;
+>> @@ -568,8 +573,6 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+>>     virtio_vsock_event_fill(vsock);
+>>     vsock->event_run = true;
+>>     mutex_unlock(&vsock->event_lock);
+>> -
+>> -    return 0;
+>> }
+>>
+>> static void virtio_vsock_vqs_del(struct virtio_vsock *vsock)
+>> @@ -664,6 +667,7 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>>         goto out;
+>>
+>>     rcu_assign_pointer(the_virtio_vsock, vsock);
+>> +    virtio_vsock_vqs_fill(vsock);
+>>
+>>     mutex_unlock(&the_virtio_vsock_mutex);
+>>
+>> @@ -736,6 +740,7 @@ static int virtio_vsock_restore(struct virtio_device *vdev)
+>>         goto out;
+>>
+>>     rcu_assign_pointer(the_virtio_vsock, vsock);
+>> +    virtio_vsock_vqs_fill(vsock);
+>>
+>> out:
+>>     mutex_unlock(&the_virtio_vsock_mutex);
+>> -- 
+>> 2.34.1
+>>
+> 
 
