@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-43594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E69F7D3FCA
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 21:05:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41BE47D3FCB
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 21:05:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2680B20C2E
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:05:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD776B20B5E
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB82C21A07;
-	Mon, 23 Oct 2023 19:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B0E21A09;
+	Mon, 23 Oct 2023 19:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="p7AhMwAa"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QYgJ3tzR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66531219F4
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 19:05:07 +0000 (UTC)
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9459100
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:05:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F7B219F4
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 19:05:18 +0000 (UTC)
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F08DB3
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:05:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1698087907; x=1729623907;
+  t=1698087918; x=1729623918;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bEZsFLMr4d49tHAsDLwXOTmTJKo8XvUSJCzl/pLSNjE=;
-  b=p7AhMwAauyocGeCoGiu/hv7ybg+SsvTFfuOxGtFoWTb1vNYIhzb2LKrr
-   ZGd7LjzfVDJhWOJhnvwk3z49RnTwm6pdCBm1N8N1fdXq9fILXA9F/MkyE
-   a5jFVkRkJFN46/YVT18kmMFXy2zv90kLIAV0+cUzXr68FrZQO0G3nNo04
-   Q=;
+  bh=D7AG6imKIVTPG6w1n0Qw7Y26gS++BFPYfT61MTm2KoY=;
+  b=QYgJ3tzRMmH+lwBC/mqlOZBAgVtkiLWfp7XgQdkPUj9Qk4Mb9JU1Ixc2
+   z+8HiLi16evqfYk/qfhlbKC1ykY6Z5tm5T4atRAucty3N1NuL8icIM66Y
+   eNL0bmYU1k0NPwMSXAtKCHdCBYnNrBrg+18k1gqEmtQrGbPYe/XvpAhK/
+   A=;
 X-IronPort-AV: E=Sophos;i="6.03,246,1694736000"; 
-   d="scan'208";a="371782338"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-f323d91c.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 19:05:00 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2b-m6i4x-f323d91c.us-west-2.amazon.com (Postfix) with ESMTPS id B89DF40DBB;
-	Mon, 23 Oct 2023 19:04:58 +0000 (UTC)
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:53646]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.249:2525] with esmtp (Farcaster)
- id 25a03b7e-74b7-480f-966d-f17627ab2e4b; Mon, 23 Oct 2023 19:04:58 +0000 (UTC)
-X-Farcaster-Flow-ID: 25a03b7e-74b7-480f-966d-f17627ab2e4b
+   d="scan'208";a="611676002"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 19:05:16 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1a-m6i4x-96feee09.us-east-1.amazon.com (Postfix) with ESMTPS id 858DD40E0C;
+	Mon, 23 Oct 2023 19:05:12 +0000 (UTC)
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:21595]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.61.148:2525] with esmtp (Farcaster)
+ id 7d0bc177-48f0-4bb7-ba35-e7609e0a27b0; Mon, 23 Oct 2023 19:05:11 +0000 (UTC)
+X-Farcaster-Flow-ID: 7d0bc177-48f0-4bb7-ba35-e7609e0a27b0
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Mon, 23 Oct 2023 19:04:46 +0000
+ 15.2.1118.39; Mon, 23 Oct 2023 19:05:11 +0000
 Received: from 88665a182662.ant.amazon.com (10.119.77.134) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.39;
- Mon, 23 Oct 2023 19:04:43 +0000
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Mon, 23 Oct 2023 19:05:08 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
 CC: Coco Li <lixiaoyan@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 04/12] tcp: Save address type in inet_bind2_bucket.
-Date: Mon, 23 Oct 2023 12:02:47 -0700
-Message-ID: <20231023190255.39190-5-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 05/12] tcp: Rename tb in inet_bind2_bucket_(init|create)().
+Date: Mon, 23 Oct 2023 12:02:48 -0700
+Message-ID: <20231023190255.39190-6-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20231023190255.39190-1-kuniyu@amazon.com>
 References: <20231023190255.39190-1-kuniyu@amazon.com>
@@ -73,92 +73,89 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.119.77.134]
-X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
+X-ClientProxiedBy: EX19D044UWA003.ant.amazon.com (10.13.139.43) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: Bulk
 
-inet_bind2_bucket_addr_match() and inet_bind2_bucket_match_addr_any()
-are called for each bhash2 bucket to check conflicts.  Thus, we call
-ipv6_addr_any() and ipv6_addr_v4mapped() over and over during bind().
+Later, we no longer link sockets to bhash.  Instead, each bhash2
+bucket is linked to the corresponding bhash bucket.
 
-Let's avoid calling them by saving the address type in inet_bind2_bucket.
+Then, we pass the bhash bucket to bhash2 allocation functions as
+tb.  However, tb is already used in inet_bind2_bucket_create() and
+inet_bind2_bucket_init() as the bhash2 bucket.
+
+To make the following diff clear, let's use tb2 for the bhash2 bucket
+there.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/inet_hashtables.h |  1 +
- net/ipv4/inet_hashtables.c    | 29 +++++++++++++----------------
- 2 files changed, 14 insertions(+), 16 deletions(-)
+ net/ipv4/inet_hashtables.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
-index 171cc235d045..260e673ede22 100644
---- a/include/net/inet_hashtables.h
-+++ b/include/net/inet_hashtables.h
-@@ -96,6 +96,7 @@ struct inet_bind2_bucket {
- 	int			l3mdev;
- 	unsigned short		port;
- #if IS_ENABLED(CONFIG_IPV6)
-+	unsigned short		addr_type;
- 	struct in6_addr		v6_rcv_saddr;
- #define rcv_saddr		v6_rcv_saddr.s6_addr32[3]
- #else
 diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 58900565c6ed..129e4ab4042b 100644
+index 129e4ab4042b..38406a69853b 100644
 --- a/net/ipv4/inet_hashtables.c
 +++ b/net/ipv4/inet_hashtables.c
-@@ -110,10 +110,14 @@ static void inet_bind2_bucket_init(struct inet_bind2_bucket *tb,
- 	tb->l3mdev    = l3mdev;
- 	tb->port      = port;
+@@ -100,30 +100,30 @@ bool inet_bind_bucket_match(const struct inet_bind_bucket *tb, const struct net
+ 		tb->l3mdev == l3mdev;
+ }
+ 
+-static void inet_bind2_bucket_init(struct inet_bind2_bucket *tb,
++static void inet_bind2_bucket_init(struct inet_bind2_bucket *tb2,
+ 				   struct net *net,
+ 				   struct inet_bind_hashbucket *head,
+ 				   unsigned short port, int l3mdev,
+ 				   const struct sock *sk)
+ {
+-	write_pnet(&tb->ib_net, net);
+-	tb->l3mdev    = l3mdev;
+-	tb->port      = port;
++	write_pnet(&tb2->ib_net, net);
++	tb2->l3mdev = l3mdev;
++	tb2->port = port;
  #if IS_ENABLED(CONFIG_IPV6)
--	if (sk->sk_family == AF_INET6)
-+	BUILD_BUG_ON(USHRT_MAX < (IPV6_ADDR_ANY | IPV6_ADDR_MAPPED));
-+	if (sk->sk_family == AF_INET6) {
-+		tb->addr_type = ipv6_addr_type(&sk->sk_v6_rcv_saddr);
- 		tb->v6_rcv_saddr = sk->sk_v6_rcv_saddr;
--	else
-+	} else {
-+		tb->addr_type = IPV6_ADDR_MAPPED;
- 		ipv6_addr_set_v4mapped(sk->sk_rcv_saddr, &tb->v6_rcv_saddr);
-+	}
+ 	BUILD_BUG_ON(USHRT_MAX < (IPV6_ADDR_ANY | IPV6_ADDR_MAPPED));
+ 	if (sk->sk_family == AF_INET6) {
+-		tb->addr_type = ipv6_addr_type(&sk->sk_v6_rcv_saddr);
+-		tb->v6_rcv_saddr = sk->sk_v6_rcv_saddr;
++		tb2->addr_type = ipv6_addr_type(&sk->sk_v6_rcv_saddr);
++		tb2->v6_rcv_saddr = sk->sk_v6_rcv_saddr;
+ 	} else {
+-		tb->addr_type = IPV6_ADDR_MAPPED;
+-		ipv6_addr_set_v4mapped(sk->sk_rcv_saddr, &tb->v6_rcv_saddr);
++		tb2->addr_type = IPV6_ADDR_MAPPED;
++		ipv6_addr_set_v4mapped(sk->sk_rcv_saddr, &tb2->v6_rcv_saddr);
+ 	}
  #else
- 	tb->rcv_saddr = sk->sk_rcv_saddr;
+-	tb->rcv_saddr = sk->sk_rcv_saddr;
++	tb2->rcv_saddr = sk->sk_rcv_saddr;
  #endif
-@@ -153,7 +157,7 @@ static bool inet_bind2_bucket_addr_match(const struct inet_bind2_bucket *tb2,
- 	if (sk->sk_family == AF_INET6)
- 		return ipv6_addr_equal(&tb2->v6_rcv_saddr, &sk->sk_v6_rcv_saddr);
+-	INIT_HLIST_HEAD(&tb->owners);
+-	INIT_HLIST_HEAD(&tb->deathrow);
+-	hlist_add_head(&tb->node, &head->chain);
++	INIT_HLIST_HEAD(&tb2->owners);
++	INIT_HLIST_HEAD(&tb2->deathrow);
++	hlist_add_head(&tb2->node, &head->chain);
+ }
  
--	if (!ipv6_addr_v4mapped(&tb2->v6_rcv_saddr))
-+	if (tb2->addr_type != IPV6_ADDR_MAPPED)
- 		return false;
- #endif
- 	return tb2->rcv_saddr == sk->sk_rcv_saddr;
-@@ -830,21 +834,14 @@ bool inet_bind2_bucket_match_addr_any(const struct inet_bind2_bucket *tb, const
- 		return false;
+ struct inet_bind2_bucket *inet_bind2_bucket_create(struct kmem_cache *cachep,
+@@ -133,12 +133,12 @@ struct inet_bind2_bucket *inet_bind2_bucket_create(struct kmem_cache *cachep,
+ 						   int l3mdev,
+ 						   const struct sock *sk)
+ {
+-	struct inet_bind2_bucket *tb = kmem_cache_alloc(cachep, GFP_ATOMIC);
++	struct inet_bind2_bucket *tb2 = kmem_cache_alloc(cachep, GFP_ATOMIC);
  
- #if IS_ENABLED(CONFIG_IPV6)
--	if (sk->sk_family == AF_INET6) {
--		if (ipv6_addr_any(&tb->v6_rcv_saddr))
--			return true;
--
--		if (!ipv6_addr_v4mapped(&tb->v6_rcv_saddr))
--			return false;
--
--		return ipv6_addr_v4mapped(&sk->sk_v6_rcv_saddr) &&
--			tb->rcv_saddr == 0;
--	}
--
--	if (ipv6_addr_any(&tb->v6_rcv_saddr))
-+	if (tb->addr_type == IPV6_ADDR_ANY)
- 		return true;
+-	if (tb)
+-		inet_bind2_bucket_init(tb, net, head, port, l3mdev, sk);
++	if (tb2)
++		inet_bind2_bucket_init(tb2, net, head, port, l3mdev, sk);
  
--	if (!ipv6_addr_v4mapped(&tb->v6_rcv_saddr))
-+	if (tb->addr_type != IPV6_ADDR_MAPPED)
-+		return false;
-+
-+	if (sk->sk_family == AF_INET6 &&
-+	    !ipv6_addr_v4mapped(&sk->sk_v6_rcv_saddr))
- 		return false;
- #endif
- 	return tb->rcv_saddr == 0;
+-	return tb;
++	return tb2;
+ }
+ 
+ /* Caller must hold hashbucket lock for this tb with local BH disabled */
 -- 
 2.30.2
 
