@@ -1,127 +1,103 @@
-Return-Path: <netdev+bounces-43427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F4627D2F80
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:12:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41E317D2F84
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:13:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39DD7281450
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 10:12:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0CDC28140C
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 10:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAAE314268;
-	Mon, 23 Oct 2023 10:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A491427B;
+	Mon, 23 Oct 2023 10:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bWlA1dIz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE013EEA8
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 10:12:35 +0000 (UTC)
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77B8BDA;
-	Mon, 23 Oct 2023 03:12:33 -0700 (PDT)
-Received: from [78.30.35.151] (port=33152 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1qurv5-00EyJm-M8; Mon, 23 Oct 2023 12:12:26 +0200
-Date: Mon, 23 Oct 2023 12:12:22 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Kaustubh Pandey <quic_kapandey@quicinc.com>
-Cc: mark.tomlinson@alliedtelesis.co.nz, netdev@vger.kernel.org,
-	quic_sharathv@quicinc.com, quic_subashab@quicinc.com,
-	netfilter-devel@vger.kernel.org
-Subject: Re: KASAN: vmalloc-out-of-bounds in ipt_do_table
-Message-ID: <ZTZHBgHovKrN8q6w@calendula>
-References: <7ce196a5-9477-41df-b0fa-c208021a35ba@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280ED13AF9
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 10:13:21 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29E4ED7A;
+	Mon, 23 Oct 2023 03:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698055999; x=1729591999;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lUqcNyeEWqG+/5OmMSoWR9OibhxOM4OinwmqXR7AGrI=;
+  b=bWlA1dIz+SsM1q1sw2dFUxSszmA76iP/qxJLm5DZtS2WF4AOstg+P5w5
+   Xrs5SQm8OIH8Gbv8PbRM/Rxx7kS1JDA6vcr78fwmWHcLBxnAkvgIhJfKG
+   Op4Zqi1ridnRkid0+hXFPZZCeei4e/O33S4yrkaWdY1/OWKfMF7uP1/RI
+   Xd19aJGJYgkUI54dBTl7qIGgdICfe6WxvT78PlaH6P3TZk/nDEuU5KD5e
+   e6WxRvxK5S56X+irVJZoR63UdVJ0Ysz5VnPEu8K1hzNnoXTGKXcRWvXL/
+   Zb4WgJwQwkE+DetB4YhRt66XgZc5vF+wR4IF/57FphWk5609+y6m8qHNA
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10871"; a="8364947"
+X-IronPort-AV: E=Sophos;i="6.03,244,1694761200"; 
+   d="scan'208";a="8364947"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 03:13:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10871"; a="881716793"
+X-IronPort-AV: E=Sophos;i="6.03,244,1694761200"; 
+   d="scan'208";a="881716793"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 03:13:16 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.97-RC2)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1qurvt-00000007uDG-1P00;
+	Mon, 23 Oct 2023 13:13:13 +0300
+Date: Mon, 23 Oct 2023 13:13:13 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: syzbot <syzbot+b8bf7edf9f83071ea0a9@syzkaller.appspotmail.com>
+Cc: gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rafael@kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [kernel?] general protection fault in wpan_phy_register
+Message-ID: <ZTZHObssfh+46Lm6@smile.fi.intel.com>
+References: <0000000000008f824606052a2d9b@google.com>
+ <000000000000af2dbf06083f7baf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7ce196a5-9477-41df-b0fa-c208021a35ba@quicinc.com>
-X-Spam-Score: -1.9 (-)
+In-Reply-To: <000000000000af2dbf06083f7baf@google.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Cc'ing netfilter-devel.
+On Sat, Oct 21, 2023 at 01:03:31PM -0700, syzbot wrote:
+> syzbot suspects this issue was fixed by commit:
+> 
+> commit fd6f7ad2fd4d53fa14f4fd190f9b05d043973892
+> Author: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Date:   Mon Aug 28 14:58:24 2023 +0000
+> 
+>     driver core: return an error when dev_set_name() hasn't happened
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13ea2e89680000
+> start commit:   ac28b1ec6135 net: ipv4: fix one memleak in __inet_del_ifa()
+> git tree:       net
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=e82a7781f9208c0d
+> dashboard link: https://syzkaller.appspot.com/bug?extid=b8bf7edf9f83071ea0a9
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14871d58680000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14ace678680000
+> 
+> If the result looks correct, please mark the issue as fixed by replying with:
 
-On Mon, Oct 23, 2023 at 03:31:25PM +0530, Kaustubh Pandey wrote:
-> Hi Everyone,
-> 
-> We have observed below issue on v5.15 kernel
-> 
-> [83180.055298]
-> ==================================================================
-> [83180.055376] BUG: KASAN: vmalloc-out-of-bounds in ipt_do_table+0x43c/0xaf4
-> [83180.055464] Read of size 8 at addr ffffffc02c0f9000 by task Disposer/1686
-> [83180.055544] CPU: 1 PID: 1686 Comm: Disposer Tainted: G S      W  OE
->   5.15.78-android13-8-g3d973ad4cc47 #1
+#syz fix: driver core: return an error when dev_set_name() hasn't happened
 
-This is slightly behind current -stable. Perhaps this is missing?
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-commit e58a171d35e32e6e8c37cfe0e8a94406732a331f
-Author: Florian Westphal <fw@strlen.de>
-Date:   Fri Feb 17 23:20:06 2023 +0100
+-- 
+With Best Regards,
+Andy Shevchenko
 
-    netfilter: ebtables: fix table blob use-after-free
 
-> [83180.055613] Hardware name: Qualcomm Technologies, Inc. Kalama
-> MTP,davinci DVT (DT)
-> [83180.055655] Call trace:
-> [83180.055677]  dump_backtrace+0x0/0x3b0
-> [83180.055740]  show_stack+0x2c/0x3c
-> [83180.055792]  dump_stack_lvl+0x8c/0xa8
-> [83180.055866]  print_address_description+0x74/0x384
-> [83180.055940]  kasan_report+0x180/0x260
-> [83180.056002]  __asan_load8+0xb4/0xb8
-> [83180.056064]  ipt_do_table+0x43c/0xaf4
-> [83180.056120]  iptable_mangle_hook+0xf4/0x22c
-> [83180.056182]  nf_hook_slow+0x90/0x198
-> [83180.056245]  ip_mc_output+0x50c/0x67c
-> [83180.056302]  ip_send_skb+0x88/0x1bc
-> [83180.056355]  udp_send_skb+0x524/0x930
-> [83180.056415]  udp_sendmsg+0x126c/0x13ac
-> [83180.056474]  udpv6_sendmsg+0x6d4/0x1764
-> [83180.056539]  inet6_sendmsg+0x78/0x98
-> [83180.056605]  __sys_sendto+0x360/0x450
-> [83180.056667]  __arm64_sys_sendto+0x80/0x9c
-> [83180.056725]  invoke_syscall+0x80/0x218
-> [83180.056791]  el0_svc_common+0x18c/0x1bc
-> [83180.056857]  do_el0_svc+0x44/0xfc
-> [83180.056918]  el0_svc+0x20/0x50
-> [83180.056966]  el0t_64_sync_handler+0x84/0xe4
-> [83180.057020]  el0t_64_sync+0x1a4/0x1a8
-> [83180.057110] Memory state around the buggy address:
-> [83180.057150]  ffffffc02c0f8f00: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-> f8 f8 f8
-> [83180.057193]  ffffffc02c0f8f80: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-> f8 f8 f8
-> [83180.057237] >ffffffc02c0f9000: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-> f8 f8 f8
-> [83180.057269]                    ^
-> [83180.057304]  ffffffc02c0f9080: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-> f8 f8 f8
-> [83180.057345]  ffffffc02c0f9100: f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8 f8
-> f8 f8 f8
-> [83180.057378]
-> ==================================================================
-> 
-> There are no reproduction steps available for this.
-> 
-> I have checked along the lines and see that
-> https://github.com/torvalds/linux/commit/175e476b8cdf2a4de7432583b49c871345e4f8a1
-> is still present in this kernel.
-> Checked around similar lines in latest kernel and still see that
-> implementation hasnt  changed much.
-> 
-> Can you pls help check if this is a known issue and was fixed in latest
-> or help in pointing out how to debug this further ?
-> 
-> Thanks,
-> Kaustubh
-> 
 
