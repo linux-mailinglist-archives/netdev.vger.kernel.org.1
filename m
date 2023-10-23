@@ -1,117 +1,94 @@
-Return-Path: <netdev+bounces-43560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 657DC7D3E06
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:41:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB857D3E16
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:43:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 969E31C20A1D
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:41:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28DAC280F38
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:43:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E6721342;
-	Mon, 23 Oct 2023 17:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD94421112;
+	Mon, 23 Oct 2023 17:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7E421340;
-	Mon, 23 Oct 2023 17:41:12 +0000 (UTC)
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA407D73;
-	Mon, 23 Oct 2023 10:41:08 -0700 (PDT)
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6c7b3adbeb6so2445137a34.0;
-        Mon, 23 Oct 2023 10:41:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63EFE200BF;
+	Mon, 23 Oct 2023 17:43:43 +0000 (UTC)
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B926FF;
+	Mon, 23 Oct 2023 10:43:42 -0700 (PDT)
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-583552eafd3so1929325eaf.0;
+        Mon, 23 Oct 2023 10:43:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698082868; x=1698687668;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=41Bv19GFI0dp3UjXn4zsNgx4oX4Yzpdp0llUpY4cVik=;
-        b=sf6STRMmhtI6vxDaUOFrHk9KO13sBrd1HJGwxs+RcMQpdug49L63Do4yoeyxFO55Mz
-         +NZCwJnpVlQG37YNrE7hbBJjdTXT8UElznZXaGlp4cQiA4ggL+DlvpVVZiMKrUszllwI
-         mFGtK4V9lNDsOd+nuSNomBbHIQmp4BELKPYsj1cAOukG+Ceb9zHnag3JJQ2QisYBV5dz
-         zt9bULAYhvB3LLm6nWWB9EPmqjJbwy2aEwPEk8dcBPFiJbo9YZ6/R+c5BP/4vsSzxQT3
-         eeIR4CPwoKkqM5OlN46nOdM0O0O+kly5WO/45oJ1mbgqlmUc8qxLpi7v49jMydxzXCIV
-         DB9A==
-X-Gm-Message-State: AOJu0YyNNSV9Wh3G8A04b97iRrzMmchNUB3hdIzmj2AFvBGNzQCSqeMt
-	lCcfqkUrpOK1/6xHIAlBKw==
-X-Google-Smtp-Source: AGHT+IF1LFd6rdnm4Zyq9zPkgqqNnfACBtz9e9mwvvEY869hZWaxoncCuhA73fhcz/iEFjabWrHRPg==
-X-Received: by 2002:a05:6830:34a4:b0:6b9:a6ef:2709 with SMTP id c36-20020a05683034a400b006b9a6ef2709mr12287668otu.8.1698082867622;
-        Mon, 23 Oct 2023 10:41:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698083021; x=1698687821;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c7LX1REoaUHg4Ho2SH1SkZYL3w8GokVQSY2mKadQZME=;
+        b=KE4NYb5CfVc9teXuBFUmlPzfbWSIAuTw9zodVj3Z3MNfJykKQZ3XQRD6j4SJjlHIcL
+         RvTnEfEv6YGYlTndWkybxwyJbYuIGSBtqtT2/oSKSksCLCmFmrJi7q5igDbTvngjJVuJ
+         2MGYFgtmt2ezxFbmftNfNCSP6qqt4oBMezrCJBqCb7GwU+5ihhPT2Rapg7rYzzVUrt3K
+         pfkcX4aXbkyyzr+VuSaiaVLwkrtQsVbofCeEc6WvRd3632dG+lFHGycrwL2sWBcfmVMG
+         sd5HeLWeE62zKT9/ib5kNOkY5k9gdWpWUtl+F68q8TVv8aryeaSqwJKMyVnxBFMIr3d4
+         aNXw==
+X-Gm-Message-State: AOJu0Yzt6JkD3BtAqpnopuduGdnW8eSVLCOq9HARYAkcAawa6YJ3CRsv
+	arXt5CZoFvh/fdKKCpwq4w==
+X-Google-Smtp-Source: AGHT+IH4CGn5BouhmBudMVEJ2xntrZh9i20oGkrxRttcAVrPeJoL+bhkvjPFJBIFu46oMns3TmYouA==
+X-Received: by 2002:a4a:db89:0:b0:582:c8b4:d9df with SMTP id s9-20020a4adb89000000b00582c8b4d9dfmr9412997oou.1.1698083021376;
+        Mon, 23 Oct 2023 10:43:41 -0700 (PDT)
 Received: from herring.priv ([2607:fb91:e6e0:8169:8cd7:6070:de02:c079])
-        by smtp.gmail.com with ESMTPSA id f21-20020a056830205500b006b753685cc5sm1501499otp.79.2023.10.23.10.41.05
+        by smtp.gmail.com with ESMTPSA id f22-20020a4ace96000000b0057bb406dc31sm1589980oos.2.2023.10.23.10.43.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 10:41:06 -0700 (PDT)
-Received: (nullmailer pid 864634 invoked by uid 1000);
-	Mon, 23 Oct 2023 17:40:49 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Mon, 23 Oct 2023 10:43:40 -0700 (PDT)
+Received: (nullmailer pid 867812 invoked by uid 1000);
+	Mon, 23 Oct 2023 17:43:35 -0000
+Date: Mon, 23 Oct 2023 12:43:35 -0500
+From: Rob Herring <robh@kernel.org>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Gregory Clement <gregory.clement@bootlin.com>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Russell King <linux@armlinux.org.uk>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Christian Marangi <ansuelsmth@gmail.com>, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v5 1/7] dt-bindings: net: dsa: Require ports or
+ ethernet-ports
+Message-ID: <20231023174335.GA865777-robh@kernel.org>
+References: <20231023-marvell-88e6152-wan-led-v5-0-0e82952015a7@linaro.org>
+ <20231023-marvell-88e6152-wan-led-v5-1-0e82952015a7@linaro.org>
+ <CACRpkdZ_o0pMXZEVWfGiu2tPjv=dLMagT6KF-d=kaZ6fJZqr0A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: Thorsten.Kummermehr@microchip.com, casper.casan@gmail.com, devicetree@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org, kuba@kernel.org, UNGLinuxDriver@microchip.com, linux-doc@vger.kernel.org, horms@kernel.org, pabeni@redhat.com, andrew@lunn.ch, rdunlap@infradead.org, horatiu.vultur@microchip.com, Nicolas.Ferre@microchip.com, robh+dt@kernel.org, linux-kernel@vger.kernel.org, conor+dt@kernel.org, davem@davemloft.net, edumazet@google.com, Woojung.Huh@microchip.com, netdev@vger.kernel.org, steen.hegelund@microchip.com, corbet@lwn.net
-In-Reply-To: <20231023154649.45931-10-Parthiban.Veerasooran@microchip.com>
-References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
- <20231023154649.45931-10-Parthiban.Veerasooran@microchip.com>
-Message-Id: <169808266366.861355.6966014557522700866.robh@kernel.org>
-Subject: Re: [PATCH net-next v2 9/9] dt-bindings: net: add Microchip's
- LAN865X 10BASE-T1S MACPHY
-Date: Mon, 23 Oct 2023 12:40:49 -0500
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACRpkdZ_o0pMXZEVWfGiu2tPjv=dLMagT6KF-d=kaZ6fJZqr0A@mail.gmail.com>
 
-
-On Mon, 23 Oct 2023 21:16:49 +0530, Parthiban Veerasooran wrote:
-> Add DT bindings for Microchip's LAN865X 10BASE-T1S MACPHY. The LAN8650/1
-> combines a Media Access Controller (MAC) and an Ethernet PHY to enable
-> 10BASE‑T1S networks. The Ethernet Media Access Controller (MAC) module
-> implements a 10 Mbps half duplex Ethernet MAC, compatible with the IEEE
-> 802.3 standard and a 10BASE-T1S physical layer transceiver integrated
-> into the LAN8650/1. The communication between the Host and the MAC-PHY is
-> specified in the OPEN Alliance 10BASE-T1x MACPHY Serial Interface (TC6).
+On Mon, Oct 23, 2023 at 09:51:00AM +0200, Linus Walleij wrote:
+> On Mon, Oct 23, 2023 at 9:19 AM Linus Walleij <linus.walleij@linaro.org> wrote:
 > 
-> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-> ---
->  .../bindings/net/microchip,lan865x.yaml       | 101 ++++++++++++++++++
->  MAINTAINERS                                   |   1 +
->  2 files changed, 102 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/microchip,lan865x.yaml
+> > Bindings using dsa.yaml#/$defs/ethernet-ports specify that
+> > a DSA switch node need to have a ports or ethernet-ports
+> > subnode, and that is actually required, so add requirements
+> > using oneOf.
+> >
+> > Suggested-by: Rob Herring <robh@kernel.org>
+> > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> (...)
+> > +  oneOf:
+> > +    - required:
+> > +      - ports
+> > +    - required:
+> > +      - ethernet-ports
 > 
+> Ooops I meant to drop the patch altogether because I just
+> couldn't figure out how to test this.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Just move it up a level (no indent).
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/microchip,lan865x.yaml:21:53: [error] syntax error: mapping values are not allowed here (syntax)
-
-dtschema/dtc warnings/errors:
-make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/microchip,lan865x.example.dts'
-Documentation/devicetree/bindings/net/microchip,lan865x.yaml:21:53: mapping values are not allowed in this context
-make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/net/microchip,lan865x.example.dts] Error 1
-./Documentation/devicetree/bindings/net/microchip,lan865x.yaml:21:53: mapping values are not allowed in this context
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/microchip,lan865x.yaml: ignoring, error parsing file
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231023154649.45931-10-Parthiban.Veerasooran@microchip.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Rob
 
