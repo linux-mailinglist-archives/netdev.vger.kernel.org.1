@@ -1,162 +1,254 @@
-Return-Path: <netdev+bounces-43473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAE3B7D36C5
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:34:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DD877D36C7
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:35:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74B2A28154C
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:34:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FDB01C209E3
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D6518040;
-	Mon, 23 Oct 2023 12:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5ixgswJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E30718E2C;
+	Mon, 23 Oct 2023 12:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA0318E20
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:34:35 +0000 (UTC)
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52934FF;
-	Mon, 23 Oct 2023 05:34:34 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1cace3e142eso16473355ad.3;
-        Mon, 23 Oct 2023 05:34:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698064474; x=1698669274; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cCfeGAPmI/1C6hVy3j5HY6SeWT2q6xH+8rq3JEHka0s=;
-        b=L5ixgswJLEDr2m2u2dG+LgKdftPbLwF2n2vApNX6Ci+Hv2f9LBwaXVXQU2LAhWasFD
-         oXP0a8+C0jJOB2jtB9C56tkdt/CkaDOdGJcjLm7bUxoenMznTXHf4R/w9i6ITH/eliB/
-         vHUY9VB7AmiSZRWmAosbXlfg3f8rS+szw74e9GVCfia6WLJ7Av96tQePL37SnuIhI/Qv
-         HB8OHqWG+bdcpWEz9V7F2Z2EACXnHi/ZmzL7JNyhSgcdfPv5zSp332jvxdvaC09jVsJK
-         2yt4TJhlkAziJNCpB6w/Tj8yZXpxMLsLUEgdyCUkw7mEj1iSUiNtWvuPPfmlB4gUaE13
-         ZzkQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C842A18E1C
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:34:57 +0000 (UTC)
+Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 196C11A4
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 05:34:55 -0700 (PDT)
+Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-3b3447c72c4so5947117b6e.1
+        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 05:34:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698064474; x=1698669274;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cCfeGAPmI/1C6hVy3j5HY6SeWT2q6xH+8rq3JEHka0s=;
-        b=rtkY/MKMWIRrx3WJFeqKA8YzcYLaG0BtKPz1YLpOGNfK9CckGTJ70iAInMqgw+2ytb
-         n0FXWq2hUSJTtzIT83XCW1JsTV13uplUWHb6uiRQsyW6TEJifB0PUOq+QMsVJn/K7ZKj
-         waXgQTc//HvALlGSxqYhfimxicGND/aeREdORGqx6/DTtqoL0pWe3Ggi7Hd0diQoSIeM
-         tTQwjoNZ2tUjkOQ+3W/Am/F6vU+VkPlbr3h5UnOKlAjGqBQtUueQ8zovoPie+FM8YEUd
-         O7Ex6l6RLZZurLhnyH8uPkjudXbfC/bmlFNgMKhmXkcqDf5rqHYK/kFIVHCQTFZKzpqn
-         VTaA==
-X-Gm-Message-State: AOJu0YyWbi3LeyJVIN6ay8ogZIfqOFOMCEaycmK2HQqZAdnKaoa62nCs
-	hnrWhhZrBm/PGmKLfice/zQ=
-X-Google-Smtp-Source: AGHT+IH1wbasmBNgondsuKTvzLHD5UV7liWemEtyM+fqBb/NsiHuIK/oggwkA7jK0980y2/7I2tSkw==
-X-Received: by 2002:a17:902:efd1:b0:1c9:ba77:b27e with SMTP id ja17-20020a170902efd100b001c9ba77b27emr6801484plb.46.1698064473560;
-        Mon, 23 Oct 2023 05:34:33 -0700 (PDT)
-Received: from swarup-virtual-machine.localdomain ([171.76.85.44])
-        by smtp.gmail.com with ESMTPSA id c24-20020a170902d91800b001c9ab91d3d7sm5799275plz.37.2023.10.23.05.34.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 05:34:33 -0700 (PDT)
-From: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
-To: davem@davemloft.net,
-	jiri@resnulli.us,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Cc: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
-Subject: [PATCH v2] selftests:net change ifconfig with ip command
-Date: Mon, 23 Oct 2023 18:04:22 +0530
-Message-Id: <20231023123422.2895-1-swarupkotikalapudi@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <ZTYc04N9VK7EarHY@nanopsycho>
-References: <ZTYc04N9VK7EarHY@nanopsycho>
+        d=1e100.net; s=20230601; t=1698064494; x=1698669294;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LaSzd+gkbrCM7vGgdBMSRARMqGm+PCQWkfvF4VBNU/A=;
+        b=lUbx7v4OPIltgMTxgx9bDW5JSHfhmIK7+AJsIkv670jssjzVVXWBYMqwgfyyU15i10
+         KVn9qkvS2kWhNvymjQSaTbxxtVChBeu4CoTWtXe2AJuuhOSYtEa0GNwdIso+z/uX7qSw
+         RuSLYOw4W7jIWNEswChCWSo/VZ50jO3Harbifo53BDUkZU/GHTUZh47w2TykobaAkc2G
+         V+6og9nOhSOp0DpWVzsFFADw2AtagbR3tpoejcM2JXnZQs3nRD2MRLb77AYRgyJ9L9bi
+         cPVeEqe7+lWvqOAinz3j4uNRv1MNAFL22WdrXyNJCug1cTBgYvli7PGLuNFkvSEfeRSd
+         M2vg==
+X-Gm-Message-State: AOJu0Yxgnbv1E2tujMpAK7eGLqOiGqOqnX/xiLpZP9p2Uotl1Jxf0hjv
+	qIQLh9g7Q60a5AKsBnKfkT2e+N0/hWz9egZyX5zLNjlgsYLa
+X-Google-Smtp-Source: AGHT+IFvppQwU00ucRjxbSJLrBNaCTrfp+Me/5264fl4UoBcdOHXKeYyeJjFogEE73vJ5c+BUPT8d+NQy/ZEJpZpl8n+0eMLPrpf
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:198a:b0:3b2:ec65:399e with SMTP id
+ bj10-20020a056808198a00b003b2ec65399emr3653503oib.3.1698064494477; Mon, 23
+ Oct 2023 05:34:54 -0700 (PDT)
+Date: Mon, 23 Oct 2023 05:34:54 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ffc87a06086172a0@google.com>
+Subject: [syzbot] [net?] KASAN: slab-use-after-free Read in ptp_release
+From: syzbot <syzbot+8a676a50d4eee2f21539@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	richardcochran@gmail.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Change ifconfig with ip command,
-on a system where ifconfig is
-not used this script will not
-work correcly.
+Hello,
 
-Test result with this patchset:
+syzbot found the following issue on:
 
-sudo make TARGETS="net" kselftest
-....
-TAP version 13
-1..1
- timeout set to 1500
- selftests: net: route_localnet.sh
- run arp_announce test
- net.ipv4.conf.veth0.route_localnet = 1
- net.ipv4.conf.veth1.route_localnet = 1
- net.ipv4.conf.veth0.arp_announce = 2
- net.ipv4.conf.veth1.arp_announce = 2
- PING 127.25.3.14 (127.25.3.14) from 127.25.3.4 veth0: 56(84)
-  bytes of data.
- 64 bytes from 127.25.3.14: icmp_seq=1 ttl=64 time=0.038 ms
- 64 bytes from 127.25.3.14: icmp_seq=2 ttl=64 time=0.068 ms
- 64 bytes from 127.25.3.14: icmp_seq=3 ttl=64 time=0.068 ms
- 64 bytes from 127.25.3.14: icmp_seq=4 ttl=64 time=0.068 ms
- 64 bytes from 127.25.3.14: icmp_seq=5 ttl=64 time=0.068 ms
+HEAD commit:    2dac75696c6d Add linux-next specific files for 20231018
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10dd834d680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6f8545e1ef7a2b66
+dashboard link: https://syzkaller.appspot.com/bug?extid=8a676a50d4eee2f21539
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
- --- 127.25.3.14 ping statistics ---
- 5 packets transmitted, 5 received, 0% packet loss, time 4073ms
- rtt min/avg/max/mdev = 0.038/0.062/0.068/0.012 ms
- ok
- run arp_ignore test
- net.ipv4.conf.veth0.route_localnet = 1
- net.ipv4.conf.veth1.route_localnet = 1
- net.ipv4.conf.veth0.arp_ignore = 3
- net.ipv4.conf.veth1.arp_ignore = 3
- PING 127.25.3.14 (127.25.3.14) from 127.25.3.4 veth0: 56(84)
-  bytes of data.
- 64 bytes from 127.25.3.14: icmp_seq=1 ttl=64 time=0.032 ms
- 64 bytes from 127.25.3.14: icmp_seq=2 ttl=64 time=0.065 ms
- 64 bytes from 127.25.3.14: icmp_seq=3 ttl=64 time=0.066 ms
- 64 bytes from 127.25.3.14: icmp_seq=4 ttl=64 time=0.065 ms
- 64 bytes from 127.25.3.14: icmp_seq=5 ttl=64 time=0.065 ms
+Unfortunately, I don't have any reproducer for this issue yet.
 
- --- 127.25.3.14 ping statistics ---
- 5 packets transmitted, 5 received, 0% packet loss, time 4092ms
- rtt min/avg/max/mdev = 0.032/0.058/0.066/0.013 ms
- ok
-ok 1 selftests: net: route_localnet.sh
-...
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2375f16ed327/disk-2dac7569.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c80aee6e2e6c/vmlinux-2dac7569.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/664dc23b738d/bzImage-2dac7569.xz
 
-Signed-off-by: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8a676a50d4eee2f21539@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in __lock_acquire+0x41eb/0x5dc0 kernel/locking/lockdep.c:5004
+Read of size 8 at addr ffff888058af5020 by task syz-executor.4/30114
+
+CPU: 0 PID: 30114 Comm: syz-executor.4 Not tainted 6.6.0-rc6-next-20231018-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:364 [inline]
+ print_report+0xc4/0x620 mm/kasan/report.c:475
+ kasan_report+0xda/0x110 mm/kasan/report.c:588
+ __lock_acquire+0x41eb/0x5dc0 kernel/locking/lockdep.c:5004
+ lock_acquire kernel/locking/lockdep.c:5753 [inline]
+ lock_acquire+0x1b2/0x530 kernel/locking/lockdep.c:5718
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0x3a/0x50 kernel/locking/spinlock.c:162
+ ptp_release+0xb2/0x2b0 drivers/ptp/ptp_chardev.c:146
+ ptp_read+0xf6/0x830 drivers/ptp/ptp_chardev.c:589
+ posix_clock_read+0x138/0x1b0 kernel/time/posix-clock.c:51
+ vfs_read+0x1ce/0x8f0 fs/read_write.c:468
+ ksys_read+0x12f/0x250 fs/read_write.c:613
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7f5b40c7cae9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f5b41a770c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+RAX: ffffffffffffffda RBX: 00007f5b40d9c050 RCX: 00007f5b40c7cae9
+RDX: 000000000000008a RSI: 0000000020000040 RDI: 0000000000000005
+RBP: 00007f5b40cc847a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f5b40d9c050 R15: 00007fffd3982cb8
+ </TASK>
+
+Allocated by task 30113:
+ kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ ____kasan_kmalloc mm/kasan/common.c:374 [inline]
+ __kasan_kmalloc+0xa2/0xb0 mm/kasan/common.c:383
+ kmalloc include/linux/slab.h:600 [inline]
+ kzalloc include/linux/slab.h:721 [inline]
+ ptp_open+0xe3/0x4f0 drivers/ptp/ptp_chardev.c:112
+ posix_clock_open+0x17e/0x240 kernel/time/posix-clock.c:134
+ chrdev_open+0x26d/0x6e0 fs/char_dev.c:414
+ do_dentry_open+0x8d4/0x18d0 fs/open.c:948
+ do_open fs/namei.c:3621 [inline]
+ path_openat+0x1d3b/0x2ce0 fs/namei.c:3778
+ do_filp_open+0x1de/0x430 fs/namei.c:3808
+ do_sys_openat2+0x176/0x1e0 fs/open.c:1440
+ do_sys_open fs/open.c:1455 [inline]
+ __do_sys_openat fs/open.c:1471 [inline]
+ __se_sys_openat fs/open.c:1466 [inline]
+ __x64_sys_openat+0x175/0x210 fs/open.c:1466
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Freed by task 30113:
+ kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ kasan_save_free_info+0x2b/0x40 mm/kasan/generic.c:522
+ ____kasan_slab_free mm/kasan/common.c:236 [inline]
+ ____kasan_slab_free+0x15b/0x1b0 mm/kasan/common.c:200
+ kasan_slab_free include/linux/kasan.h:164 [inline]
+ slab_free_hook mm/slub.c:1800 [inline]
+ slab_free_freelist_hook+0x114/0x1e0 mm/slub.c:1826
+ slab_free mm/slub.c:3809 [inline]
+ __kmem_cache_free+0xc0/0x180 mm/slub.c:3822
+ ptp_release+0x204/0x2b0 drivers/ptp/ptp_chardev.c:150
+ ptp_read+0xf6/0x830 drivers/ptp/ptp_chardev.c:589
+ posix_clock_read+0x138/0x1b0 kernel/time/posix-clock.c:51
+ vfs_read+0x1ce/0x8f0 fs/read_write.c:468
+ ksys_read+0x12f/0x250 fs/read_write.c:613
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+The buggy address belongs to the object at ffff888058af4000
+ which belongs to the cache kmalloc-8k of size 8192
+The buggy address is located 4128 bytes inside of
+ freed 8192-byte region [ffff888058af4000, ffff888058af6000)
+
+The buggy address belongs to the physical page:
+page:ffffea000162bc00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x58af0
+head:ffffea000162bc00 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0xfff00000000840(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000000840 ffff888012c42280 ffffea000066c400 dead000000000006
+raw: 0000000000000000 0000000080020002 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5072, tgid 5072 (syz-executor.0), ts 99807679464, free_ts 30263208265
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x2cf/0x340 mm/page_alloc.c:1537
+ prep_new_page mm/page_alloc.c:1544 [inline]
+ get_page_from_freelist+0xa16/0x3680 mm/page_alloc.c:3348
+ __alloc_pages+0x1d0/0x4c0 mm/page_alloc.c:4604
+ alloc_pages_mpol+0x258/0x5f0 mm/mempolicy.c:2133
+ alloc_slab_page mm/slub.c:1870 [inline]
+ allocate_slab+0x251/0x380 mm/slub.c:2017
+ new_slab mm/slub.c:2070 [inline]
+ ___slab_alloc+0x8c7/0x1580 mm/slub.c:3223
+ __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3322
+ __slab_alloc_node mm/slub.c:3375 [inline]
+ slab_alloc_node mm/slub.c:3468 [inline]
+ __kmem_cache_alloc_node+0x131/0x310 mm/slub.c:3517
+ __do_kmalloc_node mm/slab_common.c:1006 [inline]
+ __kmalloc_node+0x56/0x130 mm/slab_common.c:1014
+ kmalloc_node include/linux/slab.h:620 [inline]
+ kvmalloc_node+0x6f/0x1a0 mm/util.c:607
+ kvmalloc include/linux/slab.h:738 [inline]
+ kvmalloc_array include/linux/slab.h:756 [inline]
+ __ptr_ring_init_queue_alloc include/linux/ptr_ring.h:471 [inline]
+ ptr_ring_init include/linux/ptr_ring.h:489 [inline]
+ skb_array_init include/linux/skb_array.h:182 [inline]
+ pfifo_fast_init+0x125/0x3a0 net/sched/sch_generic.c:858
+ qdisc_create_dflt+0x101/0x3f0 net/sched/sch_generic.c:1004
+ attach_one_default_qdisc net/sched/sch_generic.c:1160 [inline]
+ netdev_for_each_tx_queue include/linux/netdevice.h:2511 [inline]
+ attach_default_qdiscs net/sched/sch_generic.c:1178 [inline]
+ dev_activate+0x66c/0x1310 net/sched/sch_generic.c:1237
+ __dev_open+0x383/0x4d0 net/core/dev.c:1459
+ __dev_change_flags+0x56a/0x730 net/core/dev.c:8608
+ dev_change_flags+0x9a/0x170 net/core/dev.c:8680
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1137 [inline]
+ free_unref_page_prepare+0x476/0xa40 mm/page_alloc.c:2383
+ free_unref_page+0x33/0x3b0 mm/page_alloc.c:2523
+ free_contig_range+0xb6/0x190 mm/page_alloc.c:6569
+ destroy_args+0x7c9/0xa10 mm/debug_vm_pgtable.c:1028
+ debug_vm_pgtable+0x1d50/0x40e0 mm/debug_vm_pgtable.c:1408
+ do_one_initcall+0x128/0x670 init/main.c:1232
+ do_initcall_level init/main.c:1294 [inline]
+ do_initcalls init/main.c:1310 [inline]
+ do_basic_setup init/main.c:1329 [inline]
+ kernel_init_freeable+0x5c2/0x900 init/main.c:1547
+ kernel_init+0x1c/0x2a0 init/main.c:1437
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+Memory state around the buggy address:
+ ffff888058af4f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888058af4f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff888058af5000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                               ^
+ ffff888058af5080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888058af5100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
 ---
- tools/testing/selftests/net/route_localnet.sh | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/tools/testing/selftests/net/route_localnet.sh b/tools/testing/selftests/net/route_localnet.sh
-index 116bfeab72fa..e08701c750e3 100755
---- a/tools/testing/selftests/net/route_localnet.sh
-+++ b/tools/testing/selftests/net/route_localnet.sh
-@@ -18,8 +18,10 @@ setup() {
-     ip route del 127.0.0.0/8 dev lo table local
-     ip netns exec "${PEER_NS}" ip route del 127.0.0.0/8 dev lo table local
- 
--    ifconfig veth0 127.25.3.4/24 up
--    ip netns exec "${PEER_NS}" ifconfig veth1 127.25.3.14/24 up
-+    ip address add 127.25.3.4/24 dev veth0
-+    ip link set dev veth0 up
-+    ip netns exec "${PEER_NS}" ip address add 127.25.3.14/24 dev veth1
-+    ip netns exec "${PEER_NS}" ip link set dev veth1 up
- 
-     ip route flush cache
-     ip netns exec "${PEER_NS}" ip route flush cache
--- 
-2.34.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
