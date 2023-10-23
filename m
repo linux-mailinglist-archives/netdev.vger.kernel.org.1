@@ -1,160 +1,116 @@
-Return-Path: <netdev+bounces-43556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC8A47D3DF1
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:39:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 810427D3DFB
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D28CB20CF1
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:39:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DBE02810D2
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431A7210F6;
-	Mon, 23 Oct 2023 17:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xxp+fd/k"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9162D210F6;
+	Mon, 23 Oct 2023 17:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B1A20B3E
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 17:39:10 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34CB083
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 10:39:09 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9bf0ac97fdeso506691066b.2
-        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 10:39:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698082747; x=1698687547; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zXe6k56/EhvQPRaSbGipEWjZE263q3B+4H13mBLQc6s=;
-        b=xxp+fd/krg2jKh82IwL7MBrB0v5TwNARm8IueB4o6HYkKbzHrjUKrHYuY6nDwIzFJ6
-         QER0w+EbNY0IEu9CvWAK6oBk6ONxM7/Wyj79hvcY/DsfQ8UI1FnSYRENCSeh/FLNABKW
-         SQQ82UDLTm3OR3hzHcahc2ZhRV/Gtyrp9LNvhbV8ILGmGsjXrco1XHBxNXLaj8Jtd2I3
-         RDr8Lv5mJKAn2YQXpQaCLW0X1okGaA9YN37nJTAGd1GUAk1OOQTfLGp5jHEyg4nj0vFY
-         g+MPDBz4+uGehMwLsx/ucC+Q7MwkAtf3Mkb/J/QLdfl7mBGs+p2gop3dUu92RdDgLgw0
-         CUBQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5BF1BDEB;
+	Mon, 23 Oct 2023 17:40:58 +0000 (UTC)
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 721DBB0;
+	Mon, 23 Oct 2023 10:40:57 -0700 (PDT)
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6c4b9e09521so2505781a34.3;
+        Mon, 23 Oct 2023 10:40:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698082747; x=1698687547;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zXe6k56/EhvQPRaSbGipEWjZE263q3B+4H13mBLQc6s=;
-        b=jWARtVJavUmn55seMc+57/FwWaFzFw63uGs3fCn366XdAMXbekQ3gGc25/zfsQBWxB
-         iJPASHntED9MDDPwlFHYpFe8qM9bycuYz+7XC+VlgYnJEN12x7J8TREfQwDatnQbmmqm
-         lIaDIcvor92dqZhCkxam2myu7nrrNXzMuLhnCpugpH7dYZjU3HvWVW46DuygidsiFMDA
-         NgcQPt7Fd1XrR0wwyf6rWPALAWyjVm6kF/Y5PtdR7N1vtQUV7wdQ0Ncko2l5y73ATnDT
-         44laR6axlmzs9KNw4RnORMrfDYlPBTU2a35oneP3U/p9k9EHy4YBG/bvjgWJ3uVeYQLS
-         jjoQ==
-X-Gm-Message-State: AOJu0YyuwW7fQj3Tg1n9+3syKGsjWXEN5TSFBsAyIZole1QkY3pazWpo
-	z6w8S+rEZABEzfxCDvBJxpSwqw==
-X-Google-Smtp-Source: AGHT+IGcfuofM+DQllnpvWLo5m4Zem0XPjXgh6dW/zXkKw0WGIjvu+x3F3hLnpkMzSzBJBFeCiXCng==
-X-Received: by 2002:a17:907:1b1c:b0:9bd:a7a5:3a5a with SMTP id mp28-20020a1709071b1c00b009bda7a53a5amr6775433ejc.36.1698082747677;
-        Mon, 23 Oct 2023 10:39:07 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.218.126])
-        by smtp.gmail.com with ESMTPSA id k17-20020a1709063e1100b009b2cc87b8c3sm6940519eji.52.2023.10.23.10.39.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Oct 2023 10:39:07 -0700 (PDT)
-Message-ID: <299ec30a-3441-4d7d-9941-0fe8fde9de23@linaro.org>
-Date: Mon, 23 Oct 2023 19:39:05 +0200
+        d=1e100.net; s=20230601; t=1698082857; x=1698687657;
+        h=date:subject:message-id:references:in-reply-to:cc:to:from
+         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gJUB7T6ggr9ReWGTHjmIzl9odtVPcmxjSmpLxnF/YjE=;
+        b=VTOiTKNeh0qvTcAUYXnF+O67rR3klIVi5shGC/jyK9GcACRWIrbyHcZnfO4wh9++Xq
+         Dr5pEfF4+aC6T77BbDSS8lHzwW7Qonlc7uXjJoF5sVgg9voiDsQTW8r5lTB6S9VC2Ii1
+         XnDgYtZt5j4/1Vy72HqA94KwvV0YkeppdpM/pvoLrK3J4Qj+/tceu9R2fTesupHbNRz+
+         WrAqHbgJjvhsVtz9BMRntmkBoN2YJ5Y4vIzPimrV2xkHd6wt4tZx2IZWzqKgUqUu5CzT
+         H4/lj6bI/5xb/gqdS000Oy5xpmZIOE5uvIH5jIU0cPizJDh9iLls36ghC0jxDbHXy7Pb
+         97Jw==
+X-Gm-Message-State: AOJu0YyxOjSC5BwqyReI/uZE/JbxlhvztMCtIe/oKbIo6bHK/BI5qAoA
+	PFhm20vxAEltjdCT5Trq+g==
+X-Google-Smtp-Source: AGHT+IErcHg33n39OkEdWsOE47mWXIR4sKav331Xa/eEmRdc558JSqoUNUuAI0pR3IQ3X5PA+BEk7Q==
+X-Received: by 2002:a05:6870:7029:b0:1e9:96c6:e040 with SMTP id u41-20020a056870702900b001e996c6e040mr10972318oae.32.1698082856727;
+        Mon, 23 Oct 2023 10:40:56 -0700 (PDT)
+Received: from herring.priv ([2607:fb91:e6e0:8169:8cd7:6070:de02:c079])
+        by smtp.gmail.com with ESMTPSA id z16-20020a9d7a50000000b006cd0a04b56esm1491815otm.56.2023.10.23.10.40.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Oct 2023 10:40:56 -0700 (PDT)
+Received: (nullmailer pid 864632 invoked by uid 1000);
+	Mon, 23 Oct 2023 17:40:49 -0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/5] dts: qcom: ipq4019: Add description for the
- IPQ4019 ESS EDMA and switch
-Content-Language: en-US
-To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Luka Perkov <luka.perkov@sartura.hr>, Robert Marko
- <robert.marko@sartura.hr>, Andy Gross <agross@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@somainline.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-References: <20231023155013.512999-1-romain.gantois@bootlin.com>
- <20231023155013.512999-6-romain.gantois@bootlin.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231023155013.512999-6-romain.gantois@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Rob Herring <robh@kernel.org>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: linux-doc@vger.kernel.org, horms@kernel.org, devicetree@vger.kernel.org, horatiu.vultur@microchip.com, krzysztof.kozlowski+dt@linaro.org, corbet@lwn.net, linux-kernel@vger.kernel.org, Nicolas.Ferre@microchip.com, robh+dt@kernel.org, UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, rdunlap@infradead.org, andrew@lunn.ch, edumazet@google.com, pabeni@redhat.com, kuba@kernel.org, steen.hegelund@microchip.com, davem@davemloft.net, Thorsten.Kummermehr@microchip.com, Woojung.Huh@microchip.com, casper.casan@gmail.com, conor+dt@kernel.org
+In-Reply-To: <20231023154649.45931-5-Parthiban.Veerasooran@microchip.com>
+References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
+ <20231023154649.45931-5-Parthiban.Veerasooran@microchip.com>
+Message-Id: <169808266165.861277.6927507882203709016.robh@kernel.org>
+Subject: Re: [PATCH net-next v2 4/9] dt-bindings: net: add OPEN Alliance
+ 10BASE-T1x MAC-PHY Serial Interface
+Date: Mon, 23 Oct 2023 12:40:49 -0500
 
-On 23/10/2023 17:50, Romain Gantois wrote:
-> The Qualcomm IPQ4019 includes a modified version of the QCA8K Ethernet
-> switch. The switch's CPU port is connected to the SoC through the internal
-> EDMA Ethernet controller. Add support for these two devices, which are
-> coupled tightly enough to justify treating them as a single device.
+
+On Mon, 23 Oct 2023 21:16:44 +0530, Parthiban Veerasooran wrote:
+> Add DT bindings OPEN Alliance 10BASE-T1x MACPHY Serial Interface
+> parameters. These are generic properties that can apply to any 10BASE-T1x
+> MAC-PHY which uses OPEN Alliance TC6 specification.
+> 
+> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+> ---
+>  .../devicetree/bindings/net/oa-tc6.yaml       | 72 +++++++++++++++++++
+>  MAINTAINERS                                   |  1 +
+>  2 files changed, 73 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/oa-tc6.yaml
 > 
 
-Please use subject prefixes matching the subsystem. You can get them for
-example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
-your patch is touching.
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
-> ---
->  .../boot/dts/qcom/qcom-ipq4018-ap120c-ac.dtsi | 13 +++
->  arch/arm/boot/dts/qcom/qcom-ipq4019.dtsi      | 94 +++++++++++++++++++
->  2 files changed, 107 insertions(+)
+yamllint warnings/errors:
+./Documentation/devicetree/bindings/net/oa-tc6.yaml:16:68: [error] syntax error: mapping values are not allowed here (syntax)
 
-Best regards,
-Krzysztof
+dtschema/dtc warnings/errors:
+make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/oa-tc6.example.dts'
+Documentation/devicetree/bindings/net/oa-tc6.yaml:16:68: mapping values are not allowed in this context
+make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/net/oa-tc6.example.dts] Error 1
+make[2]: *** Waiting for unfinished jobs....
+./Documentation/devicetree/bindings/net/oa-tc6.yaml:16:68: mapping values are not allowed in this context
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/oa-tc6.yaml: ignoring, error parsing file
+make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1427: dt_binding_check] Error 2
+make: *** [Makefile:234: __sub-make] Error 2
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231023154649.45931-5-Parthiban.Veerasooran@microchip.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
