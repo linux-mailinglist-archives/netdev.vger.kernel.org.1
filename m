@@ -1,51 +1,54 @@
-Return-Path: <netdev+bounces-43481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 217757D38CE
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:03:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 030E27D38D4
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:04:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDF3628133F
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:03:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB49D2813BD
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4615619BC0;
-	Mon, 23 Oct 2023 14:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8CD51A583;
+	Mon, 23 Oct 2023 14:04:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="NZR/yraA"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287C11B26B
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 14:03:51 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 601F7C2
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 07:03:49 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-447-orEJjE89OeeGCSgho3wybg-1; Mon,
- 23 Oct 2023 10:03:28 -0400
-X-MC-Unique: orEJjE89OeeGCSgho3wybg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 59E171C11703;
-	Mon, 23 Oct 2023 14:03:14 +0000 (UTC)
-Received: from hog (unknown [10.39.192.51])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 01E23111D784;
-	Mon, 23 Oct 2023 14:03:12 +0000 (UTC)
-Date: Mon, 23 Oct 2023 16:03:11 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Hangyu Hua <hbh25y@gmail.com>
-Cc: borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: tls: Fix possible NULL-pointer dereference in
- tls_decrypt_device() and tls_decrypt_sw()
-Message-ID: <ZTZ9H4aDB45RzrFD@hog>
-References: <20231023080611.19244-1-hbh25y@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77AE1B26B
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 14:04:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74247C433C8;
+	Mon, 23 Oct 2023 14:04:19 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="NZR/yraA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1698069857;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a50K0V9T1FPsR2jaKp1w4O6pzSmklgTtl4SI1anzDNw=;
+	b=NZR/yraAyQD6UFh5OFNCQwAN8jFa0XXnp5//mlWQvFo7VrBJlkIs/Los7YsKijowzzCMrN
+	TjYIzwVoyCzNEgSl5csIDcuJLWw/FG+CmawZlQmsVSJGvE76RPTAq7dWigIPcH4jJ5RWCA
+	zg4lZUDB48ZR/K6VLkx/SQTQHYqRKiQ=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c64f3372 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Mon, 23 Oct 2023 14:04:16 +0000 (UTC)
+Date: Mon, 23 Oct 2023 16:04:13 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Daniel =?utf-8?Q?Gr=C3=B6ber?= <dxld@darkboxed.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] wireguard: Fix leaking sockets in wg_socket_init error
+ paths
+Message-ID: <ZTZ9XfPOXD4JXdjk@zx2c4.com>
+References: <20231023130609.595122-1-dxld@darkboxed.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,66 +57,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231023080611.19244-1-hbh25y@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231023130609.595122-1-dxld@darkboxed.org>
 
-2023-10-23, 16:06:11 +0800, Hangyu Hua wrote:
-> tls_rx_one_record can be called in tls_sw_splice_read and tls_sw_read_sock
-> with msg being NULL. This may lead to null pointer dereferences in
-> tls_decrypt_device and tls_decrypt_sw.
+Hi,
+
+The signed-off-by is missing and the subject does not match the format
+of any other wireguard commits.
+
+On Mon, Oct 23, 2023 at 03:06:09PM +0200, Daniel Gröber wrote:
+> This doesn't seem to be reachable normally, but while working on a patch
+
+"Normally" as in what? At all? Or?
+
+> for the address binding code I ended up triggering this leak and had to
+> reboot to get rid of the leaking wg sockets.
+
+This commit message doesn't describe any rationale for this patch. Can
+you describe the bug?
+
+> ---
+>  drivers/net/wireguard/socket.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> Fix this by adding a check.
+> diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.c
+> index 0414d7a6ce74..c35163f503e7 100644
+> --- a/drivers/net/wireguard/socket.c
+> +++ b/drivers/net/wireguard/socket.c
+> @@ -387,7 +387,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+>  	ret = udp_sock_create(net, &port4, &new4);
+>  	if (ret < 0) {
+>  		pr_err("%s: Could not create IPv4 socket\n", wg->dev->name);
+> -		goto out;
+> +		goto err;
 
-Have you actually hit this NULL dereference? I don't see how it can
-happen.
+`new4` is either NULL or has already been freed here in the `goto retry`
+case. `new6` is NULL here.
 
-darg->zc is 0 in both cases, so tls_decrypt_device doesn't call
-skb_copy_datagram_msg.
+>  	}
+>  	set_sock_opts(new4);
+>  	setup_udp_tunnel_sock(net, new4, &cfg);
+> @@ -402,7 +402,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+>  				goto retry;
+>  			pr_err("%s: Could not create IPv6 socket\n",
+>  			       wg->dev->name);
+> -			goto out;
+> +			goto err;
 
-tls_decrypt_sw will call tls_decrypt_sg with out_iov = &msg->msg_iter
-(a bogus pointer but no NULL deref yet), and darg->zc is still
-0. tls_decrypt_sg skips the use of out_iov/out_sg and allocates
-clear_skb, and the next place where it would use out_iov is skipped
-because we have clear_skb.
+`new4` has just been freed by `udp_tunnel_sock_release` just above the
+context. `new6` is NULL.
 
-Relevant parts of tls_decrypt_sg:
+>  		}
+>  		set_sock_opts(new6);
+>  		setup_udp_tunnel_sock(net, new6, &cfg);
+> @@ -414,6 +414,11 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+>  out:
+>  	put_net(net);
+>  	return ret;
+> +
+> +err:
+> +	sock_free(new4 ? new4->sk : NULL);
+> +	sock_free(new6 ? new6->sk : NULL);
+> +	goto out;
+>  }
+>  
+>  void wg_socket_reinit(struct wg_device *wg, struct sock *new4,
 
-static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
-			  struct scatterlist *out_sg,
-			  struct tls_decrypt_arg *darg)
-{
-[...]
-	if (darg->zc && (out_iov || out_sg)) {
-		clear_skb = NULL;
-[...]
-	} else {
-		darg->zc = false;
+I don't see the bug. If there is one, maybe try again with a real patch
+that describes it better. If there isn't one, what is the point?
 
-		clear_skb = tls_alloc_clrtxt_skb(sk, skb, rxm->full_len);
-[...]
-	}
-
-[...]
-	if (err < 0)
-		goto exit_free;
-
-	if (clear_skb) {
-		sg_init_table(sgout, n_sgout);
-		sg_set_buf(&sgout[0], dctx->aad, prot->aad_size);
-
-		err = skb_to_sgvec(clear_skb, &sgout[1], prot->prepend_size,
-				   data_len + prot->tail_size);
-		if (err < 0)
-			goto exit_free;
-	} else if (out_iov) {
-[...]
-	} else if (out_sg) {
-		memcpy(sgout, out_sg, n_sgout * sizeof(*sgout));
-	}
-[...]
-}
-
--- 
-Sabrina
-
+Jason
 
