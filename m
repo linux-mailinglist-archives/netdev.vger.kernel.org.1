@@ -1,197 +1,150 @@
-Return-Path: <netdev+bounces-43399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E93DD7D2DF0
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:20:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A07E87D2E60
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:34:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4273281481
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 09:20:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DB15B20DF5
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 09:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A4D12B90;
-	Mon, 23 Oct 2023 09:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xe2km3me"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590D9134C8;
+	Mon, 23 Oct 2023 09:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AEE12B8A;
-	Mon, 23 Oct 2023 09:20:04 +0000 (UTC)
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C22597;
-	Mon, 23 Oct 2023 02:20:02 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id 5614622812f47-3b2d9a9c824so734942b6e.0;
-        Mon, 23 Oct 2023 02:20:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698052801; x=1698657601; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vTLLmppAiMZ7nebqhxgQeiaMrLVs8gT7ZeBZYFeZ6xE=;
-        b=Xe2km3mefczzcEdTcj3r5z29OEcc9m2dEynCHe4u18Bg0Qe0xPid9udVTJReXpgL11
-         /w1OLrrz2peHd2LXTZ4EIKsg5CZcwjG71QleQVJr4SwXD69nUZK14zJ4/2/6DtJMDmpl
-         q6sH0ZpqliwoIIse/Q7hogJXfwO24OP6RIBjkqd9C69T14l83saw1cCXXWwI1CP7jVa/
-         n/q8GLseWdzzM5ew4ZP7FHRWJ4MPHJxsX12HSxfrqlhAFFANrCHvDon1gDR3fGNh5+Wh
-         UWsUQzSD/1GMV6ULZ7ZKK00RlGWHNlcym4P019lzr2UmIqZN7VlPAdalGSClmdO6zyKr
-         fMcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698052801; x=1698657601;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vTLLmppAiMZ7nebqhxgQeiaMrLVs8gT7ZeBZYFeZ6xE=;
-        b=gSApZzXYJNSnO3MdOJtLS+gsY/HfxTeDiE2ungy1jqPW3wMMSjftQA4x7JE/s/gPTR
-         qB0y0wmi++hcyMmkLVfUcl1oyU/hIHb1sl9r/LgTKq25efTBLb0choawYiRreuLqZu73
-         6UBkvmd/P5uC5ye9mRWEJe5ZXDMYGZAOzyfYpoD9NTIVUHrmkKQSALP67Ia2o9Q7P93U
-         rLQKe/lPcaz6VtBA0tuNfmjvezSJKDPs4feYWL3Rwyjtqw+V/+8q8WScuVnPhBO+PRBS
-         E/GEIXhIY+Tc2QnaQKiaDv10lv17+MGPGTWG1tEMhVzaMnaVkiufYyOw0veOFZ+e0lsK
-         KUPw==
-X-Gm-Message-State: AOJu0Yztr85CcmydEXO8iqJFft4srNUy1UhcEmRy0GhinW61BJjAchwE
-	Cjb+xakws4GuRtJfbZA5RUdr/3T4NONqE8g3j5Q=
-X-Google-Smtp-Source: AGHT+IFriz68SBWCUSMU11F4QB9bXbe0kY3AVlbNs7eJqLAlATQXIQkeCpneiw2ILwtUzPeql2Rdrrw5FcvVA8kr3SI=
-X-Received: by 2002:a05:6830:a84:b0:6c4:7516:f2cf with SMTP id
- n4-20020a0568300a8400b006c47516f2cfmr8139106otu.2.1698052801541; Mon, 23 Oct
- 2023 02:20:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88016134AF
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 09:34:09 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F379F110
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 02:34:07 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qurJi-0000D8-0k; Mon, 23 Oct 2023 11:33:46 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qurJg-003fwl-Sp; Mon, 23 Oct 2023 11:33:44 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qurJg-009wcP-2e;
+	Mon, 23 Oct 2023 11:33:44 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: [PATCH net-next v7 0/9] net: dsa: microchip: provide Wake on LAN support
+Date: Mon, 23 Oct 2023 11:33:34 +0200
+Message-Id: <20231023093343.2370248-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231019174944.3376335-1-sdf@google.com> <20231019174944.3376335-12-sdf@google.com>
-In-Reply-To: <20231019174944.3376335-12-sdf@google.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Mon, 23 Oct 2023 11:19:50 +0200
-Message-ID: <CAJ8uoz0UERM3_yAbNmTV=c5kE1rmKBY2KQ0bRH9gV6de1NRJqA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 11/11] xsk: Document tx_metadata_len layout
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
-	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
-	maciej.fijalkowski@intel.com, hawk@kernel.org, yoong.siang.song@intel.com, 
-	netdev@vger.kernel.org, xdp-hints@xdp-project.net
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, 19 Oct 2023 at 19:50, Stanislav Fomichev <sdf@google.com> wrote:
->
-> - how to use
-> - how to query features
-> - pointers to the examples
->
-> Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> ---
->  Documentation/networking/index.rst           |  1 +
->  Documentation/networking/xsk-tx-metadata.rst | 77 ++++++++++++++++++++
->  2 files changed, 78 insertions(+)
->  create mode 100644 Documentation/networking/xsk-tx-metadata.rst
->
-> diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-> index 2ffc5ad10295..f3c2566d6cad 100644
-> --- a/Documentation/networking/index.rst
-> +++ b/Documentation/networking/index.rst
-> @@ -122,6 +122,7 @@ Refer to :ref:`netdev-FAQ` for a guide on netdev development process specifics.
->     xfrm_sync
->     xfrm_sysctl
->     xdp-rx-metadata
-> +   xsk-tx-metadata
->
->  .. only::  subproject and html
->
-> diff --git a/Documentation/networking/xsk-tx-metadata.rst b/Documentation/networking/xsk-tx-metadata.rst
-> new file mode 100644
-> index 000000000000..b7289f06745c
-> --- /dev/null
-> +++ b/Documentation/networking/xsk-tx-metadata.rst
-> @@ -0,0 +1,77 @@
-> +==================
-> +AF_XDP TX Metadata
-> +==================
-> +
-> +This document describes how to enable offloads when transmitting packets
-> +via :doc:`af_xdp`. Refer to :doc:`xdp-rx-metadata` on how to access similar
-> +metadata on the receive side.
-> +
-> +General Design
-> +==============
-> +
-> +The headroom for the metadata is reserved via ``tx_metadata_len`` in
-> +``struct xdp_umem_reg``. The metadata length is therefore the same for
-> +every socket that shares the same umem. The metadata layout is a fixed UAPI,
-> +refer to ``union xsk_tx_metadata`` in ``include/uapi/linux/if_xdp.h``.
-> +Thus, generally, the ``tx_metadata_len`` field above should contain
-> +``sizeof(union xsk_tx_metadata)``.
-> +
-> +The headroom and the metadata itself should be located right before
-> +``xdp_desc->addr`` in the umem frame. Within a frame, the metadata
-> +layout is as follows::
-> +
-> +           tx_metadata_len
-> +     /                         \
-> +    +-----------------+---------+----------------------------+
-> +    | xsk_tx_metadata | padding |          payload           |
-> +    +-----------------+---------+----------------------------+
-> +                                ^
-> +                                |
-> +                          xdp_desc->addr
-> +
-> +An AF_XDP application can request headrooms larger than ``sizeof(struct
-> +xsk_tx_metadata)``. The kernel will ignore the padding (and will still
-> +use ``xdp_desc->addr - tx_metadata_len`` to locate
-> +the ``xsk_tx_metadata``). For the frames that shouldn't carry
-> +any metadata (i.e., the ones that don't have ``XDP_TX_METADATA`` option),
-> +the metadata area is ignored by the kernel as well.
-> +
-> +The flags field enables the particular offload:
-> +
-> +- ``XDP_TX_METADATA_TIMESTAMP``: requests the device to put transmission
-> +  timestamp into ``tx_timestamp`` field of ``union xsk_tx_metadata``.
-> +- ``XDP_TX_METADATA_CHECKSUM``: requests the device to calculate L4
-> +  checksum. ``csum_start`` specifies byte offset of there the checksumming
+This patch series introduces extensive Wake on LAN (WoL) support for the
+Microchip KSZ9477 family of switches, coupled with some code refactoring
+and error handling enhancements. The principal aim is to enable and
+manage Wake on Magic Packet and other PHY event triggers for waking up
+the system, whilst ensuring that the switch isn't reset during a
+shutdown if WoL is active.
 
-nit: of there -> where
+The Wake on LAN functionality is optional and is particularly beneficial
+if the PME pins are connected to the SoC as a wake source or to a PMIC
+that can enable or wake the SoC.
 
-> +  should start and ``csum_offset`` specifies byte offset where the
-> +  device should store the computed checksum.
-> +- ``XDP_TX_METADATA_CHECKSUM_SW``: requests checksum calculation to
-> +  be done in software; this mode works only in ``XSK_COPY`` mode and
-> +  is mostly intended for testing. Do not enable this option, it
-> +  will negatively affect performance.
-> +
-> +Besides the flags above, in order to trigger the offloads, the first
-> +packet's ``struct xdp_desc`` descriptor should set ``XDP_TX_METADATA``
-> +bit in the ``options`` field. Also not that in a multi-buffer packet
+changes v7:
+- move wakeup-source after reset-gpios
+- update "Wake event on port.." debug message
+- add and use ksz_is_port_mac_global_usable() instead of
+  ksz_switch_macaddr_get/put.
 
-nit: not -> note
+changes v6:
+- add variables magic_switched_off and magic_switched_on for readability
+- EXPORT_SYMBOL(ksz_switch_shutdown); to fix build as module 
 
-> +only the first chunk should carry the metadata.
-> +
-> +Querying Device Capabilities
-> +============================
-> +
-> +Every devices exports its offloads capabilities via netlink netdev family.
-> +Refer to ``xsk-flags`` features bitmask in
-> +``Documentation/netlink/specs/netdev.yaml``.
-> +
-> +- ``tx-timestamp``: device supports ``XDP_TX_METADATA_TIMESTAMP``
-> +- ``tx-checksum``: device supports ``XDP_TX_METADATA_CHECKSUM``
-> +
-> +Note that every devices supports ``XDP_TX_METADATA_CHECKSUM_SW`` when
-> +running in ``XSK_COPY`` mode.
-> +
-> +See ``tools/net/ynl/samples/netdev.c`` on how to query this information.
-> +
-> +Example
-> +=======
-> +
-> +See ``tools/testing/selftests/bpf/xdp_hw_metadata.c`` for an example
-> +program that handles TX metadata. Also see https://github.com/fomichev/xskgen
-> +for a more bare-bones example.
-> --
-> 2.42.0.655.g421f12c284-goog
->
->
+changes v5:
+- rework Wake on Magic Packet support.
+- Make sure we show more or less realistic information on get_wol by
+  comparing refcounted mac address against the ports address
+- fix mac address refcounting on set_wol()
+- rework shutdown sequence by to handle PMIC related issues. Make sure
+  PME pin is net frequently toggled.
+- use wakeup_source variable instead of reading PME pin register.
+
+changes v4:
+- add ksz_switch_shutdown() and do not skip dsa_switch_shutdown() and
+  etc.
+- try to configure MAC address on WAKE_MAGIC. If not possible, prevent
+  WAKE_MAGIC configuration
+- use ksz_switch_macaddr_get() for WAKE_MAGIC.
+- prevent ksz_port_set_mac_address if WAKE_MAGIC is active
+- do some more refactoring and patch reordering
+
+changes v3:
+- use ethernet address of DSA master instead from devicetree
+- use dev_ops->wol* instead of list of supported switch
+- don't shutdown the switch if WoL is enabled
+- rework on top of latest HSR changes
+
+changes v2:
+- rebase against latest next
+
+Oleksij Rempel (9):
+  net: dsa: microchip: Add missing MAC address register offset for
+    ksz8863
+  dt-bindings: net: dsa: microchip: add wakeup-source property
+  net: dsa: microchip: use wakeup-source DT property to enable PME
+    output
+  net: dsa: microchip: ksz9477: add Wake on LAN support
+  net: dsa: microchip: ksz9477: Add Wake on Magic Packet support
+  net: dsa: microchip: Refactor comment for ksz_switch_macaddr_get()
+    function
+  net: dsa: microchip: Add error handling for ksz_switch_macaddr_get()
+  net: dsa: microchip: Refactor switch shutdown routine for WoL
+    preparation
+  net: dsa: microchip: Ensure Stable PME Pin State for Wake-on-LAN
+
+ .../bindings/net/dsa/microchip,ksz.yaml       |   2 +
+ drivers/net/dsa/microchip/ksz9477.c           | 195 ++++++++++++++++++
+ drivers/net/dsa/microchip/ksz9477.h           |   5 +
+ drivers/net/dsa/microchip/ksz9477_i2c.c       |   5 +-
+ drivers/net/dsa/microchip/ksz_common.c        | 132 ++++++++++--
+ drivers/net/dsa/microchip/ksz_common.h        |  11 +
+ drivers/net/dsa/microchip/ksz_spi.c           |   5 +-
+ 7 files changed, 335 insertions(+), 20 deletions(-)
+
+-- 
+2.39.2
+
 
