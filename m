@@ -1,98 +1,253 @@
-Return-Path: <netdev+bounces-43652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20AB97D41A8
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 23:29:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E93CC7D41C4
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 23:36:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFBE0281331
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 21:29:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 768C0B20ACD
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 21:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03F12032F;
-	Mon, 23 Oct 2023 21:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1647E200CB;
+	Mon, 23 Oct 2023 21:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LNh34dCR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PvgAUMYz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE07479C3;
-	Mon, 23 Oct 2023 21:29:15 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 707A097;
-	Mon, 23 Oct 2023 14:29:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZhjxUrT7ActbgiD9MJ/0J4Uyj55UgMInYRT8SxjqdOs=; b=LNh34dCRqWx9h3oSXcJ5/QXkAf
-	ybmB7vgbVZJ+eIP0hwZIsQaNuzsAmJS1OFLuo3ll3Le0uUIW1zkgLnUb7rbZf3TfUvVzEnDRfDfEc
-	EwsKbLHs7ZGXVR7QwhN6NGRZfkYsLmG0AnxsMd4QOTtcK8qtxcAkhRqc1BvHW3KeYnP0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qv2Tq-00011F-7W; Mon, 23 Oct 2023 23:28:58 +0200
-Date: Mon, 23 Oct 2023 23:28:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
-	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [PATCH net-next v2 1/9] net: ethernet: implement OPEN Alliance
- control transaction interface
-Message-ID: <c51d9660-d6c3-4202-9fc6-b9add06b64ce@lunn.ch>
-References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
- <20231023154649.45931-2-Parthiban.Veerasooran@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0821214A85
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 21:35:59 +0000 (UTC)
+Received: from out-205.mta0.migadu.com (out-205.mta0.migadu.com [91.218.175.205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DA52BD
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 14:35:58 -0700 (PDT)
+Message-ID: <42d66dde-29d6-f948-bc2e-72465beb800f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1698096956;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7NzOgVAY6bvLUksVYUKvNj9r++7UpyzJXRYa2Cetic0=;
+	b=PvgAUMYzTY9V+oDiz+H1rUNzwifJtXOau2MrJwr2ckGrLdpxn4AmPSMvFqrwybwlffsR80
+	4qVvPmntZsz+yzIsfDzc9rZOfNIfODRHbaFEWlQV3L/8MsVvmdZnhodrq+2VQoz3Pv41pw
+	XrAooVadMtN+F0yONmwHZjvgK2k42TI=
+Date: Mon, 23 Oct 2023 14:35:47 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231023154649.45931-2-Parthiban.Veerasooran@microchip.com>
+Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie
+ generation/validation SOCK_OPS hooks.
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com,
+ jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, kuni1840@gmail.com,
+ mykolal@fb.com, netdev@vger.kernel.org, pabeni@redhat.com, sdf@google.com,
+ sinquersw@gmail.com, song@kernel.org, yonghong.song@linux.dev
+References: <20231020231003.51313-1-kuniyu@amazon.com>
+ <20231021064801.87816-1-kuniyu@amazon.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231021064801.87816-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> +static void oa_tc6_prepare_ctrl_buf(struct oa_tc6 *tc6, u32 addr, u32 val[],
-> +				    u8 len, bool wnr, u8 *buf, bool prote)
+On 10/20/23 11:48 PM, Kuniyuki Iwashima wrote:
+> I think this was doable.  With the diff below, I was able to skip
+> validation in cookie_v[46]_check() when if skb->sk is not NULL.
+> 
+> The kfunc allocates req and set req->syncookie to 1, which is usually
+> set in TX path, so if it's 1 in RX (inet_steal_sock()), we can see
+> that req is allocated by kfunc (at least, req->syncookie &&
+> req->rsk_listener never be true in the current TCP stack).
+> 
+> The difference here is that req allocated by kfunc holds refcnt of
+> rsk_listener (passing true to inet_reqsk_alloc()) to prevent freeing
+> the listener until req reaches cookie_v[46]_check().
 
-One of the comments i made last time was that wnr is not obvious. I
-assume it means write-not-read. So why not just write? Since it a
-boolean, i assume war is never needed, so !wnr cal always be
-considered rnw.
+The cookie_v[46]_check() holds the listener sk refcnt now?
 
-And prote could well be protect, the two extra characters make it a
-lot more obvious. Or better still.
+ >
+> The cookie generation at least should be done at tc/xdp.  The
+> valdation can be done earlier as well on tc/xdp, but it could
+> add another complexity, listener's life cycle if we allocate
+> req there.
 
+I think your code below looks pretty close already.
+
+It seems the only concern/complexity is the extra rsk_listener refcnt (btw the 
+concern is on performance for the extra refcnt? or there is correctness issue?).
+
+Asking because bpf_sk_assign() can already assign a listener to skb->sk and it 
+also does not take a refcnt on the listener. The same no refcnt needed on 
+req->rsk_listener should be doable also. sock_pfree may need to be smarter to 
+check req->syncookie. What else may need to change?
+
+> 
+> I'm wondering which place to add the validation capability, and
+> I think SOCK_OPS is simpler than tc.
+> 
+>    #1 validate cookie and allocate req at tc, and skip validation
+> 
+>    #2 validate cookie (and update bpf map at xdp/tc, and look up bpf
+>       map) and allocate req at SOCK_OPS hook
+> 
+> Given SYN proxy is usually on the other node and incoming cookie
+> is almost always valid, we might need not validate it in the early
+> stage in the stack.
+> 
+> What do you think ?
+
+Yeah, supporting validation in sock_ops is an open option if the tc side is too 
+hard but I feel you are pretty close on the tc side.
+
+> 
+> ---8<---
+> diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
+> index 3ecfeadbfa06..e5e4627bf270 100644
+> --- a/include/net/inet_hashtables.h
+> +++ b/include/net/inet_hashtables.h
+> @@ -462,9 +462,19 @@ struct sock *inet_steal_sock(struct net *net, struct sk_buff *skb, int doff,
+>   	if (!sk)
+>   		return NULL;
+>   
+> -	if (!prefetched || !sk_fullsock(sk))
+> +	if (!prefetched)
+>   		return sk;
+>   
+> +	if (!sk_fullsock(sk)) {
+> +		if (sk->sk_state == TCP_NEW_SYN_RECV && inet_reqsk(sk)->syncookie) {
+> +			skb->sk = sk;
+> +			skb->destructor = sock_pfree;
+> +			sk = inet_reqsk(sk)->rsk_listener;
+> +		}
+> +
+> +		return sk;
+> +	}
+> +
+>   	if (sk->sk_protocol == IPPROTO_TCP) {
+>   		if (sk->sk_state != TCP_LISTEN)
+>   			return sk;
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index cc2e4babc85f..bca491ddf42c 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -11800,6 +11800,71 @@ __bpf_kfunc int bpf_sock_addr_set_sun_path(struct bpf_sock_addr_kern *sa_kern,
+>   
+>   	return 0;
+>   }
+> +
+> +__bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct sk_buff *skb, struct sock *sk,
+> +					struct tcp_options_received *tcp_opt,
+> +					int tcp_opt__sz, u16 mss)
 > +{
-> +	u32 hdr;
+> +	const struct tcp_request_sock_ops *af_ops;
+> +	const struct request_sock_ops *ops;
+> +	struct inet_request_sock *ireq;
+> +	struct tcp_request_sock *treq;
+> +	struct request_sock *req;
 > +
-> +	/* Prepare the control header with the required details */
-> +	hdr = FIELD_PREP(CTRL_HDR_DNC, 0) |
-> +	      FIELD_PREP(CTRL_HDR_WNR, wnr) |
-> +	      FIELD_PREP(CTRL_HDR_AID, 0) |
-> +	      FIELD_PREP(CTRL_HDR_MMS, addr >> 16) |
-> +	      FIELD_PREP(CTRL_HDR_ADDR, addr) |
-> +	      FIELD_PREP(CTRL_HDR_LEN, len - 1);
-> +	hdr |= FIELD_PREP(CTRL_HDR_P, oa_tc6_get_parity(hdr));
-> +	*(__be32 *)buf = cpu_to_be32(hdr);
+> +	if (!sk)
+> +		return -EINVAL;
 > +
-> +	if (wnr) {
-> +		for (u8 i = 0; i < len; i++) {
-> +			u16 pos;
+> +	if (!skb_at_tc_ingress(skb))
+> +		return -EINVAL;
 > +
-> +			if (!prote) {
-
-nitpick, but please use positive logic. Do the protected case first.
-
-	 Andrew
+> +	if (dev_net(skb->dev) != sock_net(sk))
+> +		return -ENETUNREACH;
+> +
+> +	switch (sk->sk_family) {
+> +	case AF_INET:  /* TODO: MPTCP */
+> +		ops = &tcp_request_sock_ops;
+> +		af_ops = &tcp_request_sock_ipv4_ops;
+> +		break;
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +	case AF_INET6:
+> +		ops = &tcp6_request_sock_ops;
+> +		af_ops = &tcp_request_sock_ipv6_ops;
+> +		break;
+> +#endif
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (sk->sk_type != SOCK_STREAM || sk->sk_state != TCP_LISTEN)
+> +		return -EINVAL;
+> +
+> +	req = inet_reqsk_alloc(ops, sk, true);
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+> +	ireq = inet_rsk(req);
+> +	treq = tcp_rsk(req);
+> +
+> +	refcount_set(&req->rsk_refcnt, 1);
+> +	req->syncookie = 1;
+> +	req->mss = mss;
+> +	req->ts_recent = tcp_opt->saw_tstamp ? tcp_opt->rcv_tsval : 0;
+> +
+> +	ireq->snd_wscale = tcp_opt->snd_wscale;
+> +	ireq->sack_ok = tcp_opt->sack_ok;
+> +	ireq->wscale_ok = tcp_opt->wscale_ok;
+> +	ireq->tstamp_ok	= tcp_opt->saw_tstamp;
+> +
+> +	tcp_rsk(req)->af_specific = af_ops;
+> +	tcp_rsk(req)->ts_off = tcp_opt->rcv_tsecr - tcp_ns_to_ts(tcp_clock_ns());
+> +
+> +	skb_orphan(skb);
+> +	skb->sk = req_to_sk(req);
+> +	skb->destructor = sock_pfree;
+> +
+> +	return 0;
+> +}
+> +
+>   __diag_pop();
+>   
+>   int bpf_dynptr_from_skb_rdonly(struct sk_buff *skb, u64 flags,
+> @@ -11828,6 +11893,10 @@ BTF_SET8_START(bpf_kfunc_check_set_sock_addr)
+>   BTF_ID_FLAGS(func, bpf_sock_addr_set_sun_path)
+>   BTF_SET8_END(bpf_kfunc_check_set_sock_addr)
+>   
+> +BTF_SET8_START(bpf_kfunc_check_set_tcp_reqsk)
+> +BTF_ID_FLAGS(func, bpf_sk_assign_tcp_reqsk)
+> +BTF_SET8_END(bpf_kfunc_check_set_tcp_reqsk)
+> +
+>   static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
+>   	.owner = THIS_MODULE,
+>   	.set = &bpf_kfunc_check_set_skb,
+> @@ -11843,6 +11912,11 @@ static const struct btf_kfunc_id_set bpf_kfunc_set_sock_addr = {
+>   	.set = &bpf_kfunc_check_set_sock_addr,
+>   };
+>   
+> +static const struct btf_kfunc_id_set bpf_kfunc_set_tcp_reqsk = {
+> +	.owner = THIS_MODULE,
+> +	.set = &bpf_kfunc_check_set_tcp_reqsk,
+> +};
+> +
+>   static int __init bpf_kfunc_init(void)
+>   {
+>   	int ret;
+> @@ -11858,8 +11932,10 @@ static int __init bpf_kfunc_init(void)
+>   	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_LWT_SEG6LOCAL, &bpf_kfunc_set_skb);
+>   	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_NETFILTER, &bpf_kfunc_set_skb);
+>   	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_kfunc_set_xdp);
+> -	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
+> -						&bpf_kfunc_set_sock_addr);
+> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
+> +					       &bpf_kfunc_set_sock_addr);
+> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
+> +	return ret;
+>   }
+>   late_initcall(bpf_kfunc_init);
+>   
+> ---8<---
 
 
