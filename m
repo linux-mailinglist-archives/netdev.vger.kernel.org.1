@@ -1,81 +1,77 @@
-Return-Path: <netdev+bounces-43487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08BBB7D3945
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:26:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64B507D394A
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:28:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA2F21F21EB3
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:26:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5917B20C06
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B281B296;
-	Mon, 23 Oct 2023 14:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18071B292;
+	Mon, 23 Oct 2023 14:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HhG63FUi"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jfp2GZfW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FC41B292;
-	Mon, 23 Oct 2023 14:26:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E094C433C8;
-	Mon, 23 Oct 2023 14:26:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698071199;
-	bh=p2y3WlKWMWCwJ0nsz6Tduo3jHWpXvj9LTx0Tabn/ZsI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=HhG63FUiPW9BxI0n2o5zfOSEO7M0eLWRC17BsSejPKyZ4foYQmYHfWlfmF0qDDg3m
-	 gpmzHedZuK++tf0IVhwIxVOnEzDLhzobWtantOPgEiqP+VdkIb/8OtInYci2dzX5Tk
-	 hahEydOJ/3BKGy+rN1Y9iA6ClA6GOxhSB8PGCTqUKXaM7QaZh2GEol/Cnb1DmvTWhM
-	 E//sgpg8BkBhGDf8WPhfI923s9dSnL6pb1IoaVp5gV9/vyQlOhtR8sDdzT8sMe9hij
-	 1IFhdzgJyJxYEESVVAvx9Mh+pRuGidfyHyG7R13nIt2O9wAbZkPskArLQQR1GjvG8S
-	 nzwlySFX7EVEA==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4DFF6EB2CB2; Mon, 23 Oct 2023 16:26:37 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, martin.lau@linux.dev, razor@blackwall.org,
- ast@kernel.org, andrii@kernel.org, john.fastabend@gmail.com,
- sdf@google.com, Daniel Borkmann <daniel@iogearbox.net>, Quentin Monnet
- <quentin@isovalent.com>
-Subject: Re: [PATCH bpf-next v2 4/7] bpftool: Implement link show support
- for netkit
-In-Reply-To: <20231019204919.4203-5-daniel@iogearbox.net>
-References: <20231019204919.4203-1-daniel@iogearbox.net>
- <20231019204919.4203-5-daniel@iogearbox.net>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 23 Oct 2023 16:26:37 +0200
-Message-ID: <87lebtqusi.fsf@toke.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF82B134DF
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 14:28:12 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6CD3DD;
+	Mon, 23 Oct 2023 07:28:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=sPMDCYa/eOvobhpB1VjCXUms41/R3FiMxkI8iUKywDY=; b=jfp2GZfWZO5vRu5SlGBeGwS9G1
+	VBSd4G9YruH6A4xRuvPE7fXFrufnfnVlxioWMn8lSb6KR+CFKsyXji4GgyFcmTanIzQDXEcolTPp4
+	MC9mDatDpeInPyav9nX9minyyJf66k2GRGtKYuuh8n1piL3P71dwv+ayBB7r/8tZKP4c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1quvuW-00323v-AQ; Mon, 23 Oct 2023 16:28:04 +0200
+Date: Mon, 23 Oct 2023 16:28:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Jia, Fang" <fang.jia@windriver.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: phy: fixed link 1000 or 100 set with autoneg off
+Message-ID: <dfc37ead-2abe-4053-b0a6-911c9c387451@lunn.ch>
+References: <d7aa45f8-adf8-ff9a-b2c4-04b0f2cc3c06@windriver.com>
+ <c23dcdb0-f493-453d-82b9-b498f4d3c88b@gmail.com>
+ <9dd0e0b8-751b-170a-7c8f-bc084efae69b@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9dd0e0b8-751b-170a-7c8f-bc084efae69b@windriver.com>
 
-Daniel Borkmann <daniel@iogearbox.net> writes:
+> Thanks very much for your reply.
+> 
+> Actually, due to some reason, the phydev's default aneg state is off.
+> And we just found if use ethtool to set, it had the same result.
 
-> Add support to dump netkit link information to bpftool in similar way as
-> we have for XDP. The netkit link info only exposes the ifindex.
->
-> Below shows an example link dump output, and a cgroup link is included for
-> comparison, too:
->
->   # bpftool link
->   [...]
->   10: cgroup  prog 2466
->         cgroup_id 1  attach_type cgroup_inet6_post_bind
->   [...]
->   8: netkit  prog 35
->         ifindex nk1(18)
->   [...]
+I find it surprising it defaults to aneg off. Are you sure something
+has not turned it off before you look at it?
 
-Couldn't we make this show whether the program is attached as
-primary/peer as well? Seems like that would be useful (like in the
-cgroup output above)?
+The emulator does not support writing to any registers. However,
+fixed_mdio_write() does not return an error, it just does nothing.  It
+needs testing, but maybe try making it return -EOPNOTSUPP. That should
+prevent auto-neg being turned off, but it might also break everything
+if it tries to do some other write during probe or link up. It could
+be it needs a more select response, allowing writes to some bits, like
+the reset bit, and start auto-neg, but not others like disable
+auto-neg.
 
--Toke
+	Andrew
 
