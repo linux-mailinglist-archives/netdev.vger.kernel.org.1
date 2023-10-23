@@ -1,588 +1,114 @@
-Return-Path: <netdev+bounces-43351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 511077D2AEC
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 09:10:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 631187D2AF2
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 09:12:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65F811C20852
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 07:10:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA9802813A4
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 07:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B120B7482;
-	Mon, 23 Oct 2023 07:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A5979FF;
+	Mon, 23 Oct 2023 07:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ve0zNz5Q"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BCE1FAB
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 07:10:01 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 666FED6E;
-	Mon, 23 Oct 2023 00:09:59 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.200])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SDRBk09wnz6K8wt;
-	Mon, 23 Oct 2023 15:09:17 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 23 Oct 2023 08:09:55 +0100
-Message-ID: <36fcda5b-cd8d-1e2e-ff0d-3284ab60c06b@huawei.com>
-Date: Mon, 23 Oct 2023 10:09:54 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA536EC5
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 07:12:26 +0000 (UTC)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E3BCD6B
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 00:12:23 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-99c1c66876aso431239066b.2
+        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 00:12:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698045141; x=1698649941; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tDpgNYJBZWfpDGAZyLDDwSjicDHKCRY45Gtgt4Snt7Y=;
+        b=ve0zNz5Q8R4r8Wkpn2WN+1QSLg9K9NDUPZP4MFDHzjWDCNb6ZZmMkYbL5xme7XVWwb
+         KIrfHeGNfk/CSkvQWTleJDabnsiiUeId7zgCXGgiXa2YSuaCACY0eCk+sMDJ+UbNLHGW
+         Jq+ZeLpxdeamBeggJvAGKlANdpSnfpONqaKM/G9Yl4UgWXcKu0EWj7huIsNlTczWvEyA
+         ZIV/DtZw2arA3Ojr4BAygILzIa4FIhltWVdXgX8tt0pV7pM7kmwr1tkRpbDdGzoaFOrf
+         GdeK4cn4FoCnJBQdQYfgnDLfOJYMfsDj7AdsRtNPfcUQUDS0aN3pQ6lhT58hUdHVPdim
+         u1MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698045141; x=1698649941;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tDpgNYJBZWfpDGAZyLDDwSjicDHKCRY45Gtgt4Snt7Y=;
+        b=awj4rXtgWRb7Pk8rxVym+mPhGKE0pqXWd8Ghwz/TzSEpf+b49o5FPaU8ltz5T8NsgG
+         LmM79bu6+qinHCM/9krBWmoO6A3Dji7xdvVBhf4vVhc4W8/Z28jBp+OVvX4mgvo/nYD7
+         5jMl9Yr170WmEXfkHbnaNb5b2ZmHgREvrm9rcq6lEBa9lFW7/78udNNV/cMbyrqQ3euq
+         IDQN3+aefls4HkNw6VwANUetCf3Lp2vjMmNjp6LjTIVRBzF5g0BrpWj3Re6xlXD+ZPUZ
+         /ze3iz8A31aOvdXK+21L1CAN/Lu78e94l29J2UhF4sBuXwscD/4grIANH+7vNcFXt2Uu
+         bamA==
+X-Gm-Message-State: AOJu0Ywv9gtbLow5AUhjI/tjqz+SeiI2sOvb4iPVwBEF3Vpw8Un3uexW
+	+qab0iYZpXb9B17qHJmmggesUQ==
+X-Google-Smtp-Source: AGHT+IFNEqdPmZMghAIy7qjWE2pPnFeO4o0LaZi8rPbo2VteX3nMu1nl4MGz2o+B+svnGR5EbZ9hJw==
+X-Received: by 2002:a17:907:86a6:b0:9bf:388e:8e93 with SMTP id qa38-20020a17090786a600b009bf388e8e93mr7195167ejc.0.1698045141185;
+        Mon, 23 Oct 2023 00:12:21 -0700 (PDT)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id 16-20020a170906225000b0098921e1b064sm6158861ejr.181.2023.10.23.00.12.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Oct 2023 00:12:20 -0700 (PDT)
+Date: Mon, 23 Oct 2023 09:12:19 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: David Ahern <dsahern@kernel.org>
+Cc: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH] selftests:net change ifconfig with ip command
+Message-ID: <ZTYc04N9VK7EarHY@nanopsycho>
+References: <20231022113148.2682-1-swarupkotikalapudi@gmail.com>
+ <fde654ce-e4b6-449c-94a9-eeaad1eed6b7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v13 10/12] selftests/landlock: Add 7 new test variants
- dedicated to network
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>
-References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
- <20231016015030.1684504-11-konstantin.meskhidze@huawei.com>
- <20231016.phei8Is2weod@digikod.net>
- <9fe690cb-a6ca-4c54-dd38-4d7a3cb02a4b@huawei.com>
- <20231020.zahs6Cahch6N@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <20231020.zahs6Cahch6N@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fde654ce-e4b6-449c-94a9-eeaad1eed6b7@kernel.org>
+
+Sun, Oct 22, 2023 at 07:50:52PM CEST, dsahern@kernel.org wrote:
+>On 10/22/23 5:31 AM, Swarup Laxman Kotiaklapudi wrote:
+>> diff --git a/tools/testing/selftests/net/route_localnet.sh b/tools/testing/selftests/net/route_localnet.sh
+>> index 116bfeab72fa..3ab9beb4462c 100755
+>> --- a/tools/testing/selftests/net/route_localnet.sh
+>> +++ b/tools/testing/selftests/net/route_localnet.sh
+>> @@ -18,8 +18,10 @@ setup() {
+>>      ip route del 127.0.0.0/8 dev lo table local
+>>      ip netns exec "${PEER_NS}" ip route del 127.0.0.0/8 dev lo table local
+>>  
+>> -    ifconfig veth0 127.25.3.4/24 up
+>> -    ip netns exec "${PEER_NS}" ifconfig veth1 127.25.3.14/24 up
+>> +    ip a add 127.25.3.4/24 dev veth0
+>
+>ip addr add ...
+
+Why not "address" then? :)
+What's wrong with "a"?
 
 
-
-10/20/2023 6:40 PM, Mickaël Salaün пишет:
-> On Fri, Oct 20, 2023 at 02:41:42PM +0300, Konstantin Meskhidze (A) wrote:
->> 
->> 
->> 10/18/2023 3:32 PM, Mickaël Salaün пишет:
->> > You can update the subject with:
->> > "selftests/landlock: Add network tests"
->> 
->> Ok.
->> > 
->> > On Mon, Oct 16, 2023 at 09:50:28AM +0800, Konstantin Meskhidze wrote:
->> > > These test suites try to check edge cases for TCP sockets
->> > > bind() and connect() actions.
->> > 
->> > You can replace with that:
->> > Add 77 test suites to check edge cases related to bind() and connect()
->> > actions. They are defined with 6 fixtures and their variants:
->> > 
->> > > 
->> > > protocol:
->> > > * bind: Tests with non-landlocked/landlocked ipv4, ipv6 and unix sockets.
->> > 
->> > As you already did, you can write one paragraph per fixture, but
->> > starting by explaining the fixture and its related variants, and then
->> > listing the tests and explaining their specificities. For instance:
->> > 
->> > The "protocol" fixture is extended with 12 variants defined as a matrix
->> > of: sandboxed/not-sandboxed, IPv4/IPv6/unix network domain, and
->> > stream/datagram socket. 4 related tests suites are defined:
->> > * bind: Test bind combinations with increasingly more
->> >    restricting domains.
->> > * connect: Test connect combinations with increasingly more
->> >    restricting domains.
->> > ...
->> 
->>   Ok. Will be updated.
->> > 
->> > s/ipv/IPv/g
->> 
->>   Got it. Thanks.
->> > 
->> > > * connect: Tests with non-landlocked/landlocked ipv4, ipv6 and unix
->> > > sockets.
->> > > * bind_unspec: Tests with non-landlocked/landlocked restrictions
->> > > for bind action with AF_UNSPEC socket family.
->> > > * connect_unspec: Tests with non-landlocked/landlocked restrictions
->> > > for connect action with AF_UNSPEC socket family.
->> > > 
->> > > ipv4:
->> > > * from_unix_to_inet: Tests to make sure unix sockets' actions are not
->> > > restricted by Landlock rules applied to TCP ones.
->> > > 
->> > > tcp_layers:
->> > > * ruleset_overlap.
->> > > * ruleset_expand.
->> > > 
->> > > mini:
->> > > * network_access_rights: Tests with  legitimate access values.
->> > > * unknown_access_rights: Tests with invalid attributes, out of access range.
->> > > * inval:
->> > >     - unhandled allowed access.
->> > >     - zero access value.
->> > > * tcp_port_overflow: Tests with wrong port values more than U16_MAX.
->> > > 
->> > > ipv4_tcp:
->> > > * port_endianness: Tests with big/little endian port formats.
->> > > 
->> > > port_specific:
->> > > * bind_connect: Tests with specific port values.
->> > > 
->> > > layout1:
->> > > * with_net: Tests with network bind() socket action within
->> > > filesystem directory access test.
->> > > 
->> > > Test coverage for security/landlock is 94.5% of 932 lines according
->> > > to gcc/gcov-11.
->> > > 
->> > > Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
->> > > Link: https://lore.kernel.org/r/20230920092641.832134-11-konstantin.meskhidze@huawei.com
->> > > Co-developed-by:: Mickaël Salaün <mic@digikod.net>
->> > > Signed-off-by: Mickaël Salaün <mic@digikod.net>
->> > > ---
->> > > 
->> > > Changes since v12:
->> > > * Renames port_zero to port_specific fixture.
->> > > * Refactors port_specific test:
->> > >     - Adds set_port() and get_binded_port() helpers.
->> > >     - Adds checks for port 0, allowed by Landlock in this version.
->> > >     - Adds checks for port 1023.
->> > > * Refactors commit message.
->> > > 
->> > 
->> > > +static void set_port(struct service_fixture *const srv, in_port_t port)
->> > > +{
->> > > +	switch (srv->protocol.domain) {
->> > > +	case AF_UNSPEC:
->> > > +	case AF_INET:
->> > > +		srv->ipv4_addr.sin_port = port;
->> > 
->> > We should call htons() here, and make port a uint16_t.
->> 
->>   Done.
->> > 
->> > > +		return;
->> > > +
->> > > +	case AF_INET6:
->> > > +		srv->ipv6_addr.sin6_port = port;
->> > > +		return;
->> > > +
->> > > +	default:
->> > > +		return;
->> > > +	}
->> > > +}
->> > > +
->> > > +static in_port_t get_binded_port(int socket_fd,
->> > 
->> > The returned type should be uint16_t (i.e. host endianess).
->> 
->>   Done.
->> > 
->> > > +				 const struct protocol_variant *const prot)
->> > > +{
->> > > +	struct sockaddr_in ipv4_addr;
->> > > +	struct sockaddr_in6 ipv6_addr;
->> > > +	socklen_t ipv4_addr_len, ipv6_addr_len;
->> > > +
->> > > +	/* Gets binded port. */
->> > > +	switch (prot->domain) {
->> > > +	case AF_UNSPEC:
->> > > +	case AF_INET:
->> > > +		ipv4_addr_len = sizeof(ipv4_addr);
->> > > +		getsockname(socket_fd, &ipv4_addr, &ipv4_addr_len);
->> > > +		return ntohs(ipv4_addr.sin_port);
->> > > +
->> > > +	case AF_INET6:
->> > > +		ipv6_addr_len = sizeof(ipv6_addr);
->> > > +		getsockname(socket_fd, &ipv6_addr, &ipv6_addr_len);
->> > > +		return ntohs(ipv6_addr.sin6_port);
->> > > +
->> > > +	default:
->> > > +		return 0;
->> > > +	}
->> > > +}
->> > 
->> > These are good helpers!
->> > 
->> > 
->> > > +FIXTURE_TEARDOWN(ipv4)
->> > > +{
->> > > +}
->> > > +
->> > > +// Kernel FIXME: tcp_sandbox_with_tcp and tcp_sandbox_with_udp
->> > 
->> > No FIXME should remain.
->> 
->>   Ok. Deleted.
->> > 
->> > > +TEST_F(ipv4, from_unix_to_inet)
->> > 
->> > > +TEST_F(mini, network_access_rights)
->> > > +{
->> > > +	const struct landlock_ruleset_attr ruleset_attr = {
->> > > +		.handled_access_net = ACCESS_ALL,
->> > > +	};
->> > > +	struct landlock_net_port_attr net_service = {
->> > 
->> > Please rename to "net_port" everywhere.
->> 
->>   Done.
->> > 
->> > > +TEST_F(port_specific, bind_connect)
->> > > +{
->> > > +	int socket_fd, ret;
->> > > +
->> > > +	/* Adds the first rule layer with bind and connect actions. */
->> > > +	if (variant->sandbox == TCP_SANDBOX) {
->> > > +		const struct landlock_ruleset_attr ruleset_attr = {
->> > > +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
->> > > +					      LANDLOCK_ACCESS_NET_CONNECT_TCP
->> > > +		};
->> > > +		const struct landlock_net_port_attr tcp_bind_connect_zero = {
->> > > +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
->> > > +					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
->> > > +			.port = htons(0),
->> > 
->> > We don't need any htons() calls anymore. It doesn't change the 0 value
->> > in this case but this is not correct.
->> 
->>  Yep. We call htons(port) in landlock_append_net_rule().
->>  Thanks.
->> > 
->> > > +		};
->> > > +
->> > 
->> > Useless new line.
->> 
->>   Ok. Thanks.
->> > 
->> > > +		int ruleset_fd;
->> > > +
->> > > +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
->> > > +						     sizeof(ruleset_attr), 0);
->> > > +		ASSERT_LE(0, ruleset_fd);
->> > > +
->> > > +		/* Checks zero port value on bind and connect actions. */
->> > > +		EXPECT_EQ(0,
->> > > +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
->> > > +					    &tcp_bind_connect_zero, 0));
->> > > +
->> > > +		enforce_ruleset(_metadata, ruleset_fd);
->> > > +		EXPECT_EQ(0, close(ruleset_fd));
->> > > +	}
->> > > +
->> > > +	socket_fd = socket_variant(&self->srv0);
->> > > +	ASSERT_LE(0, socket_fd);
->> > > +
->> > > +	/* Sets address port to 0 for both protocol families. */
->> > > +	set_port(&self->srv0, htons(0));
->> > 
->> > ditto
->> > 
->> > > +
->> > > +	/* Binds on port 0. */
->> > > +	ret = bind_variant(socket_fd, &self->srv0);
->> > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
->> > > +		/* Binds to a random port within ip_local_port_range. */
->> > > +		EXPECT_EQ(0, ret);
->> > > +	} else {
->> > > +		/* Binds to a random port within ip_local_port_range. */
->> > > +		EXPECT_EQ(0, ret);
->> > 
->> > If the results are the same, no need to add an if block.
->> 
->>   Right. Updated.
->> > 
->> > > +	}
->> > > +
->> > > +	/* Connects on port 0. */
->> > > +	ret = connect_variant(socket_fd, &self->srv0);
->> > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
->> > > +		EXPECT_EQ(-ECONNREFUSED, ret);
->> > > +	} else {
->> > > +		EXPECT_EQ(-ECONNREFUSED, ret);
->> > > +	}
->> > 
->> > ditto
->> > 
->>  Updated.
->> > > +
->> > > +	/* Binds on port 0. */
->> > 
->> > Please close sockets once they are used, and recreate one for another
->> > bind/connect to avoid wrong checks.
->> 
->>   Ok. But I can reuse socket_fd after closeing a socket. Correct?
-> 
-> It would be clearer to have one variable for the client socket
-> (connect_fd) and another variable for the server socket (bind_fd).
-> But once the socket is closed, you can reuse the same variable by
-> storing a new socket in it. You then only need two variables for sockets
-> in this test.
-
-  Ok. Thanks.
-> 
->> > 
->> > > +	ret = bind_variant(socket_fd, &self->srv0);
->> > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
->> > > +		/* Binds to a random port within ip_local_port_range. */
->> > > +		EXPECT_EQ(0, ret);
->> > > +	} else {
->> > > +		/* Binds to a random port within ip_local_port_range. */
->> > > +		EXPECT_EQ(0, ret);
->> > > +	}
->> > 
->> > Why this second bind() block? Furthermore, it is using the same
->> > socket_fd.
-> 
-> Is this block useful?
-
-   For a self-connected socket after connection try we need to rebind it 
-again. I checked this logic in a small standalone test (with gdb on). So 
-for 2 sockets (differnt fds) there is no need to do that.
-> 
->> 
->>   I will refactor the code this way -  sockets will be recreated for each
->> bind/connect, and I prefer to use self-connected sockets (use one socket
->> descriptor) in these tests to make code simpler; testing logic remains the
->> same way as if we have 2 sockets.
->> 
->> What do you think???
-> 
-> I find it confusing to use self-connected sockets, it's not clear at all
-> what is going on, and AFAIK it doesn't reflect real use cases. Please
-> don't do that.
-> 
-> Using the same variable for both bind and connect socket will lead to
-> issues difficult to debug, and leaked FDs. For instance with the bind +
-> get_binded_port + connect test you should use one variable per socket.
-> To make it easier to read, please follow this rule everywhere (the only
-> case when this is done seems to be with the port_specific.bind_connect
-> test).
-
-   OK. I will use 2 fds for bind and connect sockets.
-> 
->> 
->> > 
->> > > +
->> > > +	/* Sets binded port for both protocol families. */
->> > > +	set_port(&self->srv0,
->> > > +		 htons(get_binded_port(socket_fd, &variant->prot)));
->> > 
->> > Ditto, these two endianess translations are useless.
->> 
->>   Updated. Thanks.
->> > 
->> > You can also add this to make sure the returned port is not 0:
->> > port = get_binded_port(socket_fd, &variant->prot);
->> > EXPECT_NE(0, port);
->> > set_port(&self->srv0, port);
->> 
->>   Ok. Thanks for the tip.
->> > 
->> > > +
->> > > +	/* Connects on the binded port. */
->> > > +	ret = connect_variant(socket_fd, &self->srv0);
->> > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
->> > > +		/* Denied by Landlock. */
->> > > +		EXPECT_EQ(-EACCES, ret);
->> > > +	} else {
->> > > +		EXPECT_EQ(0, ret);
->> > > +	}
->> > > +
->> > > +	EXPECT_EQ(0, close(socket_fd));
->> > > +
->> > 
->> > 
->> > 
->> > > +	/* Adds the second rule layer with just bind action. */
->> > 
->> > There is not only bind actions here.
->> 
->>   Right.
->> > 
->> > This second part of the tests should be in a dedicated
->> > TEST_F(port_specific, bind_1023).
->> 
->>   Got it.
->> > 
->> > > +	if (variant->sandbox == TCP_SANDBOX) {
->> > > +		const struct landlock_ruleset_attr ruleset_attr = {
->> > > +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
->> > > +					      LANDLOCK_ACCESS_NET_CONNECT_TCP
->> > > +		};
->> > > +
->> > > +		const struct landlock_net_port_attr tcp_bind_zero = {
->> > > +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
->> > > +			.port = htons(0),
->> > > +		};
->> > > +
->> > 
->> > Useless new lines.
->> 
->>   Got it.
->> > 
->> > > +		/* A rule with port value less than 1024. */
->> > > +		const struct landlock_net_port_attr tcp_bind_lower_range = {
->> > > +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
->> > > +			.port = htons(1023),
->> > > +		};
->> > > +
->> > 
->> > Useless new line.
->> 
->>   Got it.
->> > 
->> > > +		int ruleset_fd;
->> > > +
->> > > +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
->> > > +						     sizeof(ruleset_attr), 0);
->> > > +		ASSERT_LE(0, ruleset_fd);
->> > > +
->> > > +		ASSERT_EQ(0,
->> > > +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
->> > > +					    &tcp_bind_lower_range, 0));
->> > > +		ASSERT_EQ(0,
->> > > +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
->> > > +					    &tcp_bind_zero, 0));
->> > > +
->> > > +		enforce_ruleset(_metadata, ruleset_fd);
->> > > +		EXPECT_EQ(0, close(ruleset_fd));
->> > > +	}
->> > > +
->> > > +	socket_fd = socket_variant(&self->srv0);
->> > 
->> > We must have one socket FD dedicated to bind an another dedicated to
->> > connect, e.g. bind_fd and connect_fd, an close them after each use,
->> > otherwise tests might be inconsistent.
->> 
->>   Why can't we use self-connected sockets here? Why tests might be
->> inconsistent? Tests will be working the same way as if we have 2 sockets,
->> plus the code is simpler.
-> 
-> AFAIK it doesn't reflect real use cases of sockets, and I find it really
-> confusing. Where did you see this kind of usage?
-> 
-> Test might be inconsistent for instance if you change the port from 1023
-> to 1024 and you adjust the (denied by system) EXPECT_EQ(-EACCES, ret),
-> you'll get a new error in the following block, which doesn't make sense
-> at first, but then you realize it is because the socket is already
-> binded.  To avoid this kind of issues, and avoid leaking FDs, please use
-> a socket per usage and close them before testing something else.
-
-  Ok. Got it.
-> 
->> > 
->> > > +	ASSERT_LE(0, socket_fd);
->> > > +
->> > > +	/* Sets address port to 1023 for both protocol families. */
->> > > +	set_port(&self->srv0, htons(1023));
->> > > +
->> > > +	/* Binds on port 1023. */
->> > > +	ret = bind_variant(socket_fd, &self->srv0);
->> > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
->> > 
->> > No need to add this check if the result is the same for sandboxed and
->> > not sandboxed tests.
->> 
->>  Ok. Thanks.
->> > 
->> > Instead, use set_cap(_metadata, CAP_NET_BIND_SERVICE) and clear_cap()
->> > around this bind_variant() to make this test useful.
->> > 
->> > You will also need to patch common.h like this:
->> > @@ -112,10 +112,13 @@ static void _init_caps(struct __test_metadata *const _metadata, bool drop_all)
->> >          cap_t cap_p;
->> >          /* Only these three capabilities are useful for the tests. */
->> >          const cap_value_t caps[] = {
->> > +               /* clang-format off */
->> >                  CAP_DAC_OVERRIDE,
->> >                  CAP_MKNOD,
->> >                  CAP_SYS_ADMIN,
->> >                  CAP_SYS_CHROOT,
->> > +               CAP_NET_BIND_SERVICE,
->> > +               /* clang-format on */
->> >          };
->> 
->>  OK. Thanks.
->> > 
->> > > +		/* Denied by the system. */
->> > > +		EXPECT_EQ(-EACCES, ret);
->> > > +	} else {
->> > > +		/* Denied by the system. */
->> > > +		EXPECT_EQ(-EACCES, ret);
->> > > +	}
->> > > +
->> > 
->> > I don't see why the following part is useful. Why did you add it?
->>   Binding to ports < 1024 are forbidden by the system, not by Landlock.
->>   I added a rule with port 1023 to make sure it works as expected.
-> 
-> Landlock, as any LSM, can only add more restrictions. That's why it
-> would make more sense to test with CAP_NET_BIND_SERVICE, to make sure
-> Landlock rules work the same with this kind of privileged ports, but you
-> can test both cases (all within the same TEST_F though, and without
-> other tests).
-
-  Do you mean during the test to set CAP_NET_BIND_SERVICE, check it with 
-landlock (it will success), then switch  CAP_NET_BIND_SERVICE cap off 
-and bind it again ( will be refused by the system)?
-Am I correct?
-> 
->> 
->> > Why tcp_bind_zero?
->>    Beacause it's a bind action with port zero rule.
-> 
-> Yes but I don't see why it's relevant to test that here, because it was
-> tested just before.
-> 
-   OK. I just leave binding to 1023 port here.
-   I'm thinking to add binding to 1024 port then to show that this port 
-is allowed by the system but denied by landlock ( we have just rule with 
-1023 port).
-   What do you think?
->> 
->> > 
->> > The other parts are good though!
->> > 
->> > > +	/* Sets address port to 0 for both protocol families. */
->> > > +	set_port(&self->srv0, htons(0));
->> > > +
->> > > +	/* Binds on port 0. */
->> > > +	ret = bind_variant(socket_fd, &self->srv0);
->> > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
->> > > +		/* Binds to a random port within ip_local_port_range. */
->> > > +		EXPECT_EQ(0, ret);
->> > > +	} else {
->> > > +		/* Binds to a random port within ip_local_port_range. */
->> > > +		EXPECT_EQ(0, ret);
->> > > +	}
->> > > +
->> > > +	/* Sets binded port for both protocol families. */
->> > > +	set_port(&self->srv0,
->> > > +		 htons(get_binded_port(socket_fd, &variant->prot)));
->> > > +
->> > > +	/* Connects on the binded port. */
->> > > +	ret = connect_variant(socket_fd, &self->srv0);
->> > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
->> > > +		/* Denied by Landlock. */
->> > > +		EXPECT_EQ(-EACCES, ret);
->> > > +	} else {
->> > > +		EXPECT_EQ(0, ret);
->> > > +	}
->> > > +
->> > > +	EXPECT_EQ(0, close(socket_fd));
->> > > +}
->> > > +
->> > > +TEST_HARNESS_MAIN
->> > > --
->> > > 2.25.1
->> > > 
->> > .
-> .
+>
+>> +    ip link set dev veth0 up
+>> +    ip netns exec "${PEER_NS}" ip a add 127.25.3.14/24 dev veth1
+>
+>ip addr add ...
+>
+>> +    ip netns exec "${PEER_NS}" ip link set dev veth1 up
+>>  
+>>      ip route flush cache
+>>      ip netns exec "${PEER_NS}" ip route flush cache
+>
+>
 
