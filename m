@@ -1,218 +1,155 @@
-Return-Path: <netdev+bounces-43513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBCA67D3B54
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:49:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E6CF7D3B63
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:50:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FC0228140F
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 15:49:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC39B2814F6
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 15:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A77E1C2A7;
-	Mon, 23 Oct 2023 15:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2889F1C2BB;
+	Mon, 23 Oct 2023 15:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="WWNyD9nE"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SHW0P8+O"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4604C1C29D;
-	Mon, 23 Oct 2023 15:49:32 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09B0310A;
-	Mon, 23 Oct 2023 08:49:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1698076170; x=1729612170;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=q4Pt0gwBLyBOMj0Wnjreub+jmFGjoXYgtnrkexWrKuQ=;
-  b=WWNyD9nEl7TtbCz9BEaY2DrVpnbdtPDJbjx2WQ5JaO24PyuymYRq/CJZ
-   0zcNvf8nIoMENwmcgo5LdmiuYEkjSdAjALxCquamSSYs5JZIkCiDB08TL
-   4waZgWhxDDPBpM73lNvRsDihwosQtLDdWjOb4716UH3ljPMKxvxgi7eZD
-   jpVdV3Ya/3V46Ng0ZzLin71tHInCgchlBfRUaPvNlOSe3lgdKdvY64G/d
-   SPHrXIIHab930TR6UExWe1j4C7q75RmHwLWiYSj1UBsjjt7r1PgVV6h5+
-   1nXWd4p32ag6B44BukvRSJlYIMbEgnibzZ7h8n1E0LznniUUJIsDbfopQ
-   g==;
-X-CSE-ConnectionGUID: R4tFaVLSQ02v5bYQOZNT7Q==
-X-CSE-MsgGUID: i+IzyY15S9G3s11hpzaXEw==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.03,244,1694761200"; 
-   d="scan'208";a="177613932"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Oct 2023 08:49:29 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 23 Oct 2023 08:49:12 -0700
-Received: from CHE-LT-I17164LX.microchip.com (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Mon, 23 Oct 2023 08:48:58 -0700
-From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>, <corbet@lwn.net>,
-	<steen.hegelund@microchip.com>, <rdunlap@infradead.org>, <horms@kernel.org>,
-	<casper.casan@gmail.com>, <andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<horatiu.vultur@microchip.com>, <Woojung.Huh@microchip.com>,
-	<Nicolas.Ferre@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<Thorsten.Kummermehr@microchip.com>, Parthiban Veerasooran
-	<Parthiban.Veerasooran@microchip.com>
-Subject: [PATCH net-next v2 9/9] dt-bindings: net: add Microchip's LAN865X 10BASE-T1S MACPHY
-Date: Mon, 23 Oct 2023 21:16:49 +0530
-Message-ID: <20231023154649.45931-10-Parthiban.Veerasooran@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
-References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541EB1BDFD;
+	Mon, 23 Oct 2023 15:50:14 +0000 (UTC)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AE749D;
+	Mon, 23 Oct 2023 08:50:09 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1E1F01BF210;
+	Mon, 23 Oct 2023 15:50:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1698076207;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vjTVkjCQdXsf3tUmJ77Jk9QRxhArGxc9gP+wJ5AuGB0=;
+	b=SHW0P8+Ov4W6o8525HadMppMPrqfnbfazhjdIOG8bi/hKCuuAnUJGv4Y9s/tWDMj3wWeza
+	5MvThii/WbcZI1pf9Dy+jr3Sh261/X8p9PWgK6WSPjv0FuQ3OiSRsbXrylZ0xs9d4Dxmr2
+	TrD5k3OPv24PWvcBpUaGrZ+apxA4BeFfN6UnsqczQ/YWwHH1VueFyZpuUu4wvO1UWDcg4r
+	a95InWiX+MUeY2XJy+DzWOSJOeCWfpzhXS71W31SIRV1peZITrDjul0WfpwY1abWXeDq3S
+	otOSvwKr2nQwbOHrGigseB3KhpxUQ6qYBML20DVZWL64GKPau2u8Q74iVcbsug==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: davem@davemloft.net,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc: Romain Gantois <romain.gantois@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next 0/5] net: ipqess: introduce Qualcomm IPQESS driver
+Date: Mon, 23 Oct 2023 17:50:07 +0200
+Message-ID: <20231023155013.512999-1-romain.gantois@bootlin.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: romain.gantois@bootlin.com
 
-Add DT bindings for Microchip's LAN865X 10BASE-T1S MACPHY. The LAN8650/1
-combines a Media Access Controller (MAC) and an Ethernet PHY to enable
-10BASE‑T1S networks. The Ethernet Media Access Controller (MAC) module
-implements a 10 Mbps half duplex Ethernet MAC, compatible with the IEEE
-802.3 standard and a 10BASE-T1S physical layer transceiver integrated
-into the LAN8650/1. The communication between the Host and the MAC-PHY is
-specified in the OPEN Alliance 10BASE-T1x MACPHY Serial Interface (TC6).
+Hello everyone,
 
-Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
----
- .../bindings/net/microchip,lan865x.yaml       | 101 ++++++++++++++++++
- MAINTAINERS                                   |   1 +
- 2 files changed, 102 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/microchip,lan865x.yaml
+This is a driver for the Qualcomm IPQ4019 Ethernet Switch Subsystem. The
+IPQ4019 SoC integrates a modified version of the QCA8K Ethernet switch. One
+major difference with the original switch IP is that port tags are passed
+to the integrated Ethernet controller out-of-band.
 
-diff --git a/Documentation/devicetree/bindings/net/microchip,lan865x.yaml b/Documentation/devicetree/bindings/net/microchip,lan865x.yaml
-new file mode 100644
-index 000000000000..974622dd6846
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/microchip,lan865x.yaml
-@@ -0,0 +1,101 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/microchip,lan865x.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Microchip LAN8650/1 10BASE-T1S MACPHY Ethernet Controllers
-+
-+maintainers:
-+  - Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-+
-+description:
-+  The LAN8650/1 combines a Media Access Controller (MAC) and an Ethernet
-+  PHY to enable 10BASE‑T1S networks. The Ethernet Media Access Controller
-+  (MAC) module implements a 10 Mbps half duplex Ethernet MAC, compatible
-+  with the IEEE 802.3 standard and a 10BASE-T1S physical layer transceiver
-+  integrated into the LAN8650/1. The communication between the Host and
-+  the MAC-PHY is specified in the OPEN Alliance 10BASE-T1x MACPHY Serial
-+  Interface (TC6).
-+
-+  Specifications about the LAN8650/1 can be found at:
-+    https://www.microchip.com/en-us/product/lan8650
-+
-+allOf:
-+  - $ref: ethernet-controller.yaml#
-+
-+properties:
-+  compatible:
-+    const: microchip,lan865x
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    description:
-+      Interrupt from MAC-PHY asserted in the event of Receive Chunks
-+      Available, Transmit Chunk Credits Available and Extended Status
-+      Event.
-+    maxItems: 1
-+
-+  local-mac-address:
-+    description:
-+      Specifies the MAC address assigned to the network device.
-+    $ref: /schemas/types.yaml#/definitions/uint8-array
-+    minItems: 6
-+    maxItems: 6
-+
-+  spi-max-frequency:
-+    minimum: 15000000
-+    maximum: 25000000
-+
-+  oa-tc6:
-+    $ref: oa-tc6.yaml#
-+    unevaluatedProperties: true
-+
-+  "#address-cells":
-+    const: 1
-+
-+  "#size-cells":
-+    const: 0
-+
-+required:
-+  - compatible
-+  - reg
-+  - pinctrl-names
-+  - pinctrl-0
-+  - interrupts
-+  - interrupt-parent
-+  - local-mac-address
-+  - spi-max-frequency
-+  - oa-tc6
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    spi {
-+      #address-cells = <1>;
-+      #size-cells = <0>;
-+
-+      ethernet@0 {
-+        compatible = "microchip,lan865x";
-+        reg = <0>;
-+        pinctrl-names = "default";
-+        pinctrl-0 = <&eth0_pins>;
-+        interrupt-parent = <&gpio>;
-+        interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
-+        local-mac-address = [04 05 06 01 02 03];
-+        spi-max-frequency = <15000000>;
-+        status = "okay";
-+        oa-tc6 {
-+          #address-cells = <1>;
-+          #size-cells = <0>;
-+          oa-cps = <64>;
-+          oa-txcte;
-+	  oa_rxcte;
-+	  oa-prote;
-+	  oa-dprac;
-+        };
-+      };
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1b1bd3218a2d..d2b3c0e8d97e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14005,6 +14005,7 @@ MICROCHIP LAN8650/1 10BASE-T1S MACPHY ETHERNET DRIVER
- M:	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
-+F:	Documentation/devicetree/bindings/net/microchip,lan865x.yaml
- F:	drivers/net/ethernet/microchip/lan865x.c
- 
- MICROCHIP LAN87xx/LAN937x T1 PHY DRIVER
+My colleague Maxime Chevallier submitted several iterations of this driver
+about a year ago, here is the latest one:
+https://lore.kernel.org/netdev/20221104174151.439008-1-maxime.chevallier@bootlin.com/
+
+These series were rejected because they required adding out-of-band tagging
+support to the DSA subsystem. Therefore, we rewrote the driver as a pure
+switchdev module, which shares a common backend library with the current
+QCA8K driver.
+
+The main driver components are:
+ - ipqess_switch.c which registers and configures the integrated switch
+ - ipqess_port.c which creates net devices for each one of the front-facing
+   ports.
+ - ipqess_edma.c which handles the integrated EDMA Ethernet controller
+   linked to the CPU port.
+ - drivers/net/dsa/qca/qca8k-common.c which defines low-level ESS access
+   methods common to this driver and the original DSA QCA8K driver.
+
+Thanks to the people from Sartura for providing us hardware and working on
+the base QCA8K driver, and to Maxime for his work on the EDMA code.
+
+Best regards,
+
+Romain
+
+Romain Gantois (5):
+  net: dt-bindings: Introduce the Qualcomm IPQESS Ethernet switch
+  net: dsa: qca: Make the QCA8K hardware library available globally
+  net: ipqess: introduce the Qualcomm IPQESS driver
+  net: ipqess: add a PSGMII calibration procedure to the IPQESS driver
+  dts: qcom: ipq4019: Add description for the IPQ4019 ESS EDMA and
+    switch
+
+ .../bindings/net/qcom,ipq4019-ess.yaml        |  152 ++
+ MAINTAINERS                                   |    7 +
+ .../boot/dts/qcom/qcom-ipq4018-ap120c-ac.dtsi |   13 +
+ arch/arm/boot/dts/qcom/qcom-ipq4019.dtsi      |   94 +
+ drivers/net/dsa/qca/Kconfig                   |   10 +
+ drivers/net/dsa/qca/Makefile                  |    5 +-
+ drivers/net/dsa/qca/qca8k-8xxx.c              |    2 +-
+ drivers/net/dsa/qca/qca8k-common.c            |   97 +-
+ drivers/net/dsa/qca/qca8k-leds.c              |    2 +-
+ drivers/net/ethernet/qualcomm/Kconfig         |   14 +
+ drivers/net/ethernet/qualcomm/Makefile        |    2 +
+ drivers/net/ethernet/qualcomm/ipqess/Makefile |    8 +
+ .../ethernet/qualcomm/ipqess/ipqess_calib.c   |  495 ++++
+ .../ethernet/qualcomm/ipqess/ipqess_edma.c    | 1162 ++++++++++
+ .../ethernet/qualcomm/ipqess/ipqess_edma.h    |  484 ++++
+ .../qualcomm/ipqess/ipqess_notifiers.c        |  306 +++
+ .../qualcomm/ipqess/ipqess_notifiers.h        |   29 +
+ .../ethernet/qualcomm/ipqess/ipqess_port.c    | 2017 +++++++++++++++++
+ .../ethernet/qualcomm/ipqess/ipqess_port.h    |   99 +
+ .../ethernet/qualcomm/ipqess/ipqess_switch.c  |  559 +++++
+ .../ethernet/qualcomm/ipqess/ipqess_switch.h  |   40 +
+ .../net/dsa/qca => include/linux/dsa}/qca8k.h |   74 +-
+ 22 files changed, 5648 insertions(+), 23 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/qcom,ipq4019-ess.yaml
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/Makefile
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_calib.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_edma.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_edma.h
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_notifiers.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_notifiers.h
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_port.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_port.h
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_switch.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_switch.h
+ rename {drivers/net/dsa/qca => include/linux/dsa}/qca8k.h (87%)
+
 -- 
-2.34.1
+2.42.0
 
 
