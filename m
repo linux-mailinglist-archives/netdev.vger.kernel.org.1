@@ -1,323 +1,139 @@
-Return-Path: <netdev+bounces-43432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19977D2FDD
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:28:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9541F7D315A
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:08:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED2B01C2088D
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 10:28:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27BA52815A8
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6754B13AC9;
-	Mon, 23 Oct 2023 10:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805D214AA3;
+	Mon, 23 Oct 2023 11:08:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mTTUA0Rp"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ZehO/rgK"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF056FA5
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 10:28:28 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6E6D79;
-	Mon, 23 Oct 2023 03:28:25 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39NAHJJv026438;
-	Mon, 23 Oct 2023 10:28:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=fpYWhfGZJIbxbu2Kjyhz4Grm6wytg0wX8wN0sqL73QY=;
- b=mTTUA0RpHrzv0BcXz40Aj4SGdIiefSkw1sByoNBSkhn7ZVEYRJeBWDgzPt/F5CtG3x8A
- 705TkKKdPrk4WHfol9zDz7OHiiyVmvzCOoB/nf06fKIu7ujPBsoPscx58lzFnNCvpUBb
- 1HCX+j86K3nSg0XTiC09lcfyWK/hOuq8reTOKaYqJAdcNMPaaaIY08QzFdrJenSsXwDG
- lIzsezP6EcjcH7MnCMEB+E69MmYO+XIGBjQMKUw7GIArWxVg5fgdzq1gdOkuKl+smzxd
- jiGFpBabak13w9djR0ZBprlg7u8c/py8mFH9oEkMEdT6WiCnNhpPF5KsWSo+RurBlsiG eg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3twpxpgavy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Oct 2023 10:28:22 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39NAI2GB029798;
-	Mon, 23 Oct 2023 10:28:21 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3twpxpgavf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Oct 2023 10:28:21 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39N94VaA023834;
-	Mon, 23 Oct 2023 10:28:20 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tvrysr97a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 23 Oct 2023 10:28:20 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39NASJl420775632
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 23 Oct 2023 10:28:19 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3376F58051;
-	Mon, 23 Oct 2023 10:28:19 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A6BD458065;
-	Mon, 23 Oct 2023 10:28:17 +0000 (GMT)
-Received: from [9.171.5.241] (unknown [9.171.5.241])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 23 Oct 2023 10:28:17 +0000 (GMT)
-Message-ID: <ea0dcf7d-8406-476c-b027-145af207873a@linux.ibm.com>
-Date: Mon, 23 Oct 2023 12:28:16 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634C814A99;
+	Mon, 23 Oct 2023 11:08:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9982CC433C7;
+	Mon, 23 Oct 2023 11:08:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1698059292;
+	bh=xvfO7LxZUzWluuraflXkEgE6nuqlSw9WqGkQrxlBTFg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ZehO/rgK980EY7d8QX4kv4iDKZHQUiC/3s78NTon9Fd7xp3ihukQlI9uhTfKfIvc9
+	 wWT8uNq5jHQdLR5r0nXQbZjm7C9AVmIUlmC1+RhJVFKeSqc13XUMWQrZaGj5iKX+cb
+	 RMnT4bL/6Ku6T5aPaCY8zJ3wetji8TC2cTiMezzQ=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Mirko Lindner <mlindner@marvell.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	kernel test robot <lkp@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Kees Cook <keescook@chromium.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.5 129/241] sky2: Make sure there is at least one frag_addr available
+Date: Mon, 23 Oct 2023 12:55:15 +0200
+Message-ID: <20231023104837.012775048@linuxfoundation.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231023104833.832874523@linuxfoundation.org>
+References: <20231023104833.832874523@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 5/5] net/smc: put sk reference if close work was
- canceled
-Content-Language: en-GB
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-        jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
- <1697009600-22367-6-git-send-email-alibuda@linux.alibaba.com>
- <bdcb307f-d2a8-4aef-bb7d-dd87e56ff740@linux.ibm.com>
- <ee641ca5-104b-d1ec-5b2a-e20237c5378a@linux.alibaba.com>
- <ad5e4191-227e-4a62-a110-472618ef7de1@linux.ibm.com>
- <305c7ae2-a902-3e30-5e67-b590d848d0ba@linux.alibaba.com>
- <990a6b09-135a-41fb-a375-c37ffec6fe99@linux.ibm.com>
- <94f89147-cedc-b8b2-415f-942ec14cd670@linux.alibaba.com>
- <83476aac-a2f6-4705-8aec-762b1f165210@linux.ibm.com>
- <567c792e-33e0-9ff6-f5c2-0eae356c7eb1@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <567c792e-33e0-9ff6-f5c2-0eae356c7eb1@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -uvqdCW3UUCvUE7dzYuhwZhSmIGZhtob
-X-Proofpoint-ORIG-GUID: TooYV33VuxTfBE8kYI2MVLcst3Esjq1A
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-23_09,2023-10-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- malwarescore=0 clxscore=1015 impostorscore=0 mlxlogscore=999
- lowpriorityscore=0 phishscore=0 spamscore=0 bulkscore=0 priorityscore=1501
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310170001 definitions=main-2310230090
+
+6.5-stable review patch.  If anyone has any objections, please let me know.
+
+------------------
+
+From: Kees Cook <keescook@chromium.org>
+
+[ Upstream commit 6a70e5cbedaf8ad10528ac9ac114f3ec20f422df ]
+
+In the pathological case of building sky2 with 16k PAGE_SIZE, the
+frag_addr[] array would never be used, so the original code was correct
+that size should be 0. But the compiler now gets upset with 0 size arrays
+in places where it hasn't eliminated the code that might access such an
+array (it can't figure out that in this case an rx skb with fragments
+would never be created). To keep the compiler happy, make sure there is
+at least 1 frag_addr in struct rx_ring_info:
+
+   In file included from include/linux/skbuff.h:28,
+                    from include/net/net_namespace.h:43,
+                    from include/linux/netdevice.h:38,
+                    from drivers/net/ethernet/marvell/sky2.c:18:
+   drivers/net/ethernet/marvell/sky2.c: In function 'sky2_rx_unmap_skb':
+   include/linux/dma-mapping.h:416:36: warning: array subscript i is outside array bounds of 'dma_addr_t[0]' {aka 'long long unsigned int[]'} [-Warray-bounds=]
+     416 | #define dma_unmap_page(d, a, s, r) dma_unmap_page_attrs(d, a, s, r, 0)
+         |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/sky2.c:1257:17: note: in expansion of macro 'dma_unmap_page'
+    1257 |                 dma_unmap_page(&pdev->dev, re->frag_addr[i],
+         |                 ^~~~~~~~~~~~~~
+   In file included from drivers/net/ethernet/marvell/sky2.c:41:
+   drivers/net/ethernet/marvell/sky2.h:2198:25: note: while referencing 'frag_addr'
+    2198 |         dma_addr_t      frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT];
+         |                         ^~~~~~~~~
+
+With CONFIG_PAGE_SIZE_16KB=y, PAGE_SHIFT == 14, so:
+
+  #define ETH_JUMBO_MTU   9000
+
+causes "ETH_JUMBO_MTU >> PAGE_SHIFT" to be 0. Use "?: 1" to solve this build warning.
+
+Cc: Mirko Lindner <mlindner@marvell.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202309191958.UBw1cjXk-lkp@intel.com/
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/marvell/sky2.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/marvell/sky2.h b/drivers/net/ethernet/marvell/sky2.h
+index ddec1627f1a7b..8d0bacf4e49cc 100644
+--- a/drivers/net/ethernet/marvell/sky2.h
++++ b/drivers/net/ethernet/marvell/sky2.h
+@@ -2195,7 +2195,7 @@ struct rx_ring_info {
+ 	struct sk_buff	*skb;
+ 	dma_addr_t	data_addr;
+ 	DEFINE_DMA_UNMAP_LEN(data_size);
+-	dma_addr_t	frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT];
++	dma_addr_t	frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT ?: 1];
+ };
+ 
+ enum flow_control {
+-- 
+2.40.1
 
 
 
-On 23.10.23 10:52, D. Wythe wrote:
-> 
-> 
-> On 10/23/23 4:19 PM, Wenjia Zhang wrote:
->>
->>
->> On 20.10.23 04:41, D. Wythe wrote:
->>>
->>>
->>> On 10/20/23 1:40 AM, Wenjia Zhang wrote:
->>>>
->>>>
->>>> On 19.10.23 09:33, D. Wythe wrote:
->>>>>
->>>>>
->>>>> On 10/19/23 4:26 AM, Wenjia Zhang wrote:
->>>>>>
->>>>>>
->>>>>> On 17.10.23 04:06, D. Wythe wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 10/13/23 3:04 AM, Wenjia Zhang wrote:
->>>>>>>>
->>>>>>>>
->>>>>>>> On 11.10.23 09:33, D. Wythe wrote:
->>>>>>>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>>>>>>>>
->>>>>>>>> Note that we always hold a reference to sock when attempting
->>>>>>>>> to submit close_work. 
->>>>>>>> yes
->>>>>>>> Therefore, if we have successfully
->>>>>>>>> canceled close_work from pending, we MUST release that reference
->>>>>>>>> to avoid potential leaks.
->>>>>>>>>
->>>>>>>> Isn't the corresponding reference already released inside the 
->>>>>>>> smc_close_passive_work()?
->>>>>>>>
->>>>>>>
->>>>>>> Hi Wenjia,
->>>>>>>
->>>>>>> If we successfully cancel the close work from the pending state,
->>>>>>> it means that smc_close_passive_work() has never been executed.
->>>>>>>
->>>>>>> You can find more details here.
->>>>>>>
->>>>>>> /**
->>>>>>> * cancel_work_sync - cancel a work and wait for it to finish
->>>>>>> * @work:the work to cancel
->>>>>>> *
->>>>>>> * Cancel @work and wait for its execution to finish. This function
->>>>>>> * can be used even if the work re-queues itself or migrates to
->>>>>>> * another workqueue. On return from this function, @work is
->>>>>>> * guaranteed to be not pending or executing on any CPU.
->>>>>>> *
->>>>>>> * cancel_work_sync(&delayed_work->work) must not be used for
->>>>>>> * delayed_work's. Use cancel_delayed_work_sync() instead.
->>>>>>> *
->>>>>>> * The caller must ensure that the workqueue on which @work was last
->>>>>>> * queued can't be destroyed before this function returns.
->>>>>>> *
->>>>>>> * Return:
->>>>>>> * %true if @work was pending, %false otherwise.
->>>>>>> */
->>>>>>> boolcancel_work_sync(structwork_struct *work)
->>>>>>> {
->>>>>>> return__cancel_work_timer(work, false);
->>>>>>> }
->>>>>>>
->>>>>>> Best wishes,
->>>>>>> D. Wythe
->>>>>> As I understand, queue_work() would wake up the work if the work 
->>>>>> is not already on the queue. And the sock_hold() is just prio to 
->>>>>> the queue_work(). That means, cancel_work_sync() would cancel the 
->>>>>> work either before its execution or after. If your fix refers to 
->>>>>> the former case, at this moment, I don't think the reference can 
->>>>>> be hold, thus it is unnecessary to put it.
->>>>>>>
->>>>>
->>>>> I am quite confuse about why you think when we cancel the work 
->>>>> before its execution,
->>>>> the reference can not be hold ?
->>>>>
->>>>>
->>>>> Perhaps the following diagram can describe the problem in better way :
->>>>>
->>>>> smc_close_cancel_work
->>>>> smc_cdc_msg_recv_action
->>>>>
->>>>>
->>>>> sock_hold
->>>>> queue_work
->>>>> if (cancel_work_sync())        // successfully cancel before execution
->>>>> sock_put()                        //  need to put it since we 
->>>>> already hold a ref before   queue_work()
->>>>>
->>>>>
->>>> ha, I already thought you might ask such question:P
->>>>
->>>> I think here two Problems need to be clarified:
->>>>
->>>> 1) Do you think the bh_lock_sock/bh_unlock_sock in the 
->>>> smc_cdc_msg_recv does not protect the smc_cdc_msg_recv_action() from 
->>>> cancel_work_sync()?
->>>> Maybe that would go back to the discussion in the other patch on the 
->>>> behaviors of the locks.
->>>>
->>>
->>> Yes. bh_lock_sock/bh_unlock_sock can not block code execution 
->>> protected by lock_sock/unlock(). That is to say, they are not exclusive.
->>>
->> No, the logic of the inference is very vague to me. My understand is 
->> completely different. That is what I read from the kernel code. They 
->> are not *completely* exclusive, because while the bottom half context 
->> holds the lock i.e. bh_lock_sock, the process context can not get the 
->> lock by lock_sock. (This is actually my main point of my argument for 
->> these fixes, and I didn't see any clarify from you). However, while 
->> the process context holds the lock by lock_sock, the bottom half 
->> context can still get it by bh_lock_sock, this is just like what you 
->> showed in the code in lock_sock. Once it gets the ownership, it 
->> release the spinlock.
->>
-> 
-> “ while the process context holds the lock by lock_sock, the bottom half 
-> context can still get it by bh_lock_sock,  ”
-> 
-> You already got that, so why that sock_set_flag(DONE) and 
-> sock_set_flag(DEAD) can not happen concurrently ?
-> 
-
-Then I'd ask how do you understand this sentence I wrote? "while the 
-bottom half context holds the lock i.e. bh_lock_sock, the process 
-context can not get the lock by lock_sock."
-> 
->>> We can use a very simple example to infer that since bh_lock_sock is 
->>> type of spin-lock, if bh_lock_sock/bh_unlock_sock can block 
->>> lock_sock/unlock(),
->>> then lock_sock/unlock() can also block bh_lock_sock/bh_unlock_sock.
->>>
->>> If this is true, when the process context already lock_sock(), the 
->>> interrupt context must wait for the process to call
->>> release_sock(). Obviously, this is very unreasonable.
->>>
->>>
->>>> 2) If the queue_work returns true, as I said in the last main, the 
->>>> work should be (being) executed. How could the cancel_work_sync() 
->>>> cancel the work before execution successgully?
->>>
->>> No, that's not true. In fact, if queue_work returns true, it simply 
->>> means that we have added the task to the queue and may schedule a 
->>> worker to execute it,
->>> but it does not guarantee that the task will be executed or is being 
->>> executed when it returns true,
->>> the task might still in the list and waiting some worker to execute it.
->>>
->>> We can make a simple inference,
->>>
->>> 1. A known fact is that if no special flag (WORK_UNBOUND) is given, 
->>> tasks submitted will eventually be executed on the CPU where they 
->>> were submitted.
->>>
->>> 2. If the queue_work returns true, the work should be or is being 
->>> executed
->>>
->>> If all of the above are true, when we invoke queue_work in an 
->>> interrupt context, does it mean that the submitted task will be 
->>> executed in the interrupt context?
->>>
->>>
->>> Best wishes,
->>> D. Wythe
->>>
->> If you say the thread is not gauranteed to be waken up in then 
->> queue_work to execute the work, please explain what the kick_pool 
->> function does.
-> 
-> I never said that.
-> 
-What do you understand on the kick_pool there?
->>
->> However, the spin_lock understanding is still the key problem in the 
->> cases. As I said, if it is not get clarify, we don't really need to go 
->> on to disucss this.
->>
->>>>
->>>>>>>>> Fixes: 42bfba9eaa33 ("net/smc: immediate termination for SMCD 
->>>>>>>>> link groups")
->>>>>>>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->>>>>>>>> ---
->>>>>>>>>   net/smc/smc_close.c | 3 ++-
->>>>>>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>>>>>
->>>>>>>>> diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
->>>>>>>>> index 449ef45..10219f5 100644
->>>>>>>>> --- a/net/smc/smc_close.c
->>>>>>>>> +++ b/net/smc/smc_close.c
->>>>>>>>> @@ -116,7 +116,8 @@ static void smc_close_cancel_work(struct 
->>>>>>>>> smc_sock *smc)
->>>>>>>>>       struct sock *sk = &smc->sk;
->>>>>>>>>         release_sock(sk);
->>>>>>>>> -    cancel_work_sync(&smc->conn.close_work);
->>>>>>>>> +    if (cancel_work_sync(&smc->conn.close_work))
->>>>>>>>> +        sock_put(sk);
->>>>>>>>> cancel_delayed_work_sync(&smc->conn.tx_work);
->>>>>>>>>       lock_sock(sk);
->>>>>>>>>   }
->>>>>>>
->>>>>
->>>>>
->>>
-> 
 
