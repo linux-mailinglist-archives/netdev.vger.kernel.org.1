@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-43452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C2DD7D33DC
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:34:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441AC7D34A8
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B2CEB20BEA
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:34:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4A2828143E
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F01A015E90;
-	Mon, 23 Oct 2023 11:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3A915EA7;
+	Mon, 23 Oct 2023 11:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="pSmLVWu8"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="VYszL7YR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F0815E84;
-	Mon, 23 Oct 2023 11:34:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 183C7C433CA;
-	Mon, 23 Oct 2023 11:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA9B15EA0;
+	Mon, 23 Oct 2023 11:41:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5FBC43395;
+	Mon, 23 Oct 2023 11:41:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1698060876;
-	bh=1qN74NTpDOxA+hLJZqeG+tKDrGAFby2kDNk7aaej4aA=;
+	s=korg; t=1698061313;
+	bh=GGRNanOMwehvibyFuWKummVXRCevGq8X/wg5Jadc/cE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pSmLVWu8/HFdg3Eei7NmE5uSXmFTooJDWPdlE3Fw5D+bVKU9raMzxgMs26bqSe3rD
-	 fvWeQIMH4hp/+HHwRwMLpnNe8RdZRNM/QxciVm4o6DojmZYX/h4oMu+QY10646DAi6
-	 KSUjgsYDdTFu/Nl9bj2oH/d+Teh/I8wGXKrh8ryU=
+	b=VYszL7YRnvRvAbYjmqfslZdXbgaF6RaMsgxMrQv5Hn/7fv4kOSfr1AEvLrTKn73IY
+	 IGrPnmo3htVXF6n+g/zvXHIdNpUnIXCwcqqLwxpaSo/uFI0d0G5I7P7HSg2h0uuP2X
+	 9oQyW9EtyvBHVny74qWEvFhlr3VhWXXOyZxCi830=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -44,12 +44,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Kees Cook <keescook@chromium.org>
-Subject: [PATCH 5.4 122/123] Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
-Date: Mon, 23 Oct 2023 12:58:00 +0200
-Message-ID: <20231023104821.892882185@linuxfoundation.org>
+Subject: [PATCH 5.15 136/137] Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
+Date: Mon, 23 Oct 2023 12:58:13 +0200
+Message-ID: <20231023104825.258229633@linuxfoundation.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231023104817.691299567@linuxfoundation.org>
-References: <20231023104817.691299567@linuxfoundation.org>
+In-Reply-To: <20231023104820.849461819@linuxfoundation.org>
+References: <20231023104820.849461819@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -61,7 +61,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-5.4-stable review patch.  If anyone has any objections, please let me know.
+5.15-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -104,7 +104,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/include/net/bluetooth/hci_mon.h
 +++ b/include/net/bluetooth/hci_mon.h
-@@ -54,7 +54,7 @@ struct hci_mon_new_index {
+@@ -56,7 +56,7 @@ struct hci_mon_new_index {
  	__u8		type;
  	__u8		bus;
  	bdaddr_t	bdaddr;
@@ -115,7 +115,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -430,7 +430,8 @@ static struct sk_buff *create_monitor_ev
+@@ -438,7 +438,8 @@ static struct sk_buff *create_monitor_ev
  		ni->type = hdev->dev_type;
  		ni->bus = hdev->bus;
  		bacpy(&ni->bdaddr, &hdev->bdaddr);
