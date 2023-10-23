@@ -1,65 +1,100 @@
-Return-Path: <netdev+bounces-43534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 835CF7D3CBD
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:38:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB307D3CC1
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1639728159B
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:38:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 946D81C20A0E
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A21B55679;
-	Mon, 23 Oct 2023 16:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B76125A0;
+	Mon, 23 Oct 2023 16:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EdQaMRyn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="V/xOy/CX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DA5200CA
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 16:38:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7ABEC433CB;
-	Mon, 23 Oct 2023 16:38:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698079119;
-	bh=It2Eq6456oIB3m4HFRo0jRa19bilUVa2a5KypipIxeM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EdQaMRyntLSGxldGG+JLEtEVXWKr/fwCPY111hx+aAe7OoXA/53XlzPmcQBs0VIXb
-	 XzVrGgDZooB2U3W6zFr7aPM7dSguAvO6+aqhTGUiApFlRARiqx/sX1dM7rHHw2+VWL
-	 Gs2DZ0lZmZIQERrqrOo/03HII1e5GG87XxDnkQwTk+B7JgWQ2aUS2DbdyHacgqWcR9
-	 SgO0uPvjdAYfIOJFLD9y694G0xo7eSYHGOxezoHd7+QU5wrUZKkvgLKJCG/xbjIOpg
-	 Jl8jaSoEGCePgYlRiAQbjZcRg8UIV7UXtxXEkDOgkzYKpp4Iqyw8V9YxrJ47srIdSV
-	 oq5P3D8f/7ncA==
-Date: Mon, 23 Oct 2023 09:38:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux
- Networking <netdev@vger.kernel.org>, Loic Poulain
- <loic.poulain@linaro.org>, Sergey Ryazanov <ryazanov.s.a@gmail.com>,
- Johannes Berg <johannes@sipsolutions.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net v2 1/2] MAINTAINERS: Move M Chetan Kumar to CREDITS
-Message-ID: <20231023093837.49c7cb35@kernel.org>
-In-Reply-To: <20231023032905.22515-3-bagasdotme@gmail.com>
-References: <20231023032905.22515-2-bagasdotme@gmail.com>
-	<20231023032905.22515-3-bagasdotme@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748F8208A1;
+	Mon, 23 Oct 2023 16:40:47 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D6B993;
+	Mon, 23 Oct 2023 09:40:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2Qgu3sV7JqSs1+xqVkj3Q4GC+iKi/Wf5NSoQxrtF3ew=; b=V/xOy/CXT9JTBGtsL7Y3xvmZwV
+	rnjrtnpa5D22ISWgGO9NXgw8FxE1TOh+Ky7E5bQuEIBPVohIRtEarYFHeqnEvmA8GPV33pt+97QuE
+	qNoxRycGKX+H0q2vf7UImSz8VoL2M2kkyftM18WG2htwIMUd1lNv1JzSTbHPyZMJga6Y=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1quxyl-0032zT-EI; Mon, 23 Oct 2023 18:40:35 +0200
+Date: Mon, 23 Oct 2023 18:40:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: davem@davemloft.net, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next 2/5] net: dsa: qca: Make the QCA8K hardware
+ library available globally
+Message-ID: <3f279720-5386-4ea2-b54c-ffc44277b1cc@lunn.ch>
+References: <20231023155013.512999-1-romain.gantois@bootlin.com>
+ <20231023155013.512999-3-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231023155013.512999-3-romain.gantois@bootlin.com>
 
-On Mon, 23 Oct 2023 10:29:04 +0700 Bagas Sanjaya wrote:
->  M Chetan Kumar <m.chetan.kumar@linux.intel.com> (commit_signer:15/23=65%,authored:14/23=61%)
+> @@ -62,21 +61,37 @@ const struct qca8k_mib_desc ar8327_mib[] = {
+>  	MIB_DESC(1, 0xa8, "RXUnicast"),
+>  	MIB_DESC(1, 0xac, "TXUnicast"),
+>  };
+> +EXPORT_SYMBOL(ar8327_mib);
 
-14 patches authored and 15 signed off?
-Let me be more clear this time - nak, please drop this patch.
--- 
-pw-bot: cr
+Christian should decide, since he wrote most of this code, but i would
+prefer EXPORT_SYMBOL_GPL().
+
+> --- a/drivers/net/dsa/qca/qca8k.h
+> +++ b/include/linux/dsa/qca8k.h
+> @@ -13,6 +13,7 @@
+>  #include <linux/gpio.h>
+>  #include <linux/leds.h>
+>  #include <linux/dsa/tag_qca.h>
+> +#include <net/dsa.h>
+>  
+>  #define QCA8K_ETHERNET_MDIO_PRIORITY			7
+>  #define QCA8K_ETHERNET_PHY_PRIORITY			6
+> @@ -265,6 +266,7 @@
+>  #define   QCA8K_PORT_LOOKUP_STATE_LEARNING		QCA8K_PORT_LOOKUP_STATE(0x3)
+>  #define   QCA8K_PORT_LOOKUP_STATE_FORWARD		QCA8K_PORT_LOOKUP_STATE(0x4)
+>  #define   QCA8K_PORT_LOOKUP_LEARN			BIT(20)
+> +#define   QCA8K_PORT_LOOKUP_LOOPBACK_EN			BIT(21)
+
+Maybe do the move first, and then add new features in another patch?
+
+      Andrew
 
