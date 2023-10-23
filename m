@@ -1,109 +1,143 @@
-Return-Path: <netdev+bounces-43471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C99537D3645
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:19:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 944767D366E
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:26:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33737B20C9B
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:19:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EA2228146F
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FAD318E06;
-	Mon, 23 Oct 2023 12:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MLB4guL5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B5018E13;
+	Mon, 23 Oct 2023 12:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07BF93D74;
-	Mon, 23 Oct 2023 12:19:32 +0000 (UTC)
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5D42100;
-	Mon, 23 Oct 2023 05:19:30 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-507c5249d55so4531581e87.3;
-        Mon, 23 Oct 2023 05:19:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698063569; x=1698668369; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WC8RwLIS4Bs9UmtzGsUr6haXBVTLzG1rlQGdy2RVoKc=;
-        b=MLB4guL5Ok9MeBxJ7IYP4p1BgjeVbCXHf3qzUhkvi40cxz1tiQec1PNKeFz08zNhnj
-         WneAi5dEh0qgX3ww9CKhzSCdfQ+nIczbCRxOe/lj33sHMESZ3iUpDZtArm36yqJKw8wu
-         AOPRuVorHgV3FQd5RdVZBI+Kx9SzTNOas6DoHakVS5ew2gePYrNqosMF6uhFKuoKETbU
-         9MYs7D9qODqnwU2lKSsNOSPD3EhLIXq8NgR/3iEB850QW5BTEWrpc0i7MAV+wm6B1Zul
-         Gbo9CdjFFfM0DGuPwGeQmavPoPgwD6u0BQuS7sXTjLUjFLS5BRagQchfDU8lfNRcqpvR
-         6zlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698063569; x=1698668369;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WC8RwLIS4Bs9UmtzGsUr6haXBVTLzG1rlQGdy2RVoKc=;
-        b=UsbEhv04lUqh1YVOr9fnas9Ovm6MMub4AxhdU6+fhKJ2ch31JoCN9CKuwkeDdfhAT2
-         zG+S4zAPyU/TWy/HpZ7ETkg0Sk/EAVbg/Zq7LaEOpBz/PiEIU9fUMOAeqa55u3PSXsMg
-         MFzrZd2Ws1dOE5m5fmQ34Gwqj8mv5vD2WrPsNyvso0xeKokRcsE9vonfbrfO6iCxKsxm
-         SR6AuQEOKDKTuFnZ2Xckmvs5jtvdCyS+2ptplQVkDQHawtI8F20IjnBT3Bc/A4xqqZ1g
-         TSA7CbwHTtuth/yprk3OxH7I4AORatcZ6mPLLkFGZGcZkX8ILyg++PEC9nYAGFzbtg3+
-         tNeA==
-X-Gm-Message-State: AOJu0YyXq/RibcADfQjj2rHGIomRmscc1Vz04z/27I1RCJ9C+4X3Bz44
-	xXOn7EQm98Tm0y6hCuWiYe8=
-X-Google-Smtp-Source: AGHT+IGrAMp9m07AaNF5yySpls8rzV1GziF9lQyjCrmxEg63X482fDQlepLc/J9jN4lWYyHD5mTZ9A==
-X-Received: by 2002:a05:6512:4885:b0:503:35bb:1e74 with SMTP id eq5-20020a056512488500b0050335bb1e74mr5896731lfb.61.1698063568601;
-        Mon, 23 Oct 2023 05:19:28 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id cf15-20020a0564020b8f00b0053deb97e8e6sm6146122edb.28.2023.10.23.05.19.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 05:19:27 -0700 (PDT)
-Date: Mon, 23 Oct 2023 15:19:24 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Ante Knezic <ante.knezic@helmholz.de>
-Cc: UNGLinuxDriver@microchip.com, andrew@lunn.ch, conor+dt@kernel.org,
-	davem@davemloft.net, devicetree@vger.kernel.org,
-	edumazet@google.com, f.fainelli@gmail.com,
-	krzysztof.kozlowski+dt@linaro.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, marex@denx.de, netdev@vger.kernel.org,
-	o.rempel@pengutronix.de, pabeni@redhat.com, robh+dt@kernel.org,
-	woojung.huh@microchip.com
-Subject: Re: [PATCH net-next v4 2/2] net:dsa:microchip: add property to select
-Message-ID: <20231023121924.udseyuy7t77dscwl@skbuf>
-References: <20231020143759.eknrcfbztrc543mm@skbuf>
- <20231023072700.17060-1-ante.knezic@helmholz.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F068720F6
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:26:44 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D647100;
+	Mon, 23 Oct 2023 05:26:40 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SDZ8R0r84zVlwb;
+	Mon, 23 Oct 2023 20:22:47 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 23 Oct
+ 2023 20:26:34 +0800
+Subject: Re: [PATCH net-next v12 1/5] page_pool: unify frag_count handling in
+ page_pool_is_last_frag()
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
+	<lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
+	<liangchen.linux@gmail.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	Eric Dumazet <edumazet@google.com>
+References: <20231020095952.11055-1-linyunsheng@huawei.com>
+ <20231020095952.11055-2-linyunsheng@huawei.com> <ZTZcTrTy9ulPast5@hades>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <4da09821-d964-924f-470b-e5c1de18eecf@huawei.com>
+Date: Mon, 23 Oct 2023 20:26:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231023072700.17060-1-ante.knezic@helmholz.de>
+In-Reply-To: <ZTZcTrTy9ulPast5@hades>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-On Mon, Oct 23, 2023 at 09:27:00AM +0200, Ante Knezic wrote:
-> As far as I am aware only the KSZ8863 and KSZ8873 have this property available,
-> but the biggger issue might be in scaling this to port property as the register
-> "Forward Invalid VID Frame and Host Mode" where the setting is applied is
-> located under "Advanced Control Registers" section which is actually global at
-> least looking from the switch point of view. Usually port properties are more
-> applicable when registers in question are located under "Port Registers" section.
-> This is somewhat similar to for example enabling the tail tag mode which is 
-> again used only by the port 3 interface and is control from "Global Control 1"
-> register.
-> With this in mind - if you still believe we should move this to port dt 
-> property, then should we forbid setting the property for any other port other 
-> than port 3, and can/should this be enforced by the dt schema?
+On 2023/10/23 19:43, Ilias Apalodimas wrote:
+> Hi Yunsheng, 
+> 
+> [...]
+> 
+>> +	 * 1. 'n == 1': no need to actually overwrite it.
+>> +	 * 2. 'n != 1': overwrite it with one, which is the rare case
+>> +	 *              for pp_frag_count draining.
+>>  	 *
+>> -	 * The main advantage to doing this is that an atomic_read is
+>> -	 * generally a much cheaper operation than an atomic update,
+>> -	 * especially when dealing with a page that may be partitioned
+>> -	 * into only 2 or 3 pieces.
+>> +	 * The main advantage to doing this is that not only we avoid a atomic
+>> +	 * update, as an atomic_read is generally a much cheaper operation than
+>> +	 * an atomic update, especially when dealing with a page that may be
+>> +	 * partitioned into only 2 or 3 pieces; but also unify the pp_frag_count
+>> +	 * handling by ensuring all pages have partitioned into only 1 piece
+>> +	 * initially, and only overwrite it when the page is partitioned into
+>> +	 * more than one piece.
+>>  	 */
+>> -	if (atomic_long_read(&page->pp_frag_count) == nr)
+>> +	if (atomic_long_read(&page->pp_frag_count) == nr) {
+>> +		/* As we have ensured nr is always one for constant case using
+>> +		 * the BUILD_BUG_ON(), only need to handle the non-constant case
+>> +		 * here for pp_frag_count draining, which is a rare case.
+>> +		 */
+>> +		BUILD_BUG_ON(__builtin_constant_p(nr) && nr != 1);
+>> +		if (!__builtin_constant_p(nr))
+>> +			atomic_long_set(&page->pp_frag_count, 1);
+> 
+> Aren't we changing the behaviour of the current code here? IIRC is
+> atomic_long_read(&page->pp_frag_count) == nr we never updated the atomic
+> pp_frag_count and the reasoning was that the next caller can set it
+> properly. 
 
-I have no doubt that RMII settings are port settings. Scaling up the implementation
-to multiple ports on other switches doesn't mean that the DT binding shouldn't be
-per port.
+If the next caller is calling the page_pool_alloc_frag(), then yes,
+because page_pool_fragment_page() will be used to reset the
+page->pp_frag_count, so it does not really matter what is the value
+of page->pp_frag_count when we are recycling a page.
 
-Anyway, the per-port access to a global switch setting is indeed a common theme
-with the old Micrel switches. I once tried to introduce the concept of "wacky"
-regmap regfields for that:
-https://patchwork.kernel.org/project/netdevbpf/patch/20230316161250.3286055-3-vladimir.oltean@nxp.com/
+If the next caller is calling page_pool_alloc_pages() directly without
+fragmenting a page, the above code is used to ensure that pp_frag_count
+is always one when page_pool_alloc_pages() fetches a page from pool->alloc
+or pool->ring, because page_pool_fragment_page() is not used to reset the
+page->pp_frag_count for page_pool_alloc_pages() and we have removed the
+per page_pool PP_FLAG_PAGE_FRAG in page_pool_is_last_frag().
 
-but I don't have hardware to test and nobody who does picked up upon the regfield
-idea, it seems.
+As we don't know if the caller is page_pool_alloc_frag() or
+page_pool_alloc_pages(), so the above code ensure the page in pool->alloc
+or pool->ring always have the pp_frag_count being one.
+
+
+> 
+>> +
+>>  		return 0;
+>> +	}
+>>  
+>>  	ret = atomic_long_sub_return(nr, &page->pp_frag_count);
+>>  	WARN_ON(ret < 0);
+>> +
+>> +	/* We are the last user here too, reset pp_frag_count back to 1 to
+>> +	 * ensure all pages have been partitioned into 1 piece initially,
+>> +	 * this should be the rare case when the last two fragment users call
+>> +	 * page_pool_defrag_page() currently.
+>> +	 */
+>> +	if (unlikely(!ret))
+>> +		atomic_long_set(&page->pp_frag_count, 1);
+>> +
+>>  	return ret;
+>>  }
+>>  
+>  
+>  [....]
+> 
+>  Thanks
+>  /Ilias
+> 
+> .
+> 
 
