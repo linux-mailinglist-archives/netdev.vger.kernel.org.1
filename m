@@ -1,105 +1,558 @@
-Return-Path: <netdev+bounces-43397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 575637D2DC9
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:13:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1AA77D2DD0
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1186328119F
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 09:12:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 270611F21B8B
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 09:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B4812B7D;
-	Mon, 23 Oct 2023 09:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="DnyULfnh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9466D12B7F;
+	Mon, 23 Oct 2023 09:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B3D6FD6
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 09:12:52 +0000 (UTC)
-Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCA60110
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 02:12:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=Prsb
-	8L/rB7hjs8LFPDfXLYORDTbC3nZD3UOHdKFhLsg=; b=DnyULfnhAuByToTpQwQ5
-	Oq1LqgmHxlSo+FSmJpNPenmMVuZmLxoFqEdB80vjqZSzwvX8dm31peW7tFRo+cz4
-	tjIvX5GGglCcqPFDZUHFg2ReG28Gx8ZN8E9eQg8PhUzd8RNCfkGr27cvwFJ2UXNP
-	NcmuLY6FrMEk0HJV9/kGhR53oEs5FYMK81cmtfjIqGh/hAjqrHthJI3Y/St4fEH6
-	8OxardlfX/VcquU2pskFNrKRnTk0NksArkel/ARed9AsGa3cbr5hvH39G3W0UCnp
-	tsdqDaignA8oDizHWneez47WY72TsNkWAhzE560sQ8Nv9kd8tIPTWst2Uf1nrF5H
-	xw==
-Received: (qmail 1886524 invoked from network); 23 Oct 2023 11:12:44 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 23 Oct 2023 11:12:44 +0200
-X-UD-Smtp-Session: l3s3148p1@VRj4n14I9K8ujnvq
-Date: Mon, 23 Oct 2023 11:12:43 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>
-Cc: linux-renesas-soc@vger.kernel.org,
-	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: ethernet: renesas: group entries in
- Makefile
-Message-ID: <ZTY5C0nxat6/dOXO@ninjato>
-Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	linux-renesas-soc@vger.kernel.org,
-	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231022205316.3209-1-wsa+renesas@sang-engineering.com>
- <20231022205316.3209-2-wsa+renesas@sang-engineering.com>
- <94f652d4-4538-e6ed-9476-f982fd07ee97@omp.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BCCD26B
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 09:15:10 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF75EDF;
+	Mon, 23 Oct 2023 02:15:06 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.206])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SDTz53syVz67Jb4;
+	Mon, 23 Oct 2023 17:14:25 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 23 Oct 2023 10:15:03 +0100
+Message-ID: <3daaab37-4e04-0237-cc24-e4dc526a0abe@huawei.com>
+Date: Mon, 23 Oct 2023 12:15:02 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="+mZpJWQzj+NJ6ZRe"
-Content-Disposition: inline
-In-Reply-To: <94f652d4-4538-e6ed-9476-f982fd07ee97@omp.ru>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v13 10/12] selftests/landlock: Add 7 new test variants
+ dedicated to network
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
+ <20231016015030.1684504-11-konstantin.meskhidze@huawei.com>
+ <20231016.phei8Is2weod@digikod.net>
+ <9fe690cb-a6ca-4c54-dd38-4d7a3cb02a4b@huawei.com>
+ <20231020.zahs6Cahch6N@digikod.net>
+ <36fcda5b-cd8d-1e2e-ff0d-3284ab60c06b@huawei.com>
+ <20231023.DaeGeighe3qu@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <20231023.DaeGeighe3qu@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
 
 
---+mZpJWQzj+NJ6ZRe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
+10/23/2023 11:44 AM, Mickaël Salaün пишет:
+> On Mon, Oct 23, 2023 at 10:09:54AM +0300, Konstantin Meskhidze (A) wrote:
+>> 
+>> 
+>> 10/20/2023 6:40 PM, Mickaël Salaün пишет:
+>> > On Fri, Oct 20, 2023 at 02:41:42PM +0300, Konstantin Meskhidze (A) wrote:
+>> > > 
+>> > > 
+>> > > 10/18/2023 3:32 PM, Mickaël Salaün пишет:
+>> > > > You can update the subject with:
+>> > > > "selftests/landlock: Add network tests"
+>> > > 
+>> > > Ok.
+>> > > > > On Mon, Oct 16, 2023 at 09:50:28AM +0800, Konstantin Meskhidze
+>> > > wrote:
+>> > > > > These test suites try to check edge cases for TCP sockets
+>> > > > > bind() and connect() actions.
+>> > > > > You can replace with that:
+>> > > > Add 77 test suites to check edge cases related to bind() and connect()
+>> > > > actions. They are defined with 6 fixtures and their variants:
+>> > > > > > > > protocol:
+>> > > > > * bind: Tests with non-landlocked/landlocked ipv4, ipv6 and unix sockets.
+>> > > > > As you already did, you can write one paragraph per fixture, but
+>> > > > starting by explaining the fixture and its related variants, and then
+>> > > > listing the tests and explaining their specificities. For instance:
+>> > > > > The "protocol" fixture is extended with 12 variants defined as a
+>> > > matrix
+>> > > > of: sandboxed/not-sandboxed, IPv4/IPv6/unix network domain, and
+>> > > > stream/datagram socket. 4 related tests suites are defined:
+>> > > > * bind: Test bind combinations with increasingly more
+>> > > >    restricting domains.
+>> > > > * connect: Test connect combinations with increasingly more
+>> > > >    restricting domains.
+>> > > > ...
+>> > > 
+>> > >   Ok. Will be updated.
+>> > > > > s/ipv/IPv/g
+>> > > 
+>> > >   Got it. Thanks.
+>> > > > > > * connect: Tests with non-landlocked/landlocked ipv4, ipv6 and
+>> > > unix
+>> > > > > sockets.
+>> > > > > * bind_unspec: Tests with non-landlocked/landlocked restrictions
+>> > > > > for bind action with AF_UNSPEC socket family.
+>> > > > > * connect_unspec: Tests with non-landlocked/landlocked restrictions
+>> > > > > for connect action with AF_UNSPEC socket family.
+>> > > > > > > ipv4:
+>> > > > > * from_unix_to_inet: Tests to make sure unix sockets' actions are not
+>> > > > > restricted by Landlock rules applied to TCP ones.
+>> > > > > > > tcp_layers:
+>> > > > > * ruleset_overlap.
+>> > > > > * ruleset_expand.
+>> > > > > > > mini:
+>> > > > > * network_access_rights: Tests with  legitimate access values.
+>> > > > > * unknown_access_rights: Tests with invalid attributes, out of access range.
+>> > > > > * inval:
+>> > > > >     - unhandled allowed access.
+>> > > > >     - zero access value.
+>> > > > > * tcp_port_overflow: Tests with wrong port values more than U16_MAX.
+>> > > > > > > ipv4_tcp:
+>> > > > > * port_endianness: Tests with big/little endian port formats.
+>> > > > > > > port_specific:
+>> > > > > * bind_connect: Tests with specific port values.
+>> > > > > > > layout1:
+>> > > > > * with_net: Tests with network bind() socket action within
+>> > > > > filesystem directory access test.
+>> > > > > > > Test coverage for security/landlock is 94.5% of 932 lines
+>> > > according
+>> > > > > to gcc/gcov-11.
+>> > > > > > > Signed-off-by: Konstantin Meskhidze
+>> > > <konstantin.meskhidze@huawei.com>
+>> > > > > Link: https://lore.kernel.org/r/20230920092641.832134-11-konstantin.meskhidze@huawei.com
+>> > > > > Co-developed-by:: Mickaël Salaün <mic@digikod.net>
+>> > > > > Signed-off-by: Mickaël Salaün <mic@digikod.net>
+>> > > > > ---
+>> > > > > > > Changes since v12:
+>> > > > > * Renames port_zero to port_specific fixture.
+>> > > > > * Refactors port_specific test:
+>> > > > >     - Adds set_port() and get_binded_port() helpers.
+>> > > > >     - Adds checks for port 0, allowed by Landlock in this version.
+>> > > > >     - Adds checks for port 1023.
+>> > > > > * Refactors commit message.
+>> > > > > > > > +static void set_port(struct service_fixture *const srv,
+>> > > in_port_t port)
+>> > > > > +{
+>> > > > > +	switch (srv->protocol.domain) {
+>> > > > > +	case AF_UNSPEC:
+>> > > > > +	case AF_INET:
+>> > > > > +		srv->ipv4_addr.sin_port = port;
+>> > > > > We should call htons() here, and make port a uint16_t.
+>> > > 
+>> > >   Done.
+>> > > > > > +		return;
+>> > > > > +
+>> > > > > +	case AF_INET6:
+>> > > > > +		srv->ipv6_addr.sin6_port = port;
+>> > > > > +		return;
+>> > > > > +
+>> > > > > +	default:
+>> > > > > +		return;
+>> > > > > +	}
+>> > > > > +}
+>> > > > > +
+>> > > > > +static in_port_t get_binded_port(int socket_fd,
+>> > > > > The returned type should be uint16_t (i.e. host endianess).
+>> > > 
+>> > >   Done.
+>> > > > > > +				 const struct protocol_variant *const prot)
+>> > > > > +{
+>> > > > > +	struct sockaddr_in ipv4_addr;
+>> > > > > +	struct sockaddr_in6 ipv6_addr;
+>> > > > > +	socklen_t ipv4_addr_len, ipv6_addr_len;
+>> > > > > +
+>> > > > > +	/* Gets binded port. */
+>> > > > > +	switch (prot->domain) {
+>> > > > > +	case AF_UNSPEC:
+>> > > > > +	case AF_INET:
+>> > > > > +		ipv4_addr_len = sizeof(ipv4_addr);
+>> > > > > +		getsockname(socket_fd, &ipv4_addr, &ipv4_addr_len);
+>> > > > > +		return ntohs(ipv4_addr.sin_port);
+>> > > > > +
+>> > > > > +	case AF_INET6:
+>> > > > > +		ipv6_addr_len = sizeof(ipv6_addr);
+>> > > > > +		getsockname(socket_fd, &ipv6_addr, &ipv6_addr_len);
+>> > > > > +		return ntohs(ipv6_addr.sin6_port);
+>> > > > > +
+>> > > > > +	default:
+>> > > > > +		return 0;
+>> > > > > +	}
+>> > > > > +}
+>> > > > > These are good helpers!
+>> > > > > > > +FIXTURE_TEARDOWN(ipv4)
+>> > > > > +{
+>> > > > > +}
+>> > > > > +
+>> > > > > +// Kernel FIXME: tcp_sandbox_with_tcp and tcp_sandbox_with_udp
+>> > > > > No FIXME should remain.
+>> > > 
+>> > >   Ok. Deleted.
+>> > > > > > +TEST_F(ipv4, from_unix_to_inet)
+>> > > > > > +TEST_F(mini, network_access_rights)
+>> > > > > +{
+>> > > > > +	const struct landlock_ruleset_attr ruleset_attr = {
+>> > > > > +		.handled_access_net = ACCESS_ALL,
+>> > > > > +	};
+>> > > > > +	struct landlock_net_port_attr net_service = {
+>> > > > > Please rename to "net_port" everywhere.
+>> > > 
+>> > >   Done.
+>> > > > > > +TEST_F(port_specific, bind_connect)
+>> > > > > +{
+>> > > > > +	int socket_fd, ret;
+>> > > > > +
+>> > > > > +	/* Adds the first rule layer with bind and connect actions. */
+>> > > > > +	if (variant->sandbox == TCP_SANDBOX) {
+>> > > > > +		const struct landlock_ruleset_attr ruleset_attr = {
+>> > > > > +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> > > > > +					      LANDLOCK_ACCESS_NET_CONNECT_TCP
+>> > > > > +		};
+>> > > > > +		const struct landlock_net_port_attr tcp_bind_connect_zero = {
+>> > > > > +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> > > > > +					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
+>> > > > > +			.port = htons(0),
+>> > > > > We don't need any htons() calls anymore. It doesn't change the 0
+>> > > value
+>> > > > in this case but this is not correct.
+>> > > 
+>> > >  Yep. We call htons(port) in landlock_append_net_rule().
+>> > >  Thanks.
+>> > > > > > +		};
+>> > > > > +
+>> > > > > Useless new line.
+>> > > 
+>> > >   Ok. Thanks.
+>> > > > > > +		int ruleset_fd;
+>> > > > > +
+>> > > > > +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+>> > > > > +						     sizeof(ruleset_attr), 0);
+>> > > > > +		ASSERT_LE(0, ruleset_fd);
+>> > > > > +
+>> > > > > +		/* Checks zero port value on bind and connect actions. */
+>> > > > > +		EXPECT_EQ(0,
+>> > > > > +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> > > > > +					    &tcp_bind_connect_zero, 0));
+>> > > > > +
+>> > > > > +		enforce_ruleset(_metadata, ruleset_fd);
+>> > > > > +		EXPECT_EQ(0, close(ruleset_fd));
+>> > > > > +	}
+>> > > > > +
+>> > > > > +	socket_fd = socket_variant(&self->srv0);
+>> > > > > +	ASSERT_LE(0, socket_fd);
+>> > > > > +
+>> > > > > +	/* Sets address port to 0 for both protocol families. */
+>> > > > > +	set_port(&self->srv0, htons(0));
+>> > > > > ditto
+>> > > > > > +
+>> > > > > +	/* Binds on port 0. */
+>> > > > > +	ret = bind_variant(socket_fd, &self->srv0);
+>> > > > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
+>> > > > > +		/* Binds to a random port within ip_local_port_range. */
+>> > > > > +		EXPECT_EQ(0, ret);
+>> > > > > +	} else {
+>> > > > > +		/* Binds to a random port within ip_local_port_range. */
+>> > > > > +		EXPECT_EQ(0, ret);
+>> > > > > If the results are the same, no need to add an if block.
+>> > > 
+>> > >   Right. Updated.
+>> > > > > > +	}
+>> > > > > +
+>> > > > > +	/* Connects on port 0. */
+>> > > > > +	ret = connect_variant(socket_fd, &self->srv0);
+>> > > > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
+>> > > > > +		EXPECT_EQ(-ECONNREFUSED, ret);
+>> > > > > +	} else {
+>> > > > > +		EXPECT_EQ(-ECONNREFUSED, ret);
+>> > > > > +	}
+>> > > > > ditto
+>> > > >  Updated.
+>> > > > > +
+>> > > > > +	/* Binds on port 0. */
+>> > > > > Please close sockets once they are used, and recreate one for
+>> > > another
+>> > > > bind/connect to avoid wrong checks.
+>> > > 
+>> > >   Ok. But I can reuse socket_fd after closeing a socket. Correct?
+>> > 
+>> > It would be clearer to have one variable for the client socket
+>> > (connect_fd) and another variable for the server socket (bind_fd).
+>> > But once the socket is closed, you can reuse the same variable by
+>> > storing a new socket in it. You then only need two variables for sockets
+>> > in this test.
+>> 
+>>  Ok. Thanks.
+>> > 
+>> > > > > > +	ret = bind_variant(socket_fd, &self->srv0);
+>> > > > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
+>> > > > > +		/* Binds to a random port within ip_local_port_range. */
+>> > > > > +		EXPECT_EQ(0, ret);
+>> > > > > +	} else {
+>> > > > > +		/* Binds to a random port within ip_local_port_range. */
+>> > > > > +		EXPECT_EQ(0, ret);
+>> > > > > +	}
+>> > > > > Why this second bind() block? Furthermore, it is using the same
+>> > > > socket_fd.
+>> > 
+>> > Is this block useful?
+>> 
+>>   For a self-connected socket after connection try we need to rebind it
+>> again. I checked this logic in a small standalone test (with gdb on). So for
+>> 2 sockets (differnt fds) there is no need to do that.
+>> > 
+>> > > 
+>> > >   I will refactor the code this way -  sockets will be recreated for each
+>> > > bind/connect, and I prefer to use self-connected sockets (use one socket
+>> > > descriptor) in these tests to make code simpler; testing logic remains the
+>> > > same way as if we have 2 sockets.
+>> > > 
+>> > > What do you think???
+>> > 
+>> > I find it confusing to use self-connected sockets, it's not clear at all
+>> > what is going on, and AFAIK it doesn't reflect real use cases. Please
+>> > don't do that.
+>> > 
+>> > Using the same variable for both bind and connect socket will lead to
+>> > issues difficult to debug, and leaked FDs. For instance with the bind +
+>> > get_binded_port + connect test you should use one variable per socket.
+>> > To make it easier to read, please follow this rule everywhere (the only
+>> > case when this is done seems to be with the port_specific.bind_connect
+>> > test).
+>> 
+>>   OK. I will use 2 fds for bind and connect sockets.
+>> > 
+>> > > 
+>> > > > > > +
+>> > > > > +	/* Sets binded port for both protocol families. */
+>> > > > > +	set_port(&self->srv0,
+>> > > > > +		 htons(get_binded_port(socket_fd, &variant->prot)));
+>> > > > > Ditto, these two endianess translations are useless.
+>> > > 
+>> > >   Updated. Thanks.
+>> > > > > You can also add this to make sure the returned port is not 0:
+>> > > > port = get_binded_port(socket_fd, &variant->prot);
+>> > > > EXPECT_NE(0, port);
+>> > > > set_port(&self->srv0, port);
+>> > > 
+>> > >   Ok. Thanks for the tip.
+>> > > > > > +
+>> > > > > +	/* Connects on the binded port. */
+>> > > > > +	ret = connect_variant(socket_fd, &self->srv0);
+>> > > > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
+>> > > > > +		/* Denied by Landlock. */
+>> > > > > +		EXPECT_EQ(-EACCES, ret);
+>> > > > > +	} else {
+>> > > > > +		EXPECT_EQ(0, ret);
+>> > > > > +	}
+>> > > > > +
+>> > > > > +	EXPECT_EQ(0, close(socket_fd));
+>> > > > > +
+>> > > > > > > > +	/* Adds the second rule layer with just bind action. */
+>> > > > > There is not only bind actions here.
+>> > > 
+>> > >   Right.
+>> > > > > This second part of the tests should be in a dedicated
+>> > > > TEST_F(port_specific, bind_1023).
+>> > > 
+>> > >   Got it.
+>> > > > > > +	if (variant->sandbox == TCP_SANDBOX) {
+>> > > > > +		const struct landlock_ruleset_attr ruleset_attr = {
+>> > > > > +			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+>> > > > > +					      LANDLOCK_ACCESS_NET_CONNECT_TCP
+>> > > > > +		};
+>> > > > > +
+>> > > > > +		const struct landlock_net_port_attr tcp_bind_zero = {
+>> > > > > +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+>> > > > > +			.port = htons(0),
+>> > > > > +		};
+>> > > > > +
+>> > > > > Useless new lines.
+>> > > 
+>> > >   Got it.
+>> > > > > > +		/* A rule with port value less than 1024. */
+>> > > > > +		const struct landlock_net_port_attr tcp_bind_lower_range = {
+>> > > > > +			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+>> > > > > +			.port = htons(1023),
+>> > > > > +		};
+>> > > > > +
+>> > > > > Useless new line.
+>> > > 
+>> > >   Got it.
+>> > > > > > +		int ruleset_fd;
+>> > > > > +
+>> > > > > +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+>> > > > > +						     sizeof(ruleset_attr), 0);
+>> > > > > +		ASSERT_LE(0, ruleset_fd);
+>> > > > > +
+>> > > > > +		ASSERT_EQ(0,
+>> > > > > +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> > > > > +					    &tcp_bind_lower_range, 0));
+>> > > > > +		ASSERT_EQ(0,
+>> > > > > +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> > > > > +					    &tcp_bind_zero, 0));
+>> > > > > +
+>> > > > > +		enforce_ruleset(_metadata, ruleset_fd);
+>> > > > > +		EXPECT_EQ(0, close(ruleset_fd));
+>> > > > > +	}
+>> > > > > +
+>> > > > > +	socket_fd = socket_variant(&self->srv0);
+>> > > > > We must have one socket FD dedicated to bind an another
+>> > > dedicated to
+>> > > > connect, e.g. bind_fd and connect_fd, an close them after each use,
+>> > > > otherwise tests might be inconsistent.
+>> > > 
+>> > >   Why can't we use self-connected sockets here? Why tests might be
+>> > > inconsistent? Tests will be working the same way as if we have 2 sockets,
+>> > > plus the code is simpler.
+>> > 
+>> > AFAIK it doesn't reflect real use cases of sockets, and I find it really
+>> > confusing. Where did you see this kind of usage?
+>> > 
+>> > Test might be inconsistent for instance if you change the port from 1023
+>> > to 1024 and you adjust the (denied by system) EXPECT_EQ(-EACCES, ret),
+>> > you'll get a new error in the following block, which doesn't make sense
+>> > at first, but then you realize it is because the socket is already
+>> > binded.  To avoid this kind of issues, and avoid leaking FDs, please use
+>> > a socket per usage and close them before testing something else.
+>> 
+>>  Ok. Got it.
+>> > 
+>> > > > > > +	ASSERT_LE(0, socket_fd);
+>> > > > > +
+>> > > > > +	/* Sets address port to 1023 for both protocol families. */
+>> > > > > +	set_port(&self->srv0, htons(1023));
+>> > > > > +
+>> > > > > +	/* Binds on port 1023. */
+>> > > > > +	ret = bind_variant(socket_fd, &self->srv0);
+>> > > > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
+>> > > > > No need to add this check if the result is the same for
+>> > > sandboxed and
+>> > > > not sandboxed tests.
+>> > > 
+>> > >  Ok. Thanks.
+>> > > > > Instead, use set_cap(_metadata, CAP_NET_BIND_SERVICE) and
+>> > > clear_cap()
+>> > > > around this bind_variant() to make this test useful.
+>> > > > > You will also need to patch common.h like this:
+>> > > > @@ -112,10 +112,13 @@ static void _init_caps(struct __test_metadata *const _metadata, bool drop_all)
+>> > > >          cap_t cap_p;
+>> > > >          /* Only these three capabilities are useful for the tests. */
+>> > > >          const cap_value_t caps[] = {
+>> > > > +               /* clang-format off */
+>> > > >                  CAP_DAC_OVERRIDE,
+>> > > >                  CAP_MKNOD,
+>> > > >                  CAP_SYS_ADMIN,
+>> > > >                  CAP_SYS_CHROOT,
+>> > > > +               CAP_NET_BIND_SERVICE,
+>> > > > +               /* clang-format on */
+>> > > >          };
+>> > > 
+>> > >  OK. Thanks.
+>> > > > > > +		/* Denied by the system. */
+>> > > > > +		EXPECT_EQ(-EACCES, ret);
+>> > > > > +	} else {
+>> > > > > +		/* Denied by the system. */
+>> > > > > +		EXPECT_EQ(-EACCES, ret);
+>> > > > > +	}
+>> > > > > +
+>> > > > > I don't see why the following part is useful. Why did you add
+>> > > it?
+>> > >   Binding to ports < 1024 are forbidden by the system, not by Landlock.
+>> > >   I added a rule with port 1023 to make sure it works as expected.
+>> > 
+>> > Landlock, as any LSM, can only add more restrictions. That's why it
+>> > would make more sense to test with CAP_NET_BIND_SERVICE, to make sure
+>> > Landlock rules work the same with this kind of privileged ports, but you
+>> > can test both cases (all within the same TEST_F though, and without
+>> > other tests).
+>> 
+>>  Do you mean during the test to set CAP_NET_BIND_SERVICE, check it with
+>> landlock (it will success), then switch  CAP_NET_BIND_SERVICE cap off and
+>> bind it again ( will be refused by the system)?
+>> Am I correct?
+> 
+> Yes, you can use something like this:
+> 
+> set_cap(_metadata, CAP_NET_BIND_SERVICE);
+> ret = bind_variant(socket_fd, &self->srv0);
+> clear_cap(_metadata, CAP_NET_BIND_SERVICE);
+> 
+  yep. I think the same way. Thanks.
+> 
+>> > 
+>> > > 
+>> > > > Why tcp_bind_zero?
+>> > >    Beacause it's a bind action with port zero rule.
+>> > 
+>> > Yes but I don't see why it's relevant to test that here, because it was
+>> > tested just before.
+>> > 
+>>   OK. I just leave binding to 1023 port here.
+>>   I'm thinking to add binding to 1024 port then to show that this port is
+>> allowed by the system but denied by landlock ( we have just rule with 1023
+>> port).
+>>   What do you think?
+> 
+> Yes, you can do that. I guess you could use test_bind_and_connect() for
+> this test. You can group these checks (ports 1023 and 1024) in the same
+> dedicated TEST_F.
 
->    Wow! Another one? :-)
-
-Yes. Hooray ;)
-
-
---+mZpJWQzj+NJ6ZRe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmU2OQgACgkQFA3kzBSg
-KbZ9TA/+KoEDf70SZBJS/PaXDPl1Rg7e9ggvhjMjkMSXPu4maHyQXDMpS4wp0Q2G
-OkJdVm6Y4JVGaSQZIKOTrVABW5nONZlPiEtAIaroiDamIgld0xvG3yFZ2346hGzj
-zJZZzMUgIm61uq5AfP8ED4wp/OfBok5Bk2X7HGVzuW7H55sQ6FvgQ6jo3Pp/fUZp
-33TVLce2r/u3P9vLtB4utlyVz965CyUzAxKD/orVHbaApVA2y5mJJA4eHyLp33LE
-3KN7NFs9lpD44b+mBvVjrgyYa5wpDBgEs2qc6AqAd1osrFO/8yjMrQ+lyKsUQvm7
-l7H35VoAyxvywmFnp2trMBApZdvtbwcIsHuUpCBwEuLcAuzaDGcRVrJoxd4jCn/l
-t8DPpXWRlFWRmp3BVpBPgkhd1OLKGtghGjPLs+i5vc39XZ5VO7Svvkxy/W4RYNO9
-OxDfFGCGJF5eaJxa8tBSLx0eUGTwWl26ciFBMMHjecQCPI7TDX+ErS4tJcR5b/RE
-VO31By8j9YdtIlx945Up9F27EcdMfjHMm4cQobSO9TeV6KFzZ1ufcXxArHBwX6K1
-7JQsP0P1P54XzdnMUYHn4vI4iZUuNNLdaZvcliK+RPUUFqWO7wYUeVYHx04ZaQgC
-gwpANEGPlom4P8y8xQQ/Z7ygV9xOCDFuHKkAv1Us2IBgsRP5N5E=
-=fP2D
------END PGP SIGNATURE-----
-
---+mZpJWQzj+NJ6ZRe--
+   Don't think that test_bind_and_connect() has all functionality for 
+this test - it will fail without set_cap(_metadata, 
+CAP_NET_BIND_SERVICE) on.  I prefer to use bind_variant/connect_variant 
+functions here.
+> 
+>> > > 
+>> > > > > The other parts are good though!
+>> > > > > > +	/* Sets address port to 0 for both protocol families. */
+>> > > > > +	set_port(&self->srv0, htons(0));
+>> > > > > +
+>> > > > > +	/* Binds on port 0. */
+>> > > > > +	ret = bind_variant(socket_fd, &self->srv0);
+>> > > > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
+>> > > > > +		/* Binds to a random port within ip_local_port_range. */
+>> > > > > +		EXPECT_EQ(0, ret);
+>> > > > > +	} else {
+>> > > > > +		/* Binds to a random port within ip_local_port_range. */
+>> > > > > +		EXPECT_EQ(0, ret);
+>> > > > > +	}
+>> > > > > +
+>> > > > > +	/* Sets binded port for both protocol families. */
+>> > > > > +	set_port(&self->srv0,
+>> > > > > +		 htons(get_binded_port(socket_fd, &variant->prot)));
+>> > > > > +
+>> > > > > +	/* Connects on the binded port. */
+>> > > > > +	ret = connect_variant(socket_fd, &self->srv0);
+>> > > > > +	if (is_restricted(&variant->prot, variant->sandbox)) {
+>> > > > > +		/* Denied by Landlock. */
+>> > > > > +		EXPECT_EQ(-EACCES, ret);
+>> > > > > +	} else {
+>> > > > > +		EXPECT_EQ(0, ret);
+>> > > > > +	}
+>> > > > > +
+>> > > > > +	EXPECT_EQ(0, close(socket_fd));
+>> > > > > +}
+>> > > > > +
+>> > > > > +TEST_HARNESS_MAIN
+>> > > > > --
+>> > > > > 2.25.1
+>> > > > > > .
+>> > .
+> .
 
