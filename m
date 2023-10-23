@@ -1,251 +1,256 @@
-Return-Path: <netdev+bounces-43420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1417D2EC5
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:44:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC9BB7D2EE7
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:52:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 934A4281598
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 09:44:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A11972813EC
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 09:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D690213FF7;
-	Mon, 23 Oct 2023 09:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54C513AE7;
+	Mon, 23 Oct 2023 09:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="mRlbMiff"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BKeTqRP/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EBE14297
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 09:44:08 +0000 (UTC)
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2040.outbound.protection.outlook.com [40.107.15.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C0D9C2;
-	Mon, 23 Oct 2023 02:44:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aMF3bpmt/hjwUQw2xiewemalXwL/UXWSYQrK94ZYPwdMYqKTt7pW+V6CB0UR3cDEyhV7O+rQHVmpJgH1GvBzP0q2y0SjT1FXc+pf5NUY3qpliXn/RZIKc5skQzU83/R03fhfbxpzf31IYQ0F8cvYVzNwt3kmOPoyIHi9IG7xwapd9ZxWc4P1wxL4tEuVRIXk+Mu0xLK+hSRXg93hr+C9N+qCKUuUrZ5i8OKsH2w5RSRIQvGt8Xcu8kg1YRDQNHXksXwXz1+qized5iSHIRmTeHmLljwY70N/5eKGBfaaGonPMB8dMG6wVuhHC9ehNMWvJ8jX1CZEG+YEg2GDkd6S6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=syLR/2p73jSA0O6ZYfKDQwgCZJxVgqgjijNib+mZFqU=;
- b=N5U4iP6hUwYydGcD016Z7iolaEJzsu/mYWcTxq9M8S+zbib4vfHEXflZs4h+I6Ek1eL4VHCO3MZLHP8h8yMsyi+jeSvFnZJX4BQwhJgQnAt0v4afWfHoSJ4uvdkCXEdViuKQ9zeNCrBwnx6+hP5qLP+LuC2p8h207J5XpUbwpdCc1S8AmuYGJ3yxWZ2Pss7YWiDEl7lvzG76xfRgTUnFy1QBERwEFKH57COFeWtT1eci7Mh4lbWN4P25P+pvMV2k390kQO4XhaKPTTLK8ok5AFcrSN3an1yIYXMIy5ZcSMj77pg7pINxtEpv+FAzI8jVrbrFzbRwuaJuo/632HhP2Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector2-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=syLR/2p73jSA0O6ZYfKDQwgCZJxVgqgjijNib+mZFqU=;
- b=mRlbMiffjHXQs8ga2wIqEC6Uy3FI0AM8olGb+Y/CPuFpjpsHUYL0OGBGZhvx0S15ApQVzrFYk2WLZ1/mioJ3YxcC4ONWIIld1ECz3XDFkkWTsBzWTLuiOtJTgykftvyLd1Mwsz+uNg4a47HotRoH3fOGFz1+NsXDPlR1pdf+Dco=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
- by DB9PR04MB10011.eurprd04.prod.outlook.com (2603:10a6:10:4c4::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.22; Mon, 23 Oct
- 2023 09:43:54 +0000
-Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
- ([fe80::b1fa:fd23:8cc2:f5ee]) by AM9PR04MB8954.eurprd04.prod.outlook.com
- ([fe80::b1fa:fd23:8cc2:f5ee%6]) with mapi id 15.20.6933.011; Mon, 23 Oct 2023
- 09:43:54 +0000
-From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-To: sd@queasysnail.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	richardcochran@gmail.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	sebastian.tobuschat@oss.nxp.com,
-	"Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Subject: [PATCH net-next v8 7/7] net: phy: nxp-c45-tja11xx: implement mdo_insert_tx_tag
-Date: Mon, 23 Oct 2023 12:43:27 +0300
-Message-Id: <20231023094327.565297-8-radu-nicolae.pirea@oss.nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231023094327.565297-1-radu-nicolae.pirea@oss.nxp.com>
-References: <20231023094327.565297-1-radu-nicolae.pirea@oss.nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR10CA0079.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:15::32) To AM9PR04MB8954.eurprd04.prod.outlook.com
- (2603:10a6:20b:409::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1EC134A6;
+	Mon, 23 Oct 2023 09:52:25 +0000 (UTC)
+Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0FA0C4;
+	Mon, 23 Oct 2023 02:52:23 -0700 (PDT)
+Received: by mail-vk1-xa2c.google.com with SMTP id 71dfb90a1353d-49d428d89cdso285555e0c.1;
+        Mon, 23 Oct 2023 02:52:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698054743; x=1698659543; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UH47i0BQFdN1U9eAzdaKd7oOF6gd2ioYQqOsYKIl3tM=;
+        b=BKeTqRP/RbcqfYaDGNHkCKxp8l72I10i6PbUyozAIhxvWRx7olL+FKYkbAnTn6Bm9W
+         cRUDbTsAZTApgrRMlUjxRdmSy2KCAJGHiqr4Dc/kfTMPhv8CG1Q6UKfT/6ogiox1KXei
+         6o9Vub6WpBQBSuFPTm1/wyxIpus7GpJPXmyFo2nSkKlWh18orYJDJUtYst0FhshK7mgH
+         ippVK/YSzY51JjAQkW/pqxV3x5YeB2u19wFpPjcMLldskP2+y4L4iZc9cLEs+oYe/rQ+
+         cAqtcwcvwGafSXa8p8mEEQVMGfXqNvD9A4LU+2nDYlEqGDhcDXU+/5/L+t0RjSB+tE80
+         aPnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698054743; x=1698659543;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UH47i0BQFdN1U9eAzdaKd7oOF6gd2ioYQqOsYKIl3tM=;
+        b=romf/z4Y9dD47YUNjhvAxu69wjby5wdkyDYN19lwLJek+WZ0cq2T6/DPIbKS9wE6vL
+         q4I6udNJGFb4AxSSidU/zwo71DnNy1t6ZMmc9cNP36CwvLxl/qqMbk0/QBTdrBrl2LAU
+         ztacEoM1J4pNO2fxrixdM91jW8KNPzO3Iu3TcITRlPKuVdoO3Gyf5tt0xQklYrj9Nq+g
+         AazbYefF2sLrEBVOaPlAkM4OpufQO71XBhjYZ05y6YXoihK5nF9AsnXrmmtW2EH/N0fn
+         QR1ZRcNNh99pFugAKZo3TyH1pRyxpzGFABnhTCph/3c4iAZou5Kn8wi4hTJHFeqjDCwl
+         p7Ag==
+X-Gm-Message-State: AOJu0YxGKVaKYjDBk8PUE5YvZJSN11ch3xCScZNLUIo+NQ57E0GyaPkG
+	h+SJKNVR9ZFeemLblk4Hy2BbAv3g+6fKbP4AqTQ=
+X-Google-Smtp-Source: AGHT+IGu9HoKzvlBBtwlovsuIOBqf0xB3Xoy/TWWpGWBoCl65y4dL7iT6QBz8PVg+RMCIy8971cw0ViZmV2DEQqYDwI=
+X-Received: by 2002:a05:6102:5e90:b0:455:c309:720e with SMTP id
+ ij16-20020a0561025e9000b00455c309720emr3791031vsb.3.1698054742773; Mon, 23
+ Oct 2023 02:52:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|DB9PR04MB10011:EE_
-X-MS-Office365-Filtering-Correlation-Id: b4438ac4-2847-4f88-3973-08dbd3ac91fa
-X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	8zaUGqm1QbkeFhmCFeJKEDohVgE+h28SBdTKtI8zze0TrC0Im5r0X8JYxl/3AWUaDOgPeBY/5Q2HZWBIBnYoBF7kkdJZI/goBEqZ7/Oqgz6ZMvfUmPANTAZeecO0LU9A92+jwOwPfwY6kzdSTHY0wULHAzvJ3Co0jQp0cKl3GEElrw5bfm+FyGnyI3S53tXwinaHF6yluic9ZYRVYAQNZDjrFsjm5AZQkmfXPxE70CKQUosJSC+/63Ubzlsz3+oreRTRVQXoIk0ytmh1qMWV9ldvDcOqxLXmNgOtmyyOzQuR7G/+l0/Hg4dUCSS37DEDWx0iA8aNokNPv78XWeO1+cBXwrZbXUod0JQMRVFkQljHrrkTYc4SQNOKu1Il5OfrCKxgvkaFsFQmFzd9amOW9KwXZS+rNHJI6XQK9SjeJ+rBdsoPFTvb4knEGm7y41X+Pkeb3IAlkTMO09d1wyotQTZnhmgyXJBobAKHoPheX2KODP3znjQQgBA6KgtA6CAQ9U0O0/9mCW1KNDZ/ZAMoFD3+Ht0ZCFU2wKOwvcASzD+LyEW7p8rkxr7/Vzaq0ndm0mcQswrktwR5FHzvlrfAfviKZOvjm7B+fBsgevBrhIxUPPiIKrDy8ZefeJNf+DlN
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(136003)(396003)(376002)(366004)(230922051799003)(64100799003)(1800799009)(451199024)(186009)(38350700005)(6512007)(1076003)(2616005)(52116002)(26005)(6506007)(8936002)(6666004)(6486002)(478600001)(41300700001)(38100700002)(5660300002)(86362001)(8676002)(4326008)(2906002)(66556008)(316002)(66476007)(7416002)(66946007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?BwEImSvRVIccV2EgjygO2MpAivi0ZJBDXSaqpfzJWmZVmi9jMLvoxmq+eWji?=
- =?us-ascii?Q?VAPZDw8Phk7Wk/5OA4qfFGlZsrfha/E4PzoIOHc/7cOjK/h1EliQmoOA3YdR?=
- =?us-ascii?Q?b6qiOFPrXA9fFKKSBn3DEQ27ftGOqgR1B7WFgxlDSqZazIUcCRa59pXWTS58?=
- =?us-ascii?Q?RyvyA7kOxFU91z6NWd5DCXbBy41pw+OnieVogq1NIaCZTAyXpuZCh+bPuEqB?=
- =?us-ascii?Q?eKNMLI4kDvpzzdzpLjNEewiByVMHsL0BV1cKAx2h1OZcG6KG2XL3hciYPOHo?=
- =?us-ascii?Q?b+11TkD7VqRXlNE7+ob5Wh3thuv0BZtNG2ZsuqEitDYXoAbyAEo/ro6swSux?=
- =?us-ascii?Q?yKK4KtCF8kqGfM0U23G76nBfY/cn4VQZvmlWHmtpJ4d/6u/1UAZ5eYINsYT5?=
- =?us-ascii?Q?X0hDrZithU/xvehP7JJtp3QCjROZ7yOhIJ/IkB8Tzey2DvHzW3Hlont7Xad/?=
- =?us-ascii?Q?wLP9MzRcMo7caa4ArbKYf/rhYqCZlR5ukRo0BzOY940yxg+oyM2RODwLHavo?=
- =?us-ascii?Q?OLjFTopqq7piY+XMsxgfs82kIPteqcP95B5zX5SQ6cS6fTrPxff8lRX/v6Mm?=
- =?us-ascii?Q?ZRpJJ+HmmWklpMKhjSlqQsEB3NRy2OBBnXW0q48IVf8yjRXsoKMENTrh2BL/?=
- =?us-ascii?Q?2WuA8K7TV9nFepB6dkUkkHAn9XcnGGC6XqYKrsuoIGqJk/p+qJPczRofBmRp?=
- =?us-ascii?Q?uyB0av49qKkF0fL6JWRvNkyZ7zm2Od3Oxfm2ATAOe13b23YI7ucwcBbL6Gtb?=
- =?us-ascii?Q?0N0QTcCiX3rv5spk43Vo79OB6aMRI6LQ8x2T+ePOLr6DrynJB7JslhTLuhmU?=
- =?us-ascii?Q?NHhJXiulbrz4ouuT4qb6KTPNXQ/FtT8Q23VrAuzn1zmcPvgjxMzBDkCyY7VJ?=
- =?us-ascii?Q?TgaDYVffjCTJgtQqQ7DSqA9sUcADjfEDWhMZXmdUbAJLv5tKgD56n82lyWMO?=
- =?us-ascii?Q?MdEwLdCLzz6mQLvkOfVl1ZMKgzkHCTNnyzIvjo+COh35pFzknIiHApREY7a0?=
- =?us-ascii?Q?tYYgnLycMBcOPkR/K/t69UaUVHDf/5EZWY2u4xdJ2hO106mgPzwDOaBse38b?=
- =?us-ascii?Q?dRcqMKepsLGVyXbQ3+89geso94mUbfvUshap9M0qWKsdIrZIP65yUG46/3Yu?=
- =?us-ascii?Q?N5+regquR5ZZDDYEBS6Ax5jcRzwyTqeN8QPZtvV6iqLTITyQdrciSzwm5OkN?=
- =?us-ascii?Q?Flwa0E1obVVhHvVCo1yj7dbzv90OmUoON52IgRn4VDgv+YSDsEJv1anXYWCM?=
- =?us-ascii?Q?gYpHmgkcSDReDYUWQbKrY3FBwt2aAL2u/Le80cs1G/UhemF9ZyxnQ01vNGV6?=
- =?us-ascii?Q?2Ww+A95e1+ANweZC6o+sbCdJ6QvfMAFCq1Jl7WfKSV1+EBjb0qUuL0VZZZm0?=
- =?us-ascii?Q?33tfOzaT8phOeEkGl7qFfYH0pn8ay75GOlvY+fL7Af/0Pt8emBdhDtSLd1Cs?=
- =?us-ascii?Q?eA9I9c6j0sXwoiT64x3hDVPMnQlGog3KJ76ZOOaWAGEg2hMAeqzOOWnVzcfI?=
- =?us-ascii?Q?OZqXOfYY5gBxoc/WxF3ZmwzEymNv0YALpjhpCUr6tCbZ1gN3+hFLSdUulaNr?=
- =?us-ascii?Q?AjPZedchDNnvCSfq5z4FE3aHMM20dpfcXc82Wx4nEg0wh0DiBWgqrnno+eTA?=
- =?us-ascii?Q?+Q=3D=3D?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4438ac4-2847-4f88-3973-08dbd3ac91fa
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2023 09:43:54.1755
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F2WcJsi4gfoi9cCV8ViRPypnbmr4fxaoCmoeSlf5gKUzTnTBtE0vxhSmjxiPc0W+CaV6+zyx5AdQFEEYcnbaVFWfX163/9BDuCb45N+X1U8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB10011
+References: <20231019174944.3376335-1-sdf@google.com>
+In-Reply-To: <20231019174944.3376335-1-sdf@google.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Mon, 23 Oct 2023 11:52:11 +0200
+Message-ID: <CAJ8uoz26Q-8etBpgc25xFY8ZRcoJeAM5RFOWO-Q2_T1=xBfL9g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 00/11] xsk: TX metadata
+To: Stanislav Fomichev <sdf@google.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
+	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
+	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
+	maciej.fijalkowski@intel.com, hawk@kernel.org, yoong.siang.song@intel.com, 
+	netdev@vger.kernel.org, xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="UTF-8"
 
-Implement mdo_insert_tx_tag to insert the TLV header in the ethernet
-frame.
+On Thu, 19 Oct 2023 at 19:49, Stanislav Fomichev <sdf@google.com> wrote:
+>
+> This series implements initial TX metadata (offloads) for AF_XDP.
+> See patch #2 for the main implementation and mlx5/stmmac ones for the
+> example on how to consume the metadata on the device side.
+>
+> Starting with two types of offloads:
+> - request TX timestamp (and write it back into the metadata area)
+> - request TX checksum offload
+>
+> Changes since v3:
+> - fix xsk_tx_metadata_ops kdoc (Song Yoong Siang)
+> - add missing xsk_tx_metadata_to_compl for XDP_SOCKETS=n (Vinicius Costa Gomes and Intel bots)
+> - add reference timestamps to the selftests + refactor existing ones (Jesper)
+>
+> v3: https://lore.kernel.org/bpf/20231003200522.1914523-1-sdf@google.com/
 
-Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
----
-Changes in v6-v8:
-- none
+Thanks for working on this Stanislav. I went through the patch set and
+it looks good to me. You have addressed all the feedback that Maciej
+and I had on a previous version. Just had some small things in two of
+the patches. Apart from that, you are good to go and you can add my
+ack to the next version.
 
-Changes in V5:
-- removed unused defines MACSEC_TLV_CP and MACSEC_TLV_SC_ID_OFF
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
 
-Changes in V4:
-- removed macsec_extscs parameter
+Again, really appreciate all your work with this!
 
-Changes in V3:
-- extscs parameter renamed to macsec_extscs and improved description
-
-Changes in V2:
-- added extscs parameter to choose the TX SC selection mechanism between
-and MAC SA based selection and TLV header based selection
-
- drivers/net/phy/nxp-c45-tja11xx-macsec.c | 41 ++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
-
-diff --git a/drivers/net/phy/nxp-c45-tja11xx-macsec.c b/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-index 4dd10ea6e06c..6ff0ceeeecd1 100644
---- a/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-+++ b/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-@@ -11,6 +11,7 @@
- #include <linux/module.h>
- #include <linux/phy.h>
- #include <linux/processor.h>
-+#include <net/dst_metadata.h>
- #include <net/macsec.h>
- 
- #include "nxp-c45-tja11xx.h"
-@@ -118,6 +119,8 @@
- #define ADPTR_CNTRL			0x0F00
- #define ADPTR_CNTRL_CONFIG_EN		BIT(14)
- #define ADPTR_CNTRL_ADPTR_EN		BIT(12)
-+#define ADPTR_TX_TAG_CNTRL		0x0F0C
-+#define ADPTR_TX_TAG_CNTRL_ENA		BIT(31)
- 
- #define TX_SC_FLT_BASE			0x800
- #define TX_SC_FLT_SIZE			0x10
-@@ -166,6 +169,11 @@
- #define MACSEC_INPBTS			0x0638
- #define MACSEC_IPSNFS			0x063C
- 
-+#define TJA11XX_TLV_TX_NEEDED_HEADROOM	(32)
-+#define TJA11XX_TLV_NEEDED_TAILROOM	(0)
-+
-+#define ETH_P_TJA11XX_TLV		(0x4e58)
-+
- enum nxp_c45_sa_type {
- 	TX_SA,
- 	RX_SA,
-@@ -1541,6 +1549,31 @@ static int nxp_c45_mdo_get_rx_sa_stats(struct macsec_context *ctx)
- 	return 0;
- }
- 
-+struct tja11xx_tlv_header {
-+	struct ethhdr eth;
-+	u8 subtype;
-+	u8 len;
-+	u8 payload[28];
-+};
-+
-+static int nxp_c45_mdo_insert_tx_tag(struct phy_device *phydev,
-+				     struct sk_buff *skb)
-+{
-+	struct tja11xx_tlv_header *tlv;
-+	struct ethhdr *eth;
-+
-+	eth = eth_hdr(skb);
-+	tlv = skb_push(skb, TJA11XX_TLV_TX_NEEDED_HEADROOM);
-+	memmove(tlv, eth, sizeof(*eth));
-+	skb_reset_mac_header(skb);
-+	tlv->eth.h_proto = htons(ETH_P_TJA11XX_TLV);
-+	tlv->subtype = 1;
-+	tlv->len = sizeof(tlv->payload);
-+	memset(tlv->payload, 0, sizeof(tlv->payload));
-+
-+	return 0;
-+}
-+
- static const struct macsec_ops nxp_c45_macsec_ops = {
- 	.mdo_dev_open = nxp_c45_mdo_dev_open,
- 	.mdo_dev_stop = nxp_c45_mdo_dev_stop,
-@@ -1561,6 +1594,9 @@ static const struct macsec_ops nxp_c45_macsec_ops = {
- 	.mdo_get_tx_sa_stats = nxp_c45_mdo_get_tx_sa_stats,
- 	.mdo_get_rx_sc_stats = nxp_c45_mdo_get_rx_sc_stats,
- 	.mdo_get_rx_sa_stats = nxp_c45_mdo_get_rx_sa_stats,
-+	.mdo_insert_tx_tag = nxp_c45_mdo_insert_tx_tag,
-+	.needed_headroom = TJA11XX_TLV_TX_NEEDED_HEADROOM,
-+	.needed_tailroom = TJA11XX_TLV_NEEDED_TAILROOM,
- };
- 
- int nxp_c45_macsec_config_init(struct phy_device *phydev)
-@@ -1581,6 +1617,11 @@ int nxp_c45_macsec_config_init(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
-+	ret = nxp_c45_macsec_write(phydev, ADPTR_TX_TAG_CNTRL,
-+				   ADPTR_TX_TAG_CNTRL_ENA);
-+	if (ret)
-+		return ret;
-+
- 	ret = nxp_c45_macsec_write(phydev, ADPTR_CNTRL, ADPTR_CNTRL_ADPTR_EN);
- 	if (ret)
- 		return ret;
--- 
-2.34.1
-
+> Performance (mlx5):
+>
+> I've implemented a small xskgen tool to try to saturate single tx queue:
+> https://github.com/fomichev/xskgen/tree/master
+>
+> Here are the performance numbers with some analysis.
+>
+> 1. Baseline. Running with commit eb62e6aef940 ("Merge branch 'bpf:
+> Support bpf_get_func_ip helper in uprobes'"), nothing from this series:
+>
+> - with 1400 bytes of payload: 98 gbps, 8 mpps
+> ./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 116960000000 bits, took 1.189130 sec, 98.357623 gbps 8.409509 mpps
+>
+> - with 200 bytes of payload: 49 gbps, 23 mpps
+> ./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000064 packets 20960134144 bits, took 0.422235 sec, 49.640921 gbps 23.683645 mpps
+>
+> 2. Adding single commit that supports reserving tx_metadata_len
+>    changes nothing numbers-wise.
+>
+> - baseline for 1400
+> ./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 116960000000 bits, took 1.189247 sec, 98.347946 gbps 8.408682 mpps
+>
+> - baseline for 200
+> ./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 20960000000 bits, took 0.421248 sec, 49.756913 gbps 23.738985 mpps
+>
+> 3. Adding -M flag causes xskgen to reserve the metadata and fill it, but
+>    doesn't set XDP_TX_METADATA descriptor option.
+>
+> - new baseline for 1400 (with only filling the metadata)
+> ./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 116960000000 bits, took 1.188767 sec, 98.387657 gbps 8.412077 mpps
+>
+> - new baseline for 200 (with only filling the metadata)
+> ./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 20960000000 bits, took 0.410213 sec, 51.095407 gbps 24.377579 mpps
+> (the numbers go sligtly up here, not really sure why, maybe some cache-related
+> side-effects?
+>
+> 4. Next, I'm running the same test but with the commit that adds actual
+>    general infra to parse XDP_TX_METADATA (but no driver support).
+>    Essentially applying "xsk: add TX timestamp and TX checksum offload support"
+>    from this series. Numbers are the same.
+>
+> - fill metadata for 1400
+> ./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 116960000000 bits, took 1.188430 sec, 98.415557 gbps 8.414463 mpps
+>
+> - fill metadata for 200
+> ./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 20960000000 bits, took 0.411559 sec, 50.928299 gbps 24.297853 mpps
+>
+> - request metadata for 1400
+> ./xskgen -m -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 116960000000 bits, took 1.188723 sec, 98.391299 gbps 8.412389 mpps
+>
+> - request metadata for 200
+> ./xskgen -m -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000064 packets 20960134144 bits, took 0.411240 sec, 50.968131 gbps 24.316856 mpps
+>
+> 5. Now, for the most interesting part, I'm adding mlx5 driver support.
+>    The mpps for 200 bytes case goes down from 23 mpps to 19 mpps, but
+>    _only_ when I enable the metadata. This looks like a side effect
+>    of me pushing extra metadata pointer via mlx5e_xdpi_fifo_push.
+>    Hence, this part is wrapped into 'if (xp_tx_metadata_enabled)'
+>    to not affect the existing non-metadata use-cases. Since this is not
+>    regressing existing workloads, I'm not spending any time trying to
+>    optimize it more (and leaving it up to mlx owners to purse if
+>    they see any good way to do it).
+>
+> - same baseline
+> ./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 116960000000 bits, took 1.189434 sec, 98.332484 gbps 8.407360 mpps
+>
+> ./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000128 packets 20960268288 bits, took 0.425254 sec, 49.288821 gbps 23.515659 mpps
+>
+> - fill metadata for 1400
+> ./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 116960000000 bits, took 1.189528 sec, 98.324714 gbps 8.406696 mpps
+>
+> - fill metadata for 200
+> ./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000128 packets 20960268288 bits, took 0.519085 sec, 40.379260 gbps 19.264914 mpps
+>
+> - request metadata for 1400
+> ./xskgen -m -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000000 packets 116960000000 bits, took 1.189329 sec, 98.341165 gbps 8.408102 mpps
+>
+> - request metadata for 200
+> ./xskgen -m -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+> sent 10000128 packets 20960268288 bits, took 0.519929 sec, 40.313713 gbps 19.233642 mpps
+>
+> Song Yoong Siang (1):
+>   net: stmmac: Add Tx HWTS support to XDP ZC
+>
+> Stanislav Fomichev (10):
+>   xsk: Support tx_metadata_len
+>   xsk: Add TX timestamp and TX checksum offload support
+>   tools: ynl: Print xsk-features from the sample
+>   net/mlx5e: Implement AF_XDP TX timestamp and checksum offload
+>   selftests/xsk: Support tx_metadata_len
+>   selftests/bpf: Add csum helpers
+>   selftests/bpf: Add TX side to xdp_metadata
+>   selftests/bpf: Convert xdp_hw_metadata to XDP_USE_NEED_WAKEUP
+>   selftests/bpf: Add TX side to xdp_hw_metadata
+>   xsk: Document tx_metadata_len layout
+>
+>  Documentation/netlink/specs/netdev.yaml       |  19 ++
+>  Documentation/networking/index.rst            |   1 +
+>  Documentation/networking/xsk-tx-metadata.rst  |  77 ++++++
+>  drivers/net/ethernet/mellanox/mlx5/core/en.h  |   4 +-
+>  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  72 +++++-
+>  .../net/ethernet/mellanox/mlx5/core/en/xdp.h  |  11 +-
+>  .../ethernet/mellanox/mlx5/core/en/xsk/tx.c   |  17 +-
+>  .../net/ethernet/mellanox/mlx5/core/en_main.c |   1 +
+>  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  12 +
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c |  63 ++++-
+>  include/linux/netdevice.h                     |  27 ++
+>  include/linux/skbuff.h                        |  14 +-
+>  include/net/xdp_sock.h                        |  86 +++++++
+>  include/net/xdp_sock_drv.h                    |  13 +
+>  include/net/xsk_buff_pool.h                   |   7 +
+>  include/uapi/linux/if_xdp.h                   |  41 ++++
+>  include/uapi/linux/netdev.h                   |  16 ++
+>  net/core/netdev-genl.c                        |  12 +-
+>  net/xdp/xdp_umem.c                            |   4 +
+>  net/xdp/xsk.c                                 |  51 +++-
+>  net/xdp/xsk_buff_pool.c                       |   1 +
+>  net/xdp/xsk_queue.h                           |  19 +-
+>  tools/include/uapi/linux/if_xdp.h             |  55 ++++-
+>  tools/include/uapi/linux/netdev.h             |  16 ++
+>  tools/net/ynl/generated/netdev-user.c         |  19 ++
+>  tools/net/ynl/generated/netdev-user.h         |   3 +
+>  tools/net/ynl/samples/netdev.c                |   6 +
+>  tools/testing/selftests/bpf/network_helpers.h |  43 ++++
+>  .../selftests/bpf/prog_tests/xdp_metadata.c   |  31 ++-
+>  tools/testing/selftests/bpf/xdp_hw_metadata.c | 230 ++++++++++++++++--
+>  tools/testing/selftests/bpf/xsk.c             |   3 +
+>  tools/testing/selftests/bpf/xsk.h             |   1 +
+>  32 files changed, 914 insertions(+), 61 deletions(-)
+>  create mode 100644 Documentation/networking/xsk-tx-metadata.rst
+>
+> --
+> 2.42.0.655.g421f12c284-goog
+>
+>
 
