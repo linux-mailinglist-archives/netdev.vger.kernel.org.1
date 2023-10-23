@@ -1,143 +1,162 @@
-Return-Path: <netdev+bounces-43472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 944767D366E
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:26:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAE3B7D36C5
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:34:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EA2228146F
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:26:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74B2A28154C
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B5018E13;
-	Mon, 23 Oct 2023 12:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D6518040;
+	Mon, 23 Oct 2023 12:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5ixgswJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F068720F6
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:26:44 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D647100;
-	Mon, 23 Oct 2023 05:26:40 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SDZ8R0r84zVlwb;
-	Mon, 23 Oct 2023 20:22:47 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 23 Oct
- 2023 20:26:34 +0800
-Subject: Re: [PATCH net-next v12 1/5] page_pool: unify frag_count handling in
- page_pool_is_last_frag()
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
-	<lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
-	<liangchen.linux@gmail.com>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	Eric Dumazet <edumazet@google.com>
-References: <20231020095952.11055-1-linyunsheng@huawei.com>
- <20231020095952.11055-2-linyunsheng@huawei.com> <ZTZcTrTy9ulPast5@hades>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <4da09821-d964-924f-470b-e5c1de18eecf@huawei.com>
-Date: Mon, 23 Oct 2023 20:26:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA0318E20
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:34:35 +0000 (UTC)
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52934FF;
+	Mon, 23 Oct 2023 05:34:34 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1cace3e142eso16473355ad.3;
+        Mon, 23 Oct 2023 05:34:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698064474; x=1698669274; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cCfeGAPmI/1C6hVy3j5HY6SeWT2q6xH+8rq3JEHka0s=;
+        b=L5ixgswJLEDr2m2u2dG+LgKdftPbLwF2n2vApNX6Ci+Hv2f9LBwaXVXQU2LAhWasFD
+         oXP0a8+C0jJOB2jtB9C56tkdt/CkaDOdGJcjLm7bUxoenMznTXHf4R/w9i6ITH/eliB/
+         vHUY9VB7AmiSZRWmAosbXlfg3f8rS+szw74e9GVCfia6WLJ7Av96tQePL37SnuIhI/Qv
+         HB8OHqWG+bdcpWEz9V7F2Z2EACXnHi/ZmzL7JNyhSgcdfPv5zSp332jvxdvaC09jVsJK
+         2yt4TJhlkAziJNCpB6w/Tj8yZXpxMLsLUEgdyCUkw7mEj1iSUiNtWvuPPfmlB4gUaE13
+         ZzkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698064474; x=1698669274;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cCfeGAPmI/1C6hVy3j5HY6SeWT2q6xH+8rq3JEHka0s=;
+        b=rtkY/MKMWIRrx3WJFeqKA8YzcYLaG0BtKPz1YLpOGNfK9CckGTJ70iAInMqgw+2ytb
+         n0FXWq2hUSJTtzIT83XCW1JsTV13uplUWHb6uiRQsyW6TEJifB0PUOq+QMsVJn/K7ZKj
+         waXgQTc//HvALlGSxqYhfimxicGND/aeREdORGqx6/DTtqoL0pWe3Ggi7Hd0diQoSIeM
+         tTQwjoNZ2tUjkOQ+3W/Am/F6vU+VkPlbr3h5UnOKlAjGqBQtUueQ8zovoPie+FM8YEUd
+         O7Ex6l6RLZZurLhnyH8uPkjudXbfC/bmlFNgMKhmXkcqDf5rqHYK/kFIVHCQTFZKzpqn
+         VTaA==
+X-Gm-Message-State: AOJu0YyWbi3LeyJVIN6ay8ogZIfqOFOMCEaycmK2HQqZAdnKaoa62nCs
+	hnrWhhZrBm/PGmKLfice/zQ=
+X-Google-Smtp-Source: AGHT+IH1wbasmBNgondsuKTvzLHD5UV7liWemEtyM+fqBb/NsiHuIK/oggwkA7jK0980y2/7I2tSkw==
+X-Received: by 2002:a17:902:efd1:b0:1c9:ba77:b27e with SMTP id ja17-20020a170902efd100b001c9ba77b27emr6801484plb.46.1698064473560;
+        Mon, 23 Oct 2023 05:34:33 -0700 (PDT)
+Received: from swarup-virtual-machine.localdomain ([171.76.85.44])
+        by smtp.gmail.com with ESMTPSA id c24-20020a170902d91800b001c9ab91d3d7sm5799275plz.37.2023.10.23.05.34.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Oct 2023 05:34:33 -0700 (PDT)
+From: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
+To: davem@davemloft.net,
+	jiri@resnulli.us,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org
+Cc: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
+Subject: [PATCH v2] selftests:net change ifconfig with ip command
+Date: Mon, 23 Oct 2023 18:04:22 +0530
+Message-Id: <20231023123422.2895-1-swarupkotikalapudi@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <ZTYc04N9VK7EarHY@nanopsycho>
+References: <ZTYc04N9VK7EarHY@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZTZcTrTy9ulPast5@hades>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 
-On 2023/10/23 19:43, Ilias Apalodimas wrote:
-> Hi Yunsheng, 
-> 
-> [...]
-> 
->> +	 * 1. 'n == 1': no need to actually overwrite it.
->> +	 * 2. 'n != 1': overwrite it with one, which is the rare case
->> +	 *              for pp_frag_count draining.
->>  	 *
->> -	 * The main advantage to doing this is that an atomic_read is
->> -	 * generally a much cheaper operation than an atomic update,
->> -	 * especially when dealing with a page that may be partitioned
->> -	 * into only 2 or 3 pieces.
->> +	 * The main advantage to doing this is that not only we avoid a atomic
->> +	 * update, as an atomic_read is generally a much cheaper operation than
->> +	 * an atomic update, especially when dealing with a page that may be
->> +	 * partitioned into only 2 or 3 pieces; but also unify the pp_frag_count
->> +	 * handling by ensuring all pages have partitioned into only 1 piece
->> +	 * initially, and only overwrite it when the page is partitioned into
->> +	 * more than one piece.
->>  	 */
->> -	if (atomic_long_read(&page->pp_frag_count) == nr)
->> +	if (atomic_long_read(&page->pp_frag_count) == nr) {
->> +		/* As we have ensured nr is always one for constant case using
->> +		 * the BUILD_BUG_ON(), only need to handle the non-constant case
->> +		 * here for pp_frag_count draining, which is a rare case.
->> +		 */
->> +		BUILD_BUG_ON(__builtin_constant_p(nr) && nr != 1);
->> +		if (!__builtin_constant_p(nr))
->> +			atomic_long_set(&page->pp_frag_count, 1);
-> 
-> Aren't we changing the behaviour of the current code here? IIRC is
-> atomic_long_read(&page->pp_frag_count) == nr we never updated the atomic
-> pp_frag_count and the reasoning was that the next caller can set it
-> properly. 
+Change ifconfig with ip command,
+on a system where ifconfig is
+not used this script will not
+work correcly.
 
-If the next caller is calling the page_pool_alloc_frag(), then yes,
-because page_pool_fragment_page() will be used to reset the
-page->pp_frag_count, so it does not really matter what is the value
-of page->pp_frag_count when we are recycling a page.
+Test result with this patchset:
 
-If the next caller is calling page_pool_alloc_pages() directly without
-fragmenting a page, the above code is used to ensure that pp_frag_count
-is always one when page_pool_alloc_pages() fetches a page from pool->alloc
-or pool->ring, because page_pool_fragment_page() is not used to reset the
-page->pp_frag_count for page_pool_alloc_pages() and we have removed the
-per page_pool PP_FLAG_PAGE_FRAG in page_pool_is_last_frag().
+sudo make TARGETS="net" kselftest
+....
+TAP version 13
+1..1
+ timeout set to 1500
+ selftests: net: route_localnet.sh
+ run arp_announce test
+ net.ipv4.conf.veth0.route_localnet = 1
+ net.ipv4.conf.veth1.route_localnet = 1
+ net.ipv4.conf.veth0.arp_announce = 2
+ net.ipv4.conf.veth1.arp_announce = 2
+ PING 127.25.3.14 (127.25.3.14) from 127.25.3.4 veth0: 56(84)
+  bytes of data.
+ 64 bytes from 127.25.3.14: icmp_seq=1 ttl=64 time=0.038 ms
+ 64 bytes from 127.25.3.14: icmp_seq=2 ttl=64 time=0.068 ms
+ 64 bytes from 127.25.3.14: icmp_seq=3 ttl=64 time=0.068 ms
+ 64 bytes from 127.25.3.14: icmp_seq=4 ttl=64 time=0.068 ms
+ 64 bytes from 127.25.3.14: icmp_seq=5 ttl=64 time=0.068 ms
 
-As we don't know if the caller is page_pool_alloc_frag() or
-page_pool_alloc_pages(), so the above code ensure the page in pool->alloc
-or pool->ring always have the pp_frag_count being one.
+ --- 127.25.3.14 ping statistics ---
+ 5 packets transmitted, 5 received, 0% packet loss, time 4073ms
+ rtt min/avg/max/mdev = 0.038/0.062/0.068/0.012 ms
+ ok
+ run arp_ignore test
+ net.ipv4.conf.veth0.route_localnet = 1
+ net.ipv4.conf.veth1.route_localnet = 1
+ net.ipv4.conf.veth0.arp_ignore = 3
+ net.ipv4.conf.veth1.arp_ignore = 3
+ PING 127.25.3.14 (127.25.3.14) from 127.25.3.4 veth0: 56(84)
+  bytes of data.
+ 64 bytes from 127.25.3.14: icmp_seq=1 ttl=64 time=0.032 ms
+ 64 bytes from 127.25.3.14: icmp_seq=2 ttl=64 time=0.065 ms
+ 64 bytes from 127.25.3.14: icmp_seq=3 ttl=64 time=0.066 ms
+ 64 bytes from 127.25.3.14: icmp_seq=4 ttl=64 time=0.065 ms
+ 64 bytes from 127.25.3.14: icmp_seq=5 ttl=64 time=0.065 ms
 
+ --- 127.25.3.14 ping statistics ---
+ 5 packets transmitted, 5 received, 0% packet loss, time 4092ms
+ rtt min/avg/max/mdev = 0.032/0.058/0.066/0.013 ms
+ ok
+ok 1 selftests: net: route_localnet.sh
+...
 
-> 
->> +
->>  		return 0;
->> +	}
->>  
->>  	ret = atomic_long_sub_return(nr, &page->pp_frag_count);
->>  	WARN_ON(ret < 0);
->> +
->> +	/* We are the last user here too, reset pp_frag_count back to 1 to
->> +	 * ensure all pages have been partitioned into 1 piece initially,
->> +	 * this should be the rare case when the last two fragment users call
->> +	 * page_pool_defrag_page() currently.
->> +	 */
->> +	if (unlikely(!ret))
->> +		atomic_long_set(&page->pp_frag_count, 1);
->> +
->>  	return ret;
->>  }
->>  
->  
->  [....]
-> 
->  Thanks
->  /Ilias
-> 
-> .
-> 
+Signed-off-by: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
+---
+ tools/testing/selftests/net/route_localnet.sh | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/route_localnet.sh b/tools/testing/selftests/net/route_localnet.sh
+index 116bfeab72fa..e08701c750e3 100755
+--- a/tools/testing/selftests/net/route_localnet.sh
++++ b/tools/testing/selftests/net/route_localnet.sh
+@@ -18,8 +18,10 @@ setup() {
+     ip route del 127.0.0.0/8 dev lo table local
+     ip netns exec "${PEER_NS}" ip route del 127.0.0.0/8 dev lo table local
+ 
+-    ifconfig veth0 127.25.3.4/24 up
+-    ip netns exec "${PEER_NS}" ifconfig veth1 127.25.3.14/24 up
++    ip address add 127.25.3.4/24 dev veth0
++    ip link set dev veth0 up
++    ip netns exec "${PEER_NS}" ip address add 127.25.3.14/24 dev veth1
++    ip netns exec "${PEER_NS}" ip link set dev veth1 up
+ 
+     ip route flush cache
+     ip netns exec "${PEER_NS}" ip route flush cache
+-- 
+2.34.1
+
 
