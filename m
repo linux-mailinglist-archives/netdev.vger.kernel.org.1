@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-43456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 441AC7D34A8
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:41:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 958717D35C4
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:51:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4A2828143E
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:41:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C8ECB20C52
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3A915EA7;
-	Mon, 23 Oct 2023 11:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C76A179BF;
+	Mon, 23 Oct 2023 11:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="VYszL7YR"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="hfAvDVnQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA9B15EA0;
-	Mon, 23 Oct 2023 11:41:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5FBC43395;
-	Mon, 23 Oct 2023 11:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4E911CA6;
+	Mon, 23 Oct 2023 11:51:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 981E7C433C8;
+	Mon, 23 Oct 2023 11:51:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1698061313;
-	bh=GGRNanOMwehvibyFuWKummVXRCevGq8X/wg5Jadc/cE=;
+	s=korg; t=1698061897;
+	bh=xM52sSkaFA0z/TYUcVV4TvzfMFXhRnUHTMwW0mCBX7U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VYszL7YRnvRvAbYjmqfslZdXbgaF6RaMsgxMrQv5Hn/7fv4kOSfr1AEvLrTKn73IY
-	 IGrPnmo3htVXF6n+g/zvXHIdNpUnIXCwcqqLwxpaSo/uFI0d0G5I7P7HSg2h0uuP2X
-	 9oQyW9EtyvBHVny74qWEvFhlr3VhWXXOyZxCi830=
+	b=hfAvDVnQ2DlA40O+IGjAvY5tAX1yl8qMfdnbbl8R8S3TrPVb3Lna/GX4LX3eiIQn/
+	 hJ5LT41YAQ4dD636spIafwUqJxqbnlJS2zPU6vBLC/bh0ooPcco0dWtgL0FSlLv2yO
+	 VLgh0rf7BRl5+tzqKz1CzT/fSe92S6XtJ+GGpAk8=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -44,12 +44,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Kees Cook <keescook@chromium.org>
-Subject: [PATCH 5.15 136/137] Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
-Date: Mon, 23 Oct 2023 12:58:13 +0200
-Message-ID: <20231023104825.258229633@linuxfoundation.org>
+Subject: [PATCH 5.10 201/202] Bluetooth: hci_sock: Correctly bounds check and pad HCI_MON_NEW_INDEX name
+Date: Mon, 23 Oct 2023 12:58:28 +0200
+Message-ID: <20231023104832.286999580@linuxfoundation.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231023104820.849461819@linuxfoundation.org>
-References: <20231023104820.849461819@linuxfoundation.org>
+In-Reply-To: <20231023104826.569169691@linuxfoundation.org>
+References: <20231023104826.569169691@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -61,7 +61,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-5.15-stable review patch.  If anyone has any objections, please let me know.
+5.10-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
