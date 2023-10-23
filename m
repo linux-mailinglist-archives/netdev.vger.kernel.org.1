@@ -1,279 +1,193 @@
-Return-Path: <netdev+bounces-43379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B2557D2CB2
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 10:28:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B207D2CC1
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 10:31:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9388B20CAF
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 08:28:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14A83B20CB1
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 08:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3601171F;
-	Mon, 23 Oct 2023 08:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF8310799;
+	Mon, 23 Oct 2023 08:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TOgYybI0"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="1Z+YTMB7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F7363A8;
-	Mon, 23 Oct 2023 08:28:47 +0000 (UTC)
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EB4DC0;
-	Mon, 23 Oct 2023 01:28:46 -0700 (PDT)
-Received: by mail-qv1-xf2a.google.com with SMTP id 6a1803df08f44-66d501d3ffbso4128726d6.1;
-        Mon, 23 Oct 2023 01:28:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698049725; x=1698654525; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=T2el5B3d/edYoPLgmuwr9Mwa8TFkiwQOhj/8O9ejoqY=;
-        b=TOgYybI0y26eHxeLQXU428Y5rHs+FxelewBBDru5zT96U0BUmkkpttoEyne8p2sjOu
-         44rIGpMPqadFjU6bxAJHHmaTaqC7KdgU6sNZKJJaIPvpG9VkTD3wNm78Gc26qxfKtjdF
-         XX8+L03Mi+zA4c4c8Ui+8yumVx3/QuyVDkCW3uNAnlKZChv9Fu79TqlbPpW32BH6zlse
-         IEp5t917ig3yE8S3B+zkoLoWcj+pSauMStcr+hL5wCY8p9RoJtO0m5OZD6SYAi/d94q5
-         hSsQJaBtbVN9zM85i7tpcClsBCrDZSBryW+9R7hSVm+p+zS1A/Th4r+HwRJIzS72jvNd
-         bcag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698049725; x=1698654525;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=T2el5B3d/edYoPLgmuwr9Mwa8TFkiwQOhj/8O9ejoqY=;
-        b=G7b/4BShyNmSdnqBe1XKDOpZ+Ax1ohbpBoinnFBmfgoHyoUWv8F5hVu9znbCgYMv9i
-         HeIbMEuFb0ZDVvIWdi14c7ewCRaufJtVFugvgij5nw2UqZJgnfh/8lbVXiwYBoNdR6Ku
-         +8qRZfyg+G1PRn8V+7FFdoTFahLqfjqt0UbgcEofQb/Bnlsh+wii5Ky2i4xR1z0U1zcH
-         CNt2aiK42zm3Cxh32QtTJxZDMneFTosSngSokA4ucchZmrkE/WqBc8Yy8fBXljU5u4lZ
-         oDu1CcHgXpeVenXT3EzwkHyufwUkzeOyXu3yuaQzDuS3HHl1Ju/g/7Gepjdf82wabOZY
-         K+QA==
-X-Gm-Message-State: AOJu0YyYl/G8zd+0lHf/odInFbXPFMnke321kIQdQbv1GWun/psA4JLB
-	12kylQ2MGqFbMpr8QK380xWFP0J9FlVLm69TAs4=
-X-Google-Smtp-Source: AGHT+IHhPrK/U8eNAivjutwIZ6a0dSrVffu9c59zy7YXF145ShDpJhts5S/cHlmYEa+giKYUdhUQrzTtIgPEjBf6upQ=
-X-Received: by 2002:a05:6214:21ec:b0:66a:d2c1:992d with SMTP id
- p12-20020a05621421ec00b0066ad2c1992dmr8742598qvj.0.1698049725097; Mon, 23 Oct
- 2023 01:28:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18559125BA
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 08:31:06 +0000 (UTC)
+Received: from smtp-8fad.mail.infomaniak.ch (smtp-8fad.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fad])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 448D0171C
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 01:30:58 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4SDT0s5N12zMq5T6;
+	Mon, 23 Oct 2023 08:30:53 +0000 (UTC)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4SDT0s2Qx9zXZK;
+	Mon, 23 Oct 2023 10:30:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1698049853;
+	bh=Sa8y9t8zzJaOO3fi9Pyo4TJOkjYhu4szCXILEJmE850=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=1Z+YTMB7aWgmHuw+0wfOY6Hfs49JtIMKwWsVXiOLB/3cNdELGZYabySXESxyM4u/3
+	 Tme5RbDXoYbQa2/99gb8zFlT8AFkJwWpEPFJpp0yuc247BuczJ5Em8HI38kdi0HQ9V
+	 1uNoTVNX5S5v+34+SCRA36DmwBUsWHgStYaaXgWA=
+Date: Mon, 23 Oct 2023 10:30:50 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com
+Subject: Re: [PATCH v13 08/12] landlock: Add network rules and TCP hooks
+ support
+Message-ID: <20231023.Ahng6xut7aiB@digikod.net>
+References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
+ <20231016015030.1684504-9-konstantin.meskhidze@huawei.com>
+ <20231017.xahKoo9Koo8v@digikod.net>
+ <57f150b2-0920-8567-8351-1bdb74684cfa@huawei.com>
+ <20231020.ido6Aih0eiGh@digikod.net>
+ <ae62c363-e9bf-3ab8-991a-0902b0d195cb@huawei.com>
+ <20231020.ooS5Phaiqu6k@digikod.net>
+ <ed35b3a1-b060-dec6-fa18-efa6743bd1c2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231019174944.3376335-1-sdf@google.com> <20231019174944.3376335-2-sdf@google.com>
-In-Reply-To: <20231019174944.3376335-2-sdf@google.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Mon, 23 Oct 2023 10:28:33 +0200
-Message-ID: <CAJ8uoz3BXFWmA1imhSCZnmRp-+whrE6ge0T3QbA9gqqeb6deCA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 01/11] xsk: Support tx_metadata_len
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
-	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
-	maciej.fijalkowski@intel.com, hawk@kernel.org, yoong.siang.song@intel.com, 
-	netdev@vger.kernel.org, xdp-hints@xdp-project.net
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ed35b3a1-b060-dec6-fa18-efa6743bd1c2@huawei.com>
+X-Infomaniak-Routing: alpha
 
-On Thu, 19 Oct 2023 at 19:50, Stanislav Fomichev <sdf@google.com> wrote:
->
-> For zerocopy mode, tx_desc->addr can point to the arbitrary offset
+On Mon, Oct 23, 2023 at 10:23:35AM +0300, Konstantin Meskhidze (A) wrote:
+> 
+> 
+> 10/20/2023 6:41 PM, Mickaël Salaün пишет:
+> > On Fri, Oct 20, 2023 at 02:58:31PM +0300, Konstantin Meskhidze (A) wrote:
+> > > 
+> > > 
+> > > 10/20/2023 12:49 PM, Mickaël Salaün пишет:
+> > > > On Fri, Oct 20, 2023 at 07:08:33AM +0300, Konstantin Meskhidze (A) wrote:
+> > > > > > > > > 10/18/2023 3:29 PM, Mickaël Salaün пишет:
+> > > > > > On Mon, Oct 16, 2023 at 09:50:26AM +0800, Konstantin Meskhidze wrote:
+> > 
+> > > > > > > diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
+> > > > > > > index 4c209acee01e..1fe4298ff4a7 100644
+> > > > > > > --- a/security/landlock/ruleset.c
+> > > > > > > +++ b/security/landlock/ruleset.c
+> > > > > > > @@ -36,6 +36,11 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
+> > > > > > >  	refcount_set(&new_ruleset->usage, 1);
+> > > > > > >  	mutex_init(&new_ruleset->lock);
+> > > > > > >  	new_ruleset->root_inode = RB_ROOT;
+> > > > > > > +
+> > > > > > > +#if IS_ENABLED(CONFIG_INET)
+> > > > > > > +	new_ruleset->root_net_port = RB_ROOT;
+> > > > > > > +#endif /* IS_ENABLED(CONFIG_INET) */
+> > > > > > > +
+> > > > > > >  	new_ruleset->num_layers = num_layers;
+> > > > > > >  	/*
+> > > > > > >  	 * hierarchy = NULL
+> > > > > > > @@ -46,16 +51,21 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
+> > > > > > >  }
+> > > > > > > > >  struct landlock_ruleset *
+> > > > > > > -landlock_create_ruleset(const access_mask_t fs_access_mask)
+> > > > > > > +landlock_create_ruleset(const access_mask_t fs_access_mask,
+> > > > > > > +			const access_mask_t net_access_mask)
+> > > > > > >  {
+> > > > > > >  	struct landlock_ruleset *new_ruleset;
+> > > > > > > > >  	/* Informs about useless ruleset. */
+> > > > > > > -	if (!fs_access_mask)
+> > > > > > > +	if (!fs_access_mask && !net_access_mask)
+> > > > > > >  		return ERR_PTR(-ENOMSG);
+> > > > > > >  	new_ruleset = create_ruleset(1);
+> > > > > > > -	if (!IS_ERR(new_ruleset))
+> > > > > > > +	if (IS_ERR(new_ruleset))
+> > > > > > > +		return new_ruleset;
+> > > > > > > +	if (fs_access_mask)
+> > > > > > >  		landlock_add_fs_access_mask(new_ruleset, fs_access_mask, 0);
+> > > > > > > +	if (net_access_mask)
+> > > > > > > +		landlock_add_net_access_mask(new_ruleset, net_access_mask, 0);
+> > > > > > > This is good, but it is not tested: we need to add a test that
+> > > > > both
+> > > > > > handle FS and net restrictions. You can add one in net.c, just handling
+> > > > > > LANDLOCK_ACCESS_FS_READ_DIR and LANDLOCK_ACCESS_NET_BIND_TCP, add one
+> > > > > > rule with path_beneath (e.g. /dev) and another with net_port, and check
+> > > > > > that open("/") is denied, open("/dev") is allowed, and and only the
+> > > > > > allowed port is allowed with bind(). This test should be simple and can
+> > > > > > only check against an IPv4 socket, i.e. using ipv4_tcp fixture, just
+> > > > > > after port_endianness. fcntl.h should then be included by net.c
+> > > > > > >   Ok.
+> > > > > > > I guess that was the purpose of layout1.with_net (in fs_test.c)
+> > > > > but it
+> > > > > > >   Yep. I added this kind of nest in fs_test.c to test both
+> > > fs and network
+> > > > > rules together.
+> > > > > > is not complete. You can revamp this test and move it to net.c
+> > > > > > following the above suggestions, keeping it consistent with other tests
+> > > > > > in net.c . You don't need the test_open() nor create_ruleset() helpers.
+> > > > > > > This test must failed if we change
+> > > > > "ruleset->access_masks[layer_level] |="
+> > > > > > to "ruleset->access_masks[layer_level] =" in
+> > > > > > landlock_add_fs_access_mask() or landlock_add_net_access_mask().
+> > > > > > >   Do you want to change it? Why?
+> > > > > The kernel code is correct and must not be changed. However, if
+> > > by
+> > > > mistake we change it and remove the OR, a test should catch that. We
+> > > > need a test to assert this assumption.
+> > > >   OK. I will add additional assert simulating
+> > > "ruleset->access_masks[layer_level] =" kernel code.
+> > > > >   Fs and network masks are ORed to not intersect with each other.
+> > > > > Yes, they are ORed, and we need a test to check that. Noting is
+> > > > currently testing this OR (and the different rule type consistency).
+> > > > I'm suggesting to revamp the layout1.with_net test into
+> > > > ipv4_tcp.with_fs and make it check ruleset->access_masks[] and rule
+> > > > addition of different types.
+> > > 
+> > >   I will move layout1.with_net test into net.c and rename it. Looks like
+> > >   it just needed to add "ruleset->access_masks[layer_level] =" assert
+> > >   because the test already has rule addition with different types.
+> > 
+> > The with_net test doesn't have FS rules, which is the main missing part.
+> > You'll need to rely on the net.c helpers, use the hardcoded paths, and
+> > only handle one access right of each type as I suggested above.
+> > 
+> 
+>  This is with_net code:
+> 
+>   ....
+>   /* Adds a network rule. */
+> 	
+> ASSERT_EQ(0, landlock_add_rule(ruleset_fd_net, LANDLOCK_RULE_NET_PORT,
+> 				       &tcp_bind, 0));
+> 
+> 	enforce_ruleset(_metadata, ruleset_fd_net);
+> 	ASSERT_EQ(0, close(ruleset_fd_net));
+> 
+> 	ruleset_fd = create_ruleset(_metadata, ACCESS_RW, rules);
+> 
+> 	ASSERT_LE(0, ruleset_fd);
+> 	enforce_ruleset(_metadata, ruleset_fd);
+> 	ASSERT_EQ(0, close(ruleset_fd));
+> ....
+> 
+> It has FS rules - just after ruleset_fd_net rule inforced.
+> Or maybe I missed something?
 
-nit: the -> an
+ruleset_fd_net and ruleset_fd are two different rulesets, and then
+they create two different layers. We need to test support for FS and net
+with the same ruleset/layer to check ruleset->access_masks[layer_level].
 
-> and carry some TX metadata in the headroom. For copy mode, there
-> is no way currently to populate skb metadata.
->
-> Introduce new tx_metadata_len umem config option that indicates how many
-> bytes to treat as metadata. Metadata bytes come prior to tx_desc address
-> (same as in RX case).
->
-> The size of the metadata has the same constraints as XDP:
-> - less than 256 bytes
-> - 4-byte aligned
-> - non-zero
->
-> This data is not interpreted in any way right now.
->
-> Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> ---
->  include/net/xdp_sock.h            |  1 +
->  include/net/xsk_buff_pool.h       |  1 +
->  include/uapi/linux/if_xdp.h       |  1 +
->  net/xdp/xdp_umem.c                |  4 ++++
->  net/xdp/xsk.c                     | 12 +++++++++++-
->  net/xdp/xsk_buff_pool.c           |  1 +
->  net/xdp/xsk_queue.h               | 17 ++++++++++-------
->  tools/include/uapi/linux/if_xdp.h |  1 +
->  8 files changed, 30 insertions(+), 8 deletions(-)
->
-> diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-> index 7dd0df2f6f8e..5ae88a00f34a 100644
-> --- a/include/net/xdp_sock.h
-> +++ b/include/net/xdp_sock.h
-> @@ -30,6 +30,7 @@ struct xdp_umem {
->         struct user_struct *user;
->         refcount_t users;
->         u8 flags;
-> +       u8 tx_metadata_len;
->         bool zc;
->         struct page **pgs;
->         int id;
-> diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-> index b0bdff26fc88..1985ffaf9b0c 100644
-> --- a/include/net/xsk_buff_pool.h
-> +++ b/include/net/xsk_buff_pool.h
-> @@ -77,6 +77,7 @@ struct xsk_buff_pool {
->         u32 chunk_size;
->         u32 chunk_shift;
->         u32 frame_len;
-> +       u8 tx_metadata_len; /* inherited from umem */
->         u8 cached_need_wakeup;
->         bool uses_need_wakeup;
->         bool dma_need_sync;
-> diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
-> index 8d48863472b9..2ecf79282c26 100644
-> --- a/include/uapi/linux/if_xdp.h
-> +++ b/include/uapi/linux/if_xdp.h
-> @@ -76,6 +76,7 @@ struct xdp_umem_reg {
->         __u32 chunk_size;
->         __u32 headroom;
->         __u32 flags;
-> +       __u32 tx_metadata_len;
->  };
->
->  struct xdp_statistics {
-> diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
-> index 06cead2b8e34..333f3d53aad4 100644
-> --- a/net/xdp/xdp_umem.c
-> +++ b/net/xdp/xdp_umem.c
-> @@ -199,6 +199,9 @@ static int xdp_umem_reg(struct xdp_umem *umem, struct xdp_umem_reg *mr)
->         if (headroom >= chunk_size - XDP_PACKET_HEADROOM)
->                 return -EINVAL;
->
-> +       if (mr->tx_metadata_len > 256 || mr->tx_metadata_len % 4)
-> +               return -EINVAL;
-
-Should be >= 256 since the final internal destination is a u8 and the
-documentation says "should be less than 256 bytes".
-
-> +
->         umem->size = size;
->         umem->headroom = headroom;
->         umem->chunk_size = chunk_size;
-> @@ -207,6 +210,7 @@ static int xdp_umem_reg(struct xdp_umem *umem, struct xdp_umem_reg *mr)
->         umem->pgs = NULL;
->         umem->user = NULL;
->         umem->flags = mr->flags;
-> +       umem->tx_metadata_len = mr->tx_metadata_len;
->
->         INIT_LIST_HEAD(&umem->xsk_dma_list);
->         refcount_set(&umem->users, 1);
-> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> index ba070fd37d24..ba4c77a24a83 100644
-> --- a/net/xdp/xsk.c
-> +++ b/net/xdp/xsk.c
-> @@ -1265,6 +1265,14 @@ struct xdp_umem_reg_v1 {
->         __u32 headroom;
->  };
->
-> +struct xdp_umem_reg_v2 {
-> +       __u64 addr; /* Start of packet data area */
-> +       __u64 len; /* Length of packet data area */
-> +       __u32 chunk_size;
-> +       __u32 headroom;
-> +       __u32 flags;
-> +};
-> +
->  static int xsk_setsockopt(struct socket *sock, int level, int optname,
->                           sockptr_t optval, unsigned int optlen)
->  {
-> @@ -1308,8 +1316,10 @@ static int xsk_setsockopt(struct socket *sock, int level, int optname,
->
->                 if (optlen < sizeof(struct xdp_umem_reg_v1))
->                         return -EINVAL;
-> -               else if (optlen < sizeof(mr))
-> +               else if (optlen < sizeof(struct xdp_umem_reg_v2))
->                         mr_size = sizeof(struct xdp_umem_reg_v1);
-> +               else if (optlen < sizeof(mr))
-> +                       mr_size = sizeof(struct xdp_umem_reg_v2);
->
->                 if (copy_from_sockptr(&mr, optval, mr_size))
->                         return -EFAULT;
-> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-> index 49cb9f9a09be..386eddcdf837 100644
-> --- a/net/xdp/xsk_buff_pool.c
-> +++ b/net/xdp/xsk_buff_pool.c
-> @@ -85,6 +85,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
->                 XDP_PACKET_HEADROOM;
->         pool->umem = umem;
->         pool->addrs = umem->addrs;
-> +       pool->tx_metadata_len = umem->tx_metadata_len;
->         INIT_LIST_HEAD(&pool->free_list);
->         INIT_LIST_HEAD(&pool->xskb_list);
->         INIT_LIST_HEAD(&pool->xsk_tx_list);
-> diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
-> index 13354a1e4280..c74a1372bcb9 100644
-> --- a/net/xdp/xsk_queue.h
-> +++ b/net/xdp/xsk_queue.h
-> @@ -143,15 +143,17 @@ static inline bool xp_unused_options_set(u32 options)
->  static inline bool xp_aligned_validate_desc(struct xsk_buff_pool *pool,
->                                             struct xdp_desc *desc)
->  {
-> -       u64 offset = desc->addr & (pool->chunk_size - 1);
-> +       u64 addr = desc->addr - pool->tx_metadata_len;
-> +       u64 len = desc->len + pool->tx_metadata_len;
-> +       u64 offset = addr & (pool->chunk_size - 1);
->
->         if (!desc->len)
->                 return false;
->
-> -       if (offset + desc->len > pool->chunk_size)
-> +       if (offset + len > pool->chunk_size)
->                 return false;
->
-> -       if (desc->addr >= pool->addrs_cnt)
-> +       if (addr >= pool->addrs_cnt)
->                 return false;
->
->         if (xp_unused_options_set(desc->options))
-> @@ -162,16 +164,17 @@ static inline bool xp_aligned_validate_desc(struct xsk_buff_pool *pool,
->  static inline bool xp_unaligned_validate_desc(struct xsk_buff_pool *pool,
->                                               struct xdp_desc *desc)
->  {
-> -       u64 addr = xp_unaligned_add_offset_to_addr(desc->addr);
-> +       u64 addr = xp_unaligned_add_offset_to_addr(desc->addr) - pool->tx_metadata_len;
-> +       u64 len = desc->len + pool->tx_metadata_len;
->
->         if (!desc->len)
->                 return false;
->
-> -       if (desc->len > pool->chunk_size)
-> +       if (len > pool->chunk_size)
->                 return false;
->
-> -       if (addr >= pool->addrs_cnt || addr + desc->len > pool->addrs_cnt ||
-> -           xp_desc_crosses_non_contig_pg(pool, addr, desc->len))
-> +       if (addr >= pool->addrs_cnt || addr + len > pool->addrs_cnt ||
-> +           xp_desc_crosses_non_contig_pg(pool, addr, len))
->                 return false;
->
->         if (xp_unused_options_set(desc->options))
-> diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/linux/if_xdp.h
-> index 73a47da885dc..34411a2e5b6c 100644
-> --- a/tools/include/uapi/linux/if_xdp.h
-> +++ b/tools/include/uapi/linux/if_xdp.h
-> @@ -76,6 +76,7 @@ struct xdp_umem_reg {
->         __u32 chunk_size;
->         __u32 headroom;
->         __u32 flags;
-> +       __u32 tx_metadata_len;
->  };
->
->  struct xdp_statistics {
-> --
-> 2.42.0.655.g421f12c284-goog
->
->
+> 
+> > > 
+> > >   Do you have any more review updates so far?
+> > 
+> > That's all for this patch series. :)
+> 
+>   Ok. Thanks.
+> > .
 
