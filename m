@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-43572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C0BB7D3EE3
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:17:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C8A97D3EE6
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F92A1C20B2C
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:17:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9ECA31C20B48
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BEA219E9;
-	Mon, 23 Oct 2023 18:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C73121A01;
+	Mon, 23 Oct 2023 18:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNdM6PSN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F9QYv69u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699AE219E2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D796219FA;
 	Mon, 23 Oct 2023 18:17:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1678FC433CB;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58679C433B8;
 	Mon, 23 Oct 2023 18:17:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1698085046;
-	bh=8yVtlg9JD75iQuT86CmHSy5GLAWQTwgZYezbL887lg8=;
+	bh=QWmYD+03X/tAi/sqhB+uqqmbMU0F/y5Z5lgg8loKaW0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=YNdM6PSNDQDHooVVH3ieAqYZNdscXoBHuC8H9IpT0q+GYr2z8ZJGLvwr07Okdcqmr
-	 vPFlsFwicNghd7q2vNbYDd19RuzHatQFXi0sXdREzzOw2qh8woUvjad5imB4jhQo6x
-	 vagyWI8W9zfWjAw/IVhZ6z9FioYe/nNyXxogwU4UTN98DlmN0PhVm+VBMryLses1Ix
-	 qxn2urQySUpHT5pGHuQHUvWpqjFL1RoFU3pRRY93ODCgB4r4CfvF7qstdvl9R4C9f1
-	 SCOTwFRetu14OEaBnwmD7gjNtPOxmjqCjcf4WQsJ/hAeJd9STPkyt+yZYAsAhOTo47
-	 LLKDGCEzr4tpA==
+	b=F9QYv69uLQyHjV1ntueuwLT/XEWx0mZs1ShEA+zDw+LVdiFx4paP/EsroRNVdSwEw
+	 SwsHqw+sCa/DLjohc93WdYF+STZD4JVgjBrFwg6ou82w8NEWpdAu7JyYsQTetTjZGy
+	 XVwNy0zZ4LcfSKuBiXc96MXqJLJ20oT4tP4Xb1yxqfMWHkHhbyH93GkaTPdh3Nah9X
+	 yQbDcKCudYBuuPeyu8SQrspOFQ6NEg887adheJq5MKAZ15g+cYtBHf9BxAO4WGtJ7c
+	 zuEfvlE5SPM+g6TmwUaeOPMgkpeD3CyS1FcsoliEHR4vZcRrTxtdVyM87DN/oM7oro
+	 8z1KUI90IK9kQ==
 From: Mat Martineau <martineau@kernel.org>
-Date: Mon, 23 Oct 2023 11:17:08 -0700
-Subject: [PATCH net-next v2 4/7] Documentation: netlink: add a YAML spec
- for mptcp
+Date: Mon, 23 Oct 2023 11:17:09 -0700
+Subject: [PATCH net-next v2 5/7] uapi: mptcp: use header file generated
+ from YAML spec
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,7 +44,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231023-send-net-next-20231023-1-v2-4-16b1f701f900@kernel.org>
+Message-Id: <20231023-send-net-next-20231023-1-v2-5-16b1f701f900@kernel.org>
 References: <20231023-send-net-next-20231023-1-v2-0-16b1f701f900@kernel.org>
 In-Reply-To: <20231023-send-net-next-20231023-1-v2-0-16b1f701f900@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -57,427 +57,399 @@ X-Mailer: b4 0.12.4
 
 From: Davide Caratti <dcaratti@redhat.com>
 
-it describes most of the current netlink interface (uAPI definitions,
-doit/dumpit operations and attributes)
+generated with:
+
+ $ ./tools/net/ynl/ynl-gen-c.py --mode uapi \
+ > --spec Documentation/netlink/specs/mptcp.yaml \
+ > --header -o include/uapi/linux/mptcp_pm.h
 
 Link: https://github.com/multipath-tcp/mptcp_net-next/issues/340
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Davide Caratti <dcaratti@redhat.com>
 Signed-off-by: Mat Martineau <martineau@kernel.org>
 ---
- Documentation/netlink/specs/mptcp.yaml | 391 +++++++++++++++++++++++++++++++++
- MAINTAINERS                            |   1 +
- 2 files changed, 392 insertions(+)
+ MAINTAINERS                   |   2 +-
+ include/uapi/linux/mptcp.h    | 182 +++---------------------------------------
+ include/uapi/linux/mptcp_pm.h | 150 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 161 insertions(+), 173 deletions(-)
 
-diff --git a/Documentation/netlink/specs/mptcp.yaml b/Documentation/netlink/specs/mptcp.yaml
-new file mode 100644
-index 000000000000..ec5c454a87ea
---- /dev/null
-+++ b/Documentation/netlink/specs/mptcp.yaml
-@@ -0,0 +1,391 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: mptcp_pm
-+protocol: genetlink-legacy
-+doc: Multipath TCP.
-+
-+c-family-name: mptcp-pm-name
-+c-version-name: mptcp-pm-ver
-+max-by-define: true
-+kernel-policy: per-op
-+
-+definitions:
-+  -
-+    type: enum
-+    name: event-type
-+    enum-name: mptcp-event-type
-+    name-prefix: mptcp-event-
-+    entries:
-+     -
-+      name: unspec
-+      doc: unused event
-+     -
-+      name: created
-+      doc:
-+        token, family, saddr4 | saddr6, daddr4 | daddr6, sport, dport
-+        A new MPTCP connection has been created. It is the good time to
-+        allocate memory and send ADD_ADDR if needed. Depending on the
-+        traffic-patterns it can take a long time until the
-+        MPTCP_EVENT_ESTABLISHED is sent.
-+     -
-+      name: established
-+      doc:
-+        token, family, saddr4 | saddr6, daddr4 | daddr6, sport, dport
-+        A MPTCP connection is established (can start new subflows).
-+     -
-+      name: closed
-+      doc:
-+        token
-+        A MPTCP connection has stopped.
-+     -
-+      name: announced
-+      value: 6
-+      doc:
-+        token, rem_id, family, daddr4 | daddr6 [, dport]
-+        A new address has been announced by the peer.
-+     -
-+      name: removed
-+      doc:
-+        token, rem_id
-+        An address has been lost by the peer.
-+     -
-+      name: sub-established
-+      value: 10
-+      doc:
-+        token, family, loc_id, rem_id, saddr4 | saddr6, daddr4 | daddr6, sport,
-+        dport, backup, if_idx [, error]
-+        A new subflow has been established. 'error' should not be set.
-+     -
-+      name: sub-closed
-+      doc:
-+        token, family, loc_id, rem_id, saddr4 | saddr6, daddr4 | daddr6, sport,
-+        dport, backup, if_idx [, error]
-+        A subflow has been closed. An error (copy of sk_err) could be set if an
-+        error has been detected for this subflow.
-+     -
-+      name: sub-priority
-+      value: 13
-+      doc:
-+        token, family, loc_id, rem_id, saddr4 | saddr6, daddr4 | daddr6, sport,
-+        dport, backup, if_idx [, error]
-+        The priority of a subflow has changed. 'error' should not be set.
-+     -
-+      name: listener-created
-+      value: 15
-+      doc:
-+        family, sport, saddr4 | saddr6
-+        A new PM listener is created.
-+     -
-+      name: listener-closed
-+      doc:
-+        family, sport, saddr4 | saddr6
-+        A PM listener is closed.
-+
-+attribute-sets:
-+  -
-+    name: address
-+    name-prefix: mptcp-pm-addr-attr-
-+    attributes:
-+      -
-+        name: unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: family
-+        type: u16
-+      -
-+        name: id
-+        type: u8
-+      -
-+        name: addr4
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: addr6
-+        type: binary
-+        checks:
-+          exact-len: 16
-+      -
-+        name: port
-+        type: u16
-+        byte-order: big-endian
-+      -
-+        name: flags
-+        type: u32
-+      -
-+        name: if-idx
-+        type: s32
-+  -
-+    name: subflow-attribute
-+    name-prefix: mptcp-subflow-attr-
-+    attributes:
-+      -
-+        name: unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: token-rem
-+        type: u32
-+      -
-+        name: token-loc
-+        type: u32
-+      -
-+        name: relwrite-seq
-+        type: u32
-+      -
-+        name: map-seq
-+        type: u64
-+      -
-+        name: map-sfseq
-+        type: u32
-+      -
-+        name: ssn-offset
-+        type: u32
-+      -
-+        name: map-datalen
-+        type: u16
-+      -
-+        name: flags
-+        type: u32
-+      -
-+        name: id-rem
-+        type: u8
-+      -
-+        name: id-loc
-+        type: u8
-+      -
-+        name: pad
-+        type: pad
-+  -
-+    name: endpoint
-+    name-prefix: mptcp-pm-endpoint-
-+    attributes:
-+      -
-+        name: addr
-+        type: nest
-+        nested-attributes: address
-+  -
-+    name: attr
-+    name-prefix: mptcp-pm-attr-
-+    attributes:
-+      -
-+        name: unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: addr
-+        type: nest
-+        nested-attributes: address
-+      -
-+        name: rcv-add-addrs
-+        type: u32
-+      -
-+        name: subflows
-+        type: u32
-+      -
-+        name: token
-+        type: u32
-+      -
-+        name: loc-id
-+        type: u8
-+      -
-+        name: addr-remote
-+        type: nest
-+        nested-attributes: address
-+  -
-+    name: event-attr
-+    enum-name: mptcp-event-attr
-+    name-prefix: mptcp-attr-
-+    attributes:
-+      -
-+        name: unspec
-+        type: unused
-+        value: 0
-+      -
-+        name: token
-+        type: u32
-+      -
-+        name: family
-+        type: u16
-+      -
-+        name: loc-id
-+        type: u8
-+      -
-+        name: rem-id
-+        type: u8
-+      -
-+        name: saddr4
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: saddr6
-+        type: binary
-+        checks:
-+          min-len: 16
-+      -
-+        name: daddr4
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: daddr6
-+        type: binary
-+        checks:
-+          min-len: 16
-+      -
-+        name: sport
-+        type: u16
-+        byte-order: big-endian
-+      -
-+        name: dport
-+        type: u16
-+        byte-order: big-endian
-+      -
-+        name: backup
-+        type: u8
-+      -
-+        name: error
-+        type: u8
-+      -
-+        name: flags
-+        type: u16
-+      -
-+        name: timeout
-+        type: u32
-+      -
-+        name: if_idx
-+        type: u32
-+      -
-+        name: reset-reason
-+        type: u32
-+      -
-+        name: reset-flags
-+        type: u32
-+      -
-+        name: server-side
-+        type: u8
-+
-+operations:
-+  list:
-+    -
-+      name: unspec
-+      doc: unused
-+      value: 0
-+    -
-+      name: add-addr
-+      doc: Add endpoint
-+      attribute-set: endpoint
-+      dont-validate: [ strict ]
-+      flags: [ uns-admin-perm ]
-+      do: &add-addr-attrs
-+        request:
-+          attributes:
-+            - addr
-+    -
-+      name: del-addr
-+      doc: Delete endpoint
-+      attribute-set: endpoint
-+      dont-validate: [ strict ]
-+      flags: [ uns-admin-perm ]
-+      do: *add-addr-attrs
-+    -
-+      name: get-addr
-+      doc: Get endpoint information
-+      attribute-set: endpoint
-+      dont-validate: [ strict ]
-+      flags: [ uns-admin-perm ]
-+      do: &get-addr-attrs
-+        request:
-+          attributes:
-+           - addr
-+        reply:
-+          attributes:
-+           - addr
-+      dump:
-+        reply:
-+         attributes:
-+           - addr
-+    -
-+      name:  flush-addrs
-+      doc: flush addresses
-+      attribute-set: endpoint
-+      dont-validate: [ strict ]
-+      flags: [ uns-admin-perm ]
-+      do: *add-addr-attrs
-+    -
-+      name: set-limits
-+      doc: Set protocol limits
-+      attribute-set: attr
-+      dont-validate: [ strict ]
-+      flags: [ uns-admin-perm ]
-+      do: &mptcp-limits
-+        request:
-+          attributes:
-+            - rcv-add-addrs
-+            - subflows
-+    -
-+      name: get-limits
-+      doc: Get protocol limits
-+      attribute-set: attr
-+      dont-validate: [ strict ]
-+      do: &mptcp-get-limits
-+        request:
-+           attributes:
-+            - rcv-add-addrs
-+            - subflows
-+        reply:
-+          attributes:
-+            - rcv-add-addrs
-+            - subflows
-+    -
-+      name: set-flags
-+      doc: Change endpoint flags
-+      attribute-set: attr
-+      dont-validate: [ strict ]
-+      flags: [ uns-admin-perm ]
-+      do: &mptcp-set-flags
-+        request:
-+          attributes:
-+            - addr
-+            - token
-+            - addr-remote
-+    -
-+      name: announce
-+      doc: announce new sf
-+      attribute-set: attr
-+      dont-validate: [ strict ]
-+      flags: [ uns-admin-perm ]
-+      do: &announce-add
-+        request:
-+          attributes:
-+            - addr
-+            - token
-+    -
-+      name: remove
-+      doc: announce removal
-+      attribute-set: attr
-+      dont-validate: [ strict ]
-+      flags: [ uns-admin-perm ]
-+      do:
-+        request:
-+         attributes:
-+           - token
-+           - loc-id
-+    -
-+      name: subflow-create
-+      doc: todo
-+      attribute-set: attr
-+      dont-validate: [ strict ]
-+      flags: [ uns-admin-perm ]
-+      do: &sf-create
-+        request:
-+          attributes:
-+            - addr
-+            - token
-+            - addr-remote
-+    -
-+      name: subflow-destroy
-+      doc: todo
-+      attribute-set: attr
-+      dont-validate: [ strict ]
-+      flags: [ uns-admin-perm ]
-+      do: *sf-create
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 36815d2feb33..977de4624fe0 100644
+index 977de4624fe0..b2f53d5cae06 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -14960,6 +14960,7 @@ W:	https://github.com/multipath-tcp/mptcp_net-next/wiki
- B:	https://github.com/multipath-tcp/mptcp_net-next/issues
- T:	git https://github.com/multipath-tcp/mptcp_net-next.git export-net
- T:	git https://github.com/multipath-tcp/mptcp_net-next.git export
-+F:	Documentation/netlink/specs/mptcp.yaml
+@@ -14964,7 +14964,7 @@ F:	Documentation/netlink/specs/mptcp.yaml
  F:	Documentation/networking/mptcp-sysctl.rst
  F:	include/net/mptcp.h
  F:	include/trace/events/mptcp.h
+-F:	include/uapi/linux/mptcp.h
++F:	include/uapi/linux/mptcp*.h
+ F:	net/mptcp/
+ F:	tools/testing/selftests/bpf/*/*mptcp*.c
+ F:	tools/testing/selftests/net/mptcp/
+diff --git a/include/uapi/linux/mptcp.h b/include/uapi/linux/mptcp.h
+index 0e62937ab17c..64ecc8a3f9f2 100644
+--- a/include/uapi/linux/mptcp.h
++++ b/include/uapi/linux/mptcp.h
+@@ -23,99 +23,24 @@
+ #define MPTCP_SUBFLOW_FLAG_CONNECTED		_BITUL(7)
+ #define MPTCP_SUBFLOW_FLAG_MAPVALID		_BITUL(8)
+ 
+-enum {
+-	MPTCP_SUBFLOW_ATTR_UNSPEC,
+-	MPTCP_SUBFLOW_ATTR_TOKEN_REM,
+-	MPTCP_SUBFLOW_ATTR_TOKEN_LOC,
+-	MPTCP_SUBFLOW_ATTR_RELWRITE_SEQ,
+-	MPTCP_SUBFLOW_ATTR_MAP_SEQ,
+-	MPTCP_SUBFLOW_ATTR_MAP_SFSEQ,
+-	MPTCP_SUBFLOW_ATTR_SSN_OFFSET,
+-	MPTCP_SUBFLOW_ATTR_MAP_DATALEN,
+-	MPTCP_SUBFLOW_ATTR_FLAGS,
+-	MPTCP_SUBFLOW_ATTR_ID_REM,
+-	MPTCP_SUBFLOW_ATTR_ID_LOC,
+-	MPTCP_SUBFLOW_ATTR_PAD,
+-	__MPTCP_SUBFLOW_ATTR_MAX
+-};
+-
+-#define MPTCP_SUBFLOW_ATTR_MAX (__MPTCP_SUBFLOW_ATTR_MAX - 1)
+-
+-/* netlink interface */
+-#define MPTCP_PM_NAME		"mptcp_pm"
+ #define MPTCP_PM_CMD_GRP_NAME	"mptcp_pm_cmds"
+ #define MPTCP_PM_EV_GRP_NAME	"mptcp_pm_events"
+-#define MPTCP_PM_VER		0x1
+-
+-/*
+- * ATTR types defined for MPTCP
+- */
+-enum {
+-	MPTCP_PM_ATTR_UNSPEC,
+-
+-	MPTCP_PM_ATTR_ADDR,				/* nested address */
+-	MPTCP_PM_ATTR_RCV_ADD_ADDRS,			/* u32 */
+-	MPTCP_PM_ATTR_SUBFLOWS,				/* u32 */
+-	MPTCP_PM_ATTR_TOKEN,				/* u32 */
+-	MPTCP_PM_ATTR_LOC_ID,				/* u8 */
+-	MPTCP_PM_ATTR_ADDR_REMOTE,			/* nested address */
+-
+-	__MPTCP_PM_ATTR_MAX
+-};
+-
+-#define MPTCP_PM_ATTR_MAX (__MPTCP_PM_ATTR_MAX - 1)
+-
+-enum {
+-	MPTCP_PM_ENDPOINT_ADDR = 1,
+-
+-	__MPTCP_PM_ENDPOINT_MAX
+-};
+-
+-#define MPTCP_PM_ENDPOINT_MAX (__MPTCP_PM_ENDPOINT_MAX - 1)
+-
+-enum {
+-	MPTCP_PM_ADDR_ATTR_UNSPEC,
+-
+-	MPTCP_PM_ADDR_ATTR_FAMILY,			/* u16 */
+-	MPTCP_PM_ADDR_ATTR_ID,				/* u8 */
+-	MPTCP_PM_ADDR_ATTR_ADDR4,			/* struct in_addr */
+-	MPTCP_PM_ADDR_ATTR_ADDR6,			/* struct in6_addr */
+-	MPTCP_PM_ADDR_ATTR_PORT,			/* u16 */
+-	MPTCP_PM_ADDR_ATTR_FLAGS,			/* u32 */
+-	MPTCP_PM_ADDR_ATTR_IF_IDX,			/* s32 */
+-
+-	__MPTCP_PM_ADDR_ATTR_MAX
+-};
+ 
+-#define MPTCP_PM_ADDR_ATTR_MAX (__MPTCP_PM_ADDR_ATTR_MAX - 1)
++#include <linux/mptcp_pm.h>
+ 
+-#define MPTCP_PM_ADDR_FLAG_SIGNAL			(1 << 0)
+-#define MPTCP_PM_ADDR_FLAG_SUBFLOW			(1 << 1)
+-#define MPTCP_PM_ADDR_FLAG_BACKUP			(1 << 2)
+-#define MPTCP_PM_ADDR_FLAG_FULLMESH			(1 << 3)
+-#define MPTCP_PM_ADDR_FLAG_IMPLICIT			(1 << 4)
+-
+-enum {
+-	MPTCP_PM_CMD_UNSPEC,
+-
+-	MPTCP_PM_CMD_ADD_ADDR,
+-	MPTCP_PM_CMD_DEL_ADDR,
+-	MPTCP_PM_CMD_GET_ADDR,
+-	MPTCP_PM_CMD_FLUSH_ADDRS,
+-	MPTCP_PM_CMD_SET_LIMITS,
+-	MPTCP_PM_CMD_GET_LIMITS,
+-	MPTCP_PM_CMD_SET_FLAGS,
+-	MPTCP_PM_CMD_ANNOUNCE,
+-	MPTCP_PM_CMD_REMOVE,
+-	MPTCP_PM_CMD_SUBFLOW_CREATE,
+-	MPTCP_PM_CMD_SUBFLOW_DESTROY,
+-
+-	__MPTCP_PM_CMD_AFTER_LAST
+-};
++/* for backward compatibility */
++#define	__MPTCP_PM_CMD_AFTER_LAST	__MPTCP_PM_CMD_MAX
++#define	__MPTCP_ATTR_AFTER_LAST		__MPTCP_ATTR_MAX
+ 
+ #define MPTCP_INFO_FLAG_FALLBACK		_BITUL(0)
+ #define MPTCP_INFO_FLAG_REMOTE_KEY_RECEIVED	_BITUL(1)
+ 
++#define MPTCP_PM_ADDR_FLAG_SIGNAL                      (1 << 0)
++#define MPTCP_PM_ADDR_FLAG_SUBFLOW                     (1 << 1)
++#define MPTCP_PM_ADDR_FLAG_BACKUP                      (1 << 2)
++#define MPTCP_PM_ADDR_FLAG_FULLMESH                    (1 << 3)
++#define MPTCP_PM_ADDR_FLAG_IMPLICIT                    (1 << 4)
++
+ struct mptcp_info {
+ 	__u8	mptcpi_subflows;
+ 	__u8	mptcpi_add_addr_signal;
+@@ -138,93 +63,6 @@ struct mptcp_info {
+ 	__u64	mptcpi_bytes_acked;
+ };
+ 
+-/*
+- * MPTCP_EVENT_CREATED: token, family, saddr4 | saddr6, daddr4 | daddr6,
+- *                      sport, dport
+- * A new MPTCP connection has been created. It is the good time to allocate
+- * memory and send ADD_ADDR if needed. Depending on the traffic-patterns
+- * it can take a long time until the MPTCP_EVENT_ESTABLISHED is sent.
+- *
+- * MPTCP_EVENT_ESTABLISHED: token, family, saddr4 | saddr6, daddr4 | daddr6,
+- *			    sport, dport
+- * A MPTCP connection is established (can start new subflows).
+- *
+- * MPTCP_EVENT_CLOSED: token
+- * A MPTCP connection has stopped.
+- *
+- * MPTCP_EVENT_ANNOUNCED: token, rem_id, family, daddr4 | daddr6 [, dport]
+- * A new address has been announced by the peer.
+- *
+- * MPTCP_EVENT_REMOVED: token, rem_id
+- * An address has been lost by the peer.
+- *
+- * MPTCP_EVENT_SUB_ESTABLISHED: token, family, loc_id, rem_id,
+- *                              saddr4 | saddr6, daddr4 | daddr6, sport,
+- *                              dport, backup, if_idx [, error]
+- * A new subflow has been established. 'error' should not be set.
+- *
+- * MPTCP_EVENT_SUB_CLOSED: token, family, loc_id, rem_id, saddr4 | saddr6,
+- *                         daddr4 | daddr6, sport, dport, backup, if_idx
+- *                         [, error]
+- * A subflow has been closed. An error (copy of sk_err) could be set if an
+- * error has been detected for this subflow.
+- *
+- * MPTCP_EVENT_SUB_PRIORITY: token, family, loc_id, rem_id, saddr4 | saddr6,
+- *                           daddr4 | daddr6, sport, dport, backup, if_idx
+- *                           [, error]
+- * The priority of a subflow has changed. 'error' should not be set.
+- *
+- * MPTCP_EVENT_LISTENER_CREATED: family, sport, saddr4 | saddr6
+- * A new PM listener is created.
+- *
+- * MPTCP_EVENT_LISTENER_CLOSED: family, sport, saddr4 | saddr6
+- * A PM listener is closed.
+- */
+-enum mptcp_event_type {
+-	MPTCP_EVENT_UNSPEC = 0,
+-	MPTCP_EVENT_CREATED = 1,
+-	MPTCP_EVENT_ESTABLISHED = 2,
+-	MPTCP_EVENT_CLOSED = 3,
+-
+-	MPTCP_EVENT_ANNOUNCED = 6,
+-	MPTCP_EVENT_REMOVED = 7,
+-
+-	MPTCP_EVENT_SUB_ESTABLISHED = 10,
+-	MPTCP_EVENT_SUB_CLOSED = 11,
+-
+-	MPTCP_EVENT_SUB_PRIORITY = 13,
+-
+-	MPTCP_EVENT_LISTENER_CREATED = 15,
+-	MPTCP_EVENT_LISTENER_CLOSED = 16,
+-};
+-
+-enum mptcp_event_attr {
+-	MPTCP_ATTR_UNSPEC = 0,
+-
+-	MPTCP_ATTR_TOKEN,	/* u32 */
+-	MPTCP_ATTR_FAMILY,	/* u16 */
+-	MPTCP_ATTR_LOC_ID,	/* u8 */
+-	MPTCP_ATTR_REM_ID,	/* u8 */
+-	MPTCP_ATTR_SADDR4,	/* be32 */
+-	MPTCP_ATTR_SADDR6,	/* struct in6_addr */
+-	MPTCP_ATTR_DADDR4,	/* be32 */
+-	MPTCP_ATTR_DADDR6,	/* struct in6_addr */
+-	MPTCP_ATTR_SPORT,	/* be16 */
+-	MPTCP_ATTR_DPORT,	/* be16 */
+-	MPTCP_ATTR_BACKUP,	/* u8 */
+-	MPTCP_ATTR_ERROR,	/* u8 */
+-	MPTCP_ATTR_FLAGS,	/* u16 */
+-	MPTCP_ATTR_TIMEOUT,	/* u32 */
+-	MPTCP_ATTR_IF_IDX,	/* s32 */
+-	MPTCP_ATTR_RESET_REASON,/* u32 */
+-	MPTCP_ATTR_RESET_FLAGS, /* u32 */
+-	MPTCP_ATTR_SERVER_SIDE,	/* u8 */
+-
+-	__MPTCP_ATTR_AFTER_LAST
+-};
+-
+-#define MPTCP_ATTR_MAX (__MPTCP_ATTR_AFTER_LAST - 1)
+-
+ /* MPTCP Reset reason codes, rfc8684 */
+ #define MPTCP_RST_EUNSPEC	0
+ #define MPTCP_RST_EMPTCP	1
+diff --git a/include/uapi/linux/mptcp_pm.h b/include/uapi/linux/mptcp_pm.h
+new file mode 100644
+index 000000000000..0ad598fe940b
+--- /dev/null
++++ b/include/uapi/linux/mptcp_pm.h
+@@ -0,0 +1,150 @@
++/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
++/* Do not edit directly, auto-generated from: */
++/*	Documentation/netlink/specs/mptcp.yaml */
++/* YNL-GEN uapi header */
++
++#ifndef _UAPI_LINUX_MPTCP_PM_H
++#define _UAPI_LINUX_MPTCP_PM_H
++
++#define MPTCP_PM_NAME	"mptcp_pm"
++#define MPTCP_PM_VER	1
++
++/**
++ * enum mptcp_event_type
++ * @MPTCP_EVENT_UNSPEC: unused event
++ * @MPTCP_EVENT_CREATED: token, family, saddr4 | saddr6, daddr4 | daddr6,
++ *   sport, dport A new MPTCP connection has been created. It is the good time
++ *   to allocate memory and send ADD_ADDR if needed. Depending on the
++ *   traffic-patterns it can take a long time until the MPTCP_EVENT_ESTABLISHED
++ *   is sent.
++ * @MPTCP_EVENT_ESTABLISHED: token, family, saddr4 | saddr6, daddr4 | daddr6,
++ *   sport, dport A MPTCP connection is established (can start new subflows).
++ * @MPTCP_EVENT_CLOSED: token A MPTCP connection has stopped.
++ * @MPTCP_EVENT_ANNOUNCED: token, rem_id, family, daddr4 | daddr6 [, dport] A
++ *   new address has been announced by the peer.
++ * @MPTCP_EVENT_REMOVED: token, rem_id An address has been lost by the peer.
++ * @MPTCP_EVENT_SUB_ESTABLISHED: token, family, loc_id, rem_id, saddr4 |
++ *   saddr6, daddr4 | daddr6, sport, dport, backup, if_idx [, error] A new
++ *   subflow has been established. 'error' should not be set.
++ * @MPTCP_EVENT_SUB_CLOSED: token, family, loc_id, rem_id, saddr4 | saddr6,
++ *   daddr4 | daddr6, sport, dport, backup, if_idx [, error] A subflow has been
++ *   closed. An error (copy of sk_err) could be set if an error has been
++ *   detected for this subflow.
++ * @MPTCP_EVENT_SUB_PRIORITY: token, family, loc_id, rem_id, saddr4 | saddr6,
++ *   daddr4 | daddr6, sport, dport, backup, if_idx [, error] The priority of a
++ *   subflow has changed. 'error' should not be set.
++ * @MPTCP_EVENT_LISTENER_CREATED: family, sport, saddr4 | saddr6 A new PM
++ *   listener is created.
++ * @MPTCP_EVENT_LISTENER_CLOSED: family, sport, saddr4 | saddr6 A PM listener
++ *   is closed.
++ */
++enum mptcp_event_type {
++	MPTCP_EVENT_UNSPEC,
++	MPTCP_EVENT_CREATED,
++	MPTCP_EVENT_ESTABLISHED,
++	MPTCP_EVENT_CLOSED,
++	MPTCP_EVENT_ANNOUNCED = 6,
++	MPTCP_EVENT_REMOVED,
++	MPTCP_EVENT_SUB_ESTABLISHED = 10,
++	MPTCP_EVENT_SUB_CLOSED,
++	MPTCP_EVENT_SUB_PRIORITY = 13,
++	MPTCP_EVENT_LISTENER_CREATED = 15,
++	MPTCP_EVENT_LISTENER_CLOSED,
++};
++
++enum {
++	MPTCP_PM_ADDR_ATTR_UNSPEC,
++	MPTCP_PM_ADDR_ATTR_FAMILY,
++	MPTCP_PM_ADDR_ATTR_ID,
++	MPTCP_PM_ADDR_ATTR_ADDR4,
++	MPTCP_PM_ADDR_ATTR_ADDR6,
++	MPTCP_PM_ADDR_ATTR_PORT,
++	MPTCP_PM_ADDR_ATTR_FLAGS,
++	MPTCP_PM_ADDR_ATTR_IF_IDX,
++
++	__MPTCP_PM_ADDR_ATTR_MAX
++};
++#define MPTCP_PM_ADDR_ATTR_MAX (__MPTCP_PM_ADDR_ATTR_MAX - 1)
++
++enum {
++	MPTCP_SUBFLOW_ATTR_UNSPEC,
++	MPTCP_SUBFLOW_ATTR_TOKEN_REM,
++	MPTCP_SUBFLOW_ATTR_TOKEN_LOC,
++	MPTCP_SUBFLOW_ATTR_RELWRITE_SEQ,
++	MPTCP_SUBFLOW_ATTR_MAP_SEQ,
++	MPTCP_SUBFLOW_ATTR_MAP_SFSEQ,
++	MPTCP_SUBFLOW_ATTR_SSN_OFFSET,
++	MPTCP_SUBFLOW_ATTR_MAP_DATALEN,
++	MPTCP_SUBFLOW_ATTR_FLAGS,
++	MPTCP_SUBFLOW_ATTR_ID_REM,
++	MPTCP_SUBFLOW_ATTR_ID_LOC,
++	MPTCP_SUBFLOW_ATTR_PAD,
++
++	__MPTCP_SUBFLOW_ATTR_MAX
++};
++#define MPTCP_SUBFLOW_ATTR_MAX (__MPTCP_SUBFLOW_ATTR_MAX - 1)
++
++enum {
++	MPTCP_PM_ENDPOINT_ADDR = 1,
++
++	__MPTCP_PM_ENDPOINT_MAX
++};
++#define MPTCP_PM_ENDPOINT_MAX (__MPTCP_PM_ENDPOINT_MAX - 1)
++
++enum {
++	MPTCP_PM_ATTR_UNSPEC,
++	MPTCP_PM_ATTR_ADDR,
++	MPTCP_PM_ATTR_RCV_ADD_ADDRS,
++	MPTCP_PM_ATTR_SUBFLOWS,
++	MPTCP_PM_ATTR_TOKEN,
++	MPTCP_PM_ATTR_LOC_ID,
++	MPTCP_PM_ATTR_ADDR_REMOTE,
++
++	__MPTCP_PM_ATTR_MAX
++};
++#define MPTCP_PM_ATTR_MAX (__MPTCP_PM_ATTR_MAX - 1)
++
++enum mptcp_event_attr {
++	MPTCP_ATTR_UNSPEC,
++	MPTCP_ATTR_TOKEN,
++	MPTCP_ATTR_FAMILY,
++	MPTCP_ATTR_LOC_ID,
++	MPTCP_ATTR_REM_ID,
++	MPTCP_ATTR_SADDR4,
++	MPTCP_ATTR_SADDR6,
++	MPTCP_ATTR_DADDR4,
++	MPTCP_ATTR_DADDR6,
++	MPTCP_ATTR_SPORT,
++	MPTCP_ATTR_DPORT,
++	MPTCP_ATTR_BACKUP,
++	MPTCP_ATTR_ERROR,
++	MPTCP_ATTR_FLAGS,
++	MPTCP_ATTR_TIMEOUT,
++	MPTCP_ATTR_IF_IDX,
++	MPTCP_ATTR_RESET_REASON,
++	MPTCP_ATTR_RESET_FLAGS,
++	MPTCP_ATTR_SERVER_SIDE,
++
++	__MPTCP_ATTR_MAX
++};
++#define MPTCP_ATTR_MAX (__MPTCP_ATTR_MAX - 1)
++
++enum {
++	MPTCP_PM_CMD_UNSPEC,
++	MPTCP_PM_CMD_ADD_ADDR,
++	MPTCP_PM_CMD_DEL_ADDR,
++	MPTCP_PM_CMD_GET_ADDR,
++	MPTCP_PM_CMD_FLUSH_ADDRS,
++	MPTCP_PM_CMD_SET_LIMITS,
++	MPTCP_PM_CMD_GET_LIMITS,
++	MPTCP_PM_CMD_SET_FLAGS,
++	MPTCP_PM_CMD_ANNOUNCE,
++	MPTCP_PM_CMD_REMOVE,
++	MPTCP_PM_CMD_SUBFLOW_CREATE,
++	MPTCP_PM_CMD_SUBFLOW_DESTROY,
++
++	__MPTCP_PM_CMD_MAX
++};
++#define MPTCP_PM_CMD_MAX (__MPTCP_PM_CMD_MAX - 1)
++
++#endif /* _UAPI_LINUX_MPTCP_PM_H */
 
 -- 
 2.41.0
