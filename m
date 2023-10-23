@@ -1,192 +1,162 @@
-Return-Path: <netdev+bounces-43588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0E947D3F7B
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:46:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7431B7D3FAB
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:58:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 306E0B20DE8
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:46:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD773B20AFA
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:58:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86AC2136D;
-	Mon, 23 Oct 2023 18:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E69219EE;
+	Mon, 23 Oct 2023 18:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0gVQymOw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kpJfEVdr"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E3D208DC
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:46:51 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD5CA101
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:46:48 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a528c2c8bso4456765276.1
-        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:46:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698086807; x=1698691607; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aWCt7fVifu9lSRwvkCzaL8k9JM3Sqd8iOqTHPjTp+Z8=;
-        b=0gVQymOw39zXiMSQfLo9sMYGpYHiFi1O/RCTGGAlo6stYJu+F/AHL9PQkdIxWSLHZ5
-         VeEgHHMOHwyDgc6Uful/8rcks2qL4aoIfgQjI4Mbqk1vr1gCqYlDphq6Y14P/TfNEJff
-         xVDk90bAlRQNgBH6P7HTPiyBMU/2LciIG7SKKHFAPf0Npfq7pThgRiUy2mt1feNnU0PC
-         Xrj6oHoSidDeOojcSxtNVhHxOnLiV4WSanM8o/7DHqgx8SSqM3QiD4s08jZ1U0IabrMi
-         elIjW0OpQszH40Df3NoUlp8ZxNLVTLojcpYc9jU5wGPVIKEpXewXaFcG7mgqhicxkL8/
-         vP6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698086807; x=1698691607;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aWCt7fVifu9lSRwvkCzaL8k9JM3Sqd8iOqTHPjTp+Z8=;
-        b=UTZbqbScEBtUk9t9+xoVC6T/ZDg8WT5mIv0OCxSvgudLgY9iVwz4EZxZN8IaZgtgQM
-         OGcZgQOJW3FDVbxzhI+Qxw8xjA6LW4YyuLZNkySneQSBVXX3Gs/8tZDXFd0C4VL4o1LG
-         XQEYzH6icl0MU6ileLH/iYzic6Eux39qwzdUopj7SK/Ka8upPSbXq0wNpAWQtow0ua1d
-         QJahz/c+S6vpEsmYkX0pSGS2VmKklD5taSs2JYxC6ZQMIqwgIMvaSPQlqEb3tUjmhzK0
-         35F43M2pIGrt5Yg6yalA14EkxTQzKQa37XpZH5EofYgZEFIFqasQJnVQzsFweBcR2hSb
-         k/uA==
-X-Gm-Message-State: AOJu0YyIu7mJ/6YHg0A9CKvgKeXHg1b/lzIanYTdWh/MuSQKpb+XYZCl
-	swPYdaU2ImH12MiySTgj2kmucF0=
-X-Google-Smtp-Source: AGHT+IHVcMG7X5PXY5nV8TbWav2pfkXl0AU0B4K3H28H7klf2hO78/4IOCsT2NNurl+37A28QdkmVt4=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a25:374e:0:b0:d9a:425c:f5c with SMTP id
- e75-20020a25374e000000b00d9a425c0f5cmr183992yba.1.1698086807648; Mon, 23 Oct
- 2023 11:46:47 -0700 (PDT)
-Date: Mon, 23 Oct 2023 11:46:46 -0700
-In-Reply-To: <20231023111209.2278899c@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2072135D
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:58:13 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B566A100;
+	Mon, 23 Oct 2023 11:58:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698087491; x=1729623491;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jfRzDBKygKvxCl+MnO+GjTDOLBtOdkySu7nZa6XOIwI=;
+  b=kpJfEVdrj4Lrrwwe6FaCiAtul2vI5hxMxxDJmWHS3x5QVp9lijD2kVre
+   7L9fkbwFOESV6gt4eMO/jqcbrWnZerjSNOHMXuCB4VCw0pb3OrFdtH/5i
+   ORhjckzQkyWxeLWKzvk3vggyJhcmj+dhYeSMClrfTNg72gmufpGF4NmAy
+   XPGstctKOD3Tb+HXegkHXtxDb88xlqELilpc0T43tyoHEO8zjqmqFTGHq
+   4lVJ9uKbu6uYcthsAbVHfZVrTgyuS78PFbK+zPU9zR83fypckgEACi7Jt
+   DXZ6ETMm2n6178DcXVuYZ3ZXGGiM8E3VKUS7RticGq0QL0pkiNQrtY+J7
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="390791172"
+X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
+   d="scan'208";a="390791172"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 11:58:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="931781013"
+X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
+   d="scan'208";a="931781013"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by orsmga005.jf.intel.com with ESMTP; 23 Oct 2023 11:58:07 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qv07p-0007AX-0n;
+	Mon, 23 Oct 2023 18:58:05 +0000
+Date: Tue, 24 Oct 2023 02:57:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>, mschmidt@redhat.com,
+	dacampbe@redhat.com, poros@redhat.com
+Subject: Re: [PATCH iwl-next 2/3] i40e: Add other helpers to check version of
+ running firmware and AQ API
+Message-ID: <202310240231.6eF5YKB4-lkp@intel.com>
+References: <20231023162928.245583-3-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231019174944.3376335-1-sdf@google.com> <20231019174944.3376335-3-sdf@google.com>
- <20231020180411.2a9f573d@kernel.org> <ZTarsV4UT-sQ14uI@google.com> <20231023111209.2278899c@kernel.org>
-Message-ID: <ZTa_lr8W__wVcqVH@google.com>
-Subject: Re: [PATCH bpf-next v4 02/11] xsk: Add TX timestamp and TX checksum
- offload support
-From: Stanislav Fomichev <sdf@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org, 
-	magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com, 
-	hawk@kernel.org, yoong.siang.song@intel.com, netdev@vger.kernel.org, 
-	xdp-hints@xdp-project.net
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231023162928.245583-3-ivecera@redhat.com>
 
-On 10/23, Jakub Kicinski wrote:
-> On Mon, 23 Oct 2023 10:21:53 -0700 Stanislav Fomichev wrote:
-> > On 10/20, Jakub Kicinski wrote:
-> > > On Thu, 19 Oct 2023 10:49:35 -0700 Stanislav Fomichev wrote:  
-> > > > diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> > > > index 14511b13f305..22d2649a34ee 100644
-> > > > --- a/Documentation/netlink/specs/netdev.yaml
-> > > > +++ b/Documentation/netlink/specs/netdev.yaml
-> > > > @@ -55,6 +55,19 @@ name: netdev
-> > > >          name: hash
-> > > >          doc:
-> > > >            Device is capable of exposing receive packet hash via bpf_xdp_metadata_rx_hash().
-> > > > +  -
-> > > > +    type: flags
-> > > > +    name: xsk-flags
-> > > > +    render-max: true  
-> > > 
-> > > I don't think you're using the MAX, maybe don't render it.
-> > > IDK what purpose it'd serve for feature flag enums.  
-> > 
-> > I was gonna say 'to iterate over every possible bit', but we are using
-> > that 'xxx > 1U << i' implementation (which you also found a bug in).
-> > 
-> > I can drop it, but the question is: should I drop it from the rest as
-> > well? xdp-act and xdp-rx-metadata have it.
-> 
-> The xdp-act one looks used. xdp-rx-metadata looks unused, so you could
-> drop. But up to you if you want to clean it up.
+Hi Ivan,
 
-Ok. I'll cleanup xdp-rx-metadata in the same path. Might we worth it
-to limit copy-paste spread..
- 
-> > > > +/* Request transmit timestamp. Upon completion, put it into tx_timestamp
-> > > > + * field of struct xsk_tx_metadata.
-> > > > + */
-> > > > +#define XDP_TX_METADATA_TIMESTAMP		(1 << 0)
-> > > > +
-> > > > +/* Request transmit checksum offload. Checksum start position and offset
-> > > > + * are communicated via csum_start and csum_offset fields of struct
-> > > > + * xsk_tx_metadata.
-> > > > + */
-> > > > +#define XDP_TX_METADATA_CHECKSUM		(1 << 1)  
-> > > 
-> > > Reuse of enum netdev_xsk_flags is not an option?  
-> > 
-> > It is an option, but probably better to keep them separate? Netlink is
-> > for observability, and here have a tighter control over the defines and
-> > UAPI (and the don't have to map 1:1 as in the case of
-> > XDP_TX_METADATA_CHECKSUM_SW, for example).
-> 
-> The duplication is rather apparent, and they are flags so compiler
-> can't help us catch misuses of one set vs the other.
-> 
-> If you prefer to keep the separate defines - I'd rename them to tie 
-> them to the field more strongly. Specifically they should have the
-> word "flags" in them?
-> 
-> XDP_TXMD_FLAGS_TIMESTAMP
-> XDP_TXMD_FLAGS_CHECKSUM
-> 
-> maybe?
+kernel test robot noticed the following build warnings:
 
-Sg, will rename.
+[auto build test WARNING on tnguy-next-queue/dev-queue]
 
-> > > > +/* Force checksum calculation in software. Can be used for testing or
-> > > > + * working around potential HW issues. This option causes performance
-> > > > + * degradation and only works in XDP_COPY mode.
-> > > > + */
-> > > > +#define XDP_TX_METADATA_CHECKSUM_SW		(1 << 2)  
-> > > 
-> > > Is there a need for this to be on packet-by-packet basis?
-> > > HW issues should generally be fixed by the driver, is there 
-> > > any type of problem in particular you have in mind here?  
-> > 
-> > No, not really, do you think it makes sense to move it to a setsockopt
-> > or something? We'd still have to check it on a per-packet case
-> > though (from xsk_sock), so not sure it is strictly better?
-> 
-> Setsockopt or just ethtool -K $ifc tx off ? And check device features?
-> Maybe I'm overly sensitive but descriptor bits are usually super
-> precious :)
+url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/i40e-Move-i40e_is_aq_api_ver_ge-helper/20231024-003221
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
+patch link:    https://lore.kernel.org/r/20231023162928.245583-3-ivecera%40redhat.com
+patch subject: [PATCH iwl-next 2/3] i40e: Add other helpers to check version of running firmware and AQ API
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20231024/202310240231.6eF5YKB4-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231024/202310240231.6eF5YKB4-lkp@intel.com/reproduce)
 
-Good point on the descriptor bits. Let me try to move to a setsockopt.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310240231.6eF5YKB4-lkp@intel.com/
 
-> > Regarding HW issues: I don't have a good problem in mind, but I
-> > think having a SW path is useful. It least it was useful for me
-> > during developing (to compare the checksum) and I hope it will be
-> > useful for other people as well (mostly as well during development).
-> > Because the API is still a bit complicated and requires getting
-> > pseudo header csum right. Plus the fact that csum_offset is an
-> > offset from csum_start was not super intuitive to me.
-> 
-> Okay, I'm not strongly opposed, I just wanted to flag it.
-> If nobody else feels the same way, and you like the separate bit - 
-> perfectly fine by me.
-> 
-> > > > +			meta = buffer - xs->pool->tx_metadata_len;
-> > > > +
-> > > > +			if (meta->flags & XDP_TX_METADATA_CHECKSUM) {  
-> > > 
-> > > Do we need to worry about reserved / unsupported meta->flags ?  
-> > 
-> > I don't think so, probably not worth the cycles to check for the
-> > unsupported bits? Or do you think it makes sense to clearly return
-> > an error here and this extra check won't actually affect anything?
-> 
-> Hm, it is uAPI, isn't it? We try to validate anything kernel gets these
-> days, why would the flags be different? Shouldn't be more than 2 cycles.
+All warnings (new ones prefixed by >>):
 
-Yeah, agreed, worst case we can have some static_branch to disable it.
-But fair point that unlikely we'll see it cause any issues.
+   In file included from drivers/net/ethernet/intel/i40e/i40e_dcb.h:7,
+                    from drivers/net/ethernet/intel/i40e/i40e.h:15,
+                    from drivers/net/ethernet/intel/i40e/i40e_main.c:13:
+>> drivers/net/ethernet/intel/i40e/i40e_type.h:632:1: warning: 'inline' is not at beginning of declaration [-Wold-style-declaration]
+     632 | static bool inline i40e_is_fw_ver_ge(struct i40e_hw *hw, u16 maj, u16 min)
+         | ^~~~~~
+   drivers/net/ethernet/intel/i40e/i40e_type.h:646:1: warning: 'inline' is not at beginning of declaration [-Wold-style-declaration]
+     646 | static bool inline i40e_is_fw_ver_lt(struct i40e_hw *hw, u16 maj, u16 min)
+         | ^~~~~~
+   drivers/net/ethernet/intel/i40e/i40e_type.h:659:1: warning: 'inline' is not at beginning of declaration [-Wold-style-declaration]
+     659 | static bool inline i40e_is_fw_ver_eq(struct i40e_hw *hw, u16 maj, u16 min)
+         | ^~~~~~
+--
+   In file included from drivers/net/ethernet/intel/i40e/i40e_dcb.h:7,
+                    from drivers/net/ethernet/intel/i40e/i40e.h:15,
+                    from drivers/net/ethernet/intel/i40e/i40e_ptp.c:6:
+>> drivers/net/ethernet/intel/i40e/i40e_type.h:632:1: warning: 'inline' is not at beginning of declaration [-Wold-style-declaration]
+     632 | static bool inline i40e_is_fw_ver_ge(struct i40e_hw *hw, u16 maj, u16 min)
+         | ^~~~~~
+   drivers/net/ethernet/intel/i40e/i40e_type.h:646:1: warning: 'inline' is not at beginning of declaration [-Wold-style-declaration]
+     646 | static bool inline i40e_is_fw_ver_lt(struct i40e_hw *hw, u16 maj, u16 min)
+         | ^~~~~~
+   drivers/net/ethernet/intel/i40e/i40e_type.h:659:1: warning: 'inline' is not at beginning of declaration [-Wold-style-declaration]
+     659 | static bool inline i40e_is_fw_ver_eq(struct i40e_hw *hw, u16 maj, u16 min)
+         | ^~~~~~
+   drivers/net/ethernet/intel/i40e/i40e_ptp.c: In function 'i40e_ptp_init':
+   drivers/net/ethernet/intel/i40e/i40e_ptp.c:1353:27: warning: '%s' directive output may be truncated writing up to 287 bytes into a region of size 64 [-Wformat-truncation=]
+    1353 |                          "%s", sdp_desc[i].name);
+         |                           ^~
+   In function 'i40e_init_pin_config',
+       inlined from 'i40e_ptp_create_clock' at drivers/net/ethernet/intel/i40e/i40e_ptp.c:1392:13,
+       inlined from 'i40e_ptp_init' at drivers/net/ethernet/intel/i40e/i40e_ptp.c:1497:8:
+   drivers/net/ethernet/intel/i40e/i40e_ptp.c:1351:17: note: 'snprintf' output between 1 and 288 bytes into a destination of size 64
+    1351 |                 snprintf(pf->ptp_caps.pin_config[i].name,
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    1352 |                          sizeof(pf->ptp_caps.pin_config[i].name),
+         |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    1353 |                          "%s", sdp_desc[i].name);
+         |                          ~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/inline +632 drivers/net/ethernet/intel/i40e/i40e_type.h
+
+   623	
+   624	/**
+   625	 * i40e_is_fw_ver_ge
+   626	 * @hw: pointer to i40e_hw structure
+   627	 * @maj: API major value to compare
+   628	 * @min: API minor value to compare
+   629	 *
+   630	 * Assert whether current firmware version is greater/equal than provided.
+   631	 **/
+ > 632	static bool inline i40e_is_fw_ver_ge(struct i40e_hw *hw, u16 maj, u16 min)
+   633	{
+   634	        return (hw->aq.fw_maj_ver > maj ||
+   635	                (hw->aq.fw_maj_ver == maj && hw->aq.fw_min_ver >= min));
+   636	}
+   637	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
