@@ -1,590 +1,153 @@
-Return-Path: <netdev+bounces-43627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADBF27D403D
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 21:24:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DBC27D404B
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 21:32:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A0B2B20FD4
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:24:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 872B8B20C3F
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F07822EFD;
-	Mon, 23 Oct 2023 19:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B466224D4;
+	Mon, 23 Oct 2023 19:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="Qc4F4ug5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L7IJx3nJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC7622EF4
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 19:24:00 +0000 (UTC)
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B82E1BF1
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:23:13 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40837ebba42so27047335e9.0
-        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:23:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29511CF86
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 19:32:09 +0000 (UTC)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04524B4;
+	Mon, 23 Oct 2023 12:32:08 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-507a62d4788so5846458e87.0;
+        Mon, 23 Oct 2023 12:32:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1698088991; x=1698693791; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i1qaHrqVtSrGJTiCvr5M49PYhV5KV1LtHFCXx9SrGjo=;
-        b=Qc4F4ug5aOALnNHY0R4+D88qlJKoO+1eQLIqDWRDSgj4KusHg3JwnhP8M0HKCjk3hA
-         A0/BdI+bDAS7NnUX2vlGecksf9jD4xFPdE4h/WEar0zbC+jm/jPlRWJK1/hN0bC8hkHJ
-         OtuyfIyAwqDoqHhjzNePyq34ba9ie+N0IjRvIi4Uvcdms7+v9hR2bMFO+xamvbfImxkK
-         PUF+n5CEF3l9pZ8Dlbp9v+8PNICnT3S7J3WZhYrhWWuPVUD5LEQK+4/VFJSPsvwBQuxM
-         kaUANYbemuShKsFDYxnA7cuqR7segSao77qFLfsi41ORP6KFe+uwci8X5CLJA7G5GD4T
-         nbeA==
+        d=gmail.com; s=20230601; t=1698089526; x=1698694326; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uMutMjT7nYAjXNIUZq+zZiowd+ZGH08x+rX8MMHC5Do=;
+        b=L7IJx3nJDXaBS9OwhZDPd8Fjmh/v//oy0nkhxr1RwN07N2wXg28tU1L0pW1J2LfwwH
+         M6E2g+DWEqhKo/rODzIDDqkADdJTI1wAI8L6g/f6b2TF4wv/HSUtzPURyTMY8RfTVreb
+         b7/Uvn60sj9aWE9xUZXtj6qlNhSuqMWeXHOkB/2OzxVu0Z6hs8BYsNs/tdo96E/2J2nX
+         OA4AbuWhN/p2O9VDAR57T3jn2TVpJhVXZyMLXU5S8uqwOTajf4ig6eYnnt97e0wU3U0m
+         sSR3tfruDXM+DCwaox3pL7lmKZHH/F+RVwO/MY+m2+qD+nLbK5HxpVC3SI8B55EXgtPU
+         wCWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698088991; x=1698693791;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i1qaHrqVtSrGJTiCvr5M49PYhV5KV1LtHFCXx9SrGjo=;
-        b=TmH2gj8MfSe7FBgB8e9n4gGfydgDiU6nuxwPJ/ORKFZM8mGMkAa/X63LAg3X7/NW31
-         /k1s2NS+pRf6i2QFsjMIUvFP/cDMVOZ0rEeaKPHnwiKjt1qbtDpaH2tycQhQ+jCcAYjC
-         +l1DCHRxkij6Zt19LnN2k8yRwDYp82yt1erp7lVQ4BieJeFXaNdGXzHMQipD9YV+jlRI
-         do25RZN+I2PvhPMcGx5lcUrcvTZkZzdZ/ArtG6utGohcs+A9ZDa7GQwoYKPHwc4+qXzf
-         2d7zMOsYi9RV+X/7/Wdi8MxMwcY9JyyFc96e6OhQ5mzNMo/ZxeTLhBb8ztReauxacJ5a
-         aDEQ==
-X-Gm-Message-State: AOJu0Yw9hIw4ZMGNF4usqJtxlKnN9ccsb4bDBfDt3Uh9yjqyGKF+se30
-	/81vXqKETRcGe8MgU72XzxoR/Q==
-X-Google-Smtp-Source: AGHT+IHJ9kw22dSxzc0duSh1WF7OuQTj083KxoKCUWlr4caee3fNbGZ1tCS+P2KFDFmgRjTMr7di8w==
-X-Received: by 2002:a05:600c:4c16:b0:401:d947:c8a9 with SMTP id d22-20020a05600c4c1600b00401d947c8a9mr8249626wmp.19.1698088991118;
-        Mon, 23 Oct 2023 12:23:11 -0700 (PDT)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id ay20-20020a05600c1e1400b00407460234f9sm10142088wmb.21.2023.10.23.12.23.09
+        d=1e100.net; s=20230601; t=1698089526; x=1698694326;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uMutMjT7nYAjXNIUZq+zZiowd+ZGH08x+rX8MMHC5Do=;
+        b=GB5V3V2Rt33i4eeXfu1KMFz/OPEWAcHVSSqKYeIYdwswBeNn6VSVvdE1J4q1S0fwvc
+         +SeszSGePEz56h76I0LvjH3jVLC5hTlmCQnI83gJOiRRBPdiDlcLIeuXmjaLFFjkeakr
+         LWYYy6J5wg3fYIN+h+48W3LoIg8TPGl6aMWVTjOghqeugrPPWFUllVqHJ4xezAviMI4M
+         ChI+w3lMM01U1tWg1/ihkx8805JcdTjaKGumwU9xbVZZ3e8Rxo04oupZgQ5rEMrm6nS7
+         p+2NwudmFXglkq7uRg6a9ZSo0hg1sssPU9t9CiE7bemXoZR/qB/yhj+1FEKC8PIhNX8w
+         xmGg==
+X-Gm-Message-State: AOJu0Yyc/8bH/7pXMm1a1QAjOmiCuqQPjUm05VYYpu/xVKwc4WSf3F12
+	TUjkcr9ueYkDVwZBWh2OdXI=
+X-Google-Smtp-Source: AGHT+IFwnCY/MaXxAJu+nrAFt1YbkaNoJzJUTr4aQ3gUDKk7pMFRaww+Lg0nqyZo1jn38ogXUz28HQ==
+X-Received: by 2002:a05:6512:1396:b0:507:9615:b918 with SMTP id fc22-20020a056512139600b005079615b918mr8200716lfb.52.1698089525700;
+        Mon, 23 Oct 2023 12:32:05 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id n15-20020aa7c68f000000b0053eb9af1e15sm6711383edq.77.2023.10.23.12.32.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 12:23:10 -0700 (PDT)
-From: Dmitry Safonov <dima@arista.com>
-To: David Ahern <dsahern@kernel.org>,
+        Mon, 23 Oct 2023 12:32:05 -0700 (PDT)
+Date: Mon, 23 Oct 2023 22:32:03 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pavel Machek <pavel@ucw.cz>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org,
-	Dmitry Safonov <dima@arista.com>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Bob Gilligan <gilligan@arista.com>,
-	Dan Carpenter <error27@gmail.com>,
-	David Laight <David.Laight@aculab.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Donald Cassidy <dcassidy@redhat.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Eric W. Biederman" <ebiederm@xmission.com>,
-	Francesco Ruggeri <fruggeri05@gmail.com>,
-	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Ivan Delalande <colona@arista.com>,
-	Leonard Crestez <cdleonard@gmail.com>,
-	"Nassiri, Mohammad" <mnassiri@ciena.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	Simon Horman <horms@kernel.org>,
-	"Tetreault, Francois" <ftetreau@ciena.com>,
-	netdev@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v16 net-next 23/23] Documentation/tcp: Add TCP-AO documentation
-Date: Mon, 23 Oct 2023 20:22:15 +0100
-Message-ID: <20231023192217.426455-24-dima@arista.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231023192217.426455-1-dima@arista.com>
-References: <20231023192217.426455-1-dima@arista.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"open list:ARM/Mediatek SoC support" <linux-kernel@vger.kernel.org>,
+	"moderated list:ARM/Mediatek SoC support" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH net-next v2 1/2] net: dsa: Use conduit and user terms
+Message-ID: <20231023193203.5mfflqi2zbtkepx2@skbuf>
+References: <20231011222026.4181654-1-florian.fainelli@broadcom.com>
+ <20231011222026.4181654-2-florian.fainelli@broadcom.com>
+ <ZTYc6l2ZpLeGRFj9@duo.ucw.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZTYc6l2ZpLeGRFj9@duo.ucw.cz>
 
-It has Frequently Asked Questions (FAQ) on RFC 5925 - I found it very
-useful answering those before writing the actual code. It provides answers
-to common questions that arise on a quick read of the RFC, as well as how
-they were answered. There's also comparison to TCP-MD5 option,
-evaluation of per-socket vs in-kernel-DB approaches and description of
-uAPI provided.
+Hi Pavel,
 
-Hopefully, it will be as useful for reviewing the code as it was for writing.
+On Mon, Oct 23, 2023 at 09:12:42AM +0200, Pavel Machek wrote:
+> On Wed 2023-10-11 15:20:25, Florian Fainelli wrote:
+> > Use more inclusive terms throughout the DSA subsystem by moving away
+> > from "master" which is replaced by "conduit" and "slave" which is
+> > replaced by "user". No functional changes.
+> 
+> Note that by making it more "inclusive" you make it incomprehensible
+> for users where english is not their first language.
 
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: linux-doc@vger.kernel.org
-Signed-off-by: Dmitry Safonov <dima@arista.com>
-Acked-by: David Ahern <dsahern@kernel.org>
----
- Documentation/networking/index.rst  |   1 +
- Documentation/networking/tcp_ao.rst | 444 ++++++++++++++++++++++++++++
- 2 files changed, 445 insertions(+)
- create mode 100644 Documentation/networking/tcp_ao.rst
+I will preface by saying that I am quite indifferent to the whole inclusivity
+movement, with a personal tendency of considering it silly and superficial,
+and frankly a waste of time and resources. But I get that to some it may
+matter more than to me. And it's not my time that gets wasted..
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 2ffc5ad10295..683eb42309cc 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -106,6 +106,7 @@ Contents:
-    sysfs-tagging
-    tc-actions-env-rules
-    tc-queue-filters
-+   tcp_ao
-    tcp-thin
-    team
-    timestamping
-diff --git a/Documentation/networking/tcp_ao.rst b/Documentation/networking/tcp_ao.rst
-new file mode 100644
-index 000000000000..cfa5bf1cc542
---- /dev/null
-+++ b/Documentation/networking/tcp_ao.rst
-@@ -0,0 +1,444 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+========================================================
-+TCP Authentication Option Linux implementation (RFC5925)
-+========================================================
-+
-+TCP Authentication Option (TCP-AO) provides a TCP extension aimed at verifying
-+segments between trusted peers. It adds a new TCP header option with
-+a Message Authentication Code (MAC). MACs are produced from the content
-+of a TCP segment using a hashing function with a password known to both peers.
-+The intent of TCP-AO is to deprecate TCP-MD5 providing better security,
-+key rotation and support for variety of hashing algorithms.
-+
-+1. Introduction
-+===============
-+
-+.. table:: Short and Limited Comparison of TCP-AO and TCP-MD5
-+
-+ +----------------------+------------------------+-----------------------+
-+ |                      |       TCP-MD5          |         TCP-AO        |
-+ +======================+========================+=======================+
-+ |Supported hashing     |MD5                     |Must support HMAC-SHA1 |
-+ |algorithms            |(cryptographically weak)|(chosen-prefix attacks)|
-+ |                      |                        |and CMAC-AES-128 (only |
-+ |                      |                        |side-channel attacks). |
-+ |                      |                        |May support any hashing|
-+ |                      |                        |algorithm.             |
-+ +----------------------+------------------------+-----------------------+
-+ |Length of MACs (bytes)|16                      |Typically 12-16.       |
-+ |                      |                        |Other variants that fit|
-+ |                      |                        |TCP header permitted.  |
-+ +----------------------+------------------------+-----------------------+
-+ |Number of keys per    |1                       |Many                   |
-+ |TCP connection        |                        |                       |
-+ +----------------------+------------------------+-----------------------+
-+ |Possibility to change |Non-practical (both     |Supported by protocol  |
-+ |an active key         |peers have to change    |                       |
-+ |                      |them during MSL)        |                       |
-+ +----------------------+------------------------+-----------------------+
-+ |Protection against    |No                      |Yes: ignoring them     |
-+ |ICMP 'hard errors'    |                        |by default on          |
-+ |                      |                        |established connections|
-+ +----------------------+------------------------+-----------------------+
-+ |Protection against    |No                      |Yes: pseudo-header     |
-+ |traffic-crossing      |                        |includes TCP ports.    |
-+ |attack                |                        |                       |
-+ +----------------------+------------------------+-----------------------+
-+ |Protection against    |No                      |Sequence Number        |
-+ |replayed TCP segments |                        |Extension (SNE) and    |
-+ |                      |                        |Initial Sequence       |
-+ |                      |                        |Numbers (ISNs)         |
-+ +----------------------+------------------------+-----------------------+
-+ |Supports              |Yes                     |No. ISNs+SNE are needed|
-+ |Connectionless Resets |                        |to correctly sign RST. |
-+ +----------------------+------------------------+-----------------------+
-+ |Standards             |RFC 2385                |RFC 5925, RFC 5926     |
-+ +----------------------+------------------------+-----------------------+
-+
-+
-+1.1 Frequently Asked Questions (FAQ) with references to RFC 5925
-+----------------------------------------------------------------
-+
-+Q: Can either SendID or RecvID be non-unique for the same 4-tuple
-+(srcaddr, srcport, dstaddr, dstport)?
-+
-+A: No [3.1]::
-+
-+   >> The IDs of MKTs MUST NOT overlap where their TCP connection
-+   identifiers overlap.
-+
-+Q: Can Master Key Tuple (MKT) for an active connection be removed?
-+
-+A: No, unless it's copied to Transport Control Block (TCB) [3.1]::
-+
-+   It is presumed that an MKT affecting a particular connection cannot
-+   be destroyed during an active connection -- or, equivalently, that
-+   its parameters are copied to an area local to the connection (i.e.,
-+   instantiated) and so changes would affect only new connections.
-+
-+Q: If an old MKT needs to be deleted, how should it be done in order
-+to not remove it for an active connection? (As it can be still in use
-+at any moment later)
-+
-+A: Not specified by RFC 5925, seems to be a problem for key management
-+to ensure that no one uses such MKT before trying to remove it.
-+
-+Q: Can an old MKT exist forever and be used by another peer?
-+
-+A: It can, it's a key management task to decide when to remove an old key [6.1]::
-+
-+   Deciding when to start using a key is a performance issue. Deciding
-+   when to remove an MKT is a security issue. Invalid MKTs are expected
-+   to be removed. TCP-AO provides no mechanism to coordinate their removal,
-+   as we consider this a key management operation.
-+
-+also [6.1]::
-+
-+   The only way to avoid reuse of previously used MKTs is to remove the MKT
-+   when it is no longer considered permitted.
-+
-+Linux TCP-AO will try its best to prevent you from removing a key that's
-+being used, considering it a key management failure. But sine keeping
-+an outdated key may become a security issue and as a peer may
-+unintentionally prevent the removal of an old key by always setting
-+it as RNextKeyID - a forced key removal mechanism is provided, where
-+userspace has to supply KeyID to use instead of the one that's being removed
-+and the kernel will atomically delete the old key, even if the peer is
-+still requesting it. There are no guarantees for force-delete as the peer
-+may yet not have the new key - the TCP connection may just break.
-+Alternatively, one may choose to shut down the socket.
-+
-+Q: What happens when a packet is received on a new connection with no known
-+MKT's RecvID?
-+
-+A: RFC 5925 specifies that by default it is accepted with a warning logged, but
-+the behaviour can be configured by the user [7.5.1.a]::
-+
-+   If the segment is a SYN, then this is the first segment of a new
-+   connection. Find the matching MKT for this segment, using the segment's
-+   socket pair and its TCP-AO KeyID, matched against the MKT's TCP connection
-+   identifier and the MKT's RecvID.
-+
-+      i. If there is no matching MKT, remove TCP-AO from the segment.
-+         Proceed with further TCP handling of the segment.
-+         NOTE: this presumes that connections that do not match any MKT
-+         should be silently accepted, as noted in Section 7.3.
-+
-+[7.3]::
-+
-+   >> A TCP-AO implementation MUST allow for configuration of the behavior
-+   of segments with TCP-AO but that do not match an MKT. The initial default
-+   of this configuration SHOULD be to silently accept such connections.
-+   If this is not the desired case, an MKT can be included to match such
-+   connections, or the connection can indicate that TCP-AO is required.
-+   Alternately, the configuration can be changed to discard segments with
-+   the AO option not matching an MKT.
-+
-+[10.2.b]::
-+
-+   Connections not matching any MKT do not require TCP-AO. Further, incoming
-+   segments with TCP-AO are not discarded solely because they include
-+   the option, provided they do not match any MKT.
-+
-+Note that Linux TCP-AO implementation differs in this aspect. Currently, TCP-AO
-+segments with unknown key signatures are discarded with warnings logged.
-+
-+Q: Does the RFC imply centralized kernel key management in any way?
-+(i.e. that a key on all connections MUST be rotated at the same time?)
-+
-+A: Not specified. MKTs can be managed in userspace, the only relevant part to
-+key changes is [7.3]::
-+
-+   >> All TCP segments MUST be checked against the set of MKTs for matching
-+   TCP connection identifiers.
-+
-+Q: What happens when RNextKeyID requested by a peer is unknown? Should
-+the connection be reset?
-+
-+A: It should not, no action needs to be performed [7.5.2.e]::
-+
-+   ii. If they differ, determine whether the RNextKeyID MKT is ready.
-+
-+       1. If the MKT corresponding to the segment’s socket pair and RNextKeyID
-+       is not available, no action is required (RNextKeyID of a received
-+       segment needs to match the MKT’s SendID).
-+
-+Q: How current_key is set and when does it change? It is a user-triggered
-+change, or is it by a request from the remote peer? Is it set by the user
-+explicitly, or by a matching rule?
-+
-+A: current_key is set by RNextKeyID [6.1]::
-+
-+   Rnext_key is changed only by manual user intervention or MKT management
-+   protocol operation. It is not manipulated by TCP-AO. Current_key is updated
-+   by TCP-AO when processing received TCP segments as discussed in the segment
-+   processing description in Section 7.5. Note that the algorithm allows
-+   the current_key to change to a new MKT, then change back to a previously
-+   used MKT (known as "backing up"). This can occur during an MKT change when
-+   segments are received out of order, and is considered a feature of TCP-AO,
-+   because reordering does not result in drops.
-+
-+[7.5.2.e.ii]::
-+
-+   2. If the matching MKT corresponding to the segment’s socket pair and
-+   RNextKeyID is available:
-+
-+      a. Set current_key to the RNextKeyID MKT.
-+
-+Q: If both peers have multiple MKTs matching the connection's socket pair
-+(with different KeyIDs), how should the sender/receiver pick KeyID to use?
-+
-+A: Some mechanism should pick the "desired" MKT [3.3]::
-+
-+   Multiple MKTs may match a single outgoing segment, e.g., when MKTs
-+   are being changed. Those MKTs cannot have conflicting IDs (as noted
-+   elsewhere), and some mechanism must determine which MKT to use for each
-+   given outgoing segment.
-+
-+   >> An outgoing TCP segment MUST match at most one desired MKT, indicated
-+   by the segment’s socket pair. The segment MAY match multiple MKTs, provided
-+   that exactly one MKT is indicated as desired. Other information in
-+   the segment MAY be used to determine the desired MKT when multiple MKTs
-+   match; such information MUST NOT include values in any TCP option fields.
-+
-+Q: Can TCP-MD5 connection migrate to TCP-AO (and vice-versa):
-+
-+A: No [1]::
-+
-+   TCP MD5-protected connections cannot be migrated to TCP-AO because TCP MD5
-+   does not support any changes to a connection’s security algorithm
-+   once established.
-+
-+Q: If all MKTs are removed on a connection, can it become a non-TCP-AO signed
-+connection?
-+
-+A: [7.5.2] doesn't have the same choice as SYN packet handling in [7.5.1.i]
-+that would allow accepting segments without a sign (which would be insecure).
-+While switching to non-TCP-AO connection is not prohibited directly, it seems
-+what the RFC means. Also, there's a requirement for TCP-AO connections to
-+always have one current_key [3.3]::
-+
-+   TCP-AO requires that every protected TCP segment match exactly one MKT.
-+
-+[3.3]::
-+
-+   >> An incoming TCP segment including TCP-AO MUST match exactly one MKT,
-+   indicated solely by the segment’s socket pair and its TCP-AO KeyID.
-+
-+[4.4]::
-+
-+   One or more MKTs. These are the MKTs that match this connection’s
-+   socket pair.
-+
-+Q: Can a non-TCP-AO connection become a TCP-AO-enabled one?
-+
-+A: No: for already established non-TCP-AO connection it would be impossible
-+to switch using TCP-AO as the traffic key generation requires the initial
-+sequence numbers. Paraphrasing, starting using TCP-AO would require
-+re-establishing the TCP connection.
-+
-+2. In-kernel MKTs database vs database in userspace
-+===================================================
-+
-+Linux TCP-AO support is implemented using ``setsockopt()s``, in a similar way
-+to TCP-MD5. It means that a userspace application that wants to use TCP-AO
-+should perform ``setsockopt()`` on a TCP socket when it wants to add,
-+remove or rotate MKTs. This approach moves the key management responsibility
-+to userspace as well as decisions on corner cases, i.e. what to do if
-+the peer doesn't respect RNextKeyID; moving more code to userspace, especially
-+responsible for the policy decisions. Besides, it's flexible and scales well
-+(with less locking needed than in the case of an in-kernel database). One also
-+should keep in mind that mainly intended users are BGP processes, not any
-+random applications, which means that compared to IPsec tunnels,
-+no transparency is really needed and modern BGP daemons already have
-+``setsockopt()s`` for TCP-MD5 support.
-+
-+.. table:: Considered pros and cons of the approaches
-+
-+ +----------------------+------------------------+-----------------------+
-+ |                      |    ``setsockopt()``    |      in-kernel DB     |
-+ +======================+========================+=======================+
-+ | Extendability        | ``setsockopt()``       | Netlink messages are  |
-+ |                      | commands should be     | simple and extendable |
-+ |                      | extendable syscalls    |                       |
-+ +----------------------+------------------------+-----------------------+
-+ | Required userspace   | BGP or any application | could be transparent  |
-+ | changes              | that wants TCP-AO needs| as tunnels, providing |
-+ |                      | to perform             | something like        |
-+ |                      | ``setsockopt()s``      | ``ip tcpao add key``  |
-+ |                      | and do key management  | (delete/show/rotate)  |
-+ +----------------------+------------------------+-----------------------+
-+ |MKTs removal or adding| harder for userspace   | harder for kernel     |
-+ +----------------------+------------------------+-----------------------+
-+ | Dump-ability         | ``getsockopt()``       | Netlink .dump()       |
-+ |                      |                        | callback              |
-+ +----------------------+------------------------+-----------------------+
-+ | Limits on kernel     |                      equal                     |
-+ | resources/memory     |                                                |
-+ +----------------------+------------------------+-----------------------+
-+ | Scalability          | contention on          | contention on         |
-+ |                      | ``TCP_LISTEN`` sockets | the whole database    |
-+ +----------------------+------------------------+-----------------------+
-+ | Monitoring & warnings| ``TCP_DIAG``           | same Netlink socket   |
-+ +----------------------+------------------------+-----------------------+
-+ | Matching of MKTs     | half-problem: only     | hard                  |
-+ |                      | listen sockets         |                       |
-+ +----------------------+------------------------+-----------------------+
-+
-+
-+3. uAPI
-+=======
-+
-+Linux provides a set of ``setsockopt()s`` and ``getsockopt()s`` that let
-+userspace manage TCP-AO on a per-socket basis. In order to add/delete MKTs
-+``TCP_AO_ADD_KEY`` and ``TCP_AO_DEL_KEY`` TCP socket options must be used
-+It is not allowed to add a key on an established non-TCP-AO connection
-+as well as to remove the last key from TCP-AO connection.
-+
-+``setsockopt(TCP_AO_DEL_KEY)`` command may specify ``tcp_ao_del::current_key``
-++ ``tcp_ao_del::set_current`` and/or ``tcp_ao_del::rnext``
-++ ``tcp_ao_del::set_rnext`` which makes such delete "forced": it
-+provides userspace a way to delete a key that's being used and atomically set
-+another one instead. This is not intended for normal use and should be used
-+only when the peer ignores RNextKeyID and keeps requesting/using an old key.
-+It provides a way to force-delete a key that's not trusted but may break
-+the TCP-AO connection.
-+
-+The usual/normal key-rotation can be performed with ``setsockopt(TCP_AO_INFO)``.
-+It also provides a uAPI to change per-socket TCP-AO settings, such as
-+ignoring ICMPs, as well as clear per-socket TCP-AO packet counters.
-+The corresponding ``getsockopt(TCP_AO_INFO)`` can be used to get those
-+per-socket TCP-AO settings.
-+
-+Another useful command is ``getsockopt(TCP_AO_GET_KEYS)``. One can use it
-+to list all MKTs on a TCP socket or use a filter to get keys for a specific
-+peer and/or sndid/rcvid, VRF L3 interface or get current_key/rnext_key.
-+
-+To repair TCP-AO connections ``setsockopt(TCP_AO_REPAIR)`` is available,
-+provided that the user previously has checkpointed/dumped the socket with
-+``getsockopt(TCP_AO_REPAIR)``.
-+
-+A tip here for scaled TCP_LISTEN sockets, that may have some thousands TCP-AO
-+keys, is: use filters in ``getsockopt(TCP_AO_GET_KEYS)`` and asynchronous
-+delete with ``setsockopt(TCP_AO_DEL_KEY)``.
-+
-+Linux TCP-AO also provides a bunch of segment counters that can be helpful
-+with troubleshooting/debugging issues. Every MKT has good/bad counters
-+that reflect how many packets passed/failed verification.
-+Each TCP-AO socket has the following counters:
-+- for good segments (properly signed)
-+- for bad segments (failed TCP-AO verification)
-+- for segments with unknown keys
-+- for segments where an AO signature was expected, but wasn't found
-+- for the number of ignored ICMPs
-+
-+TCP-AO per-socket counters are also duplicated with per-netns counters,
-+exposed with SNMP. Those are ``TCPAOGood``, ``TCPAOBad``, ``TCPAOKeyNotFound``,
-+``TCPAORequired`` and ``TCPAODroppedIcmps``.
-+
-+RFC 5925 very permissively specifies how TCP port matching can be done for
-+MKTs::
-+
-+   TCP connection identifier. A TCP socket pair, i.e., a local IP
-+   address, a remote IP address, a TCP local port, and a TCP remote port.
-+   Values can be partially specified using ranges (e.g., 2-30), masks
-+   (e.g., 0xF0), wildcards (e.g., "*"), or any other suitable indication.
-+
-+Currently Linux TCP-AO implementation doesn't provide any TCP port matching.
-+Probably, port ranges are the most flexible for uAPI, but so far
-+not implemented.
-+
-+4. ``setsockopt()`` vs ``accept()`` race
-+========================================
-+
-+In contrast with TCP-MD5 established connection which has just one key,
-+TCP-AO connections may have many keys, which means that accepted connections
-+on a listen socket may have any amount of keys as well. As copying all those
-+keys on a first properly signed SYN would make the request socket bigger, that
-+would be undesirable. Currently, the implementation doesn't copy keys
-+to request sockets, but rather look them up on the "parent" listener socket.
-+
-+The result is that when userspace removes TCP-AO keys, that may break
-+not-yet-established connections on request sockets as well as not removing
-+keys from sockets that were already established, but not yet ``accept()``'ed,
-+hanging in the accept queue.
-+
-+The reverse is valid as well: if userspace adds a new key for a peer on
-+a listener socket, the established sockets in accept queue won't
-+have the new keys.
-+
-+At this moment, the resolution for the two races:
-+``setsockopt(TCP_AO_ADD_KEY)`` vs ``accept()``
-+and ``setsockopt(TCP_AO_DEL_KEY)`` vs ``accept()`` is delegated to userspace.
-+This means that it's expected that userspace would check the MKTs on the socket
-+that was returned by ``accept()`` to verify that any key rotation that
-+happened on listen socket is reflected on the newly established connection.
-+
-+This is a similar "do-nothing" approach to TCP-MD5 from the kernel side and
-+may be changed later by introducing new flags to ``tcp_ao_add``
-+and ``tcp_ao_del``.
-+
-+Note that this race is rare for it needs TCP-AO key rotation to happen
-+during the 3-way handshake for the new TCP connection.
-+
-+5. Interaction with TCP-MD5
-+===========================
-+
-+A TCP connection can not migrate between TCP-AO and TCP-MD5 options. The
-+established sockets that have either AO or MD5 keys are restricted for
-+adding keys of the other option.
-+
-+For listening sockets the picture is different: BGP server may want to receive
-+both TCP-AO and (deprecated) TCP-MD5 clients. As a result, both types of keys
-+may be added to TCP_CLOSED or TCP_LISTEN sockets. It's not allowed to add
-+different types of keys for the same peer.
-+
-+6. SNE Linux implementation
-+===========================
-+
-+RFC 5925 [6.2] describes the algorithm of how to extend TCP sequence numbers
-+with SNE.  In short: TCP has to track the previous sequence numbers and set
-+sne_flag when the current SEQ number rolls over. The flag is cleared when
-+both current and previous SEQ numbers cross 0x7fff, which is 32Kb.
-+
-+In times when sne_flag is set, the algorithm compares SEQ for each packet with
-+0x7fff and if it's higher than 32Kb, it assumes that the packet should be
-+verified with SNE before the increment. As a result, there's
-+this [0; 32Kb] window, when packets with (SNE - 1) can be accepted.
-+
-+Linux implementation simplifies this a bit: as the network stack already tracks
-+the first SEQ byte that ACK is wanted for (snd_una) and the next SEQ byte that
-+is wanted (rcv_nxt) - that's enough information for a rough estimation
-+on where in the 4GB SEQ number space both sender and receiver are.
-+When they roll over to zero, the corresponding SNE gets incremented.
-+
-+tcp_ao_compute_sne() is called for each TCP-AO segment. It compares SEQ numbers
-+from the segment with snd_una or rcv_nxt and fits the result into a 2GB window around them,
-+detecting SEQ numbers rolling over. That simplifies the code a lot and only
-+requires SNE numbers to be stored on every TCP-AO socket.
-+
-+The 2GB window at first glance seems much more permissive compared to
-+RFC 5926. But that is only used to pick the correct SNE before/after
-+a rollover. It allows more TCP segment replays, but yet all regular
-+TCP checks in tcp_sequence() are applied on the verified segment.
-+So, it trades a bit more permissive acceptance of replayed/retransmitted
-+segments for the simplicity of the algorithm and what seems better behaviour
-+for large TCP windows.
-+
-+7. Links
-+========
-+
-+RFC 5925 The TCP Authentication Option
-+   https://www.rfc-editor.org/rfc/pdfrfc/rfc5925.txt.pdf
-+
-+RFC 5926 Cryptographic Algorithms for the TCP Authentication Option (TCP-AO)
-+   https://www.rfc-editor.org/rfc/pdfrfc/rfc5926.txt.pdf
-+
-+Draft "SHA-2 Algorithm for the TCP Authentication Option (TCP-AO)"
-+   https://datatracker.ietf.org/doc/html/draft-nayak-tcp-sha2-03
-+
-+RFC 2385 Protection of BGP Sessions via the TCP MD5 Signature Option
-+   https://www.rfc-editor.org/rfc/pdfrfc/rfc2385.txt.pdf
-+
-+:Author: Dmitry Safonov <dima@arista.com>
--- 
-2.42.0
+Based on "DSA has become incomprehensible because it replaced master/slave
+with terms I don't know", I think an analogous attitude that's closer to
+home could just as well be: "I'm a complete stranger, but why is eastern
+Europe going through decommunization?! All I knew about eastern Europe
+is that it was communist!"
 
+I believe that in order to make an omelette, you need to break a few eggs,
+and applied here, that seems to mean that A1 level English speakers get
+to learn a word from the A2 vocabulary. I don't see how learning some
+new words in a foreign language could do too much harm for the individual
+going through that process.
+
+> Plus, "user" already means something else in kernel context
+
+If DSA is going to replace master/slave with something else, the
+user/conduit terms have the legitimacy of being documented alternative
+names at least since 2015's commit 77760e94928f ("Documentation:
+networking: add a DSA document") and 2016's commit 83c0afaec7b7 ("net:
+dsa: Add new binding implementation").
+
+It also needs to be said that I never found master/slave to be a perfect
+description of the hierarchy in DSA (but I just didn't care enough to
+change it). If you think about it in terms of netdev adjacency lists for
+example, the slaves are the uppers and the master (host interface) is
+the lower... Or the subordination relationship could also be seen in
+reverse because the user doesn't interact directly with the master/CPU
+conduit interface most of the time, it just gets reconfigured
+automatically, in a way initiated by some other entity, with what's
+necessary to process switch-tagged traffic.
+
+> so this will likely be confusing even for native speakers.
+
+Sidetracking a bit, there was a joke I can't find anymore, so I'll just
+paraphraze it:
+
+"- what do drug dealers and computer engineers have in common?
+ - they both call their customers 'users'".
+
+I think/hope most native speakers got past the confusion at this point,
+and just think of technical terms as words devoid of their original
+meaning (which also makes the master/slave dilemma questionable TBH,
+but what do I know). If there is any doubt, DSA has ample documentation
+which clarifies what a slave (now user) port is. There is also a
+paragraph documenting the naming change from master/slave.
+
+> This is wrong.
+
+Hmm, the topic is a bit arid for me to get too heated about it, but I
+don't think that your arguments justify such a strong conclusion...
+Your premise seems to be that people cannot learn, and can never adapt.
 
