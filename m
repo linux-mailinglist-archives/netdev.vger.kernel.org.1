@@ -1,109 +1,173 @@
-Return-Path: <netdev+bounces-43583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78C637D3F21
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:23:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30ABB7D3F44
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:31:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A06311C20981
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:23:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4381B20E82
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC2E2137B;
-	Mon, 23 Oct 2023 18:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE861A583;
+	Mon, 23 Oct 2023 18:31:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="AUeGajGc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="noRhcJwh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAAF1DA32
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:23:35 +0000 (UTC)
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8BFB99
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:23:34 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-3b2e07e5f3aso2397472b6e.0
-        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:23:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873A5224CA
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:31:23 +0000 (UTC)
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 910E4FD
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:31:21 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c9d4e38f79so25533725ad.2
+        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:31:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1698085414; x=1698690214; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=asV/mzEgZ0QPpPGTkL/tZKxIZbV4pZf1YGZ30QE3Rpg=;
-        b=AUeGajGcM9qqd0H0+u84YQUazg5mZQSwadjvuIsUeKb8yUmWQn/xmc7Whjnxg7YNDv
-         OLaZ6TPBJNlFrf/0GYxZwWVgO5T0PpAe511cRJx3fatgj7qQmk3EUia+c095gQ45z2em
-         vMDGCKr1HdcDOhO1/MNr7TgnyAgQmcx5lk++9UpUsv9WTU7lFHuAmMSELdOYH1mKuUmK
-         8+2hMZya9TPOSjx9FQ7j40yEA05AQH3+EpDf7o/diKFgBqLGXvtWKfiZmZbrZQm1VfEd
-         9Ll36m7GRWwyEoxMMZ6JX++nr0sr5ajAzK/UHI+YFe0obsrym+SMlDg3gXTNDN8pHi2h
-         NQ3A==
+        d=google.com; s=20230601; t=1698085881; x=1698690681; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wPnBqAKtu7qfmlWwJUK17l0J3rYG4g6m8kBJfqHBWcI=;
+        b=noRhcJwhCQfXlnR6nfDGhLsP3UYBi2y7YHr2RGSwCp2duqgu/TN2ecnH1nS4lco7J/
+         /OjqbzZ2DpoEZUSwx5b4QGw2bbD19cBsH8/rBdq0ZxbEOXvXkMSz0Ny+uBDCkbPUWVgo
+         fotd9a9N8BdpoO3Fno7JblFiRbIzTdxFp5CBHxZOQs524v6jtEPfKznXMhBGuklpd5aK
+         348Hbd8fCbf9Wxg4SFpl3+ei52or/r9tntS2EmpeOPisvSnn61mirLtexxTIfpCWCtdR
+         I9vLYKtr7cN9QuHwZ4AW3cPWMn1ZInQPDLDGnPLhba6gJvjGZBWnIECfr7amhNrW/qw3
+         djVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698085414; x=1698690214;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=asV/mzEgZ0QPpPGTkL/tZKxIZbV4pZf1YGZ30QE3Rpg=;
-        b=t9eZPbblm5vqsbP0sx0l5pky2VLj1oU3KYELfYyyzGdMo7VpeNKjzFhOrxKMZTBbn+
-         k1baEVm+Yj2yNgA2wMrT4KrOWFfdY0ivuv8JfCtfpi8HGdhLk/em4EuUMLm0UFPLHY8q
-         bFaNPYgu9xunaDhbQucl0FdZkTX+jTXm405Na5PkuaICifZglgVLFzAzgQ3eFWRhBNdy
-         ymgkBrTt32tBeonqq4h6nSpxTv9W4vaUrWf+FrisBTjOhbjigohopF83G5UFo5+fbb2J
-         K7C5cURCV/B5evd4MOjQpwvnNJhwolUyWwEWQnsfFL65voLDpMqZ92jggkGGNCJ/IT/M
-         IQ3A==
-X-Gm-Message-State: AOJu0YzXNkcHrD+tHSAyp7ocFSgUks9VVAib2ZMr7N2OgSHQP8XfWaXN
-	ZOgJNWbc3VdJydH7EWapYYdghg==
-X-Google-Smtp-Source: AGHT+IEqObC+cIKLIFikGXPFoFK2xQU9I3Zh+K8TuPgknSCWC7VYdDuKHSMhiAnrYCeSVxsNF5l/Cw==
-X-Received: by 2002:a05:6808:1a24:b0:3b0:f8bd:9503 with SMTP id bk36-20020a0568081a2400b003b0f8bd9503mr8622436oib.10.1698085414027;
-        Mon, 23 Oct 2023 11:23:34 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
-        by smtp.gmail.com with ESMTPSA id j9-20020a544809000000b003b2e4b72a75sm1582234oij.52.2023.10.23.11.23.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 11:23:33 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1quzaO-003jRh-QZ;
-	Mon, 23 Oct 2023 15:23:32 -0300
-Date: Mon, 23 Oct 2023 15:23:32 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: sharmaajay@linuxonhyperv.com
-Cc: Long Li <longli@microsoft.com>, Leon Romanovsky <leon@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ajay Sharma <sharmaajay@microsoft.com>
-Subject: Re: [Patch v7 5/5] RDMA/mana_ib: Send event to qp
-Message-ID: <20231023182332.GL691768@ziepe.ca>
-References: <1697494322-26814-1-git-send-email-sharmaajay@linuxonhyperv.com>
- <1697494322-26814-6-git-send-email-sharmaajay@linuxonhyperv.com>
+        d=1e100.net; s=20230601; t=1698085881; x=1698690681;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wPnBqAKtu7qfmlWwJUK17l0J3rYG4g6m8kBJfqHBWcI=;
+        b=JrVjyRq98y5trAfO7VQN/ieDEwOQGlNzYHxWEEz04BzpCV95HcHkd88/RxnS+bGR3O
+         WSxEDgR5QFEV0R8yedIUQkG6iTYR/YjPDlLckJqaWfneA7ddwhrTXMgNpA2fBBNT6KSG
+         T46GUq57ABMzsCaEdCfCpbm9IOg2fE+r6HveVwHc0CVtrGV9hIXs3owkTg7Pd+tPD6Ps
+         hPE1bVfRrvxNloyQ6GCfcJ5rL0MJahVh4an/rsdEjOm1bxlLNuU0qYdZX6jZseSxmu9D
+         iBc/MAYmUuiguuUfYwCk4XHJsypW+Ofvfg8PnjUiI8lakd5lYp3wz9jdwW5TwYtaJmvx
+         3brg==
+X-Gm-Message-State: AOJu0YzNNUENRIGtdrUT5kT6q7RcY+Hi1MJQHkbUlW7TMLAoew0X+mda
+	zORMdN96QgVQ6WLZENeDMIgbjN4=
+X-Google-Smtp-Source: AGHT+IG+XvWazJNWN5c7NNnSVe2lrJdtfauU4L3Qq2lLLg+ikexd9cjwYoiGnk2YQZO9DGNX/ZkD6CQ=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a17:902:968d:b0:1ca:7a4c:834d with SMTP id
+ n13-20020a170902968d00b001ca7a4c834dmr206694plp.13.1698085881006; Mon, 23 Oct
+ 2023 11:31:21 -0700 (PDT)
+Date: Mon, 23 Oct 2023 11:31:19 -0700
+In-Reply-To: <CAJ8uoz0UERM3_yAbNmTV=c5kE1rmKBY2KQ0bRH9gV6de1NRJqA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1697494322-26814-6-git-send-email-sharmaajay@linuxonhyperv.com>
+Mime-Version: 1.0
+References: <20231019174944.3376335-1-sdf@google.com> <20231019174944.3376335-12-sdf@google.com>
+ <CAJ8uoz0UERM3_yAbNmTV=c5kE1rmKBY2KQ0bRH9gV6de1NRJqA@mail.gmail.com>
+Message-ID: <ZTa792UUm6dACdf0@google.com>
+Subject: Re: [PATCH bpf-next v4 11/11] xsk: Document tx_metadata_len layout
+From: Stanislav Fomichev <sdf@google.com>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
+	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
+	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
+	maciej.fijalkowski@intel.com, hawk@kernel.org, yoong.siang.song@intel.com, 
+	netdev@vger.kernel.org, xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="utf-8"
 
-On Mon, Oct 16, 2023 at 03:12:02PM -0700, sharmaajay@linuxonhyperv.com wrote:
+On 10/23, Magnus Karlsson wrote:
+> On Thu, 19 Oct 2023 at 19:50, Stanislav Fomichev <sdf@google.com> wrote:
+> >
+> > - how to use
+> > - how to query features
+> > - pointers to the examples
+> >
+> > Signed-off-by: Stanislav Fomichev <sdf@google.com>
+> > ---
+> >  Documentation/networking/index.rst           |  1 +
+> >  Documentation/networking/xsk-tx-metadata.rst | 77 ++++++++++++++++++++
+> >  2 files changed, 78 insertions(+)
+> >  create mode 100644 Documentation/networking/xsk-tx-metadata.rst
+> >
+> > diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+> > index 2ffc5ad10295..f3c2566d6cad 100644
+> > --- a/Documentation/networking/index.rst
+> > +++ b/Documentation/networking/index.rst
+> > @@ -122,6 +122,7 @@ Refer to :ref:`netdev-FAQ` for a guide on netdev development process specifics.
+> >     xfrm_sync
+> >     xfrm_sysctl
+> >     xdp-rx-metadata
+> > +   xsk-tx-metadata
+> >
+> >  .. only::  subproject and html
+> >
+> > diff --git a/Documentation/networking/xsk-tx-metadata.rst b/Documentation/networking/xsk-tx-metadata.rst
+> > new file mode 100644
+> > index 000000000000..b7289f06745c
+> > --- /dev/null
+> > +++ b/Documentation/networking/xsk-tx-metadata.rst
+> > @@ -0,0 +1,77 @@
+> > +==================
+> > +AF_XDP TX Metadata
+> > +==================
+> > +
+> > +This document describes how to enable offloads when transmitting packets
+> > +via :doc:`af_xdp`. Refer to :doc:`xdp-rx-metadata` on how to access similar
+> > +metadata on the receive side.
+> > +
+> > +General Design
+> > +==============
+> > +
+> > +The headroom for the metadata is reserved via ``tx_metadata_len`` in
+> > +``struct xdp_umem_reg``. The metadata length is therefore the same for
+> > +every socket that shares the same umem. The metadata layout is a fixed UAPI,
+> > +refer to ``union xsk_tx_metadata`` in ``include/uapi/linux/if_xdp.h``.
+> > +Thus, generally, the ``tx_metadata_len`` field above should contain
+> > +``sizeof(union xsk_tx_metadata)``.
+> > +
+> > +The headroom and the metadata itself should be located right before
+> > +``xdp_desc->addr`` in the umem frame. Within a frame, the metadata
+> > +layout is as follows::
+> > +
+> > +           tx_metadata_len
+> > +     /                         \
+> > +    +-----------------+---------+----------------------------+
+> > +    | xsk_tx_metadata | padding |          payload           |
+> > +    +-----------------+---------+----------------------------+
+> > +                                ^
+> > +                                |
+> > +                          xdp_desc->addr
+> > +
+> > +An AF_XDP application can request headrooms larger than ``sizeof(struct
+> > +xsk_tx_metadata)``. The kernel will ignore the padding (and will still
+> > +use ``xdp_desc->addr - tx_metadata_len`` to locate
+> > +the ``xsk_tx_metadata``). For the frames that shouldn't carry
+> > +any metadata (i.e., the ones that don't have ``XDP_TX_METADATA`` option),
+> > +the metadata area is ignored by the kernel as well.
+> > +
+> > +The flags field enables the particular offload:
+> > +
+> > +- ``XDP_TX_METADATA_TIMESTAMP``: requests the device to put transmission
+> > +  timestamp into ``tx_timestamp`` field of ``union xsk_tx_metadata``.
+> > +- ``XDP_TX_METADATA_CHECKSUM``: requests the device to calculate L4
+> > +  checksum. ``csum_start`` specifies byte offset of there the checksumming
+> 
+> nit: of there -> where
+> 
+> > +  should start and ``csum_offset`` specifies byte offset where the
+> > +  device should store the computed checksum.
+> > +- ``XDP_TX_METADATA_CHECKSUM_SW``: requests checksum calculation to
+> > +  be done in software; this mode works only in ``XSK_COPY`` mode and
+> > +  is mostly intended for testing. Do not enable this option, it
+> > +  will negatively affect performance.
+> > +
+> > +Besides the flags above, in order to trigger the offloads, the first
+> > +packet's ``struct xdp_desc`` descriptor should set ``XDP_TX_METADATA``
+> > +bit in the ``options`` field. Also not that in a multi-buffer packet
+> 
+> nit: not -> note
 
-> diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
-> index ef3275ac92a0..19fae28985c3 100644
-> --- a/drivers/infiniband/hw/mana/qp.c
-> +++ b/drivers/infiniband/hw/mana/qp.c
-> @@ -210,6 +210,8 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
->  		wq->id = wq_spec.queue_index;
->  		cq->id = cq_spec.queue_index;
->  
-> +		xa_store(&mib_dev->rq_to_qp_lookup_table, wq->id, qp, GFP_KERNEL);
-> +
-
-A store with no erase?
-
-A load with no locking?
-
-This can't be right
-
-Jason
+Thank you for both, will fix!
 
