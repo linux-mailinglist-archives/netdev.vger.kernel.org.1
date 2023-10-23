@@ -1,303 +1,348 @@
-Return-Path: <netdev+bounces-43647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 083EC7D4132
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 22:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B55CA7D4142
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 22:52:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B221F28175C
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:45:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 424412813EC
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E9D224E4;
-	Mon, 23 Oct 2023 20:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE5C15EA3;
+	Mon, 23 Oct 2023 20:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="htCJgBvM"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pRaLOxwH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702A2219E0;
-	Mon, 23 Oct 2023 20:45:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24521C116B1;
-	Mon, 23 Oct 2023 20:45:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698093935;
-	bh=4n1Y2BDxRyW/MG048kYjDc3InJ3vd1rXw6LB824uI+E=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=htCJgBvMjipaNJj8ae+cOFW6SBQs0V8rcU6TpmBzcYQhNPM6wT/adQnHqNDUXHTE2
-	 xn8FE2yAC2LIRZkFpmPdA0XvSqguPo651BuSgDzmwf2qcQgnEzC7VcMnMtLPCtnSZw
-	 caNB25bXw9y76faty+z4MSxQ0jdqF5ye2oo5UPmMW/ju/W2U5DoXTJAtyWoKXxAZfb
-	 S2OuuTvpsCsZn2wmNChjLWwvQi2gTrFmBhGRc+btT7ofNb2ipma+yT+ddq6hPxO0lu
-	 B81MBlamNNaFsnia9AhWBQRIWrKBpHs4zuWEDn00MT9J4dtJlSphZSc2nOuuVGETMB
-	 RFNwi7qM0qSjA==
-From: Mat Martineau <martineau@kernel.org>
-Date: Mon, 23 Oct 2023 13:44:42 -0700
-Subject: [PATCH net-next 9/9] mptcp: refactor sndbuf auto-tuning
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CB31C288
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 20:52:27 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDAA10C0;
+	Mon, 23 Oct 2023 13:52:25 -0700 (PDT)
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39NKB33Z015542;
+	Mon, 23 Oct 2023 20:52:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=HOe7gnb40EBtnJckQPzahHQRjH+lBJ6KzUFjIpZ9CPs=;
+ b=pRaLOxwHFxlYhubIz0er7jzFkDVILL5mnqQB+8JegW59atEYKlsKfeKBER/yI96Ww4V4
+ dhtdE46Ff1VokaTqJc7n2pnmnWidyqLieKfBykz3fynnzF3/xU8nW8Ky5HFUhplmL8iS
+ Q/Zq5e2HOBsM8ujGE+isoUZfFwct+lgI3rkaEHVFdBoemjZlj5PET/a5yDfEw1JRPVTO
+ mkMwmgLPaXJOy+p3sXOWzlMNJIyh3UR3PcHEXDlhw2wj8qWWZEkkW0hOeV9yjmXat1/B
+ bTnFXhPJL1FkySjn4ueAyDNr5m+Lj3D+IwBU2cTqBmODeS5GMKyxNrSZeHESksVwFUwB WA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3twymts9h1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Oct 2023 20:52:20 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39NKZkTS011065;
+	Mon, 23 Oct 2023 20:52:19 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3twymts9gr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Oct 2023 20:52:19 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39NIL6mE010315;
+	Mon, 23 Oct 2023 20:52:19 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tvsbyb6xx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Oct 2023 20:52:18 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39NKqHY826280696
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 23 Oct 2023 20:52:18 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C87435805A;
+	Mon, 23 Oct 2023 20:52:17 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 535E158051;
+	Mon, 23 Oct 2023 20:52:16 +0000 (GMT)
+Received: from [9.171.5.241] (unknown [9.171.5.241])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 23 Oct 2023 20:52:16 +0000 (GMT)
+Message-ID: <b8b752c6-4d91-4849-8a71-e3f43a827a42@linux.ibm.com>
+Date: Mon, 23 Oct 2023 22:52:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231023-send-net-next-20231023-2-v1-9-9dc60939d371@kernel.org>
-References: <20231023-send-net-next-20231023-2-v1-0-9dc60939d371@kernel.org>
-In-Reply-To: <20231023-send-net-next-20231023-2-v1-0-9dc60939d371@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- Mat Martineau <martineau@kernel.org>
-X-Mailer: b4 0.12.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 5/5] net/smc: put sk reference if close work was
+ canceled
+Content-Language: en-GB
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
+ <1697009600-22367-6-git-send-email-alibuda@linux.alibaba.com>
+ <bdcb307f-d2a8-4aef-bb7d-dd87e56ff740@linux.ibm.com>
+ <ee641ca5-104b-d1ec-5b2a-e20237c5378a@linux.alibaba.com>
+ <ad5e4191-227e-4a62-a110-472618ef7de1@linux.ibm.com>
+ <305c7ae2-a902-3e30-5e67-b590d848d0ba@linux.alibaba.com>
+ <990a6b09-135a-41fb-a375-c37ffec6fe99@linux.ibm.com>
+ <94f89147-cedc-b8b2-415f-942ec14cd670@linux.alibaba.com>
+ <83476aac-a2f6-4705-8aec-762b1f165210@linux.ibm.com>
+ <567c792e-33e0-9ff6-f5c2-0eae356c7eb1@linux.alibaba.com>
+ <ea0dcf7d-8406-476c-b027-145af207873a@linux.ibm.com>
+ <59c0c75f-e9df-2ef1-ead2-7c5c97f3e750@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <59c0c75f-e9df-2ef1-ead2-7c5c97f3e750@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: oWAQEw4dMUa26dahpZIGDVi4jIo6HiN5
+X-Proofpoint-GUID: Jv1WP46DJkhPj05E1BY6ukTygZgS5CCi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-23_20,2023-10-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ mlxlogscore=999 phishscore=0 impostorscore=0 suspectscore=0 spamscore=0
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 priorityscore=1501
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310170001 definitions=main-2310230182
 
-From: Paolo Abeni <pabeni@redhat.com>
 
-The MPTCP protocol account for the data enqueued on all the subflows
-to the main socket send buffer, while the send buffer auto-tuning
-algorithm set the main socket send buffer size as the max size among
-the subflows.
 
-That causes bad performances when at least one subflow is sndbuf
-limited, e.g. due to very high latency, as the MPTCP scheduler can't
-even fill such buffer.
+On 23.10.23 14:18, D. Wythe wrote:
+> 
+> 
+> On 10/23/23 6:28 PM, Wenjia Zhang wrote:
+>>
+>>
+>> On 23.10.23 10:52, D. Wythe wrote:
+>>>
+>>>
+>>> On 10/23/23 4:19 PM, Wenjia Zhang wrote:
+>>>>
+>>>>
+>>>> On 20.10.23 04:41, D. Wythe wrote:
+>>>>>
+>>>>>
+>>>>> On 10/20/23 1:40 AM, Wenjia Zhang wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 19.10.23 09:33, D. Wythe wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 10/19/23 4:26 AM, Wenjia Zhang wrote:
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> On 17.10.23 04:06, D. Wythe wrote:
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> On 10/13/23 3:04 AM, Wenjia Zhang wrote:
+>>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> On 11.10.23 09:33, D. Wythe wrote:
+>>>>>>>>>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>>>>>>>>>>
+>>>>>>>>>>> Note that we always hold a reference to sock when attempting
+>>>>>>>>>>> to submit close_work. 
+>>>>>>>>>> yes
+>>>>>>>>>> Therefore, if we have successfully
+>>>>>>>>>>> canceled close_work from pending, we MUST release that reference
+>>>>>>>>>>> to avoid potential leaks.
+>>>>>>>>>>>
+>>>>>>>>>> Isn't the corresponding reference already released inside the 
+>>>>>>>>>> smc_close_passive_work()?
+>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> Hi Wenjia,
+>>>>>>>>>
+>>>>>>>>> If we successfully cancel the close work from the pending state,
+>>>>>>>>> it means that smc_close_passive_work() has never been executed.
+>>>>>>>>>
+>>>>>>>>> You can find more details here.
+>>>>>>>>>
+>>>>>>>>> /**
+>>>>>>>>> * cancel_work_sync - cancel a work and wait for it to finish
+>>>>>>>>> * @work:the work to cancel
+>>>>>>>>> *
+>>>>>>>>> * Cancel @work and wait for its execution to finish. This function
+>>>>>>>>> * can be used even if the work re-queues itself or migrates to
+>>>>>>>>> * another workqueue. On return from this function, @work is
+>>>>>>>>> * guaranteed to be not pending or executing on any CPU.
+>>>>>>>>> *
+>>>>>>>>> * cancel_work_sync(&delayed_work->work) must not be used for
+>>>>>>>>> * delayed_work's. Use cancel_delayed_work_sync() instead.
+>>>>>>>>> *
+>>>>>>>>> * The caller must ensure that the workqueue on which @work was 
+>>>>>>>>> last
+>>>>>>>>> * queued can't be destroyed before this function returns.
+>>>>>>>>> *
+>>>>>>>>> * Return:
+>>>>>>>>> * %true if @work was pending, %false otherwise.
+>>>>>>>>> */
+>>>>>>>>> boolcancel_work_sync(structwork_struct *work)
+>>>>>>>>> {
+>>>>>>>>> return__cancel_work_timer(work, false);
+>>>>>>>>> }
+>>>>>>>>>
+>>>>>>>>> Best wishes,
+>>>>>>>>> D. Wythe
+>>>>>>>> As I understand, queue_work() would wake up the work if the work 
+>>>>>>>> is not already on the queue. And the sock_hold() is just prio to 
+>>>>>>>> the queue_work(). That means, cancel_work_sync() would cancel 
+>>>>>>>> the work either before its execution or after. If your fix 
+>>>>>>>> refers to the former case, at this moment, I don't think the 
+>>>>>>>> reference can be hold, thus it is unnecessary to put it.
+>>>>>>>>>
+>>>>>>>
+>>>>>>> I am quite confuse about why you think when we cancel the work 
+>>>>>>> before its execution,
+>>>>>>> the reference can not be hold ?
+>>>>>>>
+>>>>>>>
+>>>>>>> Perhaps the following diagram can describe the problem in better 
+>>>>>>> way :
+>>>>>>>
+>>>>>>> smc_close_cancel_work
+>>>>>>> smc_cdc_msg_recv_action
+>>>>>>>
+>>>>>>>
+>>>>>>> sock_hold
+>>>>>>> queue_work
+>>>>>>> if (cancel_work_sync())        // successfully cancel before 
+>>>>>>> execution
+>>>>>>> sock_put()                        //  need to put it since we 
+>>>>>>> already hold a ref before   queue_work()
+>>>>>>>
+>>>>>>>
+>>>>>> ha, I already thought you might ask such question:P
+>>>>>>
+>>>>>> I think here two Problems need to be clarified:
+>>>>>>
+>>>>>> 1) Do you think the bh_lock_sock/bh_unlock_sock in the 
+>>>>>> smc_cdc_msg_recv does not protect the smc_cdc_msg_recv_action() 
+>>>>>> from cancel_work_sync()?
+>>>>>> Maybe that would go back to the discussion in the other patch on 
+>>>>>> the behaviors of the locks.
+>>>>>>
+>>>>>
+>>>>> Yes. bh_lock_sock/bh_unlock_sock can not block code execution 
+>>>>> protected by lock_sock/unlock(). That is to say, they are not 
+>>>>> exclusive.
+>>>>>
+>>>> No, the logic of the inference is very vague to me. My understand is 
+>>>> completely different. That is what I read from the kernel code. They 
+>>>> are not *completely* exclusive, because while the bottom half 
+>>>> context holds the lock i.e. bh_lock_sock, the process context can 
+>>>> not get the lock by lock_sock. (This is actually my main point of my 
+>>>> argument for these fixes, and I didn't see any clarify from you). 
+>>>> However, while the process context holds the lock by lock_sock, the 
+>>>> bottom half context can still get it by bh_lock_sock, this is just 
+>>>> like what you showed in the code in lock_sock. Once it gets the 
+>>>> ownership, it release the spinlock.
+>>>>
+>>>
+>>> “ while the process context holds the lock by lock_sock, the bottom 
+>>> half context can still get it by bh_lock_sock,  ”
+>>>
+>>> You already got that, so why that sock_set_flag(DONE) and 
+>>> sock_set_flag(DEAD) can not happen concurrently ?
+>>>
+>>
+>> Then I'd ask how do you understand this sentence I wrote? "while the 
+>> bottom half context holds the lock i.e. bh_lock_sock, the process 
+>> context can not get the lock by lock_sock."
+>>>
+> 
+> That's also true.  I have no questions on it.  They are asymmetrical.
+> 
+> But we cannot guarantee that the interrupt context always holds the lock 
+> before the process context, that's why i think
+> that sock_set_flag(DONE) and sock_set_flag(DEAD) can run concurrently.
+> 
+ok, I have to agree with that. I did too much focus on this case :(
+So I think the approach of the 1st patch is also appropriate. Thank you 
+for taking time to let me out!
 
-Change the send-buffer auto-tuning algorithm to compute the main socket
-send buffer size as the sum of all the subflows buffer size.
+>>>>> We can use a very simple example to infer that since bh_lock_sock 
+>>>>> is type of spin-lock, if bh_lock_sock/bh_unlock_sock can block 
+>>>>> lock_sock/unlock(),
+>>>>> then lock_sock/unlock() can also block bh_lock_sock/bh_unlock_sock.
+>>>>>
+>>>>> If this is true, when the process context already lock_sock(), the 
+>>>>> interrupt context must wait for the process to call
+>>>>> release_sock(). Obviously, this is very unreasonable.
+>>>>>
+>>>>>
+>>>>>> 2) If the queue_work returns true, as I said in the last main, the 
+>>>>>> work should be (being) executed. How could the cancel_work_sync() 
+>>>>>> cancel the work before execution successgully?
+>>>>>
+>>>>> No, that's not true. In fact, if queue_work returns true, it simply 
+>>>>> means that we have added the task to the queue and may schedule a 
+>>>>> worker to execute it,
+>>>>> but it does not guarantee that the task will be executed or is 
+>>>>> being executed when it returns true,
+>>>>> the task might still in the list and waiting some worker to execute 
+>>>>> it.
+>>>>>
+>>>>> We can make a simple inference,
+>>>>>
+>>>>> 1. A known fact is that if no special flag (WORK_UNBOUND) is given, 
+>>>>> tasks submitted will eventually be executed on the CPU where they 
+>>>>> were submitted.
+>>>>>
+>>>>> 2. If the queue_work returns true, the work should be or is being 
+>>>>> executed
+>>>>>
+>>>>> If all of the above are true, when we invoke queue_work in an 
+>>>>> interrupt context, does it mean that the submitted task will be 
+>>>>> executed in the interrupt context?
+>>>>>
+>>>>>
+>>>>> Best wishes,
+>>>>> D. Wythe
+>>>>>
+>>>> If you say the thread is not gauranteed to be waken up in then 
+>>>> queue_work to execute the work, please explain what the kick_pool 
+>>>> function does.
+>>>
+>>> I never said that.
+>>>
+>> What do you understand on the kick_pool there?
+> 
+> 
+> 
+> 
+> I think this simple logic-code graph can totally explain my point of 
+> view in clear.
+> 
+> My key point is queue_work can not guarantee the work_1 is executed or 
+> being executed, the work_1 might still be
+> in the list ( before executed ) .
+> 
+> The kick_pool() might wake up the 'a_idle_worker' from schedule(), and 
+> then the work_1 can be executed soon.
+> But we can not said that the  work_1 is already executed or being executed.
+> 
+> In fact, we can invoke cancel_work_syn() to delete the work_1 from the 
+> list to avoid to be executed, when the
+> a_idle_worker_main has not delete(or pop) the work_1 yet.
+> 
+> Besides, there is a upper limit to the number of idle workers. If the 
+> current number of work_x being executed exceeds this number,
+> the work_1 must wait until there are idle_workers available. In that 
+> case, we can not said that the  work_1 is already executed
+> or being executed as well.
+> 
+I do agree with this explaination. My thought was that cancel_work_syn() 
+deleting the work_1 from the list to avoid to be executed would rarely 
+happen, as I was focusing the scenario above. Since we have the 
+agreement on the locks now, I agree that would happen.
 
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Mat Martineau <martineau@kernel.org>
----
- net/mptcp/protocol.c | 18 ++++++++++++++++--
- net/mptcp/protocol.h | 54 +++++++++++++++++++++++++++++++++++++++++++++++-----
- net/mptcp/sockopt.c  |  5 ++++-
- net/mptcp/subflow.c  |  3 +--
- 4 files changed, 70 insertions(+), 10 deletions(-)
-
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index e44a3da12b96..1dacc072dcca 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -890,6 +890,7 @@ static bool __mptcp_finish_join(struct mptcp_sock *msk, struct sock *ssk)
- 	mptcp_sockopt_sync_locked(msk, ssk);
- 	mptcp_subflow_joined(msk, ssk);
- 	mptcp_stop_tout_timer(sk);
-+	__mptcp_propagate_sndbuf(sk, ssk);
- 	return true;
- }
- 
-@@ -1076,15 +1077,16 @@ static void mptcp_enter_memory_pressure(struct sock *sk)
- 	struct mptcp_sock *msk = mptcp_sk(sk);
- 	bool first = true;
- 
--	sk_stream_moderate_sndbuf(sk);
- 	mptcp_for_each_subflow(msk, subflow) {
- 		struct sock *ssk = mptcp_subflow_tcp_sock(subflow);
- 
- 		if (first)
- 			tcp_enter_memory_pressure(ssk);
- 		sk_stream_moderate_sndbuf(ssk);
-+
- 		first = false;
- 	}
-+	__mptcp_sync_sndbuf(sk);
- }
- 
- /* ensure we get enough memory for the frag hdr, beyond some minimal amount of
-@@ -2458,6 +2460,7 @@ static void __mptcp_close_ssk(struct sock *sk, struct sock *ssk,
- 		WRITE_ONCE(msk->first, NULL);
- 
- out:
-+	__mptcp_sync_sndbuf(sk);
- 	if (need_push)
- 		__mptcp_push_pending(sk, 0);
- 
-@@ -3224,7 +3227,7 @@ struct sock *mptcp_sk_clone_init(const struct sock *sk,
- 	 * uses the correct data
- 	 */
- 	mptcp_copy_inaddrs(nsk, ssk);
--	mptcp_propagate_sndbuf(nsk, ssk);
-+	__mptcp_propagate_sndbuf(nsk, ssk);
- 
- 	mptcp_rcv_space_init(msk, ssk);
- 	bh_unlock_sock(nsk);
-@@ -3402,6 +3405,8 @@ static void mptcp_release_cb(struct sock *sk)
- 			__mptcp_set_connected(sk);
- 		if (__test_and_clear_bit(MPTCP_ERROR_REPORT, &msk->cb_flags))
- 			__mptcp_error_report(sk);
-+		if (__test_and_clear_bit(MPTCP_SYNC_SNDBUF, &msk->cb_flags))
-+			__mptcp_sync_sndbuf(sk);
- 	}
- 
- 	__mptcp_update_rmem(sk);
-@@ -3446,6 +3451,14 @@ void mptcp_subflow_process_delegated(struct sock *ssk, long status)
- 			__set_bit(MPTCP_PUSH_PENDING, &mptcp_sk(sk)->cb_flags);
- 		mptcp_data_unlock(sk);
- 	}
-+	if (status & BIT(MPTCP_DELEGATE_SNDBUF)) {
-+		mptcp_data_lock(sk);
-+		if (!sock_owned_by_user(sk))
-+			__mptcp_sync_sndbuf(sk);
-+		else
-+			__set_bit(MPTCP_SYNC_SNDBUF, &mptcp_sk(sk)->cb_flags);
-+		mptcp_data_unlock(sk);
-+	}
- 	if (status & BIT(MPTCP_DELEGATE_ACK))
- 		schedule_3rdack_retransmission(ssk);
- }
-@@ -3530,6 +3543,7 @@ bool mptcp_finish_join(struct sock *ssk)
- 	/* active subflow, already present inside the conn_list */
- 	if (!list_empty(&subflow->node)) {
- 		mptcp_subflow_joined(msk, ssk);
-+		mptcp_propagate_sndbuf(parent, ssk);
- 		return true;
- 	}
- 
-diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index 620a82cd4c10..296d01965943 100644
---- a/net/mptcp/protocol.h
-+++ b/net/mptcp/protocol.h
-@@ -123,6 +123,7 @@
- #define MPTCP_RETRANSMIT	4
- #define MPTCP_FLUSH_JOIN_LIST	5
- #define MPTCP_CONNECTED		6
-+#define MPTCP_SYNC_SNDBUF	7
- 
- struct mptcp_skb_cb {
- 	u64 map_seq;
-@@ -443,6 +444,7 @@ DECLARE_PER_CPU(struct mptcp_delegated_action, mptcp_delegated_actions);
- #define MPTCP_DELEGATE_SCHEDULED	0
- #define MPTCP_DELEGATE_SEND		1
- #define MPTCP_DELEGATE_ACK		2
-+#define MPTCP_DELEGATE_SNDBUF		3
- 
- #define MPTCP_DELEGATE_ACTIONS_MASK	(~BIT(MPTCP_DELEGATE_SCHEDULED))
- /* MPTCP subflow context */
-@@ -516,6 +518,9 @@ struct mptcp_subflow_context {
- 
- 	u32	setsockopt_seq;
- 	u32	stale_rcv_tstamp;
-+	int     cached_sndbuf;	    /* sndbuf size when last synced with the msk sndbuf,
-+				     * protected by the msk socket lock
-+				     */
- 
- 	struct	sock *tcp_sock;	    /* tcp sk backpointer */
- 	struct	sock *conn;	    /* parent mptcp_sock */
-@@ -778,13 +783,52 @@ static inline bool mptcp_data_fin_enabled(const struct mptcp_sock *msk)
- 	       READ_ONCE(msk->write_seq) == READ_ONCE(msk->snd_nxt);
- }
- 
--static inline bool mptcp_propagate_sndbuf(struct sock *sk, struct sock *ssk)
-+static inline void __mptcp_sync_sndbuf(struct sock *sk)
- {
--	if ((sk->sk_userlocks & SOCK_SNDBUF_LOCK) || ssk->sk_sndbuf <= READ_ONCE(sk->sk_sndbuf))
--		return false;
-+	struct mptcp_subflow_context *subflow;
-+	int ssk_sndbuf, new_sndbuf;
-+
-+	if (sk->sk_userlocks & SOCK_SNDBUF_LOCK)
-+		return;
-+
-+	new_sndbuf = sock_net(sk)->ipv4.sysctl_tcp_wmem[0];
-+	mptcp_for_each_subflow(mptcp_sk(sk), subflow) {
-+		ssk_sndbuf =  READ_ONCE(mptcp_subflow_tcp_sock(subflow)->sk_sndbuf);
-+
-+		subflow->cached_sndbuf = ssk_sndbuf;
-+		new_sndbuf += ssk_sndbuf;
-+	}
-+
-+	/* the msk max wmem limit is <nr_subflows> * tcp wmem[2] */
-+	WRITE_ONCE(sk->sk_sndbuf, new_sndbuf);
-+}
-+
-+/* The called held both the msk socket and the subflow socket locks,
-+ * possibly under BH
-+ */
-+static inline void __mptcp_propagate_sndbuf(struct sock *sk, struct sock *ssk)
-+{
-+	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(ssk);
-+
-+	if (READ_ONCE(ssk->sk_sndbuf) != subflow->cached_sndbuf)
-+		__mptcp_sync_sndbuf(sk);
-+}
-+
-+/* the caller held only the subflow socket lock, either in process or
-+ * BH context. Additionally this can be called under the msk data lock,
-+ * so we can't acquire such lock here: let the delegate action acquires
-+ * the needed locks in suitable order.
-+ */
-+static inline void mptcp_propagate_sndbuf(struct sock *sk, struct sock *ssk)
-+{
-+	struct mptcp_subflow_context *subflow = mptcp_subflow_ctx(ssk);
-+
-+	if (likely(READ_ONCE(ssk->sk_sndbuf) == subflow->cached_sndbuf))
-+		return;
- 
--	WRITE_ONCE(sk->sk_sndbuf, ssk->sk_sndbuf);
--	return true;
-+	local_bh_disable();
-+	mptcp_subflow_delegate(subflow, MPTCP_DELEGATE_SNDBUF);
-+	local_bh_enable();
- }
- 
- static inline void mptcp_write_space(struct sock *sk)
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index 72858d7d8974..574e221bb765 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -95,6 +95,7 @@ static void mptcp_sol_socket_sync_intval(struct mptcp_sock *msk, int optname, in
- 		case SO_SNDBUFFORCE:
- 			ssk->sk_userlocks |= SOCK_SNDBUF_LOCK;
- 			WRITE_ONCE(ssk->sk_sndbuf, sk->sk_sndbuf);
-+			mptcp_subflow_ctx(ssk)->cached_sndbuf = sk->sk_sndbuf;
- 			break;
- 		case SO_RCVBUF:
- 		case SO_RCVBUFFORCE:
-@@ -1415,8 +1416,10 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
- 
- 	if (sk->sk_userlocks & tx_rx_locks) {
- 		ssk->sk_userlocks |= sk->sk_userlocks & tx_rx_locks;
--		if (sk->sk_userlocks & SOCK_SNDBUF_LOCK)
-+		if (sk->sk_userlocks & SOCK_SNDBUF_LOCK) {
- 			WRITE_ONCE(ssk->sk_sndbuf, sk->sk_sndbuf);
-+			mptcp_subflow_ctx(ssk)->cached_sndbuf = sk->sk_sndbuf;
-+		}
- 		if (sk->sk_userlocks & SOCK_RCVBUF_LOCK)
- 			WRITE_ONCE(ssk->sk_rcvbuf, sk->sk_rcvbuf);
- 	}
-diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-index df208666fd19..2b43577f952e 100644
---- a/net/mptcp/subflow.c
-+++ b/net/mptcp/subflow.c
-@@ -421,6 +421,7 @@ static bool subflow_use_different_dport(struct mptcp_sock *msk, const struct soc
- 
- void __mptcp_set_connected(struct sock *sk)
- {
-+	__mptcp_propagate_sndbuf(sk, mptcp_sk(sk)->first);
- 	if (sk->sk_state == TCP_SYN_SENT) {
- 		inet_sk_state_store(sk, TCP_ESTABLISHED);
- 		sk->sk_state_change(sk);
-@@ -472,7 +473,6 @@ static void subflow_finish_connect(struct sock *sk, const struct sk_buff *skb)
- 		return;
- 
- 	msk = mptcp_sk(parent);
--	mptcp_propagate_sndbuf(parent, sk);
- 	subflow->rel_write_seq = 1;
- 	subflow->conn_finished = 1;
- 	subflow->ssn_offset = TCP_SKB_CB(skb)->seq;
-@@ -1736,7 +1736,6 @@ static void subflow_state_change(struct sock *sk)
- 
- 	msk = mptcp_sk(parent);
- 	if (subflow_simultaneous_connect(sk)) {
--		mptcp_propagate_sndbuf(parent, sk);
- 		mptcp_do_fallback(sk);
- 		mptcp_rcv_space_init(msk, sk);
- 		pr_fallback(msk);
-
--- 
-2.41.0
-
+Thanks again!
+Here you are:
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
 
