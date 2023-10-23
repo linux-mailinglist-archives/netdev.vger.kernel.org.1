@@ -1,168 +1,113 @@
-Return-Path: <netdev+bounces-43580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E577D3F09
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:21:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 447317D3F0F
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:22:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6C37B20C2F
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:21:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8C22B20C53
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335BF21366;
-	Mon, 23 Oct 2023 18:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C752B21377;
+	Mon, 23 Oct 2023 18:21:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LK8vNysg"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="PbZDGy48"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDB91DA32
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:21:24 +0000 (UTC)
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 279E58F;
-	Mon, 23 Oct 2023 11:21:22 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-27d129e2e7cso2586386a91.3;
-        Mon, 23 Oct 2023 11:21:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A12A1CF80
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:21:52 +0000 (UTC)
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4200EFF
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:21:51 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id 5614622812f47-3b4145e887bso605428b6e.3
+        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:21:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698085281; x=1698690081; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gPyUiOJZ2q35fZ0XB5Sq4AM4l5aO57NWrIRPv3lvLC8=;
-        b=LK8vNysg+Om0pDW/bw4VXm8L9hugFRAK0WPXIJlzAALNtVG36gfRqFPS819QSXdbAZ
-         n1+00juRzimB9GeE60y3cG8EltMzyc6lJYIrMg5LTTwQBYalP7XBNBkotySPglOYfjFD
-         p+XW6sp+PcvtfXISb/S+5SN7wvzdUI2XxN4XiOGNnQnX9aoR8u+U1x54HlDlEdQCxCpV
-         +9fCHQOSqXBTG4vaBW8Zu6idnEZKXhoKOTA0bpqVMTtScjQZvBag7K/PVeAg1uDj2SnV
-         akN+nljqqY86a4sPP3jFNHr2Y0yHVlkT9Vx2HB3RSVL/qLrbkLvIP3JvuFa45KiyJQ3v
-         fw/Q==
+        d=ziepe.ca; s=google; t=1698085310; x=1698690110; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ELhPHgmF7pPJ0f5VbSNCKVTdPqoWjN7MfIE8blhP1v8=;
+        b=PbZDGy48iqssau03QIP9wvYb2V5M/5cCvDd4R64DNFEgRiKFLbyU047d0oZiYj5ZZd
+         KNyNdKEJLnDWRSFx8l3mIPZTSXVsW9vXg21GQKyca7VgSbc6nr4BrLPeyA89N3QpqKDD
+         iFfVpeMWULqCn8aMbbcA/n4FeUGFi9NuRmYyynsWX9fTAjyD+0OSgQAC02mtyPb2g11K
+         J+vpPbS1e3b7vWxDlRZa0zf6N71NS/Mn5dR3fcRopN9nnFNdYyOKV+it30ljw5F3Uh8w
+         jX4A6SHv//xnErt9az90/raLduCT5KJDcN3v4LaxWPFPQH7jiUPe8AgMbdZVcdfdKoWS
+         yV9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698085281; x=1698690081;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gPyUiOJZ2q35fZ0XB5Sq4AM4l5aO57NWrIRPv3lvLC8=;
-        b=FoKsQyzSys350ul5dGk43JlnC8nXvqDPPCKWMxOY2lISNM7p9i+gdD0l6DeV/C8zl0
-         u9pYdZygFuhIK41p1oGApobQL5twt77UdtfKHZFLyZUH8VCtL/7j5RaMMYMlE/rw/7gP
-         cVslOyf6vDbO2lD6LWLpMgwXZ71GspgXVKvnsKFCIrh8Puhgr+Shk7t4gI8PHUzU8zoG
-         v4XVPMeSlkR8I1R3Gz1y3OOCN5zdGeW6/P/7+qMx7J9sIOFYVpBmVsjJKR/5vHD7CF4T
-         Stqs7183674OyPhe7QKU6MZLDghmmipkzwwJ1vin0Pl3q2wnDDds7xIHcEJEKkFsrVUV
-         P/KA==
-X-Gm-Message-State: AOJu0YwYtRY7KMpCa4EGwb+ZgrSK1hdtYsa+2+QmZSXTfuuOGDhpCG0S
-	SJBs4NBd3i7wq0bnNDgxg1Q=
-X-Google-Smtp-Source: AGHT+IFoEt17HWYkQBkTd5gf+xEa9oBMi7JNVrUhDIs1qlYCY9vg1nZrhP6wnLF58WJSYTYycXydBQ==
-X-Received: by 2002:a17:90a:fa8f:b0:268:2658:3b01 with SMTP id cu15-20020a17090afa8f00b0026826583b01mr6924882pjb.39.1698085281334;
-        Mon, 23 Oct 2023 11:21:21 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id d6-20020a170903230600b001c5bcc9d916sm6205360plh.176.2023.10.23.11.21.20
+        d=1e100.net; s=20230601; t=1698085310; x=1698690110;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ELhPHgmF7pPJ0f5VbSNCKVTdPqoWjN7MfIE8blhP1v8=;
+        b=Ch//ex74zqhMyQLKt1Rg5dGIhInBC+aIwN0BdR5u8TnJtgKfUf0ozx/SCoLRk5lcON
+         OgC2GXjHdm2rC2nrMKVLviNh3jCabc1ev+k3wT9mY7G6BCB85VKWy+zBaZnVRt34/bGf
+         Ee0svkC/+jMYVKf7C4rukf9YlJAwuW1PIBweSWA90oQRQVtzwdKwXf0WIKTcRDmze3RL
+         f2hWJz5o8ZRZRWlhNt8aVu1fV2lPzlN38Oekh7O9whj+4N/tfmK3ptQFgkmVkUlinpGP
+         nFuayO8YgCebtDi7CiR9aCkJuy7MlIH2J0rsq+Yx16j0n5JiOHCNAqIjX/PL4KZtW2X4
+         BUiA==
+X-Gm-Message-State: AOJu0YxoXqnBmtUm+COYGx3tQiTB+6DpogKn92aNfJ37G6l52wF4helT
+	I4Yuh/Cp7JKOqCIxjvmkxSJmdg==
+X-Google-Smtp-Source: AGHT+IENr5mCUHAQy2/Dcv2K9Fd98rrNYfVmPpwtNc8CFJKK9E6ArTW0+TnAeTK7TBCwNez8Vc6hMQ==
+X-Received: by 2002:a05:6808:46:b0:3ad:f866:39bd with SMTP id v6-20020a056808004600b003adf86639bdmr9848014oic.27.1698085310628;
+        Mon, 23 Oct 2023 11:21:50 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
+        by smtp.gmail.com with ESMTPSA id z18-20020a056808029200b003b2f369a932sm1579278oic.49.2023.10.23.11.21.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 11:21:20 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2023-10-23
-Date: Mon, 23 Oct 2023 11:21:19 -0700
-Message-ID: <20231023182119.3629194-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Mon, 23 Oct 2023 11:21:50 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1quzYj-003jR4-AF;
+	Mon, 23 Oct 2023 15:21:49 -0300
+Date: Mon, 23 Oct 2023 15:21:49 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: sharmaajay@linuxonhyperv.com
+Cc: Long Li <longli@microsoft.com>, Leon Romanovsky <leon@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ajay Sharma <sharmaajay@microsoft.com>
+Subject: Re: [Patch v7 3/5] RDMA/mana_ib: Create adapter and Add error eq
+Message-ID: <20231023182149.GK691768@ziepe.ca>
+References: <1697494322-26814-1-git-send-email-sharmaajay@linuxonhyperv.com>
+ <1697494322-26814-4-git-send-email-sharmaajay@linuxonhyperv.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1697494322-26814-4-git-send-email-sharmaajay@linuxonhyperv.com>
 
-The following changes since commit d6e48462e88fe7efc78b455ecde5b0ca43ec50b7:
+On Mon, Oct 16, 2023 at 03:12:00PM -0700, sharmaajay@linuxonhyperv.com wrote:
+> From: Ajay Sharma <sharmaajay@microsoft.com>
+> 
+> Create adapter object as nice container for VF resources.
+> Add error eq needed for adapter creation and later used
+> for notification from Management SW. The management
+> software uses this channel to send messages or error
+> notifications back to the Client.
+> 
+> Signed-off-by: Ajay Sharma <sharmaajay@microsoft.com>
+> ---
+>  drivers/infiniband/hw/mana/device.c           |  22 ++-
+>  drivers/infiniband/hw/mana/main.c             |  97 ++++++++++++
+>  drivers/infiniband/hw/mana/mana_ib.h          |  33 ++++
+>  .../net/ethernet/microsoft/mana/gdma_main.c   | 147 ++++++++++--------
+>  drivers/net/ethernet/microsoft/mana/mana_en.c |   3 +
+>  include/net/mana/gdma.h                       |  13 +-
+>  6 files changed, 245 insertions(+), 70 deletions(-)
 
-  net: mdio: xgene: Fix unused xgene_mdio_of_match warning for !CONFIG_OF (2023-10-23 10:16:47 -0700)
+Split up your patches properly please this says it creates the
+adapter, code to create an EQ and process events should not be in this
+patch.
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-10-23
-
-for you to fetch changes up to 530886897c789cf77c9a0d4a7cc5549f0768b5f8:
-
-  Bluetooth: hci_sync: Fix Opcode prints in bt_dev_dbg/err (2023-10-23 11:05:32 -0700)
-
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
-
- - Add 0bda:b85b for Fn-Link RTL8852BE
- - ISO: Many fixes for broadcast support
- - Mark bcm4378/bcm4387 as BROKEN_LE_CODED
- - Add support ITTIM PE50-M75C
- - Add RTW8852BE device 13d3:3570
- - Add support for QCA2066
- - Add support for Intel Misty Peak - 8087:0038
-
-----------------------------------------------------------------
-Claudia Draghicescu (1):
-      Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID
-
-Dan Carpenter (1):
-      Bluetooth: msft: __hci_cmd_sync() doesn't return NULL
-
-Guan Wentao (1):
-      Bluetooth: btusb: Add 0bda:b85b for Fn-Link RTL8852BE
-
-Iulia Tanasescu (5):
-      Bluetooth: ISO: Fix BIS cleanup
-      Bluetooth: ISO: Pass BIG encryption info through QoS
-      Bluetooth: ISO: Allow binding a bcast listener to 0 bises
-      Bluetooth: ISO: Match QoS adv handle with BIG handle
-      Bluetooth: ISO: Fix bcast listener cleanup
-
-Janne Grunau (1):
-      Bluetooth: hci_bcm4377: Mark bcm4378/bcm4387 as BROKEN_LE_CODED
-
-Jingyang Wang (1):
-      Bluetooth: Add support ITTIM PE50-M75C
-
-Marcel Ziswiler (1):
-      Bluetooth: hci_sync: Fix Opcode prints in bt_dev_dbg/err
-
-Masum Reza (1):
-      Bluetooth: btusb: Add RTW8852BE device 13d3:3570 to device tables
-
-Tim Jiang (1):
-      Bluetooth: qca: add support for QCA2066
-
-Vijay Satija (1):
-      Bluetooth: Add support for Intel Misty Peak - 8087:0038
-
-Vlad Pruteanu (1):
-      Bluetooth: ISO: Set CIS bit only for devices with CIS support
-
-ZhengHan Wang (1):
-      Bluetooth: Fix double free in hci_conn_cleanup
-
-Zhengping Jiang (1):
-      Bluetooth: btmtksdio: enable bluetooth wakeup in system suspend
-
-Ziyang Xuan (1):
-      Bluetooth: Make handle of hci_conn be unique
-
-youwan Wang (1):
-      Bluetooth: btusb: Add date->evt_skb is NULL check
-
- drivers/bluetooth/btmtksdio.c    |  44 ++++++++++++--
- drivers/bluetooth/btqca.c        |  68 ++++++++++++++++++++++
- drivers/bluetooth/btqca.h        |   5 +-
- drivers/bluetooth/btusb.c        |  11 ++++
- drivers/bluetooth/hci_bcm4377.c  |   5 ++
- drivers/bluetooth/hci_qca.c      |  11 ++++
- include/net/bluetooth/hci.h      |   3 +
- include/net/bluetooth/hci_core.h |  40 ++++++++++---
- include/net/bluetooth/hci_sync.h |   2 +
- net/bluetooth/amp.c              |   3 +-
- net/bluetooth/hci_conn.c         | 123 +++++++++++++++++++++++++++------------
- net/bluetooth/hci_core.c         |   3 +
- net/bluetooth/hci_event.c        |  92 ++++++++++++++++-------------
- net/bluetooth/hci_sync.c         |  36 +++++-------
- net/bluetooth/hci_sysfs.c        |  23 ++++----
- net/bluetooth/iso.c              |  38 ++++++++----
- net/bluetooth/msft.c             |  20 +++----
- 17 files changed, 375 insertions(+), 152 deletions(-)
+Jason
 
