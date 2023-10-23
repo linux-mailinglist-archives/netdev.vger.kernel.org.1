@@ -1,162 +1,116 @@
-Return-Path: <netdev+bounces-43566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E607D3EB2
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:12:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24E657D3EC6
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 20:15:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFE972812B1
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:12:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 253A51C2098F
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988682135D;
-	Mon, 23 Oct 2023 18:12:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F7021365;
+	Mon, 23 Oct 2023 18:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n90t6WbH"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="pLl4V02x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7137D21340;
-	Mon, 23 Oct 2023 18:12:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5C4EC433C8;
-	Mon, 23 Oct 2023 18:12:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698084730;
-	bh=GW9UQ6EHFPmshL/qVWAbYEnuG1iB/9yD9/xjWaONT0o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n90t6WbHB5spdTBUGRiLxo1B6q7BldlK4KG9cH3+oGOtd//VT4aSmGLMXzJFJeW/U
-	 vJcGbBqPxOzYQ8DAVfJjxX3BAsF5PtWt43BSwDenU7QbgnsEbiJYEFJtbD3JhvsJXN
-	 5JvC9kbgpW5BzTrKsb3ZGJrwJeAbVqXm5unH0m8qpYOn3eyd30rV2Mx8VAufYI9CI9
-	 uEQEKNs58xo5MUoBr0n7TT8AVvvJTVQkWfymP/fVKlljH6ECeRMudP4SqOPzAUxg4m
-	 7c1Xsv5IYrkx+dTcoktUHHQz6KDE/VVPvP1XSOgPSKxv1MDEfzrrH6/pUv+55jwEx9
-	 Ci0f+23s/kraw==
-Date: Mon, 23 Oct 2023 11:12:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
- john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org,
- magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com,
- hawk@kernel.org, yoong.siang.song@intel.com, netdev@vger.kernel.org,
- xdp-hints@xdp-project.net
-Subject: Re: [PATCH bpf-next v4 02/11] xsk: Add TX timestamp and TX checksum
- offload support
-Message-ID: <20231023111209.2278899c@kernel.org>
-In-Reply-To: <ZTarsV4UT-sQ14uI@google.com>
-References: <20231019174944.3376335-1-sdf@google.com>
-	<20231019174944.3376335-3-sdf@google.com>
-	<20231020180411.2a9f573d@kernel.org>
-	<ZTarsV4UT-sQ14uI@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1571BDFE
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:15:01 +0000 (UTC)
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22E9E9D
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:15:00 -0700 (PDT)
+Received: by mail-ot1-x333.google.com with SMTP id 46e09a7af769-6ce2ea3a944so2537252a34.1
+        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 11:15:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1698084899; x=1698689699; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EEHshj4ZGLSNUd1/3J7uLikUiQYUKL38M7lUB087fzk=;
+        b=pLl4V02x1g+KaWGkeoEaRAtGZ4uvxAvbsXh3RWA4MZd7Z3mKpeTNMUpsoRIW6SQgjD
+         vjHHrsnCuycG0Jtxh8hmDTAQsZAGUOzvvVwOnlw164sgcOLjJ1m987eZfDtTpxbf+nH2
+         KA5p7fjDTEBiLjpqY3jiu3aD8HMxm9sizINmLH2UxnoYXOYmPJ55iLgr8AIDVt9+507a
+         KCQRYRlpk0g7+T6RWrtU16Bt8h1Xy+1kIV8RUoBFBJeG6CbQN/1EKQHO9up4HEBBUa8I
+         FHQybkh7ecT33SFnaaMYpF4PBcqb3NK00CSwIof4FV2yUskciQNw2f3sTrXrxaSiub63
+         RQRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698084899; x=1698689699;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EEHshj4ZGLSNUd1/3J7uLikUiQYUKL38M7lUB087fzk=;
+        b=o4jpNFpcDcqT8dmjGIMDPijCQ7UDNWfxzlTdtjJ1g2BqaaqeV8R8Ei/tFrTW7ua96t
+         qhokdY+ijMAA6b8cgKmHbVVQE/zjzM2Zuo7Jxz2xwbV5nh7Ybxr7RogmgRX/DUC9T8u0
+         pO9TS32FMTHJ9Hgobm1pVBtwRCq4K35HdDfElT8q/jWLtx90DOESTbhK4XgvbKY8eMTV
+         A2uYVe0ODbAzTGzu5tFzNaLot7MIOyouPn/YVkvZ8ZjVuj+6jX8fvNwhg4vrVn8XBS/3
+         9N6DGikINFsHik8EHx0HZZ34+HCZ9M5ikisMeihrTLZKjFuLzncukqOopN2B83x/b/M0
+         cUyA==
+X-Gm-Message-State: AOJu0Yz2v+1cH5cnqy5Y0wvoEMHnNIu9XzHQX+vGMwahubIGU7B3DZXK
+	nsYvCBvunKywlmYggRG8NRKG7w==
+X-Google-Smtp-Source: AGHT+IETjW4KVURL38sAuytMhqq9oI5+G8qJObbDoigH6JMmCgE8pXkkrgDDG3XrQXmZN4EUlkVEng==
+X-Received: by 2002:a05:6830:2702:b0:6be:e447:da3 with SMTP id j2-20020a056830270200b006bee4470da3mr9821558otu.28.1698084899393;
+        Mon, 23 Oct 2023 11:14:59 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-26-201.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.26.201])
+        by smtp.gmail.com with ESMTPSA id k14-20020a056830168e00b006ce2e464a45sm1530719otr.29.2023.10.23.11.14.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Oct 2023 11:14:58 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1quzS5-003jNB-IG;
+	Mon, 23 Oct 2023 15:14:57 -0300
+Date: Mon, 23 Oct 2023 15:14:57 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: sharmaajay@linuxonhyperv.com
+Cc: Long Li <longli@microsoft.com>, Leon Romanovsky <leon@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ajay Sharma <sharmaajay@microsoft.com>
+Subject: Re: [Patch v7 1/5] RDMA/mana_ib: Rename all mana_ib_dev type
+ variables to mib_dev
+Message-ID: <20231023181457.GI691768@ziepe.ca>
+References: <1697494322-26814-1-git-send-email-sharmaajay@linuxonhyperv.com>
+ <1697494322-26814-2-git-send-email-sharmaajay@linuxonhyperv.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1697494322-26814-2-git-send-email-sharmaajay@linuxonhyperv.com>
 
-On Mon, 23 Oct 2023 10:21:53 -0700 Stanislav Fomichev wrote:
-> On 10/20, Jakub Kicinski wrote:
-> > On Thu, 19 Oct 2023 10:49:35 -0700 Stanislav Fomichev wrote:  
-> > > diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> > > index 14511b13f305..22d2649a34ee 100644
-> > > --- a/Documentation/netlink/specs/netdev.yaml
-> > > +++ b/Documentation/netlink/specs/netdev.yaml
-> > > @@ -55,6 +55,19 @@ name: netdev
-> > >          name: hash
-> > >          doc:
-> > >            Device is capable of exposing receive packet hash via bpf_xdp_metadata_rx_hash().
-> > > +  -
-> > > +    type: flags
-> > > +    name: xsk-flags
-> > > +    render-max: true  
-> > 
-> > I don't think you're using the MAX, maybe don't render it.
-> > IDK what purpose it'd serve for feature flag enums.  
+On Mon, Oct 16, 2023 at 03:11:58PM -0700, sharmaajay@linuxonhyperv.com wrote:
+> From: Ajay Sharma <sharmaajay@microsoft.com>
 > 
-> I was gonna say 'to iterate over every possible bit', but we are using
-> that 'xxx > 1U << i' implementation (which you also found a bug in).
-> 
-> I can drop it, but the question is: should I drop it from the rest as
-> well? xdp-act and xdp-rx-metadata have it.
+> This patch does not introduce any functional changes. It
+> creates naming convention to distinguish especially when
+> used in the same function.Renaming all mana_ib_dev type
+> variables to mib_dev to have clean separation between
+> eth dev and ibdev variables.
 
-The xdp-act one looks used. xdp-rx-metadata looks unused, so you could
-drop. But up to you if you want to clean it up.
+> Signed-off-by: Ajay Sharma <sharmaajay@microsoft.com>
+> ---
+>  drivers/infiniband/hw/mana/cq.c      | 12 ++--
+>  drivers/infiniband/hw/mana/device.c  | 34 +++++------
+>  drivers/infiniband/hw/mana/main.c    | 87 ++++++++++++++--------------
+>  drivers/infiniband/hw/mana/mana_ib.h |  9 +--
+>  drivers/infiniband/hw/mana/mr.c      | 29 +++++-----
+>  drivers/infiniband/hw/mana/qp.c      | 84 +++++++++++++--------------
+>  drivers/infiniband/hw/mana/wq.c      | 21 +++----
+>  7 files changed, 141 insertions(+), 135 deletions(-)
 
-> > > +/* Request transmit timestamp. Upon completion, put it into tx_timestamp
-> > > + * field of struct xsk_tx_metadata.
-> > > + */
-> > > +#define XDP_TX_METADATA_TIMESTAMP		(1 << 0)
-> > > +
-> > > +/* Request transmit checksum offload. Checksum start position and offset
-> > > + * are communicated via csum_start and csum_offset fields of struct
-> > > + * xsk_tx_metadata.
-> > > + */
-> > > +#define XDP_TX_METADATA_CHECKSUM		(1 << 1)  
-> > 
-> > Reuse of enum netdev_xsk_flags is not an option?  
-> 
-> It is an option, but probably better to keep them separate? Netlink is
-> for observability, and here have a tighter control over the defines and
-> UAPI (and the don't have to map 1:1 as in the case of
-> XDP_TX_METADATA_CHECKSUM_SW, for example).
+Please no, don't create pointless giant churn like this. It only hurts
+backporters
 
-The duplication is rather apparent, and they are flags so compiler
-can't help us catch misuses of one set vs the other.
+Maybe just target the functions with more than one type
 
-If you prefer to keep the separate defines - I'd rename them to tie 
-them to the field more strongly. Specifically they should have the
-word "flags" in them?
-
-XDP_TXMD_FLAGS_TIMESTAMP
-XDP_TXMD_FLAGS_CHECKSUM
-
-maybe?
-
-> > > +/* Force checksum calculation in software. Can be used for testing or
-> > > + * working around potential HW issues. This option causes performance
-> > > + * degradation and only works in XDP_COPY mode.
-> > > + */
-> > > +#define XDP_TX_METADATA_CHECKSUM_SW		(1 << 2)  
-> > 
-> > Is there a need for this to be on packet-by-packet basis?
-> > HW issues should generally be fixed by the driver, is there 
-> > any type of problem in particular you have in mind here?  
-> 
-> No, not really, do you think it makes sense to move it to a setsockopt
-> or something? We'd still have to check it on a per-packet case
-> though (from xsk_sock), so not sure it is strictly better?
-
-Setsockopt or just ethtool -K $ifc tx off ? And check device features?
-Maybe I'm overly sensitive but descriptor bits are usually super
-precious :)
-
-> Regarding HW issues: I don't have a good problem in mind, but I
-> think having a SW path is useful. It least it was useful for me
-> during developing (to compare the checksum) and I hope it will be
-> useful for other people as well (mostly as well during development).
-> Because the API is still a bit complicated and requires getting
-> pseudo header csum right. Plus the fact that csum_offset is an
-> offset from csum_start was not super intuitive to me.
-
-Okay, I'm not strongly opposed, I just wanted to flag it.
-If nobody else feels the same way, and you like the separate bit - 
-perfectly fine by me.
-
-> > > +			meta = buffer - xs->pool->tx_metadata_len;
-> > > +
-> > > +			if (meta->flags & XDP_TX_METADATA_CHECKSUM) {  
-> > 
-> > Do we need to worry about reserved / unsupported meta->flags ?  
-> 
-> I don't think so, probably not worth the cycles to check for the
-> unsupported bits? Or do you think it makes sense to clearly return
-> an error here and this extra check won't actually affect anything?
-
-Hm, it is uAPI, isn't it? We try to validate anything kernel gets these
-days, why would the flags be different? Shouldn't be more than 2 cycles.
+Jason
 
