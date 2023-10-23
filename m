@@ -1,129 +1,192 @@
-Return-Path: <netdev+bounces-43679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A2C17D4317
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:10:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640367D4327
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:22:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B05D1C20A92
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 23:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0F022816B2
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 23:22:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2E924203;
-	Mon, 23 Oct 2023 23:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C7124207;
+	Mon, 23 Oct 2023 23:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xo2ZCHrV"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="NrGgcT1r"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFB9241F9;
-	Mon, 23 Oct 2023 23:10:30 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C1C0C0;
-	Mon, 23 Oct 2023 16:10:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698102629; x=1729638629;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XK5pkAOuUAUIv7kLf8nY8tzcC1YIWf+l3Z9h22jOQ0g=;
-  b=Xo2ZCHrVm2EB4bsOwGnEw+Pr1aNz/83cIi6xV2JxSOiW73/zfG1PRY0N
-   thYjUgSTs+DmXzw1GeKVPbfrhqIyDZ69czZ1hzEBcn4twDmCUz6UrTv7f
-   m1OfsVyoabuaVt4HjrrhSIWW/e3bRMV9wNbXnnqkz+6c8JjU21LKYBVjW
-   j8siSnclYa1kY+FCMNC5Hzi6emhnWZRb4YSNBeba2vElfkMsZ+81fXHVZ
-   VHx1AowoaIdusF8GSbqhIbUH/vgFiUyWyNfrBaXFtWbGE+G8gBkosMEnr
-   dV+5iiG2OmdeUjyYkXeVYDemKU/62+NqpyGIiNozIOjmn2VOSETqQT18H
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="385841775"
-X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="385841775"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 16:10:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="881924055"
-X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="881924055"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 23 Oct 2023 16:10:23 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qv43x-0007MK-0v;
-	Mon, 23 Oct 2023 23:10:21 +0000
-Date: Tue, 24 Oct 2023 07:09:35 +0800
-From: kernel test robot <lkp@intel.com>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
-	horms@kernel.org, casper.casan@gmail.com, andrew@lunn.ch
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
-	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Subject: Re: [PATCH net-next v2 1/9] net: ethernet: implement OPEN Alliance
- control transaction interface
-Message-ID: <202310240609.nPpYbL1B-lkp@intel.com>
-References: <20231023154649.45931-2-Parthiban.Veerasooran@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76F724204
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 23:22:50 +0000 (UTC)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD50EDE
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 16:22:48 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2c4fdf94666so51397441fa.2
+        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 16:22:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1698103367; x=1698708167; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZRqLVtJ4+w6Q7VE/TH5E+yurITf2hF65g/YIWSM61UI=;
+        b=NrGgcT1rZp9qMmxAnyHVNstXUYv6rt2UGqQiFTIt9ir6JX0xKKueSdQs7Wu0LLL2Ac
+         Tgag75fIkZRG/fElY8geqyDJJvVnbYHF9Gya4nWbvB1f3YgZ0xHlK9UsKrKPX1jYZPD5
+         PKTfQ6/3x7DrL1Odk4GrSnpY6heb74XhClsjXoEF4xO5g6Frgh34o7wza1NOPIQ0ykO1
+         9K89tmR1s8QHONUTQBYImaJcSM05a4ZmGjYLa3+8+pSjkn1B2q51uK7V0azaHS43H/gR
+         szbxuxGSIIbHwE1bVnBR8ipuhGh878O0cX1tSSEFCNmtLYI4bMz6odP9bWuiEPtYxKOw
+         wEFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698103367; x=1698708167;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZRqLVtJ4+w6Q7VE/TH5E+yurITf2hF65g/YIWSM61UI=;
+        b=b508oeukw+cbt0AbXbij+34RDxBVI6IXvBsUur3HXsByEYo0JRkNRHV5ql6tJVCAWL
+         dUZmGIn1NPJczwWNJwJ5PLNDc8sAFlZB0uCif+pgVusk7fQ5n4E7B6+0Vf89AZpReW3S
+         dP4AAJmltZvCqWw3Urv586IchiJLTi1mdyDq1FO6kxyg9wtxqL4QbMgvtS+DFam5eW9V
+         vkBcaWOt0kHhtMbPANkPBb6dkSazexKqR3fZbTHWivFEDzimSaaa0MDoHSy238IowfIr
+         ULu/xMWW52S7AG1R6WJo+vIzOGBh+E3Kw66LKt0UiMdkucMdqAJhkgS9hJnBay4Q5DAS
+         J3qQ==
+X-Gm-Message-State: AOJu0Yz2d+x2tAyDyTffo60dU+Q1kH5NMNrIzXaX59SQCYmzTMYLsDQJ
+	/52DSvKycm3iEnAmX+YJvIFDN8qtGAN9rXgIwgSX3dQ/pZK6sEJyT+Q=
+X-Google-Smtp-Source: AGHT+IGrfm5czbpRabF9/H2HucnSiA1Nms8R7DXTnfVVdNdF09Z9p2OOZlW7bFdTwCxsfO3w3b8p8sdYkkW250uGLeE=
+X-Received: by 2002:a2e:9691:0:b0:2bf:f32a:1f64 with SMTP id
+ q17-20020a2e9691000000b002bff32a1f64mr7583173lji.18.1698103366961; Mon, 23
+ Oct 2023 16:22:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231023154649.45931-2-Parthiban.Veerasooran@microchip.com>
+References: <CABWYdi1kiu1g1mAq6DpQWczg78tMzaVFnytNMemZATFHqYSqYw@mail.gmail.com>
+ <20231020104728.2060-1-hdanton@sina.com> <CABWYdi0N7uvDex5CdKD60hNQ6UFuqoB=Ss52yQu6UoMJm0MFPw@mail.gmail.com>
+ <20231021012322.1799-1-hdanton@sina.com>
+In-Reply-To: <20231021012322.1799-1-hdanton@sina.com>
+From: Ivan Babrou <ivan@cloudflare.com>
+Date: Mon, 23 Oct 2023 16:22:35 -0700
+Message-ID: <CABWYdi0j4yXWV6-Pr=2q7S6SQSZR7O6F61BLRdU=gDxvuQ3e1w@mail.gmail.com>
+Subject: Re: wait_for_unix_gc can cause CPU overload for well behaved programs
+To: Hillf Danton <hdanton@sina.com>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Parthiban,
+On Fri, Oct 20, 2023 at 6:23=E2=80=AFPM Hillf Danton <hdanton@sina.com> wro=
+te:
+>
+> On Fri, 20 Oct 2023 10:25:25 -0700 Ivan Babrou <ivan@cloudflare.com>
+> >
+> > This could solve wait_for_unix_gc spinning, but it wouldn't affect
+> > unix_gc itself, from what I understand. There would always be one
+> > socket writer or destroyer punished by running the gc still.
+>
+> See what you want. The innocents are rescued by kicking a worker off.
+> Only for thoughts.
+>
+> --- x/net/unix/garbage.c
+> +++ y/net/unix/garbage.c
+> @@ -86,7 +86,6 @@
+>  /* Internal data structures and random procedures: */
+>
+>  static LIST_HEAD(gc_candidates);
+> -static DECLARE_WAIT_QUEUE_HEAD(unix_gc_wait);
+>
+>  static void scan_inflight(struct sock *x, void (*func)(struct unix_sock =
+*),
+>                           struct sk_buff_head *hitlist)
+> @@ -185,24 +184,25 @@ static void inc_inflight_move_tail(struc
+>                 list_move_tail(&u->link, &gc_candidates);
+>  }
+>
+> -static bool gc_in_progress;
+> +static void __unix_gc(struct work_struct *w);
+> +static DECLARE_WORK(unix_gc_work, __unix_gc);
+> +
+>  #define UNIX_INFLIGHT_TRIGGER_GC 16000
+>
+>  void wait_for_unix_gc(void)
+>  {
+>         /* If number of inflight sockets is insane,
+> -        * force a garbage collect right now.
+> -        * Paired with the WRITE_ONCE() in unix_inflight(),
+> -        * unix_notinflight() and gc_in_progress().
+> -        */
+> -       if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_GC &&
+> -           !READ_ONCE(gc_in_progress))
+> -               unix_gc();
+> -       wait_event(unix_gc_wait, gc_in_progress =3D=3D false);
+> +        * kick a garbage collect right now.
+> +        *
+> +        * todo s/wait_for_unix_gc/kick_unix_gc/
+> +        */
+> +       if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_GC /2)
+> +               queue_work(system_unbound_wq, &unix_gc_work);
+>  }
+>
+> -/* The external entry point: unix_gc() */
+> -void unix_gc(void)
+> +static DEFINE_MUTEX(unix_gc_mutex);
+> +
+> +static void __unix_gc(struct work_struct *w)
+>  {
+>         struct sk_buff *next_skb, *skb;
+>         struct unix_sock *u;
+> @@ -211,15 +211,10 @@ void unix_gc(void)
+>         struct list_head cursor;
+>         LIST_HEAD(not_cycle_list);
+>
+> +       if (!mutex_trylock(&unix_gc_mutex))
+> +               return;
+>         spin_lock(&unix_gc_lock);
+>
+> -       /* Avoid a recursive GC. */
+> -       if (gc_in_progress)
+> -               goto out;
+> -
+> -       /* Paired with READ_ONCE() in wait_for_unix_gc(). */
+> -       WRITE_ONCE(gc_in_progress, true);
+> -
+>         /* First, select candidates for garbage collection.  Only
+>          * in-flight sockets are considered, and from those only ones
+>          * which don't have any external reference.
+> @@ -325,11 +320,12 @@ void unix_gc(void)
+>         /* All candidates should have been detached by now. */
+>         BUG_ON(!list_empty(&gc_candidates));
+>
+> -       /* Paired with READ_ONCE() in wait_for_unix_gc(). */
+> -       WRITE_ONCE(gc_in_progress, false);
+> -
+> -       wake_up(&unix_gc_wait);
+> -
+> - out:
+>         spin_unlock(&unix_gc_lock);
+> +       mutex_unlock(&unix_gc_mutex);
+> +}
+> +
+> +/* The external entry point: unix_gc() */
+> +void unix_gc(void)
+> +{
+> +       __unix_gc(NULL);
+>  }
+> --
 
-kernel test robot noticed the following build warnings:
+This one results in less overall load than Kuniyuki's proposed patch
+with my repro:
 
-[auto build test WARNING on net-next/main]
+* https://lore.kernel.org/netdev/20231020220511.45854-1-kuniyu@amazon.com/
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Parthiban-Veerasooran/net-ethernet-implement-OPEN-Alliance-control-transaction-interface/20231023-235310
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231023154649.45931-2-Parthiban.Veerasooran%40microchip.com
-patch subject: [PATCH net-next v2 1/9] net: ethernet: implement OPEN Alliance control transaction interface
-config: sparc-allyesconfig (https://download.01.org/0day-ci/archive/20231024/202310240609.nPpYbL1B-lkp@intel.com/config)
-compiler: sparc64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231024/202310240609.nPpYbL1B-lkp@intel.com/reproduce)
+My guess is that's because my repro is the one that is getting penalized th=
+ere.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310240609.nPpYbL1B-lkp@intel.com/
+There's still a lot work done in unix_release_sock here, where GC runs
+as long as you have any fds inflight:
 
-All warnings (new ones prefixed by >>):
+* https://elixir.bootlin.com/linux/v6.1/source/net/unix/af_unix.c#L670
 
->> drivers/net/ethernet/oa_tc6.c:250: warning: Function parameter or member 'len' not described in 'oa_tc6_read_registers'
-
-
-vim +250 drivers/net/ethernet/oa_tc6.c
-
-   238	
-   239	/**
-   240	 * oa_tc6_read_registers - function for reading multiple consecutive registers.
-   241	 * @tc6: oa_tc6 struct.
-   242	 * @addr: address of the first register to be read in the MACPHY.
-   243	 * @val: values to be read from the starting register address @addr.
-   244	 *
-   245	 * Maximum of 128 consecutive registers can be read starting at @addr.
-   246	 *
-   247	 * Returns 0 on success otherwise failed.
-   248	 */
-   249	int oa_tc6_read_registers(struct oa_tc6 *tc6, u32 addr, u32 val[], u8 len)
- > 250	{
-   251		return oa_tc6_perform_ctrl(tc6, addr, val, len, false, tc6->prote);
-   252	}
-   253	EXPORT_SYMBOL_GPL(oa_tc6_read_registers);
-   254	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Perhaps it can be improved.
 
