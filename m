@@ -1,140 +1,160 @@
-Return-Path: <netdev+bounces-43335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB457D290E
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 05:29:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA9417D2922
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 05:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 383C1B20CA3
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 03:29:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0DE4B20CA1
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 03:35:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081831847;
-	Mon, 23 Oct 2023 03:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FCE1867;
+	Mon, 23 Oct 2023 03:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yi/1+i9J"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="C4JHesz0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7292D15C9
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 03:29:38 +0000 (UTC)
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F703188;
-	Sun, 22 Oct 2023 20:29:37 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c9a1762b43so23271565ad.1;
-        Sun, 22 Oct 2023 20:29:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5EE81847
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 03:35:49 +0000 (UTC)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C431EA3
+	for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 20:35:47 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-27d0a173e61so1684709a91.0
+        for <netdev@vger.kernel.org>; Sun, 22 Oct 2023 20:35:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698031776; x=1698636576; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WE+2ax+ckyyK0GydSOksCqTiRS2Um4EHTAoyLLZfmB4=;
-        b=Yi/1+i9JuDAiNLqCAhyoAXByJNCgoen+LFceGP15b9YQJIH4IaXUKfZA+MYWdAEWu+
-         Y6ManBez0d7BY/ALwUnsldCLuLzsO5YTZuU9lonQiG+5xmTBm8djUEuP+ebQWwgvrgmt
-         IiRBIJ6cA694i8B275ZZZNGlFUiJyLWGPNXDK2PoBmPoW35G2dL4hFrxFfz9Dv3dTRJ2
-         NwJZqnBPteOGvW9WWupRcUP7WyHVbB0BjAXKX7w+MS7+5l+rS8LrMlFMwu/MXnihIwWK
-         JDV7KKgzCoALYq7nnhs9tmRKrdkbVNga+JktH6EhUZjNC3a2fGSRVv5KH0CYSLWGHR8B
-         hOwA==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1698032147; x=1698636947; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SWCegtYp8nwfQoYjg8i2/ArRcZBT2vDQSf62c++I3vQ=;
+        b=C4JHesz0fbK86A5M9SivEMJH/odsJYZFxXVKw01SMXeIBMp3lCX8c5voio8WESN2Ue
+         +1Flt3Kzt9SqNmTDIQSWa42Dugc8Aooi4pmigaVMDbUfdTYmS2pJbApyhyry921+NVpW
+         YttytDQLVNcXVzDzrx9El+LeEmM3BEeqdYMczqH4g+3/TYnCgXX6A7iT1xDIIz/TVkxw
+         DWC9LE39dYIjDOsoVp7ecHa4bplFPk/rw5YQH6f7WJ2W0v/09QoknsanEvh3OzMhJlNn
+         6JgQUALru2jeIPBcp+mkubz7rXiOl+wHBPN2/ov8nq+QdILPRzB1R7OTmb/KouVADPTZ
+         nKjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698031776; x=1698636576;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WE+2ax+ckyyK0GydSOksCqTiRS2Um4EHTAoyLLZfmB4=;
-        b=ww27MGy4OL0JEE83Ew4MyRrfRSBIAZv/NWkPMA5BgCLKP6Bj/gHoqeJ2jnOopuFFUk
-         +LbEaN/HgtfrhhnGc5S+Ktsv+7yZSrYfp8lmkDuAILOS9Cyo4+j+gKvcxDvJIQFAJTfG
-         NSLlzq84jVWda3ChX1XmEqhGuyXMJS46LzKFqLuAZZ4zl3x56AAvromj+JyAp5bB0vXv
-         6oaL6+R4q8jBodT6yV2QUlRkQpRVzyalngqiPB/YjdQXHOhK7iQxcdiBefT9H49gZilF
-         iO5Q1QEoiQTFL/wBiJrjoHhv5Y2rVNeOHPuPeaZy+ZCrWSpIrVt3YHa98NgFduoiG66Q
-         Cpcw==
-X-Gm-Message-State: AOJu0YyszTSe9wWzcKoGhCNvKraPt6uLrIqKWWUjaaK6jeMou5sNErve
-	n1ZHEU0tIxPCyuFybSbAtG0=
-X-Google-Smtp-Source: AGHT+IHOhKRMAo6KBlUi+MNLra7QroMOI7iaq9QGsi0kTMHEdxpSyWt9YCF22sVWqUuTCrSIba66Zg==
-X-Received: by 2002:a17:903:1c8:b0:1c9:bf02:6638 with SMTP id e8-20020a17090301c800b001c9bf026638mr8846162plh.51.1698031776385;
-        Sun, 22 Oct 2023 20:29:36 -0700 (PDT)
-Received: from debian.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id b5-20020a170903228500b001c727d3ea6bsm5014253plh.74.2023.10.22.20.29.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Oct 2023 20:29:35 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id 397B88055D5A; Mon, 23 Oct 2023 10:29:32 +0700 (WIB)
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH net v2 2/2] MAINTAINERS: Remove linuxwwan@intel.com mailing list
-Date: Mon, 23 Oct 2023 10:29:05 +0700
-Message-ID: <20231023032905.22515-4-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231023032905.22515-2-bagasdotme@gmail.com>
-References: <20231023032905.22515-2-bagasdotme@gmail.com>
+        d=1e100.net; s=20230601; t=1698032147; x=1698636947;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SWCegtYp8nwfQoYjg8i2/ArRcZBT2vDQSf62c++I3vQ=;
+        b=HSKteQUaVcixyzYZ29HhKvh3q38eEBj0hDISMYAtHdDCSfWm1DlN3XFj62ExDbIHg2
+         QoPouCuRQwRZAZ/7Uu2LPKRXju4I6GA3gLmDObY7chWOsPZ7Y9A/YT7YoZDym/tng32B
+         UvSHB5UM/eSpTtke7lyQ2mgDVbn5biWKLPsXf/4mrMf8EBDiUB/FvjKVc+WQTMwTjRrX
+         QoCr5W1E8CsvtzMX8/h8phHsanonFh4km7CwNc2OGEGv96XujtjRtC2xfYDWcrkbm1Hd
+         ln6ptFuxsI9i6hTaVcbKE5HOJIt4cB4ch2mbrDHaENrRZIZ5XJ09GZ1x2XyCpbK+5SUc
+         u6eg==
+X-Gm-Message-State: AOJu0YwgRDLCRY8kKFiNvnm1ZcKQoCWyre7SX4YC3xuef7uW30DiAEj7
+	KKNUqdzFC0lEbVrrztLQc0Gt81VwnuHUaj0mQ5lhxe2v
+X-Google-Smtp-Source: AGHT+IGj30MoOaVHQFRMT35CFQ5h4aVbtCV+b2A8ofQa/0Atnc2ZnTJtoqCHbtoFEmZO4yaIxgx42Q==
+X-Received: by 2002:a17:90a:202:b0:273:ec96:b6f9 with SMTP id c2-20020a17090a020200b00273ec96b6f9mr5688112pjc.25.1698032147161;
+        Sun, 22 Oct 2023 20:35:47 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c085:21c8::1237? ([2620:10d:c090:400::4:c4c8])
+        by smtp.gmail.com with ESMTPSA id ip1-20020a17090b314100b00262e485156esm6415514pjb.57.2023.10.22.20.35.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Oct 2023 20:35:46 -0700 (PDT)
+Message-ID: <afcb3c40-0148-46ef-b2be-fa4adc57b88a@davidwei.uk>
+Date: Sun, 22 Oct 2023 20:35:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1582; i=bagasdotme@gmail.com; h=from:subject; bh=nrzzUcakoOgJE4YQn7XXEJJt4nFmk1Y6mNvMO2ZAmRo=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDKmmL2Q5ruZv4bmSJczhHJh05bXqnwbDgC0lZy2ubHVdO et3i5tmRykLgxgXg6yYIsukRL6m07uMRC60r3WEmcPKBDKEgYtTACbiXs/wVyK6ZcmlLfd4cvYx 5k+98nb5nuK4dNEPJ9ZO/2IfHsa4jZeRYaHKkqLO3B+37nAsltasdz1gOzM+7qno7vCLC+YpiJl vZwIA
-X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC RESEND 00/11] Zero copy network RX using io_uring
+Content-Language: en-GB
+To: Gal Pressman <gal@nvidia.com>, Jens Axboe <axboe@kernel.dk>,
+ Pavel Begunkov <asml.silence@gmail.com>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Mina Almasry <almasrymina@google.com>, Jakub Kicinski <kuba@kernel.org>
+References: <20230826011954.1801099-1-dw@davidwei.uk>
+ <1673427d-b449-4f9e-b344-027c0dc2ec9f@nvidia.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <1673427d-b449-4f9e-b344-027c0dc2ec9f@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Messages submitted to the ML bounce (address not found error). In
-fact, the ML was mistagged as person maintainer instead of mailing
-list.
+On 2023-10-22 12:06, Gal Pressman wrote:
+> On 26/08/2023 4:19, David Wei wrote:
+>> From: David Wei <davidhwei@meta.com>
+>>
+>> This patchset is a proposal that adds zero copy network RX to io_uring.
+>> With it, userspace can register a region of host memory for receiving
+>> data directly from a NIC using DMA, without needing a kernel to user
+>> copy.
+>>
+>> Software support is added to the Broadcom BNXT driver. Hardware support
+>> for receive flow steering and header splitting is required.
+>>
+>> On the userspace side, a sample server is added in this branch of
+>> liburing:
+>> https://github.com/spikeh/liburing/tree/zcrx2
+>>
+>> Build liburing as normal, and run examples/zcrx. Then, set flow steering
+>> rules using ethtool. A sample shell script is included in
+>> examples/zcrx_flow.sh, but you need to change the source IP. Finally,
+>> connect a client using e.g. netcat and send data.
+>>
+>> This patchset + userspace code was tested on an Intel Xeon Platinum
+>> 8321HC CPU and Broadcom BCM57504 NIC.
+>>
+>> Early benchmarks using this prototype, with iperf3 as a load generator,
+>> showed a ~50% reduction in overall system memory bandwidth as measured
+>> using perf counters. Note that DDIO must be disabled on Intel systems.
+>>
+>> Mina et al. from Google and Kuba are collaborating on a similar proposal
+>> to ZC from NIC to devmem. There are many shared functionality in netdev
+>> that we can collaborate on e.g.:
+>> * Page pool memory provider backend and resource registration
+>> * Page pool refcounted iov/buf representation and lifecycle
+>> * Setting receive flow steering
+>>
+>> As mentioned earlier, this is an early prototype. It is brittle, some
+>> functionality is missing and there's little optimisation. We're looking
+>> for feedback on the overall approach and points of collaboration in
+>> netdev.
+>> * No copy fallback, if payload ends up in linear part of skb then the
+>>   code will not work
+>> * No way to pin an RX queue to a specific CPU
+>> * Only one ifq, one pool region, on RX queue...
+>>
+>> This patchset is based on the work by Jonathan Lemon
+>> <jonathan.lemon@gmail.com>:
+>> https://lore.kernel.org/io-uring/20221108050521.3198458-1-jonathan.lemon@gmail.com/
+> 
+> Hello David,
+> 
+> This work looks interesting, is there anywhere I can read about it some
+> more? Maybe it was presented (and hopefully recorded) in a recent
+> conference?
+> Maybe something geared towards adding more drivers support?
+> 
 
-Remove the ML to keep Cc: lists a bit shorter and not to spam
-everyone's inbox with postmaster notifications.
+Hi Gal,
 
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
- Intel people, if you still want to maintain int1092 (aka IOSM), please
- let me know.
+Thank you for your interest in our work! We will be publishing a paper
+and presenting this work at NetDev conference on 1 Nov.
 
- MAINTAINERS | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Support for more drivers (e.g. mlx5) is definitely on our radar. We are
+collaborating with Mina and others from Google who are working on a
+similar proposal but targetting NIC -> ZC RX into GPU memory. We both
+require shared bits of infra e.g. page pool memory providers that will
+replace the use of a one-off data_pool in this patchset. This would
+minimise driver changes needed to support this feature.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 08a7be6a5680ed..f164e573abdae8 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10450,7 +10450,6 @@ F:	drivers/platform/x86/intel/atomisp2/led.c
- 
- INTEL BIOS SAR INT1092 DRIVER
- M:	Shravan Sudhakar <s.shravan@intel.com>
--M:	Intel Corporation <linuxwwan@intel.com>
- L:	platform-driver-x86@vger.kernel.org
- S:	Maintained
- F:	drivers/platform/x86/intel/int1092/
-@@ -10879,9 +10878,8 @@ S:	Maintained
- F:	drivers/platform/x86/intel/wmi/thunderbolt.c
- 
- INTEL WWAN IOSM DRIVER
--M:	Intel Corporation <linuxwwan@intel.com>
- L:	netdev@vger.kernel.org
--S:	Maintained
-+S:	Orphan
- F:	drivers/net/wwan/iosm/
- 
- INTEL(R) TRACE HUB
-@@ -13500,7 +13498,6 @@ F:	net/dsa/tag_mtk.c
- 
- MEDIATEK T7XX 5G WWAN MODEM DRIVER
- M:	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
--M:	Intel Corporation <linuxwwan@intel.com>
- R:	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>
- R:	Liu Haijun <haijun.liu@mediatek.com>
- R:	Ricardo Martinez <ricardo.martinez@linux.intel.com>
--- 
-An old man doll... just what I always wanted! - Clara
+> I took a brief look at the bnxt patch and saw you converted the page
+> pool allocation to data pool allocation, I assume this is done for data
+> pages only, right? Headers are still allocated on page pool pages?
+> 
+> Thanks
 
+Yes, that's right.
+
+David
 
