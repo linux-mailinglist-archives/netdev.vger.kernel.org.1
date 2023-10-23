@@ -1,157 +1,119 @@
-Return-Path: <netdev+bounces-43483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C95277D38EA
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:06:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 217757D38CE
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:03:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 052A61C2098F
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:06:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDF3628133F
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:03:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CB01B273;
-	Mon, 23 Oct 2023 14:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.pl header.i=@yandex.pl header.b="IsraLzSf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4615619BC0;
+	Mon, 23 Oct 2023 14:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819342586
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 14:06:18 +0000 (UTC)
-X-Greylist: delayed 418 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 23 Oct 2023 07:06:12 PDT
-Received: from forward201a.mail.yandex.net (forward201a.mail.yandex.net [178.154.239.92])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F62310E2
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 07:06:11 -0700 (PDT)
-Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d102])
-	by forward201a.mail.yandex.net (Yandex) with ESMTP id B122564CC9
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 16:59:17 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0d:3fa3:0:640:cb15:0])
-	by forward102a.mail.yandex.net (Yandex) with ESMTP id 2ED5D60AAA;
-	Mon, 23 Oct 2023 16:59:12 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id AxNCxq5DSGk0-rI2WOUmK;
-	Mon, 23 Oct 2023 16:59:11 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.pl; s=mail;
-	t=1698069551; bh=iI33+/rzn5sH4ynUVA/931uPDe4P3bhyBCWex0PQDDY=;
-	h=Cc:Subject:From:To:Date:Message-ID;
-	b=IsraLzSfTHThKd9o2YP1Wpa39MkkF2SgSn8glE43hVvHfvK/UdTlF0rPgdNEZ4qAJ
-	 PA3Rav+qQEx/a/GCpK33bZP3L+g1+8achlRF+lWdORKgtKmZ3mBw/OA7KJJVIwT7E2
-	 SCzlCcQL0d2a3XsgsZFD4C7Q6bUM38DyUDJgZgwE=
-Authentication-Results: mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.pl
-Message-ID: <e28faa37-549d-4c49-824f-1d0dfbfb9538@yandex.pl>
-Date: Mon, 23 Oct 2023 15:59:09 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287C11B26B
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 14:03:51 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 601F7C2
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 07:03:49 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-447-orEJjE89OeeGCSgho3wybg-1; Mon,
+ 23 Oct 2023 10:03:28 -0400
+X-MC-Unique: orEJjE89OeeGCSgho3wybg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 59E171C11703;
+	Mon, 23 Oct 2023 14:03:14 +0000 (UTC)
+Received: from hog (unknown [10.39.192.51])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 01E23111D784;
+	Mon, 23 Oct 2023 14:03:12 +0000 (UTC)
+Date: Mon, 23 Oct 2023 16:03:11 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Hangyu Hua <hbh25y@gmail.com>
+Cc: borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: tls: Fix possible NULL-pointer dereference in
+ tls_decrypt_device() and tls_decrypt_sw()
+Message-ID: <ZTZ9H4aDB45RzrFD@hog>
+References: <20231023080611.19244-1-hbh25y@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org
-Content-Language: en-US-large
-From: Michal Soltys <msoltyspl@yandex.pl>
-Subject: [QUESTION] potential issue - unusual drops on XL710 (40gbit) cards
- with ksoftirqd hogging one of cpus near 100%
-Cc: =?UTF-8?Q?Rafa=C5=82_Golcz?= <rgl@touk.pl>, Piotr Przybylski <ppr@touk.pl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231023080611.19244-1-hbh25y@gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Hi,
+2023-10-23, 16:06:11 +0800, Hangyu Hua wrote:
+> tls_rx_one_record can be called in tls_sw_splice_read and tls_sw_read_sock
+> with msg being NULL. This may lead to null pointer dereferences in
+> tls_decrypt_device and tls_decrypt_sw.
+> 
+> Fix this by adding a check.
 
-A while ago we have noticed some unusual RX drops during more busy day 
-periods (but nowhere near hitting any hardware limits) on our production 
-edge servers. More details on their usage below.
+Have you actually hit this NULL dereference? I don't see how it can
+happen.
 
-First the hardware in question:
+darg->zc is 0 in both cases, so tls_decrypt_device doesn't call
+skb_copy_datagram_msg.
 
-"older" servers:
-Huawei FusionServer RH1288 V3 / 40x Intel(R) Xeon(R) CPU E5-2640 v4
+tls_decrypt_sw will call tls_decrypt_sg with out_iov = &msg->msg_iter
+(a bogus pointer but no NULL deref yet), and darg->zc is still
+0. tls_decrypt_sg skips the use of out_iov/out_sg and allocates
+clear_skb, and the next place where it would use out_iov is skipped
+because we have clear_skb.
 
-"newer" servers:
-Huawei FusionServer Pro 1288H V5 / 40x Intel(R) Xeon(R) Gold 5115
+Relevant parts of tls_decrypt_sg:
 
-In both cases the servers have 512 GB ram and are using two XL710 40GbE 
-cards in 802.3ad bond (the traffic is very well spread out).
+static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
+			  struct scatterlist *out_sg,
+			  struct tls_decrypt_arg *darg)
+{
+[...]
+	if (darg->zc && (out_iov || out_sg)) {
+		clear_skb = NULL;
+[...]
+	} else {
+		darg->zc = false;
 
-Network card details:
+		clear_skb = tls_alloc_clrtxt_skb(sk, skb, rxm->full_len);
+[...]
+	}
 
-Intel Corporation Ethernet Controller XL710 for 40GbE QSFP+ (rev 02)
+[...]
+	if (err < 0)
+		goto exit_free;
 
-Driver info as reported by ethtool same for both types:
+	if (clear_skb) {
+		sg_init_table(sgout, n_sgout);
+		sg_set_buf(&sgout[0], dctx->aad, prot->aad_size);
 
-driver: i40e
-firmware-version: 8.60 0x8000bd5f 1.3140.0
-or
-firmware-version: 8.60 0x8000bd85 1.3140.0
+		err = skb_to_sgvec(clear_skb, &sgout[1], prot->prepend_size,
+				   data_len + prot->tail_size);
+		if (err < 0)
+			goto exit_free;
+	} else if (out_iov) {
+[...]
+	} else if (out_sg) {
+		memcpy(sgout, out_sg, n_sgout * sizeof(*sgout));
+	}
+[...]
+}
 
-These are running under Ubuntu 20.04.6 LTS server with 5.15 kernels 
-(although they differ by minor versions, the issue by now happened on 
-most of those).
+-- 
+Sabrina
 
-The servers are doing content delivery work, mostly sending the data, 
-primarily from the page cache. At the busiest periods the traffic 
-approaches roughly ~50gbit per server across those 2 bonded network 
-cards (outbound traffic). Inbound traffic in comparison is a fraction of 
-that, reaching maybe 1gbit on average.
-
-The traffic is handled via Open Resty (nginx) with additional tr/edge 
-logic coded in lua. When everything is fine, we have:
-
-- outbound 30-50gbit spread across both NICs
-- inbound 500mbit-1gbit
-- NET_RX softirqs averaging ~20k/s per cpu
-- NET_TX softirqs averaging 5-10/s per cpu
-- no packet drops
-- cpu usage around ~10%-20% per core
-- ram used by nginx processes and the rest of the system up to around 15g
-- the rest of the ram in practice used as a page cache
-
-Sometimes (once per few days, on random of those servers) we have weird 
-anomaly happening during the busy hours:
-
-- lasts around 10-15 minutes, starts suddenly and ends suddenly as well
-- on one of the cpus we get the following anomalies:
-   - NET_RX softirqs drop to ~1k/s
-   - NET_TX softirqs rise to ~500-1k/s
-   - ksoftirqd hogs that particular cpu at >90% usage
-- significant packet drop on the inbound side - roughly around 10-20% 
-incoming packets
-- lots of nginx context switches
-- aggressively reclaimed page cache - up to ~200 GB memory is reclaimed 
-and immediately start filling up again with the data normally served by 
-those servers
-- the actual memory used by nginx/userland rises a tiny bit by ~1 GB 
-while that happens
-
- From things we know:
-
-- none of the network cards ever reach their theoretical capability, as 
-the traffic is well spread across them - when the issues happen it's 
-around 20-25gbit/card
-- we are not saturating inter-socket QPI links
-- this happens and stops happening pretty much suddenly
-- the TX side remains w/o drop issues
-- this has been happening since the december 2022, but it's hard to 
-pinpoint the reason at this moment
-- we have system-wide perf dumps from the period when it happens (see 
-the link at the end)
-
-Sorry for a bit chaotic writeup. At this point we are a bit out of ideas 
-how to debug it further (and what data to provide to pinpoint the issue).
-
-- is it perhaps a known issue with kernels around 5.15 and/or these 
-network cards and/or their drivers ?
-- any pointers what else (besides kernel/xl710/driver) could be an issue ?
-- any ideas how to debug it further
-- we have system-wide perf dumps from the period when it happens, if 
-that would be useful for further analysis; any assistance would be 
-greately appreciated
-
-Link to aforementioned perf dump:
-https://drive.google.com/file/d/11qFgRP-r03Oj42V_fAgQBp2ebJ1d4YBW/view
-
- From the quick check it looks like we spend a lot of time in RX path in
-__tcp_push_pending_frames()
 
