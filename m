@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-43676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E70297D4313
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:09:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 385997D4315
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:09:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E16751C20B3C
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 23:09:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E271728173A
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 23:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45704250F1;
-	Mon, 23 Oct 2023 23:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C9324200;
+	Mon, 23 Oct 2023 23:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FkvmDCcf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yq+42zaC"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AC3249EF
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 23:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E828250F5
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 23:08:39 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0F4FD7E
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE1EBD7F
 	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 16:08:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1698102516; x=1729638516;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Km+I8XmrSwLBQny/aoCpsEq7zm/AqZZtJ2xTyWIc7mg=;
-  b=FkvmDCcft4zB5gEPc+P4G/OJ+9gxXdHNJmfn199sJc7e4HPQYgjZJ4vV
-   +VgZ5SQqlpI/pGs1D8QJFErXUwUy0NVRuQbbC6BaZ5uH7H2ICQAc/OODb
-   y7YvtC8rwHYjZFSDi3UljD3KpQTMI7B/4e1giEFc2fLcWz3RtDkMkRsR5
-   /YDEGbO8x/bK5/+uJjuIQKFahnaFp8ungC5S1qJJSRK0LOnOrLbsW6sI+
-   RnfNVdufaHysJB3FX5a1mKxOOfTUyBevFPCQL9BMVUP9L1J7AlFhDv9Tn
-   CtNVOlAKsGahGAbvIkIP/sGtb1r3lktd48SRwhZpvJL67946u/8eDUYCY
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="5573727"
+  bh=vBlSk2WbyhSkIJMcaOSQZ4PEcie8UzGzVZtmSZiZD4E=;
+  b=Yq+42zaC4OwrikkVVlLfkkVP7s4N3vzIDtNTbK7wPDUgTkia2sOJEoGl
+   TqSCPnMYVgR2PraCsLgfA835F1qLrRKeRG9KnDRSlhZrhuYmSZJ3ANOHH
+   LnEVw41gwDcBQTM7csXFacKkV+I+C6EUKp7q4ybyTkR7pqMfgzn3SNKpJ
+   7iB3vJ++vAttSH8zexZMyQBorfwTSUkjF5mNkFdCp8lZTLBxIJjobA5DA
+   09NAP+ooLHLVb9knJkQvg0zK8+/4swdnq9b86AVCEqI3q4Ns2vSfdESsP
+   V+i/lAWCVPvYNokY1pKEpKYVmWCDl8ecnUI80zSUWeAtdxwTa2tOvGeEy
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="5573731"
 X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="5573727"
+   d="scan'208";a="5573731"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
   by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 16:08:32 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="793288341"
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="793288344"
 X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="793288341"
+   d="scan'208";a="793288344"
 Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
   by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 16:08:31 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
@@ -52,11 +52,10 @@ To: netdev@vger.kernel.org,
 	David Miller <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>
 Cc: Michal Schmidt <mschmidt@redhat.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next 8/9] iavf: add a common function for undoing the interrupt scheme
-Date: Mon, 23 Oct 2023 16:08:25 -0700
-Message-ID: <20231023230826.531858-10-jacob.e.keller@intel.com>
+Subject: [PATCH net-next 9/9] iavf: delete the iavf client interface
+Date: Mon, 23 Oct 2023 16:08:26 -0700
+Message-ID: <20231023230826.531858-11-jacob.e.keller@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231023230826.531858-1-jacob.e.keller@intel.com>
 References: <20231023230826.531858-1-jacob.e.keller@intel.com>
@@ -70,84 +69,1124 @@ Content-Transfer-Encoding: 8bit
 
 From: Michal Schmidt <mschmidt@redhat.com>
 
-Add a new function iavf_free_interrupt_scheme that does the inverse of
-iavf_init_interrupt_scheme. Symmetry is nice. And there will be three
-callers already.
+The iavf client interface was added in 2017 by commit ed0e894de7c1
+("i40evf: add client interface"), but there have never been any in-tree
+callers.
+
+It's not useful for future development either. The Intel out-of-tree
+iavf and irdma drivers instead use an auxiliary bus, which is a better
+solution.
+
+Remove the iavf client interface code. Also gone are the client_task
+work and the client_lock mutex.
 
 Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/iavf/iavf_main.c | 26 ++++++++++++---------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/intel/iavf/Makefile      |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf.h        |  27 -
+ drivers/net/ethernet/intel/iavf/iavf_client.c | 578 ------------------
+ drivers/net/ethernet/intel/iavf/iavf_client.h | 169 -----
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  82 ---
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  14 -
+ 6 files changed, 1 insertion(+), 871 deletions(-)
+ delete mode 100644 drivers/net/ethernet/intel/iavf/iavf_client.c
+ delete mode 100644 drivers/net/ethernet/intel/iavf/iavf_client.h
 
+diff --git a/drivers/net/ethernet/intel/iavf/Makefile b/drivers/net/ethernet/intel/iavf/Makefile
+index 9c3e45c54d01..2d154a4e2fd7 100644
+--- a/drivers/net/ethernet/intel/iavf/Makefile
++++ b/drivers/net/ethernet/intel/iavf/Makefile
+@@ -13,4 +13,4 @@ obj-$(CONFIG_IAVF) += iavf.o
+ 
+ iavf-objs := iavf_main.o iavf_ethtool.o iavf_virtchnl.o iavf_fdir.o \
+ 	     iavf_adv_rss.o \
+-	     iavf_txrx.o iavf_common.o iavf_adminq.o iavf_client.o
++	     iavf_txrx.o iavf_common.o iavf_adminq.o
+diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
+index f026d0670338..e7ab89dc883a 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf.h
++++ b/drivers/net/ethernet/intel/iavf/iavf.h
+@@ -63,7 +63,6 @@ struct iavf_vsi {
+ 	DECLARE_BITMAP(state, __IAVF_VSI_STATE_SIZE__);
+ 	int base_vector;
+ 	u16 qs_handle;
+-	void *priv;     /* client driver data reference. */
+ };
+ 
+ /* How many Rx Buffers do we bundle into one write to the hardware ? */
+@@ -256,7 +255,6 @@ struct iavf_adapter {
+ 	struct work_struct reset_task;
+ 	struct work_struct adminq_task;
+ 	struct work_struct finish_config;
+-	struct delayed_work client_task;
+ 	wait_queue_head_t down_waitqueue;
+ 	wait_queue_head_t reset_waitqueue;
+ 	wait_queue_head_t vc_waitqueue;
+@@ -265,7 +263,6 @@ struct iavf_adapter {
+ 	int num_vlan_filters;
+ 	struct list_head mac_filter_list;
+ 	struct mutex crit_lock;
+-	struct mutex client_lock;
+ 	/* Lock to protect accesses to MAC and VLAN lists */
+ 	spinlock_t mac_vlan_list_lock;
+ 	char misc_vector_name[IFNAMSIZ + 9];
+@@ -282,10 +279,6 @@ struct iavf_adapter {
+ 	u64 hw_csum_rx_error;
+ 	u32 rx_desc_count;
+ 	int num_msix_vectors;
+-	int num_rdma_msix;
+-	int rdma_base_vector;
+-	u32 client_pending;
+-	struct iavf_client_instance *cinst;
+ 	struct msix_entry *msix_entries;
+ 
+ 	u32 flags;
+@@ -294,10 +287,6 @@ struct iavf_adapter {
+ #define IAVF_FLAG_RESET_PENDING		BIT(4)
+ #define IAVF_FLAG_RESET_NEEDED		BIT(5)
+ #define IAVF_FLAG_WB_ON_ITR_CAPABLE		BIT(6)
+-#define IAVF_FLAG_SERVICE_CLIENT_REQUESTED	BIT(9)
+-#define IAVF_FLAG_CLIENT_NEEDS_OPEN		BIT(10)
+-#define IAVF_FLAG_CLIENT_NEEDS_CLOSE		BIT(11)
+-#define IAVF_FLAG_CLIENT_NEEDS_L2_PARAMS	BIT(12)
+ #define IAVF_FLAG_LEGACY_RX			BIT(15)
+ #define IAVF_FLAG_REINIT_ITR_NEEDED		BIT(16)
+ #define IAVF_FLAG_QUEUES_DISABLED		BIT(17)
+@@ -388,11 +377,6 @@ struct iavf_adapter {
+ 	u32 link_speed_mbps;
+ 
+ 	enum virtchnl_ops current_op;
+-#define CLIENT_ALLOWED(_a) ((_a)->vf_res ? \
+-			    (_a)->vf_res->vf_cap_flags & \
+-				VIRTCHNL_VF_OFFLOAD_RDMA : \
+-			    0)
+-#define CLIENT_ENABLED(_a) ((_a)->cinst)
+ /* RSS by the PF should be preferred over RSS via other methods. */
+ #define RSS_PF(_a) ((_a)->vf_res->vf_cap_flags & \
+ 		    VIRTCHNL_VF_OFFLOAD_RSS_PF)
+@@ -460,12 +444,6 @@ struct iavf_adapter {
+ 
+ /* Ethtool Private Flags */
+ 
+-/* lan device, used by client interface */
+-struct iavf_device {
+-	struct list_head list;
+-	struct iavf_adapter *vf;
+-};
+-
+ /* needed by iavf_ethtool.c */
+ extern char iavf_driver_name[];
+ 
+@@ -569,11 +547,6 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+ int iavf_config_rss(struct iavf_adapter *adapter);
+ int iavf_lan_add_device(struct iavf_adapter *adapter);
+ int iavf_lan_del_device(struct iavf_adapter *adapter);
+-void iavf_client_subtask(struct iavf_adapter *adapter);
+-void iavf_notify_client_message(struct iavf_vsi *vsi, u8 *msg, u16 len);
+-void iavf_notify_client_l2_params(struct iavf_vsi *vsi);
+-void iavf_notify_client_open(struct iavf_vsi *vsi);
+-void iavf_notify_client_close(struct iavf_vsi *vsi, bool reset);
+ void iavf_enable_channels(struct iavf_adapter *adapter);
+ void iavf_disable_channels(struct iavf_adapter *adapter);
+ void iavf_add_cloud_filter(struct iavf_adapter *adapter);
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_client.c b/drivers/net/ethernet/intel/iavf/iavf_client.c
+deleted file mode 100644
+index e6051b6355aa..000000000000
+--- a/drivers/net/ethernet/intel/iavf/iavf_client.c
++++ /dev/null
+@@ -1,578 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/* Copyright(c) 2013 - 2018 Intel Corporation. */
+-
+-#include <linux/list.h>
+-#include <linux/errno.h>
+-
+-#include "iavf.h"
+-#include "iavf_prototype.h"
+-#include "iavf_client.h"
+-
+-static
+-const char iavf_client_interface_version_str[] = IAVF_CLIENT_VERSION_STR;
+-static struct iavf_client *vf_registered_client;
+-static LIST_HEAD(iavf_devices);
+-static DEFINE_MUTEX(iavf_device_mutex);
+-
+-static u32 iavf_client_virtchnl_send(struct iavf_info *ldev,
+-				     struct iavf_client *client,
+-				     u8 *msg, u16 len);
+-
+-static int iavf_client_setup_qvlist(struct iavf_info *ldev,
+-				    struct iavf_client *client,
+-				    struct iavf_qvlist_info *qvlist_info);
+-
+-static struct iavf_ops iavf_lan_ops = {
+-	.virtchnl_send = iavf_client_virtchnl_send,
+-	.setup_qvlist = iavf_client_setup_qvlist,
+-};
+-
+-/**
+- * iavf_client_get_params - retrieve relevant client parameters
+- * @vsi: VSI with parameters
+- * @params: client param struct
+- **/
+-static
+-void iavf_client_get_params(struct iavf_vsi *vsi, struct iavf_params *params)
+-{
+-	int i;
+-
+-	memset(params, 0, sizeof(struct iavf_params));
+-	params->mtu = vsi->netdev->mtu;
+-	params->link_up = vsi->back->link_up;
+-
+-	for (i = 0; i < IAVF_MAX_USER_PRIORITY; i++) {
+-		params->qos.prio_qos[i].tc = 0;
+-		params->qos.prio_qos[i].qs_handle = vsi->qs_handle;
+-	}
+-}
+-
+-/**
+- * iavf_notify_client_message - call the client message receive callback
+- * @vsi: the VSI associated with this client
+- * @msg: message buffer
+- * @len: length of message
+- *
+- * If there is a client to this VSI, call the client
+- **/
+-void iavf_notify_client_message(struct iavf_vsi *vsi, u8 *msg, u16 len)
+-{
+-	struct iavf_client_instance *cinst;
+-
+-	if (!vsi)
+-		return;
+-
+-	cinst = vsi->back->cinst;
+-	if (!cinst || !cinst->client || !cinst->client->ops ||
+-	    !cinst->client->ops->virtchnl_receive) {
+-		dev_dbg(&vsi->back->pdev->dev,
+-			"Cannot locate client instance virtchnl_receive function\n");
+-		return;
+-	}
+-	cinst->client->ops->virtchnl_receive(&cinst->lan_info,  cinst->client,
+-					     msg, len);
+-}
+-
+-/**
+- * iavf_notify_client_l2_params - call the client notify callback
+- * @vsi: the VSI with l2 param changes
+- *
+- * If there is a client to this VSI, call the client
+- **/
+-void iavf_notify_client_l2_params(struct iavf_vsi *vsi)
+-{
+-	struct iavf_client_instance *cinst;
+-	struct iavf_params params;
+-
+-	if (!vsi)
+-		return;
+-
+-	cinst = vsi->back->cinst;
+-
+-	if (!cinst || !cinst->client || !cinst->client->ops ||
+-	    !cinst->client->ops->l2_param_change) {
+-		dev_dbg(&vsi->back->pdev->dev,
+-			"Cannot locate client instance l2_param_change function\n");
+-		return;
+-	}
+-	iavf_client_get_params(vsi, &params);
+-	cinst->lan_info.params = params;
+-	cinst->client->ops->l2_param_change(&cinst->lan_info, cinst->client,
+-					    &params);
+-}
+-
+-/**
+- * iavf_notify_client_open - call the client open callback
+- * @vsi: the VSI with netdev opened
+- *
+- * If there is a client to this netdev, call the client with open
+- **/
+-void iavf_notify_client_open(struct iavf_vsi *vsi)
+-{
+-	struct iavf_adapter *adapter = vsi->back;
+-	struct iavf_client_instance *cinst = adapter->cinst;
+-	int ret;
+-
+-	if (!cinst || !cinst->client || !cinst->client->ops ||
+-	    !cinst->client->ops->open) {
+-		dev_dbg(&vsi->back->pdev->dev,
+-			"Cannot locate client instance open function\n");
+-		return;
+-	}
+-	if (!(test_bit(__IAVF_CLIENT_INSTANCE_OPENED, &cinst->state))) {
+-		ret = cinst->client->ops->open(&cinst->lan_info, cinst->client);
+-		if (!ret)
+-			set_bit(__IAVF_CLIENT_INSTANCE_OPENED, &cinst->state);
+-	}
+-}
+-
+-/**
+- * iavf_client_release_qvlist - send a message to the PF to release rdma qv map
+- * @ldev: pointer to L2 context.
+- *
+- * Return 0 on success or < 0 on error
+- **/
+-static int iavf_client_release_qvlist(struct iavf_info *ldev)
+-{
+-	struct iavf_adapter *adapter = ldev->vf;
+-	enum iavf_status err;
+-
+-	if (adapter->aq_required)
+-		return -EAGAIN;
+-
+-	err = iavf_aq_send_msg_to_pf(&adapter->hw,
+-				     VIRTCHNL_OP_RELEASE_RDMA_IRQ_MAP,
+-				     IAVF_SUCCESS, NULL, 0, NULL);
+-
+-	if (err)
+-		dev_err(&adapter->pdev->dev,
+-			"Unable to send RDMA vector release message to PF, error %d, aq status %d\n",
+-			err, adapter->hw.aq.asq_last_status);
+-
+-	return err;
+-}
+-
+-/**
+- * iavf_notify_client_close - call the client close callback
+- * @vsi: the VSI with netdev closed
+- * @reset: true when close called due to reset pending
+- *
+- * If there is a client to this netdev, call the client with close
+- **/
+-void iavf_notify_client_close(struct iavf_vsi *vsi, bool reset)
+-{
+-	struct iavf_adapter *adapter = vsi->back;
+-	struct iavf_client_instance *cinst = adapter->cinst;
+-
+-	if (!cinst || !cinst->client || !cinst->client->ops ||
+-	    !cinst->client->ops->close) {
+-		dev_dbg(&vsi->back->pdev->dev,
+-			"Cannot locate client instance close function\n");
+-		return;
+-	}
+-	cinst->client->ops->close(&cinst->lan_info, cinst->client, reset);
+-	iavf_client_release_qvlist(&cinst->lan_info);
+-	clear_bit(__IAVF_CLIENT_INSTANCE_OPENED, &cinst->state);
+-}
+-
+-/**
+- * iavf_client_add_instance - add a client instance to the instance list
+- * @adapter: pointer to the board struct
+- *
+- * Returns cinst ptr on success, NULL on failure
+- **/
+-static struct iavf_client_instance *
+-iavf_client_add_instance(struct iavf_adapter *adapter)
+-{
+-	struct iavf_client_instance *cinst = NULL;
+-	struct iavf_vsi *vsi = &adapter->vsi;
+-	struct netdev_hw_addr *mac = NULL;
+-	struct iavf_params params;
+-
+-	if (!vf_registered_client)
+-		goto out;
+-
+-	if (adapter->cinst) {
+-		cinst = adapter->cinst;
+-		goto out;
+-	}
+-
+-	cinst = kzalloc(sizeof(*cinst), GFP_KERNEL);
+-	if (!cinst)
+-		goto out;
+-
+-	cinst->lan_info.vf = (void *)adapter;
+-	cinst->lan_info.netdev = vsi->netdev;
+-	cinst->lan_info.pcidev = adapter->pdev;
+-	cinst->lan_info.fid = 0;
+-	cinst->lan_info.ftype = IAVF_CLIENT_FTYPE_VF;
+-	cinst->lan_info.hw_addr = adapter->hw.hw_addr;
+-	cinst->lan_info.ops = &iavf_lan_ops;
+-	cinst->lan_info.version.major = IAVF_CLIENT_VERSION_MAJOR;
+-	cinst->lan_info.version.minor = IAVF_CLIENT_VERSION_MINOR;
+-	cinst->lan_info.version.build = IAVF_CLIENT_VERSION_BUILD;
+-	iavf_client_get_params(vsi, &params);
+-	cinst->lan_info.params = params;
+-	set_bit(__IAVF_CLIENT_INSTANCE_NONE, &cinst->state);
+-
+-	cinst->lan_info.msix_count = adapter->num_rdma_msix;
+-	cinst->lan_info.msix_entries =
+-			&adapter->msix_entries[adapter->rdma_base_vector];
+-
+-	mac = list_first_entry(&cinst->lan_info.netdev->dev_addrs.list,
+-			       struct netdev_hw_addr, list);
+-	if (mac)
+-		ether_addr_copy(cinst->lan_info.lanmac, mac->addr);
+-	else
+-		dev_err(&adapter->pdev->dev, "MAC address list is empty!\n");
+-
+-	cinst->client = vf_registered_client;
+-	adapter->cinst = cinst;
+-out:
+-	return cinst;
+-}
+-
+-/**
+- * iavf_client_del_instance - removes a client instance from the list
+- * @adapter: pointer to the board struct
+- *
+- **/
+-static
+-void iavf_client_del_instance(struct iavf_adapter *adapter)
+-{
+-	kfree(adapter->cinst);
+-	adapter->cinst = NULL;
+-}
+-
+-/**
+- * iavf_client_subtask - client maintenance work
+- * @adapter: board private structure
+- **/
+-void iavf_client_subtask(struct iavf_adapter *adapter)
+-{
+-	struct iavf_client *client = vf_registered_client;
+-	struct iavf_client_instance *cinst;
+-	int ret = 0;
+-
+-	if (adapter->state < __IAVF_DOWN)
+-		return;
+-
+-	/* first check client is registered */
+-	if (!client)
+-		return;
+-
+-	/* Add the client instance to the instance list */
+-	cinst = iavf_client_add_instance(adapter);
+-	if (!cinst)
+-		return;
+-
+-	dev_info(&adapter->pdev->dev, "Added instance of Client %s\n",
+-		 client->name);
+-
+-	if (!test_bit(__IAVF_CLIENT_INSTANCE_OPENED, &cinst->state)) {
+-		/* Send an Open request to the client */
+-
+-		if (client->ops && client->ops->open)
+-			ret = client->ops->open(&cinst->lan_info, client);
+-		if (!ret)
+-			set_bit(__IAVF_CLIENT_INSTANCE_OPENED,
+-				&cinst->state);
+-		else
+-			/* remove client instance */
+-			iavf_client_del_instance(adapter);
+-	}
+-}
+-
+-/**
+- * iavf_lan_add_device - add a lan device struct to the list of lan devices
+- * @adapter: pointer to the board struct
+- *
+- * Returns 0 on success or none 0 on error
+- **/
+-int iavf_lan_add_device(struct iavf_adapter *adapter)
+-{
+-	struct iavf_device *ldev;
+-	int ret = 0;
+-
+-	mutex_lock(&iavf_device_mutex);
+-	list_for_each_entry(ldev, &iavf_devices, list) {
+-		if (ldev->vf == adapter) {
+-			ret = -EEXIST;
+-			goto out;
+-		}
+-	}
+-	ldev = kzalloc(sizeof(*ldev), GFP_KERNEL);
+-	if (!ldev) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-	ldev->vf = adapter;
+-	INIT_LIST_HEAD(&ldev->list);
+-	list_add(&ldev->list, &iavf_devices);
+-	dev_info(&adapter->pdev->dev, "Added LAN device bus=0x%02x dev=0x%02x func=0x%02x\n",
+-		 adapter->hw.bus.bus_id, adapter->hw.bus.device,
+-		 adapter->hw.bus.func);
+-
+-	/* Since in some cases register may have happened before a device gets
+-	 * added, we can schedule a subtask to go initiate the clients.
+-	 */
+-	adapter->flags |= IAVF_FLAG_SERVICE_CLIENT_REQUESTED;
+-
+-out:
+-	mutex_unlock(&iavf_device_mutex);
+-	return ret;
+-}
+-
+-/**
+- * iavf_lan_del_device - removes a lan device from the device list
+- * @adapter: pointer to the board struct
+- *
+- * Returns 0 on success or non-0 on error
+- **/
+-int iavf_lan_del_device(struct iavf_adapter *adapter)
+-{
+-	struct iavf_device *ldev, *tmp;
+-	int ret = -ENODEV;
+-
+-	mutex_lock(&iavf_device_mutex);
+-	list_for_each_entry_safe(ldev, tmp, &iavf_devices, list) {
+-		if (ldev->vf == adapter) {
+-			dev_info(&adapter->pdev->dev,
+-				 "Deleted LAN device bus=0x%02x dev=0x%02x func=0x%02x\n",
+-				 adapter->hw.bus.bus_id, adapter->hw.bus.device,
+-				 adapter->hw.bus.func);
+-			list_del(&ldev->list);
+-			kfree(ldev);
+-			ret = 0;
+-			break;
+-		}
+-	}
+-
+-	mutex_unlock(&iavf_device_mutex);
+-	return ret;
+-}
+-
+-/**
+- * iavf_client_release - release client specific resources
+- * @client: pointer to the registered client
+- *
+- **/
+-static void iavf_client_release(struct iavf_client *client)
+-{
+-	struct iavf_client_instance *cinst;
+-	struct iavf_device *ldev;
+-	struct iavf_adapter *adapter;
+-
+-	mutex_lock(&iavf_device_mutex);
+-	list_for_each_entry(ldev, &iavf_devices, list) {
+-		adapter = ldev->vf;
+-		cinst = adapter->cinst;
+-		if (!cinst)
+-			continue;
+-		if (test_bit(__IAVF_CLIENT_INSTANCE_OPENED, &cinst->state)) {
+-			if (client->ops && client->ops->close)
+-				client->ops->close(&cinst->lan_info, client,
+-						   false);
+-			iavf_client_release_qvlist(&cinst->lan_info);
+-			clear_bit(__IAVF_CLIENT_INSTANCE_OPENED, &cinst->state);
+-
+-			dev_warn(&adapter->pdev->dev,
+-				 "Client %s instance closed\n", client->name);
+-		}
+-		/* delete the client instance */
+-		iavf_client_del_instance(adapter);
+-		dev_info(&adapter->pdev->dev, "Deleted client instance of Client %s\n",
+-			 client->name);
+-	}
+-	mutex_unlock(&iavf_device_mutex);
+-}
+-
+-/**
+- * iavf_client_prepare - prepare client specific resources
+- * @client: pointer to the registered client
+- *
+- **/
+-static void iavf_client_prepare(struct iavf_client *client)
+-{
+-	struct iavf_device *ldev;
+-	struct iavf_adapter *adapter;
+-
+-	mutex_lock(&iavf_device_mutex);
+-	list_for_each_entry(ldev, &iavf_devices, list) {
+-		adapter = ldev->vf;
+-		/* Signal the watchdog to service the client */
+-		adapter->flags |= IAVF_FLAG_SERVICE_CLIENT_REQUESTED;
+-	}
+-	mutex_unlock(&iavf_device_mutex);
+-}
+-
+-/**
+- * iavf_client_virtchnl_send - send a message to the PF instance
+- * @ldev: pointer to L2 context.
+- * @client: Client pointer.
+- * @msg: pointer to message buffer
+- * @len: message length
+- *
+- * Return 0 on success or < 0 on error
+- **/
+-static u32 iavf_client_virtchnl_send(struct iavf_info *ldev,
+-				     struct iavf_client *client,
+-				     u8 *msg, u16 len)
+-{
+-	struct iavf_adapter *adapter = ldev->vf;
+-	enum iavf_status err;
+-
+-	if (adapter->aq_required)
+-		return -EAGAIN;
+-
+-	err = iavf_aq_send_msg_to_pf(&adapter->hw, VIRTCHNL_OP_RDMA,
+-				     IAVF_SUCCESS, msg, len, NULL);
+-	if (err)
+-		dev_err(&adapter->pdev->dev, "Unable to send RDMA message to PF, error %d, aq status %d\n",
+-			err, adapter->hw.aq.asq_last_status);
+-
+-	return err;
+-}
+-
+-/**
+- * iavf_client_setup_qvlist - send a message to the PF to setup rdma qv map
+- * @ldev: pointer to L2 context.
+- * @client: Client pointer.
+- * @qvlist_info: queue and vector list
+- *
+- * Return 0 on success or < 0 on error
+- **/
+-static int iavf_client_setup_qvlist(struct iavf_info *ldev,
+-				    struct iavf_client *client,
+-				    struct iavf_qvlist_info *qvlist_info)
+-{
+-	struct virtchnl_rdma_qvlist_info *v_qvlist_info;
+-	struct iavf_adapter *adapter = ldev->vf;
+-	struct iavf_qv_info *qv_info;
+-	enum iavf_status err;
+-	u32 v_idx, i;
+-	size_t msg_size;
+-
+-	if (adapter->aq_required)
+-		return -EAGAIN;
+-
+-	/* A quick check on whether the vectors belong to the client */
+-	for (i = 0; i < qvlist_info->num_vectors; i++) {
+-		qv_info = &qvlist_info->qv_info[i];
+-		if (!qv_info)
+-			continue;
+-		v_idx = qv_info->v_idx;
+-		if ((v_idx >=
+-		    (adapter->rdma_base_vector + adapter->num_rdma_msix)) ||
+-		    (v_idx < adapter->rdma_base_vector))
+-			return -EINVAL;
+-	}
+-
+-	v_qvlist_info = (struct virtchnl_rdma_qvlist_info *)qvlist_info;
+-	msg_size = virtchnl_struct_size(v_qvlist_info, qv_info,
+-					v_qvlist_info->num_vectors);
+-
+-	adapter->client_pending |= BIT(VIRTCHNL_OP_CONFIG_RDMA_IRQ_MAP);
+-	err = iavf_aq_send_msg_to_pf(&adapter->hw,
+-				VIRTCHNL_OP_CONFIG_RDMA_IRQ_MAP, IAVF_SUCCESS,
+-				(u8 *)v_qvlist_info, msg_size, NULL);
+-
+-	if (err) {
+-		dev_err(&adapter->pdev->dev,
+-			"Unable to send RDMA vector config message to PF, error %d, aq status %d\n",
+-			err, adapter->hw.aq.asq_last_status);
+-		goto out;
+-	}
+-
+-	err = -EBUSY;
+-	for (i = 0; i < 5; i++) {
+-		msleep(100);
+-		if (!(adapter->client_pending &
+-		      BIT(VIRTCHNL_OP_CONFIG_RDMA_IRQ_MAP))) {
+-			err = 0;
+-			break;
+-		}
+-	}
+-out:
+-	return err;
+-}
+-
+-/**
+- * iavf_register_client - Register a iavf client driver with the L2 driver
+- * @client: pointer to the iavf_client struct
+- *
+- * Returns 0 on success or non-0 on error
+- **/
+-int iavf_register_client(struct iavf_client *client)
+-{
+-	int ret = 0;
+-
+-	if (!client) {
+-		ret = -EIO;
+-		goto out;
+-	}
+-
+-	if (strlen(client->name) == 0) {
+-		pr_info("iavf: Failed to register client with no name\n");
+-		ret = -EIO;
+-		goto out;
+-	}
+-
+-	if (vf_registered_client) {
+-		pr_info("iavf: Client %s has already been registered!\n",
+-			client->name);
+-		ret = -EEXIST;
+-		goto out;
+-	}
+-
+-	if ((client->version.major != IAVF_CLIENT_VERSION_MAJOR) ||
+-	    (client->version.minor != IAVF_CLIENT_VERSION_MINOR)) {
+-		pr_info("iavf: Failed to register client %s due to mismatched client interface version\n",
+-			client->name);
+-		pr_info("Client is using version: %02d.%02d.%02d while LAN driver supports %s\n",
+-			client->version.major, client->version.minor,
+-			client->version.build,
+-			iavf_client_interface_version_str);
+-		ret = -EIO;
+-		goto out;
+-	}
+-
+-	vf_registered_client = client;
+-
+-	iavf_client_prepare(client);
+-
+-	pr_info("iavf: Registered client %s with return code %d\n",
+-		client->name, ret);
+-out:
+-	return ret;
+-}
+-EXPORT_SYMBOL(iavf_register_client);
+-
+-/**
+- * iavf_unregister_client - Unregister a iavf client driver with the L2 driver
+- * @client: pointer to the iavf_client struct
+- *
+- * Returns 0 on success or non-0 on error
+- **/
+-int iavf_unregister_client(struct iavf_client *client)
+-{
+-	int ret = 0;
+-
+-	/* When a unregister request comes through we would have to send
+-	 * a close for each of the client instances that were opened.
+-	 * client_release function is called to handle this.
+-	 */
+-	iavf_client_release(client);
+-
+-	if (vf_registered_client != client) {
+-		pr_info("iavf: Client %s has not been registered\n",
+-			client->name);
+-		ret = -ENODEV;
+-		goto out;
+-	}
+-	vf_registered_client = NULL;
+-	pr_info("iavf: Unregistered client %s\n", client->name);
+-out:
+-	return ret;
+-}
+-EXPORT_SYMBOL(iavf_unregister_client);
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_client.h b/drivers/net/ethernet/intel/iavf/iavf_client.h
+deleted file mode 100644
+index 500269bc0f5b..000000000000
+--- a/drivers/net/ethernet/intel/iavf/iavf_client.h
++++ /dev/null
+@@ -1,169 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/* Copyright(c) 2013 - 2018 Intel Corporation. */
+-
+-#ifndef _IAVF_CLIENT_H_
+-#define _IAVF_CLIENT_H_
+-
+-#define IAVF_CLIENT_STR_LENGTH 10
+-
+-/* Client interface version should be updated anytime there is a change in the
+- * existing APIs or data structures.
+- */
+-#define IAVF_CLIENT_VERSION_MAJOR 0
+-#define IAVF_CLIENT_VERSION_MINOR 01
+-#define IAVF_CLIENT_VERSION_BUILD 00
+-#define IAVF_CLIENT_VERSION_STR     \
+-	__stringify(IAVF_CLIENT_VERSION_MAJOR) "." \
+-	__stringify(IAVF_CLIENT_VERSION_MINOR) "." \
+-	__stringify(IAVF_CLIENT_VERSION_BUILD)
+-
+-struct iavf_client_version {
+-	u8 major;
+-	u8 minor;
+-	u8 build;
+-	u8 rsvd;
+-};
+-
+-enum iavf_client_state {
+-	__IAVF_CLIENT_NULL,
+-	__IAVF_CLIENT_REGISTERED
+-};
+-
+-enum iavf_client_instance_state {
+-	__IAVF_CLIENT_INSTANCE_NONE,
+-	__IAVF_CLIENT_INSTANCE_OPENED,
+-};
+-
+-struct iavf_ops;
+-struct iavf_client;
+-
+-/* HW does not define a type value for AEQ; only for RX/TX and CEQ.
+- * In order for us to keep the interface simple, SW will define a
+- * unique type value for AEQ.
+- */
+-#define IAVF_QUEUE_TYPE_PE_AEQ	0x80
+-#define IAVF_QUEUE_INVALID_IDX	0xFFFF
+-
+-struct iavf_qv_info {
+-	u32 v_idx; /* msix_vector */
+-	u16 ceq_idx;
+-	u16 aeq_idx;
+-	u8 itr_idx;
+-};
+-
+-struct iavf_qvlist_info {
+-	u32 num_vectors;
+-	struct iavf_qv_info qv_info[];
+-};
+-
+-#define IAVF_CLIENT_MSIX_ALL 0xFFFFFFFF
+-
+-/* set of LAN parameters useful for clients managed by LAN */
+-
+-/* Struct to hold per priority info */
+-struct iavf_prio_qos_params {
+-	u16 qs_handle; /* qs handle for prio */
+-	u8 tc; /* TC mapped to prio */
+-	u8 reserved;
+-};
+-
+-#define IAVF_CLIENT_MAX_USER_PRIORITY	8
+-/* Struct to hold Client QoS */
+-struct iavf_qos_params {
+-	struct iavf_prio_qos_params prio_qos[IAVF_CLIENT_MAX_USER_PRIORITY];
+-};
+-
+-struct iavf_params {
+-	struct iavf_qos_params qos;
+-	u16 mtu;
+-	u16 link_up; /* boolean */
+-};
+-
+-/* Structure to hold LAN device info for a client device */
+-struct iavf_info {
+-	struct iavf_client_version version;
+-	u8 lanmac[6];
+-	struct net_device *netdev;
+-	struct pci_dev *pcidev;
+-	u8 __iomem *hw_addr;
+-	u8 fid;	/* function id, PF id or VF id */
+-#define IAVF_CLIENT_FTYPE_PF 0
+-#define IAVF_CLIENT_FTYPE_VF 1
+-	u8 ftype; /* function type, PF or VF */
+-	void *vf; /* cast to iavf_adapter */
+-
+-	/* All L2 params that could change during the life span of the device
+-	 * and needs to be communicated to the client when they change
+-	 */
+-	struct iavf_params params;
+-	struct iavf_ops *ops;
+-
+-	u16 msix_count;	 /* number of msix vectors*/
+-	/* Array down below will be dynamically allocated based on msix_count */
+-	struct msix_entry *msix_entries;
+-	u16 itr_index; /* Which ITR index the PE driver is suppose to use */
+-};
+-
+-struct iavf_ops {
+-	/* setup_q_vector_list enables queues with a particular vector */
+-	int (*setup_qvlist)(struct iavf_info *ldev, struct iavf_client *client,
+-			    struct iavf_qvlist_info *qv_info);
+-
+-	u32 (*virtchnl_send)(struct iavf_info *ldev, struct iavf_client *client,
+-			     u8 *msg, u16 len);
+-
+-	/* If the PE Engine is unresponsive, RDMA driver can request a reset.*/
+-	void (*request_reset)(struct iavf_info *ldev,
+-			      struct iavf_client *client);
+-};
+-
+-struct iavf_client_ops {
+-	/* Should be called from register_client() or whenever the driver is
+-	 * ready to create a specific client instance.
+-	 */
+-	int (*open)(struct iavf_info *ldev, struct iavf_client *client);
+-
+-	/* Should be closed when netdev is unavailable or when unregister
+-	 * call comes in. If the close happens due to a reset, set the reset
+-	 * bit to true.
+-	 */
+-	void (*close)(struct iavf_info *ldev, struct iavf_client *client,
+-		      bool reset);
+-
+-	/* called when some l2 managed parameters changes - mss */
+-	void (*l2_param_change)(struct iavf_info *ldev,
+-				struct iavf_client *client,
+-				struct iavf_params *params);
+-
+-	/* called when a message is received from the PF */
+-	int (*virtchnl_receive)(struct iavf_info *ldev,
+-				struct iavf_client *client,
+-				u8 *msg, u16 len);
+-};
+-
+-/* Client device */
+-struct iavf_client_instance {
+-	struct list_head list;
+-	struct iavf_info lan_info;
+-	struct iavf_client *client;
+-	unsigned long  state;
+-};
+-
+-struct iavf_client {
+-	struct list_head list;		/* list of registered clients */
+-	char name[IAVF_CLIENT_STR_LENGTH];
+-	struct iavf_client_version version;
+-	unsigned long state;		/* client state */
+-	atomic_t ref_cnt;  /* Count of all the client devices of this kind */
+-	u32 flags;
+-#define IAVF_CLIENT_FLAGS_LAUNCH_ON_PROBE	BIT(0)
+-#define IAVF_TX_FLAGS_NOTIFY_OTHER_EVENTS	BIT(2)
+-	u8 type;
+-#define IAVF_CLIENT_RDMA 0
+-	struct iavf_client_ops *ops;	/* client ops provided by the client */
+-};
+-
+-/* used by clients */
+-int iavf_register_client(struct iavf_client *client);
+-int iavf_unregister_client(struct iavf_client *client);
+-#endif /* _IAVF_CLIENT_H_ */
 diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 85252b9dce50..49a764ca5e36 100644
+index 49a764ca5e36..6e27b7938b8a 100644
 --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
 +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -1954,6 +1954,17 @@ static int iavf_init_interrupt_scheme(struct iavf_adapter *adapter)
- 	return err;
+@@ -3,7 +3,6 @@
+ 
+ #include "iavf.h"
+ #include "iavf_prototype.h"
+-#include "iavf_client.h"
+ /* All iavf tracepoints are defined by the include below, which must
+  * be included exactly once across the whole kernel with
+  * CREATE_TRACE_POINTS defined
+@@ -1286,8 +1285,6 @@ static void iavf_up_complete(struct iavf_adapter *adapter)
+ 	iavf_napi_enable_all(adapter);
+ 
+ 	adapter->aq_required |= IAVF_FLAG_AQ_ENABLE_QUEUES;
+-	if (CLIENT_ENABLED(adapter))
+-		adapter->flags |= IAVF_FLAG_CLIENT_NEEDS_OPEN;
+ 	mod_delayed_work(adapter->wq, &adapter->watchdog_task, 0);
  }
  
-+/**
-+ * iavf_free_interrupt_scheme - Undo what iavf_init_interrupt_scheme does
-+ * @adapter: board private structure
-+ **/
-+static void iavf_free_interrupt_scheme(struct iavf_adapter *adapter)
-+{
-+	iavf_free_q_vectors(adapter);
-+	iavf_reset_interrupt_capability(adapter);
-+	iavf_free_queues(adapter);
-+}
-+
- /**
-  * iavf_free_rss - Free memory used by RSS structs
-  * @adapter: board private structure
-@@ -1982,11 +1993,9 @@ static int iavf_reinit_interrupt_scheme(struct iavf_adapter *adapter, bool runni
- 	if (running)
- 		iavf_free_traffic_irqs(adapter);
- 	iavf_free_misc_irq(adapter);
--	iavf_reset_interrupt_capability(adapter);
--	iavf_free_q_vectors(adapter);
--	iavf_free_queues(adapter);
-+	iavf_free_interrupt_scheme(adapter);
+@@ -2706,12 +2703,6 @@ static void iavf_init_config_adapter(struct iavf_adapter *adapter)
+ 	adapter->link_up = false;
+ 	netif_tx_stop_all_queues(netdev);
  
--	err =  iavf_init_interrupt_scheme(adapter);
-+	err = iavf_init_interrupt_scheme(adapter);
- 	if (err)
- 		goto err;
+-	if (CLIENT_ALLOWED(adapter)) {
+-		err = iavf_lan_add_device(adapter);
+-		if (err)
+-			dev_info(&pdev->dev, "Failed to add VF to client API service list: %d\n",
+-				 err);
+-	}
+ 	dev_info(&pdev->dev, "MAC address: %pM\n", adapter->hw.mac.addr);
+ 	if (netdev->features & NETIF_F_GRO)
+ 		dev_info(&pdev->dev, "GRO is enabled\n");
+@@ -2908,7 +2899,6 @@ static void iavf_watchdog_task(struct work_struct *work)
+ 		return;
+ 	}
  
-@@ -2968,9 +2977,7 @@ static void iavf_disable_vf(struct iavf_adapter *adapter)
- 	spin_unlock_bh(&adapter->cloud_filter_list_lock);
+-	schedule_delayed_work(&adapter->client_task, msecs_to_jiffies(5));
+ 	mutex_unlock(&adapter->crit_lock);
+ restart_watchdog:
+ 	if (adapter->state >= __IAVF_DOWN)
+@@ -3019,15 +3009,6 @@ static void iavf_reset_task(struct work_struct *work)
+ 		return;
+ 	}
  
- 	iavf_free_misc_irq(adapter);
--	iavf_reset_interrupt_capability(adapter);
--	iavf_free_q_vectors(adapter);
--	iavf_free_queues(adapter);
-+	iavf_free_interrupt_scheme(adapter);
- 	memset(adapter->vf_res, 0, IAVF_VIRTCHNL_VF_RESOURCE_SIZE);
- 	iavf_shutdown_adminq(&adapter->hw);
- 	adapter->flags &= ~IAVF_FLAG_RESET_PENDING;
-@@ -5201,9 +5208,7 @@ static void iavf_remove(struct pci_dev *pdev)
- 	iavf_free_all_tx_resources(adapter);
- 	iavf_free_all_rx_resources(adapter);
- 	iavf_free_misc_irq(adapter);
+-	mutex_lock(&adapter->client_lock);
+-	if (CLIENT_ENABLED(adapter)) {
+-		adapter->flags &= ~(IAVF_FLAG_CLIENT_NEEDS_OPEN |
+-				    IAVF_FLAG_CLIENT_NEEDS_CLOSE |
+-				    IAVF_FLAG_CLIENT_NEEDS_L2_PARAMS |
+-				    IAVF_FLAG_SERVICE_CLIENT_REQUESTED);
+-		cancel_delayed_work_sync(&adapter->client_task);
+-		iavf_notify_client_close(&adapter->vsi, true);
+-	}
+ 	iavf_misc_irq_disable(adapter);
+ 	if (adapter->flags & IAVF_FLAG_RESET_NEEDED) {
+ 		adapter->flags &= ~IAVF_FLAG_RESET_NEEDED;
+@@ -3071,7 +3052,6 @@ static void iavf_reset_task(struct work_struct *work)
+ 		dev_err(&adapter->pdev->dev, "Reset never finished (%x)\n",
+ 			reg_val);
+ 		iavf_disable_vf(adapter);
+-		mutex_unlock(&adapter->client_lock);
+ 		mutex_unlock(&adapter->crit_lock);
+ 		return; /* Do not attempt to reinit. It's dead, Jim. */
+ 	}
+@@ -3210,7 +3190,6 @@ static void iavf_reset_task(struct work_struct *work)
+ 	adapter->flags &= ~IAVF_FLAG_REINIT_ITR_NEEDED;
+ 
+ 	wake_up(&adapter->reset_waitqueue);
+-	mutex_unlock(&adapter->client_lock);
+ 	mutex_unlock(&adapter->crit_lock);
+ 
+ 	return;
+@@ -3221,7 +3200,6 @@ static void iavf_reset_task(struct work_struct *work)
+ 	}
+ 	iavf_disable_vf(adapter);
+ 
+-	mutex_unlock(&adapter->client_lock);
+ 	mutex_unlock(&adapter->crit_lock);
+ 	dev_err(&adapter->pdev->dev, "failed to allocate resources during reinit\n");
+ }
+@@ -3320,48 +3298,6 @@ static void iavf_adminq_task(struct work_struct *work)
+ 	iavf_misc_irq_enable(adapter);
+ }
+ 
+-/**
+- * iavf_client_task - worker thread to perform client work
+- * @work: pointer to work_struct containing our data
+- *
+- * This task handles client interactions. Because client calls can be
+- * reentrant, we can't handle them in the watchdog.
+- **/
+-static void iavf_client_task(struct work_struct *work)
+-{
+-	struct iavf_adapter *adapter =
+-		container_of(work, struct iavf_adapter, client_task.work);
 -
--	iavf_reset_interrupt_capability(adapter);
--	iavf_free_q_vectors(adapter);
-+	iavf_free_interrupt_scheme(adapter);
+-	/* If we can't get the client bit, just give up. We'll be rescheduled
+-	 * later.
+-	 */
+-
+-	if (!mutex_trylock(&adapter->client_lock))
+-		return;
+-
+-	if (adapter->flags & IAVF_FLAG_SERVICE_CLIENT_REQUESTED) {
+-		iavf_client_subtask(adapter);
+-		adapter->flags &= ~IAVF_FLAG_SERVICE_CLIENT_REQUESTED;
+-		goto out;
+-	}
+-	if (adapter->flags & IAVF_FLAG_CLIENT_NEEDS_L2_PARAMS) {
+-		iavf_notify_client_l2_params(&adapter->vsi);
+-		adapter->flags &= ~IAVF_FLAG_CLIENT_NEEDS_L2_PARAMS;
+-		goto out;
+-	}
+-	if (adapter->flags & IAVF_FLAG_CLIENT_NEEDS_CLOSE) {
+-		iavf_notify_client_close(&adapter->vsi, false);
+-		adapter->flags &= ~IAVF_FLAG_CLIENT_NEEDS_CLOSE;
+-		goto out;
+-	}
+-	if (adapter->flags & IAVF_FLAG_CLIENT_NEEDS_OPEN) {
+-		iavf_notify_client_open(&adapter->vsi);
+-		adapter->flags &= ~IAVF_FLAG_CLIENT_NEEDS_OPEN;
+-	}
+-out:
+-	mutex_unlock(&adapter->client_lock);
+-}
+-
+ /**
+  * iavf_free_all_tx_resources - Free Tx Resources for All Queues
+  * @adapter: board private structure
+@@ -4294,8 +4230,6 @@ static int iavf_close(struct net_device *netdev)
+ 	}
  
- 	iavf_free_rss(adapter);
+ 	set_bit(__IAVF_VSI_DOWN, adapter->vsi.state);
+-	if (CLIENT_ENABLED(adapter))
+-		adapter->flags |= IAVF_FLAG_CLIENT_NEEDS_CLOSE;
+ 	/* We cannot send IAVF_FLAG_AQ_GET_OFFLOAD_VLAN_V2_CAPS before
+ 	 * IAVF_FLAG_AQ_DISABLE_QUEUES because in such case there is rtnl
+ 	 * deadlock with adminq_task() until iavf_close timeouts. We must send
+@@ -4364,10 +4298,6 @@ static int iavf_change_mtu(struct net_device *netdev, int new_mtu)
+ 	netdev_dbg(netdev, "changing MTU from %d to %d\n",
+ 		   netdev->mtu, new_mtu);
+ 	netdev->mtu = new_mtu;
+-	if (CLIENT_ENABLED(adapter)) {
+-		iavf_notify_client_l2_params(&adapter->vsi);
+-		adapter->flags |= IAVF_FLAG_SERVICE_CLIENT_REQUESTED;
+-	}
  
-@@ -5219,7 +5224,6 @@ static void iavf_remove(struct pci_dev *pdev)
+ 	if (netif_running(netdev)) {
+ 		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
+@@ -5011,7 +4941,6 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	 * and destroy them only once in remove
+ 	 */
+ 	mutex_init(&adapter->crit_lock);
+-	mutex_init(&adapter->client_lock);
+ 	mutex_init(&hw->aq.asq_mutex);
+ 	mutex_init(&hw->aq.arq_mutex);
  
- 	iounmap(hw->hw_addr);
- 	pci_release_regions(pdev);
--	iavf_free_queues(adapter);
- 	kfree(adapter->vf_res);
- 	spin_lock_bh(&adapter->mac_vlan_list_lock);
- 	/* If we got removed before an up/down sequence, we've got a filter
+@@ -5031,7 +4960,6 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	INIT_WORK(&adapter->adminq_task, iavf_adminq_task);
+ 	INIT_WORK(&adapter->finish_config, iavf_finish_config);
+ 	INIT_DELAYED_WORK(&adapter->watchdog_task, iavf_watchdog_task);
+-	INIT_DELAYED_WORK(&adapter->client_task, iavf_client_task);
+ 	queue_delayed_work(adapter->wq, &adapter->watchdog_task,
+ 			   msecs_to_jiffies(5 * (pdev->devfn & 0x07)));
+ 
+@@ -5142,7 +5070,6 @@ static void iavf_remove(struct pci_dev *pdev)
+ 	struct iavf_mac_filter *f, *ftmp;
+ 	struct net_device *netdev;
+ 	struct iavf_hw *hw;
+-	int err;
+ 
+ 	netdev = adapter->netdev;
+ 	hw = &adapter->hw;
+@@ -5176,13 +5103,6 @@ static void iavf_remove(struct pci_dev *pdev)
+ 	if (netdev->reg_state == NETREG_REGISTERED)
+ 		unregister_netdev(netdev);
+ 
+-	if (CLIENT_ALLOWED(adapter)) {
+-		err = iavf_lan_del_device(adapter);
+-		if (err)
+-			dev_warn(&pdev->dev, "Failed to delete client device: %d\n",
+-				 err);
+-	}
+-
+ 	mutex_lock(&adapter->crit_lock);
+ 	dev_info(&adapter->pdev->dev, "Removing device\n");
+ 	iavf_change_state(adapter, __IAVF_REMOVE);
+@@ -5200,7 +5120,6 @@ static void iavf_remove(struct pci_dev *pdev)
+ 	cancel_work_sync(&adapter->reset_task);
+ 	cancel_delayed_work_sync(&adapter->watchdog_task);
+ 	cancel_work_sync(&adapter->adminq_task);
+-	cancel_delayed_work_sync(&adapter->client_task);
+ 
+ 	adapter->aq_required = 0;
+ 	adapter->flags &= ~IAVF_FLAG_REINIT_ITR_NEEDED;
+@@ -5218,7 +5137,6 @@ static void iavf_remove(struct pci_dev *pdev)
+ 	/* destroy the locks only once, here */
+ 	mutex_destroy(&hw->aq.arq_mutex);
+ 	mutex_destroy(&hw->aq.asq_mutex);
+-	mutex_destroy(&adapter->client_lock);
+ 	mutex_unlock(&adapter->crit_lock);
+ 	mutex_destroy(&adapter->crit_lock);
+ 
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+index 82b84a93bcc8..64c4443dbef9 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+@@ -3,7 +3,6 @@
+ 
+ #include "iavf.h"
+ #include "iavf_prototype.h"
+-#include "iavf_client.h"
+ 
+ /**
+  * iavf_send_pf_msg
+@@ -2309,19 +2308,6 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+ 		if (v_opcode != adapter->current_op)
+ 			return;
+ 		break;
+-	case VIRTCHNL_OP_RDMA:
+-		/* Gobble zero-length replies from the PF. They indicate that
+-		 * a previous message was received OK, and the client doesn't
+-		 * care about that.
+-		 */
+-		if (msglen && CLIENT_ENABLED(adapter))
+-			iavf_notify_client_message(&adapter->vsi, msg, msglen);
+-		break;
+-
+-	case VIRTCHNL_OP_CONFIG_RDMA_IRQ_MAP:
+-		adapter->client_pending &=
+-				~(BIT(VIRTCHNL_OP_CONFIG_RDMA_IRQ_MAP));
+-		break;
+ 	case VIRTCHNL_OP_GET_RSS_HENA_CAPS: {
+ 		struct virtchnl_rss_hena *vrh = (struct virtchnl_rss_hena *)msg;
+ 
 -- 
 2.41.0
 
