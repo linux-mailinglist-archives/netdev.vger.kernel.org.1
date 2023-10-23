@@ -1,578 +1,157 @@
-Return-Path: <netdev+bounces-43480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 283C57D3837
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 15:35:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C95277D38EA
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:06:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BAC81C20910
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:35:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 052A61C2098F
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA4A19BD0;
-	Mon, 23 Oct 2023 13:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CB01B273;
+	Mon, 23 Oct 2023 14:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iaRUETHS"
+	dkim=pass (1024-bit key) header.d=yandex.pl header.i=@yandex.pl header.b="IsraLzSf"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97803D8F
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 13:35:44 +0000 (UTC)
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95EA2F9
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 06:35:41 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5a92782615dso18914267b3.2
-        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 06:35:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698068141; x=1698672941; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=qGeokiJXDbgp8yNfV9+Te0JMdXUVbQeTTmcA1PO5Z+w=;
-        b=iaRUETHSvcXmBGKaFVaO5CLQIdRhFES5D4pH4wGhS8BI5Gf/GrotqE3N7MzE8MUfog
-         Wgqn4U5sD6zO5oUqIEzKjMCNSVjf10iQEp4HkLxCRsO09bTtzkvsHH3qCvBbJbAYCB3W
-         eDQRyAYKwXjzPEf+XIY3nJuUWeXI+XWBv/PftX9UznKMe9j7lpfZVvblscAZpiZS1WT4
-         aSmn7wyJLa3ME5Lm1QUrNmVvJWUBiStcLAHoWPtIe7Z1n1IKRAgh2aJgrS+9sNE5W5bh
-         2sdjBOJNEfvEAmNmO+8Jgz6PxlsuhADobGLvK1DieKYWs84o2ZccyE6dlAiox4pKlzcx
-         RlnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698068141; x=1698672941;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qGeokiJXDbgp8yNfV9+Te0JMdXUVbQeTTmcA1PO5Z+w=;
-        b=YDHV0TMp9jzcWu7XCvPnmWuBqdwVcCKcx7X8YDOISjs0Kx3eOVIjGjfhlje/Imyf1H
-         kwx/xissvjIiUJClyD/6RE069UcT2GZ/IQcecr57EUxdryyzPcm+mzdaK7q0/bFj8zn0
-         6HrwqQ5qULcnV8KSBHTAKKYkvbdVvrj/ndacBdzbnqV9ymwCdy+yChz4uoZqXWZakiMo
-         XKqeEqwluQUcO/T5aThgOX1GnPRLoms5OxKtjgB8VOeeF+5vWpadGh51sUORytN/MaiD
-         jhmMCFZV2Yk2ams/ZnPh1UdloAEO2YO6wI2EngJP0cMGt7BGGuIUOGL8Mby+CZMftEi/
-         Jl1g==
-X-Gm-Message-State: AOJu0YwBoDkh/o5ezHSGnMqBfttyxgtSunmXSrorsV18ejN/P60rWbDh
-	ZMctWOV2SwjmR6VBlw8J86g=
-X-Google-Smtp-Source: AGHT+IEVkPu+rGGyzJ7geZ750AcqFJXj2o9mFVkSS9KF75M5fIC7TC9tV4/B8Tl8EMup/W2hFNTL6w==
-X-Received: by 2002:a0d:cad8:0:b0:570:28a9:fe40 with SMTP id m207-20020a0dcad8000000b0057028a9fe40mr9712062ywd.5.1698068140512;
-        Mon, 23 Oct 2023 06:35:40 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id z4-20020a816504000000b005a7ab32d454sm3187014ywb.10.2023.10.23.06.35.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Oct 2023 06:35:39 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <c5d3bc2d-8df3-6435-48d6-a87af1ce847e@roeck-us.net>
-Date: Mon, 23 Oct 2023 06:35:37 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819342586
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 14:06:18 +0000 (UTC)
+X-Greylist: delayed 418 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 23 Oct 2023 07:06:12 PDT
+Received: from forward201a.mail.yandex.net (forward201a.mail.yandex.net [178.154.239.92])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F62310E2
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 07:06:11 -0700 (PDT)
+Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d102])
+	by forward201a.mail.yandex.net (Yandex) with ESMTP id B122564CC9
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 16:59:17 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0d:3fa3:0:640:cb15:0])
+	by forward102a.mail.yandex.net (Yandex) with ESMTP id 2ED5D60AAA;
+	Mon, 23 Oct 2023 16:59:12 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id AxNCxq5DSGk0-rI2WOUmK;
+	Mon, 23 Oct 2023 16:59:11 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.pl; s=mail;
+	t=1698069551; bh=iI33+/rzn5sH4ynUVA/931uPDe4P3bhyBCWex0PQDDY=;
+	h=Cc:Subject:From:To:Date:Message-ID;
+	b=IsraLzSfTHThKd9o2YP1Wpa39MkkF2SgSn8glE43hVvHfvK/UdTlF0rPgdNEZ4qAJ
+	 PA3Rav+qQEx/a/GCpK33bZP3L+g1+8achlRF+lWdORKgtKmZ3mBw/OA7KJJVIwT7E2
+	 SCzlCcQL0d2a3XsgsZFD4C7Q6bUM38DyUDJgZgwE=
+Authentication-Results: mail-nwsmtp-smtp-production-main-18.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.pl
+Message-ID: <e28faa37-549d-4c49-824f-1d0dfbfb9538@yandex.pl>
+Date: Mon, 23 Oct 2023 15:59:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH iwl-next v4] ice: read internal temperature sensor
-Content-Language: en-US
-To: "Knitter, Konrad" <konrad.knitter@intel.com>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "jdelvare@suse.com" <jdelvare@suse.com>,
- Marcin Domagala <marcinx.domagala@intel.com>,
- "Joyner, Eric" <eric.joyner@intel.com>,
- Marcin Szycik <marcin.szycik@linux.intel.com>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-References: <20231016102913.898932-1-konrad.knitter@intel.com>
- <7d1c9124-d3f6-b1ac-f127-571238773156@roeck-us.net>
- <MW4PR11MB6911441F676936D0C2F771D787D8A@MW4PR11MB6911.namprd11.prod.outlook.com>
-From: Guenter Roeck <linux@roeck-us.net>
-In-Reply-To: <MW4PR11MB6911441F676936D0C2F771D787D8A@MW4PR11MB6911.namprd11.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+To: netdev@vger.kernel.org
+Content-Language: en-US-large
+From: Michal Soltys <msoltyspl@yandex.pl>
+Subject: [QUESTION] potential issue - unusual drops on XL710 (40gbit) cards
+ with ksoftirqd hogging one of cpus near 100%
+Cc: =?UTF-8?Q?Rafa=C5=82_Golcz?= <rgl@touk.pl>, Piotr Przybylski <ppr@touk.pl>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 10/23/23 04:37, Knitter, Konrad wrote:
->> -----Original Message-----
->> From: Guenter Roeck <groeck7@gmail.com> On Behalf Of Guenter Roeck
->> Sent: Sunday, October 22, 2023 6:46 PM
->> To: Knitter, Konrad <konrad.knitter@intel.com>; intel-wired-
->> lan@lists.osuosl.org
->> Cc: netdev@vger.kernel.org; jdelvare@suse.com; Marcin Domagala
->> <marcinx.domagala@intel.com>; Joyner, Eric <eric.joyner@intel.com>; Marcin
->> Szycik <marcin.szycik@linux.intel.com>; Kitszel, Przemyslaw
->> <przemyslaw.kitszel@intel.com>
->> Subject: Re: [PATCH iwl-next v4] ice: read internal temperature sensor
->>
->> On 10/16/23 03:29, Konrad Knitter wrote:
->>> Since 4.30 firmware exposes internal thermal sensor reading via admin
->>> queue commands. Expose those readouts via hwmon API when supported.
->>>
->>> Driver provides current reading from HW as well as device specific
->>> thresholds for thermal alarm (Warning, Critical, Fatal) events.
->>>
->>> $ sensors
->>>
->>> Output
->>> =========================================================
->>> ice-pci-b100
->>> Adapter: PCI adapter
->>> temp1:        +62.0°C  (high = +95.0°C, crit = +105.0°C)
->>>                          (emerg = +115.0°C)
->>>
->>> Co-developed-by: Marcin Domagala <marcinx.domagala@intel.com>
->>> Signed-off-by: Marcin Domagala <marcinx.domagala@intel.com>
->>> Co-developed-by: Eric Joyner <eric.joyner@intel.com>
->>> Signed-off-by: Eric Joyner <eric.joyner@intel.com>
->>> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
->>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->>> Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
->>> ---
->>> v4: added dependency config_hwmon, cleanups
->>
->>
->> Have yo tried to compile this with CONFIG_ICE=y and CONFIG_HWMON=m ?
->>
->> Guenter
-> 
-> CONFIG_ICE can be set to M/n only.
-> When I try CONFIG_ICE=y, it's forced to CONFIG_ICE=m.
->   
+Hi,
 
-Is that so ?
+A while ago we have noticed some unusual RX drops during more busy day 
+periods (but nowhere near hitting any hardware limits) on our production 
+edge servers. More details on their usage below.
 
-$ make allyesconfig
-$ grep CONFIG_ICE .config
-CONFIG_ICE=y
+First the hardware in question:
 
-Guenter
+"older" servers:
+Huawei FusionServer RH1288 V3 / 40x Intel(R) Xeon(R) CPU E5-2640 v4
 
->>> v3: add SPDX identification to ice_hwmon files
->>> v2: fix formmating issues, added hwmon maintainers to Cc
->>> ---
->>>    drivers/net/ethernet/intel/ice/Makefile       |   1 +
->>>    drivers/net/ethernet/intel/ice/ice.h          |   1 +
->>>    .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  28 ++++
->>>    drivers/net/ethernet/intel/ice/ice_common.c   |  56 +++++++-
->>>    drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
->>>    drivers/net/ethernet/intel/ice/ice_hwmon.c    | 126
->> ++++++++++++++++++
->>>    drivers/net/ethernet/intel/ice/ice_hwmon.h    |  15 +++
->>>    drivers/net/ethernet/intel/ice/ice_main.c     |   5 +
->>>    drivers/net/ethernet/intel/ice/ice_type.h     |   4 +
->>>    9 files changed, 237 insertions(+), 1 deletion(-)
->>>    create mode 100644 drivers/net/ethernet/intel/ice/ice_hwmon.c
->>>    create mode 100644 drivers/net/ethernet/intel/ice/ice_hwmon.h
->>>
->>> diff --git a/drivers/net/ethernet/intel/ice/Makefile
->> b/drivers/net/ethernet/intel/ice/Makefile
->>> index 8757bec23fb3..c6072080e548 100644
->>> --- a/drivers/net/ethernet/intel/ice/Makefile
->>> +++ b/drivers/net/ethernet/intel/ice/Makefile
->>> @@ -51,3 +51,4 @@ ice-$(CONFIG_RFS_ACCEL) += ice_arfs.o
->>>    ice-$(CONFIG_XDP_SOCKETS) += ice_xsk.o
->>>    ice-$(CONFIG_ICE_SWITCHDEV) += ice_eswitch.o ice_eswitch_br.o
->>>    ice-$(CONFIG_GNSS) += ice_gnss.o
->>> +ice-$(CONFIG_HWMON) += ice_hwmon.o
->>> diff --git a/drivers/net/ethernet/intel/ice/ice.h
->> b/drivers/net/ethernet/intel/ice/ice.h
->>> index ad5614d4449c..61d26be502b2 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice.h
->>> +++ b/drivers/net/ethernet/intel/ice/ice.h
->>> @@ -650,6 +650,7 @@ struct ice_pf {
->>>    #define ICE_MAX_VF_AGG_NODES		32
->>>    	struct ice_agg_node vf_agg_node[ICE_MAX_VF_AGG_NODES];
->>>    	struct ice_dplls dplls;
->>> +	struct device *hwmon_dev;
->>>    };
->>>
->>>    extern struct workqueue_struct *ice_lag_wq;
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
->> b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
->>> index 1202abfb9eb3..de2e6508f330 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
->>> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
->>> @@ -117,6 +117,7 @@ struct ice_aqc_list_caps_elem {
->>>    #define ICE_AQC_CAPS_NET_VER				0x004C
->>>    #define ICE_AQC_CAPS_PENDING_NET_VER			0x004D
->>>    #define ICE_AQC_CAPS_RDMA				0x0051
->>> +#define ICE_AQC_CAPS_SENSOR_READING			0x0067
->>>    #define ICE_AQC_CAPS_PCIE_RESET_AVOIDANCE		0x0076
->>>    #define ICE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT
->> 	0x0077
->>>    #define ICE_AQC_CAPS_NVM_MGMT
->> 	0x0080
->>> @@ -1393,6 +1394,30 @@ struct ice_aqc_get_phy_rec_clk_out {
->>>    	__le16 node_handle;
->>>    };
->>>
->>> +/* Get sensor reading (direct 0x0632) */
->>> +struct ice_aqc_get_sensor_reading {
->>> +	u8 sensor;
->>> +	u8 format;
->>> +	u8 reserved[6];
->>> +	__le32 addr_high;
->>> +	__le32 addr_low;
->>> +};
->>> +
->>> +/* Get sensor reading response (direct 0x0632) */
->>> +struct ice_aqc_get_sensor_reading_resp {
->>> +	union {
->>> +		u8 raw[8];
->>> +		/* Output data for sensor 0x00, format 0x00 */
->>> +		struct _packed {
->>> +			s8 temp;
->>> +			u8 temp_warning_threshold;
->>> +			u8 temp_critical_threshold;
->>> +			u8 temp_fatal_threshold;
->>> +			u8 reserved[4];
->>> +		} s0f0;
->>> +	} data;
->>> +};
->>> +
->>>    struct ice_aqc_link_topo_params {
->>>    	u8 lport_num;
->>>    	u8 lport_num_valid;
->>> @@ -2438,6 +2463,8 @@ struct ice_aq_desc {
->>>    		struct ice_aqc_restart_an restart_an;
->>>    		struct ice_aqc_set_phy_rec_clk_out set_phy_rec_clk_out;
->>>    		struct ice_aqc_get_phy_rec_clk_out get_phy_rec_clk_out;
->>> +		struct ice_aqc_get_sensor_reading get_sensor_reading;
->>> +		struct ice_aqc_get_sensor_reading_resp
->> get_sensor_reading_resp;
->>>    		struct ice_aqc_gpio read_write_gpio;
->>>    		struct ice_aqc_sff_eeprom read_write_sff_param;
->>>    		struct ice_aqc_set_port_id_led set_port_id_led;
->>> @@ -2617,6 +2644,7 @@ enum ice_adminq_opc {
->>>    	ice_aqc_opc_set_mac_lb				= 0x0620,
->>>    	ice_aqc_opc_set_phy_rec_clk_out			= 0x0630,
->>>    	ice_aqc_opc_get_phy_rec_clk_out			= 0x0631,
->>> +	ice_aqc_opc_get_sensor_reading			= 0x0632,
->>>    	ice_aqc_opc_get_link_topo			= 0x06E0,
->>>    	ice_aqc_opc_read_i2c				= 0x06E2,
->>>    	ice_aqc_opc_write_i2c				= 0x06E3,
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c
->> b/drivers/net/ethernet/intel/ice/ice_common.c
->>> index 283492314215..6564038e2665 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice_common.c
->>> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
->>> @@ -2462,6 +2462,26 @@ ice_parse_fdir_dev_caps(struct ice_hw *hw,
->> struct ice_hw_dev_caps *dev_p,
->>>    		  dev_p->num_flow_director_fltr);
->>>    }
->>>
->>> +/**
->>> + * ice_parse_sensor_reading_cap - Parse ICE_AQC_CAPS_SENSOR_READING
->> cap
->>> + * @hw: pointer to the HW struct
->>> + * @dev_p: pointer to device capabilities structure
->>> + * @cap: capability element to parse
->>> + *
->>> + * Parse ICE_AQC_CAPS_SENSOR_READING for device capability for reading
->>> + * enabled sensors.
->>> + */
->>> +static void
->>> +ice_parse_sensor_reading_cap(struct ice_hw *hw, struct ice_hw_dev_caps
->> *dev_p,
->>> +			     struct ice_aqc_list_caps_elem *cap)
->>> +{
->>> +	dev_p->supported_sensors = le32_to_cpu(cap->number);
->>> +
->>> +	ice_debug(hw, ICE_DBG_INIT,
->>> +		  "dev caps: supported sensors (bitmap) = 0x%x\n",
->>> +		  dev_p->supported_sensors);
->>> +}
->>> +
->>>    /**
->>>     * ice_parse_dev_caps - Parse device capabilities
->>>     * @hw: pointer to the HW struct
->>> @@ -2507,9 +2527,12 @@ ice_parse_dev_caps(struct ice_hw *hw, struct
->> ice_hw_dev_caps *dev_p,
->>>    		case ICE_AQC_CAPS_1588:
->>>    			ice_parse_1588_dev_caps(hw, dev_p, &cap_resp[i]);
->>>    			break;
->>> -		case  ICE_AQC_CAPS_FD:
->>> +		case ICE_AQC_CAPS_FD:
->>>    			ice_parse_fdir_dev_caps(hw, dev_p, &cap_resp[i]);
->>>    			break;
->>> +		case ICE_AQC_CAPS_SENSOR_READING:
->>> +			ice_parse_sensor_reading_cap(hw, dev_p,
->> &cap_resp[i]);
->>> +			break;
->>>    		default:
->>>    			/* Don't list common capabilities as unknown */
->>>    			if (!found)
->>> @@ -5292,6 +5315,37 @@ ice_aq_get_phy_rec_clk_out(struct ice_hw *hw,
->> u8 *phy_output, u8 *port_num,
->>>    	return status;
->>>    }
->>>
->>> +/**
->>> + * ice_aq_get_sensor_reading
->>> + * @hw: pointer to the HW struct
->>> + * @sensor: sensor type
->>> + * @format: requested response format
->>> + * @data: pointer to data to be read from the sensor
->>> + *
->>> + * Get sensor reading (0x0632)
->>> + */
->>> +int ice_aq_get_sensor_reading(struct ice_hw *hw,
->>> +			      struct ice_aqc_get_sensor_reading_resp *data)
->>> +{
->>> +	struct ice_aqc_get_sensor_reading *cmd;
->>> +	struct ice_aq_desc desc;
->>> +	int status;
->>> +
->>> +	ice_fill_dflt_direct_cmd_desc(&desc,
->> ice_aqc_opc_get_sensor_reading);
->>> +	cmd = &desc.params.get_sensor_reading;
->>> +#define ICE_INTERNAL_TEMP_SENSOR_FORMAT	0
->>> +#define ICE_INTERNAL_TEMP_SENSOR	0
->>> +	cmd->sensor = ICE_INTERNAL_TEMP_SENSOR;
->>> +	cmd->format = ICE_INTERNAL_TEMP_SENSOR_FORMAT;
->>> +
->>> +	status = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
->>> +	if (!status)
->>> +		memcpy(data, &desc.params.get_sensor_reading_resp,
->>> +		       sizeof(*data));
->>> +
->>> +	return status;
->>> +}
->>> +
->>>    /**
->>>     * ice_replay_pre_init - replay pre initialization
->>>     * @hw: pointer to the HW struct
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_common.h
->> b/drivers/net/ethernet/intel/ice/ice_common.h
->>> index 4a75c0c89301..9696ed59d1a8 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice_common.h
->>> +++ b/drivers/net/ethernet/intel/ice/ice_common.h
->>> @@ -240,6 +240,8 @@ ice_aq_set_phy_rec_clk_out(struct ice_hw *hw, u8
->> phy_output, bool enable,
->>>    int
->>>    ice_aq_get_phy_rec_clk_out(struct ice_hw *hw, u8 *phy_output, u8
->> *port_num,
->>>    			   u8 *flags, u16 *node_handle);
->>> +int ice_aq_get_sensor_reading(struct ice_hw *hw,
->>> +			      struct ice_aqc_get_sensor_reading_resp *data);
->>>    void
->>>    ice_stat_update40(struct ice_hw *hw, u32 reg, bool prev_stat_loaded,
->>>    		  u64 *prev_stat, u64 *cur_stat);
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_hwmon.c
->> b/drivers/net/ethernet/intel/ice/ice_hwmon.c
->>> new file mode 100644
->>> index 000000000000..14b4070663db
->>> --- /dev/null
->>> +++ b/drivers/net/ethernet/intel/ice/ice_hwmon.c
->>> @@ -0,0 +1,126 @@
->>> +// SPDX-License-Identifier: GPL-2.0
->>> +/* Copyright (C) 2023, Intel Corporation. */
->>> +
->>> +#include "ice.h"
->>> +#include "ice_hwmon.h"
->>> +#include "ice_adminq_cmd.h"
->>> +
->>> +#include <linux/hwmon.h>
->>> +
->>> +#define TEMP_FROM_REG(reg) ((reg) * 1000)
->>> +
->>> +static const struct hwmon_channel_info *ice_hwmon_info[] = {
->>> +	HWMON_CHANNEL_INFO(temp,
->>> +			   HWMON_T_INPUT | HWMON_T_MAX |
->>> +			   HWMON_T_CRIT | HWMON_T_EMERGENCY),
->>> +	NULL
->>> +};
->>> +
->>> +static int ice_hwmon_read(struct device *dev, enum hwmon_sensor_types
->> type,
->>> +			  u32 attr, int channel, long *val)
->>> +{
->>> +	struct ice_aqc_get_sensor_reading_resp resp;
->>> +	struct ice_pf *pf = dev_get_drvdata(dev);
->>> +	int ret;
->>> +
->>> +	if (type != hwmon_temp)
->>> +		return -EOPNOTSUPP;
->>> +
->>> +	ret = ice_aq_get_sensor_reading(&pf->hw, &resp);
->>> +	if (ret) {
->>> +		dev_warn_ratelimited(dev,
->>> +				     "%s HW read failure (%d)\n",
->>> +				     __func__,
->>> +				     ret);
->>> +		return ret;
->>> +	}
->>> +
->>> +	switch (attr) {
->>> +	case hwmon_temp_input:
->>> +		*val = TEMP_FROM_REG(resp.data.s0f0.temp);
->>> +		break;
->>> +	case hwmon_temp_max:
->>> +		*val =
->> TEMP_FROM_REG(resp.data.s0f0.temp_warning_threshold);
->>> +		break;
->>> +	case hwmon_temp_crit:
->>> +		*val =
->> TEMP_FROM_REG(resp.data.s0f0.temp_critical_threshold);
->>> +		break;
->>> +	case hwmon_temp_emergency:
->>> +		*val =
->> TEMP_FROM_REG(resp.data.s0f0.temp_fatal_threshold);
->>> +		break;
->>> +	default:
->>> +		dev_dbg(dev, "%s unsupported attribute (%d)\n",
->>> +			__func__, attr);
->>> +		return -EOPNOTSUPP;
->>> +	}
->>> +
->>> +	return 0;
->>> +}
->>> +
->>> +static umode_t ice_hwmon_is_visible(const void *data,
->>> +				    enum hwmon_sensor_types type, u32 attr,
->>> +				    int channel)
->>> +{
->>> +	if (type != hwmon_temp)
->>> +		return 0;
->>> +
->>> +	switch (attr) {
->>> +	case hwmon_temp_input:
->>> +	case hwmon_temp_crit:
->>> +	case hwmon_temp_max:
->>> +	case hwmon_temp_emergency:
->>> +		return 0444;
->>> +	}
->>> +
->>> +	return 0;
->>> +}
->>> +
->>> +static const struct hwmon_ops ice_hwmon_ops = {
->>> +	.is_visible = ice_hwmon_is_visible,
->>> +	.read = ice_hwmon_read
->>> +};
->>> +
->>> +static const struct hwmon_chip_info ice_chip_info = {
->>> +	.ops = &ice_hwmon_ops,
->>> +	.info = ice_hwmon_info
->>> +};
->>> +
->>> +static bool ice_is_internal_reading_supported(struct ice_pf *pf)
->>> +{
->>> +	/* Only the first PF will report temperature for a chip.
->>> +	 * Note that internal temp reading are not supported
->>> +	 * for older FW (< v4.30).
->>> +	 */
->>> +	if (pf->hw.pf_id)
->>> +		return false;
->>> +
->>> +	unsigned long sensors = pf->hw.dev_caps.supported_sensors;
->>> +
->>> +	return _test_bit(ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT,
->> &sensors);
->>> +};
->>> +
->>> +void ice_hwmon_init(struct ice_pf *pf)
->>> +{
->>> +	struct device *dev = ice_pf_to_dev(pf);
->>> +	struct device *hdev;
->>> +
->>> +	if (!ice_is_internal_reading_supported(pf))
->>> +		return;
->>> +
->>> +	hdev = hwmon_device_register_with_info(dev, "ice", pf,
->> &ice_chip_info,
->>> +					       NULL);
->>> +	if (IS_ERR(hdev)) {
->>> +		dev_warn(dev,
->>> +			 "hwmon_device_register_with_info returns error
->> (%ld)",
->>> +			 PTR_ERR(hdev));
->>> +		return;
->>> +	}
->>> +	pf->hwmon_dev = hdev;
->>> +}
->>> +
->>> +void ice_hwmon_exit(struct ice_pf *pf)
->>> +{
->>> +	if (!pf->hwmon_dev)
->>> +		return;
->>> +	hwmon_device_unregister(pf->hwmon_dev);
->>> +}
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_hwmon.h
->> b/drivers/net/ethernet/intel/ice/ice_hwmon.h
->>> new file mode 100644
->>> index 000000000000..d7ad54e12136
->>> --- /dev/null
->>> +++ b/drivers/net/ethernet/intel/ice/ice_hwmon.h
->>> @@ -0,0 +1,15 @@
->>> +/* SPDX-License-Identifier: GPL-2.0 */
->>> +/* Copyright (C) 2023, Intel Corporation. */
->>> +
->>> +#ifndef _ICE_HWMON_H_
->>> +#define _ICE_HWMON_H_
->>> +
->>> +#if IS_ENABLED(CONFIG_HWMON)
->>> +void ice_hwmon_init(struct ice_pf *pf);
->>> +void ice_hwmon_exit(struct ice_pf *pf);
->>> +#else
->>> +static void ice_hwmon_init(struct ice_pf *pf) { }
->>> +static void ice_hwmon_exit(struct ice_pf *pf) { }
->>> +#endif
->>> +
->>> +#endif /* _ICE_HWMON_H_ */
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c
->> b/drivers/net/ethernet/intel/ice/ice_main.c
->>> index a58da0024fe5..071a7da4b3b4 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice_main.c
->>> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
->>> @@ -14,6 +14,7 @@
->>>    #include "ice_dcb_lib.h"
->>>    #include "ice_dcb_nl.h"
->>>    #include "ice_devlink.h"
->>> +#include "ice_hwmon.h"
->>>    /* Including ice_trace.h with CREATE_TRACE_POINTS defined will generate
->> the
->>>     * ice tracepoint functions. This must be done exactly once across the
->>>     * ice driver.
->>> @@ -4785,6 +4786,8 @@ static void ice_init_features(struct ice_pf *pf)
->>>
->>>    	if (ice_init_lag(pf))
->>>    		dev_warn(dev, "Failed to init link aggregation support\n");
->>> +
->>> +	ice_hwmon_init(pf);
->>>    }
->>>
->>>    static void ice_deinit_features(struct ice_pf *pf)
->>> @@ -5310,6 +5313,8 @@ static void ice_remove(struct pci_dev *pdev)
->>>    		ice_free_vfs(pf);
->>>    	}
->>>
->>> +	ice_hwmon_exit(pf);
->>> +
->>>    	ice_service_task_stop(pf);
->>>    	ice_aq_cancel_waiting_tasks(pf);
->>>    	set_bit(ICE_DOWN, pf->state);
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_type.h
->> b/drivers/net/ethernet/intel/ice/ice_type.h
->>> index 877a92099ef0..0b5425d33adf 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice_type.h
->>> +++ b/drivers/net/ethernet/intel/ice/ice_type.h
->>> @@ -378,6 +378,8 @@ struct ice_hw_func_caps {
->>>    	struct ice_ts_func_info ts_func_info;
->>>    };
->>>
->>> +#define ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT	0
->>> +
->>>    /* Device wide capabilities */
->>>    struct ice_hw_dev_caps {
->>>    	struct ice_hw_common_caps common_cap;
->>> @@ -386,6 +388,8 @@ struct ice_hw_dev_caps {
->>>    	u32 num_flow_director_fltr;	/* Number of FD filters available */
->>>    	struct ice_ts_dev_info ts_dev_info;
->>>    	u32 num_funcs;
->>> +	/* bitmap of supported sensors */
->>> +	u32 supported_sensors;
->>>    };
->>>
->>>    /* MAC info */
->>>
->>> base-commit: ac4dec3fd63c7da703c244698fc92efb411ff0d4
-> 
+"newer" servers:
+Huawei FusionServer Pro 1288H V5 / 40x Intel(R) Xeon(R) Gold 5115
 
+In both cases the servers have 512 GB ram and are using two XL710 40GbE 
+cards in 802.3ad bond (the traffic is very well spread out).
+
+Network card details:
+
+Intel Corporation Ethernet Controller XL710 for 40GbE QSFP+ (rev 02)
+
+Driver info as reported by ethtool same for both types:
+
+driver: i40e
+firmware-version: 8.60 0x8000bd5f 1.3140.0
+or
+firmware-version: 8.60 0x8000bd85 1.3140.0
+
+These are running under Ubuntu 20.04.6 LTS server with 5.15 kernels 
+(although they differ by minor versions, the issue by now happened on 
+most of those).
+
+The servers are doing content delivery work, mostly sending the data, 
+primarily from the page cache. At the busiest periods the traffic 
+approaches roughly ~50gbit per server across those 2 bonded network 
+cards (outbound traffic). Inbound traffic in comparison is a fraction of 
+that, reaching maybe 1gbit on average.
+
+The traffic is handled via Open Resty (nginx) with additional tr/edge 
+logic coded in lua. When everything is fine, we have:
+
+- outbound 30-50gbit spread across both NICs
+- inbound 500mbit-1gbit
+- NET_RX softirqs averaging ~20k/s per cpu
+- NET_TX softirqs averaging 5-10/s per cpu
+- no packet drops
+- cpu usage around ~10%-20% per core
+- ram used by nginx processes and the rest of the system up to around 15g
+- the rest of the ram in practice used as a page cache
+
+Sometimes (once per few days, on random of those servers) we have weird 
+anomaly happening during the busy hours:
+
+- lasts around 10-15 minutes, starts suddenly and ends suddenly as well
+- on one of the cpus we get the following anomalies:
+   - NET_RX softirqs drop to ~1k/s
+   - NET_TX softirqs rise to ~500-1k/s
+   - ksoftirqd hogs that particular cpu at >90% usage
+- significant packet drop on the inbound side - roughly around 10-20% 
+incoming packets
+- lots of nginx context switches
+- aggressively reclaimed page cache - up to ~200 GB memory is reclaimed 
+and immediately start filling up again with the data normally served by 
+those servers
+- the actual memory used by nginx/userland rises a tiny bit by ~1 GB 
+while that happens
+
+ From things we know:
+
+- none of the network cards ever reach their theoretical capability, as 
+the traffic is well spread across them - when the issues happen it's 
+around 20-25gbit/card
+- we are not saturating inter-socket QPI links
+- this happens and stops happening pretty much suddenly
+- the TX side remains w/o drop issues
+- this has been happening since the december 2022, but it's hard to 
+pinpoint the reason at this moment
+- we have system-wide perf dumps from the period when it happens (see 
+the link at the end)
+
+Sorry for a bit chaotic writeup. At this point we are a bit out of ideas 
+how to debug it further (and what data to provide to pinpoint the issue).
+
+- is it perhaps a known issue with kernels around 5.15 and/or these 
+network cards and/or their drivers ?
+- any pointers what else (besides kernel/xl710/driver) could be an issue ?
+- any ideas how to debug it further
+- we have system-wide perf dumps from the period when it happens, if 
+that would be useful for further analysis; any assistance would be 
+greately appreciated
+
+Link to aforementioned perf dump:
+https://drive.google.com/file/d/11qFgRP-r03Oj42V_fAgQBp2ebJ1d4YBW/view
+
+ From the quick check it looks like we spend a lot of time in RX path in
+__tcp_push_pending_frames()
 
