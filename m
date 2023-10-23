@@ -1,110 +1,112 @@
-Return-Path: <netdev+bounces-43333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB02F7D28AE
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 04:46:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D37D27D2911
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 05:29:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC86B1C2089C
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 02:46:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14EA7B20D3A
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 03:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088F1637;
-	Mon, 23 Oct 2023 02:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F0A1849;
+	Mon, 23 Oct 2023 03:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H5y4JAOj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AgtlDUiu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8DF1104
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 02:46:29 +0000 (UTC)
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FAE7DB;
-	Sun, 22 Oct 2023 19:46:28 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1cacde97002so13130625ad.2;
-        Sun, 22 Oct 2023 19:46:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BABF1841
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 03:29:38 +0000 (UTC)
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA148F;
+	Sun, 22 Oct 2023 20:29:36 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id 98e67ed59e1d1-27d153c7f00so1659472a91.3;
+        Sun, 22 Oct 2023 20:29:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698029187; x=1698633987; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HQc98ygW3JLH42W3zhpB97VN01RLRDxHg6oT7E9O25I=;
-        b=H5y4JAOjGyldnWkTB5K9YPjM+gM+dlRdI98jek4ccCmB2ESWyXP5eQ27RTVCoD5IEz
-         u+tas+VpGfQVg6+DwgQf5sEJqc5sbloAeYnlCjEnUZfWu2xyvvnxvYvWDYS/hqsbFxee
-         vIZC67evt59ZkGyF8QtqRZYqCNHPYHhu/oRu4xjdsnBVbb/xqq84tN30S33ZGpF40HjE
-         hjDBSpChZYvRcaDzxUOXQstEPMnGB/yK8gZxDksqg59Ax3MWcMhGF89hLUExW4+MtSCj
-         O1RrJoCyS4U2N223BD65iTADCza7WE2um1XjOjgWf7DFeKfdPMtX6abAgS69WHyjWBbq
-         h0RA==
+        d=gmail.com; s=20230601; t=1698031776; x=1698636576; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qF7roFPOxx1o1j3QRDtTUJvVgKUHfl93L5KvFsQDK48=;
+        b=AgtlDUiuZMxK1swmpTQ9BIhHa26AEg61S41CmbywjozmRs3CToSaoDpU0GtuwPtIbC
+         OLSm6T+v0/0/jOla7JBFUs1xGjYqpA/QOf65qgfJOnBL2iBHOCf+QhLn5drc1K+O2UJ6
+         sTRYzgB5M6dpz/MOrVaC1Z7L09VSDjbeyWP/sPtdox66TJJmfgzAHlNqhyq2IZ6yKHl2
+         /7v+680D+rOisqXjROnjmqrsE4M6/awad17RJjgsw+wO6ubGgsgP9yn0SZJAPY9o2PrT
+         v4wbw2CNhmddRc9/TL8dEnETRri3g8l7S8oxTB8scRWp/f27Ghx4YOiQMODhJlPb0ewx
+         w2Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698029187; x=1698633987;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HQc98ygW3JLH42W3zhpB97VN01RLRDxHg6oT7E9O25I=;
-        b=i5qPA2Xwvh/MbVI1T4XsZhqO4mP2375m+fLZOcQnWmgkw55rJQccydoq2kvxZsuqVN
-         +MuHaQd3TLXmz1SKixquuxljq3xt1gqXFGUgNrPy1cCdc4Qhk9zw+N0DcRktlnNcGBrF
-         S1ZtOyA3ujBu42RSEEXbtjf0PZebh3yGvFeDlipa7ChjO46z8l6DoyoTfZaMq0mfdFKz
-         KYIejyKL3y++JmDvu4ZsCVZ1AdoR7RWGx+6VBe166cYQd5YED4hqWG+8ggX9Vf3lygIk
-         vpAgSoPXA3ukIYX7TOJY9pxdl9KR97UxsHNap94NAdRVDo9HJKKALrU9L8nY3K6HP1sF
-         0DFA==
-X-Gm-Message-State: AOJu0YwB3rjzdTCd51N8B2AEOSrS9b/5IPyVK4zoR7uTubDXN4Ddedl+
-	G017VG5JC+UqMbUzIkwwTIjB5ta6fbgHDw==
-X-Google-Smtp-Source: AGHT+IHNn4PQ/fdf1Gn5Ydr4cBx5xYUk3BPGPRSzdZ3Th2zqPumSc531z2wlOXGLhgZRtaN3qYZK2Q==
-X-Received: by 2002:a17:903:22c7:b0:1ca:8e79:53af with SMTP id y7-20020a17090322c700b001ca8e7953afmr6247201plg.3.1698029187468;
-        Sun, 22 Oct 2023 19:46:27 -0700 (PDT)
-Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
-        by smtp.gmail.com with ESMTPSA id e12-20020a170902ed8c00b001ba066c589dsm5022017plj.137.2023.10.22.19.46.24
+        d=1e100.net; s=20230601; t=1698031776; x=1698636576;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qF7roFPOxx1o1j3QRDtTUJvVgKUHfl93L5KvFsQDK48=;
+        b=TXe8d7hX5ZYiGxvn5DsVqul8SD0KyKmC6ThC5XXXNOYc0AiRi1dnJiJPUBjja6aXDb
+         77+gk9fu24hqRNrOkvjkJHWv4LrOKtjnGfubupmHGdx58HYtN+dURz4AAH0sOcv9dUlC
+         +1la/uf99tSyVopqh0fAgSEHOY50KD86j8TEq9uWwx/ftY7IPi68OZZV/mq/f4ZyJ1jj
+         ApNKxDVG0eNwbhcl1PjKv8YrPyZCCVyAbk5r1jQ29mUyn1F9mu2o7rPPEPI8eiH5d6Fy
+         bXgYKSQWpwm9RfjuicpINrDsXwET0ttc3E48dTAvG1/oY9Gr1Y/ADF5l+x8wLy2OeSl1
+         zZCw==
+X-Gm-Message-State: AOJu0Yx69KjQ+VxbhPqc5k5j0mChLwiDw/dtIL2Cly/tPjGLqkRLXVMW
+	GwwJk5OgXpc9naFz3YktSqM=
+X-Google-Smtp-Source: AGHT+IFUJ24+wEjXeo0kSFrJTp/x/cXWg1YBiN1ByClF6TYR0fAlOToOSYy5+j/oU47xaHLe8SlyJQ==
+X-Received: by 2002:a17:902:ec84:b0:1c7:443d:7419 with SMTP id x4-20020a170902ec8400b001c7443d7419mr6872551plg.29.1698031776208;
+        Sun, 22 Oct 2023 20:29:36 -0700 (PDT)
+Received: from debian.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id e13-20020a170902d38d00b001bb9d6b1baasm5068591pld.198.2023.10.22.20.29.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Oct 2023 19:46:26 -0700 (PDT)
-From: Edward AD <twuufnxlz@gmail.com>
-To: syzbot+9704e6f099d952508943@syzkaller.appspotmail.com
-Cc: davem@davemloft.net,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	reibax@gmail.com,
-	richardcochran@gmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] ptp: ptp_read should not release queue
-Date: Mon, 23 Oct 2023 10:46:23 +0800
-Message-ID: <20231023024622.323905-2-twuufnxlz@gmail.com>
+        Sun, 22 Oct 2023 20:29:35 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id DA9C683A133F; Mon, 23 Oct 2023 10:29:32 +0700 (WIB)
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH net v2 0/2] MAINTAINERS: WWAN subsystem changes
+Date: Mon, 23 Oct 2023 10:29:03 +0700
+Message-ID: <20231023032905.22515-2-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <0000000000002e8d4a06085267f3@google.com>
-References: <0000000000002e8d4a06085267f3@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=820; i=bagasdotme@gmail.com; h=from:subject; bh=WCwpSgcp3u6uzIpN+ngTJhNBmMfq5UpV9diesKnHaZ4=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDKmmL8R+fOSJ3tz0kaGz53TalS0+Gc2t0qn/dTlrH2hU5 Zrn6et0lLIwiHExyIopskxK5Gs6vctI5EL7WkeYOaxMIEMYuDgFYCLVOYwMXXl7r0613sUy9YRd 7/1X8dIbXqvc/M3sa3jwedNUxufmpQz/gwQFkk9Xvnilxpt38cGLRxdld+R/m3jGuviz9ZJlz9+ 94QUA
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
-X-Spam-Level: **
 
-Firstly, queue is not the memory allocated in ptp_read;
-Secondly, other processes may block at ptp_read and wait for conditions to be 
-met to perform read operations.
+I have to make this little MAINTAINERS patch series when I was dealing
+with a regression involving Intel WWAN IOSM driver [1]. The culprit
+author was (AFAIK) MIA as well as its subsystem mailing list down.
+So here is the series.
 
-Reported-and-tested-by: syzbot+9704e6f099d952508943@syzkaller.appspotmail.com
-Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
-Signed-off-by: Edward AD <twuufnxlz@gmail.com>
----
- drivers/ptp/ptp_chardev.c | 2 --
- 1 file changed, 2 deletions(-)
+Changes since v1 [2]:
+  * Alphabetically by surname sort CREDITS entry
 
-diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index 282cd7d24077..27c1ef493617 100644
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -585,7 +585,5 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
- free_event:
- 	kfree(event);
- exit:
--	if (result < 0)
--		ptp_release(pccontext);
- 	return result;
- }
+[1]: https://lore.kernel.org/lkml/267abf02-4b60-4a2e-92cd-709e3da6f7d3@gmail.com/
+[2]: https://lore.kernel.org/lkml/20231013014010.18338-1-bagasdotme@gmail.com/
+
+Bagas Sanjaya (2):
+  MAINTAINERS: Move M Chetan Kumar to CREDITS
+  MAINTAINERS: Remove linuxwwan@intel.com mailing list
+
+ CREDITS     | 5 +++++
+ MAINTAINERS | 7 +------
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+
+base-commit: d2a0fc372aca561556e765d0a9ec365c7c12f0ad
 -- 
-2.25.1
+An old man doll... just what I always wanted! - Clara
 
 
