@@ -1,153 +1,148 @@
-Return-Path: <netdev+bounces-43629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DBC27D404B
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 21:32:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA1B57D4057
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 21:35:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 872B8B20C3F
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:32:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84421281672
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:35:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B466224D4;
-	Mon, 23 Oct 2023 19:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 563CB224EA;
+	Mon, 23 Oct 2023 19:35:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L7IJx3nJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GyU9jYC+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29511CF86
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 19:32:09 +0000 (UTC)
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04524B4;
-	Mon, 23 Oct 2023 12:32:08 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-507a62d4788so5846458e87.0;
-        Mon, 23 Oct 2023 12:32:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AD2224D3
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 19:35:12 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82EC8C0
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:35:10 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9b9aeb4962so4541637276.3
+        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:35:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698089526; x=1698694326; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uMutMjT7nYAjXNIUZq+zZiowd+ZGH08x+rX8MMHC5Do=;
-        b=L7IJx3nJDXaBS9OwhZDPd8Fjmh/v//oy0nkhxr1RwN07N2wXg28tU1L0pW1J2LfwwH
-         M6E2g+DWEqhKo/rODzIDDqkADdJTI1wAI8L6g/f6b2TF4wv/HSUtzPURyTMY8RfTVreb
-         b7/Uvn60sj9aWE9xUZXtj6qlNhSuqMWeXHOkB/2OzxVu0Z6hs8BYsNs/tdo96E/2J2nX
-         OA4AbuWhN/p2O9VDAR57T3jn2TVpJhVXZyMLXU5S8uqwOTajf4ig6eYnnt97e0wU3U0m
-         sSR3tfruDXM+DCwaox3pL7lmKZHH/F+RVwO/MY+m2+qD+nLbK5HxpVC3SI8B55EXgtPU
-         wCWQ==
+        d=google.com; s=20230601; t=1698089709; x=1698694509; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=mpNGvrnmepFOL5iK9OsktiyedII/7KGUTR0lq/BVReE=;
+        b=GyU9jYC+/dOkM74MwmYBuGf7qN/0HP8h0pp8c6CNv1O34l8VdC5UVz9HA7PBd5zp2m
+         6P9X7CK8bjinlGHJBxFmhz/8MgYlADCLQd8xRH/3Lop+s/XjP5BtA7Ww08/Z5biPjw+B
+         7uN2ki6wAoaq4OmiuY/CqX3eFryNJy7wuBsf0F+dPJxQogAUiATOFb/PJDcCr8716LN5
+         4LtAOUZRicgJioKfgcyE9Xsx9VFt061GumeQUueXx/eXv1EskFiDCBAJ8B3wzooN80Ol
+         vE743Mq7JvxWbCCgydLjyl02yl7cKz8xf+x9ywYs8pqIg6n/QgLrPksE9LzL9mGnyA/C
+         QP4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698089526; x=1698694326;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uMutMjT7nYAjXNIUZq+zZiowd+ZGH08x+rX8MMHC5Do=;
-        b=GB5V3V2Rt33i4eeXfu1KMFz/OPEWAcHVSSqKYeIYdwswBeNn6VSVvdE1J4q1S0fwvc
-         +SeszSGePEz56h76I0LvjH3jVLC5hTlmCQnI83gJOiRRBPdiDlcLIeuXmjaLFFjkeakr
-         LWYYy6J5wg3fYIN+h+48W3LoIg8TPGl6aMWVTjOghqeugrPPWFUllVqHJ4xezAviMI4M
-         ChI+w3lMM01U1tWg1/ihkx8805JcdTjaKGumwU9xbVZZ3e8Rxo04oupZgQ5rEMrm6nS7
-         p+2NwudmFXglkq7uRg6a9ZSo0hg1sssPU9t9CiE7bemXoZR/qB/yhj+1FEKC8PIhNX8w
-         xmGg==
-X-Gm-Message-State: AOJu0Yyc/8bH/7pXMm1a1QAjOmiCuqQPjUm05VYYpu/xVKwc4WSf3F12
-	TUjkcr9ueYkDVwZBWh2OdXI=
-X-Google-Smtp-Source: AGHT+IFwnCY/MaXxAJu+nrAFt1YbkaNoJzJUTr4aQ3gUDKk7pMFRaww+Lg0nqyZo1jn38ogXUz28HQ==
-X-Received: by 2002:a05:6512:1396:b0:507:9615:b918 with SMTP id fc22-20020a056512139600b005079615b918mr8200716lfb.52.1698089525700;
-        Mon, 23 Oct 2023 12:32:05 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id n15-20020aa7c68f000000b0053eb9af1e15sm6711383edq.77.2023.10.23.12.32.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 12:32:05 -0700 (PDT)
-Date: Mon, 23 Oct 2023 22:32:03 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Pavel Machek <pavel@ucw.cz>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"open list:ARM/Mediatek SoC support" <linux-kernel@vger.kernel.org>,
-	"moderated list:ARM/Mediatek SoC support" <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH net-next v2 1/2] net: dsa: Use conduit and user terms
-Message-ID: <20231023193203.5mfflqi2zbtkepx2@skbuf>
-References: <20231011222026.4181654-1-florian.fainelli@broadcom.com>
- <20231011222026.4181654-2-florian.fainelli@broadcom.com>
- <ZTYc6l2ZpLeGRFj9@duo.ucw.cz>
+        d=1e100.net; s=20230601; t=1698089709; x=1698694509;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mpNGvrnmepFOL5iK9OsktiyedII/7KGUTR0lq/BVReE=;
+        b=B+iCycupuhg1cZtwjEIjG+ayDGlXVF1EPNMpN2m7Mdw/PwvIsLHoUO9BUkxnLBWX4B
+         Vyqi5oELXTpwe4mYk9jlar0Pkt4qFn6Bv8OzKfrlgJ/CMNwuMnRy4HHsvF35q2MsCE63
+         vuW5hM8P7pR8ywfjTvFLAJKI26lbKMP9Int/BA/XBA3jNARRm9M+Fcp6RClm7/O+4b04
+         TZ5AMGiMEqg2R4o9etM9YSp9/wWyVsafKB9QleZWNJszM8gZxKVnV318oOD/K9nNyQwY
+         A7UekTdhz5VqSl3zA5pmCro60V3nqf7UnhBzXmZzxO8u8bkd93Fm2v4wKHBY7u3oaOB4
+         AoUQ==
+X-Gm-Message-State: AOJu0YxLSj7GBo4MMG5SAIrzH8p/NJL5KZFIrhIuP8q0zrE2G00HKu0b
+	EtcBZBaBrPkB0a2nltcoAFqTgF3C7nssnhVpow==
+X-Google-Smtp-Source: AGHT+IETefzX2fjRbWGPZdZ7MnkUWmJiCSF1lyuREmMHugp81jgO3yXXMfhHZ/Y/bU0zTaFhuljISUlkljUy47Dwng==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a25:dccf:0:b0:d77:f6f9:159 with SMTP
+ id y198-20020a25dccf000000b00d77f6f90159mr200286ybe.9.1698089709778; Mon, 23
+ Oct 2023 12:35:09 -0700 (PDT)
+Date: Mon, 23 Oct 2023 19:35:07 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZTYc6l2ZpLeGRFj9@duo.ucw.cz>
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAOrKNmUC/x2NQQqDQAwAvyI5N7Crpbr9SilFYlZzMJVkkRbx7
+ 116mMNcZg5wNmGHe3OA8S4ub60SLw3QMurMKFN1aEPbxQp6MaXti5PJzuboXQqoXJAKra91FEX CnOIQ8rUPdEtQU5txls9/83ie5w+JKpDSdgAAAA==
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1698089708; l=2146;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=2i13pUNg5jdPNAKizwFkDgsEeFj20v602g+x3gcL7mQ=; b=ky84JixLgjvwMNGmiy2NSzwFeHDXPKLBEYdk92wBMLHMD7ib2CZNN4xkwdsRAgNnU8scCvJZ6
+ grVyjyo+v9WDPSdC5jcZNOWZG0aCmk3iFtMEQDho7OnlVjudLIvWdr8
+X-Mailer: b4 0.12.3
+Message-ID: <20231023-strncpy-drivers-s390-net-ctcm_main-c-v1-1-265db6e78165@google.com>
+Subject: [PATCH] s390/ctcm: replace deprecated strncpy with strscpy
+From: Justin Stitt <justinstitt@google.com>
+To: Alexandra Winter <wintera@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-Hi Pavel,
+strncpy() is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-On Mon, Oct 23, 2023 at 09:12:42AM +0200, Pavel Machek wrote:
-> On Wed 2023-10-11 15:20:25, Florian Fainelli wrote:
-> > Use more inclusive terms throughout the DSA subsystem by moving away
-> > from "master" which is replaced by "conduit" and "slave" which is
-> > replaced by "user". No functional changes.
-> 
-> Note that by making it more "inclusive" you make it incomprehensible
-> for users where english is not their first language.
+We expect chid to be NUL-terminated based on its use with format
+strings:
 
-I will preface by saying that I am quite indifferent to the whole inclusivity
-movement, with a personal tendency of considering it silly and superficial,
-and frankly a waste of time and resources. But I get that to some it may
-matter more than to me. And it's not my time that gets wasted..
+	CTCM_DBF_TEXT_(SETUP, CTC_DBF_INFO, "%s(%s) %s", CTCM_FUNTAIL,
+			chid, ok ? "OK" : "failed");
 
-Based on "DSA has become incomprehensible because it replaced master/slave
-with terms I don't know", I think an analogous attitude that's closer to
-home could just as well be: "I'm a complete stranger, but why is eastern
-Europe going through decommunization?! All I knew about eastern Europe
-is that it was communist!"
+Moreover, NUL-padding is not required as it is _only_ used in this one
+instance with a format string.
 
-I believe that in order to make an omelette, you need to break a few eggs,
-and applied here, that seems to mean that A1 level English speakers get
-to learn a word from the A2 vocabulary. I don't see how learning some
-new words in a foreign language could do too much harm for the individual
-going through that process.
+Considering the above, a suitable replacement is `strscpy` [2] due to
+the fact that it guarantees NUL-termination on the destination buffer
+without unnecessarily NUL-padding.
 
-> Plus, "user" already means something else in kernel context
+We can also drop the +1 from chid's declaration as we no longer need to
+be cautious about leaving a spot for a NUL-byte. Let's use the more
+idiomatic strscpy usage of (dest, src, sizeof(dest)) as this more
+closely ties the destination buffer to the length.
 
-If DSA is going to replace master/slave with something else, the
-user/conduit terms have the legitimacy of being documented alternative
-names at least since 2015's commit 77760e94928f ("Documentation:
-networking: add a DSA document") and 2016's commit 83c0afaec7b7 ("net:
-dsa: Add new binding implementation").
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Note: build-tested only.
 
-It also needs to be said that I never found master/slave to be a perfect
-description of the hierarchy in DSA (but I just didn't care enough to
-change it). If you think about it in terms of netdev adjacency lists for
-example, the slaves are the uppers and the master (host interface) is
-the lower... Or the subordination relationship could also be seen in
-reverse because the user doesn't interact directly with the master/CPU
-conduit interface most of the time, it just gets reconfigured
-automatically, in a way initiated by some other entity, with what's
-necessary to process switch-tagged traffic.
+Found with: $ rg "strncpy\("
+---
+ drivers/s390/net/ctcm_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> so this will likely be confusing even for native speakers.
+diff --git a/drivers/s390/net/ctcm_main.c b/drivers/s390/net/ctcm_main.c
+index 6faf27136024..ac15d7c2b200 100644
+--- a/drivers/s390/net/ctcm_main.c
++++ b/drivers/s390/net/ctcm_main.c
+@@ -200,13 +200,13 @@ static void channel_free(struct channel *ch)
+ static void channel_remove(struct channel *ch)
+ {
+ 	struct channel **c = &channels;
+-	char chid[CTCM_ID_SIZE+1];
++	char chid[CTCM_ID_SIZE];
+ 	int ok = 0;
+ 
+ 	if (ch == NULL)
+ 		return;
+ 	else
+-		strncpy(chid, ch->id, CTCM_ID_SIZE);
++		strscpy(chid, ch->id, sizeof(chid));
+ 
+ 	channel_free(ch);
+ 	while (*c) {
 
-Sidetracking a bit, there was a joke I can't find anymore, so I'll just
-paraphraze it:
+---
+base-commit: 9c5d00cb7b6bbc5a7965d9ab7d223b5402d1f02c
+change-id: 20231023-strncpy-drivers-s390-net-ctcm_main-c-f9180f470c69
 
-"- what do drug dealers and computer engineers have in common?
- - they both call their customers 'users'".
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
 
-I think/hope most native speakers got past the confusion at this point,
-and just think of technical terms as words devoid of their original
-meaning (which also makes the master/slave dilemma questionable TBH,
-but what do I know). If there is any doubt, DSA has ample documentation
-which clarifies what a slave (now user) port is. There is also a
-paragraph documenting the naming change from master/slave.
-
-> This is wrong.
-
-Hmm, the topic is a bit arid for me to get too heated about it, but I
-don't think that your arguments justify such a strong conclusion...
-Your premise seems to be that people cannot learn, and can never adapt.
 
