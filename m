@@ -1,53 +1,48 @@
-Return-Path: <netdev+bounces-43449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1C4E7D3300
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:25:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FAF87D3307
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:26:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37FB21C208CE
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:25:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B11D91C20935
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 11:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A2F15E82;
-	Mon, 23 Oct 2023 11:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED84515E84;
+	Mon, 23 Oct 2023 11:25:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="D4hRs9hW"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="p9JrcLm6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D5415E80;
-	Mon, 23 Oct 2023 11:25:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37E1DC433C8;
-	Mon, 23 Oct 2023 11:25:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3E915E80;
+	Mon, 23 Oct 2023 11:25:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45013C433C8;
+	Mon, 23 Oct 2023 11:25:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1698060347;
-	bh=yzzOezg/81F/MpbZzKRv7FzMGp66sO7JwXmPhPnMK9s=;
+	s=korg; t=1698060356;
+	bh=xXvY4xmd2AnMqShJdWovg+G43rAKn8hdI+9YL5/JR7g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=D4hRs9hWjhz6PnqyUsGaPAh99FPsmTeNHGuc5mO+Qqw9xW59WbzxbjD6aLNli7P4K
-	 nhiiPudG+NGk+w8DI4El5rjLRDdHtM8LcCoRJ68VIQygfZkKWSIgl2sQyjG02+lLMt
-	 DeqY5tUaio4lFFEecCFFvdQUi+5tXE5irdzmdlus=
+	b=p9JrcLm6joP5AnMckmalDI0P/9GR9I55kAMQ9ce8vpyC9dRPd4k7r12UJI36no4cP
+	 Na4N3JUxTl6s3tXCDNFiG6hPUfdXzraqu7ZCFUBhgqQIvQEREn/XkJ54k5wKbVjTFz
+	 li5gcjJ7t0U8wjlMgGcKJKO3onXo/2qJMD3sxC1A=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
-	Mirko Lindner <mlindner@marvell.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org,
-	kernel test robot <lkp@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1 115/196] sky2: Make sure there is at least one frag_addr available
-Date: Mon, 23 Oct 2023 12:56:20 +0200
-Message-ID: <20231023104831.768989916@linuxfoundation.org>
+	Sasha Levin <sashal@kernel.org>,
+	Gurucharan G <gurucharanx.g@intel.com>
+Subject: [PATCH 6.1 137/196] ice: Remove redundant pci_enable_pcie_error_reporting()
+Date: Mon, 23 Oct 2023 12:56:42 +0200
+Message-ID: <20231023104832.357990560@linuxfoundation.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231023104828.488041585@linuxfoundation.org>
 References: <20231023104828.488041585@linuxfoundation.org>
@@ -66,71 +61,63 @@ Content-Transfer-Encoding: 8bit
 
 ------------------
 
-From: Kees Cook <keescook@chromium.org>
+From: Bjorn Helgaas <bhelgaas@google.com>
 
-[ Upstream commit 6a70e5cbedaf8ad10528ac9ac114f3ec20f422df ]
+[ Upstream commit ba153552c18d7eb839ec0bad7d7484e29ba4719c ]
 
-In the pathological case of building sky2 with 16k PAGE_SIZE, the
-frag_addr[] array would never be used, so the original code was correct
-that size should be 0. But the compiler now gets upset with 0 size arrays
-in places where it hasn't eliminated the code that might access such an
-array (it can't figure out that in this case an rx skb with fragments
-would never be created). To keep the compiler happy, make sure there is
-at least 1 frag_addr in struct rx_ring_info:
+pci_enable_pcie_error_reporting() enables the device to send ERR_*
+Messages.  Since f26e58bf6f54 ("PCI/AER: Enable error reporting when AER is
+native"), the PCI core does this for all devices during enumeration.
 
-   In file included from include/linux/skbuff.h:28,
-                    from include/net/net_namespace.h:43,
-                    from include/linux/netdevice.h:38,
-                    from drivers/net/ethernet/marvell/sky2.c:18:
-   drivers/net/ethernet/marvell/sky2.c: In function 'sky2_rx_unmap_skb':
-   include/linux/dma-mapping.h:416:36: warning: array subscript i is outside array bounds of 'dma_addr_t[0]' {aka 'long long unsigned int[]'} [-Warray-bounds=]
-     416 | #define dma_unmap_page(d, a, s, r) dma_unmap_page_attrs(d, a, s, r, 0)
-         |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/sky2.c:1257:17: note: in expansion of macro 'dma_unmap_page'
-    1257 |                 dma_unmap_page(&pdev->dev, re->frag_addr[i],
-         |                 ^~~~~~~~~~~~~~
-   In file included from drivers/net/ethernet/marvell/sky2.c:41:
-   drivers/net/ethernet/marvell/sky2.h:2198:25: note: while referencing 'frag_addr'
-    2198 |         dma_addr_t      frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT];
-         |                         ^~~~~~~~~
+Remove the redundant pci_enable_pcie_error_reporting() call from the
+driver.  Also remove the corresponding pci_disable_pcie_error_reporting()
+from the driver .remove() path.
 
-With CONFIG_PAGE_SIZE_16KB=y, PAGE_SHIFT == 14, so:
+Note that this doesn't control interrupt generation by the Root Port; that
+is controlled by the AER Root Error Command register, which is managed by
+the AER service driver.
 
-  #define ETH_JUMBO_MTU   9000
-
-causes "ETH_JUMBO_MTU >> PAGE_SHIFT" to be 0. Use "?: 1" to solve this build warning.
-
-Cc: Mirko Lindner <mlindner@marvell.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202309191958.UBw1cjXk-lkp@intel.com/
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Stable-dep-of: 0288c3e709e5 ("ice: reset first in crash dump kernels")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/marvell/sky2.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/ice/ice_main.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/sky2.h b/drivers/net/ethernet/marvell/sky2.h
-index ddec1627f1a7b..8d0bacf4e49cc 100644
---- a/drivers/net/ethernet/marvell/sky2.h
-+++ b/drivers/net/ethernet/marvell/sky2.h
-@@ -2195,7 +2195,7 @@ struct rx_ring_info {
- 	struct sk_buff	*skb;
- 	dma_addr_t	data_addr;
- 	DEFINE_DMA_UNMAP_LEN(data_size);
--	dma_addr_t	frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT];
-+	dma_addr_t	frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT ?: 1];
- };
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index ae733207d0116..f0f39364819ac 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4723,7 +4723,6 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ 		return err;
+ 	}
  
- enum flow_control {
+-	pci_enable_pcie_error_reporting(pdev);
+ 	pci_set_master(pdev);
+ 
+ 	pf->pdev = pdev;
+@@ -5016,7 +5015,6 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ 	ice_devlink_destroy_regions(pf);
+ 	ice_deinit_hw(hw);
+ err_exit_unroll:
+-	pci_disable_pcie_error_reporting(pdev);
+ 	pci_disable_device(pdev);
+ 	return err;
+ }
+@@ -5142,7 +5140,6 @@ static void ice_remove(struct pci_dev *pdev)
+ 	ice_reset(&pf->hw, ICE_RESET_PFR);
+ 	pci_wait_for_pending_transaction(pdev);
+ 	ice_clear_interrupt_scheme(pf);
+-	pci_disable_pcie_error_reporting(pdev);
+ 	pci_disable_device(pdev);
+ }
+ 
 -- 
 2.40.1
 
