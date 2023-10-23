@@ -1,108 +1,264 @@
-Return-Path: <netdev+bounces-43388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2E297D2D30
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 10:51:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27CD07D2D3E
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 10:53:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EF132813FD
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 08:51:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D90DA281447
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 08:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CC511CB4;
-	Mon, 23 Oct 2023 08:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="fBDWFABt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA420125A4;
+	Mon, 23 Oct 2023 08:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D5523C5
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 08:51:19 +0000 (UTC)
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2828DD6B
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 01:51:17 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-507973f3b65so4698924e87.3
-        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 01:51:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1698051075; x=1698655875; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ysSPIE1IsCCSmbKD8t6b4YAJn+91dFhQHWn97JPjhfo=;
-        b=fBDWFABtdRy/dqJUpSZ+liDyBE3Yz4jUtCRqnbrsQ1+/b6CbT4YpugRDwZnXT42Ov5
-         0Sn0D11S4TDcztFBNmNoed/a0A7qXzGcnha0v0g2ND2NsFpXS/pQuR/2bInodCU5l0/u
-         FkseaI6z1bluG4Ldw9twsA5kNBDohQt/rd2uqiM7DFCT8ZJfBgpECkP7AKya9NTD8Nma
-         iL2wNkEP97CXuX8gis7V6MP7YrNd54fDy6sgU9QzBMMBal0WtjhxjJYQO75hPhdiQKVc
-         samvIZjVAzm/Tzxuja7T5QYbrCjXmYupEbk8nubMq+EoPPgh3nsuaNtp+pNZb9XHnLHd
-         thTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698051075; x=1698655875;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ysSPIE1IsCCSmbKD8t6b4YAJn+91dFhQHWn97JPjhfo=;
-        b=qrWILri33ES7ELaKzL1RNhv2bN7IfSqhae5JFkcTwedLRairIKWrF7QDiElbeRuEgH
-         +lbUgu0BsE/3P7jgKR0rtg6VTPnm+8JSUoZ2Q9Ch+YhRlU9zYK7klA5Rq5YERpCNuDgR
-         iksUtdrQ6ajHU8YNnBLZnQ2+npYAvEizymr6Q7EktFZg2sHkqWaoSgNkoDHraNSOgQQp
-         OiFzxw700JbZPD6PpkO/mGkXPOpTIelZLD2nXhHMBL3oau6MCXzZrhD0Lxwf3mjumMr0
-         ym/+1wfULT0PqMpDErGS0hiIp5gebPhL1FP+dWWzWQdjB3Iydn9wiSNohsQZK5yJemDy
-         p1cQ==
-X-Gm-Message-State: AOJu0YyhoZLmGhMks0WrmG1i7FBQf7eQ/3JQHYbSyeRCSaUNPcm3aoIk
-	qF1v/gpMgM9j5oDRK/Rd17aqWg==
-X-Google-Smtp-Source: AGHT+IFEURVUnPN4CEHL4cv4l6EZj9sBwtljJmg6BWQjvR/0RRtPiq7dIc0YgYd3MEVCJaTEEeOFfQ==
-X-Received: by 2002:a05:6512:3449:b0:503:1d46:6f29 with SMTP id j9-20020a056512344900b005031d466f29mr5831713lfr.37.1698051075030;
-        Mon, 23 Oct 2023 01:51:15 -0700 (PDT)
-Received: from localhost (h-46-59-36-206.A463.priv.bahnhof.se. [46.59.36.206])
-        by smtp.gmail.com with ESMTPSA id v26-20020ac258fa000000b00507a3b8b008sm1610739lfo.112.2023.10.23.01.51.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 01:51:14 -0700 (PDT)
-Date: Mon, 23 Oct 2023 10:51:13 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc: linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/2] net: ethernet: renesas: infrastructure
- preparations for upcoming driver
-Message-ID: <ZTY0AXS2QtkIkLX7@oden.dyn.berto.se>
-References: <20231022205316.3209-1-wsa+renesas@sang-engineering.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929B1101C0
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 08:52:56 +0000 (UTC)
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D437D6E;
+	Mon, 23 Oct 2023 01:52:51 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VuiM0ct_1698051163;
+Received: from 30.221.149.80(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VuiM0ct_1698051163)
+          by smtp.aliyun-inc.com;
+          Mon, 23 Oct 2023 16:52:48 +0800
+Message-ID: <567c792e-33e0-9ff6-f5c2-0eae356c7eb1@linux.alibaba.com>
+Date: Mon, 23 Oct 2023 16:52:42 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net 5/5] net/smc: put sk reference if close work was
+ canceled
+To: Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com,
+ jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
+ <1697009600-22367-6-git-send-email-alibuda@linux.alibaba.com>
+ <bdcb307f-d2a8-4aef-bb7d-dd87e56ff740@linux.ibm.com>
+ <ee641ca5-104b-d1ec-5b2a-e20237c5378a@linux.alibaba.com>
+ <ad5e4191-227e-4a62-a110-472618ef7de1@linux.ibm.com>
+ <305c7ae2-a902-3e30-5e67-b590d848d0ba@linux.alibaba.com>
+ <990a6b09-135a-41fb-a375-c37ffec6fe99@linux.ibm.com>
+ <94f89147-cedc-b8b2-415f-942ec14cd670@linux.alibaba.com>
+ <83476aac-a2f6-4705-8aec-762b1f165210@linux.ibm.com>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <83476aac-a2f6-4705-8aec-762b1f165210@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231022205316.3209-1-wsa+renesas@sang-engineering.com>
 
-Hi Wolfram,
 
-Nice work, for the whole series.
 
-Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+On 10/23/23 4:19 PM, Wenjia Zhang wrote:
+>
+>
+> On 20.10.23 04:41, D. Wythe wrote:
+>>
+>>
+>> On 10/20/23 1:40 AM, Wenjia Zhang wrote:
+>>>
+>>>
+>>> On 19.10.23 09:33, D. Wythe wrote:
+>>>>
+>>>>
+>>>> On 10/19/23 4:26 AM, Wenjia Zhang wrote:
+>>>>>
+>>>>>
+>>>>> On 17.10.23 04:06, D. Wythe wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 10/13/23 3:04 AM, Wenjia Zhang wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 11.10.23 09:33, D. Wythe wrote:
+>>>>>>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>>>>>>>
+>>>>>>>> Note that we always hold a reference to sock when attempting
+>>>>>>>> to submit close_work. 
+>>>>>>> yes
+>>>>>>> Therefore, if we have successfully
+>>>>>>>> canceled close_work from pending, we MUST release that reference
+>>>>>>>> to avoid potential leaks.
+>>>>>>>>
+>>>>>>> Isn't the corresponding reference already released inside the 
+>>>>>>> smc_close_passive_work()?
+>>>>>>>
+>>>>>>
+>>>>>> Hi Wenjia,
+>>>>>>
+>>>>>> If we successfully cancel the close work from the pending state,
+>>>>>> it means that smc_close_passive_work() has never been executed.
+>>>>>>
+>>>>>> You can find more details here.
+>>>>>>
+>>>>>> /**
+>>>>>> * cancel_work_sync - cancel a work and wait for it to finish
+>>>>>> * @work:the work to cancel
+>>>>>> *
+>>>>>> * Cancel @work and wait for its execution to finish. This function
+>>>>>> * can be used even if the work re-queues itself or migrates to
+>>>>>> * another workqueue. On return from this function, @work is
+>>>>>> * guaranteed to be not pending or executing on any CPU.
+>>>>>> *
+>>>>>> * cancel_work_sync(&delayed_work->work) must not be used for
+>>>>>> * delayed_work's. Use cancel_delayed_work_sync() instead.
+>>>>>> *
+>>>>>> * The caller must ensure that the workqueue on which @work was last
+>>>>>> * queued can't be destroyed before this function returns.
+>>>>>> *
+>>>>>> * Return:
+>>>>>> * %true if @work was pending, %false otherwise.
+>>>>>> */
+>>>>>> boolcancel_work_sync(structwork_struct *work)
+>>>>>> {
+>>>>>> return__cancel_work_timer(work, false);
+>>>>>> }
+>>>>>>
+>>>>>> Best wishes,
+>>>>>> D. Wythe
+>>>>> As I understand, queue_work() would wake up the work if the work 
+>>>>> is not already on the queue. And the sock_hold() is just prio to 
+>>>>> the queue_work(). That means, cancel_work_sync() would cancel the 
+>>>>> work either before its execution or after. If your fix refers to 
+>>>>> the former case, at this moment, I don't think the reference can 
+>>>>> be hold, thus it is unnecessary to put it.
+>>>>>>
+>>>>
+>>>> I am quite confuse about why you think when we cancel the work 
+>>>> before its execution,
+>>>> the reference can not be hold ?
+>>>>
+>>>>
+>>>> Perhaps the following diagram can describe the problem in better way :
+>>>>
+>>>> smc_close_cancel_work
+>>>> smc_cdc_msg_recv_action
+>>>>
+>>>>
+>>>> sock_hold
+>>>> queue_work
+>>>> if (cancel_work_sync())        // successfully cancel before execution
+>>>> sock_put()                        //  need to put it since we 
+>>>> already hold a ref before   queue_work()
+>>>>
+>>>>
+>>> ha, I already thought you might ask such question:P
+>>>
+>>> I think here two Problems need to be clarified:
+>>>
+>>> 1) Do you think the bh_lock_sock/bh_unlock_sock in the 
+>>> smc_cdc_msg_recv does not protect the smc_cdc_msg_recv_action() from 
+>>> cancel_work_sync()?
+>>> Maybe that would go back to the discussion in the other patch on the 
+>>> behaviors of the locks.
+>>>
+>>
+>> Yes. bh_lock_sock/bh_unlock_sock can not block code execution 
+>> protected by lock_sock/unlock(). That is to say, they are not exclusive.
+>>
+> No, the logic of the inference is very vague to me. My understand is 
+> completely different. That is what I read from the kernel code. They 
+> are not *completely* exclusive, because while the bottom half context 
+> holds the lock i.e. bh_lock_sock, the process context can not get the 
+> lock by lock_sock. (This is actually my main point of my argument for 
+> these fixes, and I didn't see any clarify from you). However, while 
+> the process context holds the lock by lock_sock, the bottom half 
+> context can still get it by bh_lock_sock, this is just like what you 
+> showed in the code in lock_sock. Once it gets the ownership, it 
+> release the spinlock.
+>
 
-On 2023-10-22 22:53:14 +0200, Wolfram Sang wrote:
-> Before we upstream a new driver, Niklas and I thought that a few
-> cleanups for Kconfig/Makefile will help readability and maintainability.
-> Here they are, looking forward to comments.
-> 
-> 
-> Wolfram Sang (2):
->   net: ethernet: renesas: group entries in Makefile
->   net: ethernet: renesas: drop SoC names in Kconfig
-> 
->  drivers/net/ethernet/renesas/Kconfig  | 9 +--------
->  drivers/net/ethernet/renesas/Makefile | 4 +---
->  2 files changed, 2 insertions(+), 11 deletions(-)
-> 
-> -- 
-> 2.35.1
-> 
+“ while the process context holds the lock by lock_sock, the bottom half 
+context can still get it by bh_lock_sock,  ”
 
--- 
-Kind Regards,
-Niklas Söderlund
+You already got that, so why that sock_set_flag(DONE) and 
+sock_set_flag(DEAD) can not happen concurrently ?
+
+
+>> We can use a very simple example to infer that since bh_lock_sock is 
+>> type of spin-lock, if bh_lock_sock/bh_unlock_sock can block 
+>> lock_sock/unlock(),
+>> then lock_sock/unlock() can also block bh_lock_sock/bh_unlock_sock.
+>>
+>> If this is true, when the process context already lock_sock(), the 
+>> interrupt context must wait for the process to call
+>> release_sock(). Obviously, this is very unreasonable.
+>>
+>>
+>>> 2) If the queue_work returns true, as I said in the last main, the 
+>>> work should be (being) executed. How could the cancel_work_sync() 
+>>> cancel the work before execution successgully?
+>>
+>> No, that's not true. In fact, if queue_work returns true, it simply 
+>> means that we have added the task to the queue and may schedule a 
+>> worker to execute it,
+>> but it does not guarantee that the task will be executed or is being 
+>> executed when it returns true,
+>> the task might still in the list and waiting some worker to execute it.
+>>
+>> We can make a simple inference,
+>>
+>> 1. A known fact is that if no special flag (WORK_UNBOUND) is given, 
+>> tasks submitted will eventually be executed on the CPU where they 
+>> were submitted.
+>>
+>> 2. If the queue_work returns true, the work should be or is being 
+>> executed
+>>
+>> If all of the above are true, when we invoke queue_work in an 
+>> interrupt context, does it mean that the submitted task will be 
+>> executed in the interrupt context?
+>>
+>>
+>> Best wishes,
+>> D. Wythe
+>>
+> If you say the thread is not gauranteed to be waken up in then 
+> queue_work to execute the work, please explain what the kick_pool 
+> function does.
+
+I never said that.
+
+>
+> However, the spin_lock understanding is still the key problem in the 
+> cases. As I said, if it is not get clarify, we don't really need to go 
+> on to disucss this.
+>
+>>>
+>>>>>>>> Fixes: 42bfba9eaa33 ("net/smc: immediate termination for SMCD 
+>>>>>>>> link groups")
+>>>>>>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>>>>>>>> ---
+>>>>>>>>   net/smc/smc_close.c | 3 ++-
+>>>>>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>>>>
+>>>>>>>> diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
+>>>>>>>> index 449ef45..10219f5 100644
+>>>>>>>> --- a/net/smc/smc_close.c
+>>>>>>>> +++ b/net/smc/smc_close.c
+>>>>>>>> @@ -116,7 +116,8 @@ static void smc_close_cancel_work(struct 
+>>>>>>>> smc_sock *smc)
+>>>>>>>>       struct sock *sk = &smc->sk;
+>>>>>>>>         release_sock(sk);
+>>>>>>>> -    cancel_work_sync(&smc->conn.close_work);
+>>>>>>>> +    if (cancel_work_sync(&smc->conn.close_work))
+>>>>>>>> +        sock_put(sk);
+>>>>>>>> cancel_delayed_work_sync(&smc->conn.tx_work);
+>>>>>>>>       lock_sock(sk);
+>>>>>>>>   }
+>>>>>>
+>>>>
+>>>>
+>>
+
 
