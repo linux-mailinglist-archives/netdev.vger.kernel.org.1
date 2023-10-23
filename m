@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-43337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49F0A7D2912
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 05:29:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BB457D290E
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 05:29:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BE71281428
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 03:29:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 383C1B20CA3
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 03:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D0615C9;
-	Mon, 23 Oct 2023 03:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081831847;
+	Mon, 23 Oct 2023 03:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mbCC8ZIl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yi/1+i9J"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9191B1845
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 03:29:39 +0000 (UTC)
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24054D51;
-	Sun, 22 Oct 2023 20:29:38 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-27d17f5457fso2852985a91.0;
-        Sun, 22 Oct 2023 20:29:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7292D15C9
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 03:29:38 +0000 (UTC)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F703188;
+	Sun, 22 Oct 2023 20:29:37 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c9a1762b43so23271565ad.1;
+        Sun, 22 Oct 2023 20:29:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698031777; x=1698636577; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698031776; x=1698636576; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tKMoisv4APMNvmaa7VcDuH3apsmnkAackD9YWfjsLis=;
-        b=mbCC8ZIlCAg4WSvKYk6FynLv7TOd8FmSnkSagQt4mp2LQp1ByWNDdyk6O5+cdCaa6R
-         nz8Iv06nJ2/qaK9vUucmGRbJQhQZAT7/MEqzyhDz8PYlpcY3HFdKTx0i3+rwX/YWyss5
-         5L84yzm64XzkwjXKgwpLjYSDFkdAH3HY1nksMgnL//HCiPuAoLBNAmbn+5wi4TYXml95
-         4+n1dsdkaUb7uFGlF2N7nO89RPM0HfVMBbzo6yjkEOQy0DyiJZkmzek73oUlLQY2Qbx8
-         sKAAB9JFqKwgIZ0jDePVnbEbAp5BezEuVDIfTC99RnxfDBrbiga8akZQQ1CqepXThBHr
-         XiMg==
+        bh=WE+2ax+ckyyK0GydSOksCqTiRS2Um4EHTAoyLLZfmB4=;
+        b=Yi/1+i9JuDAiNLqCAhyoAXByJNCgoen+LFceGP15b9YQJIH4IaXUKfZA+MYWdAEWu+
+         Y6ManBez0d7BY/ALwUnsldCLuLzsO5YTZuU9lonQiG+5xmTBm8djUEuP+ebQWwgvrgmt
+         IiRBIJ6cA694i8B275ZZZNGlFUiJyLWGPNXDK2PoBmPoW35G2dL4hFrxFfz9Dv3dTRJ2
+         NwJZqnBPteOGvW9WWupRcUP7WyHVbB0BjAXKX7w+MS7+5l+rS8LrMlFMwu/MXnihIwWK
+         JDV7KKgzCoALYq7nnhs9tmRKrdkbVNga+JktH6EhUZjNC3a2fGSRVv5KH0CYSLWGHR8B
+         hOwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698031777; x=1698636577;
+        d=1e100.net; s=20230601; t=1698031776; x=1698636576;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tKMoisv4APMNvmaa7VcDuH3apsmnkAackD9YWfjsLis=;
-        b=TACQNhL48rAs43CiNAyIjVDEdfev/4i4ZHvgxy8aIiU0St2dfZGB2hP5AQhTe/TSR6
-         g0pT+O2Wz4LjEplUvxK5bb0t86a6tnjSuCaOhfAI5XMrL63/zvZiyboZzhfC9g1V3Roy
-         ecfZuUuT9WGzqTlUiIrE1YlUA6d1pHML3YHuB+Tc5EBWdHjMrhv4L1Bc2iX3K2EUrrWi
-         rHA1MThr819eFyZ+qJJLhUYImnb3FxzcRMHlPIV4tifaITcx5iEAyQuKp5aDPrHIpuib
-         PmWJltBlyNHQy8CLl7OZqxB6o3pEjKkNkCT9JvDPZXuyCOKjyZv9eh7m2dk1PrAI7HNs
-         sf0w==
-X-Gm-Message-State: AOJu0Yw2Sc9A163sislyipJThClCfS3Ndde6CvwHKd5+FHL+HbSVFwZR
-	r3zLpDiW722qLLeXhL1HkdM=
-X-Google-Smtp-Source: AGHT+IGxMSmKttS3qdtEKU9T0y1ZbNAmbb1RKkpO2VP3Ip+fTERHjUU8R4+qV8SejH10x3MxfYXecg==
-X-Received: by 2002:a17:90a:ba15:b0:27d:1a75:5b98 with SMTP id s21-20020a17090aba1500b0027d1a755b98mr15437559pjr.12.1698031777457;
-        Sun, 22 Oct 2023 20:29:37 -0700 (PDT)
+        bh=WE+2ax+ckyyK0GydSOksCqTiRS2Um4EHTAoyLLZfmB4=;
+        b=ww27MGy4OL0JEE83Ew4MyRrfRSBIAZv/NWkPMA5BgCLKP6Bj/gHoqeJ2jnOopuFFUk
+         +LbEaN/HgtfrhhnGc5S+Ktsv+7yZSrYfp8lmkDuAILOS9Cyo4+j+gKvcxDvJIQFAJTfG
+         NSLlzq84jVWda3ChX1XmEqhGuyXMJS46LzKFqLuAZZ4zl3x56AAvromj+JyAp5bB0vXv
+         6oaL6+R4q8jBodT6yV2QUlRkQpRVzyalngqiPB/YjdQXHOhK7iQxcdiBefT9H49gZilF
+         iO5Q1QEoiQTFL/wBiJrjoHhv5Y2rVNeOHPuPeaZy+ZCrWSpIrVt3YHa98NgFduoiG66Q
+         Cpcw==
+X-Gm-Message-State: AOJu0YyszTSe9wWzcKoGhCNvKraPt6uLrIqKWWUjaaK6jeMou5sNErve
+	n1ZHEU0tIxPCyuFybSbAtG0=
+X-Google-Smtp-Source: AGHT+IHOhKRMAo6KBlUi+MNLra7QroMOI7iaq9QGsi0kTMHEdxpSyWt9YCF22sVWqUuTCrSIba66Zg==
+X-Received: by 2002:a17:903:1c8:b0:1c9:bf02:6638 with SMTP id e8-20020a17090301c800b001c9bf026638mr8846162plh.51.1698031776385;
+        Sun, 22 Oct 2023 20:29:36 -0700 (PDT)
 Received: from debian.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id 8-20020a17090a1a4800b002776288537fsm5361684pjl.53.2023.10.22.20.29.36
+        by smtp.gmail.com with ESMTPSA id b5-20020a170903228500b001c727d3ea6bsm5014253plh.74.2023.10.22.20.29.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Oct 2023 20:29:37 -0700 (PDT)
+        Sun, 22 Oct 2023 20:29:35 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-	id 290AB83AF05F; Mon, 23 Oct 2023 10:29:32 +0700 (WIB)
+	id 397B88055D5A; Mon, 23 Oct 2023 10:29:32 +0700 (WIB)
 From: Bagas Sanjaya <bagasdotme@gmail.com>
 To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Networking <netdev@vger.kernel.org>
@@ -72,9 +72,9 @@ Cc: Loic Poulain <loic.poulain@linaro.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH net v2 1/2] MAINTAINERS: Move M Chetan Kumar to CREDITS
-Date: Mon, 23 Oct 2023 10:29:04 +0700
-Message-ID: <20231023032905.22515-3-bagasdotme@gmail.com>
+Subject: [PATCH net v2 2/2] MAINTAINERS: Remove linuxwwan@intel.com mailing list
+Date: Mon, 23 Oct 2023 10:29:05 +0700
+Message-ID: <20231023032905.22515-4-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231023032905.22515-2-bagasdotme@gmail.com>
 References: <20231023032905.22515-2-bagasdotme@gmail.com>
@@ -84,75 +84,56 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2198; i=bagasdotme@gmail.com; h=from:subject; bh=AKGKW/qgr2xlsvLPK5475hdFwWwS2lFj2AVI3aefAZU=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDKmmL2SfnJk8xbVSs+1t0ZrLrSl7/6YefB2dV7bk82/7i 86Lz5t96ihlYRDjYpAVU2SZlMjXdHqXkciF9rWOMHNYmUCGMHBxCsBEmB4y/OG7WvySLytPzeZg 8ydDuTVNt6tPbNOoFbt1rTXLt/jMI3uG/2G15+4ts7ghPcUkOrJVsGTzDo133xv3Md5fJ7NVaW1 CMzMA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1582; i=bagasdotme@gmail.com; h=from:subject; bh=nrzzUcakoOgJE4YQn7XXEJJt4nFmk1Y6mNvMO2ZAmRo=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDKmmL2Q5ruZv4bmSJczhHJh05bXqnwbDgC0lZy2ubHVdO et3i5tmRykLgxgXg6yYIsukRL6m07uMRC60r3WEmcPKBDKEgYtTACbiXs/wVyK6ZcmlLfd4cvYx 5k+98nb5nuK4dNEPJ9ZO/2IfHsa4jZeRYaHKkqLO3B+37nAsltasdz1gOzM+7qno7vCLC+YpiJl vZwIA
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 
-Emails to him bounce with 550 error code:
+Messages submitted to the ML bounce (address not found error). In
+fact, the ML was mistagged as person maintainer instead of mailing
+list.
 
-```
-5.1.0 - Unknown address error 550-'5.1.1 <m.chetan.kumar@linux.intel.com>: Recipient address rejected: User unknown in virtual mailbox table'
-```
-
-It looks like he had left Intel, so move him to CREDITS.
+Remove the ML to keep Cc: lists a bit shorter and not to spam
+everyone's inbox with postmaster notifications.
 
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- He is still listed by scripts/get_maintainer.pl, though (due to significant
- contribution):
+ Intel people, if you still want to maintain int1092 (aka IOSM), please
+ let me know.
 
- ```
- $ scripts/get_maintainer.pl drivers/net/wwan/iosm/
- ...
- M Chetan Kumar <m.chetan.kumar@linux.intel.com> (commit_signer:15/23=65%,authored:14/23=61%)
- ...
- ```
+ MAINTAINERS | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
- If no one steps up maintaining IOSM, should INTEL WWAN IOSM DRIVER entry
- be removed then to get rid of him, like in [1]?
-
- [1]: https://lore.kernel.org/lkml/20210316081000.12596-1-krzysztof.kozlowski@canonical.com/
-
- CREDITS     | 5 +++++
- MAINTAINERS | 2 --
- 2 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/CREDITS b/CREDITS
-index f33a33fd237170..0472398b6aa7e9 100644
---- a/CREDITS
-+++ b/CREDITS
-@@ -2191,6 +2191,11 @@ D: pirq addr, CS5535 alsa audio driver
- S: Gurgaon, India
- S: Kuala Lumpur, Malaysia
- 
-+N: M Chetan Kumar
-+E: <m.chetan.kumar@intel.com>
-+D: Intel WWAN IOSM driver
-+D: Mediatek T7XX 5G WWAN reviewer
-+
- N: Mohit Kumar
- D: ST Microelectronics SPEAr13xx PCI host bridge driver
- D: Synopsys DesignWare PCI host bridge driver
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 7a7bd8bd80e9f2..08a7be6a5680ed 100644
+index 08a7be6a5680ed..f164e573abdae8 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -10879,7 +10879,6 @@ S:	Maintained
+@@ -10450,7 +10450,6 @@ F:	drivers/platform/x86/intel/atomisp2/led.c
+ 
+ INTEL BIOS SAR INT1092 DRIVER
+ M:	Shravan Sudhakar <s.shravan@intel.com>
+-M:	Intel Corporation <linuxwwan@intel.com>
+ L:	platform-driver-x86@vger.kernel.org
+ S:	Maintained
+ F:	drivers/platform/x86/intel/int1092/
+@@ -10879,9 +10878,8 @@ S:	Maintained
  F:	drivers/platform/x86/intel/wmi/thunderbolt.c
  
  INTEL WWAN IOSM DRIVER
--M:	M Chetan Kumar <m.chetan.kumar@intel.com>
- M:	Intel Corporation <linuxwwan@intel.com>
+-M:	Intel Corporation <linuxwwan@intel.com>
  L:	netdev@vger.kernel.org
- S:	Maintained
-@@ -13504,7 +13503,6 @@ M:	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
- M:	Intel Corporation <linuxwwan@intel.com>
+-S:	Maintained
++S:	Orphan
+ F:	drivers/net/wwan/iosm/
+ 
+ INTEL(R) TRACE HUB
+@@ -13500,7 +13498,6 @@ F:	net/dsa/tag_mtk.c
+ 
+ MEDIATEK T7XX 5G WWAN MODEM DRIVER
+ M:	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
+-M:	Intel Corporation <linuxwwan@intel.com>
  R:	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>
  R:	Liu Haijun <haijun.liu@mediatek.com>
--R:	M Chetan Kumar <m.chetan.kumar@linux.intel.com>
  R:	Ricardo Martinez <ricardo.martinez@linux.intel.com>
- L:	netdev@vger.kernel.org
- S:	Supported
 -- 
 An old man doll... just what I always wanted! - Clara
 
