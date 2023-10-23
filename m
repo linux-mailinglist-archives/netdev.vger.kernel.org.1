@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-43555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D5417D3DE8
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:37:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC8A47D3DF1
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:39:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E745B20C23
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:37:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D28CB20CF1
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90FF9210F2;
-	Mon, 23 Oct 2023 17:37:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431A7210F6;
+	Mon, 23 Oct 2023 17:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X/2caegp"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xxp+fd/k"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC152210E9
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 17:37:37 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06BAB94
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 10:37:36 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9ada2e6e75fso547248266b.2
-        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 10:37:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B1A20B3E
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 17:39:10 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34CB083
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 10:39:09 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9bf0ac97fdeso506691066b.2
+        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 10:39:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698082654; x=1698687454; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1698082747; x=1698687547; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=mpIxc8lRkjmGHBrOrWkUutSpPEIyuqpJsUF79g+Yai8=;
-        b=X/2caegpxNZNOcEnZTD1VqbE/++yQuOtxJuJgUs8PGdvlqcGEaTNNonU8W+WeBDmEQ
-         JcCBi3tOQZ4wgNMLoJVgC/R9VGE4YNMdWbnzPzih5rY6GjtVdDhCW7yUC0Ji/8hfbFi2
-         h60e++NbET6pXi2NXwmiIewfTXc87UzdIdDq7yXx/mnI0X2sMfI/+EtivGX+SIkxIEBQ
-         bGZQyTMwS1ChBL9pnMLTiWk/AfDTo2AIF2Gz8bnHI0/JGrnV4VZJOpyiiUq0gr+zHqs8
-         S1XLziFEm/WikOVzKKcz4O6EmXi2uVcoBVOJ/fIzFpHiRQsa8XJEDETeJc6aEU1jXQLa
-         8BRg==
+        bh=zXe6k56/EhvQPRaSbGipEWjZE263q3B+4H13mBLQc6s=;
+        b=xxp+fd/krg2jKh82IwL7MBrB0v5TwNARm8IueB4o6HYkKbzHrjUKrHYuY6nDwIzFJ6
+         QER0w+EbNY0IEu9CvWAK6oBk6ONxM7/Wyj79hvcY/DsfQ8UI1FnSYRENCSeh/FLNABKW
+         SQQ82UDLTm3OR3hzHcahc2ZhRV/Gtyrp9LNvhbV8ILGmGsjXrco1XHBxNXLaj8Jtd2I3
+         RDr8Lv5mJKAn2YQXpQaCLW0X1okGaA9YN37nJTAGd1GUAk1OOQTfLGp5jHEyg4nj0vFY
+         g+MPDBz4+uGehMwLsx/ucC+Q7MwkAtf3Mkb/J/QLdfl7mBGs+p2gop3dUu92RdDgLgw0
+         CUBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698082654; x=1698687454;
+        d=1e100.net; s=20230601; t=1698082747; x=1698687547;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mpIxc8lRkjmGHBrOrWkUutSpPEIyuqpJsUF79g+Yai8=;
-        b=OVtppCZxlKM25BHwffd2SCam1pBtgx9z/c2jSeg+QlY9HBTB9Yfm905BKeFJNDqu7Z
-         smh6h4mS2qGbGNOm7Okfe/BcEmvF0tEmUGYv8cXShp9ETgppWJKOKhQhhvEdnB2abQIU
-         KFzm4Yc3Au8TeEDXW00OEH/56ifCeNTqgtaKDdkjRyCQgnS1gmzwWbNpoFvGiOdpD/ML
-         tDSknmK5v5skCGVdhOPfkns9vDMqZtIdWkHYv4tlDkuaRdQwd1ZpdjoYkkIFQ6Gb+bKd
-         nw7q1P5xAXb2bF3YDrBVxHjLSfIRe1eadfe2/JzUpCrNZxlN+X+rtZdmWBmpZrsaYdMM
-         bXTQ==
-X-Gm-Message-State: AOJu0YyYGIvnes8X/D6kz1qJLp1+AKtmEXIlIKpqkQDpJDMD8SjfV0z2
-	OflHv0HoLgD2hcNqRef/FknPTg==
-X-Google-Smtp-Source: AGHT+IHidXufr99BQROxxi52qKHN2SrRZZW3iTTaRWOviu76uWx6FNOrVRKkBZbn8xpDn1uAO5YmAg==
-X-Received: by 2002:a17:907:c386:b0:9c7:fd91:4309 with SMTP id tm6-20020a170907c38600b009c7fd914309mr4570701ejc.0.1698082653885;
-        Mon, 23 Oct 2023 10:37:33 -0700 (PDT)
+        bh=zXe6k56/EhvQPRaSbGipEWjZE263q3B+4H13mBLQc6s=;
+        b=jWARtVJavUmn55seMc+57/FwWaFzFw63uGs3fCn366XdAMXbekQ3gGc25/zfsQBWxB
+         iJPASHntED9MDDPwlFHYpFe8qM9bycuYz+7XC+VlgYnJEN12x7J8TREfQwDatnQbmmqm
+         lIaDIcvor92dqZhCkxam2myu7nrrNXzMuLhnCpugpH7dYZjU3HvWVW46DuygidsiFMDA
+         NgcQPt7Fd1XrR0wwyf6rWPALAWyjVm6kF/Y5PtdR7N1vtQUV7wdQ0Ncko2l5y73ATnDT
+         44laR6axlmzs9KNw4RnORMrfDYlPBTU2a35oneP3U/p9k9EHy4YBG/bvjgWJ3uVeYQLS
+         jjoQ==
+X-Gm-Message-State: AOJu0YyuwW7fQj3Tg1n9+3syKGsjWXEN5TSFBsAyIZole1QkY3pazWpo
+	z6w8S+rEZABEzfxCDvBJxpSwqw==
+X-Google-Smtp-Source: AGHT+IGcfuofM+DQllnpvWLo5m4Zem0XPjXgh6dW/zXkKw0WGIjvu+x3F3hLnpkMzSzBJBFeCiXCng==
+X-Received: by 2002:a17:907:1b1c:b0:9bd:a7a5:3a5a with SMTP id mp28-20020a1709071b1c00b009bda7a53a5amr6775433ejc.36.1698082747677;
+        Mon, 23 Oct 2023 10:39:07 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.218.126])
-        by smtp.gmail.com with ESMTPSA id k17-20020a1709063e1100b009b2cc87b8c3sm6940519eji.52.2023.10.23.10.37.31
+        by smtp.gmail.com with ESMTPSA id k17-20020a1709063e1100b009b2cc87b8c3sm6940519eji.52.2023.10.23.10.39.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Oct 2023 10:37:33 -0700 (PDT)
-Message-ID: <81d7b86e-aee2-4222-8c7a-52d0b710a2f2@linaro.org>
-Date: Mon, 23 Oct 2023 19:37:30 +0200
+        Mon, 23 Oct 2023 10:39:07 -0700 (PDT)
+Message-ID: <299ec30a-3441-4d7d-9941-0fe8fde9de23@linaro.org>
+Date: Mon, 23 Oct 2023 19:39:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/5] net: dt-bindings: Introduce the Qualcomm
- IPQESS Ethernet switch
+Subject: Re: [PATCH net-next 5/5] dts: qcom: ipq4019: Add description for the
+ IPQ4019 ESS EDMA and switch
 Content-Language: en-US
 To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
  Rob Herring <robh+dt@kernel.org>,
@@ -87,7 +87,7 @@ Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
  Konrad Dybcio <konrad.dybcio@somainline.org>,
  Maxime Chevallier <maxime.chevallier@bootlin.com>
 References: <20231023155013.512999-1-romain.gantois@bootlin.com>
- <20231023155013.512999-2-romain.gantois@bootlin.com>
+ <20231023155013.512999-6-romain.gantois@bootlin.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -133,125 +133,26 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231023155013.512999-2-romain.gantois@bootlin.com>
+In-Reply-To: <20231023155013.512999-6-romain.gantois@bootlin.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 23/10/2023 17:50, Romain Gantois wrote:
-> Add the DT binding for the IPQESS Ethernet switch subsystem, that
-> integrates a modified QCA8K switch and an EDMA MAC controller. It inherits
-> from a basic ethernet switch binding and adds three regmaps, a phandle and
-> reset line for the PSGMII, a phandle to the MDIO bus, a clock, and 32
-> interrupts.
+> The Qualcomm IPQ4019 includes a modified version of the QCA8K Ethernet
+> switch. The switch's CPU port is connected to the SoC through the internal
+> EDMA Ethernet controller. Add support for these two devices, which are
+> coupled tightly enough to justify treating them as a single device.
 > 
+
+Please use subject prefixes matching the subsystem. You can get them for
+example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
+your patch is touching.
+
 > Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
 > ---
->  .../bindings/net/qcom,ipq4019-ess.yaml        | 152 ++++++++++++++++++
->  1 file changed, 152 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/qcom,ipq4019-ess.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qcom,ipq4019-ess.yaml b/Documentation/devicetree/bindings/net/qcom,ipq4019-ess.yaml
-> new file mode 100644
-> index 000000000000..9bb6b010ea6a
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/qcom,ipq4019-ess.yaml
-> @@ -0,0 +1,152 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/qcom,ipq4019-ess.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm IPQ4019 Ethernet switch subsystem driver
-
-Bindings should be about hardware. Please drop "driver". "Subsystem"
-also sounds like Linuxism.
-
-> +
-> +maintainers:
-> +  - Romain Gantois <romain.gantois@bootlin.com>
-> +
-> +$ref: ethernet-switch.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    const: qca,ipq4019-qca8337n
-
-
-What do you want to express here? ipq4019 is not qca. This is Qualcomm
-(so qcom) SoC.
-
-> +
-> +  reg:
-> +    maxItems: 3
-> +    description: Base ESS registers, PSGMII registers and EDMA registers
-
-You need to describe the items, so:
-items:
- - description: foo
- - description: foo
- - description: foo
-
-> +
-> +  reg-names:
-> +    maxItems: 3
-
-You need to list items instead.
-
-> +
-> +  resets:
-> +    maxItems: 2
-> +    description: Handles to the PSGMII and ESS reset lines
-
-You need to list items instead.
-
-> +
-> +  reset-names:
-> +    maxItems: 2
-
-You need to list items instead.
-
-
-> +
-> +  clocks:
-> +    maxItems: 1
-> +    description: Handle to the GCC ESS clock
-> +
-> +  clock-names:
-> +    maxItems: 1
-
-Drop clock-names, useless for one entry.
-
-> +
-> +  psgmii-ethphy:
-> +    maxItems: 1
-> +    description: Handle to the MDIO bus node corresponding to the PSGMII
-
-That's a bit odd property. Where is it defined?
-
-> +
-> +  mdio:
-> +    maxItems: 1
-> +    description: Handle to the IPQ4019 MDIO Controller
-> +
-> +  interrupts:
-> +    maxItems: 32
-> +    description: One interrupt per tx and rx queue, the first 16 are rx queues
-> +                 and the last 16 are the tx queues
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - reg-names
-> +  - resets
-> +  - reset-names
-> +  - clocks
-> +  - clock-names
-> +  - mdio
-> +  - interrupts
-> +
-> +unevaluatedProperties: false
-
+>  .../boot/dts/qcom/qcom-ipq4018-ap120c-ac.dtsi | 13 +++
+>  arch/arm/boot/dts/qcom/qcom-ipq4019.dtsi      | 94 +++++++++++++++++++
+>  2 files changed, 107 insertions(+)
 
 Best regards,
 Krzysztof
