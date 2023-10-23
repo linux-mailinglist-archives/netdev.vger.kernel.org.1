@@ -1,83 +1,42 @@
-Return-Path: <netdev+bounces-43478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C32687D374C
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 14:57:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7540A7D376B
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 15:06:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4571CB20C28
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 12:57:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15B72B20C2D
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 13:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B2D114F7E;
-	Mon, 23 Oct 2023 12:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="cn5eYQgo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E4417758;
+	Mon, 23 Oct 2023 13:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFE7134A6
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 12:57:48 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5518C103
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 05:57:47 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6b1ef786b7fso3091812b3a.3
-        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 05:57:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1698065867; x=1698670667; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yCAXAY3fgSa7Kb0MKqcgqBNDm1vRIcXYYGEzF/D8jjI=;
-        b=cn5eYQgoZwYoVrloc6pgtjiTXhKXt/b4gJTG6YWyaYjCPEW3JeXcGuvbt084Jxeb8h
-         M+fOAzw6Am89vWd0VishxaqzzqqQYCtSWHOWE9JwE6dow6D0jDl/cKXdIFyf1YY2Lz24
-         btW++4KfL4GQEAfrzygkr95BTn5LC3DRnxeUiJMPYkRUvjvC8wnMwMFSX1COCuK871Ph
-         s5LV2/rBbujfR63tRGVEI945BKdm9foz4/4671cI1mkaYN2I34wUBTDUNVpl887O2Ss8
-         bEcVZnyVRr0ST7K84/FtplkgNkqceuDMlL/2mTwgfsCKzdmWBD2AZqxpEN9Ptpb2Y8dW
-         nYGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698065867; x=1698670667;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yCAXAY3fgSa7Kb0MKqcgqBNDm1vRIcXYYGEzF/D8jjI=;
-        b=FTYm1rIZn/npY2eSy0vjpNYbq7UBoaPGG4ZD7KikaD9m+h6VZ4u0f0TLOdxz2Rivkv
-         YAUln6KXiewWWfoyatoUBaJ8dqArk8zzYNtSqej3PNVhhL5LpAp+yuBiMegsYyH64Hck
-         ZE6moWbqco1FmUzQ7rooke2ATC2QFjA0/AlvRaj6IEgrXHYctBbPvDNNF7PHAnufURmS
-         Rece27OWu+1Nq24Gj78B8zwcJqWhag8rZpRW4+Xhzom3IgrOcDWpVw4EftrdFmZUs6+l
-         ZG36GMZzBNKJLZP54lie8KH+sKZxrj30hbbNy+Mik5lxXiqkGliaimIxXsY8NKlwano+
-         /jtQ==
-X-Gm-Message-State: AOJu0YzLSicXci3VP7x28gtqu0AcwezO32V5c8LF+I5DyreMLmM/fTTx
-	ZnySsFMHModNbQpkqVH2Rw4n1g==
-X-Google-Smtp-Source: AGHT+IFf6zV09p7t/ZyPlfIP759xrLQulyHUf1/ol6SF33PPdLltGWgp7s08x8wNXn7uL1UWu0qZGQ==
-X-Received: by 2002:a05:6a20:6a06:b0:17e:87c1:7971 with SMTP id p6-20020a056a206a0600b0017e87c17971mr434493pzk.46.1698065866765;
-        Mon, 23 Oct 2023 05:57:46 -0700 (PDT)
-Received: from C02FG34NMD6R.bytedance.net ([240e:6b1:c0:120::2:3])
-        by smtp.gmail.com with ESMTPSA id k28-20020aa79d1c000000b006bde2480806sm6056588pfp.47.2023.10.23.05.57.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 05:57:46 -0700 (PDT)
-From: Albert Huang <huangjie.albert@bytedance.com>
-To: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>
-Cc: Albert Huang <huangjie.albert@bytedance.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BB515EBF
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 13:06:36 +0000 (UTC)
+Received: from janet.servers.dxld.at (mail.servers.dxld.at [IPv6:2001:678:4d8:200::1a57])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB5697
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 06:06:35 -0700 (PDT)
+Received: janet.servers.dxld.at; Mon, 23 Oct 2023 15:06:26 +0200
+From: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
+	wireguard@lists.zx2c4.com,
 	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 net-next] xsk: avoid starving the xsk further down the list
-Date: Mon, 23 Oct 2023 20:57:31 +0800
-Message-Id: <20231023125732.82261-1-huangjie.albert@bytedance.com>
-X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
+Cc: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>
+Subject: [PATCH] wireguard: Fix leaking sockets in wg_socket_init error paths
+Date: Mon, 23 Oct 2023 15:06:09 +0200
+Message-Id: <20231023130609.595122-1-dxld@darkboxed.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,95 +45,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In the previous implementation, when multiple xsk sockets were
-associated with a single xsk_buff_pool, a situation could arise
-where the xsk_tx_list maintained data at the front for one xsk
-socket while starving the xsk sockets at the back of the list.
-This could result in issues such as the inability to transmit packets,
-increased latency, and jitter. To address this problem, we introduce
-a new variable called tx_budget_spent, which limits each xsk to transmit
-a maximum of MAX_PER_SOCKET_BUDGET tx descriptors. This allocation ensures
-equitable opportunities for subsequent xsk sockets to send tx descriptors.
-The value of MAX_PER_SOCKET_BUDGET is set to 32.
-
-Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+This doesn't seem to be reachable normally, but while working on a patch
+for the address binding code I ended up triggering this leak and had to
+reboot to get rid of the leaking wg sockets.
 ---
- include/net/xdp_sock.h |  7 +++++++
- net/xdp/xsk.c          | 18 ++++++++++++++++++
- 2 files changed, 25 insertions(+)
+ drivers/net/wireguard/socket.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index 69b472604b86..de6819e50d54 100644
---- a/include/net/xdp_sock.h
-+++ b/include/net/xdp_sock.h
-@@ -63,6 +63,13 @@ struct xdp_sock {
- 
- 	struct xsk_queue *tx ____cacheline_aligned_in_smp;
- 	struct list_head tx_list;
-+	/* record the number of tx descriptors sent by this xsk and
-+	 * when it exceeds MAX_PER_SOCKET_BUDGET, an opportunity needs
-+	 * to be given to other xsks for sending tx descriptors, thereby
-+	 * preventing other XSKs from being starved.
-+	 */
-+	u32 tx_budget_spent;
-+
- 	/* Protects generic receive. */
- 	spinlock_t rx_lock;
- 
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index f5e96e0d6e01..65c32b85c326 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -33,6 +33,7 @@
- #include "xsk.h"
- 
- #define TX_BATCH_SIZE 32
-+#define MAX_PER_SOCKET_BUDGET (TX_BATCH_SIZE)
- 
- static DEFINE_PER_CPU(struct list_head, xskmap_flush_list);
- 
-@@ -413,16 +414,25 @@ EXPORT_SYMBOL(xsk_tx_release);
- 
- bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
- {
-+	bool budget_exhausted = false;
- 	struct xdp_sock *xs;
- 
- 	rcu_read_lock();
-+again:
- 	list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
-+		if (xs->tx_budget_spent >= MAX_PER_SOCKET_BUDGET) {
-+			budget_exhausted = true;
-+			continue;
-+		}
-+
- 		if (!xskq_cons_peek_desc(xs->tx, desc, pool)) {
- 			if (xskq_has_descs(xs->tx))
- 				xskq_cons_release(xs->tx);
- 			continue;
- 		}
- 
-+		xs->tx_budget_spent++;
-+
- 		/* This is the backpressure mechanism for the Tx path.
- 		 * Reserve space in the completion queue and only proceed
- 		 * if there is space in it. This avoids having to implement
-@@ -436,6 +446,14 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc)
- 		return true;
+diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.c
+index 0414d7a6ce74..c35163f503e7 100644
+--- a/drivers/net/wireguard/socket.c
++++ b/drivers/net/wireguard/socket.c
+@@ -387,7 +387,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 	ret = udp_sock_create(net, &port4, &new4);
+ 	if (ret < 0) {
+ 		pr_err("%s: Could not create IPv4 socket\n", wg->dev->name);
+-		goto out;
++		goto err;
  	}
- 
-+	if (budget_exhausted) {
-+		list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list)
-+			xs->tx_budget_spent = 0;
-+
-+		budget_exhausted = false;
-+		goto again;
-+	}
-+
+ 	set_sock_opts(new4);
+ 	setup_udp_tunnel_sock(net, new4, &cfg);
+@@ -402,7 +402,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
+ 				goto retry;
+ 			pr_err("%s: Could not create IPv6 socket\n",
+ 			       wg->dev->name);
+-			goto out;
++			goto err;
+ 		}
+ 		set_sock_opts(new6);
+ 		setup_udp_tunnel_sock(net, new6, &cfg);
+@@ -414,6 +414,11 @@ int wg_socket_init(struct wg_device *wg, u16 port)
  out:
- 	rcu_read_unlock();
- 	return false;
+ 	put_net(net);
+ 	return ret;
++
++err:
++	sock_free(new4 ? new4->sk : NULL);
++	sock_free(new6 ? new6->sk : NULL);
++	goto out;
+ }
+ 
+ void wg_socket_reinit(struct wg_device *wg, struct sock *new4,
 -- 
-2.20.1
+2.39.2
 
 
