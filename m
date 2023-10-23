@@ -1,367 +1,158 @@
-Return-Path: <netdev+bounces-43524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58F987D3B97
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:00:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A73C7D3BC3
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 18:08:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC6221F22090
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:00:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD0711C2089C
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 16:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF541CA81;
-	Mon, 23 Oct 2023 16:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86EA01CABC;
+	Mon, 23 Oct 2023 16:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="Lic3aINa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9A31B292
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 16:00:24 +0000 (UTC)
-Received: from janet.servers.dxld.at (mail.servers.dxld.at [IPv6:2001:678:4d8:200::1a57])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 169B810C0;
-	Mon, 23 Oct 2023 09:00:20 -0700 (PDT)
-Received: janet.servers.dxld.at; Mon, 23 Oct 2023 18:00:15 +0200
-From: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Daniel=20Gr=C3=B6ber?= <dxld@darkboxed.org>
-Subject: [PATCH] wireguard: Add netlink attrs for binding to address and netdev
-Date: Mon, 23 Oct 2023 18:00:06 +0200
-Message-Id: <20231023160006.85992-1-dxld@darkboxed.org>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD33C15E80
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 16:08:53 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DE6E9;
+	Mon, 23 Oct 2023 09:08:52 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39NCbGke020236;
+	Mon, 23 Oct 2023 09:08:39 -0700
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3tve5mxh0p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Oct 2023 09:08:39 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Hrr1/n7KyMRTUfmLvaI37nTdaQTXDg7eLJR4Q8s47ceLu42AJt6VvotnDK9ea233OVKOetKiE8YB890O/UeiLaNoTzEAm5VnWPIdi2+V0pxTNH2Ggu+0W15iI9WI47vFEJD8A8wrd0sGWQDjKwBnpYsA9Ln1enRysfJ/jj+ElQCODeQdlDtlLxNfePJEYqFcmrO3+6tNTc1G7yd7sxJP5AAkdbhrQhsGtcMJmMwu1pS7md5/GYsodJ01RocBZLgW1O7bA/RBogIi/1RDCtc9B73+SkvggJlQ/P1GLJq8FwnnAriqSHLHVb4pjF3IMS76Y8byEoDh9ylm5efPB4NpXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8CNDZe7CRPsUc+OPqFuRAuBTTjkO0UtitAdtgbpyeEE=;
+ b=kBNY3PJQhQCK6SbQQxSFiUgL2MeTQ+395XeDIrlxws4gyTzTePTwZXfhGAcMLiw0WKA6jRLboPy5+MWwHSMDeCOnhPOvqaz4fPSNpFkjQmH7CE22tz7xrS9/v3LXZhAHKQQwrAKZDdVvxKHkqnu9VFyOFX4dJnZ5+Qva3JlIdj9gwehH7xmHQ7wKbYNgpZtwGVWVEjDD8po+CLFAoO1gL5D+hbwdgBeWOMlG/Y2EPeybWBDqM2eXjI/x5Xgsqba6B37vg4tdUWiynMPqfFbRYGaWH73VlJbMAjzr5p3BKBdA7bu3tI71IEBbgxfHWihN07mVf7FhC1Qre2DkFIG6fQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8CNDZe7CRPsUc+OPqFuRAuBTTjkO0UtitAdtgbpyeEE=;
+ b=Lic3aINaSNoV0+HEsB1milvSlWM3wphW7sTygNOvJBJVjkNJlLwOiZ6f9XmN0mOWKeJkxVwbSsTWZVbnFneF8ANgHL8a/oU2HREdM4sOdo3MXAXtl5tDGeeowAY3UAPqAh8qc7RiWd8JKn7Tk55xkXW69qBcKxXBf51BcLR/JZI=
+Received: from PH0PR18MB4734.namprd18.prod.outlook.com (2603:10b6:510:cd::24)
+ by CH0PR18MB4162.namprd18.prod.outlook.com (2603:10b6:610:e1::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.31; Mon, 23 Oct
+ 2023 16:08:33 +0000
+Received: from PH0PR18MB4734.namprd18.prod.outlook.com
+ ([fe80::7c0a:5ded:25e9:7fa2]) by PH0PR18MB4734.namprd18.prod.outlook.com
+ ([fe80::7c0a:5ded:25e9:7fa2%6]) with mapi id 15.20.6907.028; Mon, 23 Oct 2023
+ 16:08:33 +0000
+From: Shinas Rasheed <srasheed@marvell.com>
+To: "Drewek, Wojciech" <wojciech.drewek@intel.com>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: Haseeb Gani <hgani@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>,
+        "Gallen, Erwan" <egallen@redhat.com>, mschmidt <mschmidt@redhat.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        Veerasenareddy Burru
+	<vburru@marvell.com>,
+        Sathesh B Edara <sedara@marvell.com>,
+        Eric Dumazet
+	<edumazet@google.com>
+Subject: Re: [PATCH net-next 2/3] octeon_ep: implement xmit_more in transmit
+Thread-Topic: [PATCH net-next 2/3] octeon_ep: implement xmit_more in transmit
+Thread-Index: AQHaBaZgKB+ScISTk0Gr6mfSxGxpx7BXSWwAgABBYWc=
+Date: Mon, 23 Oct 2023 16:08:33 +0000
+Message-ID: 
+ <PH0PR18MB47347E951E2A7F9C37E2F166C7D8A@PH0PR18MB4734.namprd18.prod.outlook.com>
+References: <20231023114449.2362147-1-srasheed@marvell.com>
+ <20231023114449.2362147-3-srasheed@marvell.com>
+ <MW4PR11MB57766788EBB4D99302002A7FFDD8A@MW4PR11MB5776.namprd11.prod.outlook.com>
+In-Reply-To: 
+ <MW4PR11MB57766788EBB4D99302002A7FFDD8A@MW4PR11MB5776.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR18MB4734:EE_|CH0PR18MB4162:EE_
+x-ms-office365-filtering-correlation-id: 4ceb4173-2b7d-4135-beac-08dbd3e24e74
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ +Oyx3BPyudor034lx5n+0zaqb+w5QrwCpt0zE7k7mROh4eywddz/bhVVFh+GJ1SDbDn3IEEgAMfwVTBE8dcg9TLxw6ZNT9Km1Nvu9IlsEQNqLyChhkbmTmZODJ6SRkkFV3R0I+Um2WwPhl5gPUAwTDZg1IrDubqkITrypDwAH3sI1PpdJGxAJwP7RuaMra3qM+Emb1cpZc7E1sR4G/OgQp6a7T31XT21zMZcqtWP+klo7VU978OVraV9gVrhDoWv2YCWtRFghp+nfnDsAyeAyaN0B4g3mhgpS9NT/o/yE6ykesPpNW4EXi275xTyGJAtIPC8lqlW32KRnedU94UoR+DH4YeSja/tZTXYx/r8+Snc/OCjY9do6dqXygENk1qtoCNrO2fQW49/+OH6D365fRS5sQpHMr2WBQxL3Cl5HOpxGn7uIEmI2PxTaqId8xzhufm3osJt25as23eLdTD1d2jKtoKEG7uM9Sxf/a/TOLcs8w9OmoyJAGRKGbrcEc42KhFwn0OUvIy0bzX2UyWr+1CU11jpy0h8vTh/CFKtaz3Gla+1BE/TEylHDHsivzsfYqJtKtZjtUTMZ83k7AxrHnxRMG/qPLuve2uDQDRGciJ1vujs/kJ0OG5imy4C25sU
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4734.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39850400004)(136003)(346002)(376002)(396003)(366004)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(26005)(38070700009)(38100700002)(2906002)(55016003)(86362001)(5660300002)(7416002)(52536014)(8676002)(8936002)(558084003)(33656002)(4326008)(6506007)(478600001)(7696005)(91956017)(71200400001)(110136005)(122000001)(66476007)(66946007)(64756008)(316002)(76116006)(66556008)(66446008)(54906003)(83380400001)(41300700001)(4270600006)(9686003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?iso-8859-1?Q?b3R+bM2uqWnVZDMuDp7eqUl5v0xfJM6+0R7bLnpubw4NFA+a0rUIrjnm23?=
+ =?iso-8859-1?Q?0PsIFN5s0HTxxW/IyaLG6ukTxfOsfSsSMPIA1tTzeuuKqefj+VlrWc5wPy?=
+ =?iso-8859-1?Q?j80ClKeDykBwRyWmVvubp/f1CSKyIH2x/OTtowmNWPm35qa9zJQb78mjDN?=
+ =?iso-8859-1?Q?2iCVxZEATbnfvd0GdCBH2h4CY2gDrKquVpn/E2+IIucqmVXoxiKjoaf4vd?=
+ =?iso-8859-1?Q?G3lhmCvWSXE7O7P37i7gZvAIHsy0Lh8Xp5SLleuyxwjxUD8xYoPtXZB3XL?=
+ =?iso-8859-1?Q?p93r1s2B08g/pVOikfXeU7aL4ELBd92fMssh+h40AUaBASJkSmgBU1cU5y?=
+ =?iso-8859-1?Q?yKooucpcapdfjth0MOWmvsocFHlpm/kPLv6mNr/1J+hQMOkvvvsH1ngDqt?=
+ =?iso-8859-1?Q?WpQB3NDcMHydFZHpUDNE9WBS0BI0ysCavKAwIJ3rL5x+qDdSq1nYAHygbh?=
+ =?iso-8859-1?Q?eU4F1M/9pTPUDdavbstKsa4iXG1ehSJfbjKD5f54jze6TU8xPKEb4ZjnRz?=
+ =?iso-8859-1?Q?N6iuJ+CY1w6aWc9rIjhQ0szeWyXKSzhHh3CFKHlHimaZkV+6+oftAxCK/N?=
+ =?iso-8859-1?Q?/TZ0hk9iBVDjXbxt3SHKf/inPqJOxynyb4DATUnVnmoHYg5OcjBbRT2j/e?=
+ =?iso-8859-1?Q?fl/zPAx9baL4sVUeFnqHEMF9WH2shUC+Pc002qE+4sqzpkryRVBd1I+Zh6?=
+ =?iso-8859-1?Q?gCBbolX48YlB+eIvDKn0OtmKVeebY/EesnviQWwxY4VXiIyRCihgUVRvqE?=
+ =?iso-8859-1?Q?wuNsx60zUua9l5qq6xEaL04UpoU/Mdkepmf/bHxYjFMFIqPtxg+DxBErTy?=
+ =?iso-8859-1?Q?1+aHS8JL18cN4mrIOJgA8T3uoDM283k70u/QshBem9h+/oR7kjjynB/yKJ?=
+ =?iso-8859-1?Q?2eh0ndrcU0GDU7xlHCcguiSlru4GQep1ihgLIGQWamFWbyV3bTgKzpNtuc?=
+ =?iso-8859-1?Q?iyFqubz9TIj+E9kC8gtdMAbUSAjFvUBSNwBLAi5Mg5ztkMfnCx59rgCRDD?=
+ =?iso-8859-1?Q?PIdQHvKveZpoCCIhBEIEA8eVOhe7PLVmYbGyfm8TqkzUjP4oRnNrBlVpAv?=
+ =?iso-8859-1?Q?ff3AYxxfUHQkqCEXSBQs9V/MJB9azwuSV7fXDBaTOx133NxXK6vysLy8yq?=
+ =?iso-8859-1?Q?Hsb/oIRsWZbpgfxKaOpUeV765OeUog0SHbapbNBxYxjnnaIjkz7+3agdqx?=
+ =?iso-8859-1?Q?k9aulR9icugzV5VFQfcm8+saNW8rLMogbseOBQx0Bt50Tp/04PmHkdFkVO?=
+ =?iso-8859-1?Q?AolzzJSFnLZ3WMT+XQ61XESynkSJDB+KOPtCHSOYHcA7srRujUWWJte/R+?=
+ =?iso-8859-1?Q?imBmNVW95NA/3OQaOzZYL6OzBiRlYouJMa838ekeSccEH7qqSIIHtQCxSE?=
+ =?iso-8859-1?Q?d+1wQVgqSX9pm94zeze67SrSoFGCVydYBfDgqK3PDo+RIHjILdsl+4s46I?=
+ =?iso-8859-1?Q?9LYt28SXx8W9vM+X6exVF1aKnCSt4s6sO9YyrP64xMQ9olTFuxDWXzk9MD?=
+ =?iso-8859-1?Q?6OtXEAmbI1HLygG5Fguj0DPGKZ6bbNbOxYzi4Ulib3gfpDmHiW2C9WbRk+?=
+ =?iso-8859-1?Q?p1WACuAVGM14DVEch89ZUAmqAHXKo6vRk2F/Yiujpl1ZJ9Olwm2avL6Zjo?=
+ =?iso-8859-1?Q?PzaOcZ9yr8HaQ7/bkrlZGoRQdr9ojLfX8n?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4734.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4ceb4173-2b7d-4135-beac-08dbd3e24e74
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Oct 2023 16:08:33.5168
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: avJMEUhTVsEuBOgatBGvzCDz7i5RC81lv8B/Rj86ciN+v1y4Tm6fbk0J/uE0zcp8PwOe5XDoO3LdN4Mwr/SBig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR18MB4162
+X-Proofpoint-ORIG-GUID: AXitf_5wQpfm0Erocml4IGaF9ZXcN1U2
+X-Proofpoint-GUID: AXitf_5wQpfm0Erocml4IGaF9ZXcN1U2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-23_15,2023-10-19_01,2023-05-22_02
 
-Multihomed hosts may want to run distinct wg tunnels across all their
-uplinks for redundant connectivity. Currently this entails picking
-different ports for each wg tunnel since we allow only binding to the
-wildcard address. Sharing a single port-number for all uplink
-connections (but bound to a particular IP/netdev) simplifies managment
-considerably.
-
-A closely related use-case that also touches the socket binding code is
-having a wg socket be part of a VRF. This mirrors how we support socket and
-wg device in distinct namespaces. To make using VRFs with wg easy we want
-to be able to bind to a particular device as this will cause the kernel to
-automatically route all outgoing packets with the VRF's routing table
-and (in the default udp_l3mdev_accept=0 config) only accept packets from
-interfaces in the VRF without the need for netfilter rules.
-
-While users can currently use VRFs for wg tunnel traffic by configuring
-fwmark ip-rules and setting sysctl udp_l3mdev_accept=1 (with or without
-additional nft filtering) this is at best a cludge. When VRF membership
-changes it becomes a major hassle to keep ip-rules up to date.
-
-Signed-off-by: Daniel Gröber <dxld@darkboxed.org>
----
- drivers/net/wireguard/device.c  |  4 +--
- drivers/net/wireguard/device.h  |  3 +-
- drivers/net/wireguard/netlink.c | 51 ++++++++++++++++++++++++++++-----
- drivers/net/wireguard/socket.c  | 41 +++++++++++++++++---------
- drivers/net/wireguard/socket.h  |  3 +-
- include/uapi/linux/wireguard.h  |  6 ++++
- 6 files changed, 83 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
-index 258dcc103921..fdaaf0238a49 100644
---- a/drivers/net/wireguard/device.c
-+++ b/drivers/net/wireguard/device.c
-@@ -48,7 +48,7 @@ static int wg_open(struct net_device *dev)
- 		dev_v6->cnf.addr_gen_mode = IN6_ADDR_GEN_MODE_NONE;
- 
- 	mutex_lock(&wg->device_update_lock);
--	ret = wg_socket_init(wg, wg->incoming_port);
-+	ret = wg_socket_init(wg, wg->port_cfg);
- 	if (ret < 0)
- 		goto out;
- 	list_for_each_entry(peer, &wg->peer_list, peer_list) {
-@@ -249,7 +249,7 @@ static void wg_destruct(struct net_device *dev)
- 	rtnl_unlock();
- 	mutex_lock(&wg->device_update_lock);
- 	rcu_assign_pointer(wg->creating_net, NULL);
--	wg->incoming_port = 0;
-+	memzero_explicit(&wg->port_cfg, sizeof(wg->port_cfg));
- 	wg_socket_reinit(wg, NULL, NULL);
- 	/* The final references are cleared in the below calls to destroy_workqueue. */
- 	wg_peer_remove_all(wg);
-diff --git a/drivers/net/wireguard/device.h b/drivers/net/wireguard/device.h
-index 43c7cebbf50b..ac4092d8c9d0 100644
---- a/drivers/net/wireguard/device.h
-+++ b/drivers/net/wireguard/device.h
-@@ -17,6 +17,7 @@
- #include <linux/mutex.h>
- #include <linux/net.h>
- #include <linux/ptr_ring.h>
-+#include <net/udp_tunnel.h>
- 
- struct wg_device;
- 
-@@ -53,7 +54,7 @@ struct wg_device {
- 	atomic_t handshake_queue_len;
- 	unsigned int num_peers, device_update_gen;
- 	u32 fwmark;
--	u16 incoming_port;
-+	struct udp_port_cfg port_cfg;
- };
- 
- int wg_device_init(void);
-diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
-index dc09b75a3248..28e5b8668e72 100644
---- a/drivers/net/wireguard/netlink.c
-+++ b/drivers/net/wireguard/netlink.c
-@@ -26,6 +26,8 @@ static const struct nla_policy device_policy[WGDEVICE_A_MAX + 1] = {
- 	[WGDEVICE_A_PUBLIC_KEY]		= NLA_POLICY_EXACT_LEN(NOISE_PUBLIC_KEY_LEN),
- 	[WGDEVICE_A_FLAGS]		= { .type = NLA_U32 },
- 	[WGDEVICE_A_LISTEN_PORT]	= { .type = NLA_U16 },
-+	[WGDEVICE_A_LISTEN_ADDR]	= NLA_POLICY_MIN_LEN(sizeof(struct in_addr)),
-+	[WGDEVICE_A_LISTEN_IFINDEX]	= { .type = NLA_U32 },
- 	[WGDEVICE_A_FWMARK]		= { .type = NLA_U32 },
- 	[WGDEVICE_A_PEERS]		= { .type = NLA_NESTED }
- };
-@@ -230,11 +232,20 @@ static int wg_get_device_dump(struct sk_buff *skb, struct netlink_callback *cb)
- 
- 	if (!ctx->next_peer) {
- 		if (nla_put_u16(skb, WGDEVICE_A_LISTEN_PORT,
--				wg->incoming_port) ||
-+				ntohs(wg->port_cfg.local_udp_port)) ||
-+		    nla_put_u32(skb, WGDEVICE_A_LISTEN_IFINDEX, wg->port_cfg.bind_ifindex) ||
- 		    nla_put_u32(skb, WGDEVICE_A_FWMARK, wg->fwmark) ||
- 		    nla_put_u32(skb, WGDEVICE_A_IFINDEX, wg->dev->ifindex) ||
- 		    nla_put_string(skb, WGDEVICE_A_IFNAME, wg->dev->name))
- 			goto out;
-+	        if (wg->port_cfg.family == AF_INET &&
-+		    nla_put_in_addr(skb, WGDEVICE_A_LISTEN_ADDR,
-+				    wg->port_cfg.local_ip.s_addr))
-+				goto out;
-+	        if (wg->port_cfg.family == AF_INET6 &&
-+		    nla_put_in6_addr(skb, WGDEVICE_A_LISTEN_ADDR,
-+				     &wg->port_cfg.local_ip6))
-+				goto out;
- 
- 		down_read(&wg->static_identity.lock);
- 		if (wg->static_identity.has_identity) {
-@@ -311,19 +322,46 @@ static int wg_get_device_done(struct netlink_callback *cb)
- 	return 0;
- }
- 
--static int set_port(struct wg_device *wg, u16 port)
-+static int set_port_cfg(struct wg_device *wg, struct nlattr **attrs)
- {
- 	struct wg_peer *peer;
-+	struct udp_port_cfg port_cfg = {
-+		.family = AF_UNSPEC,
-+	};
-+
-+	if (attrs[WGDEVICE_A_LISTEN_PORT])
-+		port_cfg.local_udp_port =
-+			htons(nla_get_u16(attrs[WGDEVICE_A_LISTEN_PORT]));
-+	if (attrs[WGDEVICE_A_LISTEN_ADDR]) {
-+		union {
-+			struct in_addr addr4;
-+			struct in6_addr addr6;
-+		} *u_addr = nla_data(attrs[WGDEVICE_A_LISTEN_ADDR]);
-+		size_t len = nla_len(attrs[WGDEVICE_A_LISTEN_ADDR]);
-+		if (len == sizeof(struct in_addr)) {
-+			port_cfg.family = AF_INET;
-+			port_cfg.local_ip = u_addr->addr4;
-+		} else if (len == sizeof(struct in6_addr)) {
-+			if (!IS_ENABLED(CONFIG_IPV6))
-+				return -EAFNOSUPPORT;
-+			port_cfg.family = AF_INET6;
-+			port_cfg.local_ip6 = u_addr->addr6;
-+		}
-+	}
-+	if (attrs[WGDEVICE_A_LISTEN_IFINDEX]) {
-+		port_cfg.bind_ifindex =
-+			nla_get_u32(attrs[WGDEVICE_A_LISTEN_IFINDEX]);
-+	}
- 
--	if (wg->incoming_port == port)
-+	if (memcmp(&port_cfg, &wg->port_cfg, sizeof(port_cfg)) == 0)
- 		return 0;
- 	list_for_each_entry(peer, &wg->peer_list, peer_list)
- 		wg_socket_clear_peer_endpoint_src(peer);
- 	if (!netif_running(wg->dev)) {
--		wg->incoming_port = port;
-+		wg->port_cfg = port_cfg;
- 		return 0;
- 	}
--	return wg_socket_init(wg, port);
-+	return wg_socket_init(wg, port_cfg);
- }
- 
- static int set_allowedip(struct wg_peer *peer, struct nlattr **attrs)
-@@ -531,8 +569,7 @@ static int wg_set_device(struct sk_buff *skb, struct genl_info *info)
- 	}
- 
- 	if (info->attrs[WGDEVICE_A_LISTEN_PORT]) {
--		ret = set_port(wg,
--			nla_get_u16(info->attrs[WGDEVICE_A_LISTEN_PORT]));
-+		ret = set_port_cfg(wg, info->attrs);
- 		if (ret)
- 			goto out;
- 	}
-diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.c
-index c35163f503e7..cbd3958af890 100644
---- a/drivers/net/wireguard/socket.c
-+++ b/drivers/net/wireguard/socket.c
-@@ -346,7 +346,7 @@ static void set_sock_opts(struct socket *sock)
- 	sk_set_memalloc(sock->sk);
- }
- 
--int wg_socket_init(struct wg_device *wg, u16 port)
-+int wg_socket_init(struct wg_device *wg, struct udp_port_cfg port_cfg)
- {
- 	struct net *net;
- 	int ret;
-@@ -356,12 +356,7 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 		.encap_rcv = wg_receive
- 	};
- 	struct socket *new4 = NULL, *new6 = NULL;
--	struct udp_port_cfg port4 = {
--		.family = AF_INET,
--		.local_ip.s_addr = htonl(INADDR_ANY),
--		.local_udp_port = htons(port),
--		.use_udp_checksums = true
--	};
-+	struct udp_port_cfg port4;
- #if IS_ENABLED(CONFIG_IPV6)
- 	int retries = 0;
- 	struct udp_port_cfg port6 = {
-@@ -373,6 +368,23 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 	};
- #endif
- 
-+	if (port_cfg.family == AF_UNSPEC) {
-+		port4 = (struct udp_port_cfg) {
-+			.family = AF_INET,
-+			.local_ip.s_addr = htonl(INADDR_ANY),
-+			.local_udp_port = port_cfg.local_udp_port,
-+			.use_udp_checksums = true
-+		};
-+	} else {
-+		port4 = port_cfg;
-+		port4.use_udp_checksums = true;
-+		if (IS_ENABLED(CONFIG_IPV6) && port_cfg.family == AF_INET6) {
-+			port4.use_udp6_tx_checksums = true;
-+			port4.use_udp6_rx_checksums = true;
-+			port4.ipv6_v6only = true;
-+		}
-+	}
-+
- 	rcu_read_lock();
- 	net = rcu_dereference(wg->creating_net);
- 	net = net ? maybe_get_net(net) : NULL;
-@@ -380,10 +392,6 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 	if (unlikely(!net))
- 		return -ENONET;
- 
--#if IS_ENABLED(CONFIG_IPV6)
--retry:
--#endif
--
- 	ret = udp_sock_create(net, &port4, &new4);
- 	if (ret < 0) {
- 		pr_err("%s: Could not create IPv4 socket\n", wg->dev->name);
-@@ -392,13 +400,18 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 	set_sock_opts(new4);
- 	setup_udp_tunnel_sock(net, new4, &cfg);
- 
-+	if (port_cfg.family != AF_UNSPEC)
-+		goto reinit;
-+
- #if IS_ENABLED(CONFIG_IPV6)
-+retry:
- 	if (ipv6_mod_enabled()) {
- 		port6.local_udp_port = inet_sk(new4->sk)->inet_sport;
- 		ret = udp_sock_create(net, &port6, &new6);
- 		if (ret < 0) {
- 			udp_tunnel_sock_release(new4);
--			if (ret == -EADDRINUSE && !port && retries++ < 100)
-+			if (ret == -EADDRINUSE && !port_cfg.local_udp_port &&
-+			    retries++ < 100)
- 				goto retry;
- 			pr_err("%s: Could not create IPv6 socket\n",
- 			       wg->dev->name);
-@@ -409,6 +422,8 @@ int wg_socket_init(struct wg_device *wg, u16 port)
- 	}
- #endif
- 
-+reinit:
-+	wg->port_cfg = port_cfg;
- 	wg_socket_reinit(wg, new4->sk, new6 ? new6->sk : NULL);
- 	ret = 0;
- out:
-@@ -433,8 +448,6 @@ void wg_socket_reinit(struct wg_device *wg, struct sock *new4,
- 				lockdep_is_held(&wg->socket_update_lock));
- 	rcu_assign_pointer(wg->sock4, new4);
- 	rcu_assign_pointer(wg->sock6, new6);
--	if (new4)
--		wg->incoming_port = ntohs(inet_sk(new4)->inet_sport);
- 	mutex_unlock(&wg->socket_update_lock);
- 	synchronize_net();
- 	sock_free(old4);
-diff --git a/drivers/net/wireguard/socket.h b/drivers/net/wireguard/socket.h
-index bab5848efbcd..1532a263c518 100644
---- a/drivers/net/wireguard/socket.h
-+++ b/drivers/net/wireguard/socket.h
-@@ -10,8 +10,9 @@
- #include <linux/udp.h>
- #include <linux/if_vlan.h>
- #include <linux/if_ether.h>
-+#include <net/udp_tunnel.h>
- 
--int wg_socket_init(struct wg_device *wg, u16 port);
-+int wg_socket_init(struct wg_device *wg, struct udp_port_cfg port);
- void wg_socket_reinit(struct wg_device *wg, struct sock *new4,
- 		      struct sock *new6);
- int wg_socket_send_buffer_to_peer(struct wg_peer *peer, void *data,
-diff --git a/include/uapi/linux/wireguard.h b/include/uapi/linux/wireguard.h
-index ae88be14c947..240d1c850dfd 100644
---- a/include/uapi/linux/wireguard.h
-+++ b/include/uapi/linux/wireguard.h
-@@ -28,6 +28,8 @@
-  *    WGDEVICE_A_PRIVATE_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
-  *    WGDEVICE_A_PUBLIC_KEY: NLA_EXACT_LEN, len WG_KEY_LEN
-  *    WGDEVICE_A_LISTEN_PORT: NLA_U16
-+ *    WGDEVICE_A_LISTEN_ADDR : NLA_MIN_LEN(struct sockaddr), struct sockaddr_in or struct sockaddr_in6
-+ *    WGDEVICE_A_LISTEN_IFINDEX : NLA_U32
-  *    WGDEVICE_A_FWMARK: NLA_U32
-  *    WGDEVICE_A_PEERS: NLA_NESTED
-  *        0: NLA_NESTED
-@@ -82,6 +84,8 @@
-  *                      peers should be removed prior to adding the list below.
-  *    WGDEVICE_A_PRIVATE_KEY: len WG_KEY_LEN, all zeros to remove
-  *    WGDEVICE_A_LISTEN_PORT: NLA_U16, 0 to choose randomly
-+ *    WGDEVICE_A_LISTEN_ADDR : struct sockaddr_in or struct sockaddr_in6.
-+ *    WGDEVICE_A_LISTEN_IFINDEX : NLA_U32
-  *    WGDEVICE_A_FWMARK: NLA_U32, 0 to disable
-  *    WGDEVICE_A_PEERS: NLA_NESTED
-  *        0: NLA_NESTED
-@@ -157,6 +161,8 @@ enum wgdevice_attribute {
- 	WGDEVICE_A_LISTEN_PORT,
- 	WGDEVICE_A_FWMARK,
- 	WGDEVICE_A_PEERS,
-+	WGDEVICE_A_LISTEN_ADDR,
-+	WGDEVICE_A_LISTEN_IFINDEX,
- 	__WGDEVICE_A_LAST
- };
- #define WGDEVICE_A_MAX (__WGDEVICE_A_LAST - 1)
--- 
-2.39.2
-
+Sure, will update it since the first patch changelog requires more explanat=
+ion as well=
 
