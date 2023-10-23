@@ -1,253 +1,168 @@
-Return-Path: <netdev+bounces-43653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E93CC7D41C4
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 23:36:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 799F77D4279
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 00:00:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 768C0B20ACD
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 21:36:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0483281382
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 22:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1647E200CB;
-	Mon, 23 Oct 2023 21:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6691F23755;
+	Mon, 23 Oct 2023 22:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PvgAUMYz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l5l4EQVe"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0821214A85
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 21:35:59 +0000 (UTC)
-Received: from out-205.mta0.migadu.com (out-205.mta0.migadu.com [91.218.175.205])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DA52BD
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 14:35:58 -0700 (PDT)
-Message-ID: <42d66dde-29d6-f948-bc2e-72465beb800f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1698096956;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7NzOgVAY6bvLUksVYUKvNj9r++7UpyzJXRYa2Cetic0=;
-	b=PvgAUMYzTY9V+oDiz+H1rUNzwifJtXOau2MrJwr2ckGrLdpxn4AmPSMvFqrwybwlffsR80
-	4qVvPmntZsz+yzIsfDzc9rZOfNIfODRHbaFEWlQV3L/8MsVvmdZnhodrq+2VQoz3Pv41pw
-	XrAooVadMtN+F0yONmwHZjvgK2k42TI=
-Date: Mon, 23 Oct 2023 14:35:47 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7701859
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 22:00:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EED0C433C8;
+	Mon, 23 Oct 2023 22:00:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698098425;
+	bh=qSCtDp4iUw/OU24fpGyAO6rded2YxSCqsEhzpDTpkLk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=l5l4EQVe0L7QrJNdI1lK+H0pEaThlHsMUV6cksLN5WGTTHuMzVvRBcNmf2ybFldvT
+	 saNwzYMOftsHJqNlXjuhHzn3skZb3T3DeFIcJhSOeSZUWNIMSSDNAYMvOTE7YvodkC
+	 nGUEBZaxz2eMScWULgjc5BjQgBSRNtYZlf6EE5D7nH4CKaFZocRpbxumLBlgStbVk2
+	 j7MKMTCo2dfkRvqpyETuR4JPQLPGjHuLxbmdV5IkKcxnPTaz56gjO62aO9bCv2N7KI
+	 9BrQn0S5hQCu4urL15LRSImz4JOCCuV4v1hXfft/niFGnJaaLRUhlM74VkgrVn+oEv
+	 HFuaciW4pDgBQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com,
+	nbd@nbd.name,
+	john@phrozen.org,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	frank-w@public-files.de,
+	daniel@makrotopia.org
+Subject: [PATCH net-next] net: ethernet: mtk_wed: fix firmware loading for MT7986 SoC
+Date: Tue, 24 Oct 2023 00:00:19 +0200
+Message-ID: <d983cbfe8ea562fef9264de8f0c501f7d5705bd5.1698098381.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie
- generation/validation SOCK_OPS hooks.
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com,
- jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, kuni1840@gmail.com,
- mykolal@fb.com, netdev@vger.kernel.org, pabeni@redhat.com, sdf@google.com,
- sinquersw@gmail.com, song@kernel.org, yonghong.song@linux.dev
-References: <20231020231003.51313-1-kuniyu@amazon.com>
- <20231021064801.87816-1-kuniyu@amazon.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231021064801.87816-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 10/20/23 11:48 PM, Kuniyuki Iwashima wrote:
-> I think this was doable.  With the diff below, I was able to skip
-> validation in cookie_v[46]_check() when if skb->sk is not NULL.
-> 
-> The kfunc allocates req and set req->syncookie to 1, which is usually
-> set in TX path, so if it's 1 in RX (inet_steal_sock()), we can see
-> that req is allocated by kfunc (at least, req->syncookie &&
-> req->rsk_listener never be true in the current TCP stack).
-> 
-> The difference here is that req allocated by kfunc holds refcnt of
-> rsk_listener (passing true to inet_reqsk_alloc()) to prevent freeing
-> the listener until req reaches cookie_v[46]_check().
+The WED mcu firmware does not contain all the memory regions defined in
+the dts reserved_memory node (e.g. MT7986 WED firmware does not contain
+cpu-boot region).
+Reverse the mtk_wed_mcu_run_firmware() logic to check all the fw
+sections are defined in the dts reserved_memory node.
 
-The cookie_v[46]_check() holds the listener sk refcnt now?
+Fixes: c6d961aeaa77 ("net: ethernet: mtk_wed: move mem_region array out of mtk_wed_mcu_load_firmware")
+Tested-by: Frank Wunderlich <frank-w@public-files.de>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/mediatek/mtk_wed_mcu.c | 48 +++++++++++----------
+ 1 file changed, 25 insertions(+), 23 deletions(-)
 
- >
-> The cookie generation at least should be done at tc/xdp.  The
-> valdation can be done earlier as well on tc/xdp, but it could
-> add another complexity, listener's life cycle if we allocate
-> req there.
-
-I think your code below looks pretty close already.
-
-It seems the only concern/complexity is the extra rsk_listener refcnt (btw the 
-concern is on performance for the extra refcnt? or there is correctness issue?).
-
-Asking because bpf_sk_assign() can already assign a listener to skb->sk and it 
-also does not take a refcnt on the listener. The same no refcnt needed on 
-req->rsk_listener should be doable also. sock_pfree may need to be smarter to 
-check req->syncookie. What else may need to change?
-
-> 
-> I'm wondering which place to add the validation capability, and
-> I think SOCK_OPS is simpler than tc.
-> 
->    #1 validate cookie and allocate req at tc, and skip validation
-> 
->    #2 validate cookie (and update bpf map at xdp/tc, and look up bpf
->       map) and allocate req at SOCK_OPS hook
-> 
-> Given SYN proxy is usually on the other node and incoming cookie
-> is almost always valid, we might need not validate it in the early
-> stage in the stack.
-> 
-> What do you think ?
-
-Yeah, supporting validation in sock_ops is an open option if the tc side is too 
-hard but I feel you are pretty close on the tc side.
-
-> 
-> ---8<---
-> diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
-> index 3ecfeadbfa06..e5e4627bf270 100644
-> --- a/include/net/inet_hashtables.h
-> +++ b/include/net/inet_hashtables.h
-> @@ -462,9 +462,19 @@ struct sock *inet_steal_sock(struct net *net, struct sk_buff *skb, int doff,
->   	if (!sk)
->   		return NULL;
->   
-> -	if (!prefetched || !sk_fullsock(sk))
-> +	if (!prefetched)
->   		return sk;
->   
-> +	if (!sk_fullsock(sk)) {
-> +		if (sk->sk_state == TCP_NEW_SYN_RECV && inet_reqsk(sk)->syncookie) {
-> +			skb->sk = sk;
-> +			skb->destructor = sock_pfree;
-> +			sk = inet_reqsk(sk)->rsk_listener;
-> +		}
-> +
-> +		return sk;
-> +	}
-> +
->   	if (sk->sk_protocol == IPPROTO_TCP) {
->   		if (sk->sk_state != TCP_LISTEN)
->   			return sk;
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index cc2e4babc85f..bca491ddf42c 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -11800,6 +11800,71 @@ __bpf_kfunc int bpf_sock_addr_set_sun_path(struct bpf_sock_addr_kern *sa_kern,
->   
->   	return 0;
->   }
-> +
-> +__bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct sk_buff *skb, struct sock *sk,
-> +					struct tcp_options_received *tcp_opt,
-> +					int tcp_opt__sz, u16 mss)
-> +{
-> +	const struct tcp_request_sock_ops *af_ops;
-> +	const struct request_sock_ops *ops;
-> +	struct inet_request_sock *ireq;
-> +	struct tcp_request_sock *treq;
-> +	struct request_sock *req;
-> +
-> +	if (!sk)
-> +		return -EINVAL;
-> +
-> +	if (!skb_at_tc_ingress(skb))
-> +		return -EINVAL;
-> +
-> +	if (dev_net(skb->dev) != sock_net(sk))
-> +		return -ENETUNREACH;
-> +
-> +	switch (sk->sk_family) {
-> +	case AF_INET:  /* TODO: MPTCP */
-> +		ops = &tcp_request_sock_ops;
-> +		af_ops = &tcp_request_sock_ipv4_ops;
-> +		break;
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	case AF_INET6:
-> +		ops = &tcp6_request_sock_ops;
-> +		af_ops = &tcp_request_sock_ipv6_ops;
-> +		break;
-> +#endif
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (sk->sk_type != SOCK_STREAM || sk->sk_state != TCP_LISTEN)
-> +		return -EINVAL;
-> +
-> +	req = inet_reqsk_alloc(ops, sk, true);
-> +	if (!req)
-> +		return -ENOMEM;
-> +
-> +	ireq = inet_rsk(req);
-> +	treq = tcp_rsk(req);
-> +
-> +	refcount_set(&req->rsk_refcnt, 1);
-> +	req->syncookie = 1;
-> +	req->mss = mss;
-> +	req->ts_recent = tcp_opt->saw_tstamp ? tcp_opt->rcv_tsval : 0;
-> +
-> +	ireq->snd_wscale = tcp_opt->snd_wscale;
-> +	ireq->sack_ok = tcp_opt->sack_ok;
-> +	ireq->wscale_ok = tcp_opt->wscale_ok;
-> +	ireq->tstamp_ok	= tcp_opt->saw_tstamp;
-> +
-> +	tcp_rsk(req)->af_specific = af_ops;
-> +	tcp_rsk(req)->ts_off = tcp_opt->rcv_tsecr - tcp_ns_to_ts(tcp_clock_ns());
-> +
-> +	skb_orphan(skb);
-> +	skb->sk = req_to_sk(req);
-> +	skb->destructor = sock_pfree;
-> +
-> +	return 0;
-> +}
-> +
->   __diag_pop();
->   
->   int bpf_dynptr_from_skb_rdonly(struct sk_buff *skb, u64 flags,
-> @@ -11828,6 +11893,10 @@ BTF_SET8_START(bpf_kfunc_check_set_sock_addr)
->   BTF_ID_FLAGS(func, bpf_sock_addr_set_sun_path)
->   BTF_SET8_END(bpf_kfunc_check_set_sock_addr)
->   
-> +BTF_SET8_START(bpf_kfunc_check_set_tcp_reqsk)
-> +BTF_ID_FLAGS(func, bpf_sk_assign_tcp_reqsk)
-> +BTF_SET8_END(bpf_kfunc_check_set_tcp_reqsk)
-> +
->   static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
->   	.owner = THIS_MODULE,
->   	.set = &bpf_kfunc_check_set_skb,
-> @@ -11843,6 +11912,11 @@ static const struct btf_kfunc_id_set bpf_kfunc_set_sock_addr = {
->   	.set = &bpf_kfunc_check_set_sock_addr,
->   };
->   
-> +static const struct btf_kfunc_id_set bpf_kfunc_set_tcp_reqsk = {
-> +	.owner = THIS_MODULE,
-> +	.set = &bpf_kfunc_check_set_tcp_reqsk,
-> +};
-> +
->   static int __init bpf_kfunc_init(void)
->   {
->   	int ret;
-> @@ -11858,8 +11932,10 @@ static int __init bpf_kfunc_init(void)
->   	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_LWT_SEG6LOCAL, &bpf_kfunc_set_skb);
->   	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_NETFILTER, &bpf_kfunc_set_skb);
->   	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_kfunc_set_xdp);
-> -	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
-> -						&bpf_kfunc_set_sock_addr);
-> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
-> +					       &bpf_kfunc_set_sock_addr);
-> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
-> +	return ret;
->   }
->   late_initcall(bpf_kfunc_init);
->   
-> ---8<---
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed_mcu.c b/drivers/net/ethernet/mediatek/mtk_wed_mcu.c
+index 65a78e274009..fee9c9d3a92f 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed_mcu.c
++++ b/drivers/net/ethernet/mediatek/mtk_wed_mcu.c
+@@ -258,16 +258,12 @@ mtk_wed_get_memory_region(struct mtk_wed_hw *hw, int index,
+ }
+ 
+ static int
+-mtk_wed_mcu_run_firmware(struct mtk_wed_wo *wo, const struct firmware *fw,
+-			 struct mtk_wed_wo_memory_region *region)
++mtk_wed_mcu_run_firmware(struct mtk_wed_wo *wo, const struct firmware *fw)
+ {
+ 	const u8 *first_region_ptr, *region_ptr, *trailer_ptr, *ptr = fw->data;
+ 	const struct mtk_wed_fw_trailer *trailer;
+ 	const struct mtk_wed_fw_region *fw_region;
+ 
+-	if (!region->phy_addr || !region->size)
+-		return 0;
+-
+ 	trailer_ptr = fw->data + fw->size - sizeof(*trailer);
+ 	trailer = (const struct mtk_wed_fw_trailer *)trailer_ptr;
+ 	region_ptr = trailer_ptr - trailer->num_region * sizeof(*fw_region);
+@@ -275,33 +271,41 @@ mtk_wed_mcu_run_firmware(struct mtk_wed_wo *wo, const struct firmware *fw,
+ 
+ 	while (region_ptr < trailer_ptr) {
+ 		u32 length;
++		int i;
+ 
+ 		fw_region = (const struct mtk_wed_fw_region *)region_ptr;
+ 		length = le32_to_cpu(fw_region->len);
+-
+-		if (region->phy_addr != le32_to_cpu(fw_region->addr))
++		if (first_region_ptr < ptr + length)
+ 			goto next;
+ 
+-		if (region->size < length)
+-			goto next;
++		for (i = 0; i < ARRAY_SIZE(mem_region); i++) {
++			struct mtk_wed_wo_memory_region *region;
+ 
+-		if (first_region_ptr < ptr + length)
+-			goto next;
++			region = &mem_region[i];
++			if (region->phy_addr != le32_to_cpu(fw_region->addr))
++				continue;
+ 
+-		if (region->shared && region->consumed)
+-			return 0;
++			if (region->size < length)
++				continue;
+ 
+-		if (!region->shared || !region->consumed) {
+-			memcpy_toio(region->addr, ptr, length);
+-			region->consumed = true;
+-			return 0;
++			if (region->shared && region->consumed)
++				break;
++
++			if (!region->shared || !region->consumed) {
++				memcpy_toio(region->addr, ptr, length);
++				region->consumed = true;
++				break;
++			}
+ 		}
++
++		if (i == ARRAY_SIZE(mem_region))
++			return -EINVAL;
+ next:
+ 		region_ptr += sizeof(*fw_region);
+ 		ptr += length;
+ 	}
+ 
+-	return -EINVAL;
++	return 0;
+ }
+ 
+ static int
+@@ -360,11 +364,9 @@ mtk_wed_mcu_load_firmware(struct mtk_wed_wo *wo)
+ 	dev_info(wo->hw->dev, "MTK WED WO Chip ID %02x Region %d\n",
+ 		 trailer->chip_id, trailer->num_region);
+ 
+-	for (i = 0; i < ARRAY_SIZE(mem_region); i++) {
+-		ret = mtk_wed_mcu_run_firmware(wo, fw, &mem_region[i]);
+-		if (ret)
+-			goto out;
+-	}
++	ret = mtk_wed_mcu_run_firmware(wo, fw);
++	if (ret)
++		goto out;
+ 
+ 	/* set the start address */
+ 	if (!mtk_wed_is_v3_or_greater(wo->hw) && wo->hw->index)
+-- 
+2.41.0
 
 
