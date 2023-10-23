@@ -1,45 +1,49 @@
-Return-Path: <netdev+bounces-43329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 374AA7D27D4
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 03:12:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D29F57D27E7
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 03:21:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3C05B20C6D
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 01:12:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10AED2812FB
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 01:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6557E9;
-	Mon, 23 Oct 2023 01:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30DACEA9;
+	Mon, 23 Oct 2023 01:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE5A643
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 01:12:14 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56027ED;
-	Sun, 22 Oct 2023 18:12:11 -0700 (PDT)
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SDH9x6J5mzNpDk;
-	Mon, 23 Oct 2023 09:08:05 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 23 Oct 2023 09:12:06 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <chenhao418@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next] net: hns3: add some link modes for hisilicon device
-Date: Mon, 23 Oct 2023 09:08:36 +0800
-Message-ID: <20231023010836.507078-1-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBA4A4E
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 01:21:25 +0000 (UTC)
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 6E796C2;
+	Sun, 22 Oct 2023 18:21:23 -0700 (PDT)
+Received: from localhost.localdomain (unknown [180.167.10.98])
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 157906047A509;
+	Mon, 23 Oct 2023 09:20:59 +0800 (CST)
+X-MD-Sfrom: suhui@nfschina.com
+X-MD-SrcIP: 180.167.10.98
+From: Su Hui <suhui@nfschina.com>
+To: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com
+Cc: Su Hui <suhui@nfschina.com>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: [PATCH v2 RESEND] i40e: add an error code check in i40e_vsi_setup
+Date: Mon, 23 Oct 2023 09:20:25 +0800
+Message-Id: <20231023012024.18757-1-suhui@nfschina.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,273 +51,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.2]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
 
-From: Hao Chen <chenhao418@huawei.com>
+check the value of 'ret' after calling 'i40e_vsi_config_rss'.
 
-Add HCLGE_SUPPORT_50G_R1_BIT and HCLGE_SUPPORT_100G_R2_BIT two
-capability bits and Corresponding link modes.
-
-Signed-off-by: Hao Chen <chenhao418@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Signed-off-by: Su Hui <suhui@nfschina.com>
+Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 162 +++++++++---------
- .../hisilicon/hns3/hns3pf/hclge_main.h        |  16 +-
- 2 files changed, 96 insertions(+), 82 deletions(-)
+Resend to hit the intel0wired-lan list.
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index c42574e29747..d5ba56854ec8 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -881,8 +881,8 @@ static const struct hclge_speed_bit_map speed_bit_map[] = {
- 	{HCLGE_MAC_SPEED_10G, HCLGE_SUPPORT_10G_BIT},
- 	{HCLGE_MAC_SPEED_25G, HCLGE_SUPPORT_25G_BIT},
- 	{HCLGE_MAC_SPEED_40G, HCLGE_SUPPORT_40G_BIT},
--	{HCLGE_MAC_SPEED_50G, HCLGE_SUPPORT_50G_BIT},
--	{HCLGE_MAC_SPEED_100G, HCLGE_SUPPORT_100G_BIT},
-+	{HCLGE_MAC_SPEED_50G, HCLGE_SUPPORT_50G_BITS},
-+	{HCLGE_MAC_SPEED_100G, HCLGE_SUPPORT_100G_BITS},
- 	{HCLGE_MAC_SPEED_200G, HCLGE_SUPPORT_200G_BIT},
- };
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index de7fd43dc11c..4904bc8f5777 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -14567,9 +14567,13 @@ struct i40e_vsi *i40e_vsi_setup(struct i40e_pf *pf, u8 type,
+ 	if ((pf->hw_features & I40E_HW_RSS_AQ_CAPABLE) &&
+ 	    (vsi->type == I40E_VSI_VMDQ2)) {
+ 		ret = i40e_vsi_config_rss(vsi);
++		if (ret)
++			goto err_config;
+ 	}
+ 	return vsi;
  
-@@ -939,100 +939,102 @@ static void hclge_update_fec_support(struct hclge_mac *mac)
- 				 mac->supported);
- }
- 
-+static const struct hclge_link_mode_bit_map hclge_sr_link_mode_bit_map[8] = {
-+	{HCLGE_SUPPORT_10G_BIT, ETHTOOL_LINK_MODE_10000baseSR_Full_BIT},
-+	{HCLGE_SUPPORT_25G_BIT, ETHTOOL_LINK_MODE_25000baseSR_Full_BIT},
-+	{HCLGE_SUPPORT_40G_BIT, ETHTOOL_LINK_MODE_40000baseSR4_Full_BIT},
-+	{HCLGE_SUPPORT_50G_R2_BIT, ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT},
-+	{HCLGE_SUPPORT_50G_R1_BIT, ETHTOOL_LINK_MODE_50000baseSR_Full_BIT},
-+	{HCLGE_SUPPORT_100G_R4_BIT, ETHTOOL_LINK_MODE_100000baseSR4_Full_BIT},
-+	{HCLGE_SUPPORT_100G_R2_BIT, ETHTOOL_LINK_MODE_100000baseSR2_Full_BIT},
-+	{HCLGE_SUPPORT_200G_BIT, ETHTOOL_LINK_MODE_200000baseSR4_Full_BIT},
-+};
-+
-+static const struct hclge_link_mode_bit_map hclge_lr_link_mode_bit_map[6] = {
-+	{HCLGE_SUPPORT_10G_BIT, ETHTOOL_LINK_MODE_10000baseLR_Full_BIT},
-+	{HCLGE_SUPPORT_40G_BIT, ETHTOOL_LINK_MODE_40000baseLR4_Full_BIT},
-+	{HCLGE_SUPPORT_50G_R1_BIT, ETHTOOL_LINK_MODE_50000baseLR_ER_FR_Full_BIT},
-+	{HCLGE_SUPPORT_100G_R4_BIT,
-+	 ETHTOOL_LINK_MODE_100000baseLR4_ER4_Full_BIT},
-+	{HCLGE_SUPPORT_100G_R2_BIT,
-+	 ETHTOOL_LINK_MODE_100000baseLR2_ER2_FR2_Full_BIT},
-+	{HCLGE_SUPPORT_200G_BIT,
-+	 ETHTOOL_LINK_MODE_200000baseLR4_ER4_FR4_Full_BIT},
-+};
-+
-+static const struct hclge_link_mode_bit_map hclge_cr_link_mode_bit_map[8] = {
-+	{HCLGE_SUPPORT_10G_BIT, ETHTOOL_LINK_MODE_10000baseCR_Full_BIT},
-+	{HCLGE_SUPPORT_25G_BIT, ETHTOOL_LINK_MODE_25000baseCR_Full_BIT},
-+	{HCLGE_SUPPORT_40G_BIT, ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT},
-+	{HCLGE_SUPPORT_50G_R2_BIT, ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT},
-+	{HCLGE_SUPPORT_50G_R1_BIT, ETHTOOL_LINK_MODE_50000baseCR_Full_BIT},
-+	{HCLGE_SUPPORT_100G_R4_BIT, ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT},
-+	{HCLGE_SUPPORT_100G_R2_BIT, ETHTOOL_LINK_MODE_100000baseCR2_Full_BIT},
-+	{HCLGE_SUPPORT_200G_BIT, ETHTOOL_LINK_MODE_200000baseCR4_Full_BIT},
-+};
-+
-+static const struct hclge_link_mode_bit_map hclge_kr_link_mode_bit_map[9] = {
-+	{HCLGE_SUPPORT_1G_BIT, ETHTOOL_LINK_MODE_1000baseKX_Full_BIT},
-+	{HCLGE_SUPPORT_10G_BIT, ETHTOOL_LINK_MODE_10000baseKR_Full_BIT},
-+	{HCLGE_SUPPORT_25G_BIT, ETHTOOL_LINK_MODE_25000baseKR_Full_BIT},
-+	{HCLGE_SUPPORT_40G_BIT, ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT},
-+	{HCLGE_SUPPORT_50G_R2_BIT, ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT},
-+	{HCLGE_SUPPORT_50G_R1_BIT, ETHTOOL_LINK_MODE_50000baseKR_Full_BIT},
-+	{HCLGE_SUPPORT_100G_R4_BIT, ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT},
-+	{HCLGE_SUPPORT_100G_R2_BIT, ETHTOOL_LINK_MODE_100000baseKR2_Full_BIT},
-+	{HCLGE_SUPPORT_200G_BIT, ETHTOOL_LINK_MODE_200000baseKR4_Full_BIT},
-+};
-+
- static void hclge_convert_setting_sr(u16 speed_ability,
- 				     unsigned long *link_mode)
- {
--	if (speed_ability & HCLGE_SUPPORT_10G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseSR_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_25G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_25000baseSR_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_40G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_40000baseSR4_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_50G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_100G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_100000baseSR4_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_200G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_200000baseSR4_Full_BIT,
--				 link_mode);
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(hclge_sr_link_mode_bit_map); i++) {
-+		if (speed_ability & hclge_sr_link_mode_bit_map[i].support_bit)
-+			linkmode_set_bit(
-+				hclge_sr_link_mode_bit_map[i].link_mode,
-+				link_mode);
-+	}
- }
- 
- static void hclge_convert_setting_lr(u16 speed_ability,
- 				     unsigned long *link_mode)
- {
--	if (speed_ability & HCLGE_SUPPORT_10G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseLR_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_25G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_25000baseSR_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_50G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_50000baseLR_ER_FR_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_40G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_40000baseLR4_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_100G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_100000baseLR4_ER4_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_200G_BIT)
--		linkmode_set_bit(
--			ETHTOOL_LINK_MODE_200000baseLR4_ER4_FR4_Full_BIT,
--			link_mode);
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(hclge_lr_link_mode_bit_map); i++) {
-+		if (speed_ability & hclge_lr_link_mode_bit_map[i].support_bit)
-+			linkmode_set_bit(
-+				hclge_lr_link_mode_bit_map[i].link_mode,
-+				link_mode);
-+	}
- }
- 
- static void hclge_convert_setting_cr(u16 speed_ability,
- 				     unsigned long *link_mode)
- {
--	if (speed_ability & HCLGE_SUPPORT_10G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseCR_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_25G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_25000baseCR_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_40G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_50G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_100G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_200G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_200000baseCR4_Full_BIT,
--				 link_mode);
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(hclge_cr_link_mode_bit_map); i++) {
-+		if (speed_ability & hclge_cr_link_mode_bit_map[i].support_bit)
-+			linkmode_set_bit(
-+				hclge_cr_link_mode_bit_map[i].link_mode,
-+				link_mode);
-+	}
- }
- 
- static void hclge_convert_setting_kr(u16 speed_ability,
- 				     unsigned long *link_mode)
- {
--	if (speed_ability & HCLGE_SUPPORT_1G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseKX_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_10G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseKR_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_25G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_25000baseKR_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_40G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_50G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_100G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT,
--				 link_mode);
--	if (speed_ability & HCLGE_SUPPORT_200G_BIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_200000baseKR4_Full_BIT,
--				 link_mode);
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(hclge_kr_link_mode_bit_map); i++) {
-+		if (speed_ability & hclge_kr_link_mode_bit_map[i].support_bit)
-+			linkmode_set_bit(
-+				hclge_kr_link_mode_bit_map[i].link_mode,
-+				link_mode);
-+	}
- }
- 
- static void hclge_convert_setting_fec(struct hclge_mac *mac)
-@@ -1158,10 +1160,10 @@ static u32 hclge_get_max_speed(u16 speed_ability)
- 	if (speed_ability & HCLGE_SUPPORT_200G_BIT)
- 		return HCLGE_MAC_SPEED_200G;
- 
--	if (speed_ability & HCLGE_SUPPORT_100G_BIT)
-+	if (speed_ability & HCLGE_SUPPORT_100G_BITS)
- 		return HCLGE_MAC_SPEED_100G;
- 
--	if (speed_ability & HCLGE_SUPPORT_50G_BIT)
-+	if (speed_ability & HCLGE_SUPPORT_50G_BITS)
- 		return HCLGE_MAC_SPEED_50G;
- 
- 	if (speed_ability & HCLGE_SUPPORT_40G_BIT)
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-index 7bc2049b723d..ef530b84eaa0 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-@@ -185,15 +185,22 @@ enum HLCGE_PORT_TYPE {
- #define HCLGE_SUPPORT_1G_BIT		BIT(0)
- #define HCLGE_SUPPORT_10G_BIT		BIT(1)
- #define HCLGE_SUPPORT_25G_BIT		BIT(2)
--#define HCLGE_SUPPORT_50G_BIT		BIT(3)
--#define HCLGE_SUPPORT_100G_BIT		BIT(4)
-+#define HCLGE_SUPPORT_50G_R2_BIT	BIT(3)
-+#define HCLGE_SUPPORT_100G_R4_BIT	BIT(4)
- /* to be compatible with exsit board */
- #define HCLGE_SUPPORT_40G_BIT		BIT(5)
- #define HCLGE_SUPPORT_100M_BIT		BIT(6)
- #define HCLGE_SUPPORT_10M_BIT		BIT(7)
- #define HCLGE_SUPPORT_200G_BIT		BIT(8)
-+#define HCLGE_SUPPORT_50G_R1_BIT	BIT(9)
-+#define HCLGE_SUPPORT_100G_R2_BIT	BIT(10)
-+
- #define HCLGE_SUPPORT_GE \
- 	(HCLGE_SUPPORT_1G_BIT | HCLGE_SUPPORT_100M_BIT | HCLGE_SUPPORT_10M_BIT)
-+#define HCLGE_SUPPORT_50G_BITS \
-+	(HCLGE_SUPPORT_50G_R2_BIT | HCLGE_SUPPORT_50G_R1_BIT)
-+#define HCLGE_SUPPORT_100G_BITS \
-+	(HCLGE_SUPPORT_100G_R4_BIT | HCLGE_SUPPORT_100G_R2_BIT)
- 
- enum HCLGE_DEV_STATE {
- 	HCLGE_STATE_REINITING,
-@@ -1076,6 +1083,11 @@ struct hclge_mac_speed_map {
- 	u32 speed_fw; /* speed defined in firmware */
- };
- 
-+struct hclge_link_mode_bit_map {
-+	u16 support_bit;
-+	enum ethtool_link_mode_bit_indices link_mode;
-+};
-+
- int hclge_set_vport_promisc_mode(struct hclge_vport *vport, bool en_uc_pmc,
- 				 bool en_mc_pmc, bool en_bc_pmc);
- int hclge_add_uc_addr_common(struct hclge_vport *vport,
++err_config:
++	i40e_vsi_clear_rings(vsi);
+ err_rings:
+ 	i40e_vsi_free_q_vectors(vsi);
+ err_msix:
 -- 
-2.30.0
+2.30.2
 
 
