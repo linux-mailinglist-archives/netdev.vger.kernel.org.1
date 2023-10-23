@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-43558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 810427D3DFB
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:41:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9AEC7D3E00
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 19:41:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DBE02810D2
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:41:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEC551C20AD4
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 17:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9162D210F6;
-	Mon, 23 Oct 2023 17:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 148F321112;
+	Mon, 23 Oct 2023 17:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5BF1BDEB;
-	Mon, 23 Oct 2023 17:40:58 +0000 (UTC)
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 721DBB0;
-	Mon, 23 Oct 2023 10:40:57 -0700 (PDT)
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6c4b9e09521so2505781a34.3;
-        Mon, 23 Oct 2023 10:40:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4782B1B26B;
+	Mon, 23 Oct 2023 17:41:05 +0000 (UTC)
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65D6710CF;
+	Mon, 23 Oct 2023 10:41:03 -0700 (PDT)
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3b2b1af09c5so2087457b6e.0;
+        Mon, 23 Oct 2023 10:41:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698082857; x=1698687657;
+        d=1e100.net; s=20230601; t=1698082862; x=1698687662;
         h=date:subject:message-id:references:in-reply-to:cc:to:from
          :mime-version:content-transfer-encoding:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=gJUB7T6ggr9ReWGTHjmIzl9odtVPcmxjSmpLxnF/YjE=;
-        b=VTOiTKNeh0qvTcAUYXnF+O67rR3klIVi5shGC/jyK9GcACRWIrbyHcZnfO4wh9++Xq
-         Dr5pEfF4+aC6T77BbDSS8lHzwW7Qonlc7uXjJoF5sVgg9voiDsQTW8r5lTB6S9VC2Ii1
-         XnDgYtZt5j4/1Vy72HqA94KwvV0YkeppdpM/pvoLrK3J4Qj+/tceu9R2fTesupHbNRz+
-         WrAqHbgJjvhsVtz9BMRntmkBoN2YJ5Y4vIzPimrV2xkHd6wt4tZx2IZWzqKgUqUu5CzT
-         H4/lj6bI/5xb/gqdS000Oy5xpmZIOE5uvIH5jIU0cPizJDh9iLls36ghC0jxDbHXy7Pb
-         97Jw==
-X-Gm-Message-State: AOJu0YyxOjSC5BwqyReI/uZE/JbxlhvztMCtIe/oKbIo6bHK/BI5qAoA
-	PFhm20vxAEltjdCT5Trq+g==
-X-Google-Smtp-Source: AGHT+IErcHg33n39OkEdWsOE47mWXIR4sKav331Xa/eEmRdc558JSqoUNUuAI0pR3IQ3X5PA+BEk7Q==
-X-Received: by 2002:a05:6870:7029:b0:1e9:96c6:e040 with SMTP id u41-20020a056870702900b001e996c6e040mr10972318oae.32.1698082856727;
-        Mon, 23 Oct 2023 10:40:56 -0700 (PDT)
+        bh=pmqnrhI90Z1XEYPu0vBhhTnhUoWJuxsH4Kz9QXi9qtg=;
+        b=UTjxkGvtLud72/hOwlcXscEp+CUeIS/k6aT859xrmwj4WMAcMyuLyNwnry6sLzQI6K
+         RI4vtcakXeg6PziXIPpYcL7hi1XCPiXK3OF93+wJp4MMEwG4+n6JsC9IrarLVExwR5CF
+         ilLpb03MhD6i1XhxZcMmJ7qjJFVEb7zFZ+dRlHDJDNOQq112t6p46gONAuzYLXP1XTix
+         vg4zoqnVksc3oXarq/tX5aJYGUbCoOKUwNkAgxVZV2SYRuuWRXt+2VqzmYI5L+MaVSEy
+         nduMJdy2Prq2KIG88jLG5DXJwwXV+oKoNi/S7gxonxBcEjzNvwe0tt8rc64/KiVV7tmt
+         eJNg==
+X-Gm-Message-State: AOJu0YzqrcSn731oQnJsiuj5zeoDxN0/QxZIb/ovLhZibDuzFJg9Dr3k
+	OOcjUs34543nXZfj8PDq5Q==
+X-Google-Smtp-Source: AGHT+IHV9ojFzaeIhztF8lWZjX/vfptW0p5inXTEfvWm3/N7Fj8s4KWJ5FOFJN8T6j84XIOkU8V+vw==
+X-Received: by 2002:a05:6808:bc1:b0:3a9:cfb5:462a with SMTP id o1-20020a0568080bc100b003a9cfb5462amr10051960oik.36.1698082862515;
+        Mon, 23 Oct 2023 10:41:02 -0700 (PDT)
 Received: from herring.priv ([2607:fb91:e6e0:8169:8cd7:6070:de02:c079])
-        by smtp.gmail.com with ESMTPSA id z16-20020a9d7a50000000b006cd0a04b56esm1491815otm.56.2023.10.23.10.40.54
+        by smtp.gmail.com with ESMTPSA id r5-20020a0568080aa500b003ae540759a0sm1560522oij.40.2023.10.23.10.40.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 10:40:56 -0700 (PDT)
-Received: (nullmailer pid 864632 invoked by uid 1000);
+        Mon, 23 Oct 2023 10:41:01 -0700 (PDT)
+Received: (nullmailer pid 864626 invoked by uid 1000);
 	Mon, 23 Oct 2023 17:40:49 -0000
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -56,49 +56,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Rob Herring <robh@kernel.org>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: linux-doc@vger.kernel.org, horms@kernel.org, devicetree@vger.kernel.org, horatiu.vultur@microchip.com, krzysztof.kozlowski+dt@linaro.org, corbet@lwn.net, linux-kernel@vger.kernel.org, Nicolas.Ferre@microchip.com, robh+dt@kernel.org, UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, rdunlap@infradead.org, andrew@lunn.ch, edumazet@google.com, pabeni@redhat.com, kuba@kernel.org, steen.hegelund@microchip.com, davem@davemloft.net, Thorsten.Kummermehr@microchip.com, Woojung.Huh@microchip.com, casper.casan@gmail.com, conor+dt@kernel.org
-In-Reply-To: <20231023154649.45931-5-Parthiban.Veerasooran@microchip.com>
-References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
- <20231023154649.45931-5-Parthiban.Veerasooran@microchip.com>
-Message-Id: <169808266165.861277.6927507882203709016.robh@kernel.org>
-Subject: Re: [PATCH net-next v2 4/9] dt-bindings: net: add OPEN Alliance
- 10BASE-T1x MAC-PHY Serial Interface
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Gregory Clement <gregory.clement@bootlin.com>, Rob Herring <robh+dt@kernel.org>, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, linux-arm-kernel@lists.infradead.org, Vladimir Oltean <olteanv@gmail.com>, Russell King <linux@armlinux.org.uk>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Christian Marangi <ansuelsmth@gmail.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>
+In-Reply-To: <20231023-marvell-88e6152-wan-led-v5-1-0e82952015a7@linaro.org>
+References: <20231023-marvell-88e6152-wan-led-v5-0-0e82952015a7@linaro.org>
+ <20231023-marvell-88e6152-wan-led-v5-1-0e82952015a7@linaro.org>
+Message-Id: <169808265708.861114.9088023510447543664.robh@kernel.org>
+Subject: Re: [PATCH net-next v5 1/7] dt-bindings: net: dsa: Require ports
+ or ethernet-ports
 Date: Mon, 23 Oct 2023 12:40:49 -0500
 
 
-On Mon, 23 Oct 2023 21:16:44 +0530, Parthiban Veerasooran wrote:
-> Add DT bindings OPEN Alliance 10BASE-T1x MACPHY Serial Interface
-> parameters. These are generic properties that can apply to any 10BASE-T1x
-> MAC-PHY which uses OPEN Alliance TC6 specification.
+On Mon, 23 Oct 2023 09:18:52 +0200, Linus Walleij wrote:
+> Bindings using dsa.yaml#/$defs/ethernet-ports specify that
+> a DSA switch node need to have a ports or ethernet-ports
+> subnode, and that is actually required, so add requirements
+> using oneOf.
 > 
-> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+> Suggested-by: Rob Herring <robh@kernel.org>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 > ---
->  .../devicetree/bindings/net/oa-tc6.yaml       | 72 +++++++++++++++++++
->  MAINTAINERS                                   |  1 +
->  2 files changed, 73 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/oa-tc6.yaml
+>  Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
 
 My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
 on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
 yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/oa-tc6.yaml:16:68: [error] syntax error: mapping values are not allowed here (syntax)
+./Documentation/devicetree/bindings/net/dsa/dsa.yaml:60:7: [warning] wrong indentation: expected 8 but found 6 (indentation)
+./Documentation/devicetree/bindings/net/dsa/dsa.yaml:62:7: [warning] wrong indentation: expected 8 but found 6 (indentation)
 
 dtschema/dtc warnings/errors:
-make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/oa-tc6.example.dts'
-Documentation/devicetree/bindings/net/oa-tc6.yaml:16:68: mapping values are not allowed in this context
-make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/net/oa-tc6.example.dts] Error 1
-make[2]: *** Waiting for unfinished jobs....
-./Documentation/devicetree/bindings/net/oa-tc6.yaml:16:68: mapping values are not allowed in this context
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/oa-tc6.yaml: ignoring, error parsing file
-make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1427: dt_binding_check] Error 2
-make: *** [Makefile:234: __sub-make] Error 2
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/dsa/dsa.yaml: $defs: 'oneOf' should not be valid under {'$ref': '#/definitions/json-schema-prop-names'}
+	hint: A json-schema keyword was found in $defs key.
+	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/dsa/dsa.yaml: $defs:oneOf: [{'required': ['ports']}, {'required': ['ethernet-ports']}] is not of type 'object'
+	hint: $defs entries must contain schemas
+	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
 
 doc reference errors (make refcheckdocs):
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231023154649.45931-5-Parthiban.Veerasooran@microchip.com
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231023-marvell-88e6152-wan-led-v5-1-0e82952015a7@linaro.org
 
 The base for the series is generally the latest rc1. A different dependency
 should be noted in *this* patch.
