@@ -1,218 +1,192 @@
-Return-Path: <netdev+bounces-43359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 806D47D2B10
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 09:19:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A43F7D2B35
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 09:23:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B428281465
-	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 07:19:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A4D8B20CAD
+	for <lists+netdev@lfdr.de>; Mon, 23 Oct 2023 07:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94624111A0;
-	Mon, 23 Oct 2023 07:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XBGE3orD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66584101D3;
+	Mon, 23 Oct 2023 07:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC6F101CD
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 07:19:18 +0000 (UTC)
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B10D3D7A
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 00:19:16 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2c518a1d83fso46652501fa.3
-        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 00:19:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698045554; x=1698650354; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gq8DR5RNSIB2KF67rLQezzE4XvH4EK3ZE14X17dxVQY=;
-        b=XBGE3orDkYGCRnROYC2ItWTwXtKU7waynHwyI3e5RKnZ713WYrwownzvts1SFp1eaq
-         2Hwwrtyo0t0YEJVSf9KUCSX3jPgnheDpDuL18d0GaZ3HnhoHVw8IGn3Dpgwm9lmBTWdd
-         UX0/saPUl9GPPkzbhAgtUHMf49vzV2YB8QaokLG2oKisdLPfZA5JgY/JPKujLxn9okBB
-         Xj/cNdg8yOq8YM8HClkR0hnYK6/VhjSsL9ofOjJzKZGqBlg8oW62PWLZZiKHoC3OWNfO
-         WTRbj4IGJPEjQ6IIu1OyXI0a+p95Gvo1gNBhhhyzkt8YsRaoPyu70NuPQwXOen5wtdKB
-         Vmsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698045554; x=1698650354;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gq8DR5RNSIB2KF67rLQezzE4XvH4EK3ZE14X17dxVQY=;
-        b=m+zcbFs5uhrflmZj1nPwbPKQAb+p30Ex7TupBu765AkUVE+EobRM1J7cf66OQIASA6
-         nL/wX76iLiVMcUC3ct1oOrOgBWljd+Pk4RVuj98RjZu9ocVtRgbfuUxIoeC5W0/7/V8G
-         ZyWj7qQagDWpZcxnGxzMbEwgPBGWAVj0K/m+dp9qfkYLM46/1jyWjrt04EyolW4RKpHs
-         dpCX7nqIHQ+Hs6yQNR0JRRUGIrZ8vwR13yseGiVgfCgIlXNvvoTysqHgNpYt+qUCqOGL
-         QUcD9GYxvqO8AKh1hEqpkapKLy4UFkhhuSTOy4YMvF00OtEy8hiYR4tbWxo2In2bxc9v
-         4IPw==
-X-Gm-Message-State: AOJu0YzaQ8w/cfJ8bbPeFb4XM+akfy8kdN+ci+GBAVFkC8eUmsA5bYQy
-	19Up9VNWSTYikF2C1fHylo+Z9Q==
-X-Google-Smtp-Source: AGHT+IFyR9pjQKtApff7NBytpKJ6G6eBrMw4j76oyESVgw9SxxMCqGOaLyBOAWJkZ4ODzm0UDxmoLQ==
-X-Received: by 2002:a19:550f:0:b0:507:bbbe:5287 with SMTP id n15-20020a19550f000000b00507bbbe5287mr5543058lfe.51.1698045554720;
-        Mon, 23 Oct 2023 00:19:14 -0700 (PDT)
-Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id w15-20020a05651204cf00b00507a682c049sm1578727lfq.215.2023.10.23.00.19.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 00:19:14 -0700 (PDT)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 23 Oct 2023 09:18:58 +0200
-Subject: [PATCH net-next v5 7/7] dt-bindings: marvell: Add Marvell
- MV88E6060 DSA schema
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E61F101CD
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 07:23:42 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E90B5E6;
+	Mon, 23 Oct 2023 00:23:39 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.200])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SDRR63Ccxz67HtH;
+	Mon, 23 Oct 2023 15:20:02 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 23 Oct 2023 08:23:36 +0100
+Message-ID: <ed35b3a1-b060-dec6-fa18-efa6743bd1c2@huawei.com>
+Date: Mon, 23 Oct 2023 10:23:35 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231023-marvell-88e6152-wan-led-v5-7-0e82952015a7@linaro.org>
-References: <20231023-marvell-88e6152-wan-led-v5-0-0e82952015a7@linaro.org>
-In-Reply-To: <20231023-marvell-88e6152-wan-led-v5-0-0e82952015a7@linaro.org>
-To: Andrew Lunn <andrew@lunn.ch>, 
- Gregory Clement <gregory.clement@bootlin.com>, 
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
- Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, Russell King <linux@armlinux.org.uk>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, 
- linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Linus Walleij <linus.walleij@linaro.org>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>
-X-Mailer: b4 0.12.4
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v13 08/12] landlock: Add network rules and TCP hooks
+ support
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
+ <20231016015030.1684504-9-konstantin.meskhidze@huawei.com>
+ <20231017.xahKoo9Koo8v@digikod.net>
+ <57f150b2-0920-8567-8351-1bdb74684cfa@huawei.com>
+ <20231020.ido6Aih0eiGh@digikod.net>
+ <ae62c363-e9bf-3ab8-991a-0902b0d195cb@huawei.com>
+ <20231020.ooS5Phaiqu6k@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <20231020.ooS5Phaiqu6k@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
 
-The Marvell MV88E6060 is one of the oldest DSA switches from
-Marvell, and it has DT bindings used in the wild. Let's define
-them properly.
 
-It is different enough from the rest of the MV88E6xxx switches
-that it deserves its own binding.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- .../bindings/net/dsa/marvell,mv88e6060.yaml        | 88 ++++++++++++++++++++++
- MAINTAINERS                                        |  1 +
- 2 files changed, 89 insertions(+)
+10/20/2023 6:41 PM, Mickaël Salaün пишет:
+> On Fri, Oct 20, 2023 at 02:58:31PM +0300, Konstantin Meskhidze (A) wrote:
+>> 
+>> 
+>> 10/20/2023 12:49 PM, Mickaël Salaün пишет:
+>> > On Fri, Oct 20, 2023 at 07:08:33AM +0300, Konstantin Meskhidze (A) wrote:
+>> > > 
+>> > > 
+>> > > 10/18/2023 3:29 PM, Mickaël Salaün пишет:
+>> > > > On Mon, Oct 16, 2023 at 09:50:26AM +0800, Konstantin Meskhidze wrote:
+> 
+>> > > > > diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
+>> > > > > index 4c209acee01e..1fe4298ff4a7 100644
+>> > > > > --- a/security/landlock/ruleset.c
+>> > > > > +++ b/security/landlock/ruleset.c
+>> > > > > @@ -36,6 +36,11 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
+>> > > > >  	refcount_set(&new_ruleset->usage, 1);
+>> > > > >  	mutex_init(&new_ruleset->lock);
+>> > > > >  	new_ruleset->root_inode = RB_ROOT;
+>> > > > > +
+>> > > > > +#if IS_ENABLED(CONFIG_INET)
+>> > > > > +	new_ruleset->root_net_port = RB_ROOT;
+>> > > > > +#endif /* IS_ENABLED(CONFIG_INET) */
+>> > > > > +
+>> > > > >  	new_ruleset->num_layers = num_layers;
+>> > > > >  	/*
+>> > > > >  	 * hierarchy = NULL
+>> > > > > @@ -46,16 +51,21 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
+>> > > > >  }
+>> > > > > > >  struct landlock_ruleset *
+>> > > > > -landlock_create_ruleset(const access_mask_t fs_access_mask)
+>> > > > > +landlock_create_ruleset(const access_mask_t fs_access_mask,
+>> > > > > +			const access_mask_t net_access_mask)
+>> > > > >  {
+>> > > > >  	struct landlock_ruleset *new_ruleset;
+>> > > > > > >  	/* Informs about useless ruleset. */
+>> > > > > -	if (!fs_access_mask)
+>> > > > > +	if (!fs_access_mask && !net_access_mask)
+>> > > > >  		return ERR_PTR(-ENOMSG);
+>> > > > >  	new_ruleset = create_ruleset(1);
+>> > > > > -	if (!IS_ERR(new_ruleset))
+>> > > > > +	if (IS_ERR(new_ruleset))
+>> > > > > +		return new_ruleset;
+>> > > > > +	if (fs_access_mask)
+>> > > > >  		landlock_add_fs_access_mask(new_ruleset, fs_access_mask, 0);
+>> > > > > +	if (net_access_mask)
+>> > > > > +		landlock_add_net_access_mask(new_ruleset, net_access_mask, 0);
+>> > > > > This is good, but it is not tested: we need to add a test that
+>> > > both
+>> > > > handle FS and net restrictions. You can add one in net.c, just handling
+>> > > > LANDLOCK_ACCESS_FS_READ_DIR and LANDLOCK_ACCESS_NET_BIND_TCP, add one
+>> > > > rule with path_beneath (e.g. /dev) and another with net_port, and check
+>> > > > that open("/") is denied, open("/dev") is allowed, and and only the
+>> > > > allowed port is allowed with bind(). This test should be simple and can
+>> > > > only check against an IPv4 socket, i.e. using ipv4_tcp fixture, just
+>> > > > after port_endianness. fcntl.h should then be included by net.c
+>> > > 
+>> > >   Ok.
+>> > > > > I guess that was the purpose of layout1.with_net (in fs_test.c)
+>> > > but it
+>> > > 
+>> > >   Yep. I added this kind of nest in fs_test.c to test both fs and network
+>> > > rules together.
+>> > > > is not complete. You can revamp this test and move it to net.c
+>> > > > following the above suggestions, keeping it consistent with other tests
+>> > > > in net.c . You don't need the test_open() nor create_ruleset() helpers.
+>> > > > > This test must failed if we change
+>> > > "ruleset->access_masks[layer_level] |="
+>> > > > to "ruleset->access_masks[layer_level] =" in
+>> > > > landlock_add_fs_access_mask() or landlock_add_net_access_mask().
+>> > > 
+>> > >   Do you want to change it? Why?
+>> > 
+>> > The kernel code is correct and must not be changed. However, if by
+>> > mistake we change it and remove the OR, a test should catch that. We
+>> > need a test to assert this assumption.
+>> > 
+>>   OK. I will add additional assert simulating
+>> "ruleset->access_masks[layer_level] =" kernel code.
+>> > >   Fs and network masks are ORed to not intersect with each other.
+>> > 
+>> > Yes, they are ORed, and we need a test to check that. Noting is
+>> > currently testing this OR (and the different rule type consistency).
+>> > I'm suggesting to revamp the layout1.with_net test into
+>> > ipv4_tcp.with_fs and make it check ruleset->access_masks[] and rule
+>> > addition of different types.
+>> 
+>>   I will move layout1.with_net test into net.c and rename it. Looks like
+>>   it just needed to add "ruleset->access_masks[layer_level] =" assert
+>>   because the test already has rule addition with different types.
+> 
+> The with_net test doesn't have FS rules, which is the main missing part.
+> You'll need to rely on the net.c helpers, use the hardcoded paths, and
+> only handle one access right of each type as I suggested above.
+> 
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
-new file mode 100644
-index 000000000000..4f1adf00431a
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
-@@ -0,0 +1,88 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6060.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Marvell MV88E6060 DSA switch
-+
-+maintainers:
-+  - Andrew Lunn <andrew@lunn.ch>
-+
-+description:
-+  The Marvell MV88E6060 switch has been produced and sold by Marvell
-+  since at least 2008. The switch has one pin ADDR4 that controls the
-+  MDIO address of the switch to be 0x10 or 0x00, and on the MDIO bus
-+  connected to the switch, the PHYs inside the switch appear as
-+  independent devices on address 0x00-0x04 or 0x10-0x14, so in difference
-+  from many other DSA switches this switch does not have an internal
-+  MDIO bus for the PHY devices.
-+
-+properties:
-+  compatible:
-+    const: marvell,mv88e6060
-+    description:
-+      The MV88E6060 is the oldest Marvell DSA switch product, and
-+      as such a bit limited in features compared to later hardware.
-+
-+  reg:
-+    maxItems: 1
-+
-+  reset-gpios:
-+    description:
-+      GPIO to be used to reset the whole device
-+    maxItems: 1
-+
-+allOf:
-+  - $ref: dsa.yaml#/$defs/ethernet-ports
-+
-+required:
-+  - compatible
-+  - reg
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        ethernet-switch@16 {
-+            compatible = "marvell,mv88e6060";
-+            reg = <16>;
-+
-+            ethernet-ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                ethernet-port@0 {
-+                    reg = <0>;
-+                    label = "lan1";
-+                };
-+                ethernet-port@1 {
-+                    reg = <1>;
-+                    label = "lan2";
-+                };
-+                ethernet-port@2 {
-+                    reg = <2>;
-+                    label = "lan3";
-+                };
-+                ethernet-port@3 {
-+                    reg = <3>;
-+                    label = "lan4";
-+                };
-+                ethernet-port@5 {
-+                    reg = <5>;
-+                    phy-mode = "rev-mii";
-+                    ethernet = <&ethc>;
-+                    fixed-link {
-+                        speed = <100>;
-+                        full-duplex;
-+                    };
-+                };
-+            };
-+        };
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1b4475254d27..4c933a2a56ad 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12625,6 +12625,7 @@ MARVELL 88E6XXX ETHERNET SWITCH FABRIC DRIVER
- M:	Andrew Lunn <andrew@lunn.ch>
- L:	netdev@vger.kernel.org
- S:	Maintained
-+F:	Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
- F:	Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
- F:	Documentation/networking/devlink/mv88e6xxx.rst
- F:	drivers/net/dsa/mv88e6xxx/
+  This is with_net code:
 
--- 
-2.34.1
+   ....
+   /* Adds a network rule. */
+	
+ASSERT_EQ(0, landlock_add_rule(ruleset_fd_net, LANDLOCK_RULE_NET_PORT,
+				       &tcp_bind, 0));
 
+	enforce_ruleset(_metadata, ruleset_fd_net);
+	ASSERT_EQ(0, close(ruleset_fd_net));
+
+	ruleset_fd = create_ruleset(_metadata, ACCESS_RW, rules);
+
+	ASSERT_LE(0, ruleset_fd);
+	enforce_ruleset(_metadata, ruleset_fd);
+	ASSERT_EQ(0, close(ruleset_fd));
+....
+
+It has FS rules - just after ruleset_fd_net rule inforced.
+Or maybe I missed something?
+
+>> 
+>>   Do you have any more review updates so far?
+> 
+> That's all for this patch series. :)
+
+   Ok. Thanks.
+> .
 
