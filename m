@@ -1,116 +1,68 @@
-Return-Path: <netdev+bounces-43988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B04F7D5BF7
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 21:58:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 073417D5C05
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 22:00:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36DFD1C20CE0
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:58:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD8041F2207E
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC133E469;
-	Tue, 24 Oct 2023 19:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FAE3D98E;
+	Tue, 24 Oct 2023 19:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="ZwxOBDVX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqyuiEUL"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9763E468;
-	Tue, 24 Oct 2023 19:58:10 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FEEBD7F;
-	Tue, 24 Oct 2023 12:58:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=wBc2ee6WgHMTUznIEqLMaOzJxqrA9qkMKQFIIG7GQFM=; b=ZwxOBDVXffZyVbxeALkJcZ5WRu
-	7G1rxZkDK4jhZ9uKD9zvmkivbL0n3y4TrQ8uIACv8FDpq6pjNL2gGu7UBOssgSPusZGO0J0jmHXAm
-	OrLW8yK5a17bwXU1nY3nJwssnoTNZgFJEgRL80uNQjLVYgbWoaDCv7VmxNPxhotlWaX1pY5sOvwRa
-	KkmS25coB0i76U8W9anV8mZk3vm5WtEWl48Q6TFikBCjQDhJZ/TSfzZskFpKaaUiunCwmwCdIMeMX
-	zM60dOmYjlxHg6x2oCsiLYLmOGNcKpehh5Zm6XgbbaDTN4MpGhopm883dQhI++G+tyPssawJP6pjd
-	knQU3wsg==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qvNXS-000HAE-Mw; Tue, 24 Oct 2023 21:58:06 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qvNXS-000Cvi-9I; Tue, 24 Oct 2023 21:58:06 +0200
-Subject: Re: [PATCH bpf-next v3 1/7] netkit, bpf: Add bpf programmable net
- device
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@linux.dev,
- razor@blackwall.org, ast@kernel.org, andrii@kernel.org,
- john.fastabend@gmail.com, toke@kernel.org, kuba@kernel.org, andrew@lunn.ch
-References: <20231023171856.18324-1-daniel@iogearbox.net>
- <20231023171856.18324-2-daniel@iogearbox.net> <ZTfza8hC_79X10F8@google.com>
- <ca1f0aaa-94c2-5e7d-1d00-a640bb3be44a@iogearbox.net>
- <ZTgMg3HfFohvISSF@google.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <5578ded4-8957-5cfc-5731-7156b0152af2@iogearbox.net>
-Date: Tue, 24 Oct 2023 21:58:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7404B3B2B4;
+	Tue, 24 Oct 2023 19:59:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDBC6C433C9;
+	Tue, 24 Oct 2023 19:59:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698177597;
+	bh=52wsup4chWcy8hWdeJ3lf2le043MI/8JJSxspHzfSPk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bqyuiEUL4xctJpoUMmdwBhrUSY2OgtgO57Aa6WSbaIrRzUDfwriA1E+qQSA4bpZNW
+	 Kabij32y7KKSNo0XB9kGT056GVpqO/01uPAHIcwtwLJuTtYqEzquWHobxsQHWW+mjx
+	 VXgKfKhwLY/okjMOD8fz1N/irnAniV+iY2d5rl6wORmsjaTRbuZS37Yz+F9u1nes07
+	 VY8ZHKnLBUsJx94kPJ7JVRrXv6uRHdWWk7pscNLdBbtxzVlzyXwJs2Dg3i7roo0AMl
+	 sdhrHDEIde3Z2c+5R1F/FQaa15UxEuuJkuZg8xWeF786lTIbwe3aQDiJuOAl2TMkvn
+	 NfxBvEiJAQMLg==
+Date: Tue, 24 Oct 2023 12:59:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mat Martineau <martineau@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthieu Baerts
+ <matttbe@kernel.org>, netdev@vger.kernel.org, mptcp@lists.linux.dev, Simon
+ Horman <horms@kernel.org>, Davide Caratti <dcaratti@redhat.com>
+Subject: Re: [PATCH net-next v2 5/7] uapi: mptcp: use header file generated
+ from YAML spec
+Message-ID: <20231024125956.341ef4ef@kernel.org>
+In-Reply-To: <20231023-send-net-next-20231023-1-v2-5-16b1f701f900@kernel.org>
+References: <20231023-send-net-next-20231023-1-v2-0-16b1f701f900@kernel.org>
+	<20231023-send-net-next-20231023-1-v2-5-16b1f701f900@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZTgMg3HfFohvISSF@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27071/Tue Oct 24 09:43:50 2023)
 
-On 10/24/23 8:27 PM, Stanislav Fomichev wrote:
-> On 10/24, Daniel Borkmann wrote:
->> On 10/24/23 6:40 PM, Stanislav Fomichev wrote:
->>> On 10/23, Daniel Borkmann wrote:
->> [...]
->>> The series looks great! FWIW:
->>> Acked-by: Stanislav Fomichev <sdf@google.com>
->>
->> Thanks for review!
->>
->>> One small question I have is:
->>> We now (and after introduction of tcx) seem to store non-refcounted
->>> dev pointers in the bpf_link(s). Is it guaranteed that the dev will
->>> outlive the link?
->>
->> The semantics are the same as it was done in XDP, meaning, the link is in
->> detached state so link->dev is NULL when dev goes away, see also the
->> dev_xdp_uninstall(). We cannot hold a refcount on the dev as otherwise
->> if the link outlives it we get the infamous "unregister_netdev...waiting
->> for <dev>... refcnt = 1" bug.
-> 
-> Yeah, I remember I've had a similar issue with holding netdev when
-> adding dev-bound programs, so I was wondering what are we doing here.
-> Thanks for the pointers!
-> 
-> And here, I guess the assumption that the device shutdown goes via
-> dellink (netkit_del_link) and there is no special path that reaches
-> unregister_netdevice_many_notify otherwise, right?
+On Mon, 23 Oct 2023 11:17:09 -0700 Mat Martineau wrote:
+> +/* for backward compatibility */
+> +#define	__MPTCP_PM_CMD_AFTER_LAST	__MPTCP_PM_CMD_MAX
+> +#define	__MPTCP_ATTR_AFTER_LAST		__MPTCP_ATTR_MAX
 
-Correct, this is where various netdevices do their internal cleanup.
+Do you want to intentionally move to the normal naming or would you
+prefer to keep the old names?
 
-> What about that ndo_uninit btw? Would it be more safe/clear to make
-> netkit_release_all be ndo_uninit? Looks like it's being triggered
-> in a place similar to dev_xdp_uninstall/dev_tcx_uninstall.
-
-Looking into it, that is a better location for netkit_release_all()
-indeed, and ndo_uninit is under rtnl. I'll spin a v4 with this and the
-commit message fixups that Toke suggested. Thanks for the pointer!
-
-Thanks,
-Daniel
+We have attr-cnt-name / attr-max-name for migrating existing families.
+We can add similar properties for cmd if you prefer, I think that they
+were not needed before.
 
