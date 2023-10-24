@@ -1,176 +1,149 @@
-Return-Path: <netdev+bounces-43986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98B757D5BD2
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 21:50:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3B287D5BDC
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 21:51:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39C80B20F79
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:50:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B4A22819BC
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:51:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008223CD19;
-	Tue, 24 Oct 2023 19:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01BB3D970;
+	Tue, 24 Oct 2023 19:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PyeOZbTc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llukYWrL"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5181E266A9
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 19:50:05 +0000 (UTC)
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41E4510DB
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 12:50:03 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id af79cd13be357-7789a4c01easo314858885a.0
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 12:50:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F62626E3E;
+	Tue, 24 Oct 2023 19:51:44 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9305510DA;
+	Tue, 24 Oct 2023 12:51:42 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-53ebf429b4fso7614911a12.1;
+        Tue, 24 Oct 2023 12:51:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698177002; x=1698781802; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=maw6NhMTUWspoHmkMBm+asPwHK+fd6vySlok/+0d7pw=;
-        b=PyeOZbTciYhmStcZ6R5P+CVNnvS2Fftd/q9qTYnQbdnBXxs/1ZBA4OVxkfjqHaNEnn
-         MGyJFY4SaMyGAUM5XZIpuzZDAs3fhdSLLg5syeCzPlN49oOBi6+J5xNncsmhDQe9W8+P
-         ww+JqYkyFrCQP6B3y0kvx2qfodjPGEf93655nKbrBm7ijTJ44ty0N4aI1/TLfa1O1Pev
-         q3K/OS2LL+bxfepwM1S7WPAr+3o/EEtukfv0q6TA7Fph0WqxRbORhW2GZADJpBqe4ZMl
-         slvETm1L05e3P53I+4zzfQNQIpfKdCuiOTDSVlO3ekTNcZKUE3VbO7GDaSEB/crkRO+y
-         tUiA==
+        d=gmail.com; s=20230601; t=1698177100; x=1698781900; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JUj/EbiokY8d7LdNm6RQo8caawEG1TrnDKw19EfO3ho=;
+        b=llukYWrL4R7r9w+2Xqza6rAGAKkhf6q8uIi1+AhJx+BcfrmzQ4G6DMYeuQfS6IS/j3
+         J4pXJMGvObhFLhf7Nh2m729/cSMQCXsfC7dHZ6WMSX0oUSRr+pPXdpEjDNf4vL0WJMz3
+         f5LxzsYxlTI6T9BGupyAVdfJlxhZv+tXfnPkbOa67vjUh7IrS0vSfsXA/lPeh0LTgZo6
+         zzTMQRK79nQjGs2aB8hXqe4rQ+LW42goyuXK6VqWIQSKVCCJAAUphdUwWyJt6FVGeRXo
+         CcRqhOlqy2fJG0QcBhQF3oo565lhPdOgbfZ/zvKEHsLmZbJ3KHX3WJ+xT0RRkQnL2BIC
+         +bUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698177002; x=1698781802;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=maw6NhMTUWspoHmkMBm+asPwHK+fd6vySlok/+0d7pw=;
-        b=q1QFDHKRMZle8rDr5D7Zm3MwAxxvNPyFOAakpepVvinPMYmbWT1/gb4vih/Fxy4Nrt
-         7L5XEZhopbkGaPpaWIbH+HFwDwKpR9jPlNj1oGb2+/E2ekbb2g5hqSY0AzvTD9R2wNQ/
-         MfFYb5yfASWus1Z0JdaMiynk+ZG7EzMBXWmKHowMyXlEIl7/dfWu/th2BIQCOfzWgMKK
-         85I7ytjLeJpibEyz9ptfVecrj/poSBHvWIYUpPdGL+SZuh48ds5xR0CYTRx2dvTJbw+Q
-         4A82e8wI/MIIVPs1Q+yhLj+ZcGSczmshT8u+hDhaJWfAazOyH/BevWhy2hMDwxtuLXO1
-         YngQ==
-X-Gm-Message-State: AOJu0YyOqBWC2dC9F3Zoo4dEQgcHOj2X+nXSb3ILlNhzsxCHU1GO1ItK
-	DHc2cr1z9+JAiTz+l96CpcppH6Wr8Ws=
-X-Google-Smtp-Source: AGHT+IGTPuA2V8sRPZDCyToeMaCzb76Fhwyk122lkv766VWtv3wQ41yDSjzAbf/89EPfH8CcNTTgqA==
-X-Received: by 2002:a05:620a:280b:b0:76d:bda0:e48e with SMTP id f11-20020a05620a280b00b0076dbda0e48emr15223354qkp.46.1698177002275;
-        Tue, 24 Oct 2023 12:50:02 -0700 (PDT)
-Received: from willemb.c.googlers.com.com (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id r16-20020a05620a299000b0076ef3e6e6a4sm3674792qkp.42.2023.10.24.12.50.01
+        d=1e100.net; s=20230601; t=1698177100; x=1698781900;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JUj/EbiokY8d7LdNm6RQo8caawEG1TrnDKw19EfO3ho=;
+        b=C0MFFXIWHFkUyNfDbRPYwO2qD1NpT6NQ6ecrD3Om0BIFeUxVvgOpdBmM6rjp0jBL54
+         670sxRac8P59Lo7R1naUs3D/KJbEd2AtJLVAANLwrqkZnRlEV6N/xuZ/GOKe0iq/IWc1
+         a5J5sOcaBYLi87mpLyHwjm0xbHnBgNti0lSrzu59pb3ILsPTua1KYC4wPi3dTjh0h/WX
+         hqnhlCfc3UPR3hQ+FwPNrcHX4Luou2KfG2JVpFR5bzKERkssDfO6GCCFQmyI9HmDLOSP
+         qXqXfehBZPNbv6SUGMQE45X0Ch3ARDAn88U+R/MotAxpPRlUEa0i0dWXlFzal3ZxTEii
+         BhaQ==
+X-Gm-Message-State: AOJu0Yxq79jiFLN8Ul2e8VTuKRTZu3ptQBlCs/HXT+pWUF57HmEbQpaO
+	u+lWuuHan+HSohzz+rcnARc=
+X-Google-Smtp-Source: AGHT+IG1BP5ROpvBcq82uPkVt2IykY39Qtb6MXydHhu5xMIX7B2RI0+qsY/OIOKtA3Sz56zxhshLhw==
+X-Received: by 2002:a05:6402:5243:b0:530:e2e3:28af with SMTP id t3-20020a056402524300b00530e2e328afmr11299128edd.31.1698177100282;
+        Tue, 24 Oct 2023 12:51:40 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id v30-20020a50a45e000000b0053da3a9847csm8563621edb.42.2023.10.24.12.51.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 12:50:01 -0700 (PDT)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Willem de Bruijn <willemb@google.com>,
-	syzbot+a8c7be6dee0de1b669cc@syzkaller.appspotmail.com
-Subject: [PATCH net] llc: verify mac len before reading mac header
-Date: Tue, 24 Oct 2023 15:49:36 -0400
-Message-ID: <20231024194958.3522281-1-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.42.0.758.gaed0368e0e-goog
+        Tue, 24 Oct 2023 12:51:40 -0700 (PDT)
+Date: Tue, 24 Oct 2023 22:51:37 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Enrico Mioso <mrkiko.rs@gmail.com>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Chris Packham <chris.packham@alliedtelesis.co.nz>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v7 5/7] ARM64: dts: marvell: Fix some common
+ switch mistakes
+Message-ID: <20231024195137.2fgustgmyl2r7cdt@skbuf>
+References: <20231024-marvell-88e6152-wan-led-v7-0-2869347697d1@linaro.org>
+ <20231024-marvell-88e6152-wan-led-v7-5-2869347697d1@linaro.org>
+ <20231024182842.flxrg3hjm3scnhjo@skbuf>
+ <ZTgVE8TzMEPvVeOr@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZTgVE8TzMEPvVeOr@shell.armlinux.org.uk>
 
-From: Willem de Bruijn <willemb@google.com>
+On Tue, Oct 24, 2023 at 08:03:47PM +0100, Russell King (Oracle) wrote:
+> On Tue, Oct 24, 2023 at 09:28:42PM +0300, Vladimir Oltean wrote:
+> > U-Boot code does this, so you can't rename "ports":
+> > 
+> > 	/*
+> > 	 * now if there are more switches or a SFP module coming after,
+> > 	 * enable corresponding ports
+> > 	 */
+> > 	if (id < peridot + topaz - 1) {
+> > 		res = fdt_status_okay_by_pathf(blob,
+> > 					       "%s/switch%i@%x/ports/port@a",
+> > 					       mdio_path, id, addr);
+> > 	} else if (id == peridot - 1 && !topaz && sfp) {
+> > 		res = fdt_status_okay_by_pathf(blob,
+> > 					       "%s/switch%i@%x/ports/port-sfp@a",
+> > 					       mdio_path, id, addr);
+> > 	} else {
+> > 		res = 0;
+> > 	}
+> 
+> So that's now two platforms that do this. I think at this stage, we
+> have to regard these node paths as an ABI that we just can't change
+> without causing some breakage.
 
-LLC reads the mac header with eth_hdr without verifying that the skb
-has an Ethernet header.
+No, it's still the same as the one I pointed out on v4:
+https://patchwork.kernel.org/project/netdevbpf/patch/20231018-marvell-88e6152-wan-led-v4-5-3ee0c67383be@linaro.org/
 
-Syzbot was able to enter llc_rcv on a tun device. Tun can insert
-packets without mac len and with user configurable skb->protocol
-(passing a tun_pi header when not configuring IFF_NO_PI).
+aka the Turris MOX. But it looks like my previous comment wasn't quite
+clear, thus Linus' conversion still cleans up too much in this device
+tree.
 
-    BUG: KMSAN: uninit-value in llc_station_ac_send_test_r net/llc/llc_station.c:81 [inline]
-    BUG: KMSAN: uninit-value in llc_station_rcv+0x6fb/0x1290 net/llc/llc_station.c:111
-    llc_station_ac_send_test_r net/llc/llc_station.c:81 [inline]
-    llc_station_rcv+0x6fb/0x1290 net/llc/llc_station.c:111
-    llc_rcv+0xc5d/0x14a0 net/llc/llc_input.c:218
-    __netif_receive_skb_one_core net/core/dev.c:5523 [inline]
-    __netif_receive_skb+0x1a6/0x5a0 net/core/dev.c:5637
-    netif_receive_skb_internal net/core/dev.c:5723 [inline]
-    netif_receive_skb+0x58/0x660 net/core/dev.c:5782
-    tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1555
-    tun_get_user+0x54c5/0x69c0 drivers/net/tun.c:2002
+> If we can't fix up all platforms, doesn't that make the YAML
+> conversion harder?
 
-Add a mac_len test before all three eth_hdr(skb) calls under net/llc.
+Well, I do see this as a valid concern that could potentially bite back,
+yes. I did express that the schema should not emit warnings for
+$nodename, but TBH I don't know how that constraint could be eliminated:
+https://patchwork.kernel.org/project/netdevbpf/patch/20231018-marvell-88e6152-wan-led-v4-6-3ee0c67383be@linaro.org/
 
-There are further uses in include/net/llc_pdu.h. All these are
-protected by a test skb->protocol == ETH_P_802_2. Which does not
-protect against this tun scenario.
+> You've asked me to test the Clearfog GT-8k change - which is something
+> that won't happen for a while as I don't have the hardware to hand at
+> my current location, nor remotely.
+> 
+> What I can do is poke about in the u-boot sources I have for that
+> board and see# whether it's doing anything with those node paths. Off
+> the top of my# head, given what the board is, I think it's highly
+> unlikely though,# but I will check - possibly tomorrow.
 
-But the mac_len test added in this patch in llc_fixup_skb will
-indirectly protect those too. That is called from llc_rcv before any
-other LLC code.
-
-It is tempting to just add a blanket mac_len check in llc_rcv, but
-not sure whether that could break valid LLC paths that do not assume
-an Ethernet header. 802.2 LLC may be used on top of non-802.3
-protocols in principle.
-
-Reported-by: syzbot+a8c7be6dee0de1b669cc@syzkaller.appspotmail.com
-Signed-off-by: Willem de Bruijn <willemb@google.com>
----
- net/llc/llc_input.c   | 10 ++++++++--
- net/llc/llc_s_ac.c    |  3 +++
- net/llc/llc_station.c |  3 +++
- 3 files changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/net/llc/llc_input.c b/net/llc/llc_input.c
-index 7cac441862e21..51bccfb00a9cd 100644
---- a/net/llc/llc_input.c
-+++ b/net/llc/llc_input.c
-@@ -127,8 +127,14 @@ static inline int llc_fixup_skb(struct sk_buff *skb)
- 	skb->transport_header += llc_len;
- 	skb_pull(skb, llc_len);
- 	if (skb->protocol == htons(ETH_P_802_2)) {
--		__be16 pdulen = eth_hdr(skb)->h_proto;
--		s32 data_size = ntohs(pdulen) - llc_len;
-+		__be16 pdulen;
-+		s32 data_size;
-+
-+		if (skb->mac_len < ETH_HLEN)
-+			return 0;
-+
-+		pdulen = eth_hdr(skb)->h_proto;
-+		data_size = ntohs(pdulen) - llc_len;
- 
- 		if (data_size < 0 ||
- 		    !pskb_may_pull(skb, data_size))
-diff --git a/net/llc/llc_s_ac.c b/net/llc/llc_s_ac.c
-index 79d1cef8f15a9..7923c064773cc 100644
---- a/net/llc/llc_s_ac.c
-+++ b/net/llc/llc_s_ac.c
-@@ -153,6 +153,9 @@ int llc_sap_action_send_test_r(struct llc_sap *sap, struct sk_buff *skb)
- 	int rc = 1;
- 	u32 data_size;
- 
-+	if (skb->mac_len < ETH_HLEN)
-+		return 0;
-+
- 	llc_pdu_decode_sa(skb, mac_da);
- 	llc_pdu_decode_da(skb, mac_sa);
- 	llc_pdu_decode_ssap(skb, &dsap);
-diff --git a/net/llc/llc_station.c b/net/llc/llc_station.c
-index 05c6ae0920534..f506542925109 100644
---- a/net/llc/llc_station.c
-+++ b/net/llc/llc_station.c
-@@ -76,6 +76,9 @@ static int llc_station_ac_send_test_r(struct sk_buff *skb)
- 	u32 data_size;
- 	struct sk_buff *nskb;
- 
-+	if (skb->mac_len < ETH_HLEN)
-+		goto out;
-+
- 	/* The test request command is type U (llc_len = 3) */
- 	data_size = ntohs(eth_hdr(skb)->h_proto) - 3;
- 	nskb = llc_alloc_frame(NULL, skb->dev, LLC_PDU_TYPE_U, data_size);
--- 
-2.42.0.758.gaed0368e0e-goog
-
+Ok, if U-Boot is the only bootloader, I also looked through the upstream
+board source files and only noticed any fixups for MOX. I don't know
+what these boards ship with, and how far that is from mainline U-Boot.
 
