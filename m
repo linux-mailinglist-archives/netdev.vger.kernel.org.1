@@ -1,152 +1,146 @@
-Return-Path: <netdev+bounces-43914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B9C57D56FF
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:56:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 305D57D573B
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:02:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9638FB20F06
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:56:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 616561C20A96
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26DA38DD7;
-	Tue, 24 Oct 2023 15:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40F538DFA;
+	Tue, 24 Oct 2023 16:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="koeL6VnG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjN/Gs+W"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611591D6A9;
-	Tue, 24 Oct 2023 15:56:15 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A91FE83;
-	Tue, 24 Oct 2023 08:56:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698162974; x=1729698974;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SddTswXNy85QoKJZdafbQk9nSfChueXqS/eU+G7CMYg=;
-  b=koeL6VnGVGJKMm0OZoKUANAQAtyXmNPmeVBL333MTn7PKsKdezKzflx6
-   PffPi4bDwB/pV3+9SlP/LlDdTxBdS9+hHIld92T37DDTv1WOAKOElxcVO
-   Nc+IvFHWx1xknjlumgNufiFkY0I/Nakl4/TW2RS/kDw3weY1t1Ddq1f8i
-   aV1bZ0zLIROX+kSHF7Az3+gnIEBM6TuJizN8ahYQ/o/GktRwpmoZGWSOx
-   rzRJ8cFfN3yaFTZZTZGgsS815HD1b+k3+QSlY0kQkM35LtuqaaqeXQgWJ
-   kMdeBAH4ZpyeCd3r5i8dJUTXo7es/j6G4pQyS/oF2sQMR831RQbDBZiVH
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="5719680"
-X-IronPort-AV: E=Sophos;i="6.03,248,1694761200"; 
-   d="scan'208";a="5719680"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2023 08:56:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="758510350"
-X-IronPort-AV: E=Sophos;i="6.03,248,1694761200"; 
-   d="scan'208";a="758510350"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 24 Oct 2023 08:56:07 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qvJlF-0007yD-1U;
-	Tue, 24 Oct 2023 15:56:05 +0000
-Date: Tue, 24 Oct 2023 23:55:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Luka Perkov <luka.perkov@sartura.hr>,
-	Robert Marko <robert.marko@sartura.hr>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@somainline.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next 3/5] net: ipqess: introduce the Qualcomm IPQESS
- driver
-Message-ID: <202310242300.y8Z3ImgQ-lkp@intel.com>
-References: <20231023155013.512999-4-romain.gantois@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D3D1D68B
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 16:02:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF6EDC433C9;
+	Tue, 24 Oct 2023 16:02:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698163361;
+	bh=HQb24SvxOs7vKt5G/O/gxcgeGyBy2E9aRbeySxt4ftY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tjN/Gs+Wv3djqDOFKmzrmAximw4t8Upxw4T0hMUY6uwyHVetfc4KISQcK/kXdLx33
+	 n2QxrWagKkqC23Wku4Ibq2DrHw1ACkt6TeOooS5tfRc55E14Bl+Vbnu9+GX7aAYnZi
+	 1Cg2fOUdbkLcuWqno4gfuwmXIn8o0ATUESk1TYD3a3ox1AlG02GeKRY7qhcm/Xa0ip
+	 MUAD9wT0vFtxEK8v9Z8B/t6UjHRRbTEtfWemDxBhXyIJmmWNx+4p2ngSSJKLKsHEg2
+	 Yqyt2n9dsh3JnEP5MlsIg6OceiF9R63ii/ER/jxiuLnpWB69j6XLl3mPF2Wc4F3neU
+	 G4v2JByzbY1vA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	almasrymina@google.com,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 00/15] net: page_pool: add netlink-based introspection
+Date: Tue, 24 Oct 2023 09:02:05 -0700
+Message-ID: <20231024160220.3973311-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231023155013.512999-4-romain.gantois@bootlin.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Romain,
+This is a new revision of the RFC posted in August:
+https://lore.kernel.org/all/20230816234303.3786178-1-kuba@kernel.org/
+There's been a handful of fixes and tweaks but the overall
+architecture is unchanged.
 
-kernel test robot noticed the following build warnings:
+As a reminder the RFC was posted as the first step towards
+an API which could configure the page pools (GET API as a stepping
+stone for a SET API to come later). I wasn't sure whether we should
+commit to the GET API before the SET takes shape, hence the large
+delay between versions.
 
-[auto build test WARNING on net-next/main]
+Unfortunately, real deployment experience made this series much more
+urgent. We recently started to deploy newer kernels / drivers
+at Meta, making significant use of page pools for the first time.
+We immediately run into page pool leaks both real and false positive
+warnings. As Eric pointed out/predicted there's no guarantee that
+applications will read / close their sockets so a page pool page
+may be stuck in a socket (but not leaked) forever. This happens
+a lot in our fleet. Most of these are obviously due to application
+bugs but we should not be printing kernel warnings due to minor
+application resource leaks.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/net-dt-bindings-Introduce-the-Qualcomm-IPQESS-Ethernet-switch/20231023-235323
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231023155013.512999-4-romain.gantois%40bootlin.com
-patch subject: [PATCH net-next 3/5] net: ipqess: introduce the Qualcomm IPQESS driver
-config: arc-allmodconfig (https://download.01.org/0day-ci/archive/20231024/202310242300.y8Z3ImgQ-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231024/202310242300.y8Z3ImgQ-lkp@intel.com/reproduce)
+Conversely the page pool memory may get leaked at runtime, and
+we have no way to detect / track that, unless someone reconfigures
+the NIC and destroys the page pools which leaked the pages.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310242300.y8Z3ImgQ-lkp@intel.com/
+The solution presented here is to expose the memory use of page
+pools via netlink. This allows for continuous monitoring of memory
+used by page pools, regardless if they were destroyed or not.
+Sample in patch 15 can print the memory use and recycling
+efficiency:
 
-All warnings (new ones prefixed by >>):
+$ ./page-pool
+    eth0[2]	page pools: 10 (zombies: 0)
+		refs: 41984 bytes: 171966464 (refs: 0 bytes: 0)
+		recycling: 90.3% (alloc: 656:397681 recycle: 89652:270201)
 
-   drivers/net/ethernet/qualcomm/ipqess/ipqess_edma.c: In function 'ipqess_edma_rx_buf_prepare':
->> drivers/net/ethernet/qualcomm/ipqess/ipqess_edma.c:156:25: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-     156 |                         (struct ipqess_edma_rx_desc *)buf->dma;
-         |                         ^
+The main change compared to the RFC is that the API now exposes
+outstanding references and byte counts even for "live" page pools.
+The warning is no longer printed if page pool is accessible via netlink.
 
+Jakub Kicinski (15):
+  net: page_pool: split the page_pool_params into fast and slow
+  net: page_pool: avoid touching slow on the fastpath
+  net: page_pool: factor out uninit
+  net: page_pool: id the page pools
+  net: page_pool: record pools per netdev
+  net: page_pool: stash the NAPI ID for easier access
+  eth: link netdev to page_pools in drivers
+  net: page_pool: add nlspec for basic access to page pools
+  net: page_pool: implement GET in the netlink API
+  net: page_pool: add netlink notifications for state changes
+  net: page_pool: report amount of memory held by page pools
+  net: page_pool: report when page pool was destroyed
+  net: page_pool: expose page pool stats via netlink
+  net: page_pool: mute the periodic warning for visible page pools
+  tools: ynl: add sample for getting page-pool information
 
-vim +156 drivers/net/ethernet/qualcomm/ipqess/ipqess_edma.c
-
-   139	
-   140	static int ipqess_edma_rx_buf_prepare(struct ipqess_edma_buf *buf,
-   141					      struct ipqess_edma_rx_ring *rx_ring)
-   142	{
-   143		memset(buf->skb->data, 0, sizeof(struct ipqess_edma_rx_desc));
-   144	
-   145		buf->dma = dma_map_single(rx_ring->ppdev, buf->skb->data,
-   146					  IPQESS_EDMA_RX_HEAD_BUFF_SIZE,
-   147					  DMA_FROM_DEVICE);
-   148		if (dma_mapping_error(rx_ring->ppdev, buf->dma)) {
-   149			dev_kfree_skb_any(buf->skb);
-   150			buf->skb = NULL;
-   151			return -EFAULT;
-   152		}
-   153	
-   154		buf->length = IPQESS_EDMA_RX_HEAD_BUFF_SIZE;
-   155		rx_ring->hw_desc[rx_ring->head] =
- > 156				(struct ipqess_edma_rx_desc *)buf->dma;
-   157		rx_ring->head = (rx_ring->head + 1) % IPQESS_EDMA_RX_RING_SIZE;
-   158	
-   159		ipqess_edma_m32(rx_ring->edma, IPQESS_EDMA_RFD_PROD_IDX_BITS,
-   160				(rx_ring->head + IPQESS_EDMA_RX_RING_SIZE - 1)
-   161				% IPQESS_EDMA_RX_RING_SIZE,
-   162				IPQESS_EDMA_REG_RFD_IDX_Q(rx_ring->idx));
-   163	
-   164		return 0;
-   165	}
-   166	
+ Documentation/netlink/specs/netdev.yaml       | 161 +++++++
+ Documentation/networking/page_pool.rst        |  10 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   1 +
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   1 +
+ drivers/net/ethernet/microsoft/mana/mana_en.c |   1 +
+ include/linux/list.h                          |  20 +
+ include/linux/netdevice.h                     |   4 +
+ include/linux/poison.h                        |   2 +
+ include/net/page_pool/helpers.h               |   8 +-
+ include/net/page_pool/types.h                 |  43 +-
+ include/uapi/linux/netdev.h                   |  36 ++
+ net/core/Makefile                             |   2 +-
+ net/core/netdev-genl-gen.c                    |  52 +++
+ net/core/netdev-genl-gen.h                    |  11 +
+ net/core/page_pool.c                          |  78 ++--
+ net/core/page_pool_priv.h                     |  12 +
+ net/core/page_pool_user.c                     | 414 +++++++++++++++++
+ tools/include/uapi/linux/netdev.h             |  36 ++
+ tools/net/ynl/generated/netdev-user.c         | 419 ++++++++++++++++++
+ tools/net/ynl/generated/netdev-user.h         | 171 +++++++
+ tools/net/ynl/lib/ynl.h                       |   2 +-
+ tools/net/ynl/samples/.gitignore              |   1 +
+ tools/net/ynl/samples/Makefile                |   2 +-
+ tools/net/ynl/samples/page-pool.c             | 147 ++++++
+ 24 files changed, 1586 insertions(+), 48 deletions(-)
+ create mode 100644 net/core/page_pool_priv.h
+ create mode 100644 net/core/page_pool_user.c
+ create mode 100644 tools/net/ynl/samples/page-pool.c
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.41.0
+
 
