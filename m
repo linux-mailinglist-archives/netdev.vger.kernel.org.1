@@ -1,223 +1,135 @@
-Return-Path: <netdev+bounces-43938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE1757D5846
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:29:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEAE47D57C9
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:17:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9CC9B20E71
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:29:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E663F1C20BCB
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D97A38F96;
-	Tue, 24 Oct 2023 16:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085E72E62F;
+	Tue, 24 Oct 2023 16:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KkS9vhGX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iapgXHGF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF62210FD
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 16:29:10 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2052.outbound.protection.outlook.com [40.107.220.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BEE9AC;
-	Tue, 24 Oct 2023 09:29:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VphV8SuaMVP7rj5Cq9toOjfQYoRK5ZrE6yvuVv7tS/vLIkW531GH+C4ZRRdz6Zbl8MicG7VPnzEUn+6X0qfxQBUOdZl8Idn2fxH3Ek1cxS7fVdGqq2/nIRDYEAVk+39kVUpHKirXhHfnHM66Sdf+C+vjymwWDc0rKTBkKUeuMzHDFXSX0T056MirwVygXgf8qKETgODuJGkC4+/pta6IbYHR7pHoP58lMamaY98tm+fZSb8k6SwuNuN66C6CwCZU4xP8xuG5PPNZ5lUsn21GgcYOLT2ionIkZWyXbCnYre7BDRM38jEWmZBkR/E6uqYAA6QphoZdHQmfAz0Gnif08Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=98tUsS069zVjIY6n9XGNQiNbXweySNhRfvFo7wYw+Kk=;
- b=PXcE6pqnO2zGrQHzoGHPluoK/RMHKYZ6aPKSwcIxOkTZZ4WqIDL/ePGgTzF9eNoIqNoPAPCgkTwM5ZiYvyZb7AIwcrc9Q3cUUlYl42ONZH4jwv6zCye9Oiq8VrwU6Z843Jz7mlzqLropUkWi628NG8GceQT7ihua8PCMuNYYJpRibWZz+zV3GsQF/e2uT17BkhuA0hh4ZgMZYMQsNSwuEBtDlpobUrUiilP5zymXY9rfV0yPBMTPg2w6HD+DIv2gxcaz9v5vEW0PS40ZDuyNsDtc3BEatIkNa7k5i0QzCrgul8DBTaak87kGPmjliirjiZXu6vwktgS55C6XUz+Uvg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=hisilicon.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=98tUsS069zVjIY6n9XGNQiNbXweySNhRfvFo7wYw+Kk=;
- b=KkS9vhGXk34l7gCESHxyrLFrtF3fITdx2ZYn+hDINAtHQ7XX5Cidq9GcEK4nLueAp5qIJhd1W4pjP6+FNaALcGm18Ve48EcU9Y0C5NB6Tq24Xs6/HlLj0CxXfEBiZJXsbCuNH1Pivo5v7/GImuKAwtKABH6q6S5ZY0zXt6b3MRNNECBqDrIYms9/BKm4Vg21SkOf+HGL7jIvwh5T9ZLEKR0f5tRf6p0WSXd/o6SGYCzrobdd7d8k+t+s/Pk0wKiCmH8lE5ef7nDYEg/5sUyLhJCgvFPRGQV+573/w6ClkqYLFPvRCMalzAeGRmO+yrHnf7n1PC/N54eihvyFnfxalQ==
-Received: from SN7P222CA0029.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::23)
- by DM4PR12MB5167.namprd12.prod.outlook.com (2603:10b6:5:396::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.19; Tue, 24 Oct
- 2023 16:29:06 +0000
-Received: from SA2PEPF00001504.namprd04.prod.outlook.com
- (2603:10b6:806:124:cafe::88) by SN7P222CA0029.outlook.office365.com
- (2603:10b6:806:124::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33 via Frontend
- Transport; Tue, 24 Oct 2023 16:29:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF00001504.mail.protection.outlook.com (10.167.242.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6933.15 via Frontend Transport; Tue, 24 Oct 2023 16:29:06 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 24 Oct
- 2023 09:28:52 -0700
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 24 Oct
- 2023 09:28:49 -0700
-References: <20231023112217.3439-1-phaddad@nvidia.com>
- <20231023112217.3439-4-phaddad@nvidia.com>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Patrisious Haddad <phaddad@nvidia.com>
-CC: <jgg@ziepe.ca>, <leon@kernel.org>, <dsahern@gmail.com>,
-	<stephen@networkplumber.org>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linuxarm@huawei.com>,
-	<linux-kernel@vger.kernel.org>, <huangjunxian6@hisilicon.com>,
-	<michaelgur@nvidia.com>
-Subject: Re: [PATCH v2 iproute2-next 3/3] rdma: Adjust man page for rdma
- system set privileged_qkey command
-Date: Tue, 24 Oct 2023 18:09:05 +0200
-In-Reply-To: <20231023112217.3439-4-phaddad@nvidia.com>
-Message-ID: <87zg0856io.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000E1266C4
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 16:17:16 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57E98118
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 09:17:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698164236; x=1729700236;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vU6NUxn0dSy8CYFpKW21RatM/5zlQn8ad7r9qtdb8U4=;
+  b=iapgXHGFcwqgC4c37OBq9E2w3Sz/ff+2brfdMDtKdseSzRncxgqXIPc+
+   g6bMFlbFV88i8nmbY8vRe3ARtOD9TrddcsB7x3DRj7WijkSb3P8q5wPFV
+   77v30zoYGPqF4hpXUuPrefABxuy06thsZuYBK4R1QWzeiAHy9qVMIz7kO
+   6YoSHRcNJsNI5Ou056gbUXxfj4hMbjVPdDc7btsmiq32gebo+iM3o3hn1
+   zSTRh0BBrhgTRbadDHxLQMjLf0kbN6vuQax9MVp/R6b861Rh1i4dMLIbV
+   DlzUV1AQgVBysaUlbgxeef5aZTbGnx1QYlhgAQbvJ9kiqrq/piM4emiAQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="5725474"
+X-IronPort-AV: E=Sophos;i="6.03,248,1694761200"; 
+   d="scan'208";a="5725474"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2023 09:17:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="735081789"
+X-IronPort-AV: E=Sophos;i="6.03,248,1694761200"; 
+   d="scan'208";a="735081789"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 24 Oct 2023 09:17:10 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qvK5b-00081n-38;
+	Tue, 24 Oct 2023 16:17:07 +0000
+Date: Wed, 25 Oct 2023 00:16:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, imx@lists.linux.dev,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Mario Castaneda <mario.ignacio.castaneda.lopez@nxp.com>
+Subject: Re: [PATCH net] net: stmmac: dwmac-imx: request high frequency mode
+Message-ID: <202310250045.xYg3qn6G-lkp@intel.com>
+References: <20231004195442.414766-1-shenwei.wang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00001504:EE_|DM4PR12MB5167:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f458bea-e33e-437e-9c28-08dbd4ae578e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	xxEs2wb051KT/koFhZn30oN7Wo4tDo3d2cYlU/3Ich2JYwPqi7xGRoGBXGZe+VbZ7tVckyR2syRt/Tng3UdZ20gloZmST2/BcdAWoRCzd/0VA3TTo74hWrowyX38t1uwJ25Dx+nnvqY+OlEohTYsRV74ynqmd9fQCkuk0ll5E3M2bzv9/vSeNXLcJchDekwcsINzkBVlvm52puhsuFm8taKe562UeZK127JGjtdNVrct60ItmX8+5II3qhplECqHWYv7xaM9PEdjI6PH9hVYYsXEK6OKlaFTtRVNIeHNX3pFT4mT2jZ3V1xDMEhqtRkIunuVd7/156Dzoq+BfMz6HpUhQuetY+sk707FiqO14+HznBtadrxPkepuOKcljMGLiHMMWf66wjKDQt7Lwp94apSKbWsvDGVe0Lfkci9GyTUA3/gSD4FEcpcdvkcR2HV6dbTOHPTiR2shJfRwpMN8d8KdYk8onr6vZ0ZH2dUNvE3k6dz9Cr2Qo43dMnGblNIIow8TN8d/howVrhl8WLk0gIIiqCNKL8RgSn0UiuVuZXl4x+fjZW6Kj1XTH/szXdVL/B9R8p8j++MrUbNqM17iY2NI7+RtRKpmBs7oPGubGz5apJeFNseU04SCbRmPC10MzgH2yRwlUAGRZX9SEVBpibUVTUEGvrTFObwcoJu+dxHQiaMivpnPafDW2HPnhAqcSsKrXNXKobGDUaXxPZL+9Xo7jsJsSa3iNtNihVezv/knLh/2KMxZ++c1eY0AoKkE
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(136003)(396003)(346002)(230922051799003)(1800799009)(451199024)(64100799003)(186009)(82310400011)(46966006)(40470700004)(36840700001)(26005)(478600001)(426003)(336012)(40480700001)(6666004)(86362001)(316002)(37006003)(6636002)(40460700003)(54906003)(70586007)(70206006)(36756003)(36860700001)(47076005)(16526019)(2616005)(107886003)(356005)(7636003)(2906002)(83380400001)(8936002)(8676002)(4326008)(6862004)(82740400003)(5660300002)(41300700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 16:29:06.0012
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f458bea-e33e-437e-9c28-08dbd4ae578e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00001504.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5167
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231004195442.414766-1-shenwei.wang@nxp.com>
+
+Hi Shenwei,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Shenwei-Wang/net-stmmac-dwmac-imx-request-high-frequency-mode/20231005-035606
+base:   net/main
+patch link:    https://lore.kernel.org/r/20231004195442.414766-1-shenwei.wang%40nxp.com
+patch subject: [PATCH net] net: stmmac: dwmac-imx: request high frequency mode
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20231025/202310250045.xYg3qn6G-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231025/202310250045.xYg3qn6G-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310250045.xYg3qn6G-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c:9:10: fatal error: 'linux/busfreq-imx.h' file not found
+   #include <linux/busfreq-imx.h>
+            ^~~~~~~~~~~~~~~~~~~~~
+   1 error generated.
 
 
-Patrisious Haddad <phaddad@nvidia.com> writes:
+vim +9 drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
 
-> Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
-> Reviewed-by: Michael Guralnik <michaelgur@nvidia.com>
-> ---
->  man/man8/rdma-system.8 | 32 +++++++++++++++++++++++++++-----
->  1 file changed, 27 insertions(+), 5 deletions(-)
->
-> diff --git a/man/man8/rdma-system.8 b/man/man8/rdma-system.8
-> index ab1d89fd..a2914eb8 100644
-> --- a/man/man8/rdma-system.8
-> +++ b/man/man8/rdma-system.8
-> @@ -23,16 +23,16 @@ rdma-system \- RDMA subsystem configuration
->  
->  .ti -8
->  .B rdma system set
-> -.BR netns
-> -.BR NEWMODE
-> +.BR netns/privileged_qkey
-> +.BR NEWMODE/NEWSTATE
+   > 9	#include <linux/busfreq-imx.h>
+    10	#include <linux/clk.h>
+    11	#include <linux/gpio/consumer.h>
+    12	#include <linux/kernel.h>
+    13	#include <linux/mfd/syscon.h>
+    14	#include <linux/module.h>
+    15	#include <linux/of.h>
+    16	#include <linux/of_net.h>
+    17	#include <linux/phy.h>
+    18	#include <linux/platform_device.h>
+    19	#include <linux/pm_wakeirq.h>
+    20	#include <linux/regmap.h>
+    21	#include <linux/slab.h>
+    22	#include <linux/stmmac.h>
+    23	
 
-What is this netns/priveleged_qkey syntax? I thought they are
-independent options. If so, the way to express it is:
-
-	rdma system set [netns NEWMODE] [privileged_qkey NEWSTATE]
-
-Also, your option is not actually privileged_qkey, but privileged-qkey.
-
->  .ti -8
->  .B rdma system help
->  
->  .SH "DESCRIPTION"
-> -.SS rdma system set - set RDMA subsystem network namespace mode
-> +.SS rdma system set - set RDMA subsystem network namespace mode or privileged qkey mode
->  
-> -.SS rdma system show - display RDMA subsystem network namespace mode
-> +.SS rdma system show - display RDMA subsystem network namespace mode and privileged qkey state
-
-Maybe make it just something like "configure RDMA system settings" or
-whatever the umbrella term is? The next option will certainly have to do
-something, this doesn't scale.
-
-Plus the lines are waaay over 80, even over 90 that I think I've seen
-Stephen or David mention as OK for iproute2 code.
-
->  .PP
->  .I "NEWMODE"
-> @@ -49,12 +49,21 @@ network namespaces is not needed, shared mode can be used.
->  
->  It is preferred to not change the subsystem mode when there is active
->  RDMA traffic running, even though it is supported.
-> +.PP
-> +.I "NEWSTATE"
-> +- specifies the new state of the privileged_qkey parameter. Either enabled or disabled.
-> +Whereas this decides whether a non-privileged user is allowed to specify a controlled
-> +QKEY or not, since such QKEYS are considered privileged.
-> +
-> +When this parameter is enabled, non-privileged users will be allowed to
-> +specify a controlled QKEY.
-
-This is missing syntax notes. One might think that to enable it they
-need to say "enable", but in fact it's "on", and "off" for disabled.
-There should be an "{on | off}" somewhere in there.
-
-Also, line length.
-
-Also, the paragraph is imho a bit long-winded. Maybe make it just this?
-
-	determines whether a non-privileged user is allowed to specify a
-        controlled QKEY or not.
-
->  .SH "EXAMPLES"
->  .PP
->  rdma system show
->  .RS 4
-> -Shows the state of RDMA subsystem network namespace mode on the system.
-> +Shows the state of RDMA subsystem network namespace mode on the system and
-> +the state of privileged qkey parameter.
->  .RE
->  .PP
->  rdma system set netns exclusive
-> @@ -69,6 +78,19 @@ Sets the RDMA subsystem in network namespace shared mode. In this mode RDMA devi
->  are shared among network namespaces.
->  .RE
->  .PP
-> +.PP
-> +rdma system set privileged_qkey enabled
-> +.RS 4
-> +Sets the privileged_qkey parameter to enabled. In this state non-privileged user
-> +is allowed to specify a controlled QKEY.
-> +.RE
-> +.PP
-> +rdma system set privileged_qkey disabled
-> +.RS 4
-> +Sets the privileged_qkey parameter to disabled. In this state non-privileged user
-> +is *not* allowed to specify a controlled QKEY.
-> +.RE
-> +.PP
-
-on | off, not enabled | disabled.
-
->  .SH SEE ALSO
->  .BR rdma (8),
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
