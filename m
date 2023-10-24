@@ -1,303 +1,200 @@
-Return-Path: <netdev+bounces-43701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15A817D446A
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 03:02:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F411F7D4469
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 03:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 037A9B20ED3
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:02:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 229E41C20B82
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD33063BF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827C363AC;
 	Tue, 24 Oct 2023 01:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zhoi1eWi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h0UEdfMj"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DE7523D;
-	Tue, 24 Oct 2023 01:01:52 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69214D7D;
-	Mon, 23 Oct 2023 18:01:50 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6bcdfcde944so938570b3a.1;
-        Mon, 23 Oct 2023 18:01:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75261523E
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 01:01:52 +0000 (UTC)
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A538AD7E
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:01:50 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-7789923612dso274579685a.0
+        for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:01:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1698109309; x=1698714109; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zxzmY8d6ZYjaLo7KwtGaocFvYRqIgzllSYwrvdHB8LE=;
-        b=Zhoi1eWiJ3E0ZgrTMsESD38VO79MTXjsRTehDI4rRt9F8yFYZmaCwKv4aa8k2CHPhr
-         COu4SL23DX4kJ7zWMndnXj8w73YS3/8HUOsHynB+3oYgMZjN1KdAC4GW5vVEkabgxvVj
-         /7NQ345PmgnKPvj8gVsNB6vThwaaSNhbNEFNg/MvUUV7GWMJuQl46yXfJcTIIEfZ/gTd
-         P2ygC5GNRm/jUa065nxQWQ5sHF8WOYaYsQEi2zMdXwDVKitAqX7Dc6rZqCGZ/mBUgpHF
-         ovCpwldi60At8Xjezj6j6yH01l8Afz4aMgKuGBgyY1sf0d9fJRbmL+4qMLAFNbqd+nMY
-         fh+A==
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iX/8Evm3AKef86dzGTemrUj7lOQSxgz0Ra/9GWq1lVA=;
+        b=h0UEdfMjg/0naE/aCLVGYVlxfa+cVqnkZOJqr323zGSA/BbOLNYR+pv9RnDicJq8Lm
+         EV2F7k0azUrM+/3JAU6PQsNckmTHAd7ruMF7VWvwG6THtu8s15XsjjqYgqBEHeofXTgZ
+         lSaL0fMpGEdb1ys5v/A2FqiFGLB/Cc9vB9hgu7jxmTeF9Jh8ZOLFZe2gXbPZF+4+pkiN
+         yquEfCl/C8sC0zdeoQY1M0e+4vxDIS0M87pSkG8hjo+yvyQ62fQFvwUKJ5Gses3dssfF
+         ohMwyRAzJg7HwB7Bwx+YOFnUvazVS4BCqNLRyxUHchIfhOIpdk7VlfpuEIs+9AR5oAzb
+         e3Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1698109309; x=1698714109;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zxzmY8d6ZYjaLo7KwtGaocFvYRqIgzllSYwrvdHB8LE=;
-        b=hijOSzKfmJAPcWU4mA9gnBUwW2bEK6wJ7og6u0Ri5ImfAfLpB7tKo4+xkfq+AepjJu
-         pS2XVjoFkvIeQ92H/UVYdUQYqoYUWgLeKXYHe++LILzxP0BHsYe69J1QHDYcLgU9Mx0T
-         poDhT5JWWZwvXNGC5GqRE7T6uTStel+BvMMudwzqEI3Xvkw9oa3+ajph9Zu5lGErYWiI
-         vLsswKUGoyWbS2gvvYixMl6U2CEhGONI2Ekieo2xEviRk2m878XlCqHiGpyYabA+mUzy
-         Nu3aKe/U/+o2v6Eog7ET26P126s2RrieR0L1qmR8Zrjs+ao1BbBQh/hJ2WNHIIM8o7fA
-         BZvg==
-X-Gm-Message-State: AOJu0Yz8RQsqdUrovebkDU5nKXbmcS/3T0o9y73xYjHp9ayk3+A3Whn5
-	CfXDE4iv49WKUG5XR98lrECeWv7RK5n88UZk
-X-Google-Smtp-Source: AGHT+IEA3pwufWDM6nncM8xiHgkl76NRdlbaPUgwymwdfHd7Lvw8LYGa8aQ+ipVR85Hb5NaC4+5Xyw==
-X-Received: by 2002:a05:6a21:33a4:b0:163:c167:964a with SMTP id yy36-20020a056a2133a400b00163c167964amr14151621pzb.1.1698109309628;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iX/8Evm3AKef86dzGTemrUj7lOQSxgz0Ra/9GWq1lVA=;
+        b=qYHfsleaEeq/eDqczSDrpFh5f9gfZ37dhQFXziWVgzhG8JK1AlTePd2dGAXxA//yzj
+         V1TDy5TsTcuwoq6u1t+tLW8hFyuDvt075Lg8NA4E43pgLl1fSK04gEVTIpFuKwDZCwkU
+         dBUcC3PDqNp47rbwecHn+YMYR6KfWm56QEgWb928i6pjmFWIv/W7bmHpy6eId1t6kGsf
+         mvqgaT4UsFaiD0LJ8aYVH9bEALiIZXOTMszPiHbtKcwRVz/xOTiPI7Xq8H/0pN7x6huB
+         0bdtE3LKhINkV42WyRHpJo0c/hQzcVpfgxlNAUtHRG15xz9l0dNpbKsUl8Pr3FtK83Om
+         i8hw==
+X-Gm-Message-State: AOJu0YxI4QQxKdM67uZBjRMU5xiU3xckmgsmnW8j0sKXyIcvTgtTs7Kt
+	ANSuFQka2FjSpSDpueK1R+M50tn5f30=
+X-Google-Smtp-Source: AGHT+IGhYAJLXZDGeSvq9TnoQmGS1p6Kaxq1pZluL9vNYugWmsHorAktR8vpLdDPI/3An+kgzb3SwQ==
+X-Received: by 2002:a05:620a:430f:b0:773:c792:bdda with SMTP id u15-20020a05620a430f00b00773c792bddamr12290826qko.53.1698109309492;
         Mon, 23 Oct 2023 18:01:49 -0700 (PDT)
-Received: from ip-172-30-47-114.us-west-2.compute.internal (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id k6-20020aa78206000000b006be077531aesm6707888pfi.220.2023.10.23.18.01.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 18:01:49 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: netdev@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch,
-	tmgross@umich.edu,
-	miguel.ojeda.sandonis@gmail.com,
-	benno.lossin@proton.me,
-	wedsonaf@gmail.com,
-	greg@kroah.com
-Subject: [PATCH net-next v6 5/5] net: phy: add Rust Asix PHY driver
-Date: Tue, 24 Oct 2023 09:58:42 +0900
-Message-Id: <20231024005842.1059620-6-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231024005842.1059620-1-fujita.tomonori@gmail.com>
-References: <20231024005842.1059620-1-fujita.tomonori@gmail.com>
+Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
+        by smtp.gmail.com with ESMTPSA id f8-20020a05620a408800b007759e9b0eb8sm3107450qko.99.2023.10.23.18.01.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Oct 2023 18:01:48 -0700 (PDT)
+Message-ID: <96efddab-7a50-4fb3-a0e1-186b9339a53a@gmail.com>
+Date: Mon, 23 Oct 2023 18:01:46 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: swiotlb dyn alloc WARNING splat in wireless-next.
+Content-Language: en-US
+To: Ben Greear <greearb@candelatech.com>, netdev <netdev@vger.kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Petr Tesarik <petr@tesarici.cz>
+References: <4f173dd2-324a-0240-ff8d-abf5c191be18@candelatech.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <4f173dd2-324a-0240-ff8d-abf5c191be18@candelatech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-This is the Rust implementation of drivers/net/phy/ax88796b.c. The
-features are equivalent. You can choose C or Rust versionon kernel
-configuration.
++Christoph, Petr
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Reviewed-by: Trevor Gross <tmgross@umich.edu>
-Reviewed-by: Benno Lossin <benno.lossin@proton.me>
----
- MAINTAINERS                      |   8 ++
- drivers/net/phy/Kconfig          |   8 ++
- drivers/net/phy/Makefile         |   6 +-
- drivers/net/phy/ax88796b_rust.rs | 129 +++++++++++++++++++++++++++++++
- rust/uapi/uapi_helper.h          |   2 +
- 5 files changed, 152 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/phy/ax88796b_rust.rs
+On 10/22/2023 11:48 AM, Ben Greear wrote:
+> Hello,
+> 
+> I saw this in a system with 16GB of RAM running a lot of wifi traffic
+> on 16 radios.  System appears to mostly be working OK, so not sure if it is
+> a real problem or not.
+> 
+> [76171.488627] WARNING: CPU: 2 PID: 30169 at mm/page_alloc.c:4402 
+> __alloc_pages+0x19c/0x200
+> [76171.488634] Modules linked in: tls nf_conntrack_netlink nf_conntrack 
+> nfnetlink nf_defrag_ipv6 nf_defrag_ipv4 bpfilter vrf 8021q garp mrp stp 
+> llc macvlan pktgen rpcrdma rdma_cm iw_cm ib_cm ib_core qrtr f71882fg 
+> intel_rapl_msr iTCO_wdt intel_pmc_bxt ee1004 iTCO_vendor_support 
+> snd_hda_codec_hdmi snd_hda_codec_realtek snd_hda_codec_generic 
+> ledtrig_audio coretemp intel_rapl_common iwlmvm intel_tcc_cooling 
+> x86_pkg_temp_thermal mt7921e intel_powerclamp mt7921_common mt792x_lib 
+> mt76_connac_lib kvm_intel snd_hda_intel mt76 snd_intel_dspcfg 
+> snd_hda_codec snd_hda_core mac80211 kvm snd_hwdep iwlwifi snd_seq 
+> irqbypass snd_seq_device pcspkr cfg80211 snd_pcm intel_wmi_thunderbolt 
+> i2c_i801 i2c_smbus snd_timer bfq tpm_crb snd soundcore mei_hdcp mei_pxp 
+> tpm_tis tpm_tis_core intel_pch_thermal tpm acpi_pad nfsd auth_rpcgss 
+> nfs_acl lockd grace sch_fq_codel sunrpc fuse zram raid1 dm_raid raid456 
+> libcrc32c async_raid6_recov async_memcpy async_pq async_xor xor async_tx 
+> raid6_pq i915 igb i2c_algo_bit drm_buddy intel_gtt drm_display_helper
+> [76171.488690]  drm_kms_helper cec rc_core ttm drm agpgart ixgbe mdio 
+> dca xhci_pci hwmon mei_wdt xhci_pci_renesas i2c_core video wmi [last 
+> unloaded: nfnetlink]
+> [76171.488701] CPU: 2 PID: 30169 Comm: kworker/2:2 Not tainted 
+> 6.6.0-rc5+ #13
+> [76171.488704] Hardware name: Default string Default string/SKYBAY, BIOS 
+> 5.12 02/21/2023
+> [76171.488705] Workqueue: events swiotlb_dyn_alloc
+> [76171.488708] RIP: 0010:__alloc_pages+0x19c/0x200
+> [76171.488711] Code: ff ff 00 0f 84 56 ff ff ff 80 ce 01 e9 4e ff ff ff 
+> 83 fe 0a 0f 86 db fe ff ff 80 3d ba c9 4a 01 00 75 09 c6 05 b1 c9 4a 01 
+> 01 <0f> 0b 45 31 e4 e9 4f ff ff ff a9 00 00 08 00 75 43 89 d9 80 e1 7f
+> [76171.488713] RSP: 0018:ffffc9000babfd78 EFLAGS: 00010246
+> [76171.488714] RAX: 0000000000000000 RBX: 0000000000000cc4 RCX: 
+> 0000000000000000
+> [76171.488716] RDX: 0000000000000000 RSI: 000000000000000e RDI: 
+> 0000000000000cc4
+> [76171.488717] RBP: 000000000000000e R08: 0000000000000000 R09: 
+> 0000000000000000
+> [76171.488718] R10: ffff88811ff99000 R11: 0000000000000000 R12: 
+> ffff888110070400
+> [76171.488719] R13: 0000000000000000 R14: 0000000003ffffff R15: 
+> ffff8881100586b0
+> [76171.488720] FS:  0000000000000000(0000) GS:ffff88845dc80000(0000) 
+> knlGS:0000000000000000
+> [76171.488722] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [76171.488723] CR2: 0000000003519000 CR3: 0000000002634004 CR4: 
+> 00000000003706e0
+> [76171.488725] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+> 0000000000000000
+> [76171.488726] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
+> 0000000000000400
+> [76171.488727] Call Trace:
+> [76171.488729]  <TASK>
+> [76171.488730]  ? __alloc_pages+0x19c/0x200
+> [76171.488732]  ? __warn+0x78/0x130
+> [76171.488736]  ? __alloc_pages+0x19c/0x200
+> [76171.488738]  ? report_bug+0x169/0x1a0
+> [76171.488742]  ? handle_bug+0x41/0x70
+> [76171.488744]  ? exc_invalid_op+0x13/0x60
+> [76171.488747]  ? asm_exc_invalid_op+0x16/0x20
+> [76171.488751]  ? __alloc_pages+0x19c/0x200
+> [76171.488753]  swiotlb_alloc_pool+0x102/0x280
+> [76171.488756]  swiotlb_dyn_alloc+0x2a/0xa0
+> [76171.488757]  process_one_work+0x15d/0x330
+> [76171.488759]  worker_thread+0x2e8/0x400
+> [76171.488762]  ? drain_workqueue+0x120/0x120
+> [76171.488763]  kthread+0xdc/0x110
+> [76171.488766]  ? kthread_complete_and_exit+0x20/0x20
+> [76171.488769]  ret_from_fork+0x28/0x40
+> [76171.488771]  ? kthread_complete_and_exit+0x20/0x20
+> [76171.488774]  ret_from_fork_asm+0x11/0x20
+> [76171.488778]  </TASK>
+> [76171.488778] ---[ end trace 0000000000000000 ]---
+> 
+> Thanks,
+> Ben
+> 
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 568b99d34533..410b72d3ae37 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3058,6 +3058,14 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/net/asix,ax88796c.yaml
- F:	drivers/net/ethernet/asix/ax88796c_*
- 
-+ASIX PHY DRIVER [RUST]
-+M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
-+R:	Trevor Gross <tmgross@umich.edu>
-+L:	netdev@vger.kernel.org
-+L:	rust-for-linux@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/phy/ax88796b_rust.rs
-+
- ASPEED CRYPTO DRIVER
- M:	Neal Liu <neal_liu@aspeedtech.com>
- L:	linux-aspeed@lists.ozlabs.org (moderated for non-subscribers)
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 0faebdb184ca..11b18370a05b 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -115,6 +115,14 @@ config AX88796B_PHY
- 	  Currently supports the Asix Electronics PHY found in the X-Surf 100
- 	  AX88796B package.
- 
-+config AX88796B_RUST_PHY
-+	bool "Rust reference driver for Asix PHYs"
-+	depends on RUST_PHYLIB_ABSTRACTIONS && AX88796B_PHY
-+	help
-+	  Uses the Rust reference driver for Asix PHYs (ax88796b_rust.ko).
-+	  The features are equivalent. It supports the Asix Electronics PHY
-+	  found in the X-Surf 100 AX88796B package.
-+
- config BROADCOM_PHY
- 	tristate "Broadcom 54XX PHYs"
- 	select BCM_NET_PHYLIB
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index c945ed9bd14b..58d7dfb095ab 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -41,7 +41,11 @@ aquantia-objs			+= aquantia_hwmon.o
- endif
- obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
- obj-$(CONFIG_AT803X_PHY)	+= at803x.o
--obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-+ifdef CONFIG_AX88796B_RUST_PHY
-+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b_rust.o
-+else
-+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-+endif
- obj-$(CONFIG_BCM54140_PHY)	+= bcm54140.o
- obj-$(CONFIG_BCM63XX_PHY)	+= bcm63xx.o
- obj-$(CONFIG_BCM7XXX_PHY)	+= bcm7xxx.o
-diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
-new file mode 100644
-index 000000000000..017f817f6f8d
---- /dev/null
-+++ b/drivers/net/phy/ax88796b_rust.rs
-@@ -0,0 +1,129 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (C) 2023 FUJITA Tomonori <fujita.tomonori@gmail.com>
-+
-+//! Rust Asix PHYs driver
-+//!
-+//! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796b.c)
-+use kernel::c_str;
-+use kernel::net::phy::{self, DeviceId, Driver};
-+use kernel::prelude::*;
-+use kernel::uapi;
-+
-+kernel::module_phy_driver! {
-+    drivers: [PhyAX88772A, PhyAX88772C, PhyAX88796B],
-+    device_table: [
-+        DeviceId::new_with_driver::<PhyAX88772A>(),
-+        DeviceId::new_with_driver::<PhyAX88772C>(),
-+        DeviceId::new_with_driver::<PhyAX88796B>()
-+    ],
-+    name: "rust_asix_phy",
-+    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
-+    description: "Rust Asix PHYs driver",
-+    license: "GPL",
-+}
-+
-+// Performs a software PHY reset using the standard
-+// BMCR_RESET bit and poll for the reset bit to be cleared.
-+// Toggle BMCR_RESET bit off to accommodate broken AX8796B PHY implementation
-+// such as used on the Individual Computers' X-Surf 100 Zorro card.
-+fn asix_soft_reset(dev: &mut phy::Device) -> Result {
-+    dev.write(uapi::MII_BMCR as u16, 0)?;
-+    dev.genphy_soft_reset()
-+}
-+
-+struct PhyAX88772A;
-+
-+#[vtable]
-+impl phy::Driver for PhyAX88772A {
-+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772A");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1861);
-+
-+    // AX88772A is not working properly with some old switches (NETGEAR EN 108TP):
-+    // after autoneg is done and the link status is reported as active, the MII_LPA
-+    // register is 0. This issue is not reproducible on AX88772C.
-+    fn read_status(dev: &mut phy::Device) -> Result<u16> {
-+        dev.genphy_update_link()?;
-+        if !dev.get_link() {
-+            return Ok(0);
-+        }
-+        // If MII_LPA is 0, phy_resolve_aneg_linkmode() will fail to resolve
-+        // linkmode so use MII_BMCR as default values.
-+        let ret = dev.read(uapi::MII_BMCR as u16)?;
-+
-+        if ret as u32 & uapi::BMCR_SPEED100 != 0 {
-+            dev.set_speed(uapi::SPEED_100);
-+        } else {
-+            dev.set_speed(uapi::SPEED_10);
-+        }
-+
-+        let duplex = if ret as u32 & uapi::BMCR_FULLDPLX != 0 {
-+            phy::DuplexMode::Full
-+        } else {
-+            phy::DuplexMode::Half
-+        };
-+        dev.set_duplex(duplex);
-+
-+        dev.genphy_read_lpa()?;
-+
-+        if dev.is_autoneg_enabled() && dev.is_autoneg_completed() {
-+            dev.resolve_aneg_linkmode();
-+        }
-+
-+        Ok(0)
-+    }
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        dev.genphy_resume()
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+
-+    fn link_change_notify(dev: &mut phy::Device) {
-+        // Reset PHY, otherwise MII_LPA will provide outdated information.
-+        // This issue is reproducible only with some link partner PHYs.
-+        if dev.state() == phy::DeviceState::NoLink {
-+            let _ = dev.init_hw();
-+            let _ = dev.start_aneg();
-+        }
-+    }
-+}
-+
-+struct PhyAX88772C;
-+
-+#[vtable]
-+impl Driver for PhyAX88772C {
-+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772C");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1881);
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        dev.genphy_resume()
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+}
-+
-+struct PhyAX88796B;
-+
-+#[vtable]
-+impl Driver for PhyAX88796B {
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88796B");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_model_mask(0x003b1841);
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+}
-diff --git a/rust/uapi/uapi_helper.h b/rust/uapi/uapi_helper.h
-index 301f5207f023..08f5e9334c9e 100644
---- a/rust/uapi/uapi_helper.h
-+++ b/rust/uapi/uapi_helper.h
-@@ -7,3 +7,5 @@
-  */
- 
- #include <uapi/asm-generic/ioctl.h>
-+#include <uapi/linux/mii.h>
-+#include <uapi/linux/ethtool.h>
 -- 
-2.34.1
-
+Florian
 
