@@ -1,91 +1,72 @@
-Return-Path: <netdev+bounces-43962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F07E7D59CB
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:32:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7210C7D59ED
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:49:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 590681C20A9C
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:32:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D4551C20ADA
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8FCF3AC28;
-	Tue, 24 Oct 2023 17:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FFB63A26F;
+	Tue, 24 Oct 2023 17:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nohats.ca header.i=@nohats.ca header.b="suczj/dx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cz5+LNIl"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AAA2420F
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 17:31:56 +0000 (UTC)
-Received: from mx.nohats.ca (mx.nohats.ca [IPv6:2a03:6000:1004:1::85])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07EE610C6
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 10:31:54 -0700 (PDT)
-Received: from localhost (localhost [IPv6:::1])
-	by mx.nohats.ca (Postfix) with ESMTP id 4SFJyd5twpz3DF;
-	Tue, 24 Oct 2023 19:31:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nohats.ca;
-	s=default; t=1698168713;
-	bh=ZvprvHGu/w/Qj5jOdQBRJgMZeWcirXHd1u5Si2/nJ0E=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=suczj/dxqaNGSPks0MWO/5M2SjEsbeDKVmIEJ4FrHKaF19FIwSGkWLUGC2nKDaeg+
-	 akkWZgSyZQVkMaYkplEbcJ009pNEtVJsGptRnE4ro4sHDU2YF17X9r9/+Aji2cC98i
-	 nGYHK8gMqfrK2DgixGttqD165tSq3M0CAXxops+g=
-X-Virus-Scanned: amavisd-new at mx.nohats.ca
-Received: from mx.nohats.ca ([IPv6:::1])
-	by localhost (mx.nohats.ca [IPv6:::1]) (amavisd-new, port 10024)
-	with ESMTP id h6cA923GhxH0; Tue, 24 Oct 2023 19:31:52 +0200 (CEST)
-Received: from bofh.nohats.ca (bofh.nohats.ca [193.110.157.194])
-	(using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx.nohats.ca (Postfix) with ESMTPS;
-	Tue, 24 Oct 2023 19:31:52 +0200 (CEST)
-Received: by bofh.nohats.ca (Postfix, from userid 1000)
-	id 9A0D3109FC24; Tue, 24 Oct 2023 13:31:51 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-	by bofh.nohats.ca (Postfix) with ESMTP id 9695A109FC23;
-	Tue, 24 Oct 2023 13:31:51 -0400 (EDT)
-Date: Tue, 24 Oct 2023 13:31:51 -0400 (EDT)
-From: Paul Wouters <paul@nohats.ca>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-cc: antony.antony@secunet.com, devel@linux-ipsec.org, 
-    Andreas Gruenbacher <agruenba@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [devel-ipsec] [RFC PATCH ipsec-next] udpencap: Remove Obsolete
- UDP_ENCAP_ESPINUDP_NON_IKE Support
-In-Reply-To: <CAF=yD-LUgdkZpNW9W2RV0f4PqYOkOCTRWGi6A7B7LZ1Q9bkM4Q@mail.gmail.com>
-Message-ID: <270203ee-e1a8-7dfa-5ac2-d8b0ee392ff0@nohats.ca>
-References: <b604dc470c708e1e70c954f1513e4b461531e7cc.1698136108.git.antony.antony@secunet.com> <CAF=yD-LUgdkZpNW9W2RV0f4PqYOkOCTRWGi6A7B7LZ1Q9bkM4Q@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230546FA6
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 17:49:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C74BC433C7;
+	Tue, 24 Oct 2023 17:49:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698169751;
+	bh=HZFfZ4p5R5ufKIODptS4GZrknXlxe48G7GXWWJWt8uU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Cz5+LNIlQsYorQ4WiyOtT7+FVBaFieqyc/EeQ3o7pn/nITIf9dxh8CdcETcx8UKM1
+	 J0kbzPuUZA6vEaU/ojoya9vEjmO/yZ2CM/6olbIuiyj+U/sInUReFgnrtYub5L7Dy/
+	 BcupzZv2JaXRzICZ5p58i4FVFpQ9HGc7ce5Jf4+nZTHvS7AfH73Ci9IeZKvsyaPSdn
+	 9ZUo0aUzRRz10F8H21n5IkxpwWbaaWl5NqvgJAGF1NhAc+rdx0yTcbSJ/AGL9NBul3
+	 MGmLxfm85IDenXj4M1eFGovyti3TJBRrTUSIDKybahcoxFVudnE6K575zaf/nfmv9k
+	 8UDnI4w1BiwmQ==
+Date: Tue, 24 Oct 2023 10:49:10 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, almasrymina@google.com, hawk@kernel.org,
+ ilias.apalodimas@linaro.org
+Subject: Re: [PATCH net-next 05/15] net: page_pool: record pools per netdev
+Message-ID: <20231024104910.71ced925@kernel.org>
+In-Reply-To: <cb0d160b-42bf-40c9-ac36-246010d04975@kernel.org>
+References: <20231024160220.3973311-1-kuba@kernel.org>
+	<20231024160220.3973311-6-kuba@kernel.org>
+	<cb0d160b-42bf-40c9-ac36-246010d04975@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 24 Oct 2023, Willem de Bruijn via Devel wrote:
+On Tue, 24 Oct 2023 11:31:46 -0600 David Ahern wrote:
+> On 10/24/23 10:02 AM, Jakub Kicinski wrote:
+> > Link the page pools with netdevs. This needs to be netns compatible
+> > so we have two options. Either we record the pools per netns and
+> > have to worry about moving them as the netdev gets moved.
+> > Or we record them directly on the netdev so they move with the netdev
+> > without any extra work.
+> > 
+> > Implement the latter option. Since pools may outlast netdev we need
+> > a place to store orphans. In time honored tradition use loopback
+> > for this purpose.
+> 
+> blackhole_netdev might be a better choice than loopback
 
-> I don't know how important this is, but a quick online search brought
-> up one package: https://github.com/rdratlos/racoon-ipsec-tools.git
->
-> Behind #if defined(ENABLE_NATT_00) || defined(ENABLE_NATT_01), so
-> probably there unused too.
-
-Also: https://ipsec-tools.sourceforge.net/
-
- 	Important Note
- 	The development of ipsec-tools has been ABANDONED.
-
- 	ipsec-tools has security issues, and you should not use it. Please
- 	switch to a secure alternative!
-
-There are known unfixed CVEs in that codebase.
-
-While Apple and Android have their own clones of this code for IKEv1,
-even basically all 20+ year old IKEv1 clients support the draft 02/03/05
-versions that obsoletes the 00/01 draft code.
-
-Paul
+With loopback we still keep it per netns, and still accessible 
+via netlink.
 
