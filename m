@@ -1,252 +1,107 @@
-Return-Path: <netdev+bounces-43834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAF157D4EF8
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:35:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08E0B7D4E9C
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:11:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 703B32819CB
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 11:35:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 438F11C20974
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 11:11:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B0D273CC;
-	Tue, 24 Oct 2023 11:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1AE26288;
+	Tue, 24 Oct 2023 11:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QWTS8td/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kx25fGXi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5743A262AB
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:35:18 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A685FAC
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 04:35:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698147317; x=1729683317;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=EAMD0jNiRaewglGSb4G3nZUn8vvQClD5emTa18/MaeY=;
-  b=QWTS8td/R9FIqld01zQjRoUYFwXwaDI8eWH3SR82ABgFzfahmJ1OiPaQ
-   hrUhnuaPhd8Fk5WjnPKfyCnCBgsFCKj+PSmdTSx35gNi05jfUixhWRjAk
-   HItA1wfY5RUcRytBkBrUDLZgASF6B18buWB9lxGbGEf7FTz+jgUOg56EV
-   r8sgG1jE/bD5ZX0t/yFBKBtq+grvn2H91nTfQ/VlYrc6Od8I3vqe61JiB
-   Uh8l+rYJ4kDMgv8+fr6H195eTYI+4TQQpJlSr5vpp9PQYfj0YRjvC1h3Q
-   BoD8bAMUY6DNq3ZFqQf3L+6uX5oes9ZKJS0Ld57zbhYj2QqV3UPj1C3B9
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="5660579"
-X-IronPort-AV: E=Sophos;i="6.03,247,1694761200"; 
-   d="scan'208";a="5660579"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2023 04:35:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,247,1694761200"; 
-   d="scan'208";a="6146314"
-Received: from wasp.igk.intel.com ([10.102.20.192])
-  by orviesa001.jf.intel.com with ESMTP; 24 Oct 2023 04:33:56 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	piotr.raczynski@intel.com,
-	wojciech.drewek@intel.com,
-	marcin.szycik@intel.com,
-	jacob.e.keller@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jesse.brandeburg@intel.com,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [PATCH iwl-next v1 15/15] ice: reserve number of CP queues
-Date: Tue, 24 Oct 2023 13:09:29 +0200
-Message-ID: <20231024110929.19423-16-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231024110929.19423-1-michal.swiatkowski@linux.intel.com>
-References: <20231024110929.19423-1-michal.swiatkowski@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E997498
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:11:21 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7BC10C3
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 04:11:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698145879;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2H7Y3L+wO4O4PCAdKbwK4BPdzk6P9AjMRpwDaWWqLDQ=;
+	b=Kx25fGXieD0/Ex61NNcJ9KFyOBBfMWdyyPBTdJx0bVafVyVu3Tih9Iosqg7tkloCh6AIjm
+	6KxNKmBtwXa4tof+e0vARAx+m9nDitnDvQiToe30qQwJlUu/E1THefJ+X7w2vf1t+lndHK
+	8u/2HGt3Se0jebXaRGDcHIGCPz2W9KU=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-421-OEXZlvVSP0Gby6nCo-CpjA-1; Tue, 24 Oct 2023 07:11:16 -0400
+X-MC-Unique: OEXZlvVSP0Gby6nCo-CpjA-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9c45a6a8832so44241566b.1
+        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 04:11:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698145875; x=1698750675;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2H7Y3L+wO4O4PCAdKbwK4BPdzk6P9AjMRpwDaWWqLDQ=;
+        b=Omna8pS/jC7gTcF5YlXz5PUXbxrdYUW2poiNPe2P/aJE9lKDhvT390VRJDSvuVC0kw
+         0Rbqo9Ebld4fyASO6iR31nlnGNRjDoWognHdGBMeEEKuW2QTGAdhT950vKmDVBfQOt1w
+         NcVANsdJPnt0ymQy+x3LQeJvJ1JWFJop3+KsxDgA0PaWCico1aJqZuXi/7P4+GeEsA40
+         7uULJoAPrxW7QKXM2jLNEJ6RYGBjt18Vun6PG49hH30SVYLtsv8wWSWn22Qw7j3ZsrkW
+         aUWbqljudxpFwI7turU3gVq5EeSV4J6nOBSP29qWFfq7OXW/mQyv/fE0txUGiyzLw9Sv
+         YThw==
+X-Gm-Message-State: AOJu0YxGgvAQSRcf+Ys2o61DcVJ0nUYh28IqQGGLJ0cOWaT8+E+7YiaK
+	N4bf2F9ZDhxen0wnx3fdkxx3H9u6pkHxWYm/zOglYhB4ZMXN7QkBdO1/KVpOdrIM12DiYKpPAXS
+	k5fcEZ4vsEZbmuMu2
+X-Received: by 2002:a17:906:f50:b0:9cb:b737:e469 with SMTP id h16-20020a1709060f5000b009cbb737e469mr1904591ejj.4.1698145875542;
+        Tue, 24 Oct 2023 04:11:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHbm6fF0XWXv8tlBeoO6lS6nrzwyNW4FLJl6hKfbijCy2f0/nuEpU6IezwHCF7SzoFNY107dQ==
+X-Received: by 2002:a17:906:f50:b0:9cb:b737:e469 with SMTP id h16-20020a1709060f5000b009cbb737e469mr1904578ejj.4.1698145875194;
+        Tue, 24 Oct 2023 04:11:15 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-242-180.dyn.eolo.it. [146.241.242.180])
+        by smtp.gmail.com with ESMTPSA id d13-20020a1709064c4d00b009a5f1d15642sm8026369ejw.158.2023.10.24.04.11.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 04:11:14 -0700 (PDT)
+Message-ID: <f44e4fd716729f1f35ef58895b1acde53adb9b35.camel@redhat.com>
+Subject: Re: [PATCH net 2/2] liquidio: Simplify octeon_download_firmware()
+From: Paolo Abeni <pabeni@redhat.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ dchickles@marvell.com,  sburla@marvell.com, fmanlunas@marvell.com,
+ davem@davemloft.net,  edumazet@google.com, kuba@kernel.org,
+ veerasenareddy.burru@cavium.com
+Cc: felix.manlunas@cavium.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Date: Tue, 24 Oct 2023 13:11:13 +0200
+In-Reply-To: <0278c7dfbc23f78a2d85060369132782f8466090.1698007858.git.christophe.jaillet@wanadoo.fr>
+References: <cover.1698007858.git.christophe.jaillet@wanadoo.fr>
+	 <0278c7dfbc23f78a2d85060369132782f8466090.1698007858.git.christophe.jaillet@wanadoo.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Rebuilding CP VSI each time the PR is created drastically increase the
-time of maximum VFs creation. Add function to reserve number of CP
-queues to deal with this problem.
+On Sun, 2023-10-22 at 22:59 +0200, Christophe JAILLET wrote:
+> In order to remove the usage of strncat(), write directly at the rigth
+> place in the 'h->bootcmd' array and check if the output is truncated.
+>=20
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> The goal is to potentially remove the strncat() function from the kernel.
+> Their are only few users and most of them use it wrongly.
+>=20
+> This patch is compile tested only.
 
-Use the same function to decrease number of queues in case of removing
-VFs. Assume that caller of ice_eswitch_reserve_cp_queues() will also
-call ice_eswitch_attach/detach() correct number of times.
+Then just switch to strlcat, would be less invasive.
 
-Still one by one PR adding is handy for VF resetting routine.
+Thanks,
 
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice.h         |  6 +++
- drivers/net/ethernet/intel/ice/ice_eswitch.c | 52 +++++++++++++++++---
- drivers/net/ethernet/intel/ice/ice_eswitch.h |  4 ++
- drivers/net/ethernet/intel/ice/ice_sriov.c   |  3 ++
- 4 files changed, 58 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 597bdb6945c6..cd7dcd0fa7f2 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -528,6 +528,12 @@ struct ice_eswitch {
- 	struct ice_esw_br_offloads *br_offloads;
- 	struct xarray reprs;
- 	bool is_running;
-+	/* struct to allow cp queues management optimization */
-+	struct {
-+		int to_reach;
-+		int value;
-+		bool is_reaching;
-+	} qs;
- };
- 
- struct ice_agg_node {
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index 9ff4fe4fb133..3f80e2081e5d 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -176,7 +176,7 @@ static void ice_eswitch_remap_rings_to_vectors(struct ice_eswitch *eswitch)
- 
- 		repr = xa_find(&eswitch->reprs, &repr_id, U32_MAX,
- 			       XA_PRESENT);
--		if (WARN_ON(!repr))
-+		if (!repr)
- 			break;
- 
- 		repr_id += 1;
-@@ -455,6 +455,8 @@ static int ice_eswitch_enable_switchdev(struct ice_pf *pf)
- 		return -ENODEV;
- 
- 	ctrl_vsi = pf->eswitch.control_vsi;
-+	/* cp VSI is createad with 1 queue as default */
-+	pf->eswitch.qs.value = 1;
- 	pf->eswitch.uplink_vsi = uplink_vsi;
- 
- 	if (ice_eswitch_setup_env(pf))
-@@ -487,6 +489,7 @@ static void ice_eswitch_disable_switchdev(struct ice_pf *pf)
- 	ice_vsi_release(ctrl_vsi);
- 
- 	pf->eswitch.is_running = false;
-+	pf->eswitch.qs.is_reaching = false;
- }
- 
- /**
-@@ -615,15 +618,33 @@ static void
- ice_eswitch_cp_change_queues(struct ice_eswitch *eswitch, int change)
- {
- 	struct ice_vsi *cp = eswitch->control_vsi;
-+	int queues = 0;
-+
-+	if (eswitch->qs.is_reaching) {
-+		if (eswitch->qs.to_reach >= eswitch->qs.value + change) {
-+			queues = eswitch->qs.to_reach;
-+			eswitch->qs.is_reaching = false;
-+		} else {
-+			queues = 0;
-+		}
-+	} else if ((change > 0 && cp->alloc_txq <= eswitch->qs.value) ||
-+		   change < 0) {
-+		queues = cp->alloc_txq + change;
-+	}
- 
--	ice_vsi_close(cp);
-+	if (queues) {
-+		cp->req_txq = queues;
-+		cp->req_rxq = queues;
-+		ice_vsi_close(cp);
-+		ice_vsi_rebuild(cp, ICE_VSI_FLAG_NO_INIT);
-+		ice_vsi_open(cp);
-+	} else if (!change) {
-+		/* change == 0 means that VSI wasn't open, open it here */
-+		ice_vsi_open(cp);
-+	}
- 
--	cp->req_txq = cp->alloc_txq + change;
--	cp->req_rxq = cp->alloc_rxq + change;
--	ice_vsi_rebuild(cp, ICE_VSI_FLAG_NO_INIT);
-+	eswitch->qs.value += change;
- 	ice_eswitch_remap_rings_to_vectors(eswitch);
--
--	ice_vsi_open(cp);
- }
- 
- int
-@@ -641,6 +662,7 @@ ice_eswitch_attach(struct ice_pf *pf, struct ice_vf *vf)
- 		if (err)
- 			return err;
- 		/* Control plane VSI is created with 1 queue as default */
-+		pf->eswitch.qs.to_reach -= 1;
- 		change = 0;
- 	}
- 
-@@ -732,3 +754,19 @@ int ice_eswitch_rebuild(struct ice_pf *pf)
- 
- 	return 0;
- }
-+
-+/**
-+ * ice_eswitch_reserve_cp_queues - reserve control plane VSI queues
-+ * @pf: pointer to PF structure
-+ * @change: how many more (or less) queues is needed
-+ *
-+ * Remember to call ice_eswitch_attach/detach() the "change" times.
-+ */
-+void ice_eswitch_reserve_cp_queues(struct ice_pf *pf, int change)
-+{
-+	if (pf->eswitch.qs.value + change < 0)
-+		return;
-+
-+	pf->eswitch.qs.to_reach = pf->eswitch.qs.value + change;
-+	pf->eswitch.qs.is_reaching = true;
-+}
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.h b/drivers/net/ethernet/intel/ice/ice_eswitch.h
-index 59d51c0d14e5..1a288a03a79a 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.h
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.h
-@@ -26,6 +26,7 @@ void ice_eswitch_set_target_vsi(struct sk_buff *skb,
- 				struct ice_tx_offload_params *off);
- netdev_tx_t
- ice_eswitch_port_start_xmit(struct sk_buff *skb, struct net_device *netdev);
-+void ice_eswitch_reserve_cp_queues(struct ice_pf *pf, int change);
- #else /* CONFIG_ICE_SWITCHDEV */
- static inline void ice_eswitch_detach(struct ice_pf *pf, struct ice_vf *vf) { }
- 
-@@ -76,5 +77,8 @@ ice_eswitch_port_start_xmit(struct sk_buff *skb, struct net_device *netdev)
- {
- 	return NETDEV_TX_BUSY;
- }
-+
-+static inline void
-+ice_eswitch_reserve_cp_queues(struct ice_pf *pf, int change) { }
- #endif /* CONFIG_ICE_SWITCHDEV */
- #endif /* _ICE_ESWITCH_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 51f5f420d632..5a45bd5ce6ad 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -172,6 +172,8 @@ void ice_free_vfs(struct ice_pf *pf)
- 	else
- 		dev_warn(dev, "VFs are assigned - not disabling SR-IOV\n");
- 
-+	ice_eswitch_reserve_cp_queues(pf, -ice_get_num_vfs(pf));
-+
- 	mutex_lock(&vfs->table_lock);
- 
- 	ice_for_each_vf(pf, bkt, vf) {
-@@ -930,6 +932,7 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
- 		goto err_unroll_sriov;
- 	}
- 
-+	ice_eswitch_reserve_cp_queues(pf, num_vfs);
- 	ret = ice_start_vfs(pf);
- 	if (ret) {
- 		dev_err(dev, "Failed to start %d VFs, err %d\n", num_vfs, ret);
--- 
-2.41.0
+Paolo
 
 
