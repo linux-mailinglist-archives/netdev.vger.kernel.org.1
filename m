@@ -1,96 +1,117 @@
-Return-Path: <netdev+bounces-43959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D9567D59AA
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:24:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85CF37D59BA
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3060F2819C1
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:24:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AD142819AB
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50503A298;
-	Tue, 24 Oct 2023 17:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6819B3A29F;
+	Tue, 24 Oct 2023 17:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bh1xQlAI"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WSiqAtdN"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCA627EDD
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 17:24:30 +0000 (UTC)
-Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90CFC122
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 10:24:28 -0700 (PDT)
-Received: by mail-vk1-xa34.google.com with SMTP id 71dfb90a1353d-49d0f24a815so1758672e0c.2
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 10:24:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC08827EDD
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 17:28:51 +0000 (UTC)
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57D9D133
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 10:28:50 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1ca72f8ff3aso32678975ad.0
+        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 10:28:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698168267; x=1698773067; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Jao6kpGym5ga8wPT9tk+CrG+dBzqzZE2yl0TnbxWrnE=;
-        b=bh1xQlAIUx1iPmr2YXop8M3IMMEOjpnskTvttHk4fMqdQbHxGrxNK+NZX3D+1or9j0
-         x1uD5OTWZl02cZhHQZR4MtP5vA3SxsMwGOzzxoLQwIuY7kibGMGcNa0AFIWhs1EGRhw1
-         u2Ff5dMqFbOEQWSHDzybEYfaViSS1LJ+QWM5pB7x4OyJFrkoDtmSQnW3KD/OT40aiBt3
-         Tb10pLS0Cv1PQItL3Z71V8WJGrPPjrOgzm45cu1BMuOPYGsil2b5h81NJWzT6mGcK+9J
-         Uk6IjaqHkHXo1eYnF9M/YFa6ExIPKH/siHGZw1KW3Nczof3VgdiDMuiOnA4LCghPEBDh
-         Rb2w==
+        d=chromium.org; s=google; t=1698168530; x=1698773330; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v5+vnHpkaeDGkL4KU8yjQESLCmsVuX8ylTfakxaPTtU=;
+        b=WSiqAtdN8PzA+kCu8lcgn/moDnuGBVsVifULPm264T9xl2ixUN+CEzB/G8SfDDTV8K
+         pM/NokKvdXpktq5+3wT1s+7bXFZ5Wz1n07B/3QbktvU3O8cA6e2u08kUIjzMEkJ+g75q
+         FuGmP5bOxY51HjMomrGGTqXaam5F5M+pWfakg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698168267; x=1698773067;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Jao6kpGym5ga8wPT9tk+CrG+dBzqzZE2yl0TnbxWrnE=;
-        b=Sb78KfwPN+vYW14HcpqOA0lyX3tMBpJgmtm6+hOKYva+GuxrjqxQk6usUUdJhScPWm
-         SBJa/azlPSnXWs6nFK1rm3/SESgQM43MsLCgLkWG1wbGdV39vePe2VcFrFCkiub8Aqd7
-         ERqZZb7h0p2eFH1rpOLjrjwfWRwK6Mnm3Q46IkI881h3PciGwcSHHn+dZMB8pIbRy6MM
-         l/RCLFCiPSxgCe/Vf2khIZL2Hj+P0UcGPIWl0Df4FcVmMUSN90DOZCHOWwsIc3coiReO
-         vXJCbdB3I6VWEu4i86Ee9Y/3rJ7DPmtV86Jkd9gFBbmMe42lv8/6v9I1swl9HwSl0Ip/
-         yK2Q==
-X-Gm-Message-State: AOJu0YxP/Xj8tJzKJN3PppqWmlQCr9+O2NPt3UfvZvfYtkF16VsvNuh0
-	vhkjKjAz9Us79ITUMqvMrXrCROFf3ydXPf6Yde0ENJsBrw0=
-X-Google-Smtp-Source: AGHT+IGT0OT0/3P1p5NsSoxu773O+O+2eXk4OoM2yxQPxWPoqeuvhwzxpPpxNb20xMrD53AHe/lS4iWyI4FY+aMbctE=
-X-Received: by 2002:a1f:2a0a:0:b0:495:bd61:a184 with SMTP id
- q10-20020a1f2a0a000000b00495bd61a184mr8308675vkq.2.1698168267604; Tue, 24 Oct
- 2023 10:24:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698168530; x=1698773330;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v5+vnHpkaeDGkL4KU8yjQESLCmsVuX8ylTfakxaPTtU=;
+        b=t2kQqAmJDdRcBa7j9FKZ3wZE9aLYdzBF2Xiof0Hdewwi6xYXyyQKh9Y3ZS5QAIPvze
+         pa7ODF0aIPLCE4K7rASNUM7LQbgSj/AfFjc3+hiX5gHd4VRgTvbBuGaXld+dgmXWoF4Y
+         EaogNroRT31O3fBww1d1Z8mV17VfDx1rrJmptdxGqZeFYu0w89Ei9grjqP0KNudg/WZw
+         hKiOgkmmEwi56HukhePXAEZ7P7b4hC33EgVsJJmTQXNZC0dD/QX3zJmVoQZCjMTLd5Cy
+         05mhySJfpsEq7EOcqX3R2X1jl/0Ov8+TRQENuE2ekyyzxlwTrLGjA427bihEXv1TbuXZ
+         hvRw==
+X-Gm-Message-State: AOJu0YzlCN5Itgn0R69nPnLvJyzPZiO5s6NLBoXo8Yaqf7BXi8kBrhsB
+	IhFWQyNT4T748TynUJGpO/sJ6Q==
+X-Google-Smtp-Source: AGHT+IFQks8f7taxe/T8lJX4HzjJyBwLcpA05m1ZgzLrUenz+1s8G0m8uqUjTVMkOtGRSqaCkc2qWw==
+X-Received: by 2002:a17:902:ce88:b0:1ca:59bf:6cc9 with SMTP id f8-20020a170902ce8800b001ca59bf6cc9mr13033744plg.57.1698168529819;
+        Tue, 24 Oct 2023 10:28:49 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id n17-20020a170902e55100b001bb1f0605b2sm7650806plf.214.2023.10.24.10.28.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 10:28:49 -0700 (PDT)
+Date: Tue, 24 Oct 2023 10:28:48 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Alexandra Winter <wintera@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] s390/ctcm: replace deprecated strncpy with strscpy
+Message-ID: <202310241027.516C46AA@keescook>
+References: <20231023-strncpy-drivers-s390-net-ctcm_main-c-v1-1-265db6e78165@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <b604dc470c708e1e70c954f1513e4b461531e7cc.1698136108.git.antony.antony@secunet.com>
-In-Reply-To: <b604dc470c708e1e70c954f1513e4b461531e7cc.1698136108.git.antony.antony@secunet.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Tue, 24 Oct 2023 13:23:51 -0400
-Message-ID: <CAF=yD-LUgdkZpNW9W2RV0f4PqYOkOCTRWGi6A7B7LZ1Q9bkM4Q@mail.gmail.com>
-Subject: Re: [RFC PATCH ipsec-next] udpencap: Remove Obsolete
- UDP_ENCAP_ESPINUDP_NON_IKE Support
-To: antony.antony@secunet.com
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, Florian Westphal <fw@strlen.de>, 
-	Andreas Gruenbacher <agruenba@redhat.com>, devel@linux-ipsec.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231023-strncpy-drivers-s390-net-ctcm_main-c-v1-1-265db6e78165@google.com>
 
-On Tue, Oct 24, 2023 at 4:42=E2=80=AFAM Antony Antony <antony.antony@secune=
-t.com> wrote:
->
-> The UDP_ENCAP_ESPINUDP_NON_IKE mode, introduced into the Linux kernel
-> in 2004 [2], has remained inactive and obsolete for an extended period.
->
-> This mode was originally defined in an early version of an IETF draft
-> [1] from 2001. By the time it was integrated into the kernel in 2004 [2],
-> it had already been replaced by UDP_ENCAP_ESPINUDP [3] in later
-> versions of draft-ietf-ipsec-udp-encaps, particularly in version 06.
->
-> Over time, UDP_ENCAP_ESPINUDP_NON_IKE has lost its relevance, with no
-> known use cases.
+On Mon, Oct 23, 2023 at 07:35:07PM +0000, Justin Stitt wrote:
+> strncpy() is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
+> 
+> We expect chid to be NUL-terminated based on its use with format
+> strings:
+> 
+> 	CTCM_DBF_TEXT_(SETUP, CTC_DBF_INFO, "%s(%s) %s", CTCM_FUNTAIL,
+> 			chid, ok ? "OK" : "failed");
+> 
+> Moreover, NUL-padding is not required as it is _only_ used in this one
+> instance with a format string.
+> 
+> Considering the above, a suitable replacement is `strscpy` [2] due to
+> the fact that it guarantees NUL-termination on the destination buffer
+> without unnecessarily NUL-padding.
+> 
+> We can also drop the +1 from chid's declaration as we no longer need to
+> be cautious about leaving a spot for a NUL-byte. Let's use the more
+> idiomatic strscpy usage of (dest, src, sizeof(dest)) as this more
+> closely ties the destination buffer to the length.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
 
-I don't know how important this is, but a quick online search brought
-up one package: https://github.com/rdratlos/racoon-ipsec-tools.git
+Yeah, all looks correct to me.
 
-Behind #if defined(ENABLE_NATT_00) || defined(ENABLE_NATT_01), so
-probably there unused too.
+Reviewed-by: Kees Cook <keescook@chromium.org>
+
+-- 
+Kees Cook
 
