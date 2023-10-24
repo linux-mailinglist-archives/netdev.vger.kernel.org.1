@@ -1,166 +1,130 @@
-Return-Path: <netdev+bounces-43898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76BC67D53DD
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:24:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 530797D53F6
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:26:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01DECB2101E
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:24:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB161B20F0D
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488DC2C867;
-	Tue, 24 Oct 2023 14:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8251F2C873;
+	Tue, 24 Oct 2023 14:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FonKB+pa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C824FBFB
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 14:24:37 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871A3111
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 07:24:35 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qvIKZ-0003p9-WC; Tue, 24 Oct 2023 16:24:28 +0200
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qvIKY-003y1U-PT; Tue, 24 Oct 2023 16:24:26 +0200
-Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qvIKY-00G8uT-MW; Tue, 24 Oct 2023 16:24:26 +0200
-Date: Tue, 24 Oct 2023 16:24:26 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Ante Knezic <ante.knezic@helmholz.de>
-Cc: UNGLinuxDriver@microchip.com, andrew@lunn.ch, conor+dt@kernel.org,
-	davem@davemloft.net, devicetree@vger.kernel.org,
-	edumazet@google.com, f.fainelli@gmail.com,
-	krzysztof.kozlowski+dt@linaro.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, marex@denx.de, netdev@vger.kernel.org,
-	olteanv@gmail.com, pabeni@redhat.com, robh+dt@kernel.org,
-	woojung.huh@microchip.com
-Subject: Re: [PATCH net-next v4 2/2] net:dsa:microchip: add property to select
-Message-ID: <20231024142426.GE3803936@pengutronix.de>
-References: <20231024100915.GC3803936@pengutronix.de>
- <20231024130832.13596-1-ante.knezic@helmholz.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E772C85D
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 14:26:35 +0000 (UTC)
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E6FA111
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 07:26:34 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-7788fb06997so313718885a.0
+        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 07:26:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1698157593; x=1698762393; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HSkD7qLJMOj3J00NGcykYcTjPHnf3wlBQzh0/FoSFS4=;
+        b=FonKB+paqvcJd3aVuqUZ+DevZ/ju7KgsAyiFti5qWAKKk+pIspKJHAt+VmB9+TR+e3
+         b3PpYYT+SeXQzIkU81+kDj62AQt3o320/Y2tYt8AsChGLQ8gMBB3U2Q4Rx2zY9HY0vM7
+         qSupfNWy5VBNU0ydV9brylYzcOL/rULFNdIXs/1Eda4n/asAKTypg4cA0J96uw1A89Kd
+         1mycTcY/dX5c+xNytOcYy/OmZ42s5vi5HYt0SnWGnx2guiTFCmgqG4tQVnx7ri508m+7
+         Dzkv0imnofKK1jCFF2KEIdx1X/vgKy+PV96B1zZYeZXoQObuNiz6UcI33NBaevNUG7yP
+         vZrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698157593; x=1698762393;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HSkD7qLJMOj3J00NGcykYcTjPHnf3wlBQzh0/FoSFS4=;
+        b=NrrFzq9RhtKT/fFvflHfXGqpEhLQhhLPtFJyGfwBXjncU0ctk5zLrQeOX2Wahwdf3o
+         icWB3qEVdFZ2OcPYRlVCryNBI2BOVI3V4h8mmYv9hsNTwA8FCSmFvlKuKpLB2WEO7+qv
+         lJJkO4JWIiPsOXFeUDRs0LP5nN0zy2evNKZ4+KAfnr6Mk0itLetwa7sTjQ56AhaVQEoE
+         /a4exCgoKXtHB3LrPyHAgy7xsj3GY86keL2N/H7h0bWoM7sn64K385XBfOP3SsRULHM+
+         Ex/PIrQcIWcEuXuUFNMYrEAFt2oq9xFyjgkDRhb24z8yMsLjIno+cKaS38vi2JjzWWu2
+         hkRQ==
+X-Gm-Message-State: AOJu0YzlSxlDnNFJWnVABhDPkMnanoSefk6uQmTQ0vPZxscvyfOiCFT+
+	suWqr7qnElfVnXNkJfsvUVO3nG3QeoOjBErCMwIXkw==
+X-Google-Smtp-Source: AGHT+IEe+TEGePA52UECB7U2kmO8POiVcE6AKJVynAW93jmiSs63kLXqKS6YPGva2vriS+ablYsZ3A==
+X-Received: by 2002:a05:6214:230f:b0:66d:62b7:53f4 with SMTP id gc15-20020a056214230f00b0066d62b753f4mr14290057qvb.45.1698157592853;
+        Tue, 24 Oct 2023 07:26:32 -0700 (PDT)
+Received: from debian.debian ([140.141.197.139])
+        by smtp.gmail.com with ESMTPSA id e20-20020ad442b4000000b0065d1380dd17sm3598217qvr.61.2023.10.24.07.26.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 07:26:32 -0700 (PDT)
+Date: Tue, 24 Oct 2023 07:26:28 -0700
+From: Yan Zhai <yan@cloudflare.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Aya Levin <ayal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	linux-kernel@vger.kernel.org, kernel-team@cloudflare.com,
+	Florian Westphal <fw@strlen.de>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Alexander H Duyck <alexander.duyck@gmail.com>
+Subject: [PATCH v5 net-next 0/3] ipv6: avoid atomic fragment on GSO output
+Message-ID: <cover.1698156966.git.yan@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231024130832.13596-1-ante.knezic@helmholz.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Oct 24, 2023 at 03:08:32PM +0200, Ante Knezic wrote:
-> On Tue, 24 Oct 2023 12:09:15 +0200, Oleksij Rampel wrote:
-> 
-> > > As you suggested, it looks like KSZ9897 clocking mode depends on RMII interface
-> > > mode (with strapping pins), but I don't see this for KSZ8863. The PHY/MAC mode
-> > > is selected with Register 0x35 bit 7 and the clocking mode is selected via
-> > > strapping pins EN_REFCLKO and SMTXD32 (and additional register 0xC6 bit 3).
-> > > I guess its possible for the KSZ8863 to be the clock provider/consumer
-> > > regardless of PHY/MAC mode?
-> >
-> >Register 0x35 bit 7 is for MII mode
-> >Register 0xC6 bit 3 is for RMII mode
-> >
-> >MII != RMII
-> 
-> Yes, right you are. Looks like I got lost in the datasheets...
-> 
-> > > Table 3-5: RMII CLOCK SETTING of KSZ8863 datasheet describes the available
-> > > clocking modes. If we try to create a relation between KSZ9897 and KSZ8863:
-> > >
-> > > KSZ9897 "Normal Mode" is equivalent to KSZ8863 mode described in first column
-> > > of table 3-5:
-> > > - EN_REFCLKO = 0, 0xC6(3) = 0 -> external 50Mhz OSC input to REFCLKI and X1
-> > >   pin directly
-> > >
-> > > KSZ9897 "Clock Mode" is equivalent to KSZ8863 mode described in fourth/fifth
-> > > column (difference is only clock frequency) of table 3-5:
-> > > - EN_REFCLKO = 1, 0xC6(3) = 1 -> 50/25Mhz on X1 pin, 50/25Mhz RMII clock goes
-> > >   to REFCLKI internally. REFCLKI can be pulled down by resistor.
-> > >
-> > > That leaves us with additional columns 2 and 3 of table 3-5 for KSZ8863, that
-> > > are similar to KSZ9897 Clock mode, but REFCLKI needs to be fed externally from
-> > > REFCLKO.
-> > 
-> > All of 5 variants described in "Table 3-5: RMII CLOCK SETTING of KSZ8863"
-> > can be boiled down to two main configurations:
-> > 
-> > REFCLKI is used as clock source for internal MAC == Normal Mode or
-> > RevRMII mode.
-> > REFCLKI is not used as clock source for internal MAC == Clock Mode or
-> > RMII mode.
-> > 
-> > Variants 1, 2, 3 describe only how can we feed REFCLKI from outside of
-> > the chip. Even variant 2 and 3 make the switch to be an actually
-> > physical clock provider, we still need to use REFCLKI and wire it
-> > outside of the chip which make it practically a Normal Mode or RevRMII mode.
-> 
-> That is correct, I guess its a matter of nomenclature, but how do you 
-> "tell" the switch whether it has REFCLKI routed externally or not if not by 
-> setting the 0xC6 bit 3? Is there another way to achieve this?
+When the ipv6 stack output a GSO packet, if its gso_size is larger than
+dst MTU, then all segments would be fragmented. However, it is possible
+for a GSO packet to have a trailing segment with smaller actual size
+than both gso_size as well as the MTU, which leads to an "atomic
+fragment". Atomic fragments are considered harmful in RFC-8021. An
+Existing report from APNIC also shows that atomic fragments are more
+likely to be dropped even it is equivalent to a no-op [1].
 
-I do not see any other way to "tell" it. The only thing to change in you
-patches is a different way to tell it to the kernel.
-Instead of introducing a new devicetree property, you need to reuse
-phy-mode property.
+The series contains following changes:
+* drop feature RTAX_FEATURE_ALLFRAG, which has been broken. This helps
+  simplifying other changes in this set.
+* refactor __ip6_finish_output code to separate GSO and non-GSO packet
+  processing, mirroring IPv4 side logic.
+* avoid generating atomic fragment on GSO packets.
 
-> > > > I already did some work to configure CPU interface, where which can be at least
-> > > > partially reused for your work:
-> > > > https://lore.kernel.org/all/20230517121034.3801640-2-o.rempel@pengutronix.de/
-> > > > (Looks I forgot to complete mainlining for this patch)
-> > > >
-> > > > If implanted as described, no new devicetree properties will be needed.
-> > >
-> > > I don't quite get how the proposed patch might effect this topic?
-> > 
-> > You will need to add ksz8_phylink_mac_link_up() as this patch already
-> > dose.
-> > 
-> > > By setting PHY/MAC mode? As noted, I dont see the same relation between clock and
-> > > MII mode for KSZ8863 as for KSZ9897?
-> > 
-> > I hope current mail will clear it.
-> 
-> I tried your patch but it does not do it for me. As stated, my hw platform does
-> not have REFCLKI routed externally so a state at column 4/5 is expected.
+Link: https://www.potaroo.net/presentations/2022-03-01-ipv6-frag.pdf [1]
 
-My patches do not address your problem. It is just example which already creates
-ksz8_phylink_mac_link_up() and do some CPU port configuration, which you
-will need do too, but for other registers. Or just for get it to avoid
-confusion.
+change log:
+V4 -> V5: minor fixup
+V3 -> V4: cleaned up all RTAX_FEATURE_ALLFRAG code, rather than just
+drop the check at IPv6 output.
+V2 -> V3: split the changes to separate commits as Willem de Bruijn suggested
+V1 is incorrect and omitted
 
-What you need is to set 0xC6 bit 3 for PHY_INTERFACE_MODE_REVRMII and 
-clear it for PHY_INTERFACE_MODE_RMII.
+V4: https://lore.kernel.org/netdev/cover.1698114636.git.yan@cloudflare.com/
+V3: https://lore.kernel.org/netdev/cover.1697779681.git.yan@cloudflare.com/
+V2: https://lore.kernel.org/netdev/ZS1%2Fqtr0dZJ35VII@debian.debian/
 
-Since phy-mode for RMII was never set correctly, it will most probably
-break every single devicetree using KSZ switches. It is the price of fixing
-things :/
+Yan Zhai (3):
+  ipv6: drop feature RTAX_FEATURE_ALLFRAG
+  ipv6: refactor ip6_finish_output for GSO handling
+  ipv6: avoid atomic fragment on GSO packets
 
-Regards,
-Oleksij
+ include/net/dst.h                  |  7 -----
+ include/net/inet_connection_sock.h |  1 -
+ include/net/inet_sock.h            |  1 -
+ include/uapi/linux/rtnetlink.h     |  2 +-
+ net/ipv4/tcp_output.c              | 20 +------------
+ net/ipv6/ip6_output.c              | 45 ++++++++++++++++--------------
+ net/ipv6/tcp_ipv6.c                |  1 -
+ net/ipv6/xfrm6_output.c            |  2 +-
+ net/mptcp/subflow.c                |  1 -
+ 9 files changed, 27 insertions(+), 53 deletions(-)
+
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.30.2
+
+
 
