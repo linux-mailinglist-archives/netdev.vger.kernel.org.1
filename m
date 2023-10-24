@@ -1,94 +1,95 @@
-Return-Path: <netdev+bounces-43911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFA57D54B2
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:08:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 816217D55BA
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:20:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3703B20DEC
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:08:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BF7F281B1F
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D892AB5E;
-	Tue, 24 Oct 2023 15:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1WUcBoE5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A7E636AEE;
+	Tue, 24 Oct 2023 15:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8760213FED
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 15:08:36 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA42210D4
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 08:08:34 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so14890a12.0
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 08:08:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698160113; x=1698764913; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AN6NTJXQ2pnokdJ55KzUK3vWFKSJONMYwiEEr9XTwTo=;
-        b=1WUcBoE5jAg/WuQLxIaaSUMuDWqFijh5KSJJ45vJIyqtDyB07oQ/4NtAU18VhC/p83
-         VpOiWXHcOqWWZqo0OuppQNa5PzD+0DxKl5sZHRHHtFTXiNAFfIu9dCMzqNjmoTSS/SWn
-         o3IAEuEF6QXneU6odsbyEkZIq9ALN3c8QVdjWhVZzECxYgVfiLvVjQ2JFfDA47kT/mxW
-         awtvQNEFcpkNg6OQ1Ughwjvyr5dzB2/IyjQbv7I+ctoSiB9NOIPBGacqMZoupGFsFUWd
-         Sklc6tS2O+idM8PPE1gBb7n793FDCfWiaGuSsOvXkMk+n1smRJAUlg5S4aq7hnxt8Y/M
-         NpgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698160113; x=1698764913;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AN6NTJXQ2pnokdJ55KzUK3vWFKSJONMYwiEEr9XTwTo=;
-        b=qnjHGT510LQ2BcMOvq1fY4r04EIgTZHW5sneieeT4YyDTCSr6tha01GHKDhbbV81xv
-         +I9Ft9pmcsXuXopGkURPsDmV06qfRGv03bWqz/L+kMeliW+rKLSPfHydqh32XEqaXKXM
-         URNQn7ZODYuYxVMz6v8z76XqK/bEkFinrJl3Yw7z2WV2amXbgrE4WqVap0r7IJbdCfa9
-         ummgYYt+LdKlVZxeVet9VSkXhA4gBXvnXA+q4LWYpj3Dp+VaBTQ74PnTA+8Yr1eRpt9N
-         JHCA5XBgEjkHGMcdBYJRqdDG67PEKJWESAhHPbLFPZ149ptLp7+RbhJ93ASe6b9Yhz5y
-         roIA==
-X-Gm-Message-State: AOJu0YwXsVtsRoGBZ02vZGg7ckc5/X+SXDu9AG9sEeaRfXbvFPi2VIEu
-	zssI+HbYgKmUYoChRHs2NVIcnBrUKZTjRCUp4GZ6Fw==
-X-Google-Smtp-Source: AGHT+IGDaQwq8PYlqMHnqY7xaD7BvFZBeaYTGKJoUNgOrP7VfmW9tZsV9kzPV1QQiiG7hgxsqnwAs4uvuzS5I3CUNYY=
-X-Received: by 2002:a05:6402:241b:b0:540:9fd2:f831 with SMTP id
- t27-20020a056402241b00b005409fd2f831mr126967eda.3.1698160112944; Tue, 24 Oct
- 2023 08:08:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C123735884
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 15:20:50 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A9C3C2A
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 08:20:32 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qvJCg-00011d-1o; Tue, 24 Oct 2023 17:20:22 +0200
+Date: Tue, 24 Oct 2023 17:20:22 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Florian Westphal <fw@strlen.de>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Andreas Gruenbacher <agruenba@redhat.com>, devel@linux-ipsec.org,
+	netdev@vger.kernel.org
+Subject: Re: [RFC PATCH ipsec-next] udpencap: Remove Obsolete
+ UDP_ENCAP_ESPINUDP_NON_IKE Support
+Message-ID: <20231024152022.GC29201@breakpoint.cc>
+References: <b604dc470c708e1e70c954f1513e4b461531e7cc.1698136108.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1698156966.git.yan@cloudflare.com> <0e1d4599f858e2becff5c4fe0b5f843236bc3fe8.1698156966.git.yan@cloudflare.com>
-In-Reply-To: <0e1d4599f858e2becff5c4fe0b5f843236bc3fe8.1698156966.git.yan@cloudflare.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 24 Oct 2023 17:08:18 +0200
-Message-ID: <CANn89iK+ektbs1Db=z4+O89HaOLVLK3NbXisWuyLxXQHcpJoNg@mail.gmail.com>
-Subject: Re: [PATCH v5 net-next 2/3] ipv6: refactor ip6_finish_output for GSO handling
-To: Yan Zhai <yan@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Aya Levin <ayal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org, 
-	kernel-team@cloudflare.com, Florian Westphal <fw@strlen.de>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Alexander H Duyck <alexander.duyck@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b604dc470c708e1e70c954f1513e4b461531e7cc.1698136108.git.antony.antony@secunet.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Oct 24, 2023 at 4:26=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wrote=
-:
->
-> Separate GSO and non-GSO packets handling to make the logic cleaner. For
-> GSO packets, frag_max_size check can be omitted because it is only
-> useful for packets defragmented by netfilter hooks. Both local output
-> and GRO logic won't produce GSO packets when defragment is needed. This
-> also mirrors what IPv4 side code is doing.
->
-> Suggested-by: Florian Westphal <fw@strlen.de>
-> Signed-off-by: Yan Zhai <yan@cloudflare.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+Antony Antony <antony.antony@secunet.com> wrote:
+> The UDP_ENCAP_ESPINUDP_NON_IKE mode, introduced into the Linux kernel
+> in 2004 [2], has remained inactive and obsolete for an extended period.
+> 
+> This mode was originally defined in an early version of an IETF draft
+> [1] from 2001. By the time it was integrated into the kernel in 2004 [2],
+> it had already been replaced by UDP_ENCAP_ESPINUDP [3] in later
+> versions of draft-ietf-ipsec-udp-encaps, particularly in version 06.
+> 
+> Over time, UDP_ENCAP_ESPINUDP_NON_IKE has lost its relevance, with no
+> known use cases.
+> 
+> With this commit, we remove support for UDP_ENCAP_ESPINUDP_NON_IKE,
+> simplifying the code base and eliminating unnecessary complexity.
+> 
+> References:
+> [1] https://datatracker.ietf.org/doc/html/draft-ietf-ipsec-udp-encaps-00.txt
+> 
+> [2] Commit that added UDP_ENCAP_ESPINUDP_NON_IKE to the Linux historic
+>     repository.
+> 
+>     Author: Andreas Gruenbacher <agruen@suse.de>
+>     Date: Fri Apr 9 01:47:47 2004 -0700
+> 
+>    [IPSEC]: Support draft-ietf-ipsec-udp-encaps-00/01, some ipec impls need it.
+> 
+> [3] Commit that added UDP_ENCAP_ESPINUDP to the Linux historic
+>     repository.
+> 
+>     Author: Derek Atkins <derek@ihtfp.com>
+>     Date: Wed Apr 2 13:21:02 2003 -0800
+> 
+>     [IPSEC]: Implement UDP Encapsulation framework.
+> 
+> Should I leave the '#define UDP_ENCAP_ESPINUDP_NON_IKE' in the uapi/linux/udp.h?
+> since it is a chnage to ABI?
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Yes, but you can add e.g. append "(obsolete)" or "(not supported
+anymore)" or something like that to the trailing comment.
+
+And you could wrap it in "#ifndef __KERNEL__" to have build breakage
+if anytning in the kernel tries to make use of it.
+
+Patch LGTM.
 
