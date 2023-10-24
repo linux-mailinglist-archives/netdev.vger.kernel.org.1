@@ -1,93 +1,89 @@
-Return-Path: <netdev+bounces-43840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8E0C7D4F8E
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:13:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F11B97D4FCF
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:32:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BF1428195A
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 12:13:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E5C11C20B3D
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 12:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5206B26E22;
-	Tue, 24 Oct 2023 12:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ELKk/21v"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792A41C20;
+	Tue, 24 Oct 2023 12:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33785262BA;
-	Tue, 24 Oct 2023 12:13:12 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA3FEF9;
-	Tue, 24 Oct 2023 05:13:07 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 21F7D240007;
-	Tue, 24 Oct 2023 12:13:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1698149586;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=93RoybtCmurkEhmIcEikf8HjaYFy2otQkCDnAt4Q9kg=;
-	b=ELKk/21vjkPETZrMa4aDzQBq4IDx0/H74mmiNL06MB34Yl/+2q6kw44OHlOe3F5XqibIT2
-	vsv04tEI8l3XtSsLBm8ygRdVQgM6cpCd1YODIunnTCtwWOmxewC/y5+GdKsvM7nrjlvcRZ
-	0Nb9Hztu7D/J1iqK7rrVlf+9wjwBSQu45suHEf95RVgoLU4I17N5JlWzTbleOtP5YU0QNs
-	8erlqmOSckGnRVrieB0s6uQ1Jqy1mQuAp2jB3y4XsKyegNhUsbwEL21xeJ/Ey3denUKuSY
-	0qSjLkJ4uiGdk2OF1I6ryrwoR7fubqZI2RL0FhvlVtZWM1yLbixuAseiOf3Z6w==
-Date: Tue, 24 Oct 2023 14:13:17 +0200 (CEST)
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-cc: Romain Gantois <romain.gantois@bootlin.com>, Rob Herring <robh@kernel.org>, 
-    Luka Perkov <luka.perkov@sartura.hr>, 
-    Konrad Dybcio <konrad.dybcio@somainline.org>, 
-    Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org, 
-    Jakub Kicinski <kuba@kernel.org>, 
-    Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-    Russell King <linux@armlinux.org.uk>, Andy Gross <agross@kernel.org>, 
-    davem@davemloft.net, thomas.petazzoni@bootlin.com, 
-    Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org, 
-    Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-    Florian Fainelli <f.fainelli@gmail.com>, linux-kernel@vger.kernel.org, 
-    Eric Dumazet <edumazet@google.com>, Bjorn Andersson <andersson@kernel.org>, 
-    linux-arm-kernel@lists.infradead.org, 
-    Robert Marko <robert.marko@sartura.hr>, 
-    Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>, 
-    Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next 1/5] net: dt-bindings: Introduce the Qualcomm
- IPQESS Ethernet switch
-In-Reply-To: <7018bf8b-1f89-408e-8649-3788a28f3b1a@linaro.org>
-Message-ID: <0389bcc9-b74e-5394-d15a-17914ec3c1a9@bootlin.com>
-References: <20231023155013.512999-1-romain.gantois@bootlin.com> <20231023155013.512999-2-romain.gantois@bootlin.com> <169808266457.861402.14537617078362005098.robh@kernel.org> <35ec9e4b-21ee-1436-da00-02e11effdc23@bootlin.com> <550cba92-39dc-4e45-beb3-c714d14d9d85@linaro.org>
- <498ee025-b1b7-eafc-3758-993c5d564f67@bootlin.com> <7018bf8b-1f89-408e-8649-3788a28f3b1a@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACE5273D9
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 12:32:47 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7F390;
+	Tue, 24 Oct 2023 05:32:46 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qvGaR-0007R8-2s; Tue, 24 Oct 2023 14:32:43 +0200
+Message-ID: <c36ebd70-0b2c-487f-a7ef-d13256f68c5c@leemhuis.info>
+Date: Tue, 24 Oct 2023 14:32:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-GND-Sasl: romain.gantois@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: Fwd: kernel tried to execute NX-protected page - exploit attempt?
+ (uid: 0) (qbittorrent with tx-nocache-copy)
+Content-Language: en-US, de-DE
+To: Eric Dumazet <edumazet@google.com>, Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ "David S. Miller" <davem@davemloft.net>, Benjamin Poirier
+ <bpoirier@suse.de>, Tom Herbert <therbert@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, CM76 <cmaff76@gmail.com>
+References: <2bf06faa-a0a7-4dee-90cd-a054b4e4c947@gmail.com>
+ <17a017b9-9807-48ef-bc7b-be8f5df750c5@gmail.com>
+ <CANn89iJxCqGeEM2sJbs8TU00Rj-iddoyoabvB7x4eEaPwCKTMA@mail.gmail.com>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <CANn89iJxCqGeEM2sJbs8TU00Rj-iddoyoabvB7x4eEaPwCKTMA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1698150766;a946f30f;
+X-HE-SMSGID: 1qvGaR-0007R8-2s
 
-On Tue, 24 Oct 2023, Krzysztof Kozlowski wrote:
-
-> Rob's bot might be using not-yet-released dtschema from main branch,
-> thus the error. However the error is true: you added a custom field
-> without type. That's why I asked: where is it defined?
+On 24.10.23 11:25, Eric Dumazet wrote:
+> On Tue, Oct 24, 2023 at 10:53 AM Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+>>
+>> On 24/10/2023 15:15, Bagas Sanjaya wrote:
+>>>
+>>> I notice a regression report on Bugzilla [1]. Quoting from it:
+>>>> I believe this is also an issue with the Broadcom bnx2 drivers since it only seem to happen when I enable "tx-nocache-copy" in ethtool.
+>>[...]
+>> Thanks.
+>
+> This has been fixed already two weeks ago.
 > 
+> commit 71c299c711d1f44f0bf04f1fea66baad565240f1
 
-I didn't define it anywhere, that's an oversight on my part. The psgmii_ethphy 
-property is a handle to an MDIO device, which I thought was integrated to the 
-PSGMII bus in the IPQ4019. However, I just learned from Robert Marko that this 
-MDIO device corresponds to a SoC-facing PHY integrated in the external QCA807x 
-IP. Therefore, I'm not convinced that this MDIO device should be handled by 
-the ESS driver.
+Eric, thx for letting us know!
 
-I'm going to have to consider refactoring the psgmii_ethphy handling out of 
-the IPQESS driver, which would make this device tree property unnecessary.
+#regzbot fix: 71c299c711d1f44f0
 
-Best Regards,
+Bagas, maybe in a case like this wait with forwarding the report until
+the reporter confirmed that the bug happens with a really fresh kernel.
 
-Romain
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
+
+
 
