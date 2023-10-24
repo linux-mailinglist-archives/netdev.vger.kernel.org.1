@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-43718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE32F7D44E4
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 03:23:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 028907D44E8
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 03:24:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8E20B20D3B
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:23:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34B0A1C2030D
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3336E523E;
-	Tue, 24 Oct 2023 01:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB37C5396;
+	Tue, 24 Oct 2023 01:24:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z7z1j180"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ErFEmo7p"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EFE1FC8;
-	Tue, 24 Oct 2023 01:23:42 +0000 (UTC)
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C6FED7E;
-	Mon, 23 Oct 2023 18:23:41 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-6b20577ef7bso3107221b3a.3;
-        Mon, 23 Oct 2023 18:23:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2FF5233;
+	Tue, 24 Oct 2023 01:24:41 +0000 (UTC)
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C20A1;
+	Mon, 23 Oct 2023 18:24:40 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6bf03b98b9bso3272618b3a.1;
+        Mon, 23 Oct 2023 18:24:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698110621; x=1698715421; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698110679; x=1698715479; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=vxT89Onvy9DgpB3EuvxkaurRVz8Aot2j7wpkVZCSt1E=;
-        b=Z7z1j180M1vciAOJzt1MjDG87GJJUUQlGoiW9ewGYRj5yTdxTIMvtqVlR35477xvfU
-         J+KuwuDV7EkgHz7WPjTTHT2yVZzw0B4Zc1HTOpMsrU+/r/yPshvJILK0kVrlD5mpaSsq
-         DdkVglnabh+tIKRjJltwRswyASBk0/nbNu6BiSvNM5MpM3DX94k1bhsLiU+hPolPyfcc
-         CkVoFS1SiX7c3eJ6aNdzjBlnyONg5L8L7PbQ+fVaTOne5dmvWdsXVh8TjnvYXaSD1Icd
-         qG6qu5xIidkU7jOUa3V1n/p8PGsw0q1+MjkbKkvqFxMyLQjkAoZwegZWM99OsQCCS3/B
-         mEJg==
+        bh=ukfZ2wDSYwLBJ91J8jVOY9qdOhwfvLQPwRB8zxLyUOI=;
+        b=ErFEmo7p7ozkpEqphqYyv56ZRMyjKo6XCVoLbw6Uwyg+FY7w84knJEVVk0mWOsADNg
+         GFFNsEhAMVnA2FeBKoYSFl8TLb1bVk8YwKWYaO3cy+wKbXGDZWW0YQRiL9BwRXXs89BJ
+         TEkrnAEkb01QcrtPw1NWWHvvwWwp6cbeGi4I7+7lj483x9pAFVh5A4VDoRox2QXbFUhX
+         1PYedkE/ALDilnpQkprtVhmlBEYwECoaKKYow4qR712y037HajHMSllkikuFQvVVvFbM
+         +3kzK0FDK/1F1hKpZ+n6qcL9XM/bdnJP8mHbvEXmmY46IH/YVM4Sww7KFEy9FuJamu/U
+         zTVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698110621; x=1698715421;
+        d=1e100.net; s=20230601; t=1698110679; x=1698715479;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vxT89Onvy9DgpB3EuvxkaurRVz8Aot2j7wpkVZCSt1E=;
-        b=bRQ+nDF2ozQBcU9clrqdQ7A+5YfxP97jm9UsLouUtRW+tnrNXQowdeJcxP0NlEB1Bq
-         Jzxj473SKkKywBmKmbuUt+cMT7dLij1i9yZwlPZF0Yk6ODj7gLAyEkfHoVrXmRFX6eO2
-         Zf5gGPapHjwYnExrtieon8DDhFmKKCFAxAX8JW8snd1kQoztfJFeQjjylj9P4T8gCOPP
-         5PcT0KHP3Y2BDAU8/pyLzBlRZERy/CALOFcLb0G8Cxukz8MqX2q0wTi+IdB32U+FeTs0
-         U3EiS19S8+KBQymt7EqfY3FsPHx6bxfK8X/7o6yykGh+/sK4LEwLecnlPKFi9yLbxMCE
-         KEUA==
-X-Gm-Message-State: AOJu0YxPusFy1aoAAddeYUie2QUkFFVXH12zGoOdzJsw0yfpoU1R1YQV
-	6F9ZelqYTnrL4+luMplxpE0=
-X-Google-Smtp-Source: AGHT+IFyJTrr1k8dZgbHJbUjxTyylZZqBW+c/o9YmZ+W14ir0mKK4KPFD4NZmMqtEEzuV1417gw7Ww==
-X-Received: by 2002:a05:6a00:114f:b0:693:3cac:7897 with SMTP id b15-20020a056a00114f00b006933cac7897mr7872482pfm.9.1698110620939;
-        Mon, 23 Oct 2023 18:23:40 -0700 (PDT)
+        bh=ukfZ2wDSYwLBJ91J8jVOY9qdOhwfvLQPwRB8zxLyUOI=;
+        b=s7cqwdM6ljlYS+hgIAB+cDdPMbqkU2+RZcwbeCP8w318HDWnHjUCrh8NjXdtqxPCtj
+         xIojQnweItBVl0XbYBroFeXuLRG/CJ5t30vV4bBSaU1nmr73buMKckPcyoM7yMe0/Pi5
+         1y+8dUhqez7OTK1L78N8xPIyGbD7ZTqr1aXzi6SQGEhikCwGX6RLmaILRROZeH/5T41C
+         DdyaHHA4st92Ubk1NO4zvaT8Ch2u6OqJzLmkq/TqILhckfV0t96QCCiM42+NTjMc5D0o
+         rp0fcAp0GVVTUA19+7ijV39Am5Dl/6y5WY4kAVrbLfC7jXUmtLXarWD6iWjblYeJgRuW
+         QRKA==
+X-Gm-Message-State: AOJu0YxhRf78DNuWL1gjVvoKFksffk7pOAfBlX7lbakvijWAZ7plDuh8
+	xYazlwPntYrsxvRBLlpJpbM=
+X-Google-Smtp-Source: AGHT+IGagaBk//v+ZsQAZyQEwmI9Bg10n7RdkSy4LBgqGC0ayG6zxzVzATqffWGzqW1pR7hX1mXQZQ==
+X-Received: by 2002:a05:6a20:da9a:b0:17a:e2b9:77e0 with SMTP id iy26-20020a056a20da9a00b0017ae2b977e0mr1778169pzb.7.1698110679359;
+        Mon, 23 Oct 2023 18:24:39 -0700 (PDT)
 Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id k3-20020aa79d03000000b006bc3e8f58besm6757110pfp.56.2023.10.23.18.23.38
+        by smtp.gmail.com with ESMTPSA id k3-20020aa79d03000000b006bc3e8f58besm6757110pfp.56.2023.10.23.18.24.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Oct 2023 18:23:40 -0700 (PDT)
-Message-ID: <2f12beb1-ff94-4806-8ed7-e78eb8474a7d@gmail.com>
-Date: Mon, 23 Oct 2023 18:23:37 -0700
+        Mon, 23 Oct 2023 18:24:38 -0700 (PDT)
+Message-ID: <1bb56c00-d7b1-4a81-8fd8-49e05d36a506@gmail.com>
+Date: Mon, 23 Oct 2023 18:24:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/8] r8152: Increase USB control msg timeout to 5000ms
- as per spec
+Subject: Re: [PATCH v5 2/8] r8152: Run the unload routine if we have errors
+ during probe
 Content-Language: en-US
 To: Douglas Anderson <dianders@chromium.org>, Jakub Kicinski
  <kuba@kernel.org>, Hayes Wang <hayeswang@realtek.com>,
@@ -80,7 +80,7 @@ Cc: Edward Hill <ecgh@chromium.org>, Laura Nao <laura.nao@collabora.com>,
  Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 References: <20231020210751.3415723-1-dianders@chromium.org>
- <20231020140655.v5.1.I6e4fb5ae61b4c6ab32058cb12228fd5bd32da676@changeid>
+ <20231020140655.v5.2.Ica8e16a84695e787d55e54e291fbf8a28e7f2f7b@changeid>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -115,38 +115,18 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231020140655.v5.1.I6e4fb5ae61b4c6ab32058cb12228fd5bd32da676@changeid>
+In-Reply-To: <20231020140655.v5.2.Ica8e16a84695e787d55e54e291fbf8a28e7f2f7b@changeid>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 10/20/2023 2:06 PM, Douglas Anderson wrote:
-> According to the comment next to USB_CTRL_GET_TIMEOUT and
-> USB_CTRL_SET_TIMEOUT, although sending/receiving control messages is
-> usually quite fast, the spec allows them to take up to 5 seconds.
-> Let's increase the timeout in the Realtek driver from 500ms to 5000ms
-> (using the #defines) to account for this.
-> 
-> This is not just a theoretical change. The need for the longer timeout
-> was seen in testing. Specifically, if you drop a sc7180-trogdor based
-> Chromebook into the kdb debugger and then "go" again after sitting in
-> the debugger for a while, the next USB control message takes a long
-> time. Out of ~40 tests the slowest USB control message was 4.5
-> seconds.
-> 
-> While dropping into kdb is not exactly an end-user scenario, the above
-> is similar to what could happen due to an temporary interrupt storm,
-> what could happen if there was a host controller (HW or SW) issue, or
-> what could happen if the Realtek device got into a confused state and
-> needed time to recover.
-> 
-> This change is fairly critical since the r8152 driver in Linux doesn't
-> expect register reads/writes (which are backed by USB control
-> messages) to fail.
+> The rtl8152_probe() function lacks a call to the chip-specific
+> unload() routine when it sees an error in probe. Add it in to match
+> the cleanup code in rtl8152_disconnect().
 > 
 > Fixes: ac718b69301c ("net/usb: new driver for RTL8152")
-> Suggested-by: Hayes Wang <hayeswang@realtek.com>
 > Signed-off-by: Douglas Anderson <dianders@chromium.org>
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
