@@ -1,74 +1,59 @@
-Return-Path: <netdev+bounces-43891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ABE07D5387
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:00:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5F9A7D538B
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 274D01C20C6F
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:00:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 662B51C20BEA
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807F52B765;
-	Tue, 24 Oct 2023 14:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="eqpEzEDI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C202B765;
+	Tue, 24 Oct 2023 14:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E6B125DE
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 14:00:01 +0000 (UTC)
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0347F10EF
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 06:59:59 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-52bd9ddb741so6947440a12.0
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 06:59:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698155997; x=1698760797; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SgdX192KFs5xjFiQY9Esfa/RVC4h8fO0VTXfZSLKSz0=;
-        b=eqpEzEDInlHlslZ+v3NLgYMsK6LpydrTC2e/F2dhoOw2dLa+HAqEXL3WKXz4KPW2Fd
-         cl4sQpUz88tWGzyweoZgKy4mRu7lmCeTfPu2AbWXrJ5fh06Fse1VFgTQ6z4L2O/zvgwt
-         dYhHQ5LvvNy6T6K+gzsd1RN3g1D/NGVFmQS6d4C5pi6ivQZDEQFGZvmGTsvcaRjpm/6f
-         X13DhMLZBKDogkn4WgyM0na8I7TaO0BFyoYsUSnGsSgLkwFvGG5RLoeEmkfMVxfK361V
-         fTm+Kvv2d15bfkwMq8V9l4lQ1iNTYxHP4vfBlarIWrSWXm9IH3yO+cBIvr18Qfrgomt6
-         rEjA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11806125DE;
+	Tue, 24 Oct 2023 14:00:38 +0000 (UTC)
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B6710D4;
+	Tue, 24 Oct 2023 07:00:37 -0700 (PDT)
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-584042e7f73so2635324eaf.2;
+        Tue, 24 Oct 2023 07:00:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698155997; x=1698760797;
+        d=1e100.net; s=20230601; t=1698156037; x=1698760837;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SgdX192KFs5xjFiQY9Esfa/RVC4h8fO0VTXfZSLKSz0=;
-        b=ay8tmgZLiGCtopFVJuM3X8jagWhFicRA/eXLJDzenPRAYA/LDDL7TdLsJFXpt/AUlS
-         m/kmvhz+ON4Iz+OKQE3b4LYhIpf0ZZ8j/QyWuSxX0Dv9xpIIymX/sbwDz0By3XmPW+vw
-         if0WvGkRER3fKxkmwxyAkXhaZA1O1QkBhj3/iQYNEaa0yCf+JYEo1+cvzyxXjROtq7HY
-         H43b6bfzovA1OJz0bUb2gUQi8wBDGn9J0ayg/AeCytjRSNh7m8/IQsK/IvuzC9VURUgL
-         Fvd/3UomJm1793rL8qiY5iIuja0/DdGBBVEQ8psFEgf8MFXMKHADEy/x/KbbkX7aCFqt
-         /WLg==
-X-Gm-Message-State: AOJu0YxpolCigF0okq3m20cmWPGKlKSd7A3FLb8Hh0RN83s/s+sFORdI
-	LMKXpslQ7f0dtuWuebRoZQF5Lw==
-X-Google-Smtp-Source: AGHT+IEOqSVuyPBWT2PEqpT8k//S2BmNYh48OAyoFg4PNFz48+TogLO7Km36A6Ryl0V8LASW4amubg==
-X-Received: by 2002:a05:6402:2707:b0:540:3a46:cdcd with SMTP id y7-20020a056402270700b005403a46cdcdmr6418116edd.29.1698155997370;
-        Tue, 24 Oct 2023 06:59:57 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id o2-20020a509b02000000b0053db0df6970sm8138765edi.54.2023.10.24.06.59.56
+        bh=4H3TWjIQjf85zyBxIKv34+QRRIwX3a8rnrmF0O3dKsg=;
+        b=s/EV7EcOt5icWCFfLL3dpeLoFzNdHnSJC/smlmqm+yWNYlrikJ/9yU9dnlbzWXsmMp
+         wF6hiqUxxfH8wshEgsl/YpynM9CMhTcC0lPwetdhE1AFz1sOn0TMIG6U+OkWHU2mNjCS
+         hwNkEkF9jTNyhv6YRij8i9EJUjhFu1qLf96gnwE2ANETiznKnNnoTWkoPyJp7qVW2xjL
+         8S6hyHfxYoOAcdZiMSHGSP69BlLnXXJ9pfMF3x2LzFmj4YxjKNpfu/y49zgfxActq6YH
+         TZ8jvfGDz3XjKMM+dVY7lD0rYjg4LtrHleR5vg1CJjvlnmOymIQarKEF9OJcVP2Ife14
+         9Blw==
+X-Gm-Message-State: AOJu0YwOGZisC+2dUWFtfZr4/n1zXvn21ZaJ0yiZrC0GNzYQQsscX1XC
+	Mw+EzCdJ3gIp7IitlLGh0w==
+X-Google-Smtp-Source: AGHT+IH90mhjSMFC6luigjMC7lPfefuM1k+Kx6QDH0HCVGUzuacnelhYBUjr/MSrx7O9d++RvMeWuw==
+X-Received: by 2002:a4a:d6c5:0:b0:57b:8ff1:f482 with SMTP id j5-20020a4ad6c5000000b0057b8ff1f482mr12021472oot.0.1698156035973;
+        Tue, 24 Oct 2023 07:00:35 -0700 (PDT)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id w6-20020a9d6746000000b006ce33ba6474sm1865133otm.4.2023.10.24.07.00.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 06:59:56 -0700 (PDT)
-Date: Tue, 24 Oct 2023 15:59:55 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	piotr.raczynski@intel.com, wojciech.drewek@intel.com,
-	marcin.szycik@intel.com, jacob.e.keller@intel.com,
-	przemyslaw.kitszel@intel.com, jesse.brandeburg@intel.com
-Subject: Re: [PATCH iwl-next v1 00/15] one by one port representors creation
-Message-ID: <ZTfN22fHri3vKWyF@nanopsycho>
-References: <20231024110929.19423-1-michal.swiatkowski@linux.intel.com>
- <ZTeveEZ1W/zejDuM@nanopsycho>
- <ZTfCVsYtbwSg9nZ/@wasp>
+        Tue, 24 Oct 2023 07:00:34 -0700 (PDT)
+Received: (nullmailer pid 3550335 invoked by uid 1000);
+	Tue, 24 Oct 2023 14:00:33 -0000
+Date: Tue, 24 Oct 2023 09:00:33 -0500
+From: Rob Herring <robh@kernel.org>
+To: Alexander Stein <alexander.stein@ew.tq-group.com>
+Cc: Philipp Zabel <p.zabel@pengutronix.de>, David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, Amit Kucheria <amitk@kernel.org>, Zhang Rui <rui.zhang@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, NXP Linux Team <linux-imx@nxp.com>, dri-devel@lists.freedesktop.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, linux-pm@vger.kernel.org
+Subject: Re: [PATCH 0/6] imx6q related DT binding fixes
+Message-ID: <20231024140033.GA3544257-robh@kernel.org>
+References: <20230810144451.1459985-1-alexander.stein@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,99 +62,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZTfCVsYtbwSg9nZ/@wasp>
+In-Reply-To: <20230810144451.1459985-1-alexander.stein@ew.tq-group.com>
 
-Tue, Oct 24, 2023 at 03:10:46PM CEST, michal.swiatkowski@linux.intel.com wrote:
->On Tue, Oct 24, 2023 at 01:50:16PM +0200, Jiri Pirko wrote:
->> Tue, Oct 24, 2023 at 01:09:14PM CEST, michal.swiatkowski@linux.intel.com wrote:
->> >Hi,
->> >
->> >Currently ice supports creating port representors only for VFs. For that
->> >use case they can be created and removed in one step.
->> >
->> >This patchset is refactoring current flow to support port representor
->> >creation also for subfunctions and SIOV. In this case port representors
->> >need to be createad and removed one by one. Also, they can be added and
->> >removed while other port representors are running.
->> >
->> >To achieve that we need to change the switchdev configuration flow.
->> >Three first patches are only cosmetic (renaming, removing not used code).
->> >Next few ones are preparation for new flow. The most important one
->> >is "add VF representor one by one". It fully implements new flow.
->> >
->> >New type of port representor (for subfunction) will be introduced in
->> >follow up patchset.
->> 
->> Examples please. Show new outputs of devlink commands.
->> 
->> Thanks!
->>
->
->If you mean outputs after refactor to one by one solution nothing
->has changed:
->
-># devlink port show (after creating 4 VFs in switchdev mode)
->pci/0000:18:00.0/0: type eth netdev ens785f0np0 flavour physical port 0 splittable true lanes 8
->pci/0000:18:00.0/2: type eth netdev ens785f0np0_0 flavour pcivf controller 0 pfnum 0 vfnum 0 external false splittable false
->pci/0000:18:00.0/4: type eth netdev ens785f0np0_3 flavour pcivf controller 0 pfnum 0 vfnum 3 external false splittable false
->pci/0000:18:00.0/5: type eth netdev ens785f0np0_1 flavour pcivf controller 0 pfnum 0 vfnum 1 external false splittable false
->pci/0000:18:00.0/6: type eth netdev ens785f0np0_2 flavour pcivf controller 0 pfnum 0 vfnum 2 external false splittable false
->
->According subfunction, it will also be in cover latter for patchset that
->is implementing subfunction.
->
->Commands:
-># devlink dev eswitch set pci/0000:18:00.0 mode switchdev
-># devlink port add pci/0000:18:00.0 flavour pcisf pfnum 0 sfnum 1000
-># devlink port function set pci/0000:18:00.0/3 state active
->
->Outputs:
->Don't have it saved, will send it here after rebasing subfunction of top
->of this one.
+On Thu, Aug 10, 2023 at 04:44:45PM +0200, Alexander Stein wrote:
+> Hi everyone,
+> 
+> while working on i.MX6Q based board (arch/arm/boot/dts/nxp/imx/imx6q-mba6a.dts)
+> I noticed several warnings on dtbs_check. The first 5 patches should be pretty
+> much straight forward.
+> I'm not 100% sure on the sixth patch, as it might be affected by incorrect
+> compatible lists. Please refer to the note in that patch.
+> I'm also no sure whether thse patches warrent a Fixes tag, so I only added that
+> for patch 3. All of these patches are independent and can be picked up
+> individually.
+> 
+> Best regards,
+> Alexander
+> 
+> Alexander Stein (6):
+>   dt-bindings: trivial-devices: Remove national,lm75
+>   dt-bindings: imx-thermal: Add #thermal-sensor-cells property
+>   dt-bindings: display: imx: hdmi: Allow 'reg' and 'interrupts'
+>   dt-bindings: net: microchip: Allow nvmem-cell usage
+>   dt-bindings: timer: add imx7d compatible
+>   dt-bindings: timer: fsl,imxgpt: Add optional osc_per clock
 
-Ah, I was under impression it is part of this set. Sorry.
+I noticed this is the top warning for 32-bit i.MX[1] and found this. 
+Looks like 5 and 6 never got applied, so I've applied them.
 
+Rob
 
->
->Thanks,
->Michal
->
->> >
->> >Michal Swiatkowski (15):
->> >  ice: rename switchdev to eswitch
->> >  ice: remove redundant max_vsi_num variable
->> >  ice: remove unused control VSI parameter
->> >  ice: track q_id in representor
->> >  ice: use repr instead of vf->repr
->> >  ice: track port representors in xarray
->> >  ice: remove VF pointer reference in eswitch code
->> >  ice: make representor code generic
->> >  ice: return pointer to representor
->> >  ice: allow changing SWITCHDEV_CTRL VSI queues
->> >  ice: set Tx topology every time new repr is added
->> >  ice: realloc VSI stats arrays
->> >  ice: add VF representors one by one
->> >  ice: adjust switchdev rebuild path
->> >  ice: reserve number of CP queues
->> >
->> > drivers/net/ethernet/intel/ice/ice.h          |  13 +-
->> > drivers/net/ethernet/intel/ice/ice_devlink.c  |  29 +
->> > drivers/net/ethernet/intel/ice/ice_devlink.h  |   1 +
->> > drivers/net/ethernet/intel/ice/ice_eswitch.c  | 562 ++++++++++--------
->> > drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +-
->> > .../net/ethernet/intel/ice/ice_eswitch_br.c   |  22 +-
->> > drivers/net/ethernet/intel/ice/ice_lib.c      |  81 ++-
->> > drivers/net/ethernet/intel/ice/ice_main.c     |   6 +-
->> > drivers/net/ethernet/intel/ice/ice_repr.c     | 195 +++---
->> > drivers/net/ethernet/intel/ice/ice_repr.h     |   9 +-
->> > drivers/net/ethernet/intel/ice/ice_sriov.c    |  20 +-
->> > drivers/net/ethernet/intel/ice/ice_tc_lib.c   |   4 +-
->> > drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   9 +-
->> > drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   2 +-
->> > 14 files changed, 553 insertions(+), 422 deletions(-)
->> >
->> >-- 
->> >2.41.0
->> >
->> >
+[1] https://gitlab.com/robherring/linux-dt/-/jobs/5361483372/artifacts/external_file/platform-warnings.log
 
