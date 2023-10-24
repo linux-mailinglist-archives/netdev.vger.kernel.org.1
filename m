@@ -1,89 +1,100 @@
-Return-Path: <netdev+bounces-43841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F11B97D4FCF
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:32:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB6E7D501B
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:43:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E5C11C20B3D
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 12:32:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D6EB1C209B8
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 12:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792A41C20;
-	Tue, 24 Oct 2023 12:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B787266A2;
+	Tue, 24 Oct 2023 12:43:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CTF3gqvq"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACE5273D9
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 12:32:47 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7F390;
-	Tue, 24 Oct 2023 05:32:46 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qvGaR-0007R8-2s; Tue, 24 Oct 2023 14:32:43 +0200
-Message-ID: <c36ebd70-0b2c-487f-a7ef-d13256f68c5c@leemhuis.info>
-Date: Tue, 24 Oct 2023 14:32:42 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB5B26295
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 12:43:10 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4389D186
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 05:43:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698151388;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Q8xEvrw5kPl+Kn6m0vz2m9HYGcHh0NovL+ylnmM6Mjc=;
+	b=CTF3gqvqg38ltDWqgRtBDR9glMUjUbN8OYvjgviy4OYBi6z8KKsLdDrSw1NCB7iv+nVLfW
+	SNdMFBCiE8so5GymzHJyUV2uQjELmt5pL/uY+ogRstFk1zt45RgUw20h0PUBUsd02uSWZj
+	Lhw6MlkB+ean3ZiDlk/BZwnWMt8tZY8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-8snoKRPkNl-P2UWdzztT7A-1; Tue, 24 Oct 2023 08:42:50 -0400
+X-MC-Unique: 8snoKRPkNl-P2UWdzztT7A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AA90B85C1A5;
+	Tue, 24 Oct 2023 12:42:49 +0000 (UTC)
+Received: from p1.luc.com (unknown [10.43.2.183])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 239342166B26;
+	Tue, 24 Oct 2023 12:42:48 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH 1/2] i40e: Do not call devlink_port_type_clear()
+Date: Tue, 24 Oct 2023 14:42:44 +0200
+Message-ID: <20231024124245.837908-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Fwd: kernel tried to execute NX-protected page - exploit attempt?
- (uid: 0) (qbittorrent with tx-nocache-copy)
-Content-Language: en-US, de-DE
-To: Eric Dumazet <edumazet@google.com>, Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux Memory Management List <linux-mm@kvack.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- "David S. Miller" <davem@davemloft.net>, Benjamin Poirier
- <bpoirier@suse.de>, Tom Herbert <therbert@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, CM76 <cmaff76@gmail.com>
-References: <2bf06faa-a0a7-4dee-90cd-a054b4e4c947@gmail.com>
- <17a017b9-9807-48ef-bc7b-be8f5df750c5@gmail.com>
- <CANn89iJxCqGeEM2sJbs8TU00Rj-iddoyoabvB7x4eEaPwCKTMA@mail.gmail.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <CANn89iJxCqGeEM2sJbs8TU00Rj-iddoyoabvB7x4eEaPwCKTMA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1698150766;a946f30f;
-X-HE-SMSGID: 1qvGaR-0007R8-2s
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On 24.10.23 11:25, Eric Dumazet wrote:
-> On Tue, Oct 24, 2023 at 10:53 AM Bagas Sanjaya <bagasdotme@gmail.com> wrote:
->>
->> On 24/10/2023 15:15, Bagas Sanjaya wrote:
->>>
->>> I notice a regression report on Bugzilla [1]. Quoting from it:
->>>> I believe this is also an issue with the Broadcom bnx2 drivers since it only seem to happen when I enable "tx-nocache-copy" in ethtool.
->>[...]
->> Thanks.
->
-> This has been fixed already two weeks ago.
-> 
-> commit 71c299c711d1f44f0bf04f1fea66baad565240f1
+Do not call devlink_port_type_clear() prior devlink port unregister
+and let devlink core to take care about it.
 
-Eric, thx for letting us know!
+Reproducer:
+[root@host ~]# rmmod i40e
+[ 4539.964699] i40e 0000:02:00.0: devlink port type for port 0 cleared without a software interface reference, device type not supported by the kernel?
+[ 4540.319811] i40e 0000:02:00.1: devlink port type for port 1 cleared without a software interface reference, device type not supported by the kernel?
 
-#regzbot fix: 71c299c711d1f44f0
+Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_devlink.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Bagas, maybe in a case like this wait with forwarding the report until
-the reporter confirmed that the bug happens with a really fresh kernel.
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
-
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+index 74bc111b4849..cc4e9e2addb7 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+@@ -231,6 +231,5 @@ int i40e_devlink_create_port(struct i40e_pf *pf)
+  **/
+ void i40e_devlink_destroy_port(struct i40e_pf *pf)
+ {
+-	devlink_port_type_clear(&pf->devlink_port);
+ 	devlink_port_unregister(&pf->devlink_port);
+ }
+-- 
+2.41.0
 
 
