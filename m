@@ -1,253 +1,165 @@
-Return-Path: <netdev+bounces-43695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FF3D7D445C
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 02:57:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9EF37D4465
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 03:01:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD1EB1C20B13
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 00:56:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EC26B20CB0
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC021863;
-	Tue, 24 Oct 2023 00:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C922187D;
+	Tue, 24 Oct 2023 01:01:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bWet3xyc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S3g9tnY+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99DF97E;
-	Tue, 24 Oct 2023 00:56:53 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DDD210E;
-	Mon, 23 Oct 2023 17:56:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=78+m0X28g+8K5fIS7BSl6fCBE5Ci01OLZTR2J9ZW1K4=; b=bW
-	et3xycyU6pd/IilZVvr/W60pMyg8jDYcWaWrsakzeGtJBPGJm+6EyueGFx5HUHZQvJla6ZYoqp9EF
-	LQUowD3SjVmArluMRq2HAvW3I8R+w+iaX236FuwicHclWDy3zmlA9fAI441J+OpyWcphlLTCAR9+p
-	gitztlkGwuGLQvc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qv5ir-0001eZ-O7; Tue, 24 Oct 2023 02:56:41 +0200
-Date: Tue, 24 Oct 2023 02:56:41 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
-	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [PATCH net-next v2 5/9] net: ethernet: oa_tc6: implement
- internal PHY initialization
-Message-ID: <5c240b3b-60c2-45bb-8861-e3a8de28d00f@lunn.ch>
-References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
- <20231023154649.45931-6-Parthiban.Veerasooran@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B0A7E;
+	Tue, 24 Oct 2023 01:01:47 +0000 (UTC)
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E21CC;
+	Mon, 23 Oct 2023 18:01:45 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id ca18e2360f4ac-7a950f1451fso19532539f.1;
+        Mon, 23 Oct 2023 18:01:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698109305; x=1698714105; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gCnGJIAkzmcBzTAXnOhGKfxN6A+3ny8E52Dd47yc1qU=;
+        b=S3g9tnY+wuTcVwy/m+Mdt1/jqI4n29fKLV/EE5TK7fQ31banfYQqmGXyNj9MtHhWRc
+         iR4Wi1CxhXFYj7yG9q0mwFCOfYK6Kmh6nul++IcCaw5Odv2poO7aAj5Mcgk/+QM1FTjg
+         3h1lmXO+66876+BrcyE5UupoaujPFkm63jJzWEVKHphx/RTno1M8svSsuOYdvZgrHG3e
+         w1a+G6UUg8R2ziQvT7zw4Acth+wqrldBs1XRCyBfaToG7hHRa6Nz2NMXXYi2UFJ3VgBb
+         MUv2ydrO8YQuzMtlG8Hl3XDdPo+mz6zS7dXEn7TYO4e6R1pc0VuleG7AyeW9QGu+fovF
+         ljjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698109305; x=1698714105;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gCnGJIAkzmcBzTAXnOhGKfxN6A+3ny8E52Dd47yc1qU=;
+        b=FHgFwE6fJFx8yFaRQ3lRNldhcbD+4tenQ6xM0OeHwOhsUL6P/2drmZAqIzzoqEXmI+
+         v2NIW+vbEwRQWaLG5obhnFVeSSrTL5GD/XAwVSXtK79jiillSzihmeS7KuOHBW3lFHdu
+         6bw5cPpr+gwE+tlJCBjflxtTM3zxrVaNQX8EgnOL7TCh3gbJxgiBqD+xxpeFPFg4mPNc
+         LgDI3cCl8ckgt8/J+7L7RVMlg0cDK5z1q38gVtjHEUMewQ6V4B03U0pz7vPhSXPJ6yZv
+         unCijwJl/xM19d7zkmroJnJOdSTx+1CqbHmt3zxLxA+khnCm4kivzvsynmfXSZT8Xete
+         4u2w==
+X-Gm-Message-State: AOJu0YyoyI3eK9zn0BPxSDLt3pCkDoD4fgh+4z4ywi+dc7w0PA9QDWPW
+	FVahaRmdDu8G1sAZRgiz1ooYWt0usj4yMg==
+X-Google-Smtp-Source: AGHT+IEeDAK829vqiJsRQ6gDAFuWRAlAV7CRBgvgYPt278LIF2C8l7wDX3QOMspbbVHhJ76NjC51cA==
+X-Received: by 2002:a05:6e02:320a:b0:357:4682:d128 with SMTP id cd10-20020a056e02320a00b003574682d128mr11555538ilb.1.1698109304864;
+        Mon, 23 Oct 2023 18:01:44 -0700 (PDT)
+Received: from ip-172-30-47-114.us-west-2.compute.internal (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id k6-20020aa78206000000b006be077531aesm6707888pfi.220.2023.10.23.18.01.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Oct 2023 18:01:44 -0700 (PDT)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: netdev@vger.kernel.org
+Cc: rust-for-linux@vger.kernel.org,
+	andrew@lunn.ch,
+	tmgross@umich.edu,
+	miguel.ojeda.sandonis@gmail.com,
+	benno.lossin@proton.me,
+	wedsonaf@gmail.com,
+	greg@kroah.com
+Subject: [PATCH net-next v6 0/5] Rust abstractions for network PHY drivers
+Date: Tue, 24 Oct 2023 09:58:37 +0900
+Message-Id: <20231024005842.1059620-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231023154649.45931-6-Parthiban.Veerasooran@microchip.com>
 
-> +	/* Minimum supported Chunk Payload Size */
->  	mincps = FIELD_GET(MINCPS, regval);
-> +	/* Cut-Through Capability */
->  	ctc = (regval & CTC) ? true : false;
+This patchset adds Rust abstractions for phylib. It doesn't fully
+cover the C APIs yet but I think that it's already useful. I implement
+two PHY drivers (Asix AX88772A PHYs and Realtek Generic FE-GE). Seems
+they work well with real hardware.
 
-These comment should be in the patch which added these, not here.
+The first patch introduces Rust bindings for phylib.
 
-> +	/* Direct PHY Register Access Capability */
-> +	dprac = (regval & DPRAC) ? true : false;
-> +	/* Indirect PHY Register access Capability */
-> +	iprac = (regval & IPRAC) ? true : false;
->  
->  	regval = 0;
->  	oa_node = of_get_child_by_name(spi->dev.of_node, "oa-tc6");
-> @@ -242,7 +257,7 @@ static int oa_tc6_configure(struct oa_tc6 *tc6)
->  			if (tc6->cps < mincps)
->  				return -ENODEV;
->  		} else {
-> -			tc6->cps = 64;
-> +			tc6->cps = OA_TC6_MAX_CPS;
+The second patch add a macro to declare a kernel module for PHYs
+drivers.
 
-This also should of been in an earlier patch.
+The third patch add Miguel's work to make sure that the C's enum is
+sync with Rust sides. If not, compiling fails. Note that this is a
+temporary solution. It will be replaced with bindgen when it supports
+generating the enum conversion code.
 
->  		}
->  		if (of_property_present(oa_node, "oa-txcte")) {
->  			/* Return error if the tx cut through mode is configured
-> @@ -266,8 +281,26 @@ static int oa_tc6_configure(struct oa_tc6 *tc6)
->  			regval |= PROTE;
->  			tc6->prote = true;
->  		}
-> +		if (of_property_present(oa_node, "oa-dprac")) {
-> +			/* Return error if the direct phy register access mode
-> +			 * is configured but it is not supported by MAC-PHY.
-> +			 */
-> +			if (dprac)
-> +				tc6->dprac = true;
-> +			else
-> +				return -ENODEV;
-> +		}
+The fourth add the Rust ETHERNET PHY LIBRARY entry to MAINTAINERS
+file; adds the binding file and me as a maintainer (as Andrew Lunn
+suggested) with Trevor Gross as a reviewer.
 
-This is not in the binding. Why do we even need to be able to
-configure it. Direct is faster, so use it is available. If not, use
-indirect. And if both dprac and iproc are false, dev_err() and
--ENODEV.
+The last patch introduces the Rust version of Asix PHY drivers,
+drivers/net/phy/ax88796b.c. The features are equivalent to the C
+version. You can choose C (by default) or Rust version on kernel
+configuration.
 
-> +static int oa_tc6_mdiobus_read(struct mii_bus *bus, int phy_id, int idx)
+v6:
+  - improves comments
+  - makes the requirement of phy_drivers_register clear
+  - fixes Makefile of the third patch
+v5: https://lore.kernel.org/all/20231019.094147.1808345526469629486.fujita.tomonori@gmail.com/T/
+  - drops the rustified-enum option, writes match by hand; no *risk* of UB
+  - adds Miguel's patch for enum checking
+  - moves CONFIG_RUST_PHYLIB_ABSTRACTIONS to drivers/net/phy/Kconfig
+  - adds a new entry for this abstractions in MAINTAINERS
+  - changes some of Device's methods to take &mut self
+  - comment improvment
+v4: https://lore.kernel.org/netdev/20231012125349.2702474-1-fujita.tomonori@gmail.com/T/
+  - split the core patch
+  - making Device::from_raw() private
+  - comment improvement with code update
+  - commit message improvement
+  - avoiding using bindings::phy_driver in public functions
+  - using an anonymous constant in module_phy_driver macro
+v3: https://lore.kernel.org/netdev/20231011.231607.1747074555988728415.fujita.tomonori@gmail.com/T/
+  - changes the base tree to net-next from rust-next
+  - makes this feature optional; only enabled with CONFIG_RUST_PHYLIB_BINDINGS=y
+  - cosmetic code and comment improvement
+  - adds copyright
+v2: https://lore.kernel.org/netdev/20231006094911.3305152-2-fujita.tomonori@gmail.com/T/
+  - build failure fix
+  - function renaming
+v1: https://lore.kernel.org/netdev/20231002085302.2274260-3-fujita.tomonori@gmail.com/T/
 
-It would be good to put direct in the name. If somebody implements
-indirect, it will make the naming easier.
+FUJITA Tomonori (4):
+  rust: core abstractions for network PHY drivers
+  rust: net::phy add module_phy_driver macro
+  MAINTAINERS: add Rust PHY abstractions for ETHERNET PHY LIBRARY
+  net: phy: add Rust Asix PHY driver
 
-> +{
-> +	struct oa_tc6 *tc6 = bus->priv;
-> +	u32 regval;
-> +	bool ret;
-> +
-> +	ret = oa_tc6_read_register(tc6, 0xFF00 | (idx & 0xFF), &regval);
-> +	if (ret)
-> +		return -ENODEV;
-> +
-> +	return regval;
-> +}
-> +
-> +static int oa_tc6_mdiobus_write(struct mii_bus *bus, int phy_id, int idx,
-> +				u16 val)
-> +{
-> +	struct oa_tc6 *tc6 = bus->priv;
-> +
-> +	return oa_tc6_write_register(tc6, 0xFF00 | (idx & 0xFF), val);
-> +}
-> +
-> +static int oa_tc6_phy_init(struct oa_tc6 *tc6)
-> +{
-> +	int ret;
-> +
-> +	if (tc6->dprac) {
+Miguel Ojeda (1):
+  rust: add second `bindgen` pass for enum exhaustiveness checking
 
-You can avoid the indentation by first checking indirect is the only
-choice, and doing a dev_err() followed by return -ENODEV.
+ MAINTAINERS                          |  16 +
+ drivers/net/phy/Kconfig              |  16 +
+ drivers/net/phy/Makefile             |   6 +-
+ drivers/net/phy/ax88796b_rust.rs     | 129 +++++
+ rust/.gitignore                      |   1 +
+ rust/Makefile                        |  14 +
+ rust/bindings/bindings_enum_check.rs |  36 ++
+ rust/bindings/bindings_helper.h      |   3 +
+ rust/kernel/lib.rs                   |   3 +
+ rust/kernel/net.rs                   |   6 +
+ rust/kernel/net/phy.rs               | 837 +++++++++++++++++++++++++++
+ rust/uapi/uapi_helper.h              |   2 +
+ 12 files changed, 1068 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/phy/ax88796b_rust.rs
+ create mode 100644 rust/bindings/bindings_enum_check.rs
+ create mode 100644 rust/kernel/net.rs
+ create mode 100644 rust/kernel/net/phy.rs
 
-> +		tc6->mdiobus = mdiobus_alloc();
-> +		if (!tc6->mdiobus) {
-> +			netdev_err(tc6->netdev, "MDIO bus alloc failed\n");
-> +			return -ENODEV;
-> +		}
-> +
-> +		tc6->mdiobus->phy_mask = ~(u32)BIT(1);
 
-Does the standard define this ? BIT(1), not BIT(0)?
+base-commit: f4dbc2bb7a54d3bff234a9f1915f1b7187bedb1f
+-- 
+2.34.1
 
->  /**
->   * oa_tc6_init - allocates and intializes oa_tc6 structure.
->   * @spi: device with which data will be exchanged.
-> - * @prote: control data (register) read/write protection enable/disable.
-
-Something else which should of been in the previous patch. Please look
-through this patch and find all the other instances.
-
-> + * @netdev: network device to use.
->   *
->   * Returns pointer reference to the oa_tc6 structure if all the memory
->   * allocation success otherwise NULL.
->   */
-> -struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
-> +struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
->  {
->  	struct oa_tc6 *tc6;
->  
-> @@ -395,15 +521,19 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
->  	if (!tc6)
->  		return NULL;
->  
-> +	/* Allocate memory for the control tx buffer used for SPI transfer. */
->  	tc6->ctrl_tx_buf = devm_kzalloc(&spi->dev, TC6_CTRL_BUF_SIZE, GFP_KERNEL);
->  	if (!tc6->ctrl_tx_buf)
->  		return NULL;
->  
-> +	/* Allocate memory for the control rx buffer used for SPI transfer. */
->  	tc6->ctrl_rx_buf = devm_kzalloc(&spi->dev, TC6_CTRL_BUF_SIZE, GFP_KERNEL);
->  	if (!tc6->ctrl_rx_buf)
->  		return NULL;
->  
->  	tc6->spi = spi;
-> +	tc6->netdev = netdev;
-> +	SET_NETDEV_DEV(netdev, &spi->dev);
->  
->  	/* Perform MAC-PHY software reset */
->  	if (oa_tc6_sw_reset(tc6)) {
-> @@ -417,10 +547,27 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
->  		return NULL;
->  	}
->  
-> +	/* Initialize PHY */
-> +	if (oa_tc6_phy_init(tc6)) {
-> +		dev_err(&spi->dev, "PHY initialization failed\n");
-> +		return NULL;
-> +	}
-> +
->  	return tc6;
->  }
->  EXPORT_SYMBOL_GPL(oa_tc6_init);
->  
-> +/**
-> + * oa_tc6_exit - exit function.
-> + * @tc6: oa_tc6 struct.
-> + *
-> + */
-> +void oa_tc6_exit(struct oa_tc6 *tc6)
-> +{
-> +	oa_tc6_phy_exit(tc6);
-> +}
-> +EXPORT_SYMBOL_GPL(oa_tc6_exit);
-> +
->  MODULE_DESCRIPTION("OPEN Alliance 10BASE‑T1x MAC‑PHY Serial Interface Lib");
->  MODULE_AUTHOR("Parthiban Veerasooran <parthiban.veerasooran@microchip.com>");
->  MODULE_LICENSE("GPL");
-> diff --git a/include/linux/oa_tc6.h b/include/linux/oa_tc6.h
-> index 378636fd9ca8..36b729c384ac 100644
-> --- a/include/linux/oa_tc6.h
-> +++ b/include/linux/oa_tc6.h
-> @@ -5,54 +5,59 @@
->   * Author: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
->   */
->  
-> +#include <linux/etherdevice.h>
->  #include <linux/spi/spi.h>
->  
->  /* Control header */
-> -#define CTRL_HDR_DNC		BIT(31)		/* Data-Not-Control */
-> -#define CTRL_HDR_HDRB		BIT(30)		/* Received Header Bad */
-> -#define CTRL_HDR_WNR		BIT(29)		/* Write-Not-Read */
-> -#define CTRL_HDR_AID		BIT(28)		/* Address Increment Disable */
-> -#define CTRL_HDR_MMS		GENMASK(27, 24)	/* Memory Map Selector */
-> -#define CTRL_HDR_ADDR		GENMASK(23, 8)	/* Address */
-> -#define CTRL_HDR_LEN		GENMASK(7, 1)	/* Length */
-> -#define CTRL_HDR_P		BIT(0)		/* Parity Bit */
-> +#define CTRL_HDR_DNC	BIT(31)		/* Data-Not-Control */
-> +#define CTRL_HDR_HDRB	BIT(30)		/* Received Header Bad */
-> +#define CTRL_HDR_WNR	BIT(29)		/* Write-Not-Read */
-> +#define CTRL_HDR_AID	BIT(28)		/* Address Increment Disable */
-> +#define CTRL_HDR_MMS	GENMASK(27, 24)	/* Memory Map Selector */
-> +#define CTRL_HDR_ADDR	GENMASK(23, 8)	/* Address */
-> +#define CTRL_HDR_LEN	GENMASK(7, 1)	/* Length */
-> +#define CTRL_HDR_P	BIT(0)		/* Parity Bit */
-
-Please don't change the whitespace like this.
-
-       Andrew
 
