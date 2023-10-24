@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-43712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94F0A7D44D3
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 03:18:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30F8A7D44D4
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 03:18:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C72A31C20B86
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:18:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A90EEB20D91
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 01:18:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06124C92;
-	Tue, 24 Oct 2023 01:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527F54C92;
+	Tue, 24 Oct 2023 01:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L2xKkHIJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dz4M7w1S"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CA453AC
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 01:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85E24538B
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 01:18:36 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDD37E8
-	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:18:22 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47047E8
+	for <netdev@vger.kernel.org>; Mon, 23 Oct 2023 18:18:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698110302; x=1729646302;
+  t=1698110314; x=1729646314;
   h=subject:from:to:cc:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+KcOBDTK4rHYWMAz2vQJFUNrOZmjHZ07yuvduJ/FdTs=;
-  b=L2xKkHIJo0EygnUjB7QUWRtCA4KiYHyfhOVLeAPeAwF0isDypttzVW7m
-   eSQslusYaSnt7NzhfaXJIdR+S/O9eIEkeaF/bC69JlgwwjCTJIzV9NvOl
-   r/V+PqIKvtXQY/8yuH/30cFPJ9MoCI+6eoV9ws2lZvyZKpYc4htQAIYs0
-   sWp9Td6OETkC4nInHFnhFVrQ3yU0WLUJdQ0/EFEaSyMZLXowzmcy89SoC
-   xg0DxZqi5NNuPBIMwj8H6kje9P3JFIHPuUhPoTIJNeiiP0kg4vHkh7n/Q
-   X0nzlc0+YkEp2HXqSjpzkCMFtBtLpqspL0Md0RSWTNLdkgt8DDFy0sFxT
+  bh=a9LVXHurYKFCbDSAuLWms+xCRHwWjM8hzWSV2F6+5Zw=;
+  b=dz4M7w1SiSD/IeNHuWaHmgsvDbZ2BX0II3o/iuegfwAnrFZOIvon7YOY
+   dvJKZ0l+GInKa//2kI0ieBGGZ86b1dbfD1i6bBZr/skAIAl1NUQ5LCNmK
+   RAg9VJiICCPLaNEWccdDQgi8zTvR3OnhGhrphai1ykkJnrS6P3wWz5NZK
+   1LRniGsAAJr1JFW6Jf4sY7pEI2GEFhHgJhNUITRNY3Yu0kn6TAyAu6zvR
+   AVqYEfiTq6ME8d0Ig8qyI9LRtwCovRe8pQkFdHS4Btivm6IbjXb98bQVs
+   UhLX7OTnO+zkrc/cu499DCwcgnzXaSVTKonzp5R5ABaoNXOulCVKcS2RD
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="366305785"
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="366305815"
 X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="366305785"
+   d="scan'208";a="366305815"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 18:18:22 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2023 18:18:28 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="761938444"
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="761938458"
 X-IronPort-AV: E=Sophos;i="6.03,246,1694761200"; 
-   d="scan'208";a="761938444"
+   d="scan'208";a="761938458"
 Received: from anambiarhost.jf.intel.com ([10.166.29.163])
-  by fmsmga007.fm.intel.com with ESMTP; 23 Oct 2023 18:18:22 -0700
-Subject: [net-next PATCH v6 08/10] net: Add NAPI IRQ support
+  by fmsmga007.fm.intel.com with ESMTP; 23 Oct 2023 18:18:27 -0700
+Subject: [net-next PATCH v6 09/10] netdev-genl: spec: Add PID in netdev
+ netlink YAML spec
 From: Amritha Nambiar <amritha.nambiar@intel.com>
 To: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
 Cc: sridhar.samudrala@intel.com, amritha.nambiar@intel.com
-Date: Mon, 23 Oct 2023 18:34:01 -0700
-Message-ID: <169811124126.59034.7955140077923696489.stgit@anambiarhost.jf.intel.com>
+Date: Mon, 23 Oct 2023 18:34:06 -0700
+Message-ID: <169811124667.59034.10304395300563829113.stgit@anambiarhost.jf.intel.com>
 In-Reply-To: <169811096816.59034.13985871730113977096.stgit@anambiarhost.jf.intel.com>
 References: <169811096816.59034.13985871730113977096.stgit@anambiarhost.jf.intel.com>
 User-Agent: StGit/unknown-version
@@ -65,82 +66,107 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-Add support to associate the interrupt vector number for a
-NAPI instance.
+Add support in netlink spec(netdev.yaml) for PID of the
+NAPI thread. Add code generated from the spec.
 
 Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
 Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_lib.c |    2 ++
- include/linux/netdevice.h                |    6 ++++++
- net/core/dev.c                           |    1 +
- net/core/netdev-genl.c                   |    4 ++++
- 4 files changed, 13 insertions(+)
+ Documentation/netlink/specs/netdev.yaml |    5 +++++
+ include/uapi/linux/netdev.h             |    1 +
+ tools/include/uapi/linux/netdev.h       |    1 +
+ tools/net/ynl/generated/netdev-user.c   |    6 ++++++
+ tools/net/ynl/generated/netdev-user.h   |    2 ++
+ 5 files changed, 15 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index e2c24853376f..9662fbfef366 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -2968,6 +2968,8 @@ void ice_q_vector_set_napi_queues(struct ice_q_vector *q_vector, bool locked)
- 	ice_for_each_tx_ring(tx_ring, q_vector->tx)
- 		ice_queue_set_napi(tx_ring->q_index, NETDEV_QUEUE_TYPE_TX,
- 				   &q_vector->napi, locked);
-+	/* Also set the interrupt number for the NAPI */
-+	netif_napi_set_irq(&q_vector->napi, q_vector->irq.virq);
- }
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index 2faa69d5752f..9ddb1d0b37dc 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -108,6 +108,10 @@ attribute-sets:
+         name: irq
+         doc: The associated interrupt vector number for the napi
+         type: u32
++      -
++        name: pid
++        doc: PID of the napi thread
++        type: s32
+   -
+     name: queue
+     attributes:
+@@ -198,6 +202,7 @@ operations:
+             - napi-id
+             - ifindex
+             - irq
++            - pid
+       dump:
+         request:
+           attributes:
+diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+index d461915aa514..a13fb55b2dde 100644
+--- a/include/uapi/linux/netdev.h
++++ b/include/uapi/linux/netdev.h
+@@ -73,6 +73,7 @@ enum {
+ 	NETDEV_A_NAPI_IFINDEX = 1,
+ 	NETDEV_A_NAPI_NAPI_ID,
+ 	NETDEV_A_NAPI_IRQ,
++	NETDEV_A_NAPI_PID,
  
- /**
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index f1e0d23a5465..361e814542ec 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -382,6 +382,7 @@ struct napi_struct {
- 	/* control-path-only fields follow */
- 	struct list_head	dev_list;
- 	struct hlist_node	napi_hash_node;
-+	int			irq;
+ 	__NETDEV_A_NAPI_MAX,
+ 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
+diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
+index d461915aa514..a13fb55b2dde 100644
+--- a/tools/include/uapi/linux/netdev.h
++++ b/tools/include/uapi/linux/netdev.h
+@@ -73,6 +73,7 @@ enum {
+ 	NETDEV_A_NAPI_IFINDEX = 1,
+ 	NETDEV_A_NAPI_NAPI_ID,
+ 	NETDEV_A_NAPI_IRQ,
++	NETDEV_A_NAPI_PID,
+ 
+ 	__NETDEV_A_NAPI_MAX,
+ 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
+diff --git a/tools/net/ynl/generated/netdev-user.c b/tools/net/ynl/generated/netdev-user.c
+index a3060531b42e..ca9a68f6bd72 100644
+--- a/tools/net/ynl/generated/netdev-user.c
++++ b/tools/net/ynl/generated/netdev-user.c
+@@ -102,6 +102,7 @@ struct ynl_policy_attr netdev_napi_policy[NETDEV_A_NAPI_MAX + 1] = {
+ 	[NETDEV_A_NAPI_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
+ 	[NETDEV_A_NAPI_NAPI_ID] = { .name = "napi-id", .type = YNL_PT_U32, },
+ 	[NETDEV_A_NAPI_IRQ] = { .name = "irq", .type = YNL_PT_U32, },
++	[NETDEV_A_NAPI_PID] = { .name = "pid", .type = YNL_PT_U32, },
  };
  
- enum {
-@@ -2646,6 +2647,11 @@ void __netif_queue_set_napi(unsigned int queue_index,
- 			    enum netdev_queue_type type,
- 			    struct napi_struct *napi);
+ struct ynl_policy_nest netdev_napi_nest = {
+@@ -400,6 +401,11 @@ int netdev_napi_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
+ 				return MNL_CB_ERROR;
+ 			dst->_present.irq = 1;
+ 			dst->irq = mnl_attr_get_u32(attr);
++		} else if (type == NETDEV_A_NAPI_PID) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.pid = 1;
++			dst->pid = mnl_attr_get_u32(attr);
+ 		}
+ 	}
  
-+static inline void netif_napi_set_irq(struct napi_struct *napi, int irq)
-+{
-+	napi->irq = irq;
-+}
-+
- /* Default NAPI poll() weight
-  * Device drivers are strongly advised to not use bigger value
-  */
-diff --git a/net/core/dev.c b/net/core/dev.c
-index d02c7a0ce4bc..adf20fa02b93 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6507,6 +6507,7 @@ void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
- 	 */
- 	if (dev->threaded && napi_kthread_create(napi))
- 		dev->threaded = 0;
-+	napi->irq = -1;
- }
- EXPORT_SYMBOL(netif_napi_add_weight);
+diff --git a/tools/net/ynl/generated/netdev-user.h b/tools/net/ynl/generated/netdev-user.h
+index 947932a9359b..6836633cf6da 100644
+--- a/tools/net/ynl/generated/netdev-user.h
++++ b/tools/net/ynl/generated/netdev-user.h
+@@ -215,11 +215,13 @@ struct netdev_napi_get_rsp {
+ 		__u32 napi_id:1;
+ 		__u32 ifindex:1;
+ 		__u32 irq:1;
++		__u32 pid:1;
+ 	} _present;
  
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index d6ef7fc093d0..ad4b1ee0a2d1 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -167,7 +167,11 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
- 	if (nla_put_u32(rsp, NETDEV_A_NAPI_IFINDEX, napi->dev->ifindex))
- 		goto nla_put_failure;
+ 	__u32 napi_id;
+ 	__u32 ifindex;
+ 	__u32 irq;
++	__s32 pid;
+ };
  
-+	if (napi->irq >= 0 && nla_put_u32(rsp, NETDEV_A_NAPI_IRQ, napi->irq))
-+		goto nla_put_failure;
-+
- 	genlmsg_end(rsp, hdr);
-+
- 	return 0;
- 
- nla_put_failure:
+ void netdev_napi_get_rsp_free(struct netdev_napi_get_rsp *rsp);
 
 
