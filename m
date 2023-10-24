@@ -1,89 +1,177 @@
-Return-Path: <netdev+bounces-44000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0314D7D5CA5
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 22:55:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8928E7D5CBA
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 22:58:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88115B20F99
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:54:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35C87281A91
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4FE3A29C;
-	Tue, 24 Oct 2023 20:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF603CCEC;
+	Tue, 24 Oct 2023 20:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="OiXrljXO"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1OR2An/b"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E282241E1
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 20:54:54 +0000 (UTC)
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A50410CE;
-	Tue, 24 Oct 2023 13:54:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=eczaaR5q+CGZ3I8qy3H/FRI3HwlrnLDnYPRKVQMfxDw=;
-	t=1698180893; x=1699390493; b=OiXrljXOE0GtZC+BppNsSdVulyWEQ2XZjnTE+VrLHk2Cjwd
-	ldNI5DrVw5h3I534dfl6In0+hqaZGstI2x9DwIAhoCYzLWgWG/GgJdhJy2XzrZ8eK3WqOegb06EQB
-	wKfF3lIcqvpQn8BSWblJ156GyA/hFn9TlJfbfexhIvhTg979aemGAiefiDDge7ZKUHnynOeFRZCx1
-	H46GHV7XZfhaodpXAOQPBh+yCrH5+EKnmwuqGetbX/0xA93LhMsmDVJDH0bzfJ5ZhGDiYtT67P4S0
-	4fnTgS94272yIC61vQZa9JZOeep5GcoE6JUenlTCNlczbF8+yZkOJLuIj/U4emOw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97-RC1)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1qvOQM-00000001bj2-3kYI;
-	Tue, 24 Oct 2023 22:54:51 +0200
-Message-ID: <f53b015defece9c4b29fbecfaa6fc50d2f299a39.camel@sipsolutions.net>
-Subject: Re: pull-request: wireless-2023-10-24
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Date: Tue, 24 Oct 2023 22:54:50 +0200
-In-Reply-To: <20231024135208.3e40b69a@kernel.org>
-References: <20231024103540.19198-2-johannes@sipsolutions.net>
-	 <169817882433.2839.2840092877928784369.git-patchwork-notify@kernel.org>
-	 <1020bbec6fd85d55f0862b1aa147afbd25de3e74.camel@sipsolutions.net>
-	 <20231024135208.3e40b69a@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4202420A
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 20:58:09 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF8CEE5;
+	Tue, 24 Oct 2023 13:58:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fJJZkI+E6B70cwLuwkzJztPpydBmNN2zVZWw2Pq+4OISX1g7M15w73xKjPFVERAKv4yn4GHXZQlszBRD2OBFSzAbEIf5YLIISBLyKvU4xKhdmczYt6KarqDdP3zdz3gSg/0P6ZADbLXX4iQHAjsimny4zclIZxnGleSHb0ElvrLi0zimuAi0w/ndMNPLrl88hhoD8Fr7Dyp4kq+zro2zbMQNNlhWycFLWhqLixfXx3qz1HAUOTu12vLXICgHFo8Ivq4Le3jWtAa6ko5pHwCK4dcDdgTzNVvEGYJrvNPOG5Zg7XnZzkhf32C95ApS9WOHwN0mzBfWTscC9CHmrOfoXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qTuw1hZXtOTINltcUsdgTW4XtPdXmLCObXPMnryJKKU=;
+ b=XTen9RjhoHMC0N+69cNq50pIT6Q9X3abN0P0SXMeVTv2+bGZk0FkaunbRRhxFNgFr7gnaOD4vYwMaZPytOMUoeKPZMaB/T3TBYnAy8v3w1jPBUJG/K7hWJA4+O6zuB6mgrAijzbVIjNcDsX2KcLRufxWUMFGAVXfmqkzKrXXQvk9QMSnjAVo8qy1Q83ej7mJY0+40HCLVOGIU7neFWOdlpXgBlXeUK6AZJhAAEd7BUS+06rXYNGOF3pw/qkoKAYQQbEydFYccHHlJXOyhSjs5wNJ28zm4X8Fx7lGHxEDWQJnzbgrrPOMp8Q/zPiZTCCzuaUV82bE4LPW26RM9tsKEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qTuw1hZXtOTINltcUsdgTW4XtPdXmLCObXPMnryJKKU=;
+ b=1OR2An/b5hQEL5gOInI5bgZvRCe4QvSIfSOwRQKvInhnvrP93J9NqFxMeZLjTVobxn3cbf0Aq8QIyt73EL+bi/QZHshDpg+xKdiIKu21hpBCyRE0liROGM8FEzo4xsNry5EMvwPpAcT0jcnir5L8d7o9oOE+gRVgjrjmvra07G4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ CH3PR12MB9098.namprd12.prod.outlook.com (2603:10b6:610:19e::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Tue, 24 Oct
+ 2023 20:58:03 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::3d14:1fe0:fcb0:958c]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::3d14:1fe0:fcb0:958c%2]) with mapi id 15.20.6933.019; Tue, 24 Oct 2023
+ 20:58:03 +0000
+Message-ID: <c50f2d3d-98dd-4194-9080-81298dd0563c@amd.com>
+Date: Tue, 24 Oct 2023 13:58:00 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] amd/pds_core: core: No need for Null pointer check before
+ kfree
+To: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>,
+ brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231024182051.48513-1-bragathemanick0908@gmail.com>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20231024182051.48513-1-bragathemanick0908@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PH8PR07CA0036.namprd07.prod.outlook.com
+ (2603:10b6:510:2cf::9) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|CH3PR12MB9098:EE_
+X-MS-Office365-Filtering-Correlation-Id: a31801d8-21b8-4ce6-fc2b-08dbd4d3e9be
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	YG6H9zH5Lj4e2vGcxXKamJ6Jrfl2tFMu9XryWmMl1AQx+6Q5eZ0bDH2c4EvRHYx/HH4Bhc8OoL2dUgZzlMI83mAtJmbXly9x+oRhdIcOL8ISXzjdMGxntu5qmOZeVu2PyaANHZoZSEhiJ4hptv+qhYvSJR6f3yrPK+QyIxBpE4F18mLulYLC7ovVL1ndxJNIjkDaJADXdzdLvvwD0NYrs2XPqMfbLIzPJq4g5nLG5pAoq7bBox90YWdK2ZyFEGemL9FU3SeHm0EgBq2HDh557mMSc57LNyN2XOoTsFGi3xYwxk7wGwGcv79F8Fc2MsQirpPl5ql+Fy70kE9siC3jt41+OzWTq6sJ0e3rarHZiAtOXWy6CbWvlxEcvIpy2tRliFxg+4DEIvsfDOnDHJizzgORHIa9nHGy2drtsMEuEUuDCznHLYN5jBOBjpls/E/iNvxIhoZ8z6/LdVyQmry9b93gjYH9azNKnLHSooCOpRhdmRukFlZPMomQSI8SUMcv+brTIFwqz6mNmIADZVCgFOGxyo5SJaC9PNe6+s+BD+e+GN/rdzk2XBGjkuy4KBwaDxQJCRJhNnOPWnqqaB37usacjNO1yLhXQhOYk7GT86mR0iBhvNiPT2o2inqcciGETNd3+nntXl/4fvPzfcsXqw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(366004)(346002)(39860400002)(136003)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(83380400001)(31686004)(2906002)(36756003)(4326008)(8676002)(26005)(53546011)(8936002)(2616005)(38100700002)(6506007)(66476007)(6512007)(478600001)(6486002)(316002)(31696002)(5660300002)(86362001)(66946007)(41300700001)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZjJKSlc4Q21mN0lVV2ZKdVNkN2tMRzBPNTVjMHljUEY1U3VnTkZodGVzNFVE?=
+ =?utf-8?B?MGlxRDQ5ZEtRa2lrWkhJMzZmMGFTYlJrTDRYVDZwZ3Bab204MHYrVlpuSFow?=
+ =?utf-8?B?VUhIQUlLMzJ0QnNQaFZWTkkzY1FTT3c0ZGhXbU5kQW5LdTB1bmQzbExyQ3dF?=
+ =?utf-8?B?aTJzWVpoVURaai9RNWJQVU9oS3ZHcjk2VlZoY3ZOZlhRS0d4K0wwbEh1VlVM?=
+ =?utf-8?B?RWwwOHNOaG9QSUJ6eHI3cTBoYysyY0YvSDdIaW5jbjF1K2VNVlQrNkFEOHJW?=
+ =?utf-8?B?RjY3WlhKWGxjbmdOUWNrYk5pRGFsOHQ5VGN5TDBXYTYxT2J5VEUybm92YjNn?=
+ =?utf-8?B?amZzQXlIWlRwd2JtMzJEeWl2VUVPc0sxdkdnOHQwVVZic001SE03T0xmdjc3?=
+ =?utf-8?B?TTFpcWxnUHFka1Z5ZVFFZ2c2OTJyWFJxZjV6U0JPYVIyZ3F0QmJCYmxLS0Fa?=
+ =?utf-8?B?ZEw5NlJXdkpHUWNRT09mU1Yzb3FqTUU0TmRlbGJHOWJDN0s1VGJqQU82dUxL?=
+ =?utf-8?B?LzJVRjBzR0dVcDdOUjVMa2pJc3JhMUNUS1FJN2hheEVsQUlva1lRWjF0aWNK?=
+ =?utf-8?B?amVPUS9LV0NIRUxUV2hKYmpzNm9NdUVSMVJGMFZXZ3pVOVFCQloyRGtiVERI?=
+ =?utf-8?B?ZVExOUh5QjZRMmlBUDZtMngzd1BrNFl3azhjblYwdzdhK001SE1sUjB6enpU?=
+ =?utf-8?B?K2tvb0s0RDEwK0Z3N2t4R3QwOU1vS09LUkd0bFY4UTZKYVVKejVLUzVTL3JU?=
+ =?utf-8?B?d2tEQkcwWk14UjlMQ1BnSWlxVkt1cklRSFpERllZeXU2YXcyOG9FZG11SkJK?=
+ =?utf-8?B?c0hGSGEyMEN0UTEzT2h0SG5UM04xVmRxUHVMMVQvRjl0cGlKUUI2UnNkZmc1?=
+ =?utf-8?B?TEJwN2xtOVFQWmpYRkJsTjU1UkpxcitOSkJ4dmFacEtwSHVOb0VDSEhjdjZn?=
+ =?utf-8?B?YjRpSlNGVHhQYUJJNFNiSFE5R1VVK1ZiWHJvMi9hZ2g2b1A0dVZaMzNmM2s1?=
+ =?utf-8?B?Y2JxMHVtbVhWaXorZldZWXk0YWNqNVE1U2pIcVNYTkhlNUFKbHAxbDVMeVhB?=
+ =?utf-8?B?V1hhNyswKzg1NldSdFZ1MEhZRnRXdGp3aUZUMGExbFkwYTJZeXZtYWE1Mkc3?=
+ =?utf-8?B?amVNYXRiT3pQUFc0MjgxMHFMRjhCQ1hZT0VOemIxeUlBNC9nNmRBaUdaeVNa?=
+ =?utf-8?B?SXVHKzlZdzc0a3NwK3h3TlJOMHhSUGlYRHdLMEdveC9TNDdrd0RyL3YrcFEx?=
+ =?utf-8?B?cmNjWWM5T1NSNkVVM1UydXEyTzBkb25BeVhMWmNubWdqOW4zWDJTTjZEbktW?=
+ =?utf-8?B?UXZpRE5HSldtUDR0K3MyKzhURmFxOXd4YlpkZnBwZGZPNmVYaTl4VlZvY0VX?=
+ =?utf-8?B?dFRoUVd1aW5jYWY1UVl2T0E0QXZwOUY0aGpUM0c1bHBOUFYxZmlEeVZLNkNV?=
+ =?utf-8?B?RFp4VjdTbmJJQU5BWmtjbE1PNkNITmtuOXhIdVBHS2V0YzE0SkZETVpJdXpS?=
+ =?utf-8?B?WlNGZGdhQldDNTR5TXlEcGhjZXB0VWk2TFZtS1d3OEZzbU9GMXJ4K1dFQ3Bj?=
+ =?utf-8?B?MENTZW92cGpBakkrTk1ZZFdEenRtbzNab2RqeExqUnVFcnFTbmR5ekhBeGZ4?=
+ =?utf-8?B?Um1CQnoyVERDVGplN2QzaGdlYUtYbFZDbExKRktVVVNWOGN5dUw2MzRXNDVG?=
+ =?utf-8?B?ekRqMnJBNnZrQ3FlckVDbWg0L1dJM1BpYVowYjJkYlZJY0s4L3NNY3VmWDNl?=
+ =?utf-8?B?dG1KbFk0ZnUzNzFqbjFEejJScUVPL01XNGsxU1poYVhqQ3dGa01Hek05MlBW?=
+ =?utf-8?B?QzdRRmVmVXdwK0VKUEUyVHFkUjlLZWF2OVRBc0EwSHQ4dUVucGtkS05JdWMw?=
+ =?utf-8?B?aEVnUXBVc0ZXOS9LcDZSZHc2VHh5ZUFnK3hkKzNyVmtUM3lQeGhrM1o4QW5a?=
+ =?utf-8?B?RndKcElWSDVxSXEwUFM4U0VKNmxVL1hDQjI5bTZNUkxuNHNvbWFycEZrL1pU?=
+ =?utf-8?B?T3pkTStsVmpsTFZ4WmpoRkZlU0d6RVc0SU1PNFZmbTN3UnpISjRCOGc3S0pB?=
+ =?utf-8?B?VUF1WE50cDRrcnZIeHlmYTcyQUczN2w0N2R2ZWtTZ0tIdG1BN0UxWnhvUlpP?=
+ =?utf-8?Q?4BRaFBH46fxuqoAC0wRa7UFHO?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a31801d8-21b8-4ce6-fc2b-08dbd4d3e9be
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 20:58:02.9941
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: F77bqHzjDjTPuUM7phe0uh1WzXWJuuX36I0Ems6RY+SOpNrQeiuAmxrk29QGdme7vjSnDdc1Kv6iMf6TIGpXgg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9098
 
-On Tue, 2023-10-24 at 13:52 -0700, Jakub Kicinski wrote:
-> On Tue, 24 Oct 2023 22:25:18 +0200 Johannes Berg wrote:
-> > Are you planning to merge net into net-next really soon for some reason=
-?
->=20
-> Submitting on Wed did cross my mind, but there's no solid plan.
-> Unless that changes, Paolo will submit net on Thursday, EU time.
-> And we'll cross-merge once Linux pulls.=20
+On 10/24/2023 11:20 AM, Bragatheswaran Manickavel wrote:
+> 
+> kfree()/vfree() internally perform NULL check on the
+> pointer handed to it and take no action if it indeed is
+> NULL. Hence there is no need for a pre-check of the memory
+> pointer before handing it to kfree()/vfree().
+> 
+> Issue reported by ifnullfree.cocci Coccinelle semantic
+> patch script.
+> 
+> Signed-off-by: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
 
-OK, sounds good.
+Thanks -sln
 
-> > If not, I can resolve this conflict and we'll include it in the next
-> > (and last) wireless-next pull request, which will be going out Thursday
-> > morning (Europe time.)
->=20
-> Sounds good! But do you need to do the resolution to put something=20
-> on top? Otherwise we can deal with the conflict when pulling.
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
 
-No, not really, nothing left that's not in wireless-next already (I
-think), except maybe some tiny cleanups.
 
-Just trying to make it easier for you, even if it's really not a complex
-conflict :)
-
-johannes
-
+> ---
+>   drivers/net/ethernet/amd/pds_core/core.c | 7 ++-----
+>   1 file changed, 2 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
+> index 2a8643e167e1..0d2091e9eb28 100644
+> --- a/drivers/net/ethernet/amd/pds_core/core.c
+> +++ b/drivers/net/ethernet/amd/pds_core/core.c
+> @@ -152,11 +152,8 @@ void pdsc_qcq_free(struct pdsc *pdsc, struct pdsc_qcq *qcq)
+>                  dma_free_coherent(dev, qcq->cq_size,
+>                                    qcq->cq_base, qcq->cq_base_pa);
+> 
+> -       if (qcq->cq.info)
+> -               vfree(qcq->cq.info);
+> -
+> -       if (qcq->q.info)
+> -               vfree(qcq->q.info);
+> +       vfree(qcq->cq.info);
+> +       vfree(qcq->q.info);
+> 
+>          memset(qcq, 0, sizeof(*qcq));
+>   }
+> --
+> 2.34.1
+> 
 
