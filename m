@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-43993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 735C67D5C28
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 22:10:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808E97D5C27
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 22:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23F80281AFE
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B10AF1C20CFE
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FEC03E47F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B49C3E475;
 	Tue, 24 Oct 2023 20:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NK+R+GBK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u+fOitUn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BBD3E477
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 20:10:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 99FC5C433CB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03CA3D99C;
+	Tue, 24 Oct 2023 20:10:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 89610C433C8;
 	Tue, 24 Oct 2023 20:10:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1698178227;
-	bh=Yd89YpvY02OQcJfs/E3uCkgXbsOGXDhxmyHcx/Wrs8s=;
+	bh=FweFrBA5GoLxt0rHJp8rpoAgZynSyNvlwoeW27A/aDc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NK+R+GBKCE2A7PgCh7Rb1Vy08IdvcaIxvfBo3N5XeM3yVmng66iDv1rmm72DnAFaA
-	 gosWHEnBHD79bnqJTvyABCIkzMAT6uqmNOTbG4u4cVU0nfU8Ou5cFgt3mRGWf7Qine
-	 s5pYQIuHsbDxAF6TQmoqQO9odWqmSV0nZS+L6u6afCDWf1JtI3fENkbn11FXxDfIfq
-	 hg3PDRiXgbe5PXAkapmYbVNGVrq7FOC4eErXnyQeOT4a4qF5CxP9xJY5DDwGPB3n+h
-	 wNSDRninbMw4AuQbPVFxiLzmj8l9dC/pirfLUdRyAlNPJG6xE5fjMBCWNVT3agJRGG
-	 FE9hqgBc+g6Sw==
+	b=u+fOitUnMI6sk1vrqU8xsdm9scrwsT766/QdKWFUFVP8fgl6NANwxL8LtyzhcVmNn
+	 BZpsrEJ6GoiibPlgNQlXdG0P9X9aLV4KogInpR/MwGglwLYLP9l9dEV44w+6/jOj+8
+	 pgcwS2M6CMuahc+H1/ZsTCUapjk2FaKXeRfgyo/E0TqwmI4sXWOLm9ggkD0aptmuif
+	 5Tdz310Y2aDmyRWn+5UQRhjWeO9WhEV5NeFgiPNMr1imJpTz9EVsO3Mnv7oFZ8HUND
+	 UGXCkG9/xbLdz5ttkCqGo7adgKjBpWxsNrP0ua3p7aIRcIT/vSPWcy6/lo4kyg4X1K
+	 TPTYdB6ph52GA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7B967C3959F;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E81DC00446;
 	Tue, 24 Oct 2023 20:10:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,40 +43,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tsnep: Fix tsnep_request_irq() format-overflow
- warning
+Subject: Re: [PATCH net-next v2 0/7] mptcp: convert Netlink code to use YAML
+ spec
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169817822750.29692.18015497545388889511.git-patchwork-notify@kernel.org>
+ <169817822744.29692.7677408637061312181.git-patchwork-notify@kernel.org>
 Date: Tue, 24 Oct 2023 20:10:27 +0000
-References: <20231023183856.58373-1-gerhard@engleder-embedded.com>
-In-Reply-To: <20231023183856.58373-1-gerhard@engleder-embedded.com>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, lkp@intel.com
+References: <20231023-send-net-next-20231023-1-v2-0-16b1f701f900@kernel.org>
+In-Reply-To: <20231023-send-net-next-20231023-1-v2-0-16b1f701f900@kernel.org>
+To: Mat Martineau <martineau@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, matttbe@kernel.org, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, horms@kernel.org, dcaratti@redhat.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 23 Oct 2023 20:38:56 +0200 you wrote:
-> Compiler warns about a possible format-overflow in tsnep_request_irq():
-> drivers/net/ethernet/engleder/tsnep_main.c:884:55: warning: 'sprintf' may write a terminating nul past the end of the destination [-Wformat-overflow=]
->                          sprintf(queue->name, "%s-rx-%d", name,
->                                                        ^
-> drivers/net/ethernet/engleder/tsnep_main.c:881:55: warning: 'sprintf' may write a terminating nul past the end of the destination [-Wformat-overflow=]
->                          sprintf(queue->name, "%s-tx-%d", name,
->                                                        ^
-> drivers/net/ethernet/engleder/tsnep_main.c:878:49: warning: '-txrx-' directive writing 6 bytes into a region of size between 5 and 25 [-Wformat-overflow=]
->                          sprintf(queue->name, "%s-txrx-%d", name,
->                                                  ^~~~~~
+On Mon, 23 Oct 2023 11:17:04 -0700 you wrote:
+> This series from Davide converts most of the MPTCP Netlink interface
+> (plus uAPI bits) to use sources generated by YNL using a YAML spec file.
+> 
+> This new YAML file is useful to validate the API and to generate a good
+> documentation page.
+> 
+> Patch 1 modifies YNL spec to support "uns-admin-perm" for genetlink
+> legacy.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] tsnep: Fix tsnep_request_irq() format-overflow warning
-    https://git.kernel.org/netdev/net-next/c/00e984cb986b
+  - [net-next,v2,1/7] tools: ynl: add uns-admin-perm to genetlink legacy
+    https://git.kernel.org/netdev/net-next/c/52c121f4bf27
+  - [net-next,v2,2/7] tools: ynl-gen: add support for exact-len validation
+    https://git.kernel.org/netdev/net-next/c/0c63ad379526
+  - [net-next,v2,3/7] net: mptcp: convert netlink from small_ops to ops
+    https://git.kernel.org/netdev/net-next/c/1d0507f46843
+  - [net-next,v2,4/7] Documentation: netlink: add a YAML spec for mptcp
+    https://git.kernel.org/netdev/net-next/c/bc8aeb2045e2
+  - [net-next,v2,5/7] uapi: mptcp: use header file generated from YAML spec
+    https://git.kernel.org/netdev/net-next/c/9d1ed17f93ce
+  - [net-next,v2,6/7] net: mptcp: rename netlink handlers to mptcp_pm_nl_<blah>_{doit,dumpit}
+    https://git.kernel.org/netdev/net-next/c/1e07938e29c5
+  - [net-next,v2,7/7] net: mptcp: use policy generated by YAML spec
+    https://git.kernel.org/netdev/net-next/c/aab4d8564947
 
 You are awesome, thank you!
 -- 
