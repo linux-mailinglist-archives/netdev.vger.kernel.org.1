@@ -1,42 +1,64 @@
-Return-Path: <netdev+bounces-43815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1BBF7D4E88
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:06:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E245F7D4EDC
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:34:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 240141C20B05
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 11:06:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39090B20DD5
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 11:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7020C26281;
-	Tue, 24 Oct 2023 11:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA928262A6;
+	Tue, 24 Oct 2023 11:34:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CtLs9bhm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1A17498
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:06:30 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68BDEB3
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 04:06:29 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qvFEx-0007oa-Bt; Tue, 24 Oct 2023 13:06:27 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Westphal <fw@strlen.de>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net-next v2] sched: act_ct: switch to per-action label counting
-Date: Tue, 24 Oct 2023 13:05:51 +0200
-Message-ID: <20231024110557.20688-1-fw@strlen.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455541FD7
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:34:41 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AB8A128
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 04:34:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698147280; x=1729683280;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=CKvAcJ0UICqy+gXSIAnwDmufo4fKFX/tjp+tbbgzTG4=;
+  b=CtLs9bhmMmbuC6yxjHJXbaxomyxPN8CWz5/4Nb+sHXaxOhksGv7fZa+y
+   h3iGz96wbPUpxSLihoNsiWgPOKOITZeznBMpu49gSwBhnO893YNAPElOf
+   PLpohhNUm/wEQ3kSuhWyZMxx2rCPgKydLNbFKUVfkRoSEarYDPtR9hc7C
+   U8r7LQpkWPAQQ8au7CR868JKjqK4cLSAGpsiuAKVnvVpl/yI0pCo9gH+J
+   MEzmK/GcAA87K9nnpJzCbbwI6mRaLFdtnBppekAjskDVge60HOZS7k8HX
+   t5cJSXkfODv67+dEEyKWWD0r7Wh35S+oc3LijlqJzDrNHUDe3tM9h3QP/
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10872"; a="5660512"
+X-IronPort-AV: E=Sophos;i="6.03,247,1694761200"; 
+   d="scan'208";a="5660512"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2023 04:34:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,247,1694761200"; 
+   d="scan'208";a="6145938"
+Received: from wasp.igk.intel.com ([10.102.20.192])
+  by orviesa001.jf.intel.com with ESMTP; 24 Oct 2023 04:33:20 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	piotr.raczynski@intel.com,
+	wojciech.drewek@intel.com,
+	marcin.szycik@intel.com,
+	jacob.e.keller@intel.com,
+	przemyslaw.kitszel@intel.com,
+	jesse.brandeburg@intel.com,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH iwl-next v1 00/15] one by one port representors creation
+Date: Tue, 24 Oct 2023 13:09:14 +0200
+Message-ID: <20231024110929.19423-1-michal.swiatkowski@linux.intel.com>
 X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -46,146 +68,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-net->ct.labels_used was meant to convey 'number of ip/nftables rules
-that need the label extension allocated'.
+Hi,
 
-act_ct enables this for each net namespace, which voids all attempts
-to avoid ct->ext allocation when possible.
+Currently ice supports creating port representors only for VFs. For that
+use case they can be created and removed in one step.
 
-Move this increment to the control plane to request label extension
-space allocation only when its needed.
+This patchset is refactoring current flow to support port representor
+creation also for subfunctions and SIOV. In this case port representors
+need to be createad and removed one by one. Also, they can be added and
+removed while other port representors are running.
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- v2: want reverse xmas
+To achieve that we need to change the switchdev configuration flow.
+Three first patches are only cosmetic (renaming, removing not used code).
+Next few ones are preparation for new flow. The most important one
+is "add VF representor one by one". It fully implements new flow.
 
- include/net/tc_act/tc_ct.h |  1 +
- net/sched/act_ct.c         | 41 +++++++++++++++++---------------------
- 2 files changed, 19 insertions(+), 23 deletions(-)
+New type of port representor (for subfunction) will be introduced in
+follow up patchset.
 
-diff --git a/include/net/tc_act/tc_ct.h b/include/net/tc_act/tc_ct.h
-index b24ea2d9400b..8a6dbfb23336 100644
---- a/include/net/tc_act/tc_ct.h
-+++ b/include/net/tc_act/tc_ct.h
-@@ -22,6 +22,7 @@ struct tcf_ct_params {
- 
- 	struct nf_nat_range2 range;
- 	bool ipv4_range;
-+	bool put_labels;
- 
- 	u16 ct_action;
- 
-diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-index 7c652d14528b..43b06cb284ce 100644
---- a/net/sched/act_ct.c
-+++ b/net/sched/act_ct.c
-@@ -690,7 +690,6 @@ static struct tc_action_ops act_ct_ops;
- 
- struct tc_ct_action_net {
- 	struct tc_action_net tn; /* Must be first */
--	bool labels;
- };
- 
- /* Determine whether skb->_nfct is equal to the result of conntrack lookup. */
-@@ -829,8 +828,13 @@ static void tcf_ct_params_free(struct tcf_ct_params *params)
- 	}
- 	if (params->ct_ft)
- 		tcf_ct_flow_table_put(params->ct_ft);
--	if (params->tmpl)
-+	if (params->tmpl) {
-+		if (params->put_labels)
-+			nf_connlabels_put(nf_ct_net(params->tmpl));
-+
- 		nf_ct_put(params->tmpl);
-+	}
-+
- 	kfree(params);
- }
- 
-@@ -1154,9 +1158,9 @@ static int tcf_ct_fill_params(struct net *net,
- 			      struct nlattr **tb,
- 			      struct netlink_ext_ack *extack)
- {
--	struct tc_ct_action_net *tn = net_generic(net, act_ct_ops.net_id);
- 	struct nf_conntrack_zone zone;
- 	int err, family, proto, len;
-+	bool put_labels = false;
- 	struct nf_conn *tmpl;
- 	char *name;
- 
-@@ -1186,15 +1190,20 @@ static int tcf_ct_fill_params(struct net *net,
- 	}
- 
- 	if (tb[TCA_CT_LABELS]) {
-+		unsigned int n_bits = sizeof_field(struct tcf_ct_params, labels) * 8;
-+
- 		if (!IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS)) {
- 			NL_SET_ERR_MSG_MOD(extack, "Conntrack labels isn't enabled.");
- 			return -EOPNOTSUPP;
- 		}
- 
--		if (!tn->labels) {
-+		if (nf_connlabels_get(net, n_bits - 1)) {
- 			NL_SET_ERR_MSG_MOD(extack, "Failed to set connlabel length");
- 			return -EOPNOTSUPP;
-+		} else {
-+			put_labels = true;
- 		}
-+
- 		tcf_ct_set_key_val(tb,
- 				   p->labels, TCA_CT_LABELS,
- 				   p->labels_mask, TCA_CT_LABELS_MASK,
-@@ -1238,10 +1247,15 @@ static int tcf_ct_fill_params(struct net *net,
- 		}
- 	}
- 
-+	p->put_labels = put_labels;
-+
- 	if (p->ct_action & TCA_CT_ACT_COMMIT)
- 		__set_bit(IPS_CONFIRMED_BIT, &tmpl->status);
- 	return 0;
- err:
-+	if (put_labels)
-+		nf_connlabels_put(net);
-+
- 	nf_ct_put(p->tmpl);
- 	p->tmpl = NULL;
- 	return err;
-@@ -1542,32 +1556,13 @@ static struct tc_action_ops act_ct_ops = {
- 
- static __net_init int ct_init_net(struct net *net)
- {
--	unsigned int n_bits = sizeof_field(struct tcf_ct_params, labels) * 8;
- 	struct tc_ct_action_net *tn = net_generic(net, act_ct_ops.net_id);
- 
--	if (nf_connlabels_get(net, n_bits - 1)) {
--		tn->labels = false;
--		pr_err("act_ct: Failed to set connlabels length");
--	} else {
--		tn->labels = true;
--	}
--
- 	return tc_action_net_init(net, &tn->tn, &act_ct_ops);
- }
- 
- static void __net_exit ct_exit_net(struct list_head *net_list)
- {
--	struct net *net;
--
--	rtnl_lock();
--	list_for_each_entry(net, net_list, exit_list) {
--		struct tc_ct_action_net *tn = net_generic(net, act_ct_ops.net_id);
--
--		if (tn->labels)
--			nf_connlabels_put(net);
--	}
--	rtnl_unlock();
--
- 	tc_action_net_exit(net_list, act_ct_ops.net_id);
- }
- 
+Michal Swiatkowski (15):
+  ice: rename switchdev to eswitch
+  ice: remove redundant max_vsi_num variable
+  ice: remove unused control VSI parameter
+  ice: track q_id in representor
+  ice: use repr instead of vf->repr
+  ice: track port representors in xarray
+  ice: remove VF pointer reference in eswitch code
+  ice: make representor code generic
+  ice: return pointer to representor
+  ice: allow changing SWITCHDEV_CTRL VSI queues
+  ice: set Tx topology every time new repr is added
+  ice: realloc VSI stats arrays
+  ice: add VF representors one by one
+  ice: adjust switchdev rebuild path
+  ice: reserve number of CP queues
+
+ drivers/net/ethernet/intel/ice/ice.h          |  13 +-
+ drivers/net/ethernet/intel/ice/ice_devlink.c  |  29 +
+ drivers/net/ethernet/intel/ice/ice_devlink.h  |   1 +
+ drivers/net/ethernet/intel/ice/ice_eswitch.c  | 562 ++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +-
+ .../net/ethernet/intel/ice/ice_eswitch_br.c   |  22 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  81 ++-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   6 +-
+ drivers/net/ethernet/intel/ice/ice_repr.c     | 195 +++---
+ drivers/net/ethernet/intel/ice/ice_repr.h     |   9 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c    |  20 +-
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c   |   4 +-
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   9 +-
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   2 +-
+ 14 files changed, 553 insertions(+), 422 deletions(-)
+
 -- 
 2.41.0
 
