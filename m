@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-43922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E6F07D5743
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:03:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F09007D5744
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:03:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A475F281A64
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:03:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AAC7B21163
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B243A26D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9983A28B;
 	Tue, 24 Oct 2023 16:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="glUSDVsX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rxM7p5GU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBC43A265
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF503A27E
 	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 16:02:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD83CC433D9;
-	Tue, 24 Oct 2023 16:02:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 241DFC433C9;
+	Tue, 24 Oct 2023 16:02:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1698163364;
-	bh=bAbrp+PwATunC6AisJFm+R5C2NoS2C5HzBAtTGgwWfA=;
+	bh=Rq8SndcZ/W9+UTaffLwtZA7dwWBWF0utXnuRiR9kxtQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=glUSDVsXYriJZvUHS/HnTNXodnVzeLZtYWJcHVu8NxWnlbnhkaHz07Bb/9ZOZSPxU
-	 XwNtHuW5YvX81VNG0kwkcZaveYukDvUIPw2jF99kVKDOJPkHnTtJTLWBywrfhz2Kfs
-	 hKs5Zfn1teTTjl52B9Iq4AGVkTSmFnpzF+DWvu8YYpSw76SxFfpoQ0REe8gbHmkBUz
-	 dxUzbcCImLKAG52Y5vr49cu0tuosbNzavV99Fi33yRfbOpnnLe1IyaymcAKab5Qw/J
-	 xD7larPUCk2f7nM79yUJ8snSIPpKopF0kqZx65kU+hKIglMv5j6T4ChsxqQkQOwi8T
-	 iJdMGq6V9ndIA==
+	b=rxM7p5GUrPRKcHSeokbLY//NDeOoTThI68PwstJnxO5TTsJbIjsKY8/fFeLtmXOyC
+	 F8i6VKUisOKRF3O0ILPIRHbAAuHniOuQivxzF5WcwDKh/vqTusib8NdXFfNbb01TUO
+	 KmxjqEtZzG33IV3Ah3YohvCNwl7M61BYUlZpGX2s/YvSmDWCRoyGljEkgmApabX10W
+	 Lm6mGa3uQzae5idiuvLOlX8/0XejNZBAeOkBskhe55viPHsaAxtz3rJlpdF746Spnh
+	 MWJAfkWz2gMTZU7v/9/0iqzQIVHACJDA1Pcs03+gYbcR0Gnzx5qL/4S2Wip35AbSDp
+	 /xaBPL3+7Vkhw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -41,9 +41,9 @@ Cc: netdev@vger.kernel.org,
 	hawk@kernel.org,
 	ilias.apalodimas@linaro.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 07/15] eth: link netdev to page_pools in drivers
-Date: Tue, 24 Oct 2023 09:02:12 -0700
-Message-ID: <20231024160220.3973311-8-kuba@kernel.org>
+Subject: [PATCH net-next 08/15] net: page_pool: add nlspec for basic access to page pools
+Date: Tue, 24 Oct 2023 09:02:13 -0700
+Message-ID: <20231024160220.3973311-9-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231024160220.3973311-1-kuba@kernel.org>
 References: <20231024160220.3973311-1-kuba@kernel.org>
@@ -55,53 +55,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Link page pool instances to netdev for the drivers which
-already link to NAPI. Unless the driver is doing something
-very weird per-NAPI should imply per-netdev.
+Add a Netlink spec in YAML for getting very basic information
+about page pools.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 1 +
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 1 +
- drivers/net/ethernet/microsoft/mana/mana_en.c     | 1 +
- 3 files changed, 3 insertions(+)
+ Documentation/netlink/specs/netdev.yaml | 45 +++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d0359b569afe..04b1b53b1bf1 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3298,6 +3298,7 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
- 		pp.pool_size += bp->rx_ring_size;
- 	pp.nid = dev_to_node(&bp->pdev->dev);
- 	pp.napi = &rxr->bnapi->napi;
-+	pp.netdev = bp->dev;
- 	pp.dev = &bp->pdev->dev;
- 	pp.dma_dir = bp->rx_dir;
- 	pp.max_len = PAGE_SIZE;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index ea58c6917433..9e4325453d15 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -902,6 +902,7 @@ static int mlx5e_alloc_rq(struct mlx5e_params *params,
- 		pp_params.nid       = node;
- 		pp_params.dev       = rq->pdev;
- 		pp_params.napi      = rq->cq.napi;
-+		pp_params.netdev    = rq->netdev;
- 		pp_params.dma_dir   = rq->buff.map_dir;
- 		pp_params.max_len   = PAGE_SIZE;
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index 14511b13f305..cc9e87dc36e9 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -86,6 +86,34 @@ name: netdev
+              See Documentation/networking/xdp-rx-metadata.rst for more details.
+         type: u64
+         enum: xdp-rx-metadata
++  -
++    name: page-pool
++    attributes:
++      -
++        name: id
++        doc: Unique ID of a Page Pool instance.
++        type: uint
++        checks:
++          min: 1
++          max: u32-max
++      -
++        name: ifindex
++        doc: |
++          ifindex of the netdev to which the pool belongs.
++          May be reported as 0 if the page pool was allocated for a netdev
++          which got destroyed already (page pools may outlast their netdevs
++          because they wait for all memory to be returned).
++        type: u32
++        checks:
++          min: 1
++          max: s32-max
++      -
++        name: napi-id
++        doc: Id of NAPI using this Page Pool instance.
++        type: uint
++        checks:
++          min: 1
++          max: u32-max
  
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 48ea4aeeea5d..91ad64538cb3 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -2137,6 +2137,7 @@ static int mana_create_page_pool(struct mana_rxq *rxq, struct gdma_context *gc)
- 	pprm.pool_size = RX_BUFFERS_PER_QUEUE;
- 	pprm.nid = gc->numa_node;
- 	pprm.napi = &rxq->rx_cq.napi;
-+	pprm.netdev = rxq->ndev;
+ operations:
+   list:
+@@ -120,6 +148,23 @@ name: netdev
+       doc: Notification about device configuration being changed.
+       notify: dev-get
+       mcgrp: mgmt
++    -
++      name: page-pool-get
++      doc: |
++        Get / dump information about Page Pools.
++        (Only Page Pools associated with a net_device can be listed.)
++      attribute-set: page-pool
++      do:
++        request:
++          attributes:
++            - id
++        reply: &pp-reply
++          attributes:
++            - id
++            - ifindex
++            - napi-id
++      dump:
++        reply: *pp-reply
  
- 	rxq->page_pool = page_pool_create(&pprm);
- 
+ mcast-groups:
+   list:
 -- 
 2.41.0
 
