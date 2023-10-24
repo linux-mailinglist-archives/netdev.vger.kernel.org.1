@@ -1,47 +1,83 @@
-Return-Path: <netdev+bounces-43913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBA987D56A0
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:37:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9C57D56FF
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:56:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 185E21C20A88
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:37:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9638FB20F06
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF630374D6;
-	Tue, 24 Oct 2023 15:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26DA38DD7;
+	Tue, 24 Oct 2023 15:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghsfOXO4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="koeL6VnG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3ABE3714B
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 15:36:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B98C3C433C8;
-	Tue, 24 Oct 2023 15:36:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698161818;
-	bh=Qeb3y3GkI5YoTa2Z4FvcJRz+qDQD4OJYM3FJEUsXO34=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ghsfOXO4bRyLYAyP1GocDXRWIgd24qRSrh12T2JyWKv6ZvFXdSnB4luJTywl7TDQE
-	 Ld58FWuinLtJkVLpt1KSACDB7d59v366qOgpr80y52zb1xmMbNCSvdcrGAbAVFUFso
-	 Q/D4nWLjKTlLzMGbs5kN7J6K0k2u4ZqsVnWnnhfTW4ZRWew2bW2EiP6/6n3Qdy5E/6
-	 dlSRvqRU2TSyo40CoB3NQPBK8/MwJgNBKrJrm05zOuvpG+R6gwqlLq6o7mFt7RmI2c
-	 OFnHAqbj40J+/Wzfgve0orNf2xeH/5bLY9d1nfnuf8/NF5fmG7soid8TJ1D+UkKZs6
-	 ACKW1vI+4Y/sg==
-Date: Tue, 24 Oct 2023 18:36:53 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: George Kennedy <george.kennedy@oracle.com>
-Cc: jgg@ziepe.ca, sd@queasysnail.net, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	tom.hromatka@oracle.com, harshit.m.mogalapalli@oracle.com
-Subject: Re: [PATCH] mlx5: reset state to avoid attempted QP double free and
- UAF
-Message-ID: <20231024153653.GC1939579@unreal>
-References: <1698147005-5396-1-git-send-email-george.kennedy@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611591D6A9;
+	Tue, 24 Oct 2023 15:56:15 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A91FE83;
+	Tue, 24 Oct 2023 08:56:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698162974; x=1729698974;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SddTswXNy85QoKJZdafbQk9nSfChueXqS/eU+G7CMYg=;
+  b=koeL6VnGVGJKMm0OZoKUANAQAtyXmNPmeVBL333MTn7PKsKdezKzflx6
+   PffPi4bDwB/pV3+9SlP/LlDdTxBdS9+hHIld92T37DDTv1WOAKOElxcVO
+   Nc+IvFHWx1xknjlumgNufiFkY0I/Nakl4/TW2RS/kDw3weY1t1Ddq1f8i
+   aV1bZ0zLIROX+kSHF7Az3+gnIEBM6TuJizN8ahYQ/o/GktRwpmoZGWSOx
+   rzRJ8cFfN3yaFTZZTZGgsS815HD1b+k3+QSlY0kQkM35LtuqaaqeXQgWJ
+   kMdeBAH4ZpyeCd3r5i8dJUTXo7es/j6G4pQyS/oF2sQMR831RQbDBZiVH
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="5719680"
+X-IronPort-AV: E=Sophos;i="6.03,248,1694761200"; 
+   d="scan'208";a="5719680"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2023 08:56:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="758510350"
+X-IronPort-AV: E=Sophos;i="6.03,248,1694761200"; 
+   d="scan'208";a="758510350"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 24 Oct 2023 08:56:07 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qvJlF-0007yD-1U;
+	Tue, 24 Oct 2023 15:56:05 +0000
+Date: Tue, 24 Oct 2023 23:55:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next 3/5] net: ipqess: introduce the Qualcomm IPQESS
+ driver
+Message-ID: <202310242300.y8Z3ImgQ-lkp@intel.com>
+References: <20231023155013.512999-4-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,111 +86,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1698147005-5396-1-git-send-email-george.kennedy@oracle.com>
+In-Reply-To: <20231023155013.512999-4-romain.gantois@bootlin.com>
 
-On Tue, Oct 24, 2023 at 06:30:05AM -0500, George Kennedy wrote:
-> In the unlikely event that workqueue allocation fails and returns
-> NULL in mlx5_mkey_cache_init(), reset the state to
-> MLX5_UMR_STATE_UNINIT in mlx5_ib_stage_post_ib_reg_umr_init()
-> after the call to mlx5r_umr_resource_cleanup(), which frees
-> the QP. This will avoid attempted double free of the same QP
-> when __mlx5_ib_add() does its cleanup.
-> 
-> Syzkaller reported a UAF in ib_destroy_qp_user
-> 
-> workqueue: Failed to create a rescuer kthread for wq "mkey_cache": -EINTR
-> infiniband mlx5_0: mlx5_mkey_cache_init:981:(pid 1642):
->     failed to create work queue
-> infiniband mlx5_0: mlx5_ib_stage_post_ib_reg_umr_init:4075:(pid 1642):
->     mr cache init failed -12
-> ==================================================================
-> BUG: KASAN: slab-use-after-free in ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2073)
-> Read of size 8 at addr ffff88810da310a8 by task repro_upstream/1642
-> 
-> Call Trace:
->  <TASK>
-> kasan_report (mm/kasan/report.c:590)
-> ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2073)
-> mlx5r_umr_resource_cleanup (drivers/infiniband/hw/mlx5/umr.c:198)
-> __mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4178)
-> mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
-> ...
->  </TASK>
-> 
-> Allocated by task 1642:
-> __kmalloc (./include/linux/kasan.h:198 mm/slab_common.c:1026
->     mm/slab_common.c:1039)
-> create_qp (./include/linux/slab.h:603 ./include/linux/slab.h:720
->     ./include/rdma/ib_verbs.h:2795 drivers/infiniband/core/verbs.c:1209)
-> ib_create_qp_kernel (drivers/infiniband/core/verbs.c:1347)
-> mlx5r_umr_resource_init (drivers/infiniband/hw/mlx5/umr.c:164)
-> mlx5_ib_stage_post_ib_reg_umr_init (drivers/infiniband/hw/mlx5/main.c:4070)
-> __mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4168)
-> mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
-> ...
-> 
-> Freed by task 1642:
-> __kmem_cache_free (mm/slub.c:1826 mm/slub.c:3809 mm/slub.c:3822)
-> ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2112)
-> mlx5r_umr_resource_cleanup (drivers/infiniband/hw/mlx5/umr.c:198)
-> mlx5_ib_stage_post_ib_reg_umr_init (drivers/infiniband/hw/mlx5/main.c:4076
->     drivers/infiniband/hw/mlx5/main.c:4065)
-> __mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4168)
-> mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
-> ...
-> 
-> The buggy address belongs to the object at ffff88810da31000
->  which belongs to the cache kmalloc-2k of size 2048
-> The buggy address is located 168 bytes inside of
->  freed 2048-byte region [ffff88810da31000, ffff88810da31800)
-> 
-> The buggy address belongs to the physical page:
-> page:000000003b5e469d refcount:1 mapcount:0 mapping:0000000000000000
->     index:0x0 pfn:0x10da30
-> head:000000003b5e469d order:3 entire_mapcount:0 nr_pages_mapped:0
->     pincount:0
-> flags: 0x17ffffc0000840(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
-> page_type: 0xffffffff()
-> raw: 0017ffffc0000840 ffff888100042f00 ffffea0004180800 dead000000000002
-> raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
-> page dumped because: kasan: bad access detected
-> 
-> Memory state around the buggy address:
->  ffff88810da30f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->  ffff88810da31000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >ffff88810da31080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->                                   ^
->  ffff88810da31100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->  ffff88810da31180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ==================================================================
-> Disabling lock debugging due to kernel taint
-> 
-> Fixes: 04876c12c19e ("RDMA/mlx5: Move init and cleanup of UMR to umr.c")
-> Reported-by: syzkaller <syzkaller@googlegroups.com>
-> Signed-off-by: George Kennedy <george.kennedy@oracle.com>
-> ---
->  drivers/infiniband/hw/mlx5/main.c | 1 +
->  1 file changed, 1 insertion(+)
+Hi Romain,
 
-Thanks for the report,
+kernel test robot noticed the following build warnings:
 
-I think that the following change will be better aligned to mlx5_ib code.
-Can you please resend your patch?
+[auto build test WARNING on net-next/main]
 
-diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
-index ec7c45272764..b1f8914abf44 100644
---- a/drivers/infiniband/hw/mlx5/main.c
-+++ b/drivers/infiniband/hw/mlx5/main.c
-@@ -4092,10 +4092,8 @@ static int mlx5_ib_stage_post_ib_reg_umr_init(struct mlx5_ib_dev *dev)
- 		return ret;
- 
- 	ret = mlx5_mkey_cache_init(dev);
--	if (ret) {
-+	if (ret)
- 		mlx5_ib_warn(dev, "mr cache init failed %d\n", ret);
--		mlx5r_umr_resource_cleanup(dev);
--	}
- 	return ret;
- }
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/net-dt-bindings-Introduce-the-Qualcomm-IPQESS-Ethernet-switch/20231023-235323
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231023155013.512999-4-romain.gantois%40bootlin.com
+patch subject: [PATCH net-next 3/5] net: ipqess: introduce the Qualcomm IPQESS driver
+config: arc-allmodconfig (https://download.01.org/0day-ci/archive/20231024/202310242300.y8Z3ImgQ-lkp@intel.com/config)
+compiler: arceb-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231024/202310242300.y8Z3ImgQ-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310242300.y8Z3ImgQ-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/qualcomm/ipqess/ipqess_edma.c: In function 'ipqess_edma_rx_buf_prepare':
+>> drivers/net/ethernet/qualcomm/ipqess/ipqess_edma.c:156:25: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+     156 |                         (struct ipqess_edma_rx_desc *)buf->dma;
+         |                         ^
+
+
+vim +156 drivers/net/ethernet/qualcomm/ipqess/ipqess_edma.c
+
+   139	
+   140	static int ipqess_edma_rx_buf_prepare(struct ipqess_edma_buf *buf,
+   141					      struct ipqess_edma_rx_ring *rx_ring)
+   142	{
+   143		memset(buf->skb->data, 0, sizeof(struct ipqess_edma_rx_desc));
+   144	
+   145		buf->dma = dma_map_single(rx_ring->ppdev, buf->skb->data,
+   146					  IPQESS_EDMA_RX_HEAD_BUFF_SIZE,
+   147					  DMA_FROM_DEVICE);
+   148		if (dma_mapping_error(rx_ring->ppdev, buf->dma)) {
+   149			dev_kfree_skb_any(buf->skb);
+   150			buf->skb = NULL;
+   151			return -EFAULT;
+   152		}
+   153	
+   154		buf->length = IPQESS_EDMA_RX_HEAD_BUFF_SIZE;
+   155		rx_ring->hw_desc[rx_ring->head] =
+ > 156				(struct ipqess_edma_rx_desc *)buf->dma;
+   157		rx_ring->head = (rx_ring->head + 1) % IPQESS_EDMA_RX_RING_SIZE;
+   158	
+   159		ipqess_edma_m32(rx_ring->edma, IPQESS_EDMA_RFD_PROD_IDX_BITS,
+   160				(rx_ring->head + IPQESS_EDMA_RX_RING_SIZE - 1)
+   161				% IPQESS_EDMA_RX_RING_SIZE,
+   162				IPQESS_EDMA_REG_RFD_IDX_Q(rx_ring->idx));
+   163	
+   164		return 0;
+   165	}
+   166	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
