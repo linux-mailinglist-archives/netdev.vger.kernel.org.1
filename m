@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-43858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 846C07D5068
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:56:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE5B57D5069
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:56:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A86841C20CB7
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 12:56:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE6FD1C20CDF
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 12:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC6B2773A;
-	Tue, 24 Oct 2023 12:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C44B26E3A;
+	Tue, 24 Oct 2023 12:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="E41Q/qPN"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ee352qqp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0573733F1
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 12:55:54 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2043.outbound.protection.outlook.com [40.107.243.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC4F3B6
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 05:55:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75EF2773F
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 12:55:59 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2089.outbound.protection.outlook.com [40.107.243.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEB6128
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 05:55:57 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nG4FnOCQ4voVryy8cS5dzMDpVA2Zo0ZxgXnr0Afz82SNraDIkQ+HRjXGAGBjNYZphvsgnLR0uVchqkOp21lYgsxGFQ0nfQ+5s8BrbFamThGNU5+09cZZAFxg/KlQt5Q6fsuGkDWf7p2jfSGLf+vT/SikX4bdLJM93W0eqlRwgHYyzU7UvxyOAGZ1pjL5jShwrazEOGJShA+BCD37wqXxlxUrzV9tvgVhxNzzV5bRsMY0cDN1d6tgOrDB7NAG4Nd3G0coGhJyyR2YRRLc/ey0M1iwrka1Fl2GPGJjPWXR8JL+/M16xwainkty514jz/DIfpXufgN+obMOsOxIGm9PyA==
+ b=NiouoqcsVyJQLFccnkYc6Ezjavtd1mW/DBRn77YbMptooq2tTdMqF8+uunXCb+0dPrvF5WYJG0b77L4oxwXKAimq1fmOHCQS+mUl0E6r5AbKorN586k2zs5OCvM4wsrsKxk17GEPRDgsbHT9YkWstigHy399Cyt+hhrrcupJPc4Av9vVmfenMHZmLlBx+4gNqpz06TeTIGyHBMFBjExY4vARxbm7Ptsfzvx+rrM341TucaILFKCFee3bo5vM1KBDnrBaw0VcadJf+hxeSMpUiiEhGD520G3XtOD5M8aoB2zEoQ9doK8EYKpf84XhPegHVWRYwaZ2xYW99cZk8rDDzA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RBStJjYESTdFV+dOPhyL395nDEhGCppe23AFcqqPhXg=;
- b=PGb27kE191XgsZSLL3g3KeLlv4kDI58WwSoH7kYUP8wuF94ZhOQSLpof3I0iJxPFbhb3x0fyCbOyX2Z3qhEF7QRlGVQfdlLgFDvjjjE+klBU8aZDdiAnW61M6gLwv7FyyWd1mC1W8Vfofas96Rjr3SbA1GXxq+6jzEkeawAj9qPWnZ6/uXUerYXluvGW4atSfDXX9dGEz/cVhWq67fmU3TDtk6ii33QdStivSTaJcQ5LCikA29ZTRHL4CEuuoc28Upo1lYSZSMKxHu5JgPV8bCU8NmQXBptazwFR/mmRBmQWIkvEuHbGrlFZBiqRHCdNp7fCfcwlDvTgpTm3R+vjwQ==
+ bh=yrfBrm71oCXSvhCL0E4JO2MlegGvxnrMPPGQly7sBdM=;
+ b=gDfyb06WLEd8sVVE/TxaAhI76abVgFJnUwIKKBHr7hd4MCiPnELftx1yzMvQh88mqBcu1syTjduN/Psu2zlEkOTbg2F56D7507uFJKCs5m/T+jeUXynbSsmXo0R1V4wVYSGxK/m0FVK0QeU9yXyORPvGrStQCEEA2/1XJVG9DOJqpGsXD+kJKFDmhWTCH/jrLSvFevDu8K7Jig7W9FzV9YXS18U1hSPFAxC5FLaClIba8d65O49EKZnfhTyXljcE8DDkOV6NbjEr7axqG/xK2RYNDXIt563FNLFFhZWZ7jhWSJ5DlpKkeg9LJXxJPqiNXFYyERcFE8ysgUBg7PjmRg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RBStJjYESTdFV+dOPhyL395nDEhGCppe23AFcqqPhXg=;
- b=E41Q/qPNwA/8VL1jvCdLnD0/mGdgVseYsqDAlhfG3vKO2BS3MIfxvHY65SrCn7Vs0iiFG4fPcoTa63Odu0w/qiIY1OyX8B9dalGGDk3a0QxoADUnaGAO+8kSYA+1qeRB8B3XMlPW6GLVR82j00Jm7QCwSKgvdbrYJkTGo0A6hoIvqwhMm8WvP+8p76jdM13Y+cvnwNkGqOh4cA6VTrIXL5GMGybb0SQvbu7wXMRFB+Q2zMQ7ZN+GAinaH+LPV4bvk3iXVh0kHFp5XXRVqa6VQXiXzKB2xJ/LFnivEbHuOMUYq0vrdhZHE0umMYGjcnI2zi2ZilI8ACD0epFEf07c/w==
+ bh=yrfBrm71oCXSvhCL0E4JO2MlegGvxnrMPPGQly7sBdM=;
+ b=ee352qqpKNOdCYHqIP1u+CfqB0/iqy5nymgvowaKR9dRd+o+T6wXMDFp/Won4/UCGJLpuFKPsPZEoZVYiHY+5Nxm1uMlgVs+ZBPOqCYkLl/CpDH7byk/ewEFvrB1llQE9wofDOFXPpWr3LUj+6rrvvN0yGGHvQYdrcgwmP3JtaioD6iZkH3RomPSqc2BEYjVQbZIu83yK/JlIojpIoHENipAQYWop9v5mXTSsr22JLXD57LdpRGGEBApasaldZmSaN5A5vBnwDK8+YQUmxcGVbxZwj1vNL4RAZYqTVARorXAYe7SpzPOMdFedQT9dYKiSEy6XZt5lSGoLLDLmJSkiw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
  by PH8PR12MB7256.namprd12.prod.outlook.com (2603:10b6:510:223::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.26; Tue, 24 Oct
- 2023 12:55:50 +0000
+ 2023 12:55:55 +0000
 Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
  ([fe80::42b4:7f1:b049:39b2]) by SJ1PR12MB6075.namprd12.prod.outlook.com
  ([fe80::42b4:7f1:b049:39b2%6]) with mapi id 15.20.6907.030; Tue, 24 Oct 2023
- 12:55:50 +0000
+ 12:55:55 +0000
 From: Aurelien Aptel <aaptel@nvidia.com>
 To: linux-nvme@lists.infradead.org,
 	netdev@vger.kernel.org,
@@ -68,16 +68,16 @@ Cc: Or Gerlitz <ogerlitz@nvidia.com>,
 	borisp@nvidia.com,
 	galshalom@nvidia.com,
 	mgurtovoy@nvidia.com
-Subject: [PATCH v17 10/20] net/mlx5e: Rename from tls to transport static params
-Date: Tue, 24 Oct 2023 12:54:35 +0000
-Message-Id: <20231024125445.2632-11-aaptel@nvidia.com>
+Subject: [PATCH v17 11/20] net/mlx5e: Refactor ico sq polling to get budget
+Date: Tue, 24 Oct 2023 12:54:36 +0000
+Message-Id: <20231024125445.2632-12-aaptel@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231024125445.2632-1-aaptel@nvidia.com>
 References: <20231024125445.2632-1-aaptel@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: LO2P265CA0377.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:a3::29) To SJ1PR12MB6075.namprd12.prod.outlook.com
+X-ClientProxiedBy: LO4P302CA0001.GBRP302.PROD.OUTLOOK.COM
+ (2603:10a6:600:2c2::6) To SJ1PR12MB6075.namprd12.prod.outlook.com
  (2603:10b6:a03:45e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -87,374 +87,210 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|PH8PR12MB7256:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9360a589-aae6-4827-f13d-08dbd4908c68
+X-MS-Office365-Filtering-Correlation-Id: 155cad02-e378-4d9a-452b-08dbd4908f85
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	DfZq1X/xxmc++OBFflt1DjK7UiSmtn68ffvw/wUxT77RoUfgA7aqU0diWHZndK2LEtFYbnma6gwIUeZgBXUA9gx5Kbzva92FLWqy1hXl1fBtx4SM0gWTqe9QU9GuD1WUhMJldjK9pNi2mjyZo4FX+RKoHk5YKrTRZf40vdHUtkCQCvI6XHO2eoTaQa9DBTdyf9NX+YkCUL+ohSqA7fz/WvP3R7EXHdBidjdVhH6+3GZgNbb+OjlVToOA2XHtegcjlOJxaXlSsTmGBVQdl/VUqDtSMUxELLJ3Jp1CC1mnBfAzxPOEhS2B8vZiy77fcSIvqgqKFRfRbnkR13gUQkE5EGZlw745CMRukMJoUsINIBby7fVmm7bn6nSfMsInzv4sP9hvduDrDXrJi8zylfZ9CbctNz0oeeD/3ltslM0ofQWBi6ttWtI88ySNlSniOXPMVzd/E4CkbSf36nWOWI8TpBDMKngrBsXH+GMNra6P/e2CvGeB6qxY/0PrwuVS8lmUK7ntrkRnlTNg3p2mW4KXFA7SwevH65oD16Slo3OHT7tjwM66tkS6KiCqpAKjbUhd
+	47ZhoP3in4ebo1fauGO44xvaHWGqxBGem7vcAlosT1yv8WnkFsfwE0rhU3bZYyOyCz8Lf8pLawAFhPQt25NKN6MwVmeuwEhj/1L4pDEh2Bw3t182g89tGQdR5r8gPngAYV9NInO7qP6U07dri07fRp0/U53IzAEoF6F9T1RFhC+j8tNuzQg98XcVx5S7EJVApmu7tRE1OtKaNAY4tI4WI2zYbPBJ2Afseoo4Ih+q9jFZnbbf/J16d4pnIaX1RCmvmfn7ZxlXS2EBuDsAQgPvVd+3wPIwXxtkxQV4+43mUwTX7LHl+a+WzgqNVyJNVMcgK9e/y5m5HXnCCUu7wnyDkX5MI48y2fonwe5zUimska3fFa+Tx+hq2/YR6BjfYgzguc6dll++uOnB743+n7qakz7UWxfOCyq4fHVf0NxPnydVCjdxCqZkpdbH8eyR12+EXt268kbQTVngWnbY1S8G/frnVOPEs0NueUp3fNlcH4GHC+El0/MNrJq1YnSfzQpGs54MzqNrGzTVz9puWmnTRlNLJRnwNOWPp4nkybCIcKKI8kF3muWGJHsGTbeXDZMa
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(366004)(39860400002)(136003)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(26005)(36756003)(66946007)(316002)(66556008)(66476007)(86362001)(38100700002)(83380400001)(1076003)(6506007)(107886003)(2616005)(30864003)(6512007)(6666004)(8936002)(2906002)(478600001)(6486002)(8676002)(41300700001)(7416002)(5660300002)(4326008);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(366004)(39860400002)(136003)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(26005)(36756003)(66946007)(316002)(66556008)(66476007)(86362001)(38100700002)(83380400001)(1076003)(6506007)(107886003)(2616005)(6512007)(6666004)(8936002)(2906002)(478600001)(6486002)(8676002)(41300700001)(7416002)(5660300002)(4326008);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?gwQkmaHuHmGD0+/e0BncqbxSCOOrIPRsgC0X47WmVykcwKvVXHQeTvRLAgca?=
- =?us-ascii?Q?A8RlxX26KVX1UeWzyaiXzbNXmupw8+clRjTfPWX4WqqUGGWoid2Y9Ptt5nOe?=
- =?us-ascii?Q?zbf8nQGzL/TQSB/QCiaExIoPlyoM9+MO05AWMRyOk81R2Ovr/C3ZnZDDXOgn?=
- =?us-ascii?Q?lzLSYoetvoX4EHIJdhVK0RHQdxQELsdycI/Al/emAfInk1eGuMQCDqKYubKa?=
- =?us-ascii?Q?egXcFenFyQWv7oqW9W/JctQcgze8iKwf0h5pQ6XvIdRp8WGmKYleMvqvOTBJ?=
- =?us-ascii?Q?7SEJvN/uh5cQw2WD3CIbD6jaSwm6igKbRn7rMuoA316MFz+7Zb1A7zj1rAKG?=
- =?us-ascii?Q?pcqX4EnC1oMLzU9lnWGl6EGrRPeytUHstKMswtJyvUENJoIHxiIRYSbGx1Nw?=
- =?us-ascii?Q?6ac0ygpr6qFOWbxc2n23Ety3+RXVLWX6GfOHxMV85tp/16+AR5ewNcPne/aO?=
- =?us-ascii?Q?W+b8VcaciTrQ9Ij0WkLoGLyllRtKUQorCFTXOUkugl8SGC1oLBsVBrPXtbdr?=
- =?us-ascii?Q?bnV/hWKj1jMjXmhendljshsuKmqHEhCkSotQbz/sGqhF2yvsvDCW3w9EBhi6?=
- =?us-ascii?Q?wDLJCz6/AyuZO6hSzB3HqYTeQK1xSlvuDpeqhLLaopyONgP21/xdB4ERUgu7?=
- =?us-ascii?Q?ACEzTVqC9RoULtYR+jG1HPYGkIcyUalpbBllDVYywVlJdVh0dkf0W7+YGRyF?=
- =?us-ascii?Q?km8GsnPlplt1LlYOsNL/2cr4dA6ElZ52DKfiQZsfvPFWO12KkFkM7AgoXmZ/?=
- =?us-ascii?Q?zjoLiV79eHJ7d7urJwoNz4vhVy/iWddo6qXpXibLuss0M9jX9MDFj8z6ml3R?=
- =?us-ascii?Q?Nvwdfwq77ofRYzwnGyiCqr4vKWCJ7O1STbSD8aXLebApsfnai5zbplx1uDM5?=
- =?us-ascii?Q?HzM9Zm3nE6s7BgRxlqL2IcoTJ0oJ/RkxhrprnZGZA2Wv8e9H/ew76g4to/oS?=
- =?us-ascii?Q?/oJwGVbmkRn6OELDJWaZfxUgT8Et0TxqjMv7Pw12/qMq8xjmHKm0NfgrQ4wP?=
- =?us-ascii?Q?7i/AkHjwAXb4J2iHOMd934WXOimGgIR/Pr2u56By4+DMHeWxFCLR+NHYx0SU?=
- =?us-ascii?Q?13alWdGoyxid0wg2sl/upCt8fcIVC3d1xQILldoMks5BoUYznn+iZkgSFa1Z?=
- =?us-ascii?Q?yCIOngGgHV6Ka7N5GiStADa/+Yomn3QfEfnyUb6E1+UIxWSLfElFqB+xJmBF?=
- =?us-ascii?Q?b5CYCIjQDFi78fgWHCAGNC1YVzVDmUPl72WNEXsNvkqs530lC3AowenE+5d4?=
- =?us-ascii?Q?M7UVY/A2SlNoVr4zqYfy6D3D9v2g/f86kUdZ15EGRW730z3O09rJl8lWRTPB?=
- =?us-ascii?Q?aKYMMbhkOdWzIklLrEJNPzyHjGWjCLEhG70QnpbhDUeaqxH8MidUnIgJzGTr?=
- =?us-ascii?Q?GH8NG0dn12KGkmt7NhyYf0CzXUFkVL4MbVNy1JX/xt3AdSJT9roFHdws2oZ8?=
- =?us-ascii?Q?iRCNpvAMrBZahzQPRmdiI3lW8R7BZUuAKnaJyd77j25zRkNw90sW6yk4WHZy?=
- =?us-ascii?Q?QfNbuGww52ltMe8Bfhpby8p7AHcJ/4ferdSpw0NpzkfZunFqRlnLevd2a+Cz?=
- =?us-ascii?Q?moKGhkenaytgL/fU45j+dJewhaioY5Yf9B0qXXpx?=
+	=?us-ascii?Q?99TYPJyplKEpwPHhVbUWsPQe0J/+Pk7EcrFkXlN/nESK9hKO+NHU9+8ilefP?=
+ =?us-ascii?Q?pZeJvsqaBXgCPJyRH6UY6ki3V+3+PlvzcC0pMmuuHXh6eyDxP/A2kpawHhmc?=
+ =?us-ascii?Q?2lSWvHQIMkWT7ts4A3GaecLVQBorIsmbqjjJ9YZb5DLV7gw2ae13rgeGKnvx?=
+ =?us-ascii?Q?xl5N7911VO4X9oEXaMUTeVGk3+QcfvCUQ6BxeSF/OeM/r6IpbEDz3BC7e8Ko?=
+ =?us-ascii?Q?fP+On4Z+fPNyRsDucCgb7dNqL4G7lkxIc+h3HtyDhg4BBEx3q/fsR1Q9ALbX?=
+ =?us-ascii?Q?FNqa8ZLwysMGTeLjwJQSd7MwF8COhRalgZPi4TG2iFqcgxA7BR2oGFy+4JT4?=
+ =?us-ascii?Q?Y2DlfxvsihHgJpXmzsRcZBHQ6ozLC3w1cMkQDQQ8+m7OC5x9BrEUgWrgHNTa?=
+ =?us-ascii?Q?5+9w7OcG1aCcGkGGe8/UhLZoCfEFIffyz6+ksCfJt5D939I53b+9W9BlhKaL?=
+ =?us-ascii?Q?TKJp5hloeWO/IgHVoNqR3fHNszKtMETm7oftiIGG9Ul0KrAHDv2YVUHi+aXL?=
+ =?us-ascii?Q?Y3eielpYaBZmjadan+u1kmmJXogq6F7yLNdxBia++E8hcb3EiUUmb6W49rUO?=
+ =?us-ascii?Q?VwXKVRVJETCk+xsSOnTye3wBbJ2f6HyZK8q65SK/E/s1hfVfpMZ+hBoL1maj?=
+ =?us-ascii?Q?GtrN4d2iuVADarADPK1eFwXn3zEV3lN0X3ZC2dNaOHQ2ABa1RVfjZIeapEyx?=
+ =?us-ascii?Q?2iukbp5fb5bcFgMqfu5lYqmZvXpiAXu0Rs/oTuO+LjnGW7l1yP3D1DckyRYL?=
+ =?us-ascii?Q?bmYiAg7LrRM0weRtj+i2eYTmDN+CFqUlizmxlTShORPCR3mJA4Lr0H/mvzJg?=
+ =?us-ascii?Q?g6Je54OqCAsODCVVFiL8W1z8MzbS5dwRrNrNo2upFebhmaTfZACkH9nMuHrM?=
+ =?us-ascii?Q?KfOrbiD8uZ4yClUWJ8tC3Tp2DB+1fLij7XM/Z8G83/NEBkLLD8DvVBVg5qVT?=
+ =?us-ascii?Q?3Ycvj7tRl/kFl6pjKFe0Cub0wV5RhlJXGHsfD5kChp2hdchzu5A+O0iiGx4h?=
+ =?us-ascii?Q?C0G758SdtRVuRnODEG298ctbJZ1EfkWhWmOJ+iGigBkK3xd0EKBf1XNKowJa?=
+ =?us-ascii?Q?wSUVOUGMeDCkQBPyZuei1KGvKXtX3QEOaSLAwORYp6uTwWaPbOHIdnwzkNU6?=
+ =?us-ascii?Q?lvNwLqrpvExfpJ1QcwO1sexWLfiT9toC039/xjW0GwwitqVy5Lg+fevD+GCP?=
+ =?us-ascii?Q?iwqOR2+nA/xZSgOwubs7YH9ajFJWqC+C9AtapUowJMUUoxfXY146r7ejtmh3?=
+ =?us-ascii?Q?UsF68mLDWzf98uhp/5prnrahknrX2usj1wOntnX4vnbb9pruXvTXaGOEA9xf?=
+ =?us-ascii?Q?/ACi2jEYZTXkmOlEmbb4JqOoo8gffZ4qy9DTUguTpiCVZ+aJPN0Q1qBHbznd?=
+ =?us-ascii?Q?M8FejDKsFvQZTtwbdQLnN+Lwac/i7ioxXbx5VlQUAM7bELKJq5skb8R2uoun?=
+ =?us-ascii?Q?Ti/UZHZIgSqx4Q4RK6LjJq3DvH22NRRkhILTn0Cag1He9Drl71zlLnFOu5nQ?=
+ =?us-ascii?Q?EXEsOIoGv1xgk6PSIWg/Py7ez1klnwjpnZXvqBmjE4m9mwBcXzxcOa0cOYyl?=
+ =?us-ascii?Q?UtqQms9w0Y0q8xR2S+Gl+lfHBkMga9+5Y2a0DoNJ?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9360a589-aae6-4827-f13d-08dbd4908c68
+X-MS-Exchange-CrossTenant-Network-Message-Id: 155cad02-e378-4d9a-452b-08dbd4908f85
 X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 12:55:50.1759
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 12:55:55.2644
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vuZTdH9+NUdbAvTJEjv81MyfN05xkbK8hzbr4q5vMp/7nbGufP1qahKtyeJ45PunejOhc0rM34zLPnH2ME7tVw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: ifpBrDjUNn13gHAXGhFzYR8HdFp/KNc0KIp6baiLHKNVu6OcHNu9hRMDnWFcBM7uDkDIpNYu2ppT+i0QH/3HoA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7256
 
 From: Or Gerlitz <ogerlitz@nvidia.com>
 
-The static params structure is used in TLS but also in other
-transports we're offloading like nvmeotcp:
+The mlx5e driver uses ICO SQs for internal control operations which
+are not visible to the network stack, such as UMR mapping for striding
+RQ (MPWQ) and etc more cases.
 
-- Rename the relevant structures/fields
-- Create common file for appropriate transports
-- Apply changes in the TLS code
+The upcoming nvmeotcp offload uses ico sq for umr mapping as part of the
+offload. As a pre-step for nvmeotcp ico sqs which have their own napi and
+need to comply with budget, add the budget as parameter to the polling of
+cqs related to ico sqs.
+
+The polling already stops after a limit is reached, so just have the
+caller to provide this limit as the budget.
+
+Additionnaly, we move the mdev pointer directly on the icosq structure.
+This provides better separation between channels to ICO SQs for use-cases
+where they are not tightly coupled (such as the upcoming nvmeotcp code).
 
 No functional change here.
 
 Signed-off-by: Or Gerlitz <ogerlitz@nvidia.com>
-Signed-off-by: Ben Ben-Ishay <benishay@nvidia.com>
 Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
 Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- .../mlx5/core/en_accel/common_utils.h         | 32 +++++++++++++++++
- .../mellanox/mlx5/core/en_accel/ktls.c        |  2 +-
- .../mellanox/mlx5/core/en_accel/ktls_rx.c     |  6 ++--
- .../mellanox/mlx5/core/en_accel/ktls_tx.c     |  8 ++---
- .../mellanox/mlx5/core/en_accel/ktls_txrx.c   | 36 ++++++++-----------
- .../mellanox/mlx5/core/en_accel/ktls_utils.h  | 17 ++-------
- include/linux/mlx5/device.h                   |  8 ++---
- include/linux/mlx5/mlx5_ifc.h                 |  8 +++--
- 8 files changed, 67 insertions(+), 50 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en_accel/common_utils.h
+ drivers/net/ethernet/mellanox/mlx5/core/en.h               | 1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c   | 4 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h          | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c          | 5 ++---
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c            | 4 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c          | 4 ++--
+ 7 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/common_utils.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/common_utils.h
-new file mode 100644
-index 000000000000..efdf48125848
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/common_utils.h
-@@ -0,0 +1,32 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
-+/* Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. */
-+#ifndef __MLX5E_COMMON_UTILS_H__
-+#define __MLX5E_COMMON_UTILS_H__
-+
-+#include "en.h"
-+
-+struct mlx5e_set_transport_static_params_wqe {
-+	struct mlx5_wqe_ctrl_seg ctrl;
-+	struct mlx5_wqe_umr_ctrl_seg uctrl;
-+	struct mlx5_mkey_seg mkc;
-+	struct mlx5_wqe_transport_static_params_seg params;
-+};
-+
-+/* macros for transport_static_params handling */
-+#define MLX5E_TRANSPORT_SET_STATIC_PARAMS_WQEBBS \
-+	(DIV_ROUND_UP(sizeof(struct mlx5e_set_transport_static_params_wqe), MLX5_SEND_WQE_BB))
-+
-+#define MLX5E_TRANSPORT_FETCH_SET_STATIC_PARAMS_WQE(sq, pi) \
-+	((struct mlx5e_set_transport_static_params_wqe *)\
-+	 mlx5e_fetch_wqe(&(sq)->wq, pi, sizeof(struct mlx5e_set_transport_static_params_wqe)))
-+
-+#define MLX5E_TRANSPORT_STATIC_PARAMS_WQE_SZ \
-+	(sizeof(struct mlx5e_set_transport_static_params_wqe))
-+
-+#define MLX5E_TRANSPORT_STATIC_PARAMS_DS_CNT \
-+	(DIV_ROUND_UP(MLX5E_TRANSPORT_STATIC_PARAMS_WQE_SZ, MLX5_SEND_WQE_DS))
-+
-+#define MLX5E_TRANSPORT_STATIC_PARAMS_OCTWORD_SIZE \
-+	(MLX5_ST_SZ_BYTES(transport_static_params) / MLX5_SEND_WQE_DS)
-+
-+#endif /* __MLX5E_COMMON_UTILS_H__ */
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.c
-index 984fa04bd331..bab9b0c59491 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.c
-@@ -100,7 +100,7 @@ bool mlx5e_is_ktls_rx(struct mlx5_core_dev *mdev)
- 		return false;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index b2a5da9739d2..1e1d8f3d2b24 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -555,6 +555,7 @@ struct mlx5e_icosq {
+ 	/* control path */
+ 	struct mlx5_wq_ctrl        wq_ctrl;
+ 	struct mlx5e_channel      *channel;
++	struct mlx5_core_dev      *mdev;
  
- 	/* Check the possibility to post the required ICOSQ WQEs. */
--	if (WARN_ON_ONCE(max_sq_wqebbs < MLX5E_TLS_SET_STATIC_PARAMS_WQEBBS))
-+	if (WARN_ON_ONCE(max_sq_wqebbs < MLX5E_TRANSPORT_SET_STATIC_PARAMS_WQEBBS))
- 		return false;
- 	if (WARN_ON_ONCE(max_sq_wqebbs < MLX5E_TLS_SET_PROGRESS_PARAMS_WQEBBS))
- 		return false;
+ 	struct work_struct         recover_work;
+ } ____cacheline_aligned_in_smp;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
+index fc5a9fdd06db..9ab0b036ce92 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
+@@ -46,7 +46,7 @@ static int mlx5e_query_rq_state(struct mlx5_core_dev *dev, u32 rqn, u8 *state)
+ 
+ static int mlx5e_wait_for_icosq_flush(struct mlx5e_icosq *icosq)
+ {
+-	struct mlx5_core_dev *dev = icosq->channel->mdev;
++	struct mlx5_core_dev *dev = icosq->mdev;
+ 	unsigned long exp_time;
+ 
+ 	exp_time = jiffies + msecs_to_jiffies(mlx5_tout_ms(dev, FLUSH_ON_ERROR));
+@@ -91,7 +91,7 @@ static int mlx5e_rx_reporter_err_icosq_cqe_recover(void *ctx)
+ 	rq = &icosq->channel->rq;
+ 	if (test_bit(MLX5E_RQ_STATE_ENABLED, &icosq->channel->xskrq.state))
+ 		xskrq = &icosq->channel->xskrq;
+-	mdev = icosq->channel->mdev;
++	mdev = icosq->mdev;
+ 	dev = icosq->channel->netdev;
+ 	err = mlx5_core_query_sq_state(mdev, icosq->sqn, &state);
+ 	if (err) {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+index 879d698b6119..cdd7fbf218ae 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+@@ -62,7 +62,7 @@ void mlx5e_trigger_irq(struct mlx5e_icosq *sq);
+ void mlx5e_completion_event(struct mlx5_core_cq *mcq, struct mlx5_eqe *eqe);
+ void mlx5e_cq_error_event(struct mlx5_core_cq *mcq, enum mlx5_event event);
+ int mlx5e_napi_poll(struct napi_struct *napi, int budget);
+-int mlx5e_poll_ico_cq(struct mlx5e_cq *cq);
++int mlx5e_poll_ico_cq(struct mlx5e_cq *cq, int budget);
+ 
+ /* RX */
+ INDIRECT_CALLABLE_DECLARE(bool mlx5e_post_rx_wqes(struct mlx5e_rq *rq));
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
-index 9b597cb24598..20994773056c 100644
+index 20994773056c..3c6c5a4692a3 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
-@@ -136,16 +136,16 @@ static struct mlx5_wqe_ctrl_seg *
- post_static_params(struct mlx5e_icosq *sq,
- 		   struct mlx5e_ktls_offload_context_rx *priv_rx)
- {
--	struct mlx5e_set_tls_static_params_wqe *wqe;
-+	struct mlx5e_set_transport_static_params_wqe *wqe;
- 	struct mlx5e_icosq_wqe_info wi;
- 	u16 pi, num_wqebbs;
- 
--	num_wqebbs = MLX5E_TLS_SET_STATIC_PARAMS_WQEBBS;
-+	num_wqebbs = MLX5E_TRANSPORT_SET_STATIC_PARAMS_WQEBBS;
- 	if (unlikely(!mlx5e_icosq_can_post_wqe(sq, num_wqebbs)))
- 		return ERR_PTR(-ENOSPC);
- 
- 	pi = mlx5e_icosq_get_next_pi(sq, num_wqebbs);
--	wqe = MLX5E_TLS_FETCH_SET_STATIC_PARAMS_WQE(sq, pi);
-+	wqe = MLX5E_TRANSPORT_FETCH_SET_STATIC_PARAMS_WQE(sq, pi);
- 	mlx5e_ktls_build_static_params(wqe, sq->pc, sq->sqn, &priv_rx->crypto_info,
- 				       mlx5e_tir_get_tirn(&priv_rx->tir),
- 				       mlx5_crypto_dek_get_id(priv_rx->dek),
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_tx.c
-index d61be26a4df1..0691995470e2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_tx.c
-@@ -33,7 +33,7 @@ u16 mlx5e_ktls_get_stop_room(struct mlx5_core_dev *mdev, struct mlx5e_params *pa
- 
- 	num_dumps = mlx5e_ktls_dumps_num_wqes(params, MAX_SKB_FRAGS, TLS_MAX_PAYLOAD_SIZE);
- 
--	stop_room += mlx5e_stop_room_for_wqe(mdev, MLX5E_TLS_SET_STATIC_PARAMS_WQEBBS);
-+	stop_room += mlx5e_stop_room_for_wqe(mdev, MLX5E_TRANSPORT_SET_STATIC_PARAMS_WQEBBS);
- 	stop_room += mlx5e_stop_room_for_wqe(mdev, MLX5E_TLS_SET_PROGRESS_PARAMS_WQEBBS);
- 	stop_room += num_dumps * mlx5e_stop_room_for_wqe(mdev, MLX5E_KTLS_DUMP_WQEBBS);
- 	stop_room += 1; /* fence nop */
-@@ -550,12 +550,12 @@ post_static_params(struct mlx5e_txqsq *sq,
- 		   struct mlx5e_ktls_offload_context_tx *priv_tx,
- 		   bool fence)
- {
--	struct mlx5e_set_tls_static_params_wqe *wqe;
-+	struct mlx5e_set_transport_static_params_wqe *wqe;
- 	u16 pi, num_wqebbs;
- 
--	num_wqebbs = MLX5E_TLS_SET_STATIC_PARAMS_WQEBBS;
-+	num_wqebbs = MLX5E_TRANSPORT_SET_STATIC_PARAMS_WQEBBS;
- 	pi = mlx5e_txqsq_get_next_pi(sq, num_wqebbs);
--	wqe = MLX5E_TLS_FETCH_SET_STATIC_PARAMS_WQE(sq, pi);
-+	wqe = MLX5E_TRANSPORT_FETCH_SET_STATIC_PARAMS_WQE(sq, pi);
- 	mlx5e_ktls_build_static_params(wqe, sq->pc, sq->sqn, &priv_tx->crypto_info,
- 				       priv_tx->tisn,
- 				       mlx5_crypto_dek_get_id(priv_tx->dek),
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c
-index 570a912dd6fa..8abea6fe6cd9 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c
-@@ -8,10 +8,6 @@ enum {
- 	MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_2 = 0x2,
- };
- 
--enum {
--	MLX5E_ENCRYPTION_STANDARD_TLS = 0x1,
--};
--
- #define EXTRACT_INFO_FIELDS do { \
- 	salt    = info->salt;    \
- 	rec_seq = info->rec_seq; \
-@@ -20,7 +16,7 @@ enum {
- } while (0)
- 
- static void
--fill_static_params(struct mlx5_wqe_tls_static_params_seg *params,
-+fill_static_params(struct mlx5_wqe_transport_static_params_seg *params,
- 		   union mlx5e_crypto_info *crypto_info,
- 		   u32 key_id, u32 resync_tcp_sn)
- {
-@@ -53,25 +49,25 @@ fill_static_params(struct mlx5_wqe_tls_static_params_seg *params,
- 		return;
+@@ -267,7 +267,7 @@ resync_post_get_progress_params(struct mlx5e_icosq *sq,
+ 		goto err_out;
  	}
  
--	gcm_iv      = MLX5_ADDR_OF(tls_static_params, ctx, gcm_iv);
--	initial_rn  = MLX5_ADDR_OF(tls_static_params, ctx, initial_record_number);
-+	gcm_iv      = MLX5_ADDR_OF(transport_static_params, ctx, gcm_iv);
-+	initial_rn  = MLX5_ADDR_OF(transport_static_params, ctx, initial_record_number);
+-	pdev = mlx5_core_dma_dev(sq->channel->priv->mdev);
++	pdev = mlx5_core_dma_dev(sq->mdev);
+ 	buf->dma_addr = dma_map_single(pdev, &buf->progress,
+ 				       PROGRESS_PARAMS_PADDED_SIZE, DMA_FROM_DEVICE);
+ 	if (unlikely(dma_mapping_error(pdev, buf->dma_addr))) {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index ea58c6917433..9ae4c4213db7 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -1500,6 +1500,7 @@ static int mlx5e_alloc_icosq(struct mlx5e_channel *c,
+ 	int err;
  
- 	memcpy(gcm_iv,      salt,    salt_sz);
- 	memcpy(initial_rn,  rec_seq, rec_seq_sz);
+ 	sq->channel   = c;
++	sq->mdev      = mdev;
+ 	sq->uar_map   = mdev->mlx5e_res.hw_objs.bfreg.map;
+ 	sq->reserved_room = param->stop_room;
  
- 	tls_version = MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_2;
+@@ -1898,11 +1899,9 @@ void mlx5e_deactivate_icosq(struct mlx5e_icosq *icosq)
  
--	MLX5_SET(tls_static_params, ctx, tls_version, tls_version);
--	MLX5_SET(tls_static_params, ctx, const_1, 1);
--	MLX5_SET(tls_static_params, ctx, const_2, 2);
--	MLX5_SET(tls_static_params, ctx, encryption_standard,
--		 MLX5E_ENCRYPTION_STANDARD_TLS);
--	MLX5_SET(tls_static_params, ctx, resync_tcp_sn, resync_tcp_sn);
--	MLX5_SET(tls_static_params, ctx, dek_index, key_id);
-+	MLX5_SET(transport_static_params, ctx, tls_version, tls_version);
-+	MLX5_SET(transport_static_params, ctx, const_1, 1);
-+	MLX5_SET(transport_static_params, ctx, const_2, 2);
-+	MLX5_SET(transport_static_params, ctx, acc_type,
-+		 MLX5_TRANSPORT_STATIC_PARAMS_ACC_TYPE_TLS);
-+	MLX5_SET(transport_static_params, ctx, resync_tcp_sn, resync_tcp_sn);
-+	MLX5_SET(transport_static_params, ctx, dek_index, key_id);
+ static void mlx5e_close_icosq(struct mlx5e_icosq *sq)
+ {
+-	struct mlx5e_channel *c = sq->channel;
+-
+ 	if (sq->ktls_resync)
+ 		mlx5e_ktls_rx_resync_destroy_resp_list(sq->ktls_resync);
+-	mlx5e_destroy_sq(c->mdev, sq->sqn);
++	mlx5e_destroy_sq(sq->mdev, sq->sqn);
+ 	mlx5e_free_icosq_descs(sq);
+ 	mlx5e_free_icosq(sq);
+ }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index 8d9743a5e42c..addf8905fc35 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -993,7 +993,7 @@ static void mlx5e_handle_shampo_hd_umr(struct mlx5e_shampo_umr umr,
+ 	shampo->ci = (shampo->ci + umr.len) & (shampo->hd_per_wq - 1);
  }
  
- void
--mlx5e_ktls_build_static_params(struct mlx5e_set_tls_static_params_wqe *wqe,
-+mlx5e_ktls_build_static_params(struct mlx5e_set_transport_static_params_wqe *wqe,
- 			       u16 pc, u32 sqn,
- 			       union mlx5e_crypto_info *crypto_info,
- 			       u32 tis_tir_num, u32 key_id, u32 resync_tcp_sn,
-@@ -80,19 +76,17 @@ mlx5e_ktls_build_static_params(struct mlx5e_set_tls_static_params_wqe *wqe,
- 	struct mlx5_wqe_umr_ctrl_seg *ucseg = &wqe->uctrl;
- 	struct mlx5_wqe_ctrl_seg     *cseg  = &wqe->ctrl;
- 	u8 opmod = direction == TLS_OFFLOAD_CTX_DIR_TX ?
--		MLX5_OPC_MOD_TLS_TIS_STATIC_PARAMS :
--		MLX5_OPC_MOD_TLS_TIR_STATIC_PARAMS;
--
--#define STATIC_PARAMS_DS_CNT DIV_ROUND_UP(sizeof(*wqe), MLX5_SEND_WQE_DS)
-+		MLX5_OPC_MOD_TRANSPORT_TIS_STATIC_PARAMS :
-+		MLX5_OPC_MOD_TRANSPORT_TIR_STATIC_PARAMS;
+-int mlx5e_poll_ico_cq(struct mlx5e_cq *cq)
++int mlx5e_poll_ico_cq(struct mlx5e_cq *cq, int budget)
+ {
+ 	struct mlx5e_icosq *sq = container_of(cq, struct mlx5e_icosq, cq);
+ 	struct mlx5_cqe64 *cqe;
+@@ -1068,7 +1068,7 @@ int mlx5e_poll_ico_cq(struct mlx5e_cq *cq)
+ 						 wi->wqe_type);
+ 			}
+ 		} while (!last_wqe);
+-	} while ((++i < MLX5E_TX_CQ_POLL_BUDGET) && (cqe = mlx5_cqwq_get_cqe(&cq->wq)));
++	} while ((++i < budget) && (cqe = mlx5_cqwq_get_cqe(&cq->wq)));
  
- 	cseg->opmod_idx_opcode = cpu_to_be32((pc << 8) | MLX5_OPCODE_UMR | (opmod << 24));
- 	cseg->qpn_ds           = cpu_to_be32((sqn << MLX5_WQE_CTRL_QPN_SHIFT) |
--					     STATIC_PARAMS_DS_CNT);
-+					     MLX5E_TRANSPORT_STATIC_PARAMS_DS_CNT);
- 	cseg->fm_ce_se         = fence ? MLX5_FENCE_MODE_INITIATOR_SMALL : 0;
- 	cseg->tis_tir_num      = cpu_to_be32(tis_tir_num << 8);
+ 	sq->cc = sqcc;
  
- 	ucseg->flags = MLX5_UMR_INLINE;
--	ucseg->bsf_octowords = cpu_to_be16(MLX5_ST_SZ_BYTES(tls_static_params) / 16);
-+	ucseg->bsf_octowords = cpu_to_be16(MLX5E_TRANSPORT_STATIC_PARAMS_OCTWORD_SIZE);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
+index a7d9b7cb4297..fd52311aada9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
+@@ -178,8 +178,8 @@ int mlx5e_napi_poll(struct napi_struct *napi, int budget)
  
- 	fill_static_params(&wqe->params, crypto_info, key_id, resync_tcp_sn);
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_utils.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_utils.h
-index 3d79cd379890..5e2d186778aa 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_utils.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_utils.h
-@@ -6,6 +6,7 @@
+ 	busy |= work_done == budget;
  
- #include <net/tls.h>
- #include "en.h"
-+#include "en_accel/common_utils.h"
- 
- enum {
- 	MLX5E_TLS_PROGRESS_PARAMS_AUTH_STATE_NO_OFFLOAD     = 0,
-@@ -33,13 +34,6 @@ union mlx5e_crypto_info {
- 	struct tls12_crypto_info_aes_gcm_256 crypto_info_256;
- };
- 
--struct mlx5e_set_tls_static_params_wqe {
--	struct mlx5_wqe_ctrl_seg ctrl;
--	struct mlx5_wqe_umr_ctrl_seg uctrl;
--	struct mlx5_mkey_seg mkc;
--	struct mlx5_wqe_tls_static_params_seg params;
--};
--
- struct mlx5e_set_tls_progress_params_wqe {
- 	struct mlx5_wqe_ctrl_seg ctrl;
- 	struct mlx5_wqe_tls_progress_params_seg params;
-@@ -50,19 +44,12 @@ struct mlx5e_get_tls_progress_params_wqe {
- 	struct mlx5_seg_get_psv  psv;
- };
- 
--#define MLX5E_TLS_SET_STATIC_PARAMS_WQEBBS \
--	(DIV_ROUND_UP(sizeof(struct mlx5e_set_tls_static_params_wqe), MLX5_SEND_WQE_BB))
--
- #define MLX5E_TLS_SET_PROGRESS_PARAMS_WQEBBS \
- 	(DIV_ROUND_UP(sizeof(struct mlx5e_set_tls_progress_params_wqe), MLX5_SEND_WQE_BB))
- 
- #define MLX5E_KTLS_GET_PROGRESS_WQEBBS \
- 	(DIV_ROUND_UP(sizeof(struct mlx5e_get_tls_progress_params_wqe), MLX5_SEND_WQE_BB))
- 
--#define MLX5E_TLS_FETCH_SET_STATIC_PARAMS_WQE(sq, pi) \
--	((struct mlx5e_set_tls_static_params_wqe *)\
--	 mlx5e_fetch_wqe(&(sq)->wq, pi, sizeof(struct mlx5e_set_tls_static_params_wqe)))
--
- #define MLX5E_TLS_FETCH_SET_PROGRESS_PARAMS_WQE(sq, pi) \
- 	((struct mlx5e_set_tls_progress_params_wqe *)\
- 	 mlx5e_fetch_wqe(&(sq)->wq, pi, sizeof(struct mlx5e_set_tls_progress_params_wqe)))
-@@ -76,7 +63,7 @@ struct mlx5e_get_tls_progress_params_wqe {
- 	 mlx5e_fetch_wqe(&(sq)->wq, pi, sizeof(struct mlx5e_dump_wqe)))
- 
- void
--mlx5e_ktls_build_static_params(struct mlx5e_set_tls_static_params_wqe *wqe,
-+mlx5e_ktls_build_static_params(struct mlx5e_set_transport_static_params_wqe *wqe,
- 			       u16 pc, u32 sqn,
- 			       union mlx5e_crypto_info *crypto_info,
- 			       u32 tis_tir_num, u32 key_id, u32 resync_tcp_sn,
-diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
-index 820bca965fb6..f1dde3c6a3f3 100644
---- a/include/linux/mlx5/device.h
-+++ b/include/linux/mlx5/device.h
-@@ -454,8 +454,8 @@ enum {
- };
- 
- enum {
--	MLX5_OPC_MOD_TLS_TIS_STATIC_PARAMS = 0x1,
--	MLX5_OPC_MOD_TLS_TIR_STATIC_PARAMS = 0x2,
-+	MLX5_OPC_MOD_TRANSPORT_TIS_STATIC_PARAMS = 0x1,
-+	MLX5_OPC_MOD_TRANSPORT_TIR_STATIC_PARAMS = 0x2,
- };
- 
- enum {
-@@ -463,8 +463,8 @@ enum {
- 	MLX5_OPC_MOD_TLS_TIR_PROGRESS_PARAMS = 0x2,
- };
- 
--struct mlx5_wqe_tls_static_params_seg {
--	u8     ctx[MLX5_ST_SZ_BYTES(tls_static_params)];
-+struct mlx5_wqe_transport_static_params_seg {
-+	u8     ctx[MLX5_ST_SZ_BYTES(transport_static_params)];
- };
- 
- struct mlx5_wqe_tls_progress_params_seg {
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index 4df6d1c12437..9aa81c8c5b14 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -12349,12 +12349,16 @@ enum {
- 	MLX5_GENERAL_OBJECT_TYPE_ENCRYPTION_KEY_PURPOSE_MACSEC = 0x4,
- };
- 
--struct mlx5_ifc_tls_static_params_bits {
-+enum {
-+	MLX5_TRANSPORT_STATIC_PARAMS_ACC_TYPE_TLS               = 0x1,
-+};
-+
-+struct mlx5_ifc_transport_static_params_bits {
- 	u8         const_2[0x2];
- 	u8         tls_version[0x4];
- 	u8         const_1[0x2];
- 	u8         reserved_at_8[0x14];
--	u8         encryption_standard[0x4];
-+	u8         acc_type[0x4];
- 
- 	u8         reserved_at_20[0x20];
- 
+-	mlx5e_poll_ico_cq(&c->icosq.cq);
+-	if (mlx5e_poll_ico_cq(&c->async_icosq.cq))
++	mlx5e_poll_ico_cq(&c->icosq.cq, MLX5E_TX_CQ_POLL_BUDGET);
++	if (mlx5e_poll_ico_cq(&c->async_icosq.cq, MLX5E_TX_CQ_POLL_BUDGET))
+ 		/* Don't clear the flag if nothing was polled to prevent
+ 		 * queueing more WQEs and overflowing the async ICOSQ.
+ 		 */
 -- 
 2.34.1
 
