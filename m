@@ -1,115 +1,89 @@
-Return-Path: <netdev+bounces-43751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A087D48A3
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 09:35:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A44397D48C8
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 09:40:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93E4F1C20AE1
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 07:35:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B227D1C20B15
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 07:40:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A9014A9F;
-	Tue, 24 Oct 2023 07:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72C113AD7;
+	Tue, 24 Oct 2023 07:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dI75M02X"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Gl7KKMp0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7B613AFC
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 07:35:34 +0000 (UTC)
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D026310D8
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 00:35:30 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1c9c145bb5bso94195ad.1
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 00:35:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698132930; x=1698737730; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uyep+u71crtfaR4lFjOq7pR39SPnIQZqdddTx57In1c=;
-        b=dI75M02Xv850RuqhbVJbDxjzdjdwvsqVcGYZ1YDOt55aFXeIVlhQkBrYXIAB/7iZfs
-         cmR/PLwc/0xrJYA+0GzUBXAGDvscWxjF6IMht0n8kROeqyR5xXJFKrxotDtDdqLSrqbS
-         cMAIxLmYsup62Hhzt+x66ADpdbII6nROUEzjXI3fR4BCUyfrxBFfdDGdmY0wNeockcq9
-         PHG/EbEHbJamz+7NYPRjUSG60E07jIEPKTHA28uJBZDwzTFAOt6v1YGONOFSRLCS8++z
-         7tp+NE7Ivpk+vJ2jYpKMsjZCzAeQov1X81bdn2S9ej880RkWGzpPu+eDqBOM2PSxddAz
-         VNiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698132930; x=1698737730;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Uyep+u71crtfaR4lFjOq7pR39SPnIQZqdddTx57In1c=;
-        b=bWFWn5HMciz3aacytzGkCqiaJEx/mr3426hxJhH2SFZIgnMEeeUS1VrY6GPXDaVsqC
-         cGCmLA0fgIzRXoFvjgZASRdf2aS2F5JGUMzfayt8zQuBLXbZePWaXs1xOdD4ngOafn/5
-         gJ68EsZqR1RS2o3nZ4v6eHBQJhyUnzp3p42P4RB0te4yiO6ZVUaSyj92eTMftATYQLBp
-         Bg5+d0XyGct6TGL6vgyUgM1hg7aZa9CEQzob8Q7iKcFbHilz2VpGODw4Rqgt9/Wh1yur
-         VJVxqckE4mI3dPPUR8oNYI/rQPz1rusanjO1O2TuKgzu+AMeB4V8mp7djVvYFZSrBTzj
-         LB9w==
-X-Gm-Message-State: AOJu0Yz8Ro7Fg7uJTNMnt1rMw6P6NDT5onCq/Of4ZrGynTHnlTjr6GJi
-	bw7aYGlskQ7sc6q0rp8BWFvmf5Jd2iVaCRo0fN1rdA==
-X-Google-Smtp-Source: AGHT+IH2U2wjlJhZU4maQKEC7MX9MJ2lmSSUVHJxpBXDZMYoB9uPHOCxx3ZtCWo3ROSpAdvF7groh0U0QmI4cUm1ZYc=
-X-Received: by 2002:a17:902:d586:b0:1c9:e48c:726d with SMTP id
- k6-20020a170902d58600b001c9e48c726dmr184955plh.4.1698132929698; Tue, 24 Oct
- 2023 00:35:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8D23FE1
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 07:40:50 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6E3EB7;
+	Tue, 24 Oct 2023 00:40:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=wDdZe1ccmDlYEf7VbnHjWqpDq2mjMLwOKz8KmLSioHo=;
+	t=1698133248; x=1699342848; b=Gl7KKMp0/2fbMdEI06eSLpDgullckzYiFaDvSwo9zirYEB8
+	AGu5CMj5/EaI9eRCv+pP4/XLq68tY52rGnAWQJO2X3IcOQGJf3NKnTH/ykwWh4Kl0hNmnoJy019N3
+	3Jxg1zepg2E6OMI7uv3YWXtXi/1sHRjF+JnUySi8LIwKMaMzYGNbeea1YcuTkrikrldmkDQLoh+B4
+	eYDIZKSZm6qCANGEPgMHXh1IH/a4C7lzfBe+EhGYKsaigP4I2AMdWG8z657ZixF7oQZI7t/IZO97K
+	gaiiVStt850HFiyVbiEQZinMdsnlJvV43DHqtrZ8ZLD8/8ifgCEDY7WLR3AWQ7Uw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97-RC1)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qvC1s-00000001IKI-3VUL;
+	Tue, 24 Oct 2023 09:40:45 +0200
+Message-ID: <3a68f9ff27d9c82a038aea6acfb39848d0b31842.camel@sipsolutions.net>
+Subject: Re: [PATCH net v2 1/2] MAINTAINERS: Move M Chetan Kumar to CREDITS
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jakub Kicinski <kuba@kernel.org>, Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux
+ Networking <netdev@vger.kernel.org>, Loic Poulain
+ <loic.poulain@linaro.org>, Sergey Ryazanov <ryazanov.s.a@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Date: Tue, 24 Oct 2023 09:40:43 +0200
+In-Reply-To: <20231023185221.2eb7cb38@kernel.org>
+References: <20231023032905.22515-2-bagasdotme@gmail.com>
+	 <20231023032905.22515-3-bagasdotme@gmail.com>
+	 <20231023093837.49c7cb35@kernel.org>
+	 <e1b1f477-e41d-4834-984b-0db219342e5b@gmail.com>
+	 <20231023185221.2eb7cb38@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231019120026.42215-1-wuyun.abel@bytedance.com>
- <20231019120026.42215-3-wuyun.abel@bytedance.com> <69c50d431e2927ce6a6589b4d7a1ed21f0a4586c.camel@redhat.com>
-In-Reply-To: <69c50d431e2927ce6a6589b4d7a1ed21f0a4586c.camel@redhat.com>
-From: Shakeel Butt <shakeelb@google.com>
-Date: Tue, 24 Oct 2023 00:35:18 -0700
-Message-ID: <CALvZod5EMJcxZgmvUXun29R-PrT-v=18DHpd40QLNweXz71vFw@mail.gmail.com>
-Subject: Re: [PATCH net v3 3/3] sock: Ignore memcg pressure heuristics when
- raising allocated
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Abel Wu <wuyun.abel@bytedance.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-malware-bazaar: not-scanned
 
-On Tue, Oct 24, 2023 at 12:08=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On Thu, 2023-10-19 at 20:00 +0800, Abel Wu wrote:
-> > Before sockets became aware of net-memcg's memory pressure since
-> > commit e1aab161e013 ("socket: initial cgroup code."), the memory
-> > usage would be granted to raise if below average even when under
-> > protocol's pressure. This provides fairness among the sockets of
-> > same protocol.
-> >
-> > That commit changes this because the heuristic will also be
-> > effective when only memcg is under pressure which makes no sense.
-> > So revert that behavior.
-> >
-> > After reverting, __sk_mem_raise_allocated() no longer considers
-> > memcg's pressure. As memcgs are isolated from each other w.r.t.
-> > memory accounting, consuming one's budget won't affect others.
-> > So except the places where buffer sizes are needed to be tuned,
-> > allow workloads to use the memory they are provisioned.
-> >
-> > Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
-> > Acked-by: Shakeel Butt <shakeelb@google.com>
-> > Acked-by: Paolo Abeni <pabeni@redhat.com>
->
-> It's totally not clear to me why you changed the target tree from net-
-> next to net ?!? This is net-next material, I asked to strip the fixes
-> tag exactly for that reason.
->
-> Since there is agreement on this series and we are late in the cycle, I
-> would avoid a re-post (we can apply the series to net-next anyway) but
-> any clarification on the target tree change will be appreciated,
-> thanks!
->
+On Mon, 2023-10-23 at 18:52 -0700, Jakub Kicinski wrote:
+>=20
+> > He's now in a state of limbo. He has significant contribution
+> > (and gets listed by get_maintainer script with (AFAIK) no way
+> > to filter him out), yet emails to him bounces. What will be
+> > the resolution then?
+>=20
+> Yes :( Not much we can do about that (even if we drop him from
+> maintainers all fixes will CC him based on the sign-off tags).
 
-I didn't even notice the change in the target tree. I would say let's
-keep this for net-next as there are no urgent fixes here.
+I was hoping he'd chime in here - I did manage to find him at his
+personal address, but I didn't want to just add his personal address to
+the public list.
+
+If he's OK with exposing his personal (or new work?) address I guess we
+could add him to the .mailmap, to address this particular problem.
+
+Anyway I've BCC'ed him now (Hi Chetan :) ), but he had also said he was
+checking with his new work about this all.
+
+johannes
 
