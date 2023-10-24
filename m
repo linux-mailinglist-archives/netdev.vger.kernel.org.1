@@ -1,97 +1,173 @@
-Return-Path: <netdev+bounces-43939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C68D7D584B
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:29:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DACA57D588B
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:36:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F9E9281812
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:29:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8B111C20D22
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084713A267;
-	Tue, 24 Oct 2023 16:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69123A29C;
+	Tue, 24 Oct 2023 16:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="TNtI6T01"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Fnb9y0Zr"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FABE3A260;
-	Tue, 24 Oct 2023 16:29:29 +0000 (UTC)
-Received: from mail-40133.protonmail.ch (mail-40133.protonmail.ch [185.70.40.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BC0210E9;
-	Tue, 24 Oct 2023 09:29:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1698164960; x=1698424160;
-	bh=9wCN5hqgjoeWJfYj6IaF7NWT36bB8jzQnGe4cq5/zwM=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=TNtI6T01vp/iSJsaJUbpm4T4Kiv5eI7YMO/RV8vS1VQCcuLxdgE9+aC7Cn2lF7ts0
-	 BfdBy0hINwLrWMiaJOQ5oVH/NSUlz2tInL1XUdxwgkD7eFXhraLomhl+/WWkFuXUBX
-	 NcTAK2YsS7eynRP2j4kzSfLV0dtmKAOMyXcxVjbNvWCLKpLMZYDu9xypuul0W2tEJl
-	 G+o8xP/octkC6pVRharnhuQ/TXlwxdAah/yvKb1VSPxTQv/53jwQiRhFztx0bM6Hhm
-	 0SFKHkii1JHkQNWmdV5Bpcfh/3EOVV5hmMfhTNKDBn0H9CEk3ZRX6dLTu6tBfP6vOB
-	 N6cSvOslplE1Q==
-Date: Tue, 24 Oct 2023 16:29:16 +0000
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com, greg@kroah.com, Miguel Ojeda <ojeda@kernel.org>
-Subject: Re: [PATCH net-next v6 3/5] rust: add second `bindgen` pass for enum exhaustiveness checking
-Message-ID: <6412a54b-844a-497c-a7e2-2b5f94005226@proton.me>
-In-Reply-To: <20231024005842.1059620-4-fujita.tomonori@gmail.com>
-References: <20231024005842.1059620-1-fujita.tomonori@gmail.com> <20231024005842.1059620-4-fujita.tomonori@gmail.com>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78553A268;
+	Tue, 24 Oct 2023 16:35:55 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89BED93;
+	Tue, 24 Oct 2023 09:35:50 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39OGRZRT005791;
+	Tue, 24 Oct 2023 16:35:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=gzAjjy82jfI/5Z+fp7XVCAqrdkII0tgN1G0UzbsZCZo=;
+ b=Fnb9y0ZriqGJj5MvDcRRkh1VycEDeuyBKKqq6BatKHg9/SgcJ8G2C/45OFMoBlHYdYE6
+ yTP2oay52RuQh5gl+5MtG0DpAYIm9EbnLMH7eukwj3POJTzvZUmbGqcmwCXOXpgoGJPp
+ 0Y8iXmGzmsbtx+aX/8+3ItQHJ5HPyVUlTDqZGOnWUesixqisyFczLKU0e2HhkeOwmGn2
+ qn48lyjHbCRUU4PjrO/UKLh2TGbYYCBWj5Xzj/2DajWvBe+ga4pVeiqMY2lzcyszMVE7
+ v57Duk43ML+p4Ykl+1V0yvtHneL0yiZUciRJkI4UichkMD/HQA2NIvri3MMXMUY8oulu Vw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3txhf5r641-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 24 Oct 2023 16:35:48 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39OGRY6k005735;
+	Tue, 24 Oct 2023 16:35:43 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3txhf5r4kk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 24 Oct 2023 16:35:40 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39OFq1sP023782;
+	Tue, 24 Oct 2023 16:31:09 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tvryt11vj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 24 Oct 2023 16:31:09 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39OGV6Lj37290336
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 24 Oct 2023 16:31:06 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B611120043;
+	Tue, 24 Oct 2023 16:31:06 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 069E520040;
+	Tue, 24 Oct 2023 16:31:06 +0000 (GMT)
+Received: from [9.171.57.222] (unknown [9.171.57.222])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 24 Oct 2023 16:31:05 +0000 (GMT)
+Message-ID: <c82af527-d72a-476f-8a76-893d68b6a87f@linux.ibm.com>
+Date: Tue, 24 Oct 2023 18:31:05 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] s390/qeth: replace deprecated strncpy with strscpy
+To: Justin Stitt <justinstitt@google.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Wenjia Zhang
+ <wenjia@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20231023-strncpy-drivers-s390-net-qeth_core_main-c-v1-1-e7ce65454446@google.com>
+Content-Language: en-GB
+From: Thorsten Winkler <twinkler@linux.ibm.com>
+In-Reply-To: <20231023-strncpy-drivers-s390-net-qeth_core_main-c-v1-1-e7ce65454446@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: BwEG0FpVjPOs9G4YuxgdOSKf9jDJn1ZN
+X-Proofpoint-ORIG-GUID: XAQV7EPJWV3xI0saw8O4bh3S0Kz7Cesg
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-24_16,2023-10-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ phishscore=0 mlxlogscore=999 priorityscore=1501 mlxscore=0 adultscore=0
+ malwarescore=0 suspectscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310170001
+ definitions=main-2310240143
 
-On 24.10.23 02:58, FUJITA Tomonori wrote:
-> From: Miguel Ojeda <ojeda@kernel.org>
 
-I think this commit message should also explain what it is
-doing and not only the error below.
 
---=20
-Cheers,
-Benno
+On 23.10.23 21:39, Justin Stitt wrote:
+> strncpy() is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
+> 
+> We expect new_entry->dbf_name to be NUL-terminated based on its use with
+> strcmp():
+> |       if (strcmp(entry->dbf_name, name) == 0) {
+> 
+> Moreover, NUL-padding is not required as new_entry is kzalloc'd just
+> before this assignment:
+> |       new_entry = kzalloc(sizeof(struct qeth_dbf_entry), GFP_KERNEL);
+> 
+> ... rendering any future NUL-byte assignments (like the ones strncpy()
+> does) redundant.
+> 
+> Considering the above, a suitable replacement is `strscpy` [2] due to
+> the fact that it guarantees NUL-termination on the destination buffer
+> without unnecessarily NUL-padding.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
 
->      error[E0005]: refutable pattern in function argument
->           --> rust/bindings/bindings_enum_check.rs:29:6
->            |
->      29    |       (phy_state::PHY_DOWN
->            |  ______^
->      30    | |     | phy_state::PHY_READY
->      31    | |     | phy_state::PHY_HALTED
->      32    | |     | phy_state::PHY_ERROR
->      ...     |
->      35    | |     | phy_state::PHY_NOLINK
->      36    | |     | phy_state::PHY_CABLETEST): phy_state,
->            | |______________________________^ pattern `phy_state::PHY_NEW=
-` not covered
->            |
->      note: `phy_state` defined here
->           --> rust/bindings/bindings_generated_enum_check.rs:60739:10
->            |
->      60739 | pub enum phy_state {
->            |          ^^^^^^^^^
->      ...
->      60745 |     PHY_NEW =3D 5,
->            |     ------- not covered
->            =3D note: the matched value is of type `phy_state`
->=20
-> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+LGTM, thank you!
+
+Reviewed-by: Thorsten Winkler <twinkler@linux.ibm.com>
+Tested-by: Thorsten Winkler <twinkler@linux.ibm.com>
+
 > ---
-
-[...]
-
-
+> Note: build-tested only.
+> 
+> Found with: $ rg "strncpy\("
+> ---
+>   drivers/s390/net/qeth_core_main.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/s390/net/qeth_core_main.c b/drivers/s390/net/qeth_core_main.c
+> index cd783290bde5..6af2511e070c 100644
+> --- a/drivers/s390/net/qeth_core_main.c
+> +++ b/drivers/s390/net/qeth_core_main.c
+> @@ -6226,7 +6226,7 @@ static int qeth_add_dbf_entry(struct qeth_card *card, char *name)
+>   	new_entry = kzalloc(sizeof(struct qeth_dbf_entry), GFP_KERNEL);
+>   	if (!new_entry)
+>   		goto err_dbg;
+> -	strncpy(new_entry->dbf_name, name, DBF_NAME_LEN);
+> +	strscpy(new_entry->dbf_name, name, sizeof(new_entry->dbf_name));
+>   	new_entry->dbf_info = card->debug;
+>   	mutex_lock(&qeth_dbf_list_mutex);
+>   	list_add(&new_entry->dbf_list, &qeth_dbf_list);
+> 
+> ---
+> base-commit: 9c5d00cb7b6bbc5a7965d9ab7d223b5402d1f02c
+> change-id: 20231023-strncpy-drivers-s390-net-qeth_core_main-c-0b0ee08672ec
+> 
+> Best regards,
+> --
+> Justin Stitt <justinstitt@google.com>
+> 
+> 
 
