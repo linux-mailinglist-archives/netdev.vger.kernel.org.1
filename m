@@ -1,103 +1,236 @@
-Return-Path: <netdev+bounces-43971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FE177D5A5C
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:23:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3A637D5A69
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:27:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15F271C20CC5
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:23:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D52851C20852
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B313C6A1;
-	Tue, 24 Oct 2023 18:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E3D3C683;
+	Tue, 24 Oct 2023 18:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="GoBMniGd"
+	dkim=pass (2048-bit key) header.d=uipath.com header.i=@uipath.com header.b="U5IHB+Rj"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7AC6134B2
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 18:23:38 +0000 (UTC)
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B49CA10D0
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:23:33 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-d9ad90e1038so4383019276.3
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:23:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1698171813; x=1698776613; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fhPdOnDAT6+PH0Vz8+OhielyBKDSwn2hQuYPBjz8d74=;
-        b=GoBMniGdumoQamnCW981sYPNKX4w3n07WuWq2knVER51Gc5Y7j/PQkY1mforczzlua
-         t/H+c1wmbpIVoX6Bl5WjQKy3UDWumv22J8txGIMAYH4lsxAfrdEG1MHKxyW/bwFcW7zZ
-         efy0cilMUzI+bke3LuELpoNSzX/pjD9AzGa8J3eL4+ZJ71cGIaGJTZHiz6vDuBvvmh+K
-         ke8VL+eBHQAXdnOf3n9/aReOaw4Gcw53UkMnkLEx+4bQ4skHqn86sfnagYJiX3E4LkGI
-         1XX8pY+sAXDhetrHi/U9Ii22D8cbB7i6MWLDC4w1bZCkVsaIQBw5XMdIHwK1Mj8qx/cL
-         oC6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698171813; x=1698776613;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fhPdOnDAT6+PH0Vz8+OhielyBKDSwn2hQuYPBjz8d74=;
-        b=rkhLBPycug0vOpyoSRvY4uJd5sUD+mLMJ2OJ2M9q5zyEhRR5fqo85iHvAE0awkCIbz
-         zURtgG4/0guFENL+aJZB59ZbA7TtuaC0fqLoNjy/A01TNewI/yuxtfq8KaK/A2mhMLi4
-         Zmwiay0Mx/KGA8dekkVnVkNVc4sbEwVtbvpoJbn1R0fLduBIc/3OPQ6POOrWHnP8Mhw/
-         cn6Y2VmcIyLNC0+OUPmKxaiyIyCtwY0CkOJmeEP5cyhkaZuGik5/H8phm+2RMs/xcnef
-         g3WPlFIFWYFkFRtXekQ8K+hdnUa94Z3m3Yv16j+Fu8FPMk74p/16Cp7LxvYnMRS6ahn6
-         ma7A==
-X-Gm-Message-State: AOJu0YzdCGobm5lDP9OGNu9hZApN6i4oH5CJcmI7i11QtrjX2JjSChwe
-	C7rSafIJJ7//+48T72jIOCS5HCMTuARGBWzj8Y7z
-X-Google-Smtp-Source: AGHT+IGYicwo5fgU8AO29MEj/Hqf7OL3O4Fu0oZpB1YjJyeL4usUQIL7t8AbMBYxOoSYtknsoEYzmYx0zZzWthpg+eM=
-X-Received: by 2002:a25:b322:0:b0:d9b:4c61:26f1 with SMTP id
- l34-20020a25b322000000b00d9b4c6126f1mr12961292ybj.24.1698171812890; Tue, 24
- Oct 2023 11:23:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774611CA9C
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 18:27:12 +0000 (UTC)
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2118.outbound.protection.outlook.com [40.107.6.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EFD9123;
+	Tue, 24 Oct 2023 11:27:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VMuVryeTXL7EWpgtmwmFxMzz+vWYWmxy4c3yN7E1Q9uMxqhN0lEvJWw58g67oRv5+JaeeolN3KV0e/gEGoFiqoLoj7U128Opz5DtYi/A2nPAOMaNUGDxU9RyGaSZwe1S1EEPqiQm6+OYIc6Kv9XH/vTahi2M+P1/8kdLOmfMwjtqwkAcG6iwk7/K8cLRVq9qq1knrMLRSX2kbDBmqpdaH8Z2c0/l9Ge2mzh6qz2V+evvvtV3iVKdfjkKELkraDPrqIJhBhrctgrSaXcF5BxW1v4YiApSxJx5v04uHoY30JviGyN2FFOsO6sw0hsz6sGArkP0xjPxlzwlcnoRq9g8fw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fGuELi3XUY50mzSuATuWLj85HnwWO3fV7VGuJbAm+IU=;
+ b=IrFEn6uwU60pMtpa/izvWbT/SEYCUr1fY3L/aGtAAH2vDx9J1Vp7KpWnhwdRR9bX/ld7BScMCwHAn82uLeLoRIhCrNdJGu9hIWb5GM1lS+yuLRKOarxUn8OcZQT0gxm48qmBA9mfFFyTmjBoTnGVOsmYawO6ByPTkoksL+oyYmURXsSYJkIusLFzybrgubZVkREUuN40D+mOX71LWi86euoWIkUhKDXrKhySjriNHar21fqdjoN96MF5W5ZbtOQdunrcUQTDchPHeF9Hbhbbh2FCRiFHsYxWuy2RzwFKjNqV2qVjs6tCFW9fN4Q/001vHB9XgLHdEb8PLl1v+ccxcA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=uipath.com; dmarc=pass action=none header.from=uipath.com;
+ dkim=pass header.d=uipath.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uipath.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fGuELi3XUY50mzSuATuWLj85HnwWO3fV7VGuJbAm+IU=;
+ b=U5IHB+RjZO7PL4otOE5Km/Gwruj+7lg7lGB2rExRoJMXD7efHaC/mBCsl46rmkaCq10/Uoa3BIkZ3dkSTCAs4HgBOyOTJmp2PabHE7ZSUEhTDgFefgEUpXYgqKTq37y8eUhUy69NJVRi/lMQjinjDbrZi2ykZ3dXhoG81QTE1HoCvh590Ehw0NgRX391BSLRNbVW5vV1wOYVeNTodnl3CnrP3x3PnbfJvxfVz4vWFMPPRJN9zYfBSWMlvU9Qh721HWqg8PSRGtCJ09DTdSLfrYfJsXG1TtSDdfGGL9/D8fzflT53n7jQFv3iuAsyMNV61DZqzR+phlo5Kp9oxXgzvA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=uipath.com;
+Received: from VI1PR02MB4527.eurprd02.prod.outlook.com (2603:10a6:803:b1::28)
+ by AS2PR02MB9488.eurprd02.prod.outlook.com (2603:10a6:20b:598::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Tue, 24 Oct
+ 2023 18:27:07 +0000
+Received: from VI1PR02MB4527.eurprd02.prod.outlook.com
+ ([fe80::717d:6e0d:ec4b:7668]) by VI1PR02MB4527.eurprd02.prod.outlook.com
+ ([fe80::717d:6e0d:ec4b:7668%6]) with mapi id 15.20.6907.030; Tue, 24 Oct 2023
+ 18:27:07 +0000
+Message-ID: <674f7593-5421-4ecf-a0e0-2c46ab42a051@uipath.com>
+Date: Tue, 24 Oct 2023 21:27:00 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] vsock/virtio: initialize the_virtio_vsock before using
+ VQs
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Mihai Petrisor <mihai.petrisor@uipath.com>,
+ Viorel Canja <viorel.canja@uipath.com>,
+ Alexandru Matei <alexandru.matei@uipath.com>
+References: <20231023192207.1804-1-alexandru.matei@uipath.com>
+ <iqjmblf2n42w7afw42udxvju3znupmwrixfsbwcn247u7bayoc@zrbken7ls6m7>
+Content-Language: en-US
+From: Alexandru Matei <alexandru.matei@uipath.com>
+In-Reply-To: <iqjmblf2n42w7afw42udxvju3znupmwrixfsbwcn247u7bayoc@zrbken7ls6m7>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: VI1PR10CA0101.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:803:28::30) To VI1PR02MB4527.eurprd02.prod.outlook.com
+ (2603:10a6:803:b1::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016180220.3866105-1-andrii@kernel.org> <CAEf4BzaMLg31g6Jm9LmFM9UYUjm1Eq7P6Y-KnoiDoh7Sbj_RWg@mail.gmail.com>
-In-Reply-To: <CAEf4BzaMLg31g6Jm9LmFM9UYUjm1Eq7P6Y-KnoiDoh7Sbj_RWg@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Tue, 24 Oct 2023 14:23:21 -0400
-Message-ID: <CAHC9VhRxR3ygxskpfbukHeM5wmX0=SifvLny2eiezWvwAyB9tw@mail.gmail.com>
-Subject: Re: [PATCH v8 bpf-next 00/18] BPF token and BPF FS-based delegation
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	keescook@chromium.org, brauner@kernel.org, lennart@poettering.net, 
-	kernel-team@meta.com, sargun@sargun.me
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI1PR02MB4527:EE_|AS2PR02MB9488:EE_
+X-MS-Office365-Filtering-Correlation-Id: c1131d7f-a67c-4a9c-0a19-08dbd4bed40a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	0i6waNBqPxf3tKqLyx9VO9ZcAV1lP4ojABy426TLXftGN0etgEpdFzmdu2+wsrkJPAG2d8vIhypsnWVlXmoyjKrtwId00zLXDsTMbT7FEvPbtBEeWO7kxhm9979hKeZjvDg3fYbDBuapiJB99XEz3q44v0+IBngRHBIHE9ItTo8DOPYpxcaMgRX0ZGqnGtDTmfLnAmI9qaxASusnvLeHO6oakQnrwIRUcMopq4sKnMbmfJ9Bzi+YgwtVmZjplbEOZ0LB747HE2230xlv62SIli1FRj3JCbwOMt3G/FYYGWU/Dw33UzmZ6yAJvavUD3WsfWg0ePcUDeVgsOJ2q6SV6YdZaNi4cDbaKDWqal4gpjHiavSXIcpmJ3rMmXL0dxBwqUtE2+en3ncVOUjRa79GlFFFr9+CKoDFPOJgXLlKVCGfgSQ4yOGg7vtgNO2GKajO+SdRrx9NDX/GULDuSc2Dbih8i4x23sxESl/Fu6F9kS+IN00Lga20eSkXD0rvM1T5lO6Nxb0GDpkxiImXds8Z9npWMSKahzOpt1jcQ3GklrwNoSgDq9ZNUtq+aaAj60q2+PlDH5r0VY/YbLpDyVk7wjcidi/bYCS//YXq2leSOid0JsJAq9GD8XqmgDo+GB0X0ROhKmEuUN/6kseeXxU0RQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR02MB4527.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(396003)(366004)(39860400002)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(6512007)(107886003)(26005)(7416002)(6666004)(2616005)(6506007)(8936002)(53546011)(83380400001)(5660300002)(8676002)(4326008)(478600001)(44832011)(6486002)(2906002)(41300700001)(316002)(6916009)(66476007)(54906003)(66556008)(66946007)(31696002)(38100700002)(86362001)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SU1TMm5ZSlRWRjVSdHNtcmR3MkRCbU9tZ0tXSmtlS0s1VzBFaDUvVlZPRDJq?=
+ =?utf-8?B?cDVmbnNZQzU5aGhxcHdnSDdRNDk4MTJrL0k3c1ZXOWtMa3dVT2xjYUpLbnBp?=
+ =?utf-8?B?STlLNVAybVhqRlNvTmlTblpGU0VIMEJyOTZLSWVBbUhyaW1WMEZTMUgvNFFH?=
+ =?utf-8?B?eWZBQUY5amhHcHBya214MTFIbkU2SzU5QWw3SGhSZThqb3VvQjhuS2R3ZGJM?=
+ =?utf-8?B?TVJwWUZ4VWJCSU9iWFJTbFN6L3Rjdys1VUtBSWw1S1BoOHhqc3lVVUJhbE1x?=
+ =?utf-8?B?TDA5OHRvb1pCREMvNG11RU5lWW1sRktkR3RiellnazZHWWlOeGpIanBEdkhJ?=
+ =?utf-8?B?bk5pTllzN0R4Wk0weEs1TWU2VldFUEQrc1R2eCtXNnozMmRZL3N4OEJHQlJG?=
+ =?utf-8?B?TzlYeHJaMjI5NlVkTWw5RmJuQ25qNXVNS2VHOVZObnZiaXJCTVZKSEt5NXVH?=
+ =?utf-8?B?QjJRRHRPdkZPUFowRVpQTDNyTEhuWENELzVqK3RWcEs5OTZRTm5EZE1LT1R5?=
+ =?utf-8?B?ak9vMmN1SmE3TUFtUzhsRkFTNnBNQXBsRE5JN2x6R1Ura0dmbWZ4RDVCb0s0?=
+ =?utf-8?B?aFY4ZGpBNUVBdEpQemtaTStFbVA4SVZ5eXptUzQweUxCLy9WMFdac0FsQk1M?=
+ =?utf-8?B?UkFCWXcrWFduSDl3YkJEMWxpQ2ZOK29YbGV0TmgxSHJuYmo5QUNsMnZpN0lz?=
+ =?utf-8?B?R0FmeFpBaURqbnV6V0F1bTlucUZtdFBlQmxTNHBkRm9IZk5SWXF3RjNaNDc0?=
+ =?utf-8?B?ZEo1VG82NHBUaXdXcDBmRUpPSkNUNzVBUzlhamRucjdmNDh1MUJROWtyNGFH?=
+ =?utf-8?B?NGpxWkprZmM4Z2c5d2UvZzFRMGZLaVZwUjFvQ1dKSloxNzRHODFicUx2Wk5C?=
+ =?utf-8?B?aElCNDBndjZ4SUphNjlwM2pCWkl6MGZQVVpaeGdteG9xU1pRMlpwR2dFRWly?=
+ =?utf-8?B?QjFRdGxURkNKdSs3elJyUWtSYjV4QXJyU2pweWxtQUtiT3k2UzRadFo1cXBT?=
+ =?utf-8?B?ZWV0WHlLa0pKTGw2RGtkVTlkWnNxUGpBdnlEckR0SHNJczZiWU9OM053VndB?=
+ =?utf-8?B?VXpaUmxzQTNzS1M3N2pFdlU1cU1Tcy9MQWorWmNUbkNUR2JVUzFpcjlDaGZ0?=
+ =?utf-8?B?cjBUY3hCb25kbmhCdm4rRHJQWVVmcXZ2YUFvMENNeXd0a1BiUWJoRDlkU1lN?=
+ =?utf-8?B?eGZOSjVXOFNOMmZnUFo0S21sYXk4Q3FkSDZBUUlxbEE4SzdmODFQTUFDaHBy?=
+ =?utf-8?B?c2xhbGxib2s5aHJZOFYvbGtpb2hSTDhtZ0hBVUdjK0YrUGV1N2tKSzVRRG5w?=
+ =?utf-8?B?SWFzanA4dVJoVE0zTnkvS3V0cXBFcHRGWkJsUTJMUHNyY2ZuUFB1c3I2dml5?=
+ =?utf-8?B?aEJTTU9TUFhLa2ZuMnJOd20zYTh3VmlacTQ2ZkJWY3ZqZi85V0JxaC82bkVO?=
+ =?utf-8?B?YVFaK2NhSjlSNHlYZTh3WkQ2U2VGaGg2aTlkb1BKbm9hQS8vY056NndNT01w?=
+ =?utf-8?B?cmVQZ3A3UWd0TGtvbmxOdkRZTC8xNlNWbHFyL3l1LzE2aGNSU0NiVFhMcjFz?=
+ =?utf-8?B?SlF4OWRtNHAvdmw3aEFWdnpaOHRnVDBxbTljWHlRbTF3b25mQ3ZOT1FmSE9B?=
+ =?utf-8?B?cFVKSW9yaW12cjlUNkkzRHF3TVBLZjRWQXpoaThjRHVYWnRQUEZSYUFER2dW?=
+ =?utf-8?B?c3grcDNGSlc5dXhGRWFIcllWMEdIa0s4bzNjZ3Y3K0VXZVhWTUdweVhJVHBU?=
+ =?utf-8?B?cXBlUUxwUStqUGtLQXE4M2RxUUtTSkdXak4wZWNDNTlsdnNLU3Y0TFY1VmlW?=
+ =?utf-8?B?K3duWThEbU5yaVhjSk16MWNLV2ZMOEpkNmFJTVhsZ3ZJVm4wbEt0TmFOSzFO?=
+ =?utf-8?B?cE9xUUcxaWZjWG11OGZLbjJiRml1a3ZCbmVuS3VYR3BvVy9IZGdsajJmdHc4?=
+ =?utf-8?B?MUpxVEUvSVgvS3ZFVmJncUxPRkc3M2t6NC9CcUdLbklNK3Z4NDk0UU5iaHpm?=
+ =?utf-8?B?NXBmVWQzS2p5aXZQZTZWTzZZeDl2Y3lGa1dRNURJR1h3VG04M0FzdExYVlVp?=
+ =?utf-8?B?ZG85bVJ6aWJpZm83anBRTnN3aVB4ZTkrbWQ4TDF1MlJTMmhvVHVOYlEyRUIz?=
+ =?utf-8?B?Q3AwTG0zQTlaYzlQR0x3bXgweGNuMml6cEV4VWdHRHNpcDgwVUl3Ym5mMGRL?=
+ =?utf-8?B?ZEE9PQ==?=
+X-OriginatorOrg: uipath.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1131d7f-a67c-4a9c-0a19-08dbd4bed40a
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR02MB4527.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 18:27:07.1456
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: d8353d2a-b153-4d17-8827-902c51f72357
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SJxRuZJXhOAxQXZHI2eFetMt3PRPEnREK+uZKhffYlqRHyiIPVMatBDRxpOeizo6QhefGoMxb1XeHVbkGWaA5J6PJte16q7B32OYh0Hb/KA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR02MB9488
 
-On Tue, Oct 24, 2023 at 1:52=E2=80=AFPM Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
-> On Mon, Oct 16, 2023 at 11:04=E2=80=AFAM Andrii Nakryiko <andrii@kernel.o=
-rg> wrote:
+On 10/24/2023 10:22 AM, Stefano Garzarella wrote:
+> On Mon, Oct 23, 2023 at 10:22:07PM +0300, Alexandru Matei wrote:
+>> Once VQs are filled with empty buffers and we kick the host, it can send
+>> connection requests. If the_virtio_vsock is not initialized before,
+>> replies are silently dropped and do not reach the host.
+>>
+>> virtio_transport_send_pkt() can queue packets once the_virtio_vsock is
+>> set, but they won't be processed until vsock->tx_run is set to true. We
+>> queue vsock->send_pkt_work when initialization finishes to send those
+>> packets queued earlier.
+>>
+>> Fixes: 0deab087b16a ("vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock")
+>> Signed-off-by: Alexandru Matei <alexandru.matei@uipath.com>
+>> ---
+>> v3:
+>> - renamed vqs_fill to vqs_start and moved tx_run initialization to it
+>> - queued send_pkt_work at the end of initialization to send packets queued earlier
+>> v2:
+>> - split virtio_vsock_vqs_init in vqs_init and vqs_fill and moved
+>>  the_virtio_vsock initialization after vqs_init
+>>
+>> net/vmw_vsock/virtio_transport.c | 13 +++++++++++--
+>> 1 file changed, 11 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> index e95df847176b..c0333f9a8002 100644
+>> --- a/net/vmw_vsock/virtio_transport.c
+>> +++ b/net/vmw_vsock/virtio_transport.c
+>> @@ -555,6 +555,11 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+>>
+>>     virtio_device_ready(vdev);
+>>
+>> +    return 0;
+>> +}
+>> +
+>> +static void virtio_vsock_vqs_start(struct virtio_vsock *vsock)
+>> +{
+>>     mutex_lock(&vsock->tx_lock);
+>>     vsock->tx_run = true;
+>>     mutex_unlock(&vsock->tx_lock);
+>> @@ -568,8 +573,6 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+>>     virtio_vsock_event_fill(vsock);
+>>     vsock->event_run = true;
+>>     mutex_unlock(&vsock->event_lock);
+>> -
+>> -    return 0;
+>> }
+>>
+>> static void virtio_vsock_vqs_del(struct virtio_vsock *vsock)
+>> @@ -664,6 +667,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>>         goto out;
+>>
+>>     rcu_assign_pointer(the_virtio_vsock, vsock);
+>> +    virtio_vsock_vqs_start(vsock);
+>> +
+>> +    queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+> 
+> I would move this call in virtio_vsock_vqs_start() adding also a comment on top, bringing back what you wrote in the commit. Something like this:
+> 
+>         /* virtio_transport_send_pkt() can queue packets once
+>          * the_virtio_vsock is set, but they won't be processed until
+>          * vsock->tx_run is set to true. We queue vsock->send_pkt_work
+>          * when initialization finishes to send those packets queued
+>          * earlier.
+>          */
+> 
+> Just as a consideration, we don't need to queue the other workers (rx, event) because as long as we don't fill the queues with empty buffers, the host can't send us any notification. (We could add it in the comment if you want).
+> 
 
-...
+Thanks. Sure, I added it in the comment.
 
-> > v7->v8:
-> >   - add bpf_token_allow_cmd and bpf_token_capable hooks (Paul);
-> >   - inline bpf_token_alloc() into bpf_token_create() to prevent acciden=
-tal
-> >     divergence with security_bpf_token_create() hook (Paul);
->
-> Hi Paul,
->
-> I believe I addressed all the concerns you had in this revision. Can
-> you please take a look and confirm that all things look good to you
-> from LSM perspective? Thanks!
-
-Yes, thanks for that, this patchset is near the top of my list, there
-just happen to be a lot of things vying for my time at the moment.  My
-apologies on the delay.
-
---=20
-paul-moore.com
+> The rest LGTM!
+> 
+> Thanks,
+> Stefano
+> 
+>>
+>>     mutex_unlock(&the_virtio_vsock_mutex);
+>>
+>> @@ -736,6 +742,9 @@ static int virtio_vsock_restore(struct virtio_device *vdev)
+>>         goto out;
+>>
+>>     rcu_assign_pointer(the_virtio_vsock, vsock);
+>> +    virtio_vsock_vqs_start(vsock);
+>> +
+>> +    queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+>>
+>> out:
+>>     mutex_unlock(&the_virtio_vsock_mutex);
+>> -- 
+>> 2.25.1
+>>
+> 
 
