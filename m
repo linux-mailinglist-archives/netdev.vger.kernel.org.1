@@ -1,139 +1,243 @@
-Return-Path: <netdev+bounces-43936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E64BC7D5815
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:24:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01C0F7D5842
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:28:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A37E52811AD
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:24:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C51C1C20B18
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81FD3994F;
-	Tue, 24 Oct 2023 16:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B083995D;
+	Tue, 24 Oct 2023 16:28:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="k4MIVHE+"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="YvYHivHi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B4638F96
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 16:24:12 +0000 (UTC)
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0688C118
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 09:24:10 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-6b201a93c9cso3680585b3a.0
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 09:24:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1698164649; x=1698769449; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZKTm1mrgyLc1h8Vt1hMbh4XUq9UQSm1P9ND6vgHtPB4=;
-        b=k4MIVHE+0PbeZIPTGn5y3n93OW81aHxr2DHqvg+mjJpDYtKmt+bhBwWyYLEdpkvpQ4
-         qeDKwvVdjsxLw1u72xTXBHq0Ev/DT0c61BuiyOaKlHruXjyaBe61Ls/UXghY67A1UnRo
-         Riy4CrAoHEHn0uqUUcMqaQ/+RMev2zIZ6AxVokNe48o5mlFQq8GaG/pYpY4i4st7dDE9
-         6Yxlty5xikWBvI7WUCrMQwnIbiQdAS23IcSH+Wxt3iaq8V8OBjxXY7MpcZNHkCBPvSug
-         8JR62EOTJ+x21AtT8YmylanyYYBhJlgKc/vIu4RWTTuxTGvCTfSCikRh1kMGh4pAXfbK
-         xGRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698164649; x=1698769449;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZKTm1mrgyLc1h8Vt1hMbh4XUq9UQSm1P9ND6vgHtPB4=;
-        b=KDwIJ6NYG1ATPq2/sxogNpogEMhyvBw1tTEnURtOCyxCLt0/mJ+hcb0GZR+irbuDVu
-         OxzKns0kQ2mC7dbDzdGHgMUl2l7OVVCxCmur6h5+azarsOLtDih0pPl0rw34qMT7KhDy
-         bCGmojN0X0mo931Shc2tdLLg+yw/V/I5aX9SK1ZLdbXrbkXIav0g/cIe1bfhl6R/R7VY
-         8G8Hz/RNc7JqqySjKz9gkfWAuvD+bKBVW8bFi1qeSdILGbUvfdHyVu4Vzn3b5KdXkKpg
-         2Br1+mhGeAO8G/WpwPlvyo4UMfoVm95eY8lgc11P9Hh8wH72YaohaVXdKUgO4QvlejMX
-         g3+g==
-X-Gm-Message-State: AOJu0YzVeSjOgZFs+CHRuxlk8ItCh+yNb+1CqjXdnjrkeQg35xr1Veev
-	mAc9jk07g6a19EYn76BJQi9KhoqB13M5zcMuXoT15w==
-X-Google-Smtp-Source: AGHT+IEAI9u7l/s4QVSYjQHbkLLuhBrDpPV96Xch65PsfjSchtzTZm58WnDeu2X2ZQ59ZzT2bUYsOjtfY4Tuo1cd9lw=
-X-Received: by 2002:a05:6a00:c8d:b0:6bc:635a:aad3 with SMTP id
- a13-20020a056a000c8d00b006bc635aaad3mr10680827pfv.9.1698164649373; Tue, 24
- Oct 2023 09:24:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50AC200CC
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 16:28:14 +0000 (UTC)
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FDF3AC
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 09:28:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1698164891; x=1698424091;
+	bh=98N9uf5cvl0J5A8D85/ZuRYIyJrQH+TppzADUVcMh9w=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=YvYHivHiiDzSOg1r/g2PyKTudaqnKVcbPLYXEDhqcmr1LJcWtCLB56+sXhXgSng5a
+	 pbTc4s9rxGdOfRbIK4YXpKU72nIuA4XnrunTWoNcsz8McV7inI1kuGfk1BabVQOfBx
+	 dK/rzFppfobiuuVAmHPsG5CXJ0QHh4AXaU/T4R0DNKmihTsoXQtBUvXerhvloj668j
+	 RmJ3Ckole9ZpZLfQoxYstsC4qHI8OPZgO125C/0QjTkX9vRK1r7ZTwPQzmTFeEbEtB
+	 52hb4rg9So1kaSRWck+weakzb0zc7hLEA0cr6+KYfyK/7O17Ydyv4K7tZyX28+918W
+	 JCkhfSBjlmdlQ==
+Date: Tue, 24 Oct 2023 16:28:02 +0000
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com, greg@kroah.com
+Subject: Re: [PATCH net-next v6 2/5] rust: net::phy add module_phy_driver macro
+Message-ID: <ca5873fb-3139-4198-8ff8-c3abc6c40347@proton.me>
+In-Reply-To: <20231024005842.1059620-3-fujita.tomonori@gmail.com>
+References: <20231024005842.1059620-1-fujita.tomonori@gmail.com> <20231024005842.1059620-3-fujita.tomonori@gmail.com>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231023155013.512999-1-romain.gantois@bootlin.com>
- <20231023155013.512999-4-romain.gantois@bootlin.com> <b8ac3558-b6f0-4658-b406-8ceba062a52c@lunn.ch>
- <f4e6dcee-23cf-bf29-deef-cf876e63bb8a@bootlin.com> <932bef01-b498-4c1a-a7f4-3357fe94e883@lunn.ch>
-In-Reply-To: <932bef01-b498-4c1a-a7f4-3357fe94e883@lunn.ch>
-From: Robert Marko <robert.marko@sartura.hr>
-Date: Tue, 24 Oct 2023 18:23:58 +0200
-Message-ID: <CA+HBbNHb2RF3tfDYRTG6AndhmW1U4tvFmiC+rhYwH8SCLqSUzw@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/5] net: ipqess: introduce the Qualcomm IPQESS driver
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	thomas.petazzoni@bootlin.com, Florian Fainelli <f.fainelli@gmail.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	linux-arm-kernel@lists.infradead.org, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, Luka Perkov <luka.perkov@sartura.hr>, 
-	Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@somainline.org>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 24, 2023 at 4:08=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > > > + for (c =3D 0; c < priv->info->mib_count; c++) {
-> > > > +         mib =3D &ar8327_mib[c];
-> > > > +         reg =3D QCA8K_PORT_MIB_COUNTER(port->index) + mib->offset=
-;
-> > > > +
-> > > > +         ret =3D qca8k_read(priv, reg, &val);
-> > > > +         if (ret < 0)
-> > > > +                 continue;
-> > >
-> > > Given the switch is built in, is this fast? The 8k driver avoids doin=
-g
-> > > register reads for this.
-> >
-> > Sorry, I don't quite understand what you mean. Are you referring to the=
- existing
-> > QCA8k DSA driver? From what I've seen, it calls qca8k_get_ethtool_stats=
- defined
-> > in qca8k-common.c and this uses the same register read.
->
-> It should actually build an Ethernet frame containing a command to get
-> most of the statistics in one operation. That frame is sent to the
-> switch over the SoCs ethernet interface. The switch replies with a
-> frame containing the statistics. This should be faster than doing lots
-> of register reads over a slow MDIO bus.
->
-> Now, given that this switch is built into the SoC, i assume the MDIO
-> bus is gone, so register access is fast. So you don't need to use
-> Ethernet frames.
+On 24.10.23 02:58, FUJITA Tomonori wrote:
+> This macro creates an array of kernel's `struct phy_driver` and
+> registers it. This also corresponds to the kernel's
+> `MODULE_DEVICE_TABLE` macro, which embeds the information for module
+> loading into the module binary file.
+>=20
+> A PHY driver should use this macro.
+>=20
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>   rust/kernel/net/phy.rs | 129 +++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 129 insertions(+)
+>=20
+> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+> index 2d821c2475e1..f346b2b4d3cb 100644
+> --- a/rust/kernel/net/phy.rs
+> +++ b/rust/kernel/net/phy.rs
+> @@ -706,3 +706,132 @@ const fn as_int(&self) -> u32 {
+>           }
+>       }
+>   }
+> +
+> +/// Declares a kernel module for PHYs drivers.
+> +///
+> +/// This creates a static array of kernel's `struct phy_driver` and regi=
+sters it.
+> +/// This also corresponds to the kernel's `MODULE_DEVICE_TABLE` macro, w=
+hich embeds the information
+> +/// for module loading into the module binary file. Every driver needs a=
+n entry in `device_table`.
+> +///
+> +/// # Examples
+> +///
+> +/// ```ignore
 
-It is being accessed as regular MMIO so the MDIO bottleneck is not present,
-so we never tried if the special ethernet packets are even support, especia=
-lly
-since the tag is completely different from that in regular qca8k switches.
+Is this example ignored, because it does not compile?
 
-Regards,
-Robert
->
->          Andrew
+I think Wedson was wrapping his example with `module!` inside
+of a module, so maybe try that?
 
+> +/// use kernel::c_str;
+> +/// use kernel::net::phy::{self, DeviceId};
+> +/// use kernel::prelude::*;
+> +///
+> +/// kernel::module_phy_driver! {
+> +///     drivers: [PhyAX88772A],
+> +///     device_table: [
+> +///         DeviceId::new_with_driver::<PhyAX88772A>(),
+> +///     ],
+> +///     name: "rust_asix_phy",
+> +///     author: "Rust for Linux Contributors",
+> +///     description: "Rust Asix PHYs driver",
+> +///     license: "GPL",
+> +/// }
+> +///
+> +/// struct PhyAX88772A;
+> +///
+> +/// impl phy::Driver for PhyAX88772A {
+> +///     const NAME: &'static CStr =3D c_str!("Asix Electronics AX88772A"=
+);
+> +///     const PHY_DEVICE_ID: phy::DeviceId =3D phy::DeviceId::new_with_e=
+xact_mask(0x003b1861);
+> +/// }
+> +/// ```
+> +///
+> +/// This expands to the following code:
+> +///
+> +/// ```ignore
+> +/// use kernel::c_str;
+> +/// use kernel::net::phy::{self, DeviceId};
+> +/// use kernel::prelude::*;
+> +///
+> +/// struct Module {
+> +///     _reg: ::kernel::net::phy::Registration,
+> +/// }
+> +///
+> +/// module! {
+> +///     type: Module,
+> +///     name: "rust_asix_phy",
+> +///     author: "Rust for Linux Contributors",
+> +///     description: "Rust Asix PHYs driver",
+> +///     license: "GPL",
+> +/// }
+> +///
+> +/// const _: () =3D {
+> +///     static mut DRIVERS: [::kernel::net::phy::DriverVTable; 1] =3D [
+> +///         ::kernel::net::phy::create_phy_driver::<PhyAX88772A>::(),
+> +///     ];
+> +///
+> +///     impl ::kernel::Module for Module {
+> +///        fn init(module: &'static ThisModule) -> Result<Self> {
+> +///            let mut reg =3D unsafe { ::kernel::net::phy::Registration=
+::register(module, Pin::static_mut(&mut DRIVERS)) }?;
 
+Can you please format this as well?
+
+> +///            Ok(Module { _reg: reg })
+> +///        }
+> +///     }
+> +/// }
+> +///
+> +/// static __mod_mdio__phydev_device_table: [::kernel::bindings::mdio_de=
+vice_id; 2] =3D [
+> +///     ::kernel::bindings::mdio_device_id {
+> +///         phy_id: 0x003b1861,
+> +///         phy_id_mask: 0xffffffff,
+> +///     },
+> +///     ::kernel::bindings::mdio_device_id {
+> +///         phy_id: 0,
+> +///         phy_id_mask: 0,
+> +///     }
+> +/// ];
+> +/// ```
+> +#[macro_export]
+> +macro_rules! module_phy_driver {
+> +    (@replace_expr $_t:tt $sub:expr) =3D> {$sub};
+> +
+> +    (@count_devices $($x:expr),*) =3D> {
+> +        0usize $(+ $crate::module_phy_driver!(@replace_expr $x 1usize))*
+> +    };
+> +
+> +    (@device_table [$($dev:expr),+]) =3D> {
+> +        #[no_mangle]
+> +        static __mod_mdio__phydev_device_table: [
+> +            ::kernel::bindings::mdio_device_id;
+> +            $crate::module_phy_driver!(@count_devices $($dev),+) + 1
+> +        ] =3D [
+> +            $($dev.mdio_device_id()),+,
+> +            ::kernel::bindings::mdio_device_id {
+> +                phy_id: 0,
+> +                phy_id_mask: 0
+> +            }
+> +        ];
+> +    };
+> +
+> +    (drivers: [$($driver:ident),+], device_table: [$($dev:expr),+], $($f=
+:tt)*) =3D> {
+> +        struct Module {
+> +            _reg: ::kernel::net::phy::Registration,
+> +        }
+> +
+> +        $crate::prelude::module! {
+> +            type: Module,
+> +            $($f)*
+> +        }
+> +
+> +        const _: () =3D {
+> +            static mut DRIVERS: [
+> +                ::kernel::net::phy::DriverVTable;
+> +                $crate::module_phy_driver!(@count_devices $($driver),+)
+> +            ] =3D [
+> +                $(::kernel::net::phy::create_phy_driver::<$driver>()),+
+> +            ];
+> +
+> +            impl ::kernel::Module for Module {
+> +                fn init(module: &'static ThisModule) -> Result<Self> {
+> +                    // SAFETY: The anonymous constant guarantees that no=
+body else can access the `DRIVERS` static.
+> +                    // The array is used only in the C side.
+> +                    let mut reg =3D unsafe { ::kernel::net::phy::Registr=
+ation::register(module, core::pin::Pin::static_mut(&mut DRIVERS)) }?;
+
+Can you put the safe operations outside of the `unsafe` block?
+
+Since `rustfmt` does not work well within `macro_rules`, you
+have to manually format this code. One trick I use to do this
+is to replace all meta variables with normal variables and
+just put it in `rustfmt` and then revert the replacement in
+the output.
 
 --=20
-Robert Marko
-Staff Embedded Linux Engineer
-Sartura Ltd.
-Lendavska ulica 16a
-10000 Zagreb, Croatia
-Email: robert.marko@sartura.hr
-Web: www.sartura.hr
+Cheers,
+Benno
+
+> +                    Ok(Module { _reg: reg })
+> +                }
+> +            }
+> +        };
+> +
+> +        $crate::module_phy_driver!(@device_table [$($dev),+]);
+> +    }
+> +}
+> --
+> 2.34.1
+>=20
+
+
 
