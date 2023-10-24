@@ -1,177 +1,278 @@
-Return-Path: <netdev+bounces-44001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8928E7D5CBA
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 22:58:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33DA07D5CC8
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 22:58:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35C87281A91
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:58:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B7511C202D5
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF603CCEC;
-	Tue, 24 Oct 2023 20:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA333CCE4;
+	Tue, 24 Oct 2023 20:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1OR2An/b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DJ5MD12F"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4202420A
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 20:58:09 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF8CEE5;
-	Tue, 24 Oct 2023 13:58:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fJJZkI+E6B70cwLuwkzJztPpydBmNN2zVZWw2Pq+4OISX1g7M15w73xKjPFVERAKv4yn4GHXZQlszBRD2OBFSzAbEIf5YLIISBLyKvU4xKhdmczYt6KarqDdP3zdz3gSg/0P6ZADbLXX4iQHAjsimny4zclIZxnGleSHb0ElvrLi0zimuAi0w/ndMNPLrl88hhoD8Fr7Dyp4kq+zro2zbMQNNlhWycFLWhqLixfXx3qz1HAUOTu12vLXICgHFo8Ivq4Le3jWtAa6ko5pHwCK4dcDdgTzNVvEGYJrvNPOG5Zg7XnZzkhf32C95ApS9WOHwN0mzBfWTscC9CHmrOfoXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qTuw1hZXtOTINltcUsdgTW4XtPdXmLCObXPMnryJKKU=;
- b=XTen9RjhoHMC0N+69cNq50pIT6Q9X3abN0P0SXMeVTv2+bGZk0FkaunbRRhxFNgFr7gnaOD4vYwMaZPytOMUoeKPZMaB/T3TBYnAy8v3w1jPBUJG/K7hWJA4+O6zuB6mgrAijzbVIjNcDsX2KcLRufxWUMFGAVXfmqkzKrXXQvk9QMSnjAVo8qy1Q83ej7mJY0+40HCLVOGIU7neFWOdlpXgBlXeUK6AZJhAAEd7BUS+06rXYNGOF3pw/qkoKAYQQbEydFYccHHlJXOyhSjs5wNJ28zm4X8Fx7lGHxEDWQJnzbgrrPOMp8Q/zPiZTCCzuaUV82bE4LPW26RM9tsKEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qTuw1hZXtOTINltcUsdgTW4XtPdXmLCObXPMnryJKKU=;
- b=1OR2An/b5hQEL5gOInI5bgZvRCe4QvSIfSOwRQKvInhnvrP93J9NqFxMeZLjTVobxn3cbf0Aq8QIyt73EL+bi/QZHshDpg+xKdiIKu21hpBCyRE0liROGM8FEzo4xsNry5EMvwPpAcT0jcnir5L8d7o9oOE+gRVgjrjmvra07G4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- CH3PR12MB9098.namprd12.prod.outlook.com (2603:10b6:610:19e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Tue, 24 Oct
- 2023 20:58:03 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::3d14:1fe0:fcb0:958c]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::3d14:1fe0:fcb0:958c%2]) with mapi id 15.20.6933.019; Tue, 24 Oct 2023
- 20:58:03 +0000
-Message-ID: <c50f2d3d-98dd-4194-9080-81298dd0563c@amd.com>
-Date: Tue, 24 Oct 2023 13:58:00 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] amd/pds_core: core: No need for Null pointer check before
- kfree
-To: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>,
- brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231024182051.48513-1-bragathemanick0908@gmail.com>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <20231024182051.48513-1-bragathemanick0908@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PH8PR07CA0036.namprd07.prod.outlook.com
- (2603:10b6:510:2cf::9) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A232C852
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 20:58:49 +0000 (UTC)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6715110E5
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 13:58:40 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1cac925732fso32885025ad.1
+        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 13:58:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698181119; x=1698785919; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GGDURy9U9mjy/0Q/rtph0AJvgDV8lMe/NUApwLQAq3w=;
+        b=DJ5MD12FMncNos5UPVWUE9THeKtl0fxoxKWcwj5AqTq/F9GA9USgoNm8Da432Rluqe
+         vj+t1VY7DbR0mighYuypgPPeKqVo4pfWeDNP9qVPaAwUyPox+Vb65uC5eHcK/FQ5a00W
+         bVkYcm0yMsS45PsltZu/0gMbrCTIsfS5ZPgj/xVUa1comn/0ydk3uFW9h9hxBKWaCj2B
+         7fFRmmIeDvcpduj0fMP4na4RTt5s2ZujIL8FiCX0u8NbBwtYHc7Oo3rTRFToR6tbs3B7
+         0HLzWVMkXOK5EkhpUemX5Lzf1+9maG+GPZNRSpZ2WShK/CzIM+EKkMHvEG8C+a2oQNdO
+         rLjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698181119; x=1698785919;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GGDURy9U9mjy/0Q/rtph0AJvgDV8lMe/NUApwLQAq3w=;
+        b=KQLOErqOi0ZfINeEaeUAW11k39PpmUV1Yy3uXWgi49WEfUQYBfZQSbUNzBZCdcAyR2
+         o6Hp6tuCoegRVR+XoIIlVKsJd0Gg6MR+aSqR6J2T0sEfC9Lqc5LV6IubtwY3FhAfowbF
+         bmOCfNxCgd0/im8zYO/xRq4ip26MeMrSH+HQaFt3WAKEbnii0H+QVjBo/qPDskFBzAI4
+         I5qGozweLVqDCKlaNe0CTYrECRrBbTLinwJliOeEtgLE4ZsJUVBKWtgGERWapPp8qyHc
+         5NGjpbTWviHZ+TzbKTQVNcNdkugA3pExHeA4BLK9DkLJ01aDugLSoTFoPDkYahqHrTA5
+         ApZQ==
+X-Gm-Message-State: AOJu0YwiOhI0A9ENEWdrmKaUZOoDz8eGTz55pCAAGD9okAJeyKXSvVZV
+	dlhV4rXyTwYTLuWJM96UMtnmaEeJiqU/Xg==
+X-Google-Smtp-Source: AGHT+IGX+b4oFPwqezkyVocNVfEbGb4sUjtGFtI/6rgOmWCPfbpTKzO3tL5I+SV6V70L+YU5lO6mgg==
+X-Received: by 2002:a17:903:110d:b0:1c9:e508:ad43 with SMTP id n13-20020a170903110d00b001c9e508ad43mr12320669plh.8.1698181119249;
+        Tue, 24 Oct 2023 13:58:39 -0700 (PDT)
+Received: from tresc054937.tre-sc.gov.br (177-131-126-82.acessoline.net.br. [177.131.126.82])
+        by smtp.gmail.com with ESMTPSA id je17-20020a170903265100b001c728609574sm7894803plb.6.2023.10.24.13.58.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 13:58:38 -0700 (PDT)
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linus.walleij@linaro.org,
+	alsi@bang-olufsen.dk,
+	andrew@lunn.ch,
+	vivien.didelot@gmail.com,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh+dt@kernel.org,
+	krzk+dt@kernel.org,
+	arinc.unal@arinc9.com,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Subject: [PATCH net-next 1/2] net: dsa: realtek: support reset controller
+Date: Tue, 24 Oct 2023 17:58:04 -0300
+Message-ID: <20231024205805.19314-1-luizluca@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|CH3PR12MB9098:EE_
-X-MS-Office365-Filtering-Correlation-Id: a31801d8-21b8-4ce6-fc2b-08dbd4d3e9be
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	YG6H9zH5Lj4e2vGcxXKamJ6Jrfl2tFMu9XryWmMl1AQx+6Q5eZ0bDH2c4EvRHYx/HH4Bhc8OoL2dUgZzlMI83mAtJmbXly9x+oRhdIcOL8ISXzjdMGxntu5qmOZeVu2PyaANHZoZSEhiJ4hptv+qhYvSJR6f3yrPK+QyIxBpE4F18mLulYLC7ovVL1ndxJNIjkDaJADXdzdLvvwD0NYrs2XPqMfbLIzPJq4g5nLG5pAoq7bBox90YWdK2ZyFEGemL9FU3SeHm0EgBq2HDh557mMSc57LNyN2XOoTsFGi3xYwxk7wGwGcv79F8Fc2MsQirpPl5ql+Fy70kE9siC3jt41+OzWTq6sJ0e3rarHZiAtOXWy6CbWvlxEcvIpy2tRliFxg+4DEIvsfDOnDHJizzgORHIa9nHGy2drtsMEuEUuDCznHLYN5jBOBjpls/E/iNvxIhoZ8z6/LdVyQmry9b93gjYH9azNKnLHSooCOpRhdmRukFlZPMomQSI8SUMcv+brTIFwqz6mNmIADZVCgFOGxyo5SJaC9PNe6+s+BD+e+GN/rdzk2XBGjkuy4KBwaDxQJCRJhNnOPWnqqaB37usacjNO1yLhXQhOYk7GT86mR0iBhvNiPT2o2inqcciGETNd3+nntXl/4fvPzfcsXqw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(366004)(346002)(39860400002)(136003)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(83380400001)(31686004)(2906002)(36756003)(4326008)(8676002)(26005)(53546011)(8936002)(2616005)(38100700002)(6506007)(66476007)(6512007)(478600001)(6486002)(316002)(31696002)(5660300002)(86362001)(66946007)(41300700001)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZjJKSlc4Q21mN0lVV2ZKdVNkN2tMRzBPNTVjMHljUEY1U3VnTkZodGVzNFVE?=
- =?utf-8?B?MGlxRDQ5ZEtRa2lrWkhJMzZmMGFTYlJrTDRYVDZwZ3Bab204MHYrVlpuSFow?=
- =?utf-8?B?VUhIQUlLMzJ0QnNQaFZWTkkzY1FTT3c0ZGhXbU5kQW5LdTB1bmQzbExyQ3dF?=
- =?utf-8?B?aTJzWVpoVURaai9RNWJQVU9oS3ZHcjk2VlZoY3ZOZlhRS0d4K0wwbEh1VlVM?=
- =?utf-8?B?RWwwOHNOaG9QSUJ6eHI3cTBoYysyY0YvSDdIaW5jbjF1K2VNVlQrNkFEOHJW?=
- =?utf-8?B?RjY3WlhKWGxjbmdOUWNrYk5pRGFsOHQ5VGN5TDBXYTYxT2J5VEUybm92YjNn?=
- =?utf-8?B?amZzQXlIWlRwd2JtMzJEeWl2VUVPc0sxdkdnOHQwVVZic001SE03T0xmdjc3?=
- =?utf-8?B?TTFpcWxnUHFka1Z5ZVFFZ2c2OTJyWFJxZjV6U0JPYVIyZ3F0QmJCYmxLS0Fa?=
- =?utf-8?B?ZEw5NlJXdkpHUWNRT09mU1Yzb3FqTUU0TmRlbGJHOWJDN0s1VGJqQU82dUxL?=
- =?utf-8?B?LzJVRjBzR0dVcDdOUjVMa2pJc3JhMUNUS1FJN2hheEVsQUlva1lRWjF0aWNK?=
- =?utf-8?B?amVPUS9LV0NIRUxUV2hKYmpzNm9NdUVSMVJGMFZXZ3pVOVFCQloyRGtiVERI?=
- =?utf-8?B?ZVExOUh5QjZRMmlBUDZtMngzd1BrNFl3azhjblYwdzdhK001SE1sUjB6enpU?=
- =?utf-8?B?K2tvb0s0RDEwK0Z3N2t4R3QwOU1vS09LUkd0bFY4UTZKYVVKejVLUzVTL3JU?=
- =?utf-8?B?d2tEQkcwWk14UjlMQ1BnSWlxVkt1cklRSFpERllZeXU2YXcyOG9FZG11SkJK?=
- =?utf-8?B?c0hGSGEyMEN0UTEzT2h0SG5UM04xVmRxUHVMMVQvRjl0cGlKUUI2UnNkZmc1?=
- =?utf-8?B?TEJwN2xtOVFQWmpYRkJsTjU1UkpxcitOSkJ4dmFacEtwSHVOb0VDSEhjdjZn?=
- =?utf-8?B?YjRpSlNGVHhQYUJJNFNiSFE5R1VVK1ZiWHJvMi9hZ2g2b1A0dVZaMzNmM2s1?=
- =?utf-8?B?Y2JxMHVtbVhWaXorZldZWXk0YWNqNVE1U2pIcVNYTkhlNUFKbHAxbDVMeVhB?=
- =?utf-8?B?V1hhNyswKzg1NldSdFZ1MEhZRnRXdGp3aUZUMGExbFkwYTJZeXZtYWE1Mkc3?=
- =?utf-8?B?amVNYXRiT3pQUFc0MjgxMHFMRjhCQ1hZT0VOemIxeUlBNC9nNmRBaUdaeVNa?=
- =?utf-8?B?SXVHKzlZdzc0a3NwK3h3TlJOMHhSUGlYRHdLMEdveC9TNDdrd0RyL3YrcFEx?=
- =?utf-8?B?cmNjWWM5T1NSNkVVM1UydXEyTzBkb25BeVhMWmNubWdqOW4zWDJTTjZEbktW?=
- =?utf-8?B?UXZpRE5HSldtUDR0K3MyKzhURmFxOXd4YlpkZnBwZGZPNmVYaTl4VlZvY0VX?=
- =?utf-8?B?dFRoUVd1aW5jYWY1UVl2T0E0QXZwOUY0aGpUM0c1bHBOUFYxZmlEeVZLNkNV?=
- =?utf-8?B?RFp4VjdTbmJJQU5BWmtjbE1PNkNITmtuOXhIdVBHS2V0YzE0SkZETVpJdXpS?=
- =?utf-8?B?WlNGZGdhQldDNTR5TXlEcGhjZXB0VWk2TFZtS1d3OEZzbU9GMXJ4K1dFQ3Bj?=
- =?utf-8?B?MENTZW92cGpBakkrTk1ZZFdEenRtbzNab2RqeExqUnVFcnFTbmR5ekhBeGZ4?=
- =?utf-8?B?Um1CQnoyVERDVGplN2QzaGdlYUtYbFZDbExKRktVVVNWOGN5dUw2MzRXNDVG?=
- =?utf-8?B?ekRqMnJBNnZrQ3FlckVDbWg0L1dJM1BpYVowYjJkYlZJY0s4L3NNY3VmWDNl?=
- =?utf-8?B?dG1KbFk0ZnUzNzFqbjFEejJScUVPL01XNGsxU1poYVhqQ3dGa01Hek05MlBW?=
- =?utf-8?B?QzdRRmVmVXdwK0VKUEUyVHFkUjlLZWF2OVRBc0EwSHQ4dUVucGtkS05JdWMw?=
- =?utf-8?B?aEVnUXBVc0ZXOS9LcDZSZHc2VHh5ZUFnK3hkKzNyVmtUM3lQeGhrM1o4QW5a?=
- =?utf-8?B?RndKcElWSDVxSXEwUFM4U0VKNmxVL1hDQjI5bTZNUkxuNHNvbWFycEZrL1pU?=
- =?utf-8?B?T3pkTStsVmpsTFZ4WmpoRkZlU0d6RVc0SU1PNFZmbTN3UnpISjRCOGc3S0pB?=
- =?utf-8?B?VUF1WE50cDRrcnZIeHlmYTcyQUczN2w0N2R2ZWtTZ0tIdG1BN0UxWnhvUlpP?=
- =?utf-8?Q?4BRaFBH46fxuqoAC0wRa7UFHO?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a31801d8-21b8-4ce6-fc2b-08dbd4d3e9be
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 20:58:02.9941
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F77bqHzjDjTPuUM7phe0uh1WzXWJuuX36I0Ems6RY+SOpNrQeiuAmxrk29QGdme7vjSnDdc1Kv6iMf6TIGpXgg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9098
+Content-Transfer-Encoding: 8bit
 
-On 10/24/2023 11:20 AM, Bragatheswaran Manickavel wrote:
-> 
-> kfree()/vfree() internally perform NULL check on the
-> pointer handed to it and take no action if it indeed is
-> NULL. Hence there is no need for a pre-check of the memory
-> pointer before handing it to kfree()/vfree().
-> 
-> Issue reported by ifnullfree.cocci Coccinelle semantic
-> patch script.
-> 
-> Signed-off-by: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
+The 'reset-gpios' will not work when the switch reset is controlled by a
+reset controller.
 
-Thanks -sln
+Although the reset is optional and the driver performs a soft reset
+during setup, if the initial reset state was asserted, the driver will
+not detect it.
 
-Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+This is an example of how to use the reset controller:
 
+        switch {
+                compatible = "realtek,rtl8366rb";
 
-> ---
->   drivers/net/ethernet/amd/pds_core/core.c | 7 ++-----
->   1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
-> index 2a8643e167e1..0d2091e9eb28 100644
-> --- a/drivers/net/ethernet/amd/pds_core/core.c
-> +++ b/drivers/net/ethernet/amd/pds_core/core.c
-> @@ -152,11 +152,8 @@ void pdsc_qcq_free(struct pdsc *pdsc, struct pdsc_qcq *qcq)
->                  dma_free_coherent(dev, qcq->cq_size,
->                                    qcq->cq_base, qcq->cq_base_pa);
-> 
-> -       if (qcq->cq.info)
-> -               vfree(qcq->cq.info);
-> -
-> -       if (qcq->q.info)
-> -               vfree(qcq->q.info);
-> +       vfree(qcq->cq.info);
-> +       vfree(qcq->q.info);
-> 
->          memset(qcq, 0, sizeof(*qcq));
->   }
-> --
-> 2.34.1
-> 
+                resets = <&rst 8>;
+                reset-names = "switch";
+
+		...
+	}
+
+The reset controller will take precedence over the reset GPIO.
+
+Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+---
+ drivers/net/dsa/realtek/realtek-mdio.c | 36 +++++++++++++++++++++-----
+ drivers/net/dsa/realtek/realtek-smi.c  | 34 +++++++++++++++++++-----
+ drivers/net/dsa/realtek/realtek.h      |  6 +++++
+ 3 files changed, 63 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
+index 292e6d087e8b..600124c58c00 100644
+--- a/drivers/net/dsa/realtek/realtek-mdio.c
++++ b/drivers/net/dsa/realtek/realtek-mdio.c
+@@ -140,6 +140,23 @@ static const struct regmap_config realtek_mdio_nolock_regmap_config = {
+ 	.disable_locking = true,
+ };
+ 
++static int realtek_mdio_hwreset(struct realtek_priv *priv, bool active)
++{
++#ifdef CONFIG_RESET_CONTROLLER
++	if (priv->reset_ctl) {
++		if (active)
++			return reset_control_assert(priv->reset_ctl);
++		else
++			return reset_control_deassert(priv->reset_ctl);
++	}
++#endif
++
++	if (priv->reset)
++		gpiod_set_value(priv->reset, active);
++
++	return 0;
++}
++
+ static int realtek_mdio_probe(struct mdio_device *mdiodev)
+ {
+ 	struct realtek_priv *priv;
+@@ -194,20 +211,26 @@ static int realtek_mdio_probe(struct mdio_device *mdiodev)
+ 
+ 	dev_set_drvdata(dev, priv);
+ 
+-	/* TODO: if power is software controlled, set up any regulators here */
+ 	priv->leds_disabled = of_property_read_bool(np, "realtek,disable-leds");
+ 
++#ifdef CONFIG_RESET_CONTROLLER
++	priv->reset_ctl = devm_reset_control_get(dev, "switch");
++	if (IS_ERR(priv->reset_ctl)) {
++		dev_err(dev, "failed to get switch reset control\n");
++		return PTR_ERR(priv->reset_ctl);
++	}
++#endif
++
+ 	priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
+ 	if (IS_ERR(priv->reset)) {
+ 		dev_err(dev, "failed to get RESET GPIO\n");
+ 		return PTR_ERR(priv->reset);
+ 	}
+-
+-	if (priv->reset) {
+-		gpiod_set_value(priv->reset, 1);
++	if (priv->reset_ctl || priv->reset) {
++		realtek_mdio_hwreset(priv, 1);
+ 		dev_dbg(dev, "asserted RESET\n");
+ 		msleep(REALTEK_HW_STOP_DELAY);
+-		gpiod_set_value(priv->reset, 0);
++		realtek_mdio_hwreset(priv, 0);
+ 		msleep(REALTEK_HW_START_DELAY);
+ 		dev_dbg(dev, "deasserted RESET\n");
+ 	}
+@@ -246,8 +269,7 @@ static void realtek_mdio_remove(struct mdio_device *mdiodev)
+ 	dsa_unregister_switch(priv->ds);
+ 
+ 	/* leave the device reset asserted */
+-	if (priv->reset)
+-		gpiod_set_value(priv->reset, 1);
++	realtek_mdio_hwreset(priv, 1);
+ }
+ 
+ static void realtek_mdio_shutdown(struct mdio_device *mdiodev)
+diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
+index bfd11591faf4..751159d71223 100644
+--- a/drivers/net/dsa/realtek/realtek-smi.c
++++ b/drivers/net/dsa/realtek/realtek-smi.c
+@@ -408,6 +408,23 @@ static int realtek_smi_setup_mdio(struct dsa_switch *ds)
+ 	return ret;
+ }
+ 
++static int realtek_smi_hwreset(struct realtek_priv *priv, bool active)
++{
++#ifdef CONFIG_RESET_CONTROLLER
++	if (priv->reset_ctl) {
++		if (active)
++			return reset_control_assert(priv->reset_ctl);
++		else
++			return reset_control_deassert(priv->reset_ctl);
++	}
++#endif
++
++	if (priv->reset)
++		gpiod_set_value(priv->reset, active);
++
++	return 0;
++}
++
+ static int realtek_smi_probe(struct platform_device *pdev)
+ {
+ 	const struct realtek_variant *var;
+@@ -457,18 +474,24 @@ static int realtek_smi_probe(struct platform_device *pdev)
+ 	dev_set_drvdata(dev, priv);
+ 	spin_lock_init(&priv->lock);
+ 
+-	/* TODO: if power is software controlled, set up any regulators here */
++#ifdef CONFIG_RESET_CONTROLLER
++	priv->reset_ctl = devm_reset_control_get(dev, "switch");
++	if (IS_ERR(priv->reset_ctl)) {
++		dev_err(dev, "failed to get switch reset control\n");
++		return PTR_ERR(priv->reset_ctl);
++	}
++#endif
+ 
+ 	priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
+ 	if (IS_ERR(priv->reset)) {
+ 		dev_err(dev, "failed to get RESET GPIO\n");
+ 		return PTR_ERR(priv->reset);
+ 	}
+-	if (priv->reset) {
+-		gpiod_set_value(priv->reset, 1);
++	if (priv->reset_ctl || priv->reset) {
++		realtek_smi_hwreset(priv, 1);
+ 		dev_dbg(dev, "asserted RESET\n");
+ 		msleep(REALTEK_HW_STOP_DELAY);
+-		gpiod_set_value(priv->reset, 0);
++		realtek_smi_hwreset(priv, 0);
+ 		msleep(REALTEK_HW_START_DELAY);
+ 		dev_dbg(dev, "deasserted RESET\n");
+ 	}
+@@ -518,8 +541,7 @@ static void realtek_smi_remove(struct platform_device *pdev)
+ 		of_node_put(priv->slave_mii_bus->dev.of_node);
+ 
+ 	/* leave the device reset asserted */
+-	if (priv->reset)
+-		gpiod_set_value(priv->reset, 1);
++	realtek_smi_hwreset(priv, 1);
+ }
+ 
+ static void realtek_smi_shutdown(struct platform_device *pdev)
+diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
+index 4fa7c6ba874a..ad61e5c13f96 100644
+--- a/drivers/net/dsa/realtek/realtek.h
++++ b/drivers/net/dsa/realtek/realtek.h
+@@ -12,6 +12,9 @@
+ #include <linux/platform_device.h>
+ #include <linux/gpio/consumer.h>
+ #include <net/dsa.h>
++#ifdef CONFIG_RESET_CONTROLLER
++#include <linux/reset.h>
++#endif
+ 
+ #define REALTEK_HW_STOP_DELAY		25	/* msecs */
+ #define REALTEK_HW_START_DELAY		100	/* msecs */
+@@ -48,6 +51,9 @@ struct rtl8366_vlan_4k {
+ 
+ struct realtek_priv {
+ 	struct device		*dev;
++#ifdef CONFIG_RESET_CONTROLLER
++	struct reset_control    *reset_ctl;
++#endif
+ 	struct gpio_desc	*reset;
+ 	struct gpio_desc	*mdc;
+ 	struct gpio_desc	*mdio;
+-- 
+2.42.0
+
 
