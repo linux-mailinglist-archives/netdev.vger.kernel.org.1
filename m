@@ -1,220 +1,109 @@
-Return-Path: <netdev+bounces-43884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47BD7D516F
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:21:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1173A7D5207
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:40:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3CD41C20C74
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:21:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92371B20BE4
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B7C2B5FB;
-	Tue, 24 Oct 2023 13:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F132AB2F;
+	Tue, 24 Oct 2023 13:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IFf5k+VO"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fVfgHpnx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5F92AB2E
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 13:20:45 +0000 (UTC)
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7EF6128
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 06:20:40 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-507c8316abcso6030555e87.1
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 06:20:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698153639; x=1698758439; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IpZ8b7O2cRe1OvuYy4CjSC9AKU1bWUMAZ3eqzNW29dM=;
-        b=IFf5k+VOFbXindKp11L+8xfJZdZX8KIsLMPpYcuaPCeI3dS6gwGel/I8D4zfhUW+RT
-         FtaSr05apHp1DC7bv2xr5THYhPQlLEbXLhXW+/jRJTdVpFWC4X3SfaNUQmg3VOu5NO9L
-         e/uwwiw0vR2dw09qK2iEKLu4Sj7AV+JeStNcQNLslZljVMERi1haXCvmuWiosf4GeFkH
-         DBaIyZeLeiK/kVopGzxFKX7b/ITfJPHRYyq+8RmVi1T6BDszdpK0ThsY/UUnr6m6qZNT
-         XZOaqMMWzi5K2rmynEOVKvMTauceqqBWCEd8VOfP52EEwunntCfyemziFWkIexR0EKEl
-         eLaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698153639; x=1698758439;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IpZ8b7O2cRe1OvuYy4CjSC9AKU1bWUMAZ3eqzNW29dM=;
-        b=ibXcFYXb6dWMPolpAfM6v6me9Bk0T31NBydiglFWnynnjkVq9QTdMrcJM0Cpixc9SQ
-         JvEi1jJwPPgH7G//Qo0D5UlBtdnfb6SGPgsYiq/Jyp07ggaBi6MKyZ1MCrhKoeFwgrEw
-         BonEnsSMi1v6388CmH9Xq0kju3ChOUUa+KgyBt+AnZc024MuDAy6w0rSZnZ9VLsSO7RC
-         f/+zMx56P35FCqJuu+WApvw2KG9VBza0Nh7JD73knveXH9++cj510FIm0r6cmtr71lW7
-         /O5e0blz87TmmVVG7uAOvQXMXUU0VLcce57ebpTzHeVaQjBgIvXyaxb32P9/75s8Hly6
-         IZsw==
-X-Gm-Message-State: AOJu0YwpOk6HMlrk+fK176vfKOYdhpnsxI3G/SFzbSfHWLHxGbe1ibii
-	Ak5FXMGzt/hfuEzLIQVW+NxJpQ==
-X-Google-Smtp-Source: AGHT+IE42ZwxuiLGgEP6CY50vZPuTWFatHkn0sPZUAo9tit11mSOsxO/4Gi/5hxrfG8TnIW9Qz6dpw==
-X-Received: by 2002:ac2:4183:0:b0:507:9f51:acee with SMTP id z3-20020ac24183000000b005079f51aceemr7796503lfh.22.1698153638918;
-        Tue, 24 Oct 2023 06:20:38 -0700 (PDT)
-Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id d5-20020a193845000000b00507ab956ab9sm2147365lfj.147.2023.10.24.06.20.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 06:20:38 -0700 (PDT)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 24 Oct 2023 15:20:33 +0200
-Subject: [PATCH net-next v7 7/7] dt-bindings: marvell: Add Marvell
- MV88E6060 DSA schema
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412A7134B1;
+	Tue, 24 Oct 2023 13:40:45 +0000 (UTC)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED7395;
+	Tue, 24 Oct 2023 06:40:41 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 694441BF210;
+	Tue, 24 Oct 2023 13:40:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1698154840;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XAvwTUEXIaI0z46pwJVVezsvG++BVtQgJpn7cNB1ctk=;
+	b=fVfgHpnxlEj7KXhnlLkjkqIn4X+DlaVL28wNNDKsdKIyO3C3tvJQuTHYhg5CqnbLkuLnAJ
+	MhjWilxmzP1cRei4l0+6prxLMziuTntq9RysPTZe30dYV50oRayMr13kCzvEzclbcaYryh
+	ERnuCbdc2IHW4tbscWoIBlJ60sEyXnkg7y7EnGhxy0YUq0M5CPlkzk/nzoDiX74mJVuTCz
+	IZWE0bfR+0kPEB5Wen0qms4C9EAH4tE8o6XR0LueVCj8q8PRwjegXINaoQdEeC8sZWBfZR
+	WCKn4VSEZkKwpznLprcK4dM+i1TMkLP2POCtIyJUI0Q5OwBHZkyug+uSq8+HhQ==
+Date: Tue, 24 Oct 2023 15:40:37 +0200
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
+ Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh
+ <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Jonathan Corbet <corbet@lwn.net>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, Simon Horman
+ <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v6 07/16] net_tstamp: Add TIMESTAMPING SOFTWARE
+ and HARDWARE mask
+Message-ID: <20231024154037.2f61fe5b@kmaincent-XPS-13-7390>
+In-Reply-To: <CAF=yD-+O6QxuYJzijMes7J_DHHd7yYCz8sBLFERM1U6pYN0Gkg@mail.gmail.com>
+References: <20231019-feature_ptp_netnext-v6-0-71affc27b0e5@bootlin.com>
+	<20231019-feature_ptp_netnext-v6-7-71affc27b0e5@bootlin.com>
+	<CAF=yD-+O6QxuYJzijMes7J_DHHd7yYCz8sBLFERM1U6pYN0Gkg@mail.gmail.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231024-marvell-88e6152-wan-led-v7-7-2869347697d1@linaro.org>
-References: <20231024-marvell-88e6152-wan-led-v7-0-2869347697d1@linaro.org>
-In-Reply-To: <20231024-marvell-88e6152-wan-led-v7-0-2869347697d1@linaro.org>
-To: Andrew Lunn <andrew@lunn.ch>, 
- Gregory Clement <gregory.clement@bootlin.com>, 
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
- Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, Russell King <linux@armlinux.org.uk>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- =?utf-8?q?Marek_Beh=C3=BAn?= <kabel@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>, 
- linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Linus Walleij <linus.walleij@linaro.org>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>, Rob Herring <robh@kernel.org>
-X-Mailer: b4 0.12.4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-The Marvell MV88E6060 is one of the oldest DSA switches from
-Marvell, and it has DT bindings used in the wild. Let's define
-them properly.
+On Thu, 19 Oct 2023 10:48:04 -0400
+Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
 
-It is different enough from the rest of the MV88E6xxx switches
-that it deserves its own binding.
+> On Thu, Oct 19, 2023 at 10:29=E2=80=AFAM Kory Maincent
+> <kory.maincent@bootlin.com> wrote:
+> >
+> > Timestamping software or hardware flags are often used as a group,
+> > therefore adding these masks will easier future use. =20
+>=20
+> This assumes that device support for timestamping is often symmetric:
+> a device supports both rx and tx, or neither.
+>
+> All devices support software receive timestamping, as that timestamp
+> is taken in the core network stack. But to support transmit timestamps
+> drivers have to call sbk_tstamp_tx in their ndo_start_xmit.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Reviewed-by: Rob Herring <robh@kernel.org>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- .../bindings/net/dsa/marvell,mv88e6060.yaml        | 88 ++++++++++++++++++++++
- MAINTAINERS                                        |  1 +
- 2 files changed, 89 insertions(+)
+Yes, and in that software only case they often call ethtool_op_get_ts_info =
+to
+fill the timestamp info.
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
-new file mode 100644
-index 000000000000..4f1adf00431a
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
-@@ -0,0 +1,88 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6060.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Marvell MV88E6060 DSA switch
-+
-+maintainers:
-+  - Andrew Lunn <andrew@lunn.ch>
-+
-+description:
-+  The Marvell MV88E6060 switch has been produced and sold by Marvell
-+  since at least 2008. The switch has one pin ADDR4 that controls the
-+  MDIO address of the switch to be 0x10 or 0x00, and on the MDIO bus
-+  connected to the switch, the PHYs inside the switch appear as
-+  independent devices on address 0x00-0x04 or 0x10-0x14, so in difference
-+  from many other DSA switches this switch does not have an internal
-+  MDIO bus for the PHY devices.
-+
-+properties:
-+  compatible:
-+    const: marvell,mv88e6060
-+    description:
-+      The MV88E6060 is the oldest Marvell DSA switch product, and
-+      as such a bit limited in features compared to later hardware.
-+
-+  reg:
-+    maxItems: 1
-+
-+  reset-gpios:
-+    description:
-+      GPIO to be used to reset the whole device
-+    maxItems: 1
-+
-+allOf:
-+  - $ref: dsa.yaml#/$defs/ethernet-ports
-+
-+required:
-+  - compatible
-+  - reg
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        ethernet-switch@16 {
-+            compatible = "marvell,mv88e6060";
-+            reg = <16>;
-+
-+            ethernet-ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                ethernet-port@0 {
-+                    reg = <0>;
-+                    label = "lan1";
-+                };
-+                ethernet-port@1 {
-+                    reg = <1>;
-+                    label = "lan2";
-+                };
-+                ethernet-port@2 {
-+                    reg = <2>;
-+                    label = "lan3";
-+                };
-+                ethernet-port@3 {
-+                    reg = <3>;
-+                    label = "lan4";
-+                };
-+                ethernet-port@5 {
-+                    reg = <5>;
-+                    phy-mode = "rev-mii";
-+                    ethernet = <&ethc>;
-+                    fixed-link {
-+                        speed = <100>;
-+                        full-duplex;
-+                    };
-+                };
-+            };
-+        };
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1b4475254d27..4c933a2a56ad 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12625,6 +12625,7 @@ MARVELL 88E6XXX ETHERNET SWITCH FABRIC DRIVER
- M:	Andrew Lunn <andrew@lunn.ch>
- L:	netdev@vger.kernel.org
- S:	Maintained
-+F:	Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
- F:	Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
- F:	Documentation/networking/devlink/mv88e6xxx.rst
- F:	drivers/net/dsa/mv88e6xxx/
+There is several drivers that support hardware and software timestamp, these
+mask could be useful for these. In case of asymmetric support we can still =
+use
+the SOF_TIMESTAMPING_RX/TX_SOFTWARE flags.
 
--- 
-2.34.1
+I forgot to specify, in the commit message but this patch is mainly to ease
+the next patch of this series to deal with software/hardware time stamping.
+Maybe you prefer to have this squash into next patch as had suggested Flori=
+an
+in last version.
 
+K=C3=B6ry
 
