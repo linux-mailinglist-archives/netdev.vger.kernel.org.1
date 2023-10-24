@@ -1,224 +1,92 @@
-Return-Path: <netdev+bounces-43909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 642B97D5463
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:52:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DE7A7D548E
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:59:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95F131C20380
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:52:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBD82281630
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C693E26E06;
-	Tue, 24 Oct 2023 14:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04B329414;
+	Tue, 24 Oct 2023 14:59:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VDi7GKny"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sEHqTEi7"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8822AB5E
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 14:51:56 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DF0E10E2;
-	Tue, 24 Oct 2023 07:51:54 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39O2KOlF021960;
-	Tue, 24 Oct 2023 07:51:43 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=BGTdEvAtLiqmgykdwG7+xPge8E3jhAnU5OgJrH52q8k=;
- b=VDi7GKnyNhnotbBJ4TB00ShmXdsGWF+dOR/nDED9aj38P8KSWCWVcN2wGakQUmTY/vSD
- 9dPVsuEeMT1UABPeVmeoMz9Q6vFoe8ROgzIoRJ4sVknWvls2EL/Q9YyFGLIX94HziqVt
- AWm0RSITjTCuIIMnCZAvjNTC4j3b5si+T+5J0zwhwiSMqOGZBmRG1z5A8M3X5SakZ10r
- 3by83tVsL1Ncy7u6M0y+X1u6BH8sW7YRYJt5NhwXETsKOsmjdIJJanpGig/npAuRrWH6
- XkxTiDLW//g9xfT31UKcrMT4pXLLTS2lRHxec1QogqFpJMhkhDGo2YHiVdXLYR7IW5+Q VQ== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3tx523tpqd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 24 Oct 2023 07:51:43 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 24 Oct
- 2023 07:51:41 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 24 Oct 2023 07:51:42 -0700
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 4636C3F7067;
-	Tue, 24 Oct 2023 07:51:41 -0700 (PDT)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
-        "Veerasenareddy
- Burru" <vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>,
-        Eric Dumazet
-	<edumazet@google.com>
-Subject: [PATCH net-next v2 4/4] octeon_ep: remove atomic variable usage in Tx data path
-Date: Tue, 24 Oct 2023 07:51:19 -0700
-Message-ID: <20231024145119.2366588-5-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231024145119.2366588-1-srasheed@marvell.com>
-References: <20231024145119.2366588-1-srasheed@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2E7273E1
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 14:59:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDB23C433C9;
+	Tue, 24 Oct 2023 14:59:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698159550;
+	bh=aa4Ls/pdF9G/SIrSROntnz15DjH0eznKEP+phgpolfg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sEHqTEi7/hk1CoVb0pNsePlJvj7io3hZWecDvvgOhY/p3+JrE13VoA8nlZQkKQ1Kc
+	 N20lmhhpnsGEXCM1klduXJ2WujtHjmFi5e7MJrQym02vVMvVUFDA19dR3ghXWH41GP
+	 Y4gx3lXLVrc0CqAe9tClRLCA3ZciOc55PuR2esd4wYNeidzXtZlc1pbuOklmJZ6Qlr
+	 Mh04yMnBSZJVKfU9vHb0zoc9inx07jnJQk/tT5ctQX+FeR+Vkfcjjdom45c6CU0XFT
+	 hpURYPrIhUUWZzeT2/eUlSrN++ChljRi8XBmXqzCuzP0qqOPqke9NnVqqdAMiR2CTu
+	 MBWiZPeqzbfFA==
+Date: Tue, 24 Oct 2023 07:59:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, sagi@grimberg.me, hch@lst.de, kbusch@kernel.org,
+ axboe@fb.com, chaitanyak@nvidia.com, davem@davemloft.net,
+ aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
+ ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
+ galshalom@nvidia.com, mgurtovoy@nvidia.com, edumazet@google.com,
+ pabeni@redhat.com, imagedong@tencent.com
+Subject: Re: [PATCH v17 02/20] netlink: add new family to manage ULP_DDP
+ enablement and stats
+Message-ID: <20231024075908.68730358@kernel.org>
+In-Reply-To: <ZTfNfvtZz7F1up6u@nanopsycho>
+References: <20231024125445.2632-1-aaptel@nvidia.com>
+	<20231024125445.2632-3-aaptel@nvidia.com>
+	<ZTfNfvtZz7F1up6u@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 6yPdpZiMzuYoOd8CRQQbXka7VJf7XjMC
-X-Proofpoint-ORIG-GUID: 6yPdpZiMzuYoOd8CRQQbXka7VJf7XjMC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-24_15,2023-10-24_01,2023-05-22_02
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Replace atomic variable "instr_pending" which represents number of
-posted tx instructions pending completion, with host_write_idx and
-flush_index variables in the xmit and completion processing respectively.
+On Tue, 24 Oct 2023 15:58:22 +0200 Jiri Pirko wrote:
+> >+definitions:
+> >+  -
+> >+    type: enum
+> >+    name: cap
+> >+    entries:
+> >+      - nvme-tcp
+> >+      - nvme-tcp-ddgst-rx
+> >+
+> >+uapi-header: linux/ulp_ddp_nl.h  
+> 
+> Not needed.
+> Hmm, Jakub, why this is not only allowed in genetlink-legacy?
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V2:
-  - No changes
-V1: https://lore.kernel.org/all/20231023114449.2362147-4-srasheed@marvell.com/
+Agreed that it's not needed here.
+There's a non-trivial chance of name collisions between new families 
+and existing headers under include/uapi/linux. Since this is a C/C++
+-only artifact and "modern" languages will simply ignore it allowing it
+seemed like the right choice.
 
- drivers/net/ethernet/marvell/octeon_ep/octep_config.h |  1 +
- drivers/net/ethernet/marvell/octeon_ep/octep_main.c   | 11 ++++-------
- drivers/net/ethernet/marvell/octeon_ep/octep_main.h   |  9 +++++++++
- drivers/net/ethernet/marvell/octeon_ep/octep_tx.c     |  5 +----
- drivers/net/ethernet/marvell/octeon_ep/octep_tx.h     |  3 ---
- 5 files changed, 15 insertions(+), 14 deletions(-)
+> >+      -
+> >+        name: pad
+> >+        type: pad
+> >+      -
+> >+        name: rx-nvmeotcp-sk-add
+> >+        doc: Sockets successfully configured for NVMeTCP offloading.
+> >+        type: u64
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_config.h b/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-index ed8b1ace56b9..91cfa19c65b9 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-@@ -13,6 +13,7 @@
- #define OCTEP_64BYTE_INSTR  64
- 
- /* Tx Queue: maximum descriptors per ring */
-+/* This needs to be a power of 2 */
- #define OCTEP_IQ_MAX_DESCRIPTORS    1024
- /* Minimum input (Tx) requests to be enqueued to ring doorbell */
- #define OCTEP_DB_MIN                8
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index 1a88a6bf0598..53b7fbfe39ff 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -777,7 +777,7 @@ static int octep_stop(struct net_device *netdev)
-  */
- static inline int octep_iq_full_check(struct octep_iq *iq)
- {
--	if (likely((iq->max_count - atomic_read(&iq->instr_pending)) >=
-+	if (likely((IQ_INSTR_SPACE(iq)) >
- 		   OCTEP_WAKE_QUEUE_THRESHOLD))
- 		return 0;
- 
-@@ -787,7 +787,7 @@ static inline int octep_iq_full_check(struct octep_iq *iq)
- 	/* check again and restart the queue, in case NAPI has just freed
- 	 * enough Tx ring entries.
- 	 */
--	if (unlikely((iq->max_count - atomic_read(&iq->instr_pending)) >=
-+	if (unlikely(IQ_INSTR_SPACE(iq) >
- 		     OCTEP_WAKE_QUEUE_THRESHOLD)) {
- 		netif_start_subqueue(iq->netdev, iq->q_no);
- 		iq->stats.restart_cnt++;
-@@ -900,14 +900,11 @@ static netdev_tx_t octep_start_xmit(struct sk_buff *skb,
- 	xmit_more = netdev_xmit_more();
- 
- 	skb_tx_timestamp(skb);
--	atomic_inc(&iq->instr_pending);
- 	iq->fill_cnt++;
- 	wi++;
--	if (wi == iq->max_count)
--		wi = 0;
--	iq->host_write_index = wi;
-+	iq->host_write_index = wi & iq->ring_size_mask;
- 	if (xmit_more &&
--	    (atomic_read(&iq->instr_pending) <
-+	    (IQ_INSTR_PENDING(iq) <
- 	     (iq->max_count - OCTEP_WAKE_QUEUE_THRESHOLD)) &&
- 	    iq->fill_cnt < iq->fill_threshold)
- 		return NETDEV_TX_OK;
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-index 6df902ebb7f3..c33e046b69a4 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-@@ -40,6 +40,15 @@
- #define  OCTEP_OQ_INTR_RESEND_BIT  59
- 
- #define  OCTEP_MMIO_REGIONS     3
-+
-+#define  IQ_INSTR_PENDING(iq)  ({ typeof(iq) iq__ = (iq); \
-+				  ((iq__)->host_write_index - (iq__)->flush_index) & \
-+				  (iq__)->ring_size_mask; \
-+				})
-+#define  IQ_INSTR_SPACE(iq)    ({ typeof(iq) iq_ = (iq); \
-+				  (iq_)->max_count - IQ_INSTR_PENDING(iq_); \
-+				})
-+
- /* PCI address space mapping information.
-  * Each of the 3 address spaces given by BAR0, BAR2 and BAR4 of
-  * Octeon gets mapped to different physical address spaces in
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-index d0adb82d65c3..06851b78aa28 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-@@ -21,7 +21,6 @@ static void octep_iq_reset_indices(struct octep_iq *iq)
- 	iq->flush_index = 0;
- 	iq->pkts_processed = 0;
- 	iq->pkt_in_done = 0;
--	atomic_set(&iq->instr_pending, 0);
- }
- 
- /**
-@@ -82,7 +81,6 @@ int octep_iq_process_completions(struct octep_iq *iq, u16 budget)
- 	}
- 
- 	iq->pkts_processed += compl_pkts;
--	atomic_sub(compl_pkts, &iq->instr_pending);
- 	iq->stats.instr_completed += compl_pkts;
- 	iq->stats.bytes_sent += compl_bytes;
- 	iq->stats.sgentry_sent += compl_sg;
-@@ -91,7 +89,7 @@ int octep_iq_process_completions(struct octep_iq *iq, u16 budget)
- 	netdev_tx_completed_queue(iq->netdev_q, compl_pkts, compl_bytes);
- 
- 	if (unlikely(__netif_subqueue_stopped(iq->netdev, iq->q_no)) &&
--	    ((iq->max_count - atomic_read(&iq->instr_pending)) >
-+	    (IQ_INSTR_SPACE(iq) >
- 	     OCTEP_WAKE_QUEUE_THRESHOLD))
- 		netif_wake_subqueue(iq->netdev, iq->q_no);
- 	return !budget;
-@@ -144,7 +142,6 @@ static void octep_iq_free_pending(struct octep_iq *iq)
- 		dev_kfree_skb_any(skb);
- 	}
- 
--	atomic_set(&iq->instr_pending, 0);
- 	iq->flush_index = fi;
- 	netdev_tx_reset_queue(netdev_get_tx_queue(iq->netdev, iq->q_no));
- }
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-index 86c98b13fc44..1ba4ff65e54d 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-@@ -172,9 +172,6 @@ struct octep_iq {
- 	/* Statistics for this input queue. */
- 	struct octep_iq_stats stats;
- 
--	/* This field keeps track of the instructions pending in this queue. */
--	atomic_t instr_pending;
--
- 	/* Pointer to the Virtual Base addr of the input ring. */
- 	struct octep_tx_desc_hw *desc_ring;
- 
--- 
-2.25.1
+Everything you have as u64 should now be uint, and pads can then go
+away.
 
 
