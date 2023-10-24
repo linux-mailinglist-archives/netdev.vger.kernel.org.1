@@ -1,96 +1,108 @@
-Return-Path: <netdev+bounces-43811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E2D97D4E2F
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 12:45:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F13AB7D4E48
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 12:53:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 325D1281939
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 10:45:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7511DB20BD1
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 10:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A741579C7;
-	Tue, 24 Oct 2023 10:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17B6E219ED;
+	Tue, 24 Oct 2023 10:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b="crzkkKK9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LseKrDJD"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D468923A7
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 10:45:06 +0000 (UTC)
-Received: from bee.tesarici.cz (bee.tesarici.cz [77.93.223.253])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B9BCE5
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 03:45:04 -0700 (PDT)
-Received: from meshulam.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-4427-cc85-6706-c595.ipv6.o2.cz [IPv6:2a00:1028:83b8:1e7a:4427:cc85:6706:c595])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by bee.tesarici.cz (Postfix) with ESMTPSA id E93D3176A0D;
-	Tue, 24 Oct 2023 12:44:59 +0200 (CEST)
-Authentication-Results: mail.tesarici.cz; dmarc=fail (p=none dis=none) header.from=tesarici.cz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tesarici.cz; s=mail;
-	t=1698144300; bh=Y1aIWSgGtygvtDkXdBYmCHvtBgAzdfjU/bA7G6eAls0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=crzkkKK9Ld6sw0zQ6fw5+sqpMhfGnK5CjYaiGxlnF+8da/O1Zzo4SFMNnqiJ/kBFB
-	 FrhFW4Xj2361L9YyCQrHL4movNovK/Ba60pGt7Z0wG91ZAriE0mn51eDE9HKPyvRgE
-	 0/cuyZysxOzxTOgQzfxALPElVPLqm6ExOki1Q62EZ5b81Wu4KVT7l03YmNZOePhd6C
-	 NzknKgvOUJHxLg7hTfoUuesLJApau/aKEbrDEP063KRjK6kcE/l3xF02Dd6Q0YzIDk
-	 dmbYIoUe5XbFXkrPNdSUYyAdbrU+moP1uMKqQcWusVXnemQ7pdCIHnDOdmTb6cljLp
-	 +421wq59u1dRQ==
-Date: Tue, 24 Oct 2023 12:44:57 +0200
-From: Petr =?UTF-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Ben Greear <greearb@candelatech.com>, netdev <netdev@vger.kernel.org>,
- Christoph Hellwig <hch@lst.de>
-Subject: Re: swiotlb dyn alloc WARNING splat in wireless-next.
-Message-ID: <20231024124457.2a8fdf23@meshulam.tesarici.cz>
-In-Reply-To: <96efddab-7a50-4fb3-a0e1-186b9339a53a@gmail.com>
-References: <4f173dd2-324a-0240-ff8d-abf5c191be18@candelatech.com>
-	<96efddab-7a50-4fb3-a0e1-186b9339a53a@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-suse-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B905CBE
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 10:53:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCDDC109
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 03:53:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698144811;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r6ob6RKRIAPi5Khx0xpjNiWs6euw8iDGvt/Bc/jthnM=;
+	b=LseKrDJDeviJlhuurHo00cTFJQRmO+7iPJamiVPUz4UYkAuAJBxSlQU2yrVSck28SBy+wU
+	Ot/EsutMtlgE5n1clX8OXT5oFp3peX1jwUrWwo72gzQ8B9E5z/fN3KPYLWdRa6REnyWrT4
+	lHym4e2geEaPvgVik2DioVyCyfGTXnI=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-633-zxz326yeOk2pSRZ7FLhM5A-1; Tue, 24 Oct 2023 06:53:30 -0400
+X-MC-Unique: zxz326yeOk2pSRZ7FLhM5A-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c50cf8cf25so7607361fa.0
+        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 03:53:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698144809; x=1698749609;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r6ob6RKRIAPi5Khx0xpjNiWs6euw8iDGvt/Bc/jthnM=;
+        b=GvQ1LDdHZjDtrRvtaV146SKVt02r6t3GLHagyLFp8SnanZiS+NJ6YC/Y1DGtGecxsJ
+         aZPViE3vSYmXSjh8f+al+8Zfj6TNh5K/FnMV41eNyXb1JPzN7doioc9XXLj8fSIA9OqZ
+         5R9EpdARpdmDO9rIVV/JJdASbdcJOcNG7BQJinoT6aTWCKpGsvkODmkUFc1xLvN5VOkb
+         GqrnO6n1T0qWyefGUhGyUqWQYsMcXcBuF3swdlTj+pFO4c8W/poVTCjxe6jax6e0m0qF
+         rZSqD3DVO2rtu0tylPW1w0DdmXP2wfD6WFk0zmzXEU/slwTQlXYr3IxWYquxVWK3NvXz
+         gIew==
+X-Gm-Message-State: AOJu0YyajsQwiB7fLfjP6EXZaK3mbjTkb3SlvaECXeg7NbJeMwwqAXLL
+	RvkicL750wp8+gLoZVTRi0IpQHVJtcxKTps9ib/m8IDhry6f1TlyY/uRyfaS6/RTC7Yuzev3z6/
+	3hz0QR4kWDp4VBDxs
+X-Received: by 2002:a2e:9093:0:b0:2bf:e5dc:aa68 with SMTP id l19-20020a2e9093000000b002bfe5dcaa68mr8167968ljg.3.1698144808820;
+        Tue, 24 Oct 2023 03:53:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG6+UwT5yEGXNUvPuTwPIUcgM8GHlIrJ64DEgbjtALnH/OkHpdWanmLDXcDqMv2xU2rWv9gcg==
+X-Received: by 2002:a2e:9093:0:b0:2bf:e5dc:aa68 with SMTP id l19-20020a2e9093000000b002bfe5dcaa68mr8167954ljg.3.1698144808405;
+        Tue, 24 Oct 2023 03:53:28 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-242-180.dyn.eolo.it. [146.241.242.180])
+        by smtp.gmail.com with ESMTPSA id y14-20020a170906070e00b00993664a9987sm8086424ejb.103.2023.10.24.03.53.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 03:53:27 -0700 (PDT)
+Message-ID: <b0b4054adcb5250ad49e19d8f90c89de802f0125.camel@redhat.com>
+Subject: Re: [PATCH net-next 2/2] net: ethernet: renesas: drop SoC names in
+ Kconfig
+From: Paolo Abeni <pabeni@redhat.com>
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>, 
+	linux-renesas-soc@vger.kernel.org
+Cc: Niklas =?ISO-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>, 
+ Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub Kicinski
+ <kuba@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Tue, 24 Oct 2023 12:53:26 +0200
+In-Reply-To: <20231022205316.3209-3-wsa+renesas@sang-engineering.com>
+References: <20231022205316.3209-1-wsa+renesas@sang-engineering.com>
+	 <20231022205316.3209-3-wsa+renesas@sang-engineering.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 
-Hi Florian,
+On Sun, 2023-10-22 at 22:53 +0200, Wolfram Sang wrote:
+> Mentioning SoCs in Kconfig descriptions tends to get stale (e.g. RAVB is
+> missing RZV2M) or imprecise (e.g. SH_ETH is not available on all
+> R8A779x). Drop them instead of providing vague information. Improve the
+> file description a tad while here.
 
-thank you for your report!
+It's not a big deal, but assuming that keeping the SoC list up2date
+requires too much effort, I would still keep it, with some additional
+wording specifying it's partial and potentially inaccurate.
 
-On Mon, 23 Oct 2023 18:01:46 -0700
-Florian Fainelli <f.fainelli@gmail.com> wrote:
+Such list could be an useful starting point for an integrator looking
+for the correct driver for his/her SoC.
 
-> +Christoph, Petr
->=20
-> On 10/22/2023 11:48 AM, Ben Greear wrote:
-> > Hello,
-> >=20
-> > I saw this in a system with 16GB of RAM running a lot of wifi traffic
-> > on 16 radios.=C2=A0 System appears to mostly be working OK, so not sure=
- if it is
-> > a real problem or not.
-> >=20
-> > [76171.488627] WARNING: CPU: 2 PID: 30169 at mm/page_alloc.c:4402=20
-> > __alloc_pages+0x19c/0x200
+Cheers,
 
-This is a WARN_ON_ONCE_GFP(order > MAX_ORDER, gfp), and the allocation
-fails. The dynamic SWIOTLB pool allocator will then reduce the requested
-size by half until allocation succeeds (or fails even for minimum size).
-That's why your system behaves normally.
+Paolo
 
-However, starting with a request that is larger than MAX_ORDER is
-silly, especially since this is the default if you build your kernel
-with CONFIG_SWIOTLB_DYNAMIC=3Dy and boot it without any swiotlb=3D
-parameter. It makes sense to clamp the requested size to MAX_ORDER
-before the first loop iteration.
-
-I'm going to send a patch.
-
-Petr T
 
