@@ -1,222 +1,136 @@
-Return-Path: <netdev+bounces-43887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59C5F7D5212
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:43:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A589B7D5329
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:50:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4DA3B20B90
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:43:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 461DAB20F86
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2EB2943C;
-	Tue, 24 Oct 2023 13:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UwecES12"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760372B5DD;
+	Tue, 24 Oct 2023 13:49:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6B421378
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 13:43:42 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F7C793;
-	Tue, 24 Oct 2023 06:43:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698155021; x=1729691021;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=KRo+2AD2u8nWJgx+4MOYr+5TEkrKOatN/EKo2KUhHRE=;
-  b=UwecES12rPk5MdcsmWM+ihtLUQ96vNPVEx1uZCmJDaxw8+iDlCT1GfHF
-   eUkiEK9Ngw5iE/SMVlxpCKp6IamDSeEmArIMpYtwoE+I3gIqxPqLZekMN
-   GlAPRcZr6kKXFQ4A22DEV07Lco3NkNApFlIv6b8t54Qca0vS+bM2Tpkrl
-   qnxG0x333PeG4/75Gfh9WLx6aBtzLBaFvpEULBWIzb9XuGvGZVTPVdvvm
-   1L9e7RvyPjEb2WY0sj1QaoHgQXSablOJMhDbZCn98jGn7OeixiBOAmKwI
-   bhrN6bltylP4bYS0/313Q9pVfjn6d4zySOqFzgFrMTaoPWHaLzZvOOt1k
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="366401150"
-X-IronPort-AV: E=Sophos;i="6.03,247,1694761200"; 
-   d="scan'208";a="366401150"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2023 06:43:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="793489938"
-X-IronPort-AV: E=Sophos;i="6.03,247,1694761200"; 
-   d="scan'208";a="793489938"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Oct 2023 06:43:40 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 24 Oct 2023 06:43:39 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 24 Oct 2023 06:43:39 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 24 Oct 2023 06:43:39 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 24 Oct 2023 06:43:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AzWgaQDhceb0n3pa39YEMEWvLUdiBbEiDO/cW11tx/0Sg9RhGW30YBL9zLPnt5wJOITaMRNA9uY865Egxbly1oteRaXloyfPGd6vT8qNAJtdYaXjGrI2poqVU5jUTauDRePoWA2neI1JggY2Ulr/ckIj/no1ZA7HkoIvxjWQ4W3Z9PbqTMPpDD6kfIVwMrrgMFtWGgPbsuHOYGCtH0V0RK5PyfokzEyrLEbHK6h8FUcLbiOdA3LyAuiLZRpIBx3Ijk531f0q7COxYDPs+SlRn6izR0L10jpb1ihVBENrESgak+KiY+APqzZ44y7t0kr9lHJI59xNPIvrWK8MFONK7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KnYCz7BdskmPAla5Cf8eHHDfGqdq7ic1l9J6lUA2nyc=;
- b=GIfCnorEuQktw2llfgkiJXbNuuyAwNPwmy3zGiRIZlC51qakbxH4wXe7kR0tonHQBHtOS0wD00MTNyF6iHbNmQtzYkPJ9p/JAF8NREFehq36xjNVkvee//njdfxwuyh4tQ36wk9OzycGN1gVJzaFnQIjgCRT8zudMm4cv7BojZRSWpQeITxazmU+K4Et56P6DA27PtILKrORw4xm9ntUJQCQ0bUXYOYIbR9hm1Fgim6EghUdWu62nZzRRn86C9pvLT+4kn8WVwFWluBj1V5h67Ys/ccwvScgvjQOSmz87cKcZ57EQWDEb/M0jofvJ+pZH2Dv6BGqXSROoTNxuwLqYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
- by DS0PR11MB7803.namprd11.prod.outlook.com (2603:10b6:8:f5::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Tue, 24 Oct
- 2023 13:43:35 +0000
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::7666:c666:e6b6:6e48]) by BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::7666:c666:e6b6:6e48%4]) with mapi id 15.20.6907.021; Tue, 24 Oct 2023
- 13:43:34 +0000
-Message-ID: <a7bd7ebd-5669-4eb2-55f8-9beb4c1431cc@intel.com>
-Date: Tue, 24 Oct 2023 15:43:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH net-next v3 08/11] net/mlx5: devlink health: use retained
- error fmsg API
-Content-Language: en-US
-To: Dan Carpenter <dan.carpenter@linaro.org>
-CC: Jiri Pirko <jiri@resnulli.us>, <netdev@vger.kernel.org>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shannon Nelson
-	<shannon.nelson@amd.com>, Michael Chan <michael.chan@broadcom.com>, "Cai
- Huoqing" <cai.huoqing@linux.dev>, George Cherian
-	<george.cherian@marvell.com>, Danielle Ratson <danieller@nvidia.com>, "Moshe
- Shemesh" <moshe@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Ariel Elior
-	<aelior@marvell.com>, Manish Chopra <manishc@marvell.com>, Igor Russkikh
-	<irusskikh@marvell.com>, Coiby Xu <coiby.xu@gmail.com>, Simon Horman
-	<horms@kernel.org>, Brett Creeley <brett.creeley@amd.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>, Geetha sowjanya
-	<gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, Ido Schimmel
-	<idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Eran Ben Elisha
-	<eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>, Leon Romanovsky
-	<leon@kernel.org>, <linux-kernel@vger.kernel.org>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Jiri Pirko <jiri@nvidia.com>
-References: <20231018202647.44769-1-przemyslaw.kitszel@intel.com>
- <20231018202647.44769-9-przemyslaw.kitszel@intel.com>
- <8bd30131-c9f2-4075-a575-7fa2793a1760@moroto.mountain>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <8bd30131-c9f2-4075-a575-7fa2793a1760@moroto.mountain>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0284.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e6::8) To BYAPR11MB3672.namprd11.prod.outlook.com
- (2603:10b6:a03:fa::30)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E779125DE
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 13:49:06 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 113FD30C3
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 06:49:02 -0700 (PDT)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qvHm2-0007R6-1x; Tue, 24 Oct 2023 15:48:46 +0200
+Message-ID: <9c1c9408-88ac-4ade-b8ec-2ae5d8922cac@pengutronix.de>
+Date: Tue, 24 Oct 2023 15:48:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|DS0PR11MB7803:EE_
-X-MS-Office365-Filtering-Correlation-Id: 74c20840-2cd7-4626-7d53-08dbd49737b6
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5dcwgQ1mr6RHRcSUjfp4NwKWrK+HsVcLH14IJz/Mag90N0Ptbs81KcJJV7vGP2CNrSBHGXrUy3L4kOAOjgYLQpXl1Vh+sWgyOfczd1hFq8FpIpPAriMCqHD7iyYVFJ1VR3b+29ZSIZxm8q9o5n97D8+slDzuoy34tGAd9Y7kx79Px7ScgXnUQVEv2134LCWhwAyYTJK1LGfu9aiep+lOOQgFpAqty6rme5CaQM2G2isEvljVLD0FK4mJO/sfMeTwCvuZroOtY48Pw/aBY0wt6A+P8mDzD27Wq9Lc8X1W7HcBxF6SzgpurC40oAN2pshWoNVNV1j8ij0O8sFwm2ti/F2JQXHsg5+WMGfInN8mQiz/KsGCRxhecMS6L26hNV3Ne/Ou5hI6k5I5aGRrhJSzEah3Tg2b8S1b2kmbElUy9dmaHLxxcIzuSAijBHFbJEw3/jiUnpidP+t6lkSHFDBS/41VpCB6zZ6rPPzNB0upD8z6vrY1E6LrYl/FeZehAtVDWGKF8SHCc6eZKujFuf7zLdMHD9iLbKfVxsYUZsgJxnpWQGj0LJjDM3hXvsfPF3HucQqJF7OSSUYUiVy915y02kfH72Ybqb3UitaIKXixfF4hqvN9lTv606ESUf5ia+PovBE1Rw62lEtXt9gZjgKjQg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(39860400002)(376002)(366004)(396003)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(26005)(31686004)(38100700002)(2906002)(86362001)(31696002)(36756003)(7406005)(7416002)(5660300002)(4326008)(8936002)(8676002)(478600001)(6506007)(2616005)(66476007)(41300700001)(54906003)(6666004)(6916009)(66556008)(66946007)(316002)(82960400001)(6486002)(6512007)(53546011)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TlJaZWt4QnFXN1NmRzNlRmNFVkpPZGlmZUgvcE1ienJKb2ZNdXgxeHFQMTE2?=
- =?utf-8?B?MzZlbklEcmVVMHdSbHFuTzJ6Y0FNVVhVb0llb2thdHRsWk85cmZFeE9UaWg4?=
- =?utf-8?B?eW9tdzJHUE0yMnhRLzNFdEJOSm51azl0ZW5XeHZJK0xRUDkvaHlHeEZENFlm?=
- =?utf-8?B?Nnp0WTdhM01OZ0k2cm5PYmhRMHdDZFFYMzFFbDJQaFJYMWUxUG16TVhWTk1y?=
- =?utf-8?B?dHFDTWptL3czMHV0WDlDWXBsZjdFa3FrbGcrYklCS1RPSVgxZXhRS3BSTzVw?=
- =?utf-8?B?T3BsTDFJUkhSVmVPNFhXazJRVEZpZmM5RlUxV2xOZXNBU1Y0N2t2VGpqMlJr?=
- =?utf-8?B?QjEvbzhLaVdYVDdkcHArV2hLMUNNU2N0ODBNL2NSQTFoNVhqTG5heGpzYlM0?=
- =?utf-8?B?K0U5RzN0ZkpMcDNWZzlpSkoyM2pLTG11STY0YWZ5MWpEVW1FOUZlUTdKb0Zy?=
- =?utf-8?B?Y3VuTHQ3ekY5RS8zUWljZG5DYU1pU1A1a3R3a25MOVVuRWhidlFqSmdFejJq?=
- =?utf-8?B?eTV4eUZnaFU3cWNaVHdOaHBQZ1hWNkpZcU1BUzVOOTJROS9ibForb0ZYc3pB?=
- =?utf-8?B?cm03SzA1SnJqTlM5dGtMYVI2Z3dqWjBVQjZaZWh0RHRMUm1lUU1Pa2tHWU81?=
- =?utf-8?B?a3RCQU1uQkFsMjZ2dEo2ekFYY1Q1OU9tUVBHN2FzQS84ek1MZGNqa3FoSklz?=
- =?utf-8?B?anBXTC9oYWd0VzUwTVZaLzMrVjRRR21FcXhFajhBcDdTSkNvbUxBTnBOOWlo?=
- =?utf-8?B?RVZvRTRZZnBqWklFaXZOOGFPOGR3ZDduQlBMcHdWLy9yQllLeUN4TWc1Sk5L?=
- =?utf-8?B?M3ZEWi9yZnNEaVREZXBETnF5YXlaQlFUdVFRdHE3TE1XNDhlZmpKcDRFY3V4?=
- =?utf-8?B?ODFFY3F2WUt3RmhQSVZRSjl1TXJIcXFEa3FydXFRZ1J6M0JtdjZtM01TZTEv?=
- =?utf-8?B?d3JWMngxVjZPWm5xM3o3RDBsc0ZYUnExVUV2NU5yOXZvcFFib1RnVGswV1Yw?=
- =?utf-8?B?NUQ0TGxSWGtjYWtKclhLL2V3cE5tZXlnZ3oyNFRYSHJoNUtGbjRZU2tnaHRT?=
- =?utf-8?B?RFcwZUdHc3MvZDNYSDNSeG5YYXRiTHEzN2pGQUxhbnc0eUdpemZuMDl0RHM4?=
- =?utf-8?B?RWlPMXdvNGNJTTRrcmoxYWFMdkltUVBxTEUwYWhSUTZWL2llVmREZ3FtemhN?=
- =?utf-8?B?ekYvQ2J3N1RFWTlHV0U4QitESE12S1Rka3FSbFo0VzRPMFpRLzdWeW1LQUZi?=
- =?utf-8?B?cFoxWFAvL01rMkZ1Sm9DYzA3RlFVcVBGbWVvaVhUWXNuaVlBVWQwYkhZKy9k?=
- =?utf-8?B?Um4ybTc3d0diSWg2VVpCY2pVdko3aytudk0zZGhSZVdVZ1NlcThpR2hEZ2RO?=
- =?utf-8?B?eWRuS1liK280SmRxVUhLV05Hd08xNkQyWUNaczE2dGZ0VlFNK0JraDdweXlD?=
- =?utf-8?B?UUxzRWNJNVh0RHRnVzhkR25kTldTNnZ6M0lWNkx6OE9RQ09yRkk5bzQxZnJh?=
- =?utf-8?B?Z0JyMlRvdGlPK09pYmZ4VUJPYmVOWjUzN1lmZ3cxbHlkdlU1cjl3NExkd3cw?=
- =?utf-8?B?aC9LaURvcGUxMUpxUzZDUklTd1ZSK2kvUkhqdXR5QlpZbFVwUmlGTmd6dlhT?=
- =?utf-8?B?Z0hZanRUZVdub3IwU01UMXJZTXMzSnY4SUFwaHdQY3ROREdKeldJRlhGaG1k?=
- =?utf-8?B?d1dielYrTFhsemtMeWIyQVZqTUlDTnZFcjRac2I3Z1l3dGhEY29wbThzb2Iz?=
- =?utf-8?B?R1BlQmFPQXdLVVZtazR2YWdrOWlZeEl1Z0xlU0RTaGZlQy9GZStqelloOGNn?=
- =?utf-8?B?Vk1rZWJLVWI4L0dNT21PNk9kc1dwT2xWNnd4WFVMRk55K1UvdXVmZEVoL3VR?=
- =?utf-8?B?bFVTa2JKOENlRmd3bGo0Mk5Wb3BNOVN2UkxIcjRKR3RKUmp1ZmFMZnpzZllM?=
- =?utf-8?B?dDQvVFp3RDI0VUxOa3BwSzRZWmg3bHgydFJ4MDZxMzBUWWFoUkkzR05KbDRL?=
- =?utf-8?B?WXF1c2twa2EzdFVqK3BEZ0hwblFkcjBiQUFuNVdZWUo5Rit4NEtHQlJZQlRW?=
- =?utf-8?B?NStrMi9oanZMOVJlNDNJYlVOM3NCVnowemlwT1BQVzRTVmZrSnNCYnExMnlR?=
- =?utf-8?B?N0d3TGgzbjc1LzAvb0srTE9vS2o5M1JmTG8zRUtEQ1p2dUhtV2hBc0Z3MldB?=
- =?utf-8?B?ZWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74c20840-2cd7-4626-7d53-08dbd49737b6
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2023 13:43:34.6555
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Fz8L9JuBZg23AThlMDrRc2Y5PR+j+3uGxDD6SJQHYRJ2V+RkWMJ/ehAmFuxqxDCTtouELlqoIkM5Smtm+hG4z97Dudki6JutSIemyd5u7rU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7803
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US, de-DE
+To: Shawn Guo <shawnguo@kernel.org>, Fabio Estevam <festevam@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>,
+ "linux-stm32@st-md-mailman.stormreply.com"
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: Pengutronix Kernel Team <kernel@pengutronix.de>
+From: Johannes Zink <j.zink@pengutronix.de>
+Subject: BUG: stmmac: Timeout accessing MAC_VLAN_Tag_Filter when EEE is
+ enabled
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: j.zink@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 10/24/23 11:50, Dan Carpenter wrote:
-> On Wed, Oct 18, 2023 at 10:26:44PM +0200, Przemek Kitszel wrote:
->>   	if (rq->icosq) {
->>   		struct mlx5e_icosq *icosq = rq->icosq;
->>   		u8 icosq_hw_state;
->>   
->> -		err = mlx5_core_query_sq_state(rq->mdev, icosq->sqn, &icosq_hw_state);
->> -		if (err)
->> -			return err;
->> -
->> -		err = mlx5e_reporter_icosq_diagnose(icosq, icosq_hw_state, fmsg);
->> -		if (err)
->> -			return err;
->> +		mlx5_core_query_sq_state(rq->mdev, icosq->sqn, &icosq_hw_state);
-> 
-> When we remove the error checking then Smatch correctly complains that
-> icosq_hw_state is used uninitialized.
-> 
->      drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c:268 mlx5e_rx_reporter_build_diagnose_output_rq_common()
->      error: uninitialized symbol 'icosq_hw_state'.
-> 
->> +		mlx5e_reporter_icosq_diagnose(icosq, icosq_hw_state, fmsg);
->>   	}
->>   
->>   	return 0;
->>   }
-> 
-> See also:
->      drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c:229 mlx5e_tx_reporter_build_diagnose_output_sq_common()
->      error: uninitialized symbol 'state'.
-> 
-> regards,
-> dan carpenter
+Hi everyone,
 
-thank you for the report, I will post a fix soon
+for a vanilla kernel version 6.5.2 I observed the following behaviour on an 
+i.MX8MP-EVK:
+
+root@<redacted>:~# ethtool -s eth1 autoneg on speed 100 duplex full
+root@<redacted>:~# ethtool --show-eee eth1
+EEE settings for eth1:
+         EEE status: enabled - inactive
+         Tx LPI: disabled
+         Supported EEE link modes:  100baseT/Full
+                                    1000baseT/Full
+         Advertised EEE link modes:  100baseT/Full
+         Link partner advertised EEE link modes:  Not reported
+root@<redacted>:~# ip link add link eth1 name eqos.5 type vlan id 5
+RTNETLINK answers: Device or resource busy
+root@<redacted>:~# dmesg | tail -n 1
+[  819.085069] imx-dwmac 30bf0000.ethernet eth1: Timeout accessing 
+MAC_VLAN_Tag_Filter
+root@<redacted>:~# ip link show dev eqos.5@eth1
+Device "eqos.5@eth1" does not exist.
+root@<redacted>:~# ethtool --set-eee eth1 eee off
+root@<redacted>:~# ethtool --show-eee eth1
+EEE settings for eth1:
+         EEE status: disabled
+         Tx LPI: disabled
+         Supported EEE link modes:  100baseT/Full
+                                    1000baseT/Full
+         Advertised EEE link modes:  Not reported
+         Link partner advertised EEE link modes:  Not reported
+root@<redacted>:~# ip link add link eth1 name eqos.5 type vlan id 5
+root@<redacted>:~# ip link show dev eqos.5 
+
+5: eqos.5@eth1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode 
+DEFAULT group default qlen 1000
+     link/ether 00:04:9f:07:9c:42 brd ff:ff:ff:ff:ff:ff
+
+The same holds for removing VLANs when EEE is enabled:
+
+(after reboot)
+root@<redacted>:~# ethtool --set-eee eth1 eee off
+root@<redacted>:~# ip link add link eth1 name eqos.5 type vlan id 5
+root@<redacted>:~# ethtool --set-eee eth1 eee on
+root@<redacted>:~# ip link del link eth1 name eqos.5 type vlan id 5
+root@beluga-1311a8001168e9dc:~# dmesg | tail -n2
+[  240.918085] imx-dwmac 30bf0000.ethernet eth1: Timeout accessing 
+MAC_VLAN_Tag_Filter
+[  240.925827] imx-dwmac 30bf0000.ethernet eth1: failed to kill vid 0081/5
+
+Which is even a bit more concerning, because there is no error reported to 
+userspace, only a netdev_err print to the kernel log
+
+In my debugging session I found that this behaviour is only linked to EEE being 
+enabled or disabled.
+On 1Gbps links, the eee-broken-1000t property is set for the ethphy node, which 
+is why the behaviour usually does not occur for 1GBps (which is probably the 
+most common usecase).
+
+Maybe someone on this list has more insight in the inner workings of the 
+dwmac/stmmac/eqos and could point out how to fix this issue, I'd be happy to 
+send patches and fix it. Also, maybe someone has other implementations at hand 
+and can check if this can be reproduced
+
+Do you deem disabling EEE while setting the VLAN up a valid workaround or 
+should we rather add a warning when the timeout occurs and EEE is still enabled?
+
+Best regards
+Johannes
+
+-- 
+Pengutronix e.K.                | Johannes Zink                  |
+Steuerwalder Str. 21            | https://www.pengutronix.de/    |
+31137 Hildesheim, Germany       | Phone: +49-5121-206917-0       |
+Amtsgericht Hildesheim, HRA 2686| Fax:   +49-5121-206917-5555    |
 
