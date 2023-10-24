@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-43878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C33B7D515B
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:20:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4EFA7D515E
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:20:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD7851C20BC3
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:20:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20B5AB20F79
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877832AB3F;
-	Tue, 24 Oct 2023 13:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B2C2AB56;
+	Tue, 24 Oct 2023 13:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RS6oO+kO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fgmuT7+7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8852942B
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 13:20:38 +0000 (UTC)
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9846012B
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 06:20:33 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-507a0907896so6646643e87.2
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 06:20:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E5C29D05
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 13:20:40 +0000 (UTC)
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C11F1CC
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 06:20:34 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-507a29c7eefso6671381e87.1
+        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 06:20:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698153632; x=1698758432; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1698153633; x=1698758433; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UT552xSRxg7vfw/B4jlHzjbiGIGKhdCrIlQ9lB9ogSk=;
-        b=RS6oO+kOF6nFFUVyLqUXSibAbxFVFD2hlRtuAZmm5qt2pu+qY5uBmBvWge6Dos0uDr
-         4CtOsOImZWm1DeRwDfsVlV8eiKIKskzDay04kBVtIIOv81jIhU+7FgKLtjFZ8x9PeEfN
-         VK6xhrdVk15l4GIpzzZCU5Vl+Pd9wfEYgQXyyP2IihEHDfJ0ST8cpc3QpVjHDMFphJc2
-         eluxCaR6YYRBznfJrluPosuTuEBQgdKQWOe/TlJKv4xrCZEKewbSCE0t2IQctjBayRcg
-         ICT+FSUc5yi6CbyJuL8U+cDuu4WqSULFW4pAQJyrq/tLdG3ulXrM+ISVFOTh9Iv9aQFt
-         J5Cw==
+        bh=Q8dS0fiX8s3oTQdiSNWl2/6C6tud53gSSackCKtgSFY=;
+        b=fgmuT7+7UTFWpHnkgEtCIHBht6rKqPuBKoAoHh173UC53GMZIa0G1kHHC+y3YasIaY
+         IdzRe5zqZ1Tzzxdvf9Mnmw4BeLO4eA/9Gm3JYFX8k+3gX4wYrB1JqcITHMYPbgcYrywN
+         7kFieQYXcBXlot5wMsOsOE2P5YHuWHUQIvI8nKizxCDepPug715miP6rAbG8OiJX6x0A
+         VeQ0uMzCZJnf8/X8ZEjxUg2MiYdSy7KjhV0UK1BHwxxg59Z+NIyXnUvyum5DtaTUyGlW
+         lWQlpjEvE6yR6UFSWoocx/XZwbZ48iTDARuIaGl9KauBQIjCNNiIspECPio7Yu7a6JIK
+         Kh/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698153632; x=1698758432;
+        d=1e100.net; s=20230601; t=1698153633; x=1698758433;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UT552xSRxg7vfw/B4jlHzjbiGIGKhdCrIlQ9lB9ogSk=;
-        b=WSiuZK/7JEwBOWB71qY8PDNUAU8F5NfCi22ZuCr780IyP4nLv8cPkG40gILc16CkMG
-         wMVl2XLZVJxF4jYUb3tTpxo7bm2TJrQRiX0D59XdDdMu51vsqUF+odDNVhwv8e6ANCP/
-         aviHzhvMS1xd+Urfni6CDslcKB/VehVTKfHVAdkcN4qOXcQO4iNymS4kv2FLf+F4X2ZF
-         IQu+jj/LPaqa1ijAo1Cd39LIqgBJhKwHZ9JsfTMd521XIxGEUqKUw5EU6dLwAJ36voP6
-         Npk7ri3xL5MCQ5/KA0AcnpaQM4j5KyZdtUgvYrEpKcbzYQeZuZL88SP98v2JGWFxlpjM
-         azxQ==
-X-Gm-Message-State: AOJu0YwEaugWznPxhNiIxt81u0lYhZrSwMvaWMp+Ihk9Aq0SkcuOMqOs
-	QHryLvXgj/4nKYlgqm8VtAh8Fg==
-X-Google-Smtp-Source: AGHT+IEj+KMeONE10q/gquHsR7jOzyg2PFLfGY6LK/CyGvVzrP9Ev1G3Y33qwldjE7BWxEeoNM6aWg==
-X-Received: by 2002:a05:6512:4016:b0:508:1178:efa4 with SMTP id br22-20020a056512401600b005081178efa4mr188587lfb.55.1698153631805;
-        Tue, 24 Oct 2023 06:20:31 -0700 (PDT)
+        bh=Q8dS0fiX8s3oTQdiSNWl2/6C6tud53gSSackCKtgSFY=;
+        b=CbQQS+RJIiN/zpUeaVUyDaSMtcygk6TnasA+rKL9egB3WybXNYar4hGtaP3rOYalHi
+         qlB0OWuZSZn1JfqGF7VTN81sCQpw/ky4VjSiVTNa3EvdE+EZOsW571mvtHpMhiMDg28y
+         Vk1+tmQoU4hJyws6eQFLz4/2tC4KgO7GJlHHJs85bbRkd90N9n4CcdMdHML1wP+lqsTz
+         qqzwivP+4P2Fhikr7HMnZn2uzgi43kovbVdOP76zDf4KrRSdRF/CQTijwQdzktYVSbL8
+         ZTTV60rP9HrVNrQRZ932qXfhFYrrE7WfQElgEQ0NxRovtSwp+S82oOxBpTrx6IT/KBrb
+         Thgg==
+X-Gm-Message-State: AOJu0YzwWMbip1RGZOUpNrBy3Zv4J6MUt5QeZ4DEeV1XqtscZwZ9QAVI
+	9/vkKTnMPo60Di+LMzzxGxaHvg==
+X-Google-Smtp-Source: AGHT+IHMtXzw21flMwTEMR5C4A+qw3BxpCf34frnRqxgXOGfce6I7SN6Bq4PJJvbRwvYIl/PbOEf7A==
+X-Received: by 2002:a05:6512:4016:b0:508:1178:efa4 with SMTP id br22-20020a056512401600b005081178efa4mr188638lfb.55.1698153632957;
+        Tue, 24 Oct 2023 06:20:32 -0700 (PDT)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id d5-20020a193845000000b00507ab956ab9sm2147365lfj.147.2023.10.24.06.20.30
+        by smtp.gmail.com with ESMTPSA id d5-20020a193845000000b00507ab956ab9sm2147365lfj.147.2023.10.24.06.20.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 06:20:31 -0700 (PDT)
+        Tue, 24 Oct 2023 06:20:32 -0700 (PDT)
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 24 Oct 2023 15:20:27 +0200
-Subject: [PATCH net-next v7 1/7] dt-bindings: net: dsa: Require ports or
- ethernet-ports
+Date: Tue, 24 Oct 2023 15:20:28 +0200
+Subject: [PATCH net-next v7 2/7] dt-bindings: net: mvusb: Fix up DSA
+ example
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231024-marvell-88e6152-wan-led-v7-1-2869347697d1@linaro.org>
+Message-Id: <20231024-marvell-88e6152-wan-led-v7-2-2869347697d1@linaro.org>
 References: <20231024-marvell-88e6152-wan-led-v7-0-2869347697d1@linaro.org>
 In-Reply-To: <20231024-marvell-88e6152-wan-led-v7-0-2869347697d1@linaro.org>
 To: Andrew Lunn <andrew@lunn.ch>, 
@@ -87,35 +87,56 @@ To: Andrew Lunn <andrew@lunn.ch>,
 Cc: Christian Marangi <ansuelsmth@gmail.com>, 
  linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Linus Walleij <linus.walleij@linaro.org>, Rob Herring <robh@kernel.org>
+ Linus Walleij <linus.walleij@linaro.org>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Rob Herring <robh@kernel.org>
 X-Mailer: b4 0.12.4
 
-Bindings using dsa.yaml#/$defs/ethernet-ports specify that
-a DSA switch node need to have a ports or ethernet-ports
-subnode, and that is actually required, so add requirements
-using oneOf.
+When adding a proper schema for the Marvell mx88e6xxx switch,
+the scripts start complaining about this embedded example:
 
-Suggested-by: Rob Herring <robh@kernel.org>
+  dtschema/dtc warnings/errors:
+  net/marvell,mvusb.example.dtb: switch@0: ports: '#address-cells'
+  is a required property
+  from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+  net/marvell,mvusb.example.dtb: switch@0: ports: '#size-cells'
+  is a required property
+  from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+
+Fix this up by extending the example with those properties in
+the ports node.
+
+While we are at it, rename "ports" to "ethernet-ports" and rename
+"switch" to "ethernet-switch" as this is recommended practice.
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Reviewed-by: Rob Herring <robh@kernel.org>
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 ++++++
- 1 file changed, 6 insertions(+)
+ Documentation/devicetree/bindings/net/marvell,mvusb.yaml | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-index 6107189d276a..2abd036578d1 100644
---- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
-@@ -46,4 +46,10 @@ $defs:
-             $ref: dsa-port.yaml#
-             unevaluatedProperties: false
+diff --git a/Documentation/devicetree/bindings/net/marvell,mvusb.yaml b/Documentation/devicetree/bindings/net/marvell,mvusb.yaml
+index 3a3325168048..ab838c1ffeed 100644
+--- a/Documentation/devicetree/bindings/net/marvell,mvusb.yaml
++++ b/Documentation/devicetree/bindings/net/marvell,mvusb.yaml
+@@ -50,11 +50,14 @@ examples:
+                     #address-cells = <1>;
+                     #size-cells = <0>;
  
-+oneOf:
-+  - required:
-+      - ports
-+  - required:
-+      - ethernet-ports
+-                    switch@0 {
++                    ethernet-switch@0 {
+                             compatible = "marvell,mv88e6190";
+                             reg = <0x0>;
+ 
+-                            ports {
++                            ethernet-ports {
++                                    #address-cells = <1>;
++                                    #size-cells = <0>;
 +
- ...
+                                     /* Port definitions */
+                             };
+ 
 
 -- 
 2.34.1
