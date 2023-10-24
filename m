@@ -1,109 +1,108 @@
-Return-Path: <netdev+bounces-43844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B14C7D5035
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:48:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C42E7D5036
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 14:49:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 189ACB20E44
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 12:48:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F0D51C209B8
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 12:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9300B266BE;
-	Tue, 24 Oct 2023 12:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BAC266BE;
+	Tue, 24 Oct 2023 12:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IWf8VyOC"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E235533F1;
-	Tue, 24 Oct 2023 12:48:42 +0000 (UTC)
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE311CC;
-	Tue, 24 Oct 2023 05:48:41 -0700 (PDT)
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-58441865ffaso1721340eaf.1;
-        Tue, 24 Oct 2023 05:48:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698151721; x=1698756521;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=n7IhxXRlskYcJ5lLaoUuwURziaHmVBMP8WH2znEzqGs=;
-        b=Y1G1q7jMc74LjCLEaUd89MOJzvtgH/hCuk0gBlKSPZiBH/9khLZA19KdaebICO72dK
-         36+CA5S54aH2hJtaraXaG8bpOWtldTTVaucUqMqKa6cUlB6LCc4C6xmvSY819timovrU
-         8aYxXVAYaV9V2UxEd7xDUNq34qYfD2JyT0KCCfbJYUfIEifjesj9KSmlxtso954hZ2Nj
-         8MQOZSULS4QCkrktF/EYgSZtduEjx3g2vBDAEqEPi6ssONhK82FHbipHn+Xwn/eJhiE3
-         dxNwyxhchXkwf8YuAFHjJ0eiYHVWX5zJebiklKUkYJkfTcSuggvuCBdeBqMYzSz/d7JW
-         brpg==
-X-Gm-Message-State: AOJu0Yy22eGZP7B8TcvYu3ogQc4fsS1I1PbCeAWCPaaIBWxcYvA0hyvB
-	DOK17dUqUJpfldawpntU+Cejd1poUg==
-X-Google-Smtp-Source: AGHT+IERP02p8mG8jQwC1rb7eQXcVDY+PYIHSHNQTUPah9qW3w7GkcKnL2Mp8Z4hl+R+YXDXxBtwQg==
-X-Received: by 2002:a05:6808:18a9:b0:3af:5fea:2f7b with SMTP id bi41-20020a05680818a900b003af5fea2f7bmr15719454oib.47.1698151720916;
-        Tue, 24 Oct 2023 05:48:40 -0700 (PDT)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id bj6-20020a056808198600b003adcaf28f61sm1924931oib.41.2023.10.24.05.48.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 05:48:40 -0700 (PDT)
-Received: (nullmailer pid 3451039 invoked by uid 1000);
-	Tue, 24 Oct 2023 12:48:34 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A11E26292
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 12:49:40 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22A909B
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 05:49:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698151778;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UVRePymm5LlGxEOZU5dUiW35O7/1kIgQIOIIucxo4g8=;
+	b=IWf8VyOC/dmlcAsnAEgeDgaHWoISDhg/HwHu84hqKLXu/P5f7Qu86Ac45ulckG6/jJWlvV
+	jB1vL3iyx7WonS5P+cnB0l4/s3Z8a0xsHv/mSGuoZ2rZQC2zaqu6hdKHRM9K9u2emmWVm1
+	GS8BbQH3Qq6uEyiIAEYy2iMP4+VCI3o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-99-vJLQkFovPimUQaMJtn9_zQ-1; Tue, 24 Oct 2023 08:49:22 -0400
+X-MC-Unique: vJLQkFovPimUQaMJtn9_zQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 23920185A790;
+	Tue, 24 Oct 2023 12:49:22 +0000 (UTC)
+Received: from [10.43.2.183] (unknown [10.43.2.183])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C6D9B2166B26;
+	Tue, 24 Oct 2023 12:49:20 +0000 (UTC)
+Message-ID: <349d8eb5-b499-45ea-8de5-2c3658d4c446@redhat.com>
+Date: Tue, 24 Oct 2023 14:49:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Vladimir Oltean <olteanv@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>, =?utf-8?q?Marek_Beh=C3=BAn?= <kabel@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>, Rob Herring <robh+dt@kernel.org>, Eric Dumazet <edumazet@google.com>, Gregory Clement <gregory.clement@bootlin.com>
-In-Reply-To: <20231024-marvell-88e6152-wan-led-v6-1-993ab0949344@linaro.org>
-References: <20231024-marvell-88e6152-wan-led-v6-0-993ab0949344@linaro.org>
- <20231024-marvell-88e6152-wan-led-v6-1-993ab0949344@linaro.org>
-Message-Id: <169815156038.3447619.17571704457000261488.robh@kernel.org>
-Subject: Re: [PATCH net-next v6 1/7] dt-bindings: net: dsa: Require ports
- or ethernet-ports
-Date: Tue, 24 Oct 2023 07:48:34 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] i40e: Do not call devlink_port_type_clear()
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
+ Jacob Keller <jacob.e.keller@intel.com>
+References: <20231024124245.837908-1-ivecera@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20231024124245.837908-1-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
 
-On Tue, 24 Oct 2023 11:24:53 +0200, Linus Walleij wrote:
-> Bindings using dsa.yaml#/$defs/ethernet-ports specify that
-> a DSA switch node need to have a ports or ethernet-ports
-> subnode, and that is actually required, so add requirements
-> using oneOf.
+
+On 24. 10. 23 14:42, Ivan Vecera wrote:
+> Do not call devlink_port_type_clear() prior devlink port unregister
+> and let devlink core to take care about it.
 > 
-> Suggested-by: Rob Herring <robh@kernel.org>
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> Reproducer:
+> [root@host ~]# rmmod i40e
+> [ 4539.964699] i40e 0000:02:00.0: devlink port type for port 0 cleared without a software interface reference, device type not supported by the kernel?
+> [ 4540.319811] i40e 0000:02:00.1: devlink port type for port 1 cleared without a software interface reference, device type not supported by the kernel?
+> 
+> Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 > ---
->  Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
+>   drivers/net/ethernet/intel/i40e/i40e_devlink.c | 1 -
+>   1 file changed, 1 deletion(-)
 > 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_devlink.c b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+> index 74bc111b4849..cc4e9e2addb7 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_devlink.c
+> @@ -231,6 +231,5 @@ int i40e_devlink_create_port(struct i40e_pf *pf)
+>    **/
+>   void i40e_devlink_destroy_port(struct i40e_pf *pf)
+>   {
+> -	devlink_port_type_clear(&pf->devlink_port);
+>   	devlink_port_unregister(&pf->devlink_port);
+>   }
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Please drop... there is missing net-next target.
+Will post v2.
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/dsa/dsa.yaml:60:5: [warning] wrong indentation: expected 6 but found 4 (indentation)
-./Documentation/devicetree/bindings/net/dsa/dsa.yaml:62:5: [warning] wrong indentation: expected 6 but found 4 (indentation)
-
-dtschema/dtc warnings/errors:
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231024-marvell-88e6152-wan-led-v6-1-993ab0949344@linaro.org
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+Ivan
 
 
