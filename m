@@ -1,183 +1,107 @@
-Return-Path: <netdev+bounces-43940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 216887D586E
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:32:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96CE67D5879
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAE0E1F228E7
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:32:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51743281A9F
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F336F29416;
-	Tue, 24 Oct 2023 16:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED8BF2B5D7;
+	Tue, 24 Oct 2023 16:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cCqt93SE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lZTRAspK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F053A27F;
-	Tue, 24 Oct 2023 16:32:54 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FF4593;
-	Tue, 24 Oct 2023 09:32:53 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39OGJfKA023175;
-	Tue, 24 Oct 2023 16:32:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=UkAO23c+2aMfodExmELLTmdZvgxFGuee6Ajbo77NV1A=;
- b=cCqt93SENK/H+YC6+YVBf/QwswVEyBDTJkRD5/wEL08yW/3391sAXxNfKqOA+g0Vcctk
- Mzf7/hh2juzF6P9O/l3xIeuSIVQ/QuGwpqETG+lFidTRTkISHrBRuw8bcpfxyfPqLOvG
- ROWSGwYDqzmithCPHHdlbTyyjuznQZPllnTQi0IzEAckLTP3ujYnDDkeHHOEwDn8PCwj
- 16oPYFghnzp7d7zr9R4pH86DwoG0RHlCA6KjTWJ+S0bAQ5kcUMc0YJ8CiBNoxFDqNt+X
- MIdW4UQ3+04laaa8as0sWlqQfQX9mYoT1Rm8riYgu6AESoSxCy+GOr/s+jT6CzxFzmlq DQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3txhbkrgm4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Oct 2023 16:32:51 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39OGKm0R026944;
-	Tue, 24 Oct 2023 16:32:50 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3txhbkrgkj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Oct 2023 16:32:50 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39OG1UIi010218;
-	Tue, 24 Oct 2023 16:32:49 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tvsbygxgm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Oct 2023 16:32:49 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39OGWkGS24707744
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 24 Oct 2023 16:32:46 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6A59E20040;
-	Tue, 24 Oct 2023 16:32:46 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A97F320043;
-	Tue, 24 Oct 2023 16:32:45 +0000 (GMT)
-Received: from [9.171.57.222] (unknown [9.171.57.222])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 24 Oct 2023 16:32:45 +0000 (GMT)
-Message-ID: <6302faa1-b0f3-4405-b4c0-28d309506823@linux.ibm.com>
-Date: Tue, 24 Oct 2023 18:32:45 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] s390/ctcm: replace deprecated strncpy with strscpy
-Content-Language: en-GB
-To: Justin Stitt <justinstitt@google.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Wenjia Zhang
- <wenjia@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20231023-strncpy-drivers-s390-net-ctcm_main-c-v1-1-265db6e78165@google.com>
-From: Thorsten Winkler <twinkler@linux.ibm.com>
-In-Reply-To: <20231023-strncpy-drivers-s390-net-ctcm_main-c-v1-1-265db6e78165@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3anXJQg1cO57P-0sE1YqQFOL8TGs8Bqs
-X-Proofpoint-ORIG-GUID: RB4OGPEHdMBidTDH8y5UceOR1haKTiMY
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96543A26E;
+	Tue, 24 Oct 2023 16:34:12 +0000 (UTC)
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97D4E10D5;
+	Tue, 24 Oct 2023 09:34:09 -0700 (PDT)
+Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-779f2718accso29025585a.1;
+        Tue, 24 Oct 2023 09:34:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698165248; x=1698770048; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uxlGF2huoBf3gQegLGUHLrMjlaXDURjhRNvYADg8LmE=;
+        b=lZTRAspKjdwRxLc/oVqNLvu7WgUKp06fseGeuhQMTeegc1y1udsm9uOSSFyYg7lGEo
+         jNQpdOz1YUgKdsteB8MoCvdepcqg/eC2BXv2mE+vNTgJia2oQF7Dl0L/pzxB+UiKBXYp
+         R+rIet+eg81PYcJm+AAE6nGFxHEjCLslZd7PUwQZyqr52mWvwunMbH+nmphNNZSjbATE
+         BC2P0OFoMYvaZAOvjfSeU13ObFl8Mh8AKe7WcAM+aW+CXQT1Ia+wi5tyYjxQvDFPVus2
+         I7O8HKLEGk8L/ghBceD2ufiBPb9mCl0SCwp7C3wYat89RADLutoqbB5UeIy9CK/k6tBq
+         ecqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698165248; x=1698770048;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uxlGF2huoBf3gQegLGUHLrMjlaXDURjhRNvYADg8LmE=;
+        b=EuVylJMVAcUduTfkavJoc/rCsDy4vL0bzBXa/VNdz/9b24EJmS0CK/j4VYBLRzL5aN
+         TSz9qPAwLs8ut4oEOzxlkaBk27tGHW04AN5uL8mwDxrK4LoRIDQGa14rVrkOGsQnfYwe
+         fHucD3DlqHyNulAJBPe4XdIV9D0/09kNes4Ja3QV3j88K18OzBjQQAnrQYeN2SgELGvj
+         HRnDwg4h3WkQBJLqqRFK//v+SvtI91v3oaMblMLxkREqYkDitWWsQly2W2GCwyti5GAZ
+         L2NeVAgWGGflcmEiDzl8NLodECpGNjeMANP2P3/92vTXwlqdRacTlUG1DDG3TGSxH1Da
+         JCiA==
+X-Gm-Message-State: AOJu0Yxej7O3C5/369zKdHXFszTzNBBA8ZaqpWNv0KEYHy9yw2UQSEcl
+	7Jo+vIfbB4yoJUmko/8CYhQ=
+X-Google-Smtp-Source: AGHT+IHg2hQOyHtXeTUA7PVDYJ0xqDkt8W6ms2wylLaxLKy0rZaAjlYf2EDHPdQicvzSqZgO826bvw==
+X-Received: by 2002:a05:620a:25c6:b0:774:193c:94bd with SMTP id y6-20020a05620a25c600b00774193c94bdmr14838663qko.4.1698165248609;
+        Tue, 24 Oct 2023 09:34:08 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id h21-20020ac87455000000b00419b094537esm3590812qtr.59.2023.10.24.09.34.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Oct 2023 09:34:06 -0700 (PDT)
+Message-ID: <d5871a55-a699-470c-a41d-ff457699d9c0@gmail.com>
+Date: Tue, 24 Oct 2023 09:34:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-24_16,2023-10-24_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 phishscore=0 mlxscore=0 impostorscore=0 malwarescore=0
- suspectscore=0 clxscore=1011 adultscore=0 mlxlogscore=999
- priorityscore=1501 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2310170001 definitions=main-2310240142
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 1/7] dt-bindings: net: dsa: Require ports or
+ ethernet-ports
+Content-Language: en-US
+To: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
+ Gregory Clement <gregory.clement@bootlin.com>,
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+ linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Rob Herring <robh@kernel.org>
+References: <20231024-marvell-88e6152-wan-led-v7-0-2869347697d1@linaro.org>
+ <20231024-marvell-88e6152-wan-led-v7-1-2869347697d1@linaro.org>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20231024-marvell-88e6152-wan-led-v7-1-2869347697d1@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 10/24/23 06:20, Linus Walleij wrote:
+> Bindings using dsa.yaml#/$defs/ethernet-ports specify that
+> a DSA switch node need to have a ports or ethernet-ports
+> subnode, and that is actually required, so add requirements
+> using oneOf.
+> 
+> Suggested-by: Rob Herring <robh@kernel.org>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 
+Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
-On 23.10.23 21:35, Justin Stitt wrote:
-> strncpy() is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
-> 
-> We expect chid to be NUL-terminated based on its use with format
-> strings:
-> 
-> 	CTCM_DBF_TEXT_(SETUP, CTC_DBF_INFO, "%s(%s) %s", CTCM_FUNTAIL,
-> 			chid, ok ? "OK" : "failed");
-> 
-> Moreover, NUL-padding is not required as it is _only_ used in this one
-> instance with a format string.
-> 
-> Considering the above, a suitable replacement is `strscpy` [2] due to
-> the fact that it guarantees NUL-termination on the destination buffer
-> without unnecessarily NUL-padding.
-> 
-> We can also drop the +1 from chid's declaration as we no longer need to
-> be cautious about leaving a spot for a NUL-byte. Let's use the more
-> idiomatic strscpy usage of (dest, src, sizeof(dest)) as this more
-> closely ties the destination buffer to the length.
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
-
-LGTM, thank you!
-
-Reviewed-by: Thorsten Winkler <twinkler@linux.ibm.com>
-Tested-by: Thorsten Winkler <twinkler@linux.ibm.com>
-
-> ---
-> Note: build-tested only.
-> 
-> Found with: $ rg "strncpy\("
-> ---
->   drivers/s390/net/ctcm_main.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/s390/net/ctcm_main.c b/drivers/s390/net/ctcm_main.c
-> index 6faf27136024..ac15d7c2b200 100644
-> --- a/drivers/s390/net/ctcm_main.c
-> +++ b/drivers/s390/net/ctcm_main.c
-> @@ -200,13 +200,13 @@ static void channel_free(struct channel *ch)
->   static void channel_remove(struct channel *ch)
->   {
->   	struct channel **c = &channels;
-> -	char chid[CTCM_ID_SIZE+1];
-> +	char chid[CTCM_ID_SIZE];
->   	int ok = 0;
->   
->   	if (ch == NULL)
->   		return;
->   	else
-> -		strncpy(chid, ch->id, CTCM_ID_SIZE);
-> +		strscpy(chid, ch->id, sizeof(chid));
->   
->   	channel_free(ch);
->   	while (*c) {
-> 
-> ---
-> base-commit: 9c5d00cb7b6bbc5a7965d9ab7d223b5402d1f02c
-> change-id: 20231023-strncpy-drivers-s390-net-ctcm_main-c-f9180f470c69
-> 
-> Best regards,
-> --
-> Justin Stitt <justinstitt@google.com>
-> 
-> 
 
