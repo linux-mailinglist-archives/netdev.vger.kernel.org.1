@@ -1,42 +1,47 @@
-Return-Path: <netdev+bounces-43912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 816217D55BA
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:20:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBA987D56A0
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:37:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BF7F281B1F
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:20:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 185E21C20A88
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A7E636AEE;
-	Tue, 24 Oct 2023 15:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF630374D6;
+	Tue, 24 Oct 2023 15:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghsfOXO4"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C123735884
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 15:20:50 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A9C3C2A
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 08:20:32 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qvJCg-00011d-1o; Tue, 24 Oct 2023 17:20:22 +0200
-Date: Tue, 24 Oct 2023 17:20:22 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Antony Antony <antony.antony@secunet.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Florian Westphal <fw@strlen.de>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>, devel@linux-ipsec.org,
-	netdev@vger.kernel.org
-Subject: Re: [RFC PATCH ipsec-next] udpencap: Remove Obsolete
- UDP_ENCAP_ESPINUDP_NON_IKE Support
-Message-ID: <20231024152022.GC29201@breakpoint.cc>
-References: <b604dc470c708e1e70c954f1513e4b461531e7cc.1698136108.git.antony.antony@secunet.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3ABE3714B
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 15:36:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B98C3C433C8;
+	Tue, 24 Oct 2023 15:36:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698161818;
+	bh=Qeb3y3GkI5YoTa2Z4FvcJRz+qDQD4OJYM3FJEUsXO34=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ghsfOXO4bRyLYAyP1GocDXRWIgd24qRSrh12T2JyWKv6ZvFXdSnB4luJTywl7TDQE
+	 Ld58FWuinLtJkVLpt1KSACDB7d59v366qOgpr80y52zb1xmMbNCSvdcrGAbAVFUFso
+	 Q/D4nWLjKTlLzMGbs5kN7J6K0k2u4ZqsVnWnnhfTW4ZRWew2bW2EiP6/6n3Qdy5E/6
+	 dlSRvqRU2TSyo40CoB3NQPBK8/MwJgNBKrJrm05zOuvpG+R6gwqlLq6o7mFt7RmI2c
+	 OFnHAqbj40J+/Wzfgve0orNf2xeH/5bLY9d1nfnuf8/NF5fmG7soid8TJ1D+UkKZs6
+	 ACKW1vI+4Y/sg==
+Date: Tue, 24 Oct 2023 18:36:53 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: George Kennedy <george.kennedy@oracle.com>
+Cc: jgg@ziepe.ca, sd@queasysnail.net, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	tom.hromatka@oracle.com, harshit.m.mogalapalli@oracle.com
+Subject: Re: [PATCH] mlx5: reset state to avoid attempted QP double free and
+ UAF
+Message-ID: <20231024153653.GC1939579@unreal>
+References: <1698147005-5396-1-git-send-email-george.kennedy@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,51 +50,111 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b604dc470c708e1e70c954f1513e4b461531e7cc.1698136108.git.antony.antony@secunet.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1698147005-5396-1-git-send-email-george.kennedy@oracle.com>
 
-Antony Antony <antony.antony@secunet.com> wrote:
-> The UDP_ENCAP_ESPINUDP_NON_IKE mode, introduced into the Linux kernel
-> in 2004 [2], has remained inactive and obsolete for an extended period.
+On Tue, Oct 24, 2023 at 06:30:05AM -0500, George Kennedy wrote:
+> In the unlikely event that workqueue allocation fails and returns
+> NULL in mlx5_mkey_cache_init(), reset the state to
+> MLX5_UMR_STATE_UNINIT in mlx5_ib_stage_post_ib_reg_umr_init()
+> after the call to mlx5r_umr_resource_cleanup(), which frees
+> the QP. This will avoid attempted double free of the same QP
+> when __mlx5_ib_add() does its cleanup.
 > 
-> This mode was originally defined in an early version of an IETF draft
-> [1] from 2001. By the time it was integrated into the kernel in 2004 [2],
-> it had already been replaced by UDP_ENCAP_ESPINUDP [3] in later
-> versions of draft-ietf-ipsec-udp-encaps, particularly in version 06.
+> Syzkaller reported a UAF in ib_destroy_qp_user
 > 
-> Over time, UDP_ENCAP_ESPINUDP_NON_IKE has lost its relevance, with no
-> known use cases.
+> workqueue: Failed to create a rescuer kthread for wq "mkey_cache": -EINTR
+> infiniband mlx5_0: mlx5_mkey_cache_init:981:(pid 1642):
+>     failed to create work queue
+> infiniband mlx5_0: mlx5_ib_stage_post_ib_reg_umr_init:4075:(pid 1642):
+>     mr cache init failed -12
+> ==================================================================
+> BUG: KASAN: slab-use-after-free in ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2073)
+> Read of size 8 at addr ffff88810da310a8 by task repro_upstream/1642
 > 
-> With this commit, we remove support for UDP_ENCAP_ESPINUDP_NON_IKE,
-> simplifying the code base and eliminating unnecessary complexity.
+> Call Trace:
+>  <TASK>
+> kasan_report (mm/kasan/report.c:590)
+> ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2073)
+> mlx5r_umr_resource_cleanup (drivers/infiniband/hw/mlx5/umr.c:198)
+> __mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4178)
+> mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
+> ...
+>  </TASK>
 > 
-> References:
-> [1] https://datatracker.ietf.org/doc/html/draft-ietf-ipsec-udp-encaps-00.txt
+> Allocated by task 1642:
+> __kmalloc (./include/linux/kasan.h:198 mm/slab_common.c:1026
+>     mm/slab_common.c:1039)
+> create_qp (./include/linux/slab.h:603 ./include/linux/slab.h:720
+>     ./include/rdma/ib_verbs.h:2795 drivers/infiniband/core/verbs.c:1209)
+> ib_create_qp_kernel (drivers/infiniband/core/verbs.c:1347)
+> mlx5r_umr_resource_init (drivers/infiniband/hw/mlx5/umr.c:164)
+> mlx5_ib_stage_post_ib_reg_umr_init (drivers/infiniband/hw/mlx5/main.c:4070)
+> __mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4168)
+> mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
+> ...
 > 
-> [2] Commit that added UDP_ENCAP_ESPINUDP_NON_IKE to the Linux historic
->     repository.
+> Freed by task 1642:
+> __kmem_cache_free (mm/slub.c:1826 mm/slub.c:3809 mm/slub.c:3822)
+> ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2112)
+> mlx5r_umr_resource_cleanup (drivers/infiniband/hw/mlx5/umr.c:198)
+> mlx5_ib_stage_post_ib_reg_umr_init (drivers/infiniband/hw/mlx5/main.c:4076
+>     drivers/infiniband/hw/mlx5/main.c:4065)
+> __mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4168)
+> mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
+> ...
 > 
->     Author: Andreas Gruenbacher <agruen@suse.de>
->     Date: Fri Apr 9 01:47:47 2004 -0700
+> The buggy address belongs to the object at ffff88810da31000
+>  which belongs to the cache kmalloc-2k of size 2048
+> The buggy address is located 168 bytes inside of
+>  freed 2048-byte region [ffff88810da31000, ffff88810da31800)
 > 
->    [IPSEC]: Support draft-ietf-ipsec-udp-encaps-00/01, some ipec impls need it.
+> The buggy address belongs to the physical page:
+> page:000000003b5e469d refcount:1 mapcount:0 mapping:0000000000000000
+>     index:0x0 pfn:0x10da30
+> head:000000003b5e469d order:3 entire_mapcount:0 nr_pages_mapped:0
+>     pincount:0
+> flags: 0x17ffffc0000840(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
+> page_type: 0xffffffff()
+> raw: 0017ffffc0000840 ffff888100042f00 ffffea0004180800 dead000000000002
+> raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
 > 
-> [3] Commit that added UDP_ENCAP_ESPINUDP to the Linux historic
->     repository.
+> Memory state around the buggy address:
+>  ffff88810da30f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>  ffff88810da31000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> >ffff88810da31080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                                   ^
+>  ffff88810da31100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>  ffff88810da31180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ==================================================================
+> Disabling lock debugging due to kernel taint
 > 
->     Author: Derek Atkins <derek@ihtfp.com>
->     Date: Wed Apr 2 13:21:02 2003 -0800
-> 
->     [IPSEC]: Implement UDP Encapsulation framework.
-> 
-> Should I leave the '#define UDP_ENCAP_ESPINUDP_NON_IKE' in the uapi/linux/udp.h?
-> since it is a chnage to ABI?
+> Fixes: 04876c12c19e ("RDMA/mlx5: Move init and cleanup of UMR to umr.c")
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Signed-off-by: George Kennedy <george.kennedy@oracle.com>
+> ---
+>  drivers/infiniband/hw/mlx5/main.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-Yes, but you can add e.g. append "(obsolete)" or "(not supported
-anymore)" or something like that to the trailing comment.
+Thanks for the report,
 
-And you could wrap it in "#ifndef __KERNEL__" to have build breakage
-if anytning in the kernel tries to make use of it.
+I think that the following change will be better aligned to mlx5_ib code.
+Can you please resend your patch?
 
-Patch LGTM.
+diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
+index ec7c45272764..b1f8914abf44 100644
+--- a/drivers/infiniband/hw/mlx5/main.c
++++ b/drivers/infiniband/hw/mlx5/main.c
+@@ -4092,10 +4092,8 @@ static int mlx5_ib_stage_post_ib_reg_umr_init(struct mlx5_ib_dev *dev)
+ 		return ret;
+ 
+ 	ret = mlx5_mkey_cache_init(dev);
+-	if (ret) {
++	if (ret)
+ 		mlx5_ib_warn(dev, "mr cache init failed %d\n", ret);
+-		mlx5r_umr_resource_cleanup(dev);
+-	}
+ 	return ret;
+ }
+ 
 
