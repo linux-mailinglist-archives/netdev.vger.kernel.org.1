@@ -1,134 +1,87 @@
-Return-Path: <netdev+bounces-43768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75EB07D4ACD
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 10:48:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4A857D4ADD
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 10:50:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5A441C20AE3
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 08:48:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DB4EB20C5E
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 08:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5543D134BD;
-	Tue, 24 Oct 2023 08:48:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35E714F77;
+	Tue, 24 Oct 2023 08:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YLNyr0IM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NZYB6nuc"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F6410969;
-	Tue, 24 Oct 2023 08:48:28 +0000 (UTC)
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38A9F120;
-	Tue, 24 Oct 2023 01:48:27 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5a7ad24b3aaso43753977b3.2;
-        Tue, 24 Oct 2023 01:48:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698137306; x=1698742106; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5GOGtyCurxdqhUDkc/2ztUItYkUDrH0lly0fN9/AIkE=;
-        b=YLNyr0IMMKcFeyjzOIUshbFeRYwY902rxjgt7TKlth5pt1zS1fO8+ysBdGn5LHlCjm
-         BQ8fEaj93Ao/Xirc1UaPBZNIjMRZaXZxYLqaLvEBCW+Nc+WAxaozJ47n7Brdvd4gU8+m
-         Bh/ukzZ50h9QD+ElW1zPqMxU+Co4OF/JO2nexXvFODwj+4kS8n/cc1GKVEnLDb7nZBlF
-         RT0HXxDPFjQzBmP7jg5mHh2X0rjcIuYZuhA+9qujPUKZ9Zin9Zdp5eSUZFx3CghBIhIu
-         2e0PN4QJmOKi2vEEJn9GM069+g/ApSwdZh6/fMHwuv6H+t4sbYHb7KiNUqjy5GFtx7y6
-         GddQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698137306; x=1698742106;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5GOGtyCurxdqhUDkc/2ztUItYkUDrH0lly0fN9/AIkE=;
-        b=WeHnr/FuHkm7+zrbt5jlAil4MvH+GA5vwTRVQtX3l6YEe/cB9Xo/TWsrQzG7NsIR+m
-         1mvxdWCEvjOxF1eAct/W+wBAi5XDtIJ7v7c6wxLcLBIjOKZLwSdEzv7LHndo0xyuTBls
-         Wswpr599eFQmWLznJl4Ppj7ZVzUgEt52HlkJZIELu0/ZsrvhdvUCca8l96/NNicohxMN
-         bNeO/3XOMoEvhM1kZbASaoIM1sj6hdEVc1Iv3hS7Jh/R1VCm3CGuuLgtcn7UMCrPCuGm
-         8AmWojDX2h1+wgK2r/oxZIrhyFqKgJN3MS3Xnl3wEp1BETYsM1Iy4SnL/6pT9wMNWicS
-         hHBw==
-X-Gm-Message-State: AOJu0YzgoYrxBuVxldMovMDkOcPc+7cEYQjqs6JlojbWRMRiQSu6UL7t
-	Uqjw6fKn8qphQ5L/7Plweesn7rDM+0vLeHVCkxk=
-X-Google-Smtp-Source: AGHT+IFjeDO/GVsokzPqU9MghWmCcagptc2RLP+Lr/TRgbQ8v8fxezcUyB/Z/oOqtbzFoB07AAsO3n0rSTsYlAqkOG0=
-X-Received: by 2002:a25:aaa9:0:b0:d9a:c61e:4466 with SMTP id
- t38-20020a25aaa9000000b00d9ac61e4466mr11583153ybi.61.1698137306349; Tue, 24
- Oct 2023 01:48:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFBD2F5B
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 08:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EDD81C433C8;
+	Tue, 24 Oct 2023 08:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698137424;
+	bh=j4HL2aupPBACZEv/S/x7M5eQl4uU26MAymTGtHLc+8A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NZYB6nucGCi3fCtKKh33IznbS2fs8ZV6bEXn3gtMPo+Qo/R68YHP2lhyl1gUNAr+F
+	 mlf3yfXP0VHhNryLhc0LmFqZ84n5JjWnjX5g30TS9TIWlcvAm0tbJXaei7pKlks6H6
+	 K9/OP6EY1EwId2LOhEicGkORn/gStS+iuK/TU/6MNxOiVH+4U4AuRGm021zH36ogF2
+	 fPpuIdVNNd9frixcJawjNhA6B6PK7/6Kl4L7tK5dzGeseH2ZJD35mlW8WmVV5QliMa
+	 G5yfIcx5mpp772jLXYkhS8DxcWQGy8/RdxjWUehhr+GJEXiO2YOZ+W2wFwI/Lq5WA+
+	 rwC5P0EJhJsdA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D8BC3C41620;
+	Tue, 24 Oct 2023 08:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <e361ef91-607d-400b-a721-f846c21e2400@proton.me>
- <4935f458-4719-4472-b937-0da8b16ebbaa@lunn.ch> <CANiq72nOCv-TfE3ODgVyQoOxNc80BtH+5cV2XFBFZ=ztTgVhaw@mail.gmail.com>
- <20231022.184702.1777825182430453165.fujita.tomonori@gmail.com>
- <CANiq72mDWJDb9Fhd4CHt8YKapdWaOrqhJMOrQZ9CDRtvNdrGqA@mail.gmail.com> <798666eb-713b-445d-b9f0-72b6bbf957ff@lunn.ch>
-In-Reply-To: <798666eb-713b-445d-b9f0-72b6bbf957ff@lunn.ch>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 24 Oct 2023 10:48:14 +0200
-Message-ID: <CANiq72=mBGvLYWaX4knG3DxVkaxCJ_d3382KxMhVgn7xFiGrjg@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 1/5] rust: core abstractions for network PHY drivers
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, benno.lossin@proton.me, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu, 
-	boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 1/3] sock: Code cleanup on __sk_mem_raise_allocated()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169813742388.16775.7785724351431638461.git-patchwork-notify@kernel.org>
+Date: Tue, 24 Oct 2023 08:50:23 +0000
+References: <20231019120026.42215-1-wuyun.abel@bytedance.com>
+In-Reply-To: <20231019120026.42215-1-wuyun.abel@bytedance.com>
+To: Abel Wu <wuyun.abel@bytedance.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shakeelb@google.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Sun, Oct 22, 2023 at 5:34=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Sun, Oct 22, 2023 at 01:37:33PM +0200, Miguel Ojeda wrote:
-> >
-> > Instead, the documentation should answer the question "What is this?".
-> > And the answer should be something like "The state of the PHY ......"
->
-> Its the state of the state machine, not the state of the PHY. It is
+Hello:
 
-I didn't say it was the state of the PHY -- please note the dots above.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> already documented in kernel doc, so we don't really want to duplicate
-> it. So maybe just cross reference to the kdoc:
->
-> https://docs.kernel.org/networking/kapi.html#c.phy_state
+On Thu, 19 Oct 2023 20:00:24 +0800 you wrote:
+> Code cleanup for both better simplicity and readability.
+> No functional change intended.
+> 
+> Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
+> Acked-by: Shakeel Butt <shakeelb@google.com>
+> ---
+>  net/core/sock.c | 22 ++++++++++++----------
+>  1 file changed, 12 insertions(+), 10 deletions(-)
 
-Yes, that can be worth it for simple 1:1 cases like the `enum`
-(assuming they are properly documented in the C side), but we still
-want a suitable short description (e.g. "PHY state machine states"),
-like Tomonori did in the version he just sent (v6).
+Here is the summary with links:
+  - [net,v3,1/3] sock: Code cleanup on __sk_mem_raise_allocated()
+    https://git.kernel.org/netdev/net-next/c/2def8ff3fdb6
+  - [net,v3,2/3] sock: Doc behaviors for pressure heurisitics
+    https://git.kernel.org/netdev/net-next/c/2e12072c67b5
+  - [net,v3,3/3] sock: Ignore memcg pressure heuristics when raising allocated
+    https://git.kernel.org/netdev/net-next/c/66e6369e312d
 
-I wondered about the docs of each variant, too, but those should be OK
-too, because `rustdoc` does not create an individual page for them, so
-one can always see the link to the C docs at the top from the `enum`
-description.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> > Yes, documenting that something wraps/relies on/maps a particular C
-> > functionality is something we do for clarity and practicality (we also
-> > link the related C headers). This is, I assume, the kind of clarity
-> > Andrew was asking for, i.e. to be practical and let the user know what
-> > they are dealing with on the C side, especially early on.
->
-> I don't think 'early on' is relevant. In the kernel, you pretty much
-> always need the bigger picture, how a pieces of the puzzle fits in
-> with what is above it and what is below it. Sometimes you need to
-> extend what is above and below. Or a reviewer will tell you to move
-> code into the core, so others can share it, etc.
 
-"Early on" in my reply is referring to what you said earlier, i.e.
-that initially abstractions are minimal.
-
-In any case, yes, using complex systems typically requires knowing a
-bit of what is going on in different parts, but that does not mean we
-cannot make self-contained documentation as much as reasonably
-possible. We want that using a particular Rust abstraction does not
-require reading its source code or the code in the C side.
-
-In the example that you mention, if the reviewer wants to share code,
-then it should be extracted into a new Rust abstraction (and possibly
-the C core depending on what it is, of course) and using it from the
-driver, but also documenting the Rust abstraction.
-
-Cheers,
-Miguel
 
