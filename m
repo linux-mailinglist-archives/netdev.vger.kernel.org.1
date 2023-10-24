@@ -1,110 +1,109 @@
-Return-Path: <netdev+bounces-43979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 363617D5B9D
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 21:38:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE0027D5BA6
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 21:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 377D8B2103B
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:38:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 876242818A1
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B923D386;
-	Tue, 24 Oct 2023 19:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A453D38C;
+	Tue, 24 Oct 2023 19:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PNnE1fsk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C6SyJxB9"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34E124A09;
-	Tue, 24 Oct 2023 19:38:46 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79F8D12B;
-	Tue, 24 Oct 2023 12:38:45 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-53f9af41444so7912189a12.1;
-        Tue, 24 Oct 2023 12:38:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041CE3CD07
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 19:40:20 +0000 (UTC)
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 732B710D7
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 12:40:15 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-7a69a71cc1dso188280339f.0
+        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 12:40:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698176323; x=1698781123; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1698176414; x=1698781214; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qa1FCPOA2Jbm1K9NwOvyFQLbqNXLKlJRD2kfQ1W5URk=;
-        b=PNnE1fskSX01E8C24OC7ibAFQ+3RUd0XVg5AOb+/DuQLeMznoKg8WyCB9AQBPetdDa
-         5NlJR5/SF+A8iOjJburQToqFWbDRcp/AMh+LcbL/qAjGsH3YlPLnokL4eI1SVlqLBlil
-         ChXLOdAwjEHex83RIsrbWPJVFGMTDE4cnj/B7VwSJC06D6MWcpwXkZ+lQNclm1SI0qKY
-         EtoNmHT7uz9NnBfandVWe8cemx1vE92x4qmIiMXVmx4cun82SKAa4QejEwDYqEVDTMdY
-         /46LpRi8r0qmvFIa4mEnNGAXEPMkJt9z5xGfENIGNuVfBWEw9F5RjmRLUeKFt7eBA4xG
-         SVhQ==
+        bh=iQPpgnc6iH7M54KsEpKq47ofo2VjroMenjJs2kprUFI=;
+        b=C6SyJxB9rQ7H8B92KH9fXeig100UYCfQozT2elpD3t2tehfVDTMlW6YSOLoT5ksa0B
+         xmNa5/zK3yz21u0yroYdaNaEU6lx0PBIwEc1u39dhNbjbKI6Z/YmR9sMEdsyxhSfLMdA
+         3rqM7lOSDvZMpSJxEzDZByvSsHfvQ7S0Ff/YSfQ/wI9zrKOKx605ZTnO+RitLIT9dJu9
+         EMGPBGpRp0UBlLuQ1eDgkbb7SIK8uJXIl3SrGOny8YMT1sp3J2ZFQEon64RFL0E+JY9u
+         UH+eqC78H3COuHTAEhtATL6xD+d1Hc5v5CZ41SBrXjwHTivyDYSfP9PK1lGBkct5/3t6
+         YtXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698176323; x=1698781123;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1698176414; x=1698781214;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qa1FCPOA2Jbm1K9NwOvyFQLbqNXLKlJRD2kfQ1W5URk=;
-        b=hEyYEPYMiPIvse/MvEwSgBzm99QsZAbjYVq9SwE3L+JoIsyFwUIHjGQllt/wDC+b8e
-         MAyyUJ/i83uYmj0pRAGPSw8FQQ5cPeBVkNCu6odgyNyOiAvfS7JeXhidtxMzS5l/eDM8
-         by8myfopL0LWc0UU7vCZZsKWqk4OhqmRJh8b/+sgYzZCOKp8KpiMnzDDhbUSVJNg7rD6
-         yuQktmm6IMAAkru7gmJIOTt75OHesGcnYfVgbV7Ci8SuHtwqwstzDCCBky4WOpgQPhwi
-         xoEBbd3IwmCng7lk6Tu6LEL3BqDpg4CVNKOgcNMVihPl89o6cw+IFqTfamfA2nJiFNr5
-         DcgQ==
-X-Gm-Message-State: AOJu0Yxrdtn6m75jnKCnRj0izqoyJ/dyioLbZOTdcPRMS8lBNdIpJNr7
-	V4wTVt/movO7vqPT5voskY3LFrcyyD8EXpPQZiStPUOy
-X-Google-Smtp-Source: AGHT+IHZCqbbrX9RbVTa0U9y52YE3qkfkGd/vZUXay19Wnnng0nFLVPN1xmb7Fm5oWaWK8ep3GCX05+V45OeHSMZiDM=
-X-Received: by 2002:a50:cd03:0:b0:53e:7d91:611f with SMTP id
- z3-20020a50cd03000000b0053e7d91611fmr10199074edi.11.1698176323383; Tue, 24
- Oct 2023 12:38:43 -0700 (PDT)
+        bh=iQPpgnc6iH7M54KsEpKq47ofo2VjroMenjJs2kprUFI=;
+        b=Lh+AlN4jx/tLMyM/oJeDHSOoPBl4PctQ8IDTfHBPgKdgX/koEiVoAMpAvx3xUFuEb7
+         1Y4IzOYjWYIP9Ma9SRUXHBjQogzSZQ7KJOHOUyDvUJdwZODbLxpdX2xtvu+ZXEc1ueDo
+         eObJXwL41lVhsy7OWYY+iRa7mQm7pUIL8ZaZYPqGXOepdozKl1arkccJTUeW5Lb3B3Zd
+         J1WcQkoOlqtloOK1A/Z22RdXC4Q5bQCkxbIHG0o2QKgCM3qGrLK3rGeWvxkF+x3Xklm5
+         c65g9GMdsaA2WMFydovhlb3shWdnJWqgdSQ3erlbhuKw3uAg/g1Fg7sYRsOI4bIZmeTN
+         asow==
+X-Gm-Message-State: AOJu0YzenZsDHtofMrJ4S+BHlgUgEk4nVneBRsFl6MR2wenB7+02K+MD
+	ZV9OOjVlR+8XPz7F0QWorJvaG5HTlTE=
+X-Google-Smtp-Source: AGHT+IE7k+UORsR+zD8bEbwvuibrW3HGR6l9vrRioMECsByYL+6znIy809AaqxJ4XMQAiSpMSm+9Og==
+X-Received: by 2002:a05:6e02:b2e:b0:34f:9f86:dd45 with SMTP id e14-20020a056e020b2e00b0034f9f86dd45mr17457015ilu.3.1698176414485;
+        Tue, 24 Oct 2023 12:40:14 -0700 (PDT)
+Received: from localhost.localdomain ([64.77.246.98])
+        by smtp.gmail.com with ESMTPSA id s7-20020a056e02216700b00357ca1ed25esm2294486ilv.80.2023.10.24.12.40.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 12:40:14 -0700 (PDT)
+From: Alex Henrie <alexhenrie24@gmail.com>
+To: netdev@vger.kernel.org,
+	jbohac@suse.cz,
+	benoit.boissinot@ens-lyon.org,
+	davem@davemloft.net,
+	hideaki.yoshifuji@miraclelinux.com,
+	dsahern@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org
+Cc: Alex Henrie <alexhenrie24@gmail.com>
+Subject: [PATCH resend 1/4] net: ipv6/addrconf: clamp preferred_lft to the maximum allowed
+Date: Tue, 24 Oct 2023 13:40:01 -0600
+Message-ID: <20231024194010.99995-1-alexhenrie24@gmail.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20230829054623.104293-1-alexhenrie24@gmail.com>
+References: <20230829054623.104293-1-alexhenrie24@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231016180220.3866105-1-andrii@kernel.org> <CAEf4BzaMLg31g6Jm9LmFM9UYUjm1Eq7P6Y-KnoiDoh7Sbj_RWg@mail.gmail.com>
- <CAHC9VhRxR3ygxskpfbukHeM5wmX0=SifvLny2eiezWvwAyB9tw@mail.gmail.com>
-In-Reply-To: <CAHC9VhRxR3ygxskpfbukHeM5wmX0=SifvLny2eiezWvwAyB9tw@mail.gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 24 Oct 2023 12:38:31 -0700
-Message-ID: <CAEf4BzbKn5Ee8TVMpph_E8JhKkv6KpgHZBEV0X4RwtMKum10Mg@mail.gmail.com>
-Subject: Re: [PATCH v8 bpf-next 00/18] BPF token and BPF FS-based delegation
-To: Paul Moore <paul@paul-moore.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	keescook@chromium.org, brauner@kernel.org, lennart@poettering.net, 
-	kernel-team@meta.com, sargun@sargun.me
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 24, 2023 at 11:23=E2=80=AFAM Paul Moore <paul@paul-moore.com> w=
-rote:
->
-> On Tue, Oct 24, 2023 at 1:52=E2=80=AFPM Andrii Nakryiko
-> <andrii.nakryiko@gmail.com> wrote:
-> > On Mon, Oct 16, 2023 at 11:04=E2=80=AFAM Andrii Nakryiko <andrii@kernel=
-.org> wrote:
->
-> ...
->
-> > > v7->v8:
-> > >   - add bpf_token_allow_cmd and bpf_token_capable hooks (Paul);
-> > >   - inline bpf_token_alloc() into bpf_token_create() to prevent accid=
-ental
-> > >     divergence with security_bpf_token_create() hook (Paul);
-> >
-> > Hi Paul,
-> >
-> > I believe I addressed all the concerns you had in this revision. Can
-> > you please take a look and confirm that all things look good to you
-> > from LSM perspective? Thanks!
->
-> Yes, thanks for that, this patchset is near the top of my list, there
-> just happen to be a lot of things vying for my time at the moment.  My
-> apologies on the delay.
+Without this patch, there is nothing to stop the preferred lifetime of a
+temporary address from being greater than its valid lifetime. If that
+was the case, the valid lifetime was effectively ignored.
 
-No problem, thanks!
+Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
+---
+ net/ipv6/addrconf.c | 1 +
+ 1 file changed, 1 insertion(+)
 
->
-> --
-> paul-moore.com
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 0b6ee962c84e..e51c30d1daff 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -1397,6 +1397,7 @@ static int ipv6_create_tempaddr(struct inet6_ifaddr *ifp, bool block)
+ 			      idev->cnf.temp_valid_lft + age);
+ 	cfg.preferred_lft = cnf_temp_preferred_lft + age - idev->desync_factor;
+ 	cfg.preferred_lft = min_t(__u32, ifp->prefered_lft, cfg.preferred_lft);
++	cfg.preferred_lft = min_t(__u32, cfg.valid_lft, cfg.preferred_lft);
+ 
+ 	cfg.plen = ifp->prefix_len;
+ 	tmp_tstamp = ifp->tstamp;
+-- 
+2.42.0
+
 
