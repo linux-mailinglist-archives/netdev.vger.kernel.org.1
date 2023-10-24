@@ -1,92 +1,116 @@
-Return-Path: <netdev+bounces-43691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AAA07D4417
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 02:35:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8EB47D441C
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 02:37:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3ACDDB20D43
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 00:35:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F15EE1C20AEE
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 00:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F10815CB;
-	Tue, 24 Oct 2023 00:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B8F1855;
+	Tue, 24 Oct 2023 00:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UpqdOSeg"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Nh8j3vef"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3613F185E
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 00:35:08 +0000 (UTC)
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 102D8FD;
-	Mon, 23 Oct 2023 17:35:07 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-3573e6dd79bso14155485ab.2;
-        Mon, 23 Oct 2023 17:35:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698107706; x=1698712506; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xe1cBVUYUBVEHWHBgBiCCusgXLHqv806hVr5v8bqXiI=;
-        b=UpqdOSegzotdiTm21JQeOCcg0fl0x5WeU+AkXGjzMCx+FoMpxgJSLipy3W2SoZcDQq
-         teIx4UbXlS8urzCu4Di1p8TGsprbQI1M40dQlHUsM8doPX3VnrjRRnG2YX5wI/VXheme
-         vAt3zOoW91vwIxjfG9qeYjalziF2ZvY5xbx2bHbSGY193YUM/d+XwsziRON3z4SaeVkb
-         spt6qsk9hHFUgdzcD5wy+/E4mE2nWpeksdnrOOIkT7Xxvg9+TT7w6tf7sh+xfzMuMGay
-         WDFmjs7VPZClZunVk0Sh8zY5uKKdsApwbstvE28BYDhR0jx0Z5X1riiJ5db+PL78W7Gt
-         D+gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698107706; x=1698712506;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xe1cBVUYUBVEHWHBgBiCCusgXLHqv806hVr5v8bqXiI=;
-        b=GOjSG1zgvmT+ZQnKVI/4wPyMfzn+7wv2+He/TnnDt7JTMSbKKmG6tAZ6vdjc3Exy1G
-         EcsdLqkl4MTE5Ll+fptt0tvSRfvx9JSCBqkqZp/5+ri/5Or5djXoOIh9FO/rgwAW3i85
-         GC/C8SW/MlJb8VJmGvl/NNWxl6f/0RhshXxAslD/KRUMhceKVvlGeKMlB3OyFZ1a5UIx
-         c/L1N6wKxjw5HM+T6QiSnudXGnAi7PQf3ey4WKKzMg7lGIAB696bS+FdsILRNKbLZwfj
-         tf468D5pX26wRQ9CuwVXNsU3REqWPlIL917wbuYjr6KkYJheAC21P6hgkgXSC185zmF9
-         nvtw==
-X-Gm-Message-State: AOJu0Yx3drD6VZ5N+6ixIChAAn6QoZNV+tpRvFHH+pa7JjsFb//rAuNi
-	dEo6QY3VAOK/H7GwoRl1Msg=
-X-Google-Smtp-Source: AGHT+IE7vZ8YXjfUC7cr3qjF3GFmbjrgf6ZayozQbTesq2aRI53rTKfKOrKkGPFfbIzKWDdhaCwu3A==
-X-Received: by 2002:a05:6e02:1c85:b0:350:e9c6:e765 with SMTP id w5-20020a056e021c8500b00350e9c6e765mr13441217ill.11.1698107706384;
-        Mon, 23 Oct 2023 17:35:06 -0700 (PDT)
-Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
-        by smtp.gmail.com with ESMTPSA id x12-20020aa79a4c000000b006bf536bcd23sm4744219pfj.161.2023.10.23.17.35.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Oct 2023 17:35:05 -0700 (PDT)
-From: Edward AD <twuufnxlz@gmail.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	reibax@gmail.com,
-	richardcochran@gmail.com,
-	syzbot+9704e6f099d952508943@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	twuufnxlz@gmail.com,
-	wojciech.drewek@intel.com
-Subject: Re: [PATCH net] ptp: ptp_read should not release queue
-Date: Tue, 24 Oct 2023 08:34:58 +0800
-Message-ID: <20231024003457.1096214-2-twuufnxlz@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231023093334.3d6cda24@kernel.org>
-References: <20231023093334.3d6cda24@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BA14C95;
+	Tue, 24 Oct 2023 00:37:39 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9551F9F;
+	Mon, 23 Oct 2023 17:37:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IbkFeQ5G28rXN3aE/XpDlcgQ2XTNatnb7axQWP+p/D0=; b=Nh8j3vefZI+3csLTxryBpWR3k8
+	cKuTeLWPVL7484mjPb+3/eKHtHWejpfh7sr22uTbdAnBfcTmUP6cI4ztdJzb4XhV/smisVvooS1it
+	e+JpeC2TLh5Zd+zPaVru99f3tiMalghv8bZ52x9bbemWVACou7LnHFmp2NJ0BgVkAjwA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qv5QC-0001c2-Iw; Tue, 24 Oct 2023 02:37:24 +0200
+Date: Tue, 24 Oct 2023 02:37:24 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
+	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
+Subject: Re: [PATCH net-next v2 4/9] dt-bindings: net: add OPEN Alliance
+ 10BASE-T1x MAC-PHY Serial Interface
+Message-ID: <fd7f7d62-7921-4aac-9359-ff09449fd20c@lunn.ch>
+References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
+ <20231023154649.45931-5-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231023154649.45931-5-Parthiban.Veerasooran@microchip.com>
 
-On Mon, 23 Oct 2023 09:33:34 -0700 Jakub Kicinski wrote:
->> Signed-off-by: Edward AD <twuufnxlz@gmail.com>
-> 
-> We need a legal name for the signoff, not initials.
-You may have some misunderstandings about my name, AD is not an acronym. 
-This is my full and legal name 'Edward AD'.
+> +  oa-cps:
+> +    maxItems: 1
+> +    description:
+> +      Chunk Payload Size. Configures the data chunk payload size to 2^N,
+> +      where N is the value of this bitfield. The minimum possible data
+> +      chunk payload size is 8 bytes or N = 3. The default data chunk
+> +      payload size is 64 bytes, or N = 6. The minimum supported data chunk
+> +      payload size for this MAC-PHY device is indicated in the CPSMIN
+> +      field of the CAPABILITY register. Valid values for this parameter
+> +      are 8, 16, 32 and 64. All other values are reserved.
+> +
+> +  oa-txcte:
+> +    maxItems: 1
+> +    description:
+> +      Transmit Cut-Through Enable. When supported by this MAC-PHY device,
+> +      this bit enables the cut-through mode of frame transfer through the
+> +      MAC-PHY device from the SPI host to the network.
+> +
+> +  oa-rxcte:
+> +    maxItems: 1
+> +    description:
+> +      Receive Cut-Through Enable. When supported by this MAC-PHY device,
+> +      this bit enables the cut-through mode of frame transfer through the
+> +      MAC-PHY device from the network to the SPI host.
+> +
+> +  oa-prote:
+> +    maxItems: 1
+> +    description:
+> +      Control data read/write Protection Enable. When set, all control
+> +      data written to and read from the MAC-PHY will be transferred with
+> +      its complement for detection of bit errors.
+
+Device tree described hardware. Its not supposed to be used to
+describe configuration. So it is not clear to me if any of these are
+valid in DT.
+
+It seems to me, the amount of control transfers should be very small
+compared to data transfers. So why not just set protection enable to
+be true?
+
+What is the effect of chunk payload size ? Is there a reason to use a
+lower value than the default 64? I assume smaller sizes make data
+transfer more expensive, since you need more DMA setup and completion
+handing etc.
+
+An Ethernet driver is allowed to have driver specific private
+flags. See ethtool(1) --show-priv-flags and --set-priv-flags You could
+maybe use these to configure cut through?
+
+      Andrew
+
+
 
