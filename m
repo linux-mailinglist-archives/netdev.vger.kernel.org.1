@@ -1,73 +1,102 @@
-Return-Path: <netdev+bounces-43757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A49B17D4944
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 10:07:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE4E57D4988
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 10:12:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A43D21C20AC1
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 08:07:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A77B1C20A1D
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 08:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2ECE156CD;
-	Tue, 24 Oct 2023 08:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC2F15E9D;
+	Tue, 24 Oct 2023 08:12:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b="0afEiYWF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iAWFY5yK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239AF257D
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 08:07:00 +0000 (UTC)
-Received: from bee.tesarici.cz (bee.tesarici.cz [77.93.223.253])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1852799
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 01:06:59 -0700 (PDT)
-Received: from meshulam.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-4427-cc85-6706-c595.ipv6.o2.cz [IPv6:2a00:1028:83b8:1e7a:4427:cc85:6706:c595])
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A0714A8F
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 08:12:20 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 677ED8F
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 01:12:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698135138;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=M4KgBKcWnOf+HdfkmOB81ZgiYiCuChuxsC6xnZ9eoT8=;
+	b=iAWFY5yK1O/qpC+WEiijgwNRE+OvW72e9/W0liBimLd1Xn582fyK7sca2MFY4ubYrXJvRb
+	y1/6Rf4DwcBHcMrtbDaUaJBSrjEY2wqGdFxLEMSkyZJy3rlMUotMp6qG8dVzfKUO9Jr68N
+	b+rhlIwOkI2CU9oPyKKjixiIHgEWqvg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-277-yxYj-cPHOz2shsJQt_URWg-1; Tue, 24 Oct 2023 04:12:16 -0400
+X-MC-Unique: yxYj-cPHOz2shsJQt_URWg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by bee.tesarici.cz (Postfix) with ESMTPSA id 984FB174C4D;
-	Tue, 24 Oct 2023 10:06:56 +0200 (CEST)
-Authentication-Results: mail.tesarici.cz; dmarc=fail (p=none dis=none) header.from=tesarici.cz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tesarici.cz; s=mail;
-	t=1698134816; bh=Zd1GUWd5iKjynBSEWxZa12JBrIgjgAIg/+wIDEr9/Xo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=0afEiYWFQut1xFV+DW0TnwqYPKAgCFMeOVOTOwBz8DLiTYv5r5u5x1Kfl0SMKoeQE
-	 0MqW63Yl9calsJjIWO/OSesfdKD+RByEaSXkzGCVnuz46q43EB6VeNVaTQRXR1ZLTM
-	 SBke3qjOpF9B4Eah5YWlLb1JWOKqjF6vfWfQvjXJAkSfcYkoJrMvHzgA7AZLxTn+Ap
-	 FD9Wloy8J94POhjxHmIzRIo8RpDO5ELuSmP8P/xnfpeKd5oUvZHzpKS9DIxzV+lBGa
-	 xsSBttII3G8s8+KZPDhxDb3oGE/KBInM8TiAIWkyueCsLtgBvc9j2pzeo/DH0e0/v9
-	 tKOrmo88p/5GQ==
-Date: Tue, 24 Oct 2023 10:06:54 +0200
-From: Petr =?UTF-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Ben Greear
- <greearb@candelatech.com>, netdev <netdev@vger.kernel.org>
-Subject: Re: swiotlb dyn alloc WARNING splat in wireless-next.
-Message-ID: <20231024100654.56d53be4@meshulam.tesarici.cz>
-In-Reply-To: <20231024062920.GA8472@lst.de>
-References: <4f173dd2-324a-0240-ff8d-abf5c191be18@candelatech.com>
-	<96efddab-7a50-4fb3-a0e1-186b9339a53a@gmail.com>
-	<20231024062920.GA8472@lst.de>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-suse-linux-gnu)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D73231019C86;
+	Tue, 24 Oct 2023 08:12:15 +0000 (UTC)
+Received: from p1.luc.com (unknown [10.43.2.183])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DC239492BFB;
+	Tue, 24 Oct 2023 08:12:13 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	mschmidt@redhat.com,
+	dacampbe@redhat.com,
+	poros@redhat.com
+Subject: [PATCH iwl-next v2 0/3] i40e: Add and use version check helpers
+Date: Tue, 24 Oct 2023 10:12:08 +0200
+Message-ID: <20231024081211.677502-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-On Tue, 24 Oct 2023 08:29:20 +0200
-Christoph Hellwig <hch@lst.de> wrote:
+The series moves an existing check for AQ API version to header file,
+adds another ones for firmware version check and use them to refactor
+existing open-coded version checks.
 
-> Looks like we need to limit the maxium allocation size.
-> 
-> Peter, do you have time to look into this?
+Series content:
+Patch 1: Moves i40e_is_aq_api_ver_ge() helper to header file
+Patch 2: Adds another helpers to check running FW version
+Patch 3: Re-factors existing open-coded checks to use the new helpers
 
-Yes, I'm already looking...
+Changes:
+v2 - Fixed indentation
 
-Petr T
+Ivan Vecera (3):
+  i40e: Move i40e_is_aq_api_ver_ge helper
+  i40e: Add other helpers to check version of running firmware and AQ API
+  i40e: Use helpers to check running FW and AQ API versions
+
+ drivers/net/ethernet/intel/i40e/i40e_adminq.c | 56 ++++++---------
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 48 +++++--------
+ drivers/net/ethernet/intel/i40e/i40e_dcb.c    |  7 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |  6 +-
+ drivers/net/ethernet/intel/i40e/i40e_type.h   | 68 +++++++++++++++++++
+ 5 files changed, 108 insertions(+), 77 deletions(-)
+
+-- 
+2.41.0
+
 
