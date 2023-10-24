@@ -1,83 +1,108 @@
-Return-Path: <netdev+bounces-43683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 319187D4385
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 02:00:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33BB77D43B7
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 02:11:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92204B20CF1
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 00:00:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 653F91C20860
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 00:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416681861;
-	Tue, 24 Oct 2023 00:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82107E5;
+	Tue, 24 Oct 2023 00:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJ/qdwbD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dOegSviw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199DD185B
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 00:00:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 86048C433C9;
-	Tue, 24 Oct 2023 00:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698105625;
-	bh=4oWYcLHkuNEOFMr9LsI3cMKfFRst3F45y1Tf941R8is=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YJ/qdwbDh1AokWdntYgGHV6Fl1APrn7e/aaXVecevg1lBzC85lbbC8NwDy8xFm5+z
-	 W9iJiRlCyx4X61UpQyQL/K/Qk/DsxL7vpkxYAkz9uzZt7irSkT26DvrSw6hG9BFV0X
-	 +l3/bBl+RSqE4N3QWJ39HvCqWS45MKr9o/mTvEgJiyAJDXXViruqu+UGXEPYSIZXtz
-	 o4zmB+Q62xYWERIrmioXIZg0ViQc7FsBp81+IXiIJhS7bNxQyGGRxB4/duS+3/jdXt
-	 j7CfK3jCl5FlQqVTK0Rn2VfkrmFqg3jLK2Oaca9hkGmrOIJPIDuv2CVNrA8Q2N6a4Q
-	 M29kaAGSM0bgg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E598E4CC11;
-	Tue, 24 Oct 2023 00:00:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB55386
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 00:11:22 +0000 (UTC)
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1020810C;
+	Mon, 23 Oct 2023 17:11:21 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-357c94845e6so9670575ab.1;
+        Mon, 23 Oct 2023 17:11:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698106280; x=1698711080; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SxM8ogapjGL3mH2yiP7/UA3gEGZG7d192nEgnAulpr4=;
+        b=dOegSviweEM8phIku5s2ePkWLNvtmv2knyqQ5iZxzpAGIupomVAzAI2nimBHZL3Bfp
+         KTVJddki9wyaJ0Yn2C865Nh8cg1ss9iV1gZW/Ju4ijUeYCD0nxb0yvOb4dIUjZ3WM+Cx
+         CRIpQg+NU9Rlxk2mXkn6Lvel4kvPSrWWwvfZaCj4RSKyGEFUPdt1SEtCMPpk0YvTVEJr
+         qqqeMfE+YdtttLJUURagzeuAvMg+LBYMDZecGwj9uUdyQqHkUK5Wq8mrGayIJAv2d37t
+         y+EL8isYvLSewQ1Q2/3JKBGXaSQXxKCx+44xl/z+vg52D+Jv/XIcjwHKpPGgf0TMzTzD
+         0OJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698106280; x=1698711080;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SxM8ogapjGL3mH2yiP7/UA3gEGZG7d192nEgnAulpr4=;
+        b=c8VHWcmert2AF0CubP+U8QpR5cy17k/LOc50ntozJMgEWNWAeXJ4gWu+oD1dRm+bR3
+         jiTF3pDct7Mb/P00ep1bE1fTqmpmAlxle7+wgx4rPGFtAap5AyXbCuv/Yoj3gVS3HMaO
+         cfYhfNXHHfc4yIQ5txhs2jqaL6fNoWfTQLLXQUII5QywfNrYNndipbLK3pislvMVYobi
+         RqYLgsYOu2yhHvmSr9ThiWKx8GoiKSxknotaj7wacwGqnyOGvrj2hy4n9V2Eu4m5b8S6
+         GEsH4lzCGXPPqj6Z3taC5RBiV+GRzvQoiy4bws+GaiHFTrL9FqC65wRWcmgI7NZK/y4F
+         paXg==
+X-Gm-Message-State: AOJu0YxlfMqpX0+Qd/7V99OK+AlmEYM9SUBEtA38smRjpn40qpxLtsGO
+	/4nQU+BV3fSa1VwbLJ+z194=
+X-Google-Smtp-Source: AGHT+IFdJ7JO3b+5zx7rnIRwyFIoFjSSEtUnKxMHtd1CIa1+tENkXvrX33uH8frn57TOlMMfdJD3Sw==
+X-Received: by 2002:a05:6e02:20e5:b0:357:d0b8:c4dc with SMTP id q5-20020a056e0220e500b00357d0b8c4dcmr6592045ilv.19.1698106280246;
+        Mon, 23 Oct 2023 17:11:20 -0700 (PDT)
+Received: from [192.168.0.106] ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id e4-20020a656884000000b005b488b6441esm5367592pgt.58.2023.10.23.17.11.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Oct 2023 17:11:19 -0700 (PDT)
+Message-ID: <e1b1f477-e41d-4834-984b-0db219342e5b@gmail.com>
+Date: Tue, 24 Oct 2023 07:11:12 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth-next 2023-10-23
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169810562544.27223.14391491254024201624.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Oct 2023 00:00:25 +0000
-References: <20231023182119.3629194-1-luiz.dentz@gmail.com>
-In-Reply-To: <20231023182119.3629194-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/2] MAINTAINERS: Move M Chetan Kumar to CREDITS
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Loic Poulain <loic.poulain@linaro.org>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20231023032905.22515-2-bagasdotme@gmail.com>
+ <20231023032905.22515-3-bagasdotme@gmail.com>
+ <20231023093837.49c7cb35@kernel.org>
+Content-Language: en-US
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+In-Reply-To: <20231023093837.49c7cb35@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 23 Oct 2023 11:21:19 -0700 you wrote:
-> The following changes since commit d6e48462e88fe7efc78b455ecde5b0ca43ec50b7:
+On 23/10/2023 23:38, Jakub Kicinski wrote:
+> On Mon, 23 Oct 2023 10:29:04 +0700 Bagas Sanjaya wrote:
+>>  M Chetan Kumar <m.chetan.kumar@linux.intel.com> (commit_signer:15/23=65%,authored:14/23=61%)
 > 
->   net: mdio: xgene: Fix unused xgene_mdio_of_match warning for !CONFIG_OF (2023-10-23 10:16:47 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-10-23
-> 
-> [...]
+> 14 patches authored and 15 signed off?
+> Let me be more clear this time - nak, please drop this patch.
 
-Here is the summary with links:
-  - pull request: bluetooth-next 2023-10-23
-    https://git.kernel.org/netdev/net-next/c/f4dbc2bb7a54
+Or maybe as well drop INTEL WWAN IOSM DRIVER entry (and let
+WWAN subsystem maintainers handle it)? I don't want
+people get their inboxes spammed with bounces against
+his addresses, though.
 
-You are awesome, thank you!
+He's now in a state of limbo. He has significant contribution
+(and gets listed by get_maintainer script with (AFAIK) no way
+to filter him out), yet emails to him bounces. What will be
+the resolution then?
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+An old man doll... just what I always wanted! - Clara
 
 
