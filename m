@@ -1,365 +1,145 @@
-Return-Path: <netdev+bounces-43731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DCCF7D4555
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 04:07:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EA237D4567
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 04:17:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6E35B20E73
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 02:07:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 919281C20A41
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 02:17:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590E01FC2;
-	Tue, 24 Oct 2023 02:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36FC2107;
+	Tue, 24 Oct 2023 02:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vPeLO5pV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JtHzB6oC"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895021C20;
-	Tue, 24 Oct 2023 02:07:22 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0E15A4;
-	Mon, 23 Oct 2023 19:07:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kLiGhnX5zQwB/BzwQRqYcmHWrhiC8XReLyj6hICSTFo=; b=vPeLO5pVIVQ+DszrzLwWXndym5
-	QBVFQjOlofnj/GByDXGDmhJxx4M8h/EbwmHxWgjKPRriUIEthQ0UdmG+QJ3PAlyZfJzKRT66C+llX
-	NsPhQo9vf8y9S9B+URxAejEoe5WmNwDZEWJlK2hpcuuwXeRoGB36BnwyeFKrmnGi0lQU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qv6ow-00020X-5N; Tue, 24 Oct 2023 04:07:02 +0200
-Date: Tue, 24 Oct 2023 04:07:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
-	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [PATCH net-next v2 7/9] net: ethernet: oa_tc6: implement data
- transaction interface
-Message-ID: <9b7a5ed9-840f-4346-a168-e538a8477714@lunn.ch>
-References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
- <20231023154649.45931-8-Parthiban.Veerasooran@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5970863DE
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 02:17:21 +0000 (UTC)
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DE28C4;
+	Mon, 23 Oct 2023 19:17:19 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id d2e1a72fcca58-6bcbfecf314so814226b3a.1;
+        Mon, 23 Oct 2023 19:17:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698113839; x=1698718639; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zyEFDhAWm65pg1j3rI0ZzRtuZnY7gYN9zi0XKDJuvm8=;
+        b=JtHzB6oC4uEclOz04uT3WtT02ejjVv95OXkGMMwL+ZZ1vHKnZhcE4TYrjf37UGDgdY
+         1ifU9jEU7XUMDGBkqRUbFLptIizPivRtN5IXH62y3+t6ENsK9lW7weX9b3qnRaUvv2Yz
+         T3AgzI7D2YAKzeXfthsn3Euy9TLKjiVk+ou8Aeu/gl2dEAylX1bZpinHRLOZq054jkMx
+         AFX76l8Fjnz+b6HLu/U3aOvpLX3eY8AIZRiqjo5PpK9JzpmBUvPCtlSQr6Ob4Q87MbmB
+         N2y1nmuM8VguZY0jUrB615rrJKRyxYAETkIRkJ/3HFOujruQfB8p6Nb91lObxE7QM5EV
+         RqSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698113839; x=1698718639;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zyEFDhAWm65pg1j3rI0ZzRtuZnY7gYN9zi0XKDJuvm8=;
+        b=rof0iK0SJUva5oitSkh2zFLqGFraprfB7rFj8UUGts2Bhy7/zsMXthQ3hlgh4Xue1n
+         fvtvAxz0vRR13kvY+GC99iRiOWV+ADvV3bdnfH2QxZjpkQ1Mx6YoMSUdnDpbj9VzEnfU
+         hvnm04c2bVHlZ6t5X6r/3cNOxk+ZulE1x+CbobYAVuT+rLfLWHs84LF3/VYOIaEk2OLF
+         amfBnhs1VDD31uvqQrdbBz3jhDeWwjX/diYMsZIC4i0U4L+4JEINt22V/XDqAVmZbKDk
+         7opX9KjDw0hS35KTSnV1uXx62HCtcTrmdGUujEMPoeEaxoNt9RVmG25xLKsiKdScdsXW
+         XslA==
+X-Gm-Message-State: AOJu0YwhG6iTnKXoIwcumKcEt6Y5ixN+SYv7oBhLATTuGFA0BzG4/Kph
+	ewbm7Rdco3doWrODtAiB9ws=
+X-Google-Smtp-Source: AGHT+IE9fvMwgsqbR5lA/PxMEX4lZmpmQMzM0WUD/UVQEP0lwtXuL3w2pLyDP/a5H/OpbO7q2gcxEA==
+X-Received: by 2002:a05:6a20:8f03:b0:13f:65ca:52a2 with SMTP id b3-20020a056a208f0300b0013f65ca52a2mr15761981pzk.5.1698113838741;
+        Mon, 23 Oct 2023 19:17:18 -0700 (PDT)
+Received: from [127.0.0.1] (059149129201.ctinets.com. [59.149.129.201])
+        by smtp.gmail.com with ESMTPSA id 5-20020a170902e9c500b001c72c07c9d9sm6591188plk.308.2023.10.23.19.17.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Oct 2023 19:17:18 -0700 (PDT)
+Message-ID: <120e6c2c-6122-41db-8c46-7753e9659c70@gmail.com>
+Date: Tue, 24 Oct 2023 10:17:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231023154649.45931-8-Parthiban.Veerasooran@microchip.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: tls: Fix possible NULL-pointer dereference in
+ tls_decrypt_device() and tls_decrypt_sw()
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231023080611.19244-1-hbh25y@gmail.com> <ZTZ9H4aDB45RzrFD@hog>
+Content-Language: en-US
+From: Hangyu Hua <hbh25y@gmail.com>
+In-Reply-To: <ZTZ9H4aDB45RzrFD@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> +static u16 oa_tc6_prepare_empty_chunk(struct oa_tc6 *tc6, u8 *buf, u8 cp_count)
-> +{
-> +	u32 hdr;
-> +
-> +	/* Prepare empty chunks used for getting interrupt information or if
-> +	 * receive data available.
-> +	 */
-> +	for (u8 i = 0; i < cp_count; i++) {
-> +		hdr = FIELD_PREP(DATA_HDR_DNC, 1);
-> +		hdr |= FIELD_PREP(DATA_HDR_P, oa_tc6_get_parity(hdr));
-> +		*(__be32 *)&buf[i * (tc6->cps + TC6_HDR_SIZE)] = cpu_to_be32(hdr);
-> +		memset(&buf[TC6_HDR_SIZE + (i * (tc6->cps + TC6_HDR_SIZE))], 0,
-> +		       tc6->cps);
-> +	}
+On 23/10/2023 22:03, Sabrina Dubroca wrote:
+> 2023-10-23, 16:06:11 +0800, Hangyu Hua wrote:
+>> tls_rx_one_record can be called in tls_sw_splice_read and tls_sw_read_sock
+>> with msg being NULL. This may lead to null pointer dereferences in
+>> tls_decrypt_device and tls_decrypt_sw.
+>>
+>> Fix this by adding a check.
+> 
+> Have you actually hit this NULL dereference? I don't see how it can
+> happen.
+> 
+> darg->zc is 0 in both cases, so tls_decrypt_device doesn't call
+> skb_copy_datagram_msg.
+> 
+> tls_decrypt_sw will call tls_decrypt_sg with out_iov = &msg->msg_iter
+> (a bogus pointer but no NULL deref yet), and darg->zc is still
+> 0. tls_decrypt_sg skips the use of out_iov/out_sg and allocates
+> clear_skb, and the next place where it would use out_iov is skipped
+> because we have clear_skb.
 
-This is not simple, and its the sort of code which makes me wounder if
-its gone off the end of the buffer. It would be good to find somebody
-internally within Microchip to review this code.
+My bad. I only checked &msg->msg_iter's address in tls_decrypt_sw and 
+found it was wrong. Do I need to make a new patch to fix the harmless 
+bogus pointer?
 
-> +static void oa_tc6_rx_eth_ready(struct oa_tc6 *tc6)
-> +{
-> +	struct sk_buff *skb;
-> +
-> +	/* Send the received ethernet packet to network layer */
-> +	skb = netdev_alloc_skb(tc6->netdev, tc6->rxd_bytes + NET_IP_ALIGN);
-> +	if (!skb) {
-> +		tc6->netdev->stats.rx_dropped++;
-> +		netdev_dbg(tc6->netdev, "Out of memory for rx'd frame");
-
-You can just return here, and skip the else. Less indentation is
-better, it generally makes the code more readable.
-
-> +	} else {
-> +		skb_reserve(skb, NET_IP_ALIGN);
-> +		memcpy(skb_put(skb, tc6->rxd_bytes), &tc6->eth_rx_buf[0],
-> +		       tc6->rxd_bytes);
-> +		skb->protocol = eth_type_trans(skb, tc6->netdev);
-> +		tc6->netdev->stats.rx_packets++;
-> +		tc6->netdev->stats.rx_bytes += tc6->rxd_bytes;
-> +		/* 0 for NET_RX_SUCCESS and 1 for NET_RX_DROP */
-> +		if (netif_rx(skb))
-> +			tc6->netdev->stats.rx_dropped++;
-
-Rather than have a comment do:
-
-		if (netif_rx(skb) == NET_RX_DROP)
-			tc6->netdev->stats.rx_dropped++;
-
-
-> +static void oa_tc6_rx_eth_complete2(struct oa_tc6 *tc6, u8 *payload, u32 ftr)
-> +{
-> +	u16 ebo;
-
-What does ftr and ebo mean? Its really hard to read this code because
-the names are not really meaningful.
-
-> +
-> +	if (FIELD_GET(DATA_FTR_EV, ftr))
-> +		ebo = FIELD_GET(DATA_FTR_EBO, ftr) + 1;
-> +	else
-> +		ebo = tc6->cps;
-> +
-> +	memcpy(&tc6->eth_rx_buf[tc6->rxd_bytes], &payload[0], ebo);
-> +	tc6->rxd_bytes += ebo;
-> +	if (FIELD_GET(DATA_FTR_EV, ftr)) {
-> +		/* If EV set then send the received ethernet frame to n/w */
-> +		oa_tc6_rx_eth_ready(tc6);
-> +		tc6->rxd_bytes = 0;
-> +		tc6->rx_eth_started = false;
-> +	}
-> +}
-> +
-> +static void oa_tc6_rx_eth_complete1(struct oa_tc6 *tc6, u8 *payload, u32 ftr)
-> +{
-> +	u16 ebo;
-> +	u16 sbo;
-> +
-> +	sbo = FIELD_GET(DATA_FTR_SWO, ftr) * 4;
-> +	ebo = FIELD_GET(DATA_FTR_EBO, ftr) + 1;
-> +
-> +	if (ebo <= sbo) {
-> +		memcpy(&tc6->eth_rx_buf[tc6->rxd_bytes], &payload[0], ebo);
-> +		tc6->rxd_bytes += ebo;
-> +		oa_tc6_rx_eth_ready(tc6);
-> +		tc6->rxd_bytes = 0;
-> +		memcpy(&tc6->eth_rx_buf[tc6->rxd_bytes], &payload[sbo],
-> +		       tc6->cps - sbo);
-> +		tc6->rxd_bytes += (tc6->cps - sbo);
-> +	} else {
-> +		memcpy(&tc6->eth_rx_buf[tc6->rxd_bytes], &payload[sbo],
-> +		       ebo - sbo);
-> +		tc6->rxd_bytes += (ebo - sbo);
-> +		oa_tc6_rx_eth_ready(tc6);
-> +		tc6->rxd_bytes = 0;
-> +	}
-> +}
-> +
-> +static void oa_tc6_start_rx_eth(struct oa_tc6 *tc6, u8 *payload, u32 ftr)
-> +{
-> +	u16 sbo;
-> +
-> +	tc6->rxd_bytes = 0;
-> +	tc6->rx_eth_started = true;
-> +	sbo = FIELD_GET(DATA_FTR_SWO, ftr) * 4;
-> +	memcpy(&tc6->eth_rx_buf[tc6->rxd_bytes], &payload[sbo], tc6->cps - sbo);
-> +	tc6->rxd_bytes += (tc6->cps - sbo);
-> +}
-> +
-> +static u32 oa_tc6_get_footer(struct oa_tc6 *tc6, u8 *buf, u8 cp_num)
-> +{
-> +	__be32 ftr;
-> +
-> +	ftr = *(__be32 *)&buf[tc6->cps + (cp_num * (tc6->cps + TC6_FTR_SIZE))];
-> +
-> +	return be32_to_cpu(ftr);
-> +}
-> +
-> +static void oa_tc6_update_txc_rca(struct oa_tc6 *tc6, u32 ftr)
-> +{
-> +	tc6->txc = FIELD_GET(DATA_FTR_TXC, ftr);
-> +	tc6->rca = FIELD_GET(DATA_FTR_RCA, ftr);
-> +}
-> +
-> +static int oa_tc6_check_ftr_errors(struct oa_tc6 *tc6, u32 ftr)
-> +{
-> +	/* Check for footer parity error */
-> +	if (oa_tc6_get_parity(ftr)) {
-> +		net_err_ratelimited("%s: Footer parity error\n",
-> +				    tc6->netdev->name);
-> +		return FTR_ERR;
-> +	}
-> +	/* If EXST set in the footer then read STS0 register to get the
-> +	 * status information.
-> +	 */
-> +	if (FIELD_GET(DATA_FTR_EXST, ftr)) {
-> +		if (oa_tc6_process_exst(tc6))
-> +			net_err_ratelimited("%s: Failed to process EXST\n",
-> +					    tc6->netdev->name);
-> +		return FTR_ERR;
-> +	}
-> +	if (FIELD_GET(DATA_FTR_HDRB, ftr)) {
-> +		net_err_ratelimited("%s: Footer eeceived header bad\n",
-> +				    tc6->netdev->name);
-> +		return FTR_ERR;
-> +	}
-> +	if (!FIELD_GET(DATA_FTR_SYNC, ftr)) {
-> +		net_err_ratelimited("%s: Footer configuration unsync\n",
-> +				    tc6->netdev->name);
-> +		return FTR_ERR;
-> +	}
-> +	return FTR_OK;
-> +}
-> +
-> +static void oa_tc6_drop_rx_eth(struct oa_tc6 *tc6)
-> +{
-> +	tc6->rxd_bytes = 0;
-> +	tc6->rx_eth_started = false;
-> +	tc6->netdev->stats.rx_dropped++;
-> +	net_err_ratelimited("%s: Footer frame drop\n",
-> +			    tc6->netdev->name);
-> +}
-> +
-> +static int oa_tc6_process_rx_chunks(struct oa_tc6 *tc6, u8 *buf, u16 len)
-> +{
-> +	u8 cp_count;
-> +	u8 *payload;
-> +	u32 ftr;
-> +	int ret;
-> +
-> +	/* Calculate the number of chunks received */
-> +	cp_count = len / (tc6->cps + TC6_FTR_SIZE);
-> +
-> +	for (u8 i = 0; i < cp_count; i++) {
-> +		/* Get the footer and payload */
-> +		ftr = oa_tc6_get_footer(tc6, buf, i);
-> +		payload = &buf[(i * (tc6->cps + TC6_FTR_SIZE))];
-
-This would be more readable:
-
-	/* Calculate the number of chunks received */
-	chunks = len / (tc6->cps + TC6_FTR_SIZE);
-
-	for (u8 chunk = 0; chunk < chunks; chunk++) {
-		/* Get the footer and payload */
-		ftr = oa_tc6_get_footer(tc6, buf, chunk);
-		payload = &buf[(chunk * (tc6->cps + TC6_FTR_SIZE))];
-
-etc.
-
-And maybe move most of this code into a function
-oa_tc6_process_rx_chunk(). With lots of small functions with good
-names, you need less comments.
-
-
-> +		/* Check for data valid */
-> +		if (FIELD_GET(DATA_FTR_DV, ftr)) {
-> +			/* Check whether both start valid and end valid are in a
-> +			 * single chunk payload means a single chunk payload may
-> +			 * contain an entire ethernet frame.
-> +			 */
-> +			if (FIELD_GET(DATA_FTR_SV, ftr) &&
-> +			    FIELD_GET(DATA_FTR_EV, ftr)) {
-
-
-		if (FIELD_GET(DATA_FOOTER_START_VALID, footer) &&
-		    FIELD_GET(DATA_FOOTER_END_VALID, footer)) {
-
-Don't you think that is more readable?
-
-> +static void oa_tc6_prepare_tx_chunks(struct oa_tc6 *tc6, u8 *buf,
-> +				     struct sk_buff *skb)
-> +{
-> +	bool frame_started = false;
-> +	u16 copied_bytes = 0;
-> +	u16 copy_len;
-> +	u32 hdr;
-> +
-> +	/* Calculate the number tx credit counts needed to transport the tx
-> +	 * ethernet frame.
-> +	 */
-> +	tc6->txc_needed = (skb->len / tc6->cps) + ((skb->len % tc6->cps) ? 1 : 0);
-
-Why call it a credit here, but a chunk when receiving?
-
-> +static int oa_tc6_perform_spi_xfer(struct oa_tc6 *tc6)
-> +{
-> +	bool do_tx_again;
-> +	u16 total_len;
-> +	u16 rca_len;
-> +	u16 tx_len;
-> +	int ret;
-> +
-> +	do {
-> +		do_tx_again = false;
-> +		rca_len = 0;
-> +		tx_len = 0;
-> +
-> +		/* In case of an interrupt, perform an empty chunk transfer to
-> +		 * know the purpose of the interrupt. Interrupt may occur in
-> +		 * case of RCA (Receive Chunk Available) and TXC (Transmit
-> +		 * Credit Count). Both will occur if they are not indicated
-> +		 * through the previous footer.
-> +		 */
-> +		if (tc6->int_flag) {
-> +			tc6->int_flag = false;
-> +			total_len = oa_tc6_prepare_empty_chunk(tc6,
-> +							       tc6->spi_tx_buf,
-> +							       1);
-> +		} else {
-> +			/* Calculate the transfer length */
-> +			if (tc6->tx_flag && tc6->txc) {
-> +				tx_len = oa_tc6_calculate_tx_len(tc6);
-> +				memcpy(&tc6->spi_tx_buf[0],
-> +				       &tc6->eth_tx_buf[tc6->tx_pos], tx_len);
-> +			}
-> +
-> +			if (tc6->rca)
-> +				rca_len = oa_tc6_calculate_rca_len(tc6, tx_len);
-> +
-> +			total_len = tx_len + rca_len;
-> +		}
-> +		ret = oa_tc6_spi_transfer(tc6->spi, tc6->spi_tx_buf,
-> +					  tc6->spi_rx_buf, total_len);
-> +		if (ret)
-> +			return ret;
-> +		/* Process the rxd chunks to get the ethernet frame or status */
-> +		ret = oa_tc6_process_rx_chunks(tc6, tc6->spi_rx_buf, total_len);
-> +		if (ret)
-> +			return ret;
-> +		if (tc6->tx_flag) {
-> +			tc6->tx_pos += tx_len;
-> +			tc6->txc_needed = tc6->txc_needed -
-> +					  (tx_len / (tc6->cps + TC6_HDR_SIZE));
-> +			/* If the complete ethernet frame is transmitted then
-> +			 * return the skb and update the details to n/w layer.
-> +			 */
-> +			if (!tc6->txc_needed)
-> +				oa_tc6_tx_eth_complete(tc6);
-> +			else if (tc6->txc)
-> +				/* If txc is available again and updated from
-> +				 * the previous footer then perform tx again.
-> +				 */
-> +				do_tx_again = true;
-> +		}
-> +
-> +		/* If rca is updated from the previous footer then perform empty
-> +		 * tx to receive ethernet frame.
-> +		 */
-> +		if (tc6->rca)
-> +			do_tx_again = true;
-> +	} while (do_tx_again);
-
-The coding standard say:
-
-Functions should be short and sweet, and do just one thing. They
-should fit on one or two screenfuls of text (the ISO/ANSI screen size
-is 80x24, as we all know), and do one thing and do that well.
-
-This is too long, and does too many things.
-
-     Andrew
+> 
+> Relevant parts of tls_decrypt_sg:
+> 
+> static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
+> 			  struct scatterlist *out_sg,
+> 			  struct tls_decrypt_arg *darg)
+> {
+> [...]
+> 	if (darg->zc && (out_iov || out_sg)) {
+> 		clear_skb = NULL;
+> [...]
+> 	} else {
+> 		darg->zc = false;
+> 
+> 		clear_skb = tls_alloc_clrtxt_skb(sk, skb, rxm->full_len);
+> [...]
+> 	}
+> 
+> [...]
+> 	if (err < 0)
+> 		goto exit_free;
+> 
+> 	if (clear_skb) {
+> 		sg_init_table(sgout, n_sgout);
+> 		sg_set_buf(&sgout[0], dctx->aad, prot->aad_size);
+> 
+> 		err = skb_to_sgvec(clear_skb, &sgout[1], prot->prepend_size,
+> 				   data_len + prot->tail_size);
+> 		if (err < 0)
+> 			goto exit_free;
+> 	} else if (out_iov) {
+> [...]
+> 	} else if (out_sg) {
+> 		memcpy(sgout, out_sg, n_sgout * sizeof(*sgout));
+> 	}
+> [...]
+> }
+> 
 
