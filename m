@@ -1,114 +1,144 @@
-Return-Path: <netdev+bounces-43872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C20B7D50E3
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:04:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E61D7D5107
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 15:08:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36092282117
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:04:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F0DB1C20BA0
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A8A28698;
-	Tue, 24 Oct 2023 13:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8054F29408;
+	Tue, 24 Oct 2023 13:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="ClMZyH7B"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DC81C20
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 13:04:49 +0000 (UTC)
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37E514EDA;
-	Tue, 24 Oct 2023 06:04:21 -0700 (PDT)
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-d9ac31cb051so4199341276.3;
-        Tue, 24 Oct 2023 06:04:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698152660; x=1698757460;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wHvmrlYR3ANScM/PMUCYI43KI777+90NRiRHddhNy8c=;
-        b=dhxyYXGjmxqb95MATT7xFpJj9ZUpaLDT+31GfHQJWtL/WBvRb6RwYHiXFpoPW4Q/TE
-         RNKaY7PhAXEkr2WfUqt5PgrquMFwKzdBhzFrxf3eo1ET++dv2bCeb7ajp2lnCZxeZcOn
-         BRnFZpHiMm5Vn4X7fKsE5HFOTxBX6yOSrQaWaF5LtSo1p/KzVrC8qtiae8XxfZPx5z7X
-         UJ1XajsLse3dq8fb8sHDyG4gwuZMHop48gH7BP+KJs4XonDVA6e8NWq0EFUTMG7gN5Q6
-         eD/u6EZ+mlY/bYC3JeYzfW03D4NrC6DSZzivbGnFOMjX9iVR6B1CqZX4WqePbOM9uuLP
-         ndgw==
-X-Gm-Message-State: AOJu0YyifiggVM44HL5yExeB+B3IrGX1ytTgnka7Liwtu7qdtHQZDlPh
-	Wk2gPUQY1Hfdw6g8fgXgPbObgM0p4kHNYQ==
-X-Google-Smtp-Source: AGHT+IFzctphmQ+Icxvoha1yYfi0pSUEcyxJPpaHFA2U+5N9GW+155l7YRUMWI17noliF3frKKaCGw==
-X-Received: by 2002:a25:aac8:0:b0:d9b:e043:96f5 with SMTP id t66-20020a25aac8000000b00d9be04396f5mr12501179ybi.0.1698152659786;
-        Tue, 24 Oct 2023 06:04:19 -0700 (PDT)
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com. [209.85.219.182])
-        by smtp.gmail.com with ESMTPSA id w31-20020a25ac1f000000b00d9ab86bdaffsm3543021ybi.12.2023.10.24.06.04.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 06:04:19 -0700 (PDT)
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-d852b28ec3bso4198045276.2;
-        Tue, 24 Oct 2023 06:04:18 -0700 (PDT)
-X-Received: by 2002:a25:b097:0:b0:da0:3c34:2bf5 with SMTP id
- f23-20020a25b097000000b00da03c342bf5mr2005654ybj.2.1698152658170; Tue, 24 Oct
- 2023 06:04:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0FE328E21
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 13:08:42 +0000 (UTC)
+Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4231128
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 06:08:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
+	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
+	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=cBXs12jA7KWFzgQ+tTcAiIjIPBfDlt2cfHoxnkBGFbI=; b=ClMZyH7BRo4K2ENDs428Dr5d++
+	zobCebV05RD3zYD010uIQ8S/4mOeMXsRQclv41/AkHt4jlgzejwjie1uISlbInqtfaGifFdjiEUT9
+	P+redGQ16yxAjbvI/PWWJfsi440bixH3jAJkOWiDqceRVRfg9xhLr87buuS3L6oRQk5ZNrWia5Tjq
+	XO56vG9ZbcjmYe/4ltGOPzWVeIJrDDRTx9/XEjJbav0gqtBo4+1QA9kVGV4tNzIxL1IO/3lJL0hIB
+	46Ip2OlmfAyccllHrDF77/wb6CpVuzh5uXffgHQGBoLWKrRkc6SC22nxI1+U/CAzPAYNpHXJhBGON
+	0ECoucjw==;
+Received: from [192.168.1.4] (port=15909 helo=SH-EX2013.helmholz.local)
+	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Ante.Knezic@helmholz.de>)
+	id 1qvH9A-0002Tm-0H;
+	Tue, 24 Oct 2023 15:08:36 +0200
+Received: from linuxdev.helmholz.local (192.168.6.7) by
+ SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Tue, 24 Oct 2023 15:08:35 +0200
+From: Ante Knezic <ante.knezic@helmholz.de>
+To: <o.rempel@pengutronix.de>
+CC: <UNGLinuxDriver@microchip.com>, <andrew@lunn.ch>,
+	<ante.knezic@helmholz.de>, <conor+dt@kernel.org>, <davem@davemloft.net>,
+	<devicetree@vger.kernel.org>, <edumazet@google.com>, <f.fainelli@gmail.com>,
+	<krzysztof.kozlowski+dt@linaro.org>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <marex@denx.de>, <netdev@vger.kernel.org>,
+	<olteanv@gmail.com>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<woojung.huh@microchip.com>
+Subject: Re: [PATCH net-next v4 2/2] net:dsa:microchip: add property to select
+Date: Tue, 24 Oct 2023 15:08:32 +0200
+Message-ID: <20231024130832.13596-1-ante.knezic@helmholz.de>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20231024100915.GC3803936@pengutronix.de>
+References: <20231024100915.GC3803936@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231022205316.3209-1-wsa+renesas@sang-engineering.com>
- <20231022205316.3209-3-wsa+renesas@sang-engineering.com> <b0b4054adcb5250ad49e19d8f90c89de802f0125.camel@redhat.com>
-In-Reply-To: <b0b4054adcb5250ad49e19d8f90c89de802f0125.camel@redhat.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 24 Oct 2023 15:04:05 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdViDiR+rfzH8VeHxOx0cZHaw27CUE5PRwxaQuaWmbWu=w@mail.gmail.com>
-Message-ID: <CAMuHMdViDiR+rfzH8VeHxOx0cZHaw27CUE5PRwxaQuaWmbWu=w@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] net: ethernet: renesas: drop SoC names in Kconfig
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>, linux-renesas-soc@vger.kernel.org, 
-	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
-	Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [192.168.6.7]
+X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
+ SH-EX2013.helmholz.local (192.168.1.4)
+X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
 
-Hi Paolo,
+On Tue, 24 Oct 2023 12:09:15 +0200, Oleksij Rampel wrote:
 
-On Tue, Oct 24, 2023 at 12:54=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
-> On Sun, 2023-10-22 at 22:53 +0200, Wolfram Sang wrote:
-> > Mentioning SoCs in Kconfig descriptions tends to get stale (e.g. RAVB i=
-s
-> > missing RZV2M) or imprecise (e.g. SH_ETH is not available on all
-> > R8A779x). Drop them instead of providing vague information. Improve the
-> > file description a tad while here.
+> > As you suggested, it looks like KSZ9897 clocking mode depends on RMII interface
+> > mode (with strapping pins), but I don't see this for KSZ8863. The PHY/MAC mode
+> > is selected with Register 0x35 bit 7 and the clocking mode is selected via
+> > strapping pins EN_REFCLKO and SMTXD32 (and additional register 0xC6 bit 3).
+> > I guess its possible for the KSZ8863 to be the clock provider/consumer
+> > regardless of PHY/MAC mode?
 >
-> It's not a big deal, but assuming that keeping the SoC list up2date
-> requires too much effort, I would still keep it, with some additional
-> wording specifying it's partial and potentially inaccurate.
+>Register 0x35 bit 7 is for MII mode
+>Register 0xC6 bit 3 is for RMII mode
+>
+>MII != RMII
 
-Apparently it was too much effort...
+Yes, right you are. Looks like I got lost in the datasheets...
 
-> Such list could be an useful starting point for an integrator looking
-> for the correct driver for his/her SoC.
+> > Table 3-5: RMII CLOCK SETTING of KSZ8863 datasheet describes the available
+> > clocking modes. If we try to create a relation between KSZ9897 and KSZ8863:
+> >
+> > KSZ9897 "Normal Mode" is equivalent to KSZ8863 mode described in first column
+> > of table 3-5:
+> > - EN_REFCLKO = 0, 0xC6(3) = 0 -> external 50Mhz OSC input to REFCLKI and X1
+> >   pin directly
+> >
+> > KSZ9897 "Clock Mode" is equivalent to KSZ8863 mode described in fourth/fifth
+> > column (difference is only clock frequency) of table 3-5:
+> > - EN_REFCLKO = 1, 0xC6(3) = 1 -> 50/25Mhz on X1 pin, 50/25Mhz RMII clock goes
+> >   to REFCLKI internally. REFCLKI can be pulled down by resistor.
+> >
+> > That leaves us with additional columns 2 and 3 of table 3-5 for KSZ8863, that
+> > are similar to KSZ9897 Clock mode, but REFCLKI needs to be fed externally from
+> > REFCLKO.
+> 
+> All of 5 variants described in "Table 3-5: RMII CLOCK SETTING of KSZ8863"
+> can be boiled down to two main configurations:
+> 
+> REFCLKI is used as clock source for internal MAC == Normal Mode or
+> RevRMII mode.
+> REFCLKI is not used as clock source for internal MAC == Clock Mode or
+> RMII mode.
+> 
+> Variants 1, 2, 3 describe only how can we feed REFCLKI from outside of
+> the chip. Even variant 2 and 3 make the switch to be an actually
+> physical clock provider, we still need to use REFCLKI and wire it
+> outside of the chip which make it practically a Normal Mode or RevRMII mode.
 
-For modern DT-based systems, it's much easier to look up compatible
-values.
+That is correct, I guess its a matter of nomenclature, but how do you 
+"tell" the switch whether it has REFCLKI routed externally or not if not by 
+setting the 0xC6 bit 3? Is there another way to achieve this?
 
-See also scripts/dtc/dt_to_config.
+> > > I already did some work to configure CPU interface, where which can be at least
+> > > partially reused for your work:
+> > > https://lore.kernel.org/all/20230517121034.3801640-2-o.rempel@pengutronix.de/
+> > > (Looks I forgot to complete mainlining for this patch)
+> > >
+> > > If implanted as described, no new devicetree properties will be needed.
+> >
+> > I don't quite get how the proposed patch might effect this topic?
+> 
+> You will need to add ksz8_phylink_mac_link_up() as this patch already
+> dose.
+> 
+> > By setting PHY/MAC mode? As noted, I dont see the same relation between clock and
+> > MII mode for KSZ8863 as for KSZ9897?
+> 
+> I hope current mail will clear it.
 
-Gr{oetje,eeting}s,
+I tried your patch but it does not do it for me. As stated, my hw platform does
+not have REFCLKI routed externally so a state at column 4/5 is expected.
 
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
