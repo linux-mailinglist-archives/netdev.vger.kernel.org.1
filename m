@@ -1,142 +1,252 @@
-Return-Path: <netdev+bounces-43836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 831C37D4F38
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:50:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 166757D4F47
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:57:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 364D9281867
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 11:50:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97FB12818D2
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 11:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A967266AE;
-	Tue, 24 Oct 2023 11:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CE48266C4;
+	Tue, 24 Oct 2023 11:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="IQrY0IyI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U38GQfbR"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7A1224EA
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:50:25 +0000 (UTC)
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 042DF10C0
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 04:50:21 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-40839807e82so25430825e9.0
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 04:50:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698148219; x=1698753019; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i2XdxedmWSwH4vw/QHp+RZVDywlMbPNif4GB1QAW8hE=;
-        b=IQrY0IyImyLc6pGoBPpjx83YZgUEScTt/bUeURAsWkzl3C60838zMcarlim3WjXNq+
-         2X9bJGqnor4L4FUnkO7O5h08nfoV/qnV1jjHqkPdFZ/9uCtBHTqKIkIYtQZ9lHeauWOo
-         itHm34kWEQ/kL7/w2+lXWLGcaQyTljH1nMDRdjDbU9YcSgRfYQx/QP2O7HMbUJ3CAQ3M
-         SoJO236n8wZCD7eXhUaC3jU+o291X5gjiJPiQOiKPQai9UaKONNlaDzMj0LeolKGLF05
-         0qHdGTNgIbTNNf+dsTcX9+iEdoT2XVQ1DGeYRSVqIOTeSsHw+DZyxhj5iCTwp5G+CPOY
-         Mi9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698148219; x=1698753019;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i2XdxedmWSwH4vw/QHp+RZVDywlMbPNif4GB1QAW8hE=;
-        b=Ge+Ui5TLGi4YOui9JQR7k5gF372DTD0Wg7+wDX2JaGHAyCNbiaEC0OzfWYsLUK11wC
-         DYwH0tr88HEcPrjYV0v1JLwEZF9LlvwT2IsGZM1f/58mgfMWxct+w0aHyEIfzX/0oY4L
-         VL0B2xyWtRuuiizK+uMRWKsNgvhg0mR7/o56qtMBssu4KzEIeMf+OqZXXkdD24D3Wngl
-         41aM69qMef+oxWiPtcQCulbyb96gDwr3uXVMWmTXNGrOtzi3SaCUP5wepd+62vuxFyzQ
-         PCf7vXKQOexyn/OxyI0zwhk8S9aTjj4D9/7BfAGUiIEZMH9W1aJRQpTov2VcCW/OPqKk
-         BNHw==
-X-Gm-Message-State: AOJu0YyjbR7wCYO06xsr6gtSAqTs7VjTufpL29iLuBEqYiP1s6th5tRP
-	8LFxrDoIRmYFaZH5SmT2t5GTbg==
-X-Google-Smtp-Source: AGHT+IFYLVTxRjI85SHP8iUKKoWYZ69YKRQqPUSXVKzjW23w/XZMU4VToX0MAPWkBNL+z3sQ5mm9AQ==
-X-Received: by 2002:a05:600c:602a:b0:407:4126:f71c with SMTP id az42-20020a05600c602a00b004074126f71cmr14878834wmb.6.1698148219327;
-        Tue, 24 Oct 2023 04:50:19 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id c16-20020a05600c0ad000b003fee567235bsm16537251wmr.1.2023.10.24.04.50.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 04:50:18 -0700 (PDT)
-Date: Tue, 24 Oct 2023 13:50:16 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	piotr.raczynski@intel.com, wojciech.drewek@intel.com,
-	marcin.szycik@intel.com, jacob.e.keller@intel.com,
-	przemyslaw.kitszel@intel.com, jesse.brandeburg@intel.com
-Subject: Re: [PATCH iwl-next v1 00/15] one by one port representors creation
-Message-ID: <ZTeveEZ1W/zejDuM@nanopsycho>
-References: <20231024110929.19423-1-michal.swiatkowski@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6A211731;
+	Tue, 24 Oct 2023 11:57:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31B9CC433C7;
+	Tue, 24 Oct 2023 11:57:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698148647;
+	bh=P/62AzhAT4KUu+utmsfzDa4VRGeCzMsZgfgeMsb7fFQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=U38GQfbR3I5gJybWpH3LqCbdHqpdPDApaYa1y7mhdHfH2MA7aXAYD+2IlpfaC18ma
+	 ay52CdaP3lbY7qoerCPgb9NzBkZaYvVu6JOy6tttoVEA/9mwRg6ZlI0aiqvEeInWsf
+	 kOd9ellhuLwmoQl6mfxAOuMpu+8dt9wLEIdk/FScqAlOGcsHo8PqLqskRi6YiRSxlr
+	 NaPcuKp9WnIagQ1fYKvNijy78f+vYKm/NxP7lIuAqlZd/dVtwz/vPsm47pdz6uMMdW
+	 SXvqgXOgbwqZFCX4/1BYlXn7j2iOMuHpR9lEIalQ/nNPG4+BlxKqWdsLHMuJxaJ+IJ
+	 XV8pef6DwsLOQ==
+Message-ID: <59767fb8-8b9a-472a-884c-009cb00ed0b9@kernel.org>
+Date: Tue, 24 Oct 2023 13:57:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231024110929.19423-1-michal.swiatkowski@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 8/9] microchip: lan865x: add driver support
+ for Microchip's LAN865X MACPHY
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, corbet@lwn.net, steen.hegelund@microchip.com,
+ rdunlap@infradead.org, horms@kernel.org, casper.casan@gmail.com,
+ andrew@lunn.ch
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ horatiu.vultur@microchip.com, Woojung.Huh@microchip.com,
+ Nicolas.Ferre@microchip.com, UNGLinuxDriver@microchip.com,
+ Thorsten.Kummermehr@microchip.com
+References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
+ <20231023154649.45931-9-Parthiban.Veerasooran@microchip.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20231023154649.45931-9-Parthiban.Veerasooran@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Tue, Oct 24, 2023 at 01:09:14PM CEST, michal.swiatkowski@linux.intel.com wrote:
->Hi,
->
->Currently ice supports creating port representors only for VFs. For that
->use case they can be created and removed in one step.
->
->This patchset is refactoring current flow to support port representor
->creation also for subfunctions and SIOV. In this case port representors
->need to be createad and removed one by one. Also, they can be added and
->removed while other port representors are running.
->
->To achieve that we need to change the switchdev configuration flow.
->Three first patches are only cosmetic (renaming, removing not used code).
->Next few ones are preparation for new flow. The most important one
->is "add VF representor one by one". It fully implements new flow.
->
->New type of port representor (for subfunction) will be introduced in
->follow up patchset.
+On 23/10/2023 17:46, Parthiban Veerasooran wrote:
+> The LAN8650/1 is designed to conform to the OPEN Alliance 10BASE‑T1x
+> MAC‑PHY Serial Interface specification, Version 1.1. The IEEE Clause 4
+> MAC integration provides the low pin count standard SPI interface to any
+> microcontroller therefore providing Ethernet functionality without
+> requiring MAC integration within the microcontroller. The LAN8650/1
+> operates as an SPI client supporting SCLK clock rates up to a maximum of
+> 25 MHz. This SPI interface supports the transfer of both data (Ethernet
+> frames) and control (register access).
+> 
+> By default, the chunk data payload is 64 bytes in size. A smaller payload
+> data size of 32 bytes is also supported and may be configured in the
+> Chunk Payload Size (CPS) field of the Configuration 0 (OA_CONFIG0)
+> register. Changing the chunk payload size requires the LAN8650/1 be reset
+> and shall not be done during normal operation.
+> 
+> The Ethernet Media Access Controller (MAC) module implements a 10 Mbps
+> half duplex Ethernet MAC, compatible with the IEEE 802.3 standard.
+> 10BASE-T1S physical layer transceiver integrated into the LAN8650/1. The
+> PHY and MAC are connected via an internal Media Independent Interface
+> (MII).
+> 
+> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+> ---
+>  MAINTAINERS                              |   6 +
+>  drivers/net/ethernet/microchip/Kconfig   |  11 +
+>  drivers/net/ethernet/microchip/Makefile  |   2 +
+>  drivers/net/ethernet/microchip/lan865x.c | 415 +++++++++++++++++++++++
+>  4 files changed, 434 insertions(+)
+>  create mode 100644 drivers/net/ethernet/microchip/lan865x.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 9580be91f5e9..1b1bd3218a2d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -14001,6 +14001,12 @@ L:	netdev@vger.kernel.org
+>  S:	Maintained
+>  F:	drivers/net/ethernet/microchip/lan743x_*
+>  
+> +MICROCHIP LAN8650/1 10BASE-T1S MACPHY ETHERNET DRIVER
+> +M:	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+> +L:	netdev@vger.kernel.org
+> +S:	Maintained
+> +F:	drivers/net/ethernet/microchip/lan865x.c
+> +
+>  MICROCHIP LAN87xx/LAN937x T1 PHY DRIVER
+>  M:	Arun Ramadoss <arun.ramadoss@microchip.com>
+>  R:	UNGLinuxDriver@microchip.com
+> diff --git a/drivers/net/ethernet/microchip/Kconfig b/drivers/net/ethernet/microchip/Kconfig
+> index 329e374b9539..596caf59dea6 100644
+> --- a/drivers/net/ethernet/microchip/Kconfig
+> +++ b/drivers/net/ethernet/microchip/Kconfig
+> @@ -59,4 +59,15 @@ source "drivers/net/ethernet/microchip/lan966x/Kconfig"
+>  source "drivers/net/ethernet/microchip/sparx5/Kconfig"
+>  source "drivers/net/ethernet/microchip/vcap/Kconfig"
+>  
+> +config LAN865X
+> +	tristate "LAN865x support"
+> +	depends on SPI
+> +	depends on OA_TC6
+> +	help
+> +      	  Support for the Microchip LAN8650/1 Rev.B0 MACPHY Ethernet chip. It
+> +	  uses OPEN Alliance 10BASE-T1x Serial Interface specification.
+> +
+> +      	  To compile this driver as a module, choose M here. The module will be
+> +          called lan865x.
 
-Examples please. Show new outputs of devlink commands.
+That's odd indentation. Kconfig help goes with tab and two spaces.
 
-Thanks!
+> +
+>  endif # NET_VENDOR_MICROCHIP
+> diff --git a/drivers/net/ethernet/microchip/Makefile b/drivers/net/ethernet/microchip/Makefile
+> index bbd349264e6f..1fa4e15a067d 100644
+> --- a/drivers/net/ethernet/microchip/Makefile
+> +++ b/drivers/net/ethernet/microchip/Makefile
+> @@ -12,3 +12,5 @@ lan743x-objs := lan743x_main.o lan743x_ethtool.o lan743x_ptp.o
+>  obj-$(CONFIG_LAN966X_SWITCH) += lan966x/
+>  obj-$(CONFIG_SPARX5_SWITCH) += sparx5/
+>  obj-$(CONFIG_VCAP) += vcap/
+
+...
+
+> +static void lan865x_remove(struct spi_device *spi)
+> +{
+> +	struct lan865x_priv *priv = spi_get_drvdata(spi);
+> +
+> +	oa_tc6_exit(priv->tc6);
+> +	unregister_netdev(priv->netdev);
+> +	free_netdev(priv->netdev);
+> +}
+> +
+> +#ifdef CONFIG_OF
+
+Drop ifdef
+
+> +static const struct of_device_id lan865x_dt_ids[] = {
+> +	{ .compatible = "microchip,lan865x" },
+> +	{ /* Sentinel */ }
+> +};
+> +MODULE_DEVICE_TABLE(of, lan865x_dt_ids);
+> +#endif
+> +
+> +#ifdef CONFIG_ACPI
+> +static const struct acpi_device_id lan865x_acpi_ids[] = {
+> +	{ .id = "LAN865X",
+> +	},
+> +	{},
+> +};
+> +MODULE_DEVICE_TABLE(acpi, lan865x_acpi_ids);
+> +#endif
+> +
+> +static struct spi_driver lan865x_driver = {
+> +	.driver = {
+> +		.name = DRV_NAME,
+> +#ifdef CONFIG_OF
+
+Drop ifdef
+
+> +		.of_match_table = lan865x_dt_ids,
+> +#endif
+> +#ifdef CONFIG_ACPI
+
+Why do you need this ifdef?
+
+> +		   .acpi_match_table = ACPI_PTR(lan865x_acpi_ids),
+> +#endif
+> +	 },
+> +	.probe = lan865x_probe,
+> +	.remove = lan865x_remove,
+> +};
+> +module_spi_driver(lan865x_driver);
+> +
+> +MODULE_DESCRIPTION(DRV_NAME " 10Base-T1S MACPHY Ethernet Driver");
+> +MODULE_AUTHOR("Parthiban Veerasooran <parthiban.veerasooran@microchip.com>");
+> +MODULE_LICENSE("GPL");
+> +MODULE_ALIAS("spi:" DRV_NAME);
+
+You should not need MODULE_ALIAS() in normal cases. If you need it,
+usually it means your device ID table is wrong.
 
 
->
->Michal Swiatkowski (15):
->  ice: rename switchdev to eswitch
->  ice: remove redundant max_vsi_num variable
->  ice: remove unused control VSI parameter
->  ice: track q_id in representor
->  ice: use repr instead of vf->repr
->  ice: track port representors in xarray
->  ice: remove VF pointer reference in eswitch code
->  ice: make representor code generic
->  ice: return pointer to representor
->  ice: allow changing SWITCHDEV_CTRL VSI queues
->  ice: set Tx topology every time new repr is added
->  ice: realloc VSI stats arrays
->  ice: add VF representors one by one
->  ice: adjust switchdev rebuild path
->  ice: reserve number of CP queues
->
-> drivers/net/ethernet/intel/ice/ice.h          |  13 +-
-> drivers/net/ethernet/intel/ice/ice_devlink.c  |  29 +
-> drivers/net/ethernet/intel/ice/ice_devlink.h  |   1 +
-> drivers/net/ethernet/intel/ice/ice_eswitch.c  | 562 ++++++++++--------
-> drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +-
-> .../net/ethernet/intel/ice/ice_eswitch_br.c   |  22 +-
-> drivers/net/ethernet/intel/ice/ice_lib.c      |  81 ++-
-> drivers/net/ethernet/intel/ice/ice_main.c     |   6 +-
-> drivers/net/ethernet/intel/ice/ice_repr.c     | 195 +++---
-> drivers/net/ethernet/intel/ice/ice_repr.h     |   9 +-
-> drivers/net/ethernet/intel/ice/ice_sriov.c    |  20 +-
-> drivers/net/ethernet/intel/ice/ice_tc_lib.c   |   4 +-
-> drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   9 +-
-> drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   2 +-
-> 14 files changed, 553 insertions(+), 422 deletions(-)
->
->-- 
->2.41.0
->
->
+Best regards,
+Krzysztof
+
 
