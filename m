@@ -1,367 +1,183 @@
-Return-Path: <netdev+bounces-43965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E19FD7D59FB
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 19:55:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D940C7D5A10
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:03:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED18B1F22319
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 17:55:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A37DB20DE0
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA4839957;
-	Tue, 24 Oct 2023 17:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFDD02C858;
+	Tue, 24 Oct 2023 18:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="goE4SmmC"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CUSheZJk"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E6C2510F;
-	Tue, 24 Oct 2023 17:55:28 +0000 (UTC)
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B93990;
-	Tue, 24 Oct 2023 10:55:26 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5a8ee23f043so49278527b3.3;
-        Tue, 24 Oct 2023 10:55:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698170125; x=1698774925; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=29SwzqMfI5xje6oeP6NpaUnoP+IrAWpjP49txa0RKgQ=;
-        b=goE4SmmCQ0XHCDHOrPr4va0numk5tzhsekqWYI8gwU3/UJjsaV48SbctVQkobLVFDf
-         kAa9k8LXtLv0cUvB9y5cWzkvzDlYSyi4Wz6luqwDt0+tLbVI6NyOySN65Ien4wxedj9h
-         /J/8FMKTYo3lGxy/7mb8HPuHcHi+uC9UisL7UkdMmjgIfOVx1WUKtzint9c43tnznh01
-         2UJzFUOMQmh3S6tJvnsZZJakROW/YTZufqlQzJMrPEuHzLBzUvOEVi7CcB9xoI88drhD
-         Z9X+iYB9+mWW4C/6ZhWXd/W5FCH/ZYE1l0ytSLKaUlTicYTwKPXqCKOtkV5bu/eivg2m
-         vF/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698170125; x=1698774925;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=29SwzqMfI5xje6oeP6NpaUnoP+IrAWpjP49txa0RKgQ=;
-        b=erppLd9dsi87m6tU27tIGn3QdxhIPv8LcbpNZmarfTKsf8aGQYAeZ2tzduz9ih6wbi
-         IB5qO+kjSFYOcWniNW/P4x9YS4IBoQisabFri0eprU150qI5xkfA5UqwNTp8MI3Bt26L
-         WBhAJv6ftX82MgYHKNfXVifYCqNaTyowluG/7z0Yll1KscDGdRfh8cLZsJZrN229OeZG
-         yy226qmDRWgfTTZAS1R83Xb/ExVBiD/jA5mu4cExIhwx1mZsO5tMs+aa/hJmTuI8pQgo
-         n1S4TdDDCeemkySsqDHz3p/1Uhfc4ANsM5dPdOvhHFjY9jvXNtn832nSks03Ii0+e1MH
-         dlmA==
-X-Gm-Message-State: AOJu0Yw63CVbIGa2KvX3gc5gEP6t5yfOMiUfZiQbO3WmSj++oI5Ye4Qd
-	OgdPG+MI2ZW0rwwsuXqgeRU=
-X-Google-Smtp-Source: AGHT+IEAubiewUWnh8FDWfzZKF8dL9cgt588ceXnYHfwAz4wwx/uPblFHR6QuNK7FcJD3FTmecuSXA==
-X-Received: by 2002:a0d:d457:0:b0:583:307d:41bc with SMTP id w84-20020a0dd457000000b00583307d41bcmr13986631ywd.27.1698170124985;
-        Tue, 24 Oct 2023 10:55:24 -0700 (PDT)
-Received: from ?IPV6:2600:1700:6cf8:1240:11a9:306d:df17:629b? ([2600:1700:6cf8:1240:11a9:306d:df17:629b])
-        by smtp.gmail.com with ESMTPSA id x125-20020a817c83000000b005a82f14b8dbsm4269002ywc.49.2023.10.24.10.55.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 10:55:24 -0700 (PDT)
-Message-ID: <dd6ef06f-1d6c-4dfc-a7d8-58903c0fe1c8@gmail.com>
-Date: Tue, 24 Oct 2023 10:55:22 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35429440E
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 18:03:42 +0000 (UTC)
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F44CAC;
+	Tue, 24 Oct 2023 11:03:40 -0700 (PDT)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39OHcvqv002966;
+	Tue, 24 Oct 2023 18:03:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2023-03-30;
+ bh=1hh3WVX2Y8gePijr+Q42i+xhT654Z1/Sgq8TbsbTf14=;
+ b=CUSheZJkbvyt+Iw91vVEMashKybRq+rvDpluZBiymi5yohyL6PL3LhDl4qIlswC505TG
+ 8Mjk8CLaTPbSrbSL/Dw2d1U9HCOo2VoiiT9UgQza3LZ9+ObSBnmWUwRwOrYgUxMSjyZy
+ 8AkMMUClMY4Fzewc60RWjoVjjLYsDLSE9s2kmt5q1T8kiKpsXc/hJgDj4/1GDKaD5BmF
+ Kc6AU1wdRSAnbd8q0rCajEU+FVZdvT8CfAmwjbiZHfbbj7pimNwLe7sru9yNJG9cRaMr
+ AqxxtHty40WDh9PKcm8aOQaQZN0x2xjls4fMVZqHR0B+6NWGhrGGu48nkeTkCpTAfSAV GA== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tv68te3k6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 24 Oct 2023 18:03:29 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39OHrp77019038;
+	Tue, 24 Oct 2023 18:03:29 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3tv535uhc9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 24 Oct 2023 18:03:29 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39OI3Q1A006333;
+	Tue, 24 Oct 2023 18:03:26 GMT
+Received: from gkennedy-linux.us.oracle.com (gkennedy-linux.us.oracle.com [10.152.170.45])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3tv535uh5f-1;
+	Tue, 24 Oct 2023 18:03:26 +0000
+From: George Kennedy <george.kennedy@oracle.com>
+To: leon@kernel.org, jgg@ziepe.ca, sd@queasysnail.net,
+        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc: george.kennedy@oracle.com, tom.hromatka@oracle.com,
+        harshit.m.mogalapalli@oracle.com
+Subject: [PATCH v2] mlx5: fix init stage error handling to avoid double free of same QP and UAF
+Date: Tue, 24 Oct 2023 13:01:58 -0500
+Message-Id: <1698170518-4006-1-git-send-email-george.kennedy@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-24_17,2023-10-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 bulkscore=0
+ mlxscore=0 suspectscore=0 phishscore=0 adultscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2310170001
+ definitions=main-2310240155
+X-Proofpoint-ORIG-GUID: O5EZbzmadk4R3CvRnJPBDS0JqW-_ZmRl
+X-Proofpoint-GUID: O5EZbzmadk4R3CvRnJPBDS0JqW-_ZmRl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Kui-Feng Lee <sinquersw@gmail.com>
-Subject: Re: [PATCH v1 bpf-next 00/11] bpf: tcp: Add SYN Cookie
- generation/validation SOCK_OPS hooks.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com,
- jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, kuni1840@gmail.com,
- martin.lau@linux.dev, mykolal@fb.com, netdev@vger.kernel.org,
- pabeni@redhat.com, sdf@google.com, song@kernel.org, yonghong.song@linux.dev
-References: <9aebb3e9-70c5-428c-bc31-7b38a04e4848@gmail.com>
- <20231024012208.82653-1-kuniyu@amazon.com>
-Content-Language: en-US
-In-Reply-To: <20231024012208.82653-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
+In the unlikely event that workqueue allocation fails and returns
+NULL in mlx5_mkey_cache_init(), delete the call to
+mlx5r_umr_resource_cleanup() (which frees the QP) in
+mlx5_ib_stage_post_ib_reg_umr_init().  This will avoid attempted
+double free of the same QP when __mlx5_ib_add() does its cleanup.
 
+Syzkaller reported a UAF in ib_destroy_qp_user
 
-On 10/23/23 18:22, Kuniyuki Iwashima wrote:
->> On 10/23/23 14:35, Martin KaFai Lau wrote:
->>> On 10/20/23 11:48 PM, Kuniyuki Iwashima wrote:
->>>> I think this was doable.  With the diff below, I was able to skip
->>>> validation in cookie_v[46]_check() when if skb->sk is not NULL.
->>>>
->>>> The kfunc allocates req and set req->syncookie to 1, which is usually
->>>> set in TX path, so if it's 1 in RX (inet_steal_sock()), we can see
->>>> that req is allocated by kfunc (at least, req->syncookie &&
->>>> req->rsk_listener never be true in the current TCP stack).
->>>>
->>>> The difference here is that req allocated by kfunc holds refcnt of
->>>> rsk_listener (passing true to inet_reqsk_alloc()) to prevent freeing
->>>> the listener until req reaches cookie_v[46]_check().
->>>
->>> The cookie_v[46]_check() holds the listener sk refcnt now?
->>
->> The caller of cookie_v[46]_check() should hold a refcnt of the listener.
-> 
-> No, it need not.
-> 
-> When we handle the default syn cookie, cookie_tcp_reqsk_alloc() passes
-> false to inet_reqsk_alloc(), then reqsk does not hold refcnt of the
-> listener.
-> 
-> If inet_csk_reqsk_queue_add() in tcp_get_cookie_sock() succeeds, we know
-> the listener is still alive
+workqueue: Failed to create a rescuer kthread for wq "mkey_cache": -EINTR
+infiniband mlx5_0: mlx5_mkey_cache_init:981:(pid 1642):
+failed to create work queue
+infiniband mlx5_0: mlx5_ib_stage_post_ib_reg_umr_init:4075:(pid 1642):
+mr cache init failed -12
+==================================================================
+BUG: KASAN: slab-use-after-free in ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2073)
+Read of size 8 at addr ffff88810da310a8 by task repro_upstream/1642
 
-What I said is the callers of cookie_v[46]_check().
-For example, tcp_v4_rcv() will make sure the existence of the sk passing
-to tcp_v4_do_rcv() -> tcp_v4_cookie_check(). tcp_v4_rcv() gets the sk
-from __inet_lookup_skb().  The sk can be refcounted or not.
-For the case of not refcounted, it should be rcu protected
-(SOCK_RCU_FREE).
+Call Trace:
+<TASK>
+kasan_report (mm/kasan/report.c:590)
+ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2073)
+mlx5r_umr_resource_cleanup (drivers/infiniband/hw/mlx5/umr.c:198)
+__mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4178)
+mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
+...
+</TASK>
 
-AFAIK, tcp_v4_rcv() is called in a rcu_read_lock() section
-(far in ip_local_deliver_finish(), even netif_receive_skb_core()).
+Allocated by task 1642:
+__kmalloc (./include/linux/kasan.h:198 mm/slab_common.c:1026
+mm/slab_common.c:1039)
+create_qp (./include/linux/slab.h:603 ./include/linux/slab.h:720
+./include/rdma/ib_verbs.h:2795 drivers/infiniband/core/verbs.c:1209)
+ib_create_qp_kernel (drivers/infiniband/core/verbs.c:1347)
+mlx5r_umr_resource_init (drivers/infiniband/hw/mlx5/umr.c:164)
+mlx5_ib_stage_post_ib_reg_umr_init (drivers/infiniband/hw/mlx5/main.c:4070)
+__mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4168)
+mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
+...
 
-tcp_v4_rcv() and cookie_v4_check() also access the content of sk
-without increase the refcount of sk. That also indicate these function
-believe the sk returned by __inet_lookup_skb() is either refcounted
-or protected in someway (RCU here).
+Freed by task 1642:
+__kmem_cache_free (mm/slub.c:1826 mm/slub.c:3809 mm/slub.c:3822)
+ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2112)
+mlx5r_umr_resource_cleanup (drivers/infiniband/hw/mlx5/umr.c:198)
+mlx5_ib_stage_post_ib_reg_umr_init (drivers/infiniband/hw/mlx5/main.c:4076
+drivers/infiniband/hw/mlx5/main.c:4065)
+__mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4168)
+mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
+...
 
-What I mean protection is that the sk may be closed but not destroyed.
+The buggy address belongs to the object at ffff88810da31000
+which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 168 bytes inside of
+freed 2048-byte region [ffff88810da31000, ffff88810da31800)
 
+The buggy address belongs to the physical page:
+page:000000003b5e469d refcount:1 mapcount:0 mapping:0000000000000000
+index:0x0 pfn:0x10da30
+head:000000003b5e469d order:3 entire_mapcount:0 nr_pages_mapped:0
+pincount:0
+flags: 0x17ffffc0000840(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
+page_type: 0xffffffff()
+raw: 0017ffffc0000840 ffff888100042f00 ffffea0004180800 dead000000000002
+raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
 
-> 
-> 
->> If the listener is destroyed, the callers of cookie_v[46]_check() should
->> fail to lookup a sock for the skb. However, in this case, the kfunc sets
->> a sock to skb->sk, and the lookup function
->> (__inet_lookup_skb()) steals sock from skb. So, there is no guarantee
->> ensuring the listener is still alive.
->>
->> One solution is let the stealing function to lookup the listener if
->> inet_reqsk(skb->sk)->syncookie is true.
-> 
-> kfunc at least guarantees that the listener is not freed until req
-> is freed.  There's two cases where the listener could be close()d
-> after kfunc:
-> 
->    1. close()d before lookup
->       -> kfree_skb(skb) calls reqsk_put() and releases the last
->          refcnt of the listener
-> 
->    2. close()d between lookup and inet_csk_reqsk_queue_add()
->       -> inet_csk_reqsk_queue_add() fails and __reqsk_free()
->          releases the last refcnt of the listener.
-> 
-> So, we need not look up the listener again in inet_steal_sock().
+Memory state around the buggy address:
+ffff88810da30f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ffff88810da31000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88810da31080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+			      ^
+ffff88810da31100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ffff88810da31180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+Disabling lock debugging due to kernel taint
 
-After thinking about this again, increasing the refcount of the listener
-in the kfunc is not necessary. Since the caller of a
-bpf program should already hold a refcount of the sk or
-rcu protected, we can let inet_csk_reqsk_queue_add() handle it,
-just like what you mentioned earlier.
+Fixes: 04876c12c19e ("RDMA/mlx5: Move init and cleanup of UMR to umr.c")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Suggested-by: Leon Romanovsky <leon@kernel.org>
+Signed-off-by: George Kennedy <george.kennedy@oracle.com>
+---
+v2: went with fix suggested by: Leon Romanovsky <leon@kernel.org>
 
-WDYT?
+ drivers/infiniband/hw/mlx5/main.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-
-> 
-> 
->>>
->>>   >
->>>> The cookie generation at least should be done at tc/xdp.  The
->>>> valdation can be done earlier as well on tc/xdp, but it could
->>>> add another complexity, listener's life cycle if we allocate
->>>> req there.
->>>
->>> I think your code below looks pretty close already.
->>>
->>> It seems the only concern/complexity is the extra rsk_listener refcnt (btw the
->>> concern is on performance for the extra refcnt? or there is correctness issue?).
-> 
-> Yes, that's the only concern and I think it's all ok now.
-> 
-> [ I was seeing a weird refcnt warning, but I missed *refcounted was true
->    in inet_steal_sock() for reqsk and forgot to flipping it to false :S ]
-> 
-> 
->>>
->>> Asking because bpf_sk_assign() can already assign a listener to skb->sk and it
->>> also does not take a refcnt on the listener. The same no refcnt needed on
->>> req->rsk_listener should be doable also. sock_pfree may need to be smarter to
->>> check req->syncookie. What else may need to change?
-> 
-> I was wondering if we are in the same RCU period between tc and
-> cookie_v[46]_check(), but yeah, probably sock_pfree() can check
-> req->syncookie and set NULL to rsk_listener so that reqsk_put()
-> will not touch the listener.
-> 
-> 
->>>
->>>>
->>>> I'm wondering which place to add the validation capability, and
->>>> I think SOCK_OPS is simpler than tc.
->>>>
->>>>     #1 validate cookie and allocate req at tc, and skip validation
->>>>
->>>>     #2 validate cookie (and update bpf map at xdp/tc, and look up bpf
->>>>        map) and allocate req at SOCK_OPS hook
->>>>
->>>> Given SYN proxy is usually on the other node and incoming cookie
->>>> is almost always valid, we might need not validate it in the early
->>>> stage in the stack.
->>>>
->>>> What do you think ?
->>>
->>> Yeah, supporting validation in sock_ops is an open option if the tc side is too
->>> hard but I feel you are pretty close on the tc side.
-> 
-> Now I think I can go v2 with tc.
-> 
-> Thanks for your guide!
-> 
-> 
->>>
->>>>
->>>> ---8<---
->>>> diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
->>>> index 3ecfeadbfa06..e5e4627bf270 100644
->>>> --- a/include/net/inet_hashtables.h
->>>> +++ b/include/net/inet_hashtables.h
->>>> @@ -462,9 +462,19 @@ struct sock *inet_steal_sock(struct net *net, struct sk_buff *skb, int doff,
->>>>    	if (!sk)
->>>>    		return NULL;
->>>>    
->>>> -	if (!prefetched || !sk_fullsock(sk))
->>>> +	if (!prefetched)
->>>>    		return sk;
->>>>    
->>>> +	if (!sk_fullsock(sk)) {
->>>> +		if (sk->sk_state == TCP_NEW_SYN_RECV && inet_reqsk(sk)->syncookie) {
->>>> +			skb->sk = sk;
->>>> +			skb->destructor = sock_pfree;
->>>> +			sk = inet_reqsk(sk)->rsk_listener;
->>>> +		}
->>>> +
->>>> +		return sk;
->>>> +	}
->>>> +
->>>>    	if (sk->sk_protocol == IPPROTO_TCP) {
->>>>    		if (sk->sk_state != TCP_LISTEN)
->>>>    			return sk;
->>>> diff --git a/net/core/filter.c b/net/core/filter.c
->>>> index cc2e4babc85f..bca491ddf42c 100644
->>>> --- a/net/core/filter.c
->>>> +++ b/net/core/filter.c
->>>> @@ -11800,6 +11800,71 @@ __bpf_kfunc int bpf_sock_addr_set_sun_path(struct bpf_sock_addr_kern *sa_kern,
->>>>    
->>>>    	return 0;
->>>>    }
->>>> +
->>>> +__bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct sk_buff *skb, struct sock *sk,
->>>> +					struct tcp_options_received *tcp_opt,
->>>> +					int tcp_opt__sz, u16 mss)
->>>> +{
->>>> +	const struct tcp_request_sock_ops *af_ops;
->>>> +	const struct request_sock_ops *ops;
->>>> +	struct inet_request_sock *ireq;
->>>> +	struct tcp_request_sock *treq;
->>>> +	struct request_sock *req;
->>>> +
->>>> +	if (!sk)
->>>> +		return -EINVAL;
->>>> +
->>>> +	if (!skb_at_tc_ingress(skb))
->>>> +		return -EINVAL;
->>>> +
->>>> +	if (dev_net(skb->dev) != sock_net(sk))
->>>> +		return -ENETUNREACH;
->>>> +
->>>> +	switch (sk->sk_family) {
->>>> +	case AF_INET:  /* TODO: MPTCP */
->>>> +		ops = &tcp_request_sock_ops;
->>>> +		af_ops = &tcp_request_sock_ipv4_ops;
->>>> +		break;
->>>> +#if IS_ENABLED(CONFIG_IPV6)
->>>> +	case AF_INET6:
->>>> +		ops = &tcp6_request_sock_ops;
->>>> +		af_ops = &tcp_request_sock_ipv6_ops;
->>>> +		break;
->>>> +#endif
->>>> +	default:
->>>> +		return -EINVAL;
->>>> +	}
->>>> +
->>>> +	if (sk->sk_type != SOCK_STREAM || sk->sk_state != TCP_LISTEN)
->>>> +		return -EINVAL;
->>>> +
->>>> +	req = inet_reqsk_alloc(ops, sk, true);
->>>> +	if (!req)
->>>> +		return -ENOMEM;
->>>> +
->>>> +	ireq = inet_rsk(req);
->>>> +	treq = tcp_rsk(req);
->>>> +
->>>> +	refcount_set(&req->rsk_refcnt, 1);
->>>> +	req->syncookie = 1;
->>>> +	req->mss = mss;
->>>> +	req->ts_recent = tcp_opt->saw_tstamp ? tcp_opt->rcv_tsval : 0;
->>>> +
->>>> +	ireq->snd_wscale = tcp_opt->snd_wscale;
->>>> +	ireq->sack_ok = tcp_opt->sack_ok;
->>>> +	ireq->wscale_ok = tcp_opt->wscale_ok;
->>>> +	ireq->tstamp_ok	= tcp_opt->saw_tstamp;
->>>> +
->>>> +	tcp_rsk(req)->af_specific = af_ops;
->>>> +	tcp_rsk(req)->ts_off = tcp_opt->rcv_tsecr - tcp_ns_to_ts(tcp_clock_ns());
->>>> +
->>>> +	skb_orphan(skb);
->>>> +	skb->sk = req_to_sk(req);
->>>> +	skb->destructor = sock_pfree;
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>>    __diag_pop();
->>>>    
->>>>    int bpf_dynptr_from_skb_rdonly(struct sk_buff *skb, u64 flags,
->>>> @@ -11828,6 +11893,10 @@ BTF_SET8_START(bpf_kfunc_check_set_sock_addr)
->>>>    BTF_ID_FLAGS(func, bpf_sock_addr_set_sun_path)
->>>>    BTF_SET8_END(bpf_kfunc_check_set_sock_addr)
->>>>    
->>>> +BTF_SET8_START(bpf_kfunc_check_set_tcp_reqsk)
->>>> +BTF_ID_FLAGS(func, bpf_sk_assign_tcp_reqsk)
->>>> +BTF_SET8_END(bpf_kfunc_check_set_tcp_reqsk)
->>>> +
->>>>    static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
->>>>    	.owner = THIS_MODULE,
->>>>    	.set = &bpf_kfunc_check_set_skb,
->>>> @@ -11843,6 +11912,11 @@ static const struct btf_kfunc_id_set bpf_kfunc_set_sock_addr = {
->>>>    	.set = &bpf_kfunc_check_set_sock_addr,
->>>>    };
->>>>    
->>>> +static const struct btf_kfunc_id_set bpf_kfunc_set_tcp_reqsk = {
->>>> +	.owner = THIS_MODULE,
->>>> +	.set = &bpf_kfunc_check_set_tcp_reqsk,
->>>> +};
->>>> +
->>>>    static int __init bpf_kfunc_init(void)
->>>>    {
->>>>    	int ret;
->>>> @@ -11858,8 +11932,10 @@ static int __init bpf_kfunc_init(void)
->>>>    	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_LWT_SEG6LOCAL, &bpf_kfunc_set_skb);
->>>>    	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_NETFILTER, &bpf_kfunc_set_skb);
->>>>    	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_kfunc_set_xdp);
->>>> -	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
->>>> -						&bpf_kfunc_set_sock_addr);
->>>> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
->>>> +					       &bpf_kfunc_set_sock_addr);
->>>> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &bpf_kfunc_set_tcp_reqsk);
->>>> +	return ret;
->>>>    }
->>>>    late_initcall(bpf_kfunc_init);
->>>>    
->>>> ---8<---
+diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
+index 555629b7..5d963ab 100644
+--- a/drivers/infiniband/hw/mlx5/main.c
++++ b/drivers/infiniband/hw/mlx5/main.c
+@@ -4071,10 +4071,8 @@ static int mlx5_ib_stage_post_ib_reg_umr_init(struct mlx5_ib_dev *dev)
+ 		return ret;
+ 
+ 	ret = mlx5_mkey_cache_init(dev);
+-	if (ret) {
++	if (ret)
+ 		mlx5_ib_warn(dev, "mr cache init failed %d\n", ret);
+-		mlx5r_umr_resource_cleanup(dev);
+-	}
+ 	return ret;
+ }
+ 
+-- 
+1.8.3.1
 
 
