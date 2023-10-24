@@ -1,144 +1,817 @@
-Return-Path: <netdev+bounces-43973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF7FC7D5A6B
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:27:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B2457D5A73
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 20:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E3BB1F228D3
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:27:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E59D1C20B70
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:28:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7E63C683;
-	Tue, 24 Oct 2023 18:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F413C6B3;
+	Tue, 24 Oct 2023 18:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bvDZ6+N/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H2EKLnU+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17DF1CA9C
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 18:27:18 +0000 (UTC)
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60A3EA2
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:27:17 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1c9d7dc2b36so35076245ad.0
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:27:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7991CA9C;
+	Tue, 24 Oct 2023 18:28:52 +0000 (UTC)
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E254A2;
+	Tue, 24 Oct 2023 11:28:49 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2c50fbc218bso69056691fa.3;
+        Tue, 24 Oct 2023 11:28:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698172037; x=1698776837; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vpnVxDUoXZXPbsu71ld1wnr0DCJM9qoaA81AmF/Tg5o=;
-        b=bvDZ6+N/ljrcgyEk/UTLQT1zNn7UR2gvM3EpRXqgEHkEfAsFZ36xifA9OXiD/xZ+lJ
-         Zftf4Zo9vy+R6TEzb/2CnM+T++x/YJdTZmPMChebdXOWx5la/QIhnGDVr1bwup4OUcV+
-         qGFMiGb7c68XrHaYXQ6TT+oxWTSDwnCYZZqn6iSd9ibkgr5g+9Ihn6UOCq/XaMhLmBYG
-         C5UpKnxxv0YyHBbqcA33UaV2U1mCZZKH88kBK8lBM6UKtKzoi4LXgSf6ouikfxAPUIEO
-         ieY+xEW9ijvUoFgs9OuINHOQLp/bQZRX/0r/sz5IqF7sPDt0fWQD2qoYo1dkXgsRRxM9
-         RVRA==
+        d=gmail.com; s=20230601; t=1698172127; x=1698776927; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TTND06KKW954BVYcuOIRNTzHHZcvdqYsQeg2uMm3Vos=;
+        b=H2EKLnU+DSdRAUmZQgYm3pJaUsH8JRQtlEyFNFLk0u4XOoWCZsENUkqL0VAJ4YpKXr
+         ufpb74sOysHmaP0+9l6T/maYl1iaMbWaVpas61t16aocfmUtUodHufzYuaNVFBFqp60N
+         SC83y520uuOATGHma7BUJW4R1921sZhInkN8gFpccbxWVMoL62oEKrTiIZBimokgPIN8
+         ony3CUxCQpMJ8jvsClTLnIme2nz/HyXEz12vvsd8umw48RGg/q01cgTCVVEU9hehHiEY
+         Rb93UamGV1e/WSNK94389tzVTgK1uq6IWn4Y+f3eKl/j/cOt0P1Ia8Kv+NgpC0paIWsQ
+         DVDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698172037; x=1698776837;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vpnVxDUoXZXPbsu71ld1wnr0DCJM9qoaA81AmF/Tg5o=;
-        b=VSLNAEeadn67qWrglagg4z6vTZO4sjuiIwtHGmAUbO6Qs2jZhGdQOJcRXmClk78SgB
-         V6kDVBkFE8tqUXwSqmDrGKee9+drJGqKM590Nk5nThlyvlYIO6e6pGp7OyZYm3J2ZBlW
-         4+MVR/Iu4j5H7MbnvVbtxc4Ed16zqHAR+NBegvhPNW2JT+7ydJfCvdzBKZTcRB9Ps2TE
-         ut2XKyMRFeYoxrFTXF1b7LAd3or/HrY/vieaQ4kCyEC9pGv7wsEYWiZkl/atGRZglgBI
-         har2ESNimwHAKr9k3dD7ZKm3TmBVhHYCafFsFhRmzXiNwQuaBrBwaA04naFEiGBZdFPa
-         CTHw==
-X-Gm-Message-State: AOJu0YzQoyxldE/GjA0ju6h9AZgfDzPFajfSIzZTQEUtiZuKbiYoNK5Z
-	d8rCB+09sWjhqEBXVCs6eS9W9RY=
-X-Google-Smtp-Source: AGHT+IEvAsnhyN0I8736rcZmez3drzDpxGiuVDFRQiJIr8SsGNuTSfJh3rhjnni4eg0l30dbbR421OU=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:903:26c6:b0:1bb:a78c:7a3e with SMTP id
- jg6-20020a17090326c600b001bba78c7a3emr269854plb.3.1698172036775; Tue, 24 Oct
- 2023 11:27:16 -0700 (PDT)
-Date: Tue, 24 Oct 2023 11:27:15 -0700
-In-Reply-To: <ca1f0aaa-94c2-5e7d-1d00-a640bb3be44a@iogearbox.net>
+        d=1e100.net; s=20230601; t=1698172127; x=1698776927;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TTND06KKW954BVYcuOIRNTzHHZcvdqYsQeg2uMm3Vos=;
+        b=hNGG8AvW5XaZr7/uY956F/pL/062XHq1ufu+27ldV19EjdZkRziJ3B+Mab0+pcBQSP
+         0PxBp7bi2yDRKsEaEUXpfRYQx5d2XplI3x432I1mFqpbKcvnpqYJkwubnBjlc7GBqR4l
+         LwLIR41CiJpgLFJXqM9z9w5rGLgK2mkuneqOAqDQG8V6iRoLxrH4pSWKlN/J9drP6/Qr
+         WVFMWqzZhcWOJXAvoaLu2ju1iaJjUPsEZ8ebgN1f6bLrp35JZB8vsYs6gbCIdGQ+CCFz
+         QciQgSI//Yp4ToYv7X0xzgtUKiOyRx09wUTs4uKsBgI6HojanH2IqA/uXvQJI25iSOrV
+         FShA==
+X-Gm-Message-State: AOJu0YyfReCpbQsUx6gQ4sqTvi8FqhonBy8jjcCnA66AgDrpirXTle57
+	uSE/aPypbaTIlO/dkBA72CY=
+X-Google-Smtp-Source: AGHT+IHh68C3TTL3eYVJAvZtTdQmZqSspK4jRmLFo9cBMVR3rZl0ZzLxDWWNAmumNfhjzO36y8ir+g==
+X-Received: by 2002:a2e:b0c3:0:b0:2c5:1702:a434 with SMTP id g3-20020a2eb0c3000000b002c51702a434mr9408575ljl.52.1698172126774;
+        Tue, 24 Oct 2023 11:28:46 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id v21-20020a170906489500b009b928eb8dd3sm8569063ejq.163.2023.10.24.11.28.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Oct 2023 11:28:46 -0700 (PDT)
+Date: Tue, 24 Oct 2023 21:28:42 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>,
+	Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>,
+	Enrico Mioso <mrkiko.rs@gmail.com>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Russell King <linux@armlinux.org.uk>,
+	Chris Packham <chris.packham@alliedtelesis.co.nz>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v7 5/7] ARM64: dts: marvell: Fix some common
+ switch mistakes
+Message-ID: <20231024182842.flxrg3hjm3scnhjo@skbuf>
+References: <20231024-marvell-88e6152-wan-led-v7-0-2869347697d1@linaro.org>
+ <20231024-marvell-88e6152-wan-led-v7-5-2869347697d1@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231023171856.18324-1-daniel@iogearbox.net> <20231023171856.18324-2-daniel@iogearbox.net>
- <ZTfza8hC_79X10F8@google.com> <ca1f0aaa-94c2-5e7d-1d00-a640bb3be44a@iogearbox.net>
-Message-ID: <ZTgMg3HfFohvISSF@google.com>
-Subject: Re: [PATCH bpf-next v3 1/7] netkit, bpf: Add bpf programmable net device
-From: Stanislav Fomichev <sdf@google.com>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@linux.dev, 
-	razor@blackwall.org, ast@kernel.org, andrii@kernel.org, 
-	john.fastabend@gmail.com, toke@kernel.org, kuba@kernel.org, andrew@lunn.ch
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231024-marvell-88e6152-wan-led-v7-5-2869347697d1@linaro.org>
 
-On 10/24, Daniel Borkmann wrote:
-> On 10/24/23 6:40 PM, Stanislav Fomichev wrote:
-> > On 10/23, Daniel Borkmann wrote:
-> [...]
-> > The series looks great! FWIW:
-> > Acked-by: Stanislav Fomichev <sdf@google.com>
->=20
-> Thanks for review!
->=20
-> > One small question I have is:
-> > We now (and after introduction of tcx) seem to store non-refcounted
-> > dev pointers in the bpf_link(s). Is it guaranteed that the dev will
-> > outlive the link?
->=20
-> The semantics are the same as it was done in XDP, meaning, the link is in
-> detached state so link->dev is NULL when dev goes away, see also the
-> dev_xdp_uninstall(). We cannot hold a refcount on the dev as otherwise
-> if the link outlives it we get the infamous "unregister_netdev...waiting
-> for <dev>... refcnt =3D 1" bug.
+Linus,
 
-Yeah, I remember I've had a similar issue with holding netdev when
-adding dev-bound programs, so I was wondering what are we doing here.
-Thanks for the pointers!=20
+On Tue, Oct 24, 2023 at 03:20:31PM +0200, Linus Walleij wrote:
+> Fix some errors in the Marvell MV88E6xxx switch descriptions:
+> - The top node had no address size or cells.
+> - switch0@0 is not OK, should be ethernet-switch@0.
+> - ports should be ethernet-ports
+> - port@0 should be ethernet-port@0
+> - PHYs should be named ethernet-phy@
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  .../dts/marvell/armada-3720-espressobin-ultra.dts  |  14 +-
+>  .../boot/dts/marvell/armada-3720-espressobin.dtsi  |  20 +--
+>  .../boot/dts/marvell/armada-3720-gl-mv1000.dts     |  20 +--
+>  .../boot/dts/marvell/armada-3720-turris-mox.dts    | 189 +++++++++++----------
+>  .../boot/dts/marvell/armada-7040-mochabin.dts      |  24 ++-
+>  .../dts/marvell/armada-8040-clearfog-gt-8k.dts     |  22 +--
+>  arch/arm64/boot/dts/marvell/cn9130-crb.dtsi        |  42 +++--
+>  7 files changed, 164 insertions(+), 167 deletions(-)
+> 
+> diff --git a/arch/arm64/boot/dts/marvell/armada-3720-espressobin-ultra.dts b/arch/arm64/boot/dts/marvell/armada-3720-espressobin-ultra.dts
+> index f9abef8dcc94..870bb380a40a 100644
+> --- a/arch/arm64/boot/dts/marvell/armada-3720-espressobin-ultra.dts
+> +++ b/arch/arm64/boot/dts/marvell/armada-3720-espressobin-ultra.dts
+> @@ -126,32 +126,32 @@ &switch0 {
+>  
+>  	reset-gpios = <&gpiosb 23 GPIO_ACTIVE_LOW>;
+>  
+> -	ports {
+> -		switch0port1: port@1 {
+> +	ethernet-ports {
+> +		switch0port1: ethernet-port@1 {
+>  			reg = <1>;
+>  			label = "lan0";
+>  			phy-handle = <&switch0phy0>;
+>  		};
+>  
+> -		switch0port2: port@2 {
+> +		switch0port2: ethernet-port@2 {
+>  			reg = <2>;
+>  			label = "lan1";
+>  			phy-handle = <&switch0phy1>;
+>  		};
+>  
+> -		switch0port3: port@3 {
+> +		switch0port3: ethernet-port@3 {
+>  			reg = <3>;
+>  			label = "lan2";
+>  			phy-handle = <&switch0phy2>;
+>  		};
+>  
+> -		switch0port4: port@4 {
+> +		switch0port4: ethernet-port@4 {
+>  			reg = <4>;
+>  			label = "lan3";
+>  			phy-handle = <&switch0phy3>;
+>  		};
+>  
+> -		switch0port5: port@5 {
+> +		switch0port5: ethernet-port@5 {
+>  			reg = <5>;
+>  			label = "wan";
+>  			phy-handle = <&extphy>;
+> @@ -160,7 +160,7 @@ switch0port5: port@5 {
+>  	};
+>  
+>  	mdio {
+> -		switch0phy3: switch0phy3@14 {
+> +		switch0phy3: ethernet-phy@14 {
+>  			reg = <0x14>;
+>  		};
+>  	};
+> diff --git a/arch/arm64/boot/dts/marvell/armada-3720-espressobin.dtsi b/arch/arm64/boot/dts/marvell/armada-3720-espressobin.dtsi
+> index 5fc613d24151..86ec0df1c676 100644
+> --- a/arch/arm64/boot/dts/marvell/armada-3720-espressobin.dtsi
+> +++ b/arch/arm64/boot/dts/marvell/armada-3720-espressobin.dtsi
+> @@ -145,19 +145,17 @@ &usb2 {
+>  };
+>  
+>  &mdio {
+> -	switch0: switch0@1 {
+> +	switch0: ethernet-switch@1 {
+>  		compatible = "marvell,mv88e6085";
+> -		#address-cells = <1>;
+> -		#size-cells = <0>;
+>  		reg = <1>;
+>  
+>  		dsa,member = <0 0>;
+>  
+> -		ports {
+> +		ethernet-ports {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			switch0port0: port@0 {
+> +			switch0port0: ethernet-port@0 {
+>  				reg = <0>;
+>  				label = "cpu";
+>  				ethernet = <&eth0>;
+> @@ -168,19 +166,19 @@ fixed-link {
+>  				};
+>  			};
+>  
+> -			switch0port1: port@1 {
+> +			switch0port1: ethernet-port@1 {
+>  				reg = <1>;
+>  				label = "wan";
+>  				phy-handle = <&switch0phy0>;
+>  			};
+>  
+> -			switch0port2: port@2 {
+> +			switch0port2: ethernet-port@2 {
+>  				reg = <2>;
+>  				label = "lan0";
+>  				phy-handle = <&switch0phy1>;
+>  			};
+>  
+> -			switch0port3: port@3 {
+> +			switch0port3: ethernet-port@3 {
+>  				reg = <3>;
+>  				label = "lan1";
+>  				phy-handle = <&switch0phy2>;
+> @@ -192,13 +190,13 @@ mdio {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			switch0phy0: switch0phy0@11 {
+> +			switch0phy0: ethernet-phy@11 {
+>  				reg = <0x11>;
+>  			};
+> -			switch0phy1: switch0phy1@12 {
+> +			switch0phy1: ethernet-phy@12 {
+>  				reg = <0x12>;
+>  			};
+> -			switch0phy2: switch0phy2@13 {
+> +			switch0phy2: ethernet-phy@13 {
+>  				reg = <0x13>;
+>  			};
+>  		};
 
-And here, I guess the assumption that the device shutdown goes via
-dellink (netkit_del_link) and there is no special path that reaches
-unregister_netdevice_many_notify otherwise, right?
+I looked at U-Boot's ft_board_setup() from board/Marvell/mvebu_armada-37xx/board.c
+and it doesn't appear to do anything with the switch. But after the MOX precedent
+(which is _still_ problematic, more below), I still think we are way too
+trigger-happy with this, and it would be good to ask someone who has the
+Espressobin to test.
 
-What about that ndo_uninit btw? Would it be more safe/clear to make
-netkit_release_all be ndo_uninit? Looks like it's being triggered
-in a place similar to dev_xdp_uninstall/dev_tcx_uninstall.
+Pali, you are the last committer on the Linux DTS, could you please boot-test
+this change, or at least confirm that as far as you know, there are no bootloader
+dependencies on the precise node name for the switch and its child nodes?
 
-> > > +	ret =3D netkit_link_prog_attach(&nkl->link,
-> > > +				      attr->link_create.flags,
-> > > +				      attr->link_create.netkit.relative_fd,
-> > > +				      attr->link_create.netkit.expected_revision);
-> > > +	if (ret) {
-> > > +		nkl->dev =3D NULL;
-> > > +		bpf_link_cleanup(&link_primer);
-> > > +		goto out;
-> >=20
-> > What happens to nkl here? Do we leak it?
->=20
-> No, this is done similarly as in XDP and tcx, that is, bpf_link_cleanup()=
- will
-> trigger eventual release of nlk here :
->=20
-> /* Clean up bpf_link and corresponding anon_inode file and FD. After
->  * anon_inode is created, bpf_link can't be just kfree()'d due to deferre=
-d
->  * anon_inode's release() call. This helper marks bpf_link as
->  * defunct, releases anon_inode file and puts reserved FD. bpf_prog's ref=
-cnt
->  * is not decremented, it's the responsibility of a calling code that fai=
-led
->  * to complete bpf_link initialization.
->  * This helper eventually calls link's dealloc callback, but does not cal=
-l
->  * link's release callback.
->  */
->=20
-> Thanks,
-> Daniel
+> diff --git a/arch/arm64/boot/dts/marvell/armada-3720-gl-mv1000.dts b/arch/arm64/boot/dts/marvell/armada-3720-gl-mv1000.dts
+> index b1b45b4fa9d4..63fbc8352161 100644
+> --- a/arch/arm64/boot/dts/marvell/armada-3720-gl-mv1000.dts
+> +++ b/arch/arm64/boot/dts/marvell/armada-3720-gl-mv1000.dts
+> @@ -152,31 +152,29 @@ &uart0 {
+>  };
+>  
+>  &mdio {
+> -	switch0: switch0@1 {
+> +	switch0: ethernet-switch@1 {
+>  		compatible = "marvell,mv88e6085";
+> -		#address-cells = <1>;
+> -		#size-cells = <0>;
+>  		reg = <1>;
+>  
+>  		dsa,member = <0 0>;
+>  
+> -		ports: ports {
+> +		ports: ethernet-ports {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			port@0 {
+> +			ethernet-port@0 {
+>  				reg = <0>;
+>  				label = "cpu";
+>  				ethernet = <&eth0>;
+>  			};
+>  
+> -			port@1 {
+> +			ethernet-port@1 {
+>  				reg = <1>;
+>  				label = "wan";
+>  				phy-handle = <&switch0phy0>;
+>  			};
+>  
+> -			port@2 {
+> +			ethernet-port@2 {
+>  				reg = <2>;
+>  				label = "lan0";
+>  				phy-handle = <&switch0phy1>;
+> @@ -185,7 +183,7 @@ port@2 {
+>  				nvmem-cell-names = "mac-address";
+>  			};
+>  
+> -			port@3 {
+> +			ethernet-port@3 {
+>  				reg = <3>;
+>  				label = "lan1";
+>  				phy-handle = <&switch0phy2>;
+> @@ -199,13 +197,13 @@ mdio {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			switch0phy0: switch0phy0@11 {
+> +			switch0phy0: ethernet-phy@11 {
+>  				reg = <0x11>;
+>  			};
+> -			switch0phy1: switch0phy1@12 {
+> +			switch0phy1: ethernet-phy@12 {
+>  				reg = <0x12>;
+>  			};
+> -			switch0phy2: switch0phy2@13 {
+> +			switch0phy2: ethernet-phy@13 {
+>  				reg = <0x13>;
+>  			};
+>  		};
 
-=F0=9F=91=8D
+Enrico, I see the GL-MV1000 device tree submission is relatively new.
+Could you please ACK this change as well?
+
+> diff --git a/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts b/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
+> index 9eab2bb22134..cdf1b8bdb230 100644
+> --- a/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
+> +++ b/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
+> @@ -304,7 +304,12 @@ phy1: ethernet-phy@1 {
+>  		reg = <1>;
+>  	};
+>  
+> -	/* switch nodes are enabled by U-Boot if modules are present */
+> +	/*
+> +	 * NOTE: switch nodes are enabled by U-Boot if modules are present
+> +	 * DO NOT change this node name (switch0@10) even if it is not following
+> +	 * conventions! Deployed U-Boot binaries are explicitly looking for
+> +	 * this node in order to augment the device tree!
+> +	 */
+
+Not "this node", but all switch nodes!
+
+>  	switch0@10 {
+>  		compatible = "marvell,mv88e6190";
+>  		reg = <0x10>;
+> @@ -317,92 +322,92 @@ mdio {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			switch0phy1: switch0phy1@1 {
+> +			switch0phy1: ethernet-phy@1 {
+>  				reg = <0x1>;
+>  			};
+>  
+> -			switch0phy2: switch0phy2@2 {
+> +			switch0phy2: ethernet-phy@2 {
+>  				reg = <0x2>;
+>  			};
+>  
+> -			switch0phy3: switch0phy3@3 {
+> +			switch0phy3: ethernet-phy@3 {
+>  				reg = <0x3>;
+>  			};
+>  
+> -			switch0phy4: switch0phy4@4 {
+> +			switch0phy4: ethernet-phy@4 {
+>  				reg = <0x4>;
+>  			};
+>  
+> -			switch0phy5: switch0phy5@5 {
+> +			switch0phy5: ethernet-phy@5 {
+>  				reg = <0x5>;
+>  			};
+>  
+> -			switch0phy6: switch0phy6@6 {
+> +			switch0phy6: ethernet-phy@6 {
+>  				reg = <0x6>;
+>  			};
+>  
+> -			switch0phy7: switch0phy7@7 {
+> +			switch0phy7: ethernet-phy@7 {
+>  				reg = <0x7>;
+>  			};
+>  
+> -			switch0phy8: switch0phy8@8 {
+> +			switch0phy8: ethernet-phy@8 {
+>  				reg = <0x8>;
+>  			};
+>  		};
+>  
+> -		ports {
+> +		ethernet-ports {
+
+U-Boot code does this, so you can't rename "ports":
+
+	/*
+	 * now if there are more switches or a SFP module coming after,
+	 * enable corresponding ports
+	 */
+	if (id < peridot + topaz - 1) {
+		res = fdt_status_okay_by_pathf(blob,
+					       "%s/switch%i@%x/ports/port@a",
+					       mdio_path, id, addr);
+	} else if (id == peridot - 1 && !topaz && sfp) {
+		res = fdt_status_okay_by_pathf(blob,
+					       "%s/switch%i@%x/ports/port-sfp@a",
+					       mdio_path, id, addr);
+	} else {
+		res = 0;
+	}
+
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			port@1 {
+> +			ethernet-port@1 {
+
+or "port@.*", or "port-sfp@a", for the same reason. Here and everywhere
+in this device tree. Basically only the ethernet-phy rename seems safe.
+
+>  				reg = <0x1>;
+>  				label = "lan1";
+>  				phy-handle = <&switch0phy1>;
+>  			};
+>  
+> -			port@2 {
+> +			ethernet-port@2 {
+>  				reg = <0x2>;
+>  				label = "lan2";
+>  				phy-handle = <&switch0phy2>;
+>  			};
+>  
+> -			port@3 {
+> +			ethernet-port@3 {
+>  				reg = <0x3>;
+>  				label = "lan3";
+>  				phy-handle = <&switch0phy3>;
+>  			};
+>  
+> -			port@4 {
+> +			ethernet-port@4 {
+>  				reg = <0x4>;
+>  				label = "lan4";
+>  				phy-handle = <&switch0phy4>;
+>  			};
+>  
+> -			port@5 {
+> +			ethernet-port@5 {
+>  				reg = <0x5>;
+>  				label = "lan5";
+>  				phy-handle = <&switch0phy5>;
+>  			};
+>  
+> -			port@6 {
+> +			ethernet-port@6 {
+>  				reg = <0x6>;
+>  				label = "lan6";
+>  				phy-handle = <&switch0phy6>;
+>  			};
+>  
+> -			port@7 {
+> +			ethernet-port@7 {
+>  				reg = <0x7>;
+>  				label = "lan7";
+>  				phy-handle = <&switch0phy7>;
+>  			};
+>  
+> -			port@8 {
+> +			ethernet-port@8 {
+>  				reg = <0x8>;
+>  				label = "lan8";
+>  				phy-handle = <&switch0phy8>;
+>  			};
+>  
+> -			port@9 {
+> +			ethernet-port@9 {
+>  				reg = <0x9>;
+>  				label = "cpu";
+>  				ethernet = <&eth1>;
+> @@ -410,7 +415,7 @@ port@9 {
+>  				managed = "in-band-status";
+>  			};
+>  
+> -			switch0port10: port@a {
+> +			switch0port10: ethernet-port@a {
+>  				reg = <0xa>;
+>  				label = "dsa";
+>  				phy-mode = "2500base-x";
+> @@ -430,7 +435,7 @@ port-sfp@a {
+>  		};
+>  	};
+>  
+> -	switch0@2 {
+> +	ethernet-switch@2 {
+
+It's funny that you add a comment TO NOT rename switch nodes, then you
+proceed to do just that.
+
+Having that said, we need to suppress these warnings for the Marvell
+schema only:
+
+arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dtb: switch0@10: $nodename:0: 'switch0@10' does not match '^(ethernet-)?switch(@.*)?$'
+        from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dtb: ethernet-switch@12: ethernet-ports: 'port-sfp@a' does not match any of the regexes: '^(ethernet-)?port@[0-9]+$', 'pinctrl-[0-9]+'
+        from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+
+because someone _will_ fix them and break the boot in the process.
+
+Rob, Krzysztof, Conor, do you have any suggestion on how to achieve that?
+
+>  		compatible = "marvell,mv88e6085";
+>  		reg = <0x2>;
+>  		dsa,member = <0 0>;
+> diff --git a/arch/arm64/boot/dts/marvell/armada-7040-mochabin.dts b/arch/arm64/boot/dts/marvell/armada-7040-mochabin.dts
+> index 48202810bf78..40b7ee7ead72 100644
+> --- a/arch/arm64/boot/dts/marvell/armada-7040-mochabin.dts
+> +++ b/arch/arm64/boot/dts/marvell/armada-7040-mochabin.dts
+> @@ -301,10 +301,8 @@ eth2phy: ethernet-phy@1 {
+>  	};
+>  
+>  	/* 88E6141 Topaz switch */
+> -	switch: switch@3 {
+> +	switch: ethernet-switch@3 {
+>  		compatible = "marvell,mv88e6085";
+> -		#address-cells = <1>;
+> -		#size-cells = <0>;
+>  		reg = <3>;
+>  
+>  		pinctrl-names = "default";
+> @@ -314,35 +312,35 @@ switch: switch@3 {
+>  		interrupt-parent = <&cp0_gpio1>;
+>  		interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
+>  
+> -		ports {
+> +		ethernet-ports {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			swport1: port@1 {
+> +			swport1: ethernet-port@1 {
+>  				reg = <1>;
+>  				label = "lan0";
+>  				phy-handle = <&swphy1>;
+>  			};
+>  
+> -			swport2: port@2 {
+> +			swport2: ethernet-port@2 {
+>  				reg = <2>;
+>  				label = "lan1";
+>  				phy-handle = <&swphy2>;
+>  			};
+>  
+> -			swport3: port@3 {
+> +			swport3: ethernet-port@3 {
+>  				reg = <3>;
+>  				label = "lan2";
+>  				phy-handle = <&swphy3>;
+>  			};
+>  
+> -			swport4: port@4 {
+> +			swport4: ethernet-port@4 {
+>  				reg = <4>;
+>  				label = "lan3";
+>  				phy-handle = <&swphy4>;
+>  			};
+>  
+> -			port@5 {
+> +			ethernet-port@5 {
+>  				reg = <5>;
+>  				label = "cpu";
+>  				ethernet = <&cp0_eth1>;
+> @@ -355,19 +353,19 @@ mdio {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			swphy1: swphy1@17 {
+> +			swphy1: ethernet-phy@17 {
+>  				reg = <17>;
+>  			};
+>  
+> -			swphy2: swphy2@18 {
+> +			swphy2: ethernet-phy@18 {
+>  				reg = <18>;
+>  			};
+>  
+> -			swphy3: swphy3@19 {
+> +			swphy3: ethernet-phy@19 {
+>  				reg = <19>;
+>  			};
+>  
+> -			swphy4: swphy4@20 {
+> +			swphy4: ethernet-phy@20 {
+>  				reg = <20>;
+>  			};
+>  		};
+
+Robert, would you mind ACKing the MOCHAbin change?
+
+> diff --git a/arch/arm64/boot/dts/marvell/armada-8040-clearfog-gt-8k.dts b/arch/arm64/boot/dts/marvell/armada-8040-clearfog-gt-8k.dts
+> index 4125202028c8..67892f0d2863 100644
+> --- a/arch/arm64/boot/dts/marvell/armada-8040-clearfog-gt-8k.dts
+> +++ b/arch/arm64/boot/dts/marvell/armada-8040-clearfog-gt-8k.dts
+> @@ -497,42 +497,42 @@ ge_phy: ethernet-phy@0 {
+>  		reset-deassert-us = <10000>;
+>  	};
+>  
+> -	switch0: switch0@4 {
+> +	switch0: ethernet-switch@4 {
+>  		compatible = "marvell,mv88e6085";
+>  		reg = <4>;
+>  		pinctrl-names = "default";
+>  		pinctrl-0 = <&cp1_switch_reset_pins>;
+>  		reset-gpios = <&cp1_gpio1 24 GPIO_ACTIVE_LOW>;
+>  
+> -		ports {
+> +		ethernet-ports {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			port@1 {
+> +			ethernet-port@1 {
+>  				reg = <1>;
+>  				label = "lan2";
+>  				phy-handle = <&switch0phy0>;
+>  			};
+>  
+> -			port@2 {
+> +			ethernet-port@2 {
+>  				reg = <2>;
+>  				label = "lan1";
+>  				phy-handle = <&switch0phy1>;
+>  			};
+>  
+> -			port@3 {
+> +			ethernet-port@3 {
+>  				reg = <3>;
+>  				label = "lan4";
+>  				phy-handle = <&switch0phy2>;
+>  			};
+>  
+> -			port@4 {
+> +			ethernet-port@4 {
+>  				reg = <4>;
+>  				label = "lan3";
+>  				phy-handle = <&switch0phy3>;
+>  			};
+>  
+> -			port@5 {
+> +			ethernet-port@5 {
+>  				reg = <5>;
+>  				label = "cpu";
+>  				ethernet = <&cp1_eth2>;
+> @@ -545,19 +545,19 @@ mdio {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			switch0phy0: switch0phy0@11 {
+> +			switch0phy0: ethernet-phy@11 {
+>  				reg = <0x11>;
+>  			};
+>  
+> -			switch0phy1: switch0phy1@12 {
+> +			switch0phy1: ethernet-phy@12 {
+>  				reg = <0x12>;
+>  			};
+>  
+> -			switch0phy2: switch0phy2@13 {
+> +			switch0phy2: ethernet-phy@13 {
+>  				reg = <0x13>;
+>  			};
+>  
+> -			switch0phy3: switch0phy3@14 {
+> +			switch0phy3: ethernet-phy@14 {
+>  				reg = <0x14>;
+>  			};
+>  		};
+
+Russell, could you please do the same for this device tree?
+
+> diff --git a/arch/arm64/boot/dts/marvell/cn9130-crb.dtsi b/arch/arm64/boot/dts/marvell/cn9130-crb.dtsi
+> index 32cfb3e2efc3..7538ed56053b 100644
+> --- a/arch/arm64/boot/dts/marvell/cn9130-crb.dtsi
+> +++ b/arch/arm64/boot/dts/marvell/cn9130-crb.dtsi
+> @@ -207,11 +207,9 @@ phy0: ethernet-phy@0 {
+>  		reg = <0>;
+>  	};
+>  
+> -	switch6: switch0@6 {
+> +	switch6: ethernet-switch@6 {
+>  		/* Actual device is MV88E6393X */
+>  		compatible = "marvell,mv88e6190";
+> -		#address-cells = <1>;
+> -		#size-cells = <0>;
+>  		reg = <6>;
+>  		interrupt-parent = <&cp0_gpio1>;
+>  		interrupts = <28 IRQ_TYPE_LEVEL_LOW>;
+> @@ -220,59 +218,59 @@ switch6: switch0@6 {
+>  
+>  		dsa,member = <0 0>;
+>  
+> -		ports {
+> +		ethernet-ports {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			port@1 {
+> +			ethernet-port@1 {
+>  				reg = <1>;
+>  				label = "p1";
+>  				phy-handle = <&switch0phy1>;
+>  			};
+>  
+> -			port@2 {
+> +			ethernet-port@2 {
+>  				reg = <2>;
+>  				label = "p2";
+>  				phy-handle = <&switch0phy2>;
+>  			};
+>  
+> -			port@3 {
+> +			ethernet-port@3 {
+>  				reg = <3>;
+>  				label = "p3";
+>  				phy-handle = <&switch0phy3>;
+>  			};
+>  
+> -			port@4 {
+> +			ethernet-port@4 {
+>  				reg = <4>;
+>  				label = "p4";
+>  				phy-handle = <&switch0phy4>;
+>  			};
+>  
+> -			port@5 {
+> +			ethernet-port@5 {
+>  				reg = <5>;
+>  				label = "p5";
+>  				phy-handle = <&switch0phy5>;
+>  			};
+>  
+> -			port@6 {
+> +			ethernet-port@6 {
+>  				reg = <6>;
+>  				label = "p6";
+>  				phy-handle = <&switch0phy6>;
+>  			};
+>  
+> -			port@7 {
+> +			ethernet-port@7 {
+>  				reg = <7>;
+>  				label = "p7";
+>  				phy-handle = <&switch0phy7>;
+>  			};
+>  
+> -			port@8 {
+> +			ethernet-port@8 {
+>  				reg = <8>;
+>  				label = "p8";
+>  				phy-handle = <&switch0phy8>;
+>  			};
+>  
+> -			port@9 {
+> +			ethernet-port@9 {
+>  				reg = <9>;
+>  				label = "p9";
+>  				phy-mode = "10gbase-r";
+> @@ -280,7 +278,7 @@ port@9 {
+>  				managed = "in-band-status";
+>  			};
+>  
+> -			port@a {
+> +			ethernet-port@a {
+>  				reg = <10>;
+>  				ethernet = <&cp0_eth0>;
+>  				phy-mode = "10gbase-r";
+> @@ -293,35 +291,35 @@ mdio {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+>  
+> -			switch0phy1: switch0phy1@1 {
+> +			switch0phy1: ethernet-phy@1 {
+>  				reg = <0x1>;
+>  			};
+>  
+> -			switch0phy2: switch0phy2@2 {
+> +			switch0phy2: ethernet-phy@2 {
+>  				reg = <0x2>;
+>  			};
+>  
+> -			switch0phy3: switch0phy3@3 {
+> +			switch0phy3: ethernet-phy@3 {
+>  				reg = <0x3>;
+>  			};
+>  
+> -			switch0phy4: switch0phy4@4 {
+> +			switch0phy4: ethernet-phy@4 {
+>  				reg = <0x4>;
+>  			};
+>  
+> -			switch0phy5: switch0phy5@5 {
+> +			switch0phy5: ethernet-phy@5 {
+>  				reg = <0x5>;
+>  			};
+>  
+> -			switch0phy6: switch0phy6@6 {
+> +			switch0phy6: ethernet-phy@6 {
+>  				reg = <0x6>;
+>  			};
+>  
+> -			switch0phy7: switch0phy7@7 {
+> +			switch0phy7: ethernet-phy@7 {
+>  				reg = <0x7>;
+>  			};
+>  
+> -			switch0phy8: switch0phy8@8 {
+> +			switch0phy8: ethernet-phy@8 {
+>  				reg = <0x8>;
+>  			};
+>  		};
+
+Chris, does this look okay?
 
