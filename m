@@ -1,176 +1,291 @@
-Return-Path: <netdev+bounces-43954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF407D5927
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:50:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC8767D592D
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:51:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 913AB281B0A
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:50:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F6C6281BA1
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373D930FAB;
-	Tue, 24 Oct 2023 16:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A21339AA;
+	Tue, 24 Oct 2023 16:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="rmFYz1iO"
+	dkim=pass (1024-bit key) header.d=lafranque.net header.i=@lafranque.net header.b="PQpsd5vz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDEE219ED
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 16:50:11 +0000 (UTC)
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9894F12B
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 09:50:06 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-694ed847889so3956614b3a.2
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 09:50:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1698166206; x=1698771006; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1oKCz+gES9ENr36vU8F+2Ihm5m3MOjMu8e8TQOShMnQ=;
-        b=rmFYz1iOGAB4dv5Wdjp/Ij5HGNJcnv0fKIlttOPxn8MDROG80QX2WCuEa0RDuGo+NR
-         OTEofCa9iklGSQsgo6/qY4Il/rCOD118b//UV/J6iF9EPZ3wO0zVJHYqbHHUFvf+dSkj
-         Gfst5MkKjklIufobJVZhwSFrCznMfg/fG/CPOW1Ta0gEzbo7GLkb+uwceyGc2s04Pk68
-         jF7CLk0mQZBVAjP54H1dEyczYaG0GJOOnQ0uyoiGqEuIJwDRHXHRhPqLazIlc3jEAY27
-         aSaBAkn+NPJrKjnmwXPvdynRDcXNY4KY0IhXBkBhVqpblcGr8BPh1ZnZB5Yz+I1BM1eh
-         WgPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698166206; x=1698771006;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1oKCz+gES9ENr36vU8F+2Ihm5m3MOjMu8e8TQOShMnQ=;
-        b=lMoNUqI45tg77ZA8e9p8iErS68lVJkwOQA3UHy9pSuExqBNilmCt7uzIvexhAzfKuq
-         3ezISLKqUWiJfsZSvjaeQEwIIiWPiJttB2LMb39Rdgac5D9MFtIIus9PtVzUrpO3P0Oj
-         kf0e2BFes13b3KJbaf2Egru7s59ko3IGViKAxQBKZtvk8+Y1E2sEwZEzA5jbw1Fx1E0L
-         FyoNb3U+CtdviLTZyByrbBZYYOLtgeqhbzjuQJjmWTNj52bP86XBNhMF+AoZlrMD8Vil
-         qoTZhFzzGwMxRcEVJp+YD3JWfs9RN4myGhDjzhmveZgd/c7b07cFKBpCIVd4FuWDZsRV
-         c3lA==
-X-Gm-Message-State: AOJu0YwZf9xVbFB6TS32gpEsDExDuOFoCQo9GxXu9zYzbJbKrvmvlaJx
-	JGcpjJ/rjh2ZrWYOtpg3rnAVUzxVu6sSMsPgdH4cgQ==
-X-Google-Smtp-Source: AGHT+IGTEcjpi9RLGNBmpXQi1mcg5Alhj/JTK3OmS7gVU+H7MUVTLkga3R8mMsWOHtUoQkl/lusRI2tW9kh0vFamIrI=
-X-Received: by 2002:a05:6a00:248b:b0:68f:cc0e:355d with SMTP id
- c11-20020a056a00248b00b0068fcc0e355dmr11561988pfv.25.1698166206034; Tue, 24
- Oct 2023 09:50:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B6F241E1
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 16:51:16 +0000 (UTC)
+Received: from mail.lac-coloc.fr (unknown [45.90.160.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89915133
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 09:51:12 -0700 (PDT)
+Authentication-Results: mail.lac-coloc.fr;
+	auth=pass (plain)
+From: Alce Lafranque <alce@lafranque.net>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	netdev@vger.kernel.org
+Cc: Alce Lafranque <alce@lafranque.net>,
+	Vincent Bernat <vincent@bernat.ch>
+Subject: [PATCH net-next v7] vxlan: add support for flowlabel inherit
+Date: Tue, 24 Oct 2023 11:50:28 -0500
+Message-Id: <20231024165028.251294-1-alce@lafranque.net>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231023155013.512999-1-romain.gantois@bootlin.com>
- <20231023155013.512999-5-romain.gantois@bootlin.com> <df71bbe5-fec0-45cc-adb4-acfbcc356ba3@lunn.ch>
- <9d447cb5-c8f9-06d2-0909-2870d57f0f7a@bootlin.com> <4bde9110-c88d-4a22-8e67-e788db4673f3@lunn.ch>
-In-Reply-To: <4bde9110-c88d-4a22-8e67-e788db4673f3@lunn.ch>
-From: Robert Marko <robert.marko@sartura.hr>
-Date: Tue, 24 Oct 2023 18:49:55 +0200
-Message-ID: <CA+HBbNEMvijVFMKYTUopScwcMRwPFpdZ99GwY-Gb=hTLfgJx5Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/5] net: ipqess: add a PSGMII calibration
- procedure to the IPQESS driver
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	thomas.petazzoni@bootlin.com, Florian Fainelli <f.fainelli@gmail.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	linux-arm-kernel@lists.infradead.org, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, Luka Perkov <luka.perkov@sartura.hr>, 
-	Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@somainline.org>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Received: from localhost (Unknown [127.0.0.1])
+	by mail.lac-coloc.fr (Haraka/3.0.1) with ESMTPSA id 758D34B5-9B82-4409-8044-57CC22E3E352.1
+	envelope-from <alce@lafranque.net>
+	tls TLS_AES_256_GCM_SHA384 (authenticated bits=0);
+	Tue, 24 Oct 2023 16:51:09 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=lafranque.net; s=s20211111873;
+	h=from:subject:date:message-id:to:cc:mime-version;
+	bh=+LuzC4319h3RJp8Kc74+HyjND8xiATvg2JeYaqnq44E=;
+	b=PQpsd5vzF0iaO9nT2rtz7hUJvpTlR3dDX0ukaEjIpmr8RpbsbKr77QVsJnrr8JD8ijN77ec4Yu
+	zpED1t/oRiKRNmet4r1pZpMs/ApcMopqORwyZCxB7bZHE9NcmCdHN34x3vCo+1nfnBULpW0/pmYW
+	+Vxn47UNTsItw2dYmgkm4=
 
-On Tue, Oct 24, 2023 at 4:13=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > Yes, I'll add more detailed comments to the code in the v2. The calibra=
-tion
-> > procedure itself targets the PSGMII device, which is internal to the So=
-C and can
-> > be logically accessed as a PHY device on the MDIO bus. This component i=
-s a
-> > little opaque and has some nonstandard MII register definitions.
-> >
-> > The "testing" phase that follows the calibration accesses both the inte=
-rnal
-> > QCA8K switch ports and the external QCA8075 PHY. For example, it puts b=
-oth the
-> > switch ports and the PHY ports in loopback before starting packet gener=
-ation on
-> > the external PHYs. This is done to verify that the PSGMII link works co=
-rrectly
-> > after being calibrated.
-> >
-> > So this code interacts with both internal ESS devices and external PHYs=
-, but
-> > mostly the former, which is why I kept everything in the MAC/switch dri=
-ver.
->
-> Accessing the external PHYs i would suggest go over the normal phylib
-> API. Somebody might build a board using a different PHY, with
-> different registers. If all you need is loopback, there is a phylib
-> call for that.
->
-> Directly accessing the internal ESS is fine, it cannot be changed, but
-> if there are phylib helpers which do the same thing, consider using
-> them.
+By default, VXLAN encapsulation over IPv6 sets the flow label to 0, with
+an option for a fixed value. This commits add the ability to inherit the
+flow label from the inner packet, like for other tunnel implementations.
+This enables devices using only L3 headers for ECMP to correctly balance
+VXLAN-encapsulated IPv6 packets.
 
-Hi,
-This SoC is a bit special as it only supports using RGMII and PSGMII.
-PSGMII is Qualcomm-s modification of SGMII with 5 SGMII lines to provide
-1G of bandwidth from the switch to PHY-s.
+```
+$ ./ip/ip link add dummy1 type dummy
+$ ./ip/ip addr add 2001:db8::2/64 dev dummy1
+$ ./ip/ip link set up dev dummy1
+$ ./ip/ip link add vxlan1 type vxlan id 100 flowlabel inherit remote 2001:db8::1 local 2001:db8::2
+$ ./ip/ip link set up dev vxlan1
+$ ./ip/ip addr add 2001:db8:1::2/64 dev vxlan1
+$ ./ip/ip link set arp off dev vxlan1
+$ ping -q 2001:db8:1::1 &
+$ tshark -d udp.port==8472,vxlan -Vpni dummy1 -c1
+[...]
+Internet Protocol Version 6, Src: 2001:db8::2, Dst: 2001:db8::1
+    0110 .... = Version: 6
+    .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
+        .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
+        .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+    .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
+[...]
+Virtual eXtensible Local Area Network
+    Flags: 0x0800, VXLAN Network ID (VNI)
+    Group Policy ID: 0
+    VXLAN Network Identifier (VNI): 100
+[...]
+Internet Protocol Version 6, Src: 2001:db8:1::2, Dst: 2001:db8:1::1
+    0110 .... = Version: 6
+    .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
+        .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
+        .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+    .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
+```
 
-However, PSGMII is also weird in the sense that it requires
-calibration to be carried
-on each boot, as otherwise packet loss will start to occur.
-But for calibration to work, you must enable loopback on the switch ports a=
-nd
-on the PHY-s, both loopback and CRC verification must be enabled.
-Then you can actually enable the PSGMII serdes calibration in the SoC but i=
-t
-must occur on all of the PHYs at the same time, hence why broadcast is used=
-.
+Signed-off-by: Alce Lafranque <alce@lafranque.net>
+Co-developed-by: Vincent Bernat <vincent@bernat.ch>
+Signed-off-by: Vincent Bernat <vincent@bernat.ch>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-As far as the PHY-s go, there are only 2 PHY models supporting PSGMII,
-QCA8072 and QCA8075, both from Qualcomm, and differing only in the
-number of ports.
-QCA8072 has 2 ports while QCA8075 has 5 ports.
-Each of them also has a serdes PHY exposed over MDIO.
-These PHY-s are still being used in IPQ8074 and IPQ6018 802.11ax SoC-s.
+---
+v7:
+  - Rebase patch
+v6:
+  - Rebase patch
+v5: https://lore.kernel.org/netdev/20231019180417.210523-1-alce@lafranque.net/
+  - Rollback policy label to fixed by default
+v4: https://lore.kernel.org/all/20231014132102.54051-1-alce@lafranque.net/
+  - Fix tabs
+v3: https://lore.kernel.org/all/20231014131320.51810-1-alce@lafranque.net/
+  - Adopt policy label inherit by default
+  - Set policy to label fixed when flowlabel is set
+  - Rename IFLA_VXLAN_LABEL_BEHAVIOR to IFLA_VXLAN_LABEL_POLICY
+v2: https://lore.kernel.org/all/20231007142624.739192-1-alce@lafranque.net/
+  - Use an enum instead of flag to define label behavior
+v1: https://lore.kernel.org/all/4444C5AE-FA5A-49A4-9700-7DD9D7916C0F.1@mail.lac-coloc.fr/
+---
+ drivers/net/vxlan/vxlan_core.c | 23 ++++++++++++++++++++++-
+ include/net/ip_tunnels.h       | 11 +++++++++++
+ include/net/vxlan.h            | 33 +++++++++++++++++----------------
+ include/uapi/linux/if_link.h   |  8 ++++++++
+ 4 files changed, 58 insertions(+), 17 deletions(-)
 
-So in a nutshell, this is how stuff is connected (To the best of my knowled=
-ge):
-https://asciiflow.com/#/share/eJzVVktuwjAQvYrlFUggwk9p2fGHBVVoVAmkbAJxRSTjo=
-GDUIMQtKg5T9TScpG4T8iEOARLaYs3iZTx%2B9oxnMt5Aos4RrJEVxjmI1TUyYQ1uFGgpsPZYKe=
-UUuGaoJIoMUWRR9qFA4I79%2B%2BeloigksB606QyZBFFXE7JoGoSaBsbIjLIIDp5Fpi8N27Kcj=
-baI5UjkKY%2FT0fUJZQFQMW%2Bu2J3olDfRYTcGWqsFRta5%2B8TqAufffVzh8q0l8tI8fBodLw=
-oRSoZJgeDDRYZ%2BQAkcUNmbrXiwai8aGJr%2BqiMt9aOCxkrHNK%2BTcG43pZfsYUGxG4scZg8=
-PVyqeGvN5%2BmceNusP5bL4lLSWflmA%2FKbT6SxUMbzoxEfkH9NcEJXdjfURUzH%2FaQAkuTvo=
-94HUGxfk9nOrLXPDE0tTtWye6UwlBOElP8qxNJk6XhqAcWgYLcHzN2X2CpozRoKr%2FCPhJHCk1=
-rlWd%2FJ8chtflnj3ILZT3LTZX%2FN7PoqWW0j%2BNrh3Ol7RRSe6IBuHRhgklpGpsWLwt519fK=
-vyQ9BbT0xdC524N3bdahqLBXsgMnga%2BQw5WefrhOkEmzkxtTc0TLcjCmKpUE1vC0EQGuoS5Ue=
-Foxc1i0%2F6u3RGgTtITNzRJ%2FbD3tHwi%2FfORYFbuP0C5MQClA%3D%3D)
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 7b526ae16ed0..821f8c4de784 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -2379,7 +2379,17 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 		else
+ 			udp_sum = !(flags & VXLAN_F_UDP_ZERO_CSUM6_TX);
+ #if IS_ENABLED(CONFIG_IPV6)
+-		key.label = vxlan->cfg.label;
++		switch (vxlan->cfg.label_policy) {
++		case VXLAN_LABEL_FIXED:
++			key.label = vxlan->cfg.label;
++			break;
++		case VXLAN_LABEL_INHERIT:
++			key.label = ip_tunnel_get_flowlabel(old_iph, skb);
++			break;
++		default:
++			DEBUG_NET_WARN_ON_ONCE(1);
++			goto drop;
++		}
+ #endif
+ 	} else {
+ 		if (!info) {
+@@ -3365,6 +3375,7 @@ static const struct nla_policy vxlan_policy[IFLA_VXLAN_MAX + 1] = {
+ 	[IFLA_VXLAN_DF]		= { .type = NLA_U8 },
+ 	[IFLA_VXLAN_VNIFILTER]	= { .type = NLA_U8 },
+ 	[IFLA_VXLAN_LOCALBYPASS]	= NLA_POLICY_MAX(NLA_U8, 1),
++	[IFLA_VXLAN_LABEL_POLICY]	= NLA_POLICY_MAX(NLA_U8, VXLAN_LABEL_MAX),
+ };
+ 
+ static int vxlan_validate(struct nlattr *tb[], struct nlattr *data[],
+@@ -3739,6 +3750,12 @@ static int vxlan_config_validate(struct net *src_net, struct vxlan_config *conf,
+ 		return -EINVAL;
+ 	}
+ 
++	if (conf->label_policy && !use_ipv6) {
++		NL_SET_ERR_MSG(extack,
++			       "Label policy only applies to IPv6 VXLAN devices");
++		return -EINVAL;
++	}
++
+ 	if (conf->remote_ifindex) {
+ 		struct net_device *lowerdev;
+ 
+@@ -4081,6 +4098,8 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
+ 	if (data[IFLA_VXLAN_LABEL])
+ 		conf->label = nla_get_be32(data[IFLA_VXLAN_LABEL]) &
+ 			     IPV6_FLOWLABEL_MASK;
++	if (data[IFLA_VXLAN_LABEL_POLICY])
++		conf->label_policy = nla_get_u8(data[IFLA_VXLAN_LABEL_POLICY]);
+ 
+ 	if (data[IFLA_VXLAN_LEARNING]) {
+ 		err = vxlan_nl2flag(conf, data, IFLA_VXLAN_LEARNING,
+@@ -4398,6 +4417,7 @@ static size_t vxlan_get_size(const struct net_device *dev)
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_TOS */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_DF */
+ 		nla_total_size(sizeof(__be32)) + /* IFLA_VXLAN_LABEL */
++		nla_total_size(sizeof(__u8)) +  /* IFLA_VXLAN_LABEL_POLICY */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_LEARNING */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_PROXY */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_RSC */
+@@ -4470,6 +4490,7 @@ static int vxlan_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ 	    nla_put_u8(skb, IFLA_VXLAN_TOS, vxlan->cfg.tos) ||
+ 	    nla_put_u8(skb, IFLA_VXLAN_DF, vxlan->cfg.df) ||
+ 	    nla_put_be32(skb, IFLA_VXLAN_LABEL, vxlan->cfg.label) ||
++	    nla_put_u8(skb, IFLA_VXLAN_LABEL_POLICY, vxlan->cfg.label_policy) ||
+ 	    nla_put_u8(skb, IFLA_VXLAN_LEARNING,
+ 		       !!(vxlan->cfg.flags & VXLAN_F_LEARN)) ||
+ 	    nla_put_u8(skb, IFLA_VXLAN_PROXY,
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index f346b4efbc30..2d746f4c9a0a 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -416,6 +416,17 @@ static inline u8 ip_tunnel_get_dsfield(const struct iphdr *iph,
+ 		return 0;
+ }
+ 
++static inline __be32 ip_tunnel_get_flowlabel(const struct iphdr *iph,
++					     const struct sk_buff *skb)
++{
++	__be16 payload_protocol = skb_protocol(skb, true);
++
++	if (payload_protocol == htons(ETH_P_IPV6))
++		return ip6_flowlabel((const struct ipv6hdr *)iph);
++	else
++		return 0;
++}
++
+ static inline u8 ip_tunnel_get_ttl(const struct iphdr *iph,
+ 				       const struct sk_buff *skb)
+ {
+diff --git a/include/net/vxlan.h b/include/net/vxlan.h
+index 6a9f8a5f387c..33ba6fc151cf 100644
+--- a/include/net/vxlan.h
++++ b/include/net/vxlan.h
+@@ -210,22 +210,23 @@ struct vxlan_rdst {
+ };
+ 
+ struct vxlan_config {
+-	union vxlan_addr	remote_ip;
+-	union vxlan_addr	saddr;
+-	__be32			vni;
+-	int			remote_ifindex;
+-	int			mtu;
+-	__be16			dst_port;
+-	u16			port_min;
+-	u16			port_max;
+-	u8			tos;
+-	u8			ttl;
+-	__be32			label;
+-	u32			flags;
+-	unsigned long		age_interval;
+-	unsigned int		addrmax;
+-	bool			no_share;
+-	enum ifla_vxlan_df	df;
++	union vxlan_addr		remote_ip;
++	union vxlan_addr		saddr;
++	__be32				vni;
++	int				remote_ifindex;
++	int				mtu;
++	__be16				dst_port;
++	u16				port_min;
++	u16				port_max;
++	u8				tos;
++	u8				ttl;
++	__be32				label;
++	enum ifla_vxlan_label_policy	label_policy;
++	u32				flags;
++	unsigned long			age_interval;
++	unsigned int			addrmax;
++	bool				no_share;
++	enum ifla_vxlan_df		df;
+ };
+ 
+ enum {
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index 9f8a3da0f14f..f71c195b7abf 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -832,6 +832,7 @@ enum {
+ 	IFLA_VXLAN_DF,
+ 	IFLA_VXLAN_VNIFILTER, /* only applicable with COLLECT_METADATA mode */
+ 	IFLA_VXLAN_LOCALBYPASS,
++	IFLA_VXLAN_LABEL_POLICY,
+ 	__IFLA_VXLAN_MAX
+ };
+ #define IFLA_VXLAN_MAX	(__IFLA_VXLAN_MAX - 1)
+@@ -849,6 +850,13 @@ enum ifla_vxlan_df {
+ 	VXLAN_DF_MAX = __VXLAN_DF_END - 1,
+ };
+ 
++enum ifla_vxlan_label_policy {
++	VXLAN_LABEL_FIXED = 0,
++	VXLAN_LABEL_INHERIT = 1,
++	__VXLAN_LABEL_END,
++	VXLAN_LABEL_MAX = __VXLAN_LABEL_END - 1,
++};
++
+ /* GENEVE section */
+ enum {
+ 	IFLA_GENEVE_UNSPEC,
+-- 
+2.39.2
 
-Sorry for the external link, but I cannot get the ASCII diagram to
-show properly via plain-text.
-
-Regards,
-Robert
->      Andrew
-
-
-
---=20
-Robert Marko
-Staff Embedded Linux Engineer
-Sartura Ltd.
-Lendavska ulica 16a
-10000 Zagreb, Croatia
-Email: robert.marko@sartura.hr
-Web: www.sartura.hr
 
