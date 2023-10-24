@@ -1,107 +1,84 @@
-Return-Path: <netdev+bounces-43816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08E0B7D4E9C
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:11:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 448BA7D4EB6
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 13:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 438F11C20974
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 11:11:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CE69B20C7C
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 11:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1AE26288;
-	Tue, 24 Oct 2023 11:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED87326288;
+	Tue, 24 Oct 2023 11:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kx25fGXi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Klz/cyCr"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E997498
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:11:21 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7BC10C3
-	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 04:11:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698145879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2H7Y3L+wO4O4PCAdKbwK4BPdzk6P9AjMRpwDaWWqLDQ=;
-	b=Kx25fGXieD0/Ex61NNcJ9KFyOBBfMWdyyPBTdJx0bVafVyVu3Tih9Iosqg7tkloCh6AIjm
-	6KxNKmBtwXa4tof+e0vARAx+m9nDitnDvQiToe30qQwJlUu/E1THefJ+X7w2vf1t+lndHK
-	8u/2HGt3Se0jebXaRGDcHIGCPz2W9KU=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-421-OEXZlvVSP0Gby6nCo-CpjA-1; Tue, 24 Oct 2023 07:11:16 -0400
-X-MC-Unique: OEXZlvVSP0Gby6nCo-CpjA-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9c45a6a8832so44241566b.1
-        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 04:11:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698145875; x=1698750675;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2H7Y3L+wO4O4PCAdKbwK4BPdzk6P9AjMRpwDaWWqLDQ=;
-        b=Omna8pS/jC7gTcF5YlXz5PUXbxrdYUW2poiNPe2P/aJE9lKDhvT390VRJDSvuVC0kw
-         0Rbqo9Ebld4fyASO6iR31nlnGNRjDoWognHdGBMeEEKuW2QTGAdhT950vKmDVBfQOt1w
-         NcVANsdJPnt0ymQy+x3LQeJvJ1JWFJop3+KsxDgA0PaWCico1aJqZuXi/7P4+GeEsA40
-         7uULJoAPrxW7QKXM2jLNEJ6RYGBjt18Vun6PG49hH30SVYLtsv8wWSWn22Qw7j3ZsrkW
-         aUWbqljudxpFwI7turU3gVq5EeSV4J6nOBSP29qWFfq7OXW/mQyv/fE0txUGiyzLw9Sv
-         YThw==
-X-Gm-Message-State: AOJu0YxGgvAQSRcf+Ys2o61DcVJ0nUYh28IqQGGLJ0cOWaT8+E+7YiaK
-	N4bf2F9ZDhxen0wnx3fdkxx3H9u6pkHxWYm/zOglYhB4ZMXN7QkBdO1/KVpOdrIM12DiYKpPAXS
-	k5fcEZ4vsEZbmuMu2
-X-Received: by 2002:a17:906:f50:b0:9cb:b737:e469 with SMTP id h16-20020a1709060f5000b009cbb737e469mr1904591ejj.4.1698145875542;
-        Tue, 24 Oct 2023 04:11:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHbm6fF0XWXv8tlBeoO6lS6nrzwyNW4FLJl6hKfbijCy2f0/nuEpU6IezwHCF7SzoFNY107dQ==
-X-Received: by 2002:a17:906:f50:b0:9cb:b737:e469 with SMTP id h16-20020a1709060f5000b009cbb737e469mr1904578ejj.4.1698145875194;
-        Tue, 24 Oct 2023 04:11:15 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-242-180.dyn.eolo.it. [146.241.242.180])
-        by smtp.gmail.com with ESMTPSA id d13-20020a1709064c4d00b009a5f1d15642sm8026369ejw.158.2023.10.24.04.11.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 04:11:14 -0700 (PDT)
-Message-ID: <f44e4fd716729f1f35ef58895b1acde53adb9b35.camel@redhat.com>
-Subject: Re: [PATCH net 2/2] liquidio: Simplify octeon_download_firmware()
-From: Paolo Abeni <pabeni@redhat.com>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- dchickles@marvell.com,  sburla@marvell.com, fmanlunas@marvell.com,
- davem@davemloft.net,  edumazet@google.com, kuba@kernel.org,
- veerasenareddy.burru@cavium.com
-Cc: felix.manlunas@cavium.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Date: Tue, 24 Oct 2023 13:11:13 +0200
-In-Reply-To: <0278c7dfbc23f78a2d85060369132782f8466090.1698007858.git.christophe.jaillet@wanadoo.fr>
-References: <cover.1698007858.git.christophe.jaillet@wanadoo.fr>
-	 <0278c7dfbc23f78a2d85060369132782f8466090.1698007858.git.christophe.jaillet@wanadoo.fr>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF14A1FD7
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 11:20:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 90302C433C9;
+	Tue, 24 Oct 2023 11:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698146423;
+	bh=xftM4qcyT0lca87W0t2wbguo1Ot8Ftv8alOVYsmwwaw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Klz/cyCrllNfqL8cuJyicdAONBArsjNq7/JWYKwQijDUbNfxnWxp1sjbu+koRxe6q
+	 QhJfQk6FSzO3Adu0OIutA31SURHsYGE81iZFy8nSE7VVHH9o9Tx16zTDfb5KilAFxU
+	 5h2B/Y0eqlbWCpBKoxu/VSdbmkqAfbZKxJYVIJFVFq6b8Cqkg6j8tBPxsBROvlpcX/
+	 60Xpc5j73xbZfdBCFsUKftRw0tZSo/4PIuuHwHXoaByDdOzReTISdgbY2LJAd/zyq8
+	 e94/LQAojn4+tBE+/Wq/zJhdPEB7PNvuLmN1MdfKd7551NFC0pOKRhb5XD5jEq/dOW
+	 6hx+pUdPSlFlg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73849C04D3F;
+	Tue, 24 Oct 2023 11:20:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: sched: sch_qfq: Use non-work-conserving warning
+ handler
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169814642346.22456.5224425223628046710.git-patchwork-notify@kernel.org>
+Date: Tue, 24 Oct 2023 11:20:23 +0000
+References: <20231023064729.370649-1-liujian56@huawei.com>
+In-Reply-To: <20231023064729.370649-1-liujian56@huawei.com>
+To: Liu Jian <liujian56@huawei.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
-On Sun, 2023-10-22 at 22:59 +0200, Christophe JAILLET wrote:
-> In order to remove the usage of strncat(), write directly at the rigth
-> place in the 'h->bootcmd' array and check if the output is truncated.
->=20
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
-> The goal is to potentially remove the strncat() function from the kernel.
-> Their are only few users and most of them use it wrongly.
->=20
-> This patch is compile tested only.
+Hello:
 
-Then just switch to strlcat, would be less invasive.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Thanks,
+On Mon, 23 Oct 2023 14:47:29 +0800 you wrote:
+> A helper function for printing non-work-conserving alarms is added in
+> commit b00355db3f88 ("pkt_sched: sch_hfsc: sch_htb: Add non-work-conserving
+>  warning handler."). In this commit, use qdisc_warn_nonwc() instead of
+> WARN_ONCE() to handle the non-work-conserving warning in qfq Qdisc.
+> 
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
+> 
+> [...]
 
-Paolo
+Here is the summary with links:
+  - [net-next] net: sched: sch_qfq: Use non-work-conserving warning handler
+    https://git.kernel.org/netdev/net-next/c/6d25d1dc76bf
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
