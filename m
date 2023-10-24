@@ -1,111 +1,178 @@
-Return-Path: <netdev+bounces-43950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-43951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 934557D58D4
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:40:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3DDE7D58E8
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 18:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C43F01C20CF6
-	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:40:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19EB1B20D7C
+	for <lists+netdev@lfdr.de>; Tue, 24 Oct 2023 16:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DFE37176;
-	Tue, 24 Oct 2023 16:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64777347CE;
+	Tue, 24 Oct 2023 16:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y93CTfkd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k8vZpnYh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9CF3AC2B;
-	Tue, 24 Oct 2023 16:40:26 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B36F310E0;
-	Tue, 24 Oct 2023 09:40:21 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6bd32d1a040so4634978b3a.3;
-        Tue, 24 Oct 2023 09:40:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51093B2AF
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 16:41:52 +0000 (UTC)
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0281111
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 09:41:49 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-27d1fa1c787so3105064a91.3
+        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 09:41:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698165621; x=1698770421; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=31F3WOynZ5m4GHq6NUu2sQx3qyYWIuGHHZ5aY5Fy/F4=;
-        b=Y93CTfkdOlWZbawf0TKc+E5ZgZDFTxeboilcdwqUeDDj19OYZ9/9MXPqJARNoyzMtX
-         g7UxufmYjXfAoF202OUj4HvhYy/BItAC13RQrX/3pNVA3SX0/I2/KofIsPnKI8s0WbeS
-         SrgJ43amqtu2DTCtdFdeAC//fkSx2T0dvw4ZWR5vaHqKOFqp5c6gRl5EEgZjdBUQw9HH
-         e9rZdMe0GzN1MKtt2kxqVHmVmqtKAQqNZ/iMFKyOclIvrTnKp1gErfQw9IBf2UkVV1TU
-         uYCshMk4d+4VoTPZvU6Nh+OPmVRGS4b/SDA5gllopEHmXHRW6iTVoroLeKchp+cA7e9H
-         vPUQ==
+        d=google.com; s=20230601; t=1698165709; x=1698770509; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F9cI2QYCQEc0Q/Z2mJbULzav03v+BRSAlGepCbIXf4g=;
+        b=k8vZpnYhUGkLINDaRw74tvPFE8FRGFFzm6dO1ITeTaTHgE5Qjw1l4T+KeiGvQPrVMQ
+         Lp2xFGAJR/xzMfJ/G2EnMle6UXY/mwUxiq8RVPbxBgiqDtrKpF2nkbalKXBxcQ/FUBuz
+         VTDXVhTdzEYiC+aAYZ4FC+CdPJJweEARSdZZSPgNjxUtFb8qTMsO2XRArKMMdn/45LPQ
+         NS+c8hiK79mIjpaqBbRb3lXMWd1c5toX2rozbDQCkdVQv04/uW7NJynD7Ysrz3vgUg7W
+         2J3EvBAlAOe6knt8vhzk9OqQ6XeSUz8FpQNbcaTtQMC5mwAbFjQEk68LBJWdUF9TEQ4z
+         XHTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698165621; x=1698770421;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=31F3WOynZ5m4GHq6NUu2sQx3qyYWIuGHHZ5aY5Fy/F4=;
-        b=UBKlZIp8MS/4qjXrEygBsVQGtp1bfB6RVaZ2cDF2tvz3pJwKzYpg+p+Bv2fMDy3ANo
-         skk6h0GZxOzO9Ig69IhWLork/fuGwIk3Dgi1OyVaJpLSQcWV8C51jtC4mg9+C96dk1GN
-         s6KHxBuP2c+7OQrg8vkkAsTcSk7BsCyY+9KqugOo4yr3mYGyOKs+XxHOjxaI/hOPUcFz
-         dBohCR7mnV4kKxYuVnYhmGDWF3l8idpKT9VGLlGZcaewnEWKpbOx8XCRzZlFPRkQDGyc
-         stMlpegMRcSBTLG4pod/dFMJ0N8WHpB1VfLDrms7k338LAkCV7ONH0BEqvXkcTuAgug/
-         NYOw==
-X-Gm-Message-State: AOJu0YxVBMDMvrEfWsP7d9HlVWiRyCSIh3/mUddX/kKx8I9IdQ+WA3uf
-	fTfvAZvxPDmDtCPbvnnuVvw=
-X-Google-Smtp-Source: AGHT+IEXKKh0kgPPui7KSu8xTVHCM9yLkKv5aloD9D4pg3Ynr9RXsCdtfwdf7u+niH5Ory+Omdym0w==
-X-Received: by 2002:a05:6a00:84f:b0:6bd:b3b9:649f with SMTP id q15-20020a056a00084f00b006bdb3b9649fmr14667102pfk.7.1698165621032;
-        Tue, 24 Oct 2023 09:40:21 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id r3-20020aa79ec3000000b0063b898b3502sm7798480pfq.153.2023.10.24.09.40.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Oct 2023 09:40:20 -0700 (PDT)
-Message-ID: <839809ac-e16f-4683-a6ec-14dcf2ff5990@gmail.com>
-Date: Tue, 24 Oct 2023 09:40:18 -0700
+        d=1e100.net; s=20230601; t=1698165709; x=1698770509;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F9cI2QYCQEc0Q/Z2mJbULzav03v+BRSAlGepCbIXf4g=;
+        b=PT9qs8jiFD/bIlussVw0d7c7tb7/UN3QOSkle2Wh21uyrddcByEpr5aFc/JU7fNxOq
+         nP7XKpehjS6DATRtrzZZ2Jk1HOHVsOgJp8zYwIPfIgU84SmqbJCOp8uMyt7YnDWbhTfk
+         lt+J1GANSaaPjnrqBhgaNgcn3H2OJFDsXP48cBsigDVz+j5+LCuB63giNYjTd6jdfV15
+         OImMpdOR3UohPVj+tVBYzLzqVdgjSLHcmL0BXwu+5HsIXg3+kan7r7PJ5LMFMJ4Fph7+
+         +kg0lv2yttXdvdEhjFYg61ZFWCM3fofNYvTWjMh/JONKBR7Ie7uiB2jQI1cJoQFcjRYZ
+         DwCg==
+X-Gm-Message-State: AOJu0Ywd7Or+clbwxNPnsyP3Ev7+i7A8CorMvfAQFAr62W/bnGkVmCHk
+	HLSqQ1DQfw+3UGv6K8rvQrccxZ6WFMM3TshcUcGpKg==
+X-Google-Smtp-Source: AGHT+IGAdVWT4mftFEAGQrXm3G8HV7gIjum7jCbwbb9KaUknUgk1WfDEZHCMV8V8bp+yGQa2u32B3NoAvqDI+8P/hfU=
+X-Received: by 2002:a17:90a:4f45:b0:27e:3880:d03d with SMTP id
+ w5-20020a17090a4f4500b0027e3880d03dmr6113296pjl.7.1698165708830; Tue, 24 Oct
+ 2023 09:41:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 7/7] dt-bindings: marvell: Add Marvell
- MV88E6060 DSA schema
-Content-Language: en-US
-To: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
- Gregory Clement <gregory.clement@bootlin.com>,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
- linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Rob Herring <robh@kernel.org>
-References: <20231024-marvell-88e6152-wan-led-v7-0-2869347697d1@linaro.org>
- <20231024-marvell-88e6152-wan-led-v7-7-2869347697d1@linaro.org>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231024-marvell-88e6152-wan-led-v7-7-2869347697d1@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231019174944.3376335-1-sdf@google.com> <20231019174944.3376335-11-sdf@google.com>
+ <PH0PR11MB5830DF14E012DCAC75090010D8DFA@PH0PR11MB5830.namprd11.prod.outlook.com>
+In-Reply-To: <PH0PR11MB5830DF14E012DCAC75090010D8DFA@PH0PR11MB5830.namprd11.prod.outlook.com>
+From: Stanislav Fomichev <sdf@google.com>
+Date: Tue, 24 Oct 2023 09:41:36 -0700
+Message-ID: <CAKH8qBtqbRRER-qbT3YghgYkaHVzz=Rdvpe9h7b5bv3+gM-a5A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 10/11] selftests/bpf: Add TX side to xdp_hw_metadata
+To: "Song, Yoong Siang" <yoong.siang.song@intel.com>
+Cc: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "song@kernel.org" <song@kernel.org>, "yhs@fb.com" <yhs@fb.com>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org" <jolsa@kernel.org>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "toke@kernel.org" <toke@kernel.org>, 
+	"willemb@google.com" <willemb@google.com>, "dsahern@kernel.org" <dsahern@kernel.org>, 
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>, "bjorn@kernel.org" <bjorn@kernel.org>, 
+	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, "hawk@kernel.org" <hawk@kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/24/23 06:20, Linus Walleij wrote:
-> The Marvell MV88E6060 is one of the oldest DSA switches from
-> Marvell, and it has DT bindings used in the wild. Let's define
-> them properly.
-> 
-> It is different enough from the rest of the MV88E6xxx switches
-> that it deserves its own binding.
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Reviewed-by: Rob Herring <robh@kernel.org>
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+On Mon, Oct 23, 2023 at 7:19=E2=80=AFPM Song, Yoong Siang
+<yoong.siang.song@intel.com> wrote:
+>
+> On Friday, October 20, 2023 1:50 AM Stanislav Fomichev <sdf@google.com> w=
+rote:
+> >When we get a packet on port 9091, we swap src/dst and send it out.
+> >At this point we also request the timestamp and checksum offloads.
+> >
+> >Checksum offload is verified by looking at the tcpdump on the other side=
+.
+> >The tool prints pseudo-header csum and the final one it expects.
+> >The final checksum actually matches the incoming packets checksum
+> >because we only flip the src/dst and don't change the payload.
+> >
+> >Some other related changes:
+> >- switched to zerocopy mode by default; new flag can be used to force
+> >  old behavior
+> >- request fixed tx_metadata_len headroom
+> >- some other small fixes (umem size, fill idx+i, etc)
+> >
+> >mvbz3:~# ./xdp_hw_metadata eth3
+> >...
+> >xsk_ring_cons__peek: 1
+> >0x19546f8: rx_desc[0]->addr=3D80100 addr=3D80100 comp_addr=3D80100
+> >rx_hash: 0x80B7EA8B with RSS type:0x2A
+> >rx_timestamp:  1697580171852147395 (sec:1697580171.8521)
+> >HW RX-time:   1697580171852147395 (sec:1697580171.8521), delta to User R=
+X-time sec:0.2797 (279673.082 usec)
+> >XDP RX-time:   1697580172131699047 (sec:1697580172.1317), delta to User =
+RX-time sec:0.0001 (121.430 usec)
+> >0x19546f8: ping-pong with csum=3D3b8e (want d862) csum_start=3D54 csum_o=
+ffset=3D6
+> >0x19546f8: complete tx idx=3D0 addr=3D8
+> >tx_timestamp:  1697580172056756493 (sec:1697580172.0568)
+>
+> Hi Stanislav,
+>
+> rx_timestamp is duplicating HW RX-time while tx_timestamp is duplicating =
+HW TX-complete-time,
+> so, I think can remove printing of rx_timestamp and tx_timestamp to avoid=
+ confusion.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+That's fair, I think I'll do the following:
 
+if (meta->rx_timestamp) {
+  /* print all those reference points */
+} else {
+  printf("No rx_timestamp\n");
+}
+
+And the same for tx. So at least the users get a signal that the
+timestamps weren't set.
+
+> >HW TX-complete-time:   1697580172056756493 (sec:1697580172.0568), delta =
+to User TX-complete-time sec:0.0852 (85175.537 usec)
+> >XDP RX-time:   1697580172131699047 (sec:1697580172.1317), delta to User =
+TX-complete-time sec:0.0102 (10232.983 usec)
+> >HW RX-time:   1697580171852147395 (sec:1697580171.8521), delta to HW TX-=
+complete-time sec:0.2046 (204609.098 usec)
+> >0x19546f8: complete rx idx=3D128 addr=3D80100
+> >
+> >mvbz4:~# nc  -Nu -q1 ${MVBZ3_LINK_LOCAL_IP}%eth3 9091
+> >
+> >mvbz4:~# tcpdump -vvx -i eth3 udp
+> >        tcpdump: listening on eth3, link-type EN10MB (Ethernet), snapsho=
+t length 262144
+> >bytes
+> >12:26:09.301074 IP6 (flowlabel 0x35fa5, hlim 127, next-header UDP (17) p=
+ayload
+> >length: 11) fe80::1270:fdff:fe48:1087.55807 > fe80::1270:fdff:fe48:1077.=
+9091: [bad
+> >udp cksum 0x3b8e -> 0xde7e!] UDP, length 3
+> >        0x0000:  6003 5fa5 000b 117f fe80 0000 0000 0000
+> >        0x0010:  1270 fdff fe48 1087 fe80 0000 0000 0000
+> >        0x0020:  1270 fdff fe48 1077 d9ff 2383 000b 3b8e
+> >        0x0030:  7864 70
+> >12:26:09.301976 IP6 (flowlabel 0x35fa5, hlim 127, next-header UDP (17) p=
+ayload
+> >length: 11) fe80::1270:fdff:fe48:1077.9091 > fe80::1270:fdff:fe48:1087.5=
+5807: [udp
+> >sum ok] UDP, length 3
+> >        0x0000:  6003 5fa5 000b 117f fe80 0000 0000 0000
+> >        0x0010:  1270 fdff fe48 1077 fe80 0000 0000 0000
+> >        0x0020:  1270 fdff fe48 1087 2383 d9ff 000b de7e
+> >        0x0030:  7864 70
+> >
+> >This reverts commit c3c9abc1d0c989e0be21d78cccd99076cc94ec44.
+>
+> It didn't looked like this patch is reverting something.
+> If this is not a mistake, can you add the commit title behind the ID?
+
+Ah, that's a leftover from my rebasing and reshuffling, will drop, thanks!
 
