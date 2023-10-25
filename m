@@ -1,141 +1,178 @@
-Return-Path: <netdev+bounces-44180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E17F7D6CA7
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 15:04:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA9077D6CB6
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 15:09:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC9FB1C20C91
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 13:04:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 165351C20C65
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 13:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED9327ED0;
-	Wed, 25 Oct 2023 13:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aOQ4Ct/L"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D17E27ED7;
+	Wed, 25 Oct 2023 13:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F3A15491
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 13:04:25 +0000 (UTC)
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C06111;
-	Wed, 25 Oct 2023 06:04:24 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1c0ecb9a075so40658115ad.2;
-        Wed, 25 Oct 2023 06:04:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698239064; x=1698843864; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aItnBr/Ps6QJrhOth2m6UNiWmsSsRn+ai7RbjQVNy3k=;
-        b=aOQ4Ct/Lkb+ImmXUyABdX8BX+OY5XDK/ZVev6goepLAR5pd+d1vpqZGuATC1p4JXPb
-         D55SHTTklIeC/+VSgLjbpj+Ejl+yRGE6S43Z6gd/FFJkIzUPnExgzn3+Fcy5PxPaRlXu
-         br9HwR2nYrRJEKPOmLXNAoD2rI9ptwG9ThM0wZLfHLs0+erbxqGvO9Wn9rW++BiHoMGh
-         cpDb+ZrjnSVKiU9t3xUF6d2+oiT7Vu+7ub108l+6/XiR+46/xiGaclSBhj3LQw9m+tC7
-         ou0wTolMpj79P417dQAJFoGpBN/1FO+04PQTnYJGmNK+RvWVXBjanjwZE7/f2ETR5lMM
-         HoLw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40EB48467
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 13:09:53 +0000 (UTC)
+Received: from mail-oa1-f80.google.com (mail-oa1-f80.google.com [209.85.160.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3498E111
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 06:09:51 -0700 (PDT)
+Received: by mail-oa1-f80.google.com with SMTP id 586e51a60fabf-1e9b6561650so7801572fac.3
+        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 06:09:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698239064; x=1698843864;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aItnBr/Ps6QJrhOth2m6UNiWmsSsRn+ai7RbjQVNy3k=;
-        b=nEcD+Mhs8fuxTRX6dMZMbErRQ82lC9G6aB5yh/dZWMVOsqLscxlxJj+q0+EKbn7FPk
-         dH5Hewpai8Eh9L2dd/UTBT5C5jFxALNBXF3TLN2Mt+RuTDKC4sI+2aJHtNlTQW4n6GPi
-         1z6yQ5iw6LNuFGBFRIlOj9JQPR27a7zp49Zk7co0acpTKylc81Sj/Gf9vm69HYHzgt/x
-         pQ4Xwf+SFFJqK40/byc3NwIt/lmn16YPtH/W3HHx2bSxDygKIQFan6Uv0Wsj3jzfKMY1
-         IQR5zMP0YIXd8hvdbYu3nZT+mKypId3HHcqqnDL4bQ8SJ9fLVAlXKBX6sLTYAOirHLWs
-         2m/w==
-X-Gm-Message-State: AOJu0YwIbq8BFa2J6kiZEureYzB7orJTOEErx9W2ApJ//+BqienR6Yqf
-	QCbNBGOJnFzOMKEkz+YJ1m8=
-X-Google-Smtp-Source: AGHT+IFqT2sVfFYt+JtemJ5Ozilk0GHFzrUmXb3j9fH8lnSXfEzRxGcF8IKSN6AIghnqT7OtdMZ/GQ==
-X-Received: by 2002:a17:902:e80d:b0:1bf:d92e:c5a7 with SMTP id u13-20020a170902e80d00b001bfd92ec5a7mr14682876plg.28.1698239063240;
-        Wed, 25 Oct 2023 06:04:23 -0700 (PDT)
-Received: from debian.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id j12-20020a170902da8c00b001c61afa7009sm9155213plx.114.2023.10.25.06.04.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 06:04:22 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id 6FBB6819CFF3; Wed, 25 Oct 2023 20:04:05 +0700 (WIB)
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH net v3] MAINTAINERS: Remove linuxwwan@intel.com mailing list
-Date: Wed, 25 Oct 2023 20:03:32 +0700
-Message-ID: <20231025130332.67995-2-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.42.0
+        d=1e100.net; s=20230601; t=1698239390; x=1698844190;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gVvou1i/S2SrxgRYtwSrOSdXF9KAotPX0rTNJQUAQjY=;
+        b=jeIOdirohVMmkBdJMhHEViq4TLvBzebNXkpbK+5hVZt6zoqYySCGFvqHdiX/a/lx+2
+         6f3vxSFck6efr17Vtlj0te2WSEV1WFKamdpUlBjdbh0Ka0uCSr8AS+NuJGKqdGb775By
+         3f4CnMHdDOLvzVw3phzxCl8wBkL1ZTx4EjD1hxEM5ZE4s4b6bRbanMsCxf+CFV+DimlU
+         AoIg4G+R5Tq5ctPGNYnIW6ZA/lQXvvA3fzGYG67r9n0HRTSrmJAKSQBXEtxZLC0Kyuma
+         MFt6Eh4fCunnqm63q/Cf2/6Jmh+xCuk+eLIzbrztXh92run9rGKOIlC1iy/s3zD7K7MW
+         4K7g==
+X-Gm-Message-State: AOJu0Yw0Yi3pg6LHpVx+rp/FN5aP6aemtlikBERH/ULUZCWYjdPeBFrv
+	BltufViHC27+BDdvZSJu72Ur8SXUP9tua8a6iqC2/LJrK6cX
+X-Google-Smtp-Source: AGHT+IE3MDDhYp60257/LIBDtCE0m01CNsDUT0NqJTNR1yfirIPZ0PBGbtDDMWUeTwHqwT+I7c9VYcstv9ayfV6yD4lx4zsQN2XH
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1789; i=bagasdotme@gmail.com; h=from:subject; bh=A2cdFzhNhGYYt9DxpQC5lHsdcQnAd6421LmrVFSMjlM=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDKmWgj5XUx6m7e7/6G721bRp7b6Fjx8IV0UZ/t3WvT/08 LQr26vdO0pZGMS4GGTFFFkmJfI1nd5lJHKhfa0jzBxWJpAhDFycAjARE3aGn4zH4wJXvq6YwLje +Pr2VMspe4uTz7icyE4vS3pwylfA6w0jw8tfa03n/s47v05Ars/gw0uRfra9PUXuza8XF/qK95u wswMA
-X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6870:171d:b0:1e9:9202:20c2 with SMTP id
+ h29-20020a056870171d00b001e9920220c2mr6759363oae.0.1698239390550; Wed, 25 Oct
+ 2023 06:09:50 -0700 (PDT)
+Date: Wed, 25 Oct 2023 06:09:50 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009e122006088a2b8d@google.com>
+Subject: [syzbot] [dccp?] general protection fault in dccp_write_xmit (2)
+From: syzbot <syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dccp@vger.kernel.org, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Messages submitted to the ML bounce (address not found error). In
-fact, the ML was mistagged as person maintainer instead of mailing
-list.
+Hello,
 
-Remove the ML to keep Cc: lists a bit shorter and not to spam
-everyone's inbox with postmaster notifications.
+syzbot found the following issue on:
 
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+HEAD commit:    05d3ef8bba77 Linux 6.6-rc7
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=120b3971680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=667b53b8e7487997
+dashboard link: https://syzkaller.appspot.com/bug?extid=c71bc336c5061153b502
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a9faa0dd3d80/disk-05d3ef8b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/cea22e55cef7/vmlinux-05d3ef8b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d0679f322d2a/bzImage-05d3ef8b.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 1906 Comm: syz-executor.4 Not tainted 6.6.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
+RIP: 0010:ccid_hc_tx_send_packet net/dccp/ccid.h:166 [inline]
+RIP: 0010:dccp_write_xmit+0x66/0x1d0 net/dccp/output.c:356
+Code: 00 48 85 c0 49 89 c4 0f 84 03 01 00 00 e8 52 d8 0c f8 41 80 3e 00 0f 85 45 01 00 00 48 8b 9d f8 08 00 00 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 0f 85 1f 01 00 00 48 8b 1b 48 8d bb b0 00 00 00 48
+RSP: 0018:ffffc90004cff870 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff888016f85940 RSI: ffffffff897af1de RDI: ffff888020ba5c40
+RBP: ffff888020ba5c40 R08: 0000000000000001 R09: fffffbfff2339be7
+R10: ffffffff919cdf3f R11: 0000000000000000 R12: ffff888075c38280
+R13: dffffc0000000000 R14: ffffed1004174ca7 R15: ffff888020ba6538
+FS:  00007f31f81d66c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9c878ffc83 CR3: 0000000066952000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ dccp_sendmsg+0x968/0xcc0 net/dccp/proto.c:801
+ inet_sendmsg+0x9d/0xe0 net/ipv4/af_inet.c:846
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x2ac/0x940 net/socket.c:2558
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2612
+ __sys_sendmmsg+0x1a1/0x450 net/socket.c:2698
+ __do_sys_sendmmsg net/socket.c:2727 [inline]
+ __se_sys_sendmmsg net/socket.c:2724 [inline]
+ __x64_sys_sendmmsg+0x9c/0x100 net/socket.c:2724
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f31f747cae9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f31f81d60c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+RAX: ffffffffffffffda RBX: 00007f31f759c050 RCX: 00007f31f747cae9
+RDX: 0000000000000002 RSI: 00000000200014c0 RDI: 0000000000000004
+RBP: 00007f31f74c847a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f31f759c050 R15: 00007f31f76bfa48
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:ccid_hc_tx_send_packet net/dccp/ccid.h:166 [inline]
+RIP: 0010:dccp_write_xmit+0x66/0x1d0 net/dccp/output.c:356
+Code: 00 48 85 c0 49 89 c4 0f 84 03 01 00 00 e8 52 d8 0c f8 41 80 3e 00 0f 85 45 01 00 00 48 8b 9d f8 08 00 00 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 0f 85 1f 01 00 00 48 8b 1b 48 8d bb b0 00 00 00 48
+RSP: 0018:ffffc90004cff870 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff888016f85940 RSI: ffffffff897af1de RDI: ffff888020ba5c40
+RBP: ffff888020ba5c40 R08: 0000000000000001 R09: fffffbfff2339be7
+R10: ffffffff919cdf3f R11: 0000000000000000 R12: ffff888075c38280
+R13: dffffc0000000000 R14: ffffed1004174ca7 R15: ffff888020ba6538
+FS:  00007f31f81d66c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f5f4e398000 CR3: 0000000066952000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	00 48 85             	add    %cl,-0x7b(%rax)
+   3:	c0 49 89 c4          	rorb   $0xc4,-0x77(%rcx)
+   7:	0f 84 03 01 00 00    	je     0x110
+   d:	e8 52 d8 0c f8       	call   0xf80cd864
+  12:	41 80 3e 00          	cmpb   $0x0,(%r14)
+  16:	0f 85 45 01 00 00    	jne    0x161
+  1c:	48 8b 9d f8 08 00 00 	mov    0x8f8(%rbp),%rbx
+  23:	48 89 d8             	mov    %rbx,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1) <-- trapping instruction
+  2f:	0f 85 1f 01 00 00    	jne    0x154
+  35:	48 8b 1b             	mov    (%rbx),%rbx
+  38:	48 8d bb b0 00 00 00 	lea    0xb0(%rbx),%rdi
+  3f:	48                   	rex.W
+
+
 ---
- Changes since v2 [1]:
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-   * Keep M Chetan Kumar in MAINTAINERS, as Johannes is trying to
-     keep in touch with him. As a result, this v3 is reduced to a
-     single patch.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
- [1]: https://lore.kernel.org/netdev/20231023032905.22515-2-bagasdotme@gmail.com/
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
- MAINTAINERS | 3 ---
- 1 file changed, 3 deletions(-)
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7a7bd8bd80e9f2..2618f3f55080d4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10450,7 +10450,6 @@ F:	drivers/platform/x86/intel/atomisp2/led.c
- 
- INTEL BIOS SAR INT1092 DRIVER
- M:	Shravan Sudhakar <s.shravan@intel.com>
--M:	Intel Corporation <linuxwwan@intel.com>
- L:	platform-driver-x86@vger.kernel.org
- S:	Maintained
- F:	drivers/platform/x86/intel/int1092/
-@@ -10880,7 +10879,6 @@ F:	drivers/platform/x86/intel/wmi/thunderbolt.c
- 
- INTEL WWAN IOSM DRIVER
- M:	M Chetan Kumar <m.chetan.kumar@intel.com>
--M:	Intel Corporation <linuxwwan@intel.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
- F:	drivers/net/wwan/iosm/
-@@ -13501,7 +13499,6 @@ F:	net/dsa/tag_mtk.c
- 
- MEDIATEK T7XX 5G WWAN MODEM DRIVER
- M:	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
--M:	Intel Corporation <linuxwwan@intel.com>
- R:	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>
- R:	Liu Haijun <haijun.liu@mediatek.com>
- R:	M Chetan Kumar <m.chetan.kumar@linux.intel.com>
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
 
-base-commit: 1711435e3e67e079d6a2bce54d96d1af21c7ef2c
--- 
-An old man doll... just what I always wanted! - Clara
-
+If you want to undo deduplication, reply with:
+#syz undup
 
