@@ -1,93 +1,87 @@
-Return-Path: <netdev+bounces-44134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54B97D686B
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 12:27:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 073EF7D689C
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 12:33:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39A82B21169
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 10:27:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A00B281C76
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 10:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47E1262BE;
-	Wed, 25 Oct 2023 10:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5B3200D5;
+	Wed, 25 Oct 2023 10:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ecIQHqv4"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D392566
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 10:27:15 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA5FB0
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 03:27:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A066E26E10
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 10:33:35 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 017F2130
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 03:33:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698230013;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sLw+xTXfry5r3/ti5ulvPxarMfCsTLFS8WTKCXQP2us=;
+	b=ecIQHqv4i77MxN8nHsATOSNvgOhq10Vsi1/xTqwmmzJvHV6gOdNHam9O/M3kNt0FJ6MUQf
+	zQaM/E0oqIr5+YqsV5FcisJyfGRQk0SqYi92fRTq0BRA5uNA4seL9wiBm9PZSaGyuJZ1Of
+	xuNycKUtPzwbV8hJQcBWx+W6yXc/xNo=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-148-B-UoJyzDOqqdZRdFYbzjxw-1; Wed, 25 Oct 2023 06:27:09 -0400
-X-MC-Unique: B-UoJyzDOqqdZRdFYbzjxw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-689-M_ahc-PIPiGpIOmS0EWofg-1; Wed, 25 Oct 2023 06:33:17 -0400
+X-MC-Unique: M_ahc-PIPiGpIOmS0EWofg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5D925891F2F;
-	Wed, 25 Oct 2023 10:27:08 +0000 (UTC)
-Received: from hog (unknown [10.39.192.51])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1780A25C0;
-	Wed, 25 Oct 2023 10:27:06 +0000 (UTC)
-Date: Wed, 25 Oct 2023 12:27:05 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Hangyu Hua <hbh25y@gmail.com>, kuba@kernel.org
-Cc: borisp@nvidia.com, john.fastabend@gmail.com, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: tls: Fix possible NULL-pointer dereference in
- tls_decrypt_device() and tls_decrypt_sw()
-Message-ID: <ZTjteQgXWKXDqnos@hog>
-References: <20231023080611.19244-1-hbh25y@gmail.com>
- <ZTZ9H4aDB45RzrFD@hog>
- <120e6c2c-6122-41db-8c46-7753e9659c70@gmail.com>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4DF36891F28;
+	Wed, 25 Oct 2023 10:33:17 +0000 (UTC)
+Received: from p1.luc.cera.cz (unknown [10.45.225.62])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B1F971121320;
+	Wed, 25 Oct 2023 10:33:15 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH iwl-next 0/2] Remove VF MAC types and move helpers from i40e_type.h
+Date: Wed, 25 Oct 2023 12:33:13 +0200
+Message-ID: <20231025103315.1149589-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <120e6c2c-6122-41db-8c46-7753e9659c70@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-2023-10-24, 10:17:08 +0800, Hangyu Hua wrote:
-> On 23/10/2023 22:03, Sabrina Dubroca wrote:
-> > 2023-10-23, 16:06:11 +0800, Hangyu Hua wrote:
-> > > tls_rx_one_record can be called in tls_sw_splice_read and tls_sw_read_sock
-> > > with msg being NULL. This may lead to null pointer dereferences in
-> > > tls_decrypt_device and tls_decrypt_sw.
-> > > 
-> > > Fix this by adding a check.
-> > 
-> > Have you actually hit this NULL dereference? I don't see how it can
-> > happen.
-> > 
-> > darg->zc is 0 in both cases, so tls_decrypt_device doesn't call
-> > skb_copy_datagram_msg.
-> > 
-> > tls_decrypt_sw will call tls_decrypt_sg with out_iov = &msg->msg_iter
-> > (a bogus pointer but no NULL deref yet), and darg->zc is still
-> > 0. tls_decrypt_sg skips the use of out_iov/out_sg and allocates
-> > clear_skb, and the next place where it would use out_iov is skipped
-> > because we have clear_skb.
-> 
-> My bad. I only checked &msg->msg_iter's address in tls_decrypt_sw and found
-> it was wrong. Do I need to make a new patch to fix the harmless bogus
-> pointer?
+The series removes MAC types for VF functions and moves inline helper
+functions from i40e_type.h to i40e_prototype.h
 
-I don't think that's necessary, but maybe it would avoid people trying
-to "fix" this code in the future. Jakub, WDYT?
+Ivan Vecera (2):
+  i40e: Remove VF MAC types
+  i40e: Move inline helpers to i40e_prototype.h
+
+ drivers/net/ethernet/intel/i40e/i40e_adminq.c | 33 +++-----
+ .../net/ethernet/intel/i40e/i40e_prototype.h  | 70 +++++++++++++++++
+ drivers/net/ethernet/intel/i40e/i40e_type.h   | 76 -------------------
+ 3 files changed, 80 insertions(+), 99 deletions(-)
 
 -- 
-Sabrina
+2.41.0
 
 
