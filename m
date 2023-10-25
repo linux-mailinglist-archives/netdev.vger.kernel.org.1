@@ -1,41 +1,75 @@
-Return-Path: <netdev+bounces-44125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A4EC7D6716
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 11:40:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F12FB7D675D
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 11:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 231AA281A6B
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 09:40:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81369B20B71
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 09:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2AB2134D;
-	Wed, 25 Oct 2023 09:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F76C219F3;
+	Wed, 25 Oct 2023 09:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMMhqh7l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nkw5UGfQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFB220B00
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 09:40:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E5B43C4339A;
-	Wed, 25 Oct 2023 09:40:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698226823;
-	bh=R40SvOBaAzyQCF+k5DFHQ5r8C9Pe2q2/Ct1mYoAEFAs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JMMhqh7lTesw1IPWDMNbczynMhRjX8fJ2jaKAg98AxuPiEywWwJnt5ceVAmKBeiz2
-	 wO2G6iTmdCSU1RCh+rn+1WjuBLyVYb0ZV7nOtD+Jy9r4S/80u7Izg8HN2oqjxclwOY
-	 WeGGuFmcaxQ7+ul0MYN8vVuNGgfIydWKKY4T++gB5T96QWfNgP2V6rEVSyBWtNTfD0
-	 Q9K6xXStf5bzHZlUeMCzRQe1bGJiQ+VEvUpqH7d+alNvOvVdweeDk3ktMW4xJ/8zhJ
-	 bEGvukAfZMX7Sr21vQ1vhjEDdT+A+o23B3QyI2UyMXfiyxft9GlTT/msSR7OGsEzE2
-	 aXEtLT+98nOgQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CD944C00446;
-	Wed, 25 Oct 2023 09:40:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28D22D604
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 09:46:10 +0000 (UTC)
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C03A030CB;
+	Wed, 25 Oct 2023 02:45:33 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-5406c099cebso4414128a12.2;
+        Wed, 25 Oct 2023 02:45:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698227132; x=1698831932; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8Pt5phfixaXvNlB8r+PBZ9jiHHg7LS+G7hf/4wtAiQ8=;
+        b=nkw5UGfQ317l2jaIgUkJ5QMXvDxJjlRMwjjYh22P2FtNqROvAMKfVZDypnEMd+Tli3
+         yZsqpArpS2LC4nDaGoTCLrlZY9cYv8vD2rEGoZBorbq3wLbJL0zuqe9E/cuxALv530cI
+         7eLE8AgDF2+nq6eKlH9qM4OrG5zzu/Zf3iBYjMk947n1RU/PU8uXaD/V1zU4gicHRk8m
+         ZZO90roW6jH5XBUPDZSTWzbo1dvmKSP9OvjjUxrIyMHyYiUxuxeusf+ZEDAsYopg/yuK
+         SeXz/+SfGo3QGqwI4Og10O4CcxcXcSBs9Myg2M82+9U1PCWXCxyYB6kNJrXftqseNCMH
+         9mVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698227132; x=1698831932;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8Pt5phfixaXvNlB8r+PBZ9jiHHg7LS+G7hf/4wtAiQ8=;
+        b=rtmjgSXofNfvIwyyJa+gPNynU4uIHpY727rAe8E3WMZrk785ZdwOpNQS3JfNDvgyaM
+         mImhFW23JlfcsSLsCIrF/a3o2F49zobva9WoIN+iJWg1SPrfjDDJjAMJv1WoDgedJ4/u
+         G5yzUEeP4vFNVBzTSVlBhpEJqKcF6y5OQMDtD6a+3v0NcaashCbFkp0VxeRWRm2rPW7Q
+         RHMZw0l4+G4EoP/7vCaKKosP4Rk5d1MpNFaS15kf0zyC/p3F1u+Y9izjKUoHa/rBLr9M
+         yGk5zuP+2E2r8Do2JmQ3QcjAw8jpjmHi0vTRM+NCvw3dVLKl9Z6Sy1I/1Jcbjf1kfR/u
+         x46Q==
+X-Gm-Message-State: AOJu0YwjVeopZi6MM3btvJWF+VBaChprUZ/uQR2XLC2WXsf4MRZ2zjKX
+	tiWdwq0Tawj5LTubA8Ahztx2ItHyK2M=
+X-Google-Smtp-Source: AGHT+IEJJFWpa/GIfSnQN1JJCFiP8/YkShYQ9373CxIpiir0JCn/cBfwu/bGvw4K6IveHwUZQY9KbQ==
+X-Received: by 2002:a05:6402:3593:b0:53f:bab5:864b with SMTP id y19-20020a056402359300b0053fbab5864bmr12231040edc.16.1698227131555;
+        Wed, 25 Oct 2023 02:45:31 -0700 (PDT)
+Received: from tp.home.arpa (host-95-232-81-37.retail.telecomitalia.it. [95.232.81.37])
+        by smtp.gmail.com with ESMTPSA id ch28-20020a0564021bdc00b0053ff311f388sm7706488edb.23.2023.10.25.02.45.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Oct 2023 02:45:31 -0700 (PDT)
+From: Beniamino Galvani <b.galvani@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Guillaume Nault <gnault@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] bareudp: use ports to lookup route
+Date: Wed, 25 Oct 2023 11:44:41 +0200
+Message-ID: <20231025094441.417464-1-b.galvani@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,43 +77,109 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] amd/pds_core: core: No need for Null pointer check before
- kfree
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169822682383.18837.12141561827417952269.git-patchwork-notify@kernel.org>
-Date: Wed, 25 Oct 2023 09:40:23 +0000
-References: <20231024182051.48513-1-bragathemanick0908@gmail.com>
-In-Reply-To: <20231024182051.48513-1-bragathemanick0908@gmail.com>
-To: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
-Cc: shannon.nelson@amd.com, brett.creeley@amd.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+The source and destination ports should be taken into account when
+determining the route destination; they can affect the result, for
+example in case there are routing rules defined.
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Signed-off-by: Beniamino Galvani <b.galvani@gmail.com>
+---
+ drivers/net/bareudp.c | 29 ++++++++++++++++-------------
+ 1 file changed, 16 insertions(+), 13 deletions(-)
 
-On Tue, 24 Oct 2023 23:50:51 +0530 you wrote:
-> kfree()/vfree() internally perform NULL check on the
-> pointer handed to it and take no action if it indeed is
-> NULL. Hence there is no need for a pre-check of the memory
-> pointer before handing it to kfree()/vfree().
-> 
-> Issue reported by ifnullfree.cocci Coccinelle semantic
-> patch script.
-> 
-> [...]
-
-Here is the summary with links:
-  - amd/pds_core: core: No need for Null pointer check before kfree
-    https://git.kernel.org/netdev/net-next/c/d0110443cf4a
-
-You are awesome, thank you!
+diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
+index 9c11a0d0273b..31377bb1cc97 100644
+--- a/drivers/net/bareudp.c
++++ b/drivers/net/bareudp.c
+@@ -306,8 +306,11 @@ static int bareudp_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	if (!sock)
+ 		return -ESHUTDOWN;
+ 
++	sport = udp_flow_src_port(bareudp->net, skb,
++				  bareudp->sport_min, USHRT_MAX,
++				  true);
+ 	rt = udp_tunnel_dst_lookup(skb, dev, bareudp->net, 0, &saddr, &info->key,
+-				   0, 0, key->tos,
++				   sport, bareudp->port, key->tos,
+ 				   use_cache ?
+ 				   (struct dst_cache *)&info->dst_cache : NULL);
+ 
+@@ -317,9 +320,6 @@ static int bareudp_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	skb_tunnel_check_pmtu(skb, &rt->dst,
+ 			      BAREUDP_IPV4_HLEN + info->options_len, false);
+ 
+-	sport = udp_flow_src_port(bareudp->net, skb,
+-				  bareudp->sport_min, USHRT_MAX,
+-				  true);
+ 	tos = ip_tunnel_ecn_encap(key->tos, ip_hdr(skb), skb);
+ 	ttl = key->ttl;
+ 	df = key->tun_flags & TUNNEL_DONT_FRAGMENT ? htons(IP_DF) : 0;
+@@ -371,8 +371,11 @@ static int bareudp6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	if (!sock)
+ 		return -ESHUTDOWN;
+ 
++	sport = udp_flow_src_port(bareudp->net, skb,
++				  bareudp->sport_min, USHRT_MAX,
++				  true);
+ 	dst = udp_tunnel6_dst_lookup(skb, dev, bareudp->net, sock, 0, &saddr,
+-				     key, 0, 0, key->tos,
++				     key, sport, bareudp->port, key->tos,
+ 				     use_cache ?
+ 				     (struct dst_cache *) &info->dst_cache : NULL);
+ 	if (IS_ERR(dst))
+@@ -381,9 +384,6 @@ static int bareudp6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
+ 	skb_tunnel_check_pmtu(skb, dst, BAREUDP_IPV6_HLEN + info->options_len,
+ 			      false);
+ 
+-	sport = udp_flow_src_port(bareudp->net, skb,
+-				  bareudp->sport_min, USHRT_MAX,
+-				  true);
+ 	prio = ip_tunnel_ecn_encap(key->tos, ip_hdr(skb), skb);
+ 	ttl = key->ttl;
+ 
+@@ -480,15 +480,20 @@ static int bareudp_fill_metadata_dst(struct net_device *dev,
+ 	struct ip_tunnel_info *info = skb_tunnel_info(skb);
+ 	struct bareudp_dev *bareudp = netdev_priv(dev);
+ 	bool use_cache;
++	__be16 sport;
+ 
+ 	use_cache = ip_tunnel_dst_cache_usable(skb, info);
++	sport = udp_flow_src_port(bareudp->net, skb,
++				  bareudp->sport_min, USHRT_MAX,
++				  true);
+ 
+ 	if (!ipv6_mod_enabled() || ip_tunnel_info_af(info) == AF_INET) {
+ 		struct rtable *rt;
+ 		__be32 saddr;
+ 
+ 		rt = udp_tunnel_dst_lookup(skb, dev, bareudp->net, 0, &saddr,
+-					   &info->key, 0, 0, info->key.tos,
++					   &info->key, sport, bareudp->port,
++					   info->key.tos,
+ 					   use_cache ? &info->dst_cache : NULL);
+ 		if (IS_ERR(rt))
+ 			return PTR_ERR(rt);
+@@ -502,7 +507,7 @@ static int bareudp_fill_metadata_dst(struct net_device *dev,
+ 
+ 		dst = udp_tunnel6_dst_lookup(skb, dev, bareudp->net, sock,
+ 					     0, &saddr, &info->key,
+-					     0, 0, info->key.tos,
++					     sport, bareudp->port, info->key.tos,
+ 					     use_cache ? &info->dst_cache : NULL);
+ 		if (IS_ERR(dst))
+ 			return PTR_ERR(dst);
+@@ -513,9 +518,7 @@ static int bareudp_fill_metadata_dst(struct net_device *dev,
+ 		return -EINVAL;
+ 	}
+ 
+-	info->key.tp_src = udp_flow_src_port(bareudp->net, skb,
+-					     bareudp->sport_min,
+-			USHRT_MAX, true);
++	info->key.tp_src = sport;
+ 	info->key.tp_dst = bareudp->port;
+ 	return 0;
+ }
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.41.0
 
 
