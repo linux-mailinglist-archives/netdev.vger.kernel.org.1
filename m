@@ -1,77 +1,52 @@
-Return-Path: <netdev+bounces-44300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C5447D7823
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 00:42:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 422FA7D7832
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 00:46:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D00BDB21191
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 22:42:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA8C0280FEF
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 22:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B59923747;
-	Wed, 25 Oct 2023 22:41:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB11127EFF;
+	Wed, 25 Oct 2023 22:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SHxEthc7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bpq8K2tl"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E20125DC;
-	Wed, 25 Oct 2023 22:41:57 +0000 (UTC)
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 497C7CC;
-	Wed, 25 Oct 2023 15:41:56 -0700 (PDT)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-5a7a80a96dbso12706127b3.0;
-        Wed, 25 Oct 2023 15:41:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698273715; x=1698878515; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=J6TpQRy2A+ysOT1SNmKEivbC5vkNQz1BOTcdobs1VUs=;
-        b=SHxEthc74ozKUW+ldZ5VARMUux8GK9XQ+yUDxN7El1BwIayY0feY0S5lmsbeRqMwop
-         HkKnSDcfwTk3gv2U40nEu3JYmm5VfTePraFCZk6xXRyqXDVcj98xMH+UANDzvfg89Q7C
-         CYdRfQP7eHLWHkZDLod5Ky7Tdn9MSHq5H/wVtHrm4ma+kekK/J+kA9qm8o6grh0dRLKg
-         +hIeumMxGPtUqaBXP4eQQpzFPiRF9yZRk6eFk1rNMJN3N4qqcqucvjZ/qT+UhQ/f5XPH
-         mF1iE910yp4G1Kn7vhI+e7LPRJJE1mRtifwNOscCcODfflDKV1FdRjzK4uXqUojqjUd1
-         lSwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698273715; x=1698878515;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=J6TpQRy2A+ysOT1SNmKEivbC5vkNQz1BOTcdobs1VUs=;
-        b=EogCD2lwd2DGuprasi0zSeim9ZGUBmWrOZXxtavHrpqUGupmmFchvsxSdLVLYCZj5p
-         NF63zrSfwMTSvwb95dPpEJZku7WCgEtelyGNJXRBR4/qK/8Pf+hgANiFIa+OwaoxMV3E
-         0qELlwnZYMOapnL2M23pNGKGjGoDeJ8HRocEdmptxBEH76na9+c+aoVEwFzt1rKLRLyE
-         hSOMa4KmBF8hXoOj4LOZTkhtHWNFrJD2xM4sfwLA0pBX9fIaid79UzK3+7X387CWmFNV
-         AvBOkLLN6NAih4SQlTAlfrPEA7kcFRv262GfYWNLGSjV3QoeitKffxAU1TeDQx6ISQR/
-         bCiw==
-X-Gm-Message-State: AOJu0YzNUvHVAUwNlzGNgqUwMOW9r8EVHAZtjJq8umm0TZ9Edj0/9eHI
-	tcY7WFU7BoFgAO1wRe7wF/ledIIRFhM=
-X-Google-Smtp-Source: AGHT+IFieZai65RoqXTA924HdRVyaH05ilAYCnu1Y8diumA/+Km+LIlUWvXpe8tRENlXFsa8sWINCw==
-X-Received: by 2002:a81:eb04:0:b0:5a7:a896:3f54 with SMTP id n4-20020a81eb04000000b005a7a8963f54mr1389396ywm.26.1698273715025;
-        Wed, 25 Oct 2023 15:41:55 -0700 (PDT)
-Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:1545:3e11:ea38:83fe])
-        by smtp.gmail.com with ESMTPSA id e126-20020a816984000000b00592236855cesm5385526ywc.61.2023.10.25.15.41.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 15:41:54 -0700 (PDT)
-From: thinker.li@gmail.com
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	kernel-team@meta.com,
-	andrii@kernel.org,
-	netdev@vger.kernel.org
-Cc: sinquersw@gmail.com,
-	kuifeng@meta.com,
-	Kui-Feng Lee <thinker.li@gmail.com>
-Subject: [PATCH bpf-next] bpf, net: Use bpf mem allocator for sk local storage
-Date: Wed, 25 Oct 2023 15:41:51 -0700
-Message-Id: <20231025224151.385719-1-thinker.li@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C526749F
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 22:46:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B83B4C433C7;
+	Wed, 25 Oct 2023 22:46:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698273965;
+	bh=EwGeoWVSmqUbhWycDaxzQ6Ek3vvzienMez1ubkrLYcU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bpq8K2tloK8+334UjsyCgIy6woczN95xNwsl+ajM1RMS5654nzMqcRq3FjnTyKVAB
+	 w9qH2cWePYx5TGvFzdIt53OiYYcvTlwzwfYhN5tNOncNGu5h0Sv/VgW1JaSxMFtDx9
+	 5LUv2/4hB0S3GvGXAjTnXJAjiH6xNHiRgVYCNpaq53/4fvU/vCdfKhN25/UQXGGnDx
+	 ANJpvSRBHMEKexlS71iktJ4/oqf0c5rAXgyiesgra2MFJ5R+N560FFS0eEcnyzq3uw
+	 Zm0S/cDRlsCudH/vVxYr3WIwpjWGP4nAbwL6ego78E1DPvMVjGT7dG0iS7+u5AiiJP
+	 fLYZwkI6a29Nw==
+Date: Wed, 25 Oct 2023 15:46:03 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Cc: sd@queasysnail.net, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, richardcochran@gmail.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ sebastian.tobuschat@oss.nxp.com
+Subject: Re: [PATCH net-next v8 0/7] Add MACsec support for TJA11XX C45 PHYs
+Message-ID: <20231025154603.61751dfb@kernel.org>
+In-Reply-To: <20231025154044.7877e5c0@kernel.org>
+References: <20231023094327.565297-1-radu-nicolae.pirea@oss.nxp.com>
+	<5d7021cd-71b1-4786-9beb-1a4fe084945c@oss.nxp.com>
+	<20231025151834.7e114208@kernel.org>
+	<20231025154044.7877e5c0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,56 +54,24 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-From: Kui-Feng Lee <thinker.li@gmail.com>
+On Wed, 25 Oct 2023 15:40:44 -0700 Jakub Kicinski wrote:
+> On Wed, 25 Oct 2023 15:18:34 -0700 Jakub Kicinski wrote:
+> > On Wed, 25 Oct 2023 19:21:24 +0300 Radu Pirea (OSS) wrote: =20
+> > > The state of this patch series was set to "Changes Requested", but no=
+=20
+> > > change was requested in V8 and I addressed the changes requested in V=
+7.=20
+> > > Am I missing something or is it a mistake?   =20
+> >=20
+> > Another series got silently discarded because of a conflict.
+> > This one IDK. Everything looks fine. So let me bring it back, sorry. =20
+>=20
+> Ugh, I found out why. It has already been applied :|
 
-Switching to BPF memory allocator improve the performance
-of sk local storage in terms of creating and destroying.
+Sorry, ignore me =F0=9F=A4=A6=EF=B8=8F
 
-Here is numbers w/ and w/o this changes.
-
- - ./bench local-storage-create --storage-type=socket
-   - w/ change
-     - creates  552.474 ± 1.186k/s (552.474k/prod), 2.10 kmallocs/create
-   - w/o change
-     - creates  469.960 ± 2.501k/s (469.960k/prod), 4.18 kmallocs/create
- - ./bench -p 4 local-storage-create --storage-type=socket
-   - w/ change
-     - creates 1236.614 ± 2.833k/s (309.153k/prod), 2.09 kmallocs/create
-   - w/o change
-     - creates 1120.524 ± 1.527k/s (280.131k/prod), 4.16 kmallocs/create
- - ./bench -p 4 local-storage-create --storage-type=socket \
-      --batch-size=1024
-   - w/ change
-     - creates 1416.437 ± 37.679k/s (354.109k/prod), 2.06 kmallocs/create
-   - w/o change
-     - creates 1302.636 ± 13.649k/s (325.659k/prod), 4.12 kmallocs/create
-
-Overall, with bpf memory allocator, it improves
- - 17% for single thread and with batch size 32,
- - 10% for 4 threads and with batch size 32, and
- - 8% for 4 threads and with batch size 1024.
-
-Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
----
- net/core/bpf_sk_storage.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
-index cca7594be92e..fdd9ad15cfe9 100644
---- a/net/core/bpf_sk_storage.c
-+++ b/net/core/bpf_sk_storage.c
-@@ -68,7 +68,7 @@ static void bpf_sk_storage_map_free(struct bpf_map *map)
- 
- static struct bpf_map *bpf_sk_storage_map_alloc(union bpf_attr *attr)
- {
--	return bpf_local_storage_map_alloc(attr, &sk_cache, false);
-+	return bpf_local_storage_map_alloc(attr, &sk_cache, true);
- }
- 
- static int notsupp_get_next_key(struct bpf_map *map, void *key,
--- 
-2.34.1
+I had it applied locally because I was checking if it applies cleanly.
 
 
