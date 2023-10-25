@@ -1,132 +1,96 @@
-Return-Path: <netdev+bounces-44251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1CF07D7533
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 22:10:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 477F87D755C
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 22:17:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C50291C20DF8
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 20:10:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 081AA281CA9
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 20:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93853328CC;
-	Wed, 25 Oct 2023 20:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3897C328CB;
+	Wed, 25 Oct 2023 20:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IXobuwDD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZPJD76/8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6776B28680;
-	Wed, 25 Oct 2023 20:10:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3671C433C8;
-	Wed, 25 Oct 2023 20:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D5329422
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 20:17:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A7D3C433C7;
+	Wed, 25 Oct 2023 20:17:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698264624;
-	bh=W2ZtlC8h83hjoSYyz4fUnl72qO69z2zaIBKrCyxCmas=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IXobuwDDWpPIpl4AGv2c5SE7hxUyUbECrQX3GJJk0nfdVMzKJMUgOH4sbX/qKdVyv
-	 9Dcu7WtXFdjDy/FZYaULYAWZETMipyCvyRYNGFFX8xwMLsUCKJ0rFPScDcOX0E6xcs
-	 SVF4S8sYz77QDTgdkeUI9BFYOXEacv8eGXIGCLlk6wia3qtc3pPH5Dfc2HasEenD+j
-	 AF3B4PIFBmkf0g65ZlgJ98SB3A2W8KZAKgRCVJgee/hOb441boZQJN2m5HOhSQw1Pk
-	 qXhqILm7WzfTbaKJUEUIKKFLntVCL6b+S1gGywIhrbsPrqILWhOKv3k4TchDC26j7P
-	 NxO9TUDh0W0uw==
-Date: Wed, 25 Oct 2023 21:10:15 +0100
-From: Simon Horman <horms@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v7 4/9] net: dsa: microchip: ksz9477: add Wake
- on LAN support
-Message-ID: <20231025201015.GL57304@kernel.org>
-References: <20231023093343.2370248-1-o.rempel@pengutronix.de>
- <20231023093343.2370248-5-o.rempel@pengutronix.de>
+	s=k20201202; t=1698265061;
+	bh=qoQvaVL7qMUrF2iRg4Jlx46CHSMfHeFxu+YI87JqNtQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZPJD76/8LhJHYlPB3WQd/qtrALb0eQaWkvDP5DGoSKzX8no5DOF4brps+vbvg40rA
+	 wYFL/atGHorMI5NPmrMXQ5qRRwwbIoXi4sf//Nv67rptHyrzwNUhxNwSCmYMMUT86t
+	 KPvSEIp0EcIvDarVoRWVOSsbW3N6dCkIdSzGOm3TnPOHcPs7wpAgo5HWlCS3Y6K/JS
+	 59yreOLhEw6RDpU4IvkzgtqNn07ITU6RF06lguWm4AR8zoG8yxR3EyNiYkFGSSjmiq
+	 2hQormd/ODU/P+iXQlEBqAXED+SlHEqHJJn2Lde51VVnY3S3kGao7Z52AGsPkob66H
+	 Rtt0pBZQWeZDA==
+Date: Wed, 25 Oct 2023 13:17:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, hawk@kernel.org, ilias.apalodimas@linaro.org
+Subject: Re: [PATCH net-next 05/15] net: page_pool: record pools per netdev
+Message-ID: <20231025131740.489fdfcf@kernel.org>
+In-Reply-To: <CAHS8izOTzLVxQ_rYt1vyhb=tgs2GAtuSZUWkZ183=7J3wEEzjQ@mail.gmail.com>
+References: <20231024160220.3973311-1-kuba@kernel.org>
+	<20231024160220.3973311-6-kuba@kernel.org>
+	<CAHS8izOTzLVxQ_rYt1vyhb=tgs2GAtuSZUWkZ183=7J3wEEzjQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231023093343.2370248-5-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 23, 2023 at 11:33:38AM +0200, Oleksij Rempel wrote:
-> Add WoL support for KSZ9477 family of switches. This code was tested on
-> KSZ8563 chip.
+On Wed, 25 Oct 2023 12:56:44 -0700 Mina Almasry wrote:
+> > +#if IS_ENABLED(CONFIG_PAGE_POOL)
+> > +       /** @page_pools: page pools created for this netdevice */
+> > +       struct hlist_head       page_pools;
+> > +#endif  
 > 
-> KSZ9477 family of switches supports multiple PHY events:
-> - wake on Link Up
-> - wake on Energy Detect.
-> Since current UAPI can't differentiate between this PHY events, map all
-> of them to WAKE_PHY.
+> I wonder if this per netdev field is really necessary. Is it not
+> possible to do the same simply looping over the  (global) page_pools
+> xarray? Or is that too silly of an idea. I guess on some systems you
+> may end up with 100s or 1000s of active or orphaned page pools and
+> then globally iterating over the whole page_pools xarray can be really
+> slow..
+
+I think we want the per-netdev hlist either way, on netdev
+unregistration we need to find its pools to clear the pointers.
+At which point we can as well use that to dump the pools.
+
+I don't see a strong reason to use one approach over the other.
+Note that other objects like napi and queues (WIP patches) also walk
+netdevs and dump sub-objects from them.
+
+> > @@ -48,6 +49,7 @@ struct pp_alloc_cache {
+> >   * @pool_size: size of the ptr_ring
+> >   * @nid:       NUMA node id to allocate from pages from
+> >   * @dev:       device, for DMA pre-mapping purposes
+> > + * @netdev:    netdev this pool will serve (leave as NULL if none or multiple)  
 > 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> ---
->  drivers/net/dsa/microchip/ksz9477.c    | 100 +++++++++++++++++++++++++
->  drivers/net/dsa/microchip/ksz9477.h    |   4 +
->  drivers/net/dsa/microchip/ksz_common.c |  24 ++++++
->  drivers/net/dsa/microchip/ksz_common.h |   4 +
->  4 files changed, 132 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-> index cde8ef33d029..036dfaddb32a 100644
-> --- a/drivers/net/dsa/microchip/ksz9477.c
-> +++ b/drivers/net/dsa/microchip/ksz9477.c
-> @@ -56,6 +56,103 @@ int ksz9477_change_mtu(struct ksz_device *dev, int port, int mtu)
->  				  REG_SW_MTU_MASK, frame_size);
->  }
->  
-> +/**
-> + * ksz9477_handle_wake_reason - Handle wake reason on a specified port.
-> + * @dev: The device structure.
-> + * @port: The port number.
-> + *
-> + * This function reads the PME (Power Management Event) status register of a
-> + * specified port to determine the wake reason. If there is no wake event, it
-> + * returns early. Otherwise, it logs the wake reason which could be due to a
-> + * "Magic Packet", "Link Up", or "Energy Detect" event. The PME status register
-> + * is then cleared to acknowledge the handling of the wake event.
-> + *
-> + * Return: 0 on success, or an error code on failure.
-> + */
-> +static int ksz9477_handle_wake_reason(struct ksz_device *dev, int port)
-> +{
-> +	u8 pme_status;
-> +	int ret;
-> +
-> +	ret = ksz_pread8(dev, port, REG_PORT_PME_STATUS, &pme_status);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (!pme_status)
-> +		return 0;
-> +
-> +	dev_dbg(dev->dev, "Wake event on port %d due to:%s%s\n", port,
-> +		pme_status & PME_WOL_LINKUP ? " \"Link Up\"" : "",
-> +		pme_status & PME_WOL_ENERGY ? " \"Enery detect\"" : "");
+> Is this an existing use case (page_pools that serve null or multiple
+> netdevs), or a future use case? My understanding is that currently
+> page_pools serve at most 1 rx-queue. Spot checking a few drivers that
+> seems to be true.
 
-nit: Energy
+I think I saw one embedded driver for a switch-like device which has
+queues servicing all ports, and therefore netdevs.
+We'd need some help from people using such devices to figure out what
+the right way to represent them is, and what extra bits of
+functionality they need.
 
-> +
-> +	return ksz_pwrite8(dev, port, REG_PORT_PME_STATUS, pme_status);
-> +}
+> I'm guessing 1 is _always_ loopback?
 
-...
+AFAIK, yes. I should probably use LOOPBACK_IFINDEX, to make it clearer.
 
