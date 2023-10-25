@@ -1,100 +1,146 @@
-Return-Path: <netdev+bounces-44265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF0917D768E
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:24:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EEDC7D76B0
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:26:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8ECEBB20D95
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 21:24:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C385FB20A64
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 21:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37599339B2;
-	Wed, 25 Oct 2023 21:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+yHywfo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 327D4341AA;
+	Wed, 25 Oct 2023 21:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59AB12B6D;
-	Wed, 25 Oct 2023 21:24:10 +0000 (UTC)
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E2E132;
-	Wed, 25 Oct 2023 14:24:09 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5a7ac4c3666so1339347b3.3;
-        Wed, 25 Oct 2023 14:24:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698269049; x=1698873849; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=b2tlHyzHAWHhl5WlMfjU/HdSIBEM4uvxlEfX0//lC78=;
-        b=D+yHywfol8vj6Xkfa12jp/YevEGbSxRnwHLCwgN/eGdJI/dDRQiyYwWucOsnM49BpP
-         bCaGYKQB77A3oqGHOU3hV5Qmfh22stGqhQpP4zrLwpdlj1WoFhwfkQ6SIKWoAMlG4oY6
-         hjGg+LWZwwkrbV0G65OK7CU27+WWPfZQFxrNdVmi5qTfICHtvUVspI3D8LNaAfjR5Kgd
-         UvIU59kq0tk0HRhm5b6HOE1+cHepszaYpQYKLFkAAC0or105PIyQd/oa8j9PIpum7sDb
-         RZNSgx9+iM24f5Qw9OssICqSDG9bAngtKeEuHex2RFv/2vG8MPE36OKUWPaL1XVTnBVy
-         TxGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698269049; x=1698873849;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b2tlHyzHAWHhl5WlMfjU/HdSIBEM4uvxlEfX0//lC78=;
-        b=UkdRgJJfmAKFBfhJJsyS6CToSmHqWYPVk0LzD0ryIZce93BP5ssmWt43kXaKW7HP/R
-         +bgrn6iYdI5EsE7YJzADYVTs488b/DTjmBELKT5le6LOvtcpggB5jx0MHWjABqx9EIvj
-         ZvQRWM3tcK9BBUQ83fOWU80VovRFT97G5KRCEDdXdGn+h76yb0ZMT2AMPgvK1ZmuqJqm
-         eByX+rIGpNi6UKfBEMvCkYeAem/qnoX6DfLwnQsljJPxQMlcd1jXAfVrUyqh9IssR1YZ
-         y+lole5uqi+CBoS8+UlvXkcpgUCz+UWVEOjQ8BB0K7vIBxWZOpxzCT5P6J9Z1rt4GEOT
-         LJjg==
-X-Gm-Message-State: AOJu0YzzDJqMOqWdBwl7t/2CO8c73d91dtFpTwM74cl1lB3pMX6zGAJg
-	H/vGz8B5siNV4kx5eMhQsts=
-X-Google-Smtp-Source: AGHT+IHrejJCIAGJw5AK48PIQZcv5G1WktJGUSCMiakxtG7viabjRgphqcoVDZrVhoL/ko4uUdYWKA==
-X-Received: by 2002:a81:920e:0:b0:5a7:c906:14f with SMTP id j14-20020a81920e000000b005a7c906014fmr16271706ywg.11.1698269048830;
-        Wed, 25 Oct 2023 14:24:08 -0700 (PDT)
-Received: from ?IPV6:2600:1700:6cf8:1240:1545:3e11:ea38:83fe? ([2600:1700:6cf8:1240:1545:3e11:ea38:83fe])
-        by smtp.gmail.com with ESMTPSA id z65-20020a814c44000000b005a8eadbadbesm1670366ywa.19.2023.10.25.14.24.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Oct 2023 14:24:08 -0700 (PDT)
-Message-ID: <ad801a2c-217e-44b4-8dae-0ae7b1b8484f@gmail.com>
-Date: Wed, 25 Oct 2023 14:24:06 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3CD1BDF9
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 21:26:07 +0000 (UTC)
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CEB9912A;
+	Wed, 25 Oct 2023 14:26:01 -0700 (PDT)
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net-next 00/19] Netfilter updates for net-next
+Date: Wed, 25 Oct 2023 23:25:36 +0200
+Message-Id: <20231025212555.132775-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v4 1/7] netkit, bpf: Add bpf programmable net
- device
-To: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, martin.lau@linux.dev, razor@blackwall.org,
- ast@kernel.org, andrii@kernel.org, john.fastabend@gmail.com, sdf@google.com,
- toke@kernel.org, kuba@kernel.org, andrew@lunn.ch,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-References: <20231024214904.29825-1-daniel@iogearbox.net>
- <20231024214904.29825-2-daniel@iogearbox.net>
-Content-Language: en-US
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <20231024214904.29825-2-daniel@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Hi,
 
+The following patchset contains Netfilter updates for net-next. Mostly
+nf_tables updates with two patches for connlabel and br_netfilter.
 
-On 10/24/23 14:48, Daniel Borkmann wrote:
-> This work adds a new, minimal BPF-programmable device called "netkit"
-> (former PoC code-name "meta") we recently presented at LSF/MM/BPF. The
-> core idea is that BPF programs are executed within the drivers xmit routine
-> and therefore e.g. in case of containers/Pods moving BPF processing closer
-> to the source.
-> 
+1) Rename function name to perform on-demand GC for rbtree elements,
+   and replace async GC in rbtree by sync GC. Patches from Florian Westphal.
 
-Sorry for intruding into this discussion! Although it is too late to
-mentioned this since this patchset have been v4 already.
+2) Use commit_mutex for NFT_MSG_GETRULE_RESET to ensure that two
+   concurrent threads invoking this command do not underrun stateful
+   objects. Patches from Phil Sutter.
 
-I notice netkit has introduced a new attach type. I wonder if it
-possible to implement it as a new struct_ops type.
+3) Use single hook to deal with IP and ARP packets in br_netfilter.
+   Patch from Florian Westphal.
+
+4) Use atomic_t in netns->connlabel use counter instead of using a
+   spinlock, also patch from Florian.
+
+5) Cleanups for stateful objects infrastructure in nf_tables.
+   Patches from Phil Sutter.
+
+6) Flush path uses opaque set element offered by the iterator, instead of
+   calling pipapo_deactivate() which looks up for it again.
+
+7) Set backend .flush interface always succeeds, make it return void
+   instead.
+
+8) Add struct nft_elem_priv placeholder structure and use it by replacing
+   void * to pass opaque set element representation from backend to frontend
+   which defeats compiler type checks.
+
+9) Shrink memory consumption of set element transactions, by reducing
+   struct nft_trans_elem object size and reducing stack memory usage.
+
+10) Use struct nft_elem_priv also for set backend .insert operation too.
+
+11) Carry reset flag in nft_set_dump_ctx structure, instead of passing it
+    as a function argument, from Phil Sutter.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-23-10-25
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 5e3704030b240ab6878c32abdc2e38b6bac9dfb8:
+
+  Merge branch 'bnxt_en-next' (2023-10-22 11:41:46 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-23-10-25
+
+for you to fetch changes up to 9cdee063476988102bbc5e0e9551e10c5ed00d3e:
+
+  netfilter: nf_tables: Carry reset boolean in nft_set_dump_ctx (2023-10-24 15:48:30 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 23-10-25
+
+----------------------------------------------------------------
+Florian Westphal (4):
+      netfilter: nft_set_rbtree: rename gc deactivate+erase function
+      netfilter: nft_set_rbtree: prefer sync gc to async worker
+      br_netfilter: use single forward hook for ip and arp
+      netfilter: conntrack: switch connlabels to atomic_t
+
+Pablo Neira Ayuso (5):
+      netfilter: nft_set_pipapo: no need to call pipapo_deactivate() from flush
+      netfilter: nf_tables: set backend .flush always succeeds
+      netfilter: nf_tables: expose opaque set element as struct nft_elem_priv
+      netfilter: nf_tables: shrink memory consumption of set elements
+      netfilter: nf_tables: set->ops->insert returns opaque set element in case of EEXIST
+
+Phil Sutter (10):
+      netfilter: nf_tables: Open-code audit log call in nf_tables_getrule()
+      netfilter: nf_tables: Introduce nf_tables_getrule_single()
+      netfilter: nf_tables: Add locking for NFT_MSG_GETRULE_RESET requests
+      netfilter: nf_tables: Drop pointless memset in nf_tables_dump_obj
+      netfilter: nf_tables: Unconditionally allocate nft_obj_filter
+      netfilter: nf_tables: A better name for nft_obj_filter
+      netfilter: nf_tables: Carry s_idx in nft_obj_dump_ctx
+      netfilter: nf_tables: nft_obj_filter fits into cb->ctx
+      netfilter: nf_tables: Carry reset boolean in nft_obj_dump_ctx
+      netfilter: nf_tables: Carry reset boolean in nft_set_dump_ctx
+
+ include/net/netfilter/nf_conntrack_labels.h |   2 +-
+ include/net/netfilter/nf_tables.h           |  60 ++--
+ include/net/netns/conntrack.h               |   2 +-
+ net/bridge/br_netfilter_hooks.c             |  72 +++--
+ net/netfilter/nf_conntrack_labels.c         |  17 +-
+ net/netfilter/nf_tables_api.c               | 445 +++++++++++++++-------------
+ net/netfilter/nft_dynset.c                  |  23 +-
+ net/netfilter/nft_set_bitmap.c              |  53 ++--
+ net/netfilter/nft_set_hash.c                | 109 +++----
+ net/netfilter/nft_set_pipapo.c              |  73 ++---
+ net/netfilter/nft_set_pipapo.h              |   4 +-
+ net/netfilter/nft_set_rbtree.c              | 200 ++++++-------
+ 12 files changed, 558 insertions(+), 502 deletions(-)
 
