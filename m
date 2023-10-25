@@ -1,164 +1,86 @@
-Return-Path: <netdev+bounces-44110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEDDC7D6511
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 10:29:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90BDC7D6513
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 10:30:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66E95281735
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 08:29:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDBB4281941
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 08:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 974AC1CABB;
-	Wed, 25 Oct 2023 08:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24AF5748C;
+	Wed, 25 Oct 2023 08:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WkLV7qSc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="snQUTp10"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221331FCC
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 08:29:34 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2075.outbound.protection.outlook.com [40.107.93.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBD14B0;
-	Wed, 25 Oct 2023 01:29:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nRmxjLr72sbuuBbfOSuCGIKwVlrTQMJP8v9/ppiDCvjpQ+StoYGEoQdJuDp/aa7yLct1KAoyeUqOOqSGrrWH+EYlj8r0KWQppOztXvtjZlIc6PIsqUd72wbWIp22AOb7uKabJK2l89ahRF9FM2tUBgTus0pOiCrN0EyjRSNbXBjAXpHuX/zIgI77mCSu9oRsX4pIgI2OILMk+/s8y6zoJ7nrHohuF6Bvim2MJ3d9aSgSK0r3864k2XCKyC32Al/KUhpa/gTw1lJR1NDItY7XNE5T80aAjaikcbgEufbf7tSQ6T/JFO6TJCenK6fzcIE2pFFY+aazJoUYc+PWBV1ldw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O0mjhQQ/MExX6w70WmvmHVVBDLh++Lgb/UEv6wZxFNU=;
- b=CBCpASEx0TR7jS/YSFQQjmon97F90jZqkzfYlQlu5MjR74E2i0oWlcUY5o2Nsa1FZq5hvKFx7o5sT2EHTNinhW2kwtTRoJVxQfGijJqnDTF8v2wr4FJNzaXYhjyyzOIdB7lhMNlZW+Ve3OzxYOOEJHJpf+oZDmbN9cTp9W2t3Ers+0h0wVt9FILubKSpXoZjEhmvQA7soAol2i4n1AjLYWu5xs38TOlF+zBvLaIREU6CcEHpax7mUa8KhqgVS9WYcfdWprjdBkergc24DnT5oBRyMfD+kCAz5XszUQv2XxPUZm7Fl5p/1glQySGMUan/2irs+6WzAJXJ47yaltKfww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=hisilicon.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O0mjhQQ/MExX6w70WmvmHVVBDLh++Lgb/UEv6wZxFNU=;
- b=WkLV7qScW1aOZhO+qdtQy1Bv2Y+jE/j9i12oIaHC/Lmtb8BI2ZeIYmf44cng5JlS7DxawPTV8+gOLfFjzUHWLxkH5TpOM1Cxhhpwuw6PbGQRVUdp/2Qd7cTnCIh4F4e4JJmDD6ZSDBB61+436f+9hkSsfkf5S/qS5RDxyLn5mJThCfDC2mMS+2bjAslARjj3s1pEoN6QnNJJ72iQQYQO/hJjCjwc2mzE4pcFunfMFJ89Iv4hUsH/zeCVkTSaM16mJKZIRwRhvWgLbEw39D76cnwidf+oWeO+XsC5sYUhdFgmD7LvKd45wpNsiQZvXMD21NJ20sub9OGhl7aAiRNgWQ==
-Received: from SA0PR11CA0164.namprd11.prod.outlook.com (2603:10b6:806:1bb::19)
- by PH0PR12MB5607.namprd12.prod.outlook.com (2603:10b6:510:142::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35; Wed, 25 Oct
- 2023 08:29:30 +0000
-Received: from SA2PEPF00001508.namprd04.prod.outlook.com
- (2603:10b6:806:1bb:cafe::bf) by SA0PR11CA0164.outlook.office365.com
- (2603:10b6:806:1bb::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.19 via Frontend
- Transport; Wed, 25 Oct 2023 08:29:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SA2PEPF00001508.mail.protection.outlook.com (10.167.242.40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6933.15 via Frontend Transport; Wed, 25 Oct 2023 08:29:29 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 25 Oct
- 2023 01:29:04 -0700
-Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 25 Oct
- 2023 01:29:01 -0700
-References: <20231023112217.3439-1-phaddad@nvidia.com>
- <20231023112217.3439-3-phaddad@nvidia.com>
- <6a1632a4-28fd-4fdd-b9ff-34dd2f0bba88@gmail.com>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: David Ahern <dsahern@gmail.com>
-CC: Patrisious Haddad <phaddad@nvidia.com>, <jgg@ziepe.ca>, <leon@kernel.org>,
-	<stephen@networkplumber.org>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linuxarm@huawei.com>,
-	<linux-kernel@vger.kernel.org>, <huangjunxian6@hisilicon.com>,
-	<michaelgur@nvidia.com>
-Subject: Re: [PATCH v2 iproute2-next 2/3] rdma: Add an option to set
- privileged QKEY parameter
-Date: Wed, 25 Oct 2023 10:25:53 +0200
-In-Reply-To: <6a1632a4-28fd-4fdd-b9ff-34dd2f0bba88@gmail.com>
-Message-ID: <87v8av5cmt.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F891CF8B
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 08:30:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 657C2C433C8;
+	Wed, 25 Oct 2023 08:30:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698222627;
+	bh=KhKMCCb4QBZPaGwVmy7RtOb486ioereUy6ga837nVik=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=snQUTp10aZphyIsvSkmlpRgEcZpt9XkXiZ+gQoUmc9l+nDd6gIzSR56XQZGaXsoYS
+	 QPHu113j7HRjP/qJPiQKM/xgiuGGJcv2kKAPAtA0cuOj+6NcDUt7S1DU8VeXZHZGpM
+	 hpRtb420d05mqn6QPt6PyrjM+IJOLGTx/v9OuZyXECvqYx1wvPTm13U1Su6WKGJlXb
+	 6UEOPXFqWMNwJi65ZO7+v2d9yA0cS1PN9CuBr6bl0NPDRG0DNnDlopXuw3KadeehPk
+	 lbMRZlw3yAbBVie+HFwj3DqmzPHpRSuxlvpGHkdMY1UFEBlwl3777EEyu6ke5dpEpq
+	 uJiyjvrMSOdnQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5024CE11F55;
+	Wed, 25 Oct 2023 08:30:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00001508:EE_|PH0PR12MB5607:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8b881fd2-5278-413d-db39-08dbd53481f3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	sSnsL7So0XC3c0X1WJ+UXsjuRqLHVJ7CrFaQJr+So+avEL7cwQ16Nvq72T38Jd09JhHmTS8vT9EEnl6/ym7T3n0nhlN48YM2KYdYoSTR4yJ5RPshh0ejzrCXG7g36aT/WUTa8FRiMj5GSmQuOcT/U/c7J9uwHlJZ7CaQ4PmO3GTOPZ9mtz3pbrUeT07U+uIoKrQvtYtIQ5IEuBh0cBlV9O7W2EmQl7J1XZZM9iRTBuDO8TGooZHJUsU5n58XZSOGY7J+EJnuiPV9jLxHuJQxtHPRt1c2c0U0gESA5EqR2N3J0SpthXcpHDwLzOIGlVI05UEMWktTQicMreEc5xLZarDsBbJCsrhxwW5+sOXVJSbk96UwM/+5VP0+vT7sZSFtva0wnstIaBeX2KCM634f/DXFcYT/VkUY2bVuu4jdR2kbqXT3I/rBWmCVAR3KVGKf2EHT80sdooOmdm2C5E7G8VQaAHN++4o0IIsk1XhjOD4h0o3UWEp9v4akEmJEcb6lWC8CZJmsqT3S5lFkTKWf1BM9/zhB/3tG6+0Eudc1MMYa0+VZnWH4wNWxiQaxbR/yBDkyqi/5eXlIdAY53s8iBsMe5AQpoU0WK8sO3GsYdVoUm+kuddEC0P1joYBVYRke7mdbEe8eQCf5BCgsAlIYI1u3nd2gMWlYn6V6kCimfwosfEPtAMlDTg9O8G8+4gSbjTdCGbp+DJNn/dvk0QZrSgG3gxKIm1hHtQnIWRcJMuxm8CNwNi9IMf3KMy+5Qfc1
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(346002)(136003)(39860400002)(230922051799003)(186009)(64100799003)(451199024)(1800799009)(82310400011)(36840700001)(46966006)(40470700004)(16526019)(53546011)(40460700003)(4326008)(426003)(26005)(107886003)(2616005)(82740400003)(8936002)(336012)(8676002)(83380400001)(5660300002)(47076005)(7636003)(40480700001)(356005)(2906002)(478600001)(86362001)(41300700001)(316002)(6666004)(36756003)(70206006)(70586007)(54906003)(36860700001)(6916009);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 08:29:29.6908
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b881fd2-5278-413d-db39-08dbd53481f3
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00001508.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5607
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V2 net-next] net: hns3: add some link modes for hisilicon
+ device
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169822262732.22461.9007651558470445369.git-patchwork-notify@kernel.org>
+Date: Wed, 25 Oct 2023 08:30:27 +0000
+References: <20231024032034.417509-1-shaojijie@huawei.com>
+In-Reply-To: <20231024032034.417509-1-shaojijie@huawei.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ wojciech.drewek@intel.com, shenjian15@huawei.com, wangjie125@huawei.com,
+ liuyonglong@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
+Hello:
 
-David Ahern <dsahern@gmail.com> writes:
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> On 10/23/23 5:22 AM, Patrisious Haddad wrote:
->> diff --git a/rdma/sys.c b/rdma/sys.c
->> index fd785b25..db34cb41 100644
->> --- a/rdma/sys.c
->> +++ b/rdma/sys.c
->> @@ -40,6 +40,17 @@ static int sys_show_parse_cb(const struct nlmsghdr *nlh, void *data)
->>  				   mode_str);
->>  	}
->>  
->> +	if (tb[RDMA_NLDEV_SYS_ATTR_PRIVILEGED_QKEY_MODE]) {
->> +		uint8_t pqkey_mode;
->> +
->> +		pqkey_mode =
->> +			mnl_attr_get_u8(tb[RDMA_NLDEV_SYS_ATTR_PRIVILEGED_QKEY_MODE]);
->
-> just make it mode so it fits on one line.
->
-> 40 characters for an attribute name .... I will never understand this
-> fascination with writing a sentence for an attribute name.
+On Tue, 24 Oct 2023 11:20:34 +0800 you wrote:
+> From: Hao Chen <chenhao418@huawei.com>
+> 
+> Add HCLGE_SUPPORT_50G_R1_BIT and HCLGE_SUPPORT_100G_R2_BIT two
+> capability bits and Corresponding link modes.
+> 
+> Signed-off-by: Hao Chen <chenhao418@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> 
+> [...]
 
-Yeah, I noticed this after the review, and figured oh whatever. But this
-would be better:
+Here is the summary with links:
+  - [V2,net-next] net: hns3: add some link modes for hisilicon device
+    https://git.kernel.org/netdev/net-next/c/8ee2843f4d52
 
-		int at = RDMA_NLDEV_SYS_ATTR_PRIVILEGED_QKEY_MODE;
-		uint8_t pqkey_mode;
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-		pqkey_mode = mnl_attr_get_u8(tb[at]);
-		print_color_on_off(PRINT_ANY, COLOR_NONE, "privileged-qkey",
-				   "privileged-qkey %s ", pqkey_mode);
-
->> +
->> +		print_color_on_off(PRINT_ANY, COLOR_NONE, "privileged-qkey",
->> +				   "privileged-qkey %s ", pqkey_mode);
->> +
->> +	}
->> +
->>  	if (tb[RDMA_NLDEV_SYS_ATTR_COPY_ON_FORK])
->>  		cof = mnl_attr_get_u8(tb[RDMA_NLDEV_SYS_ATTR_COPY_ON_FORK]);
->>  
->
-> keep Petr's reviewed-by tag on the respin.
 
 
