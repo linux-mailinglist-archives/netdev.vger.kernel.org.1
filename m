@@ -1,41 +1,40 @@
-Return-Path: <netdev+bounces-44315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B87F7D78B0
+	by mail.lfdr.de (Postfix) with ESMTPS id E77EC7D78B1
 	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:37:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C2DBB21262
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:37:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CEB8B21358
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65641381B1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE54381B5;
 	Wed, 25 Oct 2023 23:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sc2Y6oJJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i26CsGYC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A86381A8;
-	Wed, 25 Oct 2023 23:37:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79CF9C43395;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A60381AD;
+	Wed, 25 Oct 2023 23:37:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA49EC433B9;
 	Wed, 25 Oct 2023 23:37:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1698277032;
-	bh=oWhq8MDM3cTZAxpiFQKriinw5wYjuNCtFlUpEjC9Uyo=;
+	bh=GyNOg92sM3p0ShPkfaGKDtFNcD8NFmdnpi3MEJceRfk=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Sc2Y6oJJ0/ZX36ftASStFjvoiI+/oBiksikRUXfbpAXyiCPtlvUs204jbwGpob+1P
-	 ntnbDWykcMzJfw4yQLDegNeLy2qghX7aCQpaqXYmci9trW5SGZ24eOVuryZCafk9R4
-	 GuMCOV5qeWw6HvF+X76cyfFhvgk9Iu8DHdxsDTQ7em0pfKkkz+ToRl2BjKk/Vi62KR
-	 yj56DYryYbOw3/6ewgz88ZzNtfcLpTI0qBD4jckGXfeDlqiOdIQ/PZZtrPkmjYuu9K
-	 hxWSpLf616g/K/QsAP/RUxWZQqE2xD9itTMBi7L4L3OlEOH3A+wVo3KSjR5Kbe5Lda
-	 Cq6IHaPiWqxKg==
+	b=i26CsGYCgYdBKFtgsah5O2+wzT/iEI/7yNx9bC1bXOTLlEHi3xsQ2QErM28QtOsx1
+	 SFiMhissGcWr1b5NNTlbLel7kvxXIsJttmD5dkZoRaykTtNV0Imwl5wBJey5WEZ0AO
+	 B0VfGHaWj0FRcg0HxQr8rYG+5ou/knGgtDy7xzfELIPy7YRSfa0AM57Ud5xqxq3uqT
+	 kWSo9A8TE6TOGNkedqJkjmXUIl0e9Q88WKHEP672Tg+XWWTfsyUa7yb+H0S5qwdBx2
+	 XTvbrmRIsUNF+R1gEctEI3jfhAWeWgZM9/Y2xbsyK6X2g3Yx85L28NEB+65/dk3bCk
+	 opar4hKmoirFQ==
 From: Mat Martineau <martineau@kernel.org>
-Date: Wed, 25 Oct 2023 16:37:03 -0700
-Subject: [PATCH net-next 02/10] selftests: mptcp: fix wait_rm_addr/sf
- parameters
+Date: Wed, 25 Oct 2023 16:37:04 -0700
+Subject: [PATCH net-next 03/10] mptcp: userspace pm send RM_ADDR for ID 0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,7 +43,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231025-send-net-next-20231025-v1-2-db8f25f798eb@kernel.org>
+Message-Id: <20231025-send-net-next-20231025-v1-3-db8f25f798eb@kernel.org>
 References: <20231025-send-net-next-20231025-v1-0-db8f25f798eb@kernel.org>
 In-Reply-To: <20231025-send-net-next-20231025-v1-0-db8f25f798eb@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>, 
@@ -58,75 +57,81 @@ X-Mailer: b4 0.12.4
 
 From: Geliang Tang <geliang.tang@suse.com>
 
-The second input parameter of 'wait_rm_addr/sf $1 1' is misused. If it's
-1, wait_rm_addr/sf will never break, and will loop ten times, then
-'wait_rm_addr/sf' equals to 'sleep 1'. This delay time is too long,
-which can sometimes make the tests fail.
+This patch adds the ability to send RM_ADDR for local ID 0. Check
+whether id 0 address is removed, if not, put id 0 into a removing
+list, pass it to mptcp_pm_remove_addr() to remove id 0 address.
 
-A better way to use wait_rm_addr/sf is to use rm_addr/sf_count to obtain
-the current value, and then pass into wait_rm_addr/sf.
+There is no reason not to allow the userspace to remove the initial
+address (ID 0). This special case was not taken into account not
+letting the userspace to delete all addresses as announced.
 
-Fixes: 4369c198e599 ("selftests: mptcp: test userspace pm out of transfer")
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/379
+Fixes: d9a4594edabf ("mptcp: netlink: Add MPTCP_PM_CMD_REMOVE")
 Cc: stable@vger.kernel.org
-Suggested-by: Matthieu Baerts <matttbe@kernel.org>
 Reviewed-by: Matthieu Baerts <matttbe@kernel.org>
 Signed-off-by: Geliang Tang <geliang.tang@suse.com>
 Signed-off-by: Mat Martineau <martineau@kernel.org>
 ---
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ net/mptcp/pm_userspace.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index edc569bab4b8..5917a74b749d 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -3289,6 +3289,7 @@ userspace_pm_rm_sf_addr_ns1()
- 	local addr=$1
- 	local id=$2
- 	local tk sp da dp
-+	local cnt_addr cnt_sf
- 
- 	tk=$(grep "type:1," "$evts_ns1" |
- 	     sed -n 's/.*\(token:\)\([[:digit:]]*\).*$/\2/p;q')
-@@ -3298,11 +3299,13 @@ userspace_pm_rm_sf_addr_ns1()
- 	     sed -n 's/.*\(daddr6:\)\([0-9a-f:.]*\).*$/\2/p;q')
- 	dp=$(grep "type:10" "$evts_ns1" |
- 	     sed -n 's/.*\(dport:\)\([[:digit:]]*\).*$/\2/p;q')
-+	cnt_addr=$(rm_addr_count ${ns1})
-+	cnt_sf=$(rm_sf_count ${ns1})
- 	ip netns exec $ns1 ./pm_nl_ctl rem token $tk id $id
- 	ip netns exec $ns1 ./pm_nl_ctl dsf lip "::ffff:$addr" \
- 				lport $sp rip $da rport $dp token $tk
--	wait_rm_addr $ns1 1
--	wait_rm_sf $ns1 1
-+	wait_rm_addr $ns1 "${cnt_addr}"
-+	wait_rm_sf $ns1 "${cnt_sf}"
+diff --git a/net/mptcp/pm_userspace.c b/net/mptcp/pm_userspace.c
+index 0f92e5b13a8a..25fa37ac3620 100644
+--- a/net/mptcp/pm_userspace.c
++++ b/net/mptcp/pm_userspace.c
+@@ -208,6 +208,40 @@ int mptcp_pm_nl_announce_doit(struct sk_buff *skb, struct genl_info *info)
+ 	return err;
  }
  
- userspace_pm_add_sf()
-@@ -3324,17 +3327,20 @@ userspace_pm_rm_sf_addr_ns2()
- 	local addr=$1
- 	local id=$2
- 	local tk da dp sp
-+	local cnt_addr cnt_sf
++static int mptcp_userspace_pm_remove_id_zero_address(struct mptcp_sock *msk,
++						     struct genl_info *info)
++{
++	struct mptcp_rm_list list = { .nr = 0 };
++	struct mptcp_subflow_context *subflow;
++	struct sock *sk = (struct sock *)msk;
++	bool has_id_0 = false;
++	int err = -EINVAL;
++
++	lock_sock(sk);
++	mptcp_for_each_subflow(msk, subflow) {
++		if (subflow->local_id == 0) {
++			has_id_0 = true;
++			break;
++		}
++	}
++	if (!has_id_0) {
++		GENL_SET_ERR_MSG(info, "address with id 0 not found");
++		goto remove_err;
++	}
++
++	list.ids[list.nr++] = 0;
++
++	spin_lock_bh(&msk->pm.lock);
++	mptcp_pm_remove_addr(msk, &list);
++	spin_unlock_bh(&msk->pm.lock);
++
++	err = 0;
++
++remove_err:
++	release_sock(sk);
++	return err;
++}
++
+ int mptcp_pm_nl_remove_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	struct nlattr *token = info->attrs[MPTCP_PM_ATTR_TOKEN];
+@@ -239,6 +273,11 @@ int mptcp_pm_nl_remove_doit(struct sk_buff *skb, struct genl_info *info)
+ 		goto remove_err;
+ 	}
  
- 	tk=$(sed -n 's/.*\(token:\)\([[:digit:]]*\).*$/\2/p;q' "$evts_ns2")
- 	da=$(sed -n 's/.*\(daddr4:\)\([0-9.]*\).*$/\2/p;q' "$evts_ns2")
- 	dp=$(sed -n 's/.*\(dport:\)\([[:digit:]]*\).*$/\2/p;q' "$evts_ns2")
- 	sp=$(grep "type:10" "$evts_ns2" |
- 	     sed -n 's/.*\(sport:\)\([[:digit:]]*\).*$/\2/p;q')
-+	cnt_addr=$(rm_addr_count ${ns2})
-+	cnt_sf=$(rm_sf_count ${ns2})
- 	ip netns exec $ns2 ./pm_nl_ctl rem token $tk id $id
- 	ip netns exec $ns2 ./pm_nl_ctl dsf lip $addr lport $sp \
- 				rip $da rport $dp token $tk
--	wait_rm_addr $ns2 1
--	wait_rm_sf $ns2 1
-+	wait_rm_addr $ns2 "${cnt_addr}"
-+	wait_rm_sf $ns2 "${cnt_sf}"
- }
++	if (id_val == 0) {
++		err = mptcp_userspace_pm_remove_id_zero_address(msk, info);
++		goto remove_err;
++	}
++
+ 	lock_sock((struct sock *)msk);
  
- userspace_tests()
+ 	list_for_each_entry(entry, &msk->pm.userspace_pm_local_addr_list, list) {
 
 -- 
 2.41.0
