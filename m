@@ -1,260 +1,106 @@
-Return-Path: <netdev+bounces-44139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B697D6971
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 12:49:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ED867D6986
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 12:52:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 768071C20C2E
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 10:48:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F39C8B2102D
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 10:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E6826E0C;
-	Wed, 25 Oct 2023 10:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B97C026E0E;
+	Wed, 25 Oct 2023 10:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OfDFG5ew"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SuTR7ZrO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A57215491
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 10:48:54 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A1F131;
-	Wed, 25 Oct 2023 03:48:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0A515491
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 10:52:13 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E2B184
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 03:52:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698230932; x=1729766932;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=KVbHUtuwoLgRV/FtC7nEWWJ1DnhqLfHtAlGqkZwcjWE=;
-  b=OfDFG5ewqBzHqS2gH1RWr/ABzAxF026GQnqkSvSoudK3YCLsLIO5ZVij
-   0emxIiL0sSxry0HKVRclYD9Cs+8jF2CiymvYJT18ktDNj4GEqInNdp3+U
-   CPVg9fCEqp1mVKuGBGsnPKPjaNpS2goISzCsp2IRVNe4Ba9VKxSJMAInz
-   9DUOTOfwR6KUmC/79q82pIU7+0JaNaLv67BSNnCGX9AAVPJWpVNam+/ci
-   spRbD4h+0Bv0jvJAJTyp0+l289edeYDN59i5y0lfYxdgZcM1wfHVojOFk
-   YWaSwXHzUSe4afWX+zcJKCnqS3eAsT0N6LWoOJjlERui2iVEsk1E4mdqQ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="372337929"
+  t=1698231128; x=1729767128;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=G8oFL5f5KsRqksPekZ1YDNregib8p4oR2OSee4LCYSY=;
+  b=SuTR7ZrOci0lN/T3yw6RJv9zhkXYDWhgi/x35fjMzkjY9ExzTVsBB4Ma
+   +Hy+MGKYPHPt/XX1MYcXDX1J2bzKjhKPEYO2y9ciX52y8sHoC9blLhVgC
+   EQYFxaIkukqyFoONdEUlDqI+MIwr1shCPCCTovg6wBthHZnBmHBIg2huh
+   scFsuEx5s7ILtLCjL6BhFMlBceBa0oLSto3FozH8lxaBRVtnA8vtXTxgJ
+   HuYwh6vu93pN5LD3VBC2vKy+3PBv4P9ZGmdFb1n/qX246X7+lh/n+reTY
+   rvz8nGtr0dxsRVvZgmlq8MQM98FzzkAmnbfz/vSLWPxLWl9fuPDo+y8ul
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="37439"
 X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="372337929"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 03:48:51 -0700
+   d="scan'208";a="37439"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 03:52:06 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="829172474"
+X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="1005974355"
 X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="829172474"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Oct 2023 03:48:51 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 25 Oct 2023 03:48:50 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 25 Oct 2023 03:48:50 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Wed, 25 Oct 2023 03:48:50 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 25 Oct 2023 03:48:49 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BMKnsxf4DsoypJS97trRDRWnlhjl103eNhpKrlUaBhYgTVengQP30FaQrZVpiu7ZS3Zbgwd9dlS+4Imgj6ZkeOC8aEXzRXKygYK3V1FetrJTGNTbeWXTWj+jgMkioi0iuu+JawC3oEAW0xmBuKfPAnW+e2OBOrZ1SAG0zTnwmI79nhgYoqElbL/B37Y2AMY+u2Q1QHPLHIQ/1h5/1IHL2+o2flIF1/ojvp89cTId8fBhJIN4u808QZKqlsmdIBIFE6XRoCayf8s+gfsyTJSCp8dTwWgJERJK+87nLKYH42U8IQQjVNIqr/GWinpzFtELJdHqtBDwOVfFU9iTpS4iwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1tBpu05RD2p0cqO27VYyZ/RQdiVpgdrQHjoQfIHgxAI=;
- b=Ee9HkSnMNHnz5x5ovgQ0Xh4gbKeh0KnNfAox4pKis3P8Um8e2S4VTuPZp0xEu3gRQYJoB5klPMsbwmLGOqOAKzJuth6T2wfPLpc9J9e/+NDssup5LBfnZbFznAjiYA/TCsH3wKh/BnvnXZrUFho39LiEEFsQqqLMUMGRjcCAwxYB25NTGFCVXsVMq/zum3AdFnGRIr3n0zKLwkB35YUVFr+BaNNlrSszULiaJ3KJxn6bskguv/d4noE4y/WywuW/b6qolw4NVPHMFc3Z9pbr/Fho1gRa24TXnhDjJU9u9z48MA5lt5PcPvfAnmdB3UKGy0VBrVDHmFIrKmJocHQvgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by CH0PR11MB5489.namprd11.prod.outlook.com (2603:10b6:610:d4::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Wed, 25 Oct
- 2023 10:48:42 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::71a7:70c4:9046:9b8a]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::71a7:70c4:9046:9b8a%4]) with mapi id 15.20.6907.032; Wed, 25 Oct 2023
- 10:48:42 +0000
-Message-ID: <8a8f54a8-1a18-4797-a592-b57bc6fc45c1@intel.com>
-Date: Wed, 25 Oct 2023 12:48:37 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 1/2] i40e: Remove VF MAC types
-Content-Language: en-US
-To: Ivan Vecera <ivecera@redhat.com>, <netdev@vger.kernel.org>
-CC: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
-	<linux-kernel@vger.kernel.org>, Jacob Keller <jacob.e.keller@intel.com>
-References: <20231025103315.1149589-1-ivecera@redhat.com>
- <20231025103315.1149589-2-ivecera@redhat.com>
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <20231025103315.1149589-2-ivecera@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0094.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a1::9) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+   d="scan'208";a="1005974355"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 25 Oct 2023 03:52:03 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qvbUX-0008pl-0A;
+	Wed, 25 Oct 2023 10:52:01 +0000
+Date: Wed, 25 Oct 2023 18:51:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	almasrymina@google.com, hawk@kernel.org,
+	ilias.apalodimas@linaro.org, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net-next 09/15] net: page_pool: implement GET in the
+ netlink API
+Message-ID: <202310251843.xbPDgsrV-lkp@intel.com>
+References: <20231024160220.3973311-10-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|CH0PR11MB5489:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1d87a285-b088-48f1-fd2f-08dbd547f48d
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5a2qa9bzWPBOcX+G0UuaWeR8Xcjbp5nAibRFqFCmXXClQ5YaAkMYXE5rqFcPfp2JJfmuGcpPXvHFFlPb6KF5dJ1BtDiFjtxP+sIj6RNp+ZLUZrsEPXS/P3eWeZu007W/iqYxtIfbRnJyVJ4IYGcOs6GQCcpkurnXpwBadUJPrhljEuxy1KsIrEjVkEX2XW/pIlIQSH3NzlZXEvBjN83apGkjvObcj6E+IjVtz/Q9HF81CI23Yp0X4bJi/JMwzMHsV0cn+XVNX8wszB1LLy8YgTUb1HM/8z8nQLmp00M0H1PnQ4DbOP+16DcDq9E4urW4x7R0bvtMWvsJ6pOyajiSnwZMo/M06XSHhUZv4syx5JFqEp7DWitduOuultU8ivdSmYtq4pxR30oHXiyY6XjAotCCBz6VuTvmJh/atqUcDHl8VYI0+ssoP8aO//KWFManc9E2fOBn/fu/eRaajiGChpfE6vTVasSmXEdqm37zelyF6KQ3obgbExnfK7m2cdzQAUD1tz3vo9co8ox+SDJz4zu0KxQZ2pSGyNtGgTMbBtwh5pBsjyhB2AhSKw5dX2kCKKrngBsJVCWIKw+bqdBR7EykLhtggYlBJQfEeS5u5ZRAZWPyFGKKY4iVM3PQynGArr4ixgalxRJ/GroOloI7ag==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(366004)(136003)(376002)(39860400002)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(66476007)(2906002)(44832011)(86362001)(38100700002)(41300700001)(82960400001)(66556008)(54906003)(316002)(6506007)(6666004)(107886003)(478600001)(66946007)(53546011)(6512007)(6486002)(83380400001)(31696002)(5660300002)(36756003)(2616005)(4326008)(8676002)(8936002)(26005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cDJZSS9FTTVXb2MxclY1SlVuajdoUGFORnNFWDgrU0VwdjBZcjZ3UlFSbW81?=
- =?utf-8?B?U2pyMHhBRzdMWjN2VkhVQWxiQm40Z3phT2tUNHhWSWtQQnhKOHZkR3VYK3lI?=
- =?utf-8?B?UitzdDJPa0lIWnZidDV5YzF0MWwvMW5oc3NqK1RqNkRIb0UrbnBYbWNMWWVH?=
- =?utf-8?B?SjhrVXdkaVFmOFZoM0JsOGZjZC9zdDdqdDc3cFQzOGdWRU9wVFlEVWFlcFN6?=
- =?utf-8?B?ejh4eElHN1VQVW1DQmtic1pXYWM0ejJUMFZaZlEzWWI4REoxSFcyTzN0ZkU4?=
- =?utf-8?B?R1pFWVVQWjFtTHBmMS9sdzR0Qm1nc21MRnFlRVZUY09OMlJGL3ZFbXNhbkhm?=
- =?utf-8?B?aVlyVHZZTENjc3FwY2NYeGFnOXpnKzB6Mi9VcTdtaUcwVC9oblJpczZtdzJu?=
- =?utf-8?B?Z1RGNzR0T05tZDJONkFqZUU3T3c4NmFxLytJMEp1U0p1R1FmdTVaSzQ4YUw1?=
- =?utf-8?B?VmhwazFxK0RvQnBuWFZEelZOZHJwU1E4SnlYSUl2d1ZRRHJKVVFCdlZjbEhY?=
- =?utf-8?B?bkFnRExLY3ZuOHZUVG1mLzlZcGh4ZERvR3M3eW93bEROeVBWVVg4NC9UWlNU?=
- =?utf-8?B?WnB6K3RkWFVSOGMyd1FYNVdxbS9DNys2U1BlMjFmZmZaRUc0UEtBYTBKZkVP?=
- =?utf-8?B?VWlMMHphOUwvRlo2MDF2aGRPZmNiTTBUMlB1S01maXByL1dVRUhKTTRLKzY3?=
- =?utf-8?B?WnFNRGtxYjJLQWw2T0ZWVUJ4d0RVcVJtR3VKWWRHQkcvd0dFKzl0dHFvR3dV?=
- =?utf-8?B?TlZFWi9ibEF6UkF3aGpHYU1oS0dteEt6Y1VWREIvS09QK09VemMvMVpXSmhI?=
- =?utf-8?B?VWZoVER1bTduVERLN2t1STRuMm1IM2Z4SDZvMmtQQTBJVEthUXdDWDZzdkh6?=
- =?utf-8?B?YkZIVVRmb0taSzJkUVlWTnVzWVg3NnBwbDFyb2FJMHVCQWdiM1IyWWtXTTgx?=
- =?utf-8?B?cERpTXoxNkhkUDRpeTdEV2I5Y0tNbTlCZXhWWGpIK3I4OWxrY201VzR0MHpX?=
- =?utf-8?B?d0ppVy9pcDJ1WkZYWEQ3bU5OajBzYW82amRudnNvQ2M4SVUxSXEwSkI4NjBS?=
- =?utf-8?B?ckJBQUdsYjRHV3FWT21RTzFIUXRXZENqcHhKbkdzSjJtSmU5dkJaNUtJUlJU?=
- =?utf-8?B?NlJXSWNYVkl2QjZSY0VEV2NKQnd6cGNTeDhDOVlRalgwNHlMQ0JyMExLZlZh?=
- =?utf-8?B?TG5nYnZhQ0VjcEhMNTI1MUxlOFBsMjdSVVlScm9LdVgxZ2gyNVNSZUlVSDlq?=
- =?utf-8?B?ZHpqbTRLeHcxM0lNc3VmTi9kbC9wVHZYV3JQV0srSlRyUGVDQS9ldFhxN0Qw?=
- =?utf-8?B?SzdUODJMak1CcFl6aU8yMDhyMzdndHo2Zjk4Zkl1d25HaEpaK0Z0cVQzZTlZ?=
- =?utf-8?B?bFVaYjJ0aHJDWTg2Z3FaZEpWWllTMXpqY3VBRjBUYU13aytGcTdBZ2lucG1r?=
- =?utf-8?B?RWw3dHIwVCswMVZzeXNKTmx2eHg5OGhpcnBuTmI3TjhTWEVlVGFoa1BVbzVy?=
- =?utf-8?B?d0NvbEk3clluVit1VkU2VFBTYXU4M3JaeVFqQVZXbGhSOWYrTjBzY0ZzNE1v?=
- =?utf-8?B?R2ZicXpXQTZqTGFiVDk4Ky9KMWVoUXdKZnh5V2dwUjIyUlJtY3daOEk3cUNJ?=
- =?utf-8?B?N1YwNGZSaU1uWEYxWHNwNXZyZ2VoSTFLeVNwdTc1MnBEQlhodUQweWY1LzJm?=
- =?utf-8?B?ckZBTVNodm1Nc3hWK2UzbFJ1SmdUa0VaY3YzQzR2VG9Pekg1Y3RubVRYOEtP?=
- =?utf-8?B?QnBERlhBT05vL3Zwa3N1RDFvSWR6eXB3MVRLWnhLWUFKZi9XMWxtNjR4Mmdv?=
- =?utf-8?B?VHB6OUllWk9qZ1pVNzU0ajQrbDZ3NmNENmxRNnAzd2ZnbVpTQm8yOUovcS9K?=
- =?utf-8?B?Y0F4SWoybnpjeWtUY0ZGK2tSWVdoTEFYUDBMSlJnNC9CT3JzclZoMlhHZG56?=
- =?utf-8?B?WkNleTMrV2VTck1oNXZoZGdiWDgzQ1hJWHhCbUZZOGJkT3UxVTZRVFkyUG5r?=
- =?utf-8?B?SmRMWlJyTzhLakVjQTdYS2VGcDJMWFF5a0RndlJKM2lHWHpTTGhTNXJZb3hL?=
- =?utf-8?B?TXRJa1hpdnJoWE9oVGRQTkx2RHlpRjM0U05nd29SL01TaVV6N2dSRUZ3WEdJ?=
- =?utf-8?B?U3ZSU3pRTjJ6TFBEUFRUYjAxaVQvZFJKQkhmRnZmTGZMbzE4WUFudDYrWDFW?=
- =?utf-8?B?ekE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d87a285-b088-48f1-fd2f-08dbd547f48d
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 10:48:42.7785
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /ugP7pqoj9o2EZLF2Arxnv824oFOZUfFgFP3IjA2unWFprROTu/S44MgoB6tEv9zDrVqq/dH5mWRVHgSuq5nNSUfvVGAlL2GIrUQbkPwPGI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5489
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231024160220.3973311-10-kuba@kernel.org>
 
+Hi Jakub,
 
+kernel test robot noticed the following build errors:
 
-On 25.10.2023 12:33, Ivan Vecera wrote:
-> The i40e_hw.mac.type cannot to be equal to I40E_MAC_VF or
-> I40E_MAC_X722_VF so remove helper i40e_is_vf(), simplify
-> i40e_adminq_init_regs() and remove enums for these VF MAC types.
-> 
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_adminq.c | 33 ++++++-------------
->  drivers/net/ethernet/intel/i40e/i40e_type.h   |  8 -----
->  2 files changed, 10 insertions(+), 31 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.c b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-> index 29fc46abf690..896c43905309 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-> @@ -17,29 +17,16 @@ static void i40e_resume_aq(struct i40e_hw *hw);
->  static void i40e_adminq_init_regs(struct i40e_hw *hw)
->  {
->  	/* set head and tail registers in our local struct */
-> -	if (i40e_is_vf(hw)) {
-> -		hw->aq.asq.tail = I40E_VF_ATQT1;
-> -		hw->aq.asq.head = I40E_VF_ATQH1;
-> -		hw->aq.asq.len  = I40E_VF_ATQLEN1;
-> -		hw->aq.asq.bal  = I40E_VF_ATQBAL1;
-> -		hw->aq.asq.bah  = I40E_VF_ATQBAH1;
-> -		hw->aq.arq.tail = I40E_VF_ARQT1;
-> -		hw->aq.arq.head = I40E_VF_ARQH1;
-> -		hw->aq.arq.len  = I40E_VF_ARQLEN1;
-> -		hw->aq.arq.bal  = I40E_VF_ARQBAL1;
-> -		hw->aq.arq.bah  = I40E_VF_ARQBAH1;
+[auto build test ERROR on net-next/main]
 
-What about removing those I40E_VF_* defines?
-This is their only usage here, right?
+url:    https://github.com/intel-lab-lkp/linux/commits/Jakub-Kicinski/net-page_pool-split-the-page_pool_params-into-fast-and-slow/20231025-023128
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231024160220.3973311-10-kuba%40kernel.org
+patch subject: [PATCH net-next 09/15] net: page_pool: implement GET in the netlink API
+config: um-allnoconfig (https://download.01.org/0day-ci/archive/20231025/202310251843.xbPDgsrV-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231025/202310251843.xbPDgsrV-lkp@intel.com/reproduce)
 
-> -	} else {
-> -		hw->aq.asq.tail = I40E_PF_ATQT;
-> -		hw->aq.asq.head = I40E_PF_ATQH;
-> -		hw->aq.asq.len  = I40E_PF_ATQLEN;
-> -		hw->aq.asq.bal  = I40E_PF_ATQBAL;
-> -		hw->aq.asq.bah  = I40E_PF_ATQBAH;
-> -		hw->aq.arq.tail = I40E_PF_ARQT;
-> -		hw->aq.arq.head = I40E_PF_ARQH;
-> -		hw->aq.arq.len  = I40E_PF_ARQLEN;
-> -		hw->aq.arq.bal  = I40E_PF_ARQBAL;
-> -		hw->aq.arq.bah  = I40E_PF_ARQBAH;
-> -	}
-> +	hw->aq.asq.tail = I40E_PF_ATQT;
-> +	hw->aq.asq.head = I40E_PF_ATQH;
-> +	hw->aq.asq.len  = I40E_PF_ATQLEN;
-> +	hw->aq.asq.bal  = I40E_PF_ATQBAL;
-> +	hw->aq.asq.bah  = I40E_PF_ATQBAH;
-> +	hw->aq.arq.tail = I40E_PF_ARQT;
-> +	hw->aq.arq.head = I40E_PF_ARQH;
-> +	hw->aq.arq.len  = I40E_PF_ARQLEN;
-> +	hw->aq.arq.bal  = I40E_PF_ARQBAL;
-> +	hw->aq.arq.bah  = I40E_PF_ARQBAH;
->  }
->  
->  /**
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
-> index 9fda0cb6bdbe..7eaf8b013125 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_type.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
-> @@ -64,9 +64,7 @@ typedef void (*I40E_ADMINQ_CALLBACK)(struct i40e_hw *, struct i40e_aq_desc *);
->  enum i40e_mac_type {
->  	I40E_MAC_UNKNOWN = 0,
->  	I40E_MAC_XL710,
-> -	I40E_MAC_VF,
->  	I40E_MAC_X722,
-> -	I40E_MAC_X722_VF,
->  	I40E_MAC_GENERIC,
->  };
->  
-> @@ -588,12 +586,6 @@ struct i40e_hw {
->  	char err_str[16];
->  };
->  
-> -static inline bool i40e_is_vf(struct i40e_hw *hw)
-> -{
-> -	return (hw->mac.type == I40E_MAC_VF ||
-> -		hw->mac.type == I40E_MAC_X722_VF);
-> -}
-> -
->  /**
->   * i40e_is_aq_api_ver_ge
->   * @hw: pointer to i40e_hw structure
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310251843.xbPDgsrV-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   /usr/bin/ld: init/main.o: warning: relocation in read-only section `.ref.text'
+   /usr/bin/ld: warning: .tmp_vmlinux.kallsyms1 has a LOAD segment with RWX permissions
+>> /usr/bin/ld: net/core/netdev-genl-gen.o:(.rodata+0x98): undefined reference to `netdev_nl_page_pool_get_doit'
+>> /usr/bin/ld: net/core/netdev-genl-gen.o:(.rodata+0xc0): undefined reference to `netdev_nl_page_pool_get_dumpit'
+   /usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+   clang: error: linker command failed with exit code 1 (use -v to see invocation)
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
