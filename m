@@ -1,123 +1,192 @@
-Return-Path: <netdev+bounces-44328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FB507D78CD
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:42:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D03527D78D1
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:43:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B317FB212BD
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:42:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8629F281A12
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C04F381AA;
-	Wed, 25 Oct 2023 23:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C71D37CAC;
+	Wed, 25 Oct 2023 23:43:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X4iZxpwW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kj0A9/1w"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909C7381A4
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:42:00 +0000 (UTC)
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB1A186
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 16:41:58 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-507d1cc0538so331828e87.2
-        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 16:41:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93316339AD
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:42:58 +0000 (UTC)
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B11F8182;
+	Wed, 25 Oct 2023 16:42:55 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-778711ee748so24795785a.2;
+        Wed, 25 Oct 2023 16:42:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698277317; x=1698882117; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n8VIiqLkglYqJ+Q19MxelXV/EJXHtj9elKsbPyNgJFE=;
-        b=X4iZxpwW9noy6PCl7Fek6l3YBr1XUibRBJzDmAgzP82lCayz5gergKKAzLCpu/Kq6o
-         DtfuzkoO0yo4/vuZRPQcNn4YL5P/DJJ7u/C0IpZRCTohn+pqVr68KgK+zeWZjh5b24rm
-         1tQOfnDf16ZjAs3diwlNVYQPZ9ySH2PkAoFAbilPzGQ69pxx9KidtW3mV9hc1h13tK0q
-         krp2qZD2+8mn/zePSDw4fmw9665OgUIVOnqUHF+GHy/qc4VzsLBOHIywuTWF/o2lWhNL
-         4Y2KiGLsEtyo6EP6dbyJ3gp13vxn8wUd4YOMTTZw2ue97ytaTPbrGWuBb/dCIr3QzHt6
-         ZNwg==
+        d=gmail.com; s=20230601; t=1698277375; x=1698882175; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wel2VyKYXmVVIAE5xa88uFLKfxBW5uAu1BSCn+hApRQ=;
+        b=kj0A9/1wgff6eQlzCwU4dO5dxdqFz2PR6nCrMDMacK5d89ZHSvzifCYMqZc6b3NR53
+         hbGI+pqQqxpoKBasSp4W2ilCoTZkfTtVlWyGPDlUOpPoBKW8RUfZfN2WEz1QL595idg8
+         ARKDGs8LLEb1xa2VkEukE78LGjPqXOvEibQ7NjgFqgqT0p3x1CghsmrIttuPZZrgd/U1
+         qre7MN4ttpdOSPqV+Njx3rqVQdPk5BVDpOMEDaj+XR2XSlTqZYhjg0NX2n/4O0Alns4G
+         7g9PxuhmMBFiRjzJcW/oXVPsWFmnFt6uRc2AE5gYn2uOUIYI0FJt32+uyLbqrX1qMi2X
+         6OKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698277317; x=1698882117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n8VIiqLkglYqJ+Q19MxelXV/EJXHtj9elKsbPyNgJFE=;
-        b=PlrHO/OCQZqb1Qi0y/BnzQXePDJIn8Y9cC0TXTsnRtmHEhQba41hUdCzmu0+2nPyCB
-         VmaJIx1w+OtLX+qmmlqxQDiS4/gnNFy0xm6P8ouVPBCdckyUihQ9JAMRVnDjVqnuQR+r
-         c1AMVMZI+xNKw8fu6yHK5yUliZQYteSZp5vhPebyTvAmHtVnMV6jMTwbmv7pfNG0YsDq
-         VqJzuEb3cAV/DoxAvKauMGH2uow2Wi1NyyGwvyZVh2uQLbTcP/gt2Wutv10CQcx1AvEv
-         5IgeCPgkLLTTyB4KMO4oTcfaYZ576XVHDlMsHbAu3uWkQjCT4OpXKYPNE6mo8Mqk+0xf
-         QbYg==
-X-Gm-Message-State: AOJu0YwjMhwTVNslS/L6q6EajA8TdMv/9xPUMeqUkdckdTzl0LEB9KIH
-	GIwvVRsweKUPap9LAEQci42j0HUoKJ2sgRgIZvv8e9+K6C8ElsQkeQIzt6sf
-X-Google-Smtp-Source: AGHT+IFvspkBVEQcaXlvdiXLBc5/Nnce7QqmAyRawMvbFwO+bR8RKg0bupAzqNCymHeTUjheo+zdDooay+3N3QXOwCg=
-X-Received: by 2002:a19:6716:0:b0:500:9a29:bcb8 with SMTP id
- b22-20020a196716000000b005009a29bcb8mr11657885lfc.4.1698277316604; Wed, 25
- Oct 2023 16:41:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698277375; x=1698882175;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wel2VyKYXmVVIAE5xa88uFLKfxBW5uAu1BSCn+hApRQ=;
+        b=dhnSOVDwRqUc/g+aH2zM49BxhanXzWCKHAc/gY4QyOMEbfqyjpbJ+gkJPjFqwPzCOX
+         cJFAUuPkndvxA5VWMCFWy3dJp4HkyDWIe9Ed2ghsS7ZzNGGdE6pbvOW6AkplAQ0b4CLP
+         pOPYhre+JEc/qXWNYxrh7cremlfTHxnThQiirVfoovdcf9c81hsr2hayZW2WErvXzO+u
+         XOmefFSRuUHSOAcvuv7F4dRJylNiimi5nI1Ekjt/lkVZrp9U5FHDsPO8G74/PFSHfvAF
+         ePTUYKDO/Q2n0xvpit/cr9zfahXRdrsU+lmY3rLk1EofYlVZiNGaxiNLjNDBZbyoLK8L
+         g8Wg==
+X-Gm-Message-State: AOJu0YwV9kRFeus0PH9JyAwqh73qtogscfGeYDt+oU/plYl4cT7YD+Us
+	WV2wyqdwgx0jLY4dO+4gP6Or0V4Oi5k=
+X-Google-Smtp-Source: AGHT+IE5Zjz7N6ZLSy2I644opaRJHJ/VHFW2Fx//iRFGbuBV7kiQ2oxc3skBJR8aiAy97cm5n2wLxg==
+X-Received: by 2002:a05:620a:1a92:b0:760:6b8e:eba with SMTP id bl18-20020a05620a1a9200b007606b8e0ebamr17027676qkb.12.1698277374818;
+        Wed, 25 Oct 2023 16:42:54 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id h12-20020a05620a10ac00b00765ab6d3e81sm4572994qkk.122.2023.10.25.16.42.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Oct 2023 16:42:54 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	stable@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>,
+	syzbot+a8c7be6dee0de1b669cc@syzkaller.appspotmail.com
+Subject: [PATCH net v2] llc: verify mac len before reading mac header
+Date: Wed, 25 Oct 2023 19:42:38 -0400
+Message-ID: <20231025234251.3796495-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.42.0.758.gaed0368e0e-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231012-strncpy-drivers-net-phy-nxp-tja11xx-c-v1-1-5ad6c9dff5c4@google.com>
- <15af4bc4-2066-44bc-8d2e-839ff3945663@lunn.ch> <CAFhGd8pmq3UKBE_6ZbLyvRRhXJzaWMQ2GfosvcEEeAS-n7M4aQ@mail.gmail.com>
- <0c401bcb-70a8-47a5-bca0-0b9e8e0439a8@lunn.ch> <CAFhGd8p3WzqQu7kT0Pt8Axuv5sKdHJQOLZVEg5x8S_QNwT6bjQ@mail.gmail.com>
- <CAFhGd8qcLARQ4GEabEvcD=HmLdikgP6J82VdT=A9hLTDNru0LQ@mail.gmail.com>
- <202310131630.5E435AD@keescook> <a958d35e-98b6-4a95-b505-776482d1150c@lunn.ch>
- <202310141935.B326C9E@keescook>
-In-Reply-To: <202310141935.B326C9E@keescook>
-From: Justin Stitt <justinstitt@google.com>
-Date: Wed, 25 Oct 2023 16:41:43 -0700
-Message-ID: <CAFhGd8r3=ndtYgjK3O5KV_wrd5OL+0hP6RjqBwhJXgc0jr1hDw@mail.gmail.com>
-Subject: Re: [PATCH] net: phy: tja11xx: replace deprecated strncpy with ethtool_sprintf
-To: Kees Cook <keescook@chromium.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 14, 2023 at 7:36=E2=80=AFPM Kees Cook <keescook@chromium.org> w=
-rote:
->
-> On Sat, Oct 14, 2023 at 03:55:41AM +0200, Andrew Lunn wrote:
-> > > I've been told that this whole ethtool API area is considered
-> > > deprecated. If that holds, then I don't think it's worth adding new
-> > > helpers to support it when ethtool_sprintf() is sufficient.
-> >
-> > I think deprecated is too strong. The current API is not great, so
-> > maybe with time a new API will emerge. But given there are around 160
-> > users of the API, probably over 100 drivers, it will be 20 years or
-> > more before all that hardware becomes obsolete and the drivers are
-> > removed.
-> >
-> > > Once you're done with the strncpy->ethtool_sprintf conversions I thin=
-k
-> > > it would be nice to have a single patch that fixes all of these
-> > > "%s"-less instances to use "%s". (Doing per-driver fixes for that cas=
-e
-> > > seems just overly painful.)
-> >
-> > I guess it is the same amount of effort to replace them with
-> > ethtool_puts()?
->
-> Yup, right. If adding ethtool_puts() makes sense, then I totally agree.
+From: Willem de Bruijn <willemb@google.com>
 
-Thanks for the discussion here.
+LLC reads the mac header with eth_hdr without verifying that the skb
+has an Ethernet header.
 
-I've sent a series [1] implementing ethtool_puts() and sending out a
-wave of replacements.
+Syzbot was able to enter llc_rcv on a tun device. Tun can insert
+packets without mac len and with user configurable skb->protocol
+(passing a tun_pi header when not configuring IFF_NO_PI).
 
-[1]: https://lore.kernel.org/all/20231025-ethtool_puts_impl-v1-0-6a53a93d3b=
-72@google.com/
->
-> --
-> Kees Cook
+    BUG: KMSAN: uninit-value in llc_station_ac_send_test_r net/llc/llc_station.c:81 [inline]
+    BUG: KMSAN: uninit-value in llc_station_rcv+0x6fb/0x1290 net/llc/llc_station.c:111
+    llc_station_ac_send_test_r net/llc/llc_station.c:81 [inline]
+    llc_station_rcv+0x6fb/0x1290 net/llc/llc_station.c:111
+    llc_rcv+0xc5d/0x14a0 net/llc/llc_input.c:218
+    __netif_receive_skb_one_core net/core/dev.c:5523 [inline]
+    __netif_receive_skb+0x1a6/0x5a0 net/core/dev.c:5637
+    netif_receive_skb_internal net/core/dev.c:5723 [inline]
+    netif_receive_skb+0x58/0x660 net/core/dev.c:5782
+    tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1555
+    tun_get_user+0x54c5/0x69c0 drivers/net/tun.c:2002
 
-Thanks
-Justin
+Add a mac_len test before all three eth_hdr(skb) calls under net/llc.
+
+There are further uses in include/net/llc_pdu.h. All these are
+protected by a test skb->protocol == ETH_P_802_2. Which does not
+protect against this tun scenario.
+
+But the mac_len test added in this patch in llc_fixup_skb will
+indirectly protect those too. That is called from llc_rcv before any
+other LLC code.
+
+It is tempting to just add a blanket mac_len check in llc_rcv, but
+not sure whether that could break valid LLC paths that do not assume
+an Ethernet header. 802.2 LLC may be used on top of non-802.3
+protocols in principle. The below referenced commit shows that used
+to, on top of Token Ring.
+
+At least one of the three eth_hdr uses goes back to before the start
+of git history. But the one that syzbot exercises is introduced in
+this commit. That commit is old enough (2008), that effectively all
+stable kernels should receive this.
+
+Fixes: f83f1768f833 ("[LLC]: skb allocation size for responses")
+Reported-by: syzbot+a8c7be6dee0de1b669cc@syzkaller.appspotmail.com
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+
+---
+
+Changes
+  v1->v2
+    - fix return value in llc_sap_action_send_test_r
+    - add Fixes tag
+    - cc: stable@vger.kernel.org
+---
+ net/llc/llc_input.c   | 10 ++++++++--
+ net/llc/llc_s_ac.c    |  3 +++
+ net/llc/llc_station.c |  3 +++
+ 3 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/net/llc/llc_input.c b/net/llc/llc_input.c
+index 7cac441862e21..51bccfb00a9cd 100644
+--- a/net/llc/llc_input.c
++++ b/net/llc/llc_input.c
+@@ -127,8 +127,14 @@ static inline int llc_fixup_skb(struct sk_buff *skb)
+ 	skb->transport_header += llc_len;
+ 	skb_pull(skb, llc_len);
+ 	if (skb->protocol == htons(ETH_P_802_2)) {
+-		__be16 pdulen = eth_hdr(skb)->h_proto;
+-		s32 data_size = ntohs(pdulen) - llc_len;
++		__be16 pdulen;
++		s32 data_size;
++
++		if (skb->mac_len < ETH_HLEN)
++			return 0;
++
++		pdulen = eth_hdr(skb)->h_proto;
++		data_size = ntohs(pdulen) - llc_len;
+ 
+ 		if (data_size < 0 ||
+ 		    !pskb_may_pull(skb, data_size))
+diff --git a/net/llc/llc_s_ac.c b/net/llc/llc_s_ac.c
+index 79d1cef8f15a9..06fb8e6944b06 100644
+--- a/net/llc/llc_s_ac.c
++++ b/net/llc/llc_s_ac.c
+@@ -153,6 +153,9 @@ int llc_sap_action_send_test_r(struct llc_sap *sap, struct sk_buff *skb)
+ 	int rc = 1;
+ 	u32 data_size;
+ 
++	if (skb->mac_len < ETH_HLEN)
++		return 1;
++
+ 	llc_pdu_decode_sa(skb, mac_da);
+ 	llc_pdu_decode_da(skb, mac_sa);
+ 	llc_pdu_decode_ssap(skb, &dsap);
+diff --git a/net/llc/llc_station.c b/net/llc/llc_station.c
+index 05c6ae0920534..f506542925109 100644
+--- a/net/llc/llc_station.c
++++ b/net/llc/llc_station.c
+@@ -76,6 +76,9 @@ static int llc_station_ac_send_test_r(struct sk_buff *skb)
+ 	u32 data_size;
+ 	struct sk_buff *nskb;
+ 
++	if (skb->mac_len < ETH_HLEN)
++		goto out;
++
+ 	/* The test request command is type U (llc_len = 3) */
+ 	data_size = ntohs(eth_hdr(skb)->h_proto) - 3;
+ 	nskb = llc_alloc_frame(NULL, skb->dev, LLC_PDU_TYPE_U, data_size);
+-- 
+2.42.0.758.gaed0368e0e-goog
+
 
