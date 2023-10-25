@@ -1,93 +1,143 @@
-Return-Path: <netdev+bounces-44198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 913147D6FAC
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 16:49:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 054947D6FB3
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 16:51:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 282B21F22EB6
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 14:49:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 358131C20DC5
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 14:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01EF28691;
-	Wed, 25 Oct 2023 14:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDC8E273F4;
+	Wed, 25 Oct 2023 14:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LjOr/sIV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ma6rDtha"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD2FC8EA
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 14:49:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EB1CB0
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 07:49:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698245355;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IQg2aiugEAr81dlu2QQgtvQkHg29djoP9+oseI0sItA=;
-	b=LjOr/sIVq+rK4VxGJpewtMj8eKR4TDiPtuJwmHZOHgYM4aFMDMUP9CXvFvwAE/gP7IigFy
-	Gt+aiMPtykyP9cpe3mao9jqxCUKhNFApt3gc4brLDugPjQ8RkN5abdc6IgVouccnVDGvoA
-	bCn4/ifoqd4XWq1ZiG4TGH8Zk93NhJg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-501-D9xpdfXVNhCgtpipLzBmYw-1; Wed, 25 Oct 2023 10:49:14 -0400
-X-MC-Unique: D9xpdfXVNhCgtpipLzBmYw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 637C9811E91;
-	Wed, 25 Oct 2023 14:49:13 +0000 (UTC)
-Received: from [10.45.225.62] (unknown [10.45.225.62])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F175525C0;
-	Wed, 25 Oct 2023 14:49:11 +0000 (UTC)
-Message-ID: <fa91d099-74d7-48f8-9316-dba9a4e0b826@redhat.com>
-Date: Wed, 25 Oct 2023 16:49:11 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2926FC8EA
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 14:51:13 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C920136;
+	Wed, 25 Oct 2023 07:51:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698245471; x=1729781471;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=l/NJMRjSMo3od/OVoprgvRt/zRss9xwyAblrboJ/CAc=;
+  b=Ma6rDtha9Tp0RxAmrqD+n+Vp3tkBTBl2VSoLKahHS2cv7aegIPc6uQuG
+   QbNkcwndjOHWK/atibXlW/Kx5XoQUnZz1cHLFd1nwFpVmhlAFCiQwSpWw
+   K8JejvOCdkNtaHeGWxdl81/blVZqL4nZ/dfWUauTVgcDrpqNVQesD+c5r
+   B+KqSXEp8gQbc/uHTzMefFbPbJnkrWvbuRJ9bz2gc6dIltRU0xm8wPdvT
+   aDlUyws6KZhn2IwXeH29n15E8RrxxdY53OlshVocTN1lb6w9t8cIQwn9D
+   VhEuL2gr4Daqn8kNg4uMbdbcp21WTJC03jPim1OkxUyz4kmx2MI/Z3dt6
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="453789860"
+X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
+   d="scan'208";a="453789860"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 07:51:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="1090250352"
+X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
+   d="scan'208";a="1090250352"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmsmga005.fm.intel.com with ESMTP; 25 Oct 2023 07:51:06 -0700
+Received: from pkitszel-desk.intel.com (unknown [10.255.194.221])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id EF9CD381BD;
+	Wed, 25 Oct 2023 15:51:01 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: linux-kernel@vger.kernel.org,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
+	Eran Ben Elisha <eranbe@nvidia.com>,
+	Aya Levin <ayal@mellanox.com>,
+	Simon Horman <horms@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: [PATCH net-next] net/mlx5: fix uninit value use
+Date: Wed, 25 Oct 2023 16:50:50 +0200
+Message-Id: <20231025145050.36114-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] i40e: Delete unused
- i40e_mac_info fields
-Content-Language: en-US
-To: Wojciech Drewek <wojciech.drewek@intel.com>, netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
- Jesse Brandeburg <jesse.brandeburg@intel.com>, linux-kernel@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Jacob Keller <jacob.e.keller@intel.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>
-References: <20231025105911.1204326-1-ivecera@redhat.com>
- <389ecfc4-dfd7-4c56-b18f-82565e059914@intel.com>
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <389ecfc4-dfd7-4c56-b18f-82565e059914@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Transfer-Encoding: 8bit
 
+Avoid use of uninitialized state variable.
 
+In case of mlx5e_tx_reporter_build_diagnose_output_sq_common() it's better
+to still collect other data than bail out entirely.
 
-On 25. 10. 23 13:03, Wojciech Drewek wrote:
-> On 25.10.2023 12:59, Ivan Vecera wrote:
->>  From commit 9eed69a9147c ("i40e: Drop FCoE code from core driver files")
->> the field i40e_mac_info.san_addr is unused (never filled).
->> The field i40e_mac_info.max_fcoeq is unused from the beginning.
->> Remove both.
->>
->> Co-developed-by: Michal Schmidt<mschmidt@redhat.com>
-> Signed-off-by from Michal is needed, other than that:
-> Reviewed-by: Wojciech Drewek<wojciech.drewek@intel.com>
-Will fix by v2
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Link: https://lore.kernel.org/netdev/8bd30131-c9f2-4075-a575-7fa2793a1760@moroto.mountain
+Fixes: d17f98bf7cc9 ("net/mlx5: devlink health: use retained error fmsg API")
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c | 6 +++++-
+ drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c | 8 ++++++--
+ 2 files changed, 11 insertions(+), 3 deletions(-)
 
-Ivan
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
+index fc5a9fdd06db..fea8c0a5fe89 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
+@@ -263,8 +263,12 @@ mlx5e_rx_reporter_build_diagnose_output_rq_common(struct mlx5e_rq *rq,
+ 	if (rq->icosq) {
+ 		struct mlx5e_icosq *icosq = rq->icosq;
+ 		u8 icosq_hw_state;
++		int err;
++
++		err = mlx5_core_query_sq_state(rq->mdev, icosq->sqn, &icosq_hw_state);
++		if (err)
++			return err;
+ 
+-		mlx5_core_query_sq_state(rq->mdev, icosq->sqn, &icosq_hw_state);
+ 		mlx5e_reporter_icosq_diagnose(icosq, icosq_hw_state, fmsg);
+ 	}
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
+index ccff7c26d6ac..6b44ddce14e9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
+@@ -221,12 +221,16 @@ mlx5e_tx_reporter_build_diagnose_output_sq_common(struct devlink_fmsg *fmsg,
+ 	bool stopped = netif_xmit_stopped(sq->txq);
+ 	struct mlx5e_priv *priv = sq->priv;
+ 	u8 state;
++	int err;
+ 
+-	mlx5_core_query_sq_state(priv->mdev, sq->sqn, &state);
+ 	devlink_fmsg_u32_pair_put(fmsg, "tc", tc);
+ 	devlink_fmsg_u32_pair_put(fmsg, "txq ix", sq->txq_ix);
+ 	devlink_fmsg_u32_pair_put(fmsg, "sqn", sq->sqn);
+-	devlink_fmsg_u8_pair_put(fmsg, "HW state", state);
++
++	err = mlx5_core_query_sq_state(priv->mdev, sq->sqn, &state);
++	if (!err)
++		devlink_fmsg_u8_pair_put(fmsg, "HW state", state);
++
+ 	devlink_fmsg_bool_pair_put(fmsg, "stopped", stopped);
+ 	devlink_fmsg_u32_pair_put(fmsg, "cc", sq->cc);
+ 	devlink_fmsg_u32_pair_put(fmsg, "pc", sq->pc);
+-- 
+2.38.1
 
 
