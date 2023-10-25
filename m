@@ -1,77 +1,138 @@
-Return-Path: <netdev+bounces-44301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 422FA7D7832
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 00:46:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2705A7D7844
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 00:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA8C0280FEF
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 22:46:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 663FB281DCF
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 22:51:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB11127EFF;
-	Wed, 25 Oct 2023 22:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E062030FBF;
+	Wed, 25 Oct 2023 22:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bpq8K2tl"
+	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="o/+Wfe6u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C526749F
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 22:46:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B83B4C433C7;
-	Wed, 25 Oct 2023 22:46:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698273965;
-	bh=EwGeoWVSmqUbhWycDaxzQ6Ek3vvzienMez1ubkrLYcU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bpq8K2tloK8+334UjsyCgIy6woczN95xNwsl+ajM1RMS5654nzMqcRq3FjnTyKVAB
-	 w9qH2cWePYx5TGvFzdIt53OiYYcvTlwzwfYhN5tNOncNGu5h0Sv/VgW1JaSxMFtDx9
-	 5LUv2/4hB0S3GvGXAjTnXJAjiH6xNHiRgVYCNpaq53/4fvU/vCdfKhN25/UQXGGnDx
-	 ANJpvSRBHMEKexlS71iktJ4/oqf0c5rAXgyiesgra2MFJ5R+N560FFS0eEcnyzq3uw
-	 Zm0S/cDRlsCudH/vVxYr3WIwpjWGP4nAbwL6ego78E1DPvMVjGT7dG0iS7+u5AiiJP
-	 fLYZwkI6a29Nw==
-Date: Wed, 25 Oct 2023 15:46:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Cc: sd@queasysnail.net, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, richardcochran@gmail.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- sebastian.tobuschat@oss.nxp.com
-Subject: Re: [PATCH net-next v8 0/7] Add MACsec support for TJA11XX C45 PHYs
-Message-ID: <20231025154603.61751dfb@kernel.org>
-In-Reply-To: <20231025154044.7877e5c0@kernel.org>
-References: <20231023094327.565297-1-radu-nicolae.pirea@oss.nxp.com>
-	<5d7021cd-71b1-4786-9beb-1a4fe084945c@oss.nxp.com>
-	<20231025151834.7e114208@kernel.org>
-	<20231025154044.7877e5c0@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282B527EFF;
+	Wed, 25 Oct 2023 22:50:56 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0BF0DBB;
+	Wed, 25 Oct 2023 15:50:55 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1004)
+	id 9138220B74C1; Wed, 25 Oct 2023 15:50:54 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9138220B74C1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1698274254;
+	bh=4zQSWnZRUjjGv8tDmJQi574JQo3zw9n1/Nch+18x6iQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=o/+Wfe6uwOpezfWcHV78m4CysvZKlOLyu7LWMxmOKjDOAbAn/XtW3q5u0NCsNMV6h
+	 29Ez6cGI5WpUOMosYNV+7FDyvqYPSwDFOILomAMzBHxOJOcgD3lRPHH58muaIFf7Dj
+	 eUtxB3DiGe3Qtl2NAYZGuZYTBUCBSAolBZuq5Oqw=
+From: longli@linuxonhyperv.com
+To: "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: linux-rdma@vger.kernel.org,
+	Long Li <longli@microsoft.com>
+Subject: [PATCH] hv_netvsc: Mark VF as slave before exposing it to user-mode
+Date: Wed, 25 Oct 2023 15:50:50 -0700
+Message-Id: <1698274250-653-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, 25 Oct 2023 15:40:44 -0700 Jakub Kicinski wrote:
-> On Wed, 25 Oct 2023 15:18:34 -0700 Jakub Kicinski wrote:
-> > On Wed, 25 Oct 2023 19:21:24 +0300 Radu Pirea (OSS) wrote: =20
-> > > The state of this patch series was set to "Changes Requested", but no=
-=20
-> > > change was requested in V8 and I addressed the changes requested in V=
-7.=20
-> > > Am I missing something or is it a mistake?   =20
-> >=20
-> > Another series got silently discarded because of a conflict.
-> > This one IDK. Everything looks fine. So let me bring it back, sorry. =20
->=20
-> Ugh, I found out why. It has already been applied :|
+From: Long Li <longli@microsoft.com>
 
-Sorry, ignore me =F0=9F=A4=A6=EF=B8=8F
+When a VF is being exposed form the kernel, it should be marked as "slave"
+before exposing to the user-mode. The VF is not usable without netvsc running
+as master. The user-mode should never see a VF without the "slave" flag.
 
-I had it applied locally because I was checking if it applies cleanly.
+This commit moves the code of setting the slave flag to the time before VF is
+exposed to user-mode.
+
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+ drivers/net/hyperv/netvsc_drv.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index ec77fb9dcf89..045777a4971d 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2206,9 +2206,6 @@ static int netvsc_vf_join(struct net_device *vf_netdev,
+ 		goto upper_link_failed;
+ 	}
+ 
+-	/* set slave flag before open to prevent IPv6 addrconf */
+-	vf_netdev->flags |= IFF_SLAVE;
+-
+ 	schedule_delayed_work(&ndev_ctx->vf_takeover, VF_TAKEOVER_INT);
+ 
+ 	call_netdevice_notifiers(NETDEV_JOIN, vf_netdev);
+@@ -2320,11 +2317,9 @@ static struct net_device *get_netvsc_byslot(const struct net_device *vf_netdev)
+ 	 */
+ 	list_for_each_entry(ndev_ctx, &netvsc_dev_list, list) {
+ 		ndev = hv_get_drvdata(ndev_ctx->device_ctx);
+-		if (ether_addr_equal(vf_netdev->perm_addr, ndev->perm_addr)) {
+-			netdev_notice(vf_netdev,
+-				      "falling back to mac addr based matching\n");
++		if (ether_addr_equal(vf_netdev->perm_addr, ndev->perm_addr) ||
++		    ether_addr_equal(vf_netdev->dev_addr, ndev->perm_addr))
+ 			return ndev;
+-		}
+ 	}
+ 
+ 	netdev_notice(vf_netdev,
+@@ -2332,7 +2327,7 @@ static struct net_device *get_netvsc_byslot(const struct net_device *vf_netdev)
+ 	return NULL;
+ }
+ 
+-static int netvsc_register_vf(struct net_device *vf_netdev)
++static int netvsc_register_vf(struct net_device *vf_netdev, unsigned long event)
+ {
+ 	struct net_device_context *net_device_ctx;
+ 	struct netvsc_device *netvsc_dev;
+@@ -2347,6 +2342,12 @@ static int netvsc_register_vf(struct net_device *vf_netdev)
+ 	if (!ndev)
+ 		return NOTIFY_DONE;
+ 
++	if (event == NETDEV_POST_INIT) {
++		/* set slave flag before open to prevent IPv6 addrconf */
++		vf_netdev->flags |= IFF_SLAVE;
++		return NOTIFY_DONE;
++	}
++
+ 	net_device_ctx = netdev_priv(ndev);
+ 	netvsc_dev = rtnl_dereference(net_device_ctx->nvdev);
+ 	if (!netvsc_dev || rtnl_dereference(net_device_ctx->vf_netdev))
+@@ -2753,8 +2754,9 @@ static int netvsc_netdev_event(struct notifier_block *this,
+ 		return NOTIFY_DONE;
+ 
+ 	switch (event) {
++	case NETDEV_POST_INIT:
+ 	case NETDEV_REGISTER:
+-		return netvsc_register_vf(event_dev);
++		return netvsc_register_vf(event_dev, event);
+ 	case NETDEV_UNREGISTER:
+ 		return netvsc_unregister_vf(event_dev);
+ 	case NETDEV_UP:
+-- 
+2.34.1
 
 
