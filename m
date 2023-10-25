@@ -1,184 +1,352 @@
-Return-Path: <netdev+bounces-44182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C13807D6CD9
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 15:14:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3E6F7D6D01
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 15:21:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FEFCB21000
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 13:14:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80183281261
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 13:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D412E27EF0;
-	Wed, 25 Oct 2023 13:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E35BF27ECE;
+	Wed, 25 Oct 2023 13:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QHmF5RNb"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="1fHjxx/i"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FA91CAB2
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 13:14:47 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A44F12F;
-	Wed, 25 Oct 2023 06:14:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698239686; x=1729775686;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=MmHp/FqCRi2labE9naDPRt9cTmWCDIW+XHuza7qUgb8=;
-  b=QHmF5RNbcCMPSr7rPX2txe+mStsCEUAJ0CuS52Mialub2ZTY3rDP8T1T
-   aw0emdFIQOv85oF36c8YARQ2qg/MoSf+njrAfH/+6drps3O/QiH4vt2w+
-   Tn4EKoBWu9pTksgboRKZvGmp8rvVcaTkAncbhrpIhLuW7FoRtyqCNZ/EA
-   bLyThDaAZoKj6sMW75S4AwAPTRf6JLU4dY13/8l4Q/x6O4LS2npjrf/VR
-   LsqonjqDTelWVrQlpp5uhjRrvOy22/7ywOvqP0kbUJoS1M3tAqSi0jmt3
-   bn46Z9YhKm5wVKW1cohs+HGB+J0+lcASZ5hwCVxUrBQHMl8MrBLr2PdtI
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10873"; a="384514240"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="384514240"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 06:14:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="89020"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Oct 2023 06:14:11 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Wed, 25 Oct 2023 06:14:45 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 25 Oct 2023 06:14:44 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Wed, 25 Oct 2023 06:14:44 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 25 Oct 2023 06:14:44 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ibcpin87W0avR7T9LmYkMwgkpkm0ZhohxKTB9CksZ6fe1l2U8++0oXbszYR8uoZNs1BI88a+NvN8MwgEo39iAQKeexqATPAP2iMoo1akJmQYfdxuHkDJYKARfDWcRg2jibQ4QhMTGtz1yhbpObOUePC5Oo/+Pl8HH5RnxW1LUJFpsuwIstcWSbVxZ42xUTMCi9HqUHuPfvsCxu233C17t5a45U8C1OnO/B3ugxXLZ/VbO5RWeK63oXMvZWDnV8tB+fve72WTqAmAAq3QBkfm9w2hJl1e7hJ/3/l4b0CTgwx/THaPLmh4ij8relVLa+RSUseHAKI7MH5kGsNQHEM2Nw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o+MFktwB3vX4fL1jEGjzwRD/DT8JiQbPwrTQXO53Cj4=;
- b=cMm2LG2UsItwmz86z1MUqg6JXc52ev3xgAeEWNuhhwBqXckOmF6gICLXkoUtmPLSxO83bjbTKS5ci+Lyj1DyhoaWSktNiy/gWklAZjaGn93PYavjhuOylDFNSO68JTauQQFuBEHHidGL3Bqom1oFTIlvjymmqT2GFul+zBpQw2yTk8zOiz/1L81k8pgBxA+CeDvwtSIvTLhGi2ELyH7Y3H2fnl+QAdgl8sqwzWyHYyB2vOtCB9M7lnycqfofJP72BBLp31r1eJmZMdqYHhdqUOtL23jQPXNo3sG7Mp8l/TXWWDJNNmETZTffxa/VJM0ou9yiiwlQq32fPXb+1vPFHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
- by SJ0PR11MB5772.namprd11.prod.outlook.com (2603:10b6:a03:422::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.21; Wed, 25 Oct
- 2023 13:14:43 +0000
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::7666:c666:e6b6:6e48]) by BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::7666:c666:e6b6:6e48%4]) with mapi id 15.20.6907.021; Wed, 25 Oct 2023
- 13:14:43 +0000
-Message-ID: <f7e712a2-a0d0-f1e1-b6dc-7c41c1ef3d86@intel.com>
-Date: Wed, 25 Oct 2023 15:14:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH net-next] bareudp: use ports to lookup route
-To: Beniamino Galvani <b.galvani@gmail.com>, <netdev@vger.kernel.org>
-CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Guillaume Nault
-	<gnault@redhat.com>, <linux-kernel@vger.kernel.org>
-References: <20231025094441.417464-1-b.galvani@gmail.com>
-Content-Language: en-US
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20231025094441.417464-1-b.galvani@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0416.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:d0::19) To BYAPR11MB3672.namprd11.prod.outlook.com
- (2603:10b6:a03:fa::30)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72D81380
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 13:21:17 +0000 (UTC)
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1503186
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 06:21:14 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5a82c2eb50cso52963247b3.2
+        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 06:21:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1698240074; x=1698844874; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6DcoXjq91K083akiBzKmjRJ24ZfSDZ3wB0oJDf159LU=;
+        b=1fHjxx/ieevHH1Ynzz/seUo73lgx7W8NTQOwtEFWq82ZkwcCatD9wij7EF3vY8eR2R
+         BWVrZjli5yerBEBWANYkEvrrIbwIZ+FuqqQWlRb/0Qp+ByWN32ewTL7kGFjzFLKhXMit
+         IJZzJI7nOW+2ZKO5ErDorDM6NjgDFoXTXRJuF6p4BB+9STkvhi1HVA7FKBwQqyc5iiBh
+         7rDWn54TIE/oI6FZyXpz/e7+YhErw2JOyisIDb8Altc5IqQsbqvLbNZjlxriwW2fvBCJ
+         jhhhLzbEon1J6YpB31Idf6A6YHdXx65aEtoYPk5hS/vG+LMo5nNEOZzuhO+U3YwdvOug
+         JtBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698240074; x=1698844874;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6DcoXjq91K083akiBzKmjRJ24ZfSDZ3wB0oJDf159LU=;
+        b=Xpa1R7qB+XgqCFJI076hrulvbFoVgnTEpRT/3ayQyyCqjA9s1HEdyYbnApJT8jog2x
+         Xgn60MoppNkpeseREvhblK1qUBNEMTFLoC15vd6PlTHTKAftP72BeHmvBy4yVuaiHSYz
+         es9i/unZw1MzC8x/xoHhrIy6lKrnKdgTFqviH5XOQ3vGgLqDdlovxSXMUiuIhG/23Tnm
+         2gyCMVnF+xGHrs5vy2AXbk8HEpLk+FYgWEch8IdZlVDCySN+R3VbtJHSa08Mz82/UyuQ
+         qNhHra+/lHgjNDDq5Rm4ezoPUZ43HPazTYYXHDvtcizKsfqYfr3zGjYeKOei5MIGqn3i
+         rG9A==
+X-Gm-Message-State: AOJu0YyVawHHZD6yBIfyKk7qI1j39RdaGOVUMNhMDOREy4VOcRcgDMKI
+	uZ+C4YCvx8RrthRsospYpHG783mue8sPVp3NpV3pHw==
+X-Google-Smtp-Source: AGHT+IE7hMas1i/UZGRzadsVtRrNQRelJ7LcBUiw5dtJ244gU7z5/nhc38cT64UtPVPDsGyjhKP7zTvMzIrjlputtiE=
+X-Received: by 2002:a0d:ea93:0:b0:5a7:ba17:7109 with SMTP id
+ t141-20020a0dea93000000b005a7ba177109mr13948389ywe.1.1698240074042; Wed, 25
+ Oct 2023 06:21:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|SJ0PR11MB5772:EE_
-X-MS-Office365-Filtering-Correlation-Id: 193502f2-a0be-4af6-f5e2-08dbd55c5a28
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gSpVlcqKCJZTvsXb5G1hhSchgcVfvYPgyucP4EE1NQNnFXK9gEGgEb/GtjUdQ6eC46Eprc/CSyi9U2ba4/wKBs9tsNyKycV/vb8j+qCQ5BYe6VYLSURwW3W/iteHfhoQRUuKAW7Cszip2oDvOKPNi5drcxUN7kVFD8w8CmcAqW97GqvYwFv5BpwBDlS2Bou06IyILb5R4PTF3+ivkAVBFKF8EUEW/zF6YSnufGE2pBzBCC98nEX4Kub8Ltt+zGdb/sAppQamMsJ1Oe0WKHn3DYOIhbebIt9mWaaye9kvWqYowogrTrDbT79VsrzB19jj7SbANHdh0o13s8fpE4a9eXkMFPbqFyHuzFNkJ3tbbmo83Jimqm54YsG2/FLNJ3BXZdsiMBgVx6/ACZxt0f+DbBCL1Yhv4jBKYOqWQ+VNYichJnz3tzZ6dRxSi0DVSS2Ei8DCxczBNEmJUJNaHKdqJaf69Xd9hDKVDmOu3VuUtqmp/2dWgTJQ5GJMxNpLa48xwEgKACYLIl2+meFEAJpekgQ7AKJDV4qQaLCTnX+JYKSTNTsb1qEnRBvAr8RUsMK+x3AThaNTPnjHYy1hboTZ1GNnCsV2NcI+8xtxVMxsqwdio0XWyLqpOmF6YOYMdfkmbmcVwAhXV8GsLmVdhS+R0Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(346002)(136003)(366004)(396003)(230922051799003)(186009)(64100799003)(451199024)(1800799009)(6506007)(36756003)(316002)(38100700002)(53546011)(6666004)(31696002)(41300700001)(4744005)(2616005)(2906002)(4326008)(31686004)(66556008)(54906003)(66476007)(66946007)(5660300002)(8676002)(6512007)(26005)(478600001)(86362001)(8936002)(6486002)(82960400001)(83380400001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K29wODZmNGZIYTR2ajQ3aWRmZWxyUWNQeW1RaHJaNGV2N0trWVlJQVpCcWo4?=
- =?utf-8?B?L2toZW01S3lmZ05ldFlSaGRlV3U3L0pVMXFZbTUyc0NEQUQ0b0syRkVaeWpN?=
- =?utf-8?B?S2RodHo5eVRGWks2UGpQc0k4Tjl1d25LYjAwemVESkJpdWFQN0tBbkxvNzdr?=
- =?utf-8?B?WWFjKzJxeU1yeXh3L1ZDekxvWUNDeWt2VmJEd1NwanYvLzduWWdzL0N1VkRN?=
- =?utf-8?B?SEdqNlpEc3Z3NGR4ZkF5OWtXcGdNWEQ2V292dW9relpPd1lrZ3BTcVF3RHQ5?=
- =?utf-8?B?UEd1R1psT2ZRL3NmT2dvaDFNeEcySFBCMzZ1NTlGMlJEbGFPTGIzeERlYVRo?=
- =?utf-8?B?eWdjNEMzMUxIYWExcVJzRDhDeUR1ektkRjlCc0hhYitkLy8vY0ZPc3gvRmR4?=
- =?utf-8?B?WGg1U0F6R292Z1IzY0lnVGo0VVlQa3VnTXFoQTdxZGZmMnBnMlRLb25nYk5Y?=
- =?utf-8?B?eWhtcG1JL1psUngvYnN3ZFltVnRGZGFMYWFOOHNQbVdwRzA4TkQwcWlXaFhO?=
- =?utf-8?B?cy9SdlRtYXI1Mlh6RERRTDRCWEwrbHNwWEYxNjIzVjVMTDVkMG80b1J1a056?=
- =?utf-8?B?Y0krcTVmbXJNL3lBdEFRbFNGMmJ0V2hoaXZuNDdrRmNzY21tOTc1SmhML0JU?=
- =?utf-8?B?bUJkQ2RTRGJjMmkvOEVJR25iMmtPRXNleWdKN0RKdlN1VFphOGo5V1V2TTl2?=
- =?utf-8?B?MGtUTnRXQmhUYkxxOTROZ25jZ05GMnFidEZyTW5UbFI2Zm5XTUx0TEJYRS8z?=
- =?utf-8?B?WGRaa0h0Y1ZEeFp2YmZic21TaGxHcHIzcEtYaUh1RjVGbER6aG9FRytoa256?=
- =?utf-8?B?b0dLUHhORE5mNXBvcDUvZHR6REo3V1BlWW9vUlJ0aGdibm9WT2s4ejFDOGxk?=
- =?utf-8?B?d20yc1d1dVlucnRtMHNjVWIwTTdtd3R0K0h4RWVHSXNQYURyZTUva3lTMnp3?=
- =?utf-8?B?NzJkNUhFeUUvZ1NkU25hdHRFMVlqRFNZMmJFOFJqaGZYQitGOUtNMkkyNUZq?=
- =?utf-8?B?OVVYU3VUbVZ2TG93Ym1zWHhtV3hwM2xrOWhuaGpFMjlreDdzM0lEUjJSZGoy?=
- =?utf-8?B?dW1lNlZGcE9PeGEvMWlBSXNTL2c5ZEpFb3BZOG9uL2k2dTh5YUl0WVZvSk4x?=
- =?utf-8?B?bGxUcEZPSmxVdUhpMG5zQVBKV2gyN210QzVkL3kxNXBiZkJDVGoxN2tkN1JM?=
- =?utf-8?B?R3kxLzlLVThCTE54WS9TcVZ5MSs1aDVXa3JETFJvd21jdldvU1U4dFozV0pK?=
- =?utf-8?B?Yzg1ek5VemZzNnorMVFsZXNpQXdMdFEybUtvaVFKZ2FzYXRiNm9QZXc1aHZ3?=
- =?utf-8?B?Q0NaSFdBamZPMnJNN215V2c0bDlLZ2dhSVhmOENIcTI0MDlaME1kRFFsMlN2?=
- =?utf-8?B?T0c0WDZvWGt2WkNJYWt3ZWFGWXBQckQ4eWQ5MC9ncy9LSEYrdWgzVHMvK1NZ?=
- =?utf-8?B?SzhsZFVSQXZ6U0QrS1VyN21PSXlVRFVka1FNWGN1TDVpdXl2d1VVWnJtWDFi?=
- =?utf-8?B?RVpsdmZaaG9rSlNMWjY1czBLcUZKOWxMTElQVXgvQUZmNDVxUi9KNTNPbi9a?=
- =?utf-8?B?L0o3S0lVaHhsZ1B4TGt4YnBZS1VVbk92dDFFSWR5WXp3VXdDUDRVQ1VSQ2lU?=
- =?utf-8?B?ZUdyMzY2T3I1bEdXTHJQelRkNVFnaDdjTzV0Yy9lWjhrd2VyMmh1QjZsOHRa?=
- =?utf-8?B?RnBCbnZxSjh5SVllejhKVXNRM0kxQ3BUSTRGcVd1Z0hOZjZDS1BrWWM2cWRX?=
- =?utf-8?B?RDhZOCs0dkk5VWsrZ1dGTWQ2UFZKOFRGUHREaXRpb3JoYnYxN3lWVFJCZW9G?=
- =?utf-8?B?MHc4V2k5UHFEU1JualFDd25ldE9VZmd3V3BwSGJ3bGNHRFFlZ002aC9IS21y?=
- =?utf-8?B?eXNrdW5pNUFJZ3pTNTlUZFQ0RThmWEJaMlZTSE45N1JtdE8zQzYweTdGaGFi?=
- =?utf-8?B?YU5PMWJwOVVhZ05hNy9LNzNLRGp2MmRjTTFNR2F0Lys1Um1wZU9MVGh1dFQ1?=
- =?utf-8?B?QTNFb0pvc2FESHIvVTVrOSs4bkxaU0ltc2QvRWo3RlllTGtMZVBVdnZMYm15?=
- =?utf-8?B?alVTYW02WlZWNkdxKzhYbXFZaXhkWXQzK0lvc3pnK3NSR1VBaG5SM1R3d3dQ?=
- =?utf-8?B?VjlQZnBqcFdXdnVZTE01K040MnhzYWEzbC8vNDJDdnRVU3hTbjZUNUZTYTRt?=
- =?utf-8?B?ekE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 193502f2-a0be-4af6-f5e2-08dbd55c5a28
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 13:14:43.2810
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vxZ7l0oKG3IyRa6RbPSrFH0UwKWPqcIgXSkHWCUMX91b1tmfbis61RzF4pL4oIc4+a28U5ImYXVWkeoNm7TGUsThXvWIPMad07iS6qKX4vE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5772
-X-OriginatorOrg: intel.com
+References: <20231009092655.22025-1-daniel@iogearbox.net> <ZTjY959R+AFXf3Xy@shredder>
+ <726368f0-bbe9-6aeb-7007-6f974ed075f2@iogearbox.net> <CAM0EoM=L3ft1zuXhMsKq=Z+u7asbvpBL-KJBXLCmHBg=6BLHzQ@mail.gmail.com>
+ <87dfbac5-695c-7582-cbb5-4d71b6698ab1@iogearbox.net>
+In-Reply-To: <87dfbac5-695c-7582-cbb5-4d71b6698ab1@iogearbox.net>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 25 Oct 2023 09:21:02 -0400
+Message-ID: <CAM0EoMn-BDVbOvHEd0Pww5Hx5XD3UJnyipO+9h3HKzAVAp5n0A@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] net, sched: Make tc-related drop reason
+ more flexible
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Ido Schimmel <idosch@idosch.org>, kuba@kernel.org, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, victor@mojatatu.com, martin.lau@linux.dev, dxu@dxuuu.xyz, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/25/23 11:44, Beniamino Galvani wrote:
-> The source and destination ports should be taken into account when
-> determining the route destination; they can affect the result, for
-> example in case there are routing rules defined.
-> 
-> Signed-off-by: Beniamino Galvani <b.galvani@gmail.com>
+On Wed, Oct 25, 2023 at 7:52=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
+et> wrote:
+>
+> On 10/25/23 1:05 PM, Jamal Hadi Salim wrote:
+> > On Wed, Oct 25, 2023 at 6:01=E2=80=AFAM Daniel Borkmann <daniel@iogearb=
+ox.net> wrote:
+> >> On 10/25/23 10:59 AM, Ido Schimmel wrote:
+> >>> On Mon, Oct 09, 2023 at 11:26:54AM +0200, Daniel Borkmann wrote:
+> >>>> diff --git a/net/core/dev.c b/net/core/dev.c
+> >>>> index 606a366cc209..664426285fa3 100644
+> >>>> --- a/net/core/dev.c
+> >>>> +++ b/net/core/dev.c
+> >>>> @@ -3910,7 +3910,8 @@ EXPORT_SYMBOL_GPL(netdev_xmit_skip_txqueue);
+> >>>>    #endif /* CONFIG_NET_EGRESS */
+> >>>>
+> >>>>    #ifdef CONFIG_NET_XGRESS
+> >>>> -static int tc_run(struct tcx_entry *entry, struct sk_buff *skb)
+> >>>> +static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
+> >>>> +              enum skb_drop_reason *drop_reason)
+> >>>>    {
+> >>>>       int ret =3D TC_ACT_UNSPEC;
+> >>>>    #ifdef CONFIG_NET_CLS_ACT
+> >>>> @@ -3922,12 +3923,14 @@ static int tc_run(struct tcx_entry *entry, s=
+truct sk_buff *skb)
+> >>>>
+> >>>>       tc_skb_cb(skb)->mru =3D 0;
+> >>>>       tc_skb_cb(skb)->post_ct =3D false;
+> >>>> +    res.drop_reason =3D *drop_reason;
+> >>>>
+> >>>>       mini_qdisc_bstats_cpu_update(miniq, skb);
+> >>>>       ret =3D tcf_classify(skb, miniq->block, miniq->filter_list, &r=
+es, false);
+> >>>>       /* Only tcf related quirks below. */
+> >>>>       switch (ret) {
+> >>>>       case TC_ACT_SHOT:
+> >>>> +            *drop_reason =3D res.drop_reason;
+> >>>
+> >>> Daniel,
+> >>>
+> >>> Getting the following splat [1] with CONFIG_DEBUG_NET=3Dy and this
+> >>> reproducer [2]. Problem seems to be that classifiers clear 'struct
+> >>> tcf_result::drop_reason', thereby triggering the warning in
+> >>> __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0).
+> >>>
+> >>> Fixed by maintaining the original drop reason if the one returned fro=
+m
+> >>> tcf_classify() is 'SKB_NOT_DROPPED_YET' [3]. I can submit this fix
+> >>> unless you have a better idea.
+> >>
+> >> Thanks for catching this, looks reasonable to me as a fix.
+> >>
+> >>> [1]
+> >>> WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0=
+x38/0x130
+> >>> Modules linked in:
+> >>> CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d9=
+582e0 #682
+> >>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.=
+fc37 04/01/2014
+> >>> RIP: 0010:kfree_skb_reason+0x38/0x130
+> >>> [...]
+> >>> Call Trace:
+> >>>    <IRQ>
+> >>>    __netif_receive_skb_core.constprop.0+0x837/0xdb0
+> >>>    __netif_receive_skb_one_core+0x3c/0x70
+> >>>    process_backlog+0x95/0x130
+> >>>    __napi_poll+0x25/0x1b0
+> >>>    net_rx_action+0x29b/0x310
+> >>>    __do_softirq+0xc0/0x29b
+> >>>    do_softirq+0x43/0x60
+> >>>    </IRQ>
+> >>>
+> >>> [2]
+> >>> #!/bin/bash
+> >>>
+> >>> ip link add name veth0 type veth peer name veth1
+> >>> ip link set dev veth0 up
+> >>> ip link set dev veth1 up
+> >>> tc qdisc add dev veth1 clsact
+> >>> tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11=
+:22:33:44:55 action drop
+> >>> mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
+> >>
+> >> I didn't know you're using mausezahn, nice :)
+> >>
+> >>> [3]
+> >>> diff --git a/net/core/dev.c b/net/core/dev.c
+> >>> index a37a932a3e14..abd0b13f3f17 100644
+> >>> --- a/net/core/dev.c
+> >>> +++ b/net/core/dev.c
+> >>> @@ -3929,7 +3929,8 @@ static int tc_run(struct tcx_entry *entry, stru=
+ct sk_buff *skb,
+> >>>           /* Only tcf related quirks below. */
+> >>>           switch (ret) {
+> >>>           case TC_ACT_SHOT:
+> >>> -               *drop_reason =3D res.drop_reason;
+> >>> +               if (res.drop_reason !=3D SKB_NOT_DROPPED_YET)
+> >>> +                       *drop_reason =3D res.drop_reason;
+> >>>                   mini_qdisc_qstats_cpu_drop(miniq);
+> >>>                   break;
+> >>>           case TC_ACT_OK:
+> >>>
+> >
+> > Out of curiosity - how does the policy say "drop" but drop_reason does
+> > not reflect it?
+>
+> Ido, Jamal, wdyt about this alternative approach - these were the locatio=
+ns I could
+> find from an initial glance (compile-tested) :
+>
+>  From a3d46a55aac484372b60b783cb6a3c98a0fef75c Mon Sep 17 00:00:00 2001
+> From: Daniel Borkmann <daniel@iogearbox.net>
+> Date: Wed, 25 Oct 2023 11:43:44 +0000
+> Subject: [PATCH] net, sched: fix..
+>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 > ---
->   drivers/net/bareudp.c | 29 ++++++++++++++++-------------
->   1 file changed, 16 insertions(+), 13 deletions(-)
-> 
+>   include/net/pkt_cls.h    | 12 ++++++++++++
+>   net/sched/cls_basic.c    |  2 +-
+>   net/sched/cls_bpf.c      |  2 +-
+>   net/sched/cls_flower.c   |  2 +-
+>   net/sched/cls_fw.c       |  2 +-
+>   net/sched/cls_matchall.c |  2 +-
+>   net/sched/cls_route.c    |  4 ++--
+>   net/sched/cls_u32.c      |  2 +-
+>   8 files changed, 20 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+> index a76c9171db0e..31d8e8587824 100644
+> --- a/include/net/pkt_cls.h
+> +++ b/include/net/pkt_cls.h
+> @@ -160,6 +160,18 @@ static inline void tcf_set_drop_reason(struct tcf_re=
+sult *res,
+>         res->drop_reason =3D reason;
+>   }
+>
+> +static inline void tcf_set_result(struct tcf_result *to,
+> +                                 const struct tcf_result *from)
+> +{
+> +       /* tcf_result's drop_reason which is the last member must be
+> +        * preserved and cannot be copied from the cls'es tcf_result
+> +        * template given this is carried all the way and potentially
+> +        * set to a concrete tc drop reason upon error or intentional
+> +        * drop. See tcf_set_drop_reason() locations.
+> +        */
+> +       memcpy(to, from, offsetof(typeof(*to), drop_reason));
+> +}
+> +
 
-Good, steady work!
+Daniel, IMO, doing this at cls_api is best instead (like what Victors
+or my original patch did). Iam ~30K feet right now with a lousy
+keyboard - you can either do it, or i or Victor can send the patch by
+end of day today. There are missing cases which were covered by Victor
+and possibly something else will pop up next.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+cheers,
+jamal
 
+>   static inline void
+>   __tcf_bind_filter(struct Qdisc *q, struct tcf_result *r, unsigned long =
+base)
+>   {
+> diff --git a/net/sched/cls_basic.c b/net/sched/cls_basic.c
+> index 1b92c33b5f81..d7ead3fc3c45 100644
+> --- a/net/sched/cls_basic.c
+> +++ b/net/sched/cls_basic.c
+> @@ -50,7 +50,7 @@ TC_INDIRECT_SCOPE int basic_classify(struct sk_buff *sk=
+b,
+>                 if (!tcf_em_tree_match(skb, &f->ematches, NULL))
+>                         continue;
+>                 __this_cpu_inc(f->pf->rhit);
+> -               *res =3D f->res;
+> +               tcf_set_result(res, &f->res);
+>                 r =3D tcf_exts_exec(skb, &f->exts, res);
+>                 if (r < 0)
+>                         continue;
+> diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
+> index 382c7a71f81f..e4620a462bc3 100644
+> --- a/net/sched/cls_bpf.c
+> +++ b/net/sched/cls_bpf.c
+> @@ -124,7 +124,7 @@ TC_INDIRECT_SCOPE int cls_bpf_classify(struct sk_buff=
+ *skb,
+>                         res->class   =3D 0;
+>                         res->classid =3D filter_res;
+>                 } else {
+> -                       *res =3D prog->res;
+> +                       tcf_set_result(res, &prog->res);
+>                 }
+>
+>                 ret =3D tcf_exts_exec(skb, &prog->exts, res);
+> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+> index e5314a31f75a..eb94090fb26c 100644
+> --- a/net/sched/cls_flower.c
+> +++ b/net/sched/cls_flower.c
+> @@ -341,7 +341,7 @@ TC_INDIRECT_SCOPE int fl_classify(struct sk_buff *skb=
+,
+>
+>                 f =3D fl_mask_lookup(mask, &skb_key);
+>                 if (f && !tc_skip_sw(f->flags)) {
+> -                       *res =3D f->res;
+> +                       tcf_set_result(res, &f->res);
+>                         return tcf_exts_exec(skb, &f->exts, res);
+>                 }
+>         }
+> diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
+> index c49d6af0e048..70b873f8771f 100644
+> --- a/net/sched/cls_fw.c
+> +++ b/net/sched/cls_fw.c
+> @@ -63,7 +63,7 @@ TC_INDIRECT_SCOPE int fw_classify(struct sk_buff *skb,
+>                 for (f =3D rcu_dereference_bh(head->ht[fw_hash(id)]); f;
+>                      f =3D rcu_dereference_bh(f->next)) {
+>                         if (f->id =3D=3D id) {
+> -                               *res =3D f->res;
+> +                               tcf_set_result(res, &f->res);
+>                                 if (!tcf_match_indev(skb, f->ifindex))
+>                                         continue;
+>                                 r =3D tcf_exts_exec(skb, &f->exts, res);
+> diff --git a/net/sched/cls_matchall.c b/net/sched/cls_matchall.c
+> index c4ed11df6254..a4018db80a60 100644
+> --- a/net/sched/cls_matchall.c
+> +++ b/net/sched/cls_matchall.c
+> @@ -37,7 +37,7 @@ TC_INDIRECT_SCOPE int mall_classify(struct sk_buff *skb=
+,
+>         if (tc_skip_sw(head->flags))
+>                 return -1;
+>
+> -       *res =3D head->res;
+> +       tcf_set_result(res, &head->res);
+>         __this_cpu_inc(head->pf->rhit);
+>         return tcf_exts_exec(skb, &head->exts, res);
+>   }
+> diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
+> index 1424bfeaca73..cbfaa1d1820f 100644
+> --- a/net/sched/cls_route.c
+> +++ b/net/sched/cls_route.c
+> @@ -109,7 +109,7 @@ static inline int route4_hash_wild(void)
+>
+>   #define ROUTE4_APPLY_RESULT()                                 \
+>   {                                                             \
+> -       *res =3D f->res;                                          \
+> +       tcf_set_result(res, &f->res);                           \
+>         if (tcf_exts_has_actions(&f->exts)) {                   \
+>                 int r =3D tcf_exts_exec(skb, &f->exts, res);      \
+>                 if (r < 0) {                                    \
+> @@ -152,7 +152,7 @@ TC_INDIRECT_SCOPE int route4_classify(struct sk_buff =
+*skb,
+>                         goto failure;
+>                 }
+>
+> -               *res =3D f->res;
+> +               tcf_set_result(res, &f->res);
+>                 spin_unlock(&fastmap_lock);
+>                 return 0;
+>         }
+> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+> index 6663e971a13e..f50ae40a29d5 100644
+> --- a/net/sched/cls_u32.c
+> +++ b/net/sched/cls_u32.c
+> @@ -172,7 +172,7 @@ TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *sk=
+b,
+>   check_terminal:
+>                         if (n->sel.flags & TC_U32_TERMINAL) {
+>
+> -                               *res =3D n->res;
+> +                               tcf_set_result(res, &n->res);
+>                                 if (!tcf_match_indev(skb, n->ifindex)) {
+>                                         n =3D rcu_dereference_bh(n->next)=
+;
+>                                         goto next_knode;
+> --
+> 2.34.1
+>
 
