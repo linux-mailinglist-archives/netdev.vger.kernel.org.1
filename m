@@ -1,182 +1,153 @@
-Return-Path: <netdev+bounces-44228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9505D7D7266
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 19:35:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D68BD7D7278
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 19:38:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69BF21C20E53
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 17:35:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D52721C20D49
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 17:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D14030D0C;
-	Wed, 25 Oct 2023 17:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 400B62E639;
+	Wed, 25 Oct 2023 17:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cgOKSV4c"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BHl9b65C"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975DA30D0A
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 17:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47241C6B0
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 17:38:04 +0000 (UTC)
 Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F36B1BB
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 10:34:49 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-777745f1541so3929385a.0
-        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 10:34:49 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5890D184
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 10:38:03 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-778af1b5b1eso2068085a.2
+        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 10:38:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1698255288; x=1698860088; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZkQVj+ohSvU7ZndpStLgdRxD2UAEprv6Wx2YjnFhCwA=;
-        b=cgOKSV4cKIBPLMuHSNCbijMwtU1Ql8jgr8H5K8/chCPqyIQptRWSi0bLAO5mowmLqW
-         yxDIKdkdHqqpf/9ipxw+D9MDsgu17oG4lPnni0a/GuYNxukW2X1KMu1g3Fm5AdicXn7+
-         O18dU+j4PKNr5EgoIEqXAG+ijfrRyNJcwdFhk=
+        d=broadcom.com; s=google; t=1698255482; x=1698860282; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eBAmwqlWjQIomHi9jpXEtlQItIoEvrrWn4y896JUFMg=;
+        b=BHl9b65CjJisdQEQowPPsQNUgjCezYLrocdw2xCQwjY4GzamMIYCHrvft0DM9oXPYg
+         1MMewL60m+OooN2lIbnP34h7Y0re70ucEuBsV1kNculT2uAvoGjEuZ/sH66FfBWozEwX
+         OSDpWpUl2rYcNvYEtMWB7nU5WjbLOdMHj1hVQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698255288; x=1698860088;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZkQVj+ohSvU7ZndpStLgdRxD2UAEprv6Wx2YjnFhCwA=;
-        b=OllfunTG/M5hwCyln17j0g7yvkIJyKHhWdFA2HFwwGSm9rEZC/1aJH2WAkMFPhPECV
-         F9ej82W69yaVXdv3vsGTxhlkMUfDq5v7iRiDJty6C+7KTg8nQlnqTE2tO8BcovQR9dYH
-         ZgwVML8q3/E4XVqFr03o02hQgDT6+FPDax0gwKfCNwyByGaeWw3QArNDWjdybDp6mBtE
-         SrVymLj+mIm3RIJ/MQo5o67ON9dMsiH5zkOmzEeUrBhoWnFPA7aAD8XgU9u7cTKNRbpv
-         u4O825lfwrbPzIUcXL2lTrhuNlx7SvJSvl2W2hBtky8i+vIx2O4QyzURk+lqMazfQPVr
-         +FfQ==
-X-Gm-Message-State: AOJu0YyzMmW/L9al+YEao+9SHJABcfhrtMHHnw6uwNxZca8UDuP+4msN
-	AXRCqag0mz6Cm3DM24AlYosBsS13xziV17qHdY4H+JtoLiI+g+xvw+3QPFxVnYMR5/OnW57WAp4
-	8k3EV4gXxCWoBGiVcYsgWZItD1lXeuYS821ed6l0BKPzL0l9cUOLWvtK2vUC4MxUns6NZfWMjr6
-	JBz5f0oMmGr3nT
-X-Google-Smtp-Source: AGHT+IEef6QF/8p68iyCZ9o8f0b0Gm4vRrfNv0vO7xt3hJm/S4UpLNGER58UumgewAJGcwWGxQM56g==
-X-Received: by 2002:a05:620a:c4f:b0:775:687f:4c2b with SMTP id u15-20020a05620a0c4f00b00775687f4c2bmr17929165qki.44.1698255288271;
-        Wed, 25 Oct 2023 10:34:48 -0700 (PDT)
-Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id bp37-20020a05620a45a500b00767dcf6f4adsm4332384qkb.51.2023.10.25.10.34.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 10:34:47 -0700 (PDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Daniil Tatianin <d-tatianin@yandex-team.ru>,
-	Simon Horman <horms@kernel.org>,
-	Justin Chen <justin.chen@broadcom.com>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Jiri Pirko <jiri@resnulli.us>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 5/5] net: bcmgenet: Interrogate PHY for WAKE_FILTER programming
-Date: Wed, 25 Oct 2023 10:33:00 -0700
-Message-Id: <20231025173300.1776832-6-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231025173300.1776832-1-florian.fainelli@broadcom.com>
-References: <20231025173300.1776832-1-florian.fainelli@broadcom.com>
+        d=1e100.net; s=20230601; t=1698255482; x=1698860282;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eBAmwqlWjQIomHi9jpXEtlQItIoEvrrWn4y896JUFMg=;
+        b=GugAu5wWu9E2z8yeWdtHy+iFC0YI295d9To3WdlLAbkX8YoQWIekv5JODQMVwpPnka
+         yNsvlnS2kjZS45rQnKKBSojfj0WSDPF0xfk3VnARTrK+Pe7w1JrcrpdkHJG9S1UUUk6p
+         hf8EXTmKT67uhNm0cO4z+OnQKX7RXoLjY+Hts2AbUEwmKBh1RrwD/aYfsOu+Z0b1vsxm
+         pGUXIQDl6/8yvWszSjm1WGnsXO+5Ie9z4qQO29rM8F5gRTKQC5fsFCP9oy/+kkgI77fv
+         N1VTc/VqinCfyd9vZwqUozk7DapnksqI9brOridH2oKweDgDM1fDRqTPRToXOcVBvdVQ
+         fwuw==
+X-Gm-Message-State: AOJu0YwkTRyiwuTDRBTHWV4vZ5Sq9Gh9vgZrbCcLBeDZqZLk96xrYp6r
+	HK9KI2UpYOZh+hUbeXZ2WZIslmFNna5QKEMm0pKmcdjZHaeI/x2xHmrtyQ+Lex09m0wxYHRK2Iy
+	BTkDvGzBrE2hlkvh607L/OviyAmvoNiDNaEC0+CasV3BqbarmQpFTX7ZSo7hRpF+VfNn+ShERBv
+	xLJXCy+l0zuVOP
+X-Google-Smtp-Source: AGHT+IHyhzKNaBSe5R0DEn37pHoczhlw8E7HXQVcWeEqwx7l31IJy6CYoa+h0kFyZlPSo9LYvJCXXg==
+X-Received: by 2002:a05:620a:444e:b0:767:923:48e7 with SMTP id w14-20020a05620a444e00b00767092348e7mr19453666qkp.5.1698255482017;
+        Wed, 25 Oct 2023 10:38:02 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id p7-20020a05620a056700b007788c1a81b6sm4366669qkp.46.2023.10.25.10.37.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Oct 2023 10:38:01 -0700 (PDT)
+Message-ID: <848b9490-64a1-4db7-8de2-7bc5e6107769@broadcom.com>
+Date: Wed, 25 Oct 2023 10:37:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/5] net: bcmgenet: Interrogate PHY for
+ WAKE_FILTER programming
+To: netdev@vger.kernel.org
+Cc: Doug Berger <opendmb@gmail.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, Willem de Bruijn <willemb@google.com>,
+ Daniil Tatianin <d-tatianin@yandex-team.ru>, Simon Horman
+ <horms@kernel.org>, Justin Chen <justin.chen@broadcom.com>,
+ Ratheesh Kannoth <rkannoth@marvell.com>, Joe Damato <jdamato@fastly.com>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Jiri Pirko <jiri@resnulli.us>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20231025173300.1776832-1-florian.fainelli@broadcom.com>
+ <20231025173300.1776832-6-florian.fainelli@broadcom.com>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ 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
+In-Reply-To: <20231025173300.1776832-6-florian.fainelli@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000372e8506088ddfe7"
+	boundary="000000000000c4dc9006088dea58"
 
---000000000000372e8506088ddfe7
-Content-Transfer-Encoding: 8bit
+--000000000000c4dc9006088dea58
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Determine whether the PHY can support waking up from the user programmed
-network filter, and if it can utilize it.
+On 10/25/23 10:33, Florian Fainelli wrote:
+> Determine whether the PHY can support waking up from the user programmed
+> network filter, and if it can utilize it.
+> 
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>>
+> ---
 
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>>
----
- drivers/net/ethernet/broadcom/genet/bcmgenet.c | 16 ++++++++++++++++
- drivers/net/phy/bcm-phy-lib.c                  | 12 +++++++++++-
- 2 files changed, 27 insertions(+), 1 deletion(-)
+[snip]
 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 9282403d1bf6..9d01c13552eb 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -1524,6 +1524,14 @@ static int bcmgenet_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
- 	struct bcmgenet_priv *priv = netdev_priv(dev);
- 	int err = 0;
- 
-+	if (dev->phydev) {
-+		err = phy_ethtool_set_rxnfc(dev->phydev, cmd);
-+		if (err != -EOPNOTSUPP)
-+			return err;
-+
-+		err = 0;
-+	}
-+
- 	switch (cmd->cmd) {
- 	case ETHTOOL_SRXCLSRLINS:
- 		err = bcmgenet_insert_flow(dev, cmd);
-@@ -1579,6 +1587,14 @@ static int bcmgenet_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
- 	int err = 0;
- 	int i = 0;
- 
-+	if (dev->phydev) {
-+		err = phy_ethtool_get_rxnfc(dev->phydev, cmd, rule_locs);
-+		if (err != -EOPNOTSUPP)
-+			return err;
-+
-+		err = 0;
-+	}
-+
- 	switch (cmd->cmd) {
- 	case ETHTOOL_GRXRINGS:
- 		cmd->data = priv->hw_params->rx_queues ?: 1;
-diff --git a/drivers/net/phy/bcm-phy-lib.c b/drivers/net/phy/bcm-phy-lib.c
-index cfbeedc5ee81..569aeab68f97 100644
---- a/drivers/net/phy/bcm-phy-lib.c
-+++ b/drivers/net/phy/bcm-phy-lib.c
-@@ -888,6 +888,15 @@ int bcm_phy_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
- 	if (wol->wolopts & WAKE_FILTER)
- 		goto program_ctl;
- 
-+	/* Enabling options other than WAKE_FILTER nullifies the one and only
-+	 * network rule that we support.
-+	 */
-+	if (!(wol->wolopts & WAKE_FILTER)) {
-+		ret = bcm_phy_write_exp(phydev, BCM54XX_WOL_SEC_KEY_8B, 0);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
- 	/* When using WAKE_MAGIC, we program the magic pattern filter to match
- 	 * the device's MAC address and we accept any MAC DA in the Ethernet
- 	 * frame.
-@@ -1175,9 +1184,10 @@ static int bcm_phy_set_rule(struct phy_device *phydev,
- 
- 	da = nfc->fs.m_u.ether_spec.h_dest;
- 	for (i = 0; i < ETH_ALEN / 2; i++) {
-+		u16 mask = da[i * 2] << 8 | da[i * 2 + 1];
- 		ret = bcm_phy_write_exp(phydev,
- 					BCM54XX_WOL_MASK(2 - i),
--					da[i * 2] << 8 | da[i * 2 + 1]);
-+					~mask);
- 		if (ret < 0)
- 			return ret;
- 	}
+> diff --git a/drivers/net/phy/bcm-phy-lib.c b/drivers/net/phy/bcm-phy-lib.c
+> index cfbeedc5ee81..569aeab68f97 100644
+> --- a/drivers/net/phy/bcm-phy-lib.c
+> +++ b/drivers/net/phy/bcm-phy-lib.c
+
+This hunk belongs in the previous patch, I will send a v2 after 
+collecting feedback.
 -- 
-2.34.1
+Florian
 
 
---000000000000372e8506088ddfe7
+--000000000000c4dc9006088dea58
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -247,15 +218,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINEIq8LqPch8Xffr
-bZoTJ0lm4zePnY47vGXeL8RjuG3RMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTAyNTE3MzQ0OFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPwf/q3mIyIvdv4B
+E+N0zjcFM9L70hBkFsRXV6SjfmSiMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMTAyNTE3MzgwMlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCzamQQimzAyAtom/SF4L0h6mWIwv2F8lpC
-ibHEw7ZdSFzeJfAPw0N4gYSqNCzwCNXg7OHgdtBlg/g8t1L3Q92pquJsc3g5aNPjlWLmspMBvilH
-xXpRicu6qyN7ZGHOVgSl2Ja/ZPDnCo0/oN+UZ9RAgZ4dJD4EmFOuYsiOchyvkwdn1pwlk4IEimJQ
-HQGF+eQGnbSgD/fo6K+PMUlODt1cDRWGSLqbQOiVW5nzHhLo/kNAtzW02WaDP9e0jsN3K1Ie4lg2
-tXIZVAF1ceE9f/WQ14XICtwked3A5KjkioS/z1yt/JRNLFDUw9uNArv6WP+pmJGO3Jg7PqtaPc3Y
-7JdD
---000000000000372e8506088ddfe7--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB6vOB9mz7erkzPvG2yT4hXAghxRedxklxi
+JhTIaOtoKr1PKzYZCRykb7HfPqJs3ntQKsUtd60RqVg88swDHO9/pzQ+eSvfjTiOZxaccCY0Rcrl
+ZB6OdlbnCsn04bBVtyXiI7HK3Xd+/i6Kz9NlPnRseKKOJtkcFnR7K1A1JYqBOdnB+Rt43pHWemyO
+wGPfwXw2rFC7r3bjnFhA3pOCVzSSqYZo6dSWB1xuhs47pk5Kb5Gg0+EYkG/Npidi8Pnv1E7FDV23
+Mb8FoRGf2pjXGboBv+f2wUkQqlKHWd0/IR79Zq4vXhtxtiZR2dYd3jfMfk4ykG1BI9xERP2GmH+o
+GFS9
+--000000000000c4dc9006088dea58--
 
