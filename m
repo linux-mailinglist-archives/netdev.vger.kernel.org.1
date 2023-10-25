@@ -1,158 +1,78 @@
-Return-Path: <netdev+bounces-44217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652F17D71D3
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 18:41:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E4B7D71EF
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 18:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3C00B2105F
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 16:41:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85E7C2812EF
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 16:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD3E921A14;
-	Wed, 25 Oct 2023 16:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75DCB27737;
+	Wed, 25 Oct 2023 16:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iy83hJrX"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Gacs860e"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128401A27D
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 16:41:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50868137
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 09:41:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698252070;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA6118B08
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 16:54:38 +0000 (UTC)
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [IPv6:2001:41d0:1004:224b::bc])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 206B6129
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 09:54:37 -0700 (PDT)
+Message-ID: <f6357d19-9bd9-e9f4-6e9d-97a73f61560d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1698252875;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=45p4m02wDHtfK/5rEeQxDQTRj1TqzHPqRAnek6DIdIw=;
-	b=Iy83hJrXQ+8F504VItQlACMRp9INDoe2VCG1cCEJHYxxfWqG2AqocRO+EMcp1pab/8hpBA
-	pbzv8cK+3Us/WF7yyHMzqeIpLY/1s0vRMTBUMlMZ12enbqZMxdo9c3dXBBEba98jFlxwXf
-	S5bSuig+r6+wZbjMBS+Z63f0mRwPWfg=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-218-YiXM7AGzNbGvRCdJUKPdFw-1; Wed, 25 Oct 2023 12:41:08 -0400
-X-MC-Unique: YiXM7AGzNbGvRCdJUKPdFw-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6befc6bbc23so696972b3a.1
-        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 09:41:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698252066; x=1698856866;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=45p4m02wDHtfK/5rEeQxDQTRj1TqzHPqRAnek6DIdIw=;
-        b=kLSgkzVuAIUBr/GbZGw3/6uiQwByzcNv3m8Q6ePcEKXezTY5EtTBhqh2iy6EKAtCLq
-         1Grb7+Qw+eMFlJLw1m2dQaY2YA5msA8QhNj44xc5oBR+mfzG4gRHlnf6tvqEF3JdU/l4
-         U9YYeln7sE8o5OBHJ6sh5Z4BuOO4R2c3y13CoECjYUoLIYgj3KFW0ATC4/uMSBEzVQqp
-         KjSufxO85aNEGFUYEXGihlE0KFCJNDbMJiIdyo7NNjRJ//ZgokdhhoexclYPC9Q7ZZLr
-         1AZJpIP0nBeyrlZ7E54iOEHScRQlJM2mzHTgWAwNsC55z4s019nabjgQGBeNcfvIuckl
-         dRIg==
-X-Gm-Message-State: AOJu0YyFBNHETUwyDzJjJIIavrDkDvUspee7UrM690uUTztb9SJI0BHl
-	AqghEN6HNgnki+e8a3j/u4gagVVhNm6sepwEQoorh3/XzlaoOvaUnTLp5UdsWQxFChUokbMYWGC
-	Hbt9XSQutPwJN9VtcCrn6R77ecsYd0iiIhnkex9ea
-X-Received: by 2002:a05:6a20:8f1a:b0:17b:a34d:5b56 with SMTP id b26-20020a056a208f1a00b0017ba34d5b56mr193003pzk.19.1698252065844;
-        Wed, 25 Oct 2023 09:41:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGSMFtLZF6hT2B6SagLd1tIs/d8nGPwGyqXWu2J7MgBFAHiktU0p9lRUP2Jys/EDmwvtCDM7p7RBF0in80bIiM=
-X-Received: by 2002:a05:6a20:8f1a:b0:17b:a34d:5b56 with SMTP id
- b26-20020a056a208f1a00b0017ba34d5b56mr192979pzk.19.1698252065453; Wed, 25 Oct
- 2023 09:41:05 -0700 (PDT)
+	bh=1VjGtvE6jtbr5u1nLIKOL6cl+2iks3m9+SCIpFYs+VU=;
+	b=Gacs860eaS4L0ykk1HnCBk/ZE4n4Uu54FUxSYgBxkbPK0ph5ye0RL9TkBPAcJU8wmp2jvs
+	4ggag2n5NOIpStz5CIMNbh5i4rKyggqdlrkE4URaodVKdwb25J1EOMxTXUdJdhGsCcdKH3
+	3jvRV/NHcaq27fWHLDDEDhUCLQCsk4A=
+Date: Wed, 25 Oct 2023 09:54:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231023-send-net-next-20231023-1-v2-0-16b1f701f900@kernel.org>
- <20231023-send-net-next-20231023-1-v2-5-16b1f701f900@kernel.org>
- <20231024125956.341ef4ef@kernel.org> <a29b6917-d578-35c4-978d-d57a3bccd63f@kernel.org>
- <20231024164936.41ae6f3c@kernel.org>
-In-Reply-To: <20231024164936.41ae6f3c@kernel.org>
-From: Davide Caratti <dcaratti@redhat.com>
-Date: Wed, 25 Oct 2023 18:40:52 +0200
-Message-ID: <CAKa-r6vCj+gPEUKpv7AsXqM77N6pB0evuh7myHq=585RA3oD5g@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 5/7] uapi: mptcp: use header file generated
- from YAML spec
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Mat Martineau <martineau@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, netdev@vger.kernel.org, mptcp@lists.linux.dev, 
-	Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH bpf-next v4 0/7] Add bpf programmable net device
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, razor@blackwall.org, ast@kernel.org,
+ andrii@kernel.org, john.fastabend@gmail.com, sdf@google.com,
+ toke@kernel.org, kuba@kernel.org, andrew@lunn.ch
+References: <20231024214904.29825-1-daniel@iogearbox.net>
+ <169819142514.13417.3415333680978363345.git-patchwork-notify@kernel.org>
+ <ZTk5MErTKAK96nO3@nanopsycho>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <ZTk5MErTKAK96nO3@nanopsycho>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-hello,
+On 10/25/23 8:50 AM, Jiri Pirko wrote:
+> Wed, Oct 25, 2023 at 01:50:25AM CEST, patchwork-bot+netdevbpf@kernel.org wrote:
+>> Hello:
+>>
+>> This series was applied to bpf/bpf-next.git (master)
+>> by Martin KaFai Lau <martin.lau@kernel.org>:
+> 
+> Interesting, applied within 2 hours after send. You bpf people don't
+> care about some 24h timeout?
 
-thanks for looking at this.
-
-On Tue, Oct 24, 2023 at 10:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> > On Mon, 23 Oct 2023 11:17:09 -0700 Mat Martineau wrote:
-> >> +/* for backward compatibility */
-> >> +#define     __MPTCP_PM_CMD_AFTER_LAST       __MPTCP_PM_CMD_MAX
-> >> +#define     __MPTCP_ATTR_AFTER_LAST         __MPTCP_ATTR_MAX
-> >
-> > Do you want to intentionally move to the normal naming or would you
-> > prefer to keep the old names?
-
-given that nobody should use them, I'd prefer to move to the normal
-naming and drop the old definitions (_MPTCP_PM_CMD_AFTER_LAST and
-__MPTCP_ATTR_AFTER_LAST). I was unsure if I could do the drop thing
-actually, because applications using them would break the build then _
-hence these two "backward compatibility" lines.
-
-For the operation list, I see it's about exposing
-
-cmd-cnt-name
-
-to [ge]netlink*.yaml, and then do:
-
-  9 max-by-define: true
- 10 kernel-policy: per-op
- 11 cmd-cnt-name: --mptcp-pm-cmd-after-last    <-- this
- 12
- 13 definitions:
-
-the generated MPTCP #define(s) are the same as the ones we have in
-net-next now: no need to specify __MPTCP_PM_CMD_MAX anymore.
-
-For the attributes, I thought I could use  'attr-cnt-name' like:
-
-169     name: attr
-170     name-prefix: mptcp-pm-attr-
-171     attr-cnt-name: --mptcp-attr-after-last <-- this
-172     attributes:
-
-as described in the [ge]netlink schema, but the tool seems to just ignore i=
-t.
---=20
-davide
-
-
-
-
-
-On Wed, Oct 25, 2023 at 1:49=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 24 Oct 2023 16:30:27 -0700 (PDT) Mat Martineau wrote:
-> > I'm not sure if you're offering to add the feature or are asking us (we=
-ll,
-> > Davide) to implement it :)
->
-> Either way is fine, Davide seems to have tackled the extensions in patche=
-s
-> 1 and 2, so he may want to do it himself. Otherwise I'm more than happy
-> to type and send the patch :)
->
-
-> Let's make sure we update documentation, tho, in this case:
-> Documentation/userspace-api/netlink/c-code-gen.rst
->
+24hr? The v1 was posted to both netdev and bpf list on 9/25. It was 10/24 
+yesterday. The part you commented in patch 1 had not been changed much since v1, 
+so there was a month of time. netdev is always on the cc list. Multiple people 
+(Andrew, Jakub...etc) had already helped to review and Daniel had addressed the 
+comments. The change history had been diminishing from v1 to v4 and v4 changes 
+was mostly nit-picking already.
 
 
