@@ -1,111 +1,82 @@
-Return-Path: <netdev+bounces-44124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D77D7D66FF
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 11:36:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1EFC7D6717
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 11:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEBFE1F229F8
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 09:36:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2E7A1C20B51
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 09:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F9621105;
-	Wed, 25 Oct 2023 09:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F999224F1;
+	Wed, 25 Oct 2023 09:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LeWrMUFw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a3Ftm80K"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C05210E2;
-	Wed, 25 Oct 2023 09:36:39 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED91BA1;
-	Wed, 25 Oct 2023 02:36:37 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-40838915cecso44637095e9.2;
-        Wed, 25 Oct 2023 02:36:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698226596; x=1698831396; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zxxdJb0Pk2jGCZTNDTuKKyAUkRDhJczRSr4g1VjXqPQ=;
-        b=LeWrMUFw/pW1F+kAXzCJfFK8Gz8EPrItOW259u1rheFNqZfY0b2iC1LjyqsJXPo074
-         SFL2+BO2czxhIpWlwCEkOLGaK4B+x4IGmOtnLVAhCBP7SVTZKu+KJqvK7C3EqnUr9byp
-         3DZW8B8T44KX+NGJlbqIae/p8vMH0eOmxZRJxUZB7Mbhb4MNYNAU4VjEsPmp5afZag/i
-         aWpG4WRd5RU2sUdvdQKmJt6XwIkuLPIjORN3nwSVhYlSL8/xoLoNmuX6yyDNMn/zXtDQ
-         j/0P0fbNq9E+Wd+wEdZB3tYNF4wRVQOBzL1tX2KSxTTGMODWv2Q1GLRS9/LtIO9JXU7A
-         taNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698226596; x=1698831396;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zxxdJb0Pk2jGCZTNDTuKKyAUkRDhJczRSr4g1VjXqPQ=;
-        b=i7ArbXV3NR3J0OnD7vdDkzwnRla8bcvxyC+RKWTXF4VNzdy3vNOXtW6fxecFv1QJTO
-         V2FwA1li0YvW41g1XTKyVYkI5oa7Zz7DgyZzzyW55e6CL6ONazU0xyV4nNOltVoTvuoG
-         SMnEz+QIsJMTDe9htG+bt57Xt4MnhzB7QFbz1Pochghdt5zTv8XoRAdpH+sOTcMmBbg8
-         VfDrjVQlhzP8u7lH8lf4Dp5ypXPrBaz6socMFkt5mpUPp6iSYqFva6Rzt+LQpK2Zsf5D
-         J6icpBH+rDrLYD2GNPddQe8tFNc1dLQsjSqArJzeWaNYajIevMJW//+pKilTxIzH6q/P
-         pEwA==
-X-Gm-Message-State: AOJu0YzIPX+AGv/HoduVTK1KlTF5fNomWo1Mpl0O2pQtngDFN6JwfGCq
-	/5oslQeX9dqVU1RI02t3gaM=
-X-Google-Smtp-Source: AGHT+IFbQlJbnygwGkAyBUdZ5bdVJ2E1WB/Uqc1fDFXVse42xvqBgs+4TMgpGZ2Nnsmk2uPqYbjaGA==
-X-Received: by 2002:adf:e7d2:0:b0:32d:9541:b1e3 with SMTP id e18-20020adfe7d2000000b0032d9541b1e3mr10511483wrn.26.1698226596082;
-        Wed, 25 Oct 2023 02:36:36 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id m17-20020a056000009100b0032d829e10c0sm11764732wrx.28.2023.10.25.02.36.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 02:36:35 -0700 (PDT)
-Date: Wed, 25 Oct 2023 12:36:32 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: davem@davemloft.net, patchwork-bot+netdevbpf@kernel.org
-Cc: Linus Walleij <linus.walleij@linaro.org>, andrew@lunn.ch,
-	gregory.clement@bootlin.com, sebastian.hesselbarth@gmail.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, linux@armlinux.org.uk, f.fainelli@gmail.com,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	kabel@kernel.org, ansuelsmth@gmail.com,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	robh@kernel.org, vladimir.oltean@nxp.com
-Subject: Re: [PATCH net-next v7 0/7] Create a binding for the Marvell
- MV88E6xxx DSA switches
-Message-ID: <20231025093632.fb2qdtunzaznd73z@skbuf>
-References: <20231024-marvell-88e6152-wan-led-v7-0-2869347697d1@linaro.org>
- <169822622768.10826.14051215485905127447.git-patchwork-notify@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D60C219F3
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 09:40:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BB84FC433C9;
+	Wed, 25 Oct 2023 09:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698226823;
+	bh=M9v/QfcahXGt7MoCY/1fFrdWgi6pHX9v0Gl8MznBkCw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=a3Ftm80KvXGnrQkLo0+8QENQajpG8aGNb+0Uk6uHqf6zvHFFcpdKy/FhPpw/cmf/i
+	 6WyFWVugcKP2X9tn77tlluBQzg9KAsIaNeohAaGD2hI5/BSshamLvHJgQ0LG+WtUSY
+	 hdaETBLdOiNXPbbwIsAOXB0Ek7QepmgOBTx9t18ytImZnMZJMicNNTrRYNesrDiLrV
+	 8PrI9rAHOVnz69trQoaJAtvBvi/8lh29bT733mFr1Xpq/CKWwuReJGBD5XFFa+jV3v
+	 S31krZfQWLsXnmfbliLwYDi91C1TUn40qFlY2QlhlccgljDLXI5A8x6XO/uA6VxGjZ
+	 G10v+zR+XHzcg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 95E29E11F57;
+	Wed, 25 Oct 2023 09:40:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <169822622768.10826.14051215485905127447.git-patchwork-notify@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: ipv6: fix typo in comments
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169822682360.18837.1022880287063370632.git-patchwork-notify@kernel.org>
+Date: Wed, 25 Oct 2023 09:40:23 +0000
+References: <20231025061656.2149-1-wangdeming@inspur.com>
+In-Reply-To: <20231025061656.2149-1-wangdeming@inspur.com>
+To: Deming Wang <wangdeming@inspur.com>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-Hi Dave,
+Hello:
 
-On Wed, Oct 25, 2023 at 09:30:27AM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
-> Hello:
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed, 25 Oct 2023 02:16:56 -0400 you wrote:
+> The word "advertize" should be replaced by "advertise".
 > 
-> This series was applied to netdev/net-next.git (main)
-> by David S. Miller <davem@davemloft.net>:
-> 
-> On Tue, 24 Oct 2023 15:20:26 +0200 you wrote:
-> > The Marvell switches are lacking DT bindings.
-> > 
-> > I need proper schema checking to add LED support to the
-> > Marvell switch. Just how it is, it can't go on like this.
-> > 
-> > Some Device Tree fixes are included in the series, these
-> > remove the major and most annoying warnings fallout noise:
-> > some warnings remain, and these are of more serious nature,
-> > such as missing phy-mode. They can be applied individually,
-> > or to the networking tree with the rest of the patches.
-> > 
-> > [...]
+> Signed-off-by: Deming Wang <wangdeming@inspur.com>
+> ---
+>  net/ipv6/esp6.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Can you please revert this series? It breaks the boot on the Turris MOX
-board.
+Here is the summary with links:
+  - net: ipv6: fix typo in comments
+    https://git.kernel.org/netdev/net/c/1711435e3e67
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
