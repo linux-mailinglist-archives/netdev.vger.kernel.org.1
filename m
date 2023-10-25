@@ -1,224 +1,136 @@
-Return-Path: <netdev+bounces-44230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B72F97D728D
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 19:44:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0CD57D7317
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 20:18:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1818DB21068
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 17:44:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 951E8B2127B
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 18:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A98B30F8D;
-	Wed, 25 Oct 2023 17:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E861D31580;
+	Wed, 25 Oct 2023 18:18:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SDngAYDl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SDe/gHo7"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD62218B08
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 17:44:15 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 518E0184;
-	Wed, 25 Oct 2023 10:44:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698255854; x=1729791854;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=t16+fRWOJOxyNhsHaAp4Ts+gfVfPJchkKdMWSoRS+Rw=;
-  b=SDngAYDl17fUMzJ7l+2WQboaj/bIeMMrKe6yGUQhD8eY/kl8EQjBx4PY
-   6ek9q29EzO0FYyZpA5PxD42IAMcE4AJnZHTQjvCqXq/sae/2yI8TiZWKX
-   QpxZK3uezB34NVBh+MCZwetucjjEBxMjRk8Meh5j4+EPMHB2HjvppvZIC
-   exioagF/ChN3To3ynTNLlkC02gzbkID7y9GqcYOHxvEqSAe71q+ohjGjm
-   ZwQxIBOTh84YWAnDuF075PzVQq6JjNr1NNmo+7ugSeB4nIMvupcrm9h6z
-   eOhqCY/v0pMIgyjNYrgeS4aChU1yuO7BA/352uEHRXET0Jc+VbooyIiQz
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="377730060"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="377730060"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 10:44:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="1090298175"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="1090298175"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Oct 2023 10:44:13 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 25 Oct 2023 10:44:13 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 25 Oct 2023 10:44:12 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Wed, 25 Oct 2023 10:44:12 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 25 Oct 2023 10:44:11 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gKjRF5w7io/iS4pK4SIxy2Vf0GpvzyzlQWlBO4EOJYt1uKOqJtwEJEA1d5EIv5irdUYzSh7KlYG7xndWPjOF9Pn1UOCNRpSDB0UUqBUDCyYIxfoNQSauN89hOcYEkEs8X9Vk4S2+KIIU7Y/xdfwUCtoJdaTcp1s+YtnYdxmLBcTHf3D2rh1N2BvniIbHBba48MiIQ0lZzdu0CbSnIshvy2ZX1RkHYMyv0tsUM1lTANj5CN6fNCr57srrvrDv/YJBisu3bxAUEbuKPdlach8jorwTLrXT/SLKUDtTAzrkKIEfyetjdihCYDIM3PkDvx9UXzMvMmHgMeIsdmXZ3lG8jg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ai8nHKyavG0P4dQYBRpKAkUjGblFrBV/rFJakgn/6+c=;
- b=VUFm4q1kgIqFbfasfO4bInku/U7dfHTl8Dhilr+mxG60VtJODJhjl/LZDdpHk++9fXnB434ccSLnMGGVtgA0HUnmcApHTkOUl9Yi74ZEj2OHid+QJrZBHGlBvhmX81PihYtovBhQVfRW5o6k1unUeTs33bb6FlK2WXXOTWGGR+5yL27fkF+C6NVsOatBlkftKcb5bfJAp2LX9SIbfFpqQ4sL3WvK3XJMv+D1ETYa5UIaHaxKn27LDESV8gxEv7L3lwNRJPZNktfzs33ULsiO4Ejgs/IYHKBmDM2l+Rl1761dcLuahPse0v+HXDPajeIrKugZfzEbOGlxRHcLrddd/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by DS7PR11MB6038.namprd11.prod.outlook.com (2603:10b6:8:75::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6907.33; Wed, 25 Oct 2023 17:44:08 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::f216:6b2b:3af0:35c1]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::f216:6b2b:3af0:35c1%4]) with mapi id 15.20.6907.032; Wed, 25 Oct 2023
- 17:44:08 +0000
-Message-ID: <022960b9-dfd1-4ed8-9b46-9cc11ba060e2@intel.com>
-Date: Wed, 25 Oct 2023 10:44:07 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 1/2] i40e: Remove VF MAC types
-Content-Language: en-US
-To: Ivan Vecera <ivecera@redhat.com>, Wojciech Drewek
-	<wojciech.drewek@intel.com>, <netdev@vger.kernel.org>
-CC: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20231025103315.1149589-1-ivecera@redhat.com>
- <20231025103315.1149589-2-ivecera@redhat.com>
- <8a8f54a8-1a18-4797-a592-b57bc6fc45c1@intel.com>
- <cbb2e9f4-03f8-4a46-99e4-e952bb754a2f@redhat.com>
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <cbb2e9f4-03f8-4a46-99e4-e952bb754a2f@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0079.namprd03.prod.outlook.com
- (2603:10b6:303:b6::24) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E0E2771A;
+	Wed, 25 Oct 2023 18:18:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36172C433C7;
+	Wed, 25 Oct 2023 18:18:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698257922;
+	bh=kSM3vOOcW5CFXl5q/eeq+LmraQ7RzEGdltScNPHIqNM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SDe/gHo7OOeisux1y0GkiBWWjSbCIqHajiBPbsjkrj3vPr2+rRiuaq7zTDnOGLIVk
+	 Vs8Xm0lLM0bRzvhi+lCASXVRYtgdAPxzqscCTFlw76jhwXz+nnLwN8CiV4yxNxK/FR
+	 0fWjly1qTwEsi/UozJdteVjGsyT/pUJUFES9f5lAbRhH3JKnPcK9H+a+pwCtnSC10+
+	 dRrPEk/kCAdRYiDyS7EZlX0glRqDeDn+HnGpEh5kDF6XZ7e+OqjJAAV8PVrCcttcYD
+	 M95B4IRKlUmCV3Fe26CEf7cj7KiUatbU8PZZeMR9MqcaoJCOQQNSYfKteQgS6XbqQl
+	 POMyFwyuqIfGA==
+Date: Wed, 25 Oct 2023 11:18:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Mat Martineau <martineau@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Matthieu Baerts <matttbe@kernel.org>,
+ netdev@vger.kernel.org, mptcp@lists.linux.dev, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH net-next v2 5/7] uapi: mptcp: use header file generated
+ from YAML spec
+Message-ID: <20231025111841.73a40904@kernel.org>
+In-Reply-To: <CAKa-r6vCj+gPEUKpv7AsXqM77N6pB0evuh7myHq=585RA3oD5g@mail.gmail.com>
+References: <20231023-send-net-next-20231023-1-v2-0-16b1f701f900@kernel.org>
+	<20231023-send-net-next-20231023-1-v2-5-16b1f701f900@kernel.org>
+	<20231024125956.341ef4ef@kernel.org>
+	<a29b6917-d578-35c4-978d-d57a3bccd63f@kernel.org>
+	<20231024164936.41ae6f3c@kernel.org>
+	<CAKa-r6vCj+gPEUKpv7AsXqM77N6pB0evuh7myHq=585RA3oD5g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DS7PR11MB6038:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0ca96753-b06b-47e7-39e4-08dbd581fd70
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fv1lqqqQpGY93qS8AXotloe+U2dBk1DXMvzjf6an6OtuH87a6e5B7BKAfmv1DNTImntyDcwBgnfEYVhUGJFq/Lmxuihi5w2/qQTGpyQT/e56QTX4smKjuk63CCGBZRqMTUGfky0uecVbovbkZHJWwLo2LN06yynQgBqLDYhtApTgwI3j7v/kPBcYGdVjNtYhhouQsKBLxiTrP1orRa5kOXnZAgqEyKWdzuj1ChRhiZnnX/bWanHFat3VnUz8Dl3jRGxLcD2RQ72AtwCSgZtJUQOsqhLClWiq1P395AwgQG9WfLtO6HQI2067/ifmnJLs+bsPXfU4/MbWnuPG+rrwObbf3PlaesbIzZf5QVb+FVi9EaG2DEVEWrBlWj6XduQUdvq1QITJ2GYYPeRLxfKClpcdSH7buGLfxxy8ufm8Amm1ckSO9AuYKQs63kEGnK8+2sOoXp/OTo3pRMAP5R66FN6vzTxprz0DIXOJPzNM5gBLoDHxgDkQBnSO68BH3kQmmiOzCgGZxIKPgMeXzwxBrErSq8T99JvQzmFpdmxEIE7/wu+xoOeZBpblqPO/H/2Og+Z95VHKAwrkT90Vj8hlS/aFb8eGvFrszfVDTXOWzM7wlg7lpM/z/uA+uXAb81tPmqjJPfePLhMT3RN7dMMFkw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(136003)(396003)(366004)(39860400002)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(6486002)(6512007)(6506007)(53546011)(478600001)(8676002)(4326008)(8936002)(41300700001)(82960400001)(31696002)(86362001)(31686004)(36756003)(2616005)(26005)(38100700002)(83380400001)(54906003)(66946007)(66556008)(66476007)(316002)(5660300002)(110136005)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NnMyL1NDTnAwTG1UUnFITE1SSHg0YzZTKzUzVzVDSHgzazFHVjlwd05JQmNj?=
- =?utf-8?B?djFGSVltQWtCZG1NTlNIdVdPbGxpRFMvYzJxaUgzUUxJVmc5MXZLOWdzVkVI?=
- =?utf-8?B?ajg2aWxvenV6dk1VZXNybi9BSGh0ZUVRclpzWmk0UzhFTG1zMmFiUXM3OTNV?=
- =?utf-8?B?M2svYjNWQ1FkZ0ZYM0VkLzBuWVNaWkVUY3plSjFmQzdLTHBGdW1zMmk0T3JU?=
- =?utf-8?B?ZWdWaXkvTFlZUmpGQ09NRzVsRWxLMGx0TmpjcGdwUkZPM2pQNVAvT3YxUGI4?=
- =?utf-8?B?NGJxcDQ0WDBSWW9PR0lEdlkxOEMybzNKS2dwU1Z2VVA0MHBsNi90VEIrVklT?=
- =?utf-8?B?dUVwSUc0eFVQTnBkZWZDUkZnYzZ1bHpFdmh2dVlmdWo2OFJoU0xJS1huaG1y?=
- =?utf-8?B?SU5RSi9YK1NXMnlrSTkzRzlGRzZmWEdrc2MxbTVPRnZ6WkltV2oydm0wMzMz?=
- =?utf-8?B?dnRKUmE2RkJoZGYzTDg5TDhjc2VxZ2YxaFFNY3VzQWVhRGlpT1lvYTlqdW1K?=
- =?utf-8?B?U3NFNHZjNEFCQzRwMGU2a3M5ZFJOSGRVMHpuZmFYSGNNa0ZZVTZYT1kxZEgv?=
- =?utf-8?B?MTlCZGJGREU5VmFBN0ErQnBDZFUzeThQb0d5SXYzZ2JNZzBpckgwcHN5dlNu?=
- =?utf-8?B?MXBlMHJESVFCbXVXbC9BU2xUdm1pbE45cTNENlNiVXRqUHRPc0xueEkyT1Fx?=
- =?utf-8?B?UCs2Y2RwTVdFUFNNNVc0TGVMbXVUQlRvelAzMW5DelNKbGU5V00vbVRrS1FU?=
- =?utf-8?B?ODZKUmZzY0FMNEpHV1NGQk1rdkdtMm8xbjd3ZkpkM0UzSUR1aTVKSGVoT2lZ?=
- =?utf-8?B?NTIyc3loN0d5K2NkVlRTNFZIOEJCVXIyR1pRaFFtZHdFZEQrQ3dzNEdpM3Qr?=
- =?utf-8?B?eTY2ckFiMkxlVkRseVVzZ3dxcDd2S1VuNndsN01rd0VtWXlrWkMrUWlJcExl?=
- =?utf-8?B?aC9oMGdSKzh4RnpsN3BoU0tLb0swRU44c1RKNWZ2a3JrUGZCcVNRK2lXdk1I?=
- =?utf-8?B?a3JnNGIxTmlwZzhSdHlYWlk4emJnOS9CTnYyRm5jYzhGQk9tL1FUU1RPd1pi?=
- =?utf-8?B?ZDVwVkNBTU9iSE0zVzhIWEQ3Mjc1bU1IRm9qeDMyRHIyOWc1WVZlQWpqY0lZ?=
- =?utf-8?B?RExSUUpNSm9kcXA4T0liUXBEeXQwVFFJRW8wT05ENDVhYThMUEo2ekIrK3NG?=
- =?utf-8?B?UEtEMU03M0Q2Y0ljcGZqR0hwVUw5djkxc2JITEFQOXFyMEk0eW1jNzI1R1lD?=
- =?utf-8?B?TkxUNllDM2dDWm9BUndmQ3VZKzV0cEpLOG13bnl2T3BwQ3QrK0J5WFpacWZh?=
- =?utf-8?B?ZS80OHNzdk13bkNxZ2VrTW9MWC9PZ3ZNTjl1eGVSNXdSKzhlRU53RlhtY1Ey?=
- =?utf-8?B?eUZiZ1A3TGgrOFNzZTJvWVZBSGswditWemV6anVueGhpV1krbVMvNTladW9l?=
- =?utf-8?B?NC9aVjZzY1BIVDAzQ0JPZ0x6REtlRi9qZnBVcEpYS2ZtYnZTSG1YeWdUNUkv?=
- =?utf-8?B?TVFVa0RTU2RRTjAvcDd5WVcwZHRzNWRGcVgyZzhmUXE1cEk5R29oY20zZTlr?=
- =?utf-8?B?YkI3K2RTYytvL0JGZStsMVYvejQ3NG5SZlk2Z2lyemNHZ1hVeDVnSU94VEpV?=
- =?utf-8?B?Q0pyUWo2T3RQVHN3Y21qYWd1dVpRczIxL0ZDZ0xyZGpjYTVLU0p4dzV1dkV2?=
- =?utf-8?B?VXNzQzMySTZDenNTWE9OMnlXb0RLc0d4dzd6Yk1qdS9kNmhqQlpGMCt6aHl1?=
- =?utf-8?B?RnZtMTFhTWsvckxmTVJUdmFFQkdEeGpYVWU2MWxqUllqcG1XV2dYenBwVXQr?=
- =?utf-8?B?R25kUXBLOHE3QUNRaCtFYUNORnowbThaYnc2dzVPdlBGOFhveDdZYlFCU0dr?=
- =?utf-8?B?ZmxRNmtCK21GL0pXWTlpWE1GRGJwZlpoekZjTGc1MGZNc2ZadWNzdVl0VThB?=
- =?utf-8?B?VG1qbkpWMWVXeUpWY2RHeFdyc2k5N0xBVnpBUDBsOXZKOFdCMkMwTVJ3STZ4?=
- =?utf-8?B?djlSQ1pYeXFZRlMvOEsya1EwYk1udzJyNFppRlFMYlZwK1ZHai9jNkI2VWNJ?=
- =?utf-8?B?djlidk1XUysvMVdTcDBibEljbkV2YWk1VEpKSGRXWlRseUI2MTZVTnUyNHlG?=
- =?utf-8?B?ckNTSzNPWlNwb3VlUy9jV0RUY2dsZXNPVWJrdGlJVzlJeGVmMDJVOHc1eDlM?=
- =?utf-8?B?YlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ca96753-b06b-47e7-39e4-08dbd581fd70
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 17:44:08.3665
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +3qxKq9e0wSevBC+k/kD6Mya/3WA2Z0uuIJHNxT88ZYJtgu+QhMGzG+Hw/IyfqXeufbgbKCc4GoSg+cVeQqhs8JAfJWkg1OHAhNV5d0B5QA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6038
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Wed, 25 Oct 2023 18:40:52 +0200 Davide Caratti wrote:
+> > > Do you want to intentionally move to the normal naming or would you
+> > > prefer to keep the old names?  
+> 
+> given that nobody should use them, I'd prefer to move to the normal
+> naming and drop the old definitions (_MPTCP_PM_CMD_AFTER_LAST and
+> __MPTCP_ATTR_AFTER_LAST). I was unsure if I could do the drop thing
+> actually, because applications using them would break the build then _
+> hence these two "backward compatibility" lines.
 
+It's up to you. Only mention on GitHub I see is this:
+https://github.com/ngi-mptcp/mptcpanalyzer/blob/d6f5a4a61235f40dd17b1ef394a91ec50eda53f7/mptcp-pm/src/Net/Mptcp/V0/Constants.chs#L34
+No idea what it is and whether the define disappearing will break it.
 
-On 10/25/2023 7:39 AM, Ivan Vecera wrote:
-> 
-> 
-> On 25. 10. 23 12:48, Wojciech Drewek wrote:
->>
->> On 25.10.2023 12:33, Ivan Vecera wrote:
->>> The i40e_hw.mac.type cannot to be equal to I40E_MAC_VF or
->>> I40E_MAC_X722_VF so remove helper i40e_is_vf(), simplify
->>> i40e_adminq_init_regs() and remove enums for these VF MAC types.
->>>
->>> Signed-off-by: Ivan Vecera<ivecera@redhat.com>
->>> ---
->>>   drivers/net/ethernet/intel/i40e/i40e_adminq.c | 33 ++++++-------------
->>>   drivers/net/ethernet/intel/i40e/i40e_type.h   |  8 -----
->>>   2 files changed, 10 insertions(+), 31 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.c b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
->>> index 29fc46abf690..896c43905309 100644
->>> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq.c
->>> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
->>> @@ -17,29 +17,16 @@ static void i40e_resume_aq(struct i40e_hw *hw);
->>>   static void i40e_adminq_init_regs(struct i40e_hw *hw)
->>>   {
->>>   	/* set head and tail registers in our local struct */
->>> -	if (i40e_is_vf(hw)) {
->>> -		hw->aq.asq.tail = I40E_VF_ATQT1;
->>> -		hw->aq.asq.head = I40E_VF_ATQH1;
->>> -		hw->aq.asq.len  = I40E_VF_ATQLEN1;
->>> -		hw->aq.asq.bal  = I40E_VF_ATQBAL1;
->>> -		hw->aq.asq.bah  = I40E_VF_ATQBAH1;
->>> -		hw->aq.arq.tail = I40E_VF_ARQT1;
->>> -		hw->aq.arq.head = I40E_VF_ARQH1;
->>> -		hw->aq.arq.len  = I40E_VF_ARQLEN1;
->>> -		hw->aq.arq.bal  = I40E_VF_ARQBAL1;
->>> -		hw->aq.arq.bah  = I40E_VF_ARQBAH1;
->> What about removing those I40E_VF_* defines?
->> This is their only usage here, right?
-> 
-> Yes, do you want to remove them in this patch? Or follow-up is sufficient?
-> 
-> Ivan
-> 
-> 
+If you're confident that no code will break we can rename.
+The downside (other than an angry user) is that if someone reports
+breakage late we may need to keep both names, to avoid breaking any
+code created in between..
 
-I'm fine with a follow up.
+> For the operation list, I see it's about exposing
+> 
+> cmd-cnt-name
+> 
+> to [ge]netlink*.yaml, and then do:
+> 
+>   9 max-by-define: true
+>  10 kernel-policy: per-op
+>  11 cmd-cnt-name: --mptcp-pm-cmd-after-last    <-- this
+>  12
+>  13 definitions:
+> 
+> the generated MPTCP #define(s) are the same as the ones we have in
+> net-next now: no need to specify __MPTCP_PM_CMD_MAX anymore.
 
-Thanks,
-Jake
+Ah, I was looking at the documentation which is clearly out of date
+already..
+
+> For the attributes, I thought I could use  'attr-cnt-name' like:
+> 
+> 169     name: attr
+> 170     name-prefix: mptcp-pm-attr-
+> 171     attr-cnt-name: --mptcp-attr-after-last <-- this
+> 172     attributes:
+> 
+> as described in the [ge]netlink schema, but the tool seems to just ignore it.
+
+Mm. Looks like we only use this one at the family level.
+
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index 1c7474ad92dc..f9010fbbfdfd 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -789,9 +789,12 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+                 pfx = f"{family.name}-a-{self.name}-"
+             self.name_prefix = c_upper(pfx)
+             self.max_name = c_upper(self.yaml.get('attr-max-name', f"{self.name_prefix}max"))
++            cnt_name = family.get('attr-cnt-name', f"__{self.name_prefix}MAX")
++            self.cnt_name = c_upper(self.yaml.get('attr-cnt-name', cnt_name))
+         else:
+             self.name_prefix = family.attr_sets[self.subset_of].name_prefix
+             self.max_name = family.attr_sets[self.subset_of].max_name
++            self.cnt_name = family.attr_sets[self.subset_of].cnt_name
+ 
+         # Added by resolve:
+         self.c_name = None
+@@ -2354,7 +2357,7 @@ _C_KW = {
+         if attr_set.subset_of:
+             continue
+ 
+-        cnt_name = c_upper(family.get('attr-cnt-name', f"__{attr_set.name_prefix}MAX"))
++        cnt_name = attr_set.cnt_name
+         max_value = f"({cnt_name} - 1)"
+ 
+         val = 0
 
