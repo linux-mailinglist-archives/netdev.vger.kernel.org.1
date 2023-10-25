@@ -1,108 +1,69 @@
-Return-Path: <netdev+bounces-44292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68B467D76F9
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:42:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07E367D773E
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:59:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FFB0281D69
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 21:42:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E3E4281D84
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 21:59:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBCDD3716F;
-	Wed, 25 Oct 2023 21:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03DA537157;
+	Wed, 25 Oct 2023 21:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ThhcX0J5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KhHLXM4c"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C64034CE3
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 21:42:10 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49435181
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 14:42:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698270129; x=1729806129;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Yy7Sp9njlehZqV5Cn84w9XdnUO7TeZM8xoWGnTFIy10=;
-  b=ThhcX0J5emCy+HnweCkPbkFHEB8i+nWQac2sNatNGrWNdbDBE7yiDkr6
-   rXdPYJSw+6ZFr66WLC3IZIbWOmxSkFQrTFHOWDtkW5hPJo8QEU5byy+6M
-   L/plj/emGXNwesdX2QVYOq9w2lDjJn6n4hgUmI/98Ixi5ximCFi8Lvmya
-   Z6sue5oJWJm5cAP1LEQx+VlVLaXXKhs9c0GAP1E+YjVVYNkYSNdTGUHHR
-   OWQJbw7nXAbsUfoWAHA2b34eljH/dAvnmFRGkRIiR96JNlfFSMGawEBPv
-   RV3msW1c8DnFtwePxLZfgVvkJuUatqyerf9ZsirEq1kCCPiOlDHU1Yx8j
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="6022491"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="6022491"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 14:42:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="708825469"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="708825469"
-Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 14:42:03 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: netdev@vger.kernel.org,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Pawel Chmielewski <pawel.chmielewski@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Paul Greenwalt <paul.greenwalt@intel.com>,
-	Tony Brelinski <tony.brelinski@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next 6/6] ice: Hook up 4 E830 devices by adding their IDs
-Date: Wed, 25 Oct 2023 14:41:57 -0700
-Message-ID: <20231025214157.1222758-7-jacob.e.keller@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231025214157.1222758-1-jacob.e.keller@intel.com>
-References: <20231025214157.1222758-1-jacob.e.keller@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD18522C;
+	Wed, 25 Oct 2023 21:59:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68EA9C433C8;
+	Wed, 25 Oct 2023 21:59:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698271176;
+	bh=FXh3Ybrebr/+Js1FhuGaszskuuHKYGlgnfDkMM4tAAA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KhHLXM4cfTGTGeGv8+z8igpASojb9gPJgkmfMKtp47yAVdGZw17msJeGgO+gI5/4Q
+	 4EmzQ55ic/XC+B/n/rb5p8oep/6uFopul3g9fgraBCeWg9AE9UkTEUnVyJ9DtuUP9q
+	 1r3JkwBXgQ+tg/QW20O09brzuHKkg5QfeH9x3nNF/F4hQV+NuURuqE9/j5kLhBBYUE
+	 Yu/ygR31OhHL/MRzVdpsXMdMBTI8t+h5IR2tcJzRjkdS9Wp8tURVRRpwPY2gO7wu7X
+	 KkKOdi8HpeUDIpHxXXA7R0g0uzJzzi6ztvoBVK2it5EXbM3Ee5Hk8rgdpWysZW4kxK
+	 D2m1tWZ2Odapw==
+Date: Wed, 25 Oct 2023 14:59:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Florian Fainelli
+ <f.fainelli@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean
+ <olteanv@gmail.com>, Woojung Huh <woojung.huh@microchip.com>, Arun Ramadoss
+ <arun.ramadoss@microchip.com>, Conor Dooley <conor+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Rob Herring
+ <robh+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, UNGLinuxDriver@microchip.com, "Russell King
+ (Oracle)" <linux@armlinux.org.uk>, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v7 5/9] net: dsa: microchip: ksz9477: Add Wake
+ on Magic Packet support
+Message-ID: <20231025145934.22218b3e@kernel.org>
+In-Reply-To: <20231023093343.2370248-6-o.rempel@pengutronix.de>
+References: <20231023093343.2370248-1-o.rempel@pengutronix.de>
+	<20231023093343.2370248-6-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Pawel Chmielewski <pawel.chmielewski@intel.com>
+On Mon, 23 Oct 2023 11:33:39 +0200 Oleksij Rempel wrote:
+> +	struct net_device *slave = dsa_to_port(ds, port)->slave;
+> +	const unsigned char *addr = slave->dev_addr;
 
-As the previous patches provide support for E830 hardware, add E830
-specific IDs to the PCI device ID table, so these devices can now be
-probed by the kernel.
-
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-Tested-by: Tony Brelinski <tony.brelinski@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 57941c5de26c..6607fa6fe556 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5611,6 +5611,10 @@ static const struct pci_device_id ice_pci_tbl[] = {
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E823L_1GBE) },
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E823L_QSFP) },
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E822_SI_DFLT) },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E830_BACKPLANE) },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E830_QSFP56) },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E830_SFP) },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E830_SFP_DD) },
- 	/* required last entry */
- 	{}
- };
--- 
-2.41.0
-
+Doesn't apply any more, after Florian's slave -> user rename.
+Please rebase and s/slave/user/ as needed.
 
