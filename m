@@ -1,218 +1,191 @@
-Return-Path: <netdev+bounces-44144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37B987D69BF
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 13:05:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01F677D69C1
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 13:05:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D21F1C209FC
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 11:05:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91F10281B8A
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 11:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B124026E2F;
-	Wed, 25 Oct 2023 11:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210D126E34;
+	Wed, 25 Oct 2023 11:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FW/hPWZ1"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="rsxYCkkr"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05008210E2
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 11:05:22 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2040.outbound.protection.outlook.com [40.107.220.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 636D110A;
-	Wed, 25 Oct 2023 04:05:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MNwxgffDj5eNNCxhGbdEpcXGOEBmBWcAwzj4lNEOVQoU08OnLFBHjyUNnxSH8Ds1FPggHw800kvZCmjHnGmpebYbOLclurSDNXZ9SF2XiICIjVqgNrd2XWwOcyRUvSUjGboOp33dRqm/R5dam2CqC5INqoSQtAO0Ejn6ZfZ7SdqMY7wKbDz4uLn65lgBa34gxw4SRfpsIQx1gq9jd1W6lH5/NEadjR3U8dhNif99Pgqm0vo7PeTDCSlBnYGberxTKGhj/z2WkylReAU1NDrTMsJtnd/L9aBEpInYr0xMOwV1/YiKK6uNBA5Ko1OKeZT1YF3Cy77934MeZlI52NV9Kw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6JGf7IxgY6E4J85t+VDTpZNd5j4A4dN4lEtXXG3bVp0=;
- b=OjMhkNyXASIp0u7gf1wuQTDcfx0je8nxftuM/9SGb19W63fMk+Iccd7EuB7qM1gwwdU8li1w/3WfN8p18bmNGavXNvg/d/56uA6d3KDjcLGCAscd05rVVUJBStsukfxps+/hCki6dSVmHqs98NbCgXEVItP3QBpH8Fk3zQjlmqfloP685XBxKd9GY4VK+ObayHogEdvWOxP4JceRf1kIs3/pGn9XMWlOQTpR+ysH16q6NTeYn+h/pBVYW3hpAH/B76x5AC8XAfS2IgYbGOuKZh5rAeWLZQ60GKvVi2mXx4Uvk7tvW5qD6+lTV1TWkAOWX9ttQuw7jWXCxr7oundNpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6JGf7IxgY6E4J85t+VDTpZNd5j4A4dN4lEtXXG3bVp0=;
- b=FW/hPWZ1nsZzlBQRdZf19hzucwCaD/WzGWPEM18yEe/kr40fWG8Yxt7VMisWoQ6NYGnGB6U0uhhOw2u6B/8qS/PIEHDK7rQ1uec0cmelCZtGxITtL4WmOiFlq4oQJfcg+ZU7jE6TPH1/A0XdxrcpJJNexN9JRLi/Rknbus79gPJTe9cg+NMteGtSdVlTxeCZ2Ralqq+vYOK5l5OqpZqtUDuBaFlcTjGAFbXbfEx/LCkf3Ff3xkcp7Z1poZwtZ9B49KbiqW19T/TvNRURcVOQ+FKV2BrSbvQlL4YVNTJmCcpMVVIKBsHAxypbqj2yXo9imW9h2EwRJ2lTjlHMlHw3Hg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by DM4PR12MB5745.namprd12.prod.outlook.com (2603:10b6:8:5c::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6933.19; Wed, 25 Oct 2023 11:05:16 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::6f24:e252:5c2f:d3c9]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::6f24:e252:5c2f:d3c9%7]) with mapi id 15.20.6907.030; Wed, 25 Oct 2023
- 11:05:16 +0000
-Date: Wed, 25 Oct 2023 14:05:11 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: netdev@vger.kernel.org, linux-pci@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	bhelgaas@google.com, alex.williamson@redhat.com, lukas@wunner.de,
-	petrm@nvidia.com, jiri@nvidia.com, mlxsw@nvidia.com
-Subject: Re: [RFC PATCH net-next 05/12] PCI: Add device-specific reset for
- NVIDIA Spectrum devices
-Message-ID: <ZTj2Z5T53uJbV1Mq@shredder>
-References: <20231017074257.3389177-6-idosch@nvidia.com>
- <20231018200826.GA1371652@bhelgaas>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231018200826.GA1371652@bhelgaas>
-X-ClientProxiedBy: TLZP290CA0011.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:9::19) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B947926E36
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 11:05:46 +0000 (UTC)
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E351130
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 04:05:45 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-da0737c451cso476452276.1
+        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 04:05:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1698231944; x=1698836744; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NXSe6IwmN/NPfSWKsgN8EzXesLS7X4/Oew8seILxOZ0=;
+        b=rsxYCkkro5wyBGdYDqTuJjiDX1zEoqw57JkIVKnBu2hpPJ+mNE/wuBjt1J41ur+iv4
+         jjwpL/C5HXITICNMcV8azhn7x/uv6wRdQtpJqcLJ45eVVNQoZkSgErS8A5senCTPJMAC
+         dTkFHHHw1nqlz9amY24f0KJ2MM3pqsIXWiyCEH56pnz8z6O4DAV76RWtt4gu3cWyQgRo
+         OnuqmP7+qT4FwN1zQelxu9TlyZIMilPudQzEzslDSJ2odhy0JvTR/44tTrln7Qk/g6MB
+         XhyxsLyTbBZsOfJPPxxxPDSmlNl+HAsY8678qucKSdH5WVjUEAtLDFAp14FcfWQgG59Y
+         lclg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698231944; x=1698836744;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NXSe6IwmN/NPfSWKsgN8EzXesLS7X4/Oew8seILxOZ0=;
+        b=KNNFPMHJfdU+vUiCFf88Iu7KqcSpjKvFnart215u3OpDjO+/8FlE9/MCeQoGgHbzYK
+         W4yCNJ+Em4OokHTeCzS7PyCfxxYNaFd/A3kSOYZf+G9VOHzkx7UgaSPHvcwzrbwAAwRj
+         n6ld/JgOsLJp37mcym3AGotHLQ4hOsIRcgnVRWNJ2dVnboS99CBY4GMNCqI/RExrf8m5
+         OX0QNckv8vjgjYUA3LQAk6R3uoMWk5CxBRFUA4JqluPQh/UIanvu9ItUaFoOIaAeHgJo
+         YwyN45l6ow3l8jfHDQvWaFtq5uToYEpWq4ogRRSZUzDEPrHSkrkgEAjXoqRRLlre21+O
+         8P5w==
+X-Gm-Message-State: AOJu0YxMZtfp01CaT7llKgyg633BzTDsrSNpfQ64fuhYvvUgox3UKkZo
+	t5ia5ThhyutiVY8C870P6vw/Ukxz5Q7OjQjyW8JBxQ==
+X-Google-Smtp-Source: AGHT+IEMD8tNi81oO0MJmIsLiHMPxHRnEPfOKhNSxjozsp8yaWIMRZN3ceHo5a0MoPfB62JI/QI4SUcV6qShkHAyIuM=
+X-Received: by 2002:a25:ce47:0:b0:da0:77de:68d0 with SMTP id
+ x68-20020a25ce47000000b00da077de68d0mr2381048ybe.26.1698231944336; Wed, 25
+ Oct 2023 04:05:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|DM4PR12MB5745:EE_
-X-MS-Office365-Filtering-Correlation-Id: d251f635-d13e-4bb6-ae70-08dbd54a44ff
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	uyxw0ahUCdJ/Q4KPvmbAhrTCwljoKHX+CGTqCU4fA57KvpVGL8j2PsUfHbEgH9vuj46a9k48Ob+Pvw/LV/6lwL7qucIq+1VjzQuZLrERN/56Df5cbjFnguG8KTRsiZabXEtKoQoJn45/Sj46bbFKME2/RigRZTKwIcBcD6bRQA1zHxZR2UfSV9LOrvCn+dsEMYNgsFb0ijWD9QYT9QgqT8AkSKS+o7zI2ygwGe/drpnBY/dzjtUQ1LKZyzZR2yhYRiOJRXAd3OtkhK3THBbLCYkGyHV2GM3WQWW0vdsQKbdybu8p8QU99Gtn5sicL5G099Ku7Tw4IcS+L+uiD6vYzPTLFQZijvjhBLjcYLcpUxgZ0SPNNZ/bJb2/E18iI+5CJWUzre/K0OpC+It+xyul6ymHEmBnGJkdm/92zHfw2KX3kk3bMCLr8akRgIH+ACL/JmCriyIDPxWipbal7AeqQb7uVP+sIQWqUCAeSVlcwHSIkUCqnns/BiP3fkC8iiZz6tnhS4E0kazuvXp4mOZ3lzScAUrincP4IaeLE/6zswAE+aEnCnqFvsEAb9TirzP2
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(366004)(376002)(346002)(136003)(396003)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(41300700001)(6506007)(6666004)(478600001)(107886003)(9686003)(6512007)(66556008)(66476007)(66946007)(6916009)(316002)(86362001)(6486002)(33716001)(26005)(83380400001)(38100700002)(8676002)(8936002)(4326008)(7416002)(5660300002)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QmcrYjBFYXZld0cySW1FWEw5bHZjN3NNWmlQVzQzWjJINmZjRkVPU0hxQ3Z2?=
- =?utf-8?B?NmRUNXdlWk9JMkhlVGxQM1EzOTEvQnNnRm1CWmhrZ01keXBsNUp1ZlB4YjFU?=
- =?utf-8?B?NjlIQXFzRXVqUU9xemlKRjNISE5pK0VmdXRrbWxUQ2hKVW56cnV4SUZlcDJq?=
- =?utf-8?B?cVhWZy94ejlRcTZyNUl0SmREdXVJaVdVMS94TEQwc0VoQ29SMExISjJkTDV5?=
- =?utf-8?B?ZndLYnprNEVOWnQ3YVo2MkY5TUFzbmxYa21ZNzBwL0xuZGgrYlE1L2JWRCtI?=
- =?utf-8?B?ZHpjR010WWVudWpCbFdXdFgzWDFxNit6Mjl5cnpYbUU2bThLQ0wwTkxmN0tO?=
- =?utf-8?B?UUJvTUhCbjVMeEdsRWpiT0ZZTXFBcnhZUlVZQkxOZnBwci80OU1rZVpaWnJB?=
- =?utf-8?B?cXFuc0xXMXpvSW9hQ3RqTjVkY3M1Qit6YWpya0Y0MXl5Rmw3UVBkMUNZUFI1?=
- =?utf-8?B?MnJKTG1jQ0xQRTh3QnVlcmd4ZCsvTk5wU1VxMTI3VWpzaEdNT24vK1NNands?=
- =?utf-8?B?RDZ3ODFhSnhjWHRZR3Z6OE4rR3lrdUs0NmVzLzZJMkt4Zm9DeGpBY1JRT1VB?=
- =?utf-8?B?QTYyU2hlUEdqNGZxOFdaK1lzK1oyeERFVnZORmYrQjFQMHN5Tzd4eCtTTDRK?=
- =?utf-8?B?enlHU1BGOVFETG1adDVsM1AxeUxXT2FDREVWdTlYTngzb2VZbzI1aU85TitX?=
- =?utf-8?B?VXhMT1U0NHBuamh6T24yZjN2VzFSV0ZuWmRlSVVnWTBmUzkxYlVGejZSVlh5?=
- =?utf-8?B?UjVWRlZWZTVybCs2MFpDMERoRUpzaUlnTjRyMTE4b29uaTJzUVRaWm43RlBZ?=
- =?utf-8?B?S0dLaHlRaFA0NGJENVRrRTNHR2RnUTFzeWV4bkg5RmFOaThTVEhmZUt6K1JI?=
- =?utf-8?B?N2lCK1R6eW54amdTdU9jaURrZTlteEhtQm1zZTY2TWJXdGxScEJvOEtzVWVO?=
- =?utf-8?B?YjBQY1hsblc1TUswV2pUWC9ocnlZVlNLU2lSRXQ0WkVmbnQ4YU4vKzdqSmdj?=
- =?utf-8?B?UHdZdkRHVU5lV0JGWlNzbXFWblYxSUFheDkwc01nUFBGdElHT2lMRlpod3Zv?=
- =?utf-8?B?MUcralllUGg3N1I2Qy9rWkpxcVBqQ1NvMGFqNkpVclFreXFpVXkxTVNXMnhk?=
- =?utf-8?B?dVp0MGdXRmtSTFJ4OG82OHpGNzlacDNYbkFUeXhwbkdTV3g4YlZBRmlhK25I?=
- =?utf-8?B?UWtaRnZDYnk1Rjh0QSt2Wk11QXFMNUJCVnlOL1krZmFKVktMVGlBVE1kTmZy?=
- =?utf-8?B?SXFhN1A4SkpXNWdJeGorcVlieUFRNVAwMVRvVHpPSWYvNWlZazQ5cnJQOTY1?=
- =?utf-8?B?UGlPVGhMYldFRGVLTnpNQWo5MTZjK2JRenZrMTZseXA2SjJqNHBnZGN4b1M5?=
- =?utf-8?B?Ym1FSlRoTlFnbTU3c245NXpZODgxaUlEVFBFejZYeEROL1VwdVlxYktDZjds?=
- =?utf-8?B?dkJKU1ZUSUJwMHVScnpTQnUwUEtKYWdiNjhWNC9WN1hBWDBUcnRpRlhCL3k0?=
- =?utf-8?B?WVZSTWgxY1NiYUx2VnkxaUVKRXlSL3hZVjlLTmIrajBEY21yQXViY3VJMGwr?=
- =?utf-8?B?SjRIUXdsRzhFenBuVWlYRVdaQStSRllQQ2pOZjc4ZkREdXJ2TmpJSnhJc2U4?=
- =?utf-8?B?NFViUi95VWVRK3dXZU50aXNnRkFsQ2tIZDJBaEN6ajRNQVNFMW1oMHQxeVUw?=
- =?utf-8?B?R3MxVkhxSStnT3FXemZZR2dudW5jNjVOa3NjWEJsQ3d0b1drcmd1VHV5OHFK?=
- =?utf-8?B?NmZ3VTZDNVpObDhpNHhvd0N6NSsyMDVsQlVFL1ZHUko2UHJXZEdQZ3JXU3dr?=
- =?utf-8?B?S3pLWUpzbEFEbUg4VkRTRzRBUU9VKy9JNUg0K3k5ckN6a2MrUFdGc1hIbWlO?=
- =?utf-8?B?bWFCeDlrR28rZXJWdldEREg0MjNNek5ESThXNVNwd05xcEhGbWVPSDFCLytH?=
- =?utf-8?B?eXNBVUFBM2wvMVI0MlA2TVRpK2xkaVdUVTBqT2laVGFHL2JkRjBaNzJZZzJ4?=
- =?utf-8?B?R2srYWxOZ01UNlVDMjhiZ2s4QS94enljeHFNWm5KOU90OURyYTd1YnkyY0Fv?=
- =?utf-8?B?YVBBaXFvWDNsMDRoaUtUU3dFUVdRS3RremRpenpxRG8zVTJ6MlhSUDl5amRM?=
- =?utf-8?Q?o40ZXBtFQQ4zzYnuG978zG6ts?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d251f635-d13e-4bb6-ae70-08dbd54a44ff
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 11:05:16.6465
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PlE6QOxJViQcBoyyeB2mu3bmQQ83FDr5F9XeRyaQLvUCoOgNtdjCKGwCL6h6ol3aG2bjdhPStuVudXgkB/x4lg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5745
+References: <20231009092655.22025-1-daniel@iogearbox.net> <ZTjY959R+AFXf3Xy@shredder>
+ <726368f0-bbe9-6aeb-7007-6f974ed075f2@iogearbox.net>
+In-Reply-To: <726368f0-bbe9-6aeb-7007-6f974ed075f2@iogearbox.net>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 25 Oct 2023 07:05:32 -0400
+Message-ID: <CAM0EoM=L3ft1zuXhMsKq=Z+u7asbvpBL-KJBXLCmHBg=6BLHzQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] net, sched: Make tc-related drop reason
+ more flexible
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Ido Schimmel <idosch@idosch.org>, kuba@kernel.org, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, victor@mojatatu.com, martin.lau@linux.dev, dxu@dxuuu.xyz, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 18, 2023 at 03:08:26PM -0500, Bjorn Helgaas wrote:
-> On Tue, Oct 17, 2023 at 10:42:50AM +0300, Ido Schimmel wrote:
-> > The PCIe specification defines two methods to trigger a hot reset across
-> > a link: Bus reset and link disablement (r6.0.1, sec 7.1, sec 6.6.1). In
-> > the first method, the Secondary Bus Reset (SBR) bit in the Bridge
-> > Control Register of the Downstream Port is asserted for at least 1ms
-> > (r6.0.1, sec 7.5.1.3.13). In the second method, the Link Disable bit in
-> > the Link Control Register of the Downstream Port is asserted and then
-> > cleared to disable and enable the link (r6.0.1, sec 7.5.3.7).
-> > 
-> > While the two methods are identical from the perspective of the
-> > Downstream device, they are different as far as the host is concerned.
-> > In the first method, the Link Training and Status State Machine (LTSSM)
-> > of the Downstream Port is expected to be in the Hot Reset state as long
-> > as the SBR bit is asserted. In the second method, the LTSSM of the
-> > Downstream Port is expected to be in the Disabled state as long as the
-> > Link Disable bit is asserted.
-> > 
-> > This above difference is of importance because the specification
-> > requires the LTTSM to exit from the Hot Reset state to the Detect state
-> > within a 2ms timeout (r6.0.1, sec 4.2.7.11).
-> 
-> I don't read 4.2.7.11 quite that way.  Here's the text (from r6.0):
-> 
->   • Lanes that were directed by a higher Layer to initiate Hot
->     Reset:
-> 
->     ◦ All Lanes in the configured Link transmit TS1 Ordered Sets
->       with the Hot Reset bit asserted and the configured Link and
->       Lane numbers.
-> 
->     ◦ If two consecutive TS1 Ordered Sets are received on any
->       Lane with the Hot Reset bit asserted and configured Link
->       and Lane numbers, then:
-> 
->       ▪ LinkUp = 0b (False)
-> 
->       ▪ If no higher Layer is directing the Physical Layer to
->         remain in Hot Reset, the next state is Detect
-> 
->       ▪ Otherwise, all Lanes in the configured Link continue to
-> 	transmit TS1 Ordered Sets with the Hot Reset bit asserted
-> 	and the configured Link and Lane numbers.
-> 
->     ◦ Otherwise, after a 2 ms timeout next state is Detect.
-> 
-> I assume that SBR being set constitutes a "higher Layer directing the
-> Physical Layer to remain in Hot Reset," so I would read this as saying
-> the LTSSM stays in Hot Reset as long as SBR is set.  Then, *after* a
-> 2 ms timeout (not *within* 2 ms), the next state is Detect.
-> 
-> > NVIDIA Spectrum devices cannot guarantee it and a host enforcing
-> > such a behavior might fail to communicate with the device after
-> > issuing a Secondary Bus Reset.
-> 
-> I don't quite follow this.  What behavior is the host enforcing here?
-> I guess you're doing an SBR, and the Spectrum device doesn't respond
-> as expected afterwards?
-> 
-> It looks like pci_reset_secondary_bus() asserts SBR for at least
-> 2 ms.  Then pci_bridge_wait_for_secondary_bus() should wait before
-> accessing the device, but maybe we don't wait long enough?
-> 
-> I guess this ends up back at d3cold_delay as suggested by Lukas.
+On Wed, Oct 25, 2023 at 6:01=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
+et> wrote:
+>
+> Hi Ido,
+>
+> On 10/25/23 10:59 AM, Ido Schimmel wrote:
+> > On Mon, Oct 09, 2023 at 11:26:54AM +0200, Daniel Borkmann wrote:
+> >> diff --git a/net/core/dev.c b/net/core/dev.c
+> >> index 606a366cc209..664426285fa3 100644
+> >> --- a/net/core/dev.c
+> >> +++ b/net/core/dev.c
+> >> @@ -3910,7 +3910,8 @@ EXPORT_SYMBOL_GPL(netdev_xmit_skip_txqueue);
+> >>   #endif /* CONFIG_NET_EGRESS */
+> >>
+> >>   #ifdef CONFIG_NET_XGRESS
+> >> -static int tc_run(struct tcx_entry *entry, struct sk_buff *skb)
+> >> +static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
+> >> +              enum skb_drop_reason *drop_reason)
+> >>   {
+> >>      int ret =3D TC_ACT_UNSPEC;
+> >>   #ifdef CONFIG_NET_CLS_ACT
+> >> @@ -3922,12 +3923,14 @@ static int tc_run(struct tcx_entry *entry, str=
+uct sk_buff *skb)
+> >>
+> >>      tc_skb_cb(skb)->mru =3D 0;
+> >>      tc_skb_cb(skb)->post_ct =3D false;
+> >> +    res.drop_reason =3D *drop_reason;
+> >>
+> >>      mini_qdisc_bstats_cpu_update(miniq, skb);
+> >>      ret =3D tcf_classify(skb, miniq->block, miniq->filter_list, &res,=
+ false);
+> >>      /* Only tcf related quirks below. */
+> >>      switch (ret) {
+> >>      case TC_ACT_SHOT:
+> >> +            *drop_reason =3D res.drop_reason;
+> >
+> > Daniel,
+> >
+> > Getting the following splat [1] with CONFIG_DEBUG_NET=3Dy and this
+> > reproducer [2]. Problem seems to be that classifiers clear 'struct
+> > tcf_result::drop_reason', thereby triggering the warning in
+> > __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0).
+> >
+> > Fixed by maintaining the original drop reason if the one returned from
+> > tcf_classify() is 'SKB_NOT_DROPPED_YET' [3]. I can submit this fix
+> > unless you have a better idea.
+>
+> Thanks for catching this, looks reasonable to me as a fix.
+>
+> > [1]
+> > WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x3=
+8/0x130
+> > Modules linked in:
+> > CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d958=
+2e0 #682
+> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc=
+37 04/01/2014
+> > RIP: 0010:kfree_skb_reason+0x38/0x130
+> > [...]
+> > Call Trace:
+> >   <IRQ>
+> >   __netif_receive_skb_core.constprop.0+0x837/0xdb0
+> >   __netif_receive_skb_one_core+0x3c/0x70
+> >   process_backlog+0x95/0x130
+> >   __napi_poll+0x25/0x1b0
+> >   net_rx_action+0x29b/0x310
+> >   __do_softirq+0xc0/0x29b
+> >   do_softirq+0x43/0x60
+> >   </IRQ>
+> >
+> > [2]
+> > #!/bin/bash
+> >
+> > ip link add name veth0 type veth peer name veth1
+> > ip link set dev veth0 up
+> > ip link set dev veth1 up
+> > tc qdisc add dev veth1 clsact
+> > tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:2=
+2:33:44:55 action drop
+> > mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
+>
+> I didn't know you're using mausezahn, nice :)
+>
+> > [3]
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index a37a932a3e14..abd0b13f3f17 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -3929,7 +3929,8 @@ static int tc_run(struct tcx_entry *entry, struct=
+ sk_buff *skb,
+> >          /* Only tcf related quirks below. */
+> >          switch (ret) {
+> >          case TC_ACT_SHOT:
+> > -               *drop_reason =3D res.drop_reason;
+> > +               if (res.drop_reason !=3D SKB_NOT_DROPPED_YET)
+> > +                       *drop_reason =3D res.drop_reason;
+> >                  mini_qdisc_qstats_cpu_drop(miniq);
+> >                  break;
+> >          case TC_ACT_OK:
+> >
 
-I had a meeting with the PCI team before submitting this patch where I
-stated that bus reset works fine (tested over 500 iterations) on the
-hosts I have access to. They said that bus reset and link toggling are
-identical from the perspective of the downstream device, but that in the
-past they saw hosts that fail bus reset because of the time it takes the
-downstream device to reach the Detect state. This was with a different
-line of products that share the same PCI IP as Spectrum.
 
-Given that I'm unable to reproduce this problem with Spectrum and that
-your preference seems to be to reuse bus reset (or bus reset plus the
-d3cold_delay quirk), I'll drop this patch for now. We can revisit this
-patch in the future, if the problem manifests itself.
+Out of curiosity - how does the policy say "drop" but drop_reason does
+not reflect it?
 
-Regarding the other two PCI patches, I plan to submit this series after
-net-next opens for v6.8. Are you OK with them being merged via net-next?
+cheers,
+jamal
 
-Thanks
+
+> When you submit feel free to add:
+>
+> Acked-by: Daniel Borkmann <daniel@iogearbox.net>
 
