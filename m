@@ -1,74 +1,71 @@
-Return-Path: <netdev+bounces-44128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F12FB7D675D
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 11:46:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F7C27D67AD
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 11:57:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81369B20B71
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 09:46:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AA242811D9
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 09:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F76C219F3;
-	Wed, 25 Oct 2023 09:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8721123775;
+	Wed, 25 Oct 2023 09:57:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nkw5UGfQ"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="euGAgP2P"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28D22D604
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 09:46:10 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C03A030CB;
-	Wed, 25 Oct 2023 02:45:33 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-5406c099cebso4414128a12.2;
-        Wed, 25 Oct 2023 02:45:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3F8224F1
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 09:57:44 +0000 (UTC)
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BED21DE
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 02:57:40 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-32daeed7771so3598298f8f.3
+        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 02:57:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698227132; x=1698831932; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698227859; x=1698832659; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Pt5phfixaXvNlB8r+PBZ9jiHHg7LS+G7hf/4wtAiQ8=;
-        b=nkw5UGfQ317l2jaIgUkJ5QMXvDxJjlRMwjjYh22P2FtNqROvAMKfVZDypnEMd+Tli3
-         yZsqpArpS2LC4nDaGoTCLrlZY9cYv8vD2rEGoZBorbq3wLbJL0zuqe9E/cuxALv530cI
-         7eLE8AgDF2+nq6eKlH9qM4OrG5zzu/Zf3iBYjMk947n1RU/PU8uXaD/V1zU4gicHRk8m
-         ZZO90roW6jH5XBUPDZSTWzbo1dvmKSP9OvjjUxrIyMHyYiUxuxeusf+ZEDAsYopg/yuK
-         SeXz/+SfGo3QGqwI4Og10O4CcxcXcSBs9Myg2M82+9U1PCWXCxyYB6kNJrXftqseNCMH
-         9mVg==
+        bh=S4ZtsZSf8iGAkU9Y47c3kfbQ9My3LTOwyo7xGwJRRCU=;
+        b=euGAgP2PjaBUpgr0wWfl5Ia2Z3WlqAk7ZWxcwVUbXum/1xhgkrfYC03ggc3wXuCVfm
+         5P2+XGwaJicYK0tg8z0bOC8FIIHxMxKodKk7pVt0LEvR+E93WAavWwynLLGiUA6MA4qp
+         TXeh+uC/x9n215Mh8BSZjDvqAPXi5kEY5MUyGdNrdXmLQcJMTgKUrjamkThQ3kn1O2nT
+         ulvGJkIpRsQrQsNdxCB4imNujhXLV21KZWBzwXTH6xBirGkaxiMbNCkuMR3kM8bCWBI9
+         cYw59PvYWD6GsHi5y8zpat7lAoWybb1cksVCSZaDOo0+wAKDnrWg2/Uh9CVIFbS0isla
+         M7dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698227132; x=1698831932;
+        d=1e100.net; s=20230601; t=1698227859; x=1698832659;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8Pt5phfixaXvNlB8r+PBZ9jiHHg7LS+G7hf/4wtAiQ8=;
-        b=rtmjgSXofNfvIwyyJa+gPNynU4uIHpY727rAe8E3WMZrk785ZdwOpNQS3JfNDvgyaM
-         mImhFW23JlfcsSLsCIrF/a3o2F49zobva9WoIN+iJWg1SPrfjDDJjAMJv1WoDgedJ4/u
-         G5yzUEeP4vFNVBzTSVlBhpEJqKcF6y5OQMDtD6a+3v0NcaashCbFkp0VxeRWRm2rPW7Q
-         RHMZw0l4+G4EoP/7vCaKKosP4Rk5d1MpNFaS15kf0zyC/p3F1u+Y9izjKUoHa/rBLr9M
-         yGk5zuP+2E2r8Do2JmQ3QcjAw8jpjmHi0vTRM+NCvw3dVLKl9Z6Sy1I/1Jcbjf1kfR/u
-         x46Q==
-X-Gm-Message-State: AOJu0YwjVeopZi6MM3btvJWF+VBaChprUZ/uQR2XLC2WXsf4MRZ2zjKX
-	tiWdwq0Tawj5LTubA8Ahztx2ItHyK2M=
-X-Google-Smtp-Source: AGHT+IEJJFWpa/GIfSnQN1JJCFiP8/YkShYQ9373CxIpiir0JCn/cBfwu/bGvw4K6IveHwUZQY9KbQ==
-X-Received: by 2002:a05:6402:3593:b0:53f:bab5:864b with SMTP id y19-20020a056402359300b0053fbab5864bmr12231040edc.16.1698227131555;
-        Wed, 25 Oct 2023 02:45:31 -0700 (PDT)
-Received: from tp.home.arpa (host-95-232-81-37.retail.telecomitalia.it. [95.232.81.37])
-        by smtp.gmail.com with ESMTPSA id ch28-20020a0564021bdc00b0053ff311f388sm7706488edb.23.2023.10.25.02.45.30
+        bh=S4ZtsZSf8iGAkU9Y47c3kfbQ9My3LTOwyo7xGwJRRCU=;
+        b=wRxMPymlnXaJsm4ggxorM4N888/Pz3FR5Me75SQu7FiQV9553Cb1JVynAixxSu5U1e
+         AJpO5BCMQvgmHkILTQtomV2PhW+JXqs6NlP/JzfI028ghvU2sY+oXKFhS5GjDwqDJrG+
+         xU6xvJeFyKPL2lbKQo8hVKyQSJtZctqahZyt+7gP/q2rFcS9u9DfsIY2ebKfe44fMM/2
+         je1DnwSyqFEpavODLanH7r1ku34KsqJBQyB/XxwRPweX9EVgLww5a2jZAhT/7FLJSDBv
+         isCf5k+CPOTyAGCXbHvuC49P9lOzHUuvRlo8b7yHIrYiOOwnmpviK3GXvJQrrcBFuFLS
+         4d+w==
+X-Gm-Message-State: AOJu0YwnQIjR8n2MPXhS3+/p9O+lQNuF9DrfsyZ0JAi66fNIn1agk1wz
+	s4rbJlgN2Le7KWWa5Gkhn2kO/LyuIq9XzB4LjOA=
+X-Google-Smtp-Source: AGHT+IEw9joUPi6CRAEAaVR92Z+TJ8tGxxznfQ0jOm8gb+rX4GksugltqiQRMb3skya+70CtfmW6EA==
+X-Received: by 2002:a5d:6310:0:b0:32d:a236:b6f4 with SMTP id i16-20020a5d6310000000b0032da236b6f4mr12506630wru.50.1698227858841;
+        Wed, 25 Oct 2023 02:57:38 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id f9-20020adff449000000b0032d81837433sm11712727wrp.30.2023.10.25.02.57.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 02:45:31 -0700 (PDT)
-From: Beniamino Galvani <b.galvani@gmail.com>
+        Wed, 25 Oct 2023 02:57:38 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Guillaume Nault <gnault@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] bareudp: use ports to lookup route
-Date: Wed, 25 Oct 2023 11:44:41 +0200
-Message-ID: <20231025094441.417464-1-b.galvani@gmail.com>
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com
+Subject: [patch net-next v3] tools: ynl: introduce option to process unknown attributes or types
+Date: Wed, 25 Oct 2023 11:57:36 +0200
+Message-ID: <20231025095736.801231-1-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -78,107 +75,179 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The source and destination ports should be taken into account when
-determining the route destination; they can affect the result, for
-example in case there are routing rules defined.
+From: Jiri Pirko <jiri@nvidia.com>
 
-Signed-off-by: Beniamino Galvani <b.galvani@gmail.com>
+In case the kernel sends message back containing attribute not defined
+in family spec, following exception is raised to the user:
+
+$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do trap-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "trap-name": "source_mac_is_multicast"}'
+Traceback (most recent call last):
+  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 521, in _decode
+    attr_spec = attr_space.attrs_by_val[attr.type]
+                ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 132
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/jiri/work/linux/./tools/net/ynl/cli.py", line 61, in <module>
+    main()
+  File "/home/jiri/work/linux/./tools/net/ynl/cli.py", line 49, in main
+    reply = ynl.do(args.do, attrs, args.flags)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 731, in do
+    return self._op(method, vals, flags)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 719, in _op
+    rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jiri/work/linux/tools/net/ynl/lib/ynl.py", line 525, in _decode
+    raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
+Exception: Space 'devlink' has no attribute with value '132'
+
+Introduce a command line option "process-unknown" and pass it down to
+YnlFamily class constructor to allow user to process unknown
+attributes and types and print them as binaries.
+
+$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do trap-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "trap-name": "source_mac_is_multicast"}' --process-unknown
+{'129': {'0': b'\x00\x00\x00\x00\x00\x00\x00\x00',
+         '1': b'\x00\x00\x00\x00\x00\x00\x00\x00',
+         '2': b'(\x00\x00\x00\x00\x00\x00\x00'},
+ '132': b'\x00',
+ '133': b'',
+ '134': {'0': b''},
+ 'bus-name': 'netdevsim',
+ 'dev-name': 'netdevsim1',
+ 'trap-action': 'drop',
+ 'trap-group-name': 'l2_drops',
+ 'trap-name': 'source_mac_is_multicast'}
+
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- drivers/net/bareudp.c | 29 ++++++++++++++++-------------
- 1 file changed, 16 insertions(+), 13 deletions(-)
+v2->v3:
+- rebased on top of previous patchset and recent net-next
+- removed fake attr spec class
+- introduced "attr.is_nest" and using it instead of direct access
+  to "attr._type"
+- pushed out rsp value addition into separate helper and sanitize
+  the unknown attr is possibly multi-value there
+- pushed out unknown attr decode into separate helper
+v1->v2:
+- changed to process unknown attributes and type instead of ignoring them
+---
+ tools/net/ynl/cli.py     |  3 ++-
+ tools/net/ynl/lib/ynl.py | 47 ++++++++++++++++++++++++++++++----------
+ 2 files changed, 38 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
-index 9c11a0d0273b..31377bb1cc97 100644
---- a/drivers/net/bareudp.c
-+++ b/drivers/net/bareudp.c
-@@ -306,8 +306,11 @@ static int bareudp_xmit_skb(struct sk_buff *skb, struct net_device *dev,
- 	if (!sock)
- 		return -ESHUTDOWN;
+diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
+index 564ecf07cd2c..2ad9ec0f5545 100755
+--- a/tools/net/ynl/cli.py
++++ b/tools/net/ynl/cli.py
+@@ -27,6 +27,7 @@ def main():
+                         const=Netlink.NLM_F_CREATE)
+     parser.add_argument('--append', dest='flags', action='append_const',
+                         const=Netlink.NLM_F_APPEND)
++    parser.add_argument('--process-unknown', action=argparse.BooleanOptionalAction)
+     args = parser.parse_args()
  
-+	sport = udp_flow_src_port(bareudp->net, skb,
-+				  bareudp->sport_min, USHRT_MAX,
-+				  true);
- 	rt = udp_tunnel_dst_lookup(skb, dev, bareudp->net, 0, &saddr, &info->key,
--				   0, 0, key->tos,
-+				   sport, bareudp->port, key->tos,
- 				   use_cache ?
- 				   (struct dst_cache *)&info->dst_cache : NULL);
+     if args.no_schema:
+@@ -36,7 +37,7 @@ def main():
+     if args.json_text:
+         attrs = json.loads(args.json_text)
  
-@@ -317,9 +320,6 @@ static int bareudp_xmit_skb(struct sk_buff *skb, struct net_device *dev,
- 	skb_tunnel_check_pmtu(skb, &rt->dst,
- 			      BAREUDP_IPV4_HLEN + info->options_len, false);
+-    ynl = YnlFamily(args.spec, args.schema)
++    ynl = YnlFamily(args.spec, args.schema, args.process_unknown)
  
--	sport = udp_flow_src_port(bareudp->net, skb,
--				  bareudp->sport_min, USHRT_MAX,
--				  true);
- 	tos = ip_tunnel_ecn_encap(key->tos, ip_hdr(skb), skb);
- 	ttl = key->ttl;
- 	df = key->tun_flags & TUNNEL_DONT_FRAGMENT ? htons(IP_DF) : 0;
-@@ -371,8 +371,11 @@ static int bareudp6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
- 	if (!sock)
- 		return -ESHUTDOWN;
+     if args.ntf:
+         ynl.ntf_subscribe(args.ntf)
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index b1da4aea9336..9e4ac9575313 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -100,6 +100,7 @@ class NlAttr:
+     def __init__(self, raw, offset):
+         self._len, self._type = struct.unpack("HH", raw[offset:offset + 4])
+         self.type = self._type & ~Netlink.NLA_TYPE_MASK
++        self.is_nest = self._type & Netlink.NLA_F_NESTED
+         self.payload_len = self._len
+         self.full_len = (self.payload_len + 3) & ~3
+         self.raw = raw[offset + 4:offset + self.payload_len]
+@@ -411,10 +412,11 @@ class GenlProtocol(NetlinkProtocol):
  
-+	sport = udp_flow_src_port(bareudp->net, skb,
-+				  bareudp->sport_min, USHRT_MAX,
-+				  true);
- 	dst = udp_tunnel6_dst_lookup(skb, dev, bareudp->net, sock, 0, &saddr,
--				     key, 0, 0, key->tos,
-+				     key, sport, bareudp->port, key->tos,
- 				     use_cache ?
- 				     (struct dst_cache *) &info->dst_cache : NULL);
- 	if (IS_ERR(dst))
-@@ -381,9 +384,6 @@ static int bareudp6_xmit_skb(struct sk_buff *skb, struct net_device *dev,
- 	skb_tunnel_check_pmtu(skb, dst, BAREUDP_IPV6_HLEN + info->options_len,
- 			      false);
  
--	sport = udp_flow_src_port(bareudp->net, skb,
--				  bareudp->sport_min, USHRT_MAX,
--				  true);
- 	prio = ip_tunnel_ecn_encap(key->tos, ip_hdr(skb), skb);
- 	ttl = key->ttl;
+ class YnlFamily(SpecFamily):
+-    def __init__(self, def_path, schema=None):
++    def __init__(self, def_path, schema=None, process_unknown=False):
+         super().__init__(def_path, schema)
  
-@@ -480,15 +480,20 @@ static int bareudp_fill_metadata_dst(struct net_device *dev,
- 	struct ip_tunnel_info *info = skb_tunnel_info(skb);
- 	struct bareudp_dev *bareudp = netdev_priv(dev);
- 	bool use_cache;
-+	__be16 sport;
+         self.include_raw = False
++        self.process_unknown = process_unknown
  
- 	use_cache = ip_tunnel_dst_cache_usable(skb, info);
-+	sport = udp_flow_src_port(bareudp->net, skb,
-+				  bareudp->sport_min, USHRT_MAX,
-+				  true);
+         try:
+             if self.proto == "netlink-raw":
+@@ -526,14 +528,40 @@ class YnlFamily(SpecFamily):
+             decoded.append({ item.type: subattrs })
+         return decoded
  
- 	if (!ipv6_mod_enabled() || ip_tunnel_info_af(info) == AF_INET) {
- 		struct rtable *rt;
- 		__be32 saddr;
++    def _decode_unknown(self, attr):
++        if attr.is_nest:
++            return self._decode(NlAttrs(attr.raw), None)
++        else:
++            return attr.as_bin()
++
++    def _rsp_add(self, rsp, name, is_multi, decoded):
++        if is_multi == None:
++            if name in rsp and type(rsp[name]) is not list:
++                rsp[name] = [rsp[name]]
++                is_multi = True
++            else:
++                is_multi = False
++
++        if not is_multi:
++            rsp[name] = decoded
++        elif name in rsp:
++            rsp[name].append(decoded)
++        else:
++            rsp[name] = [decoded]
++
+     def _decode(self, attrs, space):
+-        attr_space = self.attr_sets[space]
++        if space:
++            attr_space = self.attr_sets[space]
+         rsp = dict()
+         for attr in attrs:
+             try:
+                 attr_spec = attr_space.attrs_by_val[attr.type]
+-            except KeyError:
+-                raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
++            except (KeyError, UnboundLocalError):
++                if not self.process_unknown:
++                    raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
++                self._rsp_add(rsp, str(attr.type), None, self._decode_unknown(attr))
++                continue
++
+             if attr_spec["type"] == 'nest':
+                 subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'])
+                 decoded = subdict
+@@ -558,14 +586,11 @@ class YnlFamily(SpecFamily):
+                     selector = self._decode_enum(selector, attr_spec)
+                 decoded = {"value": value, "selector": selector}
+             else:
+-                raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
++                if not self.process_unknown:
++                    raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
++                decoded = self._decode_unknown(attr)
  
- 		rt = udp_tunnel_dst_lookup(skb, dev, bareudp->net, 0, &saddr,
--					   &info->key, 0, 0, info->key.tos,
-+					   &info->key, sport, bareudp->port,
-+					   info->key.tos,
- 					   use_cache ? &info->dst_cache : NULL);
- 		if (IS_ERR(rt))
- 			return PTR_ERR(rt);
-@@ -502,7 +507,7 @@ static int bareudp_fill_metadata_dst(struct net_device *dev,
+-            if not attr_spec.is_multi:
+-                rsp[attr_spec['name']] = decoded
+-            elif attr_spec.name in rsp:
+-                rsp[attr_spec.name].append(decoded)
+-            else:
+-                rsp[attr_spec.name] = [decoded]
++            self._rsp_add(rsp, attr_spec["name"], attr_spec.is_multi, decoded)
  
- 		dst = udp_tunnel6_dst_lookup(skb, dev, bareudp->net, sock,
- 					     0, &saddr, &info->key,
--					     0, 0, info->key.tos,
-+					     sport, bareudp->port, info->key.tos,
- 					     use_cache ? &info->dst_cache : NULL);
- 		if (IS_ERR(dst))
- 			return PTR_ERR(dst);
-@@ -513,9 +518,7 @@ static int bareudp_fill_metadata_dst(struct net_device *dev,
- 		return -EINVAL;
- 	}
+         return rsp
  
--	info->key.tp_src = udp_flow_src_port(bareudp->net, skb,
--					     bareudp->sport_min,
--			USHRT_MAX, true);
-+	info->key.tp_src = sport;
- 	info->key.tp_dst = bareudp->port;
- 	return 0;
- }
 -- 
 2.41.0
 
