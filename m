@@ -1,116 +1,229 @@
-Return-Path: <netdev+bounces-44060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FBBF7D5F65
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 03:11:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 021CA7D5F75
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 03:18:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F4C281800
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 01:11:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DCF61F218B3
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 01:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69F471386;
-	Wed, 25 Oct 2023 01:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA33D15B6;
+	Wed, 25 Oct 2023 01:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bOQy3hTY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HeG2Ep3R"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF89C1369;
-	Wed, 25 Oct 2023 01:11:19 +0000 (UTC)
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ABEF99;
-	Tue, 24 Oct 2023 18:11:18 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c50305c5c4so77734481fa.1;
-        Tue, 24 Oct 2023 18:11:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698196277; x=1698801077; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ldUvlikD+5XIQmvxpKaHp5+smB/6w0kvFDnKHFQsOQA=;
-        b=bOQy3hTY9gp1y8rUwuz3yLC5X/Podrvmt1sfqb7GRWjmszBzoZzc7oTyIIMnOeZfvH
-         iv4lQThw5xpwYYUgCiOXbjozi8PyToFBxYJ0IkCagRpxq16h3H3062RmDb86DVdU5NeL
-         bVrQOjx4ymaSRjQch9feh41OxvpW1j3T8AvrFVg/mDC/eEcAE6evPQFqks7I3epfoTRV
-         EmYG5Sb49kUIefVn40K3oYce7MYFmbbeayEB06287f5YOfkgUsMNz9xqOWNuU/IXI5MH
-         gY6rOmiRqOeu+AE43vxaGws2ChM528tKEWfb7eOiSI8QqzIWwe/q4e7S98ZWZIb79AZN
-         m6Pg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E6515B5
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 01:18:44 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871E199
+	for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 18:18:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698196722;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6+sYLcUznLWz6ItrEA9/mdy00grfjauD3njlab1BHl8=;
+	b=HeG2Ep3R3ouYd4KGz2w8Im5wqN8NRNgaMraeMe5WB5r7H+t1xOHQmcChbNxLKmK42lqsXQ
+	2cBzrx/RXrPSbP/M8+fJSXfjhqiXNtxvS5q+DzHy57yB2cKxomHpqLyqAedQ+MFcji0PGt
+	mzRWbR/WCReHILvP41OLzP2eM2VVp6Y=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-372-RmNubyw6NUKeeUsvJi97nw-1; Tue, 24 Oct 2023 21:18:40 -0400
+X-MC-Unique: RmNubyw6NUKeeUsvJi97nw-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-507a3426041so5504212e87.0
+        for <netdev@vger.kernel.org>; Tue, 24 Oct 2023 18:18:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698196277; x=1698801077;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ldUvlikD+5XIQmvxpKaHp5+smB/6w0kvFDnKHFQsOQA=;
-        b=Vs0ACgEBLqqSN13LyA7e0eSq7eG+reusNV5EKDm+JsQqsylVwpu1aerlQM/Oa98v2A
-         mk6fcZXmhKZRWQXS63x54aJF7+BoIklJB5HV3o0GyhO8Tfm2C7aYKTWVaTMAgeB/MH3L
-         cS9Nvh3zbYAw0rzTYVSczl4kjzSc4WC7NMJcEQXmG9+kW91OtTA+rYKFoFRJfSi4sHNQ
-         CRjyWb+1575tnn97IAvdEskHXuoaKOGKYXNupYdLlGb77yRCcjyrMRA0KsyJDhNqCiiq
-         p0Q6SYIgAWJUi8a9Pm5Nuc98dDaFrLezBiYaYhvPkQz7/H5gxkdbAOMvEdCeiVJYuop1
-         cY/w==
-X-Gm-Message-State: AOJu0Yw1bCFHER9wvMJz2xUuzyjX2cty5nTIIeCkELz3fJZqxw4PgoYx
-	0+qb75nzxkKL16lwlGQLvCg=
-X-Google-Smtp-Source: AGHT+IEYw8DnBjtFxl4QoC6GJSt+6+Mp5KWJ8eKGMucEKHdCmqSlKHUfZO+2gnsvMIAxpN1xD9KF9w==
-X-Received: by 2002:a2e:b04b:0:b0:2c5:1b01:b67f with SMTP id d11-20020a2eb04b000000b002c51b01b67fmr9406239ljl.52.1698196276499;
-        Tue, 24 Oct 2023 18:11:16 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id q19-20020a05600c46d300b0040836519dd9sm13261355wmo.25.2023.10.24.18.11.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Oct 2023 18:11:16 -0700 (PDT)
-Date: Wed, 25 Oct 2023 04:11:13 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 5/7] ARM64: dts: marvell: Fix some common
- switch mistakes
-Message-ID: <20231025011113.lycdzy7vxazaargx@skbuf>
-References: <20231018-marvell-88e6152-wan-led-v4-0-3ee0c67383be@linaro.org>
- <20231018-marvell-88e6152-wan-led-v4-5-3ee0c67383be@linaro.org>
- <20231019144021.ksymhjpvawv42vhj@skbuf>
- <20231019144935.3wrnqyipiq3vkxb7@skbuf>
- <20231019172649.784a60d4@dellmb>
- <20231019162232.5iykxtlcezekc2uz@skbuf>
- <CACRpkdam5UZWbB_tAKoU3_jdZLbH0TFT3yt3Xf9G1b=_42e4zQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1698196719; x=1698801519;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6+sYLcUznLWz6ItrEA9/mdy00grfjauD3njlab1BHl8=;
+        b=uUdkKaqYsijBNQOTfOImnaRNpOWHaGRpdhEPLz8WCS6NXhuC62UStB226N9FE54j2E
+         VMaWpXJsxVNLI5ieSuty2RpG2eXOLbC9k4pP22VXLRDlSNWeBC5nWfpTbAWcFMZYttu4
+         6pFbb+9UwmL0R+fz639j9AzoCfb0QpzzgFHBul1IKezucP9qYGMgXFZfF863jM5NuyYY
+         DiNM9O1EnYOYGrcBmI95/k+Qap9YCSfMXhRyN0X4DZZobTfeB1WW44aeLANeZKz37RZY
+         RpxQM2E1c2bgumZ51murPzAKQrIgPOcqpeC6CGPFgYEvoT7MDG58jslYsW1lLSJnunRl
+         OLcw==
+X-Gm-Message-State: AOJu0YyaEbAESgGGI4VaEBPJ/9OnWnoDV7UwikXAVd1vyYGBJirP0Y6/
+	zJhk1K69rOnRbvfPYj+nnBVYorvbJKSrXMJgJb+1MCttH5oECoLlRpQDyLiLgv5f8i4+96C3WEy
+	UWcO+EjLNT+WFtvLBQmoN7hspJqp196G6
+X-Received: by 2002:a05:6512:2098:b0:4fe:ecd:4950 with SMTP id t24-20020a056512209800b004fe0ecd4950mr8324343lfr.1.1698196718822;
+        Tue, 24 Oct 2023 18:18:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHw4xiciGsLWrc8jU7nWVlxCfaJXZLHo7Wgqcioh9NM4+EkVTjHFntGoxrq0EFHdcfAj2XvFbsBZLNlWPys+h8=
+X-Received: by 2002:a05:6512:2098:b0:4fe:ecd:4950 with SMTP id
+ t24-20020a056512209800b004fe0ecd4950mr8324332lfr.1.1698196718401; Tue, 24 Oct
+ 2023 18:18:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACRpkdam5UZWbB_tAKoU3_jdZLbH0TFT3yt3Xf9G1b=_42e4zQ@mail.gmail.com>
+References: <cover.1697093455.git.hengqi@linux.alibaba.com>
+ <CACGkMEthktJjPdptHo3EDQxjRqdPELOSbMw4k-d0MyYmR4i9KA@mail.gmail.com> <d215566f-8185-463b-aa0b-5925f2a0853c@linux.alibaba.com>
+In-Reply-To: <d215566f-8185-463b-aa0b-5925f2a0853c@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 25 Oct 2023 09:18:27 +0800
+Message-ID: <CACGkMEseRoUBHOJ2CgPqVe=HNkAJqdj+Sh3pWsRaPCvcjwD9Gw@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/5] virtio-net: support dynamic coalescing moderation
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	"Liu, Yujie" <yujie.liu@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 20, 2023 at 02:59:43PM +0200, Linus Walleij wrote:
-> On Thu, Oct 19, 2023 at 6:22 PM Vladimir Oltean <olteanv@gmail.com> wrote:
-> > On Thu, Oct 19, 2023 at 05:26:49PM +0200, Marek Behún wrote:
-> > > Yes, unfortunately changing that node name will break booting.
-> > >
-> > > Maybe we could add a comment into the DTS to describe this unfortunate
-> > > state of things? :)
+On Tue, Oct 24, 2023 at 8:03=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com> =
+wrote:
+>
+>
+>
+> =E5=9C=A8 2023/10/12 =E4=B8=8B=E5=8D=884:29, Jason Wang =E5=86=99=E9=81=
+=93:
+> > On Thu, Oct 12, 2023 at 3:44=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.c=
+om> wrote:
+> >> Now, virtio-net already supports per-queue moderation parameter
+> >> setting. Based on this, we use the netdim library of linux to support
+> >> dynamic coalescing moderation for virtio-net.
+> >>
+> >> Due to hardware scheduling issues, we only tested rx dim.
+> > Do you have PPS numbers? And TX numbers are also important as the
+> > throughput could be misleading due to various reasons.
+>
+> Hi Jason!
+>
+> The comparison of rx netdim performance is as follows:
+> (the backend supporting tx dim is not yet ready)
+
+Thanks a lot for the numbers.
+
+I'd still expect the TX result as I did play tx interrupt coalescing
+about 10 years ago.
+
+I will start to review the series but let's try to have some TX numbers as =
+well.
+
+Btw, it would be more convenient to have a raw PPS benchmark. E.g you
+can try to use a software or hardware packet generator.
+
+Thanks
+
+>
+>
+> I. Sockperf UDP
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> 1. Env
+> rxq_0 is affinity to cpu_0
+>
+> 2. Cmd
+> client:  taskset -c 0 sockperf tp -p 8989 -i $IP -t 10 -m 16B
+> server: taskset -c 0 sockperf sr -p 8989
+>
+> 3. Result
+> dim off: 1143277.00 rxpps, throughput 17.844 MBps, cpu is 100%.
+> dim on: 1124161.00 rxpps, throughput 17.610 MBps, cpu is 83.5%.
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>
+> II. Redis
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> 1. Env
+> There are 8 rxqs and rxq_i is affinity to cpu_i.
+>
+> 2. Result
+> When all cpus are 100%, ops/sec of memtier_benchmark client is
+> dim off:   978437.23
+> dim on: 1143638.28
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>
+> III. Nginx
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> 1. Env
+> There are 8 rxqs and rxq_i is affinity to cpu_i.
+>
+> 2. Result
+> When all cpus are 100%, requests/sec of wrk client is
+> dim off:   877931.67
+> dim on: 1019160.31
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> Thanks!
+>
 > >
-> > Well, the fact that Linus didn't notice means that there are insufficient
-> > signals currently, so I guess a more explicit comment would help. Could
-> > you prepare a patch?
-> 
-> I can just include a blurb in my patch so we don't get colliding
-> changes.
+> > Thanks
+> >
+> >> @Test env
+> >> rxq0 has affinity to cpu0.
+> >>
+> >> @Test cmd
+> >> client: taskset -c 0 sockperf tp -i ${IP} -t 30 --tcp -m ${msg_size}
+> >> server: taskset -c 0 sockperf sr --tcp
+> >>
+> >> @Test res
+> >> The second column is the ratio of the result returned by client
+> >> when rx dim is enabled to the result returned by client when
+> >> rx dim is disabled.
+> >>          --------------------------------------
+> >>          | msg_size |  rx_dim=3Don / rx_dim=3Doff |
+> >>          --------------------------------------
+> >>          |   14B    |         + 3%            |
+> >>          --------------------------------------
+> >>          |   100B   |         + 16%           |
+> >>          --------------------------------------
+> >>          |   500B   |         + 25%           |
+> >>          --------------------------------------
+> >>          |   1400B  |         + 28%           |
+> >>          --------------------------------------
+> >>          |   2048B  |         + 22%           |
+> >>          --------------------------------------
+> >>          |   4096B  |         + 5%            |
+> >>          --------------------------------------
+> >>
+> >> ---
+> >> This patch set was part of the previous netdim patch set[1].
+> >> [1] was split into a merged bugfix set[2] and the current set.
+> >> The previous relevant commentators have been Cced.
+> >>
+> >> [1] https://lore.kernel.org/all/20230811065512.22190-1-hengqi@linux.al=
+ibaba.com/
+> >> [2] https://lore.kernel.org/all/cover.1696745452.git.hengqi@linux.alib=
+aba.com/
+> >>
+> >> Heng Qi (5):
+> >>    virtio-net: returns whether napi is complete
+> >>    virtio-net: separate rx/tx coalescing moderation cmds
+> >>    virtio-net: extract virtqueue coalescig cmd for reuse
+> >>    virtio-net: support rx netdim
+> >>    virtio-net: support tx netdim
+> >>
+> >>   drivers/net/virtio_net.c | 394 ++++++++++++++++++++++++++++++++-----=
+--
+> >>   1 file changed, 322 insertions(+), 72 deletions(-)
+> >>
+> >> --
+> >> 2.19.1.6.gb485710b
+> >>
+> >>
+>
+>
 
-Colliding with what, if you shouldn't change the node names?
 
