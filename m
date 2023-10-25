@@ -1,138 +1,80 @@
-Return-Path: <netdev+bounces-44302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2705A7D7844
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 00:51:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 723D27D784C
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:00:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 663FB281DCF
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 22:51:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DFD3281B37
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E062030FBF;
-	Wed, 25 Oct 2023 22:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3064B3418C;
+	Wed, 25 Oct 2023 23:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="o/+Wfe6u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IXtimsUX"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282B527EFF;
-	Wed, 25 Oct 2023 22:50:56 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0BF0DBB;
-	Wed, 25 Oct 2023 15:50:55 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1004)
-	id 9138220B74C1; Wed, 25 Oct 2023 15:50:54 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9138220B74C1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-	s=default; t=1698274254;
-	bh=4zQSWnZRUjjGv8tDmJQi574JQo3zw9n1/Nch+18x6iQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=o/+Wfe6uwOpezfWcHV78m4CysvZKlOLyu7LWMxmOKjDOAbAn/XtW3q5u0NCsNMV6h
-	 29Ez6cGI5WpUOMosYNV+7FDyvqYPSwDFOILomAMzBHxOJOcgD3lRPHH58muaIFf7Dj
-	 eUtxB3DiGe3Qtl2NAYZGuZYTBUCBSAolBZuq5Oqw=
-From: longli@linuxonhyperv.com
-To: "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: linux-rdma@vger.kernel.org,
-	Long Li <longli@microsoft.com>
-Subject: [PATCH] hv_netvsc: Mark VF as slave before exposing it to user-mode
-Date: Wed, 25 Oct 2023 15:50:50 -0700
-Message-Id: <1698274250-653-1-git-send-email-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12450749F
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:00:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 238A2C433C8;
+	Wed, 25 Oct 2023 23:00:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698274817;
+	bh=U4U92NhAWTlUJKDTHhkeb5vu9mAzLBIAeKvwYktnV8U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IXtimsUXLsqa8ueqNljNu2E4+B8NZk3sWi/RcEoGOS8cb7M6gAOdaOCF+uQ7ituv7
+	 5Bs8cra7EOk8m7rdMtHGaaIgnR6pVIpz+g5NKagIxopfcIyN8scVrE7iLq5MILinOf
+	 V1A6E5PekBW4QFRATIr+8jnXLodPOsen8wo5udg5q+AzkcUna9KPRK4sraFhB/mrmw
+	 4J1BFazSzOtenb8QW+9+C+6butNhlCRgqvpuXTF1ZUXLYMcLmFZWGyld02DgerE3Yr
+	 CegyPGqctYGLduMIj4TmRZiuPK8pruGjytWtsQqTiQL6RgeW/y+DJVMvjL2rkt9Gqg
+	 YFV1Aix1mkN2A==
+Date: Wed, 25 Oct 2023 16:00:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, Willem de Bruijn <willemb@google.com>,
+ syzbot+a8c7be6dee0de1b669cc@syzkaller.appspotmail.com,
+ joonwpark81@gmail.com
+Subject: Re: [PATCH net] llc: verify mac len before reading mac header
+Message-ID: <20231025160016.0ffecfac@kernel.org>
+In-Reply-To: <CAF=yD-L8MobHEPvELTKkvpm4WAZAVPbJKqXnjnkaD7qr32NBEQ@mail.gmail.com>
+References: <20231024194958.3522281-1-willemdebruijn.kernel@gmail.com>
+	<CAF=yD-L8MobHEPvELTKkvpm4WAZAVPbJKqXnjnkaD7qr32NBEQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Long Li <longli@microsoft.com>
+On Tue, 24 Oct 2023 23:12:13 -0400 Willem de Bruijn wrote:
+> Fixes: f83f1768f833 ("[LLC]: skb allocation size for responses")
+> 
+> Can respin if necessary.
+> 
+> At least one of the three eth_hdr uses goes back to before the start
+> of git history.
 
-When a VF is being exposed form the kernel, it should be marked as "slave"
-before exposing to the user-mode. The VF is not usable without netvsc running
-as master. The user-mode should never see a VF without the "slave" flag.
+Right, good enough.
 
-This commit moves the code of setting the slave flag to the time before VF is
-exposed to user-mode.
-
-Signed-off-by: Long Li <longli@microsoft.com>
----
- drivers/net/hyperv/netvsc_drv.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
-index ec77fb9dcf89..045777a4971d 100644
---- a/drivers/net/hyperv/netvsc_drv.c
-+++ b/drivers/net/hyperv/netvsc_drv.c
-@@ -2206,9 +2206,6 @@ static int netvsc_vf_join(struct net_device *vf_netdev,
- 		goto upper_link_failed;
- 	}
- 
--	/* set slave flag before open to prevent IPv6 addrconf */
--	vf_netdev->flags |= IFF_SLAVE;
--
- 	schedule_delayed_work(&ndev_ctx->vf_takeover, VF_TAKEOVER_INT);
- 
- 	call_netdevice_notifiers(NETDEV_JOIN, vf_netdev);
-@@ -2320,11 +2317,9 @@ static struct net_device *get_netvsc_byslot(const struct net_device *vf_netdev)
- 	 */
- 	list_for_each_entry(ndev_ctx, &netvsc_dev_list, list) {
- 		ndev = hv_get_drvdata(ndev_ctx->device_ctx);
--		if (ether_addr_equal(vf_netdev->perm_addr, ndev->perm_addr)) {
--			netdev_notice(vf_netdev,
--				      "falling back to mac addr based matching\n");
-+		if (ether_addr_equal(vf_netdev->perm_addr, ndev->perm_addr) ||
-+		    ether_addr_equal(vf_netdev->dev_addr, ndev->perm_addr))
- 			return ndev;
--		}
- 	}
- 
- 	netdev_notice(vf_netdev,
-@@ -2332,7 +2327,7 @@ static struct net_device *get_netvsc_byslot(const struct net_device *vf_netdev)
- 	return NULL;
- }
- 
--static int netvsc_register_vf(struct net_device *vf_netdev)
-+static int netvsc_register_vf(struct net_device *vf_netdev, unsigned long event)
- {
- 	struct net_device_context *net_device_ctx;
- 	struct netvsc_device *netvsc_dev;
-@@ -2347,6 +2342,12 @@ static int netvsc_register_vf(struct net_device *vf_netdev)
- 	if (!ndev)
- 		return NOTIFY_DONE;
- 
-+	if (event == NETDEV_POST_INIT) {
-+		/* set slave flag before open to prevent IPv6 addrconf */
-+		vf_netdev->flags |= IFF_SLAVE;
-+		return NOTIFY_DONE;
-+	}
-+
- 	net_device_ctx = netdev_priv(ndev);
- 	netvsc_dev = rtnl_dereference(net_device_ctx->nvdev);
- 	if (!netvsc_dev || rtnl_dereference(net_device_ctx->vf_netdev))
-@@ -2753,8 +2754,9 @@ static int netvsc_netdev_event(struct notifier_block *this,
- 		return NOTIFY_DONE;
- 
- 	switch (event) {
-+	case NETDEV_POST_INIT:
- 	case NETDEV_REGISTER:
--		return netvsc_register_vf(event_dev);
-+		return netvsc_register_vf(event_dev, event);
- 	case NETDEV_UNREGISTER:
- 		return netvsc_unregister_vf(event_dev);
- 	case NETDEV_UP:
--- 
-2.34.1
-
+> But the one that syzbot exercises is introduced in this commit.
+> 
+> That commit is old enough (2008), that effectively all stable kernels
+> should receive this. This commit also introduces llc_mac_header_len,
+> which shows at least one valid L2 header that is not an Ethernet
+> header, back in the day:
+> 
+> +#ifdef CONFIG_TR
+> +       case ARPHRD_IEEE802_TR:
+> +               return sizeof(struct trh_hdr);
+> +#endif
+> 
+> But that token ring variant was removed in 2012 in commit 211ed865108e
+> ("net: delete all instances of special processing for token ring").
 
