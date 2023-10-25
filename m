@@ -1,315 +1,263 @@
-Return-Path: <netdev+bounces-44151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F5FD7D6A6B
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 13:53:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D3AF7D6ABA
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 14:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA465B20BE2
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 11:52:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFA621C20D44
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 12:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 157D4273EE;
-	Wed, 25 Oct 2023 11:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB02B27730;
+	Wed, 25 Oct 2023 12:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="iC8lq2Dv"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Cw4gHxjw";
+	dkim=pass (1024-bit key) header.d=microchiptechnology.onmicrosoft.com header.i=@microchiptechnology.onmicrosoft.com header.b="nVWvAcpe"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DAA1118;
-	Wed, 25 Oct 2023 11:52:51 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A607B13D;
-	Wed, 25 Oct 2023 04:52:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=B0EcCnr3vas+zgVEHoguWAMcdMazHG4FiTxiDAXqngI=; b=iC8lq2Dvp6XmmJDKr7oR8L6niC
-	IeJPVZjuaSGR8dhaNEFTcjrNi4O1b+1+EkrkowuJ/iIvQdkJV+qir7gIkJKVfP+fr62Og98RHolor
-	QRfFRma9695Oz6zr93UuRp8UJP+gjwe5TMyL9U1zm4kXw8XM9ydefR8DR/cOMtUCy2O3cVJweamqu
-	7q8NB6aM6leUD7bUVg0dQ1XiXvK6589wSqei92Sr5vloppEw/Y8sgmOuyndSrNzifByCtenXU3PwD
-	WgvPuRvmOgDH8IfiqxI3Df+MCLyzNdBhiVzWmPEhAR4VigGJa7NumXg4+1MTK4UabQE2553xqlvVg
-	MhiVQmuA==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qvcRI-000Ewe-Fd; Wed, 25 Oct 2023 13:52:44 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qvcRI-000SEv-53; Wed, 25 Oct 2023 13:52:44 +0200
-Subject: Re: [PATCH net-next v2 1/2] net, sched: Make tc-related drop reason
- more flexible
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Ido Schimmel <idosch@idosch.org>, kuba@kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, victor@mojatatu.com,
- martin.lau@linux.dev, dxu@dxuuu.xyz, xiyou.wangcong@gmail.com
-References: <20231009092655.22025-1-daniel@iogearbox.net>
- <ZTjY959R+AFXf3Xy@shredder>
- <726368f0-bbe9-6aeb-7007-6f974ed075f2@iogearbox.net>
- <CAM0EoM=L3ft1zuXhMsKq=Z+u7asbvpBL-KJBXLCmHBg=6BLHzQ@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <87dfbac5-695c-7582-cbb5-4d71b6698ab1@iogearbox.net>
-Date: Wed, 25 Oct 2023 13:52:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B70847B;
+	Wed, 25 Oct 2023 12:03:16 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23B3DB0;
+	Wed, 25 Oct 2023 05:03:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1698235393; x=1729771393;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=sZEl9JnMf5CZFQ2vOxcFRb5bZl+MFetO/ACGhZn+FMU=;
+  b=Cw4gHxjwyJAILSB+ctxUbjwwgRONg24K7225SZEfb6z4XAwd3ZJoxWJD
+   Ng6LzijxZyCbpZDEwGRGwqOckaw6wEFpwVDHzVDCRGvisepX+GU7VMTNh
+   BezJwu9kPrh5/DzvmW+40A/KO70QOHQt8pJgHSDSejYgS6PiP9B3Zoj7M
+   HJqqRfQXaED43XwefgL/iRA3E2lQhQFVesRvDkEcp2cWXIcwj7BHWVdry
+   tVh7Sz012DuUJ+r4JB+EzJkdtKRTqfm+yCYk9raFXFQXJNxAuF40NnXhb
+   Z9IABEACnZAWQkx+EJclkJZqfAm9nMkBIDsP00ykWDXiIqe4Br+k9/SED
+   Q==;
+X-CSE-ConnectionGUID: 3UEKfl7ISESICLApQIhgLQ==
+X-CSE-MsgGUID: DDovWjl1RxSgJjZp6/vLeQ==
+X-ThreatScanner-Verdict: Negative
+X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
+   d="scan'208";a="10568989"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Oct 2023 05:03:11 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 25 Oct 2023 05:03:01 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (10.10.215.250)
+ by email.microchip.com (10.10.87.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Wed, 25 Oct 2023 05:03:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gnWYQ+eqwKgYW+0QCYauzEH+UmQ05RWzVY2lCM06je0Sy1pnCu4t3yEsgwVBQrchpJnbJUi9P8h/4T4WmZEqX0khRSXbEisenBVYKCMt/ZcgLneY0S25+VHIES2QFiryKNV+Jaf1ox5M5TX34ZFp7KNiN7G9uM78mX6lNjHqxepqRU5tLTnmAh1Z7dk8azK78p9WB+D0FpbPXp7ZUXTVGO8XUhetAnWEYi/Y+3aNFl3KzjtqJwrpwNvcxE8V1k+qknLFS5PK7/tyOPcTlx+m7WkF8UK++lxAVj7AqpBfTgDsrE978sPmw1VYpHuoCO/shq+Yqz9y3zR8VFOrtGi8ew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sZEl9JnMf5CZFQ2vOxcFRb5bZl+MFetO/ACGhZn+FMU=;
+ b=L+yru1OsqLJ5Z02ygpyDwN6hp6JXbvM6831ICgd5HQjIQX39FcmmxAe5snP+vNsCAAqv1Y1XsbEk8HGQHkex9ww9O8uBvYZD1Y1/tlM3172jswbOW7cfO58HmnD7xtS26rlNu76gStLC2Nh9YSlY7Hv24nap9ZIDY/8SD2kOn6NBduNByJu+PFuoIIlOHmBkeo12XxEFi73HYNHOSD4WWn4oi3mYvJeifwpA772oTlGjoqsRynYlX8WighbprYs0p/rwBtI/udXOIjD9CFZjKUJJwJiq3dZaq4LOSvc3PQiq7hlaBidAPKElWg/B8hIeL+16DHbzyKXP6HCZnLyfmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sZEl9JnMf5CZFQ2vOxcFRb5bZl+MFetO/ACGhZn+FMU=;
+ b=nVWvAcpe2GE/LVAvfZVlZn3vs5zy+CIN8D1UbiTp4y5sLvLHPKUTYAB6R/gJvC4sdVXYM4yJE6YdTnCMjrNJiYv3eKREBygT34fC+G31K2YQ1WRDBLEbid/rAExTg08DJwv82vs1OJkQ+9nK3Rp3SbilSyOWRP0VFJ5KmRrImAk=
+Received: from DM6PR11MB3532.namprd11.prod.outlook.com (2603:10b6:5:70::25) by
+ MW4PR11MB6888.namprd11.prod.outlook.com (2603:10b6:303:22d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Wed, 25 Oct
+ 2023 12:02:58 +0000
+Received: from DM6PR11MB3532.namprd11.prod.outlook.com
+ ([fe80::6352:54f7:6c42:69ef]) by DM6PR11MB3532.namprd11.prod.outlook.com
+ ([fe80::6352:54f7:6c42:69ef%7]) with mapi id 15.20.6907.025; Wed, 25 Oct 2023
+ 12:02:58 +0000
+From: <Parthiban.Veerasooran@microchip.com>
+To: <andrew@lunn.ch>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>, <corbet@lwn.net>,
+	<Steen.Hegelund@microchip.com>, <rdunlap@infradead.org>, <horms@kernel.org>,
+	<casper.casan@gmail.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <Horatiu.Vultur@microchip.com>,
+	<Woojung.Huh@microchip.com>, <Nicolas.Ferre@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>
+Subject: Re: [PATCH net-next v2 3/9] net: ethernet: oa_tc6: implement OA TC6
+ configuration function
+Thread-Topic: [PATCH net-next v2 3/9] net: ethernet: oa_tc6: implement OA TC6
+ configuration function
+Thread-Index: AQHaBchYB3PCp799EEm9bj7uTu4tjLBX/WmAgAJtaIA=
+Date: Wed, 25 Oct 2023 12:02:58 +0000
+Message-ID: <97872e83-1490-4f1a-81ff-3f7692571dd1@microchip.com>
+References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
+ <20231023154649.45931-4-Parthiban.Veerasooran@microchip.com>
+ <423e0b42-a75e-4104-b445-7d9ff0991acf@lunn.ch>
+In-Reply-To: <423e0b42-a75e-4104-b445-7d9ff0991acf@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB3532:EE_|MW4PR11MB6888:EE_
+x-ms-office365-filtering-correlation-id: 9d94beff-c780-41f9-cc84-08dbd5525468
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: zGtJZDg8ldTn6D0IkD0SeATd9Jw2KMOOVUfwNHRvK0p6a0ERaDvt6jYG+E7coR/APGafdE21ELHXXT2XdQG5pwgdQRiks5G7cgFh1v1TgmFPWKGyrakMWDgI9vAtIeFtl7RRPw8zsJrta8u7WqNnVYOfSFir/dpJuX5y3Cywb74/F0P0PWfU9LE0Bb5lgckPkUH75nlLHimYEwirK8zznybhr96zGLZgq+hRh9hggyCOmxu9CcluY05zk+wLaRGwySH3/m0Fcjv0oWlkAntc/SHVyTZ5TFQiKR6Aiz+XJfaNe+YtnUs1qaIHrWT0kCeyzUgUbsAlqllIDOEfiS36AgPrwsMvfj2Ptd6PRR6CNCjJ6lNVauz+3tFmEmN4kWWGiOymfXTlxh4+Uur08+qyDcrJfnPFV/ojvy5a+W8cvXsKB/DlMwQvtVuVJ9qVC6U1CQxniJE9acNYRlPfpPVXiTG4yswUjv3oXzreB9QqTQYMNeJ4uTi6+FZD7cZZf/+ImFwNntcibBMZBV8yOtE03eDPwStsL5RUqTNEticBPEJbSQEfikU9z0sJ4DEXKf2SOeUH51mtR9yWNaKzB38Zn+dUV0P/ijGAdbZa+aCoKiYj6EHrzfEdM2LXGM6rGhHYYMNxX/5t4808pSo24CMGxtPMQtswfiuOFKQpWWXbZ31g0t4axrUIqcrbgDN/6HTA
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3532.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(376002)(396003)(136003)(366004)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(7416002)(71200400001)(5660300002)(64756008)(76116006)(66556008)(41300700001)(86362001)(66946007)(478600001)(66476007)(91956017)(6916009)(31696002)(54906003)(6506007)(6512007)(6486002)(66446008)(316002)(2906002)(4326008)(36756003)(122000001)(38100700002)(8936002)(8676002)(53546011)(2616005)(107886003)(31686004)(38070700009)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?a2wzUWNhVE1CQytGQytVNUhwZHZxWmRocUlocHBKRUJyeFQyWDhXN3VEc1Mz?=
+ =?utf-8?B?ZU84dXZxUGswNzlvMmh4aWVQSjRqdmFFWVg2REdUM3lENXZ3djZ3cWtyVXVC?=
+ =?utf-8?B?bDhCcHppRGZpY2tzektRbGNVU2xnY3RCUW9ud1orTEhjMVVDL0x0c25nZGhB?=
+ =?utf-8?B?TjltdlBnOFZjc3RIUDNzaGppMFMrNXJiQUFGRG5jeUg5V0o0eHdpRjRyaG1m?=
+ =?utf-8?B?cHZIZEYwRjB3TytKTDhncjZxMDJlWUJRWjFGOXlBSVNNQWVWVlkzTjZFZk45?=
+ =?utf-8?B?OGpwdFhxVFd1MThkbWNzcWxXU3lzanZYcjR4SS9ybVNmQ1F2QlFXYTRFUnZ1?=
+ =?utf-8?B?RGIySkhiWm04TFFkU1BHbXRnR2pCL1lUVXJUQlBxSTY2SlBFbVVBcnc4dDVF?=
+ =?utf-8?B?TWFPZ09lTTIxQ3ZaUUZPaUw5aE5Ob1ExTWZDYi9qbWVBZ0hDZ0VSYmI0UDZW?=
+ =?utf-8?B?Zlg1QzlLOHQxRE9HZmxvd2hlbXIybloyQVlJaGtqY1cwMFZnN05aUzdMZk5B?=
+ =?utf-8?B?RlovMy85eHRhclVGdGMxV3QyRXY1L3ArUUNLdG9sN1pJVVZEejQzdnVhSjJR?=
+ =?utf-8?B?K2czVHBYMGwxcWhxNHAwRHZDdm9XdnpPbTRMeVlENTNyRVFtZmdpZ2dCaFJ2?=
+ =?utf-8?B?R0tSVHVnUDhMdXd0eFo3QUxJOEl1Q2t5ejFXbWpDT2h6dmczclczdk9GV1My?=
+ =?utf-8?B?RllMV0Y2cDRNM3BjaUdBR3I5TFA3NlV1M2IxWVVoNXBMYnV2QStCNlgwc05O?=
+ =?utf-8?B?Y25EQkJVODFuMW9sYy92VkNNL0pibkc0cEV5Ynh4aGwrRlZBVXA4Uko2alll?=
+ =?utf-8?B?YzcyUVFxNmZZcStDLzVJUXJTZlRnb3hoMFVkWTRDcFFKbUo4MmgvMStobSta?=
+ =?utf-8?B?R3BJN3VKdDJNVHg5RHVkRXRZc1JkeVIzY1NtUWdYUmVWaXNodllmZkQxYUll?=
+ =?utf-8?B?WDBHdjU2Y2ZQTmJsd1ZYb1paQzlwYTdNL3JoV2hRZGR4c2ZaVktxZk9Mc3hX?=
+ =?utf-8?B?TVd3REF0NGJmUUVCMU1zaXhUYU5nam91RFpVVE0rWGduVGJDR2JDNGw2ZkVJ?=
+ =?utf-8?B?UlNBQ0E2OGpWTlREWE8wYUpMVmhyQ0RBbk1ZUm55eEtDSU9OaXJzbzBqbXEz?=
+ =?utf-8?B?d2VkWjAvZ2k4V3lTZlJ1R3F0bVFDdWV5UUNCb1pkc00yV2dOTXY1algvR3Vk?=
+ =?utf-8?B?NzRVdXpWT0owM1Bzd3phVlZLT1o3anVldHpTZExnaXZmUENXL2tqTFRQdTll?=
+ =?utf-8?B?VVRkMnA4NUdUNXlzYTVObjhOblV0OXVSV2JTQTQvZFpPaUJyUFNvdzczMTZp?=
+ =?utf-8?B?QTNXT1RWNXRBZzlWd1R5NlB4VU5veVFvbVhoTW5RWFk4YXEzU3hWbDdZSTJu?=
+ =?utf-8?B?TVI4WW9zYXdGd042emRIbk5acU5LTlEzQldERkFQeFpKeUtuNkJpL2E2Qjh0?=
+ =?utf-8?B?bVh3YlM4Q0gvK3BSN1JBem5DR1VvZGw5dHpKdGVxYmprdCtCN2lFNkVERlAv?=
+ =?utf-8?B?SUpMelEvcWtwaUQwU1RmMkZxMUdzb2RDZ2l3ZCttOWhXeU1wNiszQnVsUzVi?=
+ =?utf-8?B?OU1zKzlsSVU3eWtLaFF5MGg0ZW1uQmJpLzZmd3JvbmQ3YjNNQWVYZVN1Rkxr?=
+ =?utf-8?B?QUcxRUlsQXRzcTZkdTNxZ2dHSkY0K2RQVUVuekRaSExidUN0Wjg1Q3FUbDkz?=
+ =?utf-8?B?anJpQld3bnJBNGpMVlF1YlFZd3RFRlhsZDNSNGlVMExiK0VNa1pSbjZ1UkxH?=
+ =?utf-8?B?bmlhQVM0S3o5Q1BqbGtEUHNTSXJaS0I1VkF1NUxsQkRpbVVMRUFWd083N1Nw?=
+ =?utf-8?B?WFo1UmZ6WUFxUDFuSnBGNXdDeFpscWZTNkpRcUZXdCtYRnZZLzd5MnJmQVk4?=
+ =?utf-8?B?WmgvQzA5MFk3eDcyV2RJbUNnb3ZDMnZwVVBnTG0wRE1FMFRic00vYTRsV3F0?=
+ =?utf-8?B?NmMwTWJEdzlDdFhGVUFXbVAzKzdwclNxZy9qa2llK0ZqWG41Q1dtRGlmcWlk?=
+ =?utf-8?B?eHlNS29hazZud2krcnFLN2hFU0FRRGFnV2M2ZmN3b1pXdjRtd0E5V25wVDlz?=
+ =?utf-8?B?ZzhSQjlQYXBIa29oL3hXakVma2VKTzFyM3hIcE5oNUVjeXhjN3NyaEtqZ1M3?=
+ =?utf-8?B?UjZmQzRCUzNaZGp6N2xtaTErZ1RrOFFkOEVPdkJYMCtWTWZicEdKb1ZRSDVn?=
+ =?utf-8?B?Wmh3WFZSSXJoMkMzWkJjUGJ0YXVOcTBmQlNLVXJvNmR2dGhHUERSbVNGWGN2?=
+ =?utf-8?Q?svJexPH7qSxQID9Pwtiw3xQ5PilqwVuyxQYrLfs3dM=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EE254A21B84235428F5DB5281B13A228@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAM0EoM=L3ft1zuXhMsKq=Z+u7asbvpBL-KJBXLCmHBg=6BLHzQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27072/Wed Oct 25 09:45:37 2023)
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3532.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d94beff-c780-41f9-cc84-08dbd5525468
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Oct 2023 12:02:58.2680
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0LZENkCAyqxP5NHx5+MpIEu1m1SuYwmAxku6nvgI1C2nNeAnwRXW6YzjKEjhS0kX/MfLdntj5XCwLzEyteCq2d1zQWO/K/YvmZ2cKQmTj5RdZdR1XonpWQz4SukwZlQ8
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6888
 
-On 10/25/23 1:05 PM, Jamal Hadi Salim wrote:
-> On Wed, Oct 25, 2023 at 6:01 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
->> On 10/25/23 10:59 AM, Ido Schimmel wrote:
->>> On Mon, Oct 09, 2023 at 11:26:54AM +0200, Daniel Borkmann wrote:
->>>> diff --git a/net/core/dev.c b/net/core/dev.c
->>>> index 606a366cc209..664426285fa3 100644
->>>> --- a/net/core/dev.c
->>>> +++ b/net/core/dev.c
->>>> @@ -3910,7 +3910,8 @@ EXPORT_SYMBOL_GPL(netdev_xmit_skip_txqueue);
->>>>    #endif /* CONFIG_NET_EGRESS */
->>>>
->>>>    #ifdef CONFIG_NET_XGRESS
->>>> -static int tc_run(struct tcx_entry *entry, struct sk_buff *skb)
->>>> +static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
->>>> +              enum skb_drop_reason *drop_reason)
->>>>    {
->>>>       int ret = TC_ACT_UNSPEC;
->>>>    #ifdef CONFIG_NET_CLS_ACT
->>>> @@ -3922,12 +3923,14 @@ static int tc_run(struct tcx_entry *entry, struct sk_buff *skb)
->>>>
->>>>       tc_skb_cb(skb)->mru = 0;
->>>>       tc_skb_cb(skb)->post_ct = false;
->>>> +    res.drop_reason = *drop_reason;
->>>>
->>>>       mini_qdisc_bstats_cpu_update(miniq, skb);
->>>>       ret = tcf_classify(skb, miniq->block, miniq->filter_list, &res, false);
->>>>       /* Only tcf related quirks below. */
->>>>       switch (ret) {
->>>>       case TC_ACT_SHOT:
->>>> +            *drop_reason = res.drop_reason;
->>>
->>> Daniel,
->>>
->>> Getting the following splat [1] with CONFIG_DEBUG_NET=y and this
->>> reproducer [2]. Problem seems to be that classifiers clear 'struct
->>> tcf_result::drop_reason', thereby triggering the warning in
->>> __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0).
->>>
->>> Fixed by maintaining the original drop reason if the one returned from
->>> tcf_classify() is 'SKB_NOT_DROPPED_YET' [3]. I can submit this fix
->>> unless you have a better idea.
->>
->> Thanks for catching this, looks reasonable to me as a fix.
->>
->>> [1]
->>> WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x38/0x130
->>> Modules linked in:
->>> CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d9582e0 #682
->>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc37 04/01/2014
->>> RIP: 0010:kfree_skb_reason+0x38/0x130
->>> [...]
->>> Call Trace:
->>>    <IRQ>
->>>    __netif_receive_skb_core.constprop.0+0x837/0xdb0
->>>    __netif_receive_skb_one_core+0x3c/0x70
->>>    process_backlog+0x95/0x130
->>>    __napi_poll+0x25/0x1b0
->>>    net_rx_action+0x29b/0x310
->>>    __do_softirq+0xc0/0x29b
->>>    do_softirq+0x43/0x60
->>>    </IRQ>
->>>
->>> [2]
->>> #!/bin/bash
->>>
->>> ip link add name veth0 type veth peer name veth1
->>> ip link set dev veth0 up
->>> ip link set dev veth1 up
->>> tc qdisc add dev veth1 clsact
->>> tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:22:33:44:55 action drop
->>> mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
->>
->> I didn't know you're using mausezahn, nice :)
->>
->>> [3]
->>> diff --git a/net/core/dev.c b/net/core/dev.c
->>> index a37a932a3e14..abd0b13f3f17 100644
->>> --- a/net/core/dev.c
->>> +++ b/net/core/dev.c
->>> @@ -3929,7 +3929,8 @@ static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
->>>           /* Only tcf related quirks below. */
->>>           switch (ret) {
->>>           case TC_ACT_SHOT:
->>> -               *drop_reason = res.drop_reason;
->>> +               if (res.drop_reason != SKB_NOT_DROPPED_YET)
->>> +                       *drop_reason = res.drop_reason;
->>>                   mini_qdisc_qstats_cpu_drop(miniq);
->>>                   break;
->>>           case TC_ACT_OK:
->>>
-> 
-> Out of curiosity - how does the policy say "drop" but drop_reason does
-> not reflect it?
-
-Ido, Jamal, wdyt about this alternative approach - these were the locations I could
-find from an initial glance (compile-tested) :
-
- From a3d46a55aac484372b60b783cb6a3c98a0fef75c Mon Sep 17 00:00:00 2001
-From: Daniel Borkmann <daniel@iogearbox.net>
-Date: Wed, 25 Oct 2023 11:43:44 +0000
-Subject: [PATCH] net, sched: fix..
-
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
-  include/net/pkt_cls.h    | 12 ++++++++++++
-  net/sched/cls_basic.c    |  2 +-
-  net/sched/cls_bpf.c      |  2 +-
-  net/sched/cls_flower.c   |  2 +-
-  net/sched/cls_fw.c       |  2 +-
-  net/sched/cls_matchall.c |  2 +-
-  net/sched/cls_route.c    |  4 ++--
-  net/sched/cls_u32.c      |  2 +-
-  8 files changed, 20 insertions(+), 8 deletions(-)
-
-diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-index a76c9171db0e..31d8e8587824 100644
---- a/include/net/pkt_cls.h
-+++ b/include/net/pkt_cls.h
-@@ -160,6 +160,18 @@ static inline void tcf_set_drop_reason(struct tcf_result *res,
-  	res->drop_reason = reason;
-  }
-
-+static inline void tcf_set_result(struct tcf_result *to,
-+				  const struct tcf_result *from)
-+{
-+	/* tcf_result's drop_reason which is the last member must be
-+	 * preserved and cannot be copied from the cls'es tcf_result
-+	 * template given this is carried all the way and potentially
-+	 * set to a concrete tc drop reason upon error or intentional
-+	 * drop. See tcf_set_drop_reason() locations.
-+	 */
-+	memcpy(to, from, offsetof(typeof(*to), drop_reason));
-+}
-+
-  static inline void
-  __tcf_bind_filter(struct Qdisc *q, struct tcf_result *r, unsigned long base)
-  {
-diff --git a/net/sched/cls_basic.c b/net/sched/cls_basic.c
-index 1b92c33b5f81..d7ead3fc3c45 100644
---- a/net/sched/cls_basic.c
-+++ b/net/sched/cls_basic.c
-@@ -50,7 +50,7 @@ TC_INDIRECT_SCOPE int basic_classify(struct sk_buff *skb,
-  		if (!tcf_em_tree_match(skb, &f->ematches, NULL))
-  			continue;
-  		__this_cpu_inc(f->pf->rhit);
--		*res = f->res;
-+		tcf_set_result(res, &f->res);
-  		r = tcf_exts_exec(skb, &f->exts, res);
-  		if (r < 0)
-  			continue;
-diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
-index 382c7a71f81f..e4620a462bc3 100644
---- a/net/sched/cls_bpf.c
-+++ b/net/sched/cls_bpf.c
-@@ -124,7 +124,7 @@ TC_INDIRECT_SCOPE int cls_bpf_classify(struct sk_buff *skb,
-  			res->class   = 0;
-  			res->classid = filter_res;
-  		} else {
--			*res = prog->res;
-+			tcf_set_result(res, &prog->res);
-  		}
-
-  		ret = tcf_exts_exec(skb, &prog->exts, res);
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index e5314a31f75a..eb94090fb26c 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -341,7 +341,7 @@ TC_INDIRECT_SCOPE int fl_classify(struct sk_buff *skb,
-
-  		f = fl_mask_lookup(mask, &skb_key);
-  		if (f && !tc_skip_sw(f->flags)) {
--			*res = f->res;
-+			tcf_set_result(res, &f->res);
-  			return tcf_exts_exec(skb, &f->exts, res);
-  		}
-  	}
-diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
-index c49d6af0e048..70b873f8771f 100644
---- a/net/sched/cls_fw.c
-+++ b/net/sched/cls_fw.c
-@@ -63,7 +63,7 @@ TC_INDIRECT_SCOPE int fw_classify(struct sk_buff *skb,
-  		for (f = rcu_dereference_bh(head->ht[fw_hash(id)]); f;
-  		     f = rcu_dereference_bh(f->next)) {
-  			if (f->id == id) {
--				*res = f->res;
-+				tcf_set_result(res, &f->res);
-  				if (!tcf_match_indev(skb, f->ifindex))
-  					continue;
-  				r = tcf_exts_exec(skb, &f->exts, res);
-diff --git a/net/sched/cls_matchall.c b/net/sched/cls_matchall.c
-index c4ed11df6254..a4018db80a60 100644
---- a/net/sched/cls_matchall.c
-+++ b/net/sched/cls_matchall.c
-@@ -37,7 +37,7 @@ TC_INDIRECT_SCOPE int mall_classify(struct sk_buff *skb,
-  	if (tc_skip_sw(head->flags))
-  		return -1;
-
--	*res = head->res;
-+	tcf_set_result(res, &head->res);
-  	__this_cpu_inc(head->pf->rhit);
-  	return tcf_exts_exec(skb, &head->exts, res);
-  }
-diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
-index 1424bfeaca73..cbfaa1d1820f 100644
---- a/net/sched/cls_route.c
-+++ b/net/sched/cls_route.c
-@@ -109,7 +109,7 @@ static inline int route4_hash_wild(void)
-
-  #define ROUTE4_APPLY_RESULT()					\
-  {								\
--	*res = f->res;						\
-+	tcf_set_result(res, &f->res);				\
-  	if (tcf_exts_has_actions(&f->exts)) {			\
-  		int r = tcf_exts_exec(skb, &f->exts, res);	\
-  		if (r < 0) {					\
-@@ -152,7 +152,7 @@ TC_INDIRECT_SCOPE int route4_classify(struct sk_buff *skb,
-  			goto failure;
-  		}
-
--		*res = f->res;
-+		tcf_set_result(res, &f->res);
-  		spin_unlock(&fastmap_lock);
-  		return 0;
-  	}
-diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-index 6663e971a13e..f50ae40a29d5 100644
---- a/net/sched/cls_u32.c
-+++ b/net/sched/cls_u32.c
-@@ -172,7 +172,7 @@ TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *skb,
-  check_terminal:
-  			if (n->sel.flags & TC_U32_TERMINAL) {
-
--				*res = n->res;
-+				tcf_set_result(res, &n->res);
-  				if (!tcf_match_indev(skb, n->ifindex)) {
-  					n = rcu_dereference_bh(n->next);
-  					goto next_knode;
--- 
-2.34.1
-
+SGkgQW5kcmV3LA0KDQpPbiAyNC8xMC8yMyA0OjI4IGFtLCBBbmRyZXcgTHVubiB3cm90ZToNCj4g
+RVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVu
+bGVzcyB5b3Uga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+IA0KPj4gKyAgICAgLyogUmVhZCBh
+bmQgY29uZmlndXJlIHRoZSBJTUFTSzAgcmVnaXN0ZXIgZm9yIHVubWFza2luZyB0aGUgaW50ZXJy
+dXB0cyAqLw0KPj4gKyAgICAgcmV0ID0gb2FfdGM2X3BlcmZvcm1fY3RybCh0YzYsIElNQVNLMCwg
+JnJlZ3ZhbCwgMSwgZmFsc2UsIGZhbHNlKTsNCj4+ICsgICAgIGlmIChyZXQpDQo+PiArICAgICAg
+ICAgICAgIHJldHVybiByZXQ7DQo+IA0KPiBDYW4geW91IHVzZSBvYV90YzZfcmVhZF9yZWdpc3Rl
+cigpIGhlcmU/IEkgZ3Vlc3MgdGhlIHF1ZXN0aW9uIGlzLCB3aGF0DQo+IGRvZXMgdGM2LT5wcm90
+ZWN0IGRlZmF1bHQgdG8gdW50aWwgaXQgaXMgc2V0IGxhdGVyIGluIHRoaXMgZnVuY3Rpb24/DQo+
+IFNvIGxvbmcgYXMgaXQgZGVmYXVsdHMgdG8gZmFsc2UsIGkgZ3Vlc3MgeW91IGNhbiB1c2UgdGhl
+IHJlZ2lzdGVyDQo+IHJlYWQvd3JpdGUgZnVuY3Rpb25zLCB3aGljaCBhcmUgYSBsb3QgbW9yZSBy
+ZWFkYWJsZSB0aGFuIHRoaXMgZ2VuZXJpYw0KPiBvYV90YzZfcGVyZm9ybV9jdHJsKCkuDQpZZXMs
+IEkgd2lsbCBkbyB0aGF0LiBBbHNvIGZvciBuZXh0IHR3byBjYWxscyBhcyB3ZWxsLg0KPiANCj4+
+ICsNCj4+ICsgICAgIHJlZ3ZhbCAmPSB+KFRYUEVNICYgVFhCT0VNICYgVFhCVUVNICYgUlhCT0VN
+ICYgTE9GRU0gJiBIRFJFTSk7DQo+PiArDQo+PiArICAgICByZXQgPSBvYV90YzZfcGVyZm9ybV9j
+dHJsKHRjNiwgSU1BU0swLCAmcmVndmFsLCAxLCB0cnVlLCBmYWxzZSk7DQo+PiArICAgICBpZiAo
+cmV0KQ0KPj4gKyAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KPj4gKw0KPj4gKyAgICAgLyogUmVh
+ZCBTVERDQVAgcmVnaXN0ZXIgdG8gZ2V0IHRoZSBNQUMtUEhZIHN0YW5kYXJkIGNhcGFiaWxpdGll
+cyAqLw0KPj4gKyAgICAgcmV0ID0gb2FfdGM2X3BlcmZvcm1fY3RybCh0YzYsIFNURENBUCwgJnJl
+Z3ZhbCwgMSwgZmFsc2UsIGZhbHNlKTsNCj4+ICsgICAgIGlmIChyZXQpDQo+PiArICAgICAgICAg
+ICAgIHJldHVybiByZXQ7DQo+PiArDQo+PiArICAgICBtaW5jcHMgPSBGSUVMRF9HRVQoTUlOQ1BT
+LCByZWd2YWwpOw0KPj4gKyAgICAgY3RjID0gKHJlZ3ZhbCAmIENUQykgPyB0cnVlIDogZmFsc2U7
+DQo+PiArDQo+PiArICAgICByZWd2YWwgPSAwOw0KPj4gKyAgICAgb2Ffbm9kZSA9IG9mX2dldF9j
+aGlsZF9ieV9uYW1lKHNwaS0+ZGV2Lm9mX25vZGUsICJvYS10YzYiKTsNCj4+ICsgICAgIGlmIChv
+YV9ub2RlKSB7DQo+PiArICAgICAgICAgICAgIC8qIFJlYWQgT0EgcGFyYW1ldGVycyBmcm9tIERU
+ICovDQo+PiArICAgICAgICAgICAgIGlmIChvZl9wcm9wZXJ0eV9wcmVzZW50KG9hX25vZGUsICJv
+YS1jcHMiKSkgew0KPj4gKyAgICAgICAgICAgICAgICAgICAgIHJldCA9IG9mX3Byb3BlcnR5X3Jl
+YWRfdTMyKG9hX25vZGUsICJvYS1jcHMiLCAmdGM2LT5jcHMpOw0KPiANCj4gSWYgb2ZfcHJvcGVy
+dHlfcmVhZF91MzIoKSBkb2VzIG5vdCBmaW5kIHRoZSBwcm9wZXJ0eSwgaXQgaXMgZG9jdW1lbnRl
+ZA0KPiB0byBub3QgdG91Y2ggdGM2LT5jcHMuIFNvIHlvdSBjYW4gc2V0IHRjNi0+Y3BzIHRvIHRo
+ZSBkZWZhdWx0IDY0LA0KPiBiZWZvcmUgdGhlIGJpZyBpZiwgYW5kIHNraXAgdGhlIG9mX3Byb3Bl
+cnR5X3ByZXNlbnQoKS4gWW91IGNhbiB0aGVuDQo+IHByb2JhYmx5IHJlbW92ZSB0aGUgZWxzZSBh
+dCB0aGUgZW5kIGFzIHdlbGwuDQpBaCBvaywgd2lsbCBkbyB0aGF0Lg0KPiANCj4+ICsgICAgICAg
+ICAgICAgICAgICAgICBpZiAocmV0IDwgMCkNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIHJldHVybiByZXQ7DQo+PiArICAgICAgICAgICAgICAgICAgICAgLyogUmV0dXJuIGVycm9y
+IGlmIHRoZSBjb25maWd1cmVkIGNwcyBpcyBsZXNzIHRoYW4gdGhlDQo+PiArICAgICAgICAgICAg
+ICAgICAgICAgICogbWluaW11bSBjcHMgc3VwcG9ydGVkIGJ5IHRoZSBNQUMtUEhZLg0KPj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAqLw0KPj4gKyAgICAgICAgICAgICAgICAgICAgIGlmICh0YzYt
+PmNwcyA8IG1pbmNwcykNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiAt
+RU5PREVWOw0KPiANCj4gQSBkZXZfZXJyKCkgd291bGQgYmUgbmljZSBoZXJlIHRvIGluZGljYXRl
+IHdoeS4NCk9rIHN1cmUuDQo+IA0KPj4gKyAgICAgICAgICAgICB9IGVsc2Ugew0KPj4gKyAgICAg
+ICAgICAgICAgICAgICAgIHRjNi0+Y3BzID0gNjQ7DQo+PiArICAgICAgICAgICAgIH0NCj4+ICsg
+ICAgICAgICAgICAgaWYgKG9mX3Byb3BlcnR5X3ByZXNlbnQob2Ffbm9kZSwgIm9hLXR4Y3RlIikp
+IHsNCj4+ICsgICAgICAgICAgICAgICAgICAgICAvKiBSZXR1cm4gZXJyb3IgaWYgdGhlIHR4IGN1
+dCB0aHJvdWdoIG1vZGUgaXMgY29uZmlndXJlZA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAq
+IGJ1dCBpdCBpcyBub3Qgc3VwcG9ydGVkIGJ5IE1BQy1QSFkuDQo+PiArICAgICAgICAgICAgICAg
+ICAgICAgICovDQo+PiArICAgICAgICAgICAgICAgICAgICAgaWYgKGN0YykNCj4+ICsgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHJlZ3ZhbCB8PSBUWENURTsNCj4+ICsgICAgICAgICAgICAg
+ICAgICAgICBlbHNlDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gLUVO
+T0RFVjsNCj4gDQo+IGFuZCBhIGRldl9lcnIoKSBoZXJlIGFzIHdlbGwuDQpPayBzdXJlLg0KPiAN
+Cj4+ICsgICAgICAgICAgICAgfQ0KPj4gKyAgICAgICAgICAgICBpZiAob2ZfcHJvcGVydHlfcHJl
+c2VudChvYV9ub2RlLCAib2EtcnhjdGUiKSkgew0KPj4gKyAgICAgICAgICAgICAgICAgICAgIC8q
+IFJldHVybiBlcnJvciBpZiB0aGUgcnggY3V0IHRocm91Z2ggbW9kZSBpcyBjb25maWd1cmVkDQo+
+PiArICAgICAgICAgICAgICAgICAgICAgICogYnV0IGl0IGlzIG5vdCBzdXBwb3J0ZWQgYnkgTUFD
+LVBIWS4NCj4+ICsgICAgICAgICAgICAgICAgICAgICAgKi8NCj4+ICsgICAgICAgICAgICAgICAg
+ICAgICBpZiAoY3RjKQ0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVndmFsIHw9
+IFJYQ1RFOw0KPj4gKyAgICAgICAgICAgICAgICAgICAgIGVsc2UNCj4+ICsgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIHJldHVybiAtRU5PREVWOw0KPj4gKyAgICAgICAgICAgICB9DQo+IA0K
+PiBhbmQgYW5vdGhlciBkZXZfZXJyKCkuIFdpdGhvdXQgdGhlc2UgcHJpbnRzLCB5b3UgcHJvYmFi
+bHkgbmVlZCB0bw0KPiBtb2RpZnkgdGhlIGNvZGUgdG8gZmlndXJlIG91dCB3aHkgdGhlIHByb2Jl
+IGZhaWxlZC4NClllcyBJIHVuZGVyc3RhbmQuIFdpbGwgZG8gdGhhdCBpbiB0aGUgbmV4dCByZXZp
+c2lvbi4NCj4gDQo+PiArICAgICAgICAgICAgIGlmIChvZl9wcm9wZXJ0eV9wcmVzZW50KG9hX25v
+ZGUsICJvYS1wcm90ZSIpKSB7DQo+PiArICAgICAgICAgICAgICAgICAgICAgcmVndmFsIHw9IFBS
+T1RFOw0KPj4gKyAgICAgICAgICAgICAgICAgICAgIHRjNi0+cHJvdGUgPSB0cnVlOw0KPj4gKyAg
+ICAgICAgICAgICB9DQo+PiArICAgICB9IGVsc2Ugew0KPj4gKyAgICAgICAgICAgICB0YzYtPmNw
+cyA9IDY0Ow0KPj4gKyAgICAgfQ0KPj4gKw0KPj4gKyAgICAgcmVndmFsIHw9IEZJRUxEX1BSRVAo
+Q1BTLCBpbG9nMih0YzYtPmNwcykgLyBpbG9nMigyKSkgfCBTWU5DOw0KPj4gKw0KPj4gKyAgICAg
+cmV0dXJuIG9hX3RjNl9wZXJmb3JtX2N0cmwodGM2LCBDT05GSUcwLCAmcmVndmFsLCAxLCB0cnVl
+LCBmYWxzZSk7DQo+PiArfQ0KPj4gKw0KPj4gICBzdGF0aWMgaW50IG9hX3RjNl9zd19yZXNldChz
+dHJ1Y3Qgb2FfdGM2ICp0YzYpDQo+PiAgIHsNCj4+ICAgICAgICB1MzIgcmVndmFsOw0KPj4gQEAg
+LTMxMCw3ICszODcsNyBAQCBFWFBPUlRfU1lNQk9MX0dQTChvYV90YzZfcmVhZF9yZWdpc3RlcnMp
+Ow0KPj4gICAgKiBSZXR1cm5zIHBvaW50ZXIgcmVmZXJlbmNlIHRvIHRoZSBvYV90YzYgc3RydWN0
+dXJlIGlmIGFsbCB0aGUgbWVtb3J5DQo+PiAgICAqIGFsbG9jYXRpb24gc3VjY2VzcyBvdGhlcndp
+c2UgTlVMTC4NCj4+ICAgICovDQo+PiAtc3RydWN0IG9hX3RjNiAqb2FfdGM2X2luaXQoc3RydWN0
+IHNwaV9kZXZpY2UgKnNwaSwgYm9vbCBwcm90ZSkNCj4+ICtzdHJ1Y3Qgb2FfdGM2ICpvYV90YzZf
+aW5pdChzdHJ1Y3Qgc3BpX2RldmljZSAqc3BpKQ0KPiANCj4gV2FzIHRoZXJlIGEgcmVhc29uIHRv
+IGhhdmUgcHJvdGUgaW5pdGlhbGx5LCBhbmQgdGhlbiByZW1vdmUgaXQgaGVyZT8NClRoZSByZWFz
+b24gaXMsIGNvbnRyb2wgY29tbXVuaWNhdGlvbiB1c2VzICJwcm90ZWN0Ii4gQnV0IGluIHRoZSBm
+aXJzdCANCnBhdGNoIHRoZXJlIHdhcyBubyBkdCB1c2VkLiBMYXRlciBpbiB0aGlzIHBhdGNoLCBk
+dCB1c2VkIGZvciBhbGwgdGhlIA0KY29uZmlndXJhdGlvbiBwYXJhbWV0ZXJzIGFuZCB0aGlzIGFs
+c28gcGFydCBvZiB0aGF0LiBUaGF0J3Mgd2h5IHJlbW92ZWQgDQphbmQgbW92ZWQgdGhpcyB0byBk
+dCBjb25maWd1cmF0aW9uLg0KDQpXaGF0J3MgeW91ciBvcGluaW9uPyBzaGFsbCBJIGtlZXAgYXMg
+aXQgaXMgbGlrZSB0aGlzPyBvciByZW1vdmUgdGhlIA0KcHJvdGVjdCBpbiB0aGUgZmlyc3QgdHdv
+IHBhdGNoZXMgYW5kIGludHJvZHVjZSBpbiB0aGlzIHBhdGNoPw0KDQpCZXN0IFJlZ2FyZHMsDQpQ
+YXJ0aGliYW4gVg0KPiANCj4gICAgICBBbmRyZXcNCg0K
 
