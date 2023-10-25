@@ -1,213 +1,216 @@
-Return-Path: <netdev+bounces-44261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A8387D766D
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:12:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A6337D7679
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:17:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 513791C20AB7
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 21:12:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BC7A281D2B
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 21:17:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE05328C8;
-	Wed, 25 Oct 2023 21:12:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368FF3398E;
+	Wed, 25 Oct 2023 21:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JlyYePMj"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="jh9Gytuw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C9012B6D
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 21:12:03 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5974A184
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 14:12:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698268322; x=1729804322;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=p3iymF7QdwqWkpLA29x+B4tb8nQGdhzYEOYh1UR9NrM=;
-  b=JlyYePMjvKcxKwjDuojUbhy/HIbIWqnHrGKDA6orWo1sJ2SVuvImtmn/
-   ng4Ll6i2FRxJcBQzidcPsAFVYcQFvcQGFTOt6GdHFaHjK0b2QZBPaeY3d
-   gIjG2OLsxHtt2kEUdOAgdjW75nTriW6vaVC3c2qin8ISPZI6zE/7oa8xK
-   xQniTJmi0W0bIag+tEQOwkNN4Y+3GNaS9WwI3cus8ya8khX7mNEdHSvj2
-   DtLdF3ZZ4MBotpgTr1osAJqRpPpFvmCxmZBij44BHU1GsmM5IaFJ7LgOX
-   7qp6IrboRTquwmPmS3SVX0O7IsjuEtTthbcvGRsJaTg0coI80dBJS1Bij
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="377769752"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="377769752"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 14:12:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="788253656"
-X-IronPort-AV: E=Sophos;i="6.03,250,1694761200"; 
-   d="scan'208";a="788253656"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Oct 2023 14:12:01 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Wed, 25 Oct 2023 14:12:01 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 25 Oct 2023 14:12:00 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Wed, 25 Oct 2023 14:12:00 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 25 Oct 2023 14:12:00 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B78C12B6D;
+	Wed, 25 Oct 2023 21:17:07 +0000 (UTC)
+Received: from DM6FTOPR00CU001.outbound.protection.outlook.com (mail-centralusazon11020003.outbound.protection.outlook.com [52.101.61.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3360012A;
+	Wed, 25 Oct 2023 14:17:05 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PeWuy7PSvtDqsApbdp4dQyKuQPlXqu3+4VEIxDcBzYfGgwJXOAC+IuqOKthFQTcUXHaQlo+fR5QIQhgpXBlRPZgUVWFVa6ZIM3ofIsSEOMCoqKbROwzf63VXMcswbHJU5hwmngTx2HloAZLcWY3mS60XKJnXPPvXU/SXCn+q3FzOEylMZ3CM9cAy26SUk2Tao903mbZ0hDkCawflGjJT33nyf6DpyxOWktK/N9Zh67iGXk5oidCjV+Dx5Qiylg7QWJLfATdkvYJsSG3URB1h3eqYuocSn1hlHXVwvMjSox1aJBUVpPxQ5cLoxZocexuzAw5PrFDG6BgtK765GVJvCQ==
+ b=cLyVX+idSIaHE8YU4gYBCuW+xDx/DdoCPCOVuknIMlU1Lp8TzyqwP857wtmF0wKrro55bBPKJKgBgwcVPiWztKjpgv8kG0CL1cztusIQK/tqUYsXqdb4RdnSqqtqIntp1HzbYq/cfVJ8P4BVhfVEf+qYYzV+55zmHqgdAV/U5bYoEUepPIEkcvYo2G4yHn7nB0X2kp3JBNot3fS7EQ6grOSeOwJYGbyoinFd6RC6U/gxRddLcJSeSvAdPrgkz0Ip1UnvFC5QWum92U83nfeBh4cuI5+NtQnh+iJqMA0ijEkME1fc9brV9oOz+qq8AOS8/V4l8dFWlHyDNOJfYYmGNg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tpnqDTcMWIsiT8+sWBhX/urF83hYbHuL4o5oOO9xYWs=;
- b=djt7WfLMAIY2+gcebfLjzlhtDEYqM0hH5xc0yBJ5aeXjQ5a0y2WbF3MHlZBU35LQUgsAuAbiROmohJtPbYR8B04UFsTQirfngVCydGjrrdSsMSeyfRyucx+4G8PhevOdWMfLAVk3Z5HTHSEBG3HH0HRL2a7uzupLmQ/w4km8GLtJOpLCUhwS4QheGe2q6UZvFOdEgdlvui/bZVdNKCSBIHRrnBpLvRtCkgBGSWWenmu7j8SCi42u8/zfZKjRecH4NE6k7DHthB401yVt//CdKoz9DR651yuicCQUxDlarireiIYuL9ohlzBWLA0tC8pUgJz+8HeHYBaOeImilXnXAg==
+ bh=nH4MiJJ/ZgiMCLMDjIknvzzzxIedakAzBwKHVsmWbT4=;
+ b=OXHciexH3oxHXn2N0gWKkd4rBvC6nb6hZd7SZNSTiYkzmYgezc8Q7ySGsIJHxHF+QLs0rs01kmhBMWdgl2N30fs1UzJQJtCx1iKC58lCFGWPmcaxEKg7z90rWd7s7ymA4vDAIRWU/8PC59+TPi6nPA5aqePbwT6r2p1j4Gt64YeUDrWgwJ4xOmiMOIrjWX66oVpqIax785+BA+2GcFFx0yJ9rl6+fKw46EsF+souzNcDCF2W2oQXO3CMFNQA2oUeO+TaHXvdD39kIfQUc95pEA41QTigYWNxGexDwaY05CZgyBPhKAclFNK3ztry2iAmHes5i2iRmI0yl2o+aFJy7w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM6PR11MB4218.namprd11.prod.outlook.com (2603:10b6:5:201::15)
- by BL1PR11MB5256.namprd11.prod.outlook.com (2603:10b6:208:30a::10) with
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nH4MiJJ/ZgiMCLMDjIknvzzzxIedakAzBwKHVsmWbT4=;
+ b=jh9Gytuw+2ZkZ9jekibbSOe1gD1kj89KWsPtmMaOJat5wRWhBA10U5QJKTKR2nPjeWvxjS9f7LweA3Cd+fC46QQWvS3wgIiWbqOKDWvmjJSs7DH1Yy/4Kd/1BPhM3yja/AXPClOlWc+eFYQBgoS/UrGvTv9tFPp8O/4DiECS4DY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+Received: from BY5PR21MB1443.namprd21.prod.outlook.com (2603:10b6:a03:21f::18)
+ by CY5PR21MB3614.namprd21.prod.outlook.com (2603:10b6:930:d::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Wed, 25 Oct
- 2023 21:11:58 +0000
-Received: from DM6PR11MB4218.namprd11.prod.outlook.com
- ([fe80::1c69:1b8b:5fd7:2e93]) by DM6PR11MB4218.namprd11.prod.outlook.com
- ([fe80::1c69:1b8b:5fd7:2e93%3]) with mapi id 15.20.6907.032; Wed, 25 Oct 2023
- 21:11:58 +0000
-From: "Brelinski, Tony" <tony.brelinski@intel.com>
-To: "Greenwalt, Paul" <paul.greenwalt@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "andrew@lunn.ch" <andrew@lunn.ch>, "Greenwalt, Paul"
-	<paul.greenwalt@intel.com>, "Nowlin, Dan" <dan.nowlin@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Chmielewski, Pawel"
-	<pawel.chmielewski@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "horms@kernel.org" <horms@kernel.org>, "Olech,
- Milena" <milena.olech@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH net-next v5 1/6] ice: Add E830 device
- IDs, MAC type and registers
-Thread-Topic: [Intel-wired-lan] [PATCH net-next v5 1/6] ice: Add E830 device
- IDs, MAC type and registers
-Thread-Index: AQHaAhpdYGsXO3GNgk6q5D6TSsldz7BbC3Pw
-Date: Wed, 25 Oct 2023 21:11:58 +0000
-Message-ID: <DM6PR11MB4218FA73D2FA6567EC6B168482DEA@DM6PR11MB4218.namprd11.prod.outlook.com>
-References: <20231018231643.2356-1-paul.greenwalt@intel.com>
- <20231018231643.2356-2-paul.greenwalt@intel.com>
-In-Reply-To: <20231018231643.2356-2-paul.greenwalt@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB4218:EE_|BL1PR11MB5256:EE_
-x-ms-office365-filtering-correlation-id: 9186e961-31c7-4377-c26b-08dbd59f061a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: KC05TZXvrddYDHwi0m2vZZFQy8+dQFfQ/+xyFrZk2WO+D14mP147zpu4BOwII49LCn/T5cpdJHZ/CU9pjd21cshlObDejkFFY8psygn1e4J7p2Nd6OhMtMwThk32NgJp4SXFGtMkPCRGmKLU0K3PmatLR3/96RjlbdTlIbSJpn3GG+PRRkpe8xe8V5upzgb/xy9AKQsssXcHcEbc4618ehXIVvH3zG/6A0Cs3x/AjfQJ27oPrfZDuc34AqDxiUM89QRKKK0jHwCkj+xQbKQwHIP0OT/XxsFuyIM1uWcl0wwIy2FWcmcK5h1uTK1NCcPDPUX0P8AD2wkGgh2otjwtPtt3Pzx4NdKeHc4v7soGT7Ce4RiPNrdXAqJ9vC+x1UWAsi0CixByE/hFypWPp2nOL70hFOnmI8xTwffTYBSO2bwTsgm7phJ04Aym5qlU8a0rGadsa6/x5GL3S24e8Br4OwY4OyCwebEGeY/zFzoQMgcZfcmSTnzNSgjd0p4Ce9T9Kzf4FPZUmgLLOCxFzYrxYjCEoPfF85BNlIvheytdLCbydsF0S4aNiRtw250fSyitqW2B0396AlH2VVsK8XF6WyqPDHLthqF7qOBNh1T2iTBj4R1TfovigEXx/d2RQ9pZ
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4218.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(366004)(396003)(346002)(39860400002)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(38070700009)(2906002)(53546011)(55016003)(478600001)(5660300002)(38100700002)(4326008)(8936002)(8676002)(41300700001)(66446008)(52536014)(66476007)(33656002)(66946007)(6506007)(86362001)(54906003)(71200400001)(110136005)(26005)(7696005)(9686003)(66556008)(107886003)(76116006)(82960400001)(122000001)(64756008)(83380400001)(316002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GBhaqbGIZYw4txVLEqldtPm40J12Ktoz+emnVfXVMSdIqQGCGozsm5FbR/J2?=
- =?us-ascii?Q?UoRZbL7iNYdX61IYygZ9RcVq7Twn+FnHMWUXcB4cqeZ823zN7jLoISI191p5?=
- =?us-ascii?Q?/5v2Jh3z+FQc37eOCty7JUuGdqGNYOPXkfV6y6OSITwVjAmVRBqId4FttdUg?=
- =?us-ascii?Q?p4b19cKP8MxtYn8v7FcjmFLtxZlxfoFYYgp91omnXS12iptUcObcC2EmIUl4?=
- =?us-ascii?Q?JRpmdjh4nlSwqtZnUpAT3Sr1AB6MFdI5mnTNhLlFUzzy2av6m5pkmouDfSKB?=
- =?us-ascii?Q?Y11KKuYBZTCJnhzjGFh1yNacxdkf9VNeNQevK8JhL56o2Y/vfGMucuNYLzHM?=
- =?us-ascii?Q?unh7WJDcvc1OIg4hCXFZb1TxupKmidminlZvpwH9baJxss1dM/n7GDoIunau?=
- =?us-ascii?Q?oMar1IVekCX3en6Aet53xe3SdrNmHabIRPr8r01gGDLVBEswb1yPY1m5VeXh?=
- =?us-ascii?Q?WGKAZSKiseelbCJB3WRix6G8T6ZInKArC5/OENWpbtIlyYIM/lXEp0C5aOFS?=
- =?us-ascii?Q?eooIS5TrcuSTAWnrdaEjANRd9qvB1rmSawKRfBJV/O/qi4Ubie0/USwtoOqt?=
- =?us-ascii?Q?K1uubEFFxC7AoTZ6c4cIS0gqzXU6WOey4fYZNaCoPtG6as4iwpEeaYwK41Bu?=
- =?us-ascii?Q?ToNthi6dFWVMXH3EetKFyMBT282A6yoaHk10kfX1axVBYTMK5q2Pi6/0phjq?=
- =?us-ascii?Q?TumvqPdyMMz4RegAN/TFCWcxSgVVfiLNgQjKGqMo/78M7I7I3TsIG1c3XATr?=
- =?us-ascii?Q?BJSRmPsgGIIIEryINkLXTnT/Ufu+ZDGOhtOkSe0zIycZ9DOtAisBisdUyDrE?=
- =?us-ascii?Q?VT5jbcTlV932+vgfAii4rEGuCdNuq26t/W1UhtXmVQiQAMp4I770wgrHFkK0?=
- =?us-ascii?Q?004khjd9kTucMYR5/tPK0ujql/B1hvSywSrfc3ZuXZ2D9Pjbm0J10FVsoUur?=
- =?us-ascii?Q?0m9HzYPoWADhHSx6HROyOH6yz3S/pQug3VD421hil7P0MGm1quNbYVD8YjUU?=
- =?us-ascii?Q?OdMtCalPZBGZ/RPuRfk/mgFENgWN+7HXlHvDJxOlaISn9ErTb6CZ/QXAIADz?=
- =?us-ascii?Q?1QwF1rIzm93rIdiofBxVwv0KgZnHFdxnwVSDU59lioC0AbQgRoz47gKOa4R5?=
- =?us-ascii?Q?ZsK3gxa7SoKp6dZbAjmtRvjo8X/YXFrninTMcBWVX+3ne5voFEYhKQ+O7JdI?=
- =?us-ascii?Q?pw6b/c3WoSIToMuh8rHVI/6eIOFMLWgGXvtVeuHli2c9fl1tVPbl8J9F7YEn?=
- =?us-ascii?Q?W0ps801+FQSAtQKsnyUaVFeIvyApWfHbR0W/nj1DTuXw11OpbgTmwSZ9L6QV?=
- =?us-ascii?Q?0tzlOa/I0MPXhfrO7CnoLzWGQF7j/6sP1/wkTRV7GlJCsqj3zHfNIzHt5syq?=
- =?us-ascii?Q?AvH8WQgiDNDfnQ1CKRldnxy8NqUecL6YcUzAREGJTamsdXuzWtEBZUdiHkRV?=
- =?us-ascii?Q?jVzvT96R5qiY87gAV50kcpNoCz7TB6yXp8JBLVvgyceJlzE3vME7qRGJCOBP?=
- =?us-ascii?Q?4E46xnyiuoq13jpKtSE8K4ATmP/k+NXERVWErEE3XFlCBNeNxqn7qBXzquBv?=
- =?us-ascii?Q?6CKphO2610XpZ2Z8oQGgxoyvZXfftT76C9UdZuHE?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.3; Wed, 25 Oct
+ 2023 21:17:02 +0000
+Received: from BY5PR21MB1443.namprd21.prod.outlook.com
+ ([fe80::c099:1450:81d3:61dd]) by BY5PR21MB1443.namprd21.prod.outlook.com
+ ([fe80::c099:1450:81d3:61dd%4]) with mapi id 15.20.6954.005; Wed, 25 Oct 2023
+ 21:17:01 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: haiyangz@microsoft.com,
+	kys@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net] hv_netvsc: fix race of netvsc and VF register_netdevice
+Date: Wed, 25 Oct 2023 14:16:32 -0700
+Message-Id: <1698268592-20373-1-git-send-email-haiyangz@microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+Content-Type: text/plain
+X-ClientProxiedBy: MW4PR03CA0248.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::13) To BY5PR21MB1443.namprd21.prod.outlook.com
+ (2603:10b6:a03:21f::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Sender: LKML haiyangz <lkmlhyz@microsoft.com>
+X-MS-Exchange-MessageSentRepresentingType: 2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY5PR21MB1443:EE_|CY5PR21MB3614:EE_
+X-MS-Office365-Filtering-Correlation-Id: a69aff3d-4ef3-4ed6-54d5-08dbd59fba9d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PyeXBB6f+7IcaFJVdAYZzOVkv1PcGMXCPDwns7c2DMqY9Jmdv70Veh5lhEbIfyxsPWZ5dQvbTNIMBD8JiIifGf6s4075m2/gbLeH4Lt6p4RutpaKv+Kap5fpv9eESyztQNnQkXd6nm2750DzWAQgenJ6Rk4Lm9AYf68/j868e7DI8yBmIi0GGn2kDTp8tbBDGYIVDNUUEDMMXuIj3Dk/2zEpW1EQuV3SurHTjzWliWkNQHt5wI39Mmd41h//RXre0N0bBnIszO79MagC4PzGDupyOX7LwJl0L5t6J2jaqGsFpNNXr1GiytTROWddkz9B4T2LAm47US7ehiprM+lBNun71+XqZecLKC7k5euVOXz8+t2SOF4BxSOSyKOqq/IARDwtqQdaslVP32T37Evd5jExiFD2wQP4YlA8kccWrAv/YjNtVO8vFH01CAA12bvHfwAoZ6dmor7AT2WGKvPlGRQeqoRwDgSzVp9Yr/dYaOuJ8+VEbtNt/az7ZBmuAULVoVHI2yWbZaPIsuDwFz1oLbnSetxi0kueCDHwcCXcxAgrlbuEyGO8cl0ssJmx3G/bRy+bOpyqi+MmlXy9oFR0d0gmiMaBmAj5U/jMDGw/Xdxooyb/g3DNtidFEoBXZ5Uo166f8/+35t1SvnOzWTT0c3g38lwTxqIdwlP08l7un7k=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR21MB1443.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(396003)(136003)(39860400002)(366004)(230922051799003)(64100799003)(1800799009)(451199024)(186009)(66899024)(6512007)(7846003)(2616005)(6506007)(6486002)(52116002)(38100700002)(82950400001)(82960400001)(38350700005)(36756003)(26005)(6666004)(2906002)(41300700001)(10290500003)(478600001)(83380400001)(8936002)(8676002)(4326008)(5660300002)(66476007)(316002)(66556008)(66946007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?BehMHLCTfx4KdJSrUOygJAOs3BEVfESreMG39+ddRRLxMyjqXjkIzkRuuSku?=
+ =?us-ascii?Q?N/XJksQe/o2Grs3/x8kQ2s4t/v/T0aXcZmg37kx8ilgU1xyFPio87eK2k2Hx?=
+ =?us-ascii?Q?JwRYi++8NmqYrWXoor/RksbGOHq4tT7MwuTQ3kU/nZ7DuAaIqhc33qnN6rBz?=
+ =?us-ascii?Q?8tafcVc6I5bxk7WTBGkzFj2XkPBzKx0XFJ5Tfq+OAtjIGzOnwya3qTYFVEc6?=
+ =?us-ascii?Q?IPpIrCTYMUFcY5UcaDjhAGo/F3poanhF9BWZojPSvkCrrLTr+ejsos4E8QNh?=
+ =?us-ascii?Q?NtxuzQRmj3irUFPNMwEI4hjRXLm4PVnySOt6WiMZ02e4i2XYjfdW0JfAMpxS?=
+ =?us-ascii?Q?R6YpuiIHa6PFU2f6h5jAGVbviVHJNzNyZlxXRYGMuguM8mYpYyumxSHA8foN?=
+ =?us-ascii?Q?Je57srY42U8KVt2KHlOqZ4PNWCgaRVw3DCIeDDXVlgtmH6Q/H/4o7iRPQkA/?=
+ =?us-ascii?Q?XRNt2QiJ/ExkDXFooDa20wXxxmWDJ1kmqciDZ0SJ6PGTqu6scVMhXppnOfoN?=
+ =?us-ascii?Q?6h+8Rf4uSVr2yjKAKk2cyRbMJUXCHb8ATgV/b1sEiDwvpjFc9+tfKQ+5EZ5S?=
+ =?us-ascii?Q?WViROR6WlvehJHPwgDx2gRnhw3WwsfEAI5Qig0hr5cNAVhqANDx9GI4bodgo?=
+ =?us-ascii?Q?eGuEtp2AX4IyfSSNKsKkqSCpYlf3wfPHSU4I8KFq7/P+TsCCBF7500hnZqMg?=
+ =?us-ascii?Q?XVrQcwbE/tooOquK3Dym7cHHrhuLBONhHmvBrpUwbHRXiMDA3IgKb6sQ11sr?=
+ =?us-ascii?Q?CkA6c331LQojTAzW3ybfpy8OqzNWtexDxAwTKDMqdZuFgGBf9y1bj8LfOZKD?=
+ =?us-ascii?Q?LNSr61HvDj/fWdMNAo9Sv3euD1N2oYyo1ND0G6pAVYMH9DozbrpgLyw2fyIF?=
+ =?us-ascii?Q?+Pf8ysIUCsSY6c0keP1tzLzoddkNCeFooUDpQX0c4DF3d5JvfCcV0Y1750+a?=
+ =?us-ascii?Q?CxTnq9RNhxzXWMB2Bi7YQ1rZkEIwamHswPzcpvEMq8hMimd+sBaXN6TC16Ej?=
+ =?us-ascii?Q?f00kVUMA/ycu7GWrl40W0y50oQxxXeJps0R+v85ugOGBosXPFjRp0MjXGZWL?=
+ =?us-ascii?Q?cH9VXLpYANwfC0yrPPXmENY6il79d4DErdAlWEDTua5LmD3NWecop7wYHsCw?=
+ =?us-ascii?Q?BJ3H3gcGv+5El/mLDZRAboL2KCGLjb5FwMsg3nA0v1wL8KfsWkL3rQOZzYDI?=
+ =?us-ascii?Q?F5Fe3okYPeu8I3NmANNe2tFx89W6In67CnTtst6OuSzXPLUZFoWhV1A5vHSM?=
+ =?us-ascii?Q?ULV9V3bAB/VBXv0kYtuQHx/dD97S0rlTuPB2Xx6Tw2jUEROuO+O89Y0FsEQE?=
+ =?us-ascii?Q?U/DDIJ5lcIh2+o+vrY7DoEMJyAbRinpVAPDGxabqw0OSXWgc+vVDuXrsiqTY?=
+ =?us-ascii?Q?COoGDLBYj2yZYCXrCuBML8U4JmO2hy2F48qfEPG8UrEhNwashL7vmwk+XYko?=
+ =?us-ascii?Q?eDEn/YsDbo9EpGgDXLZ3Kox2zPXwhBVgNrqEpIa+KQEXIdF5Sh2CBeIfbX3z?=
+ =?us-ascii?Q?gEiedyOHnrx1ckp6WEPIG/aKBhbPTDxdRS0SbQlfIZtSgUH2BqcZtIe4VLIV?=
+ =?us-ascii?Q?sW/lxRSPyM+KqR+e6B/8t2xPZaUqvyn6QqVYXeJD?=
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a69aff3d-4ef3-4ed6-54d5-08dbd59fba9d
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR21MB1443.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4218.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9186e961-31c7-4377-c26b-08dbd59f061a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Oct 2023 21:11:58.1780
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 21:17:01.3627
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: X+LwahVu1sM1bS1ljKjrHivyXr50hDKI19Asf1pQ4sbey9U/D7yN/Xzkr+JZN9CsVkx3f9NMoDk0cVkYb5EjP0H97VYwK1Vefi3FrSCshT4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5256
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LWpwU/p8V0mP1UseNq+WxA2cE3oZdNRXhcciEYDPv4u2A3a97pdGaYRkaIpTGyj82XAd2UayBnaYR+Quc0IfOg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR21MB3614
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of P=
-aul
-> Greenwalt
-> Sent: Wednesday, October 18, 2023 4:17 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: andrew@lunn.ch; Greenwalt, Paul <paul.greenwalt@intel.com>; Nowlin, D=
-an
-> <dan.nowlin@intel.com>; netdev@vger.kernel.org; Chmielewski, Pawel
-> <pawel.chmielewski@intel.com>; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; horms@kernel.org; Olech, Milena
-> <milena.olech@intel.com>
-> Subject: [Intel-wired-lan] [PATCH net-next v5 1/6] ice: Add E830 device I=
-Ds, MAC
-> type and registers
->=20
-> E830 is the 200G NIC family which uses the ice driver.
->=20
-> Add specific E830 registers. Embed macros to use proper register based on=
- (hw)-
-> >mac_type & name those macros to [ORIGINAL]_BY_MAC(hw). Registers only
-> available on one of the macs will need to be explicitly referred to as E8=
-00_NAME
-> instead of just NAME. PTP is not yet supported.
->=20
-> Co-developed-by: Milena Olech <milena.olech@intel.com>
-> Signed-off-by: Milena Olech <milena.olech@intel.com>
-> Co-developed-by: Dan Nowlin <dan.nowlin@intel.com>
-> Signed-off-by: Dan Nowlin <dan.nowlin@intel.com>
-> Co-developed-by: Scott Taylor <scott.w.taylor@intel.com>
-> Signed-off-by: Scott Taylor <scott.w.taylor@intel.com>
-> Co-developed-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
-> Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_common.c   | 71 ++++++++++++-------
->  drivers/net/ethernet/intel/ice/ice_devids.h   | 10 ++-
->  .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 24 ++++---
->  .../net/ethernet/intel/ice/ice_hw_autogen.h   | 52 ++++++++++----
->  drivers/net/ethernet/intel/ice/ice_main.c     | 13 ++--
->  drivers/net/ethernet/intel/ice/ice_type.h     |  3 +-
->  .../ethernet/intel/ice/ice_virtchnl_fdir.c    | 29 +++++---
->  7 files changed, 141 insertions(+), 61 deletions(-)
+The rtnl lock also needs to be held before rndis_filter_device_add()
+which advertises nvsp_2_vsc_capability / sriov bit, and triggers
+VF NIC offering and registering. If VF NIC finished register_netdev()
+earlier it may cause name based config failure.
 
-Tested-by: Tony Brelinski <tony.brelinski@intel.com>
+To fix this issue, move the call to rtnl_lock() before
+rndis_filter_device_add(), so VF will be registered later than netvsc
+/ synthetic NIC, and gets a name numbered (ethX) after netvsc.
+
+And, move register_netdevice_notifier() earlier, so the call back
+function is set before probing.
+
+Cc: stable@vger.kernel.org
+Fixes: e04e7a7bbd4b ("hv_netvsc: Fix a deadlock by getting rtnl lock earlier in netvsc_probe()")
+Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+
+---
+ drivers/net/hyperv/netvsc_drv.c | 30 +++++++++++++++++++-----------
+ 1 file changed, 19 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index 3ba3c8fb28a5..feca1391f756 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2531,15 +2531,6 @@ static int netvsc_probe(struct hv_device *dev,
+ 		goto devinfo_failed;
+ 	}
+ 
+-	nvdev = rndis_filter_device_add(dev, device_info);
+-	if (IS_ERR(nvdev)) {
+-		ret = PTR_ERR(nvdev);
+-		netdev_err(net, "unable to add netvsc device (ret %d)\n", ret);
+-		goto rndis_failed;
+-	}
+-
+-	eth_hw_addr_set(net, device_info->mac_adr);
+-
+ 	/* We must get rtnl lock before scheduling nvdev->subchan_work,
+ 	 * otherwise netvsc_subchan_work() can get rtnl lock first and wait
+ 	 * all subchannels to show up, but that may not happen because
+@@ -2547,9 +2538,23 @@ static int netvsc_probe(struct hv_device *dev,
+ 	 * -> ... -> device_add() -> ... -> __device_attach() can't get
+ 	 * the device lock, so all the subchannels can't be processed --
+ 	 * finally netvsc_subchan_work() hangs forever.
++	 *
++	 * The rtnl lock also needs to be held before rndis_filter_device_add()
++	 * which advertises nvsp_2_vsc_capability / sriov bit, and triggers
++	 * VF NIC offering and registering. If VF NIC finished register_netdev()
++	 * earlier it may cause name based config failure.
+ 	 */
+ 	rtnl_lock();
+ 
++	nvdev = rndis_filter_device_add(dev, device_info);
++	if (IS_ERR(nvdev)) {
++		ret = PTR_ERR(nvdev);
++		netdev_err(net, "unable to add netvsc device (ret %d)\n", ret);
++		goto rndis_failed;
++	}
++
++	eth_hw_addr_set(net, device_info->mac_adr);
++
+ 	if (nvdev->num_chn > 1)
+ 		schedule_work(&nvdev->subchan_work);
+ 
+@@ -2788,11 +2793,14 @@ static int __init netvsc_drv_init(void)
+ 	}
+ 	netvsc_ring_bytes = ring_size * PAGE_SIZE;
+ 
++	register_netdevice_notifier(&netvsc_netdev_notifier);
++
+ 	ret = vmbus_driver_register(&netvsc_drv);
+-	if (ret)
++	if (ret) {
++		unregister_netdevice_notifier(&netvsc_netdev_notifier);
+ 		return ret;
++	}
+ 
+-	register_netdevice_notifier(&netvsc_netdev_notifier);
+ 	return 0;
+ }
+ 
+-- 
+2.25.1
 
 
