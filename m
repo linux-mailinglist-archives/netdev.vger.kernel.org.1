@@ -1,113 +1,336 @@
-Return-Path: <netdev+bounces-44204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72E0E7D70B6
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 17:25:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9339D7D712C
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 17:47:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CF141C20A05
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 15:25:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 259AB2810C3
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 15:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191B22AB3C;
-	Wed, 25 Oct 2023 15:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04362B5D1;
+	Wed, 25 Oct 2023 15:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NoP9eqNL"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QPhzU/5Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CD92D62F
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 15:25:20 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF1F1701
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 08:25:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698247514;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sSOWf+/I8EKI0m+1MG2lTVVX4N7DU8rrjEKjpBfQPhc=;
-	b=NoP9eqNLbyR+VX+BFGiu3WgKZiYiEb3ugb58z6Srirp+GJLM+qaEwXLR1g6NHsQsZHx/hm
-	Wxvug3UtEUAbjHGbxSKJDA3RB+RUdpyx+YqDWZAdMrvOkKw4+vOzgOm0i3TPs0JFcW4mgK
-	Fp0S5LE3geI1rO+5jp1cTF86piE72oo=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-367-M0KvAQokPnukTE8bg2zzOA-1; Wed, 25 Oct 2023 11:25:12 -0400
-X-MC-Unique: M0KvAQokPnukTE8bg2zzOA-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9a62adedadbso363711066b.1
-        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 08:25:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997012AB3E
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 15:47:12 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66A5B136
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 08:47:09 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99357737980so921074966b.2
+        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 08:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698248828; x=1698853628; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mt7St37rIKseWM3KjSEFy+jlXydYiULEJ1tiZmCsQbs=;
+        b=QPhzU/5ZAuXzg5ZXhIptvqBKFXPPNA7p7p5U0KDawQHP0Kfa6SYdP5M/FCvc+5duOI
+         q+pV6Fov3J05NoalzMg7a1bsWXprbXCD5YtwZRITy5xd+zn7QEsyWALvLBDVUWedx4+M
+         JNH5JoL2xAKSFKWC4VY9QzZNIVNwoLv1vea+AJaOfPuR14kyf5qFfJpNYno5pg4hdzuP
+         b1FNXIzko1l3xF1yBUKVR97IVyyRd5/QzaVUHZVepzGTKu0n681L4AUfqw9uWNsFBAS8
+         +OoM70gyRUAjnn/f72ugFwhj1MsAFsCcJFaJGqq113BAB+lEVSzs1o24HJWvTuGnnoDC
+         U5Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698247511; x=1698852311;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sSOWf+/I8EKI0m+1MG2lTVVX4N7DU8rrjEKjpBfQPhc=;
-        b=K3+PcZQ1PtCon4ohS5eyn9J3NjAilGdaW9fQYlgsSCCBNAJlIxSA1f5ZfoLchSqJHB
-         ic2W1odYuLRAgUz0DEpiKbgN8CG39Yrz1cbDdLwoO1G0N/aQnzNTA7u0vsvzZlq5Jgas
-         liyCwf7igq63MsOulMtZ8A7w+jovgbuoTwo8u3zYUBYX+H1KS8QER2NY1K0lQRvRDCBy
-         ebiGm7fTKmSzjvJg02SMz41bJO4SamzlXE5l0Aze/k5Ba2S7Ncci73Nczv4jV+PS+zWX
-         R3uTmT/VWXk/JvsXJ5Oe72/x25S69B+LDI3OUFfrsxf2Zfe5GuL034Fj7vuAm5i9+9PC
-         rXiA==
-X-Gm-Message-State: AOJu0YwKxlDuzw3iAaiISSYpilYnStBDgQhZKmymZbtOx6OLGek/an78
-	iS5Gd5oraQZjJArHl5e4KzDhlQNZSXLjDG7TxX2OZBihQDjkTnXp0mTl57oxMdvdNtYgq538Xmf
-	YitAJ/idDw81DZoSgOgr/vM3XdrwcLjKj
-X-Received: by 2002:a17:907:7215:b0:9bf:b5bc:6c4b with SMTP id dr21-20020a170907721500b009bfb5bc6c4bmr13153733ejc.62.1698247511071;
-        Wed, 25 Oct 2023 08:25:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEdPdP4tKmDGqANe1hn/5pBLY9M4r7oTKHQHqnhHAdd00pfX2miKUnEXa1IR6SE8GyZOtoO6reeqBoGcEsfkiE=
-X-Received: by 2002:a17:907:7215:b0:9bf:b5bc:6c4b with SMTP id
- dr21-20020a170907721500b009bfb5bc6c4bmr13153717ejc.62.1698247510788; Wed, 25
- Oct 2023 08:25:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698248828; x=1698853628;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mt7St37rIKseWM3KjSEFy+jlXydYiULEJ1tiZmCsQbs=;
+        b=Bbx3tofx3sr4iiVTV2IFq/eVWNSUl0pzguPcSkPrgrxoMCloUU06pgB8+dz8zJw0as
+         fLMWQLf4zLQZ4w1+2fBiys4TV80Y076Romfx75ObscKGF7+Gj8l94qUMWYVhJPtoztYE
+         lG4lOFVjsCcdbRmtFnJJhEeqMpv3g6ZrS0D0CZ1/vkC/cRMaCPTqUJW7mY5Baxy6q1P6
+         SgoIgZjXNF6+muhqWH18NdXtYqewbtjdvZbXf7jAdX/8ccw3o82grhjXilBQuzOoHGjZ
+         SmFyEMENzI9O5XZUBvO7Y5XrOI+wwVcmh5b0sZFYiQXKZIO0dRELBRWFEbGgnrEPz+jj
+         vjzw==
+X-Gm-Message-State: AOJu0YxY1shWclbGcmc0mOxuILIS6j1XUNimaHaX6I+0FxqTahbdb74i
+	QiCkJBFv112FVvxTdfpWK1wyOQ==
+X-Google-Smtp-Source: AGHT+IHAS0YwqqQ+OKqxlR5ZgvGYHtOqaDNLMTPyOA3e867qhf78U8qg48nDaB/X2usvqMGaCOB5YQ==
+X-Received: by 2002:a17:907:9403:b0:9bd:a5a3:3328 with SMTP id dk3-20020a170907940300b009bda5a33328mr13208921ejc.13.1698248827647;
+        Wed, 25 Oct 2023 08:47:07 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id i25-20020a170906251900b009ca522853ecsm5035529ejb.58.2023.10.25.08.47.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Oct 2023 08:47:07 -0700 (PDT)
+Date: Wed, 25 Oct 2023 17:47:05 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@linux.dev,
+	razor@blackwall.org, ast@kernel.org, andrii@kernel.org,
+	john.fastabend@gmail.com, sdf@google.com, toke@kernel.org,
+	kuba@kernel.org, andrew@lunn.ch,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Subject: Re: [PATCH bpf-next v4 1/7] netkit, bpf: Add bpf programmable net
+ device
+Message-ID: <ZTk4ec8CBh92PZvs@nanopsycho>
+References: <20231024214904.29825-1-daniel@iogearbox.net>
+ <20231024214904.29825-2-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231023230826.531858-1-jacob.e.keller@intel.com>
- <20231023230826.531858-6-jacob.e.keller@intel.com> <20231024164234.46e9bb5f@kernel.org>
-In-Reply-To: <20231024164234.46e9bb5f@kernel.org>
-From: Michal Schmidt <mschmidt@redhat.com>
-Date: Wed, 25 Oct 2023 17:24:59 +0200
-Message-ID: <CADEbmW0qw1L=Q-nb5+Cnuxm=h4RcdRKWx1Q1TgtiZdEaUWmFeg@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/9] iavf: in iavf_down, disable queues when
- removing the driver
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org, 
-	David Miller <davem@davemloft.net>, Wojciech Drewek <wojciech.drewek@intel.com>, 
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231024214904.29825-2-daniel@iogearbox.net>
 
-On Wed, Oct 25, 2023 at 1:42=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
-> On Mon, 23 Oct 2023 16:08:21 -0700 Jacob Keller wrote:
-> > From: Michal Schmidt <mschmidt@redhat.com>
-> >
-> > In iavf_down, we're skipping the scheduling of certain operations if
-> > the driver is being removed. However, the IAVF_FLAG_AQ_DISABLE_QUEUES
-> > request must not be skipped in this case, because iavf_close waits
-> > for the transition to the __IAVF_DOWN state, which happens in
-> > iavf_virtchnl_completion after the queues are released.
-> >
-> > Without this fix, "rmmod iavf" takes half a second per interface that's
-> > up and prints the "Device resources not yet released" warning.
-> >
-> > Fixes: c8de44b577eb ("iavf: do not process adminq tasks when __IAVF_IN_=
-REMOVE_TASK is set")
+Tue, Oct 24, 2023 at 11:48:58PM CEST, daniel@iogearbox.net wrote:
+>This work adds a new, minimal BPF-programmable device called "netkit"
+>(former PoC code-name "meta") we recently presented at LSF/MM/BPF. The
+>core idea is that BPF programs are executed within the drivers xmit routine
+>and therefore e.g. in case of containers/Pods moving BPF processing closer
+>to the source.
 >
-> This looks like a 6.6 regression, why send it for net-next?
+>One of the goals was that in case of Pod egress traffic, this allows to
+>move BPF programs from hostns tcx ingress into the device itself, providing
+>earlier drop or forward mechanisms, for example, if the BPF program
+>determines that the skb must be sent out of the node, then a redirect to
+>the physical device can take place directly without going through per-CPU
+>backlog queue. This helps to shift processing for such traffic from softirq
+>to process context, leading to better scheduling decisions/performance (see
+>measurements in the slides).
+>
+>In this initial version, the netkit device ships as a pair, but we plan to
+>extend this further so it can also operate in single device mode. The pair
 
-Hi Jakub,
-At first I thought I had a dependency on the preceding patch in the
-series, but after rethinking and retesting it, it's actually fine to
-put this patch in net.git.
-Can you please do that, or will you require resending?
+Single device mode should work how?
 
-Thanks,
-Michal
 
+>comes with a primary and a peer device. Only the primary device, typically
+>residing in hostns, can manage BPF programs for itself and its peer. The
+>peer device is designated for containers/Pods and cannot attach/detach
+>BPF programs. Upon the device creation, the user can set the default policy
+>to 'pass' or 'drop' for the case when no BPF program is attached.
+
+It looks to me that you only need the host (primary) netdevice to be
+used as a handle to attach the bpf programs. Because the bpf program
+can (and probably in real use case will) redirect to uplink/another
+pod netdevice skipping the host (primary) netdevice, correct?
+
+If so, why can't you do just single device mode from start finding a
+different sort of bpf attach handle? (not sure which)
+
+
+>
+>Additionally, the device can be operated in L3 (default) or L2 mode. The
+>management of BPF programs is done via bpf_mprog, so that multi-attach is
+>supported right from the beginning with similar API and dependency controls
+>as tcx. For details on the latter see commit 053c8e1f235d ("bpf: Add generic
+>attach/detach/query API for multi-progs"). tc BPF compatibility is provided,
+>so that existing programs can be easily migrated.
+>
+>Going forward, we plan to use netkit devices in Cilium as the main device
+>type for connecting Pods. They will be operated in L3 mode in order to
+>simplify a Pod's neighbor management and the peer will operate in default
+>drop mode, so that no traffic is leaving between the time when a Pod is
+>brought up by the CNI plugin and programs attached by the agent.
+>Additionally, the programs we attach via tcx on the physical devices are
+>using bpf_redirect_peer() for inbound traffic into netkit device, hence the
+>latter is also supporting the ndo_get_peer_dev callback. Similarly, we use
+>bpf_redirect_neigh() for the way out, pushing from netkit peer to phys device
+>directly. Also, BIG TCP is supported on netkit device. For the follow-up
+>work in single device mode, we plan to convert Cilium's cilium_host/_net
+>devices into a single one.
+>
+>An extensive test suite for checking device operations and the BPF program
+>and link management API comes as BPF selftests in this series.
+>
+
+Couple of nitpicks below:
+
+[..]
+
+
+>+static int netkit_check_policy(int policy, struct nlattr *tb,
+>+			       struct netlink_ext_ack *extack)
+>+{
+>+	switch (policy) {
+>+	case NETKIT_PASS:
+>+	case NETKIT_DROP:
+>+		return 0;
+>+	default:
+
+Isn't this job for netlink policy?
+
+
+>+		NL_SET_ERR_MSG_ATTR(extack, tb,
+>+				    "Provided default xmit policy not supported");
+>+		return -EINVAL;
+>+	}
+>+}
+>+
+>+static int netkit_check_mode(int mode, struct nlattr *tb,
+>+			     struct netlink_ext_ack *extack)
+>+{
+>+	switch (mode) {
+>+	case NETKIT_L2:
+>+	case NETKIT_L3:
+>+		return 0;
+>+	default:
+
+Isn't this job for netlink policy?
+
+
+>+		NL_SET_ERR_MSG_ATTR(extack, tb,
+>+				    "Provided device mode can only be L2 or L3");
+>+		return -EINVAL;
+>+	}
+>+}
+>+
+>+static int netkit_validate(struct nlattr *tb[], struct nlattr *data[],
+>+			   struct netlink_ext_ack *extack)
+>+{
+>+	struct nlattr *attr = tb[IFLA_ADDRESS];
+>+
+>+	if (!attr)
+>+		return 0;
+>+	NL_SET_ERR_MSG_ATTR(extack, attr,
+>+			    "Setting Ethernet address is not supported");
+>+	return -EOPNOTSUPP;
+>+}
+>+
+>+static struct rtnl_link_ops netkit_link_ops;
+>+
+>+static int netkit_new_link(struct net *src_net, struct net_device *dev,
+>+			   struct nlattr *tb[], struct nlattr *data[],
+>+			   struct netlink_ext_ack *extack)
+>+{
+>+	struct nlattr *peer_tb[IFLA_MAX + 1], **tbp = tb, *attr;
+>+	enum netkit_action default_prim = NETKIT_PASS;
+>+	enum netkit_action default_peer = NETKIT_PASS;
+>+	enum netkit_mode mode = NETKIT_L3;
+>+	unsigned char ifname_assign_type;
+>+	struct ifinfomsg *ifmp = NULL;
+>+	struct net_device *peer;
+>+	char ifname[IFNAMSIZ];
+>+	struct netkit *nk;
+>+	struct net *net;
+>+	int err;
+>+
+>+	if (data) {
+>+		if (data[IFLA_NETKIT_MODE]) {
+>+			attr = data[IFLA_NETKIT_MODE];
+>+			mode = nla_get_u32(attr);
+>+			err = netkit_check_mode(mode, attr, extack);
+>+			if (err < 0)
+>+				return err;
+>+		}
+>+		if (data[IFLA_NETKIT_PEER_INFO]) {
+>+			attr = data[IFLA_NETKIT_PEER_INFO];
+>+			ifmp = nla_data(attr);
+>+			err = rtnl_nla_parse_ifinfomsg(peer_tb, attr, extack);
+>+			if (err < 0)
+>+				return err;
+>+			err = netkit_validate(peer_tb, NULL, extack);
+>+			if (err < 0)
+>+				return err;
+>+			tbp = peer_tb;
+>+		}
+>+		if (data[IFLA_NETKIT_POLICY]) {
+>+			attr = data[IFLA_NETKIT_POLICY];
+>+			default_prim = nla_get_u32(attr);
+>+			err = netkit_check_policy(default_prim, attr, extack);
+>+			if (err < 0)
+>+				return err;
+>+		}
+>+		if (data[IFLA_NETKIT_PEER_POLICY]) {
+>+			attr = data[IFLA_NETKIT_PEER_POLICY];
+>+			default_peer = nla_get_u32(attr);
+>+			err = netkit_check_policy(default_peer, attr, extack);
+>+			if (err < 0)
+>+				return err;
+>+		}
+>+	}
+>+
+>+	if (ifmp && tbp[IFLA_IFNAME]) {
+>+		nla_strscpy(ifname, tbp[IFLA_IFNAME], IFNAMSIZ);
+>+		ifname_assign_type = NET_NAME_USER;
+>+	} else {
+>+		strscpy(ifname, "nk%d", IFNAMSIZ);
+>+		ifname_assign_type = NET_NAME_ENUM;
+>+	}
+>+
+>+	net = rtnl_link_get_net(src_net, tbp);
+>+	if (IS_ERR(net))
+>+		return PTR_ERR(net);
+>+
+>+	peer = rtnl_create_link(net, ifname, ifname_assign_type,
+>+				&netkit_link_ops, tbp, extack);
+>+	if (IS_ERR(peer)) {
+>+		put_net(net);
+>+		return PTR_ERR(peer);
+>+	}
+>+
+>+	netif_inherit_tso_max(peer, dev);
+>+
+>+	if (mode == NETKIT_L2)
+>+		eth_hw_addr_random(peer);
+>+	if (ifmp && dev->ifindex)
+>+		peer->ifindex = ifmp->ifi_index;
+>+
+>+	nk = netkit_priv(peer);
+>+	nk->primary = false;
+>+	nk->policy = default_peer;
+>+	nk->mode = mode;
+>+	bpf_mprog_bundle_init(&nk->bundle);
+>+	RCU_INIT_POINTER(nk->active, NULL);
+>+	RCU_INIT_POINTER(nk->peer, NULL);
+
+Aren't these already 0?
+
+
+>+
+>+	err = register_netdevice(peer);
+>+	put_net(net);
+>+	if (err < 0)
+>+		goto err_register_peer;
+>+	netif_carrier_off(peer);
+>+	if (mode == NETKIT_L2)
+>+		dev_change_flags(peer, peer->flags & ~IFF_NOARP, NULL);
+>+
+>+	err = rtnl_configure_link(peer, NULL, 0, NULL);
+>+	if (err < 0)
+>+		goto err_configure_peer;
+>+
+>+	if (mode == NETKIT_L2)
+>+		eth_hw_addr_random(dev);
+>+	if (tb[IFLA_IFNAME])
+>+		nla_strscpy(dev->name, tb[IFLA_IFNAME], IFNAMSIZ);
+>+	else
+>+		strscpy(dev->name, "nk%d", IFNAMSIZ);
+>+
+>+	nk = netkit_priv(dev);
+>+	nk->primary = true;
+>+	nk->policy = default_prim;
+>+	nk->mode = mode;
+>+	bpf_mprog_bundle_init(&nk->bundle);
+>+	RCU_INIT_POINTER(nk->active, NULL);
+>+	RCU_INIT_POINTER(nk->peer, NULL);
+>+
+>+	err = register_netdevice(dev);
+>+	if (err < 0)
+>+		goto err_configure_peer;
+>+	netif_carrier_off(dev);
+>+	if (mode == NETKIT_L2)
+>+		dev_change_flags(dev, dev->flags & ~IFF_NOARP, NULL);
+>+
+>+	rcu_assign_pointer(netkit_priv(dev)->peer, peer);
+>+	rcu_assign_pointer(netkit_priv(peer)->peer, dev);
+>+	return 0;
+>+err_configure_peer:
+>+	unregister_netdevice(peer);
+>+	return err;
+>+err_register_peer:
+>+	free_netdev(peer);
+>+	return err;
+>+}
+>+
+
+[..]
 
