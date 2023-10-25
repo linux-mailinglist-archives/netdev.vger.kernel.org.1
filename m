@@ -1,132 +1,164 @@
-Return-Path: <netdev+bounces-44100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA65A7D622E
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 09:12:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D9ED7D6255
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 09:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A7D9B20F61
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 07:12:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AEF1281C44
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 07:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4711A15AEE;
-	Wed, 25 Oct 2023 07:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BAFCF4FF;
+	Wed, 25 Oct 2023 07:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RYvrc4vp"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ofxr20sc"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B667C156F5
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 07:12:35 +0000 (UTC)
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A1E4133
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 00:12:33 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1c9d4f08d7cso127785ad.0
-        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 00:12:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D69168BD
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 07:23:24 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E437B99
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 00:23:22 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9b95622c620so809507366b.0
+        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 00:23:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698217953; x=1698822753; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lwbGfylf8dqZZHtCf2e2D7FZ7upydRRgKUPRy5QiEuc=;
-        b=RYvrc4vpAYfAWRjya4viKV5VoAkN7P4P/3Q8rVc2lKGBfmDHbEaDhf+1BeSuWIitUF
-         06OwNQIAO9a8zGff3qg0rlJjLHIoddL2MxkY8Nm3WMyxPeoKzi7H2748C98VEPJYMgq/
-         nVBgDb38f/nIkkwGPLHedfoq+FEe49bXgxiWmt8zgv2ImqM3zLFVTc8RmN1p/hbY7fF+
-         19XEjlcvqaxEKX4SxYxAEeEVQD4IPOqHTd9rNl4wMegT69pjE25brfu3kv+xXJSInhUn
-         JzGqcFAGeAlH1qM2MruXBvN4OHpiB+Py6z4T0CPl/RwwGrjgRU7YL4dd/1vdtC08bSTd
-         DbHQ==
+        d=linaro.org; s=google; t=1698218601; x=1698823401; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SnNqjmTumDhS9QjbNc2fsxDzSTTZE7f6qzo4FhoEWiY=;
+        b=Ofxr20scyQX8OmE/lhgFZest3nmgobuf/U7oVW6mmrSONt8Ce1RKLCqHH+/hE7jAjf
+         ew2SEL0AnzSc2LNRiNPKDIKJOtx5H6779NIN1F6+ri4fU+CWaUyIUEuhK9425XaEsVko
+         6pFgALtYtjmRehgGVLzjkWjv0We9q6swURQXu4oaPKcWEqm3CxREiPZMt53JFVevjlV7
+         lv8CTAaU6OAyaaUz+fNIwnJmjuhIf2nD47tgQcFlQN2/PGT9od6Y8i0xVQTdB+mQlgtI
+         mTBD+jLgZLIn/MTZ+8BYb6DA2biw8EmuNxFgjWsXjN8w+U6JbZ4EJkfT7vJxye4fOK1R
+         cTow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698217953; x=1698822753;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lwbGfylf8dqZZHtCf2e2D7FZ7upydRRgKUPRy5QiEuc=;
-        b=KHQ47J+XE5uuW8OdDO1Kn6BHzEBFEkSVy+6C3tAovINWsoU8HPRfpcXyM0RZGLWWXn
-         d6l3PpvygsThi0WwsNmbdKlSy4AnaOr/zywmvNddIjCiPB5FaeRkl8x/jAZ1gTpXff+4
-         b/MTzyAmNHMP+uWExvKsy7qWouV1qS0mxgbVPcw3NXTIl2xW10WCUPpJ8mbIAgK3H+hO
-         isluQGQQa25l1Vn+uysq9W52t5uwe31PsX2vKSNb+TnNmY+Vfs4KUlc6hLCTzce5AqxW
-         2FI8tI785iJ3BJEXEf8HUbURxP4sLQgKA4u2uRHPPfM7renZCHbgMKhaF+ph6vuVUYjq
-         6Klg==
-X-Gm-Message-State: AOJu0YwxANoWTcZ2GsxPyMyuOXYktKdNwgmiIo2W7utVU6etTaFke3cY
-	QnRMXW6g51mPkO0jZNCaLjv6ctNArHBWSJilkfxZUw==
-X-Google-Smtp-Source: AGHT+IHU1BXYoAQ/WKeStF7iKz6ollBNNgSRA5J4cOXGGIgOTujOOgOlVNvae2Wn5XL+9vVCiPLu89alCeafa3ZNc3k=
-X-Received: by 2002:a17:902:cf0a:b0:1c4:1392:e4b5 with SMTP id
- i10-20020a170902cf0a00b001c41392e4b5mr83859plg.21.1698217952599; Wed, 25 Oct
- 2023 00:12:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698218601; x=1698823401;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SnNqjmTumDhS9QjbNc2fsxDzSTTZE7f6qzo4FhoEWiY=;
+        b=srgtDQoX8si2U5jj8FSl4i/GbvZb1rioSLa4lqQtdKgbk217ZS9YDoGxcV0e6kW3vE
+         0lyEGC/xq/BxJ2zV8b+HyBaPePzGm9EM+VfyjoZIkxKr9F7wAeenT4YBfzPt49xs/8mx
+         OTBZeTXZDhGNdRRHY7N26xqo+YoxfUtX72QofnRKz3xGYp8/nzG+/sEQYdnO5swtha8n
+         jMvLeVJ7U/DO0inRQs4qiJbbO76FhLXoyK2wcChTTPvZFuGKAz1xwYtm6uA+qgaNrqyf
+         MeXDncVMPhzHh8vn7A+7Dretk4d0sYMPhAqcXxadbAE4f2mBlmsX8Wg9F62O75BQq34A
+         L7lg==
+X-Gm-Message-State: AOJu0YzYoSb35wdghaTYaQq7E4O3DsRs5vRg3gnDimmiiY7C/IhqwrX3
+	LzyGsd1rtPJhviye6gQcRyHLkg==
+X-Google-Smtp-Source: AGHT+IGDzPdEPaKGrNOsr1qlrTkceEf3aDuIWmsxOt658eqmx0JDzDRBplXTPhd2sIMHpXKUFjspNw==
+X-Received: by 2002:a17:906:7310:b0:9c6:724:fa1f with SMTP id di16-20020a170906731000b009c60724fa1fmr12387261ejc.66.1698218600947;
+        Wed, 25 Oct 2023 00:23:20 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.218.126])
+        by smtp.gmail.com with ESMTPSA id jg36-20020a170907972400b0099d798a6bb5sm9403230ejc.67.2023.10.25.00.23.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Oct 2023 00:23:20 -0700 (PDT)
+Message-ID: <32edfc3c-321e-4816-b634-7b9540ab8c47@linaro.org>
+Date: Wed, 25 Oct 2023 09:23:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALkECRjyG8AtbUunWFYErQethdyCfiNC2-ZHP6oVtO3+GHxahA@mail.gmail.com>
-In-Reply-To: <CALkECRjyG8AtbUunWFYErQethdyCfiNC2-ZHP6oVtO3+GHxahA@mail.gmail.com>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Wed, 25 Oct 2023 09:12:20 +0200
-Message-ID: <CANp29Y5duVTxPyB=O+nyi8r68iebvEQmcCGOapL5b8Qpym8keQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: KASAN: slab-use-after-free Read in nfc_llcp_unregister_device
-To: Abagail ren <renzezhongucas@gmail.com>
-Cc: krzysztof.kozlowski@linaro.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller@googlegroups.com, 
-	Dmitry Vyukov <dvyukov@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+To: Abagail ren <renzezhongucas@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller@googlegroups.com
+References: <CALkECRjyG8AtbUunWFYErQethdyCfiNC2-ZHP6oVtO3+GHxahA@mail.gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <CALkECRjyG8AtbUunWFYErQethdyCfiNC2-ZHP6oVtO3+GHxahA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+On 25/10/2023 08:27, Abagail ren wrote:
+> Good day, dear maintainers.
+> 
+> Since the email system replied that it refused to accept the email because
+> the text contained HTML, I sent it to you again in the form of shared files.
+> 
+> We found a bug using a modified kernel configuration file used by syzbot.
+> 
+> We enhanced the probability of vulnerability discovery using our prototype
+> system developed based on syzkaller and found a bug "' KASAN:
+> slab-use-after-free Read in nfc_llcp_unregister_device." I'm still working
+> on it to find out its root cause and availability.
+> 
+> The stack information:
+> https://docs.google.com/document/d/1gdHebCRsvVsSPKfilcoXVu3Pctvoj2FSZCACcVYZXns/edit?usp=sharing
+> 
+> Kernel Branch: 6.4.0-rc3
+> 
 
 Hi,
 
-Please also note this report by syzbot:
-https://syzkaller.appspot.com/bug?extid=3D81232c4a81a886e2b580
+I received two emails from you, so I am not sure if these are separate
+issues or not.
 
-Its title is a bit different, but the stacktraces are the same. At the
-bottom, you may also find KASAN crashes.
+Anyway, there were fixes to these paths and you are testing quite old
+kernel. If you have the reproducer, it should be straightforward to test
+new kernel, so please do so. Test on linux-next.
 
-Judging by the "Discussions" block, there've been a couple of fix
-attempts already, but they did not make it to the kernel.
+> Kernel Config:
+> https://docs.google.com/document/d/1WIM0btqS2dex18HQYaL2xyoW6WdX2TsaNguTnWzHMps/edit?usp=sharing
+> 
+> Reproducer:
+> https://docs.google.com/document/d/1LrgGdOgZwO8wz0opusZ7flP9QSFZa32GdozvoxGysyY/edit?usp=sharing
 
---=20
-Aleksandr
 
-On Wed, Oct 25, 2023 at 9:03=E2=80=AFAM Abagail ren <renzezhongucas@gmail.c=
-om> wrote:
->
-> Good day, dear maintainers.
->
-> Since the email system replied that it refused to accept the email becaus=
-e the text contained HTML, I sent it to you again in the form of shared fil=
-es.
->
-> We found a bug using a modified kernel configuration file used by syzbot.
->
-> We enhanced the probability of vulnerability discovery using our prototyp=
-e system developed based on syzkaller and found a bug "' KASAN: slab-use-af=
-ter-free Read in nfc_llcp_unregister_device." I'm still working on it to fi=
-nd out its root cause and availability.
->
-> The stack information: https://docs.google.com/document/d/1gdHebCRsvVsSPK=
-filcoXVu3Pctvoj2FSZCACcVYZXns/edit?usp=3Dsharing
->
-> Kernel Branch: 6.4.0-rc3
->
-> Kernel Config: https://docs.google.com/document/d/1WIM0btqS2dex18HQYaL2xy=
-oW6WdX2TsaNguTnWzHMps/edit?usp=3Dsharing
->
-> Reproducer:  https://docs.google.com/document/d/1LrgGdOgZwO8wz0opusZ7flP9=
-QSFZa32GdozvoxGysyY/edit?usp=3Dsharing
->
-> Thank you!
->
-> Best regards,
-> Ren Zezhong
->
-> --
-> You received this message because you are subscribed to the Google Groups=
- "syzkaller" group.
-> To unsubscribe from this group and stop receiving emails from it, send an=
- email to syzkaller+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgi=
-d/syzkaller/CALkECRjyG8AtbUunWFYErQethdyCfiNC2-ZHP6oVtO3%2BGHxahA%40mail.gm=
-ail.com.
+Best regards,
+Krzysztof
+
 
