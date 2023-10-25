@@ -1,120 +1,139 @@
-Return-Path: <netdev+bounces-44141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3BEB7D699E
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 12:57:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD7E27D69A3
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 12:59:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4BAE1C20C5C
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 10:57:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C880B2102C
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 10:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187F826E09;
-	Wed, 25 Oct 2023 10:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A21C26E1C;
+	Wed, 25 Oct 2023 10:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jx1ldWRH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U1Uxxmdl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E2E1A58E;
-	Wed, 25 Oct 2023 10:57:45 +0000 (UTC)
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F93131;
-	Wed, 25 Oct 2023 03:57:43 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6bcbfecf314so1207874b3a.1;
-        Wed, 25 Oct 2023 03:57:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698231463; x=1698836263; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZPV1eC0VX1GKRD0tECZNDnHG0ZRaMmkIackM1YSkXwI=;
-        b=Jx1ldWRHDZItvKx8ZqhFtdq+QuHi/UPmImcQJuvazN0Kh7UvsK4kcfCVkN4kS/2yax
-         lRsLUbOa7JEJ5RZ3YFRN8UDJ78zLyqrpnLXXCVr+fbX3UpEV1XlGM+L2Rbzc7BSSMEwZ
-         r4f0wP5cBRIjui6bOZVqS+X8hTPaWpk1hkch3K7Qhx1/owB6/5MnTowwcwjrn8451VEQ
-         PJzBaGvlQfEZ8rHpCi3v9s49q2GFKynRLXYaf+jCP1Yqav6aiWT1V76yckB2CIGAW/JM
-         zravFl2FzeiEK5ZWcdNRbztXQffzr1juSUijtyLYF9sTIvpn1xMiTfyKukNrksvZPmjE
-         KMEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698231463; x=1698836263;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ZPV1eC0VX1GKRD0tECZNDnHG0ZRaMmkIackM1YSkXwI=;
-        b=Fdieh3luf+3eJm903J3hV4R65hnJQRBHj7Nq/b/SKBTRBOEUD0pmIvmd9qgVl6GCJK
-         cRFWDvpcKg0tfdCbuDQC8yF7yTnK/D0m65BKZMV6c4mphgTosTEEPMmV1xltR9E7nuOL
-         7fbPXPWCIocNzkua5ugHLE5d+VZw3CDE54/xLfr9upc622x/Q10WEuefJ6F2yZe/6wVB
-         FTKdv8oRqRybbqAVXYfuJUmyZ2oFn6fX67oL9fSuB5K5STVSVPmMnx/ax1+s9UM+ja8s
-         TOUROCq0pzDg2Xu718ChQ1Mvk1WHSXe2RhPahJ+TDUVuY2Fn5rlN6nGqCIVCohVpu7UJ
-         dLZA==
-X-Gm-Message-State: AOJu0Yx6QOeGSqNrVFZtLUmvOqx9rkRCKwH6cvkFLRK//AlWo9cRVLKw
-	NxlbZ3OfpBh+9A3+zj6uL87pinQHavBAu7vG
-X-Google-Smtp-Source: AGHT+IGX64kVo/YlorKG9TSNQ3dIMcsdZWIZIfYl1HgrB+BFik7GHlYG0UeebHLEFudnkGtpZDd0yw==
-X-Received: by 2002:a05:6a21:8cc5:b0:17b:170c:2d11 with SMTP id ta5-20020a056a218cc500b0017b170c2d11mr14041640pzb.6.1698231463117;
-        Wed, 25 Oct 2023 03:57:43 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id e28-20020aa7981c000000b006a7083f9f6esm9107629pfl.23.2023.10.25.03.57.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 03:57:42 -0700 (PDT)
-Date: Wed, 25 Oct 2023 19:57:41 +0900 (JST)
-Message-Id: <20231025.195741.1692073290373860448.fujita.tomonori@gmail.com>
-To: benno.lossin@proton.me
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
- miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v6 1/5] rust: core abstractions for network
- PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <46b4ea56-1b66-4a8f-8c30-ecea895638b2@proton.me>
-References: <1f61dda0-1e5e-4cdb-991b-1107439ecc99@proton.me>
-	<20231025.101046.1989690650451477174.fujita.tomonori@gmail.com>
-	<46b4ea56-1b66-4a8f-8c30-ecea895638b2@proton.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2462526E11
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 10:59:21 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A998F116
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 03:59:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698231559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hbl9d2tDVXT45ZlkhFJ2cNIXoUOP4mWOh9E5YishFi8=;
+	b=U1UxxmdlqpizscMCaK0NS5oDt2R47qUihAAwZkbSUD7XbFuarXvfJiKgKQ/KvpRX2Eq4IU
+	xGEoUJWW+9ex31MUVN7ADsGDCXEuXDHsYn2DdNRbgluy/pGTOMXc3/RCeAXM+OY/ZoAdyX
+	Ko4MTiMouAEfIg0Yt9jqxGTHyhdF0go=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-692-T7Rw2M5QPlWoXC_SolU-0g-1; Wed, 25 Oct 2023 06:59:14 -0400
+X-MC-Unique: T7Rw2M5QPlWoXC_SolU-0g-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5733F101A54C;
+	Wed, 25 Oct 2023 10:59:14 +0000 (UTC)
+Received: from p1.luc.cera.cz (unknown [10.45.225.62])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5086F492BD9;
+	Wed, 25 Oct 2023 10:59:12 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Michal Schmidt <mschmidt@redhat.com>
+Subject: [PATCH iwl-next] i40e: Delete unused i40e_mac_info fields
+Date: Wed, 25 Oct 2023 12:59:11 +0200
+Message-ID: <20231025105911.1204326-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Wed, 25 Oct 2023 07:24:00 +0000
-Benno Lossin <benno.lossin@proton.me> wrote:
+From commit 9eed69a9147c ("i40e: Drop FCoE code from core driver files")
+the field i40e_mac_info.san_addr is unused (never filled).
+The field i40e_mac_info.max_fcoeq is unused from the beginning.
+Remove both.
 
->> /// PHY state machine states.
->> ///
->> /// Corresponds to the kernel's
->> /// [`enum phy_state`](../../../../../networking/kapi.html#c.phy_state).
->> ///
->> /// Some of PHY drivers access to the state of PHY's software state machine.
-> 
-> That is one way, another would be to do:
+Co-developed-by: Michal Schmidt <mschmidt@redhat.com>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c  | 5 +----
+ drivers/net/ethernet/intel/i40e/i40e_debugfs.c | 3 +--
+ drivers/net/ethernet/intel/i40e/i40e_type.h    | 2 --
+ 3 files changed, 2 insertions(+), 8 deletions(-)
 
-This looks nicer.
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c b/drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c
+index 1ee77a2433c0..4721845fda6e 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c
+@@ -827,15 +827,12 @@ static void i40e_dcbnl_get_perm_hw_addr(struct net_device *dev,
+ 					u8 *perm_addr)
+ {
+ 	struct i40e_pf *pf = i40e_netdev_to_pf(dev);
+-	int i, j;
++	int i;
+ 
+ 	memset(perm_addr, 0xff, MAX_ADDR_LEN);
+ 
+ 	for (i = 0; i < dev->addr_len; i++)
+ 		perm_addr[i] = pf->hw.mac.perm_addr[i];
+-
+-	for (j = 0; j < dev->addr_len; j++, i++)
+-		perm_addr[i] = pf->hw.mac.san_addr[j];
+ }
+ 
+ static const struct dcbnl_rtnl_ops dcbnl_ops = {
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+index e0849f0c9c27..88240571721a 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+@@ -147,9 +147,8 @@ static void i40e_dbg_dump_vsi_seid(struct i40e_pf *pf, int seid)
+ 			 "    state[%d] = %08lx\n",
+ 			 i, vsi->state[i]);
+ 	if (vsi == pf->vsi[pf->lan_vsi])
+-		dev_info(&pf->pdev->dev, "    MAC address: %pM SAN MAC: %pM Port MAC: %pM\n",
++		dev_info(&pf->pdev->dev, "    MAC address: %pM Port MAC: %pM\n",
+ 			 pf->hw.mac.addr,
+-			 pf->hw.mac.san_addr,
+ 			 pf->hw.mac.port_addr);
+ 	hash_for_each(vsi->mac_filter_hash, bkt, f, hlist) {
+ 		dev_info(&pf->pdev->dev,
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
+index e3d40630f689..76bcbaec8ae5 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_type.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
+@@ -270,9 +270,7 @@ struct i40e_mac_info {
+ 	enum i40e_mac_type type;
+ 	u8 addr[ETH_ALEN];
+ 	u8 perm_addr[ETH_ALEN];
+-	u8 san_addr[ETH_ALEN];
+ 	u8 port_addr[ETH_ALEN];
+-	u16 max_fcoeq;
+ };
+ 
+ enum i40e_aq_resources_ids {
+-- 
+2.41.0
 
-> /// PHY state machine states.
-> ///
-> /// Corresponds to the kernel's [`enum phy_state`].
-> ///
-> /// Some of PHY drivers access to the state of PHY's software state machine.
-> ///
-> /// [`enum phy_state`]: ../../../../../networking/kapi.html#c.phy_state
-> 
-> But as I noted before, then people who only build the rustdoc will not
-> be able to view it. I personally would prefer to have the correct link
-> offline, but do not know about others.
-
-I prefer a link to online docs but either is fine by me. You prefer a
-link to a header file like?
-
-/// [`enum phy_state`]:  ../../../include/linux/phy.h
-
-
->>>> +    /// Gets the current link state. It returns true if the link is up.
-> 
-> I just noticed this as well, here also please split the line.
-
-Fixed all.
 
