@@ -1,57 +1,46 @@
-Return-Path: <netdev+bounces-44210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F907D719E
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 18:22:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A9367D71A4
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 18:23:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1B4D1C20E72
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 16:22:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 367041C20C55
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 16:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063A330CE8;
-	Wed, 25 Oct 2023 16:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D928A2E656;
+	Wed, 25 Oct 2023 16:22:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FOtbQR9d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VvigF7xP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD8130CE5
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 16:22:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A45F2C433C7;
-	Wed, 25 Oct 2023 16:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA74C26E3C
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 16:22:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CBE9C433C8;
+	Wed, 25 Oct 2023 16:22:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698250927;
-	bh=Q4J6Dffc3q5PWdgWmRB3IZ2LYtpt04/UvFaVkkyJyno=;
+	s=k20201202; t=1698250976;
+	bh=0HXWW+/bzfd0m4nuGk3Rkz9/ToswSDujSboXrysLScE=;
 	h=From:To:Cc:Subject:Date:From;
-	b=FOtbQR9dXqxXC+HsGXAsWb+9SDQB0Dxdpj3ZNLkhGQncx7+ACS2CLTNdHyV4xQ+9u
-	 K6EsShyjN5ARObfT6jC0oVPxw/ganpWUJdPT8uOOZlO5DaaKgUCyUoaDU7uqm690yP
-	 NVoQC1TCIdG3Zj4Yaz0rf5AYc7GHDZPlbkI9IPnNJjcjh/9wVnSGXZI2VzevauWsv/
-	 YT6NnuSmuM6/oOrCwu4SY7G9j/9pe3vShCRskBrMnN7JFksqGuxLnJmMj3xtTCv7tl
-	 uI+qWLCgE5F3ut2rWIbACXEc9hXWnsTXwnBPqDLsyaytfb4rT4gGd1BJMfhsEi8uDx
-	 64AXTjTMPOVqA==
+	b=VvigF7xP/ngXIvKDKJcJez4kUo3FMdAvVN9odwTsIlsbx5ddtyUierLPKvHTttRXn
+	 QYF85MdM2a979LZAKhjQeOouuhtdWJwfTlIGt2swqo6Yj086DcLKKDi9H04VcoNCl2
+	 jomBbbLvnZjgLlnm+aVsNv3RyOI7OEVeCOHRgYUA8NOd3DGaiv9293yBtv9/NPh5KT
+	 PvFEK/WCjQp3oDgH2CylNVMjIx7iOFoP6dgIbM6/oqnKhpCJ8Vsg5gyacOnm13vlZN
+	 QsO9CO2cdXvz0UazrVDlX4NJtX+gUs2rfzt9Bc2y4oiyVkV5amKhDn4NN2pkyOdPh7
+	 meBxPLrHfQmyA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	j.vosburgh@gmail.com,
-	andy@greyhouse.net,
-	dsahern@kernel.org,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	vinicius.gomes@intel.com,
-	johannes@sipsolutions.net,
-	razor@blackwall.org,
-	idosch@nvidia.com,
-	linux-wireless@vger.kernel.org
-Subject: [PATCH net-next] netlink: make range pointers in policies const
-Date: Wed, 25 Oct 2023 09:22:04 -0700
-Message-ID: <20231025162204.132528-1-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next] netlink: specs: support conditional operations
+Date: Wed, 25 Oct 2023 09:22:53 -0700
+Message-ID: <20231025162253.133159-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -61,169 +50,154 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-struct nla_policy is usually constant itself, but unless
-we make the ranges inside constant we won't be able to
-make range structs const. The ranges are not modified
-by the core.
+Page pool code is compiled conditionally, but the operations
+are part of the shared netlink family. We can handle this
+by reporting empty list of pools or -EOPNOTSUPP / -ENOSYS
+but the cleanest way seems to be removing the ops completely
+at compilation time. That way user can see that the page
+pool ops are not present using genetlink introspection.
+Same way they'd check if the kernel is "new enough" to
+support the ops.
+
+Extend the specs with the ability to specify the config
+condition under which op (and its policies, etc.) should
+be hidden.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: j.vosburgh@gmail.com
-CC: andy@greyhouse.net
-CC: dsahern@kernel.org
-CC: jhs@mojatatu.com
-CC: xiyou.wangcong@gmail.com
-CC: jiri@resnulli.us
-CC: vinicius.gomes@intel.com
-CC: johannes@sipsolutions.net
-CC: razor@blackwall.org
-CC: idosch@nvidia.com
-CC: linux-wireless@vger.kernel.org
----
- drivers/net/bonding/bond_netlink.c | 2 +-
- drivers/net/vxlan/vxlan_mdb.c      | 2 +-
- include/net/netlink.h              | 4 ++--
- net/ipv6/ioam6_iptunnel.c          | 2 +-
- net/sched/sch_fq.c                 | 2 +-
- net/sched/sch_fq_pie.c             | 2 +-
- net/sched/sch_qfq.c                | 2 +-
- net/sched/sch_taprio.c             | 2 +-
- net/wireless/nl80211.c             | 2 +-
- tools/net/ynl/ynl-gen-c.py         | 2 +-
- 10 files changed, 11 insertions(+), 11 deletions(-)
+ Documentation/netlink/genetlink-c.yaml      |  5 +++++
+ Documentation/netlink/genetlink-legacy.yaml |  5 +++++
+ Documentation/netlink/genetlink.yaml        |  5 +++++
+ tools/net/ynl/ynl-gen-c.py                  | 22 +++++++++++++++++++++
+ 4 files changed, 37 insertions(+)
 
-diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
-index 27cbe148f0db..cfa74cf8bb1a 100644
---- a/drivers/net/bonding/bond_netlink.c
-+++ b/drivers/net/bonding/bond_netlink.c
-@@ -85,7 +85,7 @@ static int bond_fill_slave_info(struct sk_buff *skb,
- }
- 
- /* Limit the max delay range to 300s */
--static struct netlink_range_validation delay_range = {
-+static const struct netlink_range_validation delay_range = {
- 	.max = 300000,
- };
- 
-diff --git a/drivers/net/vxlan/vxlan_mdb.c b/drivers/net/vxlan/vxlan_mdb.c
-index 5e041622261a..3a21389658ce 100644
---- a/drivers/net/vxlan/vxlan_mdb.c
-+++ b/drivers/net/vxlan/vxlan_mdb.c
-@@ -311,7 +311,7 @@ vxlan_mdbe_src_list_pol[MDBE_SRC_LIST_MAX + 1] = {
- 	[MDBE_SRC_LIST_ENTRY] = NLA_POLICY_NESTED(vxlan_mdbe_src_list_entry_pol),
- };
- 
--static struct netlink_range_validation vni_range = {
-+static const struct netlink_range_validation vni_range = {
- 	.max = VXLAN_N_VID - 1,
- };
- 
-diff --git a/include/net/netlink.h b/include/net/netlink.h
-index aba2b162a226..83bdf787aeee 100644
---- a/include/net/netlink.h
-+++ b/include/net/netlink.h
-@@ -360,8 +360,8 @@ struct nla_policy {
- 		const u32 mask;
- 		const char *reject_message;
- 		const struct nla_policy *nested_policy;
--		struct netlink_range_validation *range;
--		struct netlink_range_validation_signed *range_signed;
-+		const struct netlink_range_validation *range;
-+		const struct netlink_range_validation_signed *range_signed;
- 		struct {
- 			s16 min, max;
- 		};
-diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
-index f6f5b83dd954..7563f8c6aa87 100644
---- a/net/ipv6/ioam6_iptunnel.c
-+++ b/net/ipv6/ioam6_iptunnel.c
-@@ -46,7 +46,7 @@ struct ioam6_lwt {
- 	struct ioam6_lwt_encap	tuninfo;
- };
- 
--static struct netlink_range_validation freq_range = {
-+static const struct netlink_range_validation freq_range = {
- 	.min = IOAM6_IPTUNNEL_FREQ_MIN,
- 	.max = IOAM6_IPTUNNEL_FREQ_MAX,
- };
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index bf9d00518a60..0fd18c344ab5 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -897,7 +897,7 @@ static int fq_resize(struct Qdisc *sch, u32 log)
- 	return 0;
- }
- 
--static struct netlink_range_validation iq_range = {
-+static const struct netlink_range_validation iq_range = {
- 	.max = INT_MAX,
- };
- 
-diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
-index 68e6acd0f130..5b595773e59b 100644
---- a/net/sched/sch_fq_pie.c
-+++ b/net/sched/sch_fq_pie.c
-@@ -202,7 +202,7 @@ static int fq_pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	return NET_XMIT_CN;
- }
- 
--static struct netlink_range_validation fq_pie_q_range = {
-+static const struct netlink_range_validation fq_pie_q_range = {
- 	.min = 1,
- 	.max = 1 << 20,
- };
-diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-index 5598f8be18ae..28315166fe8e 100644
---- a/net/sched/sch_qfq.c
-+++ b/net/sched/sch_qfq.c
-@@ -213,7 +213,7 @@ static struct qfq_class *qfq_find_class(struct Qdisc *sch, u32 classid)
- 	return container_of(clc, struct qfq_class, common);
- }
- 
--static struct netlink_range_validation lmax_range = {
-+static const struct netlink_range_validation lmax_range = {
- 	.min = QFQ_MIN_LMAX,
- 	.max = QFQ_MAX_LMAX,
- };
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 1cb5e41c0ec7..2e1949de4171 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -1015,7 +1015,7 @@ static const struct nla_policy taprio_tc_policy[TCA_TAPRIO_TC_ENTRY_MAX + 1] = {
- 							      TC_FP_PREEMPTIBLE),
- };
- 
--static struct netlink_range_validation_signed taprio_cycle_time_range = {
-+static const struct netlink_range_validation_signed taprio_cycle_time_range = {
- 	.min = 0,
- 	.max = INT_MAX,
- };
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index 2650543dcebe..2f8353bf603c 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -463,7 +463,7 @@ nl80211_sta_wme_policy[NL80211_STA_WME_MAX + 1] = {
- 	[NL80211_STA_WME_MAX_SP] = { .type = NLA_U8 },
- };
- 
--static struct netlink_range_validation nl80211_punct_bitmap_range = {
-+static const struct netlink_range_validation nl80211_punct_bitmap_range = {
- 	.min = 0,
- 	.max = 0xffff,
- };
+diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
+index 7ef2496d57c8..9d13bbb7ae47 100644
+--- a/Documentation/netlink/genetlink-c.yaml
++++ b/Documentation/netlink/genetlink-c.yaml
+@@ -295,6 +295,11 @@ additionalProperties: False
+               type: array
+               items:
+                 enum: [ strict, dump, dump-strict ]
++            config-cond:
++              description: |
++                Name of the kernel config option gating the presence of
++                the operation, without the 'CONFIG_' prefix.
++              type: string
+             do: &subop-type
+               description: Main command handler.
+               type: object
+diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
+index cd5ebe39b52c..0daf40402a29 100644
+--- a/Documentation/netlink/genetlink-legacy.yaml
++++ b/Documentation/netlink/genetlink-legacy.yaml
+@@ -346,6 +346,11 @@ additionalProperties: False
+               type: array
+               items:
+                 enum: [ strict, dump, dump-strict ]
++            config-cond:
++              description: |
++                Name of the kernel config option gating the presence of
++                the operation, without the 'CONFIG_' prefix.
++              type: string
+             # Start genetlink-legacy
+             fixed-header: *fixed-header
+             # End genetlink-legacy
+diff --git a/Documentation/netlink/genetlink.yaml b/Documentation/netlink/genetlink.yaml
+index 501ed2e6c8ef..3283bf458ff1 100644
+--- a/Documentation/netlink/genetlink.yaml
++++ b/Documentation/netlink/genetlink.yaml
+@@ -264,6 +264,11 @@ additionalProperties: False
+               type: array
+               items:
+                 enum: [ strict, dump, dump-strict ]
++            config-cond:
++              description: |
++                Name of the kernel config option gating the presence of
++                the operation, without the 'CONFIG_' prefix.
++              type: string
+             do: &subop-type
+               description: Main command handler.
+               type: object
 diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 0fee68863db4..31fd96f14fc0 100755
+index 0fee68863db4..6eb32b2ef848 100755
 --- a/tools/net/ynl/ynl-gen-c.py
 +++ b/tools/net/ynl/ynl-gen-c.py
-@@ -2038,7 +2038,7 @@ _C_KW = {
-                 first = False
+@@ -1162,6 +1162,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         self._block_end = False
+         self._silent_block = False
+         self._ind = 0
++        self._ifdef_block = None
+         if out_file is None:
+             self._out = os.sys.stdout
+         else:
+@@ -1202,6 +1203,8 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         if self._silent_block:
+             ind += 1
+         self._silent_block = line.endswith(')') and CodeWriter._is_cond(line)
++        if line[0] == '#':
++            ind = 0
+         if add_ind:
+             ind += add_ind
+         self._out.write('\t' * ind + line + '\n')
+@@ -1328,6 +1331,19 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+             line += '= ' + str(one[1]) + ','
+             self.p(line)
  
-             sign = '' if attr.type[0] == 'u' else '_signed'
--            cw.block_start(line=f'struct netlink_range_validation{sign} {c_lower(attr.enum_name)}_range =')
-+            cw.block_start(line=f'static const struct netlink_range_validation{sign} {c_lower(attr.enum_name)}_range =')
-             members = []
-             if 'min' in attr.checks:
-                 members.append(('min', attr.get_limit('min')))
++    def ifdef_block(self, config):
++        config_option = None
++        if config:
++            config_option = 'CONFIG_' + c_upper(config)
++        if self._ifdef_block == config_option:
++            return
++
++        if self._ifdef_block:
++            self.p('#endif /* ' + self._ifdef_block + ' */')
++        if config_option:
++            self.p('#ifdef ' + config_option)
++        self._ifdef_block = config_option
++
+ 
+ scalars = {'u8', 'u16', 'u32', 'u64', 's32', 's64', 'uint', 'sint'}
+ 
+@@ -2006,10 +2022,13 @@ _C_KW = {
+ 
+ 
+ def print_req_policy(cw, struct, ri=None):
++    if ri and ri.op:
++        cw.ifdef_block(ri.op.get('config-cond', None))
+     print_req_policy_fwd(cw, struct, ri=ri, terminate=False)
+     for _, arg in struct.member_list():
+         arg.attr_policy(cw)
+     cw.p("};")
++    cw.ifdef_block(None)
+     cw.nl()
+ 
+ 
+@@ -2127,6 +2146,7 @@ _C_KW = {
+             if op.is_async:
+                 continue
+ 
++            cw.ifdef_block(op.get('config-cond', None))
+             cw.block_start()
+             members = [('cmd', op.enum_name)]
+             if 'dont-validate' in op:
+@@ -2157,6 +2177,7 @@ _C_KW = {
+                 if op.is_async or op_mode not in op:
+                     continue
+ 
++                cw.ifdef_block(op.get('config-cond', None))
+                 cw.block_start()
+                 members = [('cmd', op.enum_name)]
+                 if 'dont-validate' in op:
+@@ -2192,6 +2213,7 @@ _C_KW = {
+                 members.append(('flags', ' | '.join([c_upper('genl-' + x) for x in flags])))
+                 cw.write_struct_init(members)
+                 cw.block_end(line=',')
++    cw.ifdef_block(None)
+ 
+     cw.block_end(line=';')
+     cw.nl()
 -- 
 2.41.0
 
