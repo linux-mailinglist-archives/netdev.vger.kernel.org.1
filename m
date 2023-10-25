@@ -1,40 +1,41 @@
-Return-Path: <netdev+bounces-44316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E77EC7D78B1
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:37:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52A17D78B4
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:37:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CEB8B21358
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:37:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7558FB211AB
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE54381B5;
-	Wed, 25 Oct 2023 23:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72FE38FAE;
+	Wed, 25 Oct 2023 23:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i26CsGYC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GSYmxu9o"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A60381AD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDF7381BA;
 	Wed, 25 Oct 2023 23:37:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA49EC433B9;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3B01C433BD;
 	Wed, 25 Oct 2023 23:37:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698277032;
-	bh=GyNOg92sM3p0ShPkfaGKDtFNcD8NFmdnpi3MEJceRfk=;
+	s=k20201202; t=1698277033;
+	bh=iHTW92DQYzrFSdt6z90d4EIwPhRKgXAhTgEPt3iGoqI=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=i26CsGYCgYdBKFtgsah5O2+wzT/iEI/7yNx9bC1bXOTLlEHi3xsQ2QErM28QtOsx1
-	 SFiMhissGcWr1b5NNTlbLel7kvxXIsJttmD5dkZoRaykTtNV0Imwl5wBJey5WEZ0AO
-	 B0VfGHaWj0FRcg0HxQr8rYG+5ou/knGgtDy7xzfELIPy7YRSfa0AM57Ud5xqxq3uqT
-	 kWSo9A8TE6TOGNkedqJkjmXUIl0e9Q88WKHEP672Tg+XWWTfsyUa7yb+H0S5qwdBx2
-	 XTvbrmRIsUNF+R1gEctEI3jfhAWeWgZM9/Y2xbsyK6X2g3Yx85L28NEB+65/dk3bCk
-	 opar4hKmoirFQ==
+	b=GSYmxu9oSs1sV+fYywY1t/o1O6SyqSIgi5WzfFTfQfvzT2NwC5Yc1i0DmW2OmQ73L
+	 8FvYyqhW1qCRv2darmBmwYRv37wkhs7pGDFQ6udfM2YE8dMMEQumTGyH0zdErf/JEY
+	 KzLHAVCyw4WwQvkhRkzPz+tOpR9XrOc70/izG1+wt98VO0JvpEU7lqsFSNfeI3dCbu
+	 XLWRK1nlVrJ3JVzBfFTT/WoEqwm9/dzzpVcUqfoNkrfW8nuklLj6al9MpcMHgna9HC
+	 +hebTEQxTo9iS+XQXO7q3gjFpFyz9WoDMR1rAEnvFq1eOygrslAuzhVCLSmseYTsGK
+	 vv/U25tzMxTxw==
 From: Mat Martineau <martineau@kernel.org>
-Date: Wed, 25 Oct 2023 16:37:04 -0700
-Subject: [PATCH net-next 03/10] mptcp: userspace pm send RM_ADDR for ID 0
+Date: Wed, 25 Oct 2023 16:37:05 -0700
+Subject: [PATCH net-next 04/10] mptcp: drop useless ssk in
+ pm_subflow_check_next
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,7 +44,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231025-send-net-next-20231025-v1-3-db8f25f798eb@kernel.org>
+Message-Id: <20231025-send-net-next-20231025-v1-4-db8f25f798eb@kernel.org>
 References: <20231025-send-net-next-20231025-v1-0-db8f25f798eb@kernel.org>
 In-Reply-To: <20231025-send-net-next-20231025-v1-0-db8f25f798eb@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>, 
@@ -52,86 +53,63 @@ To: Matthieu Baerts <matttbe@kernel.org>,
  Geliang Tang <geliang.tang@suse.com>, 
  Kishen Maloor <kishen.maloor@intel.com>
 Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- Mat Martineau <martineau@kernel.org>, stable@vger.kernel.org
+ Mat Martineau <martineau@kernel.org>
 X-Mailer: b4 0.12.4
 
 From: Geliang Tang <geliang.tang@suse.com>
 
-This patch adds the ability to send RM_ADDR for local ID 0. Check
-whether id 0 address is removed, if not, put id 0 into a removing
-list, pass it to mptcp_pm_remove_addr() to remove id 0 address.
+The code using 'ssk' parameter of mptcp_pm_subflow_check_next() has been
+dropped in commit "95d686517884 (mptcp: fix subflow accounting on close)".
+So drop this useless parameter ssk.
 
-There is no reason not to allow the userspace to remove the initial
-address (ID 0). This special case was not taken into account not
-letting the userspace to delete all addresses as announced.
-
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/379
-Fixes: d9a4594edabf ("mptcp: netlink: Add MPTCP_PM_CMD_REMOVE")
-Cc: stable@vger.kernel.org
 Reviewed-by: Matthieu Baerts <matttbe@kernel.org>
 Signed-off-by: Geliang Tang <geliang.tang@suse.com>
 Signed-off-by: Mat Martineau <martineau@kernel.org>
 ---
- net/mptcp/pm_userspace.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ net/mptcp/pm.c       | 2 +-
+ net/mptcp/protocol.c | 2 +-
+ net/mptcp/protocol.h | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/mptcp/pm_userspace.c b/net/mptcp/pm_userspace.c
-index 0f92e5b13a8a..25fa37ac3620 100644
---- a/net/mptcp/pm_userspace.c
-+++ b/net/mptcp/pm_userspace.c
-@@ -208,6 +208,40 @@ int mptcp_pm_nl_announce_doit(struct sk_buff *skb, struct genl_info *info)
- 	return err;
+diff --git a/net/mptcp/pm.c b/net/mptcp/pm.c
+index d8da5374d9e1..4ae19113b8eb 100644
+--- a/net/mptcp/pm.c
++++ b/net/mptcp/pm.c
+@@ -184,7 +184,7 @@ void mptcp_pm_subflow_established(struct mptcp_sock *msk)
+ 	spin_unlock_bh(&pm->lock);
  }
  
-+static int mptcp_userspace_pm_remove_id_zero_address(struct mptcp_sock *msk,
-+						     struct genl_info *info)
-+{
-+	struct mptcp_rm_list list = { .nr = 0 };
-+	struct mptcp_subflow_context *subflow;
-+	struct sock *sk = (struct sock *)msk;
-+	bool has_id_0 = false;
-+	int err = -EINVAL;
-+
-+	lock_sock(sk);
-+	mptcp_for_each_subflow(msk, subflow) {
-+		if (subflow->local_id == 0) {
-+			has_id_0 = true;
-+			break;
-+		}
-+	}
-+	if (!has_id_0) {
-+		GENL_SET_ERR_MSG(info, "address with id 0 not found");
-+		goto remove_err;
-+	}
-+
-+	list.ids[list.nr++] = 0;
-+
-+	spin_lock_bh(&msk->pm.lock);
-+	mptcp_pm_remove_addr(msk, &list);
-+	spin_unlock_bh(&msk->pm.lock);
-+
-+	err = 0;
-+
-+remove_err:
-+	release_sock(sk);
-+	return err;
-+}
-+
- int mptcp_pm_nl_remove_doit(struct sk_buff *skb, struct genl_info *info)
+-void mptcp_pm_subflow_check_next(struct mptcp_sock *msk, const struct sock *ssk,
++void mptcp_pm_subflow_check_next(struct mptcp_sock *msk,
+ 				 const struct mptcp_subflow_context *subflow)
  {
- 	struct nlattr *token = info->attrs[MPTCP_PM_ATTR_TOKEN];
-@@ -239,6 +273,11 @@ int mptcp_pm_nl_remove_doit(struct sk_buff *skb, struct genl_info *info)
- 		goto remove_err;
- 	}
+ 	struct mptcp_pm_data *pm = &msk->pm;
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 1dacc072dcca..a29116eda30a 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -2490,7 +2490,7 @@ void mptcp_close_ssk(struct sock *sk, struct sock *ssk,
+ 	/* subflow aborted before reaching the fully_established status
+ 	 * attempt the creation of the next subflow
+ 	 */
+-	mptcp_pm_subflow_check_next(mptcp_sk(sk), ssk, subflow);
++	mptcp_pm_subflow_check_next(mptcp_sk(sk), subflow);
  
-+	if (id_val == 0) {
-+		err = mptcp_userspace_pm_remove_id_zero_address(msk, info);
-+		goto remove_err;
-+	}
-+
- 	lock_sock((struct sock *)msk);
- 
- 	list_for_each_entry(entry, &msk->pm.userspace_pm_local_addr_list, list) {
+ 	__mptcp_close_ssk(sk, ssk, subflow, MPTCP_CF_PUSH);
+ }
+diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+index 9092fcf18798..a5322074353b 100644
+--- a/net/mptcp/protocol.h
++++ b/net/mptcp/protocol.h
+@@ -888,7 +888,7 @@ bool mptcp_pm_allow_new_subflow(struct mptcp_sock *msk);
+ void mptcp_pm_connection_closed(struct mptcp_sock *msk);
+ void mptcp_pm_subflow_established(struct mptcp_sock *msk);
+ bool mptcp_pm_nl_check_work_pending(struct mptcp_sock *msk);
+-void mptcp_pm_subflow_check_next(struct mptcp_sock *msk, const struct sock *ssk,
++void mptcp_pm_subflow_check_next(struct mptcp_sock *msk,
+ 				 const struct mptcp_subflow_context *subflow);
+ void mptcp_pm_add_addr_received(const struct sock *ssk,
+ 				const struct mptcp_addr_info *addr);
 
 -- 
 2.41.0
