@@ -1,100 +1,100 @@
-Return-Path: <netdev+bounces-44264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 260287D768A
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:22:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF0917D768E
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:24:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56D5D1C20C57
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 21:22:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8ECEBB20D95
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 21:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB6C339B1;
-	Wed, 25 Oct 2023 21:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37599339B2;
+	Wed, 25 Oct 2023 21:24:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VXpR8QUR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+yHywfo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C05B12B6D;
-	Wed, 25 Oct 2023 21:22:28 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A12212A;
-	Wed, 25 Oct 2023 14:22:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Urn8GamAAmfRlpIyeTNJ8cL1pt8vGWoFXXcjKP9MuQE=; b=VXpR8QURtG7r8i5CpJY9UZSshe
-	1Fs7I958KobVil75HdIaCvNzzUhdETy5Uvr9zrFObJp9avKLyCqXmUw0uMyPZ7lO54ZUQnLxExXsh
-	oNkz7wB3W4LZuDk14kMERjVaOgOw49DWu3UMeZohNiSYEkaE25hrNGLOtkVdULYys/Rw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qvlK9-000CtD-3G; Wed, 25 Oct 2023 23:21:57 +0200
-Date: Wed, 25 Oct 2023 23:21:57 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-	Enrico Mioso <mrkiko.rs@gmail.com>,
-	Robert Marko <robert.marko@sartura.hr>,
-	Russell King <linux@armlinux.org.uk>,
-	Chris Packham <chris.packham@alliedtelesis.co.nz>,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v7 5/7] ARM64: dts: marvell: Fix some common
- switch mistakes
-Message-ID: <72d0aee4-ae19-4472-aa96-87220128bca9@lunn.ch>
-References: <20231024-marvell-88e6152-wan-led-v7-0-2869347697d1@linaro.org>
- <20231024-marvell-88e6152-wan-led-v7-5-2869347697d1@linaro.org>
- <20231024182842.flxrg3hjm3scnhjo@skbuf>
- <CACRpkdb-4GPnVegc+OqyPaZN2rNCkgmNL4qjf-LGnnz27+EBbg@mail.gmail.com>
- <CACRpkdaZYUxar8ESi6X7qLWJhuyRcFpYSF-70DvGdSn-rb7r6w@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59AB12B6D;
+	Wed, 25 Oct 2023 21:24:10 +0000 (UTC)
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E2E132;
+	Wed, 25 Oct 2023 14:24:09 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5a7ac4c3666so1339347b3.3;
+        Wed, 25 Oct 2023 14:24:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698269049; x=1698873849; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=b2tlHyzHAWHhl5WlMfjU/HdSIBEM4uvxlEfX0//lC78=;
+        b=D+yHywfol8vj6Xkfa12jp/YevEGbSxRnwHLCwgN/eGdJI/dDRQiyYwWucOsnM49BpP
+         bCaGYKQB77A3oqGHOU3hV5Qmfh22stGqhQpP4zrLwpdlj1WoFhwfkQ6SIKWoAMlG4oY6
+         hjGg+LWZwwkrbV0G65OK7CU27+WWPfZQFxrNdVmi5qTfICHtvUVspI3D8LNaAfjR5Kgd
+         UvIU59kq0tk0HRhm5b6HOE1+cHepszaYpQYKLFkAAC0or105PIyQd/oa8j9PIpum7sDb
+         RZNSgx9+iM24f5Qw9OssICqSDG9bAngtKeEuHex2RFv/2vG8MPE36OKUWPaL1XVTnBVy
+         TxGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698269049; x=1698873849;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b2tlHyzHAWHhl5WlMfjU/HdSIBEM4uvxlEfX0//lC78=;
+        b=UkdRgJJfmAKFBfhJJsyS6CToSmHqWYPVk0LzD0ryIZce93BP5ssmWt43kXaKW7HP/R
+         +bgrn6iYdI5EsE7YJzADYVTs488b/DTjmBELKT5le6LOvtcpggB5jx0MHWjABqx9EIvj
+         ZvQRWM3tcK9BBUQ83fOWU80VovRFT97G5KRCEDdXdGn+h76yb0ZMT2AMPgvK1ZmuqJqm
+         eByX+rIGpNi6UKfBEMvCkYeAem/qnoX6DfLwnQsljJPxQMlcd1jXAfVrUyqh9IssR1YZ
+         y+lole5uqi+CBoS8+UlvXkcpgUCz+UWVEOjQ8BB0K7vIBxWZOpxzCT5P6J9Z1rt4GEOT
+         LJjg==
+X-Gm-Message-State: AOJu0YzzDJqMOqWdBwl7t/2CO8c73d91dtFpTwM74cl1lB3pMX6zGAJg
+	H/vGz8B5siNV4kx5eMhQsts=
+X-Google-Smtp-Source: AGHT+IHrejJCIAGJw5AK48PIQZcv5G1WktJGUSCMiakxtG7viabjRgphqcoVDZrVhoL/ko4uUdYWKA==
+X-Received: by 2002:a81:920e:0:b0:5a7:c906:14f with SMTP id j14-20020a81920e000000b005a7c906014fmr16271706ywg.11.1698269048830;
+        Wed, 25 Oct 2023 14:24:08 -0700 (PDT)
+Received: from ?IPV6:2600:1700:6cf8:1240:1545:3e11:ea38:83fe? ([2600:1700:6cf8:1240:1545:3e11:ea38:83fe])
+        by smtp.gmail.com with ESMTPSA id z65-20020a814c44000000b005a8eadbadbesm1670366ywa.19.2023.10.25.14.24.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Oct 2023 14:24:08 -0700 (PDT)
+Message-ID: <ad801a2c-217e-44b4-8dae-0ae7b1b8484f@gmail.com>
+Date: Wed, 25 Oct 2023 14:24:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACRpkdaZYUxar8ESi6X7qLWJhuyRcFpYSF-70DvGdSn-rb7r6w@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v4 1/7] netkit, bpf: Add bpf programmable net
+ device
+To: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, martin.lau@linux.dev, razor@blackwall.org,
+ ast@kernel.org, andrii@kernel.org, john.fastabend@gmail.com, sdf@google.com,
+ toke@kernel.org, kuba@kernel.org, andrew@lunn.ch,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+References: <20231024214904.29825-1-daniel@iogearbox.net>
+ <20231024214904.29825-2-daniel@iogearbox.net>
+Content-Language: en-US
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <20231024214904.29825-2-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> The mv88e6xxx schema will look like so:
+
+
+On 10/24/23 14:48, Daniel Borkmann wrote:
+> This work adds a new, minimal BPF-programmable device called "netkit"
+> (former PoC code-name "meta") we recently presented at LSF/MM/BPF. The
+> core idea is that BPF programs are executed within the drivers xmit routine
+> and therefore e.g. in case of containers/Pods moving BPF processing closer
+> to the source.
 > 
->  properties:
->    compatible:
-> +    oneOf:
-> +      - enum:
-> +          - marvell,mv88e6085
-> +          - marvell,mv88e6190
-> +          - marvell,mv88e6250
-> (...)
-> +      - items:
-> +          - const: marvell,turris-mox-mv88e6085
-> +          - const: marvell,mv88e6085
-> +      - items:
-> +          - const: marvell,turris-mox-mv88e6190
-> +          - const: marvell,mv88e6190
 
-Lets see what the DT Maintainers think of this. But if we do go this
-way, i would like to see a comment here with an explanation. What we
-don't want is developers thinking they should add new compatibles for
-whatever board they are adding.
+Sorry for intruding into this discussion! Although it is too late to
+mentioned this since this patchset have been v4 already.
 
-	 Andrew
+I notice netkit has introduced a new attach type. I wonder if it
+possible to implement it as a new struct_ops type.
 
