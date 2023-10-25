@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-44165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07A207D6B9F
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 14:31:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D96437D6BA6
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 14:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D579B1C20E3A
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 12:31:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68E00B20F0C
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 12:31:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1045B2772E;
-	Wed, 25 Oct 2023 12:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53951286AF;
+	Wed, 25 Oct 2023 12:31:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mnkwiWLm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="b3HTZoQe"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413EC2868D
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 12:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA3028693
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 12:31:39 +0000 (UTC)
 Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2088.outbound.protection.outlook.com [40.107.223.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD1BF181
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 05:31:27 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C04DFC1
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 05:31:37 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LKfQ4LbIPjYFQEyFcDw2jIY3K6StsXI/8IgqPO8Qb43tAk0Nsd+h7/2K++UcaOMWQB2npzEl0oy9BR0bmPHYuBrEGGxGeXN4TEvN87ca0+9+vttenxP6AkSXGQTAYVAI/8u4f0QYwOPuvGqFjzHj4K20WotPqGkNqkmW/zMlkFU/Rn8lpe6jnxr8YSYZj9cxDcvNk+c5w1OVEPgejAQeHuLF0m76+PPcJSGOaRukDPkFQyJnlHjCpCvjRe4ivhR5nbsCpkCkvTMYbC7KEhhQDothkJc3lKBW7sU1670DpuSgfNZ8rjKDczsdWPX4iJGaQXh2jd2BvzIgQi5k2UjFpA==
+ b=J25c9BDxYsx53Uqt/r87l8IfW2Z4tNIeuBhdzo7sTWLJF7f7uj3H2H21yCSCwailPq1TQA9Lajhuj3yylHtayEbg5PAPGup4TYBbW1+/U3Vzis2P5y2Y3mf2WDlzuarFd+cG4sOc/Lj+aT5or2LGig3hmdUfIUzu8p10XjDX+bImUbzmvaLsu9ddQqY7v5R1AxJt8f5HrEdzSJ3LFzXTTW8fa8pfkaQYcK+gzDMMYW0kLrqyjtFFp05E4eoR92JjNiDqPkIubLii9YqT5xOqXrVwbSxshr/jzqYFbyJPGSrrNk8/KF0bjaNMjIWJy7h39qPOmtAAuuYdbFZnlPkcvg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NgAYaQzNS2YTUXSPafmhLLsXR7g31zwrW17O7KOHwfI=;
- b=gp73FmPciyHqmddA3Lm4gbrZ7tv5bVTNh8by6gH0S2XXqwJqrJJnigr8VVgews4p84r+SFF3AezQbyeOsAZ/eOPhQML/7HhU47ogR6v4ifkr8CRWr5uj14MnmvRijHaZ0HRcaSafdaRBVdKiIuoMhymIOivIJaBpQgVj/5bC4LtsgiJwku7XOCK2uE3rpqYoyHU8PEzNSxOas5uO9C19WUya8Si0Yni3gOIqD+l510CPmeBWCGNs8agWFhVgFCi7kb9AKRMij56isRpNci/XwINnjXJ09AWTBJ/XvxssDd8YFmNlvZUEb1CaY//C4zNl7g/YUhcG6rApY3V0+YTfpg==
+ bh=AsAJ0Pa5F/FZiYV8zm16gn6Wb3XmKGfj7pxlsgvFSBk=;
+ b=k1sBjvh7F1biibBIwPDdAgRSWCxz1uAA2K4UsEr7cUaPUb3zbaQ+/ruJcblnNdFZnGlOwQVR1+ikFojOM5f89cMjVbsmVRyeuT0d64HfAyaZZBmDUqpUXpkPjoNGieoaQW5RPw0hvttL72G0Opn9bcQC+Pdt9/VH5h/6HlmgYCFGp4CQHhtd+CvaxpfAw1g/nit0kVs4sguOEZIrtJoDBONJy1SJmToBp3D3RX/Zb7CkNPltzKGm35O3tztdT19VOrXoitqp2ZtUvVUOb2dQBOQHNtWiW84LQqr8UnqwzNJZZTQpY8huK7BzF9jfFtdj8v/D6zfxr1KqqwQyAwuE4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -37,18 +37,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NgAYaQzNS2YTUXSPafmhLLsXR7g31zwrW17O7KOHwfI=;
- b=mnkwiWLm2K4HDpixTEJ2rnPhydSRT0bZ5yYqJWcrqpB0POsHmL3sewI1I78jc7p/evxGe1is+s7rCRdI95gXDzkFQxtXxsWNZ19fn4XL3hV/wNOcVg1hNOqPkkbN7n/DpFxN1nV+AYmUOAZmFTvp1vDJP0PJLa3TrPMwwQX6cIGh3KMriyaRsL6HpCBkpN8alKo/udDp5B9Q3eSkcdcjK8itQKqM81GJR/ju7Bq/+ClFjFoYoUDGVkYq03Ot9wYWYtbTkuqVnboeMPHXoVRY4hTo83Y/FdG3Wppx2gElE8npRlQdQoPFv1TqriMoqQ9RXHzEwZnMxaEIyRfKNJnU1w==
-Received: from DM6PR04CA0005.namprd04.prod.outlook.com (2603:10b6:5:334::10)
- by CY5PR12MB6033.namprd12.prod.outlook.com (2603:10b6:930:2f::19) with
+ bh=AsAJ0Pa5F/FZiYV8zm16gn6Wb3XmKGfj7pxlsgvFSBk=;
+ b=b3HTZoQeVv4BHx2gV6Sg28FVH1OjGEwVzSf4GyKr8HzrgErRx7ezB0Y2utHRv+0iDKpoFid7JpZr7p4wYHL3xwm8vQDu0ocRHJhekl6Rh+SzYQm9ztAJ6rwv75gcILMlyu53igV9T2nsVOlMgQzQSpW3GK/eN+NbvXQYGm1x2njuez5cwNc8Sw3YuzZg6UB/LakfZhhg0qmUC4wspkyiSiDWyDiAaoujWKs/UY9TgQeWGInzOYZDU2uxuLaJwnkuTO5om4U5Ocz6aN6XcmII1HK9doagrX0sff/RzeQeqHPd1T7nj+gzfKZrYhh8P6nQECNP/fBD8Qqtlid97b9hMA==
+Received: from DM6PR04CA0017.namprd04.prod.outlook.com (2603:10b6:5:334::22)
+ by MN2PR12MB4535.namprd12.prod.outlook.com (2603:10b6:208:267::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.31; Wed, 25 Oct
- 2023 12:31:25 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Wed, 25 Oct
+ 2023 12:31:36 +0000
 Received: from DS2PEPF0000343A.namprd02.prod.outlook.com
- (2603:10b6:5:334:cafe::19) by DM6PR04CA0005.outlook.office365.com
- (2603:10b6:5:334::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33 via Frontend
- Transport; Wed, 25 Oct 2023 12:31:25 +0000
+ (2603:10b6:5:334:cafe::62) by DM6PR04CA0017.outlook.office365.com
+ (2603:10b6:5:334::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.31 via Frontend
+ Transport; Wed, 25 Oct 2023 12:31:35 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -58,23 +58,23 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
 Received: from mail.nvidia.com (216.228.117.160) by
  DS2PEPF0000343A.mail.protection.outlook.com (10.167.18.37) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6933.18 via Frontend Transport; Wed, 25 Oct 2023 12:31:25 +0000
+ 15.20.6933.18 via Frontend Transport; Wed, 25 Oct 2023 12:31:35 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 25 Oct
- 2023 05:31:11 -0700
+ 2023 05:31:14 -0700
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Wed, 25 Oct 2023 05:31:08 -0700
+ 15.2.986.41; Wed, 25 Oct 2023 05:31:11 -0700
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>, <bridge@lists.linux-foundation.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <roopa@nvidia.com>, <razor@blackwall.org>,
 	<mlxsw@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next v2 05/13] vxlan: mdb: Adjust function arguments
-Date: Wed, 25 Oct 2023 15:30:12 +0300
-Message-ID: <20231025123020.788710-6-idosch@nvidia.com>
+Subject: [PATCH net-next v2 06/13] vxlan: mdb: Factor out a helper for remote entry size calculation
+Date: Wed, 25 Oct 2023 15:30:13 +0300
+Message-ID: <20231025123020.788710-7-idosch@nvidia.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231025123020.788710-1-idosch@nvidia.com>
 References: <20231025123020.788710-1-idosch@nvidia.com>
@@ -91,68 +91,99 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF0000343A:EE_|CY5PR12MB6033:EE_
-X-MS-Office365-Filtering-Correlation-Id: b4a7bfcc-f753-4d6f-28a1-08dbd5564e30
+X-MS-TrafficTypeDiagnostic: DS2PEPF0000343A:EE_|MN2PR12MB4535:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4b80d9d-bcae-4d92-57ee-08dbd5565434
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	2RvPoDJ0o+VilqURmduDDXEfMKHgtWs99kZaZEW5TakNXMxYt2EvLqIsnEQb8P1YCE6ESdFoay6gemYb+0667k3dWBfhR+tmFVam/m6lOQzmh9+IYNGS//vYS7kf08x96FQZOaWBmKgc1N4UVg49D0PQeX8/zpFtIJ2U0RRHXcaeTVufqRqainOkr8xhOiQLRk8POBQ9xujfOWaXGb2Hghg9c9e1Wrcef86kDwqgB+WjghIsjJ37Jbgoun0n/uiV7GFk2dYo/E/Jt2QdvIfO4D0xWV7PnOD8JNVWxOLDnqlmDpDnoMZvTqWSBQpN3nppLWu8QRRAIjDO1H22hfmhX0r/MjcLVveg4GqhgA7Q+ZflpXl3K/MSPJDYiwEWy79veGIxZhkMuM4cvjgZmbwfAhgNPc8ikMf2i1ndngJUYy4PFU69sAnBQoZssW/lvIrHwoiyByglDi1q6V5iFrw+9nXek2XuCsI6aCNyjeD/Q15M38i8VnJgfNNGAfoPOqpSy9vgVwkCJL5NBZokhLb1QM5cnmNV3ss5PeEFmk0HuoMHgZsWo4zRMop+6iTEjfNA876AHnvxGJcaOmNLw1NrRGPPcnUoLoPliolivnn1kdtYkVa4sYdpIO/bFgCThgMOlPnCsPhQAm0g9Xm2Ti/KEMWqAcvFC3+SB5pw+0ozlsoNRd6X0EWMI6VOzfd3TgLnjzzbl3NS2r+x+V/NafycL5QCZPxspw6jDVqq8Uw+1F1jc2ucmazjxVHMQwwBcWwR
+	t6Qphq3tSWfwh+Ftim3vd1iR7EVnFu9oqLOVBxT+IrsFbkjRp+LonTXAfuNuqJ0xU/qK5i92RyTlCTF44Qtz0w8vOjPaAS+1uiuwl6uFBUiVTSEnvXqHp99WnhSYpfq0/CMbj6UcNDCSazUPgF7Oc5XZnPagDSGX+uEiR/dhJ874g2ETgqMWpajCBhLQWaDtomqWGTtls1qVu0Y3cIMPulKpsEFqH1LukrcREm9pbk1OGDxRyb9dPIg4qJeOzM30lEnworL0MX/TanCc/xn+R99M4zhO+n9SI+0I/GgTU0eW7J5+28se0AC6hgSsqeYVuAeo5pd3vQAUngEr/GfZX9j2UtKOimU36jteR8FhHyFmxg6v8CPJxdHgjbqy4ILzi4pph1GZc9rVvVkj9Jtgh6jjVYa/6Rl07C1LgjSsxxpRsCSsFVQcoLNZiCcT9J1axtqjPNTedgbkiL/8JV8SlUvTTEUysK8pFnAKgnR6sPzCecB/Iipm/ecFWr51amrjVB7YmbI2hREZhD9pBTb6hR0lLV5pg6sLxsFDrQGorqW02LEPnVSP8IOGe7XAb6Gw0fmIWXqF4gKXtATlNq4RECTdS4fRcryUkyZWqSOxS3RqH+NsFSbIBFjO+insnK8bwh5Vjd/BL0CifX0M5xQpg6Y2EUt4lSnVDiCohaK+v9CsJXtWkqZ3J+39htj1z+eIKOAHLOv6jlEvE/CEVjWErFpekuyspQMqe0sxFOrhbXsoFR3Dfi6ArLFCB6y3Kcvf
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(376002)(346002)(39860400002)(230922051799003)(82310400011)(64100799003)(451199024)(1800799009)(186009)(40470700004)(36840700001)(46966006)(36860700001)(2906002)(54906003)(70586007)(82740400003)(70206006)(478600001)(16526019)(1076003)(107886003)(316002)(7636003)(6666004)(47076005)(336012)(40480700001)(426003)(83380400001)(110136005)(86362001)(40460700003)(41300700001)(36756003)(8676002)(5660300002)(2616005)(4326008)(356005)(8936002)(26005);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(39860400002)(376002)(136003)(396003)(230922051799003)(1800799009)(64100799003)(451199024)(186009)(82310400011)(36840700001)(40470700004)(46966006)(478600001)(316002)(70206006)(70586007)(110136005)(54906003)(4326008)(8936002)(8676002)(5660300002)(40480700001)(86362001)(36860700001)(82740400003)(356005)(47076005)(41300700001)(16526019)(26005)(426003)(336012)(2906002)(83380400001)(40460700003)(7636003)(107886003)(2616005)(1076003)(36756003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 12:31:25.6864
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 12:31:35.8271
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4a7bfcc-f753-4d6f-28a1-08dbd5564e30
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4b80d9d-bcae-4d92-57ee-08dbd5565434
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	DS2PEPF0000343A.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6033
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4535
 
-Adjust the function's arguments and rename it to allow it to be reused
-by future call sites that only have access to 'struct
-vxlan_mdb_entry_key', but not to 'struct vxlan_mdb_config'.
+Currently, netlink notifications are sent for individual remote entries
+and not for the entire MDB entry itself.
+
+Subsequent patches are going to add MDB get support which will require
+the VXLAN driver to reply with an entire MDB entry.
+
+Therefore, as a preparation, factor out a helper to calculate the size
+of an individual remote entry. When determining the size of the reply
+this helper will be invoked for each remote entry in the MDB entry.
 
 No functional changes intended.
 
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- drivers/net/vxlan/vxlan_mdb.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ drivers/net/vxlan/vxlan_mdb.c | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/net/vxlan/vxlan_mdb.c b/drivers/net/vxlan/vxlan_mdb.c
-index 5e041622261a..0b6043e1473b 100644
+index 0b6043e1473b..19640f7e3a88 100644
 --- a/drivers/net/vxlan/vxlan_mdb.c
 +++ b/drivers/net/vxlan/vxlan_mdb.c
-@@ -370,12 +370,10 @@ static bool vxlan_mdb_is_valid_source(const struct nlattr *attr, __be16 proto,
- 	return true;
+@@ -925,23 +925,20 @@ vxlan_mdb_nlmsg_src_list_size(const struct vxlan_mdb_entry_key *group,
+ 	return nlmsg_size;
  }
  
--static void vxlan_mdb_config_group_set(struct vxlan_mdb_config *cfg,
--				       const struct br_mdb_entry *entry,
--				       const struct nlattr *source_attr)
-+static void vxlan_mdb_group_set(struct vxlan_mdb_entry_key *group,
-+				const struct br_mdb_entry *entry,
-+				const struct nlattr *source_attr)
+-static size_t vxlan_mdb_nlmsg_size(const struct vxlan_dev *vxlan,
+-				   const struct vxlan_mdb_entry *mdb_entry,
+-				   const struct vxlan_mdb_remote *remote)
++static size_t
++vxlan_mdb_nlmsg_remote_size(const struct vxlan_dev *vxlan,
++			    const struct vxlan_mdb_entry *mdb_entry,
++			    const struct vxlan_mdb_remote *remote)
  {
--	struct vxlan_mdb_entry_key *group = &cfg->group;
--
- 	switch (entry->addr.proto) {
- 	case htons(ETH_P_IP):
- 		group->dst.sa.sa_family = AF_INET;
-@@ -503,7 +501,7 @@ static int vxlan_mdb_config_attrs_init(struct vxlan_mdb_config *cfg,
- 				       entry->addr.proto, extack))
- 		return -EINVAL;
+ 	const struct vxlan_mdb_entry_key *group = &mdb_entry->key;
+ 	struct vxlan_rdst *rd = rtnl_dereference(remote->rd);
+ 	size_t nlmsg_size;
  
--	vxlan_mdb_config_group_set(cfg, entry, mdbe_attrs[MDBE_ATTR_SOURCE]);
-+	vxlan_mdb_group_set(&cfg->group, entry, mdbe_attrs[MDBE_ATTR_SOURCE]);
+-	nlmsg_size = NLMSG_ALIGN(sizeof(struct br_port_msg)) +
+-		     /* MDBA_MDB */
+-		     nla_total_size(0) +
+-		     /* MDBA_MDB_ENTRY */
+-		     nla_total_size(0) +
+ 		     /* MDBA_MDB_ENTRY_INFO */
+-		     nla_total_size(sizeof(struct br_mdb_entry)) +
++	nlmsg_size = nla_total_size(sizeof(struct br_mdb_entry)) +
+ 		     /* MDBA_MDB_EATTR_TIMER */
+ 		     nla_total_size(sizeof(u32));
++
+ 	/* MDBA_MDB_EATTR_SOURCE */
+ 	if (vxlan_mdb_is_sg(group))
+ 		nlmsg_size += nla_total_size(vxlan_addr_size(&group->dst));
+@@ -969,6 +966,19 @@ static size_t vxlan_mdb_nlmsg_size(const struct vxlan_dev *vxlan,
+ 	return nlmsg_size;
+ }
  
- 	/* rtnetlink code only validates that IPv4 group address is
- 	 * multicast.
++static size_t vxlan_mdb_nlmsg_size(const struct vxlan_dev *vxlan,
++				   const struct vxlan_mdb_entry *mdb_entry,
++				   const struct vxlan_mdb_remote *remote)
++{
++	return NLMSG_ALIGN(sizeof(struct br_port_msg)) +
++	       /* MDBA_MDB */
++	       nla_total_size(0) +
++	       /* MDBA_MDB_ENTRY */
++	       nla_total_size(0) +
++	       /* Remote entry */
++	       vxlan_mdb_nlmsg_remote_size(vxlan, mdb_entry, remote);
++}
++
+ static int vxlan_mdb_nlmsg_fill(const struct vxlan_dev *vxlan,
+ 				struct sk_buff *skb,
+ 				const struct vxlan_mdb_entry *mdb_entry,
 -- 
 2.40.1
 
