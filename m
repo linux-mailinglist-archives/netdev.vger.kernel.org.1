@@ -1,156 +1,110 @@
-Return-Path: <netdev+bounces-44312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F2C77D7878
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:20:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 846B47D78AD
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:37:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28E661C20859
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:20:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C441281DF9
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00DC374E9;
-	Wed, 25 Oct 2023 23:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E105637CB6;
+	Wed, 25 Oct 2023 23:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vmware.com header.i=@vmware.com header.b="n19ZZTY9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gHx2IQSs"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41214266BC
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:20:16 +0000 (UTC)
-Received: from CY4PR02CU008.outbound.protection.outlook.com (mail-westcentralusazon11012006.outbound.protection.outlook.com [40.93.200.6])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1EBFDE;
-	Wed, 25 Oct 2023 16:20:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JKD0Cz/7MOdVcKOBSUIwb6zT04/J/wuCpn6mGeYFtsQb2BqiadsIV4RcNiyIzPMAqWB6554bGAuAtAR5k6hCPXRFPGGUB1NDLFXALYmEyBOoZNR+Rf3kTeXUur0qWdQ8NXeC1WtH9dcQBiYOcnTsIO37mt66rmrbpEKw219zdpgO7MCUt2EkjnKgFOHLb6WHlYKjcb99PpK3jrb3MPLW4BKahly7agxXEWp6uhT/EIz0Gv9hTAgw8pU2NWKul1IyqnbpSe87a0Co4cIAYpBh3sf9bi1TFfvnvo4iXknP9ycWAHmebqCsrVW/sts9L6HOv1i4PD/nY1EfiMYaeJJFCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EVkIsCgEvW+/Kjnyv/a2pfewJ/gBjvEG37FVKA9qEck=;
- b=lJDsji/nYnW/yQU0OKxG91XZmZ1dVnB5NIq6DDKpTw9HnzoNL8FMVRZdIIRiaa9bzs1Hdqqhi4QHgBakTwyheKJGWEh1RGWPyJCVl/+zLt+i7F/rvcxIBM2OlWuJNCUCaBPWRDvgpmjHzowuFwpEvi5feFOth3VVMvpRQxlECg/N91YBSfrdr2jgG3556Tl+g3Ihv4Z7b3vjB76z6Pk/W0mFg0kn9u+6jStZNGD9/qbyf7BMIdPD7t9JS3/CeQn+kzHRNTVE3jGO+C/yP6iUCs2uyE2DdJ4lUqmvYIpJOKlhb2EO3sFvQ2mh7WFm6aK0TKc0lQYAgsb+400fqtDnJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
- dkim=pass header.d=vmware.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EVkIsCgEvW+/Kjnyv/a2pfewJ/gBjvEG37FVKA9qEck=;
- b=n19ZZTY9L52BKDKgh3aIUxwlmCTTw7mC4zJe9jT4FaJWaENDAMrm2S6Af3Wptaw35iabMeTmkVG0sP4jSfD3L6OuD9XvLC4MQPRubTJ243G3/DSsOLjuSKWyoDQ1f6WvWPw6+YadSkz1n3fhbciUgN4S0MjVleYv5heOs5sDHkQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vmware.com;
-Received: from MWHPR05MB3648.namprd05.prod.outlook.com (2603:10b6:301:45::23)
- by SJ0PR05MB7456.namprd05.prod.outlook.com (2603:10b6:a03:288::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Wed, 25 Oct
- 2023 23:20:12 +0000
-Received: from MWHPR05MB3648.namprd05.prod.outlook.com
- ([fe80::b1ad:1c54:64b2:a39d]) by MWHPR05MB3648.namprd05.prod.outlook.com
- ([fe80::b1ad:1c54:64b2:a39d%6]) with mapi id 15.20.6907.030; Wed, 25 Oct 2023
- 23:20:12 +0000
-From: Alexey Makhalov <amakhalov@vmware.com>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: richardcochran@gmail.com,
-	jsipek@vmware.com,
-	akaher@vmware.com,
-	deep@dshah.net,
-	pv-drivers@vmware.com,
-	Alexey Makhalov <amakhalov@vmware.com>,
-	Deep Shah <sdeep@vmware.com>
-Subject: [PATCH] MAINTAINERS: Maintainer change for ptp_vmw driver
-Date: Wed, 25 Oct 2023 16:19:31 -0700
-Message-Id: <20231025231931.76842-1-amakhalov@vmware.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR06CA0019.namprd06.prod.outlook.com
- (2603:10b6:a03:d4::32) To MWHPR05MB3648.namprd05.prod.outlook.com
- (2603:10b6:301:45::23)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C6337CAD;
+	Wed, 25 Oct 2023 23:37:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00F83C433CC;
+	Wed, 25 Oct 2023 23:37:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698277032;
+	bh=FSAtE+zTZHOTHK+nbnYCG0cPYtBr9fiZYXPBuLJCWXg=;
+	h=From:Subject:Date:To:Cc:From;
+	b=gHx2IQSsCfscN2H0LDbAUTDY3Z26HwWwJooRc1L78El1Meb+mUwcIpSFRXwgMEzve
+	 u+k5hy4P6Fmi/lXr/8YSJzVeCejhg0SUWqbZ2QXUYs9ayMxRrXVZipzJA0nyv4fc0b
+	 kKwoOCNO5j2xPXDBLT5XatCcr2rcCmgzjOBWUvKKU9xwpXPQPg+LvRJ1vBZzptVqX/
+	 60PhWaaPuna//1x1AVlG587JshjkP+w3wlXMf7Lbpx9MceSjkrT/WBRMPnAmPIzrly
+	 NAb6/ILLuVYFnE0T6x5PnR5qfMRGPAMyYcGLmiU07d/CP1Vw6KYKJFP5xj0mfLlchE
+	 h5XJLzrWDCgZA==
+From: Mat Martineau <martineau@kernel.org>
+Subject: [PATCH net-next 00/10] mptcp: Fixes and cleanup for v6.7
+Date: Wed, 25 Oct 2023 16:37:01 -0700
+Message-Id: <20231025-send-net-next-20231025-v1-0-db8f25f798eb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWHPR05MB3648:EE_|SJ0PR05MB7456:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5742fcf3-b2a2-4490-9e7e-08dbd5b0efab
-X-LD-Processed: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	XGqqRGMUwVlcYFJcH3GBBJSZgWtvYRWwBxSucg4qt8ERNjspwEsEmWvqbBrYxQBbGNe6aHCTCh8I1y+vS/dXU9c+Uz4/owvIdbD2O9hXcWmOQVpjsEKtuqj2oSW6Lll3WDLKiNSvA8ReolAwa87IZ8+XmeCcMEkU7TbzcCkXI0YohxT/WgL+IM5v7XFVTil4KcjSndC40OE32TRDPOJp1B4mSle78NUBBH7oQcvG15JSmnF3NSmfEmqkOk0+VvD8cc6DOJdwV9EByt/m7g77Wz4GCMKFk7qU1pg65pDe/qETn3wDCpfDTPLG3El3ZC7zmu6I+P6fOLlndr6q7gMbh3EmHOzSsECLqkFZQqXEDMxliBAJDf/gLJZdvoXxj+Ly563Iobeaf2jTJGG3p1qccBjy4YUBMLMjvlbJ+tt5zrU7QQCmri7lk/oCIzc3p3Jwnwh2MEi0fvg8oD+dcnhNzfciR2EnDZve9eCzONkCAKTznmQBtqnfo5feJ887N5WS8hwo657I080DVUYjA8Dtn8Z5KGFMsMaNbNRIDGimlWGHoUesDec+Xf71rVQcKWpxDKg4R6M1XL58UlChWK1qcXk1m6TM4nfyK2daayrtcX+37ykBcAK9YTj3RTkZaV6TPRS4YavBSWjktgpOccinnlu5FkXVB3UjodG+qPEfVys=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR05MB3648.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(366004)(396003)(346002)(376002)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(316002)(66556008)(41300700001)(66476007)(38350700005)(8936002)(66946007)(4326008)(54906003)(6486002)(8676002)(4744005)(5660300002)(478600001)(1076003)(86362001)(52116002)(2906002)(6512007)(6506007)(107886003)(26005)(36756003)(2616005)(83380400001)(6666004)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?EJRxQ0X4hMsiiD6ygEeIxMuaNGaALmV4NceNTxZcAN3BfZxZsjCqORjNoLDG?=
- =?us-ascii?Q?kUkWz/GWduwRJf2PHoPQ3SyYHM9Ue9edrJUv7v4kGvrR+joipuOnRT93KnZn?=
- =?us-ascii?Q?j/s+sZ0Wm/ur2+XOyMp+FH/ZZCg/cfgrK/ecivzcFyvobpt2O2i7AX86tu3A?=
- =?us-ascii?Q?PCMYovkl+niPtnWAknWmRHYUyo5Fu9bGz8X/pv310o/Om7t++m0WUqM2/XI0?=
- =?us-ascii?Q?fZseyGdczZZl1ylBZTCDiHGIO68nPJE555ZCVxQJaGk7X15ml3lcmugWR7TW?=
- =?us-ascii?Q?0ytzDk9BFbTWUrznLNQB7+KAvwsv1wRc5/Cf7qpMA9sWKzCcWx8MUd4Phlhm?=
- =?us-ascii?Q?A+djM9z3IGd9zVVRgC/KyKgXHmzjuTHVHaMSrKlMLU3ftcUQCDBXm3BgRdut?=
- =?us-ascii?Q?vRxKcvY6ELe43bMQN5u6oloi/Le4hHniRW0JBNviw/TxjRmK3kCstGCOvSZn?=
- =?us-ascii?Q?layCU5QH4MseOqSAHwKV0hDIorTvD8VyXpSYWLQ0PiZC9CHCQKh8i5tFF2co?=
- =?us-ascii?Q?zKq6iz97GabusRA3mzSC1ShGE8wG9/z41stpz12km83ilMXSqH0XKG7Stazm?=
- =?us-ascii?Q?fRIL7LBTJ6keHSUsbom3Vf+xM152V1DuJ5L/c1wHo50jUTkY3//BQ+rit+70?=
- =?us-ascii?Q?YjYGXw2+8+4sebOhqS/btrDZGdGDW1vCauyEm0axLB8a7DuggGgndamMZq0K?=
- =?us-ascii?Q?FWeoxSxGfkFtMOsCjYtwmllTaYDx+dUAA683MeX4dX0K2w17iqssWB1LG1hB?=
- =?us-ascii?Q?wqU1c99PMM3UWxSekVs4sm0EzeDjtee03EB5AQ53+vHqUA+nqPQQp9Rc5p/E?=
- =?us-ascii?Q?2Z6LusSjWdeC+ribxesCmrfbT+2o61DpncmezjVILDG9p2BDyMI18xeJQwVE?=
- =?us-ascii?Q?8DKNzn6pPfSz7hWcO3gns4wORuZqEMyI0BfPQAO0+w/BQtHFJTr57qveHh/d?=
- =?us-ascii?Q?/JGe2r8uxS/jC8ZcOtUW9TwZ1SWjMYh5cAeuyCSyiB4A6ZdGVKMKsNUEfSS3?=
- =?us-ascii?Q?uy0prtQ+17wBednT8tksqNqwK9D1cEWho/vbA9GcLIlnIfqVeLdi5FhwAtmx?=
- =?us-ascii?Q?NpJVYJ4qGN4ehGI1EQmZyyVBMVpKBcDO20wQmVubfGyZN6cRTpwrHcvoIApt?=
- =?us-ascii?Q?ZNvXDwDQwrKfPd7SLJZ+RJCC8Lf1/NYiUViDrsFMUr/O8j0ta0xB4nwqx5Hp?=
- =?us-ascii?Q?jaQPwnKfxRobzWmcVDLj1m8Ka4b+YToZ5YDRP4vz3L+PaTivIIDBriBpVNfD?=
- =?us-ascii?Q?nPuO6KFLhDwFq8ye0o/WnBtC3jXvs9DMqGS1qtx7g0fxkGjLqoqvZVtZlAsE?=
- =?us-ascii?Q?C8YG9IQZqREBK+07I5zWwcnFSQtwH8VlPucBjYZgzEOSopxlrNaHSaXBz3kY?=
- =?us-ascii?Q?+CO4rGW79n7jijq03Vd3/NweP79FgXoIzUeJXH9/9HzxAUYzJPjzRb2b2at9?=
- =?us-ascii?Q?L3CyPS637z3wbjBuTeRiC39CN99i4TX6ghumkRWSGYzOL2Hhg3wCtlcuqKss?=
- =?us-ascii?Q?PYr6VkRKdZkTsddrlXJu1pTvHnazYLcIh6ohEHdJGdwDkYYGONW6guWfIxSL?=
- =?us-ascii?Q?QtpyWAXMoiRmGVu2ghDl5tyk+JrR89ElhRJ4+XHw?=
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5742fcf3-b2a2-4490-9e7e-08dbd5b0efab
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR05MB3648.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2023 23:20:12.1302
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fiCDp9XzH+TnTCydarLiaAu7O/6xcONsdanrg2GS7L36hJ+wDaiN1Q1vGe/QvUjj+TcrOWEjwwUyvKdGEq3/LA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR05MB7456
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJ2mOWUC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI2NDAyNT3eLUvBTdvNQSIK4o0YULmyWlGKSmGqVYpJinKAE1FxSlpmVWgA2
+ OVoIpV4qtrQUA+M7qI3IAAAA=
+To: Matthieu Baerts <matttbe@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Geliang Tang <geliang.tang@suse.com>, 
+ Kishen Maloor <kishen.maloor@intel.com>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ Mat Martineau <martineau@kernel.org>, stable@vger.kernel.org
+X-Mailer: b4 0.12.4
 
-Deep has decided to transfer the maintainership of the VMware virtual
-PTP clock driver (ptp_vmw) to Jeff. Update the MAINTAINERS file to
-reflect this change.
+This series includes three initial patches that we had queued in our
+mptcp-net branch, but given the likely timing of net/net-next syncs this
+week, the need to avoid introducing branch conflicts, and another batch
+of net-next patches pending in the mptcp tree, the most practical route
+is to send everything for net-next.
 
-Signed-off-by: Alexey Makhalov <amakhalov@vmware.com>
-Acked-by: Deep Shah <sdeep@vmware.com>
-Acked-by: Jeff Sipek <jsipek@vmware.com>
+Patches 1 & 2 fix some intermittent selftest failures by adjusting timing.
+
+Patch 3 removes an unneccessary userspace path manager restriction on
+the removal of subflows with subflow ID 0.
+
+The remainder of the patches are all cleanup or selftest changes:
+
+Patches 4-8 clean up kernel code by removing unused parameters, making
+more consistent use of existing helper functions, and reducing extra
+casting of socket pointers.
+
+Patch 9 removes an unused variable in a selftest script.
+
+Patch 10 adds a little more detail to some mptcp_join test output.
+
+Signed-off-by: Mat Martineau <martineau@kernel.org>
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Geliang Tang (10):
+      selftests: mptcp: run userspace pm tests slower
+      selftests: mptcp: fix wait_rm_addr/sf parameters
+      mptcp: userspace pm send RM_ADDR for ID 0
+      mptcp: drop useless ssk in pm_subflow_check_next
+      mptcp: use mptcp_check_fallback helper
+      mptcp: use mptcp_get_ext helper
+      mptcp: move sk assignment statement ahead
+      mptcp: define more local variables sk
+      selftests: mptcp: sockopt: drop mptcp_connect var
+      selftests: mptcp: display simult in extra_msg
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 668d1e24452d..d04a1794c804 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -23035,7 +23035,7 @@ F:	drivers/scsi/vmw_pvscsi.c
- F:	drivers/scsi/vmw_pvscsi.h
- 
- VMWARE VIRTUAL PTP CLOCK DRIVER
--M:	Deep Shah <sdeep@vmware.com>
-+M:	Jeff Sipek <jsipek@vmware.com>
- R:	Ajay Kaher <akaher@vmware.com>
- R:	Alexey Makhalov <amakhalov@vmware.com>
- R:	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>
+ net/mptcp/pm.c                                     |  2 +-
+ net/mptcp/pm_userspace.c                           | 81 +++++++++++++++++-----
+ net/mptcp/protocol.c                               |  6 +-
+ net/mptcp/protocol.h                               |  4 +-
+ net/mptcp/sockopt.c                                |  2 +-
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    | 23 ++++--
+ tools/testing/selftests/net/mptcp/mptcp_sockopt.sh |  1 -
+ 7 files changed, 88 insertions(+), 31 deletions(-)
+---
+base-commit: 8846f9a04b10b7f61214425409838d764df7080d
+change-id: 20231025-send-net-next-20231025-6bd0ee2d8d7d
+
+Best regards,
 -- 
-2.39.0
+Mat Martineau <martineau@kernel.org>
 
 
