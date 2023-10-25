@@ -1,26 +1,26 @@
-Return-Path: <netdev+bounces-44281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A017D76CA
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:27:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76EB77D76C3
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:26:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79C261C20EA1
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 21:27:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3283281DC5
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 21:26:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35491381C4;
-	Wed, 25 Oct 2023 21:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBBD374D8;
+	Wed, 25 Oct 2023 21:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C19347AA
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 21:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EA8347DC
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 21:26:10 +0000 (UTC)
 Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 98CCB13D;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99446193;
 	Wed, 25 Oct 2023 14:26:06 -0700 (PDT)
 From: Pablo Neira Ayuso <pablo@netfilter.org>
 To: netfilter-devel@vger.kernel.org
@@ -30,9 +30,9 @@ Cc: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	fw@strlen.de
-Subject: [PATCH net-next 05/19] netfilter: nf_tables: Add locking for NFT_MSG_GETRULE_RESET requests
-Date: Wed, 25 Oct 2023 23:25:41 +0200
-Message-Id: <20231025212555.132775-6-pablo@netfilter.org>
+Subject: [PATCH net-next 06/19] br_netfilter: use single forward hook for ip and arp
+Date: Wed, 25 Oct 2023 23:25:42 +0200
+Message-Id: <20231025212555.132775-7-pablo@netfilter.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20231025212555.132775-1-pablo@netfilter.org>
 References: <20231025212555.132775-1-pablo@netfilter.org>
@@ -44,146 +44,154 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Phil Sutter <phil@nwl.cc>
+From: Florian Westphal <fw@strlen.de>
 
-Rule reset is not concurrency-safe per-se, so multiple CPUs may reset
-the same rule at the same time. At least counter and quota expressions
-will suffer from value underruns in this case.
+br_netfilter registers two forward hooks, one for ip and one for arp.
 
-Prevent this by introducing dedicated locking callbacks for nfnetlink
-and the asynchronous dump handling to serialize access.
+Just use a common function for both and then call the arp/ip helper
+as needed.
 
-Signed-off-by: Phil Sutter <phil@nwl.cc>
+Signed-off-by: Florian Westphal <fw@strlen.de>
 Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 ---
- net/netfilter/nf_tables_api.c | 77 +++++++++++++++++++++++++++++------
- 1 file changed, 64 insertions(+), 13 deletions(-)
+ net/bridge/br_netfilter_hooks.c | 72 ++++++++++++++++-----------------
+ 1 file changed, 34 insertions(+), 38 deletions(-)
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index d39990c3ae1d..03a306d15f43 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -3551,6 +3551,23 @@ static int nf_tables_dump_rules(struct sk_buff *skb,
- 	return skb->len;
+diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
+index 4c0c9f838f5c..6adcb45bca75 100644
+--- a/net/bridge/br_netfilter_hooks.c
++++ b/net/bridge/br_netfilter_hooks.c
+@@ -570,18 +570,12 @@ static int br_nf_forward_finish(struct net *net, struct sock *sk, struct sk_buff
  }
  
-+static int nf_tables_dumpreset_rules(struct sk_buff *skb,
-+				     struct netlink_callback *cb)
-+{
-+	struct nftables_pernet *nft_net = nft_pernet(sock_net(skb->sk));
-+	int ret;
-+
-+	/* Mutex is held is to prevent that two concurrent dump-and-reset calls
-+	 * do not underrun counters and quotas. The commit_mutex is used for
-+	 * the lack a better lock, this is not transaction path.
-+	 */
-+	mutex_lock(&nft_net->commit_mutex);
-+	ret = nf_tables_dump_rules(skb, cb);
-+	mutex_unlock(&nft_net->commit_mutex);
-+
-+	return ret;
-+}
-+
- static int nf_tables_dump_rules_start(struct netlink_callback *cb)
+ 
+-/* This is the 'purely bridged' case.  For IP, we pass the packet to
+- * netfilter with indev and outdev set to the bridge device,
+- * but we are still able to filter on the 'real' indev/outdev
+- * because of the physdev module. For ARP, indev and outdev are the
+- * bridge ports. */
+-static unsigned int br_nf_forward_ip(void *priv,
+-				     struct sk_buff *skb,
+-				     const struct nf_hook_state *state)
++static unsigned int br_nf_forward_ip(struct sk_buff *skb,
++				     const struct nf_hook_state *state,
++				     u8 pf)
  {
- 	struct nft_rule_dump_ctx *ctx = (void *)cb->ctx;
-@@ -3570,12 +3587,18 @@ static int nf_tables_dump_rules_start(struct netlink_callback *cb)
- 			return -ENOMEM;
- 		}
- 	}
--	if (NFNL_MSG_TYPE(cb->nlh->nlmsg_type) == NFT_MSG_GETRULE_RESET)
--		ctx->reset = true;
+ 	struct nf_bridge_info *nf_bridge;
+ 	struct net_device *parent;
+-	u_int8_t pf;
+ 
+ 	nf_bridge = nf_bridge_info_get(skb);
+ 	if (!nf_bridge)
+@@ -600,15 +594,6 @@ static unsigned int br_nf_forward_ip(void *priv,
+ 	if (!parent)
+ 		return NF_DROP_REASON(skb, SKB_DROP_REASON_DEV_READY, 0);
+ 
+-	if (IS_IP(skb) || is_vlan_ip(skb, state->net) ||
+-	    is_pppoe_ip(skb, state->net))
+-		pf = NFPROTO_IPV4;
+-	else if (IS_IPV6(skb) || is_vlan_ipv6(skb, state->net) ||
+-		 is_pppoe_ipv6(skb, state->net))
+-		pf = NFPROTO_IPV6;
+-	else
+-		return NF_ACCEPT;
 -
- 	return 0;
+ 	nf_bridge_pull_encap_header(skb);
+ 
+ 	if (skb->pkt_type == PACKET_OTHERHOST) {
+@@ -620,19 +605,18 @@ static unsigned int br_nf_forward_ip(void *priv,
+ 		if (br_validate_ipv4(state->net, skb))
+ 			return NF_DROP_REASON(skb, SKB_DROP_REASON_IP_INHDR, 0);
+ 		IPCB(skb)->frag_max_size = nf_bridge->frag_max_size;
+-	}
+-
+-	if (pf == NFPROTO_IPV6) {
++		skb->protocol = htons(ETH_P_IP);
++	} else if (pf == NFPROTO_IPV6) {
+ 		if (br_validate_ipv6(state->net, skb))
+ 			return NF_DROP_REASON(skb, SKB_DROP_REASON_IP_INHDR, 0);
+ 		IP6CB(skb)->frag_max_size = nf_bridge->frag_max_size;
++		skb->protocol = htons(ETH_P_IPV6);
++	} else {
++		WARN_ON_ONCE(1);
++		return NF_DROP;
+ 	}
+ 
+ 	nf_bridge->physoutdev = skb->dev;
+-	if (pf == NFPROTO_IPV4)
+-		skb->protocol = htons(ETH_P_IP);
+-	else
+-		skb->protocol = htons(ETH_P_IPV6);
+ 
+ 	NF_HOOK(pf, NF_INET_FORWARD, state->net, NULL, skb,
+ 		brnf_get_logical_dev(skb, state->in, state->net),
+@@ -641,8 +625,7 @@ static unsigned int br_nf_forward_ip(void *priv,
+ 	return NF_STOLEN;
  }
  
-+static int nf_tables_dumpreset_rules_start(struct netlink_callback *cb)
+-static unsigned int br_nf_forward_arp(void *priv,
+-				      struct sk_buff *skb,
++static unsigned int br_nf_forward_arp(struct sk_buff *skb,
+ 				      const struct nf_hook_state *state)
+ {
+ 	struct net_bridge_port *p;
+@@ -659,11 +642,8 @@ static unsigned int br_nf_forward_arp(void *priv,
+ 	if (!brnet->call_arptables && !br_opt_get(br, BROPT_NF_CALL_ARPTABLES))
+ 		return NF_ACCEPT;
+ 
+-	if (!IS_ARP(skb)) {
+-		if (!is_vlan_arp(skb, state->net))
+-			return NF_ACCEPT;
++	if (is_vlan_arp(skb, state->net))
+ 		nf_bridge_pull_encap_header(skb);
+-	}
+ 
+ 	if (unlikely(!pskb_may_pull(skb, sizeof(struct arphdr))))
+ 		return NF_DROP_REASON(skb, SKB_DROP_REASON_PKT_TOO_SMALL, 0);
+@@ -680,6 +660,28 @@ static unsigned int br_nf_forward_arp(void *priv,
+ 	return NF_STOLEN;
+ }
+ 
++/* This is the 'purely bridged' case.  For IP, we pass the packet to
++ * netfilter with indev and outdev set to the bridge device,
++ * but we are still able to filter on the 'real' indev/outdev
++ * because of the physdev module. For ARP, indev and outdev are the
++ * bridge ports.
++ */
++static unsigned int br_nf_forward(void *priv,
++				  struct sk_buff *skb,
++				  const struct nf_hook_state *state)
 +{
-+	struct nft_rule_dump_ctx *ctx = (void *)cb->ctx;
++	if (IS_IP(skb) || is_vlan_ip(skb, state->net) ||
++	    is_pppoe_ip(skb, state->net))
++		return br_nf_forward_ip(skb, state, NFPROTO_IPV4);
++	if (IS_IPV6(skb) || is_vlan_ipv6(skb, state->net) ||
++	    is_pppoe_ipv6(skb, state->net))
++		return br_nf_forward_ip(skb, state, NFPROTO_IPV6);
++	if (IS_ARP(skb) || is_vlan_arp(skb, state->net))
++		return br_nf_forward_arp(skb, state);
 +
-+	ctx->reset = true;
-+
-+	return nf_tables_dump_rules_start(cb);
++	return NF_ACCEPT;
 +}
 +
- static int nf_tables_dump_rules_done(struct netlink_callback *cb)
+ static int br_nf_push_frag_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
  {
- 	struct nft_rule_dump_ctx *ctx = (void *)cb->ctx;
-@@ -3636,12 +3659,9 @@ nf_tables_getrule_single(u32 portid, const struct nfnl_info *info,
- static int nf_tables_getrule(struct sk_buff *skb, const struct nfnl_info *info,
- 			     const struct nlattr * const nla[])
- {
--	struct nftables_pernet *nft_net = nft_pernet(info->net);
- 	u32 portid = NETLINK_CB(skb).portid;
- 	struct net *net = info->net;
- 	struct sk_buff *skb2;
--	bool reset = false;
--	char *buf;
- 
- 	if (info->nlh->nlmsg_flags & NLM_F_DUMP) {
- 		struct netlink_dump_control c = {
-@@ -3655,15 +3675,46 @@ static int nf_tables_getrule(struct sk_buff *skb, const struct nfnl_info *info,
- 		return nft_netlink_dump_start_rcu(info->sk, skb, info->nlh, &c);
- 	}
- 
--	if (NFNL_MSG_TYPE(info->nlh->nlmsg_type) == NFT_MSG_GETRULE_RESET)
--		reset = true;
--
--	skb2 = nf_tables_getrule_single(portid, info, nla, reset);
-+	skb2 = nf_tables_getrule_single(portid, info, nla, false);
- 	if (IS_ERR(skb2))
- 		return PTR_ERR(skb2);
- 
--	if (!reset)
--		return nfnetlink_unicast(skb2, net, portid);
-+	return nfnetlink_unicast(skb2, net, portid);
-+}
-+
-+static int nf_tables_getrule_reset(struct sk_buff *skb,
-+				   const struct nfnl_info *info,
-+				   const struct nlattr * const nla[])
-+{
-+	struct nftables_pernet *nft_net = nft_pernet(info->net);
-+	u32 portid = NETLINK_CB(skb).portid;
-+	struct net *net = info->net;
-+	struct sk_buff *skb2;
-+	char *buf;
-+
-+	if (info->nlh->nlmsg_flags & NLM_F_DUMP) {
-+		struct netlink_dump_control c = {
-+			.start= nf_tables_dumpreset_rules_start,
-+			.dump = nf_tables_dumpreset_rules,
-+			.done = nf_tables_dump_rules_done,
-+			.module = THIS_MODULE,
-+			.data = (void *)nla,
-+		};
-+
-+		return nft_netlink_dump_start_rcu(info->sk, skb, info->nlh, &c);
-+	}
-+
-+	if (!try_module_get(THIS_MODULE))
-+		return -EINVAL;
-+	rcu_read_unlock();
-+	mutex_lock(&nft_net->commit_mutex);
-+	skb2 = nf_tables_getrule_single(portid, info, nla, true);
-+	mutex_unlock(&nft_net->commit_mutex);
-+	rcu_read_lock();
-+	module_put(THIS_MODULE);
-+
-+	if (IS_ERR(skb2))
-+		return PTR_ERR(skb2);
- 
- 	buf = kasprintf(GFP_ATOMIC, "%.*s:%u",
- 			nla_len(nla[NFTA_RULE_TABLE]),
-@@ -8995,7 +9046,7 @@ static const struct nfnl_callback nf_tables_cb[NFT_MSG_MAX] = {
- 		.policy		= nft_rule_policy,
+ 	struct brnf_frag_data *data;
+@@ -937,13 +939,7 @@ static const struct nf_hook_ops br_nf_ops[] = {
+ 		.priority = NF_BR_PRI_BRNF,
  	},
- 	[NFT_MSG_GETRULE_RESET] = {
--		.call		= nf_tables_getrule,
-+		.call		= nf_tables_getrule_reset,
- 		.type		= NFNL_CB_RCU,
- 		.attr_count	= NFTA_RULE_MAX,
- 		.policy		= nft_rule_policy,
+ 	{
+-		.hook = br_nf_forward_ip,
+-		.pf = NFPROTO_BRIDGE,
+-		.hooknum = NF_BR_FORWARD,
+-		.priority = NF_BR_PRI_BRNF - 1,
+-	},
+-	{
+-		.hook = br_nf_forward_arp,
++		.hook = br_nf_forward,
+ 		.pf = NFPROTO_BRIDGE,
+ 		.hooknum = NF_BR_FORWARD,
+ 		.priority = NF_BR_PRI_BRNF,
 -- 
 2.30.2
 
