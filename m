@@ -1,94 +1,88 @@
-Return-Path: <netdev+bounces-44306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80CD07D785C
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:06:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86FE47D7864
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A62E31C20A9A
-	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:06:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 408A6281414
+	for <lists+netdev@lfdr.de>; Wed, 25 Oct 2023 23:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C43347A4;
-	Wed, 25 Oct 2023 23:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E47234CF1;
+	Wed, 25 Oct 2023 23:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gdwTAoy6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kV5aWgNl"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EC427EFF
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:06:38 +0000 (UTC)
-Received: from mail-vs1-xe35.google.com (mail-vs1-xe35.google.com [IPv6:2607:f8b0:4864:20::e35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E92BB
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 16:06:36 -0700 (PDT)
-Received: by mail-vs1-xe35.google.com with SMTP id ada2fe7eead31-457e36dcab6so933686137.0
-        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 16:06:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698275196; x=1698879996; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wtBcd4EK8o/4SAJnz/Re0VYmWw9I9ktKq6hlhcjyGhc=;
-        b=gdwTAoy6NqUv68prV+5WdsFrN0YwZ3mw3WuiGJseoMyZ/Mg8OB0aITiwFoJUWIt8TX
-         IzhsALTrVGv8dOo2wLQ7/fbBdEvlMXxVeLbfF6m5Xa9vCWrIMUjMbMRuQb8aDa5e7eFO
-         uyMTKK2LCGlCdi8wFkgMKxquzslQf90/LyMsGErLkLT3dQdmpk/BakZdiaG0cpsRbLwc
-         1kkcYMAZ16usXZ0PXLDsrKosx74pKbLwm5gzt//a76eRBBy8kAqEFrRvDQPBgK2pQw2Y
-         C2N43XIyoOSZsvAvSzcv01/MZsF1sw4qvyRBmWJb9K+6lkYH9jsVtpsdL2ezOsPljcF7
-         0VLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698275196; x=1698879996;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wtBcd4EK8o/4SAJnz/Re0VYmWw9I9ktKq6hlhcjyGhc=;
-        b=mfQqIPXo1uuVQJLqMOY0Lsun/sd+IgzFPX8cGujDauWUNZytJhoFbYJlP5atbcUtoe
-         LNkfc+Ra8KysDghLOsY0d5GTeFIdV1SpSsAy/wkjiLeDllTrSNnGV6R8M3mxmeitoAk2
-         l3gRfXeQkJTTSG6itVHbeUbnhgQ5VWZSNGV12t3mm3GQN3AdpKJ7pUvazUsYaVAhqdn4
-         rXhkGAZXxFhqDWO8nts7uNctB42/+bAngHBFESTdoatBvVdLsh/KZZDQuzzU0kA+O+RP
-         Pl+jofHJuAvcWO/VkG5CcxAltlAAfOlOmr1nbGu1OPGrpYW8vTyOrHTor1WOlVh7CqjQ
-         4tgw==
-X-Gm-Message-State: AOJu0YzRm1ltTaQoCkBYSVEyqjYXK9nOhH6FbBQnr2/d5Cr6QXUp14Uo
-	Xt4dHt6MIVOXCQXNxSOCEL17I5F76xHPMEwZk3o=
-X-Google-Smtp-Source: AGHT+IHztNvZ5WFdnLnmtTqu4tMS1cdCw316guNwu49swB3xMsVExeCYQXMlKWFSahnXoslCYA73B1duEmbVgV1izsE=
-X-Received: by 2002:a05:6102:1250:b0:457:a98f:1e23 with SMTP id
- p16-20020a056102125000b00457a98f1e23mr507514vsg.8.1698275195867; Wed, 25 Oct
- 2023 16:06:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD54347CF
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C9050C433C8;
+	Wed, 25 Oct 2023 23:10:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698275424;
+	bh=syA8tSJQGVVexUFPUvXgXI6B00D5f27wwhNUVPyn/Wg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kV5aWgNlr28ULSSC8Fa2QtAVkf5hFvIbRDTo1+4Lp7A7ptFELZPEUrqzQ+sGyZb9q
+	 a9cyxkF5JT2odoEPyySWklLjHkMSblKVsC6dfcObJQGiXFN1I0VVf+NInqfWbQOuHQ
+	 iwCkc/1l+mYaklHzuWkfgErN+IAWB9v/zeFxC77azJ8Da78I1g2/3+NTv7E4DMXAR6
+	 d9JsF+cmYXrB6qEoRYoRhR18HFlH8iTz0pyI5cEor39vMIKdHWxxAkzXEfxbhTliea
+	 V+iFzw2YqUnJzrgQPS0shXZsNajvRv37rv3Kecg6EvnIGAGUMMOoV9xvo7mjSEZmhS
+	 b1iFRPLxP59Xw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9D1A0C3959F;
+	Wed, 25 Oct 2023 23:10:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231024194958.3522281-1-willemdebruijn.kernel@gmail.com> <20231025160119.13d0a8c2@kernel.org>
-In-Reply-To: <20231025160119.13d0a8c2@kernel.org>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Wed, 25 Oct 2023 19:05:59 -0400
-Message-ID: <CAF=yD-JV031xfCDwb_=GG-i8+CR3OnQMCMTsMvWU0vwDtByB=w@mail.gmail.com>
-Subject: Re: [PATCH net] llc: verify mac len before reading mac header
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, Willem de Bruijn <willemb@google.com>, 
-	syzbot+a8c7be6dee0de1b669cc@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/2] netfilter: flowtable: GC pushes back packets to
+ classic path
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169827542464.7495.6756157867363734179.git-patchwork-notify@kernel.org>
+Date: Wed, 25 Oct 2023 23:10:24 +0000
+References: <20231025100819.2664-2-pablo@netfilter.org>
+In-Reply-To: <20231025100819.2664-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de
 
-On Wed, Oct 25, 2023 at 7:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 24 Oct 2023 15:49:36 -0400 Willem de Bruijn wrote:
-> > @@ -153,6 +153,9 @@ int llc_sap_action_send_test_r(struct llc_sap *sap,=
- struct sk_buff *skb)
-> >       int rc =3D 1;
-> >       u32 data_size;
-> >
-> > +     if (skb->mac_len < ETH_HLEN)
-> > +             return 0;
->
-> I think this one may want 1 to indicate error, technically. No?
+Hello:
 
-Absolutely, thanks. For both tests.
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-Will send a v2, with that Fixes tag too.
+On Wed, 25 Oct 2023 12:08:18 +0200 you wrote:
+> Since 41f2c7c342d3 ("net/sched: act_ct: Fix promotion of offloaded
+> unreplied tuple"), flowtable GC pushes back flows with IPS_SEEN_REPLY
+> back to classic path in every run, ie. every second. This is because of
+> a new check for NF_FLOW_HW_ESTABLISHED which is specific of sched/act_ct.
+> 
+> In Netfilter's flowtable case, NF_FLOW_HW_ESTABLISHED never gets set on
+> and IPS_SEEN_REPLY is unreliable since users decide when to offload the
+> flow before, such bit might be set on at a later stage.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/2] netfilter: flowtable: GC pushes back packets to classic path
+    https://git.kernel.org/netdev/net/c/735795f68b37
+  - [net,2/2] net/sched: act_ct: additional checks for outdated flows
+    https://git.kernel.org/netdev/net/c/a63b6622120c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
