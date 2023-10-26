@@ -1,184 +1,125 @@
-Return-Path: <netdev+bounces-44490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9978E7D8464
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:20:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4107D848D
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:23:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4EEBB20FDB
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:20:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29E21B20ED1
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2207A2E64B;
-	Thu, 26 Oct 2023 14:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAA12EAE6;
+	Thu, 26 Oct 2023 14:23:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="NtAkdaWq"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0861B848A
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 14:20:23 +0000 (UTC)
-Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D30091AA
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:20:20 -0700 (PDT)
-Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-6ce2b33816eso1123733a34.3
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:20:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698330020; x=1698934820;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231192EAE3
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 14:23:34 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C84AB1AE
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:23:31 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-4083cd3917eso7665305e9.3
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:23:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1698330210; x=1698935010; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q7laoKfp6mRSUnZKN04Wpi3amSzI30zHY1zAqCLX4lI=;
-        b=a+jrOMWjGNagFJqfradNURthkdYgAlDu1s9enHsTS4CGYdX5beTiBD5FjOZC18IyBK
-         akM8DLbyDxAQYYJOahgvJrtqWSDpTGh9gM+zYeSrRR4P4aDqo3lxFD/5fDacja0vqMMm
-         v1VAD1hzFg03GyrS9hdGmDW4KYwfeaj+wjD+ZQjmvmiKSJwRFNh4kp1ZwItrcKqhDkBP
-         D1zDKz2NZZNhQVJDGh7BkLEXLH2Q9NOPe3dXF2LxSCcp6BStPisThxOpsVvJ+cYR837J
-         Be0xxriXrnQH1GdRAieNoAo3nmsCmJJk1Rx4fDz2exqGdqaixTQVm8PRsiF9bUOcntNi
-         JUCg==
-X-Gm-Message-State: AOJu0Ywz6aTiI1JTTyIaUGj8tXb2q2q3aeN4/eEHu5erdnn8488jHUIR
-	zA61YRRucRRHHUW+R1pPGs8CUA9Q5Fovpa6MiJBtcxXAbXoi
-X-Google-Smtp-Source: AGHT+IH4qEDAGCgxLl0bZ+zsAy+kNl3QmFFaPFp4Ws6LnKYJ9+Bz1cSjpQ/dHdQMTYfAFLuXz7DdZ6MK1oY6/XkEUmrz9uOwJPGE
+        bh=wxlqeeGhLxH3bBosPGsgL7UrOvK0R3l9N7ltrUjHUTI=;
+        b=NtAkdaWqpZrs/2N+MDIhRLSyzv9queavnsKjAYpuPGpu1CnkfT5OdITqJ7ulsIwcJ+
+         i15z009Ntsrpuj+/YRzaWhGDOjI3DBbMicIzs276KViP1xXagyUXjsjw2RNZ6QOUfGbx
+         WvWIigi3/k+sFwH6CDQr8rH2H9AFyZblrQo2PVrOotyZZk+tbFlkV7lhkffPHvyrro+c
+         n/TsX6ew1xVcIsntgOfAeNXf9Pu/KNMr8V2zo4haxKu53ISQIUbGv6EhchIXG3p9jZGT
+         Ax2Kfn6Tod3AD6lZNZGhJY2l1IPeHVhZ7sCKKzUcK1qMVwJ6Hx3izHZbaG/DHSSgDQqS
+         1WWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698330210; x=1698935010;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wxlqeeGhLxH3bBosPGsgL7UrOvK0R3l9N7ltrUjHUTI=;
+        b=ZrcKctkDhkuSbBZipq+pqlsBk4vL7BOr2WwZECUIUDdeDkqPaZziJMPAPLTBO44LRs
+         ocpFHikNdpuwfveAUF/PKMhNWCB0wxNjM6nSzy2Q4gzwzJnBNJY7kXSrIwuiRrUp82yF
+         F0cQlLvXeKGs2/z7CHrlroq6i9F3bYwEoGYypmrEGIXrcxKVT6QUEzAd4zX/0U1xeF0X
+         1kL/HC8pq/+kvU5yUzsByHo8Aq7hAe8Y4ICkGzXZ32bAqRjtlPUAmuJ+zETGM3CeXk7s
+         XFJoRtyoiepWLkygWPfR8LsmZORh6Dilc3kdf4UlCjSeuxZ+lHVYV8NcQpvIgX6pvfsM
+         ACDQ==
+X-Gm-Message-State: AOJu0Yysm/ovvk8449nw8byaOp3RhfHDof8VTgNzI1/wH47gF/7VMEI8
+	tior2kVpnpQKi+gYryML316S5wFknnBr5PVWhZvChw==
+X-Google-Smtp-Source: AGHT+IEvp/CvedOPudNCax8pMN9Yuhw4zKOmCZRETz/ki0rZ59V73uN5wYIumBk2qPIm9nZ2PeCqpg==
+X-Received: by 2002:a05:600c:1f8d:b0:407:8ee2:9986 with SMTP id je13-20020a05600c1f8d00b004078ee29986mr13448716wmb.26.1698330210013;
+        Thu, 26 Oct 2023 07:23:30 -0700 (PDT)
+Received: from [192.168.0.106] (haunt.prize.volia.net. [93.72.109.136])
+        by smtp.gmail.com with ESMTPSA id y20-20020a1c4b14000000b0040588d85b3asm2633773wma.15.2023.10.26.07.23.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Oct 2023 07:23:29 -0700 (PDT)
+Message-ID: <36072f45-0d42-7284-d0dc-295f543fe40f@blackwall.org>
+Date: Thu, 26 Oct 2023 17:23:27 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a9d:4f0b:0:b0:6b7:3eba:59d3 with SMTP id
- d11-20020a9d4f0b000000b006b73eba59d3mr4980998otl.6.1698330020217; Thu, 26 Oct
- 2023 07:20:20 -0700 (PDT)
-Date: Thu, 26 Oct 2023 07:20:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000910ad106089f45eb@google.com>
-Subject: [syzbot] [net?] BUG: corrupted list in ptp_open
-From: syzbot <syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com>
-To: davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	reibax@gmail.com, richardcochran@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH bpf-next 2/2] netkit: use netlink policy for mode and
+ policy attributes validation
+To: Ido Schimmel <idosch@idosch.org>
+Cc: bpf@vger.kernel.org, jiri@resnulli.us, netdev@vger.kernel.org,
+ martin.lau@linux.dev, ast@kernel.org, andrii@kernel.org,
+ john.fastabend@gmail.com, kuba@kernel.org, andrew@lunn.ch, toke@kernel.org,
+ toke@redhat.com, sdf@google.com, daniel@iogearbox.net
+References: <20231026094106.1505892-1-razor@blackwall.org>
+ <20231026094106.1505892-3-razor@blackwall.org> <ZTpzfckQ5n4o2F7D@shredder>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <ZTpzfckQ5n4o2F7D@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 10/26/23 17:11, Ido Schimmel wrote:
+> On Thu, Oct 26, 2023 at 12:41:06PM +0300, Nikolay Aleksandrov wrote:
+>>   static const struct nla_policy netkit_policy[IFLA_NETKIT_MAX + 1] = {
+>>   	[IFLA_NETKIT_PEER_INFO]		= { .len = sizeof(struct ifinfomsg) },
+>> -	[IFLA_NETKIT_POLICY]		= { .type = NLA_U32 },
+>> -	[IFLA_NETKIT_MODE]		= { .type = NLA_U32 },
+>> -	[IFLA_NETKIT_PEER_POLICY]	= { .type = NLA_U32 },
+>> +	[IFLA_NETKIT_POLICY]		= NLA_POLICY_VALIDATE_FN(NLA_U32,
+>> +								 netkit_check_policy),
+> 
+> Nik, it's problematic to use NLA_POLICY_VALIDATE_FN() with anything
+> other than NLA_BINARY. See commit 9e17f99220d1 ("net/sched: act_mpls:
+> Fix warning during failed attribute validation").
+> 
 
-syzbot found the following issue on:
+But how is that code called at all? The validation type is 
+NLA_VALIDATE_FUNCTION(), not NLA_VALIDATE_MIN/MAX/RANGE/RANGE_WARN...
+nla_validate_int_range() is called only on:
+         case NLA_VALIDATE_RANGE_PTR:
+         case NLA_VALIDATE_RANGE:
+         case NLA_VALIDATE_RANGE_WARN_TOO_LONG:
+         case NLA_VALIDATE_MIN:
+         case NLA_VALIDATE_MAX:
 
-HEAD commit:    2030579113a1 Add linux-next specific files for 20231020
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=16ab79a3680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=37404d76b3c8840e
-dashboard link: https://syzkaller.appspot.com/bug?extid=df3f3ef31f60781fa911
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=140aa715680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11037669680000
+Anyway, I'll switch to NLA_BINARY in a bit to make sure it's ok. Thanks 
+for the pointer.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a99a981e5d78/disk-20305791.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/073a5ba6a2a6/vmlinux-20305791.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c7c1a7107f7b/bzImage-20305791.xz
+>> +	[IFLA_NETKIT_MODE]		= NLA_POLICY_VALIDATE_FN(NLA_U32,
+>> +								 netkit_check_mode),
+>> +	[IFLA_NETKIT_PEER_POLICY]	= NLA_POLICY_VALIDATE_FN(NLA_U32,
+>> +								 netkit_check_policy),
+>>   	[IFLA_NETKIT_PRIMARY]		= { .type = NLA_REJECT,
+>>   					    .reject_message = "Primary attribute is read-only" },
+>>   };
+>> -- 
+>> 2.38.1
+>>
+>>
 
-The issue was bisected to:
-
-commit 8f5de6fb245326704f37d91780b9a10253a8a100
-Author: Xabier Marquiegui <reibax@gmail.com>
-Date:   Wed Oct 11 22:39:55 2023 +0000
-
-    ptp: support multiple timestamp event readers
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15475b89680000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=17475b89680000
-console output: https://syzkaller.appspot.com/x/log.txt?x=13475b89680000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
-Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
-
-list_add corruption. prev->next should be next (ffff88814a1325e8), but was ffff888078d25048. (prev=ffff888078d21048).
-------------[ cut here ]------------
-kernel BUG at lib/list_debug.c:32!
-invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-CPU: 0 PID: 7237 Comm: syz-executor182 Not tainted 6.6.0-rc6-next-20231020-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
-RIP: 0010:__list_add_valid_or_report+0xb6/0x100 lib/list_debug.c:32
-Code: e8 2f a5 3a fd 0f 0b 48 89 d9 48 c7 c7 40 9d e9 8a e8 1e a5 3a fd 0f 0b 48 89 f1 48 c7 c7 c0 9d e9 8a 48 89 de e8 0a a5 3a fd <0f> 0b 48 89 f2 48 89 d9 48 89 ee 48 c7 c7 40 9e e9 8a e8 f3 a4 3a
-RSP: 0018:ffffc90009b3f898 EFLAGS: 00010286
-RAX: 0000000000000075 RBX: ffff88814a1325e8 RCX: ffffffff816bb8d9
-RDX: 0000000000000000 RSI: ffffffff816c4d42 RDI: 0000000000000005
-RBP: ffff88807c7a9048 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000080000000 R11: 0000000000000001 R12: ffff88814a132000
-R13: ffffc90009b3f900 R14: ffff888078d21048 R15: ffff88807c7a9048
-FS:  0000555556c00380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffef0aa1138 CR3: 000000007d17e000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __list_add_valid include/linux/list.h:88 [inline]
- __list_add include/linux/list.h:150 [inline]
- list_add_tail include/linux/list.h:183 [inline]
- ptp_open+0x1c5/0x4f0 drivers/ptp/ptp_chardev.c:122
- posix_clock_open+0x17e/0x240 kernel/time/posix-clock.c:134
- chrdev_open+0x26d/0x6e0 fs/char_dev.c:414
- do_dentry_open+0x8d4/0x18d0 fs/open.c:948
- do_open fs/namei.c:3621 [inline]
- path_openat+0x1d36/0x2cd0 fs/namei.c:3778
- do_filp_open+0x1dc/0x430 fs/namei.c:3808
- do_sys_openat2+0x176/0x1e0 fs/open.c:1440
- do_sys_open fs/open.c:1455 [inline]
- __do_sys_openat fs/open.c:1471 [inline]
- __se_sys_openat fs/open.c:1466 [inline]
- __x64_sys_openat+0x175/0x210 fs/open.c:1466
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7fc6c2099ae9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffef0aa1238 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fc6c2099ae9
-RDX: 0000000000000000 RSI: 0000000020000300 RDI: ffffffffffffff9c
-RBP: 00000000000f4240 R08: 0000000000000000 R09: 00000000000000a0
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000130fc
-R13: 00007ffef0aa124c R14: 00007ffef0aa1260 R15: 00007ffef0aa1250
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__list_add_valid_or_report+0xb6/0x100 lib/list_debug.c:32
-Code: e8 2f a5 3a fd 0f 0b 48 89 d9 48 c7 c7 40 9d e9 8a e8 1e a5 3a fd 0f 0b 48 89 f1 48 c7 c7 c0 9d e9 8a 48 89 de e8 0a a5 3a fd <0f> 0b 48 89 f2 48 89 d9 48 89 ee 48 c7 c7 40 9e e9 8a e8 f3 a4 3a
-RSP: 0018:ffffc90009b3f898 EFLAGS: 00010286
-RAX: 0000000000000075 RBX: ffff88814a1325e8 RCX: ffffffff816bb8d9
-RDX: 0000000000000000 RSI: ffffffff816c4d42 RDI: 0000000000000005
-RBP: ffff88807c7a9048 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000080000000 R11: 0000000000000001 R12: ffff88814a132000
-R13: ffffc90009b3f900 R14: ffff888078d21048 R15: ffff88807c7a9048
-FS:  0000555556c00380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffef0aa1138 CR3: 000000007d17e000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
