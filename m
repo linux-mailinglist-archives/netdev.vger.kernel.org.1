@@ -1,93 +1,83 @@
-Return-Path: <netdev+bounces-44478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 806207D836F
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 15:23:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FED77D839C
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 15:30:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18D94B212D6
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 13:23:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8ADF6B20FF1
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 13:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F2D2DF9C;
-	Thu, 26 Oct 2023 13:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5BF2E3E1;
+	Thu, 26 Oct 2023 13:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="KrcaQJKF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+XU9HB7"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3162D7BA
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 13:23:06 +0000 (UTC)
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580F091
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 06:23:05 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9adb9fa7200so185839566b.0
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 06:23:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698326584; x=1698931384; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jfGF1wvIaczehv06ebByBZL9NMqVboZ+F6Zxo+zfw5g=;
-        b=KrcaQJKF5Mx1m9EB+S/aiw6P7Peorb8BVFsrA2AZaME9cJfQ0pIrZIZtVCFd1AfHW+
-         3TUQF8uBD9AzjLJYYFLVwINWmN06eg7rv+FDHCRNtwxdIK3soyyRMGUmqe/m4HQYBhrZ
-         2El7bl4gGry4vri6qYozPYlRvQNOU/O40R809bDscvX/No305TzlXRYCj0cNZusC0/mm
-         luVUiXC9g11JPB8sg3N3M3vt2e2n45t6T0tA7HYeqkKoCRIctpTf2iOsu9r3P7Wk7/a2
-         gFG7SZUm+ym/AvkxMEkYTklRYUKY4fzAtJKKv45jSBnXa/UtTh7SioZvnbUb/VhVrFqD
-         nAjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698326584; x=1698931384;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jfGF1wvIaczehv06ebByBZL9NMqVboZ+F6Zxo+zfw5g=;
-        b=LpM+GRh0FtTsnLTIztYlFaEUXTrWphoPKkf0Zg19kphcptM4NVV6wQ9AUcSwquyrJI
-         b3rBUf4ILFb+MpU6T04W+/7Jjj/3SP+CxKDxPPAPNExWjn5XZszIyDxVQMDMGMb5bIiJ
-         W/bFR7wFqwqf4B7rl2pO4NKWhxNWF6hGyiQrzj6wWKHu/blFWTMR5lOzSM/cARctyRz4
-         yGcUE/6pFk6WyHh7NSBv4G0BlE8143Iehh1E4WRa4mqstYfvmviqPwu8SzVNJWlVlBgV
-         8fwB90xA4RBumsE3np2r4AO+s1SRMAmE8bU94d9kxagfVEa/ZEMvS8XCtZhF+fTTNmD7
-         TcdQ==
-X-Gm-Message-State: AOJu0YxzgQGSAH1qJN4FhjC9ygbHVU6V0/joD23dJ/UqZ3PfJXUOlV2o
-	onfayOF6rOdlRfCvIDWAefOkoA==
-X-Google-Smtp-Source: AGHT+IFzYYXh7b6O1wp2FSPKvSqNw+ZLn8IKGWJKSb4LLePgHpa6NYbUrLvtBU5Tqmqq2ikxrz1WAw==
-X-Received: by 2002:a17:907:96aa:b0:9ba:8ed:ea58 with SMTP id hd42-20020a17090796aa00b009ba08edea58mr2636546ejc.30.1698326583879;
-        Thu, 26 Oct 2023 06:23:03 -0700 (PDT)
-Received: from localhost (mail.hotelolsanka.cz. [194.213.219.10])
-        by smtp.gmail.com with ESMTPSA id f20-20020a17090660d400b009a1c05bd672sm11472502ejk.127.2023.10.26.06.23.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 06:23:03 -0700 (PDT)
-Date: Thu, 26 Oct 2023 15:23:02 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@linux.dev,
-	ast@kernel.org, andrii@kernel.org, john.fastabend@gmail.com,
-	kuba@kernel.org, andrew@lunn.ch, toke@kernel.org, toke@redhat.com,
-	sdf@google.com, daniel@iogearbox.net
-Subject: Re: [PATCH bpf-next 2/2] netkit: use netlink policy for mode and
- policy attributes validation
-Message-ID: <ZTpoNuFuE1BYLqeB@nanopsycho>
-References: <20231026094106.1505892-1-razor@blackwall.org>
- <20231026094106.1505892-3-razor@blackwall.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E552DF87
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 13:30:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9C53DC433C8;
+	Thu, 26 Oct 2023 13:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698327026;
+	bh=pFp2YBd4VyYE7lA/RZtlxRg6vfQXE6WJqS+if9pEY+o=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=D+XU9HB7BRRP6sB4v41mdsFp5k4taEv0LgLyGCvaxonqB1qfaV4Stj9rWh56IHVY1
+	 +dkBvs0WvWSiT+999vUHAafREuhDEIprUTiS4CtnnC3UI2CK8BpEnGIqCKQp6hbN4w
+	 oS/U2ugIHvB4Fin/OZOIAlxlcrgI92yAAskseClrUAs2B3srH3RPYGaMLTeUk5TXDj
+	 tmIlkUABO0rklTeLT9Zqt8ez2c+ktzEC5Nu/Wf8sgsQ/pEUEUB8h2FHFAu7AOpMOy8
+	 i7kPwPsWKEZux8FJfpYVrnNypAoJQJx7KTpEdmXyi2CoS44IE6QijOUJbmDKbrRw+O
+	 iN8lLuLYxm6bQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7ADE2C3959F;
+	Thu, 26 Oct 2023 13:30:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231026094106.1505892-3-razor@blackwall.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] bareudp: use ports to lookup route
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169832702649.29524.3769483651661946849.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Oct 2023 13:30:26 +0000
+References: <20231025094441.417464-1-b.galvani@gmail.com>
+In-Reply-To: <20231025094441.417464-1-b.galvani@gmail.com>
+To: Beniamino Galvani <b.galvani@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, gnault@redhat.com,
+ linux-kernel@vger.kernel.org
 
-Thu, Oct 26, 2023 at 11:41:06AM CEST, razor@blackwall.org wrote:
->Use netlink's NLA_POLICY_VALIDATE_FN() type for mode and primary/peer
->policy with custom validation functions to return better errors. This
->simplifies the logic a bit and relies on netlink's policy validation.
->We don't have to specify len because the type is NLA_U32 and attribute
->length is enforced by netlink.
->
->Suggested-by: Jiri Pirko <jiri@resnulli.us>
->Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+Hello:
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 25 Oct 2023 11:44:41 +0200 you wrote:
+> The source and destination ports should be taken into account when
+> determining the route destination; they can affect the result, for
+> example in case there are routing rules defined.
+> 
+> Signed-off-by: Beniamino Galvani <b.galvani@gmail.com>
+> ---
+>  drivers/net/bareudp.c | 29 ++++++++++++++++-------------
+>  1 file changed, 16 insertions(+), 13 deletions(-)
+
+Here is the summary with links:
+  - [net-next] bareudp: use ports to lookup route
+    https://git.kernel.org/netdev/net-next/c/ef113733c288
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
