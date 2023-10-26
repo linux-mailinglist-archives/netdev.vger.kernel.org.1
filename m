@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-44393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 691437D7CCF
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 08:22:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AA407D7CD2
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 08:22:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE1DAB2135B
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 06:22:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 191E6B211FE
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 06:22:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFBD11C9C;
-	Thu, 26 Oct 2023 06:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BF621172A;
+	Thu, 26 Oct 2023 06:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="HY9cktuY"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="QaL95mrp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5528820
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 06:21:53 +0000 (UTC)
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F8F7189
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:21:51 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-32da7ac5c4fso330549f8f.1
-        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:21:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098D429A1
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 06:22:47 +0000 (UTC)
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 728A0189
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:22:46 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-507a55302e0so569446e87.0
+        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:22:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1698301310; x=1698906110; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1698301365; x=1698906165; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=CdMyLmIgnuubyki8FRxtEdcZp5JvVpN2Pq4ugcFH7q0=;
-        b=HY9cktuYTYQKm3fWTTQmJwPGMMeMwYTqkSPwZNRl2ARkfitn/cQvqyGNgvRo8i7Fch
-         wJo9WEVJc2B1noQnxDwETvgjXQmkYacYymMOk8gZm2yU8NcKZmrBgkQlJh5IfntCDVHy
-         RCXJGepcsfth1YolmrbdmGa9+n/Q/Yc1JpWy33ZL1EbJTpj+inrvrmuANPljiNdytCh/
-         jIuqkUe7zMPT/dUAtLuH9l0azws2TdoUuabHeLcM/h6KUZpnI0MvEXCjjRskRKy092YM
-         RBBETNKH9GP+RaDxKmq5LPWVAUaWmhUVBBEzQuCe7DdrsvVw2K/m18GH+R7QlXa6r1kt
-         4Hog==
+        bh=aMs/lnDVBosAB87SvMFfqFQ68LKhkyMZWsGdReytLiw=;
+        b=QaL95mrpxPrw3zA7mTXkgO5OG02BhLY5a9AbfitT4OvJWpC5oZQx+i04ssSgX5UGBO
+         6ve9raAAVGiv7hFZB3vTkVeoKBQnAwn9/ddtitEhBsnXI61Q8/h0vcEI8zM9xaNpkbVn
+         DSIEhZ6SLCcSqJJew8g43YQyr/RpbHlv9xftSM0yXOizHK3hVZVpArwg4uEMrJ0J+Nh9
+         5SL/0vPASd6eB5bLkNYwwsW2gA2PBHwuTb1DxgKFqDq2sHVJGUj/0nUsPScIqUHKSFu5
+         +A0UX+IdI8n6oDzlg7qzlYvECKJPxAEf4uyqCb02LAEor7yUm6n1tux7ItX+OXBHdntK
+         S4Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698301310; x=1698906110;
+        d=1e100.net; s=20230601; t=1698301365; x=1698906165;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CdMyLmIgnuubyki8FRxtEdcZp5JvVpN2Pq4ugcFH7q0=;
-        b=JMVGBw5AaTMQzS0CbuJRLiSzH/LAVtTS+e4SyVvTTzm4H22gfGZhJV8k1577pkVO/K
-         488QQpUO62kfVEpCZA2pYEpMoGYBaJKItJUSfXWEggr5zuWTzuaqh/8XBWCRzdd0PLXI
-         46e1VXbKo8rZXn8fOfSYnHkVM2lE10SqxgokCeS7RyUQEd+wGaDxkWZ6Lc1gWpY/cwVI
-         MT1zv/TEqKYMR1C3KdBn8afEFQptB/6a56T3E0Feq3XaNaSqbPiptoRDLWOeRYOOrKxh
-         hy8vl/LeL2h6CgRptTPCpgNWfHjMtAX4lKAHRnOsoHqOsU3X7mhZUwQczI7V2Bm8fEv5
-         6cfA==
-X-Gm-Message-State: AOJu0YzUGTQK6v2jQW7EPXKpSX0WuFGCQiGqBWlS/TfpK1S/KGCQd/iZ
-	SOdpvdsanpptKC/KlTHBHCbwyIRtjzQKnl5FTcbs4A==
-X-Google-Smtp-Source: AGHT+IH/BKhgzqxD4jNWeq8H+CetF97Gscugw1tvdpjsqHEGUF9dKVdlu/6DexUvv2wLcxBcIctWcg==
-X-Received: by 2002:a5d:574f:0:b0:322:707e:a9fd with SMTP id q15-20020a5d574f000000b00322707ea9fdmr13561594wrw.34.1698301309917;
-        Wed, 25 Oct 2023 23:21:49 -0700 (PDT)
+        bh=aMs/lnDVBosAB87SvMFfqFQ68LKhkyMZWsGdReytLiw=;
+        b=ZVbOrbp9S9p4b1dm3DA+HCvjSC0APq/ijkdGYr/jdedJ+C5uHDMClTpEnGv/khpNY/
+         IXcJh5CJcG+4pgYKrZAP/vPn+hgv2fwh1o21QvFh83wWRa0deEbDmKObO4xghD8feTEv
+         lPHoBHpmW231ivS12MIDCXqM/7tFC1QJhVUCAGbCmaJJHidGeBa++aV6XIsXx6+6uISi
+         JuxGvVlNI5M2O0r641BW/G45xpZXYKW80N2MEDtOu3r2R6Hpl3e9ca53+elMgyLXJqvr
+         2zfMEL18i6/1qy4jUfnHd4m2f8Du5ULV7637cGu1NRe063YIssHk1y+GIA76jRjJqPmf
+         7nGw==
+X-Gm-Message-State: AOJu0Yx8LCNaPewzZgQYdPuWMB8WmF551ZbrdRhXLx4NCJww3m6Gzdi6
+	mtJXPx8jPYA4zoTbR3KzVwEFMevELV+Qau9Vtmx2Xg==
+X-Google-Smtp-Source: AGHT+IE1vtXM3TiHv1a9F6ZOnwo0mWn9W2yM6p1bH9mZrKinEREfvo+2//4udq2k56A2T9knjWolDg==
+X-Received: by 2002:a19:7509:0:b0:507:c763:27b7 with SMTP id y9-20020a197509000000b00507c76327b7mr12735192lfe.40.1698301364502;
+        Wed, 25 Oct 2023 23:22:44 -0700 (PDT)
 Received: from [192.168.0.106] (haunt.prize.volia.net. [93.72.109.136])
-        by smtp.gmail.com with ESMTPSA id e16-20020adfef10000000b0032d8354fb43sm13600671wro.76.2023.10.25.23.21.48
+        by smtp.gmail.com with ESMTPSA id n1-20020a5d4001000000b0032dc1fc84f2sm13634262wrp.46.2023.10.25.23.22.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Oct 2023 23:21:49 -0700 (PDT)
-Message-ID: <ba294077-8734-8ff3-d914-c4baa3821c2f@blackwall.org>
-Date: Thu, 26 Oct 2023 09:21:48 +0300
+        Wed, 25 Oct 2023 23:22:44 -0700 (PDT)
+Message-ID: <debc87e7-f3b9-8f46-e496-cd96b0202047@blackwall.org>
+Date: Thu, 26 Oct 2023 09:22:43 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,276 +68,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH bpf-next v4 1/7] netkit, bpf: Add bpf programmable net
- device
+Subject: Re: [PATCH net-next v2 07/13] bridge: add MDB get uAPI attributes
 Content-Language: en-US
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, martin.lau@linux.dev, ast@kernel.org,
- andrii@kernel.org, john.fastabend@gmail.com, sdf@google.com,
- toke@kernel.org, kuba@kernel.org, andrew@lunn.ch,
- =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>
-References: <20231024214904.29825-1-daniel@iogearbox.net>
- <20231024214904.29825-2-daniel@iogearbox.net> <ZTk4ec8CBh92PZvs@nanopsycho>
- <5df35b1b-0a63-a73f-7a32-c6c87f4676cc@blackwall.org>
- <ZTn4cOgrCOZAvIUO@nanopsycho>
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+ bridge@lists.linux-foundation.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, roopa@nvidia.com, mlxsw@nvidia.com
+References: <20231025123020.788710-1-idosch@nvidia.com>
+ <20231025123020.788710-8-idosch@nvidia.com>
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <ZTn4cOgrCOZAvIUO@nanopsycho>
+In-Reply-To: <20231025123020.788710-8-idosch@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/26/23 08:26, Jiri Pirko wrote:
-> Wed, Oct 25, 2023 at 09:21:01PM CEST, razor@blackwall.org wrote:
->> On 10/25/23 18:47, Jiri Pirko wrote:
->>> Tue, Oct 24, 2023 at 11:48:58PM CEST, daniel@iogearbox.net wrote:
->>>> This work adds a new, minimal BPF-programmable device called "netkit"
->> [snip]
->>>
->>> Couple of nitpicks below:
->>>
->>> [..]
->>>
->>>
->>
->> Hi,
->> Thanks for the review. I know about the nits below but decided against
->> changing them, more below each...
->>
->>>> +static int netkit_check_policy(int policy, struct nlattr *tb,
->>>> +			       struct netlink_ext_ack *extack)
->>>> +{
->>>> +	switch (policy) {
->>>> +	case NETKIT_PASS:
->>>> +	case NETKIT_DROP:
->>>> +		return 0;
->>>> +	default:
->>>
->>> Isn't this job for netlink policy?
->>>
->>>
->>
->> This cannot be handled by policies AFAIK, because only 2 sparse values from
->> more are allowed. We could potentially do it through validate() but
+On 10/25/23 15:30, Ido Schimmel wrote:
+> Add MDB get attributes that correspond to the MDB set attributes used in
+> RTM_NEWMDB messages. Specifically, add 'MDBA_GET_ENTRY' which will hold
+> a 'struct br_mdb_entry' and 'MDBA_GET_ENTRY_ATTRS' which will hold
+> 'MDBE_ATTR_*' attributes that are used as indexes (source IP and source
+> VNI).
 > 
-> Perhaps good time to extend the netlink validation for list
-> of values allowed?
+> An example request will look as follows:
 > 
+> [ struct nlmsghdr ]
+> [ struct br_port_msg ]
+> [ MDBA_GET_ENTRY ]
+> 	struct br_mdb_entry
+> [ MDBA_GET_ENTRY_ATTRS ]
+> 	[ MDBE_ATTR_SOURCE ]
+> 		struct in_addr / struct in6_addr
+> 	[ MDBE_ATTR_SRC_VNI ]
+> 		u32
 > 
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
 > 
->> it's the same minus the explicit policy type info. IMO this approach is good.
->>
->>>> +		NL_SET_ERR_MSG_ATTR(extack, tb,
->>>> +				    "Provided default xmit policy not supported");
->>>> +		return -EINVAL;
->>>> +	}
->>>> +}
->>>> +
->>>> +static int netkit_check_mode(int mode, struct nlattr *tb,
->>>> +			     struct netlink_ext_ack *extack)
->>>> +{
->>>> +	switch (mode) {
->>>> +	case NETKIT_L2:
->>>> +	case NETKIT_L3:
->>>> +		return 0;
->>>> +	default:
->>>
->>> Isn't this job for netlink policy?
->>>
->>>
->>
->> This one can be handled by policy indeed, but then we lose the nice user
->> error. Again can be done through validate(), but it's the same and we
->> lose explicit policy type information.
+> Notes:
+>      v2:
+>      * Add comment.
 > 
-> But the netlink validator setups the extack properly. What's wrong with
-> that?
-> 
+>   include/uapi/linux/if_bridge.h | 18 ++++++++++++++++++
+>   1 file changed, 18 insertions(+)
 > 
 
-"integer out of range" vs "Provided device mode can only be L2 or L3" ?
-I like the second one better and it's more informative. The way to get 
-it is to use NLA_POLICY_VALIDATE_FN() as type and provide custom 
-validate() callback, which is identical to the current solution, I see 
-no added value in changing it.
-
-> 
->>
->>>> +		NL_SET_ERR_MSG_ATTR(extack, tb,
->>>> +				    "Provided device mode can only be L2 or L3");
->>>> +		return -EINVAL;
->>>> +	}
->>>> +}
->>>> +
->>>> +static int netkit_validate(struct nlattr *tb[], struct nlattr *data[],
->>>> +			   struct netlink_ext_ack *extack)
->>>> +{
->>>> +	struct nlattr *attr = tb[IFLA_ADDRESS];
->>>> +
->>>> +	if (!attr)
->>>> +		return 0;
->>>> +	NL_SET_ERR_MSG_ATTR(extack, attr,
->>>> +			    "Setting Ethernet address is not supported");
->>>> +	return -EOPNOTSUPP;
->>>> +}
->>>> +
->>>> +static struct rtnl_link_ops netkit_link_ops;
->>>> +
->>>> +static int netkit_new_link(struct net *src_net, struct net_device *dev,
->>>> +			   struct nlattr *tb[], struct nlattr *data[],
->>>> +			   struct netlink_ext_ack *extack)
->>>> +{
->>>> +	struct nlattr *peer_tb[IFLA_MAX + 1], **tbp = tb, *attr;
->>>> +	enum netkit_action default_prim = NETKIT_PASS;
->>>> +	enum netkit_action default_peer = NETKIT_PASS;
->>>> +	enum netkit_mode mode = NETKIT_L3;
->>>> +	unsigned char ifname_assign_type;
->>>> +	struct ifinfomsg *ifmp = NULL;
->>>> +	struct net_device *peer;
->>>> +	char ifname[IFNAMSIZ];
->>>> +	struct netkit *nk;
->>>> +	struct net *net;
->>>> +	int err;
->>>> +
->>>> +	if (data) {
->>>> +		if (data[IFLA_NETKIT_MODE]) {
->>>> +			attr = data[IFLA_NETKIT_MODE];
->>>> +			mode = nla_get_u32(attr);
->>>> +			err = netkit_check_mode(mode, attr, extack);
->>>> +			if (err < 0)
->>>> +				return err;
->>>> +		}
->>>> +		if (data[IFLA_NETKIT_PEER_INFO]) {
->>>> +			attr = data[IFLA_NETKIT_PEER_INFO];
->>>> +			ifmp = nla_data(attr);
->>>> +			err = rtnl_nla_parse_ifinfomsg(peer_tb, attr, extack);
->>>> +			if (err < 0)
->>>> +				return err;
->>>> +			err = netkit_validate(peer_tb, NULL, extack);
->>>> +			if (err < 0)
->>>> +				return err;
->>>> +			tbp = peer_tb;
->>>> +		}
->>>> +		if (data[IFLA_NETKIT_POLICY]) {
->>>> +			attr = data[IFLA_NETKIT_POLICY];
->>>> +			default_prim = nla_get_u32(attr);
->>>> +			err = netkit_check_policy(default_prim, attr, extack);
->>>> +			if (err < 0)
->>>> +				return err;
->>>> +		}
->>>> +		if (data[IFLA_NETKIT_PEER_POLICY]) {
->>>> +			attr = data[IFLA_NETKIT_PEER_POLICY];
->>>> +			default_peer = nla_get_u32(attr);
->>>> +			err = netkit_check_policy(default_peer, attr, extack);
->>>> +			if (err < 0)
->>>> +				return err;
->>>> +		}
->>>> +	}
->>>> +
->>>> +	if (ifmp && tbp[IFLA_IFNAME]) {
->>>> +		nla_strscpy(ifname, tbp[IFLA_IFNAME], IFNAMSIZ);
->>>> +		ifname_assign_type = NET_NAME_USER;
->>>> +	} else {
->>>> +		strscpy(ifname, "nk%d", IFNAMSIZ);
->>>> +		ifname_assign_type = NET_NAME_ENUM;
->>>> +	}
->>>> +
->>>> +	net = rtnl_link_get_net(src_net, tbp);
->>>> +	if (IS_ERR(net))
->>>> +		return PTR_ERR(net);
->>>> +
->>>> +	peer = rtnl_create_link(net, ifname, ifname_assign_type,
->>>> +				&netkit_link_ops, tbp, extack);
->>>> +	if (IS_ERR(peer)) {
->>>> +		put_net(net);
->>>> +		return PTR_ERR(peer);
->>>> +	}
->>>> +
->>>> +	netif_inherit_tso_max(peer, dev);
->>>> +
->>>> +	if (mode == NETKIT_L2)
->>>> +		eth_hw_addr_random(peer);
->>>> +	if (ifmp && dev->ifindex)
->>>> +		peer->ifindex = ifmp->ifi_index;
->>>> +
->>>> +	nk = netkit_priv(peer);
->>>> +	nk->primary = false;
->>>> +	nk->policy = default_peer;
->>>> +	nk->mode = mode;
->>>> +	bpf_mprog_bundle_init(&nk->bundle);
->>>> +	RCU_INIT_POINTER(nk->active, NULL);
->>>> +	RCU_INIT_POINTER(nk->peer, NULL);
->>>
->>> Aren't these already 0?
->>>
->>>
->>
->> Yep, they are. Here decided in favor of explicit show of values, although
->> it's minor and I'm fine either way.
-> 
-> It is always confusing to see this. Reader might think this is necessary
-> as if the mem was not previuosly cleared. The general approach is to
-> rely on mem being zeroed, not sure why this is different.
-> 
-> 
-
-Oh come on :) you really believe someone reading this code would start 
-inferring about netdev_alloc mem zeroing instead of getting a mental 
-picture of the expected state? Anyway, as I said I think this is way too
-minor and it's fine either way, we can remove the explicit 
-initialization and rely on the implicit one.
-
->>
->>>> +
->>>> +	err = register_netdevice(peer);
->>>> +	put_net(net);
->>>> +	if (err < 0)
->>>> +		goto err_register_peer;
->>>> +	netif_carrier_off(peer);
->>>> +	if (mode == NETKIT_L2)
->>>> +		dev_change_flags(peer, peer->flags & ~IFF_NOARP, NULL);
->>>> +
->>>> +	err = rtnl_configure_link(peer, NULL, 0, NULL);
->>>> +	if (err < 0)
->>>> +		goto err_configure_peer;
->>>> +
->>>> +	if (mode == NETKIT_L2)
->>>> +		eth_hw_addr_random(dev);
->>>> +	if (tb[IFLA_IFNAME])
->>>> +		nla_strscpy(dev->name, tb[IFLA_IFNAME], IFNAMSIZ);
->>>> +	else
->>>> +		strscpy(dev->name, "nk%d", IFNAMSIZ);
->>>> +
->>>> +	nk = netkit_priv(dev);
->>>> +	nk->primary = true;
->>>> +	nk->policy = default_prim;
->>>> +	nk->mode = mode;
->>>> +	bpf_mprog_bundle_init(&nk->bundle);
->>>> +	RCU_INIT_POINTER(nk->active, NULL);
->>>> +	RCU_INIT_POINTER(nk->peer, NULL);
->>>> +
->>>> +	err = register_netdevice(dev);
->>>> +	if (err < 0)
->>>> +		goto err_configure_peer;
->>>> +	netif_carrier_off(dev);
->>>> +	if (mode == NETKIT_L2)
->>>> +		dev_change_flags(dev, dev->flags & ~IFF_NOARP, NULL);
->>>> +
->>>> +	rcu_assign_pointer(netkit_priv(dev)->peer, peer);
->>>> +	rcu_assign_pointer(netkit_priv(peer)->peer, dev);
->>>> +	return 0;
->>>> +err_configure_peer:
->>>> +	unregister_netdevice(peer);
->>>> +	return err;
->>>> +err_register_peer:
->>>> +	free_netdev(peer);
->>>> +	return err;
->>>> +}
->>>> +
->>>
->>> [..]
->>
->> Cheers,
->> Nik
->>
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
