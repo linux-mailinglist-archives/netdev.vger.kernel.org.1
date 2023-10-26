@@ -1,124 +1,117 @@
-Return-Path: <netdev+bounces-44611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 755487D8C54
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 01:50:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 358C67D8C58
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 01:52:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C634B21213
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 23:50:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D33AE2821B8
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 23:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D023FE4C;
-	Thu, 26 Oct 2023 23:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86663FE5E;
+	Thu, 26 Oct 2023 23:52:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pzd62/Wd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YazgZT7D"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975AC18050
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 23:50:29 +0000 (UTC)
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C33BF1B9
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 16:50:25 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-507a085efa7so1357e87.0
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 16:50:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2C418050
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 23:52:50 +0000 (UTC)
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B9F290
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 16:52:48 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-507a5edc2ebso639e87.1
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 16:52:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698364224; x=1698969024; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698364366; x=1698969166; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pl7NRdiqha9ywxzG052Y1KfU3qF8Y+2HgFsdm1GuxYs=;
-        b=pzd62/WdVDiGKYbe7AOlZJPr6arMBIUAJrnAnPFVGht/cqgalwTjDmTHZLexFT7oXw
-         jUOdQ6p2bi9umLfJr6i3sE9ktisV7j6+wBewLU/1mdbGDOwCvIyok4iOObUmczr+HLzV
-         AWMB3RE2gcr9m/EkyU/SPdM9ilhX6czBhIsGAb/mxDQ7OrwGkJn2t1NHe5At2hQRitlU
-         tsRpZtbW+YpJGJdeeClVYMlpE5zM8x17wYwFsqj3PH+q+uJvGNv7AARrlP/zR0qG72Wc
-         yqPQRdrfJz88aIYLMnT3ejSwI4KkDS1Q1ZJgsOy5uMutBFJ4cL2Y73THXzFi3sqeUpM1
-         Fuzw==
+        bh=BR3QzRP1pe5qwiInquyulK4CecHvK7FxLOO4TAyv7dA=;
+        b=YazgZT7Dg8kqWANoGNyoVeg4cciDmYxFixtYqTzi/S4tzZhbtQGW0L3149jd4OeYPT
+         tpiflrXkmlCYV4CTqKUCvAQgt47CFS9LeeEpACCkMMhKQ0Yl3S+E2zDcG5MbuCzyWszb
+         1Bibb8szhcIZ0Z+z8gzl2PRd9y1d3l3IOaQ6MuREvR5hoEgEjaAIRV6jOhVHexWYpzrv
+         5h55v97fX+1GWnb7rDdoDs0ui9Rp47uvnK4QJcnHnaEN6rh3F1EnJ4PXjE7rx7Fh0/h/
+         4TvyaqQoIKUcE3LC5mbNmG8heM1AORbyz81n9IOjmHEwIpLTJvjndcosTxdbnN33UW75
+         I1kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698364224; x=1698969024;
+        d=1e100.net; s=20230601; t=1698364366; x=1698969166;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pl7NRdiqha9ywxzG052Y1KfU3qF8Y+2HgFsdm1GuxYs=;
-        b=kIetTR5NeimHTK0IwfbUhTg9yDNLWH2RecDYE7vdvot5yBN04PdDc0K44e652JpdP0
-         SozL39ZYD3Yj1a3s2PzfwD80eZHvxqYSbp9KBG5DeBwK8NmTEZPxO0i8SLmJ4jT9TtJn
-         z0BS2s9gxfu/qUoNTtP/6UHFWJRBKlCkTcOXfY/1DuPjbBkTgSRcsebefQZ+CjGdd0gP
-         Tu9lNwMEd7ti4qSyx7t9wF5xExauMzlwEcg5aLcE4yDrGolfhzk2h43gZe3j80dEwMjd
-         ooNajhVOjPa+YxsVZx3dIpY/39RnCM0b7fcTyt2zL0mwRKtmrqdwWvgT7NhJZ8X/eiAi
-         P4vg==
-X-Gm-Message-State: AOJu0YwDoDixq+ZF06VzVIw6lWxAWRahXdEKIqNE570X8TK60d6f7H/t
-	V5P9IJh974NI2TrIWLshMm2aYkcxaC+SR5G0GKRntA==
-X-Google-Smtp-Source: AGHT+IHeLVrRJh24Ltzv5nbUUPwvwnPK835auZZjb9g2RDScbHWUFryofWVjQC6/7KmgzJawCDDzqkG9ws1xH0NaG/I=
-X-Received: by 2002:a05:6512:3490:b0:504:7b50:ec9a with SMTP id
- v16-20020a056512349000b005047b50ec9amr20107lfr.1.1698364223546; Thu, 26 Oct
- 2023 16:50:23 -0700 (PDT)
+        bh=BR3QzRP1pe5qwiInquyulK4CecHvK7FxLOO4TAyv7dA=;
+        b=tn7iEM3qWjKxKWjUZ3xTRqSyten6j2zyDLjNrhllA8b82OCxjAjg3AfaucDiQd3SDB
+         M2KsOUFsm/eyqGeK+y3YyarXM45B4Md7BgKSmaYbndrpn2heKAvamXLg00RM8bLg20C6
+         anOd4tCO+OgtbuHLgBdJWgs/hvjP0/VKDUjqsRwYY898mXP1DKGrVoZLnHcRvJObWALh
+         ZXm6Es56nMexgESjtQSGA27g17RMEm4FAlFtugHh1ckzbAuju2JQFX/+GRd7Fr9tDa4l
+         ow13k1Za9nOo/PhRI7yKgfmX4tGQzaJqkxW7l1zHwmKbbKFe+HyVmZo4QFVFCJHGrf7w
+         8myA==
+X-Gm-Message-State: AOJu0YyB1HYeJ2InwJwpl6xrhx4hw15bv8a9mL1FT00lmP/Xasc6aEHg
+	UJ2vzlA0dPMibddR6ucGLriXaxgTx0eVdZedDIpltQ==
+X-Google-Smtp-Source: AGHT+IFUt2iTTaXjRPjbJ1RfDqHMsdX/qkFs7NotCUrUJX1fMqWB5PNk8VQ6C39hakkGO2S2MN6vkQyfkgBjn0sCm0U=
+X-Received: by 2002:a05:6512:78f:b0:501:a2b9:6046 with SMTP id
+ x15-20020a056512078f00b00501a2b96046mr12723lfr.7.1698364366357; Thu, 26 Oct
+ 2023 16:52:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231026071701.62237118@kernel.org> <20231026233914.57439-1-kuniyu@amazon.com>
-In-Reply-To: <20231026233914.57439-1-kuniyu@amazon.com>
+References: <20231026081959.3477034-1-lixiaoyan@google.com>
+ <20231026081959.3477034-4-lixiaoyan@google.com> <20231026072003.65dc5774@kernel.org>
+In-Reply-To: <20231026072003.65dc5774@kernel.org>
 From: Coco Li <lixiaoyan@google.com>
-Date: Thu, 26 Oct 2023 16:50:12 -0700
-Message-ID: <CADjXwjiUGOOYOL3jKCWpH49ZVSUPk6mWMvFe5W09GX+n7Zk-DA@mail.gmail.com>
-Subject: Re: [PATCH v4 net-next 2/6] cache: enforce cache groups
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: kuba@kernel.org, andrew@lunn.ch, corbet@lwn.net, daniel@iogearbox.net, 
-	dsahern@kernel.org, edumazet@google.com, mubashirq@google.com, 
-	ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	pnemavat@google.com, weiwan@google.com, wwchao@google.com
+Date: Thu, 26 Oct 2023 16:52:35 -0700
+Message-ID: <CADjXwjjSjw-GxtiBFT_o+mdQT5hSOTH9nDNvEQHV1z4cdqX07A@mail.gmail.com>
+Subject: Re: [PATCH v4 net-next 3/6] net-smnp: reorganize SNMP fast path variables
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	Mubashir Adnan Qureshi <mubashirq@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, 
+	Wei Wang <weiwan@google.com>, Pradeep Nemavat <pnemavat@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 26, 2023 at 4:39=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
+On Thu, Oct 26, 2023 at 7:20=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> From: Jakub Kicinski <kuba@kernel.org>
-> Date: Thu, 26 Oct 2023 07:17:01 -0700
-> > On Thu, 26 Oct 2023 08:19:55 +0000 Coco Li wrote:
-> > > Set up build time warnings to safegaurd against future header changes
-> > > of organized structs.
-> >
-> > TBH I had some doubts about the value of these asserts, I thought
-> > it was just me but I was talking to Vadim F and he brought up
-> > the same question.
-> >
-> > IIUC these markings will protect us from people moving the members
-> > out of the cache lines. Does that actually happen?
-> >
-> > It'd be less typing to assert the _size_ of each group, which protects
-> > from both moving out, and adding stuff haphazardly, which I'd guess is
-> > more common. Perhaps we should do that in addition?
-
-SGTM, will add in next patch.
-
+> On Thu, 26 Oct 2023 08:19:56 +0000 Coco Li wrote:
+> > Subject: [PATCH v4 net-next 3/6] net-smnp: reorganize SNMP fast path va=
+riables
 >
-> Also, we could assert the size of the struct itself and further
-> add ____cacheline_aligned_in_smp to __cacheline_group_begin() ?
+> s/smnp/snmp/
 >
-> If someone adds/removes a member before __cacheline_group_begin(),
-> two groups could share the same cacheline.
+> > names of the metrics. User space binaries not ignoreing the
 >
+> ignoring
 >
+> > +/* Enums in this file are exported by their name and by
+> > + * their values. User space binaries should ingest both
+> > + * of the above, and therefore ordering changes in this
+> > + * file does not break user space. For an example, please
+> > + * see the output of /proc/net/netstat.
+>
+> I don't understand, what does it mean to be exposed by value?
+> User space uses the enum to offset into something or not?
+> If not why don't we move the enum out of uAPI entirely?
+>
+I mostly meant that i.e. cat /proc/net/netstat will export enum names
+first, and that userspace binary should consume both the name and the
+value.
 
-I think we shouldn't add
-____cacheline_aligned_in_smp/____cacheline_aligned together with
-cacheline_group_begin, because especially for read-only cache lines
-that are side by side, enforcing them to be in separate cache lines
-will result in more total cache lines when we don't care about the
-same cache line being shared by multiple cpus.
+I have no objections to moving the enums outside, but that seems a bit
+tangential to the purpose of this patch series.
 
-An example would be tx_read_only group vs rx_read_only group vs
-txrx_read_only groups, since there were suggestions that we mark these
-cache groups separately.
+> > +     /* Caacheline organization can be found documented in
+>
+> Cacheline
+>
+> Please invest (your time) a spell check :S
 
-For cache line separations that we care about (i.e. tcp_sock in tcp.h)
-where read and write might potentially be mixed, the
-____cacheline_aligned should probably still be only the in header file
-only.
+Much apologies, will run through spell checkers in the future.
 
