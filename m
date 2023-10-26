@@ -1,82 +1,141 @@
-Return-Path: <netdev+bounces-44596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40AE37D8BFF
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 01:00:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB6B07D8C06
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 01:02:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBBC6282023
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 23:00:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3CA91C20B6C
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 23:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 199CA3E01E;
-	Thu, 26 Oct 2023 23:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3FA63E498;
+	Thu, 26 Oct 2023 23:02:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n878+hnC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bhkc4iIR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7FA14F9D
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 23:00:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 437DCC433C7;
-	Thu, 26 Oct 2023 23:00:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698361201;
-	bh=Tprv2HEJ1ZQn4DR9o0zCe+RP/h3cr0NDKFi8qh7NFT0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n878+hnCauWva1JmpNtSNeJSFptlrbAncruHiZeq6+iA/qqnOtPfpN8Zo68DICvjY
-	 iVYB1fg0c8D3R7LhJlNigqXI9SuklS3DJe9XTug7GpXAO8QdFT8dXdNIf0fP+pEW8d
-	 R0rmEkZC6Zom5Wwnj3VCz1TCOb1chfI1qr/TwgNlu0OGm7Kr9plL+ajixRG2BuVpWq
-	 4iN/adr/NLCU5WGYo+n1jy5RZPknZDxi4aYGs/We/sheVLyNamBTE338mowP3CPI//
-	 XgnYi1jynEhBvLoULHVFq2XNCL4gEG8jiKvTCGA3/UiqU2qEXTe9W5B6T/C4nbCNWV
-	 qHQx5denoyBqg==
-Date: Thu, 26 Oct 2023 16:00:00 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Dust Li <dust.li@linux.alibaba.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Cruz Zhao <cruzzhao@linux.alibaba.com>,
-	Tianchen Ding <dtcccc@linux.alibaba.com>
-Subject: Re: [PATCH net] net/mlx5e: fix double free of encap_header
-Message-ID: <ZTrvcHEC/rU1G4ct@x130>
-References: <20231025032712.79026-1-dust.li@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C3A3E01E
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 23:02:53 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F92D1AB;
+	Thu, 26 Oct 2023 16:02:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698361372; x=1729897372;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Dp8Mxkor4+0vFNhT/6lhmMk+dPa03eQZ6dKy3m3Bw6A=;
+  b=Bhkc4iIRKIpf2l3Yqq4XWTmrurUYZ4w5SPLn8aB0L5g38jL0h6vngLrC
+   G1ogsgpp3XjKgtQJGX29NrfgIeJ0tIEOc4gMSE59934nyxvgRsv0sGtF7
+   hhvMT6C2ezPnXu+vAbnrIELpatOLNMa0w/tC2ONUjKLCY77NOuKmfgE5F
+   xBdIGGLv32hXzNLcA56NUW4sUUu2LDJGq67vJE+0/Gy7Cs7l37/BNe/HO
+   7Nz2ekMdsNXjV/J4G6zL3VajZEDgtXTz8sJhRxdo4B8shAPpMgpCmUAEK
+   xWr+az4q6NOYkXje/ddX7xxHDiWBGFnveFrTWa/R0Zqox6IliIiUO4JlP
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="378035414"
+X-IronPort-AV: E=Sophos;i="6.03,254,1694761200"; 
+   d="scan'208";a="378035414"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 16:02:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="1090731883"
+X-IronPort-AV: E=Sophos;i="6.03,254,1694761200"; 
+   d="scan'208";a="1090731883"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 26 Oct 2023 16:02:48 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qw9NG-000AD2-1b;
+	Thu, 26 Oct 2023 23:02:46 +0000
+Date: Fri, 27 Oct 2023 07:02:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>,
+	sd@queasysnail.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch,
+	hkallweit1@gmail.com, linux@armlinux.org.uk,
+	richardcochran@gmail.com
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, sebastian.tobuschat@oss.nxp.com,
+	"Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Subject: Re: [PATCH net-next v8 5/7] net: phy: nxp-c45-tja11xx: add MACsec
+ support
+Message-ID: <202310270618.i3W3qKiJ-lkp@intel.com>
+References: <20231023094327.565297-6-radu-nicolae.pirea@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231025032712.79026-1-dust.li@linux.alibaba.com>
+In-Reply-To: <20231023094327.565297-6-radu-nicolae.pirea@oss.nxp.com>
 
-On 25 Oct 11:27, Dust Li wrote:
->When mlx5_packet_reformat_alloc() fails, the encap_header allocated in
->mlx5e_tc_tun_create_header_ipv4{6} will be released within it. However,
->e->encap_header is already set to the previously freed encap_header
->before mlx5_packet_reformat_alloc(). As a result, the later
->mlx5e_encap_put() will free e->encap_header again, causing a double free
->issue.
->
->mlx5e_encap_put()
->    --> mlx5e_encap_dealloc()
->        --> kfree(e->encap_header)
->
->This happens when cmd: MLX5_CMD_OP_ALLOC_PACKET_REFORMAT_CONTEXT fail.
->
->This patch fix it by not setting e->encap_header until
->mlx5_packet_reformat_alloc() success.
->
->Fixes: d589e785baf5e("net/mlx5e: Allow concurrent creation of encap entries")
->Reported-by: Cruz Zhao <cruzzhao@linux.alibaba.com>
->Reported-by: Tianchen Ding <dtcccc@linux.alibaba.com>
->Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
+Hi Radu,
 
-Applied to net-mlx5
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Radu-Pirea-NXP-OSS/net-macsec-move-sci_to_cpu-to-macsec-header/20231023-174539
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231023094327.565297-6-radu-nicolae.pirea%40oss.nxp.com
+patch subject: [PATCH net-next v8 5/7] net: phy: nxp-c45-tja11xx: add MACsec support
+config: x86_64-randconfig-103-20231026 (https://download.01.org/0day-ci/archive/20231027/202310270618.i3W3qKiJ-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231027/202310270618.i3W3qKiJ-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310270618.i3W3qKiJ-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   ld: drivers/net/phy/nxp-c45-tja11xx-macsec.o: in function `nxp_c45_handle_macsec_interrupt':
+>> drivers/net/phy/nxp-c45-tja11xx-macsec.c:1330: undefined reference to `macsec_pn_wrapped'
+
+
+vim +1330 drivers/net/phy/nxp-c45-tja11xx-macsec.c
+
+  1299	
+  1300	void nxp_c45_handle_macsec_interrupt(struct phy_device *phydev,
+  1301					     irqreturn_t *ret)
+  1302	{
+  1303		struct nxp_c45_phy *priv = phydev->priv;
+  1304		struct nxp_c45_secy *pos, *tmp;
+  1305		struct nxp_c45_sa *sa;
+  1306		u8 encoding_sa;
+  1307		int secy_id;
+  1308		u32 reg = 0;
+  1309	
+  1310		if (!priv->macsec)
+  1311			return;
+  1312	
+  1313		do {
+  1314			nxp_c45_macsec_read(phydev, MACSEC_EVR, &reg);
+  1315			if (!reg)
+  1316				return;
+  1317	
+  1318			secy_id = MACSEC_REG_SIZE - ffs(reg);
+  1319			list_for_each_entry_safe(pos, tmp, &priv->macsec->secy_list,
+  1320						 list)
+  1321				if (pos->secy_id == secy_id)
+  1322					break;
+  1323	
+  1324			encoding_sa = pos->secy->tx_sc.encoding_sa;
+  1325			phydev_dbg(phydev, "pn_wrapped: TX SC %d, encoding_sa %u\n",
+  1326				   pos->secy_id, encoding_sa);
+  1327	
+  1328			sa = nxp_c45_find_sa(&pos->sa_list, TX_SA, encoding_sa);
+  1329			if (!IS_ERR(sa))
+> 1330				macsec_pn_wrapped(pos->secy, sa->sa);
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
