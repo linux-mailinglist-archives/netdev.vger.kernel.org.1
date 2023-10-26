@@ -1,84 +1,184 @@
-Return-Path: <netdev+bounces-44489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97D1B7D8461
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:20:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9978E7D8464
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C332B20FD2
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:20:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4EEBB20FDB
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CD82E646;
-	Thu, 26 Oct 2023 14:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bQdw5NFC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2207A2E64B;
+	Thu, 26 Oct 2023 14:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF471848A
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 14:20:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A16A5C433C7;
-	Thu, 26 Oct 2023 14:20:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698330005;
-	bh=ywpSF45QICbahUWWhznkYrdYXFXZq4D/vBvHkybPSSU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bQdw5NFCg1Pv2XXCWbLCVsCQrz7xiU0fAKQIn6PiAuFTl7tXtWvQM8O+rZ7m8Mpx+
-	 qgAfdyV21+sdzjn+Zrn6wVdiMHZR080BFxJguJthV4QhQVhS95Iq4i/yIv1zChWJ/B
-	 IwjmIeN8L7qHjE7JtIDExM/WfLtu10szHBKmU/xJmnJNk3WhZv/pZ1j7UsqmLvyPE5
-	 w/0B2ZjM8nPy4KGi5dSDMpM9I6GhXUCWAZ1CQDWXqkgtpw+orJOgkMPEoPsQVo4OYT
-	 k6GjmmDxGvezzsKSgYLOuTjAYrjUay+JKHgh+PK5MjD7VZZvs3ACOVOmUxw9BjgHRb
-	 0f6MxxgPOaW0A==
-Date: Thu, 26 Oct 2023 07:20:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Coco Li <lixiaoyan@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell
- <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Jonathan
- Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, netdev@vger.kernel.org, Chao Wu
- <wwchao@google.com>, Wei Wang <weiwan@google.com>, Pradeep Nemavat
- <pnemavat@google.com>
-Subject: Re: [PATCH v4 net-next 3/6] net-smnp: reorganize SNMP fast path
- variables
-Message-ID: <20231026072003.65dc5774@kernel.org>
-In-Reply-To: <20231026081959.3477034-4-lixiaoyan@google.com>
-References: <20231026081959.3477034-1-lixiaoyan@google.com>
-	<20231026081959.3477034-4-lixiaoyan@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0861B848A
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 14:20:23 +0000 (UTC)
+Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D30091AA
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:20:20 -0700 (PDT)
+Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-6ce2b33816eso1123733a34.3
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:20:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698330020; x=1698934820;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q7laoKfp6mRSUnZKN04Wpi3amSzI30zHY1zAqCLX4lI=;
+        b=a+jrOMWjGNagFJqfradNURthkdYgAlDu1s9enHsTS4CGYdX5beTiBD5FjOZC18IyBK
+         akM8DLbyDxAQYYJOahgvJrtqWSDpTGh9gM+zYeSrRR4P4aDqo3lxFD/5fDacja0vqMMm
+         v1VAD1hzFg03GyrS9hdGmDW4KYwfeaj+wjD+ZQjmvmiKSJwRFNh4kp1ZwItrcKqhDkBP
+         D1zDKz2NZZNhQVJDGh7BkLEXLH2Q9NOPe3dXF2LxSCcp6BStPisThxOpsVvJ+cYR837J
+         Be0xxriXrnQH1GdRAieNoAo3nmsCmJJk1Rx4fDz2exqGdqaixTQVm8PRsiF9bUOcntNi
+         JUCg==
+X-Gm-Message-State: AOJu0Ywz6aTiI1JTTyIaUGj8tXb2q2q3aeN4/eEHu5erdnn8488jHUIR
+	zA61YRRucRRHHUW+R1pPGs8CUA9Q5Fovpa6MiJBtcxXAbXoi
+X-Google-Smtp-Source: AGHT+IH4qEDAGCgxLl0bZ+zsAy+kNl3QmFFaPFp4Ws6LnKYJ9+Bz1cSjpQ/dHdQMTYfAFLuXz7DdZ6MK1oY6/XkEUmrz9uOwJPGE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a9d:4f0b:0:b0:6b7:3eba:59d3 with SMTP id
+ d11-20020a9d4f0b000000b006b73eba59d3mr4980998otl.6.1698330020217; Thu, 26 Oct
+ 2023 07:20:20 -0700 (PDT)
+Date: Thu, 26 Oct 2023 07:20:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000910ad106089f45eb@google.com>
+Subject: [syzbot] [net?] BUG: corrupted list in ptp_open
+From: syzbot <syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com>
+To: davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	reibax@gmail.com, richardcochran@gmail.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 26 Oct 2023 08:19:56 +0000 Coco Li wrote:
-> Subject: [PATCH v4 net-next 3/6] net-smnp: reorganize SNMP fast path variables
+Hello,
 
-s/smnp/snmp/
+syzbot found the following issue on:
 
-> names of the metrics. User space binaries not ignoreing the
+HEAD commit:    2030579113a1 Add linux-next specific files for 20231020
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=16ab79a3680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=37404d76b3c8840e
+dashboard link: https://syzkaller.appspot.com/bug?extid=df3f3ef31f60781fa911
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=140aa715680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11037669680000
 
-ignoring
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a99a981e5d78/disk-20305791.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/073a5ba6a2a6/vmlinux-20305791.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c7c1a7107f7b/bzImage-20305791.xz
 
-> +/* Enums in this file are exported by their name and by
-> + * their values. User space binaries should ingest both
-> + * of the above, and therefore ordering changes in this
-> + * file does not break user space. For an example, please
-> + * see the output of /proc/net/netstat.
+The issue was bisected to:
 
-I don't understand, what does it mean to be exposed by value?
-User space uses the enum to offset into something or not?
-If not why don't we move the enum out of uAPI entirely?
+commit 8f5de6fb245326704f37d91780b9a10253a8a100
+Author: Xabier Marquiegui <reibax@gmail.com>
+Date:   Wed Oct 11 22:39:55 2023 +0000
 
-> +	/* Caacheline organization can be found documented in
+    ptp: support multiple timestamp event readers
 
-Cacheline
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15475b89680000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=17475b89680000
+console output: https://syzkaller.appspot.com/x/log.txt?x=13475b89680000
 
-Please invest (your time) a spell check :S
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
+
+list_add corruption. prev->next should be next (ffff88814a1325e8), but was ffff888078d25048. (prev=ffff888078d21048).
+------------[ cut here ]------------
+kernel BUG at lib/list_debug.c:32!
+invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+CPU: 0 PID: 7237 Comm: syz-executor182 Not tainted 6.6.0-rc6-next-20231020-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
+RIP: 0010:__list_add_valid_or_report+0xb6/0x100 lib/list_debug.c:32
+Code: e8 2f a5 3a fd 0f 0b 48 89 d9 48 c7 c7 40 9d e9 8a e8 1e a5 3a fd 0f 0b 48 89 f1 48 c7 c7 c0 9d e9 8a 48 89 de e8 0a a5 3a fd <0f> 0b 48 89 f2 48 89 d9 48 89 ee 48 c7 c7 40 9e e9 8a e8 f3 a4 3a
+RSP: 0018:ffffc90009b3f898 EFLAGS: 00010286
+RAX: 0000000000000075 RBX: ffff88814a1325e8 RCX: ffffffff816bb8d9
+RDX: 0000000000000000 RSI: ffffffff816c4d42 RDI: 0000000000000005
+RBP: ffff88807c7a9048 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000001 R12: ffff88814a132000
+R13: ffffc90009b3f900 R14: ffff888078d21048 R15: ffff88807c7a9048
+FS:  0000555556c00380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffef0aa1138 CR3: 000000007d17e000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __list_add_valid include/linux/list.h:88 [inline]
+ __list_add include/linux/list.h:150 [inline]
+ list_add_tail include/linux/list.h:183 [inline]
+ ptp_open+0x1c5/0x4f0 drivers/ptp/ptp_chardev.c:122
+ posix_clock_open+0x17e/0x240 kernel/time/posix-clock.c:134
+ chrdev_open+0x26d/0x6e0 fs/char_dev.c:414
+ do_dentry_open+0x8d4/0x18d0 fs/open.c:948
+ do_open fs/namei.c:3621 [inline]
+ path_openat+0x1d36/0x2cd0 fs/namei.c:3778
+ do_filp_open+0x1dc/0x430 fs/namei.c:3808
+ do_sys_openat2+0x176/0x1e0 fs/open.c:1440
+ do_sys_open fs/open.c:1455 [inline]
+ __do_sys_openat fs/open.c:1471 [inline]
+ __se_sys_openat fs/open.c:1466 [inline]
+ __x64_sys_openat+0x175/0x210 fs/open.c:1466
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7fc6c2099ae9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffef0aa1238 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fc6c2099ae9
+RDX: 0000000000000000 RSI: 0000000020000300 RDI: ffffffffffffff9c
+RBP: 00000000000f4240 R08: 0000000000000000 R09: 00000000000000a0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000130fc
+R13: 00007ffef0aa124c R14: 00007ffef0aa1260 R15: 00007ffef0aa1250
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__list_add_valid_or_report+0xb6/0x100 lib/list_debug.c:32
+Code: e8 2f a5 3a fd 0f 0b 48 89 d9 48 c7 c7 40 9d e9 8a e8 1e a5 3a fd 0f 0b 48 89 f1 48 c7 c7 c0 9d e9 8a 48 89 de e8 0a a5 3a fd <0f> 0b 48 89 f2 48 89 d9 48 89 ee 48 c7 c7 40 9e e9 8a e8 f3 a4 3a
+RSP: 0018:ffffc90009b3f898 EFLAGS: 00010286
+RAX: 0000000000000075 RBX: ffff88814a1325e8 RCX: ffffffff816bb8d9
+RDX: 0000000000000000 RSI: ffffffff816c4d42 RDI: 0000000000000005
+RBP: ffff88807c7a9048 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000001 R12: ffff88814a132000
+R13: ffffc90009b3f900 R14: ffff888078d21048 R15: ffff88807c7a9048
+FS:  0000555556c00380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffef0aa1138 CR3: 000000007d17e000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
