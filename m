@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-44410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A66407D7E5F
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 10:20:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 750107D7E60
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 10:20:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07D6EB21409
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 08:20:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15CB6B213A6
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 08:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82121A5A9;
-	Thu, 26 Oct 2023 08:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070F41A58B;
+	Thu, 26 Oct 2023 08:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QumY1cDs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VofJahOu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8BD1A58F
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 08:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19501A58A
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 08:20:20 +0000 (UTC)
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 375D8CE
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 01:20:17 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9cb79eb417so495249276.2
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 01:20:17 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191ECB8
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 01:20:19 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9cfec5e73dso504536276.2
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 01:20:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698308416; x=1698913216; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1698308418; x=1698913218; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lPSnH5IdsOychGCLHjfmwJT4EW1gfglkruQYuYmuFAw=;
-        b=QumY1cDse1pfZZclidt/8CFBHQOC2Ua9mwUxvOkiJVn2Ni2yZePUZmOMBWwhY0coga
-         HXomvGMYDNw1BUWqPylAPT131sVvY7RuSNa5haIVIpbVPm0oh5VCDsJ89DA4BKpnz9L7
-         twkvbhlM4kuRvEMBGhdINNQA0l4arLdVnugMhQmdk3JkhTnAFYIEUnbMFDJiV/QvTrWT
-         OSc79hpFLIq+9ad5H0LKamK+X5uOdo7lEessWXocyKYb37+Rf1G9PQU/EgdQcCVLyu4K
-         k8v74CjvMGfse9R4lJR1gVi0xNsJdj3IONh+wxdegeufLtpQYSYWHCeNBlhtxCWbBrS6
-         drMg==
+        bh=qMP966O748/I088CCHvSXZ/ZZvNP4bfrKRcKTDa7jVM=;
+        b=VofJahOu06GtLdPNcbkaZ2Uh2wQWtURU+VGEDpCtHbM2jKmDLS5TA/Pp+sp/9r0rsC
+         oOXdJjySJw2WeLR3KWN5JKA9DCaqqgQ8XW/ui0EMj7JKdGqnGmNlpquAy5FlQvRiBz92
+         +YkrFYsnLHllSd+W4Xjo44hY4d1gT3gdGcTMwyrJUeF2GujrPbWd5dWxNweOiRZs55nO
+         F8meAFEPRSovRmRaZygpOdlVx24VA8Km/7N9s0RFN44uMRl80LMQUas4dYX0Y0ffRNAZ
+         MNTWVqniYM3IuJhr4jN35ALeW9/MWwNobLD6pfi5kYyhDxvcYf8XFhQr31O4LiaHdfXb
+         EjAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698308416; x=1698913216;
+        d=1e100.net; s=20230601; t=1698308418; x=1698913218;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lPSnH5IdsOychGCLHjfmwJT4EW1gfglkruQYuYmuFAw=;
-        b=Sb86ZNtcVJIbvI8tupRmuPNzxKHb+c94ShGKtU29/qkssBPBJvrD5H9rx8bsD6Io9W
-         EmYnV32XOUiWwZRzK1ZigWKHrdUmj9ixdAZLAP+ZWL4HYQ9D5mXR4sFap20U1nHfV22e
-         pXlJ8NnfYZ9ycBjnWLsm63QD0Kk/Y1ia4EdAOPwYWLac8PoM17XOmu/zbru/gb+a7gfC
-         /e5no8FaPJgkoPLr3NC+L0PTNvn4NwoNuo8otCV4vc/XFacPQqCYtG0akGIx6OqxDwkH
-         2nzxVo1I0elBtajNfqEED41CHWGutIJ2RmpzgiVTPAWsJuqFcwxYP21JnE9D4Ku3uSrU
-         cwOQ==
-X-Gm-Message-State: AOJu0YzwSVczCGp/+qyujxVZxWldTneCtCtlZCf4HFiA1yJWb0q1ZW/E
-	AQypM1Z+SgRVqUD7mvcyqKhmSxoYiJDPcm0=
-X-Google-Smtp-Source: AGHT+IGusD+jlvh/sWi/ZqVfPR9odNaS/02FaprtbNvJ3BXjnA/3azs1KQl7CAW2jogrpAxbPnKSHJiG1GKbel0=
+        bh=qMP966O748/I088CCHvSXZ/ZZvNP4bfrKRcKTDa7jVM=;
+        b=mWaUHhFz0HDQDG6QoM4ogAvyEoHdPseMVopC9usXfTmfYDwxlaosC8WIT+EZ70eWmG
+         UVb0assJgczseRcEvRUbU5WNbBkA+vYI74dqDwXDsAHz0dhb1wOX6gRTBBuPjE5jhEn8
+         4lqUKicvU50Pe4CQ5viziM5JKd2ftIGXw9cM/oyYxhDNC8rshxIZdOTu0nh8kUrWLEoV
+         g5tpttb2R/32+hA15f0Dht+qdHJro8cVu3NOL/sGNnGfB911burKjTIHAJEHQp/ydB0Y
+         qY9eooP38n/ujXQUW6s0IGFU8T3ppw43zF+ch7fT4F/VJbr7suq0v3WnLidtn1EH/8Nx
+         jfUQ==
+X-Gm-Message-State: AOJu0YyhaRgH88CJzJiGZzVcXR+Gam65TShEjZnifY509L1JGS5sWnOd
+	0IN8BWVkx+rxnXKbwgMVV3z4xYWCNZRlxY4=
+X-Google-Smtp-Source: AGHT+IFMK5r5l71Hk0J0d4hf/ZCqjG54CNYXsmQZhhjMuOW9/iMLcvxgC0WRn/sRkL+Ux25dr3luavhSIhiEi0A=
 X-Received: from coco0920.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2a23])
- (user=lixiaoyan job=sendgmr) by 2002:a81:57c1:0:b0:5a7:b8d1:ef65 with SMTP id
- l184-20020a8157c1000000b005a7b8d1ef65mr111984ywb.3.1698308416436; Thu, 26 Oct
- 2023 01:20:16 -0700 (PDT)
-Date: Thu, 26 Oct 2023 08:19:56 +0000
+ (user=lixiaoyan job=sendgmr) by 2002:a05:6902:168c:b0:d9a:e6ae:ddb7 with SMTP
+ id bx12-20020a056902168c00b00d9ae6aeddb7mr322275ybb.7.1698308418321; Thu, 26
+ Oct 2023 01:20:18 -0700 (PDT)
+Date: Thu, 26 Oct 2023 08:19:57 +0000
 In-Reply-To: <20231026081959.3477034-1-lixiaoyan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -64,8 +64,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231026081959.3477034-1-lixiaoyan@google.com>
 X-Mailer: git-send-email 2.42.0.758.gaed0368e0e-goog
-Message-ID: <20231026081959.3477034-4-lixiaoyan@google.com>
-Subject: [PATCH v4 net-next 3/6] net-smnp: reorganize SNMP fast path variables
+Message-ID: <20231026081959.3477034-5-lixiaoyan@google.com>
+Subject: [PATCH v4 net-next 4/6] netns-ipv4: reorganize netns_ipv4 fast path variables
 From: Coco Li <lixiaoyan@google.com>
 To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
 	Neal Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>, 
@@ -75,124 +75,186 @@ Cc: netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google
 	Pradeep Nemavat <pnemavat@google.com>, Coco Li <lixiaoyan@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Chao Wu <wwchao@google.com>
-
 Reorganize fast path variables on tx-txrx-rx order.
-Fast path cacheline ends afer LINUX_MIB_DELAYEDACKLOCKED.
-There are only read-write variables here.
-
-NOTE: Kernel exports these counters with a leading line with the
-names of the metrics. User space binaries not ignoreing the
-metric names will not be affected by the change of order here. An
-example can be seen by looking at /proc/net/netstat.
+Fastpath cacheline ends after sysctl_tcp_rmem.
+There are only read-only variables here. (write is on the control path
+and not considered in this case)
 
 Below data generated with pahole on x86 architecture.
-
-Fast path variables span cache lines before change: 12
+Fast path variables span cache lines before change: 4
 Fast path variables span cache lines after change: 2
 
-Signed-off-by: Chao Wu <wwchao@google.com>
 Signed-off-by: Coco Li <lixiaoyan@google.com>
 Suggested-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Wei Wang <weiwan@google.com>
 Reviewed-by: David Ahern <dsahern@kernel.org>
 ---
- include/uapi/linux/snmp.h | 41 ++++++++++++++++++++++++++-------------
- 1 file changed, 28 insertions(+), 13 deletions(-)
+ fs/proc/proc_net.c       | 39 ++++++++++++++++++++++++++++++++++++
+ include/net/netns/ipv4.h | 43 ++++++++++++++++++++++++++--------------
+ 2 files changed, 67 insertions(+), 15 deletions(-)
 
-diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
-index b2b72886cb6d1..70be81c1fdb6d 100644
---- a/include/uapi/linux/snmp.h
-+++ b/include/uapi/linux/snmp.h
-@@ -8,6 +8,13 @@
- #ifndef _LINUX_SNMP_H
- #define _LINUX_SNMP_H
+diff --git a/fs/proc/proc_net.c b/fs/proc/proc_net.c
+index 2ba31b6d68c07..38846be34acd9 100644
+--- a/fs/proc/proc_net.c
++++ b/fs/proc/proc_net.c
+@@ -344,6 +344,43 @@ const struct file_operations proc_net_operations = {
+ 	.iterate_shared	= proc_tgid_net_readdir,
+ };
  
-+/* Enums in this file are exported by their name and by
-+ * their values. User space binaries should ingest both
-+ * of the above, and therefore ordering changes in this
-+ * file does not break user space. For an example, please
-+ * see the output of /proc/net/netstat.
-+ */
++static void __init netns_ipv4_struct_check(void)
++{
++	/* TX readonly hotpath cache lines */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_early_retrans);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_tso_win_divisor);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_tso_rtt_log);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_autocorking);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_min_snd_mss);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_notsent_lowat);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_limit_output_bytes);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_min_rtt_wlen);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_wmem);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_ip_fwd_use_pmtu);
++	/* TXRX readonly hotpath cache lines */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_moderate_rcvbuf);
++	/* RX readonly hotpath cache line */
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_ip_early_demux);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_early_demux);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_reordering);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
++				      sysctl_tcp_rmem);
++}
 +
- /* ipstats mib definitions */
- /*
-  * RFC 1213:  MIB-II
-@@ -170,7 +177,28 @@ enum
- /* linux mib definitions */
- enum
+ static __net_init int proc_net_ns_init(struct net *net)
  {
-+	/* Caacheline organization can be found documented in
-+	 * Documentation/networking/net_cachelines/snmp.rst.
+ 	struct proc_dir_entry *netd, *net_statd;
+@@ -351,6 +388,8 @@ static __net_init int proc_net_ns_init(struct net *net)
+ 	kgid_t gid;
+ 	int err;
+ 
++	netns_ipv4_struct_check();
++
+ 	/*
+ 	 * This PDE acts only as an anchor for /proc/${pid}/net hierarchy.
+ 	 * Corresponding inode (PDE(inode) == net->proc_net) is never
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 73f43f6991999..617074fccde68 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -42,6 +42,34 @@ struct inet_timewait_death_row {
+ struct tcp_fastopen_context;
+ 
+ struct netns_ipv4 {
++	/* Cacheline organization can be found documented in
++	 * Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst.
 +	 * Please update the document when adding new fields.
 +	 */
 +
- 	LINUX_MIB_NUM = 0,
-+	/* TX hotpath */
-+	LINUX_MIB_TCPAUTOCORKING,		/* TCPAutoCorking */
-+	LINUX_MIB_TCPFROMZEROWINDOWADV,		/* TCPFromZeroWindowAdv */
-+	LINUX_MIB_TCPTOZEROWINDOWADV,		/* TCPToZeroWindowAdv */
-+	LINUX_MIB_TCPWANTZEROWINDOWADV,		/* TCPWantZeroWindowAdv */
-+	LINUX_MIB_TCPORIGDATASENT,		/* TCPOrigDataSent */
-+	LINUX_MIB_TCPPUREACKS,			/* TCPPureAcks */
-+	LINUX_MIB_TCPHPACKS,			/* TCPHPAcks */
-+	LINUX_MIB_TCPDELIVERED,			/* TCPDelivered */
-+	/* RX hotpath */
-+	LINUX_MIB_TCPHPHITS,			/* TCPHPHits */
-+	LINUX_MIB_TCPRCVCOALESCE,		/* TCPRcvCoalesce */
-+	LINUX_MIB_TCPKEEPALIVE,			/* TCPKeepAlive */
-+	LINUX_MIB_DELAYEDACKS,			/* DelayedACKs */
-+	LINUX_MIB_DELAYEDACKLOCKED,		/* DelayedACKLocked */
-+	/* End of hotpath variables */
- 	LINUX_MIB_SYNCOOKIESSENT,		/* SyncookiesSent */
- 	LINUX_MIB_SYNCOOKIESRECV,		/* SyncookiesRecv */
- 	LINUX_MIB_SYNCOOKIESFAILED,		/* SyncookiesFailed */
-@@ -186,14 +214,9 @@ enum
- 	LINUX_MIB_TIMEWAITKILLED,		/* TimeWaitKilled */
- 	LINUX_MIB_PAWSACTIVEREJECTED,		/* PAWSActiveRejected */
- 	LINUX_MIB_PAWSESTABREJECTED,		/* PAWSEstabRejected */
--	LINUX_MIB_DELAYEDACKS,			/* DelayedACKs */
--	LINUX_MIB_DELAYEDACKLOCKED,		/* DelayedACKLocked */
- 	LINUX_MIB_DELAYEDACKLOST,		/* DelayedACKLost */
- 	LINUX_MIB_LISTENOVERFLOWS,		/* ListenOverflows */
- 	LINUX_MIB_LISTENDROPS,			/* ListenDrops */
--	LINUX_MIB_TCPHPHITS,			/* TCPHPHits */
--	LINUX_MIB_TCPPUREACKS,			/* TCPPureAcks */
--	LINUX_MIB_TCPHPACKS,			/* TCPHPAcks */
- 	LINUX_MIB_TCPRENORECOVERY,		/* TCPRenoRecovery */
- 	LINUX_MIB_TCPSACKRECOVERY,		/* TCPSackRecovery */
- 	LINUX_MIB_TCPSACKRENEGING,		/* TCPSACKReneging */
-@@ -247,7 +270,6 @@ enum
- 	LINUX_MIB_TCPREQQFULLDOCOOKIES,		/* TCPReqQFullDoCookies */
- 	LINUX_MIB_TCPREQQFULLDROP,		/* TCPReqQFullDrop */
- 	LINUX_MIB_TCPRETRANSFAIL,		/* TCPRetransFail */
--	LINUX_MIB_TCPRCVCOALESCE,		/* TCPRcvCoalesce */
- 	LINUX_MIB_TCPBACKLOGCOALESCE,		/* TCPBacklogCoalesce */
- 	LINUX_MIB_TCPOFOQUEUE,			/* TCPOFOQueue */
- 	LINUX_MIB_TCPOFODROP,			/* TCPOFODrop */
-@@ -263,12 +285,7 @@ enum
- 	LINUX_MIB_TCPFASTOPENBLACKHOLE,		/* TCPFastOpenBlackholeDetect */
- 	LINUX_MIB_TCPSPURIOUS_RTX_HOSTQUEUES, /* TCPSpuriousRtxHostQueues */
- 	LINUX_MIB_BUSYPOLLRXPACKETS,		/* BusyPollRxPackets */
--	LINUX_MIB_TCPAUTOCORKING,		/* TCPAutoCorking */
--	LINUX_MIB_TCPFROMZEROWINDOWADV,		/* TCPFromZeroWindowAdv */
--	LINUX_MIB_TCPTOZEROWINDOWADV,		/* TCPToZeroWindowAdv */
--	LINUX_MIB_TCPWANTZEROWINDOWADV,		/* TCPWantZeroWindowAdv */
- 	LINUX_MIB_TCPSYNRETRANS,		/* TCPSynRetrans */
--	LINUX_MIB_TCPORIGDATASENT,		/* TCPOrigDataSent */
- 	LINUX_MIB_TCPHYSTARTTRAINDETECT,	/* TCPHystartTrainDetect */
- 	LINUX_MIB_TCPHYSTARTTRAINCWND,		/* TCPHystartTrainCwnd */
- 	LINUX_MIB_TCPHYSTARTDELAYDETECT,	/* TCPHystartDelayDetect */
-@@ -280,10 +297,8 @@ enum
- 	LINUX_MIB_TCPACKSKIPPEDTIMEWAIT,	/* TCPACKSkippedTimeWait */
- 	LINUX_MIB_TCPACKSKIPPEDCHALLENGE,	/* TCPACKSkippedChallenge */
- 	LINUX_MIB_TCPWINPROBE,			/* TCPWinProbe */
--	LINUX_MIB_TCPKEEPALIVE,			/* TCPKeepAlive */
- 	LINUX_MIB_TCPMTUPFAIL,			/* TCPMTUPFail */
- 	LINUX_MIB_TCPMTUPSUCCESS,		/* TCPMTUPSuccess */
--	LINUX_MIB_TCPDELIVERED,			/* TCPDelivered */
- 	LINUX_MIB_TCPDELIVEREDCE,		/* TCPDeliveredCE */
- 	LINUX_MIB_TCPACKCOMPRESSED,		/* TCPAckCompressed */
- 	LINUX_MIB_TCPZEROWINDOWDROP,		/* TCPZeroWindowDrop */
++	__cacheline_group_begin(netns_ipv4_read);
++	/* TX readonly hotpath cache lines */
++	u8 sysctl_tcp_early_retrans;
++	u8 sysctl_tcp_tso_win_divisor;
++	u8 sysctl_tcp_tso_rtt_log;
++	u8 sysctl_tcp_autocorking;
++	int sysctl_tcp_min_snd_mss;
++	unsigned int sysctl_tcp_notsent_lowat;
++	int sysctl_tcp_limit_output_bytes;
++	int sysctl_tcp_min_rtt_wlen;
++	int sysctl_tcp_wmem[3];
++	u8 sysctl_ip_fwd_use_pmtu;
++
++	/* TXRX readonly hotpath cache lines */
++	u8 sysctl_tcp_moderate_rcvbuf;
++
++	/* RX readonly hotpath cache line */
++	u8 sysctl_ip_early_demux;
++	u8 sysctl_tcp_early_demux;
++	int sysctl_tcp_reordering;
++	int sysctl_tcp_rmem[3];
++	__cacheline_group_end(netns_ipv4_read);
++
+ 	struct inet_timewait_death_row tcp_death_row;
+ 	struct udp_table *udp_table;
+ 
+@@ -96,17 +124,14 @@ struct netns_ipv4 {
+ 
+ 	u8 sysctl_ip_default_ttl;
+ 	u8 sysctl_ip_no_pmtu_disc;
+-	u8 sysctl_ip_fwd_use_pmtu;
+ 	u8 sysctl_ip_fwd_update_priority;
+ 	u8 sysctl_ip_nonlocal_bind;
+ 	u8 sysctl_ip_autobind_reuse;
+ 	/* Shall we try to damage output packets if routing dev changes? */
+ 	u8 sysctl_ip_dynaddr;
+-	u8 sysctl_ip_early_demux;
+ #ifdef CONFIG_NET_L3_MASTER_DEV
+ 	u8 sysctl_raw_l3mdev_accept;
+ #endif
+-	u8 sysctl_tcp_early_demux;
+ 	u8 sysctl_udp_early_demux;
+ 
+ 	u8 sysctl_nexthop_compat_mode;
+@@ -119,7 +144,6 @@ struct netns_ipv4 {
+ 	u8 sysctl_tcp_mtu_probing;
+ 	int sysctl_tcp_mtu_probe_floor;
+ 	int sysctl_tcp_base_mss;
+-	int sysctl_tcp_min_snd_mss;
+ 	int sysctl_tcp_probe_threshold;
+ 	u32 sysctl_tcp_probe_interval;
+ 
+@@ -135,17 +159,14 @@ struct netns_ipv4 {
+ 	u8 sysctl_tcp_backlog_ack_defer;
+ 	u8 sysctl_tcp_pingpong_thresh;
+ 
+-	int sysctl_tcp_reordering;
+ 	u8 sysctl_tcp_retries1;
+ 	u8 sysctl_tcp_retries2;
+ 	u8 sysctl_tcp_orphan_retries;
+ 	u8 sysctl_tcp_tw_reuse;
+ 	int sysctl_tcp_fin_timeout;
+-	unsigned int sysctl_tcp_notsent_lowat;
+ 	u8 sysctl_tcp_sack;
+ 	u8 sysctl_tcp_window_scaling;
+ 	u8 sysctl_tcp_timestamps;
+-	u8 sysctl_tcp_early_retrans;
+ 	u8 sysctl_tcp_recovery;
+ 	u8 sysctl_tcp_thin_linear_timeouts;
+ 	u8 sysctl_tcp_slow_start_after_idle;
+@@ -161,21 +182,13 @@ struct netns_ipv4 {
+ 	u8 sysctl_tcp_frto;
+ 	u8 sysctl_tcp_nometrics_save;
+ 	u8 sysctl_tcp_no_ssthresh_metrics_save;
+-	u8 sysctl_tcp_moderate_rcvbuf;
+-	u8 sysctl_tcp_tso_win_divisor;
+ 	u8 sysctl_tcp_workaround_signed_windows;
+-	int sysctl_tcp_limit_output_bytes;
+ 	int sysctl_tcp_challenge_ack_limit;
+-	int sysctl_tcp_min_rtt_wlen;
+ 	u8 sysctl_tcp_min_tso_segs;
+-	u8 sysctl_tcp_tso_rtt_log;
+-	u8 sysctl_tcp_autocorking;
+ 	u8 sysctl_tcp_reflect_tos;
+ 	int sysctl_tcp_invalid_ratelimit;
+ 	int sysctl_tcp_pacing_ss_ratio;
+ 	int sysctl_tcp_pacing_ca_ratio;
+-	int sysctl_tcp_wmem[3];
+-	int sysctl_tcp_rmem[3];
+ 	unsigned int sysctl_tcp_child_ehash_entries;
+ 	unsigned long sysctl_tcp_comp_sack_delay_ns;
+ 	unsigned long sysctl_tcp_comp_sack_slack_ns;
 -- 
 2.42.0.758.gaed0368e0e-goog
 
