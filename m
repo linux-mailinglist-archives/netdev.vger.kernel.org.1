@@ -1,105 +1,71 @@
-Return-Path: <netdev+bounces-44493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CD5E7D849E
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:25:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A588A7D84B1
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:28:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C38C8281FEC
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:25:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EAB2282002
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971D72EAE7;
-	Thu, 26 Oct 2023 14:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECE42EAED;
+	Thu, 26 Oct 2023 14:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="WLNoQBcL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SFoZzxh/"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224D02E41F;
-	Thu, 26 Oct 2023 14:25:39 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CA49C;
-	Thu, 26 Oct 2023 07:25:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=uIGlwfdMBsmp/4z8QYpLO2wdpNnM5FD6mLIDGow3Gn4=; b=WLNoQBcL1b4DVFYX6Iw3ZuuHG3
-	QEUxZCjMc/omDtfyVrkui8yhW390B9ion871Dhsx6M+Ba2u2NQpn9w1CCk2I/MRInU4aoLrRBur+3
-	onbb1dqWIlS+hVuS6Ti8Fu9HUuhbBYWowdIqqaM0tM60gH21AN2QU+8d97kQawR7vcHEePB0zZTgz
-	l7o7uXxyUcT4m0CIBtNVMHtl/SpZhOj4SM/ljhXE8mcCeUaVADyoRl3nRBl2gm5MbnxdNIY5VMGHs
-	hnhF0/g4tXs+maKC9UlQajPRs5Ad3JsfnrpVuD4QhxdyZ/QLf5VsZI7rTKJ25RzuH55drc4lnwjDx
-	O/ZZiVMQ==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qw1Ik-000G8Q-5k; Thu, 26 Oct 2023 16:25:34 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qw1Ij-000QCz-Jg; Thu, 26 Oct 2023 16:25:33 +0200
-Subject: Re: [PATCH bpf-next 2/2] netkit: use netlink policy for mode and
- policy attributes validation
-To: Nikolay Aleksandrov <razor@blackwall.org>,
- Ido Schimmel <idosch@idosch.org>
-Cc: bpf@vger.kernel.org, jiri@resnulli.us, netdev@vger.kernel.org,
- martin.lau@linux.dev, ast@kernel.org, andrii@kernel.org,
- john.fastabend@gmail.com, kuba@kernel.org, andrew@lunn.ch, toke@kernel.org,
- toke@redhat.com, sdf@google.com
-References: <20231026094106.1505892-1-razor@blackwall.org>
- <20231026094106.1505892-3-razor@blackwall.org> <ZTpzfckQ5n4o2F7D@shredder>
- <36072f45-0d42-7284-d0dc-295f543fe40f@blackwall.org>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <8533255d-9b73-cdbe-fbbd-28a275313229@iogearbox.net>
-Date: Thu, 26 Oct 2023 16:25:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538D12E41F
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 14:28:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8E71C433C7;
+	Thu, 26 Oct 2023 14:28:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698330513;
+	bh=YzgaZUj7ZwD2nTvz4IUUTkbHe8aOpCBq4y7FYuKdr48=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SFoZzxh/rdStD6SKg8rjCt+Yl4FzPX3b4cYze+xMgU/gLUu4pSIVqzQi9GfNQPLdU
+	 6A0b/rDx4IGDbekiwsNZ/f1d4vEFdnRVGfeCMeas7s3icdDYg1oWAB28NfjXqctV3B
+	 Oli5TFTAbquo8J7Vvnkdy9KIrHt4LQPjDMs9wLsX/w/vVp2isk6Rs8RVp5bG0pI5G/
+	 K9hN7R0jVHl2s0+p3fAN9OWGqzOUmTiCNOsCG5b7ePf/85VLV6VYihTqHc43LkSBBF
+	 kvRZX/ZDO/2IfINdW3UhJRQRY4+IDBXeLhRNeU8b4l9PmWEUvmG6/lRKFJ9dkmih68
+	 EbjQx8/pL20bw==
+Date: Thu, 26 Oct 2023 07:28:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: Michael Chan <michael.chan@broadcom.com>, <davem@davemloft.net>,
+ <netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <gospo@broadcom.com>, Ajit Khaparde <ajit.khaparde@broadcom.com>
+Subject: Re: [PATCH net-next] bnxt_en: Fix 2 stray ethtool -S counters
+Message-ID: <20231026072830.1202cccc@kernel.org>
+In-Reply-To: <1014e04b-5e74-4f7e-b2a5-ed0f8d01629d@intel.com>
+References: <20231026013231.53271-1-michael.chan@broadcom.com>
+	<1014e04b-5e74-4f7e-b2a5-ed0f8d01629d@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <36072f45-0d42-7284-d0dc-295f543fe40f@blackwall.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27073/Thu Oct 26 09:47:53 2023)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 10/26/23 4:23 PM, Nikolay Aleksandrov wrote:
-> On 10/26/23 17:11, Ido Schimmel wrote:
->> On Thu, Oct 26, 2023 at 12:41:06PM +0300, Nikolay Aleksandrov wrote:
->>>   static const struct nla_policy netkit_policy[IFLA_NETKIT_MAX + 1] = {
->>>       [IFLA_NETKIT_PEER_INFO]        = { .len = sizeof(struct ifinfomsg) },
->>> -    [IFLA_NETKIT_POLICY]        = { .type = NLA_U32 },
->>> -    [IFLA_NETKIT_MODE]        = { .type = NLA_U32 },
->>> -    [IFLA_NETKIT_PEER_POLICY]    = { .type = NLA_U32 },
->>> +    [IFLA_NETKIT_POLICY]        = NLA_POLICY_VALIDATE_FN(NLA_U32,
->>> +                                 netkit_check_policy),
->>
->> Nik, it's problematic to use NLA_POLICY_VALIDATE_FN() with anything
->> other than NLA_BINARY. See commit 9e17f99220d1 ("net/sched: act_mpls:
->> Fix warning during failed attribute validation").
+On Thu, 26 Oct 2023 12:36:37 +0200 Wojciech Drewek wrote:
+> > Fixes: 754fbf604ff6 ("bnxt_en: Update firmware interface to 1.10.2.171")  
 > 
-> But how is that code called at all? The validation type is NLA_VALIDATE_FUNCTION(), not NLA_VALIDATE_MIN/MAX/RANGE/RANGE_WARN...
-> nla_validate_int_range() is called only on:
->          case NLA_VALIDATE_RANGE_PTR:
->          case NLA_VALIDATE_RANGE:
->          case NLA_VALIDATE_RANGE_WARN_TOO_LONG:
->          case NLA_VALIDATE_MIN:
->          case NLA_VALIDATE_MAX:
-> 
-> Anyway, I'll switch to NLA_BINARY in a bit to make sure it's ok. Thanks for the pointer.
+> If this is a fix than the target should be "net" not "net-next".
 
-Sg, I took in the NULL removal one for now.
+The commit in question hasn't reached net yet, this is the second time
+you're going this incorrect feedback:
 
-Thanks,
-Daniel
+https://lore.kernel.org/all/20231023093256.0dd8f145@kernel.org/
+
+> You don't need "len" var.
+> Why not just:
+> 	num_stats += min_t(int, bp->fw_rx_stats_ext_size,
+> 			   ARRAY_SIZE(bnxt_port_stats_ext_arr));
+
+I think it's needed to make sure lines don't go over 80 chars.
 
