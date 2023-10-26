@@ -1,49 +1,55 @@
-Return-Path: <netdev+bounces-44563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8384A7D8ADD
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 23:48:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B2617D8AE3
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 23:52:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4E211C2128E
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 21:48:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FEBF1C20EC4
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 21:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416B73D98B;
-	Thu, 26 Oct 2023 21:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884493D990;
+	Thu, 26 Oct 2023 21:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eNcwDV44"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="toS75VrT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1588341741;
-	Thu, 26 Oct 2023 21:48:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F4EBC433C7;
-	Thu, 26 Oct 2023 21:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639D63D989
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 21:52:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FC67C433C7;
+	Thu, 26 Oct 2023 21:52:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698356880;
-	bh=ew1HKKt5nbfRzGpkcLlKh0lA/TCUwgQ5yYRD1O9MA5Q=;
+	s=k20201202; t=1698357138;
+	bh=Ar47rK4VoU9HotPJMrv49W+xY9ALyh8WYdwKhKQgUjU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eNcwDV44NZ+u5yga+M+B0DI42A+Bk65sQP8BUXJzHGmRfgpBwr3UpVEy7Sb5Z4W2R
-	 lDeSUzKFPkMVE0ZFEOqIVE0zayYhCRQyFkQBXaeBJxUNf9RpORLz76sZU7ckReM3U5
-	 AbU9CyaqI/WKMZUMYJQY4jxFq7FqPHjOUcQZoxc3mCPnwjoBvc5LenQixAlu2L7E5L
-	 lj4hmUMLJkO0mrzZuTxqAFK3WD9NbXyNQTEwzJnTfjK6Bv+fASEuNMs6TgmTPsxeHm
-	 8ouXDzn5ftmpzydYsELMJ/FyS2Q+rmkfYHevyWY3qn9ey4yCPt6o6Np6etJbOXexoV
-	 sMyC68cbIXqiw==
-Date: Thu, 26 Oct 2023 14:47:59 -0700
+	b=toS75VrT71cikMeUq+SfNasbWtSG1FISHYIJFDSUO0ISgit075mYCrh1WTa96gqPk
+	 B4Ho5FKtAF9MAaCg9k9C4EFXLyF6ncBFhU9Mt2qYJNLwAF1ftJPxlHjLqQi4qpuYTm
+	 Qee57m3AjAjykTLJfW+C0S85VION5dk47IDxHcwPM8jsnAZ4EIdjPp0KMdcnHUr1jN
+	 H1Gjou0ILvGoQZANolOE1wDuky0MwqaK+OtnnlcijosFr061irIm8KNpwIFIimabRH
+	 DIxjo7PAf2Hb67ywTo4VIEPMnQCz3ZeXdZ1THQFQykeZKZ/F6arfAU99Iu0Amo3ocy
+	 6qOjLI9h9hZSw==
+Date: Thu, 26 Oct 2023 14:52:17 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko
- <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko
- <mykolal@fb.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH bpf-next 1/2] bpf: add skcipher API support to TC/XDP
- programs
-Message-ID: <20231026144759.5ce20f4c@kernel.org>
-In-Reply-To: <20231026015938.276743-1-vadfed@meta.com>
-References: <20231026015938.276743-1-vadfed@meta.com>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: Ratheesh Kannoth <rkannoth@marvell.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, Sunil Kovvuri Goutham
+ <sgoutham@marvell.com>, Geethasowjanya Akula <gakula@marvell.com>,
+ Subbaraya Sundeep Bhatta <sbhatta@marvell.com>, Hariprasad Kelam
+ <hkelam@marvell.com>, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>
+Subject: Re: [EXT] Re: [PATCH net] octeontx2-pf: Fix holes in error code
+Message-ID: <20231026145217.4b840baa@kernel.org>
+In-Reply-To: <0d1cb5d7-53e8-45bd-ad45-48fae64b8d9c@intel.com>
+References: <20231026030154.1317011-1-rkannoth@marvell.com>
+	<5819e6c8-d887-40ca-9791-07c733126e64@intel.com>
+	<MWHPR1801MB1918043F69F45C9D69656449D3DDA@MWHPR1801MB1918.namprd18.prod.outlook.com>
+	<0d1cb5d7-53e8-45bd-ad45-48fae64b8d9c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,40 +59,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 25 Oct 2023 18:59:37 -0700 Vadim Fedorenko wrote:
-> Add crypto API support to BPF to be able to decrypt or encrypt packets
-> in TC/XDP BPF programs. Only symmetric key ciphers are supported for
-> now. Special care should be taken for initialization part of crypto algo
-> because crypto_alloc_sync_skcipher() doesn't work with preemtion
-> disabled, it can be run only in sleepable BPF program. Also async crypto
-> is not supported because of the very same issue - TC/XDP BPF programs
-> are not sleepable.
+On Thu, 26 Oct 2023 12:56:26 +0200 Wojciech Drewek wrote:
+> I'd add to the commit msg that some error values were wrong and it it
+> was fixed, but it's a nit.
 
-Do CC crypto@ for the next version, please.
-
-> +/**
-> + * struct bpf_crypto_skcipher_ctx - refcounted BPF sync skcipher context structure
-> + * @tfm:	The pointer to crypto_sync_skcipher struct.
-> + * @rcu:	The RCU head used to free the crypto context with RCU safety.
-> + * @usage:	Object reference counter. When the refcount goes to 0, the
-> + *		memory is released back to the BPF allocator, which provides
-> + *		RCU safety.
-> + */
-> +
-
-spurious newline?
-
-> +struct bpf_crypto_skcipher_ctx {
-
-> +/**
-> + * bpf_crypto_skcipher_ctx_acquire() - Acquire a reference to a BPF crypto context.
-
-The contexts are refcounted and can be placed in maps?
-Does anything prevent them from being used simultaneously 
-by difference CPUs?
-
-> +	case BPF_DYNPTR_TYPE_SKB:
-> +		return skb_pointer_if_linear(ptr->data, ptr->offset, __bpf_dynptr_size(ptr));
-
-dynptr takes care of checking if skb can be written to?
+Agreed, it should be explained in the commit message.
+Borderline it deserves to be a separate fix.
+-- 
+pw-bot: cr
 
