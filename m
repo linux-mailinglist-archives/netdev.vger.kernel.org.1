@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-44554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 909147D8958
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:01:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3FA87D8971
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:06:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ACF92820F1
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 20:01:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C81F2820A0
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 20:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D913C696;
-	Thu, 26 Oct 2023 20:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5313C6AF;
+	Thu, 26 Oct 2023 20:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="icdFqdMT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="48YEcNME"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99373B7BB;
-	Thu, 26 Oct 2023 20:01:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC663C078;
+	Thu, 26 Oct 2023 20:06:51 +0000 (UTC)
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E00E10CE;
-	Thu, 26 Oct 2023 13:01:39 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B34E9129;
+	Thu, 26 Oct 2023 13:06:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vKObmcd+bmpwndDhxnFsTImwwHwCmQi0gNuW0Otfi50=; b=icdFqdMTeZroD4aWMc9ieNuqQc
-	Rg+qHzTO4C+UKoT/erL/j8EpUIGcgwxRoPG/gUb47CRUUoMXyjRZy6pfCl4gxIX13jaJMCjO8HP8T
-	HwyjEp85r6+jKeHcPYSF7stVOVv0Jj+lkyrOp2b8Ra9P+AsU5RcwoCVjO/VjYg8iMfX8=;
+	bh=H+x7KSFCuyoVLXZIAzbFV9Xg0+lArjXJ8IqhdbCVoFM=; b=48YEcNME9rmeMScPY9mah6GKwW
+	zIbJ0k6hQjOUpgS1q4Ro2dylENYfj3K1HBvLSpMWttzxRow3uULdMrlaAdnqCsUldcFnfDMDlLAzq
+	OasZQoR0VMSLiZFaU6iJYbBdxav3qiFe0ASgqmIVCGIRjczgRgj6EmzKYKLyLtI1j3oI=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1qw6Xo-000HFI-Gs; Thu, 26 Oct 2023 22:01:28 +0200
-Date: Thu, 26 Oct 2023 22:01:28 +0200
+	id 1qw6cq-000HHJ-C1; Thu, 26 Oct 2023 22:06:40 +0200
+Date: Thu, 26 Oct 2023 22:06:40 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Parthiban.Veerasooran@microchip.com
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -46,13 +46,13 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	linux-doc@vger.kernel.org, Horatiu.Vultur@microchip.com,
 	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
 	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [PATCH net-next v2 2/9] net: ethernet: oa_tc6: implement mac-phy
- software reset
-Message-ID: <005b6980-4aa3-4bf7-92cc-d9f938b04006@lunn.ch>
+Subject: Re: [PATCH net-next v2 3/9] net: ethernet: oa_tc6: implement OA TC6
+ configuration function
+Message-ID: <7b3179e2-ac53-497e-94c8-ac364f5b47c6@lunn.ch>
 References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
- <20231023154649.45931-3-Parthiban.Veerasooran@microchip.com>
- <219ae3d7-0c75-49c0-b791-5623894ba318@lunn.ch>
- <fe52e414-c2a7-4e29-bb37-73a5614b3951@microchip.com>
+ <20231023154649.45931-4-Parthiban.Veerasooran@microchip.com>
+ <423e0b42-a75e-4104-b445-7d9ff0991acf@lunn.ch>
+ <97872e83-1490-4f1a-81ff-3f7692571dd1@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,45 +61,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fe52e414-c2a7-4e29-bb37-73a5614b3951@microchip.com>
+In-Reply-To: <97872e83-1490-4f1a-81ff-3f7692571dd1@microchip.com>
 
-> >> +     ret = oa_tc6_perform_ctrl(tc6, STATUS0, &regval, 1, false, false);
-> >> +     if (ret)
-> >> +             return ret;
-> >> +
-> >> +     /* Check for reset complete interrupt status */
-> >> +     if (regval & RESETC) {
-> >> +             regval = RESETC;
+> >> -struct oa_tc6 *oa_tc6_init(struct spi_device *spi, bool prote)
+> >> +struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
 > > 
-> > People don't always agree, but i found STATUS0_RESETC easier to see
-> > you have the correct bit for the register you just read.
-> Do you want me to define STATUS0_RESETC instead of RESETC or is my 
-> understanding wrong?
+> > Was there a reason to have prote initially, and then remove it here?
+> The reason is, control communication uses "protect". But in the first 
+> patch there was no dt used. Later in this patch, dt used for all the 
+> configuration parameters and this also part of that. That's why removed 
+> and moved this to dt configuration.
+> 
+> What's your opinion? shall I keep as it is like this? or remove the 
+> protect in the first two patches and introduce in this patch?
 
-Correct, STATUS0_RESETC. It avoids silly typos like:
+It will actually depend on what goes into the DT binding. If using
+protections costs very little, i would just hard code it on. Maybe you
+can run some iperf tests and see if it makes a measurable difference.
 
-     ret = oa_tc6_perform_ctrl(tc6, STATUS0, &regval, 1, false, false);
-     if (ret)
-             return ret;
+How fast an SPI bus are you using on your development board? If you
+have a 50Mbps SPI bus, it does not even matter, since the media
+bandwidth is just 10Mbps.
 
-     /* Check for reset complete interrupt status */
-     if (regval & RESET) {
-             regval = RESETC;
-
-where RESET is a valid register name, but not a bit. Or say:
-
-     ret = oa_tc6_perform_ctrl(tc6, STATUS0, &regval, 1, false, false);
-     if (ret)
-             return ret;
-
-     /* Check for reset complete interrupt status */
-     if (regval & SWRESET) {
-             regval = STATUS0_;
-
-where SWRESET is a valid bit, but not for STATUS0.
-
-I've made silly mistakes like this, and learnt that good naming helps
-to avoid it.
-
-     Andrew
+    Andrew
 
