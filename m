@@ -1,139 +1,107 @@
-Return-Path: <netdev+bounces-44527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 722C17D86F3
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 18:48:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A18717D8718
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 18:56:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01D78282087
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:48:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 420CFB20FF2
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDFD2DF6A;
-	Thu, 26 Oct 2023 16:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD63E37C93;
+	Thu, 26 Oct 2023 16:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="va5WiXQZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YYfs1UvB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC50711CB3
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 16:48:44 +0000 (UTC)
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BCB11AD
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 09:48:43 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6b6f4c118b7so1116566b3a.0
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 09:48:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487A01947F
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 16:56:24 +0000 (UTC)
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46DD5A4
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 09:56:23 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-7a6907e9aa8so29878439f.1
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 09:56:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1698338923; x=1698943723; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gsvtzZhaeGLEaz4oteU5Hnb+KWT4Jz2r9xbtXdijvP0=;
-        b=va5WiXQZDKYe65Gw2TFpRu4zBvCBCD51aEQYvhjAzeLBgr/LBqOVqDxjCCgKuGIyLD
-         nNAibJoSuebMviMvk6YhFiYoJxXyjiE/NatkbdAZQczMTxtQQPWndImWoanEgpM/2LdX
-         /dLmFOE58Q5+deDGBuIdtr35SaDrXuvXbxj/OfbQPtkxeSkiEaXAmjyfWFD8NtuFVHj5
-         AhhvkMuVBYUg78HWH73F2NSR6gcUQvm71G8tO1n8K7cqCcFNymzFve2vQ/pDUVYlgKS7
-         mNUVLgAGqUPEbzHT9StdtYTO+Tt+xyUXw0p1vDwep4xzkKwVq5eGzT3A+AbqtsR01jpG
-         SwBA==
+        d=gmail.com; s=20230601; t=1698339382; x=1698944182; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pb8AVXddAhoBblmZnhjBx3qovIXAv7Urfx982qCtqfw=;
+        b=YYfs1UvBohXuXCaqlIcc53vMfuwYBANA08pth+AQlRK7s7UAUCozLnQ8qknCO8pcnZ
+         5t/Ny+HEEeZQwge8sTh5KvtXuGhRGUvRmEKPAacfPYteVrBnGaFZQzDaj95iR4gMyTBx
+         K9rXtWD4FrEAkv9SRsg6C+7/DRQreW/4Cqr+jtGim9LFWwCnkWkBmgKdkoWredDBuFQq
+         UxeXHiS4vwPid4BDkkEiOcpORnAnPCA9zjT+vmP7K4JY2vpT0NRY2elGTT18C5qrB89q
+         NzWkYRnMMDOyh3VMJqxkzCkssXRjieeBm5UmRzzxA0FDOvwvuGDOA4q805mKWN8RW25F
+         Be4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698338923; x=1698943723;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gsvtzZhaeGLEaz4oteU5Hnb+KWT4Jz2r9xbtXdijvP0=;
-        b=vSAJqUeNjcmRS04lgG/RQcva80pEPY5GXFKGca4joRaBOehxQM0j4rCNWrekOrqQXY
-         z0ugrviWwNhOy4AO/hpsQIiNUb5/E49GzkqUUr31O31wCPNkX579mrkgsmRMDyhml6vv
-         QPidk3sfcd1IbehEGpLhEJsdd2JccuY6dWPXeNTQtMkIslmEjAEqU9QwQjNjYewhGnru
-         4Ih0n0iRF/YafeUTYOXHYsS6lNbTOZMLjig8qzRNxdGufCzsWBSXv42U8P0Tsp5l9oYL
-         KPyzpd4Q1wczhSJjJcP2kjG+cWd3PMYqtrT98H64axAPvDtGMOwcegIqvrPzGo+pJ5dS
-         ZXjw==
-X-Gm-Message-State: AOJu0YxGCNZOhwbAUlUQgyD4u4snzSsUUAbPmvW9xepLYIG+NankdKFO
-	Yva7JK6Ho9i8NWt//gat83KPMA==
-X-Google-Smtp-Source: AGHT+IHbvOMnCphFZ0wNNkpM6jLDJMcgLAP1gCu3oFnu8OZ6vA3KZjiKKUu8/g1ZFm0ACGNRGoqEUA==
-X-Received: by 2002:a05:6a20:9189:b0:156:e1ce:d4a1 with SMTP id v9-20020a056a20918900b00156e1ced4a1mr449257pzd.9.1698338922779;
-        Thu, 26 Oct 2023 09:48:42 -0700 (PDT)
-Received: from hermes.local (204-195-126-68.wavecable.com. [204.195.126.68])
-        by smtp.gmail.com with ESMTPSA id s188-20020a625ec5000000b0068fb9f98467sm11919892pfb.107.2023.10.26.09.48.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 09:48:42 -0700 (PDT)
-Date: Thu, 26 Oct 2023 09:48:41 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: longli@linuxonhyperv.com
-Cc: "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang
- <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, Long Li <longli@microsoft.com>
-Subject: Re: [PATCH] hv_netvsc: Mark VF as slave before exposing it to
- user-mode
-Message-ID: <20231026094841.39f01d26@hermes.local>
-In-Reply-To: <1698274250-653-1-git-send-email-longli@linuxonhyperv.com>
-References: <1698274250-653-1-git-send-email-longli@linuxonhyperv.com>
+        d=1e100.net; s=20230601; t=1698339382; x=1698944182;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pb8AVXddAhoBblmZnhjBx3qovIXAv7Urfx982qCtqfw=;
+        b=a39CDF7lvDpxEXtYkxhrHV0bcLrtpYKEN2oDhCvxMxvTj+6D8wPI+P61SUHnVdtKzE
+         441jMNJso7c1YhlvogWN9Ygw+liAXIZxWwH9g/MxK4DsObDdyYdI+XIiiHDxKU1STD5B
+         RLH95vbt5IHsft0vWdznLW3RFdiW+ejtN7pzyywr4GOQ1sjB01QNfMSiPilTSnf7unVS
+         ty8GnFtMngRqVBsSy0Sv/nTlRGL2CwqEE6Fbe5EUzW6jFYrOryEU+7ZKs99C+azTZLfN
+         1x9GAXyBtPgd9Vy6YoEHKMPvTey8H3zWhrqMKEeHuUmNyqAyCXNBYXaQckJQOt4mSwRe
+         qlqA==
+X-Gm-Message-State: AOJu0Yw/+O7+BCKnphZWwRZcUi6AlNFUVjUEy4YGwa51tItkkQHHqM1C
+	bYZHA59cXknTe3QPAMwgEzkbiV1CevM=
+X-Google-Smtp-Source: AGHT+IGvy+RGufezjf4G70vd2U0Ox6kD+G79WNWukraEuxjkVWP0awguz08REz45gqmv+e8Wtw1DDg==
+X-Received: by 2002:a05:6602:2b86:b0:7a9:96aa:e01e with SMTP id r6-20020a0566022b8600b007a996aae01emr200638iov.17.1698339382520;
+        Thu, 26 Oct 2023 09:56:22 -0700 (PDT)
+Received: from ?IPV6:2601:282:1e82:2350:542:b658:250a:2f23? ([2601:282:1e82:2350:542:b658:250a:2f23])
+        by smtp.googlemail.com with ESMTPSA id l22-20020a056602277600b007a29bd0befasm668112ioe.13.2023.10.26.09.56.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Oct 2023 09:56:21 -0700 (PDT)
+Message-ID: <1d25df23-3ef6-40f0-a9f0-844da8e17f57@gmail.com>
+Date: Thu, 26 Oct 2023 10:56:20 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch iproute2-next v3 1/6] ip/ipnetns: move internals of
+ get_netnsid_from_name() into namespace.c
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
+Cc: stephen@networkplumber.org, daniel.machon@microchip.com
+References: <20231024100403.762862-1-jiri@resnulli.us>
+ <20231024100403.762862-2-jiri@resnulli.us>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20231024100403.762862-2-jiri@resnulli.us>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 25 Oct 2023 15:50:50 -0700
-longli@linuxonhyperv.com wrote:
-
-> @@ -2347,6 +2342,12 @@ static int netvsc_register_vf(struct net_device *vf_netdev)
->  	if (!ndev)
->  		return NOTIFY_DONE;
+On 10/24/23 4:03 AM, Jiri Pirko wrote:
+> diff --git a/include/namespace.h b/include/namespace.h
+> index e47f9b5d49d1..e860a4b8ee5b 100644
+> --- a/include/namespace.h
+> +++ b/include/namespace.h
+> @@ -8,6 +8,8 @@
+>  #include <sys/syscall.h>
+>  #include <errno.h>
 >  
-> +	if (event == NETDEV_POST_INIT) {
-> +		/* set slave flag before open to prevent IPv6 addrconf */
-> +		vf_netdev->flags |= IFF_SLAVE;
-> +		return NOTIFY_DONE;
-> +	}
+> +#include "namespace.h"
+
+??? including this file into itself?
+
 > +
->  	net_device_ctx = netdev_priv(ndev);
->  	netvsc_dev = rtnl_dereference(net_device_ctx->nvdev);
->  	if (!netvsc_dev || rtnl_dereference(net_device_ctx->vf_netdev))
-> @@ -2753,8 +2754,9 @@ static int netvsc_netdev_event(struct notifier_block *this,
->  		return NOTIFY_DONE;
+>  #ifndef NETNS_RUN_DIR
+>  #define NETNS_RUN_DIR "/var/run/netns"
+>  #endif
+> @@ -58,4 +60,6 @@ struct netns_func {
+>  	void *arg;
+>  };
 >  
->  	switch (event) {
-> +	case NETDEV_POST_INIT:
->  	case NETDEV_REGISTER:
-> -		return netvsc_register_vf(event_dev);
-> +		return netvsc_register_vf(event_dev, event);
-
-Although correct, this is an awkward way to write this.
-There are two events which call register_vf() but the post init
-one short circuits and doesn't really register the VF.
-
-The code is clearer if flag is set in switch statement.
-
-@@ -2206,9 +2206,6 @@ static int netvsc_vf_join(struct net_device *vf_netdev,
- 		goto upper_link_failed;
- 	}
- 
--	/* set slave flag before open to prevent IPv6 addrconf */
--	vf_netdev->flags |= IFF_SLAVE;
--
- 	schedule_delayed_work(&ndev_ctx->vf_takeover, VF_TAKEOVER_INT);
- 
- 	call_netdevice_notifiers(NETDEV_JOIN, vf_netdev);
-@@ -2753,6 +2750,10 @@ static int netvsc_netdev_event(struct notifier_block *this,
- 		return NOTIFY_DONE;
- 
- 	switch (event) {
-+	case NETDEV_POST_INIT:
-+		/* set slave flag before open to prevent IPv6 addrconf */
-+		vf_netdev->flags |= IFF_SLAVE;
-+		return NOTIFY_DONE;
- 	case NETDEV_REGISTER:
- 		return netvsc_register_vf(event_dev);
- 	case NETDEV_UNREGISTER:
-
+> +int netns_id_from_name(struct rtnl_handle *rtnl, const char *name);
+> +
+>  #endif /* __NAMESPACE_H__ */
 
 
