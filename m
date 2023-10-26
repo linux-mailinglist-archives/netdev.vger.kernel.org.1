@@ -1,82 +1,64 @@
-Return-Path: <netdev+bounces-44514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF33C7D85CC
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 17:17:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAA697D8615
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 17:37:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F8E228207F
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 15:17:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8968C1F21CC8
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 15:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2482F510;
-	Thu, 26 Oct 2023 15:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F3136B1D;
+	Thu, 26 Oct 2023 15:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="DAGOl84k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QonQcWcF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25B02F509
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:17:08 +0000 (UTC)
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3665D7
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 08:17:06 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-4083cd3917eso8148865e9.3
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 08:17:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1698333425; x=1698938225; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tRNM7OP8FZNz7PcD8FSoHRmgfXGXNRO9Y1vYfQVDNxo=;
-        b=DAGOl84kADeDPMBHJLXipIG39hH+kurn76vEedHlAXdu589Zvk/JTMCxlto8EQEqDP
-         MFLrMn4rCLg+FYMiV3J7yUGchToayihjw1gUXYbnNL+O5tZIrMrm/2ETpyxs+QaDE3I4
-         jq5q9bnAUR7SMzFgoGxtJCd+wwVaJsLlwh4pjzJhR1kmx5kxy7P9WgSS3NIJWVE9YEZO
-         zorFlfZILUHGO3wqFretxUBcj38zn73DI0S/6bbZ5nCyS8rtO1pVio9MoLAYQF6zldny
-         gezbsDoNIKLr70ty3WgIkjQvqL/uziQR+iqgHflxzsJK4XHQASNn/D4v7wW2uuWKI9ze
-         rbuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698333425; x=1698938225;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tRNM7OP8FZNz7PcD8FSoHRmgfXGXNRO9Y1vYfQVDNxo=;
-        b=T3U8Axj4SI5Py+f2645kmYU4EjT61z/GeZdIyCTwr8soplHwuTXNUZUN+j6NU+rxMv
-         LUKiR55hpNigjwK6V8osAc89CfCKPdFz/NFUKFoyZDGCJgXT6iCRclaZKjqPBFuCsqWg
-         U0QNfJyQlPn54noUoBFH9KUxL94YsK7PQ7v0T0cM9MlX8F4CxdZQ5GXzquEHlNZLV5J7
-         /w8U8sit2oP3E/knsIdWhflM6dJmGnb4Q8zEAKUJTIZR9kKVPD5AXx0xA/5idgscYU78
-         007O2CrnpXJNO2jtDPp00hPcAnULi2jBcfz7y8VE/1AzxEkWfBSZ3OECin9nvcIeAEcS
-         1RKA==
-X-Gm-Message-State: AOJu0Yzy6M+amKt85E3UaOFU4NNw22cRz1SY0PyQviZkTMAxhumDhssy
-	Gjdmc7quQTQe2YIyOf7x6DJMhA==
-X-Google-Smtp-Source: AGHT+IHGG+ljO1uOaaVI84VnXV2gDunKAaklUlaOvOGhlPgpi3XYLBn97iOI8Jo83uuboDnRNluxhQ==
-X-Received: by 2002:a05:600c:3ca3:b0:408:386b:1916 with SMTP id bg35-20020a05600c3ca300b00408386b1916mr101578wmb.8.1698333424919;
-        Thu, 26 Oct 2023 08:17:04 -0700 (PDT)
-Received: from dev.. (haunt.prize.volia.net. [93.72.109.136])
-        by smtp.gmail.com with ESMTPSA id t10-20020a1c770a000000b0040775fd5bf9sm2804819wmi.0.2023.10.26.08.17.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 08:17:04 -0700 (PDT)
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: bpf@vger.kernel.org
-Cc: jiri@resnulli.us,
-	netdev@vger.kernel.org,
-	martin.lau@linux.dev,
-	ast@kernel.org,
-	andrii@kernel.org,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
-	andrew@lunn.ch,
-	toke@kernel.org,
-	toke@redhat.com,
-	sdf@google.com,
-	daniel@iogearbox.net,
-	idosch@idosch.org,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: [PATCH bpf-next v2] netkit: use netlink policy for mode and policy attributes validation
-Date: Thu, 26 Oct 2023 18:16:59 +0300
-Message-Id: <20231026151659.1676037-1-razor@blackwall.org>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B4A2DF6E
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:37:00 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7F951A6
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 08:36:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698334618;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=IJjvEoYvWtrDPaB3w2lAYudhKDjSds18qR33A85xWaw=;
+	b=QonQcWcFAsvtqH2Q6xMDTwTWZw7AQCoCba6EVEdwCbTD/y4fplm/KKeI5L+uzC5jTXYFuY
+	uMOXxv8dIUi3lZXEpSLojSiQORgi8scKhVd2f0aH9IH+GDkGbvor+RyzqRtPALxKGqu1T3
+	ewCNvjqgZMA1B5HILEEs72V6jiO0gJM=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-373-HjSetu3QPV6ANBHTZEYigw-1; Thu,
+ 26 Oct 2023 11:36:56 -0400
+X-MC-Unique: HjSetu3QPV6ANBHTZEYigw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E0C523C025C2;
+	Thu, 26 Oct 2023 15:36:55 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.226.53])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CEB6C2166B26;
+	Thu, 26 Oct 2023 15:36:53 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Maxim Mikityanskiy <maxtram95@gmail.com>
+Subject: [PATCH net] net: sched: fix warn on htb offloaded class creation
+Date: Thu, 26 Oct 2023 17:36:48 +0200
+Message-ID: <ff51f20f596b01c6d12633e984881be555660ede.1698334391.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,171 +66,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Use netlink's NLA_POLICY_VALIDATE_FN() type for mode and primary/peer
-policy with custom validation functions to return better errors. This
-simplifies the logic a bit and relies on netlink's policy validation.
-We have to use NLA_BINARY and validate the length inside the callbacks.
+The following commands:
 
-Suggested-by: Jiri Pirko <jiri@resnulli.us>
-Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+tc qdisc add dev eth1 handle 2: root htb offload
+tc class add dev eth1 parent 2: classid 2:1 htb rate 5mbit burst 15k
+
+yeld to a WARN in the HTB qdisc:
+
+ WARNING: CPU: 2 PID: 1583 at net/sched/sch_htb.c:1959
+ CPU: 2 PID: 1583 Comm: tc Kdump: loaded 6.6.0-rc2.mptcp_7895773e5235+ #59
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc37 04/01/2014
+ RIP: 0010:htb_change_class+0x25c4/0x2e30 [sch_htb]
+ Code: 24 58 48 b8 00 00 00 00 00 fc ff df 48 89 ca 48 c1 ea 03 80 3c 02 00 0f 85 92 01 00 00 49 89 8c 24 b0 01 00 00 e9 77 fc ff ff <0f> 0b e9 15 ec ff ff 80 3d f8 35 00 00 00 0f 85 d4 f9 ff ff ba 32
+ RSP: 0018:ffffc900015df240 EFLAGS: 00010246
+ RAX: 0000000000000000 RBX: ffff88811b4ca000 RCX: ffff88811db42800
+ RDX: 1ffff11023b68502 RSI: ffffffffaf2e6a00 RDI: ffff88811db42810
+ RBP: ffff88811db45000 R08: 0000000000000001 R09: fffffbfff664bbc9
+ R10: ffffffffb325de4f R11: ffffffffb2d33748 R12: 0000000000000000
+ R13: ffff88811db43000 R14: ffff88811b4caaac R15: ffff8881252c0030
+ FS:  00007f6c1f126740(0000) GS:ffff88815aa00000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 000055dca8e5b4a8 CR3: 000000011bc7a006 CR4: 0000000000370ee0
+ DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ Call Trace:
+ <TASK>
+  tc_ctl_tclass+0x394/0xeb0
+  rtnetlink_rcv_msg+0x2f5/0xaa0
+  netlink_rcv_skb+0x12e/0x3a0
+  netlink_unicast+0x421/0x730
+  netlink_sendmsg+0x79e/0xc60
+  ____sys_sendmsg+0x95a/0xc20
+  ___sys_sendmsg+0xee/0x170
+  __sys_sendmsg+0xc6/0x170
+ do_syscall_64+0x58/0x80
+ entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+
+The first command creates per TX queue pfifo qdiscs in
+tc_modify_qdisc() -> htb_init() and grafts the pfifo to each dev_queue
+via tc_modify_qdisc() ->  qdisc_graft() -> htb_attach().
+
+When the command completes, the qdisc_sleeping for each dev_queue is a
+pfifo one. The next class creation will trigger the reported splat.
+
+Address the issue taking care of old non-builtin qdisc in
+htb_change_class().
+
+Fixes: d03b195b5aa0 ("sch_htb: Hierarchical QoS hardware offload")
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
-v2: use NLA_BINARY instead of NLA_U32 (thanks Ido!), validate attribute
-    length inside the callbacks, run tests again
-    the patch is sent out of the set as only the first one was applied
-    before, see:
-    https://lore.kernel.org/bpf/8533255d-9b73-cdbe-fbbd-28a275313229@iogearbox.net/
+ net/sched/sch_htb.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
- drivers/net/netkit.c | 79 ++++++++++++++++++++------------------------
- 1 file changed, 35 insertions(+), 44 deletions(-)
-
-diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-index 5a0f86f38f09..df819df86944 100644
---- a/drivers/net/netkit.c
-+++ b/drivers/net/netkit.c
-@@ -247,29 +247,39 @@ static struct net *netkit_get_link_net(const struct net_device *dev)
- 	return peer ? dev_net(peer) : dev_net(dev);
- }
- 
--static int netkit_check_policy(int policy, struct nlattr *tb,
-+static int netkit_check_policy(const struct nlattr *attr,
- 			       struct netlink_ext_ack *extack)
- {
--	switch (policy) {
-+	if (nla_len(attr) != sizeof(u32)) {
-+		NL_SET_ERR_MSG_ATTR(extack, attr, "Invalid policy attribute length");
-+		return -EINVAL;
-+	}
-+
-+	switch (nla_get_u32(attr)) {
- 	case NETKIT_PASS:
- 	case NETKIT_DROP:
- 		return 0;
- 	default:
--		NL_SET_ERR_MSG_ATTR(extack, tb,
-+		NL_SET_ERR_MSG_ATTR(extack, attr,
- 				    "Provided default xmit policy not supported");
- 		return -EINVAL;
- 	}
- }
- 
--static int netkit_check_mode(int mode, struct nlattr *tb,
-+static int netkit_check_mode(const struct nlattr *attr,
- 			     struct netlink_ext_ack *extack)
- {
--	switch (mode) {
-+	if (nla_len(attr) != sizeof(u32)) {
-+		NL_SET_ERR_MSG_ATTR(extack, attr, "Invalid mode attribute length");
-+		return -EINVAL;
-+	}
-+
-+	switch (nla_get_u32(attr)) {
- 	case NETKIT_L2:
- 	case NETKIT_L3:
- 		return 0;
- 	default:
--		NL_SET_ERR_MSG_ATTR(extack, tb,
-+		NL_SET_ERR_MSG_ATTR(extack, attr,
- 				    "Provided device mode can only be L2 or L3");
- 		return -EINVAL;
- 	}
-@@ -306,13 +316,8 @@ static int netkit_new_link(struct net *src_net, struct net_device *dev,
- 	int err;
- 
- 	if (data) {
--		if (data[IFLA_NETKIT_MODE]) {
--			attr = data[IFLA_NETKIT_MODE];
--			mode = nla_get_u32(attr);
--			err = netkit_check_mode(mode, attr, extack);
--			if (err < 0)
--				return err;
--		}
-+		if (data[IFLA_NETKIT_MODE])
-+			mode = nla_get_u32(data[IFLA_NETKIT_MODE]);
- 		if (data[IFLA_NETKIT_PEER_INFO]) {
- 			attr = data[IFLA_NETKIT_PEER_INFO];
- 			ifmp = nla_data(attr);
-@@ -324,20 +329,10 @@ static int netkit_new_link(struct net *src_net, struct net_device *dev,
- 				return err;
- 			tbp = peer_tb;
+diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+index 0d947414e616..dc682bd542b4 100644
+--- a/net/sched/sch_htb.c
++++ b/net/sched/sch_htb.c
+@@ -1955,8 +1955,7 @@ static int htb_change_class(struct Qdisc *sch, u32 classid,
+ 				qdisc_refcount_inc(new_q);
+ 			}
+ 			old_q = htb_graft_helper(dev_queue, new_q);
+-			/* No qdisc_put needed. */
+-			WARN_ON(!(old_q->flags & TCQ_F_BUILTIN));
++			qdisc_put(old_q);
  		}
--		if (data[IFLA_NETKIT_POLICY]) {
--			attr = data[IFLA_NETKIT_POLICY];
--			default_prim = nla_get_u32(attr);
--			err = netkit_check_policy(default_prim, attr, extack);
--			if (err < 0)
--				return err;
--		}
--		if (data[IFLA_NETKIT_PEER_POLICY]) {
--			attr = data[IFLA_NETKIT_PEER_POLICY];
--			default_peer = nla_get_u32(attr);
--			err = netkit_check_policy(default_peer, attr, extack);
--			if (err < 0)
--				return err;
--		}
-+		if (data[IFLA_NETKIT_POLICY])
-+			default_prim = nla_get_u32(data[IFLA_NETKIT_POLICY]);
-+		if (data[IFLA_NETKIT_PEER_POLICY])
-+			default_peer = nla_get_u32(data[IFLA_NETKIT_PEER_POLICY]);
- 	}
- 
- 	if (ifmp && tbp[IFLA_IFNAME]) {
-@@ -818,8 +813,6 @@ static int netkit_change_link(struct net_device *dev, struct nlattr *tb[],
- 	struct netkit *nk = netkit_priv(dev);
- 	struct net_device *peer = rtnl_dereference(nk->peer);
- 	enum netkit_action policy;
--	struct nlattr *attr;
--	int err;
- 
- 	if (!nk->primary) {
- 		NL_SET_ERR_MSG(extack,
-@@ -834,22 +827,14 @@ static int netkit_change_link(struct net_device *dev, struct nlattr *tb[],
- 	}
- 
- 	if (data[IFLA_NETKIT_POLICY]) {
--		attr = data[IFLA_NETKIT_POLICY];
--		policy = nla_get_u32(attr);
--		err = netkit_check_policy(policy, attr, extack);
--		if (err)
--			return err;
-+		policy = nla_get_u32(data[IFLA_NETKIT_POLICY]);
- 		WRITE_ONCE(nk->policy, policy);
- 	}
- 
- 	if (data[IFLA_NETKIT_PEER_POLICY]) {
--		err = -EOPNOTSUPP;
--		attr = data[IFLA_NETKIT_PEER_POLICY];
--		policy = nla_get_u32(attr);
--		if (peer)
--			err = netkit_check_policy(policy, attr, extack);
--		if (err)
--			return err;
-+		if (!peer)
-+			return -EOPNOTSUPP;
-+		policy = nla_get_u32(data[IFLA_NETKIT_PEER_POLICY]);
- 		nk = netkit_priv(peer);
- 		WRITE_ONCE(nk->policy, policy);
- 	}
-@@ -889,9 +874,15 @@ static int netkit_fill_info(struct sk_buff *skb, const struct net_device *dev)
- 
- static const struct nla_policy netkit_policy[IFLA_NETKIT_MAX + 1] = {
- 	[IFLA_NETKIT_PEER_INFO]		= { .len = sizeof(struct ifinfomsg) },
--	[IFLA_NETKIT_POLICY]		= { .type = NLA_U32 },
--	[IFLA_NETKIT_MODE]		= { .type = NLA_U32 },
--	[IFLA_NETKIT_PEER_POLICY]	= { .type = NLA_U32 },
-+	[IFLA_NETKIT_POLICY]		= NLA_POLICY_VALIDATE_FN(NLA_BINARY,
-+								 netkit_check_policy,
-+								 sizeof(u32)),
-+	[IFLA_NETKIT_MODE]		= NLA_POLICY_VALIDATE_FN(NLA_BINARY,
-+								 netkit_check_mode,
-+								 sizeof(u32)),
-+	[IFLA_NETKIT_PEER_POLICY]	= NLA_POLICY_VALIDATE_FN(NLA_BINARY,
-+								 netkit_check_policy,
-+								 sizeof(u32)),
- 	[IFLA_NETKIT_PRIMARY]		= { .type = NLA_REJECT,
- 					    .reject_message = "Primary attribute is read-only" },
- };
+ 		sch_tree_lock(sch);
+ 		if (parent && !parent->level) {
 -- 
-2.38.1
+2.41.0
 
 
