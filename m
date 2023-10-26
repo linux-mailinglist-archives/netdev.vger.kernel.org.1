@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-44590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4D4C7D8BE5
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 00:55:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E23687D8BE7
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 00:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30236B20FD0
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:55:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 477E3B213C2
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345F62F506;
-	Thu, 26 Oct 2023 22:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01F43E01E;
+	Thu, 26 Oct 2023 22:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DdBKAfVB"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aLrpUXoK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39058BFD
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 22:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025DE3C699
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 22:55:40 +0000 (UTC)
 Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C531BC
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:55:37 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1c87a85332bso12708075ad.2
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:55:37 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7511F1BE
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:55:39 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1c9de3f66e5so11383465ad.3
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:55:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1698360936; x=1698965736; darn=vger.kernel.org;
-        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=//dKD4KvqTBXzSCDx8Qvfzi+xyEtiP4i2DsPcGJUks8=;
-        b=DdBKAfVBnHXa+ImPjM1yFQ8ta6Ev6D+LJL1xMoXNNW8lsRPzq4AE9FFW6eiB5Izp0f
-         XMMH8mw/qU3dURFa5Y7Pq0aTUOZv/h/PLEDwwCmyBGq67H0nn94BvAj8FO2Bm6tdHZNr
-         GcAlap46PoAm3XRu+PYi15F61z31pI6set/5w=
+        d=broadcom.com; s=google; t=1698360938; x=1698965738; darn=vger.kernel.org;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pbc4bXkrSBEUPPj8b1MmjbwM7HeKerKO1Eee8euUgnA=;
+        b=aLrpUXoKMY6GpbTLSSBufYh+0vbeMxPb4CTP5tgKMMuH79wVgXjcPeBlHMvzIE07M2
+         YANpZxT/LwLKsqVgmCmpmuaMxSnzZb46Umso+WnpaheFmC7Dyjny966nMW3dTRi+0XId
+         e50ABSKCT7Hnojdy8AC51VMi1OmNsrRVEk5oM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698360936; x=1698965736;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=//dKD4KvqTBXzSCDx8Qvfzi+xyEtiP4i2DsPcGJUks8=;
-        b=aRgsoE9G0Zg9C2YtyaQHVo1X/Bh3vak/4GbGJubVZtzDQbjn/BgU01rrkdTDUQC+ol
-         hBERvzs3AOcSF6iyOehZg6pWrlI5C129yf+fCNgN5HxzlZWa8vpshgodSd6D8bcsjU52
-         TE9J68EfriOfD0Lm5JKy2A/GKmhmcHAmedewfVt1XCD+LmDlixSH0zV2tzKH1776RlmY
-         eoEuMmwUhw3oi+ksNab5PTp7ygZ9LD8wKjcg+iOTV2qWXlcW9dP7IqCBZG1nTGnZNkq6
-         g55oBMYgPCODOFuQDAUzEtKtLbP+DrsPbRmGAzqd+C1MY3pSCBYQoQKdbRW3HN20yFo0
-         CFwQ==
-X-Gm-Message-State: AOJu0YxCptTNE3CDkOevmuytyV5V/Qh6mLK2EC6rIG45RWakfQOSytp6
-	n7HPbb+OrQsJ21IOaqaohx3+aEs4vzvJRwFG8cnaKLC60g8BTpBxcSkv99JwsnEK72ixGKBOYdF
-	AOtxGrAEQNPSZg8Txl07Uxhe0nZPcCAb842yOWPksMK0L44nFwug0kCSOoVgoGUcg55TLrsO/X1
-	q7FX9ed5oNhSyE
-X-Google-Smtp-Source: AGHT+IHbAbE0uvWV6QoIzGblKzN/iCV2i/8YEfc8RxoVyM3TQ5O/rl5wiLqo0kVYxsFR9Nq8Z8Lsjg==
-X-Received: by 2002:a17:903:2a8f:b0:1cc:118d:980b with SMTP id lv15-20020a1709032a8f00b001cc118d980bmr1154917plb.51.1698360936002;
-        Thu, 26 Oct 2023 15:55:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698360938; x=1698965738;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pbc4bXkrSBEUPPj8b1MmjbwM7HeKerKO1Eee8euUgnA=;
+        b=pkRlSAJe4fZF8f+qWf2nARwGhQj0cCgSxfdMX5nAoq2qnPpPqAovFblYjIBOlJE3i5
+         ziF9AeNwe7nId38vV3IIoNqxzL98Bn5Ayur1QBFF+Ka8Ex0uhLw99i4nZtq5Vv6IxgXp
+         3cf/jhRbGgyBvMc0AlzmldP56GgUiPQ9qn+zuxLfoJHdZWwL4DLXrUXtJarKdgM06z9a
+         wrzDHRTh3u1+Z9fBniL9PbSbQ+Gc9aJdhKd5D8e3ecWF61igLkZ1oEY7DcdJGpHE5QOd
+         teIETvmFaauZetq3aoewo8i/+NG/hV5dz79+77CIuirPkKYPmtxh/8QIDqQeschM1t8p
+         iG9A==
+X-Gm-Message-State: AOJu0YyO2FeezI0zhbKAE97qV2JIEQsgvM5RcN85yN3vrKwjWCU6siGS
+	FeSfibyR4Lxf9y7kY/yX54R+4THaBQv7qCkiW67/0UsUbuV9XHtE60PZ4A3E9SZ7bm3V52g8hlC
+	HpIwhHkJOFLuhhBRukYWjwgP7xP9iEYAV7NnkX05UORWuMhO/9mbeibxJMqrKv7wMlJEAiUcj/9
+	/Eo0rEMU0qioAM
+X-Google-Smtp-Source: AGHT+IHgz2L3+MtwaF8wXHpmQ5hhoVIfkmyxFrXbOfrSnQmXG+IahRaYVM2z350727SZpTA/AR5IKg==
+X-Received: by 2002:a17:902:eb52:b0:1c7:65e3:e605 with SMTP id i18-20020a170902eb5200b001c765e3e605mr937619pli.36.1698360938447;
+        Thu, 26 Oct 2023 15:55:38 -0700 (PDT)
 Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id o1-20020a170902d4c100b001c9b5b63e36sm206295plg.32.2023.10.26.15.55.33
+        by smtp.gmail.com with ESMTPSA id o1-20020a170902d4c100b001c9b5b63e36sm206295plg.32.2023.10.26.15.55.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 15:55:35 -0700 (PDT)
+        Thu, 26 Oct 2023 15:55:37 -0700 (PDT)
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 To: netdev@vger.kernel.org
 Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
@@ -79,10 +79,12 @@ Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
 	Jiri Pirko <jiri@resnulli.us>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v2 0/5] WAKE_FILTER for Broadcom PHY (v2)
-Date: Thu, 26 Oct 2023 15:45:04 -0700
-Message-Id: <20231026224509.112353-1-florian.fainelli@broadcom.com>
+Subject: [PATCH net-next v2 1/5] net: ethtool: Make RXNFC walking code accept a callback
+Date: Thu, 26 Oct 2023 15:45:05 -0700
+Message-Id: <20231026224509.112353-2-florian.fainelli@broadcom.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231026224509.112353-1-florian.fainelli@broadcom.com>
+References: <20231026224509.112353-1-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,68 +92,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000051e4590608a6787a"
+	boundary="00000000000077b6730608a678b0"
 
---00000000000051e4590608a6787a
+--00000000000077b6730608a678b0
 Content-Transfer-Encoding: 8bit
 
-This is a re-submission of the series that was submitted before:
+In preparation for iterating over RXNFC rules for a different purpose,
+factor the generic code that already does that by allowing a callback to
+be specified. The body of ethtool_get_max_rxnfc_channel() now accepts a
+callback as an argument and is renamed to __ethtool_for_each_rxnfc().
 
-https://lore.kernel.org/all/20230516231713.2882879-1-florian.fainelli@broadcom.com/
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+---
+ net/ethtool/common.c | 54 ++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 45 insertions(+), 9 deletions(-)
 
-A number of things have changed:
-
-- there is proper fallback between the PHY and the MAC now, whereas
-  before we would abort right away due to -EOPNOTSUPP
-
-- added support for programming the Ethernet type for matching
-
-- fixed reporting of masks via ethtool
-
-- added proper validation of RX_CLS_LOC_ANY/RX_CLS_LOC_FIRST and
-  location
-
-- addressed feedback given by Andrew by validating that we have at least
-  one RX_CLS_FLOW_WAKE filter programmed to allow enabling WAKE_FILTER
-  via ethtool, otherwise we will not wake-up from WAKE_FILTER
-
-- use a PHY register as a scratchpad to accurately report whether a
-  custom filter was installed, before that we would falsely report
-  WAKE_UCAST/BCAST/MCAST but not WAKE_FILTER upon cold boot
-
-- corrected commit message to be accurate (MAC address did not match the
-  IPv4 address in the example)
-
-Changes in v2:
-
-- corrected sparse annotationes for h_proto (Vincent)
-- added 2 spaces for commands in commit messages (Vincent)
-- added hunk in patch 5 back into patch 4 (self)
-
-Florian Fainelli (5):
-  net: ethtool: Make RXNFC walking code accept a callback
-  net: ethtool: Add validation for WAKE_FILTER
-  net: phy: Add pluming for ethtool_{get,set}_rxnfc
-  net: phy: broadcom: Add support for WAKE_FILTER
-  net: bcmgenet: Interrogate PHY for WAKE_FILTER programming
-
- .../net/ethernet/broadcom/genet/bcmgenet.c    |  16 ++
- drivers/net/phy/bcm-phy-lib.c                 | 205 +++++++++++++++++-
- drivers/net/phy/bcm-phy-lib.h                 |   5 +
- drivers/net/phy/broadcom.c                    |   2 +
- drivers/net/phy/phy.c                         |  19 ++
- include/linux/phy.h                           |   8 +
- net/ethtool/common.c                          |  96 +++++++-
- net/ethtool/common.h                          |   3 +
- net/ethtool/ioctl.c                           |   3 +
- net/ethtool/wol.c                             |   3 +
- 10 files changed, 350 insertions(+), 10 deletions(-)
-
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index b4419fb6df6a..143dae872fb2 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -536,12 +536,24 @@ static int ethtool_get_rxnfc_rule_count(struct net_device *dev)
+ 	return info.rule_cnt;
+ }
+ 
+-int ethtool_get_max_rxnfc_channel(struct net_device *dev, u64 *max)
++/**
++ * __ethtool_for_each_rxnfc: Iterate over each RXNFC rule installed
++ * @dev: network device
++ * @cb: callback to analyze an %ethtool_rxnfc rule
++ * @priv: private pointer passed to the callback
++ *
++ * @cb is supposed to return the following:
++ *   < 0 on error
++ *   == 0 to continue
++ *   > 0 to stop iterating
++ */
++static int __ethtool_for_each_rxnfc(struct net_device *dev,
++				    int (*cb)(struct ethtool_rxnfc *info,
++					      void *priv), void *priv)
+ {
+ 	const struct ethtool_ops *ops = dev->ethtool_ops;
+ 	struct ethtool_rxnfc *info;
+ 	int err, i, rule_cnt;
+-	u64 max_ring = 0;
+ 
+ 	if (!ops->get_rxnfc)
+ 		return -EOPNOTSUPP;
+@@ -570,16 +582,14 @@ int ethtool_get_max_rxnfc_channel(struct net_device *dev, u64 *max)
+ 		if (err)
+ 			goto err_free_info;
+ 
+-		if (rule_info.fs.ring_cookie != RX_CLS_FLOW_DISC &&
+-		    rule_info.fs.ring_cookie != RX_CLS_FLOW_WAKE &&
+-		    !(rule_info.flow_type & FLOW_RSS) &&
+-		    !ethtool_get_flow_spec_ring_vf(rule_info.fs.ring_cookie))
+-			max_ring =
+-				max_t(u64, max_ring, rule_info.fs.ring_cookie);
++		err = cb(&rule_info, priv);
++		if (err < 0)
++			goto err_free_info;
++		if (err > 0)
++			break;
+ 	}
+ 
+ 	kvfree(info);
+-	*max = max_ring;
+ 	return 0;
+ 
+ err_free_info:
+@@ -587,6 +597,32 @@ int ethtool_get_max_rxnfc_channel(struct net_device *dev, u64 *max)
+ 	return err;
+ }
+ 
++static int __ethtool_get_max_rxnfc_channel(struct ethtool_rxnfc *rule_info,
++					   void *priv)
++{
++	u64 *max_ring = priv;
++
++	if (rule_info->fs.ring_cookie != RX_CLS_FLOW_DISC &&
++	    rule_info->fs.ring_cookie != RX_CLS_FLOW_WAKE &&
++	    !(rule_info->flow_type & FLOW_RSS) &&
++	    !ethtool_get_flow_spec_ring_vf(rule_info->fs.ring_cookie))
++		*max_ring =
++			max_t(u64, *max_ring, rule_info->fs.ring_cookie);
++
++	return 0;
++}
++
++int ethtool_get_max_rxnfc_channel(struct net_device *dev, u64 *max)
++{
++	u64 max_ring = 0;
++	int ret;
++
++	ret = __ethtool_for_each_rxnfc(dev, __ethtool_get_max_rxnfc_channel,
++				       &max_ring);
++	*max = max_ring;
++	return ret;
++}
++
+ int ethtool_get_max_rxfh_channel(struct net_device *dev, u32 *max)
+ {
+ 	u32 dev_size, current_max = 0;
 -- 
 2.34.1
 
 
---00000000000051e4590608a6787a
+--00000000000077b6730608a678b0
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -222,15 +268,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGBz8OyYVQb9T3NF
-vKuJ+vR+9C7gTWD2oisgc2ryh/c0MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTAyNjIyNTUzNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPW+NGWz2PbDhpbg
+d5ic9lnX8WIxE7RI8owpAR3u9gaBMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMTAyNjIyNTUzOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB1VhO1TBcXrgA8NebB8iZYYI94w9HUuHhf
-Huucw88YQDszA37HzXIsuCTLcmbJ0pOF2k2gNalxP+5i2RnK5h5OV0p8q7nkVSZjJqG3SN1BAIMM
-yr0s+Y0ggigxnX8aHLezfHe4zMH6DEMQ3ClGTOLZn83xh9JHfNDQww83OfLlN1VabOKhrdRCtQOR
-uRvfLFKRoAMc0O883wAIA5ecTHdSPOiiHssFnJGPQbc79hG4KZ+2hcL5caonCK2xrnt/z75fCBqj
-hsaMKxQO4T2yaPxr4qDuW2k6W+ak3+ZN4ghk5ziCyrQNFaxiajiYMgyqbd24fOg4Sx1nYVShBgsH
-R/rY
---00000000000051e4590608a6787a--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAykczl45nzPI6YjM8XCXpzD3Ua2A01Al0C
+d2aq4NqJhcaI5N7Lwmu0vvuGX5yS3tEvlvoeHh1t4BQJ2sgvwPjNa/ylfGLcX98ao4yZCAlxy8LB
+s6dNI+x9abm/20+TB3Gu/8F+NBU+l++Lvf3IHwa1sy38oHdl0FJJAzs+5F3INnyp3VsW57GKaHpy
+wAMm2uaLKxrORDvTzXRrLLU4rbH+k+NLVGCOCY7PBIA0xQS7jd7KhoqtsS+ay2k1g2T3uHeMF+W/
+xCfeWuAusBpIIAcYkaH8EZDSSr2+/9bnm7N2kP91r327I2Zd1HCH/jhKDdk/UeoDog5Zl9Z5AIYI
+UUIT
+--00000000000077b6730608a678b0--
 
