@@ -1,507 +1,243 @@
-Return-Path: <netdev+bounces-44371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D8DD7D7A97
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 04:00:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCD8A7D7A9B
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 04:02:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F7441C20E63
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 02:00:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5DA21C20D43
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 02:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86822881E;
-	Thu, 26 Oct 2023 02:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="O2cqlMkO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D9F346A6;
+	Thu, 26 Oct 2023 02:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A781749F;
-	Thu, 26 Oct 2023 02:00:31 +0000 (UTC)
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B027212F;
-	Wed, 25 Oct 2023 19:00:29 -0700 (PDT)
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39PMVQ1n012893;
-	Wed, 25 Oct 2023 19:00:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=8UPJi435dLHCycWk7gRegwvU0o7kPnLG9DTceS7LPAM=;
- b=O2cqlMkOT2KEEIKaaAyMmscrbW3En3v1cJnEGIeexK9yteR3cpeE7uUS8sLReUM3usOk
- UnSW2c6dAfZTh4XEOyFQ4b2iwUFQ5UHoUHK+u5JcDxS1GjfD1d9rwtU04W4VoIOAHmiI
- CJr6P56g0i3Y3EWiYUMjI1YN5ToyWBkdpAogHYo7pjzWo+cIb0lx4YJcbF7V06sDl62K
- o/6SULR2p6aC/T5ICMGSuLgI5FVraCDnB22wEYuhARSnC8QkgGr19K6dJlgzAXC6JhNi
- eiaPOHxiE6apo0rvveIaOSazbYoE8yXffX450oc4bXHhutG1vFWlBlfoh5KGxih/Oo/j Bw== 
-Received: from mail.thefacebook.com ([163.114.132.120])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3tybvr8x04-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 25 Oct 2023 19:00:15 -0700
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:208::11) by
- mail.thefacebook.com (2620:10d:c085:11d::8) with Microsoft SMTP Server id
- 15.1.2507.34; Wed, 25 Oct 2023 18:59:48 -0700
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>,
-        Andrii Nakryiko
-	<andrii@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko
-	<mykolal@fb.com>
-CC: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Vadim Fedorenko
-	<vadfed@meta.com>, <bpf@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-Subject: [PATCH bpf-next 2/2] selftests: bpf: crypto skcipher algo selftests
-Date: Wed, 25 Oct 2023 18:59:38 -0700
-Message-ID: <20231026015938.276743-2-vadfed@meta.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20231026015938.276743-1-vadfed@meta.com>
-References: <20231026015938.276743-1-vadfed@meta.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EC3A50
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 02:02:23 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3135128;
+	Wed, 25 Oct 2023 19:02:20 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.207])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SG8DH2gyyz6K8yL;
+	Thu, 26 Oct 2023 10:01:35 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Thu, 26 Oct 2023 03:02:16 +0100
+Message-ID: <9e59d159-1184-ac68-9e10-cc9fcb0666f3@huawei.com>
+Date: Thu, 26 Oct 2023 05:02:15 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v13 08/12] landlock: Add network rules and TCP hooks
+ support
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+References: <20231016015030.1684504-1-konstantin.meskhidze@huawei.com>
+ <20231016015030.1684504-9-konstantin.meskhidze@huawei.com>
+ <20231017.xahKoo9Koo8v@digikod.net>
+ <57f150b2-0920-8567-8351-1bdb74684cfa@huawei.com>
+ <20231020.ido6Aih0eiGh@digikod.net>
+ <ea02392e-4460-9695-050f-7519aecebec2@huawei.com>
+ <20231024.Ahdeepoh7wos@digikod.net>
+ <bc4699d7-ab54-a3b8-06a0-1724a63c6076@huawei.com>
+ <20231025.ooG0Uach9aes@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <20231025.ooG0Uach9aes@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [2620:10d:c085:208::11]
-X-Proofpoint-ORIG-GUID: uv3H0YVWNEq2CF2pUYpl6AA-2kXB46EL
-X-Proofpoint-GUID: uv3H0YVWNEq2CF2pUYpl6AA-2kXB46EL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-25_13,2023-10-25_01,2023-05-22_02
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
 
-Add simple tc hook selftests to show the way to work with new crypto
-BPF API. Some weird structre and map are added to setup program to make
-verifier happy about dynptr initialization from memory. Simple AES-ECB
-algo is used to demonstrate encryption and decryption of fixed size
-buffers.
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- tools/testing/selftests/bpf/config            |   1 +
- .../selftests/bpf/prog_tests/crypto_sanity.c  | 129 +++++++++++++++
- .../selftests/bpf/progs/crypto_common.h       |  98 +++++++++++
- .../selftests/bpf/progs/crypto_sanity.c       | 154 ++++++++++++++++++
- 4 files changed, 382 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
- create mode 100644 tools/testing/selftests/bpf/progs/crypto_common.h
- create mode 100644 tools/testing/selftests/bpf/progs/crypto_sanity.c
 
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 02dd4409200e..2a5d6339831b 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -14,6 +14,7 @@ CONFIG_CGROUP_BPF=y
- CONFIG_CRYPTO_HMAC=y
- CONFIG_CRYPTO_SHA256=y
- CONFIG_CRYPTO_USER_API_HASH=y
-+CONFIG_CRYPTO_SKCIPHER=y
- CONFIG_DEBUG_INFO=y
- CONFIG_DEBUG_INFO_BTF=y
- CONFIG_DEBUG_INFO_DWARF4=y
-diff --git a/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c b/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
-new file mode 100644
-index 000000000000..a43969da6d15
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
-@@ -0,0 +1,129 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2022 Meta Platforms, Inc. and affiliates. */
-+
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+#include <net/if.h>
-+#include <linux/in6.h>
-+
-+#include "test_progs.h"
-+#include "network_helpers.h"
-+#include "crypto_sanity.skel.h"
-+
-+#define NS_TEST "crypto_sanity_ns"
-+#define IPV6_IFACE_ADDR "face::1"
-+#define UDP_TEST_PORT 7777
-+static const char plain_text[] = "stringtoencrypt0";
-+static const char crypted_data[] = "\x5B\x59\x39\xEA\xD9\x7A\x2D\xAD\xA7\xE0\x43" \
-+				   "\x37\x8A\x77\x17\xB2";
-+
-+void test_crypto_sanity(void)
-+{
-+	LIBBPF_OPTS(bpf_tc_hook, qdisc_hook, .attach_point = BPF_TC_EGRESS);
-+	LIBBPF_OPTS(bpf_tc_opts, tc_attach_enc);
-+	LIBBPF_OPTS(bpf_tc_opts, tc_attach_dec);
-+	LIBBPF_OPTS(bpf_test_run_opts, opts,
-+		    .data_in = crypted_data,
-+		    .data_size_in = sizeof(crypted_data),
-+		    .repeat = 1,
-+	);
-+	struct nstoken *nstoken = NULL;
-+	struct crypto_sanity *skel;
-+	struct sockaddr_in6 addr;
-+	int sockfd, err, pfd;
-+	socklen_t addrlen;
-+
-+	skel = crypto_sanity__open();
-+	if (!ASSERT_OK_PTR(skel, "skel open"))
-+		return;
-+
-+	bpf_program__set_autoload(skel->progs.skb_crypto_setup, true);
-+
-+	SYS(fail, "ip netns add %s", NS_TEST);
-+	SYS(fail, "ip -net %s -6 addr add %s/128 dev lo nodad", NS_TEST, IPV6_IFACE_ADDR);
-+	SYS(fail, "ip -net %s link set dev lo up", NS_TEST);
-+
-+	err = crypto_sanity__load(skel);
-+	if (!ASSERT_OK(err, "crypto_sanity__load"))
-+		goto fail;
-+
-+	nstoken = open_netns(NS_TEST);
-+	if (!ASSERT_OK_PTR(nstoken, "open_netns"))
-+		goto fail;
-+
-+	qdisc_hook.ifindex = if_nametoindex("lo");
-+	if (!ASSERT_GT(qdisc_hook.ifindex, 0, "if_nametoindex lo"))
-+		goto fail;
-+
-+	err = crypto_sanity__attach(skel);
-+	if (!ASSERT_OK(err, "crypto_sanity__attach"))
-+		goto fail;
-+
-+	pfd = bpf_program__fd(skel->progs.skb_crypto_setup);
-+	if (!ASSERT_GT(pfd, 0, "skb_crypto_setup fd"))
-+		goto fail;
-+
-+	err = bpf_prog_test_run_opts(pfd, &opts);
-+	if (!ASSERT_OK(err, "skb_crypto_setup") ||
-+	    !ASSERT_OK(opts.retval, "skb_crypto_setup retval"))
-+		goto fail;
-+
-+	if (!ASSERT_OK(skel->bss->status, "skb_crypto_setup status"))
-+		goto fail;
-+
-+	err = bpf_tc_hook_create(&qdisc_hook);
-+	if (!ASSERT_OK(err, "create qdisc hook"))
-+		goto fail;
-+
-+	addrlen = sizeof(addr);
-+	err = make_sockaddr(AF_INET6, IPV6_IFACE_ADDR, UDP_TEST_PORT,
-+			    (void *)&addr, &addrlen);
-+	if (!ASSERT_OK(err, "make_sockaddr"))
-+		goto fail;
-+
-+	tc_attach_dec.prog_fd = bpf_program__fd(skel->progs.decrypt_sanity);
-+	err = bpf_tc_attach(&qdisc_hook, &tc_attach_dec);
-+	if (!ASSERT_OK(err, "attach decrypt filter"))
-+		goto fail;
-+
-+	sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
-+	if (!ASSERT_NEQ(sockfd, -1, "decrypt socket"))
-+		goto fail;
-+	err = sendto(sockfd, crypted_data, 16, 0, (void *)&addr, addrlen);
-+	close(sockfd);
-+	if (!ASSERT_EQ(err, 16, "decrypt send"))
-+		goto fail;
-+
-+	bpf_tc_detach(&qdisc_hook, &tc_attach_dec);
-+	if (!ASSERT_OK(skel->bss->status, "decrypt status"))
-+		goto fail;
-+	if (!ASSERT_STRNEQ(skel->bss->dst, plain_text, sizeof(plain_text), "decrypt"))
-+		goto fail;
-+
-+	tc_attach_enc.prog_fd = bpf_program__fd(skel->progs.encrypt_sanity);
-+	err = bpf_tc_attach(&qdisc_hook, &tc_attach_enc);
-+	if (!ASSERT_OK(err, "attach encrypt filter"))
-+		goto fail;
-+
-+	sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
-+	if (!ASSERT_NEQ(sockfd, -1, "encrypt socket"))
-+		goto fail;
-+	err = sendto(sockfd, plain_text, 16, 0, (void *)&addr, addrlen);
-+	close(sockfd);
-+	if (!ASSERT_EQ(err, 16, "encrypt send"))
-+		goto fail;
-+
-+	bpf_tc_detach(&qdisc_hook, &tc_attach_enc);
-+	if (!ASSERT_OK(skel->bss->status, "encrypt status"))
-+		goto fail;
-+	if (!ASSERT_STRNEQ(skel->bss->dst, crypted_data, sizeof(crypted_data), "encrypt"))
-+		goto fail;
-+
-+fail:
-+	if (nstoken) {
-+		bpf_tc_hook_destroy(&qdisc_hook);
-+		close_netns(nstoken);
-+	}
-+	SYS_NOFAIL("ip netns del " NS_TEST " &> /dev/null");
-+	crypto_sanity__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/crypto_common.h b/tools/testing/selftests/bpf/progs/crypto_common.h
-new file mode 100644
-index 000000000000..c448f07d6e42
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/crypto_common.h
-@@ -0,0 +1,98 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) 2023 Meta Platforms, Inc. and affiliates. */
-+
-+#ifndef _CRYPTO_COMMON_H
-+#define _CRYPTO_COMMON_H
-+
-+#include "errno.h"
-+#include <stdbool.h>
-+
-+#define private(name) SEC(".bss." #name) __hidden __attribute__((aligned(8)))
-+private(CTX) static struct bpf_crypto_skcipher_ctx __kptr * global_crypto_ctx;
-+
-+struct bpf_crypto_skcipher_ctx *bpf_crypto_skcipher_ctx_create(const struct bpf_dynptr *algo, const struct bpf_dynptr *key, int *err) __ksym;
-+struct bpf_crypto_skcipher_ctx *bpf_crypto_skcipher_ctx_acquire(struct bpf_crypto_skcipher_ctx *ctx) __ksym;
-+void bpf_crypto_skcipher_ctx_release(struct bpf_crypto_skcipher_ctx *ctx) __ksym;
-+int bpf_crypto_skcipher_encrypt(struct bpf_crypto_skcipher_ctx *ctx, const struct bpf_dynptr *src, struct bpf_dynptr *dst, const struct bpf_dynptr *iv) __ksym;
-+int bpf_crypto_skcipher_decrypt(struct bpf_crypto_skcipher_ctx *ctx, const struct bpf_dynptr *src, struct bpf_dynptr *dst, const struct bpf_dynptr *iv) __ksym;
-+
-+struct __crypto_skcipher_ctx_value {
-+	struct bpf_crypto_skcipher_ctx __kptr * ctx;
-+};
-+
-+struct crypto_conf_value {
-+	__u8 algo[32];
-+	__u32 algo_size;
-+	__u8 key[32];
-+	__u32 key_size;
-+	__u8 iv[32];
-+	__u32 iv_size;
-+	__u8 dst[32];
-+	__u32 dst_size;
-+};
-+
-+struct array_conf_map {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__type(key, int);
-+	__type(value, struct crypto_conf_value);
-+	__uint(max_entries, 1);
-+} __crypto_conf_map SEC(".maps");
-+
-+struct array_map {
-+	__uint(type, BPF_MAP_TYPE_ARRAY);
-+	__type(key, int);
-+	__type(value, struct __crypto_skcipher_ctx_value);
-+	__uint(max_entries, 1);
-+} __crypto_skcipher_ctx_map SEC(".maps");
-+
-+static inline struct crypto_conf_value *crypto_conf_lookup(void)
-+{
-+	struct crypto_conf_value *v, local = {};
-+	u32 key = 0;
-+
-+	v = bpf_map_lookup_elem(&__crypto_conf_map, &key);
-+	if (v)
-+		return v;
-+
-+	bpf_map_update_elem(&__crypto_conf_map, &key, &local, 0);
-+	return bpf_map_lookup_elem(&__crypto_conf_map, &key);
-+}
-+
-+
-+static inline struct __crypto_skcipher_ctx_value *crypto_skcipher_ctx_value_lookup(void)
-+{
-+	u32 key = 0;
-+
-+	return bpf_map_lookup_elem(&__crypto_skcipher_ctx_map, &key);
-+}
-+
-+static inline int crypto_skcipher_ctx_insert(struct bpf_crypto_skcipher_ctx *ctx)
-+{
-+	struct __crypto_skcipher_ctx_value local, *v;
-+	long status;
-+	struct bpf_crypto_skcipher_ctx *old;
-+	u32 key = 0;
-+
-+	local.ctx = NULL;
-+	status = bpf_map_update_elem(&__crypto_skcipher_ctx_map, &key, &local, 0);
-+	if (status) {
-+		bpf_crypto_skcipher_ctx_release(ctx);
-+		return status;
-+	}
-+
-+	v = bpf_map_lookup_elem(&__crypto_skcipher_ctx_map, &key);
-+	if (!v) {
-+		bpf_crypto_skcipher_ctx_release(ctx);
-+		return -ENOENT;
-+	}
-+
-+	old = bpf_kptr_xchg(&v->ctx, ctx);
-+	if (old) {
-+		bpf_crypto_skcipher_ctx_release(old);
-+		return -EEXIST;
-+	}
-+
-+	return 0;
-+}
-+
-+#endif /* _CRYPTO_COMMON_H */
-diff --git a/tools/testing/selftests/bpf/progs/crypto_sanity.c b/tools/testing/selftests/bpf/progs/crypto_sanity.c
-new file mode 100644
-index 000000000000..71a172d8d2a2
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/crypto_sanity.c
-@@ -0,0 +1,154 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023 Meta Platforms, Inc. and affiliates. */
-+
-+#include "vmlinux.h"
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_misc.h"
-+#include "bpf_kfuncs.h"
-+#include "crypto_common.h"
-+
-+#define UDP_TEST_PORT 7777
-+unsigned char crypto_key[16] = "testtest12345678";
-+char crypto_algo[9] = "ecb(aes)";
-+char dst[32] = {};
-+int status;
-+
-+static inline int skb_validate_test(const struct __sk_buff *skb)
-+{
-+	struct ipv6hdr ip6h;
-+	struct udphdr udph;
-+	u32 offset;
-+
-+	if (skb->protocol != __bpf_constant_htons(ETH_P_IPV6))
-+		return -1;
-+
-+	if (bpf_skb_load_bytes(skb, ETH_HLEN, &ip6h, sizeof(ip6h)))
-+		return -1;
-+
-+	if (ip6h.nexthdr != IPPROTO_UDP)
-+		return -1;
-+
-+	if (bpf_skb_load_bytes(skb, ETH_HLEN + sizeof(ip6h), &udph, sizeof(udph)))
-+		return -1;
-+
-+	if (udph.dest != __bpf_constant_htons(UDP_TEST_PORT))
-+		return -1;
-+
-+	offset = ETH_HLEN + sizeof(ip6h) + sizeof(udph);
-+	if (skb->len < offset + 16)
-+		return -1;
-+
-+	return offset;
-+}
-+
-+SEC("?fentry.s/bpf_fentry_test1")
-+int BPF_PROG(skb_crypto_setup)
-+{
-+	struct crypto_conf_value *c;
-+	struct bpf_dynptr algo, key;
-+	int err = 0;
-+
-+	status = 0;
-+
-+	c = crypto_conf_lookup();
-+	if (!c) {
-+		status = -EINVAL;
-+		return 0;
-+	}
-+
-+	bpf_dynptr_from_mem(crypto_algo, sizeof(crypto_algo), 0, &algo);
-+	bpf_dynptr_from_mem(crypto_key, sizeof(crypto_key), 0, &key);
-+	struct bpf_crypto_skcipher_ctx *cctx = bpf_crypto_skcipher_ctx_create(&algo, &key, &err);
-+
-+	if (!cctx) {
-+		status = err;
-+		return 0;
-+	}
-+
-+	err = crypto_skcipher_ctx_insert(cctx);
-+	if (err && err != -EEXIST)
-+		status = err;
-+
-+	return 0;
-+}
-+
-+SEC("tc")
-+int decrypt_sanity(struct __sk_buff *skb)
-+{
-+	struct __crypto_skcipher_ctx_value *v;
-+	struct bpf_crypto_skcipher_ctx *ctx;
-+	struct bpf_dynptr psrc, pdst, iv;
-+	int err;
-+
-+	err = skb_validate_test(skb);
-+	if (err < 0) {
-+		status = err;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	v = crypto_skcipher_ctx_value_lookup();
-+	if (!v) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	ctx = v->ctx;
-+	if (!ctx) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	bpf_dynptr_from_skb(skb, 0, &psrc);
-+	bpf_dynptr_adjust(&psrc, err, err + 16);
-+	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
-+	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-+
-+	bpf_crypto_skcipher_decrypt(ctx, &psrc, &pdst, &iv);
-+
-+	status = 0;
-+
-+	return TC_ACT_SHOT;
-+}
-+
-+SEC("tc")
-+int encrypt_sanity(struct __sk_buff *skb)
-+{
-+	struct __crypto_skcipher_ctx_value *v;
-+	struct bpf_crypto_skcipher_ctx *ctx;
-+	struct bpf_dynptr psrc, pdst, iv;
-+	int err;
-+
-+	status = 0;
-+
-+	err = skb_validate_test(skb);
-+	if (err < 0) {
-+		status = err;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	v = crypto_skcipher_ctx_value_lookup();
-+	if (!v) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	ctx = v->ctx;
-+	if (!ctx) {
-+		status = -ENOENT;
-+		return TC_ACT_SHOT;
-+	}
-+
-+	bpf_dynptr_from_skb(skb, 0, &psrc);
-+	bpf_dynptr_adjust(&psrc, err, err + 16);
-+	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
-+	bpf_dynptr_from_mem(dst, 0, 0, &iv);
-+
-+	bpf_crypto_skcipher_encrypt(ctx, &psrc, &pdst, &iv);
-+
-+	return TC_ACT_SHOT;
-+}
-+
-+char __license[] SEC("license") = "GPL";
--- 
-2.39.3
+10/25/2023 2:29 PM, Mickaël Salaün пишет:
+> On Tue, Oct 24, 2023 at 12:12:01PM +0300, Konstantin Meskhidze (A) wrote:
+>> 
+>> 
+>> 10/24/2023 12:03 PM, Mickaël Salaün пишет:
+>> > On Tue, Oct 24, 2023 at 06:18:54AM +0300, Konstantin Meskhidze (A) wrote:
+>> > > 
+>> > > 
+>> > > 10/20/2023 12:49 PM, Mickaël Salaün пишет:
+>> > > > On Fri, Oct 20, 2023 at 07:08:33AM +0300, Konstantin Meskhidze (A) wrote:
+>> > > > > > > > > 10/18/2023 3:29 PM, Mickaël Salaün пишет:
+>> > > > > > On Mon, Oct 16, 2023 at 09:50:26AM +0800, Konstantin Meskhidze wrote:
+>> > 
+>> > > > > > > diff --git a/security/landlock/net.h b/security/landlock/net.h
+>> > > > > > > new file mode 100644
+>> > > > > > > index 000000000000..588a49fd6907
+>> > > > > > > --- /dev/null
+>> > > > > > > +++ b/security/landlock/net.h
+>> > > > > > > @@ -0,0 +1,33 @@
+>> > > > > > > +/* SPDX-License-Identifier: GPL-2.0-only */
+>> > > > > > > +/*
+>> > > > > > > + * Landlock LSM - Network management and hooks
+>> > > > > > > + *
+>> > > > > > > + * Copyright © 2022-2023 Huawei Tech. Co., Ltd.
+>> > > > > > > + */
+>> > > > > > > +
+>> > > > > > > +#ifndef _SECURITY_LANDLOCK_NET_H
+>> > > > > > > +#define _SECURITY_LANDLOCK_NET_H
+>> > > > > > > +
+>> > > > > > > +#include "common.h"
+>> > > > > > > +#include "ruleset.h"
+>> > > > > > > +#include "setup.h"
+>> > > > > > > +
+>> > > > > > > +#if IS_ENABLED(CONFIG_INET)
+>> > > > > > > +__init void landlock_add_net_hooks(void);
+>> > > > > > > +
+>> > > > > > > +int landlock_append_net_rule(struct landlock_ruleset *const ruleset,
+>> > > > > > > +			     const u16 port, access_mask_t access_rights);
+>> > > > > > > +#else /* IS_ENABLED(CONFIG_INET) */
+>> > > > > > > +static inline void landlock_add_net_hooks(void)
+>> > > > > > > +{
+>> > > > > > > +}
+>> > > > > > > +
+>> > > > > > > +static inline int
+>> > > > > > > +landlock_append_net_rule(struct landlock_ruleset *const ruleset, const u16 port,
+>> > > > > > > +			 access_mask_t access_rights);
+>> > > > > > > +{
+>> > > > > > > +	return -EAFNOSUPPORT;
+>> > > > > > > +}
+>> > > > > > > +#endif /* IS_ENABLED(CONFIG_INET) */
+>> > > > > > > +
+>> > > > > > > +#endif /* _SECURITY_LANDLOCK_NET_H */
+>> > > > > > > diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
+>> > > > > > > index 4c209acee01e..1fe4298ff4a7 100644
+>> > > > > > > --- a/security/landlock/ruleset.c
+>> > > > > > > +++ b/security/landlock/ruleset.c
+>> > > > > > > @@ -36,6 +36,11 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
+>> > > > > > >  	refcount_set(&new_ruleset->usage, 1);
+>> > > > > > >  	mutex_init(&new_ruleset->lock);
+>> > > > > > >  	new_ruleset->root_inode = RB_ROOT;
+>> > > > > > > +
+>> > > > > > > +#if IS_ENABLED(CONFIG_INET)
+>> > > > > > > +	new_ruleset->root_net_port = RB_ROOT;
+>> > > > > > > +#endif /* IS_ENABLED(CONFIG_INET) */
+>> > > > > > > +
+>> > > > > > >  	new_ruleset->num_layers = num_layers;
+>> > > > > > >  	/*
+>> > > > > > >  	 * hierarchy = NULL
+>> > > > > > > @@ -46,16 +51,21 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
+>> > > > > > >  }
+>> > > > > > > > >  struct landlock_ruleset *
+>> > > > > > > -landlock_create_ruleset(const access_mask_t fs_access_mask)
+>> > > > > > > +landlock_create_ruleset(const access_mask_t fs_access_mask,
+>> > > > > > > +			const access_mask_t net_access_mask)
+>> > > > > > >  {
+>> > > > > > >  	struct landlock_ruleset *new_ruleset;
+>> > > > > > > > >  	/* Informs about useless ruleset. */
+>> > > > > > > -	if (!fs_access_mask)
+>> > > > > > > +	if (!fs_access_mask && !net_access_mask)
+>> > > > > > >  		return ERR_PTR(-ENOMSG);
+>> > > > > > >  	new_ruleset = create_ruleset(1);
+>> > > > > > > -	if (!IS_ERR(new_ruleset))
+>> > > > > > > +	if (IS_ERR(new_ruleset))
+>> > > > > > > +		return new_ruleset;
+>> > > > > > > +	if (fs_access_mask)
+>> > > > > > >  		landlock_add_fs_access_mask(new_ruleset, fs_access_mask, 0);
+>> > > > > > > +	if (net_access_mask)
+>> > > > > > > +		landlock_add_net_access_mask(new_ruleset, net_access_mask, 0);
+>> > > > > > > This is good, but it is not tested: we need to add a test that
+>> > > > > both
+>> > > > > > handle FS and net restrictions. You can add one in net.c, just handling
+>> > > > > > LANDLOCK_ACCESS_FS_READ_DIR and LANDLOCK_ACCESS_NET_BIND_TCP, add one
+>> > > > > > rule with path_beneath (e.g. /dev) and another with net_port, and check
+>> > > > > > that open("/") is denied, open("/dev") is allowed, and and only the
+>> > > > > > allowed port is allowed with bind(). This test should be simple and can
+>> > > > > > only check against an IPv4 socket, i.e. using ipv4_tcp fixture, just
+>> > > > > > after port_endianness. fcntl.h should then be included by net.c
+>> > > > > > >   Ok.
+>> > > > > > > I guess that was the purpose of layout1.with_net (in fs_test.c)
+>> > > > > but it
+>> > > > > > >   Yep. I added this kind of nest in fs_test.c to test both
+>> > > fs and network
+>> > > > > rules together.
+>> > > > > > is not complete. You can revamp this test and move it to net.c
+>> > > > > > following the above suggestions, keeping it consistent with other tests
+>> > > > > > in net.c . You don't need the test_open() nor create_ruleset() helpers.
+>> > > > > > > This test must failed if we change
+>> > > > > "ruleset->access_masks[layer_level] |="
+>> > > > > > to "ruleset->access_masks[layer_level] =" in
+>> > > > > > landlock_add_fs_access_mask() or landlock_add_net_access_mask().
+>> > > > > > >   Do you want to change it? Why?
+>> > > > > The kernel code is correct and must not be changed. However, if
+>> > > by
+>> > > > mistake we change it and remove the OR, a test should catch that. We
+>> > > > need a test to assert this assumption.
+>> > > > > >   Fs and network masks are ORed to not intersect with each
+>> > > other.
+>> > > > > Yes, they are ORed, and we need a test to check that. Noting is
+>> > > > currently testing this OR (and the different rule type consistency).
+>> > > > I'm suggesting to revamp the layout1.with_net test into
+>> > > > ipv4_tcp.with_fs and make it check ruleset->access_masks[] and rule
+>> > > > addition of different types.
+>> > 
+>> > > From the other email:
+>> > > Thinking about this test. We don't need to add any additional ASSERT here.
+>> > > Anyway if we accidentally change "ruleset->access_masks[layer_level] |=" to
+>> > > "ruleset->access_masks[layer_level] =" we will fail either in opening
+>> > > directory or in port binding, cause adding a second rule (fs or net) will
+>> > > overwrite a first one's mask. it does not matter which one goes first. I
+>> > > will check it and send you a message.
+>> > > What do you think?
+>> > 
+>> > > 
+>> > >   About my previous comment.
+>> > > 
+>> > >   Checking the code we can  notice that adding fs mask goes first:
+>> > > 
+>> > > ...
+>> > > if (fs_access_mask)
+>> > > 		landlock_add_fs_access_mask(new_ruleset, fs_access_mask, 0);
+>> > > if (net_access_mask)
+>> > > 		landlock_add_net_access_mask(new_ruleset, net_access_mask, 0);
+>> > > ....
+>> > > 
+>> > > So with we change "ruleset->access_masks[layer_level] |="
+>> > > >> > to "ruleset->access_masks[layer_level] =" in
+>> > > landlock_add_fs_access_mask() nothing bad will happen.
+>> > > But if we do that in landlock_add_net_access_mask()
+>> > > fs mask will be overwritten and adding fs rule will fail
+>> > > (as unhandled allowed_accesss).
+>> > 
+>> > Right. What is the conclusion here? Are you OK with my test proposal?
+>> 
+>>   So we just check if landlock_add_net_access_mask() would be changed by
+>> mistake?
+> 
+> With the current kernel code, yes.
+> 
+>> Changing landlock_add_fs_access_mask() does not break the logic. Am
+>> I correct here?
+> 
+> Yes, only landlock_add_net_access_mask() changes would be detected with
+> the current kernel code, but the test checks the whole semantic, so even
+> the following code with a buggy landlock_add_fs_access_mask() would be
+> detected:
+> 
+> if (net_access_mask)
+> 	landlock_add_net_access_mask(new_ruleset, net_access_mask, 0);
+> if (fs_access_mask)
+> 	landlock_add_fs_access_mask(new_ruleset, fs_access_mask, 0);
 
+  I agree. Thanks for the explanation.
+> .
 
