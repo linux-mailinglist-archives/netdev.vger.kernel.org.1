@@ -1,107 +1,115 @@
-Return-Path: <netdev+bounces-44469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596727D8216
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 13:54:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC86E7D824D
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:11:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9ECDB21361
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:54:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 227461C20EED
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 12:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29ED32D79B;
-	Thu, 26 Oct 2023 11:54:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD8992D7B5;
+	Thu, 26 Oct 2023 12:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gg8lM5d+"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="I8Y3UlLQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9992D799;
-	Thu, 26 Oct 2023 11:54:37 +0000 (UTC)
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E50191AE;
-	Thu, 26 Oct 2023 04:54:35 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-51f64817809so99636a12.1;
-        Thu, 26 Oct 2023 04:54:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698321275; x=1698926075; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D5Q4sKw20IDYCQXVbEgRDRjEjEctNoIjeFaPqJNC/rc=;
-        b=gg8lM5d+v+Xudbnf8Wlj5+yZos22AMGP5ruaxqdfbmji4NiWItW6cvOod0+zXN+0k4
-         Wn4Ez3dPv3Y8cxj+DZxG4rFVG6YvwoUND2FSmbNKpPG8KLv4xHJyjOfrECmdMARWPI8+
-         hUmJhP+FaBLI/focenNeoTDch5u2cFQfemMQChtmAutFubr4er1pnvy9roLF+/hmPAkG
-         Bt8MhpCDxt4c3Lnh/h78EUPseYmjhOC+wN3DFSoxDUBdyKNzbHAitT5bmIRnzrYllxfQ
-         lKYi+YUNdzAXDuv0/FBDT7c22d8h0Kyxc6KTZ9RzR9YBrxkhvacRz8gCtxXOpwo68QA/
-         CnUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698321275; x=1698926075;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=D5Q4sKw20IDYCQXVbEgRDRjEjEctNoIjeFaPqJNC/rc=;
-        b=JyzWRBVI5yVKjerqB6GSAWsP4TgzUyjI9ZSe0uatIQn8gNLt0BY4sc/bNoZFaSijiX
-         1Yb6nyJePqMsD0xhWnwU+daERUn7Tocmr/KuTMAzEJ6OTQ5ngCNguPY5B6pSp+mk2Twc
-         chZzK2hjHJXKNm9TpeVtGHCEyCLYkVpR7ItqUNRVjk/h4ODdQ1OEqw4H1R9cRdEYNII5
-         6EOQme19FZCBtWxAooV5iIBlVZywwkI9Kel212JOB/pHKg3EW8S8Mz7NxT0yOs8xg+BR
-         fUR9sAp8/t8WklsAwM1GwOkYTHJ2anUBTTxah4OWW954CYhrL6VIKciSSpFk9PXAtzea
-         bQLA==
-X-Gm-Message-State: AOJu0YxnjRL/NioY/BSProqT8hzOj3TJXsj7OttaNMfjBXOQM9jh7p2k
-	wkCllEvcne1q04tX97EZCko=
-X-Google-Smtp-Source: AGHT+IHkE6Z2sn4JakvHISr7KVCogjXHvU+PXjauonII13+9RFcxWzaevHmt2KXLxZnYf1nhP9EqMQ==
-X-Received: by 2002:a05:6a20:4420:b0:163:f945:42c4 with SMTP id ce32-20020a056a20442000b00163f94542c4mr24703115pzb.1.1698321275323;
-        Thu, 26 Oct 2023 04:54:35 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id h7-20020a655187000000b0056b6d1ac949sm8780610pgq.13.2023.10.26.04.54.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 04:54:35 -0700 (PDT)
-Date: Thu, 26 Oct 2023 20:54:34 +0900 (JST)
-Message-Id: <20231026.205434.963307210202715112.fujita.tomonori@gmail.com>
-To: miguel.ojeda.sandonis@gmail.com
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
- benno.lossin@proton.me, wedsonaf@gmail.com, ojeda@kernel.org
-Subject: Re: [PATCH net-next v7 3/5] rust: add second `bindgen` pass for
- enum exhaustiveness checking
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CANiq72n6Cvxydcef03kEo9fy=5Zd7MXYqFUGX1MBaTKF2o63nw@mail.gmail.com>
-References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
-	<20231026001050.1720612-4-fujita.tomonori@gmail.com>
-	<CANiq72n6Cvxydcef03kEo9fy=5Zd7MXYqFUGX1MBaTKF2o63nw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E0D2AB2D;
+	Thu, 26 Oct 2023 12:11:44 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79AB4B9;
+	Thu, 26 Oct 2023 05:11:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=afBoL1CywY5vzAibNNUL1al1UqCXTRmPXng/B7TR7sg=; b=I8Y3UlLQFBG6oXsysPBNHoIlTL
+	My5mhjHFtOfpAiefm4lgUb/knh2KVOMifotLQlZnrgucBT2oTQvyCoUvxAKeg9Xss4hKul/w3nn/+
+	GG8RAGH0iJU8tGywZnJwstCwKi8hpAgml9y+S1lT2di94/MDPFmWBM245grI1hCEizLEiU9SeCuU3
+	QkY5ibaprj6CYD/dqbd/jDGcTgCKAWbYGCx+TNV1kG7rIqWm775SNM2Qxem3ETVmVNIXzfdu/S0cv
+	JGih0RxqiDidarh423eKeVj1WyvObpO49xVeg8TYfAUWDILdA184/O1/wrkaMFbI5PJOY0/qlc/Ty
+	/SJN7rAQ==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qvzDA-000O4a-69; Thu, 26 Oct 2023 14:11:40 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qvzD9-0005Dt-JX; Thu, 26 Oct 2023 14:11:39 +0200
+Subject: Re: [PATCH bpf-next v4 1/7] netkit, bpf: Add bpf programmable net
+ device
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@linux.dev,
+ razor@blackwall.org, ast@kernel.org, andrii@kernel.org,
+ john.fastabend@gmail.com, sdf@google.com, toke@kernel.org, kuba@kernel.org,
+ andrew@lunn.ch, =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?=
+ <toke@redhat.com>, joe@cilium.io
+References: <20231024214904.29825-1-daniel@iogearbox.net>
+ <20231024214904.29825-2-daniel@iogearbox.net> <ZTk4ec8CBh92PZvs@nanopsycho>
+ <7dcf130e-db64-34bc-5207-15e4a4963bc0@iogearbox.net>
+ <ZTn2k1vn0AN8IHlw@nanopsycho>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <c2e0535d-8091-9504-4edd-9974f44c416c@iogearbox.net>
+Date: Thu, 26 Oct 2023 14:11:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+In-Reply-To: <ZTn2k1vn0AN8IHlw@nanopsycho>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27073/Thu Oct 26 09:47:53 2023)
 
-T24gVGh1LCAyNiBPY3QgMjAyMyAxMzowMjo1NyArMDIwMA0KTWlndWVsIE9qZWRhIDxtaWd1ZWwu
-b2plZGEuc2FuZG9uaXNAZ21haWwuY29tPiB3cm90ZToNCg0KPiBPbiBUaHUsIE9jdCAyNiwgMjAy
-MyBhdCAyOjE24oCvQU0gRlVKSVRBIFRvbW9ub3JpDQo+IDxmdWppdGEudG9tb25vcmlAZ21haWwu
-Y29tPiB3cm90ZToNCj4+DQo+PiBGcm9tOiBNaWd1ZWwgT2plZGEgPG9qZWRhQGtlcm5lbC5vcmc+
-DQo+Pg0KPj4gVGhpcyBwYXRjaCBtYWtlcyBzdXJlIHRoYXQgdGhlIEMncyBlbnVtIGlzIHN5bmMg
-d2l0aCBSdXN0IHNpZGVzLiBJZg0KPj4gdGhlIGVudW0gaXMgb3V0IG9mIHN5bmMsIGNvbXBpbGlu
-ZyBmYWlscyB3aXRoIGFuIGVycm9yIGxpa2UgdGhlDQo+PiBmb2xsb3dpbmcuDQo+Pg0KPj4gTm90
-ZSB0aGF0IHRoaXMgaXMgYSB0ZW1wb3Jhcnkgc29sdXRpb24uIEl0IHdpbGwgYmUgcmVwbGFjZWQg
-d2l0aA0KPj4gYmluZGdlbiB3aGVuIGl0IHN1cHBvcnRzIGdlbmVyYXRpbmcgdGhlIGVudW0gY29u
-dmVyc2lvbiBjb2RlLg0KPiANCj4+IFNpZ25lZC1vZmYtYnk6IE1pZ3VlbCBPamVkYSA8b2plZGFA
-a2VybmVsLm9yZz4NCj4+IFNpZ25lZC1vZmYtYnk6IEZVSklUQSBUb21vbm9yaSA8ZnVqaXRhLnRv
-bW9ub3JpQGdtYWlsLmNvbT4NCj4gDQo+IFBsZWFzZSBkbyBub3QgbW9kaWZ5IHBhdGNoZXMgZnJv
-bSBvdGhlcnMgd2l0aG91dCB3YXJuaW5nIHRoYXQgeW91IGRpZA0KPiBzby4gSSBkaWQgbm90IHdy
-aXRlIHRoaXMgY29tbWl0IG1lc3NhZ2Ugbm9yIGFncmVlZCB0byB0aGlzLCBidXQgaXQNCj4gbG9v
-a3MgYXMgaWYgSSBkaWQuIEkgZXZlbiBleHBsaWNpdGx5IHNhaWQgSSB3b3VsZCBzZW5kIHRoZSBw
-YXRjaA0KPiBpbmRlcGVuZGVudGx5Lg0KPg0KPiBBcyBJIHJlY2VudGx5IHRvbGQgeW91LCBpZiB5
-b3Ugd2FudCB0byBwaWNrIGl0IHVwIGluIHlvdXIgc2VyaWVzIHRvDQo+IHNob3djYXNlIGhvdyBp
-dCB3b3VsZCB3b3JrLCB5b3Ugc2hvdWxkIGhhdmUgYXQgbGVhc3Qga2VwdCB0aGUgV0lQLCBwdXQN
-Cj4gaXQgYXQgdGhlIGVuZCBvZiB0aGUgc2VyaWVzIGFuZCBhZGRlZCBSRkMgc2luY2UgaXQgaXMg
-bm90IGludGVuZGVkIHRvDQo+IGJlIG1lcmdlZCB3aXRoIHlvdXIgb3RoZXIgcGF0Y2hlcy4NCg0K
-U29ycnksIEkgdG90YWxseSBtaXN1bmRlcnN0YW5kIHlvdXIgaW50ZW50aW9uLiBJIHRob3VnaHQg
-dGhhdCB0aGUgUEhZDQphYnN0cmFjdGlvbnMgbmVlZHMgdG8gYmUgbWVyZ2VkIHdpdGggeW91ciBw
-YXRjaCB0b2dldGhlci4NCg0KSSdsbCBkcm9wIHlvdXIgcGF0Y2ggaW4gdGhlIG5leHQgdmVyc2lv
-biBhbmQgZm9jdXMgb24gbXkgcGF0Y2hlcy4NCg==
+On 10/26/23 7:18 AM, Jiri Pirko wrote:
+> Wed, Oct 25, 2023 at 07:20:01PM CEST, daniel@iogearbox.net wrote:
+>> On 10/25/23 5:47 PM, Jiri Pirko wrote:
+>>> Tue, Oct 24, 2023 at 11:48:58PM CEST, daniel@iogearbox.net wrote:
+>> [...]
+>>>> comes with a primary and a peer device. Only the primary device, typically
+>>>> residing in hostns, can manage BPF programs for itself and its peer. The
+>>>> peer device is designated for containers/Pods and cannot attach/detach
+>>>> BPF programs. Upon the device creation, the user can set the default policy
+>>>> to 'pass' or 'drop' for the case when no BPF program is attached.
+>>>
+>>> It looks to me that you only need the host (primary) netdevice to be
+>>> used as a handle to attach the bpf programs. Because the bpf program
+>>> can (and probably in real use case will) redirect to uplink/another
+>>> pod netdevice skipping the host (primary) netdevice, correct?
+>>>
+>>> If so, why can't you do just single device mode from start finding a
+>>> different sort of bpf attach handle? (not sure which)
+>>
+>> The first point where we switch netns from a K8s Pod is out of the netdevice.
+>> For the CNI case the vast majority has one but there could also be multi-
+>> homing for Pods where there may be two or more, and from a troubleshooting
+>> PoV aka tcpdump et al, it is the most natural point. Other attach handle
+>> inside the Pod doesn't really fit given from policy PoV it also must be
+>> unreachable for apps inside the Pod itself.
+> 
+> Okay. What is the usecase for the single device model then?
+
+One immediate use case in the context of Cilium itself is to replace
+and simplify our cilium_host/cilium_net pair which is in the hostns
+and depending on the routing mode that Cilium is configured in handling
+traffic/policy from host into Pods respectively from host or Pods into
+collect_md encaps in order to route traffic E/W to other cluster nodes.
+Going further, we were thinking also to have single dev and move it into
+target netns with policy being configured from host.
+
+Best,
+Daniel
 
