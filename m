@@ -1,512 +1,167 @@
-Return-Path: <netdev+bounces-44534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD9BD7D877D
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 19:21:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 397657D8793
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 19:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F514281F99
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 17:21:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 259BF1C20B1B
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 17:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F098B38F93;
-	Thu, 26 Oct 2023 17:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="arIrR+bT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A43138F9A;
+	Thu, 26 Oct 2023 17:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07391BDC7
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 17:21:50 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30FAB1B6
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 10:21:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698340907;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CBHuUMAQd9PhM5EzsFOGYM9rh6O+w1p/dI4UGNbg3Eg=;
-	b=arIrR+bTPMTOGIB02NmuZx1I63bLsCL29lO5A9A4aN9IJESWddDQER1jtsLqa5g5hhXaYs
-	gdvkstch4xCC6yu8vrVzh6h1y66kKvWZcoor4ix9gi9OKfIAI31knVZ7TScLgKGWfwgx20
-	L8g7GlJySY68jn8WhKzOIp9SoyQk9Uk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-318-BxNP1IcnNpC2uvA6iDug9g-1; Thu, 26 Oct 2023 13:21:45 -0400
-X-MC-Unique: BxNP1IcnNpC2uvA6iDug9g-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-32cef5f8af5so1550398f8f.1
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 10:21:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698340905; x=1698945705;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CBHuUMAQd9PhM5EzsFOGYM9rh6O+w1p/dI4UGNbg3Eg=;
-        b=OgUkS5Jk3jmVCCaZ7B6PWVDu/lK7whNsIrTzjb6SAdj2bzkygiPidZ5WyNI7nF8+vv
-         kkiAHCYULjuaH3EpGo3oo+c9R+znlrYt4IAN0YFP/8yM2WIeAzKtwxabFJWBYr8n4qqR
-         H/YWf/krOxOa3KlDk5nMqTv6vuFoBYJg4i5SCAzlrFhPOfxR9B3X3LvK4xkdiAVAzVkl
-         ynZh6MA0Ha8TGLz860lp8Km+hoT3IGApLS/aqDR88tN8P+zF/qGTMCHMRAZ9yKSAu5dd
-         ioyeJBfDhotgJDH9jMKAieXyOOZZ9fxP689gdwf3K7ORUPBAbuALjRKorHvIHpFY9wmK
-         nYxw==
-X-Gm-Message-State: AOJu0Yybde6tw6lwy/TYrJbztFMzbApvSW60kv3cSJKqMSzbnqjrJlxx
-	XINrjrHFKbAxLRufFly8bc7SvmMqIbGCFUbq5N0WZTVsXw2n3gun5ey2y1kwCz7HJ7gDUvAuSz4
-	AkoiekU6AuakFzaED
-X-Received: by 2002:a5d:64e6:0:b0:32d:dcee:a909 with SMTP id g6-20020a5d64e6000000b0032ddceea909mr4785194wri.1.1698340904584;
-        Thu, 26 Oct 2023 10:21:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHcgT+h+aeJIPJhTd8o30sJ/dyyorJqMIM4y7uJTRf4X6HrXm9pBRggcfVT6uZTLhLzYc3bmw==
-X-Received: by 2002:a5d:64e6:0:b0:32d:dcee:a909 with SMTP id g6-20020a5d64e6000000b0032ddceea909mr4785164wri.1.1698340904154;
-        Thu, 26 Oct 2023 10:21:44 -0700 (PDT)
-Received: from redhat.com ([2.52.26.119])
-        by smtp.gmail.com with ESMTPSA id f9-20020adff449000000b0032d81837433sm14619439wrp.30.2023.10.26.10.21.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 10:21:43 -0700 (PDT)
-Date: Thu, 26 Oct 2023 13:21:24 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] virtio_net: use u64_stats_t infra to avoid
- data-races
-Message-ID: <20231026132111-mutt-send-email-mst@kernel.org>
-References: <20231026171840.4082735-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8B61BDC7;
+	Thu, 26 Oct 2023 17:30:28 +0000 (UTC)
+Received: from relay.hostedemail.com (smtprelay0015.hostedemail.com [216.40.44.15])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23925B9;
+	Thu, 26 Oct 2023 10:30:26 -0700 (PDT)
+Received: from omf07.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay09.hostedemail.com (Postfix) with ESMTP id 1775780BF4;
+	Thu, 26 Oct 2023 17:30:21 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf07.hostedemail.com (Postfix) with ESMTPA id D70822002C;
+	Thu, 26 Oct 2023 17:30:09 +0000 (UTC)
+Message-ID: <7eec92d9e72d28e7b5202f41b02a383eb28ddd26.camel@perches.com>
+Subject: Re: [PATCH 3/3] checkpatch: add ethtool_sprintf rules
+From: Joe Perches <joe@perches.com>
+To: Justin Stitt <justinstitt@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shay Agroskin
+ <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>, David Arinzon
+ <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>, Saeed Bishara
+ <saeedb@amazon.com>, Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru
+ <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Dimitris Michailidis
+ <dmichail@fungible.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, Salil
+ Mehta <salil.mehta@huawei.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>,  Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Louis Peens <louis.peens@corigine.com>, Shannon Nelson
+ <shannon.nelson@amd.com>, Brett Creeley <brett.creeley@amd.com>, 
+ drivers@pensando.io, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang
+ <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers
+ Reviewers <pv-drivers@vmware.com>, Andy Whitcroft <apw@canonical.com>,
+ Dwaipayan Ray <dwaipayanray1@gmail.com>, Lukas Bulwahn
+ <lukas.bulwahn@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Nick Desaulniers
+ <ndesaulniers@google.com>, Nathan Chancellor <nathan@kernel.org>, Kees Cook
+ <keescook@chromium.org>, intel-wired-lan@lists.osuosl.org, 
+ oss-drivers@corigine.com, linux-hyperv@vger.kernel.org
+Date: Thu, 26 Oct 2023 10:30:08 -0700
+In-Reply-To: <20231025-ethtool_puts_impl-v1-3-6a53a93d3b72@google.com>
+References: <20231025-ethtool_puts_impl-v1-0-6a53a93d3b72@google.com>
+	 <20231025-ethtool_puts_impl-v1-3-6a53a93d3b72@google.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231026171840.4082735-1-edumazet@google.com>
+X-Rspamd-Queue-Id: D70822002C
+X-Rspamd-Server: rspamout02
+X-Stat-Signature: gjwxid9tcn9tzi1nmcpi4hsmszny7q6k
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX1+EI9TAgP8y8yYHcBc5iItVgLH9GhH6Qh8=
+X-HE-Tag: 1698341409-723574
+X-HE-Meta: U2FsdGVkX18C6ufE/QssxWAA52g0kzXgdZJqwTBNOwFNEA1mGXzSgLWrdDtJfFtYvR9vYZrerqOWMEcF3r4AsUcZeyzJYE1vyu0mO5pnfPGhcKIJlPngze7YtCQC93ao9Ul+7IgR2g8cFoFVOEel2H8MBoPmvse5vEFG5iXnHNez6fBmMPrKhvTsCwfZmHT0TUa+OeBfONQdiUG2AjKOZBTD2+mZnQazSe0jyd2GjoF2cTSx3nGhMhrOVIjP1h1HOwA7PbqgXKe1fj+gEvsvZe+MMHOiZmH7OTlkcMCNubwSzg55E5kA+5xCLr+pJUR3FHRZombKDZ5Q8vAyzi/OB5BS3LNhadq6
 
-On Thu, Oct 26, 2023 at 05:18:40PM +0000, Eric Dumazet wrote:
-> syzbot reported a data-race in virtnet_poll / virtnet_stats [1]
-> 
-> u64_stats_t infra has very nice accessors that must be used
-> to avoid potential load-store tearing.
-> 
-> [1]
-> BUG: KCSAN: data-race in virtnet_poll / virtnet_stats
-> 
-> read-write to 0xffff88810271b1a0 of 8 bytes by interrupt on cpu 0:
-> virtnet_receive drivers/net/virtio_net.c:2102 [inline]
-> virtnet_poll+0x6c8/0xb40 drivers/net/virtio_net.c:2148
-> __napi_poll+0x60/0x3b0 net/core/dev.c:6527
-> napi_poll net/core/dev.c:6594 [inline]
-> net_rx_action+0x32b/0x750 net/core/dev.c:6727
-> __do_softirq+0xc1/0x265 kernel/softirq.c:553
-> invoke_softirq kernel/softirq.c:427 [inline]
-> __irq_exit_rcu kernel/softirq.c:632 [inline]
-> irq_exit_rcu+0x3b/0x90 kernel/softirq.c:644
-> common_interrupt+0x7f/0x90 arch/x86/kernel/irq.c:247
-> asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:636
-> __sanitizer_cov_trace_const_cmp8+0x0/0x80 kernel/kcov.c:306
-> jbd2_write_access_granted fs/jbd2/transaction.c:1174 [inline]
-> jbd2_journal_get_write_access+0x94/0x1c0 fs/jbd2/transaction.c:1239
-> __ext4_journal_get_write_access+0x154/0x3f0 fs/ext4/ext4_jbd2.c:241
-> ext4_reserve_inode_write+0x14e/0x200 fs/ext4/inode.c:5745
-> __ext4_mark_inode_dirty+0x8e/0x440 fs/ext4/inode.c:5919
-> ext4_evict_inode+0xaf0/0xdc0 fs/ext4/inode.c:299
-> evict+0x1aa/0x410 fs/inode.c:664
-> iput_final fs/inode.c:1775 [inline]
-> iput+0x42c/0x5b0 fs/inode.c:1801
-> do_unlinkat+0x2b9/0x4f0 fs/namei.c:4405
-> __do_sys_unlink fs/namei.c:4446 [inline]
-> __se_sys_unlink fs/namei.c:4444 [inline]
-> __x64_sys_unlink+0x30/0x40 fs/namei.c:4444
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> read to 0xffff88810271b1a0 of 8 bytes by task 2814 on cpu 1:
-> virtnet_stats+0x1b3/0x340 drivers/net/virtio_net.c:2564
-> dev_get_stats+0x6d/0x860 net/core/dev.c:10511
-> rtnl_fill_stats+0x45/0x320 net/core/rtnetlink.c:1261
-> rtnl_fill_ifinfo+0xd0e/0x1120 net/core/rtnetlink.c:1867
-> rtnl_dump_ifinfo+0x7f9/0xc20 net/core/rtnetlink.c:2240
-> netlink_dump+0x390/0x720 net/netlink/af_netlink.c:2266
-> netlink_recvmsg+0x425/0x780 net/netlink/af_netlink.c:1992
-> sock_recvmsg_nosec net/socket.c:1027 [inline]
-> sock_recvmsg net/socket.c:1049 [inline]
-> ____sys_recvmsg+0x156/0x310 net/socket.c:2760
-> ___sys_recvmsg net/socket.c:2802 [inline]
-> __sys_recvmsg+0x1ea/0x270 net/socket.c:2832
-> __do_sys_recvmsg net/socket.c:2842 [inline]
-> __se_sys_recvmsg net/socket.c:2839 [inline]
-> __x64_sys_recvmsg+0x46/0x50 net/socket.c:2839
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> value changed: 0x000000000045c334 -> 0x000000000045c376
-> 
-> Fixes: 3fa2a1df9094 ("virtio-net: per cpu 64 bit stats (v2)")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Wed, 2023-10-25 at 23:40 +0000, Justin Stitt wrote:
+> Add some warnings for using ethtool_sprintf() where a simple
+> ethtool_puts() would suffice.
 
-Okay then
+Hi again Justin.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+After I read patch 1/3 I don't object at all.
 
-> ---
->  drivers/net/virtio_net.c | 124 ++++++++++++++++++++-------------------
->  1 file changed, 65 insertions(+), 59 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 62962216b80c1537b06c1154315c8cd1c9c33413..d16f592c2061fad0414ed893672f91b7813c6423 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -81,24 +81,24 @@ struct virtnet_stat_desc {
->  
->  struct virtnet_sq_stats {
->  	struct u64_stats_sync syncp;
-> -	u64 packets;
-> -	u64 bytes;
-> -	u64 xdp_tx;
-> -	u64 xdp_tx_drops;
-> -	u64 kicks;
-> -	u64 tx_timeouts;
-> +	u64_stats_t packets;
-> +	u64_stats_t bytes;
-> +	u64_stats_t xdp_tx;
-> +	u64_stats_t xdp_tx_drops;
-> +	u64_stats_t kicks;
-> +	u64_stats_t tx_timeouts;
->  };
->  
->  struct virtnet_rq_stats {
->  	struct u64_stats_sync syncp;
-> -	u64 packets;
-> -	u64 bytes;
-> -	u64 drops;
-> -	u64 xdp_packets;
-> -	u64 xdp_tx;
-> -	u64 xdp_redirects;
-> -	u64 xdp_drops;
-> -	u64 kicks;
-> +	u64_stats_t packets;
-> +	u64_stats_t bytes;
-> +	u64_stats_t drops;
-> +	u64_stats_t xdp_packets;
-> +	u64_stats_t xdp_tx;
-> +	u64_stats_t xdp_redirects;
-> +	u64_stats_t xdp_drops;
-> +	u64_stats_t kicks;
->  };
->  
->  #define VIRTNET_SQ_STAT(m)	offsetof(struct virtnet_sq_stats, m)
-> @@ -775,8 +775,8 @@ static void free_old_xmit_skbs(struct send_queue *sq, bool in_napi)
->  		return;
->  
->  	u64_stats_update_begin(&sq->stats.syncp);
-> -	sq->stats.bytes += bytes;
-> -	sq->stats.packets += packets;
-> +	u64_stats_add(&sq->stats.bytes, bytes);
-> +	u64_stats_add(&sq->stats.packets, packets);
->  	u64_stats_update_end(&sq->stats.syncp);
->  }
->  
-> @@ -975,11 +975,11 @@ static int virtnet_xdp_xmit(struct net_device *dev,
->  	}
->  out:
->  	u64_stats_update_begin(&sq->stats.syncp);
-> -	sq->stats.bytes += bytes;
-> -	sq->stats.packets += packets;
-> -	sq->stats.xdp_tx += n;
-> -	sq->stats.xdp_tx_drops += n - nxmit;
-> -	sq->stats.kicks += kicks;
-> +	u64_stats_add(&sq->stats.bytes, bytes);
-> +	u64_stats_add(&sq->stats.packets, packets);
-> +	u64_stats_add(&sq->stats.xdp_tx, n);
-> +	u64_stats_add(&sq->stats.xdp_tx_drops, n - nxmit);
-> +	u64_stats_add(&sq->stats.kicks, kicks);
->  	u64_stats_update_end(&sq->stats.syncp);
->  
->  	virtnet_xdp_put_sq(vi, sq);
-> @@ -1011,14 +1011,14 @@ static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct xdp_buff *xdp,
->  	u32 act;
->  
->  	act = bpf_prog_run_xdp(xdp_prog, xdp);
-> -	stats->xdp_packets++;
-> +	u64_stats_inc(&stats->xdp_packets);
->  
->  	switch (act) {
->  	case XDP_PASS:
->  		return act;
->  
->  	case XDP_TX:
-> -		stats->xdp_tx++;
-> +		u64_stats_inc(&stats->xdp_tx);
->  		xdpf = xdp_convert_buff_to_frame(xdp);
->  		if (unlikely(!xdpf)) {
->  			netdev_dbg(dev, "convert buff to frame failed for xdp\n");
-> @@ -1036,7 +1036,7 @@ static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct xdp_buff *xdp,
->  		return act;
->  
->  	case XDP_REDIRECT:
-> -		stats->xdp_redirects++;
-> +		u64_stats_inc(&stats->xdp_redirects);
->  		err = xdp_do_redirect(dev, xdp, xdp_prog);
->  		if (err)
->  			return XDP_DROP;
-> @@ -1232,9 +1232,9 @@ static struct sk_buff *receive_small_xdp(struct net_device *dev,
->  	return skb;
->  
->  err_xdp:
-> -	stats->xdp_drops++;
-> +	u64_stats_inc(&stats->xdp_drops);
->  err:
-> -	stats->drops++;
-> +	u64_stats_inc(&stats->drops);
->  	put_page(page);
->  xdp_xmit:
->  	return NULL;
-> @@ -1253,7 +1253,7 @@ static struct sk_buff *receive_small(struct net_device *dev,
->  	struct sk_buff *skb;
->  
->  	len -= vi->hdr_len;
-> -	stats->bytes += len;
-> +	u64_stats_add(&stats->bytes, len);
->  
->  	if (unlikely(len > GOOD_PACKET_LEN)) {
->  		pr_debug("%s: rx error: len %u exceeds max size %d\n",
-> @@ -1282,7 +1282,7 @@ static struct sk_buff *receive_small(struct net_device *dev,
->  		return skb;
->  
->  err:
-> -	stats->drops++;
-> +	u64_stats_inc(&stats->drops);
->  	put_page(page);
->  	return NULL;
->  }
-> @@ -1298,14 +1298,14 @@ static struct sk_buff *receive_big(struct net_device *dev,
->  	struct sk_buff *skb =
->  		page_to_skb(vi, rq, page, 0, len, PAGE_SIZE, 0);
->  
-> -	stats->bytes += len - vi->hdr_len;
-> +	u64_stats_add(&stats->bytes, len - vi->hdr_len);
->  	if (unlikely(!skb))
->  		goto err;
->  
->  	return skb;
->  
->  err:
-> -	stats->drops++;
-> +	u64_stats_inc(&stats->drops);
->  	give_pages(rq, page);
->  	return NULL;
->  }
-> @@ -1326,7 +1326,7 @@ static void mergeable_buf_free(struct receive_queue *rq, int num_buf,
->  			DEV_STATS_INC(dev, rx_length_errors);
->  			break;
+spatch/cocci will always be a better option than checkpatch
+for conversions like this because it's a proper grammar parser
+and checkpatch is a stupid little perl script.
+
+If you resubmit this please:
+
+
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+[]
+> @@ -7020,6 +7020,19 @@ sub process {
+>  			     "Prefer strscpy, strscpy_pad, or __nonstring over strncpy - see:=
+ https://github.com/KSPP/linux/issues/90\n" . $herecurr);
 >  		}
-> -		stats->bytes += len;
-> +		u64_stats_add(&stats->bytes, len);
->  		page = virt_to_head_page(buf);
->  		put_page(page);
->  	}
-> @@ -1436,7 +1436,7 @@ static int virtnet_build_xdp_buff_mrg(struct net_device *dev,
->  			goto err;
->  		}
->  
-> -		stats->bytes += len;
-> +		u64_stats_add(&stats->bytes, len);
->  		page = virt_to_head_page(buf);
->  		offset = buf - page_address(page);
->  
-> @@ -1600,8 +1600,8 @@ static struct sk_buff *receive_mergeable_xdp(struct net_device *dev,
->  	put_page(page);
->  	mergeable_buf_free(rq, num_buf, dev, stats);
->  
-> -	stats->xdp_drops++;
-> -	stats->drops++;
-> +	u64_stats_inc(&stats->xdp_drops);
-> +	u64_stats_inc(&stats->drops);
->  	return NULL;
->  }
->  
-> @@ -1625,7 +1625,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
->  	unsigned int room = SKB_DATA_ALIGN(headroom + tailroom);
->  
->  	head_skb = NULL;
-> -	stats->bytes += len - vi->hdr_len;
-> +	u64_stats_add(&stats->bytes, len - vi->hdr_len);
->  
->  	if (unlikely(len > truesize - room)) {
->  		pr_debug("%s: rx error: len %u exceeds truesize %lu\n",
-> @@ -1666,7 +1666,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
->  			goto err_buf;
->  		}
->  
-> -		stats->bytes += len;
-> +		u64_stats_add(&stats->bytes, len);
->  		page = virt_to_head_page(buf);
->  
->  		truesize = mergeable_ctx_to_truesize(ctx);
-> @@ -1718,7 +1718,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
->  	mergeable_buf_free(rq, num_buf, dev, stats);
->  
->  err_buf:
-> -	stats->drops++;
-> +	u64_stats_inc(&stats->drops);
->  	dev_kfree_skb(head_skb);
->  	return NULL;
->  }
-> @@ -1985,7 +1985,7 @@ static bool try_fill_recv(struct virtnet_info *vi, struct receive_queue *rq,
->  		unsigned long flags;
->  
->  		flags = u64_stats_update_begin_irqsave(&rq->stats.syncp);
-> -		rq->stats.kicks++;
-> +		u64_stats_inc(&rq->stats.kicks);
->  		u64_stats_update_end_irqrestore(&rq->stats.syncp, flags);
->  	}
->  
-> @@ -2065,22 +2065,23 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
->  	struct virtnet_info *vi = rq->vq->vdev->priv;
->  	struct virtnet_rq_stats stats = {};
->  	unsigned int len;
-> +	int packets = 0;
->  	void *buf;
->  	int i;
->  
->  	if (!vi->big_packets || vi->mergeable_rx_bufs) {
->  		void *ctx;
->  
-> -		while (stats.packets < budget &&
-> +		while (packets < budget &&
->  		       (buf = virtnet_rq_get_buf(rq, &len, &ctx))) {
->  			receive_buf(vi, rq, buf, len, ctx, xdp_xmit, &stats);
-> -			stats.packets++;
-> +			packets++;
->  		}
->  	} else {
-> -		while (stats.packets < budget &&
-> +		while (packets < budget &&
->  		       (buf = virtnet_rq_get_buf(rq, &len, NULL)) != NULL) {
->  			receive_buf(vi, rq, buf, len, NULL, xdp_xmit, &stats);
-> -			stats.packets++;
-> +			packets++;
->  		}
->  	}
->  
-> @@ -2093,17 +2094,19 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
->  		}
->  	}
->  
-> +	u64_stats_set(&stats.packets, packets);
->  	u64_stats_update_begin(&rq->stats.syncp);
->  	for (i = 0; i < VIRTNET_RQ_STATS_LEN; i++) {
->  		size_t offset = virtnet_rq_stats_desc[i].offset;
-> -		u64 *item;
-> +		u64_stats_t *item, *src;
->  
-> -		item = (u64 *)((u8 *)&rq->stats + offset);
-> -		*item += *(u64 *)((u8 *)&stats + offset);
-> +		item = (u64_stats_t *)((u8 *)&rq->stats + offset);
-> +		src = (u64_stats_t *)((u8 *)&stats + offset);
-> +		u64_stats_add(item, u64_stats_read(src));
->  	}
->  	u64_stats_update_end(&rq->stats.syncp);
->  
-> -	return stats.packets;
-> +	return packets;
->  }
->  
->  static void virtnet_poll_cleantx(struct receive_queue *rq)
-> @@ -2158,7 +2161,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->  		sq = virtnet_xdp_get_sq(vi);
->  		if (virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq->vq)) {
->  			u64_stats_update_begin(&sq->stats.syncp);
-> -			sq->stats.kicks++;
-> +			u64_stats_inc(&sq->stats.kicks);
->  			u64_stats_update_end(&sq->stats.syncp);
->  		}
->  		virtnet_xdp_put_sq(vi, sq);
-> @@ -2370,7 +2373,7 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
->  	if (kick || netif_xmit_stopped(txq)) {
->  		if (virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq->vq)) {
->  			u64_stats_update_begin(&sq->stats.syncp);
-> -			sq->stats.kicks++;
-> +			u64_stats_inc(&sq->stats.kicks);
->  			u64_stats_update_end(&sq->stats.syncp);
->  		}
->  	}
-> @@ -2553,16 +2556,16 @@ static void virtnet_stats(struct net_device *dev,
->  
->  		do {
->  			start = u64_stats_fetch_begin(&sq->stats.syncp);
-> -			tpackets = sq->stats.packets;
-> -			tbytes   = sq->stats.bytes;
-> -			terrors  = sq->stats.tx_timeouts;
-> +			tpackets = u64_stats_read(&sq->stats.packets);
-> +			tbytes   = u64_stats_read(&sq->stats.bytes);
-> +			terrors  = u64_stats_read(&sq->stats.tx_timeouts);
->  		} while (u64_stats_fetch_retry(&sq->stats.syncp, start));
->  
->  		do {
->  			start = u64_stats_fetch_begin(&rq->stats.syncp);
-> -			rpackets = rq->stats.packets;
-> -			rbytes   = rq->stats.bytes;
-> -			rdrops   = rq->stats.drops;
-> +			rpackets = u64_stats_read(&rq->stats.packets);
-> +			rbytes   = u64_stats_read(&rq->stats.bytes);
-> +			rdrops   = u64_stats_read(&rq->stats.drops);
->  		} while (u64_stats_fetch_retry(&rq->stats.syncp, start));
->  
->  		tot->rx_packets += rpackets;
-> @@ -3191,17 +3194,19 @@ static void virtnet_get_ethtool_stats(struct net_device *dev,
->  	struct virtnet_info *vi = netdev_priv(dev);
->  	unsigned int idx = 0, start, i, j;
->  	const u8 *stats_base;
-> +	const u64_stats_t *p;
->  	size_t offset;
->  
->  	for (i = 0; i < vi->curr_queue_pairs; i++) {
->  		struct receive_queue *rq = &vi->rq[i];
->  
-> -		stats_base = (u8 *)&rq->stats;
-> +		stats_base = (const u8 *)&rq->stats;
->  		do {
->  			start = u64_stats_fetch_begin(&rq->stats.syncp);
->  			for (j = 0; j < VIRTNET_RQ_STATS_LEN; j++) {
->  				offset = virtnet_rq_stats_desc[j].offset;
-> -				data[idx + j] = *(u64 *)(stats_base + offset);
-> +				p = (const u64_stats_t *)(stats_base + offset);
-> +				data[idx + j] = u64_stats_read(p);
->  			}
->  		} while (u64_stats_fetch_retry(&rq->stats.syncp, start));
->  		idx += VIRTNET_RQ_STATS_LEN;
-> @@ -3210,12 +3215,13 @@ static void virtnet_get_ethtool_stats(struct net_device *dev,
->  	for (i = 0; i < vi->curr_queue_pairs; i++) {
->  		struct send_queue *sq = &vi->sq[i];
->  
-> -		stats_base = (u8 *)&sq->stats;
-> +		stats_base = (const u8 *)&sq->stats;
->  		do {
->  			start = u64_stats_fetch_begin(&sq->stats.syncp);
->  			for (j = 0; j < VIRTNET_SQ_STATS_LEN; j++) {
->  				offset = virtnet_sq_stats_desc[j].offset;
-> -				data[idx + j] = *(u64 *)(stats_base + offset);
-> +				p = (const u64_stats_t *)(stats_base + offset);
-> +				data[idx + j] = u64_stats_read(p);
->  			}
->  		} while (u64_stats_fetch_retry(&sq->stats.syncp, start));
->  		idx += VIRTNET_SQ_STATS_LEN;
-> @@ -3898,7 +3904,7 @@ static void virtnet_tx_timeout(struct net_device *dev, unsigned int txqueue)
->  	struct netdev_queue *txq = netdev_get_tx_queue(dev, txqueue);
->  
->  	u64_stats_update_begin(&sq->stats.syncp);
-> -	sq->stats.tx_timeouts++;
-> +	u64_stats_inc(&sq->stats.tx_timeouts);
->  	u64_stats_update_end(&sq->stats.syncp);
->  
->  	netdev_err(dev, "TX timeout on queue: %u, sq: %s, vq: 0x%x, name: %s, %u usecs ago\n",
-> -- 
-> 2.42.0.758.gaed0368e0e-goog
+> =20
+> +# ethtool_sprintf uses that should likely be ethtool_puts
+> +		if (   $line =3D~ /\bethtool_sprintf\s*\(\s*$FuncArg\s*,\s*$FuncArg\s*=
+\)/   ) {
+> +			WARN("ETHTOOL_SPRINTF",
+> +			     "Prefer ethtool_puts over ethtool_sprintf with only two argument=
+s" . $herecurr);
+> +		}
+> +
+> +		# use $rawline because $line loses %s via sanitization and thus we can=
+'t match against it.
+> +		if (   $rawline =3D~ /\bethtool_sprintf\s*\(\s*$FuncArg\s*,\s*\"\%s\"\=
+s*,\s*$FuncArg\s*\)/   ) {
+> +			WARN("ETHTOOL_SPRINTF2",
+> +			     "Prefer ethtool_puts over ethtool_sprintf with standalone \"%s\"=
+ specifier" . $herecurr);
+> +		}
+
+o remove the whitespace before and after the parentheses
+o use the same type "ETHTOOL_SPRINTF" or maybe "PREFER_ETHTOOL_PUTS"
+  for both warnings.
+o Add a newline on the message output
+o Add a --fix option
+
+Something like:
+---
+ scripts/checkpatch.pl | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 25fdb7fda1128..6924731110d87 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -7011,6 +7011,25 @@ sub process {
+ 			     "Prefer strscpy, strscpy_pad, or __nonstring over strncpy - see: h=
+ttps://github.com/KSPP/linux/issues/90\n" . $herecurr);
+ 		}
+=20
++# ethtool_sprintf uses that should likely be ethtool_puts
++		if ($line =3D~ /\bethtool_sprintf\s*\(\s*$FuncArg\s*,\s*$FuncArg\s*\)/) =
+{
++			if (WARN("PREFER_ETHTOOL_PUTS",
++				 "Prefer ethtool_puts over ethtool_sprintf with only two arguments\n" =
+. $herecurr) &&
++			    $fix) {
++				$fixed[$fixlinenr] =3D~ s/\bethtool_sprintf\s*\(\s*($FuncArg)\s*,\s*($=
+FuncArg)/ethtool_puts($1, $7)/;
++			}
++		}
++
++		# use $rawline because $line loses %s via sanitization and thus we can't=
+ match against it.
++		if ($rawline =3D~ /\bethtool_sprintf\s*\(\s*$FuncArg\s*,\s*\"\%s\"\s*,\s=
+*$FuncArg\s*\)/) {
++			if (WARN("PREFER_ETHTOOL_PUTS",
++				 "Prefer ethtool_puts over ethtool_sprintf with standalone \"%s\" spec=
+ifier\n" . $herecurr) &&
++			    $fix) {
++				$fixed[$fixlinenr] =3D~ s/\bethtool_sprintf\s*\(\s*($FuncArg)\s*,\s*"\=
+%s"\s*,\s*($FuncArg)/ethtool_puts($1, $7)/;
++			}
++		}
++
++
+ # typecasts on min/max could be min_t/max_t
+ 		if ($perl_version_ok &&
+ 		    defined $stat &&
+
+
 
 
