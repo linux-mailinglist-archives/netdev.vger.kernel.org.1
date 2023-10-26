@@ -1,68 +1,98 @@
-Return-Path: <netdev+bounces-44549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C17727D88BE
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 21:11:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADA697D88ED
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 21:31:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55D79B20E8D
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 19:11:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DECC11C20ED8
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 19:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994723B282;
-	Thu, 26 Oct 2023 19:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750353B2B4;
+	Thu, 26 Oct 2023 19:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Hck3Lmv1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dd8cu/aU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0DD3AC17
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 19:11:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C2B4C433C7;
-	Thu, 26 Oct 2023 19:11:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1698347507;
-	bh=Nta3p2RmHPi+PBWCmBctW0fY8+7DtRZDqSuQ8WJcx8Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hck3Lmv18PHu9GyKTR44pNGFKPa2aqBPtezwcIqhVcfFwJ4CDtDk3IkzDUOUsyruI
-	 MrCR33DWlCEGF1SQzyg68lO0XR8W/7bYnkZUy/roJmSt2Xy7TkS0KnfBYm45mz9/rN
-	 uJ5yErQ/+exRaivp4UNO4Fkl/tILhI6XnEBxodpc=
-Date: Thu, 26 Oct 2023 21:11:43 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, ulf.hansson@linaro.org, rostedt@goodmis.org,
-	sj@kernel.org, schspa@gmail.com, vladbu@nvidia.com,
-	idosch@nvidia.com
-Subject: Re: [PATCH net-next 3/4] net: fill in MODULE_DESCRIPTION()s under
- net/802*
-Message-ID: <2023102633-quake-nape-bffb@gregkh>
-References: <20231026190101.1413939-1-kuba@kernel.org>
- <20231026190101.1413939-4-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585E53B2AB
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 19:31:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 913CDC433C8;
+	Thu, 26 Oct 2023 19:30:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698348659;
+	bh=YGvTcDodB0sRAjcNb1b1GrCpOY2psaPKQ0iCqLIPzxA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dd8cu/aUDOlAWrvhfXjMP1d3r3W4EQe/Be0iZEF2TunImVpx64rnP/tcKAKV4Kad0
+	 iM8BZsWlKtdqUsvegnbpMfgcwgrpDCb1XUVXYlSu8xeSpg875zPWM5+KtzK/urpPNf
+	 opTHG5sS/2k4NRJ/XoFtsd6OHhAM1iTHJoSW2kCYRvJNCwuGuVuMhrl+Tt42lqwxZR
+	 q8w7JWDxP7CH+vrTUcaQaNzNRVd0QgnHsyJtsv5QdL6PZDfngr2CGhqCidc31r8mXZ
+	 aKJic+moVk3tn+cLJvg7P+/JXZnqZCREXJBMpmFWrb16WT2i4+A1IaYhaGdTzSowWK
+	 gXN1oxHbomzqw==
+Date: Thu, 26 Oct 2023 12:30:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com
+Subject: Re: [patch net-next v3] tools: ynl: introduce option to process
+ unknown attributes or types
+Message-ID: <20231026123058.140072c7@kernel.org>
+In-Reply-To: <ZTqS6hePUFrxuBLM@nanopsycho>
+References: <20231025095736.801231-1-jiri@resnulli.us>
+	<20231025175636.2a7858a6@kernel.org>
+	<ZTn7v05E2iirB0g2@nanopsycho>
+	<20231026074120.6c1b9fb5@kernel.org>
+	<ZTqS6hePUFrxuBLM@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231026190101.1413939-4-kuba@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 26, 2023 at 12:01:00PM -0700, Jakub Kicinski wrote:
-> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+On Thu, 26 Oct 2023 18:25:14 +0200 Jiri Pirko wrote:
+> Thu, Oct 26, 2023 at 04:41:20PM CEST, kuba@kernel.org wrote:
+> >On Thu, 26 Oct 2023 07:42:33 +0200 Jiri Pirko wrote:  
+> >> {'129': {'0': [type:0 len:12] b'\x00\x00\x00\x00\x00\x00\x00\x00',
+> >>          '1': [type:1 len:12] b'\x00\x00\x00\x00\x00\x00\x00\x00',
+> >>          '2': [type:2 len:12] b'(\x00\x00\x00\x00\x00\x00\x00'},
+> >> Looks like unnecessary redundant info, I would rather stick with
+> >> "as_bin()". __repr__() is printable representation of the whole object,
+> >> we just need value here, already have that in a structured object.
+> >> 
+> >> 
+> >> What is "type" and "len" good for here?  
+> >
+> >I already gave you a longer explanation, if you don't like the
+> >duplication, how about you stop keying them on a (stringified?!) id.  
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: ulf.hansson@linaro.org
-> CC: rostedt@goodmis.org
-> CC: sj@kernel.org
-> CC: schspa@gmail.com
-> CC: gregkh@linuxfoundation.org
-> CC: vladbu@nvidia.com
-> CC: idosch@nvidia.com
+> I don't care that much, it just looks weird :)
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+As I said my key requirement is that the NlAttr object must still 
+be there in the result.
+
+Maybe a good compromise is to stick it into the key, instead of the
+value. Replacing the stringified type id. Then you can keep the
+value as binary. We'd need to wrap it into another class but whatever,
+compromises.
+
+IDK how this works in Python exactly but to give you a rough idea
+here's pseudo code typed in the email client:
+
+class UnknownNlAttrKey:
+	def __init__(self, nlattr):
+		self.nla = nlattr
+	def __hash__(self):
+		return self.nla.type
+	def __eq__(self, other):
+		if isintance(other, Unknown...):
+			return other.nla.type == self.nla.type
+		return False
+	def __repr__():
+		return f"UnknownAttr({self.nla.type})"
 
