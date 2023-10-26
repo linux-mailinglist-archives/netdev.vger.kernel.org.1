@@ -1,67 +1,58 @@
-Return-Path: <netdev+bounces-44551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1E5D7D8917
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 21:42:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95BA87D8924
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 21:47:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D4A5281F51
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 19:42:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C1BD1F2330B
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 19:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32E593C064;
-	Thu, 26 Oct 2023 19:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7783C082;
+	Thu, 26 Oct 2023 19:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ns0bI/OA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Lj49dNdx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C474E3B7A7
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 19:42:42 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE491AC
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 12:42:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698349362; x=1729885362;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=vpvUTfYs7vHDtBYHUrs6zCXfncXkM3VoEmewNy6+y/E=;
-  b=ns0bI/OAqPO6Wrravn29FGJrBq0AX4d/t3cVOFSz+mBNQgPFjPam2wY5
-   8d4SaXYwt2fJrTtiCWIm7ZG6s9Xpfo1+vjgzOcFsVg6Gem9+Vx5xtTZKR
-   0k0gYV0Gg9qbC9Wh+iv9AcJoAe2zNS67P20bUbd31Gp59+t8HmaawGKs6
-   kWzwrqqUsz5bdOHnvohESoFbZClqBIzDsoDZoFIQpf8fmOGXaIGyuYH8/
-   dR4tF/OD0SZw94559Fy5dzAeiG4SpISs57V2/YJmIj/Fh1Q/+ZsbBwbQo
-   /546wYnZmhsPn7g5iyAx3BuxFS2C8h8OMRRfAN3x3df7EutZgoNme8/aL
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="446049"
-X-IronPort-AV: E=Sophos;i="6.03,254,1694761200"; 
-   d="scan'208";a="446049"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 12:42:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="1090695032"
-X-IronPort-AV: E=Sophos;i="6.03,254,1694761200"; 
-   d="scan'208";a="1090695032"
-Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 26 Oct 2023 12:42:38 -0700
-Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qw6FY-000A56-35;
-	Thu, 26 Oct 2023 19:42:36 +0000
-Date: Fri, 27 Oct 2023 03:41:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Cc: oe-kbuild-all@lists.linux.dev, Herbert Xu <herbert@gondor.apana.org.au>,
-	Antony Antony <antony.antony@secunet.com>, devel@linux-ipsec.org,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH ipsec-next 1/2] xfrm: introduce forwarding of ICMP Error
- messages
-Message-ID: <202310270353.sobcrQay-lkp@intel.com>
-References: <4b30e07300159db93ec0f6b31778aa0f6a41ef21.1698331320.git.antony.antony@secunet.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3B23B786;
+	Thu, 26 Oct 2023 19:46:53 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EBFD1B2;
+	Thu, 26 Oct 2023 12:46:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iSmsri1S5YsHLGyRgvyYOQUdppxAE4tSQENMgUEYJTk=; b=Lj49dNdxL88asba/4AQ4/rbxuB
+	uiYG0+vP8JAHgjyRrAg489KvzAsLU2SAuEWnT1oUtY3l5TamzP9W+KdNMmxSeG1Gbjnevz/rKhWiP
+	/L7/mcm++PhmfdHdlU+oRqttclmche12Z9/GXbNVQAKzGUJwavfbd1CNNzfuYNNuY0gQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qw6JQ-000HAX-D9; Thu, 26 Oct 2023 21:46:36 +0200
+Date: Thu, 26 Oct 2023 21:46:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban.Veerasooran@microchip.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	corbet@lwn.net, Steen.Hegelund@microchip.com, rdunlap@infradead.org,
+	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, Horatiu.Vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
+Subject: Re: [PATCH net-next v2 1/9] net: ethernet: implement OPEN Alliance
+ control transaction interface
+Message-ID: <3c7a04a3-4ae2-4f83-b7bf-0db75f58f5be@lunn.ch>
+References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
+ <20231023154649.45931-2-Parthiban.Veerasooran@microchip.com>
+ <c51d9660-d6c3-4202-9fc6-b9add06b64ce@lunn.ch>
+ <8430c607-4a62-47fc-9c13-9ba17cf09679@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,55 +61,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4b30e07300159db93ec0f6b31778aa0f6a41ef21.1698331320.git.antony.antony@secunet.com>
+In-Reply-To: <8430c607-4a62-47fc-9c13-9ba17cf09679@microchip.com>
 
-Hi Antony,
+> Still if you feel like using "write" instead of "wnr" and "protect" 
+> instead of "prote", I will change them in the next revision.
 
-kernel test robot noticed the following build warnings:
+There is some value in using names from the standard, if they are
+actually good names. But i guess most developers don't have a copy of
+the standard by there side. 
 
-[auto build test WARNING on klassert-ipsec-next/master]
-[also build test WARNING on klassert-ipsec/master net-next/main net/main linus/master v6.6-rc7 next-20231026]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+You actually wrote in the patch:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Antony-Antony/xfrm-fix-source-address-in-icmp-error-generation-from-IPsec-gateway/20231026-234542
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
-patch link:    https://lore.kernel.org/r/4b30e07300159db93ec0f6b31778aa0f6a41ef21.1698331320.git.antony.antony%40secunet.com
-patch subject: [PATCH ipsec-next 1/2] xfrm: introduce forwarding of ICMP Error messages
-config: csky-randconfig-002-20231027 (https://download.01.org/0day-ci/archive/20231027/202310270353.sobcrQay-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231027/202310270353.sobcrQay-lkp@intel.com/reproduce)
++/* Control header */
++#define CTRL_HDR_DNC           BIT(31)         /* Data-Not-Control */
++#define CTRL_HDR_HDRB          BIT(30)         /* Received Header Bad */
++#define CTRL_HDR_WNR           BIT(29)         /* Write-Not-Read */
++#define CTRL_HDR_AID           BIT(28)         /* Address Increment Disable */
++#define CTRL_HDR_MMS           GENMASK(27, 24) /* Memory Map Selector */
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310270353.sobcrQay-lkp@intel.com/
+The comments suggest you also don't think the names are particularly
+good, otherwise you would not of added comments.
 
-All warnings (new ones prefixed by >>):
+But if you instead had:
 
-   net/xfrm/xfrm_policy.c: In function 'icmp_err_packet':
->> net/xfrm/xfrm_policy.c:3490:30: warning: unused variable 'fl6' [-Wunused-variable]
-    3490 |         const struct flowi6 *fl6 = &fl->u.ip6;
-         |                              ^~~
+/* Control header */
+#define CTRL_HDR_DATA_NOT_CTRL           BIT(31)
+#define CTRL_HDR_HDR_RX_BAD              BIT(30)
+#define CTRL_HDR_WRITE           	 BIT(29)
+#define CTRL_HDR_ADDR_INC_DISABLE        BIT(28)
+#define CTRL_HDR_MEM_MAP_SELECTOR        GENMASK(27, 24)
 
+the names are probably sufficient that comments are not needed.  And
+is should be easy for somebody to map these back to the names used in
+the standard.
 
-vim +/fl6 +3490 net/xfrm/xfrm_policy.c
+This also to some extent comes into the comment about coding style, a
+function does one thing, is short, etc. Short functions tend to have
+less indentation, meaning you can use longer names. And longer names
+are more readable, making the function easier to understand, so it
+does that one thing well.
 
-  3487	
-  3488	static bool icmp_err_packet(const struct flowi *fl, unsigned short family)
-  3489	{
-> 3490		const struct flowi6 *fl6 = &fl->u.ip6;
-  3491		const struct flowi4 *fl4 = &fl->u.ip4;
-  3492	
-  3493		if (family == AF_INET &&
-  3494		    fl4->flowi4_proto == IPPROTO_ICMP &&
-  3495		    (fl4->fl4_icmp_type == ICMP_DEST_UNREACH ||
-  3496		     fl4->fl4_icmp_type == ICMP_TIME_EXCEEDED))
-  3497			return true;
-  3498	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+    Andrew
 
