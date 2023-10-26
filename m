@@ -1,118 +1,108 @@
-Return-Path: <netdev+bounces-44403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D521A7D7D8C
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 09:22:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA9247D7DA5
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 09:30:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75A33B211FE
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 07:22:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74267281D96
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 07:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19EAE11C84;
-	Thu, 26 Oct 2023 07:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C2415ADC;
+	Thu, 26 Oct 2023 07:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AiunzlF0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ayxiNJor"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E254A50
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:22:14 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44419116
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 00:22:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698304932;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3ZJkB38/zw4XAEeeCL9Roq4pYoTYCFvhY7CDxbqwXS0=;
-	b=AiunzlF0s2HMU1sz+dFgNkYX7IvZgc81ZEgxHKYSC/i/7e9p2dLzXZUFrXYDujlDwyKWhJ
-	2RrbTuch1TSYWGiblfXr6O4iWmA/k6pyUtgTCRs8skl69mMjqjkWXt6aQLqFAQJyyPuhWU
-	Jl6xE9Q6S/MqefSdRYAa48prGgbfurw=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-7Lpd8Mn_NIa0l26T_ZlmNA-1; Thu, 26 Oct 2023 03:22:10 -0400
-X-MC-Unique: 7Lpd8Mn_NIa0l26T_ZlmNA-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9c167384046so1848066b.0
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 00:22:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698304929; x=1698909729;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3ZJkB38/zw4XAEeeCL9Roq4pYoTYCFvhY7CDxbqwXS0=;
-        b=PSU6VXm2RYP9/3aER/9McPZx9K/2/Hb7V5tvdYP4sWahfLodISMDuzyEiAfXKfYXTL
-         0Di/jmBanjQnV5iDyhUd0K2XEIo+x/peBfI1XcM7kiRPxbqDcPl2Q2+sgZSGqnqVVzy3
-         ajQCueSM8bLHPaXIhP3DukysSzCpKk/aaYNFmJQDa2mGUIQKnzQt40D+Da7E+/XLk4IW
-         RT7fAeu/Us/0msX7TyAjACdLhqT7LCt7niOtVq9XdWMHf5Lni12RJ7hKZzPfQ4ZHzJaL
-         rnS30NFLvO/FiyL8VW7KL8ONq+fxwkOAWWPoJc+TqIwRmrZ4zDqbEoZR7IgAZQM0xFWf
-         PEQA==
-X-Gm-Message-State: AOJu0YyzkhZwkfoxAFgIrMbkI2QbduvGEWOXL7uaTbv5CdUpsSLFa/1f
-	rGDGksDhTuTva8et4LfIC90dO3pjJjZy01j/Z3Jf/lFBQzL0qlU6UTkXz0LxMiVVhK/bhdlYK9w
-	gZ2A74wkQlYS/zCdv
-X-Received: by 2002:a17:906:6d8f:b0:9c9:603c:407e with SMTP id h15-20020a1709066d8f00b009c9603c407emr8068032ejt.0.1698304929379;
-        Thu, 26 Oct 2023 00:22:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFiqm3J1X0mq1YRAUrKSxwrYawpgs3wu4cuGHSmjF2OVu9Mp1a/tpcR0y8zIaFQ4jGcVwc1RA==
-X-Received: by 2002:a17:906:6d8f:b0:9c9:603c:407e with SMTP id h15-20020a1709066d8f00b009c9603c407emr8068018ejt.0.1698304929028;
-        Thu, 26 Oct 2023 00:22:09 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-245-52.dyn.eolo.it. [146.241.245.52])
-        by smtp.gmail.com with ESMTPSA id vl9-20020a170907b60900b00989828a42e8sm11040909ejc.154.2023.10.26.00.22.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 00:22:08 -0700 (PDT)
-Message-ID: <5436a58dc63d7e7cc2cb2fbda722f0c0406e88bf.camel@redhat.com>
-Subject: Re: [PATCH] Fix termination state for idr_for_each_entry_ul()
-From: Paolo Abeni <pabeni@redhat.com>
-To: NeilBrown <neilb@suse.de>, netdev@vger.kernel.org, "David S. Miller"
-	 <davem@davemloft.net>
-Cc: LKML <linux-kernel@vger.kernel.org>, Matthew Wilcox
- <willy@infradead.org>,  Chris Mi <chrism@mellanox.com>, Cong Wang
- <xiyou.wangcong@gmail.com>
-Date: Thu, 26 Oct 2023 09:22:07 +0200
-In-Reply-To: <169810161336.20306.1410058490199370047@noble.neil.brown.name>
-References: <169810161336.20306.1410058490199370047@noble.neil.brown.name>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E668615AC9
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:30:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A20C3C433C8;
+	Thu, 26 Oct 2023 07:30:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698305403;
+	bh=pAwP1jHpRtTe/CQMNXQpqHZtr7aLv1pmbZ62cYbAQc4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ayxiNJorqqVDQK8jmKxtM50/BnibcRizFqMdhq/Sj4UDMg0b7CQfdIQ7cHo2SO7Zm
+	 cMIJJ3qOSOw6ivjTxNHfV7ksp7+RG44DY2FAToqF3hfkdMUH9JCPrOlC/au2gaLW9o
+	 TWhpvME+eCn+3ogQ6hv2kcVzudJHsvjtQ6GSuqmQLxee+6Ovk2llun4+Q2PnIzPsQm
+	 IrH3mqR2nKNI2RmBII5AoV6gCeUJWUi/lNzZx93Qj/kjjWy7txHQqnQMTKLwQVafjJ
+	 yXeAAYCFYSMFL1QURR8pxC30EBsFtUaAVunvIGKe2niu04TPdkjJ7jqgSq5IQ6bfs8
+	 Qjhjy9YRZNx/g==
+Date: Thu, 26 Oct 2023 10:29:58 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeed@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [pull request][net-next V2 00/15] mlx5 updates 2023-10-19
+Message-ID: <20231026072958.GD2950466@unreal>
+References: <20231021064620.87397-1-saeed@kernel.org>
+ <20231024180251.2cb78de4@kernel.org>
+ <20231025085202.GC2950466@unreal>
+ <20231025182502.54f79369@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231025182502.54f79369@kernel.org>
 
-On Tue, 2023-10-24 at 09:53 +1100, NeilBrown wrote:
-> The comment for idr_for_each_entry_ul() states
->=20
->   after normal termination @entry is left with the value NULL
->=20
-> This is not correct in the case where UINT_MAX has an entry in the idr.
-> In that case @entry will be non-NULL after termination.
-> No current code depends on the documentation being correct, but to
-> save future code we should fix it.
->=20
-> Also fix idr_for_each_entry_continue_ul().  While this is not documented
-> as leaving @entry as NULL, the mellanox driver appears to depend on
-> it doing so.  So make that explicit in the documentation as well as in
-> the code.
->=20
-> Fixes: e33d2b74d805 ("idr: fix overflow case for idr_for_each_entry_ul()"=
-)
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: Chris Mi <chrism@mellanox.com>
-> Cc: Cong Wang <xiyou.wangcong@gmail.com>
-> Signed-off-by: NeilBrown <neilb@suse.de>
+On Wed, Oct 25, 2023 at 06:25:02PM -0700, Jakub Kicinski wrote:
+> On Wed, 25 Oct 2023 11:52:02 +0300 Leon Romanovsky wrote:
+> > This patch won't fix much without following patch in that series.
+> > https://lore.kernel.org/all/20231021064620.87397-8-saeed@kernel.org/
+> > 
+> > Yes, users will see their replay window correctly through "ip xfrm state"
+> > command, so this is why it has Fixes line, but it won't change anything
+> > in the actual behavior without patch 7 and this is the reason why it was
+> > sent to net-next.
+> 
+> Odd ordering of patches, anyone doing backports would totally miss it.
+> Neither does the commit message explain the situation nor is it
+> possible to grok that fact from the ("pass it to FW") code :(
 
-Since the affected user is in the netdev tree, I think we can take this
-patch. But this is also a sort of gray area of the tree... @Matthew are
-you ok with that?
+This is why these patches are bundled together as one series.
 
-Thanks,
+> 
+> > From patch 3:
+> >  Users can configure IPsec replay window size, but mlx5 driver didn't
+> >  honor their choice and set always 32bits.
+> > 
+> > From patch 7:
+> >  After IPsec decryption it isn't enough to only check the IPsec syndrome
+> >  but need to also check the ASO syndrome in order to verify that the
+> >  operation was actually successful.
+> 
+> Hm, patch 7 looks like an independent but related fix to my uneducated
+> eye, should it also have a Fixes tag?
+> 
+> Is patch 7 needed regardless of what choice of (previously ignored)
+> parameters user makes?
 
-Paolo
+Yes, I missed register check and without that replay protection feature
+didn't work as one would expect, so it is needed anyway. The patch is
+large, complex (IMHO not for -rc7) and I agree with Saeed that "missed register"
+sounds like "missed feature".
 
+> One way to deal with the problems from patches 
+> 3 and 4 could be to reject the de facto unsupported configurations.
+> But if the supported config also doesn't check the "syndrome" correctly
+> in all cases, that's no bueno..
+
+Patch 4 was discovered before replay window testing, when we run HW vs.
+SW interoperability testing. The feature of setting seq/oseq is orthogonal
+to replay window.
+
+Thanks
+
+> 
 
