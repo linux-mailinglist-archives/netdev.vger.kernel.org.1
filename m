@@ -1,302 +1,294 @@
-Return-Path: <netdev+bounces-44339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 484547D792D
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 02:17:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E8F17D7937
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 02:19:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A114F281EE7
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 00:17:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32086281E13
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 00:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314F1370;
-	Thu, 26 Oct 2023 00:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A9F368;
+	Thu, 26 Oct 2023 00:19:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MkrJhdOQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4ITJBtB"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDC315DA;
-	Thu, 26 Oct 2023 00:16:58 +0000 (UTC)
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99787182;
-	Wed, 25 Oct 2023 17:16:56 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6bb744262caso64818b3a.0;
-        Wed, 25 Oct 2023 17:16:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698279416; x=1698884216; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b7tKUGSRGFWKOxWQ0xJnY6SNOvBsWIYWTCe4vmFebQM=;
-        b=MkrJhdOQuyJC51P2Ek8wP1WdCBcrSJ9/mv2jnPpoyL+b+7EeYfMbi3O+SKG9BBg2iv
-         2JnPysxWZWfbCWRsEToOfFps9A1IuWGLaHNYgD7eoyDXkP+Q43YftevabRtzEWCF/lqF
-         h1WTcA1qeBo/ID7fiRorJ2kIEjW//rZsaTxpHKXW/fe0cSJioBH3sAMMAo7RjWX7SBNJ
-         V3N2EiG71RluZU4pafJz+JDHAcC6DMfWge3GJeLjMJhjFUM6AfZaylSdKw4LgvVW+RMb
-         4ashh7/EXTK/opbdaCUu8Awq0Rwo4P1gpATEcOdh9wDwzsi/wPgfYMv1q9+9KdqbIIUf
-         LiCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698279416; x=1698884216;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b7tKUGSRGFWKOxWQ0xJnY6SNOvBsWIYWTCe4vmFebQM=;
-        b=h/zv9fsaCWB2JEhBxXUmuKab5X4ZX/pwIrk7jpXoxFIDOWI5OsxtRKSW2KFMtrP0al
-         Yblgqk4MOdtRcnPr2tSldolqME1U9VNuSpbx31rkQIWHF67u0D16xXufU4ioN2BgF1ke
-         Z2m9wwdW4r98GRCZ5KYo203+FgugYNR6LYEBdtHKPAW+udQkTJUIW8kJ+ThUD+VyAGyR
-         q2Rroc21zakEFFL8vMOb/gs2KdwaU0X0x5/eMavCFKKpjnjwXE6+ZuE+y8VR/vMhestI
-         P3hyoOV6vR8d6x/R0E7UBT6vyGVBLHqIczhxiGRRK/8sdO7hnSjy7BLzhDJQMrL0lAwl
-         pQGw==
-X-Gm-Message-State: AOJu0Yy+L2NQWc2VqcLSOEoCVDKDLYpiTeqicX+jI/+IuHsbOh0DWCzR
-	8Bm98+ur2wKRnP97mQCiFLWWvT2CegiKWeE/
-X-Google-Smtp-Source: AGHT+IG2EprG2hmZacRjCK8TkrnPGsZfQ1ZbeWee+1rVkIjbxxkZCanNABVtOK9dDUdB5AvCjmzTVw==
-X-Received: by 2002:a05:6a00:212a:b0:6b5:523e:9e9 with SMTP id n10-20020a056a00212a00b006b5523e09e9mr16414643pfj.3.1698279415777;
-        Wed, 25 Oct 2023 17:16:55 -0700 (PDT)
-Received: from ip-172-30-47-114.us-west-2.compute.internal (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id z123-20020a626581000000b006b341144ad0sm10407945pfb.102.2023.10.25.17.16.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 17:16:55 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: netdev@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch,
-	tmgross@umich.edu,
-	miguel.ojeda.sandonis@gmail.com,
-	benno.lossin@proton.me,
-	wedsonaf@gmail.com
-Subject: [PATCH net-next v7 5/5] net: phy: add Rust Asix PHY driver
-Date: Thu, 26 Oct 2023 09:10:50 +0900
-Message-Id: <20231026001050.1720612-6-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
-References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883B8163
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 00:19:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 096AEC433C8;
+	Thu, 26 Oct 2023 00:19:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698279556;
+	bh=+KTawYjd1Lr/vb7P4FZ9u6c6TjnG8CbjQeARedrOKT4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=V4ITJBtBCG81WDlEX6ihDhsw9Pyv0Wz39Oi/S3n62MGTCKC727MDFBApYbAfNJQQ2
+	 m6NDX5CdRvdfO5k6KnkCTQzwDviCDaUNjDOwDwcSIumKK+BYp6rAZNnw6IaupWcvT/
+	 QBHY4A3mS1/kVNdqG6x/7E03nWljKyWrIY+U3KqjmXcKHJHuIk33ZyTDFK3DLgsGUi
+	 p/R4u+0s5IjiH3klXqXbXJtY+pzDC95S/ifV2/DNS9VlmP0GadUCSgKZqMXvhayIta
+	 j+YibBfetRaSZrTnKET0pGsJ14NIsTGudT9S6B+5asIPa2JWhLE/5HqTsZMDuP7Gmm
+	 ok7xbjLUlyxOQ==
+Message-ID: <18391efa-3328-4e3f-ad9c-d278ea128095@kernel.org>
+Date: Wed, 25 Oct 2023 18:19:15 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7] vxlan: add support for flowlabel inherit
+Content-Language: en-US
+To: Alce Lafranque <alce@lafranque.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: Vincent Bernat <vincent@bernat.ch>
+References: <20231024165028.251294-1-alce@lafranque.net>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20231024165028.251294-1-alce@lafranque.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-This is the Rust implementation of drivers/net/phy/ax88796b.c. The
-features are equivalent. You can choose C or Rust versionon kernel
-configuration.
+On 10/24/23 10:50 AM, Alce Lafranque wrote:
+> By default, VXLAN encapsulation over IPv6 sets the flow label to 0, with
+> an option for a fixed value. This commits add the ability to inherit the
+> flow label from the inner packet, like for other tunnel implementations.
+> This enables devices using only L3 headers for ECMP to correctly balance
+> VXLAN-encapsulated IPv6 packets.
+> 
+> ```
+> $ ./ip/ip link add dummy1 type dummy
+> $ ./ip/ip addr add 2001:db8::2/64 dev dummy1
+> $ ./ip/ip link set up dev dummy1
+> $ ./ip/ip link add vxlan1 type vxlan id 100 flowlabel inherit remote 2001:db8::1 local 2001:db8::2
+> $ ./ip/ip link set up dev vxlan1
+> $ ./ip/ip addr add 2001:db8:1::2/64 dev vxlan1
+> $ ./ip/ip link set arp off dev vxlan1
+> $ ping -q 2001:db8:1::1 &
+> $ tshark -d udp.port==8472,vxlan -Vpni dummy1 -c1
+> [...]
+> Internet Protocol Version 6, Src: 2001:db8::2, Dst: 2001:db8::1
+>     0110 .... = Version: 6
+>     .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
+>         .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
+>         .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+>     .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
+> [...]
+> Virtual eXtensible Local Area Network
+>     Flags: 0x0800, VXLAN Network ID (VNI)
+>     Group Policy ID: 0
+>     VXLAN Network Identifier (VNI): 100
+> [...]
+> Internet Protocol Version 6, Src: 2001:db8:1::2, Dst: 2001:db8:1::1
+>     0110 .... = Version: 6
+>     .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
+>         .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
+>         .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+>     .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
+> ```
+> 
+> Signed-off-by: Alce Lafranque <alce@lafranque.net>
+> Co-developed-by: Vincent Bernat <vincent@bernat.ch>
+> Signed-off-by: Vincent Bernat <vincent@bernat.ch>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> 
+> ---
+> v7:
+>   - Rebase patch
+> v6:
+>   - Rebase patch
+> v5: https://lore.kernel.org/netdev/20231019180417.210523-1-alce@lafranque.net/
+>   - Rollback policy label to fixed by default
+> v4: https://lore.kernel.org/all/20231014132102.54051-1-alce@lafranque.net/
+>   - Fix tabs
+> v3: https://lore.kernel.org/all/20231014131320.51810-1-alce@lafranque.net/
+>   - Adopt policy label inherit by default
+>   - Set policy to label fixed when flowlabel is set
+>   - Rename IFLA_VXLAN_LABEL_BEHAVIOR to IFLA_VXLAN_LABEL_POLICY
+> v2: https://lore.kernel.org/all/20231007142624.739192-1-alce@lafranque.net/
+>   - Use an enum instead of flag to define label behavior
+> v1: https://lore.kernel.org/all/4444C5AE-FA5A-49A4-9700-7DD9D7916C0F.1@mail.lac-coloc.fr/
+> ---
+>  drivers/net/vxlan/vxlan_core.c | 23 ++++++++++++++++++++++-
+>  include/net/ip_tunnels.h       | 11 +++++++++++
+>  include/net/vxlan.h            | 33 +++++++++++++++++----------------
+>  include/uapi/linux/if_link.h   |  8 ++++++++
+>  4 files changed, 58 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+> index 7b526ae16ed0..821f8c4de784 100644
+> --- a/drivers/net/vxlan/vxlan_core.c
+> +++ b/drivers/net/vxlan/vxlan_core.c
+> @@ -2379,7 +2379,17 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+>  		else
+>  			udp_sum = !(flags & VXLAN_F_UDP_ZERO_CSUM6_TX);
+>  #if IS_ENABLED(CONFIG_IPV6)
+> -		key.label = vxlan->cfg.label;
+> +		switch (vxlan->cfg.label_policy) {
+> +		case VXLAN_LABEL_FIXED:
+> +			key.label = vxlan->cfg.label;
+> +			break;
+> +		case VXLAN_LABEL_INHERIT:
+> +			key.label = ip_tunnel_get_flowlabel(old_iph, skb);
+> +			break;
+> +		default:
+> +			DEBUG_NET_WARN_ON_ONCE(1);
+> +			goto drop;
+> +		}
+>  #endif
+>  	} else {
+>  		if (!info) {
+> @@ -3365,6 +3375,7 @@ static const struct nla_policy vxlan_policy[IFLA_VXLAN_MAX + 1] = {
+>  	[IFLA_VXLAN_DF]		= { .type = NLA_U8 },
+>  	[IFLA_VXLAN_VNIFILTER]	= { .type = NLA_U8 },
+>  	[IFLA_VXLAN_LOCALBYPASS]	= NLA_POLICY_MAX(NLA_U8, 1),
+> +	[IFLA_VXLAN_LABEL_POLICY]	= NLA_POLICY_MAX(NLA_U8, VXLAN_LABEL_MAX),
+>  };
+>  
+>  static int vxlan_validate(struct nlattr *tb[], struct nlattr *data[],
+> @@ -3739,6 +3750,12 @@ static int vxlan_config_validate(struct net *src_net, struct vxlan_config *conf,
+>  		return -EINVAL;
+>  	}
+>  
+> +	if (conf->label_policy && !use_ipv6) {
+> +		NL_SET_ERR_MSG(extack,
+> +			       "Label policy only applies to IPv6 VXLAN devices");
+> +		return -EINVAL;
+> +	}
+> +
+>  	if (conf->remote_ifindex) {
+>  		struct net_device *lowerdev;
+>  
+> @@ -4081,6 +4098,8 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
+>  	if (data[IFLA_VXLAN_LABEL])
+>  		conf->label = nla_get_be32(data[IFLA_VXLAN_LABEL]) &
+>  			     IPV6_FLOWLABEL_MASK;
+> +	if (data[IFLA_VXLAN_LABEL_POLICY])
+> +		conf->label_policy = nla_get_u8(data[IFLA_VXLAN_LABEL_POLICY]);
+>  
+>  	if (data[IFLA_VXLAN_LEARNING]) {
+>  		err = vxlan_nl2flag(conf, data, IFLA_VXLAN_LEARNING,
+> @@ -4398,6 +4417,7 @@ static size_t vxlan_get_size(const struct net_device *dev)
+>  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_TOS */
+>  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_DF */
+>  		nla_total_size(sizeof(__be32)) + /* IFLA_VXLAN_LABEL */
+> +		nla_total_size(sizeof(__u8)) +  /* IFLA_VXLAN_LABEL_POLICY */
+>  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_LEARNING */
+>  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_PROXY */
+>  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_RSC */
+> @@ -4470,6 +4490,7 @@ static int vxlan_fill_info(struct sk_buff *skb, const struct net_device *dev)
+>  	    nla_put_u8(skb, IFLA_VXLAN_TOS, vxlan->cfg.tos) ||
+>  	    nla_put_u8(skb, IFLA_VXLAN_DF, vxlan->cfg.df) ||
+>  	    nla_put_be32(skb, IFLA_VXLAN_LABEL, vxlan->cfg.label) ||
+> +	    nla_put_u8(skb, IFLA_VXLAN_LABEL_POLICY, vxlan->cfg.label_policy) ||
+>  	    nla_put_u8(skb, IFLA_VXLAN_LEARNING,
+>  		       !!(vxlan->cfg.flags & VXLAN_F_LEARN)) ||
+>  	    nla_put_u8(skb, IFLA_VXLAN_PROXY,
+> diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+> index f346b4efbc30..2d746f4c9a0a 100644
+> --- a/include/net/ip_tunnels.h
+> +++ b/include/net/ip_tunnels.h
+> @@ -416,6 +416,17 @@ static inline u8 ip_tunnel_get_dsfield(const struct iphdr *iph,
+>  		return 0;
+>  }
+>  
+> +static inline __be32 ip_tunnel_get_flowlabel(const struct iphdr *iph,
+> +					     const struct sk_buff *skb)
+> +{
+> +	__be16 payload_protocol = skb_protocol(skb, true);
+> +
+> +	if (payload_protocol == htons(ETH_P_IPV6))
+> +		return ip6_flowlabel((const struct ipv6hdr *)iph);
+> +	else
+> +		return 0;
+> +}
+> +
+>  static inline u8 ip_tunnel_get_ttl(const struct iphdr *iph,
+>  				       const struct sk_buff *skb)
+>  {
+> diff --git a/include/net/vxlan.h b/include/net/vxlan.h
+> index 6a9f8a5f387c..33ba6fc151cf 100644
+> --- a/include/net/vxlan.h
+> +++ b/include/net/vxlan.h
+> @@ -210,22 +210,23 @@ struct vxlan_rdst {
+>  };
+>  
+>  struct vxlan_config {
+> -	union vxlan_addr	remote_ip;
+> -	union vxlan_addr	saddr;
+> -	__be32			vni;
+> -	int			remote_ifindex;
+> -	int			mtu;
+> -	__be16			dst_port;
+> -	u16			port_min;
+> -	u16			port_max;
+> -	u8			tos;
+> -	u8			ttl;
+> -	__be32			label;
+> -	u32			flags;
+> -	unsigned long		age_interval;
+> -	unsigned int		addrmax;
+> -	bool			no_share;
+> -	enum ifla_vxlan_df	df;
+> +	union vxlan_addr		remote_ip;
+> +	union vxlan_addr		saddr;
+> +	__be32				vni;
+> +	int				remote_ifindex;
+> +	int				mtu;
+> +	__be16				dst_port;
+> +	u16				port_min;
+> +	u16				port_max;
+> +	u8				tos;
+> +	u8				ttl;
+> +	__be32				label;
+> +	enum ifla_vxlan_label_policy	label_policy;
+> +	u32				flags;
+> +	unsigned long			age_interval;
+> +	unsigned int			addrmax;
+> +	bool				no_share;
+> +	enum ifla_vxlan_df		df;
+>  };
+>  
+>  enum {
+> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+> index 9f8a3da0f14f..f71c195b7abf 100644
+> --- a/include/uapi/linux/if_link.h
+> +++ b/include/uapi/linux/if_link.h
+> @@ -832,6 +832,7 @@ enum {
+>  	IFLA_VXLAN_DF,
+>  	IFLA_VXLAN_VNIFILTER, /* only applicable with COLLECT_METADATA mode */
+>  	IFLA_VXLAN_LOCALBYPASS,
+> +	IFLA_VXLAN_LABEL_POLICY,
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Reviewed-by: Trevor Gross <tmgross@umich.edu>
-Reviewed-by: Benno Lossin <benno.lossin@proton.me>
----
- MAINTAINERS                      |   8 ++
- drivers/net/phy/Kconfig          |   8 ++
- drivers/net/phy/Makefile         |   6 +-
- drivers/net/phy/ax88796b_rust.rs | 129 +++++++++++++++++++++++++++++++
- rust/uapi/uapi_helper.h          |   2 +
- 5 files changed, 152 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/phy/ax88796b_rust.rs
+If you do a respin, a comment here would be good. e.g.,
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f0f0610defd6..aad0325121e0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3058,6 +3058,14 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/net/asix,ax88796c.yaml
- F:	drivers/net/ethernet/asix/ax88796c_*
- 
-+ASIX PHY DRIVER [RUST]
-+M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
-+R:	Trevor Gross <tmgross@umich.edu>
-+L:	netdev@vger.kernel.org
-+L:	rust-for-linux@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/phy/ax88796b_rust.rs
-+
- ASPEED CRYPTO DRIVER
- M:	Neal Liu <neal_liu@aspeedtech.com>
- L:	linux-aspeed@lists.ozlabs.org (moderated for non-subscribers)
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 0faebdb184ca..11b18370a05b 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -115,6 +115,14 @@ config AX88796B_PHY
- 	  Currently supports the Asix Electronics PHY found in the X-Surf 100
- 	  AX88796B package.
- 
-+config AX88796B_RUST_PHY
-+	bool "Rust reference driver for Asix PHYs"
-+	depends on RUST_PHYLIB_ABSTRACTIONS && AX88796B_PHY
-+	help
-+	  Uses the Rust reference driver for Asix PHYs (ax88796b_rust.ko).
-+	  The features are equivalent. It supports the Asix Electronics PHY
-+	  found in the X-Surf 100 AX88796B package.
-+
- config BROADCOM_PHY
- 	tristate "Broadcom 54XX PHYs"
- 	select BCM_NET_PHYLIB
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index c945ed9bd14b..58d7dfb095ab 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -41,7 +41,11 @@ aquantia-objs			+= aquantia_hwmon.o
- endif
- obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
- obj-$(CONFIG_AT803X_PHY)	+= at803x.o
--obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-+ifdef CONFIG_AX88796B_RUST_PHY
-+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b_rust.o
-+else
-+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-+endif
- obj-$(CONFIG_BCM54140_PHY)	+= bcm54140.o
- obj-$(CONFIG_BCM63XX_PHY)	+= bcm63xx.o
- obj-$(CONFIG_BCM7XXX_PHY)	+= bcm7xxx.o
-diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
-new file mode 100644
-index 000000000000..6c24c94ab2db
---- /dev/null
-+++ b/drivers/net/phy/ax88796b_rust.rs
-@@ -0,0 +1,129 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (C) 2023 FUJITA Tomonori <fujita.tomonori@gmail.com>
-+
-+//! Rust Asix PHYs driver
-+//!
-+//! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796b.c)
-+use kernel::c_str;
-+use kernel::net::phy::{self, DeviceId, Driver};
-+use kernel::prelude::*;
-+use kernel::uapi;
-+
-+kernel::module_phy_driver! {
-+    drivers: [PhyAX88772A, PhyAX88772C, PhyAX88796B],
-+    device_table: [
-+        DeviceId::new_with_driver::<PhyAX88772A>(),
-+        DeviceId::new_with_driver::<PhyAX88772C>(),
-+        DeviceId::new_with_driver::<PhyAX88796B>()
-+    ],
-+    name: "rust_asix_phy",
-+    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
-+    description: "Rust Asix PHYs driver",
-+    license: "GPL",
-+}
-+
-+// Performs a software PHY reset using the standard
-+// BMCR_RESET bit and poll for the reset bit to be cleared.
-+// Toggle BMCR_RESET bit off to accommodate broken AX8796B PHY implementation
-+// such as used on the Individual Computers' X-Surf 100 Zorro card.
-+fn asix_soft_reset(dev: &mut phy::Device) -> Result {
-+    dev.write(uapi::MII_BMCR as u16, 0)?;
-+    dev.genphy_soft_reset()
-+}
-+
-+struct PhyAX88772A;
-+
-+#[vtable]
-+impl phy::Driver for PhyAX88772A {
-+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772A");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1861);
-+
-+    // AX88772A is not working properly with some old switches (NETGEAR EN 108TP):
-+    // after autoneg is done and the link status is reported as active, the MII_LPA
-+    // register is 0. This issue is not reproducible on AX88772C.
-+    fn read_status(dev: &mut phy::Device) -> Result<u16> {
-+        dev.genphy_update_link()?;
-+        if !dev.is_link_up() {
-+            return Ok(0);
-+        }
-+        // If MII_LPA is 0, phy_resolve_aneg_linkmode() will fail to resolve
-+        // linkmode so use MII_BMCR as default values.
-+        let ret = dev.read(uapi::MII_BMCR as u16)?;
-+
-+        if ret as u32 & uapi::BMCR_SPEED100 != 0 {
-+            dev.set_speed(uapi::SPEED_100);
-+        } else {
-+            dev.set_speed(uapi::SPEED_10);
-+        }
-+
-+        let duplex = if ret as u32 & uapi::BMCR_FULLDPLX != 0 {
-+            phy::DuplexMode::Full
-+        } else {
-+            phy::DuplexMode::Half
-+        };
-+        dev.set_duplex(duplex);
-+
-+        dev.genphy_read_lpa()?;
-+
-+        if dev.is_autoneg_enabled() && dev.is_autoneg_completed() {
-+            dev.resolve_aneg_linkmode();
-+        }
-+
-+        Ok(0)
-+    }
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        dev.genphy_resume()
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+
-+    fn link_change_notify(dev: &mut phy::Device) {
-+        // Reset PHY, otherwise MII_LPA will provide outdated information.
-+        // This issue is reproducible only with some link partner PHYs.
-+        if dev.state() == phy::DeviceState::NoLink {
-+            let _ = dev.init_hw();
-+            let _ = dev.start_aneg();
-+        }
-+    }
-+}
-+
-+struct PhyAX88772C;
-+
-+#[vtable]
-+impl Driver for PhyAX88772C {
-+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772C");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1881);
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        dev.genphy_resume()
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+}
-+
-+struct PhyAX88796B;
-+
-+#[vtable]
-+impl Driver for PhyAX88796B {
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88796B");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_model_mask(0x003b1841);
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+}
-diff --git a/rust/uapi/uapi_helper.h b/rust/uapi/uapi_helper.h
-index 301f5207f023..08f5e9334c9e 100644
---- a/rust/uapi/uapi_helper.h
-+++ b/rust/uapi/uapi_helper.h
-@@ -7,3 +7,5 @@
-  */
- 
- #include <uapi/asm-generic/ioctl.h>
-+#include <uapi/linux/mii.h>
-+#include <uapi/linux/ethtool.h>
--- 
-2.34.1
+IFLA_VXLAN_LABEL_POLICY, /* IPv6 flow label policy; see
+ifla_vxlan_label_policy */
+
+
+>  	__IFLA_VXLAN_MAX
+>  };
+>  #define IFLA_VXLAN_MAX	(__IFLA_VXLAN_MAX - 1)
+> @@ -849,6 +850,13 @@ enum ifla_vxlan_df {
+>  	VXLAN_DF_MAX = __VXLAN_DF_END - 1,
+>  };
+>  
+> +enum ifla_vxlan_label_policy {
+> +	VXLAN_LABEL_FIXED = 0,
+> +	VXLAN_LABEL_INHERIT = 1,
+> +	__VXLAN_LABEL_END,
+> +	VXLAN_LABEL_MAX = __VXLAN_LABEL_END - 1,
+> +};
+> +
+>  /* GENEVE section */
+>  enum {
+>  	IFLA_GENEVE_UNSPEC,
+
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
 
