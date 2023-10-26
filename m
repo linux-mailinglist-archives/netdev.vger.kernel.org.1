@@ -1,392 +1,101 @@
-Return-Path: <netdev+bounces-44374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 877487D7AB9
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 04:13:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD6CB7D7AE4
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 04:29:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA29C1C20DD1
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 02:13:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39FB8281E09
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 02:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFE10881E;
-	Thu, 26 Oct 2023 02:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA348F47;
+	Thu, 26 Oct 2023 02:29:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jmQxp4oA"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46329440B
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 02:13:38 +0000 (UTC)
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B8C4182;
-	Wed, 25 Oct 2023 19:13:36 -0700 (PDT)
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-27d4b280e4eso266282a91.1;
-        Wed, 25 Oct 2023 19:13:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698286415; x=1698891215;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PVtOucga/HOCt9RaToOcCBOddRstGXfEelwtCQYfWtQ=;
-        b=uF6j76JKI2s0JumJh2zTllze2Gv7+uVEmTTUqXjd9mdMZoqKTSZAfC9Rzf45ZqksZ+
-         /8eSSt9nDv+zyGBnz24I8Apnfr8JVr3wc4yT0wNT4VPTa1i1Wvb5oh8Zexk/NmVh8eOg
-         zrNwKz+4C5oUkkTjMZaJPGJF0Fe3h8q6UjHfiVyPFQkVBZUD7fZMiV0Lxv3UxWM4MXwT
-         h9sPgjWB4C0dRgEilwt+L7J8siSELVnJa1eP0FfCRdzixt4bAjhQRbMgQOmweDGUxTMi
-         F1HfCG0VhKbHgZQtCc9flLtK9qZeI9sRFKyyrw0rukcx92o8/RxwIrWTMFCe0lUnMuWX
-         qI1w==
-X-Gm-Message-State: AOJu0Yzg3IvRQwumPiHsvNbJLL9Th6ncGOu4dKOIK+q0syGbKm8IpOau
-	E2vW33Tm0I5UgVniEDI+syWqMigcl0imDTHTxsI=
-X-Google-Smtp-Source: AGHT+IEo66NaPcxTkpFcnyssE/3d/nqUYWfZ9BrDD1Op3sLt/qkKSANFyzcI2tFHw82vxrUDSRhjPKFM0wc4RhxkJa8=
-X-Received: by 2002:a17:90b:789:b0:27f:e51d:aab9 with SMTP id
- l9-20020a17090b078900b0027fe51daab9mr1697980pjz.0.1698286415441; Wed, 25 Oct
- 2023 19:13:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA2F2F44
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 02:29:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D408C433C7;
+	Thu, 26 Oct 2023 02:29:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698287359;
+	bh=1CibCq0Kyu0ElVY8wg0jgw0Tv9e0nIvv2sB62YcRwrY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jmQxp4oAGewFn9D93NwKSTdCAJMeSo0jZ3MFf9RSSlRunyWlpNRUyTJZ3iwlWvxnP
+	 jk7G1n39kQkRI65fYKYLVwiELppk6qqfprCPcj0wUHApKBYoKCaguwakRm78rLaKwG
+	 OyBVHUwMkVgTBW+sk5B00fv4rQcFGhcbbS01tQEjpRoykPz+sHRMC7koO8MWNF+o5+
+	 b9k9inA4oKAcLpZiD7Q0Kkd3CGLqY5W8h5ahYt3vqMhsWeMfyr/mfp6zl36Y06/zzQ
+	 4BHfiVCcvbtdMCLM+BAJTqNx7FkhSjwcmXyDqAhk/G1HYk1i2YikA91LA4AbsZ7g6y
+	 nj2XEphK3O5cQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	o.rempel@pengutronix.de
+Subject: [PATCH net-next] net: selftests: use ethtool_sprintf()
+Date: Wed, 25 Oct 2023 19:29:16 -0700
+Message-ID: <20231026022916.566661-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231025173300.1776832-1-florian.fainelli@broadcom.com>
- <20231025173300.1776832-5-florian.fainelli@broadcom.com> <CAMZ6RqJJXK5EyyOwXXbdA-bDTY=_JQ+xfKpoCHDJZqv+rNnASQ@mail.gmail.com>
-In-Reply-To: <CAMZ6RqJJXK5EyyOwXXbdA-bDTY=_JQ+xfKpoCHDJZqv+rNnASQ@mail.gmail.com>
-From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Date: Thu, 26 Oct 2023 11:13:24 +0900
-Message-ID: <CAMZ6Rq+iBazJ+fM5yd5Tfa8==DEGV93iD-XojU=f1m3ScSGEww@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/5] net: phy: broadcom: Add support for WAKE_FILTER
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, Doug Berger <opendmb@gmail.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Gal Pressman <gal@nvidia.com>, Willem de Bruijn <willemb@google.com>, 
-	Daniil Tatianin <d-tatianin@yandex-team.ru>, Simon Horman <horms@kernel.org>, 
-	Justin Chen <justin.chen@broadcom.com>, Ratheesh Kannoth <rkannoth@marvell.com>, 
-	Joe Damato <jdamato@fastly.com>, Jiri Pirko <jiri@resnulli.us>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu. 26 Oct. 2023 at 10:10, Vincent MAILHOL
-<mailhol.vincent@wanadoo.fr> wrote:
-> Hi Florian,
->
-> On Thu. 26 Oct. 2023 at 02:32, Florian Fainelli
-> <florian.fainelli@broadcom.com> wrote:
-> > Since the PHY is capable of matching any arbitrary Ethernet MAC
-> > destination as a programmable wake-up pattern, add support for doing
-> > that using the WAKE_FILTER and ethtool::rxnfc API. For instance, in
-> > order to wake-up from the Ethernet MAC address corresponding to the IPv4
-> > multicast IP address of 224.0.0.251 (e.g.: multicast DNS), one could do:
-> >
-> > ethtool -N eth0 flow-type ether dst 01:00:5e:00:00:fb loc 0 action -2
-> > ethtool -n eth0
-> > Total 1 rules
-> >
-> > Filter: 0
-> >         Flow Type: Raw Ethernet
-> >         Src MAC addr: 00:00:00:00:00:00 mask: FF:FF:FF:FF:FF:FF
-> >         Dest MAC addr: 01:00:5E:00:00:FB mask: 00:00:00:00:00:00
-> >         Ethertype: 0x0 mask: 0xFFFF
-> >         Action: Wake-on-LAN
-> > ethtool -s eth0 wol f
->
-> Nit: indent the commands and their output with two spaces.
->
-> > Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> > ---
-> >  drivers/net/phy/bcm-phy-lib.c | 195 +++++++++++++++++++++++++++++++++-
-> >  drivers/net/phy/bcm-phy-lib.h |   5 +
-> >  drivers/net/phy/broadcom.c    |   2 +
-> >  3 files changed, 201 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/phy/bcm-phy-lib.c b/drivers/net/phy/bcm-phy-lib.c
-> > index 876f28fd8256..cfbeedc5ee81 100644
-> > --- a/drivers/net/phy/bcm-phy-lib.c
-> > +++ b/drivers/net/phy/bcm-phy-lib.c
-> > @@ -827,7 +827,8 @@ EXPORT_SYMBOL_GPL(bcm_phy_cable_test_get_status_rdb);
-> >                                          WAKE_MCAST | \
-> >                                          WAKE_BCAST | \
-> >                                          WAKE_MAGIC | \
-> > -                                        WAKE_MAGICSECURE)
-> > +                                        WAKE_MAGICSECURE | \
-> > +                                        WAKE_FILTER)
->
-> Nit: you may want to have the closing bracket on a newline to have a
-> cleaner diff for new future additions.
->
-> >  int bcm_phy_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
-> >  {
-> > @@ -881,6 +882,12 @@ int bcm_phy_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
-> >         ctl &= ~BCM54XX_WOL_DIR_PKT_EN;
-> >         ctl &= ~(BCM54XX_WOL_SECKEY_OPT_MASK << BCM54XX_WOL_SECKEY_OPT_SHIFT);
-> >
-> > +       /* For WAKE_FILTER, we have already programmed the desired MAC DA
-> > +        * and associated mask by the time we get there.
-> > +        */
-> > +       if (wol->wolopts & WAKE_FILTER)
-> > +               goto program_ctl;
-> > +
-> >         /* When using WAKE_MAGIC, we program the magic pattern filter to match
-> >          * the device's MAC address and we accept any MAC DA in the Ethernet
-> >          * frame.
-> > @@ -935,6 +942,7 @@ int bcm_phy_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
-> >                         return ret;
-> >         }
-> >
-> > +program_ctl:
-> >         if (wol->wolopts & WAKE_MAGICSECURE) {
-> >                 ctl |= BCM54XX_WOL_SECKEY_OPT_6B <<
-> >                        BCM54XX_WOL_SECKEY_OPT_SHIFT;
-> > @@ -999,6 +1007,16 @@ void bcm_phy_get_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
-> >         if (!(ctl & BCM54XX_WOL_EN))
-> >                 return;
-> >
-> > +       ret = bcm_phy_read_exp(phydev, BCM54XX_WOL_SEC_KEY_8B);
-> > +       if (ret < 0)
-> > +               return;
-> > +
-> > +       /* Mutualy exclusive with other modes */
-> > +       if (ret) {
-> > +               wol->wolopts |= WAKE_FILTER;
-> > +               return;
-> > +       }
-> > +
-> >         for (i = 0; i < sizeof(da) / 2; i++) {
-> >                 ret = bcm_phy_read_exp(phydev,
-> >                                        BCM54XX_WOL_MPD_DATA2(2 - i));
-> > @@ -1066,6 +1084,181 @@ int bcm_phy_led_brightness_set(struct phy_device *phydev,
-> >  }
-> >  EXPORT_SYMBOL_GPL(bcm_phy_led_brightness_set);
-> >
-> > +static int bcm_phy_get_rule(struct phy_device *phydev,
-> > +                           struct ethtool_rxnfc *nfc,
-> > +                           int loc)
-> > +{
-> > +       u8 da[ETH_ALEN];
-> > +       unsigned int i;
-> > +       int ret;
-> > +
-> > +       if (loc != 0)
-> > +               return -EINVAL;
-> > +
-> > +       memset(nfc, 0, sizeof(*nfc));
-> > +       nfc->flow_type = ETHER_FLOW;
-> > +       nfc->fs.flow_type = ETHER_FLOW;
-> > +
-> > +       for (i = 0; i < sizeof(da) / 2; i++) {
-> > +               ret = bcm_phy_read_exp(phydev,
-> > +                                      BCM54XX_WOL_MPD_DATA2(2 - i));
-> > +               if (ret < 0)
-> > +                       return ret;
-> > +
-> > +               da[i * 2] = ret >> 8;
-> > +               da[i * 2 + 1] = ret & 0xff;
->
-> This looks like an endianness conversion (I can not tell if this is
-> big to little or the opposite)...
+During a W=1 build GCC 13.2 says:
 
-Oopsy! On second look, this is an open coded cpu to big endian
-conversion. So the question I should have asked is:
+net/core/selftests.c: In function ‘net_selftest_get_strings’:
+net/core/selftests.c:404:52: error: ‘%s’ directive output may be truncated writing up to 279 bytes into a region of size 28 [-Werror=format-truncation=]
+  404 |                 snprintf(p, ETH_GSTRING_LEN, "%2d. %s", i + 1,
+      |                                                    ^~
+net/core/selftests.c:404:17: note: ‘snprintf’ output between 5 and 284 bytes into a destination of size 32
+  404 |                 snprintf(p, ETH_GSTRING_LEN, "%2d. %s", i + 1,
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  405 |                          net_selftests[i].name);
+      |                          ~~~~~~~~~~~~~~~~~~~~~~
 
-  why not use the put_unaligned_be16() helper here?
+avoid it by using ethtool_sprintf().
 
-Below comments still remain.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: o.rempel@pengutronix.de
+---
+ net/core/selftests.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-> > +       }
-> > +       ether_addr_copy(nfc->fs.h_u.ether_spec.h_dest, da);
-> > +
-> > +       for (i = 0; i < sizeof(da) / 2; i++) {
-> > +               ret = bcm_phy_read_exp(phydev,
-> > +                                      BCM54XX_WOL_MASK(2 - i));
-> > +               if (ret < 0)
-> > +                       return ret;
-> > +
-> > +               da[i * 2] = ~(ret >> 8);
-> > +               da[i * 2 + 1] = ~(ret & 0xff);
-> > +       }
-> > +       ether_addr_copy(nfc->fs.m_u.ether_spec.h_dest, da);
-> > +
-> > +       ret = bcm_phy_read_exp(phydev, BCM54XX_WOL_INNER_PROTO);
-> > +       if (ret < 0)
-> > +               return ret;
-> > +
-> > +       nfc->fs.h_u.ether_spec.h_proto = be16_to_cpu(ret);
->
-> ... but here it is big endian to cpu endian? It does not look coherent.
->
-> Also, did you run parse to check your endianness conversions?
->
->   https://www.kernel.org/doc/html/latest/dev-tools/sparse.html
->
-> For example, I would have expected htons() (a.k.a. cpu_to_be16())
-> instead of be16_to_cpu().
->
-> > +       nfc->fs.ring_cookie = RX_CLS_FLOW_WAKE;
-> > +       nfc->fs.location = 0;
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +static int bcm_phy_set_rule(struct phy_device *phydev,
-> > +                           struct ethtool_rxnfc *nfc)
-> > +{
-> > +       int ret = -EOPNOTSUPP;
-> > +       unsigned int i;
-> > +       __be16 h_proto;
-> > +       const u8 *da;
-> > +
-> > +       /* We support only matching on the MAC DA with a custom mask and
-> > +        * optionally with a specific Ethernet type, reject anything else.
-> > +        */
-> > +       if (nfc->fs.ring_cookie != RX_CLS_FLOW_WAKE ||
-> > +           (nfc->fs.location != 0 &&
-> > +            nfc->fs.location != RX_CLS_LOC_ANY &&
-> > +            nfc->fs.location != RX_CLS_LOC_FIRST) ||
-> > +           nfc->fs.flow_type != ETHER_FLOW ||
-> > +           !is_zero_ether_addr(nfc->fs.h_u.ether_spec.h_source) ||
-> > +           !is_zero_ether_addr(nfc->fs.m_u.ether_spec.h_source))
-> > +               return ret;
-> > +
-> > +       ret = bcm_phy_read_exp(phydev, BCM54XX_WOL_SEC_KEY_8B);
-> > +       if (ret < 0)
-> > +               return ret;
-> > +
-> > +       if (ret)
-> > +               return -EBUSY;
-> > +
-> > +       if (nfc->fs.location == RX_CLS_LOC_ANY ||
-> > +           nfc->fs.location == RX_CLS_LOC_FIRST)
-> > +               nfc->fs.location = 0;
-> > +
-> > +       da = nfc->fs.h_u.ether_spec.h_dest;
-> > +       for (i = 0; i < ETH_ALEN / 2; i++) {
-> > +               ret = bcm_phy_write_exp(phydev,
-> > +                                       BCM54XX_WOL_MPD_DATA2(2 - i),
-> > +                                       da[i * 2] << 8 | da[i * 2 + 1]);
-> > +               if (ret < 0)
-> > +                       return ret;
-> > +       }
-> > +
-> > +       da = nfc->fs.m_u.ether_spec.h_dest;
-> > +       for (i = 0; i < ETH_ALEN / 2; i++) {
-> > +               ret = bcm_phy_write_exp(phydev,
-> > +                                       BCM54XX_WOL_MASK(2 - i),
-> > +                                       da[i * 2] << 8 | da[i * 2 + 1]);
-> > +               if (ret < 0)
-> > +                       return ret;
-> > +       }
-> > +
-> > +       /* Restore default inner protocol field unless overridden by the flow
-> > +        * specification.
-> > +        */
-> > +       h_proto = be16_to_cpu(nfc->fs.h_u.ether_spec.h_proto);
-> > +       if (!h_proto)
-> > +               h_proto = ETH_P_8021Q;
-> > +
-> > +       ret = bcm_phy_write_exp(phydev, BCM54XX_WOL_INNER_PROTO,
-> > +                               h_proto);
-> > +       if (ret)
-> > +               return ret;
-> > +
-> > +       /* Use BCM54XX_WOL_SEC_KEY_8B as a scratch register to record
-> > +        * that we installed a filter rule.
-> > +        */
-> > +       return bcm_phy_write_exp(phydev, BCM54XX_WOL_SEC_KEY_8B, 1);
-> > +}
-> > +
-> > +int bcm_phy_get_rxnfc(struct phy_device *phydev,
-> > +                     struct ethtool_rxnfc *cmd, u32 *rule_locs)
-> > +{
-> > +       int err = 0, rule_cnt = 0;
-> > +
-> > +       err = bcm_phy_read_exp(phydev, BCM54XX_WOL_SEC_KEY_8B);
-> > +       if (err < 0)
-> > +               return err;
-> > +
-> > +       rule_cnt = err;
-> > +       err = 0;
-> > +
-> > +       switch (cmd->cmd) {
-> > +       case ETHTOOL_GRXCLSRLCNT:
-> > +               cmd->rule_cnt = rule_cnt;
-> > +               cmd->data = 1 | RX_CLS_LOC_SPECIAL;
-> > +               break;
-> > +       case ETHTOOL_GRXCLSRULE:
-> > +               err = bcm_phy_get_rule(phydev, cmd, cmd->fs.location);
-> > +               break;
-> > +       case ETHTOOL_GRXCLSRLALL:
-> > +               if (rule_cnt)
-> > +                       rule_locs[0] = 0;
-> > +               cmd->rule_cnt = rule_cnt;
-> > +               cmd->data = 1;
-> > +               break;
-> > +       default:
-> > +               err = -EOPNOTSUPP;
-> > +               break;
-> > +       }
-> > +
-> > +       return err;
-> > +}
-> > +EXPORT_SYMBOL_GPL(bcm_phy_get_rxnfc);
-> > +
-> > +int bcm_phy_set_rxnfc(struct phy_device *phydev,
-> > +                     struct ethtool_rxnfc *cmd)
-> > +{
-> > +       int err = 0;
-> > +
-> > +       switch (cmd->cmd) {
-> > +       case ETHTOOL_SRXCLSRLINS:
-> > +               err = bcm_phy_set_rule(phydev, cmd);
-> > +               break;
-> > +       case ETHTOOL_SRXCLSRLDEL:
-> > +               if (cmd->fs.location != 0)
-> > +                       return err;
-> > +
-> > +               err = bcm_phy_write_exp(phydev, BCM54XX_WOL_SEC_KEY_8B, 0);
-> > +               break;
-> > +       default:
-> > +               err = -EOPNOTSUPP;
-> > +               break;
-> > +       }
-> > +
-> > +       return err;
-> > +}
-> > +EXPORT_SYMBOL_GPL(bcm_phy_set_rxnfc);
-> > +
-> >  MODULE_DESCRIPTION("Broadcom PHY Library");
-> >  MODULE_LICENSE("GPL v2");
-> >  MODULE_AUTHOR("Broadcom Corporation");
-> > diff --git a/drivers/net/phy/bcm-phy-lib.h b/drivers/net/phy/bcm-phy-lib.h
-> > index b52189e45a84..7081edcec06b 100644
-> > --- a/drivers/net/phy/bcm-phy-lib.h
-> > +++ b/drivers/net/phy/bcm-phy-lib.h
-> > @@ -121,4 +121,9 @@ irqreturn_t bcm_phy_wol_isr(int irq, void *dev_id);
-> >  int bcm_phy_led_brightness_set(struct phy_device *phydev,
-> >                                u8 index, enum led_brightness value);
-> >
-> > +int bcm_phy_get_rxnfc(struct phy_device *phydev,
-> > +                     struct ethtool_rxnfc *nfc, u32 *rule_locs);
-> > +int bcm_phy_set_rxnfc(struct phy_device *phydev,
-> > +                     struct ethtool_rxnfc *nfc);
-> > +
-> >  #endif /* _LINUX_BCM_PHY_LIB_H */
-> > diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
-> > index 3a627105675a..6c2212bd2779 100644
-> > --- a/drivers/net/phy/broadcom.c
-> > +++ b/drivers/net/phy/broadcom.c
-> > @@ -1107,6 +1107,8 @@ static struct phy_driver broadcom_drivers[] = {
-> >         .get_wol        = bcm54xx_phy_get_wol,
-> >         .set_wol        = bcm54xx_phy_set_wol,
-> >         .led_brightness_set     = bcm_phy_led_brightness_set,
-> > +       .get_rxnfc      = bcm_phy_get_rxnfc,
-> > +       .set_rxnfc      = bcm_phy_set_rxnfc,
-> >  }, {
-> >         .phy_id         = PHY_ID_BCM5461,
-> >         .phy_id_mask    = 0xfffffff0,
-> > --
-> > 2.34.1
-> >
+diff --git a/net/core/selftests.c b/net/core/selftests.c
+index acb1ee97bbd3..94fe3146a959 100644
+--- a/net/core/selftests.c
++++ b/net/core/selftests.c
+@@ -397,14 +397,11 @@ EXPORT_SYMBOL_GPL(net_selftest_get_count);
+ 
+ void net_selftest_get_strings(u8 *data)
+ {
+-	u8 *p = data;
+ 	int i;
+ 
+-	for (i = 0; i < net_selftest_get_count(); i++) {
+-		snprintf(p, ETH_GSTRING_LEN, "%2d. %s", i + 1,
+-			 net_selftests[i].name);
+-		p += ETH_GSTRING_LEN;
+-	}
++	for (i = 0; i < net_selftest_get_count(); i++)
++		ethtool_sprintf(&data, "%2d. %s", i + 1,
++				net_selftests[i].name);
+ }
+ EXPORT_SYMBOL_GPL(net_selftest_get_strings);
+ 
+-- 
+2.41.0
+
 
