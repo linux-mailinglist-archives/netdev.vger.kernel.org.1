@@ -1,76 +1,184 @@
-Return-Path: <netdev+bounces-44576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C3DF7D8B87
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 00:14:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DF607D8B95
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 00:18:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA840282166
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:14:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB951B21391
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:18:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE433E48E;
-	Thu, 26 Oct 2023 22:14:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8C63F4AB;
+	Thu, 26 Oct 2023 22:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sOGBtMjl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqA2I/jk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F043D99D
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 22:14:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E3ECC433C7;
-	Thu, 26 Oct 2023 22:14:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698358479;
-	bh=wdtxi9YB4Q7u6/Z/exalHB5taKXwpbqqYgnzOSqDJYc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sOGBtMjlzkNafi0qHI+8/5DxxHZt/kBWocDwsMQVNApHs83eTyswpD4Mv5Nm18CdN
-	 fNDKPHzW8d1okDP91OssQumyw2cRR7mzn/515BMAAqAvuL4JAijQGs3Tqj3z4u3GjS
-	 /kJQOZpYNRFN2hIJ+AT6HqYVUdqTQV9NviN0J0tHl4Bw2cFozzVWVU0Q14CNh484io
-	 keq7sWuLvUpC2bAu+HHNFBfSDQexzWPWaRqQ3iRBwSbvMVRdaJa80xeUrpzeZvTD8P
-	 Prgs0SW1PfK+20KLMgnoCrMeSNPMjLdr751Hn36oVfpN//apZsjmt8CPWu0OtuiUFD
-	 b5FC/ZIUgZ4dg==
-Date: Thu, 26 Oct 2023 15:14:37 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683013D99D;
+	Thu, 26 Oct 2023 22:17:55 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24168D47;
+	Thu, 26 Oct 2023 15:17:53 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-4084095722aso11038155e9.1;
+        Thu, 26 Oct 2023 15:17:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698358671; x=1698963471; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J6aQzvymgnykTJYyUNqos0M7PldrCbODsxg27QrFdA8=;
+        b=MqA2I/jk26INgZxxsfVwUbIFNkompGVlAukrf7za5JwMkk0rE5JqLiWst0keoAtdcg
+         wPDrNVF6A1TCMXqSaBcOdf0YvWxoxDZuQyeqnsbFiQoX6ZvBb7TyYF8vJUzH62RRDYnd
+         yd5L2Znfv+pvHvGdB4g03bhFhXNl9yDKz0loSiyC8ppi7q+DZDKYQhCHl7WTGiOZvYr7
+         nb+N3uUMFacjIG3UUEt6rYExk0I9M8dpu1zrG5PHZPGEsYVd0HscdJU2kA6jnT8yNqkL
+         a7QX0aK5wmvuzFNok4B4ZLYi7qsRFDyhmBxsyZTSmLJMNNXmZGUFygtJnIc+MsvvIpcK
+         MImw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698358671; x=1698963471;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J6aQzvymgnykTJYyUNqos0M7PldrCbODsxg27QrFdA8=;
+        b=iJT1grZxiBrWILOARyUcxAl56GlPRsw9z0Lr0W42iYcQagSDNvNJyFpUQ9HFCJUWip
+         4ug48x9jEpl3D2q8uRCjUd7CczyBcphb8k3RBDrUSsQNOmIrDdfqsX8UoRF75dNbxzuj
+         0GZsVqz0KW1Vns+xPKK8wqB0ElKVZTJcJ1zpef8R68rRTSKVGaBMEjwSKdtxrtrwtiXt
+         3IdkykgocQ0WIW6yqu/2cNAqI9TK4B+oXeM9YynyApO56gEWq1M/vaXhclgS7Aq70tkC
+         NbjOmqTcjZcMXtYy7Aw41qKtl8dTefLQeS4+BE1r1kX9puUU8ut1Bh7qzUfTgGAIs2aB
+         JHig==
+X-Gm-Message-State: AOJu0YyjYiud9Fp5YMbn4Z6vnDEQ9XInMDo06MQT/Tuf5bUaTp+K3rZf
+	qJ4u4hVQuJz2u2IM37W3CYM=
+X-Google-Smtp-Source: AGHT+IEXk7wu+BWH5PuNjLGzYfglJqQqyr64jFKw9mM2T6j/NSdcIcGUsTFFoYUci+YzMymGrg+hrA==
+X-Received: by 2002:a05:600c:1d18:b0:408:4475:8cc1 with SMTP id l24-20020a05600c1d1800b0040844758cc1mr930072wms.35.1698358671120;
+        Thu, 26 Oct 2023 15:17:51 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id v3-20020a05600c428300b0040596352951sm3541734wmc.5.2023.10.26.15.17.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Oct 2023 15:17:50 -0700 (PDT)
+Date: Fri, 27 Oct 2023 01:17:45 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Justin Stitt <justinstitt@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>, linux-kernel@vger.kernel.org,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Danielle Ratson <danieller@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>,
-	Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>,
-	Simon Horman <horms@kernel.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH net-next] net/mlx5: fix uninit value use
-Message-ID: <ZTrkzRi1g3TknBdj@x130>
-References: <20231025145050.36114-1-przemyslaw.kitszel@intel.com>
+	Shay Agroskin <shayagr@amazon.com>,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	David Arinzon <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>,
+	Saeed Bishara <saeedb@amazon.com>, Rasesh Mody <rmody@marvell.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	GR-Linux-NIC-Dev@marvell.com,
+	Dimitris Michailidis <dmichail@fungible.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Louis Peens <louis.peens@corigine.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Brett Creeley <brett.creeley@amd.com>, drivers@pensando.io,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Ronak Doshi <doshir@vmware.com>,
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+	Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	UNGLinuxDriver@microchip.com, Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Kees Cook <keescook@chromium.org>, intel-wired-lan@lists.osuosl.org,
+	oss-drivers@corigine.com, linux-hyperv@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, bpf@vger.kernel.org
+Subject: Re: [PATCH next v2 3/3] treewide: Convert some ethtool_sprintf() to
+ ethtool_puts()
+Message-ID: <20231026221745.uiqvn6avvcruyafx@skbuf>
+References: <20231026-ethtool_puts_impl-v2-0-0d67cbdd0538@google.com>
+ <20231026-ethtool_puts_impl-v2-3-0d67cbdd0538@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231025145050.36114-1-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20231026-ethtool_puts_impl-v2-3-0d67cbdd0538@google.com>
 
-On 25 Oct 16:50, Przemek Kitszel wrote:
->Avoid use of uninitialized state variable.
->
->In case of mlx5e_tx_reporter_build_diagnose_output_sq_common() it's better
->to still collect other data than bail out entirely.
->
->Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
->Link: https://lore.kernel.org/netdev/8bd30131-c9f2-4075-a575-7fa2793a1760@moroto.mountain
->Fixes: d17f98bf7cc9 ("net/mlx5: devlink health: use retained error fmsg API")
->Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+On Thu, Oct 26, 2023 at 09:56:09PM +0000, Justin Stitt wrote:
+> This patch converts some basic cases of ethtool_sprintf() to
+> ethtool_puts().
+> 
+> The conversions are used in cases where ethtool_sprintf() was being used
+> with just two arguments:
+> |       ethtool_sprintf(&data, buffer[i].name);
+> or when it's used with format string: "%s"
+> |       ethtool_sprintf(&data, "%s", buffer[i].name);
+> which both now become:
+> |       ethtool_puts(&data, buffer[i].name);
+> 
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
+> ---
+>  drivers/net/dsa/lantiq_gswip.c                     |  2 +-
+>  drivers/net/dsa/mt7530.c                           |  2 +-
+>  drivers/net/dsa/qca/qca8k-common.c                 |  2 +-
+>  drivers/net/dsa/realtek/rtl8365mb.c                |  2 +-
+>  drivers/net/dsa/realtek/rtl8366-core.c             |  2 +-
+>  drivers/net/dsa/vitesse-vsc73xx-core.c             |  8 +--
+>  drivers/net/ethernet/amazon/ena/ena_ethtool.c      |  4 +-
+>  drivers/net/ethernet/brocade/bna/bnad_ethtool.c    |  2 +-
+>  drivers/net/ethernet/freescale/fec_main.c          |  4 +-
+>  .../net/ethernet/fungible/funeth/funeth_ethtool.c  |  8 +--
+>  drivers/net/ethernet/hisilicon/hns/hns_dsaf_gmac.c |  2 +-
+>  .../net/ethernet/hisilicon/hns/hns_dsaf_xgmac.c    |  2 +-
+>  drivers/net/ethernet/hisilicon/hns/hns_ethtool.c   | 65 +++++++++++-----------
+>  drivers/net/ethernet/intel/i40e/i40e_ethtool.c     |  6 +-
+>  drivers/net/ethernet/intel/iavf/iavf_ethtool.c     |  3 +-
+>  drivers/net/ethernet/intel/ice/ice_ethtool.c       |  9 +--
+>  drivers/net/ethernet/intel/idpf/idpf_ethtool.c     |  2 +-
+>  drivers/net/ethernet/intel/igb/igb_ethtool.c       |  6 +-
+>  drivers/net/ethernet/intel/igc/igc_ethtool.c       |  6 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c   |  5 +-
+>  .../net/ethernet/microchip/sparx5/sparx5_ethtool.c |  2 +-
+>  .../net/ethernet/netronome/nfp/nfp_net_ethtool.c   | 44 +++++++--------
+>  drivers/net/ethernet/pensando/ionic/ionic_stats.c  |  4 +-
+>  drivers/net/ethernet/wangxun/libwx/wx_ethtool.c    |  2 +-
+>  drivers/net/hyperv/netvsc_drv.c                    |  4 +-
+>  drivers/net/phy/nxp-tja11xx.c                      |  2 +-
+>  drivers/net/phy/smsc.c                             |  2 +-
+>  drivers/net/vmxnet3/vmxnet3_ethtool.c              | 10 ++--
+>  28 files changed, 100 insertions(+), 112 deletions(-)
 
-
-Applied to net-next-mlx5
+What's the "next" branch that you expect this to be applied through, and
+why is the patch "treewide"? It only affects networking drivers (I see
+nothing outside of drivers/net/) - so it's "net: Convert ..." and it
+should go through the "net-next.git" tree. The patch should be formatted
+as "PATCH net-next" not "PATCH next", to make this absolutely clear.
 
