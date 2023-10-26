@@ -1,151 +1,263 @@
-Return-Path: <netdev+bounces-44449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18CA27D800F
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:53:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 719DB7D8013
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94B49B212D3
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 09:53:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B0F4B21281
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 09:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725D128E08;
-	Thu, 26 Oct 2023 09:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD7028E08;
+	Thu, 26 Oct 2023 09:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MeLaPXBk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IL+4TaOY"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FA827728;
-	Thu, 26 Oct 2023 09:53:45 +0000 (UTC)
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D069E198;
-	Thu, 26 Oct 2023 02:53:43 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-540105dea92so1003465a12.2;
-        Thu, 26 Oct 2023 02:53:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698314022; x=1698918822; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2sKfBNadnTr56Xc/xg3ISbacdEoqQ0HVmsmGJG/4R2A=;
-        b=MeLaPXBkmURCRH2aQt5dYiZFnZTn8kAAciJa1+nZhdaBSw8pRHn1O0PpouF2lkOAmm
-         03VcDEmKFhnL/MCe97P63IGDv+8+Ceqh1gGS+ahCmypRiUb352Anql31eUs90Sllvpp7
-         gqKrAdreKZdog5ncH/6lRcx35FcNEjXBJCRgtQ7cIfQ3U70vupxudz+pXNOZMjgTvolg
-         SELAStw90fAs3ZqgqXZfYypKOQWy44UU9/xOuLOC/Tg64M0E5x6Jp7HZhdY82hL+HFJv
-         h++gdQ2woiSxVmZEljPMeOwqwTrZIifAgeK5cJXy7/lt6GA3+iiKlQ/H9YGmd0cLNSp1
-         0U6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698314022; x=1698918822;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2sKfBNadnTr56Xc/xg3ISbacdEoqQ0HVmsmGJG/4R2A=;
-        b=wHimgLqYVk2NfXhsomJ6P95utbpbiWKjrx5O9DDDlmKR9N8k8y7ax8/5SgwLFJk4wh
-         ZCPrAkwqmS/YX/CBDSnxUh1h7hXsTKWRs79SZcnUnkSoPkxLlJwCxeukLCt9NIQErutY
-         SH0Y/njjhLkY6wIQ3Wsn5TRW4hqxnH4LXaIQndkJ5bfU9sLxUPm8QG0nZaGZoXYnKw8o
-         2gD33b+MqMYaETFDwsNCtvqEer4sIAMM6oeXMRo0pwR6BjD5IqVK+E/cyLcsccG1M30I
-         heJ52UiGYXBFY8K0IcTNy916TKZvMYVt2lHFZKk7kMLLZB5miIq1w5wwIYytpfYlJ11b
-         zQSw==
-X-Gm-Message-State: AOJu0Yz+jHS/q/TwOIXW0tLylXQ+2Utk+ztIL7xZ4355s0miXgRBLfRs
-	r9lVObgQHDYZjquQQ/zuVKs=
-X-Google-Smtp-Source: AGHT+IG4j7BhGIqb7pQU9bz8m7JoS9pzA5FPWz2L+Tu7Yi1Zr1/NmpbNW3tpJspHBT43ihjJhJubDg==
-X-Received: by 2002:a17:907:789:b0:9b6:5b56:bbe3 with SMTP id xd9-20020a170907078900b009b65b56bbe3mr14024428ejb.72.1698314021897;
-        Thu, 26 Oct 2023 02:53:41 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id j14-20020a1709064b4e00b009ad778a68c5sm11494190ejv.60.2023.10.26.02.53.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 02:53:41 -0700 (PDT)
-Date: Thu, 26 Oct 2023 12:53:38 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v8 3/5] net: dsa: microchip: Add error handling
- for ksz_switch_macaddr_get()
-Message-ID: <20231026095338.o6v6wzrjoyci72jk@skbuf>
-References: <20231026051051.2316937-1-o.rempel@pengutronix.de>
- <20231026051051.2316937-4-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A15E26E20
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 09:55:31 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E17193
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 02:55:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698314128;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zyWJrVb8i16NmtX1jUj9T8HsL1UYZG7szk+M19SAoeM=;
+	b=IL+4TaOYjxmYdZo3q5xluKUlcv3xvvdzHglBWmhh3ySKsFmA5oxMUOFk8Pe4jcmpb8cCiq
+	F83sb6+2UU7elNIxYr5y51luY3O7t+0rTuxCZfrL5cfVEK/nZqGF4UsoRMTF5VgSoITsgb
+	u6Ew+KmT6wvEN0+MPTWI54QJZWv9Jss=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-654-v9wgk7aZM-KwCqVvp5tUqA-1; Thu, 26 Oct 2023 05:55:25 -0400
+X-MC-Unique: v9wgk7aZM-KwCqVvp5tUqA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C38A68C7EC3;
+	Thu, 26 Oct 2023 09:55:24 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.233])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B29C71C060AE;
+	Thu, 26 Oct 2023 09:55:23 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.6-rc8
+Date: Thu, 26 Oct 2023 11:55:10 +0200
+Message-ID: <20231026095510.23688-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231026051051.2316937-4-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-On Thu, Oct 26, 2023 at 07:10:49AM +0200, Oleksij Rempel wrote:
-> Enhance the ksz_switch_macaddr_get() function to handle errors that may
-> occur during the call to ksz_write8(). Specifically, this update checks
-> the return value of ksz_write8(), which may fail if regmap ranges
-> validation is not passed and returns the error code.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> ---
+Hi Linus!
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+The following changes since commit ce55c22ec8b223a90ff3e084d842f73cfba35588:
 
->  drivers/net/dsa/microchip/ksz_common.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index 0c3adc389d0b..00be812bef40 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -3640,7 +3640,7 @@ int ksz_switch_macaddr_get(struct dsa_switch *ds, int port,
->  	struct ksz_switch_macaddr *switch_macaddr;
->  	struct ksz_device *dev = ds->priv;
->  	const u16 *regs = dev->info->regs;
-> -	int i;
-> +	int i, ret;
->  
->  	/* Make sure concurrent MAC address changes are blocked */
->  	ASSERT_RTNL();
-> @@ -3667,10 +3667,20 @@ int ksz_switch_macaddr_get(struct dsa_switch *ds, int port,
->  	dev->switch_macaddr = switch_macaddr;
->  
->  	/* Program the switch MAC address to hardware */
-> -	for (i = 0; i < ETH_ALEN; i++)
-> -		ksz_write8(dev, regs[REG_SW_MAC_ADDR] + i, addr[i]);
-> +	for (i = 0; i < ETH_ALEN; i++) {
-> +		ret = ksz_write8(dev, regs[REG_SW_MAC_ADDR] + i, addr[i]);
-> +		if (ret)
-> +			goto macaddr_drop;
-> +	}
->  
->  	return 0;
-> +
-> +macaddr_drop:
-> +	dev->switch_macaddr = NULL;
-> +	refcount_set(&switch_macaddr->refcount, 0);
+  Merge tag 'net-6.6-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-10-19 12:08:18 -0700)
 
-Nitpick: this line doesn't do any harm, but it doesn't do any good, either.
-It can be removed in a follow-up patch.
+are available in the Git repository at:
 
-> +	kfree(switch_macaddr);
-> +
-> +	return ret;
->  }
->  
->  void ksz_switch_macaddr_put(struct dsa_switch *ds)
-> -- 
-> 2.39.2
-> 
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.6-rc8
+
+for you to fetch changes up to 53798666648af3aa0dd512c2380576627237a800:
+
+  iavf: in iavf_down, disable queues when removing the driver (2023-10-25 17:48:31 -0700)
+
+----------------------------------------------------------------
+Including fixes from WiFi and netfilter.
+
+Most regressions addressed here come from quite old versions, with
+the exceptions of the iavf one and the WiFi fixes. No known
+outstanding reports or investigation.
+
+Fixes to fixes:
+
+ - eth: iavf: in iavf_down, disable queues when removing the driver
+
+Previous releases - regressions:
+
+ - sched: act_ct: additional checks for outdated flows
+
+ - tcp: do not leave an empty skb in write queue
+
+ - tcp: fix wrong RTO timeout when received SACK reneging
+
+ - wifi: cfg80211: pass correct pointer to rdev_inform_bss()
+
+ - eth: i40e: sync next_to_clean and next_to_process for programming status desc
+
+ - eth: iavf: initialize waitqueues before starting watchdog_task
+
+Previous releases - always broken:
+
+ - eth: r8169: fix data-races
+
+ - eth: igb: fix potential memory leak in igb_add_ethtool_nfc_entry
+
+ - eth: r8152: avoid writing garbage to the adapter's registers
+
+ - eth: gtp: fix fragmentation needed check with gso
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Alexandru Matei (1):
+      vsock/virtio: initialize the_virtio_vsock before using VQs
+
+Anjali Kulkarni (1):
+      Fix NULL pointer dereference in cn_filter()
+
+Avraham Stern (1):
+      wifi: mac80211: don't drop all unprotected public action frames
+
+Ben Greear (1):
+      wifi: cfg80211: pass correct pointer to rdev_inform_bss()
+
+Christophe JAILLET (1):
+      net: ieee802154: adf7242: Fix some potential buffer overflow in adf7242_stats_show()
+
+David S. Miller (1):
+      Merge branch 'r8152-reg-garbage'
+
+Dell Jin (1):
+      net: ethernet: adi: adin1110: Fix uninitialized variable
+
+Deming Wang (2):
+      net: ipv4: fix typo in comments
+      net: ipv6: fix typo in comments
+
+Douglas Anderson (8):
+      r8152: Increase USB control msg timeout to 5000ms as per spec
+      r8152: Run the unload routine if we have errors during probe
+      r8152: Cancel hw_phy_work if we have an error in probe
+      r8152: Release firmware if we have an error in probe
+      r8152: Check for unplug in rtl_phy_patch_request()
+      r8152: Check for unplug in r8153b_ups_en() / r8153c_ups_en()
+      r8152: Rename RTL8152_UNPLUG to RTL8152_INACCESSIBLE
+      r8152: Block future register access if register access fails
+
+Eric Dumazet (2):
+      net: do not leave an empty skb in write queue
+      neighbour: fix various data-races
+
+Fred Chen (1):
+      tcp: fix wrong RTO timeout when received SACK reneging
+
+Ivan Vecera (2):
+      i40e: Fix I40E_FLAG_VF_VLAN_PRUNING value
+      i40e: Fix wrong check for I40E_TXR_FLAGS_WB_ON_ITR
+
+Jakub Kicinski (2):
+      Merge tag 'wireless-2023-10-24' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
+      Merge tag 'nf-23-10-25' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+
+Johannes Berg (1):
+      wifi: cfg80211: fix assoc response warning on failed links
+
+Kunwu Chan (2):
+      treewide: Spelling fix in comment
+      isdn: mISDN: hfcsusb: Spelling fix in comment
+
+Maciej Fijalkowski (1):
+      i40e: xsk: remove count_mask
+
+Mateusz Palczewski (1):
+      igb: Fix potential memory leak in igb_add_ethtool_nfc_entry
+
+Michael Sit Wei Hong (1):
+      net: stmmac: update MAC capabilities when tx queues are updated
+
+Michal Schmidt (2):
+      iavf: initialize waitqueues before starting watchdog_task
+      iavf: in iavf_down, disable queues when removing the driver
+
+Mirsad Goran Todorovac (3):
+      r8169: fix the KCSAN reported data-race in rtl_tx() while reading tp->cur_tx
+      r8169: fix the KCSAN reported data-race in rtl_tx while reading TxDescArray[entry].opts1
+      r8169: fix the KCSAN reported data race in rtl_rx while reading desc->opts1
+
+Moritz Wanzenböck (1):
+      net/handshake: fix file ref count in handshake_nl_accept_doit()
+
+Pablo Neira Ayuso (3):
+      gtp: uapi: fix GTPA_MAX
+      gtp: fix fragmentation needed check with gso
+      netfilter: flowtable: GC pushes back packets to classic path
+
+Paolo Abeni (1):
+      Merge branch 'gtp-tunnel-driver-fixes'
+
+Pieter Jansen van Vuuren (1):
+      sfc: cleanup and reduce netlink error messages
+
+Rob Herring (1):
+      net: xgene: Fix unused xgene_enet_of_match warning for !CONFIG_OF
+
+Sasha Neftin (1):
+      igc: Fix ambiguity in the ethtool advertising
+
+Shigeru Yoshida (1):
+      net: usb: smsc95xx: Fix uninit-value access in smsc95xx_read_reg
+
+Su Hui (1):
+      net: chelsio: cxgb4: add an error code check in t4_load_phy_fw
+
+Tirthendu Sarkar (1):
+      i40e: sync next_to_clean and next_to_process for programming status desc
+
+Vlad Buslov (1):
+      net/sched: act_ct: additional checks for outdated flows
+
+ drivers/connector/cn_proc.c                       |   2 +-
+ drivers/isdn/hardware/mISDN/hfcsusb.c             |   2 +-
+ drivers/net/ethernet/adi/adin1110.c               |   2 +-
+ drivers/net/ethernet/apm/xgene/xgene_enet_main.c  |   2 +-
+ drivers/net/ethernet/chelsio/cxgb4/t4_hw.c        |   2 +
+ drivers/net/ethernet/intel/i40e/i40e.h            |   2 +-
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c       |  11 +-
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c        |  22 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c       |   7 +-
+ drivers/net/ethernet/intel/igb/igb_ethtool.c      |   6 +-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c      |  35 ++-
+ drivers/net/ethernet/realtek/r8169_main.c         |   6 +-
+ drivers/net/ethernet/sfc/tc.c                     |  38 +--
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  17 +-
+ drivers/net/ethernet/toshiba/ps3_gelic_wireless.c |   2 +-
+ drivers/net/gtp.c                                 |   5 +-
+ drivers/net/ieee802154/adf7242.c                  |   5 +-
+ drivers/net/usb/r8152.c                           | 303 ++++++++++++++++------
+ drivers/net/usb/smsc95xx.c                        |   4 +-
+ include/linux/ieee80211.h                         |  29 +++
+ include/net/netfilter/nf_flow_table.h             |   1 +
+ include/uapi/linux/gtp.h                          |   2 +-
+ net/core/neighbour.c                              |  67 ++---
+ net/handshake/netlink.c                           |  30 +--
+ net/ipv4/esp4.c                                   |   2 +-
+ net/ipv4/tcp.c                                    |   8 +-
+ net/ipv4/tcp_input.c                              |   9 +-
+ net/ipv6/esp6.c                                   |   2 +-
+ net/mac80211/rx.c                                 |   3 +-
+ net/netfilter/nf_flow_table_core.c                |  14 +-
+ net/sched/act_ct.c                                |   9 +
+ net/vmw_vsock/virtio_transport.c                  |  18 +-
+ net/wireless/mlme.c                               |   3 +-
+ net/wireless/scan.c                               |   2 +-
+ 34 files changed, 458 insertions(+), 214 deletions(-)
+
 
