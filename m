@@ -1,130 +1,107 @@
-Return-Path: <netdev+bounces-44468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0B357D8212
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 13:54:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 596727D8216
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 13:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78B39281DCE
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:54:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9ECDB21361
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A78A32D79B;
-	Thu, 26 Oct 2023 11:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29ED32D79B;
+	Thu, 26 Oct 2023 11:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="dobSHw5f";
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="pIFlgNGB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gg8lM5d+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE9E2D799
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 11:54:26 +0000 (UTC)
-Received: from nautica.notk.org (ipv6.notk.org [IPv6:2001:41d0:1:7a93::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 599DC1AC
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 04:54:24 -0700 (PDT)
-Received: by nautica.notk.org (Postfix, from userid 108)
-	id 3A5D7C025; Thu, 26 Oct 2023 13:54:18 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1698321258; bh=ee0LYBUjIFZ+7KVLOmz33ifp2D3uBc4odSfidsaynyY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dobSHw5fXqoNtWFULH+zH44DBHcmqIJ5U6QRE7a8oqB7Zjy2v8HSieUwM3ongq4YK
-	 tajjyQVHmAuIWz2I+m3SVmoFyCkQ9P+viJ1KFL4cC6G9753r/eVZZwxI2B4jSiw8OB
-	 7RLCmJij8cj5AU6ysa3DePs1FnSajBhgs6xuxt/T6PXFMKhTlK0vK8YvHSDFzbzsXp
-	 MdXb3EA+jz5fifAtXsHNgzMmEgQvLav0zD8QGH8rqbItxjKWz/wpLzxwjHbEufPcW/
-	 35UvUvsElpaGk3ApjItyJIQWhLozn1iJ8mnZ/4KzmBpG9W8VuLjY7hI6g3dAnK1Rqs
-	 ohPynPrJHaGEw==
-X-Spam-Level: 
-Received: from gaia (localhost [127.0.0.1])
-	by nautica.notk.org (Postfix) with ESMTPS id E70DCC01C;
-	Thu, 26 Oct 2023 13:54:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1698321257; bh=ee0LYBUjIFZ+7KVLOmz33ifp2D3uBc4odSfidsaynyY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pIFlgNGB79E3zgP+Of/xeL7Me4MOjTBeWoN5+cvcg1kp0/7dnTps/n2eOzdCuBPH9
-	 zt+3n8/k/az/otUb1DHRGxNwj5UhKM92Gu0wbhhlRWdc48tE7xkEKYNDGy6MVUJ5/D
-	 m8/B/2a9prVBcUN7lX3FH9tcv5TBArfJ1YNs8BEqRtdgljDcuUKlbZnSVtlRinyOHP
-	 dz87ZCjVWM8ufjJ+vnqgCxwjDiCDcRp7knn1UTd9hn5VFsgrMfIxW6f7tgvJJBPBfb
-	 DriZq3/3rbo32PKQ55zeXH+v4J40BzFv3DuAiHI/IGYO1YwDp6RoNLulO5GXDYVLp7
-	 3M2/Uxgzkr+Xg==
-Received: from localhost (gaia [local])
-	by gaia (OpenSMTPD) with ESMTPA id 272289d4;
-	Thu, 26 Oct 2023 11:54:10 +0000 (UTC)
-Date: Thu, 26 Oct 2023 20:53:55 +0900
-From: asmadeus@codewreck.org
-To: Hangyu Hua <hbh25y@gmail.com>
-Cc: ericvh@kernel.org, lucho@ionkov.net, linux_oss@crudebyte.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jvrao@linux.vnet.ibm.com, v9fs@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: 9p: fix possible memory leak in p9_check_errors()
-Message-ID: <ZTpTU8-1zn_P22QX@codewreck.org>
-References: <20231026092351.30572-1-hbh25y@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9992D799;
+	Thu, 26 Oct 2023 11:54:37 +0000 (UTC)
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E50191AE;
+	Thu, 26 Oct 2023 04:54:35 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-51f64817809so99636a12.1;
+        Thu, 26 Oct 2023 04:54:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698321275; x=1698926075; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D5Q4sKw20IDYCQXVbEgRDRjEjEctNoIjeFaPqJNC/rc=;
+        b=gg8lM5d+v+Xudbnf8Wlj5+yZos22AMGP5ruaxqdfbmji4NiWItW6cvOod0+zXN+0k4
+         Wn4Ez3dPv3Y8cxj+DZxG4rFVG6YvwoUND2FSmbNKpPG8KLv4xHJyjOfrECmdMARWPI8+
+         hUmJhP+FaBLI/focenNeoTDch5u2cFQfemMQChtmAutFubr4er1pnvy9roLF+/hmPAkG
+         Bt8MhpCDxt4c3Lnh/h78EUPseYmjhOC+wN3DFSoxDUBdyKNzbHAitT5bmIRnzrYllxfQ
+         lKYi+YUNdzAXDuv0/FBDT7c22d8h0Kyxc6KTZ9RzR9YBrxkhvacRz8gCtxXOpwo68QA/
+         CnUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698321275; x=1698926075;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=D5Q4sKw20IDYCQXVbEgRDRjEjEctNoIjeFaPqJNC/rc=;
+        b=JyzWRBVI5yVKjerqB6GSAWsP4TgzUyjI9ZSe0uatIQn8gNLt0BY4sc/bNoZFaSijiX
+         1Yb6nyJePqMsD0xhWnwU+daERUn7Tocmr/KuTMAzEJ6OTQ5ngCNguPY5B6pSp+mk2Twc
+         chZzK2hjHJXKNm9TpeVtGHCEyCLYkVpR7ItqUNRVjk/h4ODdQ1OEqw4H1R9cRdEYNII5
+         6EOQme19FZCBtWxAooV5iIBlVZywwkI9Kel212JOB/pHKg3EW8S8Mz7NxT0yOs8xg+BR
+         fUR9sAp8/t8WklsAwM1GwOkYTHJ2anUBTTxah4OWW954CYhrL6VIKciSSpFk9PXAtzea
+         bQLA==
+X-Gm-Message-State: AOJu0YxnjRL/NioY/BSProqT8hzOj3TJXsj7OttaNMfjBXOQM9jh7p2k
+	wkCllEvcne1q04tX97EZCko=
+X-Google-Smtp-Source: AGHT+IHkE6Z2sn4JakvHISr7KVCogjXHvU+PXjauonII13+9RFcxWzaevHmt2KXLxZnYf1nhP9EqMQ==
+X-Received: by 2002:a05:6a20:4420:b0:163:f945:42c4 with SMTP id ce32-20020a056a20442000b00163f94542c4mr24703115pzb.1.1698321275323;
+        Thu, 26 Oct 2023 04:54:35 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id h7-20020a655187000000b0056b6d1ac949sm8780610pgq.13.2023.10.26.04.54.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Oct 2023 04:54:35 -0700 (PDT)
+Date: Thu, 26 Oct 2023 20:54:34 +0900 (JST)
+Message-Id: <20231026.205434.963307210202715112.fujita.tomonori@gmail.com>
+To: miguel.ojeda.sandonis@gmail.com
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
+ benno.lossin@proton.me, wedsonaf@gmail.com, ojeda@kernel.org
+Subject: Re: [PATCH net-next v7 3/5] rust: add second `bindgen` pass for
+ enum exhaustiveness checking
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CANiq72n6Cvxydcef03kEo9fy=5Zd7MXYqFUGX1MBaTKF2o63nw@mail.gmail.com>
+References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
+	<20231026001050.1720612-4-fujita.tomonori@gmail.com>
+	<CANiq72n6Cvxydcef03kEo9fy=5Zd7MXYqFUGX1MBaTKF2o63nw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231026092351.30572-1-hbh25y@gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: base64
 
-
-Hangyu Hua wrote on Thu, Oct 26, 2023 at 05:23:51PM +0800:
-> When p9pdu_readf is called with "s?d" attribute, it allocates a pointer
-> that will store a string. But when p9pdu_readf() fails while handling "d"
-> then this pointer will not be freed in p9_check_errors.
-
-Right, that sounds correct to me.
-
-Out of curiosity how did you notice this? The leak shouldn't happen with
-any valid server.
-
-This cannot break anything so I'll push this to -next tomorrow and
-submit to Linus next week
-
-> Fixes: ca41bb3e21d7 ("[net/9p] Handle Zero Copy TREAD/RERROR case in !dotl case.")
-
-This commit moves this code a bit, but the p9pdu_readf call predates
-it -- in this case the Fixes tag is probably not useful; this affects
-all maintained kernels.
-
-> Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
-> ---
->  net/9p/client.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/9p/client.c b/net/9p/client.c
-> index 86bbc7147fc1..6c7cd765b714 100644
-> --- a/net/9p/client.c
-> +++ b/net/9p/client.c
-> @@ -540,12 +540,15 @@ static int p9_check_errors(struct p9_client *c, struct p9_req_t *req)
->  		return 0;
->  
->  	if (!p9_is_proto_dotl(c)) {
-> -		char *ename;
-> +		char *ename = NULL;
->  
->  		err = p9pdu_readf(&req->rc, c->proto_version, "s?d",
->  				  &ename, &ecode);
-> -		if (err)
-> +		if (err) {
-> +			if (ename != NULL)
-> +				kfree(ename);
-
-Don't check for NULL before kfree - kfree does it.
-If that's the only remark you get I can fix it when applying the commit
-on my side.
-
-
->  			goto out_err;
-> +		}
->  
->  		if (p9_is_proto_dotu(c) && ecode < 512)
->  			err = -ecode;
-
--- 
-Dominique Martinet | Asmadeus
+T24gVGh1LCAyNiBPY3QgMjAyMyAxMzowMjo1NyArMDIwMA0KTWlndWVsIE9qZWRhIDxtaWd1ZWwu
+b2plZGEuc2FuZG9uaXNAZ21haWwuY29tPiB3cm90ZToNCg0KPiBPbiBUaHUsIE9jdCAyNiwgMjAy
+MyBhdCAyOjE24oCvQU0gRlVKSVRBIFRvbW9ub3JpDQo+IDxmdWppdGEudG9tb25vcmlAZ21haWwu
+Y29tPiB3cm90ZToNCj4+DQo+PiBGcm9tOiBNaWd1ZWwgT2plZGEgPG9qZWRhQGtlcm5lbC5vcmc+
+DQo+Pg0KPj4gVGhpcyBwYXRjaCBtYWtlcyBzdXJlIHRoYXQgdGhlIEMncyBlbnVtIGlzIHN5bmMg
+d2l0aCBSdXN0IHNpZGVzLiBJZg0KPj4gdGhlIGVudW0gaXMgb3V0IG9mIHN5bmMsIGNvbXBpbGlu
+ZyBmYWlscyB3aXRoIGFuIGVycm9yIGxpa2UgdGhlDQo+PiBmb2xsb3dpbmcuDQo+Pg0KPj4gTm90
+ZSB0aGF0IHRoaXMgaXMgYSB0ZW1wb3Jhcnkgc29sdXRpb24uIEl0IHdpbGwgYmUgcmVwbGFjZWQg
+d2l0aA0KPj4gYmluZGdlbiB3aGVuIGl0IHN1cHBvcnRzIGdlbmVyYXRpbmcgdGhlIGVudW0gY29u
+dmVyc2lvbiBjb2RlLg0KPiANCj4+IFNpZ25lZC1vZmYtYnk6IE1pZ3VlbCBPamVkYSA8b2plZGFA
+a2VybmVsLm9yZz4NCj4+IFNpZ25lZC1vZmYtYnk6IEZVSklUQSBUb21vbm9yaSA8ZnVqaXRhLnRv
+bW9ub3JpQGdtYWlsLmNvbT4NCj4gDQo+IFBsZWFzZSBkbyBub3QgbW9kaWZ5IHBhdGNoZXMgZnJv
+bSBvdGhlcnMgd2l0aG91dCB3YXJuaW5nIHRoYXQgeW91IGRpZA0KPiBzby4gSSBkaWQgbm90IHdy
+aXRlIHRoaXMgY29tbWl0IG1lc3NhZ2Ugbm9yIGFncmVlZCB0byB0aGlzLCBidXQgaXQNCj4gbG9v
+a3MgYXMgaWYgSSBkaWQuIEkgZXZlbiBleHBsaWNpdGx5IHNhaWQgSSB3b3VsZCBzZW5kIHRoZSBw
+YXRjaA0KPiBpbmRlcGVuZGVudGx5Lg0KPg0KPiBBcyBJIHJlY2VudGx5IHRvbGQgeW91LCBpZiB5
+b3Ugd2FudCB0byBwaWNrIGl0IHVwIGluIHlvdXIgc2VyaWVzIHRvDQo+IHNob3djYXNlIGhvdyBp
+dCB3b3VsZCB3b3JrLCB5b3Ugc2hvdWxkIGhhdmUgYXQgbGVhc3Qga2VwdCB0aGUgV0lQLCBwdXQN
+Cj4gaXQgYXQgdGhlIGVuZCBvZiB0aGUgc2VyaWVzIGFuZCBhZGRlZCBSRkMgc2luY2UgaXQgaXMg
+bm90IGludGVuZGVkIHRvDQo+IGJlIG1lcmdlZCB3aXRoIHlvdXIgb3RoZXIgcGF0Y2hlcy4NCg0K
+U29ycnksIEkgdG90YWxseSBtaXN1bmRlcnN0YW5kIHlvdXIgaW50ZW50aW9uLiBJIHRob3VnaHQg
+dGhhdCB0aGUgUEhZDQphYnN0cmFjdGlvbnMgbmVlZHMgdG8gYmUgbWVyZ2VkIHdpdGggeW91ciBw
+YXRjaCB0b2dldGhlci4NCg0KSSdsbCBkcm9wIHlvdXIgcGF0Y2ggaW4gdGhlIG5leHQgdmVyc2lv
+biBhbmQgZm9jdXMgb24gbXkgcGF0Y2hlcy4NCg==
 
