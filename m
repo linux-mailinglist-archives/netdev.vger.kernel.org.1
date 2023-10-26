@@ -1,366 +1,162 @@
-Return-Path: <netdev+bounces-44419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E6D7D7E9D
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 10:39:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE3B27D7EA8
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 10:41:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 546671C20E4E
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 08:39:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 007F61C20EE0
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 08:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532FF1799D;
-	Thu, 26 Oct 2023 08:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214C71A5B9;
+	Thu, 26 Oct 2023 08:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FLA4vt7z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oRC27PQC"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A90011C9F
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 08:39:40 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C7C128
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 01:39:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698309577;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=bQ+kIwosFjC7uy9ZZr9H4BtGhhZj5EmLC8yhuUr2RT0=;
-	b=FLA4vt7zz0ngW3GfX1djZOjVX2ZwTAjPxx6Q+rF/FUrZAVTwrTQVwhlmMd3wXjsLWxFZaB
-	jiDKm+YUCLu+QQZsmx2ylK8aSbTYd5Z5x0iOeXaIfwPZg2CrwIvMs/F0XTSST9BtqFCn41
-	O+3nQgU4iGbElvFYBVaUwn48wRtar+o=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-455-ljUTGsX1M-maIY2mQBdNoA-1; Thu,
- 26 Oct 2023 04:39:35 -0400
-X-MC-Unique: ljUTGsX1M-maIY2mQBdNoA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F0F4D29ABA17;
-	Thu, 26 Oct 2023 08:39:34 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.225.62])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 38740C1596D;
-	Thu, 26 Oct 2023 08:39:33 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [PATCH iwl-next] iavf: Remove queue tracking fields from iavf_adminq_ring
-Date: Thu, 26 Oct 2023 10:39:32 +0200
-Message-ID: <20231026083932.2623631-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D022911C9F;
+	Thu, 26 Oct 2023 08:41:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6AFC433C8;
+	Thu, 26 Oct 2023 08:40:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698309661;
+	bh=CKweGyf2oPo/e/UZLG1WYH3zEQnVvPRR68BdbBl/TGo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oRC27PQC2plQ2QFtxeYNcapuTdKaVmbmEUR0m69y9zSqXieqEvU2U8HaibfItzWZF
+	 yERD96v5VwCZUJZD6El6ZorfVxYGGBw2vENxYrzOh3JNxfzIcWV8Hyo/98RmvjYp1O
+	 Ink1QwB6gOI9hZMPLodFMqMmfk4UUgDFD2PT2vR0MIfYSLtLLeyvF4ch6/DBDJ+K3Z
+	 0bfW6e3KP7yJWPzCmJpvtwgF2RV+VsKMprb/vimV6IovW84by85aPvP9y1WYUJyow3
+	 BUjvGbMWEhiJ9hRAr+vd5AhVyyu5+qGt0miVwVbaUWHgtUSofxp310DRt0OzuziAvf
+	 CCAilLzZ675cA==
+Date: Thu, 26 Oct 2023 11:40:39 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "tglx@linutronix.de" <tglx@linutronix.de>,
+	"mcgrof@kernel.org" <mcgrof@kernel.org>,
+	"deller@gmx.de" <deller@gmx.de>,
+	"bjorn@kernel.org" <bjorn@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"nadav.amit@gmail.com" <nadav.amit@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"hca@linux.ibm.com" <hca@linux.ibm.com>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>,
+	"puranjay12@gmail.com" <puranjay12@gmail.com>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+	"tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"mark.rutland@arm.com" <mark.rutland@arm.com>,
+	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+	"mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+	"christophe.leroy@csgroup.eu" <christophe.leroy@csgroup.eu>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"rostedt@goodmis.org" <rostedt@goodmis.org>,
+	"will@kernel.org" <will@kernel.org>,
+	"dinguyen@kernel.org" <dinguyen@kernel.org>,
+	"naveen.n.rao@linux.ibm.com" <naveen.n.rao@linux.ibm.com>,
+	"sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+	"linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"song@kernel.org" <song@kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>
+Subject: Re: [PATCH v3 03/13] mm/execmem, arch: convert simple overrides of
+ module_alloc to execmem
+Message-ID: <20231026084039.GJ2824@kernel.org>
+References: <20230918072955.2507221-1-rppt@kernel.org>
+ <20230918072955.2507221-4-rppt@kernel.org>
+ <607927885bb8ca12d4cd5787f01207c256cc8798.camel@intel.com>
+ <00277a3acb36d2309156264c7e8484071bc91614.camel@intel.com>
+ <20231005052622.GD3303@kernel.org>
+ <b26d0a201bf631831a956450ebbccc3c16521133.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b26d0a201bf631831a956450ebbccc3c16521133.camel@intel.com>
 
-Fields 'head', 'tail', 'len', 'bah' and 'bal' in iavf_adminq_ring
-are used to store register offsets. These offsets are initialized
-and remains constant so there is no need to store them in the
-iavf_adminq_ring structure.
+Hi Rick,
 
-Remove these fields from iavf_adminq_ring and use register offset
-constants instead. Remove iavf_adminq_init_regs() that originally
-stores these constants into these fields.
+Sorry for the delay, I was a bit preoccupied with $stuff.
 
-Finally improve iavf_check_asq_alive() that assumes that
-non-zero value of hw->aq.asq.len indicates fully initialized
-AdminQ send queue. Replace it by check for non-zero value
-of field hw->aq.asq.count that is non-zero when the sending
-queue is initialized and is zeroed during shutdown of
-the queue.
+On Thu, Oct 05, 2023 at 06:09:07PM +0000, Edgecombe, Rick P wrote:
+> On Thu, 2023-10-05 at 08:26 +0300, Mike Rapoport wrote:
+> > On Wed, Oct 04, 2023 at 03:39:26PM +0000, Edgecombe, Rick P wrote:
+> > > On Tue, 2023-10-03 at 17:29 -0700, Rick Edgecombe wrote:
+> > > > It seems a bit weird to copy all of this. Is it trying to be
+> > > > faster
+> > > > or
+> > > > something?
+> > > > 
+> > > > Couldn't it just check r->start in execmem_text/data_alloc() path
+> > > > and
+> > > > switch to EXECMEM_DEFAULT if needed then? The
+> > > > execmem_range_is_data()
+> > > > part that comes later could be added to the logic there too. So
+> > > > this
+> > > > seems like unnecessary complexity to me or I don't see the
+> > > > reason.
+> > > 
+> > > I guess this is a bad idea because if you have the full size array
+> > > sitting around anyway you might as well use it and reduce the
+> > > exec_mem_alloc() logic.
+> > 
+> > That's was the idea, indeed. :)
+> > 
+> > > Just looking at it from the x86 side (and
+> > > similar) though, where there is actually only one execmem_range and
+> > > it
+> > > building this whole array with identical data and it seems weird.
+> > 
+> > Right, most architectures have only one range, but to support all
+> > variants
+> > that we have, execmem has to maintain the whole array.
+> 
+> What about just having an index into a smaller set of ranges. The
+> module area and the extra JIT area. So ->ranges can be size 3
+> (statically allocated in the arch code) for three areas and then the
+> index array can be size EXECMEM_TYPE_MAX. The default 0 value of the
+> indexing array will point to the default area and any special areas can
+> be set in the index point to the desired range.
+> 
+> Looking at how it would do for x86 and arm64, it looks maybe a bit
+> better to me. A little bit less code and memory usage, and a bit easier
+> to trace the configuration through to the final state (IMO). What do
+> you think? Very rough, on top of this series, below.
 
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/iavf/iavf_adminq.c | 86 +++++++------------
- drivers/net/ethernet/intel/iavf/iavf_adminq.h |  7 --
- drivers/net/ethernet/intel/iavf/iavf_common.c |  8 +-
- drivers/net/ethernet/intel/iavf/iavf_main.c   |  8 +-
- 4 files changed, 39 insertions(+), 70 deletions(-)
+I like your suggestion to only have definitions of actual ranges in arch
+code and index array to redirect allocation requests to the right range.
+I'll make the next version along the lines of your patch.
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_adminq.c b/drivers/net/ethernet/intel/iavf/iavf_adminq.c
-index 9ffbd24d83cb..82fcd18ad660 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_adminq.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_adminq.c
-@@ -7,27 +7,6 @@
- #include "iavf_adminq.h"
- #include "iavf_prototype.h"
+> As I was playing around with this, I was also wondering why it needs
+> two copies of struct execmem_params: one returned from the arch code
+> and one in exec mem. 
+
+No actual reason, one copy is enough, thanks for catching this.
+
+> And why the temporary arch copy is ro_after_init,
+> but the final execmem.c copy is not ro_after_init?
+
+I just missed it, thanks for pointing out.
  
--/**
-- *  iavf_adminq_init_regs - Initialize AdminQ registers
-- *  @hw: pointer to the hardware structure
-- *
-- *  This assumes the alloc_asq and alloc_arq functions have already been called
-- **/
--static void iavf_adminq_init_regs(struct iavf_hw *hw)
--{
--	/* set head and tail registers in our local struct */
--	hw->aq.asq.tail = IAVF_VF_ATQT1;
--	hw->aq.asq.head = IAVF_VF_ATQH1;
--	hw->aq.asq.len  = IAVF_VF_ATQLEN1;
--	hw->aq.asq.bal  = IAVF_VF_ATQBAL1;
--	hw->aq.asq.bah  = IAVF_VF_ATQBAH1;
--	hw->aq.arq.tail = IAVF_VF_ARQT1;
--	hw->aq.arq.head = IAVF_VF_ARQH1;
--	hw->aq.arq.len  = IAVF_VF_ARQLEN1;
--	hw->aq.arq.bal  = IAVF_VF_ARQBAL1;
--	hw->aq.arq.bah  = IAVF_VF_ARQBAH1;
--}
--
- /**
-  *  iavf_alloc_adminq_asq_ring - Allocate Admin Queue send rings
-  *  @hw: pointer to the hardware structure
-@@ -259,17 +238,17 @@ static enum iavf_status iavf_config_asq_regs(struct iavf_hw *hw)
- 	u32 reg = 0;
- 
- 	/* Clear Head and Tail */
--	wr32(hw, hw->aq.asq.head, 0);
--	wr32(hw, hw->aq.asq.tail, 0);
-+	wr32(hw, IAVF_VF_ATQH1, 0);
-+	wr32(hw, IAVF_VF_ATQT1, 0);
- 
- 	/* set starting point */
--	wr32(hw, hw->aq.asq.len, (hw->aq.num_asq_entries |
-+	wr32(hw, IAVF_VF_ATQLEN1, (hw->aq.num_asq_entries |
- 				  IAVF_VF_ATQLEN1_ATQENABLE_MASK));
--	wr32(hw, hw->aq.asq.bal, lower_32_bits(hw->aq.asq.desc_buf.pa));
--	wr32(hw, hw->aq.asq.bah, upper_32_bits(hw->aq.asq.desc_buf.pa));
-+	wr32(hw, IAVF_VF_ATQBAL1, lower_32_bits(hw->aq.asq.desc_buf.pa));
-+	wr32(hw, IAVF_VF_ATQBAH1, upper_32_bits(hw->aq.asq.desc_buf.pa));
- 
- 	/* Check one register to verify that config was applied */
--	reg = rd32(hw, hw->aq.asq.bal);
-+	reg = rd32(hw, IAVF_VF_ATQBAL1);
- 	if (reg != lower_32_bits(hw->aq.asq.desc_buf.pa))
- 		ret_code = IAVF_ERR_ADMIN_QUEUE_ERROR;
- 
-@@ -288,20 +267,20 @@ static enum iavf_status iavf_config_arq_regs(struct iavf_hw *hw)
- 	u32 reg = 0;
- 
- 	/* Clear Head and Tail */
--	wr32(hw, hw->aq.arq.head, 0);
--	wr32(hw, hw->aq.arq.tail, 0);
-+	wr32(hw, IAVF_VF_ARQH1, 0);
-+	wr32(hw, IAVF_VF_ARQT1, 0);
- 
- 	/* set starting point */
--	wr32(hw, hw->aq.arq.len, (hw->aq.num_arq_entries |
-+	wr32(hw, IAVF_VF_ARQLEN1, (hw->aq.num_arq_entries |
- 				  IAVF_VF_ARQLEN1_ARQENABLE_MASK));
--	wr32(hw, hw->aq.arq.bal, lower_32_bits(hw->aq.arq.desc_buf.pa));
--	wr32(hw, hw->aq.arq.bah, upper_32_bits(hw->aq.arq.desc_buf.pa));
-+	wr32(hw, IAVF_VF_ARQBAL1, lower_32_bits(hw->aq.arq.desc_buf.pa));
-+	wr32(hw, IAVF_VF_ARQBAH1, upper_32_bits(hw->aq.arq.desc_buf.pa));
- 
- 	/* Update tail in the HW to post pre-allocated buffers */
--	wr32(hw, hw->aq.arq.tail, hw->aq.num_arq_entries - 1);
-+	wr32(hw, IAVF_VF_ARQT1, hw->aq.num_arq_entries - 1);
- 
- 	/* Check one register to verify that config was applied */
--	reg = rd32(hw, hw->aq.arq.bal);
-+	reg = rd32(hw, IAVF_VF_ARQBAL1);
- 	if (reg != lower_32_bits(hw->aq.arq.desc_buf.pa))
- 		ret_code = IAVF_ERR_ADMIN_QUEUE_ERROR;
- 
-@@ -455,11 +434,11 @@ static enum iavf_status iavf_shutdown_asq(struct iavf_hw *hw)
- 	}
- 
- 	/* Stop firmware AdminQ processing */
--	wr32(hw, hw->aq.asq.head, 0);
--	wr32(hw, hw->aq.asq.tail, 0);
--	wr32(hw, hw->aq.asq.len, 0);
--	wr32(hw, hw->aq.asq.bal, 0);
--	wr32(hw, hw->aq.asq.bah, 0);
-+	wr32(hw, IAVF_VF_ATQH1, 0);
-+	wr32(hw, IAVF_VF_ATQT1, 0);
-+	wr32(hw, IAVF_VF_ATQLEN1, 0);
-+	wr32(hw, IAVF_VF_ATQBAL1, 0);
-+	wr32(hw, IAVF_VF_ATQBAH1, 0);
- 
- 	hw->aq.asq.count = 0; /* to indicate uninitialized queue */
- 
-@@ -489,11 +468,11 @@ static enum iavf_status iavf_shutdown_arq(struct iavf_hw *hw)
- 	}
- 
- 	/* Stop firmware AdminQ processing */
--	wr32(hw, hw->aq.arq.head, 0);
--	wr32(hw, hw->aq.arq.tail, 0);
--	wr32(hw, hw->aq.arq.len, 0);
--	wr32(hw, hw->aq.arq.bal, 0);
--	wr32(hw, hw->aq.arq.bah, 0);
-+	wr32(hw, IAVF_VF_ARQH1, 0);
-+	wr32(hw, IAVF_VF_ARQT1, 0);
-+	wr32(hw, IAVF_VF_ARQLEN1, 0);
-+	wr32(hw, IAVF_VF_ARQBAL1, 0);
-+	wr32(hw, IAVF_VF_ARQBAH1, 0);
- 
- 	hw->aq.arq.count = 0; /* to indicate uninitialized queue */
- 
-@@ -529,9 +508,6 @@ enum iavf_status iavf_init_adminq(struct iavf_hw *hw)
- 		goto init_adminq_exit;
- 	}
- 
--	/* Set up register offsets */
--	iavf_adminq_init_regs(hw);
--
- 	/* setup ASQ command write back timeout */
- 	hw->aq.asq_cmd_timeout = IAVF_ASQ_CMD_TIMEOUT;
- 
-@@ -587,9 +563,9 @@ static u16 iavf_clean_asq(struct iavf_hw *hw)
- 
- 	desc = IAVF_ADMINQ_DESC(*asq, ntc);
- 	details = IAVF_ADMINQ_DETAILS(*asq, ntc);
--	while (rd32(hw, hw->aq.asq.head) != ntc) {
-+	while (rd32(hw, IAVF_VF_ATQH1) != ntc) {
- 		iavf_debug(hw, IAVF_DEBUG_AQ_MESSAGE,
--			   "ntc %d head %d.\n", ntc, rd32(hw, hw->aq.asq.head));
-+			   "ntc %d head %d.\n", ntc, rd32(hw, IAVF_VF_ATQH1));
- 
- 		if (details->callback) {
- 			IAVF_ADMINQ_CALLBACK cb_func =
-@@ -624,7 +600,7 @@ bool iavf_asq_done(struct iavf_hw *hw)
- 	/* AQ designers suggest use of head for better
- 	 * timing reliability than DD bit
- 	 */
--	return rd32(hw, hw->aq.asq.head) == hw->aq.asq.next_to_use;
-+	return rd32(hw, IAVF_VF_ATQH1) == hw->aq.asq.next_to_use;
- }
- 
- /**
-@@ -663,7 +639,7 @@ enum iavf_status iavf_asq_send_command(struct iavf_hw *hw,
- 
- 	hw->aq.asq_last_status = IAVF_AQ_RC_OK;
- 
--	val = rd32(hw, hw->aq.asq.head);
-+	val = rd32(hw, IAVF_VF_ATQH1);
- 	if (val >= hw->aq.num_asq_entries) {
- 		iavf_debug(hw, IAVF_DEBUG_AQ_MESSAGE,
- 			   "AQTX: head overrun at %d\n", val);
-@@ -755,7 +731,7 @@ enum iavf_status iavf_asq_send_command(struct iavf_hw *hw,
- 	if (hw->aq.asq.next_to_use == hw->aq.asq.count)
- 		hw->aq.asq.next_to_use = 0;
- 	if (!details->postpone)
--		wr32(hw, hw->aq.asq.tail, hw->aq.asq.next_to_use);
-+		wr32(hw, IAVF_VF_ATQT1, hw->aq.asq.next_to_use);
- 
- 	/* if cmd_details are not defined or async flag is not set,
- 	 * we need to wait for desc write back
-@@ -810,7 +786,7 @@ enum iavf_status iavf_asq_send_command(struct iavf_hw *hw,
- 	/* update the error if time out occurred */
- 	if ((!cmd_completed) &&
- 	    (!details->async && !details->postpone)) {
--		if (rd32(hw, hw->aq.asq.len) & IAVF_VF_ATQLEN1_ATQCRIT_MASK) {
-+		if (rd32(hw, IAVF_VF_ATQLEN1) & IAVF_VF_ATQLEN1_ATQCRIT_MASK) {
- 			iavf_debug(hw, IAVF_DEBUG_AQ_MESSAGE,
- 				   "AQTX: AQ Critical error.\n");
- 			status = IAVF_ERR_ADMIN_QUEUE_CRITICAL_ERROR;
-@@ -878,7 +854,7 @@ enum iavf_status iavf_clean_arq_element(struct iavf_hw *hw,
- 	}
- 
- 	/* set next_to_use to head */
--	ntu = rd32(hw, hw->aq.arq.head) & IAVF_VF_ARQH1_ARQH_MASK;
-+	ntu = rd32(hw, IAVF_VF_ARQH1) & IAVF_VF_ARQH1_ARQH_MASK;
- 	if (ntu == ntc) {
- 		/* nothing to do - shouldn't need to update ring's values */
- 		ret_code = IAVF_ERR_ADMIN_QUEUE_NO_WORK;
-@@ -926,7 +902,7 @@ enum iavf_status iavf_clean_arq_element(struct iavf_hw *hw,
- 	desc->params.external.addr_low = cpu_to_le32(lower_32_bits(bi->pa));
- 
- 	/* set tail = the last cleaned desc index. */
--	wr32(hw, hw->aq.arq.tail, ntc);
-+	wr32(hw, IAVF_VF_ARQT1, ntc);
- 	/* ntc is updated to tail + 1 */
- 	ntc++;
- 	if (ntc == hw->aq.num_arq_entries)
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_adminq.h b/drivers/net/ethernet/intel/iavf/iavf_adminq.h
-index 1f60518eb0e5..406506f64bdd 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_adminq.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_adminq.h
-@@ -29,13 +29,6 @@ struct iavf_adminq_ring {
- 	/* used for interrupt processing */
- 	u16 next_to_use;
- 	u16 next_to_clean;
--
--	/* used for queue tracking */
--	u32 head;
--	u32 tail;
--	u32 len;
--	u32 bah;
--	u32 bal;
- };
- 
- /* ASQ transaction details */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_common.c b/drivers/net/ethernet/intel/iavf/iavf_common.c
-index 8091e6feca01..89d2bce529ae 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_common.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_common.c
-@@ -279,11 +279,11 @@ void iavf_debug_aq(struct iavf_hw *hw, enum iavf_debug_mask mask, void *desc,
-  **/
- bool iavf_check_asq_alive(struct iavf_hw *hw)
- {
--	if (hw->aq.asq.len)
--		return !!(rd32(hw, hw->aq.asq.len) &
--			  IAVF_VF_ATQLEN1_ATQENABLE_MASK);
--	else
-+	/* Check if the queue is initialized */
-+	if (!hw->aq.asq.count)
- 		return false;
-+
-+	return !!(rd32(hw, IAVF_VF_ATQLEN1) & IAVF_VF_ATQLEN1_ATQENABLE_MASK);
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 6e27b7938b8a..146755498feb 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -3253,7 +3253,7 @@ static void iavf_adminq_task(struct work_struct *work)
- 		goto freedom;
- 
- 	/* check for error indications */
--	val = rd32(hw, hw->aq.arq.len);
-+	val = rd32(hw, IAVF_VF_ARQLEN1);
- 	if (val == 0xdeadbeef || val == 0xffffffff) /* device in reset */
- 		goto freedom;
- 	oldval = val;
-@@ -3270,9 +3270,9 @@ static void iavf_adminq_task(struct work_struct *work)
- 		val &= ~IAVF_VF_ARQLEN1_ARQCRIT_MASK;
- 	}
- 	if (oldval != val)
--		wr32(hw, hw->aq.arq.len, val);
-+		wr32(hw, IAVF_VF_ARQLEN1, val);
- 
--	val = rd32(hw, hw->aq.asq.len);
-+	val = rd32(hw, IAVF_VF_ATQLEN1);
- 	oldval = val;
- 	if (val & IAVF_VF_ATQLEN1_ATQVFE_MASK) {
- 		dev_info(&adapter->pdev->dev, "ASQ VF Error detected\n");
-@@ -3287,7 +3287,7 @@ static void iavf_adminq_task(struct work_struct *work)
- 		val &= ~IAVF_VF_ATQLEN1_ATQCRIT_MASK;
- 	}
- 	if (oldval != val)
--		wr32(hw, hw->aq.asq.len, val);
-+		wr32(hw, IAVF_VF_ATQLEN1, val);
- 
- freedom:
- 	kfree(event.msg_buf);
 -- 
-2.41.0
-
+Sincerely yours,
+Mike.
 
