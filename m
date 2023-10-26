@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-44592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ADEB7D8BE9
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 00:55:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F0A7D8BEB
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 00:55:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DC361C21020
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:55:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE134282081
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF0F3F4CE;
-	Thu, 26 Oct 2023 22:55:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717D33F4BA;
+	Thu, 26 Oct 2023 22:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="f8uWR3yW"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WFhYFUqH"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861A23F4BA
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 22:55:43 +0000 (UTC)
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F451B8
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:55:41 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1cac80292aeso11544255ad.1
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:55:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9772F506
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 22:55:45 +0000 (UTC)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 028ACD44
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:55:44 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1cac925732fso12126425ad.1
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:55:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1698360941; x=1698965741; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1698360943; x=1698965743; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O73qfCXoiolEYsufjM0ED0QL900jsutmX4Qh/ONnd0U=;
-        b=f8uWR3yWE+7bW1LH5DxMUmNQ/XS0Xsp6PAHP8Wx9CQSfyFSL0gos2UfWgz7J1fQydf
-         SVX6aJfCmqwKZDirfHJ9wL5V9aAfmMjJd57lQAxymgfYZ6xNRjPmz6j+kOr/ut3Lekn/
-         aa2Rvice9gR5NX2wqFE+ptim8PYmBf5R/wjxU=
+        bh=9AIYQxxruLMVQ3ZrapfmRmG764noMkpQnNwvdrpIsaw=;
+        b=WFhYFUqHWgNlIjkaVGP60L1eNH21M5umB0uJq3jjzN0RYHv6sOqSkLMFQvy/cSOT9H
+         mmZTm4JVd0asq2S124ph/2huIWyCKSlLwzYcdfuSZxhASA5Cj1CjpCbbmUUMsmwqpJiQ
+         yVFh1HrAsotQVa45i0aHvN5/5pAEWKWnbxhSg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698360941; x=1698965741;
+        d=1e100.net; s=20230601; t=1698360943; x=1698965743;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O73qfCXoiolEYsufjM0ED0QL900jsutmX4Qh/ONnd0U=;
-        b=ZvGr2RR8/Tr62MdmyBKh29Z1pOvZj4rEyGJCqDu+XNYoschAf+7f0FdNLs5gw4nbzv
-         ALHX5Bz4g+GzLAXVbTn70gV/gboVJEuaFAr+ikch+Kr5VWVLDBpw0arqTDkBjc5sJ/dM
-         LcqttGgLjh94tUgXBw2LG020MhyLpkiG4JxWdvyZUVFX2rmlXcut9vaRnP/GnGNV4jDq
-         cFtJgXlEzkQQozEIx4axIgkruT+/sO60ovkcu3S8m2xh5riXLUTr4YmQCPIjB1jr13D0
-         t+kJ4aIgEh8sOzzXObEFLJZ2Wl/AjdBUsxVffJTbTGEAN9ofHW7aveIhnfi85AYa4tFz
-         gSlw==
-X-Gm-Message-State: AOJu0Yx4EiRplv/1v5EoABDaWzICZUqcoIHNoTcH8ofNrULOSq7lS441
-	QNv81OD6utvQjunlcnRwJlnY4JIeqb9qH5/+K3VVExYMpw0qhB+NLvEZnFmpTPHvD6LkLLZ74/b
-	EXiAX+0cfX6C/dScGZPo2+4w+wb84Dk/bCrGORlOtV2Cax+M/IkM2gZzKl2AM+7+zqRqZ5aLxYe
-	2jkEF01RG5J6xK
-X-Google-Smtp-Source: AGHT+IGJHiS6vZru+AUOsJcfgVHC/zU/WvqNoaFnAInF01XTG2AshW+hkcJvTW9Rh0vF5uq2BV1RCA==
-X-Received: by 2002:a17:902:d2c9:b0:1bb:d59d:8c57 with SMTP id n9-20020a170902d2c900b001bbd59d8c57mr1019293plc.18.1698360940744;
-        Thu, 26 Oct 2023 15:55:40 -0700 (PDT)
+        bh=9AIYQxxruLMVQ3ZrapfmRmG764noMkpQnNwvdrpIsaw=;
+        b=Nqp9isbfwGWJNpuXDiPDBUjXTdr18i8dlp0Y6eNMGbyHxOezqj6CgSLaTxWw4pQHlS
+         K0f+vDm6VsixKO4TGozYTWy1+Y9VXe0jZPKKOGba5Z11M6WH4Wr8z/Aonc0f4qZKQpQB
+         S+osWMNnczFaSb/CYvbz3dhnW37lHQUWi4WxjEctZmD4RX/z5P9bvL4CxbgEx7LHAr5A
+         Ntv9brTlnv4pT2r9cgKga1PQpqjMT8a9oScIf8D80e0uLV5qfAKlPSK/ehOl5gT/vIi1
+         uVr03b2nQaYUKRZg45z/9yqckL3jfZkF7FQQPHsBacx0gpQTJF0iTBSGS68L32LZxGQn
+         q7xg==
+X-Gm-Message-State: AOJu0Yw/FS03ZNBfCrG2iErmhWiu+v759+KLpyRWn+3DgEhqDZQ9QHaf
+	hAT2pr/ufPS0BNYO+P2aYXfHzKgEZqP97ZPGMhlc7RYypdc5+7nrf79AjuQTcuL45Iaqg9nTl3C
+	76G3AGpQyf6lAgHKS+o3yjyAiEcbWW1wre+i0g2KtXE49m/G/7KdYQwJL1Kmf3tWARDjn8DerAw
+	fFEzs+2oZHT1Lr
+X-Google-Smtp-Source: AGHT+IG5L2uwMX10PCEPHxC1xLkEHNpI+SjwHHdW+/Nnmg4qB1uiCpao4Wf4Hb4GtCmDHy35jo6mGQ==
+X-Received: by 2002:a17:902:eb42:b0:1c9:c951:57f9 with SMTP id i2-20020a170902eb4200b001c9c95157f9mr884795pli.68.1698360943030;
+        Thu, 26 Oct 2023 15:55:43 -0700 (PDT)
 Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id o1-20020a170902d4c100b001c9b5b63e36sm206295plg.32.2023.10.26.15.55.38
+        by smtp.gmail.com with ESMTPSA id o1-20020a170902d4c100b001c9b5b63e36sm206295plg.32.2023.10.26.15.55.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 15:55:40 -0700 (PDT)
+        Thu, 26 Oct 2023 15:55:42 -0700 (PDT)
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 To: netdev@vger.kernel.org
 Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
@@ -79,9 +79,9 @@ Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
 	Jiri Pirko <jiri@resnulli.us>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v2 2/5] net: ethtool: Add validation for WAKE_FILTER
-Date: Thu, 26 Oct 2023 15:45:06 -0700
-Message-Id: <20231026224509.112353-3-florian.fainelli@broadcom.com>
+Subject: [PATCH net-next v2 3/5] net: phy: Add pluming for ethtool_{get,set}_rxnfc
+Date: Thu, 26 Oct 2023 15:45:07 -0700
+Message-Id: <20231026224509.112353-4-florian.fainelli@broadcom.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231026224509.112353-1-florian.fainelli@broadcom.com>
 References: <20231026224509.112353-1-florian.fainelli@broadcom.com>
@@ -92,119 +92,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000009a45e40608a67830"
+	boundary="000000000000bcccc10608a67896"
 
---0000000000009a45e40608a67830
+--000000000000bcccc10608a67896
 Content-Transfer-Encoding: 8bit
 
-A driver implementing WAKE_FILTER must first install at least one rule
-with RX_CLS_FLOW_WAKE for WAKE_FILTER to be effective. Iterate over
-RXNFC rules to validate that condition while trying to enable
-WAKE_FILTER.
+Ethernet MAC drivers supporting Wake-on-LAN using programmable filters
+(WAKE_FILTER) typically configure such programmable filters using the
+ethtool::set_rxnfc API and with a sepcial RX_CLS_FLOW_WAKE to indicate
+the filter is also wake-up capable.
+
+In order to offer the same functionality for capable Ethernet PHY
+drivers, wire-up the ethtool::{get,set}_rxnfc APIs within the PHY
+library.
 
 Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 ---
- net/ethtool/common.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- net/ethtool/common.h |  3 +++
- net/ethtool/ioctl.c  |  3 +++
- net/ethtool/wol.c    |  3 +++
- 4 files changed, 51 insertions(+)
+ drivers/net/phy/phy.c | 19 +++++++++++++++++++
+ include/linux/phy.h   |  8 ++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 143dae872fb2..bab901b35731 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -742,3 +742,45 @@ ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps, u32 size)
- 	}
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index a5fa077650e8..e2f2cc38ff31 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1740,3 +1740,22 @@ int phy_ethtool_nway_reset(struct net_device *ndev)
+ 	return ret;
  }
- EXPORT_SYMBOL_GPL(ethtool_forced_speed_maps_init);
+ EXPORT_SYMBOL(phy_ethtool_nway_reset);
 +
-+static int __ethtool_check_rxnfc_wake_filter(struct ethtool_rxnfc *rule_info,
-+					     void *priv)
++int phy_ethtool_get_rxnfc(struct phy_device *phydev,
++			  struct ethtool_rxnfc *nfc, u32 *rule_locs)
 +{
-+	bool *verdict = priv;
++	if (phydev->drv && phydev->drv->get_rxnfc)
++		return phydev->drv->get_rxnfc(phydev, nfc, rule_locs);
 +
-+	if (rule_info->fs.ring_cookie == RX_CLS_FLOW_WAKE) {
-+		*verdict = true;
-+		return 1;
-+	}
-+
-+	return 0;
++	return -EOPNOTSUPP;
 +}
++EXPORT_SYMBOL(phy_ethtool_get_rxnfc);
 +
-+/**
-+ * ethtool_dev_check_wake_filter: Tests if a network device can use the
-+ * WAKE_FILTER Wake-on-LAN option.
-+ * @dev: network device to test
-+ * @wol: %ethtool_wolinfo structure with Wake-on-LAN configuration
-+ *
-+ * Returns true if there is no support for %WAKE_FILTER, no support
-+ * for RXNFC ethtool operations, or if there is at least one WAKE_FILTER
-+ * installed.
-+ */
-+bool ethtool_dev_check_wake_filter(struct net_device *dev,
-+				   const struct ethtool_wolinfo *wol)
++int phy_ethtool_set_rxnfc(struct phy_device *phydev, struct ethtool_rxnfc *nfc)
 +{
-+	bool verdict = false;
-+	int ret;
++	if (phydev->drv && phydev->drv->set_rxnfc)
++		return phydev->drv->set_rxnfc(phydev, nfc);
 +
-+	if (!(wol->wolopts & WAKE_FILTER))
-+		return true;
-+
-+	if (!dev->ethtool_ops->get_rxnfc ||
-+	    !dev->ethtool_ops->set_rxnfc)
-+		return true;
-+
-+	ret = __ethtool_for_each_rxnfc(dev, __ethtool_check_rxnfc_wake_filter,
-+				       &verdict);
-+
-+	return ret < 0 ? false : verdict;
++	return -EOPNOTSUPP;
 +}
-diff --git a/net/ethtool/common.h b/net/ethtool/common.h
-index 28b8aaaf9bcb..6cd3286d5038 100644
---- a/net/ethtool/common.h
-+++ b/net/ethtool/common.h
-@@ -56,4 +56,7 @@ int ethtool_get_module_eeprom_call(struct net_device *dev,
++EXPORT_SYMBOL(phy_ethtool_set_rxnfc);
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 3cc52826f18e..03e7c6352aef 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -1077,6 +1077,10 @@ struct phy_driver {
+ 	int (*get_sqi)(struct phy_device *dev);
+ 	/** @get_sqi_max: Get the maximum signal quality indication */
+ 	int (*get_sqi_max)(struct phy_device *dev);
++	/* Used for WAKE_FILTER programming only */
++	int (*get_rxnfc)(struct phy_device *dev,
++			 struct ethtool_rxnfc *nfc, u32 *rule_locs);
++	int (*set_rxnfc)(struct phy_device *dev, struct ethtool_rxnfc *nfc);
  
- bool __ethtool_dev_mm_supported(struct net_device *dev);
+ 	/* PLCA RS interface */
+ 	/** @get_plca_cfg: Return the current PLCA configuration */
+@@ -1989,6 +1993,10 @@ int phy_ethtool_set_plca_cfg(struct phy_device *phydev,
+ 			     struct netlink_ext_ack *extack);
+ int phy_ethtool_get_plca_status(struct phy_device *phydev,
+ 				struct phy_plca_status *plca_st);
++int phy_ethtool_get_rxnfc(struct phy_device *phydev,
++			  struct ethtool_rxnfc *nfc, u32 *rule_locs);
++int phy_ethtool_set_rxnfc(struct phy_device *phydev,
++			  struct ethtool_rxnfc *nfc);
  
-+bool ethtool_dev_check_wake_filter(struct net_device *dev,
-+				   const struct ethtool_wolinfo *wol);
-+
- #endif /* _ETHTOOL_COMMON_H */
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 0b0ce4f81c01..954446185158 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1457,6 +1457,9 @@ static int ethtool_set_wol(struct net_device *dev, char __user *useraddr)
- 	    !memcmp(wol.sopass, cur_wol.sopass, sizeof(wol.sopass)))
- 		return 0;
- 
-+	if (!ethtool_dev_check_wake_filter(dev, &wol))
-+		return -EOPNOTSUPP;
-+
- 	ret = dev->ethtool_ops->set_wol(dev, &wol);
- 	if (ret)
- 		return ret;
-diff --git a/net/ethtool/wol.c b/net/ethtool/wol.c
-index 0ed56c9ac1bc..65fbe743a070 100644
---- a/net/ethtool/wol.c
-+++ b/net/ethtool/wol.c
-@@ -132,6 +132,9 @@ ethnl_set_wol(struct ethnl_req_info *req_info, struct genl_info *info)
- 				    tb[ETHTOOL_A_WOL_SOPASS], &mod);
- 	}
- 
-+	if (!ethtool_dev_check_wake_filter(dev, &wol))
-+		return -EOPNOTSUPP;
-+
- 	if (!mod)
- 		return 0;
- 	ret = dev->ethtool_ops->set_wol(dev, &wol);
+ int __phy_hwtstamp_get(struct phy_device *phydev,
+ 		       struct kernel_hwtstamp_config *config);
 -- 
 2.34.1
 
 
---0000000000009a45e40608a67830
+--000000000000bcccc10608a67896
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -275,15 +240,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBHvslxH5XVAUqC0
-VQqu27zdMPfiM8dAJdAoa9wriqZrMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTAyNjIyNTU0MVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFq4DqNGgCW1Pvxe
+JvBdn2YMihqXn7e+rZsCmFuFH05kMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMTAyNjIyNTU0M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAy+bpEaOjnF6B+zFU+ZZ3Y1mqDUN1YWhdB
-x0OCffYap7H+UcGTzadZ8Ghnh1Z2sXJmJ8+ESzimB/p8Iu4Q0/fWxOcO/PicW0GF7mZ/cNwJ+qKo
-fdLDf2syC29Rg6TLHV9cwUayA7Guvh6DDKwp0X0i5oXDmcq87qAMa9IH9MySWGmuNXm7QVtBFAQw
-GqBvXwKD8CGxJnFRZrBlt/BfXUS7LxkhLE9Yiczhvb+yE17XqNXseuP+dRduN/BNOPseKa9Tb/Rw
-T8FnGoViRVs4e4PFYEkFJM/O7gsJ2BhOlBCdWM10UjY7WtBQtezSgNlgkZFCFBOb7CAA3VE26lHv
-BqWd
---0000000000009a45e40608a67830--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCa+ckgPwav6JdaTU/5sxA/lutEKV21ykrx
+ljUzUeRCjTV1T/FY6s7w4iU/H2qWHXVQ90HINPjVnzD28OgqEN93tjCWkALnh4uYikDet5OEjidv
+o/9s4VFwzrrRxNswZCscXuBNwbNfV9wxoj+B1zuRnmpKIxyJd7KfGNJ+vR0H+fV9rNCCe0ZM85g5
+Xu+X6YDHg7EdMPSL0PUTzEUcASPzWpDgCQZLCrvMEfvac6qG9BzD7wr8lrij+HnvZoc+h11ywYxj
+58jtV5CEBhzBnUUlKeZq26n6Re7ZfrQgYjpKXXgaIgzLXec1xGXEFXIdiz2mAZU0OAcATXYJxc2o
+JfRD
+--000000000000bcccc10608a67896--
 
