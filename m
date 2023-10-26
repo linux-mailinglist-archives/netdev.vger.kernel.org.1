@@ -1,228 +1,287 @@
-Return-Path: <netdev+bounces-44442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD9E57D7FE2
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:43:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D5AB7D7FEA
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F402B212D5
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 09:43:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85D9CB211AB
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 09:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386C728DA1;
-	Thu, 26 Oct 2023 09:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9B9286A6;
+	Thu, 26 Oct 2023 09:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L1ak0asp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GO31yEI0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B828B286AA
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 09:42:57 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9AEB1A2;
-	Thu, 26 Oct 2023 02:42:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698313376; x=1729849376;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=UhQH95HSQ0a5F6vMDXnKMvc59wLPv/Rp0FjtRjAK9bg=;
-  b=L1ak0asp/MSLd6AP72/H+QNDPdbaSu1Z6vW0kmZvq3hFk3gVJDHwBlGh
-   S/VHTC6zhfqyl/SKo0LllZqM2Qmc9y7dNAc6jS23BtoJSTtZq4+yN4rbr
-   gf1xABvgAEUcKU7OeK7SOatHJ1ey+k3NjRppFeW7bA1WsaYZzVzg8rNoa
-   ZpjbEA9qD8SldPcqs8y3SrFPuQGaVAVF69VLF4hS7MKGh4mfhX3IMmBz/
-   Rw1a2+KJ4nliFlWpOm0qub8/wlZnifOudMvpDlnWERPthY3eZzyqG2JQk
-   ygjxeXmYdGXVr2w/+xVYIV7YVYlLTliP0yOl4SUHBdxID1IoVNh3z1Ib1
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="451737974"
-X-IronPort-AV: E=Sophos;i="6.03,253,1694761200"; 
-   d="scan'208";a="451737974"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 02:42:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="829555884"
-X-IronPort-AV: E=Sophos;i="6.03,253,1694761200"; 
-   d="scan'208";a="829555884"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Oct 2023 02:42:55 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 26 Oct 2023 02:42:55 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 26 Oct 2023 02:42:55 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 26 Oct 2023 02:42:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ov5qeHCwQOJRj+QCcyzQRtnYHyKgN1dKjABkvcUyjYfEZREue40wrnVlDVkuCz7JzoAQ8qR9G27Ltgt6ubitzwivZqvtLirBN+V67T9cFQ1ZAIhMYa73Bda53xx0+cjFqrBo+fqOdy+I7I1i0pka5SaFsnHdLRfumPz5pwJLSj7tp/0xBzlvf6KZE5BiaMMI2MprLXxJBPDRjfnttf3b2q11B+eMZHDwAFWjPxoKg5Qh7VMV2jP6pt4vFaLqBchfGmdT+tpejgsT9qvUsfLTPuea1yMWCkzOEmT7WsOyZXKrf3FLvwDmggQaehdyVHaXwUa0N23OfJCX2Qs6+t73Ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CSjpP5JvFVTpTt1XsyzU8t7Ub7soh/CJgVNosx84eGI=;
- b=LUFAyOWA6uZ56+jj1515EOpRh7iZT4Q5+1EK0c/LgKfoeWGvzSwPVG73YhIzDdYWbbBpc7GwQIViw3FELIAdestPFeyWImtxekmoj7+KirP0zt1piCjJdj0H53AY91CgxgnrIJ3md3XWqkcKcVe1KA+0myXhWVpDgM3g0CAOZptpfNkdj6E86aDex776oJi4FFj7pIdpj3hy31glNA4qMbJKvwnPZSScn+d+G9rTfOZ+Nygh3MUgPDgTe0zSO2h4qa6ejdPZQ1/tUPdd+BpnBWCnYDNt1vS9SBqngzm5oVWDOqM/Kno3lH+mJxDpgH9dlB/Lv9VZNbwu+JZj0FhhzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by BL3PR11MB6481.namprd11.prod.outlook.com (2603:10b6:208:3bc::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.33; Thu, 26 Oct
- 2023 09:42:52 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::71a7:70c4:9046:9b8a]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::71a7:70c4:9046:9b8a%4]) with mapi id 15.20.6907.032; Thu, 26 Oct 2023
- 09:42:52 +0000
-Message-ID: <beb49134-37c7-48c6-8f3f-ac4a083d6bd6@intel.com>
-Date: Thu, 26 Oct 2023 11:42:45 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 1/2] i40e: Remove VF MAC types
-Content-Language: en-US
-To: Jacob Keller <jacob.e.keller@intel.com>, Ivan Vecera <ivecera@redhat.com>,
-	<netdev@vger.kernel.org>
-CC: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20231025103315.1149589-1-ivecera@redhat.com>
- <20231025103315.1149589-2-ivecera@redhat.com>
- <8a8f54a8-1a18-4797-a592-b57bc6fc45c1@intel.com>
- <cbb2e9f4-03f8-4a46-99e4-e952bb754a2f@redhat.com>
- <022960b9-dfd1-4ed8-9b46-9cc11ba060e2@intel.com>
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <022960b9-dfd1-4ed8-9b46-9cc11ba060e2@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA2P291CA0014.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1e::25) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 762B827728
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 09:45:56 +0000 (UTC)
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9867C10A
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 02:45:54 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so8042a12.1
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 02:45:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698313553; x=1698918353; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ik0oEwD2x0UjxkF+mBYA9t7kM+iJesc5g6Z8M7TZ7Bs=;
+        b=GO31yEI0MIePGDZfBvwIOhkSH92iyo3bn6CjEQZFjiJAMPDCQPG55DyyIUQShfg9dj
+         fX+K6jfzfR2e5iClOeHfC3fd0K1eY3+jZy4ZLxd+5y8JZXhlL43lLEdgKF/rMTZut4iT
+         9tyDQYrCMqp6+A2f6zQkSiz/gd9con/fL3dd6zvia6UHxPxZcJ03b2iW28+hOwmDZ1om
+         5v0AWmp2ab5rONJKhBazP0z1XcxKdWrbxIfzoRNBOQlHoL3+umG9I/z6NxMhP+SAxB46
+         RH9QUc5SSLCC9EH97gaZmZFmuVTE4PdU30FtGzBR9qrsgSryFF9i5C12rc7Njh9BNzkA
+         cseQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698313553; x=1698918353;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ik0oEwD2x0UjxkF+mBYA9t7kM+iJesc5g6Z8M7TZ7Bs=;
+        b=NjP0KFzoUf4ACVIwIFuPBTCHfIp51Y2d7xmbMzsqqv4GFX+fk9dVhdKRCvfFWc2dci
+         r8K1Hz8+WcJKlbpbE/BBo2+OmsFw55gCW0wC9Q+zJuURtUWQzKqypW02XzS03GiZSup+
+         7S+H07at1iXxY/avuN2VnitL9R12WmWXEv4E93ByAdU1S6/ynkbrMDK/25P/UplVpPtM
+         RAfTjfV7QzXLOjAFdWzD5AklE0bwA92cQFeohkFmQdokhyCc3ZzJtd3LIPhT6rirH8Cu
+         ch70QDYoSYLTi/Vxmuy3pX1n/EK5pZNxkobJjNBKRtjm2XQJkmyG1AwBWddAwn5DZFk1
+         mWcQ==
+X-Gm-Message-State: AOJu0YwylBAnbaKrLZKz7x+PJCatDZN8sdzvJNsLI9+0gMPODNQhNajg
+	sLYqppGHTa7SftyBbzJr1+2xEfDXWQmabA/wQERHdw==
+X-Google-Smtp-Source: AGHT+IGjkaZ2qcbxgYarRjQhyWOs3/z72RuFkhHcI7HXuGHkyrDkRITx1enyFy0ggJNcryG1F8H52KkLXH+zaryAOek=
+X-Received: by 2002:aa7:da95:0:b0:540:e46d:1ee8 with SMTP id
+ q21-20020aa7da95000000b00540e46d1ee8mr243948eds.4.1698313552739; Thu, 26 Oct
+ 2023 02:45:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|BL3PR11MB6481:EE_
-X-MS-Office365-Filtering-Correlation-Id: f634bded-247a-4de4-83f2-08dbd607ec7d
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jtqEpjv9cKOxLSSS4Rjmyp9xOi4AWXT6oFx0SgAGMxJ8FwTPvOI+Mvph9Erpgl0cZlPjK8uhQyMv0bsqJYq/svCNKmwkM7IyRPggmJjIKCrqxOfxedIMuqPKRezgJh3Pob58pTt8Npv5Evx6XRVfPWvHKFVzRjvdRov9KdB0HA3qTzRASGY79KcxUGWmJ0+vkCk94SGvUJj41QzkxDoglP+I+K053yTfHzBT02rtZeNtxtDcP0LC69EAza8TvlXpUE8Vrj2yLdRlSdte0mCr/vv5tTM2Lv92zPQYRnzdTnOIB5YSPrBnXBP6BsX6hvABAvABiWflIrwojPSh+VjAWYsiyPGKDDPR+hOxIkaFwTGPXLtGm5LXsDGxvemeP4dj5oHt7orj6hRHru/Hru8veWaOEXxxPG8STlCzJwEAwXHw/6CV6+F3VBN9KV4MCCiBkWNO0eQq7nhBvb5muIplAjWFzcOio8sk2xbo7pxCoTQggVLbVSgd1FLv0gAc+DFVbKWUrO/1jrgaWbOgs5AoViV6QZ+zdHRfc7ftsRYXC80WTAI2Xa84/eFVt3Cqcm8tsl4uWa79JBqHltgADjWt+TYWvFGg/xn460q84ycXQNjESNztvSw5Due/YzQsXvVZ2MiAt669yOc506RoCWyS9w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(396003)(136003)(376002)(346002)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(2906002)(2616005)(66556008)(31696002)(6506007)(6512007)(26005)(54906003)(6486002)(110136005)(6666004)(53546011)(66946007)(82960400001)(83380400001)(38100700002)(5660300002)(4326008)(316002)(41300700001)(66476007)(36756003)(8936002)(8676002)(44832011)(86362001)(31686004)(478600001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZlMxd2dLdjBTL0VmOENXd0VaNmtIeWxqeGFRTG5KUHVzSW50SG1UNkhaM0Ra?=
- =?utf-8?B?MXZwY01sUkpKL2lQQTI4OUtYalk4Y0pzcGFWaHdoaXNSeHQ1VmNsTVllaSta?=
- =?utf-8?B?bWR3SmtKQXNWTDltY2xBQmhTQXVRTkFFOXhYeXQxbERkWWc2VWtPRmxLNTlX?=
- =?utf-8?B?emQrcitYMit5dlhYQlpCUWNFOWNhdWRJRTlueUpaU09sVWVLb2lMcEZId04z?=
- =?utf-8?B?ekxLY3Fnb2x3OUN3MVFTRHhQdmpITWRPOTZxNm1NWmVNb0dnNTZ6VDkxV2N1?=
- =?utf-8?B?dFhKUzlJQWJtS3I3bUdHaFFKQXJTT2x0NXQ5dUYvVjZxU3k1YzcyQjBMVnFj?=
- =?utf-8?B?NmJjay96Sy9nNFpZd2dMMm9reXdBVE5tSnhVYVlkS1d0MEJVUVBsVDExRC9l?=
- =?utf-8?B?Qkw2Ni8xRklSVXJNdjNOMk1scVdBNTl6dmtyMkpHSElBd2gvWXVYOFVDUHNV?=
- =?utf-8?B?YmV2Z2E5VFIxRHByYXR1ektuM1hDMld3U0Z5bEVjdDFxb0VWSEdFQVRmZFln?=
- =?utf-8?B?aHdoM1Jpc2t1bkl0Y01BcVZUbGt4dXF1aWhteTZoOVcvZW9yZk83dVZsV2Ri?=
- =?utf-8?B?S2puOHFkK2R2S2V0S2ordVBpUm9WRzFqUnZwVkUxdEl0SDI3b1pPSEdKMmVr?=
- =?utf-8?B?LzNLTW5BU0ZyejhqV1BlRVlLSmVrRDJwcmFva29KdHBGd0xXOGRtWUpFekcv?=
- =?utf-8?B?UHBKYjNMY0wzS2syb2JQTHBYQVM2d1pTcGZ3UmtxSjFOTHRLRU1WdVBZYllq?=
- =?utf-8?B?VnlnTUZDUVIrWVFCUjhZZkRoWUFYUERoaHpUaVo2VVR4VE5sYUQrQlhzM1h3?=
- =?utf-8?B?UFhtbmNxQVpXaVA4MzJkZEpUbnE3M2pQT1lGaEE5Z3dEaHl2SkordkNSeXBr?=
- =?utf-8?B?a3J6WTM5bjJyMk1tRXVQWmdsQjBLZkZZN0V5SFdIbEFBdi9NaDlyL3ZtZDNU?=
- =?utf-8?B?Q1lMZE1sNzd1eUVlMzZTdVBFQlhhZ0ZPUlUrODdvWGFWM01sYWlUdmt4Yk8v?=
- =?utf-8?B?dE5hTHF2SU9iWVN5czIxRHB0cExoemJxMERhRFJQaWU3TUttbGY4bm1QcDZI?=
- =?utf-8?B?N1ZMSGR4YTFYRlNjdnFJb0tvUFlNVXQ3UWZ0T1RrYmpYbjNoMXBVZG0vVTJv?=
- =?utf-8?B?ZTBrcXB6czlUcVBhcWtUSnpJcmVma21BeGQybGRGZW55aFg5ZUE3RnRPenNy?=
- =?utf-8?B?bDNCeThSTFcvMFQ0RTd6NlZNcWRPS1JDQWZMWXVCajdRUEJPNEVYc210elJW?=
- =?utf-8?B?eUkrTzdYc1hONjhQbmYrc3ZEaFRMbEhVZzRmK0hlRWR5bnVEbWxmd2NtcEJK?=
- =?utf-8?B?YzUrWnBoR2ZhenU2Q09rRUYxN2hpVHRsTXdPV1llNStwaDlJWGZ6M0pPQk82?=
- =?utf-8?B?RGtEOXZ3MzdwcTgrMnVBUkoyMDZ3TFR3ZDViS0twcldBT3UyeFNlbnRxb3lG?=
- =?utf-8?B?NTdYZGlOTFd3VGJYTEp1V1BiQjMrMkxacEdmazJoUU0zbE04bEVOeEMwWUVw?=
- =?utf-8?B?ZzFHUkRkVTRVUmE1WitSalVvM3h2QUtzSXZ3QjlJM28xRzRhcm1JdE5MZDJD?=
- =?utf-8?B?Z3k3MWlrdWFVL2phdzdHbzlZemNNYm5oaWFrUlNQc0IvZHBCemFPMjI5NXFI?=
- =?utf-8?B?SDdnODRSVUhHZkNnSEJrR3dGcFIwd3Brc3FoVmgzMmtMQW5HYUYwQkhjSHBh?=
- =?utf-8?B?ZS9wUld3NDNsMFBpbGRVMy95bXRIQ3d5YS83M2Q5L0tHemN5VzB0Wmp3YjlF?=
- =?utf-8?B?cDd4TlhDT1BLZjJkeG5TdmhkcHppdFZCdEh5NC9DaUJJcXFQUEJjTzVsM1dx?=
- =?utf-8?B?dUN1QU5YZFRWaHpwUEFuMElpYkd4d01lNVFKdkF4S256YXlTQVFJZ0NOZWhw?=
- =?utf-8?B?dHJEVzlaZDhRVGVYL0I0MEF1OTdZWkNNSVU0NHBTNFRKVm9JdzNMMnpvS2tQ?=
- =?utf-8?B?cE9QZ1ZJSVdiYjMwYlJyVmVzcTBuS1FpZktFNjd2NXBycWxFb3BlRG44cktF?=
- =?utf-8?B?MFlrdERWTTU4MzF1dklNYzlvUmNmVndCUi9Oc3NJYjV2UDd2enFLb215RUI2?=
- =?utf-8?B?ekxqU3BPbnc2NG1vSUZ2YzhWaFJPL3p4OUtTeTZTM0ZnT0VPZmlUMGNhSnBn?=
- =?utf-8?B?NndaWkN2WVJ0TU5RV3l2VlBUaytRTW5TSVVFMnUybFRaYTk4UFo1VDU1ZDdK?=
- =?utf-8?B?eWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f634bded-247a-4de4-83f2-08dbd607ec7d
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2023 09:42:52.6432
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qIRR6m4CQfilBVdB9ThhHaWoV/6+GCqlarHTAanoWBjPeIxNB1SRxBl0cKhFF1dE52mif65lqOOVm4B49+HbGhHFb5qQKp2eUAC52xMPQM4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6481
-X-OriginatorOrg: intel.com
+References: <20231026081959.3477034-1-lixiaoyan@google.com> <20231026081959.3477034-5-lixiaoyan@google.com>
+In-Reply-To: <20231026081959.3477034-5-lixiaoyan@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 26 Oct 2023 11:45:41 +0200
+Message-ID: <CANn89iJaavn3aArjc1LDXDs1wfTZV=hUVnreQu=3Dnde=BOEMQ@mail.gmail.com>
+Subject: Re: [PATCH v4 net-next 4/6] netns-ipv4: reorganize netns_ipv4 fast
+ path variables
+To: Coco Li <lixiaoyan@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Mubashir Adnan Qureshi <mubashirq@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, 
+	Wei Wang <weiwan@google.com>, Pradeep Nemavat <pnemavat@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Oct 26, 2023 at 10:20=E2=80=AFAM Coco Li <lixiaoyan@google.com> wro=
+te:
+>
+> Reorganize fast path variables on tx-txrx-rx order.
+> Fastpath cacheline ends after sysctl_tcp_rmem.
+> There are only read-only variables here. (write is on the control path
+> and not considered in this case)
+>
+> Below data generated with pahole on x86 architecture.
+> Fast path variables span cache lines before change: 4
+> Fast path variables span cache lines after change: 2
+>
+> Signed-off-by: Coco Li <lixiaoyan@google.com>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: Wei Wang <weiwan@google.com>
+> Reviewed-by: David Ahern <dsahern@kernel.org>
+> ---
+>  fs/proc/proc_net.c       | 39 ++++++++++++++++++++++++++++++++++++
+>  include/net/netns/ipv4.h | 43 ++++++++++++++++++++++++++--------------
+>  2 files changed, 67 insertions(+), 15 deletions(-)
+>
+> diff --git a/fs/proc/proc_net.c b/fs/proc/proc_net.c
+> index 2ba31b6d68c07..38846be34acd9 100644
+> --- a/fs/proc/proc_net.c
+> +++ b/fs/proc/proc_net.c
+> @@ -344,6 +344,43 @@ const struct file_operations proc_net_operations =3D=
+ {
+>         .iterate_shared =3D proc_tgid_net_readdir,
+>  };
+>
+> +static void __init netns_ipv4_struct_check(void)
+> +{
+> +       /* TX readonly hotpath cache lines */
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_early_retrans);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_tso_win_divisor);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_tso_rtt_log);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_autocorking);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_min_snd_mss);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_notsent_lowat);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_limit_output_bytes);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_min_rtt_wlen);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_wmem);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_ip_fwd_use_pmtu);
+> +       /* TXRX readonly hotpath cache lines */
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_moderate_rcvbuf);
+> +       /* RX readonly hotpath cache line */
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_ip_early_demux);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_early_demux);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_reordering);
+> +       CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read,
+> +                                     sysctl_tcp_rmem);
+> +}
+> +
+>  static __net_init int proc_net_ns_init(struct net *net)
+>  {
+>         struct proc_dir_entry *netd, *net_statd;
+> @@ -351,6 +388,8 @@ static __net_init int proc_net_ns_init(struct net *ne=
+t)
+>         kgid_t gid;
+>         int err;
+>
+> +       netns_ipv4_struct_check();
+> +
+>         /*
+>          * This PDE acts only as an anchor for /proc/${pid}/net hierarchy=
+.
+>          * Corresponding inode (PDE(inode) =3D=3D net->proc_net) is never
+> diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+> index 73f43f6991999..617074fccde68 100644
+> --- a/include/net/netns/ipv4.h
+> +++ b/include/net/netns/ipv4.h
+> @@ -42,6 +42,34 @@ struct inet_timewait_death_row {
+>  struct tcp_fastopen_context;
+>
+>  struct netns_ipv4 {
+> +       /* Cacheline organization can be found documented in
+> +        * Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst.
+> +        * Please update the document when adding new fields.
+> +        */
+> +
+> +       __cacheline_group_begin(netns_ipv4_read);
+
+Same remark here, please use three different groups, instead of a single on=
+e.
+
+__cacheline_group_begin(tx_path);
+
+> +       /* TX readonly hotpath cache lines */
+> +       u8 sysctl_tcp_early_retrans;
+> +       u8 sysctl_tcp_tso_win_divisor;
+> +       u8 sysctl_tcp_tso_rtt_log;
+> +       u8 sysctl_tcp_autocorking;
+> +       int sysctl_tcp_min_snd_mss;
+> +       unsigned int sysctl_tcp_notsent_lowat;
+> +       int sysctl_tcp_limit_output_bytes;
+> +       int sysctl_tcp_min_rtt_wlen;
+> +       int sysctl_tcp_wmem[3];
+> +       u8 sysctl_ip_fwd_use_pmtu;
+> +
+
+__cacheline_group_end(tx_path);
+__cacheline_group_begin(rxtx_path);
+> +       /* TXRX readonly hotpath cache lines */
+> +       u8 sysctl_tcp_moderate_rcvbuf;
+> +
+
+__cacheline_group_end(rxtx_path);
+__cacheline_group_begin(rx_path);
+
+> +       /* RX readonly hotpath cache line */
+> +       u8 sysctl_ip_early_demux;
+> +       u8 sysctl_tcp_early_demux;
+> +       int sysctl_tcp_reordering;
+> +       int sysctl_tcp_rmem[3];
+> +       __cacheline_group_end(netns_ipv4_read);
+
+__cacheline_group_end(rx_path);
 
 
-
-On 25.10.2023 19:44, Jacob Keller wrote:
-> 
-> 
-> On 10/25/2023 7:39 AM, Ivan Vecera wrote:
->>
->>
->> On 25. 10. 23 12:48, Wojciech Drewek wrote:
->>>
->>> On 25.10.2023 12:33, Ivan Vecera wrote:
->>>> The i40e_hw.mac.type cannot to be equal to I40E_MAC_VF or
->>>> I40E_MAC_X722_VF so remove helper i40e_is_vf(), simplify
->>>> i40e_adminq_init_regs() and remove enums for these VF MAC types.
->>>>
->>>> Signed-off-by: Ivan Vecera<ivecera@redhat.com>
->>>> ---
->>>>   drivers/net/ethernet/intel/i40e/i40e_adminq.c | 33 ++++++-------------
->>>>   drivers/net/ethernet/intel/i40e/i40e_type.h   |  8 -----
->>>>   2 files changed, 10 insertions(+), 31 deletions(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.c b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
->>>> index 29fc46abf690..896c43905309 100644
->>>> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq.c
->>>> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
->>>> @@ -17,29 +17,16 @@ static void i40e_resume_aq(struct i40e_hw *hw);
->>>>   static void i40e_adminq_init_regs(struct i40e_hw *hw)
->>>>   {
->>>>   	/* set head and tail registers in our local struct */
->>>> -	if (i40e_is_vf(hw)) {
->>>> -		hw->aq.asq.tail = I40E_VF_ATQT1;
->>>> -		hw->aq.asq.head = I40E_VF_ATQH1;
->>>> -		hw->aq.asq.len  = I40E_VF_ATQLEN1;
->>>> -		hw->aq.asq.bal  = I40E_VF_ATQBAL1;
->>>> -		hw->aq.asq.bah  = I40E_VF_ATQBAH1;
->>>> -		hw->aq.arq.tail = I40E_VF_ARQT1;
->>>> -		hw->aq.arq.head = I40E_VF_ARQH1;
->>>> -		hw->aq.arq.len  = I40E_VF_ARQLEN1;
->>>> -		hw->aq.arq.bal  = I40E_VF_ARQBAL1;
->>>> -		hw->aq.arq.bah  = I40E_VF_ARQBAH1;
->>> What about removing those I40E_VF_* defines?
->>> This is their only usage here, right?
->>
->> Yes, do you want to remove them in this patch? Or follow-up is sufficient?
->>
->> Ivan
->>
->>
-> 
-> I'm fine with a follow up.
-
-Me too
-
-> 
-> Thanks,
-> Jake
+> +
+>         struct inet_timewait_death_row tcp_death_row;
+>         struct udp_table *udp_table;
+>
+> @@ -96,17 +124,14 @@ struct netns_ipv4 {
+>
+>         u8 sysctl_ip_default_ttl;
+>         u8 sysctl_ip_no_pmtu_disc;
+> -       u8 sysctl_ip_fwd_use_pmtu;
+>         u8 sysctl_ip_fwd_update_priority;
+>         u8 sysctl_ip_nonlocal_bind;
+>         u8 sysctl_ip_autobind_reuse;
+>         /* Shall we try to damage output packets if routing dev changes? =
+*/
+>         u8 sysctl_ip_dynaddr;
+> -       u8 sysctl_ip_early_demux;
+>  #ifdef CONFIG_NET_L3_MASTER_DEV
+>         u8 sysctl_raw_l3mdev_accept;
+>  #endif
+> -       u8 sysctl_tcp_early_demux;
+>         u8 sysctl_udp_early_demux;
+>
+>         u8 sysctl_nexthop_compat_mode;
+> @@ -119,7 +144,6 @@ struct netns_ipv4 {
+>         u8 sysctl_tcp_mtu_probing;
+>         int sysctl_tcp_mtu_probe_floor;
+>         int sysctl_tcp_base_mss;
+> -       int sysctl_tcp_min_snd_mss;
+>         int sysctl_tcp_probe_threshold;
+>         u32 sysctl_tcp_probe_interval;
+>
+> @@ -135,17 +159,14 @@ struct netns_ipv4 {
+>         u8 sysctl_tcp_backlog_ack_defer;
+>         u8 sysctl_tcp_pingpong_thresh;
+>
+> -       int sysctl_tcp_reordering;
+>         u8 sysctl_tcp_retries1;
+>         u8 sysctl_tcp_retries2;
+>         u8 sysctl_tcp_orphan_retries;
+>         u8 sysctl_tcp_tw_reuse;
+>         int sysctl_tcp_fin_timeout;
+> -       unsigned int sysctl_tcp_notsent_lowat;
+>         u8 sysctl_tcp_sack;
+>         u8 sysctl_tcp_window_scaling;
+>         u8 sysctl_tcp_timestamps;
+> -       u8 sysctl_tcp_early_retrans;
+>         u8 sysctl_tcp_recovery;
+>         u8 sysctl_tcp_thin_linear_timeouts;
+>         u8 sysctl_tcp_slow_start_after_idle;
+> @@ -161,21 +182,13 @@ struct netns_ipv4 {
+>         u8 sysctl_tcp_frto;
+>         u8 sysctl_tcp_nometrics_save;
+>         u8 sysctl_tcp_no_ssthresh_metrics_save;
+> -       u8 sysctl_tcp_moderate_rcvbuf;
+> -       u8 sysctl_tcp_tso_win_divisor;
+>         u8 sysctl_tcp_workaround_signed_windows;
+> -       int sysctl_tcp_limit_output_bytes;
+>         int sysctl_tcp_challenge_ack_limit;
+> -       int sysctl_tcp_min_rtt_wlen;
+>         u8 sysctl_tcp_min_tso_segs;
+> -       u8 sysctl_tcp_tso_rtt_log;
+> -       u8 sysctl_tcp_autocorking;
+>         u8 sysctl_tcp_reflect_tos;
+>         int sysctl_tcp_invalid_ratelimit;
+>         int sysctl_tcp_pacing_ss_ratio;
+>         int sysctl_tcp_pacing_ca_ratio;
+> -       int sysctl_tcp_wmem[3];
+> -       int sysctl_tcp_rmem[3];
+>         unsigned int sysctl_tcp_child_ehash_entries;
+>         unsigned long sysctl_tcp_comp_sack_delay_ns;
+>         unsigned long sysctl_tcp_comp_sack_slack_ns;
+> --
+> 2.42.0.758.gaed0368e0e-goog
+>
 
