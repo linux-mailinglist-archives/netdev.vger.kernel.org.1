@@ -1,181 +1,334 @@
-Return-Path: <netdev+bounces-44512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60B057D8572
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 17:02:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D45467D857E
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 17:05:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE90AB20D8D
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 15:02:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88CD5282085
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 15:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE802EB1B;
-	Thu, 26 Oct 2023 15:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5052EB1F;
+	Thu, 26 Oct 2023 15:05:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ITmJvQry"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="TElU8y0O"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04ECF1D52B
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:02:07 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5047018A
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 08:02:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698332524;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Le7r1qZdjn6tilkqUR5AFBSjzkY/HKzRQy2FXtGZ7Zs=;
-	b=ITmJvQryvmvVW4ZjbahwbbLW5rlyVy4ZEa0ALC1geggUbPMWu+tVRVLm4DkDO0Sb8Kd1kA
-	XZwsWx7Am1jaNBUOPep0ykjUDUiJEv5qYikp66ixMHoR+l5NMjNmGo86cOberSRpHZt/wk
-	wW9sjdZczihRECRbl47QWkr8XfMaTfM=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-48-CJUDbzJaOVmOKJFEhovj-w-1; Thu, 26 Oct 2023 11:02:03 -0400
-X-MC-Unique: CJUDbzJaOVmOKJFEhovj-w-1
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1c9fc94b182so9509445ad.1
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 08:02:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698332522; x=1698937322;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Le7r1qZdjn6tilkqUR5AFBSjzkY/HKzRQy2FXtGZ7Zs=;
-        b=UyQn37iy6ihEpMr3XuTE5f15zjlqL/y1jAlw85YpF2e0n9sOLnQwBm2rapPqT4NRHF
-         u1CbOJMyZNaEek6mmEYDILNa/YP8q2rNpOSW7PwowzWlfWHeq+BhNJQWcdO/Jp0haTCs
-         YuCGpT50a8M1+AwiYMR/bGHDjz75ARDw06U1bs57E7SZHkboDZXJra5ql9vuwIBIVZlg
-         QxHjjGd/etIIGsfNnfyDUZwTLTD4fMFxuhsg///eFAhEloUSu1uKhYQzvd8nhfzoUgBg
-         5yNazwhS3WA2r51eHySYKM9V8Bqkk3RqQwV2THmrqAxBmEXIsDocL3hZQMeqeRxr6SjJ
-         fvMg==
-X-Gm-Message-State: AOJu0YzlI7HWFFf2wdCDUV3bB2JMNa2DMZ5nhSBf8z8rSs1EjD7kLgn6
-	+SuiWJ4ZTN5/fMIa7Gji9YA21Qwen3ijJ1yoJbvejndJSupfB+e3+PqBbSyhsaL+HqawRSMl7AO
-	TdmgZvOQyGj4DVpP4jMd/JyIFeug=
-X-Received: by 2002:a17:902:d48b:b0:1cc:c0f:c163 with SMTP id c11-20020a170902d48b00b001cc0c0fc163mr2030460plg.17.1698332521979;
-        Thu, 26 Oct 2023 08:02:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEkMkNFGl6pf3X2t9+qgnZ2jJ6k9tsZamwMF9GCo+CggK6U8NBQgmvo80UyqhXw/fy4mQy7ew==
-X-Received: by 2002:a17:902:d48b:b0:1cc:c0f:c163 with SMTP id c11-20020a170902d48b00b001cc0c0fc163mr2030417plg.17.1698332521352;
-        Thu, 26 Oct 2023 08:02:01 -0700 (PDT)
-Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
-        by smtp.gmail.com with ESMTPSA id g11-20020a170902740b00b001c60e7bf5besm11032572pll.281.2023.10.26.08.01.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 08:02:00 -0700 (PDT)
-From: Shigeru Yoshida <syoshida@redhat.com>
-To: stefanha@redhat.com,
-	sgarzare@redhat.com,
-	davem@davemloft.net,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCA92EB12;
+	Thu, 26 Oct 2023 15:05:15 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B70718F;
+	Thu, 26 Oct 2023 08:05:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=kWKrxEGv66JIOK1EuIMdyh2Dm/xG6DW2++QgfIIgit0=; b=TElU8y0OcvlSpq/JU3XlNzw0AZ
+	O8w4FDgol+V43AzGp/C/PfHFHikcYANeZ/ZFo6o+FfhnBd0YG/0ssX64YBznJDsQbAR0wVhDvLp3Y
+	R9BX6k0GlzL8XOTS0H7iepCWt7sB5Hpli/6ppxBFcGrKI2Q8W+kAAX34VxL2wTO21KMuZX8e88EfZ
+	8Ro56RyzMXgDjLxFT2mAj+CC2+snwXCdqpaDADhMo4t8sRa5Gpvb/R9eDpH8GLDFzvWlMfcvDOCNm
+	ppYh58kahDyxL9W7sK0N/cn9mjfB69lcY3mvWE1Mr/k52Rd57d+V5DqLGQoITo7d4n1Hy24e1ORzN
+	HHnWbRkw==;
+Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qw1v3-000KIB-Uz; Thu, 26 Oct 2023 17:05:10 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
 	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shigeru Yoshida <syoshida@redhat.com>
-Subject: [PATCH net] virtio/vsock: Fix uninit-value in virtio_transport_recv_pkt()
-Date: Fri, 27 Oct 2023 00:01:54 +0900
-Message-ID: <20231026150154.3536433-1-syoshida@redhat.com>
-X-Mailer: git-send-email 2.41.0
+	bpf@vger.kernel.org
+Subject: pull-request: bpf-next 2023-10-26
+Date: Thu, 26 Oct 2023 17:05:09 +0200
+Message-Id: <20231026150509.2824-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27073/Thu Oct 26 09:47:53 2023)
 
-KMSAN reported the following uninit-value access issue:
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-=====================================================
-BUG: KMSAN: uninit-value in virtio_transport_recv_pkt+0x1dfb/0x26a0 net/vmw_vsock/virtio_transport_common.c:1421
- virtio_transport_recv_pkt+0x1dfb/0x26a0 net/vmw_vsock/virtio_transport_common.c:1421
- vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
- process_one_work kernel/workqueue.c:2630 [inline]
- process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
- worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
- kthread+0x3cc/0x520 kernel/kthread.c:388
- ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+The following pull-request contains BPF updates for your *net-next* tree.
 
-Uninit was stored to memory at:
- virtio_transport_space_update net/vmw_vsock/virtio_transport_common.c:1274 [inline]
- virtio_transport_recv_pkt+0x1ee8/0x26a0 net/vmw_vsock/virtio_transport_common.c:1415
- vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
- process_one_work kernel/workqueue.c:2630 [inline]
- process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
- worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
- kthread+0x3cc/0x520 kernel/kthread.c:388
- ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+We've added 51 non-merge commits during the last 10 day(s) which contain
+a total of 75 files changed, 5037 insertions(+), 200 deletions(-).
 
-Uninit was created at:
- slab_post_alloc_hook+0x105/0xad0 mm/slab.h:767
- slab_alloc_node mm/slub.c:3478 [inline]
- kmem_cache_alloc_node+0x5a2/0xaf0 mm/slub.c:3523
- kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:559
- __alloc_skb+0x2fd/0x770 net/core/skbuff.c:650
- alloc_skb include/linux/skbuff.h:1286 [inline]
- virtio_vsock_alloc_skb include/linux/virtio_vsock.h:66 [inline]
- virtio_transport_alloc_skb+0x90/0x11e0 net/vmw_vsock/virtio_transport_common.c:58
- virtio_transport_reset_no_sock net/vmw_vsock/virtio_transport_common.c:957 [inline]
- virtio_transport_recv_pkt+0x1279/0x26a0 net/vmw_vsock/virtio_transport_common.c:1387
- vsock_loopback_work+0x3bb/0x5a0 net/vmw_vsock/vsock_loopback.c:120
- process_one_work kernel/workqueue.c:2630 [inline]
- process_scheduled_works+0xff6/0x1e60 kernel/workqueue.c:2703
- worker_thread+0xeca/0x14d0 kernel/workqueue.c:2784
- kthread+0x3cc/0x520 kernel/kthread.c:388
- ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+The main changes are:
 
-CPU: 1 PID: 10664 Comm: kworker/1:5 Not tainted 6.6.0-rc3-00146-g9f3ebbef746f #3
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
-Workqueue: vsock-loopback vsock_loopback_work
-=====================================================
+1) Add open-coded task, css_task and css iterator support. One of the use cases is
+   customizable OOM victim selection via BPF, from Chuyi Zhou.
 
-The following simple reproducer can cause the issue described above:
+2) Fix BPF verifier's iterator convergence logic to use exact states comparison for
+   convergence checks, from Eduard Zingerman, Andrii Nakryiko and Alexei Starovoitov.
 
-int main(void)
-{
-  int sock;
-  struct sockaddr_vm addr = {
-    .svm_family = AF_VSOCK,
-    .svm_cid = VMADDR_CID_ANY,
-    .svm_port = 1234,
-  };
+3) Add BPF programmable net device where bpf_mprog defines the logic of its xmit
+   routine. It can operate in L3 and L2 mode, from Daniel Borkmann and Nikolay Aleksandrov.
 
-  sock = socket(AF_VSOCK, SOCK_STREAM, 0);
-  connect(sock, (struct sockaddr *)&addr, sizeof(addr));
-  return 0;
-}
+4) Batch of fixes for BPF per-CPU kptr and re-enable unit_size checking for
+   global per-CPU allocator, from Hou Tao.
 
-This issue occurs because the `buf_alloc` and `fwd_cnt` fields of the
-`struct virtio_vsock_hdr` are not initialized when a new skb is allocated
-in `virtio_transport_alloc_skb()`. This patch resolves the issue by
-initializing these fields during allocation.
+5) Fix libbpf which eagerly assumed that SHT_GNU_verdef ELF section was going to
+   be present whenever a binary has SHT_GNU_versym section, from Andrii Nakryiko.
 
-Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
----
- net/vmw_vsock/virtio_transport_common.c | 2 ++
- 1 file changed, 2 insertions(+)
+6) Fix BPF ringbuf correctness to fold smp_mb__before_atomic() into
+   atomic_set_release(), from Paul E. McKenney.
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 352d042b130b..102673bef189 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -68,6 +68,8 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
- 	hdr->dst_port	= cpu_to_le32(dst_port);
- 	hdr->flags	= cpu_to_le32(info->flags);
- 	hdr->len	= cpu_to_le32(len);
-+	hdr->buf_alloc	= cpu_to_le32(0);
-+	hdr->fwd_cnt	= cpu_to_le32(0);
- 
- 	if (info->msg && len > 0) {
- 		payload = skb_put(skb, len);
--- 
-2.41.0
+7) Add a warning if NAPI callback missed xdp_do_flush() under CONFIG_DEBUG_NET which
+   helps checking if drivers were missing the former, from Sebastian Andrzej Siewior.
 
+8) Fix missed RCU read-lock in bpf_task_under_cgroup() which was throwing a
+   warning under sleepable programs, from Yafang Shao.
+
+9) Avoid unnecessary -EBUSY from htab_lock_bucket by disabling IRQ before
+   checking map_locked, from Song Liu.
+
+10) Make BPF CI linked_list failure test more robust, from Kumar Kartikeya Dwivedi.
+
+11) Enable samples/bpf to be built as PIE in Fedora, from Viktor Malik.
+
+12) Fix xsk starving when multiple xsk sockets were associated with a single
+    xsk_buff_pool, from Albert Huang.
+
+13) Clarify the signed modulo implementation for the BPF ISA standardization
+    document that it uses truncated division, from Dave Thaler.
+
+14) Improve BPF verifier's JEQ/JNE branch taken logic to also consider signed
+    bounds knowledge, from Andrii Nakryiko.
+
+15) Add an option to XDP selftests to use multi-buffer AF_XDP xdp_hw_metadata
+    and mark used XDP programs as capable to use frags, from Larysa Zaremba.
+
+16) Fix bpftool's BTF dumper wrt printing a pointer value and another one
+    to fix struct_ops dump in an array, from Manu Bretelle.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Alan Maguire, Alexei Starovoitov, Andrii Nakryiko, Daniel Borkmann, 
+David Vernet, Dennis Zhou, Eduard Zingerman, Fangrui Song, Hengqi Chen, 
+Jakub Kicinski, Jiri Pirko, John Fastabend, Liam Wisehart, Magnus 
+Karlsson, Manu Bretelle, Martin KaFai Lau, Quentin Monnet, Shung-Hsi Yu, 
+Stanislav Fomichev, Tejun Heo, Toke Høiland-Jørgensen, Yonghong Song
+
+----------------------------------------------------------------
+
+The following changes since commit a3c2dd96487f1dd734c9443a3472c8dafa689813:
+
+  Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next (2023-10-16 21:05:33 -0700)
+
+are available in the Git repository at:
+
+  ssh://git@gitolite.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+for you to fetch changes up to ea41b880cc85f0a992571f66e4554a69f7806246:
+
+  netkit: Remove explicit active/peer ptr initialization (2023-10-26 15:58:39 +0200)
+
+----------------------------------------------------------------
+bpf-next-for-netdev
+
+----------------------------------------------------------------
+Albert Huang (1):
+      xsk: Avoid starving the xsk further down the list
+
+Alexei Starovoitov (3):
+      Merge branch 'add-open-coded-task-css_task-and-css-iters'
+      Merge branch 'bpf-fixes-for-per-cpu-kptr'
+      Merge branch 'exact-states-comparison-for-iterator-convergence-checks'
+
+Andrii Nakryiko (2):
+      libbpf: Don't assume SHT_GNU_verdef presence for SHT_GNU_versym section
+      bpf: Improve JEQ/JNE branch taken logic
+
+Chuyi Zhou (8):
+      cgroup: Prepare for using css_task_iter_*() in BPF
+      bpf: Introduce css_task open-coded iterator kfuncs
+      bpf: Introduce task open coded iterator kfuncs
+      bpf: Introduce css open-coded iterator kfuncs
+      bpf: teach the verifier to enforce css_iter and task_iter in RCU CS
+      bpf: Let bpf_iter_task_new accept null task ptr
+      selftests/bpf: rename bpf_iter_task.c to bpf_iter_tasks.c
+      selftests/bpf: Add tests for open-coded task and css iter
+
+Daniel Borkmann (9):
+      selftests/bpf: Add additional mprog query test coverage
+      bpf, tcx: Get rid of tcx_link_const
+      netkit, bpf: Add bpf programmable net device
+      tools: Sync if_link uapi header
+      libbpf: Add link-based API for netkit
+      bpftool: Implement link show support for netkit
+      bpftool: Extend net dump with netkit progs
+      selftests/bpf: Add netlink helper library
+      selftests/bpf: Add selftests for netkit
+
+Dave Thaler (1):
+      bpf, docs: Define signed modulo as using truncated division
+
+Denys Zagorui (1):
+      samples: bpf: Fix syscall_tp openat argument
+
+Eduard Zingerman (7):
+      bpf: move explored_state() closer to the beginning of verifier.c
+      bpf: extract same_callsites() as utility function
+      bpf: exact states comparison for iterator convergence checks
+      selftests/bpf: tests with delayed read/precision makrs in loop body
+      bpf: correct loop detection for iterators convergence
+      selftests/bpf: test if state loops are detected in a tricky case
+      bpf: print full verifier states on infinite loop detection
+
+Hou Tao (8):
+      mm/percpu.c: don't acquire pcpu_lock for pcpu_chunk_addr_search()
+      mm/percpu.c: introduce pcpu_alloc_size()
+      bpf: Re-enable unit_size checking for global per-cpu allocator
+      bpf: Use pcpu_alloc_size() in bpf_mem_free{_rcu}()
+      bpf: Move the declaration of __bpf_obj_drop_impl() to bpf.h
+      bpf: Use bpf_global_percpu_ma for per-cpu kptr in __bpf_obj_drop_impl()
+      selftests/bpf: Add more test cases for bpf memory allocator
+      bpf: Add more WARN_ON_ONCE checks for mismatched alloc and free
+
+Kumar Kartikeya Dwivedi (1):
+      selftests/bpf: Make linked_list failure test more robust
+
+Larysa Zaremba (1):
+      selftests/bpf: Add options and frags to xdp_hw_metadata
+
+Manu Bretelle (2):
+      bpftool: Fix printing of pointer value
+      bpftool: Wrap struct_ops dump in an array
+
+Martin KaFai Lau (1):
+      Merge branch 'Add bpf programmable net device'
+
+Nikolay Aleksandrov (1):
+      netkit: Remove explicit active/peer ptr initialization
+
+Paul E. McKenney (1):
+      bpf: Fold smp_mb__before_atomic() into atomic_set_release()
+
+Sebastian Andrzej Siewior (1):
+      net, bpf: Add a warning if NAPI cb missed xdp_do_flush().
+
+Song Liu (1):
+      bpf: Fix unnecessary -EBUSY from htab_lock_bucket
+
+Viktor Malik (3):
+      samples/bpf: Allow building with custom CFLAGS/LDFLAGS
+      samples/bpf: Fix passing LDFLAGS to libbpf
+      samples/bpf: Allow building with custom bpftool
+
+Yafang Shao (3):
+      bpf: Fix missed rcu read lock in bpf_task_under_cgroup()
+      selftests/bpf: Add selftest for bpf_task_under_cgroup() in sleepable prog
+      selftests/bpf: Fix selftests broken by mitigations=off
+
+ .../bpf/standardization/instruction-set.rst        |   8 +
+ MAINTAINERS                                        |   9 +
+ drivers/net/Kconfig                                |   9 +
+ drivers/net/Makefile                               |   1 +
+ drivers/net/netkit.c                               | 936 +++++++++++++++++++++
+ include/linux/bpf.h                                |   4 +
+ include/linux/bpf_mem_alloc.h                      |   1 +
+ include/linux/bpf_verifier.h                       |  35 +-
+ include/linux/btf.h                                |   1 +
+ include/linux/cgroup.h                             |  12 +-
+ include/linux/percpu.h                             |   1 +
+ include/net/netkit.h                               |  38 +
+ include/net/tcx.h                                  |   7 +-
+ include/net/xdp_sock.h                             |  16 +
+ include/uapi/linux/bpf.h                           |  14 +
+ include/uapi/linux/if_link.h                       |  24 +
+ kernel/bpf/cgroup_iter.c                           |  65 ++
+ kernel/bpf/cpumap.c                                |  10 +
+ kernel/bpf/devmap.c                                |  10 +
+ kernel/bpf/hashtab.c                               |   7 +-
+ kernel/bpf/helpers.c                               |  40 +-
+ kernel/bpf/memalloc.c                              |  42 +-
+ kernel/bpf/ringbuf.c                               |   3 +-
+ kernel/bpf/syscall.c                               |  36 +-
+ kernel/bpf/task_iter.c                             | 151 ++++
+ kernel/bpf/tcx.c                                   |   4 +-
+ kernel/bpf/verifier.c                              | 569 +++++++++++--
+ kernel/cgroup/cgroup.c                             |  18 +-
+ mm/percpu.c                                        |  35 +-
+ net/core/dev.c                                     |   2 +
+ net/core/dev.h                                     |   6 +
+ net/core/filter.c                                  |  16 +
+ net/xdp/xsk.c                                      |  28 +
+ samples/bpf/Makefile                               |  12 +-
+ samples/bpf/syscall_tp_kern.c                      |  15 +-
+ tools/bpf/bpftool/Documentation/bpftool-net.rst    |   8 +-
+ tools/bpf/bpftool/btf_dumper.c                     |   2 +-
+ tools/bpf/bpftool/link.c                           |   9 +
+ tools/bpf/bpftool/net.c                            |   7 +-
+ tools/bpf/bpftool/struct_ops.c                     |   6 +
+ tools/include/uapi/linux/bpf.h                     |  14 +
+ tools/include/uapi/linux/if_link.h                 | 141 ++++
+ tools/lib/bpf/bpf.c                                |  16 +
+ tools/lib/bpf/bpf.h                                |   5 +
+ tools/lib/bpf/elf.c                                |  16 +-
+ tools/lib/bpf/libbpf.c                             |  39 +
+ tools/lib/bpf/libbpf.h                             |  15 +
+ tools/lib/bpf/libbpf.map                           |   1 +
+ tools/testing/selftests/bpf/Makefile               |  19 +-
+ tools/testing/selftests/bpf/bpf_experimental.h     |  19 +
+ tools/testing/selftests/bpf/config                 |   1 +
+ tools/testing/selftests/bpf/netlink_helpers.c      | 358 ++++++++
+ tools/testing/selftests/bpf/netlink_helpers.h      |  46 +
+ tools/testing/selftests/bpf/prog_tests/bpf_iter.c  |  18 +-
+ tools/testing/selftests/bpf/prog_tests/iters.c     | 150 ++++
+ .../testing/selftests/bpf/prog_tests/linked_list.c |  10 +-
+ .../selftests/bpf/prog_tests/task_under_cgroup.c   |  11 +-
+ .../testing/selftests/bpf/prog_tests/tc_helpers.h  |   4 +
+ tools/testing/selftests/bpf/prog_tests/tc_netkit.c | 687 +++++++++++++++
+ tools/testing/selftests/bpf/prog_tests/tc_opts.c   | 131 ++-
+ .../testing/selftests/bpf/prog_tests/test_bpf_ma.c |  20 +-
+ .../progs/{bpf_iter_task.c => bpf_iter_tasks.c}    |   0
+ tools/testing/selftests/bpf/progs/iters.c          | 695 +++++++++++++++
+ tools/testing/selftests/bpf/progs/iters_css.c      |  72 ++
+ tools/testing/selftests/bpf/progs/iters_css_task.c |  47 ++
+ tools/testing/selftests/bpf/progs/iters_task.c     |  41 +
+ .../selftests/bpf/progs/iters_task_failure.c       | 105 +++
+ tools/testing/selftests/bpf/progs/iters_task_vma.c |   1 +
+ .../testing/selftests/bpf/progs/linked_list_fail.c |   4 +-
+ tools/testing/selftests/bpf/progs/test_bpf_ma.c    | 180 +++-
+ .../selftests/bpf/progs/test_task_under_cgroup.c   |  28 +-
+ tools/testing/selftests/bpf/progs/test_tc_link.c   |  13 +
+ .../testing/selftests/bpf/progs/xdp_hw_metadata.c  |   2 +-
+ tools/testing/selftests/bpf/unpriv_helpers.c       |  33 +-
+ tools/testing/selftests/bpf/xdp_hw_metadata.c      |  78 +-
+ 75 files changed, 5037 insertions(+), 200 deletions(-)
+ create mode 100644 drivers/net/netkit.c
+ create mode 100644 include/net/netkit.h
+ create mode 100644 tools/testing/selftests/bpf/netlink_helpers.c
+ create mode 100644 tools/testing/selftests/bpf/netlink_helpers.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tc_netkit.c
+ rename tools/testing/selftests/bpf/progs/{bpf_iter_task.c => bpf_iter_tasks.c} (100%)
+ create mode 100644 tools/testing/selftests/bpf/progs/iters_css.c
+ create mode 100644 tools/testing/selftests/bpf/progs/iters_css_task.c
+ create mode 100644 tools/testing/selftests/bpf/progs/iters_task.c
+ create mode 100644 tools/testing/selftests/bpf/progs/iters_task_failure.c
 
