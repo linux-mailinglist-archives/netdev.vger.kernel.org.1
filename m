@@ -1,114 +1,135 @@
-Return-Path: <netdev+bounces-44539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04C77D87E4
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 19:58:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BE157D882E
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 20:20:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A396B2110D
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 17:58:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CF12B210D4
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 18:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0AA38FB7;
-	Thu, 26 Oct 2023 17:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C1053A28F;
+	Thu, 26 Oct 2023 18:20:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ae94W2+r"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE472E3E9;
-	Thu, 26 Oct 2023 17:57:56 +0000 (UTC)
-Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C2DAC;
-	Thu, 26 Oct 2023 10:57:55 -0700 (PDT)
-Received: from omf03.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay07.hostedemail.com (Postfix) with ESMTP id 79A04160B8F;
-	Thu, 26 Oct 2023 17:57:50 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf03.hostedemail.com (Postfix) with ESMTPA id 6BAAF6000B;
-	Thu, 26 Oct 2023 17:57:39 +0000 (UTC)
-Message-ID: <eb9c31b2121a164a88bdd8cac663f6880cd52a93.camel@perches.com>
-Subject: Re: [PATCH 0/3] ethtool: Add ethtool_puts()
-From: Joe Perches <joe@perches.com>
-To: Kees Cook <keescook@chromium.org>
-Cc: Justin Stitt <justinstitt@google.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shay Agroskin
- <shayagr@amazon.com>, Arthur Kiyanovski <akiyano@amazon.com>, David Arinzon
- <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>, Saeed Bishara
- <saeedb@amazon.com>, Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru
- <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Dimitris Michailidis
- <dmichail@fungible.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, Salil
- Mehta <salil.mehta@huawei.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>,  Tony Nguyen <anthony.l.nguyen@intel.com>,
- Louis Peens <louis.peens@corigine.com>, Shannon Nelson
- <shannon.nelson@amd.com>, Brett Creeley <brett.creeley@amd.com>, 
- drivers@pensando.io, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang
- <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, Ronak Doshi <doshir@vmware.com>, VMware PV-Drivers
- Reviewers <pv-drivers@vmware.com>, Andy Whitcroft <apw@canonical.com>,
- Dwaipayan Ray <dwaipayanray1@gmail.com>, Lukas Bulwahn
- <lukas.bulwahn@gmail.com>,  linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Nathan
- Chancellor <nathan@kernel.org>,  intel-wired-lan@lists.osuosl.org,
- oss-drivers@corigine.com,  linux-hyperv@vger.kernel.org
-Date: Thu, 26 Oct 2023 10:57:38 -0700
-In-Reply-To: <202310261049.92A3FB31@keescook>
-References: <20231025-ethtool_puts_impl-v1-0-6a53a93d3b72@google.com>
-	 <202310260845.B2AEF3166@keescook>
-	 <39ca00132597c0cc4aac4ea11ab4b571f3981bcb.camel@perches.com>
-	 <202310261049.92A3FB31@keescook>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964F31A5B9
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 18:20:48 +0000 (UTC)
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [IPv6:2001:41d0:1004:224b::af])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2345DD49
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 11:20:45 -0700 (PDT)
+Message-ID: <4693cb58-ab86-495f-838e-50464fe116ce@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1698344440;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zdfz9dbBUnxK7CCnvyJwACcXErsLKbZ8wsFVwYqLJ+s=;
+	b=Ae94W2+rYlVe/tLX3osTwITgp/E85oylSGm3WLKBjIy+cJABM6qbc1hAHCoWdxogkATXXT
+	RQjHUhX3swK6XyQlYQmcMHGjMOS/AJLtIgP2NbKFfsRX9b028H500PzfV+rFvjmrpKB6q/
+	Znw20+Ghv6azoOuevXL42O6pTSAAQeo=
+Date: Thu, 26 Oct 2023 19:20:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Stat-Signature: hudth4n5i9tsh6noik99p4dqoecq4yae
-X-Rspamd-Server: rspamout07
-X-Rspamd-Queue-Id: 6BAAF6000B
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX1/FhF5iyLmTVijiQINcZ0DKfw8kt4QZXAA=
-X-HE-Tag: 1698343059-8063
-X-HE-Meta: U2FsdGVkX18EvEmoxNdb8hk6+O6ituHbXxaJFt94yuI4o75cydbMBKO9R15wtEF6VkcdjuFdT9yaMhXRm3vYaUDQE0fY4PwycxT9WeFqvMNRLqEIHiYE+D7Xg4oAc80cClcOXyOn1zfquNjuxwquDIEP8tJmMNk6z3BfC3ZuK2ggJziXypVPsEUK9Keu4FQ3ncfCo+W3BOl6Fmr3KUjH1uOPVXyJ4NSisvMVQpPwtWe6RV1E6cbgFDGHwkHsXtaww+tTwpwABR38XLVHFAAk31CQ+RyAx3SylbbeObJ26LbpA+oEHLjf/YBdaYbPa+iv
+Subject: Re: [PATCH bpf-next 2/2] selftests: bpf: crypto skcipher algo
+ selftests
+Content-Language: en-US
+To: Daniel Borkmann <daniel@iogearbox.net>, Vadim Fedorenko
+ <vadfed@meta.com>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20231026015938.276743-1-vadfed@meta.com>
+ <20231026015938.276743-2-vadfed@meta.com>
+ <d7f21ccf-a866-53e1-4de9-e1cc972edaed@iogearbox.net>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <d7f21ccf-a866-53e1-4de9-e1cc972edaed@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 2023-10-26 at 10:49 -0700, Kees Cook wrote:
-> On Thu, Oct 26, 2023 at 09:33:17AM -0700, Joe Perches wrote:
-> > On Thu, 2023-10-26 at 08:47 -0700, Kees Cook wrote:
-> > > On Wed, Oct 25, 2023 at 11:40:31PM +0000, Justin Stitt wrote:
-> > > > @replace_2_args@
-> > > > identifier BUF;
-> > > > expression VAR;
-> > > > @@
-> > > >=20
-> > > > -       ethtool_sprintf
-> > > > +       ethtool_puts
-> > > >         (&BUF, VAR)
-> > >=20
-> > > I think cocci will do a better job at line folding if we adjust this
-> > > rule like I had to adjust the next rule: completely remove and re-add
-> > > the arguments:
-> > >=20
-> > > -       ethtool_sprintf(&BUF, VAR)
-> > > +       ethtool_puts(&BUF, VAR)
-> > >=20
-> > > Then I think the handful of weird line wraps in the treewide patch wi=
-ll
-> > > go away.
-> > >=20
-> >=20
-> > Perhaps this, but i believe spatch needs
-> > 	 --max-width=3D80
-> > to fill all 80 columns
->=20
-> Ah, yeah. Default is 78. Current coding style max is 100... I'll adjust
-> my local wrappers.
+On 26/10/2023 15:02, Daniel Borkmann wrote:
+> On 10/26/23 3:59 AM, Vadim Fedorenko wrote:
+>> Add simple tc hook selftests to show the way to work with new crypto
+>> BPF API. Some weird structre and map are added to setup program to make
+>> verifier happy about dynptr initialization from memory. Simple AES-ECB
+>> algo is used to demonstrate encryption and decryption of fixed size
+>> buffers.
+>>
+>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>> ---
+>>   tools/testing/selftests/bpf/config            |   1 +
+>>   .../selftests/bpf/prog_tests/crypto_sanity.c  | 129 +++++++++++++++
+>>   .../selftests/bpf/progs/crypto_common.h       |  98 +++++++++++
+>>   .../selftests/bpf/progs/crypto_sanity.c       | 154 ++++++++++++++++++
+>>   4 files changed, 382 insertions(+)
+>>   create mode 100644 
+>> tools/testing/selftests/bpf/prog_tests/crypto_sanity.c
+>>   create mode 100644 tools/testing/selftests/bpf/progs/crypto_common.h
+>>   create mode 100644 tools/testing/selftests/bpf/progs/crypto_sanity.c
+>>
+>> diff --git a/tools/testing/selftests/bpf/config 
+>> b/tools/testing/selftests/bpf/config
+>> index 02dd4409200e..2a5d6339831b 100644
+>> --- a/tools/testing/selftests/bpf/config
+>> +++ b/tools/testing/selftests/bpf/config
+>> @@ -14,6 +14,7 @@ CONFIG_CGROUP_BPF=y
+>>   CONFIG_CRYPTO_HMAC=y
+>>   CONFIG_CRYPTO_SHA256=y
+>>   CONFIG_CRYPTO_USER_API_HASH=y
+>> +CONFIG_CRYPTO_SKCIPHER=y
+>>   CONFIG_DEBUG_INFO=y
+>>   CONFIG_DEBUG_INFO_BTF=y
+>>   CONFIG_DEBUG_INFO_DWARF4=y
+> 
+> Quick note: for upstream CI side, more config seems missing, see the GHA 
+> failure:
 
-Coding style max is still 80 with exceptions allowed to 100
-not a generic use of 100.
+Thanks for the signal, Daniel. Looks like CONFIG_CRYPTO_ECB is missing.
+I'll adjust config for v2, but I'll wait a bit longer to get more
+feedback
 
+> https://github.com/kernel-patches/bpf/actions/runs/6654055344/job/18081734522
+> 
+> Notice: Success: 435/3403, Skipped: 32, Failed: 1
+> Error: #64 crypto_sanity
+>    Error: #64 crypto_sanity
+>    test_crypto_sanity:PASS:skel open 0 nsec
+>    test_crypto_sanity:PASS:ip netns add crypto_sanity_ns 0 nsec
+>    test_crypto_sanity:PASS:ip -net crypto_sanity_ns -6 addr add 
+> face::1/128 dev lo nodad 0 nsec
+>    test_crypto_sanity:PASS:ip -net crypto_sanity_ns link set dev lo up 0 
+> nsec
+>    test_crypto_sanity:PASS:crypto_sanity__load 0 nsec
+>    open_netns:PASS:malloc token 0 nsec
+>    open_netns:PASS:open /proc/self/ns/net 0 nsec
+>    open_netns:PASS:open netns fd 0 nsec
+>    open_netns:PASS:setns 0 nsec
+>    test_crypto_sanity:PASS:open_netns 0 nsec
+>    test_crypto_sanity:PASS:if_nametoindex lo 0 nsec
+>    test_crypto_sanity:PASS:crypto_sanity__attach 0 nsec
+>    test_crypto_sanity:PASS:skb_crypto_setup fd 0 nsec
+>    test_crypto_sanity:PASS:skb_crypto_setup 0 nsec
+>    test_crypto_sanity:PASS:skb_crypto_setup retval 0 nsec
+>    test_crypto_sanity:FAIL:skb_crypto_setup status unexpected error: -95 
+> (errno 2)
+>    libbpf: Kernel error message: Parent Qdisc doesn't exists
+>    close_netns:PASS:setns 0 nsec
+> Test Results:
+>               bpftool: PASS
+>   test_progs-no_alu32: FAIL (returned 1)
+>              shutdown: CLEAN
+> Error: Process completed with exit code 1.
 
 
