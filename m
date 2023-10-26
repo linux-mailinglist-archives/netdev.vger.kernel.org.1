@@ -1,95 +1,105 @@
-Return-Path: <netdev+bounces-44473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0D507D8254
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:13:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D6A7D8288
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:22:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 636631F231F5
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 12:13:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F4AD281FB5
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 12:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C569E2DF67;
-	Thu, 26 Oct 2023 12:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C012DF60;
+	Thu, 26 Oct 2023 12:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="VDfLdD2x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dZTNdywl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D007F2D7B5;
-	Thu, 26 Oct 2023 12:13:19 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 675AE111;
-	Thu, 26 Oct 2023 05:13:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=wteKJASm6dXbxWE+jHSUsiJPkIx4CYo584rqpyv37ww=; b=VDfLdD2xlnp+X7kmYfHF99nxx2
-	kwnYHEvQFhPmcuybbDsbzWxzKRrm59wHhp0UGJr8fumn+ViOPvbROim+abz8IC14aCetH+qHcB0+a
-	2YPSrx2yg0Zoyip+GDJ3TaBx7OuXnFmiQI6CnQ8Rjvhzs/OST1iYFfif8uxDzkANN9dAW2evbYaHT
-	yCMI8oxd4os4jxBFvilajg9CeK8X6Ik8lS9GNnA5w4D0ufRtytp9iC71LewpOWidEVvjsA4GDKTwI
-	7rZ12Fp57Q7oLPAKwGc/Bqv4kiK+C4WEzJyJ3mXI6WSf85r8RplSa97qYHAbIdgm0Pocqv2O/WjJe
-	6SQMKmtA==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qvzEi-000OFI-NA; Thu, 26 Oct 2023 14:13:16 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qvzEh-000GdT-QN; Thu, 26 Oct 2023 14:13:15 +0200
-Subject: Re: [PATCH bpf-next 2/2] netkit: use netlink policy for mode and
- policy attributes validation
-To: Nikolay Aleksandrov <razor@blackwall.org>, bpf@vger.kernel.org
-Cc: jiri@resnulli.us, netdev@vger.kernel.org, martin.lau@linux.dev,
- ast@kernel.org, andrii@kernel.org, john.fastabend@gmail.com,
- kuba@kernel.org, andrew@lunn.ch, toke@kernel.org, toke@redhat.com,
- sdf@google.com
-References: <20231026094106.1505892-1-razor@blackwall.org>
- <20231026094106.1505892-3-razor@blackwall.org>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <f14eda0f-b045-6563-7b18-bbc5bfb009ca@iogearbox.net>
-Date: Thu, 26 Oct 2023 14:13:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3BE22D782;
+	Thu, 26 Oct 2023 12:22:40 +0000 (UTC)
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 929931AE;
+	Thu, 26 Oct 2023 05:22:35 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id 5614622812f47-3b2b1af09c5so464025b6e.0;
+        Thu, 26 Oct 2023 05:22:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698322955; x=1698927755; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gj9G8F7ts5VApr8eLYiKxxaoSqqOh3fiVYzbTmY/nQ4=;
+        b=dZTNdywlRMsMWTp4xYwnH7u//w0HCot6eFphGLcfjq2+i+HdkuodNHWtY17T+K97lk
+         IH+WSg8EPAERH2QJNRVNR8g6IeZAKy4wpFfchecxe102cjk0vHXWIuQ9bS/PTjwH7fIR
+         nFCXC7htgC7lzzsF2IN8XtksgHDm3cQZ8GEwRN2rCUt9sHrGKreSmpkeE1hHQZHB33oY
+         akjWuBEhqP03yiWafHP7dXIO6RBY7Mk4z7Mj4Y7V4cWX1n+9maDN9mzLYDLwKWTIHujD
+         XHCMxiO1qrEDfQF9y0E10IyrBiwg5wZTzedzeoT821pKGN5EZl4CAZNWyKFqG8IEPYoc
+         h0Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698322955; x=1698927755;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Gj9G8F7ts5VApr8eLYiKxxaoSqqOh3fiVYzbTmY/nQ4=;
+        b=RSS6VrYAV/xlS3Gm9OFITTli1M6fRyEjbFDdYwq5xrp4hkE1rvxdfUgAZrsLiObuS4
+         18WJVlukCkfXMcR8EPYx6hsIabEPiUVem3qD6UY9OmUc6SFe8FUz9crKpOTM2+J0++Pm
+         ouxUWKb02b9NXB1Xx8evEkzM56Pdf+qotJDWqqzDU6V/r+rOUArIRRc+EIBA1jEZKCFS
+         s3Kg30mxIZRRD2Tnt3x20vOd7PQ/VmntIrVlSJ/SJC7YT9QWGKvqCLYhJ7KeXZ1gW1/j
+         0o42KqMbcccVZzhxi/4Zw2VahOw3PbLVU0F1QuuatoIBH15jm6qoGvuqYQlGUg1M92ug
+         X76Q==
+X-Gm-Message-State: AOJu0YzTcy6hswngg5eE3mdAUcoOdIRSQn6WkVzoJ+WRGDfmeGxYEw1L
+	2odU1RFxSjK8XdHUNhTGPzfmsftiTnbSpXi+Csjtc0sT6k3xAQ==
+X-Google-Smtp-Source: AGHT+IE8pljuqrs+PF23/bNeXZENbNpAGwK9/6GDGs4QWb6U8aA/p+sqpeUuvbmjin9No8afMm11aA6r7JFN8xe2iuY=
+X-Received: by 2002:a05:6808:b29:b0:3ab:8956:ada4 with SMTP id
+ t9-20020a0568080b2900b003ab8956ada4mr15500877oij.10.1698322954778; Thu, 26
+ Oct 2023 05:22:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231026094106.1505892-3-razor@blackwall.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27073/Thu Oct 26 09:47:53 2023)
+References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
+ <20231026001050.1720612-4-fujita.tomonori@gmail.com> <CANiq72n6Cvxydcef03kEo9fy=5Zd7MXYqFUGX1MBaTKF2o63nw@mail.gmail.com>
+ <20231026.205434.963307210202715112.fujita.tomonori@gmail.com>
+In-Reply-To: <20231026.205434.963307210202715112.fujita.tomonori@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Thu, 26 Oct 2023 14:22:23 +0200
+Message-ID: <CANiq72=QgT2tG3wy5pioTQ9n416kksZrL1791pehwR=1ZGP52w@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 3/5] rust: add second `bindgen` pass for enum
+ exhaustiveness checking
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	tmgross@umich.edu, benno.lossin@proton.me, wedsonaf@gmail.com, 
+	ojeda@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/26/23 11:41 AM, Nikolay Aleksandrov wrote:
-> Use netlink's NLA_POLICY_VALIDATE_FN() type for mode and primary/peer
-> policy with custom validation functions to return better errors. This
-> simplifies the logic a bit and relies on netlink's policy validation.
-> We don't have to specify len because the type is NLA_U32 and attribute
-> length is enforced by netlink.
-> 
-> Suggested-by: Jiri Pirko <jiri@resnulli.us>
-> Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+On Thu, Oct 26, 2023 at 1:54=E2=80=AFPM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> Sorry, I totally misunderstand your intention. I thought that the PHY
+> abstractions needs to be merged with your patch together.
+>
+> I'll drop your patch in the next version and focus on my patches.
 
-Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+No harm done! I understand you were trying to help, and I apologize if
+I sounded too harsh.
 
-> ---
->   drivers/net/netkit.c | 66 +++++++++++++++-----------------------------
->   1 file changed, 22 insertions(+), 44 deletions(-)
+Your abstractions are not blocked on this patch -- they could go in
+without this, that is why I suggested marking this one as RFC and
+putting it at the end of the series. The exhaustiveness check here is
+an extra feature that prevents a class of bugs, which is great, but it
+does not really affect the abstractions, i.e. there is no unsoundness
+in your code whether this patch is in or not.
 
-Looks better indeed, shrinks code a bit, and passes the selftests, thanks
-for the suggestion!
+I will send the patch soon, and assuming it lands, then you can start
+using the feature if you wish. I would recommend basing your patches
+on top of that patch (or `rust-next` when the patch lands), so that
+your PHY series contains the addition of `check_phy_state`.
 
-Thanks,
-Daniel
+Cheers,
+Miguel
 
