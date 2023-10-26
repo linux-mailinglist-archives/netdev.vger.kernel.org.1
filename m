@@ -1,192 +1,229 @@
-Return-Path: <netdev+bounces-44376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CEF47D7AFC
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 04:41:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A05097D7B25
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 05:02:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3855B281745
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 02:41:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A39ABB20FDF
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 03:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18268623;
-	Thu, 26 Oct 2023 02:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56A20BE55;
+	Thu, 26 Oct 2023 03:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="bgzVpAaS"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JQuSjx4+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390D3187F
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 02:41:43 +0000 (UTC)
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C42E10A;
-	Wed, 25 Oct 2023 19:41:41 -0700 (PDT)
-Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 39Q29Z6Q007229;
-	Thu, 26 Oct 2023 02:41:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=
-	PPS06212021; bh=Lx70rg4dfiuQ6UAGRnbIRsNCFqQ2Ng+aqMZMzvbz6Pk=; b=
-	bgzVpAaSc3C7SsFf6VDbLMzbQWREm9RQRbdhZUlO/zisADo2C615sPLawSIhEj9W
-	BE2KsrebfVG2DBllPaKxrZlvDyHq9mS+SJQDdJkDlcRxnAt9Efc0OIFlZy+Hb2L4
-	AZouRNeqI2QFa7LnBUjx44ILVUscNJyYfTg0aJFMjM8A11uvpYgv2dQMSKM7ukUk
-	ZF4KMcZUl0v4vmQBHk/N3RTXF3cokQ2tXCIVJ4IIzvLfBuqGdiYSHqNybkw1+dL4
-	Fkdk/R/0dzjdU9yMrm/tTFJiaAdsDFOSk0ndcVblla2t9Sak66fJ04/uNoE9DlbD
-	w2pifDcrZWGwvdR1D47gqA==
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2100.outbound.protection.outlook.com [104.47.70.100])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3tv5m5w82u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Oct 2023 02:41:34 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fpU3+Byt09zipx6iTG45xieKv9sE/Ng21+FmliRpc51WLoFgrIBQ4FazSgxjyLGetJ82hvfiiejfDRqjZeQ4Wq1YPdAzuZFrMVwdfHHL4h9OisDmOF7Olmm+Pf1EnxSKz5KXGltrOcrDLQsEC3R00gwj6nS6aV9yfKUb+6MMsx/0l0jowj9X8BNJznXnmSQ+CtiZ2OYldmSUOfPkAf8WRLZfxDA1pEN77iVanR1hlwfSrTMCnBBzSpLa1fC9bIR8TIb9mN8y+ebMckQITgH9COSqmNUTayuRelj2M/cSTaVNZP7b+e14N9lb23egxXiCh5NsZyRjok18NMmnAuSAKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Lx70rg4dfiuQ6UAGRnbIRsNCFqQ2Ng+aqMZMzvbz6Pk=;
- b=BkUQAwHAC3BIEgQbRQlgORuvhXFXPT3cvypL+BSoU/Eu7vWMPbsVPOFxVwgl3SLtIdlAPOrQetzdYeQpVd3KtLVLruwmLw3L5gp4cc8lRt0LMVDWEwk49L2YkMyisVZVIieRC20V73wZcx+4VV9DLUMKc/1UPxedkqU2vk+Hfnm+ymfcGkyZoMX1Cigs9LRN28/r0HYQzVSP3LUtcLbBMh0o8nSVL2RcpSvvjuPktOBn8xMviAXmsmc097tLWyafPcOPGcML3DhoRb4/++S3AHtpNbcEuybTNGnzm+UP2E+gT8pofX+/Xdumfl0ktpDDICVq5b7i1PUyyz1jEL5j2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-Received: from DS7PR11MB7738.namprd11.prod.outlook.com (2603:10b6:8:e0::6) by
- CYYPR11MB8386.namprd11.prod.outlook.com (2603:10b6:930:bf::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6907.31; Thu, 26 Oct 2023 02:41:33 +0000
-Received: from DS7PR11MB7738.namprd11.prod.outlook.com
- ([fe80::ab73:148d:46cd:bf37]) by DS7PR11MB7738.namprd11.prod.outlook.com
- ([fe80::ab73:148d:46cd:bf37%4]) with mapi id 15.20.6907.032; Thu, 26 Oct 2023
- 02:41:32 +0000
-Message-ID: <19a2675e-928c-7986-95d5-b05a09cf1120@windriver.com>
-Date: Thu, 26 Oct 2023 10:41:23 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: phy: fixed link 1000 or 100 set with autoneg off
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <d7aa45f8-adf8-ff9a-b2c4-04b0f2cc3c06@windriver.com>
- <c23dcdb0-f493-453d-82b9-b498f4d3c88b@gmail.com>
- <9dd0e0b8-751b-170a-7c8f-bc084efae69b@windriver.com>
- <dfc37ead-2abe-4053-b0a6-911c9c387451@lunn.ch>
-From: "Jia, Fang" <fang.jia@windriver.com>
-In-Reply-To: <dfc37ead-2abe-4053-b0a6-911c9c387451@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR06CA0241.apcprd06.prod.outlook.com
- (2603:1096:4:ac::25) To DS7PR11MB7738.namprd11.prod.outlook.com
- (2603:10b6:8:e0::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F343646
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 03:02:27 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AEE318C;
+	Wed, 25 Oct 2023 20:02:25 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39PJwThe015247;
+	Wed, 25 Oct 2023 20:02:07 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=kyPnr25U7XCn3GEnW0XrY5a9Wi8LocbeayKKqDZ8C+Y=;
+ b=JQuSjx4+jIlHZNTLqSicah/igfOLAG7Sm5jwjgUHgDcvbvtpWARhMP6In1DQoE86j5rU
+ 17ctZxZt87MvQUwkP+22pthyLklV+tA3VXO5Hj5bZR8mt+j0P0MVpbg3/BVFFXqSNBO0
+ PyyiPEL01M/u9JzR5i07d68TQUNLagk+65LZLR4ydTiD8Ls0mhNVTRasmpWdeN1ay4aI
+ fkdD/QxiDwNoo0ZMgqwzNc5YSKygak3hDlQrC0pHWCDOSE4eRwSCbU3Cdstaydtuye/Z
+ E4rqqZLHxgqmGKztLBkDur6eDxgkozTaGJ+jDrZU5La3EvKI58xTeG8JMqRU46SIqcpH YA== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3ty0vrbt29-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 25 Oct 2023 20:02:07 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 25 Oct
+ 2023 20:02:06 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 25 Oct 2023 20:02:00 -0700
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id D1C7D3F7097;
+	Wed, 25 Oct 2023 20:01:56 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>
+Subject: [PATCH net] octeontx2-pf: Fix holes in error code
+Date: Thu, 26 Oct 2023 08:31:54 +0530
+Message-ID: <20231026030154.1317011-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB7738:EE_|CYYPR11MB8386:EE_
-X-MS-Office365-Filtering-Correlation-Id: 733f087b-f165-461d-b357-08dbd5cd1059
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	EA1X+8bgbaCR5aP9K39GLcPMv3hHGYQ4IMa7pEvdU2xe5Jzc9CKs9Ei4e4fzMGWfa1f6soqjbEldb0zPxpxsSdrnXzuxKLRdgSKLhxIrn0Jv5XCKzQzivCqcA+pBZV4Qkw/1gEGaRmFioLnmMq5ESIJb1UDOEhG37mM6TMyz85jTt0P1667b1Y6HKaiWVXPiWNm42h8rf4EuB5x/13v2AbkpziTxoV2KrjPhJhLJKq0HysMivtY9obRpvfiucPkTaKKn6dAqynKrrQl80MdVFS8ykR2/I5m/r1I8qGte8WA5NscKwZ83UG8SgDJvuDs4WQuNrtbmp20OHJ6L/6nLxXIpExdbqaL6TbCAptRj4x8o3Nr/2VvVkVwEfI5HDsE8AEvbfi1hMeoDXPqP3n1qj1NH5+xjwH/gbhUmv7LlmRz6HmpviJdB4k5LHZ8W+pd2pP6cb0NRxYl5KrtCfgc+nH5axH2Ql82+7PzKMjQNZNrT9weNK1aZqTNTmBf7FS/28cnDU1OsVOsJ24IbE4Slh+oBQfB5KJEPzjGq0fazgdO9bHVEa913sbcHDB93bXGXfcJYU8uzRYzdBrw/Av/Ch46APKzQMjhbikP922ON81aIRFfRAVFUSyHIWFU4nsDeGDnZkhA7sZ4ffgA1Po3TV1JsMQp4vnN4DzyvUvJ3yokhJRDjZlXNZ65jdtFPsZ9H
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB7738.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(136003)(376002)(366004)(39850400004)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(36756003)(2906002)(38100700002)(6916009)(66946007)(66556008)(2616005)(66476007)(478600001)(6506007)(316002)(54906003)(6666004)(6486002)(53546011)(6512007)(83380400001)(86362001)(31696002)(5660300002)(4326008)(8676002)(41300700001)(8936002)(26005)(31686004)(221023014)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?eStHWXFldk1iSEkzMmdSNnZpU2hXQUpUZElDb0dXRjlvVHpOZ0t1UFNJUTFK?=
- =?utf-8?B?dHlZQUkyTW5VRUQwRUNJcFpkV05WMlVySnN0S2FrbTZzd0J0UGF0Wi9Nemp4?=
- =?utf-8?B?UU8xTUJPVkdMbzByekJvaGVZdVpwb3hvdVFRR2tOSU1OOUJtdkE4ZERSNTZI?=
- =?utf-8?B?dzB0bVg1RlkrRzVSNGtQSGV0V0NNWTZwS3NGVUtzRjhIV2MrMTJjeHVSdjc5?=
- =?utf-8?B?TStYYVM2ZVdTRWJkYVdxWGxUamdVN3V0MVJVMW1PSTAzOTJZVjFCeVFpOGV1?=
- =?utf-8?B?S0VkNDIyRVM3b3htRlU1ZnM3eUtETnJsQUlLVWFZRStZWVQ3bk03Qm1xdWh2?=
- =?utf-8?B?dUZQNmdHbUF1MlhnR3NIdXliTXJORTZxY3JDTmxwSTVhTFV3OHNsWXhGUG1B?=
- =?utf-8?B?T1pFcjlZWHdCRmVTa25sLzBsRVhzS2ZDWHBmRU1tUUNKcHh3ZktlaGJTK0p4?=
- =?utf-8?B?R0ZQWGs0dEFJMGZJclFWdlJnbXZYaFlpYU1ERi96MWxNN1E3czNZYXl6R0RD?=
- =?utf-8?B?b2VjUFJsd0FhMjRsaW1sbnkxd3RSMmdZM2NrQlVYU3lLaW9KcytrdEFpcUlL?=
- =?utf-8?B?ZlNHb0doNDdpQnhpTS9TZ0VJeERMWFN2QStPK1BUSER1UUp4aHNpNTI2blBP?=
- =?utf-8?B?ZEIvQTBwSERMTTNFWnFNbS9SYmdJNGJHUWZKaVlYM21hdi9yWXpFRVJRMzVN?=
- =?utf-8?B?cnZ4YzJZOEF3M21jUnBOSWFyaktObWJqZUlYUmFmcmhiQVN5SGZmRFZQVG41?=
- =?utf-8?B?bTBCNC9HVFVkVWFscVZZaTlnV0JmQVNrbEpRc1BCdkZTK2ZZZTRTSjZsY1ZO?=
- =?utf-8?B?Mm1hM0J4d2R6Z2lBeVBQNmtGaE85K2RPVzdBMnJ0RGRXdis1eG8zNzBMN1NK?=
- =?utf-8?B?ekdmcGNhbWpJM2NjcXRDSUxpNjJ3WUpPQ3BoeUpyb3dxZGtReTR1MXlmYXpX?=
- =?utf-8?B?eFpZRlhIUFdtSEFlR2t6cUhORDhtOCtFNW1XejVJS3JzZGxWM09uREZ1bTVs?=
- =?utf-8?B?akFPUTNaLy9DalBlVGREQ0Q3aTlwZE1iMWpCZkxnL2g1alZXbHlQa01Tc0JL?=
- =?utf-8?B?ZTUvSWlDaDBwNzg4WktwUTFnaDdWZDBPQ3pwQ21UVURlSCtUM1c0Zmdaa1dD?=
- =?utf-8?B?MEhRdXV1NEh0MDk3UmxzcjBKdlo2S2tEaEdTa2FYQ2dodTJiY3poemJteWh2?=
- =?utf-8?B?VDdhYVN1WTZCeWF2cWJlT25HTHlFejloTGxHSGFUcmp2ajB0Rnd0RmFPaHhY?=
- =?utf-8?B?czdqbURxUWtZd0hyTit4T1hsYjZ3WC9xV2pTTkozNzJMVm8xbW05b2U2MnhY?=
- =?utf-8?B?R2NFSHNlNzhSRnhWdUcxdUpUQVByT3B0WURZM1JmODNVOU5Xd1ZnblBKUWxE?=
- =?utf-8?B?NTFzWlRVbE56VnNIUWNEWUNDallURVJ3cGk3dkZEMGxBclRwTnFZOHV5QUps?=
- =?utf-8?B?OTJlek5IeWZHaWp3a0c1bVU5NUJqK0RTeWJGNXlCQ2FFa2tuKzQrVFlsVGdi?=
- =?utf-8?B?djVhUzZ2TUNReFRPQzVDNUtna2JLWUdicXYwaTJQQlZGb3V5STc4bTNhK1hR?=
- =?utf-8?B?SjNXNXUvZVZCYm42V1Mxd1Q1Nkg0U0h2ZGtraTNhQ3hrYjdadnJZNmRidEoy?=
- =?utf-8?B?RDViZGJpT1VoRTMxRXBHa2Fkb0FmWXlKNDRQU2JISHNkNWFBR0lFS1V2Tzg3?=
- =?utf-8?B?ZGsvcmoycGhTeEZ0N0tuQXdRbERGVlllWFU1SUdudXorcTVkODdmTHJ6U0Ft?=
- =?utf-8?B?QWJsaFhVRk5XMldvTEQwTDE5b0FGY1ZIdmJscG04TlkwQXBXdG1nM01LMXIr?=
- =?utf-8?B?UFdsV2xCcVE4cngxVlJrNXNzL2dES0JRbEJkckNyaVNRMGlwV3U3RXcrOENn?=
- =?utf-8?B?V2I5bUVKMG92em8yV0ZjV3VRTmUyN3lZZWhRRjlQVTc0L1NyRXUvWEpTVDM1?=
- =?utf-8?B?ZU5VWHUrY3lsc3NFVUFqKzF5VVpPY2FYem1UK0ErR1NtNEZzVGFsejBwQ2pp?=
- =?utf-8?B?TngzUzFJOWx1NUxzT1cwRlp1eS9JZktOQnZaMms1S3J0c3RXM0lHQ3l6QUVG?=
- =?utf-8?B?R1pscUFpM2xnOUZVbDMrUFNVcGhYRDJWVlRYOUFGeDVSYkR1TUUxVjZvVE51?=
- =?utf-8?Q?YH/KEezLpj6uWaXx/cKGU2E80?=
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 733f087b-f165-461d-b357-08dbd5cd1059
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB7738.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2023 02:41:32.5845
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bP3QCNPyTaFtSwXryVtOOtzT03MkYryCJGRnFw0fk7ZEVXwMVJK17rjSTEtElxgvZiLaEBxNRSX869qiS8KNpQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8386
-X-Proofpoint-GUID: -bg2NsuLZuwqRUWx7TnH70DY30QXQoUV
-X-Proofpoint-ORIG-GUID: -bg2NsuLZuwqRUWx7TnH70DY30QXQoUV
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: uU_82npvhk0qncD9hR83J1j7-38HOtU4
+X-Proofpoint-ORIG-GUID: uU_82npvhk0qncD9hR83J1j7-38HOtU4
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-10-25_13,2023-10-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 spamscore=0 impostorscore=0 adultscore=0 suspectscore=0
- mlxscore=0 priorityscore=1501 mlxlogscore=571 phishscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2310170000 definitions=main-2310260021
 
-Thanks very much for all your reply.
+Error code strings are not getting printed properly
+due to holes. Print error code as well.
 
-Do you think is it possible that we don't ignore the speed and duplex 
-settings in BMCR, but we only add the bit BMCR_ANENABLE in BMCR ? just 
-for example, return (bmcr |= BMCR_ANENABLE);
+Fixes: 51afe9026d0c ("octeontx2-pf: NIX TX overwrites SQ_CTX_HW_S[SQ_INT]")
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+---
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 65 ++++++++++---------
+ .../marvell/octeontx2/nic/otx2_struct.h       | 34 +++++-----
+ 2 files changed, 51 insertions(+), 48 deletions(-)
 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index 6daf4d58c25d..e82724f69406 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1193,31 +1193,32 @@ static char *nix_mnqerr_e_str[NIX_MNQERR_MAX] = {
+ };
+ 
+ static char *nix_snd_status_e_str[NIX_SND_STATUS_MAX] =  {
+-	"NIX_SND_STATUS_GOOD",
+-	"NIX_SND_STATUS_SQ_CTX_FAULT",
+-	"NIX_SND_STATUS_SQ_CTX_POISON",
+-	"NIX_SND_STATUS_SQB_FAULT",
+-	"NIX_SND_STATUS_SQB_POISON",
+-	"NIX_SND_STATUS_HDR_ERR",
+-	"NIX_SND_STATUS_EXT_ERR",
+-	"NIX_SND_STATUS_JUMP_FAULT",
+-	"NIX_SND_STATUS_JUMP_POISON",
+-	"NIX_SND_STATUS_CRC_ERR",
+-	"NIX_SND_STATUS_IMM_ERR",
+-	"NIX_SND_STATUS_SG_ERR",
+-	"NIX_SND_STATUS_MEM_ERR",
+-	"NIX_SND_STATUS_INVALID_SUBDC",
+-	"NIX_SND_STATUS_SUBDC_ORDER_ERR",
+-	"NIX_SND_STATUS_DATA_FAULT",
+-	"NIX_SND_STATUS_DATA_POISON",
+-	"NIX_SND_STATUS_NPC_DROP_ACTION",
+-	"NIX_SND_STATUS_LOCK_VIOL",
+-	"NIX_SND_STATUS_NPC_UCAST_CHAN_ERR",
+-	"NIX_SND_STATUS_NPC_MCAST_CHAN_ERR",
+-	"NIX_SND_STATUS_NPC_MCAST_ABORT",
+-	"NIX_SND_STATUS_NPC_VTAG_PTR_ERR",
+-	"NIX_SND_STATUS_NPC_VTAG_SIZE_ERR",
+-	"NIX_SND_STATUS_SEND_STATS_ERR",
++	[NIX_SND_STATUS_GOOD] = "NIX_SND_STATUS_GOOD",
++	[NIX_SND_STATUS_SQ_CTX_FAULT] = "NIX_SND_STATUS_SQ_CTX_FAULT",
++	[NIX_SND_STATUS_SQ_CTX_POISON] = "NIX_SND_STATUS_SQ_CTX_POISON",
++	[NIX_SND_STATUS_SQB_FAULT] = "NIX_SND_STATUS_SQB_FAULT",
++	[NIX_SND_STATUS_SQB_POISON] = "NIX_SND_STATUS_SQB_POISON",
++	[NIX_SND_STATUS_HDR_ERR] = "NIX_SND_STATUS_HDR_ERR",
++	[NIX_SND_STATUS_EXT_ERR] = "NIX_SND_STATUS_EXT_ERR",
++	[NIX_SND_STATUS_JUMP_FAULT] = "NIX_SND_STATUS_JUMP_FAULT",
++	[NIX_SND_STATUS_JUMP_POISON] = "NIX_SND_STATUS_JUMP_POISON",
++	[NIX_SND_STATUS_CRC_ERR] = "NIX_SND_STATUS_CRC_ERR",
++	[NIX_SND_STATUS_IMM_ERR] = "NIX_SND_STATUS_IMM_ERR",
++	[NIX_SND_STATUS_SG_ERR] = "NIX_SND_STATUS_SG_ERR",
++	[NIX_SND_STATUS_MEM_ERR] = "NIX_SND_STATUS_MEM_ERR",
++	[NIX_SND_STATUS_INVALID_SUBDC] = "NIX_SND_STATUS_INVALID_SUBDC",
++	[NIX_SND_STATUS_SUBDC_ORDER_ERR] = "NIX_SND_STATUS_SUBDC_ORDER_ERR",
++	[NIX_SND_STATUS_DATA_FAULT] = "NIX_SND_STATUS_DATA_FAULT",
++	[NIX_SND_STATUS_DATA_POISON] = "NIX_SND_STATUS_DATA_POISON",
++	[NIX_SND_STATUS_NPC_DROP_ACTION] = "NIX_SND_STATUS_NPC_DROP_ACTION",
++	[NIX_SND_STATUS_LOCK_VIOL] = "NIX_SND_STATUS_LOCK_VIOL",
++	[NIX_SND_STATUS_NPC_UCAST_CHAN_ERR] = "NIX_SND_STATUS_NPC_UCAST_CHAN_ERR",
++	[NIX_SND_STATUS_NPC_MCAST_CHAN_ERR] = "NIX_SND_STATUS_NPC_MCAST_CHAN_ERR",
++	[NIX_SND_STATUS_NPC_MCAST_ABORT] = "NIX_SND_STATUS_NPC_MCAST_ABORT",
++	[NIX_SND_STATUS_NPC_VTAG_PTR_ERR] = "NIX_SND_STATUS_NPC_VTAG_PTR_ERR",
++	[NIX_SND_STATUS_NPC_VTAG_SIZE_ERR] = "NIX_SND_STATUS_NPC_VTAG_SIZE_ERR",
++	[NIX_SND_STATUS_SEND_MEM_FAULT] = "NIX_SND_STATUS_SEND_MEM_FAULT",
++	[NIX_SND_STATUS_SEND_STATS_ERR] = "NIX_SND_STATUS_SEND_STATS_ERR",
+ };
+ 
+ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
+@@ -1282,8 +1283,8 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
+ 			goto chk_mnq_err_dbg;
+ 
+ 		sq_op_err_code = FIELD_GET(GENMASK(7, 0), sq_op_err_dbg);
+-		netdev_err(pf->netdev, "SQ%lld: NIX_LF_SQ_OP_ERR_DBG(%llx)  err=%s\n",
+-			   qidx, sq_op_err_dbg, nix_sqoperr_e_str[sq_op_err_code]);
++		netdev_err(pf->netdev, "SQ%lld: NIX_LF_SQ_OP_ERR_DBG(0x%llx)  err=%s(%#x)\n",
++			   qidx, sq_op_err_dbg, nix_sqoperr_e_str[sq_op_err_code], sq_op_err_code);
+ 
+ 		otx2_write64(pf, NIX_LF_SQ_OP_ERR_DBG, BIT_ULL(44));
+ 
+@@ -1300,16 +1301,18 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
+ 			goto chk_snd_err_dbg;
+ 
+ 		mnq_err_code = FIELD_GET(GENMASK(7, 0), mnq_err_dbg);
+-		netdev_err(pf->netdev, "SQ%lld: NIX_LF_MNQ_ERR_DBG(%llx)  err=%s\n",
+-			   qidx, mnq_err_dbg,  nix_mnqerr_e_str[mnq_err_code]);
++		netdev_err(pf->netdev, "SQ%lld: NIX_LF_MNQ_ERR_DBG(0x%llx)  err=%s(%#x)\n",
++			   qidx, mnq_err_dbg,  nix_mnqerr_e_str[mnq_err_code], mnq_err_code);
+ 		otx2_write64(pf, NIX_LF_MNQ_ERR_DBG, BIT_ULL(44));
+ 
+ chk_snd_err_dbg:
+ 		snd_err_dbg = otx2_read64(pf, NIX_LF_SEND_ERR_DBG);
+ 		if (snd_err_dbg & BIT(44)) {
+ 			snd_err_code = FIELD_GET(GENMASK(7, 0), snd_err_dbg);
+-			netdev_err(pf->netdev, "SQ%lld: NIX_LF_SND_ERR_DBG:0x%llx err=%s\n",
+-				   qidx, snd_err_dbg, nix_snd_status_e_str[snd_err_code]);
++			netdev_err(pf->netdev,
++				   "SQ%lld: NIX_LF_SND_ERR_DBG:0x%llx err=%s(%#x)\n",
++				   qidx, snd_err_dbg, nix_snd_status_e_str[snd_err_code],
++				   snd_err_code);
+ 			otx2_write64(pf, NIX_LF_SEND_ERR_DBG, BIT_ULL(44));
+ 		}
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h
+index fa37b9f312ca..4e5899d8fa2e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h
+@@ -318,23 +318,23 @@ enum nix_snd_status_e {
+ 	NIX_SND_STATUS_EXT_ERR = 0x6,
+ 	NIX_SND_STATUS_JUMP_FAULT = 0x7,
+ 	NIX_SND_STATUS_JUMP_POISON = 0x8,
+-	NIX_SND_STATUS_CRC_ERR = 0x9,
+-	NIX_SND_STATUS_IMM_ERR = 0x10,
+-	NIX_SND_STATUS_SG_ERR = 0x11,
+-	NIX_SND_STATUS_MEM_ERR = 0x12,
+-	NIX_SND_STATUS_INVALID_SUBDC = 0x13,
+-	NIX_SND_STATUS_SUBDC_ORDER_ERR = 0x14,
+-	NIX_SND_STATUS_DATA_FAULT = 0x15,
+-	NIX_SND_STATUS_DATA_POISON = 0x16,
+-	NIX_SND_STATUS_NPC_DROP_ACTION = 0x17,
+-	NIX_SND_STATUS_LOCK_VIOL = 0x18,
+-	NIX_SND_STATUS_NPC_UCAST_CHAN_ERR = 0x19,
+-	NIX_SND_STATUS_NPC_MCAST_CHAN_ERR = 0x20,
+-	NIX_SND_STATUS_NPC_MCAST_ABORT = 0x21,
+-	NIX_SND_STATUS_NPC_VTAG_PTR_ERR = 0x22,
+-	NIX_SND_STATUS_NPC_VTAG_SIZE_ERR = 0x23,
+-	NIX_SND_STATUS_SEND_MEM_FAULT = 0x24,
+-	NIX_SND_STATUS_SEND_STATS_ERR = 0x25,
++	NIX_SND_STATUS_CRC_ERR = 0x10,
++	NIX_SND_STATUS_IMM_ERR = 0x11,
++	NIX_SND_STATUS_SG_ERR = 0x12,
++	NIX_SND_STATUS_MEM_ERR = 0x13,
++	NIX_SND_STATUS_INVALID_SUBDC = 0x14,
++	NIX_SND_STATUS_SUBDC_ORDER_ERR = 0x15,
++	NIX_SND_STATUS_DATA_FAULT = 0x16,
++	NIX_SND_STATUS_DATA_POISON = 0x17,
++	NIX_SND_STATUS_NPC_DROP_ACTION = 0x20,
++	NIX_SND_STATUS_LOCK_VIOL = 0x21,
++	NIX_SND_STATUS_NPC_UCAST_CHAN_ERR = 0x22,
++	NIX_SND_STATUS_NPC_MCAST_CHAN_ERR = 0x23,
++	NIX_SND_STATUS_NPC_MCAST_ABORT = 0x24,
++	NIX_SND_STATUS_NPC_VTAG_PTR_ERR = 0x25,
++	NIX_SND_STATUS_NPC_VTAG_SIZE_ERR = 0x26,
++	NIX_SND_STATUS_SEND_MEM_FAULT = 0x27,
++	NIX_SND_STATUS_SEND_STATS_ERR = 0x28,
+ 	NIX_SND_STATUS_MAX,
+ };
+ 
+-- 
+2.25.1
 
-On 10/23/23 22:28, Andrew Lunn wrote:
-> CAUTION: This email comes from a non Wind River email account!
-> Do not click links or open attachments unless you recognize the sender and know the content is safe.
-> 
->> Thanks very much for your reply.
->>
->> Actually, due to some reason, the phydev's default aneg state is off.
->> And we just found if use ethtool to set, it had the same result.
-> 
-> I find it surprising it defaults to aneg off. Are you sure something
-> has not turned it off before you look at it?
-> 
-
-These days I was trying to find how and why set to aneg off. It seems 
-like due to "the some reason", we have to do this.
-
-> The emulator does not support writing to any registers. However,
-> fixed_mdio_write() does not return an error, it just does nothing.  It
-> needs testing, but maybe try making it return -EOPNOTSUPP. That should
-> prevent auto-neg being turned off, but it might also break everything
-> if it tries to do some other write during probe or link up. It could
-> be it needs a more select response, allowing writes to some bits, like
-> the reset bit, and start auto-neg, but not others like disable
-> auto-neg.
-> 
->          Andrew
 
