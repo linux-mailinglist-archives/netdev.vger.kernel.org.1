@@ -1,149 +1,133 @@
-Return-Path: <netdev+bounces-44495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76E3F7D84D0
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:33:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBD447D84D4
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:34:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A11041C20EE2
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:33:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C07DB2109C
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE02814279;
-	Thu, 26 Oct 2023 14:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3012DF62;
+	Thu, 26 Oct 2023 14:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="VyYAEIbW"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471872EAF5
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 14:33:33 +0000 (UTC)
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90FD01AA
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:33:31 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 557E320826;
-	Thu, 26 Oct 2023 16:33:29 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5CdoS2Nqey8b; Thu, 26 Oct 2023 16:33:28 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id D48A220520;
-	Thu, 26 Oct 2023 16:33:28 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout2.secunet.com (Postfix) with ESMTP id D205C80004A;
-	Thu, 26 Oct 2023 16:33:28 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 26 Oct 2023 16:33:28 +0200
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Thu, 26 Oct
- 2023 16:33:28 +0200
-Date: Thu, 26 Oct 2023 16:33:22 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Florian Westphal <fw@strlen.de>
-CC: Antony Antony <antony@phenome.org>, Steffen Klassert
-	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>
-Subject: Re: [PATCH ipsec-next v3 0/3] xfrm: policy: replace session decode
- with flow dissector
-Message-ID: <ZTp4dDaWejic16eT@moon.secunet.de>
-Reply-To: <antony.antony@secunet.com>
-References: <20231004161002.10843-1-fw@strlen.de>
- <ZSUCdEwwb/+scrH7@gauss3.secunet.de>
- <ZTpXmUH_GQ0FVD7a@Antony2201.local>
- <20231026125748.GA22233@breakpoint.cc>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0039F2EAF1
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 14:34:10 +0000 (UTC)
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D3EC91
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:34:09 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40891d38e3fso7306735e9.1
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:34:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1698330848; x=1698935648; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9EOHVIQcy7UU9cwqwd+tluLHTxjtvTgjkkcZlOPXvCc=;
+        b=VyYAEIbWyF1cnp2EPHZFxbERn/9Lr3EiHv0HA0y5yKpm4sfU1ysTJRTV8wykiBqQ8N
+         8ite+wKkwd6KQ9zyRzej25dY0uXLhhp614l6OnUL9mC18YFlUerabN/+pMsHFSNl579Z
+         3PdFy3vMYvZMV1RFzYCDTqQxnMsDu+SYyOHunAvwiRX3rt6oLVx8Reik+c9WeUi4vUyB
+         t6oAlSP0h/jd0XkxebJl+CWimDZ99WIeBuJp4ODGtlYpeUllTPkvct2NTGdscxtw9GT3
+         w755E5/jI3d4pG9CoQKfKCi0SNEmE3PGU//m4G+eE0i+IEzQc/2C0eASEbtAjCaflCqs
+         jPUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698330848; x=1698935648;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9EOHVIQcy7UU9cwqwd+tluLHTxjtvTgjkkcZlOPXvCc=;
+        b=aC4vBF3W6ihvQv9JKE1vg3M2V1IEKuhLWUX+3zo2xVxmtJJgXZWHXJPk0uxv2/E+y0
+         H9bhDcAOAK6HrMlU9aRUjV7bc/xNKqEFV7VELyczXWjMJYmLuZl3Y7EZ33vqzhG3yhBf
+         ljWxHPUD7SF89sxfhngHfqJZSN0IS9X0wXWtce4bpYzUWVc6r85TOkwaDokaWN54etEx
+         5MPrjbPIdEfK1sZ6Zrq/4ARb50WZil2RybwBzRPrhRzRKtxRqMPkXzSIblr1oKxar/QN
+         2jQb8cAwirHH12sE29uvqCLn/T5duIOlddFYKNgD3aRovIerJKtjc9natLgERH16FJiW
+         aLng==
+X-Gm-Message-State: AOJu0YzA6Q+OXY3Pb5H9X9xfa0qqQOy2r/BahP+K/yI7B/8oB62Yn3xy
+	6nKBSGIbJ7z/ph3Zd4DT4Z0Xdw==
+X-Google-Smtp-Source: AGHT+IFNq02evhGW3aI6zTPqy+iBveUSalg6gcLk6pE7A1BGCrhJPK0NLseg8Vlg/DTqI0ZRW6sjdA==
+X-Received: by 2002:adf:f346:0:b0:32d:bc6e:7f0d with SMTP id e6-20020adff346000000b0032dbc6e7f0dmr12711213wrp.18.1698330847630;
+        Thu, 26 Oct 2023 07:34:07 -0700 (PDT)
+Received: from [192.168.0.106] (haunt.prize.volia.net. [93.72.109.136])
+        by smtp.gmail.com with ESMTPSA id d14-20020adffd8e000000b0031984b370f2sm14326243wrr.47.2023.10.26.07.34.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Oct 2023 07:34:07 -0700 (PDT)
+Message-ID: <5f2655c0-8e66-4aa4-a94a-e6a45be44105@blackwall.org>
+Date: Thu, 26 Oct 2023 17:34:05 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231026125748.GA22233@breakpoint.cc>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH bpf-next 2/2] netkit: use netlink policy for mode and
+ policy attributes validation
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: bpf@vger.kernel.org, jiri@resnulli.us, netdev@vger.kernel.org,
+ martin.lau@linux.dev, ast@kernel.org, andrii@kernel.org,
+ john.fastabend@gmail.com, kuba@kernel.org, andrew@lunn.ch, toke@kernel.org,
+ toke@redhat.com, sdf@google.com, daniel@iogearbox.net
+References: <20231026094106.1505892-1-razor@blackwall.org>
+ <20231026094106.1505892-3-razor@blackwall.org> <ZTpzfckQ5n4o2F7D@shredder>
+ <36072f45-0d42-7284-d0dc-295f543fe40f@blackwall.org>
+In-Reply-To: <36072f45-0d42-7284-d0dc-295f543fe40f@blackwall.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 26, 2023 at 14:57:48 +0200, Florian Westphal wrote:
-> Antony Antony <antony@phenome.org> wrote:
-> > > > Florian Westphal (3):
-> > > >   xfrm: pass struct net to xfrm_decode_session wrappers
-> > > >   xfrm: move mark and oif flowi decode into common code
-> > > >   xfrm: policy: replace session decode with flow dissector
-> > > 
-> > > Series applied, thanks a lot Florian!
-> > > 
-> > 
-> > Hi Steffen,
-> > 
-> > I would like to report a potential bug that I've encountered while working
+On 10/26/23 17:23, Nikolay Aleksandrov wrote:
+> On 10/26/23 17:11, Ido Schimmel wrote:
+>> On Thu, Oct 26, 2023 at 12:41:06PM +0300, Nikolay Aleksandrov wrote:
+>>>   static const struct nla_policy netkit_policy[IFLA_NETKIT_MAX + 1] = {
+>>>       [IFLA_NETKIT_PEER_INFO]        = { .len = sizeof(struct 
+>>> ifinfomsg) },
+>>> -    [IFLA_NETKIT_POLICY]        = { .type = NLA_U32 },
+>>> -    [IFLA_NETKIT_MODE]        = { .type = NLA_U32 },
+>>> -    [IFLA_NETKIT_PEER_POLICY]    = { .type = NLA_U32 },
+>>> +    [IFLA_NETKIT_POLICY]        = NLA_POLICY_VALIDATE_FN(NLA_U32,
+>>> +                                 netkit_check_policy),
+>>
+>> Nik, it's problematic to use NLA_POLICY_VALIDATE_FN() with anything
+>> other than NLA_BINARY. See commit 9e17f99220d1 ("net/sched: act_mpls:
+>> Fix warning during failed attribute validation").
+>>
 > 
-> s/potential//
+> But how is that code called at all? The validation type is 
+> NLA_VALIDATE_FUNCTION(), not NLA_VALIDATE_MIN/MAX/RANGE/RANGE_WARN...
+> nla_validate_int_range() is called only on:
+>          case NLA_VALIDATE_RANGE_PTR:
+>          case NLA_VALIDATE_RANGE:
+>          case NLA_VALIDATE_RANGE_WARN_TOO_LONG:
+>          case NLA_VALIDATE_MIN:
+>          case NLA_VALIDATE_MAX:
 > 
-> Does this patch make things work for you again?  Thanks!
-> 
-> diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-> index 6aea8b2f45e0..e8c406eba11b 100644
-> --- a/net/xfrm/xfrm_policy.c
-> +++ b/net/xfrm/xfrm_policy.c
-> @@ -3400,11 +3400,18 @@ decode_session4(const struct xfrm_flow_keys *flkeys, struct flowi *fl, bool reve
->  		fl4->fl4_dport = flkeys->ports.dst;
->  	}
->  
-> +	switch (flkeys->basic.ip_proto) {
-> +	case IPPROTO_GRE:
-> +		fl4->fl4_gre_key = flkeys->gre.keyid;
-> +		break;
-> +	case IPPROTO_ICMP:
-> +		fl4->fl4_icmp_type = flkeys->icmp.type;
-> +		fl4->fl4_icmp_code = flkeys->icmp.code;
-> +		break;
-> +	}
-> +
->  	fl4->flowi4_proto = flkeys->basic.ip_proto;
->  	fl4->flowi4_tos = flkeys->ip.tos;
-> -	fl4->fl4_icmp_type = flkeys->icmp.type;
-> -	fl4->fl4_icmp_type = flkeys->icmp.code;
-> -	fl4->fl4_gre_key = flkeys->gre.keyid;
->  }
->  
->  #if IS_ENABLED(CONFIG_IPV6)
-> @@ -3427,10 +3434,17 @@ decode_session6(const struct xfrm_flow_keys *flkeys, struct flowi *fl, bool reve
->  		fl6->fl6_dport = flkeys->ports.dst;
->  	}
->  
-> +	switch (flkeys->basic.ip_proto) {
-> +	case IPPROTO_GRE:
-> +		fl6->fl6_gre_key = flkeys->gre.keyid;
-> +		break;
-> +	case IPPROTO_ICMP:
-> +		fl6->fl6_icmp_type = flkeys->icmp.type;
-> +		fl6->fl6_icmp_code = flkeys->icmp.code;
-> +		break;
-> +	}
-> +
->  	fl6->flowi6_proto = flkeys->basic.ip_proto;
-> -	fl6->fl6_icmp_type = flkeys->icmp.type;
-> -	fl6->fl6_icmp_type = flkeys->icmp.code;
-> -	fl6->fl6_gre_key = flkeys->gre.keyid;
->  }
->  #endif
->  
 
-Tested-by: Antony Antony <antony.antony@secunet.com>
+Ah, I'm looking at the wrong thing.. I saw the problem. :)
 
-Thanks,
--antony
+> Anyway, I'll switch to NLA_BINARY in a bit to make sure it's ok. Thanks 
+> for the pointer.
+> 
+>>> +    [IFLA_NETKIT_MODE]        = NLA_POLICY_VALIDATE_FN(NLA_U32,
+>>> +                                 netkit_check_mode),
+>>> +    [IFLA_NETKIT_PEER_POLICY]    = NLA_POLICY_VALIDATE_FN(NLA_U32,
+>>> +                                 netkit_check_policy),
+>>>       [IFLA_NETKIT_PRIMARY]        = { .type = NLA_REJECT,
+>>>                           .reject_message = "Primary attribute is 
+>>> read-only" },
+>>>   };
+>>> -- 
+>>> 2.38.1
+>>>
+>>>
+> 
 
 
