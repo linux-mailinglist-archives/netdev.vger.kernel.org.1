@@ -1,263 +1,121 @@
-Return-Path: <netdev+bounces-44450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 719DB7D8013
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:55:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40CBE7D8024
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:58:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B0F4B21281
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 09:55:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4D41B212A8
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 09:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD7028E08;
-	Thu, 26 Oct 2023 09:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A092AB2B;
+	Thu, 26 Oct 2023 09:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IL+4TaOY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NEt5wwqI"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A15E26E20
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 09:55:31 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E17193
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 02:55:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698314128;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=zyWJrVb8i16NmtX1jUj9T8HsL1UYZG7szk+M19SAoeM=;
-	b=IL+4TaOYjxmYdZo3q5xluKUlcv3xvvdzHglBWmhh3ySKsFmA5oxMUOFk8Pe4jcmpb8cCiq
-	F83sb6+2UU7elNIxYr5y51luY3O7t+0rTuxCZfrL5cfVEK/nZqGF4UsoRMTF5VgSoITsgb
-	u6Ew+KmT6wvEN0+MPTWI54QJZWv9Jss=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-v9wgk7aZM-KwCqVvp5tUqA-1; Thu, 26 Oct 2023 05:55:25 -0400
-X-MC-Unique: v9wgk7aZM-KwCqVvp5tUqA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C38A68C7EC3;
-	Thu, 26 Oct 2023 09:55:24 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.233])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B29C71C060AE;
-	Thu, 26 Oct 2023 09:55:23 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.6-rc8
-Date: Thu, 26 Oct 2023 11:55:10 +0200
-Message-ID: <20231026095510.23688-1-pabeni@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B3C2D021;
+	Thu, 26 Oct 2023 09:58:09 +0000 (UTC)
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCE7A93;
+	Thu, 26 Oct 2023 02:58:07 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-9bf0ac97fdeso108604466b.2;
+        Thu, 26 Oct 2023 02:58:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698314286; x=1698919086; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9KIvM94Zo8czLYhdT3nLKb2AOCp1EA16AmR4SZgO/t4=;
+        b=NEt5wwqImRgDWauETNXA/+jsOSV/bAbMRs4dBNT7cfzWdx6QEOBGMXqbrgyAjDGy/7
+         Hr9JirvRT5DeB6wZfZ6tFtvh9+aMKdz7LKsU/V/4veYb/hrLGwTOZcYx0j/J62qKbdCI
+         tgxAWfn0AcXuPISxqqeOb3c+A/drBmfflaVr8CIp8AsKrVmO4mKs0Qff6pZjy3qj5Ufx
+         akde5aojA3aLHl9v2oqO/xEY24bE5/MRAyy91q4GxUv6JkMl51fQvz7Cr7LM7t0FF4Ta
+         4oVAXDsKgxccPbXQUYIZJ88yjf8oQb3C0qjyh3wkkYFIj6pdg97BC+vfV2BLoa3OT7Ov
+         BGlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698314286; x=1698919086;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9KIvM94Zo8czLYhdT3nLKb2AOCp1EA16AmR4SZgO/t4=;
+        b=N6vRd4e+QkIhSCtbz710e7guKNQqMixRqqstFYofbnCo5PmPLUVkSrdVmab5CD043r
+         jVTqUZzOfniG8z6M0svhE2+9DL91aEwiF01MKwU0RV+OpS+6/jCaWDOEGssY5KYJppzd
+         miIfeWIchzju/tbiR7AXQa/BqMbhUBP7wL8JA3tD9preyX65pTf55SwbZuNoriSDTFck
+         jBBv358uk50rRhLvh+3F939MEMr2fFAUUY3d+KO5TOCnbGLc7xH2dxq7pSZUyRFYW76P
+         3tT3pucZESR8AC8LX/p8NInXjAqMcKyxSWjTgzBYiJsJnVwX5D1OIKNvz4vo6wuH+eWq
+         4aMQ==
+X-Gm-Message-State: AOJu0Yxsc9ddX5Qn72I2jkBotTlthOpTN9FGgWhvndp2QFmY6tN8Vb8b
+	JtdHVbuPOPbBMhlA4Ml+qU8=
+X-Google-Smtp-Source: AGHT+IFCQqAufKA0LjuOtRNshjlN3m4ejifcXJ3YvxW+ZdXdN/W0E5ZaHeHdmKDkFOFggdRCPQmqFw==
+X-Received: by 2002:a17:907:841:b0:9c7:3611:9e7c with SMTP id ww1-20020a170907084100b009c736119e7cmr13848003ejb.61.1698314286213;
+        Thu, 26 Oct 2023 02:58:06 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id n13-20020a170906088d00b0098ec690e6d7sm11396113eje.73.2023.10.26.02.58.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Oct 2023 02:58:05 -0700 (PDT)
+Date: Thu, 26 Oct 2023 12:58:03 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v8 1/5] net: dsa: microchip: ksz9477: Add Wake
+ on Magic Packet support
+Message-ID: <20231026095803.a54uni73ugwm33sg@skbuf>
+References: <20231026051051.2316937-1-o.rempel@pengutronix.de>
+ <20231026051051.2316937-1-o.rempel@pengutronix.de>
+ <20231026051051.2316937-2-o.rempel@pengutronix.de>
+ <20231026051051.2316937-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231026051051.2316937-2-o.rempel@pengutronix.de>
+ <20231026051051.2316937-2-o.rempel@pengutronix.de>
 
-Hi Linus!
+On Thu, Oct 26, 2023 at 07:10:47AM +0200, Oleksij Rempel wrote:
+> Introduce Wake on Magic Packet (WoL) functionality to the ksz9477
+> driver.
+> 
+> Major changes include:
+> 
+> 1. Extending the `ksz9477_handle_wake_reason` function to identify Magic
+>    Packet wake events alongside existing wake reasons.
+> 
+> 2. Updating the `ksz9477_get_wol` and `ksz9477_set_wol` functions to
+>    handle WAKE_MAGIC alongside the existing WAKE_PHY option, and to
+>    program the switch's MAC address register accordingly when Magic
+>    Packet wake-up is enabled. This change will prevent WAKE_MAGIC
+>    activation if the related port has a different MAC address compared
+>    to a MAC address already used by HSR or an already active WAKE_MAGIC
+>    on another port.
+> 
+> 3. Adding a restriction in `ksz_port_set_mac_address` to prevent MAC
+>    address changes on ports with active Wake on Magic Packet, as the
+>    switch's MAC address register is utilized for this feature.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> ---
 
-The following changes since commit ce55c22ec8b223a90ff3e084d842f73cfba35588:
-
-  Merge tag 'net-6.6-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-10-19 12:08:18 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.6-rc8
-
-for you to fetch changes up to 53798666648af3aa0dd512c2380576627237a800:
-
-  iavf: in iavf_down, disable queues when removing the driver (2023-10-25 17:48:31 -0700)
-
-----------------------------------------------------------------
-Including fixes from WiFi and netfilter.
-
-Most regressions addressed here come from quite old versions, with
-the exceptions of the iavf one and the WiFi fixes. No known
-outstanding reports or investigation.
-
-Fixes to fixes:
-
- - eth: iavf: in iavf_down, disable queues when removing the driver
-
-Previous releases - regressions:
-
- - sched: act_ct: additional checks for outdated flows
-
- - tcp: do not leave an empty skb in write queue
-
- - tcp: fix wrong RTO timeout when received SACK reneging
-
- - wifi: cfg80211: pass correct pointer to rdev_inform_bss()
-
- - eth: i40e: sync next_to_clean and next_to_process for programming status desc
-
- - eth: iavf: initialize waitqueues before starting watchdog_task
-
-Previous releases - always broken:
-
- - eth: r8169: fix data-races
-
- - eth: igb: fix potential memory leak in igb_add_ethtool_nfc_entry
-
- - eth: r8152: avoid writing garbage to the adapter's registers
-
- - eth: gtp: fix fragmentation needed check with gso
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alexandru Matei (1):
-      vsock/virtio: initialize the_virtio_vsock before using VQs
-
-Anjali Kulkarni (1):
-      Fix NULL pointer dereference in cn_filter()
-
-Avraham Stern (1):
-      wifi: mac80211: don't drop all unprotected public action frames
-
-Ben Greear (1):
-      wifi: cfg80211: pass correct pointer to rdev_inform_bss()
-
-Christophe JAILLET (1):
-      net: ieee802154: adf7242: Fix some potential buffer overflow in adf7242_stats_show()
-
-David S. Miller (1):
-      Merge branch 'r8152-reg-garbage'
-
-Dell Jin (1):
-      net: ethernet: adi: adin1110: Fix uninitialized variable
-
-Deming Wang (2):
-      net: ipv4: fix typo in comments
-      net: ipv6: fix typo in comments
-
-Douglas Anderson (8):
-      r8152: Increase USB control msg timeout to 5000ms as per spec
-      r8152: Run the unload routine if we have errors during probe
-      r8152: Cancel hw_phy_work if we have an error in probe
-      r8152: Release firmware if we have an error in probe
-      r8152: Check for unplug in rtl_phy_patch_request()
-      r8152: Check for unplug in r8153b_ups_en() / r8153c_ups_en()
-      r8152: Rename RTL8152_UNPLUG to RTL8152_INACCESSIBLE
-      r8152: Block future register access if register access fails
-
-Eric Dumazet (2):
-      net: do not leave an empty skb in write queue
-      neighbour: fix various data-races
-
-Fred Chen (1):
-      tcp: fix wrong RTO timeout when received SACK reneging
-
-Ivan Vecera (2):
-      i40e: Fix I40E_FLAG_VF_VLAN_PRUNING value
-      i40e: Fix wrong check for I40E_TXR_FLAGS_WB_ON_ITR
-
-Jakub Kicinski (2):
-      Merge tag 'wireless-2023-10-24' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-      Merge tag 'nf-23-10-25' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-
-Johannes Berg (1):
-      wifi: cfg80211: fix assoc response warning on failed links
-
-Kunwu Chan (2):
-      treewide: Spelling fix in comment
-      isdn: mISDN: hfcsusb: Spelling fix in comment
-
-Maciej Fijalkowski (1):
-      i40e: xsk: remove count_mask
-
-Mateusz Palczewski (1):
-      igb: Fix potential memory leak in igb_add_ethtool_nfc_entry
-
-Michael Sit Wei Hong (1):
-      net: stmmac: update MAC capabilities when tx queues are updated
-
-Michal Schmidt (2):
-      iavf: initialize waitqueues before starting watchdog_task
-      iavf: in iavf_down, disable queues when removing the driver
-
-Mirsad Goran Todorovac (3):
-      r8169: fix the KCSAN reported data-race in rtl_tx() while reading tp->cur_tx
-      r8169: fix the KCSAN reported data-race in rtl_tx while reading TxDescArray[entry].opts1
-      r8169: fix the KCSAN reported data race in rtl_rx while reading desc->opts1
-
-Moritz Wanzenböck (1):
-      net/handshake: fix file ref count in handshake_nl_accept_doit()
-
-Pablo Neira Ayuso (3):
-      gtp: uapi: fix GTPA_MAX
-      gtp: fix fragmentation needed check with gso
-      netfilter: flowtable: GC pushes back packets to classic path
-
-Paolo Abeni (1):
-      Merge branch 'gtp-tunnel-driver-fixes'
-
-Pieter Jansen van Vuuren (1):
-      sfc: cleanup and reduce netlink error messages
-
-Rob Herring (1):
-      net: xgene: Fix unused xgene_enet_of_match warning for !CONFIG_OF
-
-Sasha Neftin (1):
-      igc: Fix ambiguity in the ethtool advertising
-
-Shigeru Yoshida (1):
-      net: usb: smsc95xx: Fix uninit-value access in smsc95xx_read_reg
-
-Su Hui (1):
-      net: chelsio: cxgb4: add an error code check in t4_load_phy_fw
-
-Tirthendu Sarkar (1):
-      i40e: sync next_to_clean and next_to_process for programming status desc
-
-Vlad Buslov (1):
-      net/sched: act_ct: additional checks for outdated flows
-
- drivers/connector/cn_proc.c                       |   2 +-
- drivers/isdn/hardware/mISDN/hfcsusb.c             |   2 +-
- drivers/net/ethernet/adi/adin1110.c               |   2 +-
- drivers/net/ethernet/apm/xgene/xgene_enet_main.c  |   2 +-
- drivers/net/ethernet/chelsio/cxgb4/t4_hw.c        |   2 +
- drivers/net/ethernet/intel/i40e/i40e.h            |   2 +-
- drivers/net/ethernet/intel/i40e/i40e_txrx.c       |  11 +-
- drivers/net/ethernet/intel/i40e/i40e_xsk.c        |  22 +-
- drivers/net/ethernet/intel/iavf/iavf_main.c       |   7 +-
- drivers/net/ethernet/intel/igb/igb_ethtool.c      |   6 +-
- drivers/net/ethernet/intel/igc/igc_ethtool.c      |  35 ++-
- drivers/net/ethernet/realtek/r8169_main.c         |   6 +-
- drivers/net/ethernet/sfc/tc.c                     |  38 +--
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  17 +-
- drivers/net/ethernet/toshiba/ps3_gelic_wireless.c |   2 +-
- drivers/net/gtp.c                                 |   5 +-
- drivers/net/ieee802154/adf7242.c                  |   5 +-
- drivers/net/usb/r8152.c                           | 303 ++++++++++++++++------
- drivers/net/usb/smsc95xx.c                        |   4 +-
- include/linux/ieee80211.h                         |  29 +++
- include/net/netfilter/nf_flow_table.h             |   1 +
- include/uapi/linux/gtp.h                          |   2 +-
- net/core/neighbour.c                              |  67 ++---
- net/handshake/netlink.c                           |  30 +--
- net/ipv4/esp4.c                                   |   2 +-
- net/ipv4/tcp.c                                    |   8 +-
- net/ipv4/tcp_input.c                              |   9 +-
- net/ipv6/esp6.c                                   |   2 +-
- net/mac80211/rx.c                                 |   3 +-
- net/netfilter/nf_flow_table_core.c                |  14 +-
- net/sched/act_ct.c                                |   9 +
- net/vmw_vsock/virtio_transport.c                  |  18 +-
- net/wireless/mlme.c                               |   3 +-
- net/wireless/scan.c                               |   2 +-
- 34 files changed, 458 insertions(+), 214 deletions(-)
-
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
