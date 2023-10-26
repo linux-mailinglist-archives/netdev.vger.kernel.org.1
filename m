@@ -1,93 +1,203 @@
-Return-Path: <netdev+bounces-44572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A92AD7D8B5D
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 00:03:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69B1E7D8B70
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 00:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6375A2820F2
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:03:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49FDCB2149E
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73FC3E47C;
-	Thu, 26 Oct 2023 22:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87033F4A8;
+	Thu, 26 Oct 2023 22:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VZDhVB3p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J2j7S08R"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541DC34CDA;
-	Thu, 26 Oct 2023 22:03:34 +0000 (UTC)
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24CF4194;
-	Thu, 26 Oct 2023 15:03:33 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-507a0907896so2060427e87.2;
-        Thu, 26 Oct 2023 15:03:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E783E490
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 22:10:15 +0000 (UTC)
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBDEC116
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:10:13 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-53fc7c67a41so5341053a12.0
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 15:10:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698357811; x=1698962611; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=q5hLrNJsmwnCO5l/iKscXNMyGzsoKX1e7ZUXZvYUQ+E=;
-        b=VZDhVB3pWNlapxf0QvGjotICTMY9TfBLlXZobyupzLDSkZcqpvgXJZGl84XIOUViRN
-         s5qKGIdW1CwBhDRHF2pyr3jw/ytYtjyVobKjFh7PAEgH890NYuWl/7jphoYlly/nZRxz
-         m0EhXRx3AJle++2rYEIGl/8NtfxBngaLRA02a3BMR6zGyBYuz2V/bbjBle3ivDfb8132
-         dC7Ut0U2/ACUsCJhRe9sG7nVTqen2iUPRjioCs853up2odndd8cYw6wK28F4NnpowYix
-         mzUqtjBTFgmTH/P7NNNGYF0S4DpZ4aldXUuFi0EGlq5/ECkJ7hUlD9wV5ohH5I3SaopI
-         8J2Q==
+        d=google.com; s=20230601; t=1698358212; x=1698963012; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VYkYcPfrdjdF13EUZZ4eE7TIV+DAr//+SL8WC077uOs=;
+        b=J2j7S08RIHdtE5P9LPqWSBmyk4JHy8o0zMHOmCUxJ6ex6gtuzLsOyVnrMcjETdt2my
+         aMWugK8ndDJSbiDSwZtZ3UHf6hLc21mR0kfIJuWsP843otfXTHdMtPWVB6DWEjF6jAvo
+         dKb3bUr/D9d6/CjNzhGa/2kFkg3of1YD3rpsViEouTud9mlyJvZ3egsu134wJnAZppla
+         PH8df/P9K4J6HSuJTPKBgIeEii29VDLq4gtZszfRO4HAaXEjs2qNvKIgcvf0et/1iWR1
+         Bhdr9p+K04toNFsaZlhw0lxk8QKmA/g/C7wE5qjar9deQc6EsbiVR7ymUK4MJTqE8RUL
+         A3+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698357811; x=1698962611;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q5hLrNJsmwnCO5l/iKscXNMyGzsoKX1e7ZUXZvYUQ+E=;
-        b=eyQ/H9Q5iWKzvDADONE+ofju+h0VsVhO9UrBa1jn4ijGVeYQyd3mFSV5jdq8tAP12C
-         vRsmdh3OAEi5dlnOwQaqh9EWDsH8oBNepgp1ScyPfmjYh8T0I7Hr7etrBwOn2PjQpTC7
-         vLHJr8eoAhjU7GpQBF0rdxmUGT20t0GFRDjyy2XNHJ2wzzdwCRjehBjVh+CXMXWSRsZ7
-         3N077ix21KpdGemlCecqcmTEpcXr34Bw1XuXoS4BMYLhx6DlmVKakhqLSVkfQnBxRkqq
-         SykbZ157+eLzpJKbRlWG60QlrtId3Zbiu/8sZC/tLVkDK5JjHUe/rNa2NGKVVBzjdWB5
-         lijg==
-X-Gm-Message-State: AOJu0YyvKJzqQTbu/J9FWtpX0DdUe5/CUv0ebISjftPIe8woZlozuXUw
-	a6/cQn5tOvkCrYczGpDtx4vUZ1IDL5Gp4dwXZBw=
-X-Google-Smtp-Source: AGHT+IHbgZl1rbe/BbKbUA0u9EHvueRSJ46VOIWp7wWXxyKGtD3be/nmYvNaoh/DzKVRPpw6egm8xijuXEsCU3DzP0c=
-X-Received: by 2002:a05:6512:208c:b0:507:ab66:f118 with SMTP id
- t12-20020a056512208c00b00507ab66f118mr397456lfr.68.1698357811023; Thu, 26 Oct
- 2023 15:03:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698358212; x=1698963012;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VYkYcPfrdjdF13EUZZ4eE7TIV+DAr//+SL8WC077uOs=;
+        b=S9o+DryRy6eg4AsFvK/WrEFS5lv/XnnfTUSQgZqVG7YR/Fjn5Z1ILW4F1DsGxGpO6+
+         jyeEpXUk4Q8Dpe9CMLv/m/fmPDVXImwUM2fvi0aToBCchd/ED6MuKZ0dHgUh5WRG3UJc
+         mdQsVmnxjTREPeJznypv/Q531uHCVbBK69AaA3BKMLofwUPyp56hcMO6rc6gouVZY5bn
+         Yc50aKRQo3SB+3q+KryzTc/gHo1TmWBt39Xa+qnq3x7vpfIu1HZqlzk06tVmpZ6WxP79
+         c8sMuMF4Cv9Gtojm0lkdbPJwpvOwWHlkjLQjcIY6MDg7YW3aNsTByT/w3nTNL2WuiJ9q
+         /DFQ==
+X-Gm-Message-State: AOJu0YwSLaynx2s10rXhMH8SQNJ8L+pPLkujzni8DKqw5YFOF6tg0cOy
+	4LqkUpgT2Lb+lN47Uy3MX/pUK2c9a/WMvNimjbNffA==
+X-Google-Smtp-Source: AGHT+IHuRGkSLp8NehiD60eytlHzZjcZDIT/jEslbKqr0KO3Wpe3LN4KZHOprmb19kQBB0q3jCL/Ej5UEDw1oqFqc4o=
+X-Received: by 2002:a50:fa83:0:b0:52a:38c3:1b4b with SMTP id
+ w3-20020a50fa83000000b0052a38c31b4bmr1216507edr.15.1698358211957; Thu, 26 Oct
+ 2023 15:10:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231024205805.19314-1-luizluca@gmail.com> <20231024205805.19314-3-luizluca@gmail.com>
- <20231026205807.GA347941-robh@kernel.org>
-In-Reply-To: <20231026205807.GA347941-robh@kernel.org>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Thu, 26 Oct 2023 19:03:19 -0300
-Message-ID: <CAJq09z5wm=WMifELQ2cEYWb1L4Wsc4nkaj0o8p+fireY5QG-uQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] dt-bindings: net: dsa: realtek: add reset controller
-To: Rob Herring <robh@kernel.org>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, vivien.didelot@gmail.com, f.fainelli@gmail.com, 
-	olteanv@gmail.com, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	krzk+dt@kernel.org, arinc.unal@arinc9.com, devicetree@vger.kernel.org
+References: <20231026-ethtool_puts_impl-v2-0-0d67cbdd0538@google.com>
+ <20231026-ethtool_puts_impl-v2-1-0d67cbdd0538@google.com> <20231026220248.blgf7kgt5fkkbg7f@skbuf>
+In-Reply-To: <20231026220248.blgf7kgt5fkkbg7f@skbuf>
+From: Justin Stitt <justinstitt@google.com>
+Date: Thu, 26 Oct 2023 15:09:59 -0700
+Message-ID: <CAFhGd8rWOE8zGFCdjM6i8H3TP8q5BFFxMGCk0n-nmLmjHojefg@mail.gmail.com>
+Subject: Re: [PATCH next v2 1/3] ethtool: Implement ethtool_puts()
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shay Agroskin <shayagr@amazon.com>, 
+	Arthur Kiyanovski <akiyano@amazon.com>, David Arinzon <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>, 
+	Saeed Bishara <saeedb@amazon.com>, Rasesh Mody <rmody@marvell.com>, 
+	Sudarsana Kalluru <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
+	Dimitris Michailidis <dmichail@fungible.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, 
+	Salil Mehta <salil.mehta@huawei.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Louis Peens <louis.peens@corigine.com>, 
+	Shannon Nelson <shannon.nelson@amd.com>, Brett Creeley <brett.creeley@amd.com>, drivers@pensando.io, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Ronak Doshi <doshir@vmware.com>, 
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>, 
+	Dwaipayan Ray <dwaipayanray1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
+	Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>, 
+	Daniel Golle <daniel@makrotopia.org>, Landen Chao <Landen.Chao@mediatek.com>, 
+	DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
+	Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, 
+	Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>, 
+	Daniel Machon <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Kees Cook <keescook@chromium.org>, 
+	intel-wired-lan@lists.osuosl.org, oss-drivers@corigine.com, 
+	linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > +  resets:
-> > +    maxItems: 1
-> > +
-> > +  reset-names:
-> > +    const: switch
+On Thu, Oct 26, 2023 at 3:02=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
+ wrote:
 >
-> $block-name is not really a useful name for resources. Generally, you
-> don't need -names if there's only 1 entry.
+> Hi Justin,
+>
+> On Thu, Oct 26, 2023 at 09:56:07PM +0000, Justin Stitt wrote:
+> > Use strscpy() to implement ethtool_puts().
+> >
+> > Functionally the same as ethtool_sprintf() when it's used with two
+> > arguments or with just "%s" format specifier.
+> >
+> > Signed-off-by: Justin Stitt <justinstitt@google.com>
+> > ---
+> >  include/linux/ethtool.h | 34 +++++++++++++++++++++++-----------
+> >  net/ethtool/ioctl.c     |  7 +++++++
+> >  2 files changed, 30 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> > index 226a36ed5aa1..7129dd2e227c 100644
+> > --- a/include/linux/ethtool.h
+> > +++ b/include/linux/ethtool.h
+> > @@ -1053,22 +1053,34 @@ static inline int ethtool_mm_frag_size_min_to_a=
+dd(u32 val_min, u32 *val_add,
+> >   */
+> >  extern __printf(2, 3) void ethtool_sprintf(u8 **data, const char *fmt,=
+ ...);
+> >
+> > +/**
+> > + * ethtool_puts - Write string to ethtool string data
+> > + * @data: Pointer to start of string to update
+> > + * @str: String to write
+> > + *
+> > + * Write string to data. Update data to point at start of next
+> > + * string.
+> > + *
+> > + * Prefer this function to ethtool_sprintf() when given only
+> > + * two arguments or if @fmt is just "%s".
+> > + */
+> > +extern void ethtool_puts(u8 **data, const char *str);
+> > +
+> >  /* Link mode to forced speed capabilities maps */
+> >  struct ethtool_forced_speed_map {
+> > -     u32             speed;
+> > +     u32 speed;
+> >       __ETHTOOL_DECLARE_LINK_MODE_MASK(caps);
+> >
+> > -     const u32       *cap_arr;
+> > -     u32             arr_size;
+> > +     const u32 *cap_arr;
+> > +     u32 arr_size;
+> >  };
+> >
+> > -#define ETHTOOL_FORCED_SPEED_MAP(prefix, value)                       =
+       \
+> > -{                                                                    \
+> > -     .speed          =3D SPEED_##value,                               =
+ \
+> > -     .cap_arr        =3D prefix##_##value,                            =
+ \
+> > -     .arr_size       =3D ARRAY_SIZE(prefix##_##value),                =
+ \
+> > -}
+> > +#define ETHTOOL_FORCED_SPEED_MAP(prefix, value)                      \
+> > +     {                                                            \
+> > +             .speed =3D SPEED_##value, .cap_arr =3D prefix##_##value, =
+\
+> > +             .arr_size =3D ARRAY_SIZE(prefix##_##value),            \
+> > +     }
+> >
+> > -void
+> > -ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps, =
+u32 size);
+> > +void ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *m=
+aps,
+> > +                                 u32 size);
+> >  #endif /* _LINUX_ETHTOOL_H */
+>
+> Maybe this is due to an incorrect rebase conflict resolution, but you
+> shouldn't have touched any of the ethtool force speed maps.
 
-I didn't know the reset-control name was optional. Yes, it is not
-useful. I'll get rid of it.
-It looks like there are more bindings where it is not necessary.
+Ah, I did have a conflict and resolved by simply moving the hunks
+out of each other's way. Trivial resolution.
 
-Regards,
+Should I undo this? I want my patch against next since it's targeting
+some stuff in-flight over there. BUT, I also want ethtool_puts() to be
+directly below ethtool_sprintf() in the source code. What to do?
 
-Luiz
+>
+> Please wait for at least 24 hours to pass before posting a new version,
+> to allow for more comments to come in.
+
+Ok :)
+
+Thanks
+Justin
 
