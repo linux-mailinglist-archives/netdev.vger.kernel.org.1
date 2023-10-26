@@ -1,87 +1,70 @@
-Return-Path: <netdev+bounces-44420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE3B27D7EA8
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 10:41:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EC4C7D7F4E
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:07:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 007F61C20EE0
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 08:41:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA645281EE5
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 09:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214C71A5B9;
-	Thu, 26 Oct 2023 08:41:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD4426E17;
+	Thu, 26 Oct 2023 09:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oRC27PQC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JQMTeaPD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D022911C9F;
-	Thu, 26 Oct 2023 08:41:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6AFC433C8;
-	Thu, 26 Oct 2023 08:40:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698309661;
-	bh=CKweGyf2oPo/e/UZLG1WYH3zEQnVvPRR68BdbBl/TGo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oRC27PQC2plQ2QFtxeYNcapuTdKaVmbmEUR0m69y9zSqXieqEvU2U8HaibfItzWZF
-	 yERD96v5VwCZUJZD6El6ZorfVxYGGBw2vENxYrzOh3JNxfzIcWV8Hyo/98RmvjYp1O
-	 Ink1QwB6gOI9hZMPLodFMqMmfk4UUgDFD2PT2vR0MIfYSLtLLeyvF4ch6/DBDJ+K3Z
-	 0bfW6e3KP7yJWPzCmJpvtwgF2RV+VsKMprb/vimV6IovW84by85aPvP9y1WYUJyow3
-	 BUjvGbMWEhiJ9hRAr+vd5AhVyyu5+qGt0miVwVbaUWHgtUSofxp310DRt0OzuziAvf
-	 CCAilLzZ675cA==
-Date: Thu, 26 Oct 2023 11:40:39 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "tglx@linutronix.de" <tglx@linutronix.de>,
-	"mcgrof@kernel.org" <mcgrof@kernel.org>,
-	"deller@gmx.de" <deller@gmx.de>,
-	"bjorn@kernel.org" <bjorn@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"nadav.amit@gmail.com" <nadav.amit@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"hca@linux.ibm.com" <hca@linux.ibm.com>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>,
-	"puranjay12@gmail.com" <puranjay12@gmail.com>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>,
-	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
-	"mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-	"christophe.leroy@csgroup.eu" <christophe.leroy@csgroup.eu>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"rostedt@goodmis.org" <rostedt@goodmis.org>,
-	"will@kernel.org" <will@kernel.org>,
-	"dinguyen@kernel.org" <dinguyen@kernel.org>,
-	"naveen.n.rao@linux.ibm.com" <naveen.n.rao@linux.ibm.com>,
-	"sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
-	"linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"song@kernel.org" <song@kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>
-Subject: Re: [PATCH v3 03/13] mm/execmem, arch: convert simple overrides of
- module_alloc to execmem
-Message-ID: <20231026084039.GJ2824@kernel.org>
-References: <20230918072955.2507221-1-rppt@kernel.org>
- <20230918072955.2507221-4-rppt@kernel.org>
- <607927885bb8ca12d4cd5787f01207c256cc8798.camel@intel.com>
- <00277a3acb36d2309156264c7e8484071bc91614.camel@intel.com>
- <20231005052622.GD3303@kernel.org>
- <b26d0a201bf631831a956450ebbccc3c16521133.camel@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B3D15AD3
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 09:07:06 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E19CB10E;
+	Thu, 26 Oct 2023 02:07:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698311224; x=1729847224;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tEXGA+hQXBm1ufjQHDtYW7uE1dK4Tg/P5ocdejt0Njw=;
+  b=JQMTeaPDrHN4eo5X9RBBzHlXrmcI+mWM1/xlqz0qSwY1+HaNxdPQ+m/z
+   flm3fNNbBt+wrLK6G24IN33K8iJFw6Ht04Dc6Rbl/IQ8C+qDqsQEOrEu8
+   GHrt2qPUGMRbIIXA+E4v4hlFWaV9wH47HyW2E2SpJRI06klajxjX9IWRM
+   wmgPNR/wOql6MOYa3OoFNU8AEkLgDBF694aJY8ReD4/AUlYN7EzVGDVL7
+   ZbYOoG+rQ8qMr0mKAjUlfdIVsr48Ehyi6j03lnHshMTVU1TOiq6P0+dCq
+   plB9B6BJpQWwezWwCW9CXBh8TGujfqsUnDaujvbkwBQqTZcjaOEbvxNz4
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="451732079"
+X-IronPort-AV: E=Sophos;i="6.03,253,1694761200"; 
+   d="scan'208";a="451732079"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 02:06:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="932662078"
+X-IronPort-AV: E=Sophos;i="6.03,253,1694761200"; 
+   d="scan'208";a="932662078"
+Received: from wasp.igk.intel.com (HELO wasp) ([10.102.20.192])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 02:06:54 -0700
+Date: Thu, 26 Oct 2023 10:41:34 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, linux-kernel@vger.kernel.org,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
+	Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>,
+	Simon Horman <horms@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH net-next] net/mlx5: fix uninit value use
+Message-ID: <ZTomPuMY/cWwdB8S@wasp>
+References: <20231025145050.36114-1-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,73 +73,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b26d0a201bf631831a956450ebbccc3c16521133.camel@intel.com>
+In-Reply-To: <20231025145050.36114-1-przemyslaw.kitszel@intel.com>
 
-Hi Rick,
-
-Sorry for the delay, I was a bit preoccupied with $stuff.
-
-On Thu, Oct 05, 2023 at 06:09:07PM +0000, Edgecombe, Rick P wrote:
-> On Thu, 2023-10-05 at 08:26 +0300, Mike Rapoport wrote:
-> > On Wed, Oct 04, 2023 at 03:39:26PM +0000, Edgecombe, Rick P wrote:
-> > > On Tue, 2023-10-03 at 17:29 -0700, Rick Edgecombe wrote:
-> > > > It seems a bit weird to copy all of this. Is it trying to be
-> > > > faster
-> > > > or
-> > > > something?
-> > > > 
-> > > > Couldn't it just check r->start in execmem_text/data_alloc() path
-> > > > and
-> > > > switch to EXECMEM_DEFAULT if needed then? The
-> > > > execmem_range_is_data()
-> > > > part that comes later could be added to the logic there too. So
-> > > > this
-> > > > seems like unnecessary complexity to me or I don't see the
-> > > > reason.
-> > > 
-> > > I guess this is a bad idea because if you have the full size array
-> > > sitting around anyway you might as well use it and reduce the
-> > > exec_mem_alloc() logic.
-> > 
-> > That's was the idea, indeed. :)
-> > 
-> > > Just looking at it from the x86 side (and
-> > > similar) though, where there is actually only one execmem_range and
-> > > it
-> > > building this whole array with identical data and it seems weird.
-> > 
-> > Right, most architectures have only one range, but to support all
-> > variants
-> > that we have, execmem has to maintain the whole array.
+On Wed, Oct 25, 2023 at 04:50:50PM +0200, Przemek Kitszel wrote:
+> Avoid use of uninitialized state variable.
 > 
-> What about just having an index into a smaller set of ranges. The
-> module area and the extra JIT area. So ->ranges can be size 3
-> (statically allocated in the arch code) for three areas and then the
-> index array can be size EXECMEM_TYPE_MAX. The default 0 value of the
-> indexing array will point to the default area and any special areas can
-> be set in the index point to the desired range.
+> In case of mlx5e_tx_reporter_build_diagnose_output_sq_common() it's better
+> to still collect other data than bail out entirely.
 > 
-> Looking at how it would do for x86 and arm64, it looks maybe a bit
-> better to me. A little bit less code and memory usage, and a bit easier
-> to trace the configuration through to the final state (IMO). What do
-> you think? Very rough, on top of this series, below.
-
-I like your suggestion to only have definitions of actual ranges in arch
-code and index array to redirect allocation requests to the right range.
-I'll make the next version along the lines of your patch.
-
-> As I was playing around with this, I was also wondering why it needs
-> two copies of struct execmem_params: one returned from the arch code
-> and one in exec mem. 
-
-No actual reason, one copy is enough, thanks for catching this.
-
-> And why the temporary arch copy is ro_after_init,
-> but the final execmem.c copy is not ro_after_init?
-
-I just missed it, thanks for pointing out.
- 
--- 
-Sincerely yours,
-Mike.
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Link: https://lore.kernel.org/netdev/8bd30131-c9f2-4075-a575-7fa2793a1760@moroto.mountain
+> Fixes: d17f98bf7cc9 ("net/mlx5: devlink health: use retained error fmsg API")
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c | 6 +++++-
+>  drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c | 8 ++++++--
+>  2 files changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
+> index fc5a9fdd06db..fea8c0a5fe89 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
+> @@ -263,8 +263,12 @@ mlx5e_rx_reporter_build_diagnose_output_rq_common(struct mlx5e_rq *rq,
+>  	if (rq->icosq) {
+>  		struct mlx5e_icosq *icosq = rq->icosq;
+>  		u8 icosq_hw_state;
+> +		int err;
+> +
+> +		err = mlx5_core_query_sq_state(rq->mdev, icosq->sqn, &icosq_hw_state);
+> +		if (err)
+> +			return err;
+>  
+> -		mlx5_core_query_sq_state(rq->mdev, icosq->sqn, &icosq_hw_state);
+>  		mlx5e_reporter_icosq_diagnose(icosq, icosq_hw_state, fmsg);
+>  	}
+>  
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
+> index ccff7c26d6ac..6b44ddce14e9 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
+> @@ -221,12 +221,16 @@ mlx5e_tx_reporter_build_diagnose_output_sq_common(struct devlink_fmsg *fmsg,
+>  	bool stopped = netif_xmit_stopped(sq->txq);
+>  	struct mlx5e_priv *priv = sq->priv;
+>  	u8 state;
+> +	int err;
+>  
+> -	mlx5_core_query_sq_state(priv->mdev, sq->sqn, &state);
+>  	devlink_fmsg_u32_pair_put(fmsg, "tc", tc);
+>  	devlink_fmsg_u32_pair_put(fmsg, "txq ix", sq->txq_ix);
+>  	devlink_fmsg_u32_pair_put(fmsg, "sqn", sq->sqn);
+> -	devlink_fmsg_u8_pair_put(fmsg, "HW state", state);
+> +
+> +	err = mlx5_core_query_sq_state(priv->mdev, sq->sqn, &state);
+> +	if (!err)
+> +		devlink_fmsg_u8_pair_put(fmsg, "HW state", state);
+> +
+>  	devlink_fmsg_bool_pair_put(fmsg, "stopped", stopped);
+>  	devlink_fmsg_u32_pair_put(fmsg, "cc", sq->cc);
+>  	devlink_fmsg_u32_pair_put(fmsg, "pc", sq->pc);
+> -- 
+LGTM
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> 2.38.1
 
