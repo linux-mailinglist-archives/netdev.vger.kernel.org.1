@@ -1,294 +1,226 @@
-Return-Path: <netdev+bounces-44340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E8F17D7937
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 02:19:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A53CE7D793C
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 02:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32086281E13
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 00:19:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AC12281E57
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 00:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A9F368;
-	Thu, 26 Oct 2023 00:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1D5163;
+	Thu, 26 Oct 2023 00:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4ITJBtB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NSXKpg/b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883B8163
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 00:19:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 096AEC433C8;
-	Thu, 26 Oct 2023 00:19:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698279556;
-	bh=+KTawYjd1Lr/vb7P4FZ9u6c6TjnG8CbjQeARedrOKT4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=V4ITJBtBCG81WDlEX6ihDhsw9Pyv0Wz39Oi/S3n62MGTCKC727MDFBApYbAfNJQQ2
-	 m6NDX5CdRvdfO5k6KnkCTQzwDviCDaUNjDOwDwcSIumKK+BYp6rAZNnw6IaupWcvT/
-	 QBHY4A3mS1/kVNdqG6x/7E03nWljKyWrIY+U3KqjmXcKHJHuIk33ZyTDFK3DLgsGUi
-	 p/R4u+0s5IjiH3klXqXbXJtY+pzDC95S/ifV2/DNS9VlmP0GadUCSgKZqMXvhayIta
-	 j+YibBfetRaSZrTnKET0pGsJ14NIsTGudT9S6B+5asIPa2JWhLE/5HqTsZMDuP7Gmm
-	 ok7xbjLUlyxOQ==
-Message-ID: <18391efa-3328-4e3f-ad9c-d278ea128095@kernel.org>
-Date: Wed, 25 Oct 2023 18:19:15 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0CC368
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 00:20:29 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D750A10E;
+	Wed, 25 Oct 2023 17:20:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698279628; x=1729815628;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=qJ+GlWUF9KQoO82K8l7rP8XoL76tSzuMTXyVfP6jimw=;
+  b=NSXKpg/bJlymPbTTCaT0rnbEOq2GNZ7eNjk+ZYuIORNGR4tjQyKJfgEd
+   oGCD4p78DxgCShoXOgU3rRTwkJU3aFUp//cVzVKfHph+X+rm4c2RC5X7E
+   hqpp5613Z2xZThgyeMF8bgBu6hU2I9IptaRVSjIT3XCCDL7Bx0k2Ep6RV
+   1ycl5fxkFyLBwIGMXEh8lydXxoplgn9Bcoy4dOsygjZkTmhEeasO60bpl
+   1mhG3qs+JaAQw9TzZEQMRwtbgs1Yhtj36+osD3cLoQeP/UrjaIM4thAAG
+   +4nTntE13xX4N2yf3wYPbjdS7q9cm4NSogamfY1tJffxfn5L9LnYFoZor
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="390285440"
+X-IronPort-AV: E=Sophos;i="6.03,252,1694761200"; 
+   d="scan'208";a="390285440"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2023 17:20:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="762625076"
+X-IronPort-AV: E=Sophos;i="6.03,252,1694761200"; 
+   d="scan'208";a="762625076"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Oct 2023 17:20:16 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 25 Oct 2023 17:20:15 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 25 Oct 2023 17:20:15 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Wed, 25 Oct 2023 17:20:15 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Wed, 25 Oct 2023 17:20:08 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=erMVVDnjtSadyPJsDQlAYsEF/1b3har0WGiJSu3rlivbYN7vMsGEZL2wnParNHVrBSVqGFk710m4jJeIiQcmwSdEG0PTDlPX23z/gsxkQVoUCTnhHBMWDkoZgqp+Wg0vyjtAR2EcaZ//ZHHUQvEEocAFlDkj43AA+ZVwhruI4b6aCc3XrkW2Ll3SS0lKzLgL/ZXgpC+SdZsxjNBVAneqhtZeiq/oqQYraABf7SwIbjf/1k9h8G1ZeM7yatQVGg5MMBON8PDUsDGZNVPbeDDPr+ed9VcHp5yMwxRQcLOwBgxxMZoUMaZ+or0To/IRQLT0MiHHcB0+PIinfqd/+8JmrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d6CnOH4jDprdyxRTxT3zreqosuKUyUb7jE1etPiSn6k=;
+ b=oc/6uMKwPpNuY4a7nDizRGY6kzKs3ic8WAr1Kj8rgi2ybE2YNyL30Bu1MzQfm71sXGiT162ITADjr4ElvjfqSg7hRzN5atAsgMVOnglvj/UDT/nGfo6dJl9WyROEw7Ha5ZdvzTt3doTpGx92719VivSlT3QSwju1eYGd9IxTctccjoQahiav6qwgK3kURDeK/tePUHpTGAHOkyqCDIqFfJKU6QDrvD8vNR7dQZf+BpiZzHG9Bi9mZ9mPxCEbNeaVbVN0m0ec3lmA/fc3WG+amf2tQFvHWV/WD+Vga5v0d3RQ0w7DHepnh6aMCLrTsBXW4HOzHSuAnkvPoHfsCFPuSw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by IA0PR11MB8333.namprd11.prod.outlook.com (2603:10b6:208:491::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6907.21; Thu, 26 Oct
+ 2023 00:20:05 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::f216:6b2b:3af0:35c1]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::f216:6b2b:3af0:35c1%4]) with mapi id 15.20.6907.032; Thu, 26 Oct 2023
+ 00:20:05 +0000
+Message-ID: <6d12707c-4666-40ac-9c8e-79b65f011263@intel.com>
+Date: Wed, 25 Oct 2023 17:20:02 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next 1/2] i40e: Remove VF MAC types
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, Wojciech Drewek <wojciech.drewek@intel.com>
+CC: Ivan Vecera <ivecera@redhat.com>, <netdev@vger.kernel.org>, "Jesse
+ Brandeburg" <jesse.brandeburg@intel.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20231025103315.1149589-1-ivecera@redhat.com>
+ <20231025103315.1149589-2-ivecera@redhat.com>
+ <8a8f54a8-1a18-4797-a592-b57bc6fc45c1@intel.com>
+ <ZTkHJ6IP4tj3EmCV@nanopsycho> <ZTkIH68kCzb+4VME@nanopsycho>
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <ZTkIH68kCzb+4VME@nanopsycho>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR02CA0016.namprd02.prod.outlook.com
+ (2603:10b6:303:16d::22) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7] vxlan: add support for flowlabel inherit
-Content-Language: en-US
-To: Alce Lafranque <alce@lafranque.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: Vincent Bernat <vincent@bernat.ch>
-References: <20231024165028.251294-1-alce@lafranque.net>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231024165028.251294-1-alce@lafranque.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|IA0PR11MB8333:EE_
+X-MS-Office365-Filtering-Correlation-Id: cff095cf-90e0-4380-46f7-08dbd5b94dea
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dEftvsAWdagz3wJVyIJIkfyg4iCU4Q7lYT4siKHin9PpoRoN9EtRF81RymKVgqcWE9BQG6a/QnE0LXjRRYzHGNQG3TsQXgjgZJIWs1dRYcKU3PbwggOit9BkqjVrb2AYkwtQQb41OvoKKtClvND6LeLgHBC5AKJ1OU8kSPpozAayGijdGjnbNwFcKGtBn04Yt1aVD8wcO5K8SuAKaCUvRkXOj9HIMuh4TjZkLLJi7eb2yVkTKqyBI+pFhw6tPb+I5OQyGyhTWQFqWvGjW5aJ8DyzcUxFc8zFdGXtbrBYqXhR9cZFGT3PaGUeKi3lHIvRNiFhkuZYp7sLGvhDg/TQ/9VP5dX+xf/mkyG4mzL9osK5Cyg9908wzxl482s8Dmhn4KCxUuWiCAtlovFvz/rJe7m8ezuTrXWqeqHX7l0GmDXmMuEN5QeHFrRcijdeDKvIzWb4XIckuOUQgcq0aZTipzRgefOVC8oPcqALFxQ+PuXmgiHkbMHRYGBbjKq3AN7ywfgvoBhXJ/1hufhZia+XQLyve1sVIuvnnMGWZiXKRGDY9H8GpSEFYK/wk/iRVePPS412KlP1UqZY/lJMxIZZvEZRKeAMH+x06Pj9m1HbTOf0m6n9/MfxJrrmhe3eNlZpRPZ/kSTaAIiKS6eGMDTVgQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(346002)(366004)(39860400002)(396003)(230922051799003)(1800799009)(64100799003)(186009)(451199024)(478600001)(6486002)(66946007)(66476007)(82960400001)(38100700002)(86362001)(2616005)(83380400001)(36756003)(31696002)(26005)(316002)(31686004)(110136005)(6506007)(53546011)(6636002)(66556008)(6512007)(2906002)(6666004)(54906003)(41300700001)(8676002)(5660300002)(8936002)(4326008)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?LzRMOUF4WUtBdlFXdmFBUmZyL2kzQ0ZwdU55OU1RLzJXRDE5T0xOT2ZOZ2NU?=
+ =?utf-8?B?Nmxhd3RHM2s4ZmFNVkdtczR1UUNLaVkra3RnK0RNQWhuem1oYysydTV1V1ha?=
+ =?utf-8?B?UUw1WnZkeTk1Nk5OcjM5WlV6T1ZWMWlvRDBpUkozRjBjVzdXSm1mNVkwTnJp?=
+ =?utf-8?B?NXhQRHE4RlJ6dWFLa3FZcHZRSm1jdXIwUFBOR1dYWW14R25iRm9wQUJQZml1?=
+ =?utf-8?B?ZGRkNnpsOHBTOURvTUxmeUVoY3NIY21FQW9mTDFjcDZKcjl6Z0d2ejNwUHFF?=
+ =?utf-8?B?NEwzTld2R1pPUEsrcU53YmEzVk5WVU5YQmRlSjNVT3JxN1FvNTJTcU14V3lV?=
+ =?utf-8?B?eG9MS2Z2M01UUGk1c2ZxZXU3WTdBYjdGVEhWK3ZMRitObm5lTzVzNDh1Wm12?=
+ =?utf-8?B?WGdhNWR0OWlObEZhNjFhalowNEZqZVVjaXQzK2wvOG5teWoyL0ViK2NqOW1E?=
+ =?utf-8?B?YWNobkhGY0lQWUp2TFdEb1FxUWo1dldLbzdtakxVclpmOUhVY3d4cmlCcGhu?=
+ =?utf-8?B?VndaMVVueXNPTUxKWFIrVitaT1hBdHRYN2hnMndUR1hUQllyMW9rQy9yQnFw?=
+ =?utf-8?B?RWtJbDdkZFdyRE1IOThnOEN0UmxwQWUvbDVvSWhUVjdtSzNYcDdRRkdyOUlr?=
+ =?utf-8?B?Q0ZNbGZ0SDV5dHNsbWhsR2tEQmxFelpGK0FFc2NaS1QzUE1JODg1dnU3aXJs?=
+ =?utf-8?B?bTZwbnJCS283b0hyVDh2WHZxR1VseTFtdld0cHVob1lwaklUNTI5NmxTNFR0?=
+ =?utf-8?B?VDVlaGFNcFJZWmx1ZUdIbTc4dzFrSDhpRlIyNjZqMFl0Z1VYWm1COE01Z3dV?=
+ =?utf-8?B?b2NlSXdrNFFEZkYyWEhRaXpqOUxlUTVIbmk1N2ZhMitOMFE5TWtMM2pGSXhU?=
+ =?utf-8?B?UHI1ZXJ6cnJBZVVUbDI5MWpYTk1waW5ibGtUOHVJR3pPclZ4VU9hRklpVGpU?=
+ =?utf-8?B?bWJ3U3o4QUJDQUlkNFNFTzUzS2NzRXVqb0NnUkVQYmJ4cHF6cGdFYlg5cWJl?=
+ =?utf-8?B?NkpNcTNMV0NZNExVTHZiY3JKZEhmTE84T3ZnVkdnOTArK0lKZzVDTVB1OTY5?=
+ =?utf-8?B?dWZTdW5ZdXEyRTMzQUdMd2V6OHpZdjQvdkI3QStGWmFXZGlpbGo0S3RvOG5G?=
+ =?utf-8?B?N3NNNUZUdjVHM1VIb3VIL2VPU25EOWVZU2srMzBVTlBJNyt0ZklRQzREdUlV?=
+ =?utf-8?B?MTd1ZklrcDFRejFnSmFUYjdubWU5RkZFaTdqMnB4SjQyUlY5TjJhMUlycTdP?=
+ =?utf-8?B?ZmNHY25XaVRFVDBQZ2FLN2JBWUphcFhFVWY4eW5za0ZoNUh5QmVuTmd3OFd2?=
+ =?utf-8?B?SUhQWnFtcENvK1hHbG0yM3VtcjJEWkpVOHlkd1p6Skt5eDNlckZEb1RXZ201?=
+ =?utf-8?B?YWNmS01RSXFtcjk1ZEdKTGtWSkZocDZpQktoVHNpb2t0ZHBXdDk4cXIveEI2?=
+ =?utf-8?B?NGZoYUhwZ1crMjRBZVFiQjFzdEVtOXk0emJrbnFIcUZTQ2NIaG5hTFpFc0VS?=
+ =?utf-8?B?MXRXd2VYUUVyclVSU1Vqc3lTM2V4L2pZMTFiR0FYNVQ1OGZSNG4waVdXZ25q?=
+ =?utf-8?B?TjY1a29EbzlFK3EvalVoSit5NUx0THd2cDNVQmEwQmlueU1NaC8xWEZ4SWlx?=
+ =?utf-8?B?cFpTYUtKUHBiWGpHN0xjQmtqQTcyeEtBbm5SdGQvelJMVGdpZ3F2bCt2WVNa?=
+ =?utf-8?B?MDJKUmJ0S3czN3FJNWhQZ29oeGg0VGhsK21adlpKSFdydW1mWTFSUW5DK2tC?=
+ =?utf-8?B?M1IwQXNxQW16OTZralFoUjVOODFlSFVHWlZWZzh6L0FZckRzZGI3YjVsYk1j?=
+ =?utf-8?B?aTdZK3FYcGxVdEFrSHBhUDNQRzI3dUw3enFwWlRPWEJDcW5OV0pGNnpZYUxy?=
+ =?utf-8?B?UFBMUDZtNlBPMkExMmhZQjJrMzBYYi9Tcm1tclk1VGFveHFNbUxINzNINHg0?=
+ =?utf-8?B?REd0UmZyNjVRVWs1OVM1ekpOOGFjVnVuV3podDF3R05NejBCL1lHNVVIendy?=
+ =?utf-8?B?YlZHWlg1U08wNFRDNWpWa0p0c3hNWVdQTGZzOXNRdm16UzczRm5XTFlHdllp?=
+ =?utf-8?B?dWtLMWhaWVVZOVBoMWtYa0JHVS8ycUQ2Wm9heUc2NkNPOVMxNm5uY0xWMEls?=
+ =?utf-8?B?dmxtQUFMWmJWd1ZueTZKU3o1bWJJQitQQjlJRHRUQTZxemkwcFR5T05mRFBL?=
+ =?utf-8?B?S0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: cff095cf-90e0-4380-46f7-08dbd5b94dea
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2023 00:20:05.6982
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CtBU8vlfocR5CxvD+CZ6Dkqpldr13iuW+WuHio09Lh2xCyA1sXk18FGHcuk5EEXFgYuryBuiTLNAwqUJY5H1JhAwzWJoN86raqHBAGLwh0Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8333
+X-OriginatorOrg: intel.com
 
-On 10/24/23 10:50 AM, Alce Lafranque wrote:
-> By default, VXLAN encapsulation over IPv6 sets the flow label to 0, with
-> an option for a fixed value. This commits add the ability to inherit the
-> flow label from the inner packet, like for other tunnel implementations.
-> This enables devices using only L3 headers for ECMP to correctly balance
-> VXLAN-encapsulated IPv6 packets.
+
+
+On 10/25/2023 5:20 AM, Jiri Pirko wrote:
+> Wed, Oct 25, 2023 at 02:16:39PM CEST, jiri@resnulli.us wrote:
+>> Wed, Oct 25, 2023 at 12:48:37PM CEST, wojciech.drewek@intel.com wrote:
+>>>
+>>>
+>>> On 25.10.2023 12:33, Ivan Vecera wrote:
+>>>> The i40e_hw.mac.type cannot to be equal to I40E_MAC_VF or
+>>>> I40E_MAC_X722_VF so remove helper i40e_is_vf(), simplify
+>>>> i40e_adminq_init_regs() and remove enums for these VF MAC types.
+>>>>
+>>>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>>>> ---
+>>>>  drivers/net/ethernet/intel/i40e/i40e_adminq.c | 33 ++++++-------------
+>>>>  drivers/net/ethernet/intel/i40e/i40e_type.h   |  8 -----
+>>>>  2 files changed, 10 insertions(+), 31 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.c b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
+>>>> index 29fc46abf690..896c43905309 100644
+>>>> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq.c
+>>>> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
+>>>> @@ -17,29 +17,16 @@ static void i40e_resume_aq(struct i40e_hw *hw);
+>>>>  static void i40e_adminq_init_regs(struct i40e_hw *hw)
+>>>>  {
+>>>>  	/* set head and tail registers in our local struct */
+>>>> -	if (i40e_is_vf(hw)) {
+>>>> -		hw->aq.asq.tail = I40E_VF_ATQT1;
+>>>> -		hw->aq.asq.head = I40E_VF_ATQH1;
+>>>> -		hw->aq.asq.len  = I40E_VF_ATQLEN1;
+>>>> -		hw->aq.asq.bal  = I40E_VF_ATQBAL1;
+>>>> -		hw->aq.asq.bah  = I40E_VF_ATQBAH1;
+>>>> -		hw->aq.arq.tail = I40E_VF_ARQT1;
+>>>> -		hw->aq.arq.head = I40E_VF_ARQH1;
+>>>> -		hw->aq.arq.len  = I40E_VF_ARQLEN1;
+>>>> -		hw->aq.arq.bal  = I40E_VF_ARQBAL1;
+>>>> -		hw->aq.arq.bah  = I40E_VF_ARQBAH1;
+>>>
+>>> What about removing those I40E_VF_* defines?
+>>> This is their only usage here, right?
+>>
+>> Wait, do you suggest to use the values directly? That would be
+>> wild even for i40e :)
 > 
-> ```
-> $ ./ip/ip link add dummy1 type dummy
-> $ ./ip/ip addr add 2001:db8::2/64 dev dummy1
-> $ ./ip/ip link set up dev dummy1
-> $ ./ip/ip link add vxlan1 type vxlan id 100 flowlabel inherit remote 2001:db8::1 local 2001:db8::2
-> $ ./ip/ip link set up dev vxlan1
-> $ ./ip/ip addr add 2001:db8:1::2/64 dev vxlan1
-> $ ./ip/ip link set arp off dev vxlan1
-> $ ping -q 2001:db8:1::1 &
-> $ tshark -d udp.port==8472,vxlan -Vpni dummy1 -c1
-> [...]
-> Internet Protocol Version 6, Src: 2001:db8::2, Dst: 2001:db8::1
->     0110 .... = Version: 6
->     .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
->         .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
->         .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
->     .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
-> [...]
-> Virtual eXtensible Local Area Network
->     Flags: 0x0800, VXLAN Network ID (VNI)
->     Group Policy ID: 0
->     VXLAN Network Identifier (VNI): 100
-> [...]
-> Internet Protocol Version 6, Src: 2001:db8:1::2, Dst: 2001:db8:1::1
->     0110 .... = Version: 6
->     .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
->         .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
->         .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
->     .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
-> ```
+> Ah, sec. This is duplicated in
+> drivers/net/ethernet/intel/iavf/iavf_register.h. That confused me.
 > 
-> Signed-off-by: Alce Lafranque <alce@lafranque.net>
-> Co-developed-by: Vincent Bernat <vincent@bernat.ch>
-> Signed-off-by: Vincent Bernat <vincent@bernat.ch>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> 
-> ---
-> v7:
->   - Rebase patch
-> v6:
->   - Rebase patch
-> v5: https://lore.kernel.org/netdev/20231019180417.210523-1-alce@lafranque.net/
->   - Rollback policy label to fixed by default
-> v4: https://lore.kernel.org/all/20231014132102.54051-1-alce@lafranque.net/
->   - Fix tabs
-> v3: https://lore.kernel.org/all/20231014131320.51810-1-alce@lafranque.net/
->   - Adopt policy label inherit by default
->   - Set policy to label fixed when flowlabel is set
->   - Rename IFLA_VXLAN_LABEL_BEHAVIOR to IFLA_VXLAN_LABEL_POLICY
-> v2: https://lore.kernel.org/all/20231007142624.739192-1-alce@lafranque.net/
->   - Use an enum instead of flag to define label behavior
-> v1: https://lore.kernel.org/all/4444C5AE-FA5A-49A4-9700-7DD9D7916C0F.1@mail.lac-coloc.fr/
-> ---
->  drivers/net/vxlan/vxlan_core.c | 23 ++++++++++++++++++++++-
->  include/net/ip_tunnels.h       | 11 +++++++++++
->  include/net/vxlan.h            | 33 +++++++++++++++++----------------
->  include/uapi/linux/if_link.h   |  8 ++++++++
->  4 files changed, 58 insertions(+), 17 deletions(-)
-> 
-> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-> index 7b526ae16ed0..821f8c4de784 100644
-> --- a/drivers/net/vxlan/vxlan_core.c
-> +++ b/drivers/net/vxlan/vxlan_core.c
-> @@ -2379,7 +2379,17 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
->  		else
->  			udp_sum = !(flags & VXLAN_F_UDP_ZERO_CSUM6_TX);
->  #if IS_ENABLED(CONFIG_IPV6)
-> -		key.label = vxlan->cfg.label;
-> +		switch (vxlan->cfg.label_policy) {
-> +		case VXLAN_LABEL_FIXED:
-> +			key.label = vxlan->cfg.label;
-> +			break;
-> +		case VXLAN_LABEL_INHERIT:
-> +			key.label = ip_tunnel_get_flowlabel(old_iph, skb);
-> +			break;
-> +		default:
-> +			DEBUG_NET_WARN_ON_ONCE(1);
-> +			goto drop;
-> +		}
->  #endif
->  	} else {
->  		if (!info) {
-> @@ -3365,6 +3375,7 @@ static const struct nla_policy vxlan_policy[IFLA_VXLAN_MAX + 1] = {
->  	[IFLA_VXLAN_DF]		= { .type = NLA_U8 },
->  	[IFLA_VXLAN_VNIFILTER]	= { .type = NLA_U8 },
->  	[IFLA_VXLAN_LOCALBYPASS]	= NLA_POLICY_MAX(NLA_U8, 1),
-> +	[IFLA_VXLAN_LABEL_POLICY]	= NLA_POLICY_MAX(NLA_U8, VXLAN_LABEL_MAX),
->  };
->  
->  static int vxlan_validate(struct nlattr *tb[], struct nlattr *data[],
-> @@ -3739,6 +3750,12 @@ static int vxlan_config_validate(struct net *src_net, struct vxlan_config *conf,
->  		return -EINVAL;
->  	}
->  
-> +	if (conf->label_policy && !use_ipv6) {
-> +		NL_SET_ERR_MSG(extack,
-> +			       "Label policy only applies to IPv6 VXLAN devices");
-> +		return -EINVAL;
-> +	}
-> +
->  	if (conf->remote_ifindex) {
->  		struct net_device *lowerdev;
->  
-> @@ -4081,6 +4098,8 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
->  	if (data[IFLA_VXLAN_LABEL])
->  		conf->label = nla_get_be32(data[IFLA_VXLAN_LABEL]) &
->  			     IPV6_FLOWLABEL_MASK;
-> +	if (data[IFLA_VXLAN_LABEL_POLICY])
-> +		conf->label_policy = nla_get_u8(data[IFLA_VXLAN_LABEL_POLICY]);
->  
->  	if (data[IFLA_VXLAN_LEARNING]) {
->  		err = vxlan_nl2flag(conf, data, IFLA_VXLAN_LEARNING,
-> @@ -4398,6 +4417,7 @@ static size_t vxlan_get_size(const struct net_device *dev)
->  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_TOS */
->  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_DF */
->  		nla_total_size(sizeof(__be32)) + /* IFLA_VXLAN_LABEL */
-> +		nla_total_size(sizeof(__u8)) +  /* IFLA_VXLAN_LABEL_POLICY */
->  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_LEARNING */
->  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_PROXY */
->  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_RSC */
-> @@ -4470,6 +4490,7 @@ static int vxlan_fill_info(struct sk_buff *skb, const struct net_device *dev)
->  	    nla_put_u8(skb, IFLA_VXLAN_TOS, vxlan->cfg.tos) ||
->  	    nla_put_u8(skb, IFLA_VXLAN_DF, vxlan->cfg.df) ||
->  	    nla_put_be32(skb, IFLA_VXLAN_LABEL, vxlan->cfg.label) ||
-> +	    nla_put_u8(skb, IFLA_VXLAN_LABEL_POLICY, vxlan->cfg.label_policy) ||
->  	    nla_put_u8(skb, IFLA_VXLAN_LEARNING,
->  		       !!(vxlan->cfg.flags & VXLAN_F_LEARN)) ||
->  	    nla_put_u8(skb, IFLA_VXLAN_PROXY,
-> diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-> index f346b4efbc30..2d746f4c9a0a 100644
-> --- a/include/net/ip_tunnels.h
-> +++ b/include/net/ip_tunnels.h
-> @@ -416,6 +416,17 @@ static inline u8 ip_tunnel_get_dsfield(const struct iphdr *iph,
->  		return 0;
->  }
->  
-> +static inline __be32 ip_tunnel_get_flowlabel(const struct iphdr *iph,
-> +					     const struct sk_buff *skb)
-> +{
-> +	__be16 payload_protocol = skb_protocol(skb, true);
-> +
-> +	if (payload_protocol == htons(ETH_P_IPV6))
-> +		return ip6_flowlabel((const struct ipv6hdr *)iph);
-> +	else
-> +		return 0;
-> +}
-> +
->  static inline u8 ip_tunnel_get_ttl(const struct iphdr *iph,
->  				       const struct sk_buff *skb)
->  {
-> diff --git a/include/net/vxlan.h b/include/net/vxlan.h
-> index 6a9f8a5f387c..33ba6fc151cf 100644
-> --- a/include/net/vxlan.h
-> +++ b/include/net/vxlan.h
-> @@ -210,22 +210,23 @@ struct vxlan_rdst {
->  };
->  
->  struct vxlan_config {
-> -	union vxlan_addr	remote_ip;
-> -	union vxlan_addr	saddr;
-> -	__be32			vni;
-> -	int			remote_ifindex;
-> -	int			mtu;
-> -	__be16			dst_port;
-> -	u16			port_min;
-> -	u16			port_max;
-> -	u8			tos;
-> -	u8			ttl;
-> -	__be32			label;
-> -	u32			flags;
-> -	unsigned long		age_interval;
-> -	unsigned int		addrmax;
-> -	bool			no_share;
-> -	enum ifla_vxlan_df	df;
-> +	union vxlan_addr		remote_ip;
-> +	union vxlan_addr		saddr;
-> +	__be32				vni;
-> +	int				remote_ifindex;
-> +	int				mtu;
-> +	__be16				dst_port;
-> +	u16				port_min;
-> +	u16				port_max;
-> +	u8				tos;
-> +	u8				ttl;
-> +	__be32				label;
-> +	enum ifla_vxlan_label_policy	label_policy;
-> +	u32				flags;
-> +	unsigned long			age_interval;
-> +	unsigned int			addrmax;
-> +	bool				no_share;
-> +	enum ifla_vxlan_df		df;
->  };
->  
->  enum {
-> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-> index 9f8a3da0f14f..f71c195b7abf 100644
-> --- a/include/uapi/linux/if_link.h
-> +++ b/include/uapi/linux/if_link.h
-> @@ -832,6 +832,7 @@ enum {
->  	IFLA_VXLAN_DF,
->  	IFLA_VXLAN_VNIFILTER, /* only applicable with COLLECT_METADATA mode */
->  	IFLA_VXLAN_LOCALBYPASS,
-> +	IFLA_VXLAN_LABEL_POLICY,
 
-If you do a respin, a comment here would be good. e.g.,
-
-IFLA_VXLAN_LABEL_POLICY, /* IPv6 flow label policy; see
-ifla_vxlan_label_policy */
-
-
->  	__IFLA_VXLAN_MAX
->  };
->  #define IFLA_VXLAN_MAX	(__IFLA_VXLAN_MAX - 1)
-> @@ -849,6 +850,13 @@ enum ifla_vxlan_df {
->  	VXLAN_DF_MAX = __VXLAN_DF_END - 1,
->  };
->  
-> +enum ifla_vxlan_label_policy {
-> +	VXLAN_LABEL_FIXED = 0,
-> +	VXLAN_LABEL_INHERIT = 1,
-> +	__VXLAN_LABEL_END,
-> +	VXLAN_LABEL_MAX = __VXLAN_LABEL_END - 1,
-> +};
-> +
->  /* GENEVE section */
->  enum {
->  	IFLA_GENEVE_UNSPEC,
-
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Its possible the iAVF code could be cleaned up too... Historically the
+i40e and i40evf duplicated quite some code.
 
 
