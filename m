@@ -1,105 +1,85 @@
-Return-Path: <netdev+bounces-44552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95BA87D8924
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 21:47:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA1C17D8952
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 22:01:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C1BD1F2330B
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 19:47:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A12281F50
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 20:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7783C082;
-	Thu, 26 Oct 2023 19:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC623C098;
+	Thu, 26 Oct 2023 20:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Lj49dNdx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XsmWBBXY"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3B23B786;
-	Thu, 26 Oct 2023 19:46:53 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EBFD1B2;
-	Thu, 26 Oct 2023 12:46:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=iSmsri1S5YsHLGyRgvyYOQUdppxAE4tSQENMgUEYJTk=; b=Lj49dNdxL88asba/4AQ4/rbxuB
-	uiYG0+vP8JAHgjyRrAg489KvzAsLU2SAuEWnT1oUtY3l5TamzP9W+KdNMmxSeG1Gbjnevz/rKhWiP
-	/L7/mcm++PhmfdHdlU+oRqttclmche12Z9/GXbNVQAKzGUJwavfbd1CNNzfuYNNuY0gQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qw6JQ-000HAX-D9; Thu, 26 Oct 2023 21:46:36 +0200
-Date: Thu, 26 Oct 2023 21:46:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban.Veerasooran@microchip.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	corbet@lwn.net, Steen.Hegelund@microchip.com, rdunlap@infradead.org,
-	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, Horatiu.Vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [PATCH net-next v2 1/9] net: ethernet: implement OPEN Alliance
- control transaction interface
-Message-ID: <3c7a04a3-4ae2-4f83-b7bf-0db75f58f5be@lunn.ch>
-References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
- <20231023154649.45931-2-Parthiban.Veerasooran@microchip.com>
- <c51d9660-d6c3-4202-9fc6-b9add06b64ce@lunn.ch>
- <8430c607-4a62-47fc-9c13-9ba17cf09679@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D823B7BB
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 20:01:27 +0000 (UTC)
+Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 694781B1
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 13:01:26 -0700 (PDT)
+Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-1e9fbb7d88eso864737fac.3
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 13:01:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698350485; x=1698955285; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ep6Y3gvj4hh25AytLxfNhWqQLOhOYY7X5MdSy24s3I=;
+        b=XsmWBBXY6QxB1cfXEiXE4Gx6C73ycgcFBhVckmx3/7+TofnRiN1qYBD/suaRKcmpW3
+         VQw8gNopf/ZNmgcFWwUBvnhIWKpfMBZRNfeEKmGfNNYdZzYvGb7usNote5lc5TevHekc
+         tb3R9ngHow5LGbbYyCspgJZTdgg8gIb0hQNnNykZxOy6UVgUKTCU5w+mxqH+RSa2ZJVh
+         B6W5Aclq1jYcxAOladpF62+34Ta2vkOr+D/FvJZ61pRITl8rrGB+CAtnGMpOgpauiRFq
+         XfafXgzyFuy0+ktsChmIlE9zPVx0KRF08TGIpMHgGxn59m9n5JcsHMT7ZUUiwSU8cB8b
+         z6XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698350485; x=1698955285;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1ep6Y3gvj4hh25AytLxfNhWqQLOhOYY7X5MdSy24s3I=;
+        b=UvPwMskorpaWCaSOLYpW8KBVxKEsdDDjzDW1eYRP+1RCTBI6QCFKnUkBamNxbjBx08
+         DAFVQAG1ZYbQzUPGafx+MpViqL7dS36TVeZttLuoLtCGxfAPkzD9wjvQBFgE+smDmY3k
+         ts6X7DUQTXgWQOyc1muXUTFmLD6HumO88dICvuJUTdoniqyWefiQACWi7aWc+qcC30Hz
+         ORZnqvEUFllxwmKgIAe1WRImL+CW6O8ZfgrCkDCVpOn5ySEZpN7pd5eK1hBiX+Y4XJMb
+         gpO/XXQIOKUva2e6P4cszood/PO/chYOAl8c2MZtcAwZ7GJj3wItaeQsRDZ9Y3ipqDt3
+         Zqlg==
+X-Gm-Message-State: AOJu0YzcUsFTEZG4c3bLPJCcs9j4wyI1OIe/iohM9Vq20c3Zdl8JO1+8
+	ztJCOGx1AprNu2ZrapEb5Pcz8atuIOgy2DtIcmI=
+X-Google-Smtp-Source: AGHT+IHFE5WPB5pdE2G251/sxKnsy9s0rjePghk9uCR2NrDnY26fXHLvdSLzccREBIVNfXZ3PIgZqBZEf0F2DoYFdV4=
+X-Received: by 2002:a05:6871:448d:b0:1e9:ee04:d25 with SMTP id
+ ne13-20020a056871448d00b001e9ee040d25mr478937oab.59.1698350485595; Thu, 26
+ Oct 2023 13:01:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8430c607-4a62-47fc-9c13-9ba17cf09679@microchip.com>
+References: <20231026190101.1413939-1-kuba@kernel.org> <20231026190101.1413939-5-kuba@kernel.org>
+In-Reply-To: <20231026190101.1413939-5-kuba@kernel.org>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Thu, 26 Oct 2023 16:00:49 -0400
+Message-ID: <CAF=yD-+5__3PZcqucPeaM9+oUHGLbfn8AYciEMSyTXn+kYhgzQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/4] net: fill in MODULE_DESCRIPTION()s under drivers/net/
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, jhs@mojatatu.com, arnd@arndb.de, ap420073@gmail.com, 
+	jasowang@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Still if you feel like using "write" instead of "wnr" and "protect" 
-> instead of "prote", I will change them in the next revision.
+On Thu, Oct 26, 2023 at 3:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-There is some value in using names from the standard, if they are
-actually good names. But i guess most developers don't have a copy of
-the standard by there side. 
-
-You actually wrote in the patch:
-
-+/* Control header */
-+#define CTRL_HDR_DNC           BIT(31)         /* Data-Not-Control */
-+#define CTRL_HDR_HDRB          BIT(30)         /* Received Header Bad */
-+#define CTRL_HDR_WNR           BIT(29)         /* Write-Not-Read */
-+#define CTRL_HDR_AID           BIT(28)         /* Address Increment Disable */
-+#define CTRL_HDR_MMS           GENMASK(27, 24) /* Memory Map Selector */
-
-The comments suggest you also don't think the names are particularly
-good, otherwise you would not of added comments.
-
-But if you instead had:
-
-/* Control header */
-#define CTRL_HDR_DATA_NOT_CTRL           BIT(31)
-#define CTRL_HDR_HDR_RX_BAD              BIT(30)
-#define CTRL_HDR_WRITE           	 BIT(29)
-#define CTRL_HDR_ADDR_INC_DISABLE        BIT(28)
-#define CTRL_HDR_MEM_MAP_SELECTOR        GENMASK(27, 24)
-
-the names are probably sufficient that comments are not needed.  And
-is should be easy for somebody to map these back to the names used in
-the standard.
-
-This also to some extent comes into the comment about coding style, a
-function does one thing, is short, etc. Short functions tend to have
-less indentation, meaning you can use longer names. And longer names
-are more readable, making the function easier to understand, so it
-does that one thing well.
-
-    Andrew
+Acked-by: Willem de Bruijn <willemb@google.com>
 
