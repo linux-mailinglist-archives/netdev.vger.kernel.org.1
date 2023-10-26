@@ -1,70 +1,78 @@
-Return-Path: <netdev+bounces-44427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EC4C7D7F4E
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 11:07:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9077D7ED6
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 10:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA645281EE5
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 09:07:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE33D1C20EDF
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 08:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD4426E17;
-	Thu, 26 Oct 2023 09:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C8721CF81;
+	Thu, 26 Oct 2023 08:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JQMTeaPD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ebky1cqY"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B3D15AD3
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 09:07:06 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E19CB10E;
-	Thu, 26 Oct 2023 02:07:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698311224; x=1729847224;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tEXGA+hQXBm1ufjQHDtYW7uE1dK4Tg/P5ocdejt0Njw=;
-  b=JQMTeaPDrHN4eo5X9RBBzHlXrmcI+mWM1/xlqz0qSwY1+HaNxdPQ+m/z
-   flm3fNNbBt+wrLK6G24IN33K8iJFw6Ht04Dc6Rbl/IQ8C+qDqsQEOrEu8
-   GHrt2qPUGMRbIIXA+E4v4hlFWaV9wH47HyW2E2SpJRI06klajxjX9IWRM
-   wmgPNR/wOql6MOYa3OoFNU8AEkLgDBF694aJY8ReD4/AUlYN7EzVGDVL7
-   ZbYOoG+rQ8qMr0mKAjUlfdIVsr48Ehyi6j03lnHshMTVU1TOiq6P0+dCq
-   plB9B6BJpQWwezWwCW9CXBh8TGujfqsUnDaujvbkwBQqTZcjaOEbvxNz4
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="451732079"
-X-IronPort-AV: E=Sophos;i="6.03,253,1694761200"; 
-   d="scan'208";a="451732079"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 02:06:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10874"; a="932662078"
-X-IronPort-AV: E=Sophos;i="6.03,253,1694761200"; 
-   d="scan'208";a="932662078"
-Received: from wasp.igk.intel.com (HELO wasp) ([10.102.20.192])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 02:06:54 -0700
-Date: Thu, 26 Oct 2023 10:41:34 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A3017D5
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 08:49:00 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8BDB129;
+	Thu, 26 Oct 2023 01:48:59 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-53df747cfe5so992690a12.2;
+        Thu, 26 Oct 2023 01:48:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698310138; x=1698914938; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E7ze34EchX/27SSwpayDxZBsZvdn030bpVJnYH1TN7c=;
+        b=ebky1cqYTdlTIu0LpyldbaL/y5WJFR/8ASKi9avgOlHyzoaVdCPdGlSCPyc1st4t/v
+         CHQEvLvBXUz88vblFspm/wPJi7kNGAzEawsjU9Eqax1R4vSbYwuPOY1Euf/y/R/Aebrg
+         zK/8nLKKiOwo6XMWRByriJLOIfX7U6pLj9WMe1vg6Pn4rlPMQYD2E6BOrWmESqbQ33H4
+         EKHjzO+DAxnVd3CCmsLMqA+vD1qyToSKjfOBni7Ull8UgowmBlqsgbbfR0ib2beimD3n
+         ECBkT8PJTYLi+B8piH1Jw2Wgm/U1H2t8EcUK8b+MfJbEtJXFIZPp46M8CZ8NqK65InkH
+         PoNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698310138; x=1698914938;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E7ze34EchX/27SSwpayDxZBsZvdn030bpVJnYH1TN7c=;
+        b=B6f9NdArYwms4/qfuwhY2wvG57TLVSMZotNA0kTp6v+GykIFH6lteEdtF9/BrCP2z4
+         4Aq1vU08qVJymPZ5yTBO69nR97ZdpJxixccHhPQLZexGUxAVZoQ3Kqc6BAxng4gwh3+p
+         Sq+WPCHu9Z1QTV9h8bTksvLuuRWm41WedaMkYRP6BAl9f3EGhXLIaVUGkeKIHSpMLY6J
+         Gl74XkE/vIKkwdH8Gchea8sGoMZdqEk+yNyoR2TYNrAmGwlLnL/fUoyLXFYtMvJCZwjr
+         wWSbtQ3NHUD3mKSeMJ+SnaDvnWRMp37V9Xt341/UZ6xh3rvcyJcl27+eV947Woq9Gouo
+         D8Tw==
+X-Gm-Message-State: AOJu0YzDzz1OCx+M2CGBTJCvCSizwu+94rswuj6VOtCZbfKs4+Vb2yUs
+	cIRbZkuox+sz7RFMR95MEQ6AMZxReMdgAQ==
+X-Google-Smtp-Source: AGHT+IELWK/AXGrWy9ydyRdEnqCeROKTMQt9o+/7nV3eJfjMQmTC5ijntEY7PFCGAparxz0sgFH69Q==
+X-Received: by 2002:a05:6402:3552:b0:540:b95b:6ecf with SMTP id f18-20020a056402355200b00540b95b6ecfmr5292807edd.7.1698310137941;
+        Thu, 26 Oct 2023 01:48:57 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id if5-20020a0564025d8500b0053f10da1105sm10936161edb.87.2023.10.26.01.48.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Oct 2023 01:48:57 -0700 (PDT)
+Date: Thu, 26 Oct 2023 11:48:55 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Colin Ian King <colin.i.king@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>, linux-kernel@vger.kernel.org,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Danielle Ratson <danieller@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>,
-	Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>,
-	Simon Horman <horms@kernel.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH net-next] net/mlx5: fix uninit value use
-Message-ID: <ZTomPuMY/cWwdB8S@wasp>
-References: <20231025145050.36114-1-przemyslaw.kitszel@intel.com>
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] net: dsa: microchip: ksz9477: Fix spelling mistake
+ "Enery" -> "Energy"
+Message-ID: <20231026084855.mfrqnzfk3uulwy5o@skbuf>
+References: <20231026065408.1087824-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,66 +81,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231025145050.36114-1-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20231026065408.1087824-1-colin.i.king@gmail.com>
 
-On Wed, Oct 25, 2023 at 04:50:50PM +0200, Przemek Kitszel wrote:
-> Avoid use of uninitialized state variable.
+Colin,
+
+On Thu, Oct 26, 2023 at 07:54:08AM +0100, Colin Ian King wrote:
+> There is a spelling mistake in a dev_dbg message. Fix it.
 > 
-> In case of mlx5e_tx_reporter_build_diagnose_output_sq_common() it's better
-> to still collect other data than bail out entirely.
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Link: https://lore.kernel.org/netdev/8bd30131-c9f2-4075-a575-7fa2793a1760@moroto.mountain
-> Fixes: d17f98bf7cc9 ("net/mlx5: devlink health: use retained error fmsg API")
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 > ---
->  drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c | 6 +++++-
->  drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c | 8 ++++++--
->  2 files changed, 11 insertions(+), 3 deletions(-)
+
+If the patch is 1 day old, please also copy the original patch author.
+
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+
+>  drivers/net/dsa/microchip/ksz9477.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-> index fc5a9fdd06db..fea8c0a5fe89 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
-> @@ -263,8 +263,12 @@ mlx5e_rx_reporter_build_diagnose_output_rq_common(struct mlx5e_rq *rq,
->  	if (rq->icosq) {
->  		struct mlx5e_icosq *icosq = rq->icosq;
->  		u8 icosq_hw_state;
-> +		int err;
-> +
-> +		err = mlx5_core_query_sq_state(rq->mdev, icosq->sqn, &icosq_hw_state);
-> +		if (err)
-> +			return err;
+> diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+> index 2534c3d122e4..b102a27960e1 100644
+> --- a/drivers/net/dsa/microchip/ksz9477.c
+> +++ b/drivers/net/dsa/microchip/ksz9477.c
+> @@ -83,7 +83,7 @@ static int ksz9477_handle_wake_reason(struct ksz_device *dev, int port)
 >  
-> -		mlx5_core_query_sq_state(rq->mdev, icosq->sqn, &icosq_hw_state);
->  		mlx5e_reporter_icosq_diagnose(icosq, icosq_hw_state, fmsg);
->  	}
+>  	dev_dbg(dev->dev, "Wake event on port %d due to:%s%s\n", port,
+>  		pme_status & PME_WOL_LINKUP ? " \"Link Up\"" : "",
+> -		pme_status & PME_WOL_ENERGY ? " \"Enery detect\"" : "");
+> +		pme_status & PME_WOL_ENERGY ? " \"Energy detect\"" : "");
 >  
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-> index ccff7c26d6ac..6b44ddce14e9 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-> @@ -221,12 +221,16 @@ mlx5e_tx_reporter_build_diagnose_output_sq_common(struct devlink_fmsg *fmsg,
->  	bool stopped = netif_xmit_stopped(sq->txq);
->  	struct mlx5e_priv *priv = sq->priv;
->  	u8 state;
-> +	int err;
->  
-> -	mlx5_core_query_sq_state(priv->mdev, sq->sqn, &state);
->  	devlink_fmsg_u32_pair_put(fmsg, "tc", tc);
->  	devlink_fmsg_u32_pair_put(fmsg, "txq ix", sq->txq_ix);
->  	devlink_fmsg_u32_pair_put(fmsg, "sqn", sq->sqn);
-> -	devlink_fmsg_u8_pair_put(fmsg, "HW state", state);
-> +
-> +	err = mlx5_core_query_sq_state(priv->mdev, sq->sqn, &state);
-> +	if (!err)
-> +		devlink_fmsg_u8_pair_put(fmsg, "HW state", state);
-> +
->  	devlink_fmsg_bool_pair_put(fmsg, "stopped", stopped);
->  	devlink_fmsg_u32_pair_put(fmsg, "cc", sq->cc);
->  	devlink_fmsg_u32_pair_put(fmsg, "pc", sq->pc);
+>  	return ksz_pwrite8(dev, port, REG_PORT_PME_STATUS, pme_status);
+>  }
 > -- 
-LGTM
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> 2.38.1
+> 2.39.2
+> 
 
