@@ -1,269 +1,430 @@
-Return-Path: <netdev+bounces-44368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7EE47D7A75
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 03:49:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83D177D7A95
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 04:00:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DABF281E4E
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:49:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C07DE281E1E
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 02:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB778BF6;
-	Thu, 26 Oct 2023 01:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E5637488;
+	Thu, 26 Oct 2023 02:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="YhlRHLDw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA796BE5E
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 01:48:29 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 628A5CE;
-	Wed, 25 Oct 2023 18:48:27 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.206])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SG7st6Z4rz6K5T5;
-	Thu, 26 Oct 2023 09:45:38 +0800 (CST)
-Received: from mscphis00759.huawei.com (10.123.66.134) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 26 Oct 2023 02:48:24 +0100
-From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-To: <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>
-Subject: [PATCH v14 12/12] landlock: Document network support
-Date: Thu, 26 Oct 2023 09:47:51 +0800
-Message-ID: <20231026014751.414649-13-konstantin.meskhidze@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231026014751.414649-1-konstantin.meskhidze@huawei.com>
-References: <20231026014751.414649-1-konstantin.meskhidze@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6AF6469D;
+	Thu, 26 Oct 2023 02:00:08 +0000 (UTC)
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39858128;
+	Wed, 25 Oct 2023 19:00:05 -0700 (PDT)
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 39PLfNvc016399;
+	Wed, 25 Oct 2023 18:59:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=OZPz1Oq2LyaUZOw961SQOKp4naN5ewSkvLqajBv5OZo=;
+ b=YhlRHLDw7tSocLSNlatu7lVt4UM1d8z/9m6lNwEWQWUTLgdaATA/TWzzW6NsfPz4MJ9N
+ xPDUkbTXJ3KbKUXMGX2Yj7bpjFScmV0EfVOXQru0O6X3AeB5S537x05qHcWU4xg6qmsc
+ 0Hwb/cyY4BZ2WgR0OwDYDjVLsCg/A57Lm+WTBAB77StGFXRE4FarxI0PHZFw4SRRzxkz
+ X+EzAo+okpCuFBjMrYXSKItKrhHcNOJcnUQsxNrNaJDgDXYAc24S+0CxDex5HcGedLio
+ doVcHheSaz6WXPFh7Uhs0gUJJhc8lEik5zlgCtrIXDlKC5pb82GK/pTAPnPfWgGfyIKH Dw== 
+Received: from mail.thefacebook.com ([163.114.132.120])
+	by m0001303.ppops.net (PPS) with ESMTPS id 3ty54a4fdg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 25 Oct 2023 18:59:49 -0700
+Received: from devvm4158.cln0.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c085:11d::8) with Microsoft SMTP Server id
+ 15.1.2507.34; Wed, 25 Oct 2023 18:59:46 -0700
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>,
+        Andrii Nakryiko
+	<andrii@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko
+	<mykolal@fb.com>
+CC: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Vadim Fedorenko
+	<vadfed@meta.com>, <bpf@vger.kernel.org>,
+        <netdev@vger.kernel.org>
+Subject: [PATCH bpf-next 1/2] bpf: add skcipher API support to TC/XDP programs
+Date: Wed, 25 Oct 2023 18:59:37 -0700
+Message-ID: <20231026015938.276743-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.66.134]
-X-ClientProxiedBy: mscpeml500002.china.huawei.com (7.188.26.138) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
+X-Originating-IP: [2620:10d:c085:208::11]
+X-Proofpoint-ORIG-GUID: RY2iX-rENakqTmMALOZ3NMME7fkdaggl
+X-Proofpoint-GUID: RY2iX-rENakqTmMALOZ3NMME7fkdaggl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-25_13,2023-10-25_01,2023-05-22_02
 
-Describe network access rules for TCP sockets. Add network access
-example in the tutorial. Add kernel configuration support for network.
+Add crypto API support to BPF to be able to decrypt or encrypt packets
+in TC/XDP BPF programs. Only symmetric key ciphers are supported for
+now. Special care should be taken for initialization part of crypto algo
+because crypto_alloc_sync_skcipher() doesn't work with preemtion
+disabled, it can be run only in sleepable BPF program. Also async crypto
+is not supported because of the very same issue - TC/XDP BPF programs
+are not sleepable.
 
-Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-Signed-off-by: Mickaël Salaün <mic@digikod.net>
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
 ---
+ include/linux/bpf.h   |   1 +
+ kernel/bpf/Makefile   |   3 +
+ kernel/bpf/crypto.c   | 278 ++++++++++++++++++++++++++++++++++++++++++
+ kernel/bpf/helpers.c  |   2 +-
+ kernel/bpf/verifier.c |   1 +
+ 5 files changed, 284 insertions(+), 1 deletion(-)
+ create mode 100644 kernel/bpf/crypto.c
 
-Changes since v13:
-* Fixes documentaion logic errors and typos according the review:
-https://lore.kernel.org/netdev/20231017.Saiw5quoo5wa@digikod.net/
-* Refactors commit message.
-
-Changes since v12:
-* None.
-
-Changes since v11:
-* Fixes documentaion as suggested in Günther's and Mickaёl's reviews:
-https://lore.kernel.org/netdev/3ad02c76-90d8-4723-e554-7f97ef115fc0@digikod.net/
-
-Changes since v10:
-* Fixes documentaion as Mickaёl suggested:
-https://lore.kernel.org/linux-security-module/ec23be77-566e-c8fd-179e-f50e025ac2cf@digikod.net/
-
-Changes since v9:
-* Minor refactoring.
-
-Changes since v8:
-* Minor refactoring.
-
-Changes since v7:
-* Fixes documentaion logic errors and typos as Mickaёl suggested:
-https://lore.kernel.org/netdev/9f354862-2bc3-39ea-92fd-53803d9bbc21@digikod.net/
-
-Changes since v6:
-* Adds network support documentaion.
-
----
- Documentation/userspace-api/landlock.rst | 90 ++++++++++++++++++------
- 1 file changed, 69 insertions(+), 21 deletions(-)
-
-diff --git a/Documentation/userspace-api/landlock.rst b/Documentation/userspace-api/landlock.rst
-index f6a7da21708a..4ac870923020 100644
---- a/Documentation/userspace-api/landlock.rst
-+++ b/Documentation/userspace-api/landlock.rst
-@@ -11,10 +11,10 @@ Landlock: unprivileged access control
- :Date: October 2022
-
- The goal of Landlock is to enable to restrict ambient rights (e.g. global
--filesystem access) for a set of processes.  Because Landlock is a stackable
--LSM, it makes possible to create safe security sandboxes as new security layers
--in addition to the existing system-wide access-controls. This kind of sandbox
--is expected to help mitigate the security impact of bugs or
-+filesystem or network access) for a set of processes.  Because Landlock
-+is a stackable LSM, it makes possible to create safe security sandboxes as new
-+security layers in addition to the existing system-wide access-controls. This
-+kind of sandbox is expected to help mitigate the security impact of bugs or
- unexpected/malicious behaviors in user space applications.  Landlock empowers
- any process, including unprivileged ones, to securely restrict themselves.
-
-@@ -28,20 +28,34 @@ appropriately <kernel_support>`.
- Landlock rules
- ==============
-
--A Landlock rule describes an action on an object.  An object is currently a
--file hierarchy, and the related filesystem actions are defined with `access
--rights`_.  A set of rules is aggregated in a ruleset, which can then restrict
-+A Landlock rule describes an action on an object which the process intends to
-+perform.  A set of rules is aggregated in a ruleset, which can then restrict
- the thread enforcing it, and its future children.
-
-+The two existing types of rules are:
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index d3c51a507508..17145738f176 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -1222,6 +1222,7 @@ enum bpf_dynptr_type {
+ 
+ int bpf_dynptr_check_size(u32 size);
+ u32 __bpf_dynptr_size(const struct bpf_dynptr_kern *ptr);
++enum bpf_dynptr_type bpf_dynptr_get_type(const struct bpf_dynptr_kern *ptr);
+ 
+ #ifdef CONFIG_BPF_JIT
+ int bpf_trampoline_link_prog(struct bpf_tramp_link *link, struct bpf_trampoline *tr);
+diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
+index f526b7573e97..e14b5834c477 100644
+--- a/kernel/bpf/Makefile
++++ b/kernel/bpf/Makefile
+@@ -41,6 +41,9 @@ obj-$(CONFIG_BPF_SYSCALL) += bpf_struct_ops.o
+ obj-$(CONFIG_BPF_SYSCALL) += cpumask.o
+ obj-${CONFIG_BPF_LSM} += bpf_lsm.o
+ endif
++ifeq ($(CONFIG_CRYPTO_SKCIPHER),y)
++obj-$(CONFIG_BPF_SYSCALL) += crypto.o
++endif
+ obj-$(CONFIG_BPF_PRELOAD) += preload/
+ 
+ obj-$(CONFIG_BPF_SYSCALL) += relo_core.o
+diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+new file mode 100644
+index 000000000000..f7803a5591b0
+--- /dev/null
++++ b/kernel/bpf/crypto.c
+@@ -0,0 +1,278 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright (c) 2023 Meta, Inc */
++#include <linux/bpf.h>
++#include <linux/bpf_mem_alloc.h>
++#include <linux/btf.h>
++#include <linux/btf_ids.h>
++#include <linux/filter.h>
++#include <linux/scatterlist.h>
++#include <linux/skbuff.h>
++#include <crypto/skcipher.h>
 +
-+Filesystem rules
-+    For these rules, the object is a file hierarchy,
-+    and the related filesystem actions are defined with
-+    `filesystem access rights`.
++/**
++ * struct bpf_crypto_skcipher_ctx - refcounted BPF sync skcipher context structure
++ * @tfm:	The pointer to crypto_sync_skcipher struct.
++ * @rcu:	The RCU head used to free the crypto context with RCU safety.
++ * @usage:	Object reference counter. When the refcount goes to 0, the
++ *		memory is released back to the BPF allocator, which provides
++ *		RCU safety.
++ */
 +
-+Network rules (since ABI v4)
-+    For these rules, the object is currently a TCP port,
-+    and the related actions are defined with `network access rights`.
++struct bpf_crypto_skcipher_ctx {
++	struct crypto_sync_skcipher *tfm;
++	struct rcu_head rcu;
++	refcount_t usage;
++};
 +
- Defining and enforcing a security policy
- ----------------------------------------
-
--We first need to define the ruleset that will contain our rules.  For this
--example, the ruleset will contain rules that only allow read actions, but write
--actions will be denied.  The ruleset then needs to handle both of these kind of
--actions.  This is required for backward and forward compatibility (i.e. the
--kernel and user space may not know each other's supported restrictions), hence
--the need to be explicit about the denied-by-default access rights.
-+We first need to define the ruleset that will contain our rules.
++static struct bpf_mem_alloc bpf_crypto_ctx_ma;
 +
-+For this example, the ruleset will contain rules that only allow filesystem
-+read actions and establish a specific TCP connection. Filesystem write
-+actions and other TCP actions will be denied.
++__diag_push();
++__diag_ignore_all("-Wmissing-prototypes",
++		  "Global kfuncs as their definitions will be in BTF");
 +
-+The ruleset then needs to handle both these kinds of actions.  This is
-+required for backward and forward compatibility (i.e. the kernel and user
-+space may not know each other's supported restrictions), hence the need
-+to be explicit about the denied-by-default access rights.
-
- .. code-block:: c
-
-@@ -62,6 +76,9 @@ the need to be explicit about the denied-by-default access rights.
-             LANDLOCK_ACCESS_FS_MAKE_SYM |
-             LANDLOCK_ACCESS_FS_REFER |
-             LANDLOCK_ACCESS_FS_TRUNCATE,
-+        .handled_access_net =
-+            LANDLOCK_ACCESS_NET_BIND_TCP |
-+            LANDLOCK_ACCESS_NET_CONNECT_TCP,
-     };
-
- Because we may not know on which kernel version an application will be
-@@ -70,9 +87,7 @@ should try to protect users as much as possible whatever the kernel they are
- using.  To avoid binary enforcement (i.e. either all security features or
- none), we can leverage a dedicated Landlock command to get the current version
- of the Landlock ABI and adapt the handled accesses.  Let's check if we should
--remove the ``LANDLOCK_ACCESS_FS_REFER`` or ``LANDLOCK_ACCESS_FS_TRUNCATE``
--access rights, which are only supported starting with the second and third
--version of the ABI.
-+remove access rights which are only supported in higher versions of the ABI.
-
- .. code-block:: c
-
-@@ -92,6 +107,12 @@ version of the ABI.
-     case 2:
-         /* Removes LANDLOCK_ACCESS_FS_TRUNCATE for ABI < 3 */
-         ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_TRUNCATE;
-+        __attribute__((fallthrough));
-+    case 3:
-+        /* Removes network support for ABI < 4 */
-+        ruleset_attr.handled_access_net &=
-+            ~(LANDLOCK_ACCESS_NET_BIND_TCP |
-+              LANDLOCK_ACCESS_NET_CONNECT_TCP);
-     }
-
- This enables to create an inclusive ruleset that will contain our rules.
-@@ -143,10 +164,23 @@ for the ruleset creation, by filtering access rights according to the Landlock
- ABI version.  In this example, this is not required because all of the requested
- ``allowed_access`` rights are already available in ABI 1.
-
--We now have a ruleset with one rule allowing read access to ``/usr`` while
--denying all other handled accesses for the filesystem.  The next step is to
--restrict the current thread from gaining more privileges (e.g. thanks to a SUID
--binary).
-+For network access-control, we can add a set of rules that allow to use a port
-+number for a specific action: HTTPS connections.
++/**
++ * bpf_crypto_skcipher_ctx_create() - Create a mutable BPF crypto context.
++ *
++ * Allocates a crypto context that can be used, acquired, and released by
++ * a BPF program. The crypto context returned by this function must either
++ * be embedded in a map as a kptr, or freed with bpf_crypto_skcipher_ctx_release().
++ *
++ * bpf_crypto_skcipher_ctx_create() allocates memory using the BPF memory
++ * allocator, and will not block. It may return NULL if no memory is available.
++ * @algo: bpf_dynptr which holds string representation of algorithm.
++ * @key:  bpf_dynptr which holds cipher key to do crypto.
++ */
++__bpf_kfunc struct bpf_crypto_skcipher_ctx *
++bpf_crypto_skcipher_ctx_create(const struct bpf_dynptr_kern *algo, const struct bpf_dynptr_kern *key,
++			       int *err)
++{
++	struct bpf_crypto_skcipher_ctx *ctx;
 +
-+.. code-block:: c
++	if (__bpf_dynptr_size(algo) > CRYPTO_MAX_ALG_NAME) {
++		*err = -EINVAL;
++		return NULL;
++	}
 +
-+    struct landlock_net_port_attr net_port = {
-+        .allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
-+        .port = 443,
-+    };
++	if (!crypto_has_skcipher(algo->data, CRYPTO_ALG_TYPE_SKCIPHER, CRYPTO_ALG_TYPE_MASK)) {
++		*err = -EOPNOTSUPP;
++		return NULL;
++	}
 +
-+    err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-+                            &net_port, 0);
++	ctx = bpf_mem_cache_alloc(&bpf_crypto_ctx_ma);
++	if (!ctx) {
++		*err = -ENOMEM;
++		return NULL;
++	}
 +
-+The next step is to restrict the current thread from gaining more privileges
-+(e.g. through a SUID binary). We now have a ruleset with the first rule allowing
-+read access to ``/usr`` while denying all other handled accesses for the filesystem,
-+and a second rule allowing HTTPS connections.
-
- .. code-block:: c
-
-@@ -355,7 +389,7 @@ Access rights
- -------------
-
- .. kernel-doc:: include/uapi/linux/landlock.h
--    :identifiers: fs_access
-+    :identifiers: fs_access net_access
-
- Creating a new ruleset
- ----------------------
-@@ -374,6 +408,7 @@ Extending a ruleset
-
- .. kernel-doc:: include/uapi/linux/landlock.h
-     :identifiers: landlock_rule_type landlock_path_beneath_attr
-+                  landlock_net_port_attr
-
- Enforcing a ruleset
- -------------------
-@@ -451,6 +486,14 @@ always allowed when using a kernel that only supports the first or second ABI.
- Starting with the Landlock ABI version 3, it is now possible to securely control
- truncation thanks to the new ``LANDLOCK_ACCESS_FS_TRUNCATE`` access right.
-
-+Network support (ABI < 4)
-+-------------------------
++	memset(ctx, 0, sizeof(*ctx));
 +
-+Starting with the Landlock ABI version 4, it is now possible to restrict TCP
-+bind and connect actions to only a set of allowed ports thanks to the new
-+``LANDLOCK_ACCESS_NET_BIND_TCP`` and ``LANDLOCK_ACCESS_NET_CONNECT_TCP``
-+access rights.
++	ctx->tfm = crypto_alloc_sync_skcipher(algo->data, 0, 0);
++	if (IS_ERR(ctx->tfm)) {
++		*err = PTR_ERR(ctx->tfm);
++		ctx->tfm = NULL;
++		goto err;
++	}
 +
- .. _kernel_support:
-
- Kernel support
-@@ -469,6 +512,11 @@ still enable it by adding ``lsm=landlock,[...]`` to
- Documentation/admin-guide/kernel-parameters.rst thanks to the bootloader
- configuration.
-
-+To be able to explicitly allow TCP operations (e.g., adding a network rule with
-+``LANDLOCK_ACCESS_NET_BIND_TCP``), the kernel must support TCP (``CONFIG_INET=y``).
-+Otherwise, sys_landlock_add_rule() returns an ``EAFNOSUPPORT`` error, which can
-+safely be ignored because this kind of TCP operation is already not possible.
++	*err = crypto_sync_skcipher_setkey(ctx->tfm, key->data, __bpf_dynptr_size(key));
++	if (*err)
++		goto err;
 +
- Questions and answers
- =====================
-
---
-2.25.1
++	refcount_set(&ctx->usage, 1);
++
++	return ctx;
++err:
++	if (ctx->tfm)
++		crypto_free_sync_skcipher(ctx->tfm);
++	bpf_mem_cache_free(&bpf_crypto_ctx_ma, ctx);
++
++	return NULL;
++}
++
++static void crypto_free_sync_skcipher_cb(struct rcu_head *head)
++{
++	struct bpf_crypto_skcipher_ctx *ctx;
++
++	ctx = container_of(head, struct bpf_crypto_skcipher_ctx, rcu);
++	crypto_free_sync_skcipher(ctx->tfm);
++	migrate_disable();
++	bpf_mem_cache_free(&bpf_crypto_ctx_ma, ctx);
++	migrate_enable();
++}
++
++/**
++ * bpf_crypto_skcipher_ctx_acquire() - Acquire a reference to a BPF crypto context.
++ * @ctx: The BPF crypto context being acquired. The ctx must be a trusted
++ *	     pointer.
++ *
++ * Acquires a reference to a BPF crypto context. The context returned by this function
++ * must either be embedded in a map as a kptr, or freed with
++ * bpf_crypto_skcipher_ctx_release().
++ */
++__bpf_kfunc struct bpf_crypto_skcipher_ctx *
++bpf_crypto_skcipher_ctx_acquire(struct bpf_crypto_skcipher_ctx *ctx)
++{
++	refcount_inc(&ctx->usage);
++	return ctx;
++}
++
++/**
++ * bpf_crypto_skcipher_ctx_release() - Release a previously acquired BPF crypto context.
++ * @ctx: The crypto context being released.
++ *
++ * Releases a previously acquired reference to a BPF cpumask. When the final
++ * reference of the BPF cpumask has been released, it is subsequently freed in
++ * an RCU callback in the BPF memory allocator.
++ */
++__bpf_kfunc void bpf_crypto_skcipher_ctx_release(struct bpf_crypto_skcipher_ctx *ctx)
++{
++	if (refcount_dec_and_test(&ctx->usage))
++		call_rcu(&ctx->rcu, crypto_free_sync_skcipher_cb);
++}
++
++static void *__bpf_dynptr_data_ptr(const struct bpf_dynptr_kern *ptr)
++{
++	enum bpf_dynptr_type type;
++
++	if (!ptr->data)
++		return NULL;
++
++	type = bpf_dynptr_get_type(ptr);
++
++	switch (type) {
++	case BPF_DYNPTR_TYPE_LOCAL:
++	case BPF_DYNPTR_TYPE_RINGBUF:
++		return ptr->data + ptr->offset;
++	case BPF_DYNPTR_TYPE_SKB:
++		return skb_pointer_if_linear(ptr->data, ptr->offset, __bpf_dynptr_size(ptr));
++	case BPF_DYNPTR_TYPE_XDP:
++	{
++		void *xdp_ptr = bpf_xdp_pointer(ptr->data, ptr->offset, __bpf_dynptr_size(ptr));
++		if (!IS_ERR_OR_NULL(xdp_ptr))
++			return xdp_ptr;
++
++		return NULL;
++	}
++	default:
++		WARN_ONCE(true, "unknown dynptr type %d\n", type);
++		return NULL;
++	}
++}
++
++static int bpf_crypto_skcipher_crypt(struct crypto_sync_skcipher *tfm,
++				     const struct bpf_dynptr_kern *src,
++				     struct bpf_dynptr_kern *dst,
++				     const struct bpf_dynptr_kern *iv,
++				     bool decrypt)
++{
++	struct skcipher_request *req = NULL;
++	struct scatterlist sgin, sgout;
++	int err;
++
++	if (crypto_sync_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
++		return -EINVAL;
++
++	if (!__bpf_dynptr_size(dst) || !__bpf_dynptr_size(src))
++		return -EINVAL;
++
++	if (__bpf_dynptr_size(iv) != crypto_sync_skcipher_ivsize(tfm))
++		return -EINVAL;
++
++	req = skcipher_request_alloc(&tfm->base, GFP_ATOMIC);
++	if (!req)
++		return -ENOMEM;
++
++	sg_init_one(&sgin, __bpf_dynptr_data_ptr(src), __bpf_dynptr_size(src));
++	sg_init_one(&sgout, __bpf_dynptr_data_ptr(dst), __bpf_dynptr_size(dst));
++
++	skcipher_request_set_crypt(req, &sgin, &sgout, __bpf_dynptr_size(src),
++				   __bpf_dynptr_data_ptr(iv));
++
++	err = decrypt ? crypto_skcipher_decrypt(req) : crypto_skcipher_encrypt(req);
++
++	skcipher_request_free(req);
++
++	return err;
++}
++
++/**
++ * bpf_crypto_skcipher_decrypt() - Decrypt buffer using configured context and IV provided.
++ * @ctx:	The crypto context being used. The ctx must be a trusted pointer.
++ * @src:	bpf_dynptr to the encrypted data. Must be a trusted pointer.
++ * @dst:	bpf_dynptr to the buffer where to store the result. Must be a trusted pointer.
++ * @iv:		bpf_dynptr to IV data to be used by decryptor.
++ *
++ * Decrypts provided buffer using IV data and the crypto context. Crypto context must be configured.
++ */
++__bpf_kfunc int bpf_crypto_skcipher_decrypt(struct bpf_crypto_skcipher_ctx *ctx,
++					    const struct bpf_dynptr_kern *src,
++					    struct bpf_dynptr_kern *dst,
++					    const struct bpf_dynptr_kern *iv)
++{
++	return bpf_crypto_skcipher_crypt(ctx->tfm, src, dst, iv, true);
++}
++
++/**
++ * bpf_crypto_skcipher_encrypt() - Encrypt buffer using configured context and IV provided.
++ * @ctx:	The crypto context being used. The ctx must be a trusted pointer.
++ * @src:	bpf_dynptr to the plain data. Must be a trusted pointer.
++ * @dst:	bpf_dynptr to buffer where to store the result. Must be a trusted pointer.
++ * @iv:		bpf_dynptr to IV data to be used by decryptor.
++ *
++ * Encrypts provided buffer using IV data and the crypto context. Crypto context must be configured.
++ */
++__bpf_kfunc int bpf_crypto_skcipher_encrypt(struct bpf_crypto_skcipher_ctx *ctx,
++					    const struct bpf_dynptr_kern *src,
++					    struct bpf_dynptr_kern *dst,
++					    const struct bpf_dynptr_kern *iv)
++{
++	return bpf_crypto_skcipher_crypt(ctx->tfm, src, dst, iv, false);
++}
++
++__diag_pop();
++
++BTF_SET8_START(crypt_skcipher_init_kfunc_btf_ids)
++BTF_ID_FLAGS(func, bpf_crypto_skcipher_ctx_create, KF_ACQUIRE | KF_RET_NULL | KF_SLEEPABLE)
++BTF_ID_FLAGS(func, bpf_crypto_skcipher_ctx_release, KF_RELEASE)
++BTF_ID_FLAGS(func, bpf_crypto_skcipher_ctx_acquire, KF_ACQUIRE | KF_TRUSTED_ARGS)
++BTF_SET8_END(crypt_skcipher_init_kfunc_btf_ids)
++
++static const struct btf_kfunc_id_set crypt_skcipher_init_kfunc_set = {
++	.owner = THIS_MODULE,
++	.set   = &crypt_skcipher_init_kfunc_btf_ids,
++};
++
++BTF_SET8_START(crypt_skcipher_kfunc_btf_ids)
++BTF_ID_FLAGS(func, bpf_crypto_skcipher_decrypt, KF_RCU)
++BTF_ID_FLAGS(func, bpf_crypto_skcipher_encrypt, KF_RCU)
++BTF_SET8_END(crypt_skcipher_kfunc_btf_ids)
++
++static const struct btf_kfunc_id_set crypt_skcipher_kfunc_set = {
++	.owner = THIS_MODULE,
++	.set   = &crypt_skcipher_kfunc_btf_ids,
++};
++
++BTF_ID_LIST(crypto_skcipher_dtor_ids)
++BTF_ID(struct, bpf_crypto_skcipher_ctx)
++BTF_ID(func, bpf_crypto_skcipher_ctx_release)
++
++static int __init crypto_skcipher_kfunc_init(void)
++{
++	int ret;
++	const struct btf_id_dtor_kfunc crypto_skcipher_dtors[] = {
++		{
++			.btf_id	      = crypto_skcipher_dtor_ids[0],
++			.kfunc_btf_id = crypto_skcipher_dtor_ids[1]
++		},
++	};
++
++	ret = bpf_mem_alloc_init(&bpf_crypto_ctx_ma, sizeof(struct bpf_crypto_skcipher_ctx), false);
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &crypt_skcipher_kfunc_set);
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &crypt_skcipher_kfunc_set);
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &crypt_skcipher_kfunc_set);
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC, &crypt_skcipher_init_kfunc_set);
++	return  ret ?: register_btf_id_dtor_kfuncs(crypto_skcipher_dtors,
++						   ARRAY_SIZE(crypto_skcipher_dtors),
++						   THIS_MODULE);
++}
++
++late_initcall(crypto_skcipher_kfunc_init);
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index 62a53ebfedf9..0c2a10ff5dfd 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -1444,7 +1444,7 @@ static void bpf_dynptr_set_type(struct bpf_dynptr_kern *ptr, enum bpf_dynptr_typ
+ 	ptr->size |= type << DYNPTR_TYPE_SHIFT;
+ }
+ 
+-static enum bpf_dynptr_type bpf_dynptr_get_type(const struct bpf_dynptr_kern *ptr)
++enum bpf_dynptr_type bpf_dynptr_get_type(const struct bpf_dynptr_kern *ptr)
+ {
+ 	return (ptr->size & ~(DYNPTR_RDONLY_BIT)) >> DYNPTR_TYPE_SHIFT;
+ }
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index bb58987e4844..75d2f47ca3cb 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -5184,6 +5184,7 @@ BTF_ID(struct, prog_test_ref_kfunc)
+ BTF_ID(struct, cgroup)
+ BTF_ID(struct, bpf_cpumask)
+ BTF_ID(struct, task_struct)
++BTF_ID(struct, bpf_crypto_skcipher_ctx)
+ BTF_SET_END(rcu_protected_types)
+ 
+ static bool rcu_protected_object(const struct btf *btf, u32 btf_id)
+-- 
+2.39.3
 
 
