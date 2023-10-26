@@ -1,84 +1,137 @@
-Return-Path: <netdev+bounces-44609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 912EE7D8C51
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 01:48:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F5447D8C53
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 01:50:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29E90B211F9
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 23:48:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 937D6B211F7
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 23:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEFB13FE35;
-	Thu, 26 Oct 2023 23:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4266B3FE4B;
+	Thu, 26 Oct 2023 23:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DGNSsf1w"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E7wNSz0d"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D3218050;
-	Thu, 26 Oct 2023 23:48:46 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C6F41A5;
-	Thu, 26 Oct 2023 16:48:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=A1G3XwA17+lul+TwoDNyC2Tm65smi0FiIfd0a7wJkmI=; b=DG
-	NSsf1wo+zxHxtQ4wyo3G7pEz0CPXgLSdSATU8ZMmG62awi2YJBArddxWorXWOMwzoji9qGJWwgua0
-	YigXFlLTzRpsrT38Z5/bHNb3fhbVYBrV/YyxWp1za6eYziSxMiBbCeaE5L/MQqb7KO6bjcLsV31si
-	urVzJJTtjQUXxuA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qwA5i-000IDP-36; Fri, 27 Oct 2023 01:48:42 +0200
-Date: Fri, 27 Oct 2023 01:48:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	benno.lossin@proton.me, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 0/5] Rust abstractions for network PHY drivers
-Message-ID: <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch>
-References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
- <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF5018050
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 23:50:04 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6478090
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 16:50:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698364202;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XraPJHpUz3iHlmRFAu43bZXLN3dhZLOzZ/zFKxawxmE=;
+	b=E7wNSz0dhQkRs5NCgFq9r84f31JyUD3yt3Vb6kmUhxbT00d3ExKHkTvpyWTtomHh93hTmG
+	NcqaL8sFIaKt88Ot0G3VHs3N6INbHURP+VOMB+AZ7y5gFV22zXJjJLSUqve/8soHvphwHv
+	msjOC8amgImfokHqgBcj+xRuCIYVakc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-263-_7LOw04eNOKN3_h6Jv-UZA-1; Thu, 26 Oct 2023 19:49:36 -0400
+X-MC-Unique: _7LOw04eNOKN3_h6Jv-UZA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F484811E7D;
+	Thu, 26 Oct 2023 23:49:36 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.178])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 083661121319;
+	Thu, 26 Oct 2023 23:49:34 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: linux-afs@lists.infradead.org
+cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH net] rxrpc: Fix two connection reaping bugs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <783910.1698364174.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 27 Oct 2023 00:49:34 +0100
+Message-ID: <783911.1698364174@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Thu, Oct 26, 2023 at 12:39:46PM +0200, Miguel Ojeda wrote:
-> On Thu, Oct 26, 2023 at 2:16 AM FUJITA Tomonori
-> <fujita.tomonori@gmail.com> wrote:
-> >
-> > This patchset adds Rust abstractions for phylib. It doesn't fully
-> > cover the C APIs yet but I think that it's already useful. I implement
-> > two PHY drivers (Asix AX88772A PHYs and Realtek Generic FE-GE). Seems
-> > they work well with real hardware.
-> 
-> This patch series has had 8 versions in a month. It would be better to
-> wait more between revisions for this kind of patch series, especially
-> when there is discussion still going on in the previous ones and it is
-> a new "type" of code.
+    =
 
-That is actually about right for netdev. As i said, netdev moves fast,
-review comments are expected within about 3 days. We also say don't
-post a new version within 24 hours. So that gives you an idea of the
-min and max.
+Fix two connection reaping bugs:
 
-It is however good to let discussion reach some sort of conclusion,
-but that also requires prompt discussion. And if that discussion is
-not prompt, posting a new version is a way to kick reviewers into
-action.
+ (1) rxrpc_connection_expiry is in units of seconds, so
+     rxrpc_disconnect_call() needs to multiply it by HZ when adding it to
+     jiffies.
 
-	Andrew
+ (2) rxrpc_client_conn_reap_timeout() should set RXRPC_CLIENT_REAP_TIMER i=
+f
+     local->kill_all_client_conns is clear, not if it is set (in which cas=
+e
+     we don't need the timer).  Without this, old client connections don't
+     get cleaned up until the local endpoint is cleaned up.
+
+Fixes: 5040011d073d ("rxrpc: Make the local endpoint hold a ref on a conne=
+cted call")
+Fixes: 0d6bf319bc5a ("rxrpc: Move the client conn cache management to the =
+I/O thread")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: netdev@vger.kernel.org
+cc: linux-afs@lists.infradead.org
+---
+ net/rxrpc/conn_object.c  |    2 +-
+ net/rxrpc/local_object.c |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
+index ac85d4644a3c..df8a271948a1 100644
+--- a/net/rxrpc/conn_object.c
++++ b/net/rxrpc/conn_object.c
+@@ -212,7 +212,7 @@ void rxrpc_disconnect_call(struct rxrpc_call *call)
+ 		conn->idle_timestamp =3D jiffies;
+ 		if (atomic_dec_and_test(&conn->active))
+ 			rxrpc_set_service_reap_timer(conn->rxnet,
+-						     jiffies + rxrpc_connection_expiry);
++						     jiffies + rxrpc_connection_expiry * HZ);
+ 	}
+ =
+
+ 	rxrpc_put_call(call, rxrpc_call_put_io_thread);
+diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
+index 7d910aee4f8c..c553a30e9c83 100644
+--- a/net/rxrpc/local_object.c
++++ b/net/rxrpc/local_object.c
+@@ -87,7 +87,7 @@ static void rxrpc_client_conn_reap_timeout(struct timer_=
+list *timer)
+ 	struct rxrpc_local *local =3D
+ 		container_of(timer, struct rxrpc_local, client_conn_reap_timer);
+ =
+
+-	if (local->kill_all_client_conns &&
++	if (!local->kill_all_client_conns &&
+ 	    test_and_set_bit(RXRPC_CLIENT_CONN_REAP_TIMER, &local->client_conn_f=
+lags))
+ 		rxrpc_wake_up_io_thread(local);
+ }
+
 
