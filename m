@@ -1,95 +1,175 @@
-Return-Path: <netdev+bounces-44391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B97D77D7CA8
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 08:05:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 001347D7CCC
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 08:20:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66BFF281DFB
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 06:05:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 170C41C20E74
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 06:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904F0FC07;
-	Thu, 26 Oct 2023 06:05:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF03711728;
+	Thu, 26 Oct 2023 06:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="LLmODrHF"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="IjO+h2aX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7212FC134
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 06:05:13 +0000 (UTC)
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4190115
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:05:10 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99de884ad25so75950066b.3
-        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 23:05:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698300309; x=1698905109; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8o6FZwDyH3jeQW903fHenTgcV9DcNTZdcoqxi/6X87I=;
-        b=LLmODrHFoIeN14rzP/tkRIUCva33EgIe458pnXzKzduR3TmN9l+Jlne+qnHMXmyMfw
-         MkqOwUqjbDBefK5mUCJnq1eImG+XQC98LsYweO7+qxULaRFZ4WhqV9VWR97gfJMShn2A
-         +nR3Az1abi82lq0aE9FBq/V+8iYo8qTdkFXo6AFYV3VpO1Vhpqlq3SLKFQWnhg+8tHWh
-         qrkZVx3Rc+jBVjuAFlEORumcLHLWyUinJJpLa2ISAEkuKhBmA+es9o3w6zvUy2+bbu0y
-         mIlc42ZoVNaWndbhOVB85yBbzq2AXPN5cOlZj8+ivljH3NNIMPaGzBC8x9kKUGJzxxRm
-         DWhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698300309; x=1698905109;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8o6FZwDyH3jeQW903fHenTgcV9DcNTZdcoqxi/6X87I=;
-        b=YkrChxdPoL/Xw4ZL8x/INqV8d+1gy9LngbJXLwuTjRdYYGHjge2UNubCXDO9T7hXxZ
-         6RafRFdH6aXoXE2gYoQyJILtM+xv5FsdiXQjW5Oh/44CgHtSZbi9mOp9kWM5GxnJ7FiW
-         U2faBQ7TxxlVUjYDYyMLFmaRzVrdWT0azrZf6VPCmAoypJ/KkgTmI6P5t4zr/3ogUSrh
-         uChqnNiDRYo2vNZYyZ2NF7OG6p2GOpW8ZfO+dWrQf6B1T9VSnwGfHTblSMhijE+zPHra
-         vNXrMZC20cwyvfqngLOg4eeAIWuB8Q0FFGd5pEDCzd8zZ0xqxtF65jRsTqToP6ooLhni
-         GhxA==
-X-Gm-Message-State: AOJu0YyEVUx7N6MXHQQ4fVu5jqSz5kSbO+6wInYj4g9qFc/UWl6hyMhp
-	GcbaEtwxI0mlKi1BjBvN+T4oSA==
-X-Google-Smtp-Source: AGHT+IHBRtKLtu/6dS5ngIiDSTBekn4owPO0ksXQ7vM3HyIFqs+i/iNdlZqfq5DYaiXdD1oNyU6vjg==
-X-Received: by 2002:a17:907:2587:b0:9cd:26e9:a8ae with SMTP id ad7-20020a170907258700b009cd26e9a8aemr2631416ejc.42.1698300309369;
-        Wed, 25 Oct 2023 23:05:09 -0700 (PDT)
-Received: from localhost ([80.95.114.184])
-        by smtp.gmail.com with ESMTPSA id a23-20020a1709064a5700b009ad89697c86sm11148056ejv.144.2023.10.25.23.05.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 23:05:08 -0700 (PDT)
-Date: Thu, 26 Oct 2023 08:05:06 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next] netlink: specs: support conditional operations
-Message-ID: <ZToBkrWEh2Yn/Dqb@nanopsycho>
-References: <20231025162253.133159-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9EDC8E8;
+	Thu, 26 Oct 2023 06:20:33 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EC7F187;
+	Wed, 25 Oct 2023 23:20:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=z1mjbQsJ6uRSdwCB7sKsbSWDMZlOEsZ3uAoZGbDsd4U=; b=IjO+h2aXRhx9l3GqBR5+BpWj5Q
+	SutMt2oP6WLYhiSHuzhIONMtvxgIUPRctp2KKBoVR/ITgwWWfX69sc8KhOUiUcV8eIYTB26vY353x
+	GqN1TvyXgehgUkdbpK2h0Gin30oBJ/7ZNpA3C5vR/g4MbZJiJkPK0e+QJrnzSTiFRkMqkhPsVKzI4
+	+dXvn7REhFMfQWpMWJ1Pknb0hduV+PBUEfcVeYOyNZ4WCHJOdF9XxgRCL+ZJY/Q9AadpARFT7uha6
+	JdK1Yme8zTKEMlZ5sa1ReXkThuUJFJjeA5ogsggJH0jDxTwZ18+PJLYC0yj7VFu6Wku4TMs5Z7o0X
+	NMeTrpFw==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qvtjF-0006rO-I4; Thu, 26 Oct 2023 08:20:25 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qvtjF-000NEU-1d; Thu, 26 Oct 2023 08:20:25 +0200
+Subject: Re: [PATCH bpf-next v4 1/7] netkit, bpf: Add bpf programmable net
+ device
+To: Kui-Feng Lee <sinquersw@gmail.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>
+Cc: netdev@vger.kernel.org, razor@blackwall.org, ast@kernel.org,
+ andrii@kernel.org, john.fastabend@gmail.com, sdf@google.com,
+ toke@kernel.org, kuba@kernel.org, andrew@lunn.ch,
+ =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ bpf@vger.kernel.org
+References: <20231024214904.29825-1-daniel@iogearbox.net>
+ <20231024214904.29825-2-daniel@iogearbox.net>
+ <ad801a2c-217e-44b4-8dae-0ae7b1b8484f@gmail.com>
+ <51abec01-c4ce-434f-694a-f932e0e203ec@linux.dev>
+ <7e2b81d6-b154-446e-b074-1a8dc6426ce7@gmail.com>
+ <8e5e26e8-52c7-40a8-bf49-98ac2c330db9@gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <28a19c46-2ee0-01db-cf88-6c9007e97c82@iogearbox.net>
+Date: Thu, 26 Oct 2023 08:20:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231025162253.133159-1-kuba@kernel.org>
+In-Reply-To: <8e5e26e8-52c7-40a8-bf49-98ac2c330db9@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27072/Wed Oct 25 09:45:37 2023)
 
-Wed, Oct 25, 2023 at 06:22:53PM CEST, kuba@kernel.org wrote:
->Page pool code is compiled conditionally, but the operations
->are part of the shared netlink family. We can handle this
->by reporting empty list of pools or -EOPNOTSUPP / -ENOSYS
->but the cleanest way seems to be removing the ops completely
->at compilation time. That way user can see that the page
->pool ops are not present using genetlink introspection.
->Same way they'd check if the kernel is "new enough" to
->support the ops.
->
->Extend the specs with the ability to specify the config
->condition under which op (and its policies, etc.) should
->be hidden.
->
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Hi Kui-Feng,
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+On 10/26/23 3:18 AM, Kui-Feng Lee wrote:
+> On 10/25/23 18:15, Kui-Feng Lee wrote:
+>> On 10/25/23 15:09, Martin KaFai Lau wrote:
+>>> On 10/25/23 2:24 PM, Kui-Feng Lee wrote:
+>>>> On 10/24/23 14:48, Daniel Borkmann wrote:
+>>>>> This work adds a new, minimal BPF-programmable device called "netkit"
+>>>>> (former PoC code-name "meta") we recently presented at LSF/MM/BPF. The
+>>>>> core idea is that BPF programs are executed within the drivers xmit routine
+>>>>> and therefore e.g. in case of containers/Pods moving BPF processing closer
+>>>>> to the source.
+>>>>
+>>>> Sorry for intruding into this discussion! Although it is too late to
+>>>> mentioned this since this patchset have been v4 already.
+>>>>
+>>>> I notice netkit has introduced a new attach type. I wonder if it
+>>>> possible to implement it as a new struct_ops type.
+>>>
+>>> Could your elaborate more about what does this struct_ops type do and how is it different from the SCHED_CLS bpf prog that the netkit is running?
+>>
+>> I found the code has been landed.
+>> Basing on the landed code and
+>> the patchset of registering bpf struct_ops from modules that I
+>> am working on, it will looks like what is done in following patch.
+>> No changes on syscall, uapi and libbpf are required.
+>>
+>> diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+>> index 7e484f9fd3ae..e4eafaf397bf 100644
+>> --- a/drivers/net/netkit.c
+>> +++ b/drivers/net/netkit.c
+>> @@ -20,6 +20,7 @@ struct netkit {
+>>       struct bpf_mprog_entry __rcu *active;
+>>       enum netkit_action policy;
+>>       struct bpf_mprog_bundle    bundle;
+>> +    struct hlist_head ops_list;
+>>
+>>       /* Needed in slow-path */
+>>       enum netkit_mode mode;
+>> @@ -27,6 +28,13 @@ struct netkit {
+>>       u32 headroom;
+>>   };
+>>
+>> +struct netkit_ops {
+>> +    struct hlist_node node;
+>> +    int ifindex;
+>> +
+>> +    int (*xmit)(struct sk_buff *skb);
+>> +};
+>> +
+>>   struct netkit_link {
+>>       struct bpf_link link;
+>>       struct net_device *dev;
+>> @@ -46,6 +54,22 @@ netkit_run(const struct bpf_mprog_entry *entry, struct sk_buff *skb,
+>>           if (ret != NETKIT_NEXT)
+>>               break;
+>>       }
+>> +
+>> +    return ret;
+>> +}
+>> +
+>> +static __always_inline int
+>> +netkit_run_st_ops(const struct netkit *nk, struct sk_buff *skb,
+>> +       enum netkit_action ret)
+>> +{
+>> +    struct netkit_ops *ops;
+>> +
+>> +    hlist_for_each_entry_rcu(ops, &nk->ops_list, node) {
+>> +        ret = ops->xmit(skb);
+>> +        if (ret != NETKIT_NEXT)
+>> +            break;
+>> +    }
+>> +
+>>       return ret;
+>>   }
+>>
+>> @@ -80,6 +104,8 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+>>       entry = rcu_dereference(nk->active);
+>>       if (entry)
+>>           ret = netkit_run(entry, skb, ret);
+>> +    if (ret == NETKIT_NEXT)
+>> +        ret = netkit_run_st_ops(nk, skb, ret);
+>>       switch (ret) {
+>>       case NETKIT_NEXT:
+>>       case NETKIT_PASS:
+
+I don't think it makes sense to cramp struct ops in here for what has been
+solved already with the bpf_mprog interface in a more efficient way and with
+control dependencies for the insertion (before/after relative programs/links).
+The latter is in particular crucial for a multi-user interface when dealing
+with network traffic (think for example: policy, forwarder, observability
+prog, etc).
+
+Thanks,
+Daniel
 
