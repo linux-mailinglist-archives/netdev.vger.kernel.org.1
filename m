@@ -1,323 +1,109 @@
-Return-Path: <netdev+bounces-44386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9BE77D7C2E
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 07:26:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1BAA7D7C46
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 07:35:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F3A2B21228
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 05:26:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE0CC1C20EEC
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 05:35:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69AA1C2CF;
-	Thu, 26 Oct 2023 05:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29E4C8E1;
+	Thu, 26 Oct 2023 05:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xf6L22jC"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="YLGNnZDX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4EE849C
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 05:26:14 +0000 (UTC)
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0601ADC
-	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 22:26:12 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99bdeae1d0aso76472666b.1
-        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 22:26:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB3FC2D5
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 05:35:11 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF8112A
+	for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 22:35:10 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9be3b66f254so70296366b.3
+        for <netdev@vger.kernel.org>; Wed, 25 Oct 2023 22:35:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698297970; x=1698902770; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mtXyM8fj5sYisnLlIIl95PpWU5S/CUUzFbXA9YbH/Y8=;
-        b=xf6L22jCaJyQ51VEgtkLOG+kE9WMTvxLFBKp5rozMnxKUbSv9bhSLed6TjOZeT7l/2
-         nWZd5D5zIILxyccomXTERAl8kSmxqIH0IggFreZozDwtOdNwExiYxyWVWKje2d1Mf1V8
-         eaT36Z9UCdB/mJ+/b/SdJo6sTODSuCpOzl6zi4+3wTQb2llRPiEYoMPZAlt0QVrEy8CB
-         tBb4uym0X/XMiA01pTp82KbQaLC/VlZHI41NJZ4TtF2IezEbSjCpWWz4OPohjFoSMmQT
-         3tRDc7cXt41fnvs3iLPJW19oJv1xg2eF30j+/+XWyTc4F61siUzj/cfMIvMC4Ks8WEXS
-         YFag==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698298508; x=1698903308; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AnW5wkCi1zvUqw9QeSavDrGwNvTC4IDf+32SvYPJoaM=;
+        b=YLGNnZDXiKBPV/2J5+JtclwBX/3I319PXqRsZDqosfcTOFiEXeJhwH5SwG6lrhx7GH
+         jW717/GOW0N+tFD7PE6/EMTfhV+PnGL4FxLi8ty05CL58or8WkOwxnXUVmExj0DmlS4+
+         QQCkSjEpvt0vtrw2KrStTt29prIoDmvK8M2RAAVq5wRsSqhlg8C+eNRGbxzoNNiqcepV
+         sfecRcYsBXVeGJtlDjaJAAgm97MvK2UUEQpL7swv2jlhFDJb6Vh17+Qtug6pocSj4Hpx
+         3HWmHfYdU4ydqZ8zD3tmb/tz/hp0VJnonOrMB5lXfCD5lf4bWFo2xN2/r4zRLVsco230
+         qPUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698297970; x=1698902770;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mtXyM8fj5sYisnLlIIl95PpWU5S/CUUzFbXA9YbH/Y8=;
-        b=w1ux0PiOd0eQGkxqdNeE7YPWEKyBVnbZj2KS2XYugUyvOIgt2u3xhQzvJH1LzBQxdK
-         FFBx8fE/l28x8di10zx1DKlZ+P2QkRsGnCxVH7Q+2CVgqakhCLN6eO0m4bLySVd/vp0b
-         flTXl9cMR7iYXGGzv1N7DyBqdVKKyrlTPw7iWmwvXNO+VZfpeZ3Fkn2iJ45dL2NCUm7U
-         jKV+qKYsvjMiieQcNfNbrWoxtOt9g+sYUr8rnEmAd2o6iiOgn4odoAtISgJSc4eRhM4t
-         qAeu+9OqdybBVDTbpMHif0Ix0Wm5x4uTLv1mmbSMMjUNbSzMU7x+dHlseYGRxt50LrkI
-         L6wg==
-X-Gm-Message-State: AOJu0Yw7AU/fAZ/xWn8SGgh+e7PP1aq84gAVS+OVdlUYh7slPnauZMHS
-	VCP1mrHghuxF2wtipvBzfql6xw==
-X-Google-Smtp-Source: AGHT+IFl6trbTB7bLePjEPzggFNnMVyA/BmEWUlUvagV1Ci+n3oz8T7QOVteDBFvM+wWTgcnGXtPLw==
-X-Received: by 2002:a17:906:7951:b0:99b:ed44:1a79 with SMTP id l17-20020a170906795100b0099bed441a79mr16391186ejo.3.1698297970270;
-        Wed, 25 Oct 2023 22:26:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698298508; x=1698903308;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AnW5wkCi1zvUqw9QeSavDrGwNvTC4IDf+32SvYPJoaM=;
+        b=XLk7Fg+aQbFb8GcnvDZi86cZIdhKkt496xWGtaNpoz0SZhgInQUmLwfRABeOYNyybX
+         UPpc/+UgLttfjeFx0wReU1cZAQtya6DR0c148qx/Yh8dzqd198AJDDfxh15LzdgMc0f0
+         +WVk4SDSh0N7GRWHp+xuhx3QxAkEoYkLYhi4MHBWx4GU46Gt9s7ppVo+rmtv72SxTNc3
+         yTphfziGKcqODOUPlByUPpKsx0OAf3z5DnH9kNL4yVJshHlKNgzMhcKfjtniTkrkfu7J
+         3LGve5gCD5yjiU6YWmNa0vMwe8iZDlKyAZPdk6OCw2+Gk+K8u4ll3GM0SAvYelw+OCan
+         JCeA==
+X-Gm-Message-State: AOJu0YyU13KevaGMUdHGpJsW2fTIOS/1yy2DBbhcU5gS0NvwK9J5e5Zk
+	QkkBXfzfne51itq8QVq36PC87hSmXv4l2Oz4jeJeRg==
+X-Google-Smtp-Source: AGHT+IGpJs6UjB5/zt89grKMahUSoyHMhultp9ijTf1cz/ECcdJ/yxBvo32O3TnRlEnq7e2e7Zi5DA==
+X-Received: by 2002:a17:906:dc92:b0:9a3:c4f4:12de with SMTP id cs18-20020a170906dc9200b009a3c4f412demr13178771ejc.37.1698298508693;
+        Wed, 25 Oct 2023 22:35:08 -0700 (PDT)
 Received: from localhost ([80.95.114.184])
-        by smtp.gmail.com with ESMTPSA id 26-20020a170906011a00b009ae69c303aasm10926268eje.137.2023.10.25.22.26.09
+        by smtp.gmail.com with ESMTPSA id b7-20020a1709062b4700b009ade1a4f795sm10784002ejg.168.2023.10.25.22.35.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 22:26:09 -0700 (PDT)
-Date: Thu, 26 Oct 2023 07:26:08 +0200
+        Wed, 25 Oct 2023 22:35:08 -0700 (PDT)
+Date: Thu, 26 Oct 2023 07:35:06 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: Nikolay Aleksandrov <razor@blackwall.org>
+To: Martin KaFai Lau <martin.lau@linux.dev>
 Cc: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, martin.lau@linux.dev, ast@kernel.org,
+	netdev@vger.kernel.org, razor@blackwall.org, ast@kernel.org,
 	andrii@kernel.org, john.fastabend@gmail.com, sdf@google.com,
-	toke@kernel.org, kuba@kernel.org, andrew@lunn.ch,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Subject: Re: [PATCH bpf-next v4 1/7] netkit, bpf: Add bpf programmable net
- device
-Message-ID: <ZTn4cOgrCOZAvIUO@nanopsycho>
+	toke@kernel.org, kuba@kernel.org, andrew@lunn.ch
+Subject: Re: [PATCH bpf-next v4 0/7] Add bpf programmable net device
+Message-ID: <ZTn6ivygoE937Vk0@nanopsycho>
 References: <20231024214904.29825-1-daniel@iogearbox.net>
- <20231024214904.29825-2-daniel@iogearbox.net>
- <ZTk4ec8CBh92PZvs@nanopsycho>
- <5df35b1b-0a63-a73f-7a32-c6c87f4676cc@blackwall.org>
+ <169819142514.13417.3415333680978363345.git-patchwork-notify@kernel.org>
+ <ZTk5MErTKAK96nO3@nanopsycho>
+ <f6357d19-9bd9-e9f4-6e9d-97a73f61560d@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5df35b1b-0a63-a73f-7a32-c6c87f4676cc@blackwall.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f6357d19-9bd9-e9f4-6e9d-97a73f61560d@linux.dev>
 
-Wed, Oct 25, 2023 at 09:21:01PM CEST, razor@blackwall.org wrote:
->On 10/25/23 18:47, Jiri Pirko wrote:
->> Tue, Oct 24, 2023 at 11:48:58PM CEST, daniel@iogearbox.net wrote:
->> > This work adds a new, minimal BPF-programmable device called "netkit"
->[snip]
+Wed, Oct 25, 2023 at 06:54:27PM CEST, martin.lau@linux.dev wrote:
+>On 10/25/23 8:50 AM, Jiri Pirko wrote:
+>> Wed, Oct 25, 2023 at 01:50:25AM CEST, patchwork-bot+netdevbpf@kernel.org wrote:
+>> > Hello:
+>> > 
+>> > This series was applied to bpf/bpf-next.git (master)
+>> > by Martin KaFai Lau <martin.lau@kernel.org>:
 >> 
->> Couple of nitpicks below:
->> 
->> [..]
->> 
->> 
+>> Interesting, applied within 2 hours after send. You bpf people don't
+>> care about some 24h timeout?
 >
->Hi,
->Thanks for the review. I know about the nits below but decided against
->changing them, more below each...
->
->> > +static int netkit_check_policy(int policy, struct nlattr *tb,
->> > +			       struct netlink_ext_ack *extack)
->> > +{
->> > +	switch (policy) {
->> > +	case NETKIT_PASS:
->> > +	case NETKIT_DROP:
->> > +		return 0;
->> > +	default:
->> 
->> Isn't this job for netlink policy?
->> 
->> 
->
->This cannot be handled by policies AFAIK, because only 2 sparse values from
->more are allowed. We could potentially do it through validate() but
+>24hr? The v1 was posted to both netdev and bpf list on 9/25. It was 10/24
+>yesterday. The part you commented in patch 1 had not been changed much since
+>v1, so there was a month of time. netdev is always on the cc list. Multiple
+>people (Andrew, Jakub...etc) had already helped to review and Daniel had
+>addressed the comments. The change history had been diminishing from v1 to v4
+>and v4 changes was mostly nit-picking already.
 
-Perhaps good time to extend the netlink validation for list
-of values allowed?
+AFAIK netdev maintainer have a policy (which I thoink I saw written
+down somewhere but cannot find) that the patch stays on the list one day
+before it is getting applied. It actually makes a lot of sense. Anyway,
+I may be wrong.
 
-
-
->it's the same minus the explicit policy type info. IMO this approach is good.
->
->> > +		NL_SET_ERR_MSG_ATTR(extack, tb,
->> > +				    "Provided default xmit policy not supported");
->> > +		return -EINVAL;
->> > +	}
->> > +}
->> > +
->> > +static int netkit_check_mode(int mode, struct nlattr *tb,
->> > +			     struct netlink_ext_ack *extack)
->> > +{
->> > +	switch (mode) {
->> > +	case NETKIT_L2:
->> > +	case NETKIT_L3:
->> > +		return 0;
->> > +	default:
->> 
->> Isn't this job for netlink policy?
->> 
->> 
->
->This one can be handled by policy indeed, but then we lose the nice user
->error. Again can be done through validate(), but it's the same and we
->lose explicit policy type information.
-
-But the netlink validator setups the extack properly. What's wrong with
-that?
-
-
-
->
->> > +		NL_SET_ERR_MSG_ATTR(extack, tb,
->> > +				    "Provided device mode can only be L2 or L3");
->> > +		return -EINVAL;
->> > +	}
->> > +}
->> > +
->> > +static int netkit_validate(struct nlattr *tb[], struct nlattr *data[],
->> > +			   struct netlink_ext_ack *extack)
->> > +{
->> > +	struct nlattr *attr = tb[IFLA_ADDRESS];
->> > +
->> > +	if (!attr)
->> > +		return 0;
->> > +	NL_SET_ERR_MSG_ATTR(extack, attr,
->> > +			    "Setting Ethernet address is not supported");
->> > +	return -EOPNOTSUPP;
->> > +}
->> > +
->> > +static struct rtnl_link_ops netkit_link_ops;
->> > +
->> > +static int netkit_new_link(struct net *src_net, struct net_device *dev,
->> > +			   struct nlattr *tb[], struct nlattr *data[],
->> > +			   struct netlink_ext_ack *extack)
->> > +{
->> > +	struct nlattr *peer_tb[IFLA_MAX + 1], **tbp = tb, *attr;
->> > +	enum netkit_action default_prim = NETKIT_PASS;
->> > +	enum netkit_action default_peer = NETKIT_PASS;
->> > +	enum netkit_mode mode = NETKIT_L3;
->> > +	unsigned char ifname_assign_type;
->> > +	struct ifinfomsg *ifmp = NULL;
->> > +	struct net_device *peer;
->> > +	char ifname[IFNAMSIZ];
->> > +	struct netkit *nk;
->> > +	struct net *net;
->> > +	int err;
->> > +
->> > +	if (data) {
->> > +		if (data[IFLA_NETKIT_MODE]) {
->> > +			attr = data[IFLA_NETKIT_MODE];
->> > +			mode = nla_get_u32(attr);
->> > +			err = netkit_check_mode(mode, attr, extack);
->> > +			if (err < 0)
->> > +				return err;
->> > +		}
->> > +		if (data[IFLA_NETKIT_PEER_INFO]) {
->> > +			attr = data[IFLA_NETKIT_PEER_INFO];
->> > +			ifmp = nla_data(attr);
->> > +			err = rtnl_nla_parse_ifinfomsg(peer_tb, attr, extack);
->> > +			if (err < 0)
->> > +				return err;
->> > +			err = netkit_validate(peer_tb, NULL, extack);
->> > +			if (err < 0)
->> > +				return err;
->> > +			tbp = peer_tb;
->> > +		}
->> > +		if (data[IFLA_NETKIT_POLICY]) {
->> > +			attr = data[IFLA_NETKIT_POLICY];
->> > +			default_prim = nla_get_u32(attr);
->> > +			err = netkit_check_policy(default_prim, attr, extack);
->> > +			if (err < 0)
->> > +				return err;
->> > +		}
->> > +		if (data[IFLA_NETKIT_PEER_POLICY]) {
->> > +			attr = data[IFLA_NETKIT_PEER_POLICY];
->> > +			default_peer = nla_get_u32(attr);
->> > +			err = netkit_check_policy(default_peer, attr, extack);
->> > +			if (err < 0)
->> > +				return err;
->> > +		}
->> > +	}
->> > +
->> > +	if (ifmp && tbp[IFLA_IFNAME]) {
->> > +		nla_strscpy(ifname, tbp[IFLA_IFNAME], IFNAMSIZ);
->> > +		ifname_assign_type = NET_NAME_USER;
->> > +	} else {
->> > +		strscpy(ifname, "nk%d", IFNAMSIZ);
->> > +		ifname_assign_type = NET_NAME_ENUM;
->> > +	}
->> > +
->> > +	net = rtnl_link_get_net(src_net, tbp);
->> > +	if (IS_ERR(net))
->> > +		return PTR_ERR(net);
->> > +
->> > +	peer = rtnl_create_link(net, ifname, ifname_assign_type,
->> > +				&netkit_link_ops, tbp, extack);
->> > +	if (IS_ERR(peer)) {
->> > +		put_net(net);
->> > +		return PTR_ERR(peer);
->> > +	}
->> > +
->> > +	netif_inherit_tso_max(peer, dev);
->> > +
->> > +	if (mode == NETKIT_L2)
->> > +		eth_hw_addr_random(peer);
->> > +	if (ifmp && dev->ifindex)
->> > +		peer->ifindex = ifmp->ifi_index;
->> > +
->> > +	nk = netkit_priv(peer);
->> > +	nk->primary = false;
->> > +	nk->policy = default_peer;
->> > +	nk->mode = mode;
->> > +	bpf_mprog_bundle_init(&nk->bundle);
->> > +	RCU_INIT_POINTER(nk->active, NULL);
->> > +	RCU_INIT_POINTER(nk->peer, NULL);
->> 
->> Aren't these already 0?
->> 
->> 
->
->Yep, they are. Here decided in favor of explicit show of values, although
->it's minor and I'm fine either way.
-
-It is always confusing to see this. Reader might think this is necessary
-as if the mem was not previuosly cleared. The general approach is to
-rely on mem being zeroed, not sure why this is different.
-
-
->
->> > +
->> > +	err = register_netdevice(peer);
->> > +	put_net(net);
->> > +	if (err < 0)
->> > +		goto err_register_peer;
->> > +	netif_carrier_off(peer);
->> > +	if (mode == NETKIT_L2)
->> > +		dev_change_flags(peer, peer->flags & ~IFF_NOARP, NULL);
->> > +
->> > +	err = rtnl_configure_link(peer, NULL, 0, NULL);
->> > +	if (err < 0)
->> > +		goto err_configure_peer;
->> > +
->> > +	if (mode == NETKIT_L2)
->> > +		eth_hw_addr_random(dev);
->> > +	if (tb[IFLA_IFNAME])
->> > +		nla_strscpy(dev->name, tb[IFLA_IFNAME], IFNAMSIZ);
->> > +	else
->> > +		strscpy(dev->name, "nk%d", IFNAMSIZ);
->> > +
->> > +	nk = netkit_priv(dev);
->> > +	nk->primary = true;
->> > +	nk->policy = default_prim;
->> > +	nk->mode = mode;
->> > +	bpf_mprog_bundle_init(&nk->bundle);
->> > +	RCU_INIT_POINTER(nk->active, NULL);
->> > +	RCU_INIT_POINTER(nk->peer, NULL);
->> > +
->> > +	err = register_netdevice(dev);
->> > +	if (err < 0)
->> > +		goto err_configure_peer;
->> > +	netif_carrier_off(dev);
->> > +	if (mode == NETKIT_L2)
->> > +		dev_change_flags(dev, dev->flags & ~IFF_NOARP, NULL);
->> > +
->> > +	rcu_assign_pointer(netkit_priv(dev)->peer, peer);
->> > +	rcu_assign_pointer(netkit_priv(peer)->peer, dev);
->> > +	return 0;
->> > +err_configure_peer:
->> > +	unregister_netdevice(peer);
->> > +	return err;
->> > +err_register_peer:
->> > +	free_netdev(peer);
->> > +	return err;
->> > +}
->> > +
->> 
->> [..]
->
->Cheers,
-> Nik
 >
 
