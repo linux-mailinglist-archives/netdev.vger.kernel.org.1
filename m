@@ -1,87 +1,84 @@
-Return-Path: <netdev+bounces-44352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B6467D7A18
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 03:25:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A0EB7D7A2E
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 03:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB318281DD6
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:25:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D48081C20DAD
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 01:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA466440B;
-	Thu, 26 Oct 2023 01:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF7A4426;
+	Thu, 26 Oct 2023 01:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kokRkpV1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B+AoMZqJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA92C4695
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 01:25:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C69FCC433C7;
-	Thu, 26 Oct 2023 01:25:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1DD17E2
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 01:30:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B1CCC433C8;
+	Thu, 26 Oct 2023 01:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698283504;
-	bh=g+AYHQfnDaNQIzMW69hlh01q5EDPHDE8lxzWWQzDz/4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kokRkpV1Z+YvekxL+UUfcfbGywGy0i/yIh4NOb7jr+RgMDhhf+0WXVx5zH1xr7YUc
-	 ihoL2bj46bg1bCTeZFacbTPoW8gY7HVAybiWkGa1XqpxBr/0GeC2rpgRblnB02/LsX
-	 98qdN+KO2AJwTm1jIC2qMn9Oz6iYBulsgf6l2F+E7hXEEjoq3S6hIojndEw+bh3U3A
-	 vV6AXa6i9OewYWujIylcCmFMKEjuAE2x7Px1W28a26Me8fbam6aVyzGxKHcumVoyVO
-	 GKIyVo3eE8QHCT/XESLMvStPUADEKSCCzbOvd+5FDbBPnqeuushZHG6swpvk505w5/
-	 64M1IPer1QAOw==
-Date: Wed, 25 Oct 2023 18:25:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [pull request][net-next V2 00/15] mlx5 updates 2023-10-19
-Message-ID: <20231025182502.54f79369@kernel.org>
-In-Reply-To: <20231025085202.GC2950466@unreal>
-References: <20231021064620.87397-1-saeed@kernel.org>
- <20231024180251.2cb78de4@kernel.org>
- <20231025085202.GC2950466@unreal>
+	s=k20201202; t=1698283824;
+	bh=NeVDuISCRnY6ht5Wgxvebp/tC/IIZQ1NZekH1rE67V4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=B+AoMZqJbKKkleEz1zaY9enDFoMgiIzpaLcTQPFRVjGsbOh92j/Iqg2JEBwCF7/cU
+	 81AmgPlGkkkg/soBjN3irgJ0V0wwZmjXxy5p3dlFWB+47n6myjYXw8zNsd9Kj6Ph8D
+	 pg8P9YDR4QhAXz32nKGQT579yscxQ9gFjYT87tp0vzoyyiAQYxxT3sD8Vh7x+HZAbi
+	 7CnLOLNanWdNoIVLw6gykjYtph7awsT4ROtjqVSBqZdEgvpdDtPsBAl6amgB7Gd3WG
+	 zVSkEQOaCoNNrPur0i2hKpQ7GFjkaHfzOjitaw32Npa1yly8vSp4q/fAOVHazjuFg0
+	 Cmsh+jch+TIBw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65F7FE11F55;
+	Thu, 26 Oct 2023 01:30:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] iavf: in iavf_down,
+ disable queues when removing the driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169828382441.14693.17305279040241794804.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Oct 2023 01:30:24 +0000
+References: <20231025183213.874283-1-jacob.e.keller@intel.com>
+In-Reply-To: <20231025183213.874283-1-jacob.e.keller@intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ mschmidt@redhat.com, wojciech.drewek@intel.com, rafal.romanowski@intel.com
 
-On Wed, 25 Oct 2023 11:52:02 +0300 Leon Romanovsky wrote:
-> This patch won't fix much without following patch in that series.
-> https://lore.kernel.org/all/20231021064620.87397-8-saeed@kernel.org/
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 25 Oct 2023 11:32:13 -0700 you wrote:
+> From: Michal Schmidt <mschmidt@redhat.com>
 > 
-> Yes, users will see their replay window correctly through "ip xfrm state"
-> command, so this is why it has Fixes line, but it won't change anything
-> in the actual behavior without patch 7 and this is the reason why it was
-> sent to net-next.
-
-Odd ordering of patches, anyone doing backports would totally miss it.
-Neither does the commit message explain the situation nor is it
-possible to grok that fact from the ("pass it to FW") code :(
-
-> From patch 3:
->  Users can configure IPsec replay window size, but mlx5 driver didn't
->  honor their choice and set always 32bits.
+> In iavf_down, we're skipping the scheduling of certain operations if
+> the driver is being removed. However, the IAVF_FLAG_AQ_DISABLE_QUEUES
+> request must not be skipped in this case, because iavf_close waits
+> for the transition to the __IAVF_DOWN state, which happens in
+> iavf_virtchnl_completion after the queues are released.
 > 
-> From patch 7:
->  After IPsec decryption it isn't enough to only check the IPsec syndrome
->  but need to also check the ASO syndrome in order to verify that the
->  operation was actually successful.
+> [...]
 
-Hm, patch 7 looks like an independent but related fix to my uneducated
-eye, should it also have a Fixes tag?
+Here is the summary with links:
+  - [net] iavf: in iavf_down, disable queues when removing the driver
+    https://git.kernel.org/netdev/net/c/53798666648a
 
-Is patch 7 needed regardless of what choice of (previously ignored)
-parameters user makes? One way to deal with the problems from patches 
-3 and 4 could be to reject the de facto unsupported configurations.
-But if the supported config also doesn't check the "syndrome" correctly
-in all cases, that's no bueno..
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
