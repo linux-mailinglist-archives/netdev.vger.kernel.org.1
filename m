@@ -1,129 +1,90 @@
-Return-Path: <netdev+bounces-44484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 986207D8426
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 16:02:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C82EC7D836C
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 15:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7FCE1C20E96
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 14:01:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3738BB21291
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 13:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA5A2E411;
-	Thu, 26 Oct 2023 14:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A9C2DF9A;
+	Thu, 26 Oct 2023 13:21:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="jcx72dBM"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="rAsukQ93"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAE62E405
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 14:01:53 +0000 (UTC)
-X-Greylist: delayed 2593 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 26 Oct 2023 07:01:49 PDT
-Received: from kylie.crudebyte.com (kylie.crudebyte.com [5.189.157.229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8E8F1A2
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 07:01:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-	Content-ID:Content-Description;
-	bh=fRkFsz1VlOEW5rFG9taE2bwY7cLjyhOQP6DO6wVaLOs=; b=jcx72dBMgetqtuU9SWncEF5Fyj
-	ZU735Xh9LToJXFg2iX3SW8f6cV74WXtOYHMIzzFea+1/mA1VJvN7n1jmOamiySSV5gyhPv+mgNxm0
-	w0FfRCE1sj1aROkiTIMJDOl9rNC3Y4uwoLFDTAQCE2Xm3rNsNUX9SANEf2gf/XdmaWFsnDI7g44go
-	hcKpYO5OeALjB0rJU1VU8ciRDMmagb+n08sVgwPPlrrdO20KgpEazICdeWLvhSzjlTr/ydj4MWfwO
-	hEDZFqO8idnYCpXV9UXPW9X/eY419U7Hr421oBr/yVWoKTAs/FzHxSMXEArwjmxwPH0iofGtjlnbt
-	35sVvZiw7IDT8PBcONxbJftRAbZiwZ13xWizDdZL2ORro11FMmzSSMndxib88AO5tA0A5JQJs6WD6
-	6ber8sRTD5s2GAQBIBa2K3ewYiOyB7Ctrp1owZ9XFHusHHzbZ+ellBD0/6sbz91eJyrLl/vxcApzO
-	+kBON3gVKBbi0eOgs6gJHo6H1U8Hz+XWEe/CH831F4tNHg4j6llotxOo4HZLqIGbZFLaihZKC18fh
-	y9q67KEHqNxbxaD0Qxgr/Nl8NTexgpQUpvMGdt5goebm0MRzZRmq9xLF7YkyYfUGraxHzrLuS7q4l
-	hbCoUDWQTp75bDwsqqHvQ/9l7sdiiC2krgkwtIz/k=;
-From: Christian Schoenebeck <linux_oss@crudebyte.com>
-To: Hangyu Hua <hbh25y@gmail.com>, asmadeus@codewreck.org
-Cc: ericvh@kernel.org, lucho@ionkov.net, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- jvrao@linux.vnet.ibm.com, v9fs@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: 9p: fix possible memory leak in p9_check_errors()
-Date: Thu, 26 Oct 2023 15:18:16 +0200
-Message-ID: <2383398.41Bra3A7bo@silver>
-In-Reply-To: <ZTpTU8-1zn_P22QX@codewreck.org>
-References:
- <20231026092351.30572-1-hbh25y@gmail.com> <ZTpTU8-1zn_P22QX@codewreck.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD2F2D049
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 13:21:30 +0000 (UTC)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4644791
+	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 06:21:28 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9adb9fa7200so185464066b.0
+        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 06:21:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698326487; x=1698931287; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7xcSEt7nTMuwkE+QgbNFoQD0oV4mmJrUn9Xh1xHLwJk=;
+        b=rAsukQ93QbMtcBKlHbzgsYWiQWjEfJILeVHsC7qWnq/v7LLGugdq4uvmboZQLVyez1
+         +niI9zPoRYlod2J+ldwI4ineZkoKf2f4m5xr0Z5Izm7afChDkLf3NHKoLlq2R2iuFXPm
+         arGLNHiO9hkw2xcwlY3DEt9942gyeJyD1d++JjWCFnQtoy5gGmDMUEsf+bhl42HZSEQk
+         ru4S4UfAiLX+Bp0puhNEF0y3o+QaroFt6jxBv3FUMb/r8iz/orBcM2VU9ghL/1ieE9yI
+         gvbkJd2nP1dp0E0RM6wR1znaeIiUatuDL3pHFnQjtm1+IRU8MGgvYB7Phqtbdf+n3Av5
+         aVPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698326487; x=1698931287;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7xcSEt7nTMuwkE+QgbNFoQD0oV4mmJrUn9Xh1xHLwJk=;
+        b=pnam0yC+o3QtdlqeVUcPq1m3cMZNCiqTPilJVpjvlBxty//PDbyw86haatADW/wOVr
+         e34nuW5kvYx2FK30aauZNdsPa69Bnpw2y6DWSCdyPVmbFnIvfAnig5IvsTEtGylXoGaj
+         aOvDV2NxM9Tm91xMU4DzYbCeFILnmjk/ZNWOq2+80T/tC/vGEYVULBC7xKaYKsxwDxfw
+         SBxbYTUPC4QT6f6Z3AdI0A55HJxti+yEwxu4hBYqpXJJKHyFAM0DB+nOk1n78EosLShC
+         fM7jZPDJuk3KBcIeZPZS4CxA/Xi0jGa4rYVF54T75o4ExvbLDEjxby6k0szQc6v3BiuR
+         WT0A==
+X-Gm-Message-State: AOJu0YztEkvknKov6efLZCnYpzwCFW5VrcDvllkJ7useCl/T3BWvJzGh
+	SXoGP7/Vx9WfsC9Pg95w+tF8pQ==
+X-Google-Smtp-Source: AGHT+IFYCy8h45EdUY8kJ9ndNVZ61NzkfOh6KhL3Mf9bJkxJaMSGtXL1ndYrNeEmJxrS4GklNkEWew==
+X-Received: by 2002:a17:907:3f08:b0:9bd:a5a9:34de with SMTP id hq8-20020a1709073f0800b009bda5a934demr3012154ejc.23.1698326486637;
+        Thu, 26 Oct 2023 06:21:26 -0700 (PDT)
+Received: from localhost (mail.hotelolsanka.cz. [194.213.219.10])
+        by smtp.gmail.com with ESMTPSA id lv12-20020a170906bc8c00b009c657110cf2sm11675418ejb.99.2023.10.26.06.21.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Oct 2023 06:21:25 -0700 (PDT)
+Date: Thu, 26 Oct 2023 15:21:25 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@linux.dev,
+	ast@kernel.org, andrii@kernel.org, john.fastabend@gmail.com,
+	kuba@kernel.org, andrew@lunn.ch, toke@kernel.org, toke@redhat.com,
+	sdf@google.com, daniel@iogearbox.net
+Subject: Re: [PATCH bpf-next 1/2] netkit: remove explicit active/peer ptr
+ initialization
+Message-ID: <ZTpn1Y0bGgOp6eUz@nanopsycho>
+References: <20231026094106.1505892-1-razor@blackwall.org>
+ <20231026094106.1505892-2-razor@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231026094106.1505892-2-razor@blackwall.org>
 
-On Thursday, October 26, 2023 1:53:55 PM CEST asmadeus@codewreck.org wrote:
-> 
-> Hangyu Hua wrote on Thu, Oct 26, 2023 at 05:23:51PM +0800:
-> > When p9pdu_readf is called with "s?d" attribute, it allocates a pointer
-> > that will store a string. But when p9pdu_readf() fails while handling "d"
-> > then this pointer will not be freed in p9_check_errors.
-> 
-> Right, that sounds correct to me.
-> 
-> Out of curiosity how did you notice this? The leak shouldn't happen with
-> any valid server.
-> 
-> This cannot break anything so I'll push this to -next tomorrow and
-> submit to Linus next week
-> 
-> > Fixes: ca41bb3e21d7 ("[net/9p] Handle Zero Copy TREAD/RERROR case in !dotl case.")
-> 
-> This commit moves this code a bit, but the p9pdu_readf call predates
-> it -- in this case the Fixes tag is probably not useful; this affects
-> all maintained kernels.
+Thu, Oct 26, 2023 at 11:41:05AM CEST, razor@blackwall.org wrote:
+>Remove the explicit NULLing of active/peer pointers and rely on the
+>implicit one done at net device allocation.
+>
+>Suggested-by: Jiri Pirko <jiri@resnulli.us>
+>Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Looks like it exists since introduction of p9_check_errors(), therefore:
-
-Fixes: 51a87c552dfd ("9p: rework client code to use new protocol support functions")
-
-> > Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
-> > ---
-> >  net/9p/client.c | 7 +++++--
-> >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/9p/client.c b/net/9p/client.c
-> > index 86bbc7147fc1..6c7cd765b714 100644
-> > --- a/net/9p/client.c
-> > +++ b/net/9p/client.c
-> > @@ -540,12 +540,15 @@ static int p9_check_errors(struct p9_client *c, struct p9_req_t *req)
-> >  		return 0;
-> >  
-> >  	if (!p9_is_proto_dotl(c)) {
-> > -		char *ename;
-> > +		char *ename = NULL;
-> >  
-> >  		err = p9pdu_readf(&req->rc, c->proto_version, "s?d",
-> >  				  &ename, &ecode);
-> > -		if (err)
-> > +		if (err) {
-> > +			if (ename != NULL)
-> > +				kfree(ename);
-> 
-> Don't check for NULL before kfree - kfree does it.
-> If that's the only remark you get I can fix it when applying the commit
-> on my side.
-
-With those two remarks addressed:
-
-Reviewed-by: Christian Schoenebeck <linux_oss@crudebyte.com>
-
-> 
-> 
-> >  			goto out_err;
-> > +		}
-> >  
-> >  		if (p9_is_proto_dotu(c) && ecode < 512)
-> >  			err = -ecode;
-> 
-> 
-
-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
