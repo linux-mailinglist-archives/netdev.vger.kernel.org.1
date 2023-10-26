@@ -1,144 +1,92 @@
-Return-Path: <netdev+bounces-44561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F6877D8A2E
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 23:23:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8384A7D8ADD
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 23:48:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57AC3281F8B
-	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 21:23:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4E211C2128E
+	for <lists+netdev@lfdr.de>; Thu, 26 Oct 2023 21:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD013D3A5;
-	Thu, 26 Oct 2023 21:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416B73D98B;
+	Thu, 26 Oct 2023 21:48:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RSsAOL0f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eNcwDV44"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAE44426
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 21:23:26 +0000 (UTC)
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBA621B2
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 14:23:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1698355404; x=1729891404;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=uZlt55EZq3hlOJnoeppZjmQcRB33DlPvfGCgW9bx8/s=;
-  b=RSsAOL0fri3yQUOrtGILFiXH40t3uV93dufvRukwZfynq5dAWQNtAxBl
-   3macjTtV6OMKibXpwZWI2CXJ355wrZHCHlzsf2bE8GTsUt/Z3LfMBUnXZ
-   EJqofrCvbvPDpcUclLSIUFI9IxsR6Ov5cfcuPUpfvjGVrpA/zYN38STjf
-   4=;
-X-IronPort-AV: E=Sophos;i="6.03,254,1694736000"; 
-   d="scan'208";a="248546952"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 21:23:22 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com (Postfix) with ESMTPS id 61B6D8A910;
-	Thu, 26 Oct 2023 21:23:22 +0000 (UTC)
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:55582]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.11.230:2525] with esmtp (Farcaster)
- id f1320d71-27fe-46d1-9285-2553e4b2c0db; Thu, 26 Oct 2023 21:23:22 +0000 (UTC)
-X-Farcaster-Flow-ID: f1320d71-27fe-46d1-9285-2553e4b2c0db
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Thu, 26 Oct 2023 21:23:20 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.170.42) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Thu, 26 Oct 2023 21:23:18 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next] af_unix: Remove module remnants.
-Date: Thu, 26 Oct 2023 14:23:05 -0700
-Message-ID: <20231026212305.45545-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1588341741;
+	Thu, 26 Oct 2023 21:48:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F4EBC433C7;
+	Thu, 26 Oct 2023 21:48:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698356880;
+	bh=ew1HKKt5nbfRzGpkcLlKh0lA/TCUwgQ5yYRD1O9MA5Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eNcwDV44NZ+u5yga+M+B0DI42A+Bk65sQP8BUXJzHGmRfgpBwr3UpVEy7Sb5Z4W2R
+	 lDeSUzKFPkMVE0ZFEOqIVE0zayYhCRQyFkQBXaeBJxUNf9RpORLz76sZU7ckReM3U5
+	 AbU9CyaqI/WKMZUMYJQY4jxFq7FqPHjOUcQZoxc3mCPnwjoBvc5LenQixAlu2L7E5L
+	 lj4hmUMLJkO0mrzZuTxqAFK3WD9NbXyNQTEwzJnTfjK6Bv+fASEuNMs6TgmTPsxeHm
+	 8ouXDzn5ftmpzydYsELMJ/FyS2Q+rmkfYHevyWY3qn9ey4yCPt6o6Np6etJbOXexoV
+	 sMyC68cbIXqiw==
+Date: Thu, 26 Oct 2023 14:47:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko
+ <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko
+ <mykolal@fb.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH bpf-next 1/2] bpf: add skcipher API support to TC/XDP
+ programs
+Message-ID: <20231026144759.5ce20f4c@kernel.org>
+In-Reply-To: <20231026015938.276743-1-vadfed@meta.com>
+References: <20231026015938.276743-1-vadfed@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.42]
-X-ClientProxiedBy: EX19D043UWC001.ant.amazon.com (10.13.139.202) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Since commit 97154bcf4d1b ("af_unix: Kconfig: make CONFIG_UNIX bool"),
-af_unix.c is no longer built as module.
+On Wed, 25 Oct 2023 18:59:37 -0700 Vadim Fedorenko wrote:
+> Add crypto API support to BPF to be able to decrypt or encrypt packets
+> in TC/XDP BPF programs. Only symmetric key ciphers are supported for
+> now. Special care should be taken for initialization part of crypto algo
+> because crypto_alloc_sync_skcipher() doesn't work with preemtion
+> disabled, it can be run only in sleepable BPF program. Also async crypto
+> is not supported because of the very same issue - TC/XDP BPF programs
+> are not sleepable.
 
-Let's remove unnecessary #if condition, exitcall, and module macros.
+Do CC crypto@ for the next version, please.
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/unix/af_unix.c | 23 ++++-------------------
- 1 file changed, 4 insertions(+), 19 deletions(-)
+> +/**
+> + * struct bpf_crypto_skcipher_ctx - refcounted BPF sync skcipher context structure
+> + * @tfm:	The pointer to crypto_sync_skcipher struct.
+> + * @rcu:	The RCU head used to free the crypto context with RCU safety.
+> + * @usage:	Object reference counter. When the refcount goes to 0, the
+> + *		memory is released back to the BPF allocator, which provides
+> + *		RCU safety.
+> + */
+> +
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index e10d07c76044..45506a95b25f 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -3344,7 +3344,7 @@ static const struct seq_operations unix_seq_ops = {
- 	.show   = unix_seq_show,
- };
- 
--#if IS_BUILTIN(CONFIG_UNIX) && defined(CONFIG_BPF_SYSCALL)
-+#ifdef CONFIG_BPF_SYSCALL
- struct bpf_unix_iter_state {
- 	struct seq_net_private p;
- 	unsigned int cur_sk;
-@@ -3606,7 +3606,7 @@ static struct pernet_operations unix_net_ops = {
- 	.exit = unix_net_exit,
- };
- 
--#if IS_BUILTIN(CONFIG_UNIX) && defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
-+#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
- DEFINE_BPF_ITER_FUNC(unix, struct bpf_iter_meta *meta,
- 		     struct unix_sock *unix_sk, uid_t uid)
- 
-@@ -3706,7 +3706,7 @@ static int __init af_unix_init(void)
- 	register_pernet_subsys(&unix_net_ops);
- 	unix_bpf_build_proto();
- 
--#if IS_BUILTIN(CONFIG_UNIX) && defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
-+#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_PROC_FS)
- 	bpf_iter_register();
- #endif
- 
-@@ -3714,20 +3714,5 @@ static int __init af_unix_init(void)
- 	return rc;
- }
- 
--static void __exit af_unix_exit(void)
--{
--	sock_unregister(PF_UNIX);
--	proto_unregister(&unix_dgram_proto);
--	proto_unregister(&unix_stream_proto);
--	unregister_pernet_subsys(&unix_net_ops);
--}
--
--/* Earlier than device_initcall() so that other drivers invoking
--   request_module() don't end up in a loop when modprobe tries
--   to use a UNIX socket. But later than subsys_initcall() because
--   we depend on stuff initialised there */
-+/* Later than subsys_initcall() because we depend on stuff initialised there */
- fs_initcall(af_unix_init);
--module_exit(af_unix_exit);
--
--MODULE_LICENSE("GPL");
--MODULE_ALIAS_NETPROTO(PF_UNIX);
--- 
-2.30.2
+spurious newline?
 
+> +struct bpf_crypto_skcipher_ctx {
+
+> +/**
+> + * bpf_crypto_skcipher_ctx_acquire() - Acquire a reference to a BPF crypto context.
+
+The contexts are refcounted and can be placed in maps?
+Does anything prevent them from being used simultaneously 
+by difference CPUs?
+
+> +	case BPF_DYNPTR_TYPE_SKB:
+> +		return skb_pointer_if_linear(ptr->data, ptr->offset, __bpf_dynptr_size(ptr));
+
+dynptr takes care of checking if skb can be written to?
 
