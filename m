@@ -1,63 +1,54 @@
-Return-Path: <netdev+bounces-44761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93AB17D98E1
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 14:47:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E450B7D992C
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 15:00:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3F8D1C21032
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:47:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D9D32823E7
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04AC828DB2;
-	Fri, 27 Oct 2023 12:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B4817990;
+	Fri, 27 Oct 2023 13:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HSUU9koA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LIhuElef"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFE72D793
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 12:40:40 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978D8186;
-	Fri, 27 Oct 2023 05:40:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=B0UacAvNTuQ7KhTVvh52DyxFf4XPolpvf6eIYMGNjOA=; b=HSUU9koAcnI8RK42ENCE9mr/tC
-	LaOj7PXAnAVCEyhZpZ/MGd9/Z7lg7n9i/AcnAKvx7S3sSTqBW59rTJKI+yDToJzSSAcLoUkFonkQy
-	D1d3qHuP9TJCSoaXcXNyEzvBZvvraLlhhAvkHqaPrAOOP+9gX7HN9bEiYwAxejbdmdaG1KbXITON4
-	LH4L0fLm/d4dyo9mgsYFWarpgTpzy/3fYc6Et2+0lVdoJ3BpRLd6W3gizo3/1eeXtL8B+AUI8V4YO
-	SjSNQv/kqHxUnu+FLnUexLlk4WCUhkmEQhsS5M9qXUHNstifJ88jHhh1iXzAlhAw9TR0KY0Qdwrex
-	W2X8cx/g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51896)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qwM8f-0007oo-2d;
-	Fri, 27 Oct 2023 13:40:33 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qwM8g-0000n6-H3; Fri, 27 Oct 2023 13:40:34 +0100
-Date: Fri, 27 Oct 2023 13:40:34 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org,
-	andrew@lunn.ch, Jose.Abreu@synopsys.com,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next V3] net: pcs: xpcs: Add 2500BASE-X case in get
- state for XPCS drivers
-Message-ID: <ZTuvwnGZKEueGDwa@shell.armlinux.org.uk>
-References: <20231027044306.291250-1-Raju.Lakkaraju@microchip.com>
- <ghpmbmfjps24x7xvojk4gbkl55wjcuufd4v6mz6ws5htv35g2b@ugqsbet7t73p>
- <ZTuk/OF01M24nBeG@shell.armlinux.org.uk>
- <6j7szthl34z5q2ea4qnno7e2fnde3djxifx7chhhaihqty23q6@7j42bte7b3dv>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0046E5CBC;
+	Fri, 27 Oct 2023 13:00:20 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 475EA129;
+	Fri, 27 Oct 2023 06:00:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=34TFNELcRwb0DEJVWK6Vdvd41rU1dvOB0Wf82pfyYng=; b=LIhuElef+PFF7bZIJ0tGlYuono
+	lXcK5vol/SD1w3bbteFTXN0h+02yCXpDD3tcYJbqpsML6Vkj2n7zhdjmdiEA2L++zp/Tt8nc9OLXZ
+	seoq1Es/qf2W4+YbQby/j69NtyGd4TcC6SVkNr1KppItPzCTdhSJeuzMKn9j/XcmT4y8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qwMRh-000L8r-Bm; Fri, 27 Oct 2023 15:00:13 +0200
+Date: Fri, 27 Oct 2023 15:00:13 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	benno.lossin@proton.me, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 0/5] Rust abstractions for network PHY drivers
+Message-ID: <669d8fba-f6bb-4dc8-a06b-752fb83902b4@lunn.ch>
+References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
+ <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com>
+ <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch>
+ <ZTsbG7JMzBwcYzhy@Boquns-Mac-mini.home>
+ <c40722eb-e78a-467d-8f91-ef9e8afe736d@lunn.ch>
+ <ZTsqROr8s18aWwSY@boqun-archlinux>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,105 +57,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6j7szthl34z5q2ea4qnno7e2fnde3djxifx7chhhaihqty23q6@7j42bte7b3dv>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <ZTsqROr8s18aWwSY@boqun-archlinux>
 
-On Fri, Oct 27, 2023 at 03:06:19PM +0300, Serge Semin wrote:
-> Hi Russell
+> Do the CI tests support Rust now? Does Tomo's patch pass CI? Looks like
+> something we'd like to see (and help).
+
+Its work in progress.
+
+https://patchwork.kernel.org/project/netdevbpf/patch/20231026001050.1720612-6-fujita.tomonori@gmail.com/
+
+These are the current tests we have. You can see it fails two tests. I
+would say neither are blockers. netdev does try to stick to 80
+character line length, so it would be nice to fix that. The checkpatch
+warning about the Kconfig help can also be ignored.
+
+There are currently a few builds performed for each patch, once with
+gcc and once with clang/llvm. These use the allmodconfig kernel
+configuration, since that generally builds the most code. However,
+Rust is not enabled in the configuration. So i submitted a new test,
+based on the clang build, which massages the kernel configuration to
+actually enable Rust, and to ensure the dependencies are fulfilled to
+allow the PHY driver to be enabled, and then enable it. We want the
+build with a patch to have equal or less errors and warning from the
+toolchain.
+
+Its not clear how long it will take before this new test becomes
+active. The build machine does not have a Rust toolchain yet, etc.  To
+make up for that, i just build the series myself on my machine, and it
+builds cleanly for me.
+
+We are also open to add more tests. You will get more return on
+investment if you extend the C=1 checks, since that is used in a lot
+more places than networking. But we can add more tests to the
+networking CI system, if you can tell us what to test, how to test it,
+and how to evaluate the results.
+
+> > likely will be merged. Real problems can be fixed up later, if need
+> > be.
 > 
-> On Fri, Oct 27, 2023 at 12:54:36PM +0100, Russell King (Oracle) wrote:
-> > On Fri, Oct 27, 2023 at 02:04:15PM +0300, Serge Semin wrote:
-> > > Cc += Russell
-> > > 
-> > > * It's a good practice to add all the reviewers to Cc in the new patch
-> > > * revisions.
-> > > 
-> > > On Fri, Oct 27, 2023 at 10:13:06AM +0530, Raju Lakkaraju wrote:
-> > > > Add DW_2500BASEX case in xpcs_get_state( ) to update speed, duplex and pause
-> > > > 
-> > > > Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> > > 
-> > > With a nitpick below clarified, feel free to add:
-> > > Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
-> > > 
-> > > > ---
-> > > >  drivers/net/pcs/pcs-xpcs.c | 29 +++++++++++++++++++++++++++++
-> > > >  drivers/net/pcs/pcs-xpcs.h |  2 ++
-> > > >  2 files changed, 31 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-> > > > index 4dbc21f604f2..31f0beba638a 100644
-> > > > --- a/drivers/net/pcs/pcs-xpcs.c
-> > > > +++ b/drivers/net/pcs/pcs-xpcs.c
-> > > > @@ -1090,6 +1090,28 @@ static int xpcs_get_state_c37_1000basex(struct dw_xpcs *xpcs,
-> > > >  	return 0;
-> > > >  }
-> > > >  
-> > > > +static int xpcs_get_state_2500basex(struct dw_xpcs *xpcs,
-> > > > +				    struct phylink_link_state *state)
-> > > > +{
-> > > > +	int ret;
-> > > > +
-> > > > +	ret = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_STS);
-> > > > +	if (ret < 0) {
-> > > > +		state->link = 0;
-> > > > +		return ret;
-> > > > +	}
-> > > > +
-> > > > +	state->link = !!(ret & DW_VR_MII_MMD_STS_LINK_STS);
-> > > > +	if (!state->link)
-> > > > +		return 0;
-> > > > +
-> > > > +	state->speed = SPEED_2500;
-> > > 
-> > > > +	state->pause |= MLO_PAUSE_TX | MLO_PAUSE_RX;
-> > > 
-> > > Why is it '|=' instead of just '='? Is it possible to have the 'pause'
-> > > field having some additional flags set which would be required to
-> > > preserve?
-> > 
-> > The code is correct. There are other flags on state->pause other than
-> > these, and phylink initialises state->pause prior to calling the
-> > function. The only flags that should be modified here are these two
-> > bits that the code is setting.
-> > 
-> > Phylink will initialise it to MLO_PAUSE_NONE if expecting autoneg, or
-> > the configured values if autoneg on the link is disabled.
-> 
-> Thanks for clarification. Then no more comments from my side in this
-> patch regard.
-> 
-> Regarding the XPCS driver in general. Based on what you said the rest
-> of the XPCS state getters are wrong in fully re-writing the 'pause'
-> field. Right?
+> But this doesn't apply to pure API, right? So if some one post a pure
+> Rust API with no user, but some tests, and the CI passes, the API won't
+> get merged? Even though no review is fine and if API has problems, we
+> can fix it later?
 
-Yes.
+There is always a human involved. If a reviewer does not pick up the
+missing user, the Maintainer should and reject the patch.
 
-xpcs_resolve_pma:
-        state->pause = MLO_PAUSE_TX | MLO_PAUSE_RX;
-
-xpcs_get_state_c37_sgmii:
-        state->pause = 0;
-
-are both incorrect. The former should be |=, the latter is totally
-unnecessary.
-
-Documentation:
- * pcs_get_state() - Read the current inband link state from the hardware
- * @pcs: a pointer to a &struct phylink_pcs.
- * @state: a pointer to a &struct phylink_link_state.
- *
- * Read the current inband link state from the MAC PCS, reporting the
- * current speed in @state->speed, duplex mode in @state->duplex, pause
-                                                                  ^^^^^
- * mode in @state->pause using the %MLO_PAUSE_RX and %MLO_PAUSE_TX bits,
-   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-I guess I need to make that more explicit that pcs_get_state() methods
-are only expected to _set_ these two bits as appropriate, leaving all
-other bits as-is.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+	Andrew
 
