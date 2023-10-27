@@ -1,74 +1,135 @@
-Return-Path: <netdev+bounces-44846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C65D57DA1B5
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 22:20:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1F8D7DA1B6
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 22:21:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1F0F1C21072
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 20:20:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00D1D1C21069
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 20:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CD53E015;
-	Fri, 27 Oct 2023 20:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02943E01A;
+	Fri, 27 Oct 2023 20:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="a73g1mVe"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H9+pruVO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543DD3E011
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 20:20:51 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77B881B9
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 13:20:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=G1kMmDRuPXLdNDRerDMZ+cXR4TfQqKf0hFrS0vERlaA=; b=a73g1mVekOaqaZH1puqxqhlygP
-	wNMz42xmW08yfL9832ycIU+QR13mTu6dhv/hshrZUt1dhuAh8SnO1P4eH6pkZQDJbJ8FJszHd+mbx
-	EH09ecSpKEDl9yfCE5gkM7pknRU+5Rvt9ikzhGfMv2J2GOQXeIAQDRjDiBzYSPn56QQM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qwTK0-000Muq-W6; Fri, 27 Oct 2023 22:20:44 +0200
-Date: Fri, 27 Oct 2023 22:20:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
-	vivien.didelot@gmail.com, f.fainelli@gmail.com, olteanv@gmail.com,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzk+dt@kernel.org, arinc.unal@arinc9.com
-Subject: Re: [PATCH net-next v2 3/3] net: dsa: realtek: support reset
- controller
-Message-ID: <469fc880-016d-4b92-9fb3-7b465a1a8046@lunn.ch>
-References: <20231027190910.27044-1-luizluca@gmail.com>
- <20231027190910.27044-4-luizluca@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD213DFE0
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 20:21:44 +0000 (UTC)
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 168FF1B1
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 13:21:43 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-5082a874098so1397888e87.3
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 13:21:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698438101; x=1699042901; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v2aSxynAJWD4w6QHvLKwVWJJOGC7WprRqk+AbZ7X+LM=;
+        b=H9+pruVOxJQDYQWtfYdTgN9im65ZC/k2Aej8bvWnA8mneXDCan37cuh/6U7HJUwX/U
+         KJq9+NygGgSqeVtkDo/mweJ2/0lWzlM5wfaj7Cmv0GbmNi7D/P21RPTywUAPjAF7zva/
+         qvSM+tWLU9KFaPX2/SgPk949/hr7dagG7Lc9imwkcDbS4HubCS+STWqI/lHYc9KPBCqW
+         GUNJBFFJnFSNfzyBk/TGFLpar3eT/nZgFPiWbl4e8B5OFEAJ8zippCG4h5HcvUFvh0iK
+         melPNEZmNNxgKEcGeoUhMRCeCnLm3CcbOZgLPoaWz09XyTj7bt3WihWCZJ9luNtHMwoy
+         sFMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698438101; x=1699042901;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v2aSxynAJWD4w6QHvLKwVWJJOGC7WprRqk+AbZ7X+LM=;
+        b=psp06B+0TD9vfQHvl+IAAD+aSR6RxKWMfwGmphwXV4hF9QZFYuboKgEb4Nv1gNvzDl
+         pTRvelJ0PcpTu1iFNb7zvCSIoICkBzVLTlNlHz63TNMB5TwzwLe86MEbKXJ6tqY5qxom
+         GnPGigeLEWCRsV1ADx3nkY3V4EBGlKqI1SqjbzDYD6C/gUgWcuOWF6tH7oQcIdHvG5+H
+         z7xNedFyfpzvZvTNqHDb8EHehsqUybXhf2AJOdP4HYAyJBxJdt0tkGPb+KzdrCQP1452
+         v45capDqYoXXBTJBcqoNrLsyZrHEuwaS209q8dlAG56eEI1850eoadbKE0y6UcthdUNQ
+         tLFA==
+X-Gm-Message-State: AOJu0YwubVyVflz1fe4OrGUmEQSRlbC3MGU1cPPYCSzgFNwiz/ZE5ajP
+	3ol8Gb0m/SJfSQbXXh0jXApmYA==
+X-Google-Smtp-Source: AGHT+IEa/QcaZvljgbdGu/K4ciK9D0FHLRgitkOzAfJ7CDtPubJGROFgHjxG4bfoHfSJ70jYLFcylg==
+X-Received: by 2002:ac2:4850:0:b0:507:a1e0:22f4 with SMTP id 16-20020ac24850000000b00507a1e022f4mr2496829lfy.29.1698438100941;
+        Fri, 27 Oct 2023 13:21:40 -0700 (PDT)
+Received: from [127.0.1.1] ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id r3-20020ac25a43000000b00507a3b0eb34sm388178lfn.264.2023.10.27.13.21.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Oct 2023 13:21:40 -0700 (PDT)
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 27 Oct 2023 22:21:39 +0200
+Subject: [PATCH] dsa: tag_rtl4_a: Bump min packet size
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231027190910.27044-4-luizluca@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
+X-B4-Tracking: v=1; b=H4sIANIbPGUC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI2NDAyNz3bTMCt2ikhwLYzOzoiTdVHNTo6QUU0sDw+REJaCegqJUoAKwedG
+ xtbUATWVsMF8AAAA=
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.12.4
 
-> -	/* TODO: if power is software controlled, set up any regulators here */
+It was reported that the "LuCI" web UI was not working properly
+with a device using the RTL8366RB switch. Disabling the egress
+port tagging code made the switch work again, but this is not
+a good solution as we want to be able to direct traffic to a
+certain port.
 
-Please don't remove these comments. The switch might be powered using
-a regulator. And this does look like the correct place to get the
-regulator, and turn it on before doing the reset. Somebody thought
-such boards might exist...
+It turns out that sometimes, but not always, small packets are
+dropped by the switch for no reason.
 
-> -	/* TODO: if power is software controlled, set up any regulators here */
+If we pad the ethernet frames to a minimum of ETH_FRAME_LEN + FCS
+(1518 bytes) everything starts working fine.
 
-etc.
+As we completely lack datasheet or any insight into how this
+switch works, this trial-and-error solution is the best we
+can do.
 
-    Andrew
+I have tested smaller sizes, ETH_FRAME_LEN doesn't work for
+example.
+
+Fixes: 0e90dfa7a8d8 ("net: dsa: tag_rtl4_a: Fix egress tags")
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ net/dsa/tag_rtl4_a.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/net/dsa/tag_rtl4_a.c b/net/dsa/tag_rtl4_a.c
+index c327314b95e3..8b1e81a6377b 100644
+--- a/net/dsa/tag_rtl4_a.c
++++ b/net/dsa/tag_rtl4_a.c
+@@ -41,8 +41,11 @@ static struct sk_buff *rtl4a_tag_xmit(struct sk_buff *skb,
+ 	u8 *tag;
+ 	u16 out;
+ 
+-	/* Pad out to at least 60 bytes */
+-	if (unlikely(__skb_put_padto(skb, ETH_ZLEN, false)))
++	/* We need to pad out to at least ETH_FRAME_LEN + FCS bytes. This was
++	 * found by trial-and-error. Sometimes smaller frames work, but sadly
++	 * not always.
++	 */
++	if (unlikely(__skb_put_padto(skb, ETH_FRAME_LEN + ETH_FCS_LEN, false)))
+ 		return NULL;
+ 
+ 	netdev_dbg(dev, "add realtek tag to package to port %d\n",
 
 ---
-pw-bot: cr
+base-commit: 58720809f52779dc0f08e53e54b014209d13eebb
+change-id: 20231027-fix-rtl8366rb-e752bd5901ca
+
+Best regards,
+-- 
+Linus Walleij <linus.walleij@linaro.org>
+
 
