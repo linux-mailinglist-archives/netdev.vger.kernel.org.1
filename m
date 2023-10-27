@@ -1,153 +1,78 @@
-Return-Path: <netdev+bounces-44625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D5837D8D33
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:41:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87AB47D8D3C
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:47:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E7B01C20F47
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:41:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36F0B2821CA
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC9D19C;
-	Fri, 27 Oct 2023 02:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77DD64A;
+	Fri, 27 Oct 2023 02:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9/Qy9ML"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="V3ul2WeT"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7252764A
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:41:19 +0000 (UTC)
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24FE7B0;
-	Thu, 26 Oct 2023 19:41:18 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id d2e1a72fcca58-6ba8eb7e581so349486b3a.0;
-        Thu, 26 Oct 2023 19:41:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698374477; x=1698979277; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4Y45Kg1FVvOUrUmxNTyFscKK00f1fFAimD2L0qeIY8U=;
-        b=l9/Qy9MLJRqKimW9NrRSf0xDjxeedftA+YAAuZPOAPcFguZNb9AUD+S25+Qlr60zeq
-         nzjmoxwdOQRv0Wo79T/5WWv1G9AcIDEta1E+Kdrmxr+yQKwWei8is7qQhjGGK709eX6I
-         pTtsF/hXZHl0yw3YNrLrFJEhLQq8MqxVuppwPWqX9trdt/8evC4wrQnuRrEaZjlXJx3r
-         NyBiREY/fJsIgkg0WiDsn27nwhQap/CxxIv90Q9Eyho3RHlv2/YEuRhmXzVIIlGxewbT
-         WgOosh8QXBX/QyO+hL/W2Kv/9bBwbr0bP2lgA1OEZgLE8JTwPW/5s/S26PLbh0eIRqz8
-         zsQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698374477; x=1698979277;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Y45Kg1FVvOUrUmxNTyFscKK00f1fFAimD2L0qeIY8U=;
-        b=VOX4IeQ5d47/vdWmcZ0vbRdHuT66AMC1xvL9OHwFfOdccNZtdAoRiKa/XA8r4J1Cdp
-         RM9TfesxyKH8OoZn3B9fAqgw3Z4GDsG8F5UzHpgYb3PMGE6T24+UvLAmlAE6CLkz8Kft
-         fJiwseiwghT5wegJ1NrdUQ3YmnuIoJeFCZzlUNyIJJdGck0vEcxWdwiTHcgZ52T89vKb
-         grnVUM/6FTOUfjDDqcDS9tbaieICmZDWVURRXuknZPTTnTkZD3tohbrKKE571wwfJbAD
-         IpVQqDjOlfsvb1hihG0NJNpqwvDe3h9Aa8R00IcUSEnx0UMIgDCXlVTzh7/eAUPu7xqn
-         B9Kg==
-X-Gm-Message-State: AOJu0YydnlhF5Bb5tHCfQQkkyXdDQUyvf8o0zM667EE1biYJTpYl0eDw
-	YTSFtFrVKz71peglJQWs6uw=
-X-Google-Smtp-Source: AGHT+IEdvyLE2DgnauF9a83HstUljP8iblHqKFnHxJKPWxoaD4Km4Z6EVpXrPAgNqUAmRCnnM75Sag==
-X-Received: by 2002:a05:6a21:7899:b0:14e:2c56:7b02 with SMTP id bf25-20020a056a21789900b0014e2c567b02mr1928136pzc.0.1698374477451;
-        Thu, 26 Oct 2023 19:41:17 -0700 (PDT)
-Received: from [127.0.0.1] (059149129201.ctinets.com. [59.149.129.201])
-        by smtp.gmail.com with ESMTPSA id e9-20020a170902d38900b001ca82a4a9c8sm366382pld.269.2023.10.26.19.41.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Oct 2023 19:41:16 -0700 (PDT)
-Message-ID: <0f6ebc50-06d6-4e3d-b296-1045b0255c8a@gmail.com>
-Date: Fri, 27 Oct 2023 10:41:08 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE38719C;
+	Fri, 27 Oct 2023 02:47:21 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA232C4;
+	Thu, 26 Oct 2023 19:47:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ePutOWB0IdYzMU/QyiXTZPgLpmM6M9qUvOK+z6Zfa5Y=; b=V3ul2WeTxEPKe7dmSt9m5HmSIB
+	e+liYFtT5BOT4M+E73s3ilWMhGB2Ig9V1kERKuxLLO+rYbSVjVCqr1jwMNLtOkBLmq1cMM18jHdPo
+	ybmpuTz7/4Jy9/7MG1HzyobyFGpjj5I2fdVGb6YIz9zFPN1yD4tUuOdllDE0a0LQMTlo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qwCsX-000Iap-9H; Fri, 27 Oct 2023 04:47:17 +0200
+Date: Fri, 27 Oct 2023 04:47:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	benno.lossin@proton.me, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 0/5] Rust abstractions for network PHY drivers
+Message-ID: <c40722eb-e78a-467d-8f91-ef9e8afe736d@lunn.ch>
+References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
+ <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com>
+ <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch>
+ <ZTsbG7JMzBwcYzhy@Boquns-Mac-mini.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: 9p: fix possible memory leak in p9_check_errors()
-Content-Language: en-US
-To: asmadeus@codewreck.org
-Cc: ericvh@kernel.org, lucho@ionkov.net, linux_oss@crudebyte.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jvrao@linux.vnet.ibm.com, v9fs@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231026092351.30572-1-hbh25y@gmail.com>
- <ZTpTU8-1zn_P22QX@codewreck.org>
-From: Hangyu Hua <hbh25y@gmail.com>
-In-Reply-To: <ZTpTU8-1zn_P22QX@codewreck.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZTsbG7JMzBwcYzhy@Boquns-Mac-mini.home>
 
-On 26/10/2023 19:53, asmadeus@codewreck.org wrote:
+> I wonder whether that actually helps, if a reviewer takes average four
+> days to review a version (wants to give accurate comments and doesn't
+> work on this full time), and the developer send a new version every
+> three days, there is no possible way for the developer to get the
+> reviews.
 > 
-> Hangyu Hua wrote on Thu, Oct 26, 2023 at 05:23:51PM +0800:
->> When p9pdu_readf is called with "s?d" attribute, it allocates a pointer
->> that will store a string. But when p9pdu_readf() fails while handling "d"
->> then this pointer will not be freed in p9_check_errors.
-> 
-> Right, that sounds correct to me.
-> 
-> Out of curiosity how did you notice this? The leak shouldn't happen with
-> any valid server.
+> (Honestly, if people could reach out to a conclusion for anything in
+> three days, the world would be a much more peaceful place ;-))
 
-I just found that any attributes that require memory allocation are 
-prone to errors when mixed with ordinary attributes.
+May i suggest you subscribe to the netdev list and watch it in action.
 
-> 
-> This cannot break anything so I'll push this to -next tomorrow and
-> submit to Linus next week
+It should also be noted, patches don't need reviews to be merged. If
+there is no feedback within three days, and it passes the CI tests, it
+likely will be merged. Real problems can be fixed up later, if need
+be.
 
-Agreed.
+	Andrew
 
-> 
->> Fixes: ca41bb3e21d7 ("[net/9p] Handle Zero Copy TREAD/RERROR case in !dotl case.")
-> 
-> This commit moves this code a bit, but the p9pdu_readf call predates
-> it -- in this case the Fixes tag is probably not useful; this affects
-> all maintained kernels.
-> 
->> Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
->> ---
->>   net/9p/client.c | 7 +++++--
->>   1 file changed, 5 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/9p/client.c b/net/9p/client.c
->> index 86bbc7147fc1..6c7cd765b714 100644
->> --- a/net/9p/client.c
->> +++ b/net/9p/client.c
->> @@ -540,12 +540,15 @@ static int p9_check_errors(struct p9_client *c, struct p9_req_t *req)
->>   		return 0;
->>   
->>   	if (!p9_is_proto_dotl(c)) {
->> -		char *ename;
->> +		char *ename = NULL;
->>   
->>   		err = p9pdu_readf(&req->rc, c->proto_version, "s?d",
->>   				  &ename, &ecode);
->> -		if (err)
->> +		if (err) {
->> +			if (ename != NULL)
->> +				kfree(ename);
-> 
-> Don't check for NULL before kfree - kfree does it.
-> If that's the only remark you get I can fix it when applying the commit
-> on my side.
-
-I get it. I will revise it based on your and Christian's comments and 
-send a v2.
-
-Thanks,
-Hangyu
-
-> 
-> 
->>   			goto out_err;
->> +		}
->>   
->>   		if (p9_is_proto_dotu(c) && ecode < 512)
->>   			err = -ecode;
-> 
 
