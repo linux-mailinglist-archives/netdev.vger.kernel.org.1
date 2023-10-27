@@ -1,103 +1,84 @@
-Return-Path: <netdev+bounces-44629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA13B7D8D40
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:50:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EC587D8D3F
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:50:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26F6C1C20F5D
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:50:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58D681C20FC3
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D42164A;
-	Fri, 27 Oct 2023 02:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84431857;
+	Fri, 27 Oct 2023 02:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bhXAZJkO"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C087B257B
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:50:40 +0000 (UTC)
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1645FCA;
-	Thu, 26 Oct 2023 19:50:38 -0700 (PDT)
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-28002031f06so918909a91.1;
-        Thu, 26 Oct 2023 19:50:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698375037; x=1698979837;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GEDdFhBEWomx2nDAs3Hi04Zp62KEgFzJ+9IawEdcmP0=;
-        b=oAUH0o8gcWwSEgI4OQVhfx9DyNkYVhdG8pQqtJUVDrWEJ3C9h+nCL17YMEUhNikKlz
-         JfTtUyCQFcdJjBzJuaN+qTYK6ThaHY3HX3nathISLENTv48BcWx7dqt8k6TNHxdr/IDy
-         UGmygk3r5OjsBF65dmSxvnRR/QVYyFYGC1wPh3bfiJf6QcnKENRNHj2fetvZtL+R6MK/
-         uCZJhN9Bahoj+sAndAmgtt3Qvo0xqupNIwkjsCaoHuyATWu/YI8aOylOU7mjWLREo1Gx
-         N0lJU+CmxWBDoxEL9wNJ52vtbp22u14IcKZBsGIYci4FhOO8kHemzQT0Is9NRmaYBbBY
-         RZUQ==
-X-Gm-Message-State: AOJu0YyUqozF2VDs9gztRXT1JTkVFY8gEHv4SRMSOaHxtixsL8+Gqqlm
-	OdsMV4jxTgn12QvIeKIdKInLk2GBZB+C8W7gvLM=
-X-Google-Smtp-Source: AGHT+IE0303h2zVQIQ9mlZ4ab36TLNB2HCr6BvgRl3C6IGiFI0Mtp6Hf3yYr7BQuEv/hd8yyOriwlxxSsgcKt4hxc5c=
-X-Received: by 2002:a17:90a:1a50:b0:280:9:8d0c with SMTP id
- 16-20020a17090a1a5000b0028000098d0cmr1220448pjl.33.1698375037441; Thu, 26 Oct
- 2023 19:50:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE0417EF
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:50:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 294A0C433C8;
+	Fri, 27 Oct 2023 02:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698375026;
+	bh=rmVX8CHyx0Dm4Zgd1F3HyD+fdjwR0gdjEyfIWAhPOIc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bhXAZJkOa14QCMzJCwec7vldNrCbx6JFGBDIkk13Y5ZZ9dcpAQWELDotPuwlHLkNh
+	 aLSjClFdN5Puv5mgMJMXyd75LHBVg7cOw/+kbvrSMFMFlxr6DE5CI+t0UXrBR0bISX
+	 Q18HaVhxHeMUjixDxDCFd629ogzOdwtZ/tBK6/8+xM7U0e1ner1Bn84LKEd2pkdudA
+	 GxfC/EkEAiTMJDHQgywLAboqyqqYKbh4LNaWYcgYKmPZOWK5iC1vmJRicJVACruoB8
+	 QMIQjwLTVuZjNzpuYGCDyuvZiRbU8ZQVwKjLn8zK3QkNuJcKoD0y/lPVQXFc9yIfJp
+	 spjCxFDEUtBNw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0A523E11F55;
+	Fri, 27 Oct 2023 02:50:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231025173300.1776832-1-florian.fainelli@broadcom.com>
- <20231025173300.1776832-5-florian.fainelli@broadcom.com> <CAMZ6RqJJXK5EyyOwXXbdA-bDTY=_JQ+xfKpoCHDJZqv+rNnASQ@mail.gmail.com>
- <CAMZ6Rq+iBazJ+fM5yd5Tfa8==DEGV93iD-XojU=f1m3ScSGEww@mail.gmail.com> <e6bd1a85-0bcf-457c-8fa8-33e68d818547@broadcom.com>
-In-Reply-To: <e6bd1a85-0bcf-457c-8fa8-33e68d818547@broadcom.com>
-From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Date: Fri, 27 Oct 2023 11:50:25 +0900
-Message-ID: <CAMZ6Rq+HK8Ps2QZsqi1C5Dgjn=EDhT5hWks=T02x5AMqzXkNhw@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/5] net: phy: broadcom: Add support for WAKE_FILTER
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, Doug Berger <opendmb@gmail.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Gal Pressman <gal@nvidia.com>, Willem de Bruijn <willemb@google.com>, 
-	Daniil Tatianin <d-tatianin@yandex-team.ru>, Simon Horman <horms@kernel.org>, 
-	Justin Chen <justin.chen@broadcom.com>, Ratheesh Kannoth <rkannoth@marvell.com>, 
-	Joe Damato <jdamato@fastly.com>, Jiri Pirko <jiri@resnulli.us>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] tools: ynl-gen: respect attr-cnt-name at the attr
+ set level
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169837502603.8979.8223001513024007856.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Oct 2023 02:50:26 +0000
+References: <20231025182739.184706-1-kuba@kernel.org>
+In-Reply-To: <20231025182739.184706-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, martineau@kernel.org, dcaratti@redhat.com
 
-On Fri. 27 Oct. 2023 at 02:55, Florian Fainelli
-<florian.fainelli@broadcom.com> wrote:
-> Hi Vincent,
->
-> On 10/25/23 19:13, Vincent MAILHOL wrote:
-> [snip]
-> >>
-> >> This looks like an endianness conversion (I can not tell if this is
-> >> big to little or the opposite)...
-> >
-> > Oopsy! On second look, this is an open coded cpu to big endian
-> > conversion. So the question I should have asked is:
-> >
-> >    why not use the put_unaligned_be16() helper here?
->
-> Because this is consistent with the existing code, though I will keep
-> that suggestion in mind as a subsequent patch. I personally find it
-> clearer expressed that way, but can update.
+Hello:
 
-Fair enough. I agree that this is not something to be fixed in this series.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-For your future consideration, I would have done it as:
+On Wed, 25 Oct 2023 11:27:39 -0700 you wrote:
+> Davide reports that we look for the attr-cnt-name in the wrong
+> object. We try to read it from the family, but the schema only
+> allows for it to exist at attr-set level.
+> 
+> Reported-by: Davide Caratti <dcaratti@redhat.com>
+> Link: https://lore.kernel.org/all/CAKa-r6vCj+gPEUKpv7AsXqM77N6pB0evuh7myHq=585RA3oD5g@mail.gmail.com/
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-        __be16 da[ETH_ALEN / sizeof(__be16)];
-        /* ... */
-        da[i] = cpu_to_be16(~ret);
+Here is the summary with links:
+  - [net-next] tools: ynl-gen: respect attr-cnt-name at the attr set level
+    https://git.kernel.org/netdev/net-next/c/eb9df668381d
 
-da[] can eventually be casted back to u8 * once populated.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-(...)
+
 
