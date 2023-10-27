@@ -1,101 +1,96 @@
-Return-Path: <netdev+bounces-44616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1827D8C7D
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:10:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA0317D8C76
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8C09282089
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 00:10:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91BAD2821AE
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 00:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B750A193;
-	Fri, 27 Oct 2023 00:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920C4179;
+	Fri, 27 Oct 2023 00:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="w1GL3PvU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XQ/4E0qz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F44179
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 00:10:45 +0000 (UTC)
-Received: from out203-205-221-231.mail.qq.com (out203-205-221-231.mail.qq.com [203.205.221.231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C734BC2;
-	Thu, 26 Oct 2023 17:10:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1698365440; bh=dvIPUIssHk0TkL1LRSlpPOoqG4opkQMneKjYYtEG8xA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=w1GL3PvUxbbh/280u6Egf+dtQeAhIXcsFFvOgx45kscTKjyw5NOgb1E5yxUdnD5p8
-	 5wvbIoj9HaV8FUxb1tfkVWFc2bn/sNVf4YPH2VMJ2KEINyzPRRw5MKRZcJPyLqqbzI
-	 kIARcNUbnl4GjezqEYwCuslcSJL3PUMsOCEe0tZw=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
-	by newxmesmtplogicsvrsza7-0.qq.com (NewEsmtp) with SMTP
-	id CD2406F; Fri, 27 Oct 2023 08:03:13 +0800
-X-QQ-mid: xmsmtpt1698364993tihswe20d
-Message-ID: <tencent_541B3D2565BACCBBD133319E441B774B6C08@qq.com>
-X-QQ-XMAILINFO: MK5U7QanZrCwtOxbSub+N5zKks7NPU6Qn0dDvkn/LhQdD2W3fSqRCdxUO7YnXi
-	 39DUmxEeSZyqtlo3mIJLBZifa4fCyOUwRPr/smalNWc0VCP9o8rhl4eG3yFJKlwaSKNdXfLJtkgs
-	 lOjSPvJJm0XtjT7tNTO5jiKfY6DazEm/jRZe7OM8R0Eg3FhdcnDqtAzeXCO8KdzR29SlTk5ZTH8w
-	 SafbirKL2O8cY0PYy1g6UWx81vEQnujFoSU1700kHMKbl0BUO9G2ucnSG3wEfEBeCnc8gC+IhLcJ
-	 OyXqbw73Npy6KSmy0EdORlXVs/9XHHWuGgCZFRIFSncuw4l49Cq7REvwh0w/BwH3/0fN2TL5xqfs
-	 y/zm8yQcWOswMY5aNEepdu8PSC9K8rjusYJaVmiGkfYrDOPzUyaXLMTDMqYu2lfXWU2Fe/Gbd40P
-	 GQ1+nizNz9KcMM06KQl0gjVmfXgSAz9xwmzJAWGGqw2UOzdx1sV4QsY5DcdJeneMQvhqewuiRucO
-	 wXmaWvFxgQGH6RshF4P5wQwgNK6B2JUW4hJs3LYNYAG09DY0J5/dmBC5VCN1ALWjmcLGekQ1laMU
-	 NwyFhhLhl5hWD9gIBuLeEDCIoWyXrT/chM660i6AsenNBYmz+ggFUGj95jgEbmeOFV5UQ/umfKBK
-	 +Ijp04vZhP95I0EY6gCN8RRbGi9V2qw4RJFvcn00vUDhDzs8leekDMUmUQbPgM8UXANGjAXtQHfo
-	 CwzO1XuCNW7Cz3OzklIba3+FxMJGWvyHJUtyfEWfy+kkVO1jMtBJq5ffUmwB85nXpNGo/zq9oEgW
-	 /GxW76hQx+l0MRcItD29hU9wcNIU5VSiLsmgoDfDpkcS8u15S5u+rLpQulnb3oexVIydTC3Yk1vh
-	 eNMe6zzoV1YZbwoy37kRf3UFrpE5IEgTiEEAM1ls19
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-From: Edward Adam davis <eadavis@qq.com>
-To: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
-Cc: davem@davemloft.net,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	reibax@gmail.com,
-	richardcochran@gmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH net-next] ptp: ptp_read should not release queue
-Date: Fri, 27 Oct 2023 08:03:13 +0800
-X-OQ-MSGID: <20231027000313.3603803-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <000000000000910ad106089f45eb@google.com>
-References: <000000000000910ad106089f45eb@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A62160;
+	Fri, 27 Oct 2023 00:07:41 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61138198;
+	Thu, 26 Oct 2023 17:07:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=R2G3EbMAjFyFArxWxFusjiN0c6cLZqQgdNFPGps24BE=; b=XQ
+	/4E0qz2mr+JApLyfY6LbbVPToucWNdb3Q3kzGkFo9a1Ku4IXUyHfb5h3MzVNfAW36QcBO7In2DOad
+	cDJk6Fh307oH2nan+13Xf1RgvK1n91+qI3p7f3YfyOyDlJ0W9OuKylvdzhMVDBCmdshONnRoRA8mT
+	4dGkdYjGuQUevOM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qwAO1-000IJ0-31; Fri, 27 Oct 2023 02:07:37 +0200
+Date: Fri, 27 Oct 2023 02:07:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	benno.lossin@proton.me, wedsonaf@gmail.com, ojeda@kernel.org
+Subject: Re: [PATCH net-next v7 3/5] rust: add second `bindgen` pass for enum
+ exhaustiveness checking
+Message-ID: <feb34b35-e847-43f4-824f-157b1b96c7f0@lunn.ch>
+References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
+ <20231026001050.1720612-4-fujita.tomonori@gmail.com>
+ <CANiq72n6Cvxydcef03kEo9fy=5Zd7MXYqFUGX1MBaTKF2o63nw@mail.gmail.com>
+ <20231026.205434.963307210202715112.fujita.tomonori@gmail.com>
+ <CANiq72=QgT2tG3wy5pioTQ9n416kksZrL1791pehwR=1ZGP52w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANiq72=QgT2tG3wy5pioTQ9n416kksZrL1791pehwR=1ZGP52w@mail.gmail.com>
 
-From: Edward Adam Davis <eadavis@qq.com>
+On Thu, Oct 26, 2023 at 02:22:23PM +0200, Miguel Ojeda wrote:
+> On Thu, Oct 26, 2023 at 1:54 PM FUJITA Tomonori
+> <fujita.tomonori@gmail.com> wrote:
+> >
+> > Sorry, I totally misunderstand your intention. I thought that the PHY
+> > abstractions needs to be merged with your patch together.
+> >
+> > I'll drop your patch in the next version and focus on my patches.
+> 
+> No harm done! I understand you were trying to help, and I apologize if
+> I sounded too harsh.
+> 
+> Your abstractions are not blocked on this patch -- they could go in
+> without this, that is why I suggested marking this one as RFC and
+> putting it at the end of the series.
 
-Firstly, queue is not the memory allocated in ptp_read;
-Secondly, other processes may block at ptp_read and wait for conditions to be 
-met to perform read operations.
+That is not how netdev works. It messes up the patch flow, since the
+machinery expects to commit all or nothing.
 
-Reported-by: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
-Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- drivers/ptp/ptp_chardev.c | 2 --
- 1 file changed, 2 deletions(-)
+The best way forwards is you create a stable branch with this
+patch. The netdev Maintainer can then pull that branch into netdev,
+and Tomonori can then add his patches using it on top. When everything
+meets up in linux-next, git then recognises it has the same patch
+twice and drops one of them, depending on the order of the merge.
 
-diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index 282cd7d24077..27c1ef493617 100644
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -585,7 +585,5 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
- free_event:
- 	kfree(event);
- exit:
--	if (result < 0)
--		ptp_release(pccontext);
- 	return result;
- }
--- 
-2.25.1
+> I will send the patch soon, and assuming it lands, then you can start
+> using the feature if you wish. I would recommend basing your patches
+> on top of that patch (or `rust-next` when the patch lands),
 
+That does not work. Networking patches need to be on net-next. The
+stable branch solves that when we have cross subsystem dependencies.
+
+       Andrew
 
