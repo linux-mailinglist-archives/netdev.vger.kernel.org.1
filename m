@@ -1,74 +1,96 @@
-Return-Path: <netdev+bounces-44900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CABC7DA3A5
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 00:40:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 445267DA3BD
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 00:50:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5747F2826E2
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 22:40:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 657421C2108B
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 22:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88F33B7A6;
-	Fri, 27 Oct 2023 22:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E96D1D688;
+	Fri, 27 Oct 2023 22:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IzrjaEBE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ERAzT1n/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5BC38DF5;
-	Fri, 27 Oct 2023 22:40:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08947C433C8;
-	Fri, 27 Oct 2023 22:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51AB8F69
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 22:50:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 56260C433C8;
+	Fri, 27 Oct 2023 22:50:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698446441;
-	bh=2rCIRtKFM+3RMPf0ZVAQKOeUDSTXWIOHQEyehpzPDsk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IzrjaEBEkG0Xr84XrZyxlM92yU5kvrfPjNlirqcNGfPwVB8TrAG9V8DgOvpXBR57R
-	 UDRhz4p0tOe9MTFTUoRPkTnzuOnNWCDJtWj2+6RKOz1LLf9Pt0DDDv/q839q+9rBnd
-	 eSTMvp7fDmb0SVCmVQwSfMU9w/PHq7sN0pt65bBHiK798Wf8ybEHMuUdwucNsxScV3
-	 kjBX7BgZCqR6q88chkGsLqhFV73/SMLfy/i4HgufpkQISoCPJUPgKIBUVm7uqgkle4
-	 zGMg7cpLZwmR1hNJNpMa8pGDVMdYanqAS/YLtfBoOlkU1LZhjLgoNx/ulLsaOekk5G
-	 XQv6mPx1pfWUg==
-Date: Fri, 27 Oct 2023 15:40:40 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
- paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
- davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
- pabeni@redhat.com, leon@kernel.org, longli@microsoft.com,
- ssengar@linux.microsoft.com, linux-rdma@vger.kernel.org,
- daniel@iogearbox.net, john.fastabend@gmail.com, bpf@vger.kernel.org,
- ast@kernel.org, sharmaajay@microsoft.com, hawk@kernel.org,
- tglx@linutronix.de, shradhagupta@linux.microsoft.com,
- linux-kernel@vger.kernel.org, Konstantin Taranov <kotaranov@microsoft.com>
-Subject: Re: [PATCH net-next] Use xdp_set_features_flag instead of direct
- assignment
-Message-ID: <20231027154040.58e5b09d@kernel.org>
-In-Reply-To: <1698430011-21562-1-git-send-email-haiyangz@microsoft.com>
-References: <1698430011-21562-1-git-send-email-haiyangz@microsoft.com>
+	s=k20201202; t=1698447025;
+	bh=33QsNMsb/vZmRa5UB/QpoNgXgQRoe62LkprwWwGp/OM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ERAzT1n/R57NT/LsnLGXXMYNCOKpfwQZF8TqMM9qNjLm72CZJpEu/K4hEqk6FsZCQ
+	 Fj4Yl3Ke/VsW1ZbQmevI0iSR98PIknQzygXsGbG1+6mL3DeHvzoNg9jQDjIXFS8Nwr
+	 /qriwbBjaWjyHcmdQtdMJa3r2Tc8sXmLCE+UupQ4kINhjgnbYvQlVnWehE7/xEDaPJ
+	 sFoA/VccOCPA151MOYW+gauPvNo3LoQATL/xLwU3ebLEByuiBNaV2ZwOp4Vspxez8Y
+	 f0adOJ2dRT/c6sBWdQJ0IoAZ5xtw3IsFH/M4sVztSx6P0jkeH+SKhdW0rEjmSJ/C7P
+	 Pz8Al6COz60vQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3C7D3C41620;
+	Fri, 27 Oct 2023 22:50:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/8] Intel Wired LAN Driver Updates for 2023-10-23
+ (iavf)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169844702524.17753.3058534064088871779.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Oct 2023 22:50:25 +0000
+References: <20231027175941.1340255-1-jacob.e.keller@intel.com>
+In-Reply-To: <20231027175941.1340255-1-jacob.e.keller@intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org
 
-On Fri, 27 Oct 2023 11:06:51 -0700 Haiyang Zhang wrote:
-> From: Konstantin Taranov <kotaranov@microsoft.com>
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 27 Oct 2023 10:59:33 -0700 you wrote:
+> This series includes iAVF driver cleanups from Michal Schmidt.
 > 
-> This patch uses a helper function for assignment of xdp_features.
-> This change simplifies backports.
+> Michal removes and updates stale comments, fixes some locking anti-patterns,
+> improves handling of resets when the PF is slow, avoids unnecessary
+> duplication of netdev state, refactors away some duplicate code, and finally
+> removes the never-actually-used client interface.
+> 
+> [...]
 
-Generally making backports is not a strong enough reason to change
-upstream code, but using the helper seems like a good idea.
+Here is the summary with links:
+  - [net-next,v2,1/8] iavf: fix comments about old bit locks
+    https://git.kernel.org/netdev/net-next/c/77361cb9c1d6
+  - [net-next,v2,2/8] iavf: simplify mutex_trylock+sleep loops
+    https://git.kernel.org/netdev/net-next/c/5902ee6dc651
+  - [net-next,v2,3/8] iavf: in iavf_down, don't queue watchdog_task if comms failed
+    https://git.kernel.org/netdev/net-next/c/6a0d989d3cdb
+  - [net-next,v2,4/8] iavf: fix the waiting time for initial reset
+    https://git.kernel.org/netdev/net-next/c/54584b178806
+  - [net-next,v2,5/8] iavf: rely on netdev's own registered state
+    https://git.kernel.org/netdev/net-next/c/34ad34bf06ca
+  - [net-next,v2,6/8] iavf: use unregister_netdev
+    https://git.kernel.org/netdev/net-next/c/5c4e1d187442
+  - [net-next,v2,7/8] iavf: add a common function for undoing the interrupt scheme
+    https://git.kernel.org/netdev/net-next/c/b5b219a1fa5f
+  - [net-next,v2,8/8] iavf: delete the iavf client interface
+    https://git.kernel.org/netdev/net-next/c/36d0395b30f8
 
-I touched up the white space and title when applying, thanks!
+You are awesome, thank you!
 -- 
-pw-bot: applied
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
