@@ -1,122 +1,137 @@
-Return-Path: <netdev+bounces-44852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B4907DA21D
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 22:58:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4D077DA21F
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 23:00:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14F5E282549
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 20:58:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B32931C210AB
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 21:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513D23D383;
-	Fri, 27 Oct 2023 20:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33CF63DFE4;
+	Fri, 27 Oct 2023 21:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jb/rCVvC"
+	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="CBOIWIE3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8311A3C084
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 20:58:43 +0000 (UTC)
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919C61AA
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 13:58:41 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 012261BF203;
-	Fri, 27 Oct 2023 20:58:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1698440319;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mOCsjhN2awknGo5pBlXRMM+M86Or5ct0FJt+fQPYItw=;
-	b=jb/rCVvC0bUZIVDk76vxqa5l84U5AlmuVSm0uxO1Ymb/JI+N6EF3twM4m3Y/b3QEtNFlva
-	R7adzus77K9z/T82BdpO6UKr4C+0mAQ89i7P9v90WR85vcd8WzHUcVvCvmjTGIiiBdH9yv
-	W6Q78d6NzpKvRmtSpTs1wn7hGbZkwLKJK48+H7+kp1N5uMfVFvjjWFgh6z55G0CXKLH5F6
-	KohheqQlb2rTfYPAxqpctBHwVaZOnRQBN6VXu0sfxHg5vEkT4ymLdcVxnRF85QhsY5Mrgk
-	Uw/4ahX/8PnvXxGW3Bu7koEKS6b7T51cXKpTZ1rGBX66BrBMgXWwveuSX/cYNw==
-Date: Fri, 27 Oct 2023 22:58:36 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, Wei Fang
- <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
- <xiaoning.wang@nxp.com>, Russell King <linux@armlinux.org.uk>,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-imx@nxp.com, netdev@vger.kernel.org, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: Ethernet issue on imx6
-Message-ID: <20231027225836.11594bd5@xps-13>
-In-Reply-To: <4736f0df-3db2-4342-8bc1-219cbdd996af@lunn.ch>
-References: <20231012193410.3d1812cf@xps-13>
- <8e970415-4bc3-4c6f-8cd5-4bbd20d9261d@lunn.ch>
- <20231012155857.6fd51380@hermes.local>
- <20231013102718.6b3a2dfe@xps-13>
- <4736f0df-3db2-4342-8bc1-219cbdd996af@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707473C084;
+	Fri, 27 Oct 2023 21:00:06 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D22E187;
+	Fri, 27 Oct 2023 14:00:05 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1004)
+	id 9D8C720B74C0; Fri, 27 Oct 2023 14:00:04 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9D8C720B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1698440404;
+	bh=tjnE9pRfC9wpL1nxaW/eCyk+NG9baQ7UvLcZ/DLAOVU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=CBOIWIE367mUa46w0DH2cViihfVP/wILGd2QxuPGXJ6dhX36MPeJQ03W/tgH7f+c9
+	 wYTGm0su2uLDq0O3A1rIi0V3BwpRNVbYzOeBA3Bzx06kb5x1cmTC++XZYs9gvgpcOE
+	 9VaFmC7M1MMubiK819RDilJ4yDVrx4XFijiSWAW8=
+From: longli@linuxonhyperv.com
+To: "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Long Li <longli@microsoft.com>
+Subject: [Patch v2] hv_netvsc: Mark VF as slave before exposing it to user-mode
+Date: Fri, 27 Oct 2023 13:59:50 -0700
+Message-Id: <1698440390-13719-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hi Andrew,
+From: Long Li <longli@microsoft.com>
 
-andrew@lunn.ch wrote on Fri, 13 Oct 2023 17:51:20 +0200:
+When a VF is being exposed form the kernel, it should be marked as "slave"
+before exposing to the user-mode. The VF is not usable without netvsc running
+as master. The user-mode should never see a VF without the "slave" flag.
 
-> > # ethtool -S eth0
-> > NIC statistics:
-> >      tx_dropped: 0
-> >      tx_packets: 10118
-> >      tx_broadcast: 0
-> >      tx_multicast: 13
-> >      tx_crc_errors: 0
-> >      tx_undersize: 0
-> >      tx_oversize: 0
-> >      tx_fragment: 0
-> >      tx_jabber: 0
-> >      tx_collision: 0
-> >      tx_64byte: 130
-> >      tx_65to127byte: 61031
-> >      tx_128to255byte: 19
-> >      tx_256to511byte: 10
-> >      tx_512to1023byte: 5
-> >      tx_1024to2047byte: 14459
-> >      tx_GTE2048byte: 0
-> >      tx_octets: 26219280 =20
->=20
-> These values come from the hardware. They should reflect what actually
-> made it onto the wire.
->=20
-> Do the values match what the link peer actually received?
->=20
-> Also, can you compare them to what iperf says it transmitted.
->=20
-> From this, we can rule out the industrial cable, and should also be
-> able to rule out the receiver is the problem, not the transmitter.
+This commit moves the code of setting the slave flag to the time before VF is
+exposed to user-mode.
 
-I've investigated this further and found a strange relationship with
-the display subsystem. It seems like there is some congestion happening
-at the interconnect level. I wanted to point out that your hints helped
-as I observed that the above counters were incrementing as expected,
-but the packets were just not sent out. My interpretation is some
-kind of uDMA timeout caused by some hardware locking on the NIC by
-the IPU which cannot be diagnosed at the ENET level (the interrupt
-handler is firing but the skb's are not sent out, but we have no
-error status for that).
+Signed-off-by: Long Li <longli@microsoft.com>
+---
 
-Here is the link of the thread I've just started with DRM people in
-order to really tackle this issue:
-https://lists.freedesktop.org/archives/dri-devel/2023-October/428251.html
+Change since v1:
+Use a new function to handle NETDEV_POST_INIT.
 
-Thanks,
-Miqu=C3=A8l
+ drivers/net/hyperv/netvsc_drv.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index ec77fb9dcf89..fdad58dcc6a8 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2206,9 +2206,6 @@ static int netvsc_vf_join(struct net_device *vf_netdev,
+ 		goto upper_link_failed;
+ 	}
+ 
+-	/* set slave flag before open to prevent IPv6 addrconf */
+-	vf_netdev->flags |= IFF_SLAVE;
+-
+ 	schedule_delayed_work(&ndev_ctx->vf_takeover, VF_TAKEOVER_INT);
+ 
+ 	call_netdevice_notifiers(NETDEV_JOIN, vf_netdev);
+@@ -2320,11 +2317,9 @@ static struct net_device *get_netvsc_byslot(const struct net_device *vf_netdev)
+ 	 */
+ 	list_for_each_entry(ndev_ctx, &netvsc_dev_list, list) {
+ 		ndev = hv_get_drvdata(ndev_ctx->device_ctx);
+-		if (ether_addr_equal(vf_netdev->perm_addr, ndev->perm_addr)) {
+-			netdev_notice(vf_netdev,
+-				      "falling back to mac addr based matching\n");
++		if (ether_addr_equal(vf_netdev->perm_addr, ndev->perm_addr) ||
++		    ether_addr_equal(vf_netdev->dev_addr, ndev->perm_addr))
+ 			return ndev;
+-		}
+ 	}
+ 
+ 	netdev_notice(vf_netdev,
+@@ -2332,6 +2327,19 @@ static struct net_device *get_netvsc_byslot(const struct net_device *vf_netdev)
+ 	return NULL;
+ }
+ 
++static int netvsc_prepare_slave(struct net_device *vf_netdev)
++{
++	struct net_device *ndev;
++
++	ndev = get_netvsc_byslot(vf_netdev);
++	if (!ndev)
++		return NOTIFY_DONE;
++
++	/* set slave flag before open to prevent IPv6 addrconf */
++	vf_netdev->flags |= IFF_SLAVE;
++	return NOTIFY_DONE;
++}
++
+ static int netvsc_register_vf(struct net_device *vf_netdev)
+ {
+ 	struct net_device_context *net_device_ctx;
+@@ -2753,6 +2761,8 @@ static int netvsc_netdev_event(struct notifier_block *this,
+ 		return NOTIFY_DONE;
+ 
+ 	switch (event) {
++	case NETDEV_POST_INIT:
++		return netvsc_prepare_slave(event_dev);
+ 	case NETDEV_REGISTER:
+ 		return netvsc_register_vf(event_dev);
+ 	case NETDEV_UNREGISTER:
+-- 
+2.34.1
+
 
