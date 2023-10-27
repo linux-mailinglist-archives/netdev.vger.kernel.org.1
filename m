@@ -1,151 +1,135 @@
-Return-Path: <netdev+bounces-44622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F21E97D8D05
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:06:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D035C7D8D14
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:20:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6C76B21262
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:06:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7810D282208
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CF21115;
-	Fri, 27 Oct 2023 02:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956DC15BF;
+	Fri, 27 Oct 2023 02:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Klr+QpIl"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="CT1RE1UY"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3019810F7;
-	Fri, 27 Oct 2023 02:06:25 +0000 (UTC)
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65257187;
-	Thu, 26 Oct 2023 19:06:24 -0700 (PDT)
-Received: by mail-vs1-xe33.google.com with SMTP id ada2fe7eead31-457c441555cso694860137.3;
-        Thu, 26 Oct 2023 19:06:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698372383; x=1698977183; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kZs7O2u/plePQaOCB1yVLsFRWwAAB+J3QFH9mqRARyE=;
-        b=Klr+QpIllrk3zH9s6uTRwqHYUOI57/pNUGEMjsaOCtV4rTuJg3cHIDgQAZn/QX9EMK
-         HsGyS5lXrYeVEcNIRP6rn0ba5RNglM0XumNqpwIoLQrWK+FW6MP2d2i8BQrp9ftoMCxZ
-         ibKoBPR3WKtYdMUQoZzjU58Kn6OK0L2k5/QsGBRU/l21uzp/3nNNeK/u4PBpc4DxgLVo
-         RqWlrYs7rbFskFTq/SYLybrfEYMeuGSYsK+rg1iMDtVIaQ2rosNKXHOhUqLXatXbLQus
-         aavDwUOOUgVwU5TnKndIAbztVIW9GWQXwEIDv1gtcD/IAIoGMARLVaN3IXGaRD+sWQ+u
-         A/Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698372383; x=1698977183;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kZs7O2u/plePQaOCB1yVLsFRWwAAB+J3QFH9mqRARyE=;
-        b=sTjf6YYqMaUtNkts6fDMvHHkBWXm1rQhjYKQRdSq6c+NbOax/sxg3w7bqjGZO2esKt
-         ViB2Pt33O8bujRXpLeHvxaYmED8W7BTsZRifAaIqbQDfOKqcMJzFcQcoHgCJGHk4vmNj
-         hoJs7hkxMFCJVL1isOmUq64Ew1RFu6HdMqNDyZXlzgF3w4LBtA4ozSwcomStNvzwCN1u
-         wZ3NKDRnPvDYFc9u6oA3/N8P+XITmT+MO99RBTwZmLO+i6d7UbiDl8B6poqp5ZU9NZMQ
-         v5Nag9pmjr49qJzidQtEl+sSWcKL4QZ821g+DAXLTqLX51A3aJouEtk7awGEJt05Mz1Y
-         j53Q==
-X-Gm-Message-State: AOJu0Yx4Ri5t3OXRQNdEPj+YkFovRWrYHqF9tf2WxrYw+5JEPbOENbLL
-	jREtOOxn6Wgi1K0ikGzLkdc=
-X-Google-Smtp-Source: AGHT+IEp5rB+0mmnsNUP7K9wy+H1mibKGdaEWvD1isMfVpg01Lhz1LLWfTnEcH1VGWR3kxmrew1IiA==
-X-Received: by 2002:a67:c309:0:b0:454:5a16:890d with SMTP id r9-20020a67c309000000b004545a16890dmr1493417vsj.24.1698372383301;
-        Thu, 26 Oct 2023 19:06:23 -0700 (PDT)
-Received: from auth2-smtp.messagingengine.com (auth2-smtp.messagingengine.com. [66.111.4.228])
-        by smtp.gmail.com with ESMTPSA id a16-20020a5b0ed0000000b00d8674371317sm270303ybs.36.2023.10.26.19.06.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Oct 2023 19:06:22 -0700 (PDT)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-	by mailauth.nyi.internal (Postfix) with ESMTP id 35B1027C0054;
-	Thu, 26 Oct 2023 22:06:22 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Thu, 26 Oct 2023 22:06:22 -0400
-X-ME-Sender: <xms:HRs7ZfPhViSRhPruAI_NsRT6pjjS5gTZNLBUuDrgp43m0hBTIbgP3g>
-    <xme:HRs7ZZ-i-NWkeqiZ_bpWDvITUqoxZLbCuE7f9NuyR8qP0BK-woHNAQdyOUPIq265_
-    LrfMavJSb8BkZRkpA>
-X-ME-Received: <xmr:HRs7ZeRv7EBZbUfjdbJDnZBJF5nv8b5QzwRulvQ_wTce-QgLpl13TSdYCQc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrleefgdehiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepuehoqhhu
-    nhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrg
-    htthgvrhhnpeevgffhueevkedutefgveduuedujeefledthffgheegkeekiefgudekhffg
-    geelfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    gsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdei
-    gedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfih
-    igmhgvrdhnrghmvg
-X-ME-Proxy: <xmx:HRs7ZTvoRTRgfjMX_gjgvyEztzhbDLxa_idbz8pdcGQKdNYbUf2HUw>
-    <xmx:HRs7ZXenEI2Jt6W1QuQcQhmrm3tYqyCIxtg0JO_Z_SDOd1vS-N7LCw>
-    <xmx:HRs7Zf3TJhvvES4R4F6TQIycaHmDhS068vGhHr5B9LkWkxEsMSrfYg>
-    <xmx:Hhs7ZZsS3Idzc2sf1sHmxGAu2GQvTM_1_2kvl5BmSncazErxet-jAw>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 26 Oct 2023 22:06:21 -0400 (EDT)
-Date: Thu, 26 Oct 2023 19:06:19 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	benno.lossin@proton.me, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 0/5] Rust abstractions for network PHY drivers
-Message-ID: <ZTsbG7JMzBwcYzhy@Boquns-Mac-mini.home>
-References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
- <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com>
- <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2382510F7
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:20:12 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BC46187;
+	Thu, 26 Oct 2023 19:20:11 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39QIoI84018729;
+	Thu, 26 Oct 2023 19:20:05 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=58+E2NdiPRM8G/yOQoiAbQz0nAwGmwsHu+Lu5Ee2A7k=;
+ b=CT1RE1UYfV4zhEGOWSC5/3oSVE3rYf4s6LAfa6M4+14L0TzgFMVV4E0xgRDUTXy+dIp/
+ 0hEy5Crd3nCrMEyhF9O6hdVjYVff0t8tsmYdaBEZyuditDfv7c0H/KHTqAaTtNW4zdsv
+ X39Dlib8UzDNNv/0vJL1VmGBHEFI0Ka64G+5triXhvnuZd4ILWTi9QutYjmaSGcvyZP+
+ V0G4MnmQ+T7QpM7aUzIU5dGRQhR0NiE9OnD+tA4GY1pkbDMLEuleSjLUZCiveOGZ05Ml
+ mdKgykciVdrqTlUpP2q/1mW2NE3XwJ7DCjBSNWKSpZBX+YUGgE8Vg6iBRiefL9VQgS2Z Fg== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3tywr81e17-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 26 Oct 2023 19:20:05 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 26 Oct
+ 2023 19:20:03 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 26 Oct 2023 19:20:03 -0700
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 8E3883F7082;
+	Thu, 26 Oct 2023 19:19:59 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <wojciech.drewek@intel.com>,
+        "Ratheesh Kannoth" <rkannoth@marvell.com>
+Subject: [PATCH net v1 1/2] octeontx2-pf: Fix error codes
+Date: Fri, 27 Oct 2023 07:49:52 +0530
+Message-ID: <20231027021953.1819959-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch>
+Content-Type: text/plain
+X-Proofpoint-GUID: VMFMEzM09_6SeQ5Cf8wsf08RXU4X_KwD
+X-Proofpoint-ORIG-GUID: VMFMEzM09_6SeQ5Cf8wsf08RXU4X_KwD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-26_22,2023-10-26_01,2023-05-22_02
 
-On Fri, Oct 27, 2023 at 01:48:42AM +0200, Andrew Lunn wrote:
-> On Thu, Oct 26, 2023 at 12:39:46PM +0200, Miguel Ojeda wrote:
-> > On Thu, Oct 26, 2023 at 2:16 AM FUJITA Tomonori
-> > <fujita.tomonori@gmail.com> wrote:
-> > >
-> > > This patchset adds Rust abstractions for phylib. It doesn't fully
-> > > cover the C APIs yet but I think that it's already useful. I implement
-> > > two PHY drivers (Asix AX88772A PHYs and Realtek Generic FE-GE). Seems
-> > > they work well with real hardware.
-> > 
-> > This patch series has had 8 versions in a month. It would be better to
-> > wait more between revisions for this kind of patch series, especially
-> > when there is discussion still going on in the previous ones and it is
-> > a new "type" of code.
-> 
-> That is actually about right for netdev. As i said, netdev moves fast,
-> review comments are expected within about 3 days. We also say don't
-> post a new version within 24 hours. So that gives you an idea of the
-> min and max.
-> 
-> It is however good to let discussion reach some sort of conclusion,
-> but that also requires prompt discussion. And if that discussion is
-> not prompt, posting a new version is a way to kick reviewers into
-> action.
-> 
+Some of error codes were wrong. Fix the same.
 
-I wonder whether that actually helps, if a reviewer takes average four
-days to review a version (wants to give accurate comments and doesn't
-work on this full time), and the developer send a new version every
-three days, there is no possible way for the developer to get the
-reviews.
+Fixes: 51afe9026d0c ("octeontx2-pf: NIX TX overwrites SQ_CTX_HW_S[SQ_INT]")
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-(Honestly, if people could reach out to a conclusion for anything in
-three days, the world would be a much more peaceful place ;-))
+---
 
-Regards,
-Boqun
+ChangeLog
+v0 -> v1: Splitted patch into two
+---
+ .../marvell/octeontx2/nic/otx2_struct.h       | 34 +++++++++----------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-> 	Andrew
-> 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h
+index fa37b9f312ca..4e5899d8fa2e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_struct.h
+@@ -318,23 +318,23 @@ enum nix_snd_status_e {
+ 	NIX_SND_STATUS_EXT_ERR = 0x6,
+ 	NIX_SND_STATUS_JUMP_FAULT = 0x7,
+ 	NIX_SND_STATUS_JUMP_POISON = 0x8,
+-	NIX_SND_STATUS_CRC_ERR = 0x9,
+-	NIX_SND_STATUS_IMM_ERR = 0x10,
+-	NIX_SND_STATUS_SG_ERR = 0x11,
+-	NIX_SND_STATUS_MEM_ERR = 0x12,
+-	NIX_SND_STATUS_INVALID_SUBDC = 0x13,
+-	NIX_SND_STATUS_SUBDC_ORDER_ERR = 0x14,
+-	NIX_SND_STATUS_DATA_FAULT = 0x15,
+-	NIX_SND_STATUS_DATA_POISON = 0x16,
+-	NIX_SND_STATUS_NPC_DROP_ACTION = 0x17,
+-	NIX_SND_STATUS_LOCK_VIOL = 0x18,
+-	NIX_SND_STATUS_NPC_UCAST_CHAN_ERR = 0x19,
+-	NIX_SND_STATUS_NPC_MCAST_CHAN_ERR = 0x20,
+-	NIX_SND_STATUS_NPC_MCAST_ABORT = 0x21,
+-	NIX_SND_STATUS_NPC_VTAG_PTR_ERR = 0x22,
+-	NIX_SND_STATUS_NPC_VTAG_SIZE_ERR = 0x23,
+-	NIX_SND_STATUS_SEND_MEM_FAULT = 0x24,
+-	NIX_SND_STATUS_SEND_STATS_ERR = 0x25,
++	NIX_SND_STATUS_CRC_ERR = 0x10,
++	NIX_SND_STATUS_IMM_ERR = 0x11,
++	NIX_SND_STATUS_SG_ERR = 0x12,
++	NIX_SND_STATUS_MEM_ERR = 0x13,
++	NIX_SND_STATUS_INVALID_SUBDC = 0x14,
++	NIX_SND_STATUS_SUBDC_ORDER_ERR = 0x15,
++	NIX_SND_STATUS_DATA_FAULT = 0x16,
++	NIX_SND_STATUS_DATA_POISON = 0x17,
++	NIX_SND_STATUS_NPC_DROP_ACTION = 0x20,
++	NIX_SND_STATUS_LOCK_VIOL = 0x21,
++	NIX_SND_STATUS_NPC_UCAST_CHAN_ERR = 0x22,
++	NIX_SND_STATUS_NPC_MCAST_CHAN_ERR = 0x23,
++	NIX_SND_STATUS_NPC_MCAST_ABORT = 0x24,
++	NIX_SND_STATUS_NPC_VTAG_PTR_ERR = 0x25,
++	NIX_SND_STATUS_NPC_VTAG_SIZE_ERR = 0x26,
++	NIX_SND_STATUS_SEND_MEM_FAULT = 0x27,
++	NIX_SND_STATUS_SEND_STATS_ERR = 0x28,
+ 	NIX_SND_STATUS_MAX,
+ };
+ 
+-- 
+2.25.1
+
 
