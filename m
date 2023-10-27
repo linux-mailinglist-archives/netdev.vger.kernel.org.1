@@ -1,306 +1,330 @@
-Return-Path: <netdev+bounces-44808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCC907D9ED2
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 19:24:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 535C27D9EEE
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 19:36:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DBE42823DA
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 17:24:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74A1E1C20E4B
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 17:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9383439875;
-	Fri, 27 Oct 2023 17:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3CD3987C;
+	Fri, 27 Oct 2023 17:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ecSxUd6n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VIQv8fWA"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2DF2F37
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 17:24:51 +0000 (UTC)
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D608AB8
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:24:49 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5a86b6391e9so17983337b3.0
-        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:24:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1698427489; x=1699032289; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Za9e5Dh/4QheDvhTWG1blgAX1sntB8GoxogcjDHf4KA=;
-        b=ecSxUd6ntwbhNRICYob7KgeH+2BIPGPk/51EyO9Fnrlz0uGTMrlepKwvJM/Fc0Zt/H
-         UQDnqXDkX6idZr4mNoD/YMm3A6qDUYYyjtHFcdyhQPjVtQVWcpI8StNO5BYYntgHygbc
-         NVuuOMaALD47ypQlJMPnCZHkQuQ56Z67kMh/Z9yNP9lmvNDgtkn8RcqZM9mZjUawaQGW
-         PlHAk3dS7vLeK01lTBuDKLzWEjOiotj4jvkmvixcPa0ckjlp08sN48z0LE3xZ3SeFJgV
-         bim03silzoieFmj7l5dmvPgqF1zSpTOPNXaMJVNb1gXZzfGJJaT5fHG28LhiRou9tGfe
-         7IgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698427489; x=1699032289;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Za9e5Dh/4QheDvhTWG1blgAX1sntB8GoxogcjDHf4KA=;
-        b=FuYcRdqNowGIUqM0NVYYXMtyZbeYDy9Ugs/MTPowj4hRQ8Y2LFssH3Rwq39dzxXs/g
-         6aFVtxV67ofJ8BTK3IvO82j5AFtAh51WjghX7z22OJhce2Sb20MN0G9JWfllBtxDh0uR
-         mlbVf/i8Pedp6cYFGK310LLpfzV3c0JEEpe7hvyLgD3tUx2PbCDhz7ch1PKX0/V4jk2Q
-         cjOlabeB+WjWrBDbQG/UeJ//TZiqT5aYEdK5K6n+knHoNZeT4aeowRkhs9sfLb93IV0m
-         fG0zFuf1TLd61etbQLMnY8B0lroPoNRaFRvJG/wbIjtwJQa4JZ0HAA266O8PsD+YPxmK
-         CG9w==
-X-Gm-Message-State: AOJu0Yx3Pcw1Do4smB3dQWB35GseTyn2DVbym7i3JF/yDIxM9ulWLick
-	ZleD1NpiATafh9VP961R5HHeCg5YqMZaNruGIyFlcA==
-X-Google-Smtp-Source: AGHT+IHcuu7sO7dg/XgOLhNsoEhg+OKa5f6/8kEPQoIT7JshSd7rY6W4bBRm0yDC1jVpUadifHW/d6Y58/QRUpp4/Lk=
-X-Received: by 2002:a81:9955:0:b0:5a8:1654:4b6f with SMTP id
- q82-20020a819955000000b005a816544b6fmr3178720ywg.17.1698427488962; Fri, 27
- Oct 2023 10:24:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E3B2F37
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 17:36:20 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C837E5;
+	Fri, 27 Oct 2023 10:36:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698428178; x=1729964178;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=rR4bKYKyDVEbt+DkgJKPL8+Sp4HIEcgVN944diibFKU=;
+  b=VIQv8fWA5Oha+wy8LVPg1Z0kH/r02EUxXMWr3q7xaYVpIgaPBs7IpRMk
+   dk9+JC1NrhxPI8CwRiGh3v8bWQRa1w0KJv8CMMuPtqoyjmEXb3jmWpgFl
+   aTszbLrD9a9acIkt7FItbT7lyyZOuxmWHCPD4SKYu6c1j99iykbizjl/q
+   MV4ICosOln0MfZsedLq70NM0fqqP8sUmf/sdsK0MSRQ7D9IizBx+Y44DJ
+   363EIzu/DZ0/sUUjPYB1XL8UM3PCenfNT/cVm7Lq3GH8uOKo8N8GpwOqB
+   NKy0vEm8e/mrLWODEMtkZCEkbZVIYXHQCPHxtz008GNGNroCWnDp/PQ8J
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="378188150"
+X-IronPort-AV: E=Sophos;i="6.03,256,1694761200"; 
+   d="scan'208";a="378188150"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2023 10:36:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10876"; a="794642003"
+X-IronPort-AV: E=Sophos;i="6.03,256,1694761200"; 
+   d="scan'208";a="794642003"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Oct 2023 10:36:16 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Fri, 27 Oct 2023 10:36:16 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Fri, 27 Oct 2023 10:36:16 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Fri, 27 Oct 2023 10:36:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JSVLNIT7pcGQLt7lgrlI+x/VidNHoBMRjKQs1Pirvc7rc4xGkaomUMJETFfr1GMiU0LN5hIRMgLa78Q2z3LNE5HIVTPRG2PyLVNi+E0H/MMl4mKYg5KxsBDXVW8RLfNYjEOtCVU3g1WwFzoVuclbN1kpbuLi7Wc9K0sSTDAWT51zXzH0MOgW14AIGcSj+ByL+fk70TeQGdXz10S4Ugtk0lsWHn3MSuCqjtL/WWvtgmvYVkWvqPy8pIFAMj/HOHf7yfSs5izjsY5MWY+1/2ZjgVCbEYHsLgjcJLm2Teioc8evJq+7Dr0WrKjYx29v8theJsR20dcXcOrrogvCzkrM1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=esjXQ9FiO/5SdiP1++xqhLFlmkuJLBHm0R0nxnb6Fow=;
+ b=WjFudu2VAJdcJtFmQLYc4MXqCSN8PqOUrZLXZbzWUua/Xo7ZUreiYKkrJoruyuQ7wcB0pdjLdaK7WovnJTVe0jDl06UtydgZjilCqw0GzFYKgbQj1z0MAS9AD7bexBb6ZMMR1ij66qkEQTEZVPbiUHwQQ4mgQkzX3deagjug6m5DOaOTh4Bi1T14VsIzyNAf5ZG27Xs/Qk9aQUGe3Pz5mvuQZCrAkSuiUiQAQQaT6OM4u1C6i3G6aU5My3HLmDZ1TWpYi1SF8xJlkk+pHSv+bjrwWJOV31KShBtf6HHuiOm1QRP8Lducj1ntW17q7eVBkEy99EdRMaf0u6qwIhLrHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by CH3PR11MB7915.namprd11.prod.outlook.com (2603:10b6:610:12f::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.23; Fri, 27 Oct
+ 2023 17:36:08 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::2724:db16:fe7b:2ffa]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::2724:db16:fe7b:2ffa%6]) with mapi id 15.20.6933.024; Fri, 27 Oct 2023
+ 17:36:08 +0000
+Message-ID: <2ad82651-8e52-47ea-a567-2382b26f3c71@intel.com>
+Date: Fri, 27 Oct 2023 10:36:05 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 5/5] net: bcmgenet: Interrogate PHY for
+ WAKE_FILTER programming
+Content-Language: en-US
+To: Florian Fainelli <florian.fainelli@broadcom.com>, <netdev@vger.kernel.org>
+CC: Doug Berger <opendmb@gmail.com>, Broadcom internal kernel review list
+	<bcm-kernel-feedback-list@broadcom.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+	<andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+	<linux@armlinux.org.uk>, Vladimir Oltean <vladimir.oltean@nxp.com>, "Tariq
+ Toukan" <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Willem de Bruijn
+	<willemb@google.com>, Daniil Tatianin <d-tatianin@yandex-team.ru>, "Simon
+ Horman" <horms@kernel.org>, Justin Chen <justin.chen@broadcom.com>, "Ratheesh
+ Kannoth" <rkannoth@marvell.com>, Joe Damato <jdamato@fastly.com>, "Vincent
+ Mailhol" <mailhol.vincent@wanadoo.fr>, Jiri Pirko <jiri@resnulli.us>, "open
+ list" <linux-kernel@vger.kernel.org>
+References: <20231026224509.112353-1-florian.fainelli@broadcom.com>
+ <20231026224509.112353-6-florian.fainelli@broadcom.com>
+ <0a164b9b-4f9b-4886-b19e-48298cdcff8d@intel.com>
+ <2eeb8e24-4122-450b-adf5-8c8a746db518@broadcom.com>
+ <6456509b-9df7-47e3-b941-c307594a80d2@intel.com>
+ <93abb8d0-40c6-4758-a8de-c79d7acce6bc@broadcom.com>
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <93abb8d0-40c6-4758-a8de-c79d7acce6bc@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0282.namprd03.prod.outlook.com
+ (2603:10b6:303:b5::17) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027135142.11555-1-daniel@iogearbox.net>
-In-Reply-To: <20231027135142.11555-1-daniel@iogearbox.net>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 27 Oct 2023 13:24:37 -0400
-Message-ID: <CAM0EoMm9K=jS=JZUNXo+C6qs=p=r7CtjWK20ocmTKEDxN3Bz-w@mail.gmail.com>
-Subject: Re: [PATCH net-next] net, sched: Fix SKB_NOT_DROPPED_YET splat under
- debug config
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: kuba@kernel.org, idosch@idosch.org, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Oct 27, 2023 at 9:51=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
->
-> Ido reported:
->
->   [...] getting the following splat [1] with CONFIG_DEBUG_NET=3Dy and thi=
-s
->   reproducer [2]. Problem seems to be that classifiers clear 'struct
->   tcf_result::drop_reason', thereby triggering the warning in
->   __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0). [..=
-.]
->
->   [1]
->   WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x3=
-8/0x130
->   Modules linked in:
->   CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d958=
-2e0 #682
->   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc=
-37 04/01/2014
->   RIP: 0010:kfree_skb_reason+0x38/0x130
->   [...]
->   Call Trace:
->    <IRQ>
->    __netif_receive_skb_core.constprop.0+0x837/0xdb0
->    __netif_receive_skb_one_core+0x3c/0x70
->    process_backlog+0x95/0x130
->    __napi_poll+0x25/0x1b0
->    net_rx_action+0x29b/0x310
->    __do_softirq+0xc0/0x29b
->    do_softirq+0x43/0x60
->    </IRQ>
->
->   [2]
->   #!/bin/bash
->
->   ip link add name veth0 type veth peer name veth1
->   ip link set dev veth0 up
->   ip link set dev veth1 up
->   tc qdisc add dev veth1 clsact
->   tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:2=
-2:33:44:55 action drop
->   mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
->
-> What happens is that inside most classifiers the tcf_result is copied ove=
-r
-> from a filter template e.g. *res =3D f->res which then implicitly overrid=
-es
-> the prior SKB_DROP_REASON_TC_{INGRESS,EGRESS} default drop code which was
-> set via sch_handle_{ingress,egress}() for kfree_skb_reason().
->
-> Add a small helper tcf_set_result() and convert classifiers over to it.
-> The latter leaves the drop code intact and classifiers, actions as well
-> as the action engine in tcf_exts_exec() can then in future make use of
-> tcf_set_drop_reason(), too.
->
-> Tested that the splat is fixed under CONFIG_DEBUG_NET=3Dy with the repro.
->
-> Fixes: 54a59aed395c ("net, sched: Make tc-related drop reason more flexib=
-le")
-> Reported-by: Ido Schimmel <idosch@idosch.org>
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Link: https://lore.kernel.org/netdev/ZTjY959R+AFXf3Xy@shredder
-> ---
->  include/net/pkt_cls.h    | 12 ++++++++++++
->  net/sched/cls_basic.c    |  2 +-
->  net/sched/cls_bpf.c      |  2 +-
->  net/sched/cls_flower.c   |  2 +-
->  net/sched/cls_fw.c       |  2 +-
->  net/sched/cls_matchall.c |  2 +-
->  net/sched/cls_route.c    |  4 ++--
->  net/sched/cls_u32.c      |  2 +-
->  8 files changed, 20 insertions(+), 8 deletions(-)
->
-> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-> index a76c9171db0e..31d8e8587824 100644
-> --- a/include/net/pkt_cls.h
-> +++ b/include/net/pkt_cls.h
-> @@ -160,6 +160,18 @@ static inline void tcf_set_drop_reason(struct tcf_re=
-sult *res,
->         res->drop_reason =3D reason;
->  }
->
-> +static inline void tcf_set_result(struct tcf_result *to,
-> +                                 const struct tcf_result *from)
-> +{
-> +       /* tcf_result's drop_reason which is the last member must be
-> +        * preserved and cannot be copied from the cls'es tcf_result
-> +        * template given this is carried all the way and potentially
-> +        * set to a concrete tc drop reason upon error or intentional
-> +        * drop. See tcf_set_drop_reason() locations.
-> +        */
-> +       memcpy(to, from, offsetof(typeof(*to), drop_reason));
-> +}
->
-
-I believe our bigger issue here is we are using this struct now for
-both policy set by the control plane and for runtime decisions
-(drop_reason) - whereas the original assumption was this struct only
-held set policy. In retrospect we should have put the verdict(which is
-policy) here and return the error code (as was in the first patch). I
-am also not sure humans would not make a mistake on "this field must
-be at the end of the struct". Can we put some assert (or big comment
-on the struct) to make sure someone does not overwrite this field?
-Also what happens if "from" above has a set drop_reason - is that
-lost? Do you need an assert there as well?
-BTW: The simple patch i posted fixes the problem as well (i actually
-tested it minus the typo i sent).
-
-cheers,
-jamal
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CH3PR11MB7915:EE_
+X-MS-Office365-Filtering-Correlation-Id: e28bb0e5-e458-4ab5-6c2b-08dbd7133444
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dU6k8bF6gQUlcVQX/Rv3IFoRLMt7M8fJaSuO+QCPEgaDFPd2fKNFeF4Cac+qtJlxCHzuoIbg2XBHKbgkl5PeS9ejTpH5qo1QpC2ki+LVsyg5ryDipVlliM9rPkg6oi/lUB66qSuQNdKX7dopCoISZAJTW6FcBK3hniYvxuB7QkkRvMNNd0SiZGz2Fl0aS9zgPaKXsJRnMCPUpqSCZKqoGB51gCjzuLLY3mjW6P/lrrFYUGKC5G3JmGxvSdPk+tOftpfHiSW1RmH9N9aAlz3hRsUcShOvMJWeRCiPFSoZstlQ5rikH1mWt64W3z/1b18/P9GGm6FEHfQA6n4+ro95k+kPPsN88EWrjHwEZXP0HigeARAFXk+tGtAjnYs8XFvZ7DKOx5rl1d+GvZHBuRW6b6T50nSlJCwD1sNKYxKUfE1rGKko9dAqMQbje9hzK8JbAOpmFuU8FBp2PDY18qt0aANat8+sqwBU4FxLHnMTjdQacO+P4SBiqESYCzbR1I2IxqhG1370lMbyuogwwKOLeLRB1etkiAws49JDW2xRrqNUDnVFoaCNe2W+AtMKMaHVdctz4uBWJ2DeBM1UljUs61wR3JYG6Vt54yNo44MAIi6Zp4mUZc/F4OdOY6HEBxUqLvMMWAvD3nwJ3N1P8vR5sA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(396003)(366004)(39860400002)(136003)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(31686004)(82960400001)(26005)(38100700002)(66899024)(83380400001)(4326008)(41300700001)(31696002)(8676002)(66556008)(2906002)(5660300002)(66946007)(8936002)(7416002)(86362001)(66476007)(316002)(54906003)(478600001)(6506007)(36756003)(53546011)(6666004)(966005)(6486002)(2616005)(6512007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L3IzSlE0eitCWHVYNEhYZDFSeXVVdnVISFFLaVJ5aTRjbmtEcjZmNmUrT1hL?=
+ =?utf-8?B?NmlyZ29LVGR1YzBacFV0ckZjbkxLcEVKU2Zad1hSVFZQc1czbHQ2cS91MFpE?=
+ =?utf-8?B?Q0NTNFNaRXVpTi9VVU5tcnBueGtXSDVzMEJtd3MydlZ3L1ZLN1czKzMvbXFG?=
+ =?utf-8?B?eWkzZmVEbUxacU15UUNWRzNadDZBUm5temFYcjJOemlUV2JOSHZ6eGhHeFM5?=
+ =?utf-8?B?VTZENFNWOEZZaTZka3BDTGVsajFzSHJOTlZiNHdCbmJ4YThUWmJXbW9JTXBz?=
+ =?utf-8?B?TER3SFZHRW0zSnc0VzhwUlE3aGJoYkJUZDU5SmlRUGJGaUV2TzNQNjFESVh3?=
+ =?utf-8?B?cUtQY0FQZXpERCsxZmg3TDZTdnlFY2RoWitLQ2czTzkrYUp6WEM3clVGTEdw?=
+ =?utf-8?B?eWZpRExkWDQzdVBiK1VEV3greFVReUZDL25QZ3Ryc1hwaUpqTGRLY3pPbkw5?=
+ =?utf-8?B?djdDY2R2ZTdHMVFqQ1l4bTJmSWdKTFdBTFAvdkRScHV5ZkNoUWNWYU9aMUtK?=
+ =?utf-8?B?Z1JpbWZVeGZSdmV6aUhFM2NIbWx2YWI3Qm5xNktxMkVLZ3J0ZXVWYmVOS1M4?=
+ =?utf-8?B?WU1jdVFMcERTTVNoL0xLL1Q3Y2VocnNrU2E0ZFFSdFRTS2FwQ01hMm83Y3hQ?=
+ =?utf-8?B?a2xKMWdCUGNQUGtJdTdtSG1WaFZDemd5RkVCTU14TzM2VXcwNCtkdGhCKzlJ?=
+ =?utf-8?B?N3ZBb1hNL1FHTDlZbDJNWHg5WkJIaWZvc1VRd3czeXZOM1RvbGpGZzVSOFNU?=
+ =?utf-8?B?c0JCbXpLcmR2YzU4RXlWRWZxYUV1alQzZ2Z3cGVFSzBhU21QRG1FVUsyN21N?=
+ =?utf-8?B?SE41NE8rWlRreE9hL2dpVG9LQjZPdElaUjhqQzhwZFJ1N3loN1RCSFl3RDd5?=
+ =?utf-8?B?T3hzRnBNVjVaTFU4N1kvQWZxM1lBZ1pvZ1MyOTE2UUl1eHN5TlVmREh4ZUow?=
+ =?utf-8?B?eVMzNDdJR3dJQkIzNmF0WUpkcnZPVHJ1d2ZSWEFqcUtGU2N2bVM5MnEvVVd6?=
+ =?utf-8?B?SVBHVndxeGNrNFhDVmZyM2U4THpiZzdNN1hMeTM3NXpzS2pzU21heGxiZ1kz?=
+ =?utf-8?B?SDZMY2x6ZDk3R1dRSDZXRDRUQk5CbVExTXlCVSt2VzUvTXlqMGRkMGUwRFBM?=
+ =?utf-8?B?czFXNlhtUmE0SWhvTnV3ZXlwWW5uTjNhdG1DSHBCSnpDRFhoQ0VNaUNCQW9k?=
+ =?utf-8?B?Z0lwbEVTUjNkTmZPelJ1WndvRktoMVhPTGVFR1k4T2ZIaUlhejFUdTlpRDJB?=
+ =?utf-8?B?ZUFUSmc2UnI1eURxdTVYQWJSV2FpS3BVUmVFTHlCTzUxb3A2S2VmdkhSNURV?=
+ =?utf-8?B?ZHlVVXB3czVoQTV6Q0tsVEJOekVZT2hHanlNdGc1dWM4bXh5SkQyOVM5dmNz?=
+ =?utf-8?B?MHQ4ZDB3SFBCcldxOEt6aElvWXp2aXJDZW42SUEvZ3RhR3dySHIrb1ZjNXFt?=
+ =?utf-8?B?eDFNdTg5d1ZqZ3VWNG9qanBhUFhaZkgvM0NmYm12NGI1VjBvV3dqaFM0VWpv?=
+ =?utf-8?B?OG9UOGFvVkRrZjV1UjBNaVFRbDBGVnRYbTQ2eGtlT2hKNnVmVDVqbktNTlJT?=
+ =?utf-8?B?eURsRkVoenZwSVhaOTM5bm8yeERZWVVnUmhYSGRPL3F2L0ZDTm5PdjNmRlcx?=
+ =?utf-8?B?Um1BanFCdXJiMnlDMFhOVkQ2YWZBQVBRTGdsd2ZHWWZqcWFSMkR5dmI3bDd5?=
+ =?utf-8?B?RHd2OVE2NlUvTUJoK3F1K1djNWhPZzUwU2lEZjhJS3g5bzNodVpaTzUzUzZj?=
+ =?utf-8?B?ZWtYVWJGRlQwb2VCNk9NS1FTaUpGWm5lVk5OelFwRlkzQ0IrTjZ2LzFacEpi?=
+ =?utf-8?B?NXNtdkQ1bE5mT09lb2Yyd2hBYTQxYkY5Nk9GVjFubEo3UGVBdEdBTjRhYmlF?=
+ =?utf-8?B?aE1LYWErMGRucGF5aTZsMjZmSi9pWThBYXpFMEcvNmUvRGdoODRiTy9EZDla?=
+ =?utf-8?B?Qzk0S0lFeFFwTSt0M1MrSzY3ZDFIbWhBdGhCT25SSDhrTkhuRUNoRzI3dnlw?=
+ =?utf-8?B?SVlEQ1pYRlBZbnpiUEhacER2Z0g3NU9pWG9DT0ZuZFRCQkZwQlhIbjhFSkpK?=
+ =?utf-8?B?bTJMSlBnSGVET0UrVG5OZWZ3alhYeWZTQytBY1h1TXp5L3JuOXpyTHpzYUdZ?=
+ =?utf-8?B?MFUzM1o1SVZ2OEIzbkVieTJhTmk3OFVmdjlha3p5WWc5TDFZcFpwRUJCazZ3?=
+ =?utf-8?B?Nmc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e28bb0e5-e458-4ab5-6c2b-08dbd7133444
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2023 17:36:08.5189
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WJGpcATwI6kuJcLLiI0hJ2zEEu6ovi/iOMFjAZ1P/UvlG6gjbFT3LLseTU5eqRJzTL+7s0DzMv+E5UPl2CKK9p/h5tgRET+34ETHZacaJV4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7915
+X-OriginatorOrg: intel.com
 
 
->  static inline void
->  __tcf_bind_filter(struct Qdisc *q, struct tcf_result *r, unsigned long b=
-ase)
->  {
-> diff --git a/net/sched/cls_basic.c b/net/sched/cls_basic.c
-> index 1b92c33b5f81..d7ead3fc3c45 100644
-> --- a/net/sched/cls_basic.c
-> +++ b/net/sched/cls_basic.c
-> @@ -50,7 +50,7 @@ TC_INDIRECT_SCOPE int basic_classify(struct sk_buff *sk=
-b,
->                 if (!tcf_em_tree_match(skb, &f->ematches, NULL))
->                         continue;
->                 __this_cpu_inc(f->pf->rhit);
-> -               *res =3D f->res;
-> +               tcf_set_result(res, &f->res);
->                 r =3D tcf_exts_exec(skb, &f->exts, res);
->                 if (r < 0)
->                         continue;
-> diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
-> index 382c7a71f81f..e4620a462bc3 100644
-> --- a/net/sched/cls_bpf.c
-> +++ b/net/sched/cls_bpf.c
-> @@ -124,7 +124,7 @@ TC_INDIRECT_SCOPE int cls_bpf_classify(struct sk_buff=
- *skb,
->                         res->class   =3D 0;
->                         res->classid =3D filter_res;
->                 } else {
-> -                       *res =3D prog->res;
-> +                       tcf_set_result(res, &prog->res);
->                 }
->
->                 ret =3D tcf_exts_exec(skb, &prog->exts, res);
-> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-> index e5314a31f75a..eb94090fb26c 100644
-> --- a/net/sched/cls_flower.c
-> +++ b/net/sched/cls_flower.c
-> @@ -341,7 +341,7 @@ TC_INDIRECT_SCOPE int fl_classify(struct sk_buff *skb=
-,
->
->                 f =3D fl_mask_lookup(mask, &skb_key);
->                 if (f && !tc_skip_sw(f->flags)) {
-> -                       *res =3D f->res;
-> +                       tcf_set_result(res, &f->res);
->                         return tcf_exts_exec(skb, &f->exts, res);
->                 }
->         }
-> diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
-> index c49d6af0e048..70b873f8771f 100644
-> --- a/net/sched/cls_fw.c
-> +++ b/net/sched/cls_fw.c
-> @@ -63,7 +63,7 @@ TC_INDIRECT_SCOPE int fw_classify(struct sk_buff *skb,
->                 for (f =3D rcu_dereference_bh(head->ht[fw_hash(id)]); f;
->                      f =3D rcu_dereference_bh(f->next)) {
->                         if (f->id =3D=3D id) {
-> -                               *res =3D f->res;
-> +                               tcf_set_result(res, &f->res);
->                                 if (!tcf_match_indev(skb, f->ifindex))
->                                         continue;
->                                 r =3D tcf_exts_exec(skb, &f->exts, res);
-> diff --git a/net/sched/cls_matchall.c b/net/sched/cls_matchall.c
-> index c4ed11df6254..a4018db80a60 100644
-> --- a/net/sched/cls_matchall.c
-> +++ b/net/sched/cls_matchall.c
-> @@ -37,7 +37,7 @@ TC_INDIRECT_SCOPE int mall_classify(struct sk_buff *skb=
-,
->         if (tc_skip_sw(head->flags))
->                 return -1;
->
-> -       *res =3D head->res;
-> +       tcf_set_result(res, &head->res);
->         __this_cpu_inc(head->pf->rhit);
->         return tcf_exts_exec(skb, &head->exts, res);
->  }
-> diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
-> index 1424bfeaca73..cbfaa1d1820f 100644
-> --- a/net/sched/cls_route.c
-> +++ b/net/sched/cls_route.c
-> @@ -109,7 +109,7 @@ static inline int route4_hash_wild(void)
->
->  #define ROUTE4_APPLY_RESULT()                                  \
->  {                                                              \
-> -       *res =3D f->res;                                          \
-> +       tcf_set_result(res, &f->res);                           \
->         if (tcf_exts_has_actions(&f->exts)) {                   \
->                 int r =3D tcf_exts_exec(skb, &f->exts, res);      \
->                 if (r < 0) {                                    \
-> @@ -152,7 +152,7 @@ TC_INDIRECT_SCOPE int route4_classify(struct sk_buff =
-*skb,
->                         goto failure;
->                 }
->
-> -               *res =3D f->res;
-> +               tcf_set_result(res, &f->res);
->                 spin_unlock(&fastmap_lock);
->                 return 0;
->         }
-> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-> index 6663e971a13e..f50ae40a29d5 100644
-> --- a/net/sched/cls_u32.c
-> +++ b/net/sched/cls_u32.c
-> @@ -172,7 +172,7 @@ TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *sk=
-b,
->  check_terminal:
->                         if (n->sel.flags & TC_U32_TERMINAL) {
->
-> -                               *res =3D n->res;
-> +                               tcf_set_result(res, &n->res);
->                                 if (!tcf_match_indev(skb, n->ifindex)) {
->                                         n =3D rcu_dereference_bh(n->next)=
-;
->                                         goto next_knode;
-> --
-> 2.34.1
->
+
+On 10/27/2023 10:15 AM, Florian Fainelli wrote:
+> On 10/27/23 09:55, Jacob Keller wrote:
+>>
+>>
+>> On 10/26/2023 4:52 PM, Florian Fainelli wrote:
+>>> On 10/26/23 16:23, Jacob Keller wrote:
+>>>>
+>>>>
+>>>> On 10/26/2023 3:45 PM, Florian Fainelli wrote:
+>>>>> Determine whether the PHY can support waking up from the user programmed
+>>>>> network filter, and if it can utilize it.
+>>>>>
+>>>>
+>>>> Here, you're passing through to phy_ethtool_set_rxnfc, basically
+>>>> allowing the lower device to program the wakeup filter if its supported. Ok.
+>>>>
+>>>> This almost feels like it would belong generally in the higher level
+>>>> ethtool code rather than in the driver?
+>>>
+>>> Agreed, as Doug just pointed out to me, there is still an open question
+>>> about reconciling the PHY and the MAC RXNFC spaces into a single
+>>> ethtool_rxnfc structure.
+>>>
+>>> An ideal goal is to have zero modifications to neither the MAC or the
+>>> PHY drivers such that they can both work in their own spaces as if they
+>>> were alone, or combined.
+>>>
+>>> I suppose that if we get the number of supported rules from the MAC
+>>> first, and then get the supported number of rules from the PHY next, we
+>>> could do something like this:
+>>>
+>>> rule index
+>>> | 0|
+>>> | .| -> MAC rules
+>>> |15|
+>>> |16| -> PHY rule
+>>>
+>>> and each of the MAC or the PHY {get,set}_rxnfc() operate within a base
+>>> rule number which is relative to their own space. So the MAC driver
+>>> would continue to care about its (max..first) - base (0) range, and the
+>>> PHY would care about (max..first) - base (16).
+>>>
+>>> Though then the issue is discoverability, how do you know which rule
+>>> location is backed by which hardware block. We could create an
+>>> intermediate and inert rule at index 16 for instance that acts as a
+>>> delimiter?
+>>>
+>>> Or we could create yet another RX_CLS_LOC_* value that is "special" and
+>>> can denote whether of the MAC or the PHY we should be targeting
+>>> whichever is supported, but that does not usually lend itself to being
+>>> logically ORed with the existing RX_CLS_LOC_* values. WDYT?
+>>>
+>>> pw-bot: cr
+>>
+>> Ah, yea there is a lot of complexity to consider here.
+> 
+> Yes this is only the tip of iceberg! Here is hopefully a better 
+> description of our particular system where this is being requested (the 
+> fact there is a single one also makes me question the entire effort, but 
+> anyway). We have 2 distinct system sleep modes:
+> 
+> - akin to ACPI S2 where the Ethernet PHY and MAC remain enabled and both 
+> can be used for Wake-on-LAN filtering, with the MAC being more capable 
+> than the PHY. System power consumption is just around 500mW at the wall. 
+> In that case it would make sense to leverage the MAC's capability 
+> because it is better and would lead to fewer false wake-ups
+> 
+> - akin to ACPI S3 where the Ethernet PHY only remains enabled, the MAC 
+> is powered off (as is most of the SoC), but we have limited Wake-on-LAN 
+> capability in the form of network filter as we can only match on a 
+> custom MAC DA + mask. System power consumption is closer to 350mW at the 
+> wall.
+> 
+> My users are not really willing to use the broad WAKE_MCAST because they 
+> want to match specifically on mDNS over IPv4 (or IPv6), so they prefer 
+> to program an exact match to limit the amount of false wake-ups. 
+> Arguably there will already be quite a lot in home network due to 
+> phones, IoT devices, and whatnot.
+> 
+>  From an user perspective they would know which system standby state is 
+> being entered so one could imagine that ahead of entry, we could 
+> configure either the MAC, or the PHY when targeting S2, or just the PHY 
+> when targeting S3. This implies that we can selectively target one 
+> entity, or the other.
+> 
+> For the current time being, and knowing the use case of my users, 
+> directing all of the Wake-on-LAN configuration towards the PHY would be 
+> enough IMHO, even if that means we stop leveraging the MAC capabilities, 
+> hence this patch series.
+> 
+
+Right.
+
+>>
+>> I'm not entirely sure what we should do here. What about extending with
+>> another attribute entirely instead of another bit in RX_CLS_LOC?
+> 
+> Yes possibly, or we just target different objects, right now we have 
+> visibility into the MACs via the net_device, it seems like we ought to 
+> be able to target some ethtool APIs towards PHY objects, which currently 
+> have no netlink representation. There is on-going work to bridge that gap:
+> 
+> https://lore.kernel.org/netdev/ffc6ff4a-d1af-4643-a538-fd13e6be9e06@lunn.ch/T/
+> 
+> but I am not sure we will reach an agreement any time soon. Maybe I can 
+> convince my masters to wait for that to land and use WAKE_MCAST in the 
+> meantime.
+> 
+
+Sure, but this obviously costs a potentially significant amount of extra
+power, and it would be better to avoid that.
+
+> I would not necessary want to invent a new set of ethtool commands and 
+> kernel APIs such that we could do the below examples, though maybe this 
+> is not incompatible with the work being done by Maxime:
+> 
+> # Target the Ethernet MAC
+> ethtool -N eth0 flow-type ether dst 01:00:5e:00:00:fb loc 0 action -2 # 
+> Assumes MAC by default
+> ethtool -N eth0 flow-type ether dst 01:00:5e:00:00:fb loc 0 action -2 
+> target mac
+> 
+> # Target the Ethernet PHY, if capable
+> ethtool -N eth0 flow-type ether dst 01:00:5e:00:00:fb loc 0 action -2 
+> target phy
+> 
+> # Enable WAKE_FILTER at the MAC level
+> ethtool -s eth0 wol f # assumes MAC by default
+> ethtool -s eth0 wol f target mac
+> 
+> # Enable WAKE_FILTER at the PHY level, if capable
+> ethtool -s eth0 wol f target phy
+> 
+> though maybe this is the much needed addition to ethtool so we can be 
+> more selective.
+> 
+> After a bunch of candies on Tuesday I might reach a state of trance and 
+> figure which way to proceed :D
+
+It does seem like an acceptable compromise here, and perhaps being
+driver specific is ok, since this does depend a lot on the individual
+device support, thus broadly applying this across all drivers could be
+problematic.
+
+I like the idea of being able to more precisely target the rules so that
+its clear to userspace what is being done... but I also understand the
+challenge of wanting to deliver what feels like a small win and being
+asked to do something much larger.
 
