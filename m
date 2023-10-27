@@ -1,178 +1,194 @@
-Return-Path: <netdev+bounces-44822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD0427D9F61
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 20:08:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D4197D9FC8
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 20:21:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F4A1B213EE
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 18:08:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E9AC1C2103B
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 18:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76BA73B78A;
-	Fri, 27 Oct 2023 18:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A553C083;
+	Fri, 27 Oct 2023 18:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="XcnwuTLi"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="fpZWkR5u"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEB739848;
-	Fri, 27 Oct 2023 18:07:53 +0000 (UTC)
-Received: from DM6FTOPR00CU001.outbound.protection.outlook.com (mail-centralusazon11020003.outbound.protection.outlook.com [52.101.61.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEE7FD9;
-	Fri, 27 Oct 2023 11:07:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EMCBn2kMiesrpcELmZ4QUbAQsZtbyZEURNdeXmwnH17QlLnRDNPywKZ43A1oErTS4hybnTdcasi+9N0OWz9V58wDmBwZ1N+w5eLKCBp8Z7I24vexkZ6doHUD2rhlz5WPYEjqE02WIdLB+2N834dDE+oozXRrBnGBy/S11WROobtryfmS8naykOdyF0wb/ZQatC/m6cPAb4v9Kq0TPqALcFLeDWYrDS85mmvyQsm+kpLDUguqF11EoLe6QJ0GJELB+dW9lTYBX+I4KlsNBANofGllb0b9Oyk8uUqd5xSn9m0SHiROheP7EvgHGygpB/H2pK58bjOLQeNWpo/jKRxOyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ShfL1zsfe+Uf5JILIL66mY9RziPKGLNbtlGosHYqzDo=;
- b=ROh5Idz1gChtlmRncAlYoylDAKHLPocDR5fH5zCqkBBo/CIIPxVH5XJo2mCmmGRXhEXSjaoTvrEKhoWbyHUnGpd9h8+TU68Mw/oSjEG01/M6c4EVTB9EfSzlpOH+drfIwAcnJGigX0/4+r5WdchDoleI4+GPenYTQWF+rNDZsTxK30ENY3L1cthOXGnbyE274mK+qyanhi3ShCmqlYEVQBGmi2dTvnOSAcfYOA92Nt50whBIyNX5axwkiPH5NL8xNg56v85MoSKuSxqe77FOEscjRV2oixroP8yICQUyy7v6CDznSo8N3gKzLAPwsyRCAdqEb8WnEG1jMEQ+5GnSng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ShfL1zsfe+Uf5JILIL66mY9RziPKGLNbtlGosHYqzDo=;
- b=XcnwuTLisY3hzJIDEKi52bx924hirKRXAGemtI4I32wKEX/rIhEdV4iegDN6G9zB/zwhl9K4w/VL90728lKMXGbBKrzw53Jezg6IaCl25fa7Bj0iy/IveOsKhtNytHN11i6ds6uUaAbVypcatfXU+CHsYAB1h5ka4zig+8e/9jM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-Received: from BY5PR21MB1443.namprd21.prod.outlook.com (2603:10b6:a03:21f::18)
- by MW4PR21MB2004.namprd21.prod.outlook.com (2603:10b6:303:68::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.6; Fri, 27 Oct
- 2023 18:07:48 +0000
-Received: from BY5PR21MB1443.namprd21.prod.outlook.com
- ([fe80::c099:1450:81d3:61dd]) by BY5PR21MB1443.namprd21.prod.outlook.com
- ([fe80::c099:1450:81d3:61dd%4]) with mapi id 15.20.6954.011; Fri, 27 Oct 2023
- 18:07:48 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: haiyangz@microsoft.com,
-	decui@microsoft.com,
-	stephen@networkplumber.org,
-	kys@microsoft.com,
-	paulros@microsoft.com,
-	olaf@aepfle.de,
-	vkuznets@redhat.com,
-	davem@davemloft.net,
-	wei.liu@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	leon@kernel.org,
-	longli@microsoft.com,
-	ssengar@linux.microsoft.com,
-	linux-rdma@vger.kernel.org,
-	daniel@iogearbox.net,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	ast@kernel.org,
-	sharmaajay@microsoft.com,
-	hawk@kernel.org,
-	tglx@linutronix.de,
-	shradhagupta@linux.microsoft.com,
-	linux-kernel@vger.kernel.org,
-	Konstantin Taranov <kotaranov@microsoft.com>
-Subject: [PATCH net-next] Use xdp_set_features_flag instead of direct assignment
-Date: Fri, 27 Oct 2023 11:06:51 -0700
-Message-Id: <1698430011-21562-1-git-send-email-haiyangz@microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-Content-Type: text/plain
-X-ClientProxiedBy: MW4PR03CA0350.namprd03.prod.outlook.com
- (2603:10b6:303:dc::25) To BY5PR21MB1443.namprd21.prod.outlook.com
- (2603:10b6:a03:21f::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72EF37C9E;
+	Fri, 27 Oct 2023 18:21:49 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73D0C18F;
+	Fri, 27 Oct 2023 11:21:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=yAZ1l6ZTqmOTsSYC4pFvp359bd24Tgw1IN/gEEgk1V8=; b=fpZWkR5uq/TKb7HIsEpGHRHcnp
+	V1IycfqGwcptf/0PYtqlZEDKZCo5XSOiIyXz1HFuWDhkC4OEnpVOxIP/7fBvxmzsILO5EkVSAnYQA
+	IZWkhnPae4WL2VMXf6ZOWxRODM7VYH9BlBT9MB9pFjz4bcHOIop7U/WuIdalr2CWjpubajJhiPjZ6
+	8oxzJVqZpsk2x2nvQxe/cbgPOJ3j3dmr/jkY9Itsk1qkfBjpXgTMgSb4WYy3HWTD598QAOpnmZsO7
+	z+rO9B57pvUMxx22iQb/vaEFvxjVS6rSwr/+sDTEmzapygYpAd4vLQOVsf9CMttcUmgfTZI0gnJND
+	5m4Sz0cQ==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qwRSm-000Nit-ML; Fri, 27 Oct 2023 20:21:40 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qwRSm-000MRw-E7; Fri, 27 Oct 2023 20:21:40 +0200
+Subject: Re: [PATCH net-next] net, sched: Fix SKB_NOT_DROPPED_YET splat under
+ debug config
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: kuba@kernel.org, idosch@idosch.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20231027135142.11555-1-daniel@iogearbox.net>
+ <CAM0EoMm9K=jS=JZUNXo+C6qs=p=r7CtjWK20ocmTKEDxN3Bz-w@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <5ab182b6-6ac7-16f7-7eae-7001be2b6da7@iogearbox.net>
+Date: Fri, 27 Oct 2023 20:21:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Sender: LKML haiyangz <lkmlhyz@microsoft.com>
-X-MS-Exchange-MessageSentRepresentingType: 2
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR21MB1443:EE_|MW4PR21MB2004:EE_
-X-MS-Office365-Filtering-Correlation-Id: af73b9b8-c548-4c37-d48c-08dbd717a04d
-X-LD-Processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
- 5y95vUVM5C1JjxGgHXqOEcQAwA5wK0icf0YZ/SRB+IYaLc9WGMZPvlLRwI1Ea73BRBJ3SHMV08GTCYAuUoqOLB/sbiQJw3CmmtF4RVpQia18WqZtIyJstomu88E3bwFlENTkF6U/a9bSxHgcZcN1QIUH55IZlWiE289lWPy92ivWvFRNtNJZeR3Af4oNlBUxLrOpE+TJg8XAE7RdXT5MGJaGZvIyeYcSv+0kpP0uD31vM08DT0vxpm1IjECwwZhklqTXPKa8Y4STPIUa/0eR04nhuwK7iuVdh7CE3tVjjCMOIYTr+jbJc1acnsEHvlc9bQgU5x9uMOfJ/+tTtcSj6QdXeLFpcj5SlWeMWiz7kHKWYIMsR4xtMX4gogphjJpJMpC4dQowmktumWxidxksuobEHEmBJG4g/1hCWw57029KCq+rcrfqRRUwL5GFOJiLSNPxiFAkaYkuZsYLEV3p3FiZrE3xcYCFiVwQna1Mf0YVVCLsH3WTucIQUrf2lkfNXkkvwroF29suin5evA4o9Q2FpdKiSbLIcEPhTI7Bf07ccG2WHvDcvTWNQGscWXEFv47leXtFrqEKlLKQ3Sds/6nzsgnHpPAgegEe8WlG1+vLxV2hERPbHtwBjunWDsVIBmM1mRdD91np+7MKcWt9TzutAgB2GTT2znjkmXOoF24=
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR21MB1443.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(366004)(39860400002)(346002)(396003)(230922051799003)(451199024)(1800799009)(186009)(64100799003)(38100700002)(7846003)(6506007)(6666004)(52116002)(10290500003)(83380400001)(82960400001)(82950400001)(107886003)(2616005)(6512007)(7416002)(38350700005)(8676002)(4326008)(2906002)(6486002)(5660300002)(8936002)(316002)(66556008)(66476007)(66946007)(36756003)(41300700001)(26005)(478600001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?+DaRE5YgmwM0ESVce0CLJ0I3afDkPVOZu7TbkVxX2EhXI9sMmf2FKH9tivDk?=
- =?us-ascii?Q?yorjjvWNh80sKgOneP7uGtuO4RNWVHmpGPsZULptwfcTLE/2+1n/SHwxIA3b?=
- =?us-ascii?Q?jIQo3wA9WQCbOtSrHC02KxNo1pFW+pns0slwgg9desyuJfScxvhN5MJJGlSZ?=
- =?us-ascii?Q?ufXtODneChKUAR7Q/kG2KpZusETK8oS4Mkek2/WUfSKcBaSO+BQ8NDAspxZJ?=
- =?us-ascii?Q?JoHu/oJmHsYoouulQK5IVYz/p3Y46/NOYu3LkEh3NfvlmN9S3mNqO+QWArmL?=
- =?us-ascii?Q?9jDmpZMqpQG4DrG0i3Q0RNCjljKgd5XJTHvGL6veNmmYqhllGSXO3LwrvtRg?=
- =?us-ascii?Q?I2mP029AYNoaRjTPlpeHO+I/GdJeEZntPPUKGsjs0M/HKN7as7NhaC3b4She?=
- =?us-ascii?Q?1VETzH6NscP6WY3iBnn1JOtl0hChclRrXZxUL2vbD6JCslk7Xckc907LheQy?=
- =?us-ascii?Q?aOLv9nz7u9FXyYzsgmlBScCT39gI42UiGtlOPlxnVJUBf/5XY2NWSaviWJhl?=
- =?us-ascii?Q?EOUiaZo5XM6fgNyPMcvJINNMlqDfNitlJ1YK7azv1Dqa3OtxvDGNM6ZA92p1?=
- =?us-ascii?Q?1R7aYVqxjdL9P+4uty8A66gFrMbRTh3VRk9gCeGqpE3hSNX9OcHFV1H2g3Of?=
- =?us-ascii?Q?otnsZoYY9b9unNMakjbVo4joCJ4HOgyGHy9EqYIZXeiMHMPywIBoL0geIG+e?=
- =?us-ascii?Q?4y0ieo/rhEWJWr3KFGD13iOGWyiT6rkmsuKnVqndzbX/DUZ1G9350/ss8BK7?=
- =?us-ascii?Q?FrYv7EgeeAIkrYfkQ1IzPfKF8WuEbkXJMn3Wsj4cXfISKrzaMe5c37xF8dD5?=
- =?us-ascii?Q?gYfKxypPD8NlK7u5DX6yUnleoYt24v1N3rsb85wpAp7c1p87Odq/J8NWb8YX?=
- =?us-ascii?Q?Uwhyriw0unY2z2H3GaNdux/OmaeJVytuHrzTQlfkVA1x8VR3s86abtxGBn4d?=
- =?us-ascii?Q?sSC+4XMgc8t21yrXztDZB8fH8MqVJvtyGhsB+1MDuB5ZgJuDrnFSstoI+sE1?=
- =?us-ascii?Q?1GfUplNklWwjrWncjuIdYXkk2vHlq5g3rRsQ8WpAZy8y5NKRlKUM2QTLVshF?=
- =?us-ascii?Q?uW2C+SqiF90PHEp+zREqIpX1lnU/FhowDp5exd7S32aM4GaGBHsnnHGxVZNp?=
- =?us-ascii?Q?BxxQQ+n+kl9+EuNJrpc1TT3ZaxNF5E+V2x1shnMUBY1gewFmqYkLtc1nhRCF?=
- =?us-ascii?Q?JyAYSAMCbLalkUxRrXrOXglseRWCXZHaT3QmBq6Sl+VtydrEfsRmugQg4x9g?=
- =?us-ascii?Q?JhG4oOlqvmS7JotofXjJqWcXGBaeFCg7oui4/FJjElblgNY2ae+WdAEHfxtv?=
- =?us-ascii?Q?vfg6vDpoUgWCfxBpvhEgjsuLJCFsqUF/FvGZkDG92vtAM6B9xiNlADCQosiZ?=
- =?us-ascii?Q?evKZWCHsEgm7c+E/v1s2sDep/RVj/RAayB4ZleAJrDdOVVrxHAszIA9OP5Re?=
- =?us-ascii?Q?Ah+VQiKbol3figxggw7QCWdNoGMjSnjnrPO+g7Zko2BaO5NRIq5esWbARXyl?=
- =?us-ascii?Q?Y05AT3gMZ0btExyuUNWHCblYdMk1gZv36uDhn0FZBfBKEsA9cU57oMhvDzFR?=
- =?us-ascii?Q?rKaUBghoIqmEtVcLDUF8ckCWxCEWXuApg+H1hNPe?=
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: af73b9b8-c548-4c37-d48c-08dbd717a04d
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR21MB1443.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2023 18:07:47.9551
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 65i/T8yZ633olQs8clDBWRG5Otb8rk4kodq4yW52YU49kZpXHViVvdz8aZXBDFvc8Rum6VkDFaEe2QpgGhXOQg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR21MB2004
+In-Reply-To: <CAM0EoMm9K=jS=JZUNXo+C6qs=p=r7CtjWK20ocmTKEDxN3Bz-w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27074/Fri Oct 27 09:58:36 2023)
 
-From: Konstantin Taranov <kotaranov@microsoft.com>
+On 10/27/23 7:24 PM, Jamal Hadi Salim wrote:
+> On Fri, Oct 27, 2023 at 9:51 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>
+>> Ido reported:
+>>
+>>    [...] getting the following splat [1] with CONFIG_DEBUG_NET=y and this
+>>    reproducer [2]. Problem seems to be that classifiers clear 'struct
+>>    tcf_result::drop_reason', thereby triggering the warning in
+>>    __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0). [...]
+>>
+>>    [1]
+>>    WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x38/0x130
+>>    Modules linked in:
+>>    CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d9582e0 #682
+>>    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc37 04/01/2014
+>>    RIP: 0010:kfree_skb_reason+0x38/0x130
+>>    [...]
+>>    Call Trace:
+>>     <IRQ>
+>>     __netif_receive_skb_core.constprop.0+0x837/0xdb0
+>>     __netif_receive_skb_one_core+0x3c/0x70
+>>     process_backlog+0x95/0x130
+>>     __napi_poll+0x25/0x1b0
+>>     net_rx_action+0x29b/0x310
+>>     __do_softirq+0xc0/0x29b
+>>     do_softirq+0x43/0x60
+>>     </IRQ>
+>>
+>>    [2]
+>>    #!/bin/bash
+>>
+>>    ip link add name veth0 type veth peer name veth1
+>>    ip link set dev veth0 up
+>>    ip link set dev veth1 up
+>>    tc qdisc add dev veth1 clsact
+>>    tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:22:33:44:55 action drop
+>>    mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
+>>
+>> What happens is that inside most classifiers the tcf_result is copied over
+>> from a filter template e.g. *res = f->res which then implicitly overrides
+>> the prior SKB_DROP_REASON_TC_{INGRESS,EGRESS} default drop code which was
+>> set via sch_handle_{ingress,egress}() for kfree_skb_reason().
+>>
+>> Add a small helper tcf_set_result() and convert classifiers over to it.
+>> The latter leaves the drop code intact and classifiers, actions as well
+>> as the action engine in tcf_exts_exec() can then in future make use of
+>> tcf_set_drop_reason(), too.
+>>
+>> Tested that the splat is fixed under CONFIG_DEBUG_NET=y with the repro.
+>>
+>> Fixes: 54a59aed395c ("net, sched: Make tc-related drop reason more flexible")
+>> Reported-by: Ido Schimmel <idosch@idosch.org>
+>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+>> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Link: https://lore.kernel.org/netdev/ZTjY959R+AFXf3Xy@shredder
+>> ---
+>>   include/net/pkt_cls.h    | 12 ++++++++++++
+>>   net/sched/cls_basic.c    |  2 +-
+>>   net/sched/cls_bpf.c      |  2 +-
+>>   net/sched/cls_flower.c   |  2 +-
+>>   net/sched/cls_fw.c       |  2 +-
+>>   net/sched/cls_matchall.c |  2 +-
+>>   net/sched/cls_route.c    |  4 ++--
+>>   net/sched/cls_u32.c      |  2 +-
+>>   8 files changed, 20 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+>> index a76c9171db0e..31d8e8587824 100644
+>> --- a/include/net/pkt_cls.h
+>> +++ b/include/net/pkt_cls.h
+>> @@ -160,6 +160,18 @@ static inline void tcf_set_drop_reason(struct tcf_result *res,
+>>          res->drop_reason = reason;
+>>   }
+>>
+>> +static inline void tcf_set_result(struct tcf_result *to,
+>> +                                 const struct tcf_result *from)
+>> +{
+>> +       /* tcf_result's drop_reason which is the last member must be
+>> +        * preserved and cannot be copied from the cls'es tcf_result
+>> +        * template given this is carried all the way and potentially
+>> +        * set to a concrete tc drop reason upon error or intentional
+>> +        * drop. See tcf_set_drop_reason() locations.
+>> +        */
+>> +       memcpy(to, from, offsetof(typeof(*to), drop_reason));
+>> +}
+> 
+> I believe our bigger issue here is we are using this struct now for
+> both policy set by the control plane and for runtime decisions
 
-This patch uses a helper function for assignment of xdp_features.
-This change simplifies backports.
+Hm, but that was also either way in the original rfc.
 
-Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
-Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> (drop_reason) - whereas the original assumption was this struct only
+> held set policy. In retrospect we should have put the verdict(which is
+> policy) here and return the error code (as was in the first patch). I
+> am also not sure humans would not make a mistake on "this field must
+> be at the end of the struct". Can we put some assert (or big comment
+> on the struct) to make sure someone does not overwrite this field?
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 48ea4aeeea5d..035f24764ad9 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -2687,8 +2687,8 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
- 	ndev->features = ndev->hw_features | NETIF_F_HW_VLAN_CTAG_TX |
- 			 NETIF_F_HW_VLAN_CTAG_RX;
- 	ndev->vlan_features = ndev->features;
--	ndev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
--			     NETDEV_XDP_ACT_NDO_XMIT;
-+	xdp_set_features_flag(ndev, NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
-+			     NETDEV_XDP_ACT_NDO_XMIT);
- 
- 	err = register_netdev(ndev);
- 	if (err) {
--- 
-2.25.1
+Yeah that can be done.
 
+> Also what happens if "from" above has a set drop_reason - is that
+> lost? Do you need an assert there as well?
+
+Why it's needed, do you have a use case for it?
+
+> BTW: The simple patch i posted fixes the problem as well (i actually
+> tested it minus the typo i sent).
+
+It didn't compile for me, but if you think it's a better approach, yes,
+feel free to post it as a proper patch then.
+
+What I'm not quite following though is, I thought your original use case
+was that you want to be able to troubleshoot drops from unexpected
+locations (aka not policy) in the tc engine so won't this miss cases when
+you would then want to use tcf_set_drop_reason() e.g. from tcf_action_exec()
+upon 'exception' cases (like the one for example I pointed out)? With the
+diff you proposed it will basically fallback to SKB_DROP_REASON_TC_{INGRESS,
+EGRESS}, so override anything that would have been set from there.
+
+Thanks,
+Daniel
 
