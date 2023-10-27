@@ -1,79 +1,61 @@
-Return-Path: <netdev+bounces-44723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E24357D96EB
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:49:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F5B7D9706
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:54:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A524228237B
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 11:49:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 106562823D5
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 11:54:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9363418C04;
-	Fri, 27 Oct 2023 11:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3470318C2E;
+	Fri, 27 Oct 2023 11:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zUbdpQTm"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PD5RajVb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A301864D
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 11:49:17 +0000 (UTC)
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2106FC0
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 04:49:16 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-32d895584f1so1373344f8f.1
-        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 04:49:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698407354; x=1699012154; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZUug1qIw57mr+DRpdd7GliSwdBMty2Oz1w0OdwZh2wo=;
-        b=zUbdpQTmv08t5F2FfqV/bUjHd2AENx0tS9j/5G4ZfhQ/F1nsAR4Ilwot8c7fE9h5CG
-         tOuo8OxDdL/SyIYXPCqj3y+qWH/o9mGEvIO18MWBmB+ir/WDfLulA2fPt8uCFPORs0ee
-         xdEzLiyiApJyeGmTSsHqL4uvUTFzJ7l7ayHrB3TqWPhfW/W0H572XUfz0EER9jMsQjSE
-         oP+My/+db2q2pSxQXmw6M6lgEVEcByL5G0XzlEed47c4Phs2CXYgaLHyxth7fLhn6bpb
-         1wsL5ufdbfdB640oKaxP6D0w0y3eTIdIi9RTTizTVhnj07p8FA60Hmri6MHecUodGF/G
-         7z2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698407354; x=1699012154;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZUug1qIw57mr+DRpdd7GliSwdBMty2Oz1w0OdwZh2wo=;
-        b=gMCx7xPJfjpb/fH5XW3kmTu17Uc1zldT5FH54v659jZkPa02EDSParIMerVBPlLtHQ
-         DrsSz7wCdjDSHKfRtZBCdVZECOo/pNSeeS3rgP5qMIibDtV8swNz9WAoNs+eizTvkKQe
-         zlV7DptcvYC187q/N0Wed5VYOEzCfgi7cgp/4Kz6Z4qqYw4F6NayQLlndJ5pUwSSVt+V
-         YoTzUsgn4rDqhplbNNtV/8DW97hmxlmfFwvwdJjI09aoRs+31ovRO0bvB4zr5uqZ3woQ
-         mJSbmP3p6c0d3lyQbCb0tQMErXMC1RH1l+vAfTSaNO+EC7JEQsL27km9R1oVHBg4leK5
-         B5Jw==
-X-Gm-Message-State: AOJu0Yx9BjVsOjcwdj6jrIYCCBGvVZpCuwQaI67khdqxKPHKWdFOkgSD
-	An8xa8pmYaMYUgLi6mFB4/lwOA==
-X-Google-Smtp-Source: AGHT+IHdHIPlDJMXyZBHvSDTolKHJH+uKVMA1F9BN32sTR8LYz4kzbcC9IvfvgWuJOdhdg8u+hIgwg==
-X-Received: by 2002:adf:f14a:0:b0:32d:9f1b:3a1f with SMTP id y10-20020adff14a000000b0032d9f1b3a1fmr1983922wro.31.1698407354572;
-        Fri, 27 Oct 2023 04:49:14 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id c13-20020adfe74d000000b0032da49e18fasm1633927wrn.23.2023.10.27.04.49.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Oct 2023 04:49:14 -0700 (PDT)
-Date: Fri, 27 Oct 2023 14:49:11 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	jlayton@kernel.org, neilb@suse.de, kolga@netapp.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, trond.myklebust@hammerspace.com,
-	anna@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net v2] net: sunrpc: Fix an off by one in
- rpc_sockaddr2uaddr()
-Message-ID: <9a3be793-0d42-4588-8c04-c930671e7ac4@kadam.mountain>
-References: <31b27c8e54f131b7eabcbd78573f0b5bfe380d8c.1698184674.git.christophe.jaillet@wanadoo.fr>
- <ZTkmm/clAvIdr+6W@tissot.1015granger.net>
- <20231025092829.6034bfcd@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEEA918AE4
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 11:54:45 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EF82D9;
+	Fri, 27 Oct 2023 04:54:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9sI0L2/p2wrCRRIQ0ruGQzGrqm10dnyvAFdR93FTrxk=; b=PD5RajVbp3BhCQo9Q+zyJOJFh5
+	69SPUkJJfKYkoEX6uJ6INYjXex5RCn1kan7/jKJjZxWz4adEuk6CGiY5EgEUq1F4ZpfS1lCCgn3/4
+	+fW5KYDbEpIAh8pZfp7jADUPaoq4tYpcozBNZ834wUQoW7VYr3SfvdJxSt+IHYjKWIgY5xuMbjtj+
+	u2hwY1mT1sTunAEPwORvniSDX6ygOXcWVo+Fz2FpebyGZLHUYEleMp7ZzWUdorPug9xf089x/WzHm
+	+LgS9C3SNhA2YOZyqKqoiapXp3b9sERVFg1lbCw70K3OX3TW4mG9WBxB3nQrfl7MGn1EBNi2qBu6Z
+	bZjqjSTw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54974)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qwLQC-0007m5-1b;
+	Fri, 27 Oct 2023 12:54:36 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qwLQC-0000kP-4J; Fri, 27 Oct 2023 12:54:36 +0100
+Date: Fri, 27 Oct 2023 12:54:36 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	andrew@lunn.ch, Jose.Abreu@synopsys.com,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next V3] net: pcs: xpcs: Add 2500BASE-X case in get
+ state for XPCS drivers
+Message-ID: <ZTuk/OF01M24nBeG@shell.armlinux.org.uk>
+References: <20231027044306.291250-1-Raju.Lakkaraju@microchip.com>
+ <ghpmbmfjps24x7xvojk4gbkl55wjcuufd4v6mz6ws5htv35g2b@ugqsbet7t73p>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,20 +64,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231025092829.6034bfcd@kernel.org>
+In-Reply-To: <ghpmbmfjps24x7xvojk4gbkl55wjcuufd4v6mz6ws5htv35g2b@ugqsbet7t73p>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Oct 25, 2023 at 09:28:29AM -0700, Jakub Kicinski wrote:
-> On Wed, 25 Oct 2023 10:30:51 -0400 Chuck Lever wrote:
-> > Should these two be taken via the NFS client tree or do you intend
-> > to include them in some other tree?
+On Fri, Oct 27, 2023 at 02:04:15PM +0300, Serge Semin wrote:
+> Cc += Russell
 > 
-> FWIW we're not intending to take these. If only get_maintainer
-> understood tree designations :(
+> * It's a good practice to add all the reviewers to Cc in the new patch
+> * revisions.
+> 
+> On Fri, Oct 27, 2023 at 10:13:06AM +0530, Raju Lakkaraju wrote:
+> > Add DW_2500BASEX case in xpcs_get_state( ) to update speed, duplex and pause
+> > 
+> > Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+> 
+> With a nitpick below clarified, feel free to add:
+> Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+> 
+> > ---
+> >  drivers/net/pcs/pcs-xpcs.c | 29 +++++++++++++++++++++++++++++
+> >  drivers/net/pcs/pcs-xpcs.h |  2 ++
+> >  2 files changed, 31 insertions(+)
+> > 
+> > diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+> > index 4dbc21f604f2..31f0beba638a 100644
+> > --- a/drivers/net/pcs/pcs-xpcs.c
+> > +++ b/drivers/net/pcs/pcs-xpcs.c
+> > @@ -1090,6 +1090,28 @@ static int xpcs_get_state_c37_1000basex(struct dw_xpcs *xpcs,
+> >  	return 0;
+> >  }
+> >  
+> > +static int xpcs_get_state_2500basex(struct dw_xpcs *xpcs,
+> > +				    struct phylink_link_state *state)
+> > +{
+> > +	int ret;
+> > +
+> > +	ret = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_STS);
+> > +	if (ret < 0) {
+> > +		state->link = 0;
+> > +		return ret;
+> > +	}
+> > +
+> > +	state->link = !!(ret & DW_VR_MII_MMD_STS_LINK_STS);
+> > +	if (!state->link)
+> > +		return 0;
+> > +
+> > +	state->speed = SPEED_2500;
+> 
+> > +	state->pause |= MLO_PAUSE_TX | MLO_PAUSE_RX;
+> 
+> Why is it '|=' instead of just '='? Is it possible to have the 'pause'
+> field having some additional flags set which would be required to
+> preserve?
 
-I accidentally markedt his NFS patch as net on Oct 11 as well.  :/
+The code is correct. There are other flags on state->pause other than
+these, and phylink initialises state->pause prior to calling the
+function. The only flags that should be modified here are these two
+bits that the code is setting.
 
-https://lore.kernel.org/all/356fb42c-9cf1-45cd-9233-ac845c507fb7@moroto.mountain/
+Phylink will initialise it to MLO_PAUSE_NONE if expecting autoneg, or
+the configured values if autoneg on the link is disabled.
 
-regards,
-dan carpenter
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
