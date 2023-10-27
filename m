@@ -1,96 +1,104 @@
-Return-Path: <netdev+bounces-44830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2CA87DA0E8
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 20:47:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17EDA7DA114
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 20:55:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4F9D1C2117F
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 18:47:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6046282612
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 18:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FCD63CD04;
-	Fri, 27 Oct 2023 18:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 108C83C6A9;
+	Fri, 27 Oct 2023 18:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="jAFpr4ni";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NgibRXQF"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="IPAkS5dJ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="a+s0bHh3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C194D3C6A9;
-	Fri, 27 Oct 2023 18:46:52 +0000 (UTC)
-Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8271412A;
-	Fri, 27 Oct 2023 11:46:46 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailout.nyi.internal (Postfix) with ESMTP id CC7475C01C9;
-	Fri, 27 Oct 2023 14:46:45 -0400 (EDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B39E374C5;
+	Fri, 27 Oct 2023 18:55:52 +0000 (UTC)
+X-Greylist: delayed 538 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 27 Oct 2023 11:55:49 PDT
+Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42FAAB0;
+	Fri, 27 Oct 2023 11:55:49 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailnew.nyi.internal (Postfix) with ESMTP id 75F77580897;
+	Fri, 27 Oct 2023 14:46:50 -0400 (EDT)
 Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Fri, 27 Oct 2023 14:46:45 -0400
+  by compute4.internal (MEProxy); Fri, 27 Oct 2023 14:46:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
 	:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to; s=fm2; t=1698432405; x=
-	1698518805; bh=0SBud1bmEqWqZY3oTQ6U+NNL1SBx9tn7F3PIApGl8IA=; b=j
-	AFpr4niQzEcm9Fz2w69CvSqLla63CQN+17UWh1albQcxUg2lGQfS0yLz0OjUJz2n
-	evbQQNImDOMHNqgpVuMEjrF/KHpJwrZK+G6O4WMvq722QYv384aPyE/K0pZzg9Eh
-	CZq0XZGOk8adCf1Fbb+sxf7OvYyMsxhWS1ZYmGZq/DeEG+1VbDGCsue9E3Eag5JO
-	a8u9VxbadUGCsTi7GQNxbt+wTKrAagwBgdmK0UgYdojW9BtCjKjEpi+DiX2pjSG6
-	pKdxp+ygjGmycTiZ9z1dcSdQwzUdi+FSG/oioq7fk6p54IGCz4/xRf91XD+Uh97H
-	/MpcOCHUR4d5fpyS8mSZQ==
+	:reply-to:sender:subject:subject:to:to; s=fm2; t=1698432410; x=
+	1698439610; bh=4Ah8oNGCj3UUd4tZonhdOFYd28AC8mVLruGLmu1uJPo=; b=I
+	PAkS5dJshTzDmnYREnLGTIhjhlFecijpEqy/PDiLikg0oCGpEgJh5de3dOX7wkUa
+	hyfUxIReX4ma5e5Oygouqo4Pi03/gfedrh2WAcuNkOPIW5JNchmJ/KCcQEKZIsBs
+	igQ7c3r++jeCNMMUGMxIhn5kPo8sVL3nSMnxHB+mcAxIqfXBi1h7gfQk9eUONCiJ
+	pKTlRbXXK2IA1F0uN4tRwho2zWlSmkkj4J8mTLZi7eSrAhv9ge+g4vtOvce47psP
+	5TGwghjcrPtgGhcgXKs6OwRGFO2sr+u32evgEa0yLRTo86HcIJw3EK4LHicEMh/V
+	n0FhUC9+QK9QWALZ46gfQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1698432405; x=
-	1698518805; bh=0SBud1bmEqWqZY3oTQ6U+NNL1SBx9tn7F3PIApGl8IA=; b=N
-	gibRXQFnKYn0QkB9y5cN4yi6q4Nyv6w6a2raYdFmZi0ERVsFViBFg92CipX3Vu+c
-	rT5eKisVRJ6RUc/4Nw6MBbuYA/3zxhMe3meiAvoahZlsmr/myiXdruGbHbae4gCl
-	O3INNh/ea7LdvQDLQD/yLdF2zyaeC0HYgFMMe8+F5gC4oPF5YLTJdLp3i1i5BMSW
-	jiLD4y3y6rWpeTW63H+xIuTwjZLuteU9FDu7Y+eSAy0yMOQNi4PLfRme6PmKz7xW
-	khO1fTyrqw+ZZYN8BVZNSvqHihymHFwudHBQtSv7vMt/T98KqVF7r1ei3R1bG9qb
-	N7oAO1ZnqE2Boe7cfHQYg==
-X-ME-Sender: <xms:lQU8ZaBM71bt3pYFJyUNVOX46FIVSLMttLjVkyAwS5TTSc8DR9ffkQ>
-    <xme:lQU8ZUh8Ma7rABlYxPZSQWcwrOVuBCfYlnbt6yRGT2VR9yEjEC0ElewxyVWQldVEz
-    gS5jR-p2TmVhu8lOA>
-X-ME-Received: <xmr:lQU8Zdnyeppy0sd6V6zzA8RW4GQdSAw-E6kN1dTRgo2UAyH9totWP5NobPoaIHB87n_Ky_0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrleeggdduvdelucetufdoteggodetrfdotf
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1698432410; x=
+	1698439610; bh=4Ah8oNGCj3UUd4tZonhdOFYd28AC8mVLruGLmu1uJPo=; b=a
+	+s0bHh37UBfTbKEIUYy2DpBSmxlSfdfS3Gc1uIsRC9gq23yXCvX3L7Zb/rKlnp8O
+	ssQkISNFafXFz9cdQr0nW6paOdVKvDNZZn/155wGTqdbHPE7NWa95PgXEYTR/fd8
+	he1o1CtxfK8svO7Z/fWM2O2EBRzeMwx0urPHBmttxK2fFSMuAxu6C0kB/H8w3TwS
+	4Rf67a+yesMz7Yy9CeV/wuNXY0pHVtHQ8T8/V6mL8g2emMjYooQXNszA6FalJX5X
+	zccDoTUhveN+4niVrZcYnTxVtSV7W57ITwtSSl6UAljs7ysnGK3Ezu93YaNMln21
+	A2ZFOJRRk4w8TOgGqIgRg==
+X-ME-Sender: <xms:mgU8ZWh-T_UB48zprN2VicCqDSuW13KZX9BGW0NUzBYDopTY549qzg>
+    <xme:mgU8ZXBeQN7i-OXOzcf9fAqEtrxabv8G-yQQl9mOetLlwCxFs0I0UjXgXKJJu1DZM
+    FVk4FaJsTtm_93Yvg>
+X-ME-Received: <xmr:mgU8ZeEt4Zz1Q3-uw_9yqMa5GWXpMBEmVnZFLXcl2IrYf35OsflaEUsUSedVqKSCFeFpyAE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrleeggddufedtucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    gfrhhlucfvnfffucdljedtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertder
-    tddtnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqne
-    cuggftrfgrthhtvghrnhepgfefgfegjefhudeikedvueetffelieefuedvhfehjeeljeej
-    kefgffeghfdttdetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
-    hfrhhomhepugiguhesugiguhhuuhdrgiihii
-X-ME-Proxy: <xmx:lQU8ZYzId49eHTRHRkk0v0icXxwfteTKytuUmhq6rMAs7x86Y7uOHg>
-    <xmx:lQU8ZfTvgTkaWGc7v_ynkC1E0RUOegCBai6kH7Jc_QYsufkYQanqJQ>
-    <xmx:lQU8ZTb_voezV2Am4x-5xSH9WmbPT7WvXxNakT_udrVchwoSbcvG0g>
-    <xmx:lQU8ZdBvZdQ4krVH9hrs5YPLDFCguizebTaiVphyEso8JiHQj70EOg>
+    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdljedtmdenucfjughrpefhvf
+    evufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgvlhcuighuuceo
+    ugiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgfefgfegjefhudeike
+    dvueetffelieefuedvhfehjeeljeejkefgffeghfdttdetnecuvehluhhsthgvrhfuihii
+    vgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihii
+X-ME-Proxy: <xmx:mgU8ZfQaaMlZOurJM5B2tfTHP2Lu0rHpBDLAKXQXlLZNYrw73Dht2g>
+    <xmx:mgU8ZTx2vvZndN9UGOhdREa2Iq7hv43Q8DGcbvo0B1s2T-cPNN5kAA>
+    <xmx:mgU8Zd7biLVIpHekm13ObRpvGz8wjteFPwDD7-IyKil_oNUKLmOh8w>
+    <xmx:mgU8ZRq7VqWDZvY9zoT78pBLb3G2ESoDdlYXUz0KMbXmXbytZiuteg>
 Feedback-ID: i6a694271:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 27 Oct 2023 14:46:44 -0400 (EDT)
+ 27 Oct 2023 14:46:49 -0400 (EDT)
 From: Daniel Xu <dxu@dxuuu.xyz>
 To: hawk@kernel.org,
-	steffen.klassert@secunet.com,
 	ast@kernel.org,
-	pabeni@redhat.com,
+	shuah@kernel.org,
 	daniel@iogearbox.net,
 	kuba@kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
 	davem@davemloft.net,
+	andrii@kernel.org,
 	john.fastabend@gmail.com,
-	edumazet@google.com,
+	steffen.klassert@secunet.com,
 	antony.antony@secunet.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
+Cc: mykolal@fb.com,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
 	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
 	devel@linux-ipsec.org
-Subject: [RFC bpf-next 1/6] bpf: xfrm: Add bpf_xdp_get_xfrm_state() kfunc
-Date: Fri, 27 Oct 2023 12:46:17 -0600
-Message-ID: <ee5513e6384696147da9bdccd2e22ea27d690084.1698431765.git.dxu@dxuuu.xyz>
+Subject: [RFC bpf-next 6/6] bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
+Date: Fri, 27 Oct 2023 12:46:22 -0600
+Message-ID: <62f770a8956773a3c21dccb6037aee305dc7e4c6.1698431765.git.dxu@dxuuu.xyz>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <cover.1698431765.git.dxu@dxuuu.xyz>
 References: <cover.1698431765.git.dxu@dxuuu.xyz>
@@ -102,175 +110,134 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This commit adds an unstable kfunc helper to access internal xfrm_state
-associated with an SA. This is intended to be used for the upcoming
-IPsec pcpu work to assign special pcpu SAs to a particular CPU. In other
-words: for custom software RSS.
-
-That being said, the function that this kfunc wraps is fairly generic
-and used for a lot of xfrm tasks. I'm sure people will find uses
-elsewhere over time.
+This commit extends test_tunnel selftest to test the new XDP xfrm state
+lookup kfunc.
 
 Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
 ---
- include/net/xfrm.h        |   9 ++++
- net/xfrm/Makefile         |   1 +
- net/xfrm/xfrm_policy.c    |   2 +
- net/xfrm/xfrm_state_bpf.c | 105 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 117 insertions(+)
- create mode 100644 net/xfrm/xfrm_state_bpf.c
+ .../selftests/bpf/progs/test_tunnel_kern.c    | 46 +++++++++++++++++++
+ tools/testing/selftests/bpf/test_tunnel.sh    | 12 +++--
+ 2 files changed, 54 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 98d7aa78adda..ab4cf66480f3 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -2188,4 +2188,13 @@ static inline int register_xfrm_interface_bpf(void)
+diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+index ec7e04e012ae..f5f6a18ac0f1 100644
+--- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
++++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+@@ -35,6 +35,9 @@ int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,
+ 			  struct bpf_fou_encap *encap, int type) __ksym;
+ int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
+ 			  struct bpf_fou_encap *encap) __ksym;
++struct xfrm_state *
++bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts,
++		       u32 opts__sz) __ksym;
  
- #endif
- 
-+#if IS_ENABLED(CONFIG_DEBUG_INFO_BTF)
-+int register_xfrm_state_bpf(void);
-+#else
-+static inline int register_xfrm_state_bpf(void)
-+{
-+	return 0;
-+}
-+#endif
-+
- #endif	/* _NET_XFRM_H */
-diff --git a/net/xfrm/Makefile b/net/xfrm/Makefile
-index cd47f88921f5..547cec77ba03 100644
---- a/net/xfrm/Makefile
-+++ b/net/xfrm/Makefile
-@@ -21,3 +21,4 @@ obj-$(CONFIG_XFRM_USER_COMPAT) += xfrm_compat.o
- obj-$(CONFIG_XFRM_IPCOMP) += xfrm_ipcomp.o
- obj-$(CONFIG_XFRM_INTERFACE) += xfrm_interface.o
- obj-$(CONFIG_XFRM_ESPINTCP) += espintcp.o
-+obj-$(CONFIG_DEBUG_INFO_BTF) += xfrm_state_bpf.o
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 5cdd3bca3637..62e64fa7ae5c 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -4267,6 +4267,8 @@ void __init xfrm_init(void)
- #ifdef CONFIG_XFRM_ESPINTCP
- 	espintcp_init();
- #endif
-+
-+	register_xfrm_state_bpf();
+ struct {
+ 	__uint(type, BPF_MAP_TYPE_ARRAY);
+@@ -948,4 +951,47 @@ int xfrm_get_state(struct __sk_buff *skb)
+ 	return TC_ACT_OK;
  }
  
- #ifdef CONFIG_AUDITSYSCALL
-diff --git a/net/xfrm/xfrm_state_bpf.c b/net/xfrm/xfrm_state_bpf.c
-new file mode 100644
-index 000000000000..a73a17a6497b
---- /dev/null
-+++ b/net/xfrm/xfrm_state_bpf.c
-@@ -0,0 +1,105 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Unstable XFRM state BPF helpers.
-+ *
-+ * Note that it is allowed to break compatibility for these functions since the
-+ * interface they are exposed through to BPF programs is explicitly unstable.
-+ */
-+
-+#include <linux/bpf.h>
-+#include <linux/btf_ids.h>
-+#include <net/xdp.h>
-+#include <net/xfrm.h>
-+
-+/* bpf_xfrm_state_opts - Options for XFRM state lookup helpers
-+ *
-+ * Members:
-+ * @error      - Out parameter, set for any errors encountered
-+ *		 Values:
-+ *		   -EINVAL - netns_id is less than -1
-+ *		   -EINVAL - Passed NULL for opts
-+ *		   -EINVAL - opts__sz isn't BPF_XFRM_STATE_OPTS_SZ
-+ *		   -ENONET - No network namespace found for netns_id
-+ * @netns_id	- Specify the network namespace for lookup
-+ *		 Values:
-+ *		   BPF_F_CURRENT_NETNS (-1)
-+ *		     Use namespace associated with ctx
-+ *		   [0, S32_MAX]
-+ *		     Network Namespace ID
-+ * @mark	- XFRM mark to match on
-+ * @daddr	- Destination address to match on
-+ * @spi		- Security parameter index to match on
-+ * @proto	- L3 protocol to match on
-+ * @family	- L3 protocol family to match on
-+ */
-+struct bpf_xfrm_state_opts {
-+	s32 error;
-+	s32 netns_id;
-+	u32 mark;
-+	xfrm_address_t daddr;
-+	__be32 spi;
-+	u8 proto;
-+	u16 family;
-+};
-+
-+enum {
-+	BPF_XFRM_STATE_OPTS_SZ = sizeof(struct bpf_xfrm_state_opts),
-+};
-+
-+__diag_push();
-+__diag_ignore_all("-Wmissing-prototypes",
-+		  "Global functions as their definitions will be in xfrm_state BTF");
-+
-+/* bpf_xdp_get_xfrm_state - Get XFRM state
-+ *
-+ * Parameters:
-+ * @ctx 	- Pointer to ctx (xdp_md) in XDP program
-+ *		    Cannot be NULL
-+ * @opts	- Options for lookup (documented above)
-+ *		    Cannot be NULL
-+ * @opts__sz	- Length of the bpf_xfrm_state_opts structure
-+ *		    Must be BPF_XFRM_STATE_OPTS_SZ
-+ */
-+__bpf_kfunc struct xfrm_state *
-+bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts, u32 opts__sz)
++SEC("xdp")
++int xfrm_get_state_xdp(struct xdp_md *xdp)
 +{
-+	struct xdp_buff *xdp = (struct xdp_buff *)ctx;
-+	struct net *net = dev_net(xdp->rxq->dev);
++	struct bpf_xfrm_state_opts opts = {};
++	struct ip_esp_hdr *esph;
++	struct bpf_dynptr ptr;
++	struct xfrm_state *x;
++	u8 esph_buf[8] = {};
++	u8 iph_buf[20] = {};
++	struct iphdr *iph;
++	u32 off;
 +
-+	if (!opts || opts__sz != BPF_XFRM_STATE_OPTS_SZ) {
-+		opts->error = -EINVAL;
-+		return NULL;
-+	}
++	if (bpf_dynptr_from_xdp(xdp, 0, &ptr))
++		goto out;
 +
-+	if (unlikely(opts->netns_id < BPF_F_CURRENT_NETNS)) {
-+		opts->error = -EINVAL;
-+		return NULL;
-+	}
++	off = sizeof(struct ethhdr);
++	iph = bpf_dynptr_slice(&ptr, off, iph_buf, sizeof(iph_buf));
++	if (!iph || iph->protocol != IPPROTO_ESP)
++		goto out;
 +
-+	if (opts->netns_id >= 0) {
-+		net = get_net_ns_by_id(net, opts->netns_id);
-+		if (unlikely(!net)) {
-+			opts->error = -ENONET;
-+			return NULL;
-+		}
-+	}
++	off += sizeof(struct iphdr);
++	esph = bpf_dynptr_slice(&ptr, off, esph_buf, sizeof(esph_buf));
++	if (!esph)
++		goto out;
 +
-+	return xfrm_state_lookup(net, opts->mark, &opts->daddr, opts->spi,
-+				 opts->proto, opts->family);
++	opts.netns_id = BPF_F_CURRENT_NETNS,
++	opts.daddr.a4 = iph->daddr;
++	opts.spi = esph->spi;
++	opts.proto = IPPROTO_ESP;
++	opts.family = AF_INET;
++
++	x = bpf_xdp_get_xfrm_state(xdp, &opts, sizeof(opts));
++	if (!x || opts.error)
++		goto out;
++
++	if (!x->replay_esn)
++		goto out;
++
++	bpf_printk("replay-window %d\n", x->replay_esn->replay_window);
++out:
++	return XDP_PASS;
 +}
 +
-+__diag_pop()
-+
-+BTF_SET8_START(xfrm_state_kfunc_set)
-+BTF_ID_FLAGS(func, bpf_xdp_get_xfrm_state, KF_RET_NULL)
-+BTF_SET8_END(xfrm_state_kfunc_set)
-+
-+static const struct btf_kfunc_id_set xfrm_state_xdp_kfunc_set = {
-+	.owner = THIS_MODULE,
-+	.set   = &xfrm_state_kfunc_set,
-+};
-+
-+int __init register_xfrm_state_bpf(void)
-+{
-+	return register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP,
-+					 &xfrm_state_xdp_kfunc_set);
-+}
+ char _license[] SEC("license") = "GPL";
+diff --git a/tools/testing/selftests/bpf/test_tunnel.sh b/tools/testing/selftests/bpf/test_tunnel.sh
+index dd3c79129e87..17d263681c71 100755
+--- a/tools/testing/selftests/bpf/test_tunnel.sh
++++ b/tools/testing/selftests/bpf/test_tunnel.sh
+@@ -528,7 +528,7 @@ setup_xfrm_tunnel()
+ 	# at_ns0 -> root
+ 	ip netns exec at_ns0 \
+ 		ip xfrm state add src 172.16.1.100 dst 172.16.1.200 proto esp \
+-			spi $spi_in_to_out reqid 1 mode tunnel \
++			spi $spi_in_to_out reqid 1 mode tunnel replay-window 42 \
+ 			auth-trunc 'hmac(sha1)' $auth 96 enc 'cbc(aes)' $enc
+ 	ip netns exec at_ns0 \
+ 		ip xfrm policy add src 10.1.1.100/32 dst 10.1.1.200/32 dir out \
+@@ -537,7 +537,7 @@ setup_xfrm_tunnel()
+ 	# root -> at_ns0
+ 	ip netns exec at_ns0 \
+ 		ip xfrm state add src 172.16.1.200 dst 172.16.1.100 proto esp \
+-			spi $spi_out_to_in reqid 2 mode tunnel \
++			spi $spi_out_to_in reqid 2 mode tunnel replay-window 42 \
+ 			auth-trunc 'hmac(sha1)' $auth 96 enc 'cbc(aes)' $enc
+ 	ip netns exec at_ns0 \
+ 		ip xfrm policy add src 10.1.1.200/32 dst 10.1.1.100/32 dir in \
+@@ -553,14 +553,14 @@ setup_xfrm_tunnel()
+ 	# root namespace
+ 	# at_ns0 -> root
+ 	ip xfrm state add src 172.16.1.100 dst 172.16.1.200 proto esp \
+-		spi $spi_in_to_out reqid 1 mode tunnel \
++		spi $spi_in_to_out reqid 1 mode tunnel replay-window 42 \
+ 		auth-trunc 'hmac(sha1)' $auth 96  enc 'cbc(aes)' $enc
+ 	ip xfrm policy add src 10.1.1.100/32 dst 10.1.1.200/32 dir in \
+ 		tmpl src 172.16.1.100 dst 172.16.1.200 proto esp reqid 1 \
+ 		mode tunnel
+ 	# root -> at_ns0
+ 	ip xfrm state add src 172.16.1.200 dst 172.16.1.100 proto esp \
+-		spi $spi_out_to_in reqid 2 mode tunnel \
++		spi $spi_out_to_in reqid 2 mode tunnel replay-window 42 \
+ 		auth-trunc 'hmac(sha1)' $auth 96  enc 'cbc(aes)' $enc
+ 	ip xfrm policy add src 10.1.1.200/32 dst 10.1.1.100/32 dir out \
+ 		tmpl src 172.16.1.200 dst 172.16.1.100 proto esp reqid 2 \
+@@ -585,6 +585,8 @@ test_xfrm_tunnel()
+ 	tc qdisc add dev veth1 clsact
+ 	tc filter add dev veth1 proto ip ingress bpf da object-pinned \
+ 		${BPF_PIN_TUNNEL_DIR}/xfrm_get_state
++	ip link set dev veth1 xdpdrv pinned \
++		${BPF_PIN_TUNNEL_DIR}/xfrm_get_state_xdp
+ 	ip netns exec at_ns0 ping $PING_ARG 10.1.1.200
+ 	sleep 1
+ 	grep "reqid 1" ${TRACE}
+@@ -593,6 +595,8 @@ test_xfrm_tunnel()
+ 	check_err $?
+ 	grep "remote ip 0xac100164" ${TRACE}
+ 	check_err $?
++	grep "replay-window 42" ${TRACE}
++	check_err $?
+ 	cleanup
+ 
+ 	if [ $ret -ne 0 ]; then
 -- 
 2.42.0
 
