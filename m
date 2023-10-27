@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-44683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05A577D92E3
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:57:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A25F7D9313
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 11:08:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 368561C20FCB
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 08:57:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C8691C20E43
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 09:08:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E45F156D4;
-	Fri, 27 Oct 2023 08:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DD0156DC;
+	Fri, 27 Oct 2023 09:08:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="KCXNUyLG"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KSmw3jjL"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C653F156C8
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 08:57:52 +0000 (UTC)
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2076.outbound.protection.outlook.com [40.107.22.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E7E91B8
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 01:57:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2533EBA5E
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 09:08:06 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2043.outbound.protection.outlook.com [40.107.92.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D006893
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:08:05 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RqqZuJ6LS+WHYT46t84RF75vTREuDO16JebfUja4/h2ztXZgyIIdFPDpH1z0/lJ3WmWQjTfiS6aveqHBYc2gP1rAHdUrHWvoEjECFOamFMzT+ZEbQ6mPXMyZIn1IidDFFDUBAMoQxR7W5SKMY3StOKHDhkzeAO6ZPMovErdwqaAjsp0RBVZ1X3TCdq8pJh1ap5n6zLQ5V+52ZMSp5c+SjNSYp3gFzX8is1PbIrexNendqjtg5iiZWMOto7c88NtMtM+hBiA9/1eA+dElZUBWMnkB5cDLPMc2XdfjSZJi1WeKIo/7OKrEcxmW9eTjev4nXVmmH32vN7+46ejD5LOogA==
+ b=V3Ty9I8qyGN3XPUOL84baVoYQvHvfIp5FGP2G5J/bdBBX6wrHvvqncgbWo4JntliPbhbCCsw3PeZxHB25waiAjJBCoRlYEcqFaH1AJ9ddkOEnFyil5125XNn0R96rDIVQopgiWm9XuI1hLd3OESPBwrbIFB130iB8x7n7bEufD5g8aVsXxxllT8/t6yDZh8YSOoSdXfrtiobTWcBLDJgBS777rPowGjXhrHpI6Ne/AYExF/OUOxBW2ItQ6sy8K2aPkAtJk4ASLVYcgLX0RzzaOvUIyAsDQIKR4xC1kOAD311VhHRI/+pjSoe787PVSiYjvnyESBmGHucSSAUdVYtQg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZxBLQjK2h3m8WjqlDWt3n/kU/r/6GeiauIe/yMtvt4k=;
- b=TWh5xXYZL/aCmhdXjix+9USwwC8d50812RXsDiu0vjFrEV63Obr6JlXJABJQS0FtFImzIySroBxUFCWwl7xupu2r1GzWpahq+n8D0lNHjHMlVNOhX9uEZ9kk49/8sb31GzRGS7py7YG3V6l55JPoHaTqG5tCKs9bo0nNxNpiBnh/z7QE0cS4XUp7m2MAJVED07KctfFNDdlsEKcJMQOfxjKTX/5XD+MkzQcy1bBtI/9gPIMo7ADBJ6427xhrITZRO2L5M42XE/EGW9kuA2mmagfoLsQKd9HiiMHzosoE1ObgtqM6hAhRLsna/LD+TTw2rArKP4wW+iLmAkMsBHplWQ==
+ bh=MxOepCToDPHpUEVw66+1yT2Jh7qSvDmaKJBBloTDQ0E=;
+ b=QysysIhKuSIdzV6zJpoITwYzGF2WlNUC473l4esO6u0oy/NdcqV1AG4X+GFgQGuE7OSmdRjjZBbOsE1+SkTp6/UDdbHM0BmmWI09NCqJ6eESxK+lk07atiUtTadrwyYA7NA6SLvcnqCHIdwoHtdtAnuyt6IcRm9l9G4myDZ3QQC4kzOTaH1Avty9IrFG9lUCxSULmbHD+pprvNfPo+UG/uBJfyU73nTbRxGF+NUqsxdwDybfXI2jImYAoh9aw/r4ePqZJfFWCnxqB8dOHa4I+FKVVror9rZBu00fWcCX9lCcCNgYCgRaW7LuXZIWJJs0YR+acjwBVMCKgX3xkIJw5w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZxBLQjK2h3m8WjqlDWt3n/kU/r/6GeiauIe/yMtvt4k=;
- b=KCXNUyLGqjEeWvvaR+Qo8jmjgwOxmhtp1wHbpFEco3+SOkBSYnujkxzWKvluV83g7Xhp7AhTXZfW2uRzoFu8+TDeAcQWKXN7oe3FXhIsfYnb9pbIiUJOacgdRtFbs3BxEeqACQS4k6UASIU0vhg/l+nGejTmlLgrsHcnlYLqY9gDWHycTnYIEZM6ppSk3C+uyGTqyKQ3t2G+C5KLYhJO+FgP9z4x/IsO09qExUbM5JgGF5g4CSva2P1u9ffPwie1+IHdxzsJ0e0iq7u2uqoY+ZW7M2EnkkYUEmZu6wHpd/SsFvF1gI+lTE7Ib4uQHpcFh2b5ien+eUQQtvgPGRdzlQ==
+ bh=MxOepCToDPHpUEVw66+1yT2Jh7qSvDmaKJBBloTDQ0E=;
+ b=KSmw3jjLUILb4hBUPKt5u7MghNHM1pYvVviAAnNhOC80VrEokXDnfxdaRY3rAOsAFjQ8GenGgV2HijQMtOrW5PQvGl07DPBOxdOIA+TaPq84EsGEXF+HuiqwVNzH8isvfFETtuZ8Meph1XU/xpDBYD56wQAerVrdPESGZMY2IKJHhRw1H5cnWUolv58RMlRSiLQmwlnaXMW5k2RecFTrJkN/03TQEBzPP453zEP8Dkp+syUirAwkOhgWq8vzqSVGJ5uQ0zkmOeF08vRwkSWsxsXaOsCc7hDGlr7CXRSV1GdcsAX2fUfpBV8A2cU1T2xPRUT8sGes+g82QISVRGlDVw==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from AS8PR04MB9510.eurprd04.prod.outlook.com (2603:10a6:20b:44a::11)
- by PAXPR04MB9303.eurprd04.prod.outlook.com (2603:10a6:102:2b7::22) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
+ by BN9PR12MB5145.namprd12.prod.outlook.com (2603:10b6:408:136::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.8; Fri, 27 Oct
- 2023 08:57:48 +0000
-Received: from AS8PR04MB9510.eurprd04.prod.outlook.com
- ([fe80::9f3e:3b47:5ccd:c47c]) by AS8PR04MB9510.eurprd04.prod.outlook.com
- ([fe80::9f3e:3b47:5ccd:c47c%6]) with mapi id 15.20.6954.008; Fri, 27 Oct 2023
- 08:57:48 +0000
-From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-To: netdev@vger.kernel.org
-Cc: Shung-Hsi Yu <shung-hsi.yu@suse.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@kernel.org>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	dsahern@gmail.com
-Subject: [PATCH iproute2-next v2 2/2] bpf: increase verifier verbosity when in verbose mode
-Date: Fri, 27 Oct 2023 16:57:06 +0800
-Message-ID: <20231027085706.25718-3-shung-hsi.yu@suse.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231027085706.25718-1-shung-hsi.yu@suse.com>
-References: <20231027085706.25718-1-shung-hsi.yu@suse.com>
-Content-Transfer-Encoding: 8bit
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.24; Fri, 27 Oct
+ 2023 09:08:03 +0000
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::42b4:7f1:b049:39b2]) by SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::42b4:7f1:b049:39b2%7]) with mapi id 15.20.6933.024; Fri, 27 Oct 2023
+ 09:08:02 +0000
+From: Aurelien Aptel <aaptel@nvidia.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+ sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org, Boris
+ Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com, smalin@nvidia.com,
+ malin1024@gmail.com, ogerlitz@nvidia.com, yorayz@nvidia.com,
+ galshalom@nvidia.com, mgurtovoy@nvidia.com, edumazet@google.com,
+ pabeni@redhat.com, dsahern@kernel.org, imagedong@tencent.com,
+ ast@kernel.org, jacob.e.keller@intel.com
+Subject: Re: [PATCH v17 01/20] net: Introduce direct data placement tcp offload
+In-Reply-To: <ZTfSOv0F7licIO6Y@nanopsycho>
+References: <20231024125445.2632-1-aaptel@nvidia.com>
+ <20231024125445.2632-2-aaptel@nvidia.com> <ZTfSOv0F7licIO6Y@nanopsycho>
+Date: Fri, 27 Oct 2023 12:07:58 +0300
+Message-ID: <253jzr8juvl.fsf@nvidia.com>
 Content-Type: text/plain
-X-ClientProxiedBy: TYAPR03CA0015.apcprd03.prod.outlook.com
- (2603:1096:404:14::27) To AS8PR04MB9510.eurprd04.prod.outlook.com
- (2603:10a6:20b:44a::11)
+X-ClientProxiedBy: LNXP123CA0001.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:d2::13) To SJ1PR12MB6075.namprd12.prod.outlook.com
+ (2603:10b6:a03:45e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,160 +76,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB9510:EE_|PAXPR04MB9303:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8e96e3a6-4c1b-41c8-4c64-08dbd6cacaea
+X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|BN9PR12MB5145:EE_
+X-MS-Office365-Filtering-Correlation-Id: a62b28a9-06b9-48e1-4e28-08dbd6cc394e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	XGH+XdKN2gxYX0ctJQbqROJO+bvLybW0cK6xkYRSnVtBMPPzYxUNEQmqL3dRF1lfUsR3NG7kLHKqmbmt98/gy5Z4I+wgPdGwrlfoiLFUquLBSyMKYMB69Mn192ZuVvjZmLGb2sT3Ot/QZfDhQLFDMzMRjW5GN2VcmRarxxzWdOMaD1sOq0Mh3hxs19cZX6eYrQYKHgk2CuR4OmYD3sePyGHQ2pHzgCPMNgZ/Xm11+WM2F/hwsfn/SyytR97aTOjMB+9Cs6UThDpnSd8eGHCLL8CrKv4IBy0CcRX/wNqTOWhCJr6VeS1c4VQz3NEDpE/e4+tjH9prViWx/+ZDs51ZTjcfbJEKBeGtEA/OdAfuoPfAz3LxKMNO/Z9NFHfDrgn/D9qQKZ8+C/5Szwh/DtVa5FTPpOrEYfVa4BcxyGp6kDz7UoK2PmaMYGTZdHqi/ATn3jM3y5IE1ynhZXMvPZ8NxSV5OPR20n8HJXC1900SgqfIBx4nAxpPXmgBgJfdAPrYpXxt5sh96rGS4SKceWR7qUD67Ts1iLaZMJPFAqWr9TY2MoR+M6PGyIkowt3GsUQz
+	slf24eMZ8+0UCl6y9UKlHSYk5zX23cQ4AIxbjiJpulwt4DaV+KXDP+EqbpPPnyfSx+NOyD6rYKC85uSVhn0HqGXt/XsJeIwHZnsFtIMrXLjGx0xrJ+DLR8SD3gICt5/T9q0CgkAjapKqKvL1ca3YaX68wvQGvQUALDJ425EYYEoDeh2gXG28LoWE4tpp95XnWTOAiZOhMeY9dU8/S5un9aubPGM198PD4ypkNzv+OLwsRrcH0AAG8ioC5F/nEXltf1FHEnpqrTCrtZmQB3kMqkrDy7SNk0FpQM2Dc/jLj6jk2xYUj0qIcNQ0Em7jKm4QdFWz9Ns/1p2QuvloTscH/FcGcFRNIaoc05ZyObKgG/Sc6FIu4lPMcGl9U3pjgpcuP6gRLVbqJVmOrRT9vBTnd27gEAPs3G4SUailaa6YfTe5NtiwcE/XJuDYT3TPFIzz+v0klJ9YnEL/5xH0FmPAnVXsF4jFdUHIKgVOHt1Da0GYlLvVL+D/I0zudIzS958RpWzQH2Kgagkl7lMVh4dIoEBMdIjxI4WiA+lIjEUhyw15fq5VummlFBKojyezopW9
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB9510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(39860400002)(396003)(366004)(136003)(230922051799003)(64100799003)(186009)(451199024)(1800799009)(2906002)(41300700001)(83380400001)(478600001)(4326008)(8936002)(8676002)(6486002)(66946007)(66556008)(54906003)(5660300002)(86362001)(316002)(6916009)(66476007)(6666004)(38100700002)(2616005)(1076003)(6506007)(36756003)(6512007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(346002)(376002)(136003)(366004)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(4326008)(6916009)(83380400001)(8936002)(66476007)(8676002)(66946007)(66556008)(7416002)(6666004)(2906002)(6486002)(478600001)(5660300002)(316002)(41300700001)(6506007)(2616005)(26005)(86362001)(38100700002)(36756003)(6512007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?VaUq9+urk181DXXDYOXQDcqxHEG0ipMCIbMFdj0PGgGdYNfe1sRgfDgvv74D?=
- =?us-ascii?Q?EKIlA6jvziAPgUdhRBQddw+k31zZKtIDZNrk8HTQ/4Yy7amem9N4hTgOsWTs?=
- =?us-ascii?Q?opxblQXu7I+ED2wX2Av+urbyKeIGd14CWYI0/aVbmP7JfeOkGpJxTbNQVbXY?=
- =?us-ascii?Q?aHMFKBoTQ5qWp1pj+qaX9ESQK5pSCZN6GJxh2Kdx0cKKW4PckVpQRWKgIC+s?=
- =?us-ascii?Q?y9jHIYJNLXbnVTNuZbNMoe9IjqJvWGIkLxJd+SdA5ZiPRptMk1Nzwb7KKN2k?=
- =?us-ascii?Q?RuTKXCfPHrNO7A0H+ETlI8W8gyUb2yMEYzZb26R51UAIu6ziNRY1wulyVukA?=
- =?us-ascii?Q?hJj70pT78PQmGC4jQ+htmpBLAHhU5ZNZDK+9hp95aKPYKiatz8ARs3zCNTRF?=
- =?us-ascii?Q?1UOV3KFR71NwXxE8vN/UUiGgoOo6lUt1icohZsM5pGXdXOFtKwgVV0QNy3Fn?=
- =?us-ascii?Q?T9RYTMq+mZ1SW42IjFZIn7JUj5ixA22oNTo5076HUre90DGIbhl5pWpTBVvJ?=
- =?us-ascii?Q?laG8xhF1EuyRhTuNPUeaYXWCLnXPiWMt0o+/vOo58PBGVtqsg8zRHDg4sC90?=
- =?us-ascii?Q?qbStpPRNDo68YMq+4jrC97azSSiVWDUxUWrcsxghmQF3XjIE4uF2NOt0HyXr?=
- =?us-ascii?Q?OB7KJuyfV5XrYU6wmIGUMj8WacSmY5qNusqW915iYYXh0GMSi6PeB6IQs4m6?=
- =?us-ascii?Q?4ISfautn+BNonzeadzu5GoQjfG5jV349DMh4kTRwF3Xe2LJ0lNhuSGfkCwHy?=
- =?us-ascii?Q?KmG/WxfeTgdI3XkhiVTACXgkAC9NpkirsiqMyvvcCAcSGe7+SgU3OUm8JsQZ?=
- =?us-ascii?Q?Y+GswORPb1gzhBnZjH0d8luRSUn8W1Xzj969uEY2fCx/sQUvBA1/+yM/Lq/5?=
- =?us-ascii?Q?O6HxEbFF+BntVcwaTrg+HCrEEXsoY7BNPP1/+zvuQ8zF7k7hH53cFXKmw4i6?=
- =?us-ascii?Q?oXgGY2rPdfhvBZJSMANcdfE8M7gpw1dTy8WF5I1E93wvMMvnLrosPpYMMyL6?=
- =?us-ascii?Q?IA4JXOpXQg13BHBKCjJPFKtBqyJdR6trpF/HGBf9l5K2vl/JokhI9hKJ33xv?=
- =?us-ascii?Q?wg2wiZ1qrrPxfkH93up49HW8PEu5JuWs0N1NHCu7kzPohVPOeTOTMaAsd1n1?=
- =?us-ascii?Q?LDAZep5pytw9RcyKASQW3IWjHTJ0W5D2iKPNAVEHzsDtAZEev3KvHUfc69QL?=
- =?us-ascii?Q?8JEjRf+MeTX07r7B3700G9PFgcKUkr5Ti9yXvuNc3667J/u+WzLxkYUChnix?=
- =?us-ascii?Q?ObLZQ3+ORrUqg0U5RNjt8e9H2XOeEFlJTB64C12xj61zozW9ISkpw8WFBKWv?=
- =?us-ascii?Q?IlhDkevrFFMIMC9jf9a/D74cCNJ1dmAVilROy8myUAR1zqhlHakJgCp9IOGZ?=
- =?us-ascii?Q?N6bnnrzt+y42Nc2aKUbgyVSB/rIuuD4S6aV+QlJFYUIENJot6pbfsq1BhkQ4?=
- =?us-ascii?Q?ZeYuZAtpomHQ3vYpw16n/+lWrRpHhQKMmtiS4cXt2kRMf6xgQzERcQNSoqSL?=
- =?us-ascii?Q?rNJZRBR24F/a9nhhm5qB26J+WWWLizdA27x/34XGPItvVdN8pbN9jIjm2hSb?=
- =?us-ascii?Q?r1R8NB0Ol6mS1nbYB/lLr9kwsg63nQ+t8JSjHfk6XeDsFawwf0OVT9xem+mw?=
- =?us-ascii?Q?1hl2EF7JOlmm9JsWhjAyUsplEKFb6M3CzTiMvcA3pUczbcMC7KrR/vu3knXX?=
- =?us-ascii?Q?SJ3Rqg=3D=3D?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8e96e3a6-4c1b-41c8-4c64-08dbd6cacaea
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB9510.eurprd04.prod.outlook.com
+	=?us-ascii?Q?FFChL8mrrrETK2lt7r6vVaP3xZgoUpLzXE4a/7tQaQrHOKUJzGhf6ivlhIK5?=
+ =?us-ascii?Q?kxyoBFscNLYcZpnrHD0dwtFVNGNnc3uauXI6WlL1U88JRq6yBcsrE9W1mfYD?=
+ =?us-ascii?Q?TxmpCEaec736YQ17wQC/7Y8rH/P4sYdDgkQ4px1Ty23O1Kqf2naqoaT1cEWt?=
+ =?us-ascii?Q?AFMD+LdHciPWTQbsNOy0PO5tFFcC32VJ/TeqaOUY97VpPxw+9J+lHafPdxMR?=
+ =?us-ascii?Q?KjVarEvLLvgVbjWKfZFn+2+cPMSVVS847p0pb7OifuNXZ1lnIW+nflsKQxXf?=
+ =?us-ascii?Q?8jbkNwvd3MtAKlsBY/g4WUGrs2nZrLgkBtUYK/gM2vVa3NLCWI/tvnjAn5kb?=
+ =?us-ascii?Q?1NGzNLE+dATSfWmybgkrxRSIiUTU/KH8n/wRxVFR8sBfAbiNAMn52Jrdg3Zf?=
+ =?us-ascii?Q?ezOr811GRlwnTbSx9pLURoQYupt8w149W/z6CLKFEFiTVkxprkLjW+GpzoI9?=
+ =?us-ascii?Q?wqP+v9kCxDXuzL0YOxDaoE7EC/ADFXEZo7dvrbffV2ylX1u2EKa2bf/wGxyg?=
+ =?us-ascii?Q?ZnAtzHiaw88LEji89x1+w4+/4J1h3tV3Mh/SiGBfnnMdG73dqG0eYRSYV/RC?=
+ =?us-ascii?Q?xgXoJcmWJRXCkt80i1JsE1NVuWftPjKzZXPBNj1TqlFa1zEKDRhBrRX+hPwy?=
+ =?us-ascii?Q?P8NkdPNTjoc2unhlwMoankmw+Z9U4XX+ngvsKwtHfRC4YGRGcYFrx0CqEgvZ?=
+ =?us-ascii?Q?23YOGRHAo8OsvCrl88ugY+VrhE4r/UHA9opaTblMqBaxRA+FyvtV5wYnUksX?=
+ =?us-ascii?Q?hxpLL8TnrKAoKgOG4bWzAWqmgc1s5XnLWxM/G5KSLfAGQ8j0F2kTqUj7yj6a?=
+ =?us-ascii?Q?dn5rGdU9zDq8LSF1JcuIDRblh3jeqs3XuqclsTslOes2KetYRjQ6CDsVeHEn?=
+ =?us-ascii?Q?N0zT1zqskNsxclx1haliDfibuUZeLBe+j/3TYmqVzXi4rPmQOOaCvn+aR5PM?=
+ =?us-ascii?Q?69S6T6RUQi4kp2UuP6WKQJ2p6iFlUV8HmwvilA/WDMj7a5Ti8n05pNG8rwyG?=
+ =?us-ascii?Q?KEQzgkOQjOZT2/DLeyOro3iqqqB5fPxbPDQbGC10t/C21V6M2li8iQ4imHjJ?=
+ =?us-ascii?Q?nRACIEXrUvIFiDK4B3gEHSVSkYPMQidL+hZAVF4imDdwVUC90oc82U56yvgQ?=
+ =?us-ascii?Q?mNpZ+ZpjXrNUmfAIKI+PZz5Y6G/nBl4ri11/hfdD7TQ66gJxniBueqEvkgWO?=
+ =?us-ascii?Q?Ic7OR8cuA17UDN0cKHpDNwF+NV4R/NyVWHOHj7i+CJZ4/uhli68tpvyVlxa5?=
+ =?us-ascii?Q?uDApZau1ioKt4evqzhPjzltJwSUX9q32WU2XMIqu4s6w1GLy6Gd4D/PQ8myB?=
+ =?us-ascii?Q?9MCxAb0FkGA4U2fXseHE8XIa7yCH7KTAp/sGKkIy9BCmFogHUij4pb7NtbUp?=
+ =?us-ascii?Q?Zt7BgQq3g2o4nz0UASxKNLwI8Xsm6q30Nslw0xU6gCbZrX/7avgqYwqhVUj6?=
+ =?us-ascii?Q?lFJP5rYx4K1zswLs+BKbAOZEyeYOuCWdUeQqRlbQcwfohetiM+5HwbyRH/Kz?=
+ =?us-ascii?Q?Ly/aFsImdFO/XXta5fp9N3TcFX+yALhZQpw93DV+oPvzLGJZrfBK/F33NkL2?=
+ =?us-ascii?Q?67G/kgahlKf17wj9frvlZDrmRDomTaIPFS0KnyBw?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a62b28a9-06b9-48e1-4e28-08dbd6cc394e
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2023 08:57:48.2153
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2023 09:08:02.8126
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iDglTuD6WkynjMvKhEqB+KqLRto6EAPGU0JHXkN7AUoIy4qAu411yDMu6BoHi52AhcsNy3pEd4W8OnCadNkvzw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9303
+X-MS-Exchange-CrossTenant-UserPrincipalName: LPe/DxaBnjEt8Ix2L2xPzGV19egNla1QQ4oFI0GDafllQIjsqKRdqDA0qu3LovAj3Cd3EVWeVQqNXVKhaWgk5Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5145
 
-The BPF verifier allows setting a higher verbosity level, which is
-helpful when it comes to debugging verifier issue, specially when used
-on BPF program that loads successfully (but should not have passed the
-verifier in the first place). Increase the BPF verifier log level when
-in verbose mode to help with such cases.
+Jiri Pirko <jiri@resnulli.us> writes:
+>>@@ -2134,6 +2146,9 @@ struct net_device {
+>>       netdev_features_t       mpls_features;
+>>       netdev_features_t       gso_partial_features;
+>>
+>>+#ifdef CONFIG_ULP_DDP
+>>+      struct ulp_ddp_netdev_caps ulp_ddp_caps;
+>
+> Why can't you have this inside the driver? You have set_caps/get_stats
+> ops. Try to avoid netdev struct pollution.
 
-Signed-off-by: Shung-Hsi Yu <shung-hsi.yu@suse.com>
----
- include/bpf_util.h |  4 ++--
- ip/ipvrf.c         |  3 ++-
- lib/bpf_legacy.c   | 10 ++++++----
- lib/bpf_libbpf.c   |  2 ++
- 4 files changed, 12 insertions(+), 7 deletions(-)
+Ok, we will move ulp_ddp_caps to the driver and add a get_caps() operation.
 
-diff --git a/include/bpf_util.h b/include/bpf_util.h
-index 1c924f50..8951a5e8 100644
---- a/include/bpf_util.h
-+++ b/include/bpf_util.h
-@@ -273,10 +273,10 @@ void bpf_print_ops(struct rtattr *bpf_ops, __u16 len);
- 
- int bpf_prog_load_dev(enum bpf_prog_type type, const struct bpf_insn *insns,
- 		      size_t size_insns, const char *license, __u32 ifindex,
--		      char *log, size_t size_log);
-+		      char *log, size_t size_log, bool verbose);
- int bpf_program_load(enum bpf_prog_type type, const struct bpf_insn *insns,
- 		     size_t size_insns, const char *license, char *log,
--		     size_t size_log);
-+		     size_t size_log, bool verbose);
- 
- int bpf_prog_attach_fd(int prog_fd, int target_fd, enum bpf_attach_type type);
- int bpf_prog_detach_fd(int target_fd, enum bpf_attach_type type);
-diff --git a/ip/ipvrf.c b/ip/ipvrf.c
-index 12beaec3..e7c702ab 100644
---- a/ip/ipvrf.c
-+++ b/ip/ipvrf.c
-@@ -253,7 +253,8 @@ static int prog_load(int idx)
- 	};
- 
- 	return bpf_program_load(BPF_PROG_TYPE_CGROUP_SOCK, prog, sizeof(prog),
--				"GPL", bpf_log_buf, sizeof(bpf_log_buf));
-+				"GPL", bpf_log_buf, sizeof(bpf_log_buf),
-+				false);
- }
- 
- static int vrf_configure_cgroup(const char *path, int ifindex)
-diff --git a/lib/bpf_legacy.c b/lib/bpf_legacy.c
-index 3542b12f..844974e9 100644
---- a/lib/bpf_legacy.c
-+++ b/lib/bpf_legacy.c
-@@ -1098,7 +1098,7 @@ int bpf_prog_detach_fd(int target_fd, enum bpf_attach_type type)
- 
- int bpf_prog_load_dev(enum bpf_prog_type type, const struct bpf_insn *insns,
- 		      size_t size_insns, const char *license, __u32 ifindex,
--		      char *log, size_t size_log)
-+		      char *log, size_t size_log, bool verbose)
- {
- 	union bpf_attr attr = {};
- 
-@@ -1112,6 +1112,8 @@ int bpf_prog_load_dev(enum bpf_prog_type type, const struct bpf_insn *insns,
- 		attr.log_buf = bpf_ptr_to_u64(log);
- 		attr.log_size = size_log;
- 		attr.log_level = 1;
-+		if (verbose)
-+			attr.log_level |= 2;
- 	}
- 
- 	return bpf(BPF_PROG_LOAD, &attr, sizeof(attr));
-@@ -1119,9 +1121,9 @@ int bpf_prog_load_dev(enum bpf_prog_type type, const struct bpf_insn *insns,
- 
- int bpf_program_load(enum bpf_prog_type type, const struct bpf_insn *insns,
- 		     size_t size_insns, const char *license, char *log,
--		     size_t size_log)
-+		     size_t size_log, bool verbose)
- {
--	return bpf_prog_load_dev(type, insns, size_insns, license, 0, log, size_log);
-+	return bpf_prog_load_dev(type, insns, size_insns, license, 0, log, size_log, verbose);
- }
- 
- #ifdef HAVE_ELF
-@@ -1543,7 +1545,7 @@ retry:
- 	errno = 0;
- 	fd = bpf_prog_load_dev(prog->type, prog->insns, prog->size,
- 			       prog->license, ctx->ifindex,
--			       ctx->log, ctx->log_size);
-+			       ctx->log, ctx->log_size, ctx->verbose);
- 	if (fd < 0 || ctx->verbose) {
- 		/* The verifier log is pretty chatty, sometimes so chatty
- 		 * on larger programs, that we could fail to dump everything
-diff --git a/lib/bpf_libbpf.c b/lib/bpf_libbpf.c
-index 4a8a2032..08692d30 100644
---- a/lib/bpf_libbpf.c
-+++ b/lib/bpf_libbpf.c
-@@ -289,6 +289,8 @@ static int load_bpf_object(struct bpf_cfg_in *cfg)
- 
- #if (LIBBPF_MAJOR_VERSION > 0) || (LIBBPF_MINOR_VERSION >= 7)
- 	open_opts.kernel_log_level = 1;
-+	if (cfg->verbose)
-+		open_opts.kernel_log_level |= 2;
- #endif
- 
- 	obj = bpf_object__open_file(cfg->object, &open_opts);
--- 
-2.42.0
+>>+struct netlink_ulp_ddp_stats {
+> There is nothing "netlink" about this. Just stats. Exposed over netlink,
+> yes, but that does not need the prefix.
 
+Ok, we will remove the netlink prefix.
+
+>>+enum {
+>>+      ULP_DDP_C_NVME_TCP_BIT,
+>>+      ULP_DDP_C_NVME_TCP_DDGST_RX_BIT,
+>>+
+>>+      /*
+>>+       * add capabilities above and keep in sync with
+>>+       * Documentation/netlink/specs/ulp_ddp.yaml
+>
+> Wait what? Why do you need this at all? Just use the uapi enum.
+
+The generated enum does not define a "count" (ULP_DDP_C_COUNT) which we
+need to know how big the bitfield should be. Maybe the code generator
+can be patched to add a #define with the number of values in the enum?
 
