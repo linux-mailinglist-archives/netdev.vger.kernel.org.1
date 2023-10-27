@@ -1,48 +1,47 @@
-Return-Path: <netdev+bounces-44647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 432437D8E08
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 07:17:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC85A7D8E0D
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 07:19:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F3501C20EEA
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 05:17:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 724EBB212EF
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 05:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1D95249;
-	Fri, 27 Oct 2023 05:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BD953B3;
+	Fri, 27 Oct 2023 05:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWnvWoxu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KPftb1WH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2042F3E
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 05:17:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06C01C433C7;
-	Fri, 27 Oct 2023 05:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106665CBA;
+	Fri, 27 Oct 2023 05:19:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55BD1C433C7;
+	Fri, 27 Oct 2023 05:19:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698383820;
-	bh=/NiCdPoSGMAg8lGrz7v2O2qlsTD5Woo3HpCfh0YCSJk=;
+	s=k20201202; t=1698383965;
+	bh=XQx6S1LPtKxuoAI+VdCVsEjkr21diumw1bhdxB3RXdg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZWnvWoxuohXfcWVjKwccjZN3lp1zIIPDVd3E5xy1G2eVPj+glFMUKNXuZ526g7UlW
-	 zgp8MBMLMPeDek8p9XUNyFWsU5h8fzllbYxapWR8vbcyreFa6psn6+L+FYD5LNza86
-	 gi6LB3w0P9Z/FJBRM/bTIA7F2I1XH8j4JYwM3o78ihaYBgA4wz/+GzzQqfx+RS8uTJ
-	 YpCp745bnvscr5Bc2q0dGqQ5R7c2EN7OjJWe/u++Ay4IHt87r1lGv38LQUO+Mt87g/
-	 FGCNplrJxLNttKklPVZjABzWbLnltSqHB7+B3uzzufoLul0z0knlszag+3fnRZaZdx
-	 PlOUJTAaOh87w==
-Date: Thu, 26 Oct 2023 22:16:59 -0700
+	b=KPftb1WHEgvkFr6xtOyAA3gn3wcaUIVDRTRHMR+Cib3pPXzXEWxbuC1OsqP6nzTQ+
+	 m7BRZ87KIr8OLV/PKqBe5lIyUv4CMm7xInK6rRtoj9SN+T5dnndI4UZo2wfZ3aLOyZ
+	 0sTwqYnVzm/RwN/ol5hj7lckZ3qmnhzarv9kcx7NrW1vj1+07yyDM8acDW9qSMeWX/
+	 o9xUdaiKTgpNJp+xlVjEVfws3HrdlqLhZAdkI77aX6GaeUhp6SmGqrIgxzLeaJhA7i
+	 a1YTep3ZcTUqBDVUM8Gv8SwNP4S8/EmWXUzBHaGwMqJ/TaPnmYsL0aZFrqU6s5SLq/
+	 JY8cgzwJqz2FA==
+Date: Thu, 26 Oct 2023 22:19:24 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
- davem@davemloft.net
-Subject: Re: [PATCH net-next 0/6] Intel Wired LAN Driver Updates for
- 2023-10-25 (ice)
-Message-ID: <20231026221659.3c93b286@kernel.org>
-In-Reply-To: <169838345052.10513.926800877011870802.git-patchwork-notify@kernel.org>
-References: <20231025214157.1222758-1-jacob.e.keller@intel.com>
-	<169838345052.10513.926800877011870802.git-patchwork-notify@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: pull-request: bpf-next 2023-10-26
+Message-ID: <20231026221924.2f02f9ad@kernel.org>
+In-Reply-To: <20231026150509.2824-1-daniel@iogearbox.net>
+References: <20231026150509.2824-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,24 +51,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Some disturbance in the force:
+On Thu, 26 Oct 2023 17:05:09 +0200 Daniel Borkmann wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
+> 
+> The following pull-request contains BPF updates for your *net-next* tree.
+> 
+> We've added 51 non-merge commits during the last 10 day(s) which contain
+> a total of 75 files changed, 5037 insertions(+), 200 deletions(-).
 
-On Fri, 27 Oct 2023 05:10:50 +0000 patchwork-bot+netdevbpf@kernel.org
-wrote:
->   - [net-next,1/6] ice: Add E830 device IDs, MAC type and registers
-
-ba1124f58afd
-
->   - [net-next,2/6] ice: Add 200G speed/phy type use
->     https://git.kernel.org/netdev/net-next/c/24407a01e57c
->   - [net-next,3/6] ice: Add ice_get_link_status_datalen
->     https://git.kernel.org/netdev/net-next/c/2777d24ec6d1
->   - [net-next,4/6] ice: Add support for E830 DDP package segment
-
-3cbdb0343022
-
->   - [net-next,5/6] ice: Remove redundant zeroing of the fields.
->     https://git.kernel.org/netdev/net-next/c/f8ab08c0b769
->   - [net-next,6/6] ice: Hook up 4 E830 devices by adding their IDs
->     https://git.kernel.org/netdev/net-next/c/ba20ecb1d1bb
+Pulled, thanks!
 
