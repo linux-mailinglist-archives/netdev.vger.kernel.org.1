@@ -1,78 +1,103 @@
-Return-Path: <netdev+bounces-44626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87AB47D8D3C
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:47:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA13B7D8D40
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:50:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36F0B2821CA
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:47:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26F6C1C20F5D
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77DD64A;
-	Fri, 27 Oct 2023 02:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="V3ul2WeT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D42164A;
+	Fri, 27 Oct 2023 02:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE38719C;
-	Fri, 27 Oct 2023 02:47:21 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA232C4;
-	Thu, 26 Oct 2023 19:47:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ePutOWB0IdYzMU/QyiXTZPgLpmM6M9qUvOK+z6Zfa5Y=; b=V3ul2WeTxEPKe7dmSt9m5HmSIB
-	e+liYFtT5BOT4M+E73s3ilWMhGB2Ig9V1kERKuxLLO+rYbSVjVCqr1jwMNLtOkBLmq1cMM18jHdPo
-	ybmpuTz7/4Jy9/7MG1HzyobyFGpjj5I2fdVGb6YIz9zFPN1yD4tUuOdllDE0a0LQMTlo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qwCsX-000Iap-9H; Fri, 27 Oct 2023 04:47:17 +0200
-Date: Fri, 27 Oct 2023 04:47:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	benno.lossin@proton.me, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 0/5] Rust abstractions for network PHY drivers
-Message-ID: <c40722eb-e78a-467d-8f91-ef9e8afe736d@lunn.ch>
-References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
- <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com>
- <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch>
- <ZTsbG7JMzBwcYzhy@Boquns-Mac-mini.home>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C087B257B
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:50:40 +0000 (UTC)
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1645FCA;
+	Thu, 26 Oct 2023 19:50:38 -0700 (PDT)
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-28002031f06so918909a91.1;
+        Thu, 26 Oct 2023 19:50:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698375037; x=1698979837;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GEDdFhBEWomx2nDAs3Hi04Zp62KEgFzJ+9IawEdcmP0=;
+        b=oAUH0o8gcWwSEgI4OQVhfx9DyNkYVhdG8pQqtJUVDrWEJ3C9h+nCL17YMEUhNikKlz
+         JfTtUyCQFcdJjBzJuaN+qTYK6ThaHY3HX3nathISLENTv48BcWx7dqt8k6TNHxdr/IDy
+         UGmygk3r5OjsBF65dmSxvnRR/QVYyFYGC1wPh3bfiJf6QcnKENRNHj2fetvZtL+R6MK/
+         uCZJhN9Bahoj+sAndAmgtt3Qvo0xqupNIwkjsCaoHuyATWu/YI8aOylOU7mjWLREo1Gx
+         N0lJU+CmxWBDoxEL9wNJ52vtbp22u14IcKZBsGIYci4FhOO8kHemzQT0Is9NRmaYBbBY
+         RZUQ==
+X-Gm-Message-State: AOJu0YyUqozF2VDs9gztRXT1JTkVFY8gEHv4SRMSOaHxtixsL8+Gqqlm
+	OdsMV4jxTgn12QvIeKIdKInLk2GBZB+C8W7gvLM=
+X-Google-Smtp-Source: AGHT+IE0303h2zVQIQ9mlZ4ab36TLNB2HCr6BvgRl3C6IGiFI0Mtp6Hf3yYr7BQuEv/hd8yyOriwlxxSsgcKt4hxc5c=
+X-Received: by 2002:a17:90a:1a50:b0:280:9:8d0c with SMTP id
+ 16-20020a17090a1a5000b0028000098d0cmr1220448pjl.33.1698375037441; Thu, 26 Oct
+ 2023 19:50:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZTsbG7JMzBwcYzhy@Boquns-Mac-mini.home>
+References: <20231025173300.1776832-1-florian.fainelli@broadcom.com>
+ <20231025173300.1776832-5-florian.fainelli@broadcom.com> <CAMZ6RqJJXK5EyyOwXXbdA-bDTY=_JQ+xfKpoCHDJZqv+rNnASQ@mail.gmail.com>
+ <CAMZ6Rq+iBazJ+fM5yd5Tfa8==DEGV93iD-XojU=f1m3ScSGEww@mail.gmail.com> <e6bd1a85-0bcf-457c-8fa8-33e68d818547@broadcom.com>
+In-Reply-To: <e6bd1a85-0bcf-457c-8fa8-33e68d818547@broadcom.com>
+From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Date: Fri, 27 Oct 2023 11:50:25 +0900
+Message-ID: <CAMZ6Rq+HK8Ps2QZsqi1C5Dgjn=EDhT5hWks=T02x5AMqzXkNhw@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/5] net: phy: broadcom: Add support for WAKE_FILTER
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Doug Berger <opendmb@gmail.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Tariq Toukan <tariqt@nvidia.com>, 
+	Gal Pressman <gal@nvidia.com>, Willem de Bruijn <willemb@google.com>, 
+	Daniil Tatianin <d-tatianin@yandex-team.ru>, Simon Horman <horms@kernel.org>, 
+	Justin Chen <justin.chen@broadcom.com>, Ratheesh Kannoth <rkannoth@marvell.com>, 
+	Joe Damato <jdamato@fastly.com>, Jiri Pirko <jiri@resnulli.us>, 
+	open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-> I wonder whether that actually helps, if a reviewer takes average four
-> days to review a version (wants to give accurate comments and doesn't
-> work on this full time), and the developer send a new version every
-> three days, there is no possible way for the developer to get the
-> reviews.
-> 
-> (Honestly, if people could reach out to a conclusion for anything in
-> three days, the world would be a much more peaceful place ;-))
+On Fri. 27 Oct. 2023 at 02:55, Florian Fainelli
+<florian.fainelli@broadcom.com> wrote:
+> Hi Vincent,
+>
+> On 10/25/23 19:13, Vincent MAILHOL wrote:
+> [snip]
+> >>
+> >> This looks like an endianness conversion (I can not tell if this is
+> >> big to little or the opposite)...
+> >
+> > Oopsy! On second look, this is an open coded cpu to big endian
+> > conversion. So the question I should have asked is:
+> >
+> >    why not use the put_unaligned_be16() helper here?
+>
+> Because this is consistent with the existing code, though I will keep
+> that suggestion in mind as a subsequent patch. I personally find it
+> clearer expressed that way, but can update.
 
-May i suggest you subscribe to the netdev list and watch it in action.
+Fair enough. I agree that this is not something to be fixed in this series.
 
-It should also be noted, patches don't need reviews to be merged. If
-there is no feedback within three days, and it passes the CI tests, it
-likely will be merged. Real problems can be fixed up later, if need
-be.
+For your future consideration, I would have done it as:
 
-	Andrew
+        __be16 da[ETH_ALEN / sizeof(__be16)];
+        /* ... */
+        da[i] = cpu_to_be16(~ret);
 
+da[] can eventually be casted back to u8 * once populated.
+
+(...)
 
