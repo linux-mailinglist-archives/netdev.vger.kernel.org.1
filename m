@@ -1,109 +1,109 @@
-Return-Path: <netdev+bounces-44863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 093F67DA260
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 23:23:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 279967DA27B
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 23:31:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 680A9B2147F
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 21:23:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCCE1B20CB7
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 21:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C45D3FB2F;
-	Fri, 27 Oct 2023 21:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5323FE2E;
+	Fri, 27 Oct 2023 21:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cmhlaWbN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2dAHuFM1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D223C3D999
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 21:23:19 +0000 (UTC)
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2CB6129;
-	Fri, 27 Oct 2023 14:23:16 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso2021946a12.3;
-        Fri, 27 Oct 2023 14:23:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F45A3716D
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 21:31:03 +0000 (UTC)
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC168B0
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 14:31:02 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id af79cd13be357-778999c5f1dso324332085a.2
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 14:31:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698441796; x=1699046596; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q4Q8nuDM9k/u/LkEVyOR5WiT5bOMm5Q+OB4cIkeRtaU=;
-        b=cmhlaWbN1TGM8ws9BFqH5zPVIf7v18ASDhEzHwt7V41QZxn+4AjnATuM/ebrDhwob6
-         R76iOK4rJSa82QRaPnrhH2duIPcc/1A0RcX7IKInGXWwYmvOkiMda73BPV76waQILJdL
-         +zqe2/IMTqvIGzQ+vjIzNvS7nIwU/NJlNuSasZ9vvLFVJ2aZ35tGake3DOi0WnAdZ9wE
-         cRNo/20r3aLJEJyoOM0tlcYnNiXwT+hvauEYXz/rAy5xucUMXPjlBOagAXGcWbf5N1MM
-         Wr/Cgl4mFGP8ruSfFOOXaLoatwqVtgPNeUsNdQdD5zMgg3LQRP11c4nzCfhTej6G3+qq
-         x19w==
+        d=google.com; s=20230601; t=1698442262; x=1699047062; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MI6bVykQDbdW2vz2XrrMq2PILwHbTFu4swv4LXOgVcU=;
+        b=2dAHuFM1f4xSOZtd1p6gNwbBnuxee+3C3WbbJGlurauKfV75wRs6LVi16wxVMdwHPK
+         teBpXrcXbpA7UgRxpW2ZOxzhVE/havsxJIuj4ywWqmaJIJbfbBtHgeP/KQpQSrS84Z4e
+         nviGfgD0CFM/7yvTE0rNRT6lqLWIwx2jzq7NCcLe59AJdu6RbYEtmTb0ZAwpaVG2j6JN
+         9oZDHkh+Oe0duaswRN2RcZHaNa9fIci2X2xFb2KJ012lMUjOPHBT0yx2pSPSY70Bmjhn
+         K4kpFF/Szg5bTAPStrHyVZIjgZxGL07Yy844n8uYGR05AIlLMofXk3/OfT9h7pUMNqI7
+         R7Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698441796; x=1699046596;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q4Q8nuDM9k/u/LkEVyOR5WiT5bOMm5Q+OB4cIkeRtaU=;
-        b=oGJltj/dtRtw5faMumG1coWGEfUViIj5K5WqDrvuSFdKH4dBp7E9sZugTgWyzy3o2k
-         rqUPDcJJQT4BcWuXL7Lkkdi8QUfAHOAmc1B74AsCOLhpVwYHlLhWZyDiRr1J+MRETnJi
-         6cY08Zjck/iiAt/imglO/ygcGRZOXJ4AL1ebknDrwrt2f3FJvbS4+Y8EJcR+KkxKqXL1
-         vjoigxZV5Zck16L4v7pqxdKoPxkbV+ogW+cyvl14mLyrmaZ0SrxgUwOtXIRyuuhnvKUR
-         QWRh7xsJ+6vtkpP0Kac1KMZ58rPVJy0Em0vD1gJSY023sD5YRcjbpLshGJNsfrStQN90
-         Kz7w==
-X-Gm-Message-State: AOJu0YxHzgNLTIiXSlvYQ1NOKwM2CNqQsq7+1FCdUpCRjdZ6WP/yhuUU
-	z0gBv2stbWDqh0q4VvlzMtU=
-X-Google-Smtp-Source: AGHT+IHOo+0S/yy4dCT4+non5a027LK29puQBNN6VplAOiPcx9hoopgfc8N7HSD0Q+p+5xmzhH/UxQ==
-X-Received: by 2002:a17:90b:103:b0:27d:9b67:7fa6 with SMTP id p3-20020a17090b010300b0027d9b677fa6mr3543660pjz.3.1698441796212;
-        Fri, 27 Oct 2023 14:23:16 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id p1-20020a17090a0e4100b0027768cd88d7sm5171675pja.1.2023.10.27.14.23.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Oct 2023 14:23:15 -0700 (PDT)
-Message-ID: <95f324af-88de-4692-966f-588287305e09@gmail.com>
-Date: Fri, 27 Oct 2023 14:23:13 -0700
+        d=1e100.net; s=20230601; t=1698442262; x=1699047062;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MI6bVykQDbdW2vz2XrrMq2PILwHbTFu4swv4LXOgVcU=;
+        b=Az97IzdCFUSHPJ8fBQBUwX4NwwEXrVBvI9YQvxioGuMiXReun58+zlOhsNLCpg8G7r
+         Zy6Xln4PGoB76Jvl9czvDZ3lNXm0/Zgr84YaCBTVRpGTqukTvR7S0wPsapt+z3LILnuF
+         Az9SW6DFbUSiB6b1fzhTE8FiJyLgTmPVm7wLcPqwsQO9bH9zsMdPwbo7miQJ3mvMcQgt
+         8hbFGKXceei/PdmkefPYDifm0D3x9MIlwm4XdMjFgFWUwL/7a4owAcdIPvVBVvFu8hKk
+         tPNK+8Ge+R4g1jgPk3vSe0RF+3iJWtdlWvvg0v8DDTwj1o8vu+Dsc8QAiBzO1MMD4hsg
+         mQBA==
+X-Gm-Message-State: AOJu0Yxgbq4rdZmMJP1bXvNUJmbDhVOi871trjgDGFdszvMX9frn1SNI
+	tdszG9HKHHnxQOUeonTWZ5ffNTsbEsju79UG3omw/lPa0ssxnpadXTZdJMCxtg4p/hqEGP1GvQV
+	yZ0BRzHJLDVynYh/0jds6+KpRUanaRq+XsmnoFLcvmocNPPCY1QUCIw==
+X-Google-Smtp-Source: AGHT+IH+BodIS3bugVCcaCTLSCmmzfoQjCJIIIJk2spYzrwsSlmhh+RC/6RAolXSm+aXzaR1ikiI634=
+X-Received: from ptf16.nyc.corp.google.com ([2620:0:1003:314:7908:dc2a:2e54:fd31])
+ (user=ptf job=sendgmr) by 2002:ae9:e207:0:b0:777:f69:557 with SMTP id
+ c7-20020ae9e207000000b007770f690557mr64327qkc.15.1698442261542; Fri, 27 Oct
+ 2023 14:31:01 -0700 (PDT)
+Date: Fri, 27 Oct 2023 17:30:55 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dsa: tag_rtl4_a: Bump min packet size
-Content-Language: en-US
-To: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.820.g83a721a137-goog
+Message-ID: <20231027213059.3550747-1-ptf@google.com>
+Subject: [PATCH v2] net: r8169: Disable multicast filter for RTL_GIGA_MAC_VER_46
+From: Patrick Thompson <ptf@google.com>
+To: netdev@vger.kernel.org
+Cc: Patrick Thompson <ptf@google.com>, Chun-Hao Lin <hau@realtek.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-kernel@vger.kernel.org, nic_swsd@realtek.com
+Content-Type: text/plain; charset="UTF-8"
 
-You would want your subject to be:
+MAC_VER_46 ethernet adapters fail to detect eapol packets unless
+allmulti is enabled. Add exception for VER_46 in the same way VER_35
+has an exception.
 
-net: dsa: tag_rtl4_a: Bump min packet size
+Fixes: 6e1d0b898818 ("r8169:add support for RTL8168H and RTL8107E")
+Signed-off-by: Patrick Thompson <ptf@google.com>
+---
 
-On 10/27/23 13:21, Linus Walleij wrote:
-> It was reported that the "LuCI" web UI was not working properly
-> with a device using the RTL8366RB switch. Disabling the egress
-> port tagging code made the switch work again, but this is not
-> a good solution as we want to be able to direct traffic to a
-> certain port.
-> 
-> It turns out that sometimes, but not always, small packets are
-> dropped by the switch for no reason.
+Changes in v2:
+- add Fixes tag
+- add net annotation
+- update description
 
-And we are positive that the Ethernet MAC is also properly padding 
-frames before having them ingress the switch?
+ drivers/net/ethernet/realtek/r8169_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> 
-> If we pad the ethernet frames to a minimum of ETH_FRAME_LEN + FCS
-> (1518 bytes) everything starts working fine.
-
-That is quite unprecedented, either the switch is very bogus or there is 
-something else we do not fully understand...
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 361b90007148b..a775090650e3a 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -2584,7 +2584,8 @@ static void rtl_set_rx_mode(struct net_device *dev)
+ 		rx_mode |= AcceptAllPhys;
+ 	} else if (netdev_mc_count(dev) > MC_FILTER_LIMIT ||
+ 		   dev->flags & IFF_ALLMULTI ||
+-		   tp->mac_version == RTL_GIGA_MAC_VER_35) {
++		   tp->mac_version == RTL_GIGA_MAC_VER_35 ||
++		   tp->mac_version == RTL_GIGA_MAC_VER_46) {
+ 		/* accept all multicasts */
+ 	} else if (netdev_mc_empty(dev)) {
+ 		rx_mode &= ~AcceptMulticast;
 -- 
-Florian
+2.42.0.820.g83a721a137-goog
 
 
