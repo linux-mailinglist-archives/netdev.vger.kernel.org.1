@@ -1,171 +1,143 @@
-Return-Path: <netdev+bounces-44722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B56E7D96DB
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:44:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8821C7D96D8
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:43:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8D8BB20E9C
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 11:44:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29221B20E5D
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 11:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C07418B0B;
-	Fri, 27 Oct 2023 11:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E1718B01;
+	Fri, 27 Oct 2023 11:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b="bXxYkF/b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EHWOkbCK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981DD17995
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 11:44:35 +0000 (UTC)
-X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 27 Oct 2023 04:44:32 PDT
-Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C75CB91
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 04:44:32 -0700 (PDT)
-Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 202310271143281aa3a71994b6fdffa8
-        for <netdev@vger.kernel.org>;
-        Fri, 27 Oct 2023 13:43:28 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=florian.bezdeka@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=T2bfrY/Lm4YZ9SmstD+oGVjrNxvjXUvjSIMyYD3TJS0=;
- b=bXxYkF/beih1D9f2uOlRevAMZEEQhv6/9KyaIer5htY6RPPh8gwyaVRwX1gm0OBkSTUrhw
- l4Z3TSj0jrnG9DgI8YusYk3cWx4A6+p1Dcl7LEV38RsciAnS8HlNxQmdbWRujdfAsyhd8H0+
- GPCIIcLySUeunsEXpZCdEW4kehUGA=;
-Message-ID: <d085757ed5607e82b1cd09d10d4c9f73bbdf3154.camel@siemens.com>
-Subject: Re: [PATCH net-next] net/core: Enable socket busy polling on -RT
-From: Florian Bezdeka <florian.bezdeka@siemens.com>
-To: Kurt Kanzenbach <kurt@linutronix.de>, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Date: Fri, 27 Oct 2023 13:43:27 +0200
-In-Reply-To: <20230523111518.21512-1-kurt@linutronix.de>
-References: <20230523111518.21512-1-kurt@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A09BA50
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 11:43:43 +0000 (UTC)
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 006A0129;
+	Fri, 27 Oct 2023 04:43:41 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c5720a321aso26167461fa.1;
+        Fri, 27 Oct 2023 04:43:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698407020; x=1699011820; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6FxTvodzs+sXyw4G+vyKIEx0C/eMaA77aXx03U9uf0M=;
+        b=EHWOkbCK+BwcZVovzxCt+nJEU3LQ3KM8eR5+u/7pf34L4fsKXmOieM0vszRwPx7vlK
+         CSom9hGqys18QC47N7KOvlnF4ldxqmtFNUgz9+qLQXoVju8aC/rerveRA+vf9/ief8Jn
+         R6j1c3WL84zQD79Ja+DpughczNP9OKbQsmkxUNsoiS+w04hGT8Cm2xraRRI3Hlkzpwl7
+         LPOG8hE7AoNGbTGp7pYbUuLNP1iocnKWtOW136bhZz6sCZJiJbMJ52Pxp1OMQ3L+9jab
+         wWwMMMh+ZznzJHAcz0vdGHp3pe47DTLTo+iucKRkWFZ/8tWXFgBxoXjCfa5p2rqMrb2N
+         1PCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698407020; x=1699011820;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6FxTvodzs+sXyw4G+vyKIEx0C/eMaA77aXx03U9uf0M=;
+        b=W9VtBKH6SMhL/fDTZ007ixaMWQ8AD5bsqSrY0/5Viy2jO8PuPrD4avqPhXBKetlCnb
+         3gqSOBjqIdU4DDEvTXXxpWoVU6eoeMadf2ZOadgRWxViQ/+vclWIKFFxzHGAgEGq1dGw
+         a8ugLQfcdz0nvsC/I0B8B41RdDIvavgXBpLWSlE/SaSd2nGjbcq4ARHYdi4HrvHde4+D
+         tbkMbmBg7q11EEp/oYN+oPks2pdACT+KZuesuoO5vgQ6eKZFvG+bHPfubArUHMcodwZN
+         gxrflY0kG62Q9aFCZhQ/LdGqlmkwo7j+RQKg3hyVpR+AqpdwC31LM7Dj6SfTyLBqLGx4
+         c2rA==
+X-Gm-Message-State: AOJu0YwiwpcRlmvgz+VhxyZI93XLVfdUVAtijMEGVFI2JVr8ljoqekpT
+	boiD4NbN9pHfRdeXpXLSs0I=
+X-Google-Smtp-Source: AGHT+IEKGBDUbCDFRGX1kdv/8N+AISeFx74HIk/UjgqrccXfV5jnOCN8ZLdnx0Gcf7r1wAxUT8Mhwg==
+X-Received: by 2002:a2e:7c15:0:b0:2c5:5926:de52 with SMTP id x21-20020a2e7c15000000b002c55926de52mr1804330ljc.53.1698407019812;
+        Fri, 27 Oct 2023 04:43:39 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id s7-20020a05651c200700b002c09602150asm255875ljo.27.2023.10.27.04.43.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Oct 2023 04:43:39 -0700 (PDT)
+Date: Fri, 27 Oct 2023 14:43:34 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net-next v1 1/1] net: stmmac: xgmac: Enable support for
+ multiple Flexible PPS outputs
+Message-ID: <gz5iglkftvoisrpmp2wtglctiddnfwopjo2ozedtlas3yg5vnp@bdgsrbzmmeud>
+References: <20231026094856.986796-1-0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-68982:519-21489:flowmailer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231026094856.986796-1-0x1207@gmail.com>
 
-Hi Kurt,
+On Thu, Oct 26, 2023 at 05:48:56PM +0800, Furong Xu wrote:
+> From XGMAC Core 3.20 and later, each Flexible PPS has individual PPSEN bit
+> to select Fixed mode or Flexible mode. The PPSEN must be set, or it stays
+> in Fixed PPS mode by default.
 
-On Tue, 2023-05-23 at 13:15 +0200, Kurt Kanzenbach wrote:
-> Busy polling is currently not allowed on PREEMPT_RT, because it disables
-> preemption while invoking the NAPI callback. It is not possible to acquir=
-e
-> sleeping locks with disabled preemption. For details see commit
-> 20ab39d13e2e ("net/core: disable NET_RX_BUSY_POLL on PREEMPT_RT").
+Are you sure 3.10a don't have the PPSEN flag available for all
+outputs too?
 
-Is that something that we could consider as Bug-Fix for 6.1 and request
-a backport, or would you consider that as new feature?
-
->=20
-> However, strict cyclic and/or low latency network applications may prefer=
- busy
-> polling e.g., using AF_XDP instead of interrupt driven communication.
->=20
-> The preempt_disable() is used in order to prevent the poll_owner and NAPI=
- owner
-> to be preempted while owning the resource to ensure progress. Netpoll per=
-forms
-> busy polling in order to acquire the lock. NAPI is locked by setting the
-> NAPIF_STATE_SCHED flag. There is no busy polling if the flag is set and t=
-he
-> "owner" is preempted. Worst case is that the task owning NAPI gets preemp=
-ted and
-> NAPI processing stalls.  This is can be prevented by properly prioritisin=
-g the
-> tasks within the system.
->=20
-> Allow RX_BUSY_POLL on PREEMPT_RT if NETPOLL is disabled. Don't disable
-> preemption on PREEMPT_RT within the busy poll loop.
->=20
-> Tested on x86 hardware with v6.1-RT and v6.3-RT on Intel i225 (igc) with
-> AF_XDP/ZC sockets configured to run in busy polling mode.
-
-That is exactly our use case as well and we would like to have it in
-6.1. Any (technical) reasons that prevent a backport?
-
-As some time has already passed since patch submission I will not cut
-the rest...
-
-Best regards,
-Florian
-
->=20
-> Suggested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> XGMAC Core prior 3.20, corresponding PPSEN bits are read-only reserved,
+> always set PPSEN do not make things worse ;)
+> 
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
 > ---
->=20
-> Changes since RFC:
->=20
->  * Commit message
->=20
-> Previous version:
->=20
->  * https://lore.kernel.org/all/20230517110950.78322-1-kurt@linutronix.de/
->=20
->  net/Kconfig    | 2 +-
->  net/core/dev.c | 9 ++++++---
->  2 files changed, 7 insertions(+), 4 deletions(-)
->=20
-> diff --git a/net/Kconfig b/net/Kconfig
-> index 7d39c1773eb4..2fb25b534df5 100644
-> --- a/net/Kconfig
-> +++ b/net/Kconfig
-> @@ -324,7 +324,7 @@ config CGROUP_NET_CLASSID
-> =20
->  config NET_RX_BUSY_POLL
->  	bool
-> -	default y if !PREEMPT_RT
-> +	default y if !PREEMPT_RT || (PREEMPT_RT && !NETCONSOLE)
-> =20
->  config BQL
->  	bool
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index b3c13e041935..3393c2f3dbe8 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -6197,7 +6197,8 @@ void napi_busy_loop(unsigned int napi_id,
->  	if (!napi)
->  		goto out;
-> =20
-> -	preempt_disable();
-> +	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
-> +		preempt_disable();
->  	for (;;) {
->  		int work =3D 0;
-> =20
-> @@ -6239,7 +6240,8 @@ void napi_busy_loop(unsigned int napi_id,
->  		if (unlikely(need_resched())) {
->  			if (napi_poll)
->  				busy_poll_stop(napi, have_poll_lock, prefer_busy_poll, budget);
-> -			preempt_enable();
-> +			if (!IS_ENABLED(CONFIG_PREEMPT_RT))
-> +				preempt_enable();
->  			rcu_read_unlock();
->  			cond_resched();
->  			if (loop_end(loop_end_arg, start_time))
-> @@ -6250,7 +6252,8 @@ void napi_busy_loop(unsigned int napi_id,
->  	}
->  	if (napi_poll)
->  		busy_poll_stop(napi, have_poll_lock, prefer_busy_poll, budget);
-> -	preempt_enable();
-> +	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
-> +		preempt_enable();
->  out:
->  	rcu_read_unlock();
->  }
-> --=20
-> 2.30.2
->=20
+>  drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h      | 2 +-
+>  drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> index 7a8f47e7b728..a4e8b498dea9 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> @@ -259,7 +259,7 @@
+>  	((val) << XGMAC_PPS_MINIDX(x))
+>  #define XGMAC_PPSCMD_START		0x2
+>  #define XGMAC_PPSCMD_STOP		0x5
+> -#define XGMAC_PPSEN0			BIT(4)
+> +#define XGMAC_PPSENx(x)			BIT(4 + (x) * 8)
+>  #define XGMAC_PPSx_TARGET_TIME_SEC(x)	(0x00000d80 + (x) * 0x10)
+>  #define XGMAC_PPSx_TARGET_TIME_NSEC(x)	(0x00000d84 + (x) * 0x10)
+>  #define XGMAC_TRGTBUSY0			BIT(31)
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> index f352be269deb..53bb8f16c481 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> @@ -1178,7 +1178,7 @@ static int dwxgmac2_flex_pps_config(void __iomem *ioaddr, int index,
+>  
+>  	val |= XGMAC_PPSCMDx(index, XGMAC_PPSCMD_START);
+>  	val |= XGMAC_TRGTMODSELx(index, XGMAC_PPSCMD_START);
+> -	val |= XGMAC_PPSEN0;
 
+> +	val |= XGMAC_PPSENx(index);
+
+At the very least it would be nice to have a comment here that the
+mode selection was available for the output #0 only in the IP-cores
+prior v3.20a with the outputs 1-3 always working as flexible PPS
+outputs.
+
+Other than that no more comments:
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+
+-Serge(y)
+
+>  
+>  	writel(cfg->start.tv_sec, ioaddr + XGMAC_PPSx_TARGET_TIME_SEC(index));
+>  
+> -- 
+> 2.34.1
+> 
+> 
 
