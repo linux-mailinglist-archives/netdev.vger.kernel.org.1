@@ -1,284 +1,749 @@
-Return-Path: <netdev+bounces-44772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9108A7D9AA8
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 16:01:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20DA57D9D87
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 17:54:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A7EA2822D1
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 14:01:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CC7EB20C8E
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 15:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15E1358AE;
-	Fri, 27 Oct 2023 14:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="YU8XEAy+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69EF37158;
+	Fri, 27 Oct 2023 15:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81E5358A1;
-	Fri, 27 Oct 2023 14:01:30 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3CC5C0;
-	Fri, 27 Oct 2023 07:01:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=vrnwU0TYiEQq5ECZil904ztVIXet0RsM1wRuO+zPf3M=; b=YU8XEAy+ldDkJxLKLL21xV+KPc
-	uLJ3mfbPOH9QDSLOmKd5rzL1JXJP4GUqoISRgatmuIW4NyJ+HhQ5WisZJEFKG8KWVA/nloi6s3eOY
-	ybGo4OtCfmwgqWwuSXW0jkTdpfV71KGv6aevP18j2Kmaa8ZiGPYcdkPpyAPXNIgX0JimkytI0zwPm
-	q1E7zF2Q87Y20UOAKIf2yt+EqJsdBgg+CBvl3vhRkIJloflLUODrdg+BeIK/Cy7UIAGL2yIYxVCaP
-	IuueGiamwUmfiwgvzGNzhElhGx73cpCuygIygQQfm2x2BGbkBOItoWQ27TgODanvQzsO/ooqwftTa
-	R+c8tHQw==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qwNOu-000IR5-4F; Fri, 27 Oct 2023 16:01:24 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qwNOt-0009IT-Ox; Fri, 27 Oct 2023 16:01:23 +0200
-Subject: Re: [PATCH net-next v2 1/2] net, sched: Make tc-related drop reason
- more flexible
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Ido Schimmel <idosch@idosch.org>, kuba@kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, victor@mojatatu.com,
- martin.lau@linux.dev, dxu@dxuuu.xyz, xiyou.wangcong@gmail.com
-References: <20231009092655.22025-1-daniel@iogearbox.net>
- <ZTjY959R+AFXf3Xy@shredder>
- <726368f0-bbe9-6aeb-7007-6f974ed075f2@iogearbox.net>
- <CAM0EoM=L3ft1zuXhMsKq=Z+u7asbvpBL-KJBXLCmHBg=6BLHzQ@mail.gmail.com>
- <87dfbac5-695c-7582-cbb5-4d71b6698ab1@iogearbox.net>
- <CAM0EoMn-BDVbOvHEd0Pww5Hx5XD3UJnyipO+9h3HKzAVAp5n0A@mail.gmail.com>
- <dfb92d8a-60b4-cc01-996a-82ab7ddbe8f2@iogearbox.net>
- <CAM0EoMm85OCuOAj9b7cvyAvP7H2KGCu8W2FUDP9eDMLcEXy45A@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <b1b5ddab-f37c-d594-727e-a9d009bfa5be@iogearbox.net>
-Date: Fri, 27 Oct 2023 16:01:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C409D38BAF
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 15:54:08 +0000 (UTC)
+X-Greylist: delayed 8400 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 27 Oct 2023 08:54:04 PDT
+Received: from 2.mo545.mail-out.ovh.net (2.mo545.mail-out.ovh.net [178.33.110.194])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC5ACD42
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 08:54:04 -0700 (PDT)
+Received: from ex4.mail.ovh.net (unknown [10.109.138.237])
+	by mo545.mail-out.ovh.net (Postfix) with ESMTPS id BBFEC26895;
+	Fri, 27 Oct 2023 12:16:05 +0000 (UTC)
+Received: from localhost.localdomain (93.21.160.242) by DAG10EX1.indiv4.local
+ (172.16.2.91) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.34; Fri, 27 Oct
+ 2023 14:12:44 +0200
+From: Quentin Deslandes <qde@naccy.de>
+To: <netdev@vger.kernel.org>
+CC: David Ahern <dsahern@gmail.com>, Martin KaFai Lau <martin.lau@kernel.org>,
+	Quentin Deslandes <qde@naccy.de>
+Subject: [RFC PATCH 3/3] ss: pretty-print BPF socket-local storage
+Date: Fri, 27 Oct 2023 14:11:55 +0200
+Message-ID: <20231027121155.1244308-4-qde@naccy.de>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20231027121155.1244308-1-qde@naccy.de>
+References: <20231027121155.1244308-1-qde@naccy.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAM0EoMm85OCuOAj9b7cvyAvP7H2KGCu8W2FUDP9eDMLcEXy45A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27074/Fri Oct 27 09:58:36 2023)
+Content-Type: text/plain
+X-Originating-IP: [93.21.160.242]
+X-ClientProxiedBy: CAS8.indiv4.local (172.16.1.8) To DAG10EX1.indiv4.local
+ (172.16.2.91)
+X-Ovh-Tracer-Id: 12251198364142595752
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvkedrleeggdehudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgtghisehtkeertdertddtnecuhfhrohhmpefsuhgvnhhtihhnucffvghslhgrnhguvghsuceoqhguvgesnhgrtggthidruggvqeenucggtffrrghtthgvrhhnpedthefffeegveeljeduheekieeggeehfeefhfeltedthedtheffudffudelteevtdenucffohhmrghinhepnhhrpghmrghpshdrihgupdhnrhgpmhgrphhsrdhinhhfohenucfkphepuddvjedrtddrtddruddpleefrddvuddrudeitddrvdegvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoehquggvsehnrggttgihrdguvgeqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdgushgrhhgvrhhnsehgmhgrihhlrdgtohhmpdhmrghrthhinhdrlhgruheskhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehgeehpdhmohguvgepshhmthhpohhuth
 
-On 10/26/23 1:13 AM, Jamal Hadi Salim wrote:
-> On Wed, Oct 25, 2023 at 9:46 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
->> On 10/25/23 3:21 PM, Jamal Hadi Salim wrote:
->>> On Wed, Oct 25, 2023 at 7:52 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
->>>> On 10/25/23 1:05 PM, Jamal Hadi Salim wrote:
->>>>> On Wed, Oct 25, 2023 at 6:01 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
->>>>>> On 10/25/23 10:59 AM, Ido Schimmel wrote:
->>>>>>> On Mon, Oct 09, 2023 at 11:26:54AM +0200, Daniel Borkmann wrote:
->>>>>>>> diff --git a/net/core/dev.c b/net/core/dev.c
->>>>>>>> index 606a366cc209..664426285fa3 100644
->>>>>>>> --- a/net/core/dev.c
->>>>>>>> +++ b/net/core/dev.c
->>>>>>>> @@ -3910,7 +3910,8 @@ EXPORT_SYMBOL_GPL(netdev_xmit_skip_txqueue);
->>>>>>>>      #endif /* CONFIG_NET_EGRESS */
->>>>>>>>
->>>>>>>>      #ifdef CONFIG_NET_XGRESS
->>>>>>>> -static int tc_run(struct tcx_entry *entry, struct sk_buff *skb)
->>>>>>>> +static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
->>>>>>>> +              enum skb_drop_reason *drop_reason)
->>>>>>>>      {
->>>>>>>>         int ret = TC_ACT_UNSPEC;
->>>>>>>>      #ifdef CONFIG_NET_CLS_ACT
->>>>>>>> @@ -3922,12 +3923,14 @@ static int tc_run(struct tcx_entry *entry, struct sk_buff *skb)
->>>>>>>>
->>>>>>>>         tc_skb_cb(skb)->mru = 0;
->>>>>>>>         tc_skb_cb(skb)->post_ct = false;
->>>>>>>> +    res.drop_reason = *drop_reason;
->>>>>>>>
->>>>>>>>         mini_qdisc_bstats_cpu_update(miniq, skb);
->>>>>>>>         ret = tcf_classify(skb, miniq->block, miniq->filter_list, &res, false);
->>>>>>>>         /* Only tcf related quirks below. */
->>>>>>>>         switch (ret) {
->>>>>>>>         case TC_ACT_SHOT:
->>>>>>>> +            *drop_reason = res.drop_reason;
->>>>>>>
->>>>>>> Daniel,
->>>>>>>
->>>>>>> Getting the following splat [1] with CONFIG_DEBUG_NET=y and this
->>>>>>> reproducer [2]. Problem seems to be that classifiers clear 'struct
->>>>>>> tcf_result::drop_reason', thereby triggering the warning in
->>>>>>> __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0).
->>>>>>>
->>>>>>> Fixed by maintaining the original drop reason if the one returned from
->>>>>>> tcf_classify() is 'SKB_NOT_DROPPED_YET' [3]. I can submit this fix
->>>>>>> unless you have a better idea.
->>>>>>
->>>>>> Thanks for catching this, looks reasonable to me as a fix.
->>>>>>
->>>>>>> [1]
->>>>>>> WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x38/0x130
->>>>>>> Modules linked in:
->>>>>>> CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d9582e0 #682
->>>>>>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc37 04/01/2014
->>>>>>> RIP: 0010:kfree_skb_reason+0x38/0x130
->>>>>>> [...]
->>>>>>> Call Trace:
->>>>>>>      <IRQ>
->>>>>>>      __netif_receive_skb_core.constprop.0+0x837/0xdb0
->>>>>>>      __netif_receive_skb_one_core+0x3c/0x70
->>>>>>>      process_backlog+0x95/0x130
->>>>>>>      __napi_poll+0x25/0x1b0
->>>>>>>      net_rx_action+0x29b/0x310
->>>>>>>      __do_softirq+0xc0/0x29b
->>>>>>>      do_softirq+0x43/0x60
->>>>>>>      </IRQ>
->>>>>>>
->>>>>>> [2]
->>>>>>> #!/bin/bash
->>>>>>>
->>>>>>> ip link add name veth0 type veth peer name veth1
->>>>>>> ip link set dev veth0 up
->>>>>>> ip link set dev veth1 up
->>>>>>> tc qdisc add dev veth1 clsact
->>>>>>> tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:22:33:44:55 action drop
->>>>>>> mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
->>>>>>
->>>>>> I didn't know you're using mausezahn, nice :)
->>>>>>
->>>>>>> [3]
->>>>>>> diff --git a/net/core/dev.c b/net/core/dev.c
->>>>>>> index a37a932a3e14..abd0b13f3f17 100644
->>>>>>> --- a/net/core/dev.c
->>>>>>> +++ b/net/core/dev.c
->>>>>>> @@ -3929,7 +3929,8 @@ static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
->>>>>>>             /* Only tcf related quirks below. */
->>>>>>>             switch (ret) {
->>>>>>>             case TC_ACT_SHOT:
->>>>>>> -               *drop_reason = res.drop_reason;
->>>>>>> +               if (res.drop_reason != SKB_NOT_DROPPED_YET)
->>>>>>> +                       *drop_reason = res.drop_reason;
->>>>>>>                     mini_qdisc_qstats_cpu_drop(miniq);
->>>>>>>                     break;
->>>>>>>             case TC_ACT_OK:
->>>>>>>
->>>>>
->>>>> Out of curiosity - how does the policy say "drop" but drop_reason does
->>>>> not reflect it?
->>>>
->>>> Ido, Jamal, wdyt about this alternative approach - these were the locations I could
->>>> find from an initial glance (compile-tested) :
->>>>
->>>>    From a3d46a55aac484372b60b783cb6a3c98a0fef75c Mon Sep 17 00:00:00 2001
->>>> From: Daniel Borkmann <daniel@iogearbox.net>
->>>> Date: Wed, 25 Oct 2023 11:43:44 +0000
->>>> Subject: [PATCH] net, sched: fix..
->>>>
->>>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
->>>> ---
->>>>     include/net/pkt_cls.h    | 12 ++++++++++++
->>>>     net/sched/cls_basic.c    |  2 +-
->>>>     net/sched/cls_bpf.c      |  2 +-
->>>>     net/sched/cls_flower.c   |  2 +-
->>>>     net/sched/cls_fw.c       |  2 +-
->>>>     net/sched/cls_matchall.c |  2 +-
->>>>     net/sched/cls_route.c    |  4 ++--
->>>>     net/sched/cls_u32.c      |  2 +-
->>>>     8 files changed, 20 insertions(+), 8 deletions(-)
->>>>
->>>> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
->>>> index a76c9171db0e..31d8e8587824 100644
->>>> --- a/include/net/pkt_cls.h
->>>> +++ b/include/net/pkt_cls.h
->>>> @@ -160,6 +160,18 @@ static inline void tcf_set_drop_reason(struct tcf_result *res,
->>>>           res->drop_reason = reason;
->>>>     }
->>>>
->>>> +static inline void tcf_set_result(struct tcf_result *to,
->>>> +                                 const struct tcf_result *from)
->>>> +{
->>>> +       /* tcf_result's drop_reason which is the last member must be
->>>> +        * preserved and cannot be copied from the cls'es tcf_result
->>>> +        * template given this is carried all the way and potentially
->>>> +        * set to a concrete tc drop reason upon error or intentional
->>>> +        * drop. See tcf_set_drop_reason() locations.
->>>> +        */
->>>> +       memcpy(to, from, offsetof(typeof(*to), drop_reason));
->>>> +}
->>>> +
->>>
->>> Daniel, IMO, doing this at cls_api is best instead (like what Victors
->>> or my original patch did). Iam ~30K feet right now with a lousy
->>> keyboard - you can either do it, or i or Victor can send the patch by
->>> end of day today. There are missing cases which were covered by Victor
->>> and possibly something else will pop up next.
->>
->> Sure, if you have sth clean and simple for today, go for it. Otherwise I
->> can cook a proper one out of this as a fix and ship it tomorrow AM, so we
->> have a fix for the splat in CONFIG_DEBUG_NET kernels and you can still
->> refactor later.
-> 
-> I was thinking something along these lines:
-> 
-> --- a/net/sched/cls_api.c
-> +++ b/net/sched/cls_api.c
-> @@ -1662,6 +1662,7 @@ static inline int __tcf_classify(struct sk_buff *skb,
->          const int max_reclassify_loop = 16;
->          const struct tcf_proto *first_tp;
->          int limit = 0;
-> +       u32 reason_code = res->drop_reason;
-> 
->   reclassify:
->   #endif
-> @@ -1712,8 +1713,11 @@ static inline int __tcf_classify(struct sk_buff *skb,
->                          goto reset;
->                  }
->   #endif
-> -               if (err >= 0)
-> +               if (err >= 0) {
-> +                       if (err == TC_ACT_SHOT) /* policy drop */
-> +                               tcf_set_drop_reason(res, orig_reason);
->                          return err;
-> +               }
->          }
-> 
->          if (unlikely(n)) {
-> 
-> But tbh, i am struggling with the whole approach you took in the
-> earlier patch - i.e setting the drop reason from cls_act and then
-> expecting it not to be changed on policy drops; while it works for
-> clsact, it is not going to work for the rest of the qdiscs - unless we
-> change all the qdisc enqueues to take an extra param for drop_reason.
-> Thoughts?
+ss is able to print the map ID(s) for which a given socket has BPF
+socket-local storage defined (using --bpf-maps or --bpf-map-id=). However,
+the actual content of the map remains hidden.
 
-The downside of the above would be that you then cannot make use of
-tcf_set_drop_reason() further down the tc engine, for example, within
-classifiers/actions, e.g. tcf_action_exec() where you also have drops
-like:
+This change aims to pretty-print the socket-local storage content following
+the socket details, similar to what `bpftool map dump` would do. The exact
+output format is inspired by drgn, while the BTF data processing is similar
+to bpftool's.
 
-[...]
-                 } else if (TC_ACT_EXT_CMP(ret, TC_ACT_GOTO_CHAIN)) {
-                         if (unlikely(!rcu_access_pointer(a->goto_chain))) {
-                                 net_warn_ratelimited("can't go to NULL chain!\n");
-                                 return TC_ACT_SHOT;
-                         }
-                         tcf_action_goto_chain_exec(a, res);
-                 }
-[...]
+ss will print the map's content in a best-effort fashion: BTF types that can
+be printed will be displayed, while types that are not yet supported
+(e.g. BTF_KIND_VAR) will be replaced by a placeholder. For readability
+reasons, the --oneline option is not compatible with this change.
 
-If I spot this correctly, qdiscs also use tcf_classify() as well, and
-so far none of them have kfree_skb_reason() support, but if you plan to
-add it you can just set a default res.drop_reason from there as well
-since tcf_classify() already takes the res param.
+The new out_prefix_t type is introduced to ease the printing of compound
+types (e.g. structs, unions), it defines the prefix to print before the actual
+value to ensure the output is properly indented. COL_SKSTOR's header is
+replaced with an empty string, as it doesn't need to be printed anymore;
+it's used as a "virtual" column to refer to the socket-local storage dump,
+which will be printed under the socket information. The column's width is
+fixed to 1, so it doesn't mess up ss' output.
 
-Thanks,
-Daniel
+ss' output remains unchanged unless --bpf-maps or --bpf-map-id= is used,
+in which case each socket containing BPF local storage will be followed by
+the content of the storage before the next socket's info is displayed.
+
+Signed-off-by: Quentin Deslandes <qde@naccy.de>
+---
+ misc/ss.c | 558 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 551 insertions(+), 7 deletions(-)
+
+diff --git a/misc/ss.c b/misc/ss.c
+index 893dd7a2..cc38924c 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -51,8 +51,13 @@
+ #include <linux/tls.h>
+ #include <linux/mptcp.h>
+ 
++#ifdef HAVE_LIBBPF
++#include <linux/btf.h>
++#endif
++
+ #ifdef HAVE_LIBBPF
+ #include <bpf/bpf.h>
++#include <bpf/btf.h>
+ #include <bpf/libbpf.h>
+ #endif
+ 
+@@ -136,7 +141,7 @@ static struct column columns[] = {
+ 	{ ALIGN_RIGHT,	"Peer Address:",	" ",	0, 0, 0 },
+ 	{ ALIGN_LEFT,	"Port",			"",	0, 0, 0 },
+ 	{ ALIGN_LEFT,	"Process",		"",	0, 0, 0 },
+-	{ ALIGN_LEFT,	"Socket storage",	"",	1, 0, 0 },
++	{ ALIGN_LEFT,	"",			"",	1, 0, 0 },
+ 	{ ALIGN_LEFT,	"",			"",	0, 0, 0 },
+ };
+ 
+@@ -1209,6 +1214,9 @@ static void render_calc_width(void)
+ 		 */
+ 		c->width = min(c->width, screen_width);
+ 
++		if (c == &columns[COL_SKSTOR])
++			c->width = 1;
++
+ 		if (c->width)
+ 			first = 0;
+ 	}
+@@ -3377,6 +3385,8 @@ static struct bpf_map_opts {
+ 	struct bpf_sk_storage_map_info {
+ 		unsigned int id;
+ 		int fd;
++		struct bpf_map_info info;
++		struct btf *btf;
+ 	} maps[MAX_NR_BPF_MAP_ID_OPTS];
+ 	bool show_all;
+ 	struct btf *kernel_btf;
+@@ -3388,6 +3398,32 @@ static void bpf_map_opts_mixed_error(void)
+ 		"ss: --bpf-maps and --bpf-map-id cannot be used together\n");
+ }
+ 
++static int bpf_maps_opts_load_btf(struct bpf_map_info *info, struct btf **btf)
++{
++	if (info->btf_vmlinux_value_type_id) {
++		if (!bpf_map_opts.kernel_btf) {
++			bpf_map_opts.kernel_btf = libbpf_find_kernel_btf();
++			if (!bpf_map_opts.kernel_btf) {
++				fprintf(stderr, "ss: failed to load kernel BTF\n");
++				return -1;
++			}
++		}
++
++		*btf = bpf_map_opts.kernel_btf;
++	} else if (info->btf_value_type_id) {
++		*btf = btf__load_from_kernel_by_id(info->btf_id);
++		if (!*btf) {
++			fprintf(stderr, "ss: failed to load BTF for map ID %u\n",
++				info->id);
++			return -1;
++		}
++	} else {
++		*btf = NULL;
++	}
++
++	return 0;
++}
++
+ static int bpf_map_opts_add_all(void)
+ {
+ 	unsigned int i;
+@@ -3403,6 +3439,7 @@ static int bpf_map_opts_add_all(void)
+ 	while (1) {
+ 		struct bpf_map_info info = {};
+ 		uint32_t len = sizeof(info);
++		struct btf *btf;
+ 
+ 		r = bpf_map_get_next_id(id, &id);
+ 		if (r) {
+@@ -3441,8 +3478,18 @@ static int bpf_map_opts_add_all(void)
+ 			continue;
+ 		}
+ 
++		r = bpf_maps_opts_load_btf(&info, &btf);
++		if (r) {
++			fprintf(stderr, "ss: failed to get BTF data for BPF map ID: %u\n",
++				id);
++			close(fd);
++			goto err;
++		}
++
+ 		bpf_map_opts.maps[bpf_map_opts.nr_maps].id = id;
+-		bpf_map_opts.maps[bpf_map_opts.nr_maps++].fd = fd;
++		bpf_map_opts.maps[bpf_map_opts.nr_maps].fd = fd;
++		bpf_map_opts.maps[bpf_map_opts.nr_maps].info = info;
++		bpf_map_opts.maps[bpf_map_opts.nr_maps++].btf = btf;
+ 	}
+ 
+ 	bpf_map_opts.show_all = true;
+@@ -3461,6 +3508,7 @@ static int bpf_map_opts_add_id(const char *optarg)
+ 	struct bpf_map_info info = {};
+ 	uint32_t len = sizeof(info);
+ 	size_t optarg_len;
++	struct btf *btf;
+ 	unsigned long id;
+ 	unsigned int i;
+ 	char *end;
+@@ -3512,12 +3560,34 @@ static int bpf_map_opts_add_id(const char *optarg)
+ 		return -1;
+ 	}
+ 
++	r = bpf_maps_opts_load_btf(&info, &btf);
++	if (r) {
++		fprintf(stderr, "ss: failed to get BTF data for BPF map ID: %lu\n",
++			id);
++		return -1;
++	}
++
+ 	bpf_map_opts.maps[bpf_map_opts.nr_maps].id = id;
+-	bpf_map_opts.maps[bpf_map_opts.nr_maps++].fd = fd;
++	bpf_map_opts.maps[bpf_map_opts.nr_maps].fd = fd;
++	bpf_map_opts.maps[bpf_map_opts.nr_maps].info = info;
++	bpf_map_opts.maps[bpf_map_opts.nr_maps++].btf = btf;
+ 
+ 	return 0;
+ }
+ 
++static const struct bpf_sk_storage_map_info *bpf_map_opts_get_info(
++	unsigned int map_id)
++{
++	unsigned int i;
++
++	for (i = 0; i < bpf_map_opts.nr_maps; ++i) {
++		if (bpf_map_opts.maps[i].id == map_id)
++			return &bpf_map_opts.maps[i];
++	}
++
++	return NULL;
++}
++
+ static inline bool bpf_map_opts_is_enabled(void)
+ {
+ 	return bpf_map_opts.nr_maps;
+@@ -3559,10 +3629,472 @@ static struct rtattr *bpf_map_opts_alloc_rta(void)
+ 	return stgs_rta;
+ }
+ 
++#define OUT_PREFIX_LEN 65
++
++/* Print a prefixed formatted string. Used to dump BPF socket-local storage
++ * nested structures properly. */
++#define OUT_P(p, fmt, ...) out("%s" fmt, *(p), ##__VA_ARGS__)
++
++typedef char(out_prefix_t)[OUT_PREFIX_LEN];
++
++static void out_prefix_push(out_prefix_t *prefix)
++{
++	size_t len = strlen(*prefix);
++
++	if (len + 5 > OUT_PREFIX_LEN)
++		return;
++
++	strncpy(&(*prefix)[len], "    ", 5);
++}
++
++static void out_prefix_pop(out_prefix_t *prefix)
++{
++	size_t len = strlen(*prefix);
++
++	if (len < 4)
++		return;
++
++	(*prefix)[len - 4] = '\0';
++}
++
++static inline const char *btf_typename_or_fallback(const struct btf *btf,
++	unsigned int name_off)
++{
++	static const char *fallback = "<invalid name_off>";
++	static const char *anon = "<anon>";
++	const char *typename;
++
++	typename = btf__name_by_offset(btf, name_off);
++	if (!typename)
++		return fallback;
++
++	if (strcmp(typename, "") == 0)
++		return anon;
++
++	return typename;
++}
++
++static void out_btf_int128(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	uint64_t high, low;
++	const char *typename;
++
++#ifdef __BIG_ENDIAN_BITFIELD
++	high = *(uint64_t *)data;
++	low = *(uint64_t *)(data + 8);
++#else
++	high = *(uint64_t *)(data + 8);
++	low = *(uint64_t *)data;
++#endif
++
++	typename = btf_typename_or_fallback(btf, type->name_off);
++
++	if (high == 0)
++		OUT_P(prefix, "(%s)0x%lx,\n", typename, low);
++	else
++		OUT_P(prefix, "(%s)0x%lx%016lx,\n", typename, high, low);
++}
++
++#define BITS_PER_BYTE_MASKED(bits) ((bits) & 7)
++#define BITS_ROUNDDOWN_BYTES(bits) ((bits) >> 3)
++#define BITS_ROUNDUP_BYTES(bits) \
++	(BITS_ROUNDDOWN_BYTES(bits) + !!BITS_PER_BYTE_MASKED(bits))
++
++static void out_btf_bitfield(const struct btf *btf, const struct btf_type *type,
++	uint32_t bitfield_offset, uint8_t bitfield_size, const void *data,
++	out_prefix_t *prefix)
++{
++	int left_shift_bits, right_shift_bits;
++	uint64_t high, low;
++	uint64_t print_num[2] = {};
++	int bits_to_copy;
++	const char *typename;
++
++	bits_to_copy = bitfield_offset + bitfield_size;
++	memcpy(print_num, data, BITS_ROUNDUP_BYTES(bits_to_copy));
++
++	right_shift_bits = 128 - bitfield_size;
++#if defined(__BIG_ENDIAN_BITFIELD)
++	high = print_num[0];
++	low = print_num[1];
++	left_shift_bits = bitfield_offset;
++#elif defined(__LITTLE_ENDIAN_BITFIELD)
++	high = print_num[1];
++	low = print_num[0];
++	left_shift_bits = 128 - bits_to_copy;
++#else
++#error neither big nor little endian
++#endif
++
++	/* shake out un-needed bits by shift/or operations */
++	if (left_shift_bits >= 64) {
++		high = low << (left_shift_bits - 64);
++		low = 0;
++	} else {
++		high = (high << left_shift_bits) | (low >> (64 - left_shift_bits));
++		low = low << left_shift_bits;
++	}
++
++	if (right_shift_bits >= 64) {
++		low = high >> (right_shift_bits - 64);
++		high = 0;
++	} else {
++		low = (low >> right_shift_bits) | (high << (64 - right_shift_bits));
++		high = high >> right_shift_bits;
++	}
++
++	typename = btf_typename_or_fallback(btf, type->name_off);
++
++	if (high == 0) {
++		OUT_P(prefix, "(%s:%d)0x%lx,\n", typename, bitfield_size, low);
++	} else {
++		OUT_P(prefix, "(%s:%d)0x%lx%016lx,\n", typename, bitfield_size,
++		high, low);
++	}
++}
++
++static void out_btf_int(const struct btf *btf, const struct btf_type *type,
++	uint32_t bit_offset, const void *data, out_prefix_t *prefix)
++{
++	uint32_t *int_type = (uint32_t *)(type + 1);
++	uint32_t nbits = BTF_INT_BITS(*int_type);
++	const char *typename;
++
++	typename = btf_typename_or_fallback(btf, type->name_off);
++
++	if (bit_offset || BTF_INT_OFFSET(*int_type) ||
++		BITS_PER_BYTE_MASKED(nbits)) {
++		out_btf_bitfield(btf, type, BTF_INT_OFFSET(*int_type), nbits,
++			data, prefix);
++		return;
++	}
++
++	if (nbits == 128) {
++		out_btf_int128(btf, type, data, prefix);
++		return;
++	}
++
++	switch (BTF_INT_ENCODING(*int_type)) {
++	case 0:
++		if (BTF_INT_BITS(*int_type) == 64)
++			OUT_P(prefix, "(%s)%lu,\n", typename, *(uint64_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 32)
++			OUT_P(prefix, "(%s)%u,\n", typename, *(uint32_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 16)
++			OUT_P(prefix, "(%s)%hu,\n", typename, *(uint16_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 8)
++			OUT_P(prefix, "(%s)%hhu,\n", typename, *(uint8_t *)data);
++		else
++			OUT_P(prefix, "<invalid unsigned int type>,");
++		break;
++	case BTF_INT_SIGNED:
++		if (BTF_INT_BITS(*int_type) == 64)
++			OUT_P(prefix, "(%s)%ld,\n", typename, *(int64_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 32)
++			OUT_P(prefix, "(%s)%d,\n", typename, *(int32_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 16)
++			OUT_P(prefix, "(%s)%hd,\n", typename, *(int16_t *)data);
++		else if (BTF_INT_BITS(*int_type) == 8)
++			OUT_P(prefix, "(%s)%hhd,\n", typename, *(int8_t *)data);
++		else
++			OUT_P(prefix, "<invalid signed int type>,");
++		break;
++	case BTF_INT_CHAR:
++		OUT_P(prefix, "(%s)0x%hhx,\n", typename, *(char *)data);
++		break;
++	case BTF_INT_BOOL:
++		OUT_P(prefix, "(%s)%s,\n", typename,
++			*(bool *)data ? "true" : "false");
++		break;
++	default:
++		OUT_P(prefix, "<unknown type>,\n");
++		break;
++	}
++}
++
++static void out_btf_ptr(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	unsigned long value = *(unsigned long *)data;
++	int actual_type_id;
++	const struct btf_type *actual_type;
++	const char *typename = NULL;
++
++	actual_type_id = btf__resolve_type(btf, type->type);
++	if (actual_type_id > 0) {
++		actual_type = btf__type_by_id(btf, actual_type_id);
++		if (actual_type)
++			typename = btf__name_by_offset(btf, actual_type->name_off);
++	}
++
++	typename = typename ? : "void";
++
++	OUT_P(prefix, "(%s *)%p,\n", typename, (void *)value);
++}
++
++static void out_btf_dump_type(const struct btf *btf, int bit_offset,
++	uint32_t type_id, const void *data, size_t len, out_prefix_t *prefix);
++
++static void out_btf_array(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	const struct btf_array *array = (struct btf_array *)(type + 1);
++	const struct btf_type *elem_type;
++	long long elem_size;
++
++	elem_type = btf__type_by_id(btf, array->type);
++	if (!elem_type) {
++		OUT_P(prefix, "<invalid type_id %u>,\n", array->type);
++		return;
++	}
++
++	elem_size = btf__resolve_size(btf, array->type);
++	if (elem_size < 0) {
++		OUT_P(prefix, "<can't resolve size for type_id %u>,\n", array->type);
++		return;
++	}
++
++	for (int i = 0; i < array->nelems; ++i) {
++		out_btf_dump_type(btf, 0, array->type, data + i * elem_size,
++			elem_size, prefix);
++	}
++}
++
++static void out_btf_struct(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	struct btf_member *member = (struct btf_member *)(type + 1);
++	const struct btf_type *member_type;
++	const void *member_data;
++	out_prefix_t prefix_override = {};
++	unsigned int i;
++
++	for (i = 0; i < BTF_INFO_VLEN(type->info); i++) {
++		uint32_t bitfield_offset = member[i].offset;
++		uint32_t bitfield_size = 0;
++
++		if (BTF_INFO_KFLAG(type->info)) {
++			/* If btf_type.info.kind_flag is set, then
++			 * btf_member.offset is composed of:
++			 *      bitfield_offset << 24 | bitfield_size
++			 */
++			bitfield_size = BTF_MEMBER_BITFIELD_SIZE(bitfield_offset);
++			bitfield_offset = BTF_MEMBER_BIT_OFFSET(bitfield_offset);
++		}
++
++		OUT_P(prefix, ".%s = ",
++			btf_typename_or_fallback(btf, member[i].name_off));
++
++		/* The prefix has to be overwritten as this function prints the
++		 * field's name, so we don't print the prefix once here before
++		 * the name, then again in out_btf_bitfield() or out_btf_int()
++		 * before printing the actual value on the same line. */
++
++		member_type = btf__type_by_id(btf, member[i].type);
++		if (!member_type) {
++			OUT_P(&prefix_override, "<invalid type_id %u>,\n",
++				member[i].type);
++			return;
++		}
++
++		member_data = data + BITS_ROUNDDOWN_BYTES(bitfield_offset);
++		bitfield_offset = BITS_PER_BYTE_MASKED(bitfield_offset);
++
++		if (bitfield_size) {
++			out_btf_bitfield(btf, member_type, bitfield_offset,
++				bitfield_size, member_data, &prefix_override);
++		} else {
++			out_btf_dump_type(btf, bitfield_offset, member[i].type,
++				member_data, 0, &prefix_override);
++		}
++	}
++}
++
++static void out_btf_enum(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	const struct btf_enum *enums = (struct btf_enum *)(type + 1);
++	int64_t value;
++	unsigned int i;
++
++	switch (type->size) {
++	case 8:
++		value = *(int64_t *)data;
++		break;
++	case 4:
++		value = *(int32_t *)data;
++		break;
++	case 2:
++		value = *(int16_t*)data;
++		break;
++	case 1:
++		value = *(int8_t *)data;
++		break;
++	default:
++		OUT_P(prefix, "<invalid type size %u>,\n", type->size);
++		return;
++	}
++
++	for (i = 0; BTF_INFO_VLEN(type->info); ++i) {
++		if (value == enums[i].val) {
++			OUT_P(prefix, "(enum %s)%s\n",
++				btf_typename_or_fallback(btf, type->name_off),
++				btf_typename_or_fallback(btf, enums[i].name_off));
++			return;
++		}
++	}
++}
++
++static void out_btf_enum64(const struct btf *btf, const struct btf_type *type,
++	const void *data, out_prefix_t *prefix)
++{
++	const struct btf_enum64 *enums = (struct btf_enum64 *)(type + 1);
++	uint32_t lo32, hi32;
++	uint64_t value;
++	unsigned int i;
++
++	value = *(uint64_t *)data;
++	lo32 = (uint32_t)value;
++	hi32 = value >> 32;
++
++	for (i = 0; i < BTF_INFO_VLEN(type->info); i++) {
++		if (lo32 == enums[i].val_lo32 && hi32 == enums[i].val_hi32) {
++			OUT_P(prefix, "(enum %s)%s\n",
++				btf_typename_or_fallback(btf, type->name_off),
++				btf__name_by_offset(btf, enums[i].name_off));
++			return;
++		}
++	}
++}
++
++static out_prefix_t out_global_prefix = {};
++
++static void out_btf_dump_type(const struct btf *btf, int bit_offset,
++	uint32_t type_id, const void *data, size_t len, out_prefix_t *prefix)
++{
++	const struct btf_type *type;
++	out_prefix_t *global_prefix = &out_global_prefix;
++
++	if (!btf) {
++		OUT_P(prefix, "<missing BTF information>,\n");
++		return;
++	}
++
++	type = btf__type_by_id(btf, type_id);
++	if (!type) {
++		OUT_P(prefix, "<invalid type_id %u>,\n", type_id);
++		return;
++	}
++
++	switch (BTF_INFO_KIND(type->info)) {
++	case BTF_KIND_UNION:
++	case BTF_KIND_STRUCT:
++		OUT_P(prefix, "(%s %s) {\n",
++			BTF_INFO_KIND(type->info) == BTF_KIND_STRUCT ? "struct" : "union",
++			btf_typename_or_fallback(btf, type->name_off));
++
++		out_prefix_push(global_prefix);
++		out_btf_struct(btf, type, data, global_prefix);
++		out_prefix_pop(global_prefix);
++		OUT_P(global_prefix, "},\n");
++		break;
++	case BTF_KIND_ARRAY:
++		{
++			struct btf_array *array = (struct btf_array *)(type + 1);
++			const struct btf_type *content_type = btf__type_by_id(btf, array->type);
++
++			if (!content_type) {
++				OUT_P(prefix, "<invalid type_id %u>,\n", array->type);
++				return;
++			}
++
++			OUT_P(prefix, "(%s[]) {\n",
++				btf_typename_or_fallback(btf, content_type->name_off));
++			out_prefix_push(global_prefix);
++			out_btf_array(btf, type, data, global_prefix);
++			out_prefix_pop(global_prefix);
++			OUT_P(global_prefix, "},\n");
++		}
++		break;
++	case BTF_KIND_TYPEDEF:
++	case BTF_KIND_VOLATILE:
++	case BTF_KIND_CONST:
++	case BTF_KIND_RESTRICT:
++		{
++			int actual_type_id = btf__resolve_type(btf, type_id);
++
++			if (actual_type_id < 0) {
++				OUT_P(prefix, "<invalid type_id %u>,\n", type_id);
++				return;
++			}
++
++			return out_btf_dump_type(btf, 0, actual_type_id, data,
++				len, prefix);
++		}
++		break;
++	case BTF_KIND_INT:
++		out_btf_int(btf, type, bit_offset, data, prefix);
++		break;
++	case BTF_KIND_PTR:
++		out_btf_ptr(btf, type, data, prefix);
++		break;
++	case BTF_KIND_ENUM:
++		out_btf_enum(btf, type, data, prefix);
++		break;
++	case BTF_KIND_ENUM64:
++		out_btf_enum64(btf, type, data, prefix);
++		break;
++	case BTF_KIND_FWD:
++		OUT_P(prefix, "<forward kind invalid>,\n");
++		break;
++	case BTF_KIND_UNKN:
++		OUT_P(prefix, "<unknown>,\n");
++		break;
++	case BTF_KIND_VAR:
++	case BTF_KIND_DATASEC:
++	default:
++		OUT_P(prefix, "<unsupported kind %u>,\n",
++			BTF_INFO_KIND(type->info));
++		break;
++	}
++}
++
++static void out_bpf_sk_storage(int map_id, const void *data, size_t len,
++	out_prefix_t *prefix)
++{
++	uint32_t type_id;
++	struct bpf_sk_storage_map_info *map_info;
++
++	map_info = bpf_map_opts_get_info(map_id);
++	if (!map_info) {
++		OUT_P(prefix, "map_id: %d: missing map info", map_id);
++		return;
++	}
++
++	if (map_info->info.value_size != len) {
++		OUT_P(prefix, "map_id: %d: invalid value size, expecting %u, got %lu\n",
++			map_id, map_info->info.value_size, len);
++		return;
++	}
++
++	type_id = map_info->info.btf_vmlinux_value_type_id ?: map_info->info.btf_value_type_id;
++
++	OUT_P(prefix, "map_id: %d [\n", map_id);
++	out_prefix_push(prefix);
++
++	out_btf_dump_type(map_info->btf, 0, type_id, data, len, prefix);
++
++	out_prefix_pop(prefix);
++	OUT_P(prefix, "]");
++}
++
+ static void show_sk_bpf_storages(struct rtattr *bpf_stgs)
+ {
+-	struct rtattr *tb[SK_DIAG_BPF_STORAGE_MAX + 1], *bpf_stg;
+-	unsigned int rem;
++	struct rtattr *tb[SK_DIAG_BPF_STORAGE_MAX+1], *bpf_stg;
++	out_prefix_t *global_prefix = &out_global_prefix;
++	unsigned int rem, map_id;
++	struct rtattr *value;
+ 
+ 	for (bpf_stg = RTA_DATA(bpf_stgs), rem = RTA_PAYLOAD(bpf_stgs);
+ 		RTA_OK(bpf_stg, rem); bpf_stg = RTA_NEXT(bpf_stg, rem)) {
+@@ -3574,8 +4106,15 @@ static void show_sk_bpf_storages(struct rtattr *bpf_stgs)
+ 			(struct rtattr *)bpf_stg);
+ 
+ 		if (tb[SK_DIAG_BPF_STORAGE_MAP_ID]) {
+-			out("map_id:%u",
+-				rta_getattr_u32(tb[SK_DIAG_BPF_STORAGE_MAP_ID]));
++			out("\n");
++
++			map_id = rta_getattr_u32(tb[SK_DIAG_BPF_STORAGE_MAP_ID]);
++			value = tb[SK_DIAG_BPF_STORAGE_MAP_VALUE];
++
++			out_prefix_push(global_prefix);
++			out_bpf_sk_storage(map_id, RTA_DATA(value),
++				RTA_PAYLOAD(value), global_prefix);
++			out_prefix_pop(global_prefix);
+ 		}
+ 	}
+ }
+@@ -5969,6 +6508,11 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
++	if (oneline && (bpf_map_opts.nr_maps || bpf_map_opts.show_all)) {
++		fprintf(stderr, "ss: --oneline, --bpf-maps, and --bpf-map-id are incompatible\n");
++		exit(-1);
++	}
++
+ 	if (show_processes || show_threads || show_proc_ctx || show_sock_ctx)
+ 		user_ent_hash_build();
+ 
+-- 
+2.41.0
+
 
