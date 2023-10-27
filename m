@@ -1,88 +1,90 @@
-Return-Path: <netdev+bounces-44801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CB0F7D9E66
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 19:00:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F30CC7D9EA1
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 19:06:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1A4B1C20FC0
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 17:00:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99B01B2134E
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 17:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9102939848;
-	Fri, 27 Oct 2023 17:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C343984F;
+	Fri, 27 Oct 2023 17:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iac10Equ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="D/Le1jI3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D588833
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 17:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F1815C433C9;
-	Fri, 27 Oct 2023 17:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698426024;
-	bh=nFnlUgOvDJ6s2zdi2xwHYCo37owk5Wb2BwqFspXJtdk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Iac10Equ9bGpZs8vjB7cyf1CFPKQuTq4Q62BryzXEUo1+EnB52wisiylj4Zf2nsdT
-	 9Gb2jA+MPgqp2JB9Z1XB1thEg8A6xv+Yapox4soaNBiE9RfXdBRGnKrLcKC1iovKQj
-	 eYqFsdBIaYOrE6llWaEs+IIbIVsO3P8dDQ/MOWdvdScOHslXgLqOcuqet51/TkMTO2
-	 9KuXs/p13vo8stGVLTqcgpMNDMLu5Kg+jJk3XKBAr6yGVqEf8TeTJOD4iZmaE1VTbJ
-	 eZ0isGZNT706jVDQEYru0uU0yKNIGumtZ355YBMA70vqE1Bt5sRZwJM2+KoO68tkBh
-	 PfaGXHOrmwn7g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE761C41620;
-	Fri, 27 Oct 2023 17:00:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563C43984A
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 17:06:40 +0000 (UTC)
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [IPv6:2001:41d0:1004:224b::ad])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5F306190
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:06:21 -0700 (PDT)
+Message-ID: <b3f421b5-e9e2-4719-8529-56f2a0cf1cdf@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1698426179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QPrWm9vrW74blopqiHBg8E9fZAJbeACGgI3525E4PmU=;
+	b=D/Le1jI3A2BRXH8isiIqCnpFNe9giI2cUUh1/6tCO+SQASF1UMTN9EtTihKMFZFcVziJ65
+	rOmGkphIZrDdjKa8GCa6MFhYOFkGF+rC41md3+Hkc10WQB+JG7aQgwUBaWcYPg4L14rQns
+	uid+isiu8LjULYqoE0N3pagTrI7472M=
+Date: Fri, 27 Oct 2023 18:02:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next v2 0/2] Increase BPF verifier verbosity when in
- verbose mode
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169842602383.24325.5910223144305620538.git-patchwork-notify@kernel.org>
-Date: Fri, 27 Oct 2023 17:00:23 +0000
-References: <20231027085706.25718-1-shung-hsi.yu@suse.com>
-In-Reply-To: <20231027085706.25718-1-shung-hsi.yu@suse.com>
-To: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@kernel.org,
- toke@redhat.com
+Subject: Re: [PATCH bpf-next 1/2] bpf: add skcipher API support to TC/XDP
+ programs
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Vadim Fedorenko <vadfed@meta.com>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20231026015938.276743-1-vadfed@meta.com>
+ <20231026144759.5ce20f4c@kernel.org>
+ <a10cdab4-ab67-1cd2-0827-52c3755a464f@linux.dev>
+ <20231026183509.471af050@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20231026183509.471af050@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
-
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
-
-On Fri, 27 Oct 2023 16:57:04 +0800 you wrote:
-> When debugging BPF verifier issue, it is useful get as much information
-> out of the verifier as possible to help diagnostic, but right now that
-> is not possible because load_bpf_object() does not set the
-> kernel_log_level in struct bpf_object_open_opts, which is addressed in
-> patch 1.
+On 27/10/2023 02:35, Jakub Kicinski wrote:
+> On Fri, 27 Oct 2023 00:29:29 +0100 Vadim Fedorenko wrote:
+>>> Does anything prevent them from being used simultaneously
+>>> by difference CPUs?
+>>
+>> The algorithm configuration and the key can be used by different CPUs
+>> simultaneously
 > 
-> Patch 2 further allows increasing the log level in verbose mode, so even
-> more information can be retrieved out of the verifier, and most
-> importantly, show verifier log even on successful BPF program load.
+> Makes sense, got confused ctx vs req. You allocate req on the fly.
 > 
-> [...]
+>>>> +	case BPF_DYNPTR_TYPE_SKB:
+>>>> +		return skb_pointer_if_linear(ptr->data, ptr->offset, __bpf_dynptr_size(ptr));
+>>>
+>>> dynptr takes care of checking if skb can be written to?
+>>
+>> dynptr is used to take care of size checking, but this particular part is used
+>> to provide plain buffer from skb. I'm really sure if we can (or should) encrypt
+>> or decrypt in-place, so API now assumes that src and dst are different buffers.
+> 
+> Not sure this answers my question. What I'm asking is basically whether
+> for destination we need to call __bpf_dynptr_is_rdonly() or something
+> already checks that.
 
-Here is the summary with links:
-  - [iproute2-next,v2,1/2] libbpf: set kernel_log_level when available
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=73284227f7a0
-  - [iproute2-next,v2,2/2] bpf: increase verifier verbosity when in verbose mode
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=892a33ac1bd6
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Well, I actually went to simpler implementation. As it's only needed for
+dst buffer, move __bpf_dynptr_is_rdonly to helpers and use it to check
+dst only and break earlier in case of error. If there will be other
+customers of __bpf_dynptr_data_ptr helper, I'll implement it other way.
 
