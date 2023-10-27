@@ -1,102 +1,110 @@
-Return-Path: <netdev+bounces-44729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7DD77D976E
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 14:13:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D89D7D9793
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 14:17:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 151981C20A8C
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:13:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29369282389
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:17:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD48199B7;
-	Fri, 27 Oct 2023 12:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F7F19BB8;
+	Fri, 27 Oct 2023 12:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o8daz6rc"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="B9FACaBg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989571FD5
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 12:13:01 +0000 (UTC)
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA198121
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 05:12:59 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-32d81864e3fso1287085f8f.2
-        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 05:12:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698408778; x=1699013578; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ph8ZV619qssLjPgO/yEQk7zJEM+NsPqPerc7acZSWpY=;
-        b=o8daz6rc631MqPzy5xXDSWpQC+qqEDyriqahCFFP9KRW2v++lJAhP/3E+UkavWESWk
-         NjGQCqPCP6iaxR/8iQ1k1cAdnBq/w6mI6oOGXfdinxLKzSAYjVbFF7t6w3U1WM2jE/HS
-         sefaSYFJesUVGHnLJgUCvDTW54reKPRxa4ZjaefZVGU6SdnB2PhFIM7X8FwQg79nbtMw
-         jmpk4LdHu3lkPoWMHmUz8+51aFjt/sx1/RQ9Pcc8xBoMD1DdKodC7FhZpHSj/sl+4WF5
-         +neR2a5bqH0+fFnPNPIZARb7BD9OyVxg4UuBXpyhRAXX79mIQ+WK7baW3dWEnFNRT9Ew
-         fxzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698408778; x=1699013578;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ph8ZV619qssLjPgO/yEQk7zJEM+NsPqPerc7acZSWpY=;
-        b=IKumWI9U2P2hnKTWFZkRbt/Rsh1PepBClpxiEED+FJtaGQhv4hctOhj2qtFXdjzLGU
-         vAipmlY3myDSu+9V6QMxcGzZRpoW4cPJu9NjUbMD3a49d5sCSSjDLOHODa+uK9Fi8yAr
-         w32t5jKZk+KfrKy39RN1HAHT/GfPZuQf7YVQQmYOFyKxCMUAF40GBl1fd53xwx/boRc4
-         LwbHIqnNTL3eKa8ZbNCo6m+aYY4LN6JJ8ZErWdTvlo1XF2Gn0MMFSljR+ZgxyshzrG8Q
-         Y1bkdH8lQcwureJnB+IPaxI9x5uqAo7WjpCPZhqlMXgUz/lsFvpFHI588eGVqjvT2I4k
-         i3Rw==
-X-Gm-Message-State: AOJu0YyGo5mG+khDI4Atgj+u01cRp5Tm0lqvdSAQHYC+oAkrpYYMurW8
-	GEBY8ActmhX0GSqKepX3cIe8FQ==
-X-Google-Smtp-Source: AGHT+IHQCvYgKC4GIYkhBWYFRXqIbXkxbYn7XjCLJnX8gknw9LeiqQ8kmzYwo5Nm46vJg6lPKDEazw==
-X-Received: by 2002:a5d:53c9:0:b0:32d:701b:a585 with SMTP id a9-20020a5d53c9000000b0032d701ba585mr2104274wrw.69.1698408778388;
-        Fri, 27 Oct 2023 05:12:58 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id p9-20020adff209000000b00324853fc8adsm1642437wro.104.2023.10.27.05.12.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Oct 2023 05:12:58 -0700 (PDT)
-Date: Fri, 27 Oct 2023 15:12:54 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Bo Liu <liubo03@inspur.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net-XXX] vhost-vdpa: fix use after free in vhost_vdpa_probe()
-Message-ID: <cf53cb61-0699-4e36-a980-94fd4268ff00@moroto.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA0D18646
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 12:16:57 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AB83128;
+	Fri, 27 Oct 2023 05:16:56 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39R5Tuq9012500;
+	Fri, 27 Oct 2023 05:16:51 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=Y6xTKIJSNSycWXwHzIPirKaKql9lBW7UOSjD7UTcWio=;
+ b=B9FACaBgUcdszqiQz669apVjPGmlM37xLlA+cBhM0d4jWa1Zzsp477VTzwa5AGrM4v7x
+ SWSTQanuFQObOznb/wZbZm6wkPpN0WmRfpUy0pRJOqMhhmamLx/DJjBSoXvLvBVzg8If
+ aD7Fra67U5OrucLUuCxiBr8uT+f03Jm8VDGizkwcfkU8mWAAFkwraFJZzAXFz4f0OlaD
+ VHxYHXiPuYa9GiqoYkbE5e4aDD4B4TOVCTNvnAauTnF7ZJRvBB37x65wVmc8ydcUVTm7
+ XvpUHRwDDmSX62odFEBNbphLSHJpBL3/Lg10lRQc3fkIw5ISpNLRbEhLRlnrpqsQdxlK Aw== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3tywr83b23-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Fri, 27 Oct 2023 05:16:51 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 27 Oct
+ 2023 05:16:49 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Fri, 27 Oct 2023 05:16:49 -0700
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 597073F7050;
+	Fri, 27 Oct 2023 05:16:49 -0700 (PDT)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
+        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>
+Subject: [PATCH net-next v3 0/4] Cleanup and optimizations to transmit code
+Date: Fri, 27 Oct 2023 05:16:35 -0700
+Message-ID: <20231027121639.2382565-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Gg8ZBtEi-m6sgKEgmOSJILCTcSgEbTCb
+X-Proofpoint-ORIG-GUID: Gg8ZBtEi-m6sgKEgmOSJILCTcSgEbTCb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-27_10,2023-10-27_01,2023-05-22_02
 
-The put_device() calls vhost_vdpa_release_dev() which calls
-ida_simple_remove() and frees "v".  So this call to
-ida_simple_remove() is a use after free and a double free.
+Pad small packets to ETH_ZLEN before transmit, cleanup dma sync calls,
+add xmit_more functionality and then further remove atomic
+variable usage in the prior.
 
-Fixes: ebe6a354fa7e ("vhost-vdpa: Call ida_simple_remove() when failed")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/vhost/vdpa.c | 1 -
- 1 file changed, 1 deletion(-)
+Changes:
+V3:
+  - Stop returning NETDEV_TX_BUSY when ring is full in xmit_patch.
+    Change to inspect early if next packet can fit in ring instead of
+    current packet, and stop queue if not.
+  - Add smp_mb between stopping tx queue and checking if tx queue has
+    free entries again, in queue full check function to let reflect
+    IQ process completions that might have happened on other cpus.
+  - Update small packet padding patch changelog to give more info.
+V2: https://lore.kernel.org/all/20231024145119.2366588-1-srasheed@marvell.com/
+  - Added patch for padding small packets to ETH_ZLEN, part of
+    optimization patches for transmit code missed out in V1
+  - Updated changelog to provide more details for dma_sync remove patch
+  - Updated changelog to use imperative tone in add xmit_more patch
+V1: https://lore.kernel.org/all/20231023114449.2362147-1-srasheed@marvell.com/
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 9a2343c45df0..1aa67729e188 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -1511,7 +1511,6 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
- 
- err:
- 	put_device(&v->dev);
--	ida_simple_remove(&vhost_vdpa_ida, v->minor);
- 	return r;
- }
- 
+Shinas Rasheed (4):
+  octeon_ep: add padding for small packets
+  octeon_ep: remove dma sync in trasmit path
+  octeon_ep: implement xmit_more in transmit
+  octeon_ep: remove atomic variable usage in Tx data path
+
+ .../ethernet/marvell/octeon_ep/octep_config.h |  3 +-
+ .../ethernet/marvell/octeon_ep/octep_main.c   | 55 +++++++++++--------
+ .../ethernet/marvell/octeon_ep/octep_main.h   |  9 +++
+ .../net/ethernet/marvell/octeon_ep/octep_tx.c |  5 +-
+ .../net/ethernet/marvell/octeon_ep/octep_tx.h |  3 -
+ 5 files changed, 45 insertions(+), 30 deletions(-)
+
 -- 
-2.42.0
+2.25.1
 
 
