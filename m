@@ -1,99 +1,102 @@
-Return-Path: <netdev+bounces-44664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95E977D900A
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 09:39:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F8097D9067
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 09:55:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25CD7B212A8
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 07:39:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A426AB20DA8
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 07:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61F0C2C3;
-	Fri, 27 Oct 2023 07:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6196CF9C4;
+	Fri, 27 Oct 2023 07:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bWNuWJQC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0zUDdv7j"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CACC13D
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 07:39:02 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846181AC;
-	Fri, 27 Oct 2023 00:39:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=UrVb0RxnFRlTxNQClfI8ZHdeowM3uhiJ9mxX6SCrB/s=; b=bWNuWJQCcEuejHP845AFX2lFJC
-	WQ+R+JY4/YiK21y5U0P/rQQ1K7AFgsItJU5KzHDh+DOfSS/APHTQLRVLFrynNOJZCgRVmm4eeNIQl
-	mMNAPZguvQAV5JKkzY5whERVVfBI4zbRH/+nOlOjxXo/c+6y64IgXOZaELBJ5OaUP2WSyF316S29G
-	P3KuAgnUBW9oktobYODQnCqyr0vqoITHSJq5Uka2xGpsMWPPujC/ZIH9xpfVFNG/e8CDhglqU7usB
-	5/joRs1HV9raMiXpmfcjQuyXYxPVgU6rnduQRDlk2E5TIYqudckCMYJvbbmu4qveqh7zY8hOt75iO
-	46BsoR6g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56172)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qwHQc-0007Yi-0Y;
-	Fri, 27 Oct 2023 08:38:46 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qwHQa-0000Zo-5S; Fri, 27 Oct 2023 08:38:44 +0100
-Date: Fri, 27 Oct 2023 08:38:44 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Gan Yi Fang <yi.fang.gan@intel.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Looi Hong Aun <hong.aun.looi@intel.com>,
-	Voon Weifeng <weifeng.voon@intel.com>,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Ahmad Tarmizi Noor Azura <noor.azura.ahmad.tarmizi@intel.com>
-Subject: Re: [PATCH net-next 1/1] net: stmmac: add check for advertising
- linkmode request for set-eee
-Message-ID: <ZTtpBCZuB+bjVt9D@shell.armlinux.org.uk>
-References: <20231027065054.3808352-1-yi.fang.gan@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3B31118C
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 07:55:19 +0000 (UTC)
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96D9A10A
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 00:55:18 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-53f647c84d4so10192a12.0
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 00:55:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698393317; x=1698998117; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HGYHT9Nra4593u53fEOaMbHJCKjgvXJqCWRtxH3Qt10=;
+        b=0zUDdv7jrt67HaqGUlt/7iPPzTyR4mN0BmfAu5yNbepY++rLMa5HM7LFaq8HONtfjW
+         ljYtoxLPcbRKEBnDu4amjJZ3gjl2auY7MODTYDDMfoiPzeRpQCf7ZpiMC8p7i/6v7cC+
+         mKx1Zvuo6ltYQxhLo2fJQKOinJPLHGR4zFSRngusg6mmHxboG0fMBicMNeWEQXBIJrd6
+         mWGshkTCqzBOsf3nDiYdsephvjzIRy+1LEGQiXfW4RIU9Yy9V9Hl1B5dRhwHiSWWAAVd
+         G8WKkd7XawIYlZ6Wbs7+azMVwhNxSMlWJgfaBW2Tmw26yH28r07ubzuwbUVq5VeIUJi8
+         k24A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698393317; x=1698998117;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HGYHT9Nra4593u53fEOaMbHJCKjgvXJqCWRtxH3Qt10=;
+        b=R/51RwVWyqlyJmqHA47Bn5uEi7wN0n+a6z6gNnKu4JUg7LTfsoY/6lrGiF62B0AalC
+         YTxBWeYgBheJ0q35zUV25i+Qg0QIfT0yCsHFbau8482WgNe8pQmV1Pg+Sd22tqmpV8Ol
+         4qKKO7ZU9+dgtnwoxw9shugSqT9rZd4RT4wL1cXY+IAkFlIYEaS+i+AFO3/5/LeGJ/FN
+         wKfZY+dJ1yfDrdGVX/584zjVZ5nKIvnAfxpdJhXGeK3nAgTIqH3BJ74x7x5CTmRMuoxL
+         tO1ycXZx3EX6NcA6tdYK1Aja2RgXukmFFv028gL3a9lpWbVdnsMSsZcTEY93rA1fD8Yj
+         ecfg==
+X-Gm-Message-State: AOJu0Yw/zEC//YjIL+1cXPs7C3W9xY85VoV+Jub1s45gWf6N3iokCtIm
+	Vw9KZNCMZg8FNKp3Va+kfyQH+equPcznITShZVqPVA==
+X-Google-Smtp-Source: AGHT+IGBdHxCYjAJDZJs4A0m/qb7bb49HsRy93RBIXtbcpAwXQk9vO6nwfImVtcYieozgRUsuY0jZn0w83b0oKlYxkg=
+X-Received: by 2002:a05:6402:f15:b0:542:a2a7:75a1 with SMTP id
+ i21-20020a0564020f1500b00542a2a775a1mr67870eda.0.1698393316637; Fri, 27 Oct
+ 2023 00:55:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231027065054.3808352-1-yi.fang.gan@intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20231026081959.3477034-1-lixiaoyan@google.com>
+ <20231026081959.3477034-4-lixiaoyan@google.com> <20231026072003.65dc5774@kernel.org>
+ <CADjXwjjSjw-GxtiBFT_o+mdQT5hSOTH9nDNvEQHV1z4cdqX07A@mail.gmail.com> <20231026182315.227fcd89@kernel.org>
+In-Reply-To: <20231026182315.227fcd89@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 27 Oct 2023 09:55:03 +0200
+Message-ID: <CANn89iJsY=ORcYiCAp-2AJKYbgWQS3ygOpYwzY+_vb6ojz3Gxw@mail.gmail.com>
+Subject: Re: [PATCH v4 net-next 3/6] net-smnp: reorganize SNMP fast path variables
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Coco Li <lixiaoyan@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	Mubashir Adnan Qureshi <mubashirq@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, 
+	Wei Wang <weiwan@google.com>, Pradeep Nemavat <pnemavat@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 27, 2023 at 02:50:54PM +0800, Gan Yi Fang wrote:
-> From: Noor Azura Ahmad Tarmizi <noor.azura.ahmad.tarmizi@intel.com>
-> 
-> Add check for advertising linkmode set request with what is currently
-> being supported by PHY before configuring the EEE. Unsupported setting
-> will be rejected and a message will be prompted. No checking is
-> required while setting the EEE to off.
+On Fri, Oct 27, 2023 at 3:23=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 26 Oct 2023 16:52:35 -0700 Coco Li wrote:
+> > I have no objections to moving the enums outside, but that seems a bit
+> > tangential to the purpose of this patch series.
+>
+> My thinking is - we assume we can reshuffle this enum, because nobody
+> uses the enum values directly. If someone does, tho, we would be
+> breaking binary compatibility.
+>
+> Moving it out of include/uapi/ would break the build for anyone trying
+> to refer to the enum, That gives us quicker signal that we may have
+> broken someone's code.
 
-Why should this functionality be specific to stmmac?
+Note that we already in the past shuffled values without anyone objecting..=
+.
 
-Why do we need this?
-
-What is wrong with the checking and masking that phylib is doing?
-
-Why should we trust the value in edata->supported provided by the user?
-
-Sorry, but no. I see no reason that this should be done, especially
-not in the stmmac driver.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+We probably can move the enums out of uapi, I suggest we remove this
+patch from the series
+and do that in the next cycle, I think other reorgs are more important.
 
