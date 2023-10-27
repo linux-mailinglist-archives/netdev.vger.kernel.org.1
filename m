@@ -1,253 +1,179 @@
-Return-Path: <netdev+bounces-44770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D10227D9A77
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 15:52:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38BD87D9A8E
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 15:58:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9745B213A3
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:52:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69E041C20F7F
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:58:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6522A28DB2;
-	Fri, 27 Oct 2023 13:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35478358A3;
+	Fri, 27 Oct 2023 13:58:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="jOdiNrd0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jmoRo7kf"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA631EB28;
-	Fri, 27 Oct 2023 13:51:53 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE41118A;
-	Fri, 27 Oct 2023 06:51:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=bZFuNIvNr+O7sWZ0ED5meKlY7g9oTmwwM9BLzW/byYY=; b=jOdiNrd0hsEbFcTm51HsecGzeq
-	Vm9TztWuMZOoJDbHvDdCV1rAVVtC5kL7BFuZy3Yz4y8vNwnPMsJW65Bk7eT1nUBy9rwqHuuGPW9KF
-	zCN55FX+xrWf5iFDZuGr1XlKhsBvhAxMuKNuIC9ZTQPqJHHjU8AuhaB8vc6PROaA9KLJ8PbFWyGYE
-	iMe1H8wMgYRGgyuDYDGNAeDpqZHFI+dt3GzdCZop4YHUKxDMC2XgdwHMYp1s2Y3kJdQ5qzLrJlaFk
-	9S9FeIQjSSW8J/7oPw9qdb/c9GIIJ2zM3dFCUUe69MxgmYd/BV+/24rUx4qgXRTmvnAVH49B0bnGL
-	KcaLzRgA==;
-Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qwNFc-000HL6-2U; Fri, 27 Oct 2023 15:51:48 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: kuba@kernel.org
-Cc: idosch@idosch.org,
-	jhs@mojatatu.com,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH net-next] net, sched: Fix SKB_NOT_DROPPED_YET splat under debug config
-Date: Fri, 27 Oct 2023 15:51:42 +0200
-Message-Id: <20231027135142.11555-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3C818AE4
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 13:58:03 +0000 (UTC)
+Received: from mail-ua1-x92a.google.com (mail-ua1-x92a.google.com [IPv6:2607:f8b0:4864:20::92a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884779D
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 06:58:01 -0700 (PDT)
+Received: by mail-ua1-x92a.google.com with SMTP id a1e0cc1a2514c-7ba0d338367so77049241.2
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 06:58:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698415080; x=1699019880; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3SmNzfE80j9lJmwk1LsQAeVJjZnjh0OJLvTGLS04UjA=;
+        b=jmoRo7kfsnl/0M4MO8W9KXucK1H4PaHLg7AIKGfXMr6fcHhJhxJNCI/g5pKrFRGp5D
+         rVSF0TP8xoxyIv6pqW7VmfWEwE//9HphLWzHHvp8V6Z4Gmf4Oj4jT32N4trfvYKxUA8F
+         aXngNFh0cKxtrvUzH8X5YZB+fU4qk0fK7/3jca2FLEJIYZ/MkKYo2xJ0nyOzgiKuIUyC
+         lIojrJGOeYOR8+6QyrXnO4T/vAMNGRJGx8227l6mEoboXrRQ/3TiqxmB+eWeRb0mmco+
+         wp/iHG4TOBJ8g6BUwH9PiZJ4S9IAK6fn96PbHhiybok3/XgQKPcOLJk12fnqtMNNhqdz
+         7iKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698415080; x=1699019880;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3SmNzfE80j9lJmwk1LsQAeVJjZnjh0OJLvTGLS04UjA=;
+        b=c9+9mFOaCbsObjNJQgFljgOTLFhculZwhMdX1uEBgtWkLKMn8QHyHj2FSWylMdVi0H
+         7kjuh87XvcS+XI31t8KWfmG2L29cUHuRsfiQ08kWKq/PKD/1dze0bNjEKfK9mtWzhm4q
+         wMI7l87vZzJeszleq9PwOXu3xZTdBkEBy4tmKyyyA98pN7K72ydnQapWMf4X4IibVCSb
+         N9LK15qav578iAwnjnYA05AQgwcJeaZO1LjMHLGwrJvX+QjbBXXjNw2FShFNSKRD7kUq
+         HMx0u2Du7wAJTmC6ra1bQ6lLTrlvMhem0JTMlUHPNu2c4ZYIx1SDw7rZQzNabmEzZP1I
+         1U4g==
+X-Gm-Message-State: AOJu0YxjiMYssXgn2dZ3QHbRYiTbQ2XH5dpTnrbR7jibU4XtuQOkhZTJ
+	llQqpKfSaCT/R/KO+e70OOc=
+X-Google-Smtp-Source: AGHT+IFdGoRqmWnOaVhbECbLWBfZVMuV2tRNu3FrBZxlb5KQXs6l16YcltbE5weg4vOyGE/vvpeqlQ==
+X-Received: by 2002:a67:c31b:0:b0:45b:ecd:98c4 with SMTP id r27-20020a67c31b000000b0045b0ecd98c4mr2846327vsj.16.1698415080444;
+        Fri, 27 Oct 2023 06:58:00 -0700 (PDT)
+Received: from localhost ([104.192.3.74])
+        by smtp.gmail.com with ESMTPSA id f14-20020a0cc30e000000b0065b5306565esm616806qvi.112.2023.10.27.06.57.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Oct 2023 06:57:59 -0700 (PDT)
+Date: Fri, 27 Oct 2023 16:57:55 +0300
+From: Maxim Mikityanskiy <maxtram95@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>
+Subject: Re: [PATCH net] net: sched: fix warn on htb offloaded class creation
+Message-ID: <ZTvBoQHfu23ynWf-@mail.gmail.com>
+References: <ff51f20f596b01c6d12633e984881be555660ede.1698334391.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27074/Fri Oct 27 09:58:36 2023)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ff51f20f596b01c6d12633e984881be555660ede.1698334391.git.pabeni@redhat.com>
+X-Spam-Level: **
 
-Ido reported:
+I believe this is not the right fix.
 
-  [...] getting the following splat [1] with CONFIG_DEBUG_NET=y and this
-  reproducer [2]. Problem seems to be that classifiers clear 'struct
-  tcf_result::drop_reason', thereby triggering the warning in
-  __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0). [...]
+On Thu, 26 Oct 2023 at 17:36:48 +0200, Paolo Abeni wrote:
+> The following commands:
+> 
+> tc qdisc add dev eth1 handle 2: root htb offload
+> tc class add dev eth1 parent 2: classid 2:1 htb rate 5mbit burst 15k
+> 
+> yeld to a WARN in the HTB qdisc:
 
-  [1]
-  WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x38/0x130
-  Modules linked in:
-  CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d9582e0 #682
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc37 04/01/2014
-  RIP: 0010:kfree_skb_reason+0x38/0x130
-  [...]
-  Call Trace:
-   <IRQ>
-   __netif_receive_skb_core.constprop.0+0x837/0xdb0
-   __netif_receive_skb_one_core+0x3c/0x70
-   process_backlog+0x95/0x130
-   __napi_poll+0x25/0x1b0
-   net_rx_action+0x29b/0x310
-   __do_softirq+0xc0/0x29b
-   do_softirq+0x43/0x60
-   </IRQ>
+Something is off here. These are literally the most basic commands one
+could invoke with HTB offload, I'm sure they worked. Is it something
+that broke recently? Tariq/Gal/Saeed, could you check them on a Mellanox
+NIC?
 
-  [2]
-  #!/bin/bash
+> 
+>  WARNING: CPU: 2 PID: 1583 at net/sched/sch_htb.c:1959
+>  CPU: 2 PID: 1583 Comm: tc Kdump: loaded 6.6.0-rc2.mptcp_7895773e5235+ #59
+>  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc37 04/01/2014
+>  RIP: 0010:htb_change_class+0x25c4/0x2e30 [sch_htb]
+>  Code: 24 58 48 b8 00 00 00 00 00 fc ff df 48 89 ca 48 c1 ea 03 80 3c 02 00 0f 85 92 01 00 00 49 89 8c 24 b0 01 00 00 e9 77 fc ff ff <0f> 0b e9 15 ec ff ff 80 3d f8 35 00 00 00 0f 85 d4 f9 ff ff ba 32
+>  RSP: 0018:ffffc900015df240 EFLAGS: 00010246
+>  RAX: 0000000000000000 RBX: ffff88811b4ca000 RCX: ffff88811db42800
+>  RDX: 1ffff11023b68502 RSI: ffffffffaf2e6a00 RDI: ffff88811db42810
+>  RBP: ffff88811db45000 R08: 0000000000000001 R09: fffffbfff664bbc9
+>  R10: ffffffffb325de4f R11: ffffffffb2d33748 R12: 0000000000000000
+>  R13: ffff88811db43000 R14: ffff88811b4caaac R15: ffff8881252c0030
+>  FS:  00007f6c1f126740(0000) GS:ffff88815aa00000(0000) knlGS:0000000000000000
+>  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>  CR2: 000055dca8e5b4a8 CR3: 000000011bc7a006 CR4: 0000000000370ee0
+>  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>  Call Trace:
+>  <TASK>
+>   tc_ctl_tclass+0x394/0xeb0
+>   rtnetlink_rcv_msg+0x2f5/0xaa0
+>   netlink_rcv_skb+0x12e/0x3a0
+>   netlink_unicast+0x421/0x730
+>   netlink_sendmsg+0x79e/0xc60
+>   ____sys_sendmsg+0x95a/0xc20
+>   ___sys_sendmsg+0xee/0x170
+>   __sys_sendmsg+0xc6/0x170
+>  do_syscall_64+0x58/0x80
+>  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> 
+> The first command creates per TX queue pfifo qdiscs in
+> tc_modify_qdisc() -> htb_init() and grafts the pfifo to each dev_queue
+> via tc_modify_qdisc() ->  qdisc_graft() -> htb_attach().
 
-  ip link add name veth0 type veth peer name veth1
-  ip link set dev veth0 up
-  ip link set dev veth1 up
-  tc qdisc add dev veth1 clsact
-  tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:22:33:44:55 action drop
-  mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
+Not exactly; it grafts pfifo to direct queues only. htb_attach_offload
+explicitly grafts noop to all the remaining queues.
 
-What happens is that inside most classifiers the tcf_result is copied over
-from a filter template e.g. *res = f->res which then implicitly overrides
-the prior SKB_DROP_REASON_TC_{INGRESS,EGRESS} default drop code which was
-set via sch_handle_{ingress,egress}() for kfree_skb_reason().
+> When the command completes, the qdisc_sleeping for each dev_queue is a
+> pfifo one. The next class creation will trigger the reported splat.
+> 
+> Address the issue taking care of old non-builtin qdisc in
+> htb_change_class().
+> 
+> Fixes: d03b195b5aa0 ("sch_htb: Hierarchical QoS hardware offload")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+>  net/sched/sch_htb.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+> index 0d947414e616..dc682bd542b4 100644
+> --- a/net/sched/sch_htb.c
+> +++ b/net/sched/sch_htb.c
+> @@ -1955,8 +1955,7 @@ static int htb_change_class(struct Qdisc *sch, u32 classid,
+>  				qdisc_refcount_inc(new_q);
+>  			}
+>  			old_q = htb_graft_helper(dev_queue, new_q);
+> -			/* No qdisc_put needed. */
+> -			WARN_ON(!(old_q->flags & TCQ_F_BUILTIN));
+> +			qdisc_put(old_q);
 
-Add a small helper tcf_set_result() and convert classifiers over to it.
-The latter leaves the drop code intact and classifiers, actions as well
-as the action engine in tcf_exts_exec() can then in future make use of
-tcf_set_drop_reason(), too.
+We can get here after one of two cases above:
 
-Tested that the splat is fixed under CONFIG_DEBUG_NET=y with the repro.
+1. A new queue is allocated with TC_HTB_LEAF_ALLOC_QUEUE. It's supposed
+to have a noop qdisc by default (after htb_attach_offload).
 
-Fixes: 54a59aed395c ("net, sched: Make tc-related drop reason more flexible")
-Reported-by: Ido Schimmel <idosch@idosch.org>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Link: https://lore.kernel.org/netdev/ZTjY959R+AFXf3Xy@shredder
----
- include/net/pkt_cls.h    | 12 ++++++++++++
- net/sched/cls_basic.c    |  2 +-
- net/sched/cls_bpf.c      |  2 +-
- net/sched/cls_flower.c   |  2 +-
- net/sched/cls_fw.c       |  2 +-
- net/sched/cls_matchall.c |  2 +-
- net/sched/cls_route.c    |  4 ++--
- net/sched/cls_u32.c      |  2 +-
- 8 files changed, 20 insertions(+), 8 deletions(-)
+2. An existing leaf is converted to an inner node with
+TC_HTB_LEAF_TO_INNER, its queue is reused. htb_graft_helper(dev_queue,
+NULL) makes sure that the qdisc is noop, not pfifo anymore.
 
-diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-index a76c9171db0e..31d8e8587824 100644
---- a/include/net/pkt_cls.h
-+++ b/include/net/pkt_cls.h
-@@ -160,6 +160,18 @@ static inline void tcf_set_drop_reason(struct tcf_result *res,
- 	res->drop_reason = reason;
- }
- 
-+static inline void tcf_set_result(struct tcf_result *to,
-+				  const struct tcf_result *from)
-+{
-+	/* tcf_result's drop_reason which is the last member must be
-+	 * preserved and cannot be copied from the cls'es tcf_result
-+	 * template given this is carried all the way and potentially
-+	 * set to a concrete tc drop reason upon error or intentional
-+	 * drop. See tcf_set_drop_reason() locations.
-+	 */
-+	memcpy(to, from, offsetof(typeof(*to), drop_reason));
-+}
-+
- static inline void
- __tcf_bind_filter(struct Qdisc *q, struct tcf_result *r, unsigned long base)
- {
-diff --git a/net/sched/cls_basic.c b/net/sched/cls_basic.c
-index 1b92c33b5f81..d7ead3fc3c45 100644
---- a/net/sched/cls_basic.c
-+++ b/net/sched/cls_basic.c
-@@ -50,7 +50,7 @@ TC_INDIRECT_SCOPE int basic_classify(struct sk_buff *skb,
- 		if (!tcf_em_tree_match(skb, &f->ematches, NULL))
- 			continue;
- 		__this_cpu_inc(f->pf->rhit);
--		*res = f->res;
-+		tcf_set_result(res, &f->res);
- 		r = tcf_exts_exec(skb, &f->exts, res);
- 		if (r < 0)
- 			continue;
-diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
-index 382c7a71f81f..e4620a462bc3 100644
---- a/net/sched/cls_bpf.c
-+++ b/net/sched/cls_bpf.c
-@@ -124,7 +124,7 @@ TC_INDIRECT_SCOPE int cls_bpf_classify(struct sk_buff *skb,
- 			res->class   = 0;
- 			res->classid = filter_res;
- 		} else {
--			*res = prog->res;
-+			tcf_set_result(res, &prog->res);
- 		}
- 
- 		ret = tcf_exts_exec(skb, &prog->exts, res);
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index e5314a31f75a..eb94090fb26c 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -341,7 +341,7 @@ TC_INDIRECT_SCOPE int fl_classify(struct sk_buff *skb,
- 
- 		f = fl_mask_lookup(mask, &skb_key);
- 		if (f && !tc_skip_sw(f->flags)) {
--			*res = f->res;
-+			tcf_set_result(res, &f->res);
- 			return tcf_exts_exec(skb, &f->exts, res);
- 		}
- 	}
-diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
-index c49d6af0e048..70b873f8771f 100644
---- a/net/sched/cls_fw.c
-+++ b/net/sched/cls_fw.c
-@@ -63,7 +63,7 @@ TC_INDIRECT_SCOPE int fw_classify(struct sk_buff *skb,
- 		for (f = rcu_dereference_bh(head->ht[fw_hash(id)]); f;
- 		     f = rcu_dereference_bh(f->next)) {
- 			if (f->id == id) {
--				*res = f->res;
-+				tcf_set_result(res, &f->res);
- 				if (!tcf_match_indev(skb, f->ifindex))
- 					continue;
- 				r = tcf_exts_exec(skb, &f->exts, res);
-diff --git a/net/sched/cls_matchall.c b/net/sched/cls_matchall.c
-index c4ed11df6254..a4018db80a60 100644
---- a/net/sched/cls_matchall.c
-+++ b/net/sched/cls_matchall.c
-@@ -37,7 +37,7 @@ TC_INDIRECT_SCOPE int mall_classify(struct sk_buff *skb,
- 	if (tc_skip_sw(head->flags))
- 		return -1;
- 
--	*res = head->res;
-+	tcf_set_result(res, &head->res);
- 	__this_cpu_inc(head->pf->rhit);
- 	return tcf_exts_exec(skb, &head->exts, res);
- }
-diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
-index 1424bfeaca73..cbfaa1d1820f 100644
---- a/net/sched/cls_route.c
-+++ b/net/sched/cls_route.c
-@@ -109,7 +109,7 @@ static inline int route4_hash_wild(void)
- 
- #define ROUTE4_APPLY_RESULT()					\
- {								\
--	*res = f->res;						\
-+	tcf_set_result(res, &f->res);				\
- 	if (tcf_exts_has_actions(&f->exts)) {			\
- 		int r = tcf_exts_exec(skb, &f->exts, res);	\
- 		if (r < 0) {					\
-@@ -152,7 +152,7 @@ TC_INDIRECT_SCOPE int route4_classify(struct sk_buff *skb,
- 			goto failure;
- 		}
- 
--		*res = f->res;
-+		tcf_set_result(res, &f->res);
- 		spin_unlock(&fastmap_lock);
- 		return 0;
- 	}
-diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-index 6663e971a13e..f50ae40a29d5 100644
---- a/net/sched/cls_u32.c
-+++ b/net/sched/cls_u32.c
-@@ -172,7 +172,7 @@ TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *skb,
- check_terminal:
- 			if (n->sel.flags & TC_U32_TERMINAL) {
- 
--				*res = n->res;
-+				tcf_set_result(res, &n->res);
- 				if (!tcf_match_indev(skb, n->ifindex)) {
- 					n = rcu_dereference_bh(n->next);
- 					goto next_knode;
--- 
-2.34.1
+This WARN_ON is here for a reason. If it triggered, it indicates a bug
+somewhere else, because we don't expect anything but noop_qdisc after
+the `if` above. Silencing the warning doesn't fix the bug and may lead
+to damaging the consistency of the data structures.
 
+>  		}
+>  		sch_tree_lock(sch);
+>  		if (parent && !parent->level) {
+> -- 
+> 2.41.0
+> 
 
