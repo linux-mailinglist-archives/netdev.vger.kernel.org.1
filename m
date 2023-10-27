@@ -1,91 +1,80 @@
-Return-Path: <netdev+bounces-44831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF6B37DA0FC
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 20:48:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A005C7DA125
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 21:09:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DB31B20D55
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 18:47:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA70E1C2032A
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 19:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C433B7AA;
-	Fri, 27 Oct 2023 18:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C263D38B;
+	Fri, 27 Oct 2023 19:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZVaYQ2iq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1JnwIaM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3CC374C5;
-	Fri, 27 Oct 2023 18:47:53 +0000 (UTC)
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E60B10C3;
-	Fri, 27 Oct 2023 11:47:36 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-66fbcaf03c6so5839106d6.1;
-        Fri, 27 Oct 2023 11:47:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07CDC18C2E
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 19:09:47 +0000 (UTC)
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B672BE1
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 12:09:46 -0700 (PDT)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-59b5484fbe6so18375787b3.1
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 12:09:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698432455; x=1699037255; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698433785; x=1699038585; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s/a0tTu9/JPEdXuV8EJT0RD0nNZ+OkcyleZ2EfTC0bM=;
-        b=ZVaYQ2iqIz9F5TFk7CLpbyBMbcXcwvexEV7SoDSi72/eGV4GwTaRcSyJANW1O+k8VW
-         k6ESSNi9IFwfo3c7OWITAlbfsNjwaVUgANzXBvmYNUsOyzpZe4tLFB9rx/uOvDJN7sOq
-         zbdAT3BlSo3zWO0VAth8FV4YaB1DDi3QlX4cP1vnLQleLsuMjaG9QcVA8QR7Ljexn5nb
-         URA1tRjZbz3zJ0Ho4eYC0xSPTWwGjydtrMst3eDR39pfVAZxu1wS6afI3/qEmHxFEayX
-         ZIrJo5Lf9aG4IDp1VTWc9lNkFZEbUGnLB108DjRQQ5UBLYJYH5aQklHexKrFEbAXpXPy
-         uuuQ==
+        bh=KnrT4pnhtsjQaBlW7HCmbHqYuxjYkHapoY0fCqmh3GQ=;
+        b=U1JnwIaM25pXL1MVVrgeya5kp4+cJC0Q/1nhxXgFzmQ0mmRE3XvRAhU/d186/yWXx7
+         tsbiJw7RpqYpzl5pOoi4uiObp2Elyr1fJd0XqlR8f3AB93gQiJM8lIMZVxF0l1xMaAjl
+         ottmY9spBYS0dzI5e31IZqLQx+tR6dh/FhEWoxPcAHLtlhyTcmCFblW7Hg7rqwHwYeOx
+         nfWcmbmbiYFhLemWLWd4N1W88sDtI9ZTh+9IQ5sdgUl3zo50yyVUHa42E984+WXmEbHt
+         DhcObNv5nuDfU9ruK0/EPjaX0kTlEMwfkakk2K/u6GQdvn6nYJxrCZo1MjeYnMfuE8xu
+         HLDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698432455; x=1699037255;
+        d=1e100.net; s=20230601; t=1698433785; x=1699038585;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=s/a0tTu9/JPEdXuV8EJT0RD0nNZ+OkcyleZ2EfTC0bM=;
-        b=oALmuctOrMLAKK3sbCrxeWHy7T7K7Fjyx+wIkGLDVTNEzLxPpGV74GeZM3Cfun0quA
-         uhd8NXfejxRs355hf3yul9uE6rLIziSlUkQTxpeFpLXHaifB8e2o1Hg4fyHb1Bt0WYZw
-         R9+TfbXHv9OfC/MtCkcAiUaV/idezdQ3DkaoC3rwQJ/AeNCmaiT8/DaqJD5u3T8uKO5S
-         zo1SOS3N8GomtrRyOYL3R21OD6qwRI6Ln/o+k9UwnZCPnwngpe4/1GD8nmWN/+0y1u0u
-         wG5k2r6bFAZ+GJATtygB9+IDlGLvX+0tkBY1fcJY12/TWEQc9TsY5rxlDZ+YWflEAQi5
-         sJ3A==
-X-Gm-Message-State: AOJu0YzPdyVyqlCGahuX9w6ztODtEaVCFIVSeHtbo6x3ibmlsKXRDQGG
-	EMdNdqZbCc3MCwiAgwkXKQ==
-X-Google-Smtp-Source: AGHT+IH4eVOUIF76haowlEtb/fcEKTnFPVsn6mTG+2WQozJbnW3yB6tp9L86bBH9YWLUnz06tElP5w==
-X-Received: by 2002:a05:6214:21aa:b0:66d:12c7:bf85 with SMTP id t10-20020a05621421aa00b0066d12c7bf85mr4456312qvc.31.1698432455054;
-        Fri, 27 Oct 2023 11:47:35 -0700 (PDT)
-Received: from n191-129-154.byted.org ([130.44.215.123])
-        by smtp.gmail.com with ESMTPSA id o1-20020a05620a110100b0076d25b11b62sm773944qkk.38.2023.10.27.11.47.34
+        bh=KnrT4pnhtsjQaBlW7HCmbHqYuxjYkHapoY0fCqmh3GQ=;
+        b=ps5FhE7s4onN14L7MNM6H7VmaTJXyYlkdWsMA8oV9lDikxxyCXGjAS4FH0/jjEHpNE
+         2m8jdiqmjb2hGljkMv1tXQheZxCFTRx6MgfD33JsfXMsGSP9TiNVgqpheQjYyuePA3r6
+         ukJX6fcr3OmY5QZfDp1j7DqMbzLwFA+XoIE2EjsKcKB8ArkJmcQl4Cm2/WRW/uOXBNYK
+         1xTgwPZwj2YMhY7oRu8hfnrHbUFvchKx7q0Y9LNxqWgoIKztHYYZ+iyzZ/kqo8ciS53Q
+         5Htg7c/WOVBQSRSstJtECrZs4WjPu/LNLQs+9mT0SPj1GuBAE0izUSHZpMMmMmv1pD2i
+         o1KQ==
+X-Gm-Message-State: AOJu0YztAAP/20oVLJjWIwYFtvQE2jML/xO9GMBAlj4Hl+t0Yz4BwPRf
+	NBVCUNdFW1xc4Toqp+wj6SCd+mgK0KGetg==
+X-Google-Smtp-Source: AGHT+IG5cB15BUUvNfP+1I3QG5n5V/w630fQ0IHl7viEUed+EkhNbZlBmIpo8T2ctzSr/cKDL6PoRA==
+X-Received: by 2002:a81:ae5f:0:b0:5a8:2037:36d9 with SMTP id g31-20020a81ae5f000000b005a8203736d9mr3282742ywk.25.1698433785486;
+        Fri, 27 Oct 2023 12:09:45 -0700 (PDT)
+Received: from tresc054937.tre-sc.gov.br ([187.94.103.218])
+        by smtp.gmail.com with ESMTPSA id g190-20020a8152c7000000b0059c8387f673sm958696ywb.51.2023.10.27.12.09.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Oct 2023 11:47:34 -0700 (PDT)
-From: Peilin Ye <yepeilin.cs@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Peilin Ye <peilin.ye@bytedance.com>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Cong Wang <cong.wang@bytedance.com>,
-	Jiang Wang <jiang.wang@bytedance.com>,
-	Youlun Zhang <zhangyoulun@bytedance.com>,
-	Peilin Ye <yepeilin.cs@gmail.com>
-Subject: [PATCH net] veth: Fix RX stats for bpf_redirect_peer() traffic
-Date: Fri, 27 Oct 2023 18:46:57 +0000
-Message-Id: <20231027184657.83978-1-yepeilin.cs@gmail.com>
-X-Mailer: git-send-email 2.20.1
+        Fri, 27 Oct 2023 12:09:44 -0700 (PDT)
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linus.walleij@linaro.org,
+	alsi@bang-olufsen.dk,
+	andrew@lunn.ch,
+	vivien.didelot@gmail.com,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh+dt@kernel.org,
+	krzk+dt@kernel.org,
+	arinc.unal@arinc9.com
+Subject: [PATCH net-next v2 0/3] net: dsa: realtek: support reset controller
+Date: Fri, 27 Oct 2023 16:00:54 -0300
+Message-ID: <20231027190910.27044-1-luizluca@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,140 +83,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Peilin Ye <peilin.ye@bytedance.com>
+v1->v2:
+- Introduce a dedicated commit for removing the reset-gpios requirement.
+- Place bindings patches before code changes.
+- Remove the 'reset-names' property.
+- Move the example from the commit message to realtek.yaml.
+- Split the reset function into _assert/_deassert variants.
+- Modify reset functions to return a warning instead of a value.
+- Utilize devm_reset_control_get_optional to prevent failure when
+  reset_control is missing.
+- Use 'true' and 'false' for boolean values.
+- Remove the CONFIG_RESET_CONTROLLER check as stub methods are sufficient
+  when undefined.
 
-Traffic redirected by bpf_redirect_peer() (used by recent CNIs like
-Cilium) is not accounted for in the RX stats of veth devices, confusing
-user space metrics collectors such as cAdvisor [1], as reported by
-Youlun.
-
-Currently veth devices use the @lstats per-CPU counters, which only
-cover TX traffic.  veth_get_stats64() actually collects RX stats of a
-veth device from its peer's TX (@lstats) counters, based on the
-assumption that a veth device can _only_ receive packets from its peer,
-which is no longer true.
-
-Instead, use @tstats to maintain both per-CPU RX and TX traffic counters
-for each veth device, and count bpf_redirect_peer() traffic in
-skb_do_redirect().
-
-veth_stats_rx() might need a name change (perhaps to "veth_stats_xdp()")
-for less confusion, but let's leave it to a separate patch to keep this
-fix minimal.
-
-[1] Specifically, the "container_network_receive_{byte,packet}s_total"
-    counters are affected.
-
-Reported-by: Youlun Zhang <zhangyoulun@bytedance.com>
-Fixes: 9aa1206e8f48 ("bpf: Add redirect_peer helper")
-Cc: Jiang Wang <jiang.wang@bytedance.com>
-Signed-off-by: Peilin Ye <peilin.ye@bytedance.com>
----
- drivers/net/veth.c | 36 ++++++++++++++----------------------
- net/core/filter.c  |  1 +
- 2 files changed, 15 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 9980517ed8b0..df7a7c21a46d 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -373,7 +373,7 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
- 	skb_tx_timestamp(skb);
- 	if (likely(veth_forward_skb(rcv, skb, rq, use_napi) == NET_RX_SUCCESS)) {
- 		if (!use_napi)
--			dev_lstats_add(dev, length);
-+			dev_sw_netstats_tx_add(dev, 1, length);
- 		else
- 			__veth_xdp_flush(rq);
- 	} else {
-@@ -387,14 +387,6 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
- 	return ret;
- }
- 
--static u64 veth_stats_tx(struct net_device *dev, u64 *packets, u64 *bytes)
--{
--	struct veth_priv *priv = netdev_priv(dev);
--
--	dev_lstats_read(dev, packets, bytes);
--	return atomic64_read(&priv->dropped);
--}
--
- static void veth_stats_rx(struct veth_stats *result, struct net_device *dev)
- {
- 	struct veth_priv *priv = netdev_priv(dev);
-@@ -432,24 +424,24 @@ static void veth_get_stats64(struct net_device *dev,
- 	struct veth_priv *priv = netdev_priv(dev);
- 	struct net_device *peer;
- 	struct veth_stats rx;
--	u64 packets, bytes;
- 
--	tot->tx_dropped = veth_stats_tx(dev, &packets, &bytes);
--	tot->tx_bytes = bytes;
--	tot->tx_packets = packets;
-+	tot->tx_dropped = atomic64_read(&priv->dropped);
-+	dev_fetch_sw_netstats(tot, dev->tstats);
- 
- 	veth_stats_rx(&rx, dev);
- 	tot->tx_dropped += rx.xdp_tx_err;
- 	tot->rx_dropped = rx.rx_drops + rx.peer_tq_xdp_xmit_err;
--	tot->rx_bytes = rx.xdp_bytes;
--	tot->rx_packets = rx.xdp_packets;
-+	tot->rx_bytes += rx.xdp_bytes;
-+	tot->rx_packets += rx.xdp_packets;
- 
- 	rcu_read_lock();
- 	peer = rcu_dereference(priv->peer);
- 	if (peer) {
--		veth_stats_tx(peer, &packets, &bytes);
--		tot->rx_bytes += bytes;
--		tot->rx_packets += packets;
-+		struct rtnl_link_stats64 tot_peer = {};
-+
-+		dev_fetch_sw_netstats(&tot_peer, peer->tstats);
-+		tot->rx_bytes += tot_peer.tx_bytes;
-+		tot->rx_packets += tot_peer.tx_packets;
- 
- 		veth_stats_rx(&rx, peer);
- 		tot->tx_dropped += rx.peer_tq_xdp_xmit_err;
-@@ -1508,13 +1500,13 @@ static int veth_dev_init(struct net_device *dev)
- {
- 	int err;
- 
--	dev->lstats = netdev_alloc_pcpu_stats(struct pcpu_lstats);
--	if (!dev->lstats)
-+	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
-+	if (!dev->tstats)
- 		return -ENOMEM;
- 
- 	err = veth_alloc_queues(dev);
- 	if (err) {
--		free_percpu(dev->lstats);
-+		free_percpu(dev->tstats);
- 		return err;
- 	}
- 
-@@ -1524,7 +1516,7 @@ static int veth_dev_init(struct net_device *dev)
- static void veth_dev_free(struct net_device *dev)
- {
- 	veth_free_queues(dev);
--	free_percpu(dev->lstats);
-+	free_percpu(dev->tstats);
- }
- 
- #ifdef CONFIG_NET_POLL_CONTROLLER
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 21d75108c2e9..7aca28b7d0fd 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -2492,6 +2492,7 @@ int skb_do_redirect(struct sk_buff *skb)
- 			     net_eq(net, dev_net(dev))))
- 			goto out_drop;
- 		skb->dev = dev;
-+		dev_sw_netstats_rx_add(dev, skb->len);
- 		return -EAGAIN;
- 	}
- 	return flags & BPF_F_NEIGH ?
--- 
-2.20.1
 
 
