@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-44932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 938EB7DA40B
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 01:24:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 530037DA40C
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 01:24:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C2BFB21612
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 23:24:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04FB328277F
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 23:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831C341759;
-	Fri, 27 Oct 2023 23:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4C44176D;
+	Fri, 27 Oct 2023 23:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZeO5tS+n"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KAnnrD3p"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C173FE4F
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 23:23:44 +0000 (UTC)
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 619271BC
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 16:23:43 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-773ac11de71so188027885a.2
-        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 16:23:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D50E405DA
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 23:23:45 +0000 (UTC)
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6A6BC2
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 16:23:44 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d9c687f83a2so1913164276.3
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 16:23:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1698449022; x=1699053822; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1698449024; x=1699053824; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ecdJ+JYBkGY/KAPnjcLYSSzGJJXCleUf/hIGMY6bwdA=;
-        b=ZeO5tS+nolmkJVrGJvLDb7tpGjY9UUcpaR1cv+lr7sAI8QReIlaSsHd6MuuiN3Iv0s
-         ofUEeA+wk11pP3h0AGASHXj6qLKlaxpqPxHuC1OQqd+FRZ+pxklUfafZNapLMfzNt39t
-         KKcqI8xXajJVRy7oomJfZsy7/GPC6PjG+C8KE=
+        bh=xKsz+4F5ny6XVeFoSFjGFIrUZoNK4X+2zKqUtIKuijo=;
+        b=KAnnrD3p5XfwOQlSrKbyAFiAmsaTiI4Nrq7rTOtL4vwUDfMkNEcQAv4M4ypYYD8Uhq
+         srQV3ggYD7i8SzNWfGdEULRtEjviIvcXgjpFtou8h5frzbhj8digw3UZ9hDWrlGmuG/L
+         SneV9NlihijQ7+7mavrcs0lO7MVu9XykKFXqM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698449022; x=1699053822;
+        d=1e100.net; s=20230601; t=1698449024; x=1699053824;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ecdJ+JYBkGY/KAPnjcLYSSzGJJXCleUf/hIGMY6bwdA=;
-        b=q4g3yKG2lgFoJBBOqNrHmyRqIygpXhjX7YUTFNnO+Qa31OdTa3xkxnSacimjIp+Hp2
-         OV9amDR5Sm5Q8Hu+ZPYZS0lhUwEwMYLP9gc2Ak4yOPJ9mf9gs8NORMlJxyntb3JqlA5E
-         vZBtXp9+70e91+6IoWf1GNT2JKkjtZIop5HoMKaZdi9voUtI9yTH6mSgpB+M9mTuGxT4
-         FW7qvo0I3pt+yFweJ2SP7y2yi1A8XCVdONb7rYTAjJyXg1FD0W2PB4HvZ03syw6NM873
-         g/tdWmBeWT7KdUczuZmO8gY2k5cGO5E7kz5E5CYiUx8fTbBJ/n8fWEc1yGRfbszsZcmQ
-         OX6A==
-X-Gm-Message-State: AOJu0Yw2Nu0cwENR0vgLk4QnHPVBP4ckBYJp5cEP7FlbNQPHDOk2TCj/
-	BPzzAW0IxIdTQ2A+2XqFdUXh2rF/MFQ4BBIWae0=
-X-Google-Smtp-Source: AGHT+IGSfbxsqTuyWelbeB7l5Mt4H5IlMMJM1iYYul7teDKYRxwXYdTr1NE/4EA5BfmsJT3ii2XCwg==
-X-Received: by 2002:a05:620a:28d0:b0:772:553d:a49e with SMTP id l16-20020a05620a28d000b00772553da49emr4525471qkp.18.1698449022403;
-        Fri, 27 Oct 2023 16:23:42 -0700 (PDT)
+        bh=xKsz+4F5ny6XVeFoSFjGFIrUZoNK4X+2zKqUtIKuijo=;
+        b=kJ/loh/yVVhfqszxX+uLURmq3dCkuihyFIc2CPkTmvTdJNuL8KzyPWyoz2aA7UdwVC
+         ZVDQ2VzhEUBL/XyWhnvVdt0TJqIvnoPFaFaArarw7PRXhKRfFB+6Y3bSUNQehtaqN5/X
+         Rs1GwcxT+LMPEpx5Oj2fC71RiFzTbkr17T1KNaEDyLW6yDyFfcqWkpYBbZPznDHdNnb7
+         eHAswIdR/gZHo5ZNoj55PEE4YEtbNZe2h5Ji8xeaPgtBNJpgz2rneaMxSPxF64S0Qhfd
+         NlPJrqvzJrF5ZI9tHX1/ZlMt52B9zyWMdFKuCWhI3rCVogMd/iIrisPrCniCrAe+o5Rh
+         4K0w==
+X-Gm-Message-State: AOJu0YyGiklCwDrm/ON7lUu+2dWONNVCQQmEuKsCiWG+A4hZoMFoYPzE
+	IywQJHjhYkGcp0sgwbMrr6/K3g==
+X-Google-Smtp-Source: AGHT+IGKuxoeiyIcaTaGGxm28Mi9TTn9kDYZ6jshPE+5Ql7+O8yZcv5neSX4uo1p1OwnUME359CY2A==
+X-Received: by 2002:a05:6902:1366:b0:d81:bb7e:f47f with SMTP id bt6-20020a056902136600b00d81bb7ef47fmr4128975ybb.44.1698449023742;
+        Fri, 27 Oct 2023 16:23:43 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id y27-20020a05620a09db00b007742ad3047asm984169qky.54.2023.10.27.16.23.40
+        by smtp.gmail.com with ESMTPSA id y27-20020a05620a09db00b007742ad3047asm984169qky.54.2023.10.27.16.23.42
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 27 Oct 2023 16:23:41 -0700 (PDT)
+        Fri, 27 Oct 2023 16:23:43 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: [PATCH net-next 07/13] bnxt_en: New encoding for the TX opaque field
-Date: Fri, 27 Oct 2023 16:22:46 -0700
-Message-Id: <20231027232252.36111-8-michael.chan@broadcom.com>
+Subject: [PATCH net-next 08/13] bnxt_en: Refactor bnxt_hwrm_set_coal()
+Date: Fri, 27 Oct 2023 16:22:47 -0700
+Message-Id: <20231027232252.36111-9-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231027232252.36111-1-michael.chan@broadcom.com>
 References: <20231027232252.36111-1-michael.chan@broadcom.com>
@@ -74,95 +74,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000ab9c210608bafaa7"
+	boundary="000000000000c24cb50608bafa85"
 
---000000000000ab9c210608bafaa7
+--000000000000c24cb50608bafa85
 Content-Transfer-Encoding: 8bit
 
-In order to support multiple TX rings on the same MSIX, we'll use the
-upper byte of the TX opaque field to store the ring index in the new
-tx_napi_idx field.  This tx_napi_idx field is currently always 0 until
-more infrastructure is added in later patches.
+Add 2 helper functions to set coalescing for each RX and TX rings.  This
+will make it easier to expand the number of TX rings per MSIX in the
+next patches.
 
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     | 10 ++++++++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  2 +-
- 3 files changed, 11 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 43 ++++++++++++++---------
+ 1 file changed, 26 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index ad56ca9d3ceb..1a7f14d086f7 100644
+index 1a7f14d086f7..c84a72b666aa 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -517,7 +517,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+@@ -6896,10 +6896,29 @@ int bnxt_hwrm_set_ring_coal(struct bnxt *bp, struct bnxt_napi *bnapi)
+ 	return hwrm_req_send(bp, req_rx);
+ }
  
- 		txbd->tx_bd_len_flags_type = tx_push->tx_bd_len_flags_type;
- 		txbd->tx_bd_haddr = txr->data_mapping;
--		txbd->tx_bd_opaque = SET_TX_OPAQUE(bp, prod, 2);
-+		txbd->tx_bd_opaque = SET_TX_OPAQUE(bp, txr, prod, 2);
- 		prod = NEXT_TX(prod);
- 		tx_push->tx_bd_opaque = txbd->tx_bd_opaque;
- 		txbd = &txr->tx_desc_ring[TX_RING(prod)][TX_IDX(prod)];
-@@ -562,7 +562,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		((last_frag + 2) << TX_BD_FLAGS_BD_CNT_SHIFT);
++static int
++bnxt_hwrm_set_rx_coal(struct bnxt *bp, struct bnxt_napi *bnapi,
++		      struct hwrm_ring_cmpl_ring_cfg_aggint_params_input *req)
++{
++	u16 ring_id = bnxt_cp_ring_for_rx(bp, bnapi->rx_ring);
++
++	req->ring_id = cpu_to_le16(ring_id);
++	return hwrm_req_send(bp, req);
++}
++
++static int
++bnxt_hwrm_set_tx_coal(struct bnxt *bp, struct bnxt_napi *bnapi,
++		      struct hwrm_ring_cmpl_ring_cfg_aggint_params_input *req)
++{
++	u16 ring_id = bnxt_cp_ring_for_tx(bp, bnapi->tx_ring);
++
++	req->ring_id = cpu_to_le16(ring_id);
++	return hwrm_req_send(bp, req);
++}
++
+ int bnxt_hwrm_set_coal(struct bnxt *bp)
+ {
+-	struct hwrm_ring_cmpl_ring_cfg_aggint_params_input *req_rx, *req_tx,
+-							   *req;
++	struct hwrm_ring_cmpl_ring_cfg_aggint_params_input *req_rx, *req_tx;
+ 	int i, rc;
  
- 	txbd->tx_bd_haddr = cpu_to_le64(mapping);
--	txbd->tx_bd_opaque = SET_TX_OPAQUE(bp, prod, 2 + last_frag);
-+	txbd->tx_bd_opaque = SET_TX_OPAQUE(bp, txr, prod, 2 + last_frag);
+ 	rc = hwrm_req_init(bp, req_rx, HWRM_RING_CMPL_RING_CFG_AGGINT_PARAMS);
+@@ -6920,18 +6939,11 @@ int bnxt_hwrm_set_coal(struct bnxt *bp)
+ 	for (i = 0; i < bp->cp_nr_rings; i++) {
+ 		struct bnxt_napi *bnapi = bp->bnapi[i];
+ 		struct bnxt_coal *hw_coal;
+-		u16 ring_id;
  
- 	prod = NEXT_TX(prod);
- 	txbd1 = (struct tx_bd_ext *)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index efb0db54575b..430538844178 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -64,11 +64,16 @@ struct tx_bd {
- #define TX_OPAQUE_IDX_MASK	0x0000ffff
- #define TX_OPAQUE_BDS_MASK	0x00ff0000
- #define TX_OPAQUE_BDS_SHIFT	16
-+#define TX_OPAQUE_RING_MASK	0xff000000
-+#define TX_OPAQUE_RING_SHIFT	24
+-		req = req_rx;
+-		if (!bnapi->rx_ring) {
+-			ring_id = bnxt_cp_ring_for_tx(bp, bnapi->tx_ring);
+-			req = req_tx;
+-		} else {
+-			ring_id = bnxt_cp_ring_for_rx(bp, bnapi->rx_ring);
+-		}
+-		req->ring_id = cpu_to_le16(ring_id);
+-
+-		rc = hwrm_req_send(bp, req);
++		if (!bnapi->rx_ring)
++			rc = bnxt_hwrm_set_tx_coal(bp, bnapi, req_tx);
++		else
++			rc = bnxt_hwrm_set_rx_coal(bp, bnapi, req_rx);
+ 		if (rc)
+ 			break;
  
--#define SET_TX_OPAQUE(bp, idx, bds)					\
--	(((bds) << TX_OPAQUE_BDS_SHIFT) | ((idx) & (bp)->tx_ring_mask))
-+#define SET_TX_OPAQUE(bp, txr, idx, bds)				\
-+	(((txr)->tx_napi_idx << TX_OPAQUE_RING_SHIFT) |			\
-+	 ((bds) << TX_OPAQUE_BDS_SHIFT) | ((idx) & (bp)->tx_ring_mask))
+@@ -6939,10 +6951,7 @@ int bnxt_hwrm_set_coal(struct bnxt *bp)
+ 			continue;
  
- #define TX_OPAQUE_IDX(opq)	((opq) & TX_OPAQUE_IDX_MASK)
-+#define TX_OPAQUE_RING(opq)	(((opq) & TX_OPAQUE_RING_MASK) >>	\
-+				 TX_OPAQUE_RING_SHIFT)
- #define TX_OPAQUE_BDS(opq)	(((opq) & TX_OPAQUE_BDS_MASK) >>	\
- 				 TX_OPAQUE_BDS_SHIFT)
- #define TX_OPAQUE_PROD(bp, opq)	((TX_OPAQUE_IDX(opq) + TX_OPAQUE_BDS(opq)) &\
-@@ -824,6 +829,7 @@ struct bnxt_tx_ring_info {
- 	u16			tx_cons;
- 	u16			tx_hw_cons;
- 	u16			txq_index;
-+	u8			tx_napi_idx;
- 	u8			kick_pending;
- 	struct bnxt_db_info	tx_db;
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index 23476100fad2..3515a12a6fea 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -52,7 +52,7 @@ struct bnxt_sw_tx_bd *bnxt_xmit_bd(struct bnxt *bp,
- 		((num_frags + 1) << TX_BD_FLAGS_BD_CNT_SHIFT) |
- 		bnxt_lhint_arr[len >> 9];
- 	txbd->tx_bd_len_flags_type = cpu_to_le32(flags);
--	txbd->tx_bd_opaque = SET_TX_OPAQUE(bp, prod, 1 + num_frags);
-+	txbd->tx_bd_opaque = SET_TX_OPAQUE(bp, txr, prod, 1 + num_frags);
- 	txbd->tx_bd_haddr = cpu_to_le64(mapping);
- 
- 	/* now let us fill up the frags into the next buffers */
+ 		if (bnapi->rx_ring && bnapi->tx_ring) {
+-			req = req_tx;
+-			ring_id = bnxt_cp_ring_for_tx(bp, bnapi->tx_ring);
+-			req->ring_id = cpu_to_le16(ring_id);
+-			rc = hwrm_req_send(bp, req);
++			rc = bnxt_hwrm_set_tx_coal(bp, bnapi, req_tx);
+ 			if (rc)
+ 				break;
+ 		}
 -- 
 2.30.1
 
 
---000000000000ab9c210608bafaa7
+--000000000000c24cb50608bafa85
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -233,14 +235,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPFyV38XZMLv5wslVwpBzhZAjuYGqdK+
-Chx4SHvupcezMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTAy
-NzIzMjM0MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILc+LenrUM4y3YsHbUMbe9mkoClAdC0d
+FapyjgmuqdBeMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTAy
+NzIzMjM0NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAdhVifoYy5xEowWhqtNTZb9EaD1wTolNyL9F/0SnhmWlEsdCdd
-rFTuAMBHuhtrYBNq+4G6oouMgZsm9eM0xJNXl9sWWUSb3l/pRhiVewmhqdAH6VlKuFrBboTBqLEd
-GVIXkkh2wV8hX+RVsSU8S0K8RXCil3LIZ7im+PB9GiTzXN5/5/wvBarpPhOnuyPDVPVxfnqBkVZO
-gE6JzxUju99yZXPzY9BVy2ICMhzJBCjYMZwFeSbpcTuAgPjG7BXgWRVv0eVzujOErsuSdK9mF392
-YLqp+s0cvtcZCwFtlxsxtt5PuxwyGr8YnkUrsKbungUkXype4Et/KiYzAczWb572
---000000000000ab9c210608bafaa7--
+ATANBgkqhkiG9w0BAQEFAASCAQBNUy31c0o7v3eh2pLBC7Tc7f2ntkgRS9q+i3sqv89m/dbcdabe
+U0A2cs0oDSPHfj3CgO0IlaA0S3eZ8x15tG560nBdwPsd4lG3kaVjxFBN8OTq7EUcOsqa98y6bAQb
+KsUncYj9RQWlLlwnJU64OJ5WYuNJNLnw2Dqbh/U9erJMi7QizsoY7kwfXd3tu30iTwzrmiNnXDQ7
+jKGYd0LYP/enNPWzzdfzKteloYvOuvlOrCgqnukgDlcrMPsyFtcEXXxv6RMUnMRvjx9INs+i6enG
+PRQltgtl2/4Ni02/Z2HazkXaDQbfDodP6mEmJ93I6t0wCuguYOYxjTSQhk/2uwmm
+--000000000000c24cb50608bafa85--
 
