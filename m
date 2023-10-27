@@ -1,73 +1,132 @@
-Return-Path: <netdev+bounces-44630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3235A7D8D45
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:54:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FFFD7D8D49
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:57:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88B07B21285
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:54:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 312EA1C20E81
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4040217EF;
-	Fri, 27 Oct 2023 02:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC7764A;
+	Fri, 27 Oct 2023 02:56:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k89mxws/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lv46pZwI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2009C64A
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:53:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80473C433C7;
-	Fri, 27 Oct 2023 02:53:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698375238;
-	bh=EyXeSNLa7tK0DV/fDsJKBnuzy0cW8YEfE0jxXnhc4Yc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k89mxws/0RO+ZLD6H8KeP5mmMgdoGmsjPkWWYQfmTVQmSXwV11VtY906pAvyGUexf
-	 bOxqu6NuKwlxJ5a7vmMJLAMGSfLYjXGLwjD2Dw9SL1x8sTFjsfh6ZiTx+MWXOao04E
-	 BmOQOKpubtgnNw4YQljcoB7xSHplTxAdDzIbC1TZfQmnjZWMe0W6nQBsYHSj5YkNF/
-	 pBcG7+k1zq/KyImq222S7AuLN/EUA+KtH9eUUN0Kl1dTDOc+F30r6ipyQPq3TVDJPY
-	 y+iCJrSAbbhrPmWlG9L+nrVd0dXEJMlXWu0xtfMCHkxm9L3p+Zv6DJ6LxEQDKJzE73
-	 uxekNKAfjdIfg==
-Date: Thu, 26 Oct 2023 19:53:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, Doug Berger <opendmb@gmail.com>, Broadcom
- internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Tariq Toukan <tariqt@nvidia.com>, Gal
- Pressman <gal@nvidia.com>, Willem de Bruijn <willemb@google.com>, Daniil
- Tatianin <d-tatianin@yandex-team.ru>, Simon Horman <horms@kernel.org>,
- Justin Chen <justin.chen@broadcom.com>, Ratheesh Kannoth
- <rkannoth@marvell.com>, Joe Damato <jdamato@fastly.com>, Vincent Mailhol
- <mailhol.vincent@wanadoo.fr>, Jiri Pirko <jiri@resnulli.us>,
- linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH net-next v2 3/5] net: phy: Add pluming for
- ethtool_{get,set}_rxnfc
-Message-ID: <20231026195356.7624669e@kernel.org>
-In-Reply-To: <20231026224509.112353-4-florian.fainelli@broadcom.com>
-References: <20231026224509.112353-1-florian.fainelli@broadcom.com>
-	<20231026224509.112353-4-florian.fainelli@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E9D1FA0
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:56:58 +0000 (UTC)
+Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A130129;
+	Thu, 26 Oct 2023 19:56:56 -0700 (PDT)
+Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-1e9d3cc6e7aso997529fac.2;
+        Thu, 26 Oct 2023 19:56:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698375415; x=1698980215; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LDZeSNoT/F6uceX8xPaWwPCrqzVzl/F9opDYqP7fPJg=;
+        b=lv46pZwIs5MU/Tq1hR90liS7lPOwKAK2cOWtOdt82RlyRayp7exQ/o/lc/+5WfPbdb
+         CJ0LOQkWYn6MuFUFL+NkchQ11aNU+M7fatURhkqV/cKArQqI08I7FcKvceJplnu6Ow6H
+         bK7RaGk/iJG34AadzYHSkNeCKUxLaVV/0uoZvFHCKGaH+ch8f+J+WmWCaKW7jo1O6z9y
+         hlGzIxb8560vsmnakGF/G/0L14/1Eu4E+UY1HEFuyDW3z/pOsO3gt0+v7La7aN9iOnL4
+         5FxI5GjRLYJM9DsgSb7LWzQOr0cSMNPjJakeKdgfNAh7W2MtI8oOgsc0KKXClTRPDhKo
+         zQNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698375415; x=1698980215;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LDZeSNoT/F6uceX8xPaWwPCrqzVzl/F9opDYqP7fPJg=;
+        b=Bk+x7hGLMkyVNg6yv7lG3CCBF4ddIGpGEiRF5ehprOBXtRToCIoTuV02WVw0N8iQPt
+         Tpx28dWcjr20DelOmi92Ub3G70UkkMywgi7IGv7ZRL6ZQodF2cqzSXdtQmIg1hIrUWLf
+         Oq/DhtY7yNuj990yPyfVrFBH5IYtAq23Jrgap+2foVwGPuh10xXbkkkQlXohwACfR3Hw
+         ZUtttWEAQ26lNLLvvlg9gUcZ6TZF0q88j2eFgng92fmdip9DvVSzhl3eeP4azdHbVzh+
+         MISuZGbvlqBrygZivPpm4G/TomJGuvMFIyfTg285M1r+cwKRJXlBHqyZP+30XflR35KI
+         E3Aw==
+X-Gm-Message-State: AOJu0YyhjPS0Ji5NdZeUl+B0osVDyu24VvyRcyX3Ptqr3jqdSXO3N7n9
+	UefFOYM3rM2kS4M91fK+UKSLkQR8cw0=
+X-Google-Smtp-Source: AGHT+IGAnGmIB1mQEhtj+QsEa41nDsx78wO2RvvhhYj+HlCbTyldwYFUDGN/YyeLNRYe598RQaKFmw==
+X-Received: by 2002:a05:6871:4188:b0:1e9:e063:ca6b with SMTP id lc8-20020a056871418800b001e9e063ca6bmr2108233oab.32.1698375414687;
+        Thu, 26 Oct 2023 19:56:54 -0700 (PDT)
+Received: from localhost.localdomain ([74.48.130.204])
+        by smtp.googlemail.com with ESMTPSA id z127-20020a633385000000b005b82611378bsm275339pgz.52.2023.10.26.19.56.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Oct 2023 19:56:54 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net] net: stmmac: xgmac: Fix support for multiple Flexible PPS outputs
+Date: Fri, 27 Oct 2023 10:56:03 +0800
+Message-Id: <20231027025603.1035668-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 26 Oct 2023 15:45:07 -0700 Florian Fainelli wrote:
-> Ethernet MAC drivers supporting Wake-on-LAN using programmable filters
-> (WAKE_FILTER) typically configure such programmable filters using the
-> ethtool::set_rxnfc API and with a sepcial RX_CLS_FLOW_WAKE to indicate
-> the filter is also wake-up capable.
+From XGMAC Core 3.20 and later, each Flexible PPS has individual PPSEN bit
+to select Fixed mode or Flexible mode. The PPSEN must be set, or it stays
+in Fixed PPS mode by default.
+XGMAC Core prior 3.20, corresponding PPSEN bits are read-only reserved,
+always set PPSEN do not make things worse ;)
 
-Should we explicitly check for WAKE? WAKE, and DISC are probably the
-only values that make sense for PHY nfc?
+Fixes: 95eaf3cd0a90 ("net: stmmac: dwxgmac: Add Flexible PPS support")
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h      | 2 +-
+ drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+index 7a8f47e7b728..a4e8b498dea9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+@@ -259,7 +259,7 @@
+ 	((val) << XGMAC_PPS_MINIDX(x))
+ #define XGMAC_PPSCMD_START		0x2
+ #define XGMAC_PPSCMD_STOP		0x5
+-#define XGMAC_PPSEN0			BIT(4)
++#define XGMAC_PPSENx(x)			BIT(4 + (x) * 8)
+ #define XGMAC_PPSx_TARGET_TIME_SEC(x)	(0x00000d80 + (x) * 0x10)
+ #define XGMAC_PPSx_TARGET_TIME_NSEC(x)	(0x00000d84 + (x) * 0x10)
+ #define XGMAC_TRGTBUSY0			BIT(31)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+index f352be269deb..53bb8f16c481 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+@@ -1178,7 +1178,7 @@ static int dwxgmac2_flex_pps_config(void __iomem *ioaddr, int index,
+ 
+ 	val |= XGMAC_PPSCMDx(index, XGMAC_PPSCMD_START);
+ 	val |= XGMAC_TRGTMODSELx(index, XGMAC_PPSCMD_START);
+-	val |= XGMAC_PPSEN0;
++	val |= XGMAC_PPSENx(index);
+ 
+ 	writel(cfg->start.tv_sec, ioaddr + XGMAC_PPSx_TARGET_TIME_SEC(index));
+ 
+-- 
+2.34.1
+
 
