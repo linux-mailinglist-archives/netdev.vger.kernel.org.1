@@ -1,58 +1,106 @@
-Return-Path: <netdev+bounces-44869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 960737DA2AE
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 23:54:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4484B7DA2B3
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 23:57:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C252E1C21178
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 21:54:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F14FE2825CD
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 21:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC52E3FE51;
-	Fri, 27 Oct 2023 21:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kTETYzrY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C940C3FE54;
+	Fri, 27 Oct 2023 21:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D130E3FE50
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 21:54:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2058EC433C7;
-	Fri, 27 Oct 2023 21:54:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698443660;
-	bh=nE+0Rp3RPkH3TN5q+83SQpyKgTmRbYNv26EjTXo9D/E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kTETYzrY+RCjdJAsEyEvP7hJcgJEr/Son7Az4zgZePX3o5RmIA6581hhjA+1h3XOR
-	 Z71QkMrd5Wz+DBOUlApYHQZSIW1LlWnVSeHDTlvmX7HLon4IiWnWHlqrG6cWB+1J5i
-	 rCZOTAYjk5okXclRgECdQEHG26arYZ4VoxH3lGoeGnFVRLb/zlHP89ki8fBkIDNAov
-	 yXKNee4AogISHrcfyGog4N3PdYptZBJLn/YByc3T7z40rJXaPwVEmChzamvyJZx378
-	 Ku2KjWs233jwZpUKm5vcR815SpSXgF+TB7lWhM8+N3yKgqISntIizhea4V8x1CjV5Q
-	 0g539umgmTl4A==
-Date: Fri, 27 Oct 2023 14:54:19 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com
-Subject: Re: [patch net-next v4] tools: ynl: introduce option to process
- unknown attributes or types
-Message-ID: <20231027145419.6722f416@kernel.org>
-In-Reply-To: <20231027092525.956172-1-jiri@resnulli.us>
-References: <20231027092525.956172-1-jiri@resnulli.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176FF3FB02;
+	Fri, 27 Oct 2023 21:57:39 +0000 (UTC)
+Received: from relay.hostedemail.com (smtprelay0012.hostedemail.com [216.40.44.12])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9302A1A1;
+	Fri, 27 Oct 2023 14:57:37 -0700 (PDT)
+Received: from omf05.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay08.hostedemail.com (Postfix) with ESMTP id E6ED1140931;
+	Fri, 27 Oct 2023 21:57:34 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf05.hostedemail.com (Postfix) with ESMTPA id 8C4C420010;
+	Fri, 27 Oct 2023 21:57:11 +0000 (UTC)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Date: Fri, 27 Oct 2023 14:57:11 -0700
+From: Joe Perches <joe@perches.com>
+To: Justin Stitt <justinstitt@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Shay Agroskin <shayagr@amazon.com>, Arthur Kiyanovski
+ <akiyano@amazon.com>, David Arinzon <darinzon@amazon.com>, Noam Dagan
+ <ndagan@amazon.com>, Saeed Bishara <saeedb@amazon.com>, Rasesh Mody
+ <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Dimitris Michailidis <dmichail@fungible.com>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Louis Peens
+ <louis.peens@corigine.com>, Shannon Nelson <shannon.nelson@amd.com>, Brett
+ Creeley <brett.creeley@amd.com>, drivers@pensando.io, "K. Y. Srinivasan"
+ <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
+ <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Ronak Doshi
+ <doshir@vmware.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+ Andy Whitcroft <apw@canonical.com>, Dwaipayan Ray <dwaipayanray1@gmail.com>,
+ Lukas Bulwahn <lukas.bulwahn@gmail.com>, Hauke Mehrtens <hauke@hauke-m.de>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, =?UTF-8?Q?Ar=C4=B1n=C3=A7_=C3=9CN?=
+ =?UTF-8?Q?AL?= <arinc.unal@arinc9.com>, Daniel Golle
+ <daniel@makrotopia.org>, Landen Chao <Landen.Chao@mediatek.com>, DENG
+ Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Linus Walleij
+ <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?=
+ <alsi@bang-olufsen.dk>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+ <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team
+ <linux-imx@nxp.com>, Lars Povlsen <lars.povlsen@microchip.com>, Steen
+ Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Jiawen Wu
+ <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Nick Desaulniers <ndesaulniers@google.com>, Nathan
+ Chancellor <nathan@kernel.org>, Kees Cook <keescook@chromium.org>,
+ intel-wired-lan@lists.osuosl.org, oss-drivers@corigine.com,
+ linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, bpf@vger.kernel.org
+Subject: Re: [PATCH next v2 2/3] checkpatch: add ethtool_sprintf rules
+In-Reply-To: <CAFhGd8p9ytqbRuqgWmKe=zCg7Nhft0NMvbuuEyjAQHNAcBedaQ@mail.gmail.com>
+References: <20231026-ethtool_puts_impl-v2-0-0d67cbdd0538@google.com>
+ <20231026-ethtool_puts_impl-v2-2-0d67cbdd0538@google.com>
+ <8521c712250bcffce5c71e8d2b2574de786d4572.camel@perches.com>
+ <CAFhGd8p9ytqbRuqgWmKe=zCg7Nhft0NMvbuuEyjAQHNAcBedaQ@mail.gmail.com>
+Message-ID: <b24803fe577b5b6637688d53fc316ddf@perches.com>
+X-Sender: joe@perches.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 8C4C420010
+X-Rspamd-Server: rspamout02
+X-Stat-Signature: m1pbwndhwam5b1ag1hju7qk35oscyikg
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX1+TLe8vtqI1bKTGsQAk37rK7o0vYU0SCtE=
+X-HE-Tag: 1698443831-782705
+X-HE-Meta: U2FsdGVkX1+7OJ/aFWnkB1RSMYVx1/89hz0EtWGLmwlCSeRDArhrzCUyZnrWEkVwtCbR2zisjeu8Ak7YA/Z5oSNwmQqruchMId5hTfou6k5Nlx/UjmhgdhpIoFd7/sQe3f4pmdR63PJ4Y71c3CQurETODWjnWAXybZT0GbrbJBBQ3DrLip5C3y4b7gPpFcJUebManYXF8YpkYxCkdDnoKrKkALXKALqGtOYGLfNf6T5gYPqL/7FppGaVaEcqUnARFt3VnXsUDFxFbDiIz0Eipg==
 
-On Fri, 27 Oct 2023 11:25:25 +0200 Jiri Pirko wrote:
-> - changed unknown attr key to f"UnknownAttr({attr.type})"
+On 2023-10-27 12:40, Justin Stitt wrote:
 
-Not what I wanted but okay. Let's move on.. :)
+> Yeah you can push it but it's not really a standalone so perhaps I'll
+> just steal the diff and
+> wrap into v3?
+
+Fine by me.
+No need for my sign off.
 
