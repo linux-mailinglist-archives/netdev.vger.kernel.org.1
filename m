@@ -1,53 +1,54 @@
-Return-Path: <netdev+bounces-44725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36EF77D970E
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:55:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 738937D9728
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 14:04:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6710D1C20F7F
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 11:55:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB24EB21304
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5E118C20;
-	Fri, 27 Oct 2023 11:55:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TX9atbL1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FA918E28;
+	Fri, 27 Oct 2023 12:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC54BA50
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 11:55:33 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81D5186;
-	Fri, 27 Oct 2023 04:55:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xKkgQbSQCEpZQloC8PIwFH82W161i281OBtZkhnuCC8=; b=TX9atbL1jQWE81Enyh8HJrA9xI
-	K2Ysh8YrtMMYUX6cwdcHb7MJCV9OL9/8XNYhnrwF8fYHCNdvtYXmA98KPpbjRKU5XLWdrZkBdlVj2
-	c6FwQpC2+rAx0UevgxpPwl/3TFYpt9Dmeo/U+IipSCOW+tHtpINI325wE7zCHnjBmbhg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qwLQq-000Ko8-Nf; Fri, 27 Oct 2023 13:55:16 +0200
-Date: Fri, 27 Oct 2023 13:55:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-Cc: netdev@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Juergen Beisert <jbe@pengutronix.de>,
-	Jerry Ray <jerry.ray@microchip.com>, Mans Rullgard <mans@mansr.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: lan9303: consequently nested-lock physical MDIO
-Message-ID: <f0e67b6e-e226-46fc-9e7c-60da35938d3f@lunn.ch>
-References: <20231027065741.534971-1-alexander.sverdlin@siemens.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8795D1864D
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 12:04:36 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB58C0
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 05:04:35 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qwLZp-0001Rd-Fa; Fri, 27 Oct 2023 14:04:33 +0200
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qwLZo-004d6Z-Dy; Fri, 27 Oct 2023 14:04:32 +0200
+Received: from sha by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qwLZo-00Gbnc-Ai; Fri, 27 Oct 2023 14:04:32 +0200
+Date: Fri, 27 Oct 2023 14:04:32 +0200
+From: Sascha Hauer <s.hauer@pengutronix.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	kernel@pengutronix.de
+Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
+ TIF_NOTIFY_SIGNAL
+Message-ID: <20231027120432.GB3359458@pengutronix.de>
+References: <20231023121346.4098160-1-s.hauer@pengutronix.de>
+ <addf492843338e853f7fda683ce35050f26c9da0.camel@redhat.com>
+ <20231026070310.GY3359458@pengutronix.de>
+ <8404022493c5ceda74807a3407e5a087425678e2.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,30 +57,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231027065741.534971-1-alexander.sverdlin@siemens.com>
+In-Reply-To: <8404022493c5ceda74807a3407e5a087425678e2.camel@redhat.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, Oct 27, 2023 at 08:57:38AM +0200, A. Sverdlin wrote:
-> From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+On Thu, Oct 26, 2023 at 10:49:18AM +0200, Paolo Abeni wrote:
+> On Thu, 2023-10-26 at 09:03 +0200, Sascha Hauer wrote:
+> > On Tue, Oct 24, 2023 at 03:56:17PM +0200, Paolo Abeni wrote:
+> > > On Mon, 2023-10-23 at 14:13 +0200, Sascha Hauer wrote:
+> > > > It can happen that a socket sends the remaining data at close() time.
+> > > > With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
+> > > > out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
+> > > > current task. This flag has been set in io_req_normal_work_add() by
+> > > > calling task_work_add().
+> > > > 
+> > > > It seems signal_pending() is too broad, so this patch replaces it with
+> > > > task_sigpending(), thus ignoring the TIF_NOTIFY_SIGNAL flag.
+> > > 
+> > > This looks dangerous, at best. Other possible legit users setting
+> > > TIF_NOTIFY_SIGNAL will be broken.
+> > > 
+> > > Can't you instead clear TIF_NOTIFY_SIGNAL in io_run_task_work() ?
+> > 
+> > I don't have an idea how io_run_task_work() comes into play here, but it
+> > seems it already clears TIF_NOTIFY_SIGNAL:
+> > 
+> > static inline int io_run_task_work(void)
+> > {
+> >         /*
+> >          * Always check-and-clear the task_work notification signal. With how
+> >          * signaling works for task_work, we can find it set with nothing to
+> >          * run. We need to clear it for that case, like get_signal() does.
+> >          */
+> >         if (test_thread_flag(TIF_NOTIFY_SIGNAL))
+> >                 clear_notify_signal();
+> > 	...
+> > }
 > 
-> When LAN9303 is MDIO-connected two callchains exist into
-> mdio->bus->write():
+> I see, io_run_task_work() is too late, sk_stream_wait_memory() is
+> already woken up.
 > 
-> 1. switch ports 1&2 ("physical" PHYs):
-> 
-> virtual (switch-internal) MDIO bus (lan9303_switch_ops->phy_{read|write})->
->   lan9303_mdio_phy_{read|write} -> mdiobus_{read|write}_nested
-> 
-> 2. LAN9303 virtual PHY:
-> 
-> virtual MDIO bus (lan9303_phy_{read|write}) ->
->   lan9303_virt_phy_reg_{read|write} -> regmap -> lan9303_mdio_{read|write}
+> I still think this patch is unsafe. What about explicitly handling the
+> restart in tls_sw_release_resources_tx() ? The main point is that such
+> function is called by inet_release() and the latter can't be re-
+> started.
 
+I don't think there's anything I can do in tls_sw_release_resources_tx().
+When entering this function TIF_NOTIFY_SIGNAL is not (yet) set. It gets
+set at some point while tls_sw_release_resources_tx() is running. I find
+it set when tls_tx_records() returns with -ERESTARTSYS. I tried clearing
+TIF_NOTIFY_SIGNAL then and called tls_tx_records() again, but that doesn't
+work.
 
-> Cc: stable@vger.kernel.org
-> Fixes: dc7005831523 ("net: dsa: LAN9303: add MDIO managed mode support")
-> Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Sascha
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
