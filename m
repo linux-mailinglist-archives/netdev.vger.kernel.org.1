@@ -1,192 +1,210 @@
-Return-Path: <netdev+bounces-44692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A9967D9432
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 11:51:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E17D27D944C
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 11:55:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45A1628229C
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 09:51:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4689CB211FE
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 09:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9FD168D1;
-	Fri, 27 Oct 2023 09:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3166A168D6;
+	Fri, 27 Oct 2023 09:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JMaWqSW+"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="dIDEaTMl";
+	dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b="USJj54xf"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7888168CF
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 09:51:13 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F16549D
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:51:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698400271;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+J+pIKdzOxPew/Qi1A1+iGlEwJIRobC+pGNP7AL8MAg=;
-	b=JMaWqSW+MchvU2WsNUk15dAISpsvDW60Aoi2priRhphRvOV7tyNYa6S0BWxryAyx7RWFJY
-	xCeaGebRq9IGa1lgMjgogpHUjVFQ/I7pVfQkCI19HQeqT5xndUwuc4hLaK7WXw51TunbwW
-	My7XGitRpbs5UMEdrfzs41wFSw3FAr4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-609-qMx7CWhYOj-b3VPNPguuOg-1; Fri,
- 27 Oct 2023 05:51:05 -0400
-X-MC-Unique: qMx7CWhYOj-b3VPNPguuOg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D95163822E92;
-	Fri, 27 Oct 2023 09:51:04 +0000 (UTC)
-Received: from swamp.redhat.com (unknown [10.45.225.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6C5CB40C6F79;
-	Fri, 27 Oct 2023 09:51:03 +0000 (UTC)
-From: Petr Oros <poros@redhat.com>
-To: netdev@vger.kernel.org
-Cc: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] iavf: use iavf_schedule_aq_request() helper
-Date: Fri, 27 Oct 2023 11:51:02 +0200
-Message-ID: <20231027095102.499914-1-poros@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5FB168B3
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 09:55:10 +0000 (UTC)
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C32610E;
+	Fri, 27 Oct 2023 02:55:01 -0700 (PDT)
+X-UUID: e0be110a74ae11eea33bb35ae8d461a2-20231027
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=MIME-Version:Content-Transfer-Encoding:Content-ID:Content-Type:In-Reply-To:References:Message-ID:Date:Subject:CC:To:From; bh=W4VuKq9eRZJfGtYl+rzHzB8jDqtgz2zj1DGVG+75a+Y=;
+	b=dIDEaTMld5uwv1P5Qzmf+5wQn23dT0lObk0F9oIW/I7e42A+Dx5GcVG5b26itXp0u7x5I4m9xxI19PN4RvtdT0DzezRJvpWr9uYo/lfvVB2S3EIs44+lYHHjVhLReBdBYmbxaIqDKvHB/2wLWiQMohNBCb2iFBN9IW2E5EILIkA=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.32,REQID:e992febb-3462-4df9-889e-bb1cb27ed2a8,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:5f78ec9,CLOUDID:fbd364d7-04a0-4e50-8742-3543eab8cb8e,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:
+	NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: e0be110a74ae11eea33bb35ae8d461a2-20231027
+Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw01.mediatek.com
+	(envelope-from <lena.wang@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1961234163; Fri, 27 Oct 2023 17:54:53 +0800
+Received: from mtkmbs10n1.mediatek.inc (172.21.101.34) by
+ MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 27 Oct 2023 17:54:52 +0800
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (172.21.101.237)
+ by mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 27 Oct 2023 17:54:52 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VctqfxwlBE8i1GFsRDKmC4BB89Juu0NaUNzUMfDrjPCV8LCtRn77HtxlvyaVxV2SOPRVlFh7P29tFqZwVOGoefSeBvsty29Sp4ugcv7bWUNCdVDV+A9B9ev8GS21epHcXepTPhXEZwMRvsvp27v73W0lsPMKkNjlf1OAhX7JJPg8CJHd/FtnDvJyf3RcZ3DXHBjcASR2VCPtJSjnRYketdBuM8ZJWgT/2CnZUvZoWqXYK+HO2+RhNturaw6STB6r+5Q+NqQda63aNWHTTvM4RhwVoqcJqYic7YCTvm3kMLRV8DRlHzEUgxJPxtKzgU3Thx1swEFuo21SUwsa12JT0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W4VuKq9eRZJfGtYl+rzHzB8jDqtgz2zj1DGVG+75a+Y=;
+ b=iScW9oyFVT+O2BcPruT8mRBAcs1VO1xC0RJg/MA148xQpsaNOv4NrqkjV2kG9xSqveboJXMHeCCXpCLXCjk1KfnEtAPZraK7lN7vRVAWMkCYyEnoYxOjuvtqMfIosEtCbtR1xefy7pUkkw+vtknzF6GVMA6PxL6q09T9c4ebgDZeXtf1xQBncqerYK5kgQzpLNjVCc+kmF2/bqwvA0Ozo10Mb5Koxq/593nh08IV4Jg0bI7ufXnBIRlx/FjFx90yUK/4E8OC3nTRc3Xlv0iGHGgHINogUBfNYL7nDswFS61lZsCdh/mKrtm9cYNV9HPGwzPDrmVBb+pr7PyJR/5izg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mediatek.com; dmarc=pass action=none header.from=mediatek.com;
+ dkim=pass header.d=mediatek.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mediateko365.onmicrosoft.com; s=selector2-mediateko365-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W4VuKq9eRZJfGtYl+rzHzB8jDqtgz2zj1DGVG+75a+Y=;
+ b=USJj54xfBbYal8ZVhgZY4SG2e7VuZ9yEa8yYCB3Ln1LIyCEcU8YBBjtRZxwa8lW+4imv21pqmbJHCdyMPthK8eg3q4FVyeMf610kaBAe+EyY09fU2yr3D1EDxwxFTNPHIFvryosX6ppgV43JAEC57nznGVQqKOuqqe0c3Gl+dhI=
+Received: from SEZPR03MB6466.apcprd03.prod.outlook.com (2603:1096:101:4a::8)
+ by SEZPR03MB7471.apcprd03.prod.outlook.com (2603:1096:101:132::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.23; Fri, 27 Oct
+ 2023 09:54:50 +0000
+Received: from SEZPR03MB6466.apcprd03.prod.outlook.com
+ ([fe80::d556:7c13:6e10:9a97]) by SEZPR03MB6466.apcprd03.prod.outlook.com
+ ([fe80::d556:7c13:6e10:9a97%4]) with mapi id 15.20.6933.019; Fri, 27 Oct 2023
+ 09:54:50 +0000
+From: =?utf-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>
+To: "pabeni@redhat.com" <pabeni@redhat.com>
+CC: "cmllamas@google.com" <cmllamas@google.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>,
+	"maze@google.com" <maze@google.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: Re: GKI: [kernel6.1] Kernel panic on __udpv4_gso_segment_list_csum in
+ rx-udp-gro-forwarding
+Thread-Topic: GKI: [kernel6.1] Kernel panic on __udpv4_gso_segment_list_csum
+ in rx-udp-gro-forwarding
+Thread-Index: AdoIhTjCvcufaaYrTPCBKiZyeFWqjgAId7iAAAEyhAAAAnepgAAA6tiA
+Date: Fri, 27 Oct 2023 09:54:49 +0000
+Message-ID: <8d1eedae2705357427dc974deae17850dd3b4e65.camel@mediatek.com>
+References: <SEZPR03MB6466D3C5A5F187510572F3A69CDCA@SEZPR03MB6466.apcprd03.prod.outlook.com>
+	 <0eaf6a7d914be6c1e207c2ce54de5f3284a33326.camel@redhat.com>
+	 <e0b361de5f120c583412c148fdd982624fa16e30.camel@mediatek.com>
+	 <7b3d9af8fafa18050cb5f5f7afc241baccbbb3cf.camel@redhat.com>
+In-Reply-To: <7b3d9af8fafa18050cb5f5f7afc241baccbbb3cf.camel@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=mediatek.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SEZPR03MB6466:EE_|SEZPR03MB7471:EE_
+x-ms-office365-filtering-correlation-id: 4899b7a6-c51e-45da-b294-08dbd6d2c2a3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: OGXEtWBxNywgIl22wkQPQd6kZUoz8e9qYisPL6Bl2PZjOm1fG9NYUN7UirJO97XkRLLPXQSQGcSduRqjwe4wBj2eQNblqWTQSo91bhzsLrBruh3KXEYwUjvCk8ETBdTE55Ww0xXrWsl4/lWdKvGbYEyhcvZ5qZZFao+dItYUCYuA/RCVHE1NrXIo6XpElY36wBZpr4+ToK29iNEjv+q+JoW0dWHpbJjKVTZhuIKBkBsBl2tVg5c2hQjZqcgzsCThu/0+5ihbsaoKkRpnMEXQyX7mGUJGbsDZ0bBjKXzguo7MGjBiS+gunQ5XLky8Rl03LLtEUyqkwAgBPtDfF4dLJ6KVmeapurLQoC0QDTW1SYW/TWIg2U+ukq5t2wXo/BwOWOkbjOTl04oa1RAt8axfevsoXx6Rn2nQZkbnsT9uO2r/YQBfSRDt88izfyCGDaOZEEBB7yC3Xfgk/7iAtQDStvDyOXxDTgbnoZel0CXn7ZRWsoH+PJD6h/fu862N5uacORiBfpIYZcOYOPEKau38ScWMYiZd60ncuBb3O1/Ab4loGC6+yoLk+omnFo30XIAZhRdMOtlOPTmvzgKUohvEsSsBCoSbaXzkWiDqliHew4gNfLIoHHNY94qqX634FQjKUYmR0CRVN+/KYHXnypMZCambWQ3fDftnmN5ljpFDP4x+Kyf23ngwUuI5NETfOuAGSofbNhrfXF6QeelDw+E3UQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR03MB6466.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39860400002)(136003)(376002)(346002)(230922051799003)(230273577357003)(230173577357003)(451199024)(64100799003)(186009)(1800799009)(122000001)(38070700009)(26005)(38100700002)(83380400001)(41300700001)(5660300002)(91956017)(66446008)(66556008)(2906002)(76116006)(66946007)(54906003)(8676002)(85182001)(316002)(86362001)(4001150100001)(6916009)(66476007)(64756008)(478600001)(36756003)(6506007)(4326008)(71200400001)(8936002)(6486002)(2616005)(6512007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SStyQlM3K2JvSkZsUGZ5MGtWWmdFTGJDNkxvOGlrY25CNjFyVVJoaVFFNFlq?=
+ =?utf-8?B?YmlrcHZyQTBvcC9RS21WVXE5Tm9JVmtGSWpQbHQ4TjNyVnhEQkFIakx6TVA0?=
+ =?utf-8?B?RnRxZnpFV3N4cWtBc0Jjamt3VEJ6SEozeVNnQXZhS3BMbkovOSt6djVibHNU?=
+ =?utf-8?B?RVNvdVBuenpzUHVhb2VXSU5kVTY3ZFp2VTRvQy9qZWJWcXYxaGpBakh2ZHRv?=
+ =?utf-8?B?OXQyNEJLWE9FOHk2eW1lSUIxT3RaVkZORlJRTXpzUVBJbkFWaFl4Q0VlN0ll?=
+ =?utf-8?B?a0N3eUE0cFkzZVp0eWx5bTBVcUJodDd3SFMxM3Z2bFpkaStwZTkwa1o5NlJU?=
+ =?utf-8?B?a1h6QTFnVUVjU3lCMzBVZnJ0K2hvVHIwUEYxeGxJbzFUMEp5YXNxMmY0L0RG?=
+ =?utf-8?B?akEycGVaYzVOcWZzNENZMHFRWXU3VkRESm1Menl5ZVk5WW52TmZWNTNaSFB5?=
+ =?utf-8?B?ZkREdnJUWHd6OXNZa3cyTFhrSWdHdFcxcWd6RFRZd1JiQVFsU3FvWjhUZmpk?=
+ =?utf-8?B?b1pjMllQU040WGlFL1BLL0RPZWR0SWdwTHhiSWZvWkxSQ2Z4cCtmRm1jVjV0?=
+ =?utf-8?B?TnRMZlNXT3ZhQmNYTG1DU2dnZTdpRlZ2dXVsMnFOY2V2NlkzY0YxMEdGSVZt?=
+ =?utf-8?B?dGpacVlscEx6TlBKeUJRSVNaRjd0c0pWRTZzY1RjcHB2U1pOZlVUb0dBYnhC?=
+ =?utf-8?B?WC9STFl1R0tySWJ6V2ZsTm1VbDZLL2Y2WThaaUd2TERnRWhyakdVcWw0VG51?=
+ =?utf-8?B?a0xLNHpXbE5TckhybDF5Ky9RaHBHcW9GT21mZGJ6VmpLZDA5NStmZDk4cGF5?=
+ =?utf-8?B?bHB5aVdQYVIzN3FBYVRkN29ZRVVuTG81N3hUcEJJQ0g0NVcxYU02K3ArWUtD?=
+ =?utf-8?B?VjNvekdKTU9MazF6WmpYYS9CM2hmczhldGFoNExQbkhsNTVHd3pkZGRiNXZS?=
+ =?utf-8?B?VW1ubjJnNlpFWHVnb1NObXdlRS9Qc1FENWtQS2xON3BDeXNmeTM3R01rOVly?=
+ =?utf-8?B?eGNTQmRNZTQyTC9lWnZTZ0tVT1d2NWtlZ3VtVmErMXVnYkYyeUlVcEtudG1K?=
+ =?utf-8?B?dmdIclVhOWQ5RUpOOTlXRXNzRnVMSG05bngxZzFQTnMxR3hJNHZTZ1RRV1c3?=
+ =?utf-8?B?ZWtGai9RbDNqU2VJcm8yZUNONTVYcjRkWERmYXJEQTJwTVl4a2RXTVJCQ0Ir?=
+ =?utf-8?B?Q0g0VE9lNHptbFFSV3VxK3FmQnRqSDlwZkZzemdqRFVRc1pUTFB1SlFTemgv?=
+ =?utf-8?B?aW5tTzRLdW5JU204QmZDWk8zbTRRbHkyRnU0cDREWWVCVzZIMDE3NDI3VVJ1?=
+ =?utf-8?B?UzhVSWhsOUd0RStKcEhCWm9oS1NjUUV4YittZi9mdmFKeGhFanJXSFRnb25q?=
+ =?utf-8?B?aVQ3djQrb2ZUMml5MFUyT25QdW52b20waHBNanpuc3FVemIwYTFleG5SSy9z?=
+ =?utf-8?B?T0FETFlzQThwbVB2dm5IbWpkbGtycHQvUHlQWHVML1pRYW9MUkM4ajV5NUY1?=
+ =?utf-8?B?TXlROXRKZjBhNU9wUi9UdUEvRDJLUjBzUHFxR1RJNUdibmhaZmF0bS9VR2Mw?=
+ =?utf-8?B?Z0QxOUFSbW1oZWlUakRyV01KRTRSMHE5dzc0cDU0andUeDZqeWN2OTFrbGoz?=
+ =?utf-8?B?cTdGOW9HMTUxaS9qRitEdUxEdXlwSUJnNVpzeWR4bkgyck94dzlzSjBOQ0s1?=
+ =?utf-8?B?VzlPbzZoMlY0a0lXOG1zYUVhVnZ4T1pvVE5vS1JDMmJlajljTXJpQTJQK2tz?=
+ =?utf-8?B?VENxR0tsbnh1cTNtUGpLWDZXS1JzK2RubVdTUXhEUUw5TzBWT1RQVzZycXln?=
+ =?utf-8?B?Q2xkSXh5dnVqOEZNemlPSVRKOXhmZlBNa0pnSW5acWljUTZlMk1teEZvQnZp?=
+ =?utf-8?B?ZnBLdVBPRU9ZZlE3MWpkUkx3TDQwNmdxYzBpdGZuQ0dxb3lvclhPS1pYMk5t?=
+ =?utf-8?B?aVIxcW9MZ0RoWU5Od1hGajNFVGowT3R3U2s0dks5R2t0RDNkcUpZNFk3dFhh?=
+ =?utf-8?B?T2hUeklUNWpWMkJidFJQTVRzaUYxdjI5TWpZajBTSG9oTVpyQ1Nxd3JjbmdH?=
+ =?utf-8?B?QTRTN2RySjQxVUtHRTk2b1FRSGQyOUtMdWhJWXFnVlU5eEE5cDFLK3BVOS84?=
+ =?utf-8?B?UWVSWm4xaDExSXhWQS9IUlZ0b0VMcG9ROHpBZEphbHdYbzU0dzhMOUk5U3FE?=
+ =?utf-8?B?d0E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5E306CABAE9F2B47BAB822D7EE3D4085@apcprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR03MB6466.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4899b7a6-c51e-45da-b294-08dbd6d2c2a3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2023 09:54:49.9998
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a7687ede-7a6b-4ef6-bace-642f677fbe31
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pbqRdvEg5DPq/C68ObENOk2gseGtS48l2I6+zwZBMuvpecrLZMDktMVEi/pOKh+YGBpQWO7FopDHxSuYPVW/Ug==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR03MB7471
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--23.712400-8.000000
+X-TMASE-MatchedRID: 1GZI+iG+Mtdq0U6EhO9EEy0UvD/exuSelV2LeD3ayQ8NcckEPxfz2DEU
+	xl1gE1bkfdd9BtGlLLzx1uczIHKx54/qvvWxLCnegOqr/r0d+Cz5VvfCjIxlu5722hDqHosTQqJ
+	x4++XpSr1e+V8HdVGj8JZoay2k271S4Q3I/LeUOcjK+nUBBcfy0KzuF0egUUDrFW3LKYp4bQzK+
+	JU/VbWZBT6+KIPEGWdf848Lqzjpoy6XBlyCm38klT/YzREB9OKfkuZtv/FS5reiSHKHp6DZT9Rh
+	DVQ/mzMrwnpAeqauILMJYD0aRF0ReVMn7RQEfwn9UVHiwLx0/JMkOX0UoduuaV+Af96k5K4o8WM
+	kQWv6iUVR7DQWX/WkT3Al4zalJpFwrbXMGDYqV8CpgETeT0ynA==
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--23.712400-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP:
+	007636C75CA53C3FB18468DF0EA4883C7EAA9232CDA8E60E3B652113FB2D35692000:8
 
-Use the iavf_schedule_aq_request() helper when we need to
-schedule a watchdog task immediately. No functional change.
-
-Signed-off-by: Petr Oros <poros@redhat.com>
----
- drivers/net/ethernet/intel/iavf/iavf_ethtool.c | 10 +++-------
- drivers/net/ethernet/intel/iavf/iavf_main.c    | 15 +++++----------
- 2 files changed, 8 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-index 90397293525f71..fc8d75a30602cd 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
-@@ -1447,10 +1447,9 @@ static int iavf_add_fdir_ethtool(struct iavf_adapter *adapter, struct ethtool_rx
- 	iavf_fdir_list_add_fltr(adapter, fltr);
- 	adapter->fdir_active_fltr++;
- 	fltr->state = IAVF_FDIR_FLTR_ADD_REQUEST;
--	adapter->aq_required |= IAVF_FLAG_AQ_ADD_FDIR_FILTER;
- 	spin_unlock_bh(&adapter->fdir_fltr_lock);
- 
--	mod_delayed_work(adapter->wq, &adapter->watchdog_task, 0);
-+	iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_ADD_FDIR_FILTER);
- 
- ret:
- 	if (err && fltr)
-@@ -1481,7 +1480,6 @@ static int iavf_del_fdir_ethtool(struct iavf_adapter *adapter, struct ethtool_rx
- 	if (fltr) {
- 		if (fltr->state == IAVF_FDIR_FLTR_ACTIVE) {
- 			fltr->state = IAVF_FDIR_FLTR_DEL_REQUEST;
--			adapter->aq_required |= IAVF_FLAG_AQ_DEL_FDIR_FILTER;
- 		} else {
- 			err = -EBUSY;
- 		}
-@@ -1491,7 +1489,7 @@ static int iavf_del_fdir_ethtool(struct iavf_adapter *adapter, struct ethtool_rx
- 	spin_unlock_bh(&adapter->fdir_fltr_lock);
- 
- 	if (fltr && fltr->state == IAVF_FDIR_FLTR_DEL_REQUEST)
--		mod_delayed_work(adapter->wq, &adapter->watchdog_task, 0);
-+		iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_DEL_FDIR_FILTER);
- 
- 	return err;
- }
-@@ -1660,7 +1658,6 @@ iavf_set_adv_rss_hash_opt(struct iavf_adapter *adapter,
- 			rss_old->hash_flds = hash_flds;
- 			memcpy(&rss_old->cfg_msg, &rss_new->cfg_msg,
- 			       sizeof(rss_new->cfg_msg));
--			adapter->aq_required |= IAVF_FLAG_AQ_ADD_ADV_RSS_CFG;
- 		} else {
- 			err = -EEXIST;
- 		}
-@@ -1670,12 +1667,11 @@ iavf_set_adv_rss_hash_opt(struct iavf_adapter *adapter,
- 		rss_new->packet_hdrs = hdrs;
- 		rss_new->hash_flds = hash_flds;
- 		list_add_tail(&rss_new->list, &adapter->adv_rss_list_head);
--		adapter->aq_required |= IAVF_FLAG_AQ_ADD_ADV_RSS_CFG;
- 	}
- 	spin_unlock_bh(&adapter->adv_rss_lock);
- 
- 	if (!err)
--		mod_delayed_work(adapter->wq, &adapter->watchdog_task, 0);
-+		iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_ADD_ADV_RSS_CFG);
- 
- 	mutex_unlock(&adapter->crit_lock);
- 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index b3434dbc90d6fe..7217ba018f6bbf 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -1060,13 +1060,12 @@ static int iavf_replace_primary_mac(struct iavf_adapter *adapter,
- 	 */
- 	new_f->is_primary = true;
- 	new_f->add = true;
--	adapter->aq_required |= IAVF_FLAG_AQ_ADD_MAC_FILTER;
- 	ether_addr_copy(hw->mac.addr, new_mac);
- 
- 	spin_unlock_bh(&adapter->mac_vlan_list_lock);
- 
- 	/* schedule the watchdog task to immediately process the request */
--	mod_delayed_work(adapter->wq, &adapter->watchdog_task, 0);
-+	iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_ADD_MAC_FILTER);
- 	return 0;
- }
- 
-@@ -1284,10 +1283,9 @@ static void iavf_up_complete(struct iavf_adapter *adapter)
- 
- 	iavf_napi_enable_all(adapter);
- 
--	adapter->aq_required |= IAVF_FLAG_AQ_ENABLE_QUEUES;
- 	if (CLIENT_ENABLED(adapter))
- 		adapter->flags |= IAVF_FLAG_CLIENT_NEEDS_OPEN;
--	mod_delayed_work(adapter->wq, &adapter->watchdog_task, 0);
-+	iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_ENABLE_QUEUES);
- }
- 
- /**
-@@ -1439,8 +1437,7 @@ void iavf_down(struct iavf_adapter *adapter)
- 			adapter->aq_required |= IAVF_FLAG_AQ_DEL_ADV_RSS_CFG;
- 	}
- 
--	adapter->aq_required |= IAVF_FLAG_AQ_DISABLE_QUEUES;
--	mod_delayed_work(adapter->wq, &adapter->watchdog_task, 0);
-+	iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_DISABLE_QUEUES);
- }
- 
- /**
-@@ -2340,10 +2337,8 @@ iavf_set_vlan_offload_features(struct iavf_adapter *adapter,
- 		}
- 	}
- 
--	if (aq_required) {
--		adapter->aq_required |= aq_required;
--		mod_delayed_work(adapter->wq, &adapter->watchdog_task, 0);
--	}
-+	if (aq_required)
-+		iavf_schedule_aq_request(adapter, aq_required);
- }
- 
- /**
--- 
-2.42.0
-
+T24gRnJpLCAyMDIzLTEwLTI3IGF0IDExOjEyICswMjAwLCBQYW9sbyBBYmVuaSB3cm90ZToNCj4g
+IAkgDQo+IEV4dGVybmFsIGVtYWlsIDogUGxlYXNlIGRvIG5vdCBjbGljayBsaW5rcyBvciBvcGVu
+IGF0dGFjaG1lbnRzIHVudGlsDQo+IHlvdSBoYXZlIHZlcmlmaWVkIHRoZSBzZW5kZXIgb3IgdGhl
+IGNvbnRlbnQuDQo+ICBPbiBGcmksIDIwMjMtMTAtMjcgYXQgMDg6MTcgKzAwMDAsIExlbmEgV2Fu
+ZyAo546L5aicKSB3cm90ZToNCj4gPiBTb3JyeS4gSSBkb24ndCB1c2UgbmV0ZGV2IE1MIGJlZm9y
+ZS4gSSBkbyBoYXZlIGEgZ29vZ2xlIHBhcnRuZXINCj4gYWNjb3VudA0KPiA+IGxlbmEud2FuZ0Bt
+ZWRpYXRlay5jb3JwLXBhcnRuZXIuZ29vZ2xlLmNvbSwgaXQgaXMganVzdGVkIHVzZWQgdG8NCj4g
+cmVwb3J0DQo+ID4gR29vZ2xlIGJ1ZyBhbmQgZG9uJ3Qga25vdyBob3cgdG8gc2VuZCBhIGVtYWls
+LiBJIHRyeSB0byB1c2UgdGV4dA0KPiBmb3JtYWwNCj4gPiB0byByZXBseSBtYWlsLg0KPiANCj4g
+SSdtIHNvcnJ5IGlmIHRoZSBmb2xsb3dpbmcgY2FuIHNvdW5kIG5vdCB2ZXJ5IHBvbGl0ZSwgYnV0
+IHJlYWxseSB5b3UNCj4gaGF2ZSB0byBtb3ZlIHRoaXMgY29udmVyc2F0aW9uIG9uIHRoZSBuZXRk
+ZXYgTUwgb3IgdG8gdGhlIGdvb2dsZQ0KPiBzdXBwb3J0Lg0KPiANCj4gQ2hlZXJzLA0KPiANCj4g
+UGFvbG8NCj4gDQpIaSBQYW9sbywNClNvcnJ5LCBJIGFkZCB0aGUgbmV0ZGV2IGluIGNjIGFuZCBp
+ZiBpdCBpcyBvbiBuZXRkZXYgTUwuIA0KPT09PT09PT09PT09PT09PT09PT09PT09PT0NCkkgaGF2
+ZSBtZXJnZWQgeW91ciBwYXRjaCBpbiB0aGUgbG9hZCBhbmQgdGhlIGtlcm5lbCBwYW5pYyBoYXBw
+ZW5zIHdpdGgNCnlvdXIgcGF0Y2guICBUaGUgY3Jhc2hlZCBza2Igd2l0aCBjbG9uZWQgPSAwIGFu
+ZCB1c2VycyA9IDIuIEkgYW0gYWZyYWlkDQp0aGUgcGF0Y2ggZG9lc24ndCB3b3JrIGJlY2F1c2Ug
+dGhlIHNoYXJlZCBza2IgaXMgbm90IGNoZWNrZWQuDQoNCkkgYW0gbm90IHN1cmUgaWYgeW91IGNv
+dWxkIHN1Ym1pdCB5b3VyIHByZXZpb3VzIHBhdGNoIHdpdGg6DQogKyAgICAgICBpZiAoV0FSTl9P
+Tl9PTkNFKHNrYl9zaGFyZWQoc2tiKSkpIHsNCiArICAgICAgICAgICAgICAgc2tiID0NCnNrYl9z
+aGFyZV9jaGVjayhza2IsIEdGUF9BVE9NSUMpOw0KICsgICAgICAgICAgICAgICBpZiAoIXNrYikN
+Cg0KKyAgICAgICAgICAgICAgICAgICAgICAgZ290byBlcnJfbGluZWFyaXplOw0KICsgICAgICAg
+fQ0KDQoNCg0KIGRpZmYgLS1naXQgYS9uZXQvY29yZS9za2J1ZmYuYyBiL25ldC9jb3JlL3NrYnVm
+Zi5jDQogaW5kZXggY2VhMjhkMzBhYmI1Li4xYjIzOTRlYmFmMzMgMTAwNjQ0DQogLS0tIGEvbmV0
+L2NvcmUvc2tidWZmLmMNCiArKysgYi9uZXQvY29yZS9za2J1ZmYuYw0KIEBAIC00MjcwLDYgKzQy
+NzAsMTcgQEAgc3RydWN0IHNrX2J1ZmYgKnNrYl9zZWdtZW50X2xpc3Qoc3RydWN0IHNrX2J1ZmYN
+Cipza2IsDQoNCiAgICAgICAgIHNrYl9wdXNoKHNrYiwgLXNrYl9uZXR3b3JrX29mZnNldChza2Ip
+ICsgb2Zmc2V0KTsNCg==
 
