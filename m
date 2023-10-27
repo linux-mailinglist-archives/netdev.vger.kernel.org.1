@@ -1,107 +1,144 @@
-Return-Path: <netdev+bounces-44762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E450B7D992C
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 15:00:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 472C57D994A
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 15:06:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D9D32823E7
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:00:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CAE36B210DA
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B4817990;
-	Fri, 27 Oct 2023 13:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17EB219BA9;
+	Fri, 27 Oct 2023 13:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LIhuElef"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="jrk9TbrI"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0046E5CBC;
-	Fri, 27 Oct 2023 13:00:20 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 475EA129;
-	Fri, 27 Oct 2023 06:00:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=34TFNELcRwb0DEJVWK6Vdvd41rU1dvOB0Wf82pfyYng=; b=LIhuElef+PFF7bZIJ0tGlYuono
-	lXcK5vol/SD1w3bbteFTXN0h+02yCXpDD3tcYJbqpsML6Vkj2n7zhdjmdiEA2L++zp/Tt8nc9OLXZ
-	seoq1Es/qf2W4+YbQby/j69NtyGd4TcC6SVkNr1KppItPzCTdhSJeuzMKn9j/XcmT4y8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qwMRh-000L8r-Bm; Fri, 27 Oct 2023 15:00:13 +0200
-Date: Fri, 27 Oct 2023 15:00:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	benno.lossin@proton.me, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 0/5] Rust abstractions for network PHY drivers
-Message-ID: <669d8fba-f6bb-4dc8-a06b-752fb83902b4@lunn.ch>
-References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
- <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com>
- <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch>
- <ZTsbG7JMzBwcYzhy@Boquns-Mac-mini.home>
- <c40722eb-e78a-467d-8f91-ef9e8afe736d@lunn.ch>
- <ZTsqROr8s18aWwSY@boqun-archlinux>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CE5182D2
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 13:06:42 +0000 (UTC)
+Received: from smtp-42ae.mail.infomaniak.ch (smtp-42ae.mail.infomaniak.ch [IPv6:2001:1600:4:17::42ae])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5F9128
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 06:06:39 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4SH2xB0hRRzMrYlt;
+	Fri, 27 Oct 2023 13:06:38 +0000 (UTC)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4SH2x93d5Jz3W;
+	Fri, 27 Oct 2023 15:06:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1698411997;
+	bh=HsPAU7kFJsQktIBFDD5A3oJhVu7AcVTsWYgBif0Jgno=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jrk9TbrIAf2xa+L+LrodNvyNVaPSTDKge6pv5wboD5TYW+coVvQYpZlwAJv5vK+LA
+	 hJvjFIYMmrJA/S55O3eBBzOAInOXIbMmksOn5lA9KlIifdUI3fDcolTSsamTWI4X9d
+	 wKj+3JiN0n4YWWch8Ql+bqFtxHFY7qt1Jev+QnzY=
+Date: Fri, 27 Oct 2023 15:06:34 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com, Paul Moore <paul@paul-moore.com>
+Subject: Re: [PATCH v14 00/12] Network support for Landlock
+Message-ID: <20231027.weic8eidaiQu@digikod.net>
+References: <20231026014751.414649-1-konstantin.meskhidze@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZTsqROr8s18aWwSY@boqun-archlinux>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231026014751.414649-1-konstantin.meskhidze@huawei.com>
+X-Infomaniak-Routing: alpha
 
-> Do the CI tests support Rust now? Does Tomo's patch pass CI? Looks like
-> something we'd like to see (and help).
+Thanks Konstantin!
 
-Its work in progress.
+I did some minor cosmetic changes, extended a bit the documentation and
+improved the ipv4_tcp.with_fs test. You can see these changes in my
+-next branch:
+https://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git/log/?h=next
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20231026001050.1720612-6-fujita.tomonori@gmail.com/
+We have a very good test coverage and I think these patches are ready
+for mainline.  If it's OK with you, I plan to send a PR for v6.7-rc1 .
 
-These are the current tests we have. You can see it fails two tests. I
-would say neither are blockers. netdev does try to stick to 80
-character line length, so it would be nice to fix that. The checkpatch
-warning about the Kconfig help can also be ignored.
+Regards,
+ Mickaël
 
-There are currently a few builds performed for each patch, once with
-gcc and once with clang/llvm. These use the allmodconfig kernel
-configuration, since that generally builds the most code. However,
-Rust is not enabled in the configuration. So i submitted a new test,
-based on the clang build, which massages the kernel configuration to
-actually enable Rust, and to ensure the dependencies are fulfilled to
-allow the PHY driver to be enabled, and then enable it. We want the
-build with a patch to have equal or less errors and warning from the
-toolchain.
-
-Its not clear how long it will take before this new test becomes
-active. The build machine does not have a Rust toolchain yet, etc.  To
-make up for that, i just build the series myself on my machine, and it
-builds cleanly for me.
-
-We are also open to add more tests. You will get more return on
-investment if you extend the C=1 checks, since that is used in a lot
-more places than networking. But we can add more tests to the
-networking CI system, if you can tell us what to test, how to test it,
-and how to evaluate the results.
-
-> > likely will be merged. Real problems can be fixed up later, if need
-> > be.
+On Thu, Oct 26, 2023 at 09:47:39AM +0800, Konstantin Meskhidze wrote:
+> Hi,
+> This is a new V14 patch related to Landlock LSM network confinement.
+> It is based on v6.6-rc2 kernel version.
 > 
-> But this doesn't apply to pure API, right? So if some one post a pure
-> Rust API with no user, but some tests, and the CI passes, the API won't
-> get merged? Even though no review is fine and if API has problems, we
-> can fix it later?
-
-There is always a human involved. If a reviewer does not pick up the
-missing user, the Maintainer should and reject the patch.
-
-	Andrew
+> It brings refactoring of previous patch version V13.
+> Mostly there are fixes of logic and typos, refactoring some selftests.
+> 
+> All test were run in QEMU evironment and compiled with
+>  -static flag.
+>  1. network_test: 82/82 tests passed.
+>  2. base_test: 7/7 tests passed.
+>  3. fs_test: 107/107 tests passed.
+>  4. ptrace_test: 8/8 tests passed.
+> 
+> Previous versions:
+> v13: https://lore.kernel.org/linux-security-module/20231016015030.1684504-1-konstantin.meskhidze@huawei.com/
+> v12: https://lore.kernel.org/linux-security-module/20230920092641.832134-1-konstantin.meskhidze@huawei.com/
+> v11: https://lore.kernel.org/linux-security-module/20230515161339.631577-1-konstantin.meskhidze@huawei.com/
+> v10: https://lore.kernel.org/linux-security-module/20230323085226.1432550-1-konstantin.meskhidze@huawei.com/
+> v9: https://lore.kernel.org/linux-security-module/20230116085818.165539-1-konstantin.meskhidze@huawei.com/
+> v8: https://lore.kernel.org/linux-security-module/20221021152644.155136-1-konstantin.meskhidze@huawei.com/
+> v7: https://lore.kernel.org/linux-security-module/20220829170401.834298-1-konstantin.meskhidze@huawei.com/
+> v6: https://lore.kernel.org/linux-security-module/20220621082313.3330667-1-konstantin.meskhidze@huawei.com/
+> v5: https://lore.kernel.org/linux-security-module/20220516152038.39594-1-konstantin.meskhidze@huawei.com
+> v4: https://lore.kernel.org/linux-security-module/20220309134459.6448-1-konstantin.meskhidze@huawei.com/
+> v3: https://lore.kernel.org/linux-security-module/20220124080215.265538-1-konstantin.meskhidze@huawei.com/
+> v2: https://lore.kernel.org/linux-security-module/20211228115212.703084-1-konstantin.meskhidze@huawei.com/
+> v1: https://lore.kernel.org/linux-security-module/20211210072123.386713-1-konstantin.meskhidze@huawei.com/
+> 
+> Konstantin Meskhidze (11):
+>   landlock: Make ruleset's access masks more generic
+>   landlock: Refactor landlock_find_rule/insert_rule
+>   landlock: Refactor merge/inherit_ruleset functions
+>   landlock: Move and rename layer helpers
+>   landlock: Refactor layer helpers
+>   landlock: Refactor landlock_add_rule() syscall
+>   landlock: Add network rules and TCP hooks support
+>   selftests/landlock: Share enforce_ruleset()
+>   selftests/landlock: Add network tests
+>   samples/landlock: Support TCP restrictions
+>   landlock: Document network support
+> 
+> Mickaël Salaün (1):
+>   landlock: Allow FS topology changes for domains without such rule type
+> 
+>  Documentation/userspace-api/landlock.rst     |   96 +-
+>  include/uapi/linux/landlock.h                |   55 +
+>  samples/landlock/sandboxer.c                 |  115 +-
+>  security/landlock/Kconfig                    |    1 +
+>  security/landlock/Makefile                   |    2 +
+>  security/landlock/fs.c                       |  232 +--
+>  security/landlock/limits.h                   |    6 +
+>  security/landlock/net.c                      |  198 ++
+>  security/landlock/net.h                      |   33 +
+>  security/landlock/ruleset.c                  |  405 +++-
+>  security/landlock/ruleset.h                  |  183 +-
+>  security/landlock/setup.c                    |    2 +
+>  security/landlock/syscalls.c                 |  158 +-
+>  tools/testing/selftests/landlock/base_test.c |    2 +-
+>  tools/testing/selftests/landlock/common.h    |   13 +
+>  tools/testing/selftests/landlock/config      |    4 +
+>  tools/testing/selftests/landlock/fs_test.c   |   10 -
+>  tools/testing/selftests/landlock/net_test.c  | 1744 ++++++++++++++++++
+>  18 files changed, 2908 insertions(+), 351 deletions(-)
+>  create mode 100644 security/landlock/net.c
+>  create mode 100644 security/landlock/net.h
+>  create mode 100644 tools/testing/selftests/landlock/net_test.c
+> 
+> --
+> 2.25.1
+> 
 
