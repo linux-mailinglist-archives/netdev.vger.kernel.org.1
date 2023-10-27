@@ -1,105 +1,101 @@
-Return-Path: <netdev+bounces-44698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 180BA7D9494
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:02:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1DD27D94A9
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:06:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD8C11F23522
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:02:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3456F1C20FC2
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1752171B4;
-	Fri, 27 Oct 2023 10:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6527F168CF;
+	Fri, 27 Oct 2023 10:06:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FWOwqTZw"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="VhXq9unJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFB217983
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:01:59 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9614194
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:01:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698400917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DTM6upIN3CjY9ys9ca+ckF+e8jrYVgwJYWZX7kJnPgo=;
-	b=FWOwqTZwf+J3VkiYFgDtduC88dYb9I76GfNuAhWof+eDBQhM/Zc91C5zVD8D3klslEHC+9
-	nWOxV4szPIgIbGaQHp2wouagel7zSY7/OXda2DKOiSzjOylbxKiYg5LWYZ9MOzc9dEY3W9
-	vE/0CmeVbv/kSFtiWpWWwHFwuikEsOs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-150-gc3zwK0dMquWndlNB0j-Lw-1; Fri, 27 Oct 2023 06:01:52 -0400
-X-MC-Unique: gc3zwK0dMquWndlNB0j-Lw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7E711811E7B;
-	Fri, 27 Oct 2023 10:01:51 +0000 (UTC)
-Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.226.76])
-	by smtp.corp.redhat.com (Postfix) with SMTP id 3CD8E492BE0;
-	Fri, 27 Oct 2023 10:01:49 +0000 (UTC)
-Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
-	oleg@redhat.com; Fri, 27 Oct 2023 12:00:50 +0200 (CEST)
-Date: Fri, 27 Oct 2023 12:00:47 +0200
-From: Oleg Nesterov <oleg@redhat.com>
-To: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>, linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] rxrpc_find_service_conn_rcu: use read_seqbegin() rather
- than read_seqbegin_or_lock()
-Message-ID: <20231027100047.GA30884@redhat.com>
-References: <20231027095842.GA30868@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E9C17732
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:06:07 +0000 (UTC)
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AC8910E
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:06:04 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2c50ec238aeso26628911fa.0
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:06:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1698401162; x=1699005962; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EzUFAA0TdPmj/Cb4HKxf5oHBR+/7qG5RzYUy2yOEkT4=;
+        b=VhXq9unJJzUaKJ0Jg1y1kfTx6dum6K1IVYtyqWi3MsDIzBlw+oNDQRmg4pZYsu+SJR
+         WHJ01If5Tin8kLPKIaZLMUS9tBHH7K/jy4MR1PBlM/AlxXK1F8tE2iCVx/QNaJrsBOLi
+         sRErgsbfISYfDigukmfTZlH6UjS9b/0+2IX9P5mq+FHp56kIn50sQTc5xEjhzv/XyJGD
+         /mmJFpc8RdINmDHQn3fcvrcm6gbU37T8ghFJ9geRg+p7IdFgZi2UEmkD/gfBAd/Q/mLu
+         2JsN7/JGFcvtQyL448kzZdhAVt8+U3pTT+8NsrSknz7pLUduyrSUVjEYTbSZ3cLiIOIQ
+         aIFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698401162; x=1699005962;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EzUFAA0TdPmj/Cb4HKxf5oHBR+/7qG5RzYUy2yOEkT4=;
+        b=KBmXqn/33WuQj6kNaSNCW4dP4VwX2ec+bauZQsND1PNTU2gMLyGR5UGu1j/3gJj+gz
+         MXakyhzC0j8Q2g9rrUaddVvov8gw0we5csYzVtMhiH85rXFhHez1UGIGe1J4FvHSArWJ
+         FqwBwvp1U1YrsJoQ9gWm8Iwnk/lprXXwdbaYcDMaglPtaJZewQhIoSEzrxRI9aeXUGgF
+         XkKKGwAhKfEu5MzmCOmUu5iX0TJFM99oewZe1koEDs0am3EPrcK4RLfgiGiPTx3QJF6O
+         f5ogo9m0HDOrqy9VhDEyPAamHavGQAXEzC1ypYE+yHpdLqaT5KPWWezu3kHbnd+8o8gO
+         qUEA==
+X-Gm-Message-State: AOJu0Yz5dbcfD67keC+FnXR2bxyVbXlBp0znAs6r4b1h6fWmebN+fbRd
+	cdGn8H/fj/P/tWwAkG/9JI+OIbioxcLi4iFfUQQ=
+X-Google-Smtp-Source: AGHT+IHMw/VGq/ex38Jd96pI1ZaMYN2dDPL+SSmNkWe+mKerLueKy0bGPXr07gAo++VUysXUUy1H4A==
+X-Received: by 2002:a05:651c:319:b0:2c5:7afd:75a1 with SMTP id a25-20020a05651c031900b002c57afd75a1mr1598290ljp.44.1698401162166;
+        Fri, 27 Oct 2023 03:06:02 -0700 (PDT)
+Received: from dev.. (haunt.prize.volia.net. [93.72.109.136])
+        by smtp.gmail.com with ESMTPSA id j15-20020adfb30f000000b0032d8eecf901sm1430586wrd.3.2023.10.27.03.06.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Oct 2023 03:06:01 -0700 (PDT)
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	bridge@lists.linux-foundation.org,
+	roopa@nvidia.com,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: [PATCH net-next] net: bridge: fill in MODULE_DESCRIPTION()
+Date: Fri, 27 Oct 2023 13:05:49 +0300
+Message-Id: <20231027100549.1695865-1-razor@blackwall.org>
+X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20231026190101.1413939-1-kuba@kernel.org>
+References: <20231026190101.1413939-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231027095842.GA30868@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+Content-Transfer-Encoding: 8bit
 
-On 10/27, Oleg Nesterov wrote:
->
-> read_seqbegin_or_lock() makes no sense unless you make "seq" odd
-> after the lockless access failed. See thread_group_cputime() as
-> an example, note that it does nextseq = 1 for the 2nd round.
+Fill in bridge's module description.
 
-See also
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+---
+ net/bridge/br.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-	[PATCH 1/2] seqlock: fix the wrong read_seqbegin_or_lock/need_seqretry documentation
-	https://lore.kernel.org/all/20231024120808.GA15382@redhat.com/
-
-> So this code can use read_seqbegin() without changing the current
-> behaviour.
-
-I am trying to remove the misuse of read_seqbegin_or_lock(),
-then I am going to turn need_seqretry() into
-
-	static inline int need_seqretry(seqlock_t *lock, int *seq)
-	{
-		int ret = !(*seq & 1) && read_seqretry(lock, *seq);
-
-		if (ret)
-			*seq = 1; /* make this counter odd */
-
-		return ret;
-	}
-
-Oleg.
+diff --git a/net/bridge/br.c b/net/bridge/br.c
+index a6e94ceb7c9a..cda9d7871f72 100644
+--- a/net/bridge/br.c
++++ b/net/bridge/br.c
+@@ -477,3 +477,4 @@ module_exit(br_deinit)
+ MODULE_LICENSE("GPL");
+ MODULE_VERSION(BR_VERSION);
+ MODULE_ALIAS_RTNL_LINK("bridge");
++MODULE_DESCRIPTION("Ethernet bridge driver");
+-- 
+2.38.1
 
 
