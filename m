@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-44695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA397D948A
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:00:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 391A97D948B
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D60E1C20FC2
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:00:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93B06282385
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD141171AD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6301171C5;
 	Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVZ/8YyO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXK9Cds2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDDC1772B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B205E17731
 	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 29D37C433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 38199C433C9;
 	Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1698400833;
-	bh=/WkRM2i922a3Ow+G7b6etkF/sP9cPHvui0KbyLXDWEU=;
+	bh=rmvtbkA61r4hq692J/vNITDiPIVR5LTqd1Q2i4pE35U=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AVZ/8YyO3A5t0hfO1Jna9jP2FbRvk1gcEV4M7pArJ94QmBXMgxgvBfeSHMAFf1mhF
-	 an5J48HoTRGx0+VXlVleKPGg3A1g7Uh/aTUnsBGcCL3IKNrgl1FdljdnxoQ5barKYn
-	 xd9cppL/tqOadw/xKgJL53Iz1ot9vtpM+6MqifQAeByqaOCLx2VsW9stUWUui8cC/O
-	 JJ7eH+2ZcQ0FclBMF9EnsNGjSZXnaw1V/rEqsbpqKysPkbGKoCvrDeshSAQutDKZx+
-	 bpvMVFsImTbsnskedgMLzo/Gjbj1bbEXDwvkRwuJshyL4WXrSJb2n8MRAm4+2u7BrQ
-	 QSsmhT7JIs9iA==
+	b=PXK9Cds2BDm1626vArrGavvRKVQ2PqUMWucdpDmn/vYZ6yIhL0C4AcrL58xHn4r0n
+	 JuuLkySHStIiOVogcBckGYHmsQCM8tAUKLY14625BkvjS0l01ya6BN8U/uBYq9VdSU
+	 33rzjN45KV84HFb2dxx7k8ROzEfKpg/EMxIcCbmc8AdvQFX04jBl043IcisB9VCU2y
+	 gM9v6xHCy0jFjuCabIsuoJja0iRt8Xh1Zn1xXKxUS2ECsNoJ/r7ITcTBf2vOfwViCb
+	 pKU7bYmRGV4hWaul0C6CgFjVxNzZJIkVrw9c4wMUOqvlTGe7mvAXvX+YP+nlnwt9yS
+	 2G9W5Fs6jZAGg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1101FC39563;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 188CBE19E22;
 	Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,62 +43,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/13] Add MDB get support
+Subject: Re: [PATCH net-next] virtio_net: use u64_stats_t infra to avoid
+ data-races
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169840083306.2931.12879417140055385524.git-patchwork-notify@kernel.org>
+ <169840083309.2931.2693062060056048598.git-patchwork-notify@kernel.org>
 Date: Fri, 27 Oct 2023 10:00:33 +0000
-References: <20231025123020.788710-1-idosch@nvidia.com>
-In-Reply-To: <20231025123020.788710-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, bridge@lists.linux-foundation.org,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- roopa@nvidia.com, razor@blackwall.org, mlxsw@nvidia.com
+References: <20231026171840.4082735-1-edumazet@google.com>
+In-Reply-To: <20231026171840.4082735-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
+ jasowang@redhat.com, xuanzhuo@linux.alibaba.com, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Wed, 25 Oct 2023 15:30:07 +0300 you wrote:
-> This patchset adds MDB get support, allowing user space to request a
-> single MDB entry to be retrieved instead of dumping the entire MDB.
-> Support is added in both the bridge and VXLAN drivers.
+On Thu, 26 Oct 2023 17:18:40 +0000 you wrote:
+> syzbot reported a data-race in virtnet_poll / virtnet_stats [1]
 > 
-> Patches #1-#6 are small preparations in both drivers.
+> u64_stats_t infra has very nice accessors that must be used
+> to avoid potential load-store tearing.
 > 
-> Patches #7-#8 add the required uAPI attributes for the new functionality
-> and the MDB get net device operation (NDO), respectively.
+> [1]
+> BUG: KCSAN: data-race in virtnet_poll / virtnet_stats
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,01/13] bridge: mcast: Dump MDB entries even when snooping is disabled
-    https://git.kernel.org/netdev/net-next/c/b9109b5b77f0
-  - [net-next,v2,02/13] bridge: mcast: Account for missing attributes
-    https://git.kernel.org/netdev/net-next/c/1b6d993509c1
-  - [net-next,v2,03/13] bridge: mcast: Factor out a helper for PG entry size calculation
-    https://git.kernel.org/netdev/net-next/c/62ef9cba98a2
-  - [net-next,v2,04/13] bridge: mcast: Rename MDB entry get function
-    https://git.kernel.org/netdev/net-next/c/6d0259dd6c53
-  - [net-next,v2,05/13] vxlan: mdb: Adjust function arguments
-    https://git.kernel.org/netdev/net-next/c/ff97d2a956a1
-  - [net-next,v2,06/13] vxlan: mdb: Factor out a helper for remote entry size calculation
-    https://git.kernel.org/netdev/net-next/c/14c32a46d992
-  - [net-next,v2,07/13] bridge: add MDB get uAPI attributes
-    https://git.kernel.org/netdev/net-next/c/83c1bbeb864f
-  - [net-next,v2,08/13] net: Add MDB get device operation
-    https://git.kernel.org/netdev/net-next/c/62f47bf9e2c0
-  - [net-next,v2,09/13] bridge: mcast: Add MDB get support
-    https://git.kernel.org/netdev/net-next/c/68b380a395a7
-  - [net-next,v2,10/13] vxlan: mdb: Add MDB get support
-    https://git.kernel.org/netdev/net-next/c/32d9673e96dc
-  - [net-next,v2,11/13] rtnetlink: Add MDB get support
-    https://git.kernel.org/netdev/net-next/c/ddd17a54e692
-  - [net-next,v2,12/13] selftests: bridge_mdb: Use MDB get instead of dump
-    https://git.kernel.org/netdev/net-next/c/e8bba9e83c88
-  - [net-next,v2,13/13] selftests: vxlan_mdb: Use MDB get instead of dump
-    https://git.kernel.org/netdev/net-next/c/0514dd05939a
+  - [net-next] virtio_net: use u64_stats_t infra to avoid data-races
+    https://git.kernel.org/netdev/net-next/c/61217d8f6360
 
 You are awesome, thank you!
 -- 
