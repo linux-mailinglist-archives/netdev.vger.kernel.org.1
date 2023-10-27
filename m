@@ -1,81 +1,141 @@
-Return-Path: <netdev+bounces-44638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 328107D8DB1
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 06:02:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05F3F7D8DBE
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 06:27:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C547281175
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:02:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 294BF1C20CD9
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:27:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D344411;
-	Fri, 27 Oct 2023 04:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B5C4424;
+	Fri, 27 Oct 2023 04:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="iUGSrNyQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OEZODO5C"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F477440F
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 04:02:51 +0000 (UTC)
-X-Greylist: delayed 14170 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 26 Oct 2023 21:02:49 PDT
-Received: from out203-205-221-252.mail.qq.com (out203-205-221-252.mail.qq.com [203.205.221.252])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 187671B3;
-	Thu, 26 Oct 2023 21:02:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1698379367; bh=KAZ2dqk5wzCasPZxhsxWQLln+2NhMGq3g10UXK4ZO3c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iUGSrNyQAqeTayvopD/h7suMkCH4e4nYvAmLU0RcPAOvQtTW5ZTvYslHAC1uIY10y
-	 nRgexwx2/sAjdfIbYu9AMRYNqy7S4ciDZbqDr4jTiSKe3gI2nEiAJaYa5h7GUPbszA
-	 zNSR+KbukPNXHYWlCJQ2SmqELilD7c7iVT2cIoHk=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
-	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
-	id ACA321A; Fri, 27 Oct 2023 12:02:44 +0800
-X-QQ-mid: xmsmtpt1698379364tqwcgbjse
-Message-ID: <tencent_61372097D036524ACC74E176DF66043C2309@qq.com>
-X-QQ-XMAILINFO: MFWpArBVhhGTL2fNDRRsjjukLOEVgOL+V7nknAYsrRaKxIzOvEDnTdjfV+mwVw
-	 frkXq+jQrq4BkyznpjySOZW5HXzbQ0XLdEFguKD0URm65xb4cTaNNENSn8Cq2PlVPPXc8fwErjlK
-	 54S8u7wdJ2fMICPNlo/905foAoOum740nS24u+8Eg3D1ltvlC1QUhbkAIH0mUV0/7CVK8NMB25eh
-	 6Qmg588By03DQbJlTJOynEqs5ZOZg0WTkUXPNOOk+iabnty/2fOL3ZY/Szf3Fr1gJc6PstYwrYdZ
-	 RYgP1v+mZ0DbPCd4MUWTB3eizEc+YJm837kgnw94pAyCAU8p4X0MjvIOvhgcgzkdIKjqV17iQXuW
-	 kECt0cJugZzYnJwBgxNmnIpEPv+raSiD6DVHa6SKq4c4sau/BWZUwFHokOCFgKvAIi+a5RRPhi/w
-	 o0lmgHFCllwgNug2dyhGFwvyH+X/GTIE2gFQHQnaZxRVS43B2arQ0RYHuuoHexIK+Vpumrbt+9DP
-	 wrFhyBWVBM0m1EZxMeHkt6Q4W7plZuQ0LUUVR67zWP64L5I/niOTlA/UXbe42yHl9k46EJxrg+x9
-	 R/y/mj/H6IqdN05Dq7VyL2ox/mssku/vU9d4HUKp5K0eyCrMpVO4isDLJDpjtvTAIsb7Ll9DAAdW
-	 FrVIb/tWxnSF/jmgYiZQhVviY4KKr9DYDcpssK0cyyLwXyysJ1mfcROiK5bFKWegkQ94WNVGsll7
-	 qRAhxoNCxJqDRvQSdHXx0nvDrhPZUsM0OuuPuxhzENm+dLwLmRgR/WG8dkjbvYXV8XZc6NtVSO+1
-	 y41OOxH//NosRS4Jetf6sg6aj1596o243YSWp51U7Cpe2ZYnjDAu0zo3JfA/OqRQdReWAgyh9tdw
-	 t6+t2J3C2CO5pNr1FddnKY5TfLW7dZcSdxcpdx3KsvmzrEYK104JhKeF/sWX94Hw6UwXDFqfo6AS
-	 NQHQckIt0=
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-From: Edward Adam Davis <eadavis@qq.com>
-To: eadavis@qq.com
-Cc: davem@davemloft.net,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	reibax@gmail.com,
-	richardcochran@gmail.com,
-	syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH net-next] ptp: ptp_read should not release queue
-Date: Fri, 27 Oct 2023 12:02:45 +0800
-X-OQ-MSGID: <20231027040244.3809048-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <tencent_541B3D2565BACCBBD133319E441B774B6C08@qq.com>
-References: <tencent_541B3D2565BACCBBD133319E441B774B6C08@qq.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07CE44412;
+	Fri, 27 Oct 2023 04:26:56 +0000 (UTC)
+Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50DDB1AD;
+	Thu, 26 Oct 2023 21:26:55 -0700 (PDT)
+Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5ac376d311aso12744777b3.1;
+        Thu, 26 Oct 2023 21:26:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698380814; x=1698985614; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=doe7YWrWJJLJ7oYMXyVmtX9wV3FS+h0xz0bDDyzaqhw=;
+        b=OEZODO5Cfzg6gXBwIkDABrGF70/hPsHzMni2yDi5SCzwa6BNmgxZoZE9cYJkQo1I0V
+         VQJG73ewuPaOKMC3c3i4ArDjxdg3v5P2yIW5GNGmQ0HpdEZewahdeh8o3m5eUc+4ChCu
+         934bHPfi2xe7oWtPh7b56AMj/mjDP4xS2kF9LVP4SxAYKJk/WfNbP4jl5w+mPsHKiMRc
+         lUY8LBjhCDfeGFFql+nlfgCTpHuIJazm1cu9n7jRwIdeZS4/l8ThdmLx3g1gVeuB3Hw/
+         wVQ7gop0LMF0FmIFoeT7r1R9f7lN0XD1pbqTE88ttB2QPQuajvpo7OS/vpFUZbOnK7Zp
+         Uqyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698380814; x=1698985614;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=doe7YWrWJJLJ7oYMXyVmtX9wV3FS+h0xz0bDDyzaqhw=;
+        b=nb1x3h+ULJhPMToyRqLAA3SKvMQUgYW09272jvoDso1fShAf2SDglow0rtt6grFieL
+         7EdGsWrzuaV56RAcDf8KIlPrE74OnH9+9oG1H0o/n97Z7AtZQhx+HDuigjqED6SaZ1Vt
+         vv+FyPis5hNzvdRojmAX9yKtIVyakHky0oYcCgDqAR+UTeidSyBnKCr7T5nCqG6pfQfu
+         oXb1uwCGSdKnu5zxzwo+foVHfjb7hD4P5Vsr1p64xIs7J8tptjvV/WYeXYJD8WKC0kbi
+         qYPwyNgOmdZuLRKvwsNJ30xsDDZiR9rujrXJLaRjglXq8Nq7x868FyJ02e9/GTDj7z7X
+         T6Dg==
+X-Gm-Message-State: AOJu0YwKnA6jvYt45MbJXDbeGqTN7dgDFlyXX4XzKAsbxK84OV2al4ZH
+	zDXP0Vmfo3DYQ3ngwYxTMig=
+X-Google-Smtp-Source: AGHT+IGoZqx/kSfIrValUrw1CKwM1cxje2N35tbksDYlZKJgaWEYy9wPo8oOVgo7foiOWs0zcrAdmA==
+X-Received: by 2002:a25:770f:0:b0:da0:93bf:2691 with SMTP id s15-20020a25770f000000b00da093bf2691mr1342930ybc.26.1698380814441;
+        Thu, 26 Oct 2023 21:26:54 -0700 (PDT)
+Received: from auth1-smtp.messagingengine.com (auth1-smtp.messagingengine.com. [66.111.4.227])
+        by smtp.gmail.com with ESMTPSA id v15-20020a25910f000000b00da07d9e47b4sm347213ybl.55.2023.10.26.21.26.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Oct 2023 21:26:53 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailauth.nyi.internal (Postfix) with ESMTP id 1096C27C0054;
+	Fri, 27 Oct 2023 00:26:53 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute2.internal (MEProxy); Fri, 27 Oct 2023 00:26:53 -0400
+X-ME-Sender: <xms:DDw7ZVM3XIg8bVUYPPa2m3AJuHHVfGeZvsfd-d2Aeg1R1wrxJ_mmyg>
+    <xme:DDw7ZX88ciu2gQ7QDLstWm-FdAQ0GeBGi3lkLixchg7hMGqLUhjywTwkouznJ0PPR
+    uIBMuGGi229CG0uOA>
+X-ME-Received: <xmr:DDw7ZUQ0cgBM2FlviXsGeqHTBHekkxvCoOMqQ5EvzsuvTZ4wo90lovxo6qs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrleefgdekhecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeeuohhquhhn
+    ucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrfgrth
+    htvghrnhephedugfduffffteeutddvheeuveelvdfhleelieevtdeguefhgeeuveeiudff
+    iedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsg
+    hoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieeg
+    qddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigi
+    hmvgdrnhgrmhgv
+X-ME-Proxy: <xmx:DDw7ZRvFKDdNQBfbbEAfaJ_dtQdD0KBPyASZs-Cqg3NH2CsdRWAOug>
+    <xmx:DDw7ZdfymXjVuGLzxxJVfK8dn2mICaqtoQAtaMnhgqb8miMujmGrWw>
+    <xmx:DDw7Zd0r1Hqia4ce9SMBlI84GHmM9yHPdhzTfG3LJbcYPCYP95r79A>
+    <xmx:DTw7ZXvkb-hPZH2RVY0anVAnDgP2wHJG_DzHMC2SAnZmE4YX0KNR9w>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 27 Oct 2023 00:26:52 -0400 (EDT)
+Date: Thu, 26 Oct 2023 21:26:05 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	benno.lossin@proton.me, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 0/5] Rust abstractions for network PHY drivers
+Message-ID: <ZTs73ZBgGZ-oHwF4@boqun-archlinux>
+References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
+ <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com>
+ <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch>
+ <ZTsbG7JMzBwcYzhy@Boquns-Mac-mini.home>
+ <c40722eb-e78a-467d-8f91-ef9e8afe736d@lunn.ch>
+ <ZTsqROr8s18aWwSY@boqun-archlinux>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: **
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZTsqROr8s18aWwSY@boqun-archlinux>
 
-This patch is not fix this issue, please ignore it.
+On Thu, Oct 26, 2023 at 08:11:00PM -0700, Boqun Feng wrote:
+[...]
+> > likely will be merged. Real problems can be fixed up later, if need
+> > be.
+> 
+> But this doesn't apply to pure API, right? So if some one post a pure
+> Rust API with no user, but some tests, and the CI passes, the API won't
+> get merged? Even though no review is fine and if API has problems, we
+> can fix it later?
+> 
 
-edward
+I brought this up because (at least) at this stage one of the focus
+areas of Rust is: how to wrap C structs and functions into a sound and
+reasonable API. So it's ideal if we can see more API proposals.
 
+As you may already see in the reviews of this patchset, a lot of effort
+was spent on reviewing the API based on its designed semantics (rather
+than its usage in the last patch). This is the extra effort of using
+Rust. Is it worth? I don't know, the experiment will answer that in the
+end ;-) But at least having an API design with a clear semantics and
+some future guards is great.
+
+The review because of this may take longer time than C code, so if we
+really want to keep up with netdev speed, maybe we relax the
+must-have-in-tree-user rule, so that we can review API design and
+soundness in our pace.
+
+Regards,
+Boqun
 
