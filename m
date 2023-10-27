@@ -1,223 +1,92 @@
-Return-Path: <netdev+bounces-44734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 731B57D979A
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 14:17:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 711A07D97A2
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 14:18:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F01F92823BD
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:17:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A4FB282389
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91AC21A261;
-	Fri, 27 Oct 2023 12:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACFA51A278;
+	Fri, 27 Oct 2023 12:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gr/C/a5j"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="co579VLK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD9719BB8
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 12:17:16 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C72AD72;
-	Fri, 27 Oct 2023 05:17:12 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39R5TxFL012574;
-	Fri, 27 Oct 2023 05:17:06 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=3wc5P8WLQQ7TN5OjSZbRJnjfWuESLwFLz9t5HbnNk6k=;
- b=gr/C/a5jZ+yck+A+xeimVmQhZg4IavskP6U+b4FJuaqmextI4xv7a3A1UlewR+Vlnt25
- 1VdqADFlf7Mx+lDvidVIWLWu+OMrt4kN3lOs83uxS0VI2HSWW+vX5JCosrZZIwizEmvs
- +Zo6LagVWCrmk5PwxeVhovuEbuROGpLNSlCxT1e8i3MGYCkoluEr1PIXH8OkCFKferOa
- mph0JZ0LWp1d2VXPJ/jkABHObu1dg/yRvDgOdtDpqOwqkZmb3N8oaBMGm2W6f8ipM5KU
- I6Shb7VwCQE5HsiN670jTrHpJaGJ4wezrK85fUtmZxY+RBZHz3vL7BtNukKe7b6Liwky lA== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3tywr83b4g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 27 Oct 2023 05:17:05 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 27 Oct
- 2023 05:17:04 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 27 Oct 2023 05:17:04 -0700
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id F0F4A3F709F;
-	Fri, 27 Oct 2023 05:17:03 -0700 (PDT)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
-        "Veerasenareddy
- Burru" <vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>,
-        Eric Dumazet
-	<edumazet@google.com>
-Subject: [PATCH net-next v3 4/4] octeon_ep: remove atomic variable usage in Tx data path
-Date: Fri, 27 Oct 2023 05:16:39 -0700
-Message-ID: <20231027121639.2382565-5-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231027121639.2382565-1-srasheed@marvell.com>
-References: <20231027121639.2382565-1-srasheed@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBE919BB8
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 12:17:55 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F41E1BB
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 05:17:53 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-4083f61312eso15658515e9.3
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 05:17:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698409071; x=1699013871; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HnSSviJMbW73CYFlxlkiiUfIJKhXBNtv3pZYT4H9PPE=;
+        b=co579VLKrA/JlhVxKXF5+hGXDgFVBxmXYAzgiJ5jBXxBPKOJtLDSjg8djtCBdxrKUb
+         DSFZb+dKSZYCZZnRTqufoVBQa8V+4xZ8kS3BfpKNnpebUKl7p4nV2suCTaLlunvJARDk
+         73im62tM3BHSZFIEvadj35PMZYgzNOWOHE8VBH1nFcTXGUQamri65FRMga0wxpkjE1Dv
+         9a1COrLCABMLurxhonr/k6OpL6l/vp0QYYAmlyqNu0wOTB/v44tpp6iTVsA94IR0aLPb
+         wwpXMB/47RptYSxE5/WgAh/b9x58H+WyXIdgf5RCZrTv30ruPvvt0blydCMAc7rG95WX
+         J5jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698409071; x=1699013871;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HnSSviJMbW73CYFlxlkiiUfIJKhXBNtv3pZYT4H9PPE=;
+        b=jmhL9vuHy0wix/gumV8IecJgDTVRHO53rdp33u1KZyV1IvCXRAbh8NwTdjSgJGLBF1
+         n8+yl69FJW70YQKhusxTFyaLFOevdDyB0Ov/ysxQ+M+T3BLUcRbNAAHMp6VwCJYkid/d
+         /actYe3zTlbaJ2wxaTacHb2vhj7p6/ZEkFPig5WhUVQjLl6uHEyKvWYxoXwagsi02Jo6
+         PF81aftKKaQA7bIpQ+rwxhdHsluu09/0u8wed6MTfhiD7DcWGjwEOWEyk8zMe6vnfIi1
+         rVrRpkSFvl/A27BuJ15yujZssirLPmE1FHClUJzOoPm27TCGL2nJ4rVMGEUIWm2tTHIT
+         as5Q==
+X-Gm-Message-State: AOJu0YzuL2S6ZVImtEp+/tqYverPseTmZFWwlke74lvGI5lFkYpg4A89
+	oOC4TGJ7pWALJnEVOlgPOQoBdz65cRniwvSR+yk=
+X-Google-Smtp-Source: AGHT+IHC6uUGgPeWGP9gaB+YAHmpUGN6zGIl085NvPG+QmhGh3Kqwvs35IBgNlyG8cGXTzKE3kaLCg==
+X-Received: by 2002:a05:600c:5251:b0:407:8e68:4a5b with SMTP id fc17-20020a05600c525100b004078e684a5bmr2473427wmb.38.1698409071274;
+        Fri, 27 Oct 2023 05:17:51 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id l41-20020a05600c1d2900b004090ca6d785sm1554896wms.2.2023.10.27.05.17.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Oct 2023 05:17:51 -0700 (PDT)
+Date: Fri, 27 Oct 2023 15:17:48 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Bo Liu <liubo03@inspur.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net-XXX] vhost-vdpa: fix use after free in
+ vhost_vdpa_probe()
+Message-ID: <1eaf041b-6556-40e3-ad80-993754b2bc0f@kadam.mountain>
+References: <cf53cb61-0699-4e36-a980-94fd4268ff00@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: BuBXPUVKdo1UWaqUCkheC4Oau8gX-Xur
-X-Proofpoint-ORIG-GUID: BuBXPUVKdo1UWaqUCkheC4Oau8gX-Xur
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-27_10,2023-10-27_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cf53cb61-0699-4e36-a980-94fd4268ff00@moroto.mountain>
 
-Replace atomic variable "instr_pending" which represents number of
-posted tx instructions pending completion, with host_write_idx and
-flush_index variables in the xmit and completion processing respectively.
+Ugh...  Crap.
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V3:
-  - No changes.
-V2: https://lore.kernel.org/all/20231024145119.2366588-5-srasheed@marvell.com/
-  - No changes.
-V1: https://lore.kernel.org/all/20231023114449.2362147-4-srasheed@marvell.com/
+I modified this patch to apply cleanly on net but I still didn't change
+the subject to net.  But now that I'm looking at it actually goes
+through one of the virt trees.
 
- drivers/net/ethernet/marvell/octeon_ep/octep_config.h | 1 +
- drivers/net/ethernet/marvell/octeon_ep/octep_main.c   | 9 +++------
- drivers/net/ethernet/marvell/octeon_ep/octep_main.h   | 9 +++++++++
- drivers/net/ethernet/marvell/octeon_ep/octep_tx.c     | 5 +----
- drivers/net/ethernet/marvell/octeon_ep/octep_tx.h     | 3 ---
- 5 files changed, 14 insertions(+), 13 deletions(-)
+It should still apply to whatever virt tree as well.  It's just shifted
+70 lines.
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_config.h b/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-index ed8b1ace56b9..91cfa19c65b9 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-@@ -13,6 +13,7 @@
- #define OCTEP_64BYTE_INSTR  64
- 
- /* Tx Queue: maximum descriptors per ring */
-+/* This needs to be a power of 2 */
- #define OCTEP_IQ_MAX_DESCRIPTORS    1024
- /* Minimum input (Tx) requests to be enqueued to ring doorbell */
- #define OCTEP_DB_MIN                8
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index 2d1bcdc589f3..974a34be9ffa 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -777,7 +777,7 @@ static int octep_stop(struct net_device *netdev)
-  */
- static inline int octep_iq_full_check(struct octep_iq *iq)
- {
--	if (likely((iq->max_count - atomic_read(&iq->instr_pending)) >=
-+	if (likely((IQ_INSTR_SPACE(iq)) >
- 		   OCTEP_WAKE_QUEUE_THRESHOLD))
- 		return 0;
- 
-@@ -794,7 +794,7 @@ static inline int octep_iq_full_check(struct octep_iq *iq)
- 	/* check again and restart the queue, in case NAPI has just freed
- 	 * enough Tx ring entries.
- 	 */
--	if (unlikely((iq->max_count - atomic_read(&iq->instr_pending)) >=
-+	if (unlikely(IQ_INSTR_SPACE(iq) >
- 		     OCTEP_WAKE_QUEUE_THRESHOLD)) {
- 		netif_start_subqueue(iq->netdev, iq->q_no);
- 		iq->stats.restart_cnt++;
-@@ -903,12 +903,9 @@ static netdev_tx_t octep_start_xmit(struct sk_buff *skb,
- 	__netdev_tx_sent_queue(iq->netdev_q, skb->len, xmit_more);
- 
- 	skb_tx_timestamp(skb);
--	atomic_inc(&iq->instr_pending);
- 	iq->fill_cnt++;
- 	wi++;
--	if (wi == iq->max_count)
--		wi = 0;
--	iq->host_write_index = wi;
-+	iq->host_write_index = wi & iq->ring_size_mask;
- 
- 	/* octep_iq_full_check stops the queue and returns
- 	 * true if so, in case the queue has become full
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-index 6df902ebb7f3..c33e046b69a4 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-@@ -40,6 +40,15 @@
- #define  OCTEP_OQ_INTR_RESEND_BIT  59
- 
- #define  OCTEP_MMIO_REGIONS     3
-+
-+#define  IQ_INSTR_PENDING(iq)  ({ typeof(iq) iq__ = (iq); \
-+				  ((iq__)->host_write_index - (iq__)->flush_index) & \
-+				  (iq__)->ring_size_mask; \
-+				})
-+#define  IQ_INSTR_SPACE(iq)    ({ typeof(iq) iq_ = (iq); \
-+				  (iq_)->max_count - IQ_INSTR_PENDING(iq_); \
-+				})
-+
- /* PCI address space mapping information.
-  * Each of the 3 address spaces given by BAR0, BAR2 and BAR4 of
-  * Octeon gets mapped to different physical address spaces in
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-index d0adb82d65c3..06851b78aa28 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-@@ -21,7 +21,6 @@ static void octep_iq_reset_indices(struct octep_iq *iq)
- 	iq->flush_index = 0;
- 	iq->pkts_processed = 0;
- 	iq->pkt_in_done = 0;
--	atomic_set(&iq->instr_pending, 0);
- }
- 
- /**
-@@ -82,7 +81,6 @@ int octep_iq_process_completions(struct octep_iq *iq, u16 budget)
- 	}
- 
- 	iq->pkts_processed += compl_pkts;
--	atomic_sub(compl_pkts, &iq->instr_pending);
- 	iq->stats.instr_completed += compl_pkts;
- 	iq->stats.bytes_sent += compl_bytes;
- 	iq->stats.sgentry_sent += compl_sg;
-@@ -91,7 +89,7 @@ int octep_iq_process_completions(struct octep_iq *iq, u16 budget)
- 	netdev_tx_completed_queue(iq->netdev_q, compl_pkts, compl_bytes);
- 
- 	if (unlikely(__netif_subqueue_stopped(iq->netdev, iq->q_no)) &&
--	    ((iq->max_count - atomic_read(&iq->instr_pending)) >
-+	    (IQ_INSTR_SPACE(iq) >
- 	     OCTEP_WAKE_QUEUE_THRESHOLD))
- 		netif_wake_subqueue(iq->netdev, iq->q_no);
- 	return !budget;
-@@ -144,7 +142,6 @@ static void octep_iq_free_pending(struct octep_iq *iq)
- 		dev_kfree_skb_any(skb);
- 	}
- 
--	atomic_set(&iq->instr_pending, 0);
- 	iq->flush_index = fi;
- 	netdev_tx_reset_queue(netdev_get_tx_queue(iq->netdev, iq->q_no));
- }
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-index 86c98b13fc44..1ba4ff65e54d 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-@@ -172,9 +172,6 @@ struct octep_iq {
- 	/* Statistics for this input queue. */
- 	struct octep_iq_stats stats;
- 
--	/* This field keeps track of the instructions pending in this queue. */
--	atomic_t instr_pending;
--
- 	/* Pointer to the Virtual Base addr of the input ring. */
- 	struct octep_tx_desc_hw *desc_ring;
- 
--- 
-2.25.1
+regards,
+dan carpenter
 
 
