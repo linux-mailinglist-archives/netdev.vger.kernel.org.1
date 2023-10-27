@@ -1,225 +1,153 @@
-Return-Path: <netdev+bounces-44624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B5217D8D17
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:20:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D5837D8D33
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 04:41:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11B40282235
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:20:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E7B01C20F47
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 02:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF62E10F7;
-	Fri, 27 Oct 2023 02:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC9D19C;
+	Fri, 27 Oct 2023 02:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SpN3OmnV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9/Qy9ML"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F7A1FAF
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:20:17 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B401A7;
-	Thu, 26 Oct 2023 19:20:16 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39QIojmh018893;
-	Thu, 26 Oct 2023 19:20:09 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=nD7HBJYTwzvlkastMQi/zaqa0SvNTZCAHTOred5r8No=;
- b=SpN3OmnVk54dVphRlFx2Yhuw6ZYtkS17xEGYpagz7Y3cAAMIycS7PK02JjBxVaz2PNvr
- 6yCg4CCds79vJC0avWhKXJy2SC4X+sHTV723zSexUz+04dJcQHIuTQ7D28KVmv/Rrucz
- maGGN9hyfuQ/4I3xyUsB7XCMVUW05kaLmF7+NxgqvW6dqKRCt3/fZeS6Cj1erR+nZ4A+
- N2UDFuNfavGfURdoB/A4mhmgawFdxFQmXyzYCaM+Hd5Mce6Y0bwRbHr5xmSmKpj4Bpi+
- dxgrSUXRvbhG1iLKboPAZqyXabuLRSNJT9AR7sBUd1W9O6jnOGXHqnYVlsNPtsA0CTK3 sQ== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3tywr81e1g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 26 Oct 2023 19:20:09 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 26 Oct
- 2023 19:20:07 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 26 Oct 2023 19:20:07 -0700
-Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id D85463F709B;
-	Thu, 26 Oct 2023 19:20:03 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <wojciech.drewek@intel.com>,
-        "Ratheesh Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH net v1 2/2] octeontx2-pf: Fix holes in error code
-Date: Fri, 27 Oct 2023 07:49:53 +0530
-Message-ID: <20231027021953.1819959-2-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231027021953.1819959-1-rkannoth@marvell.com>
-References: <20231027021953.1819959-1-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7252764A
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:41:19 +0000 (UTC)
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24FE7B0;
+	Thu, 26 Oct 2023 19:41:18 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id d2e1a72fcca58-6ba8eb7e581so349486b3a.0;
+        Thu, 26 Oct 2023 19:41:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698374477; x=1698979277; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4Y45Kg1FVvOUrUmxNTyFscKK00f1fFAimD2L0qeIY8U=;
+        b=l9/Qy9MLJRqKimW9NrRSf0xDjxeedftA+YAAuZPOAPcFguZNb9AUD+S25+Qlr60zeq
+         nzjmoxwdOQRv0Wo79T/5WWv1G9AcIDEta1E+Kdrmxr+yQKwWei8is7qQhjGGK709eX6I
+         pTtsF/hXZHl0yw3YNrLrFJEhLQq8MqxVuppwPWqX9trdt/8evC4wrQnuRrEaZjlXJx3r
+         NyBiREY/fJsIgkg0WiDsn27nwhQap/CxxIv90Q9Eyho3RHlv2/YEuRhmXzVIIlGxewbT
+         WgOosh8QXBX/QyO+hL/W2Kv/9bBwbr0bP2lgA1OEZgLE8JTwPW/5s/S26PLbh0eIRqz8
+         zsQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698374477; x=1698979277;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Y45Kg1FVvOUrUmxNTyFscKK00f1fFAimD2L0qeIY8U=;
+        b=VOX4IeQ5d47/vdWmcZ0vbRdHuT66AMC1xvL9OHwFfOdccNZtdAoRiKa/XA8r4J1Cdp
+         RM9TfesxyKH8OoZn3B9fAqgw3Z4GDsG8F5UzHpgYb3PMGE6T24+UvLAmlAE6CLkz8Kft
+         fJiwseiwghT5wegJ1NrdUQ3YmnuIoJeFCZzlUNyIJJdGck0vEcxWdwiTHcgZ52T89vKb
+         grnVUM/6FTOUfjDDqcDS9tbaieICmZDWVURRXuknZPTTnTkZD3tohbrKKE571wwfJbAD
+         IpVQqDjOlfsvb1hihG0NJNpqwvDe3h9Aa8R00IcUSEnx0UMIgDCXlVTzh7/eAUPu7xqn
+         B9Kg==
+X-Gm-Message-State: AOJu0YydnlhF5Bb5tHCfQQkkyXdDQUyvf8o0zM667EE1biYJTpYl0eDw
+	YTSFtFrVKz71peglJQWs6uw=
+X-Google-Smtp-Source: AGHT+IEdvyLE2DgnauF9a83HstUljP8iblHqKFnHxJKPWxoaD4Km4Z6EVpXrPAgNqUAmRCnnM75Sag==
+X-Received: by 2002:a05:6a21:7899:b0:14e:2c56:7b02 with SMTP id bf25-20020a056a21789900b0014e2c567b02mr1928136pzc.0.1698374477451;
+        Thu, 26 Oct 2023 19:41:17 -0700 (PDT)
+Received: from [127.0.0.1] (059149129201.ctinets.com. [59.149.129.201])
+        by smtp.gmail.com with ESMTPSA id e9-20020a170902d38900b001ca82a4a9c8sm366382pld.269.2023.10.26.19.41.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Oct 2023 19:41:16 -0700 (PDT)
+Message-ID: <0f6ebc50-06d6-4e3d-b296-1045b0255c8a@gmail.com>
+Date: Fri, 27 Oct 2023 10:41:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: npkMR9mJHvdaYCx5YFbWHzHSlR0X80mO
-X-Proofpoint-ORIG-GUID: npkMR9mJHvdaYCx5YFbWHzHSlR0X80mO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-26_22,2023-10-26_01,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: 9p: fix possible memory leak in p9_check_errors()
+Content-Language: en-US
+To: asmadeus@codewreck.org
+Cc: ericvh@kernel.org, lucho@ionkov.net, linux_oss@crudebyte.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jvrao@linux.vnet.ibm.com, v9fs@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231026092351.30572-1-hbh25y@gmail.com>
+ <ZTpTU8-1zn_P22QX@codewreck.org>
+From: Hangyu Hua <hbh25y@gmail.com>
+In-Reply-To: <ZTpTU8-1zn_P22QX@codewreck.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Error code strings are not getting printed properly
-due to holes. Print error code as well.
+On 26/10/2023 19:53, asmadeus@codewreck.org wrote:
+> 
+> Hangyu Hua wrote on Thu, Oct 26, 2023 at 05:23:51PM +0800:
+>> When p9pdu_readf is called with "s?d" attribute, it allocates a pointer
+>> that will store a string. But when p9pdu_readf() fails while handling "d"
+>> then this pointer will not be freed in p9_check_errors.
+> 
+> Right, that sounds correct to me.
+> 
+> Out of curiosity how did you notice this? The leak shouldn't happen with
+> any valid server.
 
-Fixes: 51afe9026d0c ("octeontx2-pf: NIX TX overwrites SQ_CTX_HW_S[SQ_INT]")
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+I just found that any attributes that require memory allocation are 
+prone to errors when mixed with ordinary attributes.
 
----
-ChangeLog:
+> 
+> This cannot break anything so I'll push this to -next tomorrow and
+> submit to Linus next week
 
-v0 -> v1: Splitted patch into two
----
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 80 +++++++++++--------
- 1 file changed, 46 insertions(+), 34 deletions(-)
+Agreed.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index 6daf4d58c25d..125fe231702a 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1193,31 +1193,32 @@ static char *nix_mnqerr_e_str[NIX_MNQERR_MAX] = {
- };
- 
- static char *nix_snd_status_e_str[NIX_SND_STATUS_MAX] =  {
--	"NIX_SND_STATUS_GOOD",
--	"NIX_SND_STATUS_SQ_CTX_FAULT",
--	"NIX_SND_STATUS_SQ_CTX_POISON",
--	"NIX_SND_STATUS_SQB_FAULT",
--	"NIX_SND_STATUS_SQB_POISON",
--	"NIX_SND_STATUS_HDR_ERR",
--	"NIX_SND_STATUS_EXT_ERR",
--	"NIX_SND_STATUS_JUMP_FAULT",
--	"NIX_SND_STATUS_JUMP_POISON",
--	"NIX_SND_STATUS_CRC_ERR",
--	"NIX_SND_STATUS_IMM_ERR",
--	"NIX_SND_STATUS_SG_ERR",
--	"NIX_SND_STATUS_MEM_ERR",
--	"NIX_SND_STATUS_INVALID_SUBDC",
--	"NIX_SND_STATUS_SUBDC_ORDER_ERR",
--	"NIX_SND_STATUS_DATA_FAULT",
--	"NIX_SND_STATUS_DATA_POISON",
--	"NIX_SND_STATUS_NPC_DROP_ACTION",
--	"NIX_SND_STATUS_LOCK_VIOL",
--	"NIX_SND_STATUS_NPC_UCAST_CHAN_ERR",
--	"NIX_SND_STATUS_NPC_MCAST_CHAN_ERR",
--	"NIX_SND_STATUS_NPC_MCAST_ABORT",
--	"NIX_SND_STATUS_NPC_VTAG_PTR_ERR",
--	"NIX_SND_STATUS_NPC_VTAG_SIZE_ERR",
--	"NIX_SND_STATUS_SEND_STATS_ERR",
-+	[NIX_SND_STATUS_GOOD] = "NIX_SND_STATUS_GOOD",
-+	[NIX_SND_STATUS_SQ_CTX_FAULT] = "NIX_SND_STATUS_SQ_CTX_FAULT",
-+	[NIX_SND_STATUS_SQ_CTX_POISON] = "NIX_SND_STATUS_SQ_CTX_POISON",
-+	[NIX_SND_STATUS_SQB_FAULT] = "NIX_SND_STATUS_SQB_FAULT",
-+	[NIX_SND_STATUS_SQB_POISON] = "NIX_SND_STATUS_SQB_POISON",
-+	[NIX_SND_STATUS_HDR_ERR] = "NIX_SND_STATUS_HDR_ERR",
-+	[NIX_SND_STATUS_EXT_ERR] = "NIX_SND_STATUS_EXT_ERR",
-+	[NIX_SND_STATUS_JUMP_FAULT] = "NIX_SND_STATUS_JUMP_FAULT",
-+	[NIX_SND_STATUS_JUMP_POISON] = "NIX_SND_STATUS_JUMP_POISON",
-+	[NIX_SND_STATUS_CRC_ERR] = "NIX_SND_STATUS_CRC_ERR",
-+	[NIX_SND_STATUS_IMM_ERR] = "NIX_SND_STATUS_IMM_ERR",
-+	[NIX_SND_STATUS_SG_ERR] = "NIX_SND_STATUS_SG_ERR",
-+	[NIX_SND_STATUS_MEM_ERR] = "NIX_SND_STATUS_MEM_ERR",
-+	[NIX_SND_STATUS_INVALID_SUBDC] = "NIX_SND_STATUS_INVALID_SUBDC",
-+	[NIX_SND_STATUS_SUBDC_ORDER_ERR] = "NIX_SND_STATUS_SUBDC_ORDER_ERR",
-+	[NIX_SND_STATUS_DATA_FAULT] = "NIX_SND_STATUS_DATA_FAULT",
-+	[NIX_SND_STATUS_DATA_POISON] = "NIX_SND_STATUS_DATA_POISON",
-+	[NIX_SND_STATUS_NPC_DROP_ACTION] = "NIX_SND_STATUS_NPC_DROP_ACTION",
-+	[NIX_SND_STATUS_LOCK_VIOL] = "NIX_SND_STATUS_LOCK_VIOL",
-+	[NIX_SND_STATUS_NPC_UCAST_CHAN_ERR] = "NIX_SND_STAT_NPC_UCAST_CHAN_ERR",
-+	[NIX_SND_STATUS_NPC_MCAST_CHAN_ERR] = "NIX_SND_STAT_NPC_MCAST_CHAN_ERR",
-+	[NIX_SND_STATUS_NPC_MCAST_ABORT] = "NIX_SND_STATUS_NPC_MCAST_ABORT",
-+	[NIX_SND_STATUS_NPC_VTAG_PTR_ERR] = "NIX_SND_STATUS_NPC_VTAG_PTR_ERR",
-+	[NIX_SND_STATUS_NPC_VTAG_SIZE_ERR] = "NIX_SND_STATUS_NPC_VTAG_SIZE_ERR",
-+	[NIX_SND_STATUS_SEND_MEM_FAULT] = "NIX_SND_STATUS_SEND_MEM_FAULT",
-+	[NIX_SND_STATUS_SEND_STATS_ERR] = "NIX_SND_STATUS_SEND_STATS_ERR",
- };
- 
- static irqreturn_t otx2_q_intr_handler(int irq, void *data)
-@@ -1238,14 +1239,16 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
- 			continue;
- 
- 		if (val & BIT_ULL(42)) {
--			netdev_err(pf->netdev, "CQ%lld: error reading NIX_LF_CQ_OP_INT, NIX_LF_ERR_INT 0x%llx\n",
-+			netdev_err(pf->netdev,
-+				   "CQ%lld: error reading NIX_LF_CQ_OP_INT, NIX_LF_ERR_INT 0x%llx\n",
- 				   qidx, otx2_read64(pf, NIX_LF_ERR_INT));
- 		} else {
- 			if (val & BIT_ULL(NIX_CQERRINT_DOOR_ERR))
- 				netdev_err(pf->netdev, "CQ%lld: Doorbell error",
- 					   qidx);
- 			if (val & BIT_ULL(NIX_CQERRINT_CQE_FAULT))
--				netdev_err(pf->netdev, "CQ%lld: Memory fault on CQE write to LLC/DRAM",
-+				netdev_err(pf->netdev,
-+					   "CQ%lld: Memory fault on CQE write to LLC/DRAM",
- 					   qidx);
- 		}
- 
-@@ -1272,7 +1275,8 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
- 			     (val & NIX_SQINT_BITS));
- 
- 		if (val & BIT_ULL(42)) {
--			netdev_err(pf->netdev, "SQ%lld: error reading NIX_LF_SQ_OP_INT, NIX_LF_ERR_INT 0x%llx\n",
-+			netdev_err(pf->netdev,
-+				   "SQ%lld: error reading NIX_LF_SQ_OP_INT, NIX_LF_ERR_INT 0x%llx\n",
- 				   qidx, otx2_read64(pf, NIX_LF_ERR_INT));
- 			goto done;
- 		}
-@@ -1282,8 +1286,11 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
- 			goto chk_mnq_err_dbg;
- 
- 		sq_op_err_code = FIELD_GET(GENMASK(7, 0), sq_op_err_dbg);
--		netdev_err(pf->netdev, "SQ%lld: NIX_LF_SQ_OP_ERR_DBG(%llx)  err=%s\n",
--			   qidx, sq_op_err_dbg, nix_sqoperr_e_str[sq_op_err_code]);
-+		netdev_err(pf->netdev,
-+			   "SQ%lld: NIX_LF_SQ_OP_ERR_DBG(0x%llx)  err=%s(%#x)\n",
-+			   qidx, sq_op_err_dbg,
-+			   nix_sqoperr_e_str[sq_op_err_code],
-+			   sq_op_err_code);
- 
- 		otx2_write64(pf, NIX_LF_SQ_OP_ERR_DBG, BIT_ULL(44));
- 
-@@ -1300,16 +1307,21 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
- 			goto chk_snd_err_dbg;
- 
- 		mnq_err_code = FIELD_GET(GENMASK(7, 0), mnq_err_dbg);
--		netdev_err(pf->netdev, "SQ%lld: NIX_LF_MNQ_ERR_DBG(%llx)  err=%s\n",
--			   qidx, mnq_err_dbg,  nix_mnqerr_e_str[mnq_err_code]);
-+		netdev_err(pf->netdev,
-+			   "SQ%lld: NIX_LF_MNQ_ERR_DBG(0x%llx)  err=%s(%#x)\n",
-+			   qidx, mnq_err_dbg,  nix_mnqerr_e_str[mnq_err_code],
-+			   mnq_err_code);
- 		otx2_write64(pf, NIX_LF_MNQ_ERR_DBG, BIT_ULL(44));
- 
- chk_snd_err_dbg:
- 		snd_err_dbg = otx2_read64(pf, NIX_LF_SEND_ERR_DBG);
- 		if (snd_err_dbg & BIT(44)) {
- 			snd_err_code = FIELD_GET(GENMASK(7, 0), snd_err_dbg);
--			netdev_err(pf->netdev, "SQ%lld: NIX_LF_SND_ERR_DBG:0x%llx err=%s\n",
--				   qidx, snd_err_dbg, nix_snd_status_e_str[snd_err_code]);
-+			netdev_err(pf->netdev,
-+				   "SQ%lld: NIX_LF_SND_ERR_DBG:0x%llx err=%s(%#x)\n",
-+				   qidx, snd_err_dbg,
-+				   nix_snd_status_e_str[snd_err_code],
-+				   snd_err_code);
- 			otx2_write64(pf, NIX_LF_SEND_ERR_DBG, BIT_ULL(44));
- 		}
- 
--- 
-2.25.1
+> 
+>> Fixes: ca41bb3e21d7 ("[net/9p] Handle Zero Copy TREAD/RERROR case in !dotl case.")
+> 
+> This commit moves this code a bit, but the p9pdu_readf call predates
+> it -- in this case the Fixes tag is probably not useful; this affects
+> all maintained kernels.
+> 
+>> Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
+>> ---
+>>   net/9p/client.c | 7 +++++--
+>>   1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/9p/client.c b/net/9p/client.c
+>> index 86bbc7147fc1..6c7cd765b714 100644
+>> --- a/net/9p/client.c
+>> +++ b/net/9p/client.c
+>> @@ -540,12 +540,15 @@ static int p9_check_errors(struct p9_client *c, struct p9_req_t *req)
+>>   		return 0;
+>>   
+>>   	if (!p9_is_proto_dotl(c)) {
+>> -		char *ename;
+>> +		char *ename = NULL;
+>>   
+>>   		err = p9pdu_readf(&req->rc, c->proto_version, "s?d",
+>>   				  &ename, &ecode);
+>> -		if (err)
+>> +		if (err) {
+>> +			if (ename != NULL)
+>> +				kfree(ename);
+> 
+> Don't check for NULL before kfree - kfree does it.
+> If that's the only remark you get I can fix it when applying the commit
+> on my side.
 
+I get it. I will revise it based on your and Christian's comments and 
+send a v2.
+
+Thanks,
+Hangyu
+
+> 
+> 
+>>   			goto out_err;
+>> +		}
+>>   
+>>   		if (p9_is_proto_dotu(c) && ecode < 512)
+>>   			err = -ecode;
+> 
 
