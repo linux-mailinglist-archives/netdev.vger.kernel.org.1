@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-44708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D627D94EA
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:14:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 03FA27D94EB
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:14:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B249C28231B
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:14:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B20D02823AD
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:14:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A8F182D2;
-	Fri, 27 Oct 2023 10:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FCE418649;
+	Fri, 27 Oct 2023 10:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="l6vh/qoA"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ZE6Ixxrw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E831802F
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:14:16 +0000 (UTC)
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0ACD1B6
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:14 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-53e08e439c7so3217777a12.0
-        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE3318049
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:14:18 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43687194
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:16 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-53dd752685fso2919643a12.3
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698401653; x=1699006453; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698401654; x=1699006454; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JHwNAGhvr8qblRJ7IY3DURpvARsJQGPAY0lSUzSqs+I=;
-        b=l6vh/qoAuguvIyh/Wfoq8iHb6v9YYXhSmekWv1ZBtKeyGECHrZmYgFY4r/mNN6efkd
-         yJ0MvVu7qWZQIT1PGJuDAumL+qgBBmZ8XbaJUKNJW48jSoLQ8WZV7HmvHPjVYBcMQ4ko
-         TOM0/Rj0wgxrGluMtUlIYliqV5VSTJEFN0MKOvGEiLXLsDw0f9nPGZHTzzcMoum4C4ua
-         m9Bj8x+2Usn9+NMsKKmFgY/7ynJ227wSf8bui6kP4gdNnNFFchI9R+nflAAOU/elK1Gj
-         vv6abRKFOB5kqjyY3E9xyuFONZzmXvE823dEjWkt5BxFxdUhrFkNLiD9M6Oif9SyBIbJ
-         Z9Rw==
+        bh=H/iH+OcilrDlqznkxaiZFecCShpMj3BOZHOw3HA1hkM=;
+        b=ZE6IxxrwL4vFhFzcBh+cxu3rR3X9OyFFcRpZPV3N4SHaJY51cazmbFXqExKqsl553p
+         J+2ivV8j+pXJ/oNGswgMnV+0mnsM9RpwYYxO8lXc4z/HNVE/3KjQmj1zjWnp7Mb/b5rT
+         MxtgF//IccJBzOpYOFpCzSJn7pYm65IJffA5mF1tAc7Js2hVuCLCK6ado1IB3797UD+Q
+         z59EL9l+OvAdVN4Qil6hAXCTPss6479PZUsvsDbOBak0iqKHlQaMlsB849iB6FA6tQXu
+         GJtqF4diFeTrC/g94TqFg1qIl4vLTvps+9Hp10I7OznRO3zwcZBOt1Lmny/3b0NSOLK/
+         2V8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698401653; x=1699006453;
+        d=1e100.net; s=20230601; t=1698401654; x=1699006454;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JHwNAGhvr8qblRJ7IY3DURpvARsJQGPAY0lSUzSqs+I=;
-        b=NVxRfh60yYRshvtBxvbPtl7DrLLp1jwJwy0qB9OrCTjrz9ydYJAbm4ndpj9zs9VQTa
-         qRgWGSz+X4C8U9SjiLRZHRIyNHPR+LGbcktUwClq9ljfcHOauAz8Bty74uEI7kRTtGaA
-         k8CmSJlYl7G90atvz4J9a/U8mhWMSu/LUgF3Dtw5N3O2hfUluory52LVNmX90+9QcFKH
-         07Uyp6CaniU84UpN0Ayl0P6zHbWKZV+mCOziwWWZn+pBRIZUj9YiHW/GWEVohw8/Zqq0
-         4XMitPv06IaA/Ne8vdyVWHSkuU0GFqPJeY7GcZL3fOQ6G2GImKtCAn75OoPY8D85De8X
-         MOXQ==
-X-Gm-Message-State: AOJu0YwcpvBdf6R9vV7vsvi+lwV4sUb+Jr2mpQPNkBvBXye+zWGAUVOb
-	ePz0iitFKtyvTA8lfzo3w53BbCKBbfGWxRmR06MFwg==
-X-Google-Smtp-Source: AGHT+IGC1oK7t60uQgZw0mTW4OoGk2YkB8HtZBFetqLFcMwCKkM4EZ2lZLWjZvUGwnBc5jcIbHj8Ig==
-X-Received: by 2002:a17:907:608c:b0:9c4:41c9:6ac6 with SMTP id ht12-20020a170907608c00b009c441c96ac6mr1569954ejc.33.1698401653104;
-        Fri, 27 Oct 2023 03:14:13 -0700 (PDT)
+        bh=H/iH+OcilrDlqznkxaiZFecCShpMj3BOZHOw3HA1hkM=;
+        b=SfuozUH0OEDen5+Z1WqOl3Q1+fgYENIiLJbtXfmlAV1LqbkxIg1TXu8TdYzMcYex1c
+         fuyT3p4QHhz7jRnXCEKmfkvdZvAopeVXbi3huboJR1Le5hmJr1rrBOzwMcds1tbfgqWC
+         wPySfdCJpLT/8mWbB6ucKTKUG25MfLT/rjXYcOdoHB/fIKki6FO23g4NemUodvzLSo8g
+         11q54Y5KNeGZ7Sv0ZE/rby+U/tV2l+3lmX/Phwkzr99RfnDZVCshGzD4wZxFhFkcdIlH
+         nHulRRk294Jbjvv5pGq6wxNA2RWS+Vb7Pvz8nOIvYbcLe1eGC1quTkDVp9MHDTFJ7pAs
+         d7Fw==
+X-Gm-Message-State: AOJu0YxH7PDs+J0UHlCkbZkLCFshiZpGRBoPdEQwMCzGvQ4U0RoLjMvq
+	yea46UqVQ3NVbgDPhqI0XHbswTxi2/RwFPvvrhUhwg==
+X-Google-Smtp-Source: AGHT+IHGCGA6XN4wVXikAvl1hqDGROUKAduEMQImPHQqauOkxbGfFrQ7EDWufY4Fki0Uo+IAITAxGw==
+X-Received: by 2002:aa7:d4d3:0:b0:540:3286:d2e8 with SMTP id t19-20020aa7d4d3000000b005403286d2e8mr1877809edr.18.1698401654708;
+        Fri, 27 Oct 2023 03:14:14 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id s8-20020a1709066c8800b009ad7fc17b2asm959132ejr.224.2023.10.27.03.14.12
+        by smtp.gmail.com with ESMTPSA id u30-20020a50a41e000000b0052febc781bfsm1034163edb.36.2023.10.27.03.14.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Oct 2023 03:14:12 -0700 (PDT)
+        Fri, 27 Oct 2023 03:14:14 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: stephen@networkplumber.org,
 	dsahern@gmail.com,
 	daniel.machon@microchip.com
-Subject: [patch net-next v4 4/7] devlink: extend pr_out_nested_handle() to print object
-Date: Fri, 27 Oct 2023 12:14:00 +0200
-Message-ID: <20231027101403.958745-5-jiri@resnulli.us>
+Subject: [patch net-next v4 5/7] devlink: introduce support for netns id for nested handle
+Date: Fri, 27 Oct 2023 12:14:01 +0200
+Message-ID: <20231027101403.958745-6-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231027101403.958745-1-jiri@resnulli.us>
 References: <20231027101403.958745-1-jiri@resnulli.us>
@@ -79,95 +79,128 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-For existing pr_out_nested_handle() user (line card), the output stays
-the same. For the new users, introduce __pr_out_nested_handle()
-to allow to print devlink instance as object allowing to carry
-attributes in it (like netns).
-
-Note that as __pr_out_handle_start() and pr_out_handle_end() are newly
-used, the function is moved below the definitions.
+Nested handle may contain DEVLINK_ATTR_NETNS_ID attribute that indicates
+the network namespace where the nested devlink instance resides. Process
+this converting to netns name if possible and print to user.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
-v3->v4:
-- rebased on top of snprintf patch
 v2->v3:
-- new patch
+- moved netns_name_by_id() into lib/namespace.c
+- s/netns_name_by_id/netns_name_from_id/
+- rebased on top of new patch "devlink: extend pr_out_nested_handle() to
+  print object"
+v1->v2:
+- use previously introduced netns_netnsid_from_name() instead of code
+  duplication for the same function.
+- s/nesns_name_by_id_func/netns_name_by_id_func/
 ---
- devlink/devlink.c | 53 +++++++++++++++++++++++++++++------------------
- 1 file changed, 33 insertions(+), 20 deletions(-)
+ devlink/devlink.c   | 23 ++++++++++++++++++++++-
+ include/namespace.h |  1 +
+ lib/namespace.c     | 34 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 57 insertions(+), 1 deletion(-)
 
 diff --git a/devlink/devlink.c b/devlink/devlink.c
-index 90f6f8ff90e2..f06f3069e80a 100644
+index f06f3069e80a..f276026b9ba7 100644
 --- a/devlink/devlink.c
 +++ b/devlink/devlink.c
-@@ -2747,26 +2747,6 @@ static bool should_arr_last_handle_end(struct dl *dl, const char *bus_name,
- 	       !cmp_arr_last_handle(dl, bus_name, dev_name);
- }
+@@ -24,6 +24,7 @@
+ #include <linux/genetlink.h>
+ #include <linux/devlink.h>
+ #include <linux/netlink.h>
++#include <linux/net_namespace.h>
+ #include <libmnl/libmnl.h>
+ #include <netinet/ether.h>
+ #include <sys/select.h>
+@@ -722,6 +723,7 @@ static const enum mnl_attr_data_type devlink_policy[DEVLINK_ATTR_MAX + 1] = {
+ 	[DEVLINK_ATTR_LINECARD_SUPPORTED_TYPES] = MNL_TYPE_NESTED,
+ 	[DEVLINK_ATTR_NESTED_DEVLINK] = MNL_TYPE_NESTED,
+ 	[DEVLINK_ATTR_SELFTESTS] = MNL_TYPE_NESTED,
++	[DEVLINK_ATTR_NETNS_ID] = MNL_TYPE_U32,
+ };
  
--static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
--{
--	struct nlattr *tb[DEVLINK_ATTR_MAX + 1] = {};
--	char buf[64];
--	int err;
--
--	err = mnl_attr_parse_nested(nla_nested_dl, attr_cb, tb);
--	if (err != MNL_CB_OK)
--		return;
--
--	if (!tb[DEVLINK_ATTR_BUS_NAME] ||
--	    !tb[DEVLINK_ATTR_DEV_NAME])
--		return;
--
--	snprintf(buf, sizeof(buf), "%s/%s",
--		 mnl_attr_get_str(tb[DEVLINK_ATTR_BUS_NAME]),
--		 mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]));
--	print_string(PRINT_ANY, "nested_devlink", " nested_devlink %s", buf);
--}
--
- static void __pr_out_handle_start(struct dl *dl, struct nlattr **tb,
- 				  bool content, bool array)
- {
-@@ -2862,6 +2842,39 @@ static void pr_out_selftests_handle_end(struct dl *dl)
- 		__pr_out_newline();
- }
+ static const enum mnl_attr_data_type
+@@ -2866,7 +2868,26 @@ static void __pr_out_nested_handle(struct dl *dl, struct nlattr *nla_nested_dl,
+ 		return;
+ 	}
  
-+static void __pr_out_nested_handle(struct dl *dl, struct nlattr *nla_nested_dl,
-+				   bool is_object)
-+{
-+	struct nlattr *tb[DEVLINK_ATTR_MAX + 1] = {};
-+	int err;
+-	__pr_out_handle_start(dl, tb, false, false);
++	__pr_out_handle_start(dl, tb, tb[DEVLINK_ATTR_NETNS_ID], false);
++	if (tb[DEVLINK_ATTR_NETNS_ID]) {
++		int32_t id = mnl_attr_get_u32(tb[DEVLINK_ATTR_NETNS_ID]);
 +
-+	err = mnl_attr_parse_nested(nla_nested_dl, attr_cb, tb);
-+	if (err != MNL_CB_OK)
-+		return;
++		if (id >= 0) {
++			char *name = netns_name_from_id(id);
 +
-+	if (!tb[DEVLINK_ATTR_BUS_NAME] ||
-+	    !tb[DEVLINK_ATTR_DEV_NAME])
-+		return;
-+
-+	if (!is_object) {
-+		char buf[64];
-+
-+		snprintf(buf, sizeof(buf), "%s/%s",
-+			 mnl_attr_get_str(tb[DEVLINK_ATTR_BUS_NAME]),
-+			 mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]));
-+		print_string(PRINT_ANY, "nested_devlink", " nested_devlink %s", buf);
-+		return;
++			if (name) {
++				print_string(PRINT_ANY, "netns",
++					     " netns %s", name);
++				free(name);
++			} else {
++				print_int(PRINT_ANY, "netnsid",
++					  " netnsid %d", id);
++			}
++		} else {
++			print_string(PRINT_FP, NULL, " netnsid %s", "unknown");
++			print_int(PRINT_JSON, "netnsid", NULL, id);
++		}
 +	}
+ 	pr_out_handle_end(dl);
+ }
+ 
+diff --git a/include/namespace.h b/include/namespace.h
+index 6483630b8082..4ae294749962 100644
+--- a/include/namespace.h
++++ b/include/namespace.h
+@@ -59,5 +59,6 @@ struct netns_func {
+ };
+ 
+ int netns_id_from_name(struct rtnl_handle *rtnl, const char *name);
++char *netns_name_from_id(int32_t id);
+ 
+ #endif /* __NAMESPACE_H__ */
+diff --git a/lib/namespace.c b/lib/namespace.c
+index f03f4bbabceb..d3aeb9658e73 100644
+--- a/lib/namespace.c
++++ b/lib/namespace.c
+@@ -188,3 +188,37 @@ out:
+ 	free(answer);
+ 	return ret;
+ }
 +
-+	__pr_out_handle_start(dl, tb, false, false);
-+	pr_out_handle_end(dl);
-+}
++struct netns_name_from_id_ctx {
++	int32_t id;
++	char *name;
++	struct rtnl_handle *rth;
++};
 +
-+static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
++static int netns_name_from_id_func(char *nsname, void *arg)
 +{
-+	__pr_out_nested_handle(NULL, nla_nested_dl, false);
++	struct netns_name_from_id_ctx *ctx = arg;
++	int32_t ret;
++
++	ret = netns_id_from_name(ctx->rth, nsname);
++	if (ret < 0 || ret != ctx->id)
++		return 0;
++	ctx->name = strdup(nsname);
++	return 1;
 +}
 +
- static bool cmp_arr_last_port_handle(struct dl *dl, const char *bus_name,
- 				     const char *dev_name, uint32_t port_index)
- {
++char *netns_name_from_id(int32_t id)
++{
++	struct rtnl_handle rth;
++	struct netns_name_from_id_ctx ctx = {
++		.id = id,
++		.rth = &rth,
++	};
++
++	if (rtnl_open(&rth, 0) < 0)
++		return NULL;
++	netns_foreach(netns_name_from_id_func, &ctx);
++	rtnl_close(&rth);
++
++	return ctx.name;
++}
 -- 
 2.41.0
 
