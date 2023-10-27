@@ -1,188 +1,253 @@
-Return-Path: <netdev+bounces-44767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE077D9A1D
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 15:37:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D10227D9A77
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 15:52:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68C2C28243B
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:36:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9745B213A3
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:52:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C301F958;
-	Fri, 27 Oct 2023 13:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6522A28DB2;
+	Fri, 27 Oct 2023 13:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="jOdiNrd0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4039C200A5
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 13:36:30 +0000 (UTC)
-Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76FD0D5F
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 06:36:27 -0700 (PDT)
-Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-3b2e2487c6bso2799257b6e.2
-        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 06:36:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698413786; x=1699018586;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=K2d7LjPPHT/lVJIo2H2QqG7uP94vUPzZNIrAqJouvjs=;
-        b=e8Aflxbwiyp+mwhrSe3z7fVwj+4rOLeWtqCqx84VtpMDeGY4NxYwrIKNHZb4+CzXyG
-         4Bd27OSo7qL6oinqUvIUVZN0Z1gCAfX9fOXjLkvZcaaka7/CqpOm7T6cGaiYj+kE86Ba
-         RUwIR/DtE1oGq+91Kp+w8dlW6uKjb8ta8H3mz6xGX3JMBLUnzBkpEz5XKufEyTTsmAgl
-         AQAB25CmIlNraW9syMXd01ChNIlq1bhykXImXTh84LJcfH09GdT8DpmdD1oLD6Hz6ZEu
-         JwFe+Jp/0cO1G3ctt29dUdVNkUgXAbGvBXy3nEHYpq8cP12QXhuXjqy0br5Z6R+6Q0We
-         TKtg==
-X-Gm-Message-State: AOJu0YxyfHrl1N2kaSzhg5e+vRd9shirU5Dzu2CnKWC4nHVCp79oQ7ds
-	HYKqgdqWwrN7JM1wIDFlc04+e4VMEDHHNfWwFyt8BfPfEwdd
-X-Google-Smtp-Source: AGHT+IGH491s58SWM3l3CcKu6CD1EgfAugYCkKz67enbaOewDHnb3taxKVf1asOkIv0olghM0iuGFO9AcU5AJRXqEM28TnQpoc9Y
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA631EB28;
+	Fri, 27 Oct 2023 13:51:53 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE41118A;
+	Fri, 27 Oct 2023 06:51:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=bZFuNIvNr+O7sWZ0ED5meKlY7g9oTmwwM9BLzW/byYY=; b=jOdiNrd0hsEbFcTm51HsecGzeq
+	Vm9TztWuMZOoJDbHvDdCV1rAVVtC5kL7BFuZy3Yz4y8vNwnPMsJW65Bk7eT1nUBy9rwqHuuGPW9KF
+	zCN55FX+xrWf5iFDZuGr1XlKhsBvhAxMuKNuIC9ZTQPqJHHjU8AuhaB8vc6PROaA9KLJ8PbFWyGYE
+	iMe1H8wMgYRGgyuDYDGNAeDpqZHFI+dt3GzdCZop4YHUKxDMC2XgdwHMYp1s2Y3kJdQ5qzLrJlaFk
+	9S9FeIQjSSW8J/7oPw9qdb/c9GIIJ2zM3dFCUUe69MxgmYd/BV+/24rUx4qgXRTmvnAVH49B0bnGL
+	KcaLzRgA==;
+Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qwNFc-000HL6-2U; Fri, 27 Oct 2023 15:51:48 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: kuba@kernel.org
+Cc: idosch@idosch.org,
+	jhs@mojatatu.com,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: [PATCH net-next] net, sched: Fix SKB_NOT_DROPPED_YET splat under debug config
+Date: Fri, 27 Oct 2023 15:51:42 +0200
+Message-Id: <20231027135142.11555-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:2118:b0:3ab:84f0:b4a5 with SMTP id
- r24-20020a056808211800b003ab84f0b4a5mr867739oiw.3.1698413786470; Fri, 27 Oct
- 2023 06:36:26 -0700 (PDT)
-Date: Fri, 27 Oct 2023 06:36:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006c9d500608b2c62b@google.com>
-Subject: [syzbot] [x25?] [reiserfs?] general protection fault in lapbeth_data_transmit
-From: syzbot <syzbot+6062afbf92a14f75d88b@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-x25@vger.kernel.org, ms@dev.tdt.de, netdev@vger.kernel.org, 
-	pabeni@redhat.com, reiserfs-devel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27074/Fri Oct 27 09:58:36 2023)
 
-Hello,
+Ido reported:
 
-syzbot found the following issue on:
+  [...] getting the following splat [1] with CONFIG_DEBUG_NET=y and this
+  reproducer [2]. Problem seems to be that classifiers clear 'struct
+  tcf_result::drop_reason', thereby triggering the warning in
+  __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0). [...]
 
-HEAD commit:    1b29d271614a Merge tag 'staging-6.4-rc7' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11028640a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ac246111fb601aec
-dashboard link: https://syzkaller.appspot.com/bug?extid=6062afbf92a14f75d88b
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=150a0f73280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=107fcaff280000
+  [1]
+  WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x38/0x130
+  Modules linked in:
+  CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d9582e0 #682
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc37 04/01/2014
+  RIP: 0010:kfree_skb_reason+0x38/0x130
+  [...]
+  Call Trace:
+   <IRQ>
+   __netif_receive_skb_core.constprop.0+0x837/0xdb0
+   __netif_receive_skb_one_core+0x3c/0x70
+   process_backlog+0x95/0x130
+   __napi_poll+0x25/0x1b0
+   net_rx_action+0x29b/0x310
+   __do_softirq+0xc0/0x29b
+   do_softirq+0x43/0x60
+   </IRQ>
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/16519d7a3fc8/disk-1b29d271.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d2cd6e97f1df/vmlinux-1b29d271.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a7781abe10c9/bzImage-1b29d271.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/5b429fa9e0f3/mount_0.gz
+  [2]
+  #!/bin/bash
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6062afbf92a14f75d88b@syzkaller.appspotmail.com
+  ip link add name veth0 type veth peer name veth1
+  ip link set dev veth0 up
+  ip link set dev veth1 up
+  tc qdisc add dev veth1 clsact
+  tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:22:33:44:55 action drop
+  mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
 
-general protection fault, probably for non-canonical address 0xdffffc0011ad8e6f: 0000 [#1] PREEMPT SMP KASAN
-KASAN: probably user-memory-access in range [0x000000008d6c7378-0x000000008d6c737f]
-CPU: 0 PID: 4991 Comm: syz-executor335 Not tainted 6.4.0-rc6-syzkaller-00269-g1b29d271614a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-RIP: 0010:dev_hard_header include/linux/netdevice.h:3137 [inline]
-RIP: 0010:lapbeth_data_transmit+0x245/0x360 drivers/net/wan/lapbether.c:257
-Code: 74 08 3c 01 0f 8e 97 00 00 00 49 8d bc 24 38 02 00 00 66 89 9d b8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 c6 00 00 00 49 8b 9c 24 38 02 00 00 48 85 db 74
-RSP: 0018:ffffc90000007c20 EFLAGS: 00010216
-RAX: dffffc0000000000 RBX: 0000000000000012 RCX: 0000000000000003
-RDX: 0000000011ad8e6f RSI: ffffffff8807bdbb RDI: 000000008d6c7378
-RBP: ffff8880223bddc0 R08: 0000000000000005 R09: 0000000000000001
-R10: 0000000000000001 R11: 0000000000094001 R12: 000000008d6c7140
-R13: 0000000000000000 R14: ffff888023302a14 R15: 0000000000000000
-FS:  00005555563323c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055727dd5a800 CR3: 000000002921e000 CR4: 0000000000350ef0
-Call Trace:
- <IRQ>
- lapb_data_transmit+0x93/0xc0 net/lapb/lapb_iface.c:447
- lapb_transmit_buffer+0x187/0x3a0 net/lapb/lapb_out.c:149
- lapb_send_control+0x1cb/0x370 net/lapb/lapb_subr.c:251
- lapb_t1timer_expiry+0x5e0/0x8f0 net/lapb/lapb_timer.c:142
- call_timer_fn+0x1a0/0x580 kernel/time/timer.c:1700
- expire_timers+0x29b/0x4b0 kernel/time/timer.c:1751
- __run_timers kernel/time/timer.c:2022 [inline]
- __run_timers kernel/time/timer.c:1995 [inline]
- run_timer_softirq+0x326/0x910 kernel/time/timer.c:2035
- __do_softirq+0x1d4/0x905 kernel/softirq.c:571
- invoke_softirq kernel/softirq.c:445 [inline]
- __irq_exit_rcu+0x114/0x190 kernel/softirq.c:650
- irq_exit_rcu+0x9/0x20 kernel/softirq.c:662
- sysvec_apic_timer_interrupt+0x97/0xc0 arch/x86/kernel/apic/apic.c:1106
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:645
-RIP: 0010:memmove+0x4f/0x1b0 arch/x86/lib/memmove_64.S:69
-Code: 0f 1f 44 00 00 48 81 fa a8 02 00 00 72 05 40 38 fe 74 48 48 83 ea 20 48 83 ea 20 4c 8b 1e 4c 8b 56 08 4c 8b 4e 10 4c 8b 46 18 <48> 8d 76 20 4c 89 1f 4c 89 57 08 4c 89 4f 10 4c 89 47 18 48 8d 7f
-RSP: 0018:ffffc90003abefb0 EFLAGS: 00000286
-RAX: ffff888073551fb4 RBX: 0000000000000002 RCX: 1ffff1100e6aa201
-RDX: fffffffff9171f60 RSI: ffff88807a3dffe4 RDI: ffff88807a3dfff4
-RBP: 0000000000000020 R08: 7a3e0c8000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000001
-R13: 0000000000000000 R14: ffff888073551fa4 R15: 0000000000000010
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:dev_hard_header include/linux/netdevice.h:3137 [inline]
-RIP: 0010:lapbeth_data_transmit+0x245/0x360 drivers/net/wan/lapbether.c:257
-Code: 74 08 3c 01 0f 8e 97 00 00 00 49 8d bc 24 38 02 00 00 66 89 9d b8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 c6 00 00 00 49 8b 9c 24 38 02 00 00 48 85 db 74
-RSP: 0018:ffffc90000007c20 EFLAGS: 00010216
+What happens is that inside most classifiers the tcf_result is copied over
+from a filter template e.g. *res = f->res which then implicitly overrides
+the prior SKB_DROP_REASON_TC_{INGRESS,EGRESS} default drop code which was
+set via sch_handle_{ingress,egress}() for kfree_skb_reason().
 
-RAX: dffffc0000000000 RBX: 0000000000000012 RCX: 0000000000000003
-RDX: 0000000011ad8e6f RSI: ffffffff8807bdbb RDI: 000000008d6c7378
-RBP: ffff8880223bddc0 R08: 0000000000000005 R09: 0000000000000001
-R10: 0000000000000001 R11: 0000000000094001 R12: 000000008d6c7140
-R13: 0000000000000000 R14: ffff888023302a14 R15: 0000000000000000
-FS:  00005555563323c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055727dd5a800 CR3: 000000002921e000 CR4: 0000000000350ef0
-----------------
-Code disassembly (best guess):
-   0:	74 08                	je     0xa
-   2:	3c 01                	cmp    $0x1,%al
-   4:	0f 8e 97 00 00 00    	jle    0xa1
-   a:	49 8d bc 24 38 02 00 	lea    0x238(%r12),%rdi
-  11:	00
-  12:	66 89 9d b8 00 00 00 	mov    %bx,0xb8(%rbp)
-  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  20:	fc ff df
-  23:	48 89 fa             	mov    %rdi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2e:	0f 85 c6 00 00 00    	jne    0xfa
-  34:	49 8b 9c 24 38 02 00 	mov    0x238(%r12),%rbx
-  3b:	00
-  3c:	48 85 db             	test   %rbx,%rbx
-  3f:	74                   	.byte 0x74
+Add a small helper tcf_set_result() and convert classifiers over to it.
+The latter leaves the drop code intact and classifiers, actions as well
+as the action engine in tcf_exts_exec() can then in future make use of
+tcf_set_drop_reason(), too.
 
+Tested that the splat is fixed under CONFIG_DEBUG_NET=y with the repro.
 
+Fixes: 54a59aed395c ("net, sched: Make tc-related drop reason more flexible")
+Reported-by: Ido Schimmel <idosch@idosch.org>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Link: https://lore.kernel.org/netdev/ZTjY959R+AFXf3Xy@shredder
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ include/net/pkt_cls.h    | 12 ++++++++++++
+ net/sched/cls_basic.c    |  2 +-
+ net/sched/cls_bpf.c      |  2 +-
+ net/sched/cls_flower.c   |  2 +-
+ net/sched/cls_fw.c       |  2 +-
+ net/sched/cls_matchall.c |  2 +-
+ net/sched/cls_route.c    |  4 ++--
+ net/sched/cls_u32.c      |  2 +-
+ 8 files changed, 20 insertions(+), 8 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+index a76c9171db0e..31d8e8587824 100644
+--- a/include/net/pkt_cls.h
++++ b/include/net/pkt_cls.h
+@@ -160,6 +160,18 @@ static inline void tcf_set_drop_reason(struct tcf_result *res,
+ 	res->drop_reason = reason;
+ }
+ 
++static inline void tcf_set_result(struct tcf_result *to,
++				  const struct tcf_result *from)
++{
++	/* tcf_result's drop_reason which is the last member must be
++	 * preserved and cannot be copied from the cls'es tcf_result
++	 * template given this is carried all the way and potentially
++	 * set to a concrete tc drop reason upon error or intentional
++	 * drop. See tcf_set_drop_reason() locations.
++	 */
++	memcpy(to, from, offsetof(typeof(*to), drop_reason));
++}
++
+ static inline void
+ __tcf_bind_filter(struct Qdisc *q, struct tcf_result *r, unsigned long base)
+ {
+diff --git a/net/sched/cls_basic.c b/net/sched/cls_basic.c
+index 1b92c33b5f81..d7ead3fc3c45 100644
+--- a/net/sched/cls_basic.c
++++ b/net/sched/cls_basic.c
+@@ -50,7 +50,7 @@ TC_INDIRECT_SCOPE int basic_classify(struct sk_buff *skb,
+ 		if (!tcf_em_tree_match(skb, &f->ematches, NULL))
+ 			continue;
+ 		__this_cpu_inc(f->pf->rhit);
+-		*res = f->res;
++		tcf_set_result(res, &f->res);
+ 		r = tcf_exts_exec(skb, &f->exts, res);
+ 		if (r < 0)
+ 			continue;
+diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
+index 382c7a71f81f..e4620a462bc3 100644
+--- a/net/sched/cls_bpf.c
++++ b/net/sched/cls_bpf.c
+@@ -124,7 +124,7 @@ TC_INDIRECT_SCOPE int cls_bpf_classify(struct sk_buff *skb,
+ 			res->class   = 0;
+ 			res->classid = filter_res;
+ 		} else {
+-			*res = prog->res;
++			tcf_set_result(res, &prog->res);
+ 		}
+ 
+ 		ret = tcf_exts_exec(skb, &prog->exts, res);
+diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+index e5314a31f75a..eb94090fb26c 100644
+--- a/net/sched/cls_flower.c
++++ b/net/sched/cls_flower.c
+@@ -341,7 +341,7 @@ TC_INDIRECT_SCOPE int fl_classify(struct sk_buff *skb,
+ 
+ 		f = fl_mask_lookup(mask, &skb_key);
+ 		if (f && !tc_skip_sw(f->flags)) {
+-			*res = f->res;
++			tcf_set_result(res, &f->res);
+ 			return tcf_exts_exec(skb, &f->exts, res);
+ 		}
+ 	}
+diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
+index c49d6af0e048..70b873f8771f 100644
+--- a/net/sched/cls_fw.c
++++ b/net/sched/cls_fw.c
+@@ -63,7 +63,7 @@ TC_INDIRECT_SCOPE int fw_classify(struct sk_buff *skb,
+ 		for (f = rcu_dereference_bh(head->ht[fw_hash(id)]); f;
+ 		     f = rcu_dereference_bh(f->next)) {
+ 			if (f->id == id) {
+-				*res = f->res;
++				tcf_set_result(res, &f->res);
+ 				if (!tcf_match_indev(skb, f->ifindex))
+ 					continue;
+ 				r = tcf_exts_exec(skb, &f->exts, res);
+diff --git a/net/sched/cls_matchall.c b/net/sched/cls_matchall.c
+index c4ed11df6254..a4018db80a60 100644
+--- a/net/sched/cls_matchall.c
++++ b/net/sched/cls_matchall.c
+@@ -37,7 +37,7 @@ TC_INDIRECT_SCOPE int mall_classify(struct sk_buff *skb,
+ 	if (tc_skip_sw(head->flags))
+ 		return -1;
+ 
+-	*res = head->res;
++	tcf_set_result(res, &head->res);
+ 	__this_cpu_inc(head->pf->rhit);
+ 	return tcf_exts_exec(skb, &head->exts, res);
+ }
+diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
+index 1424bfeaca73..cbfaa1d1820f 100644
+--- a/net/sched/cls_route.c
++++ b/net/sched/cls_route.c
+@@ -109,7 +109,7 @@ static inline int route4_hash_wild(void)
+ 
+ #define ROUTE4_APPLY_RESULT()					\
+ {								\
+-	*res = f->res;						\
++	tcf_set_result(res, &f->res);				\
+ 	if (tcf_exts_has_actions(&f->exts)) {			\
+ 		int r = tcf_exts_exec(skb, &f->exts, res);	\
+ 		if (r < 0) {					\
+@@ -152,7 +152,7 @@ TC_INDIRECT_SCOPE int route4_classify(struct sk_buff *skb,
+ 			goto failure;
+ 		}
+ 
+-		*res = f->res;
++		tcf_set_result(res, &f->res);
+ 		spin_unlock(&fastmap_lock);
+ 		return 0;
+ 	}
+diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+index 6663e971a13e..f50ae40a29d5 100644
+--- a/net/sched/cls_u32.c
++++ b/net/sched/cls_u32.c
+@@ -172,7 +172,7 @@ TC_INDIRECT_SCOPE int u32_classify(struct sk_buff *skb,
+ check_terminal:
+ 			if (n->sel.flags & TC_U32_TERMINAL) {
+ 
+-				*res = n->res;
++				tcf_set_result(res, &n->res);
+ 				if (!tcf_match_indev(skb, n->ifindex)) {
+ 					n = rcu_dereference_bh(n->next);
+ 					goto next_knode;
+-- 
+2.34.1
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
