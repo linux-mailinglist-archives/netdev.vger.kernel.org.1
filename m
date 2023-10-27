@@ -1,85 +1,109 @@
-Return-Path: <netdev+bounces-44904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5B8E7DA3C9
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 00:55:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E9037DA3D5
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 00:57:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F90A2824A5
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 22:55:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3782B21307
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 22:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B15639871;
-	Fri, 27 Oct 2023 22:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C401F405DA;
+	Fri, 27 Oct 2023 22:57:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IpV9dsQC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mHTGf6Da"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5203A38BAC;
-	Fri, 27 Oct 2023 22:55:35 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BC1F1B8;
-	Fri, 27 Oct 2023 15:55:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8BJbEzI3b4RN/xcGusAHw9OPgretZQ0T2NC2/av2UlQ=; b=IpV9dsQCA839lbeS8qlJ8dUbMP
-	+beKq06CQA3qjAXfuOSEVbK/k5XRnIW2jG0fneKb7XE0Lx54TVDuXsPQSjfBkPND2sb+BTgPOpQcQ
-	L2/m8dK5wa18V4P/u7G1qaDlZs14V0P7yUn04P47/49UvIP/Lis0/+6//ZJhbVaFXzp0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qwVjn-000NZx-Kv; Sat, 28 Oct 2023 00:55:31 +0200
-Date: Sat, 28 Oct 2023 00:55:31 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	benno.lossin@proton.me, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 0/5] Rust abstractions for network PHY drivers
-Message-ID: <ca9fc28e-f68a-4b80-b21f-08a3edf3903a@lunn.ch>
-References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
- <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com>
- <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch>
- <CANiq72mDVQg9dbtbAYLSoxQo4ZTgyKk=e-DCe8itvwgc0=HOZw@mail.gmail.com>
- <20231027072621.03df3ec0@kernel.org>
- <CANiq72n=ySX08MMMM6NGL9T5nkaXJXnV2ZsoiXjkwDtfDG11Rw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9231D3FB2C;
+	Fri, 27 Oct 2023 22:57:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDE5CC433C7;
+	Fri, 27 Oct 2023 22:57:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698447439;
+	bh=XaI4lrRhA6Xj8x4ul0wvyppQxvgfjXwL7be1kn++4HY=;
+	h=From:Subject:Date:To:Cc:From;
+	b=mHTGf6DabSa1CL6yq29/VLIrpW4wc0maqD/c3Z+R1/XRpK6189R++UiaPR+ReT8o5
+	 GSF9A6n4j9xH1SjK7B2ghA70XxnXzdnmrPitRjeqv7qnouQqAaAsyNUTuR8CE0ydkg
+	 pDe1gltKTllPP2jwP8KsV15jh49AQY2Igqh0mKRwKYbZd1dKbm6N2omGN7nrjMbUhz
+	 xlTPNTk+WquUFOzjRFwhooHYQ6JcRzK4gLBWsMcphCX2Gdv//D1iWGdmtq0XfRPpzn
+	 c+9cKEKNTg2EhsR3hBEawl5quNuqBYa7bT330g6S7A1LIzItn0fJIgXOn/S0yKHkU2
+	 HIoqpVxLAgflw==
+From: Mat Martineau <martineau@kernel.org>
+Subject: [PATCH net-next 00/15] mptcp: More selftest coverage and code
+ cleanup for net-next
+Date: Fri, 27 Oct 2023 15:57:01 -0700
+Message-Id: <20231027-send-net-next-2023107-v1-0-03eff9452957@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANiq72n=ySX08MMMM6NGL9T5nkaXJXnV2ZsoiXjkwDtfDG11Rw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAD1APGUC/zWMwQqAIBBEf0X23IIaZPYr0UFsq71YaIQg/XtSd
+ JjDG95MgUSRKcEgCkS6OPEeKqhGgN9cWAl5rgxa6lZJbTBRmDHQWZNP/GqDVi/Od6a3Riqo2yP
+ Swvn9HeG3YbrvB4uZA7pxAAAA
+To: Matthieu Baerts <matttbe@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang.tang@suse.com>
+X-Mailer: b4 0.12.4
 
-> For instance, as a trivial example, Andrew raised the maximum length
-> of a line in one of the last messages. We would like to avoid this
-> kind of difference between parts of the kernel -- it is the only
-> chance we will get, and there is really no reason to be inconsistent
-> (ideally, even automated, where possible).
+Patches 1-5 and 7-8 add selftest coverage (and an associated subflow
+counter in the kernel) to validate the recently-updated handling of
+subflows with ID 0.
 
-It should be noted that netdev prefers 80, which the coding standard
-expresses as the preferred value. checkpatch however now allows up to
-100. The netdev CI job adds an extra parameter to checkpatch to
-enforce the preferred 80.
+Patch 6 renames a label in the userspace path manager for clarity.
 
-You will probably find different levels of acceptance of 80 to 100 in
-different subsystems. So i'm not sure you will be able to achieve
-consistence.
+Patches 9-11 and 13-15 factor out common selftest code by moving certain
+functions to mptcp_lib.sh
 
-It should also be noted that 80, or 100, is not a strict limit. Being
-able to grep the kernel for strings is important. So the coding
-standard allows you to go passed this limit in order that you don't
-need to break a string. checkpatch understands this. I don't know if
-your automated tools support such exceptions.
+Patch 12 makes sure the random data file generated for selftest
+payloads has the intended size.
 
-     Andrew
+Signed-off-by: Mat Martineau <martineau@kernel.org>
+---
+Geliang Tang (15):
+      mptcp: add mptcpi_subflows_total counter
+      selftests: mptcp: add evts_get_info helper
+      selftests: mptcp: add chk_subflows_total helper
+      selftests: mptcp: update userspace pm test helpers
+      selftests: mptcp: userspace pm create id 0 subflow
+      mptcp: userspace pm rename remove_err to out
+      selftests: mptcp: userspace pm remove initial subflow
+      selftests: mptcp: userspace pm send RM_ADDR for ID 0
+      selftests: mptcp: add mptcp_lib_kill_wait
+      selftests: mptcp: add mptcp_lib_is_v6
+      selftests: mptcp: add mptcp_lib_get_counter
+      selftests: mptcp: add missing oflag=append
+      selftests: mptcp: add mptcp_lib_make_file
+      selftests: mptcp: add mptcp_lib_check_transfer
+      selftests: mptcp: add mptcp_lib_wait_local_port_listen
+
+ include/uapi/linux/mptcp.h                         |   1 +
+ net/mptcp/pm_userspace.c                           |   8 +-
+ net/mptcp/protocol.h                               |   9 +
+ net/mptcp/sockopt.c                                |   2 +
+ tools/testing/selftests/net/mptcp/diag.sh          |  23 +-
+ tools/testing/selftests/net/mptcp/mptcp_connect.sh | 110 ++----
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    | 375 ++++++++++++---------
+ tools/testing/selftests/net/mptcp/mptcp_lib.sh     |  92 +++++
+ tools/testing/selftests/net/mptcp/mptcp_sockopt.sh |  39 +--
+ tools/testing/selftests/net/mptcp/simult_flows.sh  |  19 +-
+ tools/testing/selftests/net/mptcp/userspace_pm.sh  | 129 +++----
+ 11 files changed, 401 insertions(+), 406 deletions(-)
+---
+base-commit: 3a04927f8d4b7a4f008f04af41e31173002eb1ea
+change-id: 20231027-send-net-next-2023107-92fac6789701
+
+Best regards,
+-- 
+Mat Martineau <martineau@kernel.org>
 
 
