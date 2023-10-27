@@ -1,92 +1,104 @@
-Return-Path: <netdev+bounces-44728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B95E7D973D
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 14:07:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C42DB7D97C9
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 14:21:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C41C1C2105B
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:07:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 723982823A2
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591931946C;
-	Fri, 27 Oct 2023 12:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xl6VbKP7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B79518C10;
+	Fri, 27 Oct 2023 12:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787FA18AE4
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 12:07:41 +0000 (UTC)
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89757C9
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 05:07:39 -0700 (PDT)
-Message-ID: <fc71a5f2-20e2-49f8-a954-581c877a0f09@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1698408457;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sa/vSZFE5gvOkYAuZ3jHdlVx2bGcbqIPjTph2eNpnOY=;
-	b=Xl6VbKP70G0wDRXGDda7jxFskC9XNzrTdjs184AUMo+eK+dmdxA0bk0LXOF6B09u9Beqth
-	pAwykwYZeeUFHi8uN4PK0enSORRN0OtziHkH9nhPJ6YkDXQJ9ku1l04M5JJacG5y70SKSk
-	5M3NPb0bh4kVk2WLyLM0bjHC/fjHvSs=
-Date: Fri, 27 Oct 2023 13:07:33 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992F91118C
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 12:21:23 +0000 (UTC)
+X-Greylist: delayed 337 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 27 Oct 2023 05:21:20 PDT
+Received: from smtpout11.r2.mail-out.ovh.net (smtpout11.r2.mail-out.ovh.net [54.36.141.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 528C210A
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 05:21:20 -0700 (PDT)
+Received: from ex4.mail.ovh.net (unknown [10.111.208.36])
+	by mo512.mail-out.ovh.net (Postfix) with ESMTPS id 9581F265A5;
+	Fri, 27 Oct 2023 12:15:41 +0000 (UTC)
+Received: from localhost.localdomain (93.21.160.242) by DAG10EX1.indiv4.local
+ (172.16.2.91) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.34; Fri, 27 Oct
+ 2023 14:12:20 +0200
+From: Quentin Deslandes <qde@naccy.de>
+To: <netdev@vger.kernel.org>
+CC: David Ahern <dsahern@gmail.com>, Martin KaFai Lau <martin.lau@kernel.org>,
+	Quentin Deslandes <qde@naccy.de>
+Subject: [RFC PATCH 0/3] ss: pretty-printing BPF socket-local storage
+Date: Fri, 27 Oct 2023 14:11:52 +0200
+Message-ID: <20231027121155.1244308-1-qde@naccy.de>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next 1/2] bpf: add skcipher API support to TC/XDP
- programs
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>
-Cc: Vadim Fedorenko <vadfed@meta.com>, Mykola Lysenko <mykolal@fb.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20231026015938.276743-1-vadfed@meta.com>
- <20231026144759.5ce20f4c@kernel.org>
- <a10cdab4-ab67-1cd2-0827-52c3755a464f@linux.dev>
- <20231026183509.471af050@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20231026183509.471af050@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [93.21.160.242]
+X-ClientProxiedBy: CAS8.indiv4.local (172.16.1.8) To DAG10EX1.indiv4.local
+ (172.16.2.91)
+X-Ovh-Tracer-Id: 12244442962285293224
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvkedrleeggdehtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgtghisehtkeertdertddtnecuhfhrohhmpefsuhgvnhhtihhnucffvghslhgrnhguvghsuceoqhguvgesnhgrtggthidruggvqeenucggtffrrghtthgvrhhnpeefudetveevleeuvdevtdeigeelfeevteejueekieeggfdtkeduueehuddugeeffeenucfkphepuddvjedrtddrtddruddpleefrddvuddrudeitddrvdegvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoehquggvsehnrggttgihrdguvgeqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdgushgrhhgvrhhnsehgmhgrihhlrdgtohhmpdhmrghrthhinhdrlhgruheskhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehuddvpdhmohguvgepshhmthhpohhuth
 
-On 27/10/2023 02:35, Jakub Kicinski wrote:
-> On Fri, 27 Oct 2023 00:29:29 +0100 Vadim Fedorenko wrote:
->>> Does anything prevent them from being used simultaneously
->>> by difference CPUs?
->>
->> The algorithm configuration and the key can be used by different CPUs
->> simultaneously
-> 
-> Makes sense, got confused ctx vs req. You allocate req on the fly.
-> 
->>>> +	case BPF_DYNPTR_TYPE_SKB:
->>>> +		return skb_pointer_if_linear(ptr->data, ptr->offset, __bpf_dynptr_size(ptr));
->>>
->>> dynptr takes care of checking if skb can be written to?
->>
->> dynptr is used to take care of size checking, but this particular part is used
->> to provide plain buffer from skb. I'm really sure if we can (or should) encrypt
->> or decrypt in-place, so API now assumes that src and dst are different buffers.
-> 
-> Not sure this answers my question. What I'm asking is basically whether
-> for destination we need to call __bpf_dynptr_is_rdonly() or something
-> already checks that.
+BPF allows programs to store socket-specific data using
+BPF_MAP_TYPE_SK_STORAGE maps. The data is attached to the socket itself,
+and Martin added INET_DIAG_REQ_SK_BPF_STORAGES, so it can be fetched
+using the INET_DIAG mechanism.
 
-ah, good point. I'm not sure how to make it better. the
-__bpf_dynptr_data_ptr() code is based on bpf_dynptr_slice() which has
-bpf_dynptr_slice_rdwr() variant. I don't think it's good idea to add
-local rdwr variant. I can either add 2 parameter to force checking if
-dynptr isn't read-only, or I can convert bpf_dynptr_slice* functions to
-be wrappers over __bpf_dynptr_slice and reuse it in this code.
+Currently, ss doesn't request the socket-local data, this patch aims to
+fix this.
+
+The first patch fixes a bug where the "Process" column would always be
+printed on ss' output, even if --processes/-p is not used.
+
+Patch #2 requests the socket-local data for the requested map ID
+(--bpf-map-id=) or all the maps (--bpf-maps). It then prints the map_id
+in a dedicated column.
+
+Patch #3 uses libbpf and BTF to pretty print the map's content, like
+`bpftool map dump` would do.
+
+While I think it makes sense for ss to provide the socket-local storage
+content for the sockets, it's difficult to conciliate the column-based
+output of ss and having readable socket-local data. Hence, the
+socket-local data is printed in a readable fashion over multiple lines
+under its socket statistics, independently of the column-based approach.
+
+Here is an example of ss' output with --bpf-maps:
+[...]
+ESTAB                  2960280             0 [...]
+    map_id: 259 [
+        (struct my_sk_storage) {
+            .field_hh = (char)127,
+            .<anon> = (union <anon>) {
+                .a = (int)0,
+                .b = (int)0,
+            },
+        },
+    ]
+
+Quentin Deslandes (3):
+  ss: prevent "Process" column from being printed unless requested
+  ss: add support for BPF socket-local storage
+  ss: pretty-print BPF socket-local storage
+
+ misc/ss.c | 822 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 818 insertions(+), 4 deletions(-)
+
+--
+2.41.0
 
