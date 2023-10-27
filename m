@@ -1,195 +1,126 @@
-Return-Path: <netdev+bounces-44654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC8C67D8EF0
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 08:50:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A92A7D8EFD
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 08:54:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17FF91C209CE
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 06:50:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B9221C21068
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 06:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99918F51;
-	Fri, 27 Oct 2023 06:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10378F7D;
+	Fri, 27 Oct 2023 06:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0akZ8Fq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S+iOBHWU"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4966101
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 06:50:40 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9F601B1
-	for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 23:50:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698389438;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P7+kgIpkRnIzz2eHdQqimJOoF4TSWTI0yuTdLxUk9Ko=;
-	b=R0akZ8Fq2zF0LkS7SpCr1G+zavePmgA3hOTmLJ+Y5ySwKvq3mdG+TMmdqXECJRitn1x+8j
-	5lBdCHPO3R9DUxCROrXu23ss0CBK3h8AVLZcvkuNDk7DORxiCt4UzUP68+piKzq+9C7/yq
-	3O6KRKUw4b2AvN9lLB+v52ZJhTNFtr8=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-IGTdo9skPyCRKqFhJyt14A-1; Fri, 27 Oct 2023 02:50:35 -0400
-X-MC-Unique: IGTdo9skPyCRKqFhJyt14A-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-507d0e4eedaso1971515e87.0
-        for <netdev@vger.kernel.org>; Thu, 26 Oct 2023 23:50:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698389433; x=1698994233;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P7+kgIpkRnIzz2eHdQqimJOoF4TSWTI0yuTdLxUk9Ko=;
-        b=VbzxW5RdEaR0P66iXHistx8Dcp/AAWeMTyy83rKFtBPdvlQ5Bsqc5ozmCU0GE9zzpS
-         g38lu7f8eTQhC0q1dWrqZFsjEqcJtS+x0l+4FKrx6BCtYpY1c2sZBef8OtLDz55Lqzxr
-         DpLHw606zYAT8r2ZpFHzkrRlmiWWdelUlTVL4sd0f3aKg6ixbNQBySsXRGQ9Qwux/q9B
-         wqc1dK3Zk8jECAUWBoG1i5yp5Z6B9AxKER+aSYIslPbwUE9AU4aroPXskDpDImkIORjl
-         Bb5dIDnL8HKsrXWkt6G2GFavqaiYoq2iSLRH7KugiEGqAn1NYrZw0Xdzlgb67Vl61PjC
-         FEdw==
-X-Gm-Message-State: AOJu0Yy0Sx2Zo9QExc7gJXIYlciIXH7sqXb+tDrYTnEBtGNi4ZLqnS0T
-	Io2UFXmuOHhM4PaQwbF5C0k91+WnSRsQ2gY5p+A3KZySPNGBrbrSE0INMfklvwxETo2qYP4+wiv
-	AJBf/0nttWXTziAp1FoAIHa3fekqwK0ki
-X-Received: by 2002:ac2:5f69:0:b0:501:bd6f:7c1e with SMTP id c9-20020ac25f69000000b00501bd6f7c1emr1160388lfc.33.1698389433625;
-        Thu, 26 Oct 2023 23:50:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHrsaeGI3Jo6Jp2Ssgu51RQYavSOuYL0EFM9TLHWye8++tMBTcIO+V++RD9Z65TfDRulDwCu8jfvEYPwaZU2/g=
-X-Received: by 2002:ac2:5f69:0:b0:501:bd6f:7c1e with SMTP id
- c9-20020ac25f69000000b00501bd6f7c1emr1160365lfc.33.1698389433222; Thu, 26 Oct
- 2023 23:50:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07378F51
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 06:54:27 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4298116;
+	Thu, 26 Oct 2023 23:54:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698389667; x=1729925667;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=FLxMqcP+5XqmQmOKGaFAfXKYkByQwryiGge0XuweW0I=;
+  b=S+iOBHWU7sLWy/h2VgIQH+9iZP+9j7oLhUVH41XnTFVrQIllWxQutJQk
+   Fls8wDniKpSMzmfpp4AGgCR0hCaH6MQ8iIc+kvKuwSvgFeosaj4Y0z1qc
+   6CQYAnK3kO6RgJ9gi5Lv2DwztrYn1FyMGRc+yy1pJRDcCexcYc3mPjSyV
+   4kmboAXynFj2hH9DvG+KjCNi2IulzZPiNbm6Qq4jXz6Fin7xMVymudr35
+   kVxjs++M2k0Dq+Gc9ihrL58Dq1QFJXp/h17lPREbUD5K8EdwXzU4x3V3Q
+   nH8IpCmYqUkp0dLiJy6Tq2VMBbJ7BoYO/aHUIN2HqW6qSAqTdUFfZ40Ou
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="539357"
+X-IronPort-AV: E=Sophos;i="6.03,255,1694761200"; 
+   d="scan'208";a="539357"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 23:54:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="753016032"
+X-IronPort-AV: E=Sophos;i="6.03,255,1694761200"; 
+   d="scan'208";a="753016032"
+Received: from ssid-ilbpg3-teeminta.png.intel.com ([10.88.227.74])
+  by orsmga007.jf.intel.com with ESMTP; 26 Oct 2023 23:54:21 -0700
+From: Gan Yi Fang <yi.fang.gan@intel.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Looi Hong Aun <hong.aun.looi@intel.com>,
+	Voon Weifeng <weifeng.voon@intel.com>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Ahmad Tarmizi Noor Azura <noor.azura.ahmad.tarmizi@intel.com>,
+	Gan Yi Fang <yi.fang.gan@intel.com>
+Subject: [PATCH net-next 1/1] net: stmmac: add check for advertising linkmode request for set-eee
+Date: Fri, 27 Oct 2023 14:50:54 +0800
+Message-Id: <20231027065054.3808352-1-yi.fang.gan@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231026190101.1413939-1-kuba@kernel.org> <20231026190101.1413939-5-kuba@kernel.org>
-In-Reply-To: <20231026190101.1413939-5-kuba@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 27 Oct 2023 14:50:22 +0800
-Message-ID: <CACGkMEuf5K0BKmniYmqeDtHcDpZFgzsrnFhnCKA1aD0gsM3U7w@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/4] net: fill in MODULE_DESCRIPTION()s under drivers/net/
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, jhs@mojatatu.com, arnd@arndb.de, ap420073@gmail.com, 
-	willemdebruijn.kernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 27, 2023 at 3:01=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: jhs@mojatatu.com
-> CC: arnd@arndb.de
-> CC: ap420073@gmail.com
-> CC: willemdebruijn.kernel@gmail.com
-> CC: jasowang@redhat.com
+From: Noor Azura Ahmad Tarmizi <noor.azura.ahmad.tarmizi@intel.com>
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Add check for advertising linkmode set request with what is currently
+being supported by PHY before configuring the EEE. Unsupported setting
+will be rejected and a message will be prompted. No checking is
+required while setting the EEE to off.
 
-Thanks
+Signed-off-by: Noor Azura Ahmad Tarmizi <noor.azura.ahmad.tarmizi@intel.com>
+Signed-off-by: Gan, Yi Fang <yi.fang.gan@intel.com>
+---
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c   | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-> ---
->  drivers/net/amt.c        | 1 +
->  drivers/net/dummy.c      | 1 +
->  drivers/net/eql.c        | 1 +
->  drivers/net/ifb.c        | 1 +
->  drivers/net/macvtap.c    | 1 +
->  drivers/net/sungem_phy.c | 1 +
->  drivers/net/tap.c        | 1 +
->  7 files changed, 7 insertions(+)
->
-> diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-> index 2d20be6ffb7e..53415e83821c 100644
-> --- a/drivers/net/amt.c
-> +++ b/drivers/net/amt.c
-> @@ -3449,5 +3449,6 @@ static void __exit amt_fini(void)
->  module_exit(amt_fini);
->
->  MODULE_LICENSE("GPL");
-> +MODULE_DESCRIPTION("Driver for Automatic Multicast Tunneling (AMT)");
->  MODULE_AUTHOR("Taehee Yoo <ap420073@gmail.com>");
->  MODULE_ALIAS_RTNL_LINK("amt");
-> diff --git a/drivers/net/dummy.c b/drivers/net/dummy.c
-> index c4b1b0aa438a..768454aa36d6 100644
-> --- a/drivers/net/dummy.c
-> +++ b/drivers/net/dummy.c
-> @@ -202,4 +202,5 @@ static void __exit dummy_cleanup_module(void)
->  module_init(dummy_init_module);
->  module_exit(dummy_cleanup_module);
->  MODULE_LICENSE("GPL");
-> +MODULE_DESCRIPTION("Dummy netdevice driver which discards all packets se=
-nt to it");
->  MODULE_ALIAS_RTNL_LINK(DRV_NAME);
-> diff --git a/drivers/net/eql.c b/drivers/net/eql.c
-> index ca3e4700a813..3c2efda916f1 100644
-> --- a/drivers/net/eql.c
-> +++ b/drivers/net/eql.c
-> @@ -607,4 +607,5 @@ static void __exit eql_cleanup_module(void)
->
->  module_init(eql_init_module);
->  module_exit(eql_cleanup_module);
-> +MODULE_DESCRIPTION("Equalizer Load-balancer for serial network interface=
-s");
->  MODULE_LICENSE("GPL");
-> diff --git a/drivers/net/ifb.c b/drivers/net/ifb.c
-> index 78253ad57b2e..2c1b5def4a0b 100644
-> --- a/drivers/net/ifb.c
-> +++ b/drivers/net/ifb.c
-> @@ -454,5 +454,6 @@ static void __exit ifb_cleanup_module(void)
->  module_init(ifb_init_module);
->  module_exit(ifb_cleanup_module);
->  MODULE_LICENSE("GPL");
-> +MODULE_DESCRIPTION("Intermediate Functional Block (ifb) netdevice driver=
- for sharing of resources and ingress packet queuing");
->  MODULE_AUTHOR("Jamal Hadi Salim");
->  MODULE_ALIAS_RTNL_LINK("ifb");
-> diff --git a/drivers/net/macvtap.c b/drivers/net/macvtap.c
-> index bddcc127812e..29a5929d48e5 100644
-> --- a/drivers/net/macvtap.c
-> +++ b/drivers/net/macvtap.c
-> @@ -250,5 +250,6 @@ static void __exit macvtap_exit(void)
->  module_exit(macvtap_exit);
->
->  MODULE_ALIAS_RTNL_LINK("macvtap");
-> +MODULE_DESCRIPTION("MAC-VLAN based tap driver");
->  MODULE_AUTHOR("Arnd Bergmann <arnd@arndb.de>");
->  MODULE_LICENSE("GPL");
-> diff --git a/drivers/net/sungem_phy.c b/drivers/net/sungem_phy.c
-> index 36803d932dff..d591e33268e5 100644
-> --- a/drivers/net/sungem_phy.c
-> +++ b/drivers/net/sungem_phy.c
-> @@ -1194,4 +1194,5 @@ int sungem_phy_probe(struct mii_phy *phy, int mii_i=
-d)
->  }
->
->  EXPORT_SYMBOL(sungem_phy_probe);
-> +MODULE_DESCRIPTION("PHY drivers for the sungem Ethernet MAC driver");
->  MODULE_LICENSE("GPL");
-> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> index 5c01cc7b9949..9f0495e8df4d 100644
-> --- a/drivers/net/tap.c
-> +++ b/drivers/net/tap.c
-> @@ -1399,6 +1399,7 @@ void tap_destroy_cdev(dev_t major, struct cdev *tap=
-_cdev)
->  }
->  EXPORT_SYMBOL_GPL(tap_destroy_cdev);
->
-> +MODULE_DESCRIPTION("Common library for drivers implementing the TAP inte=
-rface");
->  MODULE_AUTHOR("Arnd Bergmann <arnd@arndb.de>");
->  MODULE_AUTHOR("Sainath Grandhi <sainath.grandhi@intel.com>");
->  MODULE_LICENSE("GPL");
-> --
-> 2.41.0
->
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index f628411ae4ae..6c090d4b7117 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -867,8 +867,24 @@ static int stmmac_ethtool_op_set_eee(struct net_device *dev,
+ 		netdev_warn(priv->dev,
+ 			    "Setting EEE tx-lpi is not supported\n");
+ 
+-	if (!edata->eee_enabled)
++	if (!edata->eee_enabled) {
+ 		stmmac_disable_eee_mode(priv);
++	} else {
++		__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
++		__ETHTOOL_DECLARE_LINK_MODE_MASK(advertised);
++
++		ethtool_convert_legacy_u32_to_link_mode(supported,
++							edata->supported);
++		ethtool_convert_legacy_u32_to_link_mode(advertised,
++							edata->advertised);
++
++		/*Check if the advertise speed is supported.*/
++		if (!bitmap_subset(advertised,
++				   supported,
++				   __ETHTOOL_LINK_MODE_MASK_NBITS)){
++			return -EOPNOTSUPP;
++		}
++	}
+ 
+ 	ret = phylink_ethtool_set_eee(priv->phylink, edata);
+ 	if (ret)
+-- 
+2.34.1
 
 
