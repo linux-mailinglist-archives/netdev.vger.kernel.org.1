@@ -1,114 +1,169 @@
-Return-Path: <netdev+bounces-44717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D01D7D9591
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:50:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 900967D95EF
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 13:04:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90AA9B21271
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:50:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B7A5B210BF
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 11:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97882FC04;
-	Fri, 27 Oct 2023 10:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CD01803D;
+	Fri, 27 Oct 2023 11:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hDkfIXfa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gg8oaErw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B46479CC;
-	Fri, 27 Oct 2023 10:50:34 +0000 (UTC)
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89E881A5;
-	Fri, 27 Oct 2023 03:50:33 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id 5614622812f47-3b3f6dd612cso1162369b6e.3;
-        Fri, 27 Oct 2023 03:50:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E3417995
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 11:04:22 +0000 (UTC)
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8E6F1B5;
+	Fri, 27 Oct 2023 04:04:19 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-507ad511315so2854580e87.0;
+        Fri, 27 Oct 2023 04:04:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698403833; x=1699008633; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9MErlHqrJrrDE6AqUxBfN1R9XRrV0hnUbUn1z87Hk1w=;
-        b=hDkfIXfagMpxQr7DggTRBPqHFypVWPLBcd5ud0MeSiciiDL5UGEqcC9M+l76Oe+3vV
-         IXwDGtwmXD/ZW92Igb8GXkrZBVgDc9yx3ryNs6OCS2rF4I04Uub71VQeKmSgJ+O129xA
-         vK15RmvJo/qLb0KlzVCI/yQZCvgKZSbPcEOZ0g9umWmKYgLW3/HgqNyXm1WTtW6qt6iR
-         ch3FEWFEPXpeZloA1EqpubDILC/IeptHkHtXWc87iTJaSoFnUta3zMiA0S3kRILK9zW1
-         12VdABSYO5LWDBnvVCDRqLmJSkYJdi9qqgZ7xEOJUqzg2GtCOOsqgRYnJzeoFD1SBZ/z
-         9FZg==
+        d=gmail.com; s=20230601; t=1698404658; x=1699009458; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bHVhkrUd2pzwpv7HO715+G75TZMOXop3CMteyY7H2pM=;
+        b=gg8oaErwJxuLUr47k6gTjL3U6tjUtVGYoYvTCO3jdhRvO6J7GX/D4bNA1NwFXeLuo2
+         KfvcmM7E3kCgZAS3Q9jQ1OOkCHxBlYJhXyB31pYH+fNQ7JlbTv5sWpMIDdDgCCUX5jiC
+         6smK8DTLu3GZoKddFhVVAogGYEnlPkkmsSO1xWATItlGFmdcRm1g02q7Zg1fs8+hIQy6
+         UElbVoqFNMgoZbRTOWVzJoLt8I2oL7VKBcfMomlHiYdAWrIhihyRom8f6K5x8XuYr/Dn
+         gebWoJxLwnuuwIdZppUNI37v0nmLNQPoAPMVnKuZamZShr2DgrhpyPqWy7G0RcQMFiE+
+         PS7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698403833; x=1699008633;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9MErlHqrJrrDE6AqUxBfN1R9XRrV0hnUbUn1z87Hk1w=;
-        b=AkHRNFKoZiRTt6zU2kAo56ZgnXJRuXkBvv48WD2tugG1+c5LkgW8IzuBEGGVu/eMX/
-         6lWfF1c29zoLORhByowMlTUdG/qFLN4UgtlKH88BitCUEUVVp/LXzloN5azp781LPaG8
-         knq3qbX8qQe7i9QRhScJcnTcgyRvyzONrsQiCYINfrvqloiZnfYNPaMB/oEFpB36ecUC
-         ghcnENzvAnTL2spMXPxZ5KEuXX6ZPE1OUiOc818rou+g+EmHeWq+fzqd/PEDgfQtP6+H
-         sHJmtk5qmH4EHXOSqeouNKs7RIu6s/ebetnss3D2o47RdP19MX18YQfc/KOsocwzNryk
-         kTew==
-X-Gm-Message-State: AOJu0YytsnF2j1ytJz/+MN+dsjNaHCtpMJ/U5YVfU1Pk5BWeRLC2h6VY
-	NMalKvzp6X9fvKvMSovH0+k7H1U/bb5IxL0NkuB3NelzNGpneQ==
-X-Google-Smtp-Source: AGHT+IEw6S8BxHhmhTcOmDsR3kKdPoxjLi4msegMoPZj1z7yZhXh7ei0xgx1Wllv6y74RdJj23gN/h0S6xwk0KfSd4o=
-X-Received: by 2002:a05:6808:20d:b0:3ae:5bf5:4ad1 with SMTP id
- l13-20020a056808020d00b003ae5bf54ad1mr2055558oie.33.1698403832872; Fri, 27
- Oct 2023 03:50:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698404658; x=1699009458;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bHVhkrUd2pzwpv7HO715+G75TZMOXop3CMteyY7H2pM=;
+        b=HkaP4LSHKXPWurF4j3xGumXjD/kR8hLcd6jLI/Spq16N8YiTN1Nvl+GGilk2l0Fgha
+         PhwXSGxFuGwBDzYEfrdOOMLv1ZOC68iHqkdtsxFNq6QNqHopxPKg2e43MEK6idBgoJAi
+         Thh8dHy0XmnBCEHLwmJyXadiLCCLs31GKFM/DkX+gXI1WarPgTfmr04zS3lmP6vqHiRY
+         LK1g92rliD3M9Byg2PLW2qy++gd+73pEXR84p1yrqpeQWvO90SXoRqJiyebunucP8KG3
+         7g4+y9MB2ZR/mIQAu9ao+Uc7aaGVtWIjP/FZ4HLgi7isTKVdDkiQPSvnG/izH09nM4qu
+         fMeg==
+X-Gm-Message-State: AOJu0YzstuvNZ4YaBdA4+awYjoiUReog8rkGeP4Zl8/lpUrnP1PtOHrH
+	n2lkIz659XLDxyURjhln+yI=
+X-Google-Smtp-Source: AGHT+IEtb4zx4ZsRBKWIqJrw273/BIGGksFXKsh47T9w3Ng/1nC9ZgEn7KXE2+09nod7XzvF0QFwWg==
+X-Received: by 2002:a05:6512:3b10:b0:507:96a3:596d with SMTP id f16-20020a0565123b1000b0050796a3596dmr1678382lfv.49.1698404657652;
+        Fri, 27 Oct 2023 04:04:17 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id q4-20020a0565123a8400b00507a3b8b008sm235755lfu.112.2023.10.27.04.04.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Oct 2023 04:04:17 -0700 (PDT)
+Date: Fri, 27 Oct 2023 14:04:15 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
+	davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org, andrew@lunn.ch, 
+	Jose.Abreu@synopsys.com, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next V3] net: pcs: xpcs: Add 2500BASE-X case in get
+ state for XPCS drivers
+Message-ID: <ghpmbmfjps24x7xvojk4gbkl55wjcuufd4v6mz6ws5htv35g2b@ugqsbet7t73p>
+References: <20231027044306.291250-1-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
- <20231026001050.1720612-4-fujita.tomonori@gmail.com> <CANiq72n6Cvxydcef03kEo9fy=5Zd7MXYqFUGX1MBaTKF2o63nw@mail.gmail.com>
- <20231026.205434.963307210202715112.fujita.tomonori@gmail.com>
- <CANiq72=QgT2tG3wy5pioTQ9n416kksZrL1791pehwR=1ZGP52w@mail.gmail.com> <feb34b35-e847-43f4-824f-157b1b96c7f0@lunn.ch>
-In-Reply-To: <feb34b35-e847-43f4-824f-157b1b96c7f0@lunn.ch>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Fri, 27 Oct 2023 12:50:21 +0200
-Message-ID: <CANiq72=7Ptwb_Ks+ARUq3=6S4NLxguFM4nNx33fBqL1fjBVL2Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 3/5] rust: add second `bindgen` pass for enum
- exhaustiveness checking
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu, benno.lossin@proton.me, 
-	wedsonaf@gmail.com, ojeda@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231027044306.291250-1-Raju.Lakkaraju@microchip.com>
 
-On Fri, Oct 27, 2023 at 2:07=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> That is not how netdev works. It messes up the patch flow, since the
-> machinery expects to commit all or nothing.
+Cc += Russell
 
-Then please simply drop this patch (or improve the machinery :)
+* It's a good practice to add all the reviewers to Cc in the new patch
+* revisions.
 
-> The best way forwards is you create a stable branch with this
-> patch. The netdev Maintainer can then pull that branch into netdev,
-> and Tomonori can then add his patches using it on top. When everything
-> meets up in linux-next, git then recognises it has the same patch
-> twice and drops one of them, depending on the order of the merge.
+On Fri, Oct 27, 2023 at 10:13:06AM +0530, Raju Lakkaraju wrote:
+> Add DW_2500BASEX case in xpcs_get_state( ) to update speed, duplex and pause
+> 
+> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 
-That is only needed if you want to land all this in the next cycle, do
-you? Moreover, it also assumes this exhaustiveness check lands -- it
-has not been posted/discussed/agreed yet.
+With a nitpick below clarified, feel free to add:
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-Thus, if either of those are false, then this bit (or the entire
-series) could just wait one cycle.
+> ---
+>  drivers/net/pcs/pcs-xpcs.c | 29 +++++++++++++++++++++++++++++
+>  drivers/net/pcs/pcs-xpcs.h |  2 ++
+>  2 files changed, 31 insertions(+)
+> 
+> diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+> index 4dbc21f604f2..31f0beba638a 100644
+> --- a/drivers/net/pcs/pcs-xpcs.c
+> +++ b/drivers/net/pcs/pcs-xpcs.c
+> @@ -1090,6 +1090,28 @@ static int xpcs_get_state_c37_1000basex(struct dw_xpcs *xpcs,
+>  	return 0;
+>  }
+>  
+> +static int xpcs_get_state_2500basex(struct dw_xpcs *xpcs,
+> +				    struct phylink_link_state *state)
+> +{
+> +	int ret;
+> +
+> +	ret = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_STS);
+> +	if (ret < 0) {
+> +		state->link = 0;
+> +		return ret;
+> +	}
+> +
+> +	state->link = !!(ret & DW_VR_MII_MMD_STS_LINK_STS);
+> +	if (!state->link)
+> +		return 0;
+> +
+> +	state->speed = SPEED_2500;
 
-> That does not work. Networking patches need to be on net-next.
+> +	state->pause |= MLO_PAUSE_TX | MLO_PAUSE_RX;
 
-I have not said the patches should not go through net-next, though.
-And what I suggested definitely works.
+Why is it '|=' instead of just '='? Is it possible to have the 'pause'
+field having some additional flags set which would be required to
+preserve?
 
-> The
-> stable branch solves that when we have cross subsystem dependencies.
+-Serge(y)
 
-Yes, we are aware of that, thank you. We are even doing it right now
-with another subsystem.
-
-Cheers,
-Miguel
+> +	state->duplex = DUPLEX_FULL;
+> +
+> +	return 0;
+> +}
+> +
+>  static void xpcs_get_state(struct phylink_pcs *pcs,
+>  			   struct phylink_link_state *state)
+>  {
+> @@ -1127,6 +1149,13 @@ static void xpcs_get_state(struct phylink_pcs *pcs,
+>  			       ERR_PTR(ret));
+>  		}
+>  		break;
+> +	case DW_2500BASEX:
+> +		ret = xpcs_get_state_2500basex(xpcs, state);
+> +		if (ret) {
+> +			pr_err("xpcs_get_state_2500basex returned %pe\n",
+> +			       ERR_PTR(ret));
+> +		}
+> +		break;
+>  	default:
+>  		return;
+>  	}
+> diff --git a/drivers/net/pcs/pcs-xpcs.h b/drivers/net/pcs/pcs-xpcs.h
+> index 39a90417e535..96c36b32ca99 100644
+> --- a/drivers/net/pcs/pcs-xpcs.h
+> +++ b/drivers/net/pcs/pcs-xpcs.h
+> @@ -55,6 +55,8 @@
+>  /* Clause 37 Defines */
+>  /* VR MII MMD registers offsets */
+>  #define DW_VR_MII_MMD_CTRL		0x0000
+> +#define DW_VR_MII_MMD_STS		0x0001
+> +#define DW_VR_MII_MMD_STS_LINK_STS	BIT(2)
+>  #define DW_VR_MII_DIG_CTRL1		0x8000
+>  #define DW_VR_MII_AN_CTRL		0x8001
+>  #define DW_VR_MII_AN_INTR_STS		0x8002
+> -- 
+> 2.34.1
+> 
 
