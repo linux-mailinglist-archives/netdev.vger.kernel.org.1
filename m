@@ -1,122 +1,109 @@
-Return-Path: <netdev+bounces-44694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7DF97D9486
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:00:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA397D948A
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:00:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 621B2B209A0
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:00:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D60E1C20FC2
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DBC171AD;
-	Fri, 27 Oct 2023 09:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD141171AD;
+	Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A02EjYVE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVZ/8YyO"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C5C168D6
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 09:59:55 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52B701BD
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 02:59:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698400792;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=TZ0xtpqTEhLFnw9/Pr4Oy+UYb54uDvsk+Fp9NNzZ9YA=;
-	b=A02EjYVEA4qTLP4w7mpE/WP4arUpIZmtzYdt/zLDDyRyOrOr8lChXVmbjsACUUvre1BoLP
-	a9ziZhXdgz2f/EJjXco4rZscgqGXg2Yx2567SN4aX/em4TiXkmYonvBpkEgTwsgCpWo7ZU
-	IiMBw+RRBkCt/f0E2i9U9spvw3q6gYA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-29-a1feGKiGP7Gl7wRQ1yLo5w-1; Fri, 27 Oct 2023 05:59:46 -0400
-X-MC-Unique: a1feGKiGP7Gl7wRQ1yLo5w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 46FD08966A6;
-	Fri, 27 Oct 2023 09:59:46 +0000 (UTC)
-Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.226.76])
-	by smtp.corp.redhat.com (Postfix) with SMTP id C5C1F1121319;
-	Fri, 27 Oct 2023 09:59:43 +0000 (UTC)
-Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
-	oleg@redhat.com; Fri, 27 Oct 2023 11:58:45 +0200 (CEST)
-Date: Fri, 27 Oct 2023 11:58:42 +0200
-From: Oleg Nesterov <oleg@redhat.com>
-To: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>, linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] rxrpc_find_service_conn_rcu: use read_seqbegin() rather than
- read_seqbegin_or_lock()
-Message-ID: <20231027095842.GA30868@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDDC1772B
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 29D37C433CA;
+	Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698400833;
+	bh=/WkRM2i922a3Ow+G7b6etkF/sP9cPHvui0KbyLXDWEU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AVZ/8YyO3A5t0hfO1Jna9jP2FbRvk1gcEV4M7pArJ94QmBXMgxgvBfeSHMAFf1mhF
+	 an5J48HoTRGx0+VXlVleKPGg3A1g7Uh/aTUnsBGcCL3IKNrgl1FdljdnxoQ5barKYn
+	 xd9cppL/tqOadw/xKgJL53Iz1ot9vtpM+6MqifQAeByqaOCLx2VsW9stUWUui8cC/O
+	 JJ7eH+2ZcQ0FclBMF9EnsNGjSZXnaw1V/rEqsbpqKysPkbGKoCvrDeshSAQutDKZx+
+	 bpvMVFsImTbsnskedgMLzo/Gjbj1bbEXDwvkRwuJshyL4WXrSJb2n8MRAm4+2u7BrQ
+	 QSsmhT7JIs9iA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1101FC39563;
+	Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 00/13] Add MDB get support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169840083306.2931.12879417140055385524.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Oct 2023 10:00:33 +0000
+References: <20231025123020.788710-1-idosch@nvidia.com>
+In-Reply-To: <20231025123020.788710-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, bridge@lists.linux-foundation.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ roopa@nvidia.com, razor@blackwall.org, mlxsw@nvidia.com
 
-read_seqbegin_or_lock() makes no sense unless you make "seq" odd
-after the lockless access failed. See thread_group_cputime() as
-an example, note that it does nextseq = 1 for the 2nd round.
+Hello:
 
-So this code can use read_seqbegin() without changing the current
-behaviour.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Signed-off-by: Oleg Nesterov <oleg@redhat.com>
----
- net/rxrpc/conn_service.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+On Wed, 25 Oct 2023 15:30:07 +0300 you wrote:
+> This patchset adds MDB get support, allowing user space to request a
+> single MDB entry to be retrieved instead of dumping the entire MDB.
+> Support is added in both the bridge and VXLAN drivers.
+> 
+> Patches #1-#6 are small preparations in both drivers.
+> 
+> Patches #7-#8 add the required uAPI attributes for the new functionality
+> and the MDB get net device operation (NDO), respectively.
+> 
+> [...]
 
-diff --git a/net/rxrpc/conn_service.c b/net/rxrpc/conn_service.c
-index 89ac05a711a4..bfafe58681d9 100644
---- a/net/rxrpc/conn_service.c
-+++ b/net/rxrpc/conn_service.c
-@@ -25,7 +25,7 @@ struct rxrpc_connection *rxrpc_find_service_conn_rcu(struct rxrpc_peer *peer,
- 	struct rxrpc_conn_proto k;
- 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
- 	struct rb_node *p;
--	unsigned int seq = 0;
-+	unsigned int seq;
- 
- 	k.epoch	= sp->hdr.epoch;
- 	k.cid	= sp->hdr.cid & RXRPC_CIDMASK;
-@@ -35,7 +35,7 @@ struct rxrpc_connection *rxrpc_find_service_conn_rcu(struct rxrpc_peer *peer,
- 		 * under just the RCU read lock, so we have to check for
- 		 * changes.
- 		 */
--		read_seqbegin_or_lock(&peer->service_conn_lock, &seq);
-+		seq = read_seqbegin(&peer->service_conn_lock);
- 
- 		p = rcu_dereference_raw(peer->service_conns.rb_node);
- 		while (p) {
-@@ -49,9 +49,8 @@ struct rxrpc_connection *rxrpc_find_service_conn_rcu(struct rxrpc_peer *peer,
- 				break;
- 			conn = NULL;
- 		}
--	} while (need_seqretry(&peer->service_conn_lock, seq));
-+	} while (read_seqretry(&peer->service_conn_lock, seq));
- 
--	done_seqretry(&peer->service_conn_lock, seq);
- 	_leave(" = %d", conn ? conn->debug_id : -1);
- 	return conn;
- }
+Here is the summary with links:
+  - [net-next,v2,01/13] bridge: mcast: Dump MDB entries even when snooping is disabled
+    https://git.kernel.org/netdev/net-next/c/b9109b5b77f0
+  - [net-next,v2,02/13] bridge: mcast: Account for missing attributes
+    https://git.kernel.org/netdev/net-next/c/1b6d993509c1
+  - [net-next,v2,03/13] bridge: mcast: Factor out a helper for PG entry size calculation
+    https://git.kernel.org/netdev/net-next/c/62ef9cba98a2
+  - [net-next,v2,04/13] bridge: mcast: Rename MDB entry get function
+    https://git.kernel.org/netdev/net-next/c/6d0259dd6c53
+  - [net-next,v2,05/13] vxlan: mdb: Adjust function arguments
+    https://git.kernel.org/netdev/net-next/c/ff97d2a956a1
+  - [net-next,v2,06/13] vxlan: mdb: Factor out a helper for remote entry size calculation
+    https://git.kernel.org/netdev/net-next/c/14c32a46d992
+  - [net-next,v2,07/13] bridge: add MDB get uAPI attributes
+    https://git.kernel.org/netdev/net-next/c/83c1bbeb864f
+  - [net-next,v2,08/13] net: Add MDB get device operation
+    https://git.kernel.org/netdev/net-next/c/62f47bf9e2c0
+  - [net-next,v2,09/13] bridge: mcast: Add MDB get support
+    https://git.kernel.org/netdev/net-next/c/68b380a395a7
+  - [net-next,v2,10/13] vxlan: mdb: Add MDB get support
+    https://git.kernel.org/netdev/net-next/c/32d9673e96dc
+  - [net-next,v2,11/13] rtnetlink: Add MDB get support
+    https://git.kernel.org/netdev/net-next/c/ddd17a54e692
+  - [net-next,v2,12/13] selftests: bridge_mdb: Use MDB get instead of dump
+    https://git.kernel.org/netdev/net-next/c/e8bba9e83c88
+  - [net-next,v2,13/13] selftests: vxlan_mdb: Use MDB get instead of dump
+    https://git.kernel.org/netdev/net-next/c/0514dd05939a
+
+You are awesome, thank you!
 -- 
-2.25.1.362.g51ebf55
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
