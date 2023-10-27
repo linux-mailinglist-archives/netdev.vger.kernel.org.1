@@ -1,96 +1,66 @@
-Return-Path: <netdev+bounces-44922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 966AA7DA3EC
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 01:04:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E6A7DA3F0
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 01:05:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42E692825AA
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 23:04:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65DE91C21123
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 23:05:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D263FE56;
-	Fri, 27 Oct 2023 23:03:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9133A405D6;
+	Fri, 27 Oct 2023 23:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="M7hoPYjM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kA7lzF9E"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9184438BAC
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 23:03:56 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5208EE5;
-	Fri, 27 Oct 2023 16:03:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xRiJUuGtHW8iQQcWj1oKNcb7oucnpbSMai50FKnBweM=; b=M7hoPYjMTY6dR1wilNag4sc1b6
-	OLHFdmdwyCFcNsBJRwhRzeV4MzMG0TWm1ytdW7oR6qrYdT+tu1jMYTrFExoSMZFzFhQeVTmUHBk5S
-	+lxh4g+segET8/HtuzR81aVd751X1jAX9EcTxfBn3bCiuBqL2EeQmVjuQ66BS8k/siJU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qwVrn-000Ned-27; Sat, 28 Oct 2023 01:03:47 +0200
-Date: Sat, 28 Oct 2023 01:03:47 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dsa: tag_rtl4_a: Bump min packet size
-Message-ID: <3ffe7ea1-4dfb-4db8-a2ce-67733a190138@lunn.ch>
-References: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
- <95f324af-88de-4692-966f-588287305e09@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758B338BAC
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 23:05:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ED63C433C7;
+	Fri, 27 Oct 2023 23:05:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698447932;
+	bh=NE+81gfyy96xKk7IPcqnToO7uQkc2vbU5rV52eM5mvk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kA7lzF9EFrorsFxlsI39nNjDJCQiBFQ3pTy+JoPwRX9FGkdE+mZ9v/WEvVyDRLcL3
+	 XlAVb4Jtaibz/vb775fnQs6BELMUNHQsCx5RyBR0UdxAJbcTu3FT7A+pf67z9/PuK7
+	 O8yoj6zWb6EQC11R2Ez0AQbMDXDOQlhFcVxGrKnh0jkXnJzjqU9ocF3jH47HgdVczN
+	 MnKilTW9YIKH5h/lBwP7LGcTpAJ/bANYABP6QxRzSiDNExHTeTbuFpXwY2hmMOPvCC
+	 AyD1QntogF4ZKBu4ulPT+KkBbmPcnupD0qKv86VrEAgo38Q/3FPl9ptVfS35BFeP0O
+	 t/9jqQXjTdluQ==
+Date: Fri, 27 Oct 2023 16:05:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] net: dsa: microchip: ksz9477: Fix spelling
+ mistake "Enery" -> "Energy"
+Message-ID: <20231027160530.5cc4ef5d@kernel.org>
+In-Reply-To: <20231026065408.1087824-1-colin.i.king@gmail.com>
+References: <20231026065408.1087824-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <95f324af-88de-4692-966f-588287305e09@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 27, 2023 at 02:23:13PM -0700, Florian Fainelli wrote:
-> You would want your subject to be:
+On Thu, 26 Oct 2023 07:54:08 +0100 Colin Ian King wrote:
+> There is a spelling mistake in a dev_dbg message. Fix it.
 > 
-> net: dsa: tag_rtl4_a: Bump min packet size
-> 
-> On 10/27/23 13:21, Linus Walleij wrote:
-> > It was reported that the "LuCI" web UI was not working properly
-> > with a device using the RTL8366RB switch. Disabling the egress
-> > port tagging code made the switch work again, but this is not
-> > a good solution as we want to be able to direct traffic to a
-> > certain port.
-> > 
-> > It turns out that sometimes, but not always, small packets are
-> > dropped by the switch for no reason.
-> 
-> And we are positive that the Ethernet MAC is also properly padding frames
-> before having them ingress the switch?
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 
-It might be interesting to run a script which systematically does a
-ping, or similar, for all frame sizes.
-
-> > If we pad the ethernet frames to a minimum of ETH_FRAME_LEN + FCS
-> > (1518 bytes) everything starts working fine.
-> 
-> That is quite unprecedented, either the switch is very bogus or there is
-> something else we do not fully understand...
-
-It would also be interesting to know if the frames on the wire have
-the padding removed when needed. Its not going to be good for
-performance if a TCP ACK is 1500bytes in size, rather than the usual
-~64.
-
-Have problems also been noticed with traffic going from user port to
-user port?
-
-	Andrew
+Applied, thanks.
+-- 
+pw-bot: accept
 
