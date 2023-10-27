@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-44697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 391A97D948B
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:00:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1BD77D948C
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:00:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93B06282385
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:00:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 536A0B21348
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6301171C5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6174171B4;
 	Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXK9Cds2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xx9Fmz9s"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B205E17731
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A022617730
 	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 38199C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 253DFC433C8;
 	Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1698400833;
-	bh=rmvtbkA61r4hq692J/vNITDiPIVR5LTqd1Q2i4pE35U=;
+	bh=acgkIgq+c+zzLDrNfvbjU1Kz+1KOS4/HgXyE8E8YI70=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PXK9Cds2BDm1626vArrGavvRKVQ2PqUMWucdpDmn/vYZ6yIhL0C4AcrL58xHn4r0n
-	 JuuLkySHStIiOVogcBckGYHmsQCM8tAUKLY14625BkvjS0l01ya6BN8U/uBYq9VdSU
-	 33rzjN45KV84HFb2dxx7k8ROzEfKpg/EMxIcCbmc8AdvQFX04jBl043IcisB9VCU2y
-	 gM9v6xHCy0jFjuCabIsuoJja0iRt8Xh1Zn1xXKxUS2ECsNoJ/r7ITcTBf2vOfwViCb
-	 pKU7bYmRGV4hWaul0C6CgFjVxNzZJIkVrw9c4wMUOqvlTGe7mvAXvX+YP+nlnwt9yS
-	 2G9W5Fs6jZAGg==
+	b=Xx9Fmz9sIWoYJvyjoPvHTnW8ANqhIsaFVjkwntvnvaQBSA9eSg2fD74l0tAomnxI/
+	 XoAGAWZ6tzOGvMjUT7dmqh2yJro18BwkDIiOt6FIAKdOHEHSLjUsoRWTEPDlmdTt8u
+	 j5lC57fD0JgLgr8dFrmTEqdbMHiSb8nhhDPZCOplakoQGsiJ//6KbBjgtQRRfCSsq3
+	 3LOIVEN7nMy9rBAuxBs8cBYeqgDSa2t5gqGeop70RTIhkid5DPx1WL8VEH/QhkxqZY
+	 1Ny/HleMNd6XKUJssLRcaK/51kHYnDC6pq1IMq0Cdb8vOtq8cGutkw+ZRY2f2m8dmx
+	 oe/PEoaBMxATA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 188CBE19E22;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 09308E11F56;
 	Fri, 27 Oct 2023 10:00:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,38 +43,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] virtio_net: use u64_stats_t infra to avoid
- data-races
+Subject: Re: [PATCH v16 net-next 01/23] net/tcp: Prepare tcp_md5sig_pool for
+ TCP-AO
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169840083309.2931.2693062060056048598.git-patchwork-notify@kernel.org>
+ <169840083303.2931.6349303415176898109.git-patchwork-notify@kernel.org>
 Date: Fri, 27 Oct 2023 10:00:33 +0000
-References: <20231026171840.4082735-1-edumazet@google.com>
-In-Reply-To: <20231026171840.4082735-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, mst@redhat.com,
- jasowang@redhat.com, xuanzhuo@linux.alibaba.com, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
+References: <20231023192217.426455-2-dima@arista.com>
+In-Reply-To: <20231023192217.426455-2-dima@arista.com>
+To: Dmitry Safonov <dima@arista.com>
+Cc: dsahern@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ kuba@kernel.org, davem@davemloft.net, linux-kernel@vger.kernel.org,
+ luto@amacapital.net, ardb@kernel.org, gilligan@arista.com, error27@gmail.com,
+ David.Laight@aculab.com, 0x7f454c46@gmail.com, dcassidy@redhat.com,
+ ebiggers@kernel.org, ebiederm@xmission.com, fruggeri05@gmail.com,
+ dgaillar@ciena.com, herbert@gondor.apana.org.au, yoshfuji@linux-ipv6.org,
+ colona@arista.com, cdleonard@gmail.com, mnassiri@ciena.com,
+ noureddine@arista.com, horms@kernel.org, ftetreau@ciena.com,
+ netdev@vger.kernel.org, Steen.Hegelund@microchip.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 26 Oct 2023 17:18:40 +0000 you wrote:
-> syzbot reported a data-race in virtnet_poll / virtnet_stats [1]
+On Mon, 23 Oct 2023 20:21:53 +0100 you wrote:
+> TCP-AO, similarly to TCP-MD5, needs to allocate tfms on a slow-path,
+> which is setsockopt() and use crypto ahash requests on fast paths,
+> which are RX/TX softirqs. Also, it needs a temporary/scratch buffer
+> for preparing the hash.
 > 
-> u64_stats_t infra has very nice accessors that must be used
-> to avoid potential load-store tearing.
-> 
-> [1]
-> BUG: KCSAN: data-race in virtnet_poll / virtnet_stats
+> Rework tcp_md5sig_pool in order to support other hashing algorithms
+> than MD5. It will make it possible to share pre-allocated crypto_ahash
+> descriptors and scratch area between all TCP hash users.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] virtio_net: use u64_stats_t infra to avoid data-races
-    https://git.kernel.org/netdev/net-next/c/61217d8f6360
+  - [v16,net-next,01/23] net/tcp: Prepare tcp_md5sig_pool for TCP-AO
+    https://git.kernel.org/netdev/net-next/c/8c73b26315aa
+  - [v16,net-next,02/23] net/tcp: Add TCP-AO config and structures
+    https://git.kernel.org/netdev/net-next/c/c845f5f3590e
+  - [v16,net-next,03/23] net/tcp: Introduce TCP_AO setsockopt()s
+    https://git.kernel.org/netdev/net-next/c/4954f17ddefc
+  - [v16,net-next,04/23] net/tcp: Prevent TCP-MD5 with TCP-AO being set
+    https://git.kernel.org/netdev/net-next/c/0aadc73995d0
+  - [v16,net-next,05/23] net/tcp: Calculate TCP-AO traffic keys
+    https://git.kernel.org/netdev/net-next/c/7c2ffaf21bd6
+  - [v16,net-next,06/23] net/tcp: Add TCP-AO sign to outgoing packets
+    https://git.kernel.org/netdev/net-next/c/1e03d32bea8e
+  - [v16,net-next,07/23] net/tcp: Add tcp_parse_auth_options()
+    https://git.kernel.org/netdev/net-next/c/f7dca36fc54a
+  - [v16,net-next,08/23] net/tcp: Add AO sign to RST packets
+    https://git.kernel.org/netdev/net-next/c/ba7783ad45c8
+  - [v16,net-next,09/23] net/tcp: Add TCP-AO sign to twsk
+    https://git.kernel.org/netdev/net-next/c/decde2586b34
+  - [v16,net-next,10/23] net/tcp: Wire TCP-AO to request sockets
+    https://git.kernel.org/netdev/net-next/c/06b22ef29591
+  - [v16,net-next,11/23] net/tcp: Sign SYN-ACK segments with TCP-AO
+    https://git.kernel.org/netdev/net-next/c/9427c6aa3ec9
+  - [v16,net-next,12/23] net/tcp: Verify inbound TCP-AO signed segments
+    https://git.kernel.org/netdev/net-next/c/0a3a809089eb
+  - [v16,net-next,13/23] net/tcp: Add TCP-AO segments counters
+    https://git.kernel.org/netdev/net-next/c/af09a341dcf6
+  - [v16,net-next,14/23] net/tcp: Add TCP-AO SNE support
+    https://git.kernel.org/netdev/net-next/c/64382c71a557
+  - [v16,net-next,15/23] net/tcp: Add tcp_hash_fail() ratelimited logs
+    https://git.kernel.org/netdev/net-next/c/2717b5adea9e
+  - [v16,net-next,16/23] net/tcp: Ignore specific ICMPs for TCP-AO connections
+    https://git.kernel.org/netdev/net-next/c/953af8e3acb6
+  - [v16,net-next,17/23] net/tcp: Add option for TCP-AO to (not) hash header
+    https://git.kernel.org/netdev/net-next/c/7753c2f0a857
+  - [v16,net-next,18/23] net/tcp: Add TCP-AO getsockopt()s
+    https://git.kernel.org/netdev/net-next/c/ef84703a911f
+  - [v16,net-next,19/23] net/tcp: Allow asynchronous delete for TCP-AO keys (MKTs)
+    https://git.kernel.org/netdev/net-next/c/d6732b95b6fb
+  - [v16,net-next,20/23] net/tcp: Add static_key for TCP-AO
+    https://git.kernel.org/netdev/net-next/c/67fa83f7c86a
+  - [v16,net-next,21/23] net/tcp: Wire up l3index to TCP-AO
+    https://git.kernel.org/netdev/net-next/c/248411b8cb89
+  - [v16,net-next,22/23] net/tcp: Add TCP_AO_REPAIR
+    https://git.kernel.org/netdev/net-next/c/faadfaba5e01
+  - [v16,net-next,23/23] Documentation/tcp: Add TCP-AO documentation
+    https://git.kernel.org/netdev/net-next/c/7fe0e38bb669
 
 You are awesome, thank you!
 -- 
