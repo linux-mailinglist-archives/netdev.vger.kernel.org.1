@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-44835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7E4A7DA127
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 21:09:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89CE77DA129
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 21:10:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E44E28251E
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 19:09:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1A051C2114C
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 19:10:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E573D3A5;
-	Fri, 27 Oct 2023 19:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5E43D3A9;
+	Fri, 27 Oct 2023 19:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsEOGJ5s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i52M5Ctk"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876D218C2E;
-	Fri, 27 Oct 2023 19:09:55 +0000 (UTC)
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A2FEFA;
-	Fri, 27 Oct 2023 12:09:54 -0700 (PDT)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-5a7c011e113so19843007b3.1;
-        Fri, 27 Oct 2023 12:09:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B0A18C2E;
+	Fri, 27 Oct 2023 19:09:59 +0000 (UTC)
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75A25E1;
+	Fri, 27 Oct 2023 12:09:58 -0700 (PDT)
+Received: by mail-oi1-x22a.google.com with SMTP id 5614622812f47-3b52360cdf0so1463872b6e.2;
+        Fri, 27 Oct 2023 12:09:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698433793; x=1699038593; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698433797; x=1699038597; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5DHal/WfnOt0F/bUzqgVKdReu0rsmHy97KCWbd2FIy4=;
-        b=gsEOGJ5sRfwcn1SMLKcQCvKWn/vA2aAVCWiHW/+bSlKW/ZbzUDXY4GFiMfq3dWZjtR
-         sJyANzBSTT2EuJFL/0lGwduAzcPfcUj/PcNx5MksOYPOv/9TjMAVhgXFBSuPswaBAxFV
-         BU1pmwBpe7uKQBxupgK04u6dIcqR9DS4wVQIuh4vm4RpXMjF/KuqBfW0iaS4Xv8c0a6Y
-         CrpkKfoCPs6YBBg3oLBCjhDa96p4n0Ly3BgZmXaKkDmY56zFAiCwyKGYM0KM69YDWvNP
-         E/9oV0giJOFkg9wPK0dvTqORJLovDyx1jIhYqqXjJ4Fy7uIpO2IzNTrCD/Fme3/+15yp
-         ErHg==
+        bh=oPqEy9jv1wfSRtPqoFs4WQDF0XgSUK8DzG8WnJXocV0=;
+        b=i52M5CtkDcAN2HLiUsr0F5eNvCCH1jFbkv6etwtbuE+JCwsxy9PK9ty6Qytzb6Ioi7
+         63wwayajhidvszd1RuqYegN89HbaRoNQoS+XQMbpuuvRzYrs3k6PfsJuquJZ5KJqYEnT
+         dBkuXTWufzYxHsqCsaTThcHRroj10IdYCUEl4aIxgNuu87vTATolY2Q/GWlsB3cG9qA2
+         tBMEXOJFBVyoj/p/viml59yCgueHf8rmYyc0i78YBCf5ODlR1rQnv8INeSwycmnhT1PM
+         1xMzATZzzpzO1banN5OpXoHrn1f3TW4lgZwBOKHo28cEyGEd70psAMVZSonf00haTN44
+         Wz5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698433793; x=1699038593;
+        d=1e100.net; s=20230601; t=1698433797; x=1699038597;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5DHal/WfnOt0F/bUzqgVKdReu0rsmHy97KCWbd2FIy4=;
-        b=vEJ9imthX4CGHK7IoFprMPBTE89W8Oq21HLJZgra2qK7XfefbEWZuWqAPuaorS3uu3
-         chax9T2WfU5m34NsS/Lbq6Lbc15fMkK+2OFbCKyX7AolvB5FT3IKOsbxujU8tfo+MNB8
-         9EU9dE89VMu9iXTHRucpnczFf236t8UxpSWBG549MOCPcCMKZkX0PRkFKXkhrDIiGewd
-         fwf5V2u8C3S96Qx/sE8zofgLnvc38x0T/9x9kLCc1L6FgwqBk5cjht3R8VfN0ZlUSv4U
-         5wxhuMVL73Vo+Bp+IDzHpEhZ3ZawoUhcTTLOn+rUb2mMmFJbPucNXvBcqoHgqaZWs5uR
-         NTcQ==
-X-Gm-Message-State: AOJu0YzQ+AyarAAs4hSylfG+scUbePDM7eTkN7iDWrXkBq5NvHsBfsxq
-	2aEj4EgWzAUVerqscwxDkJK3VTn1EMhMrw==
-X-Google-Smtp-Source: AGHT+IGmCJKCSHLQvZDv3+bYpIGHFwwmGuYO0V4HVvm0U6XgV7xPo3U4MmezZEzezmD4V8fi0j/3uA==
-X-Received: by 2002:a81:ac22:0:b0:5a7:bbd1:ec1d with SMTP id k34-20020a81ac22000000b005a7bbd1ec1dmr3565642ywh.17.1698433792785;
-        Fri, 27 Oct 2023 12:09:52 -0700 (PDT)
+        bh=oPqEy9jv1wfSRtPqoFs4WQDF0XgSUK8DzG8WnJXocV0=;
+        b=ZlcOy9gVJDwKDiSR+Gw1ANcqaExkQXDRvz49RX5zzXQAsO0aNSEYqojhRczLDimUpx
+         RoPiT1JdR8DSKHXs1q9OTkmsnyuzgajr3MIul2zftJetEflIuZQKwaSwl8SevfE/d2e/
+         a38pP9TYoKaXF+IFTW2a44fAm6Ac1UeMPe9WatZYJeQ1Ikos6qgD5VrCMCkLYaWMjXwh
+         tzUxCQEDrTAZAj6orOsxcOFGW84Lrt0lGdiV8N4HTqOMy+nh0RzrBn6mDwenyNmqBhCI
+         R960ezDgd5vDK1cRxozAORv55xRtGJkGe7uIpmnikazbtoqbcNpDQoUkttWD84ySa9pV
+         YQSA==
+X-Gm-Message-State: AOJu0YzIOpKXgpB9+tOwPmrPd9HBnJTSbrtcF7ZsMgwYB0FgDS05pYlD
+	lqbOBjwjuirlNJFf6nTLXLU/k9XyO16aKQ==
+X-Google-Smtp-Source: AGHT+IFdVvEh3Q4QtZj4reidkBZucpEkboPs3FCTlb7ywcKmUjIMx923UhFV5KD3cCXOrgZ2BYk62Q==
+X-Received: by 2002:a05:6808:2c9:b0:3b2:dd32:2fe9 with SMTP id a9-20020a05680802c900b003b2dd322fe9mr3514384oid.35.1698433796956;
+        Fri, 27 Oct 2023 12:09:56 -0700 (PDT)
 Received: from tresc054937.tre-sc.gov.br ([187.94.103.218])
-        by smtp.gmail.com with ESMTPSA id g190-20020a8152c7000000b0059c8387f673sm958696ywb.51.2023.10.27.12.09.49
+        by smtp.gmail.com with ESMTPSA id g190-20020a8152c7000000b0059c8387f673sm958696ywb.51.2023.10.27.12.09.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Oct 2023 12:09:52 -0700 (PDT)
+        Fri, 27 Oct 2023 12:09:56 -0700 (PDT)
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linus.walleij@linaro.org,
@@ -74,9 +74,9 @@ Cc: linus.walleij@linaro.org,
 	arinc.unal@arinc9.com,
 	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
 	devicetree@vger.kernel.org
-Subject: [PATCH net-next v2 1/3] dt-bindings: net: dsa: realtek: reset-gpios is not required
-Date: Fri, 27 Oct 2023 16:00:55 -0300
-Message-ID: <20231027190910.27044-2-luizluca@gmail.com>
+Subject: [PATCH net-next v2 2/3] dt-bindings: net: dsa: realtek: add reset controller
+Date: Fri, 27 Oct 2023 16:00:56 -0300
+Message-ID: <20231027190910.27044-3-luizluca@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231027190910.27044-1-luizluca@gmail.com>
 References: <20231027190910.27044-1-luizluca@gmail.com>
@@ -88,28 +88,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The 'reset-gpios' should not be mandatory. although they might be
-required for some devices if the switch reset was left asserted by a
-previous driver, such as the bootloader.
+Realtek switches can use a reset controller instead of reset-gpios.
 
 Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 Cc: devicetree@vger.kernel.org
 ---
- Documentation/devicetree/bindings/net/dsa/realtek.yaml | 1 -
- 1 file changed, 1 deletion(-)
+ .../devicetree/bindings/net/dsa/realtek.yaml  | 75 +++++++++++++++++++
+ 1 file changed, 75 insertions(+)
 
 diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-index cce692f57b08..46e113df77c8 100644
+index 46e113df77c8..ef7b27c3b1a3 100644
 --- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
 +++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-@@ -127,7 +127,6 @@ else:
-     - mdc-gpios
-     - mdio-gpios
-     - mdio
--    - reset-gpios
+@@ -59,6 +59,9 @@ properties:
+     description: GPIO to be used to reset the whole device
+     maxItems: 1
  
- required:
-   - compatible
++  resets:
++    maxItems: 1
++
+   realtek,disable-leds:
+     type: boolean
+     description: |
+@@ -385,3 +388,75 @@ examples:
+                     };
+             };
+       };
++
++  - |
++    #include <dt-bindings/gpio/gpio.h>
++
++    platform {
++            switch {
++                    compatible = "realtek,rtl8365mb";
++                    mdc-gpios = <&gpio1 16 GPIO_ACTIVE_HIGH>;
++                    mdio-gpios = <&gpio1 17 GPIO_ACTIVE_HIGH>;
++
++                    resets = <&rst 8>;
++
++                    ethernet-ports {
++                            #address-cells = <1>;
++                            #size-cells = <0>;
++
++                            ethernet-port@0 {
++                                    reg = <0>;
++                                    label = "wan";
++                                    phy-handle = <&ethphy-0>;
++                            };
++                            ethernet-port@1 {
++                                    reg = <1>;
++                                    label = "lan1";
++                                    phy-handle = <&ethphy-1>;
++                            };
++                            ethernet-port@2 {
++                                    reg = <2>;
++                                    label = "lan2";
++                                    phy-handle = <&ethphy-2>;
++                            };
++                            ethernet-port@3 {
++                                    reg = <3>;
++                                    label = "lan3";
++                                    phy-handle = <&ethphy-3>;
++                            };
++                            ethernet-port@4 {
++                                    reg = <4>;
++                                    label = "lan4";
++                                    phy-handle = <&ethphy-4>;
++                            };
++                            ethernet-port@5 {
++                                    reg = <5>;
++                                    ethernet = <&eth0>;
++                                    phy-mode = "rgmii";
++                                    fixed-link {
++                                            speed = <1000>;
++                                            full-duplex;
++                                    };
++                            };
++                    };
++
++                    mdio {
++                            compatible = "realtek,smi-mdio";
++                            #address-cells = <1>;
++                            #size-cells = <0>;
++
++                            ethphy-0: ethernet-phy@0 {
++                                    reg = <0>;
++                            };
++                            ethphy-1: ethernet-phy@1 {
++                                    reg = <1>;
++                            };
++                            ethphy-2: ethernet-phy@2 {
++                                    reg = <2>;
++                            };
++                            ethphy-3: ethernet-phy@3 {
++                                    reg = <3>;
++                            };
++                    };
++            };
++    };
 -- 
 2.42.0
 
