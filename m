@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-44705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B07C57D94E7
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:14:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B4B77D94E8
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:14:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 301E828241B
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:14:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 302BF1F2354E
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBD618031;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9041803C;
 	Fri, 27 Oct 2023 10:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="gQ3lu4w7"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="x0EzoOrX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38B51799B
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:14:14 +0000 (UTC)
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4BD1A5
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:09 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-540c54944c4so3875375a12.1
-        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E60179A5
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:14:15 +0000 (UTC)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5AA81BC
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:11 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9c603e2354fso385534366b.1
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698401648; x=1699006448; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698401650; x=1699006450; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pcI5z2eI3kUBo0BHAkZY7kIa+FkgUkPSSF4raygR3z8=;
-        b=gQ3lu4w7SrC4UeqNjlr1sbySzGu8d5y2tdccbPJoxgG4bVY5DmeKXe/prZKDH41v60
-         lVLEddEmpSygurov3mrj0ehd6JAsZxssNioeojv6zkHpUx2AfRfbchj3m81BnNuokLaH
-         bhShOsZor6ie+sfoTOoDqLHT4vt22v1aBSYIs8neYmsllV7TOHqzHK7vT+BJiEmugF4W
-         koXYu9b0hIDVtyfhlnhlyAIzeTX3oTQF9vjJ7gH8spMr9CLEVu221dTPbTK8pVe++r/p
-         imv2xuZVkac2qrYpLSVf8nmdrj2+KgFoTB8nM1P+vq3pH4NrBLvUDxyPepELUH/P26qL
-         SnNQ==
+        bh=rTqhdD/yxa3vJkiQbvPLc+KLXqkT95pVduQu/oE9MT0=;
+        b=x0EzoOrXM1BoRQ2fUHGHfl0gJW3CwmoDKR3paQWwWl/2/qLKPaD8Od9TRqfXUUdRNl
+         YMOX9VDKT5W3h+Dcdp8SV50N1eiaOnNH1HyrX/fhbcN/IBSXHTpg9o4423KurdPSOBJF
+         7z2GoRXMOainu89vVKlKJHnPIrH0zqHIF4VQf42Nzgp2mrD6oci5uxhDo/dahibBCxbB
+         6rmQrx9oEV/yG7hKDkFfjoW+gUQuhS5zvHwLcDC4dxvfrsvd3ZW8d82z45Qbvslq0VUY
+         7whwy5unilA1u2ZiLu4s2P4VqOqPbv3Eg+/wnTT18KgHT7Bztcpz/Uy6QXtWd2hj7VOm
+         ap5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698401648; x=1699006448;
+        d=1e100.net; s=20230601; t=1698401650; x=1699006450;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pcI5z2eI3kUBo0BHAkZY7kIa+FkgUkPSSF4raygR3z8=;
-        b=S8gQAdXwpekGeBxkXBnGR6x8A9ncE3JqtmJrWHoivUs0uZ39+mVtXp4OrnsWqV3EQ0
-         5XVqByOKewP8+wrsulRFmZ6oFPxuYaBwDtpw93ECogzNoS/fLH3wwWBtOtO90wugQbGm
-         ShnSxFkd024bDdA0Iyn5a9IZHXw4JRZxirx0R7nDpm/C1f3kFmO4LeqjJqg8puDvLDyY
-         WP+o/jKxtsW4tkLa9dDtD/9bMSi5CbSJWBdVVWKLBl/Rnl87duiSqWD5PH/xB+WFjTXi
-         NtCGfUjQAirh84vswwje2DgpMY4NGPtL+JEu7+uRTAyP3Cn4btEpvCFhSmqmGPr2a04p
-         hElA==
-X-Gm-Message-State: AOJu0Yw7b8ybzLcC9WTlDZWpb1+k37KZ9WQhELlQ3Ma17atgeE0Ze5jB
-	TlfamFDr0LGMmiF8b3nLexwG7hG6XaYatpRPxUDDVw==
-X-Google-Smtp-Source: AGHT+IFKFqOgHq8UMxwaKe62NCvEyEKbUoQRgNDzbQE5jgxQzwT+XKr4eDAgA8d8HawvqFiqqw6YLw==
-X-Received: by 2002:a05:6402:2314:b0:53d:bf72:d586 with SMTP id l20-20020a056402231400b0053dbf72d586mr4449279eda.16.1698401648091;
-        Fri, 27 Oct 2023 03:14:08 -0700 (PDT)
+        bh=rTqhdD/yxa3vJkiQbvPLc+KLXqkT95pVduQu/oE9MT0=;
+        b=Zw0oikbt2jKNUBtsDhT/Eqg1q0fmS1MHXZaSBpzJjeDVzocl+tNnJ/sG7lN5iDLtiA
+         4ppGqjZ/llpgCtyNxyoMeH1+QLTjvESKbhInp2MrkNiAjjgvH5j+dnovYNnxNuR9I9Hp
+         AtrmpZRIGj9HIIUm0RfhNJIggGgrbiqrZUMGKaJVRD0rl7VqTDeIXYvoQ6/slc+7/pt+
+         78kVobTamIJaV8RaWMPOzsyOdbPOh+CNq00Q9/NFIrtvMr40LK/olbriaYR5Rg6q+pRN
+         DMFNoYPWHcASJBff7bjKGYb8DCTtVT7i04mEDFScn7zuzpad3FBlEtvNmA3HdYjWXj4R
+         hnEA==
+X-Gm-Message-State: AOJu0YwERHze11CzWKutjk1f+oUZMJAXNH7YSp3rNWU/ymSzpffJdw8l
+	ELTfBU44R5zFFpWhcp0EtHJ1sslrwa+vxCLfvDfaTQ==
+X-Google-Smtp-Source: AGHT+IFXdSj8hsRoPw8/121dCNEMZXzJHnHtoEM9VT58iVsNRCpRZiFdSVnm13wTVYoMTlfQYbAo3Q==
+X-Received: by 2002:a17:907:9403:b0:9be:85c9:43f1 with SMTP id dk3-20020a170907940300b009be85c943f1mr1840016ejc.7.1698401649888;
+        Fri, 27 Oct 2023 03:14:09 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id b1-20020a056402138100b0054026e95beesm984266edv.76.2023.10.27.03.14.07
+        by smtp.gmail.com with ESMTPSA id s9-20020a170906a18900b009ae6a6451fdsm963320ejy.35.2023.10.27.03.14.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Oct 2023 03:14:07 -0700 (PDT)
+        Fri, 27 Oct 2023 03:14:09 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: stephen@networkplumber.org,
 	dsahern@gmail.com,
 	daniel.machon@microchip.com
-Subject: [patch net-next v4 1/7] ip/ipnetns: move internals of get_netnsid_from_name() into namespace.c
-Date: Fri, 27 Oct 2023 12:13:57 +0200
-Message-ID: <20231027101403.958745-2-jiri@resnulli.us>
+Subject: [patch net-next v4 2/7] devlink: use snprintf instead of sprintf
+Date: Fri, 27 Oct 2023 12:13:58 +0200
+Message-ID: <20231027101403.958745-3-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231027101403.958745-1-jiri@resnulli.us>
 References: <20231027101403.958745-1-jiri@resnulli.us>
@@ -79,160 +79,91 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-In order to be able to reuse get_netnsid_from_name() function outside of
-ip code, move the internals to lib/namespace.c to a new function called
-netns_id_from_name().
+Use snprintf instead of sprintf to ensure only valid memory is printed
+to and the output string is properly terminated.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
 v3->v4:
-- removed namespace.h include
-v2->v3:
-- s/netns_netnsid_from_name/netns_id_from_name/
-v1->v2:
 - new patch
 ---
- include/namespace.h |  2 ++
- ip/ipnetns.c        | 45 +----------------------------------------
- lib/namespace.c     | 49 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 52 insertions(+), 44 deletions(-)
+ devlink/devlink.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/include/namespace.h b/include/namespace.h
-index e47f9b5d49d1..6483630b8082 100644
---- a/include/namespace.h
-+++ b/include/namespace.h
-@@ -58,4 +58,6 @@ struct netns_func {
- 	void *arg;
- };
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index 3baad355759e..b711e92caaba 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -2761,8 +2761,9 @@ static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
+ 	    !tb[DEVLINK_ATTR_DEV_NAME])
+ 		return;
  
-+int netns_id_from_name(struct rtnl_handle *rtnl, const char *name);
-+
- #endif /* __NAMESPACE_H__ */
-diff --git a/ip/ipnetns.c b/ip/ipnetns.c
-index 9d996832aef8..0ae46a874a0c 100644
---- a/ip/ipnetns.c
-+++ b/ip/ipnetns.c
-@@ -105,52 +105,9 @@ static int ipnetns_have_nsid(void)
- 
- int get_netnsid_from_name(const char *name)
- {
--	struct {
--		struct nlmsghdr n;
--		struct rtgenmsg g;
--		char            buf[1024];
--	} req = {
--		.n.nlmsg_len = NLMSG_LENGTH(sizeof(struct rtgenmsg)),
--		.n.nlmsg_flags = NLM_F_REQUEST,
--		.n.nlmsg_type = RTM_GETNSID,
--		.g.rtgen_family = AF_UNSPEC,
--	};
--	struct nlmsghdr *answer;
--	struct rtattr *tb[NETNSA_MAX + 1];
--	struct rtgenmsg *rthdr;
--	int len, fd, ret = -1;
--
- 	netns_nsid_socket_init();
- 
--	fd = netns_get_fd(name);
--	if (fd < 0)
--		return fd;
--
--	addattr32(&req.n, 1024, NETNSA_FD, fd);
--	if (rtnl_talk(&rtnsh, &req.n, &answer) < 0) {
--		close(fd);
--		return -2;
--	}
--	close(fd);
--
--	/* Validate message and parse attributes */
--	if (answer->nlmsg_type == NLMSG_ERROR)
--		goto out;
--
--	rthdr = NLMSG_DATA(answer);
--	len = answer->nlmsg_len - NLMSG_SPACE(sizeof(*rthdr));
--	if (len < 0)
--		goto out;
--
--	parse_rtattr(tb, NETNSA_MAX, NETNS_RTA(rthdr), len);
--
--	if (tb[NETNSA_NSID]) {
--		ret = rta_getattr_s32(tb[NETNSA_NSID]);
--	}
--
--out:
--	free(answer);
--	return ret;
-+	return netns_id_from_name(&rtnsh, name);
+-	sprintf(buf, "%s/%s", mnl_attr_get_str(tb[DEVLINK_ATTR_BUS_NAME]),
+-		mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]));
++	snprintf(buf, sizeof(buf), "%s/%s",
++		 mnl_attr_get_str(tb[DEVLINK_ATTR_BUS_NAME]),
++		 mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]));
+ 	print_string(PRINT_ANY, "nested_devlink", " nested_devlink %s", buf);
  }
  
- struct nsid_cache {
-diff --git a/lib/namespace.c b/lib/namespace.c
-index 1202fa85f97d..f03f4bbabceb 100644
---- a/lib/namespace.c
-+++ b/lib/namespace.c
-@@ -7,9 +7,11 @@
- #include <fcntl.h>
- #include <dirent.h>
- #include <limits.h>
-+#include <linux/net_namespace.h>
+@@ -2773,7 +2774,7 @@ static void __pr_out_handle_start(struct dl *dl, struct nlattr **tb,
+ 	const char *dev_name = mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]);
+ 	char buf[64];
  
- #include "utils.h"
- #include "namespace.h"
-+#include "libnetlink.h"
+-	sprintf(buf, "%s/%s", bus_name, dev_name);
++	snprintf(buf, sizeof(buf), "%s/%s", bus_name, dev_name);
  
- static void bind_etc(const char *name)
- {
-@@ -139,3 +141,50 @@ int netns_foreach(int (*func)(char *nsname, void *arg), void *arg)
- 	closedir(dir);
- 	return 0;
- }
-+
-+int netns_id_from_name(struct rtnl_handle *rtnl, const char *name)
-+{
-+	struct {
-+		struct nlmsghdr n;
-+		struct rtgenmsg g;
-+		char            buf[1024];
-+	} req = {
-+		.n.nlmsg_len = NLMSG_LENGTH(sizeof(struct rtgenmsg)),
-+		.n.nlmsg_flags = NLM_F_REQUEST,
-+		.n.nlmsg_type = RTM_GETNSID,
-+		.g.rtgen_family = AF_UNSPEC,
-+	};
-+	struct nlmsghdr *answer;
-+	struct rtattr *tb[NETNSA_MAX + 1];
-+	struct rtgenmsg *rthdr;
-+	int len, fd, ret = -1;
-+
-+	fd = netns_get_fd(name);
-+	if (fd < 0)
-+		return fd;
-+
-+	addattr32(&req.n, 1024, NETNSA_FD, fd);
-+	if (rtnl_talk(rtnl, &req.n, &answer) < 0) {
-+		close(fd);
-+		return -2;
-+	}
-+	close(fd);
-+
-+	/* Validate message and parse attributes */
-+	if (answer->nlmsg_type == NLMSG_ERROR)
-+		goto out;
-+
-+	rthdr = NLMSG_DATA(answer);
-+	len = answer->nlmsg_len - NLMSG_SPACE(sizeof(*rthdr));
-+	if (len < 0)
-+		goto out;
-+
-+	parse_rtattr(tb, NETNSA_MAX, NETNS_RTA(rthdr), len);
-+
-+	if (tb[NETNSA_NSID])
-+		ret = rta_getattr_s32(tb[NETNSA_NSID]);
-+
-+out:
-+	free(answer);
-+	return ret;
-+}
+ 	if (dl->json_output) {
+ 		if (array) {
+@@ -2832,7 +2833,7 @@ static void pr_out_selftests_handle_start(struct dl *dl, struct nlattr **tb)
+ 	const char *dev_name = mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]);
+ 	char buf[64];
+ 
+-	sprintf(buf, "%s/%s", bus_name, dev_name);
++	snprintf(buf, sizeof(buf), "%s/%s", bus_name, dev_name);
+ 
+ 	if (dl->json_output) {
+ 		if (should_arr_last_handle_end(dl, bus_name, dev_name))
+@@ -2902,9 +2903,10 @@ static void __pr_out_port_handle_start(struct dl *dl, const char *bus_name,
+ 	if (dl->no_nice_names || !try_nice ||
+ 	    ifname_map_rev_lookup(dl, bus_name, dev_name,
+ 				  port_index, &ifname) != 0)
+-		sprintf(buf, "%s/%s/%d", bus_name, dev_name, port_index);
++		snprintf(buf, sizeof(buf), "%s/%s/%d",
++			 bus_name, dev_name, port_index);
+ 	else
+-		sprintf(buf, "%s", ifname);
++		snprintf(buf, sizeof(buf), "%s", ifname);
+ 
+ 	if (dl->json_output) {
+ 		if (array) {
+@@ -5230,7 +5232,7 @@ pr_out_port_rate_handle_start(struct dl *dl, struct nlattr **tb, bool try_nice)
+ 	bus_name = mnl_attr_get_str(tb[DEVLINK_ATTR_BUS_NAME]);
+ 	dev_name = mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]);
+ 	node_name = mnl_attr_get_str(tb[DEVLINK_ATTR_RATE_NODE_NAME]);
+-	sprintf(buf, "%s/%s/%s", bus_name, dev_name, node_name);
++	snprintf(buf, sizeof(buf), "%s/%s/%s", bus_name, dev_name, node_name);
+ 	if (dl->json_output)
+ 		open_json_object(buf);
+ 	else
+@@ -6305,7 +6307,7 @@ static void pr_out_json_occ_show_item_list(struct dl *dl, const char *label,
+ 
+ 	open_json_object(label);
+ 	list_for_each_entry(occ_item, list, list) {
+-		sprintf(buf, "%u", occ_item->index);
++		snprintf(buf, sizeof(buf), "%u", occ_item->index);
+ 		open_json_object(buf);
+ 		if (bound_pool)
+ 			print_uint(PRINT_JSON, "bound_pool", NULL,
+@@ -8674,7 +8676,7 @@ static void pr_out_region_handle_start(struct dl *dl, struct nlattr **tb)
+ 	const char *region_name = mnl_attr_get_str(tb[DEVLINK_ATTR_REGION_NAME]);
+ 	char buf[256];
+ 
+-	sprintf(buf, "%s/%s/%s", bus_name, dev_name, region_name);
++	snprintf(buf, sizeof(buf), "%s/%s/%s", bus_name, dev_name, region_name);
+ 	if (dl->json_output)
+ 		open_json_object(buf);
+ 	else
 -- 
 2.41.0
 
