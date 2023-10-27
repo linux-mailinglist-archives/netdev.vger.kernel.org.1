@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-44909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB847DA3D8
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 00:57:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A413E7DA3DA
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 00:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA95C2824F7
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 22:57:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00F24B21637
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 22:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999EC4120C;
-	Fri, 27 Oct 2023 22:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403423FB2C;
+	Fri, 27 Oct 2023 22:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L5ZTsYOh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vJunKNXh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73ED5405FA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B489941210;
 	Fri, 27 Oct 2023 22:57:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 292A4C433A9;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F132C43397;
 	Fri, 27 Oct 2023 22:57:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1698447440;
-	bh=bfJE6HiF3+FAp9zrybQcVB6vSbN1zDCfxLnLX/6Ihz0=;
+	bh=5f40ZioG1ogz3Pf9ezONiK0STbvS2+za3qrEMD7o4QQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=L5ZTsYOhNDvkfVtPMH7put5tndpNepNAXR3mWiDg/2Rjl/tVaLJLAizy4Iyfrq4xO
-	 lQNQkpifmntKLhFY6Ce0p8DRbJHou3ztYYClhsepqn0LQHTcMvQ48pWq4Z5JBZW70i
-	 O6anHgKiPZUmQchdty61jT/zcYNdSlPsWfmlZ7p+eQY36J/T3tHSMEuuLsNkZVokzC
-	 EWV5PRCFOrFvtCr2+GMXSxkawPhfdicu1QaqBx3Vsj3BpcE7R3pKaRwSjUBbqOWOv5
-	 y5Oq6XsriMQbt5Qa1zF1QbI0kzf7/dt6QPCVmhpoUv8fd15A0hbMWO6stqwCvngtUF
-	 Oy85+qgFKr5RQ==
+	b=vJunKNXhILc7eIlh65uaA2e1kjg2rhxRs/uEy9I6hL1aQek2yo5rSE/FZd71fpOD2
+	 DmxEfaxeZhkQ9xF8brabytppbLdVV+3ekybMVpcC9TuJoCLqABdBcMV0NeWw0BdOuX
+	 6b9R6SNzuuydiHKGU57x7MaWEDZvQ/NdtA+Zx8wUdi7d+7AONEHywLF5wc58iQOieh
+	 66IHPCIdTurjyq+BymkOdVakaYo8jOdDzJ9lBXDfjDVfcyAYsE/h+mCN2EJB59QDLn
+	 FRjV8M/QCNIoI6C8tyvGamU6zxcT/NFv7C7DIbBTnQX/ejXx78GIXZapwqi6nNlYln
+	 5Cn2Mvh89Q+0A==
 From: Mat Martineau <martineau@kernel.org>
-Date: Fri, 27 Oct 2023 15:57:06 -0700
-Subject: [PATCH net-next 05/15] selftests: mptcp: userspace pm create id 0
- subflow
+Date: Fri, 27 Oct 2023 15:57:07 -0700
+Subject: [PATCH net-next 06/15] mptcp: userspace pm rename remove_err to
+ out
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,7 +44,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231027-send-net-next-2023107-v1-5-03eff9452957@kernel.org>
+Message-Id: <20231027-send-net-next-2023107-v1-6-03eff9452957@kernel.org>
 References: <20231027-send-net-next-2023107-v1-0-03eff9452957@kernel.org>
 In-Reply-To: <20231027-send-net-next-2023107-v1-0-03eff9452957@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>, 
@@ -56,48 +56,57 @@ X-Mailer: b4 0.12.4
 
 From: Geliang Tang <geliang.tang@suse.com>
 
-This patch adds a selftest to create id 0 subflow. Pass id 0 to the
-helper userspace_pm_add_sf() to create id 0 subflow. chk_mptcp_info
-shows one subflow but chk_subflows_total shows two subflows in each
-namespace.
+The value of 'err' will not be only '-EINVAL', but can be '0' in some
+cases.
 
+So it's better to rename the label 'remove_err' to 'out' to avoid
+confusions.
+
+Suggested-by: Matthieu Baerts <matttbe@kernel.org>
 Reviewed-by: Matthieu Baerts <matttbe@kernel.org>
 Signed-off-by: Geliang Tang <geliang.tang@suse.com>
 Signed-off-by: Mat Martineau <martineau@kernel.org>
 ---
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ net/mptcp/pm_userspace.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 494aee8574fb..6c2c47ce11ad 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -3494,6 +3494,25 @@ userspace_tests()
- 		kill_events_pids
- 		wait $tests_pid
- 	fi
-+
-+	# userspace pm create id 0 subflow
-+	if reset_with_events "userspace pm create id 0 subflow" &&
-+	   continue_if mptcp_lib_has_file '/proc/sys/net/mptcp/pm_type'; then
-+		set_userspace_pm $ns2
-+		pm_nl_set_limits $ns1 0 1
-+		speed=5 \
-+			run_tests $ns1 $ns2 10.0.1.1 &
-+		local tests_pid=$!
-+		wait_mpj $ns2
-+		chk_mptcp_info subflows 0 subflows 0
-+		chk_subflows_total 1 1
-+		userspace_pm_add_sf $ns2 10.0.3.2 0
-+		chk_join_nr 1 1 1
-+		chk_mptcp_info subflows 1 subflows 1
-+		chk_subflows_total 2 2
-+		kill_events_pids
-+		wait $tests_pid
-+	fi
- }
+diff --git a/net/mptcp/pm_userspace.c b/net/mptcp/pm_userspace.c
+index 5c01b9bc619a..efecbe3cf415 100644
+--- a/net/mptcp/pm_userspace.c
++++ b/net/mptcp/pm_userspace.c
+@@ -276,12 +276,12 @@ int mptcp_pm_nl_remove_doit(struct sk_buff *skb, struct genl_info *info)
  
- endpoint_tests()
+ 	if (!mptcp_pm_is_userspace(msk)) {
+ 		GENL_SET_ERR_MSG(info, "invalid request; userspace PM not selected");
+-		goto remove_err;
++		goto out;
+ 	}
+ 
+ 	if (id_val == 0) {
+ 		err = mptcp_userspace_pm_remove_id_zero_address(msk, info);
+-		goto remove_err;
++		goto out;
+ 	}
+ 
+ 	lock_sock(sk);
+@@ -296,7 +296,7 @@ int mptcp_pm_nl_remove_doit(struct sk_buff *skb, struct genl_info *info)
+ 	if (!match) {
+ 		GENL_SET_ERR_MSG(info, "address with specified id not found");
+ 		release_sock(sk);
+-		goto remove_err;
++		goto out;
+ 	}
+ 
+ 	list_move(&match->list, &free_list);
+@@ -310,7 +310,7 @@ int mptcp_pm_nl_remove_doit(struct sk_buff *skb, struct genl_info *info)
+ 	}
+ 
+ 	err = 0;
+- remove_err:
++out:
+ 	sock_put(sk);
+ 	return err;
+ }
 
 -- 
 2.41.0
