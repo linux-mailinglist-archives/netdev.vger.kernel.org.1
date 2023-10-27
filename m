@@ -1,63 +1,84 @@
-Return-Path: <netdev+bounces-44648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC85A7D8E0D
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 07:19:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 403747D8E29
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 07:30:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 724EBB212EF
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 05:19:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA07AB210FA
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 05:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BD953B3;
-	Fri, 27 Oct 2023 05:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894255CBB;
+	Fri, 27 Oct 2023 05:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KPftb1WH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rvo5n6Jl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106665CBA;
-	Fri, 27 Oct 2023 05:19:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55BD1C433C7;
-	Fri, 27 Oct 2023 05:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2F7612C
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 05:30:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D2292C433C9;
+	Fri, 27 Oct 2023 05:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698383965;
-	bh=XQx6S1LPtKxuoAI+VdCVsEjkr21diumw1bhdxB3RXdg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KPftb1WHEgvkFr6xtOyAA3gn3wcaUIVDRTRHMR+Cib3pPXzXEWxbuC1OsqP6nzTQ+
-	 m7BRZ87KIr8OLV/PKqBe5lIyUv4CMm7xInK6rRtoj9SN+T5dnndI4UZo2wfZ3aLOyZ
-	 0sTwqYnVzm/RwN/ol5hj7lckZ3qmnhzarv9kcx7NrW1vj1+07yyDM8acDW9qSMeWX/
-	 o9xUdaiKTgpNJp+xlVjEVfws3HrdlqLhZAdkI77aX6GaeUhp6SmGqrIgxzLeaJhA7i
-	 a1YTep3ZcTUqBDVUM8Gv8SwNP4S8/EmWXUzBHaGwMqJ/TaPnmYsL0aZFrqU6s5SLq/
-	 JY8cgzwJqz2FA==
-Date: Thu, 26 Oct 2023 22:19:24 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: pull-request: bpf-next 2023-10-26
-Message-ID: <20231026221924.2f02f9ad@kernel.org>
-In-Reply-To: <20231026150509.2824-1-daniel@iogearbox.net>
-References: <20231026150509.2824-1-daniel@iogearbox.net>
+	s=k20201202; t=1698384627;
+	bh=4CWjoHhCr3X2E7xAcEv+eOauN9xR9PQxvGnRuz2M7f8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Rvo5n6JlM9HkL9tiR+YtYBZ8lPs+RHHIi0KI1Vi/29KjTcfOxA0s2CFZr1Kk3Y6Be
+	 MRR/kaTyZxgB+8oS2X6GtY68YMPIehmu0rLdQq4c0A8W2maXBwEwmTq3iigujAsFy0
+	 2I+BT31EfZ8YT45VBR4SZAlWRz5T/i2wQA3Tx0Tieou+aqYfzvWtwDyP0SJmITdIWQ
+	 /E2yN5wQiDkUv4D0ThQzW30pl4NzX19jmE+HWgXQLh7WoZrGTn9dUscIVSJvS8QZq9
+	 Mp4vedvUz1sP5zQmuY6Xa2IpSt/poUBrNjLdgRBZ6OQU/smRloj1ixTQNLgtnh05dt
+	 QlCQVeLp9/r4Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BA816E4CC0F;
+	Fri, 27 Oct 2023 05:30:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] MAINTAINERS: Remove linuxwwan@intel.com mailing list
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169838462775.19664.12297909147407168362.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Oct 2023 05:30:27 +0000
+References: <20231025130332.67995-2-bagasdotme@gmail.com>
+In-Reply-To: <20231025130332.67995-2-bagasdotme@gmail.com>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ loic.poulain@linaro.org, ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org
 
-On Thu, 26 Oct 2023 17:05:09 +0200 Daniel Borkmann wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
-> 
-> The following pull-request contains BPF updates for your *net-next* tree.
-> 
-> We've added 51 non-merge commits during the last 10 day(s) which contain
-> a total of 75 files changed, 5037 insertions(+), 200 deletions(-).
+Hello:
 
-Pulled, thanks!
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 25 Oct 2023 20:03:32 +0700 you wrote:
+> Messages submitted to the ML bounce (address not found error). In
+> fact, the ML was mistagged as person maintainer instead of mailing
+> list.
+> 
+> Remove the ML to keep Cc: lists a bit shorter and not to spam
+> everyone's inbox with postmaster notifications.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3] MAINTAINERS: Remove linuxwwan@intel.com mailing list
+    https://git.kernel.org/netdev/net-next/c/cc54d2e2c58a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
