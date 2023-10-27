@@ -1,41 +1,73 @@
-Return-Path: <netdev+bounces-44649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 403747D8E29
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 07:30:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 909F87D8E8D
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 08:16:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA07AB210FA
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 05:30:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1674AB20ECF
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 06:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894255CBB;
-	Fri, 27 Oct 2023 05:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 899B58C0C;
+	Fri, 27 Oct 2023 06:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rvo5n6Jl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cWfSHQFj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2F7612C
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 05:30:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D2292C433C9;
-	Fri, 27 Oct 2023 05:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698384627;
-	bh=4CWjoHhCr3X2E7xAcEv+eOauN9xR9PQxvGnRuz2M7f8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Rvo5n6JlM9HkL9tiR+YtYBZ8lPs+RHHIi0KI1Vi/29KjTcfOxA0s2CFZr1Kk3Y6Be
-	 MRR/kaTyZxgB+8oS2X6GtY68YMPIehmu0rLdQq4c0A8W2maXBwEwmTq3iigujAsFy0
-	 2I+BT31EfZ8YT45VBR4SZAlWRz5T/i2wQA3Tx0Tieou+aqYfzvWtwDyP0SJmITdIWQ
-	 /E2yN5wQiDkUv4D0ThQzW30pl4NzX19jmE+HWgXQLh7WoZrGTn9dUscIVSJvS8QZq9
-	 Mp4vedvUz1sP5zQmuY6Xa2IpSt/poUBrNjLdgRBZ6OQU/smRloj1ixTQNLgtnh05dt
-	 QlCQVeLp9/r4Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BA816E4CC0F;
-	Fri, 27 Oct 2023 05:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF7C5245
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 06:15:57 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2F4E1B1;
+	Thu, 26 Oct 2023 23:15:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698387356; x=1729923356;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RzxknOAHxhYQy517vTA+5JreFWE2tbMpxk8ZOQ6gyW0=;
+  b=cWfSHQFj1f9YPlsrzzwgMWStoey8sg1NqQzcnoN6M4jUjdo6VZLStxZR
+   BS51Z2zFqpWxs9FeOZd1Iwa5XuJt4V+txZM34UqjMwY9Xf+7DxC1gTmAU
+   1epKuWlkvZ96yGsNNVvzSQ7YCTQgQ9BKUc37PekkNeXXia1WRN74guJM2
+   m9XYNM5frPDRlbOazvm5WjRU/fxcHcbij3ZNdWLkb6ZXIWe8mMPPAafA3
+   wXmmP3AzFFyncRzAWAfmU50fsZapN/BVj7BkZk/yOaeeTNClv5i/NftBx
+   /MH4V7klG9JYbajAj9qb3XbmU1GvbU00W3FYSk901TkJA3m1qcovhcbNe
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="473958859"
+X-IronPort-AV: E=Sophos;i="6.03,255,1694761200"; 
+   d="scan'208";a="473958859"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2023 23:14:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10875"; a="735995360"
+X-IronPort-AV: E=Sophos;i="6.03,255,1694761200"; 
+   d="scan'208";a="735995360"
+Received: from ssid-ilbpg3-teeminta.png.intel.com ([10.88.227.74])
+  by orsmga006.jf.intel.com with ESMTP; 26 Oct 2023 23:14:21 -0700
+From: Gan Yi Fang <yi.fang.gan@intel.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Looi Hong Aun <hong.aun.looi@intel.com>,
+	Voon Weifeng <weifeng.voon@intel.com>,
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
+	Gan Yi Fang <yi.fang.gan@intel.com>
+Subject: [PATCH net-next 1/1] net: stmmac: check CBS input values before configuration
+Date: Fri, 27 Oct 2023 14:11:14 +0800
+Message-Id: <20231027061114.3792619-1-yi.fang.gan@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,42 +75,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] MAINTAINERS: Remove linuxwwan@intel.com mailing list
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169838462775.19664.12297909147407168362.git-patchwork-notify@kernel.org>
-Date: Fri, 27 Oct 2023 05:30:27 +0000
-References: <20231025130332.67995-2-bagasdotme@gmail.com>
-In-Reply-To: <20231025130332.67995-2-bagasdotme@gmail.com>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- loic.poulain@linaro.org, ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org
 
-Hello:
+From: Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Add check for below conditions before proceeding to configuration.
+A message will be prompted if the input value is invalid.
 
-On Wed, 25 Oct 2023 20:03:32 +0700 you wrote:
-> Messages submitted to the ML bounce (address not found error). In
-> fact, the ML was mistagged as person maintainer instead of mailing
-> list.
-> 
-> Remove the ML to keep Cc: lists a bit shorter and not to spam
-> everyone's inbox with postmaster notifications.
-> 
-> [...]
+Idleslope minus sendslope should equal speed_div.
+Idleslope is always a positive value.
+Sendslope is always a negative value.
+Hicredit is always a positive value.
+Locredit is always a negative value.
 
-Here is the summary with links:
-  - [net,v3] MAINTAINERS: Remove linuxwwan@intel.com mailing list
-    https://git.kernel.org/netdev/net-next/c/cc54d2e2c58a
+Signed-off-by: Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>
+Signed-off-by: Gan, Yi Fang <yi.fang.gan@intel.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+index ac41ef4cbd2f..e8a079946f84 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+@@ -381,6 +381,11 @@ static int tc_setup_cbs(struct stmmac_priv *priv,
+ 		return -EOPNOTSUPP;
+ 	}
+ 
++	if ((qopt->idleslope - qopt->sendslope != speed_div) ||
++	    qopt->idleslope < 0 || qopt->sendslope > 0 ||
++	    qopt->hicredit < 0 || qopt->locredit > 0)
++		return -EINVAL;
++
+ 	mode_to_use = priv->plat->tx_queues_cfg[queue].mode_to_use;
+ 	if (mode_to_use == MTL_QUEUE_DCB && qopt->enable) {
+ 		ret = stmmac_dma_qmode(priv, priv->ioaddr, queue, MTL_QUEUE_AVB);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
