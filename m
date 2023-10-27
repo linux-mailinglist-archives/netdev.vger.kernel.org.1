@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-44710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C447D94ED
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:14:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FED37D94EE
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:14:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33F24B21500
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:14:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29D1B282433
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2249418AE4;
-	Fri, 27 Oct 2023 10:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3BF3179A1;
+	Fri, 27 Oct 2023 10:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="dp7QUkX0"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NDW/zTi/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627B8182BB
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:14:19 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1AB31AC
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:17 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9bf86b77a2aso266868366b.0
-        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304F818AEF
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:14:21 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D1C111
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:19 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-99de884ad25so290043866b.3
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698401656; x=1699006456; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698401658; x=1699006458; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1/tu5XWHHR8usb5Jk8v5P3g4yLTlyEOFPX8/M/aZHvs=;
-        b=dp7QUkX0FwHzkhbyKlAwAtXIgbnXH6o1ehQu/MaCcuum4ciQXqedSA8MmjhmJ4/lW7
-         aVA9KcqBlHxUdY67p+Jk/NDrbOFrrzKRC90WhotXSW+iGNbSPMK4set+7I9Gq8N+dIa+
-         65hfrGJ+3ECyy2ZpxuGGN/ufcxg6VH30VvtHqDF9T5twrq5Bhd1LuO0LojXKXUsUxFr4
-         1lOnkNP55lnA4XdYteaEJTb8soDH975pvAHR6Prv3DHUkCbDFYyiXMJDTnpARrf118u2
-         ZLbG7BA7dDWNYnKDu5LRnIwCWRLTM7JiJeIjvhgCTxmSe4/BiGbruuMriHnJ7fR57M32
-         AMLQ==
+        bh=WVEm7APPSSSk+YJQkBaPKu7CTimG895Qex6fY+sz04k=;
+        b=NDW/zTi/z91o5Ekwx5RicwfBPbNN7Q7R2j8LrV/pf+BRV9p9vKpkxcghCp97zRXUwe
+         /eDXTJutKjqRMYbSY1CdnwHrQXEECuuW9hN84UUkfdZQ/DByD0zbs66gy0a/dOJKqF1g
+         VUEPHb7VqNQHbDu06soPrrlmT/V4S5BJDwQR0PBAfify1IXRPy9VqfYRoFMgJDUJ8NLp
+         b1QTzjy/6ejiBMrt1JPWkp8+NCBHQQmo+PFJVOPUjEQgPas6RpG/DShN05uB+vXcTGBE
+         ALbuYnmV1LCb8iVfTIHsPD5FbBNYGFxk30yozndPZjAmgw8ObAOWHIPw1Zw1OaBtkfQf
+         5sFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698401656; x=1699006456;
+        d=1e100.net; s=20230601; t=1698401658; x=1699006458;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1/tu5XWHHR8usb5Jk8v5P3g4yLTlyEOFPX8/M/aZHvs=;
-        b=igfjTMj09Brg7M460pgmUSiaUjOUhMjjda6bMBevJU3mW0WiBoa1dNMXCUKXt+ZXNd
-         sM+lKvQAxiAOWt0u/EdVcvZGyE5Ib9Ix4yFyMjdJTLu5dnFs/4qtK/Gcri9RDs6DRAr4
-         LNuwT4xSO7sI6e/2U/Ttt54aTjZhOZbhcdWxiaMynHZysbswirqopgXTb6CjPWjnS6lN
-         zfsNGGycFI/4oueyzplKMB1WEF+zWN0OAFjdkC0hSezEDUdQ2HdcD8ngMUKuqeHeyQ7l
-         QkEk5OBm6p1f2NvaLSfrSVW9jybL7mqA08rJ6F4Ak9jdZfpBquz/VcKvfe7kOJcDMFYm
-         cR+g==
-X-Gm-Message-State: AOJu0Yxb5gBxgcEW/WF9a9XFQQ/qP92cP5AFVPPKFO8+TkK5Rnqpb8OJ
-	tbcW/wmYFti+Rkkv2QWXUprsUxNAvLUesrp9k9xX/Q==
-X-Google-Smtp-Source: AGHT+IFrp+nR/Itr9VaIcjK2yyMjgJCNyY6AH0G6u9MOqOBDS6VAk0xjpgqMQaBzUoDj70dHzbsygA==
-X-Received: by 2002:a17:907:3ea9:b0:9c5:45f8:c529 with SMTP id hs41-20020a1709073ea900b009c545f8c529mr2076606ejc.20.1698401656430;
-        Fri, 27 Oct 2023 03:14:16 -0700 (PDT)
+        bh=WVEm7APPSSSk+YJQkBaPKu7CTimG895Qex6fY+sz04k=;
+        b=Az+r5DvExoKz7b2Lpx9pficbcwqL8SE4v9VqSPs4QyhCduGi+/eFy40wbH1VPdOlhz
+         Nm0anJZlKmzQrTqt5got9qlO+aidoc6RXpzNkyJl1tbSaI6+Ue0mD5Uwp/GMM/tABdAb
+         tGzXds0MyMvQNf72X0nMt3LaLbOnF82IoESa91sOZj0cMbxIdOzSxJQzL6xjBvGik6G5
+         l1HAnh+FO/VesRJTVHFFmZU/kTXSe7p6t++Mxl/emlcHDF4gHZzbgnmpEhqT2nZyfY5l
+         qLjXj3Z/9mR3l/n17Oy7vLmTMOi/e4ThzZeJq+hQ06Vm59Sa0vXJ6BUUoxaBcHbdA7eY
+         eoow==
+X-Gm-Message-State: AOJu0YwVIsIK++K8Zn9LFOmNCUNgKuAcSUICDOAwyGOe+87Pf8Ihpz1g
+	pnhvpfSaxPuZSDhOCA+l7NEGAxEDHIY+r05CbshCWA==
+X-Google-Smtp-Source: AGHT+IFfu8gSec0X8VNfECaNQ4pek2v8RK5jv+N8PPxIzx90sNZ3br0xG1wrLeVQqmMfq9SfqodsaQ==
+X-Received: by 2002:a17:907:9614:b0:9af:4561:591d with SMTP id gb20-20020a170907961400b009af4561591dmr1917582ejc.18.1698401658053;
+        Fri, 27 Oct 2023 03:14:18 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id cw23-20020a170906c79700b009c3828fec06sm943856ejb.81.2023.10.27.03.14.15
+        by smtp.gmail.com with ESMTPSA id 3-20020a170906208300b0099cd1c0cb21sm954886ejq.129.2023.10.27.03.14.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Oct 2023 03:14:15 -0700 (PDT)
+        Fri, 27 Oct 2023 03:14:17 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: stephen@networkplumber.org,
 	dsahern@gmail.com,
 	daniel.machon@microchip.com
-Subject: [patch net-next v4 6/7] devlink: print nested handle for port function
-Date: Fri, 27 Oct 2023 12:14:02 +0200
-Message-ID: <20231027101403.958745-7-jiri@resnulli.us>
+Subject: [patch net-next v4 7/7] devlink: print nested devlink handle for devlink dev
+Date: Fri, 27 Oct 2023 12:14:03 +0200
+Message-ID: <20231027101403.958745-8-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231027101403.958745-1-jiri@resnulli.us>
 References: <20231027101403.958745-1-jiri@resnulli.us>
@@ -79,62 +79,79 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-If port function contains nested handle attribute, print it.
+Devlink dev may contain one or more nested devlink instances.
+Print them using previously introduced pr_out_nested_handle_obj()
+helper.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
 v2->v3:
 - rebased on top of new patch "devlink: extend pr_out_nested_handle() to
-  print object"
+  print object" and previous patch to use pr_out_nested_handle_obj()
 ---
- devlink/devlink.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ devlink/devlink.c | 30 ++++++++++++++++++++++++++----
+ 1 file changed, 26 insertions(+), 4 deletions(-)
 
 diff --git a/devlink/devlink.c b/devlink/devlink.c
-index f276026b9ba7..ae31e7cf34e3 100644
+index ae31e7cf34e3..f999e5940c63 100644
 --- a/devlink/devlink.c
 +++ b/devlink/devlink.c
-@@ -772,6 +772,7 @@ static const enum mnl_attr_data_type
- devlink_function_policy[DEVLINK_PORT_FUNCTION_ATTR_MAX + 1] = {
- 	[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR ] = MNL_TYPE_BINARY,
- 	[DEVLINK_PORT_FN_ATTR_STATE] = MNL_TYPE_U8,
-+	[DEVLINK_PORT_FN_ATTR_DEVLINK] = MNL_TYPE_NESTED,
- };
- 
- static int function_attr_cb(const struct nlattr *attr, void *data)
-@@ -2896,6 +2897,22 @@ static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
- 	__pr_out_nested_handle(NULL, nla_nested_dl, false);
+@@ -3860,13 +3860,35 @@ static void pr_out_reload_data(struct dl *dl, struct nlattr **tb)
+ 	pr_out_object_end(dl);
  }
  
-+static void pr_out_nested_handle_obj(struct dl *dl,
-+				     struct nlattr *nla_nested_dl,
-+				     bool obj_start, bool obj_end)
++static void pr_out_dev_nested(struct dl *dl, const struct nlmsghdr *nlh)
 +{
-+	if (obj_start) {
-+		pr_out_object_start(dl, "nested_devlink");
-+		check_indent_newline(dl);
++	int i = 0, count = 0;
++	struct nlattr *attr;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		if (mnl_attr_get_type(attr) == DEVLINK_ATTR_NESTED_DEVLINK)
++			count++;
 +	}
-+	__pr_out_nested_handle(dl, nla_nested_dl, true);
-+	if (obj_end) {
-+		if (!dl->json_output)
-+			__pr_out_indent_dec();
-+		pr_out_object_end(dl);
++	if (!count)
++		return;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		if (mnl_attr_get_type(attr) != DEVLINK_ATTR_NESTED_DEVLINK)
++			continue;
++		pr_out_nested_handle_obj(dl, attr, i == 0, i == count - 1);
++		i++;
 +	}
 +}
-+
- static bool cmp_arr_last_port_handle(struct dl *dl, const char *bus_name,
- 				     const char *dev_name, uint32_t port_index)
- {
-@@ -4839,6 +4856,9 @@ static void pr_out_port_function(struct dl *dl, struct nlattr **tb_port)
- 				     port_fn_caps->value & DEVLINK_PORT_FN_CAP_IPSEC_PACKET ?
- 				     "enable" : "disable");
- 	}
-+	if (tb[DEVLINK_PORT_FN_ATTR_DEVLINK])
-+		pr_out_nested_handle_obj(dl, tb[DEVLINK_PORT_FN_ATTR_DEVLINK],
-+					 true, true);
  
- 	if (!dl->json_output)
- 		__pr_out_indent_dec();
+-static void pr_out_dev(struct dl *dl, struct nlattr **tb)
++static void pr_out_dev(struct dl *dl, const struct nlmsghdr *nlh,
++		       struct nlattr **tb)
+ {
+ 	if ((tb[DEVLINK_ATTR_RELOAD_FAILED] && mnl_attr_get_u8(tb[DEVLINK_ATTR_RELOAD_FAILED])) ||
+-	    (tb[DEVLINK_ATTR_DEV_STATS] && dl->stats)) {
++	    (tb[DEVLINK_ATTR_DEV_STATS] && dl->stats) ||
++	     tb[DEVLINK_ATTR_NESTED_DEVLINK]) {
+ 		__pr_out_handle_start(dl, tb, true, false);
+ 		pr_out_reload_data(dl, tb);
++		pr_out_dev_nested(dl, nlh);
+ 		pr_out_handle_end(dl);
+ 	} else {
+ 		pr_out_handle(dl, tb);
+@@ -3883,7 +3905,7 @@ static int cmd_dev_show_cb(const struct nlmsghdr *nlh, void *data)
+ 	if (!tb[DEVLINK_ATTR_BUS_NAME] || !tb[DEVLINK_ATTR_DEV_NAME])
+ 		return MNL_CB_ERROR;
+ 
+-	pr_out_dev(dl, tb);
++	pr_out_dev(dl, nlh, tb);
+ 	return MNL_CB_OK;
+ }
+ 
+@@ -6810,7 +6832,7 @@ static int cmd_mon_show_cb(const struct nlmsghdr *nlh, void *data)
+ 			return MNL_CB_ERROR;
+ 		pr_out_mon_header(genl->cmd);
+ 		dl->stats = true;
+-		pr_out_dev(dl, tb);
++		pr_out_dev(dl, nlh, tb);
+ 		pr_out_mon_footer();
+ 		break;
+ 	case DEVLINK_CMD_PORT_GET: /* fall through */
 -- 
 2.41.0
 
