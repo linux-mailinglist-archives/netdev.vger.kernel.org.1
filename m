@@ -1,158 +1,173 @@
-Return-Path: <netdev+bounces-44711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FED37D94EE
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:14:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9DD7D94F3
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 12:15:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29D1B282433
-	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:14:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85C9F282357
+	for <lists+netdev@lfdr.de>; Fri, 27 Oct 2023 10:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3BF3179A1;
-	Fri, 27 Oct 2023 10:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B5E1799B;
+	Fri, 27 Oct 2023 10:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NDW/zTi/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQ2cWcnb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304F818AEF
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:14:21 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D1C111
-	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:19 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-99de884ad25so290043866b.3
-        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:14:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698401658; x=1699006458; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WVEm7APPSSSk+YJQkBaPKu7CTimG895Qex6fY+sz04k=;
-        b=NDW/zTi/z91o5Ekwx5RicwfBPbNN7Q7R2j8LrV/pf+BRV9p9vKpkxcghCp97zRXUwe
-         /eDXTJutKjqRMYbSY1CdnwHrQXEECuuW9hN84UUkfdZQ/DByD0zbs66gy0a/dOJKqF1g
-         VUEPHb7VqNQHbDu06soPrrlmT/V4S5BJDwQR0PBAfify1IXRPy9VqfYRoFMgJDUJ8NLp
-         b1QTzjy/6ejiBMrt1JPWkp8+NCBHQQmo+PFJVOPUjEQgPas6RpG/DShN05uB+vXcTGBE
-         ALbuYnmV1LCb8iVfTIHsPD5FbBNYGFxk30yozndPZjAmgw8ObAOWHIPw1Zw1OaBtkfQf
-         5sFQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE0B168CF
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 10:15:36 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3866D7
+	for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:15:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698401733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/3RUe/42QKtvFOMbEd083sCtycO90wm6iZz1XgOvH0k=;
+	b=CQ2cWcnb4RRtqcAvgjETRzgp9BX6TAs94TmhTIOykcaQa3u8whvFFo2qiDrtr/RMq1Up76
+	NCbIjiFYj4itn+ogdX5mOWS8I19uokIlaorGWvGGvkg0cjlC9myNNya76BzrEYPGtealSD
+	NZ1MgMq3+HqRLQy0AmAk5t1ChX3bjSQ=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-231-mM99Roe_MneRR4q9jXgKCw-1; Fri, 27 Oct 2023 06:15:32 -0400
+X-MC-Unique: mM99Roe_MneRR4q9jXgKCw-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-41e1d05a5d7so23299901cf.2
+        for <netdev@vger.kernel.org>; Fri, 27 Oct 2023 03:15:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698401658; x=1699006458;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WVEm7APPSSSk+YJQkBaPKu7CTimG895Qex6fY+sz04k=;
-        b=Az+r5DvExoKz7b2Lpx9pficbcwqL8SE4v9VqSPs4QyhCduGi+/eFy40wbH1VPdOlhz
-         Nm0anJZlKmzQrTqt5got9qlO+aidoc6RXpzNkyJl1tbSaI6+Ue0mD5Uwp/GMM/tABdAb
-         tGzXds0MyMvQNf72X0nMt3LaLbOnF82IoESa91sOZj0cMbxIdOzSxJQzL6xjBvGik6G5
-         l1HAnh+FO/VesRJTVHFFmZU/kTXSe7p6t++Mxl/emlcHDF4gHZzbgnmpEhqT2nZyfY5l
-         qLjXj3Z/9mR3l/n17Oy7vLmTMOi/e4ThzZeJq+hQ06Vm59Sa0vXJ6BUUoxaBcHbdA7eY
-         eoow==
-X-Gm-Message-State: AOJu0YwVIsIK++K8Zn9LFOmNCUNgKuAcSUICDOAwyGOe+87Pf8Ihpz1g
-	pnhvpfSaxPuZSDhOCA+l7NEGAxEDHIY+r05CbshCWA==
-X-Google-Smtp-Source: AGHT+IFfu8gSec0X8VNfECaNQ4pek2v8RK5jv+N8PPxIzx90sNZ3br0xG1wrLeVQqmMfq9SfqodsaQ==
-X-Received: by 2002:a17:907:9614:b0:9af:4561:591d with SMTP id gb20-20020a170907961400b009af4561591dmr1917582ejc.18.1698401658053;
-        Fri, 27 Oct 2023 03:14:18 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id 3-20020a170906208300b0099cd1c0cb21sm954886ejq.129.2023.10.27.03.14.17
+        d=1e100.net; s=20230601; t=1698401732; x=1699006532;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/3RUe/42QKtvFOMbEd083sCtycO90wm6iZz1XgOvH0k=;
+        b=fxVBMK1DSZbgnOc4keXbvTVwGX31P2ADxENonMKVuMxzQaKTvaNNaQfMq8KCC3JBQQ
+         fNzA9PKx3RRGmC7Ot7jO4lfjiwVW9X+T+02L6pvFv6Fv+CHdDRovrUcyrNcqosxg98Q0
+         xKtOaeWCMMpTPkA6IY1liBvWDfjsKCMM6KD2NveInZBJTih6XuUZRBnV9PvkfQ62Hhrm
+         amMROskZoHIf6vjlKDTNq6WhWt+hYoGbMRJnIJMuRF3ZoKm/k/m++YOn5o/F406bqbRy
+         ibisaqGNMOjLN/5NJ0FnST9u5pAL9wXztaWNhlv0GOv1cbfo6OmjdUJZVUCSxeBEurrs
+         RWag==
+X-Gm-Message-State: AOJu0Yy+iFvp2DZc94c7GWi9Ehi0oXSA7jmYrHHDAL6cOGl5+q8PqF5v
+	okEhNNQxC0kb9v+2KFBrJkI+kU5PNHXaSvmVL+fFjIGoevpZ7ViXXYRRZrpkbg3xz8w8HXL3EKp
+	GnvdHXkttLiEAT0+hlHGQk9uV
+X-Received: by 2002:ac8:5d07:0:b0:418:1235:5c86 with SMTP id f7-20020ac85d07000000b0041812355c86mr2910756qtx.43.1698401731792;
+        Fri, 27 Oct 2023 03:15:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFTEePNVAmHZb/864E4GdsNkiYTWojqEFJErvbBvnJDxMpu5e0tdtlubNMMIbyRvGLZJkKphA==
+X-Received: by 2002:ac8:5d07:0:b0:418:1235:5c86 with SMTP id f7-20020ac85d07000000b0041812355c86mr2910723qtx.43.1698401731427;
+        Fri, 27 Oct 2023 03:15:31 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-185-56.business.telecomitalia.it. [87.12.185.56])
+        by smtp.gmail.com with ESMTPSA id g21-20020ac85815000000b00418122186ccsm460002qtg.12.2023.10.27.03.15.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Oct 2023 03:14:17 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org,
-	dsahern@gmail.com,
-	daniel.machon@microchip.com
-Subject: [patch net-next v4 7/7] devlink: print nested devlink handle for devlink dev
-Date: Fri, 27 Oct 2023 12:14:03 +0200
-Message-ID: <20231027101403.958745-8-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231027101403.958745-1-jiri@resnulli.us>
-References: <20231027101403.958745-1-jiri@resnulli.us>
+        Fri, 27 Oct 2023 03:15:31 -0700 (PDT)
+Date: Fri, 27 Oct 2023 12:15:25 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: syzbot <syzbot+0c8ce1da0ac31abbadcd@syzkaller.appspotmail.com>, 
+	davem@davemloft.net, kuba@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, stefanha@redhat.com, 
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux-foundation.org, syoshida@redhat.com
+Subject: Re: [syzbot] [net?] KMSAN: uninit-value in virtio_transport_recv_pkt
+Message-ID: <6pljp7toxsxk4ljnggvn44djqzbi2g3bfou5snhugdrbabu7wv@fpueaouu26ly>
+References: <00000000000008b2940608ae3ce9@google.com>
+ <ooihytsfbk3brbwi2oj27ju3ff43ns36qhksfixrxdau2nieor@ervvukakvk4n>
+ <CANn89i+kKiSL6KJ6cEW_J5BmV3vSswbNPMNVm8ysKjDynF9d5w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+kKiSL6KJ6cEW_J5BmV3vSswbNPMNVm8ysKjDynF9d5w@mail.gmail.com>
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Fri, Oct 27, 2023 at 10:48:39AM +0200, Eric Dumazet wrote:
+>On Fri, Oct 27, 2023 at 10:25 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Fri, Oct 27, 2023 at 01:11:24AM -0700, syzbot wrote:
+>> >Hello,
+>> >
+>> >syzbot found the following issue on:
+>> >
+>> >HEAD commit:    d90b0276af8f Merge tag 'hardening-v6.6-rc3' of git://git.k..
+>> >git tree:       upstream
+>> >console+strace: https://syzkaller.appspot.com/x/log.txt?x=102c8b22680000
+>> >kernel config:  https://syzkaller.appspot.com/x/.config?x=6f1a4029b69273f3
+>> >dashboard link: https://syzkaller.appspot.com/bug?extid=0c8ce1da0ac31abbadcd
+>> >compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+>> >syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=101e58ec680000
+>> >C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17f7adb6680000
+>> >
+>> >Downloadable assets:
+>> >disk image: https://storage.googleapis.com/syzbot-assets/83ae10beee39/disk-d90b0276.raw.xz
+>> >vmlinux: https://storage.googleapis.com/syzbot-assets/c231992300f6/vmlinux-d90b0276.xz
+>> >kernel image: https://storage.googleapis.com/syzbot-assets/6377c9c2ea97/bzImage-d90b0276.xz
+>> >
+>> >IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>> >Reported-by: syzbot+0c8ce1da0ac31abbadcd@syzkaller.appspotmail.com
+>> >
+>> >=====================================================
+>> >BUG: KMSAN: uninit-value in virtio_transport_recv_pkt+0x1c42/0x2580 net/vmw_vsock/virtio_transport_common.c:1421
+>> > virtio_transport_recv_pkt+0x1c42/0x2580 net/vmw_vsock/virtio_transport_common.c:1421
+>> > vsock_loopback_work+0x3e2/0x5d0 net/vmw_vsock/vsock_loopback.c:120
+>> > process_one_work kernel/workqueue.c:2630 [inline]
+>> > process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
+>> > worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
+>> > kthread+0x3e8/0x540 kernel/kthread.c:388
+>> > ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+>> > ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+>> >
+>> >Uninit was stored to memory at:
+>> > virtio_transport_space_update net/vmw_vsock/virtio_transport_common.c:1274 [inline]
+>> > virtio_transport_recv_pkt+0x1ea4/0x2580 net/vmw_vsock/virtio_transport_common.c:1415
+>> > vsock_loopback_work+0x3e2/0x5d0 net/vmw_vsock/vsock_loopback.c:120
+>> > process_one_work kernel/workqueue.c:2630 [inline]
+>> > process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
+>> > worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
+>> > kthread+0x3e8/0x540 kernel/kthread.c:388
+>> > ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+>> > ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+>> >
+>> >Uninit was created at:
+>> > slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
+>> > slab_alloc_node mm/slub.c:3478 [inline]
+>> > kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3523
+>> > kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:559
+>> > __alloc_skb+0x318/0x740 net/core/skbuff.c:650
+>> > alloc_skb include/linux/skbuff.h:1286 [inline]
+>> > virtio_vsock_alloc_skb include/linux/virtio_vsock.h:66 [inline]
+>> > virtio_transport_alloc_skb+0x8b/0x1170 net/vmw_vsock/virtio_transport_common.c:58
+>> > virtio_transport_reset_no_sock net/vmw_vsock/virtio_transport_common.c:957 [inline]
+>> > virtio_transport_recv_pkt+0x1531/0x2580 net/vmw_vsock/virtio_transport_common.c:1387
+>> > vsock_loopback_work+0x3e2/0x5d0 net/vmw_vsock/vsock_loopback.c:120
+>> > process_one_work kernel/workqueue.c:2630 [inline]
+>> > process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2703
+>> > worker_thread+0xf45/0x1490 kernel/workqueue.c:2784
+>> > kthread+0x3e8/0x540 kernel/kthread.c:388
+>> > ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+>> > ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+>> >
+>> >CPU: 0 PID: 8 Comm: kworker/0:0 Not tainted 6.6.0-rc2-syzkaller-00337-gd90b0276af8f #0
+>> >Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
+>> >Workqueue: vsock-loopback vsock_loopback_work
+>> >=====================================================
+>> >
+>>
+>> Shigeru Yoshida already posted a patch here:
+>>
+>> https://lore.kernel.org/netdev/20231026150154.3536433-1-syoshida@redhat.com/
+>
+>Sure thing, this is why I released this syzbot report from my queue.
+>
 
-Devlink dev may contain one or more nested devlink instances.
-Print them using previously introduced pr_out_nested_handle_obj()
-helper.
+Thanks for that ;-)
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
-v2->v3:
-- rebased on top of new patch "devlink: extend pr_out_nested_handle() to
-  print object" and previous patch to use pr_out_nested_handle_obj()
----
- devlink/devlink.c | 30 ++++++++++++++++++++++++++----
- 1 file changed, 26 insertions(+), 4 deletions(-)
-
-diff --git a/devlink/devlink.c b/devlink/devlink.c
-index ae31e7cf34e3..f999e5940c63 100644
---- a/devlink/devlink.c
-+++ b/devlink/devlink.c
-@@ -3860,13 +3860,35 @@ static void pr_out_reload_data(struct dl *dl, struct nlattr **tb)
- 	pr_out_object_end(dl);
- }
- 
-+static void pr_out_dev_nested(struct dl *dl, const struct nlmsghdr *nlh)
-+{
-+	int i = 0, count = 0;
-+	struct nlattr *attr;
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		if (mnl_attr_get_type(attr) == DEVLINK_ATTR_NESTED_DEVLINK)
-+			count++;
-+	}
-+	if (!count)
-+		return;
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		if (mnl_attr_get_type(attr) != DEVLINK_ATTR_NESTED_DEVLINK)
-+			continue;
-+		pr_out_nested_handle_obj(dl, attr, i == 0, i == count - 1);
-+		i++;
-+	}
-+}
- 
--static void pr_out_dev(struct dl *dl, struct nlattr **tb)
-+static void pr_out_dev(struct dl *dl, const struct nlmsghdr *nlh,
-+		       struct nlattr **tb)
- {
- 	if ((tb[DEVLINK_ATTR_RELOAD_FAILED] && mnl_attr_get_u8(tb[DEVLINK_ATTR_RELOAD_FAILED])) ||
--	    (tb[DEVLINK_ATTR_DEV_STATS] && dl->stats)) {
-+	    (tb[DEVLINK_ATTR_DEV_STATS] && dl->stats) ||
-+	     tb[DEVLINK_ATTR_NESTED_DEVLINK]) {
- 		__pr_out_handle_start(dl, tb, true, false);
- 		pr_out_reload_data(dl, tb);
-+		pr_out_dev_nested(dl, nlh);
- 		pr_out_handle_end(dl);
- 	} else {
- 		pr_out_handle(dl, tb);
-@@ -3883,7 +3905,7 @@ static int cmd_dev_show_cb(const struct nlmsghdr *nlh, void *data)
- 	if (!tb[DEVLINK_ATTR_BUS_NAME] || !tb[DEVLINK_ATTR_DEV_NAME])
- 		return MNL_CB_ERROR;
- 
--	pr_out_dev(dl, tb);
-+	pr_out_dev(dl, nlh, tb);
- 	return MNL_CB_OK;
- }
- 
-@@ -6810,7 +6832,7 @@ static int cmd_mon_show_cb(const struct nlmsghdr *nlh, void *data)
- 			return MNL_CB_ERROR;
- 		pr_out_mon_header(genl->cmd);
- 		dl->stats = true;
--		pr_out_dev(dl, tb);
-+		pr_out_dev(dl, nlh, tb);
- 		pr_out_mon_footer();
- 		break;
- 	case DEVLINK_CMD_PORT_GET: /* fall through */
--- 
-2.41.0
+Stefano
 
 
