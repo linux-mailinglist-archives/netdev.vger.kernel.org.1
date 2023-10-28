@@ -1,159 +1,140 @@
-Return-Path: <netdev+bounces-44993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5802F7DA647
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 11:53:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65CA27DA656
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 12:09:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 135A1281F8B
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 09:53:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D3011C209CA
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B6B156D5;
-	Sat, 28 Oct 2023 09:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D96D295;
+	Sat, 28 Oct 2023 10:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="IitLcnK5";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="U5qWYXKZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDE211717;
-	Sat, 28 Oct 2023 09:52:30 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FF8210A;
-	Sat, 28 Oct 2023 02:52:28 -0700 (PDT)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SHZV743GbzVlYW;
-	Sat, 28 Oct 2023 17:48:31 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by canpemm500010.china.huawei.com
- (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Sat, 28 Oct
- 2023 17:52:26 +0800
-From: Liu Jian <liujian56@huawei.com>
-To: <john.fastabend@gmail.com>, <jakub@cloudflare.com>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <andrii@kernel.org>, <martin.lau@linux.dev>,
-	<song@kernel.org>, <yonghong.song@linux.dev>, <kpsingh@kernel.org>,
-	<sdf@google.com>, <haoluo@google.com>, <jolsa@kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <dsahern@kernel.org>
-CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <liujian56@huawei.com>
-Subject: [PATCH bpf-next v7 7/7] selftests/bpf: add tests for verdict skmsg to closed socket
-Date: Sat, 28 Oct 2023 18:05:52 +0800
-Message-ID: <20231028100552.2444158-8-liujian56@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231028100552.2444158-1-liujian56@huawei.com>
-References: <20231028100552.2444158-1-liujian56@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E335128F4
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 10:09:22 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 501A9E5
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 03:09:21 -0700 (PDT)
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1698487759;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/eThjMyxxADdAuiED1QlrJIwp0kdinX2KFks4H+LMO8=;
+	b=IitLcnK5iA+9pdX0bTbNhXSOfEwt4duFlbgW75If/Nnb+AGY6uz6QuXtA1o3YX7aJ47JO4
+	cUJQLcenamKIGTKQwbZnuKoS3acgwsSeBYdfpZAYkpcicc+A1T4aEgl0u0RrITfEjhizuH
+	+74kRgcgsLngkWWxgQC7GreE7XJT6fG40NRId1Mm6rgFSDK+dQ9IlIi3aWRh+eA0E6fJ7f
+	9+CnBKRp6K94x5D/8k1YipCHSwuxdoSGQ/1kyb9hsZJrNSE/mcXaiYXXhmqqvIwRgbhmad
+	emWNzl3/7h0M3Cs9efn3T54IFdOaWUvRKwAgHA7y6acbfUiAkVCJsoiF6u4Eig==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1698487759;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/eThjMyxxADdAuiED1QlrJIwp0kdinX2KFks4H+LMO8=;
+	b=U5qWYXKZPyXkI4oz5fZWwmseutH+AUUlMFVPqkxH2AC0DFbySm58Q7F9084jE/H11o/bbH
+	pl1Ar71NwqpHKTCQ==
+To: Florian Bezdeka <florian.bezdeka@siemens.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH net-next] net/core: Enable socket busy polling on -RT
+In-Reply-To: <d085757ed5607e82b1cd09d10d4c9f73bbdf3154.camel@siemens.com>
+References: <20230523111518.21512-1-kurt@linutronix.de>
+ <d085757ed5607e82b1cd09d10d4c9f73bbdf3154.camel@siemens.com>
+Date: Sat, 28 Oct 2023 12:09:18 +0200
+Message-ID: <87zg033vox.fsf@kurt>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+
+--=-=-=
 Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- canpemm500010.china.huawei.com (7.192.105.118)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 
-Add four tests for verdict skmsg to closed socket in sockmap_basic.c.
+Hi Florian,
 
-Signed-off-by: Liu Jian <liujian56@huawei.com>
----
- .../selftests/bpf/prog_tests/sockmap_basic.c  | 42 +++++++++++++++----
- 1 file changed, 34 insertions(+), 8 deletions(-)
+On Fri Oct 27 2023, Florian Bezdeka wrote:
+> On Tue, 2023-05-23 at 13:15 +0200, Kurt Kanzenbach wrote:
+>> Busy polling is currently not allowed on PREEMPT_RT, because it disables
+>> preemption while invoking the NAPI callback. It is not possible to acqui=
+re
+>> sleeping locks with disabled preemption. For details see commit
+>> 20ab39d13e2e ("net/core: disable NET_RX_BUSY_POLL on PREEMPT_RT").
+>
+> Is that something that we could consider as Bug-Fix for 6.1 and request
+> a backport, or would you consider that as new feature?
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index 75107762a86e..4d49129cdd6b 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -525,9 +525,10 @@ static void test_sockmap_skb_verdict_peek(void)
- 	test_sockmap_pass_prog__destroy(pass);
- }
- 
--static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is_self)
-+static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is_self,
-+				     bool target_shutdown)
- {
--	int key, sent, recvd, recv_fd;
-+	int key, sent, recvd, recv_fd, target_fd;
- 	int err, map, verdict, s, c0, c1, p0, p1;
- 	struct test_sockmap_msg_verdict *skel;
- 	char buf[256] = "0123456789";
-@@ -571,18 +572,22 @@ static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is
- 		skel->bss->skmsg_redir_flags = BPF_F_INGRESS;
- 		if (is_self) {
- 			skel->bss->skmsg_redir_key = 0;
-+			target_fd = p1;
- 			recv_fd = p1;
- 		} else {
- 			skel->bss->skmsg_redir_key = 1;
-+			target_fd = c1;
- 			recv_fd = c1;
- 		}
- 	} else {
- 		skel->bss->skmsg_redir_flags = 0;
- 		if (is_self) {
- 			skel->bss->skmsg_redir_key = 0;
-+			target_fd = p1;
- 			recv_fd = c1;
- 		} else {
- 			skel->bss->skmsg_redir_key = 2;
-+			target_fd = p0;
- 			recv_fd = c0;
- 		}
- 	}
-@@ -595,6 +600,19 @@ static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is
- 	recvd = recv_timeout(recv_fd, &buf, sizeof(buf), SOCK_NONBLOCK, IO_TIMEOUT_SEC);
- 	ASSERT_EQ(recvd, sizeof(buf), "recv_timeout(recv_fd)");
- 
-+	if (target_shutdown) {
-+		signal(SIGPIPE, SIG_IGN);
-+		close(target_fd);
-+		sent = send(p1, &buf, sizeof(buf), 0);
-+		if (is_permanent) {
-+			ASSERT_EQ(sent, -1, "xsend(p1)");
-+			ASSERT_EQ(errno, EPIPE, "xsend(p1)");
-+		} else {
-+			ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
-+		}
-+		goto out_close;
-+	}
-+
- 	sent = xsend(p1, &buf, sizeof(buf), 0);
- 	ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
- 	recvd = recv_timeout(recv_fd, &buf, sizeof(buf), SOCK_NONBLOCK, IO_TIMEOUT_SEC);
-@@ -651,15 +669,23 @@ void test_sockmap_basic(void)
- 	if (test__start_subtest("sockmap skb_verdict msg_f_peek"))
- 		test_sockmap_skb_verdict_peek();
- 	if (test__start_subtest("sockmap msg_verdict"))
--		test_sockmap_msg_verdict(false, false, false);
-+		test_sockmap_msg_verdict(false, false, false, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress"))
--		test_sockmap_msg_verdict(true, false, false);
-+		test_sockmap_msg_verdict(true, false, false, false);
- 	if (test__start_subtest("sockmap msg_verdict permanent"))
--		test_sockmap_msg_verdict(false, true, false);
-+		test_sockmap_msg_verdict(false, true, false, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress permanent"))
--		test_sockmap_msg_verdict(true, true, false);
-+		test_sockmap_msg_verdict(true, true, false, false);
- 	if (test__start_subtest("sockmap msg_verdict permanent self"))
--		test_sockmap_msg_verdict(false, true, true);
-+		test_sockmap_msg_verdict(false, true, true, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress permanent self"))
--		test_sockmap_msg_verdict(true, true, true);
-+		test_sockmap_msg_verdict(true, true, true, false);
-+	if (test__start_subtest("sockmap msg_verdict permanent shutdown"))
-+		test_sockmap_msg_verdict(false, true, false, true);
-+	if (test__start_subtest("sockmap msg_verdict ingress permanent shutdown"))
-+		test_sockmap_msg_verdict(true, true, false, true);
-+	if (test__start_subtest("sockmap msg_verdict shutdown"))
-+		test_sockmap_msg_verdict(false, false, false, true);
-+	if (test__start_subtest("sockmap msg_verdict ingress shutdown"))
-+		test_sockmap_msg_verdict(true, false, false, true);
- }
--- 
-2.34.1
+IMO it is in category "never worked". Hence it is not stable material.
 
+>
+>>=20
+>> However, strict cyclic and/or low latency network applications may prefe=
+r busy
+>> polling e.g., using AF_XDP instead of interrupt driven communication.
+>>=20
+>> The preempt_disable() is used in order to prevent the poll_owner and NAP=
+I owner
+>> to be preempted while owning the resource to ensure progress. Netpoll pe=
+rforms
+>> busy polling in order to acquire the lock. NAPI is locked by setting the
+>> NAPIF_STATE_SCHED flag. There is no busy polling if the flag is set and =
+the
+>> "owner" is preempted. Worst case is that the task owning NAPI gets preem=
+pted and
+>> NAPI processing stalls.  This is can be prevented by properly prioritisi=
+ng the
+>> tasks within the system.
+>>=20
+>> Allow RX_BUSY_POLL on PREEMPT_RT if NETPOLL is disabled. Don't disable
+>> preemption on PREEMPT_RT within the busy poll loop.
+>>=20
+>> Tested on x86 hardware with v6.1-RT and v6.3-RT on Intel i225 (igc) with
+>> AF_XDP/ZC sockets configured to run in busy polling mode.
+>
+> That is exactly our use case as well and we would like to have it in
+> 6.1. Any (technical) reasons that prevent a backport?
+
+There is no technical reason which prevents a backport to v6.1. In fact,
+we're using this with v6.1-RT LTS.
+
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmU83c4THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgsZ4EACs8uV1M7Ek6AH0iXDAg2zq/eFoVUOl
+zfSOVQtix5yDRKJROJraM65htBJOoOJjRpZMs9GHSYRq7Nod3+UdDHZWWyc5C3ag
+WMUZGBR4Ur2jzxiE7tzgy+X4FZpC7WIRqC7v6N8C22iXZArBbb+D2t2B00X7L/Tw
+JGUJpiTGfupl/GvxlpjFnSbrCRyDwAW7mWqSUANvviswnNDmWFuKqviu+d3RzB99
+R7Nv2NSSl8AZg6OY3CGFntE9o9A6da/nw6npj2b+qTvgezrQ+981/AAusl7ZWzih
+kokw18eJUYTRpmk8rzE6Xaek0GpxObIuEMtfvdx1rMocmPYeaLZyz1uZMaFu0Lok
+lVi+7IdysELWS6Gs6cuzIWrkLLBREjUxmNPeoCHUutJh+q/dbq+EV+2JGMHr3LnG
+d/XiCHW8XeLPq7XVlUd0Ayu1bDtRQWHvsqhTQUaWfKy/BmqhqR4PDSALu3fNLKq9
+n3yVQCt0t2WTKXnntXDV7Rlr1KOpJDMnsdagxmSZcrke3PSdhjHkemJsyUR8YIY7
+hpfK4Dczjd1wCiiEgTN8UrUkirsEJMe+YTUFc/HW1RxU+PlI9XUQE25cT/FnqiRK
+Jqe3o7vd/yKc5JiLuEFSq02ACYlf8COJX2YXk9ZykjUVjBrgXceM99gTb7dMZdum
+5bRUQs688uLQAA==
+=Z/FS
+-----END PGP SIGNATURE-----
+--=-=-=--
 
