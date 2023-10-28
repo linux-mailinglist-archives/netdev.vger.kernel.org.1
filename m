@@ -1,141 +1,97 @@
-Return-Path: <netdev+bounces-45006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0417C7DA7AD
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 17:07:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C9957DA7B1
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 17:12:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13F541C20A05
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 15:07:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9DD01C20986
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 15:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8BB15AFB;
-	Sat, 28 Oct 2023 15:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9634A15AEB;
+	Sat, 28 Oct 2023 15:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ghZ/6tGX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SeEZI6xD"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0AF6AB3;
-	Sat, 28 Oct 2023 15:07:34 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B9AC91;
-	Sat, 28 Oct 2023 08:07:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=amPD2Fv/HjzzurFL/5PbBJlVeFR9uLqmO4pACbtWeSM=; b=gh
-	Z/6tGXugP/rUAK2/gcHRJsj10N/7Y7i8cEejJllfAcKBCjzDAdvPaG6z1hpubLIdwQVC161N9eff0
-	pbyTRX8AAQe+6ngnAO0kTpFtj/d0L1+ADFaj9+GA7vZdzuelUfUTVkfuSdCBQWx0830yQjxzc2Swk
-	TPr7a1OI5OFXX+s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qwktF-000PNE-09; Sat, 28 Oct 2023 17:06:17 +0200
-Date: Sat, 28 Oct 2023 17:06:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Justin Stitt <justinstitt@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shay Agroskin <shayagr@amazon.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	David Arinzon <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>, Rasesh Mody <rmody@marvell.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	GR-Linux-NIC-Dev@marvell.com,
-	Dimitris Michailidis <dmichail@fungible.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Louis Peens <louis.peens@corigine.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>, drivers@pensando.io,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Ronak Doshi <doshir@vmware.com>,
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-	Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>,
-	Dwaipayan Ray <dwaipayanray1@gmail.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com, Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Kees Cook <keescook@chromium.org>, intel-wired-lan@lists.osuosl.org,
-	oss-drivers@corigine.com, linux-hyperv@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/3] ethtool: Implement ethtool_puts()
-Message-ID: <c7fffb8e-3ca7-4a70-8c6a-0b9c3d6d96d1@lunn.ch>
-References: <20231027-ethtool_puts_impl-v3-0-3466ac679304@google.com>
- <20231027-ethtool_puts_impl-v3-1-3466ac679304@google.com>
- <8ca4ba13-1bcf-4c7b-91b6-8c77fbe55b30@lunn.ch>
- <CAFhGd8p8mmGfR-eTu_g3k64Z79z=M1xfjTFDhmJ1XaszCtQx1w@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CE6642;
+	Sat, 28 Oct 2023 15:12:06 +0000 (UTC)
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03974C0;
+	Sat, 28 Oct 2023 08:12:02 -0700 (PDT)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-5a7afd45199so25559917b3.0;
+        Sat, 28 Oct 2023 08:12:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698505921; x=1699110721; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wAIcFay2mJQ/MIHPS/30VW7e6mQ/ldNPB7+UODDmJtI=;
+        b=SeEZI6xDm2h634oUFni404ELNV2s14PfER1jGXz1szvA5+RaGeJFDiLCiEdEqvDjMV
+         eYhPs/3E0r4HwzZZ/nVOjO5w9aPoGpWXKJnF0Ta4oIf+pzJXb4h6nvwfOnLR0DULCgrm
+         o69O7HkWNbB+fx8YEaGstFCuCxcL4nNtv/LWRksueMtciEnppywDF6sk81sJcq6cQXC2
+         qRiR3B9VS9fgiu5iX5cxesYHVgBQko8Vt3pGR2t225AekfqHW2pRB8x5vxoF1mHV4LNs
+         1xmN2+UeoDsEV8O9DaRlFe00THrkqsee0BY805wvojRr2YGlOnl67zNDxInzY/hvKMGs
+         OdNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698505921; x=1699110721;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wAIcFay2mJQ/MIHPS/30VW7e6mQ/ldNPB7+UODDmJtI=;
+        b=QxPznv6SYAn1lw6Oz/Y/yswnDBrnAa89XGiSlrqMX3m4VmHAUf7S4Wf7+ZYlpJKtoB
+         f2+Zu9KIBe4+Y1/JhIxPaSNEJ66nbj9nUBAM4a/kBzFCSXfnvuOj5Qn5SVkp/jSni5LS
+         tOga8PKX3VZNBAWu0HWu8akrDamb032yeqEYt4e+86TfAvz7RehAk0IZXzIFCrnTKT5i
+         bswVOUiO+CmaTBB2rNQiaJeiYKN/NScWikLbiNPS8lWTHH3Eo20HoepVlU0t+Lv7JAfi
+         b6NNTfvTWW9FRCPygkausaomj29/HWDS2kWHmT3lt2iU/lJvVg1yB4PQYLzzU6rDpcWg
+         lDBQ==
+X-Gm-Message-State: AOJu0YzB2GpjmhLlGxoHuqZu0s/tuRYCdaCJt2Z0X6fHVoHWivvbAjFS
+	GFp83uCFmyPV91VjabHS+WqmIEeX1WF1teyu+q4=
+X-Google-Smtp-Source: AGHT+IFy5UgsARBoD+eDXpWYeQapwrjHE7Hx01EtgKzxq515XyOaHQbS9Yb+k7p2CLPFMIhZYo5MnRCVyBxftpby8/c=
+X-Received: by 2002:a05:690c:f13:b0:5a7:d133:370d with SMTP id
+ dc19-20020a05690c0f1300b005a7d133370dmr7080914ywb.16.1698505921160; Sat, 28
+ Oct 2023 08:12:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFhGd8p8mmGfR-eTu_g3k64Z79z=M1xfjTFDhmJ1XaszCtQx1w@mail.gmail.com>
+References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
+ <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com>
+ <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch> <CANiq72mDVQg9dbtbAYLSoxQo4ZTgyKk=e-DCe8itvwgc0=HOZw@mail.gmail.com>
+ <20231027072621.03df3ec0@kernel.org> <CANiq72n=ySX08MMMM6NGL9T5nkaXJXnV2ZsoiXjkwDtfDG11Rw@mail.gmail.com>
+ <ca9fc28e-f68a-4b80-b21f-08a3edf3903a@lunn.ch> <CANiq72k4MFe2qL5XrweObo-bxT9qPA6+GAF4bSwLzyQJRX-mJw@mail.gmail.com>
+ <1e8b5a62-047a-4b87-9815-0ea320ccc466@proton.me>
+In-Reply-To: <1e8b5a62-047a-4b87-9815-0ea320ccc466@proton.me>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Sat, 28 Oct 2023 17:11:49 +0200
+Message-ID: <CANiq72=Ugc4bqJCQxnAOw1f3gtD-a_aYdrjbCp4A0aX2hqDaVA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 0/5] Rust abstractions for network PHY drivers
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu, wedsonaf@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 27, 2023 at 06:20:08PM -0700, Justin Stitt wrote:
-> On Fri, Oct 27, 2023 at 4:43 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > > +/**
-> > > + * ethtool_puts - Write string to ethtool string data
-> > > + * @data: Pointer to start of string to update
-> >
-> > Isn't it actually a pointer to a pointer to the start of string to
-> > update?
-> 
-> I suppose.
+On Sat, Oct 28, 2023 at 1:41=E2=80=AFPM Benno Lossin <benno.lossin@proton.m=
+e> wrote:
+>
+> We have it disabled on the `pub mod code` in error.rs line 20:
+> https://elixir.bootlin.com/linux/latest/source/rust/kernel/error.rs#L20
 
-Its kind of relevant because you increment by the length, which you
-can only do because it is **. I also find it a pretty strange API, so
-documenting it correctly is important for me.
+Thanks Benno -- I checked the `rust` branch, and forgot about that one.
 
-> 
-> FWIW, I just copy-pasted the sprintf doc and tweaked:
-> /**
->  * ethtool_sprintf - Write formatted string to ethtool string data
->  * @data: Pointer to start of string to update
+It is an interesting example though, because it could have gone either
+way: we were not using it for the same code in the `rust` branch -- it
+was an aesthetic improvement for consistency. In fact, if we do the
+macro differently, it would not be needed.
 
-So that need fixing as well. I will cook up a patch for this one.
-
-   Andrew
+Cheers,
+Miguel
 
