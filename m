@@ -1,72 +1,71 @@
-Return-Path: <netdev+bounces-44970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 159A77DA5CE
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:24:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1284C7DA5CF
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:26:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422982822E6
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:24:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90D17B2128F
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0668F4E;
-	Sat, 28 Oct 2023 08:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191798F56;
+	Sat, 28 Oct 2023 08:26:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="EyoEZy+G"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="lHKN7Ow4"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0988F49
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:24:44 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A348ED
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:24:41 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-53e08e439c7so4755109a12.0
-        for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:24:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0AF5664
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:26:35 +0000 (UTC)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B805EED
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:26:33 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-99c3d3c3db9so451663066b.3
+        for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:26:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698481480; x=1699086280; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698481592; x=1699086392; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bkFshng92MVsu3H8XxKlEoY3lCYrKhteF06/VM9f0Kg=;
-        b=EyoEZy+G0/5Ogy0nRrUzqnmdazirSEihuBtYrfxNFkLYoTwMD8kLVbWnlDkPZzGWqA
-         pryz9gaeQEsV6Ag34GqmqqdeUFSg7T8ePyuzsdLnyzUQ/TiBtL2LRFn+0GQNjsiDQXM0
-         vptLFWDiP34fCRRg9RUHYp4XDi3A9bhYWwMozQTvrQ153GaqWgHsfa1Wxkt3VANgScXJ
-         Qln0GfVFjvB3XFUGFviYdLFKajasPbpEop+c0937r0mv3CC47R1IAYAns3xTjFvjxEIO
-         VXo2YqH3/TxFjzYGR5oaJHMXZTrFrHAW/Isjoxjx0H477ghUKwF3O6aHQlYWR/GEhJyP
-         P/Tg==
+        bh=eJhQkTYQByEPzp5iF0kZrmUfhaZVU4sB1U1O9fNnad4=;
+        b=lHKN7Ow49hV20GxheiY0qXa6Wb/S5s6wLK+s+qonTCfJXjVsGUWLXFKC89Z6Q+WzBq
+         yQAEquaGEjL37HgKRw82kzhfAf5USpH3Rk/JVQfFNI6anv/GR5Ebh2u5zrwrVAooFZX5
+         CIkTQVt2CWULg1pTow4X22yBpdV4vgnLTpJOhjZtQjdyd9Fc3sE0GzmFB0CS25908mM+
+         aO9y/oPa9C8189EON3S9znIgFaidB2e5HQxEqdzY3NxArSMUHSC+Th6bp+ke8e9a3uTP
+         5uOA8uFydAfgpiyoDoMp58eqk0s31b6gy0S+T9C9ju9BFkeGN8qR/ZTykraiBOGI0Ag+
+         75Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698481480; x=1699086280;
+        d=1e100.net; s=20230601; t=1698481592; x=1699086392;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bkFshng92MVsu3H8XxKlEoY3lCYrKhteF06/VM9f0Kg=;
-        b=rD7x/MwR/olOfmu3KS6h8M/z3JFYLJJALV0wXL4Lrv/tJvC720O3G0DID1iWdDHKWL
-         6uRjr5iCKX6vXv+mHh5k99R49nuVyHUT9wSYMkUwKFwPWSQl8h26LMiKavC2Ls44oxeK
-         l6mn1OIPj0a7uuIrRSKdEbM4BXb5VTpfFD6MVxaxB7O4oCGh+JyxJ1AFw8qmoWg5MRn/
-         f53HgUsW+Dc8H+skqQV/ULFcO5/N9z6+WN4QNoImMQIL+pioXSdH2IR/anCBQu0SWgxc
-         ja7oQWqjgv/HrN7Fo/zTL2TlYRAXTRttBpGQdrVszoW6qo1EA27oQvMCQCb2cyoNf4Bm
-         ndHw==
-X-Gm-Message-State: AOJu0YzTe3GlpPh2IM5v8Aj0lNPUPyVcVB7rw0UwRFPZii9sX3l3qt+O
-	cdO5b/kmcJ6RdAcZY7St2FJ1Fw==
-X-Google-Smtp-Source: AGHT+IGPLMph/6iANab0gSEtv1tEqWd51HLLRzRPsSt7JmQmBxiaWUoua/3NXFwaIGoxDtbU3l4rKA==
-X-Received: by 2002:a17:907:c293:b0:9be:d55a:81ba with SMTP id tk19-20020a170907c29300b009bed55a81bamr4094343ejc.65.1698481479747;
-        Sat, 28 Oct 2023 01:24:39 -0700 (PDT)
+        bh=eJhQkTYQByEPzp5iF0kZrmUfhaZVU4sB1U1O9fNnad4=;
+        b=B7W1JVPi0R2BTLN+Z28PynPjg7Eiy50sCg3oyqz5foLUTSQ4dMKjxTt5dT0r72J3Eb
+         7OJZbA3gGN9AQThb8GZrnm4cvpel+OtEG1XMMYMqRjFf4U0ifJt6Aj3o8rlqOkenZFAH
+         ep3+HFyPUfdFYiu7zhZK3tUBiyqSGpsqdgpPchyK0AHh9Pw4o7EhY1b40dc82gQQN5MW
+         oF9Tf5v+DZ8Dk6qEx5TTQXSTuXnmb1GNXr9YyhhVFi2Oq5HFrXKykssX/zxXwbYPiPHf
+         ZwAmfoNJVvUd9av4UQPEsz6PcOi63k6X/xm43ZmiYQmCqClQCOhUL2Yaq/ktyf66ENwb
+         R8Fg==
+X-Gm-Message-State: AOJu0YyLEN2OQ326tM8pK7Jkl9HQTxhLUdDYy2NEA9xzYg0m7llDQxHW
+	zo+e58Dtk3OlRN+4S5qjoSEX5g==
+X-Google-Smtp-Source: AGHT+IFT/Q0SSMzgfM0wM05xnWL7uI2zo7YMO3TkPKajP7gwViLLOWD+0duceRfvnMA3Om+oP9Hxzg==
+X-Received: by 2002:a17:907:9815:b0:9bd:f031:37b6 with SMTP id ji21-20020a170907981500b009bdf03137b6mr3740555ejc.49.1698481592122;
+        Sat, 28 Oct 2023 01:26:32 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id a13-20020a170906190d00b009ae3d711fd9sm2417681eje.69.2023.10.28.01.24.38
+        by smtp.gmail.com with ESMTPSA id i14-20020a170906a28e00b009b27d4153c0sm2435670ejz.178.2023.10.28.01.26.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Oct 2023 01:24:39 -0700 (PDT)
-Date: Sat, 28 Oct 2023 10:24:37 +0200
+        Sat, 28 Oct 2023 01:26:31 -0700 (PDT)
+Date: Sat, 28 Oct 2023 10:26:30 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com
-Subject: Re: [patch net-next v4] tools: ynl: introduce option to process
- unknown attributes or types
-Message-ID: <ZTzFRZbRJhLbtE97@nanopsycho>
-References: <20231027092525.956172-1-jiri@resnulli.us>
- <20231027145419.6722f416@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next] tools: ynl-gen: don't touch the output file if
+ content is the same
+Message-ID: <ZTzFtiReRQUSKdoq@nanopsycho>
+References: <20231027223408.1865704-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,14 +74,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231027145419.6722f416@kernel.org>
+In-Reply-To: <20231027223408.1865704-1-kuba@kernel.org>
 
-Fri, Oct 27, 2023 at 11:54:19PM CEST, kuba@kernel.org wrote:
->On Fri, 27 Oct 2023 11:25:25 +0200 Jiri Pirko wrote:
->> - changed unknown attr key to f"UnknownAttr({attr.type})"
+Sat, Oct 28, 2023 at 12:34:08AM CEST, kuba@kernel.org wrote:
+>I often regenerate all YNL files in the tree to make sure they
+>are in sync with the codegen and specs. Generator rewrites
+>the files unconditionally, so since make looks at file modification
+>time to decide what to rebuild - my next build takes longer.
 >
->Not what I wanted but okay. Let's move on.. :)
+>We already generate the code to a tempfile most of the time,
+>only overwrite the target when we have to.
+>
+>Before:
+>
+>  $ stat include/uapi/linux/netdev.h
+>    File: include/uapi/linux/netdev.h
+>    Size: 2307      	Blocks: 8          IO Block: 4096   regular file
+>  Access: 2023-10-27 15:19:56.347071940 -0700
+>  Modify: 2023-10-27 15:19:45.089000900 -0700
+>  Change: 2023-10-27 15:19:45.089000900 -0700
+>   Birth: 2023-10-27 15:19:45.088000894 -0700
+>
+>  $ ./tools/net/ynl/ynl-regen.sh -f
+>  [...]
+>
+>  $ stat include/uapi/linux/netdev.h
+>    File: include/uapi/linux/netdev.h
+>    Size: 2307      	Blocks: 8          IO Block: 4096   regular file
+>  Access: 2023-10-27 15:19:56.347071940 -0700
+>  Modify: 2023-10-27 15:22:18.417968446 -0700
+>  Change: 2023-10-27 15:22:18.417968446 -0700
+>   Birth: 2023-10-27 15:19:45.088000894 -0700
+>
+>After:
+>
+>  $ stat include/uapi/linux/netdev.h
+>    File: include/uapi/linux/netdev.h
+>    Size: 2307      	Blocks: 8          IO Block: 4096   regular file
+>  Access: 2023-10-27 15:22:41.520114221 -0700
+>  Modify: 2023-10-27 15:22:18.417968446 -0700
+>  Change: 2023-10-27 15:22:18.417968446 -0700
+>   Birth: 2023-10-27 15:19:45.088000894 -0700
+>
+>  $ ./tools/net/ynl/ynl-regen.sh -f
+>  [...]
+>
+>  $ stat include/uapi/linux/netdev.h
+>    File: include/uapi/linux/netdev.h
+>    Size: 2307      	Blocks: 8          IO Block: 4096   regular file
+>  Access: 2023-10-27 15:22:41.520114221 -0700
+>  Modify: 2023-10-27 15:22:18.417968446 -0700
+>  Change: 2023-10-27 15:22:18.417968446 -0700
+>   Birth: 2023-10-27 15:19:45.088000894 -0700
+>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Feel free to patch the way you wanted. But I don't see any nicer way
-now. What you suggest with the class does not make sense to me.
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
