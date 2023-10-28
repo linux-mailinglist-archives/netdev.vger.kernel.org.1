@@ -1,130 +1,105 @@
-Return-Path: <netdev+bounces-45017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF7D57DA8B3
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 20:45:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BACD7DA8B6
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 20:45:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63AE6B20F0D
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 18:45:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8675B2816DA
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 18:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4431C168CD;
-	Sat, 28 Oct 2023 18:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2202215AEF;
+	Sat, 28 Oct 2023 18:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OsehjT8T"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="JGfeoGIA"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A671738E
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 18:45:21 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C3BBED
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 11:45:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-Id:Date:Subject:Cc:To:From:From:Sender:Reply-To:Subject:Date:
-	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=BaUsEdmEkQI+C5F2OhzCkM50XzbZ4NjjHQ81nBzVNoM=; b=OsehjT8TQ8RFpmHDV3yI3GLzCP
-	xKuxH+QutouiUWYvfBj6zshiQC3FSrg23F2JR4BfJ/DYIXrCvVafiJzqEz9wNO0xYgXDWik3rCDwE
-	EUH3yFJUv6Q5bRLPO2T5+M6SSxBgKDEZ/nAUBI6JT3xLFReXgMo/Q2ksKttbekFIcEbM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qwoJ8-000PsK-Q0; Sat, 28 Oct 2023 20:45:14 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: netdev <netdev@vger.kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH v1 net-next 2/2] net: mdio: fill in missing MODULE_DESCRIPTION()s
-Date: Sat, 28 Oct 2023 20:44:58 +0200
-Message-Id: <20231028184458.99448-3-andrew@lunn.ch>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20231028184458.99448-1-andrew@lunn.ch>
-References: <20231028184458.99448-1-andrew@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A29182A7
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 18:45:49 +0000 (UTC)
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 565E9ED
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 11:45:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1698518744; x=1698777944;
+	bh=/EfWUbB9Wsb/p9NJr2noKXHqOgah1wCmDmmFw9ATLn4=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=JGfeoGIA2vqLUoFwzzyof+JmzcnPHaXIdaTMJam6rYJPQvHZGMO0x/BcIvfh5Mvph
+	 7ltfIsWqIHh4iEJPYOVQU2jluh4KUdp+UqJfe4xIFCX1mhcL7eiyc7aci4Pr/6PgZK
+	 5Dhw61smOeOcUXYyHTIIjEVXbwax4GjWOtDnfRQG3Dnd2i19eS2/kxjnz5JwF0vQ/x
+	 +SdsmLilp6eelwLywMNu2qGsdEi8mHKHod1eUiJbreTxQf47xVLw+FBXNapVjkXek5
+	 nZrRizKfUL6o6ZXGTdXQUeF1KnoVKiBDISMvOfml/d2BDV7ICYMUXAYpXkPnLGoDKJ
+	 S09kYUakV8PaA==
+Date: Sat, 28 Oct 2023 18:45:40 +0000
+To: Andrew Lunn <andrew@lunn.ch>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, boqun.feng@gmail.com, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY drivers
+Message-ID: <0e858596-51b7-458c-a4eb-fa1e192e1ab3@proton.me>
+In-Reply-To: <b045970a-9d0f-48a1-9a06-a8057d97f371@lunn.ch>
+References: <20231026001050.1720612-2-fujita.tomonori@gmail.com> <ZTwWse0COE3w6_US@boqun-archlinux> <ba9614cf-bff6-4617-99cb-311fe40288c1@proton.me> <20231028.182723.123878459003900402.fujita.tomonori@gmail.com> <45b9c77c-e19c-4c06-a2ea-0cf7e4f17422@proton.me> <b045970a-9d0f-48a1-9a06-a8057d97f371@lunn.ch>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-W=1 builds now warn if a module is built without a
-MODULE_DESCRIPTION(). Fill them in based on the Kconfig text, or
-similar.
+On 28.10.23 20:23, Andrew Lunn wrote:
+> On Sat, Oct 28, 2023 at 04:37:53PM +0000, Benno Lossin wrote:
+>> On 28.10.23 11:27, FUJITA Tomonori wrote:
+>>> On Fri, 27 Oct 2023 21:19:38 +0000
+>>> Benno Lossin <benno.lossin@proton.me> wrote:
+>>>> I did not notice this before, but this means we cannot use the `link`
+>>>> function from bindgen, since that takes `&self`. We would need a
+>>>> function that takes `*const Self` instead.
+>>>
+>>> Implementing functions to access to a bitfield looks tricky so we need
+>>> to add such feature to bindgen or we add getters to the C side?
+>>
+>> Indeed, I just opened an issue [1] on the bindgen repo.
+>>
+>> [1]: https://github.com/rust-lang/rust-bindgen/issues/2674
+>=20
+> Please could you help me understand the consequences here. Are you
+> saying the rust toolchain is fatally broken here, it cannot generate
+> valid code at the moment? As a result we need to wait for a new
+> version of bindgen?
+This only affects bitfields, since they require special accessor functions
+generated by bindgen, so I would not say that the toolchain is fatally brok=
+en.
+It also is theoretically possible to manually access the bitfields in a cor=
+rect
+manner, but that is error prone (which is why we use the accessor functions
+provided by bindgen).
 
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/mdio/acpi_mdio.c    | 1 +
- drivers/net/mdio/fwnode_mdio.c  | 1 +
- drivers/net/mdio/mdio-aspeed.c  | 1 +
- drivers/net/mdio/mdio-bitbang.c | 1 +
- drivers/net/mdio/of_mdio.c      | 1 +
- 5 files changed, 5 insertions(+)
+In this particular case we have three options:
+1. wait until bindgen provides a raw accessor function that allows to use
+    only raw pointers.
+2. create some C helper functions for the bitfield access that will be repl=
+aced
+    by the bindgen functions once bindgen has updated.
+3. Since for the `phy_device` bindings, we only ever call functions while h=
+olding
+    the `phy_device.lock` lock (at least I think that this is correct) we m=
+ight be
+    able to get away with creating a reference to the object and use the cu=
+rrent
+    accessor functions anyway.
 
-diff --git a/drivers/net/mdio/acpi_mdio.c b/drivers/net/mdio/acpi_mdio.c
-index 4630dde01974..5d0f11f280cf 100644
---- a/drivers/net/mdio/acpi_mdio.c
-+++ b/drivers/net/mdio/acpi_mdio.c
-@@ -16,6 +16,7 @@
- 
- MODULE_AUTHOR("Calvin Johnson <calvin.johnson@oss.nxp.com>");
- MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("ACPI MDIO bus (Ethernet PHY) accessors");
- 
- /**
-  * __acpi_mdiobus_register - Register mii_bus and create PHYs from the ACPI ASL.
-diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
-index 1183ef5e203e..fd02f5cbc853 100644
---- a/drivers/net/mdio/fwnode_mdio.c
-+++ b/drivers/net/mdio/fwnode_mdio.c
-@@ -14,6 +14,7 @@
- 
- MODULE_AUTHOR("Calvin Johnson <calvin.johnson@oss.nxp.com>");
- MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("FWNODE MDIO bus (Ethernet PHY) accessors");
- 
- static struct pse_control *
- fwnode_find_pse_control(struct fwnode_handle *fwnode)
-diff --git a/drivers/net/mdio/mdio-aspeed.c b/drivers/net/mdio/mdio-aspeed.c
-index 70edeeb7771e..c2170650415c 100644
---- a/drivers/net/mdio/mdio-aspeed.c
-+++ b/drivers/net/mdio/mdio-aspeed.c
-@@ -205,3 +205,4 @@ module_platform_driver(aspeed_mdio_driver);
- 
- MODULE_AUTHOR("Andrew Jeffery <andrew@aj.id.au>");
- MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("ASPEED MDIO bus controller");
-diff --git a/drivers/net/mdio/mdio-bitbang.c b/drivers/net/mdio/mdio-bitbang.c
-index 81b7748c10ce..f88639297ff2 100644
---- a/drivers/net/mdio/mdio-bitbang.c
-+++ b/drivers/net/mdio/mdio-bitbang.c
-@@ -263,3 +263,4 @@ void free_mdio_bitbang(struct mii_bus *bus)
- EXPORT_SYMBOL(free_mdio_bitbang);
- 
- MODULE_LICENSE("GPL v2");
-+MODULE_DESCRIPTION("Bitbanged MDIO buses");
-diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
-index 7eb32ebb846d..64ebcb6d235c 100644
---- a/drivers/net/mdio/of_mdio.c
-+++ b/drivers/net/mdio/of_mdio.c
-@@ -25,6 +25,7 @@
- 
- MODULE_AUTHOR("Grant Likely <grant.likely@secretlab.ca>");
- MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("OpenFirmware MDIO bus (Ethernet PHY) accessors");
- 
- /* Extract the clause 22 phy ID from the compatible string of the form
-  * ethernet-phy-idAAAA.BBBB */
--- 
-2.42.0
+But for point 3 I will have to consult the others.
+
+--=20
+Cheers,
+Benno
+
 
 
