@@ -1,84 +1,111 @@
-Return-Path: <netdev+bounces-45002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A38527DA6BF
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 13:42:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE9DC7DA796
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 16:41:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38BDE2822C1
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 11:42:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8319BB210FA
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 14:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671B6125D5;
-	Sat, 28 Oct 2023 11:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB27714F62;
+	Sat, 28 Oct 2023 14:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="V1zbv65b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBa6vP9t"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92151DF57
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 11:42:00 +0000 (UTC)
-Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97F4EDE
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 04:41:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1698493315; x=1698752515;
-	bh=nJ/RLhSQQxDJCV667FIlY0OXMJZ66uaeodg8xQv58WY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=V1zbv65b93CQqEroRlIFjI0OUXxNYiG9oElfQdkXZkQgKB2gZDChum2+8nInmRsed
-	 lpnRkbnnZFN1qx2R6fSInNmjsePNuD2PpcHYUD7Ws0fjIRN7ow374fM5DPMR115E9t
-	 5e+yz9y4bUNrV8teV2xFKYBWXrirsZW5XagBYguU7GJkOBUXZ7lSkoNz8an0Va4Ta7
-	 UII0pwCOe2jCjhkukP+CvbTnN5DbZf+lTnA3IUtIXSrym7CNVcPPpMcdUVFOGZSRgu
-	 wleOt6RVqWshRqWQljehcA45+tIsx68NS5Z8sSEaueFbPCFht9ymxMfoLaMrzq8/EY
-	 qw4fYqKoAxsOg==
-Date: Sat, 28 Oct 2023 11:41:52 +0000
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Jakub Kicinski <kuba@kernel.org>, FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 0/5] Rust abstractions for network PHY drivers
-Message-ID: <1e8b5a62-047a-4b87-9815-0ea320ccc466@proton.me>
-In-Reply-To: <CANiq72k4MFe2qL5XrweObo-bxT9qPA6+GAF4bSwLzyQJRX-mJw@mail.gmail.com>
-References: <20231026001050.1720612-1-fujita.tomonori@gmail.com> <CANiq72mktqtv2iZSiE6sKJ-gaee_KaEmziqd=a=Vp2ojA+2TPQ@mail.gmail.com> <e167ba14-b605-453f-b67d-b807baffc3e1@lunn.ch> <CANiq72mDVQg9dbtbAYLSoxQo4ZTgyKk=e-DCe8itvwgc0=HOZw@mail.gmail.com> <20231027072621.03df3ec0@kernel.org> <CANiq72n=ySX08MMMM6NGL9T5nkaXJXnV2ZsoiXjkwDtfDG11Rw@mail.gmail.com> <ca9fc28e-f68a-4b80-b21f-08a3edf3903a@lunn.ch> <CANiq72k4MFe2qL5XrweObo-bxT9qPA6+GAF4bSwLzyQJRX-mJw@mail.gmail.com>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E2323A5;
+	Sat, 28 Oct 2023 14:41:44 +0000 (UTC)
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DE12EB;
+	Sat, 28 Oct 2023 07:41:43 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id d9443c01a7336-1cc2f17ab26so6488225ad.0;
+        Sat, 28 Oct 2023 07:41:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698504103; x=1699108903; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mogg5X7d2GZ29xgOrb/+nvXHqC0JmhaLIwextb1v/14=;
+        b=IBa6vP9tg1hxRM8oLhJV83O1qsSWxXMyh2OIrwTEx6AfY/vVMxOPAXZnuNfe2iKAb9
+         Ra1qbqY9ycDRlwGdisGmbVn9RlNdu7cWTpBl85N6PdQv7MLvJbUnOkTTmYkZTti1ZEoA
+         m/tseEEUhIia/dmuF1t2PPuR5FqRuvYpfCo7fVARC3fSCrfTbRjiBn0QNJTOofy224xe
+         evJbH5J+EkF5ezzZAnl2yURr9n5qD/KBIKkaTh8ZgMw/A7dUH2O9/srI5bZ9H7t21MOe
+         +B4LtqX5k/Zj7GaiMwLVbV3MbXpjY60RsfVrJGucbnrMVdT4Y0SWiOy9IyUNy+qG29W9
+         r5jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698504103; x=1699108903;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mogg5X7d2GZ29xgOrb/+nvXHqC0JmhaLIwextb1v/14=;
+        b=kGIdZe1NbmRFoEYqB92oBYV5nTAo0SELrbBePBRnA4/iV8QcEzLs7IyAcAImrXKyNU
+         IxDKqSgSV/OwSA2hzPK7HxTKCMxuUjAhQgS/GfeAz5QDqmyqmUyaoAzQV+Q/qltDydaM
+         fJnp6v9aTS7PANRb5PCEa91ufR4ulUeg3f4PboQZLZGYkmLgz2rhE2j2REMhdZ8C4S2/
+         0pZH8d4xmU4pKkSOhMA71oauvdiH7hFfK+aS+7Q+8L3LruQRNMHBMVJZWUSq3C/7eSRy
+         qeC6Choy5pqIomJdnj3xxbQ8UKNI7eNpcYWe5k2olxQVIUK7poWdLxg8mvi5onjkteJl
+         L1+w==
+X-Gm-Message-State: AOJu0Yx5NsiwWwRosdkFUKzAbfX/rv7JQPTRa3siZQGaFNhd6faikuvi
+	Netr+XZHgAxCucrNiJoRz2s=
+X-Google-Smtp-Source: AGHT+IE48W7C9EcGBo31JtUbLFJMzB8XIJdO4gsF13JfO+44ruwtMvSCZX/XYHWKHBom5u1Ob8s1sg==
+X-Received: by 2002:a17:903:3208:b0:1cc:3e45:ac0e with SMTP id s8-20020a170903320800b001cc3e45ac0emr99555plh.69.1698504102629;
+        Sat, 28 Oct 2023 07:41:42 -0700 (PDT)
+Received: from localhost.localdomain ([27.4.124.129])
+        by smtp.gmail.com with ESMTPSA id f15-20020a170902ce8f00b001c60a2b5c61sm3302209plg.134.2023.10.28.07.41.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Oct 2023 07:41:42 -0700 (PDT)
+From: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>,
+	dccp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+Subject: [PATCH net] dccp: check for ccid in ccid_hc_tx_send_packet
+Date: Sat, 28 Oct 2023 20:11:36 +0530
+Message-Id: <20231028144136.3462-1-bragathemanick0908@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On 10/28/23 13:07, Miguel Ojeda wrote:
-> On Sat, Oct 28, 2023 at 12:55=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wro=
-te:
->> It should also be noted that 80, or 100, is not a strict limit. Being
->> able to grep the kernel for strings is important. So the coding
->> standard allows you to go passed this limit in order that you don't
->> need to break a string. checkpatch understands this. I don't know if
->> your automated tools support such exceptions.
->=20
-> Not breaking string literals is the default behavior of `rustfmt` (and
-> we use its default behavior).
->=20
-> It is also definitely possible to turn off `rustfmt` locally, i.e. for
-> particular "items" (e.g. a function, a block, a statement), rather
-> than lines, which is very convenient.
->=20
-> However, as far as I recall, we have never needed to disable it. I am
-> sure it will eventually be needed somewhere, but what I am trying to
-> say is that it works well enough that one can just use it.
+ccid_hc_tx_send_packet might be called with a NULL ccid pointer
+leading to a NULL pointer dereference
 
-We have it disabled on the `pub mod code` in error.rs line 20:
-https://elixir.bootlin.com/linux/latest/source/rust/kernel/error.rs#L20
+Below mentioned commit has similarly changes
+commit 276bdb82dedb ("dccp: check ccid before dereferencing")
 
---=20
-Cheers,
-Benno
+Reported-by: syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=c71bc336c5061153b502
+Signed-off-by: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
+---
+ net/dccp/ccid.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/dccp/ccid.h b/net/dccp/ccid.h
+index 105f3734dadb..1015dc2b9392 100644
+--- a/net/dccp/ccid.h
++++ b/net/dccp/ccid.h
+@@ -163,7 +163,7 @@ static inline int ccid_packet_dequeue_eval(const int return_code)
+ static inline int ccid_hc_tx_send_packet(struct ccid *ccid, struct sock *sk,
+ 					 struct sk_buff *skb)
+ {
+-	if (ccid->ccid_ops->ccid_hc_tx_send_packet != NULL)
++	if (ccid != NULL && ccid->ccid_ops->ccid_hc_tx_send_packet != NULL)
+ 		return ccid->ccid_ops->ccid_hc_tx_send_packet(sk, skb);
+ 	return CCID_PACKET_SEND_AT_ONCE;
+ }
+-- 
+2.34.1
 
 
