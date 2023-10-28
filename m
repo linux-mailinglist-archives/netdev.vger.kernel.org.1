@@ -1,75 +1,87 @@
-Return-Path: <netdev+bounces-45027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C9AD7DAA0D
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 00:04:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C421D7DAA19
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 01:11:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3BAAB20DDA
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 22:04:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49DE0B20E6A
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 23:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5685C182C6;
-	Sat, 28 Oct 2023 22:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A85318AEA;
+	Sat, 28 Oct 2023 23:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTUdjj7t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D2T6KYUM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC45B65C
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 22:04:09 +0000 (UTC)
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15F47BE;
-	Sat, 28 Oct 2023 15:04:08 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40790b0a224so23795385e9.0;
-        Sat, 28 Oct 2023 15:04:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E4820F2;
+	Sat, 28 Oct 2023 23:11:41 +0000 (UTC)
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9415ED6;
+	Sat, 28 Oct 2023 16:11:40 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-77891c236fcso262019385a.3;
+        Sat, 28 Oct 2023 16:11:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698530646; x=1699135446; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W6xAxAgJ8/E1rrp4YMb11CAldnTGshTkVGRolTNv03Y=;
-        b=GTUdjj7tdcYyGawfuFz8N3axp/lgQxJpE7gTZ2f4eV/0pFcqsIBurC47gINhRWQHod
-         I6AUCujXFOR+cZB/K4MoeDUbFzXa0BAeMx6clyXY7WAeHDaOXevsxHm1eF1MbY0y7q2i
-         UIPtZydTxYSJD5LQQkSJrdPCQlN7shsNlbdS1XMDQIfzanNiJrPHr4Zl2TDrIPdynkXK
-         wvlnk5Fm0rmaAs4seSMTu3kMcyaeWeVmQjOwyGngHV58qZ9OWuM6bFd4CZoY9J5iQZDV
-         W7Qn9tPKEiYnmDTmYSFZd2JTqmq9XrJIOkQsudUa5SH1sRB44d70AJtB3PDPK9qJgM2K
-         VsHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698530646; x=1699135446;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1698534699; x=1699139499; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=W6xAxAgJ8/E1rrp4YMb11CAldnTGshTkVGRolTNv03Y=;
-        b=l6fIZenNYS7zq4doRG9XOhMxb3JijL+KPmaR/qHsXwjLWrZR+lyQJcRiZ4kx9Bohr9
-         S3F+pb2QlO6UtXckD673ES46ZYJOdqHHEsFtUaFcYk2+yVEtzVC1+2SPf3xT5Dsd/Glw
-         83sRJhCbhmqNp+IHP/a3bcY2yNFUUTYk+RyINVGpyRk8OaMrorVk1gSchCyxMKq27pHv
-         IHoUfBfSj8OzMgYniQtjLXfjgnWdDZD7GOo89OEFtKt5wfZQbbb5A5Yi1Ek2iR75UwDy
-         psE+lfAiXvibIwshSwAy0XJpBL1irlb9rkoJDvcgvMvTOKNO+hvr3SrJaDU8d6M8RWuy
-         n/zQ==
-X-Gm-Message-State: AOJu0YzVDKWGqQHp3Dcr89CPFyLLLW4wdyJQAsRlYMrnOgOcP5ndIYYd
-	/rdQTP9Up2hVTx6QorOl418=
-X-Google-Smtp-Source: AGHT+IGCLKsiOFpUOuwmLcFbsoirfIdDeHaZc2OJdfVUAJVeXg6mb8QiXLuLdKX5c4LmBVuLTYJkEQ==
-X-Received: by 2002:a5d:64e3:0:b0:32d:8401:404a with SMTP id g3-20020a5d64e3000000b0032d8401404amr4879072wri.10.1698530645910;
-        Sat, 28 Oct 2023 15:04:05 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id q26-20020adfb19a000000b0031f82743e25sm4638731wra.67.2023.10.28.15.04.04
+        bh=jYVnGp3cT6/jvVqSx9OkSVZgoRvtxkzuv24koCwWOG8=;
+        b=D2T6KYUM+NLwFRHO0Cclg+cwjQO+kbeFA34kSNssPvsFCVsOkNYVEId+XkhonvgPCe
+         GHiS0nIo9nio5i7bUfLEVe8BZfLMjZ8LxsCkESzI8PKHJiDwLsEv4FUc8T2zhTml9JG4
+         9L1hnJUwUM7DRwYNJvwBK4a2W4hhL1DPCchDPGne/l1Ai9R761vq6zjNGRQi07vh3Z0E
+         dMRAMBsksK5osIHPZZpIRki28Xubl5GeAyOhkvyq12DQJQCOquIvnB0Kyjn0bnPqu8Uh
+         4yjBRKiXL/C1V7rFAZGbkoBF2yuP3r/Nrj5+efktHyQpmB2bb2b4m79kRC2t/X6h1Lf4
+         0BHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698534699; x=1699139499;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jYVnGp3cT6/jvVqSx9OkSVZgoRvtxkzuv24koCwWOG8=;
+        b=mqHEQSAWoq69H0dDXtOG02+RYbjIy7d+CUSUevSvG4nCKw2hJwgGXF0FmA1bSw7V/b
+         EG3Bv0NYUNGUyOFHuXqByivQVq1wK5sOTGvLTS1DEPUGMsgOR4zpiCzt4EC8YUpNr7sc
+         FcRkcN/trpn17k1O9UizKzG91fB6qR+eIk+Fjvmpu36GwyF/nrKth4o+r+73KgTSpcYE
+         ZSjmuKrF2J8u0jCoplLUr9aAo/m4E1gVJTpVxz+W6mwxRwB9CXLcD54itstt9MVzHHQ4
+         j7NlJSLJqE8Z6DE5itasS7cR5cBDHxI/RRa/PjNAFwZ/gwXcTDdgzrrKEwkKl1U3Ie0H
+         2DAQ==
+X-Gm-Message-State: AOJu0YzINiI5maSNlhA5ksFir6lIgheN5kXMRJusASzleQYrYnwEtu1n
+	zmJT3GgwgUJZblB6aGnQ1Q==
+X-Google-Smtp-Source: AGHT+IGz3+YVwqb4dUdzhuz8wzmFiJtLAHz3MS74BztY0QK4r1cZu0N6BysPVkqTN3lpukHZsE/P9Q==
+X-Received: by 2002:a05:622a:130c:b0:418:a14:9c30 with SMTP id v12-20020a05622a130c00b004180a149c30mr8750949qtk.9.1698534699640;
+        Sat, 28 Oct 2023 16:11:39 -0700 (PDT)
+Received: from n191-129-154.byted.org ([147.160.184.150])
+        by smtp.gmail.com with ESMTPSA id z18-20020a05622a061200b00417dd1dd0adsm1968894qta.87.2023.10.28.16.11.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Oct 2023 15:04:05 -0700 (PDT)
-Date: Sun, 29 Oct 2023 01:04:02 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Mauri Sandberg <sandberg@mailfence.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+        Sat, 28 Oct 2023 16:11:39 -0700 (PDT)
+Date: Sat, 28 Oct 2023 23:11:37 +0000
+From: Peilin Ye <yepeilin.cs@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dsa: tag_rtl4_a: Bump min packet size
-Message-ID: <20231028220402.gdsynephzfkpvk4m@skbuf>
-References: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Peilin Ye <peilin.ye@bytedance.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Cong Wang <cong.wang@bytedance.com>,
+	Jiang Wang <jiang.wang@bytedance.com>,
+	Youlun Zhang <zhangyoulun@bytedance.com>
+Subject: Re: [PATCH net] veth: Fix RX stats for bpf_redirect_peer() traffic
+Message-ID: <20231028231135.GA2236124@n191-129-154.byted.org>
+References: <20231027184657.83978-1-yepeilin.cs@gmail.com>
+ <20231027190254.GA88444@n191-129-154.byted.org>
+ <59be18ff-dabc-2a07-3d78-039461b0f3f7@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,83 +90,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
+In-Reply-To: <59be18ff-dabc-2a07-3d78-039461b0f3f7@iogearbox.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Fri, Oct 27, 2023 at 10:21:39PM +0200, Linus Walleij wrote:
-> It was reported that the "LuCI" web UI was not working properly
-> with a device using the RTL8366RB switch. Disabling the egress
-> port tagging code made the switch work again, but this is not
-> a good solution as we want to be able to direct traffic to a
-> certain port.
+Hi Daniel,
+
+Thanks for taking a look!
+
+On Sat, Oct 28, 2023 at 09:06:44AM +0200, Daniel Borkmann wrote:
+> > > diff --git a/net/core/filter.c b/net/core/filter.c
+> > > index 21d75108c2e9..7aca28b7d0fd 100644
+> > > --- a/net/core/filter.c
+> > > +++ b/net/core/filter.c
+> > > @@ -2492,6 +2492,7 @@ int skb_do_redirect(struct sk_buff *skb)
+> > >   			     net_eq(net, dev_net(dev))))
+> > >   			goto out_drop;
+> > >   		skb->dev = dev;
+> > > +		dev_sw_netstats_rx_add(dev, skb->len);
+> > 
+> > This assumes that all devices that support BPF_F_PEER (currently only
+> > veth) use tstats (instead of lstats, or dstats) - is that okay?
 > 
-> It turns out that sometimes, but not always, small packets are
-> dropped by the switch for no reason.
-
-"For no reason" is a technical statement which means "an unspecific/inconclusive
-drop reason in the ethtool -S output on the conduit interface (which also
-shows the hardware counters of the CPU port", or is it just a figure of
-speech? If just a figure of speech, could you please determine which
-counter gets incremented when the switch drops packets?
-
-What user port is being targeted when the switch drops packets? Any user
-port, or just specific ones?
-
-What protocol headers do those packets that are dropped have? Is it size
-that they have in common, I wonder (given that you say that small
-packets are not always dropped), or is it something else?
-
-> If we pad the ethernet frames to a minimum of ETH_FRAME_LEN + FCS
-> (1518 bytes) everything starts working fine.
+> Dumb question, but why all this change and not simply just call ...
 > 
-> As we completely lack datasheet or any insight into how this
-> switch works, this trial-and-error solution is the best we
-> can do.
+>   dev_lstats_add(dev, skb->len)
 > 
-> I have tested smaller sizes, ETH_FRAME_LEN doesn't work for
-> example.
-> 
-> Fixes: 0e90dfa7a8d8 ("net: dsa: tag_rtl4_a: Fix egress tags")
+> ... on the host dev ?
 
-Have you actually checked out this sha1sum and confirmed that the packet
-drop can be reproduced there? Ideally you could also go back to a bit
-earlier, to commit 9eb8bc593a5e ("net: dsa: tag_rtl4_a: fix egress tags")
-(this is a different commit from Qingfang with the same description) and
-test on user port 0 only?
+Since I didn't want to update host-veth's TX counters.  If we
+bpf_redirect_peer()ed a packet from NIC TC ingress to Pod-veth TC ingress,
+I think it means we've bypassed host-veth TX?
 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  net/dsa/tag_rtl4_a.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> > If not, should I add another NDO e.g. ->ndo_stats_rx_add()?
 > 
-> diff --git a/net/dsa/tag_rtl4_a.c b/net/dsa/tag_rtl4_a.c
-> index c327314b95e3..8b1e81a6377b 100644
-> --- a/net/dsa/tag_rtl4_a.c
-> +++ b/net/dsa/tag_rtl4_a.c
-> @@ -41,8 +41,11 @@ static struct sk_buff *rtl4a_tag_xmit(struct sk_buff *skb,
->  	u8 *tag;
->  	u16 out;
->  
-> -	/* Pad out to at least 60 bytes */
-> -	if (unlikely(__skb_put_padto(skb, ETH_ZLEN, false)))
-> +	/* We need to pad out to at least ETH_FRAME_LEN + FCS bytes. This was
-> +	 * found by trial-and-error. Sometimes smaller frames work, but sadly
-> +	 * not always.
-> +	 */
-> +	if (unlikely(__skb_put_padto(skb, ETH_FRAME_LEN + ETH_FCS_LEN, false)))
->  		return NULL;
->  
->  	netdev_dbg(dev, "add realtek tag to package to port %d\n",
-> 
-> ---
-> base-commit: 58720809f52779dc0f08e53e54b014209d13eebb
-> change-id: 20231027-fix-rtl8366rb-e752bd5901ca
-> 
-> Best regards,
-> -- 
-> Linus Walleij <linus.walleij@linaro.org>
-> 
+> Definitely no new stats ndo resp indirect call in fast path.
 
-Until more is known:
+Yeah, I think I'll put a comment saying that all devices that support
+BPF_F_PEER must use tstats (or must use lstats), then.
 
-pw-bot: cr
+Thanks,
+Peilin Ye
+
 
