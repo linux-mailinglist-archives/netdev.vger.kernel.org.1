@@ -1,142 +1,128 @@
-Return-Path: <netdev+bounces-44984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 791DF7DA5EB
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:44:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4BC77DA62A
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 11:27:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32B0D28270C
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:44:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 834281C209A9
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 09:27:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF337CA56;
-	Sat, 28 Oct 2023 08:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4ECB670;
+	Sat, 28 Oct 2023 09:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a74tq0Xi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88DEB661
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:43:40 +0000 (UTC)
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 200C3135
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:43:39 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id E9A8E20839;
-	Sat, 28 Oct 2023 10:43:37 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LYmP2EGmVp5y; Sat, 28 Oct 2023 10:43:36 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 8242120764;
-	Sat, 28 Oct 2023 10:43:33 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 75DCD80004A;
-	Sat, 28 Oct 2023 10:43:33 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Sat, 28 Oct 2023 10:43:33 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Sat, 28 Oct
- 2023 10:43:32 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 6D0753183E7A; Sat, 28 Oct 2023 10:43:31 +0200 (CEST)
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
-	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 10/10] xfrm: policy: fix layer 4 flowi decoding
-Date: Sat, 28 Oct 2023 10:43:28 +0200
-Message-ID: <20231028084328.3119236-11-steffen.klassert@secunet.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231028084328.3119236-1-steffen.klassert@secunet.com>
-References: <20231028084328.3119236-1-steffen.klassert@secunet.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5274D2595;
+	Sat, 28 Oct 2023 09:27:27 +0000 (UTC)
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E1ECF0;
+	Sat, 28 Oct 2023 02:27:25 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6bcdfcde944so739064b3a.1;
+        Sat, 28 Oct 2023 02:27:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698485245; x=1699090045; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oe6k9URnl0hGpafNj5yK6ToO4iREfmFUhc0Lu2xjTfA=;
+        b=a74tq0XipV6rs2lGFzn+mYWgvrdt1bCOYp44e7ikgaN9+rxn4TmMIwTAle6HUbRytY
+         Sz+f4OXgVBS8dFHpqjHbPWGDKQqz4OJMcI3mTcRbxS4CB00gGMzoxtCvNfArhmX56tRT
+         oxNWSPiio9M/gHN3bzrCLXNoJJ5zlVaNGxe9j5L5spVffyCo1PLy8lqq3bRziUsaYFy3
+         1jSwkyk8woO5HZBInu7YvOaO9X4zxWpXLZZtdjnAkxIbsUrNWXcsv3O7kWNlG6t14a2w
+         XjUedKvCr1uPwZfVeYhQyeQW4jhzYv6d9jbN9zy3xoasLDuG1E4Ok01UDiri8ge3Ao3O
+         gbRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698485245; x=1699090045;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oe6k9URnl0hGpafNj5yK6ToO4iREfmFUhc0Lu2xjTfA=;
+        b=e9bI3bRSWVGk1/SvB/xfVz6zr0Hlcoclfs9Ac9PIbPKX80iEqoDHBeD66cfvjNRdki
+         BeubLEWeQc28kG+JfOKwXdGyMNgCIle+bIq+e8rlp/82S2nQM6UqW6zD/WEVnFB85Lar
+         G5A5TUepPLhNh3Z+ytpJBvTJKGsQMfo/ObTKl4X/NLqQG6TGXRvkqEWBz1wkZW7Oa/F/
+         HvlW4ykm50lqN9LB8OBjqWswFE78sY7Dba1cMp8AqAAmtFrGplJcem2V0rR/ROHexN9G
+         yIZyicm9c4WBjldzbDaJRZVXwONoSvESqERN3FGLWRBK4m0HK7RXt3IYYp1uohhJCSVn
+         YuFA==
+X-Gm-Message-State: AOJu0YyIE0aEIp5D63/FJQpmZu0LlXcrCc4GWgOisoqKJK5jPKtwdxlw
+	X+fMH49y9B2VPWWuZgsirmi7QQdVm9Vq1w==
+X-Google-Smtp-Source: AGHT+IHXNok7nLFWAgysk5569g6xbuTE37WjdJM6vDESMGdoh3rkp1zAmmMt2cOuFt+YJ110ET7Ddg==
+X-Received: by 2002:a17:902:d28b:b0:1c7:5581:f9c with SMTP id t11-20020a170902d28b00b001c755810f9cmr4980380plc.0.1698485244753;
+        Sat, 28 Oct 2023 02:27:24 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id y10-20020a17090322ca00b001a98f844e60sm2847089plg.263.2023.10.28.02.27.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Oct 2023 02:27:24 -0700 (PDT)
+Date: Sat, 28 Oct 2023 18:27:23 +0900 (JST)
+Message-Id: <20231028.182723.123878459003900402.fujita.tomonori@gmail.com>
+To: benno.lossin@proton.me
+Cc: boqun.feng@gmail.com, fujita.tomonori@gmail.com,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <ba9614cf-bff6-4617-99cb-311fe40288c1@proton.me>
+References: <20231026001050.1720612-2-fujita.tomonori@gmail.com>
+	<ZTwWse0COE3w6_US@boqun-archlinux>
+	<ba9614cf-bff6-4617-99cb-311fe40288c1@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-From: Florian Westphal <fw@strlen.de>
+On Fri, 27 Oct 2023 21:19:38 +0000
+Benno Lossin <benno.lossin@proton.me> wrote:
 
-The commit shipped with two bugs:
- fl4->fl4_icmp_type = flkeys->icmp.type;
- fl4->fl4_icmp_type = flkeys->icmp.code;
-               ~~~~ should have been "code".
+> On 10/27/23 21:59, Boqun Feng wrote:
+>> On Thu, Oct 26, 2023 at 09:10:46AM +0900, FUJITA Tomonori wrote:
+>> [...]
+>>> +    /// Gets the current link state.
+>>> +    ///
+>>> +    /// It returns true if the link is up.
+>>> +    pub fn is_link_up(&self) -> bool {
+>>> +        const LINK_IS_UP: u32 = 1;
+>>> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+>>> +        let phydev = unsafe { *self.0.get() };
+>> 
+>> Tomo, FWIW, the above line means *copying* the content pointed by
+>> `self.0.get()` into `phydev`, i.e. `phydev` is the semantically a copy
+>> of the `phy_device` instead of an alias. In C code, it means you did:
+> 
+> Good catch. `phy_device` is rather large (did not look at the exact
+> size) and this will not be optimized on debug builds, so it could lead
+> to stackoverflows.
+> 
+>> 	struct phy_device phydev = *ptr;
+>> 
+>> Sure, both compilers can figure this out, therefore no extra copy is
+>> done, but still it's better to avoid this copy semantics by doing:
+>> 
+>> 	let phydev = unsafe { &*self.0.get() };
+> 
+> We need to be careful here, since doing this creates a reference
+> `&bindings::phy_device` which asserts that it is immutable. That is not
+> the case, since the C side might change it at any point (this is the
+> reason we wrap things in `Opaque`, since that allows mutatation even
+> through sharde references).
 
-But the more severe bug is that I got fooled by flowi member defines:
-fl4_icmp_type, fl4_gre_key and fl4_dport share the same union/address.
+You meant that the C code might modify it independently anytime, not
+the C code called the Rust abstractions might modify it, right?
 
-Fix typo and make gre/icmp key setting depend on the l4 protocol.
 
-Fixes: 7a0207094f1b ("xfrm: policy: replace session decode with flow dissector")
-Reported-and-tested-by: Antony Antony <antony@phenome.org>
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- net/xfrm/xfrm_policy.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+> I did not notice this before, but this means we cannot use the `link`
+> function from bindgen, since that takes `&self`. We would need a
+> function that takes `*const Self` instead.
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 6aea8b2f45e0..d2dddc570f4f 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -3400,11 +3400,18 @@ decode_session4(const struct xfrm_flow_keys *flkeys, struct flowi *fl, bool reve
- 		fl4->fl4_dport = flkeys->ports.dst;
- 	}
- 
-+	switch (flkeys->basic.ip_proto) {
-+	case IPPROTO_GRE:
-+		fl4->fl4_gre_key = flkeys->gre.keyid;
-+		break;
-+	case IPPROTO_ICMP:
-+		fl4->fl4_icmp_type = flkeys->icmp.type;
-+		fl4->fl4_icmp_code = flkeys->icmp.code;
-+		break;
-+	}
-+
- 	fl4->flowi4_proto = flkeys->basic.ip_proto;
- 	fl4->flowi4_tos = flkeys->ip.tos;
--	fl4->fl4_icmp_type = flkeys->icmp.type;
--	fl4->fl4_icmp_type = flkeys->icmp.code;
--	fl4->fl4_gre_key = flkeys->gre.keyid;
- }
- 
- #if IS_ENABLED(CONFIG_IPV6)
-@@ -3427,10 +3434,17 @@ decode_session6(const struct xfrm_flow_keys *flkeys, struct flowi *fl, bool reve
- 		fl6->fl6_dport = flkeys->ports.dst;
- 	}
- 
-+	switch (flkeys->basic.ip_proto) {
-+	case IPPROTO_GRE:
-+		fl6->fl6_gre_key = flkeys->gre.keyid;
-+		break;
-+	case IPPROTO_ICMPV6:
-+		fl6->fl6_icmp_type = flkeys->icmp.type;
-+		fl6->fl6_icmp_code = flkeys->icmp.code;
-+		break;
-+	}
-+
- 	fl6->flowi6_proto = flkeys->basic.ip_proto;
--	fl6->fl6_icmp_type = flkeys->icmp.type;
--	fl6->fl6_icmp_type = flkeys->icmp.code;
--	fl6->fl6_gre_key = flkeys->gre.keyid;
- }
- #endif
- 
--- 
-2.34.1
-
+Implementing functions to access to a bitfield looks tricky so we need
+to add such feature to bindgen or we add getters to the C side?
 
