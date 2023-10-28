@@ -1,182 +1,88 @@
-Return-Path: <netdev+bounces-44969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1D627DA5BE
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:06:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 159A77DA5CE
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:24:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 210F51C209A6
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:06:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422982822E6
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9917D6FD2;
-	Sat, 28 Oct 2023 08:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0668F4E;
+	Sat, 28 Oct 2023 08:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bJNxDmza"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="EyoEZy+G"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2065B63C4
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:06:33 +0000 (UTC)
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F4F128;
-	Sat, 28 Oct 2023 01:06:30 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-9be1ee3dc86so392667466b.1;
-        Sat, 28 Oct 2023 01:06:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0988F49
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:24:44 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A348ED
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:24:41 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-53e08e439c7so4755109a12.0
+        for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:24:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698480388; x=1699085188; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dSAFbD2zXqeXCz/qQ3/GP/6mFeOJu9TLTBJ5xkKSIes=;
-        b=bJNxDmzasQsZzjeydC4z0HAHqfNiP1CLFmLPIQwDMd0xM2O/OaQd89ovt5o3QLmrdB
-         5mwPSF8iqaRuP/HNgYMLJjKpjs0/Xxc+e54esyif2xoFYEfRRPEzq5A4r5JosOfakYIK
-         GyVDvdn2qbXa8QiRC9jGvHB6BXFrXepLJpCx97RvajoYE1Kxwd494lF8w5MML4Jb8ax/
-         Hy7rFmklcq6lFfM3Q94BgyO+OTE1D2JL5rVO4iqtpd/tIU459sdqBlZRTKGk5GWfJN8t
-         kBMTN+U3bk1DEBl0qYMDbPwXxTHiDWMplERoNILJljkgaN2Oc8m04vPxdj0mqH0R8B/r
-         pkyQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698481480; x=1699086280; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bkFshng92MVsu3H8XxKlEoY3lCYrKhteF06/VM9f0Kg=;
+        b=EyoEZy+G0/5Ogy0nRrUzqnmdazirSEihuBtYrfxNFkLYoTwMD8kLVbWnlDkPZzGWqA
+         pryz9gaeQEsV6Ag34GqmqqdeUFSg7T8ePyuzsdLnyzUQ/TiBtL2LRFn+0GQNjsiDQXM0
+         vptLFWDiP34fCRRg9RUHYp4XDi3A9bhYWwMozQTvrQ153GaqWgHsfa1Wxkt3VANgScXJ
+         Qln0GfVFjvB3XFUGFviYdLFKajasPbpEop+c0937r0mv3CC47R1IAYAns3xTjFvjxEIO
+         VXo2YqH3/TxFjzYGR5oaJHMXZTrFrHAW/Isjoxjx0H477ghUKwF3O6aHQlYWR/GEhJyP
+         P/Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698480388; x=1699085188;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dSAFbD2zXqeXCz/qQ3/GP/6mFeOJu9TLTBJ5xkKSIes=;
-        b=pXPGiz8jIS/+ZEQoVIRJ+d3rv+fTmOMRNCGSRq8yqFNd7o8gqbQ8ncYazbeBYtLv2O
-         haq3T8ScQ8hGZDSQ6HY2RtWtvHjSlgEPawY/uI7fykXH4hde7yhQ/p61anthCRR09YV8
-         OdudggrwyISO9uwZQpWcYAcF1nNcl+wH3szvv5VeNU6MXZcKGmI+fQwL/1woD79YRB8t
-         WQZaqTm9+uOnMqTaO9MZn07j/DgeraXyixiEs2AeZQojglxuqHZwhQcpHe8WS6paYQaV
-         BZQrmsw/ArhVuCof/sCPs+O6w1tYa40YCzAhX44Epo/u73toCmuhrwhnrO+7nmTfKjIY
-         GpFg==
-X-Gm-Message-State: AOJu0Ywtx9Gx/Huf4FSDpShtmaLVS+DNK0mkmKSTLHMk8yejF1EP2+Nd
-	4st8hyL58e7Qm9bXoTPA4M+ArBhRYg8=
-X-Google-Smtp-Source: AGHT+IHJgeVWMRHX7vuGRYML70hVSHsN/yOOAMM11wB+4IYCHjjRXA1XBH8Y9DKQszzsJUxHgssoJg==
-X-Received: by 2002:a17:906:fd8b:b0:9c6:4dec:b1f0 with SMTP id xa11-20020a170906fd8b00b009c64decb1f0mr3916751ejb.74.1698480388282;
-        Sat, 28 Oct 2023 01:06:28 -0700 (PDT)
-Received: from ?IPV6:2a01:c23:c119:9c00:b47c:4f5f:820f:2966? (dynamic-2a01-0c23-c119-9c00-b47c-4f5f-820f-2966.c23.pool.telefonica.de. [2a01:c23:c119:9c00:b47c:4f5f:820f:2966])
-        by smtp.googlemail.com with ESMTPSA id i22-20020a1709064ed600b0099ce025f8ccsm2412363ejv.186.2023.10.28.01.06.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 28 Oct 2023 01:06:27 -0700 (PDT)
-Message-ID: <c5cfc90d-c184-4b04-bea0-bac375cfa85c@gmail.com>
-Date: Sat, 28 Oct 2023 10:06:28 +0200
+        d=1e100.net; s=20230601; t=1698481480; x=1699086280;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bkFshng92MVsu3H8XxKlEoY3lCYrKhteF06/VM9f0Kg=;
+        b=rD7x/MwR/olOfmu3KS6h8M/z3JFYLJJALV0wXL4Lrv/tJvC720O3G0DID1iWdDHKWL
+         6uRjr5iCKX6vXv+mHh5k99R49nuVyHUT9wSYMkUwKFwPWSQl8h26LMiKavC2Ls44oxeK
+         l6mn1OIPj0a7uuIrRSKdEbM4BXb5VTpfFD6MVxaxB7O4oCGh+JyxJ1AFw8qmoWg5MRn/
+         f53HgUsW+Dc8H+skqQV/ULFcO5/N9z6+WN4QNoImMQIL+pioXSdH2IR/anCBQu0SWgxc
+         ja7oQWqjgv/HrN7Fo/zTL2TlYRAXTRttBpGQdrVszoW6qo1EA27oQvMCQCb2cyoNf4Bm
+         ndHw==
+X-Gm-Message-State: AOJu0YzTe3GlpPh2IM5v8Aj0lNPUPyVcVB7rw0UwRFPZii9sX3l3qt+O
+	cdO5b/kmcJ6RdAcZY7St2FJ1Fw==
+X-Google-Smtp-Source: AGHT+IGPLMph/6iANab0gSEtv1tEqWd51HLLRzRPsSt7JmQmBxiaWUoua/3NXFwaIGoxDtbU3l4rKA==
+X-Received: by 2002:a17:907:c293:b0:9be:d55a:81ba with SMTP id tk19-20020a170907c29300b009bed55a81bamr4094343ejc.65.1698481479747;
+        Sat, 28 Oct 2023 01:24:39 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id a13-20020a170906190d00b009ae3d711fd9sm2417681eje.69.2023.10.28.01.24.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Oct 2023 01:24:39 -0700 (PDT)
+Date: Sat, 28 Oct 2023 10:24:37 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com
+Subject: Re: [patch net-next v4] tools: ynl: introduce option to process
+ unknown attributes or types
+Message-ID: <ZTzFRZbRJhLbtE97@nanopsycho>
+References: <20231027092525.956172-1-jiri@resnulli.us>
+ <20231027145419.6722f416@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: r8169: Disable multicast filter for
- RTL_GIGA_MAC_VER_46
-Content-Language: en-US
-To: Patrick Thompson <ptf@google.com>, netdev@vger.kernel.org
-Cc: Chun-Hao Lin <hau@realtek.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
- nic_swsd@realtek.com, Jeffery Miller <jefferymiller@google.com>
-References: <20231027213059.3550747-1-ptf@google.com>
- <CAJs+hrEXfk82+WyYSsPvs=qk-_JOsBHdWzgnFuy692eJsP=whQ@mail.gmail.com>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <CAJs+hrEXfk82+WyYSsPvs=qk-_JOsBHdWzgnFuy692eJsP=whQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231027145419.6722f416@kernel.org>
 
-On 27.10.2023 23:50, Patrick Thompson wrote:
-> Hello Heiner,
-> 
-> I haven't heard back from realtek about the possibility that this
-> affects other MAC_VERs. Do you think it's acceptable to merge this
-> patch for now and if/when we hear back from realtek I can adjust the
-> function again?
-> 
-Fine with me. 
-Would be nice if mc filtering could be switched on/off via ethtool,
-because now we have to disable mc filtering for all the unaffected
-users too.
+Fri, Oct 27, 2023 at 11:54:19PM CEST, kuba@kernel.org wrote:
+>On Fri, 27 Oct 2023 11:25:25 +0200 Jiri Pirko wrote:
+>> - changed unknown attr key to f"UnknownAttr({attr.type})"
+>
+>Not what I wanted but okay. Let's move on.. :)
 
-> Thank you,
-> Patrick
-> 
-Heiner
-
-> On Fri, Oct 27, 2023 at 5:31 PM Patrick Thompson <ptf@google.com> wrote:
->>
->> MAC_VER_46 ethernet adapters fail to detect eapol packets unless
->> allmulti is enabled. Add exception for VER_46 in the same way VER_35
->> has an exception.
->>
->> Fixes: 6e1d0b898818 ("r8169:add support for RTL8168H and RTL8107E")
->> Signed-off-by: Patrick Thompson <ptf@google.com>
->> ---
->>
->> Changes in v2:
->> - add Fixes tag
->> - add net annotation
->> - update description
->>
->>  drivers/net/ethernet/realtek/r8169_main.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
->> index 361b90007148b..a775090650e3a 100644
->> --- a/drivers/net/ethernet/realtek/r8169_main.c
->> +++ b/drivers/net/ethernet/realtek/r8169_main.c
->> @@ -2584,7 +2584,8 @@ static void rtl_set_rx_mode(struct net_device *dev)
->>                 rx_mode |= AcceptAllPhys;
->>         } else if (netdev_mc_count(dev) > MC_FILTER_LIMIT ||
->>                    dev->flags & IFF_ALLMULTI ||
->> -                  tp->mac_version == RTL_GIGA_MAC_VER_35) {
->> +                  tp->mac_version == RTL_GIGA_MAC_VER_35 ||
->> +                  tp->mac_version == RTL_GIGA_MAC_VER_46) {
->>                 /* accept all multicasts */
->>         } else if (netdev_mc_empty(dev)) {
->>                 rx_mode &= ~AcceptMulticast;
->> --
->> 2.42.0.820.g83a721a137-goog
->>
-
+Feel free to patch the way you wanted. But I don't see any nicer way
+now. What you suggest with the class does not make sense to me.
 
