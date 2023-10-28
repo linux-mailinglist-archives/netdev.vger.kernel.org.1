@@ -1,87 +1,106 @@
-Return-Path: <netdev+bounces-45028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C421D7DAA19
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 01:11:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E96447DAA28
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 01:26:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49DE0B20E6A
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 23:11:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDA46B20D3A
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 23:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A85318AEA;
-	Sat, 28 Oct 2023 23:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C53118AFB;
+	Sat, 28 Oct 2023 23:26:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D2T6KYUM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nllB85kX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E4820F2;
-	Sat, 28 Oct 2023 23:11:41 +0000 (UTC)
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9415ED6;
-	Sat, 28 Oct 2023 16:11:40 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-77891c236fcso262019385a.3;
-        Sat, 28 Oct 2023 16:11:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCA91097C;
+	Sat, 28 Oct 2023 23:26:22 +0000 (UTC)
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10F61CF;
+	Sat, 28 Oct 2023 16:26:21 -0700 (PDT)
+Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-41e1974783cso22156001cf.3;
+        Sat, 28 Oct 2023 16:26:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698534699; x=1699139499; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1698535580; x=1699140380; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jYVnGp3cT6/jvVqSx9OkSVZgoRvtxkzuv24koCwWOG8=;
-        b=D2T6KYUM+NLwFRHO0Cclg+cwjQO+kbeFA34kSNssPvsFCVsOkNYVEId+XkhonvgPCe
-         GHiS0nIo9nio5i7bUfLEVe8BZfLMjZ8LxsCkESzI8PKHJiDwLsEv4FUc8T2zhTml9JG4
-         9L1hnJUwUM7DRwYNJvwBK4a2W4hhL1DPCchDPGne/l1Ai9R761vq6zjNGRQi07vh3Z0E
-         dMRAMBsksK5osIHPZZpIRki28Xubl5GeAyOhkvyq12DQJQCOquIvnB0Kyjn0bnPqu8Uh
-         4yjBRKiXL/C1V7rFAZGbkoBF2yuP3r/Nrj5+efktHyQpmB2bb2b4m79kRC2t/X6h1Lf4
-         0BHQ==
+        bh=Kdf9pElA1fR4QgDFyuJCQ41jT1ZvFhdzgsvGwKxFNZ8=;
+        b=nllB85kXJt+h9z2+w7zRdJudrEe/uW6FsQGSPxKfX8AoVZkb0vljpaOE38ujMoONkD
+         T7dEvy1myur3CTIy3P/k56dt5CzWLYpIO4CfLS94Q9j2MByQp33dmbWfe57HbaQMly41
+         iF5YCvoad2OSHmDknLI/AuscykA9czCoTx1iRkypYhZ2vfPW7BgmO3SKBv09L99cbyhn
+         YMLd/Lp8qACx4sgBDaRT12AeRv+QYwEJ3HJgcw63I6gyPm2kyNuu8BYWTWrBTcnaQLgN
+         zBEBHtpJhBuxfh8cGKDsaJtATSiTauA6/FJ82ipxw4fn4eHFydxK7ZYodqH6QmrjOiy4
+         8CEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698534699; x=1699139499;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1698535580; x=1699140380;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jYVnGp3cT6/jvVqSx9OkSVZgoRvtxkzuv24koCwWOG8=;
-        b=mqHEQSAWoq69H0dDXtOG02+RYbjIy7d+CUSUevSvG4nCKw2hJwgGXF0FmA1bSw7V/b
-         EG3Bv0NYUNGUyOFHuXqByivQVq1wK5sOTGvLTS1DEPUGMsgOR4zpiCzt4EC8YUpNr7sc
-         FcRkcN/trpn17k1O9UizKzG91fB6qR+eIk+Fjvmpu36GwyF/nrKth4o+r+73KgTSpcYE
-         ZSjmuKrF2J8u0jCoplLUr9aAo/m4E1gVJTpVxz+W6mwxRwB9CXLcD54itstt9MVzHHQ4
-         j7NlJSLJqE8Z6DE5itasS7cR5cBDHxI/RRa/PjNAFwZ/gwXcTDdgzrrKEwkKl1U3Ie0H
-         2DAQ==
-X-Gm-Message-State: AOJu0YzINiI5maSNlhA5ksFir6lIgheN5kXMRJusASzleQYrYnwEtu1n
-	zmJT3GgwgUJZblB6aGnQ1Q==
-X-Google-Smtp-Source: AGHT+IGz3+YVwqb4dUdzhuz8wzmFiJtLAHz3MS74BztY0QK4r1cZu0N6BysPVkqTN3lpukHZsE/P9Q==
-X-Received: by 2002:a05:622a:130c:b0:418:a14:9c30 with SMTP id v12-20020a05622a130c00b004180a149c30mr8750949qtk.9.1698534699640;
-        Sat, 28 Oct 2023 16:11:39 -0700 (PDT)
-Received: from n191-129-154.byted.org ([147.160.184.150])
-        by smtp.gmail.com with ESMTPSA id z18-20020a05622a061200b00417dd1dd0adsm1968894qta.87.2023.10.28.16.11.39
+        bh=Kdf9pElA1fR4QgDFyuJCQ41jT1ZvFhdzgsvGwKxFNZ8=;
+        b=S1DQl+EBP6QrqM4MTkQtTxZo49BjmcDMpzKW4ZpG5irJcE/y6+N1AXlxsWj/YrLX9m
+         D5hyX3k9FEMD/9EnX7+90SoTz1CE9Olo+qQDP6E7ZM3CIdPCD0zxsFMOvYL9x2vMKDRX
+         /Pjiv9XAxn7nlHTmY1vqCdmJm1dHDm5Bq6ypsgGkxupJ4o0zmsYSWbHlBvnUNtQzpKPk
+         7qW0wUIPcFSjls49B7KZw/5dzlIb/34QpSgVX2W92+4Dh25Mz+uPEALlKMTEp+5EDgIu
+         HEfK2/rBpFQBIH8wPbXr+ro/QMYNs8aw2g5R+V5vXMZgeJY5wDEYrCu+foHf7O3HJG9X
+         2QEQ==
+X-Gm-Message-State: AOJu0YxF3AUAQItFZYnzhDxjenVmr2+0amjmOr0v/He9Ldtr1zM9cswM
+	ML+zX0FiCw8mlrvSnh+kwJQ=
+X-Google-Smtp-Source: AGHT+IGWXgY2Cz5bM2GOXBrzX2zXrTGFZa4P54QCXRxTCC9D8OCBC7slxFsIKoyHtKwZGuicZq7eKQ==
+X-Received: by 2002:ac8:7fcc:0:b0:41c:bc53:4ed8 with SMTP id b12-20020ac87fcc000000b0041cbc534ed8mr8973566qtk.7.1698535580061;
+        Sat, 28 Oct 2023 16:26:20 -0700 (PDT)
+Received: from auth1-smtp.messagingengine.com (auth1-smtp.messagingengine.com. [66.111.4.227])
+        by smtp.gmail.com with ESMTPSA id g13-20020ac84dcd000000b00403cce833eesm1974736qtw.27.2023.10.28.16.26.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Oct 2023 16:11:39 -0700 (PDT)
-Date: Sat, 28 Oct 2023 23:11:37 +0000
-From: Peilin Ye <yepeilin.cs@gmail.com>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Peilin Ye <peilin.ye@bytedance.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Cong Wang <cong.wang@bytedance.com>,
-	Jiang Wang <jiang.wang@bytedance.com>,
-	Youlun Zhang <zhangyoulun@bytedance.com>
-Subject: Re: [PATCH net] veth: Fix RX stats for bpf_redirect_peer() traffic
-Message-ID: <20231028231135.GA2236124@n191-129-154.byted.org>
-References: <20231027184657.83978-1-yepeilin.cs@gmail.com>
- <20231027190254.GA88444@n191-129-154.byted.org>
- <59be18ff-dabc-2a07-3d78-039461b0f3f7@iogearbox.net>
+        Sat, 28 Oct 2023 16:26:19 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailauth.nyi.internal (Postfix) with ESMTP id 28F9727C0054;
+	Sat, 28 Oct 2023 19:26:19 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Sat, 28 Oct 2023 19:26:19 -0400
+X-ME-Sender: <xms:mpg9Zcv87cJshs9xl7hQislvcjI5eAcVqP2TUXrf731yqevjfXlHhA>
+    <xme:mpg9ZZcgjS20y9LTSlvszvKhqXmurpmFK57sCSnQ_4TS5kJnzPDa0ZKPJB7EB4vxV
+    lumvpIAJ_B6tQvW6A>
+X-ME-Received: <xmr:mpg9ZXzi8iSyqRw46y4MX1eIdUYWPSAl7GC5Bhtxuj6zqw-Lw5YowDDGd_0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrleejgddvvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeeuohhquhhn
+    ucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrfgrth
+    htvghrnhephedugfduffffteeutddvheeuveelvdfhleelieevtdeguefhgeeuveeiudff
+    iedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsg
+    hoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieeg
+    qddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigi
+    hmvgdrnhgrmhgv
+X-ME-Proxy: <xmx:mpg9ZfNCGYrKw786PqBrAWnsmy2ZD7XyHGnk2-ABkoMvjlvvP9lsUg>
+    <xmx:mpg9Zc-XLy0pdjd7WnnmwMXSF1K6OPN50fVdxtOROGORSJaZoE44lg>
+    <xmx:mpg9ZXU5YvWczY5tW54ZKqeQlhcBhY1zeF7Ip1RbXFlCSafUQlEOKQ>
+    <xmx:m5g9ZZP-6wHqFTC3PTvHNrsLirzI4TM0e9B6U2fu72kKEgH-k6B7nQ>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 28 Oct 2023 19:26:18 -0400 (EDT)
+Date: Sat, 28 Oct 2023 16:26:16 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Benno Lossin <benno.lossin@proton.me>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY
+ drivers
+Message-ID: <ZT2YmC70zrCgxlHo@Boquns-Mac-mini.home>
+References: <ba9614cf-bff6-4617-99cb-311fe40288c1@proton.me>
+ <20231028.182723.123878459003900402.fujita.tomonori@gmail.com>
+ <f0bf3628-c4ef-4f80-8c1a-edaf01d77457@lunn.ch>
+ <20231029.010905.2203628525080155252.fujita.tomonori@gmail.com>
+ <91cba75f-0997-43e8-93d0-b795b3783eff@proton.me>
+ <ZT1bt8FknDEeUotm@Boquns-Mac-mini.home>
+ <10415b9d-5051-47b1-8dee-9decc0d1539a@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,45 +109,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <59be18ff-dabc-2a07-3d78-039461b0f3f7@iogearbox.net>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <10415b9d-5051-47b1-8dee-9decc0d1539a@lunn.ch>
 
-Hi Daniel,
-
-Thanks for taking a look!
-
-On Sat, Oct 28, 2023 at 09:06:44AM +0200, Daniel Borkmann wrote:
-> > > diff --git a/net/core/filter.c b/net/core/filter.c
-> > > index 21d75108c2e9..7aca28b7d0fd 100644
-> > > --- a/net/core/filter.c
-> > > +++ b/net/core/filter.c
-> > > @@ -2492,6 +2492,7 @@ int skb_do_redirect(struct sk_buff *skb)
-> > >   			     net_eq(net, dev_net(dev))))
-> > >   			goto out_drop;
-> > >   		skb->dev = dev;
-> > > +		dev_sw_netstats_rx_add(dev, skb->len);
-> > 
-> > This assumes that all devices that support BPF_F_PEER (currently only
-> > veth) use tstats (instead of lstats, or dstats) - is that okay?
+On Sat, Oct 28, 2023 at 09:23:25PM +0200, Andrew Lunn wrote:
+> > Now let's look back into struct phy_device, it does have a few locks
+> > in it, and at least even with phydev->lock held, the content of
+> > phydev->lock itself can be changed (e.g tick locks), hence it breaks the
+> > requirement of the existence of a `&bindings::phy_device`.
 > 
-> Dumb question, but why all this change and not simply just call ...
+> tick locks appear to be a Rust thing, so are unlikely to appear in a C
+
+Ah, I meant ticket locks... same here a mutex has a wait_lock which can
+be implemented by ticket locks or queued spin locks, so the u32 lock
+field may change even with lock held.
+
+Regards,
+Boqun
+
+> structure. However, kernel C mutex does have a linked list of other
+> threads waiting for the mutex. So phydev->lock can change at any time,
+> even when held.
 > 
->   dev_lstats_add(dev, skb->len)
-> 
-> ... on the host dev ?
-
-Since I didn't want to update host-veth's TX counters.  If we
-bpf_redirect_peer()ed a packet from NIC TC ingress to Pod-veth TC ingress,
-I think it means we've bypassed host-veth TX?
-
-> > If not, should I add another NDO e.g. ->ndo_stats_rx_add()?
-> 
-> Definitely no new stats ndo resp indirect call in fast path.
-
-Yeah, I think I'll put a comment saying that all devices that support
-BPF_F_PEER must use tstats (or must use lstats), then.
-
-Thanks,
-Peilin Ye
-
+> 	Andrew
 
