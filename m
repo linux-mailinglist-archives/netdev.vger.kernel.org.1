@@ -1,115 +1,164 @@
-Return-Path: <netdev+bounces-44973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D2EC7DA5D3
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:36:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CAF7DA5D5
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:38:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22B67B212A8
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:36:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 718892823EB
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:38:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22A64427;
-	Sat, 28 Oct 2023 08:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9635CBD;
+	Sat, 28 Oct 2023 08:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ke9uTE4l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MtDJsB0K"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCB4257B
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:35:55 +0000 (UTC)
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D319121
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:35:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1698482150; x=1698741350;
-	bh=CCUKTpfWXiqM0w1ZeBbNt5hS5uZwregLAu471m/tXFI=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=ke9uTE4l9iPeaiolP+Rl9Ag5lYgxoUWhiUw2J8CwD6/681ijxc+dPHhFoOa+JZt/I
-	 qVjYwX7tZZYS5SZ8gm9VTO25CsQQngcR0+V6soc2grx4kQFS2+VgRFUtsFQFcEOY1v
-	 /haWUFHzsDrFq10PQ2mTv0KtLJ1cSm+wIEWrzQ9yxJe5aA4SyB1IbjrtL5YdkthRmN
-	 aY5JDatBSHGPwGj1t0FlATtDXp5+QYWZgTz12LQ+2nhe5PE0HDgqCwER3fByp8EPHb
-	 ngkJJt1YnOP7N7Z/0k0HWbFKfKkl/2YMBAHJUg1yjkAOCvhvSmrddgcQqI5Vld1QkO
-	 lCb03e8Abqx1Q==
-Date: Sat, 28 Oct 2023 08:35:38 +0000
-To: Boqun Feng <boqun.feng@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY drivers
-Message-ID: <e7da93d6-b938-4558-95b2-e9d2e0194621@proton.me>
-In-Reply-To: <ZTxHKCWTAA7T-MJd@boqun-archlinux>
-References: <20231026001050.1720612-1-fujita.tomonori@gmail.com> <20231026001050.1720612-2-fujita.tomonori@gmail.com> <ZTwWse0COE3w6_US@boqun-archlinux> <ba9614cf-bff6-4617-99cb-311fe40288c1@proton.me> <ZTw3_--yDkJ9ZwIP@boqun-archlinux> <77c78010-781e-4eb4-a7ba-3e9f9a07bf67@proton.me> <ZTxHKCWTAA7T-MJd@boqun-archlinux>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EC4257B
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:38:48 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F15F4;
+	Sat, 28 Oct 2023 01:38:45 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9c41e95efcbso393613466b.3;
+        Sat, 28 Oct 2023 01:38:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698482324; x=1699087124; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LpMeyzioqsroJUo35H7XsKCzwknPxdneK87kcKtXySo=;
+        b=MtDJsB0KLvuPH357Nq1sjmw+/N3cqcPL7zwljBGwCsSsZMSGPBLUrW4G9KraOgsDOX
+         C1fbGP/Lr8ZMAQSAyed1Zcj8QWQaBUQj3RQbqoPVqwKgtbldv2hicwpc5JQYH7DXlxqK
+         4UJ2WIJFo5EEJ9I0Sl3joj0OmWzL6dyYQH3k8b5dV9p1DCnbrhJWgrq4loWUpJMrrCEH
+         LPXTt1D1dZmZvUTR8juo20t9CodNDAwU26SvMGCGA/2CAAMPRqqX51u8nX+9/OJbw7Xd
+         VZLpWolc8Lx0wAOPRJ8IS+XH1xpP76wcILSYuubGbSC8Rio+4TSp5ScRuZs2bVNaxemu
+         dy8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698482324; x=1699087124;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LpMeyzioqsroJUo35H7XsKCzwknPxdneK87kcKtXySo=;
+        b=NoLAwRWQBiPkm2S6ZdQ0n269l5FWW9iU4UqTJwQdrLyCbNKvrYtrNgjvYJ9OyqYo9h
+         tJmSFSTfbU6xAOSOIMAIcQsrAfdIdTmxdMAfhqoJCMop/mSV/zPcPZlgs1Q8dLukmeOj
+         PAEth4YNmVriQQYleVgDQSVZTNm6GkXlxWI+0NdDNAFr/drUbtomYRc7P+kVhNNVShKC
+         ohD0t3Jkv6vJcpCggm8hDZ8s14B4sniqpT2rMWdAZKBfqD7fv/b78vvbo7SKZpd/UT+Z
+         SyEC/DxCbxuyXYEAXhjP68S4kl3JjTPZUFnPkxhUEpo2UmD5ZXCVESwL2L6KHmUD5NfB
+         Y8/A==
+X-Gm-Message-State: AOJu0Yx5AQ4URVavzwx8mW994BxP6Tznija6fccAqIR0I3nuTfV/c/XG
+	xu0FvD45CZDy6R224EYpPmg=
+X-Google-Smtp-Source: AGHT+IHY4dyT9zpaKF77TkYL68omyNiRhrDZFl0X1WhyeyMCdYoKj+A9ZcCQ9HLjmJ5xcRPhxkx5vQ==
+X-Received: by 2002:a17:907:2da7:b0:9bd:d1e8:57f1 with SMTP id gt39-20020a1709072da700b009bdd1e857f1mr4833016ejc.50.1698482323620;
+        Sat, 28 Oct 2023 01:38:43 -0700 (PDT)
+Received: from ?IPV6:2a01:c23:c119:9c00:b47c:4f5f:820f:2966? (dynamic-2a01-0c23-c119-9c00-b47c-4f5f-820f-2966.c23.pool.telefonica.de. [2a01:c23:c119:9c00:b47c:4f5f:820f:2966])
+        by smtp.googlemail.com with ESMTPSA id e17-20020a170906375100b0099e12a49c8fsm2457712ejc.173.2023.10.28.01.38.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 28 Oct 2023 01:38:43 -0700 (PDT)
+Message-ID: <415e0355-7d71-4b82-b4fc-37dad22486a9@gmail.com>
+Date: Sat, 28 Oct 2023 10:38:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: r8169: Disable multicast filter for
+ RTL_GIGA_MAC_VER_46
+Content-Language: en-US
+To: Patrick Thompson <ptf@google.com>, netdev@vger.kernel.org
+Cc: Chun-Hao Lin <hau@realtek.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ nic_swsd@realtek.com
+References: <20231027213059.3550747-1-ptf@google.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
+ sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
+ MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
+ dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
+ /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
+ 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
+ J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
+ kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
+ cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
+ mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
+ bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
+ ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
+ AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
+ axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
+ wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
+ ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
+ TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
+ 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
+ dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
+ +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
+ 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
+ aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
+ kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
+ fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
+ 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
+ KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
+ ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
+ 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
+ ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
+ /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
+ gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
+ AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
+ GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
+ y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
+ nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
+ Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
+ rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
+ Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
+ q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
+ H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
+ lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
+ OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
+In-Reply-To: <20231027213059.3550747-1-ptf@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 28.10.23 01:26, Boqun Feng wrote:
-> On Fri, Oct 27, 2023 at 10:50:45PM +0000, Benno Lossin wrote:
-> [...]
->>>
->>> Hmm... but does it mean even `set_speed()` has the similar issue?
->>>
->>> =09let phydev: *mut phy_device =3D self.0.get();
->>> =09unsafe { (*phydev).speed =3D ...; }
->>
->> No that should be fine, take a look at the MIR output of the following
->> code [1]:
->>
->>      struct Foo {
->>          a: usize,
->>          b: usize,
->>      }
->>
->>      fn foo(ptr: *mut Foo) {
->>          unsafe { (*ptr).b =3D 0; }
->>      }
->>
->>      fn bar(ptr: *mut Foo) {
->>          unsafe { (&mut *ptr).b =3D 0; }
->>      }
->>
->> Aside from some alignment checking, foo's MIR looks like this:
->>
->>      bb1: {
->>          ((*_1).1: usize) =3D const 0_usize;
->>          return;
->>      }
->>
->> And bar's MIR like this:
->>
->>      bb1: {
->>          _2 =3D &mut (*_1);
->>          ((*_2).1: usize) =3D const 0_usize;
->>          return;
->>      }
->>
->> [1]: https://play.rust-lang.org/?version=3Dstable&mode=3Ddebug&edition=
-=3D2021&gist=3Df7c4d87bf29a64af0acc09ff75d3716d
->>
->> So I think that is fine, but maybe Gary has something else to say about =
-it.
->>
->=20
-> Well when `-C opt-level=3D2`, they are the same:
->=20
-> =09https://godbolt.org/z/hxxo75YYh
+On 27.10.2023 23:30, Patrick Thompson wrote:
+> MAC_VER_46 ethernet adapters fail to detect eapol packets unless
+> allmulti is enabled. Add exception for VER_46 in the same way VER_35
+> has an exception.
+> 
+MAC_VER_48 (RTL8107E) has the same MAC, just a different PHY.
+So I would expect that the same quirk is needed for MAC_VER_48.
 
-It doesn't matter what the optimizer does, `bar` is unsound in our use-case
-and `foo` is fine (I think).
+MAC_VER_xx is a little misleading, actually it should be NIC_VER_xx
 
---=20
-Cheers,
-Benno
-
+> Fixes: 6e1d0b898818 ("r8169:add support for RTL8168H and RTL8107E")
+> Signed-off-by: Patrick Thompson <ptf@google.com>
+> ---
+> 
+> Changes in v2:
+> - add Fixes tag
+> - add net annotation
+> - update description
+> 
+>  drivers/net/ethernet/realtek/r8169_main.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 361b90007148b..a775090650e3a 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -2584,7 +2584,8 @@ static void rtl_set_rx_mode(struct net_device *dev)
+>  		rx_mode |= AcceptAllPhys;
+>  	} else if (netdev_mc_count(dev) > MC_FILTER_LIMIT ||
+>  		   dev->flags & IFF_ALLMULTI ||
+> -		   tp->mac_version == RTL_GIGA_MAC_VER_35) {
+> +		   tp->mac_version == RTL_GIGA_MAC_VER_35 ||
+> +		   tp->mac_version == RTL_GIGA_MAC_VER_46) {
+>  		/* accept all multicasts */
+>  	} else if (netdev_mc_empty(dev)) {
+>  		rx_mode &= ~AcceptMulticast;
 
 
