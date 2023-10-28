@@ -1,164 +1,148 @@
-Return-Path: <netdev+bounces-44974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23CAF7DA5D5
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:38:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 229E37DA5E5
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:43:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 718892823EB
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:38:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0C90B212D3
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9635CBD;
-	Sat, 28 Oct 2023 08:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MtDJsB0K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C382A9471;
+	Sat, 28 Oct 2023 08:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EC4257B
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:38:48 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F15F4;
-	Sat, 28 Oct 2023 01:38:45 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9c41e95efcbso393613466b.3;
-        Sat, 28 Oct 2023 01:38:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698482324; x=1699087124; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LpMeyzioqsroJUo35H7XsKCzwknPxdneK87kcKtXySo=;
-        b=MtDJsB0KLvuPH357Nq1sjmw+/N3cqcPL7zwljBGwCsSsZMSGPBLUrW4G9KraOgsDOX
-         C1fbGP/Lr8ZMAQSAyed1Zcj8QWQaBUQj3RQbqoPVqwKgtbldv2hicwpc5JQYH7DXlxqK
-         4UJ2WIJFo5EEJ9I0Sl3joj0OmWzL6dyYQH3k8b5dV9p1DCnbrhJWgrq4loWUpJMrrCEH
-         LPXTt1D1dZmZvUTR8juo20t9CodNDAwU26SvMGCGA/2CAAMPRqqX51u8nX+9/OJbw7Xd
-         VZLpWolc8Lx0wAOPRJ8IS+XH1xpP76wcILSYuubGbSC8Rio+4TSp5ScRuZs2bVNaxemu
-         dy8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698482324; x=1699087124;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LpMeyzioqsroJUo35H7XsKCzwknPxdneK87kcKtXySo=;
-        b=NoLAwRWQBiPkm2S6ZdQ0n269l5FWW9iU4UqTJwQdrLyCbNKvrYtrNgjvYJ9OyqYo9h
-         tJmSFSTfbU6xAOSOIMAIcQsrAfdIdTmxdMAfhqoJCMop/mSV/zPcPZlgs1Q8dLukmeOj
-         PAEth4YNmVriQQYleVgDQSVZTNm6GkXlxWI+0NdDNAFr/drUbtomYRc7P+kVhNNVShKC
-         ohD0t3Jkv6vJcpCggm8hDZ8s14B4sniqpT2rMWdAZKBfqD7fv/b78vvbo7SKZpd/UT+Z
-         SyEC/DxCbxuyXYEAXhjP68S4kl3JjTPZUFnPkxhUEpo2UmD5ZXCVESwL2L6KHmUD5NfB
-         Y8/A==
-X-Gm-Message-State: AOJu0Yx5AQ4URVavzwx8mW994BxP6Tznija6fccAqIR0I3nuTfV/c/XG
-	xu0FvD45CZDy6R224EYpPmg=
-X-Google-Smtp-Source: AGHT+IHY4dyT9zpaKF77TkYL68omyNiRhrDZFl0X1WhyeyMCdYoKj+A9ZcCQ9HLjmJ5xcRPhxkx5vQ==
-X-Received: by 2002:a17:907:2da7:b0:9bd:d1e8:57f1 with SMTP id gt39-20020a1709072da700b009bdd1e857f1mr4833016ejc.50.1698482323620;
-        Sat, 28 Oct 2023 01:38:43 -0700 (PDT)
-Received: from ?IPV6:2a01:c23:c119:9c00:b47c:4f5f:820f:2966? (dynamic-2a01-0c23-c119-9c00-b47c-4f5f-820f-2966.c23.pool.telefonica.de. [2a01:c23:c119:9c00:b47c:4f5f:820f:2966])
-        by smtp.googlemail.com with ESMTPSA id e17-20020a170906375100b0099e12a49c8fsm2457712ejc.173.2023.10.28.01.38.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 28 Oct 2023 01:38:43 -0700 (PDT)
-Message-ID: <415e0355-7d71-4b82-b4fc-37dad22486a9@gmail.com>
-Date: Sat, 28 Oct 2023 10:38:43 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A0079DC
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:43:36 +0000 (UTC)
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 262EC11F
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:43:35 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id E837A2085F;
+	Sat, 28 Oct 2023 10:43:33 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id hqG4AoAmxOSk; Sat, 28 Oct 2023 10:43:33 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 830DF2083F;
+	Sat, 28 Oct 2023 10:43:32 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout1.secunet.com (Postfix) with ESMTP id 77EDA80004A;
+	Sat, 28 Oct 2023 10:43:32 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Sat, 28 Oct 2023 10:43:32 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Sat, 28 Oct
+ 2023 10:43:31 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 2D5F73182B50; Sat, 28 Oct 2023 10:43:31 +0200 (CEST)
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
+	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
+Subject: [PATCH 0/10] pull request (net-next): ipsec-next 2023-10-28
+Date: Sat, 28 Oct 2023 10:43:18 +0200
+Message-ID: <20231028084328.3119236-1-steffen.klassert@secunet.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: r8169: Disable multicast filter for
- RTL_GIGA_MAC_VER_46
-Content-Language: en-US
-To: Patrick Thompson <ptf@google.com>, netdev@vger.kernel.org
-Cc: Chun-Hao Lin <hau@realtek.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
- nic_swsd@realtek.com
-References: <20231027213059.3550747-1-ptf@google.com>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
- sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
- MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
- dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
- /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
- 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
- J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
- kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
- cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
- mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
- bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
- ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
- AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
- axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
- wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
- ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
- TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
- 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
- dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
- +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
- 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
- aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
- kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
- fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
- 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
- KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
- ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
- 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
- ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
- /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
- gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
- AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
- GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
- y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
- nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
- Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
- rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
- Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
- q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
- H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
- lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
- OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <20231027213059.3550747-1-ptf@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On 27.10.2023 23:30, Patrick Thompson wrote:
-> MAC_VER_46 ethernet adapters fail to detect eapol packets unless
-> allmulti is enabled. Add exception for VER_46 in the same way VER_35
-> has an exception.
-> 
-MAC_VER_48 (RTL8107E) has the same MAC, just a different PHY.
-So I would expect that the same quirk is needed for MAC_VER_48.
+1) Remove unused function declarations of xfrm4_extract_input and
+   xfrm6_extract_input. From Yue Haibing.
 
-MAC_VER_xx is a little misleading, actually it should be NIC_VER_xx
+2) Annotate struct xfrm_sec_ctx with __counted_by.
+   From Kees Cook.
 
-> Fixes: 6e1d0b898818 ("r8169:add support for RTL8168H and RTL8107E")
-> Signed-off-by: Patrick Thompson <ptf@google.com>
-> ---
-> 
-> Changes in v2:
-> - add Fixes tag
-> - add net annotation
-> - update description
-> 
->  drivers/net/ethernet/realtek/r8169_main.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 361b90007148b..a775090650e3a 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -2584,7 +2584,8 @@ static void rtl_set_rx_mode(struct net_device *dev)
->  		rx_mode |= AcceptAllPhys;
->  	} else if (netdev_mc_count(dev) > MC_FILTER_LIMIT ||
->  		   dev->flags & IFF_ALLMULTI ||
-> -		   tp->mac_version == RTL_GIGA_MAC_VER_35) {
-> +		   tp->mac_version == RTL_GIGA_MAC_VER_35 ||
-> +		   tp->mac_version == RTL_GIGA_MAC_VER_46) {
->  		/* accept all multicasts */
->  	} else if (netdev_mc_empty(dev)) {
->  		rx_mode &= ~AcceptMulticast;
+3) Support GRO decapsulation for ESP in UDP encapsulation.
+   From Antony Antony et all.
 
+4) Replace the xfrm session decode with flow dissector.
+   From Florian Westphal.
+
+5) Fix a use after free in __xfrm6_udp_encap_rcv.
+
+6) Fix the layer 4 flowi decoding.
+   From Florian Westphal.
+
+Please pull or let me know if there are problems.
+
+Thanks!
+
+The following changes since commit 3a69ab875233734bc434402379100272cd70bde2:
+
+  Merge branch 'ionic-better-tx-sg=handling' (2023-09-20 10:52:31 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git tags/ipsec-next-2023-10-28
+
+for you to fetch changes up to eefed7662ff223f70ba8b1af07f1a096a5ece588:
+
+  xfrm: policy: fix layer 4 flowi decoding (2023-10-27 10:12:09 +0200)
+
+----------------------------------------------------------------
+ipsec-next-2023-10-28
+
+----------------------------------------------------------------
+Florian Westphal (4):
+      xfrm: pass struct net to xfrm_decode_session wrappers
+      xfrm: move mark and oif flowi decode into common code
+      xfrm: policy: replace session decode with flow dissector
+      xfrm: policy: fix layer 4 flowi decoding
+
+Kees Cook (1):
+      xfrm: Annotate struct xfrm_sec_ctx with __counted_by
+
+Steffen Klassert (6):
+      xfrm: Use the XFRM_GRO to indicate a GRO call on input
+      xfrm: Support GRO for IPv4 ESP in UDP encapsulation
+      xfrm: Support GRO for IPv6 ESP in UDP encapsulation
+      Merge  branch 'xfrm: Support GRO decapsulation for ESP in UDP encapsulation'
+      Merge branch 'xfrm: policy: replace session decode with flow dissector'
+      xfrm Fix use after free in __xfrm6_udp_encap_rcv.
+
+Yue Haibing (1):
+      xfrm: Remove unused function declarations
+
+ include/net/gro.h              |   2 +-
+ include/net/ipv6_stubs.h       |   3 +
+ include/net/xfrm.h             |  18 +--
+ include/uapi/linux/xfrm.h      |   3 +-
+ net/ipv4/esp4_offload.c        |   6 +-
+ net/ipv4/icmp.c                |   2 +-
+ net/ipv4/ip_vti.c              |   4 +-
+ net/ipv4/netfilter.c           |   2 +-
+ net/ipv4/udp.c                 |  16 +++
+ net/ipv4/xfrm4_input.c         |  95 ++++++++++---
+ net/ipv6/af_inet6.c            |   1 +
+ net/ipv6/esp6_offload.c        |  10 +-
+ net/ipv6/icmp.c                |   2 +-
+ net/ipv6/ip6_vti.c             |   4 +-
+ net/ipv6/netfilter.c           |   2 +-
+ net/ipv6/xfrm6_input.c         | 103 +++++++++++---
+ net/netfilter/nf_nat_proto.c   |   2 +-
+ net/xfrm/xfrm_input.c          |   6 +-
+ net/xfrm/xfrm_interface_core.c |   4 +-
+ net/xfrm/xfrm_policy.c         | 299 +++++++++++++++++------------------------
+ 20 files changed, 343 insertions(+), 241 deletions(-)
 
