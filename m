@@ -1,156 +1,83 @@
-Return-Path: <netdev+bounces-44954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 490557DA4C5
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 04:07:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1869F7DA4ED
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 05:02:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BE621C2112B
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 02:07:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DA6028277E
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 03:02:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85C665A;
-	Sat, 28 Oct 2023 02:07:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E48A31;
+	Sat, 28 Oct 2023 03:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98869644
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 02:07:14 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CC01B8;
-	Fri, 27 Oct 2023 19:07:10 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.206])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4SHNDt1KnYz67bjw;
-	Sat, 28 Oct 2023 10:06:22 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7822D394
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 03:02:40 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39410106;
+	Fri, 27 Oct 2023 20:02:38 -0700 (PDT)
+Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.54])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SHPQN403fz1L9GV;
+	Sat, 28 Oct 2023 10:59:40 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.2) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Sat, 28 Oct 2023 03:07:06 +0100
-Message-ID: <b24bee4a-5131-b8bd-2cdc-833fcc0297f1@huawei.com>
-Date: Sat, 28 Oct 2023 05:07:05 +0300
+ 15.1.2507.31; Sat, 28 Oct 2023 11:02:35 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net 0/7] There are some bugfix for the HNS3 ethernet driver
+Date: Sat, 28 Oct 2023 10:59:10 +0800
+Message-ID: <20231028025917.314305-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v14 00/12] Network support for Landlock
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, Paul Moore <paul@paul-moore.com>
-References: <20231026014751.414649-1-konstantin.meskhidze@huawei.com>
- <20231027.weic8eidaiQu@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <20231027.weic8eidaiQu@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.2]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 X-CFilter-Loop: Reflected
 
+There are some bugfix for the HNS3 ethernet driver
 
+Jian Shen (2):
+  net: hns3: fix add VLAN fail issue
+  net: hns3: fix incorrect capability bit display for copper port
 
-10/27/2023 4:06 PM, Mickaël Salaün пишет:
-> Thanks Konstantin!
-> 
-> I did some minor cosmetic changes, extended a bit the documentation and
-> improved the ipv4_tcp.with_fs test. You can see these changes in my
-> -next branch:
-> https://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git/log/?h=nex >
-> We have a very good test coverage and I think these patches are ready
-> for mainline.  If it's OK with you, I plan to send a PR for v6.7-rc1 .
-> 
-> Regards,
->   Mickaël
+Jijie Shao (2):
+  net: hns3: fix VF reset fail issue
+  net: hns3: fix VF wrong speed and duplex issue
 
-  Hi Mickaёl.
-  Sounds great. It's OK with me. I learned a lot about kernel 
-development process preparing these patch sets. Thank you so much for 
-tutoring and patience. I would not make that without your support.
+Yonglong Liu (3):
+  net: hns3: add barrier in vf mailbox reply process
+  net: hns3: fix out-of-bounds access may occur when coalesce info is
+    read via debugfs
+  net: hns3: fix variable may not initialized problem in
+    hns3_init_mac_addr()
 
-I'm ready for the next steps like we've already discussed:
-https://lore.kernel.org/linux-security-module/b4440d19-93b9-e234-007b-4fc4f987550b@digikod.net/
-> 
-> On Thu, Oct 26, 2023 at 09:47:39AM +0800, Konstantin Meskhidze wrote:
->> Hi,
->> This is a new V14 patch related to Landlock LSM network confinement.
->> It is based on v6.6-rc2 kernel version.
->> 
->> It brings refactoring of previous patch version V13.
->> Mostly there are fixes of logic and typos, refactoring some selftests.
->> 
->> All test were run in QEMU evironment and compiled with
->>  -static flag.
->>  1. network_test: 82/82 tests passed.
->>  2. base_test: 7/7 tests passed.
->>  3. fs_test: 107/107 tests passed.
->>  4. ptrace_test: 8/8 tests passed.
->> 
->> Previous versions:
->> v13: https://lore.kernel.org/linux-security-module/20231016015030.1684504-1-konstantin.meskhidze@huawei.com/
->> v12: https://lore.kernel.org/linux-security-module/20230920092641.832134-1-konstantin.meskhidze@huawei.com/
->> v11: https://lore.kernel.org/linux-security-module/20230515161339.631577-1-konstantin.meskhidze@huawei.com/
->> v10: https://lore.kernel.org/linux-security-module/20230323085226.1432550-1-konstantin.meskhidze@huawei.com/
->> v9: https://lore.kernel.org/linux-security-module/20230116085818.165539-1-konstantin.meskhidze@huawei.com/
->> v8: https://lore.kernel.org/linux-security-module/20221021152644.155136-1-konstantin.meskhidze@huawei.com/
->> v7: https://lore.kernel.org/linux-security-module/20220829170401.834298-1-konstantin.meskhidze@huawei.com/
->> v6: https://lore.kernel.org/linux-security-module/20220621082313.3330667-1-konstantin.meskhidze@huawei.com/
->> v5: https://lore.kernel.org/linux-security-module/20220516152038.39594-1-konstantin.meskhidze@huawei.com
->> v4: https://lore.kernel.org/linux-security-module/20220309134459.6448-1-konstantin.meskhidze@huawei.com/
->> v3: https://lore.kernel.org/linux-security-module/20220124080215.265538-1-konstantin.meskhidze@huawei.com/
->> v2: https://lore.kernel.org/linux-security-module/20211228115212.703084-1-konstantin.meskhidze@huawei.com/
->> v1: https://lore.kernel.org/linux-security-module/20211210072123.386713-1-konstantin.meskhidze@huawei.com/
->> 
->> Konstantin Meskhidze (11):
->>   landlock: Make ruleset's access masks more generic
->>   landlock: Refactor landlock_find_rule/insert_rule
->>   landlock: Refactor merge/inherit_ruleset functions
->>   landlock: Move and rename layer helpers
->>   landlock: Refactor layer helpers
->>   landlock: Refactor landlock_add_rule() syscall
->>   landlock: Add network rules and TCP hooks support
->>   selftests/landlock: Share enforce_ruleset()
->>   selftests/landlock: Add network tests
->>   samples/landlock: Support TCP restrictions
->>   landlock: Document network support
->> 
->> Mickaël Salaün (1):
->>   landlock: Allow FS topology changes for domains without such rule type
->> 
->>  Documentation/userspace-api/landlock.rst     |   96 +-
->>  include/uapi/linux/landlock.h                |   55 +
->>  samples/landlock/sandboxer.c                 |  115 +-
->>  security/landlock/Kconfig                    |    1 +
->>  security/landlock/Makefile                   |    2 +
->>  security/landlock/fs.c                       |  232 +--
->>  security/landlock/limits.h                   |    6 +
->>  security/landlock/net.c                      |  198 ++
->>  security/landlock/net.h                      |   33 +
->>  security/landlock/ruleset.c                  |  405 +++-
->>  security/landlock/ruleset.h                  |  183 +-
->>  security/landlock/setup.c                    |    2 +
->>  security/landlock/syscalls.c                 |  158 +-
->>  tools/testing/selftests/landlock/base_test.c |    2 +-
->>  tools/testing/selftests/landlock/common.h    |   13 +
->>  tools/testing/selftests/landlock/config      |    4 +
->>  tools/testing/selftests/landlock/fs_test.c   |   10 -
->>  tools/testing/selftests/landlock/net_test.c  | 1744 ++++++++++++++++++
->>  18 files changed, 2908 insertions(+), 351 deletions(-)
->>  create mode 100644 security/landlock/net.c
->>  create mode 100644 security/landlock/net.h
->>  create mode 100644 tools/testing/selftests/landlock/net_test.c
->> 
->> --
->> 2.25.1
->> 
-> .
+ .../ethernet/hisilicon/hns3/hns3_debugfs.c    |  9 ++++---
+ .../net/ethernet/hisilicon/hns3/hns3_enet.c   |  2 +-
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 26 ++++++++++++++-----
+ .../hisilicon/hns3/hns3vf/hclgevf_main.c      | 24 +++++++++++++----
+ .../hisilicon/hns3/hns3vf/hclgevf_mbx.c       |  7 +++++
+ 5 files changed, 53 insertions(+), 15 deletions(-)
+
+-- 
+2.30.0
+
 
