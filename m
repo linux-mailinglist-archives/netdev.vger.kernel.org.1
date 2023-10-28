@@ -1,249 +1,214 @@
-Return-Path: <netdev+bounces-45013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78F9F7DA821
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 18:51:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B07BC7DA831
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 19:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEF1D281190
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 16:51:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B5BB1C2095C
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 17:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2CF15AF5;
-	Sat, 28 Oct 2023 16:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1847E17723;
+	Sat, 28 Oct 2023 17:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="alhpMBys"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="A/sGEfir"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F2F168DB
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 16:51:09 +0000 (UTC)
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940F1C2
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 09:51:07 -0700 (PDT)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5a822f96aedso25910407b3.2
-        for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 09:51:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A394443D
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 17:16:22 +0000 (UTC)
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05030E5
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 10:16:19 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-2800f7c8125so1069949a91.1
+        for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 10:16:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1698511867; x=1699116667; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eoinu6yRueI2SYBE35N9c7itP0m0Gy5PTpBS8WGI/0k=;
-        b=alhpMBysYlFNxqK5hNn4PTc3Tb6aKsqkedVQ6CFPsz4pjv3fJfOjNPWc9KwD3OUlwE
-         UkoBrQ6tlKFkTdO9s5yep7Bilis2XMNOBKAPj1DUJA/bdbuOU7CxPcwjelH1BlzP/gKt
-         zwvcs9GirXh2eu5xA2mHmeJO4uMdZUHLu9HeuUR8WzxZfr+ho8EQZFRmvnW1LUbpi+Pm
-         AzWWMET87kd9dENamf5a6Wzet7ymZC4bkKzPragf/3+jGRoHaeaf3/8f4oyK7s+GYErq
-         Ocz7BySWiKIjhMTnAJEeKPFabanFnuhEGwSgiOY9sLneVsSbPVELD7UI455S1lj0Y2VY
-         +lLA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1698513379; x=1699118179; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WPNO+ahBLQBMC1iObupMpuBe+kCZA+YomrzIkUwQcdA=;
+        b=A/sGEfir5a7LWI4ZVQWRH/ZMR5LpsXMyjFq8opGZwxx+smvh61kDKG8qKxgTo8J/0r
+         yzaj62gCwupRRSox6Bldfm5alSZ6DKt9s3SMMbSzdmPww9K/T4E2tyi56COoSBwimsDl
+         l63fCMDMMCU8cHSsm1u9cEH9yUz+c458gtuoZw0SO9mO9ZSfq6PCmG9iu/rWJ+OLK4y8
+         IRzKd4zVduSOzGbgV3pW1uIwOu+0Gykm5S92pxbNtMGPz9zpZgVg4nvJcGdqjHCe3UcP
+         0tFEQX5I5E3LZcJEViDLHb5BRyYx/Y7f9qko2nnIdH/VL7gnkT1iJiwRFL7OaSM/XTHb
+         wGTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698511867; x=1699116667;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eoinu6yRueI2SYBE35N9c7itP0m0Gy5PTpBS8WGI/0k=;
-        b=dXCnSD22vDJkc6P3l+va0H2sD9moGSs6Qh0PVc918XvS2zwrvbiNJTrIU8tuh+kE4/
-         OhKQ6B51NT1bZskmJpOuwCJYyyii80SfOq7c+K/qQK9PUe3xKkKO8gz/JXVV5wvn720y
-         RSycrGFxIQ9docOMGv5T40r2SVfPNndyTIfVb8rwyOBQSRS0p799YngMniape3GmVGpq
-         21d8/GKu/0jpPMQgFzXgPDYSp9mh2odC6tK1KMWzhuyyPolDXiUkbIDijbrB6njG+qUA
-         tOeAjBU+GXq5DtUwTWtA/Rbv5hdK8AySNIuVTjEW6f3pg3EbVaMFlI+ruuJBvAxG0hQd
-         RTLg==
-X-Gm-Message-State: AOJu0YyLqmOv/I3Idk1ZICh6lrot1hiKgZzdacpv6D46EPGs7/kN39MQ
-	nHfQMmrHl4smMx+D+k1sUUTBIHTiZsYAEkVkipVWRkCmd48lytjl2BQ=
-X-Google-Smtp-Source: AGHT+IEunwFLPXvkpcQ8RI6w/kS57M0Sxj4TgEGHrVzOfhuN+JVm9ZFE0cT/p5Pou6zOyaeszVvvF4io6zdcj4Pnkyw=
-X-Received: by 2002:a25:68cd:0:b0:da0:4453:8f10 with SMTP id
- d196-20020a2568cd000000b00da044538f10mr4777268ybc.43.1698511866663; Sat, 28
- Oct 2023 09:51:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698513379; x=1699118179;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WPNO+ahBLQBMC1iObupMpuBe+kCZA+YomrzIkUwQcdA=;
+        b=c1kZF/75830MBq1UHT19EOzvI1mkkT5EVtfGAxVs9hWzYbYviHwM0TRPrPc+HuB18m
+         ULQ7Fm2dQjyXarL4gyTg+wnEsMJxg4kLZxw9PhZL7cAe91DdFlR0NVF05tn0o/PYPKZE
+         IuRBrKS/P3MEM3cjtHEWdSR1J+pyY1dHRZIjxcaln4Vl8WTysT7pxjdxgYh8NTaq9n/C
+         MMFP0SJyiPV85Z+Dl8/Y5nu46mRMgr6tJpCPZTEEtNmL7Oh7xcIiLtvbRkJ8cLuIgntJ
+         dMXCGAvQ6yPT2pPypP8U8p4x5ZHFZrEE1zJq2O7B9bEKS0PlRG5S7MJGCVwjL23mEhmQ
+         fvTA==
+X-Gm-Message-State: AOJu0Ywhg9eW8qmWpn3NfmUuFW7Zafd3wZoPwEW6TR+Cesc5yruBOWP0
+	ifG2CyQlXKsk2c8UMpeI9JZo5A==
+X-Google-Smtp-Source: AGHT+IH2PAayCVb7jRktTBu5FkVrrM9EO2e6XCqvBrfKOsesKwX3lcV/Zo2+ZKHR6zL58Iwy9yCn+A==
+X-Received: by 2002:a17:90b:1c8b:b0:280:72b:397d with SMTP id oo11-20020a17090b1c8b00b00280072b397dmr7253510pjb.20.1698513379160;
+        Sat, 28 Oct 2023 10:16:19 -0700 (PDT)
+Received: from mbili.tail33bf8.ts.net (S0106e0553d2d6601.vc.shawcable.net. [24.86.212.220])
+        by smtp.gmail.com with ESMTPSA id b21-20020a17090a551500b002802a080d1dsm1266704pji.16.2023.10.28.10.16.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Oct 2023 10:16:18 -0700 (PDT)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com
+Cc: jiri@resnulli.us,
+	xiyou.wangcong@gmail.com,
+	daniel@iogearbox.net,
+	idosch@idosch.org,
+	netdev@vger.kernel.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: [PATCH net 1/1] net, sched: Fix SKB_NOT_DROPPED_YET splat under debug config
+Date: Sat, 28 Oct 2023 13:16:10 -0400
+Message-Id: <20231028171610.28596-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027135142.11555-1-daniel@iogearbox.net> <CAM0EoMm9K=jS=JZUNXo+C6qs=p=r7CtjWK20ocmTKEDxN3Bz-w@mail.gmail.com>
- <5ab182b6-6ac7-16f7-7eae-7001be2b6da7@iogearbox.net>
-In-Reply-To: <5ab182b6-6ac7-16f7-7eae-7001be2b6da7@iogearbox.net>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 28 Oct 2023 12:50:55 -0400
-Message-ID: <CAM0EoM=-UYDxdzXVWwv=aNYTbhogNdSO9xJ-MijCmOPnvKnLRg@mail.gmail.com>
-Subject: Re: [PATCH net-next] net, sched: Fix SKB_NOT_DROPPED_YET splat under
- debug config
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: kuba@kernel.org, idosch@idosch.org, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 27, 2023 at 2:21=E2=80=AFPM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
->
-> On 10/27/23 7:24 PM, Jamal Hadi Salim wrote:
-> > On Fri, Oct 27, 2023 at 9:51=E2=80=AFAM Daniel Borkmann <daniel@iogearb=
-ox.net> wrote:
-> >>
-> >> Ido reported:
-> >>
-> >>    [...] getting the following splat [1] with CONFIG_DEBUG_NET=3Dy and=
- this
-> >>    reproducer [2]. Problem seems to be that classifiers clear 'struct
-> >>    tcf_result::drop_reason', thereby triggering the warning in
-> >>    __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0).=
- [...]
-> >>
-> >>    [1]
-> >>    WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason=
-+0x38/0x130
-> >>    Modules linked in:
-> >>    CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6=
-d9582e0 #682
-> >>    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-=
-1.fc37 04/01/2014
-> >>    RIP: 0010:kfree_skb_reason+0x38/0x130
-> >>    [...]
-> >>    Call Trace:
-> >>     <IRQ>
-> >>     __netif_receive_skb_core.constprop.0+0x837/0xdb0
-> >>     __netif_receive_skb_one_core+0x3c/0x70
-> >>     process_backlog+0x95/0x130
-> >>     __napi_poll+0x25/0x1b0
-> >>     net_rx_action+0x29b/0x310
-> >>     __do_softirq+0xc0/0x29b
-> >>     do_softirq+0x43/0x60
-> >>     </IRQ>
-> >>
-> >>    [2]
-> >>    #!/bin/bash
-> >>
-> >>    ip link add name veth0 type veth peer name veth1
-> >>    ip link set dev veth0 up
-> >>    ip link set dev veth1 up
-> >>    tc qdisc add dev veth1 clsact
-> >>    tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:=
-11:22:33:44:55 action drop
-> >>    mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
-> >>
-> >> What happens is that inside most classifiers the tcf_result is copied =
-over
-> >> from a filter template e.g. *res =3D f->res which then implicitly over=
-rides
-> >> the prior SKB_DROP_REASON_TC_{INGRESS,EGRESS} default drop code which =
-was
-> >> set via sch_handle_{ingress,egress}() for kfree_skb_reason().
-> >>
-> >> Add a small helper tcf_set_result() and convert classifiers over to it=
-.
-> >> The latter leaves the drop code intact and classifiers, actions as wel=
-l
-> >> as the action engine in tcf_exts_exec() can then in future make use of
-> >> tcf_set_drop_reason(), too.
-> >>
-> >> Tested that the splat is fixed under CONFIG_DEBUG_NET=3Dy with the rep=
-ro.
-> >>
-> >> Fixes: 54a59aed395c ("net, sched: Make tc-related drop reason more fle=
-xible")
-> >> Reported-by: Ido Schimmel <idosch@idosch.org>
-> >> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> >> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> >> Cc: Jakub Kicinski <kuba@kernel.org>
-> >> Link: https://lore.kernel.org/netdev/ZTjY959R+AFXf3Xy@shredder
-> >> ---
-> >>   include/net/pkt_cls.h    | 12 ++++++++++++
-> >>   net/sched/cls_basic.c    |  2 +-
-> >>   net/sched/cls_bpf.c      |  2 +-
-> >>   net/sched/cls_flower.c   |  2 +-
-> >>   net/sched/cls_fw.c       |  2 +-
-> >>   net/sched/cls_matchall.c |  2 +-
-> >>   net/sched/cls_route.c    |  4 ++--
-> >>   net/sched/cls_u32.c      |  2 +-
-> >>   8 files changed, 20 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-> >> index a76c9171db0e..31d8e8587824 100644
-> >> --- a/include/net/pkt_cls.h
-> >> +++ b/include/net/pkt_cls.h
-> >> @@ -160,6 +160,18 @@ static inline void tcf_set_drop_reason(struct tcf=
-_result *res,
-> >>          res->drop_reason =3D reason;
-> >>   }
-> >>
-> >> +static inline void tcf_set_result(struct tcf_result *to,
-> >> +                                 const struct tcf_result *from)
-> >> +{
-> >> +       /* tcf_result's drop_reason which is the last member must be
-> >> +        * preserved and cannot be copied from the cls'es tcf_result
-> >> +        * template given this is carried all the way and potentially
-> >> +        * set to a concrete tc drop reason upon error or intentional
-> >> +        * drop. See tcf_set_drop_reason() locations.
-> >> +        */
-> >> +       memcpy(to, from, offsetof(typeof(*to), drop_reason));
-> >> +}
-> >
-> > I believe our bigger issue here is we are using this struct now for
-> > both policy set by the control plane and for runtime decisions
->
-> Hm, but that was also either way in the original rfc.
->
+Getting the following splat [1] with CONFIG_DEBUG_NET=y and this
+reproducer [2]. Problem seems to be that classifiers clear 'struct
+tcf_result::drop_reason', thereby triggering the warning in
+__kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0).
 
-I lost track of the different versions, but one of the earlier ones did.
+Fixed by disambiguating a legit error from a verdict with a bogus drop_reason
 
-> > (drop_reason) - whereas the original assumption was this struct only
-> > held set policy. In retrospect we should have put the verdict(which is
-> > policy) here and return the error code (as was in the first patch). I
-> > am also not sure humans would not make a mistake on "this field must
-> > be at the end of the struct". Can we put some assert (or big comment
-> > on the struct) to make sure someone does not overwrite this field?
->
-> Yeah that can be done.
->
-> > Also what happens if "from" above has a set drop_reason - is that
-> > lost? Do you need an assert there as well?
->
-> Why it's needed, do you have a use case for it?
->
+[1]
+WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x38/0x130
+Modules linked in:
+CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d9582e0 #682
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc37 04/01/2014
+RIP: 0010:kfree_skb_reason+0x38/0x130
+[...]
+Call Trace:
+ <IRQ>
+ __netif_receive_skb_core.constprop.0+0x837/0xdb0
+ __netif_receive_skb_one_core+0x3c/0x70
+ process_backlog+0x95/0x130
+ __napi_poll+0x25/0x1b0
+ net_rx_action+0x29b/0x310
+ __do_softirq+0xc0/0x29b
+ do_softirq+0x43/0x60
+ </IRQ>
 
-I dont have an exact use case - more like making the API more future proof.
+[2]
 
-> > BTW: The simple patch i posted fixes the problem as well (i actually
-> > tested it minus the typo i sent).
->
-> It didn't compile for me, but if you think it's a better approach, yes,
-> feel free to post it as a proper patch then.
->
+ip link add name veth0 type veth peer name veth1
+ip link set dev veth0 up
+ip link set dev veth1 up
+tc qdisc add dev veth1 clsact
+tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:22:33:44:55 action drop
+mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
 
-Sorry, yes - what i posted wouldnt have compiled, it was just to
-illustrate the idea (but i did test it after). In regards to the other
-point you made on the action code the idea was Victor was going to
-post a patch afterwards to cover other cases that are not covered in
-the current case. But i can add the one check and will let Victor take
-care of the rest.
+Ido reported:
 
-> What I'm not quite following though is, I thought your original use case
-> was that you want to be able to troubleshoot drops from unexpected
-> locations (aka not policy) in the tc engine so won't this miss cases when
-> you would then want to use tcf_set_drop_reason() e.g. from tcf_action_exe=
-c()
-> upon 'exception' cases (like the one for example I pointed out)? With the
-> diff you proposed it will basically fallback to SKB_DROP_REASON_TC_{INGRE=
-SS,
-> EGRESS}, so override anything that would have been set from there.
+  [...] getting the following splat [1] with CONFIG_DEBUG_NET=y and this
+  reproducer [2]. Problem seems to be that classifiers clear 'struct
+  tcf_result::drop_reason', thereby triggering the warning in
+  __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0). [...]
 
-The initial motivation was to deal with syzkaller injecting trickery
-where the distinction between a verdict and a failure was in the grey
-zone. CBQ for example was so susceptible we ended just deleting it
-(well, it was also not really being used that much otherwise we would
-have seen bug reports over the years).
-This evolved to us wanting to track more where the errors were
-happening in the code path (and tracing the return codes) to
-eventually deciding what we needed was drop reason(and now drop
-monitor).
-The initialization you have is fine - if we go the tc_cb field setup
-then we could initialize to SKB_DROP_REASON_TC_EGRESS for the other
-qdiscs.
+  [1]
+  WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x38/0x130
+  Modules linked in:
+  CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d9582e0 #682
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc37 04/01/2014
+  RIP: 0010:kfree_skb_reason+0x38/0x130
+  [...]
+  Call Trace:
+   <IRQ>
+   __netif_receive_skb_core.constprop.0+0x837/0xdb0
+   __netif_receive_skb_one_core+0x3c/0x70
+   process_backlog+0x95/0x130
+   __napi_poll+0x25/0x1b0
+   net_rx_action+0x29b/0x310
+   __do_softirq+0xc0/0x29b
+   do_softirq+0x43/0x60
+   </IRQ>
 
-cheers,
-jamal
-> Thanks,
-> Daniel
+  [2]
+  #!/bin/bash
+
+  ip link add name veth0 type veth peer name veth1
+  ip link set dev veth0 up
+  ip link set dev veth1 up
+  tc qdisc add dev veth1 clsact
+  tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:22:33:44:55 action drop
+  mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
+
+What happens is that inside most classifiers the tcf_result is copied over
+from a filter template e.g. *res = f->res which then implicitly overrides
+the prior SKB_DROP_REASON_TC_{INGRESS,EGRESS} default drop code which was
+set via sch_handle_{ingress,egress}() for kfree_skb_reason().
+
+Commit text above copied verbatim from Daniel. The general idea of the patch
+is not very different from what Ido originally posted but instead done at the
+cls_api codepath.
+
+Fixes: 54a59aed395c ("net, sched: Make tc-related drop reason more flexible")
+Reported-by: Ido Schimmel <idosch@idosch.org>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Link: https://lore.kernel.org/netdev/ZTjY959R+AFXf3Xy@shredder
+---
+ net/sched/act_api.c | 2 +-
+ net/sched/cls_api.c | 9 ++++++++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index 9d3f26bf0440..c39252d61ebb 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -1098,7 +1098,7 @@ int tcf_action_exec(struct sk_buff *skb, struct tc_action **actions,
+ 			}
+ 		} else if (TC_ACT_EXT_CMP(ret, TC_ACT_GOTO_CHAIN)) {
+ 			if (unlikely(!rcu_access_pointer(a->goto_chain))) {
+-				net_warn_ratelimited("can't go to NULL chain!\n");
++				tcf_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
+ 				return TC_ACT_SHOT;
+ 			}
+ 			tcf_action_goto_chain_exec(a, res);
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index 1daeb2182b70..1976bd163986 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -1658,6 +1658,7 @@ static inline int __tcf_classify(struct sk_buff *skb,
+ 				 int act_index,
+ 				 u32 *last_executed_chain)
+ {
++	u32 orig_reason = res->drop_reason;
+ #ifdef CONFIG_NET_CLS_ACT
+ 	const int max_reclassify_loop = 16;
+ 	const struct tcf_proto *first_tp;
+@@ -1712,8 +1713,14 @@ static inline int __tcf_classify(struct sk_buff *skb,
+ 			goto reset;
+ 		}
+ #endif
+-		if (err >= 0)
++		if (err >= 0) {
++			/* Policy drop or drop reason is over-written by
++			 * classifiers with a bogus value(0) */
++			if (err == TC_ACT_SHOT &&
++			    res->drop_reason == SKB_NOT_DROPPED_YET)
++				tcf_set_drop_reason(res, orig_reason);
+ 			return err;
++		}
+ 	}
+ 
+ 	if (unlikely(n)) {
+-- 
+2.34.1
+
 
