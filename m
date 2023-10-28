@@ -1,95 +1,115 @@
-Return-Path: <netdev+bounces-44972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-44973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 746457DA5D2
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:31:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D2EC7DA5D3
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 10:36:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BA4DB20D8F
-	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:31:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22B67B212A8
+	for <lists+netdev@lfdr.de>; Sat, 28 Oct 2023 08:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510D628E2;
-	Sat, 28 Oct 2023 08:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22A64427;
+	Sat, 28 Oct 2023 08:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ke9uTE4l"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963179444
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:31:11 +0000 (UTC)
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF201F4
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:31:09 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id C2105207CA;
-	Sat, 28 Oct 2023 10:31:07 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QQqLaXuUtvJw; Sat, 28 Oct 2023 10:31:05 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 5B342206DF;
-	Sat, 28 Oct 2023 10:31:05 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 56D7980004A;
-	Sat, 28 Oct 2023 10:31:05 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Sat, 28 Oct 2023 10:31:05 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Sat, 28 Oct
- 2023 10:31:04 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 590633182A90; Sat, 28 Oct 2023 10:31:04 +0200 (CEST)
-Date: Sat, 28 Oct 2023 10:31:04 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Florian Westphal <fw@strlen.de>
-CC: <netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>, Antony Antony
-	<antony@phenome.org>
-Subject: Re: [PATCH ipsec-next v2] xfrm: policy: fix layer 4 flowi decoding
-Message-ID: <ZTzGyIFyfnKgklSv@gauss3.secunet.de>
-References: <ZTp4dDaWejic16eT@moon.secunet.de>
- <20231026144610.26347-1-fw@strlen.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCB4257B
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 08:35:55 +0000 (UTC)
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D319121
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 01:35:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1698482150; x=1698741350;
+	bh=CCUKTpfWXiqM0w1ZeBbNt5hS5uZwregLAu471m/tXFI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=ke9uTE4l9iPeaiolP+Rl9Ag5lYgxoUWhiUw2J8CwD6/681ijxc+dPHhFoOa+JZt/I
+	 qVjYwX7tZZYS5SZ8gm9VTO25CsQQngcR0+V6soc2grx4kQFS2+VgRFUtsFQFcEOY1v
+	 /haWUFHzsDrFq10PQ2mTv0KtLJ1cSm+wIEWrzQ9yxJe5aA4SyB1IbjrtL5YdkthRmN
+	 aY5JDatBSHGPwGj1t0FlATtDXp5+QYWZgTz12LQ+2nhe5PE0HDgqCwER3fByp8EPHb
+	 ngkJJt1YnOP7N7Z/0k0HWbFKfKkl/2YMBAHJUg1yjkAOCvhvSmrddgcQqI5Vld1QkO
+	 lCb03e8Abqx1Q==
+Date: Sat, 28 Oct 2023 08:35:38 +0000
+To: Boqun Feng <boqun.feng@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY drivers
+Message-ID: <e7da93d6-b938-4558-95b2-e9d2e0194621@proton.me>
+In-Reply-To: <ZTxHKCWTAA7T-MJd@boqun-archlinux>
+References: <20231026001050.1720612-1-fujita.tomonori@gmail.com> <20231026001050.1720612-2-fujita.tomonori@gmail.com> <ZTwWse0COE3w6_US@boqun-archlinux> <ba9614cf-bff6-4617-99cb-311fe40288c1@proton.me> <ZTw3_--yDkJ9ZwIP@boqun-archlinux> <77c78010-781e-4eb4-a7ba-3e9f9a07bf67@proton.me> <ZTxHKCWTAA7T-MJd@boqun-archlinux>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231026144610.26347-1-fw@strlen.de>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 26, 2023 at 04:45:42PM +0200, Florian Westphal wrote:
-> The commit shipped with two bugs:
->  fl4->fl4_icmp_type = flkeys->icmp.type;
->  fl4->fl4_icmp_type = flkeys->icmp.code;
->                ~~~~ should have been "code".
-> 
-> But the more severe bug is that I got fooled by flowi member defines:
-> fl4_icmp_type, fl4_gre_key and fl4_dport share the same union/address.
-> 
-> Fix typo and make gre/icmp key setting depend on the l4 protocol.
-> 
-> Fixes: 7a0207094f1b ("xfrm: policy: replace session decode with flow dissector")
-> Reported-and-tested-by: Antony Antony <antony@phenome.org>
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> ---
->  v2: decode_session6 must use IPPROTO_ICMPV6, not IPPROTO_ICMP.
-> 
->  I normally do not resend immediately but in this case it seems like the
->  lesser evil. 
+On 28.10.23 01:26, Boqun Feng wrote:
+> On Fri, Oct 27, 2023 at 10:50:45PM +0000, Benno Lossin wrote:
+> [...]
+>>>
+>>> Hmm... but does it mean even `set_speed()` has the similar issue?
+>>>
+>>> =09let phydev: *mut phy_device =3D self.0.get();
+>>> =09unsafe { (*phydev).speed =3D ...; }
+>>
+>> No that should be fine, take a look at the MIR output of the following
+>> code [1]:
+>>
+>>      struct Foo {
+>>          a: usize,
+>>          b: usize,
+>>      }
+>>
+>>      fn foo(ptr: *mut Foo) {
+>>          unsafe { (*ptr).b =3D 0; }
+>>      }
+>>
+>>      fn bar(ptr: *mut Foo) {
+>>          unsafe { (&mut *ptr).b =3D 0; }
+>>      }
+>>
+>> Aside from some alignment checking, foo's MIR looks like this:
+>>
+>>      bb1: {
+>>          ((*_1).1: usize) =3D const 0_usize;
+>>          return;
+>>      }
+>>
+>> And bar's MIR like this:
+>>
+>>      bb1: {
+>>          _2 =3D &mut (*_1);
+>>          ((*_2).1: usize) =3D const 0_usize;
+>>          return;
+>>      }
+>>
+>> [1]: https://play.rust-lang.org/?version=3Dstable&mode=3Ddebug&edition=
+=3D2021&gist=3Df7c4d87bf29a64af0acc09ff75d3716d
+>>
+>> So I think that is fine, but maybe Gary has something else to say about =
+it.
+>>
+>=20
+> Well when `-C opt-level=3D2`, they are the same:
+>=20
+> =09https://godbolt.org/z/hxxo75YYh
 
-This was indeed the better way to do it.
+It doesn't matter what the optimizer does, `bar` is unsound in our use-case
+and `foo` is fine (I think).
 
-Applied, thanks a lot!
+--=20
+Cheers,
+Benno
+
+
 
