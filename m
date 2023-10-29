@@ -1,130 +1,194 @@
-Return-Path: <netdev+bounces-45032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 700167DAA40
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 02:07:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 338017DAA79
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 03:16:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 281C02817B5
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 00:07:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE7E1C2091D
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 02:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FFA18F;
-	Sun, 29 Oct 2023 00:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952A9803;
+	Sun, 29 Oct 2023 02:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eeOL6tsO"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="wopizG9m"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59403369
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 00:07:04 +0000 (UTC)
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53B4FCF
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 17:07:03 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6b7f0170d7bso3264542b3a.2
-        for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 17:07:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698538023; x=1699142823; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bUkEh3tHkfI0S9GOoC3gSJqNUbeBd7p0TPf4wZ8XTE0=;
-        b=eeOL6tsOOnRcFSRGPeGPMLu8lIEhdg4FvwhGljYznWu89EVYpogPgmVNJdNB4Ca40z
-         BCYMPudgmP4g2cCR0yxnetfFzI4k/PZL4JNRo7GIfTNHh8H6NlpPHUTeK9+fmVX6fAbM
-         y5XpZXpnaLOcEmvg18AwrKx5T3CPsbcwI0LBcTZwsucJVN0EKXtOg9QV6nUaFL7pqn0Y
-         tv92irttdMXvE7yxXaZW8CEFogJAoDnDNzbEzCP70CiS9AxBYbaelJzxhu62EC4DeTcR
-         8rh/isk9VsH+Ko473SnfLkx48ylKMr3rr1pZqpINl3l/b8LOH+LsEpbcf7yIDTjESdB8
-         dQLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698538023; x=1699142823;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bUkEh3tHkfI0S9GOoC3gSJqNUbeBd7p0TPf4wZ8XTE0=;
-        b=r6uKOE7ns5vEEYNkEAx4DeQCJ2w4NhYRr4W3EKqaWP4caCnITdAkrRWxOMofYNIpQx
-         j+LW1ZD1hQr8Vf79BKrKao0V9mHwNiPO8gsbcgKkR4Lv3xkhzpL0YykI/MXi1WdobQUR
-         4bbl8WWKJBskJeVg77RXvbxXHn7i/a3PN9GGcXzV8J6le2JyvnBUZD0UAbBWHR1R3DNu
-         ug6yYAF5oX86SV5uanPit9r6Z4yWx49JPQPY6Ek2o9B6CKwBmeV6mK19x/IcFwfGwWyB
-         s0YpiO8Fr65MrBq0Tb9vkrok6hH+1YygcA9ZlA6eTPQYDgYPToDiaKEtFjYjXtcqZvzi
-         EgnA==
-X-Gm-Message-State: AOJu0YxUz1O1IkCg9rMzbqC5GLJ72tXALJSfHLD8/nL450vL0UCxI/+B
-	Ff0Gl0VlEHHxjmjT6ZIgjMgsfMHGch4=
-X-Google-Smtp-Source: AGHT+IGlG6VhZ7Tg4GqxPp5D3ZaiwZue29SkLcBjdt2H4FNTf86Qw5Y4Y2WMEV+d4jA0wRozjMTU2Q==
-X-Received: by 2002:a05:6a00:114c:b0:6be:59f:5172 with SMTP id b12-20020a056a00114c00b006be059f5172mr8047949pfm.19.1698538022613;
-        Sat, 28 Oct 2023 17:07:02 -0700 (PDT)
-Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id n4-20020a056a00212400b0068883728c16sm3525954pfj.144.2023.10.28.17.07.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 28 Oct 2023 17:07:02 -0700 (PDT)
-Message-ID: <4a570a37-d6b8-48d9-bf44-a5bc006e1c5f@gmail.com>
-Date: Sat, 28 Oct 2023 17:07:01 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDED62C
+	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 02:16:09 +0000 (UTC)
+Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 821889E;
+	Sat, 28 Oct 2023 19:16:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1698545754; bh=TeGL/ruicGTt/TU4zXKMm4s2wVxGs0xWLZ5ZFCL0jMo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=wopizG9mDV/CeEB7B4KrLHgan1BCBX7qBiWHSktt22hZQpgmW7PSMnryAy6jnY0PX
+	 66zxkZsqxwW0zjCGvqCFAL6nu9cm3vXJ3Q1Lys3r/zE8gxKcsXoHCgmkQmeNSO05CV
+	 SK6CW7ea1sCvTdQbW45mzxiMUEErlraAVZSOtKRs=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+	by newxmesmtplogicsvrsza12-0.qq.com (NewEsmtp) with SMTP
+	id 26A0EAAA; Sun, 29 Oct 2023 10:09:42 +0800
+X-QQ-mid: xmsmtpt1698545382twkg9homf
+Message-ID: <tencent_D71CEB16EC1ECD0879366E9C2E216FBC950A@qq.com>
+X-QQ-XMAILINFO: NwcVoNZsSZVxnWIfSv4ddjusxzaNrdL4KXJzdnPl7tlIKaYruKmVXGdpzUZLl7
+	 FzxfQI3H/H8jE6t1JIHfw+YhWqSmf0WswZfAnhnAmJO1waphgppOPdSNC7frlYivy+h/CeAFb2KO
+	 x6KSsnvERkCsBwcz5S5ppDp5g8FiKoQsKdfBoLuCswX7eXMOvk9QS60fo2rC+7izhkMG5E8c/B8D
+	 +Yxw6V5fbl/xei+MMfZjU0WtqgW8UCn4BSVhQxIOBPUzq1FuKORmT9zfKBYLokXNbZvcAOFMp6G6
+	 iGfLaaPTP52TNGgHSTni4jSmNxEaC0H6WKsWo2JC9zgEUjkYL9nzrKoI1Xhzm2TRBwMJTxwm7Dwv
+	 A9q6pUmgoYe83xqU/qC/ZDVebA+fUoydq/67B7dxu107ho1RPDi0ZBgu3PuKPKXKzJckiRnpNS7b
+	 l0NXTBIA5V7RQ0ELn2SbtyUvLYMWmJ7a7DZj/1sy52H0x1OLLuV6RIVfcIoXsGrmiPrU+Ua0XzjS
+	 fevWPiTJ7av3m8JU4WPlp8PBQdc6WwXyWHbm0kSv8eikfp+zlxvlhDQtCb2nkFIS6sueooSiGL64
+	 jj+p/fE5D+NaKoZEQxPTHQdwnF7SQnuTVW172UerjFfNQtXX2ZqSAFK6MkNw33diT9XV/moU+VvT
+	 gT5VpzGtBLMJkgV7+SWFBK7eYBZlgKpqD5EULtcFfP30V10XQniDZf0KzaIADBDS4NgpxXOuD0M2
+	 TA+RO0LpCZksHVH/V/N0rDWmk375H9GtwoLts6YmvgJQ/OoqxFacwyPvIDFjJmIbtjZUrBod8wL9
+	 3Zls0GMW1/3GRa37ESnjq0P8AZtHXQWoG67g7E1cZrsXy/Pi32ZT2+JOOttP+Bq6ji+Te1PENfsi
+	 L/ajxLi+OuV6bZMaVtQm29Ig3y2kAR4yAR/jI8rGxAJbTwLzMEJP8=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+From: Edward Adam Davis <eadavis@qq.com>
+To: eadavis@qq.com
+Cc: davem@davemloft.net,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	reibax@gmail.com,
+	richardcochran@gmail.com,
+	syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH-net-next] ptp: fix corrupted list in ptp_open
+Date: Sun, 29 Oct 2023 10:09:42 +0800
+X-OQ-MSGID: <20231029020941.856425-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <tencent_61372097D036524ACC74E176DF66043C2309@qq.com>
+References: <tencent_61372097D036524ACC74E176DF66043C2309@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 net-next 2/2] net: mdio: fill in missing
- MODULE_DESCRIPTION()s
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, netdev <netdev@vger.kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <rmk+kernel@armlinux.org.uk>,
- Richard Cochran <richardcochran@gmail.com>, Joel Stanley <joel@jms.id.au>,
- Andrew Jeffery <andrew@codeconstruct.com.au>
-References: <20231028184458.99448-1-andrew@lunn.ch>
- <20231028184458.99448-3-andrew@lunn.ch>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
- xGlkaOSDuu09rxuW+69Y2f1TzjFuGpBk4ysWOR85O2Nx8AJ6fYGCoeTbovrNlGT1M9obSFGQ
- X3IzRnWoqlfudjTO5TKoqkbOgpYqIo5n1QbEjCCwCwCg3DOH/4ug2AUUlcIT9/l3pGvoRJ0E
- AICDzi3l7pmC5IWn2n1mvP5247urtHFs/uusE827DDj3K8Upn2vYiOFMBhGsxAk6YKV6IP0d
- ZdWX6fqkJJlu9cSDvWtO1hXeHIfQIE/xcqvlRH783KrihLcsmnBqOiS6rJDO2x1eAgC8meAX
- SAgsrBhcgGl2Rl5gh/jkeA5ykwbxA/9u1eEuL70Qzt5APJmqVXR+kWvrqdBVPoUNy/tQ8mYc
- nzJJ63ng3tHhnwHXZOu8hL4nqwlYHRa9eeglXYhBqja4ZvIvCEqSmEukfivk+DlIgVoOAJbh
- qIWgvr3SIEuR6ayY3f5j0f2ejUMYlYYnKdiHXFlF9uXm1ELrb0YX4GMHz80nRmxvcmlhbiBG
- YWluZWxsaSA8Zi5mYWluZWxsaUBnbWFpbC5jb20+wmYEExECACYCGyMGCwkIBwMCBBUCCAME
- FgIDAQIeAQIXgAUCVF/S8QUJHlwd3wAKCRBhV5kVtWN2DvCVAJ4u4/bPF4P3jxb4qEY8I2gS
- 6hG0gACffNWlqJ2T4wSSn+3o7CCZNd7SLSDOw00ESM+4EhAQAL/o09boR9D3Vk1Tt7+gpYr3
- WQ6hgYVON905q2ndEoA2J0dQxJNRw3snabHDDzQBAcqOvdi7YidfBVdKi0wxHhSuRBfuOppu
- pdXkb7zxuPQuSveCLqqZWRQ+Cc2QgF7SBqgznbe6Ngout5qXY5Dcagk9LqFNGhJQzUGHAsIs
- hap1f0B1PoUyUNeEInV98D8Xd/edM3mhO9nRpUXRK9Bvt4iEZUXGuVtZLT52nK6Wv2EZ1TiT
- OiqZlf1P+vxYLBx9eKmabPdm3yjalhY8yr1S1vL0gSA/C6W1o/TowdieF1rWN/MYHlkpyj9c
- Rpc281gAO0AP3V1G00YzBEdYyi0gaJbCEQnq8Vz1vDXFxHzyhgGz7umBsVKmYwZgA8DrrB0M
- oaP35wuGR3RJcaG30AnJpEDkBYHznI2apxdcuTPOHZyEilIRrBGzDwGtAhldzlBoBwE3Z3MY
- 31TOpACu1ZpNOMysZ6xiE35pWkwc0KYm4hJA5GFfmWSN6DniimW3pmdDIiw4Ifcx8b3mFrRO
- BbDIW13E51j9RjbO/nAaK9ndZ5LRO1B/8Fwat7bLzmsCiEXOJY7NNpIEpkoNoEUfCcZwmLrU
- +eOTPzaF6drw6ayewEi5yzPg3TAT6FV3oBsNg3xlwU0gPK3v6gYPX5w9+ovPZ1/qqNfOrbsE
- FRuiSVsZQ5s3AAMFD/9XjlnnVDh9GX/r/6hjmr4U9tEsM+VQXaVXqZuHKaSmojOLUCP/YVQo
- 7IiYaNssCS4FCPe4yrL4FJJfJAsbeyDykMN7wAnBcOkbZ9BPJPNCbqU6dowLOiy8AuTYQ48m
- vIyQ4Ijnb6GTrtxIUDQeOBNuQC/gyyx3nbL/lVlHbxr4tb6YkhkO6shjXhQh7nQb33FjGO4P
- WU11Nr9i/qoV8QCo12MQEo244RRA6VMud06y/E449rWZFSTwGqb0FS0seTcYNvxt8PB2izX+
- HZA8SL54j479ubxhfuoTu5nXdtFYFj5Lj5x34LKPx7MpgAmj0H7SDhpFWF2FzcC1bjiW9mjW
- HaKaX23Awt97AqQZXegbfkJwX2Y53ufq8Np3e1542lh3/mpiGSilCsaTahEGrHK+lIusl6mz
- Joil+u3k01ofvJMK0ZdzGUZ/aPMZ16LofjFA+MNxWrZFrkYmiGdv+LG45zSlZyIvzSiG2lKy
- kuVag+IijCIom78P9jRtB1q1Q5lwZp2TLAJlz92DmFwBg1hyFzwDADjZ2nrDxKUiybXIgZp9
- aU2d++ptEGCVJOfEW4qpWCCLPbOT7XBr+g/4H3qWbs3j/cDDq7LuVYIe+wchy/iXEJaQVeTC
- y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
- X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231028184458.99448-3-andrew@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+There is no lock protection when writing ptp->tsevqs in ptp_open(), ptp_read(),
+ptp_release(), which can cause data corruption and increase mutual exclusion
+to avoid this issue.
 
+Moreover, the queue should not be released in ptp_read() and should be deleted
+together.
 
-On 10/28/2023 11:44 AM, Andrew Lunn wrote:
-> W=1 builds now warn if a module is built without a
-> MODULE_DESCRIPTION(). Fill them in based on the Kconfig text, or
-> similar.
-> 
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+Reported-and-tested-by: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ drivers/ptp/ptp_chardev.c | 14 ++++++++++++--
+ drivers/ptp/ptp_clock.c   |  3 +++
+ drivers/ptp/ptp_private.h |  1 +
+ 3 files changed, 16 insertions(+), 2 deletions(-)
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+index 282cd7d24077..5546e4b4e083 100644
+--- a/drivers/ptp/ptp_chardev.c
++++ b/drivers/ptp/ptp_chardev.c
+@@ -109,6 +109,9 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+ 	struct timestamp_event_queue *queue;
+ 	char debugfsname[32];
+ 
++	if (mutex_lock_interruptible(&ptp->tsevq_mux)) 
++		return -ERESTARTSYS;
++
+ 	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
+ 	if (!queue)
+ 		return -EINVAL;
+@@ -132,15 +135,20 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+ 	debugfs_create_u32_array("mask", 0444, queue->debugfs_instance,
+ 				 &queue->dfs_bitmap);
+ 
++	mutex_unlock(&ptp->tsevq_mux);
+ 	return 0;
+ }
+ 
+ int ptp_release(struct posix_clock_context *pccontext)
+ {
+ 	struct timestamp_event_queue *queue = pccontext->private_clkdata;
++	struct ptp_clock *ptp =
++		container_of(pccontext->clk, struct ptp_clock, clock);
+ 	unsigned long flags;
+ 
+ 	if (queue) {
++		if (mutex_lock_interruptible(&ptp->tsevq_mux)) 
++			return -ERESTARTSYS;
+ 		debugfs_remove(queue->debugfs_instance);
+ 		pccontext->private_clkdata = NULL;
+ 		spin_lock_irqsave(&queue->lock, flags);
+@@ -148,6 +156,7 @@ int ptp_release(struct posix_clock_context *pccontext)
+ 		spin_unlock_irqrestore(&queue->lock, flags);
+ 		bitmap_free(queue->mask);
+ 		kfree(queue);
++		mutex_unlock(&ptp->tsevq_mux);
+ 	}
+ 	return 0;
+ }
+@@ -543,6 +552,8 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
+ 		cnt = EXTTS_BUFSIZE;
+ 
+ 	cnt = cnt / sizeof(struct ptp_extts_event);
++	if (mutex_lock_interruptible(&ptp->tsevq_mux)) 
++		return -ERESTARTSYS;
+ 
+ 	if (wait_event_interruptible(ptp->tsev_wq,
+ 				     ptp->defunct || queue_cnt(queue))) {
+@@ -585,7 +596,6 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
+ free_event:
+ 	kfree(event);
+ exit:
+-	if (result < 0)
+-		ptp_release(pccontext);
++	mutex_unlock(&ptp->tsevq_mux);
+ 	return result;
+ }
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 3d1b0a97301c..7930db6ec18d 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -176,6 +176,7 @@ static void ptp_clock_release(struct device *dev)
+ 
+ 	ptp_cleanup_pin_groups(ptp);
+ 	kfree(ptp->vclock_index);
++	mutex_destroy(&ptp->tsevq_mux);
+ 	mutex_destroy(&ptp->pincfg_mux);
+ 	mutex_destroy(&ptp->n_vclocks_mux);
+ 	/* Delete first entry */
+@@ -247,6 +248,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (!queue)
+ 		goto no_memory_queue;
+ 	list_add_tail(&queue->qlist, &ptp->tsevqs);
++	mutex_init(&ptp->tsevq_mux);
+ 	queue->mask = bitmap_alloc(PTP_MAX_CHANNELS, GFP_KERNEL);
+ 	if (!queue->mask)
+ 		goto no_memory_bitmap;
+@@ -356,6 +358,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (ptp->kworker)
+ 		kthread_destroy_worker(ptp->kworker);
+ kworker_err:
++	mutex_destroy(&ptp->tsevq_mux);
+ 	mutex_destroy(&ptp->pincfg_mux);
+ 	mutex_destroy(&ptp->n_vclocks_mux);
+ 	bitmap_free(queue->mask);
+diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+index 52f87e394aa6..1525bd2059ba 100644
+--- a/drivers/ptp/ptp_private.h
++++ b/drivers/ptp/ptp_private.h
+@@ -44,6 +44,7 @@ struct ptp_clock {
+ 	struct pps_device *pps_source;
+ 	long dialed_frequency; /* remembers the frequency adjustment */
+ 	struct list_head tsevqs; /* timestamp fifo list */
++	struct mutex tsevq_mux; /* one process at a time reading the fifo */
+ 	struct mutex pincfg_mux; /* protect concurrent info->pin_config access */
+ 	wait_queue_head_t tsev_wq;
+ 	int defunct; /* tells readers to go away when clock is being removed */
 -- 
-Florian
+2.25.1
+
 
