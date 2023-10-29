@@ -1,52 +1,55 @@
-Return-Path: <netdev+bounces-45136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B8E7DB008
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 00:02:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D349B7DB00A
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 00:02:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 490FD1F21D46
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 23:02:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B7AE281516
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 23:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DF5215487;
-	Sun, 29 Oct 2023 23:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53D614F94;
+	Sun, 29 Oct 2023 23:02:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JJ0pA88a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YZosUkxc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729B214F94
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 23:02:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20942C433CB;
-	Sun, 29 Oct 2023 23:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6D6156FB
+	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 23:02:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E4C6C433AB;
+	Sun, 29 Oct 2023 23:02:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698620540;
-	bh=F+KDT330zA7lLtN8EcxqS8DGK9XLFLIFJHi7Hdj9Vl0=;
+	s=k20201202; t=1698620543;
+	bh=4/C17ww5DjA3eWjC0vh6NWIdEDDn79fbftPuDSQdUzE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JJ0pA88a7RX74BXfWubo5PKp5h2t1NjQmMIYjzlRrJ4xP9ZBg43pfWeoJFoMm+ffe
-	 ynQ7g68j5AM0pa1kD+DpeND404c9xfGq+hnKjj3I3DDCY54pBuESKLAZI/nT8/RSyN
-	 HN/Om4g1NUQYPehU+LH1oTTmjBStIOR5S//9cbXACQ00H9QHpareeA4EsnbKf8HNLb
-	 NiRv7+dY+uYt0LoW2G7uTfsZBOpzcXyJQkOADyy6I0vwfKiw76zxKzHKHDjKh3RWLW
-	 9vbTZ/OBNt8Fzpj3HnxTR5rqf1Wjk5vMAYu3dRxQbXUtqtBQ8usLc20h3Jq4Hpr3zl
-	 20jkn7+/3EnCw==
+	b=YZosUkxcBAn2tN0i2E5bMxUtpukL+On8blUdvweylqhKxtg4gRWjsKFtJ7JQzkuQI
+	 WWIZKfCPREAjAOCXjSc+4XEfRB0p5M8ndtR0ZcmoW1457+BY2jK/DctWpAAYs6Yf45
+	 rLoHaODWcj1MAOklJGT0mURCygJn78k0FoWbjE/HylLyX6cQJ0dp4LxrE5NvvojeMy
+	 YcqpgIdKisSRmft8hE1d5w/zNrJeABmsc6tOonb6qQO4vc/tPSNVd1oRTYPPwNMVW/
+	 qA4uqfz15k8ehuR+UVW1hL3tMOw+/0eox6lyaCUa+yY494MTbxRXdGm5tWND3KElsp
+	 cBs80Mb0pKzpA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Ma Ke <make_ruc2021@163.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
+Cc: Florian Westphal <fw@strlen.de>,
+	kernel test robot <lkp@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
+	pablo@netfilter.org,
+	kadlec@netfilter.org,
 	davem@davemloft.net,
-	dsahern@kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 03/11] net: ipv4: fix return value check in esp_remove_trailer
-Date: Sun, 29 Oct 2023 19:01:54 -0400
-Message-ID: <20231029230213.793581-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 05/11] netfilter: nfnetlink_log: silence bogus compiler warning
+Date: Sun, 29 Oct 2023 19:01:56 -0400
+Message-ID: <20231029230213.793581-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231029230213.793581-1-sashal@kernel.org>
 References: <20231029230213.793581-1-sashal@kernel.org>
@@ -61,35 +64,37 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 4.14.328
 Content-Transfer-Encoding: 8bit
 
-From: Ma Ke <make_ruc2021@163.com>
+From: Florian Westphal <fw@strlen.de>
 
-[ Upstream commit 513f61e2193350c7a345da98559b80f61aec4fa6 ]
+[ Upstream commit 2e1d175410972285333193837a4250a74cd472e6 ]
 
-In esp_remove_trailer(), to avoid an unexpected result returned by
-pskb_trim, we should check the return value of pskb_trim().
+net/netfilter/nfnetlink_log.c:800:18: warning: variable 'ctinfo' is uninitialized
 
-Signed-off-by: Ma Ke <make_ruc2021@163.com>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+The warning is bogus, the variable is only used if ct is non-NULL and
+always initialised in that case.  Init to 0 too to silence this.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202309100514.ndBFebXN-lkp@intel.com/
+Signed-off-by: Florian Westphal <fw@strlen.de>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/esp4.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/netfilter/nfnetlink_log.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index d5e860573ecd4..79fa2d7852efa 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -547,7 +547,9 @@ static inline int esp_remove_trailer(struct sk_buff *skb)
- 		skb->csum = csum_block_sub(skb->csum, csumdiff,
- 					   skb->len - trimlen);
- 	}
--	pskb_trim(skb, skb->len - trimlen);
-+	ret = pskb_trim(skb, skb->len - trimlen);
-+	if (unlikely(ret))
-+		return ret;
+diff --git a/net/netfilter/nfnetlink_log.c b/net/netfilter/nfnetlink_log.c
+index 40ba9c8e3c078..7d7a94e3fc507 100644
+--- a/net/netfilter/nfnetlink_log.c
++++ b/net/netfilter/nfnetlink_log.c
+@@ -637,8 +637,8 @@ nfulnl_log_packet(struct net *net,
+ 	unsigned int plen;
+ 	struct nfnl_log_net *log = nfnl_log_pernet(net);
+ 	const struct nfnl_ct_hook *nfnl_ct = NULL;
++	enum ip_conntrack_info ctinfo = 0;
+ 	struct nf_conn *ct = NULL;
+-	enum ip_conntrack_info ctinfo;
  
- 	ret = nexthdr[1];
- 
+ 	if (li_user && li_user->type == NF_LOG_TYPE_ULOG)
+ 		li = li_user;
 -- 
 2.42.0
 
