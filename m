@@ -1,77 +1,96 @@
-Return-Path: <netdev+bounces-45140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 327DC7DB189
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 00:45:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B1F7DAFFD
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 00:01:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 621231C208CF
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 23:45:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B4D41F21CD3
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 23:01:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7424C14F90;
-	Sun, 29 Oct 2023 23:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896121426A;
+	Sun, 29 Oct 2023 23:01:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TcT1Rc44"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FiCgoR1O"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819DBD2ED
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 23:45:25 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39DA49E;
-	Sun, 29 Oct 2023 16:45:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KaJzOtJRW4EWZHUOSEMMSs8gJwo3z32RgK/AsKPmB5E=; b=TcT1Rc44sOhOTrfiX4DFzUB0QX
-	kiIDhy4VFO7soYj7F2TiwyIJ6KU4+HZboUkTX91Tjan6hFN5K6nsDjIZw+BgsMrbZC0+xayzBzbW9
-	F/+6SBRckibKw6CF21tMyWjzUjksQgsikBGsO+MgImr3DT1aPvZuY6ZxdTZ60sitTiSM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qxEly-000TGF-Dp; Mon, 30 Oct 2023 00:00:46 +0100
-Date: Mon, 30 Oct 2023 00:00:46 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>, DENG Qingfang <dqfext@gmail.com>,
-	Mauri Sandberg <sandberg@mailfence.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dsa: tag_rtl4_a: Bump min packet size
-Message-ID: <54f8d583-e900-4ce8-87d1-a18556698f10@lunn.ch>
-References: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
- <20231028220402.gdsynephzfkpvk4m@skbuf>
- <CACRpkdbq03ZXcB-TaBp5Udo3M47rb-o+LfkEkC-gA1+=x1Zd-g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7B8156C0
+	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 23:01:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D54DC433CB;
+	Sun, 29 Oct 2023 23:01:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698620501;
+	bh=X5gW/IKRH0gSCzo1RVJwjhXb3IQF5Zegx0zxC3MlmTs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FiCgoR1OeAswNpr2BAgdwkpFWJYKnJiVSpN4aYcVMflDgoQYSZmTaBJ2UFTxlNYvY
+	 G304TNi0e9tPbI0NFavqaaPQMCVo/S6TRrtcEthvahxEzH7xmnBevX3u7SBQBhgcWG
+	 xgrGKuMNMfb35ymLBL0DBRe6AWtoAERbj5jkD5xkXQfysvqox3rg4KlkjRTQ3BUsaV
+	 bdprhmmAp8Et0V4GuDU0RmbzM0UQiJFP9mDrAuLvaY72CoU5kUar2w4thrhLBVoZlw
+	 tjWOdSX4L54QpOJX/xj6+DdkgUHJgUZfQWedMNdryVujR/oHnBgbxWpV4B1IOZWAIa
+	 CRTHSroLwIfYA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Ma Ke <make_ruc2021@163.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 02/12] net: ipv6: fix return value check in esp_remove_trailer
+Date: Sun, 29 Oct 2023 19:01:15 -0400
+Message-ID: <20231029230135.793281-2-sashal@kernel.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231029230135.793281-1-sashal@kernel.org>
+References: <20231029230135.793281-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACRpkdbq03ZXcB-TaBp5Udo3M47rb-o+LfkEkC-gA1+=x1Zd-g@mail.gmail.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 4.19.297
+Content-Transfer-Encoding: 8bit
 
-> 1496 is suspiciously much 1500 - DSA tag size. However the
-> MTU of the parent ethernet is bumped nicely to 1504 and the
-> device MTU is set up to accomodate it as well.
-> 
-> Modifying the patch to just pad out packets >= 1496 bytes
-> solves the problem in a better way, but maybe that is not the
-> last thing we try here...
+From: Ma Ke <make_ruc2021@163.com>
 
-Have you tried playing with RTL8366RB_SGCR in rtl8366rb_change_mtu()?
+[ Upstream commit dad4e491e30b20f4dc615c9da65d2142d703b5c2 ]
 
-I had an annoying bug in the mv88e6xxx driver where the MTU
-configuration register was up to, but not including... So i had to
-change a <= to <.
+In esp_remove_trailer(), to avoid an unexpected result returned by
+pskb_trim, we should check the return value of pskb_trim().
 
-	Andrew
+Signed-off-by: Ma Ke <make_ruc2021@163.com>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/ipv6/esp6.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index d847ffbe97451..6529e46ad0914 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -517,7 +517,9 @@ static inline int esp_remove_trailer(struct sk_buff *skb)
+ 		skb->csum = csum_block_sub(skb->csum, csumdiff,
+ 					   skb->len - trimlen);
+ 	}
+-	pskb_trim(skb, skb->len - trimlen);
++	ret = pskb_trim(skb, skb->len - trimlen);
++	if (unlikely(ret))
++		return ret;
+ 
+ 	ret = nexthdr[1];
+ 
+-- 
+2.42.0
+
 
