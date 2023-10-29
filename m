@@ -1,107 +1,299 @@
-Return-Path: <netdev+bounces-45058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D38767DABFA
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 11:26:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4DAD7DAC11
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 12:11:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 465BDB20D8A
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 10:26:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89C3B28142C
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 11:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 184C06104;
-	Sun, 29 Oct 2023 10:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649388F40;
+	Sun, 29 Oct 2023 11:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="ReP8Qjzf"
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="g7zJywWK";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="hnDTJdP5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C06B20EB
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 10:26:33 +0000 (UTC)
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.169])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B63FC1
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 03:26:31 -0700 (PDT)
-X-KPN-MessageId: 989e70bd-7645-11ee-a148-005056abad63
-Received: from smtp.kpnmail.nl (unknown [10.31.155.39])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id 989e70bd-7645-11ee-a148-005056abad63;
-	Sun, 29 Oct 2023 11:26:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=kpnmail.nl; s=kpnmail01;
-	h=content-type:mime-version:message-id:subject:to:from:date;
-	bh=Ene+KD+OLY/eF4wbQbbYp0cyIG+loB+quOJN3C+dwK0=;
-	b=ReP8Qjzfn8smapjWLmHSUwoVIiUHPMozQsPleN76sKHNRhl8sh7vMDoSk7XUhYM1d+wBay3i7fuVr
-	 tsHeCx2KhKI6Iw6l7AQGoY8JuqgneeRceRjwSJ84NVLNugDmi9TJ9+6ru5UbcckV58YTCCq0OXPkOr
-	 vg1L/bPQrjdPoZ4k=
-X-KPN-MID: 33|X/UREv6pLOSLpGAsa0QuE8Fcd1E8Ysarx47/xy9e4CJgoOXSQqm9dCFJ4NYInd4
- RIpnIVfB+w76NZmW8DXTsam3xb3Ep3PBudCj+1MxB3/M=
-X-KPN-VerifiedSender: No
-X-CMASSUN: 33|nR+/AQAecFAhplUamEwsfUN0OYR6GaeGXTxfCiiYSWLFF+Kx4choAQ98qAG9wR4
- lSyTT1jV7pou92gtU311sBA==
-X-Originating-IP: 213.10.186.43
-Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
-	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id 9dd10230-7645-11ee-a7ab-005056ab7447;
-	Sun, 29 Oct 2023 11:26:28 +0100 (CET)
-Date: Sun, 29 Oct 2023 11:26:26 +0100
-From: Antony Antony <antony@phenome.org>
-To: Michael Richardson <mcr@sandelman.ca>
-Cc: antony.antony@secunet.com, Herbert Xu <herbert@gondor.apana.org.au>,
-	netdev@vger.kernel.org, devel@linux-ipsec.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7EC2FAF
+	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 11:11:40 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7DCDC0;
+	Sun, 29 Oct 2023 04:11:38 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 3C06460182;
+	Sun, 29 Oct 2023 12:11:36 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1698577896; bh=DY2xKmVncOybZOf1srDA6dHzjor+EqjADbirBoJ9WQI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=g7zJywWKTkgUxWQWCdk8k6QlKXx8JheOwufuyZyZA/NzgWv5G6AzxAWA9F23KeMVW
+	 SccOSD8OMkYvuUWpczS5OHkYXHthlhPgjZ3RpFPTrLggqMSjlj9t3IFrLpij9bLWZz
+	 OAxjCMjpxZYbRmiKo53np1iVBenQ6eNBIRXgB+IRj/3ZBtuMcaVnc6SmdAaviEKou/
+	 zpYT2lB92ot1Jy+LXPP+ZesAtX4DJb5lB54NMioA8qhaMrWU8mUhMLe6WUEFrssUKM
+	 Jc9nKj1yz+3Zxyw+cpGAIQ6FnqzNwNCwVOuqEKKP/TYMHbe3ex2cW2+ryBzPAdi7lG
+	 wMNRSM2IimfUw==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id hf1umPGTCaNK; Sun, 29 Oct 2023 12:11:33 +0100 (CET)
+Received: from defiant.home (78-3-40-247.adsl.net.t-com.hr [78.3.40.247])
+	by domac.alu.hr (Postfix) with ESMTPSA id 7742760173;
+	Sun, 29 Oct 2023 12:11:30 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1698577893; bh=DY2xKmVncOybZOf1srDA6dHzjor+EqjADbirBoJ9WQI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hnDTJdP5KrlZ0+t9BybL+vDpfUkO07Z8v37kope2ILiVUpezVuIijgDL8qP3p6cIV
+	 49kJ4nkWMcUFlJH/ZzNcbsx9S3s31ROnhK8mlRyvtgHdwziX0w4M5NNuxicGVhdSHn
+	 wZC3mjOD2xkbSnh9Ec/x4mW2w4ZAl6aLTKBltGSHt436KQbbu6TXy3/WQfKx5MLRy0
+	 NVkt+MGdU+yKqWmfxLBLGXtS5YOPP6fPF5sxw6PyDH7Q7ey1cOcJ5CEXT+aT9Xtccz
+	 pFv/YG/gs7+PCATS5koYRNPsjOLLD+k1jZZVONqT3Zvbfih+mYXZIpQQ3g0dpw0wWJ
+	 mkTycYMNpmpRg==
+From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Joerg Roedel <jroedel@suse.de>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	nic_swsd@realtek.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [devel-ipsec] [PATCH v2 ipsec-next 2/2] xfrm: fix source address
- in icmp error generation from IPsec gateway
-Message-ID: <ZT4zUnhvbW2VZlRm@Antony2201.local>
-References: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
- <300c36a0644b63228cee8d0a74be0e1e81d0fe98.1698394516.git.antony.antony@secunet.com>
- <16810.1698413407@localhost>
+	Paolo Abeni <pabeni@redhat.com>,
+	Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>,
+	Marco Elver <elver@google.com>
+Subject: [PATCH v4 1/5] r8169: Coalesce r8169_mac_ocp_write/modify calls to reduce spinlock stalls
+Date: Sun, 29 Oct 2023 12:04:39 +0100
+Message-Id: <20231029110442.347448-1-mirsad.todorovac@alu.unizg.hr>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <16810.1698413407@localhost>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 27, 2023 at 09:30:07AM -0400, Michael Richardson via Devel wrote:
-> 
-> Antony Antony via Devel <devel@linux-ipsec.org> wrote:
->     > When enabling support for xfrm lookup using reverse ICMP payload,
->     > We have identified an issue where the source address of the IPv4 e.g
->     > "Destination Host Unreachable" message is incorrect. The IPv6 appear
->     > to do the right thing.
-> 
-> One thing that operators of routers with a multitude of interfaces want to do
-> is send all ICMP messages from a specific IP address.  Often the public
-> address, that has the sane reverse DNS name.
+A pair of new helpers r8168_mac_ocp_write_seq() and r8168_mac_ocp_modify_seq()
+are introduced.
 
-While it makes sense for routers with multiple interfaces, receiving ICMP 
-errors from private addresses can be confusing. However, wouldn't this also 
-make it more challenging to adhere to BCP 32 and BCP 38? Routing with 
-multiple interfaces is tricky on Linux, especially when it comes to 
-compliance with these BCPs.
+The motivation for these helpers was the locking overhead of 130 consecutive
+r8168_mac_ocp_write() calls in the RTL8411b reset after the NIC gets confused
+if the PHY is powered-down.
 
-> AFAIK, this is not an option on Linux, but Cisco/Juniper/etc. devices usually
-> can do this.  I can't recall how today. (I was actually looking that up this week)
+To quote Heiner:
 
-I wonder if a netfilter rule would be a solution for you, something like:
+    On RTL8411b the RX unit gets confused if the PHY is powered-down.
+    This was reported in [0] and confirmed by Realtek. Realtek provided
+    a sequence to fix the RX unit after PHY wakeup.
 
-"ip protocol icmp type <error codes> snat to x.x.x.x"
+A series of about 130 r8168_mac_ocp_write() calls is performed to program the
+RTL registers for recovery, each doing an expensive spin_lock_irqsave() and
+spin_unlock_irqrestore().
 
-I would love see a simple option instead of a SNAT hack. May be a routing 
-rule that will choose sourse address for ICMP error code.
+Each mac ocp write is made of:
 
-> This can conflict however, with the need to get the result back into the
-> tunnel.  I don't have a good answer, except that we probably need a fair bit
+    static void __r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg,
+                      u32 data)
+    {
+        if (rtl_ocp_reg_failure(reg))
+            return;
 
-Forwarding that ICMP packet, which is not covered by your forward IPsec 
-policy, would be fixed with the second patch in this series. In that case 
-lookup would using the orginal packet as describe in RFC 4301, Section 6.
+        RTL_W32(tp, OCPDR, OCPAR_FLAG | (reg << 15) | data);
+    }
 
--antony
+    static void r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg,
+                    u32 data)
+    {
+        unsigned long flags;
+
+        raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
+        __r8168_mac_ocp_write(tp, reg, data);
+        raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
+    }
+
+Register programming is done through RTL_W32() macro which expands into
+
+    #define RTL_W32(tp, reg, val32) writel((val32), tp->mmio_addr + (reg))
+
+which is further (on Alpha):
+
+    extern inline void writel(u32 b, volatile void __iomem *addr)
+    {
+        mb();
+        __raw_writel(b, addr);
+    }
+
+or on i386/x86_64:
+
+    #define build_mmio_write(name, size, type, reg, barrier) \
+    static inline void name(type val, volatile void __iomem *addr) \
+    { asm volatile("mov" size " %0,%1": :reg (val), \
+    "m" (*(volatile type __force *)addr) barrier); }
+
+    build_mmio_write(writel, "l", unsigned int, "r", :"memory")
+
+This obviously involves iat least a compiler barrier.
+
+mb() expands into something like this i.e. on x86_64:
+
+    #define mb()    asm volatile("lock; addl $0,0(%%esp)" ::: "memory")
+
+This means a whole lot of memory bus stalls: for spin_lock_irqsave(),
+memory barrier, writel(), and spin_unlock_irqrestore().
+
+With about 130 of these sequential calls to r8168_mac_ocp_write() this looks like
+a lock storm that will stall all of the cores and CPUs on the same memory controller
+for certain time I/O takes to finish.
+
+In a sequential case of RTL register programming, the writes to RTL registers
+can be coalesced under a same raw spinlock. This can dramatically decrease the
+number of bus stalls in a multicore or multi-CPU system.
+
+Macro helpers r8168_mac_ocp_write_seq() and r8168_mac_ocp_modify_seq() are
+provided to reduce lock contention:
+
+    static void rtl_hw_start_8411_2(struct rtl8169_private *tp)
+    {
+
+        ...
+
+        /* The following Realtek-provided magic fixes an issue with the RX unit
+         * getting confused after the PHY having been powered-down.
+         */
+
+        static const struct recover_8411b_info init_zero_seq[] = {
+            { 0xFC28, 0x0000 }, { 0xFC2A, 0x0000 }, { 0xFC2C, 0x0000 },
+            ...
+        };
+
+        ...
+
+        r8168_mac_ocp_write_seq(tp, init_zero_seq);
+
+        ...
+
+    }
+
+The hex data is preserved intact through s/r8168_mac_ocp_write[(]tp,/{ / and s/[)];/ },/
+functions that only changed the function names and the ending of the line, so the actual
+hex data is unchanged.
+
+To repeat, the reason for the introduction of the original commit
+was to enable recovery of the RX unit on the RTL8411b which was confused by the
+powered-down PHY. This sequence of r8168_mac_ocp_write() calls amplifies the problem
+into a series of about 500+ memory bus locks, most waiting for the main memory read,
+modify and write under a LOCK. The memory barrier in RTL_W32 should suffice for
+the programming sequence to reach RTL NIC registers.
+
+[0] https://bugzilla.redhat.com/show_bug.cgi?id=1692075
+
+Fixes: fe4e8db0392a6 ("r8169: fix issue with confused RX unit after PHY power-down on RTL8411b")
+Fixes: 91c8643578a21 ("r8169: use spinlock to protect mac ocp register access")
+Fixes: d6c36cbc5e533 ("r8169: Use a raw_spinlock_t for the register locks.")
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Marco Elver <elver@google.com>
+Cc: nic_swsd@realtek.com
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Link: https://lore.kernel.org/lkml/20231028005153.2180411-1-mirsad.todorovac@alu.unizg.hr/
+Link: https://lore.kernel.org/lkml/20231028110459.2644926-1-mirsad.todorovac@alu.unizg.hr/
+Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+---
+v4:
+ fixed complaints as advised by Heiner and checkpatch.pl.
+ split the patch into five sections to be more easily manipulated and reviewed
+ introduced r8168_mac_ocp_write_seq()
+ applied coalescing of mac ocp writes/modifies for 8168H, 8125 and 8125B
+
+v3:
+ removed register/mask pair array sentinels, so using ARRAY_SIZE().
+ avoided duplication of RTL_W32() call code as advised by Heiner.
+
+ drivers/net/ethernet/realtek/r8169_main.c | 57 +++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 361b90007148..df79fd95cf2d 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -939,6 +939,63 @@ static void r8168_mac_ocp_modify(struct rtl8169_private *tp, u32 reg, u16 mask,
+ 	raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
+ }
+ 
++struct e_info_regdata {
++	u32	reg;
++	u32	data;
++};
++
++struct e_info_regmaskset {
++	u32	reg;
++	u16	mask;
++	u16	set;
++};
++
++static void __r8168_mac_ocp_write_seqlen(struct rtl8169_private *tp,
++					 const struct e_info_regdata *array, int len)
++{
++	struct e_info_regdata const *p;
++
++	for (p = array; len--; p++)
++		__r8168_mac_ocp_write(tp, p->reg, p->data);
++}
++
++static void r8168_mac_ocp_write_seqlen(struct rtl8169_private *tp,
++				       const struct e_info_regdata *array, int len)
++{
++	unsigned long flags;
++
++	raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
++	__r8168_mac_ocp_write_seqlen(tp, array, len);
++	raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
++}
++
++static void __r8168_mac_ocp_modify_seqlen(struct rtl8169_private *tp,
++					  const struct e_info_regmaskset *array, int len)
++{
++	struct e_info_regmaskset const *p;
++	u16 data;
++
++	for (p = array; len--; p++) {
++		data = __r8168_mac_ocp_read(tp, p->reg);
++		__r8168_mac_ocp_write(tp, p->reg, (data & ~p->mask) | p->set);
++	}
++}
++
++static void r8168_mac_ocp_modify_seqlen(struct rtl8169_private *tp,
++					const struct e_info_regmaskset *array, int len)
++{
++	unsigned long flags;
++
++	raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
++	__r8168_mac_ocp_modify_seqlen(tp, array, len);
++	raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
++}
++
++#define r8168_mac_ocp_write_seq(tp, a) r8168_mac_ocp_write_seqlen(tp, a, ARRAY_SIZE(a))
++#define r8168_mac_ocp_modify_seq(tp, a) r8168_mac_ocp_modify_seqlen(tp, a, ARRAY_SIZE(a))
++#define __r8168_mac_ocp_write_seq(tp, a) __r8168_mac_ocp_write_seqlen(tp, a, ARRAY_SIZE(a))
++#define __r8168_mac_ocp_modify_seq(tp, a) __r8168_mac_ocp_modify_seqlen(tp, a, ARRAY_SIZE(a))
++
+ /* Work around a hw issue with RTL8168g PHY, the quirk disables
+  * PHY MCU interrupts before PHY power-down.
+  */
+-- 
+2.34.1
+
 
