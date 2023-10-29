@@ -1,105 +1,137 @@
-Return-Path: <netdev+bounces-45080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFB667DAD01
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 16:38:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D060F7DAD47
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 17:48:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48E182814EE
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 15:38:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2C58B20C42
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 16:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A822CA5D;
-	Sun, 29 Oct 2023 15:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E920BD2E8;
+	Sun, 29 Oct 2023 16:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="elKvagR+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYCcOS7D"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA863C8CA
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 15:38:18 +0000 (UTC)
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C85DBBD
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 08:38:17 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5a86b6391e9so32220157b3.0
-        for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 08:38:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907EBCA46;
+	Sun, 29 Oct 2023 16:48:46 +0000 (UTC)
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29203BD;
+	Sun, 29 Oct 2023 09:48:45 -0700 (PDT)
+Received: by mail-qv1-xf2e.google.com with SMTP id 6a1803df08f44-66cfd874520so23887736d6.2;
+        Sun, 29 Oct 2023 09:48:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698593897; x=1699198697; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1698598124; x=1699202924; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qT43Nf94mF07rnV7CrLvxuub2Ca7aEi64+U8CyL0b3g=;
-        b=elKvagR+t77xfpkmWelkGAt9q/K6/ipzvvpjNMG9HNLEq+AAqckqpJP8yQzR7Sm90U
-         6a8Fr9tIpFYT+OecNH1TStn2w8g6nVk4z/63yUxaH8yRoRFafBHqb9Xc5vdKm9lkppmN
-         cul1g9JyEMIHlB+PZWhSqGtQTZoljHYl4Rru+MprgmBzrT1b2extbmbodGdnfVaDaqid
-         b5n8hhtw/6EdyB+l5XitgNGGC2pREvkBcAhj0eFIhCLjLs0lhLSyHhOSaNLAfVjTkfJt
-         7a8XSWMpXnh6BZJQ5k4yoDKq5gr+I8qNatnBw7iXTCcV4vhgxgtQer4YJzDH09g2tcf9
-         kftg==
+        bh=LrJHYqPsGjpCVZNZq+4SKKUIZPykXEAa2/KtTyJxlHo=;
+        b=ZYCcOS7D6m2recgavIZ9hQJprh31+Je8ybrbWl076b7NMCv602j9FMAi0f2RiF3eCm
+         i51NlO4cslSElCP+VRsI36HRAc5636e+8mcpB5UogOUYlXnCgYUrDEYShMKtj7a7tSrE
+         LyhjAWTXetULFRBhXq84ir5OAzKsykwCsYY1itMBNTIa4IjS+51cTwX3RtjlBVHf2yrf
+         Gh9ua19R3Ddhwmb2JnJQwdOYk0IQZKo1b8ui7KEAfgT9SuyyG0FvglvI4H6C9cKGDtBg
+         4ym6C9Wi+n6sfNHibITU7mN7e4MzvPERkWzFnY8OvL4HDrOrxxlnT6BD7h/26UtXwBXK
+         Bpdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698593897; x=1699198697;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1698598124; x=1699202924;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qT43Nf94mF07rnV7CrLvxuub2Ca7aEi64+U8CyL0b3g=;
-        b=mq0agZxPsUTXWGl3KIMxGTjQnOMeyLItg7Qy4WS/pAero6DYGp/UEXkFfWmgIONKfz
-         JARxKmZsL77ql2k8D5XA/aaJEL+eN6iPZptYMUYWmKNWoal0tkSpCm2iNSpfrfgcahkx
-         48u+yi/LMcyz8qYNS0oDJQk3sXsarL18S80EAIm2IRtm7iJmKfrqakY0WwLEiWXEgpML
-         SzhcBQjlFBAmgFPqNhecQWOJL3tPkY9x7spY6fNg1yal1+sU4HdnvLumrCZWy5Zga3O3
-         LA1slKSuW5sHqUlO73dZCvMe4XyiPM2K9E1AK8PHsS0DkqdCWR3E6Fnhnq68/qxitIYG
-         TUlw==
-X-Gm-Message-State: AOJu0YwyOzRHdBtOWaB1jhpRfhW9093snUB8yzIJ9LESbdlvdzPGibBS
-	Mbe+6OXZsdWYGlRwQreiUZlwW13cK85C/GMKSXI9DQ==
-X-Google-Smtp-Source: AGHT+IG9mfhQQbXcGl8AcijtrKNfwYSt3oDBm67fZGoetZ9+aWcXQ2nRVhfuKvMzIE9tEEvaJNYpsV9CoFfSaSnzLeU=
-X-Received: by 2002:a0d:ec47:0:b0:595:9135:83c7 with SMTP id
- r7-20020a0dec47000000b00595913583c7mr7285708ywn.47.1698593896903; Sun, 29 Oct
- 2023 08:38:16 -0700 (PDT)
+        bh=LrJHYqPsGjpCVZNZq+4SKKUIZPykXEAa2/KtTyJxlHo=;
+        b=ZTiq9tl5VaX65Qyvb+6qkWL33kFr51/TgKbPI/Qcu0BsOaTay29SUZ5nK1yMNO0CcQ
+         JI+FqaiX9lOQZuQxXTL1f84U6F0x86cuuHgE0HVn2sKRQF6+iHSxbjYGLwOZD7E2JyPp
+         86RW3zgAIccjEUQZRo4U1Ec5WBYIG6kFAqRl/zD7LmqOJykeHVXp6nyUM1gZ2P56OOzt
+         3l+YL/GUJd45iGxUdc74aaNkgxfYdxzPdfAXWe6YQFpu+o8mJadlnThfS8rhtxXS2dJV
+         FVKm2eERkeYUbwfuYlz61RnFruL0CjUaHMcImkTzMSu0prSYCWWNwDEbqKH9YLKrUF8s
+         xgBA==
+X-Gm-Message-State: AOJu0YxaRnDvqKHe/a7byZlcZ/jUVxKGOYHQQYxWkdq3o619qZ++YwK7
+	epkjLYausrwYGuMWC1n4LI4=
+X-Google-Smtp-Source: AGHT+IF6E1N0OxP5x9lYEZkWXEcifaKtACfYTIHu6QC6r7XTuxwpfzjXpGS7/XrPgvgmAAXvEWDUyg==
+X-Received: by 2002:a05:6214:2488:b0:658:22f8:4e51 with SMTP id gi8-20020a056214248800b0065822f84e51mr13775390qvb.1.1698598124205;
+        Sun, 29 Oct 2023 09:48:44 -0700 (PDT)
+Received: from auth2-smtp.messagingengine.com (auth2-smtp.messagingengine.com. [66.111.4.228])
+        by smtp.gmail.com with ESMTPSA id qs16-20020a05620a395000b00767e98535b7sm2581628qkn.67.2023.10.29.09.48.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Oct 2023 09:48:43 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailauth.nyi.internal (Postfix) with ESMTP id 6690927C0060;
+	Sun, 29 Oct 2023 12:48:43 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Sun, 29 Oct 2023 12:48:43 -0400
+X-ME-Sender: <xms:64w-ZYjAWoD3C9A9gg8Zw2k5nNQPfo9RRZ5NctYQJ4geLeVXvjN4mA>
+    <xme:64w-ZRBG9OQO-oNzPBAxSZiHpnkQm672ZtkffAgyzg8A28EbrInmru3FTPe_DHM7S
+    zh3pnr7yfm3eM5msg>
+X-ME-Received: <xmr:64w-ZQGNFGFJRy0tIFxJAW-rMTS_ek7LItVL9b_7A5_RyHUHpqW88GvArvM>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrleekgdeludcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeeuohhquhhn
+    ucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrfgrth
+    htvghrnhephedugfduffffteeutddvheeuveelvdfhleelieevtdeguefhgeeuveeiudff
+    iedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsg
+    hoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieeg
+    qddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigi
+    hmvgdrnhgrmhgv
+X-ME-Proxy: <xmx:64w-ZZRbPuwkYFSlDtJZhem6txUfI4WX2XobUc1wLJDUrxr2nOjMdg>
+    <xmx:64w-ZVy6h52wMZ-kZXuPfrqK6msZElBIIXRBU0rPpqxKjHxScgmVlw>
+    <xmx:64w-ZX6d7xlNkWeq1ktBMYjh0rzcCA9Jlo7cT59mBPre0z596Ypmzw>
+    <xmx:64w-ZUx0O7y6jQr4AblM7YxYHBX6cIIJDTIzqrrMN62c6prQycBQYQ>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 29 Oct 2023 12:48:42 -0400 (EDT)
+Date: Sun, 29 Oct 2023 09:48:41 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: benno.lossin@proton.me, andrew@lunn.ch, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY
+ drivers
+Message-ID: <ZT6M6WPrCaLb-0QO@Boquns-Mac-mini.home>
+References: <45b9c77c-e19c-4c06-a2ea-0cf7e4f17422@proton.me>
+ <b045970a-9d0f-48a1-9a06-a8057d97f371@lunn.ch>
+ <0e858596-51b7-458c-a4eb-fa1e192e1ab3@proton.me>
+ <20231029.132112.1989077223203124314.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org> <95f324af-88de-4692-966f-588287305e09@gmail.com>
-In-Reply-To: <95f324af-88de-4692-966f-588287305e09@gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 29 Oct 2023 16:38:04 +0100
-Message-ID: <CACRpkdbyMEqjW1a9oK-GM2_XL0famH1RgSXW-fQLszn9t9UhWw@mail.gmail.com>
-Subject: Re: [PATCH] dsa: tag_rtl4_a: Bump min packet size
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231029.132112.1989077223203124314.fujita.tomonori@gmail.com>
 
-On Fri, Oct 27, 2023 at 11:23=E2=80=AFPM Florian Fainelli <f.fainelli@gmail=
-.com> wrote:
+On Sun, Oct 29, 2023 at 01:21:12PM +0900, FUJITA Tomonori wrote:
+[...]
+> 
+> The current code is fine from Rust perspective because the current
+> code copies phy_driver on stack and makes a reference to the copy, if
+> I undertand correctly.
+> 
 
-> > It turns out that sometimes, but not always, small packets are
-> > dropped by the switch for no reason.
->
-> And we are positive that the Ethernet MAC is also properly padding
-> frames before having them ingress the switch?
+I had the same thought Benno brought the issue on `&`, but unfortunately
+it's not true ;-) In the following code:
 
-I don't fully follow, this code is the one adding the padding isn't it?
-Then the result is transmitted to the switch from the ethernet
-MAC (drivers/net/ethernet/cortina/gemini.c).
+	let phydev = unsafe { *self.0.get() };
 
-What am I getting wrong here...
+, semantically the *whole* `bindings::phy_device` is being read, so if
+there is any modification (i.e. write) that may happen in the meanwhile,
+it's data race, and data races are UB (even in C).
 
-> > If we pad the ethernet frames to a minimum of ETH_FRAME_LEN + FCS
-> > (1518 bytes) everything starts working fine.
->
-> That is quite unprecedented, either the switch is very bogus or there is
-> something else we do not fully understand...
+So both implementations have the problem because of the same cause.
 
-The switch is pretty bogus, all documentation we have of it is a vendor
-code drop, no data sheet. The format for ingress and egress tags
-was discovered using trial-and-error.
+> It's not nice to create an 500-bytes object on stack. It turned out
+> that it's not so simple to avoid it.
 
-Yours,
-Linus Walleij
+As you can see, copying is not the way to work around this.
+
+Regards,
+Boqun
+
 
