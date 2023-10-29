@@ -1,161 +1,131 @@
-Return-Path: <netdev+bounces-45106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B4297DAEC2
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 23:16:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9487C7DAEC6
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 23:18:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 441BC1C20896
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 22:16:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 308AAB20C7E
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 22:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E83F1095F;
-	Sun, 29 Oct 2023 22:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cnu9R1Hu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEED107AE;
+	Sun, 29 Oct 2023 22:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBF3D295
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 22:16:13 +0000 (UTC)
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1D55C1
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 15:16:11 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id 3f1490d57ef6-d81d09d883dso3093226276.0
-        for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 15:16:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698617770; x=1699222570; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4DHjqrde8ErThPTqoMnEMyFAJvtH9637SxQ0kWsDcbc=;
-        b=cnu9R1Hunif6hkx5vZzhlV3YK2KmVCIWJOkI6CzrPQpSHK7PCPBYIe81RwPFeYsSuE
-         dUHZIW8IzlV4y2Eu4tNQwxek4iXGTHEXhKRcFW+VCBBu6LMJoOGrPmmoN9C3kZHVCELD
-         g60CmbAJgPyZapM3aO5+8lkW+4vYnY3Rpvy0QeDoucK3wov24x9ppE5Ue2pP88Oklk4N
-         66YGRp7I6Vd1wPWJ1h93sM0ll4IKajJ/GrRrD7K2fbwh4tLGf4V1ISqID79ntZRyfCRU
-         WMq8x6T0XnIjaiNaSH0V5kRcS5bfKS3sjK+nz2aA6NOeeVpr4UibOAa/nSsQ/OkgUj1F
-         ZH6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698617770; x=1699222570;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4DHjqrde8ErThPTqoMnEMyFAJvtH9637SxQ0kWsDcbc=;
-        b=aE63plqw6hosSaU5jjtJCz7NmEIZZIuPjFDxHyy5ijvgwRRSomffDU3vgByNdNPybP
-         Is/afpjYLpeFH5MnWrPkfV12Pf2l9AkyblRCZNT6aGwzMoLBS+aBMQK8tDPg9b2u7Ghr
-         TcZehaLsdCegMVDMl0HHi/ofyrT24fhsqY/kHeqJojsrlm07+vukL1l2kzqpoPP9TUyV
-         eG+qertKU5iK50JCtI7z53arMhqZDqfs4lxG2HMJZyjEkRbT043HoNtCqe4GfVVpmvwT
-         OVF5dmJGqcMUinzrl68rXVgI5EpI3R6fTZ+ilsG77UpXfxWS+iJdwAvj+wBke1slX2AI
-         hsEA==
-X-Gm-Message-State: AOJu0YycED532txsP2hXr5PS1wGHppbzes6VK2nDJelA6NvRxGA6uOsx
-	7QkIppMojsv4pltRXvr95UnMkrJOxRYl9N7Xd6HsqA==
-X-Google-Smtp-Source: AGHT+IH/StsWnId+Cl/46lJYj7GmjzV1lpbpqKYC2PXIsJJCbV0u0G6JHkFtvVTBSMTpOiMlJ+iZzujaEVJfuab+ppg=
-X-Received: by 2002:a25:ab32:0:b0:d9b:4a2c:7a73 with SMTP id
- u47-20020a25ab32000000b00d9b4a2c7a73mr7311315ybi.61.1698617770419; Sun, 29
- Oct 2023 15:16:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0691361
+	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 22:18:12 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F91BC0
+	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 15:18:09 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-317-UlBHNFbGNfOFxGkrYIZEWg-1; Sun, 29 Oct 2023 22:18:06 +0000
+X-MC-Unique: UlBHNFbGNfOFxGkrYIZEWg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 29 Oct
+ 2023 22:18:18 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Sun, 29 Oct 2023 22:18:18 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Andrew Lunn' <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>
+CC: Linus Walleij <linus.walleij@linaro.org>, Vladimir Oltean
+	<olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] dsa: tag_rtl4_a: Bump min packet size
+Thread-Topic: [PATCH] dsa: tag_rtl4_a: Bump min packet size
+Thread-Index: AQHaCSnhGWzkfBO9PU2ZFG9wM9DcyLBhVnbQ
+Date: Sun, 29 Oct 2023 22:18:17 +0000
+Message-ID: <7f6684f1f3d84a208daee16321197315@AcuMS.aculab.com>
+References: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
+ <95f324af-88de-4692-966f-588287305e09@gmail.com>
+ <3ffe7ea1-4dfb-4db8-a2ce-67733a190138@lunn.ch>
+In-Reply-To: <3ffe7ea1-4dfb-4db8-a2ce-67733a190138@lunn.ch>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org> <20231028220402.gdsynephzfkpvk4m@skbuf>
-In-Reply-To: <20231028220402.gdsynephzfkpvk4m@skbuf>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 29 Oct 2023 23:15:58 +0100
-Message-ID: <CACRpkdbq03ZXcB-TaBp5Udo3M47rb-o+LfkEkC-gA1+=x1Zd-g@mail.gmail.com>
-Subject: Re: [PATCH] dsa: tag_rtl4_a: Bump min packet size
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: DENG Qingfang <dqfext@gmail.com>, Mauri Sandberg <sandberg@mailfence.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Vladimir,
-
-first: THANKS, because you ALWAYS ask the *right* questions,
-and I quickly get closer to the real solution!
-
-On Sun, Oct 29, 2023 at 12:04=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com=
-> wrote:
-> On Fri, Oct 27, 2023 at 10:21:39PM +0200, Linus Walleij wrote:
-
-> > It was reported that the "LuCI" web UI was not working properly
-> > with a device using the RTL8366RB switch. Disabling the egress
-> > port tagging code made the switch work again, but this is not
-> > a good solution as we want to be able to direct traffic to a
-> > certain port.
+From: Andrew Lunn
+> Sent: 28 October 2023 00:04
+>=20
+> On Fri, Oct 27, 2023 at 02:23:13PM -0700, Florian Fainelli wrote:
+> > You would want your subject to be:
 > >
-> > It turns out that sometimes, but not always, small packets are
-> > dropped by the switch for no reason.
->
-> "For no reason" is a technical statement which means "an unspecific/incon=
-clusive
-> drop reason in the ethtool -S output on the conduit interface (which also
-> shows the hardware counters of the CPU port", or is it just a figure of
-> speech? If just a figure of speech, could you please determine which
-> counter gets incremented when the switch drops packets?
+> > net: dsa: tag_rtl4_a: Bump min packet size
+> >
+> > On 10/27/23 13:21, Linus Walleij wrote:
+> > > It was reported that the "LuCI" web UI was not working properly
+> > > with a device using the RTL8366RB switch. Disabling the egress
+> > > port tagging code made the switch work again, but this is not
+> > > a good solution as we want to be able to direct traffic to a
+> > > certain port.
+> > >
+> > > It turns out that sometimes, but not always, small packets are
+> > > dropped by the switch for no reason.
+> >
+> > And we are positive that the Ethernet MAC is also properly padding fram=
+es
+> > before having them ingress the switch?
+>=20
+> It might be interesting to run a script which systematically does a
+> ping, or similar, for all frame sizes.
+>=20
+> > > If we pad the ethernet frames to a minimum of ETH_FRAME_LEN + FCS
+> > > (1518 bytes) everything starts working fine.
 
-I ran ethtool -S on the switch port before and after trying to access the w=
-eb
-UI (LuCI) on the router with the chip, i.e. putting http://192.168.1.1 into
-the address bar of a browser and hitting enter three times.
+Thought - is that just because it slows everything down??
 
-Then I ran diff -ur on the two outputs (before and after) and get this
-disturbing and symmetric stat:
+> > That is quite unprecedented, either the switch is very bogus or there i=
+s
+> > something else we do not fully understand...
+>=20
+> It would also be interesting to know if the frames on the wire have
+> the padding removed when needed. Its not going to be good for
+> performance if a TCP ACK is 1500bytes in size, rather than the usual
+> ~64.
 
--     Dot1dTpPortInDiscards: 0
-+     Dot1dTpPortInDiscards: 3
+Non IP protocols are very likely to object to unexpected frame padding.
+I'm also sure I've seen systems do (the equivalent of) printk for
+overlong UDP packets.
 
-(Counters defined in drivers/net/dsa/realtek/rtl8366rb.c)
+If you search the right place you'll find reports of packets
+being discarded before one of the VM network implementations
+padded ethernet frames to an even byte length.
+(I can't remember which, but have some fpga logic that adjusts
+the MAC address based on the TCP port number and manages to
+require there be no unexpected padding - yes it is broken.)
 
-> What user port is being targeted when the switch drops packets? Any user
-> port, or just specific ones?
+=09David
 
-I tried on lan0, lan1, lan2 and lan3 (DSA ports 0,1,2,3): same result.
-On each of the ports, the same Dot1dTpPortInDiscards counter
-goes up.
+>=20
+> Have problems also been noticed with traffic going from user port to
+> user port?
+>=20
+> =09Andrew
 
-> What protocol headers do those packets that are dropped have?
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
-HTTP
-
-> Is it size
-> that they have in common, I wonder (given that you say that small
-> packets are not always dropped), or is it something else?
-
-I got it wrong, it's big packets getting dropped, not small ones... :(
-
-Some tcpdump:ing gives at hand that the problem is that the
-httpd is sending 1500 byte packages. Anything over 1496 fails
-in ping tests.
-
-1496 is suspiciously much 1500 - DSA tag size. However the
-MTU of the parent ethernet is bumped nicely to 1504 and the
-device MTU is set up to accomodate it as well.
-
-Modifying the patch to just pad out packets >=3D 1496 bytes
-solves the problem in a better way, but maybe that is not the
-last thing we try here...
-
-I'll resend the patch with more elaborate commit log and test
-description in the commit.
-
-> > Fixes: 0e90dfa7a8d8 ("net: dsa: tag_rtl4_a: Fix egress tags")
->
-> Have you actually checked out this sha1sum and confirmed that the packet
-> drop can be reproduced there? Ideally you could also go back to a bit
-> earlier, to commit 9eb8bc593a5e ("net: dsa: tag_rtl4_a: fix egress tags")
-> (this is a different commit from Qingfang with the same description) and
-> test on user port 0 only?
-
-Yes it should be an earlier commit indeed. I'll fix!
-
-Yours,
-Linus Walleij
 
