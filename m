@@ -1,211 +1,240 @@
-Return-Path: <netdev+bounces-45078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D14D27DAC85
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 13:48:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 742C37DAC90
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 13:55:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 684A3B20DBB
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 12:48:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C0C41C2088D
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 12:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9ED3214;
-	Sun, 29 Oct 2023 12:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90026107;
+	Sun, 29 Oct 2023 12:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ag0Ioi1t"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JcLj/YXz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376CC23B0;
-	Sun, 29 Oct 2023 12:48:41 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E9A4FC;
-	Sun, 29 Oct 2023 05:48:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WhKMfvltVO9iP+la09IlqJVnluJEowd6b9Vqvk1dYjlDrIymKUkWVY6HyH0iIVaJuvzg0D1LRWviuUzDBgQCdmHQ16fit9qv3m6UfmrjllxeGlAGuwPa0ZGEeG4WBn8VgVNFrm1RoTOW+cPP9WqQoTq//VXY11CeKk0dtMzRA4HDz/xSKzrl3dh7LjonH2Zc20csHInvWm3GFn9PpAs8OPqMeYELehStSb75vg8WiWSaDdWbKZ0xCRn5huk15Mu9IQIfv6GXXe9qxL0a7tm7/JeknJHOhKMGhq2LUpCIIgp/HWfc+oWELN1dpDKP7/u+b4+aveGhmi4PQ0pw+AjH1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1Y+xvY/yMRqGKtkrx4qNYRgBjXkb6GiV4pZHXQPGPVs=;
- b=JaWuEUr2FKC3vbAneM2z9TxHqkfXpkzunzpWYg3VPkxP/LplqrOMvLpxkgaUAvbX80f4xKrFtfkMlYoA/vt09+n/c3EcWeLm7SMf+XnE0mUb/F9l/XNttrKKxz3x3gbi5+u0SNe0F4pjYGzDhQ62MpfVJgnWQIci+1lRvDVDVIy0mUP7qRUsWx9xMup01rGLRxc/SOk7P7fzBikjlM0QE7oHRak3TrInnYy41kIK1iTRJsR34nMmxTTD5Co1X2HCs0HYvs3OJYuRqdnSyr/Y7B15VV1AJyvlo18q9LLpLZGyvBGBedD5l8RJiLwqfDpIz/j9Ec66vQmuT6OUNyi/pg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1Y+xvY/yMRqGKtkrx4qNYRgBjXkb6GiV4pZHXQPGPVs=;
- b=Ag0Ioi1tFgE8ymF5GKxMKSBDtNhOaAhihLpTzUmThPeqEbDuUAbA2wbysnRVpUDCMwy/utW2mJGd4uMRo/pMOH1txKqdRdTpKAZ5Jh5/KIredXqQPAgiJI0YhZgHiOYlVZMD98HYOfkbrnJrn7x4+ZL+q6sUAQ6WIAzVfafHEe1adpdispRGneZIramNqlRqNAjU/i62KA8DteOc8OlXBpgbUYcgTmFkrLIlFsNpxe0KglJW/1kAIB0qY3biy4FbOKC55cnwMUsFsWH4F0kmRcMvIKrjweRv4tP9afrhQjb4IBs3rb+gmztSNnGa+5PrmINOgBnrSTMAODX+ePxbcQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) by
- PH7PR12MB7281.namprd12.prod.outlook.com (2603:10b6:510:208::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6933.22; Sun, 29 Oct 2023 12:48:37 +0000
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::8cde:e637:db89:eae6]) by DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::8cde:e637:db89:eae6%5]) with mapi id 15.20.6933.025; Sun, 29 Oct 2023
- 12:48:37 +0000
-Message-ID: <e471519b-b253-4121-9eec-f7f05948c258@nvidia.com>
-Date: Sun, 29 Oct 2023 14:48:28 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v4 1/6] net: ethtool: allow
- symmetric-xor RSS hash for any flow type
-To: Ahmed Zaki <ahmed.zaki@intel.com>, Jakub Kicinski <kuba@kernel.org>,
- Alexander H Duyck <alexander.duyck@gmail.com>
-Cc: mkubecek@suse.cz, andrew@lunn.ch, willemdebruijn.kernel@gmail.com,
- Wojciech Drewek <wojciech.drewek@intel.com>, corbet@lwn.net,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- jesse.brandeburg@intel.com, edumazet@google.com, anthony.l.nguyen@intel.com,
- horms@kernel.org, vladimir.oltean@nxp.com,
- Jacob Keller <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org,
- pabeni@redhat.com, davem@davemloft.net
-References: <20231016154937.41224-1-ahmed.zaki@intel.com>
- <26812a57-bdd8-4a39-8dd2-b0ebcfd1073e@intel.com>
- <CAKgT0Ud7JjUiE32jJbMbBGVexrndSCepG54PcGYWHJ+OC9pOtQ@mail.gmail.com>
- <14feb89d-7b4a-40c5-8983-5ef331953224@intel.com>
- <CAKgT0UfcT5cEDRBzCxU9UrQzbBEgFt89vJZjz8Tow=yAfEYERw@mail.gmail.com>
- <20231016163059.23799429@kernel.org>
- <CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
- <20231017131727.78e96449@kernel.org>
- <CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
- <20231017173448.3f1c35aa@kernel.org>
- <CAKgT0Udz+YdkmtO2Gbhr7CccHtBbTpKich4er3qQXY-b2inUoA@mail.gmail.com>
- <20231018165020.55cc4a79@kernel.org>
- <45c6ab9f-50f6-4e9e-a035-060a4491bded@intel.com>
- <20231020153316.1c152c80@kernel.org>
- <c2c0dbe8-eee5-4e87-a115-7424ba06d21b@intel.com>
- <20231020164917.69d5cd44@kernel.org>
- <f6ab0dc1-b5d5-4fff-9ee2-69d21388d4ca@intel.com>
- <89e63967-46c4-49fe-87bc-331c7c2f6aab@nvidia.com>
- <e644840d-7f3d-4e3c-9e0f-6d958ec865e0@intel.com>
-Content-Language: en-US
-From: Gal Pressman <gal@nvidia.com>
-In-Reply-To: <e644840d-7f3d-4e3c-9e0f-6d958ec865e0@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P265CA0055.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2af::11) To DS7PR12MB6288.namprd12.prod.outlook.com
- (2603:10b6:8:93::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53AA23B0
+	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 12:55:06 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0E30C2
+	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 05:55:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698584104; x=1730120104;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uuVOo2cSJbl54SVJTPcZzZIDzT0I0Vfu2pQz5kAivK4=;
+  b=JcLj/YXzhiKXJCukcWbFDql3s8cyTp5gGRvc4ENUuXzFLNgej+Ip9nYG
+   NmtlJePG0WrdXf7PCfn04Z95RFPWu2Mzb5nm9GAwhIOMHgi8Tx8aUYequ
+   MzFQUmSOWwbDczOYTN8XTaln2/TEuHjji3jw5To9/KcSL2V9pI7CMFUj2
+   6a6BDCwEfdAmwRimti3wdEp5n0qd1MXNV3o5QMx8xpJlvXNHxrR2JLKsS
+   TSuIjunc54ijoZrB374loNZ1VlQC6LKHxEgcS5pZ8x8PjWaSg1pIBUToH
+   XK5Thqdq7HY8BvobrIuDDhNNdMEMXhj+cNVBbZGlCibfFBaoirrf3+KNP
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10877"; a="378324101"
+X-IronPort-AV: E=Sophos;i="6.03,261,1694761200"; 
+   d="scan'208";a="378324101"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2023 05:55:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,261,1694761200"; 
+   d="scan'208";a="1278485"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 29 Oct 2023 05:54:46 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qx5Jh-000CZ7-2E;
+	Sun, 29 Oct 2023 12:54:57 +0000
+Date: Sun, 29 Oct 2023 20:54:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: Coco Li <lixiaoyan@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Mubashir Adnan Qureshi <mubashirq@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Chao Wu <wwchao@google.com>,
+	Wei Wang <weiwan@google.com>, Pradeep Nemavat <pnemavat@google.com>,
+	Coco Li <lixiaoyan@google.com>
+Subject: Re: [PATCH v5 net-next 3/5] netns-ipv4: reorganize netns_ipv4 fast
+ path variables
+Message-ID: <202310292036.So7PkmBh-lkp@intel.com>
+References: <20231029075244.2612089-4-lixiaoyan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6288:EE_|PH7PR12MB7281:EE_
-X-MS-Office365-Filtering-Correlation-Id: 01c6a5af-76db-4313-be33-08dbd87d5e70
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	GpBI/ytYVt7BK2OLPbztSlmU6YLnDNrAY7hn/lqPC+TvxVe3TZ7TPnIfj4/L7/+vtRKoaBeoHqYp6UBS2hL9H5mSJbWLRQhY8BMvq6DYDjUWC/V6hAQFb4gVVIG13gzcRmuMShyMBFckA0eBVX6yez0WDrfW0QqqzHDV9VHE2NbBoyqgFxo5qa6Phd8zE9dSKi2u5OAXEZvpsObMIqQuSHGqQGhPnChaQSysN5YBSddAJNhlpP9+XlsXzaS2EcxKy2BS2mWh616IVXQiqTDPPaC8SF99RaI5ZmnB1eIMrR6/Q/6A/mBfd+/+tCrda5H8mkvWSSC9NalRPGrpQFWnvW4W0FiORt94HRpIr4aTmarA2Cfwua9VzrHSVF4u0TVdl/2m1cpp2s1yBd7jevI7gIM3ME3kIuAp62MUD5J295PM/HUj8xhg3We5JG2H6Tp6S4I9ZUqNc9m4zxD1yVkhYbhoUcF9XQnAGbIiSBjyi+tZN5GI9lelxbyzbEo8g4WumXjNxucBhZn6D+frb1tFVNDIUbjOxYnV11TN+disLbj/bv5fYHoP5vcNHG4drBwX2/YgYlRwIcrC09r52sTufDlS4Jmc1+XG3WmkRnQLrnRNyW+f7Am/RUI+NASUcstM8C7FZDf1zDfgnDRHedJFc2PNCYg4BE0Y6sE0xF8IsXm3odUwTrZctKRCIGuQilL+
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6288.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(376002)(366004)(346002)(136003)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(38100700002)(2906002)(31686004)(31696002)(83380400001)(7416002)(4001150100001)(5660300002)(2616005)(86362001)(6512007)(41300700001)(36756003)(66556008)(110136005)(66476007)(316002)(66946007)(54906003)(53546011)(6666004)(6506007)(6486002)(8676002)(966005)(26005)(478600001)(8936002)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WVRFb01SRm1FakhweVNmVXV0MnJ0dE9vN2dnTlEySnhiOEpLUGNld0k5aitZ?=
- =?utf-8?B?TUtWQkhReVpIR3NtQXkyZE5MaUdRalZjUTA2SFlScUZJa3ZGcDc4NHhuZ3cv?=
- =?utf-8?B?eDJzUFo1YmlhQlh5eXdVeGVSVU5yMEtSazV2WUhPV0Jla2VLT3JvNHZWR21z?=
- =?utf-8?B?WVB6MFFmZk8yYkhrODM5QWdLdTFmVXdrYzl1Mnk5YWJKbjN1VUthTjNXNEY3?=
- =?utf-8?B?NzY1RmVVb05hV1pCa1BJZDkyRGlobmVmQ3NPSHg4b1dGek95RzR6RWM4cElj?=
- =?utf-8?B?aTRKQTl3WEhLbEJTbEpBdTV1U2pnNHZPZlgzaDVQWlI1TEdvYnBRNnF5U2xB?=
- =?utf-8?B?azE2RUtnYUJRRURpV0FvNGJRU3JGN3F0ZUloVWVRamI1USs3Rnh5cmdETXRF?=
- =?utf-8?B?cFA0OTFIQW1IS2kzeXBwVys1S0pWTGR5akRhVERob2VKblNYcFgra2ZMWXZk?=
- =?utf-8?B?MlVWb0JlbmZzeU9pMDZRblhDYUVyYUNYbkQ1RGRYMGNBQTNrNzZ3dkVvVFcv?=
- =?utf-8?B?Zm9ORTF6eHdMWGNLbEZXWGttNzJRRjlPOG15RUZ3QXl5RmF4T3Yxb2Z5WFZJ?=
- =?utf-8?B?TTBvMStPRCsrQmx4SXB1UFJGTnN4clNLdjM2cUgyVTlNZlRJNWdQaTFjaFMw?=
- =?utf-8?B?QmlEOE9XYWtmbER0VE9veGZaTzJUR1FiSkdnL3F3eHVsSlRNTmhuWnJYMVZI?=
- =?utf-8?B?UHR1Q1JvK1N2dzdZZDhKbkM5SHRlRDc1bm5xbERrN1E2eDQ2MXVJRWdJSW90?=
- =?utf-8?B?Vmp6STNVL0NaSTJINDBvQWlrUHpsZUp5ckNHdzlsVDMrd0RLRzU4bmVjMGUz?=
- =?utf-8?B?dWlBYStyaFVzTFFmWnVCQWtJUW1PTnpkRGtNdUxkN0Q5VCtxK3E5dnpPWmNU?=
- =?utf-8?B?Zk1YTXp6T2ZmRG9ZNjk5bzNlRlRqZ2NCK0dPZXVmd2NXeXozL2Rad2VoeVBJ?=
- =?utf-8?B?a3h3dXdNVkhnOE85Rm95ZXExbVROY0pPZXdLNXE5aVA4ZTJhb2UvLzRDMHJT?=
- =?utf-8?B?RnBiaWJsU0hYNmhUejJnZDl3VDFBYUdUZTN0VVpYZlFCWDRURFgvclF0ZW5i?=
- =?utf-8?B?TlpQRU1sRHR5UThaWUVlZkt1R1NFc1JiZlRNQm9CdXhySndHT2lXb1ZmVENn?=
- =?utf-8?B?MEY1blpRRUprd3N6TlV5QlVaQnZoKzRjdVpwUUkrcTNBL29XOUpyZTZ0cStp?=
- =?utf-8?B?am1JeVJaTlBwNnNXbjQvTm0zSyt1RkVDT3NUSWFLNWpCWXhIYXZEcUNWZXAy?=
- =?utf-8?B?ajFkdXM3T2ZKU0RxSGpzVFFLN2FXTFRsWTJZeTRsVm8rSk5qRk1EbjFVR1R5?=
- =?utf-8?B?bVE4UU02elJDaE9Rck9xRituVzR0bWhUeER3SE12cFlXVHVrZ3d4NUZZbXp1?=
- =?utf-8?B?SVEyVlBqdEpQdWJlbTUyeUYvaDhpN0orOGxHdy9oRVJ2WEJaSlZCYVp4SWQ2?=
- =?utf-8?B?NWhLVURlMmZxeCsvZWg1RWRESDVZVkNMdHpWNm5ncm12c1lJZVhLUExDbFMy?=
- =?utf-8?B?UjF1aEp4L0RxdFhrRHZ4THJQclFFL2U1cmV1d1hkZTNzaTQycnh3dEpjZDQx?=
- =?utf-8?B?cUJoYjdLZGVSL3hqK3dwK2l5KzVGaWpncUxsdVF1cHluN1hhbXNQRnJ6eW93?=
- =?utf-8?B?N2o5aVRzakUvK1hvVTJBdXc1TXZBZDdOTUJYcFA3SDh0b09xeE9abmNrT3Bk?=
- =?utf-8?B?Z29SZERXNnE0L29RSmI4U0RZdnRQYVIxYzhRamk5UVljaDRZWlU1OHlHL2JL?=
- =?utf-8?B?VEl1ZUZSTWtuZjNkU01taU1QZHdVZGtJcTN0NlR6VDFDWWt3M0dJUk1MU0hH?=
- =?utf-8?B?Y3M5ckNYYmdVK1dOOUlUZy9PRjhzdVAyZWd2RE5yWDlaRHQ4aDJkVTNLblkx?=
- =?utf-8?B?SGxTWWJ1MkZSeEVIZ2hoQ2RpSUduMm1YeGxoeE1WSHdNMVJ5QWJkL0RzN3RM?=
- =?utf-8?B?Si9JOHJOMFhlSlZ2R1FnVS94MnZ5YXYyVXdlNlpPbTJDbUt3Z0N6b1ZiNFpG?=
- =?utf-8?B?QjExalgrN3hFdDcxWnpzbGhCWWNxWml4NWlXOEh2TFpLWExUWG5ETDJtaXlt?=
- =?utf-8?B?b0hQeExvTytUOWJ1YTFRcVdWTjhlNlRHTnVUc0N3SFlVU1RUL0duN1NzWW1s?=
- =?utf-8?Q?cuJ1ClTafSWwG9FgvEl9sKpoa?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 01c6a5af-76db-4313-be33-08dbd87d5e70
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6288.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2023 12:48:37.2196
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Bdv7t2My4IpoVFmXRD5XdlrQ4jXJOCPMttfLujlufaT7Sm2AizfKL6CTzogzCuIN
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7281
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231029075244.2612089-4-lixiaoyan@google.com>
 
-On 29/10/2023 14:42, Ahmed Zaki wrote:
-> 
-> 
-> On 2023-10-29 06:25, Gal Pressman wrote:
->> On 21/10/2023 3:00, Ahmed Zaki wrote:
->>>
->>>
->>> On 2023-10-20 17:49, Jakub Kicinski wrote:
->>>> On Fri, 20 Oct 2023 17:14:11 -0600 Ahmed Zaki wrote:
->>>>> I replied to that here:
->>>>>
->>>>> https://lore.kernel.org/all/afb4a06f-cfba-47ba-adb3-09bea7cb5f00@intel.com/
->>>>>
->>>>> I am kind of confused now so please bear with me. ethtool either sends
->>>>> "ethtool_rxfh" or "ethtool_rxnfc". AFAIK "ethtool_rxfh" is the
->>>>> interface
->>>>> for "ethtool -X" which is used to set the RSS algorithm. But we
->>>>> kind of
->>>>> agreed to go with "ethtool -U|-N" for symmetric-xor, and that uses
->>>>> "ethtool_rxnfc" (as implemented in this series).
->>>>
->>>> I have no strong preference. Sounds like Alex prefers to keep it closer
->>>> to algo, which is "ethtool_rxfh".
->>>>
->>>>> Do you mean use "ethtool_rxfh" instead of "ethtool_rxnfc"? how would
->>>>> that work on the ethtool user interface?
->>>>
->>>> I don't know what you're asking of us. If you find the code to
->>>> confusing
->>>> maybe someone at Intel can help you :|
->>>
->>> The code is straightforward. I am confused by the requirements: don't
->>> add a new algorithm but use "ethtool_rxfh".
->>>
->>> I'll see if I can get more help, may be I am missing something.
->>>
->>
->> What was the decision here?
->> Is this going to be exposed through ethtool -N or -X?
-> 
-> I am working on a new version that uses "ethtool_rxfh" to set the
-> symmetric-xor. The user will set per-device via:
-> 
-> ethtool -X eth0 hfunc toeplitz symmetric-xor
-> 
-> then specify the per-flow type RSS fields as usual:
-> 
-> ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n
-> 
-> The downside is that all flow-types will have to be either symmetric or
-> asymmetric.
+Hi Coco,
 
-Why are we making the interface less flexible than it can be with -N?
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Coco-Li/Documentations-Analyze-heavily-used-Networking-related-structs/20231029-172902
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231029075244.2612089-4-lixiaoyan%40google.com
+patch subject: [PATCH v5 net-next 3/5] netns-ipv4: reorganize netns_ipv4 fast path variables
+config: um-allnoconfig (https://download.01.org/0day-ci/archive/20231029/202310292036.So7PkmBh-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231029/202310292036.So7PkmBh-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310292036.So7PkmBh-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from net/core/net_namespace.c:5:
+   In file included from include/linux/rtnetlink.h:7:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     547 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from net/core/net_namespace.c:5:
+   In file included from include/linux/rtnetlink.h:7:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from net/core/net_namespace.c:5:
+   In file included from include/linux/rtnetlink.h:7:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     584 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     692 |         readsb(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     700 |         readsw(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     708 |         readsl(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     717 |         writesb(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     726 |         writesw(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     735 |         writesl(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+>> net/core/net_namespace.c:1127:2: error: expected expression
+    1127 |         / TXRX readonly hotpath cache lines */
+         |         ^
+>> net/core/net_namespace.c:1127:4: error: use of undeclared identifier 'TXRX'
+    1127 |         / TXRX readonly hotpath cache lines */
+         |           ^
+   12 warnings and 2 errors generated.
+
+
+vim +1127 net/core/net_namespace.c
+
+  1101	
+  1102	static void __init netns_ipv4_struct_check(void)
+  1103	{
+  1104		/* TX readonly hotpath cache lines */
+  1105		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
+  1106					      sysctl_tcp_early_retrans);
+  1107		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
+  1108					      sysctl_tcp_tso_win_divisor);
+  1109		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
+  1110					      sysctl_tcp_tso_rtt_log);
+  1111		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
+  1112					      sysctl_tcp_autocorking);
+  1113		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
+  1114					      sysctl_tcp_min_snd_mss);
+  1115		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
+  1116					      sysctl_tcp_notsent_lowat);
+  1117		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
+  1118					      sysctl_tcp_limit_output_bytes);
+  1119		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
+  1120					      sysctl_tcp_min_rtt_wlen);
+  1121		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
+  1122					      sysctl_tcp_wmem);
+  1123		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_tx,
+  1124					      sysctl_ip_fwd_use_pmtu);
+  1125		CACHELINE_ASSERT_GROUP_SIZE(struct netns_ipv4, netns_ipv4_read_tx, 33);
+  1126	
+> 1127		/ TXRX readonly hotpath cache lines */
+  1128		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_txrx,
+  1129					      sysctl_tcp_moderate_rcvbuf);
+  1130		CACHELINE_ASSERT_GROUP_SIZE(struct netns_ipv4, netns_ipv4_read_txrx, 1);
+  1131	
+  1132		/* RX readonly hotpath cache line */
+  1133		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
+  1134					      sysctl_ip_early_demux);
+  1135		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
+  1136					      sysctl_tcp_early_demux);
+  1137		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
+  1138					      sysctl_tcp_reordering);
+  1139		CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
+  1140					      sysctl_tcp_rmem);
+  1141		CACHELINE_ASSERT_GROUP_SIZE(struct netns_ipv4, netns_ipv4_read_rx, 18);
+  1142	}
+  1143	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
