@@ -1,131 +1,114 @@
-Return-Path: <netdev+bounces-45107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9487C7DAEC6
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 23:18:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6410C7DAECE
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 23:24:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 308AAB20C7E
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 22:18:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E26C4281430
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 22:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEED107AE;
-	Sun, 29 Oct 2023 22:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11CB12E6D;
+	Sun, 29 Oct 2023 22:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Uh9alWGo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0691361
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 22:18:12 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F91BC0
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 15:18:09 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-317-UlBHNFbGNfOFxGkrYIZEWg-1; Sun, 29 Oct 2023 22:18:06 +0000
-X-MC-Unique: UlBHNFbGNfOFxGkrYIZEWg-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 29 Oct
- 2023 22:18:18 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Sun, 29 Oct 2023 22:18:18 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Andrew Lunn' <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>
-CC: Linus Walleij <linus.walleij@linaro.org>, Vladimir Oltean
-	<olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] dsa: tag_rtl4_a: Bump min packet size
-Thread-Topic: [PATCH] dsa: tag_rtl4_a: Bump min packet size
-Thread-Index: AQHaCSnhGWzkfBO9PU2ZFG9wM9DcyLBhVnbQ
-Date: Sun, 29 Oct 2023 22:18:17 +0000
-Message-ID: <7f6684f1f3d84a208daee16321197315@AcuMS.aculab.com>
-References: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
- <95f324af-88de-4692-966f-588287305e09@gmail.com>
- <3ffe7ea1-4dfb-4db8-a2ce-67733a190138@lunn.ch>
-In-Reply-To: <3ffe7ea1-4dfb-4db8-a2ce-67733a190138@lunn.ch>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681E4C8D2;
+	Sun, 29 Oct 2023 22:24:52 +0000 (UTC)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05E9FBA;
+	Sun, 29 Oct 2023 15:24:51 -0700 (PDT)
+Received: from [192.168.1.90] (unknown [188.24.143.101])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 5F5D166072BB;
+	Sun, 29 Oct 2023 22:24:48 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1698618289;
+	bh=CceHk5gunNkmS5xqnTyMOvT/5Ea2c+1CgMjho/nsIsU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Uh9alWGouQ7U6jJthpEGwuVHe+CmdXjzGtc0aY68TODT29nPU4vrPOt4UnOKnhPYl
+	 1//sMVxcYVCTnIY8joZ85xDL5cS4E1Od5si2MlzQW7T2HNYzOWO1zppZstlFmSmt64
+	 hwZphy/RqXi9zkJNfzKRY5Xkv3ZdDA+cFBmkeXg3DB2CiCzxqIISPfiVuM5+Qwh1wX
+	 Rb7kDregtZwbcFKuaz0sppThi5rjy7iIrmURUp+uuFD1A4I6LDUwRLRsavbF2F73HP
+	 B9/fO78eoxmE4ZROfBb5EqpUTR/hEDnPyv4jGOzlL1cHBPq8wpxAX8VYKWNnzMtLsH
+	 SfX2djN/7cteA==
+Message-ID: <05186c62-fcad-4d56-8ae8-d802f87a39e2@collabora.com>
+Date: Mon, 30 Oct 2023 00:24:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/12] dt-bindings: net: snps,dwmac: Allow exclusive
+ usage of ahb reset
 Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
+ <20231029042712.520010-2-cristian.ciocaltea@collabora.com>
+ <3016eff2-fce5-4b5e-bbb2-d56cbb45df85@linaro.org>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <3016eff2-fce5-4b5e-bbb2-d56cbb45df85@linaro.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-From: Andrew Lunn
-> Sent: 28 October 2023 00:04
->=20
-> On Fri, Oct 27, 2023 at 02:23:13PM -0700, Florian Fainelli wrote:
-> > You would want your subject to be:
-> >
-> > net: dsa: tag_rtl4_a: Bump min packet size
-> >
-> > On 10/27/23 13:21, Linus Walleij wrote:
-> > > It was reported that the "LuCI" web UI was not working properly
-> > > with a device using the RTL8366RB switch. Disabling the egress
-> > > port tagging code made the switch work again, but this is not
-> > > a good solution as we want to be able to direct traffic to a
-> > > certain port.
-> > >
-> > > It turns out that sometimes, but not always, small packets are
-> > > dropped by the switch for no reason.
-> >
-> > And we are positive that the Ethernet MAC is also properly padding fram=
-es
-> > before having them ingress the switch?
->=20
-> It might be interesting to run a script which systematically does a
-> ping, or similar, for all frame sizes.
->=20
-> > > If we pad the ethernet frames to a minimum of ETH_FRAME_LEN + FCS
-> > > (1518 bytes) everything starts working fine.
+On 10/29/23 13:25, Krzysztof Kozlowski wrote:
+> On 29/10/2023 05:27, Cristian Ciocaltea wrote:
+>> The Synopsys DesignWare MAC found on the StarFive JH7100 SoC requires
+>> just the 'ahb' reset name, but the binding allows selecting it only in
+>> conjunction with 'stmmaceth'.
+>>
+>> Fix the issue by permitting exclusive usage of the 'ahb' reset name.
+>>
+>> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+>> ---
+>>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>> index 5c2769dc689a..a4d7172ea701 100644
+>> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>> @@ -146,7 +146,7 @@ properties:
+>>    reset-names:
+>>      minItems: 1
+>>      items:
+>> -      - const: stmmaceth
+>> +      - enum: [stmmaceth, ahb]
+> 
+> Also, this makes sense only with patch #4, so this should be squashed there.
 
-Thought - is that just because it slows everything down??
+I added this as a separate patch since it changes the generic schema
+which is included by many other bindings.  JH7100 just happens to be the
+first use-case requiring this update.  But I can squash the patch if
+that's not a good enough reason to keep it separately.
 
-> > That is quite unprecedented, either the switch is very bogus or there i=
-s
-> > something else we do not fully understand...
->=20
-> It would also be interesting to know if the frames on the wire have
-> the padding removed when needed. Its not going to be good for
-> performance if a TCP ACK is 1500bytes in size, rather than the usual
-> ~64.
-
-Non IP protocols are very likely to object to unexpected frame padding.
-I'm also sure I've seen systems do (the equivalent of) printk for
-overlong UDP packets.
-
-If you search the right place you'll find reports of packets
-being discarded before one of the VM network implementations
-padded ethernet frames to an even byte length.
-(I can't remember which, but have some fpga logic that adjusts
-the MAC address based on the TCP port number and manages to
-require there be no unexpected padding - yes it is broken.)
-
-=09David
-
->=20
-> Have problems also been noticed with traffic going from user port to
-> user port?
->=20
-> =09Andrew
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
-
+Thanks,
+Cristian
 
