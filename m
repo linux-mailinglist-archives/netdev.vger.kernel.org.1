@@ -1,130 +1,145 @@
-Return-Path: <netdev+bounces-45035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09C97DAAA4
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 05:21:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CAE97DAAAB
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 05:27:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2775C1C20947
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 04:21:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81AEDB20D59
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 04:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4834215A4;
-	Sun, 29 Oct 2023 04:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA3515AB;
+	Sun, 29 Oct 2023 04:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hdy1zEq6"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="YGCEXx3l"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C004E137A;
-	Sun, 29 Oct 2023 04:21:15 +0000 (UTC)
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 171B3CF;
-	Sat, 28 Oct 2023 21:21:14 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1cacbd54b05so5119445ad.0;
-        Sat, 28 Oct 2023 21:21:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698553273; x=1699158073; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zVxbFwome+ksxz8e5B9+RqlDTcXB31sSq2RQuNFgOp4=;
-        b=hdy1zEq6YDjeAZ963sancF3TODk24ZT0bYxB325TcKXMagVLYKteSi87jWkXBS+zav
-         FTYNuwzwTEgcrjYYR7xey08hTzoTrXkIGcZ0SfH5ZHmeVFkLjyibGvqfB+hI0JzoP0on
-         LE2rxFuFbGBwL3SeF6gN6q2JKEH4yOWMb75KgLG/kCwa74RRk8KlDpuw3w/iTY+EvYex
-         xFu/Z5N3IPP0K7RQGN2WScKt0D6GHJyayma9YYdEX5OigRClaLuoUqUNrg3jcnQdsIsK
-         ijTj3I77F3WdNTFwuZi2PhtkRorFTg0IcTQEvVHY6JKNe4y9ouvyRQJCCFOOxg+HQqmz
-         8Ezw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698553273; x=1699158073;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zVxbFwome+ksxz8e5B9+RqlDTcXB31sSq2RQuNFgOp4=;
-        b=qXm1SmRV2cVpJR+a02LZQIOgsKaWLSJN9aJ04LZix3dGOOdp4nW/cHNkKQS/8f3UFp
-         K8Atv+E1XvkRfTR3axOqkCzOkjdB152tK83tIAaBoKIuoBlo1ZJJhpHE0K2RHaroHJw2
-         +GbOQIIEi2hNwE1RfCJv8KN6ddFKMlZiEImOSgEVFf2e3TAkXuZqXT8kg2qWMpLLjom2
-         6RK3Q3luXvqkhu+H+r6riavTe4Aq56a1GO44aw//gzepX7kr2RS+1wEobDuZ0S7pvlgi
-         ygAMLVD9MkYUBHq8KKBFxtTxQx7zhaxo2kicWkDnQ7TYQMS5R8igcgMS4ZFdfMturOyL
-         F0uQ==
-X-Gm-Message-State: AOJu0YyInLikCXsIUq1rKTQA7CSUJTo6pR09P500gWEkUfc2YCbGtHg8
-	mA7BkUC5xmvNfp8t5b/2C8I=
-X-Google-Smtp-Source: AGHT+IHqMxOIoiutN/cITbDgO8V35soEtOHkNdQkY9gTgWqywSZ1hCbKyn9qLCFeYNWx2I3x/oouZg==
-X-Received: by 2002:a05:6a20:5483:b0:17a:d292:25d1 with SMTP id i3-20020a056a20548300b0017ad29225d1mr9941675pzk.6.1698553273431;
-        Sat, 28 Oct 2023 21:21:13 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id f16-20020a635550000000b005b96b42f7ccsm1224843pgm.82.2023.10.28.21.21.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Oct 2023 21:21:13 -0700 (PDT)
-Date: Sun, 29 Oct 2023 13:21:12 +0900 (JST)
-Message-Id: <20231029.132112.1989077223203124314.fujita.tomonori@gmail.com>
-To: benno.lossin@proton.me
-Cc: andrew@lunn.ch, fujita.tomonori@gmail.com, boqun.feng@gmail.com,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu,
- miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network
- PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <0e858596-51b7-458c-a4eb-fa1e192e1ab3@proton.me>
-References: <45b9c77c-e19c-4c06-a2ea-0cf7e4f17422@proton.me>
-	<b045970a-9d0f-48a1-9a06-a8057d97f371@lunn.ch>
-	<0e858596-51b7-458c-a4eb-fa1e192e1ab3@proton.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A5F81B;
+	Sun, 29 Oct 2023 04:27:22 +0000 (UTC)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77FE7AD;
+	Sat, 28 Oct 2023 21:27:20 -0700 (PDT)
+Received: from localhost (unknown [188.24.143.101])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 93BFF6607332;
+	Sun, 29 Oct 2023 04:27:17 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1698553637;
+	bh=n+ZdkLjYx7BCTMug2pHsJcPM5JrGsyJS0p5MK5HHjEE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YGCEXx3lfRjWUCbd2vc4CJYDoWcmz0cympjiLksceK9GI1HYaUyW7t//lstBik5s1
+	 HpGJgn6kj7XZdunSkpVWEYWhptEkIxwtHKlAPrhrD3KEvlGxqO7lJeODc0FhbK/3P3
+	 mLFj9qNWGjdjUT2MQJkDFEr0gd4pnhPKasLldg9T9ADjHwxO98Vk9+AnKOeGPoz2qj
+	 r8SnXUwYhVkRDwD+5ONz2jF8yXsI8JWcnxbgP9NDIr7KYXv6OYL986X2M8hHsgNTUs
+	 O0rDkHC89XRAH4oY15VddESeIjQYD1sFgNbCS+IUJoWIKu2xVd2iG7UjfX/Jn/smIT
+	 o7v1ijfzkKb1Q==
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	kernel@collabora.com
+Subject: [PATCH v2 00/12] Enable networking support for StarFive JH7100 SoC
+Date: Sun, 29 Oct 2023 06:27:00 +0200
+Message-ID: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sat, 28 Oct 2023 18:45:40 +0000
-Benno Lossin <benno.lossin@proton.me> wrote:
+This patch series adds ethernet support for the StarFive JH7100 SoC and 
+makes it available for the StarFive VisionFive V1 and BeagleV Starlight 
+boards, although I could only validate on the former SBC.
 
-> On 28.10.23 20:23, Andrew Lunn wrote:
->> On Sat, Oct 28, 2023 at 04:37:53PM +0000, Benno Lossin wrote:
->>> On 28.10.23 11:27, FUJITA Tomonori wrote:
->>>> On Fri, 27 Oct 2023 21:19:38 +0000
->>>> Benno Lossin <benno.lossin@proton.me> wrote:
->>>>> I did not notice this before, but this means we cannot use the `link`
->>>>> function from bindgen, since that takes `&self`. We would need a
->>>>> function that takes `*const Self` instead.
->>>>
->>>> Implementing functions to access to a bitfield looks tricky so we need
->>>> to add such feature to bindgen or we add getters to the C side?
->>>
->>> Indeed, I just opened an issue [1] on the bindgen repo.
->>>
->>> [1]: https://github.com/rust-lang/rust-bindgen/issues/2674
->> 
->> Please could you help me understand the consequences here. Are you
->> saying the rust toolchain is fatally broken here, it cannot generate
->> valid code at the moment? As a result we need to wait for a new
->> version of bindgen?
-> This only affects bitfields, since they require special accessor functions
-> generated by bindgen, so I would not say that the toolchain is fatally broken.
-> It also is theoretically possible to manually access the bitfields in a correct
-> manner, but that is error prone (which is why we use the accessor functions
-> provided by bindgen).
-> 
-> In this particular case we have three options:
-> 1. wait until bindgen provides a raw accessor function that allows to use
->     only raw pointers.
-> 2. create some C helper functions for the bitfield access that will be replaced
->     by the bindgen functions once bindgen has updated.
-> 3. Since for the `phy_device` bindings, we only ever call functions while holding
->     the `phy_device.lock` lock (at least I think that this is correct) we might be
->     able to get away with creating a reference to the object and use the current
->     accessor functions anyway.
-> 
-> But for point 3 I will have to consult the others.
+The work is heavily based on the reference implementation [1] and depends 
+the non-coherent DMA support provided by Emil via the SiFive Composable 
+Cache controller [2].
 
-The current code is fine from Rust perspective because the current
-code copies phy_driver on stack and makes a reference to the copy, if
-I undertand correctly.
+[1] https://github.com/starfive-tech/linux/commits/visionfive
+[2] https://lore.kernel.org/all/CAJM55Z_pdoGxRXbmBgJ5GbVWyeM1N6+LHihbNdT26Oo_qA5VYA@mail.gmail.com/
 
-It's not nice to create an 500-bytes object on stack. It turned out
-that it's not so simple to avoid it.
+Changes in v2:
+ - Dropped ccache PATCH 01-05 reworked by Emil via [2]
+ - Dropped already applied PATCH 06/12
+ - Added PATCH v2 01 to prepare snps-dwmac binding for JH7100 support
+ - Added PATCH v2 02-03 to provide some jh7110-dwmac binding optimizations
+ - Handled JH7110 conflicting work in PATCH 07 via PATCH v2 04
+ - Reworked PATCH 8 via PATCH v2 05, adding JH7100 quirk and dropped
+ - starfive,gtxclk-dlychain DT property, also fixed register naming
+ - Added PATCH v2 08 providing DMA coherency related DT changes
+ - Updated PATCH 9 commit msg:
+   s/OF_DMA_DEFAULT_COHERENT/ARCH_DMA_DEFAULT_COHERENT/
+ - Replaced 'uncached-offset' property with 'sifive,cache-ops' 
+   in PATCH 10/12 and dropped 'sideband' reg
+ - Add new patch providing coherent DMA memory pool (PATCH v2 10)
+ - Updated PATCH 11/12 according to the stmmac glue layer changes in
+   upstream
+ - Split PATCH 12/12 into PATCH v2 10-12 to handle individual gmac setup of
+   VisionFive v1 and BeagleV boards as they use different PHYs; also
+   switched phy-mode from "rgmii-tx" to "rgmii-id" (requires a reduction of
+   rx-internal-delay-ps by ~50%)
+ - Rebased series onto next-20231024
+ - v1: https://lore.kernel.org/lkml/20230211031821.976408-1-cristian.ciocaltea@collabora.com/
+
+Cristian Ciocaltea (11):
+  dt-bindings: net: snps,dwmac: Allow exclusive usage of ahb reset
+  dt-bindings: net: starfive,jh7110-dwmac: Drop superfluous select
+  dt-bindings: net: starfive,jh7110-dwmac: Drop redundant reset
+    description
+  dt-bindings: net: starfive,jh7110-dwmac: Add JH7100 SoC compatible
+  net: stmmac: dwmac-starfive: Add support for JH7100 SoC
+  riscv: dts: starfive: jh7100: Add dma-noncoherent property
+  riscv: dts: starfive: jh7100: Add ccache DT node
+  riscv: dts: starfive: jh7100: Add sysmain and gmac DT nodes
+  riscv: dts: starfive: jh7100-common: Setup gmac pinmux
+  riscv: dts: starfive: visionfive-v1: Enable gmac and setup phy
+  [UNTESTED] riscv: dts: starfive: beaglev-starlight: Enable gmac
+
+Emil Renner Berthing (1):
+  riscv: dts: starfive: Add pool for coherent DMA memory on JH7100
+    boards
+
+ .../devicetree/bindings/net/snps,dwmac.yaml   |   3 +-
+ .../bindings/net/starfive,jh7110-dwmac.yaml   |  84 +++++++++------
+ .../dts/starfive/jh7100-beaglev-starlight.dts |   5 +
+ .../boot/dts/starfive/jh7100-common.dtsi      | 100 ++++++++++++++++++
+ .../jh7100-starfive-visionfive-v1.dts         |  17 +++
+ arch/riscv/boot/dts/starfive/jh7100.dtsi      |  51 +++++++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |   6 +-
+ .../ethernet/stmicro/stmmac/dwmac-starfive.c  |  32 +++++-
+ 8 files changed, 259 insertions(+), 39 deletions(-)
+
+-- 
+2.42.0
+
 
