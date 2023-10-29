@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-45031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 931B17DAA3F
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 02:06:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 700167DAA40
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 02:07:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A83701C20937
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 00:06:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 281C02817B5
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 00:07:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09CC0191;
-	Sun, 29 Oct 2023 00:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FFA18F;
+	Sun, 29 Oct 2023 00:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EdAYS7Ch"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eeOL6tsO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9119918F
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 00:06:45 +0000 (UTC)
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F560CF
-	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 17:06:44 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3b2ec9a79bdso2322129b6e.3
-        for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 17:06:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59403369
+	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 00:07:04 +0000 (UTC)
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53B4FCF
+	for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 17:07:03 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6b7f0170d7bso3264542b3a.2
+        for <netdev@vger.kernel.org>; Sat, 28 Oct 2023 17:07:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698538004; x=1699142804; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698538023; x=1699142823; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
         bh=bUkEh3tHkfI0S9GOoC3gSJqNUbeBd7p0TPf4wZ8XTE0=;
-        b=EdAYS7ChJ4UXb4jeF9HAG46+crHYEXNNOyZn43mMZ9uD68dmAikCj6NxnEMTWkQCG6
-         DTj3gorhzJjX3g/xTwtbpebdmQupqqw+enSVHIXQ1Kqho+VNYOZlXQ1iaf/cRSLav9UV
-         oENRwBv8PhBFbaEJa6cW+pcAomybPIQLj/3L1Ku2hP4ZXubiiIFl9Hk6FlApzNIpPKUw
-         PN0vPzylCICRn5E3RXkc4aKnO5ryfwt+k6poBC72kyHjeNwZo8iD2hsaFst36XDENf2U
-         XUdzIeVpH0d36x8VhmcP1MgBqnktlvsD53bZnZ4U9BMd7SW0u8KjCZi+vc1v4xj6TEo8
-         /ekw==
+        b=eeOL6tsOOnRcFSRGPeGPMLu8lIEhdg4FvwhGljYznWu89EVYpogPgmVNJdNB4Ca40z
+         BCYMPudgmP4g2cCR0yxnetfFzI4k/PZL4JNRo7GIfTNHh8H6NlpPHUTeK9+fmVX6fAbM
+         y5XpZXpnaLOcEmvg18AwrKx5T3CPsbcwI0LBcTZwsucJVN0EKXtOg9QV6nUaFL7pqn0Y
+         tv92irttdMXvE7yxXaZW8CEFogJAoDnDNzbEzCP70CiS9AxBYbaelJzxhu62EC4DeTcR
+         8rh/isk9VsH+Ko473SnfLkx48ylKMr3rr1pZqpINl3l/b8LOH+LsEpbcf7yIDTjESdB8
+         dQLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698538004; x=1699142804;
+        d=1e100.net; s=20230601; t=1698538023; x=1699142823;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=bUkEh3tHkfI0S9GOoC3gSJqNUbeBd7p0TPf4wZ8XTE0=;
-        b=WiQbQ+VlKLqKWm/0wgWL1tPMY1AiZENUpSod/UHilPHtXeNR9uEV2FmHXfM1aBuLky
-         +fhjr1RN2dcNkRSqNb/+6J/3sI9uvUSUqMMkylmxTn62or7e9gABMHKSMcqZ1BB2CEaC
-         ITiCJ0kIoXWDA77Okzs8v7NoDiqR5aHM2NQtHBIO61n9HeCro/adUQAkvW6K6JtveIqO
-         baTy9xhP5sjn/oZw37uCeeAled0dca/KYWEYIzsOp/3EwVVFy5Gzxx4FXMQlDj+Sk6OP
-         MNmeac5OmF2c0KJ5hWGDDxOb7qpGK2xrP+I9zLv/bW07zzqE0g6ou8CFeQWBZhx9k+rO
-         wC5Q==
-X-Gm-Message-State: AOJu0Yxj4RZQJsgWTA79p1y9zTmeegt8X8NJNHGIJhDD5+jY+6yJwp4U
-	w5hP+WLt4xK1DYyet86vHeHWDuxYr1c=
-X-Google-Smtp-Source: AGHT+IEa+G78wXtuEtKH/W61LGQQBeRe6JF38ZXbitt/d2YrVG2Bp+7i3GnRZOL+44jBsHseI0TEMg==
-X-Received: by 2002:a05:6808:f8e:b0:3a7:2690:94e0 with SMTP id o14-20020a0568080f8e00b003a7269094e0mr8642762oiw.4.1698538003813;
-        Sat, 28 Oct 2023 17:06:43 -0700 (PDT)
+        b=r6uKOE7ns5vEEYNkEAx4DeQCJ2w4NhYRr4W3EKqaWP4caCnITdAkrRWxOMofYNIpQx
+         j+LW1ZD1hQr8Vf79BKrKao0V9mHwNiPO8gsbcgKkR4Lv3xkhzpL0YykI/MXi1WdobQUR
+         4bbl8WWKJBskJeVg77RXvbxXHn7i/a3PN9GGcXzV8J6le2JyvnBUZD0UAbBWHR1R3DNu
+         ug6yYAF5oX86SV5uanPit9r6Z4yWx49JPQPY6Ek2o9B6CKwBmeV6mK19x/IcFwfGwWyB
+         s0YpiO8Fr65MrBq0Tb9vkrok6hH+1YygcA9ZlA6eTPQYDgYPToDiaKEtFjYjXtcqZvzi
+         EgnA==
+X-Gm-Message-State: AOJu0YxUz1O1IkCg9rMzbqC5GLJ72tXALJSfHLD8/nL450vL0UCxI/+B
+	Ff0Gl0VlEHHxjmjT6ZIgjMgsfMHGch4=
+X-Google-Smtp-Source: AGHT+IGlG6VhZ7Tg4GqxPp5D3ZaiwZue29SkLcBjdt2H4FNTf86Qw5Y4Y2WMEV+d4jA0wRozjMTU2Q==
+X-Received: by 2002:a05:6a00:114c:b0:6be:59f:5172 with SMTP id b12-20020a056a00114c00b006be059f5172mr8047949pfm.19.1698538022613;
+        Sat, 28 Oct 2023 17:07:02 -0700 (PDT)
 Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id n4-20020a056a00212400b0068883728c16sm3525954pfj.144.2023.10.28.17.06.42
+        by smtp.gmail.com with ESMTPSA id n4-20020a056a00212400b0068883728c16sm3525954pfj.144.2023.10.28.17.07.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 28 Oct 2023 17:06:42 -0700 (PDT)
-Message-ID: <fbb52a88-bd73-4843-92f8-6c16564ca496@gmail.com>
-Date: Sat, 28 Oct 2023 17:06:41 -0700
+        Sat, 28 Oct 2023 17:07:02 -0700 (PDT)
+Message-ID: <4a570a37-d6b8-48d9-bf44-a5bc006e1c5f@gmail.com>
+Date: Sat, 28 Oct 2023 17:07:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,7 +67,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 net-next 1/2] net: phy: fill in missing
+Subject: Re: [PATCH v1 net-next 2/2] net: mdio: fill in missing
  MODULE_DESCRIPTION()s
 Content-Language: en-US
 To: Andrew Lunn <andrew@lunn.ch>, netdev <netdev@vger.kernel.org>
@@ -76,7 +76,7 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
  Richard Cochran <richardcochran@gmail.com>, Joel Stanley <joel@jms.id.au>,
  Andrew Jeffery <andrew@codeconstruct.com.au>
 References: <20231028184458.99448-1-andrew@lunn.ch>
- <20231028184458.99448-2-andrew@lunn.ch>
+ <20231028184458.99448-3-andrew@lunn.ch>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -111,7 +111,7 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20231028184458.99448-2-andrew@lunn.ch>
+In-Reply-To: <20231028184458.99448-3-andrew@lunn.ch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
