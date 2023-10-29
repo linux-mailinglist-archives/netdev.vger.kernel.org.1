@@ -1,568 +1,297 @@
-Return-Path: <netdev+bounces-45056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE1CE7DABA4
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 08:53:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFA527DABDF
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 10:33:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC4AFB212FE
-	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 07:53:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20783B20DA3
+	for <lists+netdev@lfdr.de>; Sun, 29 Oct 2023 09:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F3D879E5;
-	Sun, 29 Oct 2023 07:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7898F58;
+	Sun, 29 Oct 2023 09:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0bZ8E3V1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VPhcMnvy"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C0DB663
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 07:53:04 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD6DFF5
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 00:53:00 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da040c021aeso2813140276.3
-        for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 00:53:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698565980; x=1699170780; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hWdI+T1/x3wrCMuc4qiSzuWO2baLjpkcRSCLbgpR5fw=;
-        b=0bZ8E3V1CkyZj9jbM3YUYZeIg3Fz6zllxG/o4KNe3waC6zlpeiPBc3usQHrhhmjEZQ
-         us6nuhvKr3xI/nx09L1am9Uy+6NxtX7IkjmX4Kq6Ga64hTxeiC/KdwYaM6ySNbvrjZp2
-         dOdPKcs+E01CaRcOcpbj2K7FCxb1agqO8g9WxgJMhzWqfgpCAKbhdtoPGHq/SJt+RQM9
-         jBEeb/skmZQCS93O9IlEEzqK0rfUmmbsQof+PH74OIwAJDUAfDfVT1ShBKOXQwFs77To
-         GqmnqHsNJCHz9XFlArmMJwm21Fru4ALLtdGzPimfOrOffjrZtCF3VTtEV0W2BpHN/gpN
-         7c8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698565980; x=1699170780;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hWdI+T1/x3wrCMuc4qiSzuWO2baLjpkcRSCLbgpR5fw=;
-        b=o/HqU+NxpSoIxT/N1TLrQ/qq/94w3fckpbqC2mRCe2Wm/L8pQV+lSCsiXYmz42woX1
-         /7uBwk9G+q2CM175/jhC16a7WKNneutKXj+G8FXnFjXvUO0DSCoHFHCnimlHRPmnG6+J
-         gM7j+psuTk1YmtGprn6PCe8l53BujREpoOYIKpWoB3L6kM8pfotcj9PS9fA2Wtrqljx2
-         kVVKj55gcL6samOUpxjw/xVGRgLNH5aMjbfNwL6TdVejC1tONNvolZraPIXSTKzt7SAL
-         7OkvZdUbUd0owbzXXGu+E2G51p7RqPZfZTWQWtNa6B1lTLvmNNgI4FGGow5XRjVZUt49
-         NPxQ==
-X-Gm-Message-State: AOJu0YzRwtgqKw2mFceJzpK+BlrtIZ/MNPLV+5hINA3CyCUGQSAw+O4M
-	YSFfF8IumrfIAJGLAt3hBguIh2OJIvC8wEk=
-X-Google-Smtp-Source: AGHT+IG1KPh+jINKTsw+sPrJSRHIPQpgLnuGMXPgKEtKKtISQqnDtQoSyLARemCVYuR6YMvL3/eCGQN+YCLL4hs=
-X-Received: from coco0920.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2a23])
- (user=lixiaoyan job=sendgmr) by 2002:a5b:706:0:b0:d9a:c27e:5f37 with SMTP id
- g6-20020a5b0706000000b00d9ac27e5f37mr123084ybq.3.1698565979739; Sun, 29 Oct
- 2023 00:52:59 -0700 (PDT)
-Date: Sun, 29 Oct 2023 07:52:44 +0000
-In-Reply-To: <20231029075244.2612089-1-lixiaoyan@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0352B320A;
+	Sun, 29 Oct 2023 09:33:01 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B050BD;
+	Sun, 29 Oct 2023 02:33:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698571980; x=1730107980;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EB6AXOCzM0UMKHUfSK5sQFRebDnHx2JnAx0qwYWuJyQ=;
+  b=VPhcMnvyGW6DweSmc/AxMW6vLGIRf8JHztWeKtz+ABZbAI+v+LkXImr2
+   j19J1f7lEWOf/xGfPuKYByTJ+B44+oEAmIQ620O/6xl9gq8+BgM2F4JPU
+   r6nriLrliBv61uLN+zHHNEL/xo+VfiSxS21ELbolyBJRW7Kh8uD2XOMya
+   rdW08Z+S3E1V71b+ndcRI3pbiVHZCnkiLbY30RNqNWbJISZ+q3V2lxSrZ
+   5f9xYC507kLYpUUyaRSHu8twh8BOvpGdGm4FgJKdRQ82JPt2XzH59dLGK
+   2ILqFRkEzHaTerXgiTwcWubToZgOMy0X5/5MjDHtnf28X0cs2iZwUK3+p
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10877"; a="763520"
+X-IronPort-AV: E=Sophos;i="6.03,261,1694761200"; 
+   d="scan'208";a="763520"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2023 02:32:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10877"; a="789203497"
+X-IronPort-AV: E=Sophos;i="6.03,261,1694761200"; 
+   d="scan'208";a="789203497"
+Received: from lkp-server01.sh.intel.com (HELO 8917679a5d3e) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 29 Oct 2023 02:32:56 -0700
+Received: from kbuild by 8917679a5d3e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qx2A9-000CSp-2K;
+	Sun, 29 Oct 2023 09:32:53 +0000
+Date: Sun, 29 Oct 2023 17:32:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vadim Fedorenko <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>
+Cc: oe-kbuild-all@lists.linux.dev, Vadim Fedorenko <vadfed@meta.com>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2 1/2] bpf: add skcipher API support to TC/XDP
+ programs
+Message-ID: <202310291759.z9P4QJvI-lkp@intel.com>
+References: <20231027172039.1365917-1-vadfed@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231029075244.2612089-1-lixiaoyan@google.com>
-X-Mailer: git-send-email 2.42.0.820.g83a721a137-goog
-Message-ID: <20231029075244.2612089-6-lixiaoyan@google.com>
-Subject: [PATCH v5 net-next 5/5] tcp: reorganize tcp_sock fast path variables
-From: Coco Li <lixiaoyan@google.com>
-To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Jonathan Corbet <corbet@lwn.net>, 
-	David Ahern <dsahern@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>, 
-	Pradeep Nemavat <pnemavat@google.com>, Coco Li <lixiaoyan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231027172039.1365917-1-vadfed@meta.com>
 
-The variables are organized according in the following way:
+Hi Vadim,
 
-- TX read-mostly hotpath cache lines
-- TXRX read-mostly hotpath cache lines
-- RX read-mostly hotpath cache lines
-- TX read-write hotpath cache line
-- TXRX read-write hotpath cache line
-- RX read-write hotpath cache line
+kernel test robot noticed the following build warnings:
 
-Fastpath cachelines end after rcvq_space.
+[auto build test WARNING on bpf-next/master]
 
-Cache line boundaries are enforced only between read-mostly and
-read-write. That is, if read-mostly tx cachelines bleed into
-read-mostly txrx cachelines, we do not care. We care about the
-boundaries between read and write cachelines because we want
-to prevent false sharing.
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/selftests-bpf-crypto-skcipher-algo-selftests/20231028-020332
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20231027172039.1365917-1-vadfed%40meta.com
+patch subject: [PATCH bpf-next v2 1/2] bpf: add skcipher API support to TC/XDP programs
+config: x86_64-randconfig-001-20231029 (https://download.01.org/0day-ci/archive/20231029/202310291759.z9P4QJvI-lkp@intel.com/config)
+compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231029/202310291759.z9P4QJvI-lkp@intel.com/reproduce)
 
-Fast path variables span cache lines before change: 12
-Fast path variables span cache lines after change: 8
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310291759.z9P4QJvI-lkp@intel.com/
 
-Signed-off-by: Coco Li <lixiaoyan@google.com>
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Wei Wang <weiwan@google.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
----
- include/linux/tcp.h | 248 ++++++++++++++++++++++++--------------------
- net/ipv4/tcp.c      |  93 +++++++++++++++++
- 2 files changed, 227 insertions(+), 114 deletions(-)
+All warnings (new ones prefixed by >>):
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index ec4e9367f5b03..e70426c1dc007 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -194,23 +194,121 @@ static inline bool tcp_rsk_used_ao(const struct request_sock *req)
- #define TCP_RMEM_TO_WIN_SCALE 8
- 
- struct tcp_sock {
-+	/* Cacheline organization can be found documented in
-+	 * Documentation/networking/net_cachelines/tcp_sock.rst.
-+	 * Please update the document when adding new fields.
-+	 */
-+
- 	/* inet_connection_sock has to be the first member of tcp_sock */
- 	struct inet_connection_sock	inet_conn;
--	u16	tcp_header_len;	/* Bytes of tcp header to send		*/
-+
-+	/* TX read-mostly hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_read_tx);
-+	/* timestamp of last sent data packet (for restart window) */
-+	u32	max_window;	/* Maximal window ever seen from peer	*/
-+	u32	rcv_ssthresh;	/* Current window clamp			*/
-+	u32	reordering;	/* Packet reordering metric.		*/
-+	u32	notsent_lowat;	/* TCP_NOTSENT_LOWAT */
- 	u16	gso_segs;	/* Max number of segs per GSO packet	*/
-+	/* from STCP, retrans queue hinting */
-+	struct sk_buff *lost_skb_hint;
-+	struct sk_buff *retransmit_skb_hint;
-+	__cacheline_group_end(tcp_sock_read_tx);
-+
-+	/* TXRX read-mostly hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_read_txrx);
-+	u32	tsoffset;	/* timestamp offset */
-+	u32	snd_wnd;	/* The window we expect to receive	*/
-+	u32	mss_cache;	/* Cached effective mss, not including SACKS */
-+	u32	snd_cwnd;	/* Sending congestion window		*/
-+	u32	prr_out;	/* Total number of pkts sent during Recovery. */
-+	u32	lost_out;	/* Lost packets			*/
-+	u32	sacked_out;	/* SACK'd packets			*/
-+	u16	tcp_header_len;	/* Bytes of tcp header to send		*/
-+	u8	chrono_type : 2,	/* current chronograph type */
-+		repair      : 1,
-+		is_sack_reneg:1,    /* in recovery from loss with SACK reneg? */
-+		is_cwnd_limited:1;/* forward progress limited by snd_cwnd? */
-+	__cacheline_group_end(tcp_sock_read_txrx);
-+
-+	/* RX read-mostly hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_read_rx);
-+	u32	copied_seq;	/* Head of yet unread data */
-+	u32	rcv_tstamp;	/* timestamp of last received ACK (for keepalives) */
-+	u32	snd_wl1;	/* Sequence for window update		*/
-+	u32	tlp_high_seq;	/* snd_nxt at the time of TLP */
-+	u32	rttvar_us;	/* smoothed mdev_max			*/
-+	u32	retrans_out;	/* Retransmitted packets out		*/
-+	u16	advmss;		/* Advertised MSS			*/
-+	u16	urg_data;	/* Saved octet of OOB data and control flags */
-+	u32	lost;		/* Total data packets lost incl. rexmits */
-+	struct  minmax rtt_min;
-+	/* OOO segments go in this rbtree. Socket lock must be held. */
-+	struct rb_root	out_of_order_queue;
-+	u32	snd_ssthresh;	/* Slow start size threshold		*/
-+	__cacheline_group_end(tcp_sock_read_rx);
- 
-+	/* TX read-write hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_write_tx) ____cacheline_aligned;
-+	u32	segs_out;	/* RFC4898 tcpEStatsPerfSegsOut
-+				 * The total number of segments sent.
-+				 */
-+	u32	data_segs_out;	/* RFC4898 tcpEStatsPerfDataSegsOut
-+				 * total number of data segments sent.
-+				 */
-+	u64	bytes_sent;	/* RFC4898 tcpEStatsPerfHCDataOctetsOut
-+				 * total number of data bytes sent.
-+				 */
-+	u32	snd_sml;	/* Last byte of the most recently transmitted small packet */
-+	u32	chrono_start;	/* Start time in jiffies of a TCP chrono */
-+	u32	chrono_stat[3];	/* Time in jiffies for chrono_stat stats */
-+	u32	write_seq;	/* Tail(+1) of data held in tcp send buffer */
-+	u32	pushed_seq;	/* Last pushed seq, required to talk to windows */
-+	u32	lsndtime;
-+	u32	mdev_us;	/* medium deviation			*/
-+	u64	tcp_wstamp_ns;	/* departure time for next sent data packet */
-+	u64	tcp_clock_cache; /* cache last tcp_clock_ns() (see tcp_mstamp_refresh()) */
-+	u64	tcp_mstamp;	/* most recent packet received/sent */
-+	u32	rtt_seq;	/* sequence number to update rttvar	*/
-+	struct list_head tsorted_sent_queue; /* time-sorted sent but un-SACKed skbs */
-+	struct sk_buff *highest_sack;   /* skb just after the highest
-+					 * skb with SACKed bit set
-+					 * (validity guaranteed only if
-+					 * sacked_out > 0)
-+					 */
-+	u8	ecn_flags;	/* ECN status bits.			*/
-+	__cacheline_group_end(tcp_sock_write_tx);
-+
-+	/* TXRX read-write hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_write_txrx);
- /*
-  *	Header prediction flags
-  *	0x5?10 << 16 + snd_wnd in net byte order
-  */
- 	__be32	pred_flags;
--
-+	u32	rcv_nxt;	/* What we want to receive next		*/
-+	u32	snd_nxt;	/* Next sequence we send		*/
-+	u32	snd_una;	/* First byte we want an ack for	*/
-+	u32	window_clamp;	/* Maximal window to advertise		*/
-+	u32	srtt_us;	/* smoothed round trip time << 3 in usecs */
-+	u32	packets_out;	/* Packets which are "in flight"	*/
-+	u32	snd_up;		/* Urgent pointer		*/
-+	u32	delivered;	/* Total data packets delivered incl. rexmits */
-+	u32	delivered_ce;	/* Like the above but only ECE marked packets */
-+	u32	app_limited;	/* limited until "delivered" reaches this val */
-+	u32	rcv_wnd;	/* Current receiver window		*/
- /*
-- *	RFC793 variables by their proper names. This means you can
-- *	read the code and the spec side by side (and laugh ...)
-- *	See RFC793 and RFC1122. The RFC writes these in capitals.
-+ *      Options received (usually on last packet, some only on SYN packets).
-  */
--	u64	bytes_received;	/* RFC4898 tcpEStatsAppHCThruOctetsReceived
-+	struct tcp_options_received rx_opt;
-+	u8	nonagle     : 4,/* Disable Nagle algorithm?             */
-+		rate_app_limited:1;  /* rate_{delivered,interval_us} limited? */
-+	__cacheline_group_end(tcp_sock_write_txrx);
-+
-+	/* RX read-write hotpath cache lines */
-+	__cacheline_group_begin(tcp_sock_write_rx);
-+	u64	bytes_received;
-+				/* RFC4898 tcpEStatsAppHCThruOctetsReceived
- 				 * sum(delta(rcv_nxt)), or how many bytes
- 				 * were acked.
- 				 */
-@@ -220,45 +318,44 @@ struct tcp_sock {
- 	u32	data_segs_in;	/* RFC4898 tcpEStatsPerfDataSegsIn
- 				 * total number of data segments in.
- 				 */
-- 	u32	rcv_nxt;	/* What we want to receive next 	*/
--	u32	copied_seq;	/* Head of yet unread data		*/
- 	u32	rcv_wup;	/* rcv_nxt on last window update sent	*/
-- 	u32	snd_nxt;	/* Next sequence we send		*/
--	u32	segs_out;	/* RFC4898 tcpEStatsPerfSegsOut
--				 * The total number of segments sent.
--				 */
--	u32	data_segs_out;	/* RFC4898 tcpEStatsPerfDataSegsOut
--				 * total number of data segments sent.
--				 */
--	u64	bytes_sent;	/* RFC4898 tcpEStatsPerfHCDataOctetsOut
--				 * total number of data bytes sent.
--				 */
-+	u32	max_packets_out;  /* max packets_out in last window */
-+	u32	cwnd_usage_seq;  /* right edge of cwnd usage tracking flight */
-+	u32	rate_delivered;    /* saved rate sample: packets delivered */
-+	u32	rate_interval_us;  /* saved rate sample: time elapsed */
-+	u32	rcv_rtt_last_tsecr;
-+	u64	first_tx_mstamp;  /* start of window send phase */
-+	u64	delivered_mstamp; /* time we reached "delivered" */
- 	u64	bytes_acked;	/* RFC4898 tcpEStatsAppHCThruOctetsAcked
- 				 * sum(delta(snd_una)), or how many bytes
- 				 * were acked.
- 				 */
-+	struct {
-+		u32	rtt_us;
-+		u32	seq;
-+		u64	time;
-+	} rcv_rtt_est;
-+/* Receiver queue space */
-+	struct {
-+		u32	space;
-+		u32	seq;
-+		u64	time;
-+	} rcvq_space;
-+	__cacheline_group_end(tcp_sock_write_rx);
-+	/* End of Hot Path */
-+
-+/*
-+ *	RFC793 variables by their proper names. This means you can
-+ *	read the code and the spec side by side (and laugh ...)
-+ *	See RFC793 and RFC1122. The RFC writes these in capitals.
-+ */
- 	u32	dsack_dups;	/* RFC4898 tcpEStatsStackDSACKDups
- 				 * total number of DSACK blocks received
- 				 */
-- 	u32	snd_una;	/* First byte we want an ack for	*/
-- 	u32	snd_sml;	/* Last byte of the most recently transmitted small packet */
--	u32	rcv_tstamp;	/* timestamp of last received ACK (for keepalives) */
--	u32	lsndtime;	/* timestamp of last sent data packet (for restart window) */
- 	u32	last_oow_ack_time;  /* timestamp of last out-of-window ACK */
- 	u32	compressed_ack_rcv_nxt;
--
--	u32	tsoffset;	/* timestamp offset */
--
- 	struct list_head tsq_node; /* anchor in tsq_tasklet.head list */
--	struct list_head tsorted_sent_queue; /* time-sorted sent but un-SACKed skbs */
--
--	u32	snd_wl1;	/* Sequence for window update		*/
--	u32	snd_wnd;	/* The window we expect to receive	*/
--	u32	max_window;	/* Maximal window ever seen from peer	*/
--	u32	mss_cache;	/* Cached effective mss, not including SACKS */
- 
--	u32	window_clamp;	/* Maximal window to advertise		*/
--	u32	rcv_ssthresh;	/* Current window clamp			*/
- 	u8	scaling_ratio;	/* see tcp_win_from_space() */
- 	/* Information of the most recently (s)acked skb */
- 	struct tcp_rack {
-@@ -272,24 +369,16 @@ struct tcp_sock {
- 		   dsack_seen:1, /* Whether DSACK seen after last adj */
- 		   advanced:1;	 /* mstamp advanced since last lost marking */
- 	} rack;
--	u16	advmss;		/* Advertised MSS			*/
- 	u8	compressed_ack;
- 	u8	dup_ack_counter:2,
- 		tlp_retrans:1,	/* TLP is a retransmission */
- 		tcp_usec_ts:1, /* TSval values in usec */
- 		unused:4;
--	u32	chrono_start;	/* Start time in jiffies of a TCP chrono */
--	u32	chrono_stat[3];	/* Time in jiffies for chrono_stat stats */
--	u8	chrono_type:2,	/* current chronograph type */
--		rate_app_limited:1,  /* rate_{delivered,interval_us} limited? */
-+	u8	thin_lto    : 1,/* Use linear timeouts for thin streams */
-+		recvmsg_inq : 1,/* Indicate # of bytes in queue upon recvmsg */
- 		fastopen_connect:1, /* FASTOPEN_CONNECT sockopt */
- 		fastopen_no_cookie:1, /* Allow send/recv SYN+data without a cookie */
--		is_sack_reneg:1,    /* in recovery from loss with SACK reneg? */
--		fastopen_client_fail:2; /* reason why fastopen failed */
--	u8	nonagle     : 4,/* Disable Nagle algorithm?             */
--		thin_lto    : 1,/* Use linear timeouts for thin streams */
--		recvmsg_inq : 1,/* Indicate # of bytes in queue upon recvmsg */
--		repair      : 1,
-+		fastopen_client_fail:2, /* reason why fastopen failed */
- 		frto        : 1;/* F-RTO (RFC5682) activated in CA_Loss */
- 	u8	repair_queue;
- 	u8	save_syn:2,	/* Save headers of SYN packet */
-@@ -297,45 +386,19 @@ struct tcp_sock {
- 		syn_fastopen:1,	/* SYN includes Fast Open option */
- 		syn_fastopen_exp:1,/* SYN includes Fast Open exp. option */
- 		syn_fastopen_ch:1, /* Active TFO re-enabling probe */
--		syn_data_acked:1,/* data in SYN is acked by SYN-ACK */
--		is_cwnd_limited:1;/* forward progress limited by snd_cwnd? */
--	u32	tlp_high_seq;	/* snd_nxt at the time of TLP */
-+		syn_data_acked:1;/* data in SYN is acked by SYN-ACK */
- 
- 	u32	tcp_tx_delay;	/* delay (in usec) added to TX packets */
--	u64	tcp_wstamp_ns;	/* departure time for next sent data packet */
--	u64	tcp_clock_cache; /* cache last tcp_clock_ns() (see tcp_mstamp_refresh()) */
- 
- /* RTT measurement */
--	u64	tcp_mstamp;	/* most recent packet received/sent */
--	u32	srtt_us;	/* smoothed round trip time << 3 in usecs */
--	u32	mdev_us;	/* medium deviation			*/
- 	u32	mdev_max_us;	/* maximal mdev for the last rtt period	*/
--	u32	rttvar_us;	/* smoothed mdev_max			*/
--	u32	rtt_seq;	/* sequence number to update rttvar	*/
--	struct  minmax rtt_min;
- 
--	u32	packets_out;	/* Packets which are "in flight"	*/
--	u32	retrans_out;	/* Retransmitted packets out		*/
--	u32	max_packets_out;  /* max packets_out in last window */
--	u32	cwnd_usage_seq;  /* right edge of cwnd usage tracking flight */
--
--	u16	urg_data;	/* Saved octet of OOB data and control flags */
--	u8	ecn_flags;	/* ECN status bits.			*/
- 	u8	keepalive_probes; /* num of allowed keep alive probes	*/
--	u32	reordering;	/* Packet reordering metric.		*/
- 	u32	reord_seen;	/* number of data packet reordering events */
--	u32	snd_up;		/* Urgent pointer		*/
--
--/*
-- *      Options received (usually on last packet, some only on SYN packets).
-- */
--	struct tcp_options_received rx_opt;
- 
- /*
-  *	Slow start and congestion control (see also Nagle, and Karn & Partridge)
-  */
-- 	u32	snd_ssthresh;	/* Slow start size threshold		*/
-- 	u32	snd_cwnd;	/* Sending congestion window		*/
- 	u32	snd_cwnd_cnt;	/* Linear increase counter		*/
- 	u32	snd_cwnd_clamp; /* Do not allow snd_cwnd to grow above this */
- 	u32	snd_cwnd_used;
-@@ -343,32 +406,10 @@ struct tcp_sock {
- 	u32	prior_cwnd;	/* cwnd right before starting loss recovery */
- 	u32	prr_delivered;	/* Number of newly delivered packets to
- 				 * receiver in Recovery. */
--	u32	prr_out;	/* Total number of pkts sent during Recovery. */
--	u32	delivered;	/* Total data packets delivered incl. rexmits */
--	u32	delivered_ce;	/* Like the above but only ECE marked packets */
--	u32	lost;		/* Total data packets lost incl. rexmits */
--	u32	app_limited;	/* limited until "delivered" reaches this val */
--	u64	first_tx_mstamp;  /* start of window send phase */
--	u64	delivered_mstamp; /* time we reached "delivered" */
--	u32	rate_delivered;    /* saved rate sample: packets delivered */
--	u32	rate_interval_us;  /* saved rate sample: time elapsed */
--
-- 	u32	rcv_wnd;	/* Current receiver window		*/
--	u32	write_seq;	/* Tail(+1) of data held in tcp send buffer */
--	u32	notsent_lowat;	/* TCP_NOTSENT_LOWAT */
--	u32	pushed_seq;	/* Last pushed seq, required to talk to windows */
--	u32	lost_out;	/* Lost packets			*/
--	u32	sacked_out;	/* SACK'd packets			*/
- 
- 	struct hrtimer	pacing_timer;
- 	struct hrtimer	compressed_ack_timer;
- 
--	/* from STCP, retrans queue hinting */
--	struct sk_buff* lost_skb_hint;
--	struct sk_buff *retransmit_skb_hint;
--
--	/* OOO segments go in this rbtree. Socket lock must be held. */
--	struct rb_root	out_of_order_queue;
- 	struct sk_buff	*ooo_last_skb; /* cache rb_last(out_of_order_queue) */
- 
- 	/* SACKs data, these 2 need to be together (see tcp_options_write) */
-@@ -377,12 +418,6 @@ struct tcp_sock {
- 
- 	struct tcp_sack_block recv_sack_cache[4];
- 
--	struct sk_buff *highest_sack;   /* skb just after the highest
--					 * skb with SACKed bit set
--					 * (validity guaranteed only if
--					 * sacked_out > 0)
--					 */
--
- 	int     lost_cnt_hint;
- 
- 	u32	prior_ssthresh; /* ssthresh saved at recovery start	*/
-@@ -433,21 +468,6 @@ struct tcp_sock {
- 
- 	u32 rcv_ooopack; /* Received out-of-order packets, for tcpinfo */
- 
--/* Receiver side RTT estimation */
--	u32 rcv_rtt_last_tsecr;
--	struct {
--		u32	rtt_us;
--		u32	seq;
--		u64	time;
--	} rcv_rtt_est;
--
--/* Receiver queue space */
--	struct {
--		u32	space;
--		u32	seq;
--		u64	time;
--	} rcvq_space;
--
- /* TCP-specific MTU probe information. */
- 	struct {
- 		u32		  probe_seq_start;
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 53bcc17c91e4c..44c745307bc21 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4563,6 +4563,97 @@ static void __init tcp_init_mem(void)
- 	sysctl_tcp_mem[2] = sysctl_tcp_mem[0] * 2;	/* 9.37 % */
- }
- 
-+static void __init tcp_struct_check(void)
-+{
-+	/* TX read-mostly hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, max_window);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, rcv_ssthresh);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, reordering);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, notsent_lowat);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, gso_segs);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, lost_skb_hint);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_tx, retransmit_skb_hint);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_tx, 40);
-+
-+	/* TXRX read-mostly hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, tsoffset);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, snd_wnd);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, mss_cache);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, snd_cwnd);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, prr_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, lost_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_txrx, sacked_out);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_txrx, 31);
-+
-+	/* RX read-mostly hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, copied_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rcv_tstamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, snd_wl1);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, tlp_high_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rttvar_us);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, retrans_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, advmss);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, urg_data);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, lost);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, rtt_min);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, out_of_order_queue);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_read_rx, snd_ssthresh);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_read_rx, 69);
-+
-+	/* TX read-write hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, segs_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, data_segs_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, bytes_sent);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, snd_sml);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, chrono_start);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, chrono_stat);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, write_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, pushed_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, lsndtime);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, mdev_us);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_wstamp_ns);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_clock_cache);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tcp_mstamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, rtt_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, tsorted_sent_queue);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, highest_sack);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_tx, ecn_flags);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_tx, 113);
-+
-+	/* TXRX read-write hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, pred_flags);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_nxt);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_nxt);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_una);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, window_clamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, srtt_us);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, packets_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, snd_up);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, delivered);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, delivered_ce);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, app_limited);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_wnd);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rx_opt);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 76);
-+
-+	/* RX read-write hotpath cache lines */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_received);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, segs_in);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, data_segs_in);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_wup);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, max_packets_out);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, cwnd_usage_seq);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rate_delivered);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rate_interval_us);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_rtt_last_tsecr);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, first_tx_mstamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, delivered_mstamp);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_acked);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcv_rtt_est);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, rcvq_space);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_rx, 99);
-+}
-+
- void __init tcp_init(void)
- {
- 	int max_rshare, max_wshare, cnt;
-@@ -4573,6 +4664,8 @@ void __init tcp_init(void)
- 	BUILD_BUG_ON(sizeof(struct tcp_skb_cb) >
- 		     sizeof_field(struct sk_buff, cb));
- 
-+	tcp_struct_check();
-+
- 	percpu_counter_init(&tcp_sockets_allocated, 0, GFP_KERNEL);
- 
- 	timer_setup(&tcp_orphan_timer, tcp_orphan_update, TIMER_DEFERRABLE);
+>> kernel/bpf/crypto.c:72:1: warning: no previous declaration for 'bpf_crypto_skcipher_ctx_create' [-Wmissing-declarations]
+    bpf_crypto_skcipher_ctx_create(const struct bpf_dynptr_kern *palgo,
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> kernel/bpf/crypto.c:140:1: warning: no previous declaration for 'bpf_crypto_skcipher_ctx_acquire' [-Wmissing-declarations]
+    bpf_crypto_skcipher_ctx_acquire(struct bpf_crypto_skcipher_ctx *ctx)
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> kernel/bpf/crypto.c:154:18: warning: no previous declaration for 'bpf_crypto_skcipher_ctx_release' [-Wmissing-declarations]
+    __bpf_kfunc void bpf_crypto_skcipher_ctx_release(struct bpf_crypto_skcipher_ctx *ctx)
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> kernel/bpf/crypto.c:208:17: warning: no previous declaration for 'bpf_crypto_skcipher_decrypt' [-Wmissing-declarations]
+    __bpf_kfunc int bpf_crypto_skcipher_decrypt(struct bpf_crypto_skcipher_ctx *ctx,
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> kernel/bpf/crypto.c:225:17: warning: no previous declaration for 'bpf_crypto_skcipher_encrypt' [-Wmissing-declarations]
+    __bpf_kfunc int bpf_crypto_skcipher_encrypt(struct bpf_crypto_skcipher_ctx *ctx,
+                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/bpf_crypto_skcipher_ctx_create +72 kernel/bpf/crypto.c
+
+    58	
+    59	/**
+    60	 * bpf_crypto_skcipher_ctx_create() - Create a mutable BPF crypto context.
+    61	 *
+    62	 * Allocates a crypto context that can be used, acquired, and released by
+    63	 * a BPF program. The crypto context returned by this function must either
+    64	 * be embedded in a map as a kptr, or freed with bpf_crypto_skcipher_ctx_release().
+    65	 *
+    66	 * bpf_crypto_skcipher_ctx_create() allocates memory using the BPF memory
+    67	 * allocator, and will not block. It may return NULL if no memory is available.
+    68	 * @algo: bpf_dynptr which holds string representation of algorithm.
+    69	 * @key:  bpf_dynptr which holds cipher key to do crypto.
+    70	 */
+    71	__bpf_kfunc struct bpf_crypto_skcipher_ctx *
+  > 72	bpf_crypto_skcipher_ctx_create(const struct bpf_dynptr_kern *palgo,
+    73				       const struct bpf_dynptr_kern *pkey, int *err)
+    74	{
+    75		struct bpf_crypto_skcipher_ctx *ctx;
+    76		char *algo;
+    77	
+    78		if (__bpf_dynptr_size(palgo) > CRYPTO_MAX_ALG_NAME) {
+    79			*err = -EINVAL;
+    80			return NULL;
+    81		}
+    82	
+    83		algo = __bpf_dynptr_data_ptr(palgo);
+    84	
+    85		if (!crypto_has_skcipher(algo, CRYPTO_ALG_TYPE_SKCIPHER, CRYPTO_ALG_TYPE_MASK)) {
+    86			*err = -EOPNOTSUPP;
+    87			return NULL;
+    88		}
+    89	
+    90		ctx = kmalloc(sizeof(*ctx), GFP_KERNEL);
+    91		if (!ctx) {
+    92			*err = -ENOMEM;
+    93			return NULL;
+    94		}
+    95	
+    96		memset(ctx, 0, sizeof(*ctx));
+    97	
+    98		ctx->tfm = crypto_alloc_sync_skcipher(algo, 0, 0);
+    99		if (IS_ERR(ctx->tfm)) {
+   100			*err = PTR_ERR(ctx->tfm);
+   101			ctx->tfm = NULL;
+   102			goto err;
+   103		}
+   104	
+   105		*err = crypto_sync_skcipher_setkey(ctx->tfm, __bpf_dynptr_data_ptr(pkey),
+   106						   __bpf_dynptr_size(pkey));
+   107		if (*err)
+   108			goto err;
+   109	
+   110		refcount_set(&ctx->usage, 1);
+   111	
+   112		return ctx;
+   113	err:
+   114		if (ctx->tfm)
+   115			crypto_free_sync_skcipher(ctx->tfm);
+   116		kfree(ctx);
+   117	
+   118		return NULL;
+   119	}
+   120	
+   121	static void crypto_free_sync_skcipher_cb(struct rcu_head *head)
+   122	{
+   123		struct bpf_crypto_skcipher_ctx *ctx;
+   124	
+   125		ctx = container_of(head, struct bpf_crypto_skcipher_ctx, rcu);
+   126		crypto_free_sync_skcipher(ctx->tfm);
+   127		kfree(ctx);
+   128	}
+   129	
+   130	/**
+   131	 * bpf_crypto_skcipher_ctx_acquire() - Acquire a reference to a BPF crypto context.
+   132	 * @ctx: The BPF crypto context being acquired. The ctx must be a trusted
+   133	 *	     pointer.
+   134	 *
+   135	 * Acquires a reference to a BPF crypto context. The context returned by this function
+   136	 * must either be embedded in a map as a kptr, or freed with
+   137	 * bpf_crypto_skcipher_ctx_release().
+   138	 */
+   139	__bpf_kfunc struct bpf_crypto_skcipher_ctx *
+ > 140	bpf_crypto_skcipher_ctx_acquire(struct bpf_crypto_skcipher_ctx *ctx)
+   141	{
+   142		refcount_inc(&ctx->usage);
+   143		return ctx;
+   144	}
+   145	
+   146	/**
+   147	 * bpf_crypto_skcipher_ctx_release() - Release a previously acquired BPF crypto context.
+   148	 * @ctx: The crypto context being released.
+   149	 *
+   150	 * Releases a previously acquired reference to a BPF cpumask. When the final
+   151	 * reference of the BPF cpumask has been released, it is subsequently freed in
+   152	 * an RCU callback in the BPF memory allocator.
+   153	 */
+ > 154	__bpf_kfunc void bpf_crypto_skcipher_ctx_release(struct bpf_crypto_skcipher_ctx *ctx)
+   155	{
+   156		if (refcount_dec_and_test(&ctx->usage))
+   157			call_rcu(&ctx->rcu, crypto_free_sync_skcipher_cb);
+   158	}
+   159	
+   160	static int bpf_crypto_skcipher_crypt(struct crypto_sync_skcipher *tfm,
+   161					     const struct bpf_dynptr_kern *src,
+   162					     struct bpf_dynptr_kern *dst,
+   163					     const struct bpf_dynptr_kern *iv,
+   164					     bool decrypt)
+   165	{
+   166		struct skcipher_request *req = NULL;
+   167		struct scatterlist sgin, sgout;
+   168		int err;
+   169	
+   170		if (crypto_sync_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+   171			return -EINVAL;
+   172	
+   173		if (__bpf_dynptr_is_rdonly(dst))
+   174			return -EINVAL;
+   175	
+   176		if (!__bpf_dynptr_size(dst) || !__bpf_dynptr_size(src))
+   177			return -EINVAL;
+   178	
+   179		if (__bpf_dynptr_size(iv) != crypto_sync_skcipher_ivsize(tfm))
+   180			return -EINVAL;
+   181	
+   182		req = skcipher_request_alloc(&tfm->base, GFP_ATOMIC);
+   183		if (!req)
+   184			return -ENOMEM;
+   185	
+   186		sg_init_one(&sgin, __bpf_dynptr_data_ptr(src), __bpf_dynptr_size(src));
+   187		sg_init_one(&sgout, __bpf_dynptr_data_ptr(dst), __bpf_dynptr_size(dst));
+   188	
+   189		skcipher_request_set_crypt(req, &sgin, &sgout, __bpf_dynptr_size(src),
+   190					   __bpf_dynptr_data_ptr(iv));
+   191	
+   192		err = decrypt ? crypto_skcipher_decrypt(req) : crypto_skcipher_encrypt(req);
+   193	
+   194		skcipher_request_free(req);
+   195	
+   196		return err;
+   197	}
+   198	
+   199	/**
+   200	 * bpf_crypto_skcipher_decrypt() - Decrypt buffer using configured context and IV provided.
+   201	 * @ctx:	The crypto context being used. The ctx must be a trusted pointer.
+   202	 * @src:	bpf_dynptr to the encrypted data. Must be a trusted pointer.
+   203	 * @dst:	bpf_dynptr to the buffer where to store the result. Must be a trusted pointer.
+   204	 * @iv:		bpf_dynptr to IV data to be used by decryptor.
+   205	 *
+   206	 * Decrypts provided buffer using IV data and the crypto context. Crypto context must be configured.
+   207	 */
+ > 208	__bpf_kfunc int bpf_crypto_skcipher_decrypt(struct bpf_crypto_skcipher_ctx *ctx,
+   209						    const struct bpf_dynptr_kern *src,
+   210						    struct bpf_dynptr_kern *dst,
+   211						    const struct bpf_dynptr_kern *iv)
+   212	{
+   213		return bpf_crypto_skcipher_crypt(ctx->tfm, src, dst, iv, true);
+   214	}
+   215	
+   216	/**
+   217	 * bpf_crypto_skcipher_encrypt() - Encrypt buffer using configured context and IV provided.
+   218	 * @ctx:	The crypto context being used. The ctx must be a trusted pointer.
+   219	 * @src:	bpf_dynptr to the plain data. Must be a trusted pointer.
+   220	 * @dst:	bpf_dynptr to buffer where to store the result. Must be a trusted pointer.
+   221	 * @iv:		bpf_dynptr to IV data to be used by decryptor.
+   222	 *
+   223	 * Encrypts provided buffer using IV data and the crypto context. Crypto context must be configured.
+   224	 */
+ > 225	__bpf_kfunc int bpf_crypto_skcipher_encrypt(struct bpf_crypto_skcipher_ctx *ctx,
+   226						    const struct bpf_dynptr_kern *src,
+   227						    struct bpf_dynptr_kern *dst,
+   228						    const struct bpf_dynptr_kern *iv)
+   229	{
+   230		return bpf_crypto_skcipher_crypt(ctx->tfm, src, dst, iv, false);
+   231	}
+   232	
+
 -- 
-2.42.0.820.g83a721a137-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
