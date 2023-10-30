@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-45216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 088477DB8BB
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:08:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D79E77DB8C2
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:08:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D0FE281337
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 11:08:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9218B28149A
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 11:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F4C12E4D;
-	Mon, 30 Oct 2023 11:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE64712E5B;
+	Mon, 30 Oct 2023 11:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="drETaWl1"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K1JViR9L"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E86F11194
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 11:08:14 +0000 (UTC)
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80D89DA
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:08:12 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-4079ed65471so31708495e9.1
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:08:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04BE712E50
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 11:08:52 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCFDBC0
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:08:50 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2c50ec238aeso60119021fa.0
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:08:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698664091; x=1699268891; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1698664129; x=1699268929; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=c8YUMXVjGsp7QycWhLIdbuMi1zziTusz002mRumFttA=;
-        b=drETaWl147bRlPutpw0BC+6G4dtjBQRoLn8lBvQw6uPytz9lPr4zQ4pyaBcuIyB203
-         53cU8HmVwR6k9rrxxPwlvf4uo4rt94IZ2FDoOsQ96PixodN6Kcu3bjISnUDq3nUIKMd6
-         v6yM/L2CoU5N9dthwdDeDBZbqTaFcFPTpNgpTezeLOeLpzh9SbphwBTd1/bbANLu6iVa
-         DQy5nZ9QL3cjdGvZqE3xtkLN1jAWjlcKDdLrbTmwKhZsmK2Qhgdbp0be7HQf83XNSAMP
-         4RB5stsDgv1FPyQyn7zSlHvSH0fOckhRy+HzMrGPqLykLepLD59nbZ/luXk4+KqUOnwo
-         JX3A==
+        bh=atBJUT0WBGYVt6zhYd3mjzV/V17w9px/MQvdW4tfAT4=;
+        b=K1JViR9LJ+/3dfB0JJuFODFiEVBFFfQgRV4v3SrLN5BVDgrVvjQr8PUCkIfdX0ZbYl
+         3Qt/uR7HXP6Mxn6GOyAsdLehlz27lpBHAWeTdMPCoIP/HMHspTiisG6qnJtIQ11Gxjh7
+         HR/+BOTnLcmOWhIGMfMmryW6wVm1qSLY7I3yIT9ChEoMuiEHgSpQJbxRot7+isow/wUT
+         vGoj+mkBSntP9MfESroK/rmnE9Q5MQdoDYvvo3ej6a+ThVitF2fxUBWC6aClDIugg+AD
+         UR5gTFkqJDTd2DF/uwTD9tBj9Pm6/TjZ4kBKlfOqA4SUZnv8v7iEIoqxZW0p7DyyWeqq
+         tuzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698664091; x=1699268891;
+        d=1e100.net; s=20230601; t=1698664129; x=1699268929;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c8YUMXVjGsp7QycWhLIdbuMi1zziTusz002mRumFttA=;
-        b=lcvv8zh+KkyjB+nP0OUlZYQs+2FbTpfS9gu31ALhQSI1LM0sraAwtuErBHrQK70Q41
-         Q/ueVhKUvANj36RlReKz7UQxS4F/A9AaAXxBVIXM2iRC9JKGtQl2qHqh5l8xTZeO8Aka
-         z6xs7HKXrzY5NFB66Cq32Q/6z3m7Q30bOlKDi54bIWdUepUKgQtDArRcrdktfNd9E4CJ
-         DOv+xrcAy0XATlz85xmcUoii8UAy8Goiz6LAnNYr3b1V6MMAwXuJoriQ9BLSCfMZyX2y
-         wKqA/R96kFcihvBhmzuAcvWS7kCokiG9lC5n6CE72MAz01qvNnMLV2ertJ23dspqB5Pi
-         Y0tA==
-X-Gm-Message-State: AOJu0YzFmOMFHaetF3LklMyW825CyhfshGJ9yp9HVact9EM7qOuoweXq
-	by8RLuH7TJj9BgmId8UF6kZpwQ==
-X-Google-Smtp-Source: AGHT+IFPATwT+gA7n2SMo0pqpfBec+Mba3Z9T78KW9wESAYjKLzpG0Cq0nCcH6c64eFwLGDIX/r5DQ==
-X-Received: by 2002:a05:600c:444f:b0:406:535a:cfb4 with SMTP id v15-20020a05600c444f00b00406535acfb4mr8468038wmn.1.1698664090891;
-        Mon, 30 Oct 2023 04:08:10 -0700 (PDT)
+        bh=atBJUT0WBGYVt6zhYd3mjzV/V17w9px/MQvdW4tfAT4=;
+        b=rkG8WGaGukvnGmRoEI5mJX7D2O5iJAAKs3dnvHqDoM37eEaLy55OmhuKgFKWBi/PcY
+         nEjurE/KkZL/aWQa/vk5sss80WiegHQqDrgeNi5l9y9P/b/tALSdH+EDqFtyrIi1kqSE
+         lNqAWdO5MDqcVq9zwS9wUIelfQtUam3qEBX57HgGxdf9iOneibHP89MGc7zFQNXZa8K6
+         HFC7UnKa0ORw9K1r0WI2mF97sGRAqgHpcdd/PElVQhmZpBRVE/gJnYix9KeuAd61kmNn
+         oj5N50Zc2S7ymzT9VqtIftYiIX6dcDx4MfJRxVX4KlSfZRJvocVD/YSjWBQSovBfBwwe
+         T8kw==
+X-Gm-Message-State: AOJu0YzoTMbC66iX/G72mIQq+3Fg/h1oYHCL+qg8aWR7+lye3EQpjGdc
+	EXT8SGUzoq2hLipuMOzRRk4uMQ==
+X-Google-Smtp-Source: AGHT+IHiGM4vS0zw1vZwRYa6lqkvncT6SbyZCf6FcQkqCx4mV9qetcpOH5LZfGDziCLj4bxathejOA==
+X-Received: by 2002:a2e:9410:0:b0:2c4:fe14:a85 with SMTP id i16-20020a2e9410000000b002c4fe140a85mr8260002ljh.18.1698664129275;
+        Mon, 30 Oct 2023 04:08:49 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.218.126])
-        by smtp.gmail.com with ESMTPSA id f24-20020a1c6a18000000b004063977eccesm12165035wmc.42.2023.10.30.04.08.09
+        by smtp.gmail.com with ESMTPSA id f24-20020a1c6a18000000b004063977eccesm12165035wmc.42.2023.10.30.04.08.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 04:08:10 -0700 (PDT)
-Message-ID: <8e2c7363-7544-41bc-a673-26cabdcb60c5@linaro.org>
-Date: Mon, 30 Oct 2023 12:08:09 +0100
+        Mon, 30 Oct 2023 04:08:48 -0700 (PDT)
+Message-ID: <18ca181a-8aee-46f5-9e2d-bfba4c8bd99e@linaro.org>
+Date: Mon, 30 Oct 2023 12:08:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/8] dt-bindings: clock: ipq5332: add definition for
- GPLL0_OUT_AUX clock
+Subject: Re: [PATCH 8/8] arm64: defconfig: build NSS Clock Controller driver
+ for IPQ5332
 Content-Language: en-US
 To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>,
  Bjorn Andersson <andersson@kernel.org>, Andy Gross <agross@kernel.org>,
@@ -83,7 +83,7 @@ Cc: linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
  netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 References: <20231030-ipq5332-nsscc-v1-0-6162a2c65f0a@quicinc.com>
- <20231030-ipq5332-nsscc-v1-3-6162a2c65f0a@quicinc.com>
+ <20231030-ipq5332-nsscc-v1-8-6162a2c65f0a@quicinc.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -129,20 +129,14 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231030-ipq5332-nsscc-v1-3-6162a2c65f0a@quicinc.com>
+In-Reply-To: <20231030-ipq5332-nsscc-v1-8-6162a2c65f0a@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 30/10/2023 10:47, Kathiravan Thirumoorthy wrote:
-> Add the definition for GPLL0_OUT_AUX clock.
-> 
-> Signed-off-by: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-> ---
->  include/dt-bindings/clock/qcom,ipq5332-gcc.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
+> Build Qualcomm IPQ9574 NSSCC driver as module.
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Why? Commit msg should answer this.
 
 Best regards,
 Krzysztof
