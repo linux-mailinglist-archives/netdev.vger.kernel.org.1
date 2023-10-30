@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-45218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 519067DB8CA
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:11:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 656857DB8D3
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:13:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74DB61C2097F
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 11:11:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 960E81C2091B
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 11:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F44C12E5F;
-	Mon, 30 Oct 2023 11:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7E912E5B;
+	Mon, 30 Oct 2023 11:13:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WwnDYnxs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U/pPIA/J"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BDDCCA7E
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 11:11:20 +0000 (UTC)
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2066BC1
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:11:18 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-507bd64814fso5993197e87.1
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:11:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F3712E50
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 11:13:27 +0000 (UTC)
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21EF3C1
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:13:25 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-77063481352so431481585a.1
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:13:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698664276; x=1699269076; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1698664404; x=1699269204; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ojHq6t613j32ixJLp2uQz84rEU+XqX8cshyS8EwKZk0=;
-        b=WwnDYnxsnZOdwWfAXvp8k7oTlpEj//riCrPjr+mrFWgZaYavoUuECYQj972Z89tHzU
-         Wf2AKXOLFdxu699LIl1ITu2gcsHEQnZFptfPtgq/iqwytFDulkEczC1AsVG+1cGOW648
-         JA4rYKKZPx78l7Nz4GstIwsNPQrbSeZr0N2gvIZYziLLKFt5ojfdK3BPM4KYOHDUxrI8
-         8ir7ixrA714B1Kgim+INr3QM4RVoW275ocrp7opp/76uJm2Y2P+SKbgxnytAyQ+0+PEQ
-         sH5MUDafwOtG0IWEHLKmNGFF576Bawyciuav+kDIqYjfInotwFi3CZzWpnH8PCTicle7
-         FWyQ==
+        bh=SgWjNq31LLMvIH97jAFcRbchzkMBnpDF+XZyz14A3Z8=;
+        b=U/pPIA/JqVJhrZE0Iy6v0hwAVAm/y16NGJ1RdBPbXqXmR7ScmpUigIrEBG62pPBsNe
+         8ipWq8jFDWeILp3BUu3dA0UoSRIV0aO8ya1I+jSsKSBit4o1F/ahnInDC2FJzjkYyvAM
+         1iO6BhXZ5dBHuWPnF8u6Nw2uAC/i01O0x1oJo3gkEC5zCvQc63Vx1+RAxvTSZWdGL+ge
+         KkSlJ1vO/UvEF1D1EQURylS5Ip6wVFjot3qCz05qfDpBNSLfDo2cqdJp30PE39EETY/B
+         HP05j0L+yRvO/CBZCMnv4rMhyBR4PX1OF991DdZ/+m0zPgZhN2A2A0LN1Cc+r0A89BGN
+         2QrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698664276; x=1699269076;
+        d=1e100.net; s=20230601; t=1698664404; x=1699269204;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ojHq6t613j32ixJLp2uQz84rEU+XqX8cshyS8EwKZk0=;
-        b=N6ogHrG3mF9y7I6gtHwLbiImmNtJW+P+UBSktxo6sXf2bflCwi1IqtOSrDhFabTdr+
-         1tzC0eUfMsZvqHm8wRSVbFvc4n59+b5hQ3kCj22btENsgj5zGJsmH8tAazSVBTspw7q1
-         t68/G7u6yidZcveA62+URxVDbiRJln8WFKjMOa6QB7RE2REUBRQS/cmsNEUBNfhle3es
-         sspuNFj9ZesUzg9YEozxyyWDspBEkwRr5fJP5uhO9GVlnXaVj/GBEuYaCy7egjVE2TUF
-         +Li+o9YlelAL+UcLz4NZK2bacOW3Jx7yRamBSk2rdWKIe4FAR0iWw0HuAgEEWfuov8h5
-         8QVQ==
-X-Gm-Message-State: AOJu0YxpE/gGe2NwG8vaWhOsGPHdx3pzB4UvVbYiqXCypHDj+0CWSO7y
-	uywEGUuOzNtS7ZgaznGQkRVg4w==
-X-Google-Smtp-Source: AGHT+IG+dPO/PRBYbJrzpexeYYJ5YO4tgN+kC0NSUB9sWJcBAKWqW9Jp3ehM99UHFvY+B0qja378PA==
-X-Received: by 2002:a19:910a:0:b0:500:9214:b308 with SMTP id t10-20020a19910a000000b005009214b308mr6597050lfd.65.1698664276299;
-        Mon, 30 Oct 2023 04:11:16 -0700 (PDT)
+        bh=SgWjNq31LLMvIH97jAFcRbchzkMBnpDF+XZyz14A3Z8=;
+        b=cAovL/vzvvXoc/6/5bWlGUuvidxddqHXDZK7ti+eX9D9lkyOuCeLX+UuodmeTqdmLK
+         /KQ2UPVUkYbn7mHAy0MJMPAnY/yKjWJOqyNM4ppECc8TcPxXI0wcLHPINpetK0I280su
+         LLSx5aB54X7y8pGD7OchxFJTkEYua+4y56eX+3oP+z0l9hzss2J09vnZeGYOzQBnguuB
+         OjoAJlWR7wPohtlwKWcjFdRDs4a6KFz9Wg5dQbEJEpcG8zfn3aimL2HUtSKEkH/FHdG6
+         kojzX/eGH/z9G6RUG1H2nY/Vxk+gZgAJ0y3ViZJ9bsjDIULzDEFDEZhv22+sNzB9OKD7
+         ydfw==
+X-Gm-Message-State: AOJu0Yx301jt6MWVDVPyJxyH5T72zbM6REfsHmuqYP+wK2DTleSX0Sjp
+	4fT4rorgXrDh7tqgmuGPS2bXiA==
+X-Google-Smtp-Source: AGHT+IFpiTBjgWjt2nidX1ZNZm3fyFiep013ECmfMMPAVenMKEi3zq/a29YnJESGs1dBOhpi17H6LQ==
+X-Received: by 2002:a05:6214:925:b0:66d:2ce2:8651 with SMTP id dk5-20020a056214092500b0066d2ce28651mr15528477qvb.0.1698664404201;
+        Mon, 30 Oct 2023 04:13:24 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.218.126])
-        by smtp.gmail.com with ESMTPSA id w14-20020a5d544e000000b0032db4e660d9sm7995538wrv.56.2023.10.30.04.11.14
+        by smtp.gmail.com with ESMTPSA id y12-20020ad445ac000000b00671ab3da5d0sm1663882qvu.105.2023.10.30.04.13.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 04:11:15 -0700 (PDT)
-Message-ID: <02e2bd74-2509-4cec-a85e-4acfc13eea84@linaro.org>
-Date: Mon, 30 Oct 2023 12:11:13 +0100
+        Mon, 30 Oct 2023 04:13:23 -0700 (PDT)
+Message-ID: <6cc57f82-cd65-42b3-99cd-79b5b784c386@linaro.org>
+Date: Mon, 30 Oct 2023 12:13:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/8] dt-bindings: clock: add IPQ5332 NSSCC clock and reset
- definitions
+Subject: Re: [PATCH 7/8] arm64: dts: qcom: ipq5332: add support for the NSSCC
 Content-Language: en-US
 To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>,
  Bjorn Andersson <andersson@kernel.org>, Andy Gross <agross@kernel.org>,
@@ -83,7 +82,7 @@ Cc: linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
  netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 References: <20231030-ipq5332-nsscc-v1-0-6162a2c65f0a@quicinc.com>
- <20231030-ipq5332-nsscc-v1-5-6162a2c65f0a@quicinc.com>
+ <20231030-ipq5332-nsscc-v1-7-6162a2c65f0a@quicinc.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -129,27 +128,54 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231030-ipq5332-nsscc-v1-5-6162a2c65f0a@quicinc.com>
+In-Reply-To: <20231030-ipq5332-nsscc-v1-7-6162a2c65f0a@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 30/10/2023 10:47, Kathiravan Thirumoorthy wrote:
-> Add NSSCC clock and reset definitions for IPQ5332.
-
-Qualcomm IPQ5332
-
-This applies to all your patches in all your patchsets in entire
-Qualcomm organisation. You add code to common, upstream Linux kernel
-where hundreds of companies also contribute. Except me and few more
-folks, no one knows what is IPQ5332. Other 5000 developers do not know.
-Other millions of users do not know.
-
+> Describe the NSS clock controller node and it's relevant external
+> clocks.
 > 
 > Signed-off-by: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
 > ---
+>  arch/arm64/boot/dts/qcom/ipq5332.dtsi | 28 ++++++++++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/ipq5332.dtsi b/arch/arm64/boot/dts/qcom/ipq5332.dtsi
+> index 42e2e48b2bc3..291f14a3f10a 100644
+> --- a/arch/arm64/boot/dts/qcom/ipq5332.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/ipq5332.dtsi
+> @@ -15,6 +15,18 @@ / {
+>  	#size-cells = <2>;
+>  
+>  	clocks {
+> +		cmn_pll_nss_clk_200m: cmn-pll-nss-clk-200m {
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Node names should be generic. See also an explanation and list of
+examples (not exhaustive) in DT specification:
+https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#generic-names-recommendation
 
+
+so with "clk" suffix, e.g. cmn-pll-nss-1-clk.
+
+> +			compatible = "fixed-clock";
+> +			clock-frequency = <200000000>;
+> +			#clock-cells = <0>;
+> +		};
+> +
+> +		cmn_pll_nss_clk_300m: cmn-pll-nss-clk-300m {
+> +			compatible = "fixed-clock";
+> +			clock-frequency = <300000000>;
+> +			#clock-cells = <0>;
+> +		};
+> +
+>  		sleep_clk: sleep-clk {
+>  			compatible = "fixed-clock";
+>  			#clock-cells = <0>;
+> @@ -473,6 +485,22 @@ frame@b128000 {
+>  				status = "disabled";
+>  			};
+>  		};
 Best regards,
 Krzysztof
 
