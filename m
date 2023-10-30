@@ -1,125 +1,120 @@
-Return-Path: <netdev+bounces-45235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F4887DBA25
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 13:51:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA36E7DBA53
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:12:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95E35B20C99
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:51:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1500F1C209CB
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 13:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9272EAD7;
-	Mon, 30 Oct 2023 12:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515A815EB2;
+	Mon, 30 Oct 2023 13:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixeLiNlq"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="1WpNljdf"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85065469E
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 12:51:33 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EE37C2;
-	Mon, 30 Oct 2023 05:51:32 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-53de0d1dc46so7470927a12.3;
-        Mon, 30 Oct 2023 05:51:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E433239
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 13:12:33 +0000 (UTC)
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FC83C4
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 06:12:32 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2c4fdf94666so58249511fa.2
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 06:12:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698670290; x=1699275090; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bwdRBZbCT8Bb3c6eN7LkCskdruKqPbFov+yv5OPGtT0=;
-        b=ixeLiNlqi270MuG5H8aOXIm2nBY+odNvhDgZj1rlhKZA7Gy1FrxHA6UqIBV75Kcvh3
-         qaQ7J+U+cE3HWvPG4xQo6W+R1sxJcTG0pgL9QvVv49Cb86D6MnG1HSw+zqLbxZvPMgNY
-         1B9zo5cAyGWUgJvygTLRy7F0u2Z9A7VAKumPEABBGL2FFySaClXrNVnx0N/HyBxCM0hk
-         7jgjPfGgUusvchiz86Th+ycZF39g/vS9Zpo/WOdGBUuHbK2wwYePhsJ18gr2W34UtKMT
-         1QF/nsO6tlFbbZniHHrVThzcn3knnm7//JrzcZU/EgMQTC5A2s59Rg6UjpvcGLJmOVqD
-         uhbw==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1698671550; x=1699276350; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BCgzPLdh5Zbi3HFUCrtnL+eU3rwEEkUPSInjtoIMgtc=;
+        b=1WpNljdfZVmFtMlZYruDuRcYUhjJ9MD+VR7VrOdyJtNS9apbbAO49RlahxGlVKcjAD
+         D0uRxI+JAR9zqN2Z7Fap8EwOCCnunt5n30tpnq7/UUcwE8dnAycjMY6cK+I/lAo5UQDd
+         XEMZdkx6CNRdsfMnzmz9hBZ0xCAW74KqUvvELi7gxed90p6YwFjSiJQicSqTHkvJ5B42
+         F7sr+X3G8ieuPdejA13b3p/cTGhrJsU3n9uPZfC33KleeFbHc2f3EArQ2Ob/4gEB7Rhy
+         prlIVoviqE2KVq6avTm+OWL6A4aydMO+2OrqujmbPsaQkdpD7VKTSLi8Fb71+VjwYZnB
+         f8+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698670290; x=1699275090;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1698671550; x=1699276350;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bwdRBZbCT8Bb3c6eN7LkCskdruKqPbFov+yv5OPGtT0=;
-        b=sxkSs1NLTqup+UsuZzTf6FOPTPM86iS7Bvb+YcPWGeGhksbsVp9T6WMP56T7idPjK2
-         OzvcleiPERkln9neyQ3xDAKmUfWHny0wdLL8TmxsxU4XnpK2G/5utBAjUPNhftYbbfbA
-         4JStogXBJZm9I6jY3zyplRXq2nZGdAcWncAOXW+ydZPQNV9t5+T/Z3sbkrZFHxS7+3mB
-         nNZSSO+m89AW0eKbL8AO94Nr2Qz8ZakZvda2UBzO9vYzal4urVxjIGKtDeantvg8XzQm
-         w3lcK4sd4JhJ5nESP1bEvwGWbofdOV99oxYAv8srqamcXSUOBsZZki8Ym4FSxRUOFPJ6
-         rwlg==
-X-Gm-Message-State: AOJu0YyU70pz9fCxq8SZi2H7G6JbNrXNyB5RtCevH0NAeMn0QfwlzTaa
-	EVrwBTvBtIDwXGuX6OaVKJI=
-X-Google-Smtp-Source: AGHT+IEDegdd3F2L6G4PD7PW0gYhigit544HH9eq87Ly8+Hsf45YlnSaJ+098PkZt75Bl2CP20smrg==
-X-Received: by 2002:a05:6402:8c1:b0:53e:afc0:ea43 with SMTP id d1-20020a05640208c100b0053eafc0ea43mr8425263edz.4.1698670290238;
-        Mon, 30 Oct 2023 05:51:30 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id q20-20020a50aa94000000b00522828d438csm6165680edc.7.2023.10.30.05.51.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 05:51:30 -0700 (PDT)
-Date: Mon, 30 Oct 2023 14:51:27 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dsa: tag_rtl4_a: Bump min packet size
-Message-ID: <20231030125127.xccqwct3jgg6o2rl@skbuf>
-References: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
- <95f324af-88de-4692-966f-588287305e09@gmail.com>
- <CACRpkdbyMEqjW1a9oK-GM2_XL0famH1RgSXW-fQLszn9t9UhWw@mail.gmail.com>
+        bh=BCgzPLdh5Zbi3HFUCrtnL+eU3rwEEkUPSInjtoIMgtc=;
+        b=ZIQRN96jG+6b1OipfvOOcOYTf3Eea7gKxjqGxDmwSANNMik24O8zhD9qqg5/tka2Nx
+         MQqOlxW4QYONkzaUNAAFdOb7HRKdHA0/rxexhw1NuxBlJq5SKCoRAgq0cR5FylQp7GGN
+         aKUt0oDP0Fi50rnncuJJ3KHDZPVRtoIL+0HNCJ1hw9NfKhiddNov4zE/4KuGIEVOBgjo
+         M0ke1TV3KRKVAL811j6mkDdL/581Nw4nwo/kd38MR9b6Bpj6sEsrGxwPF2i0Zn4IujxV
+         m2TgWPe9CeVPsSiEzPILye5YbRAUHR+yo1Ap9OSGWD6CUTRmOVN+kpwc1qLnfifsxVx+
+         ioAw==
+X-Gm-Message-State: AOJu0YzX2T7HZ3O0XyN5bpbU1ln7A5y5FJvXgTRTwSrBsTGF3E++sn6y
+	6pCqv3QfDlxbVo/wDvcEQ5KTYg==
+X-Google-Smtp-Source: AGHT+IGKlfCKy/4QIKk3P+v1ZYLfujM9kkcdY93OtQsT2LLTfOcExVPaFyyeTw1T+Zsbxl0ZP6h2bg==
+X-Received: by 2002:a2e:a781:0:b0:2b6:de52:357 with SMTP id c1-20020a2ea781000000b002b6de520357mr8042231ljf.40.1698671550112;
+        Mon, 30 Oct 2023 06:12:30 -0700 (PDT)
+Received: from [192.168.0.106] (haunt.prize.volia.net. [93.72.109.136])
+        by smtp.gmail.com with ESMTPSA id ha7-20020a05600c860700b004053a6b8c41sm9095805wmb.12.2023.10.30.06.12.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Oct 2023 06:12:29 -0700 (PDT)
+Message-ID: <1de34b92-e6fc-4c73-0995-b7400f2ecef1@blackwall.org>
+Date: Mon, 30 Oct 2023 15:12:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACRpkdbyMEqjW1a9oK-GM2_XL0famH1RgSXW-fQLszn9t9UhWw@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [RFC Draft PATCHv2 net-next] Doc: update bridge doc
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ido Schimmel <idosch@idosch.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Stephen Hemminger <stephen@networkplumber.org>
+References: <20231027071842.2705262-1-liuhangbin@gmail.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20231027071842.2705262-1-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Oct 29, 2023 at 04:38:04PM +0100, Linus Walleij wrote:
-> On Fri, Oct 27, 2023 at 11:23 PM Florian Fainelli <f.fainelli@gmail.com> wrote:
+On 10/27/23 10:18, Hangbin Liu wrote:
+> The current bridge kernel doc is too old. It only pointed to the
+> linuxfoundation wiki page which lacks of the new features.
 > 
-> > > It turns out that sometimes, but not always, small packets are
-> > > dropped by the switch for no reason.
-> >
-> > And we are positive that the Ethernet MAC is also properly padding
-> > frames before having them ingress the switch?
+> Here let's start the new bridge document and put all the bridge info
+> so new developers and users could catch up the last bridge status soon.
 > 
-> I don't fully follow, this code is the one adding the padding isn't it?
-> Then the result is transmitted to the switch from the ethernet
-> MAC (drivers/net/ethernet/cortina/gemini.c).
+> In this patch, I copied and modifed most of the bridge description from iproute2.
+> But the Bridge internals part is incomplete as there are too much
+> attributes while I'm not very familiar. So I only added 2 identifiers as
+> example. Some part of the documents are generated by ChatGPT as I'm not
+> good at summarizing.
 > 
-> What am I getting wrong here...
+> As a draft patch, please tell me what other part I need to add or
+> update. Thanks!
+> 
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+> v2: Drop the python tool that generate iproute man page from kernel doc
+> ---
+>   Documentation/networking/bridge.rst | 205 ++++++++++++-
+>   include/uapi/linux/if_bridge.h      |  24 ++
+>   include/uapi/linux/if_link.h        | 454 ++++++++++++++++++++++++++++
+>   net/bridge/br_sysfs_br.c            |  94 ++++++
+>   4 files changed, 767 insertions(+), 10 deletions(-)
+> 
+> diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
 
-What you are missing is that the existing padding done by rtl4a_tag_xmit()
-shouldn't be normally needed except for exceptional cases.
+Thank you for working on this, I'll be able to review it in a few days.
+Sorry about the delay.
 
-Socket buffers smaller than ETH_ZLEN can be passed to any network
-device, and it is expected that either the driver or the hardware pads
-up to ETH_ZLEN automatically. Thus, the conduit driver should already
-know that it needs to pad packets to ETH_ZLEN.
+Thanks,
+  Nik
 
-The exceptional cases are:
-- This is a tail tag (not the case here), which by definition needs to
-  be located at the end of the skb. If you first put the tag then let
-  the conduit interface pad, then the tail tag is no longer at the tail.
-  So in that case, DSA pads first in generic code - dsa_user_xmit().
-- The switch must handle the case where, after stripping the DSA tag
-  from a ETH_ZLEN sized packet coming from the CPU port, it re-pads the
-  packet on user port egress. Some switches don't handle that properly,
-  and thus, we have isolated __skb_put_padto() calls within certain
-  tagging protocols which address just that case.
 
-So, what Florian was asking is whether the conduit interface is not
-doing its expected job properly. You clarified that the problem is big
-rather than small packets, but we still need an explanation for the
-existing __skb_put_padto() call, given that it seems that it was placed
-there due to a misunderstanding rather than due to an explicit need for
-an exceptional case.
 
