@@ -1,104 +1,152 @@
-Return-Path: <netdev+bounces-45268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E6207DBC89
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:25:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB3AD7DBC98
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8B0C281424
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:25:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8D621C209E1
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA1C182A3;
-	Mon, 30 Oct 2023 15:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="NB0Wy7Aq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334E01804D;
+	Mon, 30 Oct 2023 15:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1871F18AE1;
-	Mon, 30 Oct 2023 15:25:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF14FC433C8;
-	Mon, 30 Oct 2023 15:25:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1698679544;
-	bh=btyjpiEdwQ+MufjXyopFOcMveHsu8z12SIfdV1MwW1E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NB0Wy7AqZMyCyTj7jPHOyVOmMcV2xXkZ9p/0mLLlOk8ctevt0m08Wy5FWx0uvRNzp
-	 zQ4ePKjZSEYIDgB0vLHw05dy6x8M/Nkt/yAYI8CzutUxSYoIaGSXMNxzxhCs7/dS8C
-	 wKbp2P2FYs76TuQo1aSSsk62hEfdI2Hl6DsZ/1VE=
-Date: Mon, 30 Oct 2023 16:25:40 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Benjamin Poirier <benjamin.poirier@gmail.com>
-Cc: Kira <nyakov13@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Coiby Xu <coiby.xu@gmail.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Sven Joachim <svenjoac@gmx.de>,
-	Ian Kent <raven@themaw.net>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-staging@lists.linux.dev
-Subject: Re: [PATCH] staging: Revert "staging: qlge: Retire the driver"
-Message-ID: <2023103001-drew-parmesan-c61a@gregkh>
-References: <20231030150400.74178-1-benjamin.poirier@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF77D18AE1
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 15:29:35 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 036E2B3
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 08:29:33 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mtapsc-5-oHEMwp6QNkelFYo-i2F22g-1; Mon, 30 Oct 2023 15:29:31 +0000
+X-MC-Unique: oHEMwp6QNkelFYo-i2F22g-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 30 Oct
+ 2023 15:29:45 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 30 Oct 2023 15:29:45 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Shinas Rasheed' <srasheed@marvell.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: Haseeb Gani <hgani@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>,
+	"egallen@redhat.com" <egallen@redhat.com>, "mschmidt@redhat.com"
+	<mschmidt@redhat.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "wizhao@redhat.com"
+	<wizhao@redhat.com>, "konguyen@redhat.com" <konguyen@redhat.com>,
+	Veerasenareddy Burru <vburru@marvell.com>, Sathesh B Edara
+	<sedara@marvell.com>, Eric Dumazet <edumazet@google.com>
+Subject: RE: [PATCH net-next v2 3/4] octeon_ep: implement xmit_more in
+ transmit
+Thread-Topic: [PATCH net-next v2 3/4] octeon_ep: implement xmit_more in
+ transmit
+Thread-Index: AQHaBomkOels9gSWWE2IVlse9GkwiLBevpOAgAOrQICAAA7xIA==
+Date: Mon, 30 Oct 2023 15:29:45 +0000
+Message-ID: <9631475a8ba94c1682696d219c632538@AcuMS.aculab.com>
+References: <20231024145119.2366588-1-srasheed@marvell.com>
+ <20231024145119.2366588-4-srasheed@marvell.com>
+ <0fc50b8e6ff44c43b10481da608c95c3@AcuMS.aculab.com>
+ <PH0PR18MB47340A7A9E68DE2747DB94F9C7A1A@PH0PR18MB4734.namprd18.prod.outlook.com>
+In-Reply-To: <PH0PR18MB47340A7A9E68DE2747DB94F9C7A1A@PH0PR18MB4734.namprd18.prod.outlook.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231030150400.74178-1-benjamin.poirier@gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-On Tue, Oct 31, 2023 at 02:04:00AM +1100, Benjamin Poirier wrote:
-> This reverts commit 875be090928d19ff4ae7cbaadb54707abb3befdf.
-> 
-> On All Hallows' Eve, fear and cower for it is the return of the undead
-> driver.
-> 
-> There was a report [1] from a user of a QLE8142 device. They would like for
-> the driver to remain in the kernel. Therefore, revert the removal of the
-> qlge driver.
-> 
-> [1] https://lore.kernel.org/netdev/566c0155-4f80-43ec-be2c-2d1ad631bf25@gmail.com/
+RnJvbTogU2hpbmFzIFJhc2hlZWQgPHNyYXNoZWVkQG1hcnZlbGwuY29tPg0KPiBTZW50OiAzMCBP
+Y3RvYmVyIDIwMjMgMTQ6MTUNCj4gDQo+IEhpLA0KPiANCj4gSSB1bmRlcnN0YW5kIHRoZSB3aW5k
+b3cgaXMgY2xvc2VkLCBidXQganVzdCByZXBseWluZyB0byBhIHBlbmRpbmcgY29tbWVudCBvbiB0
+aGUgdGhyZWFkLg0KPiANCj4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206
+IERhdmlkIExhaWdodCA8RGF2aWQuTGFpZ2h0QEFDVUxBQi5DT00+DQo+ID4gLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQ0KPiA+IEZyb206IFNoaW5hcyBSYXNoZWVkDQo+ID4gPiBTZW50OiAyNCBPY3RvYmVyIDIwMjMg
+MTU6NTENCj4gPiA+DQo+ID4gPiBBZGQgeG1pdF9tb3JlIGhhbmRsaW5nIGluIHR4IGRhdGFwYXRo
+IGZvciBvY3Rlb25fZXAgcGYuDQo+ID4gPg0KPiA+IC4uLg0KPiA+ID4gLQ0KPiA+ID4gLQkvKiBS
+aW5nIERvb3JiZWxsIHRvIG5vdGlmeSB0aGUgTklDIHRoZXJlIGlzIGEgbmV3IHBhY2tldCAqLw0K
+PiA+ID4gLQl3cml0ZWwoMSwgaXEtPmRvb3JiZWxsX3JlZyk7DQo+ID4gPiAtCWlxLT5zdGF0cy5p
+bnN0cl9wb3N0ZWQrKzsNCj4gPiA+ICsJLyogUmluZyBEb29yYmVsbCB0byBub3RpZnkgdGhlIE5J
+QyBvZiBuZXcgcGFja2V0cyAqLw0KPiA+ID4gKwl3cml0ZWwoaXEtPmZpbGxfY250LCBpcS0+ZG9v
+cmJlbGxfcmVnKTsNCj4gPiA+ICsJaXEtPnN0YXRzLmluc3RyX3Bvc3RlZCArPSBpcS0+ZmlsbF9j
+bnQ7DQo+ID4gPiArCWlxLT5maWxsX2NudCA9IDA7DQo+ID4gPiAgCXJldHVybiBORVRERVZfVFhf
+T0s7DQo+ID4NCj4gPiBEb2VzIHRoYXQgcmVhbGx5IG5lZWQgdGhlIGNvdW50Pw0KPiA+IEEgJ2Rv
+b3JiZWxsJyByZWdpc3RlciB1c3VhbGx5IGp1c3QgdGVsbHMgdGhlIE1BQyBlbmdpbmUNCj4gPiB0
+byBnbyBhbmQgbG9vayBhdCB0aGUgdHJhbnNtaXQgcmluZy4NCj4gPiBJdCB0aGVuIGNvbnRpbnVl
+cyB0byBwcm9jZXNzIHRyYW5zbWl0cyB1bnRpbCBpdCBmYWlscw0KPiA+IHRvIGZpbmQgYSBwYWNr
+ZXQuDQo+ID4gU28gaWYgdGhlIHRyYW5zbWl0IGlzIGFjdGl2ZSB5b3UgZG9uJ3QgbmVlZCB0byBz
+ZXQgdGhlIGJpdC4NCj4gPiAoQWx0aG91Z2ggdGhhdCBpcyBhY3R1YWxseSByYXRoZXIgaGFyZCB0
+byBkZXRlY3QuKQ0KPiANCj4gVGhlIHdheSB0aGUgb2N0ZW9uIGhhcmR3YXJlIHdvcmtzIGlzIHRo
+YXQgaXQgZXhwZWN0cyBudW1iZXIgb2YgbmV3bHkgdXBkYXRlZCBwYWNrZXRzDQo+IHRvIGJlIHdy
+aXR0ZW4gdG8gdGhlIGRvb3JiZWxsIHJlZ2lzdGVyLHdoaWNoIGVmZmVjdGl2ZWx5IGluY3JlbWVu
+dHMgdGhlIGRvb3JiZWxsDQo+IGNvdW50IHdoaWNoIHNoYWxsIGJlIGRlY3JlbWVudGVkIGJ5IGhh
+cmR3YXJlIGFzIGl0IHJlYWRzIHRoZXNlIHBhY2tldHMuIFNvIGluIGVzc2VuY2UsDQo+IHRoZSBk
+b29yYmVsbCBjb3VudCBhbHNvIGluZGljYXRlcyBvdXRzdGFuZGluZyBwYWNrZXRzIHRvIGJlIHJl
+YWQgYnkgaGFyZHdhcmUuDQoNClVudXN1YWwgLSBJIHdvdWxkbid0IGNhbGwgdGhhdCBhIGRvb3Ji
+ZWxsIHJlZ2lzdGVyLg0KDQo+ID4gVGhlICd4bWl0X21vcmUnIGZsYWcgaXMgdXNlZnVsIGlmICh0
+aGUgZXF1aXZhbGVudCBvZikgd3JpdGluZw0KPiA+IHRoZSBkb29yYmVsbCByZWdpc3RlciBpcyBl
+eHBlbnNpdmUgc2luY2UgaXQgY2FuIGJlIGRlbGF5ZWQNCj4gPiB0byBhIGxhdGVyIGZyYW1lIGFu
+ZCBvbmx5IGRvbmUgb25jZSAtIGFkZGluZyBhIHNsaWdodCBsYXRlbmN5DQo+ID4gdG8gdGhlIGVh
+cmxpZXIgdHJhbnNtaXRzIGlmIHRoZSBtYWMgZW5naW5lIHdhcyBpZGxlLg0KPiA+DQo+ID4gSSdt
+IG5vdCBzdXJlIGhvdyBtdWNoIChpZiBhbnkpIHBlcmZvcm1hbmNlIGdhaW4geW91IGFjdHVhbGx5
+DQo+ID4gZ2V0IGZyb20gYXZvaWRpbmcgdGhlIHdyaXRlbCgpLg0KPiA+IFNpbmdsZSBQQ0llIHdy
+aXRlcyBhcmUgJ3Bvc3RlZCcgYW5kIHByZXR0eSBtdWNoIGNvbXBsZXRlbHkNCj4gPiBhc3luY2hy
+b25vdXMuDQo+IA0KPiBDYW4geW91IGVsYWJvcmF0ZSB3aGF0IHlvdSBhcmUgc3VnZ2VzdGluZyBo
+ZXJlIHRvIGRvPyBUaGUgZHJpdmVyIGlzIHRyeWluZw0KPiB0byBtYWtlIHVzZSBvZiB0aGUgJ3ht
+aXRfbW9yZScgaGludCBmcm9tIHRoZSBuZXR3b3JrIHN0YWNrLCBhcyBhbnkgbmV0d29yaw0KPiBk
+cml2ZXIgbWlnaHQgb3B0IHRvIGRvLg0KDQpUaGVyZSBhcmUgc29tZSBkcml2ZXJzIHdoZXJlIHdh
+a2luZyB1cCB0aGUgTUFDIGVuZ2luZSBpcyBleHBlbnNpdmUuDQpJZiB5b3UgbmVlZCB0byBkbyBh
+IFBDSWUgcmVhZCB0aGVuIHRoZXkgYXJlIGV4cGVuc2l2ZS4NClRoZXJlIG1pZ2h0IGFsc28gYmUg
+ZHJpdmVycyB0aGF0IG5lZWQgdG8gc2VuZCBhIFVTQiBtZXNzYWdlLg0KSSBkb24ndCBhY3R1YWxs
+eSBrbm93IHdoaWNoIG9uZSBpdCB3YXMgYWRkZWQgZm9yLg0KDQo+IEkgdGhpbmsgYXZvaWRpbmcg
+Y29udGludW91cyBQQ0llIHBvc3RzIGZvciBlYWNoIHBhY2tldCBzaGFsbCBzdGlsbCBiZSB3YXN0
+ZWZ1bA0KPiBhcyB0aGUgaGFyZHdhcmUgY2FuIGJ1bGsgcmVhZCBmcm9tIHRoZSBxdWV1ZSBpZiB3
+ZSBnaXZlIGl0IGEgYmF0Y2ggb2YgcGFja2V0cy4NCg0KSWYgeW91IGRvIHdyaXRlcyBmb3IgZXZl
+cnkgcGFja2V0IHRoZW4gdGhlIGhhcmR3YXJlIGNhbiBnZXQgb24gd2l0aA0Kc2VuZGluZyB0aGUg
+Zmlyc3QgcGFja2V0IGFuZCBtaWdodCBiZSBhYmxlIHRvIGRvIGJ1bGsgcmVhZHMNCmZvciB0aGUg
+bmV4dCBwYWNrZXQocykgd2hlbiB0aGF0IGZpbmlzaGVzLg0KDQpUaGUgZXh0cmEgY29kZSB5b3Ug
+YXJlIGFkZGluZyBjb3VsZCBlYXNpbHkgKHdhdmluZyBoYW5kcykNCmJlIG1vcmUgZXhwZW5zaXZl
+IHRoYW4gdGhlIHBvc3RlZCBQQ0llIHdyaXRlLg0KKEVzcGVjaWFsbHkgaWYgeW91IGhhdmUgdG8g
+YWRkIGFuIGF0b21pYyBvcGVyYXRpb24uKQ0KDQpVbmxlc3MsIG9mIGNvdXJzZSwgeW91IGhhdmUg
+dG8gd2FpdCBmb3IgaXQgdG8gc2VuZCB0aGF0IGJhdGNoDQpvZiBwYWNrZXRzIGJlZm9yZSB5b3Ug
+Y2FuIGdpdmUgaXQgYW55IG1vcmUuDQpXaGljaCB3b3VsZCBiZSByYXRoZXIgZW50aXJlbHkgYnJv
+a2VuIGFuZCB3b3VsZCByZWFsbHkgcmVxdWlyZQ0KeW91IGRvIHRoZSB3cml0ZSBpbiB0aGUgZW5k
+LW9mLXRyYW5zaXQgcGF0aC4NCg0KPiA+IFRoZSBvdGhlciBwcm9ibGVtIEkndmUgc2VlbiBpcyB0
+aGF0IG5ldGRldl94bWl0X21vcmUoKSBpcw0KPiA+IHRoZSBzdGF0ZSBvZiB0aGUgcXVldWUgd2hl
+biB0aGUgdHJhbnNtaXQgd2FzIHN0YXJ0ZWQsIG5vdA0KPiA+IHRoZSBjdXJyZW50IHN0YXRlLg0K
+PiA+IElmIGEgcGFja2V0IGlzIGFkZGVkIHdoaWxlIHRoZSBlYXJsaWVyIHRyYW5zbWl0IHNldHVw
+IGNvZGUNCj4gPiBpcyBydW5uaW5nIChzZXR0aW5nIHVwIHRoZSBkZXNjcmlwdG9ycyBldGMpIHRo
+ZSBpdCBpc24ndCBzZXQuDQo+ID4gU28gdGhlIGZhc3QgcGF0aCBkb2Vzbid0IGdldCB0YWtlbi4N
+Cj4gDQo+IEJ5IHRoZSBuZXh0IHBhY2tldCB0aGUga2VybmVsIHNlbmRzLCB0aGUgeG1pdF9tb3Jl
+IHNob3VsZCBiZSBzZXQNCj4gYXMgZmFyIEkgdW5kZXJzdGFuZCwgcmlnaHQ/IChhcyB0aGUgeG1p
+dF9tb3JlIGJvb2wgaXMgc2V0IGlmIHNrYi0+bmV4dA0KPiBpcyBwcmVzZW50LCBpZiB0aGUgdHJh
+bnNtaXQgcGF0aCBmb2xsb3dzIGRldl9oYXJkX3N0YXJ0X3htaXQpLg0KDQpUaGUgbG9vcCBpcyBz
+b21ldGhpbmcgbGlrZToNCgl3aGlsZSAoZ2V0X3BhY2tldCgpKSB7DQoJCXBlcl9jcHUtPnhtaXRf
+bW9yZSA9ICFxdWV1ZV9lbXB0eSgpOw0KCQlpZiAodHJhbnNtaXRfcGFja2V0KCkgIT0gVFhfT0sp
+DQoJCQlicmVhazsNCgl9DQpTbyBpZiBhIHBhY2tldCBpcyBhZGRlZCB3aGlsZSBhbGwgdGhlIHRy
+YW5zbWl0IHNldHVwIGNvZGUgaXMgcnVubmluZw0KaXQgaXNuJ3QgZGV0ZWN0ZWQuDQpJIG1hbmFn
+ZWQgdG8gcmVwZWF0ZWRseSBnZXQgdGhhdCB0byBsb29wIHdoZW4geG1pdF9tb3JlIHdhc24ndCBz
+ZXQNCmFuZCBpbiBhIGRyaXZlciB3aGVyZSB0aGUgJ2Rvb3JiZWxsJyB3cml0ZSB3YXNuJ3QgZW50
+aXJlbHkgdHJpdmlhbC4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lk
+ZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0K
+UmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
 
-Who's going to maintain this?
-
-> Reported by: Kira <nyakov13@gmail.com>
-> Signed-off-by: Benjamin Poirier <benjamin.poirier@gmail.com>
-> ---
-> 
-> Notes:
->     Once the removal and revert show up in the net-next tree, I plan to send a
->     followup patch to move the driver to drivers/net/ as discussed earlier:
->     https://lore.kernel.org/netdev/20231019074237.7ef255d7@kernel.org/
-
-are you going to be willing to maintain this and keep it alive?
-
-I'm all this, if you want to, but I would like it out of staging.  So
-how about applying this, and a follow-on one that moves it there once
--rc1 is out?  And it probably should be in the 'net' tree, as you don't
-want 6.7 to come out without the driver at all, right?
-
-> +QLOGIC QLGE 10Gb ETHERNET DRIVER
-> +M:	Manish Chopra <manishc@marvell.com>
-> +M:	GR-Linux-NIC-Dev@marvell.com
-> +M:	Coiby Xu <coiby.xu@gmail.com>
-> +L:	netdev@vger.kernel.org
-> +S:	Supported
-> +F:	Documentation/networking/device_drivers/qlogic/qlge.rst
-> +F:	drivers/staging/qlge/
-
-It's obvious taht these people are not maintaining this code, so they
-should be dropped from the MAINTAINERS file as well.
-
-thanks,
-
-greg k-h
 
