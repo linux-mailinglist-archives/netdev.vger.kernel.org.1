@@ -1,219 +1,128 @@
-Return-Path: <netdev+bounces-45254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67A257DBB92
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:16:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 222AD7DBB99
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:19:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2ACBB20C7A
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:16:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB16828133A
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B73C17982;
-	Mon, 30 Oct 2023 14:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A9D17999;
+	Mon, 30 Oct 2023 14:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bDXaHL8P"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Ic4ZQEsz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C454015E81
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 14:16:30 +0000 (UTC)
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A30DE;
-	Mon, 30 Oct 2023 07:16:28 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9c773ac9b15so675497366b.2;
-        Mon, 30 Oct 2023 07:16:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698675387; x=1699280187; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NotOi/IQjQkafFHNa5lm4v8ln1I7duJrUMZ0i8r8XoY=;
-        b=bDXaHL8PLPPM2HKcmQ45j1GhEku5gHYz4UmtXvjfXdYu7CXKJtu7ChfoIdeVNwxFUX
-         09oCp3yvnGQYrP1R6y2o2tl7Sz6j8xgMiRi8vSgo1GnNceZXcQK1lKyBgNA7UutLy9HL
-         +nelcrE0PVGFQGMJvBVyao7MJ52wrhICgWtAQn/2wP+01AVPnG3L4JyG+kfJ6u3Gyw0q
-         7in7eZPlqQTvoEVi5tAh4jLQ3KxlId6w5Eqsr6YphCpwJm6OFVHMruIga4z+IIW1jUwS
-         O/1/jkZQRi+vsvzP5cFXdV/Ck1bpiCCOGJRIzPkjpUI36VtvDibdIeBKTdwZpgqvX8zb
-         9vFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698675387; x=1699280187;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NotOi/IQjQkafFHNa5lm4v8ln1I7duJrUMZ0i8r8XoY=;
-        b=CKEp5pu5cv9AJZlBqQLqPSfBP1PGT+Z0qDACRBjX09AmCfNFToqStZgDHy6Ezu+Bwd
-         Lp6PVfRSuZBy8/DnzD3PLhz5mwkRinUNrJiqQrohO4HT4qxy1S3ugxYa/qc9LLYxGJth
-         rcisXMZY3sc6N2VWkMDmRfU8b9MjnnQQ9gsXQUs5s1QASzb/ezZQKt8y5VxopsATh1WC
-         qGyiaQLN+HUMvsGYRlddAlIzyEcswMRlQxR8I/AuYiJH/R/QL/FVeXhPGgKFxFDro9mn
-         d2fqOsg7hsQofrLBf2JyqMXwF54RpKowOMbWizDya2MXhDo4hR8Ue1RK2llx5TUoPamC
-         2TMQ==
-X-Gm-Message-State: AOJu0Yydo1jIqIttHx45741+1roF3sbmaUmtthoLLIC8ZF/qhr/Q1EvW
-	X5UiD4X/rB4KQeyvgNc7Yno=
-X-Google-Smtp-Source: AGHT+IHIhDbQTbb2pT5sEOcg8opE2jO+TfDUzPSTq+WgT93QauODCdQY5CVihq5WGK5Ym2t0j5UUIg==
-X-Received: by 2002:a17:906:a198:b0:9d3:f436:6804 with SMTP id s24-20020a170906a19800b009d3f4366804mr1660027ejy.29.1698675386476;
-        Mon, 30 Oct 2023 07:16:26 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id g16-20020a1709064e5000b0098951bb4dc3sm6075214ejw.184.2023.10.30.07.16.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 07:16:26 -0700 (PDT)
-Date: Mon, 30 Oct 2023 16:16:23 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
-Message-ID: <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
-References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
- <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497D717982;
+	Mon, 30 Oct 2023 14:19:47 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDED7B7;
+	Mon, 30 Oct 2023 07:19:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=pUI5nGy0LFYKow2okhoQ6OKyczy/kEldDjABNORebOc=; b=Ic4ZQEszf7DdPBZRY4YiXz7+XW
+	MXv68gsOVMuwSkXRYL3DrKHyZyOzPhzVGgAzEr2A8oyeWtTuVUNGncN2F6Z6J4fvq0Qi+kxFw3Nv+
+	Wf2XDjFO0BG4tlbg6rVzLmM4d2PQc1hwMNJAKKWQFYImP5WKESkANmYPNN6Qxph0TbYQdY3QbEPQ6
+	Di2fOOca1/h91PJlU7/bCFlPRgI4jm3zJn92v3HYBljyZR/8uiXQ6JDr1dIDq0nhvxRVrE7nsJXX6
+	TlIZkm3efA9OG3prnCXoxKJq8psh4siiA9ollSw1vn53aWlwdBFGj6ZROeQb92e8a3iV6UND6mRPD
+	/f/ivMyw==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qxT72-0001SS-KC; Mon, 30 Oct 2023 15:19:28 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qxT71-000Y1o-O6; Mon, 30 Oct 2023 15:19:27 +0100
+Subject: Re: [PATCH net] veth: Fix RX stats for bpf_redirect_peer() traffic
+To: Peilin Ye <yepeilin.cs@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Peilin Ye <peilin.ye@bytedance.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Cong Wang <cong.wang@bytedance.com>, Jiang Wang <jiang.wang@bytedance.com>,
+ Youlun Zhang <zhangyoulun@bytedance.com>
+References: <20231027184657.83978-1-yepeilin.cs@gmail.com>
+ <20231027190254.GA88444@n191-129-154.byted.org>
+ <59be18ff-dabc-2a07-3d78-039461b0f3f7@iogearbox.net>
+ <20231028231135.GA2236124@n191-129-154.byted.org>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <94c88020-5282-c82b-8f88-a2d012444699@iogearbox.net>
+Date: Mon, 30 Oct 2023 15:19:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
- <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
+In-Reply-To: <20231028231135.GA2236124@n191-129-154.byted.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27077/Mon Oct 30 08:39:55 2023)
 
-On Mon, Oct 30, 2023 at 10:26:50AM +0100, Linus Walleij wrote:
-> It was reported that the "LuCI" web UI was not working properly
-> with a device using the RTL8366RB switch. Disabling the egress
-> port tagging code made the switch work again, but this is not
-> a good solution as we want to be able to direct traffic to a
-> certain port.
+On 10/29/23 1:11 AM, Peilin Ye wrote:
+> On Sat, Oct 28, 2023 at 09:06:44AM +0200, Daniel Borkmann wrote:
+>>>> diff --git a/net/core/filter.c b/net/core/filter.c
+>>>> index 21d75108c2e9..7aca28b7d0fd 100644
+>>>> --- a/net/core/filter.c
+>>>> +++ b/net/core/filter.c
+>>>> @@ -2492,6 +2492,7 @@ int skb_do_redirect(struct sk_buff *skb)
+>>>>    			     net_eq(net, dev_net(dev))))
+>>>>    			goto out_drop;
+>>>>    		skb->dev = dev;
+>>>> +		dev_sw_netstats_rx_add(dev, skb->len);
+>>>
+>>> This assumes that all devices that support BPF_F_PEER (currently only
+>>> veth) use tstats (instead of lstats, or dstats) - is that okay?
+>>
+>> Dumb question, but why all this change and not simply just call ...
+>>
+>>    dev_lstats_add(dev, skb->len)
+>>
+>> ... on the host dev ?
 > 
-> It turns out that packets between 1496 and 1500 bytes are
-> dropped unless padded out to 1518 bytes.
-> 
-> If we pad the ethernet frames to a minimum of ETH_FRAME_LEN + FCS
-> (1518 bytes) everything starts working fine.
-> 
-> 1496 is the size of a normal data frame minus the internal DSA
-> tag. The number is intuitive, the explanation evades me.
-> 
-> As we completely lack datasheet or any insight into how this
-> switch works, this trial-and-error solution is the best we
-> can do. FWIW this bug may very well be the reason why Realteks
-> code drops are not using CPU tagging. The vendor routers using
-> this switch are all hardwired to disable CPU tagging and all
-> packets are pushed to all ports on TX. This is also the case
-> in the old OpenWrt driver, derived from the vendor code drops.
-> 
-> I have tested smaller sizes, only 1518 or bigger padding works.
-> 
-> Modifying the MTU on the switch (one setting affecting all
-> ports) has no effect.
-> 
-> Before this patch:
-> 
-> PING 192.168.1.1 (192.168.1.1) 1470(1498) bytes of data.
-> ^C
-> --- 192.168.1.1 ping statistics ---
-> 2 packets transmitted, 0 received, 100% packet loss, time 1048ms
-> 
-> PING 192.168.1.1 (192.168.1.1) 1472(1500) bytes of data.
-> ^C
-> --- 192.168.1.1 ping statistics ---
-> 12 packets transmitted, 0 received, 100% packet loss, time 11267ms
-> 
-> After this patch:
-> 
-> PING 192.168.1.1 (192.168.1.1) 1470(1498) bytes of data.
-> 1478 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.533 ms
-> 1478 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=0.630 ms
-> 
-> PING 192.168.1.1 (192.168.1.1) 1472(1500) bytes of data.
-> 1480 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.527 ms
-> 1480 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=0.562 ms
-> 
-> Also LuCI starts working with the 1500 bytes frames it produces
-> from the HTTP server.
-> 
-> Fixes: 9eb8bc593a5e ("net: dsa: tag_rtl4_a: fix egress tags")
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
-> Changes in v2:
-> - Pad packages >= 1496 bytes after some further tests
-> - Use more to-the-point description
-> - Provide ping results in the commit message
-> - Link to v1: https://lore.kernel.org/r/20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org
-> ---
->  net/dsa/tag_rtl4_a.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/net/dsa/tag_rtl4_a.c b/net/dsa/tag_rtl4_a.c
-> index c327314b95e3..3292bc49b158 100644
-> --- a/net/dsa/tag_rtl4_a.c
-> +++ b/net/dsa/tag_rtl4_a.c
-> @@ -45,6 +45,16 @@ static struct sk_buff *rtl4a_tag_xmit(struct sk_buff *skb,
->  	if (unlikely(__skb_put_padto(skb, ETH_ZLEN, false)))
->  		return NULL;
->  
-> +	/* Packets over 1496 bytes get dropped unless they get padded
-> +	 * out to 1518 bytes. 1496 is ETH_DATA_LEN - tag which is hardly
-> +	 * a coinicidence, and 1518 is ETH_FRAME_LEN + FCS so we define
-> +	 * the threshold size and padding like this.
-> +	 */
-> +	if (skb->len >= (ETH_DATA_LEN - RTL4_A_HDR_LEN)) {
-> +		if (unlikely(__skb_put_padto(skb, ETH_FRAME_LEN + ETH_FCS_LEN, false)))
-> +			return NULL;
-> +	}
+> Since I didn't want to update host-veth's TX counters.  If we
+> bpf_redirect_peer()ed a packet from NIC TC ingress to Pod-veth TC ingress,
+> I think it means we've bypassed host-veth TX?
 
-De-obfuscating the macros:
+Yes. So the idea is to transition to tstats replace the location where
+we used to bump lstats with tstat's tx counter, and only the peer redirect
+would bump the rx counter.. then upon stats traversal we fold the latter into
+the rx stats which was populated by the opposite's tx counters. Makes sense.
 
-	if (skb->len >= 1496)
-		__skb_put_padto(skb, 1518, false);
+OT: does cadvisor run inside the Pod to collect the device stats? Just
+curious how it gathers them.
 
-	(...)
-
-	skb_push(skb, 4);
-
-which means that here, skb->len will be 1522, if it was originally 1496.
-So the code adds 26 extra octets, and only 4 of those are legitimate (a tag).
-The rest is absolutely unexplained, which means that until there is a
-valid explanation for them:
-
-pw-bot: cr
-
-(sorry, but if it works and we don't know why it works, then at some
-point it will break and we won't know why it stopped working)
-
-In the discussion on the previous thread:
-https://lore.kernel.org/netdev/CACRpkdbq03ZXcB-TaBp5Udo3M47rb-o+LfkEkC-gA1+=x1Zd-g@mail.gmail.com/
-
-you said that what increments is Dot1dTpPortInDiscards. 802.1Q-2018 says
-about it: "Count of received valid frames that were discarded (i.e.,
-filtered) by the Forwarding Process." which is odd enough to me, since
-packets sent by rtl4a_tag_xmit() should *not* be processed by the forwarding
-layer of the switch, but rather, force-delivered to the specified egress
-port.
-
-Could you please try to revert the effect of commit 339133f6c318 ("net:
-dsa: tag_rtl4_a: Drop bit 9 from egress frames") by setting that bit in
-the egress tag again? Who knows, maybe it is the bit which tells the
-switch to bypass the forwarding process. Or maybe there is a bit in a
-different position which does this. You could try to fill in all bits in
-unknown positions, check that there are no regressions with packet sizes
-< 1496, and then see if that made any changes to packet sizes >= 1496.
-If it did, try to see which bit made the difference.
-
-> +
->  	netdev_dbg(dev, "add realtek tag to package to port %d\n",
->  		   dp->index);
->  	skb_push(skb, RTL4_A_HDR_LEN);
+>>> If not, should I add another NDO e.g. ->ndo_stats_rx_add()?
+>>
+>> Definitely no new stats ndo resp indirect call in fast path.
 > 
-> ---
-> base-commit: d9e164e4199bc465b3540d5fe3ffc8a9a4fc6157
-> change-id: 20231027-fix-rtl8366rb-e752bd5901ca
-> 
-> Best regards,
-> -- 
-> Linus Walleij <linus.walleij@linaro.org>
-> 
+> Yeah, I think I'll put a comment saying that all devices that support
+> BPF_F_PEER must use tstats (or must use lstats), then.
 
+sgtm.
+
+Thanks,
+Daniel
 
