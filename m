@@ -1,210 +1,147 @@
-Return-Path: <netdev+bounces-45192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78BC17DB5AF
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 10:04:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12D2E7DB5DF
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 10:12:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB1761C20A59
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 09:04:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8CF3B20C47
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 09:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF13D505;
-	Mon, 30 Oct 2023 09:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90ECDD526;
+	Mon, 30 Oct 2023 09:11:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q4FnNHvt"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ME+oxpv5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D74D2FA
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 09:04:04 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D98BDE;
-	Mon, 30 Oct 2023 02:04:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698656643; x=1730192643;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=HXGK7sSsr5+opx08mGT0ZofSHBbyl3M3jD1J1d73E4g=;
-  b=Q4FnNHvtGUjIrq8Q8d1yxVDEhiyF6FpYW66H5d/XngJCQY6uLDdhRrRM
-   m8hC34cVulgj93U9TwLWiF9P6gztUxVWEs30/nAHRNZII7/ZMVTo0T+0T
-   KSq7CwhI4NbsIClZwe9pqmXiNbEK+ucxk2sJxT8AckNozJeTxH0saA/oS
-   LqUX1mrOmPQvOu1TpIdQOBk+VbUhU6UB1X3DwFbhXPh2e5SRNBosqea3Q
-   85A4iFcJ17erFeeV8UR2RKgcjHBAD12cGJmmx5ixiagGvG2OTbkj6dEm7
-   M0xNGu1uoUlbFsvS7T3OO53lDL5AiFO1vhgFHvWBU7n4mNjSxOf26KcKb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10878"; a="452295953"
-X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
-   d="scan'208";a="452295953"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 02:04:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10878"; a="826000355"
-X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
-   d="scan'208";a="826000355"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Oct 2023 02:04:02 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 30 Oct 2023 02:04:01 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 30 Oct 2023 02:04:01 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 30 Oct 2023 02:04:01 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eh9lfTsgFntFz33NsSTcJ69qthvnNffFn6vzX2/e15+W8O8cABWWpeMFzjI0z03RsZRKXdmjgvyS+2hpzJrHf7do7lqwAXSVoa/rGr0rdX9uphs0Tp2aFdrWm2zF2bOD6BPc01eNYHaoT7Snmc49IobyRMYEAf7CHMb8E/dhcZJLo2898B3+gwkPqsVoc0doiLGsl68Zbo00XFeE6sB7wY4gCVvB8PDJnJC575saRofJBAV7X8DOIkRHvZgFcyONP+Y26av4X6cFE++rHhcW6LwuoP+9UdI7JFrnHWvFJYC0w8CDdzaIOL85NlbxrU/PLFUVyBBmtWuXFXuklQZfeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZaHpICN7hR90rsMs3w9PFjYdmq5GcQsALrg0TyR7NWo=;
- b=GHodMxhch5ZcsaHiaLne7fLJYjVCJkRLsWkX34Yh67gEnD2tfUl9XkhR0jYWTAMK6WwibtLX2qFADyqVIB0iNMA7ipCIyClouuYqcmFTMPbT8BhqDDa2pcAf72CgXqaxIusrxFnQBMHQwzMrA0F4PEsTdyL8Ht5GnuvO/IQqfAmAxfqS9v98YEcAzZGT4aTj2DzUNstSnKtKR3O1vaWFN69tMTxySf4iLulr/z5YdUEIwHGqtvD5MrXo97+EKcsycbYMNlNZ8c+o+JsYD6RIpUPUI2k+BV8UDHW05Bjo0vgzKpCTwwHnc3FKD08kXIZyj+96KTB7SsMOEEjSUREV4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
- by CO1PR11MB4978.namprd11.prod.outlook.com (2603:10b6:303:91::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.28; Mon, 30 Oct
- 2023 09:03:59 +0000
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::7911:8ae6:fc73:1097]) by BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::7911:8ae6:fc73:1097%6]) with mapi id 15.20.6907.032; Mon, 30 Oct 2023
- 09:03:59 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: ivecera <ivecera@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: Eric Dumazet <edumazet@google.com>, "dacampbe@redhat.com"
-	<dacampbe@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>, open list
-	<linux-kernel@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "moderated list:INTEL ETHERNET DRIVERS"
-	<intel-wired-lan@lists.osuosl.org>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next 3/6] i40e: Use DECLARE_BITMAP
- for flags and hw_features fields in i40e_pf
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next 3/6] i40e: Use DECLARE_BITMAP
- for flags and hw_features fields in i40e_pf
-Thread-Index: AQHaA5P3bOgubmWSP0ePBzjqfldr77BiF+sw
-Date: Mon, 30 Oct 2023 09:03:59 +0000
-Message-ID: <BL0PR11MB312265F889807ED756CB63A4BDA1A@BL0PR11MB3122.namprd11.prod.outlook.com>
-References: <20231020193746.2274379-1-ivecera@redhat.com>
- <20231020193746.2274379-3-ivecera@redhat.com>
-In-Reply-To: <20231020193746.2274379-3-ivecera@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|CO1PR11MB4978:EE_
-x-ms-office365-filtering-correlation-id: 9c1c4a66-1121-439e-3af6-08dbd927279f
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: B9IN+tcQLAejc0BTloqTEg6SxaypNuPpH3ky4XAkCLXApX6otlRAsXjxyTsWJ+m/cxISIFqceJ50cLpwm6rXLebl4sQ+wRKvH+h6j6FwbidkEuv5J/NruC4iy3kWWwrSu04kH0eN0Y//4g2qu7XgqBbYSSkdcFKX8n7D+ZotvfMyaLWMptL0ZpCzShwbVX003knY+WwoYwoOwM2PDGHgIoPxG/CfFk/Pnr3eCS/nLGknQFpB4ya0VxoATgO4sYIcrUAPP7fv55QvG7ZVhFpSs1V5M0+JQXcrYT3OjaOxQ/SZnHUBjcHOvbDQ6VjTv1fbzmMb6RHFWsVr/tGQezIQ7cFh03v7GQ7Y+vy7CYE7e9781V1Wm76NEuLrB51k8/bkoyAsZb0bxr2pEMs8bVUSahn0yjaWsUJ06pA1jsMmBcQIeGvw8KFSwSHpf59aycZoMaZfOD6UEYC+bf8+1lPbH9eb2E7qEMQVESpmePhi8E2Kf8MBy0idr2MkwGVi02rUlOwCY5fq2cQY/5WMGdhkq/i2bDvb03825mFZDgdMLTKC0FIJKIPDbIxu8qVzciF1wcPNqrjQ8zjB5uX9ziV0HiDtOVvdN/Xg4NnSd2E3uuI7mcgy9xIKdK8QVE5MRCYZ
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(376002)(366004)(136003)(346002)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(64756008)(6506007)(7696005)(53546011)(71200400001)(9686003)(478600001)(83380400001)(26005)(2906002)(5660300002)(7416002)(66946007)(41300700001)(54906003)(66556008)(66446008)(66476007)(76116006)(52536014)(110136005)(4326008)(8936002)(8676002)(316002)(38070700009)(86362001)(33656002)(38100700002)(122000001)(82960400001)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TBjI9xNd85nQAMvEjM7fgqUTdEDuiUgLoYOFrORaoC4vpEJ+8fenVugNoD/+?=
- =?us-ascii?Q?xC6d6phfM4/JiOEKXLypxhA8VlGhHKyK/4DefD+jlTrXnhuYfbp6tPco/JLj?=
- =?us-ascii?Q?f643Jl2o7ZVtjzbzB4mMm9JMupyoyJzM+8xB4vGGavVt97lGBIwOp/vbDj9l?=
- =?us-ascii?Q?manKatChZltPvjFj/rRgXDYxyzrT+JIdY8JgpGwuoRplVZfG5xmaZCpJojlY?=
- =?us-ascii?Q?3W/kR4/c8VjbRuGISKRv7ne024L5UJi7VLkSv6L+WFmV1oJfNVquJXbtjC/i?=
- =?us-ascii?Q?O0/vs232EUOjhGS+cxw1uDJNwj8qQvfHqTyHw+uZwl5yk3CkAYUNzj3xNUEP?=
- =?us-ascii?Q?ZmwmcUkt0yUb6uvSiNUGr7v9Pgjr3HhodbQjxwQg0yx97jd+UfbXoH7nISlA?=
- =?us-ascii?Q?WRvlM/G+dn6NC8bK3v7PZ00ZeoU5SkQ1qVMnPSjfT/5mH261yu2DfabmrwV4?=
- =?us-ascii?Q?fM9ByRlAUqaXybW5Ht3Y015EFpG1iq2qPXr2Senxr5Fx3THUzBctG0eHTPUa?=
- =?us-ascii?Q?QzDzvXBRbcE4WADmiDom9AmZB1plx17IWH/KGc6Xe4Hy6IIPKVllE6rihi8f?=
- =?us-ascii?Q?4tcFx9bhxTwbm0PLKcA1YRfJRkKVwsTDE20pvMe9wLOH6/JUGsM3ILlyaa2j?=
- =?us-ascii?Q?S97jsqO+Qk7hS3p41bRjkEXRcyyGIFCYQRhaSFC/u4QSRR1XQHi3pVLuQsum?=
- =?us-ascii?Q?a35GVPSCGL2MsmJiz9qzWerGLLB96VIfQEbu/Ztdg+RJr+C+t8hMF4EamiDx?=
- =?us-ascii?Q?hppiWs8iQuewe2OLnq08tMBQJNgv5H238Wi8XJBnIzrXGTMkKBHsZEyPPshf?=
- =?us-ascii?Q?EgytVDxaFRT6ksZ544ZHC6KdcNLEXfm6qV5h9Bow5GsLVbONrMb7QaViQth/?=
- =?us-ascii?Q?HouwglvCbHmeyZYBkEXlYDtSFHthwlMRElzctHARprt9sLGQOcAnXYszvp4l?=
- =?us-ascii?Q?Rdgr1COf8uF5NSJSoGvRwUt7NNM7F95QGzlx1UO1BzZit82+dyc2FTGyNVnc?=
- =?us-ascii?Q?BnBpBwYzua4nnOUjjKnj70gLpcOGY7cOPWW3Y++hc6HHBbA61ofHGSZN/mot?=
- =?us-ascii?Q?UzjnaghEMXEy6oCx406i9DeIBoXrxr+aPq/GRDERMKh2xDdmVzmMMTwm4SaV?=
- =?us-ascii?Q?qbArmnWKYjuratiF1IdiZCKad3HuVhJ68e3oRPnVVA73x/3MVA5BzwiekUFu?=
- =?us-ascii?Q?+tigiB0RaKBv7HbXc3WS4fzlyUQ0WI988Rxn8vJOIA2FAFnxdRL2F4YBaOPp?=
- =?us-ascii?Q?3SSwhkYRc4NYAbHDlKV26LvyDQYHI6IG5jKwPA73ai0KVBvBRiocK2+SS1RO?=
- =?us-ascii?Q?Z+16UX3SW4NRxvVqNl6D3hov7PRGZaZzPja+FvC28tkksxVsBiOYTepicvmd?=
- =?us-ascii?Q?OEmKW7IGL7hKuAREbHZT1IzVCAbDhyxiPbfx5DXQZ/BEMtJA4zm7oR7el4WU?=
- =?us-ascii?Q?Knkz4C7U1bXO9iqgfGdo+4xHzi7ZNQotK3XV5FNpvcl0qW2v12wKcd11azcB?=
- =?us-ascii?Q?/+GF5Tc9Rfaz1ZDxK3NqDmWKa823psk6F6HGL5K7xk8YNwNvPnR0ifWHnHzz?=
- =?us-ascii?Q?hlGZ+xSUhb//GbKjABPC2GbmZZA6BX2Y1WPMhEWGM9RtezaW9dF/0LXf3vEc?=
- =?us-ascii?Q?hg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28FD96AD9
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 09:11:57 +0000 (UTC)
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 820E9B6
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 02:11:52 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-53e04b17132so6830562a12.0
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 02:11:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1698657111; x=1699261911; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=68F4Nugtl6JmNyuxi5kC0lowONV3iMbK9eM0e7VxFDE=;
+        b=ME+oxpv56vEn1NDi3glLaaZ2NB/d5Yy8M9xlKUPMR+cvcuFmmZnxPV3efnCH8Eq59d
+         +/jePruzVNCAdpjNU5BraIq4BchxVzmfZXN6OpZ7ECjipxpP/4w2rrZI+J0Ejbp/Con4
+         ZcuMNqijY9BcR8oadJSjs6dvim2LvF+7j9CX3+hik/gkp0dJGWEKbeTPjiq7wbSjYhkX
+         v0fmhotPj7FFrY8udi59CarRMvfHJAawoz/5exJ/R+kRdRTfPsn3k7UmnMCMteL9B5wb
+         nCOWdS2oCg65UEIneUpb+DbNc4HL+WYIV6VRp6Cir8lF40/+Bwms5JPg74RvY+a8FbiP
+         CpKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698657111; x=1699261911;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=68F4Nugtl6JmNyuxi5kC0lowONV3iMbK9eM0e7VxFDE=;
+        b=Tgk2kq4zzhg9F4+YGKrc9Cq5lGNNku1vvWkVwFJLOAt1XUY/1jPbiol0JfDsEoUeFr
+         A2DSZ9pWQNTcpKoZO6hAB1iMjK6sAXFBEMfUToN4OmstjUXg04V7EOxHDJ2nuXwwz78u
+         suEH3j3txk+Iruq4d18/voKI6St+D3ahLZrP3HUGFQQdXVuw0i20MMrNGGXCpv+2xdEg
+         b02xsXXqgFqmXEYshY5ZQ1HR15GfImVX+S0oWQVqCUoH+EZ3HebKerJ6tardaKmdfjr7
+         Xds8E/nhRY0smEh6+GSTWqVMUYlH/+1u1zbmMPjXhE/9vdUeEabGcUcQphBKto6/oe8+
+         p/gg==
+X-Gm-Message-State: AOJu0Yy9f4dA14eifm/dq52PTG7dKftagkEMVb5PDKZ8AthRr+ouclYH
+	q57lqzeLDlMhRWCqhdYBxU124w==
+X-Google-Smtp-Source: AGHT+IGgMDyiGE1uiui2ycx+5YGKiTLigU2lmyJm3sD7BkIU7BEPVbulx6Ppd2BUsQxuxgAfTWxcsg==
+X-Received: by 2002:a50:9ec2:0:b0:53e:e6eb:c838 with SMTP id a60-20020a509ec2000000b0053ee6ebc838mr7136522edf.8.1698657111004;
+        Mon, 30 Oct 2023 02:11:51 -0700 (PDT)
+Received: from cloudflare.com (79.184.209.104.ipv4.supernova.orange.pl. [79.184.209.104])
+        by smtp.gmail.com with ESMTPSA id fd10-20020a056402388a00b0053e5a1bf77dsm5747877edb.88.2023.10.30.02.11.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 02:11:49 -0700 (PDT)
+References: <20231028100552.2444158-1-liujian56@huawei.com>
+ <20231028100552.2444158-8-liujian56@huawei.com>
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Liu Jian <liujian56@huawei.com>
+Cc: john.fastabend@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v7 7/7] selftests/bpf: add tests for verdict
+ skmsg to closed socket
+Date: Mon, 30 Oct 2023 10:04:35 +0100
+In-reply-to: <20231028100552.2444158-8-liujian56@huawei.com>
+Message-ID: <87fs1s1nl2.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c1c4a66-1121-439e-3af6-08dbd927279f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Oct 2023 09:03:59.4506
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IzyvYA+LqWSoQavTvEJJh1ptA5K+SXXssVX7Dj8sS5ljGxoSJs/MorEhdjT6OMDQatqFmNkIzTC8fLQY/CHoqzJHUTYG7ZpoNSO2SnxqrTQGeFGGt6WdZCCE6/3S66m5
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4978
-X-OriginatorOrg: intel.com
+Content-Type: text/plain
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of I=
-van Vecera
-> Sent: Saturday, October 21, 2023 1:08 AM
-> To: netdev@vger.kernel.org
-> Cc: Eric Dumazet <edumazet@google.com>; dacampbe@redhat.com; Richard Coch=
-ran <richardcochran@gmail.com>; Brandeburg, Jesse <jesse.brandeburg@intel.c=
-om>; open list <linux-kernel@vger.kernel.org>; Nguyen, Anthony L <anthony.l=
-.nguyen@intel.com>; moderated list:INTEL ETHERNET DRIVERS <intel-wired-lan@=
-lists.osuosl.org>; Keller, Jacob E <jacob.e.keller@intel.com>; Jakub Kicins=
-ki <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; David S. Miller <dav=
-em@davemloft.net>
-> Subject: [Intel-wired-lan] [PATCH iwl-next 3/6] i40e: Use DECLARE_BITMAP =
-for flags and hw_features fields in i40e_pf
+On Sat, Oct 28, 2023 at 06:05 PM +08, Liu Jian wrote:
+> Add four tests for verdict skmsg to closed socket in sockmap_basic.c.
 >
-> Convert flags and hw_features fields from i40e_pf from u32 to
-> bitmaps and their usage to use bit access functions.
->
-> Changes:
-> - Convert "pf_ptr->(flags|hw_features) & FL" to "test_bit(FL, ...)"
-> - Convert "pf_ptr->(flags|hw_features) |=3D FL" to "set_bit(FL, ...)"
-> - Convert "pf_ptr->(flags|hw_features) &=3D ~FL" to "clear_bit(FL, ...)"
-> - Rename flag field to bitno in i40e_priv_flags and adjust ethtool
->   callbacks to work with flags bitmap
-> - Rename flag names where '_ENABLED'->'_ENA' and '_DISABLED'->'_DIS'
->   like in ice driver
->
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
 > ---
-> drivers/net/ethernet/intel/i40e/i40e.h        | 165 ++---
-> drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |  24 +-
->  .../net/ethernet/intel/i40e/i40e_debugfs.c    |   4 +-
->  .../net/ethernet/intel/i40e/i40e_ethtool.c    | 209 ++++---
->  drivers/net/ethernet/intel/i40e/i40e_main.c   | 587 +++++++++---------
->  drivers/net/ethernet/intel/i40e/i40e_ptp.c    |  26 +-
->  drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  20 +-
->  drivers/net/ethernet/intel/i40e/i40e_txrx.h   |   4 +-
->  .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  20 +-
->  9 files changed, 544 insertions(+), 515 deletions(-)
+>  .../selftests/bpf/prog_tests/sockmap_basic.c  | 42 +++++++++++++++----
+>  1 file changed, 34 insertions(+), 8 deletions(-)
 >
+> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+> index 75107762a86e..4d49129cdd6b 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+[...]
 
+> @@ -651,15 +669,23 @@ void test_sockmap_basic(void)
+>  	if (test__start_subtest("sockmap skb_verdict msg_f_peek"))
+>  		test_sockmap_skb_verdict_peek();
+>  	if (test__start_subtest("sockmap msg_verdict"))
+> -		test_sockmap_msg_verdict(false, false, false);
+> +		test_sockmap_msg_verdict(false, false, false, false);
+>  	if (test__start_subtest("sockmap msg_verdict ingress"))
+> -		test_sockmap_msg_verdict(true, false, false);
+> +		test_sockmap_msg_verdict(true, false, false, false);
+>  	if (test__start_subtest("sockmap msg_verdict permanent"))
+> -		test_sockmap_msg_verdict(false, true, false);
+> +		test_sockmap_msg_verdict(false, true, false, false);
+>  	if (test__start_subtest("sockmap msg_verdict ingress permanent"))
+> -		test_sockmap_msg_verdict(true, true, false);
+> +		test_sockmap_msg_verdict(true, true, false, false);
+>  	if (test__start_subtest("sockmap msg_verdict permanent self"))
+> -		test_sockmap_msg_verdict(false, true, true);
+> +		test_sockmap_msg_verdict(false, true, true, false);
+>  	if (test__start_subtest("sockmap msg_verdict ingress permanent self"))
+> -		test_sockmap_msg_verdict(true, true, true);
+> +		test_sockmap_msg_verdict(true, true, true, false);
+> +	if (test__start_subtest("sockmap msg_verdict permanent shutdown"))
+> +		test_sockmap_msg_verdict(false, true, false, true);
+> +	if (test__start_subtest("sockmap msg_verdict ingress permanent shutdown"))
+> +		test_sockmap_msg_verdict(true, true, false, true);
+> +	if (test__start_subtest("sockmap msg_verdict shutdown"))
+> +		test_sockmap_msg_verdict(false, false, false, true);
+> +	if (test__start_subtest("sockmap msg_verdict ingress shutdown"))
+> +		test_sockmap_msg_verdict(true, false, false, true);
+>  }
+
+I appreciate the split up of test changes into commits. Thanks.
+
+As you see, the args for test_sockmap_msg_verdict became quite cryptic.
+I think having dedicated aliases for 'true' would make it more readable:
+
+        const bool INGRESS = true;
+        const bool PERMANENT = true;
+        const bool TO_SELF = true;
+        const bool TARGET_SHUTDOWN = true;
+
+Then invocations as:
+
+        test_sockmap_msg_verdict(true, false, false, true);
+
+become:
+
+        test_sockmap_msg_verdict(INGRESS, !PERMANENT, !TO_SELF, TARGET_SHUTDOWN);
 
