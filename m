@@ -1,196 +1,186 @@
-Return-Path: <netdev+bounces-45184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13C377DB4A0
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 08:55:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 071DC7DB4DC
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 09:11:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFE1F1C208A5
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 07:55:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BABD1F2194E
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 08:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A05CA61;
-	Mon, 30 Oct 2023 07:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CB4D264;
+	Mon, 30 Oct 2023 08:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="irZ/4Y2d"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lnaAqkSN"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD3D6AC0
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 07:55:52 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE7CEC2
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 00:55:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698652549;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5t9eU8J5yxO7BvU8JT+OpUytvz6S9LcChDCUUgV2Oz8=;
-	b=irZ/4Y2dQSaBsBuzaueaPk+OvJb2xtduDvBqGfzbuwamlcmVl7fVT2F7okjTkVdvTutUqZ
-	FpxQw9hwVQqid9ASePBC9fvc2AlrujBVMVWfwzKVUh7w1VOsp4HEC/jLf2eCKGD9ZjyFVk
-	PcF8R7Rcp2vaRC+hNMbKnfiULEyOOqM=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-HI4T-qURNkmJNqNdorOGTA-1; Mon, 30 Oct 2023 03:55:47 -0400
-X-MC-Unique: HI4T-qURNkmJNqNdorOGTA-1
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-6bf2b098e43so2589353b3a.3
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 00:55:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698652546; x=1699257346;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5t9eU8J5yxO7BvU8JT+OpUytvz6S9LcChDCUUgV2Oz8=;
-        b=CnaWrqeRIYa63QhKoW36YS8NvOI7yRAOtCJXU6a5Xg346Iji+jD4Y0fOm+5fP5K/Et
-         r6U5e/CSqMXoB0t0OpwN7GSdWClFvN8S3xcWQuYxqPL9kjnHbfxPE3UtiRHPAUAciaXo
-         quBWRHtEKxw81RYMoCAGX/tFg5i5ULiZVc3nBjAOqTnCxbhq2Pr+by6cTZLmkCgpL/U1
-         1u7HxKGNyBXZx6Xt1UD/lPkWO2FQ8ScGLV1jMJkhTT4D7klB4EVCvk9mjUX88u2rtjfd
-         Fp2jLglBEQK9l3gPtPMgD3zlWIycACujADB1A3feyXxoz2dX/Nx+8USq+DoBFRyJ7Hge
-         JEng==
-X-Gm-Message-State: AOJu0Yw2Gkcv/6YfhW67NQs/5u4ncNCJGtFxoGTkx1qrfbbr/Sped+Ac
-	WQLcgYxhOYT324a+Yl+/1uYXUCpcJxlFOhOMJkPDtaGX3j13LT0XTF6952Y6zSQh04ho2fNH9HI
-	zpMPsq1gUrUeJ38jM
-X-Received: by 2002:a05:6a20:3d0b:b0:16b:79c2:7d6e with SMTP id y11-20020a056a203d0b00b0016b79c27d6emr8487042pzi.30.1698652546280;
-        Mon, 30 Oct 2023 00:55:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFK1Rxl23x3SQRnaFLCEUYXHyALve0OUwu9/SycOUu0i0w32D2cvv1z7vkHbvguD9UjlU6/wA==
-X-Received: by 2002:a05:6a20:3d0b:b0:16b:79c2:7d6e with SMTP id y11-20020a056a203d0b00b0016b79c27d6emr8487037pzi.30.1698652545956;
-        Mon, 30 Oct 2023 00:55:45 -0700 (PDT)
-Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
-        by smtp.gmail.com with ESMTPSA id be3-20020a170902aa0300b001c9e53b721csm3016067plb.261.2023.10.30.00.55.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 00:55:45 -0700 (PDT)
-From: Shigeru Yoshida <syoshida@redhat.com>
-To: jmaloy@redhat.com,
-	ying.xue@windriver.com
-Cc: netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com,
-	syzbot+9425c47dccbcb4c17d51@syzkaller.appspotmail.com
-Subject: [PATCH net v3] tipc: Change nla_policy for bearer-related names to NLA_NUL_STRING
-Date: Mon, 30 Oct 2023 16:55:40 +0900
-Message-ID: <20231030075540.3784537-1-syoshida@redhat.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9443D71
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 08:11:13 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDCBEA2
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 01:11:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698653472; x=1730189472;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JrV9p031XU2lw+OQUeQ5j0v+gUOuPTHmbTNJ1hS4QzU=;
+  b=lnaAqkSNKsnF5wieDKiXsoqoi3uOVwU0ld5WV7r6MXWZkaEJJS+zXhRI
+   +U+QKf3nSn5xMxpa9336NfmX2b4cTIARx0gSuz7VW+pNCMqP5eudfDVsN
+   tJ4u4znM1POLsNyxhyHtiNJW4dm6LP3u6KIx6zYEnH50jz0nGRSCmw3MN
+   M3+uFilR3o9UJOTmVEdP3Llm6Nxe55vhJipvIbwnF9ABjENjZ0XzlRmwW
+   16hsF1rh1XIqS9iKjZzqGgjmb0jw4Fr2vJ2lcb8/sO2UPx2M+uwW1S0MF
+   mb6nC6yLAEpzzDsE7pdQaiGWa+itNjtHSrwF3BD15VaxULEwkxc4GlSYo
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10878"; a="452289067"
+X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
+   d="scan'208";a="452289067"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 01:11:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10878"; a="825984915"
+X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
+   d="scan'208";a="825984915"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Oct 2023 01:11:12 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 30 Oct 2023 01:11:11 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 30 Oct 2023 01:11:11 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 30 Oct 2023 01:11:11 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OxQvMVg50VCmoncGUXPXMGkdAMtwIuzSL5GSVVvDRAXdE7mSwqku/ZtYEDdTqRwrPzGvSqBz/WgCjwpAMkBPvzsxwpnzsfR9dbNEp9cAktjMu1i0rkiK9PhzzsSgjHgxunWg6AvC/01IIfMC1TxfQx+iGbAnLTCIBLHZCfXzf0TIMjPNdpT/IlFjmO6a0Lmlsl03OLF6Sxd6RaZpWSgnNp968gAzJQnAQVtaOrW0c1qHUuu4Fhu7SkDDFYnirBamgHHBgeqnhc9PyHXQxVHQlPYGKnL/F8dj13hx7ENzGJhBK/sFIQJsDo69Ifx2zOJTvzIbEqmR875/9KusqlU5cg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VDmmzTl9ryodxnJ9ZagFEQwccboyBsUVeXsMze/1JLY=;
+ b=DeTi9vlY4d3wohl33q6mE+a6plaJxcY3TNfiQb8EYvJ5QlUzn93Epkaazvd+XIYX0axuQ6HuehSvhkvuFohwvzEt85YEpL5av/khBKao+yZSI9RMJMRJACivxBqionspSKBkZKuplDrpiQ6rasrLCPsgsiDGLDU1/Z88cH6pYp1qxPjQjJX19ZHDHx9kPzwMKDyQp1ejaICAIwMpqlOlRoMeGMATx1kXcDi58HCJrG7mZ0q8/dfOahdRjWatq7IISk3dt6Bdk8sn9ZP90cOsV8cCW3RLzxjvkp+k6ChWSsz3a0a06Q0s26EBbu1gtgaeepWT0y8L7WejxKyAVTB0lw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
+ by MW4PR11MB6933.namprd11.prod.outlook.com (2603:10b6:303:22a::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.22; Mon, 30 Oct
+ 2023 08:11:04 +0000
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::d5af:4ec3:b590:6cc]) by PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::d5af:4ec3:b590:6cc%4]) with mapi id 15.20.6933.028; Mon, 30 Oct 2023
+ 08:11:04 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: "Ertman, David M" <david.m.ertman@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2] ice: Fix SRIOV LAG disable
+ on non-compliant aggreagate
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2] ice: Fix SRIOV LAG disable
+ on non-compliant aggreagate
+Thread-Index: AQHZ+5+CfokJv8s46k2hlT7/LCC1NrBiGezg
+Date: Mon, 30 Oct 2023 08:11:04 +0000
+Message-ID: <PH0PR11MB5013B1AC9BEEC3D2FAB6454096A1A@PH0PR11MB5013.namprd11.prod.outlook.com>
+References: <20231010173215.1502053-1-david.m.ertman@intel.com>
+In-Reply-To: <20231010173215.1502053-1-david.m.ertman@intel.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|MW4PR11MB6933:EE_
+x-ms-office365-filtering-correlation-id: e255d6c4-ec81-4be0-8b17-08dbd91fc304
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZEG8cN1B1RK5J7NDrTzH8RgFzdpjHMFloNwcmoh3duA6aaXOypJoNbkaXEe4FuihvedSjvlcTqE2jOgEwnVwuULKn5YQyeNUW9o3K1Vritd+ZFrQpZdZfb7yrcMnvsXWgjSgRCMtMVV2kMSizoAynWjqCWFABjVNzB4fcVH1h1E1DTLYNtWRCdWiUMBn8Qmj4OZduGW34RBy6SV3sNX6pAzy9zpzPml4VSrHlX0Qx2WHUOldMzyM49HsFdmyRzo1vhu3DcjmvWRLctbG34vuvMezRPJnvGCIW6XRspVBL8exPMPiwaT2rW5k1sz7//jwwQFLPeVV97xGUvyPeJwlmBTUanQlApU2YhCsm6vJ3wBieigcXuPXL9pNr/ZmJXhn2UuKD5C3dQWLgke/TJhKy7rY7bi/IvWmHLVFX4yNPdBatK5eOcyoRD+9akdTIH4ep9A/Rtpbrg0vHVauFHLv/RabCl3g0bPBWxBmYyvzgsAOpaY24tlsjcXkWW2E7F6qNWnKFSdc19Pc9Ab2Vb0x7McSWAKgp9ascPk5g5MMCHEYIb+EjAwyvu7M5IKrSx25ZA9u5jB6/ELFzlTSmhTBmDaYOA9IL+qGmRrSvXylxyDXVimn72mJFYlQ1cuJolcp
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(136003)(346002)(376002)(366004)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(33656002)(2906002)(86362001)(4744005)(38100700002)(83380400001)(55016003)(316002)(5660300002)(82960400001)(9686003)(122000001)(41300700001)(71200400001)(110136005)(66446008)(66476007)(64756008)(66556008)(66946007)(76116006)(53546011)(7696005)(6506007)(38070700009)(52536014)(26005)(4326008)(8676002)(478600001)(8936002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?cIF5AVWv3oWNh6kZW9tVLiw1HVk443SeVLyMBmoK2/5pYgLwuRAAHZOgEd31?=
+ =?us-ascii?Q?or2/xcEsxriNaHFZL5OC9tJPzqJHlasN7Pkjrc/GGG4+W5gUubk2V4Ww5wlo?=
+ =?us-ascii?Q?F8thFHP2pDyQm3bfw7bn+E7yRBPBwFuCFyTK+0gMW7221XQB7+6tAtfRzzFK?=
+ =?us-ascii?Q?v90e9sHYxgwEC4eGHWXtJjMW7qwUpMcOUe1+zV+EBkx22hCP0f0muHhfvzTT?=
+ =?us-ascii?Q?C9h7l3jaUxVur5/iANZWZWoHsYOH+SHI7ac2lxQzpvRx1LCvpC2BzutQQLCo?=
+ =?us-ascii?Q?AvE+lmkdlqJpAErGZVyitcMufxxaCijaQrhgiMW4VrmkYJ+T8LWw2ejTxeQQ?=
+ =?us-ascii?Q?AG3izBrGAYDoXdfTewR2DL5VBCe4/UplRJBrTBJ5dtvpH4qNnCAi9rJOWH7h?=
+ =?us-ascii?Q?rbP3edVL0hRqlRIgJm6zQiNug59b+qYP9ueVtsMab9fFuA+2GvV2xxcW9WX0?=
+ =?us-ascii?Q?fhbK3M8a7VOA4wZ5VQonHH8l6jV3CsF+NWJ+Lms2uWBFsuqs7udH6QuGCHiK?=
+ =?us-ascii?Q?FPgwte/wdnUEj+A1HgWmvSMXqth2WB6NpPRAHEGYV+dqEKDoGUCnUm21aajj?=
+ =?us-ascii?Q?6D6vKXzjWWTFYpL0uhZJ72ysdmUXvXw8wTXbETJEvSxoNb3p2Oz5ZXlCMaZW?=
+ =?us-ascii?Q?NOEJsFAsmRluvFQZZy2h3/PXKHUH4bMNWoBW5xOBISf4rDlE4hXU0A/piRtS?=
+ =?us-ascii?Q?eb+v/bf/t3Owj8yziOKzVOvqjXra2D35N2z/OkxNsnDxrXDKwUA7qWhzyUWi?=
+ =?us-ascii?Q?N1ZccWVAO6kRh4jPiYjhHeptZk10sz52kQ/W7FX5gXxcvrmClLJYZ5sh3ZHR?=
+ =?us-ascii?Q?H1vZB2EXtZ2/9dYpcWfpc5BYpKLfWk0bmkwTJv3M+O7HaLonO8HCWYT8Undb?=
+ =?us-ascii?Q?nK2LN8yQH/9ba5457l7C1pbgAvtRoJWbZGkIFHqK7W5XjGpJEi9sawXjU0ht?=
+ =?us-ascii?Q?O/wIwcIr3uzcJZSdmRg8iZQUzDRGzSsR4yPPTyqfRa8hSbiagfnWXZjMwUHg?=
+ =?us-ascii?Q?FuaThGcmGO8iLjkZvEpb7vjHWkycQXovKJLD2vxdaGPdfmvlyUz8SzApEcap?=
+ =?us-ascii?Q?vhcQqjrFltD36vMZp9EGxcPbfL7tuLS9u93obIuKVNrPumqQou5/itQwSZTl?=
+ =?us-ascii?Q?6UAJPz0QL1hVqONF5S3e/XkR8qIDud1RvCW6DuVdPwtSiYjJ/bqZMSRc9ww9?=
+ =?us-ascii?Q?ao76j8ga0e8mqhEhvS2hvt3XlBqdj09FvuyPGSVp83+NzfU6B3EboEUTwMsN?=
+ =?us-ascii?Q?74k6DCI1bXiBS24R9sR9DKBDOOtnIAt0EYp5+iXwPEku1O66OCXmXqIcy5/J?=
+ =?us-ascii?Q?j4SjBKJDedS93+s5KtAmx1VqjzSb898ocjlfyS4Mfldrzy9X76m+ccGqrV9n?=
+ =?us-ascii?Q?WM+2DGRX8u+Zp46hN3Gev8ATQBiHYR4+oIqjEfj/gDbdNN8jXg7PS2litkfQ?=
+ =?us-ascii?Q?JiBbKPdtWuxSYsvaF+IrTJFPR0mtM7zxsEAO8Wvqm9YLqpQ0QQrqChyYr3va?=
+ =?us-ascii?Q?mrzbBnd8F/+2+gjmEiysethfs774JbWZ9fReBZEIGZnPTo9pq626r9ggUCPu?=
+ =?us-ascii?Q?pi4xxKgWdTD7J+sNzqODajULy4oVPTlZoEcncgyuXJG/3eHfzvCWd7JDglsn?=
+ =?us-ascii?Q?mw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e255d6c4-ec81-4be0-8b17-08dbd91fc304
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Oct 2023 08:11:04.1634
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nykuQzAbQSN7Din/XaiYd9i2un9HPUUB6816My60R6IW8Y3D8dNlKKtSONUoYHo0rF86C+aG0Rijy6f4WsFCDorqvhIOA6efQwZ4sFGaG3c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6933
+X-OriginatorOrg: intel.com
 
-syzbot reported the following uninit-value access issue [1]:
-
-=====================================================
-BUG: KMSAN: uninit-value in strlen lib/string.c:418 [inline]
-BUG: KMSAN: uninit-value in strstr+0xb8/0x2f0 lib/string.c:756
- strlen lib/string.c:418 [inline]
- strstr+0xb8/0x2f0 lib/string.c:756
- tipc_nl_node_reset_link_stats+0x3ea/0xb50 net/tipc/node.c:2595
- genl_family_rcv_msg_doit net/netlink/genetlink.c:971 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
- genl_rcv_msg+0x11ec/0x1290 net/netlink/genetlink.c:1066
- netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2545
- genl_rcv+0x40/0x60 net/netlink/genetlink.c:1075
- netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- netlink_unicast+0xf47/0x1250 net/netlink/af_netlink.c:1368
- netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
- sock_sendmsg_nosec net/socket.c:730 [inline]
- sock_sendmsg net/socket.c:753 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
- __sys_sendmsg net/socket.c:2624 [inline]
- __do_sys_sendmsg net/socket.c:2633 [inline]
- __se_sys_sendmsg net/socket.c:2631 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Uninit was created at:
- slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
- slab_alloc_node mm/slub.c:3478 [inline]
- kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3523
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:559
- __alloc_skb+0x318/0x740 net/core/skbuff.c:650
- alloc_skb include/linux/skbuff.h:1286 [inline]
- netlink_alloc_large_skb net/netlink/af_netlink.c:1214 [inline]
- netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1885
- sock_sendmsg_nosec net/socket.c:730 [inline]
- sock_sendmsg net/socket.c:753 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
- __sys_sendmsg net/socket.c:2624 [inline]
- __do_sys_sendmsg net/socket.c:2633 [inline]
- __se_sys_sendmsg net/socket.c:2631 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-TIPC bearer-related names including link names must be null-terminated
-strings. If a link name which is not null-terminated is passed through
-netlink, strstr() and similar functions can cause buffer overrun. This
-causes the above issue.
-
-This patch changes the nla_policy for bearer-related names from NLA_STRING
-to NLA_NUL_STRING. This resolves the issue by ensuring that only
-null-terminated strings are accepted as bearer-related names.
-
-syzbot reported similar uninit-value issue related to bearer names [2]. The
-root cause of this issue is that a non-null-terminated bearer name was
-passed. This patch also resolved this issue.
-
-Fixes: 7be57fc69184 ("tipc: add link get/dump to new netlink api")
-Fixes: 0655f6a8635b ("tipc: add bearer disable/enable to new netlink api")
-Reported-and-tested-by: syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=5138ca807af9d2b42574 [1]
-Reported-and-tested-by: syzbot+9425c47dccbcb4c17d51@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=9425c47dccbcb4c17d51 [2]
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
----
-v2->v3:
-- Change the title
-- Change the nla_policy for bearer-related names instead of using nla_strscpy()
-- Resolve bearer-name related issue too
-https://lore.kernel.org/all/20231020163415.2445440-1-syoshida@redhat.com/
-
-v1->v2:
-- Use nla_strscpy()
-- Fix similar bugs in other functions other than syzbot reported
-https://lore.kernel.org/all/20230924060325.3779150-1-syoshida@redhat.com/
----
- net/tipc/netlink.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
-index e8fd257c0e68..1a9a5bdaccf4 100644
---- a/net/tipc/netlink.c
-+++ b/net/tipc/netlink.c
-@@ -88,7 +88,7 @@ const struct nla_policy tipc_nl_net_policy[TIPC_NLA_NET_MAX + 1] = {
- 
- const struct nla_policy tipc_nl_link_policy[TIPC_NLA_LINK_MAX + 1] = {
- 	[TIPC_NLA_LINK_UNSPEC]		= { .type = NLA_UNSPEC },
--	[TIPC_NLA_LINK_NAME]		= { .type = NLA_STRING,
-+	[TIPC_NLA_LINK_NAME]		= { .type = NLA_NUL_STRING,
- 					    .len = TIPC_MAX_LINK_NAME },
- 	[TIPC_NLA_LINK_MTU]		= { .type = NLA_U32 },
- 	[TIPC_NLA_LINK_BROADCAST]	= { .type = NLA_FLAG },
-@@ -125,7 +125,7 @@ const struct nla_policy tipc_nl_prop_policy[TIPC_NLA_PROP_MAX + 1] = {
- 
- const struct nla_policy tipc_nl_bearer_policy[TIPC_NLA_BEARER_MAX + 1]	= {
- 	[TIPC_NLA_BEARER_UNSPEC]	= { .type = NLA_UNSPEC },
--	[TIPC_NLA_BEARER_NAME]		= { .type = NLA_STRING,
-+	[TIPC_NLA_BEARER_NAME]		= { .type = NLA_NUL_STRING,
- 					    .len = TIPC_MAX_BEARER_NAME },
- 	[TIPC_NLA_BEARER_PROP]		= { .type = NLA_NESTED },
- 	[TIPC_NLA_BEARER_DOMAIN]	= { .type = NLA_U32 }
--- 
-2.41.0
-
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Dave Ertman
+> Sent: Tuesday, October 10, 2023 11:02 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org
+> Subject: [Intel-wired-lan] [PATCH iwl-next v2] ice: Fix SRIOV LAG disable=
+ on
+> non-compliant aggreagate
+>=20
+> If an attribute of an aggregate interface disqualifies it from supporting=
+ SRIOV,
+> the driver will unwind the SRIOV support.  Currently the driver is cleari=
+ng the
+> feature bit for all interfaces in the aggregate, but this is not allowing=
+ the
+> other interfaces to unwind successfully on driver unload.
+>=20
+> Only clear the feature bit for the interface that is currently unwinding.
+>=20
+> Fixes: bf65da2eb279 ("ice: enforce interface eligibility and add messagin=
+g for
+> SRIOV LAG")
+> Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_lag.c | 12 +++---------
+>  1 file changed, 3 insertions(+), 9 deletions(-)
+>=20
+Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
 
