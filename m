@@ -1,201 +1,221 @@
-Return-Path: <netdev+bounces-45261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEDDD7DBBFD
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:43:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD4D17DBC09
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:45:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08BE9281375
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:43:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43EF5B20BF5
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E225015EB0;
-	Mon, 30 Oct 2023 14:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85F517981;
+	Mon, 30 Oct 2023 14:45:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="KZb8szLv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sCGDb+RF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8902B67E
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 14:43:00 +0000 (UTC)
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2124.outbound.protection.outlook.com [40.107.247.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88DE0CC
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 07:42:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ic8I81jY22HmVDxbYwc/WqDxZc6PwlKhRZDWx6dp3DZSUva+DpWgdZBjs2ZLE08S4Jt3fRRbB8QUVFwN9FUC7+H8jjxNqG0S2tvSQKcK86+tHL63cVcYkftfSyoOGj1AWNmtAyn5N2WQSrVILk5ygOMV+tL81GNSB1yEGmW/NL5IGNKOIN8ycMNcOerm/byss8ofYRNNqVjBJIpY8nIJy9t1jDslZVgUsJgP5C/HVuBTi8yxbdkNbQTzYPi9iUx9ZNlrd9NCboDUXEjtSQriNSq42C+9k0O2y4z21TTuuQVjhDiixqXdRK6ou61tS7AZWzvuotl+jLQ68dkJIbokiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Blz5+dAGj8ly2hYXhVCum8+QnEGYbC1AG8Mh3Y4hJus=;
- b=ATeYGHd8EQ48nDoVGqpeRmucFS0YAQOi30qpPce5YgkMNXpluadMbBCbmn7ik+LrAC9quNrk0XNl3pk1ObA4shI0mZGd3AlnGee3oxit9kZhOVBl3sI6PAf4S7I8M+9oF8/0ySW/rVxdOt2oFTebgOJ1WwNKvnWTuX1urfOc8Z+1WTdg2DrrgKNxWxA+k/yiTxvxevbnRF6NcogpASwRLzPeQPGBO1ERxIIMfwTdv45synZIY7SenPW5p4eK6oahjTMo3uByqvspRkWmSDXOl5xE1pan1buTmkWosbTi4U2pIZwVi23Q4aJyzeR4dwmH8vZ90rYg8env5W+MaHPC9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
- dkim=pass header.d=voleatech.de; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Blz5+dAGj8ly2hYXhVCum8+QnEGYbC1AG8Mh3Y4hJus=;
- b=KZb8szLvg7jC0Y+Hamhz9u7GiIzCrrEbnWxAaaUxwPtUMD0ahRQc9WusVMCqkhmm12Yuqk1FXTir+47JwZdIv/9UFdSzhlMIPG0PHg1Qx7uDpzYF/dnwYw9hOcdk/PKHlaVy0i0JwvPiQ8dh3jnbKn1AZjgFcF/K23BSRlJLbj8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=voleatech.de;
-Received: from AM4PR05MB3506.eurprd05.prod.outlook.com (2603:10a6:205:3::26)
- by PAVPR05MB10158.eurprd05.prod.outlook.com (2603:10a6:102:2fb::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.22; Mon, 30 Oct
- 2023 14:42:56 +0000
-Received: from AM4PR05MB3506.eurprd05.prod.outlook.com
- ([fe80::3443:3414:3900:1cc]) by AM4PR05MB3506.eurprd05.prod.outlook.com
- ([fe80::3443:3414:3900:1cc%4]) with mapi id 15.20.6933.023; Mon, 30 Oct 2023
- 14:42:56 +0000
-Date: Mon, 30 Oct 2023 15:42:52 +0100
-From: Sven Auhagen <sven.auhagen@voleatech.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, thomas.petazzoni@bootlin.com, 
-	hawk@kernel.org, lorenzo@kernel.org, Paulo.DaSilva@kyberna.com, 
-	mcroce@linux.microsoft.com
-Subject: Re: [PATCH v2 1/2] net: page_pool: check page pool ethtool stats
-Message-ID: <r3kkmihygodvoo5pa6mvdtwqrzik3dh6su32lerkficokzt4s7@w23lpg2edugf>
-References: <abr3xq5eankrmzvyhjd5za6itfm5s7wpqwfy7lp3iuwsv33oi3@dx5eg6wmb2so>
- <20231002124650.7f01e1e6@kernel.org>
- <ZTiu0Itkhbb8OqS7@hera>
- <20231025075341.GA2950466@unreal>
- <j2viq53y3m7z6lj6tkzqxijtavtdfsdnenl2yt2pl4jkqupm6w@aautqnvca6w3>
- <20231030142355.GB5885@unreal>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231030142355.GB5885@unreal>
-X-ClientProxiedBy: FR3P281CA0012.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1d::15) To AM4PR05MB3506.eurprd05.prod.outlook.com
- (2603:10a6:205:3::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357B115EB0
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 14:45:40 +0000 (UTC)
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2F85C2
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 07:45:37 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-32ded3eb835so3441221f8f.0
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 07:45:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698677136; x=1699281936; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=szEFjozfjQlU1fIpP+2UlllDpbLkMMNkDieto4qaR9U=;
+        b=sCGDb+RFqYEkFpIx2qLRuwM+1wmDURPtAkLGN/nsHo01bFEcjhRcx6e/HHx04cp9s4
+         VIo2yZsvNpexa0wR3zrvBMQNv0vfGGAsAdup+ve68q5L34bjuvPSpV8gzNFPB77bEmEU
+         wJdvi0nM3RkGR32KqK1mzaHfuF6LolYZbyD0vk7rPiv/X2Dythj3a28w8K0s9pgvMzln
+         5wrPFnEeKYg0XvaJqIJGA0tRz3Ty4xJu/xQDeVBVO4A0s7i8Frk0t02CQ6JokJXDWwIb
+         G4EelTajE2iYk6tVjnKQSc52nnGWJ+405Dcy4oQ4Km0EFcMFm1BF0kRqPHCgAzV+WQS9
+         QaFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698677136; x=1699281936;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=szEFjozfjQlU1fIpP+2UlllDpbLkMMNkDieto4qaR9U=;
+        b=WzyXdshK19kf8NC7+f3mt+WqrY/nl2wvPynQGYfRS+4Ho7W6sdkDyzdnDwv35tsj+/
+         SfeIGwF3j7Nva0XEY/RpUqP0UQVyaX8A7/KQsN36mqIXreP5NvaeUaqh41qNqTqKeQog
+         TMroDj5D5D1PcJ9OvPNZFvz6cvFkxFbdjA+h/N7K2Um5gTOWkG43DBFfb4A17TL3yIzQ
+         5OEB07hfgDZgxcTL0jFAWCiOJrmWaUc+HwTLTR6N38ihsopoPcLL30Sa/9KGexrxSXk0
+         LwGfbdOVTkRsvYIdkwhg3N9kKIxq2Jdc9UP78dDdd8ep2VWMpzVfbNYSgeeslPGtFPXb
+         dXcg==
+X-Gm-Message-State: AOJu0Yyn8VeH13oPuHoN3DAuobPiD8Vlz9M21owH7rXdUoOsTQjNU9eU
+	4CplgMvGBDsxHIbyc3MHgoHDyQ==
+X-Google-Smtp-Source: AGHT+IHL7rufCPYYwtK8AHSway8F5cicDHnVBNyeHVBibhD4S35vO8lUcRk45zQ2iN3OloyKIi1Liw==
+X-Received: by 2002:adf:9c91:0:b0:32d:adda:e8ca with SMTP id d17-20020adf9c91000000b0032daddae8camr7350366wre.22.1698677136128;
+        Mon, 30 Oct 2023 07:45:36 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.218.126])
+        by smtp.gmail.com with ESMTPSA id w16-20020adfee50000000b0032db1d741a6sm8387969wro.99.2023.10.30.07.45.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Oct 2023 07:45:35 -0700 (PDT)
+Message-ID: <08ad71a0-daf1-4588-a97c-95f3ee5df84e@linaro.org>
+Date: Mon, 30 Oct 2023 15:45:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM4PR05MB3506:EE_|PAVPR05MB10158:EE_
-X-MS-Office365-Filtering-Correlation-Id: 307014b5-d0b5-4eae-c725-08dbd956811a
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	IgXQ3NuxH9CboL9jHeYNPCGvTALY1ClSWFccdhD3OD8+YisJV11Yr0n5v6cmOBngN5+T5ZGqXs0b8vd2S/pz9hu409ZEYjK6VzvS1GLevNaZxl1Af0KQKK/XfK9ttpQMv1lsamZLrjs1z2DSb8JKSs0YhDmGdEyXH2s7UeYF3HnH5xuwlfgPQOzp2pgF6+idexAjPH3Rrkl5S4iOcH/HBuLjsDLbYm8k/fDpv03r2VPX1Ym/7yJ0GjhdvA2/Ko+yKD+b63FPlWelGLlcw9UfCSSagdK5nuNP3RWl2M53Ajh0KBUxqnYZvKW4S0sn4mn1eTNZZwYErhpZMb9+BvKpzQPdHT0EuGFjUVGp0zlQwaQ5JhwJNmhKNVcVpHH5GmsA22hz3dueV1/Dy+vsgoa9bPvNaYEVeqy/yJwgYvQBfJCTlsT8nLr3gWq/MxUUoP7q4lEj46E0PfqywOaJdp3mp7zn1eJBcTr5KxKbnJ4wdVlgR6ogHHnE6t2YSuXkLFIx6brk5At1Oll6Gjmjob3Xkznd79uBKzM95FGFrj5nvjxD4Dfe3nEwGXa6Soe89bNT
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM4PR05MB3506.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(39830400003)(376002)(346002)(396003)(366004)(64100799003)(186009)(451199024)(1800799009)(478600001)(66946007)(316002)(4326008)(6916009)(41300700001)(54906003)(66476007)(44832011)(26005)(66556008)(8936002)(8676002)(2906002)(5660300002)(6486002)(86362001)(6506007)(6666004)(9686003)(6512007)(38100700002)(33716001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?8ET9TNN6mgDphbbxSIc47p989fmjq9LlIxYDQ2yCPw5jMCpiNcp/+Qe/d1lN?=
- =?us-ascii?Q?29VZIz1yitO2Mwf1Hv4rPYlXVnXpzIyrc2T9NhiHqpvqx6XmmROAVSclRRaZ?=
- =?us-ascii?Q?WEHVT0CZ9BUrC0HMq7+YhI6G8bSLlF+YC2Zga/m6Vfj0KST+oj7DnWjfLxs5?=
- =?us-ascii?Q?RoEVjAYhfilm7aCaHAWIaxEnMncvgr+f/QZkkzyWx4M/RsdeBpuYCVL0gobm?=
- =?us-ascii?Q?bOOL7woPv7DxmSnucaR0ciOVQaqIUYVKU1HpqHh35Bc+1jJoBov0DSCwQgPj?=
- =?us-ascii?Q?yok7Geo3cfWf1cWZrGwGLgJD59eGy3IVs8kEsWiQHpPjQIYcW5cxieHMejx3?=
- =?us-ascii?Q?uhukGUPt2KqxQL4hc1nij8+NSh3LNJrhGaiYFvLoercZlGucAPFJhnA+Mxpf?=
- =?us-ascii?Q?a0/jofa3H8RFy1jnNFhVwVuLY5iAoI1xsd14QqCxEYgweNAIZ2QVCpew5g2K?=
- =?us-ascii?Q?AZ9pKBmFYyDEznK0UxaALZiRMT2Z+FVkbDcCCMRkYPGzoMe5KpF4edPba7Yu?=
- =?us-ascii?Q?KxQu/WyPW7bO2VM6gHB6fvDYVA4sHJoPgO/zngdWDdH1ZYgMTGjt8hQ+n6L+?=
- =?us-ascii?Q?rjxX/Sm6lZoAeVzs/hWIkxKVAVtH8MH1g2YI4xuyORHPIzFFXbafueUG+KrH?=
- =?us-ascii?Q?iGmE8l2YHrLCdPURbkJ88wljYDV6EzTaFqdQNxoR23925EEfiinu0D78rAWb?=
- =?us-ascii?Q?AcsxeyT/vh8HX6ltJEV2jceoYBkO3r/K7CzhkoE83FeyjHwh0vkLEG1UiuLW?=
- =?us-ascii?Q?mCHCVlFqs4KNLM+qayRWUyhGStyPIZnnfHp//uDXMnEv7fE6lktJjxbN+uW3?=
- =?us-ascii?Q?27WzZw9K6DYDmf8yBa1x46RkM6QAMi7zkct53RBwHvyxwKfEXRrDqpc/Jyfn?=
- =?us-ascii?Q?l68BdoK2DxQ5FkXFH5ZNKmMEExz6zrIyfnYW3hdMqkt4/MPRCHiMfzA8qC3e?=
- =?us-ascii?Q?hxbBQgo2kebm/3UBSpDssRF60KBDRzXBMcboA2y+ymeAG5xiZb1hWgSm2AqF?=
- =?us-ascii?Q?mga/uSur1BaqZnbxpMIj04ZqoA67wTFbFZEI0UWU1XNuitGg2fBHQMGcQLMy?=
- =?us-ascii?Q?nf33rNwvCiWHNUc5VZBfSH/8lPVsL5czG6OG0tKM5CPXs1+yhMKu69cd9J+2?=
- =?us-ascii?Q?2mYG+DXJU7VfKigsp77/Xy6Ht0z4hmn5t2rSHSp9bi4sKJi60liK31GgELAG?=
- =?us-ascii?Q?TcQHv8cPOdipf1BUpHUQkWfd1mawwNppzgXIgOUTNhmgZnjfFHP2Q/cwJ82x?=
- =?us-ascii?Q?fpp/3U5Ea5XNrOvwr98gQ1fc7FqQ43MXGnIt6NS9ausN/BFw0ULfKlXS6011?=
- =?us-ascii?Q?12X8LYOdOv7LoxZM8e2Kg+H6QkKZhxlchoutFQ0/Dr81o5zSNGw6KzG8P4Pp?=
- =?us-ascii?Q?Zfyc2mwpC4cLRDx9t40+ccTDwM9xs3Ke2U2WvUCRUapRWZn3SRwL4EAAtKEB?=
- =?us-ascii?Q?58jHL/UI57g6acfztIObkQyqXQvqVsJT9GoGEkuOmuzLgGKTJBrKQGJLhRCA?=
- =?us-ascii?Q?tDpxSkuJGJeVM5RDDIRBBn8XFvgvHI1Sn3QEPs7FtHNBLdDTidgjqHzu0Ehe?=
- =?us-ascii?Q?tBZUYGoRyRRX+jqNqfkKsXCk2bxHBzNNd/P7zIuaYXIua4ELjNGJn38mH31/?=
- =?us-ascii?Q?vQ=3D=3D?=
-X-OriginatorOrg: voleatech.de
-X-MS-Exchange-CrossTenant-Network-Message-Id: 307014b5-d0b5-4eae-c725-08dbd956811a
-X-MS-Exchange-CrossTenant-AuthSource: AM4PR05MB3506.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 14:42:56.0812
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XGKkg0x5AwtRZHsVzQSNVdSGXYSEK0DQZfpyzsogpKIhAO8H26Mnfb9OwnZBvbU393j1ssihMo3zMMPxXZGs+3fLUZzZ3//Klu4OaFq7NUg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR05MB10158
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 9/9] dt-bindings: net: add Microchip's LAN865X
+ 10BASE-T1S MACPHY
+Content-Language: en-US
+To: Parthiban.Veerasooran@microchip.com
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ Horatiu.Vultur@microchip.com, Woojung.Huh@microchip.com,
+ Nicolas.Ferre@microchip.com, UNGLinuxDriver@microchip.com,
+ Thorsten.Kummermehr@microchip.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, corbet@lwn.net,
+ Steen.Hegelund@microchip.com, rdunlap@infradead.org, horms@kernel.org,
+ casper.casan@gmail.com, andrew@lunn.ch
+References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
+ <20231023154649.45931-10-Parthiban.Veerasooran@microchip.com>
+ <91764d23-eed2-48f9-97c5-ac6a44f48f2b@linaro.org>
+ <3ee02690-8912-47b4-a97e-6d364969c956@microchip.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <3ee02690-8912-47b4-a97e-6d364969c956@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 30, 2023 at 04:23:55PM +0200, Leon Romanovsky wrote:
-> On Mon, Oct 30, 2023 at 10:39:18AM +0100, Sven Auhagen wrote:
-> > On Wed, Oct 25, 2023 at 10:53:41AM +0300, Leon Romanovsky wrote:
-> > > On Wed, Oct 25, 2023 at 08:59:44AM +0300, Ilias Apalodimas wrote:
-> > > > Hi Jakub,
-> > > > 
-> > > > On Mon, Oct 02, 2023 at 12:46:50PM -0700, Jakub Kicinski wrote:
-> > > > > On Sun, 1 Oct 2023 13:41:15 +0200 Sven Auhagen wrote:
-> > > > > > If the page_pool variable is null while passing it to
-> > > > > > the page_pool_get_stats function we receive a kernel error.
-> > > > > >
-> > > > > > Check if the page_pool variable is at least valid.
-> > > > >
-> > > > > IMHO this seems insufficient, the driver still has to check if PP
-> > > > > was instantiated when the strings are queried. My weak preference
-> > > > > would be to stick to v1 and have the driver check all the conditions.
-> > > > > But if nobody else feels this way, it's fine :)
-> > > > 
-> > > > I don't disagree, but OTOH it would be sane for the API not to crash if
-> > > > something invalid is passed. 
-> > > 
-> > > In-kernel API assumes that in-kernel callers know how to use it.
-> > > 
-> > > > Maybe the best approach would be to keep the
-> > > > driver checks, which are saner, but add the page pool code as well with a
-> > > > printable error indicating a driver bug?
-> > > 
-> > > It is no different from adding extra checks to prevent drivers from random calls
-> > > with random parameters to well defined API.
-> > > 
-> > > Thanks
-> > 
-> > I can see the point for both arguments so I think we should definitely
-> > keep the driver check.
-> > 
-> > Is there a consensus on what to do on the page pool side?
-> > Do you want me to keep the additional page pool check to prevent
-> > a kernel crash?
+On 30/10/2023 14:16, Parthiban.Veerasooran@microchip.com wrote:
+> Hi Krzysztof,
 > 
-> I don't want to see bloat of checks in kernel API. They hide issues and
-> not prevent them.
-> 
-> > I mean the mvneta change was also implemented with this problem
-> > and it leads to serious side effects without an additional check.
-> > Especially if the page pool ethtool stats is implemented in more
-> > drivers in the future and the implementations are not 100% correct,
-> > it will crash the kernel.
-> 
-> Like many other driver mistakes.
-> 
-> Thanks
+> On 24/10/23 1:33 pm, Krzysztof Kozlowski wrote:
+>> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+>>
+>> On 23/10/2023 17:46, Parthiban Veerasooran wrote:
+>>> Add DT bindings for Microchip's LAN865X 10BASE-T1S MACPHY. The LAN8650/1
+>>> combines a Media Access Controller (MAC) and an Ethernet PHY to enable
+>>> 10BASE‑T1S networks. The Ethernet Media Access Controller (MAC) module
+>>> implements a 10 Mbps half duplex Ethernet MAC, compatible with the IEEE
+>>> 802.3 standard and a 10BASE-T1S physical layer transceiver integrated
+>>> into the LAN8650/1. The communication between the Host and the MAC-PHY is
+>>> specified in the OPEN Alliance 10BASE-T1x MACPHY Serial Interface (TC6).
+>>
+>> It does not look like you tested the bindings, at least after quick
+>> look. Please run `make dt_binding_check` (see
+>> Documentation/devicetree/bindings/writing-schema.rst for instructions).
+>> Maybe you need to update your dtschema and yamllint.
+> Sorry, somehow I missed doing this check. Will fix this in the next 
+> revision.
 
-Understood, thanks.
-I will resubmit with the initial patch that has only
-the driver fix in it.
+Please also build your driver.
 
-Best
-Sven
-
+>>
+>>>
+>>> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+>>> ---
+>>>   .../bindings/net/microchip,lan865x.yaml       | 101 ++++++++++++++++++
+>>>   MAINTAINERS                                   |   1 +
+>>>   2 files changed, 102 insertions(+)
+>>>   create mode 100644 Documentation/devicetree/bindings/net/microchip,lan865x.yaml
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/microchip,lan865x.yaml b/Documentation/devicetree/bindings/net/microchip,lan865x.yaml
+>>> new file mode 100644
+>>> index 000000000000..974622dd6846
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/microchip,lan865x.yaml
+>>> @@ -0,0 +1,101 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/net/microchip,lan865x.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: Microchip LAN8650/1 10BASE-T1S MACPHY Ethernet Controllers
+>>> +
+>>> +maintainers:
+>>> +  - Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+>>> +
+>>> +description:
+>>> +  The LAN8650/1 combines a Media Access Controller (MAC) and an Ethernet
+>>> +  PHY to enable 10BASE‑T1S networks. The Ethernet Media Access Controller
+>>> +  (MAC) module implements a 10 Mbps half duplex Ethernet MAC, compatible
+>>> +  with the IEEE 802.3 standard and a 10BASE-T1S physical layer transceiver
+>>> +  integrated into the LAN8650/1. The communication between the Host and
+>>> +  the MAC-PHY is specified in the OPEN Alliance 10BASE-T1x MACPHY Serial
+>>> +  Interface (TC6).
+>>> +
+>>> +  Specifications about the LAN8650/1 can be found at:
+>>> +    https://www.microchip.com/en-us/product/lan8650
+>>> +
+>>> +allOf:
+>>> +  - $ref: ethernet-controller.yaml#
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    const: microchip,lan865x
+>>
+>> No wildcards in compatibles.
+> Ah ok missed it. So it will become like below isn't it?
 > 
-> > 
-> > Best
-> > Sven
-> > 
-> > > 
-> > > > 
-> > > > Thanks
-> > > > /Ilias
-> > > > 
+> properties:
+>    compatible:
+>      enum:
+>        - microchip,lan8650
+>        - microchip,lan8651
+
+Rather enum for lan8650 and items for lan8651 with fallback. Aren't they
+compatible, since you wanted to use wildcard?
+
+
+Best regards,
+Krzysztof
+
 
