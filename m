@@ -1,128 +1,119 @@
-Return-Path: <netdev+bounces-45255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 222AD7DBB99
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:19:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1818F7DBBA2
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:24:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB16828133A
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:19:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3F842813B7
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A9D17999;
-	Mon, 30 Oct 2023 14:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03E6179A9;
+	Mon, 30 Oct 2023 14:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Ic4ZQEsz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fbi4/tjq"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497D717982;
-	Mon, 30 Oct 2023 14:19:47 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDED7B7;
-	Mon, 30 Oct 2023 07:19:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=pUI5nGy0LFYKow2okhoQ6OKyczy/kEldDjABNORebOc=; b=Ic4ZQEszf7DdPBZRY4YiXz7+XW
-	MXv68gsOVMuwSkXRYL3DrKHyZyOzPhzVGgAzEr2A8oyeWtTuVUNGncN2F6Z6J4fvq0Qi+kxFw3Nv+
-	Wf2XDjFO0BG4tlbg6rVzLmM4d2PQc1hwMNJAKKWQFYImP5WKESkANmYPNN6Qxph0TbYQdY3QbEPQ6
-	Di2fOOca1/h91PJlU7/bCFlPRgI4jm3zJn92v3HYBljyZR/8uiXQ6JDr1dIDq0nhvxRVrE7nsJXX6
-	TlIZkm3efA9OG3prnCXoxKJq8psh4siiA9ollSw1vn53aWlwdBFGj6ZROeQb92e8a3iV6UND6mRPD
-	/f/ivMyw==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qxT72-0001SS-KC; Mon, 30 Oct 2023 15:19:28 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qxT71-000Y1o-O6; Mon, 30 Oct 2023 15:19:27 +0100
-Subject: Re: [PATCH net] veth: Fix RX stats for bpf_redirect_peer() traffic
-To: Peilin Ye <yepeilin.cs@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Peilin Ye <peilin.ye@bytedance.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- Cong Wang <cong.wang@bytedance.com>, Jiang Wang <jiang.wang@bytedance.com>,
- Youlun Zhang <zhangyoulun@bytedance.com>
-References: <20231027184657.83978-1-yepeilin.cs@gmail.com>
- <20231027190254.GA88444@n191-129-154.byted.org>
- <59be18ff-dabc-2a07-3d78-039461b0f3f7@iogearbox.net>
- <20231028231135.GA2236124@n191-129-154.byted.org>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <94c88020-5282-c82b-8f88-a2d012444699@iogearbox.net>
-Date: Mon, 30 Oct 2023 15:19:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3259179A0
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 14:24:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A332C433C8;
+	Mon, 30 Oct 2023 14:24:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698675841;
+	bh=LURC/rLxExQ3bpL0yDbWx8HByNj3zGefLpsyRChzNOg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fbi4/tjqgp6NsTt9Bvn9HXfbWDEjFvrMUY8hQmzw7deSuJEHllPcUTLi7ZvHf7Mt8
+	 9/tfm1EHLJ+VAL02abgN1L1nFYA3f9APuF2aPnwKdQNsZF9uJxzpKTYvv7qJt7ls6c
+	 V74ytnNQzA3uXKU/1MkXK2QrdQs5TjsB4x7Q1WBcQxJG1XGj9z14Wgeu8olo07s+TV
+	 J+MnXFpC6Uxi0kwx+8C6Mn2t+QiTzJJ+fRBrkp+PmHZCm/tjOswKmTktBMiH4av7jR
+	 sAZbYGp7jW3I+QoFouQOB43vQIeJG+g6x4rRk1J4GUl954yS+RY5GiCJqE4w9id49p
+	 1Nlufv+ddnkfA==
+Date: Mon, 30 Oct 2023 16:23:55 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Sven Auhagen <sven.auhagen@voleatech.de>
+Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, hawk@kernel.org, lorenzo@kernel.org,
+	Paulo.DaSilva@kyberna.com, mcroce@linux.microsoft.com
+Subject: Re: [PATCH v2 1/2] net: page_pool: check page pool ethtool stats
+Message-ID: <20231030142355.GB5885@unreal>
+References: <abr3xq5eankrmzvyhjd5za6itfm5s7wpqwfy7lp3iuwsv33oi3@dx5eg6wmb2so>
+ <20231002124650.7f01e1e6@kernel.org>
+ <ZTiu0Itkhbb8OqS7@hera>
+ <20231025075341.GA2950466@unreal>
+ <j2viq53y3m7z6lj6tkzqxijtavtdfsdnenl2yt2pl4jkqupm6w@aautqnvca6w3>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231028231135.GA2236124@n191-129-154.byted.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27077/Mon Oct 30 08:39:55 2023)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <j2viq53y3m7z6lj6tkzqxijtavtdfsdnenl2yt2pl4jkqupm6w@aautqnvca6w3>
 
-On 10/29/23 1:11 AM, Peilin Ye wrote:
-> On Sat, Oct 28, 2023 at 09:06:44AM +0200, Daniel Borkmann wrote:
->>>> diff --git a/net/core/filter.c b/net/core/filter.c
->>>> index 21d75108c2e9..7aca28b7d0fd 100644
->>>> --- a/net/core/filter.c
->>>> +++ b/net/core/filter.c
->>>> @@ -2492,6 +2492,7 @@ int skb_do_redirect(struct sk_buff *skb)
->>>>    			     net_eq(net, dev_net(dev))))
->>>>    			goto out_drop;
->>>>    		skb->dev = dev;
->>>> +		dev_sw_netstats_rx_add(dev, skb->len);
->>>
->>> This assumes that all devices that support BPF_F_PEER (currently only
->>> veth) use tstats (instead of lstats, or dstats) - is that okay?
->>
->> Dumb question, but why all this change and not simply just call ...
->>
->>    dev_lstats_add(dev, skb->len)
->>
->> ... on the host dev ?
+On Mon, Oct 30, 2023 at 10:39:18AM +0100, Sven Auhagen wrote:
+> On Wed, Oct 25, 2023 at 10:53:41AM +0300, Leon Romanovsky wrote:
+> > On Wed, Oct 25, 2023 at 08:59:44AM +0300, Ilias Apalodimas wrote:
+> > > Hi Jakub,
+> > > 
+> > > On Mon, Oct 02, 2023 at 12:46:50PM -0700, Jakub Kicinski wrote:
+> > > > On Sun, 1 Oct 2023 13:41:15 +0200 Sven Auhagen wrote:
+> > > > > If the page_pool variable is null while passing it to
+> > > > > the page_pool_get_stats function we receive a kernel error.
+> > > > >
+> > > > > Check if the page_pool variable is at least valid.
+> > > >
+> > > > IMHO this seems insufficient, the driver still has to check if PP
+> > > > was instantiated when the strings are queried. My weak preference
+> > > > would be to stick to v1 and have the driver check all the conditions.
+> > > > But if nobody else feels this way, it's fine :)
+> > > 
+> > > I don't disagree, but OTOH it would be sane for the API not to crash if
+> > > something invalid is passed. 
+> > 
+> > In-kernel API assumes that in-kernel callers know how to use it.
+> > 
+> > > Maybe the best approach would be to keep the
+> > > driver checks, which are saner, but add the page pool code as well with a
+> > > printable error indicating a driver bug?
+> > 
+> > It is no different from adding extra checks to prevent drivers from random calls
+> > with random parameters to well defined API.
+> > 
+> > Thanks
 > 
-> Since I didn't want to update host-veth's TX counters.  If we
-> bpf_redirect_peer()ed a packet from NIC TC ingress to Pod-veth TC ingress,
-> I think it means we've bypassed host-veth TX?
-
-Yes. So the idea is to transition to tstats replace the location where
-we used to bump lstats with tstat's tx counter, and only the peer redirect
-would bump the rx counter.. then upon stats traversal we fold the latter into
-the rx stats which was populated by the opposite's tx counters. Makes sense.
-
-OT: does cadvisor run inside the Pod to collect the device stats? Just
-curious how it gathers them.
-
->>> If not, should I add another NDO e.g. ->ndo_stats_rx_add()?
->>
->> Definitely no new stats ndo resp indirect call in fast path.
+> I can see the point for both arguments so I think we should definitely
+> keep the driver check.
 > 
-> Yeah, I think I'll put a comment saying that all devices that support
-> BPF_F_PEER must use tstats (or must use lstats), then.
+> Is there a consensus on what to do on the page pool side?
+> Do you want me to keep the additional page pool check to prevent
+> a kernel crash?
 
-sgtm.
+I don't want to see bloat of checks in kernel API. They hide issues and
+not prevent them.
 
-Thanks,
-Daniel
+> I mean the mvneta change was also implemented with this problem
+> and it leads to serious side effects without an additional check.
+> Especially if the page pool ethtool stats is implemented in more
+> drivers in the future and the implementations are not 100% correct,
+> it will crash the kernel.
+
+Like many other driver mistakes.
+
+Thanks
+
+> 
+> Best
+> Sven
+> 
+> > 
+> > > 
+> > > Thanks
+> > > /Ilias
+> > > 
 
