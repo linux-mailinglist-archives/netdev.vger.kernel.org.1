@@ -1,77 +1,73 @@
-Return-Path: <netdev+bounces-45223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8A07DB95D
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:55:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB3237DB964
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 13:00:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B647D281562
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 11:55:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C954C1C20A42
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A8614A83;
-	Mon, 30 Oct 2023 11:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED3514F90;
+	Mon, 30 Oct 2023 12:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="HvoOMHM3"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="OBHjmSKF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FF314285
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 11:55:28 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF322C5
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:55:26 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9adca291f99so652102866b.2
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:55:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD30EEDB
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 12:00:24 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69632E6
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 05:00:22 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9d2e6c8b542so191386166b.0
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 05:00:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698666925; x=1699271725; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698667221; x=1699272021; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q31c8fnQHD+W10kmomcQ4zTSAMbkT+bVtaWYEa58nas=;
-        b=HvoOMHM3zushLZ9gCVFUIC4w7Sq7a2oQf/zsEOrIJiV2h3ds3QAP5QGzzx8OOL+dRS
-         sNxzjq1xK1IqleJ0U2RWCPf1GazQcoR38f0IkZvEMevVJHyA7lrZPMVym0p9b1vK5l9A
-         Sdi9DCSdHxh/voEzqQ6C7id53wKrCXOXGRDHUpg2aU0N6bKaAcRwrMIhnpm7UWUEkIaa
-         z4I+5xiv+JwyPIxKPDtqeE35zVMyQDdmJggjNCCaDZQ5DYE5iHHoPbo541xDR+Fi9MqX
-         3QMk8i8gwj7wkGUw5BLpoqX2LZ/cvl+bYuwWfikj2XGbtHwzwZga4wuZxrgtOxfDHqZY
-         yqGg==
+        bh=eD/Hku5WqOIioJLR7k0Stytz0LCcxDS5zuThuxZH3V0=;
+        b=OBHjmSKFu05TB83BwUChpVYHYJ4/rhgRXe0sQ0nwZKc2e+fWzRIJYPZigaLmdVZqxL
+         78+MIYsQoqnmHX1/ap0x3VRNdUMAYIQkMAHMXD5M+EyGtFJlXxxwEc6OGBiI3LeYquH7
+         8iZTigYYHkztWVAF94xR9cOKIQTyu5jaZreMpCbfWJJ1GnR0Zd8SL6+WTcN9NxQKDJ99
+         /LDr/pIXHNNxeJIHOk5nGCDSrBcrp979nbsT7WMgyLn8S3gIUdZymsQ5SKoZgmWyxJ9e
+         UGYUGumxDfE/ApkYWPu9r+pVDsZ4nXgIcfap5kiN27JqRbiA0nC4zANb3HK1zZiRSTUo
+         dj2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698666925; x=1699271725;
+        d=1e100.net; s=20230601; t=1698667221; x=1699272021;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Q31c8fnQHD+W10kmomcQ4zTSAMbkT+bVtaWYEa58nas=;
-        b=dd42U90sD2FzWX6uPpuG08nUTtp+/TLM4iMp+sXgI28s9z3CJz+9smj9d8+VKGOjOE
-         kMoFI6GtZQRuaxeZASjPbieputUvobUV1vZ0J7EEITrHcZpOegpfU3vuJhHS4rYBhQ04
-         MDDt1UTP4DiM3diHuqPmseWuS3zPsLSacFEG05XFqLBTEEeKI94O6kBaoUyjgKNbyC4E
-         O9NDBpldIIVE+oSY8FjjnEzD21h5T9uV3naBbCxMz4oo0PS2/SU6F2Xo6XbGbFgYe+hn
-         3mQvWqcoylRN7NdTevPyS36enfhWQLU4pTUjgoNSBPLrgA0BQWqpalttchJEZ9c181XG
-         rZow==
-X-Gm-Message-State: AOJu0YwRjkb0b9vq9F/VByMONeCH8dR4PCXweJi0bBbRsERfm9nzuRK6
-	6Beu+sR5wfrdKFRl1heumTf33g==
-X-Google-Smtp-Source: AGHT+IEK0FVzrhD+/lsg/GFhSKbE3HoxQjpfS+HOYJ/lF5CE71Yh2/i3l6Z4QGe2FLuRhkkWz0rUHA==
-X-Received: by 2002:a17:906:c14b:b0:9be:ab38:a362 with SMTP id dp11-20020a170906c14b00b009beab38a362mr8139316ejc.46.1698666925439;
-        Mon, 30 Oct 2023 04:55:25 -0700 (PDT)
+        bh=eD/Hku5WqOIioJLR7k0Stytz0LCcxDS5zuThuxZH3V0=;
+        b=LfkIrC0PhwFZBumHEWbAVYrmkU+APPDu3OCA0QdGmq2aVoklTOE84OjdpHnmIN0aiK
+         Ngkxpiv2FRHuLWx3qOccmA1E1plTfXa2OdzBBiG4ZeyJrgKVgeJuxqxLgBuyHUoO53KD
+         7AfAssTkSR+zP25iKNafDzMkE7EsIB+T8wT4D9IWVi5wCaPnvSbVrcMGQTdnljONzSSQ
+         wJ9wc8Xeu3+02HFEn3gVCJz5RXdeuwNOB8AP+If6pAD9C35cagXS0aRoJJmKSD3ntcAZ
+         /SCLT4miuUHUBJoYNyJKnxhejPg51Q6wrdbJv4OW8CLWAMVt9qFcnHm70LjTWPF4ybH/
+         h2LQ==
+X-Gm-Message-State: AOJu0YwVHuoeSvccoNCmxp/gb++UnyRG7RlzKEAx1ckDbZ8odWui7sVq
+	Zyk5iWtQCDiXqbwIk+Qk5DxQmQ==
+X-Google-Smtp-Source: AGHT+IEu6pYcuAdxr8KM6ya/Cfy3+ocS+J14sUsIKB4T8zEWt11CS+7dZS44KS+gjWW9iDuewhT57Q==
+X-Received: by 2002:a17:906:fd8c:b0:9c7:5a01:ffea with SMTP id xa12-20020a170906fd8c00b009c75a01ffeamr9315203ejb.30.1698667220758;
+        Mon, 30 Oct 2023 05:00:20 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id lf19-20020a170906ae5300b009ad89697c86sm5944350ejb.144.2023.10.30.04.55.24
+        by smtp.gmail.com with ESMTPSA id c16-20020a1709060fd000b0098ce63e36e9sm5958410ejk.16.2023.10.30.05.00.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 04:55:24 -0700 (PDT)
-Date: Mon, 30 Oct 2023 12:55:23 +0100
+        Mon, 30 Oct 2023 05:00:20 -0700 (PDT)
+Date: Mon, 30 Oct 2023 13:00:18 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Bernd Edlinger <bernd.edlinger@hotmail.de>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: stmmac: Wait a bit for the reset to take effect
-Message-ID: <ZT+Zq4j9iQj1+Xai@nanopsycho>
-References: <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: jmaloy@redhat.com, ying.xue@windriver.com, netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+	syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com,
+	syzbot+9425c47dccbcb4c17d51@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v3] tipc: Change nla_policy for bearer-related names
+ to NLA_NUL_STRING
+Message-ID: <ZT+a0upR3QjrZJBK@nanopsycho>
+References: <20231030075540.3784537-1-syoshida@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,16 +76,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+In-Reply-To: <20231030075540.3784537-1-syoshida@redhat.com>
 
-Mon, Oct 30, 2023 at 07:01:11AM CET, bernd.edlinger@hotmail.de wrote:
->otherwise the synopsys_id value may be read out wrong,
->because the GMAC_VERSION register might still be in reset
->state, for at least 1 us after the reset is de-asserted.
+Mon, Oct 30, 2023 at 08:55:40AM CET, syoshida@redhat.com wrote:
+>syzbot reported the following uninit-value access issue [1]:
 >
->Add a wait for 10 us before continuing to be on the safe side.
+>=====================================================
+>BUG: KMSAN: uninit-value in strlen lib/string.c:418 [inline]
+>BUG: KMSAN: uninit-value in strstr+0xb8/0x2f0 lib/string.c:756
+> strlen lib/string.c:418 [inline]
+> strstr+0xb8/0x2f0 lib/string.c:756
+> tipc_nl_node_reset_link_stats+0x3ea/0xb50 net/tipc/node.c:2595
+> genl_family_rcv_msg_doit net/netlink/genetlink.c:971 [inline]
+> genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
+> genl_rcv_msg+0x11ec/0x1290 net/netlink/genetlink.c:1066
+> netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2545
+> genl_rcv+0x40/0x60 net/netlink/genetlink.c:1075
+> netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+> netlink_unicast+0xf47/0x1250 net/netlink/af_netlink.c:1368
+> netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
+> sock_sendmsg_nosec net/socket.c:730 [inline]
+> sock_sendmsg net/socket.c:753 [inline]
+> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
+> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
+> __sys_sendmsg net/socket.c:2624 [inline]
+> __do_sys_sendmsg net/socket.c:2633 [inline]
+> __se_sys_sendmsg net/socket.c:2631 [inline]
+> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x63/0xcd
 >
->Signed-off-by: Bernd Edlinger <bernd.edlinger@hotmail.de>
+>Uninit was created at:
+> slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
+> slab_alloc_node mm/slub.c:3478 [inline]
+> kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3523
+> kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:559
+> __alloc_skb+0x318/0x740 net/core/skbuff.c:650
+> alloc_skb include/linux/skbuff.h:1286 [inline]
+> netlink_alloc_large_skb net/netlink/af_netlink.c:1214 [inline]
+> netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1885
+> sock_sendmsg_nosec net/socket.c:730 [inline]
+> sock_sendmsg net/socket.c:753 [inline]
+> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
+> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
+> __sys_sendmsg net/socket.c:2624 [inline]
+> __do_sys_sendmsg net/socket.c:2633 [inline]
+> __se_sys_sendmsg net/socket.c:2631 [inline]
+> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>
+>TIPC bearer-related names including link names must be null-terminated
+>strings. If a link name which is not null-terminated is passed through
+>netlink, strstr() and similar functions can cause buffer overrun. This
+>causes the above issue.
+>
+>This patch changes the nla_policy for bearer-related names from NLA_STRING
+>to NLA_NUL_STRING. This resolves the issue by ensuring that only
+>null-terminated strings are accepted as bearer-related names.
+>
+>syzbot reported similar uninit-value issue related to bearer names [2]. The
+>root cause of this issue is that a non-null-terminated bearer name was
+>passed. This patch also resolved this issue.
+>
+>Fixes: 7be57fc69184 ("tipc: add link get/dump to new netlink api")
+>Fixes: 0655f6a8635b ("tipc: add bearer disable/enable to new netlink api")
+>Reported-and-tested-by: syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com
+>Closes: https://syzkaller.appspot.com/bug?extid=5138ca807af9d2b42574 [1]
+>Reported-and-tested-by: syzbot+9425c47dccbcb4c17d51@syzkaller.appspotmail.com
+>Closes: https://syzkaller.appspot.com/bug?extid=9425c47dccbcb4c17d51 [2]
+>Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
 
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
