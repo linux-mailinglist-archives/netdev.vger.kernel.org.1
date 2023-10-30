@@ -1,131 +1,146 @@
-Return-Path: <netdev+bounces-45280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFE277DBE44
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 17:52:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 735B97DBE4D
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 17:54:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE9E91C208C3
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:52:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB354B20C8B
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A3218C23;
-	Mon, 30 Oct 2023 16:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2580518E26;
+	Mon, 30 Oct 2023 16:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RmKSY1ex"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R6Ubol4r"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6EA13AC5
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 16:52:40 +0000 (UTC)
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEEB5A9
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 09:52:38 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so490a12.0
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 09:52:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698684757; x=1699289557; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6/BSsNWLspfthFQHwJtcXo2ADTyt8+cC4m6Msvhwdq4=;
-        b=RmKSY1ex/z57HODjZlgWtUPt/mxKQbwD1EL/6r4UfBsrrT/QPdqYXOa8Ejw/uvPx/8
-         LkjYdaWaP85xaCHnWmBWEfs+zGitrFdX4faCefuzYWYwkuluY7R7Pce8VcFbN3GhZ8eb
-         LIv/n0DtluzSoDbg+9E1dlUuokdpbQrYIorPJ91qFnywciAJGUL+Px1Q2XZ0aLCUYmBR
-         ZhBKncA9AWNUeqL2viiwDCttI3ZyIxv2FxzBU6saYExW69XaTeEGsOslPJzLdAPJa3YH
-         MjzCOFr4HUhe2Lvl7ixs1un8F2MYAxJ7oIcIjbTZiqLbHRajmrK41vIqCFdlIWx2w/k8
-         6fNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698684757; x=1699289557;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6/BSsNWLspfthFQHwJtcXo2ADTyt8+cC4m6Msvhwdq4=;
-        b=LPS5LTMbFYSXsrT4UGSgfFh7PShJbFKDRZWHXGKy9mGKP8sw6SD24dm+FrwMgke58w
-         trF3bfKEZfo8YAJOMQZA0wfaU3uocafVmVQCBSRU+WRa6oYoAPXmptAYUHdPjvBXQZPr
-         b0dVRs2oF/5YloE+ORUQ2xqaLLUIWqzGyHkwkWuVbPBssZJI46gLf8frUWOXh7f5/uX3
-         JiWOfgF2KUaY0IbeKMlBjln5ENMiot7fBXVur/Iua1CDF6zYjS+syu0cnSyg+2RRNIq2
-         CjduPSffvIAr671rM0U2+fnrFmEUOGOlrW/+YStsHz31wxU4d1oTZSGsLDgJgc1DA+h+
-         wPVA==
-X-Gm-Message-State: AOJu0Yy+zuqN5umrx1DwyXL/mDdPfzwzHKEIWCS1s+5M+j6ODPhnk+w7
-	cXO/dGfQvLUOfVvR/xAbVl+Cd858x1fzISy3GNQZMQ==
-X-Google-Smtp-Source: AGHT+IF65SluPCi/VLGKwqVMoN830lGi2osimZ14H4dVF5gzTbHCeUGKZxc+REGpx/dAte8oKZK5ztGUNEnyr9Ekavg=
-X-Received: by 2002:a05:6402:1a56:b0:543:5119:2853 with SMTP id
- bf22-20020a0564021a5600b0054351192853mr61455edb.6.1698684756998; Mon, 30 Oct
- 2023 09:52:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D61718C3B
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 16:53:56 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C25C1B3;
+	Mon, 30 Oct 2023 09:53:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698684835; x=1730220835;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0MNp78TBktcSSvD5TYdlbWZXz2ANgvZ0t7h0WBasLSk=;
+  b=R6Ubol4riWJamMMhV6SwAjIYR5ZyB2caGHWIkxWoiUUIF9mOWJq6X07T
+   /o9UIs1Tdq04h+QM3Z1eR9oOtC8NHiBmPYayrbh01AdzG4nE4BRISRDe9
+   VDnf4tNKCmLCfvT2X0s/v4wPrfRDsXwJXXcoK4uvySx8nYK07D/qFR71r
+   xpeDNnUNJtqes0sO87FhbLoNLe+/ECly7tjDkIa5pwV/+uf66P8cXeH1p
+   9wjDs5iWUBvDPIdnqGp3vha4q1KytSl9ovLygfBUK2q+nAJQmxz2wknKW
+   pEaWMnPmMLtPzCnkIrShf4R2w5Dp7YDRFHd+ioT6gXO21KJmmMr6zBmYt
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="990052"
+X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
+   d="scan'208";a="990052"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 09:53:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="933829289"
+X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
+   d="scan'208";a="933829289"
+Received: from mmichali-devpc.igk.intel.com ([10.211.235.239])
+  by orsmga005.jf.intel.com with ESMTP; 30 Oct 2023 09:53:50 -0700
+From: Michal Michalik <michal.michalik@intel.com>
+To: netdev@vger.kernel.org
+Cc: vadim.fedorenko@linux.dev,
+	jiri@resnulli.us,
+	arkadiusz.kubalewski@intel.com,
+	jonathan.lemon@gmail.com,
+	pabeni@redhat.com,
+	poros@redhat.com,
+	milena.olech@intel.com,
+	mschmidt@redhat.com,
+	linux-clk@vger.kernel.org,
+	bvanassche@acm.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	Michal Michalik <michal.michalik@intel.com>
+Subject: [PATCH RFC net-next v2 0/2] selftests/dpll: DPLL subsystem integration tests
+Date: Mon, 30 Oct 2023 17:53:24 +0100
+Message-Id: <20231030165326.24453-1-michal.michalik@intel.com>
+X-Mailer: git-send-email 2.9.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027213059.3550747-1-ptf@google.com> <415e0355-7d71-4b82-b4fc-37dad22486a9@gmail.com>
-In-Reply-To: <415e0355-7d71-4b82-b4fc-37dad22486a9@gmail.com>
-From: Patrick Thompson <ptf@google.com>
-Date: Mon, 30 Oct 2023 12:52:24 -0400
-Message-ID: <CAJs+hrEi8oo1q5mMfNbaUi8x1H-sBGmYToTkRfVXs=ga9LPupQ@mail.gmail.com>
-Subject: Re: [PATCH v2] net: r8169: Disable multicast filter for RTL_GIGA_MAC_VER_46
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, Chun-Hao Lin <hau@realtek.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	nic_swsd@realtek.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-I wouldn't trust the mc filter, the eap packet being filtered is not a
-multicast packet so I wonder what else could be erroneously filtered.
-I do agree that it would be nice to be able to override it for testing
-purposes.
+The recently merged common DPLL interface discussed on a newsletter[1]
+is introducing new, complex subsystem which requires proper integration
+testing - this patch adds core for such framework, as well as the
+initial test cases. Framework does not require neither any special
+hardware nor any special system architecture.
 
-Would you like me to add MAC_VER_48 to the patch? I would not be able
-to test and confirm that it affects it in the same way I have for
-VER_46.
+To properly test the DPLL subsystem this patch adds fake DPLL devices and it's
+pins implementation to netdevsim. Creating netdevsim devices and adding ports
+to it register new DPLL devices and pins. First port of each netdevsim device
+acts as a entitiy which registers two DPLL devices: EEC and PPS DPLLs. First
+port also register the common pins: PPS and GNSS. Additionally each port
+register also RCLK (recovered clock) pin for itself. That allow us to check
+mutliple scenarios which might be problematic in real implementations (like
+different ordering etc.)
 
-It is unfortunate that the naming doesn't quite line up.
+Patch adds few helper scripts, which are:
+1) tools/testing/selftests/dpll/run_dpll_tests.sh
+    Script is checking for all dependencies, creates temporary
+    environment, installs required libraries and run all tests - can be
+    used standalone
+2) tools/testing/selftests/dpll/ynlfamilyhandler.py˙
+    Library for easier ynl use in the pytest framework - can be used
+    standalone
 
-On Sat, Oct 28, 2023 at 4:38=E2=80=AFAM Heiner Kallweit <hkallweit1@gmail.c=
-om> wrote:
->
-> On 27.10.2023 23:30, Patrick Thompson wrote:
-> > MAC_VER_46 ethernet adapters fail to detect eapol packets unless
-> > allmulti is enabled. Add exception for VER_46 in the same way VER_35
-> > has an exception.
-> >
-> MAC_VER_48 (RTL8107E) has the same MAC, just a different PHY.
-> So I would expect that the same quirk is needed for MAC_VER_48.
->
-> MAC_VER_xx is a little misleading, actually it should be NIC_VER_xx
->
-> > Fixes: 6e1d0b898818 ("r8169:add support for RTL8168H and RTL8107E")
-> > Signed-off-by: Patrick Thompson <ptf@google.com>
-> > ---
-> >
-> > Changes in v2:
-> > - add Fixes tag
-> > - add net annotation
-> > - update description
-> >
-> >  drivers/net/ethernet/realtek/r8169_main.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/et=
-hernet/realtek/r8169_main.c
-> > index 361b90007148b..a775090650e3a 100644
-> > --- a/drivers/net/ethernet/realtek/r8169_main.c
-> > +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> > @@ -2584,7 +2584,8 @@ static void rtl_set_rx_mode(struct net_device *de=
-v)
-> >               rx_mode |=3D AcceptAllPhys;
-> >       } else if (netdev_mc_count(dev) > MC_FILTER_LIMIT ||
-> >                  dev->flags & IFF_ALLMULTI ||
-> > -                tp->mac_version =3D=3D RTL_GIGA_MAC_VER_35) {
-> > +                tp->mac_version =3D=3D RTL_GIGA_MAC_VER_35 ||
-> > +                tp->mac_version =3D=3D RTL_GIGA_MAC_VER_46) {
-> >               /* accept all multicasts */
-> >       } else if (netdev_mc_empty(dev)) {
-> >               rx_mode &=3D ~AcceptMulticast;
->
+[1] https://lore.kernel.org/netdev/169494842736.21621.10730860855645661664.git-patchwork-notify@kernel.org/
+
+Changelog:
+v1 -> v2:
+- moved from separate module to implementation in netdevsim
+
+Michal Michalik (2):
+  netdevsim: implement DPLL for subsystem selftests
+  selftests/dpll: add DPLL system integration selftests
+
+ drivers/net/Kconfig                              |   1 +
+ drivers/net/netdevsim/Makefile                   |   2 +-
+ drivers/net/netdevsim/dpll.c                     | 438 +++++++++++++++++++++++
+ drivers/net/netdevsim/dpll.h                     |  81 +++++
+ drivers/net/netdevsim/netdev.c                   |  20 ++
+ drivers/net/netdevsim/netdevsim.h                |   4 +
+ tools/testing/selftests/Makefile                 |   1 +
+ tools/testing/selftests/dpll/Makefile            |   8 +
+ tools/testing/selftests/dpll/__init__.py         |   0
+ tools/testing/selftests/dpll/config              |   2 +
+ tools/testing/selftests/dpll/consts.py           |  34 ++
+ tools/testing/selftests/dpll/dpll_utils.py       | 109 ++++++
+ tools/testing/selftests/dpll/requirements.txt    |   3 +
+ tools/testing/selftests/dpll/run_dpll_tests.sh   |  75 ++++
+ tools/testing/selftests/dpll/test_dpll.py        | 414 +++++++++++++++++++++
+ tools/testing/selftests/dpll/ynlfamilyhandler.py |  49 +++
+ 16 files changed, 1240 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/netdevsim/dpll.c
+ create mode 100644 drivers/net/netdevsim/dpll.h
+ create mode 100644 tools/testing/selftests/dpll/Makefile
+ create mode 100644 tools/testing/selftests/dpll/__init__.py
+ create mode 100644 tools/testing/selftests/dpll/config
+ create mode 100644 tools/testing/selftests/dpll/consts.py
+ create mode 100644 tools/testing/selftests/dpll/dpll_utils.py
+ create mode 100644 tools/testing/selftests/dpll/requirements.txt
+ create mode 100755 tools/testing/selftests/dpll/run_dpll_tests.sh
+ create mode 100644 tools/testing/selftests/dpll/test_dpll.py
+ create mode 100644 tools/testing/selftests/dpll/ynlfamilyhandler.py
+
+-- 
+2.9.5
+
+base-commit: 55c900477f5b3897d9038446f72a281cae0efd86
 
