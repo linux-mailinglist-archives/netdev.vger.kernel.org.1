@@ -1,152 +1,163 @@
-Return-Path: <netdev+bounces-45269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB3AD7DBC98
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:29:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E637DBC9C
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:31:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8D621C209E1
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:29:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2350CB20CB7
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334E01804D;
-	Mon, 30 Oct 2023 15:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8601A18AE6;
+	Mon, 30 Oct 2023 15:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVEDM77g"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF77D18AE1
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 15:29:35 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 036E2B3
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 08:29:33 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mtapsc-5-oHEMwp6QNkelFYo-i2F22g-1; Mon, 30 Oct 2023 15:29:31 +0000
-X-MC-Unique: oHEMwp6QNkelFYo-i2F22g-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 30 Oct
- 2023 15:29:45 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Mon, 30 Oct 2023 15:29:45 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Shinas Rasheed' <srasheed@marvell.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: Haseeb Gani <hgani@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>,
-	"egallen@redhat.com" <egallen@redhat.com>, "mschmidt@redhat.com"
-	<mschmidt@redhat.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>, "wizhao@redhat.com"
-	<wizhao@redhat.com>, "konguyen@redhat.com" <konguyen@redhat.com>,
-	Veerasenareddy Burru <vburru@marvell.com>, Sathesh B Edara
-	<sedara@marvell.com>, Eric Dumazet <edumazet@google.com>
-Subject: RE: [PATCH net-next v2 3/4] octeon_ep: implement xmit_more in
- transmit
-Thread-Topic: [PATCH net-next v2 3/4] octeon_ep: implement xmit_more in
- transmit
-Thread-Index: AQHaBomkOels9gSWWE2IVlse9GkwiLBevpOAgAOrQICAAA7xIA==
-Date: Mon, 30 Oct 2023 15:29:45 +0000
-Message-ID: <9631475a8ba94c1682696d219c632538@AcuMS.aculab.com>
-References: <20231024145119.2366588-1-srasheed@marvell.com>
- <20231024145119.2366588-4-srasheed@marvell.com>
- <0fc50b8e6ff44c43b10481da608c95c3@AcuMS.aculab.com>
- <PH0PR18MB47340A7A9E68DE2747DB94F9C7A1A@PH0PR18MB4734.namprd18.prod.outlook.com>
-In-Reply-To: <PH0PR18MB47340A7A9E68DE2747DB94F9C7A1A@PH0PR18MB4734.namprd18.prod.outlook.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04C6182C6
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 15:31:03 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06409C9;
+	Mon, 30 Oct 2023 08:31:02 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53db360294fso7804062a12.3;
+        Mon, 30 Oct 2023 08:31:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698679860; x=1699284660; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OwEL6Pg+GghxIBTWLg7sNVv9RjmOZEAEG7bBzkZXR7g=;
+        b=EVEDM77gRD/J82tHhTVAt8AC9BcvlPT0H9Tnp+5FBeeXkVb84ebjVyCMLASxN5hxzG
+         b5J32MB/SqxFYfkJ1kkCsU/0rhIditGfLEyVjI+rMpE6kcXJ4zzJmvZgmjVRytXzH3FB
+         e0N22jPvUpjbTMprvKm0QdpvDwOmR7nHrsleGX9x0JXUjFoyZ3DcaUkfnznv8o0e6QlH
+         ZGGYbvZxt8xbYOk5Bl3AXTSavLsxlLGB3d0+eK3TfJqXSBCF/DvngBHpEx017aPIbK56
+         qtzXgu6W/1qQlZ2x+Mr1eoEZfdtfF2KmWMTAHdETzVea3GGxCYRHzfGzJUD4QHHrH6nH
+         cmsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698679860; x=1699284660;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OwEL6Pg+GghxIBTWLg7sNVv9RjmOZEAEG7bBzkZXR7g=;
+        b=uUkAPUC/TadKpHvlnMZs+xRL2MhBMT3SZS86LN06OhK80b83z1BqLJHyJnp7CcDnu+
+         M2xL9Uxi0tB/KmCCRWPYRZG9R67gkAZPDtwvHHqumSX+zm6dWHAHnseaqpW+iJUBfWPX
+         JQ1thtgqC39fNfWr87FeisqtObTDhB+lHrybkr8Wvr9ZwE7+aNXhKCA77xsDXH48MUSe
+         OXN2U22/pm/FKwF6gLalNGByXF5QcNCelmUJmdzifgehYzp+ZC01mykY+RLj+BObUERa
+         5XRweQxlB8qLvsoO7CE6d6dgtT9tVvPyQRnGQtvsB631K18L+Wk06h+nCVQ82pf6/9Db
+         silw==
+X-Gm-Message-State: AOJu0YwP9NQT2isZtTRJkokeaq63eBuh/FwiX9DpqC86TuqCu3MUAX1S
+	e0pkLB/FXwrHv/iQpCSqj4M=
+X-Google-Smtp-Source: AGHT+IG9pPQq9f7S7tZBTZOUFwtWw3/Nj1u7nONKa0vBEqjmp+oqajxd/j3IOP8Fo2JfnZ1SGfxFyA==
+X-Received: by 2002:a17:906:2b55:b0:9d2:810f:4922 with SMTP id b21-20020a1709062b5500b009d2810f4922mr3407648ejg.33.1698679860170;
+        Mon, 30 Oct 2023 08:31:00 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id g10-20020a17090613ca00b00992b8d56f3asm6172905ejc.105.2023.10.30.08.30.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 08:30:59 -0700 (PDT)
+Date: Mon, 30 Oct 2023 17:30:57 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
+Message-ID: <20231030153057.3ofydbzh7q2um3os@skbuf>
+References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
+ <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
+ <CACRpkdYg8hattBC1esfh3WBNLZdMM5rLWhn4HTRLMfr2ubbzAA@mail.gmail.com>
+ <20231030152325.qdpvv4nbczhal35c@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231030152325.qdpvv4nbczhal35c@skbuf>
 
-RnJvbTogU2hpbmFzIFJhc2hlZWQgPHNyYXNoZWVkQG1hcnZlbGwuY29tPg0KPiBTZW50OiAzMCBP
-Y3RvYmVyIDIwMjMgMTQ6MTUNCj4gDQo+IEhpLA0KPiANCj4gSSB1bmRlcnN0YW5kIHRoZSB3aW5k
-b3cgaXMgY2xvc2VkLCBidXQganVzdCByZXBseWluZyB0byBhIHBlbmRpbmcgY29tbWVudCBvbiB0
-aGUgdGhyZWFkLg0KPiANCj4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206
-IERhdmlkIExhaWdodCA8RGF2aWQuTGFpZ2h0QEFDVUxBQi5DT00+DQo+ID4gLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LQ0KPiA+IEZyb206IFNoaW5hcyBSYXNoZWVkDQo+ID4gPiBTZW50OiAyNCBPY3RvYmVyIDIwMjMg
-MTU6NTENCj4gPiA+DQo+ID4gPiBBZGQgeG1pdF9tb3JlIGhhbmRsaW5nIGluIHR4IGRhdGFwYXRo
-IGZvciBvY3Rlb25fZXAgcGYuDQo+ID4gPg0KPiA+IC4uLg0KPiA+ID4gLQ0KPiA+ID4gLQkvKiBS
-aW5nIERvb3JiZWxsIHRvIG5vdGlmeSB0aGUgTklDIHRoZXJlIGlzIGEgbmV3IHBhY2tldCAqLw0K
-PiA+ID4gLQl3cml0ZWwoMSwgaXEtPmRvb3JiZWxsX3JlZyk7DQo+ID4gPiAtCWlxLT5zdGF0cy5p
-bnN0cl9wb3N0ZWQrKzsNCj4gPiA+ICsJLyogUmluZyBEb29yYmVsbCB0byBub3RpZnkgdGhlIE5J
-QyBvZiBuZXcgcGFja2V0cyAqLw0KPiA+ID4gKwl3cml0ZWwoaXEtPmZpbGxfY250LCBpcS0+ZG9v
-cmJlbGxfcmVnKTsNCj4gPiA+ICsJaXEtPnN0YXRzLmluc3RyX3Bvc3RlZCArPSBpcS0+ZmlsbF9j
-bnQ7DQo+ID4gPiArCWlxLT5maWxsX2NudCA9IDA7DQo+ID4gPiAgCXJldHVybiBORVRERVZfVFhf
-T0s7DQo+ID4NCj4gPiBEb2VzIHRoYXQgcmVhbGx5IG5lZWQgdGhlIGNvdW50Pw0KPiA+IEEgJ2Rv
-b3JiZWxsJyByZWdpc3RlciB1c3VhbGx5IGp1c3QgdGVsbHMgdGhlIE1BQyBlbmdpbmUNCj4gPiB0
-byBnbyBhbmQgbG9vayBhdCB0aGUgdHJhbnNtaXQgcmluZy4NCj4gPiBJdCB0aGVuIGNvbnRpbnVl
-cyB0byBwcm9jZXNzIHRyYW5zbWl0cyB1bnRpbCBpdCBmYWlscw0KPiA+IHRvIGZpbmQgYSBwYWNr
-ZXQuDQo+ID4gU28gaWYgdGhlIHRyYW5zbWl0IGlzIGFjdGl2ZSB5b3UgZG9uJ3QgbmVlZCB0byBz
-ZXQgdGhlIGJpdC4NCj4gPiAoQWx0aG91Z2ggdGhhdCBpcyBhY3R1YWxseSByYXRoZXIgaGFyZCB0
-byBkZXRlY3QuKQ0KPiANCj4gVGhlIHdheSB0aGUgb2N0ZW9uIGhhcmR3YXJlIHdvcmtzIGlzIHRo
-YXQgaXQgZXhwZWN0cyBudW1iZXIgb2YgbmV3bHkgdXBkYXRlZCBwYWNrZXRzDQo+IHRvIGJlIHdy
-aXR0ZW4gdG8gdGhlIGRvb3JiZWxsIHJlZ2lzdGVyLHdoaWNoIGVmZmVjdGl2ZWx5IGluY3JlbWVu
-dHMgdGhlIGRvb3JiZWxsDQo+IGNvdW50IHdoaWNoIHNoYWxsIGJlIGRlY3JlbWVudGVkIGJ5IGhh
-cmR3YXJlIGFzIGl0IHJlYWRzIHRoZXNlIHBhY2tldHMuIFNvIGluIGVzc2VuY2UsDQo+IHRoZSBk
-b29yYmVsbCBjb3VudCBhbHNvIGluZGljYXRlcyBvdXRzdGFuZGluZyBwYWNrZXRzIHRvIGJlIHJl
-YWQgYnkgaGFyZHdhcmUuDQoNClVudXN1YWwgLSBJIHdvdWxkbid0IGNhbGwgdGhhdCBhIGRvb3Ji
-ZWxsIHJlZ2lzdGVyLg0KDQo+ID4gVGhlICd4bWl0X21vcmUnIGZsYWcgaXMgdXNlZnVsIGlmICh0
-aGUgZXF1aXZhbGVudCBvZikgd3JpdGluZw0KPiA+IHRoZSBkb29yYmVsbCByZWdpc3RlciBpcyBl
-eHBlbnNpdmUgc2luY2UgaXQgY2FuIGJlIGRlbGF5ZWQNCj4gPiB0byBhIGxhdGVyIGZyYW1lIGFu
-ZCBvbmx5IGRvbmUgb25jZSAtIGFkZGluZyBhIHNsaWdodCBsYXRlbmN5DQo+ID4gdG8gdGhlIGVh
-cmxpZXIgdHJhbnNtaXRzIGlmIHRoZSBtYWMgZW5naW5lIHdhcyBpZGxlLg0KPiA+DQo+ID4gSSdt
-IG5vdCBzdXJlIGhvdyBtdWNoIChpZiBhbnkpIHBlcmZvcm1hbmNlIGdhaW4geW91IGFjdHVhbGx5
-DQo+ID4gZ2V0IGZyb20gYXZvaWRpbmcgdGhlIHdyaXRlbCgpLg0KPiA+IFNpbmdsZSBQQ0llIHdy
-aXRlcyBhcmUgJ3Bvc3RlZCcgYW5kIHByZXR0eSBtdWNoIGNvbXBsZXRlbHkNCj4gPiBhc3luY2hy
-b25vdXMuDQo+IA0KPiBDYW4geW91IGVsYWJvcmF0ZSB3aGF0IHlvdSBhcmUgc3VnZ2VzdGluZyBo
-ZXJlIHRvIGRvPyBUaGUgZHJpdmVyIGlzIHRyeWluZw0KPiB0byBtYWtlIHVzZSBvZiB0aGUgJ3ht
-aXRfbW9yZScgaGludCBmcm9tIHRoZSBuZXR3b3JrIHN0YWNrLCBhcyBhbnkgbmV0d29yaw0KPiBk
-cml2ZXIgbWlnaHQgb3B0IHRvIGRvLg0KDQpUaGVyZSBhcmUgc29tZSBkcml2ZXJzIHdoZXJlIHdh
-a2luZyB1cCB0aGUgTUFDIGVuZ2luZSBpcyBleHBlbnNpdmUuDQpJZiB5b3UgbmVlZCB0byBkbyBh
-IFBDSWUgcmVhZCB0aGVuIHRoZXkgYXJlIGV4cGVuc2l2ZS4NClRoZXJlIG1pZ2h0IGFsc28gYmUg
-ZHJpdmVycyB0aGF0IG5lZWQgdG8gc2VuZCBhIFVTQiBtZXNzYWdlLg0KSSBkb24ndCBhY3R1YWxs
-eSBrbm93IHdoaWNoIG9uZSBpdCB3YXMgYWRkZWQgZm9yLg0KDQo+IEkgdGhpbmsgYXZvaWRpbmcg
-Y29udGludW91cyBQQ0llIHBvc3RzIGZvciBlYWNoIHBhY2tldCBzaGFsbCBzdGlsbCBiZSB3YXN0
-ZWZ1bA0KPiBhcyB0aGUgaGFyZHdhcmUgY2FuIGJ1bGsgcmVhZCBmcm9tIHRoZSBxdWV1ZSBpZiB3
-ZSBnaXZlIGl0IGEgYmF0Y2ggb2YgcGFja2V0cy4NCg0KSWYgeW91IGRvIHdyaXRlcyBmb3IgZXZl
-cnkgcGFja2V0IHRoZW4gdGhlIGhhcmR3YXJlIGNhbiBnZXQgb24gd2l0aA0Kc2VuZGluZyB0aGUg
-Zmlyc3QgcGFja2V0IGFuZCBtaWdodCBiZSBhYmxlIHRvIGRvIGJ1bGsgcmVhZHMNCmZvciB0aGUg
-bmV4dCBwYWNrZXQocykgd2hlbiB0aGF0IGZpbmlzaGVzLg0KDQpUaGUgZXh0cmEgY29kZSB5b3Ug
-YXJlIGFkZGluZyBjb3VsZCBlYXNpbHkgKHdhdmluZyBoYW5kcykNCmJlIG1vcmUgZXhwZW5zaXZl
-IHRoYW4gdGhlIHBvc3RlZCBQQ0llIHdyaXRlLg0KKEVzcGVjaWFsbHkgaWYgeW91IGhhdmUgdG8g
-YWRkIGFuIGF0b21pYyBvcGVyYXRpb24uKQ0KDQpVbmxlc3MsIG9mIGNvdXJzZSwgeW91IGhhdmUg
-dG8gd2FpdCBmb3IgaXQgdG8gc2VuZCB0aGF0IGJhdGNoDQpvZiBwYWNrZXRzIGJlZm9yZSB5b3Ug
-Y2FuIGdpdmUgaXQgYW55IG1vcmUuDQpXaGljaCB3b3VsZCBiZSByYXRoZXIgZW50aXJlbHkgYnJv
-a2VuIGFuZCB3b3VsZCByZWFsbHkgcmVxdWlyZQ0KeW91IGRvIHRoZSB3cml0ZSBpbiB0aGUgZW5k
-LW9mLXRyYW5zaXQgcGF0aC4NCg0KPiA+IFRoZSBvdGhlciBwcm9ibGVtIEkndmUgc2VlbiBpcyB0
-aGF0IG5ldGRldl94bWl0X21vcmUoKSBpcw0KPiA+IHRoZSBzdGF0ZSBvZiB0aGUgcXVldWUgd2hl
-biB0aGUgdHJhbnNtaXQgd2FzIHN0YXJ0ZWQsIG5vdA0KPiA+IHRoZSBjdXJyZW50IHN0YXRlLg0K
-PiA+IElmIGEgcGFja2V0IGlzIGFkZGVkIHdoaWxlIHRoZSBlYXJsaWVyIHRyYW5zbWl0IHNldHVw
-IGNvZGUNCj4gPiBpcyBydW5uaW5nIChzZXR0aW5nIHVwIHRoZSBkZXNjcmlwdG9ycyBldGMpIHRo
-ZSBpdCBpc24ndCBzZXQuDQo+ID4gU28gdGhlIGZhc3QgcGF0aCBkb2Vzbid0IGdldCB0YWtlbi4N
-Cj4gDQo+IEJ5IHRoZSBuZXh0IHBhY2tldCB0aGUga2VybmVsIHNlbmRzLCB0aGUgeG1pdF9tb3Jl
-IHNob3VsZCBiZSBzZXQNCj4gYXMgZmFyIEkgdW5kZXJzdGFuZCwgcmlnaHQ/IChhcyB0aGUgeG1p
-dF9tb3JlIGJvb2wgaXMgc2V0IGlmIHNrYi0+bmV4dA0KPiBpcyBwcmVzZW50LCBpZiB0aGUgdHJh
-bnNtaXQgcGF0aCBmb2xsb3dzIGRldl9oYXJkX3N0YXJ0X3htaXQpLg0KDQpUaGUgbG9vcCBpcyBz
-b21ldGhpbmcgbGlrZToNCgl3aGlsZSAoZ2V0X3BhY2tldCgpKSB7DQoJCXBlcl9jcHUtPnhtaXRf
-bW9yZSA9ICFxdWV1ZV9lbXB0eSgpOw0KCQlpZiAodHJhbnNtaXRfcGFja2V0KCkgIT0gVFhfT0sp
-DQoJCQlicmVhazsNCgl9DQpTbyBpZiBhIHBhY2tldCBpcyBhZGRlZCB3aGlsZSBhbGwgdGhlIHRy
-YW5zbWl0IHNldHVwIGNvZGUgaXMgcnVubmluZw0KaXQgaXNuJ3QgZGV0ZWN0ZWQuDQpJIG1hbmFn
-ZWQgdG8gcmVwZWF0ZWRseSBnZXQgdGhhdCB0byBsb29wIHdoZW4geG1pdF9tb3JlIHdhc24ndCBz
-ZXQNCmFuZCBpbiBhIGRyaXZlciB3aGVyZSB0aGUgJ2Rvb3JiZWxsJyB3cml0ZSB3YXNuJ3QgZW50
-aXJlbHkgdHJpdmlhbC4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lk
-ZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0K
-UmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
+On Mon, Oct 30, 2023 at 05:23:25PM +0200, Vladimir Oltean wrote:
+> On Mon, Oct 30, 2023 at 03:37:24PM +0100, Linus Walleij wrote:
+> > On Mon, Oct 30, 2023 at 3:16 PM Vladimir Oltean <olteanv@gmail.com> wrote:
+> > 
+> > > Could you please try to revert the effect of commit 339133f6c318 ("net:
+> > > dsa: tag_rtl4_a: Drop bit 9 from egress frames") by setting that bit in
+> > > the egress tag again? Who knows, maybe it is the bit which tells the
+> > > switch to bypass the forwarding process.
+> > 
+> > I have already tried that, it was one of the first things I tried,
+> > just looking over the git log and looking for usual suspects.
+> > 
+> > Sadly it has no effect whatsoever, the problem persists :(
+> > 
+> > > Or maybe there is a bit in a
+> > > different position which does this. You could try to fill in all bits in
+> > > unknown positions, check that there are no regressions with packet sizes
+> > > < 1496, and then see if that made any changes to packet sizes >= 1496.
+> > > If it did, try to see which bit made the difference.
+> > 
+> > Hehe now we're talking :D
+> > 
+> > I did something similar before, I think just switching a different bit
+> > every 10 packets or so and running a persistent ping until it succeeds
+> > or not.
+> > 
+> > I'll see what I can come up with.
+> > 
+> > Yours,
+> > Linus Walleij
+> 
+> And the drop reason in ethtool -S also stays unchanged despite all the
+> extra bits set in the tag? It still behaves as if the packet goes
+> through the forwarding path?
+
+Could you please place these skb_dump() calls before and after the magic
+__skb_put_padto() call, for us to see if anything unexpected changes?
+Maybe the socket buffers have some unusual geometry which the conduit
+interface doesn't like, for some reason.
+
+The number of skb dumps that you provide back should be even, and
+ideally the first one should be the unaltered packet, to avoid confusion :)
+
+diff --git a/net/dsa/tag_rtl4_a.c b/net/dsa/tag_rtl4_a.c
+index 25238093686c..2ca189b5125e 100644
+--- a/net/dsa/tag_rtl4_a.c
++++ b/net/dsa/tag_rtl4_a.c
+@@ -41,18 +41,22 @@ static struct sk_buff *rtl4a_tag_xmit(struct sk_buff *skb,
+ 	u8 *tag;
+ 	u16 out;
+ 
+-	/* Pad out to at least 60 bytes */
+-	if (unlikely(__skb_put_padto(skb, ETH_ZLEN, false)))
+-		return NULL;
+-
+ 	/* Packets over 1496 bytes get dropped unless they get padded
+ 	 * out to 1518 bytes. 1496 is ETH_DATA_LEN - tag which is hardly
+ 	 * a coinicidence, and 1518 is ETH_FRAME_LEN + FCS so we define
+ 	 * the threshold size and padding like this.
+ 	 */
+ 	if (skb->len >= (ETH_DATA_LEN - RTL4_A_HDR_LEN)) {
++		skb_dump(KERN_ERR, skb, true);
++
+ 		if (unlikely(__skb_put_padto(skb, ETH_FRAME_LEN + ETH_FCS_LEN, false)))
+ 			return NULL;
++
++		skb_dump(KERN_ERR, skb, true);
++	} else {
++		/* Pad out to at least 60 bytes */
++		if (unlikely(__skb_put_padto(skb, ETH_ZLEN, false)))
++			return NULL;
+ 	}
+ 
+ 	netdev_dbg(dev, "add realtek tag to package to port %d\n",
+-- 
+2.34.1
 
 
