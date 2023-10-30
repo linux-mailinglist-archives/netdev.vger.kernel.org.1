@@ -1,188 +1,196 @@
-Return-Path: <netdev+bounces-45183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14FA97DB490
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 08:46:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C377DB4A0
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 08:55:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46CB71C20904
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 07:46:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFE1F1C208A5
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 07:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8433A6FAF;
-	Mon, 30 Oct 2023 07:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A05CA61;
+	Mon, 30 Oct 2023 07:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HS/r0+NY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="irZ/4Y2d"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DC31113
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 07:46:53 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E0BA2
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 00:46:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698652011; x=1730188011;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=TDksR4q0Azf5t0tnFmDRtjKnHz4j5LYSGlJXWfMw8aw=;
-  b=HS/r0+NYtujPytqF2wJNy8kscR1mJf7qgzOtL+fMeHly/c1imV/ca4ln
-   pQF1ZZdvl4FJ4Z3PFHm2kW78UtMpapfs216oSFT8kZ5jZZo8eZDjd+ALm
-   K6hEeJ1ZyQKkTOB7y7bHwa2GesMXTUI6PURnfNn3B/xk1jAMzavpf3PzU
-   VO37aw3akNwjP8QVOSOxrIHD43e06orgsgjEjfgGbROCWp4M38BY5U7wS
-   ITDfq+NU49vg7iiOFIU8AGmf6yTPQ/mGoe8MJ9cZ+Hk+81bxvIUgHAQZT
-   pPa1KWjZRsMnkV2w2GrHKaQjtedVrPq+yNvduc0IWt11/Vz8AQKUOtm7v
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10878"; a="474263063"
-X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
-   d="scan'208";a="474263063"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 00:46:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
-   d="scan'208";a="1389098"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Oct 2023 00:46:52 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 30 Oct 2023 00:46:50 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 30 Oct 2023 00:46:50 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 30 Oct 2023 00:46:50 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RRvq3x+5vL8rB8jzQkYD9JM0kR3Zp4TMvmAbWLcOg3Rs7BuE/VamDiRTyOghuG9WdQqdt3BzYcEAhQvQ+kJZrgUhLBFZR9bsX2dU9frMIpqIiWXP1A9UkSzT7wf07WKgkgHxbPwyG+pv4bTbgCj8yox7hxUgPuNjzwKOKZsQo+d5QrIMoJ3x5IqBYKxSzzb/WPyL/7MQhU8weYMF4Rh/MGZwad2TlyAuR+xMNLWwPNO9u8tbykgO3Bgod7aevNvcVIHa+S/6Sp0e8OrA/GoOTG+Pl5zWG1bOiVugAC/QUFHK5R0QM3MmXW38TmjA22Ap/wVapPV0VM1urilg5S6icQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WqMgL5GzpWD6mURS3Bn3CZgqbxVZVohDgHwpYEyA13U=;
- b=iXXeh2EJowjuQSgUPbVgPt4g4QR3o5pY7p+yF9oxI5bWcXZGamr2b8c9MnhZw33RyZtevVV9BxnVMJOxx2Qh0+9MqRNxzQNDfc72aU4W2lGpxT4C6PgHZP+OotFqwfb5qV6zPYIeEj9zihbTMMaRwrWs6WK5Q35ZVbx1o16r72x1SLZgCbAYKvfUJ0XWIfHXMOMw5nGuSRPWLC4OspRf0KTm5HiL5YDbsa5WiMJtFUbPOWvVuz3NHiseCzaglirvHxgmYjrPz4t5JPukL1LpR/+orNvrMm7XdsZbE0sV+SprQYWRFJcE+UnGJTCggjcJIeWLx8slWU+1FwckmCgqlQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
- by SN7PR11MB7510.namprd11.prod.outlook.com (2603:10b6:806:349::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.27; Mon, 30 Oct
- 2023 07:46:49 +0000
-Received: from PH0PR11MB5013.namprd11.prod.outlook.com
- ([fe80::d5af:4ec3:b590:6cc]) by PH0PR11MB5013.namprd11.prod.outlook.com
- ([fe80::d5af:4ec3:b590:6cc%4]) with mapi id 15.20.6933.028; Mon, 30 Oct 2023
- 07:46:49 +0000
-From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
-To: Marcin Szycik <marcin.szycik@linux.intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Michal Swiatkowski
-	<michal.swiatkowski@linux.intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net] ice: Fix VF-VF direction
- matching in drop rule in switchdev
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] ice: Fix VF-VF direction
- matching in drop rule in switchdev
-Thread-Index: AQHaB1JautlsyDNGYE6yaGgxHxVUW7Bh+8SQ
-Date: Mon, 30 Oct 2023 07:46:48 +0000
-Message-ID: <PH0PR11MB5013F399AFD55F21D31E660796A1A@PH0PR11MB5013.namprd11.prod.outlook.com>
-References: <20231025144724.234304-1-marcin.szycik@linux.intel.com>
-In-Reply-To: <20231025144724.234304-1-marcin.szycik@linux.intel.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|SN7PR11MB7510:EE_
-x-ms-office365-filtering-correlation-id: 7ab0cc0e-db44-4b75-d50c-08dbd91c5fa0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Yci00PinNysW8i2fYe485seLnCjNo8HchU1nebqNBMGR8nAJzqKHWaMU56XcSP+LBjc9WQn7bq3VAm2qTjccr5Mi7AkDaMSBQaNC2lAWOwpmvEJIv9h7io9mKouHsfJR9O/WI4J8uXGMLPhGd7o8I8mtZBRfGktcRX0MJD5Z+lg+D+ztC0BSeWdc+puOYQb5ay++F/nlUKq7DtJNNYvgcKThFJW2T6B0mvOI2RqMPrIp8ACQXKMJiIznKDkkZjFtY7Bso3ZubL/Z3eYuXUPpUmSMbeXpmP/5XDPQ5edg7NMMKizeNkV8y45y/UZv73/zxZYrI0G5T++mCjGRPus5gdXmpHEYKcnKIA15z+A7KBbBRF96872fmfbyroRTQqD2e3c+akiEBDn7RW8zV09qDzuGp7eVeQVolAJlppnqqlouS49v101lbajOFoaCKpFq9pBbYl3XxB+5d21r3N+SxyPdRN0FY9rEA7TYZWZ6DyKV/XJDIizWv55S2Q7LXYtRkC6b7slo6iBB6tN/p0rlHD9af9AYxjQzLwjRIOJRkymJ8lt/oR8+O8f5TE5vXMs58N0s3cFQ/pUGfF9cIbk10EZlV09NBTp5VlXpJzsKq3FAoWRv1nO+tgwESUZAO74a
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(39860400002)(136003)(366004)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(55016003)(66556008)(54906003)(66476007)(66446008)(64756008)(122000001)(82960400001)(316002)(38100700002)(71200400001)(7696005)(53546011)(9686003)(478600001)(110136005)(83380400001)(76116006)(66946007)(6506007)(26005)(5660300002)(41300700001)(2906002)(4744005)(8676002)(8936002)(4326008)(86362001)(33656002)(52536014)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?OsoZWOJ+J6vfcxpOM0VQmIpMeoyyoIeDPIfNgKGWUO71bTewGcMvevho2glq?=
- =?us-ascii?Q?3UZh2EcHh0OLxOtBg53C/oi1twKDbibey36H+Bt9fgyEw2rhDUJfl4qdaKX+?=
- =?us-ascii?Q?gGM5TwBJce8N0yGAmiErIxNO5lfxDEesLbtaiBioZXPQNjs/iqEaOtp75Qk1?=
- =?us-ascii?Q?eRqCepn8blOiDr7GaQ9yf29rlyYDVPz0TGlU3nKT4EsdhAl5TevZ6R7nSmjQ?=
- =?us-ascii?Q?AhojmECX/NU/Ys1NmUGGej7HhCy9TMvjPdTye7TT8l0g+KyI09wJ8SPkQ6Kq?=
- =?us-ascii?Q?SIX84G9Hz/fEYAspnVulvQtfKdOyPfxw0f8ZGNtoGgDuXMjWtMYGr9vtXNxR?=
- =?us-ascii?Q?mgjGbI3JCrxnt4d8S2PPZh++TUOHnBqxc850Kul7xLZ3ZBJleBEFiJKNb2rL?=
- =?us-ascii?Q?nZ+WSM2mz/kDr/kki7QSdWN5KoAB5x+M5FXt5pXWIeisKLp8ofI0O1xrwvId?=
- =?us-ascii?Q?YkSxTq63UvJkzaU1arIcVaGesfSWpj9Q/L/Ot3FpMMWsz6MQPDCViqO7pcut?=
- =?us-ascii?Q?1Q1BaU/mZgfxnOKU8nEzBCAj8PS4ddYuC3feOkRzOgZoY8cuMuiGxuKGyGHk?=
- =?us-ascii?Q?oyK0F/eyFOao9HAjb9Ydj2CXwF0Xoji9j7Uv9hHhvESJwTOVoeM9iyA7BcRe?=
- =?us-ascii?Q?aBDUgQmYAZiY/SDZqPYBBhqoEbk9WpLrUZQa5KOQvy/8/tLaW7i5SQJ95m62?=
- =?us-ascii?Q?inUkqjdM/yf8DhpQL9Gt6oefcRdKX8UzQMaM2sKPnkFkkYzyKyUa5dyVl69i?=
- =?us-ascii?Q?zjaO2iNQz6eZm5dWMQ48z/pjn1KZf2ctB3wpIvLMD7yYVmfNaZBLv1qZa3gK?=
- =?us-ascii?Q?soKEFx9YzdT8mhIwslb6nh44e7OscKR71rINeQJ2R83K/PcWvNJtDuQWHWVZ?=
- =?us-ascii?Q?8aw3+r4ID3KJEqAqsokiXdXhyEBbCtAzJBuu9U3U1AmrxZ/zRelr8qzS3dW7?=
- =?us-ascii?Q?JWvTVrup/M99+weajjVbYYwOt2buI9tjBN85yYO4AzUgFGhyol88ZT87dRbR?=
- =?us-ascii?Q?y6tVh3LTcZuUhSco9q6xwaOMzpJg0odVg84vUirvCdiJnY8UJhYWaTlLHPLx?=
- =?us-ascii?Q?sb54kqTRT6CI31awnXhK+G0AL+TTWSLTRtEIAdYHz20oh2T1gNZEaGfVR/hq?=
- =?us-ascii?Q?1GjhAnnUMovhWyYJnzq6F+3QIoEXuKc25baRwl8juLitEujj6S3NcIgLgdw2?=
- =?us-ascii?Q?g0T5XCFfJkD+zfMzJAaIW/4nV1f/xVM1As4ocICbcWF15Mbig20Xz05LN0BI?=
- =?us-ascii?Q?wwEUG7bjz5Tan+Ozx8A5TypFmtSMDKx38EuwsGXxgT9bHXIrJ6Ffj+f2MQ9O?=
- =?us-ascii?Q?+IQt/HWGRXx507fZc3sNSAsByt4UELuvl2nl2G0mc2e9xYEAxTe/iTDDsLMN?=
- =?us-ascii?Q?I0BwL3xWE201moi3EvqrtFdo8MnMGWCweW4f+vsTovUIJBIXMNp9DcdMefom?=
- =?us-ascii?Q?LjOtDkbXHYlMl9MEg5bIRfN1TULWM61I70F55ebTAfXeE1v1l4WXQ7zwLKFZ?=
- =?us-ascii?Q?nwaPGhXwYcFM23sAozb7o9s/ao3ff2wym9jgqGIkkrzAfaeFy2vVzmQv3lkG?=
- =?us-ascii?Q?hInQz5436y3Sg+vTMC4JUx1KuovdXQ/RRSofM1K0JvP2czBNiVKA8hDdv0+l?=
- =?us-ascii?Q?6g=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD3D6AC0
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 07:55:52 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE7CEC2
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 00:55:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698652549;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=5t9eU8J5yxO7BvU8JT+OpUytvz6S9LcChDCUUgV2Oz8=;
+	b=irZ/4Y2dQSaBsBuzaueaPk+OvJb2xtduDvBqGfzbuwamlcmVl7fVT2F7okjTkVdvTutUqZ
+	FpxQw9hwVQqid9ASePBC9fvc2AlrujBVMVWfwzKVUh7w1VOsp4HEC/jLf2eCKGD9ZjyFVk
+	PcF8R7Rcp2vaRC+hNMbKnfiULEyOOqM=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-653-HI4T-qURNkmJNqNdorOGTA-1; Mon, 30 Oct 2023 03:55:47 -0400
+X-MC-Unique: HI4T-qURNkmJNqNdorOGTA-1
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-6bf2b098e43so2589353b3a.3
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 00:55:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698652546; x=1699257346;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5t9eU8J5yxO7BvU8JT+OpUytvz6S9LcChDCUUgV2Oz8=;
+        b=CnaWrqeRIYa63QhKoW36YS8NvOI7yRAOtCJXU6a5Xg346Iji+jD4Y0fOm+5fP5K/Et
+         r6U5e/CSqMXoB0t0OpwN7GSdWClFvN8S3xcWQuYxqPL9kjnHbfxPE3UtiRHPAUAciaXo
+         quBWRHtEKxw81RYMoCAGX/tFg5i5ULiZVc3nBjAOqTnCxbhq2Pr+by6cTZLmkCgpL/U1
+         1u7HxKGNyBXZx6Xt1UD/lPkWO2FQ8ScGLV1jMJkhTT4D7klB4EVCvk9mjUX88u2rtjfd
+         Fp2jLglBEQK9l3gPtPMgD3zlWIycACujADB1A3feyXxoz2dX/Nx+8USq+DoBFRyJ7Hge
+         JEng==
+X-Gm-Message-State: AOJu0Yw2Gkcv/6YfhW67NQs/5u4ncNCJGtFxoGTkx1qrfbbr/Sped+Ac
+	WQLcgYxhOYT324a+Yl+/1uYXUCpcJxlFOhOMJkPDtaGX3j13LT0XTF6952Y6zSQh04ho2fNH9HI
+	zpMPsq1gUrUeJ38jM
+X-Received: by 2002:a05:6a20:3d0b:b0:16b:79c2:7d6e with SMTP id y11-20020a056a203d0b00b0016b79c27d6emr8487042pzi.30.1698652546280;
+        Mon, 30 Oct 2023 00:55:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFK1Rxl23x3SQRnaFLCEUYXHyALve0OUwu9/SycOUu0i0w32D2cvv1z7vkHbvguD9UjlU6/wA==
+X-Received: by 2002:a05:6a20:3d0b:b0:16b:79c2:7d6e with SMTP id y11-20020a056a203d0b00b0016b79c27d6emr8487037pzi.30.1698652545956;
+        Mon, 30 Oct 2023 00:55:45 -0700 (PDT)
+Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
+        by smtp.gmail.com with ESMTPSA id be3-20020a170902aa0300b001c9e53b721csm3016067plb.261.2023.10.30.00.55.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 00:55:45 -0700 (PDT)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: jmaloy@redhat.com,
+	ying.xue@windriver.com
+Cc: netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com,
+	syzbot+9425c47dccbcb4c17d51@syzkaller.appspotmail.com
+Subject: [PATCH net v3] tipc: Change nla_policy for bearer-related names to NLA_NUL_STRING
+Date: Mon, 30 Oct 2023 16:55:40 +0900
+Message-ID: <20231030075540.3784537-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ab0cc0e-db44-4b75-d50c-08dbd91c5fa0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Oct 2023 07:46:48.9530
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lsojqoggcUAduswUdxjUXAdATJrxmtECf3qRWz2lDFW1M7AINQKiJwTOguKOh3mWKhjVQR2IDu5TkG5Zmq5/5lXPl6m5YuR8+uox0Fah/3o=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7510
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Marcin Szycik
-> Sent: Wednesday, October 25, 2023 8:17 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Marcin Szycik <marcin.szycik@linux.intel.com>=
-;
-> Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net] ice: Fix VF-VF direction match=
-ing in
-> drop rule in switchdev
->=20
-> When adding a drop rule on a VF, rule direction is not being set, which
-> results in it always being set to ingress (ICE_ESWITCH_FLTR_INGRESS equal=
-s
-> 0). Because of this, drop rules added on port representors don't match an=
-y
-> packets.
->=20
-> To fix it, set rule direction in drop action to egress when netdev is a p=
-ort
-> representor, otherwise set it to ingress.
->=20
-> Fixes: 0960a27bd479 ("ice: Add direction metadata")
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_tc_lib.c | 24 ++++++++++++++++++++-
->  1 file changed, 23 insertions(+), 1 deletion(-)
->=20
-Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+syzbot reported the following uninit-value access issue [1]:
+
+=====================================================
+BUG: KMSAN: uninit-value in strlen lib/string.c:418 [inline]
+BUG: KMSAN: uninit-value in strstr+0xb8/0x2f0 lib/string.c:756
+ strlen lib/string.c:418 [inline]
+ strstr+0xb8/0x2f0 lib/string.c:756
+ tipc_nl_node_reset_link_stats+0x3ea/0xb50 net/tipc/node.c:2595
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:971 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
+ genl_rcv_msg+0x11ec/0x1290 net/netlink/genetlink.c:1066
+ netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2545
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1075
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0xf47/0x1250 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ sock_sendmsg net/socket.c:753 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
+ __sys_sendmsg net/socket.c:2624 [inline]
+ __do_sys_sendmsg net/socket.c:2633 [inline]
+ __se_sys_sendmsg net/socket.c:2631 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Uninit was created at:
+ slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3523
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:559
+ __alloc_skb+0x318/0x740 net/core/skbuff.c:650
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ netlink_alloc_large_skb net/netlink/af_netlink.c:1214 [inline]
+ netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1885
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ sock_sendmsg net/socket.c:753 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
+ __sys_sendmsg net/socket.c:2624 [inline]
+ __do_sys_sendmsg net/socket.c:2633 [inline]
+ __se_sys_sendmsg net/socket.c:2631 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+TIPC bearer-related names including link names must be null-terminated
+strings. If a link name which is not null-terminated is passed through
+netlink, strstr() and similar functions can cause buffer overrun. This
+causes the above issue.
+
+This patch changes the nla_policy for bearer-related names from NLA_STRING
+to NLA_NUL_STRING. This resolves the issue by ensuring that only
+null-terminated strings are accepted as bearer-related names.
+
+syzbot reported similar uninit-value issue related to bearer names [2]. The
+root cause of this issue is that a non-null-terminated bearer name was
+passed. This patch also resolved this issue.
+
+Fixes: 7be57fc69184 ("tipc: add link get/dump to new netlink api")
+Fixes: 0655f6a8635b ("tipc: add bearer disable/enable to new netlink api")
+Reported-and-tested-by: syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=5138ca807af9d2b42574 [1]
+Reported-and-tested-by: syzbot+9425c47dccbcb4c17d51@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=9425c47dccbcb4c17d51 [2]
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+v2->v3:
+- Change the title
+- Change the nla_policy for bearer-related names instead of using nla_strscpy()
+- Resolve bearer-name related issue too
+https://lore.kernel.org/all/20231020163415.2445440-1-syoshida@redhat.com/
+
+v1->v2:
+- Use nla_strscpy()
+- Fix similar bugs in other functions other than syzbot reported
+https://lore.kernel.org/all/20230924060325.3779150-1-syoshida@redhat.com/
+---
+ net/tipc/netlink.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/tipc/netlink.c b/net/tipc/netlink.c
+index e8fd257c0e68..1a9a5bdaccf4 100644
+--- a/net/tipc/netlink.c
++++ b/net/tipc/netlink.c
+@@ -88,7 +88,7 @@ const struct nla_policy tipc_nl_net_policy[TIPC_NLA_NET_MAX + 1] = {
+ 
+ const struct nla_policy tipc_nl_link_policy[TIPC_NLA_LINK_MAX + 1] = {
+ 	[TIPC_NLA_LINK_UNSPEC]		= { .type = NLA_UNSPEC },
+-	[TIPC_NLA_LINK_NAME]		= { .type = NLA_STRING,
++	[TIPC_NLA_LINK_NAME]		= { .type = NLA_NUL_STRING,
+ 					    .len = TIPC_MAX_LINK_NAME },
+ 	[TIPC_NLA_LINK_MTU]		= { .type = NLA_U32 },
+ 	[TIPC_NLA_LINK_BROADCAST]	= { .type = NLA_FLAG },
+@@ -125,7 +125,7 @@ const struct nla_policy tipc_nl_prop_policy[TIPC_NLA_PROP_MAX + 1] = {
+ 
+ const struct nla_policy tipc_nl_bearer_policy[TIPC_NLA_BEARER_MAX + 1]	= {
+ 	[TIPC_NLA_BEARER_UNSPEC]	= { .type = NLA_UNSPEC },
+-	[TIPC_NLA_BEARER_NAME]		= { .type = NLA_STRING,
++	[TIPC_NLA_BEARER_NAME]		= { .type = NLA_NUL_STRING,
+ 					    .len = TIPC_MAX_BEARER_NAME },
+ 	[TIPC_NLA_BEARER_PROP]		= { .type = NLA_NESTED },
+ 	[TIPC_NLA_BEARER_DOMAIN]	= { .type = NLA_U32 }
+-- 
+2.41.0
+
 
