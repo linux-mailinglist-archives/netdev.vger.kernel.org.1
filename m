@@ -1,159 +1,150 @@
-Return-Path: <netdev+bounces-45229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1BD77DB9D8
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 13:25:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 969EB7DB8B6
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:08:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 355B42814EC
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:25:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0474AB20CA2
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 11:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E62515E8F;
-	Mon, 30 Oct 2023 12:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1937411194;
+	Mon, 30 Oct 2023 11:08:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GIdjG8ls"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vHaaAgBB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC1715E8C
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 12:25:19 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2075.outbound.protection.outlook.com [40.107.220.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40B6AD6
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 05:25:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=clm94x+wyKFqLRzNKtXQnazPutKEgItUWNkunWAkInu+mAEmc8QDu1EaNN77HrLDE8GtQssU3befvBBuZydv3Ib/sHtBEtW6gEX+7r6pTavb3Kmqj56VfvTSjDllepvPOTml7V9nR4CtO3AYvjUwhTq3yCs9M5QWCDaMUe/AxHVAyQPmySoCsIjtmQm9qQWrmvqpMWCdsvqOKCjzC7kfrLigO/w8u87wfWEvJdNlr4pQITa4hp4kQym9MvmBusevhPB0U1Tkq6ufPX84P6/Uc09zs4A06eUscY1BvFJKKJ10ZX6mGSgZK4AXVHFREMc60M9Z2mM5/nxjMtxu66MjIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AOkjGiv12HRed4etXU/STksSdAfPvxUv0g7g39cHAvQ=;
- b=bI2mkvJOj/t2TAMC3WbInP8pASiFK9GP9P5cb3aBh5B6BYMV0dt8xBuNSFOrq2kf/eoyLE0/7G6PR7bQ1FO+1ZlVCIrf9/VTqTnO+6OkKWGlEmej+IyQIRIF3mTUxMTDzLlrIuIJOw/VJO6eb6k6ipOlRORoR/2JoXI+NLtf2c7nBgCvtNCkehUceFOlQwbfPIK+P7XhPpHc35vOVCqD/0ihon27WJSftXzsS50kdEVssw/fBaUzZ+7YJAbSL2X6FuA32MHx7WR4h8hAVgHmk5M5JSmIewNll07OEO8V7ZUn8cp/SoctzqI6s3vO0iAkRTnLgK34MyTDBKby8CTuzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=microchip.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AOkjGiv12HRed4etXU/STksSdAfPvxUv0g7g39cHAvQ=;
- b=GIdjG8ls8V57uX+mshBrmIeIWwm83T8nWviz3JxS3Fcmr5bhXQKyaMr9PvQv25NxIZ6gEPrFammBtFnmCLGN4fssYE7DfseIMu50+1KLytyAGOyGUIyfU8vYnhFrI47K0EwQr0vJMk56aOGridYz08saYVsi8PBNtouEvuvFsVsvP/HRxX80o6ZDc8TLFLcunNm1KErs5cyTQb1AN3Uelc1IbDACLW/UiUFQZek6Ll1/KEYSLEQQJ0a0aKHcqdSVcEZFZuRjytmk+wEVYF37bNtrmqMQQtqjssXqteS79951427BBGFNnDa72gCzcmXYmMG79u59tHeurkReSLKfqA==
-Received: from DS7P222CA0003.NAMP222.PROD.OUTLOOK.COM (2603:10b6:8:2e::19) by
- IA0PR12MB8301.namprd12.prod.outlook.com (2603:10b6:208:40b::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.26; Mon, 30 Oct
- 2023 12:25:14 +0000
-Received: from DS3PEPF000099DB.namprd04.prod.outlook.com
- (2603:10b6:8:2e:cafe::89) by DS7P222CA0003.outlook.office365.com
- (2603:10b6:8:2e::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.27 via Frontend
- Transport; Mon, 30 Oct 2023 12:25:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DS3PEPF000099DB.mail.protection.outlook.com (10.167.17.197) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6933.15 via Frontend Transport; Mon, 30 Oct 2023 12:25:13 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 30 Oct
- 2023 05:25:04 -0700
-Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 30 Oct
- 2023 05:25:02 -0700
-References: <20231024100403.762862-1-jiri@resnulli.us>
- <20231024100403.762862-4-jiri@resnulli.us>
- <61a6392e-5d77-4f15-bcd2-7bd26326d805@gmail.com>
- <878r7o5dht.fsf@nvidia.com>
- <a9b610e6-b0ce-46b6-89ea-faef78c5a4f2@gmail.com>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: David Ahern <dsahern@gmail.com>
-CC: Petr Machata <me@pmachata.org>, Jiri Pirko <jiri@resnulli.us>,
-	<netdev@vger.kernel.org>, <stephen@networkplumber.org>,
-	<daniel.machon@microchip.com>
-Subject: Re: [patch iproute2-next v3 3/6] devlink: extend
- pr_out_nested_handle() to print object
-Date: Mon, 30 Oct 2023 12:03:57 +0100
-In-Reply-To: <a9b610e6-b0ce-46b6-89ea-faef78c5a4f2@gmail.com>
-Message-ID: <871qdc5mcj.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DF7379
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 11:08:01 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D1B7A9
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:08:00 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-40850b244beso33763025e9.2
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 04:08:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698664079; x=1699268879; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LySuM1+hMHdVRTBo4hm5hOVSaASwzItae2Pgu8ozUv8=;
+        b=vHaaAgBBKYXoMaK/d7+QlQRapxniRrSVum9ipCigT6zj8a+yZcXpFOzKUluVRNN3sg
+         EanlC1nJkXEKu3VA5Yjezt2imOmWMDAZtMDhpu6uQTsc5cw9kvJNLFHTiyoTktnnGhS3
+         sboJIfBGPRZXZAG07zaqsTmEVJpNFN2BLUUvRvmP7t6DSAnB2Px6/ebTp0e+7Hvzx+xC
+         DxY7RihMBc6usacxKtDuWnmjgHqFBvZ1PwBE4893vy8uM0F/3yiBKrM1mLRgxFqUYsmD
+         V6h58N+aWJ0bQYYSpXNgqrp4XV40V+9rlxY/lVUbqLR5KLTSogapizdJPMbCfhwMaXku
+         hfpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698664079; x=1699268879;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LySuM1+hMHdVRTBo4hm5hOVSaASwzItae2Pgu8ozUv8=;
+        b=LSLj2M4Y5wFdw6esw+bgwwP+zA+GPJHcKZPfxw1c6C0GL1TolN3agN1+QpNguVJ4O/
+         2kjuiPG1Hj6vsU1JmruZYFz73oS5ainOtnc6Hs8YAGa1SF9jWhWMi8qEvvgtMsfA8PTd
+         Yr0guvqVz40XzQeTdIsGBOePf8HX/pN822lP+fVyDkjNt2ifQ9srU4/ipqAr4tPP/WIP
+         VvTn514Z//GJG+SbNM9RLc8+RrEII+gU80jwL78yrL/0wPLfhHxbAZ9HRtZDQM7cpab+
+         NLAabgRGBuTZPCAD0ZXsa0WvnjhAkwU+TNjEnNhL4Rwq60+7MZD3z66iQZ6G3NsykyrO
+         Pb5w==
+X-Gm-Message-State: AOJu0YwVKaqyEISpg2fTycp44FxseGoD4Vo6uojFRY1VVZkPxLvvBJ41
+	eflqX+EaGVql3Xla0C348JOXgg==
+X-Google-Smtp-Source: AGHT+IGCSXei8ur217aYgeuZWp78IYCsgCMRF77bspaDdGVI6lGKsSgo77Y9TWkNQ26hBrcdGFsa9g==
+X-Received: by 2002:a05:600c:a05:b0:409:773:cf5d with SMTP id z5-20020a05600c0a0500b004090773cf5dmr8004246wmp.28.1698664078803;
+        Mon, 30 Oct 2023 04:07:58 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.218.126])
+        by smtp.gmail.com with ESMTPSA id f24-20020a1c6a18000000b004063977eccesm12165035wmc.42.2023.10.30.04.07.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Oct 2023 04:07:58 -0700 (PDT)
+Message-ID: <5ec8490a-1f15-4b98-a3f4-f107f424fd0c@linaro.org>
+Date: Mon, 30 Oct 2023 12:07:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DB:EE_|IA0PR12MB8301:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f13e0c3-f46f-409e-f5e6-08dbd9434495
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	UlzHtQcnfKOURdMcQgUpHqi7lKqdgFsCT4AMmnhkWE1VGJv+9nVw92K1FHKJ6SHDHRSBwDRl+Rxpfjh19bC3BLciOrw+Ub9evfF01qed7UxaHvw9tlYTZrl2t/hRLnBNMT/7FvZVOrfZOxZ8DArFo2tHmpM41QPsoj4/uQejxKESarAwSAcLOf6w95AM/+3BadKqGupMhbCrasQZKzrUTpP/wO78noWhu5pF6IW5Gt2nrRJvtRwl3mXEGxA2k4E9+SIwM5e+IT2RpLIyWqbF8ALjzCNIdWuYnhkghMUEc1KxleH1qYlZHQD2T84nnpqAFytiji6+N7DXaf9AfukiZRLMDATC4s/vM9zgsbHCw15TCXSvBOAhJ8sH0j8rnHULhz1CtVEAz88XmiPYvew3V4nCz99BIL1nbYj2jwiPKaBr+2tYD60mj7Pe4dUFat8NNVVrKNLrenCXij3p6pbw69Z+JAFfKLjT9PZA8sEOkQz4hxAwqdFKEnUPwZBR7+yH3ysboAnZafQ7/ts77n+KJksXYSmQgsNvtKzQ7nJLwJ8fz3l+8ZUbfIXJEzaZ5EoRNcISM3NG8Sk9va7fowlv9uJuk0yOUPeSG6pVJ92zevjZvz2xRIWRq5DxrYoai32krS8Ohs/Z//16cXnGXHP84OK5uC8ICBqSdtILapibu2dXvD8pt31IIHoFq0ydcOHJtG0VqUEvb/ag5g+RwWT/WaH0pmnd5jFsamkVAvC8zlfnMj5flc6D+cAZ+VQW/dXi
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(136003)(376002)(346002)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(82310400011)(36840700001)(40470700004)(46966006)(2906002)(86362001)(41300700001)(4326008)(8676002)(8936002)(5660300002)(40460700003)(36756003)(478600001)(40480700001)(47076005)(6666004)(53546011)(7636003)(6916009)(54906003)(316002)(16526019)(26005)(70206006)(426003)(70586007)(336012)(36860700001)(83380400001)(82740400003)(2616005)(356005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 12:25:13.8365
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f13e0c3-f46f-409e-f5e6-08dbd9434495
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099DB.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8301
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/8] dt-bindings: clock: ipq5332: drop the few nss clocks
+ definition
+Content-Language: en-US
+To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>,
+ Bjorn Andersson <andersson@kernel.org>, Andy Gross <agross@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <20231030-ipq5332-nsscc-v1-0-6162a2c65f0a@quicinc.com>
+ <20231030-ipq5332-nsscc-v1-2-6162a2c65f0a@quicinc.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20231030-ipq5332-nsscc-v1-2-6162a2c65f0a@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 30/10/2023 10:47, Kathiravan Thirumoorthy wrote:
+> gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk are
+> enabled by default and it's RCG is properly configured by bootloader.
+> 
+> Some of the NSS clocks needs these clocks to be enabled. To avoid
+> these clocks being disabled by clock framework, drop these entries.
 
-David Ahern <dsahern@gmail.com> writes:
+This is not the way to prevent Linux from disabling the clocks. The way
+is to mark them as critical, so I do not think you provided accurate
+rationale for bindings change.
 
-> On 10/27/23 7:12 AM, Petr Machata wrote:
->> I was wondering whether somehing like this might make sense in the
->> iproute2 library:
->> 
->> 	#define alloca_sprintf(FMT, ...) ({					\
->> 		int xasprintf_n = snprintf(NULL, 0, (FMT), __VA_ARGS__);	\
->> 		char *xasprintf_buf = alloca(xasprintf_n);			\
->> 		sprintf(xasprintf_buf, (FMT), __VA_ARGS__);			\
->> 		xasprintf_buf;							\
->> 	})
->> 
->> 	void foo() {
->> 		const char *buf = alloca_sprintf("%x %y %z", etc.);
->> 		printf(... buf ...);
->> 	}
->> 
->> I'm not really happy with it -- because of alloca vs. array, and because
->> of the double evaluation. But all those SPRINT_BUF's peppered everywhere
->> make me uneasy every time I read or write them.
->
-> agreed.
->
->> 
->> Or maybe roll something custom asprintf-like that can reuse and/or
->> realloc a passed-in buffer?
->> 
->> The sprintf story is pretty bad in iproute2 right now, IMHO.
->
-> It is a bit of a mess. If you have a few cycles, want to send an RFC?
-> Just pick 1 or 2 to convert to show intent with a new design.
+Best regards,
+Krzysztof
 
-I picked at it a bit over the weekend, but came up with nothing that I
-find comfortable proposing. The static buffer approach has some major
-advantages: nothing ever fails and nothing ever needs cleanups. This
-keeps the client code tidy and compact. Anything dynamic adds points of
-failure and cleanups, which in C means more client-side boilerplate.
-Anyway, I'll pick at it some more and see I find anything.
 
