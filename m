@@ -1,62 +1,93 @@
-Return-Path: <netdev+bounces-45348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C6757DC301
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 00:15:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B62177DC32E
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 00:33:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E247D1C20AB0
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 23:15:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7091D281415
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 23:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD72A168B8;
-	Mon, 30 Oct 2023 23:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D1218E11;
+	Mon, 30 Oct 2023 23:33:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GH4SCN61"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShMnix/a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9C915E96
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 23:15:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB760C433C9;
-	Mon, 30 Oct 2023 23:15:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698707705;
-	bh=9umW4ZL1h/kspfg3KCaDmu0m+cqzhiIXiYtpSFVPNOA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GH4SCN612U+QFEpNv1tXJb1QCWqn457q8C6WX+17HrdA3G4JiyNsmt9s07RyQtINu
-	 G79YXdsQ49Btr48yd9YFwggdd+sU/DDrLiowqpQMPe/ybEiy4HhPsVXf03PwYx2AS1
-	 tjs9LJPqZIIUbDabAeLmFUyBgiIks2iNpriGWASMwe/vMptMqbkezHnNHETmo9q9C/
-	 bfm0Q91P2pfI5d/EV3lIF5M2Xv78SpskFsrIiLlOnrl5VJdINl13phLCLLeCdQtr44
-	 34Ft3QSwynllml8145pzK5720Zpt4tEl7h7a46YgDx8/YgdYddSCfAT1IZ7CToiX4f
-	 kk/qysJPIgc/A==
-Date: Mon, 30 Oct 2023 16:15:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [GIT PULL] Networking for 6.7
-Message-ID: <20231030161503.4f247eeb@kernel.org>
-In-Reply-To: <20231028011741.2400327-1-kuba@kernel.org>
-References: <20231028011741.2400327-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B372EAC0
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 23:33:41 +0000 (UTC)
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32E14C2;
+	Mon, 30 Oct 2023 16:33:38 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-408425c7c10so39900355e9.0;
+        Mon, 30 Oct 2023 16:33:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698708816; x=1699313616; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qYm41u7ayhqnUK+JOXZSmWC57AQCSUDe57Jp92vB994=;
+        b=ShMnix/a5ByCpr8GpO+JzXAgVA4kgrSCewhJVqBC4rKz1ExVX1M8A8W7TSDgZr2e2P
+         PANFAAX/F0HzY5sqjdvSB4OZ/kM9YF9MHhPG1X1tMh7G8yaclKGn1OQlHTPoewNZovmB
+         MNEM2uKM5BEgKBwTphWzzIycPiUFzvdLWn6vBsVLn5wQXaSPcSEgjIYOMypF9tm9igG/
+         /Yajpc6WGG+BEQt5ybDwnpPksqpgI5q9u7Imq7RREtX4/36rPui7eYgvpiohmDdhTb+I
+         eVSbxymfwtBa+co0ZMaOEekSMGvkpDZryXixGs5RvhFbzCPKaeADiyFF4AqL4wYApZek
+         92nA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698708816; x=1699313616;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qYm41u7ayhqnUK+JOXZSmWC57AQCSUDe57Jp92vB994=;
+        b=C3irSiGC0TD/oDUrZCKatECGQnpgFwjrq1wVZLA+ROJSQgg3p2RXOVKPrKbgdC46o+
+         LzudyA2sTHKJdFSfoKpsHnNgILxpJIBWRD2wux2WLdyxtCSwbSgUlogYEcv82YXJUMaD
+         zVd9v0yP/mAYuM5rFkigAM6D2kOeq2tYD1pMvhJcAFbMJsjLTIsllPd/9wbgK836zJv0
+         bnAmI/WpKeIAc64cW+tlxgnC2txp5i8BromaYm5nUW7YhkRAsCLzfFPSnxJe9utGO5NE
+         aE1d5NWTANh0zADnp3WHTIlUz1keKLsRI7gWuVrpHqOQUlpKKAM8nXOiVmUc14OZjkqz
+         V1SA==
+X-Gm-Message-State: AOJu0YykYkOgMS8hi/kpCiQnwZgAgg6NMC2z1vb+hS+vauacDxfyxVJO
+	xe6akNf3YbjiFutGs3pcbGX8tJOhz4yfqA==
+X-Google-Smtp-Source: AGHT+IEDx2dVwZ1t1/yIHxEQSJixAWuO6iqcNtDsXt5AMo8FXtAQWMsEuNtBVZWnqRilzygnlq6LWw==
+X-Received: by 2002:a05:600c:468e:b0:3fe:e7b2:c97f with SMTP id p14-20020a05600c468e00b003fee7b2c97fmr8689466wmo.36.1698708816388;
+        Mon, 30 Oct 2023 16:33:36 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id a15-20020a056000050f00b00326dd5486dcsm104081wrf.107.2023.10.30.16.33.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 16:33:36 -0700 (PDT)
+Date: Tue, 31 Oct 2023 01:33:34 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
+Message-ID: <20231030233334.jcd5dnojruo57hfk@skbuf>
+References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
+ <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
+ <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
+ <20231030222035.oqos7v7sdq5u6mti@skbuf>
+ <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
 
-On Fri, 27 Oct 2023 18:17:41 -0700 Jakub Kicinski wrote:
-> Hi Linus!
-> 
-> I'll be traveling next week, so anticipating no -rc8 here is our
-> merge window material.
+On Mon, Oct 30, 2023 at 11:57:33PM +0100, Linus Walleij wrote:
+> Here you can incidentally also see what happens if we don't pad the big packets:
+> the packet gets truncated.
 
-Minor heads up, there's a silent conflict with the crypto tree,
-you may want to squash this into whichever you merge second:
-https://lore.kernel.org/all/20231030160953.28f2df61@canb.auug.org.au/
+Are we sure we are debugging a switch problem? On how many platforms
+with the RTL8366RB can the issue be seen? Is the conduit interface the
+same on all these platforms, or is it different and that makes no
+difference?
 
