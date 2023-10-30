@@ -1,119 +1,97 @@
-Return-Path: <netdev+bounces-45256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1818F7DBBA2
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:24:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 140D87DBBD2
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:29:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3F842813B7
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:24:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D046B20C90
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D03E6179A9;
-	Mon, 30 Oct 2023 14:24:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85B7B1774F;
+	Mon, 30 Oct 2023 14:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fbi4/tjq"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q66Nu931"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3259179A0
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 14:24:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A332C433C8;
-	Mon, 30 Oct 2023 14:24:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698675841;
-	bh=LURC/rLxExQ3bpL0yDbWx8HByNj3zGefLpsyRChzNOg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fbi4/tjqgp6NsTt9Bvn9HXfbWDEjFvrMUY8hQmzw7deSuJEHllPcUTLi7ZvHf7Mt8
-	 9/tfm1EHLJ+VAL02abgN1L1nFYA3f9APuF2aPnwKdQNsZF9uJxzpKTYvv7qJt7ls6c
-	 V74ytnNQzA3uXKU/1MkXK2QrdQs5TjsB4x7Q1WBcQxJG1XGj9z14Wgeu8olo07s+TV
-	 J+MnXFpC6Uxi0kwx+8C6Mn2t+QiTzJJ+fRBrkp+PmHZCm/tjOswKmTktBMiH4av7jR
-	 sAZbYGp7jW3I+QoFouQOB43vQIeJG+g6x4rRk1J4GUl954yS+RY5GiCJqE4w9id49p
-	 1Nlufv+ddnkfA==
-Date: Mon, 30 Oct 2023 16:23:55 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Sven Auhagen <sven.auhagen@voleatech.de>
-Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, hawk@kernel.org, lorenzo@kernel.org,
-	Paulo.DaSilva@kyberna.com, mcroce@linux.microsoft.com
-Subject: Re: [PATCH v2 1/2] net: page_pool: check page pool ethtool stats
-Message-ID: <20231030142355.GB5885@unreal>
-References: <abr3xq5eankrmzvyhjd5za6itfm5s7wpqwfy7lp3iuwsv33oi3@dx5eg6wmb2so>
- <20231002124650.7f01e1e6@kernel.org>
- <ZTiu0Itkhbb8OqS7@hera>
- <20231025075341.GA2950466@unreal>
- <j2viq53y3m7z6lj6tkzqxijtavtdfsdnenl2yt2pl4jkqupm6w@aautqnvca6w3>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195DDCA68
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 14:29:43 +0000 (UTC)
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BC779F
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 07:29:41 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id 3f1490d57ef6-d9ac3b4f42cso4936435276.0
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 07:29:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698676180; x=1699280980; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g7wCCUpKRrJS75YLiT/U9xTHRv00wzxQlN/INc0kfAw=;
+        b=q66Nu931ktcoJb0N2QYBo9Ao0W67q7tEqUw6LQbwsHZOZz+twX1F++Ae51QCDZ2bgk
+         3EEKXlpj0hJoD737EFr5AiNXfd7m7UE9Bax3+1kODV3YLLzV0/3EgaPA8wPmaQigSXdD
+         mLuZd290mW9I/NG3vLUKAJKE+eAoh6PNLyToyFoBY9iRtMHXbWJ0YXRWts0vQtKrEwS/
+         7AIUywYr/JMDY6mSa/AVkwZyD4srqHei4grCWk2hSlu+d9CAG7x7xmPiPG0yX6pJ4uTD
+         cQz3EyQEAWO9djWz67XSJNqMj4symljq+HCrvJrUCQmNw1bbWIY9bn9GWmhdvjq1+GMz
+         dTyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698676180; x=1699280980;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g7wCCUpKRrJS75YLiT/U9xTHRv00wzxQlN/INc0kfAw=;
+        b=IeOpaXWpD+s+us+/VRi2su6pkfN0DA1kYhVVPAUjYwMDNTpDcszZZJ1KD8QgTV7bI5
+         Sv3yh//G2UAxE177cznYPfrxz6hVb7uBJevmzRpTldAKsWKrg0nA/WoQHmkRpg8b6ffB
+         H4ZXYscwl6a9ueyRAb58dTVI9L0fNkz+ZmoVeqWTnW47roUAztfNnbu+KcXbG5LRh9Aj
+         8VdwGMubPW6EduZpCRNrDeASnEUE7oPnbe+MiwIExYMGI19pkSSQkb8YUKKgK9ZxvO67
+         1B17HfN8nvlJtPywofOv7ax50KwcbCJPQMZc9GCF0+38DQozDdRmjeHRrwNHvxbDoXJT
+         MX/A==
+X-Gm-Message-State: AOJu0YzugOZwEUBvklaNSZ6713Xx8ov8Bk1pSOjbDzO5Xgid4QUcQ8wD
+	W83lPKKfe/aJhmldibKHF/fm6DJpxHM0CLHS50dGtg==
+X-Google-Smtp-Source: AGHT+IHEuY8or3WBjzxVCMAjxo8ALWrphZ5RqsKs5y+czx7cWMwRa6pCbEzNckPHRz8dE0gKHScUmwC8orxs0sVozbU=
+X-Received: by 2002:a25:dcd4:0:b0:d86:4342:290 with SMTP id
+ y203-20020a25dcd4000000b00d8643420290mr11467610ybe.21.1698676180428; Mon, 30
+ Oct 2023 07:29:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <j2viq53y3m7z6lj6tkzqxijtavtdfsdnenl2yt2pl4jkqupm6w@aautqnvca6w3>
+References: <20231027-fix-rtl8366rb-v1-1-d565d905535a@linaro.org>
+ <95f324af-88de-4692-966f-588287305e09@gmail.com> <CACRpkdbyMEqjW1a9oK-GM2_XL0famH1RgSXW-fQLszn9t9UhWw@mail.gmail.com>
+ <20231030125127.xccqwct3jgg6o2rl@skbuf>
+In-Reply-To: <20231030125127.xccqwct3jgg6o2rl@skbuf>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 30 Oct 2023 15:29:28 +0100
+Message-ID: <CACRpkdaPqg4X5HrLn_Nt3_FYNtd0bL4wAKWFfRXStvX9bWagYg@mail.gmail.com>
+Subject: Re: [PATCH] dsa: tag_rtl4_a: Bump min packet size
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 30, 2023 at 10:39:18AM +0100, Sven Auhagen wrote:
-> On Wed, Oct 25, 2023 at 10:53:41AM +0300, Leon Romanovsky wrote:
-> > On Wed, Oct 25, 2023 at 08:59:44AM +0300, Ilias Apalodimas wrote:
-> > > Hi Jakub,
-> > > 
-> > > On Mon, Oct 02, 2023 at 12:46:50PM -0700, Jakub Kicinski wrote:
-> > > > On Sun, 1 Oct 2023 13:41:15 +0200 Sven Auhagen wrote:
-> > > > > If the page_pool variable is null while passing it to
-> > > > > the page_pool_get_stats function we receive a kernel error.
-> > > > >
-> > > > > Check if the page_pool variable is at least valid.
-> > > >
-> > > > IMHO this seems insufficient, the driver still has to check if PP
-> > > > was instantiated when the strings are queried. My weak preference
-> > > > would be to stick to v1 and have the driver check all the conditions.
-> > > > But if nobody else feels this way, it's fine :)
-> > > 
-> > > I don't disagree, but OTOH it would be sane for the API not to crash if
-> > > something invalid is passed. 
-> > 
-> > In-kernel API assumes that in-kernel callers know how to use it.
-> > 
-> > > Maybe the best approach would be to keep the
-> > > driver checks, which are saner, but add the page pool code as well with a
-> > > printable error indicating a driver bug?
-> > 
-> > It is no different from adding extra checks to prevent drivers from random calls
-> > with random parameters to well defined API.
-> > 
-> > Thanks
-> 
-> I can see the point for both arguments so I think we should definitely
-> keep the driver check.
-> 
-> Is there a consensus on what to do on the page pool side?
-> Do you want me to keep the additional page pool check to prevent
-> a kernel crash?
+On Mon, Oct 30, 2023 at 1:51=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
+ wrote:
 
-I don't want to see bloat of checks in kernel API. They hide issues and
-not prevent them.
+> So, what Florian was asking is whether the conduit interface is not
+> doing its expected job properly. You clarified that the problem is big
+> rather than small packets, but we still need an explanation for the
+> existing __skb_put_padto() call, given that it seems that it was placed
+> there due to a misunderstanding rather than due to an explicit need for
+> an exceptional case.
 
-> I mean the mvneta change was also implemented with this problem
-> and it leads to serious side effects without an additional check.
-> Especially if the page pool ethtool stats is implemented in more
-> drivers in the future and the implementations are not 100% correct,
-> it will crash the kernel.
+Hm Deng added that and it was because the same was needed for
+some other tagger IIRC, let's see what he says.
 
-Like many other driver mistakes.
+I will do some tests to just remove it and see what happens.
 
-Thanks
-
-> 
-> Best
-> Sven
-> 
-> > 
-> > > 
-> > > Thanks
-> > > /Ilias
-> > > 
+Yours,
+Linus Walleij
 
